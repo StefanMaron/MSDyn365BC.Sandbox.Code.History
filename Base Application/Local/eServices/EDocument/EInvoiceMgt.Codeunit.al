@@ -1192,7 +1192,7 @@ codeunit 10145 "E-Invoice Mgt."
                       FormatDateTime(ServiceInvHeader."Date/Time Cancel Sent"), ServiceInvHeader."Date/Time Stamped", ServiceInvHeader."Fiscal Invoice Number PAC",
                       ServiceInvHeader."CFDI Cancellation Reason Code", ServiceInvoiceHeaderSubst."Substitution Document No.");
                 MethodTypeRef::CancelRequest:
-                    CancelStatusRequestXMLDocument(XMLDoc, OutStr, ServiceInvoiceHeaderSubst."CFDI Cancellation ID");
+                    CancelStatusRequestXMLDocument(XMLDoc, OutStr, ServiceInvHeader."CFDI Cancellation ID");
             end;
             Response := InvokeMethod(XMLDoc, MethodType);
 
@@ -7773,6 +7773,7 @@ IsVATExemptLine(TempDocumentLine));
     begin
         SalesInvoiceHeader."CFDI Cancellation Reason Code" := SalesInvoiceHeaderRec."CFDI Cancellation Reason Code";
         SalesInvoiceHeader."Substitution Document No." := SalesInvoiceHeaderRec."Substitution Document No.";
+        SalesInvoiceHeader."Fiscal Invoice Number PAC" := SalesInvoiceHeaderRec."Fiscal Invoice Number PAC";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, codeunit::"Sales Credit Memo Hdr. - Edit", 'OnBeforeSalesCrMemoHeaderModify', '', false, false)]
@@ -7780,6 +7781,13 @@ IsVATExemptLine(TempDocumentLine));
     begin
         SalesCrMemoHeader."CFDI Cancellation Reason Code" := FromSalesCrMemoHeader."CFDI Cancellation Reason Code";
         SalesCrMemoHeader."Substitution Document No." := FromSalesCrMemoHeader."Substitution Document No.";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, codeunit::"Service Inv. Header - Edit", 'OnOnRunOnBeforeTestFieldNo', '', false, false)]
+    local procedure UpdateServiceInvHeader(var ServiceInvoiceHeader: Record "Service Invoice Header"; ServiceInvoiceHeaderRec: Record "Service Invoice Header")
+    begin
+        ServiceInvoiceHeader."CFDI Cancellation Reason Code" := ServiceInvoiceHeaderRec."CFDI Cancellation Reason Code";
+        ServiceInvoiceHeader."Substitution Document No." := ServiceInvoiceHeaderRec."Substitution Document No.";
     end;
 
     [EventSubscriber(ObjectType::Codeunit, codeunit::"Shipment Header - Edit", 'OnBeforeSalesShptHeaderModify', '', false, false)]
