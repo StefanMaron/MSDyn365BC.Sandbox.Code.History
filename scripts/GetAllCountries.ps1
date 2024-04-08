@@ -1,5 +1,5 @@
 $countries = [System.Collections.ArrayList]::new()
-Get-BCArtifactUrl -select All -Type OnPrem | % {
+Get-BCArtifactUrl -select All -Type Sandbox | % {
     [System.Uri]$Url = $_
     [version]$Version = $Url.AbsolutePath.Split('/')[2]
     if ($Version -ge [version]::Parse('15.0.0.0')) {
