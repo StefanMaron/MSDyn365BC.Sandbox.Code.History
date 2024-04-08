@@ -1603,8 +1603,10 @@ codeunit 104000 "Upgrade - BaseApp"
             DefaultDimensionDataTransfer.AddConstantValue("Default Dimension Parent Type"::Employee, DefaultDimension.FieldNo("Parent Type"));
             DefaultDimensionDataTransfer.UpdateAuditFields := false;
             DefaultDimensionDataTransfer.CopyFields();
+            Clear(DefaultDimensionDataTransfer);
         end;
 
+        Clear(DefaultDimension);
         DefaultDimension.SetFilter(DimensionId, '%1', BlankGuid);
         if not DefaultDimension.IsEmpty() then begin
             DefaultDimensionDataTransfer.SetTables(Database::Dimension, Database::"Default Dimension");
