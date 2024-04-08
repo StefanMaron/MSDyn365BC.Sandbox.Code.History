@@ -1054,7 +1054,6 @@ codeunit 10145 "E-Invoice Mgt."
         XMLDoc: DotNet XmlDocument;
         Response: Text;
         OutStr: OutStream;
-        CancelDateTime: Text[50];
     begin
         if SalesInvHeader."Source Code" = SourceCodeSetup."Deleted Document" then
             Error(Text007);
@@ -1067,8 +1066,6 @@ codeunit 10145 "E-Invoice Mgt."
             SalesInvoiceHeaderSubst.Get(SalesInvHeader."Substitution Document No.");
 
         SalesInvHeader."Date/Time Cancel Sent" := ConvertCurrentDateTimeToTimeZone(GetTimeZoneFromDocument(SalesInvHeader));
-        CancelDateTime := FormatDateTime(SalesInvHeader."Date/Time Cancel Sent");
-        SalesInvHeader."Date/Time Canceled" := CancelDateTime;
 
         if GLSetup."Cancel on Time Expiration" and (SalesInvHeader."Date/Time Stamp Received" > GetDateTime24HoursAgo()) then begin
             DocumentRef.GetTable(SalesInvHeader);
@@ -1079,7 +1076,7 @@ codeunit 10145 "E-Invoice Mgt."
                 MethodTypeRef::Cancel:
                     CancelXMLDocument(
                       XMLDoc, OutStr,
-                      CancelDateTime, SalesInvHeader."Date/Time Stamped", SalesInvHeader."Fiscal Invoice Number PAC",
+                      FormatDateTime(SalesInvHeader."Date/Time Cancel Sent"), SalesInvHeader."Date/Time Stamped", SalesInvHeader."Fiscal Invoice Number PAC",
                       SalesInvHeader."CFDI Cancellation Reason Code", SalesInvoiceHeaderSubst."Fiscal Invoice Number PAC");
                 MethodTypeRef::CancelRequest:
                     CancelStatusRequestXMLDocument(XMLDoc, OutStr, SalesInvHeader."CFDI Cancellation ID");
@@ -1113,7 +1110,6 @@ codeunit 10145 "E-Invoice Mgt."
         XMLDoc: DotNet XmlDocument;
         Response: Text;
         OutStr: OutStream;
-        CancelDateTime: Text[50];
     begin
         if SalesCrMemoHeader."Source Code" = SourceCodeSetup."Deleted Document" then
             Error(Text007);
@@ -1126,8 +1122,6 @@ codeunit 10145 "E-Invoice Mgt."
             SalesCrMemoHeaderSubst.Get(SalesCrMemoHeader."Substitution Document No.");
 
         SalesCrMemoHeader."Date/Time Cancel Sent" := ConvertCurrentDateTimeToTimeZone(GetTimeZoneFromDocument(SalesCrMemoHeader));
-        CancelDateTime := FormatDateTime(SalesCrMemoHeader."Date/Time Cancel Sent");
-        SalesCrMemoHeader."Date/Time Canceled" := CancelDateTime;
 
         if GLSetup."Cancel on Time Expiration" and (SalesCrMemoHeader."Date/Time Stamp Received" > GetDateTime24HoursAgo()) then begin
             DocumentRef.GetTable(SalesCrMemoHeader);
@@ -1139,7 +1133,7 @@ codeunit 10145 "E-Invoice Mgt."
                 MethodTypeRef::Cancel:
                     CancelXMLDocument(
                       XMLDoc, OutStr,
-                      CancelDateTime, SalesCrMemoHeader."Date/Time Stamped", SalesCrMemoHeader."Fiscal Invoice Number PAC",
+                      FormatDateTime(SalesCrMemoHeader."Date/Time Cancel Sent"), SalesCrMemoHeader."Date/Time Stamped", SalesCrMemoHeader."Fiscal Invoice Number PAC",
                       SalesCrMemoHeader."CFDI Cancellation Reason Code", SalesCrMemoHeaderSubst."Fiscal Invoice Number PAC");
                 MethodTypeRef::CancelRequest:
                     CancelStatusRequestXMLDocument(XMLDoc, OutStr, SalesCrMemoHeader."CFDI Cancellation ID");
@@ -1173,7 +1167,6 @@ codeunit 10145 "E-Invoice Mgt."
         XMLDoc: DotNet XmlDocument;
         Response: Text;
         OutStr: OutStream;
-        CancelDateTime: Text[50];
     begin
         if ServiceInvHeader."Source Code" = SourceCodeSetup."Deleted Document" then
             Error(Text007);
@@ -1186,8 +1179,6 @@ codeunit 10145 "E-Invoice Mgt."
             ServiceInvoiceHeaderSubst.Get(ServiceInvHeader."Substitution Document No.");
 
         ServiceInvHeader."Date/Time Cancel Sent" := ConvertCurrentDateTimeToTimeZone(GetTimeZoneFromDocument(ServiceInvHeader));
-        CancelDateTime := FormatDateTime(ServiceInvHeader."Date/Time Cancel Sent");
-        ServiceInvHeader."Date/Time Canceled" := CancelDateTime;
 
         if GLSetup."Cancel on Time Expiration" and (ServiceInvHeader."Date/Time Stamp Received" > GetDateTime24HoursAgo()) then begin
             DocumentRef.GetTable(ServiceInvHeader);
@@ -1198,7 +1189,7 @@ codeunit 10145 "E-Invoice Mgt."
                 MethodTypeRef::Cancel:
                     CancelXMLDocument(
                       XMLDoc, OutStr,
-                      CancelDateTime, ServiceInvHeader."Date/Time Stamped", ServiceInvHeader."Fiscal Invoice Number PAC",
+                      FormatDateTime(ServiceInvHeader."Date/Time Cancel Sent"), ServiceInvHeader."Date/Time Stamped", ServiceInvHeader."Fiscal Invoice Number PAC",
                       ServiceInvHeader."CFDI Cancellation Reason Code", ServiceInvoiceHeaderSubst."Substitution Document No.");
                 MethodTypeRef::CancelRequest:
                     CancelStatusRequestXMLDocument(XMLDoc, OutStr, ServiceInvoiceHeaderSubst."CFDI Cancellation ID");
@@ -1232,7 +1223,6 @@ codeunit 10145 "E-Invoice Mgt."
         XMLDoc: DotNet XmlDocument;
         Response: Text;
         OutStr: OutStream;
-        CancelDateTime: Text[50];
     begin
         if ServiceCrMemoHeader."Source Code" = SourceCodeSetup."Deleted Document" then
             Error(Text007);
@@ -1245,8 +1235,6 @@ codeunit 10145 "E-Invoice Mgt."
             ServiceCrMemoHeaderSubst.Get(ServiceCrMemoHeader."Substitution Document No.");
 
         ServiceCrMemoHeader."Date/Time Cancel Sent" := ConvertCurrentDateTimeToTimeZone(GetTimeZoneFromDocument(ServiceCrMemoHeader));
-        CancelDateTime := FormatDateTime(ServiceCrMemoHeader."Date/Time Cancel Sent");
-        ServiceCrMemoHeader."Date/Time Canceled" := CancelDateTime;
 
         if GLSetup."Cancel on Time Expiration" and (ServiceCrMemoHeader."Date/Time Stamp Received" > GetDateTime24HoursAgo()) then begin
             DocumentRef.GetTable(ServiceCrMemoHeader);
@@ -1257,7 +1245,7 @@ codeunit 10145 "E-Invoice Mgt."
                 MethodTypeRef::Cancel:
                     CancelXMLDocument(
                       XMLDoc, OutStr,
-                      CancelDateTime, ServiceCrMemoHeader."Date/Time Stamped", ServiceCrMemoHeader."Fiscal Invoice Number PAC",
+                      FormatDateTime(ServiceCrMemoHeader."Date/Time Cancel Sent"), ServiceCrMemoHeader."Date/Time Stamped", ServiceCrMemoHeader."Fiscal Invoice Number PAC",
                       ServiceCrMemoHeader."CFDI Cancellation Reason Code", ServiceCrMemoHeaderSubst."Fiscal Invoice Number PAC");
                 MethodTypeRef::CancelRequest:
                     CancelStatusRequestXMLDocument(XMLDoc, OutStr, ServiceCrMemoHeader."CFDI Cancellation ID");
@@ -1291,15 +1279,12 @@ codeunit 10145 "E-Invoice Mgt."
         XMLDoc: DotNet XmlDocument;
         Response: Text;
         OutStr: OutStream;
-        CancelDateTime: Text[50];
     begin
         SalesShipmentHeader.TestField("CFDI Cancellation Reason Code");
         if CancellationReasonRequired(SalesShipmentHeader."CFDI Cancellation Reason Code") then
             SalesShipmentHeaderSubst.Get(SalesShipmentHeader."Substitution Document No.");
 
         SalesShipmentHeader."Date/Time Cancel Sent" := ConvertCurrentDateTimeToTimeZone(GetTimeZoneFromDocument(SalesShipmentHeader));
-        CancelDateTime := FormatDateTime(SalesShipmentHeader."Date/Time Cancel Sent");
-        SalesShipmentHeader."Date/Time Canceled" := CancelDateTime;
 
         if GLSetup."Cancel on Time Expiration" and (SalesShipmentHeader."Date/Time Stamp Received" > GetDateTime24HoursAgo()) then begin
             DocumentRef.GetTable(SalesShipmentHeader);
@@ -1310,7 +1295,7 @@ codeunit 10145 "E-Invoice Mgt."
                 MethodTypeRef::Cancel:
                     CancelXMLDocument(
                       XMLDoc, OutStr,
-                      CancelDateTime, SalesShipmentHeader."Date/Time Stamped", SalesShipmentHeader."Fiscal Invoice Number PAC",
+                      FormatDateTime(SalesShipmentHeader."Date/Time Cancel Sent"), SalesShipmentHeader."Date/Time Stamped", SalesShipmentHeader."Fiscal Invoice Number PAC",
                       SalesShipmentHeader."CFDI Cancellation Reason Code", SalesShipmentHeader."Fiscal Invoice Number PAC");
                 MethodTypeRef::CancelRequest:
                     CancelStatusRequestXMLDocument(XMLDoc, OutStr, SalesShipmentHeader."CFDI Cancellation ID");
@@ -1341,15 +1326,12 @@ codeunit 10145 "E-Invoice Mgt."
         XMLDoc: DotNet XmlDocument;
         Response: Text;
         OutStr: OutStream;
-        CancelDateTime: Text[50];
     begin
         TransferShipmentHeader.TestField("CFDI Cancellation Reason Code");
         if CancellationReasonRequired(TransferShipmentHeader."CFDI Cancellation Reason Code") then
             TransferShipmentHeaderSubst.Get(TransferShipmentHeader."Substitution Document No.");
 
         TransferShipmentHeader."Date/Time Cancel Sent" := ConvertCurrentDateTimeToTimeZone(GetTimeZoneFromDocument(TransferShipmentHeader));
-        CancelDateTime := FormatDateTime(TransferShipmentHeader."Date/Time Cancel Sent");
-        TransferShipmentHeader."Date/Time Canceled" := CancelDateTime;
 
         if GLSetup."Cancel on Time Expiration" and (TransferShipmentHeader."Date/Time Stamp Received" > GetDateTime24HoursAgo()) then begin
             DocumentRef.GetTable(TransferShipmentHeader);
@@ -1360,7 +1342,7 @@ codeunit 10145 "E-Invoice Mgt."
                 MethodTypeRef::Cancel:
                     CancelXMLDocument(
                       XMLDoc, OutStr,
-                      CancelDateTime, TransferShipmentHeader."Date/Time Stamped", TransferShipmentHeader."Fiscal Invoice Number PAC",
+                       FormatDateTime(TransferShipmentHeader."Date/Time Cancel Sent"), TransferShipmentHeader."Date/Time Stamped", TransferShipmentHeader."Fiscal Invoice Number PAC",
                       TransferShipmentHeader."CFDI Cancellation Reason Code", TransferShipmentHeader."Fiscal Invoice Number PAC");
                 MethodTypeRef::CancelRequest:
                     CancelStatusRequestXMLDocument(XMLDoc, OutStr, TransferShipmentHeader."CFDI Cancellation ID");
@@ -1391,7 +1373,6 @@ codeunit 10145 "E-Invoice Mgt."
         OutStr: OutStream;
         XMLDoc: DotNet XmlDocument;
         Response: Text;
-        CancelDateTime: Text[50];
     begin
         Session.LogMessage(
             '0000C7C', StrSubstNo(CancelDocMsg, GetDocTypeTextFromDatabaseId(Database::"Cust. Ledger Entry")), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
@@ -1401,8 +1382,6 @@ codeunit 10145 "E-Invoice Mgt."
             CustLedgerEntrySubst.Get(CustLedgerEntry."Substitution Entry No.");
 
         CustLedgerEntry."Date/Time Cancel Sent" := ConvertCurrentDateTimeToTimeZone(GetTimeZoneFromCustomer(CustLedgerEntry."Customer No."));
-        CancelDateTime := FormatDateTime(CustLedgerEntry."Date/Time Cancel Sent");
-        CustLedgerEntry."Date/Time Canceled" := CancelDateTime;
 
         if GLSetup."Cancel on time expiration" and (CustLedgerEntry."Date/Time Stamp Received" > GetDateTime24HoursAgo()) then begin
             DocumentRef.GetTable(CustLedgerEntry);
@@ -1413,7 +1392,7 @@ codeunit 10145 "E-Invoice Mgt."
                 MethodTypeRef::Cancel:
                     CancelXMLDocument(
                       XMLDoc, OutStr,
-                      CancelDateTime, CustLedgerEntry."Date/Time Stamped", CustLedgerEntry."Fiscal Invoice Number PAC",
+                      FormatDateTime(CustLedgerEntry."Date/Time Cancel Sent"), CustLedgerEntry."Date/Time Stamped", CustLedgerEntry."Fiscal Invoice Number PAC",
                       CustLedgerEntry."CFDI Cancellation Reason Code", CustLedgerEntrySubst."Fiscal Invoice Number PAC");
                 MethodTypeRef::CancelRequest:
                     CancelStatusRequestXMLDocument(XMLDoc, OutStr, CustLedgerEntry."CFDI Cancellation ID");
@@ -1446,15 +1425,15 @@ codeunit 10145 "E-Invoice Mgt."
         Status: Option " ","Stamp Received",Sent,Canceled,"Stamp Request Error","Cancel Error","Cancel In Progress";
         DateTimeCancelSent: DateTime;
     begin
-        FieldRef := RecRef.Field(GetFieldIDElectronicDocumentStatus());
+        FieldRef := RecRef.Field(GetFieldIDElectronicDocumentStatus()); // "Electronic Document Status" (Option)
         FieldRef.Value := Status::Canceled;
         DateTimeCancelSent := ConvertCurrentDateTimeToTimeZone(GetTimeZoneFromDocument(RecRef));
-        FieldRef := RecRef.Field(GetFieldIDDateTimeCancelSent());
+        FieldRef := RecRef.Field(GetFieldIDDateTimeCancelSent()); // "Date/Time Cancel Sent" (DateTime)
         FieldRef.Value := DateTimeCancelSent;
-        FieldRef := RecRef.Field(GetFieldIDDateTimeCancelled());
+        FieldRef := RecRef.Field(GetFieldIDDateTimeCancelled()); // "Date/Time Canceled" (Text)
         FieldRef.Value := FormatDateTime(DateTimeCancelSent);
         if MarkAsCanceled then begin
-            FieldRef := RecRef.Field(GetFieldIDMarkedAsCanceled());
+            FieldRef := RecRef.Field(GetFieldIDMarkedAsCanceled()); // "Marked as Canceled" (Boolean)
             FieldRef.Value := true;
         end;
         RecRef.Modify();
@@ -1547,6 +1526,7 @@ codeunit 10145 "E-Invoice Mgt."
         CancelStatus: Option InProgress,Rejected,Cancelled;
         CancelResult: Text[250];
         DocumentStatus: Option " ","Stamp Received",Sent,Canceled,"Stamp Request Error","Cancel Error","Cancel In Progress";
+        DateTimeCancelled: Text[50];
     begin
         GetGLSetup();
         GetCompanyInfo();
@@ -1637,10 +1617,11 @@ codeunit 10145 "E-Invoice Mgt."
                 exit;
             end;
             if Action = EDocAction::CancelRequest then begin
-                ProcessCancelResponse(XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult);
+                ProcessCancelResponse(XMLDocResult, XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult, DateTimeCancelled);
                 GetDocumentStatusFromCancelStatus(DocumentStatus, CancelStatus);
                 SalesInvoiceHeader."Electronic Document Status" := DocumentStatus;
                 SalesInvoiceHeader."Error Description" := CancelResult;
+                SalesInvoiceHeader."Date/Time Canceled" := DateTimeCancelled;
                 exit;
             end;
         end else begin
@@ -1750,6 +1731,7 @@ codeunit 10145 "E-Invoice Mgt."
         CancelStatus: Option InProgress,Rejected,Cancelled;
         CancelResult: Text[250];
         DocumentStatus: Option " ","Stamp Received",Sent,Canceled,"Stamp Request Error","Cancel Error","Cancel In Progress";
+        DateTimeCancelled: Text[50];
     begin
         GetGLSetup();
         GetCompanyInfo();
@@ -1807,10 +1789,11 @@ codeunit 10145 "E-Invoice Mgt."
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
-            ProcessCancelResponse(XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult);
+            ProcessCancelResponse(XMLDoc, XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult, DateTimeCancelled);
             GetDocumentStatusFromCancelStatus(DocumentStatus, CancelStatus);
             SalesCrMemoHeader."Electronic Document Status" := DocumentStatus;
             SalesCrMemoHeader."Error Description" := CancelResult;
+            SalesCrMemoHeader."Date/Time Canceled" := DateTimeCancelled;
             exit;
         end;
 
@@ -1884,6 +1867,7 @@ codeunit 10145 "E-Invoice Mgt."
         CancelStatus: Option InProgress,Rejected,Cancelled;
         CancelResult: Text[250];
         DocumentStatus: Option " ","Stamp Received",Sent,Canceled,"Stamp Request Error","Cancel Error","Cancel In Progress";
+        DateTimeCancelled: Text[50];
     begin
         GetGLSetup();
         GetCompanyInfo();
@@ -1941,10 +1925,11 @@ codeunit 10145 "E-Invoice Mgt."
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
-            ProcessCancelResponse(XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult);
+            ProcessCancelResponse(XMLDoc, XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult, DateTimeCancelled);
             GetDocumentStatusFromCancelStatus(DocumentStatus, CancelStatus);
             ServInvoiceHeader."Electronic Document Status" := DocumentStatus;
             ServInvoiceHeader."Error Description" := CancelResult;
+            ServInvoiceHeader."Date/Time Canceled" := DateTimeCancelled;
             exit;
         end;
 
@@ -2017,6 +2002,7 @@ codeunit 10145 "E-Invoice Mgt."
         CancelStatus: Option InProgress,Rejected,Cancelled;
         CancelResult: Text[250];
         DocumentStatus: Option " ","Stamp Received",Sent,Canceled,"Stamp Request Error","Cancel Error","Cancel In Progress";
+        DateTimeCancelled: Text[50];
     begin
         GetGLSetup();
         GetCompanyInfo();
@@ -2074,10 +2060,11 @@ codeunit 10145 "E-Invoice Mgt."
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
-            ProcessCancelResponse(XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult);
+            ProcessCancelResponse(XMLDoc, XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult, DateTimeCancelled);
             GetDocumentStatusFromCancelStatus(DocumentStatus, CancelStatus);
             ServCrMemoHeader."Electronic Document Status" := DocumentStatus;
             ServCrMemoHeader."Error Description" := CancelResult;
+            ServCrMemoHeader."Date/Time Canceled" := DateTimeCancelled;
             exit;
         end;
 
@@ -2149,6 +2136,7 @@ codeunit 10145 "E-Invoice Mgt."
         CancelStatus: Option InProgress,Rejected,Cancelled;
         CancelResult: Text[250];
         DocumentStatus: Option " ","Stamp Received",Sent,Canceled,"Stamp Request Error","Cancel Error","Cancel In Progress";
+        DateTimeCancelled: Text[50];
     begin
         GetGLSetup();
         GetCompanyInfo();
@@ -2206,10 +2194,11 @@ codeunit 10145 "E-Invoice Mgt."
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
-            ProcessCancelResponse(XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult);
+            ProcessCancelResponse(XMLDoc, XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult, DateTimeCancelled);
             GetDocumentStatusFromCancelStatus(DocumentStatus, CancelStatus);
             SalesShipmentHeader."Electronic Document Status" := DocumentStatus;
             SalesShipmentHeader."Error Description" := CancelResult;
+            SalesShipmentHeader."Date/Time Canceled" := DateTimeCancelled;
             exit;
         end;
         XMLCurrNode := XMLDoc.SelectSingleNode('Resultado');
@@ -2280,6 +2269,7 @@ codeunit 10145 "E-Invoice Mgt."
         CancelStatus: Option InProgress,Rejected,Cancelled;
         CancelResult: Text[250];
         DocumentStatus: Option " ","Stamp Received",Sent,Canceled,"Stamp Request Error","Cancel Error","Cancel In Progress";
+        DateTimeCancelled: Text[50];
     begin
         GetGLSetup();
         GetCompanyInfo();
@@ -2338,10 +2328,11 @@ codeunit 10145 "E-Invoice Mgt."
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
-            ProcessCancelResponse(XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult);
+            ProcessCancelResponse(XMLDoc, XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult, DateTimeCancelled);
             GetDocumentStatusFromCancelStatus(DocumentStatus, CancelStatus);
             TransferShipmentHeader."Electronic Document Status" := DocumentStatus;
             TransferShipmentHeader."Error Description" := CancelResult;
+            TransferShipmentHeader."Date/Time Canceled" := DateTimeCancelled;
             exit;
         end;
         XMLCurrNode := XMLDoc.SelectSingleNode('Resultado');
@@ -2391,10 +2382,12 @@ codeunit 10145 "E-Invoice Mgt."
         RecordRef.SetTable(TransferShipmentHeader);
     end;
 
-    local procedure ProcessCancelResponse(XMLCurrNode: DotNet XmlNode; XMLDOMNamedNodeMap: DotNet XmlNamedNodeMap; var CancelStatus: Option InProgress,Rejected,Cancelled; var CancelResult: Text[250])
+    local procedure ProcessCancelResponse(XmlDoc: DotNet XmlDocument; XMLCurrNode: DotNet XmlNode; XMLDOMNamedNodeMap: DotNet XmlNamedNodeMap; var CancelStatus: Option InProgress,Rejected,Cancelled; var CancelResult: Text[250]; var DateTimeCancelled: Text[50])
     var
+        XMLCurrNodeEvent: DotNet XmlNode;
         StatusTxt: Text[10];
     begin
+        DateTimeCancelled := '';
         XMLCurrNode := XMLDOMNamedNodeMap.GetNamedItem('Estatus');
         StatusTxt := XMLCurrNode.Value;
         XMLCurrNode := XMLDOMNamedNodeMap.GetNamedItem('Resultado');
@@ -2408,6 +2401,8 @@ codeunit 10145 "E-Invoice Mgt."
                 begin
                     CancelStatus := CancelStatus::Cancelled;
                     CancelResult := '';
+                    XMLCurrNodeEvent := XMLDoc.DocumentElement.SelectNodes('Evento').Item(0);
+                    DateTimeCancelled := XMLCurrNodeEvent.Attributes.GetNamedItem('Fecha').Value;
                 end;
         end;
     end;
@@ -5229,6 +5224,7 @@ codeunit 10145 "E-Invoice Mgt."
         CancelStatus: Option InProgress,Rejected,Cancelled;
         CancelResult: Text[250];
         DocumentStatus: Option " ","Stamp Received",Sent,Canceled,"Stamp Request Error","Cancel Error","Cancel In Progress";
+        DateTimeCancelled: Text[50];
     begin
         GetGLSetup();
         GetCheckCompanyInfo;
@@ -5285,10 +5281,11 @@ codeunit 10145 "E-Invoice Mgt."
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
-            ProcessCancelResponse(XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult);
+            ProcessCancelResponse(XMLDocResult, XMLCurrNode, XMLDOMNamedNodeMap, CancelStatus, CancelResult, DateTimeCancelled);
             GetDocumentStatusFromCancelStatus(DocumentStatus, CancelStatus);
             CustLedgerEntry."Electronic Document Status" := DocumentStatus;
             CustLedgerEntry."Error Description" := CancelResult;
+            CustLedgerEntry."Date/Time Canceled" := DateTimeCancelled;
             exit;
         end;
 
