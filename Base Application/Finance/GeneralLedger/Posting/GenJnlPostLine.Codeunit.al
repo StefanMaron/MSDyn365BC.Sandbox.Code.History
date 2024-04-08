@@ -6632,7 +6632,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
                 "Calculate Interest" := true;
     end;
 
-#pragma warning disable AS0024
     procedure GLCalcAddCurrency(Amount: Decimal; AddCurrAmount: Decimal; OldAddCurrAmount: Decimal; UseAddCurrAmount: Boolean; GenJnlLine: Record "Gen. Journal Line") Result: Decimal
     var
         PurchSetup: Record "Purchases & Payables Setup";
@@ -6657,7 +6656,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
         UseVendExchRate := false;
         exit(OldAddCurrAmount);
     end;
-#pragma warning restore AS0024
 
     local procedure HandleAddCurrResidualGLEntry(GenJnlLine: Record "Gen. Journal Line"; GLEntry2: Record "G/L Entry")
     var
