@@ -1,0 +1,156 @@
+codeunit 163533 "Create Stat. Report. Setup CZL"
+{
+
+    trigger OnRun()
+    begin
+        StatutoryReportingSetupCZL.Get();
+        StatutoryReportingSetupCZL."VAT Statement Template Name" := CreateVATStatementTemplate.GetVATName();
+        StatutoryReportingSetupCZL."VAT Statement Name" := CreateVATStatementName.GetVAT('XVAT19');
+        StatutoryReportingSetupCZL."Company Type" := StatutoryReportingSetupCZL."Company Type"::Corporate;
+        StatutoryReportingSetupCZL."Company Trade Name" := XCRONUSInternational;
+        StatutoryReportingSetupCZL."Company Trade Name Appendix" := XAs;
+        StatutoryReportingSetupCZL."VAT Control Report E-mail" := XTestEmail;
+        StatutoryReportingSetupCZL."Data Box ID" := XABC123;
+        StatutoryReportingSetupCZL."Simplified Tax Document Limit" := 10000;
+        StatutoryReportingSetupCZL."VAT Statement Country Name" := XCzechRepublic;
+        StatutoryReportingSetupCZL."Official Code" := X4a;
+        StatutoryReportingSetupCZL."Official Type" := StatutoryReportingSetupCZL."Official Type"::Corporate;
+        StatutoryReportingSetupCZL."Official First Name" := XJohn;
+        StatutoryReportingSetupCZL."Official Surname" := XNovak;
+        StatutoryReportingSetupCZL."Official Registration No." := X123456;
+        StatutoryReportingSetupCZL."Tax Payer Status" := StatutoryReportingSetupCZL."Tax Payer Status"::Payer;
+        StatutoryReportingSetupCZL."VIES Number of Lines" := 20;
+        StatutoryReportingSetupCZL.Validate("VIES Declaration Export No.", Xmlport::"VIES Declaration CZL");
+        StatutoryReportingSetupCZL.Validate("VIES Declaration Report No.", Report::"VIES Declaration CZL");
+        StatutoryReportingSetupCZL."VIES Decl. Auth. Employee No." := 'OSO0010';
+        StatutoryReportingSetupCZL."VIES Decl. Filled Employee No." := 'OSO0020';
+        StatutoryReportingSetupCZL."VAT Stat. Auth. Employee No." := 'OSO0010';
+        StatutoryReportingSetupCZL."VAT Stat. Filled Employee No." := 'OSO0020';
+        StatutoryReportingSetupCZL."Company Type" := StatutoryReportingSetupCZL."Company Type"::Corporate;
+        StatutoryReportingSetupCZL.Street := XTheRing;
+        StatutoryReportingSetupCZL."House No." := X5;
+        StatutoryReportingSetupCZL."Tax Office Number" := X461;
+        StatutoryReportingSetupCZL."Tax Office Region Number" := X3003;
+
+        CreateNoSeries.InitBaseSeries(
+          StatutoryReportingSetupCZL."Company Official Nos.", XCO, XCompanyOfficial, 'OSO0010', 'OSO9990', '', '', 10);
+        CreateNoSeries.InitBaseSeries(
+          StatutoryReportingSetupCZL."VAT Control Report Nos.", XVCR, XVATControlReport, XVCR001, '', '', '', 1);
+        CreateNoSeries.InitBaseSeries2(
+          StatutoryReportingSetupCZL."VIES Declaration Nos.", XVIES, XVIESDeclaration, XVIES16001, '', '', '', 1);
+#if not CLEAN22
+#pragma warning disable AL0432
+        CreateNoSeries.InitBaseSeries2(
+          StatutoryReportingSetupCZL."Intrastat Declaration Nos.", XINTR, XIntrastat, XINTRS001, '', '', '', 1);
+        SetDefaultNos(StatutoryReportingSetupCZL."Intrastat Declaration Nos.", false);
+#pragma warning restore AL0432
+#endif
+        StatutoryReportingSetupCZL.Modify();
+    end;
+
+    var
+        StatutoryReportingSetupCZL: Record "Statutory Reporting Setup CZL";
+        CreateVATStatementTemplate: Codeunit "Create VAT Statement Template";
+        CreateVATStatementName: Codeunit "Create VAT Statement Name";
+        XCRONUSInternational: Label 'CRONUS International';
+        XAs: Label 'a.s.';
+        XTestEmail: Label 'test@test.cz';
+        XABC123: Label 'ABC123';
+        XCzechRepublic: Label 'Czech Republic';
+        X4a: Label '4a';
+        XJohn: Label 'John';
+        XNovak: Label 'Novak';
+        X123456: Label '123456';
+        XTheRing: Label 'The Ring';
+        X5: Label '5';
+        CreateNoSeries: Codeunit "Create No. Series";
+        XCO: Label 'CO', Comment = 'Company Official';
+        XCompanyOfficial: Label 'Company Official';
+        XVCR: Label 'VCR', Comment = 'VAT Control Report';
+        XVATControlReport: Label 'VAT Control Report';
+        XVCR001: Label 'VCR001';
+        XVIES: Label 'VIES';
+        XVIESDeclaration: Label 'VIES Declaration';
+        XVIES16001: Label 'VIES16001';
+#if not CLEAN22
+#pragma warning disable AL0432
+        XINTR: Label 'INTR', Comment = 'Intrastat';
+        XIntrastat: Label 'Intrastat';
+        XINTRS001: Label 'INTRS001';
+#pragma warning restore AL0432
+#endif
+        X461: Label '461';
+        X3003: Label '3003';
+
+    procedure CreateEvaluationData()
+    begin
+        StatutoryReportingSetupCZL.Get();
+        StatutoryReportingSetupCZL."Company Type" := StatutoryReportingSetupCZL."Company Type"::Corporate;
+        StatutoryReportingSetupCZL."Company Trade Name" := XCRONUSInternational;
+        StatutoryReportingSetupCZL."Company Trade Name Appendix" := XAs;
+        StatutoryReportingSetupCZL."VAT Control Report E-mail" := XTestEmail;
+        StatutoryReportingSetupCZL."Data Box ID" := XABC123;
+        StatutoryReportingSetupCZL."Official Code" := X4a;
+        StatutoryReportingSetupCZL."Official Type" := StatutoryReportingSetupCZL."Official Type"::Corporate;
+        StatutoryReportingSetupCZL."Official First Name" := XJohn;
+        StatutoryReportingSetupCZL."Official Surname" := XNovak;
+        StatutoryReportingSetupCZL."Official Registration No." := X123456;
+        StatutoryReportingSetupCZL."Tax Payer Status" := StatutoryReportingSetupCZL."Tax Payer Status"::Payer;
+        StatutoryReportingSetupCZL."VIES Decl. Auth. Employee No." := 'OSO0010';
+        StatutoryReportingSetupCZL."VIES Decl. Filled Employee No." := 'OSO0020';
+        StatutoryReportingSetupCZL."VAT Stat. Auth. Employee No." := 'OSO0010';
+        StatutoryReportingSetupCZL."VAT Stat. Filled Employee No." := 'OSO0020';
+        StatutoryReportingSetupCZL."Company Type" := StatutoryReportingSetupCZL."Company Type"::Corporate;
+        StatutoryReportingSetupCZL.Street := XTheRing;
+        StatutoryReportingSetupCZL."House No." := X5;
+        StatutoryReportingSetupCZL."Tax Office Number" := X461;
+        StatutoryReportingSetupCZL."Tax Office Region Number" := X3003;
+        StatutoryReportingSetupCZL.Modify();
+    end;
+
+    procedure InsertMiniAppData()
+    begin
+        StatutoryReportingSetupCZL.Get();
+        StatutoryReportingSetupCZL."VAT Statement Template Name" := CreateVATStatementTemplate.GetVATName();
+        StatutoryReportingSetupCZL."VAT Statement Name" := CreateVATStatementName.GetVAT('XVAT19');
+        StatutoryReportingSetupCZL."Simplified Tax Document Limit" := 10000;
+        StatutoryReportingSetupCZL."VAT Statement Country Name" := XCzechRepublic;
+        StatutoryReportingSetupCZL."VIES Number of Lines" := 20;
+        StatutoryReportingSetupCZL.Validate("VIES Declaration Export No.", Xmlport::"VIES Declaration CZL");
+        StatutoryReportingSetupCZL.Validate("VIES Declaration Report No.", Report::"VIES Declaration CZL");
+#if not CLEAN22
+#pragma warning disable AL0432
+        StatutoryReportingSetupCZL.Validate("Get Tariff No. From", StatutoryReportingSetupCZL."Get Tariff No. From"::"Item Card");
+        StatutoryReportingSetupCZL.Validate("Get Net Weight From", StatutoryReportingSetupCZL."Get Net Weight From"::"Item Card");
+        StatutoryReportingSetupCZL.Validate("Get Country/Region of Origin", StatutoryReportingSetupCZL."Get Country/Region of Origin"::"Item Card");
+        StatutoryReportingSetupCZL.Validate("Intrastat Rounding Type", StatutoryReportingSetupCZL."Intrastat Rounding Type"::Up);
+#pragma warning restore AL0432
+#endif
+        StatutoryReportingSetupCZL.Validate("VAT Control Report Xml Format", StatutoryReportingSetupCZL."VAT Control Report Xml Format"::"03_01_03");
+
+        CreateNoSeries.InitBaseSeries(
+          StatutoryReportingSetupCZL."Company Official Nos.", XCO, XCompanyOfficial, 'OSO0010', 'OSO9990', '', '', 10);
+        CreateNoSeries.InitBaseSeries(
+          StatutoryReportingSetupCZL."VAT Control Report Nos.", XVCR, XVATControlReport, XVCR001, '', '', '', 1);
+        CreateNoSeries.InitBaseSeries2(
+          StatutoryReportingSetupCZL."VIES Declaration Nos.", XVIES, XVIESDeclaration, XVIES16001, '', '', '', 1);
+#if not CLEAN22
+#pragma warning disable AL0432
+        CreateNoSeries.InitBaseSeries2(
+          StatutoryReportingSetupCZL."Intrastat Declaration Nos.", XINTR, XIntrastat, XINTRS001, '', '', '', 1);
+        SetDefaultNos(StatutoryReportingSetupCZL."Intrastat Declaration Nos.", false);
+#pragma warning restore AL0432
+#endif
+        StatutoryReportingSetupCZL.Modify();
+    end;
+
+    local procedure SetDefaultNos(SeriesCode: Code[20]; DefaultNos: Boolean)
+    var
+        NoSeries: Record "No. Series";
+    begin
+        NoSeries.Get(SeriesCode);
+        NoSeries."Default Nos." := DefaultNos;
+        NoSeries.Modify();
+    end;
+}
+

@@ -1,0 +1,296 @@
+codeunit 101256 "Create VAT Statement Line"
+{
+
+    trigger OnRun()
+    begin
+        with DemoDataSetup do begin
+            Get();
+            if "Company Type" = "Company Type"::"Sales Tax" then
+                exit;
+
+            InsertData('', XTaxabletransactionsTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XSupplyofgoodsorservicesindomesticTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('1Z', '', 1, '', 2, DomesticCode(), BaseVATItemCode(), '', 2, 1, false, 0, false, '', 'A4', 0);
+            InsertData('1Z', '', 1, '', 2, DomesticCode(), BaseVATServiceCode(), '', 2, 1, false, 0, false, '', 'A4', 0);
+            InsertData('1ZAK', XstandardratebasetotalTxt, 11700, '', 0, '', '', '1Z', 0, 0, true, 0, false, 'DP3-01Z', '', 0);
+            InsertData('1D', '', 1, '', 2, DomesticCode(), BaseVATItemCode(), '', 1, 1, false, 0, false, '', 'A4', 0);
+            InsertData('1D', '', 1, '', 2, DomesticCode(), BaseVATServiceCode(), '', 1, 1, false, 0, false, '', 'A4', 0);
+            InsertData('1DAN', XstandardratetaxtotalTxt, 11700, '', 0, '', '', '1D', 0, 0, true, 0, false, 'DP3-01D', '', 0);
+            InsertData('2Z', '', 1, '', 2, DomesticCode(), FirstReducedVATItemCode(), '', 2, 1, false, 0, false, '', 'A4', 0);
+            InsertData('2Z', '', 1, '', 2, DomesticCode(), FirstReducedVATServiceCode(), '', 2, 1, false, 0, false, '', 'A4', 0);
+            InsertData('2Z', '', 1, '', 2, DomesticCode(), SecondReducedVATItemCode(), '', 2, 1, false, 0, false, '', 'A4', 0);
+            InsertData('2ZAK', XreducedratebasetotalTxt, 11700, '', 0, '', '', '2Z', 0, 0, true, 0, false, 'DP3-02Z', '', 0);
+            InsertData('2D', '', 1, '', 2, DomesticCode(), FirstReducedVATItemCode(), '', 1, 1, false, 0, false, '', 'A4', 0);
+            InsertData('2D', '', 1, '', 2, DomesticCode(), FirstReducedVATServiceCode(), '', 1, 1, false, 0, false, '', 'A4', 0);
+            InsertData('2D', '', 1, '', 2, DomesticCode(), SecondReducedVATItemCode(), '', 1, 1, false, 0, false, '', 'A4', 0);
+            InsertData('2DAN', XreducedratetaxtotalTxt, 11700, '', 0, '', '', '2D', 0, 0, true, 0, false, 'DP3-02D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('', XSupplyofgoodsfromothermemberstateTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('3Z', '', 1, '', 1, EUCode(), BaseVATItemCode(), '', 2, 0, false, 0, false, '', 'A2', 0);
+            InsertData('3ZAK', XstandardratebasetotalTxt, 11700, '', 0, '', '', '3Z', 0, 0, true, 0, false, 'DP3-03Z', '', 0);
+            InsertData('3D', '', 1, '', 1, EUCode(), BaseVATItemCode(), '', 1, 0, false, 0, false, '', 'A2', 0);
+            InsertData('3DAN', XstandardratetaxtotalTxt, 11700, '', 0, '', '', '3D', 0, 0, true, 0, false, 'DP3-03D', '', 0);
+            InsertData('4Z', '', 1, '', 1, EUCode(), FirstReducedVATItemCode(), '', 2, 0, false, 0, false, '', 'A2', 0);
+            InsertData('4Z', '', 1, '', 1, EUCode(), SecondReducedVATItemCode(), '', 2, 0, false, 0, false, '', 'A2', 0);
+            InsertData('4ZAK', XreducedratebasetotalTxt, 11700, '', 0, '', '', '4Z', 0, 0, true, 0, false, 'DP3-04Z', '', 0);
+            InsertData('4D', '', 1, '', 1, EUCode(), FirstReducedVATItemCode(), '', 1, 0, false, 0, false, '', 'A2', 0);
+            InsertData('4D', '', 1, '', 1, EUCode(), SecondReducedVATItemCode(), '', 1, 0, false, 0, false, '', 'A2', 0);
+            InsertData('4DAN', XreducedratetaxtotalTxt, 11700, '', 0, '', '', '4D', 0, 0, true, 0, false, 'DP3-04D', '', 0);
+            InsertData('', XSupplyofservicesfromVATregisteredpersoninEUTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('5Z', '', 1, '', 1, EUCode(), BaseVATServiceCode(), '', 2, 0, false, 0, false, '', 'A2', 0);
+            InsertData('5ZAK', XstandardratebasetotalTxt, 11700, '', 0, '', '', '5Z', 0, 0, true, 0, false, 'DP3-05Z', '', 0);
+            InsertData('5D', '', 1, '', 1, EUCode(), BaseVATServiceCode(), '', 1, 0, false, 0, false, '', 'A2', 0);
+            InsertData('5DAN', XstandardratetaxtotalTxt, 11700, '', 0, '', '', '5D', 0, 0, true, 0, false, 'DP3-05D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('6Z', '', 1, '', 1, EUCode(), FirstReducedVATServiceCode(), '', 2, 0, false, 0, false, '', 'A2', 0);
+            InsertData('6ZAK', XreducedratebasetotalTxt, 11700, '', 0, '', '', '6Z', 0, 0, true, 0, false, 'DP3-06Z', '', 0);
+            InsertData('6D', '', 1, '', 1, EUCode(), FirstReducedVATServiceCode(), '', 1, 0, false, 0, false, '', 'A2', 0);
+            InsertData('6DAN', XreducedratetaxtotalTxt, 11700, '', 0, '', '', '6D', 0, 0, true, 0, false, 'DP3-06D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XImportofgoodsTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('7Z', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('7ZAK', XstandardratebaseTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-07Z', '', 0);
+            InsertData('7D', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('7DAN', XstandardratetaxTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-07D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('8Z', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('8ZAK', XreducedratebaseTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-08Z', '', 0);
+            InsertData('8D', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('8DAN', XreducedratetaxTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-08D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XVehicleacquisitionTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('9ZAK', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-09Z', '', 0);
+            InsertData('9DAN', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-09D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XReversechargeschemeTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('10Z', '', 1, '', 1, DomesticCode(), BaseVATReverseChargeCode(), '', 2, 0, false, 0, false, '', 'B1', 0);
+            InsertData('10ZAK', XstandardratebasetotalTxt, 11700, '', 0, '', '', '10Z', 0, 0, true, 0, false, 'DP3-10Z', '', 0);
+            InsertData('10D', '', 1, '', 1, DomesticCode(), BaseVATReverseChargeCode(), '', 1, 0, false, 0, false, '', 'B1', 0);
+            InsertData('10DAN', XstandardratetaxtotalTxt, 11700, '', 0, '', '', '10D', 0, 0, true, 0, false, 'DP3-10D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('11Z', '', 1, '', 1, DomesticCode(), FirstReducedVATReverseChargeCode(), '', 2, 0, false, 0, false, '', 'B1', 0);
+            InsertData('11ZAK', XreducedratebasetotalTxt, 11700, '', 0, '', '', '11Z', 0, 0, true, 0, false, 'DP3-11Z', '', 0);
+            InsertData('11D', '', 1, '', 1, DomesticCode(), FirstReducedVATReverseChargeCode(), '', 1, 0, false, 0, false, '', 'B1', 0);
+            InsertData('11DAN', XreducedratetaxtotalTxt, 11700, '', 0, '', '', '11D', 0, 0, true, 0, false, 'DP3-11D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XOthertaxabletransactionsforwhichthetaxpayerisTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XobligedtodeclaretaxontheirreceiptTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('12Z', '', 1, '', 1, ExportCode(), BaseVATServiceCode(), '', 2, 0, false, 0, false, '', '', 0);
+            InsertData('12ZAK', XstandardratebaseTxt, 11700, '', 0, '', '', '12Z', 0, 0, true, 0, false, 'DP3-12Z', '', 0);
+            InsertData('12D', '', 1, '', 1, ExportCode(), BaseVATServiceCode(), '', 1, 0, false, 0, false, '', '', 0);
+            InsertData('12DAN', XstandardratetaxTxt, 11700, '', 0, '', '', '12D', 0, 0, true, 0, false, 'DP3-12D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('13Z', '', 1, '', 1, ExportCode(), FirstReducedVATServiceCode(), '', 2, 0, false, 0, false, '', '', 0);
+            InsertData('13ZAK', XreducedratebaseTxt, 11700, '', 0, '', '', '13Z', 0, 0, true, 0, false, 'DP3-13Z', '', 0);
+            InsertData('13D', '', 1, '', 1, ExportCode(), FirstReducedVATServiceCode(), '', 1, 0, false, 0, false, '', '', 0);
+            InsertData('13DAN', XreducedratetaxTxt, 11700, '', 0, '', '', '13D', 0, 0, true, 0, false, 'DP3-13D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XVATexempttransactionsTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XWithclaimondeductionTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('20Z', '', 1, '', 2, EUCode(), BaseVATItemCode(), '', 2, 1, false, 0, false, '', '', 0);
+            InsertData('20Z', '', 1, '', 2, EUCode(), FirstReducedVATItemCode(), '', 2, 1, false, 0, false, '', '', 0);
+            InsertData('20Z', '', 1, '', 2, EUCode(), SecondReducedVATItemCode(), '', 2, 1, false, 0, false, '', '', 0);
+            InsertData('20ZAK', XDeliveryofgoodstoamemberstateEUTxt, 11700, '', 0, '', '', '20Z', 0, 0, true, 0, false, 'DP3-20Z', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('21Z', '', 1, '', 2, EUCode(), FirstReducedVATServiceCode(), '', 2, 1, false, 0, false, '', '', 0);
+            InsertData('21Z', '', 1, '', 2, EUCode(), BaseVATServiceCode(), '', 2, 1, false, 0, false, '', '', 0);
+            InsertData('21ZAK', XSupplyofservicesoutsidedomesticTxt, 11700, '', 0, '', '', '21Z', 0, 0, true, 0, false, 'DP3-21Z', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('22Z', '', 1, '', 2, ExportCode(), FirstReducedVATItemCode(), '', 2, 1, false, 0, false, '', '', 0);
+            InsertData('22Z', '', 1, '', 2, ExportCode(), BaseVATItemCode(), '', 2, 1, false, 0, false, '', '', 0);
+            InsertData('22ZAK', XGoodsexportTxt, 11700, '', 0, '', '', '22Z', 0, 0, true, 0, false, 'DP3-22Z', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('23ZAK', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-23Z', '', 0);
+            InsertData('24ZAK', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-24Z', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('25Z', '', 1, '', 2, DomesticCode(), FirstReducedVATReverseChargeCode(), '', 2, 1, false, 0, false, '', 'A1', 0);
+            InsertData('25Z', '', 1, '', 2, DomesticCode(), BaseVATReverseChargeCode(), '', 2, 1, false, 0, false, '', 'A1', 0);
+            InsertData('25ZAK', XReversechargeschemeTxt, 11700, '', 0, '', '', '25Z', 0, 0, true, 0, false, 'DP3-25Z', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('26Z', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('26Z', '', 3, '', 0, '', '', '', 0, 0, false, 0, false, '', '', 0);
+            InsertData('26ZAK', XOthertaxabledeliverablesTxt, 11700, '', 0, '', '', '26Z', 0, 0, true, 0, false, 'DP3-26Z', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XAdditionaldataTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XSimplifiedtrilateraltradeprocedureTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('30Z', '', 1, '', 1, EUCode(), BaseVATItemCode(), '', 2, 0, false, 0, false, '', '', 0);
+            InsertData('30Z', '', 1, '', 1, EUCode(), FirstReducedVATItemCode(), '', 2, 0, false, 0, false, '', '', 0);
+            InsertData('30Z', '', 1, '', 1, EUCode(), SecondReducedVATItemCode(), '', 2, 0, false, 0, false, '', '', 0);
+            InsertData('30ZAK', XTripartitetradeacquisitionTxt, 11700, '', 0, '', '', '30Z', 0, 0, true, 0, false, 'DP3-30Z', '', 0);
+            InsertData('31Z', '', 1, '', 2, EUCode(), BaseVATItemCode(), '', 2, 1, false, 0, false, '', '', 0);
+            InsertData('31Z', '', 1, '', 2, EUCode(), FirstReducedVATItemCode(), '', 2, 1, false, 0, false, '', '', 0);
+            InsertData('31Z', '', 1, '', 2, EUCode(), SecondReducedVATItemCode(), '', 2, 1, false, 0, false, '', '', 0);
+            InsertData('31ZAK', XTripartitetradedeliveryTxt, 11700, '', 0, '', '', '31Z', 0, 0, true, 0, false, 'DP3-31Z', '', 0);
+            InsertData('32ZAK', XImportofgoodsexemptfromVATTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-32Z', '', 0);
+            InsertData('33DAN', XTaxcorrectiononreceivablesfrominsolventdebtorscreditorTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-33D', '', 0);
+            InsertData('34DAN', XTaxcorrectiononreceivablesfrominsolventdebtorsdebtorTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-34D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XEntitledtoataxdeductionTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XTaxabletransactionreceivedTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('40Z', '', 1, '', 1, DomesticCode(), BaseVATItemCode(), '', 2, 0, false, 0, false, '', 'B2', 0);
+            InsertData('40Z', '', 1, '', 1, DomesticCode(), BaseVATServiceCode(), '', 2, 0, false, 0, false, '', 'B2', 0);
+            InsertData('40ZAK', XstandardratebaseTxt, 11700, '', 0, '', '', '40Z', 0, 0, true, 0, false, 'DP3-40Z', '', 0);
+            InsertData('40D', '', 1, '', 1, DomesticCode(), BaseVATItemCode(), '', 1, 0, false, 0, false, '', 'B2', 0);
+            InsertData('40D', '', 1, '', 1, DomesticCode(), BaseVATServiceCode(), '', 1, 0, false, 0, false, '', 'B2', 0);
+            InsertData('40DAN', XstandardratetaxfulldeductionTxt, 11700, '', 0, '', '', '40D', 0, 0, true, 0, false, 'DP3-40D', '', 0);
+            InsertData('41Z', '', 1, '', 1, DomesticCode(), FirstReducedVATItemCode(), '', 2, 0, false, 0, false, '', 'B2', 0);
+            InsertData('41Z', '', 1, '', 1, DomesticCode(), FirstReducedVATServiceCode(), '', 2, 0, false, 0, false, '', 'B2', 0);
+            InsertData('41Z', '', 1, '', 1, DomesticCode(), SecondReducedVATItemCode(), '', 2, 0, false, 0, false, '', 'B2', 0);
+            InsertData('41ZAK', XreducedratebaseTxt, 11700, '', 0, '', '', '41Z', 0, 0, true, 0, false, 'DP3-41Z', '', 0);
+            InsertData('41D', '', 1, '', 1, DomesticCode(), FirstReducedVATItemCode(), '', 1, 0, false, 0, false, '', 'B2', 0);
+            InsertData('41D', '', 1, '', 1, DomesticCode(), FirstReducedVATServiceCode(), '', 1, 0, false, 0, false, '', 'B2', 0);
+            InsertData('41D', '', 1, '', 1, DomesticCode(), SecondReducedVATItemCode(), '', 1, 0, false, 0, false, '', 'B2', 0);
+            InsertData('41DAN', XreducedratetaxfulldeductionTxt, 11700, '', 0, '', '', '41D', 0, 0, true, 0, false, 'DP3-41D', '', 0);
+            InsertData('', XImportofgoodswherethecustomsofficeistheVATadministratorTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('42ZAK', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-42Z', '', 0);
+            InsertData('42DAN', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-42D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XTaxabletransactionsreportedinrows313Txt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('43Z', '', 11700, '', 0, '', '', '3ZAK|5ZAK|7ZAK|9ZAK|10ZAK', 0, 0, false, 0, false, '', '', 0);
+            InsertData('43ZAK', XstandardratebaseTxt, 11700, '', 0, '', '', '43Z', 0, 0, true, 0, false, 'DP3-43Z', '', 0);
+            InsertData('43D', '', 11700, '', 0, '', '', '3DAN|5DAN|7DAN|9DAN|10DAN', 0, 0, false, 0, false, '', '', 0);
+            InsertData('43DAN', XstandardratetaxfulldeductionTxt, 11700, '', 0, '', '', '43D', 0, 0, true, 0, false, 'DP3-43D', '', 0);
+            InsertData('44Z', '', 11700, '', 0, '', '', '4ZAK|6ZAK|8ZAK|11ZAK', 0, 0, false, 0, false, '', '', 0);
+            InsertData('44ZAK', XreducedratebaseTxt, 11700, '', 0, '', '', '44Z', 0, 0, true, 0, false, 'DP3-44Z', '', 0);
+            InsertData('44D', '', 11700, '', 0, '', '', '4DAN|6DAN|8DAN|11DAN', 0, 0, false, 0, false, '', '', 0);
+            InsertData('44DAN', XreducedratetaxfulldeductionTxt, 11700, '', 0, '', '', '44D', 0, 0, true, 0, false, 'DP3-44D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XCorrectionofdeductionsVATTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('45DAN', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-45D', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XTotaltaxdeductionTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('46DAN', XtaxfulldeductionTxt, 11700, '', 0, '', '', '4?DAN', 0, 0, true, 0, false, 'DP3-46D', '', 0);
+            InsertData('46DANK', XtaxshorteneddeductionTxt, 11700, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-46K', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XValueofacquiredfixedassetsTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('47DMZAK', XBaseTxt, 11700, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-47Z', '', 0);
+            InsertData('47DMDAN', XTaxfulldeductionTxt, 11700, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-47D', '', 0);
+            InsertData('47DMDANK', XtaxshorteneddeductionTxt, 11700, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-47K', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XReductionoftheentitledtoataxdeductionTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('50Z', '', 3, '', 0, '', '', '', 2, 0, false, 0, false, '', '', 0);
+            InsertData('50ZAK', XExempttransactionwithoutVATdeductionTxt, 11700, '', 0, '', '', '50Z', 0, 0, true, 0, false, 'DP3-50Z', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XValueofperformacenotincludedinthecoefficientTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('51ZAKN', XwithVATdeductionTxt, 11700, '', 0, '', '', '30ZAK', 0, 0, true, 0, false, 'DP3-51S', '', 0);
+            InsertData('51ZAKBN', XwithoutVATdeductionTxt, 11700, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-51B', '', 0);
+            InsertData('', '', 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XTaxliabilitycalculationTxt, 3, '', 0, '', '', '', 0, 0, true, 0, false, '', '', 0);
+            InsertData('60DAN', XAdjustmentoftaxdeductionTxt, 11700, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-60D', '', 0);
+            InsertData('61DAN', XTaxrefundTxt, 11700, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-61D', '', 0);
+            InsertData('62DAN', XVAToutputTxt, 11700, '', 0, '', '', '?DAN|1?DAN|61DAN', 0, 0, true, 0, false, 'DP3-62D', '', 0);
+            InsertData('63DAN', XVATdeductionTxt, 11700, '', 0, '', '', '46DAN+60DAN', 0, 0, true, 0, false, 'DP3-63D', '', 0);
+            InsertData('DPH', XCalculationofVATTxt, 11700, '', 0, '', '', '62DAN-63DAN', 0, 0, true, 0, false, '', '', 0);
+            InsertData('', XVATliabilityTxt, 11700, '', 0, '', '', 'DPH', 0, 0, true, 0, false, 'DP3-64D', '', 1);
+            InsertData('', XExcessVATdeductionTxt, 11700, '', 0, '', '', 'DPH', 0, 0, true, 1, false, 'DP3-65D', '', 2);
+            InsertData('66D', XDifferencefromthelastknowntaxliabilityTxt, 11700, '', 0, '', '', '', 0, 0, true, 0, false, 'DP3-66D', '', 0);
+        end;
+    end;
+
+    var
+        DemoDataSetup: Record "Demo Data Setup";
+        NextLineNo: Integer;
+        XVAT: Label 'VAT';
+        XDEFAULT: Label 'DEFAULT';
+        XTaxabletransactionsTxt: Label 'Taxable transactions';
+        XSupplyofgoodsorservicesindomesticTxt: Label 'Supply of goods or services in domestic';
+        XstandardratebasetotalTxt: Label 'standard rate (base) - total';
+        XstandardratetaxtotalTxt: Label 'standard rate (tax) - total';
+        XreducedratebasetotalTxt: Label 'reduced rate (base) - total';
+        XreducedratetaxtotalTxt: Label 'reduced rate (tax) - total';
+        XSupplyofgoodsfromothermemberstateTxt: Label 'Supply of goods from other member state';
+        XSupplyofservicesfromVATregisteredpersoninEUTxt: Label 'Supply of services from VAT registered person in EU';
+        XImportofgoodsTxt: Label 'Import of goods';
+        XstandardratebaseTxt: Label 'standard rate (base)';
+        XstandardratetaxTxt: Label 'standard rate (tax)';
+        XreducedratebaseTxt: Label 'reduced rate (base)';
+        XreducedratetaxTxt: Label 'reduced rate (tax)';
+        XVehicleacquisitionTxt: Label 'Vehicle acquisition';
+        XReversechargeschemeTxt: Label 'Reverse charge scheme';
+        XOthertaxabletransactionsforwhichthetaxpayerisTxt: Label 'Other taxable transactions for which the taxpayer  is';
+        XobligedtodeclaretaxontheirreceiptTxt: Label 'obliged to declare tax on their receipt';
+        XVATexempttransactionsTxt: Label 'VAT exempt transactions';
+        XWithclaimondeductionTxt: Label 'with claim on deduction';
+        XDeliveryofgoodstoamemberstateEUTxt: Label 'Delivery of goods to a member state EU';
+        XSupplyofservicesoutsidedomesticTxt: Label 'Supply of services outside domestic';
+        XGoodsexportTxt: Label 'Goods export';
+        XOthertaxabledeliverablesTxt: Label 'Other taxable deliverables';
+        XAdditionaldataTxt: Label 'Additional data';
+        XSimplifiedtrilateraltradeprocedureTxt: Label 'Simplified trilateral trade procedure';
+        XTripartitetradeacquisitionTxt: Label 'Tripartite trade - acquisition';
+        XTripartitetradedeliveryTxt: Label 'Tripartite trade - delivery';
+        XImportofgoodsexemptfromVATTxt: Label 'Import of goods exempt from VAT';
+        XTaxcorrectiononreceivablesfrominsolventdebtorscreditorTxt: Label 'Tax correction on receivables from insolvent debtors - creditor';
+        XTaxcorrectiononreceivablesfrominsolventdebtorsdebtorTxt: Label 'Tax correction on receivables from insolvent debtors  - debtor';
+        XEntitledtoataxdeductionTxt: Label 'Entitled to a tax deduction';
+        XTaxabletransactionreceivedTxt: Label 'Taxable transaction received';
+        XstandardratetaxfulldeductionTxt: Label 'standard rate (tax - full deduction)';
+        XreducedratetaxfulldeductionTxt: Label 'reduced rate (tax - full deduction)';
+        XImportofgoodswherethecustomsofficeistheVATadministratorTxt: Label 'Import of goods where the customs office is the VAT administrator';
+        XTaxabletransactionsreportedinrows313Txt: Label 'Taxable transactions reported in rows 3 - 13';
+        XCorrectionofdeductionsVATTxt: Label 'Correction of deductions VAT';
+        XTotaltaxdeductionTxt: Label 'Total tax deduction';
+        XtaxfulldeductionTxt: Label 'tax - full deduction';
+        XtaxshorteneddeductionTxt: Label 'tax - shoretened deduction';
+        XValueofacquiredfixedassetsTxt: Label 'Value of acquired fixed assets';
+        XBaseTxt: Label 'Base';
+        XReductionoftheentitledtoataxdeductionTxt: Label 'Reduction of the entitled to a tax deduction';
+        XExempttransactionwithoutVATdeductionTxt: Label 'Exempt transaction without VAT deduction';
+        XValueofperformacenotincludedinthecoefficientTxt: Label 'Value of performace not included in the coefficient';
+        XwithVATdeductionTxt: Label 'with VAT deduction';
+        XwithoutVATdeductionTxt: Label 'without VAT deduction';
+        XTaxliabilitycalculationTxt: Label 'Tax liability calculation';
+        XAdjustmentoftaxdeductionTxt: Label 'Adjustment of tax deduction';
+        XTaxrefundTxt: Label 'Tax refund';
+        XVAToutputTxt: Label 'VAT output';
+        XVATdeductionTxt: Label 'VAT deduction';
+        XCalculationofVATTxt: Label 'Calculation of VAT';
+        XVATliabilityTxt: Label 'VAT liability';
+        XExcessVATdeductionTxt: Label 'Excess VAT deduction';
+        XDifferencefromthelastknowntaxliabilityTxt: Label 'Difference from the last known tax liability';
+        XVAT19: Label 'VAT-19';
+
+    procedure InsertData(RowNo: Code[10]; Description: Text[100]; Type: Option; AccountTotaling: Text[30]; GenPostingType: Option; VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; RowTotaling: Text[50]; AmountType: Option; CalculateWith: Option; Print: Boolean; PrintWith: Option; NewPage: Boolean; AttributeCode: Code[20]; VATControlRepSectionCode: Code[20]; Show: Option)
+    var
+        VATStatementLine: Record "VAT Statement Line";
+        AppInfo: ModuleInfo;
+    begin
+        VATStatementLine.Init();
+        VATStatementLine.Validate("Statement Template Name", XVAT);
+        // NAVCZ
+        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
+            VATStatementLine.Validate("Statement Name", XDEFAULT)
+        else
+            VATStatementLine.Validate("Statement Name", XVAT19);
+        // NAVCZ
+        NextLineNo := NextLineNo + 10000;
+        VATStatementLine.Validate("Line No.", NextLineNo);
+        VATStatementLine.Validate("Row No.", RowNo);
+        VATStatementLine.Validate(Description, Description);
+        VATStatementLine.Validate(Type, Type);
+        VATStatementLine.Validate("Account Totaling", AccountTotaling);
+        VATStatementLine.Validate("Gen. Posting Type", GenPostingType);
+        VATStatementLine.Validate("VAT Bus. Posting Group", VATBusPostingGroup);
+        VATStatementLine.Validate("VAT Prod. Posting Group", VATProdPostingGroup);
+        VATStatementLine.Validate("Row Totaling", RowTotaling);
+        VATStatementLine.Validate("Amount Type", AmountType);
+        VATStatementLine.Validate("Calculate with", CalculateWith);
+        VATStatementLine.Validate(Print, Print);
+        VATStatementLine.Validate("Print with", PrintWith);
+        VATStatementLine.Validate("New Page", NewPage);
+        // NAVCZ
+        VATStatementLine.Validate("Show CZL", Show);
+        VATStatementLine."Attribute Code CZL" := AttributeCode;
+        VATStatementLine."VAT Ctrl. Report Section CZL" := VATControlRepSectionCode;
+#if not CLEAN23
+        if RowNo in ['30Z', '31Z'] then
+            VATStatementLine."EU-3 Party Trade CZL" := VATStatementLine."EU-3 Party Trade CZL"::Yes;
+#endif
+        if RowNo in ['30Z', '31Z'] then
+            VATStatementLine."EU 3 Party Trade" := VATStatementLine."EU 3 Party Trade"::EU3;
+        // NAVCZ
+
+        VATStatementLine.Insert();
+    end;
+}
+
