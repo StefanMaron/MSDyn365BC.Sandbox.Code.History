@@ -87,6 +87,8 @@ $Versions | Sort-Object -Property Country, Version | % {
         
         Get-ChildItem -Recurse -Filter "*.xlf" | Remove-Item
 
+        "$($country)-$($version.ToString())" > version.txt
+
         git config user.email "stefanmaron@outlook.de"
         git config user.name "Stefan Maron"
         git add -A | out-null
