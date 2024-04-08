@@ -79,10 +79,6 @@ $Versions | Sort-Object -Property Country, Version | % {
 
         if (-not (Test-Path $TargetPathOfVersion)) {
             #Platform Folder
-            if ($PlatformPath -eq '')
-            {
-                return
-            }
             $TargetPathOfVersion = (Join-Path $PlatformPath "Applications")
         }
         
