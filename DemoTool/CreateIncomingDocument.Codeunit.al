@@ -3,8 +3,8 @@ codeunit 101130 "Create Incoming Document"
 
     trigger OnRun()
     begin
-        InsertData(GetInvoiceFileName);
-        CreateIncomingDocSetup;
+        InsertData(GetInvoiceFileName());
+        CreateIncomingDocSetup();
     end;
 
     local procedure GetInvoiceFileName(): Text
@@ -24,7 +24,7 @@ codeunit 101130 "Create Incoming Document"
         ImportAttachmentIncDoc: Codeunit "Import Attachment - Inc. Doc.";
         FilePath: Text;
     begin
-        if DemoDataSetup.Get then;
+        if DemoDataSetup.Get() then;
         FilePath := DemoDataSetup."Path to Picture Folder" + 'IncomingDocuments\';
         FilePath += FileName;
         ImportAttachmentIncDoc.ImportAttachment(IncomingDocumentAttachment, FilePath);
@@ -32,8 +32,8 @@ codeunit 101130 "Create Incoming Document"
 
     procedure CreateEvaluationData()
     begin
-        InsertData(GetEvaluationCompanyInvoiceFileName);
-        CreateIncomingDocSetup;
+        InsertData(GetEvaluationCompanyInvoiceFileName());
+        CreateIncomingDocSetup();
     end;
 
     procedure CreateIncomingDocSetup()

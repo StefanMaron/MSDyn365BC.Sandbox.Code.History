@@ -229,7 +229,7 @@ codeunit 101018 "Create Customer"
                 Customer.Validate("Payment Terms Code", X1M8D);
             1:
                 begin
-                    Customer.Validate("Customer Disc. Group", DemoDataSetup.RetailCode);
+                    Customer.Validate("Customer Disc. Group", DemoDataSetup.RetailCode());
                     Customer.Validate("Payment Terms Code", X14DAYS);
                 end;
             2:
@@ -253,12 +253,12 @@ codeunit 101018 "Create Customer"
                 Customer.Validate("Credit Limit (LCY)",
                   Round(
                     CurrencyExchangeRate.ExchangeAmtFCYToLCY(
-                      WorkDate, 'EUR', 3871.17, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'EUR')), 0.01));
+                      WorkDate(), 'EUR', 3871.17, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'EUR')), 0.01));
             '35451236':
                 Customer.Validate("Credit Limit (LCY)",
                   Round(
                     CurrencyExchangeRate.ExchangeAmtFCYToLCY(
-                      WorkDate, 'ISK', 90000, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'ISK')), 0.01));
+                      WorkDate(), 'ISK', 90000, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'ISK')), 0.01));
             '20000':
                 Customer.Validate("Application Method", 1);
             '49633663':
@@ -266,10 +266,10 @@ codeunit 101018 "Create Customer"
         end;
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
             if "Currency Code" = '' then begin
-                Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode);
+                Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode());
                 Customer.Validate("Fin. Charge Terms Code", X15DOM);
             end else begin
-                Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode);
+                Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode());
                 Customer.Validate("Fin. Charge Terms Code", X20FOR);
             end;
 
@@ -290,6 +290,12 @@ codeunit 101018 "Create Customer"
 
         Customer.Validate("Language Code", CreateLanguage.GetLanguageCode("Country Code"));
         Customer.Validate("Territory Code", CreateTerritory.GetTerritoryCode(Customer."Country/Region Code", "Territory Code"));
+
+        if (DemoDataSetup."Country/Region Code" = "Country Code") then
+            Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode())
+        else
+            Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode());
+
         Customer.Insert(true);
 
         Customer.Validate(Contact, CreateContact.FormatContact(Title, "Contact Name"));

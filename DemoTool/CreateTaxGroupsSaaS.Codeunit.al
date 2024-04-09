@@ -8,7 +8,7 @@ codeunit 101220 "Create Tax Groups SaaS"
             if DemoDataSetup."Data Type" <> DemoDataSetup."Data Type"::Standard then
                 if not "Tax Group".Get(XLABOR) then begin
                     InsertData(XLABOR, XLaboronJob);
-                    InsertLocalData;
+                    InsertLocalData();
                 end;
             if not "Tax Group".Get(NONTAXABLETok) then
                 InsertData(NONTAXABLETok, XNontaxableTxt);

@@ -6,35 +6,31 @@ codeunit 101999 "Create Vendor Template"
     end;
 
     var
-        xCashDescriptionTxt: Label 'Cash-Payment Vendor (Cash)', Comment = 'Translate.';
         DemoDataSetup: Record "Demo Data Setup";
         Vendor: Record Vendor;
+        CreateTemplateHelper: Codeunit "Create Template Helper";
+        xCashDescriptionTxt: Label 'Cash-Payment Vendor (Cash)', Comment = 'Translate.';
         xBusinessDescriptionTxt: Label 'Business-to-Business Vendor (Bank)', Comment = 'Translate.';
         xManualTxt: Label 'Manual';
         xCODTxt: Label 'COD';
         X1M8DTxt: Label '1M(8D)';
         xBANKTxt: Label 'BANK', Comment = 'To be translated.';
         xCASHCAPTxt: Label 'CASH', Comment = 'Translated.';
-        CreateTemplateHelper: Codeunit "Create Template Helper";
 
     procedure InsertMiniAppData()
     var
         ConfigTemplateHeader: Record "Config. Template Header";
     begin
-        with DemoDataSetup do begin
-            Get();
+        DemoDataSetup.Get();
+        // Cash-Payment vendor template
+        InsertTemplate(ConfigTemplateHeader, xCashDescriptionTxt, '', DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), true);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, xCODTxt, xCASHCAPTxt);
+        // Business-to-Business vendor template
+        InsertTemplate(ConfigTemplateHeader, xBusinessDescriptionTxt, '', DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), true);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X1M8DTxt, xBANKTxt);
 
-            // Business-to-Business vendor template
-            InsertTemplate(ConfigTemplateHeader, xBusinessDescriptionTxt, '', DomesticCode, DomesticCode, true);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X1M8DTxt, xBANKTxt);
-
-            // Cash-Payment vendor template
-            InsertTemplate(ConfigTemplateHeader, xCashDescriptionTxt, '', DomesticCode, DomesticCode, true);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, xCODTxt, xCASHCAPTxt);
-
-            CreateTemplateHelper.CreateTemplateSelectionRule(
-              DATABASE::Vendor, ConfigTemplateHeader.Code, '', 0, 0);
-        end;
+        CreateTemplateHelper.CreateTemplateSelectionRule(
+          DATABASE::Vendor, ConfigTemplateHeader.Code, '', 0, 0);
     end;
 
     local procedure InsertTemplate(var ConfigTemplateHeader: Record "Config. Template Header"; Description: Text[50]; CountryCode: Text[50]; GenBusGroup: Code[20]; VendorGroup: Code[20]; TaxLiable: Boolean)

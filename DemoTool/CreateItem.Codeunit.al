@@ -54,10 +54,10 @@ codeunit 101027 "Create Item"
         InsertData('766BC-A', 46350.76923, 30128, '', '', 10, 119.72, 104.1, 1.47, '9403 30 19', '', '', '');
         InsertData('766BC-B', 15305.00086, 10666, '', '', 10, 155.96, 135.6, 6.67, '9403 30 19', '', '', '');
         InsertData('766BC-C', 8087.69231, 5257, '', '', 10, 94.31, 82, 5.18, '9403 30 19', '', '', '');
-        InsertItemAttributesAndValues;
-        InsertLocalData;
-        InsertItemCategoriesWithAttributes;
-        AssignCategoriesToItems;
+        InsertItemAttributesAndValues();
+        InsertLocalData();
+        InsertItemCategoriesWithAttributes();
+        AssignCategoriesToItems();
         // Remember to add Item Description in codeunit 101030 Create Item Translation.
     end;
 
@@ -75,7 +75,7 @@ codeunit 101027 "Create Item"
         XPACK: Label 'PACK';
         XPALLET: Label 'PALLET';
         XPCS: Label 'PCS';
-	    XSET: Label 'SET';
+        XSET: Label 'SET';
         XA: Label 'A';
         XB: Label 'B';
         XCM: Label 'CM';
@@ -187,38 +187,38 @@ codeunit 101027 "Create Item"
         case true of
             Item."No." in ['1925-W', '1929-W', '1953-W', '1965-W', '1969-W']:
                 begin
-                    Item."Inventory Posting Group" := DemoDataSetup.ResaleCode;
-                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode);
+                    Item."Inventory Posting Group" := DemoDataSetup.ResaleCode();
+                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode());
                     Item.Validate("Replenishment System", Item."Replenishment System"::Assembly);
                 end;
             StrPos(Item."No.", 'W') > 0:
                 begin
-                    Item."Inventory Posting Group" := DemoDataSetup.FinishedCode;
-                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode);
+                    Item."Inventory Posting Group" := DemoDataSetup.FinishedCode();
+                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode());
                     Item.Validate("Replenishment System", Item."Replenishment System"::Assembly);
                 end;
             (StrPos(Item."No.", 'S') > 0) or (Item."No." = '80100'):
                 begin
-                    Item."Inventory Posting Group" := DemoDataSetup.ResaleCode;
-                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode);
+                    Item."Inventory Posting Group" := DemoDataSetup.ResaleCode();
+                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode());
                 end;
             Item."No." in ['766BC-A', '766BC-B', '766BC-C']:
                 begin
-                    Item."Inventory Posting Group" := DemoDataSetup.FinishedCode;
-                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode);
+                    Item."Inventory Posting Group" := DemoDataSetup.FinishedCode();
+                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode());
                     Item.Validate("Replenishment System", Item."Replenishment System"::Assembly);
                 end;
             else begin
-                Item."Inventory Posting Group" := DemoDataSetup.RawMatCode;
-                Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RawMatCode);
+                Item."Inventory Posting Group" := DemoDataSetup.RawMatCode();
+                Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RawMatCode());
             end;
         end;
 
         if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::"Sales Tax" then
-            Item.Validate("Tax Group Code", GetTaxGroupCode);
+            Item.Validate("Tax Group Code", GetTaxGroupCode());
 
         case Item."Inventory Posting Group" of
-            DemoDataSetup.RawMatCode:
+            DemoDataSetup.RawMatCode():
                 if Item."Base Unit of Measure" = XCAN then begin
                     Counter1 := Counter1 + 1;
                     Item.Validate("Shelf No.", StrSubstNo('B%1', Counter1));
@@ -226,12 +226,12 @@ codeunit 101027 "Create Item"
                     Counter4 := Counter4 + 1;
                     Item.Validate("Shelf No.", StrSubstNo('A%1', Counter4));
                 end;
-            DemoDataSetup.ResaleCode:
+            DemoDataSetup.ResaleCode():
                 begin
                     Counter2 := Counter2 + 1;
                     Item.Validate("Shelf No.", StrSubstNo('D%1', Counter2));
                 end;
-            DemoDataSetup.FinishedCode:
+            DemoDataSetup.FinishedCode():
                 begin
                     Counter3 := Counter3 + 1;
                     Item.Validate("Shelf No.", StrSubstNo('F%1', Counter3));
@@ -239,12 +239,12 @@ codeunit 101027 "Create Item"
         end;
 
         case Item."Inventory Posting Group" of
-            DemoDataSetup.RawMatCode:
-                Item."Item Disc. Group" := DemoDataSetup.RawMatCode;
-            DemoDataSetup.ResaleCode:
-                Item."Item Disc. Group" := DemoDataSetup.ResaleCode;
-            DemoDataSetup.FinishedCode:
-                Item."Item Disc. Group" := DemoDataSetup.FinishedCode;
+            DemoDataSetup.RawMatCode():
+                Item."Item Disc. Group" := DemoDataSetup.RawMatCode();
+            DemoDataSetup.ResaleCode():
+                Item."Item Disc. Group" := DemoDataSetup.ResaleCode();
+            DemoDataSetup.FinishedCode():
+                Item."Item Disc. Group" := DemoDataSetup.FinishedCode();
             else
                 Item."Item Disc. Group" := '';
         end;
@@ -290,7 +290,7 @@ codeunit 101027 "Create Item"
 
         case Item."No." of // After price calculation since the profit is not know at this time.
             '766BC-A', '766BC-B', '766BC-C':
-                Item."Price/Profit Calculation" := 1;
+                Item."Price/Profit Calculation" := Item."Price/Profit Calculation"::"Price=Cost+Profit";
         end;
 
         ItemImagePath := DemoDataSetup."Path to Picture Folder" + StrSubstNo('Images\Item\%1.jpg', Item."No.");
@@ -462,12 +462,12 @@ codeunit 101027 "Create Item"
         InsertItemCategoryData(
           XFURNITURE, XOfficefurniture, '');
         InsertItemCategoryData(
-          DemoDataSetup.MiscCode, XMiscellaneous, '');
+          DemoDataSetup.MiscCode(), XMiscellaneous, '');
 
         InsertItemCategoryData(XCHAIR, XOfficeChair, XFURNITURE);
         InsertItemCategoryData(XDesklc, XOfficeDesk, XFURNITURE);
         InsertItemCategoryData(XTablelc, XAssortedTables, XFURNITURE);
-        InsertItemCategoryData(XSuppliers, XOfficeSupplies, DemoDataSetup.MiscCode);
+        InsertItemCategoryData(XSuppliers, XOfficeSupplies, DemoDataSetup.MiscCode());
 
         EmptyColorAttributeValueID := CreateOptionItemAttributeValue(GetItemAttributeIDByName(xColor), '');
         InsertItemAttributeValueMapping(
@@ -502,7 +502,7 @@ codeunit 101027 "Create Item"
         AddCategoryToItem('1906-S', XTablelc);
         AddCategoryToItem('1908-S', XCHAIR);
         AddCategoryToItem('1920-S', XTablelc);
-        AddCategoryToItem('1928-S', DemoDataSetup.MiscCode);
+        AddCategoryToItem('1928-S', DemoDataSetup.MiscCode());
         AddCategoryToItem('1936-S', XCHAIR);
         AddCategoryToItem('1960-S', XCHAIR);
         AddCategoryToItem('1964-S', XCHAIR);
@@ -510,7 +510,7 @@ codeunit 101027 "Create Item"
         AddCategoryToItem('1972-S', XCHAIR);
         AddCategoryToItem('1980-S', XCHAIR);
         AddCategoryToItem('1988-S', XCHAIR);
-        AddCategoryToItem('1996-S', DemoDataSetup.MiscCode);
+        AddCategoryToItem('1996-S', DemoDataSetup.MiscCode());
         AddCategoryToItem('2000-S', XCHAIR);
     end;
 

@@ -24,7 +24,7 @@ codeunit 132597 "Dictionary Wrapper Unit Tests"
 
         // [WHEN] We test DictionaryWrapper.Count
         // [THEN] The function gives us the correct result
-        Assert.AreEqual(3, DictionaryWrapper.Count, 'Count returns wrong result');
+        Assert.AreEqual(3, DictionaryWrapper.Count(), 'Count returns wrong result');
     end;
 
     [Test]
@@ -42,7 +42,7 @@ codeunit 132597 "Dictionary Wrapper Unit Tests"
         DictionaryWrapper.Clear();
 
         // [THEN] The function clears the dictionary
-        Assert.AreEqual(0, DictionaryWrapper.Count, 'Count returns wrong result');
+        Assert.AreEqual(0, DictionaryWrapper.Count(), 'Count returns wrong result');
     end;
 
     [Test]
@@ -61,7 +61,7 @@ codeunit 132597 "Dictionary Wrapper Unit Tests"
         DictionaryWrapper.Set(1, 'ONE');
 
         // [THEN] The function works correctly for existing key
-        Assert.AreEqual(3, DictionaryWrapper.Count, 'Count returns wrong result');
+        Assert.AreEqual(3, DictionaryWrapper.Count(), 'Count returns wrong result');
         Assert.AreEqual(true, DictionaryWrapper.ContainsKey(1), 'ContainsKey returns wrong result');
         Assert.AreEqual(true, DictionaryWrapper.TryGetValue(1, Value), 'TryGetValue returns wrong result');
         Assert.AreEqual('ONE', Value, 'TryGetValue returns wrong value');
@@ -83,7 +83,7 @@ codeunit 132597 "Dictionary Wrapper Unit Tests"
         DictionaryWrapper.Set(4, 'four');
 
         // [THEN] The function works correctly for missing key
-        Assert.AreEqual(4, DictionaryWrapper.Count, 'Count is wrong');
+        Assert.AreEqual(4, DictionaryWrapper.Count(), 'Count is wrong');
         Assert.AreEqual(true, DictionaryWrapper.ContainsKey(4), 'ContainsKey returns wrong result');
         Assert.AreEqual(true, DictionaryWrapper.TryGetValue(4, Value), 'TryGetValue returns wrong result');
         Assert.AreEqual('four', Value, 'TryGetValue returns wrong value');
@@ -265,7 +265,7 @@ codeunit 132597 "Dictionary Wrapper Unit Tests"
         // [THEN] The function works correctly for existing key
         DictionaryWrapper.Remove(1);
 
-        Assert.AreEqual(2, DictionaryWrapper.Count, 'Count returns wrong result');
+        Assert.AreEqual(2, DictionaryWrapper.Count(), 'Count returns wrong result');
         Assert.AreEqual(false, DictionaryWrapper.ContainsKey(1), 'ContainsKey returns wrong result');
         Assert.AreEqual(false, DictionaryWrapper.TryGetValue(1, Value), 'ContainsKey returns wrong result');
     end;
@@ -285,7 +285,7 @@ codeunit 132597 "Dictionary Wrapper Unit Tests"
         // [THEN] The function works correctly for missing key
         DictionaryWrapper.Remove(4);
 
-        Assert.AreEqual(3, DictionaryWrapper.Count, 'Count returns wrong result');
+        Assert.AreEqual(3, DictionaryWrapper.Count(), 'Count returns wrong result');
     end;
 
     local procedure Initilize(var DictionaryWrapper: Codeunit "Dictionary Wrapper")

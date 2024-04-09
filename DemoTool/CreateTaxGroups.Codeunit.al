@@ -6,8 +6,7 @@ codeunit 101321 "Create Tax Groups"
         DemoDataSetup: Record "Demo Data Setup";
     begin
         DemoDataSetup.Get();
-        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::"Sales Tax"
-        then begin
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::"Sales Tax" then begin
             InsertData(xTAXABLETok, xTaxableDescription);
             InsertData(xNONTAXABLETok, xNonTaxableDescription);
             TaxSetup.Get();

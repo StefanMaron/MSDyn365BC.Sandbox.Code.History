@@ -20,12 +20,13 @@ codeunit 122001 "Interface Evaluation Data"
         XEAST: Label 'EAST';
         XWEST: Label 'WEST';
         XLATE: Label 'LATE', Comment = 'Late';
-        PmtRecNoSeriesTok: Label 'PREC', Locked = true;
         PmtRecNoSeriesStartNoTok: Label 'PREC000', Locked = true;
+        XStatementLineDescription1: Label 'Transfer to savings account';
+        XStatementLineDescription2: Label 'Funds for Spring event 2023';
+        XStatementLineDescription3: Label 'Deposit to Account';
 
     procedure CreateSetupData()
     var
-        DemoDataSetup: Record "Demo Data Setup";
         CreateContact: Codeunit "Create Contact";
         CreateCustomer: Codeunit "Create Customer";
         CreateVendor: Codeunit "Create Vendor";
@@ -67,37 +68,36 @@ codeunit 122001 "Interface Evaluation Data"
         DemoDataSetup.Get();
         Window.Open(XEvalDataMsg);
 
-        CreateDimension.InsertEvaluationData;
-
-        CreateGeneralLedgerSetup.InsertEvaluationData;
+        CreateDimension.InsertEvaluationData();
+        CreateGeneralLedgerSetup.InsertEvaluationData();
 
         RunCodeunit(CODEUNIT::"Create Accounting Period");
         RunCodeunit(CODEUNIT::"Create Company Information");
         RunCodeunit(CODEUNIT::"Create Shipment Method");
-        CreateLocation.CreateEvaluationData;
-        CreateInventoryPostingSetup.CreateEvaluationData;
+        CreateLocation.CreateEvaluationData();
+        CreateInventoryPostingSetup.CreateEvaluationData();
         RunCodeunit(CODEUNIT::"Create In-Transit Location");
-        UpdateInventoryPostingSetup.CreateEvaluationData;
+        UpdateInventoryPostingSetup.CreateEvaluationData();
         RunCodeunit(CODEUNIT::"Create Salesperson/Purchaser");
         RunCodeunit(CODEUNIT::"Create Customer Disc. Group");
         RunCodeunit(CODEUNIT::"Create Territory");
-        CreateDocSendingProfile.CreateEvaluationData;
+        CreateDocSendingProfile.CreateEvaluationData();
         RunCodeunit(CODEUNIT::"Create Salutation");
-        CreateMarketingSetup.CreateEvaluationData;
-        CreateCustomer.CreateEvaluationData;
-        CreateVendor.CreateEvaluationData;
+        CreateMarketingSetup.CreateEvaluationData();
+        CreateCustomer.CreateEvaluationData();
+        CreateVendor.CreateEvaluationData();
         CreateDefaultDimension.CreateEvaluationData();
-        CreateContact.CreateEvaluationData;
-        CreateCVBankAccount.CreateEvaluationData;
-        CreateShiptoAddress.CreateEvaluationData;
+        CreateContact.CreateEvaluationData();
+        CreateCVBankAccount.CreateEvaluationData();
+        CreateShiptoAddress.CreateEvaluationData();
         RunCodeunit(CODEUNIT::"Create Bank Account");
         RunCodeunit(CODEUNIT::"Create Item");
         RunCodeunit(CODEUNIT::"Create Item Cross Reference");
         RunCodeunit(CODEUNIT::"Create Item Translation");
         RunCodeunit(CODEUNIT::"Create Item Substitution");
         RunCodeunit(CODEUNIT::"Create Catalog Item");
-        CreateInteractTemplLang.CreateEvaluationData;
-        CreateInteractionTemplate.CreateEvaluationData;
+        CreateInteractTemplLang.CreateEvaluationData();
+        CreateInteractionTemplate.CreateEvaluationData();
         RunCodeunit(CODEUNIT::"Create Salutation Formula");
         RunCodeunit(CODEUNIT::"Create Mailing Group");
         RunCodeunit(CODEUNIT::"Create Industry Group");
@@ -125,28 +125,30 @@ codeunit 122001 "Interface Evaluation Data"
         RunCodeunit(CODEUNIT::"Create Item Charges");
         RunCodeunit(CODEUNIT::"Create Item Tracking Codes");
 
-        CreateEmployee.CreateEvaluationData;
+        CreateEmployee.CreateEvaluationData();
         RunCodeunit(Codeunit::"Create Causes of Absence");
-        CreateContactProfileAnswer.InsertEvaluationData;
-        CreateSegmentHeader.CreateEvaluationData;
-        CreateSegmentLine.CreateEvaluationData;
-        CreateOpportunity.CreateEvaluationData;
-        CreateOpportunityEntry.CreateEvaluationData;
-        CreateTransferRoute.CreateEvaluationData;
-        CreateCampaign.CreateEvaluationData;
-        CreateBOMComponent.CreateEvaluationData;
-        CreateAnalysisView.CreateEvaluationData;
+        CreateContactProfileAnswer.InsertEvaluationData();
+        CreateSegmentHeader.CreateEvaluationData();
+        CreateSegmentLine.CreateEvaluationData();
+        CreateOpportunity.CreateEvaluationData();
+        CreateOpportunityEntry.CreateEvaluationData();
+        CreateTransferRoute.CreateEvaluationData();
+        CreateCampaign.CreateEvaluationData();
+        CreateBOMComponent.CreateEvaluationData();
+        CreateAnalysisView.CreateEvaluationData();
         Codeunit.Run(Codeunit::"Create Allocation Accounts");
+        RunCodeunit(Codeunit::"Create Dispute Status");
+        RunCodeunit(Codeunit::"Create Reminder Automation");
+
         CreateColumnLayoutName.Run();
         CreateColumnLayout.Run();
         CreateAccScheduleName.InsertEvaluationData();
         CreateAccScheduleLine.InsertEvaluationData();
         RunCodeunit(CODEUNIT::"Create Payment Reg. Setup");
-
-        CreateGenJnlLines;
+        CreateGenJnlLines();
         CreateICPartner.CreateICSetup('ICHQ');
 
-        UpdateContactEmail;
+        UpdateContactEmail();
 
         RunCodeunit(CODEUNIT::"Create Data Sensitivity");
         RunCodeunit(CODEUNIT::"Create Time Series Data");
@@ -155,29 +157,29 @@ codeunit 122001 "Interface Evaluation Data"
         LastPostingDate := 19030320D;
 
         CreatePurchaseDocument.CreateOpenPurchDocuments(
-          MakeAdjustments.AdjustDate(GetCurrentDay), GetOpenDocsMarker);
+          MakeAdjustments.AdjustDate(GetCurrentDay()), GetOpenDocsMarker());
         CreateSalesDocument.CreateOpenSalesDocuments(
-          MakeAdjustments.AdjustDate(GetCurrentDay), GetOpenDocsMarker);
+          MakeAdjustments.AdjustDate(GetCurrentDay()), GetOpenDocsMarker());
         CreatePurchaseDocument.CreatePurchaseOrders(
-          MakeAdjustments.AdjustDate(GetCurrentDay), GetOpenDocsMarker);
+          MakeAdjustments.AdjustDate(GetCurrentDay()), GetOpenDocsMarker());
         CreateSalesDocument.CreatePaidLateSalesDocuments(
-          MakeAdjustments.AdjustDate(CalcDate('<-75D>', GetCurrentDay)), XLATE);
+          MakeAdjustments.AdjustDate(CalcDate('<-75D>', GetCurrentDay())), XLATE);
 
         // Generate Sales Invoices based on Jobs in system
         RunCodeunit(CODEUNIT::"Create Invoices for Jobs");
 
-        ReleasePurchases;
-        ReopenPurchases;
-        ReleaseSales;
-        ReopenSalesSkipOrder;
+        ReleasePurchases();
+        ReopenPurchases();
+        ReleaseSales();
+        ReopenSalesSkipOrder();
 
-        CreateTransferOrder.CreateEvaluationData(GetOpenDocsMarker);
+        CreateTransferOrder.CreateEvaluationData(GetOpenDocsMarker());
 
         CreateGenlJournalLine.InsertEvaluationData();
         CreateBankAccountReconciliation();
         CreatePaymentReconciliationJournal();
 
-        CreateIncomingDocument.CreateEvaluationData;
+        CreateIncomingDocument.CreateEvaluationData();
         RunCodeunit(Codeunit::"Create Over-Receipt Code");
         CreateJobResponsibility.CreateEvaluationData();
         CreateNewTemplates();
@@ -298,29 +300,29 @@ codeunit 122001 "Interface Evaluation Data"
         BankAccReconciliationLine."Statement Type" := BankAccReconciliation."Statement Type";
         BankAccReconciliationLine."Bank Account No." := BankAccReconciliation."Bank Account No.";
         BankAccReconciliationLine."Statement No." := BankAccReconciliation."Statement No.";
-        GenJournalLine.SetFilter(Description, 'DEPOSIT*');
+        GenJournalLine.SetFilter("Document No.", 'DEPOSIT*');
         if GenJournalLine.FindSet() then
             repeat
                 DepositAmount -= GenJournalLine.Amount;
                 TransactionDate := GenJournalLine."Posting Date";
             until GenJournalLine.Next() = 0;
-        GenJournalLine.SetFilter(Description, 'BANK1*');
+        GenJournalLine.SetFilter("Document No.", 'BANK1*');
         if GenJournalLine.FindSet() then
             repeat
                 Bank1Amount -= GenJournalLine.Amount;
                 TransactionDate := GenJournalLine."Posting Date";
             until GenJournalLine.Next() = 0;
 
-        GenJournalLine.SetFilter(Description, 'BANK2*');
+        GenJournalLine.SetFilter("Document No.", 'BANK2*');
         if GenJournalLine.FindSet() then
             repeat
                 Bank2Amount -= GenJournalLine.Amount;
                 TransactionDate := GenJournalLine."Posting Date";
             until GenJournalLine.Next() = 0;
 
-        CreateBankReconciliationLine(BankAccReconciliationLine, 'BANK1', TransactionDate, Bank1Amount);
-        CreateBankReconciliationLine(BankAccReconciliationLine, 'BANK2', CalcDate('<+3D>', TransactionDate), Bank2Amount);
-        CreateBankReconciliationLine(BankAccReconciliationLine, 'DEPOSIT', TransactionDate, DepositAmount);
+        CreateBankReconciliationLine(BankAccReconciliationLine, XStatementLineDescription1, TransactionDate, Bank1Amount);
+        CreateBankReconciliationLine(BankAccReconciliationLine, XStatementLineDescription2, CalcDate('<+3D>', TransactionDate), Bank2Amount);
+        CreateBankReconciliationLine(BankAccReconciliationLine, XStatementLineDescription3 + ' ' + Format(TransactionDate), TransactionDate, DepositAmount);
 
         BankAccReconciliation."Statement Ending Balance" := Bank1Amount + Bank2Amount + DepositAmount;
         BankAccReconciliation.Modify();
@@ -369,7 +371,7 @@ codeunit 122001 "Interface Evaluation Data"
         PurchaseHeader.Reset();
         PurchaseHeader.SetRange("Payment Method Code", '');
         PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Invoice);
-        PurchaseHeader.SetFilter("Your Reference", '<>%1', GetOpenDocsMarker);
+        PurchaseHeader.SetFilter("Your Reference", '<>%1', GetOpenDocsMarker());
         if PurchaseHeader.FindSet() then
             repeat
                 PmtCount += 1;
@@ -397,7 +399,7 @@ codeunit 122001 "Interface Evaluation Data"
         PmtCount := 0;
         SalesHeader.Reset();
         SalesHeader.SetRange("Payment Method Code", '');
-        SalesHeader.SetFilter("Your Reference", '<>%1', GetOpenDocsMarker);
+        SalesHeader.SetFilter("Your Reference", '<>%1', GetOpenDocsMarker());
         if SalesHeader.FindSet() then
             repeat
                 PmtCount += 1;
@@ -595,8 +597,8 @@ codeunit 122001 "Interface Evaluation Data"
         TotalPostingDays := LastPostingDate - FirstPostingDate;
         DocumentIndex := 0;
         NotPaidDocumentsPeriod := 5;
-        PeriodWithIn90Days := GetCurrentDay - FirstPostingDate <= 90;
-        PeriodWithIn30Days := GetCurrentDay - FirstPostingDate <= 30;
+        PeriodWithIn90Days := GetCurrentDay() - FirstPostingDate <= 90;
+        PeriodWithIn30Days := GetCurrentDay() - FirstPostingDate <= 30;
 
         TempItemLineBuffer.Reset();
         TempItemLineBuffer.SetCurrentKey("Document Date Delta", "Document Index");
@@ -605,7 +607,7 @@ codeunit 122001 "Interface Evaluation Data"
             if TempItemLineBuffer."Document Index" <> DocumentIndex then begin
                 DocumentIndex := TempItemLineBuffer."Document Index";
                 DocCount += 1;
-                if TempItemLineBuffer.Sign = 1 then
+                if TempItemLineBuffer.Sign() = 1 then
                     CreatePurchDocumentHeader(CreatePurchaseDocument,
                       TempItemLineBuffer."Customer/Vendor No.",
                       MakeAdjustments.AdjustDate(FirstPostingDate + TempItemLineBuffer."Document Date Delta"), not PeriodWithIn30Days)
@@ -615,7 +617,7 @@ codeunit 122001 "Interface Evaluation Data"
                       MakeAdjustments.AdjustDate(FirstPostingDate + TempItemLineBuffer."Document Date Delta"),
                       (TempItemLineBuffer."Document Date Delta" <= TotalPostingDays - NotPaidDocumentsPeriod) or not PeriodWithIn90Days);
             end;
-            if TempItemLineBuffer.Sign = 1 then
+            if TempItemLineBuffer.Sign() = 1 then
                 CreatePurchDocumentLine(CreatePurchaseDocument, TempItemLineBuffer."Item No.", TempItemLineBuffer.Quantity)
             else
                 CreateSalesDocumentLine(CreateSalesDocument, TempItemLineBuffer."Item No.", -TempItemLineBuffer.Quantity);
@@ -626,7 +628,7 @@ codeunit 122001 "Interface Evaluation Data"
     var
         CreatePurchaseDocument: Codeunit "Create Purchase Document";
     begin
-        CreatePurchDocumentHeader(CreatePurchaseDocument, GetRandomVendor, PostingDate, true);
+        CreatePurchDocumentHeader(CreatePurchaseDocument, GetRandomVendor(), PostingDate, true);
         CreatePurchDocumentLine(CreatePurchaseDocument, ItemNo, Quantity);
     end;
 
@@ -634,7 +636,7 @@ codeunit 122001 "Interface Evaluation Data"
     var
         CreatePurchaseDocument: Codeunit "Create Purchase Document";
     begin
-        CreatePurchDocumentHeader(CreatePurchaseDocument, GetRandomVendor, PostingDate, true);
+        CreatePurchDocumentHeader(CreatePurchaseDocument, GetRandomVendor(), PostingDate, true);
         CreatePurchaseDocument.AddLocation(LocationCode);
         CreatePurchDocumentLine(CreatePurchaseDocument, ItemNo, Quantity);
     end;
@@ -644,7 +646,7 @@ codeunit 122001 "Interface Evaluation Data"
         CreatePurchaseDocument.AddInvoiceHeader(VendorNo, PostingDate);
         if AddPaymentCodes then
             CreatePurchaseDocument.AddPaymentCodes(
-              CreatePaymentTerms.CashOnDeliveryCode, CreatePaymentMethod.GetCashCode);
+              CreatePaymentTerms.CashOnDeliveryCode(), CreatePaymentMethod.GetCashCode());
     end;
 
     local procedure CreatePurchDocumentLine(var CreatePurchaseDocument: Codeunit "Create Purchase Document"; ItemNo: Code[20]; Quantity: Decimal)
@@ -657,7 +659,7 @@ codeunit 122001 "Interface Evaluation Data"
         CreateSalesDocument.AddInvoiceHeader(CustomerNo, PostingDate);
         if AddPaymentCodes then
             CreateSalesDocument.AddPaymentCodes(
-              CreatePaymentTerms.CashOnDeliveryCode, CreatePaymentMethod.GetCashCode);
+              CreatePaymentTerms.CashOnDeliveryCode(), CreatePaymentMethod.GetCashCode());
     end;
 
     local procedure CreateSalesDocumentLine(var CreateSalesDocument: Codeunit "Create Sales Document"; ItemNo: Code[20]; Quantity: Decimal)
@@ -667,34 +669,30 @@ codeunit 122001 "Interface Evaluation Data"
 
     local procedure CreateGenJnlLines()
     var
-        GenJournalLine: Record "Gen. Journal Line";
         CreateGenJournalLine: Codeunit "Create Gen. Journal Line";
         GetGLAccNo: Codeunit "Get G/L Account No. and Name";
         MonthNo: Integer;
         PostingDate: Date;
     begin
-        with CreateGenJournalLine do begin
-            PostingDate := MakeAdjustments.AdjustDate(19011231D);
-            InsertEvaluationEntry(0, GetGLAccNo.CapitalStock(), PostingDate, AdjustAmount(-20000.0), '');
-            InsertEvaluationEntry(0, GetGLAccNo.Cash(), PostingDate, AdjustAmount(20000.0), '');
-            InsertEvaluationEntry(0, GetGLAccNo.VendorsDomestic(), PostingDate, AdjustAmount(-2329.42), '');
-            InsertEvaluationEntry(0, GetGLAccNo.AccumDeprOperEquip(), PostingDate, AdjustAmount(3499.0), '');
-            InsertEvaluationEntry(0, GetGLAccNo.OperatEquipment(), PostingDate, AdjustAmount(5498.0), '');
-            InsertEvaluationEntry(0, GetGLAccNo.ResaleItems(), PostingDate, AdjustAmount(28547.16), '');
-            InsertEvaluationEntry(0, GetGLAccNo.CustomersDomesticCAD(), PostingDate, AdjustAmount(2870.0), '');
-            InsertEvaluationEntry(
-              GenJournalLine."Account Type"::"Bank Account", GetCheckingBankAccount, PostingDate, AdjustAmount(31638.4), '');
-            SetExactlyBalanced;
-            InsertEvaluationEntry(0, GetGLAccNo.RetainedEarnings(), PostingDate, 0, '');
+        PostingDate := MakeAdjustments.AdjustDate(19011231D);
+        CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.CapitalStock(), PostingDate, AdjustAmount(-20000.0), '');
+        CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.Cash(), PostingDate, AdjustAmount(20000.0), '');
+        CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.VendorsDomestic(), PostingDate, AdjustAmount(-2329.42), '');
+        CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.AccumDeprOperEquip(), PostingDate, AdjustAmount(3499.0), '');
+        CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.OperatEquipment(), PostingDate, AdjustAmount(5498.0), '');
+        CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.ResaleItems(), PostingDate, AdjustAmount(28547.16), '');
+        CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.CustomersDomesticCAD(), PostingDate, AdjustAmount(2870.0), '');
+        CreateGenJournalLine.InsertEvaluationEntry(3, GetCheckingBankAccount(), PostingDate, AdjustAmount(31638.4), '');
+        CreateGenJournalLine.SetExactlyBalanced();
+        CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.RetainedEarnings(), PostingDate, 0, '');
 
-            FirstPostingDate := CalcDate('<1D>', PostingDate);
-            for MonthNo := 1 to 15 do begin
-                PostingDate := CalcDate('<' + Format(MonthNo - 1) + 'M>', FirstPostingDate);
-                InsertEvaluationEntry(0, GetGLAccNo.RepairAndMaintenance(), PostingDate, AdjustAmount(1000), '');
-                InsertEvaluationEntry(0, GetGLAccNo.Salaries(), PostingDate, AdjustAmount(1000), '');
-                SetExactlyBalanced;
-                InsertEvaluationEntry(0, GetGLAccNo.BankChecking(), PostingDate, 0, '');
-            end;
+        FirstPostingDate := CalcDate('<1D>', PostingDate);
+        for MonthNo := 1 to 15 do begin
+            PostingDate := CalcDate('<' + Format(MonthNo - 1) + 'M>', FirstPostingDate);
+            CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.RepairAndMaintenance(), PostingDate, AdjustAmount(1000), '');
+            CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.Salaries(), PostingDate, AdjustAmount(1000), '');
+            CreateGenJournalLine.SetExactlyBalanced();
+            CreateGenJournalLine.InsertEvaluationEntry(0, GetGLAccNo.BankChecking(), PostingDate, 0, '');
         end;
     end;
 
@@ -726,8 +724,8 @@ codeunit 122001 "Interface Evaluation Data"
     procedure PickCustVend(IsVendor: Boolean): Code[20]
     begin
         if IsVendor then
-            exit(GetRandomVendor);
-        exit(GetRandomCustomer);
+            exit(GetRandomVendor());
+        exit(GetRandomCustomer());
     end;
 
     procedure CreateInventory(PostingDate: Date)
@@ -795,7 +793,7 @@ codeunit 122001 "Interface Evaluation Data"
         // Returns a pseudo random integer in the interval [1,Range]
         if Range < 1 then
             exit(1);
-        exit(1 + Round(Uniform * (Range - 1), 1));
+        exit(1 + Round(Uniform() * (Range - 1), 1));
     end;
 
     procedure SetSeed(Val: Integer): Integer
@@ -833,7 +831,7 @@ codeunit 122001 "Interface Evaluation Data"
     local procedure Uniform(): Decimal
     begin
         // Generates a pseudo random uniform number
-        UpdateSeed;
+        UpdateSeed();
 
         exit((Seed mod 137) / 137);
     end;

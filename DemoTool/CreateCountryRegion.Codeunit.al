@@ -153,7 +153,7 @@
         InsertData('ME', XMontenegro, '499', '', '', 0, 1, '9941', '');
         InsertData('CN', XChinaTxt, '156', '', '', 0, 0, '', '');
         InsertData('CR', XCostaRica, '188', '', '', 0, 0, '', '');
-        InsertTranslations;
+        InsertTranslations();
     end;
 
     var

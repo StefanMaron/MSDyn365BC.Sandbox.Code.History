@@ -22,7 +22,7 @@ codeunit 101318 "Create Tax Areas"
             InsertData('QC', xQuebec, TaxArea."Country/Region"::CA);
             InsertData('SK', xSaskatchewan, TaxArea."Country/Region"::CA);
             InsertData('YK', xYukon, TaxArea."Country/Region"::CA);
-            InsertTranslations;
+            InsertTranslations();
         end;
     end;
 

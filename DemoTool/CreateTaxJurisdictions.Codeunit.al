@@ -7,7 +7,7 @@ codeunit 101320 "Create Tax Jurisdictions"
     begin
         DemoDataSetup.Get();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
-            UpdateTaxSetup;
+            UpdateTaxSetup();
             if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::"Sales Tax"
             then begin
                 InsertTaxJurisdiction('CA', xGovernmentofCanada, xGSTHSTAccount, 'CA', xGSTPrintDescription);
@@ -27,11 +27,11 @@ codeunit 101320 "Create Tax Jurisdictions"
                 // QST - Quebec sales tax
                 InsertTaxJurisdiction('CAQC', xQuebec, xPSTAccount, 'CAQC', xQuebecPrintDescription);
 
-                UpdatePrintOrder;
-                InsertTranslations;
+                UpdatePrintOrder();
+                InsertTranslations();
             end;
         end else begin
-            UpdateTaxMiniSetup;
+            UpdateTaxMiniSetup();
             InsertTaxJurisdiction2('CA', xGovernmentofCanada, GetGLAccNo.GSTHSTSalesTax(), GetGLAccNo.GSTHSTInputCredits(), 'CA', xGSTPrintDescription);
 
             // HST - Harmonized Sales Tax Provinces
@@ -49,8 +49,8 @@ codeunit 101320 "Create Tax Jurisdictions"
             // QST - Quebec sales tax
             InsertTaxJurisdiction2('CAQC', xQuebec, GetGLAccNo.QSTSalesTaxCollected(), GetGLAccNo.GSTHSTInputCredits(), 'CAQC', xQuebecPrintDescription);
 
-            UpdatePrintOrder;
-            InsertTranslations;
+            UpdatePrintOrder();
+            InsertTranslations();
         end;
     end;
 

@@ -3,15 +3,13 @@ codeunit 118013 "Update Inventory Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, FinishedCode, '992120', '992121');
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, RawMatCode, '992130', '992131');
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, ResaleCode, '992110', '992111');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, FinishedCode, '992120', '992121');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, RawMatCode, '992130', '992131');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, ResaleCode, '992110', '992111');
-        end;
+        DemoDataSetup.Get();
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.FinishedCode(), '992120', '992121');
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.RawMatCode(), '992130', '992131');
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.ResaleCode(), '992110', '992111');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.FinishedCode(), '992120', '992121');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.RawMatCode(), '992130', '992131');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.ResaleCode(), '992110', '992111');
     end;
 
     var
@@ -23,15 +21,13 @@ codeunit 118013 "Update Inventory Posting Setup"
 
     procedure CreateEvaluationData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, ResaleCode, GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), '', '', '', '', '', '');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, ResaleCode, GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), '', '', '', '', '', '');
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, FinishedCode(), GetGLAccNo.FinishedGoods(), GetGLAccNo.FinishedGoodsInterim(), '', '', '', '', '', '');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, FinishedCode(), GetGLAccNo.FinishedGoods(), GetGLAccNo.FinishedGoodsInterim(), '', '', '', '', '', '');
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, RawMatCode(), GetGLAccNo.RawMaterials(), GetGLAccNo.RawMaterialsInterim(), '', '', '', '', '', '');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, RawMatCode(), GetGLAccNo.RawMaterials(), GetGLAccNo.RawMaterialsInterim(), '', '', '', '', '', '');
-        end;
+        DemoDataSetup.Get();
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.ResaleCode(), GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), '', '', '', '', '', '');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.ResaleCode(), GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), '', '', '', '', '', '');
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.FinishedCode(), GetGLAccNo.FinishedGoods(), GetGLAccNo.FinishedGoodsInterim(), '', '', '', '', '', '');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.FinishedCode(), GetGLAccNo.FinishedGoods(), GetGLAccNo.FinishedGoodsInterim(), '', '', '', '', '', '');
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.RawMatCode(), GetGLAccNo.RawMaterials(), GetGLAccNo.RawMaterialsInterim(), '', '', '', '', '', '');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.RawMatCode(), GetGLAccNo.RawMaterials(), GetGLAccNo.RawMaterialsInterim(), '', '', '', '', '', '');
     end;
 }
 

@@ -14,7 +14,7 @@ codeunit 101003 "Create Payment Terms"
         InsertData(X15DAYS, '<15D>', '', 0, XNet15days);
         InsertData(X30DAYS, '<30D>', '', 0, XNet30days);
         InsertData(X60DAYS, '<60D>', '', 0, XNet60days);
-        InsertTranslations;
+        InsertTranslations();
     end;
 
     var

@@ -4,7 +4,7 @@ codeunit 101079 "Create Company Information"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        InsertData;
+        InsertData();
     end;
 
     var
@@ -62,7 +62,7 @@ codeunit 101079 "Create Company Information"
 
         DemoDataSetup.Get();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Evaluation then
-            CompanyInformation."Tax Area Code" := CreateTaxAreas.GetOntarioTaxAreaCode;
+            CompanyInformation."Tax Area Code" := CreateTaxAreas.GetOntarioTaxAreaCode();
 
         CompanyInformation.Insert();
     end;

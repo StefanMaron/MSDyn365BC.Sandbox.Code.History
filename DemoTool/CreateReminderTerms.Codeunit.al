@@ -3,11 +3,9 @@ codeunit 101292 "Create Reminder Terms"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(DomesticCode, XDomesticCustomers);
-            InsertData(ForeignCode, XForeignCustomers);
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.DomesticCode(), XDomesticCustomers);
+        InsertData(DemoDataSetup.ForeignCode(), XForeignCustomers);
     end;
 
     var

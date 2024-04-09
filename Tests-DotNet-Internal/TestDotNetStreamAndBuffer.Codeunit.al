@@ -21,22 +21,22 @@ codeunit 146034 Test_DotNet_StreamAndBuffer
     [Scope('OnPrem')]
     procedure TestReadingWritingUsingMemoryStream()
     begin
-        CreateStream;
-        Assert.AreEqual(true, DotNet_Stream.CanRead, 'CanRead check failed');
-        Assert.AreEqual(true, DotNet_Stream.CanWrite, 'CanWrite check failed');
-        Assert.AreEqual(true, DotNet_Stream.CanSeek, 'CanSeek check failed');
-        Assert.AreEqual(false, DotNet_Stream.IsDotNetNull, 'Null check failed');
+        CreateStream();
+        Assert.AreEqual(true, DotNet_Stream.CanRead(), 'CanRead check failed');
+        Assert.AreEqual(true, DotNet_Stream.CanWrite(), 'CanWrite check failed');
+        Assert.AreEqual(true, DotNet_Stream.CanSeek(), 'CanSeek check failed');
+        Assert.AreEqual(false, DotNet_Stream.IsDotNetNull(), 'Null check failed');
         DotNet_Stream.WriteByte(1);
-        CreateExampleByteArray;
+        CreateExampleByteArray();
         DotNet_Stream.Write(Byte_DotNet_Array, 0, 4);
         // Seek to the start of stream but skip first byte
-        DotNet_SeekOrigin.SeekBegin;
+        DotNet_SeekOrigin.SeekBegin();
         DotNet_Stream.Seek(1, DotNet_SeekOrigin);
-        ClearActualArray;
+        ClearActualArray();
         DotNet_Stream.Read(Byte_DotNet_Array, 0, 4);
         CheckArrayItems(Byte_DotNet_Array, ExpectedByte_DotNet_Array);
         DotNet_Stream.Seek(0, DotNet_SeekOrigin);
-        Assert.AreEqual(1, DotNet_Stream.ReadByte, 'ReadByte check failed');
+        Assert.AreEqual(1, DotNet_Stream.ReadByte(), 'ReadByte check failed');
         DotNet_Stream.Close();
         DotNet_Stream.Dispose();
     end;
@@ -51,23 +51,23 @@ codeunit 146034 Test_DotNet_StreamAndBuffer
     begin
         TempBlob.CreateOutStream(OutputData);
         DotNet_Stream.FromOutStream(OutputData);
-        Assert.AreEqual(true, DotNet_Stream.CanRead, 'CanRead check failed');
-        Assert.AreEqual(true, DotNet_Stream.CanWrite, 'CanWrite check failed');
-        Assert.AreEqual(true, DotNet_Stream.CanSeek, 'CanSeek check failed');
-        Assert.AreEqual(false, DotNet_Stream.IsDotNetNull, 'Null check failed');
+        Assert.AreEqual(true, DotNet_Stream.CanRead(), 'CanRead check failed');
+        Assert.AreEqual(true, DotNet_Stream.CanWrite(), 'CanWrite check failed');
+        Assert.AreEqual(true, DotNet_Stream.CanSeek(), 'CanSeek check failed');
+        Assert.AreEqual(false, DotNet_Stream.IsDotNetNull(), 'Null check failed');
         DotNet_Stream.WriteByte(1);
-        CreateExampleByteArray;
+        CreateExampleByteArray();
         DotNet_Stream.Write(Byte_DotNet_Array, 0, 4);
         DotNet_Stream.Close();
         DotNet_Stream.Dispose();
         TempBlob.CreateInStream(InputData);
         DotNet_Stream.FromInStream(InputData);
-        Assert.AreEqual(true, DotNet_Stream.CanRead, 'CanRead check failed');
-        Assert.AreEqual(true, DotNet_Stream.CanWrite, 'CanWrite check failed');
-        Assert.AreEqual(true, DotNet_Stream.CanSeek, 'CanSeek check failed');
-        Assert.AreEqual(false, DotNet_Stream.IsDotNetNull, 'Null check failed');
-        Assert.AreEqual(1, DotNet_Stream.ReadByte, 'ReadByte check failed');
-        ClearActualArray;
+        Assert.AreEqual(true, DotNet_Stream.CanRead(), 'CanRead check failed');
+        Assert.AreEqual(true, DotNet_Stream.CanWrite(), 'CanWrite check failed');
+        Assert.AreEqual(true, DotNet_Stream.CanSeek(), 'CanSeek check failed');
+        Assert.AreEqual(false, DotNet_Stream.IsDotNetNull(), 'Null check failed');
+        Assert.AreEqual(1, DotNet_Stream.ReadByte(), 'ReadByte check failed');
+        ClearActualArray();
         DotNet_Stream.Read(Byte_DotNet_Array, 0, 4);
         CheckArrayItems(Byte_DotNet_Array, ExpectedByte_DotNet_Array);
         DotNet_Stream.Close();
@@ -86,7 +86,7 @@ codeunit 146034 Test_DotNet_StreamAndBuffer
         DotNetString.Set(Format(TestChar) + Format(TestChar));
         DotNetString.ToCharArray(0, 2, Char_DotNet_Array);
         Assert.AreEqual(4, DotNet_Buffer.ByteLength(Char_DotNet_Array), 'ByteLength check failed');
-        CreateExampleByteArray;
+        CreateExampleByteArray();
         Assert.AreEqual(10, DotNet_Buffer.GetByte(Byte_DotNet_Array, 0), 'GetByte Check failed');
         Assert.AreEqual(11, DotNet_Buffer.GetByte(Byte_DotNet_Array, 1), 'GetByte Check failed');
         Assert.AreEqual(12, DotNet_Buffer.GetByte(Byte_DotNet_Array, 2), 'GetByte Check failed');

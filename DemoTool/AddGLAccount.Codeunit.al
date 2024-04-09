@@ -3,37 +3,35 @@ codeunit 117559 "Add G/L Account"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Data Type" <> "Data Type"::Evaluation then begin
-                CreateGLAccount.InsertData('995795', XPrepaidServiceContractslc, 3, 1, 0, '', 0, '', '', '', '', false);
-                CreateGLAccount.InsertData(
-                  '995796', XPrepaidHardwareContractslc, 0, 1, 0, '', 2, DomesticCode, ServicesCode, DomesticCode, ServicesVATCode, true);
-                CreateGLAccount.InsertData(
-                  '995797', XPrepaidSoftwareContractslc, 0, 1, 0, '', 2, DomesticCode, ServicesCode, DomesticCode, ServicesVATCode, true);
-                CreateGLAccount.InsertData('995799', XTotalPrepaidServiceContractlc, 4, 1, 0,
-                  MakeAdjustments.Convert('995795') + '..' + MakeAdjustments.Convert('995799'), 0, '', '', '', '', false);
-            end;
-
-            CreateGLAccount.InsertData('996950', XSalesofServiceContractslc, 3, 0, 0, '', 0, '', '', '', '', false);
+        DemoDataSetup.Get();
+        if DemoDataSetup."Data Type" <> DemoDataSetup."Data Type"::Evaluation then begin // CA
+            CreateGLAccount.InsertData('995795', XPrepaidServiceContractslc, 3, 1, 0, '', 0, '', '', '', '', false);
             CreateGLAccount.InsertData(
-              '996955', XServiceContractSalelc, 0, 0, 0, '', 2, DomesticCode, ServicesCode, DomesticCode, ServicesVATCode, true);
-            CreateGLAccount.InsertData('996959', XTotalSaleofServContractslc, 4, 0, 0,
-              MakeAdjustments.Convert('996950') + '..' + MakeAdjustments.Convert('996959'), 0, '', '', '', '', false);
-            if "Data Type" = "Data Type"::Evaluation then begin
-                CreateGLAccount.AssignGIFICode('41400', '8000');
-                CreateGLAccount.AssignGIFICode('41500', '8000');
-            end;
-
-            GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-              GLAccountCategory."Account Category"::Liabilities, GLAccountCategoryMgt.GetCurrentLiabilities());
-            CreateGLAccount.AssignSubcategoryToChartOfAccounts(GLAccountCategory);
-
-            GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-              GLAccountCategory."Account Category"::Income, GLAccountCategoryMgt.GetIncomeService());
-            CreateGLAccount.AssignSubcategoryToChartOfAccounts(GLAccountCategory);
+              '995796', XPrepaidHardwareContractslc, 0, 1, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesVATCode(), true);
+            CreateGLAccount.InsertData(
+              '995797', XPrepaidSoftwareContractslc, 0, 1, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesVATCode(), true);
+            CreateGLAccount.InsertData('995799', XTotalPrepaidServiceContractlc, 4, 1, 0,
+              MakeAdjustments.Convert('995795') + '..' + MakeAdjustments.Convert('995799'), 0, '', '', '', '', false);
         end;
-        GLAccIndent.Indent;
+
+        CreateGLAccount.InsertData('996950', XSalesofServiceContractslc, 3, 0, 0, '', 0, '', '', '', '', false);
+        CreateGLAccount.InsertData(
+          '996955', XServiceContractSalelc, 0, 0, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesVATCode(), true);
+        CreateGLAccount.InsertData('996959', XTotalSaleofServContractslc, 4, 0, 0,
+          MakeAdjustments.Convert('996950') + '..' + MakeAdjustments.Convert('996959'), 0, '', '', '', '', false);
+        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Evaluation then begin
+            CreateGLAccount.AssignGIFICode('41400', '8000');
+            CreateGLAccount.AssignGIFICode('41500', '8000');
+        end;
+
+        GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
+          GLAccountCategory."Account Category"::Liabilities, GLAccountCategoryMgt.GetCurrentLiabilities());
+        CreateGLAccount.AssignSubcategoryToChartOfAccounts(GLAccountCategory);
+
+        GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
+          GLAccountCategory."Account Category"::Income, GLAccountCategoryMgt.GetIncomeService());
+        CreateGLAccount.AssignSubcategoryToChartOfAccounts(GLAccountCategory);
+        GLAccIndent.Indent();
     end;
 
     var

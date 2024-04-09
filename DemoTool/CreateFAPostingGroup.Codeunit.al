@@ -14,15 +14,7 @@ codeunit 101803 "Create FA Posting Group"
         XCAR: Label 'CAR';
         XMACHINERY: Label 'MACHINERY';
         XTELEPHONE: Label 'TELEPHONE';
-        XEQUIPMENT: Label 'EQUIPMENT';
-        XPATENTS: Label 'PATENTS';
-        XGOODWILL: Label 'GOODWILL';
-        XPLANT: Label 'PLANT';
-        XPROPERTY: Label 'PROPERTY';
         XVEHICLES: Label 'VEHICLES';
-        XFURNITUREFIXTURES: Label 'FURNITURE';
-        XIP: Label 'IP';
-        XLEASEHOLD: Label 'LEASEHOLD';
         XOfficeEquipment: Label 'EQUIPMENT';
         XBuilding: Label 'BUILDING';
 

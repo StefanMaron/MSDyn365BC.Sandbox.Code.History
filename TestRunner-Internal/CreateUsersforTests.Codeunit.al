@@ -9,7 +9,7 @@ codeunit 130617 "Create Users for Tests"
         WidowsUserID: Code[50];
         WindowsSID: Text[119];
     begin
-        WindowsIdentity := WindowsIdentity.GetCurrent;
+        WindowsIdentity := WindowsIdentity.GetCurrent();
         WidowsUserID := WindowsIdentity.Name;
         SecurityIdentifier := WindowsIdentity.User;
         WindowsSID := SecurityIdentifier.ToString();
@@ -18,7 +18,7 @@ codeunit 130617 "Create Users for Tests"
         UsersCreateSuperUser.SafeCreateUser(WidowsUserID, WindowsSID);
 
         // Create Local User
-        UsersCreateSuperUser.SafeCreateUser(UserId, Sid);
+        UsersCreateSuperUser.SafeCreateUser(UserId, Sid());
     end;
 }
 

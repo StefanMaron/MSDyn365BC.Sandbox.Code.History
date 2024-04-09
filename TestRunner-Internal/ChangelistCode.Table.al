@@ -1,6 +1,7 @@
 table 130026 "Changelist Code"
 {
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -65,7 +66,7 @@ table 130026 "Changelist Code"
 
     trigger OnDelete()
     begin
-        DeleteChildren;
+        DeleteChildren();
     end;
 
     [Scope('OnPrem')]

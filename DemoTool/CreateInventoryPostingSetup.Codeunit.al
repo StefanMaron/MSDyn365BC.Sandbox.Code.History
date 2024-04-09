@@ -3,30 +3,28 @@ codeunit 101110 "Create Inventory Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('', FinishedCode, '992120', '992121');
-            InsertData('', RawMatCode, '992130', '992131');
-            InsertData('', ResaleCode, '992110', '992111');
-            InsertData(XBLUE, FinishedCode, '992120', '992121');
-            InsertData(XBLUE, RawMatCode, '992130', '992131');
-            InsertData(XBLUE, ResaleCode, '992110', '992111');
-            InsertData(XGREEN, FinishedCode, '992120', '992121');
-            InsertData(XGREEN, RawMatCode, '992130', '992131');
-            InsertData(XGREEN, ResaleCode, '992110', '992111');
-            InsertData(XRED, FinishedCode, '992120', '992121');
-            InsertData(XRED, RawMatCode, '992130', '992131');
-            InsertData(XRED, ResaleCode, '992110', '992111');
-            InsertData(XYELLOW, FinishedCode, '992120', '992121');
-            InsertData(XYELLOW, RawMatCode, '992130', '992131');
-            InsertData(XYELLOW, ResaleCode, '992110', '992111');
-            InsertData(XWHITE, FinishedCode, '992120', '992121');
-            InsertData(XWHITE, RawMatCode, '992130', '992131');
-            InsertData(XWHITE, ResaleCode, '992110', '992111');
-            InsertData(XSILVER, FinishedCode, '992120', '992121');
-            InsertData(XSILVER, RawMatCode, '992130', '992131');
-            InsertData(XSILVER, ResaleCode, '992110', '992111');
-        end;
+        DemoDataSetup.Get();
+        InsertData('', DemoDataSetup.FinishedCode(), '992120', '992121');
+        InsertData('', DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData('', DemoDataSetup.ResaleCode(), '992110', '992111');
+        InsertData(XBLUE, DemoDataSetup.FinishedCode(), '992120', '992121');
+        InsertData(XBLUE, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XBLUE, DemoDataSetup.ResaleCode(), '992110', '992111');
+        InsertData(XGREEN, DemoDataSetup.FinishedCode(), '992120', '992121');
+        InsertData(XGREEN, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XGREEN, DemoDataSetup.ResaleCode(), '992110', '992111');
+        InsertData(XRED, DemoDataSetup.FinishedCode(), '992120', '992121');
+        InsertData(XRED, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XRED, DemoDataSetup.ResaleCode(), '992110', '992111');
+        InsertData(XYELLOW, DemoDataSetup.FinishedCode(), '992120', '992121');
+        InsertData(XYELLOW, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XYELLOW, DemoDataSetup.ResaleCode(), '992110', '992111');
+        InsertData(XWHITE, DemoDataSetup.FinishedCode(), '992120', '992121');
+        InsertData(XWHITE, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XWHITE, DemoDataSetup.ResaleCode(), '992110', '992111');
+        InsertData(XSILVER, DemoDataSetup.FinishedCode(), '992120', '992121');
+        InsertData(XSILVER, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XSILVER, DemoDataSetup.ResaleCode(), '992110', '992111');
     end;
 
     var
@@ -77,20 +75,18 @@ codeunit 101110 "Create Inventory Posting Setup"
     procedure InsertMiniAppData()
 
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('', FinishedCode(), GetGLAccNo.FinishedGoods(), GetGLAccNo.FinishedGoodsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
-            InsertData('', RawMatCode(), GetGLAccNo.RawMaterials(), GetGLAccNo.RawMaterialsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
-            InsertData('', ResaleCode, GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
-        end;
+        DemoDataSetup.Get();
+        InsertData('', DemoDataSetup.FinishedCode(), GetGLAccNo.FinishedGoods(), GetGLAccNo.FinishedGoodsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
+        InsertData('', DemoDataSetup.RawMatCode(), GetGLAccNo.RawMaterials(), GetGLAccNo.RawMaterialsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
+        InsertData('', DemoDataSetup.ResaleCode(), GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
     end;
 
     procedure CreateEvaluationData()
     begin
         DemoDataSetup.Get();
-        InsertData(XMAIN, DemoDataSetup.ResaleCode, GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
-        InsertData(XEAST, DemoDataSetup.ResaleCode, GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
-        InsertData(XWEST, DemoDataSetup.ResaleCode, GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
+        InsertData(XMAIN, DemoDataSetup.ResaleCode(), GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
+        InsertData(XEAST, DemoDataSetup.ResaleCode(), GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
+        InsertData(XWEST, DemoDataSetup.ResaleCode(), GetGLAccNo.ResaleItems(), GetGLAccNo.ResaleItemsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
         InsertData(XMAIN, DemoDataSetup.FinishedCode(), GetGLAccNo.FinishedGoods(), GetGLAccNo.FinishedGoodsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
         InsertData(XEAST, DemoDataSetup.FinishedCode(), GetGLAccNo.FinishedGoods(), GetGLAccNo.FinishedGoodsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());
         InsertData(XWEST, DemoDataSetup.FinishedCode(), GetGLAccNo.FinishedGoods(), GetGLAccNo.FinishedGoodsInterim(), GetGLAccNo.WIPAccountFinishedGoods(), GetGLAccNo.MaterialVariance(), GetGLAccNo.CapacityVariance(), GetGLAccNo.MfgOverheadVariance(), GetGLAccNo.CapOverheadVariance(), GetGLAccNo.SubcontractedVariance());

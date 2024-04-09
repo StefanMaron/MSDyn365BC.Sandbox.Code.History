@@ -4,31 +4,29 @@ codeunit 101312 "Create Purchases & Payables S."
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        with "Purchases & Payables Setup" do begin
-            Get();
-            Validate("Receipt on Invoice", true);
-            Validate("Return Shipment on Credit Memo", true);
-            Validate("Discount Posting", "Discount Posting"::"All Discounts");
-            Validate("Invoice Rounding", true);
-            "Copy Vendor Name to Entries" := true;
-            "Create No. Series".InitBaseSeries("Vendor Nos.", XVEND, XVendor, XV10, XV99990, '', '', 10, true);
-            "Create No. Series".InitTempSeries("Quote Nos.", XPQUO, XPurchaseQuote);
-            "Create No. Series".InitTempSeries("Blanket Order Nos.", XPBLK, XBlanketPurchaseOrder);
-            "Create No. Series".InitFinalSeries("Order Nos.", XPORD, XPurchaseOrder, 6);
-            "Create No. Series".InitTempSeries("Return Order Nos.", XPRETORD, XPurchaseReturnOrder);
-            "Create No. Series".InitFinalSeries("Posted Receipt Nos.", XPRCPT, XPurchaseReceipt, 7);
-            "Create No. Series".InitTempSeries("Invoice Nos.", XPINV, XPurchaseInvoice);
-            "Create No. Series".InitFinalSeries("Posted Invoice Nos.", XPINVPLUS, XPostedPurchaseInvoice, 8);
-            "Create No. Series".InitTempSeries("Credit Memo Nos.", XPCR, XPurchaseCreditMemo);
-            "Create No. Series".InitBaseSeries("Price List Nos.", XPPL, XPurchasePriceList, XP00001, XP99999, '', '', 1, true);
-            "Create No. Series".InitFinalSeries("Posted Return Shpt. Nos.", XPShpt, XPostedPurchaseShipment, 5);
-            "Create No. Series".InitFinalSeries("Posted Credit Memo Nos.", XPCRPLUS, XPostedPurchaseCreditMemo, 9);
-            "Invoice Nos." := "Posted Invoice Nos.";
-            "Credit Memo Nos." := "Posted Credit Memo Nos.";
-            "Appln. between Currencies" := "Appln. between Currencies"::All;
-            "Document Default Line Type" := "Document Default Line Type"::Item;
-            Modify();
-        end;
+        "Purchases & Payables Setup".Get();
+        "Purchases & Payables Setup".Validate("Receipt on Invoice", true);
+        "Purchases & Payables Setup".Validate("Return Shipment on Credit Memo", true);
+        "Purchases & Payables Setup".Validate("Discount Posting", "Purchases & Payables Setup"."Discount Posting"::"All Discounts");
+        "Purchases & Payables Setup".Validate("Invoice Rounding", true);
+        "Purchases & Payables Setup"."Copy Vendor Name to Entries" := true;
+        "Create No. Series".InitBaseSeries("Purchases & Payables Setup"."Vendor Nos.", XVEND, XVendor, XV10, XV99990, '', '', 10, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Quote Nos.", XPQUO, XPurchaseQuote);
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Blanket Order Nos.", XPBLK, XBlanketPurchaseOrder);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Order Nos.", XPORD, XPurchaseOrder, 6);
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Return Order Nos.", XPRETORD, XPurchaseReturnOrder);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Posted Receipt Nos.", XPRCPT, XPurchaseReceipt, 7);
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Invoice Nos.", XPINV, XPurchaseInvoice);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Posted Invoice Nos.", XPINVPLUS, XPostedPurchaseInvoice, 8);
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Credit Memo Nos.", XPCR, XPurchaseCreditMemo);
+        "Create No. Series".InitBaseSeries("Purchases & Payables Setup"."Price List Nos.", XPPL, XPurchasePriceList, XP00001, XP99999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Posted Return Shpt. Nos.", XPShpt, XPostedPurchaseShipment, 5);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Posted Credit Memo Nos.", XPCRPLUS, XPostedPurchaseCreditMemo, 9);
+        "Purchases & Payables Setup"."Invoice Nos." := "Purchases & Payables Setup"."Posted Invoice Nos.";
+        "Purchases & Payables Setup"."Credit Memo Nos." := "Purchases & Payables Setup"."Posted Credit Memo Nos.";
+        "Purchases & Payables Setup"."Appln. between Currencies" := "Purchases & Payables Setup"."Appln. between Currencies"::All;
+        "Purchases & Payables Setup"."Document Default Line Type" := "Purchases & Payables Setup"."Document Default Line Type"::Item;
+        "Purchases & Payables Setup".Modify();
     end;
 
     var
@@ -67,44 +65,40 @@ codeunit 101312 "Create Purchases & Payables S."
     procedure InsertMiniAppData()
     begin
         DemoDataSetup.Get();
-        with "Purchases & Payables Setup" do begin
-            Get();
-            Validate("Discount Posting", "Discount Posting"::"All Discounts");
-            Validate("Invoice Rounding", true);
-            Validate("Receipt on Invoice", true);
-            "Copy Vendor Name to Entries" := true;
-            "Create No. Series".InitBaseSeries("Vendor Nos.", XVEND, XVendor, XV10, XV99990, '', '', 10, true);
-            "Create No. Series".InitTempSeries("Quote Nos.", XPQUO, XPurchaseQuote);
-            "Create No. Series".InitFinalSeries("Order Nos.", XPORD, XPurchaseOrder, 6);
-            "Create No. Series".InitFinalSeries("Posted Receipt Nos.", XPRCPT, XPurchaseReceipt, 7);
-            "Create No. Series".InitFinalSeries("Invoice Nos.", XPINV, XPurchaseInvoice, 7);
-            "Create No. Series".InitFinalSeries("Posted Invoice Nos.", XPINVPLUS, XPostedPurchaseInvoice, 8);
-            "Create No. Series".InitTempSeries("Credit Memo Nos.", XPCR, XPurchaseCreditMemo);
-            "Create No. Series".InitFinalSeries("Posted Credit Memo Nos.", XPCRPLUS, XPostedPurchaseCreditMemo, 9);
-            "Create No. Series".InitBaseSeries("Price List Nos.", XPPL, XPurchasePriceList, XP00001, XP99999, '', '', 1, true);
-            "Create No. Series".InitTempSeries("Blanket Order Nos.", XPBLK, XBlanketPurchaseOrder);
-            "Create No. Series".InitTempSeries("Return Order Nos.", XPRETORD, XPurchaseReturnOrder);
-            "Create No. Series".InitFinalSeries("Posted Return Shpt. Nos.", XPShpt, XPostedPurchaseShipment, 5);
-            "Appln. between Currencies" := "Appln. between Currencies"::All;
-            "Discount Posting" := "Discount Posting"::"All Discounts";
-            "Ext. Doc. No. Mandatory" := true;
-            "Document Default Line Type" := "Document Default Line Type"::Item;
-            "Allow VAT Difference" := true;
-            Modify();
-        end;
+        "Purchases & Payables Setup".Get();
+        "Purchases & Payables Setup".Validate("Discount Posting", "Purchases & Payables Setup"."Discount Posting"::"All Discounts");
+        "Purchases & Payables Setup".Validate("Invoice Rounding", true);
+        "Purchases & Payables Setup".Validate("Receipt on Invoice", true);
+        "Purchases & Payables Setup"."Copy Vendor Name to Entries" := true;
+        "Create No. Series".InitBaseSeries("Purchases & Payables Setup"."Vendor Nos.", XVEND, XVendor, XV10, XV99990, '', '', 10, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Quote Nos.", XPQUO, XPurchaseQuote);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Order Nos.", XPORD, XPurchaseOrder, 6);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Posted Receipt Nos.", XPRCPT, XPurchaseReceipt, 7);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Invoice Nos.", XPINV, XPurchaseInvoice, 7);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Posted Invoice Nos.", XPINVPLUS, XPostedPurchaseInvoice, 8);
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Credit Memo Nos.", XPCR, XPurchaseCreditMemo);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Posted Credit Memo Nos.", XPCRPLUS, XPostedPurchaseCreditMemo, 9);
+        "Create No. Series".InitBaseSeries("Purchases & Payables Setup"."Price List Nos.", XPPL, XPurchasePriceList, XP00001, XP99999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Blanket Order Nos.", XPBLK, XBlanketPurchaseOrder);
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Return Order Nos.", XPRETORD, XPurchaseReturnOrder);
+        "Create No. Series".InitFinalSeries("Purchases & Payables Setup"."Posted Return Shpt. Nos.", XPShpt, XPostedPurchaseShipment, 5);
+        "Purchases & Payables Setup"."Appln. between Currencies" := "Purchases & Payables Setup"."Appln. between Currencies"::All;
+        "Purchases & Payables Setup"."Discount Posting" := "Purchases & Payables Setup"."Discount Posting"::"All Discounts";
+        "Purchases & Payables Setup"."Ext. Doc. No. Mandatory" := true;
+        "Purchases & Payables Setup"."Document Default Line Type" := "Purchases & Payables Setup"."Document Default Line Type"::Item;
+        "Purchases & Payables Setup"."Allow VAT Difference" := true;
+        "Purchases & Payables Setup".Modify();
     end;
 
     procedure Finalize()
     begin
         DemoDataSetup.Get();
-        with "Purchases & Payables Setup" do begin
-            Get();
-            "Invoice Nos." := XPINV;
-            "Credit Memo Nos." := XPCR;
-            "Posted Prepmt. Inv. Nos." := XPINVPLUS;
-            "Posted Prepmt. Cr. Memo Nos." := XPCRPLUS;
-            Modify();
-        end;
+        "Purchases & Payables Setup".Get();
+        "Purchases & Payables Setup"."Invoice Nos." := XPINV;
+        "Purchases & Payables Setup"."Credit Memo Nos." := XPCR;
+        "Purchases & Payables Setup"."Posted Prepmt. Inv. Nos." := XPINVPLUS;
+        "Purchases & Payables Setup"."Posted Prepmt. Cr. Memo Nos." := XPCRPLUS;
+        "Purchases & Payables Setup".Modify();
     end;
 }
 

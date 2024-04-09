@@ -27,32 +27,26 @@ codeunit 101997 "Create Item Template"
         ConfigTemplateHeader: Record "Config. Template Header";
         CreateTemplateHelper: Codeunit "Create Template Helper";
     begin
-        with DemoDataSetup do begin
-            Get;
+        DemoDataSetup.Get();
+        // Item template
+        InsertTemplateHeader(ConfigTemplateHeader, xItemDescrTxt);
+        InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Inventory), xBaseUOMPCSTxt, DemoDataSetup.RetailCode(), TAXABLETok, DemoDataSetup.ResaleCode());
 
-            // Item template
-            InsertTemplateHeader(ConfigTemplateHeader, xItemDescrTxt);
-            InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Inventory), xBaseUOMPCSTxt, RetailCode, TAXABLETok, ResaleCode);
+        CreateTemplateHelper.CreateTemplateSelectionRule(
+          DATABASE::Item, ConfigTemplateHeader.Code, InventoryConditionTxt, 0, 0);
+        // Item template No Tax
+        InsertTemplateHeader(ConfigTemplateHeader, xItemNoTaxDescrTxt);
+        InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Inventory), xBaseUOMPCSTxt, DemoDataSetup.NoVATCode(), NONTAXABLETok, DemoDataSetup.ResaleCode());
+        // Service template
+        InsertTemplateHeader(ConfigTemplateHeader, xServiceDescTxt);
+        InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Service), xBaseUOMHourTxt, DemoDataSetup.ServicesCode(), TAXABLETok, '');
 
-            CreateTemplateHelper.CreateTemplateSelectionRule(
-              DATABASE::Item, ConfigTemplateHeader.Code, InventoryConditionTxt, 0, 0);
-
-            // Item template No Tax
-            InsertTemplateHeader(ConfigTemplateHeader, xItemNoTaxDescrTxt);
-            InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Inventory), xBaseUOMPCSTxt, NoVATCode, NONTAXABLETok, ResaleCode);
-
-            // Service template
-            InsertTemplateHeader(ConfigTemplateHeader, xServiceDescTxt);
-            InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Service), xBaseUOMHourTxt, ServicesCode, TAXABLETok, '');
-
-            CreateTemplateHelper.CreateTemplateSelectionRule(
-              DATABASE::Item, ConfigTemplateHeader.Code, ServiceConditionTxt, 0, 0);
-
-            // Service No Tax template
-            InsertTemplateHeader(ConfigTemplateHeader, xServiceNoTaxDescTxt);
-            InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Service), xBaseUOMHourTxt, ServicesCode, NONTAXABLETok, '');
-            InsertPostingGroupsItemTemplates;
-        end;
+        CreateTemplateHelper.CreateTemplateSelectionRule(
+          DATABASE::Item, ConfigTemplateHeader.Code, ServiceConditionTxt, 0, 0);
+        // Service No Tax template
+        InsertTemplateHeader(ConfigTemplateHeader, xServiceNoTaxDescTxt);
+        InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Service), xBaseUOMHourTxt, DemoDataSetup.ServicesCode(), NONTAXABLETok, '');
+        InsertPostingGroupsItemTemplates();
     end;
 
     local procedure InsertTemplateHeader(var ConfigTemplateHeader: Record "Config. Template Header"; Description: Text[50])
@@ -87,14 +81,12 @@ codeunit 101997 "Create Item Template"
         if (DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Evaluation) or
            (DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Standard)
         then
-            DefInventoryPostingGroup := DemoDataSetup.ResaleCode
+            DefInventoryPostingGroup := DemoDataSetup.ResaleCode()
         else
-            DefInventoryPostingGroup := DemoDataSetup.FinishedCode;
-
-        InsertItemTemplateData(XMiscellaneous, DemoDataSetup.RetailCode, DefInventoryPostingGroup, '', '');
-
+            DefInventoryPostingGroup := DemoDataSetup.FinishedCode();
+        InsertItemTemplateData(XMiscellaneous, DemoDataSetup.RetailCode(), DefInventoryPostingGroup, '', '');
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Evaluation then begin
-            FurnitureTemplateCode := InsertItemTemplateData(XOfficefurniture, DemoDataSetup.RetailCode, DefInventoryPostingGroup, '', '');
+            FurnitureTemplateCode := InsertItemTemplateData(XOfficefurniture, DemoDataSetup.RetailCode(), DefInventoryPostingGroup, '', '');
             if not NonstockItem.IsEmpty() then
                 NonstockItem.ModifyAll("Item Templ. Code", CreateNewItemTemplate.GetItemCode());
         end;

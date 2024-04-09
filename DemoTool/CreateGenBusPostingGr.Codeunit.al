@@ -4,9 +4,9 @@ codeunit 101250 "Create Gen. Bus. Posting Gr."
     begin
         DemoDataSetup.Get();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
-            InsertData(DemoDataSetup.DomesticCode, XDomesticcustomersandvendors, '');
-            InsertData(DemoDataSetup.EUCode, XCustomersandvendorsinEU, '');
-            InsertData(DemoDataSetup.ExportCode, XOthercustomersandvendorsnotEU, '');
+            InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, '');
+            InsertData(DemoDataSetup.EUCode(), XCustomersandvendorsinEU, '');
+            InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, '');
         end
         else
             InsertMiniAppData();
@@ -34,9 +34,9 @@ codeunit 101250 "Create Gen. Bus. Posting Gr."
     procedure InsertMiniAppData()
     begin
         DemoDataSetup.Get();
-        InsertData(DemoDataSetup.DomesticCode, XDomesticcustomersandvendors, '');
-        InsertData(DemoDataSetup.ExportCode, XOthercustomersandvendorsnotEU, '');
-        InsertData(DemoDataSetup.InterCompCode, XInterCompany, '');
+        InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, '');
+        InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, '');
+        InsertData(DemoDataSetup.InterCompCode(), XInterCompany, '');
     end;
 }
 

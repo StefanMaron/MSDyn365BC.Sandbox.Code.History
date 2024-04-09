@@ -83,6 +83,7 @@ codeunit 101322 "Create Tax Details"
             TaxDetail."Tax Group Code" := '';
             TaxDetail.Insert();
         end;
+
     end;
 }
 

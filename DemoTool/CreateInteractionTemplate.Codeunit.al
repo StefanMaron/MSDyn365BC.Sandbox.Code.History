@@ -24,8 +24,8 @@ codeunit 101564 "Create Interaction Template"
         InsertData(XSVCONTR, XServiceContract, XSERVICE, 8, 1, 1, 1, '', 0, 0, false);
         InsertData(XSVCONTRQ, XServiceContractQuote, XSERVICE, 8, 1, 1, 1, '', 0, 0, false);
         InsertData(XSVQUOTE, XServiceQuote, XSERVICE, 8, 1, 1, 1, '', 0, 0, false);
-        InsertSalesTemplates;
-        InsertPurhcaseTemplates;
+        InsertSalesTemplates();
+        InsertPurhcaseTemplates();
     end;
 
     var
@@ -147,8 +147,8 @@ codeunit 101564 "Create Interaction Template"
         InsertData(XMEETINV, XMeetingInvitation, XSYSTEM, 8, 1, 1, 1, '', 0, 0, false);
         InsertData(XOUTGOING, XOutgoingphonecall, XPHONE, 1, 15, 1, 1, '', 0, 0, true);
         InsertData(XINCOME, XIncomingphonecall, XPHONE, 0, 15, 2, 2, '', 0, 0, true);
-        InsertSalesTemplates;
-        InsertPurhcaseTemplates;
+        InsertSalesTemplates();
+        InsertPurhcaseTemplates();
     end;
 
     procedure CreateEvaluationData()

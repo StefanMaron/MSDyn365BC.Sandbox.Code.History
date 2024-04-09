@@ -67,7 +67,7 @@ codeunit 101342 "Create Dimension"
         InsertDimensionTransl(XSALESPERSON, 3084, 'Représentant', 'Code du représentant', 'Filtre représentant');
         InsertDimensionTransl(XPURCHASER, 3084, 'Acheteur', 'Code de l''acheteur', 'Filtre acheteur');
 
-        DimensionValueIndent.Indent;
+        DimensionValueIndent.Indent();
     end;
 
     internal procedure GetDepartmentCode(): Code[20]
@@ -256,7 +256,7 @@ codeunit 101342 "Create Dimension"
         InsertDimensionTransl(XSALESPERSON, Language.GetDefaultApplicationLanguageId(), 'Salesperson', 'Salesperson Code', 'Salesperson Filter');
         InsertDimensionTransl(XPURCHASER, Language.GetDefaultApplicationLanguageId(), 'Purchaser', 'Purchaser Code', 'Purchaser Filter');
 
-        DimensionValueIndent.Indent;
+        DimensionValueIndent.Indent();
     end;
 
     procedure GetGlobalDimensionCode(Index: Integer): Code[20]

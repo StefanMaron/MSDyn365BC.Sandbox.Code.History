@@ -8,20 +8,20 @@ codeunit 101092 "Create Cust. Posting Group"
         DemoDataSetup.Get();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
             InsertData(
-              DemoDataSetup.DomesticCode, XDomesticCustomersTxt,
+              DemoDataSetup.DomesticCode(), XDomesticCustomersTxt,
               '992310', '996810', '999250', '999255', '999140', '999120', '999120', '999150', '999260', '999270');
             InsertData(
-              DemoDataSetup.ForeignCode, XForeignCustomersTxt,
+              DemoDataSetup.ForeignCode(), XForeignCustomersTxt,
               '992320', '996810', '999250', '999255', '999140', '999120', '999120', '999150', '999260', '999270');
             InsertData(
-              DemoDataSetup.EUCode, XCustomersInEUTxt,
+              DemoDataSetup.EUCode(), XCustomersInEUTxt,
               '992320', '996810', '999250', '999255', '999140', '999120', '999120', '999150', '999260', '999270');
         end else begin
             InsertData(
-              DemoDataSetup.DomesticCode, XDomesticCustomersTxt,
+              DemoDataSetup.DomesticCode(), XDomesticCustomersTxt,
               GetGLAccNo.CustomersDomesticCAD(), GetGLAccNo.FeesandChargesRecDom(), GetGLAccNo.PaymentDiscountGranted(), GetGLAccNo.PmtDiscGrantedDecreases(), GetGLAccNo.InvoiceRounding(), GetGLAccNo.FinanceChargesfromCustomers(), GetGLAccNo.ApplicationRounding(), GetGLAccNo.PaymentToleranceGranted(), GetGLAccNo.PmtTolGrantedDecreases());
             InsertData(
-              DemoDataSetup.ForeignCode, XForeignCustomersTxt,
+              DemoDataSetup.ForeignCode(), XForeignCustomersTxt,
               GetGLAccNo.CustomersForeignFCY(), GetGLAccNo.FeesandChargesRecDom(), GetGLAccNo.PaymentDiscountGranted(), GetGLAccNo.PmtDiscGrantedDecreases(), GetGLAccNo.InvoiceRounding(), GetGLAccNo.FinanceChargesfromCustomers(), GetGLAccNo.ApplicationRounding(), GetGLAccNo.PaymentToleranceGranted(), GetGLAccNo.PmtTolGrantedDecreases());
 
         end;
@@ -55,6 +55,13 @@ codeunit 101092 "Create Cust. Posting Group"
         CustomerPostingGroup.Validate("Payment Tolerance Debit Acc.", MakeAdjustments.Convert(PaymentToleranceDebitAcc));
         CustomerPostingGroup.Validate("Payment Tolerance Credit Acc.", MakeAdjustments.Convert(PaymentToleranceCreditAcc));
         CustomerPostingGroup.Insert();
+    end;
+
+    procedure GetRoundingAccount(): code[20]
+    var
+        MakeAdjustments: Codeunit "Make Adjustments";
+    begin
+        exit(MakeAdjustments.Convert('999150'));
     end;
 
     procedure InsertData(Code: Code[20]; PostingGroupDescription: Text[50]; ReceivablesAccount: Code[20]; ServiceChargeAcc: Code[20]; PmtDiscDebitAcc: Code[20]; PmtDiscCreditAcc: Code[20]; InvoiceRoundingAccount: Code[20]; AdditionalFeeAcc: Code[20]; ApplicationRoundingAccount: Code[20]; PaymentToleranceDebitAcc: Code[20]; PaymentToleranceCreditAcc: Code[20])
