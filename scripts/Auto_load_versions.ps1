@@ -55,10 +55,10 @@ $Versions | Sort-Object -Property Country, Version | % {
         }
         else {
             if ($CommitIDLastCUFromPreviousMajor -ne $null) {
-                git checkout -b "$($country)-$($Version.Major)" $CommitIDLastCUFromPreviousMajor
+                git switch -c "$($country)-$($Version.Major)" $CommitIDLastCUFromPreviousMajor
             }
             else {
-                git checkout -b "$($country)-$($Version.Major)" $LatestCommitIDOfBranchEmpty                
+                git switch -c "$($country)-$($Version.Major)" $LatestCommitIDOfBranchEmpty                
             }
         }
         
