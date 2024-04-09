@@ -5818,10 +5818,16 @@ codeunit 10145 "E-Invoice Mgt."
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         ServiceInvoiceLine: Record "Service Invoice Line";
         ServiceCrMemoLine: Record "Service Cr.Memo Line";
+        DetailedCustLedgEntryDoc: Record "Detailed Cust. Ledg. Entry";
         TableId: Integer;
     begin
         TableId := GetRelatedDocumentTableID(DetailedCustLedgEntry, EntrySourceCode);
         TempVATAmountLine.DeleteAll();
+
+        DetailedCustLedgEntryDoc.SetRange("Cust. Ledger Entry No.", DetailedCustLedgEntry."Cust. Ledger Entry No.");
+        DetailedCustLedgEntryDoc.SetFilter("Document Type", '<>%1', DetailedCustLedgEntry."Document Type"::Payment);
+        DetailedCustLedgEntryDoc.CalcSums(Amount);
+        DocAmountInclVAT := DetailedCustLedgEntryDoc.Amount;
 
         case TableId of
             DATABASE::"Sales Invoice Header":
@@ -5835,8 +5841,6 @@ codeunit 10145 "E-Invoice Mgt."
                         InsertTempVATAmountLine(TempVATAmountLine, TempDocumentLine);
                     until SalesInvoiceLine.Next() = 0;
                     FiscalInvoiceNumberPAC := SalesInvoiceHeader."Fiscal Invoice Number PAC";
-                    SalesInvoiceHeader.CalcFields("Amount Including VAT");
-                    DocAmountInclVAT := SalesInvoiceHeader."Amount Including VAT";
                     SubjectToTax := GetSubjectToTaxFromDocument(DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.");
                 end;
             DATABASE::"Sales Cr.Memo Header":
@@ -5850,8 +5854,6 @@ codeunit 10145 "E-Invoice Mgt."
                         InsertTempVATAmountLine(TempVATAmountLine, TempDocumentLine);
                     until SalesCrMemoLine.Next() = 0;
                     FiscalInvoiceNumberPAC := SalesCrMemoHeader."Fiscal Invoice Number PAC";
-                    SalesCrMemoHeader.CalcFields("Amount Including VAT");
-                    DocAmountInclVAT := -SalesCrMemoHeader."Amount Including VAT";
                     SubjectToTax := GetSubjectToTaxFromDocument(DATABASE::"Sales Cr.Memo Header", SalesCrMemoHeader."No.");
                 end;
             DATABASE::"Service Invoice Header":
@@ -5864,8 +5866,6 @@ codeunit 10145 "E-Invoice Mgt."
                         InsertTempVATAmountLine(TempVATAmountLine, TempDocumentLine);
                     until ServiceInvoiceLine.Next() = 0;
                     FiscalInvoiceNumberPAC := ServiceInvoiceHeader."Fiscal Invoice Number PAC";
-                    ServiceInvoiceHeader.CalcFields("Amount Including VAT");
-                    DocAmountInclVAT := ServiceInvoiceHeader."Amount Including VAT";
                     SubjectToTax := GetSubjectToTaxFromDocument(DATABASE::"Service Invoice Header", ServiceInvoiceHeader."No.");
                 end;
             DATABASE::"Service Cr.Memo Header":
@@ -5878,8 +5878,6 @@ codeunit 10145 "E-Invoice Mgt."
                         InsertTempVATAmountLine(TempVATAmountLine, TempDocumentLine);
                     until ServiceCrMemoLine.Next() = 0;
                     FiscalInvoiceNumberPAC := ServiceCrMemoHeader."Fiscal Invoice Number PAC";
-                    ServiceCrMemoHeader.CalcFields("Amount Including VAT");
-                    DocAmountInclVAT := -ServiceCrMemoHeader."Amount Including VAT";
                     SubjectToTax := GetSubjectToTaxFromDocument(DATABASE::"Service Cr.Memo Header", ServiceCrMemoHeader."No.");
                 end;
         end;
