@@ -37,7 +37,8 @@ jobs:
     
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.prepare.outputs.countries) }}
+      matrix: 
+        Countries: [de,be]
 
     steps:
       - name: Install BC Container Helper
