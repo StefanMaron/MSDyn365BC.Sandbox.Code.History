@@ -43,23 +43,21 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         CreateConfigWorksheet: Codeunit "Create Config. Worksheet";
     begin
-        with CreateConfigWorksheet do begin
-            CreateConfigGroup(XLocalSettingsTxt);
-            CreateConfigLine(DATABASE::"Withhold Code");
-            CreateConfigLine(DATABASE::"Withhold Code Line");
-            CreateConfigLine(DATABASE::"Contribution Code");
-            CreateConfigLine(DATABASE::"Contribution Code Line");
-            CreateConfigLine(DATABASE::"Contribution Bracket");
-            CreateConfigLine(DATABASE::"Contribution Bracket Line");
-            CreateConfigLine(DATABASE::"VAT Identifier");
-            CreateConfigLine(DATABASE::"No. Series Line Sales");
-            CreateConfigLine(DATABASE::"No. Series Line Purchase");
-            CreateConfigLine(DATABASE::"VAT Register");
-            CreateConfigLine(DATABASE::"Payment Lines");
-            CreateConfigLine(DATABASE::"ABI/CAB Codes");
-            CreateConfigLine(DATABASE::"Bill Posting Group");
-            CreateConfigLine(DATABASE::Bill);
-        end;
+        CreateConfigWorksheet.CreateConfigGroup(XLocalSettingsTxt);
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Withhold Code");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Withhold Code Line");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Contribution Code");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Contribution Code Line");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Contribution Bracket");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Contribution Bracket Line");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"VAT Identifier");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"No. Series Line Sales");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"No. Series Line Purchase");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"VAT Register");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Payment Lines");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"ABI/CAB Codes");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Bill Posting Group");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::Bill);
     end;
 
     procedure SetFieldsAndFilters(TableID: Integer)
@@ -82,7 +80,7 @@ codeunit 101931 "Create Local RapidStart Pack"
                 begin
                     CreateConfigPackageHelper.CreateProcessingFilter(
                       0, PaymentLines.FieldNo(Type), StrSubstNo('=%1', Format(PaymentLines.Type::"Payment Terms", 0, 9)));
-                    CreateConfigPackageHelper.SetSkipTableTriggers;
+                    CreateConfigPackageHelper.SetSkipTableTriggers();
                 end;
             DATABASE::"Bill Posting Group":
                 CreateConfigPackageHelper.CreateProcessingFilter(0, BillPostingGroup.FieldNo("No."), StrSubstNo('=%1', ''' '''));

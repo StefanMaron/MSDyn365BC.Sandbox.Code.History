@@ -71,16 +71,15 @@ codeunit 101080 "Create Gen. Journal Template"
         XJOBGLJournal: Label 'Job G/L Journal';
         XGJNLJOB: Label 'GJNL-JOB';
 
-    procedure InsertData(Name: Code[10]; Description: Text[80]; Type: Option; Recurring: Boolean; "Source Code": Code[10]; "No. Series": Code[10]; NoSeriesDescription: Text[30]; NoSeriesStartNo: Code[20]; NoSeriesEndNo: Code[20])
+    procedure InsertData(Name: Code[10]; Description: Text[80]; Type: Enum "Gen. Journal Template Type"; Recurring: Boolean; "Source Code": Code[10]; "No. Series": Code[10]; NoSeriesDescription: Text[30]; NoSeriesStartNo: Code[20]; NoSeriesEndNo: Code[20])
     var
-        "No. Series2": Record "No. Series";
+        NoSeries: Record "No. Series";
     begin
         if ("No. Series" <> '') and ("No. Series" <> LastNoSeriesCode) then
-          if not "No. Series2".Get("No. Series") then
-            "Create No. Series".InitBaseSeries(
-                "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1,
-                "No. Series2"."No. Series Type"::Normal, '', 0, '', false);//IT
-
+            if not NoSeries.Get("No. Series") then
+                "Create No. Series".InitBaseSeries(
+                  "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1,
+                  NoSeries."No. Series Type"::Normal, '', 0, '', false);//IT
         LastNoSeriesCode := "No. Series";
 
         "Gen. Journal Template".Init();

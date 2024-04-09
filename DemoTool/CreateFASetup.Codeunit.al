@@ -7,9 +7,9 @@ codeunit 101801 "Create FA Setup"
     begin
         "FA Setup".Init();
         "Create No. Series".InitBaseSeries("FA Setup"."Fixed Asset Nos.", XFA, XFixedAsset, XFA10, XFA0999990, XFA000090, '', 10,
-          "No. Series"."No. Series Type"::Normal, '', 0, '', false, true);
+          "No. Series"."No. Series Type"::Normal, '', 0, '', true, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries("FA Setup"."Insurance Nos.", XFAINS, XInsurance, XFAINS10, XINS0999990, XINS000040, '', 10,
-          "No. Series"."No. Series Type"::Normal, '', 0, '', false, true);
+          "No. Series"."No. Series Type"::Normal, '', 0, '', true, Enum::"No. Series Implementation"::Sequence);
         "FA Setup"."Default Depr. Book" := XCOMPANY;
         "FA Setup"."Insurance Depr. Book" := "FA Setup"."Default Depr. Book";
         if not "FA Setup".Insert(true) then

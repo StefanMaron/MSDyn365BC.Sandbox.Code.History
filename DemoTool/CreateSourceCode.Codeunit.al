@@ -3,24 +3,18 @@ codeunit 101230 "Create Source Code"
 
     trigger OnRun()
     begin
-        with "Source Code" do begin
-            Init();
-            Code := XSTART;
-            Description := XOpeningEntries;
-            Insert(true);
-        end;
+        "Source Code".Init();
+        "Source Code".Code := XSTART;
+        "Source Code".Description := XOpeningEntries;
+        "Source Code".Insert(true);
         //BEGIN IT
-        with "Source Code" do begin
-            Code := XxRIBA;
-            Description := XBankReceipts;
-            Insert(true);
-        end;
+        "Source Code".Code := XxRIBA;
+        "Source Code".Description := XBankReceipts;
+        "Source Code".Insert(true);
 
-        with "Source Code" do begin
-            Code := XxBANKTRANSF;
-            Description := XBankTransfers;
-            Insert(true);
-        end;
+        "Source Code".Code := XxBANKTRANSF;
+        "Source Code".Description := XBankTransfers;
+        "Source Code".Insert(true);
         //END IT
     end;
 

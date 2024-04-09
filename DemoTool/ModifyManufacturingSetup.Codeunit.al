@@ -6,27 +6,25 @@ codeunit 119070 "Modify Manufacturing Setup"
         "No. Series": Record "No. Series";
     begin
         DemoDataSetup.Get();
-        with MfgSetup do begin
-            Get();
-            CreateNoSeries.InitFinalSeries(
-              "Planned Order Nos.", XMPLANM, XProductionOrderPlanned, 9,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Planned Order Nos." := XMPLANM;
+        MfgSetup.Get();
+        CreateNoSeries.InitFinalSeries(
+          MfgSetup."Planned Order Nos.", XMPLANM, XProductionOrderPlanned, 9,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        MfgSetup."Planned Order Nos." := XMPLANM;
 
-            CreateNoSeries.InitFinalSeries(
-              "Firm Planned Order Nos.", XMFIRMPM, XProductionOrderFirmPlanned, 10,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Firm Planned Order Nos." := XMFIRMPM;
+        CreateNoSeries.InitFinalSeries(
+          MfgSetup."Firm Planned Order Nos.", XMFIRMPM, XProductionOrderFirmPlanned, 10,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        MfgSetup."Firm Planned Order Nos." := XMFIRMPM;
 
-            CreateNoSeries.InitFinalSeries(
-              "Released Order Nos.", XMRELM, XProductionOrderReleased, 11,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Released Order Nos." := XMRELM;
+        CreateNoSeries.InitFinalSeries(
+          MfgSetup."Released Order Nos.", XMRELM, XProductionOrderReleased, 11,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        MfgSetup."Released Order Nos." := XMRELM;
 
-            "Current Production Forecast" := Format(DemoDataSetup."Starting Year" + 1);
-            "Show Capacity In" := XMINUTES;
-            Modify();
-        end;
+        MfgSetup."Current Production Forecast" := Format(DemoDataSetup."Starting Year" + 1);
+        MfgSetup."Show Capacity In" := XMINUTES;
+        MfgSetup.Modify();
     end;
 
     var
@@ -46,15 +44,13 @@ codeunit 119070 "Modify Manufacturing Setup"
 
     procedure Finalize()
     begin
-        with MfgSetup do begin
-            Get();
+        MfgSetup.Get();
 
-            "Planned Order Nos." := XMPLAN;
-            "Firm Planned Order Nos." := XMFIRMP;
-            "Released Order Nos." := XMREL;
+        MfgSetup."Planned Order Nos." := XMPLAN;
+        MfgSetup."Firm Planned Order Nos." := XMFIRMP;
+        MfgSetup."Released Order Nos." := XMREL;
 
-            Modify();
-        end;
+        MfgSetup.Modify();
     end;
 }
 

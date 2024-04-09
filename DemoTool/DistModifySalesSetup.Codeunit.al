@@ -5,13 +5,11 @@ codeunit 118811 "Dist. Modify Sales Setup"
     var
         "No. Series": Record "No. Series";
     begin
-        with "Sales & Receivables Setup" do begin
-            Get();
-            "Create No. Series".InitTempSeries("Order Nos.", XSORDD, XSalesOrderDist, 6,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Order Nos." := XSORDD;
-            Modify();
-        end;
+        "Sales & Receivables Setup".Get();
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Order Nos.", XSORDD, XSalesOrderDist, 6,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Sales & Receivables Setup"."Order Nos." := XSORDD;
+        "Sales & Receivables Setup".Modify();
     end;
 
     var
@@ -23,11 +21,9 @@ codeunit 118811 "Dist. Modify Sales Setup"
 
     procedure Finalize()
     begin
-        with "Sales & Receivables Setup" do begin
-            Get();
-            "Order Nos." := XSORD1;
-            Modify();
-        end;
+        "Sales & Receivables Setup".Get();
+        "Sales & Receivables Setup"."Order Nos." := XSORD1;
+        "Sales & Receivables Setup".Modify();
     end;
 }
 

@@ -9,11 +9,11 @@ codeunit 161346 "Create Purch. No. Series Lines"
         MakeAdj: Codeunit "Make Adjustments";
     begin
         CreateNoSeries.InsertSeries(TempSeriesCode, XxEUVNPUR, XInvCrMemoVATNoForEUVend, XxV010001, '', '', '', 1, true,
-                                         NoSeries."No. Series Type"::Purchase, XxEUPURCH, 0, XxEUVNSLS, true);
+                                         NoSeries."No. Series Type"::Purchase, XxEUPURCH, 0, XxEUVNSLS, true, Enum::"No. Series Implementation"::Sequence);
         CreateNoSeries.InsertSeries(TempSeriesCode, XxITVNPUR, XInvCrMemoVATNoForItalianVend, '108001', '', '', '', 1, true,
-                                         NoSeries."No. Series Type"::Purchase, XxNATPURCH, 0, '', true);
+                                         NoSeries."No. Series Type"::Purchase, XxNATPURCH, 0, '', true, Enum::"No. Series Implementation"::Sequence);
         CreateNoSeries.InsertSeries(TempSeriesCode, XxEXTVNPUR, XInvCrMemoVATNoForExtraEUVend, XxFX010001, '', '', '', 1,
-                                         true, NoSeries."No. Series Type"::Purchase, XxEXTPURCH, 0, '', true);
+                                         true, NoSeries."No. Series Type"::Purchase, XxEXTPURCH, 0, '', true, Enum::"No. Series Implementation"::Sequence);
 
         InsertData(XxEUVNPUR, 10000, XxV010001, 1, true, MakeAdj.AdjustDate(DMY2Date(1, 1, 1901)));
         InsertData(XxITVNPUR, 10000, '108001', 1, true, MakeAdj.AdjustDate(DMY2Date(1, 1, 1901)));

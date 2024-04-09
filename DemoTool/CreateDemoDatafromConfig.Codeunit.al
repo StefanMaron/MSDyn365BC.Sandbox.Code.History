@@ -19,7 +19,7 @@ codeunit 101899 "Create Demo Data from Config"
     begin
         SetupDemonstrationData(DemoDataSetup);
         CODEUNIT.Run(CODEUNIT::"Create Demonstration Data");
-        CleanUp;
+        CleanUp();
     end;
 
     local procedure CreateDemoDataLogToFile(LogFileName: Text) Success: Boolean;
@@ -47,21 +47,19 @@ codeunit 101899 "Create Demo Data from Config"
     var
         DemoDataTool: Page "Demonstration Data Tool";
     begin
-        with DemoDataSetup do begin
-            if Get() then
-                Delete();
-            ImportDemoDataConfig;
-            Get();
-            if "Data Type" = "Data Type"::Evaluation then
-                "Starting Year" := Date2DMY(Today, 3) - 1
-            else
-                "Starting Year" := Date2DMY(Today, 3) + 1;
-            "Working Date" := DMY2Date(1, 1, "Starting Year");
-            "Progress Window Design" := DemoDataTool.ProgressWindowDesign;
-            "LCY an EMU Currency" := ("Currency Code" = 'EUR');
-            SetTaxRates;
-            Modify(true);
-        end;
+        if DemoDataSetup.Get() then
+            DemoDataSetup.Delete();
+        ImportDemoDataConfig();
+        DemoDataSetup.Get();
+        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Evaluation then
+            DemoDataSetup."Starting Year" := Date2DMY(Today, 3) - 1
+        else
+            DemoDataSetup."Starting Year" := Date2DMY(Today, 3) + 1;
+        DemoDataSetup."Working Date" := DMY2Date(1, 1, DemoDataSetup."Starting Year");
+        DemoDataSetup."Progress Window Design" := DemoDataTool.ProgressWindowDesign();
+        DemoDataSetup."LCY an EMU Currency" := (DemoDataSetup."Currency Code" = 'EUR');
+        DemoDataSetup.SetTaxRates();
+        DemoDataSetup.Modify(true);
         UpdateDomains(DemoDataSetup);
     end;
 
@@ -80,8 +78,8 @@ codeunit 101899 "Create Demo Data from Config"
         CurrentLanguage: Integer;
     begin
         CurrentLanguage := GlobalLanguage;
-        if DemoDataConfiguration.ConfigLanguageID <> CurrentLanguage then
-            GlobalLanguage(DemoDataConfiguration.ConfigLanguageID);
+        if DemoDataConfiguration.ConfigLanguageID() <> CurrentLanguage then
+            GlobalLanguage(DemoDataConfiguration.ConfigLanguageID());
 
         ConfigFile.Open(DemoDataConfiguration.ConfigFileName(false));
         ConfigFile.CreateInStream(ConfigStream);
@@ -101,8 +99,8 @@ codeunit 101899 "Create Demo Data from Config"
         CurrentLanguage: Integer;
     begin
         CurrentLanguage := GlobalLanguage;
-        if DemoDataConfiguration.ConfigLanguageID <> CurrentLanguage then
-            GlobalLanguage(DemoDataConfiguration.ConfigLanguageID);
+        if DemoDataConfiguration.ConfigLanguageID() <> CurrentLanguage then
+            GlobalLanguage(DemoDataConfiguration.ConfigLanguageID());
 
         ConfigFile.Create(DemoDataConfiguration.ConfigFileName(false));
         ConfigFile.CreateOutStream(ConfigStream);
@@ -116,12 +114,11 @@ codeunit 101899 "Create Demo Data from Config"
 
     local procedure UpdateDomains(var DemoDataSetup: Record "Demo Data Setup")
     begin
-        with DemoDataSetup do
-            if "Data Type" <> "Data Type"::Extended then begin
-                SelectDomains(false);
-                "Skip sequence of actions" := true;
-                Modify();
-            end;
+        if DemoDataSetup."Data Type" <> DemoDataSetup."Data Type"::Extended then begin
+            DemoDataSetup.SelectDomains(false);
+            DemoDataSetup."Skip sequence of actions" := true;
+            DemoDataSetup.Modify();
+        end;
     end;
 }
 

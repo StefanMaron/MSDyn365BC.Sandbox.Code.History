@@ -144,7 +144,7 @@ codeunit 161391 "Create FatturaPA Codes"
         CT19Txt: Label '19';
         CT19DescTxt: Label 'Flat rate';
 
-    procedure InsertCodeData(CodeValue: Code[4]; DescValue: Text[250]; TypeValue: Option)
+    procedure InsertCodeData(CodeValue: Code[4]; DescValue: Text[250]; TypeValue: Enum "Fattura Code Type")
     var
         FatturaCode: Record "Fattura Code";
     begin

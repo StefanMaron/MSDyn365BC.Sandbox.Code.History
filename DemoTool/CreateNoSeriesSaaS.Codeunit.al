@@ -5,30 +5,26 @@ codeunit 101221 "Create No Series SaaS"
     var
         JJnlNoSeries: Code[20];
     begin
-        with DummyJobsSetup do begin
-            if not NoSeries.Get(XJOBTxt) then
-                CreateNoSeries.InitBaseSeries("Job Nos.", XJOBTxt, XJOBTxt, XJ10Txt, XJ99990Txt, '', '', 10,
-                  NoSeries."No. Series Type"::Normal, '', 0, '', false, true);
+        if not NoSeries.Get(XJOBTxt) then
+            CreateNoSeries.InitBaseSeries(DummyJobsSetup."Job Nos.", XJOBTxt, XJOBTxt, XJ10Txt, XJ99990Txt, '', '', 10,
+              NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
 
-            if not NoSeries.Get(XJOBWIPTxt) then
-                CreateNoSeries.InitBaseSeries("Job WIP Nos.", XJOBWIPTxt, XJobWIPDescTxt, XDefaultJobWIPNoTxt, XDefaultJobWIPEndNoTxt, '', '', 1,
-                  NoSeries."No. Series Type"::Normal, '', 0, '', false, true);
-        end;
+        if not NoSeries.Get(XJOBWIPTxt) then
+            CreateNoSeries.InitBaseSeries(DummyJobsSetup."Job WIP Nos.", XJOBWIPTxt, XJobWIPDescTxt, XDefaultJobWIPNoTxt, XDefaultJobWIPEndNoTxt, '', '', 1,
+              NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
 
         JJnlNoSeries := '';
         if not NoSeries.Get(XJJNL) then
             CreateNoSeries.InitBaseSeries(JJnlNoSeries, XJJNL, XJJNLDescTxt, XJJNLNoTxt, XJJNLEndNoTxt, '', '', 1,
-              NoSeries."No. Series Type"::Normal, '', 0, '', false, true);
+              NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
 
-        with DummyResourcesSetup do begin
-            if not NoSeries.Get(XRES) then
-                CreateNoSeries.InitBaseSeries("Resource Nos.", XRES, XRESDescTxt, XRESNoTxt, XResEndNoTxt, '', '', 10,
-                  NoSeries."No. Series Type"::Normal, '', 0, '', false, true);
+        if not NoSeries.Get(XRES) then
+            CreateNoSeries.InitBaseSeries(DummyResourcesSetup."Resource Nos.", XRES, XRESDescTxt, XRESNoTxt, XResEndNoTxt, '', '', 10,
+              NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
 
-            if not NoSeries.Get(XTS) then
-                CreateNoSeries.InitBaseSeries("Time Sheet Nos.", XTS, XTSDescTxt, XTSNoTxt, XTSEndNoTxt, '', '', 1,
-                  NoSeries."No. Series Type"::Normal, '', 0, '', false, true);
-        end;
+        if not NoSeries.Get(XTS) then
+            CreateNoSeries.InitBaseSeries(DummyResourcesSetup."Time Sheet Nos.", XTS, XTSDescTxt, XTSNoTxt, XTSEndNoTxt, '', '', 1,
+              NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
     end;
 
     var

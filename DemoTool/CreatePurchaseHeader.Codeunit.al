@@ -65,7 +65,6 @@ codeunit 101038 "Create Purchase Header"
         XBTZ009: Label 'BTZ-009';
         XAWE1: Label 'AWE1';
         XAWE2: Label 'AWE2';
-        XGIRO: Label 'GIRO';
         XKR950201: Label 'KR95-02-01';
         XBANKTxt: Label 'BANK', Comment = 'Has to be translated exactly the same as global constant 1005 (XBANK) from COD101289 (Create Payment Method)';
 

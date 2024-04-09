@@ -7,82 +7,80 @@ codeunit 101311 "Create Sales & Receivables S."
         "Create No. Series Line Sales": Codeunit "Create Sales No. Series Lines";
     begin
         DemoDataSetup.Get();
-        with "Sales & Receivables Setup" do begin
-            Get();
-            Validate("Shipment on Invoice", true);
-            Validate("Return Receipt on Credit Memo", true);
-            Validate("Discount Posting", "Discount Posting"::"All Discounts");
-            Validate("Invoice Rounding", true);
-            Validate("Customer Group Dimension Code", XCUSTOMERGROUP);
-            Validate("Salesperson Dimension Code", XSALESPERSON);
-            "Copy Customer Name to Entries" := true;
-            "Create No. Series".InitBaseSeries("Customer Nos.", XCUST, XCustomer, XC10, XC99990, '', '', 10,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false, true);
-            "Create No. Series".InitTempSeries("Quote Nos.", XSQUO, XSalesQuote,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Blanket Order Nos.", XSBLK, XBlanketSalesOrder,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Order Nos.", XSORD, XSalesOrderexpired, 1,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Order Nos.", XSORD1, XSalesOrder, 1,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Order Nos.", XSORD2, XSalesOrder, 2,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InsertRelation(XSORD1, XSORD2);
-            "Create No. Series".InitTempSeries("Return Order Nos.", XSRETORD, XSalesReturnOrder,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Posted Shipment Nos.", XSSHPT, XSalesShipment, 2,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Invoice Nos.", XSINV, XSalesInvoice,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Posted Invoice Nos.", XSINVplus, XPostedSalesInvoice, 3,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', true);
-            "Create No. Series".InitTempSeries("Credit Memo Nos.", XSCR, XSalesCreditMemo,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Posted Return Receipt Nos.", XSRCPT, XPostedSalesReceipt, 7,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Posted Credit Memo Nos.", XSCRPLUS, XPostedSalesCreditMemo, 4,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', true);
-            "Create No. Series".InitBaseSeries("Price List Nos.", XSPL, XSalesPriceList, XS00001, XS99999, '', '', 1,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false, true);
-            "Create No. Series".InitTempSeries("Reminder Nos.", XSREM, XReminder,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Issued Reminder Nos.", XSREMPLUS, XIssuedReminder, 5,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Fin. Chrg. Memo Nos.", XSFIN, XFinanceChargeMemo,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Issued Fin. Chrg. M. Nos.", XSFINPLUS, XIssuedFinanceChargeMemo, 6,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Direct Debit Mandate Nos.", XDDMTxt, XDirectDebitMandateTxt,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Fattura PA Nos.", XFattPaTxt, XFatturaPATxt,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Posted Prepmt. Inv. Nos.", XSPREINVplus, XPostedPrepaymentSalesCreditMemo, 6,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Posted Prepmt. Cr. Memo Nos.", XSPRECRPLUS, XPostedSalesCreditMemo,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Canceled Issued Reminder Nos.", XSREMCPLUS, XCanceledIssuedReminder, 6,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Canc. Iss. Fin. Ch. Mem. Nos.", XSFINCPLUS, XCanceledIssuedFinanceChargeMemo, 7,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series Line Sales".Run(); //IT
-            "Order Nos." := XSORD;
-            // IT
-            //  "Invoice Nos." := "Posted Invoice Nos.";
-            //  "Credit Memo Nos." := "Posted Credit Memo Nos.";
-            // IT
-            "Appln. between Currencies" := "Appln. between Currencies"::All;
-            "Document Default Line Type" := "Document Default Line Type"::Item;
-            //BEGIN IT
-            Evaluate("Bank Receipts Risk Period", '<20D>');
-            Validate("Bank Receipts Risk Period");
-            "Temporary Bill List No." := XxTMDCUS;
-            "Recall Bill Description" := XRecallBill;
-            "Fattura PA Electronic Format" := XFatturaPATxt;
-            //END IT
-
-            Modify();
-        end;
+        "Sales & Receivables Setup".Get();
+        "Sales & Receivables Setup".Validate("Shipment on Invoice", true);
+        "Sales & Receivables Setup".Validate("Return Receipt on Credit Memo", true);
+        "Sales & Receivables Setup".Validate("Discount Posting", "Sales & Receivables Setup"."Discount Posting"::"All Discounts");
+        "Sales & Receivables Setup".Validate("Invoice Rounding", true);
+        "Sales & Receivables Setup".Validate("Customer Group Dimension Code", XCUSTOMERGROUP);
+        "Sales & Receivables Setup".Validate("Salesperson Dimension Code", XSALESPERSON);
+        "Sales & Receivables Setup"."Copy Customer Name to Entries" := true;
+        "Create No. Series".InitBaseSeries("Sales & Receivables Setup"."Customer Nos.", XCUST, XCustomer, XC10, XC99990, '', '', 10,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Quote Nos.", XSQUO, XSalesQuote,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Blanket Order Nos.", XSBLK, XBlanketSalesOrder,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Order Nos.", XSORD, XSalesOrderexpired, 1,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Order Nos.", XSORD1, XSalesOrder, 1,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Order Nos.", XSORD2, XSalesOrder, 2,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InsertRelation(XSORD1, XSORD2);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Return Order Nos.", XSRETORD, XSalesReturnOrder,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Posted Shipment Nos.", XSSHPT, XSalesShipment, 2,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Invoice Nos.", XSINV, XSalesInvoice,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Posted Invoice Nos.", XSINVplus, XPostedSalesInvoice, 3,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', true);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Credit Memo Nos.", XSCR, XSalesCreditMemo,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Posted Return Receipt Nos.", XSRCPT, XPostedSalesReceipt, 7,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Posted Credit Memo Nos.", XSCRPLUS, XPostedSalesCreditMemo, 4,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', true);
+        "Create No. Series".InitBaseSeries("Sales & Receivables Setup"."Price List Nos.", XSPL, XSalesPriceList, XS00001, XS99999, '', '', 1,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Reminder Nos.", XSREM, XReminder,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Issued Reminder Nos.", XSREMPLUS, XIssuedReminder, 5,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Fin. Chrg. Memo Nos.", XSFIN, XFinanceChargeMemo,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Issued Fin. Chrg. M. Nos.", XSFINPLUS, XIssuedFinanceChargeMemo, 6,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Direct Debit Mandate Nos.", XDDMTxt, XDirectDebitMandateTxt,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Fattura PA Nos.", XFattPaTxt, XFatturaPATxt,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Posted Prepmt. Inv. Nos.", XSPREINVplus, XPostedPrepaymentSalesCreditMemo, 6,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Posted Prepmt. Cr. Memo Nos.", XSPRECRPLUS, XPostedSalesCreditMemo,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Canceled Issued Reminder Nos.", XSREMCPLUS, XCanceledIssuedReminder, 6,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Canc. Iss. Fin. Ch. Mem. Nos.", XSFINCPLUS, XCanceledIssuedFinanceChargeMemo, 7,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series Line Sales".Run();
+        //IT
+        "Sales & Receivables Setup"."Order Nos." := XSORD;
+        // IT
+        //  "Invoice Nos." := "Posted Invoice Nos.";
+        //  "Credit Memo Nos." := "Posted Credit Memo Nos.";
+        // IT
+        "Sales & Receivables Setup"."Appln. between Currencies" := "Sales & Receivables Setup"."Appln. between Currencies"::All;
+        "Sales & Receivables Setup"."Document Default Line Type" := "Sales & Receivables Setup"."Document Default Line Type"::Item;
+        //BEGIN IT
+        Evaluate("Sales & Receivables Setup"."Bank Receipts Risk Period", '<20D>');
+        "Sales & Receivables Setup".Validate("Bank Receipts Risk Period");
+        "Sales & Receivables Setup"."Temporary Bill List No." := XxTMDCUS;
+        "Sales & Receivables Setup"."Recall Bill Description" := XRecallBill;
+        "Sales & Receivables Setup"."Fattura PA Electronic Format" := XFatturaPATxt;
+        //END IT
+        "Sales & Receivables Setup".Modify();
     end;
 
     var
@@ -114,7 +112,6 @@ codeunit 101311 "Create Sales & Receivables S."
         XSINVplus: Label 'S-INV+';
         XPostedSalesInvoice: Label 'Posted Sales Invoice';
         XSPREINVplus: Label 'S-INV-P+';
-        XPostedPrrepaymentSalesInvoice: Label 'Posted Prepayment Sales Invoice';
         XSCR: Label 'S-CR';
         XSalesCreditMemo: Label 'Sales Credit Memo';
         XSRCPT: Label 'S-RCPT';
@@ -152,59 +149,57 @@ codeunit 101311 "Create Sales & Receivables S."
         CreateNoSeriesLineSales: Codeunit "Create Sales No. Series Lines";
     begin
         DemoDataSetup.Get();
-        with "Sales & Receivables Setup" do begin
-            Get();
-            Validate("Discount Posting", "Discount Posting"::"All Discounts");
-            Validate("Invoice Rounding", true);
-            Validate("Shipment on Invoice", true);
-            "Copy Customer Name to Entries" := true;
-            "Create No. Series".InitBaseSeries("Customer Nos.", XCUST, XCustomer, XC10, XC99990, '', '', 10,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false, true);
-            "Create No. Series".InitTempSeries("Quote Nos.", XSQUO, XSalesQuote,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Order Nos.", XSORD, XSalesOrder, 1,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Return Order Nos.", XSRETORD, XSalesReturnOrder,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Posted Return Receipt Nos.", XSRCPT, XPostedSalesReceipt, 7,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Posted Shipment Nos.", XSSHPT, XSalesShipment, 2,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', true);
-            "Create No. Series".InitFinalSeries("Invoice Nos.", XSINV, XSalesInvoice, 2,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Posted Invoice Nos.", XSINVplus, XPostedSalesInvoice, 3,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', true);
-            "Create No. Series".InitTempSeries("Credit Memo Nos.", XSCR, XSalesCreditMemo,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Posted Credit Memo Nos.", XSCRPLUS, XPostedSalesCreditMemo, 4,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', true);
-            "Create No. Series".InitBaseSeries("Price List Nos.", XSPL, XSalesPriceList, XS00001, XS99999, '', '', 1,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false, true);
-            "Create No. Series".InitTempSeries("Reminder Nos.", XSREM, XReminder,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Issued Reminder Nos.", XSREMPLUS, XIssuedReminder, 5,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Fin. Chrg. Memo Nos.", XSFIN, XFinanceChargeMemo,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitFinalSeries("Issued Fin. Chrg. M. Nos.", XSFINPLUS, XIssuedFinanceChargeMemo, 6,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Blanket Order Nos.", XSBLK, XBlanketSalesOrder,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Create No. Series".InitTempSeries("Fattura PA Nos.", XFattPaTxt, XFatturaPATxt,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Sales & Receivables Setup".Get();
+        "Sales & Receivables Setup".Validate("Discount Posting", "Sales & Receivables Setup"."Discount Posting"::"All Discounts");
+        "Sales & Receivables Setup".Validate("Invoice Rounding", true);
+        "Sales & Receivables Setup".Validate("Shipment on Invoice", true);
+        "Sales & Receivables Setup"."Copy Customer Name to Entries" := true;
+        "Create No. Series".InitBaseSeries("Sales & Receivables Setup"."Customer Nos.", XCUST, XCustomer, XC10, XC99990, '', '', 10,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Quote Nos.", XSQUO, XSalesQuote,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Order Nos.", XSORD, XSalesOrder, 1,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Return Order Nos.", XSRETORD, XSalesReturnOrder,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Posted Return Receipt Nos.", XSRCPT, XPostedSalesReceipt, 7,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Posted Shipment Nos.", XSSHPT, XSalesShipment, 2,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', true);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Invoice Nos.", XSINV, XSalesInvoice, 2,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Posted Invoice Nos.", XSINVplus, XPostedSalesInvoice, 3,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', true);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Credit Memo Nos.", XSCR, XSalesCreditMemo,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Posted Credit Memo Nos.", XSCRPLUS, XPostedSalesCreditMemo, 4,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', true);
+        "Create No. Series".InitBaseSeries("Sales & Receivables Setup"."Price List Nos.", XSPL, XSalesPriceList, XS00001, XS99999, '', '', 1,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Reminder Nos.", XSREM, XReminder,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Issued Reminder Nos.", XSREMPLUS, XIssuedReminder, 5,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Fin. Chrg. Memo Nos.", XSFIN, XFinanceChargeMemo,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Issued Fin. Chrg. M. Nos.", XSFINPLUS, XIssuedFinanceChargeMemo, 6,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Blanket Order Nos.", XSBLK, XBlanketSalesOrder,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Fattura PA Nos.", XFattPaTxt, XFatturaPATxt,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
 
-            "Appln. between Currencies" := "Appln. between Currencies"::All;
-            "Discount Posting" := "Discount Posting"::"All Discounts";
-            "Stockout Warning" := true;
-            "VAT Bus. Posting Gr. (Price)" := CreateVATBusPostingGr.GetDomesticVATGroup;
-            "Document Default Line Type" := "Document Default Line Type"::Item;
-            Evaluate("Bank Receipts Risk Period", '<20D>');
-            Validate("Bank Receipts Risk Period");
-            "Temporary Bill List No." := XxTMDCUS;
-            "Recall Bill Description" := XRecallBill;
-            "Fattura PA Electronic Format" := XFatturaPATxt;
-            Modify();
-        end;
+        "Sales & Receivables Setup"."Appln. between Currencies" := "Sales & Receivables Setup"."Appln. between Currencies"::All;
+        "Sales & Receivables Setup"."Discount Posting" := "Sales & Receivables Setup"."Discount Posting"::"All Discounts";
+        "Sales & Receivables Setup"."Stockout Warning" := true;
+        "Sales & Receivables Setup"."VAT Bus. Posting Gr. (Price)" := CreateVATBusPostingGr.GetDomesticVATGroup();
+        "Sales & Receivables Setup"."Document Default Line Type" := "Sales & Receivables Setup"."Document Default Line Type"::Item;
+        Evaluate("Sales & Receivables Setup"."Bank Receipts Risk Period", '<20D>');
+        "Sales & Receivables Setup".Validate("Bank Receipts Risk Period");
+        "Sales & Receivables Setup"."Temporary Bill List No." := XxTMDCUS;
+        "Sales & Receivables Setup"."Recall Bill Description" := XRecallBill;
+        "Sales & Receivables Setup"."Fattura PA Electronic Format" := XFatturaPATxt;
+        "Sales & Receivables Setup".Modify();
 
         CreateNoSeriesLineSales.Run();
     end;
@@ -212,15 +207,13 @@ codeunit 101311 "Create Sales & Receivables S."
     procedure Finalize()
     begin
         DemoDataSetup.Get();
-        with "Sales & Receivables Setup" do begin
-            Get();
-            "Invoice Nos." := XSINV;
-            "Credit Memo Nos." := XSCR;
-            "Order Nos." := XSORD1;
-            "Posted Prepmt. Inv. Nos." := XSINVplus;
-            "Posted Prepmt. Cr. Memo Nos." := XSCRPLUS;
-            Modify();
-        end;
+        "Sales & Receivables Setup".Get();
+        "Sales & Receivables Setup"."Invoice Nos." := XSINV;
+        "Sales & Receivables Setup"."Credit Memo Nos." := XSCR;
+        "Sales & Receivables Setup"."Order Nos." := XSORD1;
+        "Sales & Receivables Setup"."Posted Prepmt. Inv. Nos." := XSINVplus;
+        "Sales & Receivables Setup"."Posted Prepmt. Cr. Memo Nos." := XSCRPLUS;
+        "Sales & Receivables Setup".Modify();
     end;
 }
 

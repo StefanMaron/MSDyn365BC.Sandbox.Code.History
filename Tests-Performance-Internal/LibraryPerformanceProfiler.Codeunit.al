@@ -32,10 +32,10 @@ codeunit 132209 "Library - Performance Profiler"
     begin
         if ClearCache then
             SelectLatestVersion();
-        PermissionTestHelper := PermissionTestHelper.PermissionTestHelper;
+        PermissionTestHelper := PermissionTestHelper.PermissionTestHelper();
         PermissionTestHelper.EnableFullALFunctionTracing(true);
-        EtwPerformanceProfiler := EtwPerformanceProfiler.EtwPerformanceProfiler;
-        EtwPerformanceProfiler.Start(SessionId, -1);
+        EtwPerformanceProfiler := EtwPerformanceProfiler.EtwPerformanceProfiler();
+        EtwPerformanceProfiler.Start(SessionId(), -1);
     end;
 
     procedure StopProfiler(var PerfProfilerEventsTest: Record "Perf Profiler Events Test"; TestName: Text; LogFromObjectType: Option; LogFromObjectID: Integer; LogResults: Boolean): Text
@@ -48,15 +48,15 @@ codeunit 132209 "Library - Performance Profiler"
         PauseLogging: Boolean;
         ObjectIsATestLibrary: Boolean;
     begin
-        Sleep(WaitingTimeForProfilerEventsCollection);
+        Sleep(WaitingTimeForProfilerEventsCollection());
         PerfProfilerEventsTest.Reset();
         PerfProfilerEventsTest.DeleteAll();
-        PermissionTestHelper := PermissionTestHelper.PermissionTestHelper;
+        PermissionTestHelper := PermissionTestHelper.PermissionTestHelper();
         PermissionTestHelper.EnableFullALFunctionTracing(false);
         EtwPerformanceProfiler.Stop();
         I := 1;
 
-        while EtwPerformanceProfiler.CallTreeMoveNext do begin
+        while EtwPerformanceProfiler.CallTreeMoveNext() do begin
             ObjectID := EtwPerformanceProfiler.CallTreeCurrentStatementOwningObjectId;
             ObjectType := EtwPerformanceProfiler.CallTreeCurrentStatementOwningObjectType;
             ObjectIsATestLibrary := (ObjectID >= 130000) and (ObjectID < 133000);
@@ -73,7 +73,7 @@ codeunit 132209 "Library - Performance Profiler"
                 Clear(PerfProfilerEventsTest);
                 PerfProfilerEventsTest.Init();
                 PerfProfilerEventsTest.Id := I;
-                PerfProfilerEventsTest."Session ID" := SessionId;
+                PerfProfilerEventsTest."Session ID" := SessionId();
                 PerfProfilerEventsTest.Indentation := EtwPerformanceProfiler.CallTreeCurrentStatementIndentation;
                 PerfProfilerEventsTest."Object Type" := EtwPerformanceProfiler.CallTreeCurrentStatementOwningObjectType;
                 PerfProfilerEventsTest."Object ID" := EtwPerformanceProfiler.CallTreeCurrentStatementOwningObjectId;

@@ -5,25 +5,23 @@ codeunit 101314 "Create Resources Setup"
     var
         NoSeries: Record "No. Series";
     begin
-        with ResourcesSetup do begin
-            Get();
-            if "Resource Nos." = '' then
-                if not NoSeries.Get(XRES) then
-                    CreateNoSeries.InitBaseSeries("Resource Nos.", XRES, XResource, XR10, XR9990, '', '', 10,
-                      NoSeries."No. Series Type"::Normal, '', 0, '', false, true)
-                else
-                    "Resource Nos." := XRES;
-            if "Time Sheet Nos." = '' then
-                if not NoSeries.Get(XTS) then
-                    CreateNoSeries.InitBaseSeries("Time Sheet Nos.", XTS, XTimeSheet, XTS00001, XTS99999, '', '', 1,
-                      NoSeries."No. Series Type"::Normal, '', 0, '', false, true)
-                else
-                    "Time Sheet Nos." := XTS;
+        ResourcesSetup.Get();
+        if ResourcesSetup."Resource Nos." = '' then
+            if not NoSeries.Get(XRES) then
+                CreateNoSeries.InitBaseSeries(ResourcesSetup."Resource Nos.", XRES, XResource, XR10, XR9990, '', '', 10,
+                  NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence)
+            else
+                ResourcesSetup."Resource Nos." := XRES;
+        if ResourcesSetup."Time Sheet Nos." = '' then
+            if not NoSeries.Get(XTS) then
+                CreateNoSeries.InitBaseSeries(ResourcesSetup."Time Sheet Nos.", XTS, XTimeSheet, XTS00001, XTS99999, '', '', 1,
+                  NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence)
+            else
+                ResourcesSetup."Time Sheet Nos." := XTS;
 #if not CLEAN22
-            "Use New Time Sheet Experience" := true;
+        ResourcesSetup."Use New Time Sheet Experience" := true;
 #endif
-            Modify();
-        end;
+        ResourcesSetup.Modify();
     end;
 
     var

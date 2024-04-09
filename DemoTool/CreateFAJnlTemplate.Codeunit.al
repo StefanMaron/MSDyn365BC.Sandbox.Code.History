@@ -26,7 +26,7 @@ codeunit 101812 "Create FA Jnl. Template"
         if "No. Series" <> '' then
             "Create No. Series".InitBaseSeries(
               "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1,
-              "No. Series2"."No. Series Type"::Normal, '', 0, '', false, true);
+              "No. Series2"."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
         "FA Journal Template".Init();
         "FA Journal Template".Validate(Name, Name);
         "FA Journal Template".Validate(Description, Description);

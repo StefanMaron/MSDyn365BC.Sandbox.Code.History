@@ -3,25 +3,23 @@ codeunit 117046 "Create Troubleshooting Setup"
 
     trigger OnRun()
     begin
-        with TroubleshootingSetup do begin
-            InsertData(Type::"Service Item Group", XDESKTOP, XTR00005);
-            InsertData(Type::"Service Item Group", XSERVER, XTR00005);
-            InsertData(Type::"Service Item", '7', XTR00001);
-            InsertData(Type::"Service Item", '7', XTR00002);
-            InsertData(Type::"Service Item", '7', XTR00003);
-            InsertData(Type::"Service Item", '7', XTR00004);
-            InsertData(Type::"Service Item", '7', XTR00005);
-            InsertData(Type::"Service Item", '16', XTR00001);
-            InsertData(Type::"Service Item", '16', XTR00002);
-            InsertData(Type::"Service Item", '16', XTR00003);
-            InsertData(Type::"Service Item", '16', XTR00004);
-            InsertData(Type::"Service Item", '16', XTR00005);
-            InsertData(Type::"Service Item", '17', XTR00001);
-            InsertData(Type::"Service Item", '17', XTR00002);
-            InsertData(Type::"Service Item", '17', XTR00003);
-            InsertData(Type::"Service Item", '17', XTR00004);
-            InsertData(Type::"Service Item", '17', XTR00005);
-        end;
+        InsertData(TroubleshootingSetup.Type::"Service Item Group", XDESKTOP, XTR00005);
+        InsertData(TroubleshootingSetup.Type::"Service Item Group", XSERVER, XTR00005);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '7', XTR00001);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '7', XTR00002);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '7', XTR00003);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '7', XTR00004);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '7', XTR00005);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '16', XTR00001);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '16', XTR00002);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '16', XTR00003);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '16', XTR00004);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '16', XTR00005);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '17', XTR00001);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '17', XTR00002);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '17', XTR00003);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '17', XTR00004);
+        InsertData(TroubleshootingSetup.Type::"Service Item", '17', XTR00005);
     end;
 
     var
@@ -34,7 +32,7 @@ codeunit 117046 "Create Troubleshooting Setup"
         XTR00003: Label 'TR00003';
         XTR00004: Label 'TR00004';
 
-    procedure InsertData(Type: Option; "No.": Text[250]; "Troubleshooting No.": Text[250])
+    procedure InsertData(Type: Enum "Troubleshooting Item Type"; "No.": Text[250]; "Troubleshooting No.": Text[250])
     var
         TroubleshootingSetup: Record "Troubleshooting Setup";
     begin

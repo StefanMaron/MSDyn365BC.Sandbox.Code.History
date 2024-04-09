@@ -1,6 +1,7 @@
 table 130200 "Test Codeunit"
 {
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

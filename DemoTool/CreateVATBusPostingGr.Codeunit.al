@@ -3,13 +3,11 @@ codeunit 101323 "Create VAT Bus. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Company Type" = "Company Type"::VAT then begin
-                InsertData(DomesticCode, XDomesticcustomersandvendors, XxITVNSLS, XxITVNPUR);
-                InsertData(EUCode, XCustomersandvendorsinEU, XxEUVNSLS, XxEUVNPUR);
-                InsertData(ExportCode, XOthercustomersandvendorsnotEU, XxEXTVNSLS, XxEXTVNPUR);
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then begin
+            InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, XxITVNSLS, XxITVNPUR);
+            InsertData(DemoDataSetup.EUCode(), XCustomersandvendorsinEU, XxEUVNSLS, XxEUVNPUR);
+            InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, XxEXTVNSLS, XxEXTVNPUR);
         end;
     end;
 
@@ -30,7 +28,7 @@ codeunit 101323 "Create VAT Bus. Posting Gr."
     begin
         VATBusinessPostingGroup.Init();
         VATBusinessPostingGroup.Validate(Code, Code);
-        VATBusinessPostingGroup.Validate(Description, Description);
+        VATBusinessPostingGroup.Validate(Description, Description); // IT
         VATBusinessPostingGroup.Validate("Default Sales Operation Type", "Default Sales Operation Type");
         VATBusinessPostingGroup.Validate("Default Purch. Operation Type", "Default Purch. Operation Type");
         VATBusinessPostingGroup.Insert();
@@ -39,7 +37,7 @@ codeunit 101323 "Create VAT Bus. Posting Gr."
     procedure GetDomesticVATGroup(): Code[10]
     begin
         DemoDataSetup.Get();
-        exit(DemoDataSetup.DomesticCode);
+        exit(DemoDataSetup.DomesticCode());
     end;
 }
 

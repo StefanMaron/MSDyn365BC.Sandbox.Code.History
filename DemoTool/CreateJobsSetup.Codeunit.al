@@ -3,28 +3,26 @@ codeunit 101315 "Create Jobs Setup"
 
     trigger OnRun()
     begin
-        with JobsSetup do begin
-            Get();
-            if "Job Nos." = '' then
-                if not NoSeries.Get(XJOBTxt) then
-                    CreateNoSeries.InitBaseSeries("Job Nos.", XJOBTxt, XJOBTxt, XJ10Txt, XJ99990Txt, '', '', 10,
-                        NoSeries."No. Series Type"::Normal, '', 0, '', false, true)
-                else
-                    "Job Nos." := XJOBTxt;
-            if "Job WIP Nos." = '' then
-                if not NoSeries.Get(XJOBWIPTxt) then
-                    CreateNoSeries.InitBaseSeries("Job WIP Nos.", XJOBWIPTxt, XJobWIPDescTxt, XDefaultJobWIPNoTxt, XDefaultJobWIPEndNoTxt, '', '', 1,
-                        NoSeries."No. Series Type"::Normal, '', 0, '', false, true)
-                else
-                    "Job WIP Nos." := XJOBWIPTxt;
-            if "Price List Nos." = '' then
-                if not NoSeries.Get(XJPL) then
-                    CreateNoSeries.InitBaseSeries("Price List Nos.", XJPL, XJobPriceList, XJ00001, XJ99999, '', '', 1,
-                        NoSeries."No. Series Type"::Normal, '', 0, '', false, true)
-                else
-                    "Price List Nos." := XJPL;
-            Modify();
-        end
+        JobsSetup.Get();
+        if JobsSetup."Job Nos." = '' then
+            if not NoSeries.Get(XJOBTxt) then
+                CreateNoSeries.InitBaseSeries(JobsSetup."Job Nos.", XJOBTxt, XJOBTxt, XJ10Txt, XJ99990Txt, '', '', 10,
+                    NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence)
+            else
+                JobsSetup."Job Nos." := XJOBTxt;
+        if JobsSetup."Job WIP Nos." = '' then
+            if not NoSeries.Get(XJOBWIPTxt) then
+                CreateNoSeries.InitBaseSeries(JobsSetup."Job WIP Nos.", XJOBWIPTxt, XJobWIPDescTxt, XDefaultJobWIPNoTxt, XDefaultJobWIPEndNoTxt, '', '', 1,
+                    NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence)
+            else
+                JobsSetup."Job WIP Nos." := XJOBWIPTxt;
+        if JobsSetup."Price List Nos." = '' then
+            if not NoSeries.Get(XJPL) then
+                CreateNoSeries.InitBaseSeries(JobsSetup."Price List Nos.", XJPL, XJobPriceList, XJ00001, XJ99999, '', '', 1,
+                    NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence)
+            else
+                JobsSetup."Price List Nos." := XJPL;
+        JobsSetup.Modify();
     end;
 
     var

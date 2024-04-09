@@ -5,13 +5,11 @@ codeunit 119044 "Modify Sales & Rec. Setup"
     var
         "No. Series": Record "No. Series";
     begin
-        with "Sales & Receivables Setup" do begin
-            Get();
-            "Create No. Series".InitFinalSeries("Order Nos.", XSORDM, XSalesOrderManufacturing, 9,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Order Nos." := XSORDM;
-            Modify();
-        end;
+        "Sales & Receivables Setup".Get();
+        "Create No. Series".InitFinalSeries("Sales & Receivables Setup"."Order Nos.", XSORDM, XSalesOrderManufacturing, 9,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Sales & Receivables Setup"."Order Nos." := XSORDM;
+        "Sales & Receivables Setup".Modify();
     end;
 
     var
@@ -23,11 +21,9 @@ codeunit 119044 "Modify Sales & Rec. Setup"
 
     procedure Finalize()
     begin
-        with "Sales & Receivables Setup" do begin
-            Get();
-            "Order Nos." := XSORD1;
-            Modify();
-        end;
+        "Sales & Receivables Setup".Get();
+        "Sales & Receivables Setup"."Order Nos." := XSORD1;
+        "Sales & Receivables Setup".Modify();
     end;
 }
 

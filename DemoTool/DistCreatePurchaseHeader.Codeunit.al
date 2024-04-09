@@ -11,13 +11,11 @@ codeunit 118822 "Dist. Create Purchase Header"
         CreatePurchaseHeader.InsertData(1, '47586622', 19030129D, XD120, '', XxEXTVNPUR, '', 439240.17);
         CreatePurchaseHeader.InsertData(1, '30000', 19030103D, '', '', XxITVNPUR, '', 0);
 
-        with "Purchases & Payables Setup" do begin
-            Get();
-            "Create No. Series".InitTempSeries("Order Nos.", XPORDD1, XPurchaseOrderDist, 104,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false);
-            "Order Nos." := XPORDD1;
-            Modify();
-        end;
+        "Purchases & Payables Setup".Get();
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Order Nos.", XPORDD1, XPurchaseOrderDist, 104,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false);
+        "Purchases & Payables Setup"."Order Nos." := XPORDD1;
+        "Purchases & Payables Setup".Modify();
 
         CreatePurchaseHeader.InsertData(1, '30000', 19030123D, XD303, '', XxITVNPUR, '', 0);
         CreatePurchaseHeader.InsertData(1, '40000', 19030126D, XD304, '', XxITVNPUR, '', 0);

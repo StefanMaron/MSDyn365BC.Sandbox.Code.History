@@ -87,7 +87,7 @@ page 130020 "Test Suites"
 
                         trigger OnAction()
                         begin
-                            ExportTestSuiteSetup;
+                            ExportTestSuiteSetup();
                         end;
                     }
                     action("I&mport")
@@ -97,7 +97,7 @@ page 130020 "Test Suites"
 
                         trigger OnAction()
                         begin
-                            ImportTestSuiteSetup;
+                            ImportTestSuiteSetup();
                         end;
                     }
                 }
@@ -115,7 +115,7 @@ page 130020 "Test Suites"
 
                         trigger OnAction()
                         begin
-                            ExportTestSuiteResult;
+                            ExportTestSuiteResult();
                         end;
                     }
                     action(Action24)
@@ -125,7 +125,7 @@ page 130020 "Test Suites"
 
                         trigger OnAction()
                         begin
-                            ImportTestSuiteResult;
+                            ImportTestSuiteResult();
                         end;
                     }
                 }

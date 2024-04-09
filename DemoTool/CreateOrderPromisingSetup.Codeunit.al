@@ -5,21 +5,19 @@ codeunit 101316 "Create Order Promising Setup"
     var
         "No. Series": Record "No. Series";
     begin
-        with OrderPromSetup do begin
-            if not Get() then
-                Insert();
-            Evaluate("Offset (Time)", '<1D>');
-            "Create No. Series".InitBaseSeries("Order Promising Nos.", XOPROM, XOrderPromising, XOP101001, XOP199999, '', '', 1,
-              "No. Series"."No. Series Type"::Normal, '', 0, '', false, true);
-            if ReqWkshTemplate.Find('-') then begin
-                "Order Promising Template" := ReqWkshTemplate.Name;
-                ReqWkshName.SetRange("Worksheet Template Name", ReqWkshTemplate.Name);
-                if ReqWkshName.FindFirst() then
-                    "Order Promising Worksheet" := ReqWkshName.Name;
-            end;
-            "Order Promising Nos." := XOPROM;
-            Modify();
+        if not OrderPromSetup.Get() then
+            OrderPromSetup.Insert();
+        Evaluate(OrderPromSetup."Offset (Time)", '<1D>');
+        "Create No. Series".InitBaseSeries(OrderPromSetup."Order Promising Nos.", XOPROM, XOrderPromising, XOP101001, XOP199999, '', '', 1,
+          "No. Series"."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
+        if ReqWkshTemplate.Find('-') then begin
+            OrderPromSetup."Order Promising Template" := ReqWkshTemplate.Name;
+            ReqWkshName.SetRange("Worksheet Template Name", ReqWkshTemplate.Name);
+            if ReqWkshName.FindFirst() then
+                OrderPromSetup."Order Promising Worksheet" := ReqWkshName.Name;
         end;
+        OrderPromSetup."Order Promising Nos." := XOPROM;
+        OrderPromSetup.Modify();
     end;
 
     var

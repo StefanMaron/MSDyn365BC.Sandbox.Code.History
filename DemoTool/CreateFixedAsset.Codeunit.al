@@ -6,7 +6,7 @@ codeunit 101800 "Create Fixed Asset"
         "Vendor No." := '44127914';
         InsertData(
           XFA000010, XMercedes300, XTANGIBLE, XCAR, XADM, XMERCEDES, XADM, 0, '', XOF,
-            XEA12394Q, 19030412D, "Vendor No.", "Vendor No.", '');
+          XEA12394Q, 19030412D, "Vendor No.", "Vendor No.", '');
         InsertData(
           XFA000020, XToyotaSupra30, XTANGIBLE, XCAR, XSALES, XTOYOTA, XSALES, 0, '', XJO,
           XEA12395Q, 19030718D, "Vendor No.", "Vendor No.", '');
@@ -95,7 +95,7 @@ codeunit 101800 "Create Fixed Asset"
         "Fixed Asset".Validate("FA Class Code", "FA Class Code");
         "Fixed Asset".Validate("FA Subclass Code", "FA Subclass Code");
         "Fixed Asset".Validate("FA Location Code", "FA Location Code");
-        "Fixed Asset"."Main Asset/Component" := "Main Asset/Component";
+        "Fixed Asset"."Main Asset/Component" := "FA Component Type".FromInteger("Main Asset/Component");
         "Fixed Asset"."Component of Main Asset" := "Component of Main Asset";
         "Fixed Asset".Validate("Responsible Employee", "Responsible Employee");
         "Fixed Asset".Validate("Serial No.", "Serial No.");

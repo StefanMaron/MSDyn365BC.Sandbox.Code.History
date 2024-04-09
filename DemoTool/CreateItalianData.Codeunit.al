@@ -29,12 +29,12 @@ codeunit 161300 "Create Italian Data"
         InsertVATIdentifier(XxFCI2, XxFCIArt2);
         InsertVATIdentifier(XxIND100, XVAT20PERC100PERCNondeductible);
         InsertVATIdentifier(XxIND50, XVAT20PERC50PERCNondeductible);
-        InsertVATIdentifier(DemoDataSetup.ServicesVATCode, XxVAT10PERC);
-        InsertVATIdentifier(DemoDataSetup.GoodsVATCode, XxVAT20PERC);
+        InsertVATIdentifier(DemoDataSetup.ServicesVATCode(), XxVAT10PERC);
+        InsertVATIdentifier(DemoDataSetup.GoodsVATCode(), XxVAT20PERC);
         InsertVATIdentifier(XxNI41, XNIArt41DL331slash93);
         InsertVATIdentifier(XxNI8, XNonTaxableArt8slash1);
         InsertVATIdentifier(XxNI9, XNonTaxableArt9);
-        InsertVATIdentifier(DemoDataSetup.NoVATCode, XNonTaxable);
+        InsertVATIdentifier(DemoDataSetup.NoVATCode(), XNonTaxable);
 
         Window.Update(1, VATProductPostingGroup.TableCaption());
         InsertVATProductPostingGroup(XxE13, XTaxExemptArt13);
@@ -42,8 +42,8 @@ codeunit 161300 "Create Italian Data"
         InsertVATProductPostingGroup(XxIND50, XOrdVAT20PERC50PERCNondeduct);
         InsertVATProductPostingGroup(XxVAT0, XZeroPERCTaxExemptNIFCIOthers);
         InsertVATProductPostingGroup(XxVAT04, XMinimumVAT4PERC);
-        InsertVATProductPostingGroup(DemoDataSetup.ServicesVATCode, XReducedVAT10PERC);
-        InsertVATProductPostingGroup(DemoDataSetup.GoodsVATCode, XOrdinaryVAT20PERC);
+        InsertVATProductPostingGroup(DemoDataSetup.ServicesVATCode(), XReducedVAT10PERC);
+        InsertVATProductPostingGroup(DemoDataSetup.GoodsVATCode(), XOrdinaryVAT20PERC);
         InsertVATProductPostingGroup(XxNI8, XNonTaxableArt8slash1);
 
         Window.Update(1, NoSeries.TableCaption());
@@ -137,8 +137,8 @@ codeunit 161300 "Create Italian Data"
 
         VATPostingSetup.Init();
         VATPostingSetup."VAT Bus. Posting Group" := '';
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode);
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode());
         VATPostingSetup."VAT %" := 0;
         VATPostingSetup."Deductible %" := 100;
         if not VATPostingSetup.Insert() then
@@ -146,8 +146,8 @@ codeunit 161300 "Create Italian Data"
 
         VATPostingSetup.Init();
         VATPostingSetup."VAT Bus. Posting Group" := '';
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode);
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode());
         VATPostingSetup."VAT %" := 0;
         VATPostingSetup."Deductible %" := 100;
         if not VATPostingSetup.Insert() then
@@ -155,17 +155,17 @@ codeunit 161300 "Create Italian Data"
 
         VATPostingSetup.Init();
         VATPostingSetup."VAT Bus. Posting Group" := '';
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode);
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode());
         VATPostingSetup."VAT %" := 0;
         VATPostingSetup."Deductible %" := 100;
         if not VATPostingSetup.Insert() then
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5611');
         VATPostingSetup.Validate("Purchase VAT Account", '5631');
         VATPostingSetup."VAT %" := 10;
@@ -174,9 +174,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup."VAT %" := 20;
@@ -185,9 +185,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup."VAT %" := 0;
@@ -196,9 +196,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5611');
         VATPostingSetup.Validate("Purchase VAT Account", '5631');
         VATPostingSetup."VAT %" := 10;
@@ -209,9 +209,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup."VAT %" := 20;
@@ -222,9 +222,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup."VAT %" := 0;
@@ -235,7 +235,7 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
         VATPostingSetup."VAT Prod. Posting Group" := XxIND50;
         VATPostingSetup.Validate("VAT Identifier", XxIND50);
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
@@ -245,7 +245,7 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
         VATPostingSetup."VAT Prod. Posting Group" := XxE13;
         VATPostingSetup.Validate("VAT Identifier", XxE13);
         VATPostingSetup.Validate("Sales VAT Account", '5610');
@@ -256,9 +256,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5611');
         VATPostingSetup.Validate("Purchase VAT Account", '5631');
         VATPostingSetup.Validate("Reverse Chrg. VAT Acc.", '5621');
@@ -269,9 +269,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup.Validate("Reverse Chrg. VAT Acc.", '5620');
@@ -282,9 +282,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup."VAT %" := 0;
@@ -367,9 +367,9 @@ codeunit 161300 "Create Italian Data"
         Customer.Address := XVialeMarelli72;
         Customer.City := XMilano;
         Customer."Post Code" := XIT20100;
-        Customer."Gen. Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        Customer."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        Customer."Customer Posting Group" := DemoDataSetup.DomesticCode;
+        Customer."Gen. Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        Customer."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        Customer."Customer Posting Group" := DemoDataSetup.DomesticCode();
         Customer."Payment Terms Code" := '306090';
         Customer."Location Code" := XxBLUE;
         Customer.Insert(true);
@@ -494,7 +494,7 @@ codeunit 161300 "Create Italian Data"
         Window.Update(1, GLAccount.TableCaption());
 
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::Assets, GLAccountCategoryMgt.GetCurrentAssets);
+          GLAccountCategory."Account Category"::Assets, GLAccountCategoryMgt.GetCurrentAssets());
 
         InsertGLAccount(GLAccount, '2450', XBills, GLAccount."Income/Balance"::"Balance Sheet",
           GLAccount."Account Type"::"Begin-Total", GLAccountCategory);
@@ -510,7 +510,7 @@ codeunit 161300 "Create Italian Data"
           GLAccount."Account Type"::"End-Total", GLAccountCategory);
 
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::Equity, GLAccountCategoryMgt.GetRetEarnings);
+          GLAccountCategory."Account Category"::Equity, GLAccountCategoryMgt.GetRetEarnings());
 
         InsertGLAccount(GLAccount, '3130', XGainForTheYear, GLAccount."Income/Balance"::"Balance Sheet",
           GLAccount."Account Type"::Posting, GLAccountCategory);
@@ -553,7 +553,7 @@ codeunit 161300 "Create Italian Data"
         if GLAccount.Insert() then;
 
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::Income, GLAccountCategoryMgt.GetOtherIncomeExpense);
+          GLAccountCategory."Account Category"::Income, GLAccountCategoryMgt.GetOtherIncomeExpense());
 
         InsertGLAccount(GLAccount, '010111', XGainLoss, GLAccount."Income/Balance"::"Balance Sheet",
           GLAccount."Account Type"::Posting, GLAccountCategory);
@@ -572,7 +572,7 @@ codeunit 161300 "Create Italian Data"
         GLAccount."Account Type" := GLAccount."Account Type"::"End-Total";
         if GLAccount.Insert() then;
 
-        GLAccountIndent.Indent;
+        GLAccountIndent.Indent();
 
         Window.Update(1, SalesReceivablesSetup.TableCaption());
 
@@ -613,9 +613,9 @@ codeunit 161300 "Create Italian Data"
         Customer.Address := XViaMagenta8;
         Customer.City := XMilano;
         Customer."Post Code" := XIT20100;
-        Customer."Gen. Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        Customer."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        Customer."Customer Posting Group" := DemoDataSetup.DomesticCode;
+        Customer."Gen. Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        Customer."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        Customer."Customer Posting Group" := DemoDataSetup.DomesticCode();
         Customer."Payment Terms Code" := XxCM;
         Customer."Payment Method Code" := XxRIBA;
         Customer."Location Code" := XxBLUE;
@@ -683,9 +683,9 @@ codeunit 161300 "Create Italian Data"
         Vendor.Address := XPiazzaleGiulioCesare8;
         Vendor.City := XMilano;
         Vendor."Post Code" := XIT20100;
-        Vendor."Gen. Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        Vendor."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        Vendor."Vendor Posting Group" := DemoDataSetup.DomesticCode;
+        Vendor."Gen. Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        Vendor."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        Vendor."Vendor Posting Group" := DemoDataSetup.DomesticCode();
         Vendor."Payment Terms Code" := XxCM;
         Vendor."Payment Method Code" := XxBANKTRANSF;
         Vendor."Location Code" := XxBLUE;
@@ -749,9 +749,9 @@ codeunit 161300 "Create Italian Data"
         Vendor.Address := XCorsoColombo10;
         Vendor.City := XMilano;
         Vendor."Post Code" := XIT20100;
-        Vendor.Validate("Gen. Bus. Posting Group", DemoDataSetup.DomesticCode);
-        Vendor.Validate("VAT Bus. Posting Group", DemoDataSetup.DomesticCode);
-        Vendor.Validate("Vendor Posting Group", DemoDataSetup.DomesticCode);
+        Vendor.Validate("Gen. Bus. Posting Group", DemoDataSetup.DomesticCode());
+        Vendor.Validate("VAT Bus. Posting Group", DemoDataSetup.DomesticCode());
+        Vendor.Validate("Vendor Posting Group", DemoDataSetup.DomesticCode());
         Vendor.Validate("Withholding Tax Code", XxPROFESS);
         Vendor.Insert(true);
 
@@ -896,7 +896,6 @@ codeunit 161300 "Create Italian Data"
         Customer: Record Customer;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        Bill: Record Bill;
         BillPostingGroup: Record "Bill Posting Group";
         SourceCode: Record "Source Code";
         NoSeries: Record "No. Series";
@@ -916,7 +915,6 @@ codeunit 161300 "Create Italian Data"
         VATIdentifier: Record "VAT Identifier";
         VATProductPostingGroup: Record "VAT Product Posting Group";
         VATPostingSetup: Record "VAT Posting Setup";
-        PurchWithhContribution: Record "Purch. Withh. Contribution";
         DemoDataSetup: Record "Demo Data Setup";
         GLAccountCategory: Record "G/L Account Category";
         SuggestCustomerBill: Report "Suggest Customer Bills";
@@ -962,7 +960,7 @@ codeunit 161300 "Create Italian Data"
             VATProductPostingGroup.Modify();
     end;
 
-    local procedure InsertNoSeries("Code": Code[20]; Description: Text[50]; NoSeriesType: Option; VATRegister: Code[10]; ReverseSalesVATNoSeries: Code[20])
+    local procedure InsertNoSeries("Code": Code[20]; Description: Text[50]; NoSeriesType: Enum "No. Series Type"; VATRegister: Code[10]; ReverseSalesVATNoSeries: Code[20])
     begin
         NoSeries.Init();
         NoSeries.Code := Code;
@@ -977,7 +975,7 @@ codeunit 161300 "Create Italian Data"
         if NoSeries.Insert() then;
     end;
 
-    local procedure InsertPurchaseHeader(var PurchaseHeader: Record "Purchase Header"; DocumentType: Option; VendorNo: Code[20]; VendorInvoiceNo: Code[35]; CheckTotal: Decimal)
+    local procedure InsertPurchaseHeader(var PurchaseHeader: Record "Purchase Header"; DocumentType: Enum "Purchase Document Type"; VendorNo: Code[20]; VendorInvoiceNo: Code[35]; CheckTotal: Decimal)
     begin
         PurchaseHeader.Init();
         PurchaseHeader."Document Type" := DocumentType;
@@ -989,7 +987,7 @@ codeunit 161300 "Create Italian Data"
         PurchaseHeader.Modify();
     end;
 
-    local procedure InsertPurchaseLine(var PurchaseHeader: Record "Purchase Header"; Vendor: Record Vendor; LineNo: Integer; AccountType: Option; AccountNo: Code[20]; Qty: Decimal; UoMCode: Code[10]; UnitCost: Decimal; LocationCode: Code[10])
+    local procedure InsertPurchaseLine(var PurchaseHeader: Record "Purchase Header"; Vendor: Record Vendor; LineNo: Integer; AccountType: Enum "Purchase Document Type"; AccountNo: Code[20]; Qty: Decimal; UoMCode: Code[10]; UnitCost: Decimal; LocationCode: Code[10])
     var
         PurchaseLine: Record "Purchase Line";
     begin
@@ -1007,14 +1005,14 @@ codeunit 161300 "Create Italian Data"
         PurchaseLine.Insert();
     end;
 
-    local procedure InsertGLAccount(var GLAccount: Record "G/L Account"; No: Code[20]; Name: Text[50]; IncomeBalance: Option; Type: Option; GLAccountCategory: Record "G/L Account Category")
+    local procedure InsertGLAccount(var GLAccount: Record "G/L Account"; No: Code[20]; Name: Text[50]; IncomeBalance: Option; Type: Enum "G/L Account Type"; GLAccountCategory: Record "G/L Account Category")
     begin
         GLAccount.Init();
         GLAccount."No." := No;
         GLAccount.Validate(Name, Name);
         GLAccount."Income/Balance" := IncomeBalance;
         GLAccount."Account Type" := Type;
-        GLAccount."Account Category" := GLAccountCategory."Account Category";
+        GLAccount."Account Category" := "G/L Account Category".FromInteger(GLAccountCategory."Account Category");
         GLAccount."Account Subcategory Entry No." := GLAccountCategory."Entry No.";
         if GLAccount.Insert() then;
     end;
@@ -1024,7 +1022,7 @@ codeunit 161300 "Create Italian Data"
         DemoDataSetup.Get();
 
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::Assets, GLAccountCategoryMgt.GetCurrentAssets);
+          GLAccountCategory."Account Category"::Assets, GLAccountCategoryMgt.GetCurrentAssets());
 
         InsertGLAccount(GLAccount, '2450', XBills, GLAccount."Income/Balance"::"Balance Sheet",
           GLAccount."Account Type"::"Begin-Total", GLAccountCategory);
@@ -1040,7 +1038,7 @@ codeunit 161300 "Create Italian Data"
           GLAccount."Account Type"::"End-Total", GLAccountCategory);
 
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::Equity, GLAccountCategoryMgt.GetRetEarnings);
+          GLAccountCategory."Account Category"::Equity, GLAccountCategoryMgt.GetRetEarnings());
 
         InsertGLAccount(GLAccount, '3130', XGainForTheYear, GLAccount."Income/Balance"::"Balance Sheet",
           GLAccount."Account Type"::Posting, GLAccountCategory);
@@ -1083,7 +1081,7 @@ codeunit 161300 "Create Italian Data"
         if GLAccount.Insert() then;
 
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::Income, GLAccountCategoryMgt.GetOtherIncomeExpense);
+          GLAccountCategory."Account Category"::Income, GLAccountCategoryMgt.GetOtherIncomeExpense());
 
         InsertGLAccount(GLAccount, '010111', XGainLoss, GLAccount."Income/Balance"::"Balance Sheet",
           GLAccount."Account Type"::Posting, GLAccountCategory);
@@ -1102,33 +1100,33 @@ codeunit 161300 "Create Italian Data"
         GLAccount."Account Type" := GLAccount."Account Type"::"End-Total";
         if GLAccount.Insert() then;
 
-        GLAccountIndent.Indent;
+        GLAccountIndent.Indent();
 
         InsertVATIdentifier(XxE10, XTaxExemptArt10);
         InsertVATIdentifier(XxE13, XTaxExemptArt13);
         InsertVATIdentifier(XxFCI2, XxFCIArt2);
         InsertVATIdentifier(XxIND100, XVAT20PERC100PERCNondeductible);
         InsertVATIdentifier(XxIND50, XVAT20PERC50PERCNondeductible);
-        InsertVATIdentifier(DemoDataSetup.ServicesVATCode, XxVAT10PERC);
-        InsertVATIdentifier(DemoDataSetup.GoodsVATCode, XxVAT20PERC);
+        InsertVATIdentifier(DemoDataSetup.ServicesVATCode(), XxVAT10PERC);
+        InsertVATIdentifier(DemoDataSetup.GoodsVATCode(), XxVAT20PERC);
         InsertVATIdentifier(XxNI41, XNIArt41DL331slash93);
         InsertVATIdentifier(XxNI8, XNonTaxableArt8slash1);
         InsertVATIdentifier(XxNI9, XNonTaxableArt9);
-        InsertVATIdentifier(DemoDataSetup.NoVATCode, XNonTaxable);
+        InsertVATIdentifier(DemoDataSetup.NoVATCode(), XNonTaxable);
 
         InsertVATProductPostingGroup(XxE13, XTaxExemptArt13);
         InsertVATProductPostingGroup(XxIND100, XOrdVAT20PERC100PERCNondeduct);
         InsertVATProductPostingGroup(XxIND50, XOrdVAT20PERC50PERCNondeduct);
         InsertVATProductPostingGroup(XxVAT0, XZeroPERCTaxExemptNIFCIOthers);
         InsertVATProductPostingGroup(XxVAT04, XMinimumVAT4PERC);
-        InsertVATProductPostingGroup(DemoDataSetup.ServicesVATCode, XReducedVAT10PERC);
-        InsertVATProductPostingGroup(DemoDataSetup.GoodsVATCode, XOrdinaryVAT20PERC);
+        InsertVATProductPostingGroup(DemoDataSetup.ServicesVATCode(), XReducedVAT10PERC);
+        InsertVATProductPostingGroup(DemoDataSetup.GoodsVATCode(), XOrdinaryVAT20PERC);
         InsertVATProductPostingGroup(XxNI8, XNonTaxableArt8slash1);
 
         VATPostingSetup.Init();
         VATPostingSetup."VAT Bus. Posting Group" := '';
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode);
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode());
         VATPostingSetup."VAT %" := 0;
         VATPostingSetup."Deductible %" := 100;
         if not VATPostingSetup.Insert() then
@@ -1136,8 +1134,8 @@ codeunit 161300 "Create Italian Data"
 
         VATPostingSetup.Init();
         VATPostingSetup."VAT Bus. Posting Group" := '';
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode);
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode());
         VATPostingSetup."VAT %" := 0;
         VATPostingSetup."Deductible %" := 100;
         if not VATPostingSetup.Insert() then
@@ -1145,17 +1143,17 @@ codeunit 161300 "Create Italian Data"
 
         VATPostingSetup.Init();
         VATPostingSetup."VAT Bus. Posting Group" := '';
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode);
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode());
         VATPostingSetup."VAT %" := 0;
         VATPostingSetup."Deductible %" := 100;
         if not VATPostingSetup.Insert() then
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5611');
         VATPostingSetup.Validate("Purchase VAT Account", '5631');
         VATPostingSetup."VAT %" := 10;
@@ -1164,9 +1162,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup."VAT %" := 20;
@@ -1175,9 +1173,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.ExportCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup."VAT %" := 0;
@@ -1186,9 +1184,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5611');
         VATPostingSetup.Validate("Purchase VAT Account", '5631');
         VATPostingSetup."VAT %" := 10;
@@ -1199,9 +1197,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup."VAT %" := 20;
@@ -1212,9 +1210,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup."VAT %" := 0;
@@ -1225,7 +1223,7 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
         VATPostingSetup."VAT Prod. Posting Group" := XxIND50;
         VATPostingSetup.Validate("VAT Identifier", XxIND50);
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
@@ -1235,7 +1233,7 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode;
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.DomesticCode();
         VATPostingSetup."VAT Prod. Posting Group" := XxE13;
         VATPostingSetup.Validate("VAT Identifier", XxE13);
         VATPostingSetup.Validate("Sales VAT Account", '5610');
@@ -1246,9 +1244,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.ServicesVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.ServicesVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5611');
         VATPostingSetup.Validate("Purchase VAT Account", '5631');
         VATPostingSetup.Validate("Reverse Chrg. VAT Acc.", '5621');
@@ -1259,9 +1257,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.GoodsVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.GoodsVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup.Validate("Reverse Chrg. VAT Acc.", '5620');
@@ -1272,9 +1270,9 @@ codeunit 161300 "Create Italian Data"
             VATPostingSetup.Modify();
 
         VATPostingSetup.Init();
-        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode;
-        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode;
-        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode);
+        VATPostingSetup."VAT Bus. Posting Group" := DemoDataSetup.EUCode();
+        VATPostingSetup."VAT Prod. Posting Group" := DemoDataSetup.NoVATCode();
+        VATPostingSetup.Validate("VAT Identifier", DemoDataSetup.NoVATCode());
         VATPostingSetup.Validate("Sales VAT Account", '5610');
         VATPostingSetup.Validate("Purchase VAT Account", '5630');
         VATPostingSetup."VAT %" := 0;

@@ -4,8 +4,8 @@ codeunit 101301 "Create Finance Charge Text"
     trigger OnRun()
     begin
         LineNo := 10000;
-        InsertDomestic;
-        InsertForeign;
+        InsertDomestic();
+        InsertForeign();
     end;
 
     var

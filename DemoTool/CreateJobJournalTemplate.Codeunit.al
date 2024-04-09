@@ -32,7 +32,7 @@ codeunit 101209 "Create Job Journal Template"
         if "No. Series" <> '' then
             "Create No. Series".InitBaseSeries(
                 "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1,
-                "No. Series2"."No. Series Type"::Normal, '', 0, '', false, true);//IT
+                "No. Series2"."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);//IT
 
         "Job Journal Template".Init();
         "Job Journal Template".Validate(Name, Name);

@@ -34,7 +34,7 @@ codeunit 135200 "Time Series Tests"
         State: Option;
     begin
         // [SCENARIO] Error is thrown when data is prepared without the Azure ML connection having been initialized
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [WHEN] The PrepareData function is called without connection having been initialized first
         asserterror TimeSeriesManagement.PrepareData(RecordVariant, 0, 0, 0, 0, 0D, 0);
@@ -55,7 +55,7 @@ codeunit 135200 "Time Series Tests"
         TimeSeriesManagement: Codeunit "Time Series Management";
     begin
         // [SCENARIO] Error is thrown when processing of data is invoked without data having been prepared
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [WHEN] The ProcessData function is called without data having been prepared
         asserterror TimeSeriesManagement.Forecast(1, 80, TimeSeriesManagement.GetTimeSeriesModelOption('ARIMA'));
@@ -78,7 +78,7 @@ codeunit 135200 "Time Series Tests"
         TimeSeriesManagement: Codeunit "Time Series Management";
     begin
         // [SCENARIO] Error is thrown when attempting to load data without data having been processed
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [WHEN] The LoadForecast function is called without data having been processed
         asserterror TimeSeriesManagement.GetForecast(TempTimeSeriesForecast);
@@ -96,6 +96,8 @@ codeunit 135200 "Time Series Tests"
         Date: Record Date;
         TimeSeriesManagement: Codeunit "Time Series Management";
         State: Option;
+        Url: Text;
+        ApiKey: Text;
     begin
         // [SCENARIO] The time series buffer is filled for consumption by Azure ML
 
@@ -103,8 +105,10 @@ codeunit 135200 "Time Series Tests"
         CreateTestData(ItemLedgerEntry, DataSize::Small);
 
         // [GIVEN] An initialized Time Series Management
-        LibraryLowerPermissions.SetO365Basic;
-        TimeSeriesManagement.Initialize('https://services.azureml.net', '', 0, false);
+        LibraryLowerPermissions.SetO365Basic();
+        Url := 'https://services.azureml.net';
+        ApiKey := '';
+        TimeSeriesManagement.Initialize(Url, ApiKey, 0, false);
 
         // [WHEN] The data is prepared
         TimeSeriesManagement.PrepareData(
@@ -135,7 +139,7 @@ codeunit 135200 "Time Series Tests"
         // [SCENARIO] Forecasting is completed, even if no input data is provided
 
         // [GIVEN] An initialized Time Series Management
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         AzureAIUsage.DeleteAll();
         GetForecast(TimeSeriesManagement, TempItemLedgerEntry, TempTimeSeriesForecast, Date."Period Type"::Date, 1);
 
@@ -163,6 +167,8 @@ codeunit 135200 "Time Series Tests"
         No: Integer;
         Quantity: Integer;
         OriginalWorkDate: Date;
+        ApiUrl: Text;
+        ApiKey: Text;
     begin
         // [SCENARIO] A time series input for Azure ML is created
 
@@ -170,12 +176,14 @@ codeunit 135200 "Time Series Tests"
         OriginalWorkDate := WorkDate();
         WorkDate := DMY2Date(15, 3, 2019);
         CreateTestData(ItemLedgerEntry, DataSize::Big);
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [GIVEN] An initialized Time Series Management
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot + GetResponseFileName));
-        TimeSeriesManagement.Initialize(MockServiceURITxt, '', 0, false);
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+        ApiUrl := MockServiceURITxt;
+        ApiKey := '';
+        TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
 
         // [WHEN] The data is prepared and processed
         TimeSeriesManagement.PrepareData(
@@ -186,7 +194,7 @@ codeunit 135200 "Time Series Tests"
         TimeSeriesManagement.Forecast(3, 80, TimeSeriesManagement.GetTimeSeriesModelOption('ARIMA'));
 
         // [THEN] The input contains the correct data
-        for LineNo := 1 to TimeSeriesManagement.GetInputLength do begin
+        for LineNo := 1 to TimeSeriesManagement.GetInputLength() do begin
             TempTimeSeriesBufferInput.Init();
 
             Evaluate(No, TimeSeriesManagement.GetInput(LineNo, 2));
@@ -220,6 +228,8 @@ codeunit 135200 "Time Series Tests"
         TimeSeriesManagement: Codeunit "Time Series Management";
         Horizon: Integer;
         StartDateKey: Integer;
+        ApiUrl: Text;
+        ApiKey: Text;
     begin
         // [SCENARIO] Time Series parameters are set correctly, when processing is run
 
@@ -227,10 +237,12 @@ codeunit 135200 "Time Series Tests"
         CreateTestData(ItemLedgerEntry, DataSize::Small);
 
         // [GIVEN] An initialized Time Series Management
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot + GetResponseFileName));
-        TimeSeriesManagement.Initialize(MockServiceURITxt, '', 0, false);
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+        ApiUrl := MockServiceURITxt;
+        ApiKey := '';
+        TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
 
         // [GIVEN] The data has been prepared
         StartDateKey := 4; // Starting 3 months back with a frequency of a month
@@ -263,6 +275,8 @@ codeunit 135200 "Time Series Tests"
         Date: Record Date;
         TimeSeriesManagement: Codeunit "Time Series Management";
         State: Option;
+        ApiUrl: Text;
+        ApiKey: Text;
     begin
         // [SCENARIO] Time Series Forecast output is created, when data based on normal fields has been processed
 
@@ -271,9 +285,11 @@ codeunit 135200 "Time Series Tests"
 
         // [GIVEN] An initialized Time Series Management
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot + GetResponseFileName));
-        TimeSeriesManagement.Initialize(MockServiceURITxt, '', 0, false);
-        LibraryLowerPermissions.SetO365Basic;
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+        ApiUrl := MockServiceURITxt;
+        ApiKey := '';
+        TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
+        LibraryLowerPermissions.SetO365Basic();
 
         // [GIVEN] The data with normal fields has been prepared
         TimeSeriesManagement.PrepareData(
@@ -284,7 +300,7 @@ codeunit 135200 "Time Series Tests"
         TimeSeriesManagement.Forecast(6, 80, TimeSeriesManagement.GetTimeSeriesModelOption('ARIMA'));
 
         // [THEN] A time series forecast is created
-        Assert.IsTrue(TimeSeriesManagement.GetOutputLength > 0, 'The forecast was not created.');
+        Assert.IsTrue(TimeSeriesManagement.GetOutputLength() > 0, 'The forecast was not created.');
 
         // [THEN] State of Time Series Management is set to done
         TimeSeriesManagement.GetState(State);
@@ -299,15 +315,19 @@ codeunit 135200 "Time Series Tests"
         Date: Record Date;
         TimeSeriesManagement: Codeunit "Time Series Management";
         State: Option;
+        ApiUrl: Text;
+        ApiKey: Text;
     begin
         // [SCENARIO] A Time Series Forecast output is created, when data based on flowfields has been processed
 
         // [GIVEN] An initialized Time Series Management
-        LibraryLowerPermissions.SetSalesDocsCreate;
+        LibraryLowerPermissions.SetSalesDocsCreate();
 
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot + GetResponseFileName));
-        TimeSeriesManagement.Initialize(MockServiceURITxt, '', 0, false);
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+        ApiUrl := MockServiceURITxt;
+        ApiKey := '';
+        TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
 
         // [GIVEN] The data with flowfields has been prepared
         TimeSeriesManagement.PrepareData(
@@ -318,7 +338,7 @@ codeunit 135200 "Time Series Tests"
         TimeSeriesManagement.Forecast(6, 80, TimeSeriesManagement.GetTimeSeriesModelOption('ARIMA'));
 
         // [THEN] A time series forecast is created
-        Assert.IsTrue(TimeSeriesManagement.GetOutputLength > 0, 'The forecast was not created.');
+        Assert.IsTrue(TimeSeriesManagement.GetOutputLength() > 0, 'The forecast was not created.');
 
         // [THEN] State of Time Series Management is set to done
         TimeSeriesManagement.GetState(State);
@@ -333,15 +353,19 @@ codeunit 135200 "Time Series Tests"
         Date: Record Date;
         TimeSeriesManagement: Codeunit "Time Series Management";
         State: Option;
+        ApiUrl: Text;
+        ApiKey: Text;
     begin
         // [SCENARIO] A Time Series Forecast output is created, when manually created data has been processed
 
         // [GIVEN] An initialized Time Series Management
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot + GetResponseFileName));
-        TimeSeriesManagement.Initialize(MockServiceURITxt, '', 0, false);
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+        ApiUrl := MockServiceURITxt;
+        ApiKey := '';
+        TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
 
         // [GIVEN] The data has been prepared
         TempTimeSeriesBuffer.Init();
@@ -357,7 +381,7 @@ codeunit 135200 "Time Series Tests"
         TimeSeriesManagement.Forecast(1, 80, TimeSeriesManagement.GetTimeSeriesModelOption('ARIMA'));
 
         // [THEN] A time series forecast is created
-        Assert.IsTrue(TimeSeriesManagement.GetOutputLength > 0, 'The forecast was not created.');
+        Assert.IsTrue(TimeSeriesManagement.GetOutputLength() > 0, 'The forecast was not created.');
 
         // [THEN] State of Time Series Management is set to done
         TimeSeriesManagement.GetState(State);
@@ -377,9 +401,9 @@ codeunit 135200 "Time Series Tests"
 
         // [GIVEN] A completed time series forecast scenario
         CreateTestData(ItemLedgerEntry, DataSize::Small);
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot + GetResponseFileName));
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
 
         // [WHEN] The results are requested
         GetForecast(TimeSeriesManagement, ItemLedgerEntry, TempTimeSeriesForecast, Date."Period Type"::Month, 3);
@@ -401,15 +425,19 @@ codeunit 135200 "Time Series Tests"
         ObservationPeriods: Integer;
         ForecastPeriods: Integer;
         CurrentPeriod: Integer;
+        ApiUrl: Text;
+        ApiKey: Text;
     begin
         // [SCENARIO] The dates in the Time Series Buffer table have the correct values
 
         // [GIVEN] Data has been prepared
         CreateTestData(ItemLedgerEntry, DataSize::Big);
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot + GetResponseFileName));
-        TimeSeriesManagement.Initialize(MockServiceURITxt, '', 0, false);
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+        ApiUrl := MockServiceURITxt;
+        ApiKey := '';
+        TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
         ObservationPeriods := 24; // The oberservation period in the mock service is 24.
         TimeSeriesManagement.PrepareData(
           ItemLedgerEntry, ItemLedgerEntry.FieldNo("Item No."), ItemLedgerEntry.FieldNo("Posting Date"),
@@ -450,21 +478,25 @@ codeunit 135200 "Time Series Tests"
         TimeSeriesManagement: Codeunit "Time Series Management";
         EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
         ExpectedProcessingTime: Decimal;
+        ApiUrl: Text;
+        ApiKey: Text;
     begin
         // [SCENARIO] Processing time is returned by the library
 
         // [GIVEN] Mock vendor ledger entry data
-        MockVendorLedgerEntryData;
+        MockVendorLedgerEntryData();
 
         // [GIVEN] A completed time series forecast scenario
         LibraryLowerPermissions.SetOutsideO365Scope();
         AzureAIUsage.DeleteAll();
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
 
-        LibraryLowerPermissions.SetPurchDocsCreate;
+        LibraryLowerPermissions.SetPurchDocsCreate();
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot + GetResponseFileName));
-        TimeSeriesManagement.Initialize(MockServiceURITxt, '', 0, true);
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+        ApiUrl := MockServiceURITxt;
+        ApiKey := '';
+        TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, true);
         TimeSeriesManagement.PrepareData(
           VendorLedgerEntry, VendorLedgerEntry.FieldNo("Vendor No."), VendorLedgerEntry.FieldNo("Posting Date"),
           VendorLedgerEntry.FieldNo(Amount), Date."Period Type"::Week, WorkDate(), 1);
@@ -500,7 +532,7 @@ codeunit 135200 "Time Series Tests"
             ItemLedgerEntry,
             ItemLedgerEntry.FieldNo("Item No."),
             Date."Period Type"::Month,
-            WorkDate);
+            WorkDate());
 
         // [GIVEN] An integer is given instead of a record
         // [THEN] An ERROR is raised
@@ -509,7 +541,7 @@ codeunit 135200 "Time Series Tests"
             NumberOfPeriodsWithHistory,
             ItemLedgerEntry.FieldNo("Posting Date"),
             Date."Period Type"::Month,
-            WorkDate);
+            WorkDate());
 
         // [GIVEN] There are historical data for 12 months
         CreateTestData(ItemLedgerEntry, DataSize::Big);
@@ -518,7 +550,7 @@ codeunit 135200 "Time Series Tests"
         // [GIVEN] Thee minimum number of historical periods is 5
         TimeSeriesManagement.SetMinimumHistoricalPeriods(5);
 
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [THEN] There are 12 periods with history when period type is month (RecordRef)
         Assert.IsTrue(TimeSeriesManagement.HasMinimumHistoricalData(
@@ -554,7 +586,7 @@ codeunit 135200 "Time Series Tests"
         // [SCENARIO] Developers may setup their desired number of minimum historical periods
         // [GIVEN] The Minimum historical periods is set to Negative
         // [THEN] An ERROR is raised
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         asserterror TimeSeriesManagement.SetMinimumHistoricalPeriods(-5);
         TimeSeriesManagement.SetMinimumHistoricalPeriods(5);
     end;
@@ -568,7 +600,7 @@ codeunit 135200 "Time Series Tests"
         // [SCENARIO] Developers may setup their desired number of Maximum historical periods
         // [GIVEN] The Maximum historical periods is set to Negative
         // [THEN] An ERROR is raised
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         asserterror TimeSeriesManagement.SetMaximumHistoricalPeriods(-5);
         TimeSeriesManagement.SetMaximumHistoricalPeriods(5);
     end;
@@ -613,8 +645,8 @@ codeunit 135200 "Time Series Tests"
         OriginalWorkDate: Date;
         "count": Integer;
     begin
-        OpenVatEntries;
-        ClearNoSeriesLineSalesLastDayUsed;
+        OpenVatEntries();
+        ClearNoSeriesLineSalesLastDayUsed();
 
         if LedgerDataSize = LedgerDataSize::"No Data" then
             exit;
@@ -670,8 +702,8 @@ codeunit 135200 "Time Series Tests"
         LibraryERM.ClearGenJournalLines(GenJournalBatch);
         LibraryERM.CreateGeneralJnlLineWithBalAcc(
           GenJournalLine, GenJournalBatch."Journal Template Name", GenJournalBatch.Name,
-          GenJournalLine."Document Type"::Invoice, GenJournalLine."Account Type"::Vendor, LibraryPurchase.CreateVendorNo,
-          GenJournalLine."Bal. Account Type"::"G/L Account", LibraryERM.CreateGLAccountNo,
+          GenJournalLine."Document Type"::Invoice, GenJournalLine."Account Type"::Vendor, LibraryPurchase.CreateVendorNo(),
+          GenJournalLine."Bal. Account Type"::"G/L Account", LibraryERM.CreateGLAccountNo(),
           -LibraryRandom.RandDecInRange(100, 200, 2));
         LibraryERM.PostGeneralJnlLine(GenJournalLine);
     end;
@@ -689,15 +721,21 @@ codeunit 135200 "Time Series Tests"
     [Scope('OnPrem')]
     procedure ClearNoSeriesLineSalesLastDayUsed()
     var
-        NoSeriesLineSales: Record "No. Series Line Sales";
+        NoSeriesLine: Record "No. Series Line";
     begin
-        NoSeriesLineSales.ModifyAll("Last Date Used", 0D);
+        NoSeriesLine.SetRange("No. Series Type", NoSeriesLine."No. Series Type"::"Sales");
+        NoSeriesLine.ModifyAll("Last Date Used", 0D);
     end;
 
     [Normal]
     local procedure GetForecast(var TimeSeriesManagement: Codeunit "Time Series Management"; var ItemLedgerEntry: Record "Item Ledger Entry"; var TempTimeSeriesForecast: Record "Time Series Forecast" temporary; PeriodType: Option; Periods: Integer)
+    var
+        ApiUrl: Text;
+        ApiKey: Text;
     begin
-        TimeSeriesManagement.Initialize(MockServiceURITxt, '', 0, false);
+        ApiUrl := MockServiceURITxt;
+        ApiKey := '';
+        TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
         TimeSeriesManagement.PrepareData(
           ItemLedgerEntry, ItemLedgerEntry.FieldNo("Item No."), ItemLedgerEntry.FieldNo("Posting Date"),
           ItemLedgerEntry.FieldNo(Quantity), PeriodType, WorkDate(), Periods);

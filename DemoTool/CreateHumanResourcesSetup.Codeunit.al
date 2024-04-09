@@ -5,12 +5,10 @@ codeunit 101618 "Create Human Resources Setup"
     var
         NoSeries: Record "No. Series";
     begin
-        with "Human Resouces Setup" do begin
-            Get();
-            "Create No. Series".InitBaseSeries("Employee Nos.", XEMP, XEmployee, XE10, XE9990, '', '', 10,
-              NoSeries."No. Series Type"::Normal, '', 0, '', false, true);
-            Modify();
-        end;
+        "Human Resouces Setup".Get();
+        "Create No. Series".InitBaseSeries("Human Resouces Setup"."Employee Nos.", XEMP, XEmployee, XE10, XE9990, '', '', 10,
+          NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
+        "Human Resouces Setup".Modify();
     end;
 
     var

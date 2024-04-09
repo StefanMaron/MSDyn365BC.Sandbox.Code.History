@@ -62,7 +62,7 @@ codeunit 161370 "Create Payment Terms Lines"
         DueDateCalculation: DateFormula;
         DiscountDateCalculation: DateFormula;
 
-    procedure InsertData(Type: Option; "Code": Code[10]; "Line No.": Integer; "Payment %": Decimal; "Due Date Calculation": DateFormula; "Discount Date Calculation": DateFormula; "Discount %": Decimal; "Due Date": Date; "Pmt. Discount Date": Date; "Sales/Purchase": Option; "Journal Template Name": Code[10]; "Journal Line No.": Integer)
+    procedure InsertData(Type: Enum "Payment Lines Document Type"; "Code": Code[10]; "Line No.": Integer; "Payment %": Decimal; "Due Date Calculation": DateFormula; "Discount Date Calculation": DateFormula; "Discount %": Decimal; "Due Date": Date; "Pmt. Discount Date": Date; "Sales/Purchase": Option; "Journal Template Name": Code[10]; "Journal Line No.": Integer)
     begin
         PaymentLines.Init();
         PaymentLines.Type := Type;

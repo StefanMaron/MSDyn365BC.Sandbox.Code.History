@@ -64,7 +64,6 @@ codeunit 101036 "Create Sales Header"
         CA: Codeunit "Make Adjustments";
         i: Integer;
         "Date Displacement": Text[1];
-        XGUILDFORD10CR: Label 'GUILDFORD, 10 CR';
 
     procedure InsertData("Document Type": Integer; "Sell-to Customer No.": Code[20]; "Posting Date": Date; "Operation Type": Code[20])
     begin
