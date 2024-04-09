@@ -4,7 +4,7 @@ codeunit 101225 "Create Post Code"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        ImportLocalPostCodes;
+        ImportLocalPostCodes();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Standard then
             exit;
 
@@ -570,12 +570,6 @@ codeunit 101225 "Create Post Code"
         XKlaukkala: Label 'Klaukkala';
         XJokela: Label 'Jokela';
         XKuhmo: Label 'Kuhmo';
-        XLACHAPELLEBASSEMER: Label 'LA CHAPELLE BASSE MER';
-        XCASSEL: Label 'CASSEL';
-        XPARIS: Label 'PARIS';
-        XESBLY: Label 'ESBLY';
-        XPLAISIR: Label 'PLAISIR';
-        XLALONDELESMAURES: Label 'LA LONDE LES MAURES';
         XAthens: Label 'Athens';
         XPiraeus: Label 'Piraeus';
         XThessaloniki: Label 'Thessaloniki';

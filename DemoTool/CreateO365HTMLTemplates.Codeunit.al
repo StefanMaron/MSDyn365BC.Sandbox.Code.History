@@ -5,10 +5,10 @@ codeunit 119204 "Create O365 HTML Templates"
     var
         O365BrandColor: Record "O365 Brand Color";
     begin
-        CreateHTMLTemplates;
-        O365BrandColor.CreateDefaultBrandColors;
-        SetDefaultColor;
-        CreatePaymentServiceLogos;
+        CreateHTMLTemplates();
+        O365BrandColor.CreateDefaultBrandColors();
+        SetDefaultColor();
+        CreatePaymentServiceLogos();
     end;
 
     var
@@ -40,9 +40,9 @@ codeunit 119204 "Create O365 HTML Templates"
     var
         DummyPaymentReportingArgument: Record "Payment Reporting Argument";
     begin
-        CreatePaymentServiceLogo(DummyPaymentReportingArgument.GetPayPalServiceID, DummyPaymentReportingArgument.GetPayPalLogoFile);
-        CreatePaymentServiceLogo(DummyPaymentReportingArgument.GetMSWalletServiceID, DummyPaymentReportingArgument.GetMSWalletLogoFile);
-        CreatePaymentServiceLogo(DummyPaymentReportingArgument.GetWorldPayServiceID, DummyPaymentReportingArgument.GetWorldPayLogoFile);
+        CreatePaymentServiceLogo(DummyPaymentReportingArgument.GetPayPalServiceID(), DummyPaymentReportingArgument.GetPayPalLogoFile());
+        CreatePaymentServiceLogo(DummyPaymentReportingArgument.GetMSWalletServiceID(), DummyPaymentReportingArgument.GetMSWalletLogoFile());
+        CreatePaymentServiceLogo(DummyPaymentReportingArgument.GetWorldPayServiceID(), DummyPaymentReportingArgument.GetWorldPayLogoFile());
     end;
 
     local procedure CreatePaymentServiceLogo(PaymentServiceID: Integer; FileName: Text)

@@ -36,23 +36,23 @@ codeunit 101080 "Create Gen. Journal Template"
           XGJNLREC, XRecurringGeneralJournal, '6001', 'G07000');
 
         "Create No. Series".InitBaseSeries(SeriesCode, XBOR, XOrderReceipt, XLCR001, XLCR999, '', '', 1);
-        SetManualNoSeries;
+        SetManualNoSeries();
         "Create No. Series".InitBaseSeries(SeriesCode, XLCR, XBillOfExchange, XBOE001, XBOE999, '', '', 1);
-        SetManualNoSeries;
+        SetManualNoSeries();
         "Create No. Series".InitBaseSeries(SeriesCode, XPRE, XWithdraw, XWID001, XWID999, '', '', 1);
-        SetManualNoSeries;
+        SetManualNoSeries();
         "Create No. Series".InitBaseSeries(SeriesCode, XVIR, XDraft, XDRA001, XDRA999, '', '', 1);
-        SetManualNoSeries;
+        SetManualNoSeries();
         "Create No. Series".InitBaseSeries(SeriesCode, XLCRENCAIS, XLCRCollectionBill, XLCRCOLL001, XLCRCOLL999, '', '', 1);
-        SetManualNoSeries;
+        SetManualNoSeries();
         "Create No. Series".InitBaseSeries(SeriesCode, XLCRENTETE, XLCRHeader, XLCRENT001, XLCRENT999, '', '', 1);
-        SetManualNoSeries;
+        SetManualNoSeries();
         "Create No. Series".InitBaseSeries(SeriesCode, XLCRREM, XLCRDiscount, XLCRDISC001, XLCRDISC999, '', '', 1);
-        SetManualNoSeries;
+        SetManualNoSeries();
         "Create No. Series".InitBaseSeries(SeriesCode, XBORE, XOrderReceipt2, XBORE0001, XBORE9999, '', '', 1);
-        SetManualNoSeries;
+        SetManualNoSeries();
         "Create No. Series".InitBaseSeries(SeriesCode, XLCRE, XBillOfExchange2, XLCRE0001, XLCRE9999, '', '', 1);
-        SetManualNoSeries;
+        SetManualNoSeries();
     end;
 
     var
@@ -127,14 +127,14 @@ codeunit 101080 "Create Gen. Journal Template"
         XBORE9999: Label 'BORE9999', Locked = true;
         XLCRE9999: Label 'LCRE9999', Locked = true;
 
-    procedure InsertData(Name: Code[10]; Description: Text[80]; Type: Option; Recurring: Boolean; "Source Code": Code[10]; "No. Series": Code[10]; NoSeriesDescription: Text[30]; NoSeriesStartNo: Code[20]; NoSeriesEndNo: Code[20])
+    procedure InsertData(Name: Code[10]; Description: Text[80]; Type: Enum "Gen. Journal Template Type"; Recurring: Boolean; "Source Code": Code[10]; "No. Series": Code[10]; NoSeriesDescription: Text[30]; NoSeriesStartNo: Code[20]; NoSeriesEndNo: Code[20])
     var
-      NoSeries: Record "No. Series";
+        NoSeries: Record "No. Series";
     begin
         if ("No. Series" <> '') and ("No. Series" <> LastNoSeriesCode) then
-          if not NoSeries.Get("No. Series") then
-              "Create No. Series".InitBaseSeries(
-                "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1);
+            if not NoSeries.Get("No. Series") then
+                "Create No. Series".InitBaseSeries(
+                  "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1);
         LastNoSeriesCode := "No. Series";
 
         "Gen. Journal Template".Init();

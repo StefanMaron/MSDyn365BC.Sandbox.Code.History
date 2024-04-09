@@ -3,20 +3,17 @@ codeunit 101093 "Create Vendor Posting Group"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(
-              DomesticCode, XDomesticVendorsTxt,
-              '995410', '998910', '999135', '999130', '999140', '999150', '999160', '999170', '666500', '658500', '758500');
-            InsertData(
-              ForeignCode, XForeignVendorsTxt,
-              '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170', '666500', '658500', '758500');
-            InsertData(
-              EUCode, XVendorsInEUTxt, '995410', '998910', '999135', '999130', '999140', '999150', '999160', '999170', '666500', '658500', '758500');
-
-            // Modif Demo Finance (CM) : ajout d'un groupe pour le module réglement
-            InsertData(XFRANCEEFF, '', '403000', '998910', '999135', '999130', '999140', '999150', '999160', '999170', '666500', '658500', '758500');
-        end;
+        DemoDataSetup.Get();
+        InsertData(
+          DemoDataSetup.DomesticCode(), XDomesticVendorsTxt,
+          '995410', '998910', '999135', '999130', '999140', '999150', '999160', '999170', '666500', '658500', '758500');
+        InsertData(
+          DemoDataSetup.ForeignCode(), XForeignVendorsTxt,
+          '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170', '666500', '658500', '758500');
+        InsertData(
+          DemoDataSetup.EUCode(), XVendorsInEUTxt, '995410', '998910', '999135', '999130', '999140', '999150', '999160', '999170', '666500', '658500', '758500');
+        // Modif Demo Finance (CM) : ajout d'un groupe pour le module réglement
+        InsertData(XFRANCEEFF, '', '403000', '998910', '999135', '999130', '999140', '999150', '999160', '999170', '666500', '658500', '758500');
     end;
 
     var

@@ -1,4 +1,4 @@
-codeunit 119087 "Create Cost Allocation Target"
+﻿codeunit 119087 "Create Cost Allocation Target"
 {
 
     trigger OnRun()
@@ -93,41 +93,39 @@ codeunit 119087 "Create Cost Allocation Target"
         CostAllocationTarget: Record "Cost Allocation Target";
         LastLineNo: Integer;
     begin
-        with CostAllocationTarget do begin
-            Reset();
-            SetRange(ID, CostAllocationTargetID);
-            if FindLast() then
-                LastLineNo := "Line No."
-            else
-                LastLineNo := 0;
-            Init();
-            ID := CostAllocationTargetID;
-            "Line No." := LastLineNo + 10000;
-            Validate("Target Cost Type", TargetCostType);
-            Validate("Target Cost Center", TargetCostCenter);
-            Validate("Target Cost Object", TargetCostObject);
+        CostAllocationTarget.Reset();
+        CostAllocationTarget.SetRange(ID, CostAllocationTargetID);
+        if CostAllocationTarget.FindLast() then
+            LastLineNo := CostAllocationTarget."Line No."
+        else
+            LastLineNo := 0;
+        CostAllocationTarget.Init();
+        CostAllocationTarget.ID := CostAllocationTargetID;
+        CostAllocationTarget."Line No." := LastLineNo + 10000;
+        CostAllocationTarget.Validate("Target Cost Type", TargetCostType);
+        CostAllocationTarget.Validate("Target Cost Center", TargetCostCenter);
+        CostAllocationTarget.Validate("Target Cost Object", TargetCostObject);
 
-            if not Insert then
-                Modify();
+        if not CostAllocationTarget.Insert() then
+            CostAllocationTarget.Modify();
 
-            Validate(Share, CostAllocationTargetShare);
-            Base := Base::Static;
-            if PercentPerShare <> 0 then begin
-                "Allocation Target Type" := "Allocation Target Type"::"Percent per Share";
-                "Percent per Share" := PercentPerShare;
-            end;
-
-            if AmountPerShare <> 0 then begin
-                "Allocation Target Type" := "Allocation Target Type"::"Amount per Share";
-                "Amount per Share" := AmountPerShare;
-            end;
-
-            "Share Updated on" := Today;
-            "Last Date Modified" := Today;
-            "User ID" := UserId;
-            if not Insert then
-                Modify();
+        CostAllocationTarget.Validate(Share, CostAllocationTargetShare);
+        CostAllocationTarget.Base := CostAllocationTarget.Base::Static;
+        if PercentPerShare <> 0 then begin
+            CostAllocationTarget."Allocation Target Type" := CostAllocationTarget."Allocation Target Type"::"Percent per Share";
+            CostAllocationTarget."Percent per Share" := PercentPerShare;
         end;
+
+        if AmountPerShare <> 0 then begin
+            CostAllocationTarget."Allocation Target Type" := CostAllocationTarget."Allocation Target Type"::"Amount per Share";
+            CostAllocationTarget."Amount per Share" := AmountPerShare;
+        end;
+
+        CostAllocationTarget."Share Updated on" := Today;
+        CostAllocationTarget."Last Date Modified" := Today;
+        CostAllocationTarget."User ID" := UserId();
+        if not CostAllocationTarget.Insert() then
+            CostAllocationTarget.Modify();
     end;
 
     procedure InsertDataDynamic(CostAllocationTargetID: Code[10]; TargetCostType: Code[20]; TargetCostCenter: Code[20]; TargetCostObject: Code[20]; PercentperShare: Decimal; AmountperShare: Decimal; CostAllocationTargetBase: Integer; NoFilter: Text[30]; CostCenterFilter: Text[30]; CostObjectFilter: Text[30]; DateFilterCode: Integer; GroupFilter: Text[30])
@@ -135,43 +133,41 @@ codeunit 119087 "Create Cost Allocation Target"
         CostAllocationTarget: Record "Cost Allocation Target";
         LastLineNo: Integer;
     begin
-        with CostAllocationTarget do begin
-            Reset();
-            SetRange(ID, CostAllocationTargetID);
-            if FindLast() then
-                LastLineNo := "Line No."
-            else
-                LastLineNo := 0;
-            Init();
-            ID := CostAllocationTargetID;
-            "Line No." := LastLineNo + 10000;
-            Validate("Target Cost Type", TargetCostType);
-            Validate("Target Cost Center", TargetCostCenter);
-            Validate("Target Cost Object", TargetCostObject);
+        CostAllocationTarget.Reset();
+        CostAllocationTarget.SetRange(ID, CostAllocationTargetID);
+        if CostAllocationTarget.FindLast() then
+            LastLineNo := CostAllocationTarget."Line No."
+        else
+            LastLineNo := 0;
+        CostAllocationTarget.Init();
+        CostAllocationTarget.ID := CostAllocationTargetID;
+        CostAllocationTarget."Line No." := LastLineNo + 10000;
+        CostAllocationTarget.Validate("Target Cost Type", TargetCostType);
+        CostAllocationTarget.Validate("Target Cost Center", TargetCostCenter);
+        CostAllocationTarget.Validate("Target Cost Object", TargetCostObject);
 
-            if PercentperShare <> 0 then begin
-                "Allocation Target Type" := "Allocation Target Type"::"Percent per Share";
-                "Percent per Share" := PercentperShare;
-            end;
-
-            if AmountperShare <> 0 then begin
-                "Allocation Target Type" := "Allocation Target Type"::"Amount per Share";
-                "Amount per Share" := AmountperShare;
-            end;
-
-            Base := CostAllocationTargetBase;
-            Validate("No. Filter", NoFilter);
-            "Cost Center Filter" := CostCenterFilter;
-            "Cost Object Filter" := CostObjectFilter;
-            "Date Filter Code" := DateFilterCode;
-            "Group Filter" := GroupFilter;
-
-            "Last Date Modified" := Today;
-            "User ID" := UserId;
-
-            if not Insert then
-                Modify();
+        if PercentperShare <> 0 then begin
+            CostAllocationTarget."Allocation Target Type" := CostAllocationTarget."Allocation Target Type"::"Percent per Share";
+            CostAllocationTarget."Percent per Share" := PercentperShare;
         end;
+
+        if AmountperShare <> 0 then begin
+            CostAllocationTarget."Allocation Target Type" := CostAllocationTarget."Allocation Target Type"::"Amount per Share";
+            CostAllocationTarget."Amount per Share" := AmountperShare;
+        end;
+
+        CostAllocationTarget.Base := "Cost Allocation target Base".FromInteger(CostAllocationTargetBase);
+        CostAllocationTarget.Validate("No. Filter", NoFilter);
+        CostAllocationTarget."Cost Center Filter" := CostCenterFilter;
+        CostAllocationTarget."Cost Object Filter" := CostObjectFilter;
+        CostAllocationTarget."Date Filter Code" := "Cost Allocation Target Period".FromInteger(DateFilterCode);
+        CostAllocationTarget."Group Filter" := GroupFilter;
+
+        CostAllocationTarget."Last Date Modified" := Today;
+        CostAllocationTarget."User ID" := UserId();
+
+        if not CostAllocationTarget.Insert() then
+            CostAllocationTarget.Modify();
     end;
 }
 

@@ -8,7 +8,7 @@ codeunit 117507 "Create Service Base Calendar"
 
         DemoDataSetup.Get();
 
-        InsertRec(XSERVICE, XServiceCalendar);
+        InsertRec(XSERVICE, XServiceCalendar); // FR
         InsertRec(DemoDataSetup."Country/Region Code", XGBBaseNationalCalendar);
 
         InsertBaseCalChange(
@@ -80,11 +80,7 @@ codeunit 117507 "Create Service Base Calendar"
         XGBBaseNationalCalendar: Label 'GB Base National Calendar';
         XWeekend: Label 'Weekend';
         XNewYearsEve: Label 'New Years Eve';
-        XBankHolidayScotlandOnly: Label 'Bank Holiday, Scotland Only';
-        XStPatricksDay: Label 'St Patricks Day';
-        XBattleoftheBoyneDay: Label 'Battle of the Boyne Day';
         XChristmasDay: Label 'Christmas Day';
-        XBoxingDay: Label 'Boxing Day';
         XMayDayBankHoliday: Label 'May Day Bank Holiday';
         XBankHoliday: Label 'Bank Holiday';
         XSummerBankHolidayScotland: Label 'Summer Bank Holiday, Scotland';

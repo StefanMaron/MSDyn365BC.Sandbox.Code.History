@@ -1,4 +1,4 @@
-﻿codeunit 101085 "Create Acc. Schedule Line"
+codeunit 101085 "Create Acc. Schedule Line"
 {
 
     trigger OnRun()
@@ -615,7 +615,6 @@
         XRunningCosts: Label 'Costs from operation';
         "Calculate with": Option Sign,"Opposite Sign";
         XProfitSharingSchemeIX: Label 'Profit-Sharing Scheme (IX)';
-        XFixedAssetsProducedUseCompany: Label 'Fixed Assets Produced For Use Of The Company';
         XStoredProduction: Label 'Stored Production';
         XNetAmountOfTurnover: Label 'Net Amount of Turnover';
         XSoldProdAssetsServices: Label 'Sold Production (Assets and Services)';
@@ -661,7 +660,6 @@
         XTotalI: Label 'Total I';
         XTotalII: Label 'Total II';
         XTotalIII: Label 'Total III';
-        XTotalIV: Label 'Total IV';
         XTotalV: Label 'Total V';
         XTotalVI: Label 'Total VI';
         XTotalVII: Label 'Total VII';
@@ -860,7 +858,6 @@
           XCASHFLOW, '', '', '', true, false, false, false, false);
         InsertDataForCashFlow(
           XCASHFLOW, 'R70', XTotalCashFlow, 'R50|R60', true, true, false, false, false);
-        
 
         InsertData(XREVENUE, '', XREVENUE, '', 0, '', '', '', '', false, true);
         InsertData(XREVENUE, '', '', '', 0, '', '', '', '', false, false);
@@ -912,7 +909,7 @@
         else
             CFAccSchedLine.Validate(Show, CFAccSchedLine.Show::No);
 
-        CFAccSchedLine.Modify
+        CFAccSchedLine.Modify();
     end;
 
     procedure InsertData("Schedule Name": Code[10]; "Row No.": Code[10]; Description: Text[80]; Totaling: Text[80]; "Totaling Type": Option; Dim1Totaling: Text[80]; Dim2Totaling: Text[80]; Dim3Totaling: Text[80]; Dim4Totaling: Text[80]; ShowOppositeSign: Boolean; Bold: Boolean)
@@ -965,7 +962,7 @@
         "Account Schedule Line".Insert();
     end;
 
-    procedure InsertMiniAppData(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Option; RowType: Option; ShowOppositeSign: Boolean)
+    procedure InsertMiniAppData(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Enum "Acc. Schedule Line Totaling Type"; RowType: Option; ShowOppositeSign: Boolean)
     var
         AccScheduleLine: Record "Acc. Schedule Line";
         LineNo: Integer;
@@ -981,7 +978,7 @@
         AccScheduleLine.Validate("Line No.", LineNo);
         AccScheduleLine.Validate("Row No.", RowNo);
         AccScheduleLine.Validate(Description, Description);
-        AccScheduleLine."Totaling Type" := "Acc. Schedule Line Totaling Type".FromInteger(TotalingType);
+        AccScheduleLine."Totaling Type" := TotalingType;
         AccScheduleLine.Totaling := Totaling;
         AccScheduleLine.Validate("Row Type", RowType);
         AccScheduleLine.Validate("Show Opposite Sign", ShowOppositeSign);
@@ -996,7 +993,7 @@
         AccScheduleLine.Insert();
     end;
 
-    procedure InsertMiniAppDataFormula(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Option; RowType: Option; ShowOppositeSign: Boolean; HideCurrencySymbol: Boolean)
+    procedure InsertMiniAppDataFormula(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Enum "Acc. Schedule Line Totaling Type"; RowType: Option; ShowOppositeSign: Boolean; HideCurrencySymbol: Boolean)
     var
         AccScheduleLine: Record "Acc. Schedule Line";
         LineNo: Integer;
@@ -1012,7 +1009,7 @@
         AccScheduleLine.Validate("Line No.", LineNo);
         AccScheduleLine.Validate("Row No.", RowNo);
         AccScheduleLine.Validate(Description, Description);
-        AccScheduleLine."Totaling Type" := "Acc. Schedule Line Totaling Type".FromInteger(TotalingType);
+        AccScheduleLine."Totaling Type" := TotalingType;
         AccScheduleLine.Totaling := Totaling;
         AccScheduleLine.Validate("Row Type", RowType);
         AccScheduleLine.Validate("Show Opposite Sign", ShowOppositeSign);

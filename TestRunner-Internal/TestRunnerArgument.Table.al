@@ -1,6 +1,7 @@
 table 130205 "Test Runner Argument"
 {
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

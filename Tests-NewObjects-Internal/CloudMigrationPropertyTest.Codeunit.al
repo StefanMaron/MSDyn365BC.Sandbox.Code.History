@@ -70,11 +70,13 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Alloc. Account Distribution");
         ListOfTablesToMigrate.Add(Database::"Allocation Account");
         ListOfTablesToMigrate.Add(Database::"Allocation Line");
+        ListOfTablesToMigrate.Add(Database::"Dispute Status");
         ListOfTablesToMigrate.Add(Database::"Job Journal Template");
         ListOfTablesToMigrate.Add(Database::"Job Ledger Entry");
         ListOfTablesToMigrate.Add(Database::"Job Planning Line - Calendar");
         ListOfTablesToMigrate.Add(Database::"Job Planning Line Invoice");
         ListOfTablesToMigrate.Add(Database::"Job Planning Line");
+        ListOfTablesToMigrate.Add(Database::"Job Planning Line Archive");
         ListOfTablesToMigrate.Add(Database::"Job Posting Group");
         ListOfTablesToMigrate.Add(Database::"Job Queue Category");
         ListOfTablesToMigrate.Add(Database::"Job Queue Entry Buffer");
@@ -82,6 +84,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Job Responsibility");
         ListOfTablesToMigrate.Add(Database::"Job Task Dimension");
         ListOfTablesToMigrate.Add(Database::"Job Task");
+        ListOfTablesToMigrate.Add(Database::"Job Task Archive");
         ListOfTablesToMigrate.Add(Database::"Job Usage Link");
         ListOfTablesToMigrate.Add(Database::"Job WIP Entry");
         ListOfTablesToMigrate.Add(Database::"Job WIP G/L Entry");
@@ -89,6 +92,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Job WIP Total");
         ListOfTablesToMigrate.Add(Database::"Job WIP Warning");
         ListOfTablesToMigrate.Add(Database::"Job");
+        ListOfTablesToMigrate.Add(Database::"Job Archive");
         ListOfTablesToMigrate.Add(Database::"Jobs Setup");
         ListOfTablesToMigrate.Add(Database::"Language");
         ListOfTablesToMigrate.Add(Database::"Last Used Chart");
@@ -106,6 +110,9 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Maintenance Ledger Entry");
         ListOfTablesToMigrate.Add(Database::"Maintenance Registration");
         ListOfTablesToMigrate.Add(Database::"Maintenance");
+        ListOfTablesToMigrate.Add(Database::"Man. Integration Field Mapping");
+        ListOfTablesToMigrate.Add(Database::"Man. Integration Table Mapping");
+        ListOfTablesToMigrate.Add(Database::"Man. Int. Field Mapping");
         ListOfTablesToMigrate.Add(Database::"Manufacturer");
         ListOfTablesToMigrate.Add(Database::"Manufacturing Comment Line");
         ListOfTablesToMigrate.Add(Database::"Manufacturing Cue");
@@ -128,15 +135,16 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"My Vendor");
         ListOfTablesToMigrate.Add(Database::"Named Forward Link");
         ListOfTablesToMigrate.Add(Database::"No. Series Line");
+#if not CLEAN24
+        ListOfTablesToMigrate.Add(Database::"No. Series Line Sales");
+        ListOfTablesToMigrate.Add(Database::"No. Series Line Purchase");
+#endif
         ListOfTablesToMigrate.Add(Database::"No. Series Relationship");
         ListOfTablesToMigrate.Add(Database::"No. Series");
         ListOfTablesToMigrate.Add(Database::"Nonstock Item Setup");
         ListOfTablesToMigrate.Add(Database::"Nonstock Item");
         ListOfTablesToMigrate.Add(Database::"Notification Context");
         ListOfTablesToMigrate.Add(Database::"O365 Getting Started");
-#if not CLEAN21
-        ListOfTablesToMigrate.Add(Database::"O365 Sales Cue");
-#endif
         ListOfTablesToMigrate.Add(Database::"OCR Service Document Template");
         ListOfTablesToMigrate.Add(Database::"OCR Service Setup");
         ListOfTablesToMigrate.Add(Database::"Office Add-in Context");
@@ -186,7 +194,10 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Phys. Invt. Order Line");
         ListOfTablesToMigrate.Add(Database::"Phys. Invt. Record Header");
         ListOfTablesToMigrate.Add(Database::"Phys. Invt. Record Line");
+#if not CLEAN24
         ListOfTablesToMigrate.Add(Database::"Phys. Invt. Tracking");
+#endif
+        ListOfTablesToMigrate.Add(Database::"Invt. Order Tracking");
         ListOfTablesToMigrate.Add(Database::"Picture Entity");
         ListOfTablesToMigrate.Add(Database::"Planning Assignment");
         ListOfTablesToMigrate.Add(Database::"Planning Component");
@@ -246,7 +257,10 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Profile Import");
         ListOfTablesToMigrate.Add(Database::"Profile Questionnaire Header");
         ListOfTablesToMigrate.Add(Database::"Profile Questionnaire Line");
+#if not CLEAN24
         ListOfTablesToMigrate.Add(Database::"Pstd. Exp. Phys. Invt. Track");
+#endif
+        ListOfTablesToMigrate.Add(Database::"Pstd.Exp.Invt.Order.Tracking");
         ListOfTablesToMigrate.Add(Database::"Pstd. Phys. Invt. Order Hdr");
         ListOfTablesToMigrate.Add(Database::"Pstd. Phys. Invt. Order Line");
         ListOfTablesToMigrate.Add(Database::"Pstd. Phys. Invt. Record Hdr");
@@ -290,12 +304,22 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Registered Whse. Activity Line");
         ListOfTablesToMigrate.Add(Database::"Relationship Mgmt. Cue");
         ListOfTablesToMigrate.Add(Database::"Relative");
+        ListOfTablesToMigrate.Add(Database::"Reminder Attachment Text");
         ListOfTablesToMigrate.Add(Database::"Reminder Comment Line");
+        ListOfTablesToMigrate.Add(Database::"Reminder Email Text");
         ListOfTablesToMigrate.Add(Database::"Reminder Header");
         ListOfTablesToMigrate.Add(Database::"Reminder Level");
         ListOfTablesToMigrate.Add(Database::"Reminder Line");
         ListOfTablesToMigrate.Add(Database::"Reminder Terms Translation");
         ListOfTablesToMigrate.Add(Database::"Reminder Terms");
+        ListOfTablesToMigrate.Add(Database::"Reminder Action Group");
+        ListOfTablesToMigrate.Add(Database::"Reminder Action");
+        ListOfTablesToMigrate.Add(Database::"Create Reminders Setup");
+        ListOfTablesToMigrate.Add(Database::"Issue Reminders Setup");
+        ListOfTablesToMigrate.Add(Database::"Send Reminders Setup");
+        ListOfTablesToMigrate.Add(Database::"Reminder Automation Error");
+        ListOfTablesToMigrate.Add(Database::"Reminder Action Group Log");
+        ListOfTablesToMigrate.Add(Database::"Reminder Action Log");
         ListOfTablesToMigrate.Add(Database::"Reminder Text");
         ListOfTablesToMigrate.Add(Database::"Reminder/Fin. Charge Entry");
         ListOfTablesToMigrate.Add(Database::"Remit Address");
@@ -588,6 +612,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Warehouse Journal Batch");
         ListOfTablesToMigrate.Add(Database::"Warehouse Journal Line");
         ListOfTablesToMigrate.Add(Database::"Warehouse Journal Template");
+        ListOfTablesToMigrate.Add(Database::"Warehouse Reason Code");
         ListOfTablesToMigrate.Add(Database::"Warehouse Receipt Header");
         ListOfTablesToMigrate.Add(Database::"Warehouse Receipt Line");
         ListOfTablesToMigrate.Add(Database::"Warehouse Register");
@@ -906,6 +931,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Column Layout Name");
         ListOfTablesToMigrate.Add(Database::"Column Layout");
         ListOfTablesToMigrate.Add(Database::"Comment Line");
+        ListOfTablesToMigrate.Add(Database::"Comment Line Archive");
         ListOfTablesToMigrate.Add(Database::"Communication Method");
         ListOfTablesToMigrate.Add(Database::"Company Information");
         ListOfTablesToMigrate.Add(Database::"Company Size");
@@ -934,6 +960,9 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Copy Item Buffer");
         ListOfTablesToMigrate.Add(Database::"Copy Item Parameters");
         ListOfTablesToMigrate.Add(Database::"Cost Accounting Setup");
+        ListOfTablesToMigrate.Add(Database::"Cost Adj. Item Bucket");
+        ListOfTablesToMigrate.Add(Database::"Cost Adjustment Detailed Log");
+        ListOfTablesToMigrate.Add(Database::"Cost Adjustment Log");
         ListOfTablesToMigrate.Add(Database::"Cost Allocation Source");
         ListOfTablesToMigrate.Add(Database::"Cost Allocation Target");
         ListOfTablesToMigrate.Add(Database::"Cost Budget Entry");
@@ -955,6 +984,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"CRM Annotation Buffer");
         ListOfTablesToMigrate.Add(Database::"CRM Annotation Coupling");
         ListOfTablesToMigrate.Add(Database::"CRM Connection Setup");
+        ListOfTablesToMigrate.Add(Database::"FS Connection Setup");
         ListOfTablesToMigrate.Add(Database::"CRM Full Synch. Review Line");
         ListOfTablesToMigrate.Add(Database::"CRM Integration Record");
         ListOfTablesToMigrate.Add(Database::"CRM Option Mapping");
@@ -1008,7 +1038,9 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Deferral Posting Buffer");
         ListOfTablesToMigrate.Add(Database::"Deferral Template");
         ListOfTablesToMigrate.Add(Database::"Delivery Sorter");
+#if not CLEAN24
         ListOfTablesToMigrate.Add(Database::"Deposits Page Setup");
+#endif
         ListOfTablesToMigrate.Add(Database::"Depreciation Book");
         ListOfTablesToMigrate.Add(Database::"Depreciation Table Header");
         ListOfTablesToMigrate.Add(Database::"Depreciation Table Line");
@@ -1069,7 +1101,10 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Exchange Folder");
         ListOfTablesToMigrate.Add(Database::"Exchange Service Setup");
         ListOfTablesToMigrate.Add(Database::"Exchange Sync");
+#if not CLEAN24
         ListOfTablesToMigrate.Add(Database::"Exp. Phys. Invt. Tracking");
+#endif
+        ListOfTablesToMigrate.Add(Database::"Exp. Invt. Order Tracking");
         ListOfTablesToMigrate.Add(Database::"Extended Text Header");
         ListOfTablesToMigrate.Add(Database::"Extended Text Line");
         ListOfTablesToMigrate.Add(Database::"FA Allocation");
@@ -1115,6 +1150,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"G/L Acc. Balance Buffer");
         ListOfTablesToMigrate.Add(Database::"G/L Acc. Balance/Budget Buffer");
         ListOfTablesToMigrate.Add(Database::"G/L Account (Analysis View)");
+        ListOfTablesToMigrate.Add(Database::"G/L Account Source Currency");
         ListOfTablesToMigrate.Add(Database::"G/L Account Category");
         ListOfTablesToMigrate.Add(Database::"G/L Account Where-Used");
         ListOfTablesToMigrate.Add(Database::"G/L Account");
@@ -1137,9 +1173,6 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Generic Chart Setup");
         ListOfTablesToMigrate.Add(Database::"Generic Chart Y-Axis");
         ListOfTablesToMigrate.Add(Database::"Geolocation");
-#if not CLEAN21
-        ListOfTablesToMigrate.Add(Database::"Graph Mail Setup");
-#endif
         ListOfTablesToMigrate.Add(Database::"Grounds for Termination");
         ListOfTablesToMigrate.Add(Database::"Handled IC Inbox Jnl. Line");
         ListOfTablesToMigrate.Add(Database::"Handled IC Inbox Purch. Header");

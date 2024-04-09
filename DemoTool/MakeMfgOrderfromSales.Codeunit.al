@@ -3,7 +3,7 @@ codeunit 119076 "Make Mfg. Order from Sales"
 
     trigger OnRun()
     begin
-        InsertData('109005', '1001', "Production Order Status"::"Firm Planned", 0);
+        InsertData('109005', '1001', "Production Order Status"::"Firm Planned", "Create Production Order Type"::ItemOrder);
     end;
 
     var
@@ -11,7 +11,7 @@ codeunit 119076 "Make Mfg. Order from Sales"
         SalesOrderLine: Record "Sales Line";
         ProdOrderFromSale: Codeunit "Create Prod. Order from Sale";
 
-    procedure InsertData(SalesNo: Code[20]; ItemNo: Code[20]; NewStatus: Enum "Production Order Status"; NewOrderType: Option ItemOrder,ProjectOrder)
+    procedure InsertData(SalesNo: Code[20]; ItemNo: Code[20]; NewStatus: Enum "Production Order Status"; NewOrderType: Enum "Create Production Order Type")
     begin
         ProdOrderFromSale.SetHideValidationDialog(true);
 

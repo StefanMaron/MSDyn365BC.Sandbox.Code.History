@@ -35,15 +35,13 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         CreateConfigWorksheet: Codeunit "Create Config. Worksheet";
     begin
-        with CreateConfigWorksheet do begin
-            CreateConfigGroup(XLocalSettingsTxt);
-            CreateConfigLine(DATABASE::"FR Acc. Schedule Name");
-            CreateConfigLine(DATABASE::"FR Acc. Schedule Line");
-            CreateConfigLine(DATABASE::"Payment Class");
-            CreateConfigLine(DATABASE::"Payment Status");
-            CreateConfigLine(DATABASE::"Payment Step");
-            CreateConfigLine(DATABASE::"Payment Address");
-        end;
+        CreateConfigWorksheet.CreateConfigGroup(XLocalSettingsTxt);
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"FR Acc. Schedule Name");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"FR Acc. Schedule Line");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Payment Class");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Payment Status");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Payment Step");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Payment Address");
     end;
 
     procedure SetFieldsAndFilters(TableID: Integer)

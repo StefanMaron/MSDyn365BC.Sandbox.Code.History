@@ -67,7 +67,7 @@ codeunit 101287 "Create C/V Bank Account"
           '50000', '50000', XCF, XCreditdeFrance, XJeanPierreDumas, X74FaubStMathieu, XFR75000, XFR, '', XFRA,
           X0196696298, X0196696504, '10000', '00010321008', '', '', '01100', 17);
 
-        PostInsertData;
+        PostInsertData();
     end;
 
     var

@@ -1,4 +1,4 @@
-﻿codeunit 101084 "Create Acc. Schedule Name"
+codeunit 101084 "Create Acc. Schedule Name"
 {
 
     trigger OnRun()
@@ -47,7 +47,6 @@
         XANALYSIS: Label 'ANALYSIS';
         XBALONLY: Label 'BAL ONLY';
         XCapitalStructure: Label 'Capital Structure';
-        XStandardSchedule: Label 'Standard Schedule';
         XCAMPAIGN: Label 'CAMPAIGN';
         XCampaignAnalysis: Label 'Campaign Analysis';
         XBUDGANALYS: Label 'BUDGANALYS';
@@ -63,7 +62,6 @@
         XCostAcctTransfer: Label 'Cost Acct. Transfer';
         XCAPROF: Label 'CA-PROF', Comment = 'Cost Acct. Summary Record DB per CC/CO.';
         XCostAcctSummaryRecordDB: Label 'Cost Acct. Summary Record DB per CC/CO', Comment = 'It is description of Account Schedule Name. DB means Database, CC means Cost Center and CO means Cost Object.';
-        XRESULT: Label 'RESULT';
         XSIG: Label 'SIG';
         XProvDeprec: Label 'Prov. Deprec.';
         XNet: Label 'Net';

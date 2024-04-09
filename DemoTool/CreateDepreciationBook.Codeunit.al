@@ -12,7 +12,6 @@ codeunit 101808 "Create Depreciation Book"
     var
         "FA Setup": Record "FA Setup";
         "Depreciation Book": Record "Depreciation Book";
-        XCompanyBook: Label 'Company Book';
         XAccountingBook: Label 'Accounting Book';
 
     procedure InsertData("Code": Code[10]; Description: Text[30]; "G/L Integration - Acq. Cost": Boolean; "G/L Integration - Depreciation": Boolean; "G/L Integration - Write Down": Boolean; "G/L Integration - Appreciation": Boolean; "G/L Integration - Custom 1": Boolean; "G/L Integration - Custom 2": Boolean; "G/L Integration - Disposal": Boolean; "G/L Integration - Maintenance": Boolean; "Use Rounding in Periodic Depr.": Boolean; "Default Final Rounding Amount": Decimal; "Disposal Calculation Method": Option)

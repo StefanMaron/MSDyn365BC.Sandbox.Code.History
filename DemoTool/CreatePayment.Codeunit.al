@@ -101,8 +101,6 @@ codeunit 160201 "Create Payment"
         XBORE: Label 'BORE', Locked = true;
         XLCRE: Label 'LCRE', Locked = true;
         XEFFETS: Label 'EFFETS';
-        XPAYMENTJNL: Label 'PAYMENTJNL', Comment = 'PAYMENTJNL stands for Payment Journal.';
-        XCASHRECJNL: Label 'CASHRECJNL', Comment = 'CASHRECJNL stands for Cash Receipt Journal.';
         "XLCR-REM": Label 'LCR-REM';
         Text0000: Label 'Promissory note - Entered';
         Text0001: Label 'Promissory Note - Posted';
@@ -133,7 +131,6 @@ codeunit 160201 "Create Payment"
         Text0026: Label 'Cancel Bill of Exchange';
         Text0027: Label 'Print Bill of Exchange remittance';
         Text0028: Label 'Create ETEBAC file';
-        Text0029: Label 'Post Bill of Exchange remittance';
         Text0030: Label 'Post protested Bill of Exchange';
         Text0031: Label 'Post Cash receipt';
         Text0032: Label 'Print Notification';
@@ -202,7 +199,7 @@ codeunit 160201 "Create Payment"
         PaymentStep.Name := Name;
         PaymentStep."Previous Status" := PreviousStatus;
         PaymentStep."Next Status" := NextStatus;
-        PaymentStep."Action Type" := ActionType;
+        PaymentStep."Action Type" := "Payment Step Action Type".FromInteger(ActionType);
         PaymentStep."Report No." := ReportNo;
         PaymentStep."Export No." := ExportNo;
         PaymentStep."Verify Lines RIB" := VerifyLinesRIB;
@@ -229,7 +226,7 @@ codeunit 160201 "Create Payment"
         PaymentStepLedger.Sign := Sign;
         PaymentStepLedger.Description := Description;
         PaymentStepLedger."Accounting Type" := AccountingType;
-        PaymentStepLedger."Account Type" := AccountType;
+        PaymentStepLedger."Account Type" := "Gen. Journal Account Type".FromInteger(AccountType);
         PaymentStepLedger."Account No." := AccountNo;
         PaymentStepLedger."Customer Posting Group" := CustPostGroup;
         PaymentStepLedger."Vendor Posting Group" := VendPostGroup;
@@ -237,7 +234,7 @@ codeunit 160201 "Create Payment"
         PaymentStepLedger."Detail Level" := DetailLevel;
         PaymentStepLedger.Application := Application;
         PaymentStepLedger."Memorize Entry" := MemorizeEntry;
-        PaymentStepLedger."Document Type" := DocumentType;
+        PaymentStepLedger."Document Type" := "Gen. Journal Document Type".FromInteger(DocumentType);
         PaymentStepLedger."Document No." := DocumentNo;
         PaymentStepLedger.Insert();
     end;

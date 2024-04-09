@@ -3,13 +3,13 @@ codeunit 118014 "Update Location"
 
     trigger OnRun()
     begin
-        ModifyData(XYELLOW, true, true, true, true, false, false, 0, false, '', '', '', '', '', '', '', '', 0, '', '');
-        ModifyData(XGREEN, true, true, true, true, false, false, 0, false, '', '', '', '', '', '', '', '', 0, '', '');
+        ModifyData(XYELLOW, true, true, true, true, false, false, 0, false, '', '', '', '', '', '', '', '', "Location Default Bin Selection"::" ", '', '');
+        ModifyData(XGREEN, true, true, true, true, false, false, 0, false, '', '', '', '', '', '', '', '', "Location Default Bin Selection"::" ", '', '');
         ModifyData(
           XWHITE, true, true, true, true, true, true, 2, true, XW110001, XSTD,
-          XW080001, XW090001, XW070001, XW070002, XW070003, XW140001, 0, XW070002, XW070003);
+          XW080001, XW090001, XW070001, XW070002, XW070003, XW140001, "Location Default Bin Selection"::" ", XW070002, XW070003);
 
-        ModifyData(XSILVER, false, false, false, false, true, false, 0, false, '', '', '', '', '', '', '', '', 1, '', '');
+        ModifyData(XSILVER, false, false, false, false, true, false, 0, false, '', '', '', '', '', '', '', '', "Location Default Bin Selection"::"Fixed Bin", '', '');
     end;
 
     var
@@ -27,7 +27,7 @@ codeunit 118014 "Update Location"
         XW070003: Label 'W-07-0003';
         XW140001: Label 'W-14-0001';
 
-    procedure ModifyData("Location Code": Code[10]; RequirePutAway: Boolean; RequirePick: Boolean; UseReceive: Boolean; UseShipment: Boolean; UseBins: Boolean; UseWMS: Boolean; CheckBinCapacity: Option Never,"Allow excess","Prohibit excess"; AllowBreakBulk: Boolean; AdjmtBinCode: Code[20]; PutAwayTemplCode: Code[10]; ReceiptBinCode: Code[20]; ShipmentBinCode: Code[20]; OpenShopFloorBinCode: Code[20]; InbProdBinCode: Code[20]; OutbProdBinCode: Code[20]; CrossDockBinCode: Code[10]; DefaultBinSelection: Option " ","Fixed Bin","Last-Used Bin"; InbAsmBinCode: Code[20]; OutbAsmBinCode: Code[20])
+    procedure ModifyData("Location Code": Code[10]; RequirePutAway: Boolean; RequirePick: Boolean; UseReceive: Boolean; UseShipment: Boolean; UseBins: Boolean; UseWMS: Boolean; CheckBinCapacity: Option Never,"Allow excess","Prohibit excess"; AllowBreakBulk: Boolean; AdjmtBinCode: Code[20]; PutAwayTemplCode: Code[10]; ReceiptBinCode: Code[20]; ShipmentBinCode: Code[20]; OpenShopFloorBinCode: Code[20]; InbProdBinCode: Code[20]; OutbProdBinCode: Code[20]; CrossDockBinCode: Code[10]; DefaultBinSelection: Enum "Location Default Bin Selection"; InbAsmBinCode: Code[20]; OutbAsmBinCode: Code[20])
     begin
         Location.Get("Location Code");
         Location.Validate("Require Put-away", RequirePutAway);

@@ -3,21 +3,18 @@ codeunit 117017 "Create Symptom Code"
 
     trigger OnRun()
     begin
-        with SymptomCode do begin
-            InsertData('1', XNospacefunction);
-            InsertData('2', XLevel);
-            InsertData('3', XQuality);
-            InsertData('4', XNoise);
-            InsertData('5', XUnstable);
-            InsertData('6', XRecordingandphysical);
-            InsertData('7', XSpecialspacefunctions);
-            InsertData('8', XOtherspaceconditions);
-            InsertData('9', XSpecialspacecategories);
-        end;
+        InsertData('1', XNospacefunction);
+        InsertData('2', XLevel);
+        InsertData('3', XQuality);
+        InsertData('4', XNoise);
+        InsertData('5', XUnstable);
+        InsertData('6', XRecordingandphysical);
+        InsertData('7', XSpecialspacefunctions);
+        InsertData('8', XOtherspaceconditions);
+        InsertData('9', XSpecialspacecategories);
     end;
 
     var
-        SymptomCode: Record "Symptom Code";
         XNospacefunction: Label 'No function';
         XLevel: Label 'Level';
         XQuality: Label 'Quality';

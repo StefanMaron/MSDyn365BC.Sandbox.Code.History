@@ -3,17 +3,14 @@ codeunit 117044 "Create Troubleshooting Header"
 
     trigger OnRun()
     begin
-        with TroubleshootingHeader do begin
-            InsertData(XTR00001, XServerfailure, '');
-            InsertData(XTR00002, XNetworkfailure, '');
-            InsertData(XTR00003, XRAMFailure, XSMdashTROUBLE);
-            InsertData(XTR00004, XHarddiskfailure, '');
-            InsertData(XTR00005, XGeneralTroubleshooting, '');
-        end;
+        InsertData(XTR00001, XServerfailure, '');
+        InsertData(XTR00002, XNetworkfailure, '');
+        InsertData(XTR00003, XRAMFailure, XSMdashTROUBLE);
+        InsertData(XTR00004, XHarddiskfailure, '');
+        InsertData(XTR00005, XGeneralTroubleshooting, '');
     end;
 
     var
-        TroubleshootingHeader: Record "Troubleshooting Header";
         XTR00001: Label 'TR00001';
         XTR00002: Label 'TR00002';
         XTR00003: Label 'TR00003';

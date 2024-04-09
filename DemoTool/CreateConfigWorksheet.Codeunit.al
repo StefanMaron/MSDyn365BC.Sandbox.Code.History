@@ -66,13 +66,13 @@ codeunit 101932 "Create Config. Worksheet"
         ConfigLine: Record "Config. Line";
     begin
         ConfigLine.Init();
-        ConfigLine."Line No." := GetNextConfigLineNo;
+        ConfigLine."Line No." := GetNextConfigLineNo();
         ConfigLine."Vertical Sorting" := GetNextVerticalSorting();
         ConfigLine.Validate("Line Type", LineType);
         ConfigLine.Name := LineName;
         ConfigLine.Insert();
-        if CreateConfigPackageHelper.GetPackageCode <> '' then
-            ConfigPackageManagement.AssignPackage(ConfigLine, CreateConfigPackageHelper.GetPackageCode);
+        if CreateConfigPackageHelper.GetPackageCode() <> '' then
+            ConfigPackageManagement.AssignPackage(ConfigLine, CreateConfigPackageHelper.GetPackageCode());
     end;
 
     procedure CreateConfigLine(TableID: Integer)
@@ -80,13 +80,13 @@ codeunit 101932 "Create Config. Worksheet"
         ConfigLine: Record "Config. Line";
     begin
         ConfigLine.Init();
-        ConfigLine."Line No." := GetNextConfigLineNo;
+        ConfigLine."Line No." := GetNextConfigLineNo();
         ConfigLine."Vertical Sorting" := GetNextVerticalSorting();
         ConfigLine.Validate("Line Type", ConfigLine."Line Type"::Table);
         ConfigLine.Validate("Table ID", TableID);
         ConfigLine.Insert();
-        if CreateConfigPackageHelper.GetPackageCode <> '' then
-            ConfigPackageManagement.AssignPackage(ConfigLine, CreateConfigPackageHelper.GetPackageCode);
+        if CreateConfigPackageHelper.GetPackageCode() <> '' then
+            ConfigPackageManagement.AssignPackage(ConfigLine, CreateConfigPackageHelper.GetPackageCode());
     end;
 
     procedure CreateMiniWorksheetLines()
@@ -103,15 +103,15 @@ codeunit 101932 "Create Config. Worksheet"
     var
         DemoDataSetup: Record "Demo Data Setup";
     begin
-        Intialize;
+        Intialize();
         CreateConfigArea(XSalesCompanyTxt);
         CreateConfigGroup(XMasterDataTxt);
         CreateConfigLine(DATABASE::Customer);
-        SetConfigLineDimsAsColumns;
+        SetConfigLineDimsAsColumns();
         CreateConfigLine(DATABASE::Vendor);
-        SetConfigLineDimsAsColumns;
+        SetConfigLineDimsAsColumns();
         CreateConfigLine(DATABASE::Item);
-        SetConfigLineDimsAsColumns;
+        SetConfigLineDimsAsColumns();
         if Extended then begin
             CreateConfigLine(DATABASE::"Bank Account");
             CreateConfigLine(DATABASE::"Salesperson/Purchaser");
@@ -177,8 +177,8 @@ codeunit 101932 "Create Config. Worksheet"
             CreateConfigLine(DATABASE::"Shipping Agent");
         CreateConfigLine(DATABASE::"Payment Terms");
 
-        CreateLocalRapidStartPack.CreateWorksheetLines;
-        ConfigMgt.AssignParentLineNos;
+        CreateLocalRapidStartPack.CreateWorksheetLines();
+        ConfigMgt.AssignParentLineNos();
     end;
 
     procedure SetConfigLineDimsAsColumns()

@@ -112,8 +112,6 @@ codeunit 132583 "Amount Auto Format Test"
     procedure TestReadRounding()
     var
         AutoFormat: Codeunit "Auto Format";
-        UIHelperTriggers: Codeunit "UI Helper Triggers";
-        RoundingPrecision: Decimal;
     begin
         // [GIVEN] The Amount Rounding Precision value from the table "General Ledger Setup"
         InitializeGLSetup('2:2', '3:3', '€', 'EUR');

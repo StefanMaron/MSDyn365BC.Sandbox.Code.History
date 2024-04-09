@@ -3,12 +3,10 @@ codeunit 101329 "Create Curr for Reminder Level"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(ForeignCode, 1, XDKK, 45);
-            InsertData(ForeignCode, 1, XEUR, 4.5);
-            InsertData(ForeignCode, 1, XUSD, 7.5);
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.ForeignCode(), 1, XDKK, 45);
+        InsertData(DemoDataSetup.ForeignCode(), 1, XEUR, 4.5);
+        InsertData(DemoDataSetup.ForeignCode(), 1, XUSD, 7.5);
     end;
 
     var

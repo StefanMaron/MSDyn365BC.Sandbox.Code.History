@@ -3,14 +3,11 @@ codeunit 117183 "Create Service Price Adjustmen"
 
     trigger OnRun()
     begin
-        with ServicePriceAdjustmentGroup do begin
-            InsertData(XMONITOR, XMonitors);
-            InsertData(XOSP, XOnlyspareparts);
-        end;
+        InsertData(XMONITOR, XMonitors);
+        InsertData(XOSP, XOnlyspareparts);
     end;
 
     var
-        ServicePriceAdjustmentGroup: Record "Service Price Adjustment Group";
         XMONITOR: Label 'MONITOR';
         XMonitors: Label 'Monitors';
         XOSP: Label 'OSP';
