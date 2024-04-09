@@ -25,7 +25,7 @@ codeunit 101122 "Create Assessee Code"
 
     procedure InsertMiniAppData()
     begin
-        AddAssesseeForMini;
+        AddAssesseeForMini();
     end;
 
     local procedure AddAssesseeForMini()

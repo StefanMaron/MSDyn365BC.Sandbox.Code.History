@@ -3,15 +3,12 @@ codeunit 117181 "Create Service Price Group"
 
     trigger OnRun()
     begin
-        with ServicePriceGroup do begin
-            InsertData(XDESKTOP, XPCDesktops);
-            InsertData(XMONITOR, XMonitors);
-            InsertData(XSERVER, XServers);
-        end;
+        InsertData(XDESKTOP, XPCDesktops);
+        InsertData(XMONITOR, XMonitors);
+        InsertData(XSERVER, XServers);
     end;
 
     var
-        ServicePriceGroup: Record "Service Price Group";
         XDESKTOP: Label 'DESKTOP';
         XPCDesktops: Label 'PC Desktops';
         XMONITOR: Label 'MONITOR';

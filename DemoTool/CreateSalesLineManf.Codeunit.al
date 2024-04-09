@@ -16,6 +16,5 @@ codeunit 119061 "Create Sales Line Manf"
 
     var
         CreateSalesLine: Codeunit "Create Sales Line";
-        DemoToolSubscriber: Codeunit "Demo Tool Subscribers";
 }
 

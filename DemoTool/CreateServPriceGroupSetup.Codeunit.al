@@ -4,11 +4,9 @@ codeunit 117182 "Create Serv. Price Group Setup"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        with ServPriceGroupSetup do begin
-            InsertData(XMONITOR, '', '', '', 0D, XMONITOR, false, "Adjustment Type"::Maximum, 150, false);
-            InsertData(XSERVER, '', '', '', 0D, XOSP, false, "Adjustment Type"::Fixed, 200, false);
-            InsertData(XSERVER, '', '', '', 19020101D, XOSP, false, "Adjustment Type"::Fixed, 210, false);
-        end;
+        InsertData(XMONITOR, '', '', '', 0D, XMONITOR, false, ServPriceGroupSetup."Adjustment Type"::Maximum, 150, false);
+        InsertData(XSERVER, '', '', '', 0D, XOSP, false, ServPriceGroupSetup."Adjustment Type"::Fixed, 200, false);
+        InsertData(XSERVER, '', '', '', 19020101D, XOSP, false, ServPriceGroupSetup."Adjustment Type"::Fixed, 210, false);
     end;
 
     var

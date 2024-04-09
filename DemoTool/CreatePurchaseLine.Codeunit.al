@@ -2,9 +2,6 @@ codeunit 101039 "Create Purchase Line"
 {
 
     trigger OnRun()
-    var
-        PurchHeader: Record "Purchase Header";
-        DemoToolSubscriber: Codeunit "Demo Tool Subscribers";
     begin
         DemoDataSetup.Get();
         InsertData(1, '106001', 2, '1964-S', XGREEN, 14, 0, 0, '', '', '', '', '');
@@ -272,8 +269,6 @@ codeunit 101039 "Create Purchase Line"
     end;
 
     procedure CreateINPurchInvoiceLines()
-    var
-        PurchHeader: Record "Purchase Header";
     begin
         InsertData(2, GetDocumentNo("Purchase Document Type"::Invoice, 'PI-1001'), 1, '8112', 'BLUE', 1, 0, 1000, '', '', '', '', '');
         InsertData(2, GetDocumentNo("Purchase Document Type"::Invoice, 'PI-1002'), 1, '8430', 'BLUE', 1, 0, 8000, '', '', '195', '16', 'A');

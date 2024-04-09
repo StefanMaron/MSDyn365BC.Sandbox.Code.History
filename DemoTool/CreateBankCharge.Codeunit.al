@@ -16,7 +16,6 @@ codeunit 120544 "Create Bank Charge"
         BankCharge: Record "Bank Charge";
         BankChargeDeemedValueSetup: Record "Bank Charge Deemed Value Setup";
         XGSTCredit: Enum "GST Credit";
-        DeemedValFormula: Enum "Deemed Value Calculation";
         XBankCodeBKCHG_01: Label 'BKCHG_01';
         XBankCodeBKCHG_02: Label 'BKCHG_02';
         XBankCodeBKCHG_03: Label 'BKCHG_03';

@@ -1,6 +1,7 @@
 table 122002 "Quantity Allocation Buffer"
 {
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

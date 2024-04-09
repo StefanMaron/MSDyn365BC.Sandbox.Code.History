@@ -5,15 +5,13 @@ codeunit 101031 "Create Payment Reg. Setup"
     var
         PaymentRegistrationSetup: Record "Payment Registration Setup";
     begin
-        with PaymentRegistrationSetup do begin
-            DeleteAll();
+        PaymentRegistrationSetup.DeleteAll();
 
-            Init();
-            Validate("Journal Template Name", XPaymentTxt);
-            Validate("Journal Batch Name", XPmtRegTxt);
-            "Auto Fill Date Received" := true;
-            Insert();
-        end;
+        PaymentRegistrationSetup.Init();
+        PaymentRegistrationSetup.Validate("Journal Template Name", XPaymentTxt);
+        PaymentRegistrationSetup.Validate("Journal Batch Name", XPmtRegTxt);
+        PaymentRegistrationSetup."Auto Fill Date Received" := true;
+        PaymentRegistrationSetup.Insert();
     end;
 
     var

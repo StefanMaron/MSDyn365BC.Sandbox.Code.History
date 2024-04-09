@@ -31,7 +31,6 @@ codeunit 120538 "Create Tax Accounting Period"
         CA: Codeunit "Make Adjustments";
         StartDate: Date;
         EndDate: Date;
-        XFinancialYear: Label '2020-2021';
 
     procedure InsertData(TaxTypeCode: Code[20]; "Starting Date": Date; "Ending Date": Date)
     var

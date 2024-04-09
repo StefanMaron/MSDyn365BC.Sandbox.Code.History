@@ -2,8 +2,6 @@
 {
 
     trigger OnRun()
-    var
-        DemoToolSubscriber: Codeunit "Demo Tool Subscribers";
     begin
         DemoDataSetup.Get();
         "Entry Balance" := 0;
@@ -1800,7 +1798,7 @@
         "Exactly Balanced" := true;
         InsertOtherEntry(0, '995310', 19021231D, '00-12B', XBalanceSheetChanges, -197594.35, '');
 
-        CreatePeriodicDepr;
+        CreatePeriodicDepr();
 
         InsertJobLine('998450', '992910', 19030126D, XW401, XParkingFee, 28, XGUILDFORD10CR, '1310', 0);
         InsertJobLine('998430', '992910', 19030127D, XW402, XRoadToll, 33.75, XGUILDFORD10CR, '1310', 35);
@@ -1811,21 +1809,22 @@
     procedure InsertEvaluationData()
     var
         CreateBankAccount: Codeunit "Create Bank Account";
+        CreateGenJournalBatch: Codeunit "Create Gen. Journal Batch";
     begin
         DemoDataSetup.Get();
         "Entry Balance" := 0;
         "Exactly Balanced" := false;
         InsertDailyEntry(
-          XGENERAL, XDAILY, 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'BANK1', 'BANK1',
+          XGENERAL, CreateGenJournalBatch.GetDailyJournalBatchName(), 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'BANK1', XPaymentDescription1,
           3, CreateBankAccount.GetCheckingBankAccountCode(), -2000.0, '', '', 0, '', 0D);
         InsertDailyEntry(
-          XGENERAL, XDAILY, 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'BANK2', 'BANK2',
+          XGENERAL, CreateGenJournalBatch.GetDailyJournalBatchName(), 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'BANK2', XPaymentDescription2,
           3, CreateBankAccount.GetCheckingBankAccountCode(), -3000.0, '', '', 0, '', 0D);
         InsertDailyEntry(
-          XGENERAL, XDAILY, 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'DEPOSIT3', 'DEPOSIT3',
+          XGENERAL, CreateGenJournalBatch.GetDailyJournalBatchName(), 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'DEPOSIT3', XPaymentDescription3,
           3, CreateBankAccount.GetCheckingBankAccountCode(), -4000.0, '', '', 0, '', 0D);
         InsertDailyEntry(
-          XGENERAL, XDAILY, 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'DEPOSIT4', 'DEPOSIT4',
+          XGENERAL, CreateGenJournalBatch.GetDailyJournalBatchName(), 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'DEPOSIT4', XPaymentDescription4,
           3, CreateBankAccount.GetCheckingBankAccountCode(), -4000.0, '', '', 0, '', 0D);
     end;
 
@@ -1849,7 +1848,6 @@
         XPURCH: Label 'PURCH';
         XSALES: Label 'SALES';
         XGENERAL: Label 'GENERAL';
-        XDAILY: Label 'DAILY';
         XVATSettlement: Label 'VAT Settlement';
         XCleaningExpensesDec: Label 'Cleaning Expenses, Dec.';
         XRent1stQuarter: Label 'Rent, 1st Quarter,';
@@ -1927,7 +1925,10 @@
         XParkingFee: Label 'Parking fee';
         XGUILDFORD10CR: Label 'GUILDFORD, 10 CR';
         XRoadToll: Label 'Road Toll';
-        XDELHI: Label 'Delhi';
+        XPaymentDescription1: Label 'Transfer, January';
+        XPaymentDescription2: Label 'Transfer of funds for Spring ';
+        XPaymentDescription3: Label 'Deposit 3, ';
+        XPaymentDescription4: Label 'Deposit 4, ';
 
     procedure InsertDailyEntry(JnlTemplateName: Code[10]; JnlBatchName: Code[10]; "Account Type": Option; "Account No.": Code[20]; Date: Date; "Document Type": Option; "Document No.": Code[20]; Description: Text[50]; "Bal. Account Type": Option; "Bal. Account No.": Code[20]; Amount: Decimal; "Shortcut Dimension 1 Code": Code[20]; "Shortcut Dimension 2 Code": Code[20]; "Applies-to Doc. Type": Option; "Applies-to Doc. No.": Code[20]; "Due Date": Date)
     var
@@ -2535,7 +2536,7 @@
         GenJnlLine.Validate("Bal. Account Type", BalAccType);
         GenJnlLine.Validate("Bal. Account No.", BalAccNo);
         if CurrencyCode <> '' then
-            GenJnlLine.validate("Currency Code", CurrencyCode);
+            GenJnlLine.Validate("Currency Code", CurrencyCode);
         GenJnlLine.Validate("External Document No.", ExternalDocumentNo);
         GenJnlLine."TCS Nature of Collection" := NOC;
         GenJnlLine."Nature of Remittance" := NOR;
@@ -2598,7 +2599,7 @@
         GenJnlLine.Validate("Bal. Account Type", BalAccType);
         GenJnlLine.Validate("Bal. Account No.", BalAccNo);
         if CurrencyCode <> '' then
-            GenJnlLine.validate("Currency Code", CurrencyCode);
+            GenJnlLine.Validate("Currency Code", CurrencyCode);
         GenJnlLine.Validate("External Document No.", ExternalDocumentNo);
         GenJnlLine.Modify();
         CalculateTax.CallTaxEngineOnGenJnlLine(GenJnlLine, GenJnlLine);

@@ -1,4 +1,4 @@
-#if not CLEAN21
+#if not CLEAN23
 codeunit 101212 "Create Job G/L Prices"
 {
     ObsoleteState = Pending;

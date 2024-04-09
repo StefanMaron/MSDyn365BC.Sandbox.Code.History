@@ -18,7 +18,7 @@ codeunit 101127 "Create Voucher Posting Debit"
 
     procedure InsertMiniAppData()
     begin
-        AddVoucherPostingDebitForMini;
+        AddVoucherPostingDebitForMini();
     end;
 
     local procedure AddVoucherPostingDebitForMini()

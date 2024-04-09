@@ -23,7 +23,6 @@ codeunit 118824 "Dist. Release Purch. Documents"
     var
         PurchHeader: Record "Purchase Header";
         ReleasePurchaseDocument: Codeunit "Release Purchase Document";
-        CreatePurchLine: Codeunit "Create Purchase Line";
 
     procedure ReleasePurchaseDoc(DocumentType: Option; DocumentNo: Code[20])
     begin

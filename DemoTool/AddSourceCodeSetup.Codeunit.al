@@ -25,8 +25,6 @@ codeunit 117555 "Add Source Code Setup"
         XCASHRCPTVSourceCodeLbl: Label 'CASHRCPTV';
         XCONTRAVSourceCodeLbl: Label 'CONTRAV';
         XJOURNALVSourceCodeLbl: Label 'JOURNALV';
-        XTCSADJNLSourceCodeLbl: Label 'TCSADJNL';
-        XTCSADJNLLbl: Label 'TCS Adjustment Journal';
         XGSTSETSourceCodeLbl: Label 'GSTSET';
         XGSTCRADJSourceCodeLbl: Label 'GSTCRADJ';
 }

@@ -3,16 +3,13 @@ codeunit 117004 "Create Service Order Type"
 
     trigger OnRun()
     begin
-        with ServiceOrderType do begin
-            InsertData(XHARDWARE, XHardwareService);
-            InsertData(XPREVMAINT, XPreventativeMaintenance);
-            InsertData(XSERVICE, XGeneralService);
-            InsertData(XSOFTWARE, XSoftwareService);
-        end;
+        InsertData(XHARDWARE, XHardwareService);
+        InsertData(XPREVMAINT, XPreventativeMaintenance);
+        InsertData(XSERVICE, XGeneralService);
+        InsertData(XSOFTWARE, XSoftwareService);
     end;
 
     var
-        ServiceOrderType: Record "Service Order Type";
         XHARDWARE: Label 'HARDWARE';
         XPREVMAINT: Label 'PREVMAINT';
         XSERVICE: Label 'SERVICE';

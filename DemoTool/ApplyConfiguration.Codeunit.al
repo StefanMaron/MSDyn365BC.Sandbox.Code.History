@@ -13,19 +13,19 @@ codeunit 101940 "Apply Configuration"
         DataClassificationEvalData: Codeunit "Data Classification Eval. Data";
         DataType: Option Evaluation,Standard;
     begin
-        SetDefaultRoleCenter;
-        SetExperienceTierToEssential;
+        SetDefaultRoleCenter();
+        SetExperienceTierToEssential();
         SetupAndRunAssistedCompanySetup(DataType::Evaluation);
-        RunCashFlowForecastWizard;
-        DataClassificationEvalData.CreateEvaluationData;
+        RunCashFlowForecastWizard();
+        DataClassificationEvalData.CreateEvaluationData();
     end;
 
     procedure ApplyStandardConfiguration()
     var
         DataType: Option Evaluation,Standard;
     begin
-        SetDefaultRoleCenter;
-        SetExperienceTierToEssential;
+        SetDefaultRoleCenter();
+        SetExperienceTierToEssential();
         SetupAndRunAssistedCompanySetup(DataType::Standard);
     end;
 
@@ -96,7 +96,7 @@ codeunit 101940 "Apply Configuration"
         // Imitate that the user has run the Cash Flow Forecasting Setup wizard
         WorkDate := LogInManagement.GetDefaultWorkDate();
 
-        CashFlowManagement.SetupCashFlow(CopyStr(CashFlowManagement.GetCashAccountFilter, 1, 250));
+        CashFlowManagement.SetupCashFlow(CopyStr(CashFlowManagement.GetCashAccountFilter(), 1, 250));
 
         CashFlowSetup.UpdateTaxPaymentInfo(TaxablePeriod::Quarterly, TaxPaymentWindow, CashFlowSetup."Tax Bal. Account Type"::" ", '');
 
@@ -112,13 +112,13 @@ codeunit 101940 "Apply Configuration"
     procedure ApplyEvaluationConfigurationWithCulture(PackLanguage: Code[10])
     begin
         PackLanguageCode := PackLanguage;
-        ApplyEvaluationConfiguration;
+        ApplyEvaluationConfiguration();
     end;
 
     procedure ApplyStandardConfigurationWithCulture(PackLanguage: Code[10])
     begin
         PackLanguageCode := PackLanguage;
-        ApplyStandardConfiguration;
+        ApplyStandardConfiguration();
     end;
 }
 

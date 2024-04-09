@@ -27,4 +27,3 @@ codeunit 101801 "Create FA Setup"
         XINS000040: Label 'INS000040';
         XCOMPANY: Label 'COMPANY';
 }
-

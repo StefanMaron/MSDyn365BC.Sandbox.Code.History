@@ -1,6 +1,8 @@
 table 130204 "Test Coverage Map"
 {
     ReplicateData = false;
+    DataClassification = CustomerContent;
+
     fields
     {
         field(1; "Test Codeunit ID"; Integer)

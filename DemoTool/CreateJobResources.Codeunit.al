@@ -43,8 +43,6 @@ codeunit 101157 "Create Job Resources"
         XLABOR: Label 'LABOR';
         X10DeerfieldRoad: Label '10 Deerfield Road';
         XManager: Label 'Manager';
-        XLIFT: Label 'LIFT';
-        XLiftforFurniture: Label 'Lift for Furniture';
         XGSTGroup2089: Label '2089';
         XHSNCode2089001: Label '2089001';
 

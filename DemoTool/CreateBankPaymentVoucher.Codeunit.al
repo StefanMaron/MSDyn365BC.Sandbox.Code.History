@@ -1798,7 +1798,7 @@ codeunit 101282 "Create Bank Payment Voucher"
         "Exactly Balanced" := true;
         InsertOtherEntry(0, '995310', 19021231D, '00-12B', XBalanceSheetChanges, -197594.35, '');
 
-        CreatePeriodicDepr;
+        CreatePeriodicDepr();
 
         InsertJobLine('998450', '992910', 19030126D, XW401, XParkingFee, 28, XGUILDFORD10CR, '1310', 0);
         InsertJobLine('998430', '992910', 19030127D, XW402, XRoadToll, 33.75, XGUILDFORD10CR, '1310', 35);
@@ -2460,27 +2460,6 @@ codeunit 101282 "Create Bank Payment Voucher"
 
         DemoDataSetup.Get();
         GenJournalLine.Insert();
-    end;
-
-    local procedure InsertBankPaymentVoucher(
-      TemplateName: Text[20];
-      BatchName: Text[20];
-      DocumentType: Enum "Gen. Journal Document Type";
-      DocumentNo: Code[20];
-      PostingDate: Date;
-      AccType: Enum "Gen. Journal Account Type";
-      AccNo: Code[20];
-      NOC: Code[20];
-      SourceCode: Code[20];
-      BalAccType: Enum "Gen. Journal Account Type";
-      BalAccNo: Code[20];
-      ExternalDocumentNo: Code[20];
-      PostGenJnlline: Boolean)
-    var
-        GenJnlLine: Record "Gen. Journal Line";
-    begin
-        GenJnlLine.Init();
-        GenJnlLine.Validate("Journal Template Name", TemplateName);
     end;
 }
 

@@ -2,7 +2,6 @@ codeunit 101017 "Create TDS Section"
 {
 
     trigger OnRun()
-    var
     begin
         with DemoDataSetup do begin
             Get();
@@ -38,7 +37,6 @@ codeunit 101017 "Create TDS Section"
 
     var
         DemoDataSetup: Record "Demo Data Setup";
-        XContractorLbl: Label 'Contractor';
         X194CContractor: Label 'Contractor';
         XSContractorSingletransaction: Label 'Contractor-Single transaction';
         XCContractorConsolidatedPaymentDuringtheFY: Label 'Contractor – Consolidated Payment During the F.Y.';
@@ -70,11 +68,10 @@ codeunit 101017 "Create TDS Section"
         X194ABP: Label '194A-BP';
         X194AOT: Label '194A-OT';
 
-        PresentationOrder: Integer;
 
     procedure InsertMiniAppData()
     begin
-        AddTDSSectionForMini;
+        AddTDSSectionForMini();
     end;
 
     local procedure AddTDSSectionForMini()

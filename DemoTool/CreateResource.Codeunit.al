@@ -42,10 +42,6 @@ codeunit 101156 "Create Resource"
         XLABOR: Label 'LABOR';
         XGSTGroup2089: Label '2089';
         XHSNCode2089001: Label '2089001';
-        XKatherine: Label 'Katherine';
-        xKATHERINEHULL: Label 'KATHERINE HULL';
-        X10DeerfieldRoad: Label '10 Deerfield Road';
-        XManager: Label 'Manager';
 
     procedure InsertData("No.": Code[20]; Type: Enum "Resource Type"; Name: Text[30]; Address: Text[30]; "Job Title": Text[20]; "Employment Date": Date; "Unit of Measure Code": Text[10]; "Direct Unit Cost": Decimal; "Indirect Cost %": Decimal; "Unit Price": Decimal; "Last Date Modified": Date; "Post Code": Code[20])
     var

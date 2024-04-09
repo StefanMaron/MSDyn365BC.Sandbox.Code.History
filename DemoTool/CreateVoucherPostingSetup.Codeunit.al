@@ -32,7 +32,7 @@ codeunit 101125 "Create Voucher Posting Setup"
 
     procedure InsertMiniAppData()
     begin
-        AddVoucherPostingSetupForMini;
+        AddVoucherPostingSetupForMini();
     end;
 
     local procedure AddVoucherPostingSetupForMini()

@@ -28,16 +28,10 @@ codeunit 120549 "Create HSN/SAC"
         XHSNGroup2090: Label '2090';
         XHSNCode0988001: Label '0988001';
         XHSNCode0988002: Label '0988002';
-        XHSNCode0988003: Label '0988003';
-        XHSNCode0988004: Label '0988004';
-        XHSNCode0988005: Label '0988005';
         XHSNCode0989001: Label '0989001';
         XHSNCode0989002: Label '0989002';
-        XHSNCode0989003: Label '0989003';
-        XHSNCode0989004: Label '0989004';
         XHSNCode2089001: Label '2089001';
         XHSNCode2090001: Label '2090001';
-        XHSNCode2090002: Label '2090002';
 
 
     procedure InsertData(GSTGroupCode: Code[10]; HSNSACCode: code[10]; Descrip: Text[50]; HSType: Enum "GST Goods And Services Type");

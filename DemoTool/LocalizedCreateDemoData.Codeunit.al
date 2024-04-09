@@ -15,15 +15,10 @@ codeunit 101903 "Localized Create Demo Data"
 
     procedure CreateEvaluationData()
     var
-        PurchaseHeader: Record "Purchase Header";
-        SalesHeader: Record "Sales Header";
-        SalesPost: Codeunit "Sales-Post";
-        PurchPost: Codeunit "Purch.-Post";
         CreateSalesHeader: Codeunit "Create Sales Header";
         CreateSalesLine: Codeunit "Create Sales Line";
         CreatePurchHeader: Codeunit "Create Purchase Header";
         CreatePurchLine: Codeunit "Create Purchase Line";
-        CreateGenJnlLine: Codeunit "Create Gen. Journal Line";
         CreateTransferOrderAdd: Codeunit "Create Transfer Order Add.";
         AddNoSeries: Codeunit "Add No. Series";
         AddNoSeriesLine: Codeunit "Add No. Series Line";
@@ -32,7 +27,7 @@ codeunit 101903 "Localized Create Demo Data"
         XPostedINSales: Label 'Posted Sales IN Invoice';
     begin
         AddNoSeries.InsertRec(XINSALES, XPostedINSales, '1');
-        AddNoSeriesLine.InsertRec(XINSALES, '10000', XIN00001, '', 19030127D);
+        AddNoSeriesLine.InsertRec(XINSALES, 10000, XIN00001, '', 19030127D);
 
         CreateSalesHeader.CreateINSalesOrders();
         CreateSalesLine.CreateINSalesOrderLines();

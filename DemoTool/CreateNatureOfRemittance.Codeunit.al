@@ -30,7 +30,7 @@ codeunit 101121 "Create Nature Of Remittance"
 
     procedure InsertMiniAppData()
     begin
-        AddNatureOfremittanceForMini;
+        AddNatureOfremittanceForMini();
     end;
 
     local procedure AddNatureOfremittanceForMini()

@@ -30,7 +30,7 @@ codeunit 101123 "Create Concessional Code"
 
     procedure InsertMiniAppData()
     begin
-        AddCOncessionalCodeForMini;
+        AddCOncessionalCodeForMini();
     end;
 
     local procedure AddCOncessionalCodeForMini()

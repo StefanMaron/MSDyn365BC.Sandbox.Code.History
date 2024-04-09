@@ -1,6 +1,7 @@
 table 101903 "G/L Account Map Buffer"
 {
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

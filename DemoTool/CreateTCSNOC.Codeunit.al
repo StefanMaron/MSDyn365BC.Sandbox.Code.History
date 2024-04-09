@@ -3,7 +3,6 @@ codeunit 101227 "Create TCS NOC"
 {
 
     trigger OnRun()
-    var
     begin
         with DemoDataSetup do begin
             Get();
@@ -50,7 +49,7 @@ codeunit 101227 "Create TCS NOC"
 
     procedure InsertMiniAppData()
     begin
-        AddTCSNOCForMini;
+        AddTCSNOCForMini();
     end;
 
     local procedure AddTCSNOCForMini()

@@ -97,7 +97,6 @@ codeunit 101037 "Create Sales Line"
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         TransferExtendedText: Codeunit "Transfer Extended Text";
-        DemoToolSubscriber: Codeunit "Demo Tool Subscribers";
         "Line No.": Integer;
         "Previous Document No.": Code[20];
         LastOrdinaryLineNo: Integer;
@@ -107,7 +106,6 @@ codeunit 101037 "Create Sales Line"
         XTerry: Label 'Terry';
         XMILES: Label 'MILES';
         XAssemblingFurnitureJanuary: Label 'Assembling Furniture, January';
-        XDelhi: Label 'DELHI';
         XBLUE: Label 'BLUE';
 
     procedure InsertData("Document Type": Integer; "Document No.": Code[20]; Type: Integer; "No.": Code[20]; "Location Code": Code[10]; Quantity: Decimal; NOC: Code[20]; UnitPrice: Decimal)

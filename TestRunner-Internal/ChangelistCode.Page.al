@@ -156,7 +156,7 @@ page 130026 "Changelist Code"
 
                     trigger OnAction()
                     begin
-                        ClearStatus
+                        ClearStatus();
                     end;
                 }
                 action("Delete Line")

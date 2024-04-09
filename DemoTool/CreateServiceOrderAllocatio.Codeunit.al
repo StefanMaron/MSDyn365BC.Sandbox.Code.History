@@ -3,11 +3,9 @@ codeunit 117051 "Create Service Order Allocatio"
 
     trigger OnRun()
     begin
-        with ServiceOrderAllocation do begin
-            InsertData(1, Status::Active, XSO000001, 19030109D, XKatherine, '', 10000, 4, 0T, 0T, '', '', '7', false, 'AS764789', false, "Document Type"::Order
-              );
-            InsertData(2, Status::Nonactive, XSO000002, 0D, '', '', 10000, 0, 0T, 0T, '', '', '', false, '', false, "Document Type"::Order);
-        end;
+        InsertData(1, ServiceOrderAllocation.Status::Active, XSO000001, 19030109D, XKatherine, '', 10000, 4, 0T, 0T, '', '', '7', false, 'AS764789', false, ServiceOrderAllocation."Document Type"::Order
+  );
+        InsertData(2, ServiceOrderAllocation.Status::Nonactive, XSO000002, 0D, '', '', 10000, 0, 0T, 0T, '', '', '', false, '', false, ServiceOrderAllocation."Document Type"::Order);
     end;
 
     var

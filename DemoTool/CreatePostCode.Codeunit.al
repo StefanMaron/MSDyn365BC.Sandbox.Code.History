@@ -4,7 +4,7 @@ codeunit 101225 "Create Post Code"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        ImportLocalPostCodes;
+        ImportLocalPostCodes();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Standard then
             exit;
 
@@ -504,14 +504,12 @@ codeunit 101225 "Create Post Code"
         XTangerang: Label 'Tangerang';
         XBandung: Label 'Bandung';
         XSurabaya: Label 'Surabaya';
-        XDelhi: Label 'Delhi';
         XMumbai: Label 'Mumbai';
         XNagpur: Label 'Nagpur';
         XBangalore: Label 'Bengaluru';
         XChennai: Label 'Chennai';
         XKolkata: Label 'Kolkata';
         XNewDelhi: Label 'New Delhi';
-        XGurgaon: Label 'Gurgaon';
         XNoida: Label 'Noida';
         XFaridabad: Label 'Faridabad';
         XGurugram: Label 'Gurugram';

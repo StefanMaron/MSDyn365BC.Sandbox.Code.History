@@ -153,20 +153,17 @@ codeunit 101018 "Create Customer"
         TaxArea: Record "Tax Area";
         CreateCurrency: Codeunit "Create Currency";
         CreateTerritory: Codeunit "Create Territory";
-        CreatePostCode: Codeunit "Create Post Code";
         CreateContact: Codeunit "Create Contact";
         Counter: Integer;
         PreviousCurrencyCode: Code[10];
         TaxLiable: Boolean;
         XTheCannonGroupPLC: Label 'The Cannon Group PLC';
-        X192MarketSquare: Label '192 Market Square';
         XMr: Label 'Mr.';
         XAndyTeal: Label 'Andy Teal';
         XBLUE: Label 'BLUE';
         XMID1: Label 'MID';
         XMID2: Label 'MID';
         XSelangorianLtd: Label 'Selangorian Ltd.';
-        X153ThomasDrive: Label '153 Thomas Drive';
         XMarkMcArthur: Label 'Mark McArthur';
         XJohnHaddockInsuranceCo: Label 'John Haddock Insurance Co.';
         X10HighTowerGreen: Label '10 High Tower Green';
@@ -196,68 +193,16 @@ codeunit 101018 "Create Customer"
         XSALES: Label 'SALES';
         XEXW: Label 'EXW';
         X1M8D: Label '1M(8D)';
-        XAdatumCorporation: Label 'Adatum Corporation';
-        XTreyResearch: Label 'Trey Research';
-        XSchoolOfFineArt: Label 'School of Fine Art';
-        XAlpineSkiHouse: Label 'Alpine Ski House';
-        XRelecloud: Label 'Relecloud';
         X21StationRoad: Label 'Station Road, 21';
-        "X91-95SouthwarkBridgeRd": Label 'Southwark Bridge Rd, 91-95';
-        X5WalterGropiusStrasse: Label 'Walter-Gropius-Strasse 5';
-        X1OccamCourt: Label 'Occam Court, 1';
-        XParkStadtSchwabing: Label 'Park Stadt Schwabing';
-        XSurrey: Label 'Surrey';
         XRobertTownes: Label 'Robert Townes';
         XHelenRay: Label 'Helen Ray';
         XMeaganBond: Label 'Meagan Bond';
         XIanDeberry: Label 'Ian Deberry';
-        XJesseHomer: Label 'Jesse Homer';
-        X11000: Label '11000';
-        X21000: Label '21000';
-        X31000: Label '31000';
-        X41000: Label '41000';
-        X51000: Label '51000';
-        XTheNikkonGroupPLC: Label 'The Nikkon Group PLC';
-        XLawrieLtd: Label 'Lawrie Ltd.';
-        XIndiaInsuranceCo: Label 'India Insurance Co.';
-        XPixelStudio: Label 'Pixel Studio';
-        XIndustrialProjectDepartment: Label 'Industrial Project Department';
-        XChirakDelhiRoad28: Label 'Chirak Delhi Road 28';
-        XDwarkaSector6: Label 'Dwarka, Sector 6';
-        XSector62Faridabad: Label 'Sector 62, Faridabad';
-        XFlowerRoad10: Label 'Flower Road 10';
-        X10ARJUNNAGAR: Label '10, ARJUN NAGAR';
-        X12000: Label '12000';
-        X22000: Label '22000';
-        X32000: Label '32000';
-        X42000: Label '42000';
-        X52000: Label '52000';
-        X63000: Label '63000';
-        X64000: Label '64000';
-        XTheMikeGroupPLC: Label 'The Mike Group PLC';
-        XAarveeDenimsLtd: Label 'Aarvee Denims Ltd.';
-        XMarcHaddockInsuranceCo: Label 'Marc Haddock Insurance Co.';
-        XAbanOffshoreCompany: Label 'Aban Offshore Company';
-        XMoonstechnologieslimited: Label 'Moons technologies limited';
-        XMilesSoftwareServicesLimited: Label 'Miles Software Services Ltd.';
-        XMicronsLimited: Label 'Microns Limited';
-        XChiragDelhiRoad29: Label 'Chirag Delhi Road 29';
-        XDwarkaSector8: Label 'Dwarka, Sector 8';
-        XSector58Faridabad: Label 'Sector 58, Faridabad';
-        XFlowerRoad102: Label 'Flower Road 102';
-        XNoidaSector77GautamBuddaNagar: Label 'Gautam Budda Nagar';
-        X30BakerStreet: Label '30 Baker Street';
-        XFairway159: Label 'Fairway 159';
-        X10City: Label 'Delhi';
         X1StateCode: Label 'DL';
         X1GSTRegNo: Label '07ABCDE0123F1Z1';
         XGSTRegType: Enum "GST Registration Type";
         XGSTCustType: Enum "GST Customer Type";
-        X20City: Label 'Gurgaon';
         X2StateCode: Label 'HR';
-        X2GSTRegNo: Label '06QWERT0123Y1Z2';
-        XPANSTATUS: Enum "P.A.N.Status";
-        X30City: Label 'Manchester';
         X3StateCode: Label '';
         XSouthwarkBridgeRd9195: Label 'Southwark Bridge Rd, 91-95';
 
@@ -300,7 +245,7 @@ codeunit 101018 "Create Customer"
                 Customer.Validate("Payment Terms Code", X1M8D);
             1:
                 begin
-                    Customer.Validate("Customer Disc. Group", DemoDataSetup.RetailCode);
+                    Customer.Validate("Customer Disc. Group", DemoDataSetup.RetailCode());
                     Customer.Validate("Payment Terms Code", X14DAYS);
                 end;
             2:
@@ -324,12 +269,12 @@ codeunit 101018 "Create Customer"
                 Customer.Validate("Credit Limit (LCY)",
                   Round(
                     CurrencyExchangeRate.ExchangeAmtFCYToLCY(
-                      WorkDate, 'EUR', 3871.17, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'EUR')), 0.01));
+                      WorkDate(), 'EUR', 3871.17, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'EUR')), 0.01));
             '35451236':
                 Customer.Validate("Credit Limit (LCY)",
                   Round(
                     CurrencyExchangeRate.ExchangeAmtFCYToLCY(
-                      WorkDate, 'ISK', 90000, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'ISK')), 0.01));
+                      WorkDate(), 'ISK', 90000, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'ISK')), 0.01));
             '20000':
                 Customer.Validate("Application Method", 1);
             '49633663':
@@ -337,10 +282,10 @@ codeunit 101018 "Create Customer"
         end;
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
             if "Currency Code" = '' then begin
-                Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode);
+                Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode());
                 Customer.Validate("Fin. Charge Terms Code", X15DOM);
             end else begin
-                Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode);
+                Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode());
                 Customer.Validate("Fin. Charge Terms Code", X20FOR);
             end;
 
@@ -367,6 +312,12 @@ codeunit 101018 "Create Customer"
 
         Customer.Validate("Language Code", CreateLanguage.GetLanguageCode("Country Code"));
         Customer.Validate("Territory Code", CreateTerritory.GetTerritoryCode(Customer."Country/Region Code", "Territory Code"));
+
+        if (DemoDataSetup."Country/Region Code" = "Country Code") then
+            Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode())
+        else
+            Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode());
+
         Customer.Insert(true);
 
         Customer.Validate(Contact, CreateContact.FormatContact(Title, "Contact Name"));
@@ -487,8 +438,8 @@ codeunit 101018 "Create Customer"
         Customer."P.A.N. No." := PANNO;
         Customer."P.A.N. Status" := PanStatus;
         Customer."P.A.N. Reference No." := PanRefNo;
-        Customer.validate("Gen. Bus. Posting Group", GenBusPostingGroup);
-        Customer.validate("Customer Posting Group", CustomerPostingGroup);
+        Customer.Validate("Gen. Bus. Posting Group", GenBusPostingGroup);
+        Customer.Validate("Customer Posting Group", CustomerPostingGroup);
         Customer.Validate("VAT Bus. Posting Group", '');
         Customer.Modify(true);
     end;

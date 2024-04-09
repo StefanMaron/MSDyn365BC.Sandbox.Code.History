@@ -25,18 +25,16 @@ codeunit 101900 "Create Demonstration Data"
         if SourceCode.Get(XSTART) then
             Error(XThiscompalrdycontainsdata);
 
-        with DemoDataSetup do begin
-            Get();
-            PreRunLanguage := GlobalLanguage;
-            if "Data Language ID" <> PreRunLanguage then
-                GlobalLanguage("Data Language ID");
+        DemoDataSetup.Get();
+        PreRunLanguage := GlobalLanguage;
+        if DemoDataSetup."Data Language ID" <> PreRunLanguage then
+            GlobalLanguage(DemoDataSetup."Data Language ID");
 
-            File.Open("Path to Picture Folder" + 'CurrencyData.txt');
-            File.CreateInStream(IStream);
-            CurrencyDataXML.SetSource(IStream);
-            CurrencyDataXML.Import();
-            File.Close();
-        end;
+        File.Open(DemoDataSetup."Path to Picture Folder" + 'CurrencyData.txt');
+        File.CreateInStream(IStream);
+        CurrencyDataXML.SetSource(IStream);
+        CurrencyDataXML.Import();
+        File.Close();
 
         WorkDate := DemoDataSetup."Working Date";
 
@@ -55,13 +53,13 @@ codeunit 101900 "Create Demonstration Data"
             DemoDataSetup."Data Type"::Standard:
                 begin
                     SetApplicationArea('Premium');
-                    InterfaceTrialData.CreateSetupData;
+                    InterfaceTrialData.CreateSetupData();
                 end;
             DemoDataSetup."Data Type"::Evaluation:
                 begin
                     SetApplicationArea('Premium');
-                    InterfaceTrialData.CreateSetupData;
-                    InterfaceEvaluationData.CreateSetupData;
+                    InterfaceTrialData.CreateSetupData();
+                    InterfaceEvaluationData.CreateSetupData();
                 end;
             DemoDataSetup."Data Type"::Extended:
                 begin
@@ -86,7 +84,7 @@ codeunit 101900 "Create Demonstration Data"
         if DemoDataSetup."Service Management" then
             InterfaceServiceManagement.Create();
         if DemoDataSetup.Distribution then
-            InterfaceDistribution.CreateData;
+            InterfaceDistribution.CreateData();
         if DemoDataSetup.Manufacturing then
             InterfaceManufacturing.Create();
         if DemoDataSetup.ADCS then
@@ -95,13 +93,13 @@ codeunit 101900 "Create Demonstration Data"
             InterfaceReservedforfut3.Create();
         if DemoDataSetup."Reserved for future use 4" then
             InterfaceReservedforfut4.Create();
-        LocalizedCreateDemoData.CreateDataBeforeActions;
+        LocalizedCreateDemoData.CreateDataBeforeActions();
         if not DemoDataSetup."Skip sequence of actions" then
             CODEUNIT.Run(CODEUNIT::"Create Sequence of Actions");
-        LocalizedCreateDemoData.CreateDataAfterActions;
+        LocalizedCreateDemoData.CreateDataAfterActions();
 
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
-            CreateGLAccount.AddCategoriesToGLAccounts;
+            CreateGLAccount.AddCategoriesToGLAccounts();
         CODEUNIT.Run(CODEUNIT::"Categ. Generate Acc. Schedules");
         CODEUNIT.Run(CODEUNIT::"Update Acc. Sched. KPI Data");
 
@@ -109,22 +107,19 @@ codeunit 101900 "Create Demonstration Data"
             DemoDataSetup."Data Type"::Standard,
             DemoDataSetup."Data Type"::Evaluation:
                 begin
-                    CreateRapidStartPackage.InsertMiniAppData;
+                    CreateRapidStartPackage.InsertMiniAppData();
                     if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Evaluation then
-                        LocalizedCreateDemoData.CreateEvaluationData;
-#if not CLEAN21
-                    CODEUNIT.Run(CODEUNIT::"Create O365 Sales Init. Setup");
-#endif
-                    UpdateAPIData;
+                        LocalizedCreateDemoData.CreateEvaluationData();
+                    UpdateAPIData();
                     CODEUNIT.Run(CODEUNIT::"Export RapidStart Packages");
                 end;
             DemoDataSetup."Data Type"::Extended:
                 begin
                     CODEUNIT.Run(CODEUNIT::"Create Cash Flow Data");
-                    LocalizedCreateDemoData.CreateExtendedData;
+                    LocalizedCreateDemoData.CreateExtendedData();
                     ShouldCollectTableIDs := false;
                     CODEUNIT.Run(CODEUNIT::"Create RapidStart Package");
-                    UpdateAPIData;
+                    UpdateAPIData();
                     CODEUNIT.Run(CODEUNIT::"Export RapidStart Packages");
                 end;
         end;
@@ -134,7 +129,7 @@ codeunit 101900 "Create Demonstration Data"
         // Insert Data Out Of Geo. Apps
         Codeunit.Run(Codeunit::"Add Data Out Of Geo. Apps");
 
-        if ApplicationAreaMgmtFacade.IsPremiumExperienceEnabled then
+        if ApplicationAreaMgmtFacade.IsPremiumExperienceEnabled() then
             ApplicationAreaSetup.DeleteAll(true);
 
         TempCurrencyData.DeleteAll();
@@ -148,8 +143,6 @@ codeunit 101900 "Create Demonstration Data"
         DemoDataSetup: Record "Demo Data Setup";
         SourceCode: Record "Source Code";
         TempIntegerTableID: Record "Integer" temporary;
-        TaxType: Record "Tax Type";
-        DemoDataSubscriber: Codeunit "Demo Tool Subscribers";
         LocalizedCreateDemoData: Codeunit "Localized Create Demo Data";
         InterfaceBasisData: Codeunit "Interface Basis Data";
         InterfaceFinancials: Codeunit "Interface Financials";
@@ -221,7 +214,7 @@ codeunit 101900 "Create Demonstration Data"
     begin
         // Virtual table does not support ModifyAll
         FeatureKey.SetRange("Is One Way", false); // only enable features that can be disabled
-        FeatureKey.SetFilter(ID, '<>ModernPageView&<>AnalysisMode');
+        FeatureKey.SetFilter(ID, '<>PowerAutomateCopilot');
         if FeatureKey.FindSet(true) then
             repeat
                 FeatureKey.Enabled := FeatureKey.Enabled::"All Users";
@@ -305,7 +298,7 @@ codeunit 101900 "Create Demonstration Data"
            9004, // Plan
            9019, // "Default Permission Set In Plan"
            12142, // "VAT Book Entry" 
-           12144, // "GL Book Entry"           
+           12144, // "GL Book Entry"
            Database::"Demo Data File"];
 
         OnAfterIsTableIDIncludedIntoFullPack(TableID, IsTableIDExcluded);

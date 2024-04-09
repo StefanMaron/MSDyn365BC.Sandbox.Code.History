@@ -9,12 +9,10 @@ codeunit 118812 "Dist. Create Sales Header"
         CreateSalesHeader.InsertData(1, '49633663', 19030127D, '', false, '');
         CreateSalesHeader.InsertData(1, '10000', 19030118D, '', false, '');
 
-        with "Sales & Receivables Setup" do begin
-            Get();
-            "Create No. Series".InitTempSeries("Order Nos.", XSORDD1, XSalesOrderDist, 104);
-            "Order Nos." := XSORDD1;
-            Modify();
-        end;
+        "Sales & Receivables Setup".Get();
+        "Create No. Series".InitTempSeries("Sales & Receivables Setup"."Order Nos.", XSORDD1, XSalesOrderDist, 104);
+        "Sales & Receivables Setup"."Order Nos." := XSORDD1;
+        "Sales & Receivables Setup".Modify();
 
         CreateSalesHeader.InsertData(1, '10000', 19030118D, '', false, '');
         CreateSalesHeader.InsertData(1, '20000', 19030118D, '', false, '');

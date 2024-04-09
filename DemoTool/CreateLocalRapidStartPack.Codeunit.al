@@ -14,7 +14,6 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         TDSPostingSetup: Record "TDS Posting Setup";
         GSTRegNo: Record "GST Registration Nos.";
-        RefInvNo: Record "Reference Invoice No.";
     begin
         CreateTable(Database::"GST Setup");
         CreateTable(Database::"Tax Transaction Value");

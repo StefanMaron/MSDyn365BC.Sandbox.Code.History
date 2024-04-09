@@ -3,12 +3,10 @@ codeunit 101230 "Create Source Code"
 
     trigger OnRun()
     begin
-        with "Source Code" do begin
-            Init();
-            Code := XSTART;
-            Description := XOpeningEntries;
-            Insert(true);
-        end;
+        "Source Code".Init();
+        "Source Code".Code := XSTART;
+        "Source Code".Description := XOpeningEntries;
+        "Source Code".Insert(true);
         InsertData(XBANKPYMTVSourceCodeLbl, XBANKPYMTV);
         InsertData(XBANKRCPTVSourceCodeLbl, XBANKRCPTV);
         InsertData(XCASHPYMTVSourceCodeLbl, XCASHPYMTV);

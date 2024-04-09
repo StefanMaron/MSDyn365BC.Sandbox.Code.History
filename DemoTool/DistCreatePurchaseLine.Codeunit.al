@@ -2,8 +2,6 @@ codeunit 118823 "Dist. Create Purchase Line"
 {
 
     trigger OnRun()
-    var
-        DemoToolSubscriber: Codeunit "Demo Tool Subscribers";
     begin
         CreatePurchaseLine.InsertData(1, '6001', 2, '1908-S', XGREEN, 20, 0, 0, '', '', '', '', '');
         CreatePurchaseLine.InsertData(1, '6001', 2, '1906-S', XGREEN, 20, 0, 0, '', '', '', '', '');

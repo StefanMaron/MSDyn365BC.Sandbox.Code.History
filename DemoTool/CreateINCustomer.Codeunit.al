@@ -353,7 +353,7 @@ codeunit 101235 "Create IN Customer"
                 Customer.Validate("Payment Terms Code", X1M8D);
             1:
                 begin
-                    Customer.Validate("Customer Disc. Group", DemoDataSetup.RetailCode);
+                    Customer.Validate("Customer Disc. Group", DemoDataSetup.RetailCode());
                     Customer.Validate("Payment Terms Code", X14DAYS);
                 end;
             2:
@@ -377,12 +377,12 @@ codeunit 101235 "Create IN Customer"
                 Customer.Validate("Credit Limit (LCY)",
                   Round(
                     CurrencyExchangeRate.ExchangeAmtFCYToLCY(
-                      WorkDate, 'EUR', 3871.17, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'EUR')), 0.01));
+                      WorkDate(), 'EUR', 3871.17, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'EUR')), 0.01));
             '35451236':
                 Customer.Validate("Credit Limit (LCY)",
                   Round(
                     CurrencyExchangeRate.ExchangeAmtFCYToLCY(
-                      WorkDate, 'ISK', 90000, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'ISK')), 0.01));
+                      WorkDate(), 'ISK', 90000, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'ISK')), 0.01));
             '20000':
                 Customer.Validate("Application Method", 1);
             '49633663':
@@ -390,10 +390,10 @@ codeunit 101235 "Create IN Customer"
         end;
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
             if "Currency Code" = '' then begin
-                Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode);
+                Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode());
                 Customer.Validate("Fin. Charge Terms Code", X15DOM);
             end else begin
-                Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode);
+                Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode());
                 Customer.Validate("Fin. Charge Terms Code", X20FOR);
             end;
 
@@ -596,8 +596,8 @@ codeunit 101235 "Create IN Customer"
         Customer."P.A.N. No." := PANNO;
         Customer."P.A.N. Status" := PanStatus;
         Customer."P.A.N. Reference No." := PanRefNo;
-        Customer.validate("Gen. Bus. Posting Group", GenBusPostingGroup);
-        Customer.validate("Customer Posting Group", CustomerPostingGroup);
+        Customer.Validate("Gen. Bus. Posting Group", GenBusPostingGroup);
+        Customer.Validate("Customer Posting Group", CustomerPostingGroup);
         Customer.Validate("VAT Bus. Posting Group", '');
         Customer.Modify(true);
     end;

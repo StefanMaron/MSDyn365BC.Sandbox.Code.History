@@ -2,8 +2,6 @@ codeunit 101047 "Create Std. Purchase Line"
 {
 
     trigger OnRun()
-    var
-        DemoToolSubscriber: Codeunit "Demo Tool Subscribers";
     begin
         LineNo := 0;
         InsertData(XCLEANING, 1, '998110', 125, Xforadministration, XADM);

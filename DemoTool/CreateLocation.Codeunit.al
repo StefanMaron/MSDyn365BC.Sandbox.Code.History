@@ -137,14 +137,6 @@ codeunit 101014 "Create Location"
         XJackPotter: Label 'Jack Potter';
         XEleanorFaulkner: Label 'Eleanor Faulkner';
         XOscarGreenwood: Label 'Oscar Greenwood';
-        X1StateCode: Label 'HR';
-        X1GstRegNo: Label '07COMPA0007I1Z1';
-        X2StateCode: Label 'DL';
-        X2GstRegNo: Label '07COMPA0007I1Z2';
-        XDelhi: Label 'DELHI';
-        XDELHINAME: Label 'Delhi Warehouse';
-        XDelhiStateCode: Label 'DL';
-        XDelhiGstReg: Label '07APLKO4591W1ZI';
 
     procedure InsertData("Code": Code[10]; Name: Text[30]; Name2: Text[30]; Address: Text[30]; Address2: Text[30]; PostCode: Code[20]; CountryCode: Code[10]; PhoneNo: Text[30]; FaxNo: Text[30]; EMail: Text[30]; HomePage: Text[30]; Contact: Text[30]; RequirePutAway: Boolean; RequirePick: Boolean; RequireReceive: Boolean; RequireShipment: Boolean; TCAN: Code[20]; TAN: Code[20])
     begin

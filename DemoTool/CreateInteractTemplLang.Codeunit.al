@@ -72,7 +72,7 @@ codeunit 101596 "Create Interact. Templ. Lang."
     local procedure InsertAttachment(var Attachment: Record Attachment; FileExtension: Text[250])
     begin
         Attachment.Init();
-        Attachment."No." := GetNextAttachmentNo;
+        Attachment."No." := GetNextAttachmentNo();
         Attachment."File Extension" := FileExtension;
         Attachment.Insert();
     end;

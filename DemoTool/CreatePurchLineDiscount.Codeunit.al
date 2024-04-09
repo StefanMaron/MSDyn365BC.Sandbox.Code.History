@@ -1,4 +1,4 @@
-#if not CLEAN21
+#if not CLEAN23
 codeunit 101100 "Create Purch. Line Discount"
 {
     ObsoleteState = Pending;
@@ -6,8 +6,6 @@ codeunit 101100 "Create Purch. Line Discount"
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
 
     trigger OnRun()
-    var
-        DemoToolSubscriber: Codeunit "Demo Tool Subscribers";
     begin
         InsertData('1924-W', '20000', 25, 3);
         InsertData('1924-W', '20000', 50, 4);

@@ -6,7 +6,7 @@ codeunit 117562 "Add Resource"
         DemoDataSetup.Get();
         InsertData(XKatherine, XKatherineHulllc, XKATHERINEHULL, X14SidneyBoulevard, XServiceManager,
           20010101D, XHOUR, 49, 10.0, 53.9, 49.62617, 107, 20000919D, XSERVICES, CreatePostCode.Convert('GB-N12 5XY'),
-          DemoDataSetup.ServicesVATCode);
+          DemoDataSetup.ServicesVATCode());
     end;
 
     var

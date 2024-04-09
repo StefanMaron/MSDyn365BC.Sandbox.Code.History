@@ -99,7 +99,7 @@ codeunit 101800 "Create Fixed Asset"
         "Fixed Asset".Validate("FA Class Code", "FA Class Code");
         "Fixed Asset".Validate("FA Subclass Code", "FA Subclass Code");
         "Fixed Asset".Validate("FA Location Code", "FA Location Code");
-        "Fixed Asset"."Main Asset/Component" := "Main Asset/Component";
+        "Fixed Asset"."Main Asset/Component" := "FA Component Type".FromInteger("Main Asset/Component");
         "Fixed Asset"."Component of Main Asset" := "Component of Main Asset";
         "Fixed Asset".Validate("Responsible Employee", "Responsible Employee");
         "Fixed Asset".Validate("Serial No.", "Serial No.");

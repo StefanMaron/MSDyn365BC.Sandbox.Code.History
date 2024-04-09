@@ -3,26 +3,24 @@ codeunit 117028 "Create Repair Status"
 
     trigger OnRun()
     begin
-        with RepairStatus do begin
-            InsertData(XFINISHED, XServiceisfinished, "Service Order Status"::Finished, Priority::Low, false, false, false, true, false, false,
-              false, false, false, true, true, true, true, true);
-            InsertData(XINPROCESS, XServiceinprocess, "Service Order Status"::"In Process", Priority::High, false, false, true, false, false,
-              false, false, false, false, true, true, true, true, true);
-            InsertData(XINITIAL, XInitialRepairStatus, "Service Order Status"::Pending, Priority::"Medium High", true, false, false, false,
-              false, false, false, false, false, true, true, true, true, true);
-            InsertData(XPARTLYSERV, XPartlyServiced, "Service Order Status"::Pending, Priority::"Medium High", false, true, false, false, false,
-              false, false, false, false, true, true, true, true, true);
-            InsertData(XQUOTEFIN, XQuotationFinished, "Service Order Status"::"On Hold", Priority::"Medium Low", false, false, false, false,
-              false, false, false, false, true, true, true, true, true, true);
-            InsertData(XREFERRED, XReferredlc, "Service Order Status"::Pending, Priority::"Medium High", false, false, false, false, true, false,
-              false, false, false, true, true, true, true, true);
-            InsertData(XSPORDERED, XSparePartordered, "Service Order Status"::"On Hold", Priority::"Medium Low", false, false, false, false,
-              false, true, false, false, false, false, false, false, false, true);
-            InsertData(XSPRCVD, XSparepartreceived, "Service Order Status"::Pending, Priority::"Medium High", false, false, false, false, false
-              , false, true, false, false, true, true, true, true, true);
-            InsertData(XWAITCUST, XWaitingforCustomer, "Service Order Status"::"On Hold", Priority::"Medium Low", false, false, false, false,
-              false, false, false, true, false, true, true, true, true, true);
-        end;
+        InsertData(XFINISHED, XServiceisfinished, RepairStatus."Service Order Status"::Finished, RepairStatus.Priority::Low, false, false, false, true, false, false,
+          false, false, false, true, true, true, true, true);
+        InsertData(XINPROCESS, XServiceinprocess, RepairStatus."Service Order Status"::"In Process", RepairStatus.Priority::High, false, false, true, false, false,
+          false, false, false, false, true, true, true, true, true);
+        InsertData(XINITIAL, XInitialRepairStatus, RepairStatus."Service Order Status"::Pending, RepairStatus.Priority::"Medium High", true, false, false, false,
+          false, false, false, false, false, true, true, true, true, true);
+        InsertData(XPARTLYSERV, XPartlyServiced, RepairStatus."Service Order Status"::Pending, RepairStatus.Priority::"Medium High", false, true, false, false, false,
+          false, false, false, false, true, true, true, true, true);
+        InsertData(XQUOTEFIN, XQuotationFinished, RepairStatus."Service Order Status"::"On Hold", RepairStatus.Priority::"Medium Low", false, false, false, false,
+          false, false, false, false, true, true, true, true, true, true);
+        InsertData(XREFERRED, XReferredlc, RepairStatus."Service Order Status"::Pending, RepairStatus.Priority::"Medium High", false, false, false, false, true, false,
+          false, false, false, true, true, true, true, true);
+        InsertData(XSPORDERED, XSparePartordered, RepairStatus."Service Order Status"::"On Hold", RepairStatus.Priority::"Medium Low", false, false, false, false,
+          false, true, false, false, false, false, false, false, false, true);
+        InsertData(XSPRCVD, XSparepartreceived, RepairStatus."Service Order Status"::Pending, RepairStatus.Priority::"Medium High", false, false, false, false, false
+          , false, true, false, false, true, true, true, true, true);
+        InsertData(XWAITCUST, XWaitingforCustomer, RepairStatus."Service Order Status"::"On Hold", RepairStatus.Priority::"Medium Low", false, false, false, false,
+          false, false, false, true, false, true, true, true, true, true);
     end;
 
     var

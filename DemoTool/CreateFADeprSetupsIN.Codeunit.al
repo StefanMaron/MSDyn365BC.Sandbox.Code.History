@@ -107,8 +107,6 @@ codeunit 120554 "Create FA Depr. Setups IN"
     end;
 
     local procedure CreateFABlocks()
-    var
-        FixedAssetBlock: Record "Fixed Asset Block";
     begin
         InsertDataFABlock(XTANGIBLE, XBLOCK01, 'Residential buildings', 5, 0);
         InsertDataFABlock(XTANGIBLE, XBLOCK02, 'Office,Factory,Godowns,Hotels', 10, 0);

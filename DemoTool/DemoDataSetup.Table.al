@@ -2,6 +2,7 @@ table 101900 "Demo Data Setup"
 {
     DataPerCompany = false;
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -43,7 +44,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if "Company Type" <> "Company Type"::VAT then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(18; "Additional Currency Code"; Code[10])
@@ -115,7 +116,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if Financials then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(114; "Relationship Mgt."; Boolean)
@@ -124,7 +125,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if "Relationship Mgt." then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(115; "Reserved for future use 1"; Boolean)
@@ -133,7 +134,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if "Reserved for future use 1" then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(116; "Reserved for future use 2"; Boolean)
@@ -142,7 +143,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if "Reserved for future use 2" then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(117; "Service Management"; Boolean)
@@ -151,7 +152,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if "Service Management" then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(118; Distribution; Boolean)
@@ -162,7 +163,7 @@ table 101900 "Demo Data Setup"
                 if not Distribution and ADCS then
                     Error(DistributionDataErr);
 
-                CheckMiniApp;
+                CheckMiniApp();
             end;
         }
         field(119; Manufacturing; Boolean)
@@ -171,7 +172,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if Manufacturing then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(120; ADCS; Boolean)
@@ -181,7 +182,7 @@ table 101900 "Demo Data Setup"
             begin
                 if ADCS then begin
                     Distribution := true;
-                    CheckMiniApp;
+                    CheckMiniApp();
                 end;
             end;
         }
@@ -191,7 +192,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if "Reserved for future use 3" then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(123; "Reserved for future use 4"; Boolean)
@@ -200,7 +201,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if "Reserved for future use 4" then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(124; "Reserved for future use 5"; Boolean)
@@ -209,7 +210,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if "Reserved for future use 5" then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(125; "Test Demonstration Company"; Boolean)
@@ -221,7 +222,7 @@ table 101900 "Demo Data Setup"
             trigger OnValidate()
             begin
                 if "Skip sequence of actions" then
-                    CheckMiniApp;
+                    CheckMiniApp();
             end;
         }
         field(130; "Goods VAT Rate"; Decimal)

@@ -29,7 +29,6 @@ codeunit 118814 "Dist. Release Sales Documents"
         SalesHeader: Record "Sales Header";
         SalesPost: Codeunit "Sales-Post";
         ReleaseSalesDocument: Codeunit "Release Sales Document";
-        CreateSalesLine: Codeunit "Create Sales Line";
 
     procedure ReleaseSalesDoc(DocumentType: Option; DocumentNo: Code[20])
     begin

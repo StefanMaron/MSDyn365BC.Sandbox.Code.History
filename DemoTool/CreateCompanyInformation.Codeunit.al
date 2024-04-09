@@ -4,8 +4,8 @@ codeunit 101079 "Create Company Information"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        InsertData;
-        ModifyData;
+        InsertData();
+        ModifyData();
     end;
 
     var

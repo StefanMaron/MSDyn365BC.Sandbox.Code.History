@@ -623,7 +623,7 @@ report 1306 "Standard Sales - Invoice"
                     column(DocumentNo_ShipmentLine; "Document No.")
                     {
                     }
-                    column(PostingDate_ShipmentLine; Format("Posting Date"))
+                    column(PostingDate_ShipmentLine; "Posting Date")
                     {
                     }
                     column(PostingDate_ShipmentLine_Lbl; FieldCaption("Posting Date"))
@@ -639,9 +639,6 @@ report 1306 "Standard Sales - Invoice"
 
                     trigger OnPreDataItem()
                     begin
-                        if not DisplayShipmentInformation then
-                            CurrReport.Break();
-
                         SetRange("Line No.", Line."Line No.");
                     end;
                 }
@@ -865,7 +862,7 @@ report 1306 "Standard Sales - Invoice"
                     TotalVATBaseOnVATAmtLine += "VAT Base";
                     TotalVATAmountOnVATAmtLine += "VAT Amount";
 
-                    if ShowVATClause("VAT Clause Code") then begin
+                    if ShowVATClause("VAT Clause Code") and ShouldInsertVATClauseLine() then begin
                         VATClauseLine := VATAmountLine;
                         if VATClauseLine.Insert() then;
                     end;
@@ -961,7 +958,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(LineFee; "Integer")
             {
-                DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = filter(1 ..));
+                DataItemTableView = sorting(Number) order(ascending) where(Number = filter(1 ..));
                 column(LineFeeCaptionText; TempLineFeeNoteOnReportHist.ReportText)
                 {
                 }
@@ -1124,8 +1121,8 @@ report 1306 "Standard Sales - Invoice"
                 Currency: Record Currency;
                 GeneralLedgerSetup: Record "General Ledger Setup";
             begin
-                CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
-                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
+                CurrReport.Language := LanguageMgt.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := LanguageMgt.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 if not IsReportInPreviewMode() then
@@ -1359,7 +1356,7 @@ report 1306 "Standard Sales - Invoice"
         VATClause: Record "VAT Clause";
         SellToContact: Record Contact;
         BillToContact: Record Contact;
-        Language: Codeunit Language;
+        LanguageMgt: Codeunit Language;
         FormatAddr: Codeunit "Format Address";
         FormatDocument: Codeunit "Format Document";
         SegManagement: Codeunit SegManagement;
@@ -1432,10 +1429,10 @@ report 1306 "Standard Sales - Invoice"
         ChecksPayableLbl: Label 'Please make checks payable to %1', Comment = '%1 = company name';
         QuestionsLbl: Label 'Questions?';
         ThanksLbl: Label 'Thank You!';
-        JobNoLbl2: Label 'Job No.';
-        JobTaskNoLbl2: Label 'Job Task No.';
+        JobNoLbl2: Label 'Project No.';
+        JobTaskNoLbl2: Label 'Project Task No.';
         JobTaskDescription: Text[100];
-        JobTaskDescLbl: Label 'Job Task Description';
+        JobTaskDescLbl: Label 'Project Task Description';
         UnitLbl: Label 'Unit';
         VATClausesText: Text;
         QtyLbl: Label 'Qty', Comment = 'Short form of Quantity';
@@ -1500,10 +1497,8 @@ report 1306 "Standard Sales - Invoice"
     local procedure InitializeShipmentLine()
     var
         SalesShipmentHeader: Record "Sales Shipment Header";
+        SalesShipmentBuffer2: Record "Sales Shipment Buffer";
     begin
-        if not DisplayShipmentInformation then
-            exit;
-
         if Line.Type = Line.Type::" " then
             exit;
 
@@ -1515,7 +1510,14 @@ report 1306 "Standard Sales - Invoice"
 
         ShipmentLine.Reset();
         ShipmentLine.SetRange("Line No.", Line."Line No.");
-        if not ShipmentLine.IsEmpty() then begin
+        if ShipmentLine.FindFirst() then begin
+            SalesShipmentBuffer2 := ShipmentLine;
+            if not DisplayShipmentInformation then
+                if ShipmentLine.Next() = 0 then begin
+                    ShipmentLine.Get(SalesShipmentBuffer2."Document No.", SalesShipmentBuffer2."Line No.", SalesShipmentBuffer2."Entry No.");
+                    ShipmentLine.Delete();
+                    exit;
+                end;
             ShipmentLine.CalcSums(Quantity);
             if ShipmentLine.Quantity <> Line.Quantity then begin
                 ShipmentLine.DeleteAll();
@@ -1604,7 +1606,7 @@ report 1306 "Standard Sales - Invoice"
                 TempLineFeeNoteOnReportHist.Insert();
             until LineFeeNoteOnReportHist.Next() = 0
         else begin
-            LineFeeNoteOnReportHist.SetRange("Language Code", Language.GetUserLanguageCode());
+            LineFeeNoteOnReportHist.SetRange("Language Code", LanguageMgt.GetUserLanguageCode());
             if LineFeeNoteOnReportHist.FindSet() then
                 repeat
                     TempLineFeeNoteOnReportHist.Init();
@@ -1684,15 +1686,13 @@ report 1306 "Standard Sales - Invoice"
 
     local procedure FormatDocumentFields(SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
-        with SalesInvoiceHeader do begin
-            FormatDocument.SetTotalLabels(GetCurrencySymbol(), TotalText, TotalInclVATText, TotalExclVATText);
-            FormatDocument.SetSalesPerson(SalespersonPurchaser, "Salesperson Code", SalesPersonText);
-            FormatDocument.SetPaymentTerms(PaymentTerms, "Payment Terms Code", "Language Code");
-            FormatDocument.SetPaymentMethod(PaymentMethod, "Payment Method Code", "Language Code");
-            FormatDocument.SetShipmentMethod(ShipmentMethod, "Shipment Method Code", "Language Code");
+        FormatDocument.SetTotalLabels(SalesInvoiceHeader.GetCurrencySymbol(), TotalText, TotalInclVATText, TotalExclVATText);
+        FormatDocument.SetSalesPerson(SalespersonPurchaser, SalesInvoiceHeader."Salesperson Code", SalesPersonText);
+        FormatDocument.SetPaymentTerms(PaymentTerms, SalesInvoiceHeader."Payment Terms Code", SalesInvoiceHeader."Language Code");
+        FormatDocument.SetPaymentMethod(PaymentMethod, SalesInvoiceHeader."Payment Method Code", SalesInvoiceHeader."Language Code");
+        FormatDocument.SetShipmentMethod(ShipmentMethod, SalesInvoiceHeader."Shipment Method Code", SalesInvoiceHeader."Language Code");
 
-            OnAfterFormatDocumentFields(SalesInvoiceHeader);
-        end;
+        OnAfterFormatDocumentFields(SalesInvoiceHeader);
     end;
 
     local procedure GetJobTaskDescription(JobNo: Code[20]; JobTaskNo: Code[20]): Text[100]
@@ -1732,7 +1732,7 @@ report 1306 "Standard Sales - Invoice"
     begin
     end;
 
-    [IntegrationEvent(TRUE, FALSE)]
+    [IntegrationEvent(true, false)]
     local procedure OnAfterGetSalesHeader(SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
     end;
@@ -1777,6 +1777,21 @@ report 1306 "Standard Sales - Invoice"
         OnBeforeFormatLineValues(CurrLine, FormattedQuantity, FormattedUnitPrice, FormattedVATPct, FormattedLineAmount, IsHandled);
         if not IsHandled then
             FormatDocument.SetSalesInvoiceLine(CurrLine, FormattedQuantity, FormattedUnitPrice, FormattedVATPct, FormattedLineAmount);
+    end;
+
+    local procedure ShouldInsertVATClauseLine(): Boolean
+    var
+        TempVATClauseLine: Record "VAT Amount Line" temporary;
+    begin
+        if VATAmountLine."VAT Amount" <> 0 then
+            exit(true);
+
+        TempVATClauseLine.Copy(VATClauseLine, true);
+        TempVATClauseLine.SetRange("VAT Identifier", VATAmountLine."VAT Identifier");
+        TempVATClauseLine.SetRange("VAT Clause Code", VATAmountLine."VAT Clause Code");
+        TempVATClauseLine.SetRange("VAT Amount", VATAmountLine."VAT Amount");
+
+        exit(TempVATClauseLine.IsEmpty());
     end;
 
     [IntegrationEvent(false, false)]

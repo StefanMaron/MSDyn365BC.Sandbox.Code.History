@@ -44,12 +44,12 @@ codeunit 118016 "Create Transfer Order Add."
     local procedure InsertHeader(TransferFromCode: Code[20]; TransferToCode: Code[20]; InTransitCode: Code[20]; PostingDate: Date; ShipmentDate: Date; ReceiptDate: Date): Code[20]
     var
         InventorySetup: Record "Inventory Setup";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
+        NoSeries: Codeunit "No. Series";
         TransferNo: Code[20];
     begin
         InventorySetup.Get();
 
-        TransferNo := NoSeriesManagement.GetNextNo(InventorySetup."Transfer Order Nos.", 0D, true);
+        TransferNo := NoSeries.GetNextNo(InventorySetup."Transfer Order Nos.");
         TransferHeader.Init();
         TransferHeader."No." := TransferNo;
         TransferHeader."No. Series" := InventorySetup."Transfer Order Nos.";
@@ -122,7 +122,7 @@ codeunit 118016 "Create Transfer Order Add."
         TransLine: Record "Transfer Line";
     begin
         if TransLine.Get(DocumentNo, LineNo) then begin
-            TransLine.validate("Transfer Price", TransferPrice);
+            TransLine.Validate("Transfer Price", TransferPrice);
             TransLine.Modify();
         end;
     end;

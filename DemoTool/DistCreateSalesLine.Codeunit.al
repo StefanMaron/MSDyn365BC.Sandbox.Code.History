@@ -63,7 +63,6 @@ codeunit 118813 "Dist. Create Sales Line"
 
     var
         CreateSalesLine: Codeunit "Create Sales Line";
-        DemoToolSubscriber: Codeunit "Demo Tool Subscribers";
         XGREEN: Label 'GREEN';
         XBLUE: Label 'BLUE';
         XWHITE: Label 'WHITE';
