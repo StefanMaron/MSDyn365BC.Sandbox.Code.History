@@ -36,16 +36,14 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         CreateConfigWorksheet: Codeunit "Create Config. Worksheet";
     begin
-        with CreateConfigWorksheet do begin
-            CreateConfigGroup(XLocalSettingsTxt);
-            CreateConfigLine(DATABASE::"VAT Cipher Code");
-            CreateConfigLine(DATABASE::"VAT Cipher Setup");
-            CreateConfigLine(DATABASE::"Bank Directory");
-            CreateConfigLine(DATABASE::"LSV Setup");
-            CreateConfigLine(DATABASE::"LSV Journal");
-            CreateConfigLine(DATABASE::"ESR Setup");
-            CreateConfigLine(DATABASE::"DTA Setup");
-        end;
+        CreateConfigWorksheet.CreateConfigGroup(XLocalSettingsTxt);
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"VAT Cipher Code");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"VAT Cipher Setup");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Bank Directory");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"LSV Setup");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"LSV Journal");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"ESR Setup");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"DTA Setup");
     end;
 
     procedure SetFieldsAndFilters(TableID: Integer)
@@ -53,7 +51,7 @@ codeunit 101931 "Create Local RapidStart Pack"
         DemoDataSetup: Record "Demo Data Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
-        if CreateConfigPackageHelper.GetDataType <> DemoDataSetup."Data Type"::Extended then
+        if CreateConfigPackageHelper.GetDataType() <> DemoDataSetup."Data Type"::Extended then
             case TableID of
                 DATABASE::"General Ledger Setup":
                     CreateConfigPackageHelper.ValidateField(GeneralLedgerSetup.FieldNo("Adjust for Payment Disc."), false);

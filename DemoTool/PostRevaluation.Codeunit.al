@@ -5,23 +5,23 @@ codeunit 101850 "Post Revaluation"
     begin
         DemoDataSetup.Get();
         InvtAdjustment.SetProperties(false, false);
-        InvtAdjustment.MakeMultiLevelAdjmt;
+        InvtAdjustment.MakeMultiLevelAdjmt();
         Clear(InvtAdjustment);
-        FillRevalJnl;
+        FillRevalJnl();
 
         ItemJnlLine.SetRange("Journal Template Name", XREVAL);
         ItemJnlLine.SetRange("Journal Batch Name", XDEFAULT);
         if ItemJnlLine.Find('-') then
             repeat
-                DepreciateItem;
+                DepreciateItem();
             until ItemJnlLine.Next() = 0;
 
         ItemJnlPost.Run(ItemJnlLine);
         Clear(Item);
         InvtAdjustment.SetProperties(false, false);
-        InvtAdjustment.MakeMultiLevelAdjmt;
+        InvtAdjustment.MakeMultiLevelAdjmt();
         Clear(InvtAdjustment);
-        PostCostToGL;
+        PostCostToGL();
     end;
 
     var
@@ -52,7 +52,9 @@ codeunit 101850 "Post Revaluation"
 
         Item.SetRange("No.", '1900');
 
-        CalcInvtValue.InitializeRequest(DMY2Date(31, 12, DemoDataSetup."Starting Year"), '', true, 1, false, false, false, 0, true);
+        CalcInvtValue.SetParameters(
+            DMY2Date(31, 12, DemoDataSetup."Starting Year"), '', true, "Inventory Value Calc. Per"::Item,
+            false, false, false, "Inventory Value Calc. Base"::" ", true);
         CalcInvtValue.SetItemJnlLine(ItemJnlLine);
         CalcInvtValue.SetTableView(Item);
         CalcInvtValue.UseRequestPage(false);
@@ -61,11 +63,9 @@ codeunit 101850 "Post Revaluation"
 
     procedure DepreciateItem()
     begin
-        with ItemJnlLine do begin
-            CalcNewUnitCost("Inventory Value (Calculated)", "Inventory Value (Revalued)");
-            Validate("Inventory Value (Revalued)");
-            Modify();
-        end;
+        CalcNewUnitCost(ItemJnlLine."Inventory Value (Calculated)", ItemJnlLine."Inventory Value (Revalued)");
+        ItemJnlLine.Validate("Inventory Value (Revalued)");
+        ItemJnlLine.Modify();
     end;
 
     procedure CalcNewUnitCost(OldAmount: Decimal; var NewAmount: Decimal)

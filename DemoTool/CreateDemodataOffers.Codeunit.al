@@ -3,7 +3,7 @@ codeunit 161556 "Create Demodata Offers"
 
     trigger OnRun()
     begin
-        CreateSalesQuotes;
+        CreateSalesQuotes();
     end;
 
     var
@@ -128,7 +128,7 @@ codeunit 161556 "Create Demodata Offers"
         Counter := Counter + 1;
     end;
 
-    procedure CreateSalesLine(Type2: Option; No2: Code[20]; Description2: Text[50]; Quantity2: Integer; UnitPrice2: Decimal; Discount2: Decimal; QuoteVariant: Boolean)
+    procedure CreateSalesLine(Type2: Enum "Sales Line Type"; No2: Code[20]; Description2: Text[50]; Quantity2: Integer; UnitPrice2: Decimal; Discount2: Decimal; QuoteVariant: Boolean)
     begin
         Clear(SalesLine);
         SalesLine.Init();

@@ -28,57 +28,55 @@ codeunit 161550 "Create Demodata ESR"
         end;
 
         CompanyInfo.Get();
-        with ESRSetup do begin
-            Init();
-            "Bank Code" := Text11510;
-            "ESR System" := "ESR System"::ESR;
-            "Bal. Account Type" := "Bal. Account Type"::"G/L Account";
-            Validate("Bal. Account No.", '1020');
-            "ESR Filename" := 'c:\cronus.v11';
-            Validate("BESR Customer ID", '68705010000');
-            Validate("ESR Account No.", '01-13980-3');
-            "ESR Currency Code" := 'EUR';
-            "ESR Member Name 1" := Format(Text11512, -MaxStrLen("ESR Member Name 1"));
-            "ESR Member Name 2" := Format(Text11513, -MaxStrLen("ESR Member Name 2"));
-            "ESR Member Name 3" := Format(Text11514, -MaxStrLen("ESR Member Name 3"));
-            "Beneficiary Text" := Format(Text11515, -MaxStrLen("Beneficiary Text"));
+        ESRSetup.Init();
+        ESRSetup."Bank Code" := Text11510;
+        ESRSetup."ESR System" := ESRSetup."ESR System"::ESR;
+        ESRSetup."Bal. Account Type" := ESRSetup."Bal. Account Type"::"G/L Account";
+        ESRSetup.Validate("Bal. Account No.", '1020');
+        ESRSetup."ESR Filename" := 'c:\cronus.v11';
+        ESRSetup.Validate("BESR Customer ID", '68705010000');
+        ESRSetup.Validate("ESR Account No.", '01-13980-3');
+        ESRSetup."ESR Currency Code" := 'EUR';
+        ESRSetup."ESR Member Name 1" := Format(Text11512, -MaxStrLen(ESRSetup."ESR Member Name 1"));
+        ESRSetup."ESR Member Name 2" := Format(Text11513, -MaxStrLen(ESRSetup."ESR Member Name 2"));
+        ESRSetup."ESR Member Name 3" := Format(Text11514, -MaxStrLen(ESRSetup."ESR Member Name 3"));
+        ESRSetup."Beneficiary Text" := Format(Text11515, -MaxStrLen(ESRSetup."Beneficiary Text"));
 
-            Beneficiary := Format(CompanyInfo.Name, -MaxStrLen(Beneficiary));
-            "Beneficiary 2" := Format(CompanyInfo.Address, -MaxStrLen("Beneficiary 2"));
-            "Beneficiary 3" := Format(CompanyInfo."Post Code" + ' ' + CompanyInfo.City, -MaxStrLen("Beneficiary 3"));
-            "Beneficiary 4" := '';
-            "Backup Copy" := false;
+        ESRSetup.Beneficiary := Format(CompanyInfo.Name, -MaxStrLen(ESRSetup.Beneficiary));
+        ESRSetup."Beneficiary 2" := Format(CompanyInfo.Address, -MaxStrLen(ESRSetup."Beneficiary 2"));
+        ESRSetup."Beneficiary 3" := Format(CompanyInfo."Post Code" + ' ' + CompanyInfo.City, -MaxStrLen(ESRSetup."Beneficiary 3"));
+        ESRSetup."Beneficiary 4" := '';
+        ESRSetup."Backup Copy" := false;
 
-            "ESR Payment Method Code" := Format(Text11506, -MaxStrLen("ESR Payment Method Code"));
-            "ESR Main Bank" := true;
+        ESRSetup."ESR Payment Method Code" := Format(Text11506, -MaxStrLen(ESRSetup."ESR Payment Method Code"));
+        ESRSetup."ESR Main Bank" := true;
 
-            if not Insert then
-                Modify();
+        if not ESRSetup.Insert() then
+            ESRSetup.Modify();
 
-            Init();
-            "Bank Code" := Text11521;
-            "ESR System" := "ESR System"::ESR;
-            "Bal. Account Type" := "Bal. Account Type"::"G/L Account";
-            Validate("Bal. Account No.", '1010');
-            "ESR Filename" := 'c:\cronus.v11';
-            Validate("BESR Customer ID", '00000000000');
-            Validate("ESR Account No.", '60-9-9');
-            "ESR Member Name 1" := Format(CompanyInfo.Name, -MaxStrLen("ESR Member Name 1"));
-            "ESR Member Name 2" := Format(CompanyInfo.Address, -MaxStrLen("ESR Member Name 2"));
-            "ESR Member Name 3" := Format(CompanyInfo."Post Code" + ' ' + CompanyInfo.City, -MaxStrLen("ESR Member Name 3"));
-            "Beneficiary Text" := '';
-            Beneficiary := '';
-            "Beneficiary 2" := '';
-            "Beneficiary 3" := '';
-            "Beneficiary 4" := '';
-            "Backup Copy" := false;
+        ESRSetup.Init();
+        ESRSetup."Bank Code" := Text11521;
+        ESRSetup."ESR System" := ESRSetup."ESR System"::ESR;
+        ESRSetup."Bal. Account Type" := ESRSetup."Bal. Account Type"::"G/L Account";
+        ESRSetup.Validate("Bal. Account No.", '1010');
+        ESRSetup."ESR Filename" := 'c:\cronus.v11';
+        ESRSetup.Validate("BESR Customer ID", '00000000000');
+        ESRSetup.Validate("ESR Account No.", '60-9-9');
+        ESRSetup."ESR Member Name 1" := Format(CompanyInfo.Name, -MaxStrLen(ESRSetup."ESR Member Name 1"));
+        ESRSetup."ESR Member Name 2" := Format(CompanyInfo.Address, -MaxStrLen(ESRSetup."ESR Member Name 2"));
+        ESRSetup."ESR Member Name 3" := Format(CompanyInfo."Post Code" + ' ' + CompanyInfo.City, -MaxStrLen(ESRSetup."ESR Member Name 3"));
+        ESRSetup."Beneficiary Text" := '';
+        ESRSetup.Beneficiary := '';
+        ESRSetup."Beneficiary 2" := '';
+        ESRSetup."Beneficiary 3" := '';
+        ESRSetup."Beneficiary 4" := '';
+        ESRSetup."Backup Copy" := false;
 
-            "ESR Payment Method Code" := Format(Text11508, -MaxStrLen("ESR Payment Method Code"));
-            "ESR Main Bank" := false;
+        ESRSetup."ESR Payment Method Code" := Format(Text11508, -MaxStrLen(ESRSetup."ESR Payment Method Code"));
+        ESRSetup."ESR Main Bank" := false;
 
-            if not Insert then
-                Modify();
-        end;
+        if not ESRSetup.Insert() then
+            ESRSetup.Modify();
         DemoDataSetup.Get();
         d.Close();
     end;
@@ -95,10 +93,6 @@ codeunit 161550 "Create Demodata ESR"
         Text11514: Label '6301 Zug';
         Text11515: Label 'In favor:';
         Text11521: Label 'GIRO';
-        XPANDPSETUP: Label 'P&P-SETUP';
-        XSANDRJOURNAL: Label 'S&R-JOURNAL';
-        XSANDRJOURNALPOST: Label 'S&R-JOURNAL, POST';
-        XSANDRQOIRC: Label 'S&R-Q/O/I/R/C';
         ESRSetup: Record "ESR Setup";
         PaymentMethod: Record "Payment Method";
         CompanyInfo: Record "Company Information";

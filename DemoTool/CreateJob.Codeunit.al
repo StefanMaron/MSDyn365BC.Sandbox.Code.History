@@ -41,7 +41,7 @@ codeunit 101167 "Create Job"
         Job.Validate("WIP Method", WipMethod);
 
         Job.Insert();
-        Job.CopyDefaultDimensionsFromCustomer;
+        Job.CopyDefaultDimensionsFromCustomer();
     end;
 }
 

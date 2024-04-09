@@ -5,11 +5,11 @@ codeunit 161558 "Create Demodata LSV"
     begin
         d.Open(Text11509);
 
-        ClearLSVJournal;
+        ClearLSVJournal();
 
-        WriteSetup;
-        ChangeCustomerBank;
-        ModifyPaymentType;
+        WriteSetup();
+        ChangeCustomerBank();
+        ModifyPaymentType();
         d.Close();
     end;
 
@@ -39,9 +39,6 @@ codeunit 161558 "Create Demodata LSV"
         Text11537: Label 'Luzerner Kantonalbank';
         Text11538: Label 'Customer with LSV Collection';
         XNBL: Label 'NBL';
-        XSANDRSETUP: Label 'S&R-SETUP';
-        XSANDRJOURNAL: Label 'S&R-JOURNAL';
-        XSANDRJOURNALPOST: Label 'S&R-JOURNAL, POST';
         LsvSetup: Record "LSV Setup";
         CustomerBankAccount: Record "Customer Bank Account";
         PaymentMethod: Record "Payment Method";
@@ -54,84 +51,82 @@ codeunit 161558 "Create Demodata LSV"
 
     procedure WriteSetup()
     begin
-        with LsvSetup do begin
-            Init();
-            "Bank Code" := XGIRO;
-            "LSV Customer ID" := Text11512;
-            "LSV Sender ID" := Text11512;
-            "LSV Sender Clearing" := '4823';
-            "LSV Payment Method Code" := 'LSV';
-            "ESR Bank Code" := XGIRO;
-            "LSV Currency Code" := 'CHF';
-            "LSV Sender IBAN" := 'CH9300762011623852957';
-            "LSV Customer Bank Code" := 'LSV';
-            "DebitDirect Customerno." := '909700';
+        LsvSetup.Init();
+        LsvSetup."Bank Code" := XGIRO;
+        LsvSetup."LSV Customer ID" := Text11512;
+        LsvSetup."LSV Sender ID" := Text11512;
+        LsvSetup."LSV Sender Clearing" := '4823';
+        LsvSetup."LSV Payment Method Code" := 'LSV';
+        LsvSetup."ESR Bank Code" := XGIRO;
+        LsvSetup."LSV Currency Code" := 'CHF';
+        LsvSetup."LSV Sender IBAN" := 'CH9300762011623852957';
+        LsvSetup."LSV Customer Bank Code" := 'LSV';
+        LsvSetup."DebitDirect Customerno." := '909700';
 
-            "Bal. Account No." := '1020';
-            "LSV File Folder" := 'c:\';
-            "LSV Filename" := 'DTALSV';
-            Text := Text11516;
-            "Text 2" :=
-              Text11517 +
-              Text11518 +
-              Text11519;
+        LsvSetup."Bal. Account No." := '1020';
+        LsvSetup."LSV File Folder" := 'c:\';
+        LsvSetup."LSV Filename" := 'DTALSV';
+        LsvSetup.Text := Text11516;
+        LsvSetup."Text 2" :=
+          Text11517 +
+          Text11518 +
+          Text11519;
 
-            "Computer Bureau Name" := Text11520;
-            "Computer Bureau Name 2" := Text11521;
-            "Computer Bureau Address" := Text11522;
-            "Computer Bureau Post Code" := '8021';
-            "Computer Bureau City" := Text11523;
-            "Computer Bureau E-Mail" := '';
-            "Computer Bureau Home Page" := '';
-            "LSV Bank Name" := Text11524;
-            "LSV Bank Name 2" := '';
-            "LSV Bank Address" := Text11525;
-            "LSV Bank Post Code" := '6301';
-            "LSV Bank City" := Text11526;
-            "LSV Bank E-Mail" := '';
-            "LSV Bank Home Page" := '';
-            "LSV Bank Transfer Hyperlink" := 'https://gate.sic.ch';
-            if not Insert(true) then
-                Modify();
+        LsvSetup."Computer Bureau Name" := Text11520;
+        LsvSetup."Computer Bureau Name 2" := Text11521;
+        LsvSetup."Computer Bureau Address" := Text11522;
+        LsvSetup."Computer Bureau Post Code" := '8021';
+        LsvSetup."Computer Bureau City" := Text11523;
+        LsvSetup."Computer Bureau E-Mail" := '';
+        LsvSetup."Computer Bureau Home Page" := '';
+        LsvSetup."LSV Bank Name" := Text11524;
+        LsvSetup."LSV Bank Name 2" := '';
+        LsvSetup."LSV Bank Address" := Text11525;
+        LsvSetup."LSV Bank Post Code" := '6301';
+        LsvSetup."LSV Bank City" := Text11526;
+        LsvSetup."LSV Bank E-Mail" := '';
+        LsvSetup."LSV Bank Home Page" := '';
+        LsvSetup."LSV Bank Transfer Hyperlink" := 'https://gate.sic.ch';
+        if not LsvSetup.Insert(true) then
+            LsvSetup.Modify();
 
-            Init();
-            "Bank Code" := XWWBEUR;
-            "LSV Customer ID" := Text11512;
-            "LSV Sender ID" := Text11512;
-            "LSV Sender Clearing" := '423';
-            "LSV Payment Method Code" := 'LSV';
-            "ESR Bank Code" := XNBL;
-            "LSV Currency Code" := 'EUR';
-            "LSV Sender IBAN" := 'CH9300762011623852957';
-            "LSV Customer Bank Code" := 'LSV';
-            "DebitDirect Customerno." := '909700';
+        LsvSetup.Init();
+        LsvSetup."Bank Code" := XWWBEUR;
+        LsvSetup."LSV Customer ID" := Text11512;
+        LsvSetup."LSV Sender ID" := Text11512;
+        LsvSetup."LSV Sender Clearing" := '423';
+        LsvSetup."LSV Payment Method Code" := 'LSV';
+        LsvSetup."ESR Bank Code" := XNBL;
+        LsvSetup."LSV Currency Code" := 'EUR';
+        LsvSetup."LSV Sender IBAN" := 'CH9300762011623852957';
+        LsvSetup."LSV Customer Bank Code" := 'LSV';
+        LsvSetup."DebitDirect Customerno." := '909700';
 
-            "Bal. Account No." := '1020';
-            "LSV File Folder" := 'c:\';
-            "LSV Filename" := 'DTALSV';
-            Text := Text11516;
-            "Text 2" :=
-              Text11517 +
-              Text11518 +
-              Text11519;
+        LsvSetup."Bal. Account No." := '1020';
+        LsvSetup."LSV File Folder" := 'c:\';
+        LsvSetup."LSV Filename" := 'DTALSV';
+        LsvSetup.Text := Text11516;
+        LsvSetup."Text 2" :=
+          Text11517 +
+          Text11518 +
+          Text11519;
 
-            "Computer Bureau Name" := Text11520;
-            "Computer Bureau Name 2" := Text11521;
-            "Computer Bureau Address" := Text11522;
-            "Computer Bureau Post Code" := '8021';
-            "Computer Bureau City" := Text11523;
-            "Computer Bureau E-Mail" := '';
-            "Computer Bureau Home Page" := '';
-            "LSV Bank Name" := Text11524;
-            "LSV Bank Name 2" := '';
-            "LSV Bank Address" := Text11525;
-            "LSV Bank Post Code" := '6301';
-            "LSV Bank City" := Text11526;
-            "LSV Bank E-Mail" := '';
-            "LSV Bank Home Page" := '';
-            if not Insert(true) then
-                Modify();
-        end;
+        LsvSetup."Computer Bureau Name" := Text11520;
+        LsvSetup."Computer Bureau Name 2" := Text11521;
+        LsvSetup."Computer Bureau Address" := Text11522;
+        LsvSetup."Computer Bureau Post Code" := '8021';
+        LsvSetup."Computer Bureau City" := Text11523;
+        LsvSetup."Computer Bureau E-Mail" := '';
+        LsvSetup."Computer Bureau Home Page" := '';
+        LsvSetup."LSV Bank Name" := Text11524;
+        LsvSetup."LSV Bank Name 2" := '';
+        LsvSetup."LSV Bank Address" := Text11525;
+        LsvSetup."LSV Bank Post Code" := '6301';
+        LsvSetup."LSV Bank City" := Text11526;
+        LsvSetup."LSV Bank E-Mail" := '';
+        LsvSetup."LSV Bank Home Page" := '';
+        if not LsvSetup.Insert(true) then
+            LsvSetup.Modify();
     end;
 
     procedure ChangeCustomerBank()
@@ -140,72 +135,70 @@ codeunit 161558 "Create Demodata LSV"
     begin
         if BankDirectory.IsEmpty() then
             CODEUNIT.Run(CODEUNIT::"Bank Directory");
-        with CustomerBankAccount do begin
-            Init();
-            "Customer No." := '10000';
-            Code := 'LSV';
-            Name := Text11529;
-            Address := '';
-            "Post Code" := '6055';
-            City := Text11530;
-            Validate("Bank Branch No.", '81232');
-            "Bank Account No." := '34124.24';
-            Validate("Giro Account No.", '01-28302-7');
-            if not Insert then
-                Modify();
+        CustomerBankAccount.Init();
+        CustomerBankAccount."Customer No." := '10000';
+        CustomerBankAccount.Code := 'LSV';
+        CustomerBankAccount.Name := Text11529;
+        CustomerBankAccount.Address := '';
+        CustomerBankAccount."Post Code" := '6055';
+        CustomerBankAccount.City := Text11530;
+        CustomerBankAccount.Validate("Bank Branch No.", '81232');
+        CustomerBankAccount."Bank Account No." := '34124.24';
+        CustomerBankAccount.Validate("Giro Account No.", '01-28302-7');
+        if not CustomerBankAccount.Insert() then
+            CustomerBankAccount.Modify();
 
-            Init();
-            "Customer No." := '20000';
-            Code := 'LSV';
-            Name := Text11531;
-            Address := Text11532;
-            "Post Code" := '6055';
-            City := Text11530;
-            Validate("Bank Branch No.", '780');
-            "Bank Account No." := '01-30-033237-00';
-            Validate("Giro Account No.", '01-17601-2');
-            if not Insert then
-                Modify();
+        CustomerBankAccount.Init();
+        CustomerBankAccount."Customer No." := '20000';
+        CustomerBankAccount.Code := 'LSV';
+        CustomerBankAccount.Name := Text11531;
+        CustomerBankAccount.Address := Text11532;
+        CustomerBankAccount."Post Code" := '6055';
+        CustomerBankAccount.City := Text11530;
+        CustomerBankAccount.Validate("Bank Branch No.", '780');
+        CustomerBankAccount."Bank Account No." := '01-30-033237-00';
+        CustomerBankAccount.Validate("Giro Account No.", '01-17601-2');
+        if not CustomerBankAccount.Insert() then
+            CustomerBankAccount.Modify();
 
-            Init();
-            "Customer No." := '30000';
-            Code := 'LSV';
-            Name := Text11533;
-            Address := Text11534;
-            "Post Code" := '6002';
-            City := Text11535;
-            Validate("Bank Branch No.", '8411');
-            "Bank Account No." := '421-740-018.10';
-            Validate("Giro Account No.", '01-1760-2');
-            if not Insert then
-                Modify();
+        CustomerBankAccount.Init();
+        CustomerBankAccount."Customer No." := '30000';
+        CustomerBankAccount.Code := 'LSV';
+        CustomerBankAccount.Name := Text11533;
+        CustomerBankAccount.Address := Text11534;
+        CustomerBankAccount."Post Code" := '6002';
+        CustomerBankAccount.City := Text11535;
+        CustomerBankAccount.Validate("Bank Branch No.", '8411');
+        CustomerBankAccount."Bank Account No." := '421-740-018.10';
+        CustomerBankAccount.Validate("Giro Account No.", '01-1760-2');
+        if not CustomerBankAccount.Insert() then
+            CustomerBankAccount.Modify();
 
-            Init();
-            "Customer No." := '40000';
-            Code := 'LSV';
-            Name := Text11536;
-            Address := '';
-            "Post Code" := '6002';
-            City := Text11535;
-            Validate("Bank Branch No.", '8450');
-            "Bank Account No." := '4178933000506';
-            Validate("Giro Account No.", '10-1010-6');
-            if not Insert then
-                Modify();
+        CustomerBankAccount.Init();
+        CustomerBankAccount."Customer No." := '40000';
+        CustomerBankAccount.Code := 'LSV';
+        CustomerBankAccount.Name := Text11536;
+        CustomerBankAccount.Address := '';
+        CustomerBankAccount."Post Code" := '6002';
+        CustomerBankAccount.City := Text11535;
+        CustomerBankAccount.Validate("Bank Branch No.", '8450');
+        CustomerBankAccount."Bank Account No." := '4178933000506';
+        CustomerBankAccount.Validate("Giro Account No.", '10-1010-6');
+        if not CustomerBankAccount.Insert() then
+            CustomerBankAccount.Modify();
 
-            Init();
-            "Customer No." := '50000';
-            Code := 'LSV';
-            Name := Text11537;
-            Address := '';
-            "Post Code" := '6002';
-            City := Text11535;
-            Validate("Bank Branch No.", '778');
-            "Bank Account No." := '01-00-036430-00';
-            Validate("Giro Account No.", '80-70-2');
-            if not Insert then
-                Modify();
-        end;
+        CustomerBankAccount.Init();
+        CustomerBankAccount."Customer No." := '50000';
+        CustomerBankAccount.Code := 'LSV';
+        CustomerBankAccount.Name := Text11537;
+        CustomerBankAccount.Address := '';
+        CustomerBankAccount."Post Code" := '6002';
+        CustomerBankAccount.City := Text11535;
+        CustomerBankAccount.Validate("Bank Branch No.", '778');
+        CustomerBankAccount."Bank Account No." := '01-00-036430-00';
+        CustomerBankAccount.Validate("Giro Account No.", '80-70-2');
+        if not CustomerBankAccount.Insert() then
+            CustomerBankAccount.Modify();
     end;
 
     procedure ModifyPaymentType()

@@ -30,7 +30,7 @@ codeunit 101287 "Create C/V Bank Account"
           '', '', XCOM, XCommerzBank, XYvonneSchleger, XEickelscheidt67, 'DE-40593', XDE, XEUR, XDEU,
           X49210267511, X49210368024, X4835, X6000600000, '', '');
 
-        PostInsertData;
+        PostInsertData();
     end;
 
     var
@@ -106,21 +106,13 @@ codeunit 101287 "Create C/V Bank Account"
         XDEU: Label 'DEU';
         X49210267511: Label '+49 2102 67511';
         X49210368024: Label '+49 2103 68024';
-        X1000: Label '1000';
         X1000100000: Label '1000 100000';
-        X1100: Label '1100';
         X1100100000: Label '1100 100000';
-        X1200: Label '1200';
         X1200100000: Label '1200 100000';
-        X2000: Label '2000';
         X2000200000: Label '2000 200000';
-        X3000: Label '3000';
         X3000300000: Label '3000 300000';
-        X4000: Label '4000';
         X4000400000: Label '4000 400000';
-        X5000: Label '5000';
         X5000500000: Label '5000 500000';
-        X6000: Label '6000';
         X6000600000: Label '6000 600000';
         X4835: Label '4835';
         Vend33299199Txt: Label '33299199', Locked = true;

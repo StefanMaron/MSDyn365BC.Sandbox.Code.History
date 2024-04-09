@@ -18,10 +18,10 @@ codeunit 161551 "Create Demodata GlForeign Curr"
         DDTWorkingDate := DemoDataSetup."Working Date";
 
         // Start Process
-        PrepareChartOfAcc;
-        GlAccountIndent.Indent;
-        CreateGlJournal;
-        PrepareGlLine;
+        PrepareChartOfAcc();
+        GlAccountIndent.Indent();
+        CreateGlJournal();
+        PrepareGlLine();
 
         d.Close();
     end;
@@ -61,19 +61,22 @@ codeunit 161551 "Create Demodata GlForeign Curr"
         WriteChartOfAcc('1030', Text11516, Text11517);
     end;
 
-    procedure WriteChartOfAcc(_AccNo: Code[10]; _AccName: Text[30]; _Currency: Code[10])
+    procedure WriteChartOfAcc(AccNo: Code[10]; AccName: Text[30]; CurrencyCode: Code[10])
     var
         GLAccount: Record "G/L Account";
         GLAccountExist: Boolean;
     begin
-        GLAccountExist := GLAccount.Get(_AccNo);
-        GLAccount."No." := _AccNo;
-        GLAccount.Validate(Name, _AccName);
+        GLAccountExist := GLAccount.Get(AccNo);
+        GLAccount."No." := AccNo;
+        GLAccount.Validate(Name, AccName);
         GLAccount."Account Type" := GLAccount."Account Type"::Posting;
         GLAccount."Income/Balance" := GLAccount."Income/Balance"::"Balance Sheet";
         GLAccount."Direct Posting" := true;
-        // VALIDATE("Currency Code",_Currency);
-        GLAccount."Currency Code" := _Currency;
+#if not CLEAN24
+        GLAccount."Currency Code" := CurrencyCode;
+#else
+        GLAccount."Source Currency Code" := CurrencyCode;
+#endif
 
         if GLAccountExist then
             GLAccount.Modify()
@@ -83,14 +86,12 @@ codeunit 161551 "Create Demodata GlForeign Curr"
 
     procedure CreateGlJournal()
     begin
-        with GenJnlBatch do begin
-            Init();
-            "Journal Template Name" := Text11509;
-            Name := Text11510;
-            Description := Format(Text11518, -MaxStrLen(Description));
-            if not Insert then
-                Modify();
-        end;
+        GenJnlBatch.Init();
+        GenJnlBatch."Journal Template Name" := Text11509;
+        GenJnlBatch.Name := Text11510;
+        GenJnlBatch.Description := Format(Text11518, -MaxStrLen(GenJnlBatch.Description));
+        if not GenJnlBatch.Insert() then
+            GenJnlBatch.Modify();
     end;
 
     procedure PrepareGlLine()
@@ -103,7 +104,7 @@ codeunit 161551 "Create Demodata GlForeign Curr"
         WriteGlLine(DDTWorkingDate + 16, '1028', '1020', 10000, 16000, Text11521);  // 10000 USD à 1.60
         WriteGlLine(DDTWorkingDate + 18, '1028', '1020', 215.4, 350.03, Text11522);  // 215.40 USD à 1.625 = 350.025
         WriteGlLine(DDTWorkingDate + 21, '1020', '1030', -880, -220, Text11523);  //   880 DKK à 20
-        PostGlLines;
+        PostGlLines();
 
         WriteGlLine(DDTWorkingDate + 18, '1026', '1020', 1200, 1800, Text11520);  // EUR - CHF: 1200  EUR à 1.50
         WriteGlLine(DDTWorkingDate + 20, '1026', '1020', 500, 760, Text11520);  // EUR - CHF:  500 EUR à 1.52
@@ -111,46 +112,41 @@ codeunit 161551 "Create Demodata GlForeign Curr"
         WriteGlLine(DDTWorkingDate + 23, '1028', '1020', 10000, 10620, Text11521);  // USD - CHF: 10000 USD à 1.62
     end;
 
-    procedure WriteGlLine(_Date: Date; _AccountNo: Code[10]; _BalAccountNo: Code[10]; _Amount: Decimal; _AmountLCY: Decimal; _Desc: Text[50])
+    procedure WriteGlLine(PostingDate: Date; AccountNo: Code[10]; BalAccountNo: Code[10]; Amount: Decimal; AmountLCY: Decimal; Description: Text[50])
     begin
-        with GenJnlLine do begin
-            Init();
+        GenJnlLine.Init();
+        GenJnlLine."Journal Template Name" := Text11509;
+        GenJnlLine."Journal Batch Name" := Text11510;
+        LastLineNo := LastLineNo + 10000;
+        GenJnlLine."Line No." := LastLineNo;
+        if LastDocNo = '' then
+            LastDocNo := Text11525
+        else
+            LastDocNo := IncStr(LastDocNo);
+        GenJnlLine."Document No." := LastDocNo;
+        GenJnlLine."Account Type" := GenJnlLine."Account Type"::"G/L Account";
+        GenJnlLine."Bal. Account Type" := GenJnlLine."Bal. Account Type"::"G/L Account";
 
-            "Journal Template Name" := Text11509;
-            "Journal Batch Name" := Text11510;
-            LastLineNo := LastLineNo + 10000;
-            "Line No." := LastLineNo;
-            if LastDocNo = '' then
-                LastDocNo := Text11525
-            else
-                LastDocNo := IncStr(LastDocNo);
-            "Document No." := LastDocNo;
-            "Account Type" := "Account Type"::"G/L Account";
-            "Bal. Account Type" := "Bal. Account Type"::"G/L Account";
-
-            "Posting Date" := _Date;
-            Validate("Account No.", _AccountNo);
-            Validate("Bal. Account No.", _BalAccountNo);
-            Validate(Amount, _Amount);
-            Validate("Amount (LCY)", _AmountLCY);
-            Description := _Desc;
-            Insert();
-        end;
+        GenJnlLine."Posting Date" := PostingDate;
+        GenJnlLine.Validate("Account No.", AccountNo);
+        GenJnlLine.Validate("Bal. Account No.", BalAccountNo);
+        GenJnlLine.Validate(Amount, Amount);
+        GenJnlLine.Validate("Amount (LCY)", AmountLCY);
+        GenJnlLine.Description := Description;
+        GenJnlLine.Insert();
     end;
 
     procedure PostGlLines()
     begin
-        with GenJnlLine do begin
-            Reset();
-            SetRange("Journal Template Name", Text11509);
-            SetRange("Journal Batch Name", Text11510);
-            Find('-');
-            repeat
-                GenJnlPostLine.Run(GenJnlLine);
-            until Next = 0;
+        GenJnlLine.Reset();
+        GenJnlLine.SetRange("Journal Template Name", Text11509);
+        GenJnlLine.SetRange("Journal Batch Name", Text11510);
+        GenJnlLine.Find('-');
+        repeat
+            GenJnlPostLine.Run(GenJnlLine);
+        until GenJnlLine.Next() = 0;
 
-            DeleteAll();
-        end;
+        GenJnlLine.DeleteAll();
     end;
 }
 

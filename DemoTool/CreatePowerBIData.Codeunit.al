@@ -3,7 +3,7 @@ codeunit 101086 "Create PowerBI Data"
 
     trigger OnRun()
     begin
-        CreateAccSchedKpiSetup;
+        CreateAccSchedKpiSetup();
     end;
 
     local procedure CreateAccSchedKpiSetup()
@@ -20,9 +20,9 @@ codeunit 101086 "Create PowerBI Data"
         AccSchedKPIWebSrvSetup."Web Service Name" := 'powerbifinance';
         AccSchedKPIWebSrvSetup.Insert();
 
-        CreateAccSchedKpiSetupLine(MiniCreateChartDefinitions.GetCashCycleAccSchedName);
-        CreateAccSchedKpiSetupLine(MiniCreateChartDefinitions.GetIncAndExpAccSchedName);
-        CreateAccSchedKpiSetupLine(MiniCreateChartDefinitions.GetReducedTrialBalanceAccSchedName);
+        CreateAccSchedKpiSetupLine(MiniCreateChartDefinitions.GetCashCycleAccSchedName());
+        CreateAccSchedKpiSetupLine(MiniCreateChartDefinitions.GetIncAndExpAccSchedName());
+        CreateAccSchedKpiSetupLine(MiniCreateChartDefinitions.GetReducedTrialBalanceAccSchedName());
     end;
 
     local procedure CreateAccSchedKpiSetupLine(AccSchedName: Code[10])

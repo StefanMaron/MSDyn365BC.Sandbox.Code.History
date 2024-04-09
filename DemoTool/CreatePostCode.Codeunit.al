@@ -4,12 +4,11 @@ codeunit 101225 "Create Post Code"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        ImportLocalPostCodes;
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Standard then
             exit;
 
         "Post Code".DeleteAll();
-        ImportLocalPostCodes;
+        ImportLocalPostCodes();
 
         InsertData('AT-1100', XWien, '');
         InsertData('AT-1230', XWien, '');
@@ -412,12 +411,6 @@ codeunit 101225 "Create Post Code"
         XZnojmo: Label 'Znojmo';
         XBojkovice: Label 'Bojkovice';
         XOlomouch: Label 'Olomouch';
-        XSchaffhausen: Label 'Schaffhausen';
-        XLuzern: Label 'Luzern';
-        XGlattbrugg: Label 'Glattbrugg';
-        XRotkreuz: Label 'Rotkreuz';
-        XPratteln: Label 'Pratteln';
-        XImmensee: Label 'Immensee';
         XHamburg: Label 'Hamburg';
         XHamburg36: Label 'Hamburg 36';
         XDusseldorf: Label 'Dusseldorf', Comment = 'Translate';

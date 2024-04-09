@@ -2,6 +2,7 @@ table 101902 "Code Sort"
 {
     Caption = 'Code Sort';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

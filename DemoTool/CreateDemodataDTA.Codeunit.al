@@ -45,8 +45,8 @@ codeunit 161553 "Create Demodata DTA"
 
         Window.Update(1, Text11517);
 
-        UpdateDTASetup;
-        CreateVendors;
+        UpdateDTASetup();
+        CreateVendors();
 
         Window.Close();
         WorkDate(WorkDate2);
@@ -127,9 +127,6 @@ codeunit 161553 "Create Demodata DTA"
         xPABROAD: Label 'PABROAD';
         xSWIFT: Label 'SWIFT';
         xCASHOUTABR: Label 'CASHOUTABR';
-        XPANDPSETUP: Label 'P&P-SETUP';
-        XPANDPJOURNAL: Label 'P&P-JOURNAL';
-        XPANDPJOURNALPOST: Label 'P&P-JOURNAL, POST';
         DTASetup: Record "DTA Setup";
         Vendor: Record Vendor;
         VendorBankAccount: Record "Vendor Bank Account";
@@ -147,104 +144,92 @@ codeunit 161553 "Create Demodata DTA"
 
     procedure UpdateDTASetup()
     begin
-        with DTASetup do begin
-            CompanyInfo.Get();
-            DeleteAll();
+        CompanyInfo.Get();
+        DTASetup.DeleteAll();
+        // DTA Bank ZKB
+        DTASetup.Init();
+        DTASetup."Bank Code" := Text11528;
+        DTASetup."DTA/EZAG" := 0;
+        DTASetup."DTA File Folder" := 'a:\';
+        DTASetup."DTA Filename" := 'dtalsv';
+        DTASetup.Validate("DTA Customer ID", Text11531);
+        DTASetup.Validate("DTA Sender ID", Text11531);
+        DTASetup.Validate("DTA Sender Clearing", '787');
+        DTASetup."DTA Debit Acc. No." := '01-30-130264-05';
+        DTASetup."DTA Sender Name" := Format(CompanyInfo.Name, -24);
+        DTASetup."DTA Sender Address" := Format(CompanyInfo.Address, -24);
+        DTASetup."DTA Sender Post Code" := CopyStr(CompanyInfo."Post Code", 1, MaxStrLen(DTASetup."DTA Sender Post Code"));
+        DTASetup."DTA Sender City" := Format(CompanyInfo.City, -24);
 
-            // DTA Bank ZKB
-            Init();
-            "Bank Code" := Text11528;
-            "DTA/EZAG" := 0;
-            "DTA File Folder" := 'a:\';
-            "DTA Filename" := 'dtalsv';
-            Validate("DTA Customer ID", Text11531);
-            Validate("DTA Sender ID", Text11531);
-            Validate("DTA Sender Clearing", '787');
-            "DTA Debit Acc. No." := '01-30-130264-05';
-            "DTA Sender Name" := Format(CompanyInfo.Name, -24);
-            "DTA Sender Address" := Format(CompanyInfo.Address, -24);
-            "DTA Sender Post Code" := CopyStr(CompanyInfo."Post Code", 1, MaxStrLen("DTA Sender Post Code"));
-            "DTA Sender City" := Format(CompanyInfo.City, -24);
+        DTASetup."DTA Currency Code" := 'EUR';
+        DTASetup."Bal. Account No." := '1026';
+        DTASetup."Credit Limit" := 200000;
 
-            "DTA Currency Code" := 'EUR';
-            "Bal. Account No." := '1026';
-            "Credit Limit" := 200000;
+        DTASetup."DTA Bank Name" := Text11523;
+        DTASetup."DTA Bank Name 2" := '';
+        DTASetup."DTA Bank Address" := Text11532;
+        DTASetup."DTA Bank Post Code" := '6301';
+        DTASetup."DTA Bank City" := Text11522;
+        DTASetup."DTA Bank E-Mail" := '';
+        DTASetup."DTA Bank Home Page" := '';
+        if not DTASetup.Insert() then
+            DTASetup.Modify();
+        // DTA Bank CS
+        DTASetup.Init();
+        DTASetup."Bank Code" := Text11533;
+        DTASetup."DTA/EZAG" := DTASetup."DTA/EZAG"::DTA;
+        DTASetup."DTA Main Bank" := true;
+        DTASetup."DTA File Folder" := 'c:\paycom\to_sign1\';
+        DTASetup."DTA Filename" := 'dtalsv';
+        DTASetup.Validate("DTA Customer ID", Text11531);
+        DTASetup.Validate("DTA Sender ID", Text11531);
+        DTASetup.Validate("DTA Sender Clearing", '4823');
+        DTASetup."DTA Debit Acc. No." := '275.588-3';
+        DTASetup."DTA Sender Name" := Format(CompanyInfo.Name, -24);
+        DTASetup."DTA Sender Address" := Format(CompanyInfo.Address, -24);
+        DTASetup."DTA Sender Post Code" := CopyStr(CompanyInfo."Post Code", 1, MaxStrLen(DTASetup."DTA Sender Post Code"));
+        DTASetup."DTA Sender City" := Format(CompanyInfo.City, -24);
+        DTASetup."Credit Limit" := 300000;
+        DTASetup."Bal. Account No." := '1020';
 
-            "DTA Bank Name" := Text11523;
-            "DTA Bank Name 2" := '';
-            "DTA Bank Address" := Text11532;
-            "DTA Bank Post Code" := '6301';
-            "DTA Bank City" := Text11522;
-            "DTA Bank E-Mail" := '';
-            "DTA Bank Home Page" := '';
-            if not Insert then
-                Modify();
+        DTASetup."Computer Bureau Name" := Text11536;
+        DTASetup."Computer Bureau Name 2" := Text11537;
+        DTASetup."Computer Bureau Address" := Text11538;
+        DTASetup."Computer Bureau Post Code" := '8021';
+        DTASetup."Computer Bureau City" := Text11539;
+        DTASetup."Computer Bureau E-Mail" := '';
+        DTASetup."Computer Bureau Home Page" := '';
 
-            // DTA Bank CS
-            Init();
-            "Bank Code" := Text11533;
-            "DTA/EZAG" := "DTA/EZAG"::DTA;
-            "DTA Main Bank" := true;
-            "DTA File Folder" := 'c:\paycom\to_sign1\';
-            "DTA Filename" := 'dtalsv';
-            Validate("DTA Customer ID", Text11531);
-            Validate("DTA Sender ID", Text11531);
-            Validate("DTA Sender Clearing", '4823');
-            "DTA Debit Acc. No." := '275.588-3';
-            "DTA Sender Name" := Format(CompanyInfo.Name, -24);
-            "DTA Sender Address" := Format(CompanyInfo.Address, -24);
-            "DTA Sender Post Code" := CopyStr(CompanyInfo."Post Code", 1, MaxStrLen("DTA Sender Post Code"));
-            "DTA Sender City" := Format(CompanyInfo.City, -24);
-            "Credit Limit" := 300000;
-            "Bal. Account No." := '1020';
+        DTASetup."DTA Bank Name" := Text11540;
+        DTASetup."DTA Bank Name 2" := '';
+        DTASetup."DTA Bank Address" := Text11541;
+        DTASetup."DTA Bank Post Code" := '6301';
+        DTASetup."DTA Bank City" := Text11522;
+        DTASetup."DTA Bank E-Mail" := '';
+        DTASetup."DTA Bank Home Page" := '';
 
-            "Computer Bureau Name" := Text11536;
-            "Computer Bureau Name 2" := Text11537;
-            "Computer Bureau Address" := Text11538;
-            "Computer Bureau Post Code" := '8021';
-            "Computer Bureau City" := Text11539;
-            "Computer Bureau E-Mail" := '';
-            "Computer Bureau Home Page" := '';
+        if not DTASetup.Insert(true) then
+            DTASetup.Modify();
+        // EZAG Post
+        DTASetup.Init();
+        DTASetup."Bank Code" := Text11544;
+        DTASetup."DTA/EZAG" := 1;
+        DTASetup."EZAG File Folder" := 'a:\';
+        DTASetup."EZAG Filename" := 'pttcria';
+        DTASetup.Validate("EZAG Debit Account No.", '30-200017-6');
+        DTASetup.Validate("EZAG Charges Account No.", '30-200017-6');
+        DTASetup.Validate("Last EZAG Order No.", '00');
+        DTASetup.Validate("Bal. Account No.", '1010');
+        DTASetup."Credit Limit" := 0;
 
-            "DTA Bank Name" := Text11540;
-            "DTA Bank Name 2" := '';
-            "DTA Bank Address" := Text11541;
-            "DTA Bank Post Code" := '6301';
-            "DTA Bank City" := Text11522;
-            "DTA Bank E-Mail" := '';
-            "DTA Bank Home Page" := '';
+        DTASetup."EZAG Media ID" := '3572670';
+        DTASetup."Yellownet E-Mail" := '';
+        DTASetup."Yellownet Home Page" := 'www.yellownet.ch';
 
-            if not Insert(true) then
-                Modify();
+        if not DTASetup.Insert() then
+            DTASetup.Modify();
 
-            // EZAG Post
-            Init();
-            "Bank Code" := Text11544;
-            "DTA/EZAG" := 1;
-            "EZAG File Folder" := 'a:\';
-            "EZAG Filename" := 'pttcria';
-            Validate("EZAG Debit Account No.", '30-200017-6');
-            Validate("EZAG Charges Account No.", '30-200017-6');
-            Validate("Last EZAG Order No.", '00');
-            Validate("Bal. Account No.", '1010');
-            "Credit Limit" := 0;
-
-            "EZAG Media ID" := '3572670';
-            "Yellownet E-Mail" := '';
-            "Yellownet Home Page" := 'www.yellownet.ch';
-
-            if not Insert then
-                Modify();
-
-            if "EZAG Post Logo".Import('localfiles\Logo_Postfinance.bmp') = ''
-            then
-                ;
-
-            if "EZAG Bar Code".Import('localfiles\ezag_barcode.bmp') = ''
-            then
-                ;
-            Modify();
-        end;
+        DTASetup.Modify();
     end;
 
     procedure CreateVendors()
@@ -524,53 +509,49 @@ codeunit 161553 "Create Demodata DTA"
 
     procedure CreateVendor(CNo: Code[20]; CName: Text[30]; CAddress: Text[30]; CPostCode: Code[20]; CCity: Text[30]; CVendorPostingGroup: Code[20]; CVATBusPostingGroup: Code[20]; CGenBusPostingGroup: Code[20]; CPaymentTermsCode: Code[10]; CStandardBank: Code[10]; CCurrency: Code[10]; CCountry: Code[10])
     begin
-        with Vendor do begin
-            Init();
-            "No." := CNo;
-            Name := CName;
-            Address := CAddress;
-            "Post Code" := CPostCode;
-            City := CCity;
-            "Vendor Posting Group" := CVendorPostingGroup;
-            "VAT Bus. Posting Group" := CVATBusPostingGroup;
-            "Gen. Bus. Posting Group" := CGenBusPostingGroup;
-            "Payment Terms Code" := CPaymentTermsCode;
-            "Preferred Bank Account Code" := CStandardBank;
-            "Currency Code" := CCurrency;
-            "Country/Region Code" := CCountry;
+        Vendor.Init();
+        Vendor."No." := CNo;
+        Vendor.Name := CName;
+        Vendor.Address := CAddress;
+        Vendor."Post Code" := CPostCode;
+        Vendor.City := CCity;
+        Vendor."Vendor Posting Group" := CVendorPostingGroup;
+        Vendor."VAT Bus. Posting Group" := CVATBusPostingGroup;
+        Vendor."Gen. Bus. Posting Group" := CGenBusPostingGroup;
+        Vendor."Payment Terms Code" := CPaymentTermsCode;
+        Vendor."Preferred Bank Account Code" := CStandardBank;
+        Vendor."Currency Code" := CCurrency;
+        Vendor."Country/Region Code" := CCountry;
 
-            Insert(true);
-        end;
+        Vendor.Insert(true);
     end;
 
     procedure CreateVendorBank(CNo: Code[20]; CCode: Code[10]; CPaymentForm: Option ESR,"ESR+","Post Payment Domestic","Bank Payment Domestic","Cash Outpayment Order Domestic","Post Payment Abroad","Bank Payment Abroad","SWIFT Payment Abroad","Cash Outpayment Order Abroad"; CEsrType: Option " ","5/15","9/27","9/16"; CEsrAccountNo: Code[11]; CStart: Integer; CLength: Integer; CBalanceAcc: Code[20]; CClearing: Code[10]; CBankAcc: Code[20]; CGiroAcc: Code[11])
     begin
-        with VendorBankAccount do begin
-            Init();
-            "Vendor No." := CNo;
-            Code := CCode;
-            "Payment Form" := CPaymentForm;
-            "ESR Type" := CEsrType;
-            Validate("ESR Account No.", CEsrAccountNo);
-            "Invoice No. Startposition" := CStart;
-            "Invoice No. Length" := CLength;
-            Validate("Balance Account No.", CBalanceAcc);
-            Validate("Clearing No.", CClearing);
-            "Bank Account No." := CBankAcc;
-            Validate("Giro Account No.", CGiroAcc);
+        VendorBankAccount.Init();
+        VendorBankAccount."Vendor No." := CNo;
+        VendorBankAccount.Code := CCode;
+        VendorBankAccount."Payment Form" := CPaymentForm;
+        VendorBankAccount."ESR Type" := CEsrType;
+        VendorBankAccount.Validate("ESR Account No.", CEsrAccountNo);
+        VendorBankAccount."Invoice No. Startposition" := CStart;
+        VendorBankAccount."Invoice No. Length" := CLength;
+        VendorBankAccount.Validate("Balance Account No.", CBalanceAcc);
+        VendorBankAccount.Validate("Clearing No.", CClearing);
+        VendorBankAccount."Bank Account No." := CBankAcc;
+        VendorBankAccount.Validate("Giro Account No.", CGiroAcc);
 
-            case CNo of
-                '100021':
-                    begin
-                        Name := 'Bank of Boston';
-                        Address := 'Mid River Square';
-                        City := 'Boston / MA';
-                    end;
-                '100022':
-                    "SWIFT Code" := 'HIGHROOMBNK';
-            end;
-            Insert();
+        case CNo of
+            '100021':
+                begin
+                    VendorBankAccount.Name := 'Bank of Boston';
+                    VendorBankAccount.Address := 'Mid River Square';
+                    VendorBankAccount.City := 'Boston / MA';
+                end;
+            '100022':
+                VendorBankAccount."SWIFT Code" := 'HIGHROOMBNK';
         end;
+        VendorBankAccount.Insert();
     end;
 }
 

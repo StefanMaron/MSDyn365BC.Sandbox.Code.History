@@ -16,7 +16,7 @@ codeunit 130003 "Code Coverage Lab Mgt"
         CodeCoverageMgt.Start(false);
 
         GetChangelistCode.ProcessChangeList(ExpandEnvVariables(InputFilePathTxt));
-        IncludeAllCodeBase;
+        IncludeAllCodeBase();
         DumpCodeBaseLines(ExpandEnvVariables(OutputFilePathTxt));
 
         CodeCoverageMgt.Stop();
@@ -27,7 +27,7 @@ codeunit 130003 "Code Coverage Lab Mgt"
         DataStream: OutStream;
         CCDumpFile: File;
     begin
-        CodeCoverageMgt.Refresh;
+        CodeCoverageMgt.Refresh();
 
         CCDumpFile.Create(StrSubstNo(FilePath));
         CCDumpFile.CreateOutStream(DataStream);
@@ -41,7 +41,7 @@ codeunit 130003 "Code Coverage Lab Mgt"
         CodeCoverageMgt.Start(false);
 
         GetChangelistCode.ProcessGitChanges(ChangesInputFile);
-        IncludeAllCodeBase;
+        IncludeAllCodeBase();
         RestoreFromBackupFile(CoverageInputFile);
         DumpALCodeCoverage(CheckinID, OutputFile);
         DumpALCodeCoveragePerObject(CheckinID, OutputFilePerObject);
@@ -54,7 +54,7 @@ codeunit 130003 "Code Coverage Lab Mgt"
         CodeCoverageMgt.Start(false);
 
         GetChangelistCode.ProcessChangeList(ChangesInputFile);
-        IncludeAllCodeBase;
+        IncludeAllCodeBase();
         RestoreFromBackupFile(CoverageInputFile);
         DumpALCodeCoverage(CheckinID, OutputFile);
         DumpALCodeCoveragePerObject(CheckinID, OutputFilePerObject);
@@ -67,7 +67,7 @@ codeunit 130003 "Code Coverage Lab Mgt"
         DataStream: OutStream;
         CCDumpFile: File;
     begin
-        CodeCoverageMgt.Refresh;
+        CodeCoverageMgt.Refresh();
 
         CCDumpFile.Create(StrSubstNo(FilePath));
         CCDumpFile.CreateOutStream(DataStream);
@@ -84,7 +84,7 @@ codeunit 130003 "Code Coverage Lab Mgt"
         DataStream: OutStream;
         CCDumpFile: File;
     begin
-        CodeCoverageMgt.Refresh;
+        CodeCoverageMgt.Refresh();
 
         CCDumpFile.Create(StrSubstNo(FilePath));
         CCDumpFile.CreateOutStream(DataStream);

@@ -424,7 +424,7 @@ codeunit 101085 "Create Acc. Schedule Line"
         else
             CFAccSchedLine.Validate(Show, CFAccSchedLine.Show::No);
 
-        CFAccSchedLine.Modify
+        CFAccSchedLine.Modify();
     end;
 
     procedure InsertData("Schedule Name": Code[10]; "Row No.": Code[10]; Description: Text[80]; Totaling: Text[80]; "Totaling Type": Option; Dim1Totaling: Text[80]; Dim2Totaling: Text[80]; Dim3Totaling: Text[80]; Dim4Totaling: Text[80]; ShowOppositeSign: Boolean; Bold: Boolean)
@@ -452,7 +452,7 @@ codeunit 101085 "Create Acc. Schedule Line"
         "Acc. Schedule Line".Insert();
     end;
 
-    procedure InsertMiniAppData(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Option; RowType: Option; ShowOppositeSign: Boolean)
+    procedure InsertMiniAppData(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Enum "Acc. Schedule Line Totaling Type"; RowType: Option; ShowOppositeSign: Boolean)
     var
         AccScheduleLine: Record "Acc. Schedule Line";
         LineNo: Integer;
@@ -468,7 +468,7 @@ codeunit 101085 "Create Acc. Schedule Line"
         AccScheduleLine.Validate("Line No.", LineNo);
         AccScheduleLine.Validate("Row No.", RowNo);
         AccScheduleLine.Validate(Description, Description);
-        AccScheduleLine."Totaling Type" := "Acc. Schedule Line Totaling Type".FromInteger(TotalingType);
+        AccScheduleLine."Totaling Type" := TotalingType;
         AccScheduleLine.Totaling := Totaling;
         AccScheduleLine.Validate("Row Type", RowType);
         AccScheduleLine.Validate("Show Opposite Sign", ShowOppositeSign);
@@ -483,7 +483,7 @@ codeunit 101085 "Create Acc. Schedule Line"
         AccScheduleLine.Insert();
     end;
 
-    procedure InsertMiniAppDataFormula(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Option; RowType: Option; ShowOppositeSign: Boolean; HideCurrencySymbol: Boolean)
+    procedure InsertMiniAppDataFormula(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Enum "Acc. Schedule Line Totaling Type"; RowType: Option; ShowOppositeSign: Boolean; HideCurrencySymbol: Boolean)
     var
         AccScheduleLine: Record "Acc. Schedule Line";
         LineNo: Integer;
@@ -499,7 +499,7 @@ codeunit 101085 "Create Acc. Schedule Line"
         AccScheduleLine.Validate("Line No.", LineNo);
         AccScheduleLine.Validate("Row No.", RowNo);
         AccScheduleLine.Validate(Description, Description);
-        AccScheduleLine."Totaling Type" := "Acc. Schedule Line Totaling Type".FromInteger(TotalingType);
+        AccScheduleLine."Totaling Type" := TotalingType;
         AccScheduleLine.Totaling := Totaling;
         AccScheduleLine.Validate("Row Type", RowType);
         AccScheduleLine.Validate("Show Opposite Sign", ShowOppositeSign);

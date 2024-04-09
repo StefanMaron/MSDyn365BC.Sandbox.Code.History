@@ -197,21 +197,18 @@ codeunit 101030 "Create Item Translation"
         InsertData('766BC-B', 'DES', 'OLYMPIA Bürosystem');
         InsertData('766BC-C', 'DES', 'OLYMPIA Regalsystem');
 
-        with Item do begin
-            Reset();
-            // Round "Last Direct Cost" to 0.5
-            if Find('-') then
-                repeat
-                    "Last Direct Cost" := Round("Last Direct Cost", 0.5);
-
-                    // Round "Unit Price" to 1 or 10
-                    if "Unit Price" < 200 then
-                        "Unit Price" := Round("Unit Price", 1.0)
-                    else
-                        "Unit Price" := Round("Unit Price", 10.0);
-                    Modify();
-                until Next = 0;
-        end;
+        Item.Reset();
+        // Round "Last Direct Cost" to 0.5
+        if Item.Find('-') then
+            repeat
+                Item."Last Direct Cost" := Round(Item."Last Direct Cost", 0.5);
+                // Round "Unit Price" to 1 or 10
+                if Item."Unit Price" < 200 then
+                    Item."Unit Price" := Round(Item."Unit Price", 1.0)
+                else
+                    Item."Unit Price" := Round(Item."Unit Price", 10.0);
+                Item.Modify();
+            until Item.Next() = 0;
     end;
 
     var

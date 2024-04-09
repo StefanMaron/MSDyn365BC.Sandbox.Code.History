@@ -19,7 +19,6 @@ codeunit 139325 "Document Service Mock Tests"
     [Scope('OnPrem')]
     procedure DocumentService_OnPremNoSetup_NoLink()
     var
-        EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
         UserSettings: TestPage "User Settings";
     begin
         // Initialize
@@ -34,7 +33,6 @@ codeunit 139325 "Document Service Mock Tests"
     [Scope('OnPrem')]
     procedure DocumentService_OnPremSetup_ShowsLink()
     var
-        EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
         UserSettings: TestPage "User Settings";
     begin
         // Initialize
@@ -50,7 +48,6 @@ codeunit 139325 "Document Service Mock Tests"
     [Scope('OnPrem')]
     procedure DocumentService_SaasNoSetup_ShowsLink()
     var
-        EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
         UserSettings: TestPage "User Settings";
     begin
         // Initialize
@@ -65,7 +62,6 @@ codeunit 139325 "Document Service Mock Tests"
     [Scope('OnPrem')]
     procedure DocumentService_SaasSetup_ShowsLink()
     var
-        EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
         UserSettings: TestPage "User Settings";
     begin
         // Initialize
@@ -81,7 +77,6 @@ codeunit 139325 "Document Service Mock Tests"
     [Scope('OnPrem')]
     procedure DocumentService_SaasSetup_CorrectLink()
     var
-        EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
         DocumentServiceManagement: Codeunit "Document Service Management";
     begin
         // Initialize
@@ -103,7 +98,6 @@ codeunit 139325 "Document Service Mock Tests"
     [Scope('OnPrem')]
     procedure DocumentService_SaasNoSetup_CorrectLink()
     var
-        EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
         DocumentServiceManagement: Codeunit "Document Service Management";
     begin
         // Initialize
@@ -125,7 +119,6 @@ codeunit 139325 "Document Service Mock Tests"
     [Scope('OnPrem')]
     procedure DocumentService_OnPremSetup_CorrectLink()
     var
-        EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
         DocumentServiceManagement: Codeunit "Document Service Management";
     begin
         // Initialize
@@ -283,10 +276,8 @@ codeunit 139325 "Document Service Mock Tests"
 
     var
         Assert: Codeunit Assert;
-        LibraryRandom: Codeunit "Library - Random";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
-        AzureADMgt: Codeunit "Azure AD Mgt.";
         SubscriberDocumentServiceMockTests: Codeunit "Document Service Mock Tests";
         IsInitialized: Boolean;
         ForceOnPrem: Boolean;

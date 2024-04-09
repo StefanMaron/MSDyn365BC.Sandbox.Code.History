@@ -33,16 +33,13 @@ codeunit 161502 "Create CH VAT Prod.Pos.Gr."
         xDescHotel: Label 'Hotels, 3.6%';
         xDescHalbNor: Label 'Half Standard Rate';
         "VAT Product Posting Group": Record "VAT Product Posting Group";
-        XBASIC: Label 'BASIC', Comment = 'Basic is a name of Permission Set.';
 
     procedure InsertData(ActCode: Code[10]; ActDescription: Text[50])
     begin
-        with "VAT Product Posting Group" do begin
-            Init();
-            Validate(Code, ActCode);
-            Validate(Description, ActDescription);
-            if not Insert then;
-        end;
+        "VAT Product Posting Group".Init();
+        "VAT Product Posting Group".Validate(Code, ActCode);
+        "VAT Product Posting Group".Validate(Description, ActDescription);
+        if not "VAT Product Posting Group".Insert() then;
     end;
 }
 

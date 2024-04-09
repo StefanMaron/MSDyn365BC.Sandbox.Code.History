@@ -69,13 +69,13 @@ codeunit 161508 "Enhance CH Master Data"
 
         // Lagerbuchungsgruppen Bezeichnungen anf´Š¢gen
         DemoDataSetup.Get();
-        InventoryPostingGroup.Get(DemoDataSetup.ResaleCode);
+        InventoryPostingGroup.Get(DemoDataSetup.ResaleCode());
         InventoryPostingGroup.Description := xInvWVDesc;
         InventoryPostingGroup.Modify();
-        InventoryPostingGroup.Get(DemoDataSetup.FinishedCode);
+        InventoryPostingGroup.Get(DemoDataSetup.FinishedCode());
         InventoryPostingGroup.Description := xInvFertigDesc;
         InventoryPostingGroup.Modify();
-        InventoryPostingGroup.Get(DemoDataSetup.RawMatCode);
+        InventoryPostingGroup.Get(DemoDataSetup.RawMatCode());
         InventoryPostingGroup.Description := xInvRohDesc;
         InventoryPostingGroup.Modify();
 
@@ -108,9 +108,6 @@ codeunit 161508 "Enhance CH Master Data"
         xInvWVDesc: Label 'Resale';
         xInvFertigDesc: Label 'Finished Prod.';
         xInvRohDesc: Label 'Raw Materials';
-        xCompanyHead: Label 'Company Notes';
-        xWritingLink: Label 'Write New Company Note';
-        xEditingLink: Label 'Edit Company Note';
         xGenJournAllge: Label 'GENERAL';
         xGenJournBar: Label 'CASH';
         xGenJournStand: Label 'DEFAULT';

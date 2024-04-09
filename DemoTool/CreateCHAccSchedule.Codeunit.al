@@ -8,7 +8,7 @@ codeunit 161510 "Create CH Acc. Schedule"
         InsertSchemaName(xSchemaKam, Text50005);
 
         KtoSchemaZeile.Init();
-        KtoSchemaZeile.Show := 0;
+        KtoSchemaZeile.Show := KtoSchemaZeile.Show::Yes;
 
         KtoSchemaZeile.Validate("Schedule Name", xSchemaAbsatz);
         InsertSchemaZeile(10000, '', Text50001, '', 0);

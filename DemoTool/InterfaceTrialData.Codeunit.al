@@ -3,7 +3,7 @@ codeunit 122000 "Interface Trial Data"
 
     trigger OnRun()
     begin
-        CreateSetupData;
+        CreateSetupData();
     end;
 
     var
@@ -15,7 +15,6 @@ codeunit 122000 "Interface Trial Data"
         CreateSalesReceivablesS: Codeunit "Create Sales & Receivables S.";
         CreatePurchasesPayablesS: Codeunit "Create Purchases & Payables S.";
         CreateInventorySetup: Codeunit "Create Inventory Setup";
-        CreateGLAccount: Codeunit "Create G/L Account";
         CreatePaymentMethod: Codeunit "Create Payment Method";
         CreateInventoryPostingSetup: Codeunit "Create Inventory Posting Setup";
         CreateItemPostingGroup: Codeunit "Create Item Posting Group";
@@ -24,7 +23,6 @@ codeunit 122000 "Interface Trial Data"
         CreateGenJournalBatch: Codeunit "Create Gen. Journal Batch";
         CreateCashFlowData: Codeunit "Create Cash Flow Data";
         CreateCHGenPostingSetup: Codeunit "Create CH Gen. Posting Setup";
-        CreateFASubclass: Codeunit "Create FA Subclass";
         CreateFAPostingGroup: Codeunit "Create FA Posting Group";
         CreateFALocation: Codeunit "Create FA Location";
         Window: Dialog;
@@ -53,7 +51,7 @@ codeunit 122000 "Interface Trial Data"
         RunCodeunit(CODEUNIT::"Create Shipping Agent");
         RunCodeunit(CODEUNIT::"Create Shipping Agent Service");
         RunCodeunit(CODEUNIT::"Create Currency");
-        CreateFinanceChargeTerms.InsertMiniAppData;
+        CreateFinanceChargeTerms.InsertMiniAppData();
         RunCodeunit(CODEUNIT::"Create Reminder Terms");
         RunCodeunit(CODEUNIT::"Create Reminder Level");
         RunCodeunit(CODEUNIT::"Create Reminder Text");
@@ -71,48 +69,45 @@ codeunit 122000 "Interface Trial Data"
         RunCodeunit(CODEUNIT::"Create VAT Statement Name");
         RunCodeunit(CODEUNIT::"Create VAT Statement Line");
         RunCodeunit(CODEUNIT::"Create VAT Report Configs");
-        CreateGeneralLedgerSetup.InsertMiniAppData;
-        CreatePurchasesPayablesS.InsertMiniAppData;
-        CreateInventorySetup.InsertMiniAppData;
+        CreateGeneralLedgerSetup.InsertMiniAppData();
+        CreatePurchasesPayablesS.InsertMiniAppData();
+        CreateInventorySetup.InsertMiniAppData();
         RunCodeunit(CODEUNIT::"Create Jobs Setup");
         RunCodeunit(CODEUNIT::"Create Resources Setup");
-        CreateSalesReceivablesS.InsertMiniAppData;
+        CreateSalesReceivablesS.InsertMiniAppData();
         RunCodeunit(CODEUNIT::"Create CH G/L Account");
         RunCodeunit(CODEUNIT::"Create CH VAT Posting Setup");
-        CreateCHGenPostingSetup.InsertMiniAppData;
+        CreateCHGenPostingSetup.InsertMiniAppData();
         RunCodeunit(CODEUNIT::"Create Jobs Setup");
-        CreateCurrency.ModifyData;
+        CreateCurrency.ModifyData();
         RunCodeunit(CODEUNIT::"Create VAT Assisted Setup");
         RunCodeunit(CODEUNIT::"Create VAT Clause");
         RunCodeunit(CODEUNIT::"Create Cust. Posting Group");
         RunCodeunit(CODEUNIT::"Create Vendor Posting Group");
         RunCodeunit(CODEUNIT::"Create Data Exch. Column Def");
-#if not CLEAN21
-        RunCodeunit(CODEUNIT::"Create Payment Instructions");
-#endif
-        CreatePaymentMethod.InsertMiniAppData;
-        CreateCurrency.ModifyData;
+        CreatePaymentMethod.InsertMiniAppData();
+        CreateCurrency.ModifyData();
         RunCodeunit(CODEUNIT::"Create Unit of Measure Trans.");
-        CreateItemPostingGroup.InsertMiniAppData;
-        CreateInventoryPostingSetup.InsertMiniAppData;
+        CreateItemPostingGroup.InsertMiniAppData();
+        CreateInventoryPostingSetup.InsertMiniAppData();
         RunCodeunit(CODEUNIT::"Create Bank Acc. Posting Group");
-        CreateCashFlowData.InsertMiniAppData;
+        CreateCashFlowData.InsertMiniAppData();
         RunCodeunit(CODEUNIT::"Create PowerBI Data");
         RunCodeunit(CODEUNIT::"Create Media Repository");
         RunCodeunit(CODEUNIT::"Create Activity");
         RunCodeunit(CODEUNIT::"Create Activity Step");
         RunCodeunit(Codeunit::"Create Job Queue Setup");
-        CreateSalesCycle.InsertMiniAppData;
-        CreateSalesCycleStage.InsertMiniAppData;
-        CreateInteractionGroup.InsertMiniAppData;
-        CreateInteractionTemplate.InsertMiniAppData;
-        CreateInteractTemplSetup.InsertMiniAppData;
-        CreateBusinessRelation.InsertMiniAppData;
-        CreateMarketingSetup.InsertMiniAppData;
-        CreateProfileQuestHeader.InsertEvaluationData;
-        CreateProfileQuestLine.InsertEvaluationData;
-        CreateIncomingDocument.CreateIncomingDocSetup;
-        CreateTextToAccountMapping.CreateEvaluationData;
+        CreateSalesCycle.InsertMiniAppData();
+        CreateSalesCycleStage.InsertMiniAppData();
+        CreateInteractionGroup.InsertMiniAppData();
+        CreateInteractionTemplate.InsertMiniAppData();
+        CreateInteractTemplSetup.InsertMiniAppData();
+        CreateBusinessRelation.InsertMiniAppData();
+        CreateMarketingSetup.InsertMiniAppData();
+        CreateProfileQuestHeader.InsertEvaluationData();
+        CreateProfileQuestLine.InsertEvaluationData();
+        CreateIncomingDocument.CreateIncomingDocSetup();
+        CreateTextToAccountMapping.CreateEvaluationData();
         RunCodeunit(CODEUNIT::"Create Price Calculation Setup");
         RunCodeunit(Codeunit::"Create Assembly Setup");
         RunCodeunit(CODEUNIT::"Create Req. Wksh. Template");
@@ -131,32 +126,27 @@ codeunit 122000 "Interface Trial Data"
         RunCodeunit(CODEUNIT::"Create FA Recl. Jnl. Batch");
         RunCodeunit(CODEUNIT::"Create FA Ins. Jnl. Template");
         RunCodeunit(CODEUNIT::"Create FA Ins. Jnl. Batch");
-        CreateFAPostingGroup.CreateTrialData;
-        RunCodeunit(CODEUNIT::"Create FA Class");
-        CreateFASubclass.CreateTrialData;
+        CreateFAPostingGroup.CreateTrialData();
         RunCodeunit(CODEUNIT::"Create Depreciation Book");
         RunCodeunit(CODEUNIT::"Create FA Insurance Type");
         RunCodeunit(CODEUNIT::"Create FA Journal Setup");
-        CreateFALocation.CreateTrialData;
+        CreateFALocation.CreateTrialData();
 
-        CreateGenJournalTemplate.InsertMiniAppData;
-        CreateGenJournalBatch.InsertMiniAppData;
+        CreateGenJournalTemplate.InsertMiniAppData();
+        CreateGenJournalBatch.InsertMiniAppData();
         RunCodeunit(CODEUNIT::"Create Chart Definitions");
-        InsertOnlineMapSetup;
+        InsertOnlineMapSetup();
         if Currency.Get(DemoDataSetup."Currency Code") then
             Currency.Delete(true);
         RunCodeunit(CODEUNIT::"Create Custom Report Layout");
         RunCodeunit(CODEUNIT::"Create Cue Setup");
         RunCodeunit(CODEUNIT::"Create O365 HTML Templates");
-#if not CLEAN21
-        RunCodeunit(CODEUNIT::"Create O365 Social Networks");
-#endif
 #if not CLEAN22
         RunCodeunit(CODEUNIT::"Create Intrastat Demo Data");
 #endif
         RunCodeunit(CODEUNIT::"Create Tariff Number");
         RunCodeunit(CODEUNIT::"Create Transaction Type");
-        CreateItemJournalTemplate.InsertMiniAppData;
+        CreateItemJournalTemplate.InsertMiniAppData();
         RunCodeunit(CODEUNIT::"Create Excel Templates");
         RunCodeunit(Codeunit::"Create Word Templates");
         RunCodeunit(CODEUNIT::"Create Miniform Header");
@@ -166,8 +156,9 @@ codeunit 122000 "Interface Trial Data"
         RunCodeunit(CODEUNIT::"Create Named Forward Links");
         CreateICPartner.CreateICSetup();
         RunCodeunit(Codeunit::"Create IC G/L Account");
+        RunCodeunit(CODEUNIT::"Create Reminder Communication");
 
-        FinalizeSetup;
+        FinalizeSetup();
 
         Window.Close();
     end;

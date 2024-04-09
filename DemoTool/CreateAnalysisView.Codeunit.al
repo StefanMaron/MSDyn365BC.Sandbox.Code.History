@@ -60,7 +60,7 @@ codeunit 101345 "Create Analysis View"
         XGLCODE: Label 'GEN_LEDGER', Comment = 'General Ledger is a name of Analysis View Code.';
         XGLNAME: Label 'General Ledger';
 
-    procedure InsertAnalysisView("Code": Code[10]; Name: Text[50]; UpdateOnPosting: Boolean; AccFilter: Code[250]; StartDate: Date; DateCompr: Option "None",Day,Week,Month,Quarter,Year,Period; IncludeBudget: Boolean; Dim1Code: Code[20]; Dim2Code: Code[20]; Dim3Code: Code[20]; Dim4Code: Code[20]; AccountSource: Integer)
+    procedure InsertAnalysisView("Code": Code[10]; Name: Text[50]; UpdateOnPosting: Boolean; AccFilter: Code[250]; StartDate: Date; DateCompr: Option "None",Day,Week,Month,Quarter,Year,Period; IncludeBudget: Boolean; Dim1Code: Code[20]; Dim2Code: Code[20]; Dim3Code: Code[20]; Dim4Code: Code[20]; AccountSource: Enum "Analysis Account Source")
     var
         AnalysisView: Record "Analysis View";
     begin
@@ -79,7 +79,6 @@ codeunit 101345 "Create Analysis View"
         AnalysisView.Validate("Dimension 3 Code", Dim3Code);
         AnalysisView.Validate("Dimension 4 Code", Dim4Code);
         AnalysisView.Modify();
-
         if AnalysisView.Code = XCAMPAIGN then begin
             AnalysisView.Validate("Account Filter", '3..3999');
             AnalysisView.Modify();

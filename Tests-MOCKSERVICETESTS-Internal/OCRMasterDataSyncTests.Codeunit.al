@@ -27,11 +27,11 @@ codeunit 135098 "OCR Master Data Sync Tests"
 
         // verify
         CheckJobQueueEntry(false);
-        EnableService;
+        EnableService();
         CheckJobQueueEntry(true);
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -44,11 +44,11 @@ codeunit 135098 "OCR Master Data Sync Tests"
 
         // verify
         CheckJobQueueEntry(true);
-        DisableService;
+        DisableService();
         CheckJobQueueEntry(false);
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -61,11 +61,11 @@ codeunit 135098 "OCR Master Data Sync Tests"
 
         // verify
         CheckJobQueueEntry(false);
-        EnableMasterDataSync;
+        EnableMasterDataSync();
         CheckJobQueueEntry(true);
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -78,11 +78,11 @@ codeunit 135098 "OCR Master Data Sync Tests"
 
         // verify
         CheckJobQueueEntry(true);
-        DisableMasterDataSync;
+        DisableMasterDataSync();
         CheckJobQueueEntry(false);
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -102,7 +102,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
 
         // cleanup
         DeleteVendor(Vendor);
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -115,7 +115,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         // initialize
         Initialize(true, true, false);
         CreateVendor(Vendor);
-        DeleteJobQueueEntry;
+        DeleteJobQueueEntry();
 
         // verify
         CheckJobQueueEntry(false);
@@ -124,7 +124,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
 
         // cleanup
         DeleteVendor(Vendor);
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -137,7 +137,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         // initialize
         Initialize(true, true, false);
         CreateVendor(Vendor);
-        DeleteJobQueueEntry;
+        DeleteJobQueueEntry();
 
         // verify
         CheckJobQueueEntry(false);
@@ -145,7 +145,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         CheckJobQueueEntry(true);
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -159,7 +159,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         // initialize
         Initialize(true, true, false);
         CreateVendor(Vendor);
-        DeleteJobQueueEntry;
+        DeleteJobQueueEntry();
 
         // verify
         CheckJobQueueEntry(false);
@@ -169,7 +169,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         // cleanup
         DeleteVendorBankAccount(VendorBankAccount);
         DeleteVendor(Vendor);
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -184,7 +184,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         Initialize(true, true, false);
         CreateVendor(Vendor);
         CreateVendorBankAccount(VendorBankAccount, Vendor."No.");
-        DeleteJobQueueEntry;
+        DeleteJobQueueEntry();
 
         // verify
         CheckJobQueueEntry(false);
@@ -194,7 +194,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         // cleanup
         DeleteVendorBankAccount(VendorBankAccount);
         DeleteVendor(Vendor);
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -209,7 +209,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         Initialize(true, true, false);
         CreateVendor(Vendor);
         CreateVendorBankAccount(VendorBankAccount, Vendor."No.");
-        DeleteJobQueueEntry;
+        DeleteJobQueueEntry();
 
         // verify
         CheckJobQueueEntry(false);
@@ -218,7 +218,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
 
         // cleanup
         DeleteVendor(Vendor);
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -232,17 +232,17 @@ codeunit 135098 "OCR Master Data Sync Tests"
         // initialize
         Initialize(true, true, false);
         CreateVendor(Vendor);
-        DeleteJobQueueEntry;
-        OCRMasterDataSyncEvents.EnableValidation;
+        DeleteJobQueueEntry();
+        OCRMasterDataSyncEvents.EnableValidation();
         OCRMasterDataSyncEvents.EnqueueVariable(StrSubstNo('<SupplierNumber>%1</SupplierNumber>', Vendor."No."));
         OCRMasterDataSyncEvents.EnqueueVariable('');
 
         // verify
         Assert.IsTrue(ReadSoftOCRMasterDataSync.SyncMasterData(false, true), 'Expecting sync success.');
-        OCRMasterDataSyncEvents.AssertEmptyQueue;
+        OCRMasterDataSyncEvents.AssertEmptyQueue();
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -263,8 +263,8 @@ codeunit 135098 "OCR Master Data Sync Tests"
         CreateVendor(Vendor);
         CreateVendorBankAccount(VendorBankAccount, Vendor."No.");
         ModifyVendorBankAccountNumber(VendorBankAccount);
-        DeleteJobQueueEntry;
-        OCRMasterDataSyncEvents.EnableValidation;
+        DeleteJobQueueEntry();
+        OCRMasterDataSyncEvents.EnableValidation();
         OCRMasterDataSyncEvents.EnqueueVariable(StrSubstNo('<SupplierNumber>%1</SupplierNumber>', Vendor."No."));
         OCRMasterDataSyncEvents.EnqueueVariable(StrSubstNo(
             '<BankNumber>%1</BankNumber><AccountNumber>%2</AccountNumber>',
@@ -272,10 +272,10 @@ codeunit 135098 "OCR Master Data Sync Tests"
 
         // verify
         Assert.IsTrue(ReadSoftOCRMasterDataSync.SyncMasterData(false, true), 'Expecting sync success.');
-        OCRMasterDataSyncEvents.AssertEmptyQueue;
+        OCRMasterDataSyncEvents.AssertEmptyQueue();
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -296,8 +296,8 @@ codeunit 135098 "OCR Master Data Sync Tests"
         CreateVendor(Vendor);
         CreateVendorBankAccount(VendorBankAccount, Vendor."No.");
         ModifyVendorBankESRAccountNumber(VendorBankAccount);
-        DeleteJobQueueEntry;
-        OCRMasterDataSyncEvents.EnableValidation;
+        DeleteJobQueueEntry();
+        OCRMasterDataSyncEvents.EnableValidation();
         OCRMasterDataSyncEvents.EnqueueVariable(StrSubstNo('<SupplierNumber>%1</SupplierNumber>', Vendor."No."));
         OCRMasterDataSyncEvents.EnqueueVariable(StrSubstNo(
             '<BankNumber>%1</BankNumber><AccountNumber>%2</AccountNumber>',
@@ -305,10 +305,10 @@ codeunit 135098 "OCR Master Data Sync Tests"
 
         // verify
         Assert.IsTrue(ReadSoftOCRMasterDataSync.SyncMasterData(false, true), 'Expecting sync success.');
-        OCRMasterDataSyncEvents.AssertEmptyQueue;
+        OCRMasterDataSyncEvents.AssertEmptyQueue();
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -330,8 +330,8 @@ codeunit 135098 "OCR Master Data Sync Tests"
         CreateVendorBankAccount(VendorBankAccount, Vendor."No.");
         ModifyVendorBankAccountSWIFT(VendorBankAccount);
         ModifyVendorBankAccountIBAN(VendorBankAccount);
-        DeleteJobQueueEntry;
-        OCRMasterDataSyncEvents.EnableValidation;
+        DeleteJobQueueEntry();
+        OCRMasterDataSyncEvents.EnableValidation();
         OCRMasterDataSyncEvents.EnqueueVariable(StrSubstNo('<SupplierNumber>%1</SupplierNumber>', Vendor."No."));
         OCRMasterDataSyncEvents.EnqueueVariable(StrSubstNo(
             '<BankNumberType>bic</BankNumberType><BankNumber>%1</BankNumber>' +
@@ -340,10 +340,10 @@ codeunit 135098 "OCR Master Data Sync Tests"
 
         // verify
         Assert.IsTrue(ReadSoftOCRMasterDataSync.SyncMasterData(false, true), 'Expecting sync success.');
-        OCRMasterDataSyncEvents.AssertEmptyQueue;
+        OCRMasterDataSyncEvents.AssertEmptyQueue();
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -404,7 +404,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         CheckLastSyncTimeDiffers(TestSyncTime);
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -443,7 +443,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         CheckLastSyncTimeEquals(TestSyncTime);
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     [Test]
@@ -462,17 +462,17 @@ codeunit 135098 "OCR Master Data Sync Tests"
         CheckJobQueueEntryCount(1);
 
         // cleanup
-        DeleteSetup;
+        DeleteSetup();
     end;
 
     local procedure Initialize(ServiceEnabled: Boolean; SyncEnabled: Boolean; DeleteSyncJob: Boolean)
     var
         OCRServiceSetup: Record "OCR Service Setup";
     begin
-        DisableTask;
+        DisableTask();
         OCRMasterDataSyncEvents.SetPortionSize(0);
-        OCRMasterDataSyncEvents.DisableValidation;
-        OCRMasterDataSyncEvents.ClearQueue;
+        OCRMasterDataSyncEvents.DisableValidation();
+        OCRMasterDataSyncEvents.ClearQueue();
 
         if OCRServiceSetup.Get() then
             OCRServiceSetup.Delete(true);
@@ -492,7 +492,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
         OCRServiceSetup.Modify();
 
         if DeleteSyncJob then
-            DeleteJobQueueEntry;
+            DeleteJobQueueEntry();
     end;
 
     local procedure DisableTask()
@@ -657,9 +657,9 @@ codeunit 135098 "OCR Master Data Sync Tests"
     begin
         GetJobQueueEntry(JobQueueEntry);
         if Exists then
-            Assert.IsTrue(JobQueueEntry.FindFirst, 'Sync Job is not created.')
+            Assert.IsTrue(JobQueueEntry.FindFirst(), 'Sync Job is not created.')
         else
-            Assert.IsFalse(JobQueueEntry.FindFirst, 'Sync Job is not deleted.')
+            Assert.IsFalse(JobQueueEntry.FindFirst(), 'Sync Job is not deleted.')
     end;
 
     local procedure CheckJobQueueEntryCount(ExpectedCount: Integer)

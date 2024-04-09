@@ -3,17 +3,14 @@ codeunit 117014 "Create Loaner"
 
     trigger OnRun()
     begin
-        with Loaner do begin
-            InsertData(XL00001, XMonitor, '', XPCS, '', false, XSMdashLOANER, 'A3452');
-            InsertData(XL00002, XMonitor, '', XPCS, '', false, XSMdashLOANER, '12365');
-            InsertData(XL00003, XServerdashTeamwearPackage, '', XPCS, '8920-W', false, XSMdashLOANER, 'AB-123');
-            InsertData(XL00004, XServerdashTeamwearPackage, '', XPCS, '8920-W', false, XSMdashLOANER, 'AC-256');
-            InsertData(XL00005, XATHENSspaceDesk, '', XPCS, '1896-S', false, XSMdashLOANER, 'CG-123');
-        end;
+        InsertData(XL00001, XMonitor, '', XPCS, '', false, XSMdashLOANER, 'A3452');
+        InsertData(XL00002, XMonitor, '', XPCS, '', false, XSMdashLOANER, '12365');
+        InsertData(XL00003, XServerdashTeamwearPackage, '', XPCS, '8920-W', false, XSMdashLOANER, 'AB-123');
+        InsertData(XL00004, XServerdashTeamwearPackage, '', XPCS, '8920-W', false, XSMdashLOANER, 'AC-256');
+        InsertData(XL00005, XATHENSspaceDesk, '', XPCS, '1896-S', false, XSMdashLOANER, 'CG-123');
     end;
 
     var
-        Loaner: Record Loaner;
         XL00001: Label 'L00001';
         XL00002: Label 'L00002';
         XL00003: Label 'L00003';

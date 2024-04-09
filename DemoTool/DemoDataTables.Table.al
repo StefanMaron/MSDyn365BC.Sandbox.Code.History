@@ -2,6 +2,7 @@ table 101906 "Demo Data Tables"
 {
     Caption = 'Demo Data Tables';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

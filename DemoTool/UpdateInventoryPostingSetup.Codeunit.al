@@ -3,15 +3,13 @@ codeunit 118013 "Update Inventory Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, FinishedCode, '1260', '1261');
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, RawMatCode, '1210', '1211');
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, ResaleCode, '1200', '1201');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, FinishedCode, '1260', '1261');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, RawMatCode, '1210', '1211');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, ResaleCode, '1200', '1201');
-        end;
+        DemoDataSetup.Get();
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.FinishedCode(), '1260', '1261');
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.RawMatCode(), '1210', '1211');
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.ResaleCode(), '1200', '1201');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.FinishedCode(), '1260', '1261');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.RawMatCode(), '1210', '1211');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.ResaleCode(), '1200', '1201');
     end;
 
     var
@@ -22,11 +20,9 @@ codeunit 118013 "Update Inventory Posting Setup"
 
     procedure CreateEvaluationData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, ResaleCode, '1200', '1201');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, ResaleCode, '1200', '1201');
-        end;
+        DemoDataSetup.Get();
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.ResaleCode(), '1200', '1201');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.ResaleCode(), '1200', '1201');
     end;
 }
 

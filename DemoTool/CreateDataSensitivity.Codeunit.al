@@ -5,7 +5,7 @@ codeunit 101750 "Create Data Sensitivity"
     var
         DataClassificationEvalData: Codeunit "Data Classification Eval. Data";
     begin
-        DataClassificationEvalData.CreateEvaluationData;
+        DataClassificationEvalData.CreateEvaluationData();
     end;
 }
 

@@ -40,7 +40,7 @@ codeunit 101322 "Create Tax Details"
             InsertData(XILCOOK, '', 0, 19010101D, 0, 1, 0, false);
             InsertData(XILCOOK, XNONTAXABLETok, 0, 19010101D, 0, 0, 0, false);
 
-            InsertLocalData;
+            InsertLocalData();
         end;
     end;
 

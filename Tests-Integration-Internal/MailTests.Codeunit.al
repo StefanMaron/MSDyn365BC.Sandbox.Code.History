@@ -13,14 +13,12 @@ codeunit 139013 "Mail Tests"
         Assert: Codeunit Assert;
         LibraryRandom: Codeunit "Library - Random";
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
-        LibraryUtility: Codeunit "Library - Utility";
         ActiveDirectoryMockEvents: Codeunit "Active Directory Mock Events";
         [RunOnClient]
         OutlookMessageMock: DotNet OutlookMessageMock;
         [RunOnClient]
         OutlookMessageFactoryMock: DotNet OutlookMessageFactoryMock;
         Initialized: Boolean;
-        LongPasswordErr: Label 'Long password was set or get incorrect.';
 
     [Test]
     [Scope('OnPrem')]
@@ -122,7 +120,7 @@ codeunit 139013 "Mail Tests"
         if not CommunicationMethod.Get() then begin
             CommunicationMethod.Init();
             CommunicationMethod."E-Mail" := EMail;
-            CommunicationMethod.Insert
+            CommunicationMethod.Insert();
         end else
             EMail := CommunicationMethod."E-Mail";
 
@@ -258,7 +256,7 @@ codeunit 139013 "Mail Tests"
         Initialize();
 
         if not Contact.FindFirst() then
-            CreateDefaultContact;
+            CreateDefaultContact();
 
         with ContactAltAddress do begin
             SetRange("Contact No.", Contact."No.");
@@ -306,7 +304,7 @@ codeunit 139013 "Mail Tests"
         Contact.SetRange(Type, Contact.Type::Person);
         Contact.SetFilter("Company No.", '<>""');
         if not Contact.FindFirst() then
-            CreateDefaultContact;
+            CreateDefaultContact();
 
         // Ensure contact has different address from company
         Contact."E-Mail" := 'thisisaspecialemail@somewherespecial.local';
@@ -442,7 +440,7 @@ codeunit 139013 "Mail Tests"
         Mail.CollectCurrentUserEmailAddresses(TempNameValueBuffer);
         Assert.AreEqual(OriginalCount + 1, TempNameValueBuffer.Count, 'Expected 1 email addresses to be added');
     end;
-    
+
     local procedure CreateDefaultContact()
     var
         Contact: Record Contact;
@@ -473,11 +471,11 @@ codeunit 139013 "Mail Tests"
     var
         OutlookMessageFactory: Codeunit "Outlook Message Factory";
     begin
-        BindActiveDirectoryMockEvents;
+        BindActiveDirectoryMockEvents();
         if Initialized then
             exit;
         Initialized := true;
-        OutlookMessageFactoryMock := OutlookMessageFactoryMock.OutlookMessageFactoryMock;
+        OutlookMessageFactoryMock := OutlookMessageFactoryMock.OutlookMessageFactoryMock();
         OutlookMessageFactory.SetOutlookMessageFactory(OutlookMessageFactoryMock);
     end;
 
@@ -495,10 +493,10 @@ codeunit 139013 "Mail Tests"
 
     local procedure BindActiveDirectoryMockEvents()
     begin
-        if ActiveDirectoryMockEvents.Enabled then
+        if ActiveDirectoryMockEvents.Enabled() then
             exit;
         BindSubscription(ActiveDirectoryMockEvents);
-        ActiveDirectoryMockEvents.Enable;
+        ActiveDirectoryMockEvents.Enable();
     end;
 }
 

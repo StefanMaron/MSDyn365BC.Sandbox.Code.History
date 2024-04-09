@@ -371,8 +371,8 @@ codeunit 161505 "Create CH G/L Account"
         InsertRec('9000', K9000, 1, 0, '', '', '');
         InsertRec('9100', K9100, 1, 0, '', '', '');
 
-        GLAccIndent.Indent;
-        AddCategoriesToGLAccounts;
+        GLAccIndent.Indent();
+        AddCategoriesToGLAccounts();
     end;
 
     var
@@ -871,85 +871,85 @@ codeunit 161505 "Create CH G/L Account"
         GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
     begin
         case GLAccountCategory.Description of
-            GLAccountCategoryMgt.GetCurrentAssets: // 2
+            GLAccountCategoryMgt.GetCurrentAssets():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '10', '10');
                     UpdateGLAccounts(GLAccountCategory, '1399', '1399');
                 end;
-            GLAccountCategoryMgt.GetCash: // 3
+            GLAccountCategoryMgt.GetCash():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '100', '100');
                     UpdateGLAccounts(GLAccountCategory, '1000', '1099');
                 end;
-            GLAccountCategoryMgt.GetAR: // 4
+            GLAccountCategoryMgt.GetAR():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '110', '120');
                     UpdateGLAccounts(GLAccountCategory, '1100', '1199');
                 end;
-            GLAccountCategoryMgt.GetPrepaidExpenses: // 5
+            GLAccountCategoryMgt.GetPrepaidExpenses():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '130', '130');
                     UpdateGLAccounts(GLAccountCategory, '1300', '1398');
                 end;
-            GLAccountCategoryMgt.GetInventory: // 6
+            GLAccountCategoryMgt.GetInventory():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '120', '120');
                     UpdateGLAccounts(GLAccountCategory, '1200', '1299');
                 end;
-            GLAccountCategoryMgt.GetEquipment: // 8
+            GLAccountCategoryMgt.GetEquipment():
                 ;
-            GLAccountCategoryMgt.GetAccumDeprec: // 9
+            GLAccountCategoryMgt.GetAccumDeprec():
                 ;
-            GLAccountCategoryMgt.GetCurrentLiabilities: // 11
+            GLAccountCategoryMgt.GetCurrentLiabilities():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '20', '20');
                     UpdateGLAccounts(GLAccountCategory, '200', '230');
                     UpdateGLAccounts(GLAccountCategory, '1757', '1798');
                     UpdateGLAccounts(GLAccountCategory, '2000', '2399');
                 end;
-            GLAccountCategoryMgt.GetPayrollLiabilities: // 12
+            GLAccountCategoryMgt.GetPayrollLiabilities():
                 UpdateGLAccounts(GLAccountCategory, '1739', '1756');
-            GLAccountCategoryMgt.GetLongTermLiabilities: // 13
+            GLAccountCategoryMgt.GetLongTermLiabilities():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '24', '24');
                     UpdateGLAccounts(GLAccountCategory, '240', '260');
                     UpdateGLAccounts(GLAccountCategory, '2400', '2799');
                 end;
-            GLAccountCategoryMgt.GetCommonStock: // 15
+            GLAccountCategoryMgt.GetCommonStock():
                 UpdateGLAccounts(GLAccountCategory, '0790', '0844');
-            GLAccountCategoryMgt.GetRetEarnings: // 16
+            GLAccountCategoryMgt.GetRetEarnings():
                 UpdateGLAccounts(GLAccountCategory, '0845', '0869');
-            GLAccountCategoryMgt.GetDistrToShareholders: // 17
+            GLAccountCategoryMgt.GetDistrToShareholders():
                 UpdateGLAccounts(GLAccountCategory, '0871', '0948');
-            GLAccountCategoryMgt.GetIncomeService: // 19
+            GLAccountCategoryMgt.GetIncomeService():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '34', '34');
                     UpdateGLAccounts(GLAccountCategory, '3400', '3490');
                 end;
-            GLAccountCategoryMgt.GetIncomeProdSales: //20
+            GLAccountCategoryMgt.GetIncomeProdSales():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '3', '3');
                     UpdateGLAccounts(GLAccountCategory, '30', '32');
                     UpdateGLAccounts(GLAccountCategory, '2999', '3281');
                 end;
-            GLAccountCategoryMgt.GetIncomeSalesDiscounts: // 22
+            GLAccountCategoryMgt.GetIncomeSalesDiscounts():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '39', '39');
                     UpdateGLAccounts(GLAccountCategory, '3900', '3999');
                 end;
-            GLAccountCategoryMgt.GetIncomeSalesReturns: // 23
+            GLAccountCategoryMgt.GetIncomeSalesReturns():
                 ;
-            GLAccountCategoryMgt.GetIncomeInterest: // 24
+            GLAccountCategoryMgt.GetIncomeInterest():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '68', '68');
                     UpdateGLAccounts(GLAccountCategory, '680', '685');
                     UpdateGLAccounts(GLAccountCategory, '6800', '6899');
                 end;
-            GLAccountCategoryMgt.GetJobSalesContra: //25
+            GLAccountCategoryMgt.GetJobSalesContra():
                 UpdateGLAccounts(GLAccountCategory, '8450', '8460');
-            GLAccountCategoryMgt.GetCOGSLabor: // 27
+            GLAccountCategoryMgt.GetCOGSLabor():
                 UpdateGLAccounts(GLAccountCategory, '7705', '7795');
-            GLAccountCategoryMgt.GetCOGSMaterials: // 28
+            GLAccountCategoryMgt.GetCOGSMaterials():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '4', '4');
                     UpdateGLAccounts(GLAccountCategory, '40', '42');
@@ -958,38 +958,38 @@ codeunit 161505 "Create CH G/L Account"
                     UpdateGLAccounts(GLAccountCategory, '4900', '4999');
                     UpdateGLAccounts(GLAccountCategory, '7805', '7895');
                 end;
-            GLAccountCategoryMgt.GetJobsCost: // 30
+            GLAccountCategoryMgt.GetJobsCost():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '44', '45');
                     UpdateGLAccounts(GLAccountCategory, '4400', '4894');
                 end;
-            GLAccountCategoryMgt.GetRentExpense: // 32
+            GLAccountCategoryMgt.GetRentExpense():
                 UpdateGLAccounts(GLAccountCategory, '6000', '6010');
-            GLAccountCategoryMgt.GetAdvertisingExpense: // 33
+            GLAccountCategoryMgt.GetAdvertisingExpense():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '66', '66');
                     UpdateGLAccounts(GLAccountCategory, '6600', '6699');
                 end;
-            GLAccountCategoryMgt.GetFeesExpense: // 35
+            GLAccountCategoryMgt.GetFeesExpense():
                 ;
-            GLAccountCategoryMgt.GetInsuranceExpense: // 36
+            GLAccountCategoryMgt.GetInsuranceExpense():
                 ;
-            GLAccountCategoryMgt.GetPayrollExpense: // 37
+            GLAccountCategoryMgt.GetPayrollExpense():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '5', '5');
                     UpdateGLAccounts(GLAccountCategory, '5000', '5999');
                 end;
-            GLAccountCategoryMgt.GetBenefitsExpense: // 38
+            GLAccountCategoryMgt.GetBenefitsExpense():
                 ;
-            GLAccountCategoryMgt.GetSalariesExpense: // 39
+            GLAccountCategoryMgt.GetSalariesExpense():
                 UpdateGLAccounts(GLAccountCategory, '4099', '4198');
-            GLAccountCategoryMgt.GetRepairsExpense: // 40
+            GLAccountCategoryMgt.GetRepairsExpense():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '61', '61');
                     UpdateGLAccounts(GLAccountCategory, '6050', '6050');
                     UpdateGLAccounts(GLAccountCategory, '6100', '6200');
                 end;
-            GLAccountCategoryMgt.GetUtilitiesExpense: // 41
+            GLAccountCategoryMgt.GetUtilitiesExpense():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '6', '6');
                     UpdateGLAccounts(GLAccountCategory, '60', '60');
@@ -999,7 +999,7 @@ codeunit 161505 "Create CH G/L Account"
                     UpdateGLAccounts(GLAccountCategory, '6099', '6099');
                     UpdateGLAccounts(GLAccountCategory, '6210', '6599');
                 end;
-            GLAccountCategoryMgt.GetOtherIncomeExpense: // 42
+            GLAccountCategoryMgt.GetOtherIncomeExpense():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '7', '7');
                     UpdateGLAccounts(GLAccountCategory, '36', '36');
@@ -1008,7 +1008,7 @@ codeunit 161505 "Create CH G/L Account"
                     UpdateGLAccounts(GLAccountCategory, '6700', '6799');
                     UpdateGLAccounts(GLAccountCategory, '7000', '7510');
                 end;
-            GLAccountCategoryMgt.GetTaxExpense: // 43
+            GLAccountCategoryMgt.GetTaxExpense():
                 UpdateGLAccounts(GLAccountCategory, '8900', '8956');
         end;
     end;
