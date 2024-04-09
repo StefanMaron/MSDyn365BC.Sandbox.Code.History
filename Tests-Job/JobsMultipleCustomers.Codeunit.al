@@ -1520,6 +1520,53 @@ codeunit 136323 "Jobs - Multiple Customers"
         SalesLine.TestField("Document No.", SalesHeader."No.");
     end;
 
+    [Test]
+    procedure CopyTotalsProjectTasksTypeIntoProjectsWithMultipleCustomerBillingOption()
+    var
+        JobTasks: array[3] of Record "Job Task";
+        Jobs: array[2] of Record Job;
+        Customers: array[2] of Record Customer;
+        CopyJob: Codeunit "Copy Job";
+    begin
+        // [SCENARIO 522645] Copy Totals Project Tasks Type into Projects with Multiple Customer Billing Option
+        Initialize();
+
+        // [GIVEN] Set One Customer Billing option on Project Setup
+        SetOneCustomerBillingMethodOnProjectSetup();
+
+        // [GIVEN] Create Customer
+        LibrarySales.CreateCustomer(Customers[1]);
+
+        // [GIVEN] Create new Project
+        LibraryJob.CreateJob(Jobs[1], Customers[1]."No.");
+
+        // [GIVEN] Create new Project Task of Type Begin Total
+        LibraryJob.CreateJobTask(Jobs[1], JobTasks[1]);
+        JobTasks[1]."Job Task Type" := JobTasks[1]."Job Task Type"::"Begin-Total";
+        JobTasks[1].Modify(true);
+
+        // [GIVEN] Create new Project Task
+        LibraryJob.CreateJobTask(Jobs[1], JobTasks[2]);
+
+        // [GIVEN] Set Multiple Customers on Project Setup
+        SetMultiupleCustomersOnProjectSetup();
+
+        // [GIVEN] Create new Project
+        LibraryJob.CreateJob(Jobs[2], Customers[1]."No.");
+
+        // [WHEN] Copy Project Tasks
+        CopyJob.CopyJobTasks(Jobs[1], Jobs[2]);
+
+        // [THEN] Verify results
+        JobTasks[3].Get(Jobs[2]."No.", JobTasks[1]."Job Task No.");
+        JobTasks[3].TestField("Sell-to Customer No.", '');
+        JobTasks[3].TestField("Bill-to Customer No.", '');
+
+        JobTasks[3].Get(Jobs[2]."No.", JobTasks[2]."Job Task No.");
+        JobTasks[3].TestField("Sell-to Customer No.", Jobs[2]."Sell-to Customer No.");
+        JobTasks[3].TestField("Bill-to Customer No.", Jobs[2]."Bill-to Customer No.");
+    end;
+
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(Codeunit::"Jobs - Multiple Customers");
