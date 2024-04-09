@@ -939,6 +939,8 @@ table 210 "Job Journal Line"
 
                     Validate("Remaining Qty.", CalcQtyFromBaseQty(JobPlanningLine."Remaining Qty. (Base)" - "Quantity (Base)"));
 
+                    "Assemble to Order" := JobPlanningLine."Assemble to Order";
+
                     if Quantity > 0 then
                         WhseValidateSourceLine.JobJnlLineVerifyChangeForWhsePick(Rec, xRec);
                 end else
