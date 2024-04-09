@@ -50,13 +50,13 @@ codeunit 135206 "Image Analysis Management Test"
 
         InitializeMockKeyvault('fakekey', 'https://fakeuri', '1000', 'Hour');
         LibraryInventory.CreateItem(Item);
-        Item.Picture.ImportFile(GetImagePath, 'Description');
+        Item.Picture.ImportFile(GetImagePath(), 'Description');
 
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         ImageAnalysisManagement.Initialize();
         ImageAnalysisManagement.SetMedia(Item.Picture.Item(1));
-        HttpMessageHandler := HttpMessageHandler.MockHttpMessageHandler(GetImageAnalysisTagsResponsePath);
+        HttpMessageHandler := HttpMessageHandler.MockHttpMessageHandler(GetImageAnalysisTagsResponsePath());
         ImageAnalysisManagement.SetHttpMessageHandler(HttpMessageHandler);
 
         // [WHEN] Analyze is invoked
@@ -72,7 +72,7 @@ codeunit 135206 "Image Analysis Management Test"
         Assert.IsTrue(Result, 'Analysis failed. Error is ' + MessageTxt);
 
         // [THEN] The correct number and type of tags are found
-        Assert.AreEqual(4, ImageAnalysisResult.TagCount, 'Wrong number of tags found.');
+        Assert.AreEqual(4, ImageAnalysisResult.TagCount(), 'Wrong number of tags found.');
         Assert.AreEqual('seat', ImageAnalysisResult.TagName(2), 'Wrong name of tag found.');
         Assert.AreEqual(0.998513400554657, ImageAnalysisResult.TagConfidence(1), 'Wrong confidence of tag found.');
 
@@ -101,12 +101,12 @@ codeunit 135206 "Image Analysis Management Test"
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
         InitializeMockKeyvault('fakekey', 'https://fakeuri/customvision/', '1000', 'Hour');
         LibraryInventory.CreateItem(Item);
-        LibraryLowerPermissions.SetO365Basic;
-        Item.Picture.ImportFile(GetImagePath, 'Description');
+        LibraryLowerPermissions.SetO365Basic();
+        Item.Picture.ImportFile(GetImagePath(), 'Description');
 
         ImageAnalysisManagement.Initialize();
         ImageAnalysisManagement.SetMedia(Item.Picture.Item(1));
-        HttpMessageHandler := HttpMessageHandler.MockHttpMessageHandler(GetCustomImageAnalysisTagsResponsePath);
+        HttpMessageHandler := HttpMessageHandler.MockHttpMessageHandler(GetCustomImageAnalysisTagsResponsePath());
         ImageAnalysisManagement.SetHttpMessageHandler(HttpMessageHandler);
 
         // [WHEN] Analyze is invoked
@@ -123,7 +123,7 @@ codeunit 135206 "Image Analysis Management Test"
 
         // [THEN] The correct number and type of tags are found
         Assert.AreEqual('Hemlock', ImageAnalysisResult.TagName(2), 'Wrong name of tag found.');
-        Assert.AreEqual(2, ImageAnalysisResult.TagCount, 'Wrong number of tags found.');
+        Assert.AreEqual(2, ImageAnalysisResult.TagCount(), 'Wrong number of tags found.');
         Assert.AreEqual(1.0, ImageAnalysisResult.TagConfidence(1), 'Wrong confidence of tag found.');
 
         CheckTagsColorsFacesEmpty(ImageAnalysisResult);
@@ -151,12 +151,12 @@ codeunit 135206 "Image Analysis Management Test"
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
         InitializeMockKeyvault('fakekey', 'https://fakeuri/customvision/', '1000', 'Hour');
         LibraryInventory.CreateItem(Item);
-        LibraryLowerPermissions.SetO365Basic;
-        Item.Picture.ImportFile(GetImagePath, 'Description');
+        LibraryLowerPermissions.SetO365Basic();
+        Item.Picture.ImportFile(GetImagePath(), 'Description');
 
         ImageAnalysisManagement.Initialize();
         ImageAnalysisManagement.SetMedia(Item.Picture.Item(1));
-        HttpMessageHandler := HttpMessageHandler.MockHttpMessageHandler(GetCustomImageAnalysisTagsResponsePathV2);
+        HttpMessageHandler := HttpMessageHandler.MockHttpMessageHandler(GetCustomImageAnalysisTagsResponsePathV2());
         ImageAnalysisManagement.SetHttpMessageHandler(HttpMessageHandler);
 
         // [WHEN] Analyze is invoked
@@ -173,7 +173,7 @@ codeunit 135206 "Image Analysis Management Test"
 
         // [THEN] The correct number and type of tags are found
         Assert.AreEqual('Hemlock', ImageAnalysisResult.TagName(2), 'Wrong name of tag found.');
-        Assert.AreEqual(2, ImageAnalysisResult.TagCount, 'Wrong number of tags found.');
+        Assert.AreEqual(2, ImageAnalysisResult.TagCount(), 'Wrong number of tags found.');
         Assert.AreEqual(1.0, ImageAnalysisResult.TagConfidence(1), 'Wrong confidence of tag found.');
 
         CheckTagsColorsFacesEmpty(ImageAnalysisResult);
@@ -190,15 +190,15 @@ codeunit 135206 "Image Analysis Management Test"
         Assert.AreEqual(0, ImageAnalysisResult.TagConfidence(5), 'Wrong tag confidence returned.');
 
         // [THEN] The correct colors are returned
-        Assert.AreEqual('', ImageAnalysisResult.DominantColorForeground, 'Wrong dominant foreground color found.');
-        Assert.AreEqual('', ImageAnalysisResult.DominantColorBackground, 'Wrong dominant background color found.');
-        Assert.AreEqual(0, ImageAnalysisResult.DominantColorCount, 'Wrong number of dominant colors found.');
+        Assert.AreEqual('', ImageAnalysisResult.DominantColorForeground(), 'Wrong dominant foreground color found.');
+        Assert.AreEqual('', ImageAnalysisResult.DominantColorBackground(), 'Wrong dominant background color found.');
+        Assert.AreEqual(0, ImageAnalysisResult.DominantColorCount(), 'Wrong number of dominant colors found.');
 
         // [THEN] No error is raised if wrong color number is used
         Assert.AreEqual('', ImageAnalysisResult.DominantColor(3), 'Wrong color returned.');
 
         // [THEN] The correct number of faces are found
-        Assert.AreEqual(0, ImageAnalysisResult.FaceCount, 'Wrong number of faces found.');
+        Assert.AreEqual(0, ImageAnalysisResult.FaceCount(), 'Wrong number of faces found.');
 
         // [THEN] No error is raised if wrong face number is used
         Assert.AreEqual('', ImageAnalysisResult.FaceGender(1), 'Wrong face gender returned.');
@@ -231,15 +231,15 @@ codeunit 135206 "Image Analysis Management Test"
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
 
         LibraryInventory.CreateItem(Item);
-        Item.Picture.ImportFile(GetImagePath, 'Description');
+        Item.Picture.ImportFile(GetImagePath(), 'Description');
         InitializeMockKeyvault('fakekey', 'https://fakeuri', '1000', 'Hour');
 
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         ImageAnalysisManagement.Initialize();
         ImageAnalysisManagement.SetMedia(Item.Picture.Item(1));
         ImageAnalysisManagement.SetHttpMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(GetImageAnalysisColorResponsePath));
+          HttpMessageHandler.MockHttpMessageHandler(GetImageAnalysisColorResponsePath()));
 
         // [WHEN] Analyze is invoked
         Result := ImageAnalysisManagement.AnalyzeColors(ImageAnalysisResult);
@@ -249,23 +249,23 @@ codeunit 135206 "Image Analysis Management Test"
         Assert.IsTrue(Result, 'Analysis failed. Error is ' + MessageTxt);
 
         // [THEN] The correct number and type of tags are found
-        Assert.AreEqual(0, ImageAnalysisResult.TagCount, 'Wrong number of tags found.');
+        Assert.AreEqual(0, ImageAnalysisResult.TagCount(), 'Wrong number of tags found.');
 
         // [THEN] No error is raised if wrong tag number is used
         Assert.AreEqual('', ImageAnalysisResult.TagName(5), 'Wrong tag name returned.');
         Assert.AreEqual(0, ImageAnalysisResult.TagConfidence(5), 'Wrong tag confidence returned.');
 
         // [THEN] The correct colors are returned
-        Assert.AreEqual('White', ImageAnalysisResult.DominantColorForeground, 'Wrong dominant foreground color found.');
-        Assert.AreEqual('White', ImageAnalysisResult.DominantColorBackground, 'Wrong dominant background color found.');
-        Assert.AreEqual(2, ImageAnalysisResult.DominantColorCount, 'Wrong number of dominant colors found.');
+        Assert.AreEqual('White', ImageAnalysisResult.DominantColorForeground(), 'Wrong dominant foreground color found.');
+        Assert.AreEqual('White', ImageAnalysisResult.DominantColorBackground(), 'Wrong dominant background color found.');
+        Assert.AreEqual(2, ImageAnalysisResult.DominantColorCount(), 'Wrong number of dominant colors found.');
         Assert.AreEqual('Blue', ImageAnalysisResult.DominantColor(2), 'Wrong dominant color found.');
 
         // [THEN] No error is raised if wrong color number is used
         Assert.AreEqual('', ImageAnalysisResult.DominantColor(3), 'Wrong color returned.');
 
         // [THEN] The correct number of faces are found
-        Assert.AreEqual(0, ImageAnalysisResult.FaceCount, 'Wrong number of faces found.');
+        Assert.AreEqual(0, ImageAnalysisResult.FaceCount(), 'Wrong number of faces found.');
 
         // [THEN] No error is raised if wrong face number is used
         Assert.AreEqual('', ImageAnalysisResult.FaceGender(1), 'Wrong face gender returned.');
@@ -291,22 +291,22 @@ codeunit 135206 "Image Analysis Management Test"
         // [GIVEN] A BLOB with an image of a face
         // Import needs to happen before setting to saas
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(false);
-        FileManagement.BLOBImportFromServerFile(TempBlob, GetFaceImagePath);
+        FileManagement.BLOBImportFromServerFile(TempBlob, GetFaceImagePath());
         InitializeMockKeyvault('fakekey', 'https://fakeuri', '1000', 'Hour');
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         ImageAnalysisManagement.Initialize();
 
         ImageAnalysisManagement.SetBlob(TempBlob);
         ImageAnalysisManagement.SetHttpMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(GetFaceAnalysisResponsePath));
+          HttpMessageHandler.MockHttpMessageHandler(GetFaceAnalysisResponsePath()));
 
         // [WHEN] Analyze is invoked
         ImageAnalysisManagement.AnalyzeFaces(ImageAnalysisResult);
 
         // [THEN] The correct face characteristics are found
-        Assert.AreEqual(1, ImageAnalysisResult.FaceCount, 'Wrong number of faces found.');
+        Assert.AreEqual(1, ImageAnalysisResult.FaceCount(), 'Wrong number of faces found.');
         Assert.AreEqual('Female', ImageAnalysisResult.FaceGender(1), 'Wrong gender of face found.');
         Assert.AreEqual(28, ImageAnalysisResult.FaceAge(1), 'Wrong age of face found.');
     end;
@@ -319,29 +319,28 @@ codeunit 135206 "Image Analysis Management Test"
         ImageAnalysisManagement: Codeunit "Image Analysis Management";
         ImageAnalysisResult: Codeunit "Image Analysis Result";
         FileManagement: Codeunit "File Management";
-        EnvInfo: Codeunit "Environment Information";
     begin
         // [SCENARIO] Image Analysis is invoked on a proper image with a face for a minor (< 16 years)
 
         // [GIVEN] A BLOB with an image of a face of a minor
         // This import needs to happen before setting to saas
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(false);
-        FileManagement.BLOBImportFromServerFile(TempBlob, GetFaceImagePath);
+        FileManagement.BLOBImportFromServerFile(TempBlob, GetFaceImagePath());
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
         InitializeMockKeyvault('fakekey', 'https://fakeuri', '1000', 'Hour');
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         ImageAnalysisManagement.Initialize();
 
         ImageAnalysisManagement.SetBlob(TempBlob);
         ImageAnalysisManagement.SetHttpMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(GetFaceMinorAnalysisResponsePath));
+          HttpMessageHandler.MockHttpMessageHandler(GetFaceMinorAnalysisResponsePath()));
 
         // [WHEN] Analyze is invoked
         ImageAnalysisManagement.AnalyzeFaces(ImageAnalysisResult);
 
         // [THEN] The no face characteristics are found
-        Assert.AreEqual(1, ImageAnalysisResult.FaceCount, 'Wrong number of faces found.');
+        Assert.AreEqual(1, ImageAnalysisResult.FaceCount(), 'Wrong number of faces found.');
         Assert.AreEqual('', ImageAnalysisResult.FaceGender(1), 'The gender may not be specified for a minor.');
         Assert.AreEqual(0, ImageAnalysisResult.FaceAge(1), 'The age may not be specified for a minor.');
     end;
@@ -382,7 +381,7 @@ codeunit 135206 "Image Analysis Management Test"
         // [GIVEN] An image to analyse and initialization with a wrong key
         // This import needs to happen before setting to saas
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(false);
-        FileManagement.BLOBImportFromServerFile(TempBlob, GetFaceImagePath);
+        FileManagement.BLOBImportFromServerFile(TempBlob, GetFaceImagePath());
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
         InitializeMockKeyvault('fakekey', 'https://fakeuri', '1000', 'Hour');
 
@@ -390,7 +389,7 @@ codeunit 135206 "Image Analysis Management Test"
         ImageAnalysisManagement.SetBlob(TempBlob);
 
         ImageAnalysisManagement.SetHttpMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(GetImageAnalysisErrorResponsePath));
+          HttpMessageHandler.MockHttpMessageHandler(GetImageAnalysisErrorResponsePath()));
 
         // [WHEN] Analyze is invoked
         Result := ImageAnalysisManagement.AnalyzeTags(ImageAnalysisResult);
@@ -420,7 +419,7 @@ codeunit 135206 "Image Analysis Management Test"
         // [GIVEN] An image to analyse and initialization with a wrong key
         // This import needs to happen before setting to saas
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(false);
-        FileManagement.BLOBImportFromServerFile(TempBlob, GetFaceImagePath);
+        FileManagement.BLOBImportFromServerFile(TempBlob, GetFaceImagePath());
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
         InitializeMockKeyvault('fakekey', 'https://fakeuri/customvision/', '1000', 'Hour');
         ImageAnalysisManagement.Initialize();
@@ -428,7 +427,7 @@ codeunit 135206 "Image Analysis Management Test"
         ImageAnalysisManagement.SetBlob(TempBlob);
 
         ImageAnalysisManagement.SetHttpMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(GetCustomImageAnalysisErrorResponsePath));
+          HttpMessageHandler.MockHttpMessageHandler(GetCustomImageAnalysisErrorResponsePath()));
 
         // [WHEN] Analyze is invoked
         Result := ImageAnalysisManagement.AnalyzeTags(ImageAnalysisResult);
@@ -462,7 +461,7 @@ codeunit 135206 "Image Analysis Management Test"
 
         // This import needs to happen before setting to saas
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(false);
-        FileManagement.BLOBImportFromServerFile(TempBlob, GetFaceImagePath);
+        FileManagement.BLOBImportFromServerFile(TempBlob, GetFaceImagePath());
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
         InitializeMockKeyvault('fakekey', '!!malformed', '1000', 'Hour');
         ImageAnalysisManagement.Initialize();
@@ -488,7 +487,7 @@ codeunit 135206 "Image Analysis Management Test"
 
         // [GIVEN] The limit is missing
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         InitializeMockKeyvault('fakekey', 'https://fakeuri', '', 'Hour');
 
         // [WHEN] Initialize is invoked
@@ -525,15 +524,15 @@ codeunit 135206 "Image Analysis Management Test"
         // [GIVEN] An Item with an image
         LibraryInventory.CreateItem(Item);
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
-        Item.Picture.ImportFile(GetImagePath, 'Description');
+        Item.Picture.ImportFile(GetImagePath(), 'Description');
         InitializeMockKeyvault('fakekey', 'https://fakeuri', '0', 'Hour');
 
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         ImageAnalysisManagement.Initialize();
         ImageAnalysisManagement.SetMedia(Item.Picture.Item(1));
         ImageAnalysisManagement.SetHttpMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(GetImageAnalysisTagsResponsePath));
+          HttpMessageHandler.MockHttpMessageHandler(GetImageAnalysisTagsResponsePath()));
 
         // [WHEN] Analyze is invoked
         Result := ImageAnalysisManagement.AnalyzeTags(ImageAnalysisResult);
@@ -552,7 +551,7 @@ codeunit 135206 "Image Analysis Management Test"
         ImageAnalysisManagement: Codeunit "Image Analysis Management";
     begin
         // [SCENARIO] Set a value for the limit after initializing should throw an error
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [GIVEN] ImageAnalysisManagement is Initialized
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
@@ -579,13 +578,14 @@ codeunit 135206 "Image Analysis Management Test"
         ImageAnalysisManagement: Codeunit "Image Analysis Management";
         Value: Integer;
         Type: Option;
+        ApiKey: Text;
     begin
         // [SCENARIO] For Custom Uri not set Limit means Unlimited
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [GIVEN] A custom uri and key are provided but the limit is not set
-        ImageAnalysisManagement.SetUriAndKey('some uri', 'some key');
+        ImageAnalysisManagement.SetUriAndKey('some uri', GetKey());
 
         // [WHEN] The Library is initialized
         ImageAnalysisManagement.Initialize();
@@ -600,7 +600,8 @@ codeunit 135206 "Image Analysis Management Test"
         // [GIVEN] A custom uri and key are provided but the limit is not set
         ImageAnalysisSetup.Get();
         ImageAnalysisSetup."Api Uri" := 'some uri';
-        ImageAnalysisSetup.SetApiKey('some key');
+        ApiKey := 'some key';
+        ImageAnalysisSetup.SetApiKey(ApiKey);
         ImageAnalysisSetup.Modify();
 
         // [WHEN] The Library is initialized
@@ -623,7 +624,7 @@ codeunit 135206 "Image Analysis Management Test"
     begin
         // [SCENARIO] For Custom Uri not set Limit means Unlimited
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [GIVEN] No uri and key have been specified
         ImageAnalysisSetup.DeleteAll();
@@ -653,13 +654,13 @@ codeunit 135206 "Image Analysis Management Test"
     begin
         // [SCENARIO] For Custom Uri developer can set his own Limit through API
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [GIVEN] No uri and key have been specified
         ImageAnalysisSetup.DeleteAll();
 
         // [GIVEN] A custom uri and key are provided but the limit is not set
-        ImageAnalysisManagement.SetUriAndKey('some uri', 'some key');
+        ImageAnalysisManagement.SetUriAndKey('some uri', GetKey());
 
         // [GIVEN] The Limit is set up to 10 years
         ImageAnalysisManagement.SetLimitInYears(10);
@@ -677,7 +678,7 @@ codeunit 135206 "Image Analysis Management Test"
         Clear(ImageAnalysisManagement);
 
         // [GIVEN] A custom uri and key are provided but the limit is not set
-        ImageAnalysisManagement.SetUriAndKey('some uri', 'some key');
+        ImageAnalysisManagement.SetUriAndKey('some uri', GetKey());
 
         // [GIVEN] The Limit is set up to 10 Months
         ImageAnalysisManagement.SetLimitInMonths(10);
@@ -695,7 +696,7 @@ codeunit 135206 "Image Analysis Management Test"
         Clear(ImageAnalysisManagement);
 
         // [GIVEN] A custom uri and key are provided but the limit is not set
-        ImageAnalysisManagement.SetUriAndKey('some uri', 'some key');
+        ImageAnalysisManagement.SetUriAndKey('some uri', GetKey());
 
         // [GIVEN] The Limit is set up to 10 Days
         ImageAnalysisManagement.SetLimitInDays(10);
@@ -713,7 +714,7 @@ codeunit 135206 "Image Analysis Management Test"
         Clear(ImageAnalysisManagement);
 
         // [GIVEN] A custom uri and key are provided but the limit is not set
-        ImageAnalysisManagement.SetUriAndKey('some uri', 'some key');
+        ImageAnalysisManagement.SetUriAndKey('some uri', GetKey());
 
         // [GIVEN] The Limit is set up to 10 Hours
         ImageAnalysisManagement.SetLimitInHours(10);
@@ -729,72 +730,79 @@ codeunit 135206 "Image Analysis Management Test"
         Assert.AreEqual(Value, 10, 'Limit Value was expected to be 10');
     end;
 
+    local procedure GetKey(): SecretText
+    var
+        ApiKey: Text;
+    begin
+        ApiKey := 'some key';
+        exit(ApiKey);
+    end;
+
     [Normal]
     local procedure GetImagePath(): Text
     begin
-        exit(LibraryUtility.GetInetRoot + '\App\Test\Files\ImageAnalysis\AllowedImage.jpg');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\AllowedImage.jpg');
     end;
 
     [Normal]
     local procedure GetFaceImagePath(): Text
     begin
-        exit(LibraryUtility.GetInetRoot + '\App\Test\Files\ImageAnalysis\Debra Core.jpg');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\Debra Core.jpg');
     end;
 
     [Normal]
     local procedure GetImageAnalysisColorResponsePath(): Text
     begin
-        exit(LibraryUtility.GetInetRoot + '\App\Test\Files\ImageAnalysis\ImageAnalysisColorResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\ImageAnalysisColorResponse.txt');
     end;
 
     [Normal]
     local procedure GetImageAnalysisTagsResponsePath(): Text
     begin
-        exit(LibraryUtility.GetInetRoot + '\App\Test\Files\ImageAnalysis\ImageAnalysisTagsResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\ImageAnalysisTagsResponse.txt');
     end;
 
     [Normal]
     local procedure GetCustomImageAnalysisTagsResponsePath(): Text
     begin
-        exit(LibraryUtility.GetInetRoot + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisTagsResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisTagsResponse.txt');
     end;
 
     [Normal]
     local procedure GetCustomImageAnalysisTagsResponsePathV2(): Text
     begin
-        exit(LibraryUtility.GetInetRoot + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisTagsResponseV2.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisTagsResponseV2.txt');
     end;
 
     [Normal]
     local procedure GetCustomImageAnalysisErrorResponsePath(): Text
     begin
-        exit(LibraryUtility.GetInetRoot + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisErrorResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisErrorResponse.txt');
     end;
 
     [Normal]
     local procedure GetImageAnalysisErrorResponsePath(): Text
     begin
-        exit(LibraryUtility.GetInetRoot + '\App\Test\Files\ImageAnalysis\ImageAnalysisErrorResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\ImageAnalysisErrorResponse.txt');
     end;
 
     [Normal]
     local procedure GetFaceAnalysisResponsePath(): Text
     begin
-        exit(LibraryUtility.GetInetRoot + '\App\Test\Files\ImageAnalysis\FaceImageAnalysisResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\FaceImageAnalysisResponse.txt');
     end;
 
     [Normal]
     local procedure GetFaceMinorAnalysisResponsePath(): Text
     begin
-        exit(LibraryUtility.GetInetRoot + '\App\Test\Files\ImageAnalysis\FaceMinorImageAnalysisResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\FaceMinorImageAnalysisResponse.txt');
     end;
 
     local procedure InitializeMockKeyvault(ApiKey: Text; ApiEndpoint: Text; ImageAnalysisLimit: Text; ImageAnalysisPeriodType: Text)
     var
-        AzureKeyVault: Codeunit "Azure Key Vault";
         AzureKeyVaultTestLibrary: Codeunit "Azure Key Vault Test Library";
     begin
-        MockAzureKeyvaultSecretProvider := MockAzureKeyvaultSecretProvider.MockAzureKeyVaultSecretProvider;
+        MockAzureKeyvaultSecretProvider := MockAzureKeyvaultSecretProvider.MockAzureKeyVaultSecretProvider();
         MockAzureKeyvaultSecretProvider.AddSecretMapping('AllowedApplicationSecrets', 'cognitive-vision-params');
         MockAzureKeyvaultSecretProvider.AddSecretMapping(
           'cognitive-vision-params', StrSubstNo(KeyvaultValueTxt, ApiKey, ApiEndpoint, ImageAnalysisPeriodType, ImageAnalysisLimit));

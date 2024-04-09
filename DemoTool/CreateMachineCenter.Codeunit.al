@@ -3,26 +3,24 @@ codeunit 119030 "Create Machine Center"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('110', XMikeSeamans, '100', 0, '', 1, 100, 0, 0, ManufactCode);
-            InsertData('120', XBryanWalton, '100', 0, '', 1, 100, 0, 0, ManufactCode);
-            InsertData('130', XLindaMitchell, '100', 0, '', 1, 100, 0, 0, ManufactCode);
+        DemoDataSetup.Get();
+        InsertData('110', XMikeSeamans, '100', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
+        InsertData('120', XBryanWalton, '100', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
+        InsertData('130', XLindaMitchell, '100', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
 
-            InsertData('210', XPackingtable1, '200', 0, '', 1, 100, 0, 0, ManufactCode);
-            InsertData('220', XPackingtable2, '200', 0, '', 1, 100, 0, 0, ManufactCode);
-            InsertData('230', XPackingMachine, '200', 0, '', 1, 100, 0, 0, ManufactCode);
+        InsertData('210', XPackingtable1, '200', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
+        InsertData('220', XPackingtable2, '200', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
+        InsertData('230', XPackingMachine, '200', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
 
-            InsertData('310', XPaintingCabin, '300', 0, '', 1, 100, 0, 0, ManufactCode);
-            InsertData('320', XPaintingRobot, '300', 0, '', 1, 100, 0, 0, ManufactCode);
-            InsertData('330', XDryingCabin, '300', 0, '', 1, 100, 0, 0, ManufactCode);
-            InsertData('340', XPaintinginspection, '300', 0, '', 1, 100, 0, 0, ManufactCode);
+        InsertData('310', XPaintingCabin, '300', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
+        InsertData('320', XPaintingRobot, '300', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
+        InsertData('330', XDryingCabin, '300', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
+        InsertData('340', XPaintinginspection, '300', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
 
-            InsertData('410', XDrillingmachine, '400', 0, '', 1, 100, 0, 0, ManufactCode);
-            InsertData('420', XCNCmachine, '400', 0, '', 1, 100, 0, 0, ManufactCode);
-            InsertData('430', XMachinedeburr, '400', 0, '', 1, 100, 0, 0, ManufactCode);
-            InsertData('440', XMachineinspection, '400', 0, '', 1, 100, 0, 0, ManufactCode);
-        end;
+        InsertData('410', XDrillingmachine, '400', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
+        InsertData('420', XCNCmachine, '400', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
+        InsertData('430', XMachinedeburr, '400', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
+        InsertData('440', XMachineinspection, '400', 0, '', 1, 100, 0, 0, DemoDataSetup.ManufactCode());
     end;
 
     var

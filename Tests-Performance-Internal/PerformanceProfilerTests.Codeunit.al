@@ -12,10 +12,10 @@
     end;
 
     var
+        GlobalCustLedgEntry: Record "Cust. Ledger Entry";
         LibraryApplicationArea: Codeunit "Library - Application Area";
         LibrarySales: Codeunit "Library - Sales";
         LibraryInventory: Codeunit "Library - Inventory";
-        LibraryPriceCalculation: Codeunit "Library - Price Calculation";
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryRandom: Codeunit "Library - Random";
         LibraryPerformanceProfiler: Codeunit "Library - Performance Profiler";
@@ -23,7 +23,6 @@
         LibraryERM: Codeunit "Library - ERM";
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
         LibraryReportDataset: Codeunit "Library - Report Dataset";
         Assert: Codeunit Assert;
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
@@ -31,7 +30,6 @@
         LibraryDocumentApprovals: Codeunit "Library - Document Approvals";
         LibraryCAMTFileMgt: Codeunit "Library - CAMT File Mgt.";
         LibraryJobQueue: Codeunit "Library - Job Queue";
-        GlobalCustLedgEntry: Record "Cust. Ledger Entry";
         IsInitialized: Boolean;
         BankRecIsInitialized: Boolean;
         TestsBuffer: Integer;
@@ -50,7 +48,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        OrderProcessorRoleCenter.OpenView;
+        OrderProcessorRoleCenter.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestSalesOrderProcessorRoleCentertPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"SO Processor Activities", true);
@@ -69,7 +67,7 @@
         if Item.IsEmpty() then
             exit;
         LibraryPerformanceProfiler.StartProfiler(true);
-        ItemList.OpenView;
+        ItemList.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenItemListPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Item List", true);
@@ -88,7 +86,7 @@
         if Item.IsEmpty() then
             exit;
         LibraryPerformanceProfiler.StartProfiler(true);
-        ItemList.OpenView;
+        ItemList.OpenView();
         ItemList.Next();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenItemListAndNavigatePerformance',
@@ -105,9 +103,9 @@
         ItemCard: TestPage "Item Card";
     begin
         LibraryApplicationArea.EnablePremiumSetup();
-        LibraryNotificationMgt.DisableAllNotifications;
+        LibraryNotificationMgt.DisableAllNotifications();
         LibraryPerformanceProfiler.StartProfiler(true);
-        ItemCard.OpenView;
+        ItemCard.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenItemCardPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Item Card", true);
@@ -123,9 +121,9 @@
         ItemCard: TestPage "Item Card";
     begin
         LibraryApplicationArea.EnablePremiumSetup();
-        LibraryNotificationMgt.DisableAllNotifications;
+        LibraryNotificationMgt.DisableAllNotifications();
         LibraryPerformanceProfiler.StartProfiler(true);
-        ItemCard.OpenView;
+        ItemCard.OpenView();
         ItemCard.Next();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenItemCardAndNavigatePerformance',
@@ -145,7 +143,7 @@
     begin
         LibraryTemplates.EnableTemplatesFeature();
         LibraryApplicationArea.EnablePremiumSetup();
-        LibraryNotificationMgt.DisableAllNotifications;
+        LibraryNotificationMgt.DisableAllNotifications();
         LibraryPerformanceProfiler.StartProfiler(true);
         ItemCard.OpenNew();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
@@ -166,7 +164,7 @@
         if Customer.IsEmpty() then
             exit;
         LibraryPerformanceProfiler.StartProfiler(true);
-        CustomerList.OpenView;
+        CustomerList.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenCustomerListPerformance',
             PerfProfilerEventsTest."Object Type"::Page, 22, true);
@@ -185,7 +183,7 @@
         if Customer.IsEmpty() then
             exit;
         LibraryPerformanceProfiler.StartProfiler(true);
-        CustomerList.OpenView;
+        CustomerList.OpenView();
         CustomerList.Next();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenCustomerListAndNavigatePerformance',
@@ -202,7 +200,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        CustomerCard.OpenView;
+        CustomerCard.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenCustomerCardPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Customer Card", true);
@@ -218,7 +216,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        CustomerCard.OpenView;
+        CustomerCard.OpenView();
         CustomerCard.Next();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenCustomerCardAndNavigatePerformance',
@@ -245,17 +243,15 @@
         CustomerCard.Close();
     end;
 
-#if not CLEAN21
+#if not CLEAN23
     [Test]
     [Scope('OnPrem')]
     procedure TestOpenCustomerCardSalesPricesAndDiscountPerformance()
     var
         Item: Record Item;
         Customer: Record Customer;
-        ItemDiscountGroup: Record "Item Discount Group";
         SalesLineDiscount: Record "Sales Line Discount";
         CustomerDiscountGroup: Record "Customer Discount Group";
-        Campaign: Record Campaign;
         CustomerCard: TestPage "Customer Card";
         PerfProfilerEventsTest: Record "Perf Profiler Events Test";
     begin
@@ -274,7 +270,7 @@
         //Add discount for all customer
         CreateAllCustomerDiscountWithSalesLineDiscount(SalesLineDiscount, Item);
 
-        CustomerCard.OpenView;
+        CustomerCard.OpenView();
         LibraryPerformanceProfiler.StartProfiler(true);
         CustomerCard.GotoRecord(Customer);
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
@@ -289,10 +285,8 @@
     var
         Item: Record Item;
         Customer: Record Customer;
-        ItemDiscountGroup: Record "Item Discount Group";
         PriceListLine: Record "Price List Line";
         CustomerDiscountGroup: Record "Customer Discount Group";
-        Campaign: Record Campaign;
         CustomerCard: TestPage "Customer Card";
         PerfProfilerEventsTest: Record "Perf Profiler Events Test";
     begin
@@ -311,7 +305,7 @@
         //Add discount for all customer
         CreateAllCustomerDiscountWithSalesLineDiscount(PriceListLine, Item);
 
-        CustomerCard.OpenView;
+        CustomerCard.OpenView();
         LibraryPerformanceProfiler.StartProfiler(true);
         CustomerCard.GotoRecord(Customer);
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
@@ -333,7 +327,7 @@
         if Vendor.IsEmpty() then
             exit;
         LibraryPerformanceProfiler.StartProfiler(true);
-        VendorList.OpenView;
+        VendorList.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenVendorListPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Vendor List", true);
@@ -353,7 +347,7 @@
         ExpectedUniqueQuery := GetThreshold(82);
         ExpectedTotalQuery := GetThreshold(131);
         LibraryPerformanceProfiler.StartProfiler(true);
-        VendorCard.OpenView;
+        VendorCard.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenVendorCardPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Vendor Card", true);
@@ -369,7 +363,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        VendorCard.OpenView;
+        VendorCard.OpenView();
         VendorCard.Next();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenVendorCardAndNavigatePerformance',
@@ -386,7 +380,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesOrder.OpenView;
+        SalesOrder.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenSalesOrderCardPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Order", true);
@@ -402,7 +396,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesOrderList.OpenView;
+        SalesOrderList.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenSalesOrderListPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Order List", true);
@@ -418,7 +412,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesInvoice.OpenView;
+        SalesInvoice.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenSalesInvoiceCardPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Invoice", true);
@@ -461,7 +455,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        PurchaseOrder.OpenView;
+        PurchaseOrder.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenPurchaseOrderCardPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Purchase Order", true);
@@ -477,7 +471,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        PurchaseInvoice.OpenView;
+        PurchaseInvoice.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenPurchaseInvoiceCardPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Purchase Invoice", true);
@@ -497,7 +491,7 @@
         ExpectedUniqueQuery := GetThreshold(40);
         ExpectedTotalQuery := GetThreshold(45);
         LibraryPerformanceProfiler.StartProfiler(true);
-        PostedPurchaseInvoice.OpenView;
+        PostedPurchaseInvoice.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenPostedPurchaseInvoiceCardPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Posted Purchase Invoice", true);
@@ -529,7 +523,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        AccessibleCompanies.OpenView;
+        AccessibleCompanies.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenAllowedCompaniesCardPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Accessible Companies", true);
@@ -544,7 +538,7 @@
         JobCard: TestPage "Job Card";
     begin
         LibraryPerformanceProfiler.StartProfiler(true);
-        JobCard.OpenView;
+        JobCard.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenJobCardPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Job Card", true);
@@ -580,11 +574,11 @@
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpportunityToQuotePerformance',
             PerfProfilerEventsTest."Object Type"::Codeunit, CODEUNIT::"Library - Marketing", true);
-        SalesQuotes.OpenView;
+        SalesQuotes.OpenView();
         SalesQuotes.GotoRecord(SalesHeader);
         Commit();
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesQuotes.Print.Invoke;
+        SalesQuotes.Print.Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpportunityToQuotePRINTPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Quote", true);
@@ -599,7 +593,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        BusinessManagerRoleCenter.OpenView;
+        BusinessManagerRoleCenter.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenBusinessManagerRoleCenterPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Business Manager Role Center", true);
@@ -615,7 +609,7 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         LibraryPerformanceProfiler.StartProfiler(true);
-        O365Activities.OpenView;
+        O365Activities.OpenView();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestOpenO365ActivitiesPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"O365 Activities", true);
@@ -644,9 +638,9 @@
         PostedDocNo: Code[20];
     begin
         LibraryApplicationArea.EnablePremiumSetup();
-        SetupBalAccountAsBankAccount;
+        SetupBalAccountAsBankAccount();
         PostedDocNo := CreateAndPostSalesInvoice(SalesHeader);
-        TempPaymentRegistrationBuffer.PopulateTable;
+        TempPaymentRegistrationBuffer.PopulateTable();
         MarkDocumentAsPaid(TempPaymentRegistrationBuffer, SalesHeader."Sell-to Customer No.", PostedDocNo);
         LibraryPerformanceProfiler.StartProfiler(true);
         PostPayments(TempPaymentRegistrationBuffer);
@@ -673,10 +667,10 @@
         LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.");
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", 1);
         LibrarySales.PostSalesDocument(SalesHeader, false, true);
-        CustomerCard.OpenEdit;
+        CustomerCard.OpenEdit();
         CustomerCard.GotoRecord(Customer);
         LibraryPerformanceProfiler.StartProfiler(true);
-        CustomerCard."Report Statement".Invoke;
+        CustomerCard."Report Statement".Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestReportCustomerStatementPerformance',
             PerfProfilerEventsTest."Object Type"::Report, REPORT::"Standard Statement", true);
@@ -704,10 +698,10 @@
         LibraryPurchase.CreatePurchaseInvoice(PurchaseHeader);
         PostedInvoiceNumber := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true);
         PurchInvHeader.Get(PostedInvoiceNumber);
-        PostedPurchaseInvoice.OpenEdit;
+        PostedPurchaseInvoice.OpenEdit();
         PostedPurchaseInvoice.GotoRecord(PurchInvHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        PostedPurchaseInvoice.CorrectInvoice.Invoke;
+        PostedPurchaseInvoice.CorrectInvoice.Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestCorrectPostedPurchaseInvoicePerformance',
             PerfProfilerEventsTest."Object Type"::Codeunit, CODEUNIT::"Correct PstdPurchInv (Yes/No)", true);
@@ -737,10 +731,10 @@
         LibraryPurchase.CreatePurchaseInvoice(PurchaseHeader);
         PostedInvoiceNumber := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true);
         PurchInvHeader.Get(PostedInvoiceNumber);
-        PostedPurchaseInvoice.OpenEdit;
+        PostedPurchaseInvoice.OpenEdit();
         PostedPurchaseInvoice.GotoRecord(PurchInvHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        PostedPurchaseInvoice.CancelInvoice.Invoke;
+        PostedPurchaseInvoice.CancelInvoice.Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestCancelPostedPurchaseInvoicePerformance',
             PerfProfilerEventsTest."Object Type"::Codeunit, CODEUNIT::"Cancel PstdPurchInv (Yes/No)", true);
@@ -779,10 +773,10 @@
         PaymentJournal: TestPage "Payment Journal";
     begin
         LibraryApplicationArea.EnablePremiumSetup();
-        PaymentJournal.OpenEdit;
+        PaymentJournal.OpenEdit();
         Commit();
         LibraryPerformanceProfiler.StartProfiler(true);
-        PaymentJournal.SuggestVendorPayments.Invoke;
+        PaymentJournal.SuggestVendorPayments.Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestSuggestVendorPaymentsPerformance',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Payment Journal", true);
@@ -808,11 +802,11 @@
         LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, Item."No.", 1);
         LibraryPurchase.CreatePurchaseCreditMemo(PurchaseHeader);
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true);
-        VendorCard.OpenEdit;
+        VendorCard.OpenEdit();
         VendorCard.GotoRecord(Vendor);
         Commit();
         LibraryPerformanceProfiler.StartProfiler(true);
-        VendorCard."Vendor - Balance to Date".Invoke;
+        VendorCard."Vendor - Balance to Date".Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestVendorBalanceToDatePerformance',
             PerfProfilerEventsTest."Object Type"::Report, REPORT::"Vendor - Balance to Date", true);
@@ -830,10 +824,10 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         CreateSaleDocumentWithLines(SalesHeader, SalesHeader."Document Type"::Order, 10, 0);
-        SalesOrder.OpenView;
+        SalesOrder.OpenView();
         SalesOrder.GotoRecord(SalesHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesOrder.Post.Invoke;
+        SalesOrder.Post.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestSalesOrderPostPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Order", true);
@@ -852,10 +846,10 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         CreateSaleDocumentWithLines(SalesHeader, SalesHeader."Document Type"::Order, 10, 1);
-        SalesOrder.OpenView;
+        SalesOrder.OpenView();
         SalesOrder.GotoRecord(SalesHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesOrder.Post.Invoke;
+        SalesOrder.Post.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestSalesOrderShipmentPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Order", true);
@@ -878,10 +872,10 @@
         CreateSaleDocumentWithLines(SalesHeader, SalesHeader."Document Type"::Order, 10, 1);
         LibrarySales.PostSalesDocument(SalesHeader, true, false);
         FindSalesShipmentHeader(SalesShipmentHeader, SalesHeader."No.");
-        PostedSalesShipment.OpenEdit;
+        PostedSalesShipment.OpenEdit();
         PostedSalesShipment.FILTER.SetFilter("No.", SalesShipmentHeader."No.");
         LibraryPerformanceProfiler.StartProfiler(true);
-        PostedSalesShipment.SalesShipmLines.UndoShipment.Invoke;
+        PostedSalesShipment.SalesShipmLines.UndoShipment.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestUndoPostedSalesShipment',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Posted Sales Shpt. Subform", true);
@@ -898,10 +892,10 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         CreateSaleDocumentWithLines(SalesHeader, SalesHeader."Document Type"::Order, 10, 0);
-        SalesOrder.OpenView;
+        SalesOrder.OpenView();
         SalesOrder.GotoRecord(SalesHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesOrder.Release.Invoke;
+        SalesOrder.Release.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestSalesOrderReleasePerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Order", true);
@@ -919,11 +913,11 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         CreateSaleDocumentWithLines(SalesHeader, SalesHeader."Document Type"::Order, 10, 0);
-        SalesOrder.OpenView;
+        SalesOrder.OpenView();
         SalesOrder.GotoRecord(SalesHeader);
-        SalesOrder.Release.Invoke;
+        SalesOrder.Release.Invoke();
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesOrder.Reopen.Invoke;
+        SalesOrder.Reopen.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestSalesOrderReopenPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Order", true);
@@ -941,10 +935,10 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         CreatePurchDocumentWithLines(PurchaseHeader, PurchaseHeader."Document Type"::Order, 10);
-        PurchaseOrder.OpenView;
+        PurchaseOrder.OpenView();
         PurchaseOrder.GotoRecord(PurchaseHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        PurchaseOrder.Post.Invoke;
+        PurchaseOrder.Post.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestPurchaseOrderPostPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Purchase Order", true);
@@ -960,10 +954,10 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         CreatePurchDocumentWithLines(PurchaseHeader, PurchaseHeader."Document Type"::Order, 10);
-        PurchaseOrder.OpenView;
+        PurchaseOrder.OpenView();
         PurchaseOrder.GotoRecord(PurchaseHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        PurchaseOrder.Release.Invoke;
+        PurchaseOrder.Release.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestPurchaseOrderReleasePerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Purchase Order", true);
@@ -979,11 +973,11 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         CreatePurchDocumentWithLines(PurchaseHeader, PurchaseHeader."Document Type"::Order, 10);
-        PurchaseOrder.OpenView;
+        PurchaseOrder.OpenView();
         PurchaseOrder.GotoRecord(PurchaseHeader);
-        PurchaseOrder.Release.Invoke;
+        PurchaseOrder.Release.Invoke();
         LibraryPerformanceProfiler.StartProfiler(true);
-        PurchaseOrder.Reopen.Invoke;
+        PurchaseOrder.Reopen.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestPurchaseOrderReopenPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Purchase Order", true);
@@ -1000,10 +994,10 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         PartiallyPostSalesOrder(SalesHeader);
-        SalesInvoice.OpenEdit;
+        SalesInvoice.OpenEdit();
         SalesInvoice.FILTER.SetFilter("No.", SalesHeader."No.");
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesInvoice.SalesLines.GetShipmentLines.Invoke;
+        SalesInvoice.SalesLines.GetShipmentLines.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestSalesInvoiceGetShipmentLinesPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Invoice Subform", true);
@@ -1020,10 +1014,10 @@
     begin
         LibraryApplicationArea.EnablePremiumSetup();
         PartiallyPostPurchaseOrder(PurchaseHeader);
-        PurchaseInvoice.OpenEdit;
+        PurchaseInvoice.OpenEdit();
         PurchaseInvoice.FILTER.SetFilter("No.", PurchaseHeader."No.");
         LibraryPerformanceProfiler.StartProfiler(true);
-        PurchaseInvoice.PurchLines.GetReceiptLines.Invoke;
+        PurchaseInvoice.PurchLines.GetReceiptLines.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestGetReceiptLinesAfterPartialPostingPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Purch. Invoice Subform", true);
@@ -1044,7 +1038,7 @@
           PostedSalesInvoice,
           LibrarySales.PostSalesDocument(SalesHeader, false, true));
         LibraryPerformanceProfiler.StartProfiler(true);
-        PostedSalesInvoice.Print.Invoke;
+        PostedSalesInvoice.Print.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestPostedSalesInvoicePrintPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Posted Sales Invoice", true);
@@ -1066,10 +1060,10 @@
         LibraryApplicationArea.EnablePremiumSetup();
         WorkflowInitialize();
         PrepareSalesOrderForApproval(Workflow, CurrentUserSetup, IntermediateApproverUserSetup, FinalApproverUserSetup, SalesHeader);
-        SalesOrder.OpenView;
+        SalesOrder.OpenView();
         SalesOrder.GotoRecord(SalesHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesOrder.SendApprovalRequest.Invoke;
+        SalesOrder.SendApprovalRequest.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestSalesOrderCreateApprovalWorkflowPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Order", true);
@@ -1093,10 +1087,10 @@
         PrepareSalesOrderForApproval(Workflow, CurrentUserSetup, IntermediateApproverUserSetup, FinalApproverUserSetup, SalesHeader);
         SendSalesOrderForApproval(SalesHeader);
         LibraryDocumentApprovals.UpdateApprovalEntryWithCurrUser(SalesHeader.RecordId);
-        SalesOrder.OpenView;
+        SalesOrder.OpenView();
         SalesOrder.GotoRecord(SalesHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        SalesOrder.Approve.Invoke;
+        SalesOrder.Approve.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestSalesOrderApproveWorkflowPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Sales Order", true);
@@ -1118,10 +1112,10 @@
         LibraryApplicationArea.EnablePremiumSetup();
         WorkflowInitialize();
         PreparePurchaseOrderForApproval(Workflow, CurrentUserSetup, IntermediateApproverUserSetup, FinalApproverUserSetup, PurchHeader);
-        PurchaseOrder.OpenView;
+        PurchaseOrder.OpenView();
         PurchaseOrder.GotoRecord(PurchHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        PurchaseOrder.SendApprovalRequest.Invoke;
+        PurchaseOrder.SendApprovalRequest.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestPurchaseOrderCreateApprovalWorkflowPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Purchase Order", true);
@@ -1145,18 +1139,16 @@
         PreparePurchaseOrderForApproval(Workflow, CurrentUserSetup, IntermediateApproverUserSetup, FinalApproverUserSetup, PurchHeader);
         SendPurchaseOrderForApproval(PurchHeader);
         UpdatePurchaseApprovalEntryWithTempUser(CurrentUserSetup, PurchHeader);
-        PurchaseOrder.OpenView;
+        PurchaseOrder.OpenView();
         PurchaseOrder.GotoRecord(PurchHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        PurchaseOrder.Approve.Invoke;
+        PurchaseOrder.Approve.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
           PerfProfilerEventsTest, 'TestPurchaseOrderApproveWorkflowPerformance',
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Purchase Order", true);
     end;
 
     local procedure BankRecInitialize()
-    var
-        LibraryApplicationArea: Codeunit "Library - Application Area";
     begin
         LibraryApplicationArea.EnableFoundationSetup();
         if BankRecIsInitialized then
@@ -1185,7 +1177,7 @@
         Commit();
 
         LibraryPerformanceProfiler.StartProfiler(true);
-        BankAccReconciliationPage.MatchAutomatically.Invoke;
+        BankAccReconciliationPage.MatchAutomatically.Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestBankRecMatchAutomaticallyPerformance',
             PerfProfilerEventsTest."Object Type"::Codeunit, CODEUNIT::"Library - Sales", true);
@@ -1205,11 +1197,11 @@
         SetupBankAccRecEntries(BankAccReconciliation, BankAccReconciliationPage, Amount, 1);
         Commit();
 
-        BankAccReconciliationPage.MatchAutomatically.Invoke;
-        BankAccReconciliationPage.StatementEndingBalance.SetValue(BankAccReconciliationPage.StmtLine.TotalBalance.AsDEcimal);
+        BankAccReconciliationPage.MatchAutomatically.Invoke();
+        BankAccReconciliationPage.StatementEndingBalance.SetValue(BankAccReconciliationPage.StmtLine.TotalBalance.AsDecimal());
 
         LibraryPerformanceProfiler.StartProfiler(true);
-        BankAccReconciliationPage.Post.Invoke;
+        BankAccReconciliationPage.Post.Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestBankRecPostPerformance',
             PerfProfilerEventsTest."Object Type"::Codeunit, CODEUNIT::"Library - Sales", true);
@@ -1243,7 +1235,7 @@
         Commit();
 
         LibraryPerformanceProfiler.StartProfiler(true);
-        BankAccReconciliationPage."Transfer to General Journal".Invoke;
+        BankAccReconciliationPage."Transfer to General Journal".Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestBankRecTransferToGenJnlPerformance',
             PerfProfilerEventsTest."Object Type"::Codeunit, CODEUNIT::"Library - Sales", true);
@@ -1339,7 +1331,7 @@
 
         // Measure Post
         LibraryPerformanceProfiler.StartProfiler(true);
-        PmtReconJnl.Post.Invoke;
+        PmtReconJnl.Post.Invoke();
         LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestPaymentReconciliationJnlPostPerformance',
             PerfProfilerEventsTest."Object Type"::Page, Page::"Payment Reconciliation Journal", true);
@@ -1362,9 +1354,6 @@
     local procedure InitializePaymentRec(var BankAccRecon: Record "Bank Acc. Reconciliation"; var CustLedgEntry: array[36] of Record "Cust. Ledger Entry"; var NoOfSales: Integer)
     var
         InventorySetup: Record "Inventory Setup";
-        LibraryERM: Codeunit "Library - ERM";
-        LibraryERMCountryData: Codeunit "Library - ERM Country Data";
-        LibraryInventory: Codeunit "Library - Inventory";
         TempBlobUTF8: Codeunit "Temp Blob";
         OutStream: OutStream;
         i: Integer;
@@ -1375,7 +1364,7 @@
         LibraryERMCountryData.UpdateGeneralPostingSetup();
         LibraryERMCountryData.UpdatePurchasesPayablesSetup();
         LibraryInventory.NoSeriesSetup(InventorySetup);
-        UpdateCustPostingGrp;
+        UpdateCustPostingGrp();
         LibraryERMCountryData.UpdateJournalTemplMandatory(false);
         Commit();
 
@@ -1400,8 +1389,8 @@
 
     local procedure AutoApplyLinesPaymentRec(var PmtReconJnl: TestPage "Payment Reconciliation Journal")
     begin
-        PmtReconJnl.ApplyAutomatically.Invoke;
-        PmtReconJnl.First;
+        PmtReconJnl.ApplyAutomatically.Invoke();
+        PmtReconJnl.First();
     end;
 
     local procedure ManualApplyLinesPaymentRec(var PmtReconJnl: TestPage "Payment Reconciliation Journal"; var CustLedgEntry: array[36] of Record "Cust. Ledger Entry"; NoOfSales: Integer)
@@ -1412,7 +1401,7 @@
         for j := 0 to NoOfSales - 1 do begin
             GlobalCustLedgEntry := CustLedgEntry[j * NoOfSales + 1];
             GlobalPmtReconJnl := PmtReconJnl;
-            GlobalPmtReconJnl.ApplyEntries.Invoke;
+            GlobalPmtReconJnl.ApplyEntries.Invoke();
             PmtReconJnl := GlobalPmtReconJnl;
             PmtReconJnl.Next();
         end;
@@ -1424,18 +1413,17 @@
         GLAcc: Record "G/L Account";
     begin
         LibraryERM.CreateGLAccount(GLAcc);
-        with CustPostingGroup do
-            if FindSet() then
-                repeat
-                    if "Payment Disc. Debit Acc." = '' then begin
-                        Validate("Payment Disc. Debit Acc.", GLAcc."No.");
-                        Modify(true);
-                    end;
-                    if "Payment Disc. Credit Acc." = '' then begin
-                        Validate("Payment Disc. Credit Acc.", GLAcc."No.");
-                        Modify(true);
-                    end;
-                until Next = 0;
+        if CustPostingGroup.FindSet() then
+            repeat
+                if CustPostingGroup."Payment Disc. Debit Acc." = '' then begin
+                    CustPostingGroup.Validate("Payment Disc. Debit Acc.", GLAcc."No.");
+                    CustPostingGroup.Modify(true);
+                end;
+                if CustPostingGroup."Payment Disc. Credit Acc." = '' then begin
+                    CustPostingGroup.Validate("Payment Disc. Credit Acc.", GLAcc."No.");
+                    CustPostingGroup.Modify(true);
+                end;
+            until CustPostingGroup.Next() = 0;
     end;
 
     local procedure WriteCAMTFooter(var OutStream: OutStream)
@@ -1494,7 +1482,7 @@
         CreateBankAcc(BankStmtFormat, BankAcc);
         LibraryERM.CreateBankAccReconciliation(BankAccRecon, BankAcc."No.", BankAccRecon."Statement Type"::"Payment Application");
         LibraryCAMTFileMgt.SetupSourceMock(BankStmtFormat, TempBlobUTF8);
-        BankAccRecon.ImportBankStatement;
+        BankAccRecon.ImportBankStatement();
 
         BankAccRecon.CalcFields("Total Transaction Amount");
     end;
@@ -1512,10 +1500,10 @@
     var
         PmtReconciliationJournals: TestPage "Pmt. Reconciliation Journals";
     begin
-        PmtReconciliationJournals.OpenView;
+        PmtReconciliationJournals.OpenView();
         PmtReconciliationJournals.GotoRecord(BankAccRecon);
-        PmtReconJnl.Trap;
-        PmtReconciliationJournals.EditJournal.Invoke;
+        PmtReconJnl.Trap();
+        PmtReconciliationJournals.EditJournal.Invoke();
     end;
 
     local procedure CreateBankAccReconciliation(var BankAccReconciliation: Record "Bank Acc. Reconciliation"; BankAccountNo: Code[20])
@@ -1557,17 +1545,14 @@
         CreateBankAccReconciliation(BankAccReconciliation, BankAccount."No.");
         for count := 1 to 2 do begin
             LibraryERM.CreateBankAccReconciliationLn(BankAccReconciliationLine, BankAccReconciliation);
-#if not CLEAN21
-            BankAccReconciliationLine.Validate(Type, BankAccReconciliationLine.Type::"Bank Account Ledger Entry");
-#endif
             BankAccReconciliationLine.Validate("Statement Amount", MatchFactor * ExpectedAmount);
             BankAccReconciliationLine.Modify(true);
         end;
 
-        BankAccReconciliationPage.OpenEdit;
+        BankAccReconciliationPage.OpenEdit();
         BankAccReconciliationPage.GotoRecord(BankAccReconciliation);
-        BankAccReconciliationPage.StmtLine.First;
-        BankAccReconciliationPage.ApplyBankLedgerEntries.First;
+        BankAccReconciliationPage.StmtLine.First();
+        BankAccReconciliationPage.ApplyBankLedgerEntries.First();
     end;
 
     local procedure CreateCustomerCombineShipments(var Customer: Record Customer)
@@ -1614,7 +1599,7 @@
         SalesShipmentHeader.SetRange("Sell-to Customer No.", CustomerNo);
         LibraryVariableStorage.Enqueue(CombineShipmentMsg);  // Enqueue for MessageHandler.
         LibrarySales.CombineShipments(
-          SalesHeader, SalesShipmentHeader, WorkDate(), WorkDate, CalcInvDisc, PostInvoices, OnlyStdPmtTerms, CopyTextLines);
+          SalesHeader, SalesShipmentHeader, WorkDate(), WorkDate(), CalcInvDisc, PostInvoices, OnlyStdPmtTerms, CopyTextLines);
     end;
 
     local procedure GetThreshold(ExpectedValue: Integer): Integer
@@ -1632,15 +1617,14 @@
     var
         UserSetup: Record "User Setup";
         VATEntry: Record "VAT Entry";
-        LibraryERMCountryData: Codeunit "Library - ERM Country Data";
     begin
         LibraryVariableStorage.Clear();
         VATEntry.DeleteAll();
         Commit();
         LibraryERMCountryData.CreateVATData();
         LibraryERMCountryData.UpdateGeneralPostingSetup();
-        LibraryERMCountryData.UpdateVATPostingSetup;
-        LibraryWorkflow.DisableAllWorkflows;
+        LibraryERMCountryData.UpdateVATPostingSetup();
+        LibraryWorkflow.DisableAllWorkflows();
         UserSetup.DeleteAll();
         if IsInitialized then
             exit;
@@ -1714,12 +1698,12 @@
         GenJournalLine: Record "Gen. Journal Line";
         PaymentJournal: TestPage "Payment Journal";
     begin
-        PaymentJournal.OpenEdit;
+        PaymentJournal.OpenEdit();
         PaymentJournal."Document No.".SetValue('123');
         PaymentJournal."Account Type".SetValue(GenJournalLine."Account Type"::Vendor);
         PaymentJournal."Account No.".SetValue(Vendor."No.");
         PaymentJournal.Amount.SetValue(123);
-        PaymentJournal.Post.Invoke;
+        PaymentJournal.Post.Invoke();
     end;
 
     local procedure CreateBankAccountReconciliation(var BankAccReconciliation: Record "Bank Acc. Reconciliation"; BankStatementImportFormat: Code[20])
@@ -1737,7 +1721,7 @@
           BankAccount."No.", BankAccReconciliation."Statement Type"::"Bank Reconciliation");
     end;
 
-#if not CLEAN21
+#if not CLEAN23
     local procedure CreateCustomerDiscountWithSalesLineDiscount(var Customer: Record "Customer"; var SalesLineDiscount: Record "Sales Line Discount"; Item: Record Item)
     begin
         CreateSalesLineDiscount(
@@ -1786,10 +1770,12 @@
         LibraryERM.CreateCustomerDiscountGroup(CustomerDiscountGroup);
         CreateSalesLineDiscount(
             PriceListLine, Item, "Price Source Type"::"Customer Disc. Group", CustomerDiscountGroup.Code,
-            WorkDate, LibraryRandom.RandDec(10, 2));
+            WorkDate(), LibraryRandom.RandDec(10, 2));
     end;
 
-    local procedure CreateSalesLineDiscount(var PriceListLine: Record "Price List Line"; Item: Record Item; SalesType: Option; SalesCode: Code[20]; StartingDate: Date; Quantity: Decimal)
+    local procedure CreateSalesLineDiscount(var PriceListLine: Record "Price List Line"; Item: Record Item; SalesType: Enum "Price Source Type"; SalesCode: Code[20]; StartingDate: Date; Quantity: Decimal)
+    var
+        LibraryPriceCalculation: Codeunit "Library - Price Calculation";
     begin
         LibraryPriceCalculation.CreateSalesDiscountLine(PriceListLine, '', SalesType, SalesCode, "Price Asset Type"::Item, Item."No.");
         PriceListLine.Validate("Starting Date", StartingDate);
@@ -1823,7 +1809,7 @@
     [Scope('OnPrem')]
     procedure PostAndReconcilePageHandler(var PostPmtsAndRecBankAcc: TestPage "Post Pmts and Rec. Bank Acc.")
     begin
-        PostPmtsAndRecBankAcc.OK.Invoke();
+        PostPmtsAndRecBankAcc.OK().Invoke();
     end;
 
     [ConfirmHandler]
@@ -1854,14 +1840,14 @@
     [Scope('OnPrem')]
     procedure CancelPostedInvoiceConfirmHandler(Question: Text; var Reply: Boolean)
     begin
-        Reply := LibraryVariableStorage.DequeueBoolean;
+        Reply := LibraryVariableStorage.DequeueBoolean();
     end;
 
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure PrintSalesCreditMemoRequestPageHandler(var SalesCreditMemo: TestRequestPage "Standard Sales - Credit Memo")
     begin
-        SalesCreditMemo.SaveAsXml(LibraryReportDataset.GetParametersFileName, LibraryReportDataset.GetFileName);
+        SalesCreditMemo.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
     [PageHandler]
@@ -1875,14 +1861,14 @@
     [Scope('OnPrem')]
     procedure PrintPurchaseCreditMemoRequestPageHandler(var PurchaseCreditMemo: TestRequestPage "Purchase - Credit Memo")
     begin
-        PurchaseCreditMemo.SaveAsXml(LibraryReportDataset.GetParametersFileName, LibraryReportDataset.GetFileName);
+        PurchaseCreditMemo.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure PrintPostedSalesShipmentRequestPageHandler(var SalesShipment: TestRequestPage "Sales - Shipment")
     begin
-        SalesShipment.SaveAsXml(LibraryReportDataset.GetParametersFileName, LibraryReportDataset.GetFileName);
+        SalesShipment.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
     [RequestPageHandler]
@@ -1890,7 +1876,7 @@
     procedure SuggestVendorPaymentsRequestPageHandler(var SuggestVendorPayments: TestRequestPage "Suggest Vendor Payments")
     begin
         SuggestVendorPayments.StartingDocumentNo.Value := '1';
-        SuggestVendorPayments.OK.Invoke;
+        SuggestVendorPayments.OK().Invoke();
     end;
 
     [RequestPageHandler]
@@ -1907,14 +1893,14 @@
     procedure BalanceToDateRequestHandler(var VendorBalancetoDate: TestRequestPage "Vendor - Balance to Date")
     begin
         VendorBalancetoDate.Vendor.SetFilter("Date Filter", Format(CalcDate('<+1Y>', WorkDate())));
-        VendorBalancetoDate.SaveAsXml(LibraryReportDataset.GetParametersFileName, LibraryReportDataset.GetFileName);
+        VendorBalancetoDate.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure PostAndSendConfirmationModalPageHandler(var PostandSendConfirmation: TestPage "Post and Send Confirmation")
     begin
-        PostandSendConfirmation.Yes.Invoke;
+        PostandSendConfirmation.Yes().Invoke();
     end;
 
     [ModalPageHandler]
@@ -1929,25 +1915,22 @@
     [Scope('OnPrem')]
     procedure PmtApplnToCustHandler(var PmtAppln: TestPage "Payment Application")
     begin
-        with PmtAppln do begin
-            // Remove Entry is not the same customer
-            if AppliedAmount.AsDEcimal <> 0 then
-                if "Account No.".Value <> GlobalCustLedgEntry."Customer No." then begin
-                    Applied.SetValue(false);
-                    Next;
-                end;
-
-            // Go to the first and check that it is the customer and scroll down to find the entry
-            if Applied.AsBoolean then begin
-                RelatedPartyOpenEntries.Invoke;
-                while Next and (TotalRemainingAmount.AsDEcimal <> 0) do begin
-                    Applied.SetValue(true);
-                    RemainingAmountAfterPosting.AssertEquals(0);
-                end;
+        // Remove Entry is not the same customer
+        if PmtAppln.AppliedAmount.AsDecimal() <> 0 then
+            if PmtAppln."Account No.".Value <> GlobalCustLedgEntry."Customer No." then begin
+                PmtAppln.Applied.SetValue(false);
+                PmtAppln.Next();
             end;
-
-            OK.Invoke;
+        // Go to the first and check that it is the customer and scroll down to find the entry
+        if PmtAppln.Applied.AsBoolean() then begin
+            PmtAppln.RelatedPartyOpenEntries.Invoke();
+            while PmtAppln.Next() and (PmtAppln.TotalRemainingAmount.AsDecimal() <> 0) do begin
+                PmtAppln.Applied.SetValue(true);
+                PmtAppln.RemainingAmountAfterPosting.AssertEquals(0);
+            end;
         end;
+
+        PmtAppln.OK().Invoke();
     end;
 
     local procedure SetupBalAccountAsBankAccount()
@@ -1963,27 +1946,25 @@
     var
         PaymentRegistrationSetup: Record "Payment Registration Setup";
     begin
-        with PaymentRegistrationSetup do begin
-            SetRange("User ID", SetUserID);
-            DeleteAll();
-            SetRange("User ID");
+        PaymentRegistrationSetup.SetRange("User ID", SetUserID);
+        PaymentRegistrationSetup.DeleteAll();
+        PaymentRegistrationSetup.SetRange("User ID");
 
-            Get();
-            "User ID" := SetUserID;
-            Validate("Bal. Account Type", AccountType);
-            Validate("Bal. Account No.", AccountNo);
-            "Use this Account as Def." := true;
-            "Auto Fill Date Received" := true;
+        PaymentRegistrationSetup.Get();
+        PaymentRegistrationSetup."User ID" := SetUserID;
+        PaymentRegistrationSetup.Validate("Bal. Account Type", AccountType);
+        PaymentRegistrationSetup.Validate("Bal. Account No.", AccountNo);
+        PaymentRegistrationSetup."Use this Account as Def." := true;
+        PaymentRegistrationSetup."Auto Fill Date Received" := true;
 
-            Insert(true);
-        end
+        PaymentRegistrationSetup.Insert(true);
     end;
 
     local procedure PrepareSalesOrderForApproval(var Workflow: Record Workflow; var CurrentUserSetup: Record "User Setup"; var IntermediateApproverUserSetup: Record "User Setup"; var FinalApproverUserSetup: Record "User Setup"; var SalesHeader: Record "Sales Header")
     var
         WorkflowSetup: Codeunit "Workflow Setup";
     begin
-        LibraryWorkflow.CreateEnabledWorkflow(Workflow, WorkflowSetup.SalesOrderApprovalWorkflowCode);
+        LibraryWorkflow.CreateEnabledWorkflow(Workflow, WorkflowSetup.SalesOrderApprovalWorkflowCode());
 
         LibraryDocumentApprovals.SetupUsersForApprovalsWithLimits(CurrentUserSetup, IntermediateApproverUserSetup, FinalApproverUserSetup);
 
@@ -1996,7 +1977,7 @@
     var
         WorkflowSetup: Codeunit "Workflow Setup";
     begin
-        LibraryWorkflow.CreateEnabledWorkflow(Workflow, WorkflowSetup.PurchaseOrderApprovalWorkflowCode);
+        LibraryWorkflow.CreateEnabledWorkflow(Workflow, WorkflowSetup.PurchaseOrderApprovalWorkflowCode());
 
         CreateUserSetupsAndChainOfApprovers(CurrentUserSetup, IntermediateApproverUserSetup, FinalApproverUserSetup);
 
@@ -2060,9 +2041,9 @@
     var
         SalesOrder: TestPage "Sales Order";
     begin
-        SalesOrder.OpenView;
+        SalesOrder.OpenView();
         SalesOrder.GotoRecord(SalesHeader);
-        SalesOrder.SendApprovalRequest.Invoke;
+        SalesOrder.SendApprovalRequest.Invoke();
         SalesOrder.Close();
     end;
 
@@ -2070,9 +2051,9 @@
     var
         PurchaseOrder: TestPage "Purchase Order";
     begin
-        PurchaseOrder.OpenView;
+        PurchaseOrder.OpenView();
         PurchaseOrder.GotoRecord(PurchaseHeader);
-        PurchaseOrder.SendApprovalRequest.Invoke;
+        PurchaseOrder.SendApprovalRequest.Invoke();
         PurchaseOrder.Close();
     end;
 
@@ -2147,8 +2128,8 @@
     [Scope('OnPrem')]
     procedure GetShipmentLinesPageHandler(var GetShipmentLines: TestPage "Get Shipment Lines")
     begin
-        GetShipmentLines.First;
-        GetShipmentLines.OK.Invoke;
+        GetShipmentLines.First();
+        GetShipmentLines.OK().Invoke();
     end;
 
     local procedure PartiallyShipSalesDocument(var SalesHeader: Record "Sales Header"; SellToCustomerNo: Code[20])
@@ -2157,7 +2138,7 @@
     begin
         LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomerNo);
         LibrarySales.CreateSalesLine(
-          SalesLine, SalesHeader, SalesLine.Type::"G/L Account", LibraryERM.CreateGLAccountWithSalesSetup, LibraryRandom.RandDec(10, 2));  // Taking Random values for Quantity.
+          SalesLine, SalesHeader, SalesLine.Type::"G/L Account", LibraryERM.CreateGLAccountWithSalesSetup(), LibraryRandom.RandDec(10, 2));  // Taking Random values for Quantity.
         SalesLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
         SalesLine.Validate("Qty. to Ship", SalesLine.Quantity / 2);
         SalesLine.Modify(true);
@@ -2214,7 +2195,7 @@
         QtyToReceive: Decimal;
     begin
         LibraryPurchase.CreatePurchaseLine(
-          PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, CreateItemWithLastDirectCost, 2 * LibraryRandom.RandInt(20));
+          PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, CreateItemWithLastDirectCost(), 2 * LibraryRandom.RandInt(20));
         QtyToReceive := PurchaseLine.Quantity / 2; // Taking here 2 for partial posting.
         PurchaseLine.Validate("Qty. to Receive", QtyToReceive);
         PurchaseLine.Validate("Direct Unit Cost", 100 + LibraryRandom.RandDec(10, 2));
@@ -2227,7 +2208,7 @@
         SalesInvoiceHeader: Record "Sales Invoice Header";
     begin
         SalesInvoiceHeader.Get(PostedDocNo);
-        PostedSalesInvoice.OpenEdit;
+        PostedSalesInvoice.OpenEdit();
         PostedSalesInvoice.GotoRecord(SalesInvoiceHeader);
     end;
 
@@ -2236,7 +2217,7 @@
         PurchInvHeader: Record "Purch. Inv. Header";
     begin
         PurchInvHeader.Get(PostedDocNo);
-        PostedPurchaseInvoice.OpenEdit;
+        PostedPurchaseInvoice.OpenEdit();
         PostedPurchaseInvoice.GotoRecord(PurchInvHeader);
     end;
 
@@ -2269,22 +2250,22 @@
     [Scope('OnPrem')]
     procedure QuantityOnGetReceiptLinesPageHandler(var GetReceiptLines: TestPage "Get Receipt Lines")
     begin
-        GetReceiptLines.First;
-        GetReceiptLines.OK.Invoke;
+        GetReceiptLines.First();
+        GetReceiptLines.OK().Invoke();
     end;
 
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure SalesInvoiceRequestHandler(var StandardSalesInvoice: TestRequestPage "Standard Sales - Invoice")
     begin
-        StandardSalesInvoice.SaveAsXml(LibraryReportDataset.GetParametersFileName, LibraryReportDataset.GetFileName);
+        StandardSalesInvoice.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure PurchaseInvoiceRequestHandler(var StandardPurchaseInvoice: TestRequestPage "Purchase - Invoice")
     begin
-        StandardPurchaseInvoice.SaveAsXml(LibraryReportDataset.GetParametersFileName, LibraryReportDataset.GetFileName);
+        StandardPurchaseInvoice.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
     local procedure FindSalesShipmentHeader(var SalesShipmentHeader: Record "Sales Shipment Header"; OrderNo: Code[20])
@@ -2303,7 +2284,7 @@
     [Scope('OnPrem')]
     procedure MatchRecLinesReqPageHandler(var MatchBankAccReconciliation: TestRequestPage "Match Bank Entries")
     begin
-        MatchBankAccReconciliation.OK.Invoke;
+        MatchBankAccReconciliation.OK().Invoke();
     end;
 
     [RequestPageHandler]
@@ -2317,18 +2298,14 @@
         LibraryVariableStorage.Dequeue(BatchName);
         TransBankRecToGenJnl."GenJnlLine.""Journal Template Name""".SetValue(TemplateName);
         TransBankRecToGenJnl."GenJnlLine.""Journal Batch Name""".SetValue(BatchName);
-        TransBankRecToGenJnl.OK.Invoke;
+        TransBankRecToGenJnl.OK().Invoke();
     end;
 
     [PageHandler]
     [Scope('OnPrem')]
     procedure GenJnlPageHandler(var GeneralJournal: TestPage "General Journal")
-    var
-        GenJnlLine: Record "Gen. Journal Line";
-        BatchName: Variant;
-        BankAccNo: Variant;
     begin
-        GeneralJournal.OK.Invoke;
+        GeneralJournal.OK().Invoke();
     end;
 
     [ConfirmHandler]

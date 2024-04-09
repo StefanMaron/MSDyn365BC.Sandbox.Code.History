@@ -462,18 +462,18 @@
         // [THEN] Realized VAT Entry is posted with original Unrealized amounts
         Assert.AreNearlyEqual(
           UnrealizedVATEntry."Unrealized Base", RealizedVATEntry.Base,
-          LibraryERM.GetAmountRoundingPrecision, RealizedVATEntry.FieldCaption(Base));
+          LibraryERM.GetAmountRoundingPrecision(), RealizedVATEntry.FieldCaption(Base));
         Assert.AreNearlyEqual(
           UnrealizedVATEntry."Unrealized Amount", RealizedVATEntry.Amount,
-          LibraryERM.GetAmountRoundingPrecision, RealizedVATEntry.FieldCaption(Amount));
+          LibraryERM.GetAmountRoundingPrecision(), RealizedVATEntry.FieldCaption(Amount));
 
         // [THEN] Unrealized VAT Entry has zero Remaining amounts
         Assert.AreNearlyEqual(
           0, UnrealizedVATEntry."Remaining Unrealized Base",
-          LibraryERM.GetAmountRoundingPrecision, RealizedVATEntry.FieldCaption("Remaining Unrealized Base"));
+          LibraryERM.GetAmountRoundingPrecision(), RealizedVATEntry.FieldCaption("Remaining Unrealized Base"));
         Assert.AreNearlyEqual(
           0, UnrealizedVATEntry."Remaining Unrealized Amount",
-          LibraryERM.GetAmountRoundingPrecision, RealizedVATEntry.FieldCaption("Remaining Unrealized Amount"));
+          LibraryERM.GetAmountRoundingPrecision(), RealizedVATEntry.FieldCaption("Remaining Unrealized Amount"));
     end;
 
     [Test]
@@ -530,18 +530,18 @@
         // [THEN] Realized VAT Entry is posted with original Unrealized amounts
         Assert.AreNearlyEqual(
           UnrealizedVATEntry."Unrealized Base", RealizedVATEntry.Base,
-          LibraryERM.GetAmountRoundingPrecision, RealizedVATEntry.FieldCaption(Base));
+          LibraryERM.GetAmountRoundingPrecision(), RealizedVATEntry.FieldCaption(Base));
         Assert.AreNearlyEqual(
           UnrealizedVATEntry."Unrealized Amount", RealizedVATEntry.Amount,
-          LibraryERM.GetAmountRoundingPrecision, RealizedVATEntry.FieldCaption(Amount));
+          LibraryERM.GetAmountRoundingPrecision(), RealizedVATEntry.FieldCaption(Amount));
 
         // [THEN] Unrealized VAT Entry has zero Remaining amounts
         Assert.AreNearlyEqual(
           0, UnrealizedVATEntry."Remaining Unrealized Base",
-          LibraryERM.GetAmountRoundingPrecision, RealizedVATEntry.FieldCaption("Remaining Unrealized Base"));
+          LibraryERM.GetAmountRoundingPrecision(), RealizedVATEntry.FieldCaption("Remaining Unrealized Base"));
         Assert.AreNearlyEqual(
           0, UnrealizedVATEntry."Remaining Unrealized Amount",
-          LibraryERM.GetAmountRoundingPrecision, RealizedVATEntry.FieldCaption("Remaining Unrealized Amount"));
+          LibraryERM.GetAmountRoundingPrecision(), RealizedVATEntry.FieldCaption("Remaining Unrealized Amount"));
     end;
 
     [Test]
@@ -761,7 +761,7 @@
         Commit();
     end;
 
-    local procedure CreateVATPostingSetupWithVAT(var VATPostingSetup: Record "VAT Posting Setup"; UnrealizedVATType: Option; VATCalculationType: Option)
+    local procedure CreateVATPostingSetupWithVAT(var VATPostingSetup: Record "VAT Posting Setup"; UnrealizedVATType: Option; VATCalculationType: Enum "Tax Calculation Type")
     var
         GLAccount: array[4] of Record "G/L Account";
     begin
@@ -776,13 +776,13 @@
         end;
     end;
 
-    local procedure CreateAndPostPaymentGenJournalLine(var GenJournalLine: Record "Gen. Journal Line"; AccountType: Option; AccountNo: Code[20]; ApplyToDocID: Code[20]; Amount: Decimal; PostingDate: Date)
+    local procedure CreateAndPostPaymentGenJournalLine(var GenJournalLine: Record "Gen. Journal Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; ApplyToDocID: Code[20]; Amount: Decimal; PostingDate: Date)
     begin
         CreatePaymentGenJournalLineWithAppln(GenJournalLine, AccountType, AccountNo, ApplyToDocID, Amount, PostingDate);
         LibraryERM.PostGeneralJnlLine(GenJournalLine);
     end;
 
-    local procedure CreatePaymentGenJournalLineWithAppln(var GenJournalLine: Record "Gen. Journal Line"; AccountType: Option; AccountNo: Code[20]; ApplyToDocID: Code[20]; Amount: Decimal; PostingDate: Date)
+    local procedure CreatePaymentGenJournalLineWithAppln(var GenJournalLine: Record "Gen. Journal Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; ApplyToDocID: Code[20]; Amount: Decimal; PostingDate: Date)
     var
         GenJournalTemplate: Record "Gen. Journal Template";
         BankAccount: Record "Bank Account";
@@ -791,26 +791,22 @@
         CreatePaymentGenJournal(
           GenJournalLine, AccountType, AccountNo, BankAccount."No.", GenJournalLine."Bank Payment Type"::" ",
           Amount, GenJournalTemplate.Type::Payments, GenJournalLine."Document Type"::Payment);
-        with GenJournalLine do begin
-            Validate("Posting Date", PostingDate);
-            Validate("Applies-to Doc. Type", "Applies-to Doc. Type"::Invoice);
-            Validate("Applies-to Doc. No.", ApplyToDocID);
-            Modify(true);
-        end;
+        GenJournalLine.Validate("Posting Date", PostingDate);
+        GenJournalLine.Validate("Applies-to Doc. Type", GenJournalLine."Applies-to Doc. Type"::Invoice);
+        GenJournalLine.Validate("Applies-to Doc. No.", ApplyToDocID);
+        GenJournalLine.Modify(true);
     end;
 
-    local procedure CreateAndPostPaymentGenJournalLineWithCurrency(var GenJournalLine: Record "Gen. Journal Line"; AccountType: Option; AccountNo: Code[20]; ApplyToDocID: Code[20]; Amount: Decimal; PostingDate: Date; CurrencyCode: Code[10]; CurrencyFactor: Decimal)
+    local procedure CreateAndPostPaymentGenJournalLineWithCurrency(var GenJournalLine: Record "Gen. Journal Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; ApplyToDocID: Code[20]; Amount: Decimal; PostingDate: Date; CurrencyCode: Code[10]; CurrencyFactor: Decimal)
     begin
         CreatePaymentGenJournalLineWithAppln(GenJournalLine, AccountType, AccountNo, ApplyToDocID, Amount, PostingDate);
-        with GenJournalLine do begin
-            Validate("Currency Code", CurrencyCode);
-            Validate("Currency Factor", CurrencyFactor);
-            Modify(true);
-        end;
+        GenJournalLine.Validate("Currency Code", CurrencyCode);
+        GenJournalLine.Validate("Currency Factor", CurrencyFactor);
+        GenJournalLine.Modify(true);
         LibraryERM.PostGeneralJnlLine(GenJournalLine);
     end;
 
-    local procedure CreateAndPostPurchaseDocument(var PurchaseLine: Record "Purchase Line"; DocumentType: Option; BuyfromVendorNo: Code[20]; No: Code[20]; Type: Option; Quantity: Decimal; DirectUnitCost: Decimal): Code[20]
+    local procedure CreateAndPostPurchaseDocument(var PurchaseLine: Record "Purchase Line"; DocumentType: Enum "Purchase Document Type"; BuyfromVendorNo: Code[20]; No: Code[20]; Type: Enum "Purchase Line Type"; Quantity: Decimal; DirectUnitCost: Decimal): Code[20]
     var
         PurchaseHeader: Record "Purchase Header";
     begin
@@ -823,7 +819,7 @@
         exit(LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true));
     end;
 
-    local procedure CreateAndPostSalesDocument(var SalesLine: Record "Sales Line"; CustomerNo: Code[20]; DocumentType: Option; Type: Option; No: Code[20]; Quantity: Decimal; UnitPrice: Decimal): Code[20]
+    local procedure CreateAndPostSalesDocument(var SalesLine: Record "Sales Line"; CustomerNo: Code[20]; DocumentType: Enum "Sales Document Type"; Type: Enum "Sales Line Type"; No: Code[20]; Quantity: Decimal; UnitPrice: Decimal): Code[20]
     var
         SalesHeader: Record "Sales Header";
     begin
@@ -848,9 +844,9 @@
 
     local procedure CreateCurrencyWithDifferentExchangeRate(var Currency: Record Currency; PostingDate: Date; RateFactor: Decimal; RateFactor2: Decimal)
     begin
-        Currency.Get(LibraryERM.CreateCurrencyWithGLAccountSetup);
-        Currency.Validate("Realized Gains Acc.", LibraryERM.CreateGLAccountNo);
-        Currency.Validate("Unrealized Losses Acc.", LibraryERM.CreateGLAccountNo);
+        Currency.Get(LibraryERM.CreateCurrencyWithGLAccountSetup());
+        Currency.Validate("Realized Gains Acc.", LibraryERM.CreateGLAccountNo());
+        Currency.Validate("Unrealized Losses Acc.", LibraryERM.CreateGLAccountNo());
         Currency.Modify(true);
         CreateCurrencyExchangeRate(Currency.Code, WorkDate(), RateFactor);
         CreateCurrencyExchangeRate(Currency.Code, PostingDate, RateFactor2);
@@ -903,7 +899,7 @@
         exit(GLAccount."No.");
     end;
 
-    local procedure CreateGenJournalBatch(var GenJournalBatch: Record "Gen. Journal Batch"; Type: Option)
+    local procedure CreateGenJournalBatch(var GenJournalBatch: Record "Gen. Journal Batch"; Type: Enum "Gen. Journal Template Type")
     var
         GenJournalTemplate: Record "Gen. Journal Template";
     begin
@@ -913,7 +909,7 @@
         LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
     end;
 
-    local procedure CreatePaymentGenJournal(var GenJournalLine: Record "Gen. Journal Line"; AccountType: Option; AccountNo: Code[20]; BalAccountNo: Code[20]; BankPaymentType: Option; Amount: Decimal; Type: Option; DocumentType: Option)
+    local procedure CreatePaymentGenJournal(var GenJournalLine: Record "Gen. Journal Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; BalAccountNo: Code[20]; BankPaymentType: Enum "Bank Payment Type"; Amount: Decimal; Type: Enum "Gen. Journal Template Type"; DocumentType: Enum "Gen. Journal Document Type")
     var
         GenJournalBatch: Record "Gen. Journal Batch";
     begin
@@ -945,19 +941,17 @@
         GeneralLedgerSetup.Get();
         GeneralLedgerSetup."Additional Reporting Currency" := CurrencyCode; // Validate is not required.
         GeneralLedgerSetup.Validate("Unrealized VAT", true); // Required for test.
-        GeneralLedgerSetup.Validate("Deposit Nos.", LibraryUtility.GetGlobalNoSeriesCode);
-        GeneralLedgerSetup.Validate("Bank Rec. Adj. Doc. Nos.", LibraryUtility.GetGlobalNoSeriesCode);
+        GeneralLedgerSetup.Validate("Deposit Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+        GeneralLedgerSetup.Validate("Bank Rec. Adj. Doc. Nos.", LibraryUtility.GetGlobalNoSeriesCode());
         GeneralLedgerSetup.Modify(true);
     end;
 
-    local procedure FindVATEntry(var VATEntry: Record "VAT Entry"; VATType: Option; DocumentType: Option; DocumentNo: Code[20])
+    local procedure FindVATEntry(var VATEntry: Record "VAT Entry"; VATType: Enum "General Posting Type"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20])
     begin
-        with VATEntry do begin
-            SetRange(Type, VATType);
-            SetRange("Document Type", DocumentType);
-            SetRange("Document No.", DocumentNo);
-            FindFirst();
-        end;
+        VATEntry.SetRange(Type, VATType);
+        VATEntry.SetRange("Document Type", DocumentType);
+        VATEntry.SetRange("Document No.", DocumentNo);
+        VATEntry.FindFirst();
     end;
 
     local procedure CalcVendInvoiceAmount(InvoiceNo: Code[20]): Decimal
@@ -991,7 +985,7 @@
         end;
     end;
 
-    local procedure VerifyVATAmountsInLastPmtVATEntry(VATType: Option; DocumentNo: Code[20]; VATAmount: Decimal; VATBase: Decimal)
+    local procedure VerifyVATAmountsInLastPmtVATEntry(VATType: Enum "General Posting Type"; DocumentNo: Code[20]; VATAmount: Decimal; VATBase: Decimal)
     var
         VATEntry: Record "VAT Entry";
     begin
@@ -1001,7 +995,7 @@
         VATEntry.TestField(Base, VATBase);
     end;
 
-    local procedure ApplyAndPostCustomerEntry(DocumentType: Option; DocumentNo: Code[20])
+    local procedure ApplyAndPostCustomerEntry(DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20])
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
     begin
@@ -1009,11 +1003,10 @@
         LibraryERM.PostCustLedgerApplication(CustLedgerEntry);
     end;
 
-    local procedure ApplyCustomerEntry(var ApplyCustLedgerEntry: Record "Cust. Ledger Entry"; DocumentType: Option; DocumentNo: Code[20])
+    local procedure ApplyCustomerEntry(var ApplyCustLedgerEntry: Record "Cust. Ledger Entry"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20])
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
         GLRegister: Record "G/L Register";
-        GEnJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
     begin
         LibraryERM.FindCustomerLedgerEntry(ApplyCustLedgerEntry, DocumentType, DocumentNo);
         ApplyCustLedgerEntry.CalcFields("Remaining Amount");
@@ -1034,11 +1027,11 @@
         VATEntry.SetRange("Entry No.", GLRegister."From VAT Entry No.", GLRegister."To VAT Entry No.");
         VATEntry.FindSet();
         Assert.AreNearlyEqual(
-          VATEntry.Amount, -VATAmount, LibraryERM.GetAmountRoundingPrecision,
+          VATEntry.Amount, -VATAmount, LibraryERM.GetAmountRoundingPrecision(),
           StrSubstNo(AmountErr, VATEntry.FieldCaption(Amount), VATAmount, VATEntry.TableCaption()));
         VATEntry.Next();
         Assert.AreNearlyEqual(
-          VATEntry.Amount, VATAmount, LibraryERM.GetAmountRoundingPrecision,
+          VATEntry.Amount, VATAmount, LibraryERM.GetAmountRoundingPrecision(),
           StrSubstNo(AmountErr, VATEntry.FieldCaption(Amount), -VATAmount, VATEntry.TableCaption()));
     end;
 
@@ -1072,7 +1065,7 @@
     end;
 
     [Scope('OnPrem')]
-    procedure VerifyRealizedVATAmountsInVATEntry(VATType: Option; DocumentType: Option; DocumentNo: Code[20]; RealizedVATAmount: Decimal; RealizedVATBase: Decimal; AmtRounding: Decimal)
+    procedure VerifyRealizedVATAmountsInVATEntry(VATType: Enum "General Posting Type"; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; RealizedVATAmount: Decimal; RealizedVATBase: Decimal; AmtRounding: Decimal)
     var
         VATEntry: Record "VAT Entry";
     begin

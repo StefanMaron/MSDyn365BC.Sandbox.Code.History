@@ -17,15 +17,12 @@ codeunit 110001 "Create Resource Template"
         ConfigTemplateHeader: Record "Config. Template Header";
         CreateTemplateHelper: Codeunit "Create Template Helper";
     begin
-        with DemoDataSetup do begin
-            Get();
+        DemoDataSetup.Get();
+        // Resource PERSON template
+        InsertTemplate(ConfigTemplateHeader, xPersonDescriptionTxt, DemoDataSetup.ServicesCode(), UOMHourTxt);
 
-            // Resource PERSON template
-            InsertTemplate(ConfigTemplateHeader, xPersonDescriptionTxt, ServicesCode, UOMHourTxt);
-
-            CreateTemplateHelper.CreateTemplateSelectionRule(
-              DATABASE::Resource, ConfigTemplateHeader.Code, '', 0, 0);
-        end;
+        CreateTemplateHelper.CreateTemplateSelectionRule(
+          DATABASE::Resource, ConfigTemplateHeader.Code, '', 0, 0);
     end;
 
     local procedure InsertTemplate(var ConfigTemplateHeader: Record "Config. Template Header"; Description: Text[50]; GenProdGroup: Code[20]; BaseUOM: Code[10])

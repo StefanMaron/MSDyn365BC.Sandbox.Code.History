@@ -25,14 +25,14 @@ codeunit 132582 "DotNet Exception Handler Tests"
         DotNetExceptionHandler: Codeunit "DotNet Exception Handler";
     begin
         // Setup
-        Assert.IsFalse(LoadImproperXml, RandomXmlErr);
+        Assert.IsFalse(LoadImproperXml(), RandomXmlErr);
 
         // Exercise
         DotNetExceptionHandler.Collect();
 
         // Verify
         Assert.ExpectedErrorCode('DotNetInvoke:Xml');
-        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage);
+        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage());
     end;
 
     [Test]
@@ -42,14 +42,14 @@ codeunit 132582 "DotNet Exception Handler Tests"
         DotNetExceptionHandler: Codeunit "DotNet Exception Handler";
     begin
         // Setup
-        Assert.IsFalse(DivideByZero, WrongDivisionErr);
+        Assert.IsFalse(DivideByZero(), WrongDivisionErr);
 
         // Exercise
         DotNetExceptionHandler.Collect();
 
         // Verify
         Assert.ExpectedErrorCode('AL:DivideByZero');
-        Assert.ExpectedMessage(DivideByZeroErr, DotNetExceptionHandler.GetMessage);
+        Assert.ExpectedMessage(DivideByZeroErr, DotNetExceptionHandler.GetMessage());
     end;
 
     [Test]
@@ -60,7 +60,7 @@ codeunit 132582 "DotNet Exception Handler Tests"
         XmlException: DotNet "System.Xml.XmlException";
     begin
         // Setup
-        Assert.IsFalse(LoadImproperXml, RandomXmlErr);
+        Assert.IsFalse(LoadImproperXml(), RandomXmlErr);
 
         // Exercise
         DotNetExceptionHandler.Collect();
@@ -68,7 +68,7 @@ codeunit 132582 "DotNet Exception Handler Tests"
 
         // Verify
         Assert.ExpectedErrorCode('DotNetInvoke:Xml');
-        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage);
+        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage());
     end;
 
     [Test]
@@ -79,7 +79,7 @@ codeunit 132582 "DotNet Exception Handler Tests"
         WebException: DotNet WebException;
     begin
         // Setup
-        Assert.IsFalse(LoadImproperXml, RandomXmlErr);
+        Assert.IsFalse(LoadImproperXml(), RandomXmlErr);
 
         // Exercise
         DotNetExceptionHandler.Collect();
@@ -89,7 +89,7 @@ codeunit 132582 "DotNet Exception Handler Tests"
 
         // Verify
         Assert.ExpectedErrorCode('DotNetInvoke:Xml');
-        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage);
+        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage());
     end;
 
     [Test]
@@ -100,7 +100,7 @@ codeunit 132582 "DotNet Exception Handler Tests"
         XmlException: DotNet "System.Xml.XmlException";
     begin
         // Setup
-        Assert.IsFalse(LoadImproperXml, RandomXmlErr);
+        Assert.IsFalse(LoadImproperXml(), RandomXmlErr);
 
         // Exercise
         DotNetExceptionHandler.Collect();
@@ -108,7 +108,7 @@ codeunit 132582 "DotNet Exception Handler Tests"
 
         // Verify
         Assert.ExpectedErrorCode('DotNetInvoke:Xml');
-        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage);
+        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage());
     end;
 
     [Test]
@@ -119,7 +119,7 @@ codeunit 132582 "DotNet Exception Handler Tests"
         WebException: DotNet WebException;
     begin
         // Setup
-        Assert.IsFalse(LoadImproperXml, RandomXmlErr);
+        Assert.IsFalse(LoadImproperXml(), RandomXmlErr);
 
         // Exercise
         DotNetExceptionHandler.Collect();
@@ -127,7 +127,7 @@ codeunit 132582 "DotNet Exception Handler Tests"
 
         // Verify
         Assert.ExpectedErrorCode('DotNetInvoke:Xml');
-        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage);
+        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage());
     end;
 
     [Test]
@@ -139,7 +139,7 @@ codeunit 132582 "DotNet Exception Handler Tests"
         WebException: DotNet WebException;
     begin
         // Setup
-        Assert.IsFalse(LoadImproperXml, RandomXmlErr);
+        Assert.IsFalse(LoadImproperXml(), RandomXmlErr);
 
         DotNetExceptionHandler.Collect();
         Assert.IsFalse(DotNetExceptionHandler.TryCastToType(GetDotNetType(WebException)), WebExceptionCollectedErr);
@@ -150,7 +150,7 @@ codeunit 132582 "DotNet Exception Handler Tests"
 
         // Verify
         Assert.ExpectedErrorCode('Dialog');
-        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler2.GetMessage);
+        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler2.GetMessage());
     end;
 
     [Test]
@@ -161,14 +161,14 @@ codeunit 132582 "DotNet Exception Handler Tests"
         XmlException: DotNet "System.Xml.XmlException";
     begin
         // Setup
-        Assert.IsFalse(LoadImproperXml, RandomXmlErr);
+        Assert.IsFalse(LoadImproperXml(), RandomXmlErr);
 
         // Exercise
         DotNetExceptionHandler.Catch(XmlException, GetDotNetType(XmlException));
 
         // Verify
         Assert.ExpectedErrorCode('DotNetInvoke:Xml');
-        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage);
+        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage());
     end;
 
     [Test]
@@ -179,14 +179,14 @@ codeunit 132582 "DotNet Exception Handler Tests"
         WebException: DotNet WebException;
     begin
         // Setup
-        Assert.IsFalse(LoadImproperXml, RandomXmlErr);
+        Assert.IsFalse(LoadImproperXml(), RandomXmlErr);
 
         // Exercise
         asserterror DotNetExceptionHandler.Catch(WebException, GetDotNetType(WebException));
 
         // Verify
         Assert.ExpectedErrorCode('Dialog');
-        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage);
+        Assert.ExpectedMessage(LoadXmlErr, DotNetExceptionHandler.GetMessage());
     end;
 
     [TryFunction]

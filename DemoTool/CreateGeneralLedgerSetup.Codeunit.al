@@ -5,42 +5,40 @@ codeunit 101098 "Create General Ledger Setup"
     begin
         DemoDataSetup.Get();
         Currency.Get(DemoDataSetup."Currency Code");
-        with "General Ledger Setup" do begin
-            Get();
-            UpdateFromCurrency;
+        "General Ledger Setup".Get();
+        UpdateFromCurrency();
 
-            Validate("Allow Posting From", 0D);
-            Validate("Allow Posting To", 0D);
-            if DemoDataSetup."Advanced Setup" then begin
-                Validate("Unrealized VAT", true);
-                if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::"Sales Tax" then
-                    Validate("Summarize G/L Entries", true);
-            end;
-            Validate("Adjust for Payment Disc.", DemoDataSetup."Adjust for Payment Discount");
-            Validate("Global Dimension 1 Code", XDEPARTMENT);
-            Validate("Global Dimension 2 Code", XPROJECT);
-            Validate("Shortcut Dimension 3 Code", XCUSTOMERGROUP);
-            Validate("Shortcut Dimension 4 Code", XAREA);
-            Validate("Shortcut Dimension 5 Code", XBUSINESSGROUP);
-            Validate("Shortcut Dimension 6 Code", XSALESCAMPAIGN);
-
-            if DemoDataSetup."Additional Currency Code" <> '' then
-                "Additional Reporting Currency" := DemoDataSetup."Additional Currency Code";
-
-            "Tax Invoice Renaming Threshold" := 0;
-            "Create No. Series".InitBaseSeries("Bank Account Nos.", XBANK, XBANK, XB10, 'B990', '', '', 10, true);
-            "EMU Currency" := DemoDataSetup."LCY an EMU Currency";
-            "Local Address Format" := "Local Address Format"::"City+County+Post Code";
-            "Show Amounts" := "Show Amounts"::"Amount Only";
-            "Create No. Series".InitBaseSeries("Deposit Nos.", Text001, Text002, Text003, Text004, '', '', 1);
-            "Create No. Series".InitBaseSeries("Bank Rec. Adj. Doc. Nos.", Text005, Text006, Text007, Text008, '', '', 1);
-            Modify();
+        "General Ledger Setup".Validate("Allow Posting From", 0D);
+        "General Ledger Setup".Validate("Allow Posting To", 0D);
+        if DemoDataSetup."Advanced Setup" then begin
+            "General Ledger Setup".Validate("Unrealized VAT", true);
+            if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::"Sales Tax" then
+                "General Ledger Setup".Validate("Summarize G/L Entries", true);
         end;
-        VATRegistrationLogMgt.InitServiceSetup;
+        "General Ledger Setup".Validate("Adjust for Payment Disc.", DemoDataSetup."Adjust for Payment Discount");
+        "General Ledger Setup".Validate("Global Dimension 1 Code", XDEPARTMENT);
+        "General Ledger Setup".Validate("Global Dimension 2 Code", XPROJECT);
+        "General Ledger Setup".Validate("Shortcut Dimension 3 Code", XCUSTOMERGROUP);
+        "General Ledger Setup".Validate("Shortcut Dimension 4 Code", XAREA);
+        "General Ledger Setup".Validate("Shortcut Dimension 5 Code", XBUSINESSGROUP);
+        "General Ledger Setup".Validate("Shortcut Dimension 6 Code", XSALESCAMPAIGN);
+
+        if DemoDataSetup."Additional Currency Code" <> '' then
+            "General Ledger Setup"."Additional Reporting Currency" := DemoDataSetup."Additional Currency Code";
+
+        "General Ledger Setup"."Enable Data Check" := true;
+        "General Ledger Setup"."Tax Invoice Renaming Threshold" := 0;
+        "Create No. Series".InitBaseSeries("General Ledger Setup"."Bank Account Nos.", XBANK, XBANK, XB10, 'B990', '', '', 10, Enum::"No. Series Implementation"::Sequence);
+        "General Ledger Setup"."EMU Currency" := DemoDataSetup."LCY an EMU Currency";
+        "General Ledger Setup"."Local Address Format" := "General Ledger Setup"."Local Address Format"::"City+County+Post Code";
+        "General Ledger Setup"."Show Amounts" := "General Ledger Setup"."Show Amounts"::"Amount Only";
+        "Create No. Series".InitBaseSeries("General Ledger Setup"."Deposit Nos.", Text001, Text002, Text003, Text004, '', '', 1);
+        "Create No. Series".InitBaseSeries("General Ledger Setup"."Bank Rec. Adj. Doc. Nos.", Text005, Text006, Text007, Text008, '', '', 1);
+        "General Ledger Setup".Modify();
+        VATRegistrationLogMgt.InitServiceSetup();
     end;
 
     var
-        Text000: Label 'B990';
         Text001: Label 'BANKDEP';
         Text002: Label 'Bank Deposit';
         Text003: Label 'BDEP1001';
@@ -67,47 +65,42 @@ codeunit 101098 "Create General Ledger Setup"
     begin
         DemoDataSetup.Get();
         Currency.Get(DemoDataSetup."Currency Code");
-        with "General Ledger Setup" do begin
-            Get();
-            UpdateFromCurrency;
+        "General Ledger Setup".Get();
+        UpdateFromCurrency();
 
-            Validate("Allow Posting From", 0D);
-            Validate("Allow Posting To", 0D);
-            Validate("Unrealized VAT", DemoDataSetup."Advanced Setup");
-            Validate("Adjust for Payment Disc.", true);
-            Validate("Payment Tolerance %", 0.1);
-            Validate("Max. Payment Tolerance Amount", 1);
-            "Create No. Series".InitBaseSeries("Bank Account Nos.", XBANK, XBANK, XB10, 'B990', '', '', 10, true);
-            "EMU Currency" := DemoDataSetup."LCY an EMU Currency";
-            "Local Cont. Addr. Format" := "Local Cont. Addr. Format"::"After Company Name";
-            "Local Address Format" := "Local Address Format"::"City+County+Post Code";
-            "Show Amounts" := "Show Amounts"::"Amount Only";
-            Modify();
-        end;
-        VATRegistrationLogMgt.InitServiceSetup;
+        "General Ledger Setup".Validate("Allow Posting From", 0D);
+        "General Ledger Setup".Validate("Allow Posting To", 0D);
+        "General Ledger Setup".Validate("Unrealized VAT", DemoDataSetup."Advanced Setup");
+        "General Ledger Setup".Validate("Adjust for Payment Disc.", true);
+        "General Ledger Setup".Validate("Payment Tolerance %", 0.1);
+        "General Ledger Setup".Validate("Max. Payment Tolerance Amount", 1);
+        "Create No. Series".InitBaseSeries("General Ledger Setup"."Bank Account Nos.", XBANK, XBANK, XB10, 'B990', '', '', 10, Enum::"No. Series Implementation"::Sequence);
+        "General Ledger Setup"."EMU Currency" := DemoDataSetup."LCY an EMU Currency";
+        "General Ledger Setup"."Local Cont. Addr. Format" := "General Ledger Setup"."Local Cont. Addr. Format"::"After Company Name";
+        "General Ledger Setup"."Local Address Format" := "General Ledger Setup"."Local Address Format"::"City+County+Post Code";
+        "General Ledger Setup"."Show Amounts" := "General Ledger Setup"."Show Amounts"::"Amount Only";
+        "General Ledger Setup"."Enable Data Check" := true;
+        "General Ledger Setup".Modify();
+        VATRegistrationLogMgt.InitServiceSetup();
     end;
 
     procedure InsertEvaluationData()
     begin
-        with "General Ledger Setup" do begin
-            Get();
-            Validate("Global Dimension 1 Code", XDEPARTMENT);
-            Validate("Global Dimension 2 Code", XCUSTOMERGROUP);
-            "Max. VAT Difference Allowed" := 10;
-            Modify();
-        end;
+        "General Ledger Setup".Get();
+        "General Ledger Setup".Validate("Global Dimension 1 Code", XDEPARTMENT);
+        "General Ledger Setup".Validate("Global Dimension 2 Code", XCUSTOMERGROUP);
+        "General Ledger Setup"."Max. VAT Difference Allowed" := 10;
+        "General Ledger Setup".Modify();
     end;
 
     local procedure UpdateFromCurrency()
     begin
-        with "General Ledger Setup" do begin
-            Validate("Inv. Rounding Precision (LCY)", Currency."Invoice Rounding Precision");
-            "Amount Rounding Precision" := Currency."Amount Rounding Precision";
-            "Unit-Amount Rounding Precision" := Currency."Unit-Amount Rounding Precision";
-            "Amount Decimal Places" := Currency."Amount Decimal Places";
-            "Unit-Amount Decimal Places" := Currency."Unit-Amount Decimal Places";
-            Validate("LCY Code", Currency.Code);
-        end;
+        "General Ledger Setup".Validate("Inv. Rounding Precision (LCY)", Currency."Invoice Rounding Precision");
+        "General Ledger Setup"."Amount Rounding Precision" := Currency."Amount Rounding Precision";
+        "General Ledger Setup"."Unit-Amount Rounding Precision" := Currency."Unit-Amount Rounding Precision";
+        "General Ledger Setup"."Amount Decimal Places" := Currency."Amount Decimal Places";
+        "General Ledger Setup"."Unit-Amount Decimal Places" := Currency."Unit-Amount Decimal Places";
+        "General Ledger Setup".Validate("LCY Code", Currency.Code);
     end;
 }
 

@@ -3,18 +3,16 @@ codeunit 101093 "Create Vendor Posting Group"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Data Type" = "Data Type"::Extended then begin
-                InsertData(
-                  DomesticCode, XDomesticVendorsTxt, '995410', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
-                InsertData(
-                  ForeignCode, XForeignVendorsTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
-                InsertData(
-                  EUCode, XVendorsInEUTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
-            end else
-                InsertData(DomesticCode, XDomesticVendorsTxt, CreateGLAccount.AccountsPayableDomestic(), '', CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.InterestIncome(), CreateGLAccount.InterestIncome());
-        end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
+            InsertData(
+              DemoDataSetup.DomesticCode(), XDomesticVendorsTxt, '995410', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
+            InsertData(
+              DemoDataSetup.ForeignCode(), XForeignVendorsTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
+            InsertData(
+              DemoDataSetup.EUCode(), XVendorsInEUTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
+        end else
+            InsertData(DemoDataSetup.DomesticCode(), XDomesticVendorsTxt, CreateGLAccount.AccountsPayableDomestic(), '', CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.InterestIncome(), CreateGLAccount.InterestIncome());
     end;
 
     var

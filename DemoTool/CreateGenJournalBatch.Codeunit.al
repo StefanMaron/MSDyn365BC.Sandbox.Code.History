@@ -3,42 +3,26 @@ codeunit 101232 "Create Gen. Journal Batch"
 
     trigger OnRun()
     begin
-        InsertData(XSTART, XCUSTOPEN, XCustomers, 0, '', true, false);
-        InsertData(XSTART, XGLOPEN, XGLAccounts, 0, '', true, false);
-        InsertData(XSTART, XPERIODIC, XPERIODIC, 0, '', true, false);
-        InsertData(XSTART, XVENDOPEN, XVendors, 0, '', true, false);
-        InsertData(XSTART, XBANKOPEN, XBank, 0, '', true, false);
-        InsertData(XSTART, XDEFAULT, XOther, 0, '', true, false);
+        InsertData(XSTART, XCUSTOPEN, XCustomers, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XGLOPEN, XGLAccounts, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XPERIODIC, XPERIODIC, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XVENDOPEN, XVendors, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XBANKOPEN, XBank, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XDEFAULT, XOther, "Gen. Journal Account Type"::"G/L Account", '', true, false);
 
-        InsertData(XSTART, XDEPR, XPeriodicDepr, 0, '', true, false);
-        InsertData(XASSETS, XDEFAULT, XDefaultJournalBatch, 0, '', true, false);
-        InsertData(XJOB, XDEFAULT, XDefaultJournalBatch, 0, '', true, false);
+        InsertData(XSTART, XDEPR, XPeriodicDepr, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XASSETS, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XJOB, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
 
-        InsertData(
-          XGENERAL, XDEFAULT, XDefaultJournalBatch,
-          0, '', true, false);
-        InsertData(
-          XGENERAL, XCASH, XCashreceiptsandpayments,
-          "Gen. Journal Batch"."Bal. Account Type"::"G/L Account", '992910', true, false);
-        InsertData(
-          XSALES, XDEFAULT, XDefaultJournalBatch,
-          0, '', true, false);
-        InsertData(
-          XPURCH, XDEFAULT, XDefaultJournalBatch,
-          0, '', true, false);
+        InsertData(XGENERAL, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XGENERAL, XCASH, XCashreceiptsandpayments, "Gen. Journal Batch"."Bal. Account Type"::"G/L Account", '992910', true, false);
+        InsertData(XSALES, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XPURCH, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
 
-        InsertData(
-          XCASHRCPT, XGENERAL, XGENERAL,
-          0, '', true, false);
-        InsertData(
-          XCASHRCPT, XBank, XBankpayments,
-          "Gen. Journal Batch"."Bal. Account Type"::"Bank Account", XWWBOPERATING, true, false);
-        InsertData(
-          XCASHRCPT, XGIRO, XGiropayments,
-          "Gen. Journal Batch"."Bal. Account Type"::"Bank Account", XGIRO, true, false);
-        InsertData(
-          XPAYMENT, XGENERAL, XGENERAL,
-          0, '', true, false);
+        InsertData(XCASHRCPT, XGENERAL, XGENERAL, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XCASHRCPT, XBank, XBankpayments, "Gen. Journal Batch"."Bal. Account Type"::"Bank Account", XWWBOPERATING, true, false);
+        InsertData(XCASHRCPT, XGIRO, XGiropayments, "Gen. Journal Batch"."Bal. Account Type"::"Bank Account", XGIRO, true, false);
+        InsertData(XPAYMENT, XGENERAL, XGENERAL, "Gen. Journal Account Type"::"G/L Account", '', true, false);
         InsertData(
           XPAYMENT, XBank, XBankpayments,
           "Gen. Journal Batch"."Bal. Account Type"::"Bank Account", XWWBOPERATING, false, false);
@@ -75,7 +59,7 @@ codeunit 101232 "Create Gen. Journal Batch"
         XPeriodicDepr: Label 'Periodic Depr.';
         XASSETS: Label 'ASSETS';
         XDefaultJournalBatch: Label 'Default Journal Batch';
-        XGENERAL: Label 'GENERAL';
+        XGENERAL: Label 'GENERAL', MaxLength = 10;
         XCASH: Label 'CASH';
         XCashreceiptsandpayments: Label 'Cash receipts and payments';
         XSALES: Label 'SALES';
@@ -93,11 +77,11 @@ codeunit 101232 "Create Gen. Journal Batch"
         XBankConvDescTxt: Label 'Payment Export using Bank Data Conversion Service';
         XWWBTRANSFERSTxt: Label 'WWB-TRANSFERS', Locked = true;
         XMONTHLY: Label 'Monthly';
-        XDAILY: Label 'DAILY';
+        XDAILY: Label 'DAILY', MaxLength = 10;
         XMonthlyJournalEntries: Label 'Monthly Journal Entries';
         XDailyJournalEntries: Label 'Daily Journal Entries';
 
-    procedure InsertData("Journal Template Name": Code[10]; Name: Code[10]; Description: Text[50]; "Bal. Account Type": Option; "Bal. Account No.": Code[20]; InsertNoSeries: Boolean; AllowPaymentExport: Boolean)
+    procedure InsertData("Journal Template Name": Code[10]; Name: Code[10]; Description: Text[50]; "Bal. Account Type": Enum "Gen. Journal Account Type"; "Bal. Account No.": Code[20]; InsertNoSeries: Boolean; AllowPaymentExport: Boolean)
     begin
         "Gen. Journal Batch".Init();
         "Gen. Journal Batch".Validate("Journal Template Name", "Journal Template Name");
@@ -117,10 +101,10 @@ codeunit 101232 "Create Gen. Journal Batch"
 
     procedure InsertMiniAppData()
     begin
-        InsertData(XGENERAL, XDEFAULT, XDefaultJournalBatch, 0, '', true, false);
+        InsertData(XGENERAL, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
         UpdateCopyToPostedGenJnlLines(XGENERAL, XDEFAULT, true);
         InsertData(XGENERAL, XMONTHLY, XMonthlyJournalEntries, "Gen. Journal Batch"."Bal. Account Type"::"G/L Account", CreateGLAccount.BusinessaccountOperatingDomestic(), true, false);
-        InsertData(XGENERAL, XDAILY, XDailyJournalEntries, 3, '', true, false);
+        InsertData(XGENERAL, XDAILY, XDailyJournalEntries, "Gen. Journal Account Type"::"Bank Account", '', true, false);
         UpdateCopyToPostedGenJnlLines(XGENERAL, XMONTHLY, true);
         InsertData(XCASHRCPT, XGENERAL, XGENERAL, "Gen. Journal Batch"."Bal. Account Type"::"G/L Account", CreateGLAccount.BusinessaccountOperatingDomestic(), true, false);
         InsertData(XPAYMENT, XGENERAL, XGENERAL, "Gen. Journal Batch"."Bal. Account Type"::"G/L Account", CreateGLAccount.BusinessaccountOperatingDomestic(), true, false);
@@ -129,7 +113,7 @@ codeunit 101232 "Create Gen. Journal Batch"
         InsertData(
           XPAYMENT, XCASH, XCashreceiptsandpayments,
           "Gen. Journal Batch"."Bal. Account Type"::"G/L Account", CreateGLAccount.BusinessaccountOperatingDomestic(), true, false);
-        InsertData(XASSETS, XDEFAULT, XDefaultJournalBatch, 0, '', true, false);
+        InsertData(XASSETS, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
     end;
 
     procedure GetGeneralDefaultBatch(var GenJournalBatch: Record "Gen. Journal Batch")
@@ -138,12 +122,12 @@ codeunit 101232 "Create Gen. Journal Batch"
         GenJournalBatch.Name := XDEFAULT;
     end;
 
-    internal procedure GetGeneralJournalTemplateName(): Text
+    internal procedure GetGeneralJournalTemplateName(): Code[10]
     begin
         exit(XGENERAL);
     end;
 
-    internal procedure GetDailyJournalBatchName(): Text
+    internal procedure GetDailyJournalBatchName(): Code[10]
     begin
         exit(XDAILY);
     end;

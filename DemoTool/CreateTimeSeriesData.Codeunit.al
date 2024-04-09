@@ -12,7 +12,7 @@ codeunit 119300 "Create Time Series Data"
             ItemSalesPath := TemporaryPath() + '\..\MachineLearning\itemsales.xml'
         else
             ItemSalesPath := DemoDataSetup."Path to Picture Folder" + 'MachineLearning\itemsales.xml';
-            
+
         CreateEvaluationData.SetSeed(582);
         ReadItemSalesData(ItemSalesData, ItemSalesPath);
         ProcessItemSalesData(ItemSalesData);
@@ -20,7 +20,6 @@ codeunit 119300 "Create Time Series Data"
 
     var
         CreateEvaluationData: Codeunit "Interface Evaluation Data";
-        FileManagement: Codeunit "File Management";
         Periods: Integer;
         MaxNumberOfInvoices: Integer;
 
@@ -121,12 +120,12 @@ codeunit 119300 "Create Time Series Data"
 
     local procedure GetFirstPostingDate(Period: Integer): Date
     begin
-        exit(CalcDate('<+' + Format(Period - 1) + 'M>', GetMinPostingDate));
+        exit(CalcDate('<+' + Format(Period - 1) + 'M>', GetMinPostingDate()));
     end;
 
     local procedure GetMinPostingDate(): Date
     begin
-        exit(CalcDate('<-15M>', CreateEvaluationData.GetCurrentDay));
+        exit(CalcDate('<-15M>', CreateEvaluationData.GetCurrentDay()));
     end;
 
     local procedure AllocateQuantities(var TempQuantityAllocationBuffer: Record "Quantity Allocation Buffer" temporary; ItemNo: Code[20]; Quantity: Decimal; Index: Integer)

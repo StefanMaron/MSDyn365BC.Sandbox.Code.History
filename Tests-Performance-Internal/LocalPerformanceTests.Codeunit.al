@@ -20,7 +20,6 @@ codeunit 139094 "Local Performance Tests"
         LibrarySales: Codeunit "Library - Sales";
         LibraryService: Codeunit "Library - Service";
         LibraryInventory: Codeunit "Library - Inventory";
-        Assert: Codeunit Assert;
         TestsBuffer: Integer;
         TestsBufferPercentage: Integer;
         TraceDumpFilePath: Text;
@@ -67,7 +66,6 @@ codeunit 139094 "Local Performance Tests"
         SalesLine: Record "Sales Line";
         PerfProfilerEventsTest: Record "Perf Profiler Events Test";
         SalesPostYNPrepmt: Codeunit "Sales-Post Prepayment (Yes/No)";
-        VATCalculationType: Option "Normal VAT","Reverse Charge VAT","Full VAT","Sales Tax";
         CustomerNo: Code[20];
         ItemNo: Code[20];
     begin
@@ -225,7 +223,7 @@ codeunit 139094 "Local Performance Tests"
 
     local procedure CreateGenJournalBatch(var GenJournalBatch: Record "Gen. Journal Batch"; BalAccountNo: Code[20])
     begin
-        LibraryERM.CreateGenJournalBatch(GenJournalBatch, LibraryPaymentExport.SelectPaymentJournalTemplate);
+        LibraryERM.CreateGenJournalBatch(GenJournalBatch, LibraryPaymentExport.SelectPaymentJournalTemplate());
         with GenJournalBatch do begin
             "Bal. Account Type" := "Bal. Account Type"::"Bank Account";
             "Bal. Account No." := BalAccountNo;
@@ -333,7 +331,7 @@ codeunit 139094 "Local Performance Tests"
         TaxGroup: Record "Tax Group";
     begin
         LibraryERM.CreateTaxGroup(TaxGroup);
-        LibraryERM.CreateTaxDetail(TaxDetail, CreateSalesTaxJurisdiction, TaxGroup.Code, TaxDetail."Tax Type"::"Sales Tax Only", WorkDate());
+        LibraryERM.CreateTaxDetail(TaxDetail, CreateSalesTaxJurisdiction(), TaxGroup.Code, TaxDetail."Tax Type"::"Sales Tax Only", WorkDate());
     end;
 
     local procedure CreateSalesTaxJurisdiction(): Code[10]
@@ -423,6 +421,6 @@ codeunit 139094 "Local Performance Tests"
     [Scope('OnPrem')]
     procedure SalesTaxesCollectedReqPageHandler(var SalesTaxesCollected: TestRequestPage "Sales Taxes Collected")
     begin
-        SalesTaxesCollected.SaveAsXml(LibraryReportDataset.GetParametersFileName, LibraryReportDataset.GetFileName);
+        SalesTaxesCollected.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 }

@@ -3,22 +3,20 @@ codeunit 101250 "Create Gen. Bus. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            case "Company Type" of
-                "Company Type"::"Sales Tax":
-                    begin
-                        InsertData(DomesticCode, XDomesticcustomersandvendors, '');
-                        InsertData(EUCode, XCustomersandvendorsinEU, '');
-                        InsertData(ExportCode, XOthercustomersandvendorsnotEU, '');
-                    end;
-                "Company Type"::VAT:
-                    begin
-                        InsertData(DomesticCode, XDomesticcustomersandvendors, '');
-                        InsertData(EUCode, XCustomersandvendorsinEU, '');
-                        InsertData(ExportCode, XOthercustomersandvendorsnotEU, '');
-                    end;
-            end;
+        DemoDataSetup.Get();
+        case DemoDataSetup."Company Type" of
+            DemoDataSetup."Company Type"::"Sales Tax":
+                begin
+                    InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, '');
+                    InsertData(DemoDataSetup.EUCode(), XCustomersandvendorsinEU, '');
+                    InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, '');
+                end;
+            DemoDataSetup."Company Type"::VAT:
+                begin
+                    InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, '');
+                    InsertData(DemoDataSetup.EUCode(), XCustomersandvendorsinEU, '');
+                    InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, '');
+                end;
         end;
     end;
 
@@ -42,10 +40,8 @@ codeunit 101250 "Create Gen. Bus. Posting Gr."
 
     procedure InsertMiniAppData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(DomesticCode, XDomesticcustomersandvendors, '');
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, '');
     end;
 }
 

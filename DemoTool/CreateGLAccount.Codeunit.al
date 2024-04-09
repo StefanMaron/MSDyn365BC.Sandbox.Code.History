@@ -3,335 +3,332 @@ codeunit 101015 "Create G/L Account"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('991002', XASSETS, 3, 1, 1, '', 0, '', '', '', '', true);
-            InsertData('991003', XFixedAssets, 3, 1, 1, '', 0, '', '', '', '', true);
-            InsertData('991100', XLandandBuildings, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991110', XLandandBuildings, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991120', XIncreasesduringtheYear, 0, 1, 0, '', 1, DomesticCode, MiscCode, '', '', true);
-            InsertData('991130', XDecreasesduringtheYear, 0, 1, 0, '', 2, DomesticCode, MiscCode, '', '', true);
-            InsertData('991140', XAccumDepreciationBuildings, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991190', XLandandBuildingsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991200', XOperatingEquipment, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991210', XOperatingEquipment, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991220', XIncreasesduringtheYear, 0, 1, 0, '', 1, DomesticCode, MiscCode, '', '', true);
-            InsertData('991230', XDecreasesduringtheYear, 0, 1, 0, '', 2, DomesticCode, MiscCode, '', '', true);
-            InsertData('991240', XAccumDeprOperEquip, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991290', XOperatingEquipmentTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991300', XVehicles, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991310', XVehicles, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991320', XIncreasesduringtheYear, 0, 1, 0, '', 1, DomesticCode, MiscCode, '', '', true);
-            InsertData('991330', XDecreasesduringtheYear, 0, 1, 0, '', 2, DomesticCode, MiscCode, '', '', true);
-            InsertData('991340', XAccumDepreciationVehicles, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('991390', XVehiclesTotal, 4, 1, 0,
-              Adjust.Convert('991300') + '..' + Adjust.Convert('991390'), 0, '', '', '', '', true);
-            InsertData('991999', XFixedAssetsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992000', XCurrentAssets, 3, 1, 1, '', 0, '', '', '', '', true);
-            InsertData('992100', XInventory, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992110', XResaleItems, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992111', XResaleItemsInterim, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992112', XCostofResaleSoldInterim, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992120', XFinishedGoods, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992121', XFinishedGoodsInterim, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992130', XRawMaterials, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992131', XRawMaterialsInterim, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992132', XCostofRawMatSoldInterim, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992180', XPrimoInventory, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992190', XInventoryTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992200', XJobWIP, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992210', XWIPSales, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992211', XWIPJobSales, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992212', XInvoicedJobSales, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992220', XWIPSalesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992230', XWIPCosts, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992231', XWIPJobCosts, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992232', XAccruedJobCosts, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992240', XWIPCostsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992290', XJobWIPTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992300', XAccountsReceivable, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992310', XCustomersDomestic, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992320', XCustomersForeign, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992330', XAccruedInterest, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992340', XOtherReceivables, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992390', XAccountsReceivableTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992400', XPurchasePrepayments, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992410', StrSubstNo(XVendorPrepaymentsVAT, NoVATText), 0, 1, 0, '', 0, '', NoVATCode, '', '', false);
-            InsertData('992420', StrSubstNo(XVendorPrepaymentsVAT, ServicesVATText), 0, 1, 0, '', 0, '', ServicesCode, '', '', false);
-            InsertData('992430', StrSubstNo(XVendorPrepaymentsVAT, GoodsVATText), 0, 1, 0, '', 0, '', RetailCode, '', '', false);
-            InsertData('992440', XPurchasePrepaymentsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992800', XSecurities, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992810', XBonds, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992890', XSecuritiesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992900', XLiquidAssets, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992910', XCash, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992920', XBankLCY, 0, 1, 0, '', 0, '', '', '', '', false);
-            InsertData('992930', XBankCurrencies, 0, 1, 0, '', 0, '', '', '', '', false);
-            InsertData('992940', XGiroAccount, 0, 1, 0, '', 0, '', '', '', '', false);
-            InsertData('992990', XLiquidAssetsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992995', XCurrentAssetsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('992999', XTOTALASSETS, 4, 1, 1, '', 0, '', '', '', '', true);
-            InsertData('993000', XLIABILITIESANDEQUITY, 1, 1, 1, '', 0, '', '', '', '', true);
-            InsertData('993110', XCapitalStock, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('993120', XRetainedEarnings, 0, 1, 0, '', 0, '', '', '', '', false);
-            InsertData('993195', XNetIncomefortheYear, 2, 1, 0,
-              Adjust.Convert('996100') + '..' + Adjust.Convert('999999'), 0, '', '', '', '', true);
-            InsertData('993199', XTotalStockholdersEquity, 2, 1, 0,
-              Adjust.Convert('8030000') + '..' + Adjust.Convert('993199') +
-              '|' + Adjust.Convert('996100') + '..' + Adjust.Convert('999999'), 0, '', '', '', '', true);
-            InsertData('994010', XDeferredTaxes, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995000', XLiabilities, 3, 1, 1, '', 0, '', '', '', '', true);
-            InsertData('995100', XLongtermLiabilities, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995110', XLongtermBankLoans, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995120', XMortgage, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995290', XLongtermLiabilitiesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995300', XShorttermLiabilities, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995310', XRevolvingCredit, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995350', XSalesPrepayments, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995360', StrSubstNo(XCustomerPrepaymentsVAT, NoVATText), 0, 1, 0, '', 0, '', NoVATCode, '', '', false);
-            InsertData('995370', StrSubstNo(XCustomerPrepaymentsVAT, ServicesVATText), 0, 1, 0, '', 0, '', ServicesCode, '', '', false);
-            InsertData('995380', StrSubstNo(XCustomerPrepaymentsVAT, GoodsVATText), 0, 1, 0, '', 0, '', RetailCode, '', '', false);
-            InsertData('995390', XCustomerPrepaymentsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995400', XAccountsPayable, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995410', XVendorsDomestic, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995420', XVendorsForeign, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995490', XAccountsPayableTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995500', XInvAdjmtInterim, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995510', XInvAdjmtInterimRetail, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995530', XInvAdjmtInterimRawMat, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995590', XInvAdjmtInterimTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            case "Company Type" of
-                "Company Type"::"Sales Tax":
-                    if "Advanced Setup" then begin
-                        InsertData('995610', XSalesTAXGA, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995611', XSalesTAXFL, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995612', XSalesTAXIL, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995620', XUseTAXGAReversing, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995621', XUseTAXFLReversing, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995622', XUseTAXILReversing, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995630', XUseTAXGA, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995631', XUseTAXFL, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995632', XUseTAXIL, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995615', XSalesTAXGAUnrealized, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995625', XUseTAXGAReversingUnrealized, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995635', XUseTAXGAUnrealized, 0, 1, 0, '', 0, '', '', '', '', true);
-                    end else begin
-                        InsertData('995610', XSalesTaxTok, 0, 1, 0, '', 0, '', '', '', '', true);
-                        InsertData('995620', XPurchaseTaxTok, 0, 1, 0, '', 0, '', '', '', '', true);
+        DemoDataSetup.Get();
+        InsertData('991002', XASSETS, 3, 1, 1, '', 0, '', '', '', '', true);
+        InsertData('991003', XFixedAssets, 3, 1, 1, '', 0, '', '', '', '', true);
+        InsertData('991100', XLandandBuildings, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991110', XLandandBuildings, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991120', XIncreasesduringtheYear, 0, 1, 0, '', 1, DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('991130', XDecreasesduringtheYear, 0, 1, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('991140', XAccumDepreciationBuildings, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991190', XLandandBuildingsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991200', XOperatingEquipment, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991210', XOperatingEquipment, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991220', XIncreasesduringtheYear, 0, 1, 0, '', 1, DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('991230', XDecreasesduringtheYear, 0, 1, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('991240', XAccumDeprOperEquip, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991290', XOperatingEquipmentTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991300', XVehicles, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991310', XVehicles, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991320', XIncreasesduringtheYear, 0, 1, 0, '', 1, DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('991330', XDecreasesduringtheYear, 0, 1, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('991340', XAccumDepreciationVehicles, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('991390', XVehiclesTotal, 4, 1, 0,
+          Adjust.Convert('991300') + '..' + Adjust.Convert('991390'), 0, '', '', '', '', true);
+        InsertData('991999', XFixedAssetsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992000', XCurrentAssets, 3, 1, 1, '', 0, '', '', '', '', true);
+        InsertData('992100', XInventory, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992110', XResaleItems, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992111', XResaleItemsInterim, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992112', XCostofResaleSoldInterim, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992120', XFinishedGoods, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992121', XFinishedGoodsInterim, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992130', XRawMaterials, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992131', XRawMaterialsInterim, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992132', XCostofRawMatSoldInterim, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992180', XPrimoInventory, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992190', XInventoryTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992200', XJobWIP, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992210', XWIPSales, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992211', XWIPJobSales, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992212', XInvoicedJobSales, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992220', XWIPSalesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992230', XWIPCosts, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992231', XWIPJobCosts, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992232', XAccruedJobCosts, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992240', XWIPCostsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992290', XJobWIPTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992300', XAccountsReceivable, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992310', XCustomersDomestic, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992320', XCustomersForeign, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992330', XAccruedInterest, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992340', XOtherReceivables, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992390', XAccountsReceivableTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992400', XPurchasePrepayments, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992410', StrSubstNo(XVendorPrepaymentsVAT, DemoDataSetup.NoVATText()), 0, 1, 0, '', 0, '', DemoDataSetup.NoVATCode(), '', '', false);
+        InsertData('992420', StrSubstNo(XVendorPrepaymentsVAT, DemoDataSetup.ServicesVATText()), 0, 1, 0, '', 0, '', DemoDataSetup.ServicesCode(), '', '', false);
+        InsertData('992430', StrSubstNo(XVendorPrepaymentsVAT, DemoDataSetup.GoodsVATText()), 0, 1, 0, '', 0, '', DemoDataSetup.RetailCode(), '', '', false);
+        InsertData('992440', XPurchasePrepaymentsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992800', XSecurities, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992810', XBonds, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992890', XSecuritiesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992900', XLiquidAssets, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992910', XCash, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992920', XBankLCY, 0, 1, 0, '', 0, '', '', '', '', false);
+        InsertData('992930', XBankCurrencies, 0, 1, 0, '', 0, '', '', '', '', false);
+        InsertData('992940', XGiroAccount, 0, 1, 0, '', 0, '', '', '', '', false);
+        InsertData('992990', XLiquidAssetsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992995', XCurrentAssetsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('992999', XTOTALASSETS, 4, 1, 1, '', 0, '', '', '', '', true);
+        InsertData('993000', XLIABILITIESANDEQUITY, 1, 1, 1, '', 0, '', '', '', '', true);
+        InsertData('993110', XCapitalStock, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('993120', XRetainedEarnings, 0, 1, 0, '', 0, '', '', '', '', false);
+        InsertData('993195', XNetIncomefortheYear, 2, 1, 0,
+          Adjust.Convert('996100') + '..' + Adjust.Convert('999999'), 0, '', '', '', '', true);
+        InsertData('993199', XTotalStockholdersEquity, 2, 1, 0,
+          Adjust.Convert('8030000') + '..' + Adjust.Convert('993199') +
+          '|' + Adjust.Convert('996100') + '..' + Adjust.Convert('999999'), 0, '', '', '', '', true);
+        InsertData('994010', XDeferredTaxes, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995000', XLiabilities, 3, 1, 1, '', 0, '', '', '', '', true);
+        InsertData('995100', XLongtermLiabilities, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995110', XLongtermBankLoans, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995120', XMortgage, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995290', XLongtermLiabilitiesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995300', XShorttermLiabilities, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995310', XRevolvingCredit, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995350', XSalesPrepayments, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995360', StrSubstNo(XCustomerPrepaymentsVAT, DemoDataSetup.NoVATText()), 0, 1, 0, '', 0, '', DemoDataSetup.NoVATCode(), '', '', false);
+        InsertData('995370', StrSubstNo(XCustomerPrepaymentsVAT, DemoDataSetup.ServicesVATText()), 0, 1, 0, '', 0, '', DemoDataSetup.ServicesCode(), '', '', false);
+        InsertData('995380', StrSubstNo(XCustomerPrepaymentsVAT, DemoDataSetup.GoodsVATText()), 0, 1, 0, '', 0, '', DemoDataSetup.RetailCode(), '', '', false);
+        InsertData('995390', XCustomerPrepaymentsTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995400', XAccountsPayable, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995410', XVendorsDomestic, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995420', XVendorsForeign, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995490', XAccountsPayableTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995500', XInvAdjmtInterim, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995510', XInvAdjmtInterimRetail, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995530', XInvAdjmtInterimRawMat, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995590', XInvAdjmtInterimTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        case DemoDataSetup."Company Type" of
+            DemoDataSetup."Company Type"::"Sales Tax":
+                if DemoDataSetup."Advanced Setup" then begin
+                    InsertData('995610', XSalesTAXGA, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995611', XSalesTAXFL, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995612', XSalesTAXIL, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995620', XUseTAXGAReversing, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995621', XUseTAXFLReversing, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995622', XUseTAXILReversing, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995630', XUseTAXGA, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995631', XUseTAXFL, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995632', XUseTAXIL, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995615', XSalesTAXGAUnrealized, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995625', XUseTAXGAReversingUnrealized, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995635', XUseTAXGAUnrealized, 0, 1, 0, '', 0, '', '', '', '', true);
+                end else begin
+                    InsertData('995610', XSalesTaxTok, 0, 1, 0, '', 0, '', '', '', '', true);
+                    InsertData('995620', XPurchaseTaxTok, 0, 1, 0, '', 0, '', '', '', '', true);
+                end;
+            DemoDataSetup."Company Type"::VAT:
+                begin
+                    InsertData('995610', StrSubstNo(XSalesVATPERCENT, DemoDataSetup.GoodsVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                    InsertData('995611', StrSubstNo(XSalesVATPERCENT, DemoDataSetup.ServicesVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                    InsertData('995620', StrSubstNo(XPurchaseVATPERCENTEU, DemoDataSetup.GoodsVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                    InsertData('995621', StrSubstNo(XPurchaseVATPERCENTEU, DemoDataSetup.ServicesVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                    InsertData('995630', StrSubstNo(XPurchaseVATPERCENT, DemoDataSetup.GoodsVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                    InsertData('995631', StrSubstNo(XPurchaseVATPERCENT, DemoDataSetup.ServicesVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                    if DemoDataSetup."Advanced Setup" then begin
+                        InsertData('995615', StrSubstNo(XSalesVATPERCENTUnrealized, DemoDataSetup.GoodsVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                        InsertData('995616', StrSubstNo(XSalesVATPERCENTUnrealized, DemoDataSetup.ServicesVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                        InsertData('995625', StrSubstNo(XPurchaseVATPERCENTEUUnreal, DemoDataSetup.GoodsVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                        InsertData('995626', StrSubstNo(XPurchaseVATPERCENTEUUnreal, DemoDataSetup.ServicesVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                        InsertData('995635', StrSubstNo(XPurchaseVATPCTUnrealized, DemoDataSetup.GoodsVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
+                        InsertData('995636', StrSubstNo(XPurchaseVATPCTUnrealized, DemoDataSetup.ServicesVATText()), 0, 1, 0, '', 0, '', '', '', '', false);
                     end;
-                "Company Type"::VAT:
-                    begin
-                        InsertData('995610', StrSubstNo(XSalesVATPERCENT, GoodsVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                        InsertData('995611', StrSubstNo(XSalesVATPERCENT, ServicesVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                        InsertData('995620', StrSubstNo(XPurchaseVATPERCENTEU, GoodsVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                        InsertData('995621', StrSubstNo(XPurchaseVATPERCENTEU, ServicesVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                        InsertData('995630', StrSubstNo(XPurchaseVATPERCENT, GoodsVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                        InsertData('995631', StrSubstNo(XPurchaseVATPERCENT, ServicesVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                        if "Advanced Setup" then begin
-                            InsertData('995615', StrSubstNo(XSalesVATPERCENTUnrealized, GoodsVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                            InsertData('995616', StrSubstNo(XSalesVATPERCENTUnrealized, ServicesVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                            InsertData('995625', StrSubstNo(XPurchaseVATPERCENTEUUnreal, GoodsVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                            InsertData('995626', StrSubstNo(XPurchaseVATPERCENTEUUnreal, ServicesVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                            InsertData('995635', StrSubstNo(XPurchaseVATPCTUnrealized, GoodsVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                            InsertData('995636', StrSubstNo(XPurchaseVATPCTUnrealized, ServicesVATText), 0, 1, 0, '', 0, '', '', '', '', false);
-                        end;
-                    end;
-            end;
-            InsertData('995650', XTaxes, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('995710', XSalesTaxPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995800', XPersonnelrelatedItems, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995810', XWithholdingTaxesPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995820', XSupplementaryTaxesPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995830', XPayrollTaxesPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995840', XVacationCompensationPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995850', XEmployeesPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995890', XTotalPersonnelrelatedItems, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995900', XOtherLiabilities, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995910', XDividendsfortheFiscalYear, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995920', XCorporateTaxesPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995990', XOtherLiabilitiesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995995', XShorttermLiabilitiesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995997', XTotalLiabilities, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('995999', XTOTALLIABILITIESANDEQUITY, 2, 1, 1,
-              Adjust.Convert('993000') + '..' + Adjust.Convert('995999') +
-              '|' + Adjust.Convert('996000') + '..' + Adjust.Convert('999999'), 0, '', '', '', '', true);
-            InsertData('996100', XRevenue, 3, 0, 1, '', 0, '', '', '', '', true);
-            InsertData('996105', XSalesofRetail, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996110', XSalesRetailDom, 0, 0, 0, '', 2, '', RetailCode, '', '', true);
-            InsertData('996120', XSalesRetailEU, 0, 0, 0, '', 2, EUCode, RetailCode, '', '', true);
-            InsertData('996130', XSalesRetailExport, 0, 0, 0, '', 2, ExportCode, RetailCode, '', '', true);
-            InsertData('996190', XJobSalesAppRetail, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996191', XJobSalesAdjmtRetail, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996195', XTotalSalesofRetail, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996205', XSalesofRawMaterials, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996210', XSalesRawMaterialsDom, 0, 0, 0, '', 2, '', RawMatCode, '', '', true);
-            InsertData('996220', XSalesRawMaterialsEU, 0, 0, 0, '', 2, EUCode, RawMatCode, '', '', true);
-            InsertData('996230', XSalesRawMaterialsExport, 0, 0, 0, '', 2, ExportCode, RawMatCode, '', '', true);
-            InsertData('996290', XJobSalesAdjmtRawMat, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996295', XTotalSalesofRawMaterials, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996405', XSalesofResources, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996410', XSalesResourcesDom, 0, 0, 0, '', 2, '', ServicesCode, '', '', true);
-            InsertData('996420', XSalesResourcesEU, 0, 0, 0, '', 2, EUCode, ServicesCode, '', '', true);
-            InsertData('996430', XSalesResourcesExport, 0, 0, 0, '', 2, ExportCode, ServicesCode, '', '', true);
-            InsertData('996490', XJobSalesAdjmtResources, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996495', XTotalSalesofResources, 4, 0, 0, '', 0, '', '', '', '', true);
-
-            InsertData('996605', XSalesofJobs, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996610', XSalesOtherJobExpenses, 0, 0, 0, '', 2, DomesticCode, MiscCode, '', '', true);
-            InsertData('996620', XJobSales, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996695', XTotalSalesofJobs, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996710', XConsultingFeesDom, 0, 0, 0, '', 2, '', ServicesCode, '', '', true);
-            InsertData('996810', XFeesandChargesRecDom, 0, 0, 0, '', 2, '', MiscCode, '', '', true);
-            InsertData('996910', XDiscountGranted, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('996995', XTotalRevenue, 4, 0, 0, '', 0, '', '', '', '', true);
-
-            InsertData('997100', XCost, 3, 0, 1, '', 0, '', '', '', '', true);
-            InsertData('997105', XCostofRetail, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997110', XPurchRetailDom, 0, 0, 0, '', 1, '', RetailCode, '', '', true);
-            InsertData('997120', XPurchRetailEU, 0, 0, 0, '', 1, EUCode, RetailCode, '', '', true);
-            InsertData('997130', XPurchRetailExport, 0, 0, 0, '', 1, ExportCode, RetailCode, '', '', true);
-            InsertData('997140', XDiscReceivedRetail, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997150', XDeliveryExpensesRetail, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('997170', XInventoryAdjmtRetail, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997180', XJobCostAppRetail, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997181', XJobCostAdjmtRetail, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997190', XCostofRetailSold, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997195', XTotalCostofRetail, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997205', XCostofRawMaterials, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997210', XPurchRawMaterialsDom, 0, 0, 0, '', 1, '', RawMatCode, '', '', true);
-            InsertData('997220', XPurchRawMaterialsEU, 0, 0, 0, '', 1, EUCode, RawMatCode, '', '', true);
-            InsertData('997230', XPurchRawMaterialsExport, 0, 0, 0, '', 1, ExportCode, RawMatCode, '', '', true);
-            InsertData('997240', XDiscReceivedRawMaterials, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997250', XDeliveryExpensesRawMat, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('997270', XInventoryAdjmtRawMat, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997280', XJobCostAdjmtRawMaterials, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997290', XCostofRawMaterialsSold, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997295', XTotalCostofRawMaterials, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997405', XCostofResources, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997480', XJobCostAppResources, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997481', XJobCostAdjmtResources, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997490', XCostofResourcesUsed, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997495', XTotalCostofResources, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997620', XJobCosts, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('997995', XTotalCost, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998000', XOperatingExpenses, 3, 0, 1, '', 0, '', '', '', '', true);
-            InsertData('998100', XBuildingMaintenanceExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998110', XCleaning, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998120', XElectricityandHeating, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998130', XRepairsandMaintenance, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998190', XTotalBldgMaintExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998200', XAdministrativeExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998210', XOfficeSupplies, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998230', XPhoneandFax, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998240', XPostage, 0, 0, 0, '', 1, '', NoVATCode, '', '', true);
-            InsertData('998290', XTotalAdministrativeExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998300', XComputerExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998310', XSoftware, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998320', XConsultantServices, 0, 0, 0, '', 1, '', ServicesCode, '', '', true);
-            InsertData('998330', XOtherComputerExpenses, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998390', XTotalComputerExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998400', XSellingExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998410', XAdvertising, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998420', XEntertainmentandPR, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998430', XTravel, 0, 0, 0, '', 1, '', NoVATCode, '', '', true);
-            InsertData('998450', XDeliveryExpenses, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998490', XTotalSellingExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998500', XVehicleExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998510', XGasolineandMotorOil, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998520', XRegistrationFees, 0, 0, 0, '', 1, '', NoVATCode, '', '', true);
-            InsertData('998530', XRepairsandMaintenance, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998590', XTotalVehicleExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998600', XOtherOperatingExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998610', XCashDiscrepancies, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998620', XBadDebtExpenses, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998630', XLegalandAccountingServices, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998640', XMiscellaneous, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998690', XOtherOperatingExpTotal, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998695', XTotalOperatingExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998700', XPersonnelExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998710', XWages, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998720', XSalaries, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998730', XRetirementPlanContributions, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998740', XVacationCompensation, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998750', XPayrollTaxes, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998790', XTotalPersonnelExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998800', XDepreciationofFixedAssets, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998810', XDepreciationBuildings, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998820', XDepreciationEquipment, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998830', XDepreciationVehicles, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998840', XGainsandLosses, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998890', XTotalFixedAssetDepreciation, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('998910', XOtherCostsofOperations, 0, 0, 0, '', 1, '', MiscCode, '', '', true);
-            InsertData('998995', XNetOperatingIncome, 2, 0, 1,
-              Adjust.Convert('996100') + '..' + Adjust.Convert('998995'), 0, '', '', '', '', true);
-            InsertData('999100', XInterestIncome, 3, 0, 1, '', 0, '', '', '', '', true);
-            InsertData('999110', XInterestonBankBalances, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999120', XFinanceChargesfromCustomers, 0, 0, 0, '', 2, '', NoVATCode, '', '', true);
-            InsertData('999130', XPaymentDiscountsReceived, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999135', XPmtDiscReceivedDecreases, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999160', XPaymentToleranceReceived, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999170', XPmtTolReceivedDecreases, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999140', XInvoiceRounding, 0, 0, 0, '', 0, '', NoVATCode, '', '', true);
-            InsertData('999150', XApplicationRounding, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999190', XTotalInterestIncome, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999200', XInterestExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999210', XInterestonRevolvingCredit, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999220', XInterestonBankLoans, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999230', XMortgageInterest, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999240', XFinanceChargestoVendors, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999250', XPaymentDiscountsGranted, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999255', XPmtDiscGrantedDecreases, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999260', XPaymentToleranceGranted, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999270', XPmtTolGrantedDecreases, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999290', XTotalInterestExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999310', XUnrealizedFXGains, 0, 0, 1, '', 0, '', '', '', '', true);
-            InsertData('999320', XUnrealizedFXLosses, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999330', XRealizedFXGains, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999340', XRealizedFXLosses, 0, 0, 0, '', 0, '', '', '', '', true);
-            if "Additional Currency Code" <> '' then begin
-                InsertData('999350', XResidualGains, 0, 0, 0, '', 0, '', '', '', '', true);
-                InsertData('999360', XResidualLosses, 0, 0, 0, '', 0, '', '', '', '', false);
-            end;
-            InsertData('999395', XNIBEFOREEXTRAITEMSANDTAXES, 2, 0, 1,
-              Adjust.Convert('996100') + '..' + Adjust.Convert('999395'), 0, '', '', '', '', true);
-            InsertData('999410', XExtraordinaryIncome, 0, 0, 1, '', 0, '', '', '', '', true);
-            InsertData('999420', XExtraordinaryExpenses, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('999495', XNETINCOMEBEFORETAXES, 2, 0, 0,
-              Adjust.Convert('996100') + '..' + Adjust.Convert('999495'), 0, '', '', '', '', true);
-            InsertData('999510', XCorporateTax, 0, 0, 1, '', 0, '', '', '', '', true);
-            InsertData('999999', XNETINCOME, 2, 0, 1,
-              Adjust.Convert('996100') + '..' + Adjust.Convert('999999'), 0, '', '', '', '', true);
-
-            // US accounts added
-            InsertData('8012200', XOtherMarketableSecurities, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('8022600', XTaxesPayables, 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('8022790', XTaxesPayablesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('8023050', XAccruedSalariesWages, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('8023400', XFICAPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('8023500', XMedicarePayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('8023600', XFUTAPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('8023700', XSUTAPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('8023750', XEmployeeBenefitsPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('8023775', XGarnishmentPayable, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData('8030000', XEQUITY, 1, 1, 1, '', 0, '', '', '', '', true);
-            InsertData('8059999', XGROSSPROFIT, 2, 1, 1,
-              Adjust.Convert('996100') + '..' + Adjust.Convert('8059999'), 0, '', '', '', '', true);
-            InsertData('8062600', XHealthInsurance, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('8062700', XGroupLifeInsurance, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('8062800', XWorkersCompensation, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('8062900', X401KContributions, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('8080700', XGAINSANDLOSSES2, 3, 0, 1, '', 0, '', '', '', '', true);
-            InsertData('8081300', XTOTALGAINSANDLOSSES, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('8084000', XIncomeTaxes, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('8084200', XStateIncomeTax, 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('8084300', XTotalIncomeTaxes, 4, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('8084500', XNETINCOMEBEFOREEXTRITEMS, 2, 0, 1,
-              Adjust.Convert('996100') + '..' + Adjust.Convert('8084500'), 0, '', '', '', '', true);
-            InsertData('8085000', XExtraordinaryItems, 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData('8085300', XExtraordinaryItemsTotal, 4, 0, 0, '', 0, '', '', '', '', true);
+                end;
         end;
-        GLAccIndent.Indent;
-        AddCategoriesToGLAccounts;
+        InsertData('995650', XTaxes, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('995710', XSalesTaxPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995800', XPersonnelrelatedItems, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995810', XWithholdingTaxesPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995820', XSupplementaryTaxesPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995830', XPayrollTaxesPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995840', XVacationCompensationPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995850', XEmployeesPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995890', XTotalPersonnelrelatedItems, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995900', XOtherLiabilities, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995910', XDividendsfortheFiscalYear, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995920', XCorporateTaxesPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995990', XOtherLiabilitiesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995995', XShorttermLiabilitiesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995997', XTotalLiabilities, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('995999', XTOTALLIABILITIESANDEQUITY, 2, 1, 1,
+          Adjust.Convert('993000') + '..' + Adjust.Convert('995999') +
+          '|' + Adjust.Convert('996000') + '..' + Adjust.Convert('999999'), 0, '', '', '', '', true);
+        InsertData('996100', XRevenue, 3, 0, 1, '', 0, '', '', '', '', true);
+        InsertData('996105', XSalesofRetail, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996110', XSalesRetailDom, 0, 0, 0, '', 2, '', DemoDataSetup.RetailCode(), '', '', true);
+        InsertData('996120', XSalesRetailEU, 0, 0, 0, '', 2, DemoDataSetup.EUCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData('996130', XSalesRetailExport, 0, 0, 0, '', 2, DemoDataSetup.ExportCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData('996190', XJobSalesAppRetail, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996191', XJobSalesAdjmtRetail, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996195', XTotalSalesofRetail, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996205', XSalesofRawMaterials, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996210', XSalesRawMaterialsDom, 0, 0, 0, '', 2, '', DemoDataSetup.RawMatCode(), '', '', true);
+        InsertData('996220', XSalesRawMaterialsEU, 0, 0, 0, '', 2, DemoDataSetup.EUCode(), DemoDataSetup.RawMatCode(), '', '', true);
+        InsertData('996230', XSalesRawMaterialsExport, 0, 0, 0, '', 2, DemoDataSetup.ExportCode(), DemoDataSetup.RawMatCode(), '', '', true);
+        InsertData('996290', XJobSalesAdjmtRawMat, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996295', XTotalSalesofRawMaterials, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996405', XSalesofResources, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996410', XSalesResourcesDom, 0, 0, 0, '', 2, '', DemoDataSetup.ServicesCode(), '', '', true);
+        InsertData('996420', XSalesResourcesEU, 0, 0, 0, '', 2, DemoDataSetup.EUCode(), DemoDataSetup.ServicesCode(), '', '', true);
+        InsertData('996430', XSalesResourcesExport, 0, 0, 0, '', 2, DemoDataSetup.ExportCode(), DemoDataSetup.ServicesCode(), '', '', true);
+        InsertData('996490', XJobSalesAdjmtResources, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996495', XTotalSalesofResources, 4, 0, 0, '', 0, '', '', '', '', true);
+
+        InsertData('996605', XSalesofJobs, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996610', XSalesOtherJobExpenses, 0, 0, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('996620', XJobSales, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996695', XTotalSalesofJobs, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996710', XConsultingFeesDom, 0, 0, 0, '', 2, '', DemoDataSetup.ServicesCode(), '', '', true);
+        InsertData('996810', XFeesandChargesRecDom, 0, 0, 0, '', 2, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('996910', XDiscountGranted, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('996995', XTotalRevenue, 4, 0, 0, '', 0, '', '', '', '', true);
+
+        InsertData('997100', XCost, 3, 0, 1, '', 0, '', '', '', '', true);
+        InsertData('997105', XCostofRetail, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997110', XPurchRetailDom, 0, 0, 0, '', 1, '', DemoDataSetup.RetailCode(), '', '', true);
+        InsertData('997120', XPurchRetailEU, 0, 0, 0, '', 1, DemoDataSetup.EUCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData('997130', XPurchRetailExport, 0, 0, 0, '', 1, DemoDataSetup.ExportCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData('997140', XDiscReceivedRetail, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997150', XDeliveryExpensesRetail, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('997170', XInventoryAdjmtRetail, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997180', XJobCostAppRetail, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997181', XJobCostAdjmtRetail, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997190', XCostofRetailSold, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997195', XTotalCostofRetail, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997205', XCostofRawMaterials, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997210', XPurchRawMaterialsDom, 0, 0, 0, '', 1, '', DemoDataSetup.RawMatCode(), '', '', true);
+        InsertData('997220', XPurchRawMaterialsEU, 0, 0, 0, '', 1, DemoDataSetup.EUCode(), DemoDataSetup.RawMatCode(), '', '', true);
+        InsertData('997230', XPurchRawMaterialsExport, 0, 0, 0, '', 1, DemoDataSetup.ExportCode(), DemoDataSetup.RawMatCode(), '', '', true);
+        InsertData('997240', XDiscReceivedRawMaterials, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997250', XDeliveryExpensesRawMat, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('997270', XInventoryAdjmtRawMat, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997280', XJobCostAdjmtRawMaterials, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997290', XCostofRawMaterialsSold, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997295', XTotalCostofRawMaterials, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997405', XCostofResources, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997480', XJobCostAppResources, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997481', XJobCostAdjmtResources, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997490', XCostofResourcesUsed, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997495', XTotalCostofResources, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997620', XJobCosts, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('997995', XTotalCost, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998000', XOperatingExpenses, 3, 0, 1, '', 0, '', '', '', '', true);
+        InsertData('998100', XBuildingMaintenanceExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998110', XCleaning, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998120', XElectricityandHeating, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998130', XRepairsandMaintenance, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998190', XTotalBldgMaintExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998200', XAdministrativeExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998210', XOfficeSupplies, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998230', XPhoneandFax, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998240', XPostage, 0, 0, 0, '', 1, '', DemoDataSetup.NoVATCode(), '', '', true);
+        InsertData('998290', XTotalAdministrativeExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998300', XComputerExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998310', XSoftware, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998320', XConsultantServices, 0, 0, 0, '', 1, '', DemoDataSetup.ServicesCode(), '', '', true);
+        InsertData('998330', XOtherComputerExpenses, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998390', XTotalComputerExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998400', XSellingExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998410', XAdvertising, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998420', XEntertainmentandPR, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998430', XTravel, 0, 0, 0, '', 1, '', DemoDataSetup.NoVATCode(), '', '', true);
+        InsertData('998450', XDeliveryExpenses, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998490', XTotalSellingExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998500', XVehicleExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998510', XGasolineandMotorOil, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998520', XRegistrationFees, 0, 0, 0, '', 1, '', DemoDataSetup.NoVATCode(), '', '', true);
+        InsertData('998530', XRepairsandMaintenance, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998590', XTotalVehicleExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998600', XOtherOperatingExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998610', XCashDiscrepancies, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998620', XBadDebtExpenses, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998630', XLegalandAccountingServices, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998640', XMiscellaneous, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998690', XOtherOperatingExpTotal, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998695', XTotalOperatingExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998700', XPersonnelExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998710', XWages, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998720', XSalaries, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998730', XRetirementPlanContributions, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998740', XVacationCompensation, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998750', XPayrollTaxes, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998790', XTotalPersonnelExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998800', XDepreciationofFixedAssets, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998810', XDepreciationBuildings, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998820', XDepreciationEquipment, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998830', XDepreciationVehicles, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998840', XGainsandLosses, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998890', XTotalFixedAssetDepreciation, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('998910', XOtherCostsofOperations, 0, 0, 0, '', 1, '', DemoDataSetup.MiscCode(), '', '', true);
+        InsertData('998995', XNetOperatingIncome, 2, 0, 1,
+          Adjust.Convert('996100') + '..' + Adjust.Convert('998995'), 0, '', '', '', '', true);
+        InsertData('999100', XInterestIncome, 3, 0, 1, '', 0, '', '', '', '', true);
+        InsertData('999110', XInterestonBankBalances, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999120', XFinanceChargesfromCustomers, 0, 0, 0, '', 2, '', DemoDataSetup.NoVATCode(), '', '', true);
+        InsertData('999130', XPaymentDiscountsReceived, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999135', XPmtDiscReceivedDecreases, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999160', XPaymentToleranceReceived, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999170', XPmtTolReceivedDecreases, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999140', XInvoiceRounding, 0, 0, 0, '', 0, '', DemoDataSetup.NoVATCode(), '', '', true);
+        InsertData('999150', XApplicationRounding, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999190', XTotalInterestIncome, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999200', XInterestExpenses, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999210', XInterestonRevolvingCredit, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999220', XInterestonBankLoans, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999230', XMortgageInterest, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999240', XFinanceChargestoVendors, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999250', XPaymentDiscountsGranted, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999255', XPmtDiscGrantedDecreases, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999260', XPaymentToleranceGranted, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999270', XPmtTolGrantedDecreases, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999290', XTotalInterestExpenses, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999310', XUnrealizedFXGains, 0, 0, 1, '', 0, '', '', '', '', true);
+        InsertData('999320', XUnrealizedFXLosses, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999330', XRealizedFXGains, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999340', XRealizedFXLosses, 0, 0, 0, '', 0, '', '', '', '', true);
+        if DemoDataSetup."Additional Currency Code" <> '' then begin
+            InsertData('999350', XResidualGains, 0, 0, 0, '', 0, '', '', '', '', true);
+            InsertData('999360', XResidualLosses, 0, 0, 0, '', 0, '', '', '', '', false);
+        end;
+        InsertData('999395', XNIBEFOREEXTRAITEMSANDTAXES, 2, 0, 1,
+          Adjust.Convert('996100') + '..' + Adjust.Convert('999395'), 0, '', '', '', '', true);
+        InsertData('999410', XExtraordinaryIncome, 0, 0, 1, '', 0, '', '', '', '', true);
+        InsertData('999420', XExtraordinaryExpenses, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('999495', XNETINCOMEBEFORETAXES, 2, 0, 0,
+          Adjust.Convert('996100') + '..' + Adjust.Convert('999495'), 0, '', '', '', '', true);
+        InsertData('999510', XCorporateTax, 0, 0, 1, '', 0, '', '', '', '', true);
+        InsertData('999999', XNETINCOME, 2, 0, 1,
+          Adjust.Convert('996100') + '..' + Adjust.Convert('999999'), 0, '', '', '', '', true);
+        // US accounts added
+        InsertData('8012200', XOtherMarketableSecurities, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('8022600', XTaxesPayables, 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('8022790', XTaxesPayablesTotal, 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('8023050', XAccruedSalariesWages, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('8023400', XFICAPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('8023500', XMedicarePayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('8023600', XFUTAPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('8023700', XSUTAPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('8023750', XEmployeeBenefitsPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('8023775', XGarnishmentPayable, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData('8030000', XEQUITY, 1, 1, 1, '', 0, '', '', '', '', true);
+        InsertData('8059999', XGROSSPROFIT, 2, 1, 1,
+          Adjust.Convert('996100') + '..' + Adjust.Convert('8059999'), 0, '', '', '', '', true);
+        InsertData('8062600', XHealthInsurance, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('8062700', XGroupLifeInsurance, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('8062800', XWorkersCompensation, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('8062900', X401KContributions, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('8080700', XGAINSANDLOSSES2, 3, 0, 1, '', 0, '', '', '', '', true);
+        InsertData('8081300', XTOTALGAINSANDLOSSES, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('8084000', XIncomeTaxes, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('8084200', XStateIncomeTax, 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('8084300', XTotalIncomeTaxes, 4, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('8084500', XNETINCOMEBEFOREEXTRITEMS, 2, 0, 1,
+          Adjust.Convert('996100') + '..' + Adjust.Convert('8084500'), 0, '', '', '', '', true);
+        InsertData('8085000', XExtraordinaryItems, 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData('8085300', XExtraordinaryItemsTotal, 4, 0, 0, '', 0, '', '', '', '', true);
+        GLAccIndent.Indent();
+        AddCategoriesToGLAccounts();
     end;
 
     var
@@ -363,7 +360,6 @@ codeunit 101015 "Create G/L Account"
         XExtraordinaryItemsTotal: Label 'Extraordinary Items, Total';
         XNONTAXABLE: Label 'NONTAXABLE';
         DemoDataSetup: Record "Demo Data Setup";
-        GLAccount: Record "G/L Account";
         Adjust: Codeunit "Make Adjustments";
         GLAccIndent: Codeunit "G/L Account-Indent";
         XASSETS: Label 'ASSETS';
@@ -661,7 +657,6 @@ codeunit 101015 "Create G/L Account"
         WIPAccruedCostsTok: Label 'WIP, Accrued Costs', MaxLength = 100;
         WIPInvoicedSalesTok: Label 'WIP, Invoiced Sales', MaxLength = 100;
         TotalWorkinProgressTok: Label 'Total, Work in Progress', MaxLength = 100;
-        TotalInventoryProductsandWorkinProgressTok: Label 'Total, Inventory, Products and Work in Progress', MaxLength = 100;
         ReceivablesTok: Label 'Receivables', MaxLength = 100;
         AccountsReceivablesTok: Label 'Accounts Receivables', MaxLength = 100;
         AccountReceivableDomesticTok: Label 'Account Receivable, Domestic', MaxLength = 100;
@@ -980,365 +975,361 @@ codeunit 101015 "Create G/L Account"
     local procedure AddIncomeStatementForMini()
     begin
         // Income statement 1000-4999
-        with DemoDataSetup do begin
-            Get();
-            InsertData(INCOMESTATEMENT(), INCOMESTATEMENTName(), 1, 0, 1, '', 0, '', '', '', '', true);
-            InsertData(Income(), IncomeName(), 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(SalesofGoods(), SalesofGoodsName(), 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(SaleofFinishedGoods(), SaleofFinishedGoodsName(), 0, 0, 0, '', 2, DomesticCode, RetailCode, '', '', true);
-            InsertData(SaleofRawMaterials(), SaleofRawMaterialsName(), 0, 0, 0, '', 2, DomesticCode, RetailCode, '', '', true);
-            InsertData(ResaleofGoods(), ResaleofGoodsName(), 0, 0, 0, '', 2, DomesticCode, RetailCode, '', '', true);
-            InsertData(TotalSalesofGoods(), TotalSalesofGoodsName(), 4, 0, 0, '40100..40199', 0, '', '', '', '', true);
-            InsertData(SalesofResources(), SalesofResourcesName(), 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(SaleofResources(), SaleofResourcesName(), 0, 0, 0, '', 2, DomesticCode, ServicesCode, '', '', true);
-            InsertData(SaleofSubcontracting(), SaleofSubcontractingName(), 0, 0, 0, '', 2, DomesticCode, ServicesCode, '', '', true);
-            InsertData(TotalSalesofResources(), TotalSalesofResourcesName(), 4, 0, 0, '40200..40299', 0, '', '', '', '', true);
-            InsertData(AdditionalRevenue(), AdditionalRevenueName(), 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(Incomefromsecurities(), IncomefromsecuritiesName(), 0, 0, 0, '', 2, '', '', '', '', true);
-            InsertData(ManagementFeeRevenue(), ManagementFeeRevenueName(), 0, 0, 0, '', 2, '', '', '', '', true);
-            InsertData(InterestIncome(), InterestIncomeName(), 0, 0, 0, '', 2, DomesticCode, RetailCode, '', '', true);
-            InsertData(CurrencyGains(), CurrencyGainsName(), 0, 0, 0, '', 2, '', '', '', '', true);
-            InsertData(OtherIncidentalRevenue(), OtherIncidentalRevenueName(), 0, 0, 0, '', 2, '', '', '', '', true);
-            InsertData(TotalAdditionalRevenue(), TotalAdditionalRevenueName(), 4, 0, 0, '40300..40399', 0, '', '', '', '', true);
-            InsertData(JobsandServices(), JobsandServicesName(), 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(JobSales(), JobSalesName(), 0, 0, 0, '', 2, '', '', '', '', true);
-            InsertData(JobSalesApplied(), JobSalesAppliedName(), 0, 0, 0, '', 2, '', '', '', '', true);
-            InsertData(SalesofServiceContracts(), SalesofServiceContractsName(), 0, 0, 0, '', 2, DomesticCode, RetailCode, '', '', true);
-            InsertData(SalesofServiceWork(), SalesofServiceWorkName(), 0, 0, 0, '', 2, '', '', '', '', true);
-            InsertData(TotalJobsandServices(), TotalJobsandServicesName(), 4, 0, 0, '40400..40499', 0, '', '', '', '', true);
-            InsertData(RevenueReductions(), RevenueReductionsName(), 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(SalesDiscounts(), SalesDiscountsName(), 0, 0, 0, '', 2, '', '', '', '', true);
-            InsertData(SalesInvoiceRounding(), SalesInvoiceRoundingName(), 0, 0, 0, '', 2, DomesticCode, RetailCode, '', '', true);
-            InsertData(PaymentToleranceandAllowances(), PaymentToleranceandAllowancesName(), 0, 0, 0, '', 2, '', '', '', '', true);
-            InsertData(SalesReturns(), SalesReturnsName(), 0, 0, 0, '', 2, '', '', '', '', true);
-            InsertData(TotalRevenueReductions(), TotalRevenueReductionsName(), 4, 0, 0, '40900..40999', 0, '', '', '', '', true);
-            InsertData(TOTALINCOME(), TOTALINCOMEName(), 4, 0, 0, '40001..49990', 0, '', '', '', '', true);
-            InsertData(COSTOFGOODSSOLD(), COSTOFGOODSSOLDName(), 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(CostofGoods(), CostofGoodsName(), 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(CostofMaterials(), CostofMaterialsName(), 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(CostofMaterialsProjects(), CostofMaterialsProjectsName(), 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalCostofGoods(), TotalCostofGoodsName(), 4, 0, 0, '50100..50199', 0, '', '', '', '', true);
-            InsertData(CostofResourcesandServices(), CostofResourcesandServicesName(), 3, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(CostofLabor(), CostofLaborName(), 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(CostofLaborProjects(), CostofLaborProjectsName(), 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(CostofLaborWarranty_Contract(), CostofLaborWarranty_ContractName(), 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalCostofResources(), TotalCostofResourcesName(), 4, 0, 0, '50200..50299', 0, '', '', '', '', true);
-            InsertData(Subcontractedwork(), SubcontractedworkName(), 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(CostofVariances(), CostofVariancesName(), 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(TOTALCOSTOFGOODSSOLD(), TOTALCOSTOFGOODSSOLDName(), 4, 0, 0, '50001..59990', 0, '', '', '', '', true);
-            InsertData(EXPENSES(), EXPENSESName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(FacilityExpenses(), FacilityExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(RentalFacilities(), RentalFacilitiesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Rent_Leases(), Rent_LeasesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(ElectricityforRental(), ElectricityforRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(HeatingforRental(), HeatingforRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(WaterandSewerageforRental(), WaterandSewerageforRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(CleaningandWasteforRental(), CleaningandWasteforRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(RepairsandMaintenanceforRental(), RepairsandMaintenanceforRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(InsurancesRental(), InsurancesRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(OtherRentalExpenses(), OtherRentalExpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalRentalFacilities(), TotalRentalFacilitiesName(), 4, 0, 0, '60100..60199', 1, '', '', '', '', true);
-            InsertData(PropertyExpenses(), PropertyExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(SiteFees_Leases(), SiteFees_LeasesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(ElectricityforProperty(), ElectricityforPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(HeatingforProperty(), HeatingforPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(WaterandSewerageforProperty(), WaterandSewerageforPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(CleaningandWasteforProperty(), CleaningandWasteforPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(RepairsandMaintenanceforProperty(), RepairsandMaintenanceforPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(InsurancesProperty(), InsurancesPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(OtherPropertyExpenses(), OtherPropertyExpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalPropertyExpenses(), TotalPropertyExpensesName(), 4, 0, 0, '60200..60299', 1, '', '', '', '', true);
-            InsertData(TotalFacilityExpenses(), TotalFacilityExpensesName(), 4, 0, 0, '60002..60999', 1, '', '', '', '', true);
-            InsertData(FixedAssetsLeases(), FixedAssetsLeasesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Hireofmachinery(), HireofmachineryName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Hireofcomputers(), HireofcomputersName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Hireofotherfixedassets(), HireofotherfixedassetsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalFixedAssetLeases(), TotalFixedAssetLeasesName(), 4, 0, 0, '61000..61999', 1, '', '', '', '', true);
-            InsertData(LogisticsExpenses(), LogisticsExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(VehicleExpenses(), VehicleExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(PassengerCarCosts(), PassengerCarCostsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TruckCosts(), TruckCostsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Othervehicleexpenses(), OthervehicleexpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalVehicleExpenses(), TotalVehicleExpensesName(), 4, 0, 0, '62100..62199', 1, '', '', '', '', true);
-            InsertData(FreightCosts(), FreightCostsName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Freightfeesforgoods(), FreightfeesforgoodsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Customsandforwarding(), CustomsandforwardingName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Freightfeesprojects(), FreightfeesprojectsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalFreightCosts(), TotalFreightCostsName(), 4, 0, 0, '62200..62299', 1, '', '', '', '', true);
-            InsertData(TravelExpenses(), TravelExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Tickets(), TicketsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Rentalvehicles(), RentalvehiclesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Boardandlodging(), BoardandlodgingName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Othertravelexpenses(), OthertravelexpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalTravelExpenses(), TotalTravelExpensesName(), 4, 0, 0, '62300..62399', 1, '', '', '', '', true);
-            InsertData(TotalLogisticsExpenses(), TotalLogisticsExpensesName(), 4, 0, 0, '62000..62999', 1, '', '', '', '', true);
-            InsertData(MarketingandSales(), MarketingandSalesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Advertising(), AdvertisingName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(AdvertisementDevelopment(), AdvertisementDevelopmentName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(OutdoorandTransportationAds(), OutdoorandTransportationAdsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Admatteranddirectmailings(), AdmatteranddirectmailingsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Conference_ExhibitionSponsorship(), Conference_ExhibitionSponsorshipName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Samplescontestsgifts(), SamplescontestsgiftsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(FilmTVradiointernetads(), FilmTVradiointernetadsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(PRandAgencyFees(), PRandAgencyFeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Otheradvertisingfees(), OtheradvertisingfeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalAdvertising(), TotalAdvertisingName(), 4, 0, 0, '63100..63199', 1, '', '', '', '', true);
-            InsertData(OtherMarketingExpenses(), OtherMarketingExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Catalogspricelists(), CatalogspricelistsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TradePublications(), TradePublicationsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalOtherMarketingExpenses(), TotalOtherMarketingExpensesName(), 4, 0, 0, '63200..63399', 1, '', '', '', '', true);
-            InsertData(SalesExpenses(), SalesExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(CreditCardCharges(), CreditCardChargesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(BusinessEntertainingdeductible(), BusinessEntertainingdeductibleName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(BusinessEntertainingnondeductible(), BusinessEntertainingnondeductibleName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalSalesExpenses(), TotalSalesExpensesName(), 4, 0, 0, '63400..63499', 1, '', '', '', '', true);
-            InsertData(TotalMarketingandSales(), TotalMarketingandSalesName(), 4, 0, 0, '63000..63999', 1, '', '', '', '', true);
-            InsertData(OfficeExpenses(), OfficeExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(OfficeSupplies(), OfficeSuppliesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(PhoneServices(), PhoneServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Dataservices(), DataservicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Postalfees(), PostalfeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Consumable_Expensiblehardware(), Consumable_ExpensiblehardwareName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Softwareandsubscriptionfees(), SoftwareandsubscriptionfeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalOfficeExpenses(), TotalOfficeExpensesName(), 4, 0, 0, '64000..64999', 1, '', '', '', '', true);
-            InsertData(InsurancesandRisks(), InsurancesandRisksName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(CorporateInsurance(), CorporateInsuranceName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(DamagesPaid(), DamagesPaidName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(BadDebtLosses(), BadDebtLossesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Securityservices(), SecurityservicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Otherriskexpenses(), OtherriskexpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalInsurancesandRisks(), TotalInsurancesandRisksName(), 4, 0, 0, '65000..65999', 1, '', '', '', '', true);
-            InsertData(ManagementandAdmin(), ManagementandAdminName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Management(), ManagementName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(RemunerationtoDirectors(), RemunerationtoDirectorsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(ManagementFees(), ManagementFeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Annual_interrimReports(), Annual_interrimReportsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Annual_generalmeeting(), Annual_generalmeetingName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(AuditandAuditServices(), AuditandAuditServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TaxadvisoryServices(), TaxadvisoryServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalManagementFees(), TotalManagementFeesName(), 4, 0, 0, '66100..66199', 1, '', '', '', '', true);
-            InsertData(TotalManagementandAdmin(), TotalManagementandAdminName(), 4, 0, 0, '66000..66999', 1, '', '', '', '', true);
-            InsertData(BankingandInterest(), BankingandInterestName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Bankingfees(), BankingfeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(InterestExpenses(), InterestExpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(PayableInvoiceRounding(), PayableInvoiceRoundingName(), 0, 0, 0, '', 1, DomesticCode, RetailCode, '', '', true);
-            InsertData(TotalBankingandInterest(), TotalBankingandInterestName(), 4, 0, 0, '67000..67999', 1, '', '', '', '', true);
-            InsertData(ExternalServices_Expenses(), ExternalServices_ExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(ExternalServices(), ExternalServicesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(AccountingServices(), AccountingServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(ITServices(), ITServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(MediaServices(), MediaServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(ConsultingServices(), ConsultingServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(LegalFeesandAttorneyServices(), LegalFeesandAttorneyServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(OtherExternalServices(), OtherExternalServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalExternalServices(), TotalExternalServicesName(), 4, 0, 0, '68100..68199', 1, '', '', '', '', true);
-            InsertData(OtherExternalExpenses(), OtherExternalExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(LicenseFees_Royalties(), LicenseFees_RoyaltiesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Trademarks_Patents(), Trademarks_PatentsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(AssociationFees(), AssociationFeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Miscexternalexpenses(), MiscexternalexpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(PurchaseDiscounts(), PurchaseDiscountsName(), 0, 0, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalOtherExternalExpenses(), TotalOtherExternalExpensesName(), 4, 0, 0, '68200..68299', 1, '', '', '', '', true);
-            InsertData(TotalExternalServices_Expenses(), TotalExternalServices_ExpensesName(), 4, 0, 0, '68000..68999', 1, '', '', '', '', true);
-            InsertData(Personnel(), PersonnelName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(WagesandSalaries(), WagesandSalariesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Salaries(), SalariesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(HourlyWages(), HourlyWagesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(OvertimeWages(), OvertimeWagesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Bonuses(), BonusesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(CommissionsPaid(), CommissionsPaidName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(PTOAccrued(), PTOAccruedName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalWagesandSalaries(), TotalWagesandSalariesName(), 4, 0, 0, '71000..71999', 1, '', '', '', '', true);
-            InsertData(Benefits_Pension(), Benefits_PensionName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Benefits(), BenefitsName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TrainingCosts(), TrainingCostsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(HealthCareContributions(), HealthCareContributionsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Entertainmentofpersonnel(), EntertainmentofpersonnelName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Allowances(), AllowancesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Mandatoryclothingexpenses(), MandatoryclothingexpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Othercash_remunerationbenefits(), Othercash_remunerationbenefitsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalBenefits(), TotalBenefitsName(), 4, 0, 0, '72100..72199', 1, '', '', '', '', true);
-            InsertData(Pension(), PensionName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(Pensionfeesandrecurringcosts(), PensionfeesandrecurringcostsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(EmployerContributions(), EmployerContributionsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalPension(), TotalPensionName(), 4, 0, 0, '72200..72299', 1, '', '', '', '', true);
-            InsertData(TotalBenefits_Pension(), TotalBenefits_PensionName(), 4, 0, 0, '72000..72999', 1, '', '', '', '', true);
-            InsertData(InsurancesPersonnel(), InsurancesPersonnelName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(HealthInsurance(), HealthInsuranceName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(DentalInsurance(), DentalInsuranceName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(WorkersCompensation(), WorkersCompensationName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(LifeInsurance(), LifeInsuranceName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalInsurancesPersonnel(), TotalInsurancesPersonnelName(), 4, 0, 0, '73000..73999', 1, '', '', '', '', true);
-            InsertData(PersonnelTaxes(), PersonnelTaxesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(FederalPersonnelTaxes(), FederalPersonnelTaxesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(FederalWithholdingExpense(), FederalWithholdingExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(FICAExpense(), FICAExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(FUTAExpense(), FUTAExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(MedicareExpense(), MedicareExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(OtherFederalExpense(), OtherFederalExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalFederalPersonnelTaxes(), TotalFederalPersonnelTaxesName(), 4, 0, 0, '74100..74399', 1, '', '', '', '', true);
-            InsertData(StatePersonnelTaxes(), StatePersonnelTaxesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(StateWithholdingExpense(), StateWithholdingExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(SUTAExpense(), SUTAExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalStatePersonnelTaxes(), TotalStatePersonnelTaxesName(), 4, 0, 0, '74400..74599', 1, '', '', '', '', true);
-            InsertData(TotalPersonnelTaxes(), TotalPersonnelTaxesName(), 4, 0, 0, '74000..74999', 1, '', '', '', '', true);
-            InsertData(TotalPersonnel(), TotalPersonnelName(), 4, 0, 0, '70000..79999', 1, '', '', '', '', true);
-            InsertData(Depreciation(), DepreciationName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(DepreciationLandandProperty(), DepreciationLandandPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(DepreciationFixedAssets(), DepreciationFixedAssetsName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalDepreciation(), TotalDepreciationName(), 4, 0, 0, '80000..89999', 1, '', '', '', '', true);
-            InsertData(MiscExpenses(), MiscExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(CurrencyLosses(), CurrencyLossesName(), 0, 0, 0, '', 1, '', '', '', '', true);
-            InsertData(TotalMiscExpenses(), TotalMiscExpensesName(), 4, 0, 0, '90000..91999', 1, '', '', '', '', true);
-            InsertData(TOTALEXPENSES(), TOTALEXPENSESName(), 4, 0, 0, '60001..98990', 1, '', '', '', '', true);
-            InsertData(NETINCOME(), NETINCOMEName(), 2, 0, 0, TOTALINCOME() + '|' + TOTALCOSTOFGOODSSOLD() + '|' + TOTALEXPENSES(), 0, '', '', '', '', true);
-        end;
+        DemoDataSetup.Get();
+        InsertData(INCOMESTATEMENT(), INCOMESTATEMENTName(), 1, 0, 1, '', 0, '', '', '', '', true);
+        InsertData(Income(), IncomeName(), 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(SalesofGoods(), SalesofGoodsName(), 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(SaleofFinishedGoods(), SaleofFinishedGoodsName(), 0, 0, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData(SaleofRawMaterials(), SaleofRawMaterialsName(), 0, 0, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData(ResaleofGoods(), ResaleofGoodsName(), 0, 0, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData(TotalSalesofGoods(), TotalSalesofGoodsName(), 4, 0, 0, '40100..40199', 0, '', '', '', '', true);
+        InsertData(SalesofResources(), SalesofResourcesName(), 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(SaleofResources(), SaleofResourcesName(), 0, 0, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesCode(), '', '', true);
+        InsertData(SaleofSubcontracting(), SaleofSubcontractingName(), 0, 0, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesCode(), '', '', true);
+        InsertData(TotalSalesofResources(), TotalSalesofResourcesName(), 4, 0, 0, '40200..40299', 0, '', '', '', '', true);
+        InsertData(AdditionalRevenue(), AdditionalRevenueName(), 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(Incomefromsecurities(), IncomefromsecuritiesName(), 0, 0, 0, '', 2, '', '', '', '', true);
+        InsertData(ManagementFeeRevenue(), ManagementFeeRevenueName(), 0, 0, 0, '', 2, '', '', '', '', true);
+        InsertData(InterestIncome(), InterestIncomeName(), 0, 0, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData(CurrencyGains(), CurrencyGainsName(), 0, 0, 0, '', 2, '', '', '', '', true);
+        InsertData(OtherIncidentalRevenue(), OtherIncidentalRevenueName(), 0, 0, 0, '', 2, '', '', '', '', true);
+        InsertData(TotalAdditionalRevenue(), TotalAdditionalRevenueName(), 4, 0, 0, '40300..40399', 0, '', '', '', '', true);
+        InsertData(JobsandServices(), JobsandServicesName(), 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(JobSales(), JobSalesName(), 0, 0, 0, '', 2, '', '', '', '', true);
+        InsertData(JobSalesApplied(), JobSalesAppliedName(), 0, 0, 0, '', 2, '', '', '', '', true);
+        InsertData(SalesofServiceContracts(), SalesofServiceContractsName(), 0, 0, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData(SalesofServiceWork(), SalesofServiceWorkName(), 0, 0, 0, '', 2, '', '', '', '', true);
+        InsertData(TotalJobsandServices(), TotalJobsandServicesName(), 4, 0, 0, '40400..40499', 0, '', '', '', '', true);
+        InsertData(RevenueReductions(), RevenueReductionsName(), 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(SalesDiscounts(), SalesDiscountsName(), 0, 0, 0, '', 2, '', '', '', '', true);
+        InsertData(SalesInvoiceRounding(), SalesInvoiceRoundingName(), 0, 0, 0, '', 2, DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData(PaymentToleranceandAllowances(), PaymentToleranceandAllowancesName(), 0, 0, 0, '', 2, '', '', '', '', true);
+        InsertData(SalesReturns(), SalesReturnsName(), 0, 0, 0, '', 2, '', '', '', '', true);
+        InsertData(TotalRevenueReductions(), TotalRevenueReductionsName(), 4, 0, 0, '40900..40999', 0, '', '', '', '', true);
+        InsertData(TOTALINCOME(), TOTALINCOMEName(), 4, 0, 0, '40001..49990', 0, '', '', '', '', true);
+        InsertData(COSTOFGOODSSOLD(), COSTOFGOODSSOLDName(), 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(CostofGoods(), CostofGoodsName(), 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(CostofMaterials(), CostofMaterialsName(), 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(CostofMaterialsProjects(), CostofMaterialsProjectsName(), 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalCostofGoods(), TotalCostofGoodsName(), 4, 0, 0, '50100..50199', 0, '', '', '', '', true);
+        InsertData(CostofResourcesandServices(), CostofResourcesandServicesName(), 3, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(CostofLabor(), CostofLaborName(), 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(CostofLaborProjects(), CostofLaborProjectsName(), 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(CostofLaborWarranty_Contract(), CostofLaborWarranty_ContractName(), 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalCostofResources(), TotalCostofResourcesName(), 4, 0, 0, '50200..50299', 0, '', '', '', '', true);
+        InsertData(Subcontractedwork(), SubcontractedworkName(), 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(CostofVariances(), CostofVariancesName(), 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(TOTALCOSTOFGOODSSOLD(), TOTALCOSTOFGOODSSOLDName(), 4, 0, 0, '50001..59990', 0, '', '', '', '', true);
+        InsertData(EXPENSES(), EXPENSESName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(FacilityExpenses(), FacilityExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(RentalFacilities(), RentalFacilitiesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Rent_Leases(), Rent_LeasesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(ElectricityforRental(), ElectricityforRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(HeatingforRental(), HeatingforRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(WaterandSewerageforRental(), WaterandSewerageforRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(CleaningandWasteforRental(), CleaningandWasteforRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(RepairsandMaintenanceforRental(), RepairsandMaintenanceforRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(InsurancesRental(), InsurancesRentalName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(OtherRentalExpenses(), OtherRentalExpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalRentalFacilities(), TotalRentalFacilitiesName(), 4, 0, 0, '60100..60199', 1, '', '', '', '', true);
+        InsertData(PropertyExpenses(), PropertyExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(SiteFees_Leases(), SiteFees_LeasesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(ElectricityforProperty(), ElectricityforPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(HeatingforProperty(), HeatingforPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(WaterandSewerageforProperty(), WaterandSewerageforPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(CleaningandWasteforProperty(), CleaningandWasteforPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(RepairsandMaintenanceforProperty(), RepairsandMaintenanceforPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(InsurancesProperty(), InsurancesPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(OtherPropertyExpenses(), OtherPropertyExpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalPropertyExpenses(), TotalPropertyExpensesName(), 4, 0, 0, '60200..60299', 1, '', '', '', '', true);
+        InsertData(TotalFacilityExpenses(), TotalFacilityExpensesName(), 4, 0, 0, '60002..60999', 1, '', '', '', '', true);
+        InsertData(FixedAssetsLeases(), FixedAssetsLeasesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Hireofmachinery(), HireofmachineryName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Hireofcomputers(), HireofcomputersName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Hireofotherfixedassets(), HireofotherfixedassetsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalFixedAssetLeases(), TotalFixedAssetLeasesName(), 4, 0, 0, '61000..61999', 1, '', '', '', '', true);
+        InsertData(LogisticsExpenses(), LogisticsExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(VehicleExpenses(), VehicleExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(PassengerCarCosts(), PassengerCarCostsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TruckCosts(), TruckCostsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Othervehicleexpenses(), OthervehicleexpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalVehicleExpenses(), TotalVehicleExpensesName(), 4, 0, 0, '62100..62199', 1, '', '', '', '', true);
+        InsertData(FreightCosts(), FreightCostsName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Freightfeesforgoods(), FreightfeesforgoodsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Customsandforwarding(), CustomsandforwardingName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Freightfeesprojects(), FreightfeesprojectsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalFreightCosts(), TotalFreightCostsName(), 4, 0, 0, '62200..62299', 1, '', '', '', '', true);
+        InsertData(TravelExpenses(), TravelExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Tickets(), TicketsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Rentalvehicles(), RentalvehiclesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Boardandlodging(), BoardandlodgingName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Othertravelexpenses(), OthertravelexpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalTravelExpenses(), TotalTravelExpensesName(), 4, 0, 0, '62300..62399', 1, '', '', '', '', true);
+        InsertData(TotalLogisticsExpenses(), TotalLogisticsExpensesName(), 4, 0, 0, '62000..62999', 1, '', '', '', '', true);
+        InsertData(MarketingandSales(), MarketingandSalesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Advertising(), AdvertisingName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(AdvertisementDevelopment(), AdvertisementDevelopmentName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(OutdoorandTransportationAds(), OutdoorandTransportationAdsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Admatteranddirectmailings(), AdmatteranddirectmailingsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Conference_ExhibitionSponsorship(), Conference_ExhibitionSponsorshipName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Samplescontestsgifts(), SamplescontestsgiftsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(FilmTVradiointernetads(), FilmTVradiointernetadsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(PRandAgencyFees(), PRandAgencyFeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Otheradvertisingfees(), OtheradvertisingfeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalAdvertising(), TotalAdvertisingName(), 4, 0, 0, '63100..63199', 1, '', '', '', '', true);
+        InsertData(OtherMarketingExpenses(), OtherMarketingExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Catalogspricelists(), CatalogspricelistsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TradePublications(), TradePublicationsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalOtherMarketingExpenses(), TotalOtherMarketingExpensesName(), 4, 0, 0, '63200..63399', 1, '', '', '', '', true);
+        InsertData(SalesExpenses(), SalesExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(CreditCardCharges(), CreditCardChargesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(BusinessEntertainingdeductible(), BusinessEntertainingdeductibleName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(BusinessEntertainingnondeductible(), BusinessEntertainingnondeductibleName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalSalesExpenses(), TotalSalesExpensesName(), 4, 0, 0, '63400..63499', 1, '', '', '', '', true);
+        InsertData(TotalMarketingandSales(), TotalMarketingandSalesName(), 4, 0, 0, '63000..63999', 1, '', '', '', '', true);
+        InsertData(OfficeExpenses(), OfficeExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(OfficeSupplies(), OfficeSuppliesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(PhoneServices(), PhoneServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Dataservices(), DataservicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Postalfees(), PostalfeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Consumable_Expensiblehardware(), Consumable_ExpensiblehardwareName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Softwareandsubscriptionfees(), SoftwareandsubscriptionfeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalOfficeExpenses(), TotalOfficeExpensesName(), 4, 0, 0, '64000..64999', 1, '', '', '', '', true);
+        InsertData(InsurancesandRisks(), InsurancesandRisksName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(CorporateInsurance(), CorporateInsuranceName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(DamagesPaid(), DamagesPaidName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(BadDebtLosses(), BadDebtLossesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Securityservices(), SecurityservicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Otherriskexpenses(), OtherriskexpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalInsurancesandRisks(), TotalInsurancesandRisksName(), 4, 0, 0, '65000..65999', 1, '', '', '', '', true);
+        InsertData(ManagementandAdmin(), ManagementandAdminName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Management(), ManagementName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(RemunerationtoDirectors(), RemunerationtoDirectorsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(ManagementFees(), ManagementFeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Annual_interrimReports(), Annual_interrimReportsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Annual_generalmeeting(), Annual_generalmeetingName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(AuditandAuditServices(), AuditandAuditServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TaxadvisoryServices(), TaxadvisoryServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalManagementFees(), TotalManagementFeesName(), 4, 0, 0, '66100..66199', 1, '', '', '', '', true);
+        InsertData(TotalManagementandAdmin(), TotalManagementandAdminName(), 4, 0, 0, '66000..66999', 1, '', '', '', '', true);
+        InsertData(BankingandInterest(), BankingandInterestName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Bankingfees(), BankingfeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(InterestExpenses(), InterestExpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(PayableInvoiceRounding(), PayableInvoiceRoundingName(), 0, 0, 0, '', 1, DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), '', '', true);
+        InsertData(TotalBankingandInterest(), TotalBankingandInterestName(), 4, 0, 0, '67000..67999', 1, '', '', '', '', true);
+        InsertData(ExternalServices_Expenses(), ExternalServices_ExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(ExternalServices(), ExternalServicesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(AccountingServices(), AccountingServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(ITServices(), ITServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(MediaServices(), MediaServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(ConsultingServices(), ConsultingServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(LegalFeesandAttorneyServices(), LegalFeesandAttorneyServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(OtherExternalServices(), OtherExternalServicesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalExternalServices(), TotalExternalServicesName(), 4, 0, 0, '68100..68199', 1, '', '', '', '', true);
+        InsertData(OtherExternalExpenses(), OtherExternalExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(LicenseFees_Royalties(), LicenseFees_RoyaltiesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Trademarks_Patents(), Trademarks_PatentsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(AssociationFees(), AssociationFeesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Miscexternalexpenses(), MiscexternalexpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(PurchaseDiscounts(), PurchaseDiscountsName(), 0, 0, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalOtherExternalExpenses(), TotalOtherExternalExpensesName(), 4, 0, 0, '68200..68299', 1, '', '', '', '', true);
+        InsertData(TotalExternalServices_Expenses(), TotalExternalServices_ExpensesName(), 4, 0, 0, '68000..68999', 1, '', '', '', '', true);
+        InsertData(Personnel(), PersonnelName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(WagesandSalaries(), WagesandSalariesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Salaries(), SalariesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(HourlyWages(), HourlyWagesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(OvertimeWages(), OvertimeWagesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Bonuses(), BonusesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(CommissionsPaid(), CommissionsPaidName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(PTOAccrued(), PTOAccruedName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalWagesandSalaries(), TotalWagesandSalariesName(), 4, 0, 0, '71000..71999', 1, '', '', '', '', true);
+        InsertData(Benefits_Pension(), Benefits_PensionName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Benefits(), BenefitsName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TrainingCosts(), TrainingCostsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(HealthCareContributions(), HealthCareContributionsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Entertainmentofpersonnel(), EntertainmentofpersonnelName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Allowances(), AllowancesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Mandatoryclothingexpenses(), MandatoryclothingexpensesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Othercash_remunerationbenefits(), Othercash_remunerationbenefitsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalBenefits(), TotalBenefitsName(), 4, 0, 0, '72100..72199', 1, '', '', '', '', true);
+        InsertData(Pension(), PensionName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(Pensionfeesandrecurringcosts(), PensionfeesandrecurringcostsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(EmployerContributions(), EmployerContributionsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalPension(), TotalPensionName(), 4, 0, 0, '72200..72299', 1, '', '', '', '', true);
+        InsertData(TotalBenefits_Pension(), TotalBenefits_PensionName(), 4, 0, 0, '72000..72999', 1, '', '', '', '', true);
+        InsertData(InsurancesPersonnel(), InsurancesPersonnelName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(HealthInsurance(), HealthInsuranceName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(DentalInsurance(), DentalInsuranceName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(WorkersCompensation(), WorkersCompensationName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(LifeInsurance(), LifeInsuranceName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalInsurancesPersonnel(), TotalInsurancesPersonnelName(), 4, 0, 0, '73000..73999', 1, '', '', '', '', true);
+        InsertData(PersonnelTaxes(), PersonnelTaxesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(FederalPersonnelTaxes(), FederalPersonnelTaxesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(FederalWithholdingExpense(), FederalWithholdingExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(FICAExpense(), FICAExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(FUTAExpense(), FUTAExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(MedicareExpense(), MedicareExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(OtherFederalExpense(), OtherFederalExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalFederalPersonnelTaxes(), TotalFederalPersonnelTaxesName(), 4, 0, 0, '74100..74399', 1, '', '', '', '', true);
+        InsertData(StatePersonnelTaxes(), StatePersonnelTaxesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(StateWithholdingExpense(), StateWithholdingExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(SUTAExpense(), SUTAExpenseName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalStatePersonnelTaxes(), TotalStatePersonnelTaxesName(), 4, 0, 0, '74400..74599', 1, '', '', '', '', true);
+        InsertData(TotalPersonnelTaxes(), TotalPersonnelTaxesName(), 4, 0, 0, '74000..74999', 1, '', '', '', '', true);
+        InsertData(TotalPersonnel(), TotalPersonnelName(), 4, 0, 0, '70000..79999', 1, '', '', '', '', true);
+        InsertData(Depreciation(), DepreciationName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(DepreciationLandandProperty(), DepreciationLandandPropertyName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(DepreciationFixedAssets(), DepreciationFixedAssetsName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalDepreciation(), TotalDepreciationName(), 4, 0, 0, '80000..89999', 1, '', '', '', '', true);
+        InsertData(MiscExpenses(), MiscExpensesName(), 3, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(CurrencyLosses(), CurrencyLossesName(), 0, 0, 0, '', 1, '', '', '', '', true);
+        InsertData(TotalMiscExpenses(), TotalMiscExpensesName(), 4, 0, 0, '90000..91999', 1, '', '', '', '', true);
+        InsertData(TOTALEXPENSES(), TOTALEXPENSESName(), 4, 0, 0, '60001..98990', 1, '', '', '', '', true);
+        InsertData(NETINCOME(), NETINCOMEName(), 2, 0, 0, TOTALINCOME() + '|' + TOTALCOSTOFGOODSSOLD() + '|' + TOTALEXPENSES(), 0, '', '', '', '', true);
     end;
 
     procedure AddBalanceSheetForMini()
     begin
         // Balance sheet 5000-9999
-        with DemoDataSetup do begin
-            Get();
-            InsertData(BalanceSheet(), BalanceSheetName(), 1, 1, 1, '', 0, '', '', '', '', true);
-            InsertData(Assets(), AssetsName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(IntangibleFixedAssets(), IntangibleFixedAssetsName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(DevelopmentExpenditure(), DevelopmentExpenditureName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TenancySiteLeaseholdandsimilarrights(), TenancySiteLeaseholdandsimilarrightsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Goodwill(), GoodwillName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AdvancedPaymentsforIntangibleFixedAssets(), AdvancedPaymentsforIntangibleFixedAssetsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalIntangibleFixedAssets(), TotalIntangibleFixedAssetsName(), 4, 1, 0, '11000..11999', 0, '', '', '', '', true);
-            InsertData(TangibleFixedAssets(), TangibleFixedAssetsName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(LandandBuildings(), LandandBuildingsName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Building(), BuildingName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CostofImprovementstoLeasedProperty(), CostofImprovementstoLeasedPropertyName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Land(), LandName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalLandandbuilding(), TotalLandandbuildingName(), 4, 1, 0, '12100..12199', 0, '', '', '', '', true);
-            InsertData(MachineryandEquipment(), MachineryandEquipmentName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(EquipmentsandTools(), EquipmentsandToolsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Computers(), ComputersName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CarsandotherTransportEquipments(), CarsandotherTransportEquipmentsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(LeasedAssets(), LeasedAssetsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalMachineryandEquipment(), TotalMachineryandEquipmentName(), 4, 1, 0, '12200..12299', 0, '', '', '', '', true);
-            InsertData(AccumulatedDepreciation(), AccumulatedDepreciationName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalTangibleAssets(), TotalTangibleAssetsName(), 4, 1, 0, '12000..12999', 0, '', '', '', '', true);
-            InsertData(FinancialandFixedAssets(), FinancialandFixedAssetsName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Long_termReceivables(), Long_termReceivablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ParticipationinGroupCompanies(), ParticipationinGroupCompaniesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(LoanstoPartnersorrelatedParties(), LoanstoPartnersorrelatedPartiesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(DeferredTaxAssets(), DeferredTaxAssetsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(OtherLong_termReceivables(), OtherLong_termReceivablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalFinancialandFixedAssets(), TotalFinancialandFixedAssetsName(), 4, 1, 0, '13000..13999', 0, '', '', '', '', true);
-            InsertData(InventoriesProductsandworkinProgress(), InventoriesProductsandworkinProgressName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(RawMaterials(), RawMaterialsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(SuppliesandConsumables(), SuppliesandConsumablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ProductsinProgress(), ProductsinProgressName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(FinishedGoods(), FinishedGoodsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(GoodsforResale(), GoodsforResaleName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AdvancedPaymentsforgoodsandservices(), AdvancedPaymentsforgoodsandservicesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(OtherInventoryItems(), OtherInventoryItemsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(WorkinProgress(), WorkinProgressName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(WorkinProgressFinishedGoods(), WorkinProgressFinishedGoodsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(WIPJobSales(), WIPJobSalesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(WIPJobCosts(), WIPJobCostsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(WIPAccruedCosts(), WIPAccruedCostsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(WIPInvoicedSales(), WIPInvoicedSalesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalWorkinProgress(), TotalWorkinProgressName(), 4, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Receivables(), ReceivablesName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccountsReceivables(), AccountsReceivablesName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccountReceivableDomestic(), AccountReceivableDomesticName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccountReceivableForeign(), AccountReceivableForeignName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ContractualReceivables(), ContractualReceivablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ConsignmentReceivables(), ConsignmentReceivablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CreditcardsandVouchersReceivables(), CreditcardsandVouchersReceivablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalAccountReceivables(), TotalAccountReceivablesName(), 4, 1, 0, '15100..15199', 0, '', '', '', '', true);
-            InsertData(OtherCurrentReceivables(), OtherCurrentReceivablesName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CurrentReceivablefromEmployees(), CurrentReceivablefromEmployeesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Accruedincomenotyetinvoiced(), AccruedincomenotyetinvoicedName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ClearingAccountsforTaxesandcharges(), ClearingAccountsforTaxesandchargesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TaxAssets(), TaxAssetsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CurrentReceivablesfromgroupcompanies(), CurrentReceivablesfromgroupcompaniesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalOtherCurrentReceivables(), TotalOtherCurrentReceivablesName(), 4, 1, 0, '15900..15998', 0, '', '', '', '', true);
-            InsertData(TotalReceivables(), TotalReceivablesName(), 4, 1, 0, '15000..15999', 0, '', '', '', '', true);
-            InsertData(PrepaidexpensesandAccruedIncome(), PrepaidexpensesandAccruedIncomeName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(PrepaidRent(), PrepaidRentName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(PrepaidInterestexpense(), PrepaidInterestexpenseName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccruedRentalIncome(), AccruedRentalIncomeName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccruedInterestIncome(), AccruedInterestIncomeName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Assetsintheformofprepaidexpenses(), AssetsintheformofprepaidexpensesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Otherprepaidexpensesandaccruedincome(), OtherprepaidexpensesandaccruedincomeName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalPrepaidexpensesandAccruedIncome(), TotalPrepaidexpensesandAccruedIncomeName(), 4, 1, 0, '16000..16999', 0, '', '', '', '', true);
-            InsertData(Short_terminvestments(), Short_terminvestmentsName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Bonds(), BondsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Convertibledebtinstruments(), ConvertibledebtinstrumentsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Othershort_termInvestments(), Othershort_termInvestmentsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Write_downofShort_terminvestments(), Write_downofShort_terminvestmentsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Totalshortterminvestments(), TotalshortterminvestmentsName(), 4, 1, 0, '17000..17999', 0, '', '', '', '', true);
-            InsertData(CashandBank(), CashandBankName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(PettyCash(), PettyCashName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(BusinessaccountOperatingDomestic(), BusinessaccountOperatingDomesticName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(BusinessaccountOperatingForeign(), BusinessaccountOperatingForeignName(), 0, 1, 0, '', 0, '', '', '', '', false);
-            InsertData(Otherbankaccounts(), OtherbankaccountsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CertificateofDeposit(), CertificateofDepositName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalCashandBank(), TotalCashandBankName(), 4, 1, 0, '18000..18999', 0, '', '', '', '', true);
-            InsertData(TotalAssets(), TotalAssetsName(), 4, 1, 0, '10001..19999', 0, '', '', '', '', true);
-            InsertData(Liability(), LiabilityName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Long_TermLiabilities(), Long_TermLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(BondsandDebentureLoans(), BondsandDebentureLoansName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ConvertiblesLoans(), ConvertiblesLoansName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(OtherLong_termLiabilities(), OtherLong_termLiabilitiesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(BankoverdraftFacilities(), BankoverdraftFacilitiesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalLong_termLiabilities(), TotalLong_termLiabilitiesName(), 4, 1, 0, '21000..21999', 0, '', '', '', '', true);
-            InsertData(CurrentLiabilities(), CurrentLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccountsPayableDomestic(), AccountsPayableDomesticName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccountsPayableForeign(), AccountsPayableForeignName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Advancesfromcustomers(), AdvancesfromcustomersName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ChangeinWorkinProgress(), ChangeinWorkinProgressName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Bankoverdraftshort_term(), Bankoverdraftshort_termName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(OtherLiabilities(), OtherLiabilitiesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalCurrentLiabilities(), TotalCurrentLiabilitiesName(), 4, 1, 0, '22000..22999', 0, '', '', '', '', true);
-            InsertData(TaxLiabilities(), TaxLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(SalesTax_VATLiable(), SalesTax_VATLiableName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TaxesLiable(), TaxesLiableName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(EstimatedIncomeTax(), EstimatedIncomeTaxName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(EstimatedPayrolltaxonPensionCosts(), EstimatedPayrolltaxonPensionCostsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalTaxLiabilities(), TotalTaxLiabilitiesName(), 4, 1, 0, '23000..23999', 0, '', '', '', '', true);
-            InsertData(PayrollLiabilities(), PayrollLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(EmployeesWithholdingTaxes(), EmployeesWithholdingTaxesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(StatutorySocialsecurityContributions(), StatutorySocialsecurityContributionsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ContractualSocialsecurityContributions(), ContractualSocialsecurityContributionsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AttachmentsofEarning(), AttachmentsofEarningName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(HolidayPayfund(), HolidayPayfundName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(OtherSalary_wageDeductions(), OtherSalary_wageDeductionsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalPayrollLiabilities(), TotalPayrollLiabilitiesName(), 4, 1, 0, '24000..24999', 0, '', '', '', '', true);
-            InsertData(OtherCurrentLiabilities(), OtherCurrentLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ClearingAccountforFactoringCurrentPortion(), ClearingAccountforFactoringCurrentPortionName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CurrentLiabilitiestoEmployees(), CurrentLiabilitiestoEmployeesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ClearingAccountforthirdparty(), ClearingAccountforthirdpartyName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CurrentLoans(), CurrentLoansName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(LiabilitiesGrantsReceived(), LiabilitiesGrantsReceivedName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalOtherCurrentLiabilities(), TotalOtherCurrentLiabilitiesName(), 4, 1, 0, '25000..25999', 0, '', '', '', '', true);
-            InsertData(AccruedExpensesandDeferredIncome(), AccruedExpensesandDeferredIncomeName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Accruedwages_salaries(), Accruedwages_salariesName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccruedHolidaypay(), AccruedHolidaypayName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccruedPensioncosts(), AccruedPensioncostsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccruedInterestExpense(), AccruedInterestExpenseName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(DeferredIncome(), DeferredIncomeName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(AccruedContractualcosts(), AccruedContractualcostsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(OtherAccruedExpensesandDeferredIncome(), OtherAccruedExpensesandDeferredIncomeName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalAccruedExpensesandDeferredIncome(), TotalAccruedExpensesandDeferredIncomeName(), 4, 1, 0, '26000..26999', 0, '', '', '', '', true);
-            InsertData(TotalLiabilities(), TotalLiabilitiesName(), 4, 1, 0, '20000..29999', 0, '', '', '', '', true);
-            InsertData(Equity(), EquityName(), 3, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(EquityPartner(), EquityPartnerName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(NetResults(), NetResultsName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(RestrictedEquity(), RestrictedEquityName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ShareCapital(), ShareCapitalName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Non_RestrictedEquity(), Non_RestrictedEquityName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(Profitorlossfromthepreviousyear(), ProfitorlossfromthepreviousyearName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(ResultsfortheFinancialyear(), ResultsfortheFinancialyearName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(DistributionstoShareholders(), DistributionstoShareholdersName(), 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(TotalEquity(), TotalEquityName(), 4, 1, 0, '30000..39999', 0, '', '', '', '', true);
-        end;
+        DemoDataSetup.Get();
+        InsertData(BalanceSheet(), BalanceSheetName(), 1, 1, 1, '', 0, '', '', '', '', true);
+        InsertData(Assets(), AssetsName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(IntangibleFixedAssets(), IntangibleFixedAssetsName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(DevelopmentExpenditure(), DevelopmentExpenditureName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TenancySiteLeaseholdandsimilarrights(), TenancySiteLeaseholdandsimilarrightsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Goodwill(), GoodwillName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AdvancedPaymentsforIntangibleFixedAssets(), AdvancedPaymentsforIntangibleFixedAssetsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalIntangibleFixedAssets(), TotalIntangibleFixedAssetsName(), 4, 1, 0, '11000..11999', 0, '', '', '', '', true);
+        InsertData(TangibleFixedAssets(), TangibleFixedAssetsName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(LandandBuildings(), LandandBuildingsName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Building(), BuildingName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CostofImprovementstoLeasedProperty(), CostofImprovementstoLeasedPropertyName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Land(), LandName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalLandandbuilding(), TotalLandandbuildingName(), 4, 1, 0, '12100..12199', 0, '', '', '', '', true);
+        InsertData(MachineryandEquipment(), MachineryandEquipmentName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(EquipmentsandTools(), EquipmentsandToolsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Computers(), ComputersName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CarsandotherTransportEquipments(), CarsandotherTransportEquipmentsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(LeasedAssets(), LeasedAssetsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalMachineryandEquipment(), TotalMachineryandEquipmentName(), 4, 1, 0, '12200..12299', 0, '', '', '', '', true);
+        InsertData(AccumulatedDepreciation(), AccumulatedDepreciationName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalTangibleAssets(), TotalTangibleAssetsName(), 4, 1, 0, '12000..12999', 0, '', '', '', '', true);
+        InsertData(FinancialandFixedAssets(), FinancialandFixedAssetsName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Long_termReceivables(), Long_termReceivablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ParticipationinGroupCompanies(), ParticipationinGroupCompaniesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(LoanstoPartnersorrelatedParties(), LoanstoPartnersorrelatedPartiesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(DeferredTaxAssets(), DeferredTaxAssetsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(OtherLong_termReceivables(), OtherLong_termReceivablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalFinancialandFixedAssets(), TotalFinancialandFixedAssetsName(), 4, 1, 0, '13000..13999', 0, '', '', '', '', true);
+        InsertData(InventoriesProductsandworkinProgress(), InventoriesProductsandworkinProgressName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(RawMaterials(), RawMaterialsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(SuppliesandConsumables(), SuppliesandConsumablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ProductsinProgress(), ProductsinProgressName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(FinishedGoods(), FinishedGoodsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(GoodsforResale(), GoodsforResaleName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AdvancedPaymentsforgoodsandservices(), AdvancedPaymentsforgoodsandservicesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(OtherInventoryItems(), OtherInventoryItemsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(WorkinProgress(), WorkinProgressName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(WorkinProgressFinishedGoods(), WorkinProgressFinishedGoodsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(WIPJobSales(), WIPJobSalesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(WIPJobCosts(), WIPJobCostsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(WIPAccruedCosts(), WIPAccruedCostsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(WIPInvoicedSales(), WIPInvoicedSalesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalWorkinProgress(), TotalWorkinProgressName(), 4, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Receivables(), ReceivablesName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccountsReceivables(), AccountsReceivablesName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccountReceivableDomestic(), AccountReceivableDomesticName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccountReceivableForeign(), AccountReceivableForeignName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ContractualReceivables(), ContractualReceivablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ConsignmentReceivables(), ConsignmentReceivablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CreditcardsandVouchersReceivables(), CreditcardsandVouchersReceivablesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalAccountReceivables(), TotalAccountReceivablesName(), 4, 1, 0, '15100..15199', 0, '', '', '', '', true);
+        InsertData(OtherCurrentReceivables(), OtherCurrentReceivablesName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CurrentReceivablefromEmployees(), CurrentReceivablefromEmployeesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Accruedincomenotyetinvoiced(), AccruedincomenotyetinvoicedName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ClearingAccountsforTaxesandcharges(), ClearingAccountsforTaxesandchargesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TaxAssets(), TaxAssetsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CurrentReceivablesfromgroupcompanies(), CurrentReceivablesfromgroupcompaniesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalOtherCurrentReceivables(), TotalOtherCurrentReceivablesName(), 4, 1, 0, '15900..15998', 0, '', '', '', '', true);
+        InsertData(TotalReceivables(), TotalReceivablesName(), 4, 1, 0, '15000..15999', 0, '', '', '', '', true);
+        InsertData(PrepaidexpensesandAccruedIncome(), PrepaidexpensesandAccruedIncomeName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(PrepaidRent(), PrepaidRentName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(PrepaidInterestexpense(), PrepaidInterestexpenseName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccruedRentalIncome(), AccruedRentalIncomeName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccruedInterestIncome(), AccruedInterestIncomeName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Assetsintheformofprepaidexpenses(), AssetsintheformofprepaidexpensesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Otherprepaidexpensesandaccruedincome(), OtherprepaidexpensesandaccruedincomeName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalPrepaidexpensesandAccruedIncome(), TotalPrepaidexpensesandAccruedIncomeName(), 4, 1, 0, '16000..16999', 0, '', '', '', '', true);
+        InsertData(Short_terminvestments(), Short_terminvestmentsName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Bonds(), BondsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Convertibledebtinstruments(), ConvertibledebtinstrumentsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Othershort_termInvestments(), Othershort_termInvestmentsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Write_downofShort_terminvestments(), Write_downofShort_terminvestmentsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Totalshortterminvestments(), TotalshortterminvestmentsName(), 4, 1, 0, '17000..17999', 0, '', '', '', '', true);
+        InsertData(CashandBank(), CashandBankName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(PettyCash(), PettyCashName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(BusinessaccountOperatingDomestic(), BusinessaccountOperatingDomesticName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(BusinessaccountOperatingForeign(), BusinessaccountOperatingForeignName(), 0, 1, 0, '', 0, '', '', '', '', false);
+        InsertData(Otherbankaccounts(), OtherbankaccountsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CertificateofDeposit(), CertificateofDepositName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalCashandBank(), TotalCashandBankName(), 4, 1, 0, '18000..18999', 0, '', '', '', '', true);
+        InsertData(TotalAssets(), TotalAssetsName(), 4, 1, 0, '10001..19999', 0, '', '', '', '', true);
+        InsertData(Liability(), LiabilityName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Long_TermLiabilities(), Long_TermLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(BondsandDebentureLoans(), BondsandDebentureLoansName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ConvertiblesLoans(), ConvertiblesLoansName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(OtherLong_termLiabilities(), OtherLong_termLiabilitiesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(BankoverdraftFacilities(), BankoverdraftFacilitiesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalLong_termLiabilities(), TotalLong_termLiabilitiesName(), 4, 1, 0, '21000..21999', 0, '', '', '', '', true);
+        InsertData(CurrentLiabilities(), CurrentLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccountsPayableDomestic(), AccountsPayableDomesticName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccountsPayableForeign(), AccountsPayableForeignName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Advancesfromcustomers(), AdvancesfromcustomersName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ChangeinWorkinProgress(), ChangeinWorkinProgressName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Bankoverdraftshort_term(), Bankoverdraftshort_termName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(OtherLiabilities(), OtherLiabilitiesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalCurrentLiabilities(), TotalCurrentLiabilitiesName(), 4, 1, 0, '22000..22999', 0, '', '', '', '', true);
+        InsertData(TaxLiabilities(), TaxLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(SalesTax_VATLiable(), SalesTax_VATLiableName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TaxesLiable(), TaxesLiableName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(EstimatedIncomeTax(), EstimatedIncomeTaxName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(EstimatedPayrolltaxonPensionCosts(), EstimatedPayrolltaxonPensionCostsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalTaxLiabilities(), TotalTaxLiabilitiesName(), 4, 1, 0, '23000..23999', 0, '', '', '', '', true);
+        InsertData(PayrollLiabilities(), PayrollLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(EmployeesWithholdingTaxes(), EmployeesWithholdingTaxesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(StatutorySocialsecurityContributions(), StatutorySocialsecurityContributionsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ContractualSocialsecurityContributions(), ContractualSocialsecurityContributionsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AttachmentsofEarning(), AttachmentsofEarningName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(HolidayPayfund(), HolidayPayfundName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(OtherSalary_wageDeductions(), OtherSalary_wageDeductionsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalPayrollLiabilities(), TotalPayrollLiabilitiesName(), 4, 1, 0, '24000..24999', 0, '', '', '', '', true);
+        InsertData(OtherCurrentLiabilities(), OtherCurrentLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ClearingAccountforFactoringCurrentPortion(), ClearingAccountforFactoringCurrentPortionName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CurrentLiabilitiestoEmployees(), CurrentLiabilitiestoEmployeesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ClearingAccountforthirdparty(), ClearingAccountforthirdpartyName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CurrentLoans(), CurrentLoansName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(LiabilitiesGrantsReceived(), LiabilitiesGrantsReceivedName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalOtherCurrentLiabilities(), TotalOtherCurrentLiabilitiesName(), 4, 1, 0, '25000..25999', 0, '', '', '', '', true);
+        InsertData(AccruedExpensesandDeferredIncome(), AccruedExpensesandDeferredIncomeName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Accruedwages_salaries(), Accruedwages_salariesName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccruedHolidaypay(), AccruedHolidaypayName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccruedPensioncosts(), AccruedPensioncostsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccruedInterestExpense(), AccruedInterestExpenseName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(DeferredIncome(), DeferredIncomeName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(AccruedContractualcosts(), AccruedContractualcostsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(OtherAccruedExpensesandDeferredIncome(), OtherAccruedExpensesandDeferredIncomeName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalAccruedExpensesandDeferredIncome(), TotalAccruedExpensesandDeferredIncomeName(), 4, 1, 0, '26000..26999', 0, '', '', '', '', true);
+        InsertData(TotalLiabilities(), TotalLiabilitiesName(), 4, 1, 0, '20000..29999', 0, '', '', '', '', true);
+        InsertData(Equity(), EquityName(), 3, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(EquityPartner(), EquityPartnerName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(NetResults(), NetResultsName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(RestrictedEquity(), RestrictedEquityName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ShareCapital(), ShareCapitalName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Non_RestrictedEquity(), Non_RestrictedEquityName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(Profitorlossfromthepreviousyear(), ProfitorlossfromthepreviousyearName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(ResultsfortheFinancialyear(), ResultsfortheFinancialyearName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(DistributionstoShareholders(), DistributionstoShareholdersName(), 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(TotalEquity(), TotalEquityName(), 4, 1, 0, '30000..39999', 0, '', '', '', '', true);
     end;
 
     procedure InsertData(AccountNo: Code[20]; AccountName: Text[100]; AccountType: Option; IncomeBalance: Option; NoOfBlankLines: Integer; Totaling: Text[250]; GenPostingType: Option; GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; VATGenPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; DirectPosting: Boolean)
@@ -1442,76 +1433,76 @@ codeunit 101015 "Create G/L Account"
         GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
     begin
         case GLAccountCategory.Description of
-            GLAccountCategoryMgt.GetCash:
+            GLAccountCategoryMgt.GetCash():
                 UpdateGLAccounts(GLAccountCategory, '992900', '992990');
-            GLAccountCategoryMgt.GetAR:
+            GLAccountCategoryMgt.GetAR():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '992300', '992390');
                     UpdateGLAccounts(GLAccountCategory, '995620', '995631');
                 end;
-            GLAccountCategoryMgt.GetPrepaidExpenses:
+            GLAccountCategoryMgt.GetPrepaidExpenses():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '992200', '992200');
                     UpdateGLAccounts(GLAccountCategory, '992400', '992440');
                 end;
-            GLAccountCategoryMgt.GetInventory:
+            GLAccountCategoryMgt.GetInventory():
                 UpdateGLAccounts(GLAccountCategory, '992100', '992190');
-            GLAccountCategoryMgt.GetEquipment:
+            GLAccountCategoryMgt.GetEquipment():
                 UpdateGLAccounts(GLAccountCategory, '991003', '991395');
-            GLAccountCategoryMgt.GetAccumDeprec:
+            GLAccountCategoryMgt.GetAccumDeprec():
                 UpdateGLAccounts(GLAccountCategory, '991140', '991140');
-            GLAccountCategoryMgt.GetCurrentLiabilities:
+            GLAccountCategoryMgt.GetCurrentLiabilities():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '995300', '995611');
                     UpdateGLAccounts(GLAccountCategory, '995700', '995995');
                     UpdateGLAccounts(GLAccountCategory, '994010', '994010');
                 end;
-            GLAccountCategoryMgt.GetPayrollLiabilities:
+            GLAccountCategoryMgt.GetPayrollLiabilities():
                 UpdateGLAccounts(GLAccountCategory, '995830', '995830');
-            GLAccountCategoryMgt.GetLongTermLiabilities:
+            GLAccountCategoryMgt.GetLongTermLiabilities():
                 UpdateGLAccounts(GLAccountCategory, '995100', '995290');
-            GLAccountCategoryMgt.GetCommonStock:
+            GLAccountCategoryMgt.GetCommonStock():
                 UpdateGLAccounts(GLAccountCategory, '993110', '993110');
-            GLAccountCategoryMgt.GetRetEarnings:
+            GLAccountCategoryMgt.GetRetEarnings():
                 UpdateGLAccounts(GLAccountCategory, '993120', '993120');
-            GLAccountCategoryMgt.GetDistrToShareholders:
+            GLAccountCategoryMgt.GetDistrToShareholders():
                 UpdateGLAccounts(GLAccountCategory, '993100', '993100');
-            GLAccountCategoryMgt.GetIncomeService:
+            GLAccountCategoryMgt.GetIncomeService():
                 UpdateGLAccounts(GLAccountCategory, '996410', '996955');
-            GLAccountCategoryMgt.GetIncomeProdSales:
+            GLAccountCategoryMgt.GetIncomeProdSales():
                 UpdateGLAccounts(GLAccountCategory, '996105', '996295');
-            GLAccountCategoryMgt.GetIncomeSalesDiscounts:
+            GLAccountCategoryMgt.GetIncomeSalesDiscounts():
                 UpdateGLAccounts(GLAccountCategory, '996910', '996910');
-            GLAccountCategoryMgt.GetIncomeSalesReturns:
+            GLAccountCategoryMgt.GetIncomeSalesReturns():
                 ;
-            GLAccountCategoryMgt.GetCOGSLabor:
+            GLAccountCategoryMgt.GetCOGSLabor():
                 UpdateGLAccounts(GLAccountCategory, '997480', '997793');
-            GLAccountCategoryMgt.GetCOGSMaterials:
+            GLAccountCategoryMgt.GetCOGSMaterials():
                 UpdateGLAccounts(GLAccountCategory, '997100', '997295');
-            GLAccountCategoryMgt.GetRentExpense:
+            GLAccountCategoryMgt.GetRentExpense():
                 ;
-            GLAccountCategoryMgt.GetAdvertisingExpense:
+            GLAccountCategoryMgt.GetAdvertisingExpense():
                 UpdateGLAccounts(GLAccountCategory, '998410', '998420');
-            GLAccountCategoryMgt.GetInterestExpense:
+            GLAccountCategoryMgt.GetInterestExpense():
                 UpdateGLAccounts(GLAccountCategory, '999200', '999290');
-            GLAccountCategoryMgt.GetFeesExpense:
+            GLAccountCategoryMgt.GetFeesExpense():
                 ;
-            GLAccountCategoryMgt.GetInsuranceExpense:
+            GLAccountCategoryMgt.GetInsuranceExpense():
                 ;
-            GLAccountCategoryMgt.GetPayrollExpense:
+            GLAccountCategoryMgt.GetPayrollExpense():
                 UpdateGLAccounts(GLAccountCategory, '998700', '998790');
-            GLAccountCategoryMgt.GetBenefitsExpense:
+            GLAccountCategoryMgt.GetBenefitsExpense():
                 ;
-            GLAccountCategoryMgt.GetRepairsExpense:
+            GLAccountCategoryMgt.GetRepairsExpense():
                 UpdateGLAccounts(GLAccountCategory, '998530', '998530');
-            GLAccountCategoryMgt.GetUtilitiesExpense:
+            GLAccountCategoryMgt.GetUtilitiesExpense():
                 UpdateGLAccounts(GLAccountCategory, '998100', '998240');
-            GLAccountCategoryMgt.GetOtherIncomeExpense:
+            GLAccountCategoryMgt.GetOtherIncomeExpense():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '998600', '998690');
                     UpdateGLAccounts(GLAccountCategory, '999420', '999420');
                 end;
-            GLAccountCategoryMgt.GetTaxExpense:
+            GLAccountCategoryMgt.GetTaxExpense():
                 UpdateGLAccounts(GLAccountCategory, '999510', '999510');
         end;
     end;
@@ -1676,78 +1667,78 @@ codeunit 101015 "Create G/L Account"
         GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
     begin
         case GLAccountCategory.Description of
-            GLAccountCategoryMgt.GetFixedAssets:
+            GLAccountCategoryMgt.GetFixedAssets():
                 UpdateGLAccounts(GLAccountCategory, '10800', '10900');
-            GLAccountCategoryMgt.GetCurrentAssets:
+            GLAccountCategoryMgt.GetCurrentAssets():
                 UpdateGLAccounts(GLAccountCategory, '10100', '10700');
-            GLAccountCategoryMgt.GetCash:
+            GLAccountCategoryMgt.GetCash():
                 UpdateGLAccounts(GLAccountCategory, '10100', '10300');
-            GLAccountCategoryMgt.GetAR:
+            GLAccountCategoryMgt.GetAR():
                 UpdateGLAccounts(GLAccountCategory, '10400', '10400');
-            GLAccountCategoryMgt.GetPrepaidExpenses:
+            GLAccountCategoryMgt.GetPrepaidExpenses():
                 UpdateGLAccounts(GLAccountCategory, '10500', '10600');
-            GLAccountCategoryMgt.GetInventory:
+            GLAccountCategoryMgt.GetInventory():
                 UpdateGLAccounts(GLAccountCategory, '10700', '10700');
-            GLAccountCategoryMgt.GetEquipment:
+            GLAccountCategoryMgt.GetEquipment():
                 UpdateGLAccounts(GLAccountCategory, '10800', '10800');
-            GLAccountCategoryMgt.GetAccumDeprec:
+            GLAccountCategoryMgt.GetAccumDeprec():
                 UpdateGLAccounts(GLAccountCategory, '10900', '10900');
-            GLAccountCategoryMgt.GetCurrentLiabilities:
+            GLAccountCategoryMgt.GetCurrentLiabilities():
                 UpdateGLAccounts(GLAccountCategory, '20100', '20600');
-            GLAccountCategoryMgt.GetPayrollLiabilities:
+            GLAccountCategoryMgt.GetPayrollLiabilities():
                 UpdateGLAccounts(GLAccountCategory, '20700', '21500');
-            GLAccountCategoryMgt.GetLongTermLiabilities:
+            GLAccountCategoryMgt.GetLongTermLiabilities():
                 UpdateGLAccounts(GLAccountCategory, '21900', '21900');
-            GLAccountCategoryMgt.GetCommonStock:
+            GLAccountCategoryMgt.GetCommonStock():
                 UpdateGLAccounts(GLAccountCategory, '30100', '30100');
-            GLAccountCategoryMgt.GetRetEarnings:
+            GLAccountCategoryMgt.GetRetEarnings():
                 UpdateGLAccounts(GLAccountCategory, '30200', '30200');
-            GLAccountCategoryMgt.GetDistrToShareholders:
+            GLAccountCategoryMgt.GetDistrToShareholders():
                 UpdateGLAccounts(GLAccountCategory, '30300', '30300');
-            GLAccountCategoryMgt.GetIncomeService:
+            GLAccountCategoryMgt.GetIncomeService():
                 if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
                     UpdateGLAccounts(GLAccountCategory, '996950', '996959')
                 else
                     UpdateGLAccounts(GLAccountCategory, '40100', '40100');
-            GLAccountCategoryMgt.GetIncomeProdSales:
+            GLAccountCategoryMgt.GetIncomeProdSales():
                 if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
                     UpdateGLAccounts(GLAccountCategory, '996100', '996695')
                 else
                     UpdateGLAccounts(GLAccountCategory, '40200', '40200');
-            GLAccountCategoryMgt.GetIncomeSalesDiscounts:
+            GLAccountCategoryMgt.GetIncomeSalesDiscounts():
                 UpdateGLAccounts(GLAccountCategory, '40300', '40300');
-            GLAccountCategoryMgt.GetIncomeSalesReturns:
+            GLAccountCategoryMgt.GetIncomeSalesReturns():
                 UpdateGLAccounts(GLAccountCategory, '40400', '40500');
-            GLAccountCategoryMgt.GetCOGSLabor:
+            GLAccountCategoryMgt.GetCOGSLabor():
                 ;
-            GLAccountCategoryMgt.GetCOGSMaterials:
+            GLAccountCategoryMgt.GetCOGSMaterials():
                 UpdateGLAccounts(GLAccountCategory, '50100', '50100');
-            GLAccountCategoryMgt.GetRentExpense:
+            GLAccountCategoryMgt.GetRentExpense():
                 UpdateGLAccounts(GLAccountCategory, '60100', '60100');
-            GLAccountCategoryMgt.GetAdvertisingExpense:
+            GLAccountCategoryMgt.GetAdvertisingExpense():
                 UpdateGLAccounts(GLAccountCategory, '60200', '60200');
-            GLAccountCategoryMgt.GetInterestExpense:
+            GLAccountCategoryMgt.GetInterestExpense():
                 UpdateGLAccounts(GLAccountCategory, '60300', '60300');
-            GLAccountCategoryMgt.GetFeesExpense:
+            GLAccountCategoryMgt.GetFeesExpense():
                 UpdateGLAccounts(GLAccountCategory, '60400', '60500');
-            GLAccountCategoryMgt.GetBadDebtExpense:
+            GLAccountCategoryMgt.GetBadDebtExpense():
                 UpdateGLAccounts(GLAccountCategory, '60600', '60600');
-            GLAccountCategoryMgt.GetSalariesExpense:
+            GLAccountCategoryMgt.GetSalariesExpense():
                 UpdateGLAccounts(GLAccountCategory, '60700', '60700');
-            GLAccountCategoryMgt.GetPayrollExpense:
+            GLAccountCategoryMgt.GetPayrollExpense():
                 UpdateGLAccounts(GLAccountCategory, '60800', '60900');
-            GLAccountCategoryMgt.GetBenefitsExpense:
+            GLAccountCategoryMgt.GetBenefitsExpense():
                 UpdateGLAccounts(GLAccountCategory, '61000', '61100');
-            GLAccountCategoryMgt.GetRepairsExpense:
+            GLAccountCategoryMgt.GetRepairsExpense():
                 UpdateGLAccounts(GLAccountCategory, '61200', '61200');
-            GLAccountCategoryMgt.GetUtilitiesExpense:
+            GLAccountCategoryMgt.GetUtilitiesExpense():
                 UpdateGLAccounts(GLAccountCategory, '61300', '61300');
-            GLAccountCategoryMgt.GetOtherIncomeExpense:
+            GLAccountCategoryMgt.GetOtherIncomeExpense():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '998600', '998690');
                     UpdateGLAccounts(GLAccountCategory, '61400', '61600');
                 end;
-            GLAccountCategoryMgt.GetTaxExpense:
+            GLAccountCategoryMgt.GetTaxExpense():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '8084000', '8084500');
                     UpdateGLAccounts(GLAccountCategory, '61700', '61800');

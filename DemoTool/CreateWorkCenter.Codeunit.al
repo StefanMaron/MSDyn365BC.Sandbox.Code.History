@@ -3,17 +3,15 @@ codeunit 119016 "Create Work Center"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(
-              '100', XAssemblydepartment, '', '1', 1.2, 0, 0, '', XMINUTES, 3, 100, 0, 0, 0.0001, 0, '1', 0, false, ManufactCode);
-            InsertData(
-              '200', XPackingdepartment, '', '1', 1.5, 0, 0, '', XMINUTES, 1, 100, 0, 0, 0.0001, 0, '1', 0, false, ManufactCode);
-            InsertData(
-              '300', XPaintingdepartment, '', '2', 1.7, 0, 0, '', XMINUTES, 1, 100, 0, 0, 0.0001, 0, '2', 0, false, ManufactCode);
-            InsertData(
-              '400', XMachinedepartment, '', '2', 2.5, 0, 0, '', XMINUTES, 1, 100, 0, 0, 0.0001, 0, '2', 0, false, ManufactCode);
-        end;
+        DemoDataSetup.Get();
+        InsertData(
+          '100', XAssemblydepartment, '', '1', 1.2, 0, 0, '', XMINUTES, 3, 100, 0, 0, 0.0001, 0, '1', 0, false, DemoDataSetup.ManufactCode());
+        InsertData(
+          '200', XPackingdepartment, '', '1', 1.5, 0, 0, '', XMINUTES, 1, 100, 0, 0, 0.0001, 0, '1', 0, false, DemoDataSetup.ManufactCode());
+        InsertData(
+          '300', XPaintingdepartment, '', '2', 1.7, 0, 0, '', XMINUTES, 1, 100, 0, 0, 0.0001, 0, '2', 0, false, DemoDataSetup.ManufactCode());
+        InsertData(
+          '400', XMachinedepartment, '', '2', 2.5, 0, 0, '', XMINUTES, 1, 100, 0, 0, 0.0001, 0, '2', 0, false, DemoDataSetup.ManufactCode());
     end;
 
     var

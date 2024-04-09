@@ -2,6 +2,7 @@ table 122001 "Item Line Buffer"
 {
     Caption = 'Item Line Buffer';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

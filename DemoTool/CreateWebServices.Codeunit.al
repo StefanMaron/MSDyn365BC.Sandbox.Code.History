@@ -7,13 +7,13 @@ codeunit 119201 "Create Web Services"
         WebServiceManagement: Codeunit "Web Service Management";
     begin
         WebServiceManagement.CreateWebService(WebService."Object Type"::Page, PAGE::"Sales Order", '', true);
-        CreatePowerBIWebServices;
-        CreateSegmentWebService;
-        CreateJobWebServices;
-        CreatePowerBITenantWebServices;
-        CreateAccountantPortalWebServices;
-        CreateWorkflowWebhookWebServices;
-        CreateExcelTemplateWebServices;
+        CreatePowerBIWebServices();
+        CreateSegmentWebService();
+        CreateJobWebServices();
+        CreatePowerBITenantWebServices();
+        CreateAccountantPortalWebServices();
+        CreateWorkflowWebhookWebServices();
+        CreateExcelTemplateWebServices();
     end;
 
     var
@@ -46,7 +46,6 @@ codeunit 119201 "Create Web Services"
         PowerBISalesPipelineTxt: Label 'Power BI Sales Pipeline', Locked = true;
         PowerBITop5OpportunitiesTxt: Label 'Power BI Top 5 Opportunities', Locked = true;
         PowerBIWorkDateCalcTxt: Label 'Power BI WorkDate Calc.', Locked = true;
-        PowerBIReportLabelsTxt: Label 'Power BI Report Labels', Locked = true;
         AccountantPortalActivityCuesTxt: Label 'AccountantPortalActivityCues', Locked = true;
         AccountantPortalFinanceCuesTxt: Label 'AccountantPortalFinanceCues', Locked = true;
         ODataUtility: Codeunit ODataUtility;
@@ -214,31 +213,31 @@ codeunit 119201 "Create Web Services"
     var
         TenantWebService: Record "Tenant Web Service";
     begin
-        CreatePowerBICustomerList;
-        CreatePowerBIVendorList;
-        CreatePowerBIJobList;
-        CreatePowerBISalesList;
-        CreatePowerBIPurchaseList;
-        CreatePowerBIItemPurchaseList;
-        CreatePowerBIItemSalesList;
-        CreatePowerBIGLAmountList;
-        CreatePowerBIGLBudgetedAmountList;
-        CreatePowerBITopCustOverviewWebService;
-        CreatePowerBISalesHdrCustWebService;
-        CreatePowerBICustItemLedgEntWebService;
-        CreatePowerBICustLedgerEntriesWebService;
-        CreatePowerBIVendorLedgerEntriesWebService;
-        CreatePowerBIPurchaseHdrVendorWebService;
-        CreatePowerBIVendItemLedgEntWebService;
-        CreatePowerBIAgedAccPayableWebService;
-        CreatePowerBIAgedAccReceivableWebService;
-        CreatePowerBIAgedInventoryChartWebService;
-        CreatePowerBIJobActBudgPriceWebService;
-        CreatePowerBIJobProfitabilityWebService;
-        CreatePowerBIJobActBudgCostWebService;
-        CreatePowerBISalesPipelineWebService;
-        CreatePowerBITop5OpportunitiesWebService;
-        CreatePowerBIWorkDateCalcWebService;
+        CreatePowerBICustomerList();
+        CreatePowerBIVendorList();
+        CreatePowerBIJobList();
+        CreatePowerBISalesList();
+        CreatePowerBIPurchaseList();
+        CreatePowerBIItemPurchaseList();
+        CreatePowerBIItemSalesList();
+        CreatePowerBIGLAmountList();
+        CreatePowerBIGLBudgetedAmountList();
+        CreatePowerBITopCustOverviewWebService();
+        CreatePowerBISalesHdrCustWebService();
+        CreatePowerBICustItemLedgEntWebService();
+        CreatePowerBICustLedgerEntriesWebService();
+        CreatePowerBIVendorLedgerEntriesWebService();
+        CreatePowerBIPurchaseHdrVendorWebService();
+        CreatePowerBIVendItemLedgEntWebService();
+        CreatePowerBIAgedAccPayableWebService();
+        CreatePowerBIAgedAccReceivableWebService();
+        CreatePowerBIAgedInventoryChartWebService();
+        CreatePowerBIJobActBudgPriceWebService();
+        CreatePowerBIJobProfitabilityWebService();
+        CreatePowerBIJobActBudgCostWebService();
+        CreatePowerBISalesPipelineWebService();
+        CreatePowerBITop5OpportunitiesWebService();
+        CreatePowerBIWorkDateCalcWebService();
 
         WebServiceManagement.CreateTenantWebService(TenantWebService."Object Type"::Query, QUERY::"Dimension Set Entries", '', true);
         WebServiceManagement.CreateTenantWebService(TenantWebService."Object Type"::Query, QUERY::"G/L Entries", '', true);

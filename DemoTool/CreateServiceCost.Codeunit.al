@@ -4,15 +4,13 @@ codeunit 117006 "Create Service Cost"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        with ServiceCost do begin
-            InsertData(XSTART, XStartspaceFee, '45100', 20, 1, XPCS, "Cost Type"::Other, '', 2);
-            InsertData(XTR_EAST, XTravelspaceFee, '45100', 2, 1, XPCS, "Cost Type"::Travel, XE, 0.2);
-            InsertData(XTR_MID, XTravelspaceFee, '45100', 1, 1, XPCS, "Cost Type"::Travel, XM, 0.1);
-            InsertData(XTR_NORTH, XTravelspaceFee, '45100', 3, 1, XPCS, "Cost Type"::Travel, XN, 0.3);
-            InsertData(XTR_SE, XTravelspaceFee, '45100', 4, 1, XPCS, "Cost Type"::Travel, XSE, 0.4);
-            InsertData(XTR_SOUTH, XTravelspaceFee, '45100', 5, 1, XPCS, "Cost Type"::Travel, XS, 0.5);
-            InsertData(XTR_WEST, XTravelspaceFee, '45100', 6, 1, XPCS, "Cost Type"::Travel, XW, 0.6);
-        end;
+        InsertData(XSTART, XStartspaceFee, '45100', 20, 1, XPCS, ServiceCost."Cost Type"::Other, '', 2);
+        InsertData(XTR_EAST, XTravelspaceFee, '45100', 2, 1, XPCS, ServiceCost."Cost Type"::Travel, XE, 0.2);
+        InsertData(XTR_MID, XTravelspaceFee, '45100', 1, 1, XPCS, ServiceCost."Cost Type"::Travel, XM, 0.1);
+        InsertData(XTR_NORTH, XTravelspaceFee, '45100', 3, 1, XPCS, ServiceCost."Cost Type"::Travel, XN, 0.3);
+        InsertData(XTR_SE, XTravelspaceFee, '45100', 4, 1, XPCS, ServiceCost."Cost Type"::Travel, XSE, 0.4);
+        InsertData(XTR_SOUTH, XTravelspaceFee, '45100', 5, 1, XPCS, ServiceCost."Cost Type"::Travel, XS, 0.5);
+        InsertData(XTR_WEST, XTravelspaceFee, '45100', 6, 1, XPCS, ServiceCost."Cost Type"::Travel, XW, 0.6);
     end;
 
     var

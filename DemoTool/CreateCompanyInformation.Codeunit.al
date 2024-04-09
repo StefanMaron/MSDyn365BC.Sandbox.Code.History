@@ -4,7 +4,7 @@ codeunit 101079 "Create Company Information"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        InsertData;
+        InsertData();
     end;
 
     var
@@ -62,7 +62,7 @@ codeunit 101079 "Create Company Information"
         CompanyInformation."Ship-to City" := CreatePostCode.FindCity(CompanyInformation."Ship-to Post Code");
 
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Evaluation then
-            CompanyInformation."Tax Area Code" := CreateTaxAreas.GetAtlantaGACode;
+            CompanyInformation."Tax Area Code" := CreateTaxAreas.GetAtlantaGACode();
 
         CompanyInformation.Picture.Import(DemoDataSetup."Path to Picture Folder" + 'cronus.jpg');
 
