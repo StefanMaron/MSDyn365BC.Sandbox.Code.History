@@ -1,5 +1,5 @@
 ﻿param (
-    [string]$country = 'w1'
+    [string]$country = 'de'
 )
 
 $ErrorActionPreference = "SilentlyContinue"
@@ -25,6 +25,7 @@ Get-BCArtifactUrl -select All -Type Sandbox -country $country -accept_insiderEul
 $Versions | Sort-Object -Property Country, Version | % {
     [version]$Version = $_.Version
     $country = $_.Country.Trim()
+    
     Write-Host ($($country)-$($version.ToString()))
     
     git fetch --all
@@ -50,8 +51,11 @@ $Versions | Sort-Object -Property Country, Version | % {
             $LatestCommitIDOfBranchEmpty = git log -n 1 --pretty=format:"%h" "origin/main"
         }
 
-        if ($Version.Major -gt 15 -and $Version.Build -gt 5) {
+        if ($Version.Major -gt 15 -and $Version.Minor -eq 0) {
             $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="$($country)-$($version.Major - 1).5" --pretty=format:"%h"
+        }
+        elseif ($Version.Major -gt 15 -and $Version.Minor -gt 5) {
+            $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="$($country)-$($version.Major).5" --pretty=format:"%h"
         }
         else {
             $CommitIDLastCUFromPreviousMajor = $null
