@@ -10,7 +10,7 @@ codeunit 117566 "Add Employee"
           'DE-49293', '020-2584-1095', '7223-4321-8744', Xlmcronusdemositecom,
           '1294370062', XUADMI, '4921826-897', '1', XADM, XMONTH);
         ModifyRec1(19021001D, 4, 19020519D, 35, XADM, XKatherine, '1095', XKH, 'Katherine Hull');
-        UpdateResources;
+        UpdateResources();
     end;
 
     var

@@ -3,13 +3,12 @@ codeunit 101029 "Create Cash Flow Data"
 
     trigger OnRun()
     begin
-        with CFSetup do
-            if not FindFirst() then begin
-                Init();
-                Insert();
-            end;
+        if not CFSetup.FindFirst() then begin
+            CFSetup.Init();
+            CFSetup.Insert();
+        end;
 
-        DemonstrationData;
+        DemonstrationData();
     end;
 
     var
@@ -60,7 +59,7 @@ codeunit 101029 "Create Cash Flow Data"
         // CashFlow
         CreateCFForecast(XDefaultCFCardNo, XCashFlowJanuary, XCASHFLOW);
 
-        CreateCFAccounts;
+        CreateCFAccounts();
 
         // CF Manual Revenue/Payments
         CreateRevenue(xMR + '01', '0030', XRentals, 2900);
@@ -70,7 +69,7 @@ codeunit 101029 "Create Cash Flow Data"
         CreateExpens(xME + '02', '1040', XRunningCosts, 75000);
         CreateExpens(xME + '03', '1050', XFinanceCosts, 15000);
 
-        CreateCFReportSelection;
+        CreateCFReportSelection();
     end;
 
     local procedure CreateCFAccounts()
@@ -175,7 +174,7 @@ codeunit 101029 "Create Cash Flow Data"
           CFAccount."Source Type"::" ", CFAccount."G/L Integration"::" ");
     end;
 
-    procedure CreateCFAccount(No: Code[20]; Name: Text[30]; AccountType: Integer; Indentation: Integer; Totaling: Text[250]; SourceType: Enum "Cash Flow Source Type"; GLIntegration: Integer)
+    procedure CreateCFAccount(No: Code[20]; Name: Text[30]; AccountType: Enum "Cash Flow Account Type"; Indentation: Integer; Totaling: Text[250]; SourceType: Enum "Cash Flow Source Type"; GLIntegration: Integer)
     begin
         CreateCFAccount_andGL(
           No,
@@ -188,7 +187,7 @@ codeunit 101029 "Create Cash Flow Data"
           '')
     end;
 
-    local procedure CreateCFAccount_andGL(No: Code[20]; Name: Text[30]; AccountType: Integer; Indentation: Integer; Totaling: Text[250]; SourceType: Enum "Cash Flow Source Type"; GLIntegration: Integer; GLAccount: Code[250])
+    local procedure CreateCFAccount_andGL(No: Code[20]; Name: Text[30]; AccountType: Enum "Cash Flow Account Type"; Indentation: Integer; Totaling: Text[250]; SourceType: Enum "Cash Flow Source Type"; GLIntegration: Integer; GLAccount: Code[250])
     var
         CFAccount: Record "Cash Flow Account";
     begin
@@ -327,8 +326,8 @@ codeunit 101029 "Create Cash Flow Data"
 
         CreateCFForecast(LastNoUsed, XxCashFlow, CFForecastNoSeries);
         CreateCFSetup(CFForecastNoSeries, LastNoUsed, false);
-        CreateCFAccounts;
-        CreateCFReportSelection;
+        CreateCFAccounts();
+        CreateCFReportSelection();
     end;
 }
 

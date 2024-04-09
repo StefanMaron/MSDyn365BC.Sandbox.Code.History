@@ -3,6 +3,7 @@ table 101897 DevSourceInfo
     Caption = 'DevSourceInfo';
     DataPerCompany = false;
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

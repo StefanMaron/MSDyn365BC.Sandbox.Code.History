@@ -35,17 +35,15 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         CreateConfigWorksheet: Codeunit "Create Config. Worksheet";
     begin
-        with CreateConfigWorksheet do begin
-            CreateConfigGroup(XLocalSettingsTxt);
-            CreateConfigLine(DATABASE::"Source Code Setup");
-            CreateConfigLine(DATABASE::"Place of Dispatcher");
-            CreateConfigLine(DATABASE::"Place of Receiver");
-            CreateConfigLine(DATABASE::"Data Export");
-            CreateConfigLine(DATABASE::"Data Export Record Definition");
-            CreateConfigLine(DATABASE::"Data Export Record Source");
-            CreateConfigLine(DATABASE::"Data Export Record Type");
-            CreateConfigLine(DATABASE::"Data Export Record Field");
-        end;
+        CreateConfigWorksheet.CreateConfigGroup(XLocalSettingsTxt);
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Source Code Setup");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Place of Dispatcher");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Place of Receiver");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Data Export");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Data Export Record Definition");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Data Export Record Source");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Data Export Record Type");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Data Export Record Field");
     end;
 
     procedure SetFieldsAndFilters(TableID: Integer)
@@ -53,13 +51,13 @@ codeunit 101931 "Create Local RapidStart Pack"
         DemoDataSetup: Record "Demo Data Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
-        if CreateConfigPackageHelper.GetDataType <> DemoDataSetup."Data Type"::Extended then
+        if CreateConfigPackageHelper.GetDataType() <> DemoDataSetup."Data Type"::Extended then
             case TableID of
                 DATABASE::"General Ledger Setup":
                     CreateConfigPackageHelper.ValidateField(GeneralLedgerSetup.FieldNo("Adjust for Payment Disc."), false);
                 DATABASE::"Data Export Record Source",
               DATABASE::"Data Export Record Field":
-                    CreateConfigPackageHelper.SetSkipTableTriggers;
+                    CreateConfigPackageHelper.SetSkipTableTriggers();
             end;
     end;
 }

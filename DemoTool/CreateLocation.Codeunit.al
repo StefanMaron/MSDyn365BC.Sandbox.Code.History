@@ -115,14 +115,10 @@ codeunit 101014 "Create Location"
         XRED: Label 'RED';
         XRedWarehouse: Label 'Red Warehouse';
         XMainAshfordStreet2: Label 'Main Ashford Street, 2';
-        X4405014240001: Label '+44-(0)50 1424 0001';
-        X4405014240002: Label '+44-(0)50 1424 0002';
         XCarolePoland: Label 'Carole Poland';
         XWHITE: Label 'WHITE';
         XWhiteWarehouse: Label 'White Warehouse';
         XMerrilyGroveAvenue62: Label 'Merrily Grove Avenue 6, 2';
-        X4405045679771: Label '+44-(0)50 4567 9771';
-        X4405045679772: Label '+44-(0)50 4567 9772';
         XSilver: Label 'Silver';
         XSilverWarehouse: Label 'Silver Warehouse';
         XPier102: Label 'Pier 10, 2';

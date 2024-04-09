@@ -114,90 +114,78 @@ codeunit 161406 "Create Digital Audit Data"
     var
         DataExport: Record "Data Export";
     begin
-        with DataExport do begin
-            Init();
-            Validate(Code, NewCode);
-            Validate(Description, NewDescription);
-            Insert();
-        end;
+        DataExport.Init();
+        DataExport.Validate(Code, NewCode);
+        DataExport.Validate(Description, NewDescription);
+        DataExport.Insert();
     end;
 
     procedure InsertDataRecord(NewCode: Code[10]; NewDescription: Text[50])
     var
         DataExportRecordType: Record "Data Export Record Type";
     begin
-        with DataExportRecordType do begin
-            Init();
-            Validate(Code, NewCode);
-            Validate(Description, NewDescription);
-            Insert();
-        end;
+        DataExportRecordType.Init();
+        DataExportRecordType.Validate(Code, NewCode);
+        DataExportRecordType.Validate(Description, NewDescription);
+        DataExportRecordType.Insert();
     end;
 
     procedure InsertDataRecordDef(GroupCode: Code[10]; RecordCode: Code[10]; NewDescription: Text[50])
     var
         DataExportRecordDefinition: Record "Data Export Record Definition";
     begin
-        with DataExportRecordDefinition do begin
-            Init();
-            Validate("Data Export Code", GroupCode);
-            Validate("Data Exp. Rec. Type Code", RecordCode);
-            Validate(Description, NewDescription);
-            Insert();
-        end;
+        DataExportRecordDefinition.Init();
+        DataExportRecordDefinition.Validate("Data Export Code", GroupCode);
+        DataExportRecordDefinition.Validate("Data Exp. Rec. Type Code", RecordCode);
+        DataExportRecordDefinition.Validate(Description, NewDescription);
+        DataExportRecordDefinition.Insert();
     end;
 
     procedure InsertDataRecordDefTable(GroupCode: Code[10]; RecordCode: Code[10]; TableNo: Integer; NewIndentation: Integer; RelationToLineNo: Integer; RelationToTableNo: Integer; PeriodFieldNo: Integer; LineNo: Integer; Filename: Text[250])
     var
         DataExportRecordSource: Record "Data Export Record Source";
     begin
-        with DataExportRecordSource do begin
-            Init();
-            Validate("Data Export Code", GroupCode);
-            Validate("Data Exp. Rec. Type Code", RecordCode);
-            Validate("Table No.", TableNo);
-            Indentation := NewIndentation;
-            "Relation To Table No." := RelationToTableNo;
-            "Relation To Line No." := RelationToLineNo;
-            Validate("Period Field No.", PeriodFieldNo);
-            Validate("Line No.", LineNo);
-            Validate("Export File Name", Filename);
-            Insert();
-        end;
+        DataExportRecordSource.Init();
+        DataExportRecordSource.Validate("Data Export Code", GroupCode);
+        DataExportRecordSource.Validate("Data Exp. Rec. Type Code", RecordCode);
+        DataExportRecordSource.Validate("Table No.", TableNo);
+        DataExportRecordSource.Indentation := NewIndentation;
+        DataExportRecordSource."Relation To Table No." := RelationToTableNo;
+        DataExportRecordSource."Relation To Line No." := RelationToLineNo;
+        DataExportRecordSource.Validate("Period Field No.", PeriodFieldNo);
+        DataExportRecordSource.Validate("Line No.", LineNo);
+        DataExportRecordSource.Validate("Export File Name", Filename);
+        DataExportRecordSource.Insert();
     end;
 
     procedure InsertDataRecordDefField(GroupCode: Code[10]; RecordCode: Code[10]; SourceLineNo: Integer; TableNo: Integer; FieldId: Integer; LineNo: Integer; DateFilterHandling: Integer)
     var
         DataExportRecordField: Record "Data Export Record Field";
     begin
-        with DataExportRecordField do begin
-            Init();
-            Validate("Data Export Code", GroupCode);
-            Validate("Data Exp. Rec. Type Code", RecordCode);
-            Validate("Source Line No.", SourceLineNo);
-            Validate("Table No.", TableNo);
-            Validate("Field No.", FieldId);
-            Validate("Line No.", LineNo);
-            if DateFilterHandling <> 0 then
-                Validate("Date Filter Handling", DateFilterHandling);
-            Insert();
-        end;
+        DataExportRecordField.Init();
+        DataExportRecordField.Validate("Data Export Code", GroupCode);
+        DataExportRecordField.Validate("Data Exp. Rec. Type Code", RecordCode);
+        DataExportRecordField.Validate("Source Line No.", SourceLineNo);
+        DataExportRecordField.Validate("Table No.", TableNo);
+        DataExportRecordField.Validate("Field No.", FieldId);
+        DataExportRecordField.Validate("Line No.", LineNo);
+        if DateFilterHandling <> 0 then
+            DataExportRecordField.Validate("Date Filter Handling", DateFilterHandling);
+        DataExportRecordField.Insert();
     end;
 
     procedure InsertDataTableRelation(GroupCode: Code[10]; RecordCode: Code[10]; FromTableNo: Integer; FromFieldNo: Integer; ToTableNo: Integer; ToFieldNo: Integer)
     var
         DataExportTableRelation: Record "Data Export Table Relation";
     begin
-        with DataExportTableRelation do begin
-            Init();
-            Validate("Data Export Code", GroupCode);
-            Validate("Data Exp. Rec. Type Code", RecordCode);
-            Validate("From Table No.", FromTableNo);
-            Validate("From Field No.", FromFieldNo);
-            Validate("To Table No.", ToTableNo);
-            Validate("To Field No.", ToFieldNo);
-            Insert();
-        end;
+        DataExportTableRelation.Init();
+        DataExportTableRelation.Validate("Data Export Code", GroupCode);
+        DataExportTableRelation.Validate("Data Exp. Rec. Type Code", RecordCode);
+        DataExportTableRelation.Validate("From Table No.", FromTableNo);
+        DataExportTableRelation.Validate("From Field No.", FromFieldNo);
+        DataExportTableRelation.Validate("To Table No.", ToTableNo);
+        DataExportTableRelation.Validate("To Field No.", ToFieldNo);
+        DataExportTableRelation.Insert();
     end;
 }
 

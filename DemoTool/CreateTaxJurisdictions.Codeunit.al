@@ -25,7 +25,7 @@ codeunit 101320 "Create Tax Jurisdictions"
             InsertData(XILCHICAGO, XCityofChicagocommaIL, '995612', '995632', XIL, '995622', false, AdjForPmtDisc);
             InsertData(XILCOOK, XCOOKCountycommaIL, '995612', '995632', XIL, '995622', false, AdjForPmtDisc);
 
-            InsertLocalData;
+            InsertLocalData();
         end;
     end;
 

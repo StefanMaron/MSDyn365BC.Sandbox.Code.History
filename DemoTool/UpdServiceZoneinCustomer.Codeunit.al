@@ -49,10 +49,8 @@ codeunit 117561 "Upd. Service Zone in Customer"
 
     var
         Cust: Record Customer;
-        XM: Label 'M';
         XN: Label 'N';
         XW: Label 'W';
-        XSE: Label 'SE';
         XX: Label 'X';
         XS: Label 'S';
 }

@@ -3,19 +3,17 @@ codeunit 101093 "Create Vendor Posting Group"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            AdjustForPmtDisc := true;
+        DemoDataSetup.Get();
+        AdjustForPmtDisc := true;
 
-            if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
-                InsertData(DomesticCode, XDomesticVendorsTxt, '995410', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
-                InsertData(ForeignCode, XForeignVendorsTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
-                InsertData(EUCode, XVendorsInEUTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
-            end else begin
-                InsertData(DomesticCode(), XDomesticVendorsTxt, CreateGLAccount.AccountsPayableDomestic(), CreateGLAccount.MiscVATPayable(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.Miscexternalexpenses(), CreateGLAccount.Miscexternalexpenses());
-                InsertData(ForeignCode(), XForeignVendorsTxt, CreateGLAccount.AccountsPayableForeign(), CreateGLAccount.MiscVATPayable(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.Miscexternalexpenses(), CreateGLAccount.Miscexternalexpenses());
-                InsertData(EUCode(), XVendorsInEUTxt, CreateGLAccount.AccountsPayableForeign(), CreateGLAccount.MiscVATPayable(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.Miscexternalexpenses(), CreateGLAccount.Miscexternalexpenses());
-            end;
+        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
+            InsertData(DemoDataSetup.DomesticCode(), XDomesticVendorsTxt, '995410', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
+            InsertData(DemoDataSetup.ForeignCode(), XForeignVendorsTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
+            InsertData(DemoDataSetup.EUCode(), XVendorsInEUTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
+        end else begin
+            InsertData(DemoDataSetup.DomesticCode(), XDomesticVendorsTxt, CreateGLAccount.AccountsPayableDomestic(), CreateGLAccount.MiscVATPayable(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.Miscexternalexpenses(), CreateGLAccount.Miscexternalexpenses());
+            InsertData(DemoDataSetup.ForeignCode(), XForeignVendorsTxt, CreateGLAccount.AccountsPayableForeign(), CreateGLAccount.MiscVATPayable(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.Miscexternalexpenses(), CreateGLAccount.Miscexternalexpenses());
+            InsertData(DemoDataSetup.EUCode(), XVendorsInEUTxt, CreateGLAccount.AccountsPayableForeign(), CreateGLAccount.MiscVATPayable(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PurchaseDiscounts(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.PayableInvoiceRounding(), CreateGLAccount.Miscexternalexpenses(), CreateGLAccount.Miscexternalexpenses());
         end;
     end;
 

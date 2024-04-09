@@ -3,12 +3,10 @@ codeunit 117184 "Create Serv. Price Adjustment"
 
     trigger OnRun()
     begin
-        with ServPriceAdjustmentDetail do begin
-            InsertData(XOSP, Type::Item, '80205', '', '', X10MBitEthernet);
-            InsertData(XOSP, Type::Item, '80209', '', '', X2048xIDECDROM);
-            InsertData(XOSP, Type::Item, '80216', '', '', XEthernetCable);
-            InsertData(XOSP, Type::Item, '80218', '', '', XHardDiskDrive);
-        end;
+        InsertData(XOSP, ServPriceAdjustmentDetail.Type::Item, '80205', '', '', X10MBitEthernet);
+        InsertData(XOSP, ServPriceAdjustmentDetail.Type::Item, '80209', '', '', X2048xIDECDROM);
+        InsertData(XOSP, ServPriceAdjustmentDetail.Type::Item, '80216', '', '', XEthernetCable);
+        InsertData(XOSP, ServPriceAdjustmentDetail.Type::Item, '80218', '', '', XHardDiskDrive);
     end;
 
     var

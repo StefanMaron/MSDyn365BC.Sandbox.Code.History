@@ -4,7 +4,7 @@ codeunit 101079 "Create Company Information"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        InsertData;
+        InsertData();
     end;
 
     var
@@ -13,8 +13,6 @@ codeunit 101079 "Create Company Information"
         XCRONUSInternationalLtd: Label 'CRONUS International Ltd.';
         X5TheRing: Label '5 The Ring';
         XWestminster: Label 'Westminster';
-        X06666666666: Label '0666-666-6666';
-        X06666666660: Label '0666-666-6660';
         X8889999: Label '888-9999';
         XWorldWideBank: Label 'World Wide Bank';
         XBG99999: Label 'BG99999';

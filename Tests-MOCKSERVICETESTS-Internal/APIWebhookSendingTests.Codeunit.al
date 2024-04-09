@@ -37,14 +37,14 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] An expired subscription
-        SubscriptionID := CreateExpiredSubscription;
+        SubscriptionID := CreateExpiredSubscription();
         // [GIVEN] A notification
         NotificationID := CreateNotificationOnCreate(SubscriptionID, ProcessingTime);
         // [GIVEN] An aggregate notification
         AggregateNotificationID := CreateAggregateNotificationOnCreate(SubscriptionID, ProcessingTime - 1000, 1);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Subscription has been deleted
         VerifySubscriptionDoesNotExist(SubscriptionID);
@@ -57,7 +57,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Message has been logged
         VerifyActivityLogExists(DeleteExpiredSubscriptionTitleTxt);
         // [THEN] Processing has not been started
-        VerifyProcessingNotStarted;
+        VerifyProcessingNotStarted();
     end;
 
     [Test]
@@ -72,14 +72,14 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] An obsolete subscription
-        SubscriptionID := CreateObsoleteSubscription;
+        SubscriptionID := CreateObsoleteSubscription();
         // [GIVEN] A notification
         NotificationID := CreateNotificationOnCreate(SubscriptionID, ProcessingTime);
         // [GIVEN] An aggregate notification
         AggregateNotificationID := CreateAggregateNotificationOnCreate(SubscriptionID, ProcessingTime - 1000, 1);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Subscription has been deleted
         VerifySubscriptionDoesNotExist(SubscriptionID);
@@ -92,7 +92,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Message has been logged
         VerifyActivityLogExists(DeleteObsoleteSubscriptionTitleTxt);
         // [THEN] Processing has not been started
-        VerifyProcessingNotStarted;
+        VerifyProcessingNotStarted();
     end;
 
     [Test]
@@ -154,7 +154,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] A notification
         NotificationID := CreateNotificationOnCreate(SubscriptionID, ProcessingTime);
         // [GIVEN] An aggregate notification
@@ -163,7 +163,7 @@ codeunit 135089 "API Webhook Sending Tests"
         APIWebhookSendingEvents.SetApiEnabled(false);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
@@ -175,7 +175,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Attempts number has not been increased
         VerifyAttemptNumber(AggregateNotificationID, 1);
         // [THEN] Processing has not been started
-        VerifyProcessingNotStarted;
+        VerifyProcessingNotStarted();
     end;
 
     [Test]
@@ -190,7 +190,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] An obsolete subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] A notification
         NotificationID := CreateNotificationOnCreate(SubscriptionID, ProcessingTime);
         // [GIVEN] An aggregate notification
@@ -199,7 +199,7 @@ codeunit 135089 "API Webhook Sending Tests"
         APIWebhookSendingEvents.SetApiSubscriptionsEnabled(false);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
@@ -211,7 +211,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Attempts number has not been increased
         VerifyAttemptNumber(AggregateNotificationID, 1);
         // [THEN] Processing has not been started
-        VerifyProcessingNotStarted;
+        VerifyProcessingNotStarted();
     end;
 
     [Test]
@@ -225,16 +225,16 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] An expired subscription
-        ExpiredSubscriptionID := CreateExpiredSubscription;
+        ExpiredSubscriptionID := CreateExpiredSubscription();
         // [GIVEN] An obsolete subscription
-        ObsoleteSubscriptionID := CreateObsoleteSubscription;
+        ObsoleteSubscriptionID := CreateObsoleteSubscription();
         // [GIVEN] An expired notification
         CreateNotificationOnCreate(ExpiredSubscriptionID, ProcessingTime - 1000);
         // [GIVEN] An obsolete notification
         CreateNotificationOnCreate(ObsoleteSubscriptionID, ProcessingTime);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Expired subscription has been deleted
         VerifySubscriptionDoesNotExist(ExpiredSubscriptionID);
@@ -249,7 +249,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Obsolete Notification has not failed
         VerifyAggregateNotificationDoesNotExist(ObsoleteSubscriptionID);
         // [THEN] Processing has not been started
-        VerifyProcessingNotStarted;
+        VerifyProcessingNotStarted();
     end;
 
     [Test]
@@ -351,12 +351,12 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription for an entity with a composite key
-        SubscriptionID := CreateActiveSubscriptionForEntityWithCompositeKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithCompositeKey();
         // [GIVEN] A notification
         NotificationID := CreateNotificationOnCreate(SubscriptionID, ProcessingTime);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Subscription has been deleted
         VerifySubscriptionDoesNotExist(SubscriptionID);
@@ -365,7 +365,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Notification has not failed
         VerifyAggregateNotificationDoesNotExist(NotificationID);
         // [THEN] Processing has not been been started
-        VerifyProcessingNotStarted;
+        VerifyProcessingNotStarted();
     end;
 
     [Test]
@@ -379,14 +379,14 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithTemporarySource;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithTemporarySource();
         // [GIVEN] A notification
         NotificationID := CreateNotificationOnCreate(SubscriptionID, ProcessingTime);
         // [GIVEN] Expecting empty payload
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Subscription has been deleted
         VerifySubscriptionDoesNotExist(SubscriptionID);
@@ -395,7 +395,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Notification has not failed
         VerifyAggregateNotificationDoesNotExist(NotificationID);
         // [THEN] Processing has not been started
-        VerifyProcessingNotStarted;
+        VerifyProcessingNotStarted();
     end;
 
     [Test]
@@ -411,9 +411,9 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription for an entity with a simple key
-        SimpleKeySubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SimpleKeySubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] A subscription for an entity with a composite key
-        CompositeKeySubscriptionID := CreateActiveSubscriptionForEntityWithCompositeKey;
+        CompositeKeySubscriptionID := CreateActiveSubscriptionForEntityWithCompositeKey();
 
         // [GIVEN] A notification for an entity with a simple key
         SimpleKeyNotificationID := CreateNotificationOnCreate(SimpleKeySubscriptionID, ProcessingTime - 1000);
@@ -426,10 +426,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription (simple key) has not been deleted
         VerifySubscriptionExists(SimpleKeySubscriptionID);
         // [THEN] Subscription (composite key) has been deleted
@@ -443,7 +443,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Notification (composite key) has not been converted to aggregate
         VerifyAggregateNotificationDoesNotExist(CompositeKeyNotificationID);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -460,7 +460,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] A failed notification of change type collection
         LastModifiedDateTime := ProcessingTime - 2000;
         FirstModifiedDateTime := LastModifiedDateTime - 1000;
@@ -473,17 +473,17 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Aggregate notification have been deleted
         VerifyAggregateNotificationDoesNotExist(FirstAggregateNotificationID);
         VerifyAggregateNotificationDoesNotExist(LastAggregateNotificationID);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -501,7 +501,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] A failed notification of change type collection
         LastModifiedDateTime := ProcessingTime - 2000;
         FirstModifiedDateTime := LastModifiedDateTime - 1000;
@@ -516,10 +516,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Aggregate notification have been deleted
@@ -530,7 +530,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Notification has not been converted to aggregate
         VerifyAggregateNotificationDoesNotExist(NotificationID);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -548,7 +548,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] A failed notification of change type collection with deletes
         LastModifiedDateTime := ProcessingTime - 2000;
         FirstModifiedDateTime := 0DT;
@@ -563,10 +563,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Aggregate notification have been deleted
@@ -577,7 +577,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Notification has not been converted to aggregate
         VerifyAggregateNotificationDoesNotExist(NotificationID);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -595,7 +595,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] A failed notification of change type collection without deletes
         LastModifiedDateTime := ProcessingTime - 2000;
         FirstModifiedDateTime := LastModifiedDateTime - 1000;
@@ -610,10 +610,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Aggregate notification have been deleted
@@ -624,7 +624,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Notification has not been converted to aggregate
         VerifyAggregateNotificationDoesNotExist(NotificationID);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -639,7 +639,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription for an entity with a "Last DateTime Modified" field
-        SubscriptionID := CreateActiveSubscriptionForEntityWithLastDateTimeModified;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithLastDateTimeModified();
         // [GIVEN] Three notifications including notification on delete
         NotificationID[1] := CreateNotificationOnCreate(SubscriptionID, ProcessingTime - 2000);
         NotificationID[2] := CreateNotificationOnUpdate(SubscriptionID, ProcessingTime - 1000);
@@ -653,10 +653,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notifications have been deleted
@@ -666,7 +666,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 3 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -681,7 +681,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription for an entity with a "Last DateTime Modified" field
-        SubscriptionID := CreateActiveSubscriptionForEntityWithLastDateTimeModified;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithLastDateTimeModified();
         // [GIVEN] Three notifications without notification on delete
         NotificationID[1] := CreateNotificationOnCreate(SubscriptionID, ProcessingTime - 2000);
         NotificationID[2] := CreateNotificationOnUpdate(SubscriptionID, ProcessingTime - 1000);
@@ -695,10 +695,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notifications have been deleted
@@ -708,7 +708,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 3 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -723,7 +723,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription for an entity without a "Last DateTime Modified" field
-        SubscriptionID := CreateActiveSubscriptionForEntityWithoutLastDateTimeModified;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithoutLastDateTimeModified();
         // [GIVEN] Three notifications
         NotificationID[1] := CreateNotificationOnCreate(SubscriptionID, ProcessingTime - 2000);
         NotificationID[2] := CreateNotificationOnUpdate(SubscriptionID, ProcessingTime - 1000);
@@ -737,10 +737,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notifications have been deleted
@@ -750,7 +750,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 3 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -764,7 +764,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription for an entity with a guid key
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] A notification
         NotificationID := CreateNotificationOnCreate(SubscriptionID, ProcessingTime);
         // [GIVEN] Expecting a single notification in payload
@@ -774,10 +774,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -785,7 +785,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Notification has not failed
         VerifyAggregateNotificationDoesNotExist(NotificationID);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -799,7 +799,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription for an entity with an integer key
-        SubscriptionID := CreateActiveSubscriptionForEntityWithIntegerKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithIntegerKey();
         // [GIVEN] A notification
         NotificationID := CreateNotificationOnCreate(SubscriptionID, ProcessingTime);
         // [GIVEN] Expecting a single notification in payload
@@ -809,10 +809,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -820,7 +820,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Notification has not failed
         VerifyAggregateNotificationDoesNotExist(NotificationID);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -834,7 +834,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription for an entity with a code key
-        SubscriptionID := CreateActiveSubscriptionForEntityWithCodeKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithCodeKey();
         // [GIVEN] A notification
         NotificationID := CreateNotificationOnCreate(SubscriptionID, ProcessingTime);
         // [GIVEN] Expecting a single notification in payload
@@ -844,10 +844,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -855,7 +855,7 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Notification has not failed
         VerifyAggregateNotificationDoesNotExist(NotificationID);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -870,7 +870,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Two notifications
         for I := 1 to 2 do
             NotificationID[I] := CreateNotificationOnCreate(SubscriptionID, ProcessingTime - (2 - I) * 1000);
@@ -882,10 +882,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notifications have been deleted
@@ -895,7 +895,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 2 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -911,7 +911,7 @@ codeunit 135089 "API Webhook Sending Tests"
 
         // [GIVEN] Many subscriptions with the same notification URL
         for I := 1 to 10 do
-            SubscriptionID[I] := CreateActiveSubscriptionForEntityWithGuidKey;
+            SubscriptionID[I] := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Two notifications for two first subscriptions
         for I := 1 to 2 do
             NotificationID[I] := CreateNotificationOnCreate(SubscriptionID[I], ProcessingTime - (2 - I) * 1000);
@@ -928,10 +928,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscriptions have not been deleted
         for I := 1 to 10 do
             VerifySubscriptionExists(SubscriptionID[I]);
@@ -942,7 +942,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 2 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -958,7 +958,7 @@ codeunit 135089 "API Webhook Sending Tests"
 
         // [GIVEN] Two subscriptions with different notification URLs
         for I := 1 to 2 do begin
-            SubscriptionID[I] := CreateActiveSubscriptionForEntityWithGuidKey;
+            SubscriptionID[I] := CreateActiveSubscriptionForEntityWithGuidKey();
             SetNotificationUrl(SubscriptionID[I], I, 200);
         end;
         // [GIVEN] Two notifications
@@ -981,10 +981,10 @@ codeunit 135089 "API Webhook Sending Tests"
             end;
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription have not been deleted
         for I := 1 to 2 do
             VerifySubscriptionExists(SubscriptionID[I]);
@@ -995,7 +995,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 2 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1013,7 +1013,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Two notifications on insert of entity with the same key value
         EntityKeyValue := LowerCase(GraphMgtGeneralTools.GetIdWithoutBrackets(CreateGuid()));
         ChangeType := TempAPIWebhookNotification."Change Type"::Created;
@@ -1028,10 +1028,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification have been deleted
@@ -1041,7 +1041,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 2 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1059,7 +1059,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Two notifications on delete of entity with the same key value
         EntityKeyValue := LowerCase(GraphMgtGeneralTools.GetIdWithoutBrackets(CreateGuid()));
         ChangeType := TempAPIWebhookNotification."Change Type"::Deleted;
@@ -1074,10 +1074,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification have been deleted
@@ -1087,7 +1087,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 2 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1105,7 +1105,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Two notifications on insert of entity with the same key value
         EntityKeyValue := LowerCase(GraphMgtGeneralTools.GetIdWithoutBrackets(CreateGuid()));
         for I := 1 to 3 do begin
@@ -1124,10 +1124,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification have been deleted
@@ -1137,7 +1137,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 3 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1155,7 +1155,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Two notifications on update of entity with the same key value
         EntityKeyValue := LowerCase(GraphMgtGeneralTools.GetIdWithoutBrackets(CreateGuid()));
         ChangeType := TempAPIWebhookNotification."Change Type"::Updated;
@@ -1169,10 +1169,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification have been deleted
@@ -1182,7 +1182,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 2 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1200,7 +1200,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Notifications on create, update and delete of entity with the same key value and the same LastDateTimeModified
         EntityKeyValue := LowerCase(GraphMgtGeneralTools.GetIdWithoutBrackets(CreateGuid()));
 
@@ -1228,10 +1228,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(200);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification have been deleted
@@ -1241,7 +1241,7 @@ codeunit 135089 "API Webhook Sending Tests"
         for I := 1 to 7 do
             VerifyAggregateNotificationDoesNotExist(NotificationID[I]);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1259,7 +1259,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Expecting Server Error
         SetNotificationUrl(SubscriptionID, 1, 500);
         // [GIVEN] A failed notification
@@ -1276,10 +1276,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(500);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -1292,9 +1292,9 @@ codeunit 135089 "API Webhook Sending Tests"
         VerifyAttemptNumber(FirstAggregateNotificationID, 2);
         VerifyAttemptNumber(LastAggregateNotificationID, 2);
         // [THEN] New job has correctly been scheduled
-        VerifyJobRescheduled;
+        VerifyJobRescheduled();
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1309,7 +1309,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Expecting Server Error
         SetNotificationUrl(SubscriptionID, 1, 500);
         // [GIVEN] A failed notification
@@ -1323,10 +1323,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(500);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -1337,9 +1337,9 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Attempts number has been increased
         VerifyAttemptNumber(AggregateNotificationID, 2);
         // [THEN] New job has correctly been scheduled
-        VerifyJobRescheduled;
+        VerifyJobRescheduled();
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1356,7 +1356,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Expecting Server Error
         SetNotificationUrl(SubscriptionID, 1, 500);
         // [GIVEN] A failed notification
@@ -1372,10 +1372,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(500);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -1392,9 +1392,9 @@ codeunit 135089 "API Webhook Sending Tests"
         VerifyAttemptNumber(FirstAggregateNotificationID, 2);
         VerifyAttemptNumber(LastAggregateNotificationID, 2);
         // [THEN] New job has correctly been scheduled
-        VerifyJobRescheduled;
+        VerifyJobRescheduled();
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1408,7 +1408,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Expecting Server Error
         SetNotificationUrl(SubscriptionID, 1, 500);
         // [GIVEN] A notification
@@ -1420,10 +1420,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(500);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -1434,9 +1434,9 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] The first attempt number
         VerifyAttemptNumber(NotificationID, 1);
         // [THEN] New job has correctly been scheduled
-        VerifyJobRescheduled;
+        VerifyJobRescheduled();
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1450,7 +1450,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Expecting Server Error
         SetNotificationUrl(SubscriptionID, 1, 500);
         // [GIVEN] A failed notification
@@ -1462,10 +1462,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(500);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Two aggregate notifications exist
@@ -1474,9 +1474,9 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Attempts number has been increased
         VerifyAttemptNumber(AggregateNotificationID, 2);
         // [THEN] New job has correctly been scheduled
-        VerifyJobRescheduled;
+        VerifyJobRescheduled();
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1491,7 +1491,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Expecting Server Error
         SetNotificationUrl(SubscriptionID, 1, 500);
         // [GIVEN] A failed notification
@@ -1506,10 +1506,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(500);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -1521,9 +1521,9 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Attempts number has been increased
         VerifyAttemptNumber(AggregateNotificationID, 2);
         // [THEN] New job has correctly been scheduled
-        VerifyJobRescheduled;
+        VerifyJobRescheduled();
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1538,7 +1538,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Expecting Request Timeout
         SetNotificationUrl(SubscriptionID, 1, 408);
         // [GIVEN] A failed notification
@@ -1553,10 +1553,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(408);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -1568,9 +1568,9 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Attempts number has been increased
         VerifyAttemptNumber(AggregateNotificationID, 2);
         // [THEN] New job has correctly been scheduled
-        VerifyJobRescheduled;
+        VerifyJobRescheduled();
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1585,7 +1585,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Expecting Too Many Requests
         SetNotificationUrl(SubscriptionID, 1, 429);
         // [GIVEN] A failed notification
@@ -1600,10 +1600,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(429);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -1615,9 +1615,9 @@ codeunit 135089 "API Webhook Sending Tests"
         // [THEN] Attempts number has been increased
         VerifyAttemptNumber(AggregateNotificationID, 2);
         // [THEN] New job has correctly been scheduled
-        VerifyJobRescheduled;
+        VerifyJobRescheduled();
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1632,7 +1632,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Expecting Not Found
         SetNotificationUrl(SubscriptionID, 1, 404);
         // [GIVEN] A failed notification
@@ -1647,10 +1647,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(404);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has been deleted
         VerifySubscriptionDoesNotExist(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -1663,7 +1663,7 @@ codeunit 135089 "API Webhook Sending Tests"
         VerifyJobCount(0);
         VerifyActivityLogExists(NotificationFailedTitleTxt);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1678,7 +1678,7 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Expecting Server Error
         SetNotificationUrl(SubscriptionID, 1, 500);
         // [GIVEN] A notification has failed 2 times
@@ -1695,10 +1695,10 @@ codeunit 135089 "API Webhook Sending Tests"
         EnqueueResponseCode(500);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Correct payload has been sent
-        APIWebhookSendingEvents.AssertEmptyQueue;
+        APIWebhookSendingEvents.AssertEmptyQueue();
         // [THEN] Subscription has been deleted
         VerifySubscriptionDoesNotExist(SubscriptionID);
         // [THEN] Notification has been deleted
@@ -1714,7 +1714,7 @@ codeunit 135089 "API Webhook Sending Tests"
         VerifyActivityLogExists(IncreaseAttemptNumberTitleTxt);
         VerifyActivityLogExists(DeleteSubscriptionWithTooManyFailuresTitleTxt);
         // [THEN] Processing has been finished
-        VerifyProcessingFinished;
+        VerifyProcessingFinished();
     end;
 
     [Test]
@@ -1728,18 +1728,18 @@ codeunit 135089 "API Webhook Sending Tests"
         Initialize();
 
         // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         // [GIVEN] Inactive jobs
-        CreateJobQueueEntry(ProcessingTime - 4 * MillisecondsPerDay, JobQueueEntry.Status::Error, false);
-        CreateJobQueueEntry(ProcessingTime - 3 * MillisecondsPerDay, JobQueueEntry.Status::"On Hold with Inactivity Timeout", false);
-        CreateJobQueueEntry(ProcessingTime - 2 * MillisecondsPerDay, JobQueueEntry.Status::Finished, false);
-        CreateJobQueueEntry(ProcessingTime - 1 * MillisecondsPerDay, JobQueueEntry.Status::Ready, false);
+        CreateJobQueueEntry(ProcessingTime - 4 * MillisecondsPerDay(), JobQueueEntry.Status::Error, false);
+        CreateJobQueueEntry(ProcessingTime - 3 * MillisecondsPerDay(), JobQueueEntry.Status::"On Hold with Inactivity Timeout", false);
+        CreateJobQueueEntry(ProcessingTime - 2 * MillisecondsPerDay(), JobQueueEntry.Status::Finished, false);
+        CreateJobQueueEntry(ProcessingTime - 1 * MillisecondsPerDay(), JobQueueEntry.Status::Ready, false);
         // [GIVEN] two active jobs
         CreateJobQueueEntry(ProcessingTime, JobQueueEntry.Status::"In Process", false);
-        CreateJobQueueEntry(ProcessingTime + MillisecondsPerDay, JobQueueEntry.Status::Ready, true);
+        CreateJobQueueEntry(ProcessingTime + MillisecondsPerDay(), JobQueueEntry.Status::Ready, true);
 
         // [WHEN] Process notifications
-        ProcessNotifications;
+        ProcessNotifications();
 
         // [THEN] Subscription has not been deleted
         VerifySubscriptionExists(SubscriptionID);
@@ -1790,7 +1790,7 @@ codeunit 135089 "API Webhook Sending Tests"
 
     local procedure ProcessNotifications()
     begin
-        VerifyProcessingNotStarted;
+        VerifyProcessingNotStarted();
         CODEUNIT.Run(CODEUNIT::"API Webhook Notification Send");
     end;
 
@@ -1900,7 +1900,7 @@ codeunit 135089 "API Webhook Sending Tests"
         SubscriptionID: Text;
         ExpirationDateTime: DateTime;
     begin
-        ExpirationDateTime := ProcessingTime - MillisecondsPerDay;
+        ExpirationDateTime := ProcessingTime - MillisecondsPerDay();
         SubscriptionID := CreateSubscriptionForEntityWithGuidKey(ExpirationDateTime);
         exit(SubscriptionID);
     end;
@@ -1910,7 +1910,7 @@ codeunit 135089 "API Webhook Sending Tests"
         APIWebhookSubscription: Record "API Webhook Subscription";
         SubscriptionID: Text;
     begin
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey;
+        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
         APIWebhookSubscription.Get(SubscriptionID);
         APIWebhookSubscription."Entity Publisher" := 'mock';
         APIWebhookSubscription."Entity Group" := 'test';
@@ -1926,7 +1926,7 @@ codeunit 135089 "API Webhook Sending Tests"
         ExpirationDateTime: DateTime;
     begin
         GetWebhookEntityWithGuidKey(ApiWebhookEntity);
-        ExpirationDateTime := ProcessingTime + MillisecondsPerDay;
+        ExpirationDateTime := ProcessingTime + MillisecondsPerDay();
         CreateSubscriptionForEntity(ApiWebhookEntity, ExpirationDateTime, SubscriptionID);
         exit(SubscriptionID);
     end;
@@ -1936,7 +1936,7 @@ codeunit 135089 "API Webhook Sending Tests"
         SubscriptionID: Text;
         ExpirationDateTime: DateTime;
     begin
-        ExpirationDateTime := ProcessingTime + MillisecondsPerDay;
+        ExpirationDateTime := ProcessingTime + MillisecondsPerDay();
         SubscriptionID := CreateSubscriptionForEntityWithGuidKey(ExpirationDateTime);
         exit(SubscriptionID);
     end;
@@ -1946,7 +1946,7 @@ codeunit 135089 "API Webhook Sending Tests"
         SubscriptionID: Text;
         ExpirationDateTime: DateTime;
     begin
-        ExpirationDateTime := ProcessingTime + MillisecondsPerDay;
+        ExpirationDateTime := ProcessingTime + MillisecondsPerDay();
         SubscriptionID := CreateSubscriptionForEntityWithIntegerKey(ExpirationDateTime);
         exit(SubscriptionID);
     end;
@@ -1956,7 +1956,7 @@ codeunit 135089 "API Webhook Sending Tests"
         SubscriptionID: Text;
         ExpirationDateTime: DateTime;
     begin
-        ExpirationDateTime := ProcessingTime + MillisecondsPerDay;
+        ExpirationDateTime := ProcessingTime + MillisecondsPerDay();
         SubscriptionID := CreateSubscriptionForEntityWithCodeKey(ExpirationDateTime);
         exit(SubscriptionID);
     end;
@@ -1966,7 +1966,7 @@ codeunit 135089 "API Webhook Sending Tests"
         SubscriptionID: Text;
         ExpirationDateTime: DateTime;
     begin
-        ExpirationDateTime := ProcessingTime + MillisecondsPerDay;
+        ExpirationDateTime := ProcessingTime + MillisecondsPerDay();
         SubscriptionID := CreateSubscriptionForEntityWithCompositeKey(ExpirationDateTime);
         exit(SubscriptionID);
     end;
@@ -1976,7 +1976,7 @@ codeunit 135089 "API Webhook Sending Tests"
         SubscriptionID: Text;
         ExpirationDateTime: DateTime;
     begin
-        ExpirationDateTime := ProcessingTime + MillisecondsPerDay;
+        ExpirationDateTime := ProcessingTime + MillisecondsPerDay();
         SubscriptionID := CreateSubscriptionForEntityWithTemporarySource(ExpirationDateTime);
         exit(SubscriptionID);
     end;
@@ -1986,7 +1986,7 @@ codeunit 135089 "API Webhook Sending Tests"
         SubscriptionID: Text;
         ExpirationDateTime: DateTime;
     begin
-        ExpirationDateTime := ProcessingTime + MillisecondsPerDay;
+        ExpirationDateTime := ProcessingTime + MillisecondsPerDay();
         SubscriptionID := CreateSubscriptionForEntityWithLastDateTimeModified(ExpirationDateTime);
         exit(SubscriptionID);
     end;
@@ -1996,7 +1996,7 @@ codeunit 135089 "API Webhook Sending Tests"
         SubscriptionID: Text;
         ExpirationDateTime: DateTime;
     begin
-        ExpirationDateTime := ProcessingTime + MillisecondsPerDay;
+        ExpirationDateTime := ProcessingTime + MillisecondsPerDay();
         SubscriptionID := CreateSubscriptionForEntityWithoutLastDateTimeModified(ExpirationDateTime);
         exit(SubscriptionID);
     end;
@@ -2089,7 +2089,7 @@ codeunit 135089 "API Webhook Sending Tests"
         APIWebhookSubscription."Entity Version" := ApiWebhookEntity.Version;
         APIWebhookSubscription."Entity Set Name" := ApiWebhookEntity.Name;
         APIWebhookSubscription."Company Name" := CompanyName;
-        APIWebhookSubscription."User Id" := UserSecurityId;
+        APIWebhookSubscription."User Id" := UserSecurityId();
         APIWebhookSubscription."Last Modified Date Time" := ProcessingTime;
         APIWebhookSubscription."Client State" := CopyStr(ClientStateTxt, 1, MaxStrLen(APIWebhookSubscription."Client State"));
         APIWebhookSubscription."Expiration Date Time" := ExpirationDateTime;
@@ -2148,7 +2148,7 @@ codeunit 135089 "API Webhook Sending Tests"
         APIWebhookNotification.ID := NotificationID;
         APIWebhookNotification."Subscription ID" :=
           CopyStr(SubscriptionID, 1, MaxStrLen(APIWebhookNotification."Subscription ID"));
-        APIWebhookNotification."Created By User SID" := UserSecurityId;
+        APIWebhookNotification."Created By User SID" := UserSecurityId();
         APIWebhookNotification."Entity Key Value" :=
           CopyStr(EntityKeyValue, 1, MaxStrLen(APIWebhookNotification."Entity Key Value"));
         APIWebhookNotification."Last Modified Date Time" := LastModifiedDateTime;
@@ -2186,7 +2186,7 @@ codeunit 135089 "API Webhook Sending Tests"
         APIWebhookNotificationAggr.ID := NotificationID;
         APIWebhookNotificationAggr."Subscription ID" := CopyStr(SubscriptionID, 1,
             MaxStrLen(APIWebhookNotificationAggr."Subscription ID"));
-        APIWebhookNotificationAggr."Created By User SID" := UserSecurityId;
+        APIWebhookNotificationAggr."Created By User SID" := UserSecurityId();
         APIWebhookNotificationAggr."Entity Key Value" := CopyStr(LowerCase(GraphMgtGeneralTools.GetIdWithoutBrackets(CreateGuid())), 1,
             MaxStrLen(APIWebhookNotificationAggr."Entity Key Value"));
         APIWebhookNotificationAggr."Last Modified Date Time" := LastModifiedDateTime;
@@ -2201,7 +2201,7 @@ codeunit 135089 "API Webhook Sending Tests"
     var
         JobQueueEntry: Record "Job Queue Entry";
     begin
-        CreateJobCategoryIfMissing;
+        CreateJobCategoryIfMissing();
 
         JobQueueEntry.ID := CreateGuid();
         JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
@@ -2450,7 +2450,7 @@ codeunit 135089 "API Webhook Sending Tests"
     var
         ActualStatus: Text;
     begin
-        ActualStatus := APIWebhookSendingEvents.GetProcessingStatus;
+        ActualStatus := APIWebhookSendingEvents.GetProcessingStatus();
         Assert.IsTrue((ActualStatus <> 'Started') and (ActualStatus <> 'Finished'), 'Incorrect processing status');
     end;
 
@@ -2458,7 +2458,7 @@ codeunit 135089 "API Webhook Sending Tests"
     var
         ActualStatus: Text;
     begin
-        ActualStatus := APIWebhookSendingEvents.GetProcessingStatus;
+        ActualStatus := APIWebhookSendingEvents.GetProcessingStatus();
         Assert.AreEqual('Finished', ActualStatus, 'Incorrect processing status');
     end;
 
@@ -2471,7 +2471,7 @@ codeunit 135089 "API Webhook Sending Tests"
 
     local procedure VerifyJobCount(ExpectedCount: Integer)
     begin
-        Assert.AreEqual(ExpectedCount, GetJobCount, 'Unexpected job count');
+        Assert.AreEqual(ExpectedCount, GetJobCount(), 'Unexpected job count');
     end;
 
     local procedure VerifyActivityLogExists(ExpectedMessage: Text)
@@ -2480,6 +2480,6 @@ codeunit 135089 "API Webhook Sending Tests"
     begin
         ActivityLog.SetRange(Context, ActivityLogContextLbl);
         ActivityLog.SetRange(Description, ExpectedMessage);
-        Assert.IsTrue(ActivityLog.FindFirst, 'Activity log is not found');
+        Assert.IsTrue(ActivityLog.FindFirst(), 'Activity log is not found');
     end;
 }

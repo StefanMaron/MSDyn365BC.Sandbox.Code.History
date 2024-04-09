@@ -3,7 +3,6 @@
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Utilities;
-using System.Environment;
 using System.Security.AccessControl;
 
 table 9062 "User Security Status"
@@ -12,6 +11,7 @@ table 9062 "User Security Status"
     DataPerCompany = false;
     LookupPageID = "User Security Status List";
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -22,13 +22,13 @@ table 9062 "User Security Status"
         }
         field(2; "User Name"; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("User Security ID")));
+            CalcFormula = lookup(User."User Name" where("User Security ID" = field("User Security ID")));
             Caption = 'User Name';
             FieldClass = FlowField;
         }
         field(3; "Full Name"; Text[80])
         {
-            CalcFormula = Lookup(User."Full Name" where("User Security ID" = field("User Security ID")));
+            CalcFormula = lookup(User."Full Name" where("User Security ID" = field("User Security ID")));
             Caption = 'Full Name';
             FieldClass = FlowField;
         }
@@ -101,6 +101,12 @@ table 9062 "User Security Status"
             Caption = 'Coupled Data Synch Errors';
             FieldClass = FlowField;
         }
+        field(27; "User Exists"; Boolean)
+        {
+            CalcFormula = exist(User where("User Security ID" = field("User Security ID")));
+            Caption = 'User Exists';
+            FieldClass = FlowField;
+        }
     }
 
     keys
@@ -142,16 +148,13 @@ table 9062 "User Security Status"
     var
         User: Record User;
         UserSecurityStatus: Record "User Security Status";
-        EnvironmentInfo: Codeunit "Environment Information";
         UserSelection: Codeunit "User Selection";
-        IsSaaS: Boolean;
     begin
         User.SetRange(State, User.State::Enabled);
         UserSelection.FilterSystemUserAndGroupUsers(User);
         if not User.FindSet() then
             exit;
 
-        IsSaaS := EnvironmentInfo.IsSaaS();
         repeat
             if not UserSecurityStatus.Get(User."User Security ID") then begin
                 UserSecurityStatus.Init();
