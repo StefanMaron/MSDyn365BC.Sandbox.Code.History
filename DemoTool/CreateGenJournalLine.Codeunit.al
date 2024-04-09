@@ -8,65 +8,65 @@
         "Exactly Balanced" := false;
         InsertDailyEntry(
           XPURCH, 2, '49454647', 19030102D, 2, '2701', 'VAG - Jürgensen',
-          0, '997120', -2300 / 0.8902428, '', '', 0, '', 19030202D);
+          0, '997130', -2300 / 0.8902428, '', '', 0, '', 19030202D);
         InsertDailyEntry(
           XPURCH, 2, '49454647', 19030103D, 2, '2702', 'VAG - Jürgensen',
-          0, '997120', -1500 / 0.8902428, '', '', 0, '', 19030203D);
+          0, '997130', -1500 / 0.8902428, '', '', 0, '', 19030203D);
         InsertDailyEntry(
           XPURCH, 2, '49454647', 19030107D, 2, '2703', 'VAG - Jürgensen',
-          0, '997120', -3500 / 0.8902428, '', '', 0, '', 19030207D);
+          0, '997130', -3500 / 0.8902428, '', '', 0, '', 19030207D);
         InsertDailyEntry(
           XPURCH, 2, '49454647', 19030115D, 2, '2704', 'VAG - Jürgensen',
-          0, '997120', -2600 / 0.8902428, '', '', 0, '', 19030215D);
+          0, '997130', -2600 / 0.8902428, '', '', 0, '', 19030215D);
         InsertDailyEntry(
-          XPURCH, 2, '49454647', 19030120D, 3, '2705', 'VAG - Jürgensen',
-          0, '997120', 1100 / 0.8902428, '', '', 0, '', 19030220D);
+          XPURCH, 2, '10000', 19030120D, 3, '2705', 'VAG - Jürgensen',
+          0, '997130', 1100 / 0.8902428, '', '', 0, '', 19030220D);
         InsertDailyEntry(
           XPURCH, 2, '49494949', 19030104D, 2, '2706', 'KKA Büromaschinen Gmbh',
-          0, '997120', -3300 / 0.8902428, '', '', 0, '', 19030204D);
+          0, '997130', -3300 / 0.8902428, '', '', 0, '', 19030204D);
         InsertDailyEntry(
           XPURCH, 2, '49494949', 19030107D, 2, '2707', 'KKA Büromaschinen Gmbh',
-          0, '997120', -1400 / 0.8902428, '', '', 0, '', 19030204D);
+          0, '997130', -1400 / 0.8902428, '', '', 0, '', 19030204D);
         InsertDailyEntry(
           XPURCH, 2, '49494949', 19030115D, 2, '2708', 'KKA Büromaschinen Gmbh',
-          0, '997120', -2700 / 0.8902428, '', '', 0, '', 19030215D);
+          0, '997130', -2700 / 0.8902428, '', '', 0, '', 19030215D);
         InsertDailyEntry(
           XPURCH, 2, '49494949', 19030116D, 2, '2709', 'KKA Büromaschinen Gmbh',
-          0, '997120', -5600 / 0.8902428, '', '', 0, '', 19030216D);
+          0, '997130', -5600 / 0.8902428, '', '', 0, '', 19030216D);
         InsertDailyEntry(
-          XPURCH, 2, '49494949', 19030120D, 3, '2710', 'KKA Büromaschinen Gmbh',
-          0, '997120', 1900 / 0.8902428, '', '', 0, '', 19030220D);
+          XPURCH, 2, '20000', 19030120D, 3, '2710', 'KKA Büromaschinen Gmbh',
+          0, '997130', 1900 / 0.8902428, '', '', 0, '', 19030220D);
 
         InsertDailyEntry(
           XSALES, 1, '49525252', 19030106D, 2, '2801', 'Beef House',
-          0, '996120', 2500 / 0.8902428, XSALES, '', 0, '', 19030206D);
+          0, '996130', 2500 / 0.8902428, XSALES, '', 0, '', 19030206D);
         InsertDailyEntry(
           XSALES, 1, '49525252', 19030107D, 2, '2802', 'Beef House',
-          0, '996120', 2000 / 0.8902428, XSALES, '', 0, '', 19030206D);
+          0, '996130', 2000 / 0.8902428, XSALES, '', 0, '', 19030206D);
         InsertDailyEntry(
           XSALES, 1, '49525252', 19030109D, 2, '2803', 'Beef House',
-          0, '996120', 3500 / 0.8902428, XSALES, '', 0, '', 19030209D);
+          0, '996130', 3500 / 0.8902428, XSALES, '', 0, '', 19030209D);
         InsertDailyEntry(
           XSALES, 1, '49525252', 19030120D, 2, '2804', 'Beef House',
-          0, '996120', 2200 / 0.8902428, XSALES, '', 0, '', 19030220D);
+          0, '996130', 2200 / 0.8902428, XSALES, '', 0, '', 19030220D);
         InsertDailyEntry(
-          XSALES, 1, '49525252', 19030125D, 3, '2805', 'Beef House',
-          0, '996120', -1000 / 0.8902428, XSALES, '', 0, '', 19030225D);
+          XSALES, 1, '10000', 19030125D, 3, '2805', 'Beef House',
+          0, '996130', -1000 / 0.8902428, XSALES, '', 0, '', 19030225D);
         InsertDailyEntry(
           XSALES, 1, '49633663', 19030121D, 1, '2806', 'Autohaus Mielberg KG',
-          0, '996120', -1045.556 / 0.8902428, XSALES, '', 0, '', 19030221D);
+          0, '996130', -1045.556 / 0.8902428, XSALES, '', 0, '', 19030221D);
         InsertDailyEntry(
           XSALES, 1, '49633663', 19030123D, 6, '2807', 'Autohaus Mielberg KG',
           3, XWWBEUR, 729.463 / 0.8902428, XSALES, '', 0, '', 19030223D);
         InsertDailyEntry(
           XSALES, 1, '49633663', 19030124D, 2, '2808', 'Autohaus Mielberg KG',
-          0, '996120', 4000 / 0.8902428, XSALES, '', 0, '', 19030224D);
+          0, '996130', 4000 / 0.8902428, XSALES, '', 0, '', 19030224D);
         InsertDailyEntry(
           XSALES, 1, '49633663', 19030125D, 2, '2809', 'Autohaus Mielberg KG',
-          0, '996120', 2500 / 0.8902428, XSALES, '', 0, '', 19030225D);
+          0, '996130', 2500 / 0.8902428, XSALES, '', 0, '', 19030225D);
         InsertDailyEntry(
-          XSALES, 1, '49633663', 19030126D, 3, '2810', 'Autohaus Mielberg KG',
-          0, '996120', -500 / 0.8902428, XSALES, '', 0, '', 19030226D);
+          XSALES, 1, '20000', 19030126D, 3, '2810', 'Autohaus Mielberg KG',
+          0, '996130', -500 / 0.8902428, XSALES, '', 0, '', 19030226D);
         VATDocumentNo := StrSubstNo(VATDocNumber, XSET4Q, (DemoDataSetup."Starting Year" - 1));
         InsertDailyEntry(
           XGENERAL, 0, '995310', 19020201D, 0, VATDocumentNo, XVATSettlement,
@@ -316,21 +316,21 @@
 
         InsertPeriodicEntry(0, '996210', 19020101D, -424772.74, XSALES, XSMALL, '30', '', '');
         InsertPeriodicEntry(0, '992310', 19020101D, 424772.74, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996220', 19020101D, -178512.08, XSALES, XSMALL, '30', '', '');
+        InsertPeriodicEntry(0, '996230', 19020101D, -178512.08, XSALES, XSMALL, '30', '', '');
         InsertPeriodicEntry(0, '992320', 19020101D, 178512.08, '', '', '', '', '');
         InsertPeriodicEntry(0, '996110', 19020101D, -93842.98, XSALES, XSMALL, '30', XOFFICE, '');
         InsertPeriodicEntry(0, '992310', 19020101D, 93842.98, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996120', 19020101D, -2380.3, XSALES, XSMALL, '30', XHOME, '');
+        InsertPeriodicEntry(0, '996130', 19020101D, -2380.3, XSALES, XSMALL, '30', XHOME, '');
         InsertPeriodicEntry(0, '992320', 19020101D, 2380.3, '', '', '', '', '');
         InsertPeriodicEntry(0, '996130', 19020101D, -7062.61, XSALES, XSMALL, '80', '', '');
         InsertPeriodicEntry(0, '992320', 19020101D, 7062.61, '', '', '', '', '');
         InsertPeriodicEntry(0, '997210', 19020101D, 246823.09, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995410', 19020101D, -246823.09, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997220', 19020101D, 97717.13, XSALES, '', '30', '', '');
+        InsertPeriodicEntry(0, '997230', 19020101D, 97717.13, XSALES, '', '30', '', '');
         InsertPeriodicEntry(0, '995420', 19020101D, -97717.13, '', '', '', '', '');
         InsertPeriodicEntry(0, '997110', 19020101D, 72702.0, XSALES, '', '30', XHOME, '');
         InsertPeriodicEntry(0, '995410', 19020101D, -72702.0, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997120', 19020101D, 16745.29, XSALES, '', '30', XINDUSTRIAL, '');
+        InsertPeriodicEntry(0, '997130', 19020101D, 16745.29, XSALES, '', '30', XINDUSTRIAL, '');
         InsertPeriodicEntry(0, '995420', 19020101D, -16745.29, '', '', '', '', '');
         InsertPeriodicEntry(0, '997130', 19020101D, 1850.53, XSALES, '', '80', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19020101D, -1850.53, '', '', '', '', '');
@@ -430,7 +430,7 @@
 
         InsertPeriodicEntry(0, '996210', 19020201D, -610665.1, XSALES, XMEDIUM, '30', '', '');
         InsertPeriodicEntry(0, '992310', 19020201D, 610665.1, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996220', 19020201D, -37168.74, XSALES, XSMALL, '30', XOFFICE, '');
+        InsertPeriodicEntry(0, '996230', 19020201D, -37168.74, XSALES, XSMALL, '30', XOFFICE, '');
         InsertPeriodicEntry(0, '992320', 19020201D, 37168.74, '', '', '', '', '');
         InsertPeriodicEntry(0, '996230', 19020201D, -104713.12, XSALES, XSMALL, '50', '', '');
         InsertPeriodicEntry(0, '992320', 19020201D, 104713.12, '', '', '', '', '');
@@ -440,11 +440,11 @@
         InsertPeriodicEntry(0, '992320', 19020201D, 16780.69, '', '', '', '', '');
         InsertPeriodicEntry(0, '997210', 19020201D, 330504.44, XSALES, '', '30', XHOME, '');
         InsertPeriodicEntry(0, '995410', 19020201D, -330504.44, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997220', 19020201D, 59569.56, XSALES, '', '30', '', '');
+        InsertPeriodicEntry(0, '997230', 19020201D, 59569.56, XSALES, '', '30', '', '');
         InsertPeriodicEntry(0, '995420', 19020201D, -59569.56, '', '', '', '', '');
         InsertPeriodicEntry(0, '997110', 19020201D, 75955.87, XSALES, '', '30', XHOME, '');
         InsertPeriodicEntry(0, '995410', 19020201D, -75955.87, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997120', 19020201D, 27097.14, XSALES, '', '30', XOFFICE, '');
+        InsertPeriodicEntry(0, '997130', 19020201D, 27097.14, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19020201D, -27097.14, '', '', '', '', '');
         InsertPeriodicEntry(0, '996710', 19020201D, -25625.0, XSALES, '', '', '', '');
         InsertPeriodicEntry(0, '996810', 19020201D, -183.68, XSALES, '', '', '', '');
@@ -556,14 +556,14 @@
         InsertPeriodicEntry(0, '992320', 19020301D, 8492.34, '', '', '', '', '');
         InsertPeriodicEntry(0, '997210', 19020301D, 252579.3, XSALES, '', '30', XINDUSTRIAL, '');
         InsertPeriodicEntry(0, '995410', 19020301D, -252579.3, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997220', 19020301D, 7704.26, XSALES, '', '30', XOFFICE, '');
+        InsertPeriodicEntry(0, '997230', 19020301D, 7704.26, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19020301D, -7704.26, '', '', '', '', '');
         InsertPeriodicEntry(0, '997230', 19020301D, 77343.24, XSALES, '', '50', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19020301D, -77343.24, '', '', '', '', '');
         InsertPeriodicEntry(0, '997240', 19020301D, -858.57, XSALES, '', '50', XOFFICE, '');
         InsertPeriodicEntry(0, '997110', 19020301D, 72657.14, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995410', 19020301D, -72657.14, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997120', 19020301D, 5814.59, XSALES, '', '30', XINDUSTRIAL, '');
+        InsertPeriodicEntry(0, '997130', 19020301D, 5814.59, XSALES, '', '30', XINDUSTRIAL, '');
         InsertPeriodicEntry(0, '995420', 19020301D, -5814.59, '', '', '', '', '');
         InsertPeriodicEntry(0, '997130', 19020301D, 12930.39, XSALES, '', '80', XHOME, '');
         InsertPeriodicEntry(0, '995420', 19020301D, -12930.39, '', '', '', '', '');
@@ -670,19 +670,20 @@
         InsertPeriodicEntry(0, '992320', 19020401D, 61335.66, '', '', '', '', '');
         InsertPeriodicEntry(0, '996110', 19020401D, -103325.45, XSALES, XMEDIUM, '30', XOFFICE, '');
         InsertPeriodicEntry(0, '992310', 19020401D, 103325.45, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996120', 19020401D, -768.51, XSALES, XSMALL, '30', XHOME, '');
+        InsertPeriodicEntry(0, '996130', 19020401D, -768.51, XSALES, XSMALL, '30', XHOME, '');
         InsertPeriodicEntry(0, '992320', 19020401D, 768.51, '', '', '', '', '');
         InsertPeriodicEntry(0, '996130', 19020401D, -11666.26, XSALES, XSMALL, '80', XHOME, '');
         InsertPeriodicEntry(0, '992320', 19020401D, 11666.26, '', '', '', '', '');
         InsertPeriodicEntry(0, '997210', 19020401D, 236191.86, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995410', 19020401D, -236191.86, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997220', 19020401D, 1914.47, XSALES, '', '30', XHOME, '');
+        // InsertPeriodicEntry(0,'997220',01041902D,1914.47,XSALES,'','30',XHOME,'');
+        InsertPeriodicEntry(0, '997230', 19020401D, 1914.47, XSALES, '', '30', XHOME, '');
         InsertPeriodicEntry(0, '995420', 19020401D, -1914.47, '', '', '', '', '');
         InsertPeriodicEntry(0, '997230', 19020401D, 87433.67, XSALES, '', '70', XHOME, '');
         InsertPeriodicEntry(0, '995420', 19020401D, -87433.67, '', '', '', '', '');
         InsertPeriodicEntry(0, '997110', 19020401D, 66088.16, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995410', 19020401D, -66088.16, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997120', 19020401D, 6716.66, XSALES, '', '30', XHOME, '');
+        InsertPeriodicEntry(0, '997130', 19020401D, 6716.66, XSALES, '', '30', XHOME, '');
         InsertPeriodicEntry(0, '995420', 19020401D, -6716.66, '', '', '', '', '');
         InsertPeriodicEntry(0, '997130', 19020401D, 15912.13, XSALES, '', '70', XHOME, '');
         InsertPeriodicEntry(0, '995420', 19020401D, -15912.13, '', '', '', '', '');
@@ -776,13 +777,13 @@
         InsertPeriodicEntry(0, '992320', 19020501D, 81392.82, '', '', '', '', '');
         InsertPeriodicEntry(0, '996110', 19020501D, -87233.63, XSALES, XSMALL, '30', XOFFICE, '');
         InsertPeriodicEntry(0, '992310', 19020501D, 87233.63, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996120', 19020501D, -16781.06, XSALES, XMEDIUM, '30', XHOME, '');
+        InsertPeriodicEntry(0, '996130', 19020501D, -16781.06, XSALES, XMEDIUM, '30', XHOME, '');
         InsertPeriodicEntry(0, '992320', 19020501D, 16781.06, '', '', '', '', '');
         InsertPeriodicEntry(0, '996130', 19020501D, -17562.61, XSALES, XSMALL, '70', XHOME, '');
         InsertPeriodicEntry(0, '992320', 19020501D, 17562.61, '', '', '', '', '');
         InsertPeriodicEntry(0, '997210', 19020501D, 261028.66, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995410', 19020501D, -261028.66, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997220', 19020501D, 10691.57, XSALES, '', '30', XHOME, '');
+        InsertPeriodicEntry(0, '997230', 19020501D, 10691.57, XSALES, '', '30', XHOME, '');
         InsertPeriodicEntry(0, '995420', 19020501D, -10691.57, '', '', '', '', '');
         InsertPeriodicEntry(0, '997230', 19020501D, 3564.59, XSALES, '', '70', XHOME, '');
         InsertPeriodicEntry(0, '995420', 19020501D, -3564.59, '', '', '', '', '');
@@ -884,23 +885,23 @@
 
         InsertPeriodicEntry(0, '996210', 19020601D, -409404.38, XSALES, XSMALL, '30', XHOME, XSUMMER);
         InsertPeriodicEntry(0, '992310', 19020601D, 409404.38, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996220', 19020601D, -28436.57, XSALES, XSMALL, '30', XHOME, XSUMMER);
+        InsertPeriodicEntry(0, '996230', 19020601D, -28436.57, XSALES, XSMALL, '30', XHOME, XSUMMER);
         InsertPeriodicEntry(0, '992320', 19020601D, 28436.57, '', '', '', '', '');
         InsertPeriodicEntry(0, '996230', 19020601D, -1508.49, XSALES, XSMALL, '80', XOFFICE, '');
         InsertPeriodicEntry(0, '992320', 19020601D, 1508.49, '', '', '', '', '');
         InsertPeriodicEntry(0, '996110', 19020601D, -60881.9, XSALES, XSMALL, '30', XHOME, XSUMMER);
         InsertPeriodicEntry(0, '992310', 19020601D, 60881.9, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996120', 19020601D, -8423.52, XSALES, XSMALL, '30', XHOME, XSUMMER);
+        InsertPeriodicEntry(0, '996130', 19020601D, -8423.52, XSALES, XSMALL, '30', XHOME, XSUMMER);
         InsertPeriodicEntry(0, '992320', 19020601D, 8423.52, '', '', '', '', '');
         InsertPeriodicEntry(0, '997210', 19020601D, 305004.93, XSALES, '', '30', XHOME, XSUMMER);
         InsertPeriodicEntry(0, '995410', 19020601D, -305004.93, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997220', 19020601D, 21289.83, XSALES, '', '30', XHOME, XSUMMER);
+        InsertPeriodicEntry(0, '997230', 19020601D, 21289.83, XSALES, '', '30', XHOME, XSUMMER);
         InsertPeriodicEntry(0, '995420', 19020601D, -21289.83, '', '', '', '', '');
         InsertPeriodicEntry(0, '997230', 19020601D, 1706.55, XSALES, '', '80', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19020601D, -1706.55, '', '', '', '', '');
         InsertPeriodicEntry(0, '997110', 19020601D, 64926.8, XSALES, '', '30', XHOME, XSUMMER);
         InsertPeriodicEntry(0, '995410', 19020601D, -64926.8, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997120', 19020601D, 7639.08, XSALES, '', '30', XHOME, XSUMMER);
+        InsertPeriodicEntry(0, '997130', 19020601D, 7639.08, XSALES, '', '30', XHOME, XSUMMER);
         InsertPeriodicEntry(0, '995420', 19020601D, -7639.08, '', '', '', '', '');
         InsertPeriodicEntry(0, '997130', 19020601D, 16697.84, XSALES, '', '80', XHOME, XSUMMER);
         InsertPeriodicEntry(0, '995420', 19020601D, -16697.84, '', '', '', '', '');
@@ -1016,7 +1017,7 @@
         InsertPeriodicEntry(0, '992320', 19020701D, 107322.25, '', '', '', '', '');
         InsertPeriodicEntry(0, '996110', 19020701D, -57092.24, XSALES, XMEDIUM, '30', XOFFICE, XSUMMER);
         InsertPeriodicEntry(0, '992310', 19020701D, 57092.24, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996120', 19020701D, -3447.47, XSALES, XSMALL, '30', XOFFICE, XSUMMER);
+        InsertPeriodicEntry(0, '996130', 19020701D, -3447.47, XSALES, XSMALL, '30', XOFFICE, XSUMMER);
         InsertPeriodicEntry(0, '992320', 19020701D, 3447.47, '', '', '', '', '');
         InsertPeriodicEntry(0, '996130', 19020701D, -1565.45, XSALES, XSMALL, '70', XINDUSTRIAL, XSUMMER);
         InsertPeriodicEntry(0, '992320', 19020701D, 1565.45, '', '', '', '', '');
@@ -1134,23 +1135,23 @@
 
         InsertPeriodicEntry(0, '996210', 19020801D, -623044.91, XSALES, XLARGE, '30', XHOME, '');
         InsertPeriodicEntry(0, '992310', 19020801D, 623044.91, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996220', 19020801D, -43914.23, XSALES, XMEDIUM, '30', XHOME, '');
+        InsertPeriodicEntry(0, '996230', 19020801D, -43914.23, XSALES, XMEDIUM, '30', XHOME, '');
         InsertPeriodicEntry(0, '992320', 19020801D, 43914.23, '', '', '', '', '');
         InsertPeriodicEntry(0, '996230', 19020801D, -2085.42, XSALES, XSMALL, '70', XOFFICE, '');
         InsertPeriodicEntry(0, '992320', 19020801D, 2085.42, '', '', '', '', '');
         InsertPeriodicEntry(0, '996110', 19020801D, -60258.96, XSALES, XSMALL, '30', XINDUSTRIAL, '');
         InsertPeriodicEntry(0, '992310', 19020801D, 60258.96, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996120', 19020801D, -9181.69, XSALES, XSMALL, '30', XOFFICE, '');
+        InsertPeriodicEntry(0, '996130', 19020801D, -9181.69, XSALES, XSMALL, '30', XOFFICE, '');
         InsertPeriodicEntry(0, '992320', 19020801D, 9181.69, '', '', '', '', '');
         InsertPeriodicEntry(0, '996130', 19020801D, -5816.98, XSALES, XSMALL, '50', XHOME, '');
         InsertPeriodicEntry(0, '992320', 19020801D, 5816.98, '', '', '', '', '');
         InsertPeriodicEntry(0, '997210', 19020801D, 341542.81, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995410', 19020801D, -341542.81, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997220', 19020801D, 1175.21, XSALES, '', '30', XOFFICE, '');
+        InsertPeriodicEntry(0, '997230', 19020801D, 1175.21, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19020801D, -1175.21, '', '', '', '', '');
         InsertPeriodicEntry(0, '997110', 19020801D, 68270.44, XSALES, '', '30', XHOME, '');
         InsertPeriodicEntry(0, '995410', 19020801D, -68270.44, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997120', 19020801D, 14422.62, XSALES, '', '30', XOFFICE, '');
+        InsertPeriodicEntry(0, '997130', 19020801D, 14422.62, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19020801D, -14422.62, '', '', '', '', '');
         InsertPeriodicEntry(0, '996710', 19020801D, -25387.2, XSALES, '', '', '', '');
         InsertPeriodicEntry(0, '996810', 19020801D, -134.48, XSALES, '', '', '', '');
@@ -1253,25 +1254,25 @@
 
         InsertPeriodicEntry(0, '996210', 19020901D, -430242.68, XSALES, XMEDIUM, '30', XOFFICE, '');
         InsertPeriodicEntry(0, '992310', 19020901D, 430242.68, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996220', 19020901D, -61229.61, XSALES, XSMALL, '30', XHOME, '');
+        InsertPeriodicEntry(0, '996230', 19020901D, -61229.61, XSALES, XSMALL, '30', XHOME, '');
         InsertPeriodicEntry(0, '992320', 19020901D, 61229.61, '', '', '', '', '');
         InsertPeriodicEntry(0, '996230', 19020901D, -82616.27, XSALES, XSMALL, '50', XINDUSTRIAL, '');
         InsertPeriodicEntry(0, '992320', 19020901D, 82616.27, '', '', '', '', '');
         InsertPeriodicEntry(0, '996110', 19020901D, -107470.15, XSALES, XLARGE, '30', XHOME, '');
         InsertPeriodicEntry(0, '992310', 19020901D, 107470.15, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996120', 19020901D, -1080.34, XSALES, XMEDIUM, '30', XOFFICE, '');
+        InsertPeriodicEntry(0, '996130', 19020901D, -1080.34, XSALES, XMEDIUM, '30', XOFFICE, '');
         InsertPeriodicEntry(0, '992320', 19020901D, 1080.34, '', '', '', '', '');
         InsertPeriodicEntry(0, '996130', 19020901D, -14743.4, XSALES, XSMALL, '70', XINDUSTRIAL, '');
         InsertPeriodicEntry(0, '992320', 19020901D, 14743.4, '', '', '', '', '');
         InsertPeriodicEntry(0, '997210', 19020901D, 245508.66, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995410', 19020901D, -245508.66, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997220', 19020901D, 98683.84, XSALES, '', '30', XHOME, '');
+        InsertPeriodicEntry(0, '997230', 19020901D, 98683.84, XSALES, '', '30', XHOME, '');
         InsertPeriodicEntry(0, '995420', 19020901D, -98683.84, '', '', '', '', '');
         InsertPeriodicEntry(0, '997230', 19020901D, 1171.66, XSALES, '', '70', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19020901D, -1171.66, '', '', '', '', '');
         InsertPeriodicEntry(0, '997110', 19020901D, 72871.71, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995410', 19020901D, -72871.71, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997120', 19020901D, 20249.13, XSALES, '', '30', XOFFICE, '');
+        InsertPeriodicEntry(0, '997130', 19020901D, 20249.13, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19020901D, -20249.13, '', '', '', '', '');
         InsertPeriodicEntry(0, '996710', 19020901D, -33037.8, XSALES, '', '', '', '');
         InsertPeriodicEntry(0, '996810', 19020901D, -85.28, XSALES, '', '', '', '');
@@ -1384,7 +1385,7 @@
         InsertPeriodicEntry(0, '992320', 19021001D, 209360.49, '', '', '', '', '');
         InsertPeriodicEntry(0, '996110', 19021001D, -96800.57, XSALES, XSMALL, '30', XINDUSTRIAL, '');
         InsertPeriodicEntry(0, '992310', 19021001D, 96800.57, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996120', 19021001D, -8068.83, XSALES, XSMALL, '30', XOFFICE, '');
+        InsertPeriodicEntry(0, '996130', 19021001D, -8068.83, XSALES, XSMALL, '30', XOFFICE, '');
         InsertPeriodicEntry(0, '992320', 19021001D, 8068.83, '', '', '', '', '');
         InsertPeriodicEntry(0, '996130', 19021001D, -11328.27, XSALES, XSMALL, '70', XOFFICE, '');
         InsertPeriodicEntry(0, '992320', 19021001D, 11328.27, '', '', '', '', '');
@@ -1394,7 +1395,7 @@
         InsertPeriodicEntry(0, '995420', 19021001D, -79888.56, '', '', '', '', '');
         InsertPeriodicEntry(0, '997110', 19021001D, 77623.66, XSALES, '', '30', XINDUSTRIAL, '');
         InsertPeriodicEntry(0, '995410', 19021001D, -77623.66, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997120', 19021001D, 4358.41, XSALES, '', '30', XOFFICE, '');
+        InsertPeriodicEntry(0, '997130', 19021001D, 4358.41, XSALES, '', '30', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19021001D, -4358.41, '', '', '', '', '');
         InsertPeriodicEntry(0, '997130', 19021001D, 3950.13, XSALES, '', '70', XOFFICE, '');
         InsertPeriodicEntry(0, '995420', 19021001D, -3950.13, '', '', '', '', '');
@@ -1505,7 +1506,7 @@
 
         InsertPeriodicEntry(0, '996210', 19021101D, -641629.34, XSALES, XSMALL, '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '992310', 19021101D, 641629.34, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996220', 19021101D, -233083.03, XSALES, XSMALL, '30', XHOME, XWINTER);
+        InsertPeriodicEntry(0, '996230', 19021101D, -233083.03, XSALES, XSMALL, '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '992320', 19021101D, 233083.03, '', '', '', '', '');
         InsertPeriodicEntry(0, '996110', 19021101D, -104857.78, XSALES, XMEDIUM, '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '992310', 19021101D, 104857.78, '', '', '', '', '');
@@ -1513,11 +1514,11 @@
         InsertPeriodicEntry(0, '992320', 19021101D, 19029.53, '', '', '', '', '');
         InsertPeriodicEntry(0, '997210', 19021101D, 309681.81, XSALES, '', '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '995410', 19021101D, -309681.81, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997220', 19021101D, 6092.71, XSALES, '', '30', XHOME, XWINTER);
+        InsertPeriodicEntry(0, '997230', 19021101D, 6092.71, XSALES, '', '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '995420', 19021101D, -6092.71, '', '', '', '', '');
         InsertPeriodicEntry(0, '997110', 19021101D, 84654.03, XSALES, '', '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '995410', 19021101D, -84654.03, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997120', 19021101D, 1783.2, XSALES, '', '30', XHOME, XWINTER);
+        InsertPeriodicEntry(0, '997130', 19021101D, 1783.2, XSALES, '', '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '995420', 19021101D, -1783.2, '', '', '', '', '');
         InsertPeriodicEntry(0, '997130', 19021101D, 126.96, XSALES, '', '70', XHOME, XWINTER);
         InsertPeriodicEntry(0, '995420', 19021101D, -126.96, '', '', '', '', '');
@@ -1628,19 +1629,19 @@
         InsertPeriodicEntry(0, '992320', 19021201D, 211576.19, '', '', '', '', '');
         InsertPeriodicEntry(0, '996110', 19021201D, -79461.53, XSALES, XSMALL, '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '992310', 19021201D, 79461.53, '', '', '', '', '');
-        InsertPeriodicEntry(0, '996120', 19021201D, -10821.24, XSALES, XSMALL, '30', XHOME, XWINTER);
+        InsertPeriodicEntry(0, '996130', 19021201D, -10821.24, XSALES, XSMALL, '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '992320', 19021201D, 10821.24, '', '', '', '', '');
         InsertPeriodicEntry(0, '996130', 19021201D, -12025.15, XSALES, XSMALL, '80', XHOME, XWINTER);
         InsertPeriodicEntry(0, '992320', 19021201D, 12025.15, '', '', '', '', '');
         InsertPeriodicEntry(0, '997210', 19021201D, 306509.81, XSALES, '', '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '995410', 19021201D, -306509.81, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997220', 19021201D, 131.26, XSALES, '', '30', XHOME, XWINTER);
+        InsertPeriodicEntry(0, '997230', 19021201D, 131.26, XSALES, '', '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '995420', 19021201D, -131.26, '', '', '', '', '');
         InsertPeriodicEntry(0, '997230', 19021201D, 38505.98, XSALES, '', '50', XHOME, XWINTER);
         InsertPeriodicEntry(0, '995420', 19021201D, -38505.98, '', '', '', '', '');
         InsertPeriodicEntry(0, '997110', 19021201D, 77238.96, XSALES, '', '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '995410', 19021201D, -77238.96, '', '', '', '', '');
-        InsertPeriodicEntry(0, '997120', 19021201D, 13649.84, XSALES, '', '30', XHOME, XWINTER);
+        InsertPeriodicEntry(0, '997130', 19021201D, 13649.84, XSALES, '', '30', XHOME, XWINTER);
         InsertPeriodicEntry(0, '995420', 19021201D, -13649.84, '', '', '', '', '');
         InsertPeriodicEntry(0, '996710', 19021201D, -20975.6, XSALES, '', '', '', '');
         InsertPeriodicEntry(0, '996810', 19021201D, -234.19, XSALES, '', '', '', '');
@@ -1798,7 +1799,7 @@
         "Exactly Balanced" := true;
         InsertOtherEntry(0, '995310', 19021231D, '00-12B', XBalanceSheetChanges, -197594.35, '');
 
-        CreatePeriodicDepr;
+        CreatePeriodicDepr();
 
         InsertJobLine('998450', '992910', 19030126D, XW401, XParkingFee, 28, XGUILDFORD10CR, '1310', 0);
         InsertJobLine('998430', '992910', 19030127D, XW402, XRoadToll, 33.75, XGUILDFORD10CR, '1310', 35);
@@ -1806,23 +1807,32 @@
 
     procedure InsertEvaluationData()
     var
+        GenJournalLine: Record "Gen. Journal Line";
         CreateBankAccount: Codeunit "Create Bank Account";
+        CreateGenJournalBatch: Codeunit "Create Gen. Journal Batch";
     begin
         DemoDataSetup.Get();
         "Entry Balance" := 0;
         "Exactly Balanced" := false;
         InsertDailyEntry(
-          XGENERAL, XDAILY, 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'BANK1', 'BANK1',
+          XGENERAL, CreateGenJournalBatch.GetDailyJournalBatchName(), 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'BANK1', XPaymentDescription1,
           3, CreateBankAccount.GetCheckingBankAccountCode(), -2000.0, '', '', 0, '', 0D);
         InsertDailyEntry(
-          XGENERAL, XDAILY, 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'BANK2', 'BANK2',
+          XGENERAL, CreateGenJournalBatch.GetDailyJournalBatchName(), 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'BANK2', XPaymentDescription2,
           3, CreateBankAccount.GetCheckingBankAccountCode(), -3000.0, '', '', 0, '', 0D);
         InsertDailyEntry(
-          XGENERAL, XDAILY, 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'DEPOSIT3', 'DEPOSIT3',
+          XGENERAL, CreateGenJournalBatch.GetDailyJournalBatchName(), 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'DEPOSIT3', XPaymentDescription3,
           3, CreateBankAccount.GetCheckingBankAccountCode(), -4000.0, '', '', 0, '', 0D);
         InsertDailyEntry(
-          XGENERAL, XDAILY, 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'DEPOSIT4', 'DEPOSIT4',
+          XGENERAL, CreateGenJournalBatch.GetDailyJournalBatchName(), 3, CreateBankAccount.GetSavingsBankAccountCode(), 19030119D, 1, 'DEPOSIT4', XPaymentDescription4,
           3, CreateBankAccount.GetCheckingBankAccountCode(), -4000.0, '', '', 0, '', 0D);
+        GenJournalLine.SetRange("Journal Template Name", XGENERAL);
+        GenJournalLine.SetRange("Journal Batch Name", CreateGenJournalBatch.GetDailyJournalBatchName());
+        if GenJournalLine.FindSet() then
+            repeat
+                GenJournalLine."Skip WHT" := true;
+                GenJournalLine.Modify();
+            until GenJournalLine.Next() = 0;
     end;
 
     var
@@ -1843,7 +1853,6 @@
         XPURCH: Label 'PURCH';
         XSALES: Label 'SALES';
         XGENERAL: Label 'GENERAL';
-        XDAILY: Label 'DAILY';
         XVATSettlement: Label 'VAT Settlement';
         XCleaningExpensesDec: Label 'Cleaning Expenses, Dec.';
         XRent1stQuarter: Label 'Rent, 1st Quarter,';
@@ -1921,6 +1930,12 @@
         XParkingFee: Label 'Parking fee';
         XGUILDFORD10CR: Label 'GUILDFORD, 10 CR';
         XRoadToll: Label 'Road Toll';
+        XVEND_RET: Label 'VEND RET';
+        XCUST_RET: Label 'CUST RET';
+        XPaymentDescription1: Label 'Transfer, January';
+        XPaymentDescription2: Label 'Transfer of funds for Spring ';
+        XPaymentDescription3: Label 'Deposit 3, ';
+        XPaymentDescription4: Label 'Deposit 4, ';
 
     procedure InsertDailyEntry(JnlTemplateName: Code[10]; JnlBatchName: Code[10]; "Account Type": Option; "Account No.": Code[20]; Date: Date; "Document Type": Option; "Document No.": Code[20]; Description: Text[50]; "Bal. Account Type": Option; "Bal. Account No.": Code[20]; Amount: Decimal; "Shortcut Dimension 1 Code": Code[20]; "Shortcut Dimension 2 Code": Code[20]; "Applies-to Doc. Type": Option; "Applies-to Doc. No.": Code[20]; "Due Date": Date)
     var
@@ -2015,6 +2030,42 @@
             '49525252', '49633663', '49454647', '49494949':
                 GenJournalLine.Validate("System-Created Entry", false);
         end;
+
+        if (GenJournalLine."Journal Template Name" = XPURCH) and
+           (GenJournalLine."Journal Batch Name" = XDEFAULT) and
+           (GenJournalLine."Document Type" = GenJournalLine."Document Type"::"Credit Memo") and
+           (GenJournalLine."Account Type" = GenJournalLine."Account Type"::Vendor)
+        then
+            case "Account No." of
+                '10000':
+                    begin
+                        GenJournalLine."Adjustment Applies-to" := '108018';
+                        GenJournalLine.Validate("Reason Code", XVEND_RET)
+                    end;
+                '20000':
+                    begin
+                        GenJournalLine."Adjustment Applies-to" := '108017';
+                        GenJournalLine.Validate("Reason Code", XVEND_RET);
+                    end;
+            end;
+
+        if (GenJournalLine."Journal Template Name" = XSALES) and
+           (GenJournalLine."Journal Batch Name" = XDEFAULT) and
+           (GenJournalLine."Document Type" = GenJournalLine."Document Type"::"Credit Memo") and
+           (GenJournalLine."Account Type" = GenJournalLine."Account Type"::Customer)
+        then
+            case "Account No." of
+                '10000':
+                    begin
+                        GenJournalLine."Adjustment Applies-to" := '103001';
+                        GenJournalLine.Validate("Reason Code", XCUST_RET)
+                    end;
+                '20000':
+                    begin
+                        GenJournalLine."Adjustment Applies-to" := '103002';
+                        GenJournalLine.Validate("Reason Code", XCUST_RET)
+                    end;
+            end;
 
         GenJournalLine.Insert();
     end;

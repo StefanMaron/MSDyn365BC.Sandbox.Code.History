@@ -7,14 +7,14 @@ codeunit 101997 "Create Item Template"
 
     var
         DemoDataSetup: Record "Demo Data Setup";
-        xItemDescrTxt: Label 'Item', Comment = 'Translate.';
         Item: Record Item;
+        CreateTemplateHelper: Codeunit "Create Template Helper";
+        xItemDescrTxt: Label 'Item', Comment = 'Translate.';
         xItemNoVATDescrTxt: Label 'Item No VAT', Comment = 'Translate.';
         xServiceDescTxt: Label 'Service', Comment = 'Translate.';
         xServiceNoVATDescTxt: Label 'Service No VAT', Comment = 'Translate.';
         xBaseUOMPCSTxt: Label 'PCS', Comment = 'translate';
         xBaseUOMHourTxt: Label 'Hour', Comment = 'translate';
-        CreateTemplateHelper: Codeunit "Create Template Helper";
         XOfficefurniture: Label 'Office furniture';
         XMiscellaneous: Label 'Miscellaneous';
         InventoryConditionTxt: Label '<?xml version="1.0" encoding="utf-8" standalone="yes"?><ReportParameters><DataItems><DataItem name="Table27">VERSION(1) SORTING(Field1) where(Field10=1(0))</DataItem></DataItems></ReportParameters>', Locked = true;
@@ -25,42 +25,35 @@ codeunit 101997 "Create Item Template"
         ConfigTemplateHeader: Record "Config. Template Header";
         CreateTemplateHelper: Codeunit "Create Template Helper";
     begin
-        with DemoDataSetup do begin
-            Get;
+        DemoDataSetup.Get();
+        // Item template
+        InsertTemplateHeader(ConfigTemplateHeader, xItemDescrTxt);
+        InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Inventory), xBaseUOMPCSTxt, DemoDataSetup.RetailCode(), DemoDataSetup.GoodsVATCode(), DemoDataSetup.ResaleCode());
+        InsertPricingInfo(ConfigTemplateHeader, false);
 
-            // Item template
-            InsertTemplateHeader(ConfigTemplateHeader, xItemDescrTxt);
-            InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Inventory), xBaseUOMPCSTxt, RetailCode, GoodsVATCode, ResaleCode);
-            InsertPricingInfo(ConfigTemplateHeader, false);
+        CreateTemplateHelper.CreateTemplateSelectionRule(
+          DATABASE::Item, ConfigTemplateHeader.Code, InventoryConditionTxt, 0, 0);
+        // Item template No VAT
+        InsertTemplateHeader(ConfigTemplateHeader, xItemNoVATDescrTxt);
+        InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Inventory), xBaseUOMPCSTxt, DemoDataSetup.NoVATCode(), DemoDataSetup.NoVATCode(), DemoDataSetup.ResaleCode());
+        InsertPricingInfo(ConfigTemplateHeader, false);
+        // Service template
+        InsertTemplateHeader(ConfigTemplateHeader, xServiceDescTxt);
+        InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Service), xBaseUOMHourTxt, DemoDataSetup.ServicesCode(), DemoDataSetup.GoodsVATCode(), '');
+        InsertPricingInfo(ConfigTemplateHeader, false);
 
-            CreateTemplateHelper.CreateTemplateSelectionRule(
-              DATABASE::Item, ConfigTemplateHeader.Code, InventoryConditionTxt, 0, 0);
+        CreateTemplateHelper.CreateTemplateSelectionRule(
+          DATABASE::Item, ConfigTemplateHeader.Code, ServiceConditionTxt, 0, 0);
+        // Service No VAT template
+        InsertTemplateHeader(ConfigTemplateHeader, xServiceNoVATDescTxt);
+        InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Service), xBaseUOMHourTxt, DemoDataSetup.NoVATCode(), DemoDataSetup.NoVATCode(), '');
+        InsertPricingInfo(ConfigTemplateHeader, false);
+        // Freight template
+        InsertTemplateHeader(ConfigTemplateHeader, DemoDataSetup.FreightCode());
+        InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Service), xBaseUOMHourTxt, DemoDataSetup.FreightCode(), DemoDataSetup.GoodsVATCode(), '');
+        InsertPricingInfo(ConfigTemplateHeader, false);
 
-            // Item template No VAT
-            InsertTemplateHeader(ConfigTemplateHeader, xItemNoVATDescrTxt);
-            InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Inventory), xBaseUOMPCSTxt, NoVATCode, NoVATCode, ResaleCode);
-            InsertPricingInfo(ConfigTemplateHeader, false);
-
-            // Service template
-            InsertTemplateHeader(ConfigTemplateHeader, xServiceDescTxt);
-            InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Service), xBaseUOMHourTxt, ServicesCode, GoodsVATCode, '');
-            InsertPricingInfo(ConfigTemplateHeader, false);
-
-            CreateTemplateHelper.CreateTemplateSelectionRule(
-              DATABASE::Item, ConfigTemplateHeader.Code, ServiceConditionTxt, 0, 0);
-
-            // Service No VAT template
-            InsertTemplateHeader(ConfigTemplateHeader, xServiceNoVATDescTxt);
-            InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Service), xBaseUOMHourTxt, NoVATCode, NoVATCode, '');
-            InsertPricingInfo(ConfigTemplateHeader, false);
-
-            // Freight template
-            InsertTemplateHeader(ConfigTemplateHeader, FreightCode);
-            InsertTemplateLines(ConfigTemplateHeader, Format(Item.Type::Service), xBaseUOMHourTxt, FreightCode, GoodsVATCode, '');
-            InsertPricingInfo(ConfigTemplateHeader, false);
-
-            InsertPostingGroupsItemTemplates;
-        end;
+        InsertPostingGroupsItemTemplates();
     end;
 
     local procedure InsertTemplateHeader(var ConfigTemplateHeader: Record "Config. Template Header"; Description: Text[50])
@@ -100,23 +93,23 @@ codeunit 101997 "Create Item Template"
         if (DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Evaluation) or
            (DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Standard)
         then
-            DefInventoryPostingGroup := DemoDataSetup.ResaleCode
+            DefInventoryPostingGroup := DemoDataSetup.ResaleCode()
         else
-            DefInventoryPostingGroup := DemoDataSetup.FinishedCode;
+            DefInventoryPostingGroup := DemoDataSetup.FinishedCode();
         if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then begin
             FurnitureTemplateCode :=
-              InsertItemTemplateData(XOfficefurniture, DemoDataSetup.RetailCode, DefInventoryPostingGroup, '', DemoDataSetup.NoVATCode);
-            InsertItemTemplateData(XMiscellaneous, DemoDataSetup.RetailCode, DefInventoryPostingGroup, '', DemoDataSetup.NoVATCode);
+              InsertItemTemplateData(XOfficefurniture, DemoDataSetup.RetailCode(), DefInventoryPostingGroup, '', DemoDataSetup.NoVATCode());
+            InsertItemTemplateData(XMiscellaneous, DemoDataSetup.RetailCode(), DefInventoryPostingGroup, '', DemoDataSetup.NoVATCode());
         end else begin
-            FurnitureTemplateCode := InsertItemTemplateData(XOfficefurniture, DemoDataSetup.RetailCode, DefInventoryPostingGroup, '', '');
-            InsertItemTemplateData(XMiscellaneous, DemoDataSetup.RetailCode, DefInventoryPostingGroup, '', '');
+            FurnitureTemplateCode := InsertItemTemplateData(XOfficefurniture, DemoDataSetup.RetailCode(), DefInventoryPostingGroup, '', '');
+            InsertItemTemplateData(XMiscellaneous, DemoDataSetup.RetailCode(), DefInventoryPostingGroup, '', '');
         end;
 
-        if NonstockItem.FindSet then
+        if NonstockItem.FindSet() then
             repeat
                 NonstockItem.Validate("Item Templ. Code", CreateNewItemTemplate.GetItemCode());
                 NonstockItem.Modify();
-            until NonstockItem.Next = 0;
+            until NonstockItem.Next() = 0;
     end;
 
     procedure InsertItemTemplateData(TemplateName: Text[50]; GenProdPostingGroup: Code[20]; InventoryPostingGroup: Code[20]; TaxGroupCode: Code[10]; VATProdPostingGroup: Code[20]) TemplateCode: Code[10]

@@ -2,6 +2,7 @@ table 101904 "Temporary Currency Data"
 {
     Caption = 'Temporary Currency Data';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

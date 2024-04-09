@@ -3,13 +3,11 @@ codeunit 101324 "Create VAT Prod. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Company Type" = "Company Type"::VAT then begin
-                InsertData(ServicesVATCode, StrSubstNo(XMiscellaneousVAT, ServicesVATCode));
-                InsertData(NoVATCode, NoVatTxt);
-                InsertData(GoodsVATCode, StrSubstNo(XMiscellaneousVAT, GoodsVATCode));
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then begin
+            InsertData(DemoDataSetup.ServicesVATCode(), StrSubstNo(XMiscellaneousVAT, DemoDataSetup.ServicesVATCode()));
+            InsertData(DemoDataSetup.NoVATCode(), NoVatTxt);
+            InsertData(DemoDataSetup.GoodsVATCode(), StrSubstNo(XMiscellaneousVAT, DemoDataSetup.GoodsVATCode()));
         end;
     end;
 

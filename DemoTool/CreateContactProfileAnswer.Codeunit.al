@@ -1942,20 +1942,18 @@ codeunit 101589 "Create Contact Profile Answer"
     var
         ContBusRel: Record "Contact Business Relation";
     begin
-        with ContBusRel do begin
-            SetCurrentKey("Link to Table", "No.");
-            case TableID of
-                DATABASE::Customer:
-                    SetRange("Link to Table", "Link to Table"::Customer);
-                DATABASE::Vendor:
-                    SetRange("Link to Table", "Link to Table"::Vendor);
-                DATABASE::"Bank Account":
-                    SetRange("Link to Table", "Link to Table"::"Bank Account");
-            end;
-            SetRange("No.", No);
-            FindFirst();
-            exit("Contact No.");
+        ContBusRel.SetCurrentKey("Link to Table", "No.");
+        case TableID of
+            DATABASE::Customer:
+                ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
+            DATABASE::Vendor:
+                ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Vendor);
+            DATABASE::"Bank Account":
+                ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::"Bank Account");
         end;
+        ContBusRel.SetRange("No.", No);
+        ContBusRel.FindFirst();
+        exit(ContBusRel."Contact No.");
     end;
 }
 

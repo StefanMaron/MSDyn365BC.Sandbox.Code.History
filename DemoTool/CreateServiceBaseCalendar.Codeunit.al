@@ -56,9 +56,9 @@ codeunit 117507 "Create Service Base Calendar"
           DateToDMY(19031226D), XBoxingDay);
         CheckHolidayDate(DateToDMY(19031226D), XBoxingDay);
 
-        CreateSpecialHolidays;
-        CreateAUHolidays;
-        CreateNZHolidays;
+        CreateSpecialHolidays();
+        CreateAUHolidays();
+        CreateNZHolidays();
     end;
 
     var

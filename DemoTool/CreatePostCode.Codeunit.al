@@ -4,7 +4,7 @@ codeunit 101225 "Create Post Code"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        ImportLocalPostCodes;
+        ImportLocalPostCodes();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Standard then
             exit;
 
@@ -428,12 +428,6 @@ codeunit 101225 "Create Post Code"
         XGmunden: Label 'Gmunden';
         XMittersill: Label 'Mittersill';
         XMurau: Label 'Murau';
-        XSydneyNSW: Label 'Sydney, NSW';
-        XWollongongNSW: Label 'Wollongong, NSW';
-        XMelbourneVIC: Label 'Melbourne, VIC';
-        XBrisbaneQLD: Label 'Brisbane, QLD';
-        XPerthWA: Label 'Perth, WA';
-        XMurdunnaTAS: Label 'Murdunna, TAS';
         XHumbeek: Label 'Humbeek';
         XAntwerpen: Label 'Antwerpen';
         XHerentals: Label 'Herentals';
@@ -559,17 +553,9 @@ codeunit 101225 "Create Post Code"
         XCASABLANCA: Label 'CASABLANCA';
         XMOHAMMEDIA: Label 'MOHAMMEDIA';
         XKASBAHTANGER: Label 'KASBAH TANGER';
-        XPELABUHANKLANGSelangor: Label 'PELABUHAN KLANG, Selangor';
-        XPETALINGJAYASelangor: Label 'PETALING JAYA, Selangor';
-        XAMPANGKualaLumpur: Label 'AMPANG, Kuala Lumpur';
         XKUALALUMPUR: Label 'KUALA LUMPUR';
-        XKOTAKINABALUSabah: Label 'KOTA KINABALU, Sabah';
-        XKUCHINGSarawak: Label 'KUCHING, Sarawak';
         XMaputo: Label 'Maputo';
-        XBENINEdostate: Label 'BENIN, Edo state';
         XABUJA: Label 'ABUJA';
-        XJOSPlateaustate: Label 'JOS, Plateau state';
-        XGHOHPlateaustate: Label 'GHOH, Plateau state';
         XAmsterdam: Label 'Amsterdam';
         XZaandam: Label 'Zaandam';
         XWaalwijk: Label 'Waalwijk';
@@ -634,12 +620,6 @@ codeunit 101225 "Create Post Code"
         XSiteki: Label 'Siteki';
         XManzini: Label 'Manzini';
         XNhlangano: Label 'Nhlangano';
-        XBangNaBangkok: Label 'Bang Na, Bangkok';
-        XBangRakBangkok: Label 'Bang Rak, Bangkok';
-        XKhlongSamwaBangkok: Label 'Khlong Samwa, Bangkok';
-        XWatSingChaiNat: Label 'Wat Sing, Chai Nat';
-        XNonDindaengBuriRam: Label 'Non Dindaeng, Buri Ram';
-        XSanPaTongChiangMai: Label 'San Pa Tong, Chiang Mai';
         XTunisBelvedere: Label 'Tunis Belvedere';
         XTunis: Label 'Tunis';
         XZaghouan: Label 'Zaghouan';
@@ -715,10 +695,6 @@ codeunit 101225 "Create Post Code"
         XAshford: Label 'Ashford';
         XLincoln: Label 'Lincoln';
         XMexicoCityDF: Label 'Mexico City, DF';
-        XLeonGuanajuato: Label 'Leon, Guanajuato';
-        XMonterreyNuevoLeon: Label 'Monterrey, Nuevo Leon';
-        XSanLuisPotosiSanLuis: Label 'San Luis Potosi, San Luis';
-        XMazatlanSinaloa: Label 'Mazatlan, Sinaloa';
         XBeograd: Label 'Beograd';
         XBor: Label 'Bor';
         XNoviSad: Label 'Novi Sad';

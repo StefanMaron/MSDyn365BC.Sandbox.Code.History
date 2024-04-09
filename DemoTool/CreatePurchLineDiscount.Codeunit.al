@@ -1,4 +1,4 @@
-#if not CLEAN21
+#if not CLEAN23
 codeunit 101100 "Create Purch. Line Discount"
 {
     ObsoleteState = Pending;

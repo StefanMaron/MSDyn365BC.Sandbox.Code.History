@@ -32,7 +32,7 @@ report 166600 "NZ Industry Groups"
             Text := DelChr(Text, '=', '"');
             ImportDescription := CopyStr(Text, 1);
             if StrLen(ImportDescription) <= 30 then
-                InsertRecord;
+                InsertRecord();
         end;
         TxtFile.Close();
     end;
@@ -53,17 +53,14 @@ report 166600 "NZ Industry Groups"
         Text: Text[1024];
         ImportCode: Code[20];
         ImportDescription: Text[200];
-        ImportTrue: Boolean;
 
     procedure InsertRecord()
     begin
-        with IndustryGroup do begin
-            Code := ImportCode;
-            Description := ImportDescription;
+        IndustryGroup.Code := ImportCode;
+        IndustryGroup.Description := ImportDescription;
 
-            if not IndustryGroup2.Get(Code) then
-                Insert();
-        end;
+        if not IndustryGroup2.Get(IndustryGroup.Code) then
+            IndustryGroup.Insert();
     end;
 }
 

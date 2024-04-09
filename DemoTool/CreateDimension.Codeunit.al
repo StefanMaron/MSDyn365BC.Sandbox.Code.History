@@ -57,7 +57,7 @@ codeunit 101342 "Create Dimension"
         InsertDimensionTransl(XSALESPERSON, Language.GetDefaultApplicationLanguageId(), 'Salesperson', 'Salesperson Code', 'Salesperson Filter');
         InsertDimensionTransl(XPURCHASER, Language.GetDefaultApplicationLanguageId(), 'Purchaser', 'Purchaser Code', 'Purchaser Filter');
 
-        DimensionValueIndent.Indent;
+        DimensionValueIndent.Indent();
     end;
 
     internal procedure GetDepartmentCode(): Code[20]
@@ -154,10 +154,6 @@ codeunit 101342 "Create Dimension"
         XSummerlc: Label 'Summer';
         XLT: Label 'LT';
         XLinaTownsend: Label 'Lina Townsend';
-        XDEERFIELD8WP: Label 'DEERFIELD, 8 WP';
-        XSettingupEightWorkAreas: Label 'Setting up Eight Work Areas';
-        XGUILDFORD10CR: Label 'GUILDFORD, 10 CR';
-        XSettingupTenConferenceRooms: Label 'Setting up Ten Conference Rooms';
         XEuropeNorthMISC: Label 'Europe North (MISC)';
         XEuropeNorthNonMISC: Label 'Europe North (Non MISC)';
 
@@ -252,7 +248,7 @@ codeunit 101342 "Create Dimension"
         InsertDimensionTransl(XSALESPERSON, Language.GetDefaultApplicationLanguageId(), 'Salesperson', 'Salesperson Code', 'Salesperson Filter');
         InsertDimensionTransl(XPURCHASER, Language.GetDefaultApplicationLanguageId(), 'Purchaser', 'Purchaser Code', 'Purchaser Filter');
 
-        DimensionValueIndent.Indent;
+        DimensionValueIndent.Indent();
     end;
 
     procedure GetGlobalDimensionCode(Index: Integer): Code[20]

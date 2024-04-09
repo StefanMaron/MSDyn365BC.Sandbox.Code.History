@@ -3,26 +3,23 @@ codeunit 117005 "Create Service Item Group"
 
     trigger OnRun()
     begin
-        with ServiceItemGroup do begin
-            InsertData(XCDROM, XCDROM, false, 0, '', 24);
-            InsertData(XCONTROLLER, XControllerCard, false, 0, '', 12);
-            InsertData(XDESKTOP, XDesktopspacePC, true, 0, '', 12);
-            InsertData(XGRAPHICS, XGraphicsspaceCard, false, 0, '', 12);
-            InsertData(XHARDDRIVE, XHardspaceDrive, false, 0, '', 12);
-            InsertData(XKEYBOARD, XKeyboardlc, false, 0, '', 24);
-            InsertData(XMEMORY, XMemoryspaceCard, false, 0, '', 12);
-            InsertData(XMISCACCESS, XMiscspaceAccessoriesTxt, false, 0, '', 24);
-            InsertData(XMONITOR, XMonitorlc, false, 0, '', 24);
-            InsertData(XMOUSE, XMouselc, false, 0, '', 24);
-            InsertData(XNETWCARD, XNetworkspaceCard, false, 0, '', 12);
-            InsertData(XOFFICEEQ, XOfficespaceEquipment, true, 0, '', 24);
-            InsertData(XSERVER, XServerlc, true, 0, '', 8);
-            InsertData(XZIPDRIVE, XZipspaceDrive, false, 0, '', 24);
-        end;
+        InsertData(XCDROM, XCDROM, false, 0, '', 24);
+        InsertData(XCONTROLLER, XControllerCard, false, 0, '', 12);
+        InsertData(XDESKTOP, XDesktopspacePC, true, 0, '', 12);
+        InsertData(XGRAPHICS, XGraphicsspaceCard, false, 0, '', 12);
+        InsertData(XHARDDRIVE, XHardspaceDrive, false, 0, '', 12);
+        InsertData(XKEYBOARD, XKeyboardlc, false, 0, '', 24);
+        InsertData(XMEMORY, XMemoryspaceCard, false, 0, '', 12);
+        InsertData(XMISCACCESS, XMiscspaceAccessoriesTxt, false, 0, '', 24);
+        InsertData(XMONITOR, XMonitorlc, false, 0, '', 24);
+        InsertData(XMOUSE, XMouselc, false, 0, '', 24);
+        InsertData(XNETWCARD, XNetworkspaceCard, false, 0, '', 12);
+        InsertData(XOFFICEEQ, XOfficespaceEquipment, true, 0, '', 24);
+        InsertData(XSERVER, XServerlc, true, 0, '', 8);
+        InsertData(XZIPDRIVE, XZipspaceDrive, false, 0, '', 24);
     end;
 
     var
-        ServiceItemGroup: Record "Service Item Group";
         XCDROM: Label 'CD ROM';
         XCONTROLLER: Label 'CONTROLLER';
         XControllerCard: Label 'Controller Card';

@@ -3,12 +3,10 @@ codeunit 101094 "Create Item Posting Group"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(ResaleCode, XResaleItemsTxt);
-            InsertData(FinishedCode, XFinishedItemsTxt);
-            InsertData(RawMatCode, XRawMaterialsTxt);
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.ResaleCode(), XResaleItemsTxt);
+        InsertData(DemoDataSetup.FinishedCode(), XFinishedItemsTxt);
+        InsertData(DemoDataSetup.RawMatCode(), XRawMaterialsTxt);
     end;
 
     var
@@ -28,10 +26,8 @@ codeunit 101094 "Create Item Posting Group"
 
     procedure InsertMiniAppData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(ResaleCode, XResaleItemsTxt);
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.ResaleCode(), XResaleItemsTxt);
     end;
 }
 

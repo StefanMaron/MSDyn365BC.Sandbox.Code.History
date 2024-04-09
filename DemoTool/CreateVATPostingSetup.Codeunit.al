@@ -3,27 +3,25 @@ codeunit 101325 "Create VAT Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            case "Company Type" of
-                "Company Type"::VAT:
-                    begin
-                        InsertData('', ServicesVATCode, 0, 0, '995611', '995621', 'E');
-                        InsertData('', GoodsVATCode, 0, 0, '995615', '995625', 'E');
-                        InsertData('', NoVATCode, 0, 0, '995615', '995625', 'E');
-                        InsertData(DomesticCode, ServicesVATCode, 9, 0, '995611', '995621', 'S');
-                        InsertData(DomesticCode, GoodsVATCode, 15, 0, '995615', '995625', 'S');
-                        InsertData(DomesticCode, NoVATCode, 0, 0, '995615', '995625', 'E');
-                        InsertData(MiscCode, ServicesVATCode, 9, 0, '995611', '995621', 'S');
-                        InsertData(MiscCode, GoodsVATCode, 15, 0, '995615', '995625', 'S');
-                        InsertData(MiscCode, NoVATCode, 0, 0, '995615', '995625', 'E');
-                        InsertData(ExportCode, ServicesVATCode, 0, 0, '995611', '995621', 'E');
-                        InsertData(ExportCode, GoodsVATCode, 0, 0, '995615', '995625', 'E');
-                        InsertData(ExportCode, NoVATCode, 0, 0, '995615', '995625', 'E');
-                    end;
-                "Company Type"::"Sales Tax":
-                    InsertSalesTaxData('E');
-            end;
+        DemoDataSetup.Get();
+        case DemoDataSetup."Company Type" of
+            DemoDataSetup."Company Type"::VAT:
+                begin
+                    InsertData('', DemoDataSetup.ServicesVATCode(), 0, 0, '995611', '995621', 'E');
+                    InsertData('', DemoDataSetup.GoodsVATCode(), 0, 0, '995615', '995625', 'E');
+                    InsertData('', DemoDataSetup.NoVATCode(), 0, 0, '995615', '995625', 'E');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesVATCode(), 9, 0, '995611', '995621', 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.GoodsVATCode(), 15, 0, '995615', '995625', 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.NoVATCode(), 0, 0, '995615', '995625', 'E');
+                    InsertData(DemoDataSetup.MiscCode(), DemoDataSetup.ServicesVATCode(), 9, 0, '995611', '995621', 'S');
+                    InsertData(DemoDataSetup.MiscCode(), DemoDataSetup.GoodsVATCode(), 15, 0, '995615', '995625', 'S');
+                    InsertData(DemoDataSetup.MiscCode(), DemoDataSetup.NoVATCode(), 0, 0, '995615', '995625', 'E');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.ServicesVATCode(), 0, 0, '995611', '995621', 'E');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.GoodsVATCode(), 0, 0, '995615', '995625', 'E');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.NoVATCode(), 0, 0, '995615', '995625', 'E');
+                end;
+            DemoDataSetup."Company Type"::"Sales Tax":
+                InsertSalesTaxData('E');
         end;
     end;
 
@@ -65,9 +63,9 @@ codeunit 101325 "Create VAT Posting Setup"
 
         if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then
             case VATPostingSetup."VAT Prod. Posting Group" of
-                DemoDataSetup.ServicesVATCode,
-                DemoDataSetup.GoodsVATCode,
-                DemoDataSetup.NoVATCode:
+                DemoDataSetup.ServicesVATCode(),
+                DemoDataSetup.GoodsVATCode(),
+                DemoDataSetup.NoVATCode():
                     begin
                         VATPostingSetup.Validate("Sales VAT Account", CA.Convert("Sales Account"));
                         VATPostingSetup.Validate("Purchase VAT Account", CA.Convert("Purchase Account"));

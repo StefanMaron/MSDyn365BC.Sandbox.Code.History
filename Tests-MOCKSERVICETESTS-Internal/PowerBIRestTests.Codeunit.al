@@ -48,19 +48,10 @@ codeunit 135086 "Power BI REST Tests"
     [HandlerFunctions('HandleWorkspaceReportSelection')]
     procedure Test_Select_Unselect()
     var
-#if not CLEAN21
-        PowerBIUserLicense: Record "Power BI User License";
-#endif
         PowerBIEmbeddedReportPart: TestPage "Power BI Embedded Report Part";
     begin
         // [GIVEN] The user has a license and five workspaces
         Initialize();
-#if not CLEAN21
-        PowerBIUserLicense.Init();
-        PowerBIUserLicense."User Security ID" := UserSecurityId();
-        PowerBIUserLicense."Has Power BI License" := true;
-        if PowerBIUserLicense.Insert() then;
-#endif
         SubscriberPowerBIRestTests.SetMockServiceToken('MockServicePacket448');
         LibraryLowerPermissions.SetO365Basic();
 

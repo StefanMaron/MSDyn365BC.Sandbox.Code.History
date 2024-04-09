@@ -3,17 +3,14 @@ codeunit 117067 "Create Contract Group"
 
     trigger OnRun()
     begin
-        with ContractGroup do begin
-            InsertData(XHARDWARE, XHardwareContract, true);
-            InsertData(XMAINT, XMaintenanceContract, true);
-            InsertData(XSOFTWARE, XSoftwareContract, false);
-            InsertData(XSPECIAL, XSpecialContract, false);
-            InsertData(XSUPPORT, XSupportContract, false);
-        end;
+        InsertData(XHARDWARE, XHardwareContract, true);
+        InsertData(XMAINT, XMaintenanceContract, true);
+        InsertData(XSOFTWARE, XSoftwareContract, false);
+        InsertData(XSPECIAL, XSpecialContract, false);
+        InsertData(XSUPPORT, XSupportContract, false);
     end;
 
     var
-        ContractGroup: Record "Contract Group";
         XHARDWARE: Label 'HARDWARE';
         XHardwareContract: Label 'Hardware Contract';
         XMAINT: Label 'MAINT';

@@ -24,7 +24,6 @@ codeunit 139111 "Mail Service Test"
         EmailSubjectCapMsg: Label '%1 - %2 %3';
         AttachmentNameTok: Label '%1 %2.pdf';
         SalesInvoiceTxt: Label 'Sales Invoice';
-        SalesCrMemoTxt: Label 'Sales Credit Memo';
         SalesQuoteTxt: Label 'Sales Quote';
         SalesShipmentTxt: Label 'Sales Shipment';
         SalesReceiptTxt: Label 'Sales Receipt';
@@ -32,7 +31,7 @@ codeunit 139111 "Mail Service Test"
         PurchaseOrderTxt: Label 'Purchase Order';
         ServiceInvoiceTxt: Label 'Service Invoice';
         ServiceCrMemoTxt: Label 'Service Credit Memo';
-        JobQuoteTxt: Label 'Job Quote';
+        JobQuoteTxt: Label 'Project Quote';
         IncorrectSubjectErr: Label 'Subject is not correct';
         IncorrectAttachNameErr: Label 'Attachment Name is not correct';
 
@@ -45,8 +44,6 @@ codeunit 139111 "Mail Service Test"
         SalesLine: Record "Sales Line";
         SalesShipmentHeader: Record "Sales Shipment Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
-        DialogSubject: Variant;
-        AttachmentName: Variant;
         ExpectedSubjectCap: Text;
         ExpectedAttachName: Text;
     begin
@@ -58,7 +55,7 @@ codeunit 139111 "Mail Service Test"
         // [GIVEN] Sales Order
         LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, '');
         LibrarySales.CreateSalesLine(
-          SalesLine, SalesHeader, SalesLine.Type::Item, LibraryInventory.CreateItemNo, LibraryRandom.RandInt(100));
+          SalesLine, SalesHeader, SalesLine.Type::Item, LibraryInventory.CreateItemNo(), LibraryRandom.RandInt(100));
 
         // [WHEN] Post Sales Order with Shipment and Invoice and send Email - No recipient on email throws an error
         LibrarySales.PostSalesDocumentAndEmail(SalesHeader, true, true);
@@ -67,7 +64,7 @@ codeunit 139111 "Mail Service Test"
         // [THEN] Email dialog opened, Subject = "%CompanyName% - Sales Shipment SH1", Attachment Name = "Sales Shipment SH1.pdf".
         SalesShipmentHeader.SetRange("Order No.", SalesHeader."No.");
         SalesShipmentHeader.FindLast();
-        ExpectedSubjectCap := StrSubstNo(EmailSubjectCapMsg, GetCompanyName, SalesShipmentTxt, SalesShipmentHeader."No.");
+        ExpectedSubjectCap := StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), SalesShipmentTxt, SalesShipmentHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, SalesShipmentTxt, SalesShipmentHeader."No.");
 
         VerifySubjectAndAttachmentName(ExpectedSubjectCap, ExpectedAttachName);
@@ -76,7 +73,7 @@ codeunit 139111 "Mail Service Test"
         // [THEN] Email dialog opened, Subject = "%CompanyName% - Sales Invoice SI1", Attachment Name = "Sales Invoice SI1.pdf".
         SalesInvoiceHeader.SetRange("Order No.", SalesHeader."No.");
         SalesInvoiceHeader.FindLast();
-        ExpectedSubjectCap := StrSubstNo(EmailSubjectCapMsg, GetCompanyName, SalesInvoiceTxt, SalesInvoiceHeader."No.");
+        ExpectedSubjectCap := StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), SalesInvoiceTxt, SalesInvoiceHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, SalesInvoiceTxt, SalesInvoiceHeader."No.");
 
         VerifySubjectAndAttachmentName(ExpectedSubjectCap, ExpectedAttachName);
@@ -90,8 +87,6 @@ codeunit 139111 "Mail Service Test"
     procedure FinChargeMemoAndSendEmail()
     var
         IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
-        IssuedFinChargeMemoLine: Record "Issued Fin. Charge Memo Line";
-        Customer: Record Customer;
         IssuedFinanceChargeMemoPage: Page "Issued Finance Charge Memo";
         ExpectedSubjectCap: Text;
         ExpectedAttachName: Text;
@@ -103,7 +98,7 @@ codeunit 139111 "Mail Service Test"
         // [GIVEN] Issued Finance Charge Memo with No. = "IFCM1".
         MockIssuedFinChargeMemo(IssuedFinChargeMemoHeader);
         ExpectedSubjectCap :=
-            StrSubstNo(EmailSubjectCapMsg, GetCompanyName, IssuedFinanceChargeMemoPage.Caption, IssuedFinChargeMemoHeader."No.");
+            StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), IssuedFinanceChargeMemoPage.Caption, IssuedFinChargeMemoHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, IssuedFinanceChargeMemoPage.Caption, IssuedFinChargeMemoHeader."No.");
 
         // [WHEN] Run PrintRecords function with SendAsEmail = true for Issued Finance Charge Memo.
@@ -134,7 +129,7 @@ codeunit 139111 "Mail Service Test"
         // [GIVEN] Issued Reminder "IR1".
         MockIssuedReminder(IssuedReminderHeader);
         ExpectedSubjectCap :=
-            StrSubstNo(EmailSubjectCapMsg, GetCompanyName, IssuedReminderPage.Caption, IssuedReminderHeader."No.");
+            StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), IssuedReminderPage.Caption, IssuedReminderHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, IssuedReminderPage.Caption, IssuedReminderHeader."No.");
 
         // [WHEN] Run PrintRecords function with SendAsEmail = true for Issued Reminder.
@@ -191,7 +186,7 @@ codeunit 139111 "Mail Service Test"
         LibrarySales.CreateSalesInvoice(SalesHeader);
         CreateCustomReportSelectionForCustomer(
             SalesHeader."Sell-to Customer No.", ReportSelectionUsage::"S.Invoice Draft", Report::"Standard Sales - Draft Invoice");
-        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName, SalesInvoiceTxt, SalesHeader."No.");
+        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), SalesInvoiceTxt, SalesHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, SalesInvoiceTxt, SalesHeader."No.");
 
         // [WHEN] Run EmailRecords function for Sales Invoice.
@@ -225,7 +220,7 @@ codeunit 139111 "Mail Service Test"
         LibrarySales.CreateSalesQuoteForCustomerNo(SalesHeader, LibrarySales.CreateCustomerNo());
         CreateCustomReportSelectionForCustomer(
             SalesHeader."Sell-to Customer No.", ReportSelectionUsage::"S.Quote", Report::"Standard Sales - Quote");
-        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName, SalesQuoteTxt, SalesHeader."No.");
+        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), SalesQuoteTxt, SalesHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, SalesQuoteTxt, SalesHeader."No.");
 
         // [WHEN] Run EmailRecords function for Sales Quote.
@@ -254,7 +249,7 @@ codeunit 139111 "Mail Service Test"
         // [GIVEN] Posted Return Receipt with No. = "RR1".
         ReturnReceiptHeader.Get(CreateAndPostSalesReturnOrder());
         ExpectedSubject :=
-            StrSubstNo(EmailSubjectCapMsg, GetCompanyName, SalesReceiptTxt, ReturnReceiptHeader."No.");
+            StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), SalesReceiptTxt, ReturnReceiptHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, SalesReceiptTxt, ReturnReceiptHeader."No.");
 
         // [WHEN] Run EmailRecords function for Posted Return Receipt.
@@ -284,7 +279,7 @@ codeunit 139111 "Mail Service Test"
         // [GIVEN] Job "J1".
         LibraryJob.CreateJob(Job);
         CreateCustomReportSelectionForCustomer(Job."Bill-to Customer No.", ReportSelectionUsage::JQ, Report::"Job Quote");
-        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName, JobQuoteTxt, Job."No.");
+        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), JobQuoteTxt, Job."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, JobQuoteTxt, Job."No.");
 
         // [WHEN] Run EmailRecords for Job.
@@ -313,7 +308,7 @@ codeunit 139111 "Mail Service Test"
 
         // [GIVEN] Purchase Quote "PQ1".
         LibraryPurchase.CreatePurchaseQuote(PurchaseHeader);
-        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName, PurchaseQuoteTxt, PurchaseHeader."No.");
+        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), PurchaseQuoteTxt, PurchaseHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, PurchaseQuoteTxt, PurchaseHeader."No.");
 
         // [WHEN] Run Send for Purchase Quote. Email with PDF attachment is selected by default.
@@ -342,7 +337,7 @@ codeunit 139111 "Mail Service Test"
 
         // [GIVEN] Purchase Order "PO1".
         LibraryPurchase.CreatePurchaseOrder(PurchaseHeader);
-        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName, PurchaseOrderTxt, PurchaseHeader."No.");
+        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), PurchaseOrderTxt, PurchaseHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, PurchaseOrderTxt, PurchaseHeader."No.");
 
         // [WHEN] Run Send for Purchase Order. Email with PDF attachment is selected by default.
@@ -371,7 +366,7 @@ codeunit 139111 "Mail Service Test"
 
         // [GIVEN] Posted Service Invoice "SI1".
         ServiceInvoiceHeader.Get(CreateAndPostServiceInvoice());
-        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName, ServiceInvoiceTxt, ServiceInvoiceHeader."No.");
+        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), ServiceInvoiceTxt, ServiceInvoiceHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, ServiceInvoiceTxt, ServiceInvoiceHeader."No.");
 
         // [WHEN] Run Send for Posted Service Invoice. Email with PDF attachment is selected by default.
@@ -400,7 +395,7 @@ codeunit 139111 "Mail Service Test"
 
         // [GIVEN] Posted Service Credit Memo "SCM1".
         ServiceCrMemoHeader.Get(CreateAndPostServiceCrMemo());
-        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName, ServiceCrMemoTxt, ServiceCrMemoHeader."No.");
+        ExpectedSubject := StrSubstNo(EmailSubjectCapMsg, GetCompanyName(), ServiceCrMemoTxt, ServiceCrMemoHeader."No.");
         ExpectedAttachName := StrSubstNo(AttachmentNameTok, ServiceCrMemoTxt, ServiceCrMemoHeader."No.");
 
         // [WHEN] Run Send for Posted Service Credit Memo. Email with PDF attachment is selected by default.
@@ -416,12 +411,22 @@ codeunit 139111 "Mail Service Test"
     local procedure Initialize()
     var
         CompanyInformation: Record "Company Information";
+        FeatureKey: Record "Feature Key";
+        FeatureKeyUpdateStatus: Record "Feature Data Update Status";
         LibraryWorkflow: Codeunit "Library - Workflow";
     begin
         LibraryWorkflow.SetUpEmailAccount();
-        BindActiveDirectoryMockEvents;
+        BindActiveDirectoryMockEvents();
         LibraryVariableStorage.Clear();
         LibraryERMCountryData.CreateVATData();
+        if FeatureKey.Get('ReminderTermsCommunicationTexts') then begin
+            FeatureKey.Enabled := FeatureKey.Enabled::None;
+            FeatureKey.Modify();
+        end;
+        if FeatureKeyUpdateStatus.Get('ReminderTermsCommunicationTexts', CompanyName()) then begin
+            FeatureKeyUpdateStatus."Feature Status" := FeatureKeyUpdateStatus."Feature Status"::Disabled;
+            FeatureKeyUpdateStatus.Modify();
+        end;
 
         if not IsInitialized then begin
             IsInitialized := true;
@@ -446,7 +451,7 @@ codeunit 139111 "Mail Service Test"
             Validate("Report ID", ReportID);
             Validate("Use for Email Body", true);
             Validate(
-                "Email Body Layout Code", CustomReportLayout.InitBuiltInLayout("Report ID", CustomReportLayout.Type::Word));
+                "Email Body Layout Code", CustomReportLayout.InitBuiltInLayout("Report ID", CustomReportLayout.Type::Word.AsInteger()));
             Insert(true);
         end;
     end;
@@ -561,7 +566,7 @@ codeunit 139111 "Mail Service Test"
             "Posting Date" := Today;
             "Document Date" := Today;
             "Due Date" := Today;
-            "Customer Posting Group" := FindCustomerPostingGroup;
+            "Customer Posting Group" := FindCustomerPostingGroup();
             "VAT Bus. Posting Group" := Customer."VAT Bus. Posting Group";
             Insert(false);
         end;
@@ -627,10 +632,10 @@ codeunit 139111 "Mail Service Test"
 
     local procedure BindActiveDirectoryMockEvents()
     begin
-        if ActiveDirectoryMockEvents.Enabled then
+        if ActiveDirectoryMockEvents.Enabled() then
             exit;
         BindSubscription(ActiveDirectoryMockEvents);
-        ActiveDirectoryMockEvents.Enable;
+        ActiveDirectoryMockEvents.Enable();
     end;
 }
 

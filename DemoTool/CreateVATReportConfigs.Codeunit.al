@@ -5,15 +5,13 @@ codeunit 101254 "Create VAT Report Configs"
     var
         VATReportsConfiguration: Record "VAT Reports Configuration";
     begin
-        with VATReportsConfiguration do begin
-            Init();
-            "VAT Report Type" := "VAT Report Type"::"VAT Return";
-            "VAT Report Version" := 'CURRENT';
-            "Suggest Lines Codeunit ID" := CODEUNIT::"VAT Report Suggest Lines";
-            "Validate Codeunit ID" := CODEUNIT::"VAT Report Validate";
-            Insert();
-        end;
-        CreateReportNoSeries;
+        VATReportsConfiguration.Init();
+        VATReportsConfiguration."VAT Report Type" := VATReportsConfiguration."VAT Report Type"::"VAT Return";
+        VATReportsConfiguration."VAT Report Version" := 'CURRENT';
+        VATReportsConfiguration."Suggest Lines Codeunit ID" := CODEUNIT::"VAT Report Suggest Lines";
+        VATReportsConfiguration."Validate Codeunit ID" := CODEUNIT::"VAT Report Validate";
+        VATReportsConfiguration.Insert();
+        CreateReportNoSeries();
     end;
 
     var

@@ -59,6 +59,15 @@ codeunit 101036 "Create Sales Header"
         CA: Codeunit "Make Adjustments";
         i: Integer;
         "Date Displacement": Text[1];
+        XEquip: Label 'Equip';
+        XEquipment: Label 'Equipment';
+        XVENDRET: Label 'VEND RET';
+        XReturnstoVendors: Label 'Returns to Vendors';
+        ReasonCode: Record "Reason Code";
+        XCUSTRET: Label 'CUST RET';
+        XReturnsfromCustomers: Label 'Returns from Customers';
+        XVPMTDISC: Label 'V PMT DISC';
+        XPaymentDiscounts: Label 'Payment Discounts';
 
     procedure InsertData("Document Type": Integer; "Sell-to Customer No.": Code[20]; "Posting Date": Date)
     begin
@@ -108,6 +117,39 @@ codeunit 101036 "Create Sales Header"
                     13:
                         SetPackage('DHL', '4490790441');
                 end;
+            end;
+        end;
+
+        if "Document Type" = 3 then begin
+            ReasonCode.Init();
+            ReasonCode.Code := XEquip;
+            ReasonCode.Description := XEquipment;
+            if not ReasonCode.Insert() then;
+            ReasonCode.Init();
+            ReasonCode.Code := XVENDRET;
+            ReasonCode.Description := XReturnstoVendors;
+            if not ReasonCode.Insert() then;
+            ReasonCode.Init();
+            ReasonCode.Code := XCUSTRET;
+            ReasonCode.Description := XReturnsfromCustomers;
+            if not ReasonCode.Insert() then;
+            ReasonCode.Init();
+            ReasonCode.Code := XVPMTDISC;
+            ReasonCode.Description := XPaymentDiscounts;
+            if not ReasonCode.Insert() then;
+
+            "Sales Header".Validate("Reason Code", ReasonCode.Code);
+            case "Sell-to Customer No." of
+                '10000':
+                    "Sales Header"."Adjustment Applies-to" := '00-1';
+                '20000':
+                    "Sales Header"."Adjustment Applies-to" := '00-2';
+                '30000':
+                    "Sales Header"."Adjustment Applies-to" := '00-4';
+                '47563218':
+                    "Sales Header"."Adjustment Applies-to" := '103014';
+                '49633663':
+                    "Sales Header"."Adjustment Applies-to" := '103011';
             end;
         end;
 

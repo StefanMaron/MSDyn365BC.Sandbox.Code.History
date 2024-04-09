@@ -32,7 +32,7 @@ report 166601 "NZ Post Codes"
             Text := DelStr(Text, 1, StrPos(Text, ','));
             // import city
             ImportCity := CopyStr(Text, 1);
-            InsertRecord;
+            InsertRecord();
         end;
         TxtFile.Close();
     end;
@@ -56,13 +56,11 @@ report 166601 "NZ Post Codes"
 
     procedure InsertRecord()
     begin
-        with PostCode do begin
-            Code := ImportCode;
-            City := ImportCity;
-            "Search City" := UpperCase(City);
-            if not PostCode2.Get(Code, City) then
-                Insert();
-        end;
+        PostCode.Code := ImportCode;
+        PostCode.City := ImportCity;
+        PostCode."Search City" := UpperCase(PostCode.City);
+        if not PostCode2.Get(PostCode.Code, PostCode.City) then
+            PostCode.Insert();
     end;
 }
 

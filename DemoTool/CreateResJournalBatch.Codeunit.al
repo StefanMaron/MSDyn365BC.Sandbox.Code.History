@@ -3,7 +3,7 @@ codeunit 101236 "Create Res. Journal Batch"
 
     trigger OnRun()
     begin
-        InsertData;
+        InsertData();
     end;
 
     var

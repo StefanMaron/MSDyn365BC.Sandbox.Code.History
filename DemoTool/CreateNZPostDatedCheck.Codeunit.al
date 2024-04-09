@@ -24,8 +24,6 @@ codeunit 166600 "Create NZ Post Dated Check"
     var
         XCallcustomerbeforebanking: Label 'Call customer before banking';
         XReplacesCheck: Label 'Replaces Check';
-        XCUSTOMER: Label 'Customer';
-        XVENDOR: Label 'Vendor';
         XWWBOPERATING: Label 'WWB-OPERATING';
         X1001: Label '1001';
         X1002: Label '1002';
@@ -39,7 +37,6 @@ codeunit 166600 "Create NZ Post Dated Check"
         X2004: Label '2004';
         X2005: Label '2005';
         PostDatedCheck: Record "Post Dated Check Line";
-        SalesSetup: Record "Sales & Receivables Setup";
         DemoDataSetup: Record "Demo Data Setup";
         LineNumber: Integer;
 

@@ -2,6 +2,7 @@ table 132209 "Perf Profiler Events Test"
 {
     DataPerCompany = false;
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -86,28 +87,24 @@ table 132209 "Perf Profiler Events Test"
         }
         field(16; "Event Type"; Option)
         {
-            DataClassification = ToBeClassified;
             OptionCaption = ',SqlExecuteScalar,SqlExecuteNonQuery,SqlExecuteReader,SqlReadNextResult,SqlReadNextRow,SqlBeginTransaction,SqlPrepare,SqlOpenConnection,SqlCommit,SqlRollback';
             OptionMembers = ,SqlExecuteScalar,SqlExecuteNonQuery,SqlExecuteReader,SqlReadNextResult,SqlReadNextRow,SqlBeginTransaction,SqlPrepare,SqlOpenConnection,SqlCommit,SqlRollback;
         }
 
         field(17; "Original Type"; Option)
         {
-            DataClassification = ToBeClassified;
             OptionCaption = 'StartMethod,StopMethod,Statement,None';
             OptionMembers = StartMethod,StopMethod,Statement,None;
         }
 
         field(18; "Sub Type"; Option)
         {
-            DataClassification = ToBeClassified;
             OptionCaption = 'SqlEvent,AlEvent,SystemEvent,None';
             OptionMembers = SqlEvent,AlEvent,SystemEvent,None;
         }
 
         field(19; "IsALEvent"; Boolean)
         {
-            DataClassification = ToBeClassified;
         }
         field(20; "Total MD SQL Queries"; Integer)
         {
