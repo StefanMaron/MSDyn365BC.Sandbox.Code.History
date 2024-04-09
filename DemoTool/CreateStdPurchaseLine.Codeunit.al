@@ -29,7 +29,6 @@ codeunit 101047 "Create Std. Purchase Line"
         XPAPER: Label 'PAPER';
         XPOSTAGE: Label 'POSTAGE';
         XJBFREIGHT: Label 'JB-FREIGHT';
-        CA: Codeunit "Make Adjustments";
 
     procedure InsertData(StdPurchCode: Code[10]; Type: Integer; No: Code[20]; Amount: Decimal; Description2: Text[30]; Department: Code[20])
     begin

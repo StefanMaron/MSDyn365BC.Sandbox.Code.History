@@ -3,21 +3,19 @@ codeunit 117012 "Create Service Mgt. Setup"
 
     trigger OnRun()
     begin
-        with ServiceMgtSetup do begin
-            InsertData(
-              '', "Fault Reporting Level"::"Fault+Symptom+Area (IRIS)",
-              true, false, 100, 100, false, XSTART, true, '', '', '', '');
-            ModifyData1(
-              Xperson1, Xperson2, Xperson3, 16, 8, 2,
-              "Next Service Calc. Method"::Planned, false, "Service Zones Option"::"Code Shown",
-              false, false, "Resource Skills Option"::"Code Shown", false, false, false, 365, 0D, false);
-            ModifyData2(
-              false, 24, '<1Y>', XSMdashINV, XSMdashINVPLUS,
-              XSMdashINVdashCON, XSMdashITEM, XSMdashORDER, XSMdashCONTRAC, XSMdashCNTTEMP, XSMdashTROUBLE, XSMdashPREPAID,
-              XSMdashLOANER, XSERVICE, "Contract Value Calc. Method"::"Based on Unit Price", 15, XSMdashQUOTE);
-            ModifyData3(XSERVICE, XSMdashCRdashCON, XSMdashCR, XSMdashCRPLUS, XSMdashSHIPPLUS,
-              "Logo Position on Documents"::"No Logo", true, true, true, XSMdashINV, XSMdashCONdashINV, XSMdashCONdashCM, XSMdashCR);
-        end;
+        InsertData(
+  '', ServiceMgtSetup."Fault Reporting Level"::"Fault+Symptom+Area (IRIS)",
+  true, false, 100, 100, false, XSTART, true, '', '', '', '');
+        ModifyData1(
+          Xperson1, Xperson2, Xperson3, 16, 8, 2,
+          ServiceMgtSetup."Next Service Calc. Method"::Planned, false, ServiceMgtSetup."Service Zones Option"::"Code Shown",
+          false, false, ServiceMgtSetup."Resource Skills Option"::"Code Shown", false, false, false, 365, 0D, false);
+        ModifyData2(
+          false, 24, '<1Y>', XSMdashINV, XSMdashINVPLUS,
+          XSMdashINVdashCON, XSMdashITEM, XSMdashORDER, XSMdashCONTRAC, XSMdashCNTTEMP, XSMdashTROUBLE, XSMdashPREPAID,
+          XSMdashLOANER, XSERVICE, ServiceMgtSetup."Contract Value Calc. Method"::"Based on Unit Price", 15, XSMdashQUOTE);
+        ModifyData3(XSERVICE, XSMdashCRdashCON, XSMdashCR, XSMdashCRPLUS, XSMdashSHIPPLUS,
+          ServiceMgtSetup."Logo Position on Documents"::"No Logo", true, true, true, XSMdashINV, XSMdashCONdashINV, XSMdashCONdashCM, XSMdashCR);
     end;
 
     var

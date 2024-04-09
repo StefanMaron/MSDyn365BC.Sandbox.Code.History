@@ -151,7 +151,6 @@ codeunit 101023 "Create Vendor"
         X10NorthLakeAvenue: Label '10 North Lake Avenue';
         XMrs: Label 'Mrs.';
         XCarolPhilips: Label 'Carol Philips';
-        XLND: Label 'LND';
         XARDayPropertyManagement: Label 'AR Day Property Management';
         X100DayDrive: Label '100 Day Drive';
         XMr: Label 'Mr.';

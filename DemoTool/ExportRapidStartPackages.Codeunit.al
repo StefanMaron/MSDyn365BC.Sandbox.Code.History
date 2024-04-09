@@ -9,21 +9,19 @@ codeunit 101930 "Export RapidStart Packages"
         CompressedFileName: Text;
         TempFileName: Text;
     begin
-        with ConfigPackage do begin
-            if FindSet() then
-                repeat
-                    ConfigPackageTable.SetRange("Package Code", Code);
-                    ConfigXMLExchange.SetCalledFromCode(true);
-                    TempFileName := FileMgt.ServerTempFileName('');
-                    ConfigXMLExchange.ExportPackageXML(ConfigPackageTable, TempFileName);
+        if ConfigPackage.FindSet() then
+            repeat
+                ConfigPackageTable.SetRange("Package Code", ConfigPackage.Code);
+                ConfigXMLExchange.SetCalledFromCode(true);
+                TempFileName := FileMgt.ServerTempFileName('');
+                ConfigXMLExchange.ExportPackageXML(ConfigPackageTable, TempFileName);
 
-                    CompressedFileName :=
-                      FileMgt.CombinePath(FileMgt.GetDirectoryName(TempFileName), StrSubstNo('%1.%2.rapidstart', "Product Version", Code));
-                    if FileMgt.ServerFileExists(CompressedFileName) then
-                        FileMgt.DeleteServerFile(CompressedFileName);
-                    ConfigPckgCompressionMgt.ServersideCompress(TempFileName, CompressedFileName);
-                until Next = 0;
-        end;
+                CompressedFileName :=
+                  FileMgt.CombinePath(FileMgt.GetDirectoryName(TempFileName), StrSubstNo('%1.%2.rapidstart', ConfigPackage."Product Version", ConfigPackage.Code));
+                if FileMgt.ServerFileExists(CompressedFileName) then
+                    FileMgt.DeleteServerFile(CompressedFileName);
+                ConfigPckgCompressionMgt.ServersideCompress(TempFileName, CompressedFileName);
+            until ConfigPackage.Next() = 0;
     end;
 
     var

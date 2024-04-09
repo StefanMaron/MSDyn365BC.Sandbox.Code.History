@@ -265,19 +265,17 @@
 
     procedure UpdateIBANCountries()
     begin
-        with Country do begin
-            Reset();
-            if Find('-') then
-                repeat
-                    case Code of
-                        'BE', 'DE', 'FR', 'IT', 'AT', 'DK', 'EL', 'LU', 'PT', 'GB', 'FI', 'IE', 'NL', 'ES', 'SE':
-                            begin
-                                "IBAN Country/Region" := true;
-                                Modify();
-                            end;
-                    end;
-                until Next = 0;
-        end;
+        Country.Reset();
+        if Country.Find('-') then
+            repeat
+                case Country.Code of
+                    'BE', 'DE', 'FR', 'IT', 'AT', 'DK', 'EL', 'LU', 'PT', 'GB', 'FI', 'IE', 'NL', 'ES', 'SE':
+                        begin
+                            Country."IBAN Country/Region" := true;
+                            Country.Modify();
+                        end;
+                end;
+            until Country.Next() = 0;
     end;
 }
 

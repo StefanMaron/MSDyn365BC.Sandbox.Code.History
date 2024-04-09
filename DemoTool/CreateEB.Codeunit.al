@@ -3,17 +3,17 @@ codeunit 160100 "Create EB"
 
     trigger OnRun()
     begin
-        InitializeSetup;
+        InitializeSetup();
 
         // Assign/Change Bank Acc.
-        PrepareVendors;
+        PrepareVendors();
 
         // IBLC/BLWI initialization
         InitializeIBLCcodes('090', XTransactionsOfGoods);
         InitializeIBLCcodes('091', XReimbursement);
         InitializeIBLCcodes('092', XEU3PartyTradeTransit);
 
-        AddExportProtocols;
+        AddExportProtocols();
     end;
 
     var
@@ -24,19 +24,19 @@ codeunit 160100 "Create EB"
 
     procedure CreateTrialData()
     begin
-        InitializeSetup;
+        InitializeSetup();
 
         // IBLC/BLWI initialization
         InitializeIBLCcodes('090', XTransactionsOfGoods);
         InitializeIBLCcodes('091', XReimbursement);
         InitializeIBLCcodes('092', XEU3PartyTradeTransit);
-        AddExportProtocols;
+        AddExportProtocols();
     end;
 
     procedure CreateEvaluationData()
     begin
         // Assign/Change Bank Acc.
-        PrepareVendors;
+        PrepareVendors();
     end;
 
     procedure PrepareVendors()
@@ -45,39 +45,35 @@ codeunit 160100 "Create EB"
         BankAccNo: Text[30];
         CheckSum: Text[30];
     begin
-        with Vend do begin
-            Reset();
-            ModifyAll("Suggest Payments", true);
-            // Initialize bank account for companies with LCY
-            BankAccNo := '431-0680106';
-            CheckSum := '-09';
-            SetRange("Country/Region Code", '');
-            if Find('-') then
-                repeat
-                    VendBankAcc.SetRange("Vendor No.", "No.");
-                    if VendBankAcc.FindFirst() then begin
-                        VendBankAcc."Bank Account No." := BankAccNo + CheckSum;
-                        VendBankAcc.Modify();
-                        "Preferred Bank Account Code" := VendBankAcc.Code;
-                        Modify();
-                    end;
-                    BankAccNo := IncStr(BankAccNo);
-                    CheckSum := IncStr(CheckSum);
-                until Next = 0;
-        end;
+        Vend.Reset();
+        Vend.ModifyAll("Suggest Payments", true);
+        // Initialize bank account for companies with LCY
+        BankAccNo := '431-0680106';
+        CheckSum := '-09';
+        Vend.SetRange("Country/Region Code", '');
+        if Vend.Find('-') then
+            repeat
+                VendBankAcc.SetRange("Vendor No.", Vend."No.");
+                if VendBankAcc.FindFirst() then begin
+                    VendBankAcc."Bank Account No." := BankAccNo + CheckSum;
+                    VendBankAcc.Modify();
+                    Vend."Preferred Bank Account Code" := VendBankAcc.Code;
+                    Vend.Modify();
+                end;
+                BankAccNo := IncStr(BankAccNo);
+                CheckSum := IncStr(CheckSum);
+            until Vend.Next() = 0;
     end;
 
     procedure InitializeIBLCcodes(Codes: Code[10]; Desc: Text[250])
     var
         IBLCcode: Record "IBLC/BLWI Transaction Code";
     begin
-        with IBLCcode do begin
-            Init();
-            "Transaction Code" := Codes;
-            Description := Desc;
-            if not Insert then
-                Modify();
-        end;
+        IBLCcode.Init();
+        IBLCcode."Transaction Code" := Codes;
+        IBLCcode.Description := Desc;
+        if not IBLCcode.Insert() then
+            IBLCcode.Modify();
     end;
 
     procedure InitializeSetup()
@@ -114,17 +110,15 @@ codeunit 160100 "Create EB"
     var
         ExportProtocol: Record "Export Protocol";
     begin
-        with ExportProtocol do begin
-            Init();
-            Code := ExpenseCode;
-            Description := ExpenseDescription;
-            Validate("Check Object ID", CheckObjectID);
-            "Export Object ID" := ExportObjectID;
-            "Export No. Series" := ExportNoSeries;
-            "Export Object Type" := ExportObjectType;
-            "Code Expenses" := CodeExpense;
-            Insert();
-        end;
+        ExportProtocol.Init();
+        ExportProtocol.Code := ExpenseCode;
+        ExportProtocol.Description := ExpenseDescription;
+        ExportProtocol.Validate("Check Object ID", CheckObjectID);
+        ExportProtocol."Export Object ID" := ExportObjectID;
+        ExportProtocol."Export No. Series" := ExportNoSeries;
+        ExportProtocol."Export Object Type" := ExportObjectType;
+        ExportProtocol."Code Expenses" := CodeExpense;
+        ExportProtocol.Insert();
     end;
 }
 

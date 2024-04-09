@@ -4,18 +4,18 @@ codeunit 101995 "Create RapidStart Package"
     trigger OnRun()
     begin
         CreateConfigPackageHelper.CreatePackage(true);
-        CreateConfigTemplates.CreateTemplates;
-        CreateConfigWorksheet.CreateExtWorksheetLines;
-        CreateConfigQuestionaries.CreateQuestionnaires;
+        CreateConfigTemplates.CreateTemplates();
+        CreateConfigWorksheet.CreateExtWorksheetLines();
+        CreateConfigQuestionaries.CreateQuestionnaires();
 
         CreateDemonstrationData.GetTableIDs(TempIntegerTableID);
         if TempIntegerTableID.FindSet() then
             repeat
                 CreateTable(TempIntegerTableID.Number);
             until TempIntegerTableID.Next() = 0;
-        CreateConfigTables;
-        CreateLocalRapidStartPack.CreateTables;
-        CreateConfigPackageHelper.TurnOffFieldValidation;
+        CreateConfigTables();
+        CreateLocalRapidStartPack.CreateTables();
+        CreateConfigPackageHelper.TurnOffFieldValidation();
     end;
 
     var
@@ -31,13 +31,13 @@ codeunit 101995 "Create RapidStart Package"
     procedure InsertMiniAppData()
     begin
         CreateConfigPackageHelper.CreatePackage(false);
-        CreateConfigTemplates.CreateMiniTemplates;
-        CreateConfigWorksheet.CreateMiniWorksheetLines;
+        CreateConfigTemplates.CreateMiniTemplates();
+        CreateConfigWorksheet.CreateMiniWorksheetLines();
 
-        CreateDimTables;
-        CreateMiniTables;
-        CreateJobTables;
-        CreateLocalRapidStartPack.CreateTables;
+        CreateDimTables();
+        CreateMiniTables();
+        CreateJobTables();
+        CreateLocalRapidStartPack.CreateTables();
     end;
 
     local procedure CreateMiniTables()
@@ -56,9 +56,8 @@ codeunit 101995 "Create RapidStart Package"
         InventorySetup: Record "Inventory Setup";
         IncomingDocument: Record "Incoming Document";
         GenJournalBatch: Record "Gen. Journal Batch";
-        ContactJobResponsibility: Record "Contact Job Responsibility";
     begin
-        if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then begin
+        if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then begin
             CreateTable(DATABASE::"Shipment Method");
             CreateTable(DATABASE::Location);
             CreateTable(DATABASE::"Transfer Route");
@@ -67,7 +66,7 @@ codeunit 101995 "Create RapidStart Package"
             CreateTable(DATABASE::Territory);
             CreateTable(DATABASE::"Document Sending Profile");
             SkipValidateField(DocumentSendingProfile.FieldNo(Default));
-            CreateConfigPackageHelper.SetSkipTableTriggers;
+            CreateConfigPackageHelper.SetSkipTableTriggers();
             CreateTable(DATABASE::Customer);
             SkipValidateField(Customer.FieldNo("Global Dimension 1 Code"));
             SkipValidateField(Customer.FieldNo("Global Dimension 2 Code"));
@@ -83,7 +82,7 @@ codeunit 101995 "Create RapidStart Package"
             ExcludeField(BankAccReconciliationLine.FieldNo(Difference));
             CreateTable(DATABASE::"Bank Export/Import Setup");
             CreateTable(DATABASE::"Payment Registration Setup");
-            CreateConfigPackageHelper.SetSkipTableTriggers;
+            CreateConfigPackageHelper.SetSkipTableTriggers();
             CreateTable(DATABASE::"Item Charge");
             CreateTable(DATABASE::Item);
             IncludeField(Item.FieldNo(Picture));
@@ -91,7 +90,7 @@ codeunit 101995 "Create RapidStart Package"
             CreateTableChild(DATABASE::"Item Reference", DATABASE::Item);
             CreateTableChild(DATABASE::"Item Substitution", DATABASE::Item);
             CreateTable(DATABASE::"BOM Component");
-            SetBOM;
+            SetBOM();
             CreateTable(DATABASE::"Inventory Setup");
             CreateTable(DATABASE::Manufacturer);
             CreateTable(DATABASE::Purchasing);
@@ -129,6 +128,7 @@ codeunit 101995 "Create RapidStart Package"
         end;
 
         CreateTable(Database::"Assembly Setup");
+        CreateTable(Database::"Dispute Status");
         CreateTable(Database::"Req. Wksh. Template");
         CreateTable(Database::"Requisition Wksh. Name");
         CreateTable(Database::"Order Promising Setup");
@@ -167,7 +167,13 @@ codeunit 101995 "Create RapidStart Package"
         CreateTable(DATABASE::"General Posting Setup");
         CreateTable(DATABASE::"Reminder Terms");
         CreateTable(DATABASE::"Reminder Level");
+        CreateTable(DATABASE::"Reminder Attachment Text");
+        CreateTable(DATABASE::"Reminder Email Text");
         CreateTable(DATABASE::"Reminder Text");
+        CreateTable(Database::"Reminder Action Group");
+        CreateTable(Database::"Reminder Action");
+        CreateTable(Database::"Create Reminders Setup");
+        CreateTable(Database::"Send Reminders Setup");
         CreateTable(DATABASE::"Payment Method");
         IncludeField(PaymentMethod.FieldNo("Bal. Account No."));
         CreateTable(DATABASE::"Payment Method Translation");
@@ -184,7 +190,7 @@ codeunit 101995 "Create RapidStart Package"
         CreateTable(DATABASE::"Profile Questionnaire Line");
         CreateTable(DATABASE::"Named Forward Link");
 
-        case CreateConfigPackageHelper.GetCompanyType of
+        case CreateConfigPackageHelper.GetCompanyType() of
             DemoDataSetup."Company Type"::VAT:
                 begin
                     CreateTable(DATABASE::"VAT Business Posting Group");
@@ -203,11 +209,11 @@ codeunit 101995 "Create RapidStart Package"
             DemoDataSetup."Company Type"::"Sales Tax":
                 begin
                     CreateTable(DATABASE::"VAT Posting Setup");
-                    CreateSalesTaxTables;
+                    CreateSalesTaxTables();
                 end;
         end;
 
-        if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then
+        if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then
             CreateTable(DATABASE::"Currency Exchange Rate");
         CreateTable(DATABASE::"Inventory Posting Setup");
         CreateTable(DATABASE::"Config. Line");
@@ -228,8 +234,8 @@ codeunit 101995 "Create RapidStart Package"
         SkipValidateField(8); // Cue Setup - Threshold 2
         CreateTable(DATABASE::"Acc. Sched. KPI Web Srv. Setup");
         CreateTable(DATABASE::"Acc. Sched. KPI Web Srv. Line");
-        CreateCashManagmentTables;
-        CreateO365SalesTables;
+        CreateCashManagmentTables();
+        CreateO365SalesTables();
         CreateTable(DATABASE::"Online Map Setup");
         CreateTable(DATABASE::"Online Map Parameter Setup");
         CreateTable(DATABASE::"User Preference");
@@ -242,7 +248,7 @@ codeunit 101995 "Create RapidStart Package"
 
         // Reporting
         CreateTable(DATABASE::"Custom Report Layout");
-        CreateConfigPackageHelper.SetSkipTableTriggers;
+        CreateConfigPackageHelper.SetSkipTableTriggers();
 
         // Office Add-Ins
         CreateTable(DATABASE::"Office Add-in");
@@ -278,7 +284,7 @@ codeunit 101995 "Create RapidStart Package"
         CreateTable(DATABASE::"Contact Business Relation");
         CreateTable(DATABASE::Opportunity);
         CreateTableChild(DATABASE::"Opportunity Entry", DATABASE::"Close Opportunity Code");
-        CreateConfigPackageHelper.SetSkipTableTriggers;
+        CreateConfigPackageHelper.SetSkipTableTriggers();
         CreateTableChild(Database::"Contact Job Responsibility", Database::Contact);
         CreateTable(DATABASE::"Interaction Log Entry");
         ExcludeField(InteractionLogEntry.FieldNo("User ID"));
@@ -298,7 +304,7 @@ codeunit 101995 "Create RapidStart Package"
 
         // Excel Templates
         CreateTable(DATABASE::"Excel Template Storage");
-        CreateConfigPackageHelper.SetSkipTableTriggers;
+        CreateConfigPackageHelper.SetSkipTableTriggers();
 
         // ADCS
         CreateTable(DATABASE::"Miniform Header");
@@ -314,12 +320,12 @@ codeunit 101995 "Create RapidStart Package"
         CreateTable(DATABASE::"Bank Export/Import Setup");
         CreateTable(DATABASE::"Data Exchange Type");
         CreateTable(DATABASE::"Data Exch. Def");
-        CreateConfigPackageHelper.SetSkipTableTriggers;
+        CreateConfigPackageHelper.SetSkipTableTriggers();
         CreateTable(DATABASE::"Data Exch. Line Def");
         CreateTable(DATABASE::"Data Exch. Column Def");
         CreateTable(DATABASE::"Data Exch. Mapping");
         CreateTable(DATABASE::"Data Exch. Field Mapping");
-        CreateConfigPackageHelper.SetSkipTableTriggers;
+        CreateConfigPackageHelper.SetSkipTableTriggers();
         CreateTable(DATABASE::"Bank Pmt. Appl. Rule");
         CreateTable(DATABASE::"Bank Account Posting Group");
         CreateTable(DATABASE::"Payment Registration Setup");
@@ -327,17 +333,9 @@ codeunit 101995 "Create RapidStart Package"
 
     local procedure CreateO365SalesTables()
     begin
-#if not CLEAN21
-        CreateTable(DATABASE::"O365 Sales Initial Setup");
-#endif
         CreateTable(DATABASE::"O365 HTML Template");
         CreateTable(DATABASE::"O365 Brand Color");
         CreateTable(DATABASE::"O365 Payment Service Logo");
-#if not CLEAN21
-        CreateTable(DATABASE::"O365 Social Network");
-        CreateTable(DATABASE::"O365 Payment Instructions");
-        CreateTable(DATABASE::"O365 Payment Instr. Transl.");
-#endif
     end;
 
     local procedure CreateDimTables()
@@ -397,7 +395,7 @@ codeunit 101995 "Create RapidStart Package"
           StrSubstNo('=%1', Format(PurchHeader."Document Type", 0, 9)));
         CreateConfigPackageHelper.CreateProcessingFilter(
           RuleNo, PurchHeader.FieldNo("Your Reference"),
-          StrSubstNo('<>%1', InterfaceEvaluationData.GetOpenDocsMarker));
+          StrSubstNo('<>%1', InterfaceEvaluationData.GetOpenDocsMarker()));
     end;
 
     local procedure CreateSalesDocRules()
@@ -416,7 +414,7 @@ codeunit 101995 "Create RapidStart Package"
           StrSubstNo('=%1', Format(SalesHeader."Document Type", 0, 9)));
         CreateConfigPackageHelper.CreateProcessingFilter(
           RuleNo, SalesHeader.FieldNo("Your Reference"),
-          StrSubstNo('<>%1', InterfaceEvaluationData.GetOpenDocsMarker));
+          StrSubstNo('<>%1', InterfaceEvaluationData.GetOpenDocsMarker()));
     end;
 
     local procedure CreateSalesTaxTables()
@@ -455,7 +453,7 @@ codeunit 101995 "Create RapidStart Package"
         CreateConfigPackageHelper.CreateProcessingRule(RuleNo, ConfigTableProcessingRule.Action::Ship);
         CreateConfigPackageHelper.CreateProcessingFilter(
           RuleNo, TransferHeader.FieldNo("External Document No."),
-          StrSubstNo('<>%1', InterfaceEvaluationData.GetOpenDocsMarker));
+          StrSubstNo('<>%1', InterfaceEvaluationData.GetOpenDocsMarker()));
     end;
 
     local procedure CreateTransferReceiptRules()
@@ -470,7 +468,7 @@ codeunit 101995 "Create RapidStart Package"
         CreateConfigPackageHelper.CreateProcessingRule(RuleNo, ConfigTableProcessingRule.Action::Receive);
         CreateConfigPackageHelper.CreateProcessingFilter(
           RuleNo, TransferHeader.FieldNo("External Document No."),
-          StrSubstNo('<>%1', InterfaceEvaluationData.GetOpenDocsMarker));
+          StrSubstNo('<>%1', InterfaceEvaluationData.GetOpenDocsMarker()));
     end;
 
     local procedure CreateCompanyInformationRules()
@@ -479,7 +477,7 @@ codeunit 101995 "Create RapidStart Package"
     begin
         ExcludeField(CompanyInformation.FieldNo(Name));
         ExcludeField(CompanyInformation.FieldNo("Ship-to Name"));
-        if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then
+        if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then
             CreateConfigPackageHelper.CreateProcessingRuleCustom(10000, CODEUNIT::"Setup Company Name");
     end;
 
@@ -505,7 +503,7 @@ codeunit 101995 "Create RapidStart Package"
         DimensionValue: Record "Dimension Value";
         DocType: Integer;
     begin
-        if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Extended then
+        if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Extended then
             case TableID of
                 DATABASE::"Dimension Value":
                     CreateConfigPackageHelper.MarkFieldAsPrimaryKey(DimensionValue.FieldNo("Dimension Value ID"));
@@ -526,101 +524,101 @@ codeunit 101995 "Create RapidStart Package"
         else
             case TableID of
                 DATABASE::"Salesperson/Purchaser":
-                    if CreateConfigPackageHelper.GetDataType <> DemoDataSetup."Data Type"::Evaluation then
+                    if CreateConfigPackageHelper.GetDataType() <> DemoDataSetup."Data Type"::Evaluation then
                         CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', ''' '''));
                 DATABASE::"G/L Account":
-                    SetGLAcc;
+                    SetGLAcc();
                 DATABASE::"G/L Account Category":
-                    CreateConfigPackageHelper.DeleteRecsBeforeProcessing;
+                    CreateConfigPackageHelper.DeleteRecsBeforeProcessing();
                 DATABASE::Customer:
                     begin
-                        SetCust;
-                        if CreateConfigPackageHelper.GetDataType <> DemoDataSetup."Data Type"::Evaluation then
+                        SetCust();
+                        if CreateConfigPackageHelper.GetDataType() <> DemoDataSetup."Data Type"::Evaluation then
                             CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', ''' '''));
                     end;
                 DATABASE::Vendor:
                     begin
-                        SetVend;
-                        if CreateConfigPackageHelper.GetDataType <> DemoDataSetup."Data Type"::Evaluation then
+                        SetVend();
+                        if CreateConfigPackageHelper.GetDataType() <> DemoDataSetup."Data Type"::Evaluation then
                             CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', ''' '''));
                     end;
                 DATABASE::Item:
                     begin
-                        SetItem;
-                        if CreateConfigPackageHelper.GetDataType <> DemoDataSetup."Data Type"::Evaluation then
+                        SetItem();
+                        if CreateConfigPackageHelper.GetDataType() <> DemoDataSetup."Data Type"::Evaluation then
                             CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', ''' '''));
                     end;
                 DATABASE::"Sales Header":
                     begin
-                        SetSalesHeader;
-                        if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then
-                            CreateSalesDocRules;
+                        SetSalesHeader();
+                        if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then
+                            CreateSalesDocRules();
                     end;
                 DATABASE::"Sales Line":
-                    SetSalesLine;
+                    SetSalesLine();
                 DATABASE::"Purchase Header":
                     begin
-                        SetPurchHeader;
-                        if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then
-                            CreatePurchaseDocRules;
+                        SetPurchHeader();
+                        if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then
+                            CreatePurchaseDocRules();
                     end;
                 DATABASE::"Purchase Line":
-                    SetPurchLine;
+                    SetPurchLine();
                 DATABASE::"Transfer Header":
-                    if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then begin
-                        CreateTransferShipmentRules;
-                        CreateTransferReceiptRules;
+                    if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then begin
+                        CreateTransferShipmentRules();
+                        CreateTransferReceiptRules();
                     end;
                 DATABASE::"Gen. Journal Line":
-                    if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then begin
-                        SetGenJnlLine;
-                        CreateGenJnlLineRule;
+                    if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then begin
+                        SetGenJnlLine();
+                        CreateGenJnlLineRule();
                     end else
                         CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', ''' '''));
                 DATABASE::"Item Journal Line":
                     CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', ''' '''));
                 DATABASE::"Gen. Journal Batch":
                     begin
-                        SetGenJnlBatch;
-                        if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then
-                            CreateGenJnlBatchRule;
+                        SetGenJnlBatch();
+                        if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then
+                            CreateGenJnlBatchRule();
                     end;
                 DATABASE::"General Ledger Setup":
-                    SetGLSetup;
+                    SetGLSetup();
                 DATABASE::"Bank Account":
-                    if CreateConfigPackageHelper.GetDataType <> DemoDataSetup."Data Type"::Evaluation then
+                    if CreateConfigPackageHelper.GetDataType() <> DemoDataSetup."Data Type"::Evaluation then
                         CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', ''' '''));
                 DATABASE::"Bank Acc. Reconciliation":
-                    if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then
-                        CreateBankReconRule;
+                    if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then
+                        CreateBankReconRule();
                 DATABASE::"Payment Method":
-                    SetPaymentMethod;
+                    SetPaymentMethod();
                 DATABASE::"No. Series Line":
-                    SetNoSeriesLine;
+                    SetNoSeriesLine();
                 DATABASE::"VAT Posting Setup":
-                    SetVATPostingSetup;
+                    SetVATPostingSetup();
                 DATABASE::"Dimension Value":
-                    SetDimValue;
+                    SetDimValue();
                 DATABASE::"Default Dimension":
                     begin
-                        SetDefaultDim;
+                        SetDefaultDim();
                         CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', '13|18|23'));
                     end;
                 DATABASE::"Bank Export/Import Setup":
-                    SetBankExportImportSetup;
+                    SetBankExportImportSetup();
                 DATABASE::"Default Dimension Priority":
                     CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', 0));
                 DATABASE::"Inventory Posting Setup":
-                    if CreateConfigPackageHelper.GetDataType <> DemoDataSetup."Data Type"::Evaluation then
+                    if CreateConfigPackageHelper.GetDataType() <> DemoDataSetup."Data Type"::Evaluation then
                         CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', ''' '''));
                 DATABASE::"Config. Line":
-                    CreateConfigPackageHelper.CreateTableFilter(36, StrSubstNo('=%1', DemoDataSetup.GetRSPackageCode));
+                    CreateConfigPackageHelper.CreateTableFilter(36, StrSubstNo('=%1', DemoDataSetup.GetRSPackageCode()));
                 DATABASE::"Config. Package Filter":
-                    CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', DemoDataSetup.GetRSPackageCode));
+                    CreateConfigPackageHelper.CreateTableFilter(1, StrSubstNo('=%1', DemoDataSetup.GetRSPackageCode()));
                 DATABASE::"Ship-to Address":
-                    SetShipToAddress;
+                    SetShipToAddress();
                 DATABASE::"Company Information":
-                    CreateCompanyInformationRules;
+                    CreateCompanyInformationRules();
                 DATABASE::"Item Unit of Measure":
                     SetItemUoM();
             end;
@@ -631,7 +629,7 @@ codeunit 101995 "Create RapidStart Package"
     var
         GenJournalLine: Record "Gen. Journal Line";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(GenJournalLine.FieldNo("Journal Template Name"));
         SkipValidateField(GenJournalLine.FieldNo("Journal Template Name"));
         IncludeField(GenJournalLine.FieldNo("Journal Batch Name"));
@@ -671,7 +669,7 @@ codeunit 101995 "Create RapidStart Package"
     var
         Cust: Record Customer;
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(Cust.FieldNo("No."));
         IncludeField(Cust.FieldNo(Name));
         IncludeField(Cust.FieldNo("Name 2"));
@@ -704,13 +702,14 @@ codeunit 101995 "Create RapidStart Package"
         IncludeField(Cust.FieldNo("Document Sending Profile"));
         IncludeField(Cust.FieldNo("Salesperson Code"));
         IncludeField(Cust.FieldNo(Image));
+        IncludeField(Cust.FieldNo("Reminder Terms Code"));
     end;
 
     local procedure SetVend()
     var
         Vend: Record Vendor;
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(Vend.FieldNo("No."));
         IncludeField(Vend.FieldNo(Name));
         IncludeField(Vend.FieldNo("Name 2"));
@@ -746,7 +745,7 @@ codeunit 101995 "Create RapidStart Package"
     var
         Item: Record Item;
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(Item.FieldNo("No."));
         IncludeField(Item.FieldNo("No. 2"));
         IncludeField(Item.FieldNo(Description));
@@ -803,7 +802,7 @@ codeunit 101995 "Create RapidStart Package"
     var
         PurchHeader: Record "Purchase Header";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(PurchHeader.FieldNo("Document Type"));
         IncludeField(PurchHeader.FieldNo("No."));
         IncludeField(PurchHeader.FieldNo("Vendor Invoice No."));
@@ -825,7 +824,7 @@ codeunit 101995 "Create RapidStart Package"
     var
         PurchLine: Record "Purchase Line";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(PurchLine.FieldNo("Document Type"));
         IncludeField(PurchLine.FieldNo("Document No."));
         IncludeField(PurchLine.FieldNo("Line No."));
@@ -842,7 +841,7 @@ codeunit 101995 "Create RapidStart Package"
     var
         SalesHeader: Record "Sales Header";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(SalesHeader.FieldNo("Document Type"));
         IncludeField(SalesHeader.FieldNo("No."));
         IncludeField(SalesHeader.FieldNo("Sell-to Customer No."));
@@ -863,7 +862,7 @@ codeunit 101995 "Create RapidStart Package"
     var
         SalesLine: Record "Sales Line";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(SalesLine.FieldNo("Document Type"));
         IncludeField(SalesLine.FieldNo("Document No."));
         IncludeField(SalesLine.FieldNo("Line No."));
@@ -920,7 +919,7 @@ codeunit 101995 "Create RapidStart Package"
     var
         ShiptoAddress: Record "Ship-to Address";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(ShiptoAddress.FieldNo("Customer No."));
         IncludeField(ShiptoAddress.FieldNo(Code));
         IncludeField(ShiptoAddress.FieldNo(Name));
@@ -935,7 +934,7 @@ codeunit 101995 "Create RapidStart Package"
     var
         BOMComponent: Record "BOM Component";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(BOMComponent.FieldNo("Parent Item No."));
         IncludeField(BOMComponent.FieldNo("Line No."));
         IncludeField(BOMComponent.FieldNo(Type));
@@ -959,7 +958,7 @@ codeunit 101995 "Create RapidStart Package"
     begin
         CreateTable(DATABASE::Resource);
         CreateTable(DATABASE::Job);
-        CreateConfigPackageHelper.SetSkipTableTriggers;
+        CreateConfigPackageHelper.SetSkipTableTriggers();
         CreateTableChild(DATABASE::"Job Task", DATABASE::Job);
         CreateTableChild(DATABASE::"Job Planning Line", DATABASE::Job);
         ExcludeField(JobPlanningLine.FieldNo("User ID"));

@@ -91,7 +91,7 @@ codeunit 101286 "Create Territory"
         if "Country Code" = '' then
             exit(Code)
         else
-            exit(Foreign);
+            exit(Foreign());
     end;
 
     procedure Foreign(): Code[10]

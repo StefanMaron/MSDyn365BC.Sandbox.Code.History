@@ -26,9 +26,9 @@ codeunit 101903 "Localized Create Demo Data"
     procedure CreateExtendedData()
     begin
 #if not CLEAN22
-        StartApplyingGLEntries;
+        StartApplyingGLEntries();
 #endif
-        CreateDefaultDomiciliationJnl;
+        CreateDefaultDomiciliationJnl();
     end;
 
 #if not CLEAN22

@@ -12,7 +12,6 @@ codeunit 101328 "Create Curr for Fin Chrg Terms"
         DemoDataSetup: Record "Demo Data Setup";
         X2POINT0For: Label '2.0 For.';
         XDKK: Label 'DKK';
-        XEUR: Label 'EUR';
         XUSD: Label 'USD';
 
     procedure InsertData(FinChargeTermsCode: Code[10]; CurrencyCode: Code[5]; AdditionalFee: Decimal)

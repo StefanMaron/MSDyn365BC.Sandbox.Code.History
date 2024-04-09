@@ -5,10 +5,10 @@ codeunit 160102 "Create CODA"
     begin
         ModifyBank(XNBL);
         InsertJnlTemplate(XNBL);
-        CreateGLAccounts;
+        CreateGLAccounts();
 
-        CodedTransactions;
-        CodedBankAccStatement;
+        CodedTransactions();
+        CodedBankAccStatement();
     end;
 
     var
@@ -70,16 +70,16 @@ codeunit 160102 "Create CODA"
 
     procedure CreateTrialData()
     begin
-        CreateGLAccounts;
+        CreateGLAccounts();
 
-        CodedTransactions;
+        CodedTransactions();
     end;
 
     procedure CreateEvaluationData()
     begin
         ModifyBank(XNBL);
         InsertJnlTemplate(XNBL);
-        CodedBankAccStatement;
+        CodedBankAccStatement();
     end;
 
     local procedure CreateGLAccounts()
@@ -113,31 +113,27 @@ codeunit 160102 "Create CODA"
     var
         GenJnlTemplate: Record "Gen. Journal Template";
     begin
-        with GenJnlTemplate do begin
-            Name := TemplateName;
-            Description := TemplateName;
-            Validate(Type, Type::Financial);
-            "Force Doc. Balance" := true;
-            "Bal. Account Type" := "Bal. Account Type"::"Bank Account";
-            "Bal. Account No." := TemplateName;
-            Insert();
-        end;
+        GenJnlTemplate.Name := TemplateName;
+        GenJnlTemplate.Description := TemplateName;
+        GenJnlTemplate.Validate(Type, GenJnlTemplate.Type::Financial);
+        GenJnlTemplate."Force Doc. Balance" := true;
+        GenJnlTemplate."Bal. Account Type" := GenJnlTemplate."Bal. Account Type"::"Bank Account";
+        GenJnlTemplate."Bal. Account No." := TemplateName;
+        GenJnlTemplate.Insert();
     end;
 
     procedure InsertGLAccount(GlAccount: Code[20]; VarName: Text[30])
     var
         GLAcc: Record "G/L Account";
     begin
-        with GLAcc do begin
-            Init();
-            "No." := GlAccount;
-            Name := VarName;
-            if "No." < '600000' then
-                "Income/Balance" := "Income/Balance"::"Balance Sheet";
+        GLAcc.Init();
+        GLAcc."No." := GlAccount;
+        GLAcc.Name := VarName;
+        if GLAcc."No." < '600000' then
+            GLAcc."Income/Balance" := GLAcc."Income/Balance"::"Balance Sheet";
 
-            if not Insert then
-                Modify();
-        end;
+        if not GLAcc.Insert() then
+            GLAcc.Modify();
     end;
 
     procedure CodedTransactions()
@@ -213,7 +209,7 @@ codeunit 160102 "Create CODA"
         CodedTrans."Account Type" := AccType;
         CodedTrans."Account No." := AccNo;
         CodedTrans.Description := Desc;
-        CodedTrans.Insert
+        CodedTrans.Insert();
     end;
 
     procedure CodedBankAccStatement()
@@ -393,7 +389,7 @@ codeunit 160102 "Create CODA"
     begin
         GLAccount.Get(GLAccountNo);
         GLAccountCategoryMgt.GetAccountCategory(GLAccountCategory, AccountCategoryValue);
-        GLAccount."Account Category" := GLAccountCategory."Account Category";
+        GLAccount."Account Category" := "G/L Account Category".FromInteger(GLAccountCategory."Account Category");
         GLAccount."Account Subcategory Entry No." := AccountSubcategoryEntryNo;
         GLAccount.Modify(true);
     end;

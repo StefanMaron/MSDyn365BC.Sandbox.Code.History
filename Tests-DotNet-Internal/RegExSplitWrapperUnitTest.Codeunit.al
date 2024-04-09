@@ -66,7 +66,7 @@ codeunit 132596 "RegEx Split Wrapper Unit Test"
         RegExSplitWrapper.Split('1;2;3;4;5;6', ';');
         // [WHEN] GetLength is called
         // [THEN] The correct length of that sting is returend
-        Assert.AreEqual(6, RegExSplitWrapper.GetLength, 'Wrong length of string');
+        Assert.AreEqual(6, RegExSplitWrapper.GetLength(), 'Wrong length of string');
     end;
 
     [Test]
@@ -97,7 +97,7 @@ codeunit 132596 "RegEx Split Wrapper Unit Test"
         RegExSplitWrapper.Split('', ';');
         // [WHEN] GetLength is called
         // [THEN] The array only contains one element
-        Assert.AreEqual(1, RegExSplitWrapper.GetLength, 'Array should only contain 1 element.');
+        Assert.AreEqual(1, RegExSplitWrapper.GetLength(), 'Array should only contain 1 element.');
     end;
 }
 

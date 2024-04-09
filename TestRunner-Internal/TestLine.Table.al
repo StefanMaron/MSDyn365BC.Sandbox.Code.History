@@ -1,6 +1,7 @@
 table 130021 "Test Line"
 {
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -30,7 +31,7 @@ table 130021 "Test Line"
                         end;
                 end;
 
-                UpdateLevelNo;
+                UpdateLevelNo();
             end;
         }
         field(4; "Test Codeunit"; Integer)
@@ -50,7 +51,7 @@ table 130021 "Test Line"
                     TestField("Test Codeunit", 0);
                 if AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Codeunit, "Test Codeunit") then
                     Name := AllObjWithCaption."Object Name";
-                UpdateLevelNo;
+                UpdateLevelNo();
             end;
         }
         field(5; Name; Text[128])
@@ -85,7 +86,7 @@ table 130021 "Test Line"
                     TestField("Function", '');
                     exit;
                 end;
-                UpdateLevelNo;
+                UpdateLevelNo();
                 Name := "Function";
             end;
         }
@@ -164,7 +165,7 @@ table 130021 "Test Line"
 
     trigger OnDelete()
     begin
-        DeleteChildren;
+        DeleteChildren();
     end;
 
     trigger OnInsert()
@@ -216,7 +217,7 @@ table 130021 "Test Line"
                 repeat
                     StepTestLine.Init();
                     StepTestLine.Name := CopyStr(TempCodeCoverage.Line, 1, MaxStrLen(StepTestLine.Name));
-                    StepTestLine.ExtractStepTypeFromName;
+                    StepTestLine.ExtractStepTypeFromName();
                     StepTestLine."Test Suite" := "Test Suite";
                     StepTestLine."Line No." += 1;
                     StepTestLine."Test Codeunit" := "Test Codeunit";
@@ -375,7 +376,7 @@ table 130021 "Test Line"
         ToLineNo: Integer;
     begin
         FromLineNo := "Line No." + 1;
-        ToLineNo := FindLastChildLineNo;
+        ToLineNo := FindLastChildLineNo();
         if (FromLineNo <= ToLineNo) or (ToLineNo = 0) then begin
             CopyOfTestLine.Copy(Rec);
             DeleteLinesInRange(FromLineNo, ToLineNo);

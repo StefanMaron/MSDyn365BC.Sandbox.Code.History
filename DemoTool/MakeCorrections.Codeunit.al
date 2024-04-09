@@ -13,11 +13,8 @@ codeunit 101908 "Make Corrections"
         CA: Codeunit "Make Adjustments";
         DocNo: Code[20];
         XSET1Q: Label 'SET-1Q';
-        XVAT1Q: Label 'VAT-1Q';
         XSET2Q: Label 'SET-2Q';
-        XVAT2Q: Label 'VAT-2Q';
         XSET3Q: Label 'SET-3Q';
-        XVAT3Q: Label 'VAT-3Q';
         XVATSettlement: Label 'VAT Settlement';
         XVATSET: Label 'VATSET';
         XSTART: Label 'START';

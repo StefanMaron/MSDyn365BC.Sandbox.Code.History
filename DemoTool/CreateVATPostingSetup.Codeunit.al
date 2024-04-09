@@ -3,55 +3,53 @@ codeunit 101325 "Create VAT Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            case "Company Type" of
-                "Company Type"::VAT:
-                    begin
-                        InsertData(XCC, XS0, 0, 1, '', '', 'E');
-                        InsertData(XCC, XS1, 6, 1, '', '995520', 'S');
-                        InsertData(XCC, XS3, 21, 1, '', '995520', 'S');
-                        InsertData(EUCode, XG0, 0, 1, '', '', 'E');
-                        InsertData(EUCode, XG1, 6, 1, '', '995520', 'S');
-                        InsertData(EUCode, XG2, 12, 1, '', '995520', 'S');
-                        InsertData(EUCode, GoodsVATCode, "Goods VAT Rate", 1, '', '995520', 'S');
-                        InsertData(EUCode, XI0, 0, 1, '', '', 'E');
-                        InsertData(EUCode, XI3, 21, 1, '', '995520', 'S');
-                        InsertData(EUCode, XS0, 0, 1, '', '', 'E');
-                        InsertData(EUCode, XS1, 6, 1, '', '995520', 'S');
-                        InsertData(EUCode, XS3, 21, 1, '', '995520', 'S');
-                        InsertData(XIMPEXP, XG0, 0, 0, '', '', 'E');
-                        InsertData(XIMPEXP, XG1, 0, 0, '', '', 'E');
-                        InsertData(XIMPEXP, XG2, 0, 0, '', '', 'E');
-                        InsertData(XIMPEXP, GoodsVATCode, 0, 0, '', '', 'E');
-                        InsertData(XIMPEXP, XI0, 0, 0, '', '', 'E');
-                        InsertData(XIMPEXP, XI3, 0, 0, '', '', 'E');
-                        InsertData(XIMPEXP, XS0, 0, 0, '', '', 'E');
-                        InsertData(XIMPEXP, XS1, 0, 0, '', '', 'E');
-                        InsertData(XIMPEXP, XS3, 0, 0, '', '', 'E');
-                        InsertData(XIMPREV, XG0, 0, 1, '', '', 'E');
-                        InsertData(XIMPREV, XG1, 6, 1, '', '995520', 'S');
-                        InsertData(XIMPREV, XG2, 12, 1, '', '995520', 'S');
-                        InsertData(XIMPREV, GoodsVATCode, "Goods VAT Rate", 1, '', '995520', 'S');
-                        InsertData(XIMPREV, XI0, 0, 1, '', '', 'E');
-                        InsertData(XIMPREV, XI3, 21, 1, '', '995520', 'S');
-                        InsertData(XIMPREV, XS0, 0, 0, '', '', 'E');
-                        InsertData(XIMPREV, XS1, 6, 1, '', '995520', 'S');
-                        InsertData(XIMPREV, XS3, 21, 1, '', '995520', 'S');
-                        InsertData(DomesticCode, XG0, 0, 0, '', '', 'E');
-                        InsertData(DomesticCode, XG1, 6, 0, '995510', '995520', 'S');
-                        InsertData(DomesticCode, XG2, 12, 0, '995510', '995520', 'S');
-                        InsertData(DomesticCode, GoodsVATCode, "Goods VAT Rate", 0, '995510', '995520', 'S');
-                        InsertData(DomesticCode, XI0, 0, 0, '', '', 'E');
-                        InsertData(DomesticCode, XI3, 21, 0, '995510', '995520', 'S');
-                        InsertData(DomesticCode, XS0, 0, 0, '', '', 'E');
-                        InsertData(DomesticCode, XS1, 6, 0, '995510', '995520', 'S');
-                        InsertData(DomesticCode, XS3, 21, 0, '995510', '995520', 'S');
-                        InsertData(DomesticCode, XVAT, 0, 2, '995510', '995520', 'E');
-                    end;
-                "Company Type"::"Sales Tax":
-                    InsertSalesTaxData('E');
-            end;
+        DemoDataSetup.Get();
+        case DemoDataSetup."Company Type" of
+            DemoDataSetup."Company Type"::VAT:
+                begin
+                    InsertData(XCC, XS0, 0, 1, '', '', 'E');
+                    InsertData(XCC, XS1, 6, 1, '', '995520', 'S');
+                    InsertData(XCC, XS3, 21, 1, '', '995520', 'S');
+                    InsertData(DemoDataSetup.EUCode(), XG0, 0, 1, '', '', 'E');
+                    InsertData(DemoDataSetup.EUCode(), XG1, 6, 1, '', '995520', 'S');
+                    InsertData(DemoDataSetup.EUCode(), XG2, 12, 1, '', '995520', 'S');
+                    InsertData(DemoDataSetup.EUCode(), DemoDataSetup.GoodsVATCode(), DemoDataSetup."Goods VAT Rate", 1, '', '995520', 'S');
+                    InsertData(DemoDataSetup.EUCode(), XI0, 0, 1, '', '', 'E');
+                    InsertData(DemoDataSetup.EUCode(), XI3, 21, 1, '', '995520', 'S');
+                    InsertData(DemoDataSetup.EUCode(), XS0, 0, 1, '', '', 'E');
+                    InsertData(DemoDataSetup.EUCode(), XS1, 6, 1, '', '995520', 'S');
+                    InsertData(DemoDataSetup.EUCode(), XS3, 21, 1, '', '995520', 'S');
+                    InsertData(XIMPEXP, XG0, 0, 0, '', '', 'E');
+                    InsertData(XIMPEXP, XG1, 0, 0, '', '', 'E');
+                    InsertData(XIMPEXP, XG2, 0, 0, '', '', 'E');
+                    InsertData(XIMPEXP, DemoDataSetup.GoodsVATCode(), 0, 0, '', '', 'E');
+                    InsertData(XIMPEXP, XI0, 0, 0, '', '', 'E');
+                    InsertData(XIMPEXP, XI3, 0, 0, '', '', 'E');
+                    InsertData(XIMPEXP, XS0, 0, 0, '', '', 'E');
+                    InsertData(XIMPEXP, XS1, 0, 0, '', '', 'E');
+                    InsertData(XIMPEXP, XS3, 0, 0, '', '', 'E');
+                    InsertData(XIMPREV, XG0, 0, 1, '', '', 'E');
+                    InsertData(XIMPREV, XG1, 6, 1, '', '995520', 'S');
+                    InsertData(XIMPREV, XG2, 12, 1, '', '995520', 'S');
+                    InsertData(XIMPREV, DemoDataSetup.GoodsVATCode(), DemoDataSetup."Goods VAT Rate", 1, '', '995520', 'S');
+                    InsertData(XIMPREV, XI0, 0, 1, '', '', 'E');
+                    InsertData(XIMPREV, XI3, 21, 1, '', '995520', 'S');
+                    InsertData(XIMPREV, XS0, 0, 0, '', '', 'E');
+                    InsertData(XIMPREV, XS1, 6, 1, '', '995520', 'S');
+                    InsertData(XIMPREV, XS3, 21, 1, '', '995520', 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), XG0, 0, 0, '', '', 'E');
+                    InsertData(DemoDataSetup.DomesticCode(), XG1, 6, 0, '995510', '995520', 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), XG2, 12, 0, '995510', '995520', 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.GoodsVATCode(), DemoDataSetup."Goods VAT Rate", 0, '995510', '995520', 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), XI0, 0, 0, '', '', 'E');
+                    InsertData(DemoDataSetup.DomesticCode(), XI3, 21, 0, '995510', '995520', 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), XS0, 0, 0, '', '', 'E');
+                    InsertData(DemoDataSetup.DomesticCode(), XS1, 6, 0, '995510', '995520', 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), XS3, 21, 0, '995510', '995520', 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), XVAT, 0, 2, '995510', '995520', 'E');
+                end;
+            DemoDataSetup."Company Type"::"Sales Tax":
+                InsertSalesTaxData('E');
         end;
     end;
 

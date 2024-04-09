@@ -1,6 +1,7 @@
 table 130202 "Test Result"
 {
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -95,9 +96,9 @@ table 130202 "Test Result"
         if TestCodeunit.Get(CodId) then
             File := TestCodeunit.File;
 
-        Database := BackupMgt.GetDatabase;
+        Database := BackupMgt.GetDatabase();
 
-        Insert
+        Insert();
     end;
 
     [Scope('OnPrem')]
@@ -122,7 +123,7 @@ table 130202 "Test Result"
 
         "Execution Time" := Duration;
         Restore := IsRestored;
-        Modify
+        Modify();
     end;
 
     [Scope('OnPrem')]

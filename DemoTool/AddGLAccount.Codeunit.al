@@ -21,7 +21,7 @@ codeunit 117559 "Add G/L Account"
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
           GLAccountCategory."Account Category"::Income, GLAccountCategoryMgt.GetIncomeService());
         CreateGLAccount.AssignSubcategoryToChartOfAccounts(GLAccountCategory);
-        GLAccIndent.Indent;
+        GLAccIndent.Indent();
     end;
 
     var
@@ -35,15 +35,10 @@ codeunit 117559 "Add G/L Account"
         XSERVICES: Label 'SERVICES';
         XPrepaidSoftwareContractslc: Label 'Prepaid Software Contracts';
         XPREPAIDSOFTWARECONTRACTS: Label 'PREPAID SOFTWARE CONTRACTS';
-        XTotalPrepaidServiceContractlc: Label 'Total Prepaid Service Contract';
-        TOTALXPREPAIDSERVICECONTRACT: Label 'TOTAL PREPAID SERVICE CONTRACT';
         XSalesofServiceContractslc: Label 'Sales of Service Contracts';
         XSALESOFSERVICECONTRACTS: Label 'SALES OF SERVICE CONTRACTS';
         XServiceContractSalelc: Label 'Service Contract Sale';
         XSERVICECONTRACTSALE: Label 'SERVICE CONTRACT SALE';
-        XTotalSaleofServContractslc: Label 'Total Sale of Serv. Contracts';
-        XTOTALSALEOFSERVCONTRACTS: Label 'TOTAL SALE OF SERV. CONTRACTS';
-        XVAT10: Label 'VAT10';
         MakeAdjustments: Codeunit "Make Adjustments";
         CreateGLAccount: Codeunit "Create G/L Account";
         GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";

@@ -3,23 +3,21 @@ codeunit 101324 "Create VAT Prod. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Company Type" = "Company Type"::VAT then begin
-                TestField("Goods VAT Rate");
-                TestField("Services VAT Rate");
-                InsertData(XG0, XGoodsNoVAT);
-                InsertData(XG1, XGoods6PERCENTVAT);
-                InsertData(XG2, XGoods12PERCENTVAT);
-                InsertData(GoodsVATCode, XGoods21PERCENTVAT);
-                InsertData(XS0, XServicesNoVAT);
-                InsertData(XS1, XServices6PERCENTVAT);
-                InsertData(ServicesVATCode, XServices21PERCENTVAT);
-                InsertData(XI0, XInvestments0PERCENTVAT);
-                InsertData(XI3, XInvestments21PERCENTVAT);
-                InsertData(XVAT, XOnlyVAT);
-                InsertData(NoVATCode, XMiscellaneousWithoutVAT);
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then begin
+            DemoDataSetup.TestField("Goods VAT Rate");
+            DemoDataSetup.TestField("Services VAT Rate");
+            InsertData(XG0, XGoodsNoVAT);
+            InsertData(XG1, XGoods6PERCENTVAT);
+            InsertData(XG2, XGoods12PERCENTVAT);
+            InsertData(DemoDataSetup.GoodsVATCode(), XGoods21PERCENTVAT);
+            InsertData(XS0, XServicesNoVAT);
+            InsertData(XS1, XServices6PERCENTVAT);
+            InsertData(DemoDataSetup.ServicesVATCode(), XServices21PERCENTVAT);
+            InsertData(XI0, XInvestments0PERCENTVAT);
+            InsertData(XI3, XInvestments21PERCENTVAT);
+            InsertData(XVAT, XOnlyVAT);
+            InsertData(DemoDataSetup.NoVATCode(), XMiscellaneousWithoutVAT);
         end;
     end;
 

@@ -2,6 +2,7 @@ table 122002 "Quantity Allocation Buffer"
 {
     Caption = 'Quantity Allocation Buffer';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

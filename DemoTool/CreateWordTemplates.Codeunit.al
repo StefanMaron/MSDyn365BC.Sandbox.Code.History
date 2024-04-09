@@ -11,15 +11,6 @@ codeunit 101403 "Create Word Templates"
     end;
 
     local procedure InsertWordTemplates()
-    var
-        DemoDataSetup: Record "Demo Data Setup";
-        WordTemplate: Record "Word Template";
-        File: File;
-        LayoutInStream: InStream;
-        LayoutOutStream: OutStream;
-        XmlPartOutStream: OutStream;
-        FilePath: Text;
-        WordXmlPart: Text;
     begin
         // French (Belgian) - FRB
         InsertWordTemplate('EVENT-FR', CustomerEventLbl, Database::Customer, 'WordTemplates\WordTemplate_Customer_Event_FRB.docx', 'FRB');
@@ -35,7 +26,6 @@ codeunit 101403 "Create Word Templates"
     local procedure InsertWordTemplate(Code: Code[30]; Name: Text[250]; TableId: Integer; TemplateFile: Text; LanguageCode: Code[10])
     var
         WordTemplate: Record "Word Template";
-        Language: Codeunit Language;
     begin
         if WordTemplate.Get(Code) then
             exit;

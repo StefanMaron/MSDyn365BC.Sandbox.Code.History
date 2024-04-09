@@ -5,11 +5,11 @@
     begin
         InventorySetup.Get();
         "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM1, XPartiallyManufactured, '70000', '70099', '70060', '70095', 1);
-        "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM2, XPaint, '70100', '70199', '70104', '70195', 1, true);
-        "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM3, XLooseHardware, '70200', '70299', '70201', '70295', 1, true);
-        "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM4, XFinished, '1896-S', '2996-S', '2000-S', '', 4, true);
-        "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM5, XAssemblyBOM, '1924-W', '2096-W', '1992-W', '', 4, true);
-        "Create No. Series".InitBaseSeries(InventorySetup."Nonstock Item Nos.", XNSITEM, XNonStockItems, XNS0001, XNS0100, XNS0000, XNS0095, 1, true);
+        "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM2, XPaint, '70100', '70199', '70104', '70195', 1, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM3, XLooseHardware, '70200', '70299', '70201', '70295', 1, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM4, XFinished, '1896-S', '2996-S', '2000-S', '', 4, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM5, XAssemblyBOM, '1924-W', '2096-W', '1992-W', '', 4, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitBaseSeries(InventorySetup."Nonstock Item Nos.", XNSITEM, XNonStockItems, XNS0001, XNS0100, '', XNS0095, 1, Enum::"No. Series Implementation"::Sequence);
         InventorySetup."Item Nos." := XITEM1;
         InventorySetup."Nonstock Item Nos." := XNSITEM;
         "Create No. Series".InsertRelation(XITEM1, XITEM2);
@@ -23,31 +23,31 @@
           InventorySetup."Posted Direct Trans. Nos.", XDirectTrans, XPostedDirectTransfer, XPDT000001, XPDT999999, '', '', 1);
 
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Inventory Put-away Nos.", XIPut, XInventoryPutaway, XIPU000001, XIPU999999, '', '', 1, true);
+          InventorySetup."Inventory Put-away Nos.", XIPut, XInventoryPutaway, XIPU000001, XIPU999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Inventory Pick Nos.", XIPick, XInventoryPick, XIPI000001, XIPI999999, '', '', 1, true);
+          InventorySetup."Inventory Pick Nos.", XIPick, XInventoryPick, XIPI000001, XIPI999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Inventory Movement Nos.", XIMOVEMENT, XInventoryMovement, XIM000001, XIM999999, '', '', 1, true);
+          InventorySetup."Inventory Movement Nos.", XIMOVEMENT, XInventoryMovement, XIM000001, XIM999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Posted Invt. Put-away Nos.", XIPutPLUS, XPostedInvtPutaway, XPPU000001, XPPU999999, '', '', 1, true);
+          InventorySetup."Posted Invt. Put-away Nos.", XIPutPLUS, XPostedInvtPutaway, XPPU000001, XPPU999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Posted Invt. Pick Nos.", XIPickPLUS, XPostedInvtPick, XPPI000001, XPPI999999, '', '', 1, true);
+          InventorySetup."Posted Invt. Pick Nos.", XIPickPLUS, XPostedInvtPick, XPPI000001, XPPI999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Registered Invt. Movement Nos.", XIMOVEPLUS, XRegisteredInvtMovement, XRIM000001, XRIM999999, '', '', 1, true);
+          InventorySetup."Registered Invt. Movement Nos.", XIMOVEPLUS, XRegisteredInvtMovement, XRIM000001, XRIM999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Internal Movement Nos.", XINTMOVE, XInternalMovement, XINTM000001, XINTM999999, '', '', 1, true);
+          InventorySetup."Internal Movement Nos.", XINTMOVE, XInternalMovement, XINTM000001, XINTM999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Phys. Invt. Order Nos.", XPHYSINV, XPhysicalInventoryOrder, XPHIO00001, XPHIO99999, '', '', 1, true);
+          InventorySetup."Phys. Invt. Order Nos.", XPHYSINV, XPhysicalInventoryOrder, XPHIO00001, XPHIO99999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Posted Phys. Invt. Order Nos.", XPHYSINVPLUS, XPostedPhysInventOrder, XPPHI00001, XPPHI99999, '', '', 1, true);
+          InventorySetup."Posted Phys. Invt. Order Nos.", XPHYSINVPLUS, XPostedPhysInventOrder, XPPHI00001, XPPHI99999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Invt. Receipt Nos.", XIReceipt, XInventoryReceipt, XIR000001, XIR999999, '', '', 1, true);
+          InventorySetup."Invt. Receipt Nos.", XIReceipt, XInventoryReceipt, XIR000001, XIR999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Posted Invt. Receipt Nos.", XIReceiptPLUS, XPostedInventoryReceipt, XPIR000001, XPIR999999, '', '', 1, true);
+          InventorySetup."Posted Invt. Receipt Nos.", XIReceiptPLUS, XPostedInventoryReceipt, XPIR000001, XPIR999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Invt. Shipment Nos.", XIShipment, XInventoryShipment, XIS000001, XIS999999, '', '', 1, true);
+          InventorySetup."Invt. Shipment Nos.", XIShipment, XInventoryShipment, XIS000001, XIS999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          InventorySetup."Posted Invt. Shipment Nos.", XIShipmentPLUS, XPostedInventoryShipment, XPIS000001, XPIS999999, '', '', 1, true);
+          InventorySetup."Posted Invt. Shipment Nos.", XIShipmentPLUS, XPostedInventoryShipment, XPIS000001, XPIS999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
 
         InventorySetup.Validate("Invt. Cost Jnl. Template Name", XGENERAL);
         InventorySetup.Validate("Invt. Cost Jnl. Batch Name", XDEFAULT);
@@ -104,7 +104,6 @@
         XPostedInvtPick: Label 'Posted Invt. Pick';
         XPPI000001: Label 'PPI000001';
         XPPI999999: Label 'PPI999999';
-        XNS0000: Label 'NS0000';
         XNS0095: Label 'NS0095';
         XIMOVEPLUS: Label 'I-MOVE+';
         XRegisteredInvtMovement: Label 'Registered Invt. Movement';
@@ -144,8 +143,8 @@
     procedure InsertMiniAppData()
     begin
         InventorySetup.Get();
-        "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEMTxt, XItemNoSeriesTxt, '1000', '9999', '', '9995', 1, true);
-        "Create No. Series".InitBaseSeries(InventorySetup."Nonstock Item Nos.", XNSITEM, XNonStockItems, XNS0001, XNS0100, XNS0000, XNS0095, 1, true);
+        "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEMTxt, XItemNoSeriesTxt, '1000', '9999', '', '9995', 1, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitBaseSeries(InventorySetup."Nonstock Item Nos.", XNSITEM, XNonStockItems, XNS0001, XNS0100, '', XNS0095, 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitFinalSeries(InventorySetup."Posted Transfer Shpt. Nos.", XTSHPT, XTransferShipment, 8);
         "Create No. Series".InitFinalSeries(InventorySetup."Posted Transfer Rcpt. Nos.", XTRCPT, XTransferReceipt, 9);
         "Create No. Series".InitTempSeries(InventorySetup."Transfer Order Nos.", XTORD, XTransferOrder);

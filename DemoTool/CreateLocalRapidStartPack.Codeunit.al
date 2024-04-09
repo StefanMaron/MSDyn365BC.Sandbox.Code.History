@@ -15,7 +15,7 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         ExportProtocol: Record "Export Protocol";
     begin
-        if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then begin
+        if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then begin
             CreateTable(DATABASE::"Transaction Specification");
             CreateConfigPackageHelper.SetParentTableID(DATABASE::"Bank Acc. Reconciliation", DATABASE::"General Ledger Setup");
             CreateConfigPackageHelper.SetParentTableID(DATABASE::"Sales Header", DATABASE::"Sales & Receivables Setup");

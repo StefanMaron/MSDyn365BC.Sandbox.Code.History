@@ -3,15 +3,13 @@ codeunit 101323 "Create VAT Bus. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Company Type" = "Company Type"::VAT then begin
-                InsertData(DomesticCode, XDomesticcustomersandvendors);
-                InsertData(EUCode, XCustomersandvendorsinEU);
-                InsertData(XIMPEXP, XOthercustomersandvendorsnotEU);
-                InsertData(XIMPREV, XImportReverseChargeVAT);
-                InsertData(XCC, XCocontractor);
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then begin
+            InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors); // BE
+            InsertData(DemoDataSetup.EUCode(), XCustomersandvendorsinEU);
+            InsertData(XIMPEXP, XOthercustomersandvendorsnotEU);
+            InsertData(XIMPREV, XImportReverseChargeVAT);
+            InsertData(XCC, XCocontractor);
         end;
     end;
 
@@ -38,7 +36,7 @@ codeunit 101323 "Create VAT Bus. Posting Gr."
     procedure GetDomesticVATGroup(): Code[10]
     begin
         DemoDataSetup.Get();
-        exit(DemoDataSetup.DomesticCode);
+        exit(DemoDataSetup.DomesticCode());
     end;
 }
 

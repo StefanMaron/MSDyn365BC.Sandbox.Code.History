@@ -15,16 +15,14 @@ codeunit 101620 "Create Human Resources Uom"
 
     procedure InsertData(CodeParam: Code[10]; QtyParam: Decimal; BaseUoM: Boolean)
     begin
-        with HRUoM do begin
-            Init();
-            Code := CodeParam;
-            "Qty. per Unit of Measure" := QtyParam;
-            Insert();
-            if BaseUoM then begin
-                HRSetUp.Get();
-                HRSetUp.Validate("Base Unit of Measure", Code);
-                HRSetUp.Modify();
-            end;
+        HRUoM.Init();
+        HRUoM.Code := CodeParam;
+        HRUoM."Qty. per Unit of Measure" := QtyParam;
+        HRUoM.Insert();
+        if BaseUoM then begin
+            HRSetUp.Get();
+            HRSetUp.Validate("Base Unit of Measure", HRUoM.Code);
+            HRSetUp.Modify();
         end;
     end;
 }

@@ -27,7 +27,7 @@ codeunit 101287 "Create C/V Bank Account"
           '', '', XCOM, XCommerzBank, XYvonneSchleger, XEickelscheidt67, 'DE-40593', XDE, XEUR, XDEU,
           X49210267511, X49210368024, X6000, X6000600000, '', '');
 
-        PostInsertData;
+        PostInsertData();
     end;
 
     var
@@ -60,15 +60,7 @@ codeunit 101287 "Create C/V Bank Account"
         X44296151727: Label '+44 296 151727';
         XGB54BARC20992012345678: Label 'GB 54 BARC 20992012345678';
         XGB29NWBK60161331926819: Label 'GB 29 NWBK 60161331926819';
-        XANT: Label 'ANT';
-        XAntwerp: Label 'Antwerp';
-        XDavidJaffe: Label 'David Jaffe';
-        XFrankrijklei10: Label 'Frankrijklei 10';
-        XBE: Label 'BE';
         XEUR: Label 'EUR';
-        XNLB: Label 'NLB';
-        X3232322093: Label '+32 3 232 20 93';
-        X3232339287: Label '+32 3 233 92 87';
         XUTR: Label 'UTR';
         XUtrecht: Label 'Utrecht';
         XDavidDollas: Label 'David Dollas';
@@ -109,8 +101,6 @@ codeunit 101287 "Create C/V Bank Account"
         X1100100000: Label '1100 100000';
         X1200: Label '1200';
         X1200100000: Label '1200 100000';
-        X2000: Label '2000';
-        X2000200000: Label '2000 200000';
         X3000: Label '3000';
         X3000300000: Label '3000 300000';
         X4000: Label '4000';
