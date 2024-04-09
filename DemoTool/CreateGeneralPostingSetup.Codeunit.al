@@ -3,39 +3,36 @@ codeunit 101252 "Create General Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            AdjustForPmtDisc := "Adjust for Payment Discount";
-            InsertData('', MiscCode, '', '');
-            InsertData('', NoVATCode, '', '');
-            InsertData('', RawMatCode, '', '');
-            InsertData('', RetailCode, '', '');
-            InsertData('', ServicesCode, '', '');
-            InsertData('', ManufactCode, '', '');
-            InsertData(DomesticCode, MiscCode, '', '');
-            InsertData(DomesticCode, NoVATCode, '', '');
-            InsertData(DomesticCode, RawMatCode, '996210', '997210');
-            InsertData(DomesticCode, RetailCode, '996110', '997110');
-            InsertData(DomesticCode, ServicesCode, '996410', '997110');
-            InsertData(DomesticCode, ManufactCode, '996110', '997110');
-            InsertData(EUCode, MiscCode, '', '');
-            InsertData(EUCode, NoVATCode, '', '');
-            InsertData(EUCode, RawMatCode, '996430', '997230');
-            InsertData(EUCode, RetailCode, '996430', '997230');
-            InsertData(EUCode, ServicesCode, '996430', '997230');
-            InsertData(EUCode, ManufactCode, '996430', '997230');
-            InsertData(ExportCode, MiscCode, '', '');
-            InsertData(ExportCode, NoVATCode, '', '');
-            InsertData(ExportCode, RawMatCode, '996230', '997230');
-            InsertData(ExportCode, RetailCode, '996130', '997130');
-            InsertData(ExportCode, ServicesCode, '996430', '997130');
-            InsertData(ExportCode, ManufactCode, '996130', '997130');
-        end;
+        DemoDataSetup.Get();
+        AdjustForPmtDisc := DemoDataSetup."Adjust for Payment Discount";
+        InsertData('', DemoDataSetup.MiscCode(), '', '');
+        InsertData('', DemoDataSetup.NoVATCode(), '', '');
+        InsertData('', DemoDataSetup.RawMatCode(), '', '');
+        InsertData('', DemoDataSetup.RetailCode(), '', '');
+        InsertData('', DemoDataSetup.ServicesCode(), '', '');
+        InsertData('', DemoDataSetup.ManufactCode(), '', '');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), '', '');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.NoVATCode(), '', '');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.RawMatCode(), '996210', '997210');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), '996110', '997110');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesCode(), '996410', '997110');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.ManufactCode(), '996110', '997110');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.MiscCode(), '', '');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.NoVATCode(), '', '');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.RawMatCode(), '996430', '997230');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.RetailCode(), '996430', '997230');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.ServicesCode(), '996430', '997230');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.ManufactCode(), '996430', '997230');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.MiscCode(), '', '');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.NoVATCode(), '', '');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.RawMatCode(), '996230', '997230');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.RetailCode(), '996130', '997130');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.ServicesCode(), '996430', '997130');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.ManufactCode(), '996130', '997130');
     end;
 
     var
         GeneralPostingSetup: Record "General Posting Setup";
-        GeneralBusPostingGr: Record "Gen. Business Posting Group";
         DemoDataSetup: Record "Demo Data Setup";
         GetGLAccNo: Codeunit "Create G/L Account";
         CA: Codeunit "Make Adjustments";
@@ -43,111 +40,109 @@ codeunit 101252 "Create General Posting Setup"
 
     procedure InsertMiniAppData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            AdjustForPmtDisc := false;
-            InsertData2('', ManufactCode(), '', '');
-            InsertData2('', RetailCode, '', '');
-            InsertData2('', RawMatCode, '', '');
-            InsertData2('', ServicesCode, '', '');
-            InsertData2('', MiscCode(), '', '');
-            InsertData2('', NonGST(), '', '');
-            InsertData2(DomesticCode, ManufactCode, GetGLAccNo.SalesRetailDom(), GetGLAccNo.PurchRetailDom());
-            InsertData2(DomesticCode, RawMatCode(), GetGLAccNo.SalesRawMaterialsDom(), GetGLAccNo.PurchRawMaterialsDom());
-            InsertData2(DomesticCode, RetailCode, GetGLAccNo.SalesRetailDom(), GetGLAccNo.PurchRetailDom());
-            InsertData2(DomesticCode, ServicesCode, GetGLAccNo.SalesResourcesDom(), GetGLAccNo.PurchRetailDom());
-            InsertData2(DomesticCode, MiscCode(), GetGLAccNo.SalesRetailDom(), GetGLAccNo.PurchRetailDom());
-            InsertData2(DomesticCode, NonGST(), GetGLAccNo.SalesRetailDom(), GetGLAccNo.PurchRetailDom());
-            InsertData2(ExportCode, ManufactCode, GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
-            InsertData2(ExportCode, RawMatCode, GetGLAccNo.SalesRawMaterialsExport(), GetGLAccNo.PurchRawMaterialsExport());
-            InsertData2(ExportCode, RetailCode, GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
-            InsertData2(ExportCode, ServicesCode, GetGLAccNo.SalesResourcesExport(), GetGLAccNo.PurchRetailExport());
-            InsertData2(ExportCode, MiscCode(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
-            InsertData2(ExportCode, NonGST(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
-            InsertData2(InterCompCode, ManufactCode, GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
-            InsertData2(InterCompCode, RawMatCode, GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
-            InsertData2(InterCompCode, RetailCode, GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
-            InsertData2(InterCompCode, ServicesCode, GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
-            InsertData2(InterCompCode, MiscCode(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
-            InsertData2(InterCompCode, NonGST(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
-            if GeneralPostingSetup.FindSet() then
-                repeat
-                    Case GeneralPostingSetup."Gen. Bus. Posting Group" of
-                        DomesticCode:
-                            Case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                                RawMatCode:
-                                    begin
-                                        GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRawmat());
-                                        GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedRawmat());
-                                        GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceRawmat());
-                                    end;
-                                MiscCode(),
-                                NonGST,
-                                RetailCode():
-                                    begin
-                                        GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRetail());
-                                        GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedRetail());
-                                        GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceRetail());
-                                    end;
-
-                                ManufactCode():
-                                    begin
-                                        GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRetail());
-                                        GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedCap());
-                                        GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceCap());
-                                    end;
-                                ServicesCode():
-                                    begin
-                                        GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedCap());
-                                        GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedCap());
-                                        GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceCap());
-                                    end;
-                            end;
-                        ExportCode():
-                            Case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                                ServicesCode(),
-                                MiscCode(),
-                                RawMatCode:
-                                    begin
-                                        GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRetail());
-                                        GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedRetail());
-                                        GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceRetail());
-                                    end;
-                                RetailCode():
-                                    begin
-                                        GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedCap());
-                                        GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedCap());
-                                        GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceCap());
-                                    end;
-                                ManufactCode():
-                                    begin
-                                        GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRetail());
-                                        GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedCap());
-                                        GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceCap());
-                                    end;
-                                NonGST():
-                                    begin
-                                        GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRawmat());
-                                        GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedRawmat());
-                                        GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceRawmat());
-                                    end;
-                            end;
-                        InterCompCode():
-                            Case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                                RawMatCode:
-                                    GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.OverheadAppliedRawmat());
-                                MiscCode(),
-                                NonGST(),
-                                RetailCode():
+        DemoDataSetup.Get();
+        AdjustForPmtDisc := false;
+        InsertData2('', DemoDataSetup.ManufactCode(), '', '');
+        InsertData2('', DemoDataSetup.RetailCode(), '', '');
+        InsertData2('', DemoDataSetup.RawMatCode(), '', '');
+        InsertData2('', DemoDataSetup.ServicesCode(), '', '');
+        InsertData2('', DemoDataSetup.MiscCode(), '', '');
+        InsertData2('', DemoDataSetup.NonGST(), '', '');
+        InsertData2(DemoDataSetup.DomesticCode(), DemoDataSetup.ManufactCode(), GetGLAccNo.SalesRetailDom(), GetGLAccNo.PurchRetailDom());
+        InsertData2(DemoDataSetup.DomesticCode(), DemoDataSetup.RawMatCode(), GetGLAccNo.SalesRawMaterialsDom(), GetGLAccNo.PurchRawMaterialsDom());
+        InsertData2(DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), GetGLAccNo.SalesRetailDom(), GetGLAccNo.PurchRetailDom());
+        InsertData2(DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesCode(), GetGLAccNo.SalesResourcesDom(), GetGLAccNo.PurchRetailDom());
+        InsertData2(DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), GetGLAccNo.SalesRetailDom(), GetGLAccNo.PurchRetailDom());
+        InsertData2(DemoDataSetup.DomesticCode(), DemoDataSetup.NonGST(), GetGLAccNo.SalesRetailDom(), GetGLAccNo.PurchRetailDom());
+        InsertData2(DemoDataSetup.ExportCode(), DemoDataSetup.ManufactCode(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
+        InsertData2(DemoDataSetup.ExportCode(), DemoDataSetup.RawMatCode(), GetGLAccNo.SalesRawMaterialsExport(), GetGLAccNo.PurchRawMaterialsExport());
+        InsertData2(DemoDataSetup.ExportCode(), DemoDataSetup.RetailCode(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
+        InsertData2(DemoDataSetup.ExportCode(), DemoDataSetup.ServicesCode(), GetGLAccNo.SalesResourcesExport(), GetGLAccNo.PurchRetailExport());
+        InsertData2(DemoDataSetup.ExportCode(), DemoDataSetup.MiscCode(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
+        InsertData2(DemoDataSetup.ExportCode(), DemoDataSetup.NonGST(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
+        InsertData2(DemoDataSetup.InterCompCode(), DemoDataSetup.ManufactCode(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
+        InsertData2(DemoDataSetup.InterCompCode(), DemoDataSetup.RawMatCode(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
+        InsertData2(DemoDataSetup.InterCompCode(), DemoDataSetup.RetailCode(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
+        InsertData2(DemoDataSetup.InterCompCode(), DemoDataSetup.ServicesCode(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
+        InsertData2(DemoDataSetup.InterCompCode(), DemoDataSetup.MiscCode(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
+        InsertData2(DemoDataSetup.InterCompCode(), DemoDataSetup.NonGST(), GetGLAccNo.SalesRetailExport(), GetGLAccNo.PurchRetailExport());
+        if GeneralPostingSetup.FindSet() then
+            repeat
+                case GeneralPostingSetup."Gen. Bus. Posting Group" of
+                    DemoDataSetup.DomesticCode():
+                        Case GeneralPostingSetup."Gen. Prod. Posting Group" of
+                            DemoDataSetup.RawMatCode():
+                                begin
+                                    GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRawmat());
+                                    GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedRawmat());
+                                    GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceRawmat());
+                                end;
+                            DemoDataSetup.MiscCode(),
+                            DemoDataSetup.NonGST(),
+                            DemoDataSetup.RetailCode():
+                                begin
                                     GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRetail());
-                                ServicesCode(),
-                                ManufactCode():
+                                    GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedRetail());
+                                    GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceRetail());
+                                end;
+
+                            DemoDataSetup.ManufactCode():
+                                begin
+                                    GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRetail());
+                                    GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedCap());
+                                    GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceCap());
+                                end;
+                            DemoDataSetup.ServicesCode():
+                                begin
                                     GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedCap());
-                            end;
-                    end;
-                    GeneralPostingSetup.Modify();
-                until GeneralPostingSetup.Next() = 0;
-        end;
+                                    GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedCap());
+                                    GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceCap());
+                                end;
+                        end;
+                    DemoDataSetup.ExportCode():
+                        case GeneralPostingSetup."Gen. Prod. Posting Group" of
+                            DemoDataSetup.ServicesCode(),
+                            DemoDataSetup.MiscCode(),
+                            DemoDataSetup.RawMatCode():
+                                begin
+                                    GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRetail());
+                                    GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedRetail());
+                                    GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceRetail());
+                                end;
+                            DemoDataSetup.RetailCode():
+                                begin
+                                    GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedCap());
+                                    GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedCap());
+                                    GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceCap());
+                                end;
+                            DemoDataSetup.ManufactCode():
+                                begin
+                                    GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRetail());
+                                    GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedCap());
+                                    GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceCap());
+                                end;
+                            DemoDataSetup.NonGST():
+                                begin
+                                    GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRawmat());
+                                    GeneralPostingSetup.Validate("Overhead Applied Account", GetGLAccNo.OverheadAppliedRawmat());
+                                    GeneralPostingSetup.Validate("Purchase Variance Account", GetGLAccNo.PurchaseVarianceRawmat());
+                                end;
+                        end;
+                    DemoDataSetup.InterCompCode():
+                        case GeneralPostingSetup."Gen. Prod. Posting Group" of
+                            DemoDataSetup.RawMatCode():
+                                GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.OverheadAppliedRawmat());
+                            DemoDataSetup.MiscCode(),
+                            DemoDataSetup.NonGST(),
+                            DemoDataSetup.RetailCode():
+                                GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedRetail());
+                            DemoDataSetup.ServicesCode(),
+                            DemoDataSetup.ManufactCode():
+                                GeneralPostingSetup.Validate("Direct Cost Applied Account", GetGLAccNo.DirectCostAppliedCap());
+                        end;
+                end;
+                GeneralPostingSetup.Modify();
+            until GeneralPostingSetup.Next() = 0;
     end;
 
     procedure InsertData(GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; SalesAccount: Code[20]; PurchaseAccount: Code[20])
@@ -159,13 +154,13 @@ codeunit 101252 "Create General Posting Setup"
         GeneralPostingSetup.Validate("Sales Credit Memo Account", CA.Convert(SalesAccount));
         GeneralPostingSetup.Validate("Purch. Account", CA.Convert(PurchaseAccount));
         GeneralPostingSetup.Validate("Purch. Credit Memo Account", CA.Convert(PurchaseAccount));
-        UpdatePmtDiscAccounts;
-        UpdatePmtTolAccounts;
-        UpdatePrepmtAccounts;
-        UpdateInvDiscAccounts;
+        UpdatePmtDiscAccounts();
+        UpdatePmtTolAccounts();
+        UpdatePrepmtAccounts();
+        UpdateInvDiscAccounts();
 
         case GeneralPostingSetup."Gen. Prod. Posting Group" of
-            DemoDataSetup.RawMatCode:
+            DemoDataSetup.RawMatCode():
                 begin
                     GeneralPostingSetup.Validate("COGS Account", CA.Convert('997290'));
                     GeneralPostingSetup.Validate("COGS Account (Interim)", CA.Convert('992132'));
@@ -173,9 +168,9 @@ codeunit 101252 "Create General Posting Setup"
                     GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", CA.Convert('995530'));
                     GeneralPostingSetup.Validate("Direct Cost Applied Account", CA.Convert('997270'));
                 end;
-            DemoDataSetup.RetailCode,
-            DemoDataSetup.MiscCode,
-            DemoDataSetup.NoVATCode:
+            DemoDataSetup.RetailCode(),
+            DemoDataSetup.MiscCode(),
+            DemoDataSetup.NoVATCode():
                 begin
                     GeneralPostingSetup.Validate("COGS Account", CA.Convert('997190'));
                     GeneralPostingSetup.Validate("COGS Account (Interim)", CA.Convert('992112'));
@@ -183,8 +178,8 @@ codeunit 101252 "Create General Posting Setup"
                     GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", CA.Convert('995510'));
                     GeneralPostingSetup.Validate("Direct Cost Applied Account", CA.Convert('997170'));
                 end;
-            DemoDataSetup.ServicesCode,
-            DemoDataSetup.FreightCode:
+            DemoDataSetup.ServicesCode(),
+            DemoDataSetup.FreightCode():
                 begin
                     GeneralPostingSetup.Validate("COGS Account", CA.Convert('997190'));
                     GeneralPostingSetup.Validate("COGS Account (Interim)", CA.Convert('992112'));
@@ -192,7 +187,7 @@ codeunit 101252 "Create General Posting Setup"
                     GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", CA.Convert('995510'));
                     GeneralPostingSetup.Validate("Direct Cost Applied Account", CA.Convert('997170'));
                 end;
-            DemoDataSetup.ManufactCode:
+            DemoDataSetup.ManufactCode(): // AU
                 begin
                     GeneralPostingSetup.Validate("COGS Account", CA.Convert('997190'));
                     GeneralPostingSetup.Validate("COGS Account (Interim)", CA.Convert('992112'));
@@ -231,21 +226,21 @@ codeunit 101252 "Create General Posting Setup"
         if DemoDataSetup."Data Type" <> DemoDataSetup."Data Type"::Extended then
             exit;
 
-        if GeneralPostingSetup."Gen. Bus. Posting Group" = DemoDataSetup.DomesticCode then
+        if GeneralPostingSetup."Gen. Bus. Posting Group" = DemoDataSetup.DomesticCode() then
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                DemoDataSetup.MiscCode,
-                DemoDataSetup.RawMatCode,
-                DemoDataSetup.RetailCode:
+                DemoDataSetup.MiscCode(),
+                DemoDataSetup.RawMatCode(),
+                DemoDataSetup.RetailCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Prepayments Account", CA.Convert('995380'));
                         GeneralPostingSetup.Validate("Purch. Prepayments Account", CA.Convert('992430'));
                     end;
-                DemoDataSetup.NoVATCode:
+                DemoDataSetup.NoVATCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Prepayments Account", CA.Convert('995360'));
                         GeneralPostingSetup.Validate("Purch. Prepayments Account", CA.Convert('992410'));
                     end;
-                DemoDataSetup.ServicesCode:
+                DemoDataSetup.ServicesCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Prepayments Account", CA.Convert('995370'));
                         GeneralPostingSetup.Validate("Purch. Prepayments Account", CA.Convert('992420'));
@@ -257,19 +252,19 @@ codeunit 101252 "Create General Posting Setup"
     begin
         if GeneralPostingSetup."Gen. Bus. Posting Group" <> '' then
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                DemoDataSetup.RawMatCode:
+                DemoDataSetup.RawMatCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Line Disc. Account", CA.Convert('996910'));
                         GeneralPostingSetup.Validate("Sales Inv. Disc. Account", CA.Convert('996910'));
                         GeneralPostingSetup.Validate("Purch. Line Disc. Account", CA.Convert('997240'));
                         GeneralPostingSetup.Validate("Purch. Inv. Disc. Account", CA.Convert('997240'));
                     end;
-                DemoDataSetup.RetailCode,
-                DemoDataSetup.MiscCode,
-                DemoDataSetup.NoVATCode,
-                DemoDataSetup.ServicesCode,
-                DemoDataSetup.FreightCode,
-                DemoDataSetup.ManufactCode:
+                DemoDataSetup.RetailCode(),
+                DemoDataSetup.MiscCode(),
+                DemoDataSetup.NoVATCode(),
+                DemoDataSetup.ServicesCode(),
+                DemoDataSetup.FreightCode(),
+                DemoDataSetup.ManufactCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Line Disc. Account", CA.Convert('996910'));
                         GeneralPostingSetup.Validate("Sales Inv. Disc. Account", CA.Convert('996910'));
@@ -289,7 +284,7 @@ codeunit 101252 "Create General Posting Setup"
 
         if GeneralPostingSetup."Gen. Bus. Posting Group" = DemoDataSetup.DomesticCode() then
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                DemoDataSetup.RawMatCode:
+                DemoDataSetup.RawMatCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Credit Memo Account", GetGLAccNo.SalesRawMaterialsDom());
                         GeneralPostingSetup.Validate("Purch. Credit Memo Account", GetGLAccNo.PurchRawMaterialsDom());
@@ -298,10 +293,10 @@ codeunit 101252 "Create General Posting Setup"
                         GeneralPostingSetup.Validate("Inventory Adjmt. Account", GetGLAccNo.InventoryAdjmtRawMat());
                         GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", GetGLAccNo.InvAdjmtInterimRawMat());
                     end;
-                DemoDataSetup.RetailCode,
-                DemoDataSetup.ManufactCode,
+                DemoDataSetup.RetailCode(),
+                DemoDataSetup.ManufactCode(),
                 DemoDataSetup.NonGST(),
-                DemoDataSetup.MiscCode:
+                DemoDataSetup.MiscCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Credit Memo Account", GetGLAccNo.SalesRetailDom());
                         GeneralPostingSetup.Validate("Purch. Credit Memo Account", GetGLAccNo.PurchRetailDom());
@@ -310,7 +305,7 @@ codeunit 101252 "Create General Posting Setup"
                         GeneralPostingSetup.Validate("Inventory Adjmt. Account", GetGLAccNo.InventoryAdjmtRetail());
                         GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", GetGLAccNo.InvAdjmtInterimRetail());
                     end;
-                DemoDataSetup.ServicesCode:
+                DemoDataSetup.ServicesCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Credit Memo Account", GetGLAccNo.SalesResourcesDom());
                         GeneralPostingSetup.Validate("Purch. Credit Memo Account", GetGLAccNo.PurchRetailDom());
@@ -321,23 +316,23 @@ codeunit 101252 "Create General Posting Setup"
                     end;
             end;
 
-        UpdatePrepmtMiniAccounts;
-        UpdateInvDiscMiniAccounts;
-        UpdateExportAcounts;
-        UpdateInterCompAcounts;
-        UpdateProdPostingAccounts;
+        UpdatePrepmtMiniAccounts();
+        UpdateInvDiscMiniAccounts();
+        UpdateExportAcounts();
+        UpdateInterCompAcounts();
+        UpdateProdPostingAccounts();
         GeneralPostingSetup.Insert();
     end;
 
     local procedure UpdatePrepmtMiniAccounts()
     begin
-        if GeneralPostingSetup."Gen. Bus. Posting Group" = DemoDataSetup.DomesticCode then
+        if GeneralPostingSetup."Gen. Bus. Posting Group" = DemoDataSetup.DomesticCode() then
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
                 DemoDataSetup.ManufactCode(),
-                DemoDataSetup.RetailCode,
+                DemoDataSetup.RetailCode(),
                 DemoDataSetup.MiscCode(),
                 DemoDataSetup.NonGST(),
-                DemoDataSetup.ServicesCode:
+                DemoDataSetup.ServicesCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Prepayments Account", GetGLAccNo.SalesPrepayments());
                         GeneralPostingSetup.Validate("Purch. Prepayments Account", GetGLAccNo.PurchasePrepayments());
@@ -350,7 +345,7 @@ codeunit 101252 "Create General Posting Setup"
     begin
         if GeneralPostingSetup."Gen. Bus. Posting Group" <> '' then
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                DemoDataSetup.RawMatCode:
+                DemoDataSetup.RawMatCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Line Disc. Account", GetGLAccNo.DiscountGranted());
                         GeneralPostingSetup.Validate("Sales Inv. Disc. Account", GetGLAccNo.DiscountGranted());
@@ -358,11 +353,11 @@ codeunit 101252 "Create General Posting Setup"
                         GeneralPostingSetup.Validate("Purch. Inv. Disc. Account", GetGLAccNo.DiscReceivedRawMaterials());
                     end;
 
-                DemoDataSetup.RetailCode,
+                DemoDataSetup.RetailCode(),
                 DemoDataSetup.ManufactCode(),
                 DemoDataSetup.MiscCode(),
                 DemoDataSetup.NonGST(),
-                DemoDataSetup.ServicesCode:
+                DemoDataSetup.ServicesCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Line Disc. Account", GetGLAccNo.DiscountGranted());
                         GeneralPostingSetup.Validate("Sales Inv. Disc. Account", GetGLAccNo.DiscountGranted());
@@ -376,7 +371,7 @@ codeunit 101252 "Create General Posting Setup"
     begin
         if GeneralPostingSetup."Gen. Bus. Posting Group" = DemoDataSetup.ExportCode() then
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                DemoDataSetup.RawMatCode:
+                DemoDataSetup.RawMatCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Credit Memo Account", GetGLAccNo.SalesRawMaterialsExport());
                         GeneralPostingSetup.Validate("Purch. Credit Memo Account", GetGLAccNo.PurchRawMaterialsExport());
@@ -385,10 +380,10 @@ codeunit 101252 "Create General Posting Setup"
                         GeneralPostingSetup.Validate("Inventory Adjmt. Account", GetGLAccNo.InventoryAdjmtRawMat());
                         GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", GetGLAccNo.InvAdjmtInterimRawMat());
                     end;
-                DemoDataSetup.RetailCode,
-                DemoDataSetup.ManufactCode,
+                DemoDataSetup.RetailCode(),
+                DemoDataSetup.ManufactCode(),
                 DemoDataSetup.NonGST(),
-                DemoDataSetup.MiscCode:
+                DemoDataSetup.MiscCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Credit Memo Account", GetGLAccNo.SalesRetailExport());
                         GeneralPostingSetup.Validate("Purch. Credit Memo Account", GetGLAccNo.PurchRetailExport());
@@ -397,7 +392,7 @@ codeunit 101252 "Create General Posting Setup"
                         GeneralPostingSetup.Validate("Inventory Adjmt. Account", GetGLAccNo.InventoryAdjmtRetail());
                         GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", GetGLAccNo.InvAdjmtInterimRetail());
                     end;
-                DemoDataSetup.ServicesCode:
+                DemoDataSetup.ServicesCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Credit Memo Account", GetGLAccNo.SalesResourcesExport());
                         GeneralPostingSetup.Validate("Purch. Credit Memo Account", GetGLAccNo.PurchRetailExport());
@@ -413,7 +408,7 @@ codeunit 101252 "Create General Posting Setup"
     begin
         if GeneralPostingSetup."Gen. Bus. Posting Group" = DemoDataSetup.InterCompCode() then
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                DemoDataSetup.RawMatCode:
+                DemoDataSetup.RawMatCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Credit Memo Account", GetGLAccNo.SalesRetailExport());
                         GeneralPostingSetup.Validate("Purch. Credit Memo Account", GetGLAccNo.PurchRetailExport());
@@ -422,11 +417,11 @@ codeunit 101252 "Create General Posting Setup"
                         GeneralPostingSetup.Validate("Inventory Adjmt. Account", GetGLAccNo.InventoryAdjmtRawMat());
                         GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", GetGLAccNo.InvAdjmtInterimRawMat());
                     end;
-                DemoDataSetup.RetailCode,
-                DemoDataSetup.ManufactCode,
-                DemoDataSetup.MiscCode,
+                DemoDataSetup.RetailCode(),
+                DemoDataSetup.ManufactCode(),
+                DemoDataSetup.MiscCode(),
                 DemoDataSetup.NonGST(),
-                DemoDataSetup.ServicesCode:
+                DemoDataSetup.ServicesCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Credit Memo Account", GetGLAccNo.SalesRetailExport());
                         GeneralPostingSetup.Validate("Purch. Credit Memo Account", GetGLAccNo.PurchRetailExport());
@@ -442,18 +437,18 @@ codeunit 101252 "Create General Posting Setup"
     begin
         if GeneralPostingSetup."Gen. Bus. Posting Group" = '' then
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                DemoDataSetup.RawMatCode:
+                DemoDataSetup.RawMatCode():
                     begin
                         GeneralPostingSetup.Validate("COGS Account", GetGLAccNo.CostofRetailSold());
                         GeneralPostingSetup.Validate("COGS Account (Interim)", GetGLAccNo.CostofRawMatSoldInterim());
                         GeneralPostingSetup.Validate("Inventory Adjmt. Account", GetGLAccNo.InventoryAdjmtRawMat());
                         GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", GetGLAccNo.InvAdjmtInterimRawMat());
                     end;
-                DemoDataSetup.RetailCode,
-                DemoDataSetup.ManufactCode,
-                DemoDataSetup.MiscCode,
+                DemoDataSetup.RetailCode(),
+                DemoDataSetup.ManufactCode(),
+                DemoDataSetup.MiscCode(),
                 DemoDataSetup.NonGST(),
-                DemoDataSetup.ServicesCode:
+                DemoDataSetup.ServicesCode():
                     begin
                         GeneralPostingSetup.Validate("COGS Account", GetGLAccNo.CostofRetailSold());
                         GeneralPostingSetup.Validate("COGS Account (Interim)", GetGLAccNo.CostofResaleSoldInterim());

@@ -3,16 +3,14 @@ codeunit 117003 "Create Service Line"
 
     trigger OnRun()
     begin
-        with ServiceLine do begin
-            InsertData("Document Type"::Order, XSO000001, 10000, 10000, '7', 'AS764789', Type::Item, '80202', '', false, 1, 1, 45, true, 0,
-              "Price Adjmt. Status"::" ");
-            InsertData("Document Type"::Order, XSO000001, 20000, 10000, '7', 'AS764789', Type::Resource, XKatherine, '', false, 4, 4, 0, true, 0,
-              "Price Adjmt. Status"::" ");
-            InsertData("Document Type"::Order, XSO000002, 10000, 10000, '', '', Type::Resource, XMarty, '', false, 2, 2, 54, false, 0,
-              "Price Adjmt. Status"::" ");
-            InsertData("Document Type"::Order, XSO000002, 20000, 10000, '', '', Type::Item, '80022', '', false, 1, 1, 180, false, 0, "Price Adjmt. Status"
-              ::" ");
-        end;
+        InsertData(ServiceLine."Document Type"::Order, XSO000001, 10000, 10000, '7', 'AS764789', ServiceLine.Type::Item, '80202', '', false, 1, 1, 45, true, 0,
+  ServiceLine."Price Adjmt. Status"::" ");
+        InsertData(ServiceLine."Document Type"::Order, XSO000001, 20000, 10000, '7', 'AS764789', ServiceLine.Type::Resource, XKatherine, '', false, 4, 4, 0, true, 0,
+          ServiceLine."Price Adjmt. Status"::" ");
+        InsertData(ServiceLine."Document Type"::Order, XSO000002, 10000, 10000, '', '', ServiceLine.Type::Resource, XMarty, '', false, 2, 2, 54, false, 0,
+          ServiceLine."Price Adjmt. Status"::" ");
+        InsertData(ServiceLine."Document Type"::Order, XSO000002, 20000, 10000, '', '', ServiceLine.Type::Item, '80022', '', false, 1, 1, 180, false, 0, ServiceLine."Price Adjmt. Status"
+          ::" ");
     end;
 
     var

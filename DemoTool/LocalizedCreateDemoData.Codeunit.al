@@ -17,7 +17,7 @@ codeunit 101903 "Localized Create Demo Data"
     var
         CreateBASSetup: Codeunit "Create BAS Setup";
     begin
-        CreateBASSetup.CreateBASXMLFieldIDSetup;
+        CreateBASSetup.CreateBASXMLFieldIDSetup();
     end;
 
     procedure CreateExtendedData()

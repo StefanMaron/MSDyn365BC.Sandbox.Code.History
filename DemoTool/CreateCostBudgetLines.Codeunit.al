@@ -1,4 +1,4 @@
-codeunit 119092 "Create Cost Budget Lines"
+﻿codeunit 119092 "Create Cost Budget Lines"
 {
 
     trigger OnRun()
@@ -63,7 +63,7 @@ codeunit 119092 "Create Cost Budget Lines"
         for i := 1 to 24 do begin  // 24 Month from starting Date
             CostBudgetEntry.Init();
             LastCostBudgetLineNo := LastCostBudgetLineNo + 1;
-            CostBudgetEntry."Entry No." := LastCostBudgetLineNo;
+            CostBudgetEntry."Entry No." := LastCostBudGetLineNo;
             CostBudgetEntry."Budget Name" := XDEFAULT;
             CostBudgetEntry."Cost Type No." := CostTypeNo;
             CostBudgetEntry.Date := BudDatum;

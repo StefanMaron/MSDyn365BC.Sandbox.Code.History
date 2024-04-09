@@ -63,12 +63,8 @@ codeunit 101981 "Create D365 Permission Sets"
         InventoryCreateTok: Label 'D365 INV DOC, CREATE', Locked = true;
         InventoryPostTok: Label 'D365 INV DOC, POST', Locked = true;
         RapidStartTok: Label 'D365 RAPIDSTART', Locked = true;
-        AssemblySetupTok: Label 'D365 ASSEMBLY, SETUP', Locked = true;
         AssemblyViewTok: Label 'D365 ASSEMBLY, VIEW', Locked = true;
         AssemblyEditTok: Label 'D365 ASSEMBLY, EDIT', Locked = true;
-        WarehouseSetupTok: Label 'D365 WHSE, SETUP', Locked = true;
-        WarehouseViewTok: Label 'D365 WHSE, VIEW', Locked = true;
-        WarehouseEditTok: Label 'D365 WHSE, EDIT', Locked = true;
         WebhookSubscriptionTok: Label 'D365 WEBHOOK SUBSCR', Locked = true;
         AccountantPortalTok: Label 'D365 ACCOUNTANTS', Locked = true;
         CompanyHubTok: Label 'D365 COMPANY HUB', Locked = true;
@@ -79,14 +75,9 @@ codeunit 101981 "Create D365 Permission Sets"
         JobsEditTok: Label 'D365 JOBS, EDIT', Locked = true;
         JobsViewTok: Label 'D365 JOBS, VIEW', Locked = true;
         JobsSetupTok: Label 'D365 JOBS, SETUP', Locked = true;
-        ProfileManagementTok: Label 'D365 PROFILE MGT', Locked = true;
         ServiceManagementSetupTok: Label 'D365PREM SMG, SETUP', Locked = true;
         ServiceManagementViewTok: Label 'D365PREM SMG, VIEW', Locked = true;
         ServiceManagementEditTok: Label 'D365PREM SMG, EDIT', Locked = true;
-        ManufacturingViewTok: Label 'D365PREM MFG, VIEW', Locked = true;
-        ManufacturingEditTok: Label 'D365PREM MFG, EDIT', Locked = true;
-        ADCSEditTok: Label 'D365 ADCS, EDIT', Locked = true;
-        ADCSViewTok: Label 'D365 ADCS, VIEW', Locked = true;
         IntelligentCloudTok: Label 'INTELLIGENT CLOUD', Locked = true;
         MergeDuplicatesTok: Label 'MERGE DUPLICATES', Locked = true;
         TestToolTok: Label 'TEST TOOL', Locked = true;
@@ -98,7 +89,6 @@ codeunit 101981 "Create D365 Permission Sets"
         AutomateActionPermissionSetTok: Label 'Automate - Exec', MaxLength = 20, Locked = true;
         SnapshotDebugTok: Label 'D365 SNAPSHOT DEBUG', Locked = true;
         AutomationTok: Label 'D365 AUTOMATION', MaxLength = 20, Locked = true;
-        WordTemplateTok: Label 'WORD TEMPLATE', Locked = true;
         DimensionCorrectionTok: Label 'D365 DIM CORRECTION', MaxLength = 20, Locked = true;
         ExportReportExcelTok: Label 'Export Report Excel', MaxLength = 20, Locked = true;
 

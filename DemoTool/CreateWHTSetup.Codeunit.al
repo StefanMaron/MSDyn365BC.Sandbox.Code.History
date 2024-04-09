@@ -43,46 +43,14 @@ codeunit 166501 "Create WHT Setup"
         WHTPostingSetup: Record "WHT Posting Setup";
         SourceCode: Record "Source Code";
         SourceCodeSetup: Record "Source Code Setup";
-        GLAccount: Record "G/L Account";
         GetGLAccNo: Codeunit "Create G/L Account";
         XWithholdingTax: Label 'Withholding Tax';
         XWHT: Label 'WHT';
-        XSalaryBonus: Label 'Salary Bonus';
-        XFee: Label 'Fee';
-        XLICENCE: Label 'License';
-        XINTEREST: Label 'Interest';
-        XSERVICE: Label 'Service';
-        XOTHER: Label 'Other';
-        XDOMESTIC: Label 'DOMESTIC';
-        XDomesticCompany: Label 'DomesticCompany';
-        XFOREIGN: Label 'FOREIGN';
-        XForeignCompany: Label 'Foreign Company';
-        XINDIVIDUAL: Label 'INDIVIDUAL';
-        XNOWHT: Label 'NOWHT';
-        XNoWithholdingTax: Label 'No Withholding Tax';
-        XADVERT: Label 'ADVERT';
-        XAdvertisingFee: Label 'Advertising Fee';
-        XPROF: Label 'PROF';
-        XProfessionalFee: Label 'Professional Fee';
         XWHTSTMT: Label 'WHTSTMT';
         XWithholdingTaxStatement: Label 'Withholding Tax Statement';
         XCOMPRWHT: Label 'COMPRWHT';
         XDateCompressWHTEntries: Label 'Date Compress WHT Entries';
         XWWBOPERATING: Label 'WWB-OPERATING';
-        XInsurance: Label 'Insurance';
-        XRENT: Label 'RENT';
-        XRentalIncome: Label 'Rental Income';
-        XServiceFees: Label 'Service Fees';
-        XWHT1: Label 'WHT1';
-        XWHT2: Label 'WHT2';
-        XWHT3: Label 'WHT3';
-        XWHT53: Label 'WHT53';
-        XWHT54: Label 'WHT54';
-        XWHTReportLineNoforPND1: Label 'WHT Report Line No. for PND 1';
-        XWHTReportLineNoforPND2: Label 'WHT Report Line No. for PND 2';
-        XWHTReportLineNoforPND3: Label 'WHT Report Line No. for PND 3';
-        XWHTReportLineNoforPND53: Label 'WHT Report Line No. for PND 53';
-        XWHTReportLineNoforPND54: Label 'WHT Report Line No. for PND 54';
 
     procedure InsertWHTRevType("Code": Code[10]; Description: Text[30]; Sequence: Integer)
     begin

@@ -9,9 +9,6 @@ codeunit 101085 "Create Acc. Schedule Line"
         InsertData(XCAMPAIGN, '12', XPurchRetailDom, CA.Convert('997110'), 0, XSUMMER, '', '', '', true, false);
         InsertData(XCAMPAIGN, '1', XTradingMarginDomestic, '-12-11', 2, '', '', '', '', false, true);
         InsertData(XCAMPAIGN, '', '', '', 0, '', '', '', '', false, false);
-        // InsertData(XCAMPAIGN,'21',XSalesRetailEU,CA.Convert('996120'),0,XSUMMER,'','','',TRUE,FALSE);
-        // InsertData(XCAMPAIGN,'22',XPurchRetailEU,CA.Convert('997120'),0,XSUMMER,'','','',TRUE,FALSE);
-        // InsertData(XCAMPAIGN,'2',XTradingMarginEU,'-22-21',2,'','','','',FALSE,TRUE);
         InsertData(XCAMPAIGN, '21', XSalesRetailMISC, CA.Convert('996120'), 0, XSUMMER, '', '', '', true, false);
         InsertData(XCAMPAIGN, '22', XPurchRetailMISC, CA.Convert('997120'), 0, XSUMMER, '', '', '', true, false);
         InsertData(XCAMPAIGN, '2', XTradingMarginMISC, '-22-21', 2, '', '', '', '', false, true);
@@ -21,11 +18,11 @@ codeunit 101085 "Create Acc. Schedule Line"
         InsertData(XCAMPAIGN, '3', XTradingMarginExport, '-32-31', 2, '', '', '', '', false, true);
         InsertData(XCAMPAIGN, '', '', '', 0, '', '', '', '', false, false);
         InsertData(XCAMPAIGN, '', XCampaignResult, '1+2+3', 2, '', '', '', '', false, true);
+
         InsertData(XREVENUE, '', XREVENUE, '', 0, '', '', '', '', false, true);
         InsertData(XREVENUE, '', '', '', 0, '', '', '', '', false, false);
         InsertData(XREVENUE, '', XSalesofRetail, '', 0, '', '', '', '', false, false);
         InsertData(XREVENUE, '11', XSalesRetailDom, CA.Convert('996110'), 0, '', '', '', '', false, false);
-        // InsertData(XREVENUE,'12',XSalesRetailEU,CA.Convert('996120'),0,'','','','',FALSE,FALSE);
         InsertData(XREVENUE, '12', XSalesRetailMISC, CA.Convert('996120'), 0, '', '', '', '', false, false);
         InsertData(XREVENUE, '13', XSalesRetailExport, CA.Convert('996130'), 0, '', '', '', '', false, false);
         InsertData(XREVENUE, '14', XJobSalesAdjmtRetail, CA.Convert('996190'), 0, '', '', '', '', false, false);
@@ -174,8 +171,6 @@ codeunit 101085 "Create Acc. Schedule Line"
         XPurchRetailDom: Label 'Purch, Retail - Dom.';
         XTradingMarginDomestic: Label 'Trading Margin, Domestic';
         XSalesRetailEU: Label 'Sales, Retail - EU';
-        XPurchRetailEU: Label 'Purch, Retail - EU';
-        XTradingMarginEU: Label 'Trading Margin, EU';
         XSalesRetailExport: Label 'Sales, Retail - Export';
         XPurchRetailExport: Label 'Purch, Retail - Export';
         XTradingMarginExport: Label 'Trading Margin, Export';
@@ -380,7 +375,6 @@ codeunit 101085 "Create Acc. Schedule Line"
         InsertData(
           XREVENUE, '', XRevenueTotal,
           StrSubstNo('%1..%2', CA.Convert('996110'), CA.Convert('996195')), 0, '', '', '', '', false, true);
-
     end;
 
     local procedure GLAccCatTotaling(Category: Option; Description: Text): Text[80]
@@ -409,7 +403,7 @@ codeunit 101085 "Create Acc. Schedule Line"
         else
             CFAccSchedLine.Validate(Show, CFAccSchedLine.Show::No);
 
-        CFAccSchedLine.Modify
+        CFAccSchedLine.Modify();
     end;
 
     procedure InsertData("Schedule Name": Code[10]; "Row No.": Code[10]; Description: Text[80]; Totaling: Text[80]; "Totaling Type": Option; Dim1Totaling: Text[80]; Dim2Totaling: Text[80]; Dim3Totaling: Text[80]; Dim4Totaling: Text[80]; ShowOppositeSign: Boolean; Bold: Boolean)
@@ -437,7 +431,7 @@ codeunit 101085 "Create Acc. Schedule Line"
         "Acc. Schedule Line".Insert();
     end;
 
-    procedure InsertMiniAppData(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Option; RowType: Option; ShowOppositeSign: Boolean)
+    procedure InsertMiniAppData(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Enum "Acc. Schedule Line Totaling Type"; RowType: Option; ShowOppositeSign: Boolean)
     var
         AccScheduleLine: Record "Acc. Schedule Line";
         LineNo: Integer;
@@ -453,7 +447,7 @@ codeunit 101085 "Create Acc. Schedule Line"
         AccScheduleLine.Validate("Line No.", LineNo);
         AccScheduleLine.Validate("Row No.", RowNo);
         AccScheduleLine.Validate(Description, Description);
-        AccScheduleLine."Totaling Type" := "Acc. Schedule Line Totaling Type".FromInteger(TotalingType);
+        AccScheduleLine."Totaling Type" := TotalingType;
         AccScheduleLine.Totaling := Totaling;
         AccScheduleLine.Validate("Row Type", RowType);
         AccScheduleLine.Validate("Show Opposite Sign", ShowOppositeSign);
@@ -468,7 +462,7 @@ codeunit 101085 "Create Acc. Schedule Line"
         AccScheduleLine.Insert();
     end;
 
-    procedure InsertMiniAppDataFormula(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Option; RowType: Option; ShowOppositeSign: Boolean; HideCurrencySymbol: Boolean)
+    procedure InsertMiniAppDataFormula(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Enum "Acc. Schedule Line Totaling Type"; RowType: Option; ShowOppositeSign: Boolean; HideCurrencySymbol: Boolean)
     var
         AccScheduleLine: Record "Acc. Schedule Line";
         LineNo: Integer;
@@ -484,7 +478,7 @@ codeunit 101085 "Create Acc. Schedule Line"
         AccScheduleLine.Validate("Line No.", LineNo);
         AccScheduleLine.Validate("Row No.", RowNo);
         AccScheduleLine.Validate(Description, Description);
-        AccScheduleLine."Totaling Type" := "Acc. Schedule Line Totaling Type".FromInteger(TotalingType);
+        AccScheduleLine."Totaling Type" := TotalingType;
         AccScheduleLine.Totaling := Totaling;
         AccScheduleLine.Validate("Row Type", RowType);
         AccScheduleLine.Validate("Show Opposite Sign", ShowOppositeSign);

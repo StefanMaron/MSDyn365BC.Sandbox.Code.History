@@ -28,8 +28,6 @@ codeunit 101277 "Create Bank Acc. Posting Group"
         XFCY: Label 'FCY';
         XCURRENCIES: Label 'CURRENCIES';
         XOPERATING: Label 'OPERATING', Comment = 'To be translated.';
-        XCHECKING: Label 'CHECKING', Comment = 'To be translated.';
-        XSAVINGS: Label 'SAVINGS', Comment = 'To be translated.';
         XCASH: Label 'CASH', Comment = 'To be translated.';
 
     procedure InsertData("Code": Code[20]; "G/L Account No.": Code[20])

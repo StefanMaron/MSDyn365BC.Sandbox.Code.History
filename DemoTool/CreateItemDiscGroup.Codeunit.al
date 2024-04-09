@@ -3,14 +3,12 @@ codeunit 101341 "Create Item Disc. Group"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(FinishedCode, XFinishedgoods);
-            InsertData(RawMatCode, XRawmaterial);
-            InsertData(ResaleCode, XResale2);
-            InsertData(XA, '');
-            InsertData(XB, '');
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.FinishedCode(), XFinishedgoods);
+        InsertData(DemoDataSetup.RawMatCode(), XRawmaterial);
+        InsertData(DemoDataSetup.ResaleCode(), XResale2);
+        InsertData(XA, '');
+        InsertData(XB, '');
     end;
 
     var

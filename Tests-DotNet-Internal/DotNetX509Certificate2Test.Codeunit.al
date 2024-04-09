@@ -34,43 +34,43 @@ codeunit 146043 "DotNet_X509Certificate2 Test"
         // [SCENARIO] X509Certificate2 can be exported and imported into a blob and the certificate details are preserved
         // [GIVEN] A demo certificate
         TempBlob.CreateOutStream(OutStr);
-        Base64Convert.FromBase64(DemoCertificate, OutStr);
+        Base64Convert.FromBase64(DemoCertificate(), OutStr);
         TempBlob.CreateInStream(InStr);
         DotNet_MemoryStream.MemoryStream();
         DotNet_MemoryStream.CopyFromInStream(InStr);
         DotNet_MemoryStream.ToArray(DotNet_Array);
-        DotNet_X509KeyStorageFlags.Exportable;
+        DotNet_X509KeyStorageFlags.Exportable();
         DotNet_X509Certificate2.X509Certificate2(DotNet_Array, '', DotNet_X509KeyStorageFlags); // Password not needed
 
         // [GIVEN] Certificate Details
-        FriendlyName := DotNet_X509Certificate2.FriendlyName;
-        Thumbprint := DotNet_X509Certificate2.Thumbprint;
-        Issuer := DotNet_X509Certificate2.Issuer;
-        Subject := DotNet_X509Certificate2.Subject;
-        Expiration := DotNet_X509Certificate2.Expiration;
-        HasPrivateKey := DotNet_X509Certificate2.HasPrivateKey;
+        FriendlyName := DotNet_X509Certificate2.FriendlyName();
+        Thumbprint := DotNet_X509Certificate2.Thumbprint();
+        Issuer := DotNet_X509Certificate2.Issuer();
+        Subject := DotNet_X509Certificate2.Subject();
+        Expiration := DotNet_X509Certificate2.Expiration();
+        HasPrivateKey := DotNet_X509Certificate2.HasPrivateKey();
 
         // [WHEN] Certificate Is exported and then imported
-        DotNet_X509ContentType.Pkcs12;
+        DotNet_X509ContentType.Pkcs12();
         DotNet_X509Certificate2.Export(DotNet_X509ContentType, '', DotNet_Array);
         DotNet_MemoryStream.MemoryStream(DotNet_Array);
         Clear(TempBlob);
-		TempBlob.CreateOutStream(OutStr);
+        TempBlob.CreateOutStream(OutStr);
         DotNet_MemoryStream.WriteTo(OutStr);
         TempBlob.CreateInStream(InStr);
         DotNet_MemoryStream.MemoryStream();
         DotNet_MemoryStream.CopyFromInStream(InStr);
         DotNet_MemoryStream.ToArray(DotNet_Array);
-        DotNet_X509KeyStorageFlags.Exportable;
+        DotNet_X509KeyStorageFlags.Exportable();
         DotNet_X509Certificate2.X509Certificate2(DotNet_Array, '', DotNet_X509KeyStorageFlags); // Password not needed
 
         // [THEN] Certificate Details are preserved
-        Assert.AreEqual(FriendlyName, DotNet_X509Certificate2.FriendlyName, 'Certificate Details incorrect!');
-        Assert.AreEqual(Thumbprint, DotNet_X509Certificate2.Thumbprint, 'Certificate Details incorrect!');
-        Assert.AreEqual(Issuer, DotNet_X509Certificate2.Issuer, 'Certificate Details incorrect!');
-        Assert.AreEqual(Subject, DotNet_X509Certificate2.Subject, 'Certificate Details incorrect!');
-        Assert.AreEqual(Expiration, DotNet_X509Certificate2.Expiration, 'Certificate Details incorrect!');
-        Assert.AreEqual(HasPrivateKey, DotNet_X509Certificate2.HasPrivateKey, 'Certificate Details incorrect!');
+        Assert.AreEqual(FriendlyName, DotNet_X509Certificate2.FriendlyName(), 'Certificate Details incorrect!');
+        Assert.AreEqual(Thumbprint, DotNet_X509Certificate2.Thumbprint(), 'Certificate Details incorrect!');
+        Assert.AreEqual(Issuer, DotNet_X509Certificate2.Issuer(), 'Certificate Details incorrect!');
+        Assert.AreEqual(Subject, DotNet_X509Certificate2.Subject(), 'Certificate Details incorrect!');
+        Assert.AreEqual(Expiration, DotNet_X509Certificate2.Expiration(), 'Certificate Details incorrect!');
+        Assert.AreEqual(HasPrivateKey, DotNet_X509Certificate2.HasPrivateKey(), 'Certificate Details incorrect!');
     end;
 
     [Scope('OnPrem')]

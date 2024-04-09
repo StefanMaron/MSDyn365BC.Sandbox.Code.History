@@ -8,11 +8,11 @@ codeunit 101324 "Create VAT Prod. Posting Gr."
             if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then begin
                 DemoDataSetup.TestField(DemoDataSetup."Goods VAT Rate");
                 DemoDataSetup.TestField(DemoDataSetup."Services VAT Rate");
-                InsertData(DemoDataSetup.GoodsVATCode, StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Goods VAT Rate"));
-                InsertData(DemoDataSetup.ServicesVATCode, StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Services VAT Rate"));
-                InsertData(DemoDataSetup.NoVATCode, XMiscellaneousWithoutVAT);
+                InsertData(DemoDataSetup.GoodsVATCode(), StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Goods VAT Rate"));
+                InsertData(DemoDataSetup.ServicesVATCode(), StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Services VAT Rate"));
+                InsertData(DemoDataSetup.NoVATCode(), XMiscellaneousWithoutVAT);
                 if DemoDataSetup."Reduced VAT Rate" > 0 then
-                    InsertData(DemoDataSetup.ReducedVATCode, StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Reduced VAT Rate"));
+                    InsertData(DemoDataSetup.ReducedVATCode(), StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Reduced VAT Rate"));
                 InsertData(XINPUTTAX, XInputTaxed);
                 InsertData(XASSET, XAssetwith10PERCENTVAT);
             end;
@@ -20,9 +20,9 @@ codeunit 101324 "Create VAT Prod. Posting Gr."
         else begin
             InsertData(DemoDataSetup.NonGST(), XNONGST);
             InsertData(DemoDataSetup.GSTTen(), XGstTen);
-            InsertData(DemoDataSetup.GoodsVATCode, StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Goods VAT Rate"));
-            InsertData(DemoDataSetup.ServicesVATCode, StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Services VAT Rate"));
-            InsertData(DemoDataSetup.NoVATCode, XMiscellaneousWithoutVAT);
+            InsertData(DemoDataSetup.GoodsVATCode(), StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Goods VAT Rate"));
+            InsertData(DemoDataSetup.ServicesVATCode(), StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Services VAT Rate"));
+            InsertData(DemoDataSetup.NoVATCode(), XMiscellaneousWithoutVAT);
         end;
     end;
 

@@ -5,32 +5,30 @@ codeunit 101254 "Create VAT Report Configs"
     var
         VATReportsConfiguration: Record "VAT Reports Configuration";
     begin
-        with VATReportsConfiguration do begin
-            Init();
-            "VAT Report Type" := "VAT Report Type"::"EC Sales List";
-            "VAT Report Version" := 'CURRENT';
-            "Suggest Lines Codeunit ID" := CODEUNIT::"EC Sales List Suggest Lines";
-            "Validate Codeunit ID" := CODEUNIT::"ECSL Report Validate";
-            Insert();
+        VATReportsConfiguration.Init();
+        VATReportsConfiguration."VAT Report Type" := VATReportsConfiguration."VAT Report Type"::"EC Sales List";
+        VATReportsConfiguration."VAT Report Version" := 'CURRENT';
+        VATReportsConfiguration."Suggest Lines Codeunit ID" := CODEUNIT::"EC Sales List Suggest Lines";
+        VATReportsConfiguration."Validate Codeunit ID" := CODEUNIT::"ECSL Report Validate";
+        VATReportsConfiguration.Insert();
 
-            Init();
-            "VAT Report Type" := "VAT Report Type"::"VAT Return";
-            "VAT Report Version" := 'CURRENT';
-            "Suggest Lines Codeunit ID" := CODEUNIT::"VAT Report Suggest Lines";
-            "Validate Codeunit ID" := CODEUNIT::"VAT Report Validate";
-            Insert();
+        VATReportsConfiguration.Init();
+        VATReportsConfiguration."VAT Report Type" := VATReportsConfiguration."VAT Report Type"::"VAT Return";
+        VATReportsConfiguration."VAT Report Version" := 'CURRENT';
+        VATReportsConfiguration."Suggest Lines Codeunit ID" := CODEUNIT::"VAT Report Suggest Lines";
+        VATReportsConfiguration."Validate Codeunit ID" := CODEUNIT::"VAT Report Validate";
+        VATReportsConfiguration.Insert();
 
-            Init();
-            "VAT Report Type" := "VAT Report Type"::"BAS Report";
-            "VAT Report Version" := 'CURRENT';
-            "Suggest Lines Codeunit ID" := CODEUNIT::"VAT Report Suggest Lines";
-            "Validate Codeunit ID" := CODEUNIT::"VAT Report Validate";
-            "Submission Codeunit ID" := CODEUNIT::"BAS Export";
-            "VAT Statement Name" := 'DEFAULT';
-            "VAT Statement Template" := 'BAS';
-            Insert();
-        end;
-        CreateReportNoSeries;
+        VATReportsConfiguration.Init();
+        VATReportsConfiguration."VAT Report Type" := VATReportsConfiguration."VAT Report Type"::"BAS Report";
+        VATReportsConfiguration."VAT Report Version" := 'CURRENT';
+        VATReportsConfiguration."Suggest Lines Codeunit ID" := CODEUNIT::"VAT Report Suggest Lines";
+        VATReportsConfiguration."Validate Codeunit ID" := CODEUNIT::"VAT Report Validate";
+        VATReportsConfiguration."Submission Codeunit ID" := CODEUNIT::"BAS Export";
+        VATReportsConfiguration."VAT Statement Name" := 'DEFAULT';
+        VATReportsConfiguration."VAT Statement Template" := 'BAS';
+        VATReportsConfiguration.Insert();
+        CreateReportNoSeries();
     end;
 
     var

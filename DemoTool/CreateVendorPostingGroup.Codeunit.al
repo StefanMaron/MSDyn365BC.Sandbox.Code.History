@@ -8,11 +8,11 @@ codeunit 101093 "Create Vendor Posting Group"
         DemoDataSetup.Get();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
             InsertData(
-              DemoDataSetup.DomesticCode, XDomesticVendorsTxt, '995410', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
+              DemoDataSetup.DomesticCode(), XDomesticVendorsTxt, '995410', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
             InsertData(
-              DemoDataSetup.ForeignCode, XForeignVendorsTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
+              DemoDataSetup.ForeignCode(), XForeignVendorsTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
             InsertData(
-              DemoDataSetup.MiscCode, XVendorsInEUTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
+              DemoDataSetup.MiscCode(), XVendorsInEUTxt, '995420', '998910', '999135', '999130', '999140', '999150', '999160', '999170');
         end else begin
             InsertData(DemoDataSetup.DomesticCode(), XDomesticVendorsTxt, GetGLAccNo.VendorsDomestic(), GetGLAccNo.OtherCostsofOperations(), GetGLAccNo.PmtDiscReceivedDecreases(), GetGLAccNo.PaymentDiscountsReceived(), GetGLAccNo.InvoiceRounding(), GetGLAccNo.ApplicationRounding(), GetGLAccNo.PaymentToleranceReceived(), GetGLAccNo.PmtTolReceivedDecreases());
             InsertData(DemoDataSetup.InterCompCode(), XInterCompanyTxt, GetGLAccNo.VendorsIntercompany(), GetGLAccNo.OtherCostsofOperations(), GetGLAccNo.PmtDiscReceivedDecreases(), GetGLAccNo.PaymentDiscountsReceived(), GetGLAccNo.InvoiceRounding(), GetGLAccNo.ApplicationRounding(), GetGLAccNo.PaymentToleranceReceived(), GetGLAccNo.PmtTolReceivedDecreases());

@@ -3,14 +3,11 @@ codeunit 117018 "Create Fault Reason Code"
 
     trigger OnRun()
     begin
-        with FaultReasonCode do begin
-            InsertData(XDMO, XDamagedbyowner, true, true);
-            InsertData(XME, XManufactureError, false, false);
-        end;
+        InsertData(XDMO, XDamagedbyowner, true, true);
+        InsertData(XME, XManufactureError, false, false);
     end;
 
     var
-        FaultReasonCode: Record "Fault Reason Code";
         XDMO: Label 'DMO';
         XDamagedbyowner: Label 'Damaged by owner';
         XME: Label 'ME';

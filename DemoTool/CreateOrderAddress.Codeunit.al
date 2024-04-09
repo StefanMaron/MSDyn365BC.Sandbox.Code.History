@@ -24,18 +24,6 @@ codeunit 101224 "Create Order Address"
         XWATFORD: Label 'WATFORD';
         X10FieldGreen: Label '10 Field Green';
         XMarcZimmerman: Label 'Marc Zimmerman';
-        XDARLINGHARBOUR: Label 'DARLING HARBOUR';
-        XNSW: Label 'NSW';
-        XMELBOURNE: Label 'MELBOURNE';
-        XVIC: Label 'VIC';
-        XPETRIETERRACE: Label 'PETRIE TERRACE';
-        XQLDX: Label 'QLDX';
-        XSTURTSTREET: Label 'STURT STREET';
-        XTAS: Label 'TAS';
-        X2000: Label '2000';
-        X3000: Label '3000';
-        X4000: Label '4000';
-        X5000: Label '5000';
 
     procedure InsertData("Vendor No.": Code[20]; "Code": Code[10]; Address: Text[30]; Contact: Text[30]; "Post Code": Code[20])
     var

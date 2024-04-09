@@ -8,15 +8,15 @@ codeunit 101250 "Create Gen. Bus. Posting Gr."
             case DemoDataSetup."Company Type" of
                 DemoDataSetup."Company Type"::"Sales Tax":
                     begin
-                        InsertData(DemoDataSetup.DomesticCode, XDomesticcustomersandvendors, '');
-                        InsertData(DemoDataSetup.EUCode, XCustomersandvendorsinEU, '');
-                        InsertData(DemoDataSetup.ExportCode, XOthercustomersandvendorsnotEU, '');
+                        InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, '');
+                        InsertData(DemoDataSetup.EUCode(), XCustomersandvendorsinEU, '');
+                        InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, '');
                     end;
                 DemoDataSetup."Company Type"::VAT:
                     begin
-                        InsertData(DemoDataSetup.DomesticCode, XDomesticcustomersandvendors, DemoDataSetup.DomesticCode);
-                        InsertData(DemoDataSetup.EUCode, XCustomersandvendorsinEU, DemoDataSetup.MiscCode);
-                        InsertData(DemoDataSetup.ExportCode, XOthercustomersandvendorsnotEU, DemoDataSetup.ExportCode);
+                        InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, DemoDataSetup.DomesticCode());
+                        InsertData(DemoDataSetup.EUCode(), XCustomersandvendorsinEU, DemoDataSetup.MiscCode());
+                        InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, DemoDataSetup.ExportCode());
                     end;
             end
         else
@@ -45,8 +45,8 @@ codeunit 101250 "Create Gen. Bus. Posting Gr."
     procedure InsertMiniAppData()
     begin
         DemoDataSetup.Get();
-        InsertData(DemoDataSetup.DomesticCode, XDomesticcustomersandvendors, '');
-        InsertData(DemoDataSetup.ExportCode, XOthercustomersandvendorsnotEU, '');
+        InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, '');
+        InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, '');
         InsertData(DemoDataSetup.InterCompCode(), XInterCompany, '');
     end;
 }

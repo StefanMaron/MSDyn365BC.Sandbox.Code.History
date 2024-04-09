@@ -10,26 +10,26 @@ codeunit 101325 "Create VAT Posting Setup"
             case DemoDataSetup."Company Type" of
                 DemoDataSetup."Company Type"::VAT:
                     begin
-                        InsertData('', DemoDataSetup.ServicesVATCode, DemoDataSetup."Services VAT Rate", 0, '995611', '995621', '');
-                        InsertData('', DemoDataSetup.GoodsVATCode, DemoDataSetup."Goods VAT Rate", 0, '995610', '995620', '');
-                        InsertData('', DemoDataSetup.NoVATCode, 0, 0, '995611', '995621', '');
+                        InsertData('', DemoDataSetup.ServicesVATCode(), DemoDataSetup."Services VAT Rate", 0, '995611', '995621', '');
+                        InsertData('', DemoDataSetup.GoodsVATCode(), DemoDataSetup."Goods VAT Rate", 0, '995610', '995620', '');
+                        InsertData('', DemoDataSetup.NoVATCode(), 0, 0, '995611', '995621', '');
                         InsertData('', XASSET, 10, 0, '995611', '995621', '');
                         InsertData('', XINPUTTAX, 0, 0, '995650', '995650', '');
-                        InsertData(DemoDataSetup.DomesticCode, DemoDataSetup.ServicesVATCode, DemoDataSetup."Services VAT Rate", 0, '995611', '995621', '');
-                        InsertData(DemoDataSetup.DomesticCode, DemoDataSetup.GoodsVATCode, DemoDataSetup."Goods VAT Rate", 0, '995610', '995620', '');
-                        InsertData(DemoDataSetup.DomesticCode, DemoDataSetup.NoVATCode, 0, 0, '995611', '995621', '');
-                        InsertData(DemoDataSetup.DomesticCode, XASSET, 10, 0, '995611', '995621', '');
-                        InsertData(DemoDataSetup.DomesticCode, XINPUTTAX, 0, 0, '995650', '995650', '');
-                        InsertData(DemoDataSetup.MiscCode, DemoDataSetup.ServicesVATCode, 10, 0, '995611', '995621', '');
-                        InsertData(DemoDataSetup.MiscCode, DemoDataSetup.GoodsVATCode, DemoDataSetup."Goods VAT Rate", 0, '995610', '995620', '');
-                        InsertData(DemoDataSetup.MiscCode, DemoDataSetup.NoVATCode, 0, 0, '995611', '995621', '');
-                        InsertData(DemoDataSetup.MiscCode, XASSET, 10, 0, '995611', '995621', '');
-                        InsertData(DemoDataSetup.MiscCode, XINPUTTAX, 0, 0, '995650', '995650', '');
-                        InsertData(DemoDataSetup.ExportCode, DemoDataSetup.ServicesVATCode, 0, 0, '995611', '995621', '');
-                        InsertData(DemoDataSetup.ExportCode, DemoDataSetup.GoodsVATCode, 0, 0, '995610', '995620', '');
-                        InsertData(DemoDataSetup.ExportCode, DemoDataSetup.NoVATCode, 0, 0, '995611', '995621', '');
-                        InsertData(DemoDataSetup.ExportCode, XASSET, 0, 0, '995611', '995621', '');
-                        InsertData(DemoDataSetup.ExportCode, XINPUTTAX, 0, 0, '995650', '995650', '');
+                        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesVATCode(), DemoDataSetup."Services VAT Rate", 0, '995611', '995621', '');
+                        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.GoodsVATCode(), DemoDataSetup."Goods VAT Rate", 0, '995610', '995620', '');
+                        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.NoVATCode(), 0, 0, '995611', '995621', '');
+                        InsertData(DemoDataSetup.DomesticCode(), XASSET, 10, 0, '995611', '995621', '');
+                        InsertData(DemoDataSetup.DomesticCode(), XINPUTTAX, 0, 0, '995650', '995650', '');
+                        InsertData(DemoDataSetup.MiscCode(), DemoDataSetup.ServicesVATCode(), 10, 0, '995611', '995621', '');
+                        InsertData(DemoDataSetup.MiscCode(), DemoDataSetup.GoodsVATCode(), DemoDataSetup."Goods VAT Rate", 0, '995610', '995620', '');
+                        InsertData(DemoDataSetup.MiscCode(), DemoDataSetup.NoVATCode(), 0, 0, '995611', '995621', '');
+                        InsertData(DemoDataSetup.MiscCode(), XASSET, 10, 0, '995611', '995621', '');
+                        InsertData(DemoDataSetup.MiscCode(), XINPUTTAX, 0, 0, '995650', '995650', '');
+                        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.ServicesVATCode(), 0, 0, '995611', '995621', '');
+                        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.GoodsVATCode(), 0, 0, '995610', '995620', '');
+                        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.NoVATCode(), 0, 0, '995611', '995621', '');
+                        InsertData(DemoDataSetup.ExportCode(), XASSET, 0, 0, '995611', '995621', '');
+                        InsertData(DemoDataSetup.ExportCode(), XINPUTTAX, 0, 0, '995650', '995650', '');
                     end;
                 DemoDataSetup."Company Type"::"Sales Tax":
                     InsertSalesTaxData('E');
@@ -87,37 +87,37 @@ codeunit 101325 "Create VAT Posting Setup"
         if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then
             if VATPostingSetup."VAT Bus. Posting Group" <> '' then
                 case VATPostingSetup."VAT Prod. Posting Group" of
-                    DemoDataSetup.GoodsVATCode:
+                    DemoDataSetup.GoodsVATCode():
                         begin
                             VATPostingSetup.Validate("Sales VAT Account", CA.Convert("Sales Account"));
                             VATPostingSetup.Validate("Purchase VAT Account", CA.Convert("Purchase Account"));
-                            if VATPostingSetup."VAT Calculation Type" = 1 then
+                            if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
                                 VATPostingSetup.Validate("Reverse Chrg. VAT Acc.", CA.Convert('995660'));
                             if VATPostingSetup."Unrealized VAT Type" > 0 then begin
                                 VATPostingSetup.Validate("Sales VAT Unreal. Account", CA.Convert('995615'));
                                 VATPostingSetup.Validate("Purch. VAT Unreal. Account", CA.Convert('995635'));
-                                if VATPostingSetup."VAT Calculation Type" = 1 then
+                                if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
                                     VATPostingSetup.Validate("Reverse Chrg. VAT Unreal. Acc.", CA.Convert('995660'));
                             end;
                         end;
-                    DemoDataSetup.ServicesVATCode:
+                    DemoDataSetup.ServicesVATCode():
                         begin
                             VATPostingSetup.Validate("Sales VAT Account", CA.Convert("Sales Account"));
                             VATPostingSetup.Validate("Purchase VAT Account", CA.Convert("Purchase Account"));
-                            if VATPostingSetup."VAT Calculation Type" = 1 then
+                            if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
                                 VATPostingSetup.Validate("Reverse Chrg. VAT Acc.", CA.Convert('995660'));
                             if VATPostingSetup."Unrealized VAT Type" > 0 then begin
                                 VATPostingSetup.Validate("Sales VAT Unreal. Account", CA.Convert('995615'));
                                 VATPostingSetup.Validate("Purch. VAT Unreal. Account", CA.Convert('995635'));
-                                if VATPostingSetup."VAT Calculation Type" = 1 then
+                                if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
                                     VATPostingSetup.Validate("Reverse Chrg. VAT Unreal. Acc.", CA.Convert('995660'));
                             end;
                         end;
-                    DemoDataSetup.NoVATCode:
+                    DemoDataSetup.NoVATCode():
                         begin
                             VATPostingSetup.Validate("Sales VAT Account", CA.Convert("Sales Account"));
                             VATPostingSetup.Validate("Purchase VAT Account", CA.Convert("Purchase Account"));
-                            if VATPostingSetup."VAT Calculation Type" = 1 then
+                            if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
                                 VATPostingSetup.Validate("Reverse Chrg. VAT Acc.", CA.Convert('995660'));
                         end;
                     XINPUTTAX,
@@ -125,7 +125,7 @@ codeunit 101325 "Create VAT Posting Setup"
                         begin
                             VATPostingSetup.Validate("Sales VAT Account", CA.Convert("Sales Account"));
                             VATPostingSetup.Validate("Purchase VAT Account", CA.Convert("Purchase Account"));
-                            if VATPostingSetup."VAT Calculation Type" = 1 then
+                            if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
                                 VATPostingSetup.Validate("Reverse Chrg. VAT Acc.", CA.Convert('995660'));
                         end;
                     DemoDataSetup.GSTTen(),

@@ -8,7 +8,7 @@ codeunit 119203 "Create O365 Cronus Company"
         ApplyConfiguration: Codeunit "Apply Configuration";
     begin
         CODEUNIT.Run(CODEUNIT::"Company-Initialize");
-        ApplyConfiguration.ApplyEvaluationConfiguration;
+        ApplyConfiguration.ApplyEvaluationConfiguration();
 
         // Remove all application areas from cronus, by setting default application area with FALSE in all options
         Company.SetFilter(Name, '<>%1', CompanyName);

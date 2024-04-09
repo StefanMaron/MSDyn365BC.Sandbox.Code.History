@@ -17,10 +17,10 @@ codeunit 101413 "Create IC Partner"
 
         // Gen. Bus Posting Group
         CreateGenBusPostGroup.InsertData(XINTERCOMP, XIntercompanylc, '');
-        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.MiscCode, '996130', '997130');
-        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.NoVATCode, '996130', '997130');
-        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.RawMatCode, '996130', '997130');
-        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.RetailCode, '996130', '997130');
+        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.MiscCode(), '996130', '997130');
+        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.NoVATCode(), '996130', '997130');
+        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.RawMatCode(), '996130', '997130');
+        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.RetailCode(), '996130', '997130');
 
         CreateGLAccount.InsertData('992325', XCustomersIntercompany, 0, 1, 0, '', 0, '', '', '', '', false);
         CreateGLAccount.InsertData('995425', XVendorsIntercompany, 0, 1, 0, '', 0, '', '', '', '', false);
@@ -108,9 +108,9 @@ codeunit 101413 "Create IC Partner"
     begin
         if not GenJournalTemplate.Get(XINTERCOMP) then
             CreateGenJournalTemplate.InsertData(
-                XINTERCOMP, XIntercompanylc, "Gen. Journal Template Type"::Intercompany.AsInteger(), false, XINTERCOMP, XICGJNL, XInterCompanyGenJnl, XIC0010, XIC9999);
+                XINTERCOMP, XIntercompanylc, "Gen. Journal Template Type"::Intercompany, false, XINTERCOMP, XICGJNL, XInterCompanyGenJnl, XIC0010, XIC9999);
         if not GenJournalBatch.Get(XINTERCOMP, XDEFAULT) then
-            CreateGenJournalBatch.InsertData(XINTERCOMP, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account".AsInteger(), '', true, false);
+            CreateGenJournalBatch.InsertData(XINTERCOMP, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
 
         if not ICSetup.Get() then begin
             ICSetup.Init();

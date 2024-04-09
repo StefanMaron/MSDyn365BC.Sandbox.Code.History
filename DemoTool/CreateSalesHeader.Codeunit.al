@@ -59,7 +59,6 @@ codeunit 101036 "Create Sales Header"
         CA: Codeunit "Make Adjustments";
         i: Integer;
         "Date Displacement": Text[1];
-        XGUILDFORD10CR: Label 'GUILDFORD, 10 CR';
         XEquip: Label 'Equip';
         XEquipment: Label 'Equipment';
         XVENDRET: Label 'VEND RET';

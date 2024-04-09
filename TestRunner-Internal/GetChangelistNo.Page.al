@@ -79,11 +79,11 @@ page 130027 "Get Changelist No."
     trigger OnOpenPage()
     begin
         if SdAppPath = '' then begin
-            SdAppPath := GetChangelistCode.GetSdPath;
+            SdAppPath := GetChangelistCode.GetSdPath();
             LatestObjects := true;
         end;
         if ClientPath = '' then begin
-            ClientPath := GetChangelistCode.GetSdClientPath;
+            ClientPath := GetChangelistCode.GetSdClientPath();
             LatestObjects := true;
         end;
         GetLatestObjectsEnableExpr := IsCheckedIn;

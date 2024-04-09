@@ -215,7 +215,7 @@ codeunit 132581 WebServiceReqMgtTests
         SOAPWebServiceRequestMgt.SetGlobals(BlobInStream, UnsecureUrl, Username, Password);
 
         // Excercise
-        asserterror SOAPWebServiceRequestMgt.SendRequestToWebService;
+        asserterror SOAPWebServiceRequestMgt.SendRequestToWebService();
 
         // Validation
         Assert.ExpectedError(UnsecureUriErr);
@@ -249,10 +249,10 @@ codeunit 132581 WebServiceReqMgtTests
         BlobOutStream.WriteText(Data);
 
         SOAPWebServiceRequestMgt.SetGlobals(BlobInStream, UnsecureUrl, Username, Password);
-        SOAPWebServiceRequestMgt.DisableHttpsCheck;
+        SOAPWebServiceRequestMgt.DisableHttpsCheck();
 
         // Excercise
-        asserterror SOAPWebServiceRequestMgt.SendRequestToWebService;
+        asserterror SOAPWebServiceRequestMgt.SendRequestToWebService();
 
         // Validation - No errors should occur, but it should have failed the connection attempt
         Assert.ExpectedError(NotFoundErr);
@@ -288,7 +288,7 @@ codeunit 132581 WebServiceReqMgtTests
         SOAPWebServiceRequestMgt.SetGlobals(BlobInStream, InvalidUrl, Username, Password);
 
         // Excercise
-        asserterror SOAPWebServiceRequestMgt.SendRequestToWebService;
+        asserterror SOAPWebServiceRequestMgt.SendRequestToWebService();
 
         // Validation
         Assert.ExpectedError(InvalidUriErr);
@@ -307,7 +307,7 @@ codeunit 132581 WebServiceReqMgtTests
 
         SOAPWebServiceRequestMgt.SetGlobals(BlobInStream, Url, Username, Password);
 
-        if not SOAPWebServiceRequestMgt.SendRequestToWebService then begin
+        if not SOAPWebServiceRequestMgt.SendRequestToWebService() then begin
             asserterror SOAPWebServiceRequestMgt.ProcessFaultResponse(StrSubstNo(SupportURLErr, 'support UTL'));
             ExpectedError(Expected);
         end else
@@ -327,14 +327,14 @@ codeunit 132581 WebServiceReqMgtTests
 
         SOAPWebServiceRequestMgt.SetGlobals(BlobInStream, Url, Username, Password);
 
-        if not SOAPWebServiceRequestMgt.SendRequestToWebService then begin
-            asserterror ProcessFaultResponseAMC(SOAPWebServiceRequestMgt, '<syslogtype>error</syslogtype>');
+        if not SOAPWebServiceRequestMgt.SendRequestToWebService() then begin
+            asserterror ProcessFaultResponseAMC('<syslogtype>error</syslogtype>');
             ExpectedError(Expected);
         end else
             Error(WebServiceMgtRunErr);
     end;
 
-    local procedure ProcessFaultResponseAMC(var SOAPWebServiceRequestMgt: Codeunit "SOAP Web Service Request Mgt."; ExpectedTag: Text)
+    local procedure ProcessFaultResponseAMC(ExpectedTag: Text)
     var
         ResponseText: Text;
         WebRequestHelper: Codeunit "Web Request Helper";

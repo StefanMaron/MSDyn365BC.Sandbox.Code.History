@@ -16,27 +16,12 @@ codeunit 101805 "Create FA Subclass"
         XMachinerylc: Label 'Machinery';
         XTELEPHONE: Label 'TELEPHONE';
         XTelephoneEquipment: Label 'Telephone Equipment';
-        XPATENTS: Label 'PATENTS';
-        XPatentslc: Label 'Patents';
-        XGOODWILL: Label 'GOODWILL';
-        XGoodwilllc: Label 'Goodwill';
         XEQUIPMENT: Label 'EQUIPMENT';
         XEquipmentlc: Label 'Equipment';
-        XPLANT: Label 'PLANT';
-        XPlantlc: Label 'Plants/Buildings';
-        XPROPERTY: Label 'PROPERTY';
-        XPropertylc: Label 'Property/Land';
         XVEHICLES: Label 'VEHICLES';
         XVehicleslc: Label 'Vehicles';
-        XFURNITUREFIXTURES: Label 'FURNITURE';
-        XFurnitureFixtureslc: Label 'Furniture & Fixtures';
-        XIP: Label 'IP';
-        XIPlc: Label 'Intellectual Property';
         XTANGIBLE: Label 'TANGIBLE';
         XINTANGIBLE: Label 'INTANGIBLE';
-        XFINANCIAL: Label 'FINANCIAL';
-        XLEASEHOLD: Label 'LEASEHOLD';
-        XLEASEHOLDlc: Label 'Leasehold';
         XBuilding: Label 'BUILDING';
         XBuildinglc: Label 'Building';
 
@@ -52,7 +37,7 @@ codeunit 101805 "Create FA Subclass"
 
     procedure CreateTrialData()
     begin
-        InsertData(XEQUIPMENT, XEquipmentlc, XINTANGIBLE);
+        InsertData(XEQUIPMENT, XEquipmentlc, XTANGIBLE);
         InsertData(XBuilding, XBuildinglc, XINTANGIBLE);
         InsertData(XVEHICLES, XVehicleslc, XTANGIBLE);
     end;

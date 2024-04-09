@@ -5,8 +5,8 @@ codeunit 101851 "Create Item Charges"
     var
         TaxGroup: Code[10];
     begin
-        DemoDataSetup.Get();
-        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::"Sales Tax" then
+        DemoDataSetup.Get(); // AU
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::"Sales Tax" then 
             TaxGroup := XLABORTok;
         InsertData(XJBFREIGHT, XFreightChargeJBSpedition, XSERVICES, TaxGroup);
         InsertData(XPFREIGHT, XMiscFreightChargePurch, XSERVICES, TaxGroup);

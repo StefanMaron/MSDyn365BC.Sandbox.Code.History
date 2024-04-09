@@ -39,7 +39,6 @@ codeunit 101258 "Create Transaction Type"
         XReturnofprevrecdshippedgoods: Label 'Return of previously recd./shipped goods';
         XExchangeofreturnedgoods: Label 'Exchange of returned goods';
         XExchangeofnonreturnedgoods: Label 'Exchange of non-returned goods';
-        XGoodsusedinEUaidprograms: Label 'Goods used in EU aid programs';
         XOtherpublicsupport: Label 'Other public support';
         XOtherprivatesupport: Label 'Other (private) support';
         XProcessingundercontract: Label 'Processing under contract';
@@ -51,8 +50,6 @@ codeunit 101258 "Create Transaction Type"
         XOperationalleasing: Label 'Operational leasing';
         XJointdefenseprojects: Label 'Joint defense projects';
         XConstructionmatcovbycontract: Label 'Construction materials covered by contract';
-        XEUgoodssameownsenttoprivstor: Label 'EU goods (same owner) sent to private storage';
-        XEUgoodsrecdforprivatestorage: Label 'EU goods received for private storage';
         XOther: Label 'Other';
         XGoodsusedinMISCaidprograms: Label 'Goods used in MISC aid programs';
         XMcgoodssameownsenttoprivstor: Label 'MISC goods (same owner) sent to private storage';
