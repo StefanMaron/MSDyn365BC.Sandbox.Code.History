@@ -228,8 +228,10 @@ codeunit 99000809 "Planning Line Management"
                                     OnTransferBOMOnBeforeTransferProductionBOM(ReqQty, ProdBOMLine[Level], LineQtyPerUOM, ItemQtyPerUOM, ReqLine);
                                     TransferBOM(ProdBOMLine[Level]."No.", Level + 1, ReqQty, 1);
                                     ProdBOMLine[Level].SetRange("Production BOM No.", ProdBOMNo);
-                                    ProdBOMLine[Level].SetRange(
-                                      "Version Code", VersionMgt.GetBOMVersion(ProdBOMNo, ReqLine."Starting Date", true));
+                                    if Level > 1 then
+                                        ProdBOMLine[Level].SetRange("Version Code", VersionMgt.GetBOMVersion(ProdBOMNo, ReqLine."Starting Date", true))
+                                    else
+                                        ProdBOMLine[Level].SetRange("Version Code", ProdBOMLine[Level]."Version Code");
                                     ProdBOMLine[Level].SetFilter("Starting Date", '%1|..%2', 0D, ReqLine."Starting Date");
                                     ProdBOMLine[Level].SetFilter("Ending Date", '%1|%2..', 0D, ReqLine."Starting Date");
                                 end;
