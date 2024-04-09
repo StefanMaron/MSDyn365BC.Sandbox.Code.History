@@ -3,11 +3,11 @@ codeunit 101600 "Create Employee"
 
     trigger OnRun()
     begin
-        InsertAllGeneral;
-        InsertAllContact;
-        InsertAllAdministration;
-        InsertAllPersonal;
-        InsertAllPostingGroups;
+        InsertAllGeneral();
+        InsertAllContact();
+        InsertAllAdministration();
+        InsertAllPersonal();
+        InsertAllPostingGroups();
     end;
 
     var
@@ -65,6 +65,7 @@ codeunit 101600 "Create Employee"
         XTDODDS: Label 'TDODDS';
         X66BJamesRoad: Label '66B James Road';
         XEmplExp: Label 'EMPLEXP', Locked = true;
+        XAccountsPayableTok: Label 'Accounts Payable';
         XEmployeesPayable: Label 'Employees Payable';
 
     procedure InsertGeneral("No.": Code[20]; "First Name": Text[30]; "Middle Name": Text[30]; "Last Name": Text[30]; Initials: Text[30]; Address: Text[30]; "Post Code": Code[20]; Title: Text[30]; Sex: Enum "Employee Gender")
@@ -135,10 +136,10 @@ codeunit 101600 "Create Employee"
 
     procedure CreateEvaluationData()
     begin
-        InsertAllGeneral;
-        InsertAllContact;
-        InsertAllDates;
-        InsertAllPostingGroups;
+        InsertAllGeneral();
+        InsertAllContact();
+        InsertAllDates();
+        InsertAllPostingGroups();
     end;
 
     local procedure InsertAllGeneral()
@@ -223,13 +224,23 @@ codeunit 101600 "Create Employee"
     var
         EmployeePostingGroup: Record "Employee Posting Group";
         GLAccount: Record "G/L Account";
+        RoundingGLAccount: Record "G/L Account";
+        CreateCustPostGroup: Codeunit "Create Cust. Posting Group";
     begin
         GLAccount.SetRange(Name, XEmployeesPayable);
-        if not GLAccount.FindFirst() then
-            exit;
-
+        if not GLAccount.FindFirst() then begin
+            GLAccount.SetRange(Name, XAccountsPayableTok);
+            if not GLAccount.FindFirst() then
+                exit;
+        end;
         EmployeePostingGroup.Code := XEmplExp;
+        RoundingGLAccount."No." := CreateCustPostGroup.GetRoundingAccount();
         EmployeePostingGroup."Payables Account" := GLAccount."No.";
+
+        EmployeePostingGroup.Validate("Credit Curr. Appln. Rndg. Acc.", RoundingGLAccount."No.");
+        EmployeePostingGroup.Validate("Credit Rounding Account", RoundingGLAccount."No.");
+        EmployeePostingGroup.Validate("Debit Curr. Appln. Rndg. Acc.", RoundingGLAccount."No.");
+        EmployeePostingGroup.Validate("Debit Rounding Account", RoundingGLAccount."No.");
         EmployeePostingGroup.Insert();
 
         InsertPostingGroup(XEH, EmployeePostingGroup.Code);

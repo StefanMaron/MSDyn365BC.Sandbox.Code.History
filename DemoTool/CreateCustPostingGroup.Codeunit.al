@@ -3,22 +3,20 @@ codeunit 101092 "Create Cust. Posting Group"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(
-              DomesticCode, XDomesticCustomersTxt,
-              '992310', '996410', '', '', '7690001', '7050004', '7691001', '998610', '6690002', '6691001', '6691001');
-            InsertData(
-              ForeignCode, XForeignCustomersTxt,
-              '992320', '996430', '', '', '7690001', '7050004', '7691001', '998610', '6690002', '6691001', '6691001');
-            InsertData(
-              EUCode, XCustomersInEUTxt,
-              '992310', '996420', '', '', '7690001', '7050004', '7691001', '998610', '6690002', '6691001', '6691001');
+        DemoDataSetup.Get();
+        InsertData(
+          DemoDataSetup.DomesticCode(), XDomesticCustomersTxt,
+          '992310', '996410', '', '', '7690001', '7050004', '7691001', '998610', '6690002', '6691001', '6691001');
+        InsertData(
+          DemoDataSetup.ForeignCode(), XForeignCustomersTxt,
+          '992320', '996430', '', '', '7690001', '7050004', '7691001', '998610', '6690002', '6691001', '6691001');
+        InsertData(
+          DemoDataSetup.EUCode(), XCustomersInEUTxt,
+          '992310', '996420', '', '', '7690001', '7050004', '7691001', '998610', '6690002', '6691001', '6691001');
 
-            InsertData2(DomesticCode, '4310001', '4311001', '4312001', '4315001', '7691001', '4300003', '4300004', '4300005');
-            InsertData2(ForeignCode, '', '', '', '', '', '', '', '');
-            InsertData2(EUCode, '4310001', '4311001', '4312001', '4315001', '7691001', '4300003', '4300004', '4300005');
-        end;
+        InsertData2(DemoDataSetup.DomesticCode(), '4310001', '4311001', '4312001', '4315001', '7691001', '4300003', '4300004', '4300005');
+        InsertData2(DemoDataSetup.ForeignCode(), '', '', '', '', '', '', '', '');
+        InsertData2(DemoDataSetup.EUCode(), '4310001', '4311001', '4312001', '4315001', '7691001', '4300003', '4300004', '4300005');
     end;
 
     var
@@ -26,6 +24,13 @@ codeunit 101092 "Create Cust. Posting Group"
         XDomesticCustomersTxt: Label 'Domestic customers';
         XCustomersInEUTxt: Label 'Customers in EU';
         XForeignCustomersTxt: Label 'Foreign customers (not EU)';
+
+    procedure GetRoundingAccount(): code[20]
+    var
+        MakeAdjustments: Codeunit "Make Adjustments";
+    begin
+        exit(MakeAdjustments.Convert('6690002'));
+    end;
 
     procedure InsertData("Code": Code[20]; PostingGroupDescription: Text[50]; "Receivables Account": Code[20]; "Service Charge Acc.": Code[20]; "Pmt. Disc. Debit Acc.": Code[20]; "Pmt. Disc. Credit Acc.": Code[20]; "Invoice Rounding Account": Code[20]; "Additional Fee Acc.": Code[20]; "Interest Acc.": Code[20]; "Credit Appl. Rounding Account": Code[20]; "Debit Appl. Rounding Account": Code[20]; "Payment Tolerance Debit Acc.": Code[20]; "Payment Tolerance Credit Acc.": Code[20])
     var
@@ -44,8 +49,8 @@ codeunit 101092 "Create Cust. Posting Group"
         CustomerPostingGroup.Validate("Invoice Rounding Account", MakeAdjustments.Convert("Invoice Rounding Account"));
         CustomerPostingGroup.Validate("Credit Curr. Appln. Rndg. Acc.", MakeAdjustments.Convert("Credit Appl. Rounding Account"));
         CustomerPostingGroup.Validate("Debit Curr. Appln. Rndg. Acc.", MakeAdjustments.Convert("Debit Appl. Rounding Account"));
-        CustomerPostingGroup.Validate("Debit Rounding Account", MakeAdjustments.Convert("Invoice Rounding Account"));
-        CustomerPostingGroup.Validate("Credit Rounding Account", MakeAdjustments.Convert("Invoice Rounding Account"));
+        CustomerPostingGroup.Validate("Debit Rounding Account", GetRoundingAccount());
+        CustomerPostingGroup.Validate("Credit Rounding Account", GetRoundingAccount());
         CustomerPostingGroup.Validate("Payment Tolerance Debit Acc.", MakeAdjustments.Convert("Payment Tolerance Debit Acc."));
         CustomerPostingGroup.Validate("Payment Tolerance Credit Acc.", MakeAdjustments.Convert("Payment Tolerance Credit Acc."));
         CustomerPostingGroup.Insert();

@@ -2,6 +2,7 @@ table 122003 "Item Sales Data"
 {
     Caption = 'Item Sales Data';
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

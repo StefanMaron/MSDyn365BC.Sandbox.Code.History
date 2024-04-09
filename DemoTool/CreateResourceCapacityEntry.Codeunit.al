@@ -37,7 +37,6 @@ codeunit 101160 "Create Resource Capacity Entry"
     end;
 
     var
-        DateRec: Record Date;
         "Res. Capacity Entry": Record "Res. Capacity Entry";
         EntryNo: Integer;
         XLina: Label 'Lina';

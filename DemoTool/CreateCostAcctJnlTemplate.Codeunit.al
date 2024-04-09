@@ -5,13 +5,11 @@ codeunit 119089 "Create Cost Acct. Jnl Template"
     var
         CostJournalTemplate: Record "Cost Journal Template";
     begin
-        with CostJournalTemplate do begin
-            Name := XCOSTACCT;
-            Description := XStandardJournal;
-            "Posting Report ID" := REPORT::"Cost Register";
-            if not Insert then
-                Modify();
-        end;
+        CostJournalTemplate.Name := XCOSTACCT;
+        CostJournalTemplate.Description := XStandardJournal;
+        CostJournalTemplate."Posting Report ID" := REPORT::"Cost Register";
+        if not CostJournalTemplate.Insert() then
+            CostJournalTemplate.Modify();
     end;
 
     var

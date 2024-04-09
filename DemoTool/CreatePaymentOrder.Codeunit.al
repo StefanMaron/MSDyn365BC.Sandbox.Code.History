@@ -5,62 +5,59 @@ codeunit 161006 "Create Payment Order"
     begin
         DemoDataSetup.Get();
         // Settle payable document
-        SettlePayableDoc;
+        SettlePayableDoc();
         Commit();
         // Create payment order
         InsertData(XNBL, CalcDate('<CY-2Y+2M+1D>'));
-
         // Insert documents in new payment order
-        with Doc do begin
-            Reset();
-            SetRange(Type, Type::Payable);
-            SetRange("Document Type", "Document Type"::Bill);
-            SetRange("Collection Agent", "Collection Agent"::Bank);
-            SetRange("Bill Gr./Pmt. Order No.", '');
-            Find('-');
-            FinanceCoType := "Collection Agent"::Bank;
-            PmtOrdNo := PmtOrd."No.";
-            for i := 1 to 2 do begin
-                TestField("Collection Agent", FinanceCoType);
-                TestField("Bill Gr./Pmt. Order No.", '');
-                TestField("Currency Code", '');
-                TestField(Type, Type::Payable);
-                if Accepted = Accepted::No then
-                    FieldError(Accepted);
-                OldDoc := Doc;
-                "Collection Agent" := FinanceCoType;
-                "Bill Gr./Pmt. Order No." := PmtOrdNo;
-                Modify();
-                Doc := OldDoc;
-                Doc.Next();
-            end;
-            Reset();
-            SetRange(Type, Type::Payable);
-            SetRange("Document Type", "Document Type"::Invoice);
-            SetRange("Collection Agent", "Collection Agent"::Bank);
-            SetRange("Bill Gr./Pmt. Order No.", '');
-            Find('-');
-            FinanceCoType := "Collection Agent"::Bank;
-            PmtOrdNo := PmtOrd."No.";
-            for i := 1 to 1 do begin
-                TestField("Collection Agent", FinanceCoType);
-                TestField("Bill Gr./Pmt. Order No.", '');
-                TestField("Currency Code", '');
-                TestField(Type, Type::Payable);
-                if Accepted = Accepted::No then
-                    FieldError(Accepted);
-                OldDoc := Doc;
-                "Collection Agent" := FinanceCoType;
-                "Bill Gr./Pmt. Order No." := PmtOrdNo;
-                Modify();
-                Doc := OldDoc;
-                Doc.Next();
-            end;
+        CarteraDoc.Reset();
+        CarteraDoc.SetRange(Type, CarteraDoc.Type::Payable);
+        CarteraDoc.SetRange("Document Type", CarteraDoc."Document Type"::Bill);
+        CarteraDoc.SetRange("Collection Agent", CarteraDoc."Collection Agent"::Bank);
+        CarteraDoc.SetRange("Bill Gr./Pmt. Order No.", '');
+        CarteraDoc.Find('-');
+        FinanceCoType := CarteraDoc."Collection Agent"::Bank;
+        PmtOrdNo := PmtOrd."No.";
+        for i := 1 to 2 do begin
+            CarteraDoc.TestField("Collection Agent", FinanceCoType);
+            CarteraDoc.TestField("Bill Gr./Pmt. Order No.", '');
+            CarteraDoc.TestField("Currency Code", '');
+            CarteraDoc.TestField(Type, CarteraDoc.Type::Payable);
+            if CarteraDoc.Accepted = CarteraDoc.Accepted::No then
+                CarteraDoc.FieldError(Accepted);
+            OldCarteraDoc := CarteraDoc;
+            CarteraDoc."Collection Agent" := FinanceCoType;
+            CarteraDoc."Bill Gr./Pmt. Order No." := PmtOrdNo;
+            CarteraDoc.Modify();
+            CarteraDoc := OldCarteraDoc;
+            CarteraDoc.Next();
+        end;
+        CarteraDoc.Reset();
+        CarteraDoc.SetRange(Type, CarteraDoc.Type::Payable);
+        CarteraDoc.SetRange("Document Type", CarteraDoc."Document Type"::Invoice);
+        CarteraDoc.SetRange("Collection Agent", CarteraDoc."Collection Agent"::Bank);
+        CarteraDoc.SetRange("Bill Gr./Pmt. Order No.", '');
+        CarteraDoc.Find('-');
+        FinanceCoType := CarteraDoc."Collection Agent"::Bank;
+        PmtOrdNo := PmtOrd."No.";
+        for i := 1 to 1 do begin
+            CarteraDoc.TestField("Collection Agent", FinanceCoType);
+            CarteraDoc.TestField("Bill Gr./Pmt. Order No.", '');
+            CarteraDoc.TestField("Currency Code", '');
+            CarteraDoc.TestField(Type, CarteraDoc.Type::Payable);
+            if CarteraDoc.Accepted = CarteraDoc.Accepted::No then
+                CarteraDoc.FieldError(Accepted);
+            OldCarteraDoc := CarteraDoc;
+            CarteraDoc."Collection Agent" := FinanceCoType;
+            CarteraDoc."Bill Gr./Pmt. Order No." := PmtOrdNo;
+            CarteraDoc.Modify();
+            CarteraDoc := OldCarteraDoc;
+            CarteraDoc.Next();
         end;
 
         // Modify Acc. 6260001 to post journal
         if CGCta.Get('6260001') then begin
-            CGCta."Gen. Posting Type" := 0;
+            CGCta."Gen. Posting Type" := CGCta."Gen. Posting Type"::" ";
             CGCta."Gen. Bus. Posting Group" := '';
             CGCta."Gen. Prod. Posting Group" := '';
             CGCta.Modify();
@@ -78,31 +75,28 @@ codeunit 161006 "Create Payment Order"
 
         // Create one more group
         InsertData(XWWBEUR, CalcDate('<CY-2Y+2M+1D>'));
-
         // Insert Docs. in new payment order
-        with Doc do begin
-            Reset();
-            SetRange(Type, Type::Payable);
-            SetRange("Document Type", "Document Type"::Bill);
-            SetRange("Collection Agent", "Collection Agent"::Bank);
-            SetRange("Bill Gr./Pmt. Order No.", '');
-            Find('-');
-            FinanceCoType := "Collection Agent"::Bank;
-            PmtOrdNo := PmtOrd."No.";
-            for i := 1 to 2 do begin
-                TestField("Collection Agent", FinanceCoType);
-                TestField("Bill Gr./Pmt. Order No.", '');
-                TestField("Currency Code", '');
-                TestField(Type, Type::Payable);
-                if Accepted = Accepted::No then
-                    FieldError(Accepted);
-                OldDoc := Doc;
-                "Collection Agent" := FinanceCoType;
-                "Bill Gr./Pmt. Order No." := PmtOrdNo;
-                Modify();
-                Doc := OldDoc;
-                Doc.Next();
-            end;
+        CarteraDoc.Reset();
+        CarteraDoc.SetRange(Type, CarteraDoc.Type::Payable);
+        CarteraDoc.SetRange("Document Type", CarteraDoc."Document Type"::Bill);
+        CarteraDoc.SetRange("Collection Agent", CarteraDoc."Collection Agent"::Bank);
+        CarteraDoc.SetRange("Bill Gr./Pmt. Order No.", '');
+        CarteraDoc.Find('-');
+        FinanceCoType := CarteraDoc."Collection Agent"::Bank;
+        PmtOrdNo := PmtOrd."No.";
+        for i := 1 to 2 do begin
+            CarteraDoc.TestField("Collection Agent", FinanceCoType);
+            CarteraDoc.TestField("Bill Gr./Pmt. Order No.", '');
+            CarteraDoc.TestField("Currency Code", '');
+            CarteraDoc.TestField(Type, CarteraDoc.Type::Payable);
+            if CarteraDoc.Accepted = CarteraDoc.Accepted::No then
+                CarteraDoc.FieldError(Accepted);
+            OldCarteraDoc := CarteraDoc;
+            CarteraDoc."Collection Agent" := FinanceCoType;
+            CarteraDoc."Bill Gr./Pmt. Order No." := PmtOrdNo;
+            CarteraDoc.Modify();
+            CarteraDoc := OldCarteraDoc;
+            CarteraDoc.Next();
         end;
 
         // Post group
@@ -115,31 +109,28 @@ codeunit 161006 "Create Payment Order"
 
         // Create one more group
         InsertData(XNBL, CalcDate('<CY-2Y+2M+1D>'));
-
         // Insert Docs. in new payment order
-        with Doc do begin
-            Reset();
-            SetRange(Type, Type::Payable);
-            SetRange("Document Type", "Document Type"::Bill);
-            SetRange("Collection Agent", "Collection Agent"::Bank);
-            SetRange("Bill Gr./Pmt. Order No.", '');
-            Find('-');
-            FinanceCoType := "Collection Agent"::Bank;
-            PmtOrdNo := PmtOrd."No.";
-            for i := 1 to 2 do begin
-                TestField("Collection Agent", FinanceCoType);
-                TestField("Bill Gr./Pmt. Order No.", '');
-                TestField("Currency Code", '');
-                TestField(Type, Type::Payable);
-                if Accepted = Accepted::No then
-                    FieldError(Accepted);
-                OldDoc := Doc;
-                "Collection Agent" := FinanceCoType;
-                "Bill Gr./Pmt. Order No." := PmtOrdNo;
-                Modify();
-                Doc := OldDoc;
-                Doc.Next();
-            end;
+        CarteraDoc.Reset();
+        CarteraDoc.SetRange(Type, CarteraDoc.Type::Payable);
+        CarteraDoc.SetRange("Document Type", CarteraDoc."Document Type"::Bill);
+        CarteraDoc.SetRange("Collection Agent", CarteraDoc."Collection Agent"::Bank);
+        CarteraDoc.SetRange("Bill Gr./Pmt. Order No.", '');
+        CarteraDoc.Find('-');
+        FinanceCoType := CarteraDoc."Collection Agent"::Bank;
+        PmtOrdNo := PmtOrd."No.";
+        for i := 1 to 2 do begin
+            CarteraDoc.TestField("Collection Agent", FinanceCoType);
+            CarteraDoc.TestField("Bill Gr./Pmt. Order No.", '');
+            CarteraDoc.TestField("Currency Code", '');
+            CarteraDoc.TestField(Type, CarteraDoc.Type::Payable);
+            if CarteraDoc.Accepted = CarteraDoc.Accepted::No then
+                CarteraDoc.FieldError(Accepted);
+            OldCarteraDoc := CarteraDoc;
+            CarteraDoc."Collection Agent" := FinanceCoType;
+            CarteraDoc."Bill Gr./Pmt. Order No." := PmtOrdNo;
+            CarteraDoc.Modify();
+            CarteraDoc := OldCarteraDoc;
+            CarteraDoc.Next();
         end;
 
         // Post settlement
@@ -160,18 +151,16 @@ codeunit 161006 "Create Payment Order"
         GenJnlLine.DeleteAll();
 
         if CGCta.Get('6260001') then begin
-            CGCta."Gen. Posting Type" := 1;
-            CGCta."Gen. Bus. Posting Group" := DemoDataSetup.DomesticCode;
-            CGCta."Gen. Prod. Posting Group" := DemoDataSetup.MiscCode;
+            CGCta."Gen. Posting Type" := CGCta."Gen. Posting Type"::Purchase;
+            CGCta."Gen. Bus. Posting Group" := DemoDataSetup.DomesticCode();
+            CGCta."Gen. Prod. Posting Group" := DemoDataSetup.MiscCode();
             CGCta.Modify();
         end;
     end;
 
     var
-        Doc: Record "Cartera Doc.";
-        OldDoc: Record "Cartera Doc.";
-        AccountingSetup: Record "General Ledger Setup";
-        CarteraManagement: Codeunit CarteraManagement;
+        CarteraDoc: Record "Cartera Doc.";
+        OldCarteraDoc: Record "Cartera Doc.";
         GJPostLine: Codeunit "Gen. Jnl.-Post Line";
         FinanceCoType: Integer;
         PmtOrdNo: Code[20];
@@ -210,43 +199,39 @@ codeunit 161006 "Create Payment Order"
 
     procedure SettlePayableDoc()
     var
-        Doc2: Record "Cartera Doc.";
+        CarteraDoc2: Record "Cartera Doc.";
         GenJnlLine2: Record "Gen. Journal Line";
     begin
-        with Doc2 do begin
-            Reset();
-            SetRange(Type, Type::Payable);
-            SetRange("Document Type", "Document Type"::Bill);
-            SetRange("Collection Agent", "Collection Agent"::Bank);
-            SetRange("Bill Gr./Pmt. Order No.", '');
-            Find('-');
-        end;
-        with GenJnlLine2 do begin
-            Init();
-            Validate("Journal Template Name", XPAYMENT);
-            Validate("Line No.", 10000);
-            Validate("Account Type", "Account Type"::Vendor);
-            Validate("Account No.", Doc2."Account No.");
-            Validate("Posting Date", Doc2."Posting Date");
-            Validate("Document Type", "Document Type"::Payment);
-            Validate("Document No.", 'G04001');
-            Validate(Description, XLewisHomeFurniture);
-            Validate(Amount, Doc2."Remaining Amount");
-            Validate("Posting Group", DemoDataSetup.DomesticCode);
-            Validate("Salespers./Purch. Code", XEH);
-            Validate("Source Code", XPAYMENTJNL);
-            Validate("System-Created Entry", false);
-            Validate("Applies-to Doc. Type", "Applies-to Doc. Type"::Bill);
-            Validate("Applies-to Doc. No.", Doc2."Document No.");
-            Validate("Due Date", Doc2."Due Date");
-            Validate("Journal Batch Name", XBANK);
-            Validate("VAT Calculation Type", "VAT Calculation Type"::"Normal VAT");
-            Validate("Bal. Account Type", "Bal. Account Type"::"Bank Account");
-            Validate("Bal. Account No.", XNBL);
-            Validate("Applies-to Bill No.", '1');
-            Validate("Recipient Bank Account", Doc2."Cust./Vendor Bank Acc. Code");
-            Validate("Payment Method Code", Doc2."Payment Method Code");
-        end;
+        CarteraDoc2.Reset();
+        CarteraDoc2.SetRange(Type, CarteraDoc2.Type::Payable);
+        CarteraDoc2.SetRange("Document Type", CarteraDoc2."Document Type"::Bill);
+        CarteraDoc2.SetRange("Collection Agent", CarteraDoc2."Collection Agent"::Bank);
+        CarteraDoc2.SetRange("Bill Gr./Pmt. Order No.", '');
+        CarteraDoc2.Find('-');
+        GenJnlLine2.Init();
+        GenJnlLine2.Validate("Journal Template Name", XPAYMENT);
+        GenJnlLine2.Validate("Line No.", 10000);
+        GenJnlLine2.Validate("Account Type", GenJnlLine2."Account Type"::Vendor);
+        GenJnlLine2.Validate(GenJnlLine2."Account No.", CarteraDoc2."Account No.");
+        GenJnlLine2.Validate(GenJnlLine2."Posting Date", CarteraDoc2."Posting Date");
+        GenJnlLine2.Validate("Document Type", GenJnlLine2."Document Type"::Payment);
+        GenJnlLine2.Validate("Document No.", 'G04001');
+        GenJnlLine2.Validate(Description, XLewisHomeFurniture);
+        GenJnlLine2.Validate(GenJnlLine2.Amount, CarteraDoc2."Remaining Amount");
+        GenJnlLine2.Validate("Posting Group", DemoDataSetup.DomesticCode());
+        GenJnlLine2.Validate("Salespers./Purch. Code", XEH);
+        GenJnlLine2.Validate("Source Code", XPAYMENTJNL);
+        GenJnlLine2.Validate("System-Created Entry", false);
+        GenJnlLine2.Validate("Applies-to Doc. Type", GenJnlLine2."Applies-to Doc. Type"::Bill);
+        GenJnlLine2.Validate(GenJnlLine2."Applies-to Doc. No.", CarteraDoc2."Document No.");
+        GenJnlLine2.Validate(GenJnlLine2."Due Date", CarteraDoc2."Due Date");
+        GenJnlLine2.Validate("Journal Batch Name", XBANK);
+        GenJnlLine2.Validate("VAT Calculation Type", GenJnlLine2."VAT Calculation Type"::"Normal VAT");
+        GenJnlLine2.Validate("Bal. Account Type", GenJnlLine2."Bal. Account Type"::"Bank Account");
+        GenJnlLine2.Validate("Bal. Account No.", XNBL);
+        GenJnlLine2.Validate("Applies-to Bill No.", '1');
+        GenJnlLine2.Validate(GenJnlLine2."Recipient Bank Account", CarteraDoc2."Cust./Vendor Bank Acc. Code");
+        GenJnlLine2.Validate(GenJnlLine2."Payment Method Code", CarteraDoc2."Payment Method Code");
 
         GJPostLine.SetFromSettlement(true);
         GJPostLine.Run(GenJnlLine2);

@@ -3,15 +3,13 @@ codeunit 101251 "Create Gen. Prod. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(MiscCode, XMiscellaneouswithVAT, GoodsVATCode);
-            InsertData(NoVATCode, XMiscellaneouswithoutVAT, NoVATCode);
-            InsertData(RawMatCode, XRawMaterials, GoodsVATCode);
-            InsertData(RetailCode, XRetail2, GoodsVATCode);
-            InsertData(ServicesCode, XResourcesetc, ServicesVATCode);
-            InsertData(ManufactCode, XCapacities, '');
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.MiscCode(), XMiscellaneouswithVAT, DemoDataSetup.GoodsVATCode());
+        InsertData(DemoDataSetup.NoVATCode(), XMiscellaneouswithoutVAT, DemoDataSetup.NoVATCode());
+        InsertData(DemoDataSetup.RawMatCode(), XRawMaterials, DemoDataSetup.GoodsVATCode());
+        InsertData(DemoDataSetup.RetailCode(), XRetail2, DemoDataSetup.GoodsVATCode());
+        InsertData(DemoDataSetup.ServicesCode(), XResourcesetc, DemoDataSetup.ServicesVATCode());
+        InsertData(DemoDataSetup.ManufactCode(), XCapacities, '');
     end;
 
     var
@@ -26,29 +24,25 @@ codeunit 101251 "Create Gen. Prod. Posting Gr."
 
     procedure InsertMiniAppData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(MiscCode, XMiscellaneouswithVAT, GoodsVATCode);
-            InsertData(NoVATCode, XMiscellaneouswithoutVAT, NoVATCode);
-            InsertData(RawMatCode, XRawMaterials, GoodsVATCode);
-            InsertData(FreightCode, XFreightDescriptionTxt, GoodsVATCode);
-            InsertData(RetailCode, XRetail2, GoodsVATCode);
-            InsertData(ServicesCode, XResourcesetc, ServicesVATCode);
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.MiscCode(), XMiscellaneouswithVAT, DemoDataSetup.GoodsVATCode());
+        InsertData(DemoDataSetup.NoVATCode(), XMiscellaneouswithoutVAT, DemoDataSetup.NoVATCode());
+        InsertData(DemoDataSetup.RawMatCode(), XRawMaterials, DemoDataSetup.GoodsVATCode());
+        InsertData(DemoDataSetup.FreightCode(), XFreightDescriptionTxt, DemoDataSetup.GoodsVATCode());
+        InsertData(DemoDataSetup.RetailCode(), XRetail2, DemoDataSetup.GoodsVATCode());
+        InsertData(DemoDataSetup.ServicesCode(), XResourcesetc, DemoDataSetup.ServicesVATCode());
     end;
 
     procedure InsertData(NewCode: Code[20]; NewDescription: Text[50]; DefVATProdPostingGroup: Code[20])
     var
         GenProductPostingGroup: Record "Gen. Product Posting Group";
     begin
-        with GenProductPostingGroup do begin
-            Init();
-            Validate(Code, NewCode);
-            Validate(Description, NewDescription);
-            if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then
-                "Def. VAT Prod. Posting Group" := DefVATProdPostingGroup;
-            Insert();
-        end;
+        GenProductPostingGroup.Init();
+        GenProductPostingGroup.Validate(Code, NewCode);
+        GenProductPostingGroup.Validate(Description, NewDescription);
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then
+            GenProductPostingGroup."Def. VAT Prod. Posting Group" := DefVATProdPostingGroup;
+        GenProductPostingGroup.Insert();
     end;
 }
 

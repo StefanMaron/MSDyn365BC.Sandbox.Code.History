@@ -37,13 +37,13 @@ page 130024 "Get Test Codeunits"
     trigger OnOpenPage()
     begin
         ShowFeatureTags := TestSuite."Show Test Details";
-        Load;
+        Load();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if CloseAction in [ACTION::OK, ACTION::LookupOK] then
-            CreateLines
+            CreateLines();
     end;
 
     var

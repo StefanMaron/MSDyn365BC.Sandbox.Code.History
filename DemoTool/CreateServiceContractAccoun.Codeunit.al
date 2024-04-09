@@ -3,16 +3,13 @@ codeunit 117074 "Create Service Contract Accoun"
 
     trigger OnRun()
     begin
-        with ServiceContractAccountGroup do begin
-            // InsertData(XHARDWARE,XHardwarelc,'6955','5796');
-            // InsertData(XSOFTWARE,XSoftwarelc,'6955','5797');
-            InsertData(XHARDWARE, XHardwarelc, Adjust.Convert('6955'), Adjust.Convert('5796'));
-            InsertData(XSOFTWARE, XSoftwarelc, Adjust.Convert('6955'), Adjust.Convert('5797'));
-        end;
+        // InsertData(XHARDWARE,XHardwarelc,'6955','5796');
+        // InsertData(XSOFTWARE,XSoftwarelc,'6955','5797');
+        InsertData(XHARDWARE, XHardwarelc, Adjust.Convert('6955'), Adjust.Convert('5796'));
+        InsertData(XSOFTWARE, XSoftwarelc, Adjust.Convert('6955'), Adjust.Convert('5797'));
     end;
 
     var
-        ServiceContractAccountGroup: Record "Service Contract Account Group";
         XHARDWARE: Label 'HARDWARE';
         XHardwarelc: Label 'Hardware';
         XSOFTWARE: Label 'SOFTWARE';

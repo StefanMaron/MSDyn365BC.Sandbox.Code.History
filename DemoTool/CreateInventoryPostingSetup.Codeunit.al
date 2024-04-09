@@ -3,30 +3,28 @@ codeunit 101110 "Create Inventory Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('', FinishedCode, '992120', '992111');
-            InsertData('', RawMatCode, '992130', '992131');
-            InsertData('', ResaleCode, '992110', '992121');
-            InsertData(XBLUE, FinishedCode, '992120', '992111');
-            InsertData(XBLUE, RawMatCode, '992130', '992131');
-            InsertData(XBLUE, ResaleCode, '992110', '992121');
-            InsertData(XGREEN, FinishedCode, '992120', '992111');
-            InsertData(XGREEN, RawMatCode, '992130', '992131');
-            InsertData(XGREEN, ResaleCode, '992110', '992121');
-            InsertData(XRED, FinishedCode, '992120', '992111');
-            InsertData(XRED, RawMatCode, '992130', '992131');
-            InsertData(XRED, ResaleCode, '992110', '992121');
-            InsertData(XYELLOW, FinishedCode, '992120', '992111');
-            InsertData(XYELLOW, RawMatCode, '992130', '992131');
-            InsertData(XYELLOW, ResaleCode, '992110', '992121');
-            InsertData(XWHITE, FinishedCode, '992120', '992111');
-            InsertData(XWHITE, RawMatCode, '992130', '992131');
-            InsertData(XWHITE, ResaleCode, '992110', '992121');
-            InsertData(XSILVER, FinishedCode, '992120', '992111');
-            InsertData(XSILVER, RawMatCode, '992130', '992131');
-            InsertData(XSILVER, ResaleCode, '992110', '992121');
-        end;
+        DemoDataSetup.Get();
+        InsertData('', DemoDataSetup.FinishedCode(), '992120', '992111');
+        InsertData('', DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData('', DemoDataSetup.ResaleCode(), '992110', '992121');
+        InsertData(XBLUE, DemoDataSetup.FinishedCode(), '992120', '992111');
+        InsertData(XBLUE, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XBLUE, DemoDataSetup.ResaleCode(), '992110', '992121');
+        InsertData(XGREEN, DemoDataSetup.FinishedCode(), '992120', '992111');
+        InsertData(XGREEN, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XGREEN, DemoDataSetup.ResaleCode(), '992110', '992121');
+        InsertData(XRED, DemoDataSetup.FinishedCode(), '992120', '992111');
+        InsertData(XRED, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XRED, DemoDataSetup.ResaleCode(), '992110', '992121');
+        InsertData(XYELLOW, DemoDataSetup.FinishedCode(), '992120', '992111');
+        InsertData(XYELLOW, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XYELLOW, DemoDataSetup.ResaleCode(), '992110', '992121');
+        InsertData(XWHITE, DemoDataSetup.FinishedCode(), '992120', '992111');
+        InsertData(XWHITE, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XWHITE, DemoDataSetup.ResaleCode(), '992110', '992121');
+        InsertData(XSILVER, DemoDataSetup.FinishedCode(), '992120', '992111');
+        InsertData(XSILVER, DemoDataSetup.RawMatCode(), '992130', '992131');
+        InsertData(XSILVER, DemoDataSetup.ResaleCode(), '992110', '992121');
     end;
 
     var
@@ -56,20 +54,16 @@ codeunit 101110 "Create Inventory Posting Setup"
 
     procedure InsertMiniAppData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('', ResaleCode, '992110', '992111');
-        end;
+        DemoDataSetup.Get();
+        InsertData('', DemoDataSetup.ResaleCode(), '992110', '992111');
     end;
 
     procedure CreateEvaluationData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(XMAIN, ResaleCode, '992110', '992111');
-            InsertData(XEAST, ResaleCode, '992110', '992111');
-            InsertData(XWEST, ResaleCode, '992110', '992111');
-        end;
+        DemoDataSetup.Get();
+        InsertData(XMAIN, DemoDataSetup.ResaleCode(), '992110', '992111');
+        InsertData(XEAST, DemoDataSetup.ResaleCode(), '992110', '992111');
+        InsertData(XWEST, DemoDataSetup.ResaleCode(), '992110', '992111');
     end;
 }
 

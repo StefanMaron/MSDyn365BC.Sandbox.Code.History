@@ -17,10 +17,10 @@ codeunit 101413 "Create IC Partner"
 
         // Gen. Bus Posting Group
         CreateGenBusPostGroup.InsertData(XINTERCOMP, XIntercompanylc, '');
-        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.MiscCode, '996120', '997110');
-        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.NoVATCode, '996120', '997110');
-        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.RawMatCode, '996120', '997210');
-        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.RetailCode, '996120', '997110');
+        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.MiscCode(), '996120', '997110');
+        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.NoVATCode(), '996120', '997110');
+        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.RawMatCode(), '996120', '997210');
+        CreateGenPostingSetup.InsertData(XINTERCOMP, DemoDataSetup.RetailCode(), '996120', '997110');
 
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
           GLAccountCategory."Account Category"::Assets, GLAccountCategoryMgt.GetAR());
@@ -51,8 +51,6 @@ codeunit 101413 "Create IC Partner"
         XInterCompanyGenJnl: Label 'InterCompany Gen. Jnl';
         XIC0010: Label 'IC-0010';
         XIC9999: Label 'IC9999';
-        XCustomersIntercompany: Label 'Customers, Intercompany';
-        XVendorsIntercompany: Label 'Vendors, Intercompany';
         XIC1030: Label 'IC1030';
         XIC1020: Label 'IC1020';
         XICP20: Label 'ICP20';
@@ -105,9 +103,9 @@ codeunit 101413 "Create IC Partner"
     begin
         if not GenJournalTemplate.Get(XINTERCOMP) then
             CreateGenJournalTemplate.InsertData(
-                XINTERCOMP, XIntercompanylc, "Gen. Journal Template Type"::Intercompany.AsInteger(), false, XINTERCOMP, XICGJNL, XInterCompanyGenJnl, XIC0010, XIC9999);
+                XINTERCOMP, XIntercompanylc, "Gen. Journal Template Type"::Intercompany, false, XINTERCOMP, XICGJNL, XInterCompanyGenJnl, XIC0010, XIC9999);
         if not GenJournalBatch.Get(XINTERCOMP, XDEFAULT) then
-            CreateGenJournalBatch.InsertData(XINTERCOMP, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account".AsInteger(), '', true, false);
+            CreateGenJournalBatch.InsertData(XINTERCOMP, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
 
         if not ICSetup.Get() then begin
             ICSetup.Init();

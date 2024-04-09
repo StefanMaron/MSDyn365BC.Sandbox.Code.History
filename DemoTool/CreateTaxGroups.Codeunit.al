@@ -11,7 +11,7 @@ codeunit 101321 "Create Tax Groups"
                 InsertData(XMATERIALS, XTaxableRawMaterials);
                 InsertData(XSUPPLIES, XTaxableCONTOSOSupplies);
 
-                InsertLocalData;
+                InsertLocalData();
             end;
             InsertData(NONTAXABLETok, XNontaxableTxt);
         end;

@@ -4,23 +4,12 @@ codeunit 101079 "Create Company Information"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        InsertData;
+        InsertData();
     end;
 
     var
         DemoDataSetup: Record "Demo Data Setup";
         CompanyInformation: Record "Company Information";
-        XCRONUSInternationalLtd: Label 'CRONUS International Ltd.';
-        X5TheRing: Label '5 The Ring';
-        XWestminster: Label 'Westminster';
-        X06666666666: Label '0666-666-6666';
-        X06666666660: Label '0666-666-6660';
-        X8889999: Label '888-9999';
-        XWorldWideBank: Label 'World Wide Bank';
-        XBG99999: Label 'BG99999';
-        X9999888: Label '99-99-888';
-        XGB12CPBK08929965044991: Label 'GB 12 CPBK 08929965044991';
-        X9999999: Label '99-99-999';
         XContactNameTxt: Label 'Adam Matteson';
         XCRONUSEspanaSA: Label 'CRONUS España S.A.';
         XAvenidaAragon5: Label 'Avenida Aragón, 5';

@@ -3,22 +3,20 @@ codeunit 117066 "Create Service Contract Header"
 
     trigger OnRun()
     begin
-        with ServiceContractHeader do begin
-            InsertData("Contract Type"::Quote, XSC00004, XPrepaidContractdashHardware, Status::" ", '30000', '', '<3M>', XHARDWARE,
-              "Invoice Period"::Month, 19030202D, true);
-            InsertData("Contract Type"::Contract, XSC00001, XPrepaidContractdashHardware, Status::" ", '10000', '', '<1M>', XHARDWARE,
-              "Invoice Period"::Month, 19020630D, true);
-            InsertData("Contract Type"::Contract, XSC00002, XPrepaidContractdashHardware, Status::" ", '10000', '', '<1M>', XHARDWARE,
-              "Invoice Period"::Month, 19020630D, true);
-            InsertData("Contract Type"::Contract, XSC00003, XNotPrpaidCntrctdashHardware, Status::" ", '20000', '', '<3M>', XHARDWARE,
-              "Invoice Period"::Month, 19030106D, false);
-            InsertData("Contract Type"::Contract, XSC00005, XPrepaidContractdashHardware, Status::" ", '40000', '', '<3M>', XHARDWARE,
-              "Invoice Period"::Month, 19021201D, true);
-            InsertData("Contract Type"::Contract, XSC00006, XPrepaidContractdashHardware, Status::" ", '50000', '', '<3M>', XHARDWARE,
-              "Invoice Period"::Month, 19030126D, true);
-            InsertData("Contract Type"::Contract, XSC00007, XPrepaidContractdashHardware, Status::" ", '10000', XDUDLEY, '<3M>', XHARDWARE,
-              "Invoice Period"::Quarter, 19030116D, true);
-        end;
+        InsertData(ServiceContractHeader."Contract Type"::Quote, XSC00004, XPrepaidContractdashHardware, ServiceContractHeader.Status::" ", '30000', '', '<3M>', XHARDWARE,
+          ServiceContractHeader."Invoice Period"::Month, 19030202D, true);
+        InsertData(ServiceContractHeader."Contract Type"::Contract, XSC00001, XPrepaidContractdashHardware, ServiceContractHeader.Status::" ", '10000', '', '<1M>', XHARDWARE,
+          ServiceContractHeader."Invoice Period"::Month, 19020630D, true);
+        InsertData(ServiceContractHeader."Contract Type"::Contract, XSC00002, XPrepaidContractdashHardware, ServiceContractHeader.Status::" ", '10000', '', '<1M>', XHARDWARE,
+          ServiceContractHeader."Invoice Period"::Month, 19020630D, true);
+        InsertData(ServiceContractHeader."Contract Type"::Contract, XSC00003, XNotPrpaidCntrctdashHardware, ServiceContractHeader.Status::" ", '20000', '', '<3M>', XHARDWARE,
+          ServiceContractHeader."Invoice Period"::Month, 19030106D, false);
+        InsertData(ServiceContractHeader."Contract Type"::Contract, XSC00005, XPrepaidContractdashHardware, ServiceContractHeader.Status::" ", '40000', '', '<3M>', XHARDWARE,
+          ServiceContractHeader."Invoice Period"::Month, 19021201D, true);
+        InsertData(ServiceContractHeader."Contract Type"::Contract, XSC00006, XPrepaidContractdashHardware, ServiceContractHeader.Status::" ", '50000', '', '<3M>', XHARDWARE,
+          ServiceContractHeader."Invoice Period"::Month, 19030126D, true);
+        InsertData(ServiceContractHeader."Contract Type"::Contract, XSC00007, XPrepaidContractdashHardware, ServiceContractHeader.Status::" ", '10000', XDUDLEY, '<3M>', XHARDWARE,
+          ServiceContractHeader."Invoice Period"::Quarter, 19030116D, true);
     end;
 
     var
@@ -36,21 +34,18 @@ codeunit 117066 "Create Service Contract Header"
         XDUDLEY: Label 'DUDLEY';
         MakeAdjustments: Codeunit "Make Adjustments";
 
-    procedure InsertData("Contract Type": Enum "Service Contract Type"; "Contract No.": Text[250]; Description: Text[250]; Status: Option; "Customer No.": Text[250]; "Ship-to Code": Text[250]; "Service Period": Text[250]; "Serv. Contract Acc. Gr. Code": Text[250]; "Invoice Period": Enum "Service Contract Header Invoice Period"; "Starting Date": Date; Prepaid: Boolean)
+    procedure InsertData("Contract Type": Enum "Service Contract Type"; "Contract No.": Text[250]; Description: Text[250]; Status: Enum "Service Contract Status"; "Customer No.": Text[250]; "Ship-to Code": Text[250]; "Service Period": Text[250]; "Serv. Contract Acc. Gr. Code": Text[250]; "Invoice Period": Enum "Service Contract Header Invoice Period"; "Starting Date": Date; Prepaid: Boolean)
     var
         ServiceContractHeader: Record "Service Contract Header";
     begin
         ServiceContractHeader.Init();
         ServiceContractHeader.Validate("Contract Type", "Contract Type");
         ServiceContractHeader.Validate("Contract No.", "Contract No.");
-
         ServiceContractHeader.Insert();
 
-        with ServiceContractHeader do begin
-            "Starting Date" := WorkDate();
-            "First Service Date" := WorkDate();
-            Validate("Starting Date");
-        end;
+        ServiceContractHeader."Starting Date" := WorkDate();
+        ServiceContractHeader."First Service Date" := WorkDate();
+        ServiceContractHeader.Validate("Starting Date");
 
         ServiceContractHeader.Validate(Description, Description);
         ServiceContractHeader.Validate(Status, Status);

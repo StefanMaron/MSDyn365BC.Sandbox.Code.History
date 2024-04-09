@@ -37,7 +37,7 @@ codeunit 101287 "Create C/V Bank Account"
         "Vendor Bank Account".Validate("CCC No.", X11112222334444444444);
         "Vendor Bank Account".Modify(true);
 
-        PostInsertData;
+        PostInsertData();
     end;
 
     var

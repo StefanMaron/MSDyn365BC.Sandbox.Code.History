@@ -58,20 +58,18 @@ codeunit 119086 "Create Cost Allocation Source"
     var
         CostAllocationSource: Record "Cost Allocation Source";
     begin
-        with CostAllocationSource do begin
-            Init();
-            ID := CostAllocationSourceID;
-            Level := CostAllocationSourceLevel;
-            "Valid From" := ValidFrom;
-            "Valid To" := ValidTo;
-            Validate("Cost Type Range", CostTypeRange);
-            Validate("Cost Center Code", CostCenterCode);
-            Validate("Cost Object Code", CostObjectCode);
-            Validate("Credit to Cost Type", DebitToCostType);
-            Comment := CostAllocationSourceComment;
-            if not Insert then
-                Modify();
-        end;
+        CostAllocationSource.Init();
+        CostAllocationSource.ID := CostAllocationSourceID;
+        CostAllocationSource.Level := CostAllocationSourceLevel;
+        CostAllocationSource."Valid From" := ValidFrom;
+        CostAllocationSource."Valid To" := ValidTo;
+        CostAllocationSource.Validate("Cost Type Range", CostTypeRange);
+        CostAllocationSource.Validate("Cost Center Code", CostCenterCode);
+        CostAllocationSource.Validate("Cost Object Code", CostObjectCode);
+        CostAllocationSource.Validate("Credit to Cost Type", DebitToCostType);
+        CostAllocationSource.Comment := CostAllocationSourceComment;
+        if not CostAllocationSource.Insert() then
+            CostAllocationSource.Modify();
     end;
 }
 

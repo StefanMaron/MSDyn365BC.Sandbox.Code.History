@@ -3,34 +3,32 @@ codeunit 101252 "Create General Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            AdjustForPmtDisc := true;
-            InsertData('', MiscCode, '', '');
-            InsertData('', NoVATCode, '', '');
-            InsertData('', RawMatCode, '', '');
-            InsertData('', RetailCode, '', '');
-            InsertData('', ServicesCode, '', '');
-            InsertData('', ManufactCode, '', '');
-            InsertData(DomesticCode, MiscCode, '', '');
-            InsertData(DomesticCode, NoVATCode, '', '');
-            InsertData(DomesticCode, RawMatCode, '996210', '997210');
-            InsertData(DomesticCode, RetailCode, '996110', '997110');
-            InsertData(DomesticCode, ServicesCode, '996410', '');
-            InsertData(DomesticCode, ManufactCode, '996110', '997110');
-            InsertData(EUCode, MiscCode, '', '');
-            InsertData(EUCode, NoVATCode, '', '');
-            InsertData(EUCode, RawMatCode, '996220', '997220');
-            InsertData(EUCode, RetailCode, '996120', '997120');
-            InsertData(EUCode, ServicesCode, '996420', '');
-            InsertData(EUCode, ManufactCode, '996120', '997120');
-            InsertData(ExportCode, MiscCode, '', '');
-            InsertData(ExportCode, NoVATCode, '', '');
-            InsertData(ExportCode, RawMatCode, '996230', '997230');
-            InsertData(ExportCode, RetailCode, '996130', '997130');
-            InsertData(ExportCode, ServicesCode, '996430', '');
-            InsertData(ExportCode, ManufactCode, '996130', '997130');
-        end;
+        DemoDataSetup.Get();
+        AdjustForPmtDisc := true;
+        InsertData('', DemoDataSetup.MiscCode(), '', '');
+        InsertData('', DemoDataSetup.NoVATCode(), '', '');
+        InsertData('', DemoDataSetup.RawMatCode(), '', '');
+        InsertData('', DemoDataSetup.RetailCode(), '', '');
+        InsertData('', DemoDataSetup.ServicesCode(), '', '');
+        InsertData('', DemoDataSetup.ManufactCode(), '', '');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), '', '');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.NoVATCode(), '', '');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.RawMatCode(), '996210', '997210');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), '996110', '997110');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesCode(), '996410', '');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.ManufactCode(), '996110', '997110');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.MiscCode(), '', '');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.NoVATCode(), '', '');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.RawMatCode(), '996220', '997220');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.RetailCode(), '996120', '997120');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.ServicesCode(), '996420', '');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.ManufactCode(), '996120', '997120');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.MiscCode(), '', '');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.NoVATCode(), '', '');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.RawMatCode(), '996230', '997230');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.RetailCode(), '996130', '997130');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.ServicesCode(), '996430', '');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.ManufactCode(), '996130', '997130');
     end;
 
     var
@@ -41,19 +39,17 @@ codeunit 101252 "Create General Posting Setup"
 
     procedure InsertMiniAppData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            AdjustForPmtDisc := false;
-            InsertData(DomesticCode, RetailCode, '996110', '997110');
-            InsertData(EUCode, RetailCode, '996120', '997120');
-            InsertData(ExportCode, RetailCode, '996130', '997130');
-            InsertData(DomesticCode, ServicesCode, '996410', '997110');
-            InsertData(ExportCode, ServicesCode, '996430', '');
-            InsertData(DomesticCode, NoVATCode, '', '');
-            InsertData(ExportCode, NoVATCode, '', '');
-            InsertData('', RetailCode, '', '');
-            InsertData('', NoVATCode, '', '');
-        end;
+        DemoDataSetup.Get();
+        AdjustForPmtDisc := false;
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.RetailCode(), '996110', '997110');
+        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.RetailCode(), '996120', '997120');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.RetailCode(), '996130', '997130');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesCode(), '996410', '997110');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.ServicesCode(), '996430', '');
+        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.NoVATCode(), '', '');
+        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.NoVATCode(), '', '');
+        InsertData('', DemoDataSetup.RetailCode(), '', '');
+        InsertData('', DemoDataSetup.NoVATCode(), '', '');
     end;
 
     procedure InsertData(GenBusPostingGroup: Code[20]; GenProdPostingGroup: Code[20]; SalesAccount: Code[20]; PurchaseAccount: Code[20])
@@ -65,14 +61,14 @@ codeunit 101252 "Create General Posting Setup"
         GeneralPostingSetup.Validate("Sales Credit Memo Account", CA.Convert(SalesAccount));
         GeneralPostingSetup.Validate("Purch. Account", CA.Convert(PurchaseAccount));
         GeneralPostingSetup.Validate("Purch. Credit Memo Account", CA.Convert(PurchaseAccount));
-        UpdatePmtDiscAccounts;
-        UpdatePmtTolAccounts;
-        UpdatePrepmtAccounts;
-        UpdateInvDiscAccounts;
-        UpdateJobAccounts;
+        UpdatePmtDiscAccounts();
+        UpdatePmtTolAccounts();
+        UpdatePrepmtAccounts();
+        UpdateInvDiscAccounts();
+        UpdateJobAccounts();
 
         case GeneralPostingSetup."Gen. Prod. Posting Group" of
-            DemoDataSetup.RawMatCode:
+            DemoDataSetup.RawMatCode():
                 begin
                     GeneralPostingSetup.Validate("COGS Account", CA.Convert('997290'));
                     GeneralPostingSetup.Validate("COGS Account (Interim)", CA.Convert('992131'));
@@ -80,9 +76,9 @@ codeunit 101252 "Create General Posting Setup"
                     GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", CA.Convert('995530'));
                     GeneralPostingSetup.Validate("Direct Cost Applied Account", CA.Convert('997270'));
                 end;
-            DemoDataSetup.RetailCode,
-            DemoDataSetup.MiscCode,
-            DemoDataSetup.NoVATCode:
+            DemoDataSetup.RetailCode(),
+            DemoDataSetup.MiscCode(),
+            DemoDataSetup.NoVATCode():
                 begin
                     GeneralPostingSetup.Validate("COGS Account", CA.Convert('997190'));
                     GeneralPostingSetup.Validate("COGS Account (Interim)", CA.Convert('992112'));
@@ -90,8 +86,8 @@ codeunit 101252 "Create General Posting Setup"
                     GeneralPostingSetup.Validate("Invt. Accrual Acc. (Interim)", CA.Convert('995510'));
                     GeneralPostingSetup.Validate("Direct Cost Applied Account", CA.Convert('997170'));
                 end;
-            DemoDataSetup.ServicesCode,
-            DemoDataSetup.FreightCode:
+            DemoDataSetup.ServicesCode(),
+            DemoDataSetup.FreightCode():
                 begin
                     GeneralPostingSetup.Validate("COGS Account", CA.Convert('997190'));
                     GeneralPostingSetup.Validate("COGS Account (Interim)", CA.Convert('992112'));
@@ -107,80 +103,80 @@ codeunit 101252 "Create General Posting Setup"
     begin
         if AdjustForPmtDisc then
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                DemoDataSetup.RawMatCode:
+                DemoDataSetup.RawMatCode():
                     if GeneralPostingSetup."Gen. Bus. Posting Group" <> '' then
                         case GeneralPostingSetup."Gen. Bus. Posting Group" of
-                            DemoDataSetup.DomesticCode:
+                            DemoDataSetup.DomesticCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7063001'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6061001'));
                                 end;
-                            DemoDataSetup.EUCode:
+                            DemoDataSetup.EUCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7063002'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6061002'));
                                 end;
-                            DemoDataSetup.ExportCode:
+                            DemoDataSetup.ExportCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7063003'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6061002'));
                                 end;
                         end;
-                DemoDataSetup.RetailCode:
+                DemoDataSetup.RetailCode():
                     if GeneralPostingSetup."Gen. Bus. Posting Group" <> '' then
                         case GeneralPostingSetup."Gen. Bus. Posting Group" of
-                            DemoDataSetup.DomesticCode:
+                            DemoDataSetup.DomesticCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7060001'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6060001'));
                                 end;
-                            DemoDataSetup.EUCode:
+                            DemoDataSetup.EUCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7060002'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6060002'));
                                 end;
-                            DemoDataSetup.ExportCode:
+                            DemoDataSetup.ExportCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7060003'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6060003'));
                                 end;
                         end;
-                DemoDataSetup.MiscCode,
-              DemoDataSetup.NoVATCode,
-              DemoDataSetup.ServicesCode,
-              DemoDataSetup.FreightCode:
+                DemoDataSetup.MiscCode(),
+              DemoDataSetup.NoVATCode(),
+              DemoDataSetup.ServicesCode(),
+              DemoDataSetup.FreightCode():
                     if GeneralPostingSetup."Gen. Bus. Posting Group" <> '' then
                         case GeneralPostingSetup."Gen. Bus. Posting Group" of
-                            DemoDataSetup.DomesticCode:
+                            DemoDataSetup.DomesticCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7060001'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6062001'));
                                 end;
-                            DemoDataSetup.EUCode:
+                            DemoDataSetup.EUCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7060002'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6062002'));
                                 end;
-                            DemoDataSetup.ExportCode:
+                            DemoDataSetup.ExportCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7060003'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6062003'));
                                 end;
                         end;
-                DemoDataSetup.ManufactCode:
+                DemoDataSetup.ManufactCode():
                     if GeneralPostingSetup."Gen. Bus. Posting Group" <> '' then
                         case GeneralPostingSetup."Gen. Bus. Posting Group" of
-                            DemoDataSetup.DomesticCode:
+                            DemoDataSetup.DomesticCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7062001'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6061001'));
                                 end;
-                            DemoDataSetup.EUCode:
+                            DemoDataSetup.EUCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7062002'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6061002'));
                                 end;
-                            DemoDataSetup.ExportCode:
+                            DemoDataSetup.ExportCode():
                                 begin
                                     GeneralPostingSetup.Validate("Sales Pmt. Disc. Debit Acc.", CA.Convert('7062003'));
                                     GeneralPostingSetup.Validate("Purch. Pmt. Disc. Credit Acc.", CA.Convert('6061003'));
@@ -199,17 +195,17 @@ codeunit 101252 "Create General Posting Setup"
             exit;
 
         case GeneralPostingSetup."Gen. Bus. Posting Group" of
-            DemoDataSetup.DomesticCode:
+            DemoDataSetup.DomesticCode():
                 begin
                     GeneralPostingSetup.Validate("Sales Prepayments Account", CA.Convert('4380001'));
                     GeneralPostingSetup.Validate("Purch. Prepayments Account", CA.Convert('4070001'));
                 end;
-            DemoDataSetup.EUCode:
+            DemoDataSetup.EUCode():
                 begin
                     GeneralPostingSetup.Validate("Sales Prepayments Account", CA.Convert('4380002'));
                     GeneralPostingSetup.Validate("Purch. Prepayments Account", CA.Convert('4070002'));
                 end;
-            DemoDataSetup.ExportCode:
+            DemoDataSetup.ExportCode():
                 begin
                     GeneralPostingSetup.Validate("Sales Prepayments Account", CA.Convert('4380003'));
                     GeneralPostingSetup.Validate("Purch. Prepayments Account", CA.Convert('4070003'));
@@ -221,19 +217,19 @@ codeunit 101252 "Create General Posting Setup"
     begin
         if GeneralPostingSetup."Gen. Bus. Posting Group" <> '' then
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
-                DemoDataSetup.RawMatCode:
+                DemoDataSetup.RawMatCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Line Disc. Account", CA.Convert('996910'));
                         GeneralPostingSetup.Validate("Sales Inv. Disc. Account", CA.Convert('996910'));
                         GeneralPostingSetup.Validate("Purch. Line Disc. Account", CA.Convert('997240'));
                         GeneralPostingSetup.Validate("Purch. Inv. Disc. Account", CA.Convert('997240'));
                     end;
-                DemoDataSetup.RetailCode,
-                DemoDataSetup.MiscCode,
-                DemoDataSetup.NoVATCode,
-                DemoDataSetup.ServicesCode,
-                DemoDataSetup.FreightCode,
-                DemoDataSetup.ManufactCode:
+                DemoDataSetup.RetailCode(),
+                DemoDataSetup.MiscCode(),
+                DemoDataSetup.NoVATCode(),
+                DemoDataSetup.ServicesCode(),
+                DemoDataSetup.FreightCode(),
+                DemoDataSetup.ManufactCode():
                     begin
                         GeneralPostingSetup.Validate("Sales Line Disc. Account", CA.Convert('996910'));
                         GeneralPostingSetup.Validate("Sales Inv. Disc. Account", CA.Convert('996910'));
@@ -246,20 +242,20 @@ codeunit 101252 "Create General Posting Setup"
     local procedure UpdateJobAccounts()
     begin
         case GeneralPostingSetup."Gen. Prod. Posting Group" of
-            DemoDataSetup.RawMatCode:
+            DemoDataSetup.RawMatCode():
                 begin
                     GeneralPostingSetup.Validate("Job Sales Adjmt. Account", CA.Convert('996290'));
                     GeneralPostingSetup.Validate("Job Cost Adjmt. Account", CA.Convert('997280'));
                 end;
-            DemoDataSetup.RetailCode,
-            DemoDataSetup.MiscCode,
-            DemoDataSetup.NoVATCode:
+            DemoDataSetup.RetailCode(),
+            DemoDataSetup.MiscCode(),
+            DemoDataSetup.NoVATCode():
                 begin
                     GeneralPostingSetup.Validate("Job Sales Adjmt. Account", CA.Convert('996190'));
                     GeneralPostingSetup.Validate("Job Cost Adjmt. Account", CA.Convert('997180'));
                 end;
-            DemoDataSetup.ServicesCode,
-            DemoDataSetup.FreightCode:
+            DemoDataSetup.ServicesCode(),
+            DemoDataSetup.FreightCode():
                 begin
                     GeneralPostingSetup.Validate("Job Sales Adjmt. Account", CA.Convert('996490'));
                     GeneralPostingSetup.Validate("Job Cost Adjmt. Account", CA.Convert('997480'));

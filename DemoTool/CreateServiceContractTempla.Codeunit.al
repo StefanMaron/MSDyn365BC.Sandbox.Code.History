@@ -3,20 +3,18 @@ codeunit 117069 "Create Service Contract Templa"
 
     trigger OnRun()
     begin
-        with ServiceContractTemplate do begin
-            InsertData(
-              XTEMPL0001, XPrepaidContractdashHardware, "Invoice Period"::Month, 0, true, true,
-              '', '', 12, true, '<3M>', false, false, XSMdashCNTTEMP, XHARDWARE);
-            InsertData(
-              XTEMPL0002, XNonPrpaidCntrctdashHardware, "Invoice Period"::Month, 0, true, false,
-              '', '', 12, true, '<1M-1D>', true, false, XSMdashCNTTEMP, XHARDWARE);
-            InsertData(
-              XTEMPL0003, XPrepaidContractdashSoftware, "Invoice Period"::Month, 0, true, true,
-              '', '', 12, true, '<3M>', false, false, XSMdashCNTTEMP, XSOFTWARE);
-            InsertData(
-              XTEMPL0004, XNonPrpaidCntrctdashSoftware, "Invoice Period"::Month, 0, true, false,
-              '', '', 12, true, '<1M-1D>', true, false, XSMdashCNTTEMP, XSOFTWARE);
-        end;
+        InsertData(
+          XTEMPL0001, XPrepaidContractdashHardware, ServiceContractTemplate."Invoice Period"::Month, 0, true, true,
+          '', '', 12, true, '<3M>', false, false, XSMdashCNTTEMP, XHARDWARE);
+        InsertData(
+          XTEMPL0002, XNonPrpaidCntrctdashHardware, ServiceContractTemplate."Invoice Period"::Month, 0, true, false,
+          '', '', 12, true, '<1M-1D>', true, false, XSMdashCNTTEMP, XHARDWARE);
+        InsertData(
+          XTEMPL0003, XPrepaidContractdashSoftware, ServiceContractTemplate."Invoice Period"::Month, 0, true, true,
+          '', '', 12, true, '<3M>', false, false, XSMdashCNTTEMP, XSOFTWARE);
+        InsertData(
+          XTEMPL0004, XNonPrpaidCntrctdashSoftware, ServiceContractTemplate."Invoice Period"::Month, 0, true, false,
+          '', '', 12, true, '<1M-1D>', true, false, XSMdashCNTTEMP, XSOFTWARE);
     end;
 
     var

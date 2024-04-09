@@ -160,8 +160,6 @@ codeunit 161004 "Create AEAT Trans. Form. lines"
     end;
 
     var
-        "Line No.": Integer;
-        CA: Codeunit "Make Adjustments";
         XTaxConcept: Label 'Tax Concept';
         XCurrency: Label 'Currency';
         XIDNumberforTaxPurposes: Label 'ID Number for Tax Purposes';

@@ -3,31 +3,23 @@ codeunit 101289 "Create Payment Method"
 
     trigger OnRun()
     begin
-        with "Payment Method" do begin
-            // InsertData(XGIRO,XGirotransfer,"Bal. Account Type"::"Bank Account",XGIRO);
-            // InsertData(XBANK,XBanktransfer,0,'');
-            // InsertData(XCASH,XCashpayment,"Bal. Account Type"::"G/L Account",'992910');
-            // InsertData(XCHECK,XCheckpayment,0,'');
-            // InsertData(XACCOUNT,XPaymentonaccount,0,'');
-            // InsertData(XINTERCOM,XIntercompanypayment,0,'');
-            InsertData(XGIRO, XGirotransfer, "Bal. Account Type"::"Bank Account", XGIRO, false, 0, false, 0, false, '');
-            InsertData(XBANK, XBanktransfer, 0, '', false, 0, false, 0, false, '');
-            InsertData(XBANKDOMTxt, XBankDomTransferTxt, 0, '', false, 0, false, 0, false, XBankDataConvPmtLineDefnTxt);
-            InsertData(XBANKINTTxt, XBankIntTransferTxt, 0, '', false, 0, false, 0, false, XBankDataConvPmtLineDefnTxt);
-            InsertData(XCASH, XCashpayment, "Bal. Account Type"::"G/L Account", '992910', false, 0, false, 0, false, '');
-            InsertData(XCHECK, XCheckpayment, 0, '', false, 0, false, 0, false, '');
-            InsertData(XACCOUNT, XPaymentonaccount, 0, '', false, 0, false, 0, false, '');
-            InsertData(XINTERCOM, XIntercompanypayment, 0, '', false, 0, false, 0, false, '');
-            InsertData(XAGENTE, XCollectionAssistant, 0, '', true, 1, false, 0, false, '');
-            InsertData(XEFECTO, XNegotiableBill, 1, '', true, 1, false, 1, false, '');
-            InsertData(XLETRA, XAcceptanceBill, 1, '', true, 1, true, 1, false, '');
-            InsertData(XPAGARE, XPromissoryNote, 1, '', true, 1, false, 3, false, '');
-            InsertData(XReceipt, XReceipt, 1, '', true, 1, false, 2, false, '');
-            InsertData(XORDENPAGO, XPaymentOrder, 1, '', false, 1, false, 5, true, '');
-            InsertData(XFactoring, XFactoring, 1, '', false, 1, false, 0, true, '');
-            InsertData(XCARD, XCardpayment, 0, '', false, 0, false, 0, false, '');
-            InsertData(XMultiple, XMultiplepaymentmethods, 0, '', false, 0, false, 0, false, '');
-        end;
+        InsertData(XGIRO, XGirotransfer, "Payment Method"."Bal. Account Type"::"Bank Account", XGIRO, false, 0, false, 0, false, '');
+        InsertData(XBANK, XBanktransfer, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
+        InsertData(XBANKDOMTxt, XBankDomTransferTxt, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, XBankDataConvPmtLineDefnTxt);
+        InsertData(XBANKINTTxt, XBankIntTransferTxt, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, XBankDataConvPmtLineDefnTxt);
+        InsertData(XCASH, XCashpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '992910', false, 0, false, 0, false, '');
+        InsertData(XCHECK, XCheckpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
+        InsertData(XACCOUNT, XPaymentonaccount, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
+        InsertData(XINTERCOM, XIntercompanypayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
+        InsertData(XAGENTE, XCollectionAssistant, "Payment Method"."Bal. Account Type"::"G/L Account", '', true, 1, false, 0, false, '');
+        InsertData(XEFECTO, XNegotiableBill, "Payment Method"."Bal. Account Type"::"Bank Account", '', true, 1, false, 1, false, '');
+        InsertData(XLETRA, XAcceptanceBill, "Payment Method"."Bal. Account Type"::"Bank Account", '', true, 1, true, 1, false, '');
+        InsertData(XPAGARE, XPromissoryNote, "Payment Method"."Bal. Account Type"::"Bank Account", '', true, 1, false, 3, false, '');
+        InsertData(XReceipt, XReceipt, "Payment Method"."Bal. Account Type"::"Bank Account", '', true, 1, false, 2, false, '');
+        InsertData(XORDENPAGO, XPaymentOrder, "Payment Method"."Bal. Account Type"::"Bank Account", '', false, 1, false, 5, true, '');
+        InsertData(XFactoring, XFactoring, "Payment Method"."Bal. Account Type"::"Bank Account", '', false, 1, false, 0, true, '');
+        InsertData(XCARD, XCardpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
+        InsertData(XMultiple, XMultiplepaymentmethods, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
     end;
 
     var
@@ -70,23 +62,21 @@ codeunit 101289 "Create Payment Method"
 
     procedure InsertMiniAppData()
     begin
-        with "Payment Method" do begin
-            InsertData(XGIRO, XGirotransfer, "Bal. Account Type"::"Bank Account", '', false, 0, false, 0, false, '');
-            InsertData(XBANK, XBanktransfer, 0, '', false, 0, false, 0, false, '');
-            InsertData(XBANKDOMTxt, XBankDomTransferTxt, 0, '', false, 0, false, 0, false, XBankDataConvPmtLineDefnTxt);
-            InsertData(XBANKINTTxt, XBankIntTransferTxt, 0, '', false, 0, false, 0, false, XBankDataConvPmtLineDefnTxt);
-            InsertData(XCASH, XCashpayment, "Bal. Account Type"::"G/L Account", '992910', false, 0, false, 0, false, '');
-            InsertData(XCHECK, XCheckpayment, 0, '', false, 0, false, 0, false, '');
-            InsertData(XACCOUNT, XPaymentonaccount, 0, '', false, 0, false, 0, false, '');
-            InsertData(XINTERCOM, XIntercompanypayment, 0, '', false, 0, false, 0, false, '');
-            InsertData(XEFECTO, XNegotiableBill, 1, '', true, 1, false, 1, false, '');
-            InsertData(XPAGARE, XPromissoryNote, 1, '', true, 1, false, 3, false, '');
-            InsertData(XCARD, XCardpayment, 0, '', false, 0, false, 0, false, '');
-            InsertData(XMultiple, XMultiplepaymentmethods, 0, '', false, 0, false, 0, false, '');
-        end;
+        InsertData(XGIRO, XGirotransfer, "Payment Method"."Bal. Account Type"::"Bank Account", '', false, 0, false, 0, false, '');
+        InsertData(XBANK, XBanktransfer, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
+        InsertData(XBANKDOMTxt, XBankDomTransferTxt, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, XBankDataConvPmtLineDefnTxt);
+        InsertData(XBANKINTTxt, XBankIntTransferTxt, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, XBankDataConvPmtLineDefnTxt);
+        InsertData(XCASH, XCashpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '992910', false, 0, false, 0, false, '');
+        InsertData(XCHECK, XCheckpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
+        InsertData(XACCOUNT, XPaymentonaccount, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
+        InsertData(XINTERCOM, XIntercompanypayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
+        InsertData(XEFECTO, XNegotiableBill, "Payment Method"."Bal. Account Type"::"Bank Account", '', true, 1, false, 1, false, '');
+        InsertData(XPAGARE, XPromissoryNote, "Payment Method"."Bal. Account Type"::"Bank Account", '', true, 1, false, 3, false, '');
+        InsertData(XCARD, XCardpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
+        InsertData(XMultiple, XMultiplepaymentmethods, "Payment Method"."Bal. Account Type"::"G/L Account", '', false, 0, false, 0, false, '');
     end;
 
-    procedure InsertData("Code": Code[10]; Description: Text[50]; "Bal. Account Type": Integer; "Bal. Account No.": Code[20]; "Create Bills": Boolean; "Company Type": Option; "Submit for Aceptance": Boolean; "Bill Type": Option; "Invoices to Cartera": Boolean; PmtExportLineDefn: Code[20])
+    procedure InsertData("Code": Code[10]; Description: Text[50]; "Bal. Account Type": Enum "Payment Balance Account Type"; "Bal. Account No.": Code[20]; "Create Bills": Boolean; "Company Type": Option; "Submit for Aceptance": Boolean; "Bill Type": Option; "Invoices to Cartera": Boolean; PmtExportLineDefn: Code[20])
     begin
         "Payment Method".Init();
         "Payment Method".Validate(Code, Code);
@@ -108,7 +98,6 @@ codeunit 101289 "Create Payment Method"
         "Payment Method".Validate("Create Bills", "Create Bills");
         "Payment Method".Validate("Bill Type", "Bill Type");
         "Payment Method".Validate("Invoices to Cartera", "Invoices to Cartera");
-        "Payment Method"."Use for Invoicing" := "Payment Method".Code in [XBANK, XCASH, XCHECK, XCARD, XMultiple];
         "Payment Method".Insert(true);
     end;
 

@@ -3,12 +3,10 @@ codeunit 117002 "Create Service Item Line"
 
     trigger OnRun()
     begin
-        with ServiceItemLine do begin
-            InsertData("Document Type"::Order, XSO000001, 10000, '7', XFINISHED, '7', '5', '753', 'A', 8, 19030109D, 132150T, 19030106D, 143017T,
-              19030106D, 153031T, '', '');
-            InsertData("Document Type"::Order, XSO000002, 10000, '', XINPROCESS, '', '', '', '', 12, 19030111D, 110000T, 19040521D, 174712T, 0D,
-              0T, '', '');
-        end;
+        InsertData(ServiceItemLine."Document Type"::Order, XSO000001, 10000, '7', XFINISHED, '7', '5', '753', 'A', 8, 19030109D, 132150T, 19030106D, 143017T,
+  19030106D, 153031T, '', '');
+        InsertData(ServiceItemLine."Document Type"::Order, XSO000002, 10000, '', XINPROCESS, '', '', '', '', 12, 19030111D, 110000T, 19040521D, 174712T, 0D,
+          0T, '', '');
     end;
 
     var
@@ -30,7 +28,7 @@ codeunit 117002 "Create Service Item Line"
         ServiceItemLine.Validate("Document Type", "Document Type");
         ServiceItemLine.Validate("Document No.", "Document No.");
         ServiceItemLine.Validate("Line No.", "Line No.");
-        ServiceItemLine.SetUpNewLine;
+        ServiceItemLine.SetUpNewLine();
         ServiceItemLine.Insert(true);
 
         ServiceItemLine.Validate("Service Item No.", "Service Item No.");

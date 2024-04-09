@@ -155,39 +155,36 @@ codeunit 119088 "Create Cost Acct. Jnl Line"
     var
         LastLineNo: Integer;
     begin
-        with CostJournalLine do begin
-            Reset();
-            SetRange("Journal Template Name", XCOSTACCT);
-            SetRange("Journal Batch Name", JournalBatch);
-            if FindLast() then
-                LastLineNo := "Line No."
-            else
-                LastLineNo := 0;
-            Init();
-            "Journal Template Name" := XCOSTACCT;
-            "Journal Batch Name" := JournalBatch;
-            "Line No." := LastLineNo + 10000;
-            "Posting Date" := PostingDate;
-            "Document No." := DocumentNo;
-            Validate("Cost Type No.", CostTypeNo);
-            Validate("Bal. Cost Type No.", BalCostTypeNo);
-            Description := JournalLineText;
-            Validate(Amount, AmountVar);
-
-            // Overwrite Default
-            if (CostCenterCode <> '') or (CostObjectCode <> '') then begin
-                "Cost Center Code" := CostCenterCode;
-                "Cost Object Code" := CostObjectCode;
-            end;
-
-            if (BalCostCenterCode <> '') or (BalCostObjectCode <> '') then begin
-                "Bal. Cost Center Code" := BalCostCenterCode;
-                "Bal. Cost Object Code" := BalCostObjectCode;
-            end;
-
-            if not Insert(true) then
-                Modify();
+        CostJournalLine.Reset();
+        CostJournalLine.SetRange("Journal Template Name", XCOSTACCT);
+        CostJournalLine.SetRange("Journal Batch Name", JournalBatch);
+        if CostJournalLine.FindLast() then
+            LastLineNo := CostJournalLine."Line No."
+        else
+            LastLineNo := 0;
+        CostJournalLine.Init();
+        CostJournalLine."Journal Template Name" := XCOSTACCT;
+        CostJournalLine."Journal Batch Name" := JournalBatch;
+        CostJournalLine."Line No." := LastLineNo + 10000;
+        CostJournalLine."Posting Date" := PostingDate;
+        CostJournalLine."Document No." := DocumentNo;
+        CostJournalLine.Validate("Cost Type No.", CostTypeNo);
+        CostJournalLine.Validate("Bal. Cost Type No.", BalCostTypeNo);
+        CostJournalLine.Description := JournalLineText;
+        CostJournalLine.Validate(Amount, AmountVar);
+        // Overwrite Default
+        if (CostCenterCode <> '') or (CostObjectCode <> '') then begin
+            CostJournalLine."Cost Center Code" := CostCenterCode;
+            CostJournalLine."Cost Object Code" := CostObjectCode;
         end;
+
+        if (BalCostCenterCode <> '') or (BalCostObjectCode <> '') then begin
+            CostJournalLine."Bal. Cost Center Code" := BalCostCenterCode;
+            CostJournalLine."Bal. Cost Object Code" := BalCostObjectCode;
+        end;
+
+        if not CostJournalLine.Insert(true) then
+            CostJournalLine.Modify();
     end;
 }
 

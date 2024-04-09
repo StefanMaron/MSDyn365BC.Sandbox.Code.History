@@ -3,9 +3,9 @@ codeunit 119085 "Create Cost Types"
 
     trigger OnRun()
     begin
-        CostAccMgt.GetCostTypesFromChartDirect;
-        UpdateDimOnCostTypes;
-        EnhanceCostType;
+        CostAccMgt.GetCostTypesFromChartDirect();
+        UpdateDimOnCostTypes();
+        EnhanceCostType();
     end;
 
     var
@@ -25,8 +25,6 @@ codeunit 119085 "Create Cost Types"
         XFITTINGS: Label 'FITTINGS', Comment = 'Fittings is a name of Cost Object.';
         XPERS: Label 'PERS', Comment = 'PERS stands for Person and it is a name of cost center.';
         XCostCostCenterNoOpen: Label 'Cost center %1 not open.';
-        XCostCostObjectNoOpen: Label 'Cost object %1 not open.';
-        XMATERIAL: Label 'MATERIAL', Comment = 'Material is a name of Cost Center.';
         XGL: Label 'GL';
         XALLOCATIONS: Label 'ALLOCATIONS', Comment = 'Allocation is a name of Cost Type.';
         XTOTALALLOC: Label 'TOTAL ALLOCATIONS';
@@ -43,10 +41,7 @@ codeunit 119085 "Create Cost Types"
         XREV: Label 'Revenue';
         XEARNI: Label 'earning';
         XREVE: Label 'revenue', Comment = 'revenue is a name of Cost Type.';
-        XCOSTACC: Label 'COST ACCOUNTING';
         XActualAccurals: Label 'Actual Accruals';
-        xPurchaseTrade: Label 'Purchase Trade';
-        XPurchaseRawMat: Label 'Purchase Raw Mat.';
         XEmployersSalary: Label 'Employer''s salary';
         XCalcInterestOnAssets: Label 'Calc. Interest on Assets';
         XInitialCostCenter: Label 'Alloc. of Initial Cost Center';
@@ -150,16 +145,16 @@ codeunit 119085 "Create Cost Types"
         // Create new Cost Type  --> may need localization.. adjust also in definecostallocation()
         // WriteCostType('8725',Text077,0,Text012,'');
         // WriteCostType('9225',Text078,0,Text010,'');
-        WriteCostType('6400011', XEmployersSalary, 0, XGL, '');
-        WriteCostType('6623002', XCalcInterestOnAssets, 0, XADM, '');
+        WriteCostType('6400011', XEmployersSalary, "Cost Account Type"::"Cost Type", XGL, '');
+        WriteCostType('6623002', XCalcInterestOnAssets, "Cost Account Type"::"Cost Type", XADM, '');
 
-        WriteCostType('9900', XALLOCATIONS, 3, '', '');   // From
-        WriteCostType('9901', XInitialCostCenter, 0, '', '');
-        WriteCostType('9902', XMainCostCenter, 0, '', '');
-        WriteCostType('9903', XAllocOfCostObject, 0, '', '');
-        WriteCostType('9999', XTOTALALLOC, 4, '', '');  // To
+        WriteCostType('9900', XALLOCATIONS, "Cost Account Type"::"Begin-Total", '', '');   // From
+        WriteCostType('9901', XInitialCostCenter, "Cost Account Type"::"Cost Type", '', '');
+        WriteCostType('9902', XMainCostCenter, "Cost Account Type"::"Cost Type", '', '');
+        WriteCostType('9903', XAllocOfCostObject, "Cost Account Type"::"Cost Type", '', '');
+        WriteCostType('9999', XTOTALALLOC, "Cost Account Type"::"End-Total", '', '');  // To
 
-        WriteCostType('9920', XActualAccurals, 0, XACTACCR, '');
+        WriteCostType('9920', XActualAccurals, "Cost Account Type"::"Cost Type", XACTACCR, '');
 
 
         // Remove connection to GL Account
@@ -187,8 +182,7 @@ codeunit 119085 "Create Cost Types"
                     CostType.Modify();
             until CostType.Next() = 0;
 
-
-        // CostType.GET(MakeAdjustments.Convert('996000'));
+        // CostType.Get(MakeAdjustments.Convert('996000'));
         // CostType.Name := Text096;
         // CostType.Modify();
 
@@ -199,7 +193,7 @@ codeunit 119085 "Create Cost Types"
         CostAccountMgt.LinkCostTypesToGLAccounts();
     end;
 
-    procedure WriteCostType(CostTypeNo: Code[20]; CostTypeName: Text[30]; Type: Integer; CostCenterCode: Code[20]; CostObjectCode: Code[20])
+    procedure WriteCostType(CostTypeNo: Code[20]; CostTypeName: Text[30]; Type: Enum "Cost Account Type"; CostCenterCode: Code[20]; CostObjectCode: Code[20])
     var
         CostType: Record "Cost Type";
     begin
@@ -217,12 +211,10 @@ codeunit 119085 "Create Cost Types"
     var
         Position: Integer;
     begin
-        with CostType do begin
-            Position := StrPos(Name, FromText);
-            if Position > 0 then
-                Name := CopyStr(CopyStr(Name, 1, Position - 1) + NewText + CopyStr(Name, Position + StrLen(FromText) + 1), 1, MaxStrLen(Name));
-            exit(Position <> 0);
-        end;
+        Position := StrPos(CostType.Name, FromText);
+        if Position > 0 then
+            CostType.Name := CopyStr(CopyStr(CostType.Name, 1, Position - 1) + NewText + CopyStr(CostType.Name, Position + StrLen(FromText) + 1), 1, MaxStrLen(CostType.Name));
+        exit(Position <> 0);
     end;
 }
 

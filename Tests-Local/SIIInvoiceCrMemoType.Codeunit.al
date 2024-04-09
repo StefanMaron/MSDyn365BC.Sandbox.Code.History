@@ -21,7 +21,6 @@ codeunit 147551 "SII Invoice/Cr. Memo Type"
         IncorrectXMLDocErr: Label 'The XML document was not generated properly.';
         XPathSalesFacturaExpedidaTok: Label '//soapenv:Body/siiRL:SuministroLRFacturasEmitidas/siiRL:RegistroLRFacturasEmitidas/siiRL:FacturaExpedida/';
         XPathPurchFacturaRecibidaTok: Label '//soapenv:Body/siiRL:SuministroLRFacturasRecibidas/siiRL:RegistroLRFacturasRecibidas/siiRL:FacturaRecibida/';
-        XPathSalesBaseImponibleTok: Label '//soapenv:Body/siiRL:SuministroLRFacturasEmitidas/siiRL:RegistroLRFacturasEmitidas/siiRL:FacturaExpedida/sii:TipoDesglose/sii:DesgloseTipoOperacion/sii:Entrega/sii:Sujeta/sii:NoExenta/sii:DesgloseIVA/sii:DetalleIVA';
         UploadType: Option Regular,Intracommunity,RetryAccepted;
 
     [Test]
@@ -694,7 +693,7 @@ codeunit 147551 "SII Invoice/Cr. Memo Type"
         // [GIVEN] Posted sales credit memo with "Cr. Memo Type" = "F3 Invoice issued to replace simplified invoices"
         PostSalesDocWithInvOrCrMemoType(
           CustLedgerEntry, SalesHeader."Document Type"::Invoice, 0,
-          0, SalesHeader."Cr. Memo Type"::"F3 Invoice issued to replace simplified invoices");
+          "SII Sales Invoice Type"::"F1 Invoice", SalesHeader."Cr. Memo Type"::"F3 Invoice issued to replace simplified invoices");
 
         // [WHEN] Create xml for the document
         Assert.IsTrue(SIIXMLCreator.GenerateXml(CustLedgerEntry, XMLDoc, UploadType::Regular, false), IncorrectXMLDocErr);
@@ -717,7 +716,7 @@ codeunit 147551 "SII Invoice/Cr. Memo Type"
         // [FEATURE] [Service] [Credit Memo]
         // [SCENARIO 433347] Sales credit memo with "F3" type has correct xml to send to SII
 
-        Initialize;
+        Initialize();
         // [GIVEN] Posted sales credit memo with "Cr. Memo Type" = "F3 Invoice issued to replace simplified invoices"
         PostServiceCrMemoWithInvOrCrMemoType(
           CustLedgerEntry, 0, ServiceHeader."Cr. Memo Type"::"F3 Invoice issued to replace simplified invoices");
@@ -748,7 +747,7 @@ codeunit 147551 "SII Invoice/Cr. Memo Type"
         // [GIVEN] Posted sales replacement credit memo with "Cr. Memo Type" = "F3 Invoice issued to replace simplified invoices"
         PostSalesDocWithInvOrCrMemoType(
           CustLedgerEntry, SalesHeader."Document Type"::Invoice, SalesHeader."Correction Type"::Replacement,
-          0, SalesHeader."Cr. Memo Type"::"F3 Invoice issued to replace simplified invoices");
+          "SII Sales Invoice Type"::"F1 Invoice", SalesHeader."Cr. Memo Type"::"F3 Invoice issued to replace simplified invoices");
 
         // [WHEN] Create xml for the document
         Assert.IsTrue(SIIXMLCreator.GenerateXml(CustLedgerEntry, XMLDoc, UploadType::Regular, false), IncorrectXMLDocErr);
@@ -788,73 +787,29 @@ codeunit 147551 "SII Invoice/Cr. Memo Type"
         LibrarySII.ValidateNoElementsByName(XMLDoc, 'sii:TipoRectificativa');
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    procedure SalesInvoiceWithForeignCustomerAndInvTypeR4()
-    var
-        Customer: Record Customer;
-        SalesHeader: Record "Sales Header";
-        CustLedgerEntry: Record "Cust. Ledger Entry";
-        VATEntry: Record "VAT Entry";
-        SIIXMLCreator: Codeunit "SII XML Creator";
-        XMLDoc: DotNet XmlDocument;
-    begin
-        // [FEATURE] [Sales] [Invoice]
-        // [SCENARIO 502669] Stan can post the sales invoice with a foreign customer and "Invoice Type" = "R4 Corrected Invoice (Other)"
-
-        Initialize();
-
-        // [GIVEN] Foreign customer "X"
-        LibrarySII.CreateCustWithCountryAndVATReg(Customer, LibrarySII.GetForeignCountry(), LibrarySII.GetForeignVATRegNo());
-        // [GIVEN] Posted Sales Invoice with a customer "X" and "Invoice Type" = "R4 Corrected Invoice (Other)"
-        PostSalesDocWithInvOrCrMemoType(
-          CustLedgerEntry, SalesHeader."Document Type"::Invoice, Customer."No.", 0,
-          SalesHeader."Invoice Type"::"R4 Corrected Invoice (Other)",
-          "SII Sales Credit Memo Type"::"R1 Corrected Invoice");
-
-        // [WHEN] Create xml for Posted Sales Invoice
-        Assert.IsTrue(SIIXMLCreator.GenerateXml(CustLedgerEntry, XMLDoc, UploadType::Regular, false), IncorrectXMLDocErr);
-
-        // [THEN] XML file has TipoFactura = "R4"
-        LibrarySII.VerifyOneNodeWithValueByXPath(XMLDoc, XPathSalesFacturaExpedidaTok, 'sii:TipoFactura', 'R4');
-
-        // [THEN] The structure of the line part of the XML is the following:
-        // [THEN] sii:DesgloseTipoOperacion/sii:Entrega/sii:Sujeta/sii:NoExenta/sii:DesgloseIVA/sii:DetalleIVA/
-        VATEntry.SetRange("Posting Date", CustLedgerEntry."Posting Date");
-        VATEntry.SetRange("Document No.", CustLedgerEntry."Document No.");
-        VATEntry.FindFirst();
-        LibrarySII.VerifyOneNodeWithValueByXPath(
-          XMLDoc, XPathSalesBaseImponibleTok, '/sii:BaseImponible', SIIXMLCreator.FormatNumber(-VATEntry.Base));
-    end;
-
     local procedure Initialize()
     begin
         if IsInitialized then
             exit;
 
         LibrarySII.InitSetup(true, false);
-        LibrarySII.BindSubscriptionJobQueue;
+        LibrarySII.BindSubscriptionJobQueue();
 
         IsInitialized := true;
     end;
 
     local procedure PostSalesDocWithInvOrCrMemoType(var CustLedgerEntry: Record "Cust. Ledger Entry"; DocType: Enum "Sales Document Type"; CorrType: Option; InvoiceType: Enum "SII Sales Invoice Type"; CrMemoType: Enum "SII Sales Credit Memo Type")
-    begin
-        PostSalesDocWithInvOrCrMemoType(CustLedgerEntry, DocType, LibrarySales.CreateCustomerNo(), CorrType, InvoiceType, CrMemoType);
-    end;
-
-    local procedure PostSalesDocWithInvOrCrMemoType(var CustLedgerEntry: Record "Cust. Ledger Entry"; DocType: Enum "Sales Document Type"; CustNo: Code[20]; CorrType: Option; InvoiceType: Enum "SII Sales Invoice Type"; CrMemoType: Enum "SII Sales Credit Memo Type")
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
     begin
-        LibrarySales.CreateSalesHeader(SalesHeader, DocType, CustNo);
+        LibrarySales.CreateSalesHeader(SalesHeader, DocType, LibrarySales.CreateCustomerNo());
         SalesHeader.Validate("Correction Type", CorrType);
         SalesHeader.Validate("Invoice Type", InvoiceType);
         SalesHeader.Validate("Cr. Memo Type", CrMemoType);
         SalesHeader.Modify(true);
         LibrarySales.CreateSalesLine(
-          SalesLine, SalesHeader, SalesLine.Type::"G/L Account", LibraryERM.CreateGLAccountWithSalesSetup, LibraryRandom.RandInt(100));
+          SalesLine, SalesHeader, SalesLine.Type::"G/L Account", LibraryERM.CreateGLAccountWithSalesSetup(), LibraryRandom.RandInt(100));
         SalesLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
         SalesLine.Modify(true);
         LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, DocType, LibrarySales.PostSalesDocument(SalesHeader, true, true));
@@ -865,20 +820,20 @@ codeunit 147551 "SII Invoice/Cr. Memo Type"
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
     begin
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, DocType, LibraryPurchase.CreateVendorNo);
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, DocType, LibraryPurchase.CreateVendorNo());
         PurchaseHeader.Validate("Correction Type", CorrType);
         PurchaseHeader.Validate("Invoice Type", InvoiceType);
         PurchaseHeader.Validate("Cr. Memo Type", CrMemoType);
         PurchaseHeader.Modify(true);
         LibraryPurchase.CreatePurchaseLine(
           PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account",
-          LibraryERM.CreateGLAccountWithSalesSetup, LibraryRandom.RandInt(100));
+          LibraryERM.CreateGLAccountWithSalesSetup(), LibraryRandom.RandInt(100));
         PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 2));
         PurchaseLine.Modify(true);
         LibraryERM.FindVendorLedgerEntry(VendorLedgerEntry, DocType, LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true));
     end;
 
-    local procedure PostServiceCrMemoWithInvOrCrMemoType(var CustLedgerEntry: Record "Cust. Ledger Entry"; InvoiceType: Option; CrMemoType: Integer)
+    local procedure PostServiceCrMemoWithInvOrCrMemoType(var CustLedgerEntry: Record "Cust. Ledger Entry"; InvoiceType: Option; CrMemoType: Enum "SII Sales Credit Memo Type")
     var
         ServiceHeader: Record "Service Header";
         ServiceItem: Record "Service Item";

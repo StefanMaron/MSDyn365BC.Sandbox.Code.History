@@ -12,9 +12,7 @@ codeunit 101080 "Create Gen. Journal Template"
         InsertData(
           XSALES, XSALES, "Gen. Journal Template".Type::Sales, false, '',
           XGJNLSALES, XSalesJournal, '1001', 'G02000');
-        InsertData(
-          XCARTERA, XCARTERA, "Gen. Journal Template".Type::Cartera, false, '',
-          '', '', '', '');
+
         InsertData(
           XCASHRCPT, XCashreceipts, "Gen. Journal Template".Type::"Cash Receipts", false, '',
           XGJNLRCPT, XCashReceiptsJournal, '2001', 'G03000');
@@ -36,6 +34,10 @@ codeunit 101080 "Create Gen. Journal Template"
         InsertData(
           XRECURRING, XRecurringGeneralJournal, "Gen. Journal Template".Type::General, true, '',
           XGJNLREC, XRecurringGeneralJournal, '6001', 'G07000');
+
+        InsertData(
+          XCARTERA, XCARTERA, "Gen. Journal Template".Type::Cartera, false, '',
+          '', '', '', '');
     end;
 
     var
@@ -74,14 +76,14 @@ codeunit 101080 "Create Gen. Journal Template"
         XGJNLJOB: Label 'GJNL-JOB';
         XCARTERA: Label 'Cartera';
 
-    procedure InsertData(Name: Code[10]; Description: Text[80]; Type: Option; Recurring: Boolean; "Source Code": Code[10]; "No. Series": Code[10]; NoSeriesDescription: Text[30]; NoSeriesStartNo: Code[20]; NoSeriesEndNo: Code[20])
+    procedure InsertData(Name: Code[10]; Description: Text[80]; Type: Enum "Gen. Journal Template Type"; Recurring: Boolean; "Source Code": Code[10]; "No. Series": Code[10]; NoSeriesDescription: Text[30]; NoSeriesStartNo: Code[20]; NoSeriesEndNo: Code[20])
     var
-      NoSeries: Record "No. Series";
+        NoSeries: Record "No. Series";
     begin
         if ("No. Series" <> '') and ("No. Series" <> LastNoSeriesCode) then
-          if not NoSeries.Get("No. Series") then
-              "Create No. Series".InitBaseSeries(
-                "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1);
+            if not NoSeries.Get("No. Series") then
+                "Create No. Series".InitBaseSeries(
+                  "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1);
         LastNoSeriesCode := "No. Series";
 
         "Gen. Journal Template".Init();

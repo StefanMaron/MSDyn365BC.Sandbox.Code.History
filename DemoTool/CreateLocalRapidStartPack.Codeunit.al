@@ -40,21 +40,19 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         CreateConfigWorksheet: Codeunit "Create Config. Worksheet";
     begin
-        with CreateConfigWorksheet do begin
-            CreateConfigGroup(XLocalSettingsTxt);
-            CreateConfigLine(DATABASE::"Payment Day");
-            CreateConfigLine(DATABASE::"Non-Payment Period");
-            CreateConfigLine(DATABASE::"AEAT Transference Format");
-            CreateConfigLine(DATABASE::"AEAT Transference Format XML");
-            CreateConfigLine(DATABASE::"Statistical Code");
-            CreateConfigLine(DATABASE::"Operation Code");
-            CreateConfigLine(DATABASE::"Category Code");
-            CreateConfigLine(DATABASE::"Operation Fee");
-            CreateConfigLine(DATABASE::"Cartera Report Selections");
-            CreateConfigLine(DATABASE::"Cartera Setup");
-            CreateConfigLine(DATABASE::Installment);
-            CreateConfigLine(DATABASE::"Fee Range");
-        end;
+        CreateConfigWorksheet.CreateConfigGroup(XLocalSettingsTxt);
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Payment Day");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Non-Payment Period");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"AEAT Transference Format");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"AEAT Transference Format XML");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Statistical Code");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Operation Code");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Category Code");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Operation Fee");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Cartera Report Selections");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Cartera Setup");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::Installment);
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Fee Range");
     end;
 
     procedure SetFieldsAndFilters(TableID: Integer)
@@ -75,7 +73,7 @@ codeunit 101931 "Create Local RapidStart Pack"
             DATABASE::"Source Code Setup":
                 CreateConfigPackageHelper.ValidateField(SourceCodeSetup.FieldNo("Cartera Journal"), false);
             DATABASE::"Acc. Schedule Line":
-                UpdateAccScheduleLineFieldProcessingOrder;
+                UpdateAccScheduleLineFieldProcessingOrder();
             Database::"VAT Posting Setup":
                 begin
                     CreateConfigPackageHelper.ValidateField(VatPostingSetup.FieldNo("VAT Identifier"), false);
@@ -92,9 +90,9 @@ codeunit 101931 "Create Local RapidStart Pack"
         ProcessingOrder: Integer;
     begin
         ConfigPackageField1.Get(
-          CreateConfigPackageHelper.GetPackageCode, DATABASE::"Acc. Schedule Line", AccScheduleLine.FieldNo("Totaling Type"));
+          CreateConfigPackageHelper.GetPackageCode(), DATABASE::"Acc. Schedule Line", AccScheduleLine.FieldNo("Totaling Type"));
         ConfigPackageField2.Get(
-          CreateConfigPackageHelper.GetPackageCode, DATABASE::"Acc. Schedule Line", AccScheduleLine.FieldNo(Totaling));
+          CreateConfigPackageHelper.GetPackageCode(), DATABASE::"Acc. Schedule Line", AccScheduleLine.FieldNo(Totaling));
 
         ProcessingOrder := ConfigPackageField1."Processing Order";
         ConfigPackageField1."Processing Order" := ConfigPackageField2."Processing Order";

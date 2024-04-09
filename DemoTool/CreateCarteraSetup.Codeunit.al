@@ -3,17 +3,15 @@ codeunit 161012 "Create Cartera Setup"
 
     trigger OnRun()
     begin
-        with "Cartera Setup" do begin
-            Get();
-            "Bills Discount Limit Warnings" := true;
-            "Cartera Setup"."CCC Ctrl Digits Check String" := X63791058421;
-            "Create No. Series".InitFinalSeries("Bill Group Nos.", XBREM, XBillGroup, 6);
-            "Create No. Series".InitFinalSeries("Payment Order Nos.", XBORDPAG, XPaymentOrder, 9);
-            Modify();
-            "Source Code Setup".Get();
-            "Source Code Setup"."Cartera Journal" := XCARJNL;
-            "Source Code Setup".Modify();
-        end;
+        "Cartera Setup".Get();
+        "Cartera Setup"."Bills Discount Limit Warnings" := true;
+        "Cartera Setup"."CCC Ctrl Digits Check String" := X63791058421;
+        "Create No. Series".InitFinalSeries("Cartera Setup"."Bill Group Nos.", XBREM, XBillGroup, 6);
+        "Create No. Series".InitFinalSeries("Cartera Setup"."Payment Order Nos.", XBORDPAG, XPaymentOrder, 9);
+        "Cartera Setup".Modify();
+        "Source Code Setup".Get();
+        "Source Code Setup"."Cartera Journal" := XCARJNL;
+        "Source Code Setup".Modify();
     end;
 
     var
@@ -25,17 +23,14 @@ codeunit 161012 "Create Cartera Setup"
         XBillGroup: Label 'Bill Group';
         XBORDPAG: Label 'B-ORDPAG';
         XPaymentOrder: Label 'PaymentOrder';
-        XESP: Label 'ESP';
         XCARJNL: Label 'CARJNL';
 
     procedure Finalize()
     begin
-        with "Cartera Setup" do begin
-            Get();
-            "Bill Group Nos." := XBREM;
-            "Payment Order Nos." := XBORDPAG;
-            Modify();
-        end;
+        "Cartera Setup".Get();
+        "Cartera Setup"."Bill Group Nos." := XBREM;
+        "Cartera Setup"."Payment Order Nos." := XBORDPAG;
+        "Cartera Setup".Modify();
     end;
 }
 
