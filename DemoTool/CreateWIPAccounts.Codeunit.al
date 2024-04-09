@@ -3,8 +3,6 @@ codeunit 119032 "Create WIP Accounts"
 
     trigger OnRun()
     var
-        WorkCenter: Record "Work Center";
-        MachineCenter: Record "Machine Center";
         ProdPostingGroup: Record "Gen. Product Posting Group";
         GenPostingSetup: Record "General Posting Setup";
         InvtPostingSetup: Record "Inventory Posting Setup";
@@ -30,41 +28,41 @@ codeunit 119032 "Create WIP Accounts"
         InsertData('997895', XTotalVariance, 4, 0, 0, '', 0, '', '', false);
 
         InsertData('992140', XWIPAccountFinishedgoods, 0, 1, 0, '', 0, '', '', false);
-        GLAccIndent.Indent;
+        GLAccIndent.Indent();
 
         DemoDataSetup.Get();
-        ProdPostingGroup.Validate(Code, DemoDataSetup.ManufactCode);
+        ProdPostingGroup.Validate(Code, DemoDataSetup.ManufactCode());
         ProdPostingGroup.Validate(Description, XCapacities);
         ProdPostingGroup.Insert();
 
         GenPostingSetup.Validate("Gen. Bus. Posting Group", '');
-        GenPostingSetup.Validate("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode);
+        GenPostingSetup.Validate("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode());
         GenPostingSetup.Insert();
         GenPostingSetup.Validate("Gen. Bus. Posting Group", XCUSTDOM);
-        GenPostingSetup.Validate("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode);
+        GenPostingSetup.Validate("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode());
         GenPostingSetup.Insert();
         GenPostingSetup.Validate("Gen. Bus. Posting Group", XCUSTFOR);
-        GenPostingSetup.Validate("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode);
+        GenPostingSetup.Validate("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode());
         GenPostingSetup.Insert();
         GenPostingSetup.Validate("Gen. Bus. Posting Group", XVENDDOM);
-        GenPostingSetup.Validate("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode);
+        GenPostingSetup.Validate("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode());
         GenPostingSetup.Insert();
         GenPostingSetup.Validate("Gen. Bus. Posting Group", XVENDFOR);
-        GenPostingSetup.Validate("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode);
+        GenPostingSetup.Validate("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode());
         GenPostingSetup.Insert();
 
-        UpdateManufactAccounts;
+        UpdateManufactAccounts();
 
         GLAccountCategoryMgt.GetAccountCategory(GLAccountCategory, GLAccountCategory."Account Category"::"Cost of Goods Sold");
         CreateGLAccount.AssignCategoryToChartOfAccounts(GLAccountCategory);
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::"Cost of Goods Sold", GLAccountCategoryMgt.GetCOGSMaterials);
+          GLAccountCategory."Account Category"::"Cost of Goods Sold", GLAccountCategoryMgt.GetCOGSMaterials());
         CreateGLAccount.AssignSubcategoryToChartOfAccounts(GLAccountCategory);
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::Assets, GLAccountCategoryMgt.GetCurrentAssets);
+          GLAccountCategory."Account Category"::Assets, GLAccountCategoryMgt.GetCurrentAssets());
         CreateGLAccount.AssignSubcategoryToChartOfAccounts(GLAccountCategory);
 
-        GenPostingSetup.SetRange("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode);
+        GenPostingSetup.SetRange("Gen. Prod. Posting Group", DemoDataSetup.ManufactCode());
         if GenPostingSetup.Find('-') then
             repeat
                 case GenPostingSetup."Gen. Bus. Posting Group" of
@@ -79,7 +77,7 @@ codeunit 119032 "Create WIP Accounts"
                             GenPostingSetup.Validate("Purch. Line Disc. Account", Adjust.Convert('997140'));
                             GenPostingSetup.Validate("Purch. Inv. Disc. Account", Adjust.Convert('997140'));
                         end;
-                    DemoDataSetup.EUCode:
+                    DemoDataSetup.EUCode():
                         begin
                             GenPostingSetup.Validate("Sales Account", Adjust.Convert('996120'));
                             GenPostingSetup.Validate("Sales Credit Memo Account", Adjust.Convert('996120'));
@@ -90,7 +88,7 @@ codeunit 119032 "Create WIP Accounts"
                             GenPostingSetup.Validate("Purch. Line Disc. Account", Adjust.Convert('997140'));
                             GenPostingSetup.Validate("Purch. Inv. Disc. Account", Adjust.Convert('997140'));
                         end;
-                    DemoDataSetup.ExportCode:
+                    DemoDataSetup.ExportCode():
                         begin
                             GenPostingSetup.Validate("Sales Account", Adjust.Convert('996130'));
                             GenPostingSetup.Validate("Sales Credit Memo Account", Adjust.Convert('996130'));
@@ -192,12 +190,12 @@ codeunit 119032 "Create WIP Accounts"
         InsertData('997792', XOverheadAppliedCap, 0, 0, 0, '', 0, '', '', false);
         InsertData('997793', XPurchaseVarianceCap, 0, 0, 0, '', 0, '', '', false);
 
-        UpdateManufactAccounts;
+        UpdateManufactAccounts();
 
         GLAccountCategoryMgt.GetAccountCategory(GLAccountCategory, GLAccountCategory."Account Category"::"Cost of Goods Sold");
         CreateGLAccount.AssignCategoryToChartOfAccounts(GLAccountCategory);
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::"Cost of Goods Sold", GLAccountCategoryMgt.GetCOGSMaterials);
+          GLAccountCategory."Account Category"::"Cost of Goods Sold", GLAccountCategoryMgt.GetCOGSMaterials());
         CreateGLAccount.AssignSubcategoryToChartOfAccounts(GLAccountCategory);
     end;
 
@@ -209,24 +207,24 @@ codeunit 119032 "Create WIP Accounts"
         if GenPostingSetup.FindSet() then
             repeat
                 case GenPostingSetup."Gen. Prod. Posting Group" of
-                    DemoDataSetup.RawMatCode:
+                    DemoDataSetup.RawMatCode():
                         begin
                             GenPostingSetup.Validate("Direct Cost Applied Account", Adjust.Convert('997291'));
                             GenPostingSetup.Validate("Overhead Applied Account", Adjust.Convert('997292'));
                             GenPostingSetup.Validate("Purchase Variance Account", Adjust.Convert('997293'));
                             GenPostingSetup.Modify();
                         end;
-                    DemoDataSetup.MiscCode,
-                    DemoDataSetup.NoVATCode,
-                    DemoDataSetup.RetailCode:
+                    DemoDataSetup.MiscCode(),
+                    DemoDataSetup.NoVATCode(),
+                    DemoDataSetup.RetailCode():
                         begin
                             GenPostingSetup.Validate("Direct Cost Applied Account", Adjust.Convert('997191'));
                             GenPostingSetup.Validate("Overhead Applied Account", Adjust.Convert('997192'));
                             GenPostingSetup.Validate("Purchase Variance Account", Adjust.Convert('997193'));
                             GenPostingSetup.Modify();
                         end;
-                    DemoDataSetup.ServicesCode,
-                    DemoDataSetup.ManufactCode:
+                    DemoDataSetup.ServicesCode(),
+                    DemoDataSetup.ManufactCode():
                         begin
                             GenPostingSetup.Validate("Direct Cost Applied Account", Adjust.Convert('997791'));
                             GenPostingSetup.Validate("Overhead Applied Account", Adjust.Convert('997792'));

@@ -8,18 +8,15 @@ codeunit 160805 "Import GLAcc. Scheme"
         analyse.DeleteAll();
         dds.Get();
 
-        lesfil2;
-        lesfil3;
+        lesfil2();
+        lesfil3();
     end;
 
     var
         dds: Record "Demo Data Setup";
-        byte: Text[1024];
         int: Integer;
-        kontokonv: Record "GL Accounts Conversion";
         kontoskjema: Record "Acc. Schedules Conversion";
         analyse: Record "Analysis Conversion";
-        lang: Integer;
 
     procedure lesfil2()
     var
@@ -61,25 +58,21 @@ codeunit 160805 "Import GLAcc. Scheme"
 
     procedure convert2(txt: Text[1024])
     begin
-        with kontoskjema do begin
-            Reset();
-            Init();
-            "Schedule Name" := CopyStr(txt, 1, 10);
-            Evaluate("Line No.", CopyStr(txt, 12, 7));
-            Evaluate("Totaling (New)", CopyStr(txt, 101, 80));
-            Insert();
-        end;
+        kontoskjema.Reset();
+        kontoskjema.Init();
+        kontoskjema."Schedule Name" := CopyStr(txt, 1, 10);
+        Evaluate(kontoskjema."Line No.", CopyStr(txt, 12, 7));
+        Evaluate(kontoskjema."Totaling (New)", CopyStr(txt, 101, 80));
+        kontoskjema.Insert();
     end;
 
     procedure convert3(txt: Text[1024])
     begin
-        with analyse do begin
-            Reset();
-            Init();
-            "Analysis Code" := CopyStr(txt, 1, 10);
-            Evaluate("GL Acc Filter (New)", CopyStr(txt, 20, 250));
-            Insert();
-        end;
+        analyse.Reset();
+        analyse.Init();
+        analyse."Analysis Code" := CopyStr(txt, 1, 10);
+        Evaluate(analyse."GL Acc Filter (New)", CopyStr(txt, 20, 250));
+        analyse.Insert();
     end;
 }
 

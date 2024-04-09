@@ -4,7 +4,7 @@ codeunit 101225 "Create Post Code"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        ImportLocalPostCodes;
+        ImportLocalPostCodes();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Standard then
             exit;
 
@@ -526,12 +526,6 @@ codeunit 101225 "Create Post Code"
         XArnhem: Label 'Arnhem';
         XZutphen: Label 'Zutphen';
         XApeldoorn: Label 'Apeldoorn';
-        XSandvika: Label 'Sandvika';
-        XLysaker: Label 'Lysaker';
-        XHaslum: Label 'Haslum';
-        XAsker: Label 'Asker';
-        XSki: Label 'Ski';
-        XOslo: Label 'Oslo';
         XAuckland: Label 'Auckland';
         XWoodville: Label 'Woodville';
         XDannevirke: Label 'Dannevirke';

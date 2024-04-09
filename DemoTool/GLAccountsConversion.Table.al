@@ -1,6 +1,7 @@
 table 160800 "GL Accounts Conversion"
 {
     Caption = 'GL Accounts Conversion';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -13,7 +14,7 @@ table 160800 "GL Accounts Conversion"
 
             trigger OnValidate()
             begin
-                OpprettMidlertidigKontonr;
+                OpprettMidlertidigKontonr();
             end;
         }
         field(4; "Account Type"; Option)
@@ -24,8 +25,6 @@ table 160800 "GL Accounts Conversion"
 
             trigger OnValidate()
             var
-                GLEntry: Record "G/L Entry";
-                GLBudgetEntry: Record "G/L Budget Entry";
             begin
                 if ("Original Account No." <> '') and (xRec."Account Type" = xRec."Account Type"::Posting) then
                     Error('Nei! Du kan ikke endre %1 fra %2 til %3.\Poster på kontoen kan da ikke flyttes på fornuftig måte.',
@@ -259,7 +258,7 @@ table 160800 "GL Accounts Conversion"
                 "Entry No." := KontoKonv."Entry No." + 1;
             end;
 
-        OpprettMidlertidigKontonr;
+        OpprettMidlertidigKontonr();
     end;
 
     var

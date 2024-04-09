@@ -3,15 +3,13 @@ codeunit 101093 "Create Vendor Posting Group"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(
-              DomesticCode, XDomesticVendorsTxt, '995410', '997150', '999250', '999130', '999140', '999150', '999160', '999260');
-            InsertData(
-              ForeignCode, XForeignVendorsTxt, '995420', '997150', '999250', '999130', '999140', '999150', '999160', '999260');
-            InsertData(
-              EUCode, XVendorsInEUTxt, '995420', '997150', '999250', '999130', '999140', '999150', '999160', '999260');
-        end;
+        DemoDataSetup.Get();
+        InsertData(
+          DemoDataSetup.DomesticCode(), XDomesticVendorsTxt, '995410', '997150', '999250', '999130', '999140', '999150', '999160', '999260');
+        InsertData(
+          DemoDataSetup.ForeignCode(), XForeignVendorsTxt, '995420', '997150', '999250', '999130', '999140', '999150', '999160', '999260');
+        InsertData(
+          DemoDataSetup.EUCode(), XVendorsInEUTxt, '995420', '997150', '999250', '999130', '999140', '999150', '999160', '999260');
     end;
 
     var

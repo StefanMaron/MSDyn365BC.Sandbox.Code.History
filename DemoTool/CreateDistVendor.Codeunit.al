@@ -5,18 +5,16 @@ codeunit 118843 "Create Dist. Vendor"
     var
         CreatePostCode: Codeunit "Create Post Code";
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(
-              '60000', XGrassblueLtd, X8OneWay, CreatePostCode.Convert('GB-N12 5XY'), "Country/Region Code",
-              XGrassblueLtd, XRB, XLondon, XVENDDOM, XVENDHIGH, DomesticCode, 0, XCOD, 1, XWHITE, XCIF, '');
-            InsertData(
-              '61000', XElectronicsLtd, X354OxfordStreet, CreatePostCode.Convert('GB-N16 34Z'), "Country/Region Code",
-              XElectronicsLtd, XRB, XLondon, XVENDDOM, XVENDHIGH, DomesticCode, 0, XCOD, 2, XWHITE, XCPT, '');
-            InsertData(
-              '62000', XWalkerHolland, X116KensingtonRoad, CreatePostCode.Convert('GB-WC1 3DG'), "Country/Region Code",
-              XWalkerHolland, XRB, XLondon, XVENDDOM, XVENDHIGH, DomesticCode, 0, XCOD, 3, XWHITE, XCFR, '');
-        end;
+        DemoDataSetup.Get();
+        InsertData(
+          '60000', XGrassblueLtd, X8OneWay, CreatePostCode.Convert('GB-N12 5XY'), DemoDataSetup."Country/Region Code",
+          XGrassblueLtd, XRB, XLondon, XVENDDOM, XVENDHIGH, DemoDataSetup.DomesticCode(), 0, XCOD, 1, XWHITE, XCIF, '');
+        InsertData(
+          '61000', XElectronicsLtd, X354OxfordStreet, CreatePostCode.Convert('GB-N16 34Z'), DemoDataSetup."Country/Region Code",
+          XElectronicsLtd, XRB, XLondon, XVENDDOM, XVENDHIGH, DemoDataSetup.DomesticCode(), 0, XCOD, 2, XWHITE, XCPT, '');
+        InsertData(
+          '62000', XWalkerHolland, X116KensingtonRoad, CreatePostCode.Convert('GB-WC1 3DG'), DemoDataSetup."Country/Region Code",
+          XWalkerHolland, XRB, XLondon, XVENDDOM, XVENDHIGH, DemoDataSetup.DomesticCode(), 0, XCOD, 3, XWHITE, XCFR, '');
     end;
 
     var

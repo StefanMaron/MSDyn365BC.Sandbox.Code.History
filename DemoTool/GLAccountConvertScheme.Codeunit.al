@@ -617,30 +617,28 @@ codeunit 160802 "GL Account Convert Scheme"
 
     procedure insertData("Code": Code[20]; navn: Text[30]; acctype: Option Posting,Heading,Total,"Begin-Total","End-Total"; incbal: Option; debcred: Option; blocked: Boolean; dirpost: Boolean; recacc: Boolean; newpage: Boolean; noofblanklines: Integer; total: Text[250]; genposttype: Integer; genbuspostgr: Code[10]; genprodpostgr: Code[10]; vatbuspostgr: Code[10]; vatprodpostgr: Code[10]; opprinkonto: Text[20]; midlkonto: Text[20])
     begin
-        with kontokonvertering do begin
-            Reset();
-            Init();
-            "No." := Code;
-            Validate(Name, navn);
-            Validate("Search Name", UpperCase(navn));
-            "Account Type" := acctype;
-            "Income/Balance" := incbal;
-            "Debit/Credit" := debcred;
-            Blocked := Blocked;
-            "Direct Posting" := dirpost;
-            "Reconciliation Account" := recacc;
-            "New Page" := newpage;
-            "No. of Blank Lines" := noofblanklines;
-            Totaling := total;
-            "Gen. Posting Type" := genposttype;
-            "Gen. Bus. Posting Group" := genbuspostgr;
-            "Gen. Prod. Posting Group" := genprodpostgr;
-            "VAT Bus. Posting Group" := vatbuspostgr;
-            "VAT Prod. Posting Group" := vatprodpostgr;
-            "Original Account No." := opprinkonto;
-            "Temp. Account No." := midlkonto;
-            Insert();
-        end;
+        kontokonvertering.Reset();
+        kontokonvertering.Init();
+        kontokonvertering."No." := Code;
+        kontokonvertering.Validate(Name, navn);
+        kontokonvertering.Validate("Search Name", UpperCase(navn));
+        kontokonvertering."Account Type" := acctype;
+        kontokonvertering."Income/Balance" := incbal;
+        kontokonvertering."Debit/Credit" := debcred;
+        kontokonvertering.Blocked := kontokonvertering.Blocked;
+        kontokonvertering."Direct Posting" := dirpost;
+        kontokonvertering."Reconciliation Account" := recacc;
+        kontokonvertering."New Page" := newpage;
+        kontokonvertering."No. of Blank Lines" := noofblanklines;
+        kontokonvertering.Totaling := total;
+        kontokonvertering."Gen. Posting Type" := genposttype;
+        kontokonvertering."Gen. Bus. Posting Group" := genbuspostgr;
+        kontokonvertering."Gen. Prod. Posting Group" := genprodpostgr;
+        kontokonvertering."VAT Bus. Posting Group" := vatbuspostgr;
+        kontokonvertering."VAT Prod. Posting Group" := vatprodpostgr;
+        kontokonvertering."Original Account No." := opprinkonto;
+        kontokonvertering."Temp. Account No." := midlkonto;
+        kontokonvertering.Insert();
     end;
 }
 

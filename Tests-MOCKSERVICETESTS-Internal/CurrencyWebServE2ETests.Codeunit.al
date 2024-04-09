@@ -284,7 +284,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         ExchRateUpdateSetupCard.ServiceURL.SetValue(NationalBankenURLTxt);
 
         ExchRateUpdateSetupCard.Close();
-        ExchRateUpdateSetupCard.OpenEdit;
+        ExchRateUpdateSetupCard.OpenEdit();
         CurrExchRateUpdateSetup.Get(CurrencyExchangeSetupCode);
         ExchRateUpdateSetupCard.GotoRecord(CurrExchRateUpdateSetup);
 
@@ -300,7 +300,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         ExchRateUpdateSetupCard.SimpleDataExchSetup.FILTER.SetFilter(Caption, '');
 
         // Enter lines manually
-        ExchRateUpdateSetupCard.SimpleDataExchSetup.First;
+        ExchRateUpdateSetupCard.SimpleDataExchSetup.First();
         ExchRateUpdateSetupCard.SimpleDataExchSetup.SourceField.SetValue(NationalBankenLineDefXPathTxt);
 
         ExchRateUpdateSetupCard.SimpleDataExchSetup.Next();
@@ -311,7 +311,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         StartDateNodeName := 'id';
         LibraryVariableStorage.Enqueue(StartDateNodeName);
         ExchRateUpdateSetupCard.SimpleDataExchSetup.Next();
-        ExchRateUpdateSetupCard.SimpleDataExchSetup.SourceField.AssistEdit;
+        ExchRateUpdateSetupCard.SimpleDataExchSetup.SourceField.AssistEdit();
 
         ExpectedText := NationalBankenStartingDateXPathTxt;
         Assert.AreEqual(ExchRateUpdateSetupCard.SimpleDataExchSetup.SourceField.Value, ExpectedText,
@@ -325,8 +325,8 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         ExchRateUpdateSetupCard.SimpleDataExchSetup.SourceField.SetValue(NationalBankenExchangeRateXPathTxt);
 
         // Test Setup
-        CurrencyExchangeRates.Trap;
-        ExchRateUpdateSetupCard.Preview.Invoke;
+        CurrencyExchangeRates.Trap();
+        ExchRateUpdateSetupCard.Preview.Invoke();
 
         ExpectedDate := DMY2Date(3, 3, 2015);
         VerifyCurrExchRatesOnPage(CurrencyExchangeRates, NationalBankenDefaultAmount, ExpectedDate);
@@ -350,11 +350,11 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         ExchRateUpdateSetupCard.Code.SetValue(CurrencyExchangeSetupCode);
         ExchRateUpdateSetupCard.ServiceURL.SetValue(NationalBankenURLTxt);
 
-        ExchRateUpdateSetupCard.SimpleDataExchSetup.Last;
+        ExchRateUpdateSetupCard.SimpleDataExchSetup.Last();
         ExchRateUpdateSetupCard.SimpleDataExchSetup.Next();
 
         // Verification is in the handler method
-        ExchRateUpdateSetupCard.SimpleDataExchSetup.CaptionField.AssistEdit;
+        ExchRateUpdateSetupCard.SimpleDataExchSetup.CaptionField.AssistEdit();
     end;
 
     [Test]
@@ -376,10 +376,10 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
           LibraryUtility.GenerateRandomCode(CurrExchRateUpdateSetup.FieldNo(Code), DATABASE::"Curr. Exch. Rate Update Setup");
         ExchRateUpdateSetupCard.Code.SetValue(CurrencyExchangeSetupCode);
         ExchRateUpdateSetupCard.ServiceURL.SetValue(NationalBankenURLTxt);
-        ExchRateUpdateSetupCard.SimpleDataExchSetup.First;
+        ExchRateUpdateSetupCard.SimpleDataExchSetup.First();
 
         // Verification is in the handler method
-        ExchRateUpdateSetupCard.SimpleDataExchSetup.SourceField.AssistEdit;
+        ExchRateUpdateSetupCard.SimpleDataExchSetup.SourceField.AssistEdit();
     end;
 
     [Test]
@@ -403,8 +403,8 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
           LibraryUtility.GenerateRandomCode(CurrExchRateUpdateSetup.FieldNo(Code), DATABASE::"Curr. Exch. Rate Update Setup");
         ExchRateUpdateSetupCard.Code.SetValue(CurrencyExchangeSetupCode);
         ExchRateUpdateSetupCard.ServiceURL.SetValue(NationalBankenURLTxt);
-        ExchRateUpdateSetupCard.SimpleDataExchSetup.First;
-        asserterror ExchRateUpdateSetupCard.Preview.Invoke;
+        ExchRateUpdateSetupCard.SimpleDataExchSetup.First();
+        asserterror ExchRateUpdateSetupCard.Preview.Invoke();
         Assert.ExpectedError(StrSubstNo(MissingDataLineTagErr, DataExchFieldMappingBuf.FieldCaption(Source), DataExchangeLineDefNameTxt));
     end;
 
@@ -429,7 +429,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
           LibraryUtility.GenerateRandomCode(CurrExchRateUpdateSetup.FieldNo(Code), DATABASE::"Curr. Exch. Rate Update Setup");
         ExchRateUpdateSetupCard.Code.SetValue(CurrencyExchangeSetupCode);
         ExchRateUpdateSetupCard.ServiceURL.SetValue(NationalBankenURLTxt);
-        ExchRateUpdateSetupCard.SimpleDataExchSetup.First;
+        ExchRateUpdateSetupCard.SimpleDataExchSetup.First();
         asserterror ExchRateUpdateSetupCard.Enabled.SetValue(true);
         Assert.ExpectedError(StrSubstNo(MissingDataLineTagErr, DataExchFieldMappingBuf.FieldCaption(Source), DataExchangeLineDefNameTxt));
     end;
@@ -445,7 +445,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         // [WHEN] User enters a URL to an xml source containing an empty currency exchange rates file
         // [THEN] User gets an error message
         Initialize();
-        CurrencyExchRateXMLFile := CreateEmptyCurrencyExchRateFile;
+        CurrencyExchRateXMLFile := CreateEmptyCurrencyExchRateFile();
 
         asserterror CurrExchRateUpdateSetup.GetXMLStructure(XMLBuffer, CurrencyExchRateXMLFile);
         Assert.ExpectedError(InvalidResponseErr)
@@ -466,7 +466,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         CurrencyExchangeSetupCode :=
           LibraryUtility.GenerateRandomCode(CurrExchRateUpdateSetup.FieldNo(Code), DATABASE::"Curr. Exch. Rate Update Setup");
         ExchRateUpdateSetupCard.Code.SetValue(CurrencyExchangeSetupCode);
-        asserterror ExchRateUpdateSetupCard.Preview.Invoke;
+        asserterror ExchRateUpdateSetupCard.Preview.Invoke();
         Assert.ExpectedError(StrSubstNo(MissingServiceURLErr, CurrExchRateUpdateSetup.FieldCaption("Web Service URL")));
     end;
 
@@ -630,8 +630,8 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
 
     local procedure CreateDataExch(var DataExchLineDef: Record "Data Exch. Line Def"; FileType: Option; RepeaterPath: Text[250])
     begin
-        CreateExchDef(CurrExchRateFileMgt.GetDataExchDefCode, FileType, CurrExchRateFileMgt.GetReadingWritingCodeunit);
-        CreateExchLineDef(DataExchLineDef, CurrExchRateFileMgt.GetDataExchDefCode, RepeaterPath);
+        CreateExchDef(CurrExchRateFileMgt.GetDataExchDefCode(), FileType, CurrExchRateFileMgt.GetReadingWritingCodeunit());
+        CreateExchLineDef(DataExchLineDef, CurrExchRateFileMgt.GetDataExchDefCode(), RepeaterPath);
     end;
 
     local procedure SetupDanishCurrExch(var CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup"; DataExchLineDefType: Option; FilePath: Text)
@@ -640,16 +640,16 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         DataExchLineDef: Record "Data Exch. Line Def";
         DataExchDefCard: TestPage "Data Exch Def Card";
     begin
-        CreateDataExch(DataExchLineDef, DataExchLineDefType, CurrExchRateFileMgt.GetDanishRepeaterPath);
+        CreateDataExch(DataExchLineDef, DataExchLineDefType, CurrExchRateFileMgt.GetDanishRepeaterPath());
 
         DataExchDef.Get(DataExchLineDef."Data Exch. Def Code");
-        DataExchDefCard.OpenEdit;
+        DataExchDefCard.OpenEdit();
         DataExchDefCard.GotoRecord(DataExchDef);
 
         Commit();
 
         LibraryVariableStorage.Enqueue(FilePath);
-        DataExchDefCard."Column Definitions".GetFileStructure.Invoke;
+        DataExchDefCard."Column Definitions".GetFileStructure.Invoke();
 
         MapDanishBankDataExch(DataExchLineDef);
 
@@ -661,7 +661,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         DataExchLineDef: Record "Data Exch. Line Def";
         SuggestColDefinitionXML: Codeunit "Suggest Col. Definition - XML";
     begin
-        CreateDataExch(DataExchLineDef, DummyDataExchDef."File Type"::Xml, CurrExchRateFileMgt.GetXE_RepeaterPath);
+        CreateDataExch(DataExchLineDef, DummyDataExchDef."File Type"::Xml, CurrExchRateFileMgt.GetXE_RepeaterPath());
         SuggestColDefinitionXML.GenerateDataExchColDef(CurrencyExchRateXMLFile, DataExchLineDef);
         MapXE_BankDataExch(DataExchLineDef);
         CreateCurrencyExchangeSetup(DataExchLineDef, CurrExchRateUpdateSetup);
@@ -672,7 +672,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         DataExchLineDef: Record "Data Exch. Line Def";
         SuggestColDefinitionXML: Codeunit "Suggest Col. Definition - XML";
     begin
-        CreateDataExch(DataExchLineDef, DummyDataExchDef."File Type"::Xml, CurrExchRateFileMgt.GetCanadianRepeaterPath);
+        CreateDataExch(DataExchLineDef, DummyDataExchDef."File Type"::Xml, CurrExchRateFileMgt.GetCanadianRepeaterPath());
         SuggestColDefinitionXML.GenerateDataExchColDef(CurrencyExchRateXMLFile, DataExchLineDef);
         MapCanadianBankDataExch(DataExchLineDef);
         CreateCurrencyExchangeSetup(DataExchLineDef, CurrExchRateUpdateSetup);
@@ -686,24 +686,24 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         with CurrExchRateFileMgt do begin
             CreateExchMappingHeader(DataExchLineDef);
             // Create Mapping using sample xml
-            DataExchMapping.Get(DataExchLineDef."Data Exch. Def Code", DataExchLineDef.Code, GetMappingTable);
+            DataExchMapping.Get(DataExchLineDef."Data Exch. Def Code", DataExchLineDef.Code, GetMappingTable());
             CreateExchMappingLine(
-              DataExchMapping, GetCurrencyCodeXMLElement, GetCurrencyCodeFieldNo,
+              DataExchMapping, GetCurrencyCodeXMLElement(), GetCurrencyCodeFieldNo(),
               DummyDataExchColumnDef."Data Type"::Text, 1, '', '');
             CreateExchMappingLine(
-              DataExchMapping, GetStartingDateXMLElement, GetStartingDateFieldNo,
+              DataExchMapping, GetStartingDateXMLElement(), GetStartingDateFieldNo(),
               DummyDataExchColumnDef."Data Type"::Date, 1, '', '');
 
-            TransformationRule.CreateDefaultTransformations;
-            TransformationRule.Get(TransformationRule.GetDanishDecimalFormatCode);
+            TransformationRule.CreateDefaultTransformations();
+            TransformationRule.Get(TransformationRule.GetDanishDecimalFormatCode());
 
             CreateExchMappingLine(
-              DataExchMapping, GetRelationalExchRateXMLElement, GetRelationalExchRateFieldNo,
+              DataExchMapping, GetRelationalExchRateXMLElement(), GetRelationalExchRateFieldNo(),
               DummyDataExchColumnDef."Data Type"::Decimal, 1,
               TransformationRule.Code, '');
             CreateExchMappingLine(
-              DataExchMapping, GetExchRateXMLElement, GetExchRateFieldNo,
-              DummyDataExchColumnDef."Data Type"::Decimal, GetRelationalExhangeRate,
+              DataExchMapping, GetExchRateXMLElement(), GetExchRateFieldNo(),
+              DummyDataExchColumnDef."Data Type"::Decimal, GetRelationalExhangeRate(),
               TransformationRule.Code, '');
         end;
     end;
@@ -717,16 +717,16 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         CreateExchMappingHeader(DataExchLineDef);
 
         // Create Mapping using sample xml
-        DataExchMapping.Get(DataExchLineDef."Data Exch. Def Code", DataExchLineDef.Code, CurrExchRateFileMgt.GetMappingTable);
+        DataExchMapping.Get(DataExchLineDef."Data Exch. Def Code", DataExchLineDef.Code, CurrExchRateFileMgt.GetMappingTable());
         CreateExchMappingLine(
-          DataExchMapping, CurrExchRateFileMgt.GetXE_CurrencyCodeXMLElement, CurrExchRateFileMgt.GetCurrencyCodeFieldNo,
+          DataExchMapping, CurrExchRateFileMgt.GetXE_CurrencyCodeXMLElement(), CurrExchRateFileMgt.GetCurrencyCodeFieldNo(),
           DummyDataExchColumnDef."Data Type"::Text, 1, '', '');
         CreateExchMappingLine(
-          DataExchMapping, CurrExchRateFileMgt.GetXE_StartingDateXMLElement, CurrExchRateFileMgt.GetStartingDateFieldNo,
+          DataExchMapping, CurrExchRateFileMgt.GetXE_StartingDateXMLElement(), CurrExchRateFileMgt.GetStartingDateFieldNo(),
           DummyDataExchColumnDef."Data Type"::Date, 1, '', '');
 
         // Update XPath to third element
-        DataExchFieldMapping.SetRange("Field ID", CurrExchRateFileMgt.GetStartingDateFieldNo);
+        DataExchFieldMapping.SetRange("Field ID", CurrExchRateFileMgt.GetStartingDateFieldNo());
         DataExchFieldMapping.SetRange("Data Exch. Def Code", DataExchLineDef."Data Exch. Def Code");
         DataExchFieldMapping.FindFirst();
         DataExchColumnDef.Get(
@@ -736,10 +736,10 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         DataExchColumnDef.Modify(true);
 
         CreateExchMappingLine(
-          DataExchMapping, CurrExchRateFileMgt.GetXE_ExchRateXMLElement, CurrExchRateFileMgt.GetExchRateFieldNo,
+          DataExchMapping, CurrExchRateFileMgt.GetXE_ExchRateXMLElement(), CurrExchRateFileMgt.GetExchRateFieldNo(),
           DummyDataExchColumnDef."Data Type"::Decimal, 1, '', '');
         CreateExchMappingLine(
-          DataExchMapping, '', CurrExchRateFileMgt.GetRelationalExchRateFieldNo,
+          DataExchMapping, '', CurrExchRateFileMgt.GetRelationalExchRateFieldNo(),
           DummyDataExchColumnDef."Data Type"::Decimal, 1, '', '1');
     end;
 
@@ -750,21 +750,21 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         CreateExchMappingHeader(DataExchLineDef);
 
         // Create Mapping using sample xml
-        DataExchMapping.Get(DataExchLineDef."Data Exch. Def Code", DataExchLineDef.Code, CurrExchRateFileMgt.GetMappingTable);
+        DataExchMapping.Get(DataExchLineDef."Data Exch. Def Code", DataExchLineDef.Code, CurrExchRateFileMgt.GetMappingTable());
 
         CreateExchMappingLine(
-          DataExchMapping, CurrExchRateFileMgt.GetCanadianCurrencyCodeXMLElement, CurrExchRateFileMgt.GetCurrencyCodeFieldNo,
+          DataExchMapping, CurrExchRateFileMgt.GetCanadianCurrencyCodeXMLElement(), CurrExchRateFileMgt.GetCurrencyCodeFieldNo(),
           DummyDataExchColumnDef."Data Type"::Text, 1, '', '');
         CreateExchMappingLine(
-          DataExchMapping, CurrExchRateFileMgt.GetCanadianStartingDateXMLElement, CurrExchRateFileMgt.GetStartingDateFieldNo,
+          DataExchMapping, CurrExchRateFileMgt.GetCanadianStartingDateXMLElement(), CurrExchRateFileMgt.GetStartingDateFieldNo(),
           DummyDataExchColumnDef."Data Type"::Date, 1, '', '');
 
         CreateExchMappingLine(
-          DataExchMapping, CurrExchRateFileMgt.GetCanadianExchRateXMLElement,
-          CurrExchRateFileMgt.GetExchRateFieldNo,
+          DataExchMapping, CurrExchRateFileMgt.GetCanadianExchRateXMLElement(),
+          CurrExchRateFileMgt.GetExchRateFieldNo(),
           DummyDataExchColumnDef."Data Type"::Decimal, 1, '', '');
         CreateExchMappingLine(
-          DataExchMapping, '', CurrExchRateFileMgt.GetRelationalExchRateFieldNo,
+          DataExchMapping, '', CurrExchRateFileMgt.GetRelationalExchRateFieldNo(),
           DummyDataExchColumnDef."Data Type"::Decimal, 1, '', '1');
     end;
 
@@ -858,14 +858,14 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
     local procedure WriteDanishXMLCurrencyHeader(var OutStream: OutStream)
     begin
         CurrExchRateFileMgt.WriteDanishXMLHeader(OutStream, CurrExchRateFileMgt.GetCurrencyCode(), 1);
-        CurrExchRateFileMgt.WriteDanishXMLExchHeader(OutStream, CurrExchRateFileMgt.GetExchangeRateDate);
+        CurrExchRateFileMgt.WriteDanishXMLExchHeader(OutStream, CurrExchRateFileMgt.GetExchangeRateDate());
     end;
 
     local procedure WriteDanishXMLCurrencyExchRates(var OutStream: OutStream; var CurrExchRate: Record "Currency Exchange Rate")
     var
         Date: Date;
     begin
-        Date := CurrExchRateFileMgt.GetExchangeRateDate;
+        Date := CurrExchRateFileMgt.GetExchangeRateDate();
         InsertExchRateLine(OutStream, CurrExchRate, Date, 'AUD', 'Australian dollars', 526.85);
         InsertExchRateLine(OutStream, CurrExchRate, Date, 'BGN', 'Bulgarian lev', 380.18);
         InsertExchRateLine(OutStream, CurrExchRate, Date, 'BRL', 'Brazilian real', 246.72);
@@ -909,14 +909,14 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
 
     local procedure WriteXE_XMLCurrencyHeader(var OutStream: OutStream)
     begin
-        CurrExchRateFileMgt.WriteXE_XMLHeader(OutStream, CurrExchRateFileMgt.GetCurrencyCode(), CurrExchRateFileMgt.GetExchangeRateDate);
+        CurrExchRateFileMgt.WriteXE_XMLHeader(OutStream, CurrExchRateFileMgt.GetCurrencyCode(), CurrExchRateFileMgt.GetExchangeRateDate());
     end;
 
     local procedure WriteXE_XMLCurrencyExchRates(var OutStream: OutStream; var CurrExchRate: Record "Currency Exchange Rate")
     var
         Date: Date;
     begin
-        Date := CurrExchRateFileMgt.GetExchangeRateDate;
+        Date := CurrExchRateFileMgt.GetExchangeRateDate();
 
         InsertXE_ExchRateLine(OutStream, CurrExchRate, Date, 'AED', 'United Arab Emirates Dirhams', 3.6731504268, 0.2722458609);
         InsertXE_ExchRateLine(OutStream, CurrExchRate, Date, 'AFN', 'Afghanistan Afghanis', 51.0699355345, 0.019580992);
@@ -1108,7 +1108,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
     var
         Date: Date;
     begin
-        Date := CurrExchRateFileMgt.GetExchangeRateDate;
+        Date := CurrExchRateFileMgt.GetExchangeRateDate();
         WriteCanadianXMLCurrencyExchRatesDay1(OutStream, CurrExchRate, Date);
 
         Date := CalcDate('<+1D>', Date);
@@ -1488,7 +1488,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
             Validate("Currency Code", CurrencyCode);
             Validate("Starting Date", Date);
 
-            Validate("Relational Exch. Rate Amount", CurrExchRateFileMgt.GetRelationalExhangeRate);
+            Validate("Relational Exch. Rate Amount", CurrExchRateFileMgt.GetRelationalExhangeRate());
             Validate("Exchange Rate Amount", Rate);
 
             Validate("Relational Adjmt Exch Rate Amt", "Relational Exch. Rate Amount");
@@ -1527,8 +1527,8 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         DataExchMapping.Init();
         DataExchMapping.Validate("Data Exch. Def Code", DataExchLineDef."Data Exch. Def Code");
         DataExchMapping.Validate("Data Exch. Line Def Code", DataExchLineDef.Code);
-        DataExchMapping.Validate("Table ID", CurrExchRateFileMgt.GetMappingTable);
-        DataExchMapping.Validate("Mapping Codeunit", CurrExchRateFileMgt.GetMappingCodeunit);
+        DataExchMapping.Validate("Table ID", CurrExchRateFileMgt.GetMappingTable());
+        DataExchMapping.Validate("Mapping Codeunit", CurrExchRateFileMgt.GetMappingCodeunit());
         DataExchMapping.Insert(true);
     end;
 
@@ -1646,7 +1646,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
     begin
         LibraryVariableStorage.Dequeue(CurrencyExchRateFile);
         GetFileStructure.FilePath.SetValue(CurrencyExchRateFile);
-        GetFileStructure.OK.Invoke;
+        GetFileStructure.OK().Invoke();
     end;
 
     local procedure VerifyCurrExchRates(var ExpectedCurrExchRate: Record "Currency Exchange Rate")
@@ -1672,7 +1672,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
 
                 ExpectedCurrExchRate.Delete();
                 if ExpectedCurrExchRate.Next() <> 0 then;
-            until Next = 0;
+            until Next() = 0;
         end;
     end;
 
@@ -1680,15 +1680,15 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
     begin
         with CurrencyExchangeRates do begin
             Assert.AreEqual(ExpectedCode, "Currency Code".Value, 'Wrong code value was mapped for the first record');
-            Assert.AreEqual(ExpectedExchangeRateAmount, "Exchange Rate Amount".AsDEcimal, 'Wrong exchange rate amount was provided');
-            Assert.AreEqual(ExpectedStartingDate, "Starting Date".AsDate, 'Wrong date was provided');
-            Assert.AreEqual(ExpectedRelationalExchRateAmount, "Relational Exch. Rate Amount".AsDEcimal, 'Wrong Amount was provided');
+            Assert.AreEqual(ExpectedExchangeRateAmount, "Exchange Rate Amount".AsDecimal(), 'Wrong exchange rate amount was provided');
+            Assert.AreEqual(ExpectedStartingDate, "Starting Date".AsDate(), 'Wrong date was provided');
+            Assert.AreEqual(ExpectedRelationalExchRateAmount, "Relational Exch. Rate Amount".AsDecimal(), 'Wrong Amount was provided');
         end
     end;
 
     local procedure VerifyCurrExchRatesOnPage(var CurrencyExchangeRates: TestPage "Currency Exchange Rates"; ExpectedExchangeRateAmount: Decimal; ExpectedStartingDate: Date)
     begin
-        CurrencyExchangeRates.First;
+        CurrencyExchangeRates.First();
         VerifyCurrExchRateOnPage(CurrencyExchangeRates, 'AUD', ExpectedExchangeRateAmount, ExpectedStartingDate, 527.74);
         CurrencyExchangeRates.Next();
         VerifyCurrExchRateOnPage(CurrencyExchangeRates, 'CAD', ExpectedExchangeRateAmount, ExpectedStartingDate, 543.73);
@@ -1700,7 +1700,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         VerifyCurrExchRateOnPage(CurrencyExchangeRates, 'USD', ExpectedExchangeRateAmount, ExpectedStartingDate, 694.27);
         CurrencyExchangeRates.Next();
         Assert.AreEqual('', CurrencyExchangeRates."Currency Code".Value, 'Unexpected currency code at the end of the list.');
-        Assert.IsFalse(CurrencyExchangeRates.Next, 'Unexpected currency code at the end of the list.');
+        Assert.IsFalse(CurrencyExchangeRates.Next(), 'Unexpected currency code at the end of the list.');
     end;
 
     local procedure VerifyExpectedNodeInGeneratedXmlStructure(var SelectSource: TestPage "Select Source"; NodeNameTxt: Text)
@@ -1720,7 +1720,7 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
 
         SelectSource.FILTER.SetFilter(Name, NodeNameTxt);
 
-        SelectSource.OK.Invoke;
+        SelectSource.OK().Invoke();
     end;
 
     [ModalPageHandler]

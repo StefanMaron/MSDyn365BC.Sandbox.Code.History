@@ -3,7 +3,7 @@ codeunit 160804 "Import Post Codes"
 
     trigger OnRun()
     begin
-        lesfil;
+        lesfil();
     end;
 
     var
@@ -13,17 +13,13 @@ codeunit 160804 "Import Post Codes"
         konverter: Codeunit "Ansi - Ascii Conversion";
 
     procedure convert(tekst: Text[1024])
-    var
-        test: Text[30];
     begin
-        with postcode do begin
-            Reset();
-            Init();
-            Validate(Code, konverter.Ansi2Ascii(Format(CopyStr(tekst, 1, 20))));
-            Evaluate(byte, konverter.Ansi2Ascii(CopyStr(tekst, 30, 20)));
-            Validate(City, UpperCase(byte));
-            if Insert then;
-        end;
+        postcode.Reset();
+        postcode.Init();
+        postcode.Validate(Code, konverter.Ansi2Ascii(Format(CopyStr(tekst, 1, 20))));
+        Evaluate(byte, konverter.Ansi2Ascii(CopyStr(tekst, 30, 20)));
+        postcode.Validate(City, UpperCase(byte));
+        if postcode.Insert() then;
     end;
 
     procedure lesfil()

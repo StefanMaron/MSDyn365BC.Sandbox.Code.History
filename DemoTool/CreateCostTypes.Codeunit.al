@@ -3,9 +3,9 @@ codeunit 119085 "Create Cost Types"
 
     trigger OnRun()
     begin
-        CostAccMgt.GetCostTypesFromChartDirect;
-        UpdateDimOnCostTypes;
-        EnhanceCostType;
+        CostAccMgt.GetCostTypesFromChartDirect();
+        UpdateDimOnCostTypes();
+        EnhanceCostType();
     end;
 
     var
@@ -153,16 +153,16 @@ codeunit 119085 "Create Cost Types"
         CostType.Reset();
 
         // Create new Cost Type  --> may need localization.. adjust also in definecostallocation()
-        WriteCostType('8725', XEmployersSalary, 0, XGL, '');
-        WriteCostType('9225', XCalcInterestOnAssets, 0, XADM, '');
+        WriteCostType('8725', XEmployersSalary, "Cost Account Type"::"Cost Type", XGL, '');
+        WriteCostType('9225', XCalcInterestOnAssets, "Cost Account Type"::"Cost Type", XADM, '');
 
-        WriteCostType('9900', XALLOCATIONS, 3, '', '');   // From
-        WriteCostType('9901', XInitialCostCenter, 0, '', '');
-        WriteCostType('9902', XMainCostCenter, 0, '', '');
-        WriteCostType('9903', XAllocOfCostObject, 0, '', '');
-        WriteCostType('9999', XTOTALALLOC, 4, '', '');  // To
+        WriteCostType('9900', XALLOCATIONS, "Cost Account Type"::"Begin-Total", '', '');   // From
+        WriteCostType('9901', XInitialCostCenter, "Cost Account Type"::"Cost Type", '', '');
+        WriteCostType('9902', XMainCostCenter, "Cost Account Type"::"Cost Type", '', '');
+        WriteCostType('9903', XAllocOfCostObject, "Cost Account Type"::"Cost Type", '', '');
+        WriteCostType('9999', XTOTALALLOC, "Cost Account Type"::"End-Total", '', '');  // To
 
-        WriteCostType('9920', XActualAccurals, 0, XACTACCR, '');
+        WriteCostType('9920', XActualAccurals, "Cost Account Type"::"Cost Type", XACTACCR, '');
 
         if CostType.Find('-') then
             repeat
@@ -194,7 +194,7 @@ codeunit 119085 "Create Cost Types"
         CostAccountMgt.LinkCostTypesToGLAccounts();
     end;
 
-    procedure WriteCostType(CostTypeNo: Code[20]; CostTypeName: Text[30]; Type: Integer; CostCenterCode: Code[20]; CostObjectCode: Code[20])
+    procedure WriteCostType(CostTypeNo: Code[20]; CostTypeName: Text[30]; Type: Enum "Cost Account Type"; CostCenterCode: Code[20]; CostObjectCode: Code[20])
     var
         CostType: Record "Cost Type";
     begin
@@ -212,12 +212,10 @@ codeunit 119085 "Create Cost Types"
     var
         Position: Integer;
     begin
-        with CostType do begin
-            Position := StrPos(Name, FromText);
-            if Position > 0 then
-                Name := CopyStr(CopyStr(Name, 1, Position - 1) + NewText + CopyStr(Name, Position + StrLen(FromText) + 1), 1, MaxStrLen(Name));
-            exit(Position <> 0);
-        end;
+        Position := StrPos(CostType.Name, FromText);
+        if Position > 0 then
+            CostType.Name := CopyStr(CopyStr(CostType.Name, 1, Position - 1) + NewText + CopyStr(CostType.Name, Position + StrLen(FromText) + 1), 1, MaxStrLen(CostType.Name));
+        exit(Position <> 0);
     end;
 }
 

@@ -5,10 +5,10 @@ codeunit 119202 "Create D365 Base Data"
     trigger OnRun()
     begin
         Codeunit.Run(Codeunit::"Create Profiles");
-        CreatePermissions;
-        CreateWebServices;
-        SetupAPIs;
-        SetupApplicationArea;
+        CreatePermissions();
+        CreateWebServices();
+        SetupAPIs();
+        SetupApplicationArea();
         Codeunit.Run(Codeunit::"Create Getting Started Data");
         Codeunit.Run(Codeunit::"Create Media Repository");
         Codeunit.Run(Codeunit::"Create Excel Templates");
@@ -17,38 +17,7 @@ codeunit 119202 "Create D365 Base Data"
     end;
 
     var
-        // Note: Those strings are used only for upgrade from 14.x to 15.0 for translations, and should be deleted afterwards
-        AccountantTxt: Label 'Accountant';
-        OrderProcessorTxt: Label 'Order Processor';
-        SecurityAdministratorTxt: Label 'Security Administrator';
-        BusinessManagerIDTxt: Label 'Business Manager';
-        SalesRlshpMgrIDTxt: Label 'Sales and Relationship Manager';
-        O365SalesTxt: Label 'O365 Sales';
-        ProjectManagerTxt: Label 'PROJECT MANAGER';
-        TeamMemberTxt: Label 'TEAM MEMBER', Comment = 'Please translate all caps';
-        InvoicingTxt: Label 'Invoicing';
-        AccountantPortalTxt: Label 'Accountant Portal';
-        AccountingManagerTxt: Label 'Accounting Manager';
-        AccountingServicesTxt: Label 'Accounting Services';
-        APCoordinatorTxt: Label 'AP Coordinator';
-        ARAdministratorTxt: Label 'AR Administrator';
-        BookkeeperTxt: Label 'Bookkeeper';
-        DispatcherTxt: Label 'Dispatcher';
-        ITManagerTxt: Label 'IT Manager';
-        MachineOperatorTxt: Label 'Machine Operator';
-        OutboundTechnicianTxt: Label 'Outbound Technician';
-        PresidentTxt: Label 'President';
-        PresidentSmallBusTxt: Label 'President - Small Business';
-        ProductionPlannerTxt: Label 'Production Planner';
-        PurchasingAgentTxt: Label 'Purchasing Agent';
-        RapidstartServicesTxt: Label 'RapidStart Services';
-        ResourceManagerTxt: Label 'Resource Manager';
-        SalesManagerTxt: Label 'Sales Manager';
-        ShippingAndReceivingTxt: Label 'Shipping and Receiving';
-        ShippingAndReceivingWMSTxt: Label 'Shipping and Receiving - WMS';
-        ShopSupervisorTxt: Label 'Shop Supervisor';
-        ShopSupervisorFoundTxt: Label 'Shop Supervisor - Foundation';
-        WHSWorkerWMSTxt: Label 'Warehouse Worker - WMS';
+    // Note: Those strings are used only for upgrade from 14.x to 15.0 for translations, and should be deleted afterwards
     // End of strings used for upgrade from 14.x to 15.0
 
     local procedure CreatePermissions()
@@ -69,15 +38,6 @@ codeunit 119202 "Create D365 Base Data"
 
         WebServiceManagement.CreateWebService(
           WebService."Object Type"::Codeunit, Codeunit::"Exchange Service Setup", 'ExchangeServiceSetup', true);
-#if not CLEAN21
-        WebServiceManagement.CreateWebService(
-          WebService."Object Type"::Page, Page::"O365 Sales Graph", 'C2Graph', true);
-
-        WebServiceManagement.CreateWebService(
-          WebService."Object Type"::Page, Page::"Sales Invoice Document API", 'InvoiceDocument', true);
-        WebServiceManagement.CreateWebService(
-          WebService."Object Type"::Page, Page::"Sales Invoice Reminder API", 'InvoiceReminder', true);
-#endif
         WebServiceManagement.CreateWebService(
           WebService."Object Type"::Codeunit, Codeunit::"Page Summary Provider", 'SummaryProvider', true);
 

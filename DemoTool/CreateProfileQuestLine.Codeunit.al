@@ -300,7 +300,7 @@ codeunit 101588 "Create Profile Quest. Line"
         "Profile Questionnaire Line".Validate(Type, Type);
         "Profile Questionnaire Line".Validate(Description, Description);
         "Profile Questionnaire Line".Validate("Multiple Answers", "Multiple Answers");
-        "Profile Questionnaire Line".Priority := Priority;
+        "Profile Questionnaire Line".Priority := "Profile Answer Priority".FromInteger(Priority);
         "Profile Questionnaire Line".Validate("Auto Contact Classification", "Auto Contact Classification");
         "Profile Questionnaire Line".Validate("Customer Class. Field", "Classification Fields (Cust.)");
         "Profile Questionnaire Line".Validate("Vendor Class. Field", "Classification Fields (Vend.)");

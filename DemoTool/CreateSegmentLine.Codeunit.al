@@ -45,31 +45,31 @@ codeunit 101577 "Create Segment Line"
 
         case Functionality of
             Functionality::Add:
-                with AddContacts do begin
-                    SetTableView(SegmentHeader);
-                    SetTableView(ContactBusinessRelation);
-                    SetTableView(ValueEntry);
-                    SetTableView(ContactProfileAnswer);
-                    UseRequestPage(false);
-                    RunModal;
+                begin
+                    AddContacts.SetTableView(SegmentHeader);
+                    AddContacts.SetTableView(ContactBusinessRelation);
+                    AddContacts.SetTableView(ValueEntry);
+                    AddContacts.SetTableView(ContactProfileAnswer);
+                    AddContacts.UseRequestPage(false);
+                    AddContacts.RunModal();
                 end;
             Functionality::Reduce:
-                with ReduceContacts do begin
-                    SetTableView(SegmentHeader);
-                    SetTableView(ContactBusinessRelation);
-                    SetTableView(ValueEntry);
-                    SetTableView(ContactProfileAnswer);
-                    UseRequestPage(false);
-                    RunModal;
+                begin
+                    ReduceContacts.SetTableView(SegmentHeader);
+                    ReduceContacts.SetTableView(ContactBusinessRelation);
+                    ReduceContacts.SetTableView(ValueEntry);
+                    ReduceContacts.SetTableView(ContactProfileAnswer);
+                    ReduceContacts.UseRequestPage(false);
+                    ReduceContacts.RunModal();
                 end;
             Functionality::Refine:
-                with RefineContacts do begin
-                    SetTableView(SegmentHeader);
-                    SetTableView(ContactBusinessRelation);
-                    SetTableView(ValueEntry);
-                    SetTableView(ContactProfileAnswer);
-                    UseRequestPage(false);
-                    RunModal;
+                begin
+                    RefineContacts.SetTableView(SegmentHeader);
+                    RefineContacts.SetTableView(ContactBusinessRelation);
+                    RefineContacts.SetTableView(ValueEntry);
+                    RefineContacts.SetTableView(ContactProfileAnswer);
+                    RefineContacts.UseRequestPage(false);
+                    RefineContacts.RunModal();
                 end;
         end;
     end;

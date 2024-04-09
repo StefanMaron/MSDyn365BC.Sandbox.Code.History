@@ -71,20 +71,20 @@ report 160801 "Convert GL Accounts"
                                 until ICAcc.Next() = 0;
                         end;
                     else begin
-                            // Andre kontotyper enn Konto og dem som ikke er nye endrer bare navn. RENAME brukes ikke.
-                            Finanskonto.Get("Original Account No.");
-                            Finanskonto.Delete();
-                            Finanskonto."No." := "Temp. Account No.";
-                            Finanskonto.Insert();
-                            Validate("Account Status", "Account Status"::Prepared);
-                            ICAcc.SetRange("Map-to G/L Acc. No.", "Original Account No.");
-                            if ICAcc.Find('-') then
-                                repeat
-                                    ICAcc."Map-to G/L Acc. No." := "Temp. Account No.";
-                                    ICAcc.Modify(true);
-                                until ICAcc.Next() = 0;
-                            Modify(true);
-                        end;
+                        // Andre kontotyper enn Konto og dem som ikke er nye endrer bare navn. RENAME brukes ikke.
+                        Finanskonto.Get("Original Account No.");
+                        Finanskonto.Delete();
+                        Finanskonto."No." := "Temp. Account No.";
+                        Finanskonto.Insert();
+                        Validate("Account Status", "Account Status"::Prepared);
+                        ICAcc.SetRange("Map-to G/L Acc. No.", "Original Account No.");
+                        if ICAcc.Find('-') then
+                            repeat
+                                ICAcc."Map-to G/L Acc. No." := "Temp. Account No.";
+                                ICAcc.Modify(true);
+                            until ICAcc.Next() = 0;
+                        Modify(true);
+                    end;
                 end;
 
                 if Lagre then
@@ -121,7 +121,7 @@ report 160801 "Convert GL Accounts"
                     Finanskonto.Validate("No.", "No.");
                     Validate("Account Status", "Account Status"::Converted);
                     Validate("Account Error", false);
-                    OppdatereKonto;
+                    OppdatereKonto();
                     Finanskonto.Insert(true);
 
                 end else begin
@@ -131,7 +131,7 @@ report 160801 "Convert GL Accounts"
                         if Finanskonto.Rename("No.") then begin
                             Validate("Account Status", "Account Status"::Converted);
                             Validate("Account Error", false);
-                            OppdatereKonto;
+                            OppdatereKonto();
                             Finanskonto.Modify(true);
 
                         end else
@@ -140,7 +140,7 @@ report 160801 "Convert GL Accounts"
                     else begin
                         Validate("Account Status", "Account Status"::Converted);
                         Finanskonto.Delete();
-                        OppdatereKonto;
+                        OppdatereKonto();
                         Finanskonto."No." := "No.";
                         Finanskonto.Insert();
                     end;
@@ -177,7 +177,7 @@ report 160801 "Convert GL Accounts"
                 begin
                     K1 := "Account Filter";
                     if KonverterCode("Account Filter", KontoKonv4."Original Account No.", KontoKonv4."Temp. Account No.") then
-                        Modify
+                        Modify()
                     else
                         CurrReport.Skip();
                     K2 := "Account Filter";
@@ -191,7 +191,7 @@ report 160801 "Convert GL Accounts"
                 begin
                     K1 := Totaling;
                     if KonverterText(Totaling, KontoKonv4."Original Account No.", KontoKonv4."Temp. Account No.") then
-                        Modify
+                        Modify()
                     else
                         CurrReport.Skip();
                     K2 := Totaling;
@@ -204,7 +204,7 @@ report 160801 "Convert GL Accounts"
                 begin
                     K1 := "G/L Account Range";
                     if KonverterText("G/L Account Range", KontoKonv4."Original Account No.", KontoKonv4."Temp. Account No.") then
-                        Modify
+                        Modify()
                     else
                         CurrReport.Skip();
                     K2 := "G/L Account Range";
@@ -247,7 +247,7 @@ report 160801 "Convert GL Accounts"
                 begin
                     K1 := "Account Filter";
                     if KonverterCode("Account Filter", KontoKonv5."Temp. Account No.", KontoKonv5."No.") then
-                        Modify
+                        Modify()
                     else
                         CurrReport.Skip();
                     K2 := "Account Filter";
@@ -261,7 +261,7 @@ report 160801 "Convert GL Accounts"
                 begin
                     K1 := Totaling;
                     if KonverterText(Totaling, KontoKonv5."Temp. Account No.", KontoKonv5."No.") then
-                        Modify
+                        Modify()
                     else
                         CurrReport.Skip();
                     K2 := Totaling;
@@ -274,7 +274,7 @@ report 160801 "Convert GL Accounts"
                 begin
                     K1 := "G/L Account Range";
                     if KonverterText("G/L Account Range", KontoKonv5."Temp. Account No.", KontoKonv5."No.") then
-                        Modify
+                        Modify()
                     else
                         CurrReport.Skip();
                     K2 := "G/L Account Range";
@@ -373,10 +373,8 @@ report 160801 "Convert GL Accounts"
         Test: Code[250];
         K1: Code[250];
         K2: Code[250];
-        fm: Code[250];
         ICAcc: Record "IC G/L Account";
         GLAcc: Record "G/L Account";
-        lang: Integer;
 
     procedure OppdatereKonto()
     begin

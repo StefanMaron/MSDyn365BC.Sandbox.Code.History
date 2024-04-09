@@ -3,7 +3,7 @@ codeunit 101237 "Create Job Journal Batch"
 
     trigger OnRun()
     begin
-        InsertData;
+        InsertData();
     end;
 
     var

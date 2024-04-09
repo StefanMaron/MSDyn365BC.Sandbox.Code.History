@@ -1,6 +1,7 @@
 table 160802 "Analysis Conversion"
 {
     Caption = 'Analysis Conversion';
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -15,7 +16,7 @@ table 160802 "Analysis Conversion"
         }
         field(4; Name; Text[50])
         {
-            CalcFormula = Lookup ("Analysis View".Name where(Code = field("Analysis Code")));
+            CalcFormula = Lookup("Analysis View".Name where(Code = field("Analysis Code")));
             Caption = 'Name';
             Editable = false;
             FieldClass = FlowField;

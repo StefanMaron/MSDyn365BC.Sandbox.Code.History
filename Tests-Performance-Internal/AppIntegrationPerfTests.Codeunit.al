@@ -21,7 +21,6 @@ codeunit 139092 "App Integration Perf Tests"
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryNotificationMgt: Codeunit "Library - Notification Mgt.";
         LibraryPaymentFormat: Codeunit "Library - Payment Format";
-        Assert: Codeunit Assert;
         isInitialized: Boolean;
         TraceDumpFilePath: Text;
         DefualtExchangeRateAmount: Decimal;
@@ -37,7 +36,7 @@ codeunit 139092 "App Integration Perf Tests"
         APIMockEvents: Codeunit "API Mock Events";
     begin
         Initialize();
-        ClearCRMData;
+        ClearCRMData();
 
         // CDS SystemID uptake should remove this call
         APIMockEvents.SetIsIntegrationManagementEnabled(true);
@@ -65,7 +64,7 @@ codeunit 139092 "App Integration Perf Tests"
         Initialize();
 
         // [GIVEN] A mapping allowing synch only for coupled records (the default setting)
-        ResetDefaultCRMSetupConfiguration;
+        ResetDefaultCRMSetupConfiguration();
 
         // [GIVEN] A CRM source with two records, one coupled and one not coupled
         LibraryCRMIntegration.CreateCoupledCustomerAndAccount(Customer, CRMAccount);
@@ -126,7 +125,6 @@ codeunit 139092 "App Integration Perf Tests"
     procedure TestSynchUoMToCRMUoM()
     var
         IntegrationTableMapping: Record "Integration Table Mapping";
-        TestIntegrationTable: Record "Test Integration Table";
         PerfProfilerEventsTest: Record "Perf Profiler Events Test";
     begin
         // [FEATURE] [Modified On]
@@ -192,10 +190,10 @@ codeunit 139092 "App Integration Perf Tests"
         Initialize();
         // [GIVEN] Category Hierarchy of 2 parent categories and 2 children for each
         CreateItemCategoryHierarchy(2);
-        CreateTestItemAttributes;
+        CreateTestItemAttributes();
         LibraryInventory.CreateItem(Item);
         LastItemAttributeValue := LibraryUtility.GenerateGUID();
-        LibraryNotificationMgt.DisableAllNotifications;
+        LibraryNotificationMgt.DisableAllNotifications();
 
         // [WHEN]  assign 1 item attribute the first category and 1 attribute to the second one
         FirstItemCategory.FindFirst();
@@ -210,7 +208,7 @@ codeunit 139092 "App Integration Perf Tests"
         AssignItemAttributeValueToCategory(FirstItemCategory, FirstItemAttribute, FirstItemAttributeValue.Value);
         AssignItemAttributeValueToCategory(ChildItemCategory, LastItemAttribute, LastItemAttributeValue);
 
-        ItemCard.OpenEdit;
+        ItemCard.OpenEdit();
         ItemCard.GotoRecord(Item);
         LibraryPerformanceProfiler.StartProfiler(true);
         ItemCard."Item Category Code".SetValue(ChildItemCategory.Code);
@@ -233,11 +231,11 @@ codeunit 139092 "App Integration Perf Tests"
         Initialize();
 
         // [GIVEN] An item and a set of item attributes
-        CreateTestOptionItemAttributes;
+        CreateTestOptionItemAttributes();
         LibraryInventory.CreateItem(Item);
 
         // [WHEN] The user assigns some attribute values to the item
-        ItemCard.OpenEdit;
+        ItemCard.OpenEdit();
         ItemCard.GotoRecord(Item);
 
         FirstItemAttribute.FindFirst();
@@ -304,15 +302,15 @@ codeunit 139092 "App Integration Perf Tests"
         if isInitialized then
             exit;
 
-        LibraryPatterns.SETNoSeries;
+        LibraryPatterns.SetNoSeries();
         LibraryERMCountryData.CreateVATData();
         LibraryERMCountryData.UpdateGeneralLedgerSetup();
         LibraryERMCountryData.UpdateGeneralPostingSetup();
         LibraryERMCountryData.UpdateSalesReceivablesSetup();
-        LibraryCRMIntegration.ResetEnvironment;
-        LibraryCRMIntegration.ConfigureCRM;
+        LibraryCRMIntegration.ResetEnvironment();
+        LibraryCRMIntegration.ConfigureCRM();
         isInitialized := true;
-        MyNotifications.InsertDefault(UpdateCurrencyExchangeRates.GetMissingExchangeRatesNotificationID, '', '', false);
+        MyNotifications.InsertDefault(UpdateCurrencyExchangeRates.GetMissingExchangeRatesNotificationID(), '', '', false);
         Commit();
         LibrarySetupStorage.Save(DATABASE::"Sales & Receivables Setup");
     end;
@@ -404,7 +402,7 @@ codeunit 139092 "App Integration Perf Tests"
         ItemAttribute: Record "Item Attribute";
     begin
         ItemAttribute.DeleteAll();
-        CreateTestOptionItemAttribute;
+        CreateTestOptionItemAttribute();
         CreateNonOptionTestItemAttribute(ItemAttribute.Type::Text, '');
     end;
 
@@ -412,9 +410,9 @@ codeunit 139092 "App Integration Perf Tests"
     var
         ItemCategoryCard: TestPage "Item Category Card";
     begin
-        ItemCategoryCard.OpenEdit;
+        ItemCategoryCard.OpenEdit();
         ItemCategoryCard.GotoRecord(ItemCategory);
-        ItemCategoryCard.Attributes.New;
+        ItemCategoryCard.Attributes.New();
         ItemCategoryCard.Attributes."Attribute Name".SetValue(ItemAttribute.Name);
         ItemCategoryCard.Attributes.Value.SetValue(ItemAttributeValue);
         ItemCategoryCard.Close();
@@ -429,7 +427,7 @@ codeunit 139092 "App Integration Perf Tests"
         ItemCategoryCard.Code.SetValue(ItemCategoryCode);
         ItemCategoryCard.Description.SetValue(Format(ItemCategoryCode + ItemCategoryCode));
         ItemCategoryCard."Parent Category".SetValue(ParentCategory);
-        ItemCategoryCard.OK.Invoke;
+        ItemCategoryCard.OK().Invoke();
     end;
 
     local procedure CreateTestOptionItemAttributeValues(var ItemAttributes: TestPage "Item Attributes")
@@ -438,9 +436,9 @@ codeunit 139092 "App Integration Perf Tests"
         FirstAttributeValueName: Text;
         SecondAttributeValueName: Text;
     begin
-        ItemAttributeValues.Trap;
-        ItemAttributes.ItemAttributeValues.Invoke;
-        ItemAttributeValues.First;
+        ItemAttributeValues.Trap();
+        ItemAttributes.ItemAttributeValues.Invoke();
+        ItemAttributeValues.First();
         FirstAttributeValueName := LibraryUtility.GenerateGUID();
         ItemAttributeValues.Value.SetValue(FirstAttributeValueName);
         ItemAttributeValues.Next();
@@ -481,8 +479,8 @@ codeunit 139092 "App Integration Perf Tests"
         ItemAttribute: Record "Item Attribute";
     begin
         ItemAttribute.DeleteAll();
-        CreateTestOptionItemAttribute;
-        CreateTestOptionItemAttribute;
+        CreateTestOptionItemAttribute();
+        CreateTestOptionItemAttribute();
     end;
 
     local procedure AssignItemAttributeViaItemCard(ItemAttribute: Record "Item Attribute"; var ItemAttributeValue: Record "Item Attribute Value"; var ItemCard: TestPage "Item Card")
@@ -496,7 +494,7 @@ codeunit 139092 "App Integration Perf Tests"
     begin
         LibraryVariableStorage.Enqueue(ItemAttribute);
         LibraryVariableStorage.Enqueue(ItemAttributeValue);
-        ItemCard.Attributes.Invoke;
+        ItemCard.Attributes.Invoke();
     end;
 
     [ModalPageHandler]
@@ -512,10 +510,10 @@ codeunit 139092 "App Integration Perf Tests"
         LibraryVariableStorage.Dequeue(ItemAttributeValueVar);
         ItemAttribute := ItemAttributeVar;
         ItemAttributeValue := ItemAttributeValueVar;
-        ItemAttributeValueEditor.ItemAttributeValueList.New;
+        ItemAttributeValueEditor.ItemAttributeValueList.New();
         ItemAttributeValueEditor.ItemAttributeValueList."Attribute Name".SetValue(ItemAttribute.Name);
         ItemAttributeValueEditor.ItemAttributeValueList.Value.SetValue(ItemAttributeValue);
-        ItemAttributeValueEditor.OK.Invoke;
+        ItemAttributeValueEditor.OK().Invoke();
     end;
 
     local procedure CreateDataExchangeDefinition(var DataExchDef: Record "Data Exch. Def")

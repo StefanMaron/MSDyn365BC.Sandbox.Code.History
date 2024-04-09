@@ -4,7 +4,7 @@ codeunit 101902 "Make Adjustments"
 
     trigger OnRun()
     begin
-        GenerateMap;
+        GenerateMap();
     end;
 
     var
@@ -15,6 +15,12 @@ codeunit 101902 "Make Adjustments"
     begin
         if not IsAccountMapped("Account No.", Return) then
             exit("Account No.");
+    end;
+
+    // This Account is also used for Vendor and Customer posting grouppes
+    procedure GetAdjustmentAccount(): Code[20]
+    begin
+        exit('999150');
     end;
 
     local procedure AddMapElement("Key": Code[20]; Value: Code[20])

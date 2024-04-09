@@ -15,10 +15,10 @@ codeunit 118000 "Interface Distribution"
             DeleteDemoTable := true;
         end;
 
-        CreateData;
-        "Before Posting";
+        CreateData();
+        "Before Posting"();
         Post(CA.AdjustDate(19030126D));
-        "After Posting";
+        "After Posting"();
 
         if DeleteDemoTable then
             DemoDataSetup.Delete();

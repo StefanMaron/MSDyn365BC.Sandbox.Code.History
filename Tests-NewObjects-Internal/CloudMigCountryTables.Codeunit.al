@@ -12,9 +12,6 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"OCR Setup");
         ListOfTablesToMigrate.Add(Database::"Payment Order Data");
         ListOfTablesToMigrate.Add(Database::"Payment Type Code Abroad");
-#if not CLEAN21
-        ListOfTablesToMigrate.Add(Database::"Payroll Integration Setup");
-#endif
         ListOfTablesToMigrate.Add(Database::"Recurring Group");
         ListOfTablesToMigrate.Add(Database::"Recurring Post");
         ListOfTablesToMigrate.Add(Database::"Regulatory Reporting Code");

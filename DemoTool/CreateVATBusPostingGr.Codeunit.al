@@ -3,25 +3,20 @@ codeunit 101323 "Create VAT Bus. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Company Type" = "Company Type"::VAT then begin
-                InsertData(XCUSTNOVAT, XCustomerWithout);
-                InsertData(XCUSTHIGH, XCustomerHigh);
-                InsertData(XCUSTLOW, XCustomerLow);
-                InsertData(XVENDNOVAT, XVendorWithout);
-                InsertData(XVENDHIGH, XVendorHigh);
-                InsertData(XVENDLOW, XVendorLow);
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then begin
+            InsertData(XCUSTNOVAT, XCustomerWithout); // NO
+            InsertData(XCUSTHIGH, XCustomerHigh);
+            InsertData(XCUSTLOW, XCustomerLow);
+            InsertData(XVENDNOVAT, XVendorWithout);
+            InsertData(XVENDHIGH, XVendorHigh);
+            InsertData(XVENDLOW, XVendorLow);
         end;
     end;
 
     var
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
         DemoDataSetup: Record "Demo Data Setup";
-        XDomesticcustomersandvendors: Label 'Domestic customers and vendors';
-        XCustomersandvendorsinEU: Label 'Customers and vendors in EU';
-        XOthercustomersandvendorsnotEU: Label 'Other customers and vendors (not EU)';
         XCUSTNOVAT: Label 'CUSTNOVAT';
         XCUSTHIGH: Label 'CUSTHIGH';
         XCUSTLOW: Label 'CUSTLOW';
