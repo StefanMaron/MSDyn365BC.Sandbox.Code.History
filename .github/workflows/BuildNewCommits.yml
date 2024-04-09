@@ -36,6 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     
     strategy:
+      fail-fast: false
       matrix: ${{ fromJson(needs.prepare.outputs.countries) }}
 
     steps:
