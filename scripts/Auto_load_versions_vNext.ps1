@@ -30,8 +30,9 @@ $Versions | Sort-Object -Property Country, Version | % {
     git fetch --all
 
     $RegularBranchExists = git ls-remote --heads origin "refs/heads/$($country)-$($version.Major)"
+    $CommitDoesExist =  git log --all -n 1 --grep="$($country)-$($version.Major).$($version.Minor).[0-9]*.[0-9]*$"
 
-    if ($RegularBranchExists) { 
+    if ($RegularBranchExists -and $CommitDoesExist) { 
         git push -d origin "$($country)-$($Version.Major)-vNext"
         git branch -d "$($country)-$($Version.Major)-vNext"
         return
