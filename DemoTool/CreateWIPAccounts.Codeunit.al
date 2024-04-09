@@ -23,17 +23,17 @@ codeunit 119032 "Create WIP Accounts"
         InsertData('997894', XMfgOverheadVariance, 0, 0, 0, '', 0, '', '', false);
         InsertData('997895', XTotalVariance, 4, 0, 0, '', 0, '', '', false);
 
-        GLAccIndent.Indent;
+        GLAccIndent.Indent();
 
-        UpdateManufactAccounts;
+        UpdateManufactAccounts();
 
         GLAccountCategoryMgt.GetAccountCategory(GLAccountCategory, GLAccountCategory."Account Category"::"Cost of Goods Sold");
         CreateGLAccount.AssignCategoryToChartOfAccounts(GLAccountCategory);
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::"Cost of Goods Sold", GLAccountCategoryMgt.GetCOGSMaterials);
+          GLAccountCategory."Account Category"::"Cost of Goods Sold", GLAccountCategoryMgt.GetCOGSMaterials());
         CreateGLAccount.AssignSubcategoryToChartOfAccounts(GLAccountCategory);
         GLAccountCategoryMgt.GetAccountSubcategory(GLAccountCategory,
-          GLAccountCategory."Account Category"::Assets, GLAccountCategoryMgt.GetCurrentAssets);
+          GLAccountCategory."Account Category"::Assets, GLAccountCategoryMgt.GetCurrentAssets());
         CreateGLAccount.AssignSubcategoryToChartOfAccounts(GLAccountCategory);
 
         if InvtPostingSetup.Find('-') then
@@ -63,7 +63,6 @@ codeunit 119032 "Create WIP Accounts"
         XDirectCostAppliedCap: Label 'Direct Cost Applied, Cap.';
         XOverheadAppliedCap: Label 'Overhead Applied, Cap.';
         XPurchaseVarianceCap: Label 'Purchase Variance, Cap.';
-        XTotalCostofCapacities: Label 'Total Cost of Capacities';
         XVariance: Label 'Variance';
         XMaterialVariance: Label 'Material Variance';
         XCapacityVariance: Label 'Capacity Variance';
@@ -71,7 +70,6 @@ codeunit 119032 "Create WIP Accounts"
         XCapOverheadVariance: Label 'Cap. Overhead Variance';
         XMfgOverheadVariance: Label 'Mfg. Overhead Variance';
         XTotalVariance: Label 'Total Variance';
-        XWIPAccountFinishedgoods: Label 'WIP Account, Finished goods';
         GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
         CreateGLAccount: Codeunit "Create G/L Account";
 
@@ -108,24 +106,24 @@ codeunit 119032 "Create WIP Accounts"
         if GenPostingSetup.FindSet() then
             repeat
                 case GenPostingSetup."Gen. Prod. Posting Group" of
-                    DemoDataSetup.RawMatCode:
+                    DemoDataSetup.RawMatCode():
                         begin
                             GenPostingSetup.Validate("Direct Cost Applied Account", Adjust.Convert('997291'));
                             GenPostingSetup.Validate("Overhead Applied Account", Adjust.Convert('997292'));
                             GenPostingSetup.Validate("Purchase Variance Account", Adjust.Convert('997293'));
                             GenPostingSetup.Modify();
                         end;
-                    DemoDataSetup.MiscCode,
-                    DemoDataSetup.NoVATCode,
-                    DemoDataSetup.RetailCode:
+                    DemoDataSetup.MiscCode(),
+                    DemoDataSetup.NoVATCode(),
+                    DemoDataSetup.RetailCode():
                         begin
                             GenPostingSetup.Validate("Direct Cost Applied Account", Adjust.Convert('997191'));
                             GenPostingSetup.Validate("Overhead Applied Account", Adjust.Convert('997192'));
                             GenPostingSetup.Validate("Purchase Variance Account", Adjust.Convert('997193'));
                             GenPostingSetup.Modify();
                         end;
-                    DemoDataSetup.ServicesCode,
-                    DemoDataSetup.ManufactCode:
+                    DemoDataSetup.ServicesCode(),
+                    DemoDataSetup.ManufactCode():
                         begin
                             GenPostingSetup.Validate("Direct Cost Applied Account", Adjust.Convert('997791'));
                             GenPostingSetup.Validate("Overhead Applied Account", Adjust.Convert('997792'));

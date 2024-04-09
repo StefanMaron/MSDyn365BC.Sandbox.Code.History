@@ -3,11 +3,14 @@ codeunit 119100 "Create Chart Definitions"
 
     trigger OnRun()
     begin
-        CreateFinancePerformanceCharts;
-        ChartManagement.PopulateChartDefinitionTable;
+        DemoDataSetup.Get();
+        CreateFinancePerformanceCharts();
+        ChartManagement.PopulateChartDefinitionTable();
     end;
 
     var
+        DemoDataSetup: Record "Demo Data Setup";
+        ChartManagement: Codeunit "Chart Management";
         MakeAdjustments: Codeunit "Make Adjustments";
         XCashCycleChartDescriptionTxt: Label 'Shows how many days money is tied up from the day you purchase inventory to the day you receive payment from customers.\\A cash cycle is calculated as: Days Sales in Inventory (DSI) + Days Sales Outstanding (DSO) - Days Payable Outstanding (DPO). ';
         XCashFlowChartDescriptionTxt: Label 'Shows the movement of money into or out of your company. You can select to view both future revenue and expenses not yet registered.\\Cash flow is calculated as follows: Receivables + Liquid Funds - Payables.';
@@ -48,13 +51,18 @@ codeunit 119100 "Create Chart Definitions"
         XOperatingMarginTxt: Label 'Operating Margin';
         XOperatingMarginPctTxt: Label 'Operating Margin %';
         XIncomeBeforeInterestAndTaxTxt: Label 'Income before Interest and Tax';
-        ChartManagement: Codeunit "Chart Management";
 
     local procedure CreateFinancePerformanceCharts()
     begin
-        SetupAccountSchedules;
-        CreateColumnLayout;
-        InsertFinancialChartDefinitions;
+        case DemoDataSetup."Data Type" of
+            DemoDataSetup."Data Type"::Extended:
+                SetupAccountSchedules();
+            DemoDataSetup."Data Type"::Standard,
+          DemoDataSetup."Data Type"::Evaluation:
+                SetupAccountSchedules();
+        end;
+        CreateColumnLayout();
+        InsertFinancialChartDefinitions();
     end;
 
     local procedure SetupAccountSchedules()
@@ -62,9 +70,9 @@ codeunit 119100 "Create Chart Definitions"
         AccScheduleLine: Record "Acc. Schedule Line";
         BalanceAtDate: Option;
         NetChange: Option;
-        TotalAccounts: Option;
-        PostingAccounts: Option;
-        Formula: Option;
+        TotalAccounts: Enum "Acc. Schedule Line Totaling Type";
+        PostingAccounts: Enum "Acc. Schedule Line Totaling Type";
+        Formula: Enum "Acc. Schedule Line Totaling Type";
     begin
         BalanceAtDate := AccScheduleLine."Row Type"::"Balance at Date";
         NetChange := AccScheduleLine."Row Type"::"Net Change";
@@ -74,7 +82,7 @@ codeunit 119100 "Create Chart Definitions"
 
         // Account Schedule for Cash Flow Chart
         CreateAccScheduleName(
-          XCashFlowAccSchedNameTxt, StrSubstNo(XAccSchedDescrTxt, ChartManagement.CashFlowChartName), XPeriodsColumnLayoutNameTxt);
+          XCashFlowAccSchedNameTxt, StrSubstNo(XAccSchedDescrTxt, ChartManagement.CashFlowChartName()), XPeriodsColumnLayoutNameTxt);
         CreateAccScheduleLine(
           XCashFlowAccSchedNameTxt, '10', XTotalReceivablesTxt, MakeAdjustments.Convert('992390'), TotalAccounts, BalanceAtDate);
         CreateAccScheduleLine(
@@ -88,7 +96,7 @@ codeunit 119100 "Create Chart Definitions"
         // Account Schedule for Income and Expense Chart
         CreateAccScheduleName(
           XIncAndExpAccSchedNameTxt,
-          StrSubstNo(XAccSchedDescrTxt, ChartManagement.IncomeAndExpenseChartName), XPeriodsColumnLayoutNameTxt);
+          StrSubstNo(XAccSchedDescrTxt, ChartManagement.IncomeAndExpenseChartName()), XPeriodsColumnLayoutNameTxt);
         CreateAccScheduleLine(
           XIncAndExpAccSchedNameTxt, '10', XTotalRevenueCreditTxt, MakeAdjustments.Convert('996995'), TotalAccounts, NetChange);
         CreateAccScheduleLine(XIncAndExpAccSchedNameTxt, '11', XTotalRevenueTxt, '-10', Formula, NetChange);
@@ -107,7 +115,7 @@ codeunit 119100 "Create Chart Definitions"
 
         // Account Schedule for Cash Cycle Chart
         CreateAccScheduleName(
-          XCashCycleAccSchedNameTxt, StrSubstNo(XAccSchedDescrTxt, ChartManagement.CashCycleChartName), XPeriodsColumnLayoutNameTxt);
+          XCashCycleAccSchedNameTxt, StrSubstNo(XAccSchedDescrTxt, ChartManagement.CashCycleChartName()), XPeriodsColumnLayoutNameTxt);
         CreateAccScheduleLine(
           XCashCycleAccSchedNameTxt, '10', XTotalRevenueTxt, MakeAdjustments.Convert('996995'), TotalAccounts, BalanceAtDate);
         CreateAccScheduleLine(
@@ -125,7 +133,7 @@ codeunit 119100 "Create Chart Definitions"
         CreateAccScheduleName(
           XReducedTrialBalanceAccSchedNameTxt, XReducedTrialBalanceAccSchedDescriptionTxt, XPeriodsColumnLayoutNameTxt);
         CreateAccScheduleLineExtended(
-          XReducedTrialBalanceAccSchedNameTxt, '10', XTotalRevenueTxt, CreateAccSchLine_TotalRevenue, TotalAccounts, NetChange, true);
+          XReducedTrialBalanceAccSchedNameTxt, '10', XTotalRevenueTxt, CreateAccSchLine_TotalRevenue(), TotalAccounts, NetChange, true);
         CreateAccScheduleLineExtended(
           XReducedTrialBalanceAccSchedNameTxt, '20', XTotalCostTxt,
           StrSubstNo('%1|%2', MakeAdjustments.Convert('997995'), MakeAdjustments.Convert('986099')),
@@ -137,9 +145,9 @@ codeunit 119100 "Create Chart Definitions"
         CreateAccScheduleLine(XReducedTrialBalanceAccSchedNameTxt, '60', XOperatingMarginTxt, '30 - 50', Formula, NetChange);
         CreateAccScheduleLineFormula(XReducedTrialBalanceAccSchedNameTxt, '70', XOperatingMarginPctTxt, '-''60''/''10''*100', Formula, NetChange);
         CreateAccScheduleLine(
-          XReducedTrialBalanceAccSchedNameTxt, '80', XOtherExpensesTxt, CreateAccSchLine_OtherExpenses, PostingAccounts, NetChange);
+          XReducedTrialBalanceAccSchedNameTxt, '80', XOtherExpensesTxt, CreateAccSchLine_OtherExpenses(), PostingAccounts, NetChange);
         CreateAccScheduleLineExtended(
-          XReducedTrialBalanceAccSchedNameTxt, '90', XIncomeBeforeInterestAndTaxTxt, CreateAccSchLine_NetOperatingIncome, TotalAccounts,
+          XReducedTrialBalanceAccSchedNameTxt, '90', XIncomeBeforeInterestAndTaxTxt, CreateAccSchLine_NetOperatingIncome(), TotalAccounts,
           NetChange, true);
     end;
 
@@ -158,9 +166,9 @@ codeunit 119100 "Create Chart Definitions"
     var
         AccSchedChartSetupLine: Record "Acc. Sched. Chart Setup Line";
         TrialBalanceSetup: Record "Trial Balance Setup";
-        Line: Option;
-        StepLine: Option;
-        Column: Option;
+        Line: Enum "Account Schedule Chart Type";
+        StepLine: Enum "Account Schedule Chart Type";
+        Column: Enum "Account Schedule Chart Type";
     begin
         Line := AccSchedChartSetupLine."Chart Type"::Line;
         Column := AccSchedChartSetupLine."Chart Type"::Column;
@@ -168,29 +176,29 @@ codeunit 119100 "Create Chart Definitions"
 
         // Cash Flow Chart
         InsertFinancialChartDefinition(
-          ChartManagement.CashFlowChartName, XCashFlowChartDescriptionTxt,
+          ChartManagement.CashFlowChartName(), XCashFlowChartDescriptionTxt,
           XCashFlowAccSchedNameTxt, XPeriodsColumnLayoutNameTxt, 3, true);
-        InsertFinancialChartSetupLine(ChartManagement.CashFlowChartName, XTotalReceivablesTxt, Column, 10000, 10000);
-        InsertFinancialChartSetupLine(ChartManagement.CashFlowChartName, XTotalPayablesTxt, Column, 20000, 10000);
-        InsertFinancialChartSetupLine(ChartManagement.CashFlowChartName, XTotalLiquidFundsTxt, Column, 30000, 10000);
-        InsertFinancialChartSetupLine(ChartManagement.CashFlowChartName, XTotalCashFlowTxt, StepLine, 40000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.CashFlowChartName(), XTotalReceivablesTxt, Column, 10000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.CashFlowChartName(), XTotalPayablesTxt, Column, 20000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.CashFlowChartName(), XTotalLiquidFundsTxt, Column, 30000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.CashFlowChartName(), XTotalCashFlowTxt, StepLine, 40000, 10000);
 
         // Income and Expense Chart
         InsertFinancialChartDefinition(
-          ChartManagement.IncomeAndExpenseChartName,
+          ChartManagement.IncomeAndExpenseChartName(),
           XIncomeAndExpenseChartDescriptionTxt, XIncAndExpAccSchedNameTxt, XPeriodsColumnLayoutNameTxt, 3, false);
-        InsertFinancialChartSetupLine(ChartManagement.IncomeAndExpenseChartName, XTotalRevenueTxt, Column, 20000, 10000);
-        InsertFinancialChartSetupLine(ChartManagement.IncomeAndExpenseChartName, XTotalExpenditureTxt, Column, 80000, 10000);
-        InsertFinancialChartSetupLine(ChartManagement.IncomeAndExpenseChartName, XEarningsBeforeInterestTxt, Column, 90000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.IncomeAndExpenseChartName(), XTotalRevenueTxt, Column, 20000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.IncomeAndExpenseChartName(), XTotalExpenditureTxt, Column, 80000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.IncomeAndExpenseChartName(), XEarningsBeforeInterestTxt, Column, 90000, 10000);
 
         // Cash Cycle Chart
         InsertFinancialChartDefinition(
-          ChartManagement.CashCycleChartName,
+          ChartManagement.CashCycleChartName(),
           XCashCycleChartDescriptionTxt, XCashCycleAccSchedNameTxt, XPeriodsColumnLayoutNameTxt, 12, false);
-        InsertFinancialChartSetupLine(ChartManagement.CashCycleChartName, XDaysOfSalesOutstandingTxt, Line, 50000, 10000);
-        InsertFinancialChartSetupLine(ChartManagement.CashCycleChartName, XDaysOfPaymentOutstandingTxt, Line, 60000, 10000);
-        InsertFinancialChartSetupLine(ChartManagement.CashCycleChartName, XDaysSalesOfInventoryTxt, Line, 70000, 10000);
-        InsertFinancialChartSetupLine(ChartManagement.CashCycleChartName, XCashCycleDaysTxt, Line, 80000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.CashCycleChartName(), XDaysOfSalesOutstandingTxt, Line, 50000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.CashCycleChartName(), XDaysOfPaymentOutstandingTxt, Line, 60000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.CashCycleChartName(), XDaysSalesOfInventoryTxt, Line, 70000, 10000);
+        InsertFinancialChartSetupLine(ChartManagement.CashCycleChartName(), XCashCycleDaysTxt, Line, 80000, 10000);
 
         // Insert Mini Trial balance
         TrialBalanceSetup.Get();
@@ -207,7 +215,7 @@ codeunit 119100 "Create Chart Definitions"
         AccountSchedulesChartSetup."User ID" := '';
         AccountSchedulesChartSetup.Name := ChartName;
         AccountSchedulesChartSetup.Description := ChartDescription;
-        AccountSchedulesChartSetup."Start Date" := GetCurrentDay;
+        AccountSchedulesChartSetup."Start Date" := GetCurrentDay();
         AccountSchedulesChartSetup."Account Schedule Name" := AccSchedName;
         AccountSchedulesChartSetup."Column Layout Name" := ColumnLayoutName;
         AccountSchedulesChartSetup."Period Length" := AccountSchedulesChartSetup."Period Length"::Month;
@@ -216,26 +224,24 @@ codeunit 119100 "Create Chart Definitions"
         AccountSchedulesChartSetup.Insert(true);
     end;
 
-    local procedure InsertFinancialChartSetupLine(ChartName: Text[30]; MeasureName: Text[111]; ChartType: Option; AccountScheduleLineNo: Integer; ColumnLayoutLineNo: Integer)
+    local procedure InsertFinancialChartSetupLine(ChartName: Text[30]; MeasureName: Text[111]; ChartType: Enum "Account Schedule Chart Type"; AccountScheduleLineNo: Integer; ColumnLayoutLineNo: Integer)
     var
         AccSchedChartSetupLine: Record "Acc. Sched. Chart Setup Line";
         AccountSchedulesChartSetup: Record "Account Schedules Chart Setup";
     begin
         AccountSchedulesChartSetup.Get('', ChartName);
 
-        with AccSchedChartSetupLine do begin
-            Init();
-            "User ID" := '';
-            Name := AccountSchedulesChartSetup.Name;
-            "Account Schedule Name" := AccountSchedulesChartSetup."Account Schedule Name";
-            "Column Layout Name" := AccountSchedulesChartSetup."Column Layout Name";
-            "Account Schedule Line No." := AccountScheduleLineNo;
-            "Column Layout Line No." := ColumnLayoutLineNo;
-            "Measure Name" := MeasureName;
-            "Measure Value" := StrSubstNo('%1 %2', AccountScheduleLineNo, ColumnLayoutLineNo);
-            "Chart Type" := ChartType;
-            Insert(true);
-        end;
+        AccSchedChartSetupLine.Init();
+        AccSchedChartSetupLine."User ID" := '';
+        AccSchedChartSetupLine.Name := AccountSchedulesChartSetup.Name;
+        AccSchedChartSetupLine."Account Schedule Name" := AccountSchedulesChartSetup."Account Schedule Name";
+        AccSchedChartSetupLine."Column Layout Name" := AccountSchedulesChartSetup."Column Layout Name";
+        AccSchedChartSetupLine."Account Schedule Line No." := AccountScheduleLineNo;
+        AccSchedChartSetupLine."Column Layout Line No." := ColumnLayoutLineNo;
+        AccSchedChartSetupLine."Measure Name" := MeasureName;
+        AccSchedChartSetupLine."Measure Value" := StrSubstNo('%1 %2', AccountScheduleLineNo, ColumnLayoutLineNo);
+        AccSchedChartSetupLine."Chart Type" := ChartType;
+        AccSchedChartSetupLine.Insert(true);
     end;
 
     local procedure CreateAccScheduleName(Name: Code[10]; Description: Text[80]; DefaultColumnLayout: Code[10])
@@ -245,21 +251,21 @@ codeunit 119100 "Create Chart Definitions"
         CreateAccScheduleName.InsertData(Name, Description, DefaultColumnLayout, '');
     end;
 
-    local procedure CreateAccScheduleLine(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Option; RowType: Option)
+    local procedure CreateAccScheduleLine(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Enum "Acc. Schedule Line Totaling Type"; RowType: Option)
     var
         CreateAccScheduleLine: Codeunit "Create Acc. Schedule Line";
     begin
         CreateAccScheduleLine.InsertMiniAppData(ScheduleName, RowNo, Description, Totaling, TotalingType, RowType, false);
     end;
 
-    local procedure CreateAccScheduleLineFormula(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Option; RowType: Option)
+    local procedure CreateAccScheduleLineFormula(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Enum "Acc. Schedule Line Totaling Type"; RowType: Option)
     var
         CreateAccScheduleLine: Codeunit "Create Acc. Schedule Line";
     begin
         CreateAccScheduleLine.InsertMiniAppDataFormula(ScheduleName, RowNo, Description, Totaling, TotalingType, RowType, false, true);
     end;
 
-    local procedure CreateAccScheduleLineExtended(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Option; RowType: Option; ShowOppositeSign: Boolean)
+    local procedure CreateAccScheduleLineExtended(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Enum "Acc. Schedule Line Totaling Type"; RowType: Option; ShowOppositeSign: Boolean)
     var
         CreateAccScheduleLine: Codeunit "Create Acc. Schedule Line";
     begin
@@ -310,7 +316,7 @@ codeunit 119100 "Create Chart Definitions"
     var
         ColumnLayout: Record "Column Layout";
     begin
-        exit(StrSubstNo('%1%2', Period, ColumnLayout.GetPeriodName));
+        exit(StrSubstNo('%1%2', Period, ColumnLayout.GetPeriodName()));
     end;
 
     procedure GetCashCycleAccSchedName(): Code[10]

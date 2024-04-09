@@ -289,7 +289,7 @@ codeunit 6400 "Flow Service Management"
             Current := ObjectEnumerator.Current;
 
             if Format(Current.Key) = 'value' then begin
-                JArray := Current.Value;
+                JArray := Current.Value();
                 ArrayEnumerator := JArray.GetEnumerator();
 
                 while ArrayEnumerator.MoveNext() do begin
@@ -409,7 +409,7 @@ codeunit 6400 "Flow Service Management"
         FlowUserEnvironmentConfig: Record "Flow User Environment Config";
         EmptyGuid: Guid;
     begin
-        exit(FlowUserEnvironmentConfig.Get(UserSecurityId()) OR FlowUserEnvironmentConfig.Get(EmptyGuid));
+        exit(FlowUserEnvironmentConfig.Get(UserSecurityId()) or FlowUserEnvironmentConfig.Get(EmptyGuid));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Action Triggers", 'GetPowerPlatformEnvironmentId', '', true, true)]

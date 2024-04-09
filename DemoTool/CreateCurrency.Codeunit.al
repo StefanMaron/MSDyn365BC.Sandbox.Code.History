@@ -13,7 +13,7 @@ codeunit 101004 "Create Currency"
             repeat
                 InsertData(Rec);
                 InsertExchRateData(Rec);
-            until Next = 0
+            until Next() = 0
         else
             Error(NoCurrencyFoundErr);
 
@@ -25,7 +25,7 @@ codeunit 101004 "Create Currency"
               Round(TempCurrencyData."Exchange Rate Amount" / TempCurrencyData."Relational Exch. Rate Amount", 0.0001);
             DemoDataSetup.Modify();
 
-            "Create Currency Exchange Rate".LocalizeExchangeRates;
+            "Create Currency Exchange Rate".LocalizeExchangeRates();
 
             SetLCYinGLSetup(DemoDataSetup."Currency Code");
         end;
@@ -96,21 +96,19 @@ codeunit 101004 "Create Currency"
 
     procedure InsertData(CurrencyData: Record "Temporary Currency Data")
     begin
-        with Currency do begin
-            Init();
-            Validate(Code, CurrencyData."Currency Code");
-            Validate("ISO Code", CopyStr(Code, 1, 3));
-            Validate("ISO Numeric Code", CurrencyData."ISO Numeric Code");
-            Validate(Description, GetCurrencyDescription(CurrencyData."Currency Code"));
-            Validate("Amount Rounding Precision", CurrencyData."Amount Rounding Precision");
-            Validate("Unit-Amount Rounding Precision", CurrencyData."Unit-Amount Rounding Precision");
-            Validate("Invoice Rounding Precision", CurrencyData."Invoice Rounding Precision");
-            Validate("Invoice Rounding Type", CurrencyData."Invoice Rounding Type");
-            Validate("EMU Currency", CurrencyData."EMU Currency");
-            Validate("Amount Decimal Places", CurrencyData."Amount Decimal Places");
-            Validate("Unit-Amount Decimal Places", CurrencyData."Unit-Amount Decimal Places");
-            Insert(true);
-        end;
+        Currency.Init();
+        Currency.Validate(Code, CurrencyData."Currency Code");
+        Currency.Validate("ISO Code", CopyStr(Currency.Code, 1, 3));
+        Currency.Validate("ISO Numeric Code", CurrencyData."ISO Numeric Code");
+        Currency.Validate(Description, GetCurrencyDescription(CurrencyData."Currency Code"));
+        Currency.Validate("Amount Rounding Precision", CurrencyData."Amount Rounding Precision");
+        Currency.Validate("Unit-Amount Rounding Precision", CurrencyData."Unit-Amount Rounding Precision");
+        Currency.Validate("Invoice Rounding Precision", CurrencyData."Invoice Rounding Precision");
+        Currency.Validate("Invoice Rounding Type", CurrencyData."Invoice Rounding Type");
+        Currency.Validate("EMU Currency", CurrencyData."EMU Currency");
+        Currency.Validate("Amount Decimal Places", CurrencyData."Amount Decimal Places");
+        Currency.Validate("Unit-Amount Decimal Places", CurrencyData."Unit-Amount Decimal Places");
+        Currency.Insert(true);
     end;
 
     procedure InsertExchRateData(TemporaryCurrencyData: Record "Temporary Currency Data")
@@ -118,10 +116,9 @@ codeunit 101004 "Create Currency"
         if Skip then
             exit;
 
-        with TemporaryCurrencyData do
-            "Create Currency Exchange Rate".InsertData(
-              "Currency Code", CalcDate('<CY-2Y+1D>', WorkDate()), "Exchange Rate Amount", "Exchange Rate Amount",
-              '', "Relational Exch. Rate Amount", 0, "Relational Exch. Rate Amount");
+        "Create Currency Exchange Rate".InsertData(
+              TemporaryCurrencyData."Currency Code", CalcDate('<CY-2Y+1D>', WorkDate()), TemporaryCurrencyData."Exchange Rate Amount", TemporaryCurrencyData."Exchange Rate Amount",
+              '', TemporaryCurrencyData."Relational Exch. Rate Amount", 0, TemporaryCurrencyData."Relational Exch. Rate Amount");
     end;
 
     procedure GetBusPostingGroup("Country Code": Code[10]): Code[10]
@@ -131,12 +128,12 @@ codeunit 101004 "Create Currency"
 
         case "Country Code" of
             '', DemoDataSetup."Country/Region Code":
-                exit(DemoDataSetup.DomesticCode);
+                exit(DemoDataSetup.DomesticCode());
             'AT', 'BE', 'BG', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
           'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'GB':
-                exit(DemoDataSetup.EUCode);
+                exit(DemoDataSetup.EUCode());
             else
-                exit(DemoDataSetup.ExportCode);
+                exit(DemoDataSetup.ExportCode());
         end;
     end;
 
@@ -147,12 +144,12 @@ codeunit 101004 "Create Currency"
 
         case "Country Code" of
             '', DemoDataSetup."Country/Region Code":
-                exit(DemoDataSetup.DomesticCode);
+                exit(DemoDataSetup.DomesticCode());
             'AT', 'BE', 'BG', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
           'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'GB':
-                exit(DemoDataSetup.EUCode);
+                exit(DemoDataSetup.EUCode());
             else
-                exit(DemoDataSetup.ForeignCode);
+                exit(DemoDataSetup.ForeignCode());
         end;
     end;
 

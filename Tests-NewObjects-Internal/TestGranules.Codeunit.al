@@ -58,11 +58,10 @@ codeunit 132532 "Test Granules"
         D365AutomationTok: Label 'D365 AUTOMATION';
         D365DIMCORRECTIONTok: Label 'D365 DIM CORRECTION', Locked = true;
         D365CreateFieldsTok: Label 'D365 Create Fields', Locked = true;
-        TeamsUsersTok: Label 'TEAMS USERS', Locked = true;
-        LocalReadTxt: Label 'LOCAL READ', Locked = true;
         LoginTxt: Label 'LOGIN', Locked = true;
         BackupRestoreDataTok: Label 'D365 BACKUP/RESTORE', Locked = true;
-        BackupRestoreDataDescription: Label 'Backup or restore database';
+        BackupRestoreDataDescriptionLbl: Label 'Backup or restore database';
+        OrFilterTok: Label '%1|%2', Locked = true;
 
     [Test]
     [Scope('OnPrem')]
@@ -89,7 +88,7 @@ codeunit 132532 "Test Granules"
     procedure AllAppTablesAreInPermissionSet()
     var
         TempTableDataAllObj: Record AllObj temporary;
-        TempPermission: Record Permission temporary;
+        TempExpandedPermission: Record "Expanded Permission" temporary;
         TypeHelper: Codeunit "Type Helper";
         Errors: DotNet ArrayList;
         String: Dotnet String;
@@ -99,15 +98,15 @@ codeunit 132532 "Test Granules"
         // Temporary Tables are excluded from this check
         Errors := Errors.ArrayList();
         CopyAllAppTableObjectsToTempBuffer(TempTableDataAllObj);
-        CopyAllTablePermissionsToTempBuffer(TempPermission);
+        CopyAllTablePermissionsToTempBuffer(TempExpandedPermission);
 
         // The AllObj table includes system tables which must be excluded from this check
         TempTableDataAllObj.SetFilter("Object ID", '<2000000000');
         TempTableDataAllObj.FindSet();
         repeat
-            TempPermission.SetRange("Object Type", TempTableDataAllObj."Object Type");
-            TempPermission.SetRange("Object ID", TempTableDataAllObj."Object ID");
-            if TempPermission.IsEmpty() then
+            TempExpandedPermission.SetRange("Object Type", TempTableDataAllObj."Object Type");
+            TempExpandedPermission.SetRange("Object ID", TempTableDataAllObj."Object ID");
+            if TempExpandedPermission.IsEmpty() then
                 Errors.Add(StrSubstNo(TableDataNotInAnyPermissionSetTxt, TempTableDataAllObj."Object ID", TempTableDataAllObj."Object Name"));
         until TempTableDataAllObj.Next() = 0;
 
@@ -120,18 +119,18 @@ codeunit 132532 "Test Granules"
     procedure AllLocalAppObjectsAreInLocalPermissionSet()
     var
         TempTableDataAllObj: Record AllObj temporary;
-        TempAllLocalPermission: Record Permission temporary;
+        TempAllLocalExpandedPermission: Record "Expanded Permission" temporary;
     begin
         // If this test fails, it means that you added a local Table but forgot to add it to the local permission set
         // If the table uses inherent permissions, it is excluded from this check by adding to GetTablesWithInherentEntitlements
         CopyAllAppTableObjectsToTempBuffer(TempTableDataAllObj);
         RemoveNonLocalObjectsFromObjects(TempTableDataAllObj);
-        CopyPSToTemp(TempAllLocalPermission, XLOCALTxt);
+        CopyPSToTemp(TempAllLocalExpandedPermission, XLOCALTxt);
         if TempTableDataAllObj.FindSet() then
             repeat
-                TempAllLocalPermission.SetRange("Object Type", TempTableDataAllObj."Object Type");
-                TempAllLocalPermission.SetRange("Object ID", TempTableDataAllObj."Object ID");
-                Assert.IsFalse(TempAllLocalPermission.IsEmpty, StrSubstNo(TableDataNotInLocalPermissionSetTxt, TempTableDataAllObj."Object ID", TempTableDataAllObj."Object Name"));
+                TempAllLocalExpandedPermission.SetRange("Object Type", TempTableDataAllObj."Object Type");
+                TempAllLocalExpandedPermission.SetRange("Object ID", TempTableDataAllObj."Object ID");
+                Assert.IsFalse(TempAllLocalExpandedPermission.IsEmpty, StrSubstNo(TableDataNotInLocalPermissionSetTxt, TempTableDataAllObj."Object ID", TempTableDataAllObj."Object Name"));
             until TempTableDataAllObj.Next() = 0;
     end;
 
@@ -140,19 +139,19 @@ codeunit 132532 "Test Granules"
     procedure AllLocalAppObjectsAreInO365FullPermissionSet()
     var
         TempTableDataAllObj: Record AllObj temporary;
-        TempAllLocalPermission: Record Permission temporary;
+        TempAllLocalExpandedPermission: Record "Expanded Permission" temporary;
     begin
         // If this test fails, it means that you added a local Table but forgot to add it to the O365 Full Access permission set
         // To do this, open COD101982 and add the Object here.
         // If the table uses inherent permissions, it is excluded from this check by adding to GetTablesWithInherentEntitlements
         CopyAllAppTableObjectsToTempBuffer(TempTableDataAllObj);
         RemoveNonLocalObjectsFromObjects(TempTableDataAllObj);
-        CopyPSToTemp(TempAllLocalPermission, XO365FULLTxt);
+        CopyPSToTemp(TempAllLocalExpandedPermission, XO365FULLTxt);
         if TempTableDataAllObj.FindSet() then
             repeat
-                TempAllLocalPermission.SetRange("Object Type", TempTableDataAllObj."Object Type");
-                TempAllLocalPermission.SetRange("Object ID", TempTableDataAllObj."Object ID");
-                Assert.IsFalse(TempAllLocalPermission.IsEmpty, StrSubstNo(TableDataNotInFullPermissionSetTxt, TempTableDataAllObj."Object ID", TempTableDataAllObj."Object Name"));
+                TempAllLocalExpandedPermission.SetRange("Object Type", TempTableDataAllObj."Object Type");
+                TempAllLocalExpandedPermission.SetRange("Object ID", TempTableDataAllObj."Object ID");
+                Assert.IsFalse(TempAllLocalExpandedPermission.IsEmpty, StrSubstNo(TableDataNotInFullPermissionSetTxt, TempTableDataAllObj."Object ID", TempTableDataAllObj."Object Name"));
             until TempTableDataAllObj.Next() = 0;
     end;
 
@@ -161,19 +160,19 @@ codeunit 132532 "Test Granules"
     procedure AllLocalAppObjectsAreInO365BusFullPermissionSet()
     var
         TempTableDataAllObj: Record AllObj temporary;
-        TempAllLocalPermission: Record Permission temporary;
+        TempAllLocalExpandedPermission: Record "Expanded Permission" temporary;
     begin
         // If this test fails, it means that you added a local Table but forgot to add it to the O365 Bus Full Access permission set
         // To do this, open COD101982 and add the Object here.
         // If the table uses inherent permissions, it is excluded from this check by adding to GetTablesWithInherentEntitlements
         CopyAllAppTableObjectsToTempBuffer(TempTableDataAllObj);
         RemoveNonLocalObjectsFromObjects(TempTableDataAllObj);
-        CopyPSToTemp(TempAllLocalPermission, XO365BUSFULLTxt);
+        CopyPSToTemp(TempAllLocalExpandedPermission, XO365BUSFULLTxt);
         if TempTableDataAllObj.FindSet() then
             repeat
-                TempAllLocalPermission.SetRange("Object Type", TempTableDataAllObj."Object Type");
-                TempAllLocalPermission.SetRange("Object ID", TempTableDataAllObj."Object ID");
-                Assert.IsFalse(TempAllLocalPermission.IsEmpty, StrSubstNo(TableDataNotInFullPermissionSetTxt, TempTableDataAllObj."Object ID", TempTableDataAllObj."Object Name"));
+                TempAllLocalExpandedPermission.SetRange("Object Type", TempTableDataAllObj."Object Type");
+                TempAllLocalExpandedPermission.SetRange("Object ID", TempTableDataAllObj."Object ID");
+                Assert.IsFalse(TempAllLocalExpandedPermission.IsEmpty, StrSubstNo(TableDataNotInFullPermissionSetTxt, TempTableDataAllObj."Object ID", TempTableDataAllObj."Object Name"));
             until TempTableDataAllObj.Next() = 0;
     end;
 
@@ -182,7 +181,7 @@ codeunit 132532 "Test Granules"
     procedure AllPermissionsAreObjects()
     var
         TempTableDataAllObj: Record AllObj temporary;
-        TempPermission: Record Permission temporary;
+        TempExpandedPermission: Record "Expanded Permission" temporary;
         TableMetadata: Record "Table Metadata";
         TablesWithInherentEntitlements: Dictionary of [Integer, Boolean];
     begin
@@ -191,20 +190,20 @@ codeunit 132532 "Test Granules"
 
         // CopyAllAppTableObjectsToTempBuffer and CopyAllTablePermissionsToTempBuffer to contain correct ranges
         CopyAllAppTableObjectsToTempBuffer(TempTableDataAllObj);
-        CopyAllTablePermissionsToTempBuffer(TempPermission);
-        TempPermission.SetFilter("Object ID", '<%1', 130000);
-        TempPermission.FindSet();
+        CopyAllTablePermissionsToTempBuffer(TempExpandedPermission);
+        TempExpandedPermission.SetFilter("Object ID", '<%1', 130000);
+        TempExpandedPermission.FindSet();
         repeat
-            TempTableDataAllObj.SetRange("Object Type", TempPermission."Object Type");
-            TempTableDataAllObj.SetRange("Object ID", TempPermission."Object ID");
+            TempTableDataAllObj.SetRange("Object Type", TempExpandedPermission."Object Type");
+            TempTableDataAllObj.SetRange("Object ID", TempExpandedPermission."Object ID");
 
             // Temporary Tables are not included in TempTableDataAllObj
-            if ((TempPermission."Object Type" <> TempPermission."Object Type"::"Table Data") or
-                    not TableMetadata.Get(TempPermission."Object ID") or
+            if ((TempExpandedPermission."Object Type" <> TempExpandedPermission."Object Type"::"Table Data") or
+                    not TableMetadata.Get(TempExpandedPermission."Object ID") or
                     (TableMetadata.TableType <> 6)) and
-                    not TablesWithInherentEntitlements.ContainsKey(TempPermission."Object ID") then
-                Assert.IsFalse(TempTableDataAllObj.IsEmpty, StrSubstNo(PermissionDoesNotExistsTxt, TempPermission."Object ID", TempPermission."Role ID"));
-        until TempPermission.Next() = 0;
+                    not TablesWithInherentEntitlements.ContainsKey(TempExpandedPermission."Object ID") then
+                Assert.IsFalse(TempTableDataAllObj.IsEmpty, StrSubstNo(PermissionDoesNotExistsTxt, TempExpandedPermission."Object ID", TempExpandedPermission."Role ID"));
+        until TempExpandedPermission.Next() = 0;
     end;
 
     [Test]
@@ -212,7 +211,7 @@ codeunit 132532 "Test Granules"
     procedure AllAppObjectsAreInAtLeastOneNonO365FullPermissionSet()
     var
         TempTableDataAllObj: Record AllObj temporary;
-        TempPermission: Record Permission temporary;
+        TempExpandedPermission: Record "Expanded Permission" temporary;
         O365PermissionSetsList: DotNet GenericList1;
         IsO365PermissionSet: Boolean;
     begin
@@ -223,20 +222,20 @@ codeunit 132532 "Test Granules"
         O365PermissionSetsList := O365PermissionSetsList.List();
         GetO365PermissionSets(O365PermissionSetsList, false);
         CopyAllAppTableObjectsToTempBuffer(TempTableDataAllObj);
-        CopyAllTablePermissionsToTempBuffer(TempPermission);
+        CopyAllTablePermissionsToTempBuffer(TempExpandedPermission);
         if TempTableDataAllObj.FindSet() then
             repeat
-                TempPermission.SetRange("Object Type", TempTableDataAllObj."Object Type");
-                TempPermission.SetRange("Object ID", TempTableDataAllObj."Object ID");
-                TempPermission.SetRange("Role ID", XO365FULLTxt);
-                if TempPermission.FindFirst() then begin
-                    TempPermission.SetRange("Role ID");
+                TempExpandedPermission.SetRange("Object Type", TempTableDataAllObj."Object Type");
+                TempExpandedPermission.SetRange("Object ID", TempTableDataAllObj."Object ID");
+                TempExpandedPermission.SetRange("Role ID", XO365FULLTxt);
+                if TempExpandedPermission.FindFirst() then begin
+                    TempExpandedPermission.SetRange("Role ID");
                     IsO365PermissionSet := false;
-                    if TempPermission.FindSet() then
+                    if TempExpandedPermission.FindSet() then
                         repeat
-                            if O365PermissionSetsList.Contains(TempPermission."Role ID") then
+                            if O365PermissionSetsList.Contains(TempExpandedPermission."Role ID") then
                                 IsO365PermissionSet := true;
-                        until IsO365PermissionSet or (TempPermission.Next() = 0);
+                        until IsO365PermissionSet or (TempExpandedPermission.Next() = 0);
                     Assert.IsTrue(IsO365PermissionSet, StrSubstNo(TableDataOnlyInFullPermissionSetTxt,
                         TempTableDataAllObj."Object ID", TempTableDataAllObj."Object Name"));
                 end;
@@ -247,7 +246,7 @@ codeunit 132532 "Test Granules"
     [Scope('OnPrem')]
     procedure AllD365PermissionsAreInD365PremiumBus()
     var
-        TempAllO365Permission: Record Permission temporary;
+        TempAllO365ExpandedPermission: Record "Expanded Permission" temporary;
         PermissionSet: Record "Permission Set";
     begin
         // This test verifies that all Permissions in the O365 Permission sets are also added to the 'D365 BUS PREMIUM' Permission Set with
@@ -259,19 +258,19 @@ codeunit 132532 "Test Granules"
         PermissionSet.FindSet();
         repeat
             if not (PermissionSet."Role ID" in [XO365FULLTxt, D365AccountantsTxt, D365CompanyHubTxt, XO365EXTENSIONMGTTxt, XO365BACKUPRESTORETxt, ProfileManagementTok, D365MonitorFieldsTok, XRetentionPolSetupTok, XSnapshotDebugTok, XAttachDebuggingTok, D365AutomationTok, D365DIMCORRECTIONTok, D365CreateFieldsTok]) then
-                CopyPSToTemp(TempAllO365Permission, PermissionSet."Role ID");
+                CopyPSToTemp(TempAllO365ExpandedPermission, PermissionSet."Role ID");
         until PermissionSet.Next() = 0;
 
-        CopyPSToTemp(TempAllO365Permission, XLOCALTxt);
+        CopyPSToTemp(TempAllO365ExpandedPermission, XLOCALTxt);
 
-        VerifyTempPSinPS(TempAllO365Permission, XO365PREMIUMBUSTxt);
+        VerifyTempPSinPS(TempAllO365ExpandedPermission, XO365PREMIUMBUSTxt);
     end;
 
     [Test]
     [Scope('OnPrem')]
     procedure AllO365PermissionsAreInO365BusFull()
     var
-        TempAllO365Permission: Record Permission temporary;
+        TempAllO365ExpandedPermission: Record "Expanded Permission" temporary;
         PermissionSet: Record "Permission Set";
     begin
         // This test verifies that all Permissions in the O365 Permission sets are also added to the 'D365 BUS FULL ACCESS' Permission Set with
@@ -283,19 +282,19 @@ codeunit 132532 "Test Granules"
         PermissionSet.FindSet();
         repeat
             if not (PermissionSet."Role ID" in [XO365FULLTxt, D365AccountantsTxt, D365CompanyHubTxt, XO365EXTENSIONMGTTxt, XO365PREMIUMBUSTxt, ReadTok, XO365BACKUPRESTORETxt, ProfileManagementTok, D365MonitorFieldsTok, XRetentionPolSetupTok, XSnapshotDebugTok, XAttachDebuggingTok, D365AutomationTok, D365DIMCORRECTIONTok, D365CreateFieldsTok]) then
-                CopyPSToTemp(TempAllO365Permission, PermissionSet."Role ID");
+                CopyPSToTemp(TempAllO365ExpandedPermission, PermissionSet."Role ID");
         until PermissionSet.Next() = 0;
 
-        CopyPSToTemp(TempAllO365Permission, XLOCALTxt);
+        CopyPSToTemp(TempAllO365ExpandedPermission, XLOCALTxt);
 
-        VerifyTempPSinPS(TempAllO365Permission, XO365BUSFULLTxt);
+        VerifyTempPSinPS(TempAllO365ExpandedPermission, XO365BUSFULLTxt);
     end;
 
     [Test]
     [Scope('OnPrem')]
     procedure AllO365PermissionsAreInO365Full()
     var
-        TempAllO365Permission: Record Permission temporary;
+        TempAllO365ExpandedPermission: Record "Expanded Permission" temporary;
         PermissionSet: Record "Permission Set";
     begin
         // This test verifies that all Permissions in the O365 Permission sets are also added to the 'D365 FULL ACCESS' Permission Set with
@@ -308,13 +307,13 @@ codeunit 132532 "Test Granules"
 
         repeat
             if not (PermissionSet."Role ID" in [XO365BACKUPRESTORETxt, D365AutomationTok, D365DIMCORRECTIONTok]) then
-                CopyPSToTemp(TempAllO365Permission, PermissionSet."Role ID");
+                CopyPSToTemp(TempAllO365ExpandedPermission, PermissionSet."Role ID");
         until PermissionSet.Next() = 0;
 
-        CopyPSToTemp(TempAllO365Permission, XSECURITYTxt);
-        CopyPSToTemp(TempAllO365Permission, XLOCALTxt);
+        CopyPSToTemp(TempAllO365ExpandedPermission, XSECURITYTxt);
+        CopyPSToTemp(TempAllO365ExpandedPermission, XLOCALTxt);
 
-        VerifyTempPSinPS(TempAllO365Permission, XO365FULLTxt);
+        VerifyTempPSinPS(TempAllO365ExpandedPermission, XO365FULLTxt);
     end;
 
     [Test]
@@ -368,16 +367,18 @@ codeunit 132532 "Test Granules"
     procedure BackupRestorePermissionSetExists()
     var
         PermissionSet: Record "Permission Set";
-        Permission: Record Permission;
+        ExpandedPermission: Record "Expanded Permission";
+        SystemApplicationAppId: Guid;
     begin
+        SystemApplicationAppId := '63ca2fa4-4f03-4f2b-a480-172fef340d3f';
         PermissionSet.Get(BackupRestoreDataTok);
-        PermissionSet.TestField(Name, BackupRestoreDataDescription);
+        PermissionSet.TestField(Name, BackupRestoreDataDescriptionLbl);
 
-        Permission.Get(BackupRestoreDataTok, Permission."Object Type"::System, 5410); // Backup permission
-        Assert.AreEqual(Permission."Execute Permission", Permission."Execute Permission"::Yes, 'Wrong value for Execute Permission');
+        ExpandedPermission.Get(SystemApplicationAppId, BackupRestoreDataTok, ExpandedPermission."Object Type"::System, 5410); // Backup permission
+        Assert.AreEqual(ExpandedPermission."Execute Permission", ExpandedPermission."Execute Permission"::Yes, 'Wrong value for Execute Permission');
 
-        Permission.Get(BackupRestoreDataTok, Permission."Object Type"::System, 5420); // Restore permission
-        Assert.AreEqual(Permission."Execute Permission", Permission."Execute Permission"::Yes, 'Wrong value for Execute Permission');
+        ExpandedPermission.Get(SystemApplicationAppId, BackupRestoreDataTok, ExpandedPermission."Object Type"::System, 5420); // Restore permission
+        Assert.AreEqual(ExpandedPermission."Execute Permission", ExpandedPermission."Execute Permission"::Yes, 'Wrong value for Execute Permission');
     end;
 
     [Test]
@@ -489,67 +490,67 @@ codeunit 132532 "Test Granules"
         TempTableDataAllObj.Reset();
     end;
 
-    local procedure CopyAllTablePermissionsToTempBuffer(var TempPermission: Record Permission temporary)
+    local procedure CopyAllTablePermissionsToTempBuffer(var TempExpandedPermission: Record "Expanded Permission" temporary)
     var
-        Permission: Record Permission;
+        ExpandedPermission: Record "Expanded Permission";
         AllObj: Record AllObj;
     begin
-        Permission.SetRange("Object Type", Permission."Object Type"::"Table Data");
-        Permission.FindSet();
+        ExpandedPermission.SetRange("Object Type", ExpandedPermission."Object Type"::"Table Data");
+        ExpandedPermission.FindSet();
         repeat
-            TempPermission := Permission;
-            TempPermission.Insert();
-        until Permission.Next() = 0;
+            TempExpandedPermission := ExpandedPermission;
+            TempExpandedPermission.Insert();
+        until ExpandedPermission.Next() = 0;
 
         // Do not validate system tables that are not visible to the user
-        TempPermission.SetRange("Object ID", 2000000000, 2100000000);
-        TempPermission.FindSet();
+        TempExpandedPermission.SetRange("Object ID", 2000000000, 2100000000);
+        TempExpandedPermission.FindSet();
         repeat
             AllObj.SetRange("Object Type", AllObj."Object Type"::TableData);
-            AllObj.SetRange("Object ID", TempPermission."Object ID");
+            AllObj.SetRange("Object ID", TempExpandedPermission."Object ID");
             if AllObj.IsEmpty() then
-                TempPermission.Delete();
-        until TempPermission.Next() = 0;
+                TempExpandedPermission.Delete();
+        until TempExpandedPermission.Next() = 0;
 
-        TempPermission.Reset();
-        TempPermission.SetRange("Role ID", 'SUPER');
-        TempPermission.DeleteAll();
-        TempPermission.SetRange("Role ID", 'SUPER (DATA)');
-        TempPermission.DeleteAll();
-        TempPermission.SetRange("Role ID", 'TEST TABLES');
-        TempPermission.DeleteAll();
-        TempPermission.SetRange("Role ID", 'ENFORCED SET');
-        TempPermission.DeleteAll();
+        TempExpandedPermission.Reset();
+        TempExpandedPermission.SetRange("Role ID", 'SUPER');
+        TempExpandedPermission.DeleteAll();
+        TempExpandedPermission.SetRange("Role ID", 'SUPER (DATA)');
+        TempExpandedPermission.DeleteAll();
+        TempExpandedPermission.SetRange("Role ID", 'TEST TABLES');
+        TempExpandedPermission.DeleteAll();
+        TempExpandedPermission.SetRange("Role ID", 'ENFORCED SET');
+        TempExpandedPermission.DeleteAll();
 
-        TempPermission.Reset();
+        TempExpandedPermission.Reset();
     end;
 
-    local procedure VerifyTempPSinPS(var BasePermissions: Record Permission; ContainingPSRoleIDFilter: Code[255])
+    local procedure VerifyTempPSinPS(var BasePermissions: Record "Expanded Permission"; ContainingPSRoleIDFilter: Code[255])
     var
         AllObj: Record AllObj;
-        ContainingPermission: Record Permission;
+        ContainingExpandedPermission: Record "Expanded Permission";
     begin
         BasePermissions.FindSet();
         repeat
-            ContainingPermission.SetFilter("Role ID", ContainingPSRoleIDFilter);
-            ContainingPermission.SetRange("Object Type", BasePermissions."Object Type");
-            ContainingPermission.SetRange("Object ID", BasePermissions."Object ID");
-            ContainingPermission.SetRange("Read Permission",
+            ContainingExpandedPermission.SetFilter("Role ID", ContainingPSRoleIDFilter);
+            ContainingExpandedPermission.SetRange("Object Type", BasePermissions."Object Type");
+            ContainingExpandedPermission.SetFilter("Object ID", OrFilterTok, BasePermissions."Object ID", 0); // Either the exact permission must exist, or a wildcard permission for the object type
+            ContainingExpandedPermission.SetRange("Read Permission",
               GetMinAllowedPermission(BasePermissions."Read Permission"),
               GetMaxAllowedPermission(BasePermissions."Read Permission"));
-            ContainingPermission.SetRange("Insert Permission",
+            ContainingExpandedPermission.SetRange("Insert Permission",
               GetMinAllowedPermission(BasePermissions."Insert Permission"),
               GetMaxAllowedPermission(BasePermissions."Insert Permission"));
-            ContainingPermission.SetRange("Modify Permission",
+            ContainingExpandedPermission.SetRange("Modify Permission",
               GetMinAllowedPermission(BasePermissions."Modify Permission"),
               GetMaxAllowedPermission(BasePermissions."Modify Permission"));
-            ContainingPermission.SetRange("Delete Permission",
+            ContainingExpandedPermission.SetRange("Delete Permission",
               GetMinAllowedPermission(BasePermissions."Delete Permission"),
               GetMaxAllowedPermission(BasePermissions."Delete Permission"));
-            ContainingPermission.SetRange("Execute Permission",
+            ContainingExpandedPermission.SetRange("Execute Permission",
               GetMinAllowedPermission(BasePermissions."Execute Permission"),
               GetMaxAllowedPermission(BasePermissions."Execute Permission"));
-            if ContainingPermission.IsEmpty() then begin
+            if ContainingExpandedPermission.IsEmpty() then begin
                 AllObj.Get(BasePermissions."Object Type", BasePermissions."Object ID");
                 Error(PermissionNotInPSWithSufficientPermissionsErr,
                   BasePermissions."Object Type",
@@ -568,41 +569,41 @@ codeunit 132532 "Test Granules"
 
     local procedure VerifyPSPartOfPS(BasePermissionSetRoleID: Code[20]; ContainingPermissionSetRoleID: Code[20])
     var
-        TempPermission: Record Permission temporary;
+        TempExpandedPermission: Record "Expanded Permission" temporary;
     begin
-        CopyPSToTemp(TempPermission, BasePermissionSetRoleID);
-        VerifyTempPSinPS(TempPermission, ContainingPermissionSetRoleID);
+        CopyPSToTemp(TempExpandedPermission, BasePermissionSetRoleID);
+        VerifyTempPSinPS(TempExpandedPermission, ContainingPermissionSetRoleID);
     end;
 
     local procedure GetMinAllowedPermission(PermissionOption: Option): Integer
     var
-        Permission: Record Permission;
+        ExpandedPermission: Record "Expanded Permission";
     begin
-        if PermissionOption = Permission."Read Permission"::Indirect then
-            exit(Permission."Read Permission"::Yes);
+        if PermissionOption = ExpandedPermission."Read Permission"::Indirect then
+            exit(ExpandedPermission."Read Permission"::Yes);
         exit(PermissionOption)
     end;
 
     local procedure GetMaxAllowedPermission(PermissionOption: Option): Integer
     var
-        Permission: Record Permission;
+        ExpandedPermission: Record "Expanded Permission";
     begin
-        if PermissionOption = Permission."Read Permission"::Yes then
-            exit(Permission."Read Permission"::Yes);
-        exit(Permission."Read Permission"::Indirect);
+        if PermissionOption = ExpandedPermission."Read Permission"::Yes then
+            exit(ExpandedPermission."Read Permission"::Yes);
+        exit(ExpandedPermission."Read Permission"::Indirect);
     end;
 
-    local procedure CopyPSToTemp(var TempPermission: Record Permission temporary; FromRoleID: Code[20])
+    local procedure CopyPSToTemp(var TempExpandedPermission: Record "Expanded Permission" temporary; FromRoleID: Code[20])
     var
-        Permission: Record Permission;
+        ExpandedPermission: Record "Expanded Permission";
     begin
-        Permission.SetRange("Role ID", FromRoleID);
-        if Permission.FindSet() then
+        ExpandedPermission.SetRange("Role ID", FromRoleID);
+        if ExpandedPermission.FindSet() then
             repeat
-                TempPermission := Permission;
-                TempPermission.Insert();
-            until Permission.Next() = 0;
-        TempPermission.Reset();
+                TempExpandedPermission := ExpandedPermission;
+                TempExpandedPermission.Insert();
+            until ExpandedPermission.Next() = 0;
+        TempExpandedPermission.Reset();
     end;
 
     local procedure RemoveNonLocalObjectsFromObjects(var TempLocalTableDataAllObj: Record AllObj temporary)
@@ -616,6 +617,11 @@ codeunit 132532 "Test Granules"
 
         // Semi automated tests and shipped test tool are excluded
         TempLocalTableDataAllObj.SetRange("Object ID", 130400, 130499);
+        TempLocalTableDataAllObj.DeleteAll();
+
+        // Remove de-localized objects
+        TempLocalTableDataAllObj.SetRange("Object ID", 12145, 12146);
+        TempLocalTableDataAllObj.SetFilter("Object Type", '%1|%2|%3', TempLocalTableDataAllObj."Object Type"::TableData, TempLocalTableDataAllObj."Object Type"::Table, TempLocalTableDataAllObj."Object Type"::Page);
         TempLocalTableDataAllObj.DeleteAll();
 
         TempLocalTableDataAllObj.Reset();

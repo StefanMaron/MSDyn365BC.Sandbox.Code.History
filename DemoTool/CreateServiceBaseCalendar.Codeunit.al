@@ -50,7 +50,7 @@ codeunit 117507 "Create Service Base Calendar"
           DateToDMY(19031226D), XBoxingDay);
         CheckHolidayDate(DateToDMY(19031226D), XBoxingDay);
 
-        CreateSpecialHolidays;
+        CreateSpecialHolidays();
     end;
 
     var
@@ -66,9 +66,6 @@ codeunit 117507 "Create Service Base Calendar"
         XGBBaseNationalCalendar: Label 'GB Base National Calendar';
         XWeekend: Label 'Weekend';
         XNewYearsEve: Label 'New Years Eve';
-        XBankHolidayScotlandOnly: Label 'Bank Holiday, Scotland Only';
-        XStPatricksDay: Label 'St Patricks Day';
-        XBattleoftheBoyneDay: Label 'Battle of the Boyne Day';
         XChristmasDay: Label 'Christmas Day';
         XBoxingDay: Label 'Boxing Day';
         XMayDayBankHoliday: Label 'May Day Bank Holiday';

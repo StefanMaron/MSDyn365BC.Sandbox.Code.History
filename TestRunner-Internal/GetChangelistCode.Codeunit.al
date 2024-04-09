@@ -65,7 +65,7 @@ codeunit 130026 "Get Changelist Code"
                             CheckTriggerHasCode := false;
                             CheckObjectHasCode := false;
                     end;
-                until Next = 0;
+                until Next() = 0;
 
         if CheckTriggerHasCode then
             RemoveTrigger(TriggerChangelistCode);
@@ -95,10 +95,10 @@ codeunit 130026 "Get Changelist Code"
         ObjectLineNo: Integer;
     begin
         i := 0;
-        while SReader.Peek <> -1 do begin
+        while SReader.Peek() <> -1 do begin
             i += 1;
 
-            TokenLine := SReader.ReadLine;
+            TokenLine := SReader.ReadLine();
             TokenLen := StrLen(TokenLine);
             if TokenLen > 0 then begin
                 ChangeChar := TokenLine[1];
@@ -513,7 +513,7 @@ codeunit 130026 "Get Changelist Code"
             SetRange("Object No.", "Object No.");
             repeat
                 Delete();
-            until ((Next = 0) or ("Line Type" = "Line Type"::"Trigger/Function"))
+            until ((Next() = 0) or ("Line Type" = "Line Type"::"Trigger/Function"))
         end;
     end;
 

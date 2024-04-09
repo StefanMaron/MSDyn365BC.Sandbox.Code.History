@@ -176,76 +176,70 @@ codeunit 117000 "Interface Service Management"
         CreateSalesInvoice(2, '30000', 19030116D);
         WorkDate(TempDate);
 
-        with ServHeader do begin
-            CreateServiceHeader.InsertData("Document Type"::Order, XSO000003, Priority::Low, '40000', '', '40000', '', '', 19030106D, 102021T,
-              0D, 0D, 0T, 0D, 0T);
-            CreateServiceHeader.InsertData("Document Type"::Order, XSO000004, Priority::Low, '50000', '', '50000', '', '', 19030109D, 102421T,
-              0D, 0D, 0T, 0D, 0T);
-            CreateServiceHeader.InsertData("Document Type"::Order, XSO000005, Priority::Low, '40000', '', '40000', '', '', 19030109D, 152021T,
-              0D, 0D, 0T, 0D, 0T);
-            CreateServiceHeader.InsertData("Document Type"::Order, XSO000006, Priority::Low, '30000', '', '30000', '', '', 19030120D, 142921T,
-              0D, 0D, 0T, 0D, 0T);
-            CreateServiceHeader.InsertData("Document Type"::Order, XSO000007, Priority::Low, '40000', '', '40000', '', '', 19030118D, 172021T,
-              0D, 0D, 0T, 0D, 0T);
-            CreateServiceHeader.InsertData("Document Type"::Order, XSO000008, Priority::Low, '50000', '', '50000', '', '', 19030119D, 103521T,
-              0D, 0D, 0T, 0D, 0T);
-        end;
-        with ServItemLine do begin
-            CreateServiceItemLine.InsertData(
-              "Document Type"::Order, XSO000003, 10000, '30', XINPROCESS, '7', '7', '776', '1', 12, 19030109D, 132000T, 0D, 0T, 0D, 0T, '', '');
-            CreateServiceItemLine.InsertData(
-              "Document Type"::Order, XSO000003, 20000, '31', XINPROCESS, '7', '7', '776', '1', 12, 19030109D, 132000T, 0D, 0T, 0D, 0T, '', '');
-            CreateServiceItemLine.InsertData(
-              "Document Type"::Order, XSO000003, 30000, '32', XINPROCESS, '7', '7', '776', '1', 12, 19030109D, 132000T, 0D, 0T, 0D, 0T, '', '');
-            CreateServiceItemLine.InsertData(
-              "Document Type"::Order, XSO000004, 10000, '36', XINPROCESS, '7', '8', '781', '2', 12, 19030110D, 132400T, 0D, 0T, 0D, 0T, '', '');
-            CreateServiceItemLine.InsertData(
-              "Document Type"::Order, XSO000005, 10000, '33', XINPROCESS, '7', '1', '71A', 'Z', 12, 19030110D, 142000T, 0D, 0T, 0D, 0T, '', '');
-            CreateServiceItemLine.InsertData(
-              "Document Type"::Order, XSO000006, 10000, '41', XINPROCESS, '', '', '', '', 8, 19030123D, 092900T, 0D, 0T, 0D, 0T, '', '');
-            CreateServiceItemLine.InsertData(
-              "Document Type"::Order, XSO000007, 10000, '35', XINPROCESS, '', '', '', '', 8, 19030119D, 092400T, 0D, 0T, 0D, 0T, '', '');
-            CreateServiceItemLine.InsertData(
-              "Document Type"::Order, XSO000008, 10000, '36', XINPROCESS, '7', '1', '71A', 'Z', 12, 19030120D, 133500T, 0D, 0T, 0D, 0T, '', '');
-        end;
-        with ServInvLine do begin
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000003, 10000, 10000, '30', '', Type::Resource, XMarty, '', false, 1, 1, 54, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000003, 20000, 20000, '31', '', Type::Resource, XMarty, '', false, 1, 1, 54, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000003, 30000, 30000, '32', '', Type::Resource, XMarty, '', false, 1, 1, 54, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000004, 10000, 10000, '36', '', Type::Resource, XMarty, '', false, 2, 2, 54, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000005, 10000, 10000, '33', '', Type::Resource, XTerry, '', false, 2.5, 2.5, 54, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000005, 20000, 10000, '33', '', Type::Item, '80026', '', false, 1, 1, 20.4, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000006, 10000, 10000, '41', '', Type::Resource, XTerry, '', false, 1.5, 1.5, 54, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000006, 20000, 10000, '41', '', Type::Item, '80206', '', false, 1, 1, 1.4, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000007, 10000, 10000, '35', '', Type::Resource, XMarty, '', false, 2, 2, 54, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000007, 20000, 10000, '35', '', Type::Item, '80210', '', false, 1, 1, 32.7, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000008, 10000, 10000, '36', '', Type::Resource, XTerry, '', false, 2.5, 2.5, 54, true, 0,
-              "Price Adjmt. Status"::" ");
-            CreateServiceInvoiceLine.InsertData(
-              "Document Type"::Order, XSO000008, 20000, 10000, '36', '', Type::Item, '80026', '', false, 1, 1, 20.4, true, 0,
-              "Price Adjmt. Status"::" ");
-        end;
+        CreateServiceHeader.InsertData(ServHeader."Document Type"::Order, XSO000003, ServHeader.Priority::Low, '40000', '', '40000', '', '', 19030106D, 102021T,
+          0D, 0D, 0T, 0D, 0T);
+        CreateServiceHeader.InsertData(ServHeader."Document Type"::Order, XSO000004, ServHeader.Priority::Low, '50000', '', '50000', '', '', 19030109D, 102421T,
+          0D, 0D, 0T, 0D, 0T);
+        CreateServiceHeader.InsertData(ServHeader."Document Type"::Order, XSO000005, ServHeader.Priority::Low, '40000', '', '40000', '', '', 19030109D, 152021T,
+          0D, 0D, 0T, 0D, 0T);
+        CreateServiceHeader.InsertData(ServHeader."Document Type"::Order, XSO000006, ServHeader.Priority::Low, '30000', '', '30000', '', '', 19030120D, 142921T,
+          0D, 0D, 0T, 0D, 0T);
+        CreateServiceHeader.InsertData(ServHeader."Document Type"::Order, XSO000007, ServHeader.Priority::Low, '40000', '', '40000', '', '', 19030118D, 172021T,
+          0D, 0D, 0T, 0D, 0T);
+        CreateServiceHeader.InsertData(ServHeader."Document Type"::Order, XSO000008, ServHeader.Priority::Low, '50000', '', '50000', '', '', 19030119D, 103521T,
+          0D, 0D, 0T, 0D, 0T);
+        CreateServiceItemLine.InsertData(
+          ServItemLine."Document Type"::Order, XSO000003, 10000, '30', XINPROCESS, '7', '7', '776', '1', 12, 19030109D, 132000T, 0D, 0T, 0D, 0T, '', '');
+        CreateServiceItemLine.InsertData(
+          ServItemLine."Document Type"::Order, XSO000003, 20000, '31', XINPROCESS, '7', '7', '776', '1', 12, 19030109D, 132000T, 0D, 0T, 0D, 0T, '', '');
+        CreateServiceItemLine.InsertData(
+          ServItemLine."Document Type"::Order, XSO000003, 30000, '32', XINPROCESS, '7', '7', '776', '1', 12, 19030109D, 132000T, 0D, 0T, 0D, 0T, '', '');
+        CreateServiceItemLine.InsertData(
+          ServItemLine."Document Type"::Order, XSO000004, 10000, '36', XINPROCESS, '7', '8', '781', '2', 12, 19030110D, 132400T, 0D, 0T, 0D, 0T, '', '');
+        CreateServiceItemLine.InsertData(
+          ServItemLine."Document Type"::Order, XSO000005, 10000, '33', XINPROCESS, '7', '1', '71A', 'Z', 12, 19030110D, 142000T, 0D, 0T, 0D, 0T, '', '');
+        CreateServiceItemLine.InsertData(
+          ServItemLine."Document Type"::Order, XSO000006, 10000, '41', XINPROCESS, '', '', '', '', 8, 19030123D, 092900T, 0D, 0T, 0D, 0T, '', '');
+        CreateServiceItemLine.InsertData(
+          ServItemLine."Document Type"::Order, XSO000007, 10000, '35', XINPROCESS, '', '', '', '', 8, 19030119D, 092400T, 0D, 0T, 0D, 0T, '', '');
+        CreateServiceItemLine.InsertData(
+          ServItemLine."Document Type"::Order, XSO000008, 10000, '36', XINPROCESS, '7', '1', '71A', 'Z', 12, 19030120D, 133500T, 0D, 0T, 0D, 0T, '', '');
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000003, 10000, 10000, '30', '', ServInvLine.Type::Resource, XMarty, '', false, 1, 1, 54, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000003, 20000, 20000, '31', '', ServInvLine.Type::Resource, XMarty, '', false, 1, 1, 54, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000003, 30000, 30000, '32', '', ServInvLine.Type::Resource, XMarty, '', false, 1, 1, 54, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000004, 10000, 10000, '36', '', ServInvLine.Type::Resource, XMarty, '', false, 2, 2, 54, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000005, 10000, 10000, '33', '', ServInvLine.Type::Resource, XTerry, '', false, 2.5, 2.5, 54, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000005, 20000, 10000, '33', '', ServInvLine.Type::Item, '80026', '', false, 1, 1, 20.4, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000006, 10000, 10000, '41', '', ServInvLine.Type::Resource, XTerry, '', false, 1.5, 1.5, 54, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000006, 20000, 10000, '41', '', ServInvLine.Type::Item, '80206', '', false, 1, 1, 1.4, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000007, 10000, 10000, '35', '', ServInvLine.Type::Resource, XMarty, '', false, 2, 2, 54, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000007, 20000, 10000, '35', '', ServInvLine.Type::Item, '80210', '', false, 1, 1, 32.7, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000008, 10000, 10000, '36', '', ServInvLine.Type::Resource, XTerry, '', false, 2.5, 2.5, 54, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
+        CreateServiceInvoiceLine.InsertData(
+          ServInvLine."Document Type"::Order, XSO000008, 20000, 10000, '36', '', ServInvLine.Type::Item, '80026', '', false, 1, 1, 20.4, true, 0,
+          ServInvLine."Price Adjmt. Status"::" ");
 
         SalesHeader.Reset();
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Invoice);
@@ -255,7 +249,7 @@ codeunit 117000 "Interface Service Management"
                 InvoiceSales(SalesHeader);
             until SalesHeader.Next() = 0;
 
-        ChangeLogDates;
+        ChangeLogDates();
     end;
 
     procedure RunCodeunit(CodeunitID: Integer)

@@ -3,7 +3,7 @@ codeunit 160001 "Create Demo Data eVAT"
 
     trigger OnRun()
     begin
-        InsertSetup;
+        InsertSetup();
 
         InsertVATCategory(X1A1, 3, 3, 0, 0, 0, 0, true);
         InsertVATCategory(X1A2, 3, 6, 0, 0, 0, 0, true);
@@ -52,7 +52,6 @@ codeunit 160001 "Create Demo Data eVAT"
         X4B2: Label '4B-2';
         X5A: Label '5A';
         X5B: Label '5B';
-        X5C: Label '5C';
         X5D: Label '5D';
         X5E: Label '5E';
         X5F: Label '5F';

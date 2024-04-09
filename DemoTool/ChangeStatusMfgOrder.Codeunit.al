@@ -17,10 +17,8 @@ codeunit 119072 "Change Status Mfg. Order"
 
     procedure ChangeStatus(Type: Integer; ProductionOrderNo: Code[20]; NewStatus: Enum "Production Order Status"; PostingDate: Date)
     begin
-        with ProductionOrder do begin
-            Get(Type, ProductionOrderNo);
-            ProdOrderChangeStatus.ChangeProdOrderStatus(ProductionOrder, NewStatus, MakeAdjustments.AdjustDate(PostingDate), false);
-        end;
+        ProductionOrder.Get(Type, ProductionOrderNo);
+        ProdOrderChangeStatus.ChangeProdOrderStatus(ProductionOrder, NewStatus, MakeAdjustments.AdjustDate(PostingDate), false);
     end;
 }
 

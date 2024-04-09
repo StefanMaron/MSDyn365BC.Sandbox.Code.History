@@ -6,21 +6,21 @@ codeunit 160000 "Create Local Funct. Demo Data"
         DemoDataSetup.Get();
 
         UpdateGLSetup();
-        CreatePostCodeRanges;
+        CreatePostCodeRanges();
         if DemoDataSetup."Data Type" <> DemoDataSetup."Data Type"::Standard then begin
-            CreateBankAcctPostingGrps;
-            CreateBankAccounts;
-            CreateTransactionModes;
-            CreateExportProtocols;
-            CreateImportProtocols;
-            CreateCustomerBanks;
-            CreateVendorBanks;
-            CreateGenJnlTemplates;
-            UpdateCustomers;
-            UpdateVendors;
-            UpdateBanks;
+            CreateBankAcctPostingGrps();
+            CreateBankAccounts();
+            CreateTransactionModes();
+            CreateExportProtocols();
+            CreateImportProtocols();
+            CreateCustomerBanks();
+            CreateVendorBanks();
+            CreateGenJnlTemplates();
+            UpdateCustomers();
+            UpdateVendors();
+            UpdateBanks();
         end;
-        CreateFreelyTransfMaximums;
+        CreateFreelyTransfMaximums();
     end;
 
     var
@@ -69,7 +69,6 @@ codeunit 160000 "Create Local Funct. Demo Data"
         XGIRO0001: Label 'GIRO0001';
         CreateBankAcct: Codeunit "Create Bank Account";
         CreateBankAcctPostGrp: Codeunit "Create Bank Acc. Posting Group";
-        CreateCountry: Codeunit "Create Country/Region";
         LastNoSeries: Code[20];
         XDamrak1: Label 'Damrak 1';
         X1012LX: Label '1012 LX';
@@ -82,7 +81,6 @@ codeunit 160000 "Create Local Funct. Demo Data"
         XRABOUSD: Label 'RABO-USD';
         XDeBrug12: Label 'De Brug 12';
         XMargrietKanters: Label 'Margriet Kanters';
-        XLU: Label 'LU';
         XSEPACAMT: Label 'SEPA CAMT';
         XSEPACAMTDesc: Label 'SEPA CAMT Bank Statements';
         XGenericSEPATxt: Label 'Generic SEPA';
@@ -206,92 +204,90 @@ codeunit 160000 "Create Local Funct. Demo Data"
     var
         TransactionMode: Record "Transaction Mode";
     begin
-        with TransactionMode do begin
-            CreateTransactionMode(
-              XRABOBBV,
-              "Account Type"::Vendor,
-              XPaymentVendor,
-              XABNUSD,
-              XIDENTIFIC,
-              XTelebankIdentification,
-              XRUNNO,
-              XTelebankRunNos,
-              XPAYMTPROC,
-              XPaymentsInProcess,
-              XPAYMTPROC,
-              XPaymentsInProcess,
-              '1612', XPaymentsInProcess,
-              '1180', XPaymtsReceiptsInProcess,
-              XBBV);
+        CreateTransactionMode(
+            XRABOBBV,
+            TransactionMode."Account Type"::Vendor,
+            XPaymentVendor,
+            XABNUSD,
+            XIDENTIFIC,
+            XTelebankIdentification,
+            XRUNNO,
+            XTelebankRunNos,
+            XPAYMTPROC,
+            XPaymentsInProcess,
+            XPAYMTPROC,
+            XPaymentsInProcess,
+            '1612', XPaymentsInProcess,
+            '1180', XPaymtsReceiptsInProcess,
+            XBBV);
 
-            CreateTransactionMode(
-              XPOSTBANK,
-              "Account Type"::Vendor,
-              XPaymentVendor,
-              XPOSTBANK,
-              XIDENTIFIC,
-              XTelebankIdentification,
-              XRUNNO,
-              XTelebankRunNos,
-              XPAYMTPROC,
-              XPaymentsInProcess,
-              XPAYMTPROC,
-              XPaymentsInProcess,
-              '1612', XPaymentsInProcess,
-              '1180', XPaymtsReceiptsInProcess,
-              XBTL91);
+        CreateTransactionMode(
+          XPOSTBANK,
+          TransactionMode."Account Type"::Vendor,
+          XPaymentVendor,
+          XPOSTBANK,
+          XIDENTIFIC,
+          XTelebankIdentification,
+          XRUNNO,
+          XTelebankRunNos,
+          XPAYMTPROC,
+          XPaymentsInProcess,
+          XPAYMTPROC,
+          XPaymentsInProcess,
+          '1612', XPaymentsInProcess,
+          '1180', XPaymtsReceiptsInProcess,
+          XBTL91);
 
-            CreateTransactionMode(
-              XABN,
-              "Account Type"::Vendor,
-              XPaymentVendor,
-              XABN,
-              XIDENTIFIC,
-              XTelebankIdentification,
-              XRUNNO,
-              XTelebankRunNos,
-              XPAYMTPROC,
-              XPaymentsInProcess,
-              XPAYMTPROC,
-              XPaymentsInProcess,
-              '1612', XPaymentsInProcess,
-              '1180', XPaymtsReceiptsInProcess,
-              XBTL91);
+        CreateTransactionMode(
+          XABN,
+          TransactionMode."Account Type"::Vendor,
+          XPaymentVendor,
+          XABN,
+          XIDENTIFIC,
+          XTelebankIdentification,
+          XRUNNO,
+          XTelebankRunNos,
+          XPAYMTPROC,
+          XPaymentsInProcess,
+          XPAYMTPROC,
+          XPaymentsInProcess,
+          '1612', XPaymentsInProcess,
+          '1180', XPaymtsReceiptsInProcess,
+          XBTL91);
 
-            CreateTransactionMode(
-              XABNBTL,
-              "Account Type"::Vendor,
-              XPaymentVendor,
-              XABN,
-              XIDENTIFIC,
-              XTelebankIdentification,
-              XRUNNO,
-              XTelebankRunNos,
-              XPAYMTPROC,
-              XPaymentsInProcess,
-              XPAYMTPROC,
-              XPaymentsInProcess,
-              '1612', XPaymentsInProcess,
-              '1180', XPaymtsReceiptsInProcess,
-              XBTL91);
+        CreateTransactionMode(
+          XABNBTL,
+          TransactionMode."Account Type"::Vendor,
+          XPaymentVendor,
+          XABN,
+          XIDENTIFIC,
+          XTelebankIdentification,
+          XRUNNO,
+          XTelebankRunNos,
+          XPAYMTPROC,
+          XPaymentsInProcess,
+          XPAYMTPROC,
+          XPaymentsInProcess,
+          '1612', XPaymentsInProcess,
+          '1180', XPaymtsReceiptsInProcess,
+          XBTL91);
 
-            CreateTransactionMode(
-              XABN,
-              "Account Type"::Customer,
-              XCollectionCustomers,
-              XABN,
-              XIDENTIFIC,
-              XTelebankIdentification,
-              XRUNNO,
-              XTelebankRunNos,
-              XRECPTPROC,
-              XReceiptsInProcess,
-              XRECPTPROC,
-              XReceiptsInProcess,
-              '1312', XCollectionInProcess,
-              '1180', XPaymtsReceiptsInProcess,
-              XBTL91);
-        end;
+        CreateTransactionMode(
+          XABN,
+          TransactionMode."Account Type"::Customer,
+          XCollectionCustomers,
+          XABN,
+          XIDENTIFIC,
+          XTelebankIdentification,
+          XRUNNO,
+          XTelebankRunNos,
+          XRECPTPROC,
+          XReceiptsInProcess,
+          XRECPTPROC,
+          XReceiptsInProcess,
+          '1312', XCollectionInProcess,
+          '1180', XPaymtsReceiptsInProcess,
+          XBTL91);
     end;
 
     procedure CreateTransactionMode("Code": Code[10]; AcctType: Option Klant,Leverancier; Omschrijving: Text[30]; Bank: Code[10]; KenmerkReeks: Code[10]; KenmerkReeksOmschrijving: Text[30]; Runnummerreeks: Code[10]; RunnummerreeksOmschrijving: Text[30]; StuknrReeks: Code[10]; StuknrReeksOmschrijving: Text[30]; Broncode: Code[20]; BroncodeOmschrijving: Text[30]; RekBetOdw: Code[20]; RekBetOdwTekst: Text[30]; RekBetOdwTegen: Code[10]; RekBetOdwTegenTekst: Text[30]; VerzProtocol: Code[20])
@@ -490,12 +486,10 @@ codeunit 160000 "Create Local Funct. Demo Data"
     var
         Cust: Record Customer;
     begin
-        with Cust do begin
-            Get(CustNo);
-            "Transaction Mode Code" := TransactionMode;
-            "Preferred Bank Account Code" := BankAcct;
-            Modify();
-        end;
+        Cust.Get(CustNo);
+        Cust."Transaction Mode Code" := TransactionMode;
+        Cust."Preferred Bank Account Code" := BankAcct;
+        Cust.Modify();
     end;
 
     procedure UpdateVendors()
@@ -516,12 +510,10 @@ codeunit 160000 "Create Local Funct. Demo Data"
     var
         Vend: Record Vendor;
     begin
-        with Vend do begin
-            Get(VendNo);
-            "Transaction Mode Code" := TransactionMode;
-            "Preferred Bank Account Code" := BankAcct;
-            Modify();
-        end;
+        Vend.Get(VendNo);
+        Vend."Transaction Mode Code" := TransactionMode;
+        Vend."Preferred Bank Account Code" := BankAcct;
+        Vend.Modify();
     end;
 
     procedure UpdateGLSetup()
@@ -577,39 +569,37 @@ codeunit 160000 "Create Local Funct. Demo Data"
         GenJnlTemplate: Record "Gen. Journal Template";
     begin
         DemoDataSetup.Get();
-        with GenJnlTemplate do begin
 
-            if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
-                CreateGenJnlTemplate(XCASH, XCashJournal, Type::Cash, XCASHJNL, XCASH, XCashJournal, XCASH0001, '', "Bal. Account Type"::"G/L Account", X1000)
-            else
-                CreateGenJnlTemplate(XCASH, XCashJournal, Type::Cash, XCASHJNL, XCASH, XCashJournal, XCASH0001, '', "Bal. Account Type"::"G/L Account", CreateGLAccount.PettyCash());
+        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
+            CreateGenJnlTemplate(XCASH, XCashJournal, GenJnlTemplate.Type::Cash, XCASHJNL, XCASH, XCashJournal, XCASH0001, '', GenJnlTemplate."Bal. Account Type"::"G/L Account", X1000)
+        else
+            CreateGenJnlTemplate(XCASH, XCashJournal, GenJnlTemplate.Type::Cash, XCASHJNL, XCASH, XCashJournal, XCASH0001, '', GenJnlTemplate."Bal. Account Type"::"G/L Account", CreateGLAccount.PettyCash());
 
-            CreateGenJnlTemplate(
-              XABN,
-              XABNBankJournal,
-              Type::Bank,
-              XABNBANKJNL,
-              XABNBANKJNL,
-              XABNBankJournal,
-              XABNBANK0001,
-              '',
-              "Bal. Account Type"::"Bank Account",
-              XABN);
-            CreateGenJnlTemplate(
-              XPOSTBANK,
-              XGiroJournal,
-              Type::Bank,
-              XGIROJNL,
-              XGIROJNL,
-              XGiroJournal,
-              XGIRO0001,
-              '',
-              "Bal. Account Type"::"Bank Account",
-              XPOSTBANK);
-        end;
+        CreateGenJnlTemplate(
+          XABN,
+          XABNBankJournal,
+          GenJnlTemplate.Type::Bank,
+          XABNBANKJNL,
+          XABNBANKJNL,
+          XABNBankJournal,
+          XABNBANK0001,
+          '',
+          GenJnlTemplate."Bal. Account Type"::"Bank Account",
+          XABN);
+        CreateGenJnlTemplate(
+          XPOSTBANK,
+          XGiroJournal,
+          GenJnlTemplate.Type::Bank,
+          XGIROJNL,
+          XGIROJNL,
+          XGiroJournal,
+          XGIRO0001,
+          '',
+          GenJnlTemplate."Bal. Account Type"::"Bank Account",
+          XPOSTBANK);
     end;
 
-    procedure CreateGenJnlTemplate(Name: Code[10]; Description: Text[80]; Type: Option; SourceCode2: Code[10]; NoSeries: Code[20]; NoSeriesDesc: Text[30]; NoSeriesStartNo: Code[20]; NoSeriesEndNo: Code[20]; BalAcctType: Option; BalAcctNo: Code[20])
+    procedure CreateGenJnlTemplate(Name: Code[10]; Description: Text[80]; Type: Enum "Gen. Journal Template Type"; SourceCode2: Code[10]; NoSeries: Code[20]; NoSeriesDesc: Text[30]; NoSeriesStartNo: Code[20]; NoSeriesEndNo: Code[20]; BalAcctType: Enum "Gen. Journal Account Type"; BalAcctNo: Code[20])
     var
         SourceCode: Record "Source Code";
         GenJnlTemplate: Record "Gen. Journal Template";

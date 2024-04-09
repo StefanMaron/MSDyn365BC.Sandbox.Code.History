@@ -683,9 +683,6 @@ report 20 "Calc. and Post VAT Settlement"
     begin
         OnBeforePreReport("VAT Posting Setup", PostSettlement, GLAccSettle);
 
-        if CurrReport.Preview() then
-            PostSettlement := false;
-
         if PostingDate = 0D then
             Error(Text000);
 
@@ -860,21 +857,19 @@ report 20 "Calc. and Post VAT Settlement"
 
     local procedure CopyAmounts(var GenJournalLine: Record "Gen. Journal Line"; VATEntry: Record "VAT Entry")
     begin
-        with GenJournalLine do begin
-            Amount := -VATEntry.Amount;
-            "VAT Amount" := -VATEntry.Amount;
-            "VAT Base Amount" := -VATEntry.Base;
-            "Source Currency Code" := GLSetup."Additional Reporting Currency";
-            "Source Currency Amount" := -VATEntry."Additional-Currency Amount";
-            "Source Curr. VAT Amount" := -VATEntry."Additional-Currency Amount";
-            "Source Curr. VAT Base Amount" := -VATEntry."Additional-Currency Base";
-            "Non-Deductible VAT Amount" := -VATEntry."Non-Deductible VAT Amount";
-            "Non-Deductible VAT Amount LCY" := -VATEntry."Non-Deductible VAT Amount";
-            "Non-Deductible VAT Amount ACY" := -VATEntry."Non-Deductible VAT Amount ACY";
-            "Non-Deductible VAT Base" := -VATEntry."Non-Deductible VAT Base";
-            "Non-Deductible VAT Base LCY" := -VATEntry."Non-Deductible VAT Base";
-            "Non-Deductible VAT Base ACY" := -VATEntry."Non-Deductible VAT Base ACY";
-        end;
+        GenJournalLine.Amount := -VATEntry.Amount;
+        GenJournalLine."VAT Amount" := -VATEntry.Amount;
+        GenJournalLine."VAT Base Amount" := -VATEntry.Base;
+        GenJournalLine."Source Currency Code" := GLSetup."Additional Reporting Currency";
+        GenJournalLine."Source Currency Amount" := -VATEntry."Additional-Currency Amount";
+        GenJournalLine."Source Curr. VAT Amount" := -VATEntry."Additional-Currency Amount";
+        GenJournalLine."Source Curr. VAT Base Amount" := -VATEntry."Additional-Currency Base";
+        GenJournalLine."Non-Deductible VAT Amount" := -VATEntry."Non-Deductible VAT Amount";
+        GenJournalLine."Non-Deductible VAT Amount LCY" := -VATEntry."Non-Deductible VAT Amount";
+        GenJournalLine."Non-Deductible VAT Amount ACY" := -VATEntry."Non-Deductible VAT Amount ACY";
+        GenJournalLine."Non-Deductible VAT Base" := -VATEntry."Non-Deductible VAT Base";
+        GenJournalLine."Non-Deductible VAT Base LCY" := -VATEntry."Non-Deductible VAT Base";
+        GenJournalLine."Non-Deductible VAT Base ACY" := -VATEntry."Non-Deductible VAT Base ACY";
         OnAfterCopyAmounts(GenJournalLine, VATEntry);
     end;
 

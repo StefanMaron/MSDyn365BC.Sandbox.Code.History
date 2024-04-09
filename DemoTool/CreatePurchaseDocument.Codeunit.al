@@ -91,18 +91,18 @@ codeunit 122003 "Create Purchase Document"
         CurrentPurchaseHeader."Your Reference" := OpenDocMarker;
         AddInvoiceHeader('10000', CalcDate('<+1W>', FromDate));
         AddLine('1928-S', 5);
-        UpdateInvoiceHeaderAmounts;
+        UpdateInvoiceHeaderAmounts();
 
         AddInvoiceHeader('20000', CalcDate('<+9D>', FromDate));
         AddLine('1900-S', 5);
         AddLine('1964-S', 7);
-        UpdateInvoiceHeaderAmounts;
+        UpdateInvoiceHeaderAmounts();
 
         AddInvoiceHeader('30000', CalcDate('<+1M>', FromDate));
         AddLine('1968-S', 5);
         AddLine('1972-S', 9);
         AddLine('1996-S', 2);
-        UpdateInvoiceHeaderAmounts;
+        UpdateInvoiceHeaderAmounts();
     end;
 
     procedure CreatePurchaseOrders(FromDate: Date; OpenDocMarker: Text[35])
@@ -149,14 +149,13 @@ codeunit 122003 "Create Purchase Document"
 
     procedure UpdateInvoiceHeaderAmounts()
     begin
-        with CurrentPurchaseHeader do
-            if ("Document Type" in ["Document Type"::Invoice, "Document Type"::"Credit Memo"]) and ("No." <> '') then begin
-                Find();
-                CalcFields(Amount, "Amount Including VAT");
-                Validate("Doc. Amount Incl. VAT", "Amount Including VAT");
-                Validate("Doc. Amount VAT", "Amount Including VAT" - Amount);
-                Modify(true);
-            end;
+        if (CurrentPurchaseHeader."Document Type" in [CurrentPurchaseHeader."Document Type"::Invoice, CurrentPurchaseHeader."Document Type"::"Credit Memo"]) and (CurrentPurchaseHeader."No." <> '') then begin
+            CurrentPurchaseHeader.Find();
+            CurrentPurchaseHeader.CalcFields(Amount, "Amount Including VAT");
+            CurrentPurchaseHeader.Validate("Doc. Amount Incl. VAT", CurrentPurchaseHeader."Amount Including VAT");
+            CurrentPurchaseHeader.Validate("Doc. Amount VAT", CurrentPurchaseHeader."Amount Including VAT" - CurrentPurchaseHeader.Amount);
+            CurrentPurchaseHeader.Modify(true);
+        end;
     end;
 }
 

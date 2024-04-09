@@ -6,45 +6,40 @@ codeunit 101998 "Create Customer Template"
     end;
 
     var
-        xCashDescriptionTxt: Label 'Cash-Payment / Retail Customer (Cash)', Comment = 'Translate.';
         DemoDataSetup: Record "Demo Data Setup";
         Customer: Record Customer;
+        CreateTemplateHelper: Codeunit "Create Template Helper";
+        xCashDescriptionTxt: Label 'Cash-Payment / Retail Customer (Cash)', Comment = 'Translate.';
         xBusinessDescriptionTxt: Label 'Business-to-Business Customer (Bank)', Comment = 'Translate.';
         xManualTxt: Label 'Manual';
         xCODTxt: Label 'COD';
         X1M8DTxt: Label '1M(8D)';
         xBANKTxt: Label 'BANK', Comment = 'To be translated.';
         xCASHCAPTxt: Label 'CASH', Comment = 'Translated.';
-        CreateTemplateHelper: Codeunit "Create Template Helper";
         xCUSTCOMPNYTxt: Label 'CUSTCOMPNY', Comment = 'Stands for Customer Company, keep capitalized.';
         xCUSTPERSONTxt: Label 'CUSTPERSON', Comment = 'Stands for Customer Person, keep capitalized.';
 
     procedure InsertMiniAppData()
     var
         ConfigTemplateHeader: Record "Config. Template Header";
-        CreateTemplateHelper: Codeunit "Create Template Helper";
     begin
-        with DemoDataSetup do begin
-            Get();
+        DemoDataSetup.Get();
+        // Business customer template
+        InsertTemplate(ConfigTemplateHeader,
+          xBusinessDescriptionTxt, DemoDataSetup."Country/Region Code", DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), xCUSTCOMPNYTxt, true, false,
+          Customer."Contact Type"::Company, false);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X1M8DTxt, xBANKTxt, '', '', true);
+        // Cash-Payment/Retail Customer customer template
+        InsertTemplate(ConfigTemplateHeader,
+          GetCustomerTemplateDescriptionCashCustomer(), DemoDataSetup."Country/Region Code", DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(),
+          xCUSTPERSONTxt, true, true, Customer."Contact Type"::Person, false);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, xCODTxt, xCASHCAPTxt, '', '', true);
 
-            // Business customer template
-            InsertTemplate(ConfigTemplateHeader,
-              xBusinessDescriptionTxt, "Country/Region Code", DomesticCode, DomesticCode, DomesticCode, xCUSTCOMPNYTxt, true, false,
-              Customer."Contact Type"::Company, false);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X1M8DTxt, xBANKTxt, '', '', true);
-
-            // Cash-Payment/Retail Customer customer template
-            InsertTemplate(ConfigTemplateHeader,
-              GetCustomerTemplateDescriptionCashCustomer, "Country/Region Code", DomesticCode, DomesticCode, DomesticCode,
-              xCUSTPERSONTxt, true, true, Customer."Contact Type"::Person, false);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, xCODTxt, xCASHCAPTxt, '', '', true);
-
-            CreateTemplateHelper.CreateTemplateSelectionRule(
-              DATABASE::Customer, ConfigTemplateHeader.Code, '', 0, 0);
-        end;
+        CreateTemplateHelper.CreateTemplateSelectionRule(
+          DATABASE::Customer, ConfigTemplateHeader.Code, '', 0, 0);
     end;
 
-    local procedure InsertTemplate(var ConfigTemplateHeader: Record "Config. Template Header"; Description: Text[50]; CountryCode: Code[10]; GenBusGroup: Code[20]; VATBusGroup: Code[20]; CustomerGroup: Code[20]; TemplateHeaderCode: Code[10]; AlowLine: Boolean; PriceWithVAT: Boolean; CustomerContactType: Option Company,Person; ValidateEUVatRegNo: Boolean)
+    local procedure InsertTemplate(var ConfigTemplateHeader: Record "Config. Template Header"; Description: Text[50]; CountryCode: Code[10]; GenBusGroup: Code[20]; VATBusGroup: Code[20]; CustomerGroup: Code[20]; TemplateHeaderCode: Code[10]; AlowLine: Boolean; PriceWithVAT: Boolean; CustomerContactType: Enum "Contact Type"; ValidateEUVatRegNo: Boolean)
     begin
         CreateTemplateHelper.CreateTemplateHeader(
           ConfigTemplateHeader, TemplateHeaderCode, Description, DATABASE::Customer);

@@ -133,7 +133,7 @@ codeunit 146027 Test_DotNet_StreamReader
         if Codepage > 0 then
             DotNet_Encoding.Encoding(Codepage)
         else
-            DotNet_Encoding.UTF8;
+            DotNet_Encoding.UTF8();
 
         DotNet_StreamReader.StreamReader(InputStream, DotNet_Encoding);
         ResultText := DotNet_StreamReader.ReadToEnd();
@@ -153,14 +153,14 @@ codeunit 146027 Test_DotNet_StreamReader
         if Codepage > 0 then
             DotNet_Encoding.Encoding(Codepage)
         else
-            DotNet_Encoding.UTF8;
+            DotNet_Encoding.UTF8();
 
         DotNet_StreamReader.StreamReader(InputStream, DotNet_Encoding);
         LineCount := 0;
         ResultText := '';
         repeat
-            CurrentLine := DotNet_StreamReader.ReadLine;
-            LineIsEmpty := (CurrentLine = '') and DotNet_StreamReader.EndOfStream;
+            CurrentLine := DotNet_StreamReader.ReadLine();
+            LineIsEmpty := (CurrentLine = '') and DotNet_StreamReader.EndOfStream();
             if not LineIsEmpty then begin
                 LineCount += 1;
                 ResultText += CurrentLine;
@@ -168,7 +168,7 @@ codeunit 146027 Test_DotNet_StreamReader
         until LineIsEmpty;
 
         DotNet_StreamReader.CurrentEncoding(DotNet_Encoding);
-        StreamCodepage := DotNet_Encoding.Codepage;
+        StreamCodepage := DotNet_Encoding.Codepage();
         DotNet_StreamReader.Close();
         DotNet_StreamReader.Dispose();
     end;

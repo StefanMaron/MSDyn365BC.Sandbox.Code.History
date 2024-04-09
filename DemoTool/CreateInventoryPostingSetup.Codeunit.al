@@ -3,53 +3,51 @@ codeunit 101110 "Create Inventory Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
-                InsertData('', FinishedCode, '992120', '992121');
-                InsertData('', RawMatCode, '992130', '992131');
-                InsertData('', ResaleCode, '992110', '992111');
-                InsertData(XBLUE, FinishedCode, '992120', '992121');
-                InsertData(XBLUE, RawMatCode, '992130', '992131');
-                InsertData(XBLUE, ResaleCode, '992110', '992111');
-                InsertData(XGREEN, FinishedCode, '992120', '992121');
-                InsertData(XGREEN, RawMatCode, '992130', '992131');
-                InsertData(XGREEN, ResaleCode, '992110', '992111');
-                InsertData(XRED, FinishedCode, '992120', '992121');
-                InsertData(XRED, RawMatCode, '992130', '992131');
-                InsertData(XRED, ResaleCode, '992110', '992111');
-                InsertData(XYELLOW, FinishedCode, '992120', '992121');
-                InsertData(XYELLOW, RawMatCode, '992130', '992131');
-                InsertData(XYELLOW, ResaleCode, '992110', '992111');
-                InsertData(XWHITE, FinishedCode, '992120', '992121');
-                InsertData(XWHITE, RawMatCode, '992130', '992131');
-                InsertData(XWHITE, ResaleCode, '992110', '992111');
-                InsertData(XSILVER, FinishedCode, '992120', '992121');
-                InsertData(XSILVER, RawMatCode, '992130', '992131');
-                InsertData(XSILVER, ResaleCode, '992110', '992111');
-            end else begin
-                InsertData('', FinishedCode, CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
-                InsertData('', RawMatCode, CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
-                InsertData('', ResaleCode, CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
-                InsertData(XBLUE, FinishedCode, CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
-                InsertData(XBLUE, RawMatCode, CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
-                InsertData(XBLUE, ResaleCode, CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
-                InsertData(XGREEN, FinishedCode, CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
-                InsertData(XGREEN, RawMatCode, CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
-                InsertData(XGREEN, ResaleCode, CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
-                InsertData(XRED, FinishedCode, CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
-                InsertData(XRED, RawMatCode, CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
-                InsertData(XRED, ResaleCode, CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
-                InsertData(XYELLOW, FinishedCode, CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
-                InsertData(XYELLOW, RawMatCode, CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
-                InsertData(XYELLOW, ResaleCode, CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
-                InsertData(XWHITE, FinishedCode, CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
-                InsertData(XWHITE, RawMatCode, CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
-                InsertData(XWHITE, ResaleCode, CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
-                InsertData(XSILVER, FinishedCode, CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
-                InsertData(XSILVER, RawMatCode, CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
-                InsertData(XSILVER, ResaleCode, CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
+            InsertData('', DemoDataSetup.FinishedCode(), '992120', '992121');
+            InsertData('', DemoDataSetup.RawMatCode(), '992130', '992131');
+            InsertData('', DemoDataSetup.ResaleCode(), '992110', '992111');
+            InsertData(XBLUE, DemoDataSetup.FinishedCode(), '992120', '992121');
+            InsertData(XBLUE, DemoDataSetup.RawMatCode(), '992130', '992131');
+            InsertData(XBLUE, DemoDataSetup.ResaleCode(), '992110', '992111');
+            InsertData(XGREEN, DemoDataSetup.FinishedCode(), '992120', '992121');
+            InsertData(XGREEN, DemoDataSetup.RawMatCode(), '992130', '992131');
+            InsertData(XGREEN, DemoDataSetup.ResaleCode(), '992110', '992111');
+            InsertData(XRED, DemoDataSetup.FinishedCode(), '992120', '992121');
+            InsertData(XRED, DemoDataSetup.RawMatCode(), '992130', '992131');
+            InsertData(XRED, DemoDataSetup.ResaleCode(), '992110', '992111');
+            InsertData(XYELLOW, DemoDataSetup.FinishedCode(), '992120', '992121');
+            InsertData(XYELLOW, DemoDataSetup.RawMatCode(), '992130', '992131');
+            InsertData(XYELLOW, DemoDataSetup.ResaleCode(), '992110', '992111');
+            InsertData(XWHITE, DemoDataSetup.FinishedCode(), '992120', '992121');
+            InsertData(XWHITE, DemoDataSetup.RawMatCode(), '992130', '992131');
+            InsertData(XWHITE, DemoDataSetup.ResaleCode(), '992110', '992111');
+            InsertData(XSILVER, DemoDataSetup.FinishedCode(), '992120', '992121');
+            InsertData(XSILVER, DemoDataSetup.RawMatCode(), '992130', '992131');
+            InsertData(XSILVER, DemoDataSetup.ResaleCode(), '992110', '992111');
+        end else begin
+            InsertData('', DemoDataSetup.FinishedCode(), CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
+            InsertData('', DemoDataSetup.RawMatCode(), CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
+            InsertData('', DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
+            InsertData(XBLUE, DemoDataSetup.FinishedCode(), CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
+            InsertData(XBLUE, DemoDataSetup.RawMatCode(), CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
+            InsertData(XBLUE, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
+            InsertData(XGREEN, DemoDataSetup.FinishedCode(), CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
+            InsertData(XGREEN, DemoDataSetup.RawMatCode(), CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
+            InsertData(XGREEN, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
+            InsertData(XRED, DemoDataSetup.FinishedCode(), CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
+            InsertData(XRED, DemoDataSetup.RawMatCode(), CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
+            InsertData(XRED, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
+            InsertData(XYELLOW, DemoDataSetup.FinishedCode(), CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
+            InsertData(XYELLOW, DemoDataSetup.RawMatCode(), CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
+            InsertData(XYELLOW, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
+            InsertData(XWHITE, DemoDataSetup.FinishedCode(), CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
+            InsertData(XWHITE, DemoDataSetup.RawMatCode(), CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
+            InsertData(XWHITE, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
+            InsertData(XSILVER, DemoDataSetup.FinishedCode(), CreateGLAccount.FinishedGoods(), CreateGLAccount.FinishedGoods());
+            InsertData(XSILVER, DemoDataSetup.RawMatCode(), CreateGLAccount.RawMaterials(), CreateGLAccount.RawMaterials());
+            InsertData(XSILVER, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
         end;
     end;
 
@@ -81,25 +79,21 @@ codeunit 101110 "Create Inventory Posting Setup"
 
     procedure InsertMiniAppData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('', ResaleCode, CreateGLAccount.FinishedGoods(), '');
-        end;
+        DemoDataSetup.Get();
+        InsertData('', DemoDataSetup.ResaleCode(), CreateGLAccount.FinishedGoods(), '');
     end;
 
     procedure CreateEvaluationData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
-                InsertData(XMAIN, ResaleCode, '992110', '992111');
-                InsertData(XEAST, ResaleCode, '992110', '992111');
-                InsertData(XWEST, ResaleCode, '992110', '992111');
-            end else begin
-                InsertData(XMAIN, ResaleCode, CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
-                InsertData(XEAST, ResaleCode, CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
-                InsertData(XWEST, ResaleCode, CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
+            InsertData(XMAIN, DemoDataSetup.ResaleCode(), '992110', '992111');
+            InsertData(XEAST, DemoDataSetup.ResaleCode(), '992110', '992111');
+            InsertData(XWEST, DemoDataSetup.ResaleCode(), '992110', '992111');
+        end else begin
+            InsertData(XMAIN, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
+            InsertData(XEAST, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
+            InsertData(XWEST, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), CreateGLAccount.GoodsforResale());
         end;
     end;
 }

@@ -32,15 +32,13 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         CreateConfigWorksheet: Codeunit "Create Config. Worksheet";
     begin
-        with CreateConfigWorksheet do begin
-            CreateConfigGroup(XLocalSettingsTxt);
-            CreateConfigLine(DATABASE::"Freely Transferable Maximum");
-            CreateConfigLine(DATABASE::"Elec. Tax Declaration Setup");
-            CreateConfigLine(DATABASE::"Elec. Tax Decl. VAT Category");
-            CreateConfigLine(DATABASE::"Transaction Mode");
-            CreateConfigLine(DATABASE::"Export Protocol");
-            CreateConfigLine(DATABASE::"Import Protocol");
-        end;
+        CreateConfigWorksheet.CreateConfigGroup(XLocalSettingsTxt);
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Freely Transferable Maximum");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Elec. Tax Declaration Setup");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Elec. Tax Decl. VAT Category");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Transaction Mode");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Export Protocol");
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Import Protocol");
     end;
 
     procedure SetFieldsAndFilters(TableID: Integer)
@@ -60,8 +58,8 @@ codeunit 101931 "Create Local RapidStart Pack"
             DATABASE::"Transaction Mode":
                 CreateConfigPackageHelper.ValidateField(TransactionMode.FieldNo("Our Bank"), false);
             DATABASE::"Elec. Tax Declaration Setup":
-                if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Standard then
-                    SkipContactDataInElecTaxDeclSetup;
+                if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Standard then
+                    SkipContactDataInElecTaxDeclSetup();
         end;
     end;
 
@@ -69,7 +67,7 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         ElecTaxDeclarationSetup: Record "Elec. Tax Declaration Setup";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         CreateConfigPackageHelper.IncludeField(ElecTaxDeclarationSetup.FieldNo("VAT Declaration Nos."), true);
         CreateConfigPackageHelper.IncludeField(ElecTaxDeclarationSetup.FieldNo("ICP Declaration Nos."), true);
     end;

@@ -8,10 +8,10 @@ codeunit 130029 "Get Build Coverage"
     begin
         with GetCoverage do begin
             LookupMode := true;
-            if RunModal <> ACTION::LookupOK then
+            if RunModal() <> ACTION::LookupOK then
                 exit;
 
-            Initialize(GetFromDateTime, GetToDateTime, GetSnapQueueID, GetCountryCode, GetSdAppPath);
+            Initialize(GetFromDateTime(), GetToDateTime(), GetSnapQueueID(), GetCountryCode(), GetSdAppPath());
         end;
 
         MergedTestCoveragePath := UnzipAndCCMergeTestResults(SnapQueueID, CountryCode);
@@ -83,7 +83,7 @@ codeunit 130029 "Get Build Coverage"
         GetChangelistCode.ProcessChangeList(
           RunGetSDChanges(
             SdAppPath, ConvertDateTimeToSdDateTime(FromDateTime), ConvertDateTimeToSdDateTime(ToDateTime)));
-        GetChangelistCode.Cleanup;
+        GetChangelistCode.Cleanup();
 
         UpdateDoneWindow(1);
     end;
@@ -103,7 +103,7 @@ codeunit 130029 "Get Build Coverage"
           SystemDiagnosticsProcess,
           StrSubstNo(
             '%1%5 %1 -CoreXtBranch ''Main''; %1%6 -CheckinID ''%2'' -FileName ''%3'' -CountryCode ''%4''',
-            GetChangelistCode.GetSdClientPath,
+            GetChangelistCode.GetSdClientPath(),
             SnapQueueID,
             FileName,
             CountryCode,
@@ -111,19 +111,19 @@ codeunit 130029 "Get Build Coverage"
             'Eng\Normal\Tools\CALCodeCoverage\ProcessCoverageResults.ps1'));
 
         with SystemDiagnosticsProcess do begin
-            Start;
+            Start();
 
-            errorText := DelChr(StandardError.ReadToEnd, '<>', ' ');
+            errorText := DelChr(StandardError.ReadToEnd(), '<>', ' ');
 
-            WaitForExit;
+            WaitForExit();
 
-            Close;
+            Close();
         end;
 
         if errorText <> '' then
             Error(errorText);
 
-        FileName := GetChangelistCode.GetSdClientPath + 'App\ALCodeCoverage\' + SnapQueueID + '\' +
+        FileName := GetChangelistCode.GetSdClientPath() + 'App\ALCodeCoverage\' + SnapQueueID + '\' +
           CountryCode + '\' + FileName;
 
         UpdateDoneWindow(2);
@@ -135,13 +135,13 @@ codeunit 130029 "Get Build Coverage"
         SystemDiagnosticsProcess: DotNet Process;
         errorText: Text;
     begin
-        FileName := GetChangelistCode.GetSdClientPath + 'App\ALCodeCoverage\' + CountryCode + '\SDChanges.txt';
+        FileName := GetChangelistCode.GetSdClientPath() + 'App\ALCodeCoverage\' + CountryCode + '\SDChanges.txt';
 
         InitSd(
           SystemDiagnosticsProcess,
           StrSubstNo(
             '%1%6 %1 -CoreXtBranch ''Main''; %1%7 -SDFolder ''%2'' -FromDateTime ''%3'' -ToDateTime ''%4'' -OutputFile ''%5''',
-            GetChangelistCode.GetSdClientPath,
+            GetChangelistCode.GetSdClientPath(),
             SdAppPath,
             FromDateTime,
             ToDateTime,
@@ -150,13 +150,13 @@ codeunit 130029 "Get Build Coverage"
             'Build\Application\GetSDChanges.ps1'));
 
         with SystemDiagnosticsProcess do begin
-            Start;
+            Start();
 
-            errorText := DelChr(StandardError.ReadToEnd, '<>', ' ');
+            errorText := DelChr(StandardError.ReadToEnd(), '<>', ' ');
 
-            WaitForExit;
+            WaitForExit();
 
-            Close;
+            Close();
         end;
 
         if errorText <> '' then
@@ -166,7 +166,7 @@ codeunit 130029 "Get Build Coverage"
     local procedure InitSd(var SystemDiagnosticsProcess: DotNet Process; command: Text)
     begin
         with SystemDiagnosticsProcess do begin
-            SystemDiagnosticsProcess := Process;
+            SystemDiagnosticsProcess := Process();
             StartInfo.FileName('powershell.exe');
             StartInfo.Arguments(command);
             StartInfo.UseShellExecute := false;
@@ -230,10 +230,10 @@ codeunit 130029 "Get Build Coverage"
         with GetCoverage do begin
             Init(true);
             LookupMode := true;
-            if RunModal <> ACTION::LookupOK then
+            if RunModal() <> ACTION::LookupOK then
                 exit;
 
-            Initialize(0DT, 0DT, GetSnapQueueID, GetCountryCode, '');
+            Initialize(0DT, 0DT, GetSnapQueueID(), GetCountryCode(), '');
         end;
 
         MergedTestCoveragePath := UnzipAndCCMergeTestResults(SnapQueueID, CountryCode);
