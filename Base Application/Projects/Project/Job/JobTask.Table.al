@@ -1212,7 +1212,11 @@ table 1001 "Job Task"
     begin
         if not Job.Get("Job No.") then
             exit;
+
         if Job."Task Billing Method" = Job."Task Billing Method"::"One customer" then
+            exit;
+
+        if "Job Task Type" <> "Job Task Type"::Posting then
             exit;
 
         SetHideValidationDialog(true);
