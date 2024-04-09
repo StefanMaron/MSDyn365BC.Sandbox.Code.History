@@ -567,7 +567,7 @@
         Cancel(DATABASE::"Cust. Ledger Entry", PaymentNo, ResponseOption::Success);
 
         // [THEN] Payment has been canceled with MotivoCancelacion
-        Verify(DATABASE::"Cust. Ledger Entry", PaymentNo, StatusOption::Canceled, 0);
+        Verify(DATABASE::"Cust. Ledger Entry", PaymentNo, StatusOption::"Cancel In Progress", 0);
 
         CancelTearDown(DATABASE::"Cust. Ledger Entry", PaymentNo);
     end;
@@ -656,6 +656,7 @@
         SalesInvoiceHeader.Find();
         SalesInvoiceHeader.TestField("Electronic Document Status", SalesInvoiceHeader."Electronic Document Status"::"Cancel In Progress");
         SalesInvoiceHeader.TestField("Error Description");
+        SalesInvoiceHeader.TestField("Date/Time Canceled", ''); // (TFS 498662)
 
         CancelTearDown(DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.");
     end;
@@ -690,6 +691,7 @@
         SalesInvoiceHeader.Find();
         SalesInvoiceHeader.TestField("Electronic Document Status", SalesInvoiceHeader."Electronic Document Status"::"Cancel Error");
         SalesInvoiceHeader.TestField("Error Description");
+        SalesInvoiceHeader.TestField("Date/Time Canceled", ''); // (TFS 498662)
 
         CancelTearDown(DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.");
     end;
@@ -720,10 +722,11 @@
         LibraryVariableStorage.Enqueue(CancelOption::GetResponse);
         SalesInvoiceHeader.CancelEDocument();
 
-        // [THEN] 'Electronic Document Status' set to "Cancel Error", 'Error Description' = ''
+        // [THEN] 'Electronic Document Status' set to "Cancel Error", 'Error Description' = '', "Date/Time Canceled" is updated
         SalesInvoiceHeader.Find();
         SalesInvoiceHeader.TestField("Electronic Document Status", SalesInvoiceHeader."Electronic Document Status"::Canceled);
         SalesInvoiceHeader.TestField("Error Description", '');
+        SalesInvoiceHeader.TestField("Date/Time Canceled"); // The value assigned from xml. (TFS 498662)
         LibraryVariableStorage.AssertEmpty();
     end;
 
@@ -796,9 +799,11 @@
         SalesInvoiceHeader1.Find();
         SalesInvoiceHeader1.TestField("Electronic Document Status", SalesInvoiceHeader1."Electronic Document Status"::Canceled);
         SalesInvoiceHeader1.TestField("Error Description", '');
+        SalesInvoiceHeader1.TestField("Date/Time Canceled");
         SalesInvoiceHeader2.Find();
         SalesInvoiceHeader2.TestField("Electronic Document Status", SalesInvoiceHeader2."Electronic Document Status"::Canceled);
         SalesInvoiceHeader2.TestField("Error Description", '');
+        SalesInvoiceHeader2.TestField("Date/Time Canceled");
     end;
 
     [Test]
@@ -4111,10 +4116,10 @@
         // [WHEN] Cancel Sales Invoice
         Cancel(TableNo, DocumentNo, ResponseOption::Success);
 
-        // [THEN] Sales Invoice has 'Date/Time Sent' with offset 2h from current time
+        // [THEN] Sales Invoice has 'Date/Time Cancel Sent' with offset 2h from current time
         SalesInvoiceHeader.Get(DocumentNo);
         VerifyIsNearlyEqualDateTime(
-          ConvertTxtToDateTime(SalesInvoiceHeader."Date/Time Canceled"), CurrentDateTime + TimeZoneOffset - UserOffset);
+          SalesInvoiceHeader."Date/Time Cancel Sent", CurrentDateTime + TimeZoneOffset - UserOffset);
     end;
 
     [Test]
@@ -4151,10 +4156,10 @@
         // [WHEN] Cancel payment
         Cancel(DATABASE::"Cust. Ledger Entry", PaymentNo, ResponseOption::Success);
 
-        // [THEN] Customer Ledger Entry has 'Date/Time Canceled' with offset 2h from current time
+        // [THEN] Customer Ledger Entry has 'Date/Time Cancel Sent' with offset 2h from current time
         LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, CustLedgerEntry."Document Type"::Payment, PaymentNo);
         VerifyIsNearlyEqualDateTime(
-          ConvertTxtToDateTime(CustLedgerEntry."Date/Time Canceled"), CurrentDateTime + TimeZoneOffset - UserOffset);
+          CustLedgerEntry."Date/Time Cancel Sent", CurrentDateTime + TimeZoneOffset - UserOffset);
     end;
 
     [Test]
@@ -7937,7 +7942,7 @@
                 end;
             StatusOption::"Cancel In Progress":
                 begin
-                    ExpectedDateTimeCanceledEmpty := false;
+                    ExpectedDateTimeCanceledEmpty := true;
                     ExpectedCancellationIDEmpty := false;
                 end;
         end;
@@ -8045,6 +8050,8 @@
                 begin
                     SalesShipmentHeader.Get(PostedDocumentNo);
                     SalesShipmentHeader.CalcFields("Original Document XML");
+                    Assert.AreEqual(ExpectedDateTimeCanceledEmpty, SalesShipmentHeader."Date/Time Canceled" = '',
+                        StrSubstNo(ValueErr, SalesShipmentHeader.FieldName("Date/Time Canceled")));
                     DummyTempBlob.FromRecord(SalesShipmentHeader, SalesShipmentHeader.FieldNo("Original Document XML"));
                     VerifyCancelXML(
                       DummyTempBlob,
@@ -8055,6 +8062,8 @@
                 begin
                     TransferShipmentHeader.Get(PostedDocumentNo);
                     TransferShipmentHeader.CalcFields("Original Document XML");
+                    Assert.AreEqual(ExpectedDateTimeCanceledEmpty, TransferShipmentHeader."Date/Time Canceled" = '',
+                        StrSubstNo(ValueErr, TransferShipmentHeader.FieldName("Date/Time Canceled")));
                     DummyTempBlob.FromRecord(TransferShipmentHeader, TransferShipmentHeader.FieldNo("Original Document XML"));
                     VerifyCancelXML(
                       DummyTempBlob,
@@ -8065,6 +8074,8 @@
                 begin
                     LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, CustLedgerEntry."Document Type"::Payment, PostedDocumentNo);
                     CustLedgerEntry.CalcFields("Original Document XML");
+                    Assert.AreEqual(ExpectedDateTimeCanceledEmpty, CustLedgerEntry."Date/Time Canceled" = '',
+                        StrSubstNo(ValueErr, CustLedgerEntry.FieldName("Date/Time Canceled")));
                     DummyTempBlob.FromRecord(CustLedgerEntry, CustLedgerEntry.FieldNo("Original Document XML"));
                     VerifyCancelXML(
                       DummyTempBlob,
@@ -8089,7 +8100,7 @@
     local procedure MockCancel(Response: Option; var TempBlob: Codeunit "Temp Blob")
     begin
         if Response = ResponseOption::Success then
-            MockSuccessCancel(TempBlob)
+            MockCancelResponseCanceled(TempBlob)
         else
             MockFailure(TempBlob);
     end;
@@ -8211,48 +8222,16 @@
         OutStream.WriteText('</Resultado>');
     end;
 
-    local procedure MockSuccessCancel(var TempBlob: Codeunit "Temp Blob")
-    var
-        OutStream: OutStream;
-    begin
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(OutStream);
-        OutStream.WriteText('<Resultado Descripcion="Ok" IdRespuesta="1"');
-        OutStream.WriteText(' ConsultaCancelacionId="014bc324-995f-4c2e-84ee-da7eed0e11f5" Estatus="Cancelado">');
-        OutStream.WriteText(' <Acuse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
-          'xmlns:xsd="http://www.w3.org/2001/XMLSchema"');
-        OutStream.WriteText(' RfcEmisor="CST081210DN2" Fecha="2011-08-04T12:55:17.6925706"> ' +
-          '<Folios xmlns="http://cancelacfd.sat.gob.mx">');
-        OutStream.WriteText(' <UUID>F6853AA8-C083-4220-832F-9C0BD04428D2</UUID> ' +
-          '<EstatusUUID>201</EstatusUUID> </Folios> <Signature Id=');
-        OutStream.WriteText('"SelloSAT" xmlns="http://www.w3.org/2000/09/xmldsig#"> <SignedInfo> <CanonicalizationMethod');
-        OutStream.WriteText(' Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" /> <SignatureMethod');
-        OutStream.WriteText(' Algorithm="http://www.w3.org/2001/04/xmldsig-more#hmac-sha512" /> <Reference URI="">');
-        OutStream.WriteText(' <Transforms> <Transform Algorithm="http://www.w3.org/TR/1999/REC-xpath-19991116">');
-        OutStream.WriteText(' <XPath>not(ancestor-or-self::*[local-name()=''Signature''])</XPath> </Transform> </Transforms>');
-        OutStream.WriteText(' <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha512" />');
-        OutStream.WriteText(' <DigestValue>KI/DxQBrWgYFVWUhEk2W/41RZEvwW848uZXHlRADEZBMauT0hV2ixpeuR0p' +
-          'Gb430qRD4mv07vAw5Zr0uLL0BVw==');
-        OutStream.WriteText('</DigestValue> </Reference> </SignedInfo> <SignatureValue>d1dTpD9XVCo4o1UJUx' +
-          'B/SZXfpU47pyh0RgSe6g3lNZEj');
-        OutStream.WriteText('2DeDaI7WAzuU83P8JgAn8FH9adEhQTs1Ei8BbtDwJQ==</SignatureValue> <KeyInfo> <KeyName>00001088888800000003');
-        OutStream.WriteText('</KeyName> <KeyValue> <RSAKeyValue> <Modulus>5W8PNugL/HbQV7L7H0PPfI4123iMz' +
-          'UsUXa2DdBKVemyGWGFdjhnzs+LLdU');
-        OutStream.WriteText('4BnKne2UMBHPrOE0n2rK44DfdTFLBgMhRhzLsstiaC4rMslW5AWl/dXwgva2EVVhFAuTP31LAGV5shk' +
-          'bPbp75ZCreFE00r14oQv4Ep');
-        OutStream.WriteText('mZuoxhz4yEM=</Modulus> <Exponent>AQAB</Exponent> </RSAKeyValue> </KeyValue> </KeyInfo> </Signature>');
-        OutStream.WriteText('</Acuse>');
-        OutStream.WriteText('</Resultado>');
-    end;
-
     local procedure MockCancelResponseCanceled(var TempBlob: Codeunit "Temp Blob")
     var
         OutStream: OutStream;
     begin
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
-        OutStream.WriteText('<Resultado Descripcion="OK" IdRespuesta="1" ConsultaCancelacionId="08fcbcd8-0493-46d5-946b-94ea0f6acd8b" ');
-        OutStream.WriteText('Estatus="Cancelado" Resultado="El documento fue cancelado exitosamente en el SAT"></Resultado>');
+        OutStream.WriteText('<Resultado Descripcion="OK" IdRespuesta="1" ConsultaCancelacionId="a06554c8-6859-464c-aa65-5e540e970357" Estatus="Cancelado" Resultado="El documento ha sido cancelado satisfactoriamente.">');
+        OutStream.WriteText('<Evento Acuse="&lt;?xml version=&quot;1.0&quot;?&gt;&#xD;&#xA;&lt;Acuse xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;&#xD;&#xA;  &lt;ExtensionData /&gt;&#xD;&#xA;  &lt;CodigoEstatus&gt;S - Comprobante obtenido satisfactoriamente.&lt;/CodigoEstatus&gt;&#xD;&#xA;  &lt;EsCancelable&gt;No Cancelable&lt;/EsCancelable&gt;&#xD;&#xA;  &lt;Estado&gt;Cancelado&lt;/Estado&gt;&#xD;&#xA;  &lt;EstatusCancelacion&gt;Cancelado sin aceptacin&lt;/EstatusCancelacion&gt;&#xD;&#xA;&lt;/Acuse&gt;" CodigoStatus="S - Comprobante obtenido satisfactoriamente." ConsultaId="a06554c8-6859-464c-aa65-5e540e970357" EsCancelable="No Cancelable" Estado="Cancelado" EstatusCancelacion="Cancelado sin aceptacin" Fecha="2024-03-04T09:09:22.273" FechaRegistro="2024-03-04T09:09:21.57" OperacionSolicitada="SolicitudCancelacion" Uuid="f9b01202-770b-42f8-82dd-79983e24fa71" />');
+        OutStream.WriteText('<Evento ConsultaId="a06554c8-6859-464c-aa65-5e540e970357" EstatusCancelacion="En proceso" Fecha="2024-03-04T09:09:21.573" FechaRegistro="2024-03-04T09:09:21.57" OperacionSolicitada="SolicitudCancelacion" Uuid="f9b01202-770b-42f8-82dd-79983e24fa71" />');
+        OutStream.WriteText('</Resultado>');
     end;
 
     local procedure MockCancelResponseRejected(var TempBlob: Codeunit "Temp Blob")
