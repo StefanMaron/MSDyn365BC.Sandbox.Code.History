@@ -7,8 +7,8 @@ codeunit 101975 "Create Getting Started Data"
     begin
         DemoDataSetup.Get();
         O365GettingStartedPageData.DeleteAll();
-        ImportO365GettingStartedPageImageData;
-        ImportO365SetupDeviceInstructions;
+        ImportO365GettingStartedPageImageData();
+        ImportO365SetupDeviceInstructions();
     end;
 
     var

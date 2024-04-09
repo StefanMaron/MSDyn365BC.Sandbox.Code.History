@@ -3,11 +3,9 @@ codeunit 101618 "Create Human Resources Setup"
 
     trigger OnRun()
     begin
-        with "Human Resouces Setup" do begin
-            Get();
-            "Create No. Series".InitBaseSeries("Employee Nos.", XEMP, XEmployee, XE10, XE9990, '', '', 10, true);
-            Modify();
-        end;
+        "Human Resouces Setup".Get();
+        "Create No. Series".InitBaseSeries("Human Resouces Setup"."Employee Nos.", XEMP, XEmployee, XE10, XE9990, '', '', 10, Enum::"No. Series Implementation"::Sequence);
+        "Human Resouces Setup".Modify();
     end;
 
     var

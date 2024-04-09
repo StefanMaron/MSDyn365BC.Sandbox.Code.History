@@ -15,21 +15,19 @@ codeunit 119033 "Create Constrained Capacity"
         ConstrainedCapacity.Validate("Capacity Type", Type);
         ConstrainedCapacity.Validate("Capacity No.", No);
         ConstrainedCapacity.Insert();
-        with ConstrainedCapacity do begin
-            case "Capacity Type" of
-                "Capacity Type"::"Work Center":
-                    begin
-                        WorkCenter.Get(No);
-                        Name := WorkCenter.Name;
-                        "Work Center No." := WorkCenter."No."
-                    end;
-                "Capacity Type"::"Machine Center":
-                    begin
-                        MachineCenter.Get("Capacity No.");
-                        Name := MachineCenter.Name;
-                        "Work Center No." := MachineCenter."Work Center No."
-                    end
-            end
+        case ConstrainedCapacity."Capacity Type" of
+            ConstrainedCapacity."Capacity Type"::"Work Center":
+                begin
+                    WorkCenter.Get(No);
+                    ConstrainedCapacity.Name := WorkCenter.Name;
+                    ConstrainedCapacity."Work Center No." := WorkCenter."No."
+                end;
+            ConstrainedCapacity."Capacity Type"::"Machine Center":
+                begin
+                    MachineCenter.Get(ConstrainedCapacity."Capacity No.");
+                    ConstrainedCapacity.Name := MachineCenter.Name;
+                    ConstrainedCapacity."Work Center No." := MachineCenter."Work Center No."
+                end
         end;
         ConstrainedCapacity.Validate("Critical Load %", CriticalLoadPct);
         ConstrainedCapacity.Validate("Dampener (% of Total Capacity)", DampeningPct);

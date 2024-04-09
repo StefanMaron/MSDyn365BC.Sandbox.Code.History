@@ -93,22 +93,22 @@ codeunit 119040 "Create Manufacturing Item"
         case true of
             StrPos(Item."No.", '10') > 0:
                 begin
-                    Item."Inventory Posting Group" := DemoDataSetup.FinishedCode;
-                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode);
+                    Item."Inventory Posting Group" := DemoDataSetup.FinishedCode();
+                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode());
                 end;
             Item."No." in ['1100', '1200', '1300', '1150', '1250', '1700']:
                 begin
-                    Item."Inventory Posting Group" := DemoDataSetup.FinishedCode;
-                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode);
+                    Item."Inventory Posting Group" := DemoDataSetup.FinishedCode();
+                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RetailCode());
                 end;
             else begin
-                    Item."Inventory Posting Group" := DemoDataSetup.RawMatCode;
-                    Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RawMatCode);
-                end;
+                Item."Inventory Posting Group" := DemoDataSetup.RawMatCode();
+                Item.Validate("Gen. Prod. Posting Group", DemoDataSetup.RawMatCode());
+            end;
         end;
 
         case Item."Inventory Posting Group" of
-            DemoDataSetup.RawMatCode:
+            DemoDataSetup.RawMatCode():
                 if Item."Base Unit of Measure" = XCAN then begin
                     Counter1 := Counter1 + 1;
                     Item.Validate("Shelf No.", StrSubstNo('B%1', Counter1));
@@ -116,12 +116,12 @@ codeunit 119040 "Create Manufacturing Item"
                     Counter4 := Counter4 + 1;
                     Item.Validate("Shelf No.", StrSubstNo('A%1', Counter4));
                 end;
-            DemoDataSetup.ResaleCode:
+            DemoDataSetup.ResaleCode():
                 begin
                     Counter2 := Counter2 + 1;
                     Item.Validate("Shelf No.", StrSubstNo('D%1', Counter2));
                 end;
-            DemoDataSetup.FinishedCode:
+            DemoDataSetup.FinishedCode():
                 begin
                     Counter3 := Counter3 + 1;
                     Item.Validate("Shelf No.", StrSubstNo('F%1', Counter3));

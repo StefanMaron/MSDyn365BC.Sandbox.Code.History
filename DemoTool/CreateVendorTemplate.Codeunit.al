@@ -6,10 +6,11 @@ codeunit 101999 "Create Vendor Template"
     end;
 
     var
-        xBlankDescrTxt: Label 'Blank Vendor Card', Comment = 'Translate.';
-        xCashDescriptionTxt: Label 'Cash-Payment Vendor (Cash, VAT)', Comment = 'Translate.';
         DemoDataSetup: Record "Demo Data Setup";
         Vendor: Record Vendor;
+        CreateTemplateHelper: Codeunit "Create Template Helper";
+        xBlankDescrTxt: Label 'Blank Vendor Card', Comment = 'Translate.';
+        xCashDescriptionTxt: Label 'Cash-Payment Vendor (Cash, VAT)', Comment = 'Translate.';
         xPrivateDescriptionTxt: Label 'Private Vendor (Giro, No VAT)', Comment = 'Translate.';
         xBusinessDescriptionTxt: Label 'Business-to-Business Vendor (Bank, VAT)', Comment = 'Translate.';
         xEuDescriptionTxt: Label 'EU Vendor (EUR, Bank)', Comment = 'Translate.';
@@ -21,42 +22,34 @@ codeunit 101999 "Create Vendor Template"
         xGIROTxt: Label 'GIRO', Comment = 'To be translated.';
         xBANKTxt: Label 'BANK', Comment = 'To be translated.';
         xCASHCAPTxt: Label 'CASH', Comment = 'Translated.';
-        CreateTemplateHelper: Codeunit "Create Template Helper";
 
     procedure InsertMiniAppData()
     var
         ConfigTemplateHeader: Record "Config. Template Header";
     begin
-        with DemoDataSetup do begin
-            Get();
+        DemoDataSetup.Get();
+        // Blank Template
+        InsertTemplate(ConfigTemplateHeader, xBlankDescrTxt, '', '', '', '', false);
+        // Cash-Payment vendor template
+        InsertTemplate(ConfigTemplateHeader,
+          xCashDescriptionTxt, DemoDataSetup."Country/Region Code", DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), true);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, xCODTxt, xCASHCAPTxt);
 
-            // Blank Template
-            InsertTemplate(ConfigTemplateHeader, xBlankDescrTxt, '', '', '', '', false);
-
-            // Cash-Payment vendor template
-            InsertTemplate(ConfigTemplateHeader,
-              xCashDescriptionTxt, "Country/Region Code", DomesticCode, DomesticCode, DomesticCode, true);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, xCODTxt, xCASHCAPTxt);
-
-            CreateTemplateHelper.CreateTemplateSelectionRule(
-              DATABASE::Vendor, ConfigTemplateHeader.Code, '', 0, 0);
-
-            // Private vendor template
-            InsertTemplate(ConfigTemplateHeader,
-              xPrivateDescriptionTxt, "Country/Region Code", DomesticCode, DomesticCode, DomesticCode, true);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X14DAYSTxt, xGIROTxt);
-
-            // Business-to-Business vendor template
-            InsertTemplate(ConfigTemplateHeader,
-              xBusinessDescriptionTxt, "Country/Region Code", DomesticCode, DomesticCode, DomesticCode, false);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X1M8DTxt, xBANKTxt);
-
-            // EU vendor template
-            InsertTemplate(ConfigTemplateHeader, xEuDescriptionTxt, '', EUCode, EUCode, EUCode, false);
-            if "Currency Code" <> 'EUR' then
-                InsertForeignTradeInfo(ConfigTemplateHeader, xEURTxt);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X14DAYSTxt, xBANKTxt);
-        end;
+        CreateTemplateHelper.CreateTemplateSelectionRule(
+          DATABASE::Vendor, ConfigTemplateHeader.Code, '', 0, 0);
+        // Private vendor template
+        InsertTemplate(ConfigTemplateHeader,
+          xPrivateDescriptionTxt, DemoDataSetup."Country/Region Code", DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), true);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X14DAYSTxt, xGIROTxt);
+        // Business-to-Business vendor template
+        InsertTemplate(ConfigTemplateHeader,
+          xBusinessDescriptionTxt, DemoDataSetup."Country/Region Code", DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), false);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X1M8DTxt, xBANKTxt);
+        // EU vendor template
+        InsertTemplate(ConfigTemplateHeader, xEuDescriptionTxt, '', DemoDataSetup.EUCode(), DemoDataSetup.EUCode(), DemoDataSetup.EUCode(), false);
+        if DemoDataSetup."Currency Code" <> 'EUR' then
+            InsertForeignTradeInfo(ConfigTemplateHeader, xEURTxt);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X14DAYSTxt, xBANKTxt);
     end;
 
     local procedure InsertTemplate(var ConfigTemplateHeader: Record "Config. Template Header"; Description: Text[50]; CountryCode: Text[50]; GenBusGroup: Code[20]; VATBusGroup: Code[20]; VendorGroup: Code[20]; PriceWithVAT: Boolean)

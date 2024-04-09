@@ -73,7 +73,7 @@ codeunit 130200 "Snap Test Runner"
     var
         TestResult: Record "Test Result";
     begin
-        TestRunNo := TestResult.LastTestRunNo + 1;
+        TestRunNo := TestResult.LastTestRunNo() + 1;
         CompanyWorkDate := WorkDate()
     end;
 
@@ -83,7 +83,7 @@ codeunit 130200 "Snap Test Runner"
         SystemIOPath: DotNet Path;
     begin
         if TempFilePath = '' then
-            TempFilePath := SystemIOPath.GetTempPath;
+            TempFilePath := SystemIOPath.GetTempPath();
 
         exit(TempFilePath)
     end;
@@ -96,8 +96,8 @@ codeunit 130200 "Snap Test Runner"
         TestAssignedToTenantFileName: Text;
         Acquired: Boolean;
     begin
-        LockFileName := StrSubstNo(FilePath, GetTempFilePath, CUId);
-        TestAssignedToTenantFileName := StrSubstNo(FilePath, GetTempFilePath, StrSubstNo('%1_Assigned', CUId));
+        LockFileName := StrSubstNo(FilePath, GetTempFilePath(), CUId);
+        TestAssignedToTenantFileName := StrSubstNo(FilePath, GetTempFilePath(), StrSubstNo('%1_Assigned', CUId));
 
         // File operations are not atomic, so this may still go wrong.
         Commit();
@@ -135,10 +135,10 @@ codeunit 130200 "Snap Test Runner"
         if ProduceTCM then
             CodeCoverageLog(true, false);
 
-        AzureKeyVaultTestLibrary.ClearSecrets; // Cleanup key vault cache
+        AzureKeyVaultTestLibrary.ClearSecrets(); // Cleanup key vault cache
 
         Codeunit.Run(CUId);
-        BackupStorage.SetWorkDate;
+        BackupStorage.SetWorkDate();
 
         if ProduceTCM then begin
             CodeCoverageLog(false, false);
@@ -179,7 +179,7 @@ codeunit 130200 "Snap Test Runner"
     begin
         File.Create(
           TestRunnerArgument.TryGet('producetestcoveragemap') +
-          StrSubstNo('_%1.txt', BackupMgt.GetDatabase));
+          StrSubstNo('_%1.txt', BackupMgt.GetDatabase()));
         File.CreateOutStream(OutStream);
         TestCoverageMap2.SetDestination(OutStream);
         TestCoverageMap2.ImportFile(false);
@@ -196,7 +196,7 @@ codeunit 130200 "Snap Test Runner"
     begin
         File.Create(
           TestRunnerArgument.TryGet('producetestcoveragemap') +
-          StrSubstNo('_%1_%2.dat', BackupMgt.GetDatabase, TestCodeunitID));
+          StrSubstNo('_%1_%2.dat', BackupMgt.GetDatabase(), TestCodeunitID));
         File.CreateOutStream(OutStream);
         CodeCoverageDetailed.SetDestination(OutStream);
         CodeCoverageDetailed.ImportFile(false);
@@ -296,7 +296,7 @@ codeunit 130200 "Snap Test Runner"
 
         // Make sure a call to DefaultFixture is made before any test in the codeunit is run
         // Assert.IsTrue(BackupMgt.GetExecutionFlag,STRSUBSTNO(NOBACKUPMGMTCALL,CUId,FName));
-        TestResult.Update(Success, EndTime - StartTime, BackupMgt.GetExecutionFlag);
+        TestResult.Update(Success, EndTime - StartTime, BackupMgt.GetExecutionFlag());
         BackupMgt.ClearExecutionFlag();
 
         ApplicationArea('');

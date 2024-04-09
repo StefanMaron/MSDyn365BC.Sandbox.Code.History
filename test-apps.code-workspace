@@ -1,6 +1,9 @@
 {
   "folders": [
     {
+      "path": "./Business Foundation Test Libraries"
+    },
+    {
       "path": "./Performance Toolkit Tests"
     },
     {

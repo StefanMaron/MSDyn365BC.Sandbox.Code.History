@@ -21,7 +21,7 @@ codeunit 119084 "Create Cost Object"
         // Total Amount
         InsertData(XTotal, XTotalCostObject, '99', 2, 'AA..ZZ');  // Amount
 
-        CostAccountMgt.IndentCostObjects;
+        CostAccountMgt.IndentCostObjects();
     end;
 
     var
@@ -52,20 +52,18 @@ codeunit 119084 "Create Cost Object"
     var
         CostObject: Record "Cost Object";
     begin
-        with CostObject do begin
-            Init();
-            Code := CostObjectCode;
-            Name := CostObjectName;
+        CostObject.Init();
+        CostObject.Code := CostObjectCode;
+        CostObject.Name := CostObjectName;
 
-            "Sorting Order" := SortingOrder;
-            Totaling := TotalFromTo;
-            Validate("Line Type", LineType);
-            if "Line Type" = "Line Type"::"End-Total" then
-                "Blank Line" := true;
+        CostObject."Sorting Order" := SortingOrder;
+        CostObject.Totaling := TotalFromTo;
+        CostObject.Validate("Line Type", LineType);
+        if CostObject."Line Type" = CostObject."Line Type"::"End-Total" then
+            CostObject."Blank Line" := true;
 
-            if not Insert then
-                Modify();
-        end;
+        if not CostObject.Insert() then
+            CostObject.Modify();
     end;
 }
 

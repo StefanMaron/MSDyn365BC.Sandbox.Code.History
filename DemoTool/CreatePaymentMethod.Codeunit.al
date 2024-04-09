@@ -3,18 +3,16 @@ codeunit 101289 "Create Payment Method"
 
     trigger OnRun()
     begin
-        with "Payment Method" do begin
-            InsertData(XGIRO, XGirotransfer, "Bal. Account Type"::"Bank Account", XGIRO, '');
-            InsertData(XBANK, XBanktransfer, 0, '', '');
-            InsertData(XBANKDOMTxt, XBankDomTransferTxt, 0, '', XBankDataConvPmtLineDefnTxt);
-            InsertData(XBANKINTTxt, XBankIntTransferTxt, 0, '', XBankDataConvPmtLineDefnTxt);
-            InsertData(XCASH, XCashpayment, "Bal. Account Type"::"G/L Account", '992910', '');
-            InsertData(XCHECK, XCheckpayment, 0, '', '');
-            InsertData(XACCOUNT, XPaymentonaccount, 0, '', '');
-            InsertData(XINTERCOM, XIntercompanypayment, 0, '', '');
-            InsertData(XCARD, XCardpayment, 0, '', '');
-            InsertData(XMultiple, XMultiplepaymentmethods, 0, '', '');
-        end;
+        InsertData(XGIRO, XGirotransfer, "Payment Method"."Bal. Account Type"::"Bank Account", XGIRO, '');
+        InsertData(XBANK, XBanktransfer, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
+        InsertData(XBANKDOMTxt, XBankDomTransferTxt, "Payment Method"."Bal. Account Type"::"G/L Account", '', XBankDataConvPmtLineDefnTxt);
+        InsertData(XBANKINTTxt, XBankIntTransferTxt, "Payment Method"."Bal. Account Type"::"G/L Account", '', XBankDataConvPmtLineDefnTxt);
+        InsertData(XCASH, XCashpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '992910', '');
+        InsertData(XCHECK, XCheckpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
+        InsertData(XACCOUNT, XPaymentonaccount, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
+        InsertData(XINTERCOM, XIntercompanypayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
+        InsertData(XCARD, XCardpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
+        InsertData(XMultiple, XMultiplepaymentmethods, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
     end;
 
     var
@@ -45,21 +43,19 @@ codeunit 101289 "Create Payment Method"
 
     procedure InsertMiniAppData()
     begin
-        with "Payment Method" do begin
-            InsertData(XGIRO, XGirotransfer, "Bal. Account Type"::"Bank Account", '', '');
-            InsertData(XBANK, XBanktransfer, 0, '', '');
-            InsertData(XBANKDOMTxt, XBankDomTransferTxt, 0, '', XBankDataConvPmtLineDefnTxt);
-            InsertData(XBANKINTTxt, XBankIntTransferTxt, 0, '', XBankDataConvPmtLineDefnTxt);
-            InsertData(XCASH, XCashpayment, "Bal. Account Type"::"G/L Account", '992910', '');
-            InsertData(XCHECK, XCheckpayment, 0, '', '');
-            InsertData(XACCOUNT, XPaymentonaccount, 0, '', '');
-            InsertData(XINTERCOM, XIntercompanypayment, 0, '', '');
-            InsertData(XCARD, XCardpayment, 0, '', '');
-            InsertData(XMultiple, XMultiplepaymentmethods, 0, '', '');
-        end;
+        InsertData(XGIRO, XGirotransfer, "Payment Method"."Bal. Account Type"::"Bank Account", '', '');
+        InsertData(XBANK, XBanktransfer, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
+        InsertData(XBANKDOMTxt, XBankDomTransferTxt, "Payment Method"."Bal. Account Type"::"G/L Account", '', XBankDataConvPmtLineDefnTxt);
+        InsertData(XBANKINTTxt, XBankIntTransferTxt, "Payment Method"."Bal. Account Type"::"G/L Account", '', XBankDataConvPmtLineDefnTxt);
+        InsertData(XCASH, XCashpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '992910', '');
+        InsertData(XCHECK, XCheckpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
+        InsertData(XACCOUNT, XPaymentonaccount, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
+        InsertData(XINTERCOM, XIntercompanypayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
+        InsertData(XCARD, XCardpayment, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
+        InsertData(XMultiple, XMultiplepaymentmethods, "Payment Method"."Bal. Account Type"::"G/L Account", '', '');
     end;
 
-    procedure InsertData("Code": Code[10]; Description: Text[50]; "Bal. Account Type": Integer; "Bal. Account No.": Code[20]; PmtExportLineDefn: Code[20])
+    procedure InsertData("Code": Code[10]; Description: Text[50]; "Bal. Account Type": Enum "Payment Balance Account Type"; "Bal. Account No.": Code[20]; PmtExportLineDefn: Code[20])
     begin
         "Payment Method".Init();
         "Payment Method".Validate(Code, Code);
@@ -76,7 +72,6 @@ codeunit 101289 "Create Payment Method"
                 "G/L Account".TestField("Reconciliation Account");
             end;
         end;
-        "Payment Method"."Use for Invoicing" := "Payment Method".Code in [XBANK, XCASH, XCHECK, XCARD, XMultiple];
         "Payment Method".Insert(true);
     end;
 

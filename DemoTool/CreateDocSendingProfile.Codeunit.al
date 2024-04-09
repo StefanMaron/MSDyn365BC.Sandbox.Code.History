@@ -7,7 +7,7 @@ codeunit 101402 "Create Doc. Sending Profile"
     begin
         DemoDataSetup.Get();
         InsertDataPrinter('DIRECTFILE', 'Direct to File', Printer::"Yes (Use Default Settings)");
-        InsertLocalData;
+        InsertLocalData();
     end;
 
     var
@@ -23,7 +23,7 @@ codeunit 101402 "Create Doc. Sending Profile"
         DocumentSendingProfile.Insert();
     end;
 
-    procedure InsertDataDisk("Code": Code[20]; Description: Text[50]; Disk: Option)
+    procedure InsertDataDisk("Code": Code[20]; Description: Text[50]; Disk: Enum "Doc. Sending Profile Disk")
     begin
         DocumentSendingProfile.Init();
         DocumentSendingProfile.Validate(Code, Code);

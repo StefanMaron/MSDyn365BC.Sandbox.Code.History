@@ -9,7 +9,7 @@ codeunit 118005 "Create Availability Setup"
     var
         CompanyInfo: Record "Company Information";
 
-    procedure ModifyData("Avail. Period Calc.": Code[10]; "Avail. Time Bucket": Option)
+    procedure ModifyData("Avail. Period Calc.": Code[10]; "Avail. Time Bucket": Enum "Analysis Period Type")
     begin
         CompanyInfo.Get();
         Evaluate(CompanyInfo."Check-Avail. Period Calc.", "Avail. Period Calc.");

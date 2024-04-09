@@ -4,7 +4,7 @@ codeunit 101225 "Create Post Code"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        ImportLocalPostCodes;
+        ImportLocalPostCodes();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Standard then
             exit;
 
