@@ -49,11 +49,13 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Source Code");
         RunCodeunit(CODEUNIT::"Create Payment Terms");
         RunCodeunit(CODEUNIT::"Create Currency");
+        RunCodeunit(Codeunit::"Create Dispute Status");
         RunCodeunit(CODEUNIT::"Create Finance Charge Terms");
         RunCodeunit(CODEUNIT::"Create Finance Charge Text");
         RunCodeunit(CODEUNIT::"Create Reminder Terms");
         RunCodeunit(CODEUNIT::"Create Reminder Level");
         RunCodeunit(CODEUNIT::"Create Reminder Text");
+        RunCodeunit(Codeunit::"Create Reminder Automation");
         RunCodeunit(CODEUNIT::"Create Language");
         RunCodeunit(CODEUNIT::"Create Country/Region");
         RunCodeunit(CODEUNIT::"Create Post Code");
@@ -70,7 +72,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Salesperson/Purchaser");
         RunCodeunit(CODEUNIT::"Create Location");
         RunCodeunit(CODEUNIT::"Create Cust. Invoice Disc.");
-#if not CLEAN21
+#if not CLEAN23
         RunCodeunit(CODEUNIT::"Create Sales Discount");
 #endif
         RunCodeunit(CODEUNIT::"Create Vendor Invoice Disc.");
@@ -132,7 +134,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Return Reasons");
 
         Window.Update(1, XCurrency);
-        "Create Currency".ModifyData;
+        "Create Currency".ModifyData();
 
         RunCodeunit(CODEUNIT::"Create Customer");
         RunCodeunit(CODEUNIT::"Create Ship-to Address");
@@ -145,7 +147,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Item Unit of Measure");
         RunCodeunit(CODEUNIT::"Create Unit of Measure Trans.");
         RunCodeunit(CODEUNIT::"Create Extended text");
-#if not CLEAN21
+#if not CLEAN23
         RunCodeunit(CODEUNIT::"Create Sales Price");
 #endif
         RunCodeunit(CODEUNIT::"Create Resource");
@@ -155,7 +157,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Default Dimension");
 
         RunCodeunit(CODEUNIT::"Create Job");
-#if not CLEAN21
+#if not CLEAN23
         RunCodeunit(CODEUNIT::"Create Job G/L Prices");
         RunCodeunit(CODEUNIT::"Create Job Item Prices");
         RunCodeunit(CODEUNIT::"Create Job Resource Prices");
@@ -175,7 +177,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Inventory Posting Setup");
         RunCodeunit(CODEUNIT::"Create WIP Accounts");
         RunCodeunit(CODEUNIT::"Create Item Vendor");
-#if not CLEAN21
+#if not CLEAN23
         RunCodeunit(CODEUNIT::"Create Purchase Price");
         RunCodeunit(CODEUNIT::"Create Purch. Line Discount");
 #endif
@@ -283,7 +285,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Automatic Acc. Header");
         RunCodeunit(CODEUNIT::"Create Automatic Acc. Line");
 #endif
-        InsertOnlineMapSetup;
+        InsertOnlineMapSetup();
 
         RunCodeunit(CODEUNIT::"Create Chart Definitions");
 
@@ -309,6 +311,7 @@ codeunit 110000 "Interface Basis Data"
         CreateNewTemplates();
 
         RunCodeunit(Codeunit::"Create Notification Setup");
+        RunCodeunit(CODEUNIT::"Create Reminder Communication");
 
         Window.Close();
     end;
@@ -377,8 +380,8 @@ codeunit 110000 "Interface Basis Data"
         TransferGLEntriesToCA: Codeunit "Transfer GL Entries to CA";
     begin
         DemoDataSetup.Get();
-        ModifyGeneralJournals;
-        MakeBudget;
+        ModifyGeneralJournals();
+        MakeBudget();
         AccountingPeriod.Reset();
         AccountingPeriod.SetFilter("Starting Date", '<%1', CA.AdjustDate(19020101D));
         AccountingPeriod.ModifyAll(Closed, true);
@@ -395,14 +398,14 @@ codeunit 110000 "Interface Basis Data"
 
         "Create Sales & Receivables S.".Finalize();
         "Create Purchases & Payables S.".Finalize();
-        "Create Item Journal Batch".ModifyItemBatch;
+        "Create Item Journal Batch".ModifyItemBatch();
 
         ItemJournalLine.Reset();
         ItemJournalLine.DeleteAll();
 
         UpdateAnalysisView.UpdateAll(2, false);
         CODEUNIT.Run(CODEUNIT::"Update Acc. Sched. KPI Data");
-        TransferGLEntriesToCA.TransferGLtoCA;
+        TransferGLEntriesToCA.TransferGLtoCA();
     end;
 
     procedure RunCodeunit(CodeunitID: Integer)
@@ -753,44 +756,41 @@ codeunit 110000 "Interface Basis Data"
         GenJournalTemplate: Record "Gen. Journal Template";
         GenJournalBatch: Record "Gen. Journal Batch";
         GenJournalLine: Record "Gen. Journal Line";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
+        NoSeriesBatch: Codeunit "No. Series - Batch";
         LastNo: Code[20];
         NewLastNo: Code[20];
     begin
-        with GenJournalBatch do
-            if Find('-') then
-                repeat
-                    GenJournalTemplate.Get("Journal Template Name");
-                    if Name <> 'BANK' then
-                        "No. Series" := GenJournalTemplate."No. Series";
-                    "Posting No. Series" := GenJournalTemplate."Posting No. Series";
-                    Modify();
-                until Next = 0;
+        if GenJournalBatch.Find('-') then
+            repeat
+                GenJournalTemplate.Get(GenJournalBatch."Journal Template Name");
+                if GenJournalBatch.Name <> 'BANK' then
+                    GenJournalBatch."No. Series" := GenJournalTemplate."No. Series";
+                GenJournalBatch."Posting No. Series" := GenJournalTemplate."Posting No. Series";
+                GenJournalBatch.Modify();
+            until GenJournalBatch.Next() = 0;
 
-        with GenJournalLine do
-            while Find('>') do begin
-                SetRange("Journal Template Name", "Journal Template Name");
-                SetRange("Journal Batch Name", "Journal Batch Name");
-                GenJournalBatch.Get("Journal Template Name", "Journal Batch Name");
-                if GenJournalBatch."No. Series" = '' then
-                    Find('+')
-                else begin
-                    LastNo := '';
-                    NewLastNo := '';
-                    repeat
-                        if "Document No." <> '' then begin
-                            if "Document No." <> LastNo then
-                                NewLastNo := NoSeriesManagement.GetNextNo(GenJournalBatch."No. Series", 0D, false);
-                            LastNo := "Document No.";
-                            "Document No." := NewLastNo;
-                            Modify();
-                        end;
-                    until Next = 0;
-                    Clear(NoSeriesManagement);
-                end;
-                SetRange("Journal Template Name");
-                SetRange("Journal Batch Name");
+        while GenJournalLine.Find('>') do begin
+            GenJournalLine.SetRange("Journal Template Name", GenJournalLine."Journal Template Name");
+            GenJournalLine.SetRange("Journal Batch Name", GenJournalLine."Journal Batch Name");
+            GenJournalBatch.Get(GenJournalLine."Journal Template Name", GenJournalLine."Journal Batch Name");
+            if GenJournalBatch."No. Series" = '' then
+                GenJournalLine.Find('+')
+            else begin
+                LastNo := '';
+                NewLastNo := '';
+                repeat
+                    if GenJournalLine."Document No." <> '' then begin
+                        if GenJournalLine."Document No." <> LastNo then
+                            NewLastNo := NoSeriesBatch.GetNextNo(GenJournalBatch."No. Series");
+                        LastNo := GenJournalLine."Document No.";
+                        GenJournalLine."Document No." := NewLastNo;
+                        GenJournalLine.Modify();
+                    end;
+                until GenJournalLine.Next() = 0;
             end;
+            GenJournalLine.SetRange("Journal Template Name");
+            GenJournalLine.SetRange("Journal Batch Name");
+        end;
     end;
 
     procedure MakeBudget()
@@ -823,7 +823,7 @@ codeunit 110000 "Interface Basis Data"
             SelectedDim.DeleteAll();
         end else begin
             // Demo Company Data for Budgets
-            InitBudgetData;
+            InitBudgetData();
             BudgetMonth := 0;
             repeat
                 BudgetMonth := BudgetMonth + 1;

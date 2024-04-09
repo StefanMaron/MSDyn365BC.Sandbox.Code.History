@@ -17,16 +17,16 @@ codeunit 101169 "Create Jobs For SaaS"
 
         InsertData(
           XJOB00010, XReceptionAreRemodel, '30000', CA.AdjustDate(CreationDate),
-          CA.AdjustDate(StartingDate), CA.AdjustDate(EndingDate), "Job Status"::Open, CreateJobResources.LinaCode,
-          CreateJobPostingGroup.PostingGroupCode, CA.AdjustDate(LastDateModified), XCOMPLETEDCONTRACT);
+          CA.AdjustDate(StartingDate), CA.AdjustDate(EndingDate), "Job Status"::Open, CreateJobResources.LinaCode(),
+          CreateJobPostingGroup.PostingGroupCode(), CA.AdjustDate(LastDateModified), XCOMPLETEDCONTRACT);
         InsertData(
           XJOB00020, XDecorateConferenceRoom, '10000', CA.AdjustDate(CreationDate),
-          CA.AdjustDate(StartingDate), CA.AdjustDate(EndingDate), "Job Status"::Open, CreateJobResources.LinaCode,
-          CreateJobPostingGroup.PostingGroupCode, CA.AdjustDate(LastDateModified), XCOMPLETEDCONTRACT);
+          CA.AdjustDate(StartingDate), CA.AdjustDate(EndingDate), "Job Status"::Open, CreateJobResources.LinaCode(),
+          CreateJobPostingGroup.PostingGroupCode(), CA.AdjustDate(LastDateModified), XCOMPLETEDCONTRACT);
         InsertData(
           XJOB00030, XNewOfficeFurniture, '20000', CA.AdjustDate(CreationDate),
-          CA.AdjustDate(StartingDate), CA.AdjustDate(EndingDate), "Job Status"::Open, CreateJobResources.KatherineCode,
-          CreateJobPostingGroup.PostingGroupCode, CA.AdjustDate(LastDateModified), XCOMPLETEDCONTRACT);
+          CA.AdjustDate(StartingDate), CA.AdjustDate(EndingDate), "Job Status"::Open, CreateJobResources.KatherineCode(),
+          CreateJobPostingGroup.PostingGroupCode(), CA.AdjustDate(LastDateModified), XCOMPLETEDCONTRACT);
     end;
 
     var

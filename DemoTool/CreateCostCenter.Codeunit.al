@@ -5,31 +5,31 @@ codeunit 119082 "Create Cost Center"
     var
         CostAccountMgt: Codeunit "Cost Account Mgt";
     begin
-        InsertData(XADM, XAdministration, 2, 'B', 0, '');
-        InsertData(XAdminHR, XGeneralAncillaryCC, 0, 'A', 3, '');
-        InsertData(XBUILDING, XBuildingsAndProperty, 2, 'B', 0, '');
-        InsertData(XGL, XBusinessManagement, 2, 'B', 0, '');
-        InsertData(XLABOR, XLabResearch, 2, 'E', 0, '');
-        InsertData(XOpAc, XOpAncillaryCC, 0, 'D', 3, '');
-        InsertData(XPERS, XPersonalAdm, 2, 'B', 0, '');
-        InsertData(XTotAdmin, XTotalGenAncCS, 0, 'C', 4, '');
-        InsertData(XTotalOp, XTotalOpCC, 2, 'F', 4, '');
-        InsertData(XVEHICLE, XVehicleOperation, 2, 'E', 0, '');
-        InsertData(XWORKSHOP, XWorkshopAndRepairs, 2, 'E', 0, '');
+        InsertData(XADM, XAdministration, "Cost Center Subtype"::"Aux. Cost Center", 'B', 0, '');
+        InsertData(XAdminHR, XGeneralAncillaryCC, "Cost Center Subtype"::" ", 'A', 3, '');
+        InsertData(XBUILDING, XBuildingsAndProperty, "Cost Center Subtype"::"Aux. Cost Center", 'B', 0, '');
+        InsertData(XGL, XBusinessManagement, "Cost Center Subtype"::"Aux. Cost Center", 'B', 0, '');
+        InsertData(XLABOR, XLabResearch, "Cost Center Subtype"::"Aux. Cost Center", 'E', 0, '');
+        InsertData(XOpAc, XOpAncillaryCC, "Cost Center Subtype"::" ", 'D', 3, '');
+        InsertData(XPERS, XPersonalAdm, "Cost Center Subtype"::"Aux. Cost Center", 'B', 0, '');
+        InsertData(XTotAdmin, XTotalGenAncCS, "Cost Center Subtype"::" ", 'C', 4, '');
+        InsertData(XTotalOp, XTotalOpCC, "Cost Center Subtype"::"Aux. Cost Center", 'F', 4, '');
+        InsertData(XVEHICLE, XVehicleOperation, "Cost Center Subtype"::"Aux. Cost Center", 'E', 0, '');
+        InsertData(XWORKSHOP, XWorkshopAndRepairs, "Cost Center Subtype"::"Aux. Cost Center", 'E', 0, '');
 
-        InsertData(XADVERT, XAdvertisingDepartment, 3, 'H', 0, '');
-        InsertData(XINVENTORY, LowerCase(XINVENTORY), 3, 'H', 0, '');
-        InsertData(XMainCC, XMainCostCenters, 0, 'G', 3, '');
-        InsertData(XMATERIAL, XMaterialPurch, 3, 'H', 0, '');
-        InsertData(XPROD, XProduction, 3, 'H', 0, '');
-        InsertData(XSALES, LowerCase(XSALES), 3, 'H', 0, '');
-        InsertData(XTotMain, XTotalMainCC, 0, 'I', 4, '');
+        InsertData(XADVERT, XAdvertisingDepartment, "Cost Center Subtype"::"Main Cost Center", 'H', 0, '');
+        InsertData(XINVENTORY, LowerCase(XINVENTORY), "Cost Center Subtype"::"Main Cost Center", 'H', 0, '');
+        InsertData(XMainCC, XMainCostCenters, "Cost Center Subtype"::" ", 'G', 3, '');
+        InsertData(XMATERIAL, XMaterialPurch, "Cost Center Subtype"::"Main Cost Center", 'H', 0, '');
+        InsertData(XPROD, XProduction, "Cost Center Subtype"::"Main Cost Center", 'H', 0, '');
+        InsertData(XSALES, LowerCase(XSALES), "Cost Center Subtype"::"Main Cost Center", 'H', 0, '');
+        InsertData(XTotMain, XTotalMainCC, "Cost Center Subtype"::" ", 'I', 4, '');
 
-        InsertData(XAncillCC, XAncillaryCostCenters, 0, 'X', 1, '');
-        InsertData(XACTACCR, XActualAccruals, 1, 'X', 0, '');
+        InsertData(XAncillCC, XAncillaryCostCenters, "Cost Center Subtype"::" ", 'X', 1, '');
+        InsertData(XACTACCR, XActualAccruals, "Cost Center Subtype"::"Service Cost Center", 'X', 0, '');
 
         // Total
-        InsertData(XTotal, XTotalCostCenter, 0, 'Z', 2, 'AA..ZZ');
+        InsertData(XTotal, XTotalCostCenter, "Cost Center Subtype"::" ", 'Z', 2, 'AA..ZZ');
         CostAccountMgt.IndentCostCenters();
     end;
 
@@ -75,25 +75,23 @@ codeunit 119082 "Create Cost Center"
         XTotal: Label 'Total';
         XTotalCostCenter: Label 'Total Cost Center';
 
-    procedure InsertData(CostCenterCode: Code[20]; CostCenterName: Text[30]; CostSubType: Integer; SortingOrder: Code[10]; LineType: Integer; TotalFromTo: Text[30])
+    procedure InsertData(CostCenterCode: Code[20]; CostCenterName: Text[30]; CostSubType: Enum "Cost Center Subtype"; SortingOrder: Code[10]; LineType: Integer; TotalFromTo: Text[30])
     var
         CostCenter: Record "Cost Center";
     begin
-        with CostCenter do begin
-            Init();
-            Code := CostCenterCode;
-            Name := CostCenterName;
-            "Cost Subtype" := CostSubType;
-            "Sorting Order" := SortingOrder;
-            Totaling := TotalFromTo;
-            Validate("Line Type", LineType);
+        CostCenter.Init();
+        CostCenter.Code := CostCenterCode;
+        CostCenter.Name := CostCenterName;
+        CostCenter."Cost Subtype" := CostSubType;
+        CostCenter."Sorting Order" := SortingOrder;
+        CostCenter.Totaling := TotalFromTo;
+        CostCenter.Validate("Line Type", LineType);
 
-            if "Line Type" = "Line Type"::"End-Total" then
-                "Blank Line" := true;
+        if CostCenter."Line Type" = CostCenter."Line Type"::"End-Total" then
+            CostCenter."Blank Line" := true;
 
-            if not Insert then
-                Modify();
-        end;
+        if not CostCenter.Insert() then
+            CostCenter.Modify();
     end;
 }
 

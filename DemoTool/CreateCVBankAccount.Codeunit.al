@@ -32,7 +32,7 @@ codeunit 101287 "Create C/V Bank Account"
         InsertData(
           '', '10000', X1, XNordea, '', '', '', XFI, '', '', '', '', '', X22901872095, '', '');
 
-        PostInsertData;
+        PostInsertData();
     end;
 
     var

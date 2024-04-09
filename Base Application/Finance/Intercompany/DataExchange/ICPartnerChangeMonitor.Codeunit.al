@@ -31,9 +31,6 @@ codeunit 489 "IC Partner Change Monitor"
         UserPermissions: Codeunit "User Permissions";
         CurrentModuleInfo: ModuleInfo;
     begin
-        if not GuiAllowed() then
-            exit;
-
         if UserPermissions.IsSuper(UserSecurityId()) then
             exit;
 
@@ -58,9 +55,7 @@ codeunit 489 "IC Partner Change Monitor"
             FeatureTelemetry.LogUptake('0000LKU', ICMapping.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::Used);
 
         FeatureTelemetry.LogUsage('0000LKV', ICMapping.GetFeatureTelemetryName(), Context);
-#pragma warning disable AA0139
         ActivityLog.LogActivityForUser(ICPartner.RecordId, ActivityLog.Status::Success, Context, ActivityDescription, ActivityMessage, UserId);
-#pragma warning restore AA0139
         Session.LogSecurityAudit(Context, SecurityOperationResult::Success, (ActivityDescription + ActivityMessage), AuditCategory::UserManagement);
     end;
 

@@ -124,7 +124,7 @@
   </Item>
   <Item ItemId=";Codeunit 1282048166 - NamedType 1453266191" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Job Quote]]></Val>
+      <Val><![CDATA[Project Quote]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -147,15 +147,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Mail Service Test - NamedType PurchaseQuoteTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1282048166 - NamedType 840094085" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Sales Credit Memo]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Mail Service Test - NamedType SalesCrMemoTxt)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1282048166 - NamedType 3971944715" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -210,15 +201,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Mail Service Test - NamedType ServiceInvoiceTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2262634688 - NamedType 2271286196" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Long password was set or get incorrect.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Mail Tests - NamedType LongPasswordErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3105905955 - NamedType 2258933448" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

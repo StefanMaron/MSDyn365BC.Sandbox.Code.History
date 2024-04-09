@@ -9,7 +9,7 @@ codeunit 101084 "Create Acc. Schedule Name"
         InsertData(XCATRANSFER, XCostAcctTransfer, '', '');
         InsertData(XCAPROF, XCostAcctSummaryRecordDB, '', '');
         //+JK MSFI NAVISION 4.0 FI
-        InsertData(XBALANCE, XStandardSchedule, '', '');
+        InsertData(XBALANCE, XStandardScheduleLbl, '', '');
         //-JK MSFI NAVISION 4.0 FI
         InsertData(XDEGREE, XCalculationOfCashFlowRatio, XDEGREE, '');
 
@@ -41,7 +41,7 @@ codeunit 101084 "Create Acc. Schedule Name"
         XANALYSIS: Label 'ANALYSIS';
         XBALONLY: Label 'BAL ONLY';
         XCapitalStructure: Label 'Capital Structure';
-        XStandardSchedule: Label 'Standard Schedule';
+        XStandardScheduleLbl: Label 'Standard Schedule';
         XCAMPAIGN: Label 'CAMPAIGN';
         XCampaignAnalysis: Label 'Campaign Analysis';
         XBUDGANALYS: Label 'BUDGANALYS';

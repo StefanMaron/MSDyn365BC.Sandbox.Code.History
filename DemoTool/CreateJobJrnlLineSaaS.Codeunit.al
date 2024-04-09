@@ -5,10 +5,10 @@ codeunit 101218 "Create Job Jrnl Line SaaS"
     var
         CreateJobResources: Codeunit "Create Job Resources";
     begin
-        InsertData(XJOB00010, '1010', 19010316D, XJJ1234, 0, CreateJobResources.KatherineCode, XSpecifications, 8, true);
-        InsertData(XJOB00010, '1010', 19010317D, XJJ1234, 0, CreateJobResources.KatherineCode, XSpecifications, 8, true);
-        InsertData(XJOB00010, '1110', 19010318D, XJJ1234, 0, CreateJobResources.TerryCode, XRemoveOldFurnishings, 8, true);
-        InsertData(XJOB00030, '200', 19010318D, XJJ1234, 0, CreateJobResources.KatherineCode, XKATHERINEHULL, 8, true);
+        InsertData(XJOB00010, '1010', 19010316D, XJJ1234, 0, CreateJobResources.KatherineCode(), XSpecifications, 8, true);
+        InsertData(XJOB00010, '1010', 19010317D, XJJ1234, 0, CreateJobResources.KatherineCode(), XSpecifications, 8, true);
+        InsertData(XJOB00010, '1110', 19010318D, XJJ1234, 0, CreateJobResources.TerryCode(), XRemoveOldFurnishings, 8, true);
+        InsertData(XJOB00030, '200', 19010318D, XJJ1234, 0, CreateJobResources.KatherineCode(), XKATHERINEHULL, 8, true);
         InsertData(XJOB00030, '300', 19010318D, XJJ1234, 1, X1908S, XLONDONSWIVELCHAIR, 2, true);
     end;
 
@@ -34,15 +34,15 @@ codeunit 101218 "Create Job Jrnl Line SaaS"
         CreateJobJournalBatch: Codeunit "Create Job Journal Batch";
     begin
         Date := CA.AdjustDate(Date);
-        InitJobJnlLine("Job Journal Line", XJOB, CreateJobJournalBatch.DefaultName);
+        InitJobJnlLine("Job Journal Line", XJOB, CreateJobJournalBatch.DefaultName());
         "Job Journal Line".Validate("Job No.", "Job No.");
         "Job Journal Line".Validate("Job Task No.", "Job Task");
 
         "Job Journal Line".Validate("Posting Date", Date);
         "Job Journal Line".Validate("Document No.", "Document No.");
         "Job Journal Line".Validate(Type, Type);
-        "Job Journal Line"."Gen. Bus. Posting Group" := DemoDataSetup.DomesticCode;
-        "Job Journal Line"."Gen. Prod. Posting Group" := DemoDataSetup.ServicesCode;
+        "Job Journal Line"."Gen. Bus. Posting Group" := DemoDataSetup.DomesticCode();
+        "Job Journal Line"."Gen. Prod. Posting Group" := DemoDataSetup.ServicesCode();
         "Job Journal Line".Validate("No.", "No.");
         if Description <> '' then
             "Job Journal Line".Validate(Description, Description);

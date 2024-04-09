@@ -69,7 +69,7 @@ page 130021 "Test Tool"
 
                     trigger OnValidate()
                     begin
-                        RefreshSteps;
+                        RefreshSteps();
                         CurrPage.Update(false);
                     end;
                 }
@@ -252,7 +252,7 @@ page 130021 "Test Tool"
                     var
                         TestMgtInternal: Codeunit "Test Management Internal";
                     begin
-                        TestMgtInternal.LoadDefaultTestMap
+                        TestMgtInternal.LoadDefaultTestMap();
                     end;
                 }
                 action(ImportExportTestMap)
@@ -497,7 +497,7 @@ page 130021 "Test Tool"
         TestSuite.Get(CurrentSuiteName);
         TestSuite.CalcFields("Tests to Execute");
         ShowFeatureTags := TestSuite."Show Test Details";
-        RefreshSteps;
+        RefreshSteps();
     end;
 
     var

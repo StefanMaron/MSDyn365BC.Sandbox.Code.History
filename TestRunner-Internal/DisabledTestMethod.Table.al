@@ -1,6 +1,7 @@
 table 130206 "Disabled Test Method"
 {
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {

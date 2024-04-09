@@ -13,13 +13,6 @@ codeunit 101403 "Create Word Templates"
     local procedure InsertWordTemplates()
     var
         DemoDataSetup: Record "Demo Data Setup";
-        WordTemplate: Record "Word Template";
-        File: File;
-        LayoutInStream: InStream;
-        LayoutOutStream: OutStream;
-        XmlPartOutStream: OutStream;
-        FilePath: Text;
-        WordXmlPart: Text;
     begin
         DemoDataSetup.Get();
         InsertWordTemplate('EVENT', CustomerEventLbl, Database::Customer, DemoDataSetup."Path to Picture Folder" + 'WordTemplates\WordTemplate_Customer_Event.docx');

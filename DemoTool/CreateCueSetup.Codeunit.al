@@ -4,12 +4,12 @@ codeunit 101971 "Create Cue Setup"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        InsertDataForActivitiesCue;
-        InsertDataForFinanceCue;
-        InsertDataForSalesCue;
-        InsertDataForRlshpMgmtCue;
+        InsertDataForActivitiesCue();
+        InsertDataForFinanceCue();
+        InsertDataForSalesCue();
+        InsertDataForRlshpMgmtCue();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
-            InsertDataForAdminCue;
+            InsertDataForAdminCue();
     end;
 
     var
