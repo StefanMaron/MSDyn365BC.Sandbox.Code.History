@@ -3,16 +3,13 @@ codeunit 117030 "Create Service Shelf"
 
     trigger OnRun()
     begin
-        with ServiceShelf do begin
-            InsertData('A11', XShelvesAShelf1);
-            InsertData('A12', XShelvesAShelf2);
-            InsertData('B11', XShelvesBShelf1);
-            InsertData('B12', XShelvesBShelf2);
-        end;
+        InsertData('A11', XShelvesAShelf1);
+        InsertData('A12', XShelvesAShelf2);
+        InsertData('B11', XShelvesBShelf1);
+        InsertData('B12', XShelvesBShelf2);
     end;
 
     var
-        ServiceShelf: Record "Service Shelf";
         XShelvesAShelf1: Label 'Shelves A Shelf 1';
         XShelvesAShelf2: Label 'Shelves A Shelf 2';
         XShelvesBShelf1: Label 'Shelves B Shelf 1';

@@ -4,35 +4,34 @@ codeunit 119085 "Create Cost Types"
     trigger OnRun()
     begin
         // NAVCZ
-        WriteCostType('500', XEXPENSES, 3, '', '', '');
-        WriteCostType('501', XMaterialconsumption, 0, XPROD, '', '501000..501999');
-        WriteCostType('502', XEnergyconsumption, 0, XPROD, '', '502000..502999');
-        WriteCostType('503', XNonstorablesupplies, 0, XPROD, '', '503000..503999');
-        WriteCostType('504', XCOGS, 0, XSALES, '', '504000..504999');
-        WriteCostType('510', XServices, 0, XPROD, '', '510000..519999');
-        WriteCostType('520', XPersonalexpenses, 0, XPERS, '', '520000..529999');
-        WriteCostType('530', XTaxesandfees, 0, XGL, '', '530000..539999');
-        WriteCostType('540', XOperatingexpenses, 0, XGL, '', '540000..549999');
-        WriteCostType('550', XDeprecationreserves, 0, XBUILDING, '', '550000..559999');
-        WriteCostType('560', XFinancialexpenses, 0, XADM, '', '560000..569999');
-        WriteCostType('570', XReservesandcorrectionentriesoffinancialexpenses, 0, XGL, '', '570000..579999');
-        WriteCostType('580', XChangeininventoryofownproductionandactivation, 0, XPROD, '', '580000..589999');
-        WriteCostType('590', XIncomeTax, 0, XGL, '', '590000..599900');
-        WriteCostType('599', XExpensesTotal, 4, '', '', '');
-        WriteCostType('600', XREVENUES, 3, '', '', '');
-        WriteCostType('601', XChangeininventoryofownproductionandactivation, 0, XPROD, '', '600001..603999');
-        WriteCostType('604', XSalesGoods, 0, XSALES, '', '604000..609999');
-        WriteCostType('640', XOperatingrevenues, 0, XADM, '', '640000..649999');
-        WriteCostType('660', XFinancialrevenues, 0, XADM, '', '660000..669999');
-        WriteCostType('690', XTransferaccounts, 0, XGL, '', '690000..699900');
-        WriteCostType('699', XRevenuestotal, 4, '', '', '');
+        WriteCostType('500', XEXPENSES, "Cost Account Type"::"Begin-Total", '', '', '');
+        WriteCostType('501', XMaterialconsumption, "Cost Account Type"::"Cost Type", XPROD, '', '501000..501999');
+        WriteCostType('502', XEnergyconsumption, "Cost Account Type"::"Cost Type", XPROD, '', '502000..502999');
+        WriteCostType('503', XNonstorablesupplies, "Cost Account Type"::"Cost Type", XPROD, '', '503000..503999');
+        WriteCostType('504', XCOGS, "Cost Account Type"::"Cost Type", XSALES, '', '504000..504999');
+        WriteCostType('510', XServices, "Cost Account Type"::"Cost Type", XPROD, '', '510000..519999');
+        WriteCostType('520', XPersonalexpenses, "Cost Account Type"::"Cost Type", XPERS, '', '520000..529999');
+        WriteCostType('530', XTaxesandfees, "Cost Account Type"::"Cost Type", XGL, '', '530000..539999');
+        WriteCostType('540', XOperatingexpenses, "Cost Account Type"::"Cost Type", XGL, '', '540000..549999');
+        WriteCostType('550', XDeprecationreserves, "Cost Account Type"::"Cost Type", XBUILDING, '', '550000..559999');
+        WriteCostType('560', XFinancialexpenses, "Cost Account Type"::"Cost Type", XADM, '', '560000..569999');
+        WriteCostType('570', XReservesandcorrectionentriesoffinancialexpenses, "Cost Account Type"::"Cost Type", XGL, '', '570000..579999');
+        WriteCostType('580', XChangeininventoryofownproductionandactivation, "Cost Account Type"::"Cost Type", XPROD, '', '580000..589999');
+        WriteCostType('590', XIncomeTax, "Cost Account Type"::"Cost Type", XGL, '', '590000..599900');
+        WriteCostType('599', XExpensesTotal, "Cost Account Type"::"End-Total", '', '', '');
+        WriteCostType('600', XREVENUES, "Cost Account Type"::"Begin-Total", '', '', '');
+        WriteCostType('601', XChangeininventoryofownproductionandactivation, "Cost Account Type"::"Cost Type", XPROD, '', '600001..603999');
+        WriteCostType('604', XSalesGoods, "Cost Account Type"::"Cost Type", XSALES, '', '604000..609999');
+        WriteCostType('640', XOperatingrevenues, "Cost Account Type"::"Cost Type", XADM, '', '640000..649999');
+        WriteCostType('660', XFinancialrevenues, "Cost Account Type"::"Cost Type", XADM, '', '660000..669999');
+        WriteCostType('690', XTransferaccounts, "Cost Account Type"::"Cost Type", XGL, '', '690000..699900');
+        WriteCostType('699', XRevenuestotal, "Cost Account Type"::"End-Total", '', '', '');
         // NAVCZ
 
-        EnhanceCostType;
+        EnhanceCostType();
     end;
 
     var
-        CostAccMgt: Codeunit "Cost Account Mgt";
         MakeAdjustments: Codeunit "Make Adjustments";
         XExpensesTotal: Label 'Expenses Total';
         XMaterialconsumption: Label 'Material consumption';
@@ -138,16 +137,16 @@ codeunit 119085 "Create Cost Types"
         CostAccountMgt: Codeunit "Cost Account Mgt";
     begin
         // Create new Cost Type  --> may need localization.. adjust also in definecostallocation()
-        WriteCostType('8725', XEmployersSalary, 0, XGL, '', '');
-        WriteCostType('9225', XCalcInterestOnAssets, 0, XADM, '', '');
+        WriteCostType('8725', XEmployersSalary, "Cost Account Type"::"Cost Type", XGL, '', '');
+        WriteCostType('9225', XCalcInterestOnAssets, "Cost Account Type"::"Cost Type", XADM, '', '');
 
-        WriteCostType('9900', XALLOCATIONS, 3, '', '', '');   // From
-        WriteCostType('9901', XInitialCostCenter, 0, '', '', '');
-        WriteCostType('9902', XMainCostCenter, 0, '', '', '');
-        WriteCostType('9903', XAllocOfCostObject, 0, '', '', '');
-        WriteCostType('9999', XTOTALALLOC, 4, '', '', '');  // To
+        WriteCostType('9900', XALLOCATIONS, "Cost Account Type"::"Begin-Total", '', '', '');   // From
+        WriteCostType('9901', XInitialCostCenter, "Cost Account Type"::"Cost Type", '', '', '');
+        WriteCostType('9902', XMainCostCenter, "Cost Account Type"::"Cost Type", '', '', '');
+        WriteCostType('9903', XAllocOfCostObject, "Cost Account Type"::"Cost Type", '', '', '');
+        WriteCostType('9999', XTOTALALLOC, "Cost Account Type"::"End-Total", '', '', '');  // To
 
-        WriteCostType('9920', XActualAccurals, 0, XACTACCR, '', '');
+        WriteCostType('9920', XActualAccurals, "Cost Account Type"::"Cost Type", XACTACCR, '', '');
 
         // Indent Cost Types
         CostAccountMgt.IndentCostTypes(false);
@@ -156,7 +155,7 @@ codeunit 119085 "Create Cost Types"
         CostAccountMgt.LinkCostTypesToGLAccounts();
     end;
 
-    procedure WriteCostType(CostTypeNo: Code[20]; CostTypeName: Text[100]; Type: Integer; CostCenterCode: Code[20]; CostObjectCode: Code[20]; CostGLAccountRange: Text[50])
+    procedure WriteCostType(CostTypeNo: Code[20]; CostTypeName: Text[100]; Type: Enum "Cost Account Type"; CostCenterCode: Code[20]; CostObjectCode: Code[20]; CostGLAccountRange: Text[50])
     var
         CostType: Record "Cost Type";
     begin
@@ -175,12 +174,10 @@ codeunit 119085 "Create Cost Types"
     var
         Position: Integer;
     begin
-        with CostType do begin
-            Position := StrPos(Name, FromText);
-            if Position > 0 then
-                Name := CopyStr(CopyStr(Name, 1, Position - 1) + NewText + CopyStr(Name, Position + StrLen(FromText) + 1), 1, MaxStrLen(Name));
-            exit(Position <> 0);
-        end;
+        Position := StrPos(CostType.Name, FromText);
+        if Position > 0 then
+            CostType.Name := CopyStr(CopyStr(CostType.Name, 1, Position - 1) + NewText + CopyStr(CostType.Name, Position + StrLen(FromText) + 1), 1, MaxStrLen(CostType.Name));
+        exit(Position <> 0);
     end;
 }
 

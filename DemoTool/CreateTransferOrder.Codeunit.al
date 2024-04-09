@@ -75,12 +75,12 @@ codeunit 118012 "Create Transfer Order"
     local procedure InsertHeader(TransferFromCode: Code[20]; TransferToCode: Code[20]; InTransitCode: Code[20]; PostingDate: Date; ShipmentDate: Date; ReceiptDate: Date): Code[20]
     var
         InventorySetup: Record "Inventory Setup";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
+        NoSeries: Codeunit "No. Series";
         TransferNo: Code[20];
     begin
         InventorySetup.Get();
 
-        TransferNo := NoSeriesManagement.GetNextNo(InventorySetup."Transfer Order Nos.", 0D, true);
+        TransferNo := NoSeries.GetNextNo(InventorySetup."Transfer Order Nos.");
         TransferHeader.Init();
         TransferHeader."No." := TransferNo;
         TransferHeader."No. Series" := InventorySetup."Transfer Order Nos.";
@@ -148,23 +148,23 @@ codeunit 118012 "Create Transfer Order"
         TransferLine.DeleteAll();
 
         TransferNo := InsertHeader(XMAIN, XWEST, XOUTLOG,
-            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay),
-            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay),
-            CalcDate('<+3D>', CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay)));
+            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay()),
+            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay()),
+            CalcDate('<+3D>', CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay())));
         InsertLine(TransferNo, 10000, '1968-S', 1, 1, 0);
 
         TransferNo := InsertHeader(XWEST, XEAST, XOWNLOG,
-            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay),
-            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay),
-            CalcDate('<+3D>', CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay)));
+            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay()),
+            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay()),
+            CalcDate('<+3D>', CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay())));
         TransferHeader."External Document No." := OpenDocMarker;
         TransferHeader.Modify(true);
         InsertLine(TransferNo, 10000, '1968-S', 3, 3, 0);
 
         TransferNo := InsertHeader(XEAST, XMAIN, XOWNLOG,
-            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay),
-            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay),
-            CalcDate('<+3D>', CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay)));
+            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay()),
+            CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay()),
+            CalcDate('<+3D>', CA.AdjustDate(InterfaceEvaluationData.GetCurrentDay())));
         InsertLine(TransferNo, 10000, '1968-S', 2, 1, 0);
         TransferHeader."External Document No." := OpenDocMarker;
         TransferHeader.Modify(true);

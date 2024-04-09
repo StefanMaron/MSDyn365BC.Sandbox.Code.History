@@ -3,16 +3,14 @@ codeunit 101261 "Create VAT Clause"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Data Type" in ["Data Type"::Evaluation, "Data Type"::Standard] then begin
-                // NAVCZ
-                InsertData(XEU, 'Jedná se o plnění osvobozené od daně dle zákona č. 235/2004Sb. Zákona o dani z přidané hodnoty v platném znění. Daň odvede zákazník.', '');
-                InsertData(XRC21, 'Dle §92a zákona č. 235/2004 Sb o DPH se jedná o přenesení daňové povinnosti, kdy výši daně je POVINEN DOPLNIT A PŘIZNAT', 'plátce daně, pro kterého se plnění uskutečnilo. Sazba DPH je 21% a daň odvede zákazník.');
-                InsertData(XRC15, 'Dle §92a zákona č. 235/2004 Sb o DPH se jedná o přenesení daňové povinnosti, kdy výši daně je POVINEN DOPLNIT A PŘIZNAT', 'plátce daně, pro kterého se plnění uskutečnilo. Sazba DPH je 15% a daň odvede zákazník.');
-                // NAVCZ
-                ModifyVATPostingSetup;
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Data Type" in [DemoDataSetup."Data Type"::Evaluation, DemoDataSetup."Data Type"::Standard] then begin
+            // NAVCZ
+            InsertData(XEU, 'Jedná se o plnění osvobozené od daně dle zákona č. 235/2004Sb. Zákona o dani z přidané hodnoty v platném znění. Daň odvede zákazník.', '');
+            InsertData(XRC21, 'Dle §92a zákona č. 235/2004 Sb o DPH se jedná o přenesení daňové povinnosti, kdy výši daně je POVINEN DOPLNIT A PŘIZNAT', 'plátce daně, pro kterého se plnění uskutečnilo. Sazba DPH je 21% a daň odvede zákazník.');
+            InsertData(XRC15, 'Dle §92a zákona č. 235/2004 Sb o DPH se jedná o přenesení daňové povinnosti, kdy výši daně je POVINEN DOPLNIT A PŘIZNAT', 'plátce daně, pro kterého se plnění uskutečnilo. Sazba DPH je 15% a daň odvede zákazník.');
+            // NAVCZ
+            ModifyVATPostingSetup();
         end;
     end;
 

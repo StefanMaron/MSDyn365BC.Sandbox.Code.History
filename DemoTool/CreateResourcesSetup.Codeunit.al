@@ -3,25 +3,25 @@ codeunit 101314 "Create Resources Setup"
 
     trigger OnRun()
     begin
-        DemoDataSetup.Get(); // NAVCZ
-        with ResourcesSetup do begin
-            Get();
-            if "Resource Nos." = '' then
-                if not NoSeries.Get(XRES) then
-                    CreateNoSeries.InitBaseSeries("Resource Nos.", XRES, XResource, XR10, XR9990, '', '', 10, true)
+        DemoDataSetup.Get();
+        // NAVCZ
+        ResourcesSetup.Get();
+        if ResourcesSetup."Resource Nos." = '' then
+            if not NoSeries.Get(XRES) then
+                CreateNoSeries.InitBaseSeries(ResourcesSetup."Resource Nos.", XRES, XResource, XR10, XR9990, '', '', 10, Enum::"No. Series Implementation"::Sequence)
+            else
+                ResourcesSetup."Resource Nos." := XRES;
+        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
+            // NAVCZ
+            if ResourcesSetup."Time Sheet Nos." = '' then
+                if not NoSeries.Get(XTS) then
+                    CreateNoSeries.InitBaseSeries(ResourcesSetup."Time Sheet Nos.", XTS, XTimeSheet, XTS00001, XTS99999, '', '', 1, Enum::"No. Series Implementation"::Sequence)
                 else
-                    "Resource Nos." := XRES;
-            if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then // NAVCZ
-                if "Time Sheet Nos." = '' then
-                    if not NoSeries.Get(XTS) then
-                        CreateNoSeries.InitBaseSeries("Time Sheet Nos.", XTS, XTimeSheet, XTS00001, XTS99999, '', '', 1, true)
-                    else
-                        "Time Sheet Nos." := XTS;
+                    ResourcesSetup."Time Sheet Nos." := XTS;
 #if not CLEAN22
-            "Use New Time Sheet Experience" := true;
+        ResourcesSetup."Use New Time Sheet Experience" := true;
 #endif
-            Modify();
-        end;
+        ResourcesSetup.Modify();
     end;
 
     var

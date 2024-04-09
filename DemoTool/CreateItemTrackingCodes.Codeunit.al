@@ -12,11 +12,11 @@ codeunit 118651 "Create Item Tracking Codes"
 
         LastNoSeriesCode := '';
         "Create No. Series".InitBaseSeries(
-          LastNoSeriesCode, XLOT, XLotNumbering, XLOT0001, XLOT9999, '', '', 1, true);
+          LastNoSeriesCode, XLOT, XLotNumbering, XLOT0001, XLOT9999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          LastNoSeriesCode, XSN1, XSNNumbering, XSN00001, XSN99999, '', '', 1, true);
+          LastNoSeriesCode, XSN1, XSNNumbering, XSN00001, XSN99999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(
-          LastNoSeriesCode, XSN2, XSNNumbering, XXYZ00001, XXYZ99999, '', '', 1, true);
+          LastNoSeriesCode, XSN2, XSNNumbering, XXYZ00001, XXYZ99999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
     end;
 
     var

@@ -79,12 +79,12 @@ codeunit 101080 "Create Gen. Journal Template"
 
     procedure InsertData(Name: Code[10]; Description: Text[80]; Type: Enum "Gen. Journal Template Type"; Recurring: Boolean; "Source Code": Code[10]; "No. Series": Code[10]; NoSeriesDescription: Text[30]; NoSeriesStartNo: Code[20]; NoSeriesEndNo: Code[20])
     var
-      NoSeries: Record "No. Series";
+        NoSeries: Record "No. Series";
     begin
         if ("No. Series" <> '') and ("No. Series" <> LastNoSeriesCode) then
-          if not NoSeries.Get("No. Series") then
-              "Create No. Series".InitBaseSeries(
-                "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1);
+            if not NoSeries.Get("No. Series") then
+                "Create No. Series".InitBaseSeries(
+                  "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1);
         LastNoSeriesCode := "No. Series";
 
         "Gen. Journal Template".Init();

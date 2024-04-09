@@ -3,31 +3,28 @@ codeunit 101250 "Create Gen. Bus. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            case "Company Type" of
-                "Company Type"::"Sales Tax":
-                    begin
-                        InsertData(DomesticCode, XDomesticcustomersandvendors, '');
-                        InsertData(EUCode, XCustomersandvendorsinEU, '');
-                        InsertData(ExportCode, XOthercustomersandvendorsnotEU, '');
-                    end;
-                "Company Type"::VAT:
-                    begin
-                        InsertData(DomesticCode, XDomesticcustomersandvendors, DomesticCode);
-                        InsertData(EUCode, XCustomersandvendorsinEU, EUCode);
-                        InsertData(ExportCode, XOthercustomersandvendorsnotEU, ExportCode);
-                    end;
-            end;
-
-            // NAVCZ
-            InsertData(ISurplusCode(), ISurplusText(), '');
-            InsertData(IDeficiencyCode(), IDeficiencyText(), '');
-            InsertData(ITransferCode(), ITransferText(), '');
-            InsertData(IAssemblyCode(), IAssemblyText(), '');
-            InsertData(IManufactureCode(), IManufactureText(), '');
-            // NAVCZ
+        DemoDataSetup.Get();
+        case DemoDataSetup."Company Type" of
+            DemoDataSetup."Company Type"::"Sales Tax":
+                begin
+                    InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, '');
+                    InsertData(DemoDataSetup.EUCode(), XCustomersandvendorsinEU, '');
+                    InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, '');
+                end;
+            DemoDataSetup."Company Type"::VAT:
+                begin
+                    InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, DemoDataSetup.DomesticCode());
+                    InsertData(DemoDataSetup.EUCode(), XCustomersandvendorsinEU, DemoDataSetup.EUCode());
+                    InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, DemoDataSetup.ExportCode());
+                end;
         end;
+        // NAVCZ
+        InsertData(DemoDataSetup.ISurplusCode(), DemoDataSetup.ISurplusText(), '');
+        InsertData(DemoDataSetup.IDeficiencyCode(), DemoDataSetup.IDeficiencyText(), '');
+        InsertData(DemoDataSetup.ITransferCode(), DemoDataSetup.ITransferText(), '');
+        InsertData(DemoDataSetup.IAssemblyCode(), DemoDataSetup.IAssemblyText(), '');
+        InsertData(DemoDataSetup.IManufactureCode(), DemoDataSetup.IManufactureText(), '');
+        // NAVCZ
     end;
 
     var
@@ -50,12 +47,10 @@ codeunit 101250 "Create Gen. Bus. Posting Gr."
 
     procedure InsertMiniAppData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(DomesticCode, XDomesticcustomersandvendors, DomesticCode);
-            InsertData(EUCode, XCustomersandvendorsinEU, EUCode);
-            InsertData(ExportCode, XOthercustomersandvendorsnotEU, ExportCode);
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.DomesticCode(), XDomesticcustomersandvendors, DemoDataSetup.DomesticCode());
+        InsertData(DemoDataSetup.EUCode(), XCustomersandvendorsinEU, DemoDataSetup.EUCode());
+        InsertData(DemoDataSetup.ExportCode(), XOthercustomersandvendorsnotEU, DemoDataSetup.ExportCode());
     end;
 }
 

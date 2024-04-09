@@ -10,7 +10,7 @@ codeunit 130206 "Random Test Runner"
         NoOfMethods: Integer;
     begin
         CompanyWorkDate := WorkDate();
-        TestRunNo := TestResult.LastTestRunNo + 1;
+        TestRunNo := TestResult.LastTestRunNo() + 1;
 
         // Populate the Enabled Test methods table
         CODEUNIT.Run(CODEUNIT::"Test Runner Generator");
@@ -23,7 +23,7 @@ codeunit 130206 "Random Test Runner"
                 if AllObj.Get(AllObj."Object Type"::Codeunit, EnabledTestCodeunit."Test Codeunit ID") then begin
                     // Restore backup in between codeunits
                     BackupMgt.SetEnabled(true);
-                    BackupMgt.DefaultFixture;
+                    BackupMgt.DefaultFixture();
                     BackupMgt.SetEnabled(false);
 
                     // Copy enabled methods to temp
@@ -34,7 +34,7 @@ codeunit 130206 "Random Test Runner"
                     // Execute methods
                     while NoOfMethods > 0 do begin
                         // Pick method randomly
-                        Randomize;
+                        Randomize();
                         TempEnabledTestMethod.Next(Random(TempEnabledTestMethod.Count));
 
                         // Execute Test CU
@@ -100,7 +100,7 @@ codeunit 130206 "Random Test Runner"
             exit;
         end;
 
-        TestResult.Update(Success, EndTime - StartTime, BackupMgt.GetExecutionFlag);
+        TestResult.Update(Success, EndTime - StartTime, BackupMgt.GetExecutionFlag());
 
         if FName = '' then
             exit;

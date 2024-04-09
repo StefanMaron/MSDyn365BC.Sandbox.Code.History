@@ -3,48 +3,37 @@
 
     trigger OnRun()
     begin
-        InsertData(XSTART, XCUSTOPEN, XCustomers, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XSTART, XGLOPEN, XGLAccounts, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XSTART, XPERIODIC, XPERIODIC, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XSTART, XVENDOPEN, XVendors, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XSTART, XBANKOPEN, XBank, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XSTART, XDEFAULT, XOther, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XCUSTOPEN, XCustomers, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XGLOPEN, XGLAccounts, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XPERIODIC, XPERIODIC, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XVENDOPEN, XVendors, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XBANKOPEN, XBank, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XDEFAULT, XOther, "Gen. Journal Account Type"::"G/L Account", '', true, false);
 
-        InsertData(XSTART, XDEPR, XPeriodicDepr, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XASSETS, XDEFAULT, XDefaultJournalBatch, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XJOB, XDEFAULT, XDefaultJournalBatch, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XSTART, XDEPR, XPeriodicDepr, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XASSETS, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XJOB, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
 
-        InsertData(
-          XGENERAL, XDEFAULT, XDefaultJournalBatch,
-          Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(
-          XGENERAL, XCASH, XCashreceiptsandpayments,
-          Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false); // NAVCZ
-        InsertData(
-          XSALES, XDEFAULT, XDefaultJournalBatch,
-          Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(
-          XPURCH, XDEFAULT, XDefaultJournalBatch,
-          Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XGENERAL, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XGENERAL, XCASH, XCashreceiptsandpayments,
+          "Gen. Journal Account Type"::"G/L Account", '', true, false); // NAVCZ
+        InsertData(XSALES, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XPURCH, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
 
-        InsertData(
-          XCASHRCPT, XDEFAULT, XDefaultJournalBatch, // NAVCZ
-          Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(
-          XCASHRCPT, XBank, XBankpayments,
+        InsertData(XCASHRCPT, XDEFAULT, XDefaultJournalBatch, // NAVCZ
+          "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XCASHRCPT, XBank, XBankpayments,
           "Gen. Journal Batch"."Bal. Account Type"::"Bank Account", XWWBOPERATING, true, false);
-        InsertData(
-          XCASHRCPT, XGIRO, XGiropayments,
+        InsertData(XCASHRCPT, XGIRO, XGiropayments,
           "Gen. Journal Batch"."Bal. Account Type"::"Bank Account", XGIRO, true, false);
-        InsertData(
-          XPAYMENT, XDEFAULT, XDefaultJournalBatch, // NAVCZ
-          Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XPAYMENT, XDEFAULT, XDefaultJournalBatch, // NAVCZ
+          "Gen. Journal Account Type"::"G/L Account", '', true, false);
         InsertData(
           XPAYMENT, XBank, XBankpayments,
           "Gen. Journal Batch"."Bal. Account Type"::"Bank Account", XWWBOPERATING, false, false);
         InsertData(
           XPAYMENT, XCASH, XCashreceiptsandpayments,
-          Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false); // NAVCZ
+          "Gen. Journal Account Type"::"G/L Account", '', true, false); // NAVCZ
         InsertData(
           XPAYMENT, XGIRO, XGiropayments,
           "Gen. Journal Batch"."Bal. Account Type"::"Bank Account", XGIRO, true, false);
@@ -74,7 +63,7 @@
         XPeriodicDepr: Label 'Periodic Depr.';
         XASSETS: Label 'ASSETS';
         XDefaultJournalBatch: Label 'Default Journal Batch';
-        XGENERAL: Label 'GENERAL';
+        XGENERAL: Label 'GENERAL', MaxLength = 10;
         XCASH: Label 'CASH';
         XCashreceiptsandpayments: Label 'Cash receipts and payments';
         XSALES: Label 'SALES';
@@ -91,9 +80,7 @@
         XBankConvTxt: Label 'BANK CONV', Locked = true;
         XBankConvDescTxt: Label 'Payment Export using Bank Data Conversion Service';
         XWWBTRANSFERSTxt: Label 'WWB-TRANSFERS', Locked = true;
-        XMONTHLY: Label 'Monthly';
-        XMonthlyJournalEntries: Label 'Monthly Journal Entries';
-        XDAILY: Label 'DAILY';
+        XDAILY: Label 'DAILY', MaxLength = 10;
         XRECURRING: Label 'RECURRING';
         XCLOSING: Label 'CLOSING';
         XOPBALSHT: Label 'OPBALSHT', Comment = 'Open Balance Sheet';
@@ -128,18 +115,18 @@
 
     procedure InsertMiniAppData()
     begin
-        InsertData(XGENERAL, XDEFAULT, XDefaultJournalBatch, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XGENERAL, XDAILY, XDailyJournalEntries, 3, '', true, false);
+        InsertData(XGENERAL, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XGENERAL, XDAILY, XDailyJournalEntries, "Gen. Journal Account Type"::"Bank Account", '', true, false);
         UpdateCopyToPostedGenJnlLines(XGENERAL, XDEFAULT, true);
-        InsertData(XCASHRCPT, XGENERAL, XGENERAL, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false); // NAVCZ
+        InsertData(XCASHRCPT, XGENERAL, XGENERAL, "Gen. Journal Account Type"::"G/L Account", '', true, false); // NAVCZ
         InsertData(XPAYMENT, XPmtRegTxt, XBankReconciliationTxt, "Gen. Journal Batch"."Bal. Account Type"::"Bank Account", '', true, true);
-        InsertData(XPAYMENT, XCASH, XCashreceiptsandpayments, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false); // NAVCZ
-        InsertData(XASSETS, XDEFAULT, XDefaultJournalBatch, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XPAYMENT, XCASH, XCashreceiptsandpayments, "Gen. Journal Account Type"::"G/L Account", '', true, false); // NAVCZ
+        InsertData(XASSETS, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
         // NAVCZ
-        InsertData(XRECURRING, XDEFAULT, XDefaultJournalBatch, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XCLOSING, XOPBALSHT, XOpenBalanceSheet, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XCLOSING, XCLBALSHT, XCloseBalanceSheet, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
-        InsertData(XCLOSING, XCLINCSTMT, XCloseIncomeStatement, Enum::"Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XRECURRING, XDEFAULT, XDefaultJournalBatch, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XCLOSING, XOPBALSHT, XOpenBalanceSheet, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XCLOSING, XCLBALSHT, XCloseBalanceSheet, "Gen. Journal Account Type"::"G/L Account", '', true, false);
+        InsertData(XCLOSING, XCLINCSTMT, XCloseIncomeStatement, "Gen. Journal Account Type"::"G/L Account", '', true, false);
         // NAVCZ
     end;
 
@@ -161,12 +148,12 @@
         GenJournalBatch.Name := XDEFAULT;
     end;
 
-    internal procedure GetGeneralJournalTemplateName(): Text
+    internal procedure GetGeneralJournalTemplateName(): Code[10]
     begin
         exit(XGENERAL);
     end;
 
-    internal procedure GetDailyJournalBatchName(): Text
+    internal procedure GetDailyJournalBatchName(): Code[10]
     begin
         exit(XDAILY);
     end;

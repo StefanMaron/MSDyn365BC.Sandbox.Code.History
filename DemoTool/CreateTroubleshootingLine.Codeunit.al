@@ -3,25 +3,22 @@ codeunit 117045 "Create Troubleshooting Line"
 
     trigger OnRun()
     begin
-        with TroubleshootingLine do begin
-            InsertData(XTR00001, 10000, XIsthepowerswitchdonQmark);
-            InsertData(XTR00001, 20000, XIsservercnnctdtontworkQmark);
-            InsertData(XTR00001, 30000, Xrqurdprphrlcompscnnctdtosrv);
-            InsertData(XTR00001, 40000, Xrqurdswinstalledontheserver);
-            InsertData(XTR00001, 50000, Xpossbltologontomachineslnetw);
-            InsertData(XTR00001, 60000, XWhterrormsgsifanyaredisplayd);
-            InsertData(XTR00001, 70000, XWhtltsterrormsgsalrtsevntlog);
-            InsertData(XTR00002, 10000, XIsthenetworkcableconnected);
-            InsertData(XTR00002, 20000, Xlghtsinntwcrdndcatngnetwtrffc);
-            InsertData(XTR00002, 30000, Xutltprogfornetwcrdndcthwerror);
-            InsertData(XTR00003, 10000, XWhtltsterralrtsineventlog);
-            InsertData(XTR00004, 10000, XWhtltsterralrtsineventlog);
-            InsertData(XTR00005, 10000, XPowerfailureQmark);
-        end;
+        InsertData(XTR00001, 10000, XIsthepowerswitchdonQmark);
+        InsertData(XTR00001, 20000, XIsservercnnctdtontworkQmark);
+        InsertData(XTR00001, 30000, Xrqurdprphrlcompscnnctdtosrv);
+        InsertData(XTR00001, 40000, Xrqurdswinstalledontheserver);
+        InsertData(XTR00001, 50000, Xpossbltologontomachineslnetw);
+        InsertData(XTR00001, 60000, XWhterrormsgsifanyaredisplayd);
+        InsertData(XTR00001, 70000, XWhtltsterrormsgsalrtsevntlog);
+        InsertData(XTR00002, 10000, XIsthenetworkcableconnected);
+        InsertData(XTR00002, 20000, Xlghtsinntwcrdndcatngnetwtrffc);
+        InsertData(XTR00002, 30000, Xutltprogfornetwcrdndcthwerror);
+        InsertData(XTR00003, 10000, XWhtltsterralrtsineventlog);
+        InsertData(XTR00004, 10000, XWhtltsterralrtsineventlog);
+        InsertData(XTR00005, 10000, XPowerfailureQmark);
     end;
 
     var
-        TroubleshootingLine: Record "Troubleshooting Line";
         XTR00001: Label 'TR00001';
         XTR00002: Label 'TR00002';
         XTR00003: Label 'TR00003';

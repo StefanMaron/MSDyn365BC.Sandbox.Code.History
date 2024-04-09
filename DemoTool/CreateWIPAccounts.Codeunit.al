@@ -14,9 +14,9 @@ codeunit 119032 "Create WIP Accounts"
         InsertData('997891', XCapacityVariance, 0, 0, 0, '', 0, '', '', false);
         InsertData('997892', XSubcontractedVariance, 0, 0, 0, '', 0, '', '', false);
 
-        GLAccIndent.Indent;
+        GLAccIndent.Indent();
 
-        UpdateManufactAccounts;
+        UpdateManufactAccounts();
 
         // Assets
         GLAccountCategoryMgt.GetAccountCategory(GLAccountCategory, GLAccountCategory."Account Category"::Assets);
@@ -100,7 +100,7 @@ codeunit 119032 "Create WIP Accounts"
         InsertData('997792', XOverheadAppliedCap, 0, 0, 0, '', 1, DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), false);
         InsertData('997793', XPurchaseVarianceCap, 0, 0, 0, '', 1, DemoDataSetup.DomesticCode(), DemoDataSetup.MiscCode(), false);
 
-        UpdateManufactAccounts;
+        UpdateManufactAccounts();
 
         // Assets
         GLAccountCategoryMgt.GetAccountCategory(GLAccountCategory, GLAccountCategory."Account Category"::Assets);
@@ -136,24 +136,24 @@ codeunit 119032 "Create WIP Accounts"
                 then
                     // NAVCZ
                     case GenPostingSetup."Gen. Prod. Posting Group" of
-                        DemoDataSetup.RawMatCode:
+                        DemoDataSetup.RawMatCode():
                             begin
                                 GenPostingSetup.Validate("Direct Cost Applied Account", Adjust.Convert('997291'));
                                 GenPostingSetup.Validate("Overhead Applied Account", Adjust.Convert('997292'));
                                 GenPostingSetup.Validate("Purchase Variance Account", Adjust.Convert('997293'));
                                 GenPostingSetup.Modify();
                             end;
-                        DemoDataSetup.MiscCode,
-                        DemoDataSetup.NoVATCode,
-                        DemoDataSetup.RetailCode:
+                        DemoDataSetup.MiscCode(),
+                        DemoDataSetup.NoVATCode(),
+                        DemoDataSetup.RetailCode():
                             begin
                                 GenPostingSetup.Validate("Direct Cost Applied Account", Adjust.Convert('997110')); // NAVCZ
                                 GenPostingSetup.Validate("Overhead Applied Account", Adjust.Convert('997192'));
                                 GenPostingSetup.Validate("Purchase Variance Account", Adjust.Convert('997193'));
                                 GenPostingSetup.Modify();
                             end;
-                        DemoDataSetup.ServicesCode,
-                        DemoDataSetup.ManufactCode:
+                        DemoDataSetup.ServicesCode(),
+                        DemoDataSetup.ManufactCode():
                             begin
                                 GenPostingSetup.Validate("Direct Cost Applied Account", Adjust.Convert('997150')); // NAVCZ
                                 GenPostingSetup.Validate("Overhead Applied Account", Adjust.Convert('997792'));

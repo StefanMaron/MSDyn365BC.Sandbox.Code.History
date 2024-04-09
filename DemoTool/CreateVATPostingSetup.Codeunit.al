@@ -3,56 +3,54 @@ codeunit 101325 "Create VAT Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            case "Company Type" of
-                "Company Type"::VAT:
-                    begin
-                        // NAVCZ
-                        InsertData('', NoVATCode(), 0, 0, '');
-                        InsertData('', SecondReducedVATItemCode(), 0, 0, '');
-                        InsertData('', SecondReducedVATServiceCode(), 0, 0, '');
-                        InsertData('', FirstReducedVATItemCode(), 0, 0, '');
-                        InsertData('', FirstReducedVATServiceCode(), 0, 0, '');
-                        InsertData('', BaseVATItemCode(), 0, 0, '');
-                        InsertData('', BaseVATServiceCode(), 0, 0, '');
-                        InsertData(DomesticCode(), NoVATCode(), 0, 0, '');
-                        InsertData(DomesticCode(), SecondReducedVATItemCode(), SecondReducedVATRate(), 0, '');
-                        InsertData(DomesticCode(), SecondReducedVATServiceCode(), SecondReducedVATRate(), 0, '');
-                        InsertData(DomesticCode(), FirstReducedVATItemCode(), FirstReducedVATRate(), 0, '');
-                        InsertData(DomesticCode(), FirstReducedVATServiceCode(), FirstReducedVATRate(), 0, '');
-                        InsertData(DomesticCode(), FirstReducedVATReverseChargeCode(), FirstReducedVATRate(), 1, '');
-                        InsertData(DomesticCode(), BaseVATItemCode(), BaseVATRate(), 0, '');
-                        InsertData(DomesticCode(), BaseVATServiceCode(), BaseVATRate(), 0, '');
-                        InsertData(DomesticCode(), BaseVATReverseChargeCode(), BaseVATRate(), 1, '');
-                        InsertData(EUCode(), NoVATCode(), 0, 0, '');
-                        InsertData(EUCode(), SecondReducedVATItemCode(), SecondReducedVATRate(), 1, '');
-                        InsertData(EUCode(), SecondReducedVATServiceCode(), SecondReducedVATRate(), 1, '');
-                        InsertData(EUCode(), FirstReducedVATItemCode(), FirstReducedVATRate(), 1, '');
-                        InsertData(EUCode(), FirstReducedVATServiceCode(), FirstReducedVATRate(), 1, '');
-                        InsertData(EUCode(), BaseVATItemCode(), BaseVATRate(), 1, '');
-                        InsertData(EUCode(), BaseVATServiceCode(), BaseVATRate(), 1, '');
-                        InsertData(ExportCode(), NoVATCode(), 0, 0, '');
-                        InsertData(ExportCode(), SecondReducedVATItemCode(), 0, 0, '');
-                        InsertData(ExportCode(), SecondReducedVATServiceCode(), SecondReducedVATRate(), 0, '');
-                        InsertData(ExportCode(), FirstReducedVATItemCode(), 0, 0, '');
-                        InsertData(ExportCode(), FirstReducedVATServiceCode(), FirstReducedVATRate(), 0, '');
-                        InsertData(ExportCode(), BaseVATItemCode(), 0, 0, '');
-                        InsertData(ExportCode(), BaseVATServiceCode(), BaseVATRate(), 0, '');
-                        InsertData(NPCode(), NoVATCode(), 0, 0, '');
-                        InsertData(NPCode(), SecondReducedVATItemCode(), SecondReducedVATRate(), 0, '');
-                        InsertData(NPCode(), SecondReducedVATServiceCode(), SecondReducedVATRate(), 0, '');
-                        InsertData(NPCode(), FirstReducedVATItemCode(), FirstReducedVATRate(), 0, '');
-                        InsertData(NPCode(), FirstReducedVATServiceCode(), FirstReducedVATRate(), 0, '');
-                        InsertData(NPCode(), FirstReducedVATReverseChargeCode(), FirstReducedVATRate(), 1, '');
-                        InsertData(NPCode(), BaseVATItemCode(), BaseVATRate(), 0, '');
-                        InsertData(NPCode(), BaseVATServiceCode(), BaseVATRate(), 0, '');
-                        InsertData(NPCode(), BaseVATReverseChargeCode(), BaseVATRate(), 1, '');
-                        // NAVCZ
-                    end;
-                "Company Type"::"Sales Tax":
-                    InsertSalesTaxData('E');
-            end;
+        DemoDataSetup.Get();
+        case DemoDataSetup."Company Type" of
+            DemoDataSetup."Company Type"::VAT:
+                begin
+                    // NAVCZ
+                    InsertData('', DemoDataSetup.NoVATCode(), 0, 0, '');
+                    InsertData('', DemoDataSetup.SecondReducedVATItemCode(), 0, 0, '');
+                    InsertData('', DemoDataSetup.SecondReducedVATServiceCode(), 0, 0, '');
+                    InsertData('', DemoDataSetup.FirstReducedVATItemCode(), 0, 0, '');
+                    InsertData('', DemoDataSetup.FirstReducedVATServiceCode(), 0, 0, '');
+                    InsertData('', DemoDataSetup.BaseVATItemCode(), 0, 0, '');
+                    InsertData('', DemoDataSetup.BaseVATServiceCode(), 0, 0, '');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.NoVATCode(), 0, 0, '');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.SecondReducedVATItemCode(), DemoDataSetup.SecondReducedVATRate(), 0, '');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.SecondReducedVATServiceCode(), DemoDataSetup.SecondReducedVATRate(), 0, '');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.FirstReducedVATItemCode(), DemoDataSetup.FirstReducedVATRate(), 0, '');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.FirstReducedVATServiceCode(), DemoDataSetup.FirstReducedVATRate(), 0, '');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.FirstReducedVATReverseChargeCode(), DemoDataSetup.FirstReducedVATRate(), 1, '');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.BaseVATItemCode(), DemoDataSetup.BaseVATRate(), 0, '');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.BaseVATServiceCode(), DemoDataSetup.BaseVATRate(), 0, '');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.BaseVATReverseChargeCode(), DemoDataSetup.BaseVATRate(), 1, '');
+                    InsertData(DemoDataSetup.EUCode(), DemoDataSetup.NoVATCode(), 0, 0, '');
+                    InsertData(DemoDataSetup.EUCode(), DemoDataSetup.SecondReducedVATItemCode(), DemoDataSetup.SecondReducedVATRate(), 1, '');
+                    InsertData(DemoDataSetup.EUCode(), DemoDataSetup.SecondReducedVATServiceCode(), DemoDataSetup.SecondReducedVATRate(), 1, '');
+                    InsertData(DemoDataSetup.EUCode(), DemoDataSetup.FirstReducedVATItemCode(), DemoDataSetup.FirstReducedVATRate(), 1, '');
+                    InsertData(DemoDataSetup.EUCode(), DemoDataSetup.FirstReducedVATServiceCode(), DemoDataSetup.FirstReducedVATRate(), 1, '');
+                    InsertData(DemoDataSetup.EUCode(), DemoDataSetup.BaseVATItemCode(), DemoDataSetup.BaseVATRate(), 1, '');
+                    InsertData(DemoDataSetup.EUCode(), DemoDataSetup.BaseVATServiceCode(), DemoDataSetup.BaseVATRate(), 1, '');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.NoVATCode(), 0, 0, '');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.SecondReducedVATItemCode(), 0, 0, '');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.SecondReducedVATServiceCode(), DemoDataSetup.SecondReducedVATRate(), 0, '');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.FirstReducedVATItemCode(), 0, 0, '');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.FirstReducedVATServiceCode(), DemoDataSetup.FirstReducedVATRate(), 0, '');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.BaseVATItemCode(), 0, 0, '');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.BaseVATServiceCode(), DemoDataSetup.BaseVATRate(), 0, '');
+                    InsertData(DemoDataSetup.NPCode(), DemoDataSetup.NoVATCode(), 0, 0, '');
+                    InsertData(DemoDataSetup.NPCode(), DemoDataSetup.SecondReducedVATItemCode(), DemoDataSetup.SecondReducedVATRate(), 0, '');
+                    InsertData(DemoDataSetup.NPCode(), DemoDataSetup.SecondReducedVATServiceCode(), DemoDataSetup.SecondReducedVATRate(), 0, '');
+                    InsertData(DemoDataSetup.NPCode(), DemoDataSetup.FirstReducedVATItemCode(), DemoDataSetup.FirstReducedVATRate(), 0, '');
+                    InsertData(DemoDataSetup.NPCode(), DemoDataSetup.FirstReducedVATServiceCode(), DemoDataSetup.FirstReducedVATRate(), 0, '');
+                    InsertData(DemoDataSetup.NPCode(), DemoDataSetup.FirstReducedVATReverseChargeCode(), DemoDataSetup.FirstReducedVATRate(), 1, '');
+                    InsertData(DemoDataSetup.NPCode(), DemoDataSetup.BaseVATItemCode(), DemoDataSetup.BaseVATRate(), 0, '');
+                    InsertData(DemoDataSetup.NPCode(), DemoDataSetup.BaseVATServiceCode(), DemoDataSetup.BaseVATRate(), 0, '');
+                    InsertData(DemoDataSetup.NPCode(), DemoDataSetup.BaseVATReverseChargeCode(), DemoDataSetup.BaseVATRate(), 1, '');
+                    // NAVCZ
+                end;
+            DemoDataSetup."Company Type"::"Sales Tax":
+                InsertSalesTaxData('E');
         end;
     end;
 
@@ -169,7 +167,7 @@ codeunit 101325 "Create VAT Posting Setup"
                         SetAccounts(VATPostingSetup, '995611', '995631', '995621', '995616', '995631', '995626');
                         VATPostingSetup."VAT Rate CZL" := VATPostingSetup."VAT Rate CZL"::"Reduced 2";
                     end;
-                DemoDataSetup.NoVATCode:
+                DemoDataSetup.NoVATCode():
                     SetAccounts(VATPostingSetup, '995610', '995630', '995620', '995615', '995635', '995625');
             // NAVCZ
             end;
@@ -200,12 +198,12 @@ codeunit 101325 "Create VAT Posting Setup"
     begin
         VATPostingSetup.Validate("Sales VAT Account", CA.Convert(SalesVATAccount));
         VATPostingSetup.Validate("Purchase VAT Account", CA.Convert(PurchaseVATAccount));
-        if VATPostingSetup."VAT Calculation Type" = 1 then
+        if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
             VATPostingSetup.Validate("Reverse Chrg. VAT Acc.", CA.Convert(ReverseChargeVATAcc));
         if VATPostingSetup."Unrealized VAT Type" > 0 then begin
             VATPostingSetup.Validate("Sales VAT Unreal. Account", CA.Convert(SalesVATUnrealAccount));
             VATPostingSetup.Validate("Purch. VAT Unreal. Account", CA.Convert(PurchaseVATUnrealAccount));
-            if VATPostingSetup."VAT Calculation Type" = 1 then
+            if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
                 VATPostingSetup.Validate("Reverse Chrg. VAT Unreal. Acc.", CA.Convert(ReverseChargeVATUnrealAcc));
         end;
     end;

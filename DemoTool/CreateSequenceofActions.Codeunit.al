@@ -3,8 +3,8 @@ codeunit 101901 "Create Sequence of Actions"
 
     trigger OnRun()
     begin
-        "Interface Basis Data".BeforePosting;
-        InterfaceCZData."Before Posting"; // NAVCZ
+        "Interface Basis Data".BeforePosting();
+        InterfaceCZData."Before Posting"(); // NAVCZ
 
         DemoDataSetup.Get();
 
@@ -45,11 +45,6 @@ codeunit 101901 "Create Sequence of Actions"
             if DemoDataSetup.Financials then
                 InterfaceCZData.Post(ActualDate);
             // NAVCZ
-
-            if ActualDate < CA.AdjustDate(19021231D) then
-                "Modify Registers".ModifyRegisters(CA.AdjustDate(19021231D))
-            else
-                "Modify Registers".ModifyRegisters(ActualDate);
         end;
 
         WorkDate := ActualDate;
@@ -57,20 +52,19 @@ codeunit 101901 "Create Sequence of Actions"
         Window.Update(1, XFinalSetup);
         Window.Update(2, 9900);
 
-        "Interface Basis Data".AfterPosting;
+        "Interface Basis Data".AfterPosting();
         if DemoDataSetup.Financials then
-            "Interface Finance Management"."After Posting";
+            "Interface Finance Management"."After Posting"();
         if DemoDataSetup.Manufacturing then
-            "Interface Manufacturing"."After Posting";
+            "Interface Manufacturing"."After Posting"();
         if DemoDataSetup."Relationship Mgt." then
-            "Interface Relationship Mgt."."After Posting";
+            "Interface Relationship Mgt."."After Posting"();
         if DemoDataSetup."Service Management" then
-            "Interface Service Management"."After Posting";
+            "Interface Service Management"."After Posting"();
         // NAVCZ
         if DemoDataSetup.Financials then
-            InterfaceCZData."After Posting";
+            InterfaceCZData."After Posting"();
         // NAVCZ
-
 
         Window.Close();
     end;
@@ -89,7 +83,6 @@ codeunit 101901 "Create Sequence of Actions"
         "Interface ADCS": Codeunit "Interface ADCS";
         InterfaceReservedForFut3: Codeunit "Interface Reserved for fut. 3";
         "Interface HTML": Codeunit "Interface Reserved for fut. 4";
-        "Modify Registers": Codeunit "Modify Registers";
         InterfaceCZData: Codeunit "Interface CZ Data";
         Window: Dialog;
         ActualDate: Date;

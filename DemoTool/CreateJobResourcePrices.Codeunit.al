@@ -1,4 +1,4 @@
-#if not CLEAN21
+#if not CLEAN23
 codeunit 101213 "Create Job Resource Prices"
 {
     ObsoleteState = Pending;

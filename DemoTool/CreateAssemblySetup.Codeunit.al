@@ -3,29 +3,27 @@ codeunit 118870 "Create Assembly Setup"
 
     trigger OnRun()
     begin
-        with AssemblySetup do begin
-            if not Get() then
-                Insert();
+        if not AssemblySetup.Get() then
+            AssemblySetup.Insert();
 
-            Validate("Stockout Warning", true);
-            Validate("Copy Component Dimensions from", "Copy Component Dimensions from"::"Item/Resource Card");
-            Validate("Copy Comments when Posting", true);
-            Validate("Create Movements Automatically", true);
-            Validate("Default Gen.Bus.Post. Grp. CZA", DemoDataSetup.IAssemblyCode()); // NAVCZ
+        AssemblySetup.Validate("Stockout Warning", true);
+        AssemblySetup.Validate("Copy Component Dimensions from", AssemblySetup."Copy Component Dimensions from"::"Item/Resource Card");
+        AssemblySetup.Validate("Copy Comments when Posting", true);
+        AssemblySetup.Validate("Create Movements Automatically", true);
+        AssemblySetup.Validate("Default Gen.Bus.Post. Grp. CZA", DemoDataSetup.IAssemblyCode());
+        // NAVCZ
+        CreateNoSeries.InitBaseSeries(AssemblySetup."Assembly Order Nos.", XAORD, XAORDName, '1', XEndingNumber, '', XWarningNumber, 1, Enum::"No. Series Implementation"::Sequence);
+        CreateNoSeries.InitBaseSeries(AssemblySetup."Assembly Quote Nos.", XAQUO, XAQuoteName, '1', XEndingNumber, '', XWarningNumber, 1, Enum::"No. Series Implementation"::Sequence);
+        CreateNoSeries.InitBaseSeries(AssemblySetup."Blanket Assembly Order Nos.", XABLK, XABLKName, '1', XEndingNumber,
+          '', XWarningNumber, 1, Enum::"No. Series Implementation"::Sequence);
+        CreateNoSeries.InitBaseSeries(AssemblySetup."Posted Assembly Order Nos.", XAORDPlus, XAORDPlusName, '1', XEndingNumber,
+          '', XWarningNumber, 1, Enum::"No. Series Implementation"::Sequence);
+        AssemblySetup."Assembly Order Nos." := XAORD;
+        AssemblySetup."Assembly Quote Nos." := XAQUO;
+        AssemblySetup."Blanket Assembly Order Nos." := XABLK;
+        AssemblySetup."Posted Assembly Order Nos." := XAORDPlus;
 
-            CreateNoSeries.InitBaseSeries("Assembly Order Nos.", XAORD, XAORDName, '1', XEndingNumber, XLastNumberUsed, XWarningNumber, 1, true);
-            CreateNoSeries.InitBaseSeries("Assembly Quote Nos.", XAQUO, XAQuoteName, '1', XEndingNumber, XLastNumberUsed, XWarningNumber, 1, true);
-            CreateNoSeries.InitBaseSeries("Blanket Assembly Order Nos.", XABLK, XABLKName, '1', XEndingNumber,
-              XLastNumberUsed, XWarningNumber, 1, true);
-            CreateNoSeries.InitBaseSeries("Posted Assembly Order Nos.", XAORDPlus, XAORDPlusName, '1', XEndingNumber,
-              XLastNumberUsed, XWarningNumber, 1, true);
-            "Assembly Order Nos." := XAORD;
-            "Assembly Quote Nos." := XAQUO;
-            "Blanket Assembly Order Nos." := XABLK;
-            "Posted Assembly Order Nos." := XAORDPlus;
-
-            Modify();
-        end;
+        AssemblySetup.Modify();
     end;
 
     var
@@ -41,7 +39,6 @@ codeunit 118870 "Create Assembly Setup"
         XAORDPlus: Label 'A-ORD+';
         XAORDPlusName: Label 'Posted Assembly Orders';
         XEndingNumber: Label 'A01000', Comment = 'A stands for Assembly.';
-        XLastNumberUsed: Label 'A00000', Comment = 'A stands for Assemby.';
         XWarningNumber: Label 'A00995', Comment = 'A stands for Assembly.';
 }
 

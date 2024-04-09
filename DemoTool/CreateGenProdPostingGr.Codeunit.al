@@ -3,17 +3,15 @@ codeunit 101251 "Create Gen. Prod. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            // NAVCZ
-            InsertData(MiscCode, XMiscellaneouswithVAT, BaseVATItemCode());
-            InsertData(NoVATCode, XMiscellaneouswithoutVAT, NoVATCode);
-            InsertData(RawMatCode, XRawMaterials, BaseVATServiceCode());
-            InsertData(RetailCode, XRetail2, BaseVATItemCode());
-            InsertData(ServicesCode, XResourcesetc, BaseVATItemCode());
-            InsertData(ManufactCode, XCapacities, BaseVATServiceCode());
-            // NAVCZ
-        end;
+        DemoDataSetup.Get();
+        // NAVCZ
+        InsertData(DemoDataSetup.MiscCode(), XMiscellaneouswithVAT, DemoDataSetup.BaseVATItemCode());
+        InsertData(DemoDataSetup.NoVATCode(), XMiscellaneouswithoutVAT, DemoDataSetup.NoVATCode());
+        InsertData(DemoDataSetup.RawMatCode(), XRawMaterials, DemoDataSetup.BaseVATServiceCode());
+        InsertData(DemoDataSetup.RetailCode(), XRetail2, DemoDataSetup.BaseVATItemCode());
+        InsertData(DemoDataSetup.ServicesCode(), XResourcesetc, DemoDataSetup.BaseVATItemCode());
+        InsertData(DemoDataSetup.ManufactCode(), XCapacities, DemoDataSetup.BaseVATServiceCode());
+        // NAVCZ
     end;
 
     var
@@ -28,31 +26,27 @@ codeunit 101251 "Create Gen. Prod. Posting Gr."
 
     procedure InsertMiniAppData()
     begin
-        with DemoDataSetup do begin
-            Get();
-            // NAVCZ
-            InsertData(MiscCode, XMiscellaneouswithVAT, BaseVATItemCode());
-            InsertData(NoVATCode, XMiscellaneouswithoutVAT, NoVATCode);
-            InsertData(RawMatCode, XRawMaterials, BaseVATServiceCode());
-            InsertData(FreightCode, XFreightDescriptionTxt, BaseVATItemCode());
-            InsertData(RetailCode, XRetail2, BaseVATItemCode());
-            InsertData(ServicesCode, XResourcesetc, BaseVATServiceCode());
-            // NAVCZ
-        end;
+        DemoDataSetup.Get();
+        // NAVCZ
+        InsertData(DemoDataSetup.MiscCode(), XMiscellaneouswithVAT, DemoDataSetup.BaseVATItemCode());
+        InsertData(DemoDataSetup.NoVATCode(), XMiscellaneouswithoutVAT, DemoDataSetup.NoVATCode());
+        InsertData(DemoDataSetup.RawMatCode(), XRawMaterials, DemoDataSetup.BaseVATServiceCode());
+        InsertData(DemoDataSetup.FreightCode(), XFreightDescriptionTxt, DemoDataSetup.BaseVATItemCode());
+        InsertData(DemoDataSetup.RetailCode(), XRetail2, DemoDataSetup.BaseVATItemCode());
+        InsertData(DemoDataSetup.ServicesCode(), XResourcesetc, DemoDataSetup.BaseVATServiceCode());
+        // NAVCZ
     end;
 
     procedure InsertData(NewCode: Code[20]; NewDescription: Text[50]; DefVATProdPostingGroup: Code[20])
     var
         GenProductPostingGroup: Record "Gen. Product Posting Group";
     begin
-        with GenProductPostingGroup do begin
-            Init();
-            Validate(Code, NewCode);
-            Validate(Description, NewDescription);
-            if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then
-                "Def. VAT Prod. Posting Group" := DefVATProdPostingGroup;
-            Insert();
-        end;
+        GenProductPostingGroup.Init();
+        GenProductPostingGroup.Validate(Code, NewCode);
+        GenProductPostingGroup.Validate(Description, NewDescription);
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then
+            GenProductPostingGroup."Def. VAT Prod. Posting Group" := DefVATProdPostingGroup;
+        GenProductPostingGroup.Insert();
     end;
 }
 

@@ -3,21 +3,17 @@ codeunit 117011 "Create Service Hour"
 
     trigger OnRun()
     begin
-        with ServiceHour do begin
-            InsertData("Service Contract Type"::" ", '', Day::Monday, 0D, 080000T, 170000T, false);
-            InsertData("Service Contract Type"::" ", '', Day::Tuesday, 0D, 080000T, 170000T, false);
-            InsertData("Service Contract Type"::" ", '', Day::Wednesday, 0D, 080000T, 170000T, false);
-            InsertData("Service Contract Type"::" ", '', Day::Thursday, 0D, 080000T, 170000T, false);
-            InsertData("Service Contract Type"::" ", '', Day::Friday, 0D, 080000T, 170000T, false);
-        end;
+        InsertData(ServiceHour."Service Contract Type"::" ", '', ServiceHour.Day::Monday, 0D, 080000T, 170000T, false);
+        InsertData(ServiceHour."Service Contract Type"::" ", '', ServiceHour.Day::Tuesday, 0D, 080000T, 170000T, false);
+        InsertData(ServiceHour."Service Contract Type"::" ", '', ServiceHour.Day::Wednesday, 0D, 080000T, 170000T, false);
+        InsertData(ServiceHour."Service Contract Type"::" ", '', ServiceHour.Day::Thursday, 0D, 080000T, 170000T, false);
+        InsertData(ServiceHour."Service Contract Type"::" ", '', ServiceHour.Day::Friday, 0D, 080000T, 170000T, false);
     end;
 
     var
         ServiceHour: Record "Service Hour";
 
-    procedure InsertData("Service Contract Type": Option; "Service Contract No.": Text[250]; Day: Option; "Starting Date": Date; "Starting Time": Time; "Ending Time": Time; "Valid on Holidays": Boolean)
-    var
-        ServiceHour: Record "Service Hour";
+    procedure InsertData("Service Contract Type": Enum "Service Hour Contract Type"; "Service Contract No.": Text[250]; Day: Option; "Starting Date": Date; "Starting Time": Time; "Ending Time": Time; "Valid on Holidays": Boolean)
     begin
         ServiceHour.Init();
         ServiceHour.Validate("Service Contract Type", "Service Contract Type");

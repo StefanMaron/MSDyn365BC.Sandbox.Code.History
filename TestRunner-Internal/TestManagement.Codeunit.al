@@ -376,7 +376,7 @@ codeunit 130022 "Test Management"
                 end;
             Selection::Codeunit:
                 LineNoFilter :=
-                  StrSubstNo('%1..%2', TestLine.GetMinCodeunitLineNo, TestLine.GetMaxCodeunitLineNo(NoOfFunctions));
+                  StrSubstNo('%1..%2', TestLine.GetMinCodeunitLineNo(), TestLine.GetMaxCodeunitLineNo(NoOfFunctions));
         end;
     end;
 
@@ -469,8 +469,8 @@ codeunit 130022 "Test Management"
     begin
         String := Line;
         Line := '';
-        String := String.Trim;
-        LowerString := String.ToLower;
+        String := String.Trim();
+        LowerString := String.ToLower();
         FunctionDefinition := LowerString.StartsWith('procedure ') or LowerString.StartsWith('local ');
         if not FunctionDefinition then
             OnRunDefinition := LowerString.StartsWith('trigger ') and LowerString.Contains(' onrun()');
@@ -488,7 +488,7 @@ codeunit 130022 "Test Management"
                         Flag[1] := false;
                         String := String.Replace('procedure', '');
                         String := String.Replace(';', '');
-                        String := String.Trim;
+                        String := String.Trim();
                     end else begin
                         Flag[2] := false;
                         exit(false);
@@ -710,7 +710,7 @@ codeunit 130022 "Test Management"
             TestLine2.SetRange("Test Codeunit", TestLine."Test Codeunit");
             TestLine2.SetRange("Function", '');
             if TestLine2.FindFirst() then
-                TestLine2.DeleteChildren;
+                TestLine2.DeleteChildren();
 
             CODEUNIT.Run(CurrentTestRunnerId, TestLine2);
         end;

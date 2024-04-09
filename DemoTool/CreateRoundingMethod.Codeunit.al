@@ -26,7 +26,7 @@ codeunit 101042 "Create Rounding Method"
         if MethodName = XCROWNS then
             "Rounding Method".Validate(Type, "Rounding Method".Type::Up);
         // NAVCZ
-        "Rounding Method".Insert;
+        "Rounding Method".Insert();
     end;
 
     procedure InsertMiniAppData()

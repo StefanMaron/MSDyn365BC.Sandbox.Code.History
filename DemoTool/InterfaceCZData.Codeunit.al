@@ -10,8 +10,6 @@ Codeunit 163502 "Interface CZ Data"
         Window: Dialog;
         Steps: Integer;
         MaxSteps: Integer;
-        XGENERAL: Label 'GENERAL';
-        XCASH: Label 'CASH';
 
     procedure Create()
     begin
@@ -69,7 +67,7 @@ Codeunit 163502 "Interface CZ Data"
         RunCodeunit(Codeunit::"Create Document Footer CZL");
         RunCodeunit(Codeunit::"Create Acc. Sch. File Map. CZL");
 
-        UpdateCostTypes;
+        UpdateCostTypes();
 
         Window.Close();
     end;
@@ -151,10 +149,10 @@ Codeunit 163502 "Interface CZ Data"
         PostCompensationHeader('ZAP0002', 2);
 
         // VAT Control
-        SuggestVATControls;
+        SuggestVATControls();
 
         // VIES
-        SuggestVIESDEclarations;
+        SuggestVIESDEclarations();
 
         // insert unreliable payer setup again
         if not UnrelPayerServiceSetupCZL.Get() then begin
@@ -213,7 +211,6 @@ Codeunit 163502 "Interface CZ Data"
     procedure ReleaseSalesAdvanceLetterCZZ(LetterNo: Code[20])
     var
         SalesAdvLetterHeaderCZZ: Record "Sales Adv. Letter Header CZZ";
-        RelSalesAdvLetterDocCZZ: Codeunit "Rel. Sales Adv.Letter Doc. CZZ";
     begin
         SalesAdvLetterHeaderCZZ.Get(LetterNo);
         Codeunit.Run(Codeunit::"Rel. Sales Adv.Letter Doc. CZZ", SalesAdvLetterHeaderCZZ);

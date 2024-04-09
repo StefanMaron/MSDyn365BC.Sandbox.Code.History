@@ -13,7 +13,7 @@ codeunit 101931 "Create Local RapidStart Pack"
 
     procedure CreateTables()
     begin
-        if CreateConfigPackageHelper.GetDataType = DemoDataSetup."Data Type"::Evaluation then begin
+        if CreateConfigPackageHelper.GetDataType() = DemoDataSetup."Data Type"::Evaluation then begin
             CreateTable(Database::"Bank Statement Header CZB");
             CreateTableChild(Database::"Bank Statement Line CZB", Database::"Bank Statement Header CZB");
             CreateTable(Database::"Payment Order Header CZB");
@@ -129,19 +129,17 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         ConfigTableProcessingRule: Record "Config. Table Processing Rule";
     begin
-        with ConfigTableProcessingRule do begin
-            SetRange("Package Code", CreateConfigPackageHelper.GetPackageCode());
-            SetRange("Table ID", TableID);
-            SetRange("Rule No.", RuleNo);
-            DeleteAll(true);
-        end;
+        ConfigTableProcessingRule.SetRange("Package Code", CreateConfigPackageHelper.GetPackageCode());
+        ConfigTableProcessingRule.SetRange("Table ID", TableID);
+        ConfigTableProcessingRule.SetRange("Rule No.", RuleNo);
+        ConfigTableProcessingRule.DeleteAll(true);
     end;
 
     local procedure SetPurchAdvLetterHeaderCZZ()
     var
         PurchAdvLetterHeaderCZZ: Record "Purch. Adv. Letter Header CZZ";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(PurchAdvLetterHeaderCZZ.FieldNo("No."));
         IncludeField(PurchAdvLetterHeaderCZZ.FieldNo("Advance Letter Code"));
         IncludeField(PurchAdvLetterHeaderCZZ.FieldNo("Pay-to Vendor No."));
@@ -156,7 +154,7 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         PurchAdvLetterLineCZZ: Record "Purch. Adv. Letter Line CZZ";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(PurchAdvLetterLineCZZ.FieldNo("Document No."));
         IncludeField(PurchAdvLetterLineCZZ.FieldNo("Line No."));
         IncludeField(PurchAdvLetterLineCZZ.FieldNo("VAT Prod. Posting Group"));
@@ -168,7 +166,7 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         SalesAdvLetterHeaderCZZ: Record "Sales Adv. Letter Header CZZ";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(SalesAdvLetterHeaderCZZ.FieldNo("No."));
         IncludeField(SalesAdvLetterHeaderCZZ.FieldNo("Advance Letter Code"));
         IncludeField(SalesAdvLetterHeaderCZZ.FieldNo("Bill-to Customer No."));
@@ -181,7 +179,7 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         SalesAdvLetterLineCZZ: Record "Sales Adv. Letter Line CZZ";
     begin
-        CreateConfigPackageHelper.ExcludeAllFields;
+        CreateConfigPackageHelper.ExcludeAllFields();
         IncludeField(SalesAdvLetterLineCZZ.FieldNo("Document No."));
         IncludeField(SalesAdvLetterLineCZZ.FieldNo("Line No."));
         IncludeField(SalesAdvLetterLineCZZ.FieldNo("VAT Prod. Posting Group"));

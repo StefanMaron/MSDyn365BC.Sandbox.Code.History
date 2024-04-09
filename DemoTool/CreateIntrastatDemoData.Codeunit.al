@@ -9,8 +9,8 @@ codeunit 101247 "Create Intrastat Demo Data"
     var
         IntraJnlManagement: Codeunit IntraJnlManagement;
     begin
-        CreateSetup;
-        CreateJnlTemplate;
+        CreateSetup();
+        CreateJnlTemplate();
         CreateJnlBatch(); // NAVCZ
         IntraJnlManagement.CreateDefaultAdvancedIntrastatSetup();
     end;
@@ -62,15 +62,13 @@ codeunit 101247 "Create Intrastat Demo Data"
         Date.SetRange("Period Type", Date."Period Type"::Month);
         Date.SetRange("Period No.", Month);
         Date.FindFirst();
-        with IntrastatJnlBatch do begin
-            Init();
-            "Journal Template Name" := IntrastatJnlNameTok;
-            Name := StrSubstNo('%1%2', YearText, MonthText);
-            Description := StrSubstNo('%1 %2', Date."Period Name", Year);
-            "Statistics Period" := Name;
-            "Statement Type CZL" := "Statement Type CZL"::Null;
-            Insert();
-        end;
+        IntrastatJnlBatch.Init();
+        IntrastatJnlBatch."Journal Template Name" := IntrastatJnlNameTok;
+        IntrastatJnlBatch.Name := StrSubstNo('%1%2', YearText, MonthText);
+        IntrastatJnlBatch.Description := StrSubstNo('%1 %2', Date."Period Name", Year);
+        IntrastatJnlBatch."Statistics Period" := IntrastatJnlBatch.Name;
+        IntrastatJnlBatch."Statement Type CZL" := IntrastatJnlBatch."Statement Type CZL"::Null;
+        IntrastatJnlBatch.Insert();
     end;
 }
 #endif

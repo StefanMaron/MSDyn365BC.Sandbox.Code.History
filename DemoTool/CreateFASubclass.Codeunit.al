@@ -23,21 +23,12 @@ codeunit 101805 "Create FA Subclass"
         XGoodwilllc: Label 'Goodwill';
         XEQUIPMENT: Label 'EQUIPMENT';
         XEquipmentlc: Label 'Equipment';
-        XPLANT: Label 'PLANT';
-        XPlantlc: Label 'Plants/Buildings';
-        XPROPERTY: Label 'PROPERTY';
-        XPropertylc: Label 'Property/Land';
         XVEHICLES: Label 'VEHICLES';
         XVehicleslc: Label 'Vehicles';
         XFURNITUREFIXTURES: Label 'FURNITURE';
         XFurnitureFixtureslc: Label 'Furniture & Fixtures';
-        XIP: Label 'IP';
-        XIPlc: Label 'Intellectual Property';
         XTANGIBLE: Label 'TANGIBLE';
         XINTANGIBLE: Label 'INTANGIBLE';
-        XFINANCIAL: Label 'FINANCIAL';
-        XLEASEHOLD: Label 'LEASEHOLD';
-        XLEASEHOLDlc: Label 'Leasehold';
         XBUILDING: Label 'BUILDING';
         XBuildingTxt: Label 'Building';
 

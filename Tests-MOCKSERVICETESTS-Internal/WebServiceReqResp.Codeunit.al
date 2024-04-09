@@ -59,7 +59,7 @@ codeunit 132580 "Web Service Req./Resp."
         SOAPWebServiceRequestMgt.SetGlobals(BodyInStream,
           MockServiceURLTxt, 'DemoUser', 'DemoPassword');
 
-        if not SOAPWebServiceRequestMgt.SendRequestToWebService then
+        if not SOAPWebServiceRequestMgt.SendRequestToWebService() then
             SOAPWebServiceRequestMgt.ProcessFaultResponse('');
 
         SOAPWebServiceRequestMgt.GetResponseContent(ResponseInStream);
@@ -104,7 +104,7 @@ codeunit 132580 "Web Service Req./Resp."
         //                 BankDataConvServiceSetup."Service URL", BankDataConvServiceSetup."User Name", BankDataConvServiceSetup.GetPassword());
 
         // Exercise
-        if not SOAPWebServiceRequestMgt.SendRequestToWebService then
+        if not SOAPWebServiceRequestMgt.SendRequestToWebService() then
             SOAPWebServiceRequestMgt.ProcessFaultResponse('');
 
         // Pre-Verify

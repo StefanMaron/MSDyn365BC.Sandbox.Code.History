@@ -5,25 +5,25 @@ codeunit 101216 "Create Job PlanLines SaaS"
     var
         CreateJobResources: Codeunit "Create Job Resources";
     begin
-        InsertData(XJOB00010, '1010', 10000, 2, 19030125D, '', 0, CreateJobResources.KatherineCode, XKATHERINEHULL, XHOUR, 20, 0, 50, 100);
+        InsertData(XJOB00010, '1010', 10000, 2, 19030125D, '', 0, CreateJobResources.KatherineCode(), XKATHERINEHULL, XHOUR, 20, 0, 50, 100);
         InsertData(XJOB00010, '1020', 10000, 2, 19030125D, '', 3, '', XREVIEWDESIGNS, XHOUR, 0, 0, 0, 0);
-        InsertData(XJOB00010, '1110', 10000, 2, 19030125D, '', 0, CreateJobResources.TerryCode, XTerryDodds, XHOUR, 30, 0, 50, 100);
-        InsertData(XJOB00010, '1120', 10000, 2, 19030125D, '', 0, CreateJobResources.TerryCode, XTerryDodds, XHOUR, 2, 0, 50, 100);
-        InsertData(XJOB00010, '1210', 12500, 2, 19030125D, '', 0, CreateJobResources.LinaCode, XLINATOWNSEND, XHOUR, 50, 0, 60, 120);
-        InsertData(XJOB00010, '1220', 15000, 2, 19030125D, '', 0, CreateJobResources.KatherineCode, XKATHERINEHULL, XHOUR, 1, 0, 50, 100);
-        InsertData(XJOB00010, '1230', 20000, 2, 19030125D, '', 0, CreateJobResources.MartyCode, XMartyHorst, XHOUR, 10, 0, 45, 90);
+        InsertData(XJOB00010, '1110', 10000, 2, 19030125D, '', 0, CreateJobResources.TerryCode(), XTerryDodds, XHOUR, 30, 0, 50, 100);
+        InsertData(XJOB00010, '1120', 10000, 2, 19030125D, '', 0, CreateJobResources.TerryCode(), XTerryDodds, XHOUR, 2, 0, 50, 100);
+        InsertData(XJOB00010, '1210', 12500, 2, 19030125D, '', 0, CreateJobResources.LinaCode(), XLINATOWNSEND, XHOUR, 50, 0, 60, 120);
+        InsertData(XJOB00010, '1220', 15000, 2, 19030125D, '', 0, CreateJobResources.KatherineCode(), XKATHERINEHULL, XHOUR, 1, 0, 50, 100);
+        InsertData(XJOB00010, '1230', 20000, 2, 19030125D, '', 0, CreateJobResources.MartyCode(), XMartyHorst, XHOUR, 10, 0, 45, 90);
         InsertData(XJOB00010, '1240', 25000, 2, 19030125D, '', 1, X1936S, XBERLINEGUESTCHAIRYELLOW, XPCS, 8, 0, 97.5, 143.9);
-        InsertData(XJOB00010, '1310', 30000, 2, 19030125D, '', 0, CreateJobResources.LinaCode, XLINATOWNSEND, XHOUR, 4, 0, 60, 120);
-        InsertData(XJOB00010, '1320', 35000, 2, 19030125D, '', 0, CreateJobResources.LinaCode, XLINATOWNSEND, XHOUR, 10, 0, 60, 120);
+        InsertData(XJOB00010, '1310', 30000, 2, 19030125D, '', 0, CreateJobResources.LinaCode(), XLINATOWNSEND, XHOUR, 4, 0, 60, 120);
+        InsertData(XJOB00010, '1320', 35000, 2, 19030125D, '', 0, CreateJobResources.LinaCode(), XLINATOWNSEND, XHOUR, 10, 0, 60, 120);
 
-        InsertData(XJOB00020, '100', 10000, 0, 19030125D, '5678', 0, CreateJobResources.LinaCode, XLINATOWNSEND, XHOUR, 2, 0, 60, 120);
-        InsertData(XJOB00020, '200', 10000, 1, 19030125D, '5678', 0, CreateJobResources.LinaCode, XLINATOWNSEND, XHOUR, 8, 0, 60, 120);
-        InsertData(XJOB00020, '300', 10000, 2, 19030125D, '5678', 0, CreateJobResources.LinaCode, XLINATOWNSEND, XHOUR, 4, 0, 60, 120);
+        InsertData(XJOB00020, '100', 10000, 0, 19030125D, '5678', 0, CreateJobResources.LinaCode(), XLINATOWNSEND, XHOUR, 2, 0, 60, 120);
+        InsertData(XJOB00020, '200', 10000, 1, 19030125D, '5678', 0, CreateJobResources.LinaCode(), XLINATOWNSEND, XHOUR, 8, 0, 60, 120);
+        InsertData(XJOB00020, '300', 10000, 2, 19030125D, '5678', 0, CreateJobResources.LinaCode(), XLINATOWNSEND, XHOUR, 4, 0, 60, 120);
         InsertData(XJOB00020, '300', 20000, 2, 19030125D, '5678', 1, X1920S, XANTWERPCONFERNECETABLE, XPCS, 1, 0, 328, 420.4);
 
-        InsertData(XJOB00030, '100', 10000, 0, 19030125D, '5678', 0, CreateJobResources.KatherineCode, XKATHERINEHULL, XHOUR, 8, 0, 84.7, 154);
-        InsertData(XJOB00030, '200', 10000, 1, 19030125D, '5678', 0, CreateJobResources.KatherineCode, XKATHERINEHULL, XHOUR, 16, 0, 84.7, 154);
-        InsertData(XJOB00030, '300', 10000, 2, 19030125D, '5678', 0, CreateJobResources.KatherineCode, XKATHERINEHULL, XHOUR, 10, 0, 84.7, 154);
+        InsertData(XJOB00030, '100', 10000, 0, 19030125D, '5678', 0, CreateJobResources.KatherineCode(), XKATHERINEHULL, XHOUR, 8, 0, 84.7, 154);
+        InsertData(XJOB00030, '200', 10000, 1, 19030125D, '5678', 0, CreateJobResources.KatherineCode(), XKATHERINEHULL, XHOUR, 16, 0, 84.7, 154);
+        InsertData(XJOB00030, '300', 10000, 2, 19030125D, '5678', 0, CreateJobResources.KatherineCode(), XKATHERINEHULL, XHOUR, 10, 0, 84.7, 154);
         InsertData(XJOB00030, '300', 20000, 2, 19030125D, '5678', 1, X1908S, XLONDONSWIVELCHAIR, XPCS, 2, 0, 148.1, 190.1);
     end;
 

@@ -3,18 +3,18 @@ codeunit 101092 "Create Cust. Posting Group"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(
-              DomesticCode, XDomesticCustomersTxt,
-              '992310', '996810', '999255', '999255', '999255', '999120', '996710', '999150', '999260', '999270'); // NAVCZ
-            InsertData(
-              ForeignCode, XForeignCustomersTxt,
-              '992320', '996810', '999255', '999255', '999255', '999120', '996710', '999150', '999260', '999270'); // NAVCZ
-            InsertData(
-              EUCode, XCustomersInEUTxt,
-              '992326', '996810', '999255', '999255', '999255', '999120', '996710', '999150', '999260', '999270'); // NAVCZ
-        end;
+        DemoDataSetup.Get();
+        InsertData(
+          DemoDataSetup.DomesticCode(), XDomesticCustomersTxt,
+          '992310', '996810', '999255', '999255', '999255', '999120', '996710', '999150', '999260', '999270');
+        // NAVCZ
+        InsertData(
+          DemoDataSetup.ForeignCode(), XForeignCustomersTxt,
+          '992320', '996810', '999255', '999255', '999255', '999120', '996710', '999150', '999260', '999270');
+        // NAVCZ
+        InsertData(
+          DemoDataSetup.EUCode(), XCustomersInEUTxt,
+          '992326', '996810', '999255', '999255', '999255', '999120', '996710', '999150', '999260', '999270'); // NAVCZ
     end;
 
     var
@@ -22,6 +22,13 @@ codeunit 101092 "Create Cust. Posting Group"
         XDomesticCustomersTxt: Label 'Domestic customers';
         XCustomersInEUTxt: Label 'Customers in EU';
         XForeignCustomersTxt: Label 'Foreign customers (not EU)';
+
+    procedure GetRoundingAccount(): code[20]
+    var
+        MakeAdjustments: Codeunit "Make Adjustments";
+    begin
+        exit(MakeAdjustments.Convert('999150'));
+    end;
 
     procedure InsertData("Code": Code[20]; PostingGroupDescription: Text[50]; "Receivables Account": Code[20]; "Service Charge Acc.": Code[20]; "Pmt. Disc. Debit Acc.": Code[20]; "Pmt. Disc. Credit Acc.": Code[20]; "Invoice Rounding Account": Code[20]; "Additional Fee Acc.": Code[20]; "Interest Acc.": Code[20]; "Application Rounding Account": Code[20]; "Payment Tolerance Debit Acc.": Code[20]; "Payment Tolerance Credit Acc.": Code[20])
     var

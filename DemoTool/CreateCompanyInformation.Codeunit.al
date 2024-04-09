@@ -4,13 +4,12 @@ codeunit 101079 "Create Company Information"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        InsertData;
+        InsertData();
     end;
 
     var
         DemoDataSetup: Record "Demo Data Setup";
         CompanyInformation: Record "Company Information";
-        CreateNoSeries: Codeunit "Create No. Series";
         XCRONUSInternationalLtd: Label 'CRONUS International Ltd.';
         X5TheRing: Label '5 The Ring';
         XWestminster: Label 'Westminster';
@@ -23,10 +22,8 @@ codeunit 101079 "Create Company Information"
         XGB12CPBK08929965044991: Label 'GB 12 CPBK 08929965044991';
         X9999999: Label '99-99-999';
         XContactNameTxt: Label 'Adam Matteson';
-        XComputerservices: Label 'Computer services';
         XCZ00000019: Label 'CZ00000019';
         X00000019: Label '00000019';
-        XRegistered: Label 'Registered in u KOS in Brno, part E, paragraph 12345.';
         XNBL: Label 'NBL', Comment = 'New Bank of London';
 
     procedure InsertData()

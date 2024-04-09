@@ -4,8 +4,8 @@ codeunit 101801 "Create FA Setup"
     trigger OnRun()
     begin
         "FA Setup".Init();
-        "Create No. Series".InsertSeries("FA Setup"."Fixed Asset Nos.", XFA, XFixedAsset, XFA10, XFA0999990, XFA000090, '', 10, false, true);
-        "Create No. Series".InitBaseSeries("FA Setup"."Insurance Nos.", XFAINS, XInsurance, XFAINS10, XINS0999990, XINS000040, '', 10, true);
+        "Create No. Series".InsertSeries("FA Setup"."Fixed Asset Nos.", XFA, XFixedAsset, XFA10, XFA0999990, XFA000090, '', 10, false, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitBaseSeries("FA Setup"."Insurance Nos.", XFAINS, XInsurance, XFAINS10, XINS0999990, XINS000040, '', 10, Enum::"No. Series Implementation"::Sequence);
         "FA Setup"."Default Depr. Book" := '1-ÚČETNÍ'; // NAVCZ
         "FA Setup"."Insurance Depr. Book" := "FA Setup"."Default Depr. Book";
         // NAVCZ
@@ -29,6 +29,5 @@ codeunit 101801 "Create FA Setup"
         XFAINS10: Label 'FA-INS10';
         XINS0999990: Label 'INS0999990';
         XINS000040: Label 'INS000040';
-        XCOMPANY: Label 'COMPANY';
 }
 

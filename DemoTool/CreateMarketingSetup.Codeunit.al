@@ -3,23 +3,21 @@ codeunit 101579 "Create Marketing Setup"
 
     trigger OnRun()
     begin
-        InsertBasisData;
-        with MarketingSetup do begin
-            Get();
-            Validate("Default Salesperson Code", '');
-            Validate("Default Territory Code", '');
-            Validate("Default Country/Region Code", '');
-            Validate("Default Language Code", '');
-            Validate("Default Sales Cycle Code", '');
-            Validate("Def. Company Salutation Code", XCOMPANY);
-            Validate("Default Person Salutation Code", XUNISEX);
-            Validate("Attachment Storage Type", "Attachment Storage Type"::Embedded);
-            Validate("Attachment Storage Location", '');
-            Validate("Autosearch for Duplicates", false);
-            Validate("Search Hit %", 60);
-            Validate("Maintain Dupl. Search Strings", true);
-            Modify();
-        end;
+        InsertBasisData();
+        MarketingSetup.Get();
+        MarketingSetup.Validate("Default Salesperson Code", '');
+        MarketingSetup.Validate("Default Territory Code", '');
+        MarketingSetup.Validate("Default Country/Region Code", '');
+        MarketingSetup.Validate("Default Language Code", '');
+        MarketingSetup.Validate("Default Sales Cycle Code", '');
+        MarketingSetup.Validate("Def. Company Salutation Code", XCOMPANY);
+        MarketingSetup.Validate("Default Person Salutation Code", XUNISEX);
+        MarketingSetup.Validate("Attachment Storage Type", MarketingSetup."Attachment Storage Type"::Embedded);
+        MarketingSetup.Validate("Attachment Storage Location", '');
+        MarketingSetup.Validate("Autosearch for Duplicates", false);
+        MarketingSetup.Validate("Search Hit %", 60);
+        MarketingSetup.Validate("Maintain Dupl. Search Strings", true);
+        MarketingSetup.Modify();
     end;
 
     var
@@ -56,52 +54,46 @@ codeunit 101579 "Create Marketing Setup"
 
     procedure InsertMiniAppData()
     begin
-        InsertBasisData;
-        with MarketingSetup do begin
-            Get();
-            Validate("Default Language Code", XENU);
-            Validate("Default Correspondence Type", "Default Correspondence Type"::Email);
-            Validate("Default Sales Cycle Code", XNEW);
-            Validate("Mergefield Language ID", 1033);
-            Validate("Autosearch for Duplicates", true);
-            Modify();
-        end;
+        InsertBasisData();
+        MarketingSetup.Get();
+        MarketingSetup.Validate("Default Language Code", XENU);
+        MarketingSetup.Validate("Default Correspondence Type", MarketingSetup."Default Correspondence Type"::Email);
+        MarketingSetup.Validate("Default Sales Cycle Code", XNEW);
+        MarketingSetup.Validate("Mergefield Language ID", 1033);
+        MarketingSetup.Validate("Autosearch for Duplicates", true);
+        MarketingSetup.Modify();
     end;
 
     local procedure InsertBasisData()
     begin
-        with MarketingSetup do begin
-            Get();
-            Validate("Bus. Rel. Code for Customers", XCUST);
-            Validate("Bus. Rel. Code for Vendors", XVEND);
-            Validate("Bus. Rel. Code for Bank Accs.", XBANK);
-            Validate("Inherit Salesperson Code", true);
-            Validate("Inherit Territory Code", true);
-            Validate("Inherit Country/Region Code", true);
-            Validate("Inherit Language Code", true);
-            Validate("Inherit Address Details", true);
-            Validate("Inherit Communication Details", true);
-            CreateNoSeries.InitBaseSeries("Contact Nos.", XCONT, XContact, XCT000001, XCT100000, '', '', 1);
-            CreateNoSeries.InitBaseSeries("Campaign Nos.", XCAMP, XCampaign, XCP0001, XCP9999, '', '', 1, true);
-            CreateNoSeries.InitBaseSeries("Segment Nos.", XSEGM, XSegment, XSM00001, XSM99999, '', '', 1, true);
-            CreateNoSeries.InitBaseSeries("To-do Nos.", XTASK, XTaskDescr, XTD000001, XTD999999, '', '', 1, true);
-            CreateNoSeries.InitBaseSeries("Opportunity Nos.", XOPP, XOpportunity, XOP000001, XOP999999, '', '', 1, true);
-            Validate("Bus. Rel. Code for Employees", XEmp);
-            Modify();
-        end;
+        MarketingSetup.Get();
+        MarketingSetup.Validate("Bus. Rel. Code for Customers", XCUST);
+        MarketingSetup.Validate("Bus. Rel. Code for Vendors", XVEND);
+        MarketingSetup.Validate("Bus. Rel. Code for Bank Accs.", XBANK);
+        MarketingSetup.Validate("Inherit Salesperson Code", true);
+        MarketingSetup.Validate("Inherit Territory Code", true);
+        MarketingSetup.Validate("Inherit Country/Region Code", true);
+        MarketingSetup.Validate("Inherit Language Code", true);
+        MarketingSetup.Validate("Inherit Address Details", true);
+        MarketingSetup.Validate("Inherit Communication Details", true);
+        CreateNoSeries.InitBaseSeries(MarketingSetup."Contact Nos.", XCONT, XContact, XCT000001, XCT100000, '', '', 1);
+        CreateNoSeries.InitBaseSeries(MarketingSetup."Campaign Nos.", XCAMP, XCampaign, XCP0001, XCP9999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
+        CreateNoSeries.InitBaseSeries(MarketingSetup."Segment Nos.", XSEGM, XSegment, XSM00001, XSM99999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
+        CreateNoSeries.InitBaseSeries(MarketingSetup."To-do Nos.", XTASK, XTaskDescr, XTD000001, XTD999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
+        CreateNoSeries.InitBaseSeries(MarketingSetup."Opportunity Nos.", XOPP, XOpportunity, XOP000001, XOP999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
+        MarketingSetup.Validate("Bus. Rel. Code for Employees", XEmp);
+        MarketingSetup.Modify();
     end;
 
     procedure CreateEvaluationData()
     begin
-        with MarketingSetup do begin
-            Get();
-            Validate("Attachment Storage Type", "Attachment Storage Type"::Embedded);
-            Validate("Search Hit %", 60);
-            Validate("Maintain Dupl. Search Strings", true);
-            Validate("Def. Company Salutation Code", XCOMPANY);
-            Validate("Default Person Salutation Code", XUNISEX);
-            Modify();
-        end;
+        MarketingSetup.Get();
+        MarketingSetup.Validate("Attachment Storage Type", MarketingSetup."Attachment Storage Type"::Embedded);
+        MarketingSetup.Validate("Search Hit %", 60);
+        MarketingSetup.Validate("Maintain Dupl. Search Strings", true);
+        MarketingSetup.Validate("Def. Company Salutation Code", XCOMPANY);
+        MarketingSetup.Validate("Default Person Salutation Code", XUNISEX);
+        MarketingSetup.Modify();
     end;
 }
 

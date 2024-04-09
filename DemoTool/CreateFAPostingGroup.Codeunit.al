@@ -20,12 +20,8 @@ codeunit 101803 "Create FA Posting Group"
         XEQUIPMENT: Label 'EQUIPMENT';
         XPATENTS: Label 'PATENTS';
         XGOODWILL: Label 'GOODWILL';
-        XPLANT: Label 'PLANT';
-        XPROPERTY: Label 'PROPERTY';
         XVEHICLES: Label 'VEHICLES';
         XFURNITUREFIXTURES: Label 'FURNITURE';
-        XIP: Label 'IP';
-        XLEASEHOLD: Label 'LEASEHOLD';
         XBUILDING: Label 'BUILDING';
         XSOFTWARE: Label 'SOFTWARE';
 
@@ -93,7 +89,7 @@ codeunit 101803 "Create FA Posting Group"
         "FA Posting Group".Validate("Book Val. Acc. on Disp. (Gain)", '541100');
         "FA Posting Group".Validate("Book Val. Acc. on Disp. (Loss)", '541100');
 
-        "FA Posting Group".Insert;
+        "FA Posting Group".Insert();
     end;
 
     procedure InsertDataKey("Code": Code[10])

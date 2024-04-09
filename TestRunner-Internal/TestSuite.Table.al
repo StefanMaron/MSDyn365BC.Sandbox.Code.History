@@ -3,6 +3,7 @@ table 130020 "Test Suite"
     DataCaptionFields = Name, Description;
     LookupPageID = "Test Suites";
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -99,7 +100,7 @@ table 130020 "Test Suite"
         ExportImportTestSuiteSetupXML.SetDestination(OStream);
         ExportImportTestSuiteSetupXML.SetTableView(TestSuite);
 
-        if not ExportImportTestSuiteSetupXML.Export then
+        if not ExportImportTestSuiteSetupXML.Export() then
             Error(Text000);
 
         Attachment.Export(Text004 + Name);
@@ -128,7 +129,7 @@ table 130020 "Test Suite"
         ExportImportTestSuiteResultXML.SetDestination(OStream);
         ExportImportTestSuiteResultXML.SetTableView(TestSuite);
 
-        if not ExportImportTestSuiteResultXML.Export then
+        if not ExportImportTestSuiteResultXML.Export() then
             Error(Text000);
 
         Attachment.Export(Text004 + Name);

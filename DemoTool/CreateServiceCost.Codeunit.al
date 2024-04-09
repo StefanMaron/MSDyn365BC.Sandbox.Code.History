@@ -4,15 +4,19 @@ codeunit 117006 "Create Service Cost"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        with ServiceCost do begin
-            InsertData(XSTART, XStartspaceFee, MakeAdjust.Convert('996810'), 20, 1, XPCS, "Cost Type"::Other, '', 2); // NAVCZ
-            InsertData(XTR_EAST, XTravelspaceFee, MakeAdjust.Convert('996810'), 2, 1, XPCS, "Cost Type"::Travel, XE, 0.2); // NAVCZ
-            InsertData(XTR_MID, XTravelspaceFee, MakeAdjust.Convert('996810'), 1, 1, XPCS, "Cost Type"::Travel, XM, 0.1); // NAVCZ
-            InsertData(XTR_NORTH, XTravelspaceFee, MakeAdjust.Convert('996810'), 3, 1, XPCS, "Cost Type"::Travel, XN, 0.3); // NAVCZ
-            InsertData(XTR_SE, XTravelspaceFee, MakeAdjust.Convert('996810'), 4, 1, XPCS, "Cost Type"::Travel, XSE, 0.4); // NAVCZ
-            InsertData(XTR_SOUTH, XTravelspaceFee, MakeAdjust.Convert('996810'), 5, 1, XPCS, "Cost Type"::Travel, XS, 0.5); // NAVCZ
-            InsertData(XTR_WEST, XTravelspaceFee, MakeAdjust.Convert('996810'), 6, 1, XPCS, "Cost Type"::Travel, XW, 0.6); // NAVCZ
-        end;
+        InsertData(XSTART, XStartspaceFee, MakeAdjust.Convert('996810'), 20, 1, XPCS, ServiceCost."Cost Type"::Other, '', 2);
+        // NAVCZ
+        InsertData(XTR_EAST, XTravelspaceFee, MakeAdjust.Convert('996810'), 2, 1, XPCS, ServiceCost."Cost Type"::Travel, XE, 0.2);
+        // NAVCZ
+        InsertData(XTR_MID, XTravelspaceFee, MakeAdjust.Convert('996810'), 1, 1, XPCS, ServiceCost."Cost Type"::Travel, XM, 0.1);
+        // NAVCZ
+        InsertData(XTR_NORTH, XTravelspaceFee, MakeAdjust.Convert('996810'), 3, 1, XPCS, ServiceCost."Cost Type"::Travel, XN, 0.3);
+        // NAVCZ
+        InsertData(XTR_SE, XTravelspaceFee, MakeAdjust.Convert('996810'), 4, 1, XPCS, ServiceCost."Cost Type"::Travel, XSE, 0.4);
+        // NAVCZ
+        InsertData(XTR_SOUTH, XTravelspaceFee, MakeAdjust.Convert('996810'), 5, 1, XPCS, ServiceCost."Cost Type"::Travel, XS, 0.5);
+        // NAVCZ
+        InsertData(XTR_WEST, XTravelspaceFee, MakeAdjust.Convert('996810'), 6, 1, XPCS, ServiceCost."Cost Type"::Travel, XW, 0.6); // NAVCZ
     end;
 
     var

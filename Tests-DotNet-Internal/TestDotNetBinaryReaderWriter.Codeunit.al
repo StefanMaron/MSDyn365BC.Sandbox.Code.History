@@ -29,10 +29,10 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         ExpectedDec: Decimal;
         Byte: Byte;
     begin
-        DotNet_Encoding.UTF32;
-        DotNet_SeekOrigin.SeekBegin;
+        DotNet_Encoding.UTF32();
+        DotNet_SeekOrigin.SeekBegin();
 
-        CreateStream;
+        CreateStream();
         DotNet_BinaryWriter.BinaryWriterWithEncoding(DotNet_Stream, DotNet_Encoding);
         DotNet_BinaryWriter.WriteChar('A');
         DotNet_BinaryWriter.WriteChar('B');
@@ -50,22 +50,22 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         DotNet_Stream.Seek(0, DotNet_SeekOrigin);
         DotNet_BinaryReader.BinaryReaderWithEncoding(DotNet_Stream, DotNet_Encoding);
         ExpectedChar := 'A';
-        Assert.AreEqual(ExpectedChar, DotNet_BinaryReader.ReadChar, 'ReadChar check failed');
+        Assert.AreEqual(ExpectedChar, DotNet_BinaryReader.ReadChar(), 'ReadChar check failed');
         ExpectedChar := 'B';
-        Assert.AreEqual(ExpectedChar, DotNet_BinaryReader.ReadChar, 'ReadChar check failed');
+        Assert.AreEqual(ExpectedChar, DotNet_BinaryReader.ReadChar(), 'ReadChar check failed');
 
         // Explicitly assigning 1 to a Byte variable, otherwise it appears as Integer
         Byte := 1;
-        Assert.AreEqual(Byte, DotNet_BinaryReader.ReadByte, 'ReadByte check failed');
+        Assert.AreEqual(Byte, DotNet_BinaryReader.ReadByte(), 'ReadByte check failed');
 
-        Assert.AreEqual(2, DotNet_BinaryReader.ReadInt16, 'ReadInt16 check failed');
-        Assert.AreEqual(3, DotNet_BinaryReader.ReadInt32, 'ReadInt32 check failed');
-        Assert.AreEqual(4, DotNet_BinaryReader.ReadUInt16, 'ReadUInt16 check failed');
-        Assert.AreEqual(5, DotNet_BinaryReader.ReadUInt32, 'ReadUInt32 check failed');
-        Assert.AreEqual(true, DotNet_BinaryReader.ReadBoolean, 'ReadBoolean check failed');
+        Assert.AreEqual(2, DotNet_BinaryReader.ReadInt16(), 'ReadInt16 check failed');
+        Assert.AreEqual(3, DotNet_BinaryReader.ReadInt32(), 'ReadInt32 check failed');
+        Assert.AreEqual(4, DotNet_BinaryReader.ReadUInt16(), 'ReadUInt16 check failed');
+        Assert.AreEqual(5, DotNet_BinaryReader.ReadUInt32(), 'ReadUInt32 check failed');
+        Assert.AreEqual(true, DotNet_BinaryReader.ReadBoolean(), 'ReadBoolean check failed');
         ExpectedDec := 6;
-        Assert.AreEqual(ExpectedDec, DotNet_BinaryReader.ReadDecimal, 'ReadDecimal check failed');
-        Assert.AreEqual('CDE', DotNet_BinaryReader.ReadString, 'ReadString check failed');
+        Assert.AreEqual(ExpectedDec, DotNet_BinaryReader.ReadDecimal(), 'ReadDecimal check failed');
+        Assert.AreEqual('CDE', DotNet_BinaryReader.ReadString(), 'ReadString check failed');
         Clear(Byte_DotNet_Array);
         DotNet_BinaryReader.ReadBytes(4, Byte_DotNet_Array);
         CheckArrayItems(Byte_DotNet_Array, ExpectedByte_DotNet_Array);
@@ -83,7 +83,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
     [Scope('OnPrem')]
     procedure TestWriteBool()
     begin
-        DotNet_SeekOrigin.SeekBegin;
+        DotNet_SeekOrigin.SeekBegin();
 
         // Based on https://github.com/dotnet/corefx/ BinaryWriter.WriteTests.cs BinaryWriter_WriteBoolTest
         DotNet_MemoryStream.MemoryStream();
@@ -101,13 +101,13 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         DotNet_BinaryWriter.Flush();
         DotNet_Stream.Seek(0, DotNet_SeekOrigin);
 
-        Assert.AreEqual(false, DotNet_BinaryReader.ReadBoolean, 'Read check failed'); // false
-        Assert.AreEqual(false, DotNet_BinaryReader.ReadBoolean, 'Read check failed'); // false
-        Assert.AreEqual(true, DotNet_BinaryReader.ReadBoolean, 'Read check failed');  // true
-        Assert.AreEqual(false, DotNet_BinaryReader.ReadBoolean, 'Read check failed'); // false
-        Assert.AreEqual(true, DotNet_BinaryReader.ReadBoolean, 'Read check failed');  // true
-        Assert.AreEqual(5, DotNet_BinaryReader.ReadInt32, 'Read check failed');  // 5
-        Assert.AreEqual(0, DotNet_BinaryReader.ReadInt32, 'Read check failed'); // 0
+        Assert.AreEqual(false, DotNet_BinaryReader.ReadBoolean(), 'Read check failed'); // false
+        Assert.AreEqual(false, DotNet_BinaryReader.ReadBoolean(), 'Read check failed'); // false
+        Assert.AreEqual(true, DotNet_BinaryReader.ReadBoolean(), 'Read check failed');  // true
+        Assert.AreEqual(false, DotNet_BinaryReader.ReadBoolean(), 'Read check failed'); // false
+        Assert.AreEqual(true, DotNet_BinaryReader.ReadBoolean(), 'Read check failed');  // true
+        Assert.AreEqual(5, DotNet_BinaryReader.ReadInt32(), 'Read check failed');  // 5
+        Assert.AreEqual(0, DotNet_BinaryReader.ReadInt32(), 'Read check failed'); // 0
         DotNet_BinaryReader.Close();
         DotNet_BinaryWriter.Close();
         DotNet_BinaryReader.Dispose();
@@ -121,7 +121,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         DecimalArray: array[13] of Decimal;
         Index: Integer;
     begin
-        DotNet_SeekOrigin.SeekBegin;
+        DotNet_SeekOrigin.SeekBegin();
 
         // Based on https://github.com/dotnet/corefx/ BinaryWriter.WriteTests.cs BinaryWriter_WriteDecimalTest
         DecimalArray[1] := 1;
@@ -138,7 +138,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         DecimalArray[12] := 5.55;
         DecimalArray[13] := Power(3.4899, 23);
 
-        CreateStream;
+        CreateStream();
         DotNet_BinaryWriter.BinaryWriter(DotNet_Stream);
         DotNet_BinaryReader.BinaryReader(DotNet_Stream);
         for Index := 1 to ArrayLen(DecimalArray) do
@@ -148,7 +148,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         DotNet_Stream.Seek(0, DotNet_SeekOrigin);
 
         for Index := 1 to ArrayLen(DecimalArray) do
-            Assert.AreEqual(DecimalArray[Index], DotNet_BinaryReader.ReadDecimal, 'Read check failed');
+            Assert.AreEqual(DecimalArray[Index], DotNet_BinaryReader.ReadDecimal(), 'Read check failed');
 
         DotNet_BinaryReader.Close();
         DotNet_BinaryWriter.Close();
@@ -163,7 +163,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         Int16Array: array[7] of Integer;
         Index: Integer;
     begin
-        DotNet_SeekOrigin.SeekBegin;
+        DotNet_SeekOrigin.SeekBegin();
 
         // Based on https://github.com/dotnet/corefx/ BinaryWriter.WriteTests.cs BinaryWriter_WriteInt16Test
         Int16Array[1] := -32768;
@@ -174,7 +174,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         Int16Array[6] := -50;
         Int16Array[7] := 50;
 
-        CreateStream;
+        CreateStream();
         DotNet_BinaryWriter.BinaryWriter(DotNet_Stream);
         DotNet_BinaryReader.BinaryReader(DotNet_Stream);
         for Index := 1 to ArrayLen(Int16Array) do
@@ -184,7 +184,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         DotNet_Stream.Seek(0, DotNet_SeekOrigin);
 
         for Index := 1 to ArrayLen(Int16Array) do
-            Assert.AreEqual(Int16Array[Index], DotNet_BinaryReader.ReadInt16, 'Read check failed');
+            Assert.AreEqual(Int16Array[Index], DotNet_BinaryReader.ReadInt16(), 'Read check failed');
 
         DotNet_BinaryReader.Close();
         DotNet_BinaryWriter.Close();
@@ -199,7 +199,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         Int32Array: array[7] of Integer;
         Index: Integer;
     begin
-        DotNet_SeekOrigin.SeekBegin;
+        DotNet_SeekOrigin.SeekBegin();
 
         // Based on https://github.com/dotnet/corefx/ BinaryWriter.WriteTests.cs BinaryWriter_WriteInt32Test
         Int32Array[1] := -2147483647;
@@ -211,7 +211,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         Int32Array[6] := -50;
         Int32Array[7] := 50;
 
-        CreateStream;
+        CreateStream();
         DotNet_BinaryWriter.BinaryWriter(DotNet_Stream);
         DotNet_BinaryReader.BinaryReader(DotNet_Stream);
         for Index := 1 to ArrayLen(Int32Array) do
@@ -221,7 +221,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         DotNet_Stream.Seek(0, DotNet_SeekOrigin);
 
         for Index := 1 to ArrayLen(Int32Array) do
-            Assert.AreEqual(Int32Array[Index], DotNet_BinaryReader.ReadInt32, 'Read check failed');
+            Assert.AreEqual(Int32Array[Index], DotNet_BinaryReader.ReadInt32(), 'Read check failed');
 
         DotNet_BinaryReader.Close();
         DotNet_BinaryWriter.Close();
@@ -236,7 +236,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         Unsignedint16Array: array[7] of Integer;
         Index: Integer;
     begin
-        DotNet_SeekOrigin.SeekBegin;
+        DotNet_SeekOrigin.SeekBegin();
 
         // Based on https://github.com/dotnet/corefx/ BinaryWriter.WriteTests.cs BinaryWriter_WriteUInt16Test
         Unsignedint16Array[1] := 0;
@@ -247,7 +247,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         Unsignedint16Array[6] := 10000;
         Unsignedint16Array[7] := 65535 - 100;
 
-        CreateStream;
+        CreateStream();
         DotNet_BinaryWriter.BinaryWriter(DotNet_Stream);
         DotNet_BinaryReader.BinaryReader(DotNet_Stream);
         for Index := 1 to ArrayLen(Unsignedint16Array) do
@@ -257,7 +257,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         DotNet_Stream.Seek(0, DotNet_SeekOrigin);
 
         for Index := 1 to ArrayLen(Unsignedint16Array) do
-            Assert.AreEqual(Unsignedint16Array[Index], DotNet_BinaryReader.ReadUInt16, 'Read check failed');
+            Assert.AreEqual(Unsignedint16Array[Index], DotNet_BinaryReader.ReadUInt16(), 'Read check failed');
 
         DotNet_BinaryReader.Close();
         DotNet_BinaryWriter.Close();
@@ -272,7 +272,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         Unsignedint32Array: array[7] of Integer;
         Index: Integer;
     begin
-        DotNet_SeekOrigin.SeekBegin;
+        DotNet_SeekOrigin.SeekBegin();
 
         // Based on https://github.com/dotnet/corefx/ BinaryWriter.WriteTests.cs BinaryWriter_WriteUInt32Test
         Unsignedint32Array[1] := 0;
@@ -283,7 +283,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         Unsignedint32Array[6] := 10000;
         Unsignedint32Array[7] := 2147483647 - 100;
 
-        CreateStream;
+        CreateStream();
         DotNet_BinaryWriter.BinaryWriter(DotNet_Stream);
         DotNet_BinaryReader.BinaryReader(DotNet_Stream);
         for Index := 1 to ArrayLen(Unsignedint32Array) do
@@ -293,7 +293,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         DotNet_Stream.Seek(0, DotNet_SeekOrigin);
 
         for Index := 1 to ArrayLen(Unsignedint32Array) do
-            Assert.AreEqual(Unsignedint32Array[Index], DotNet_BinaryReader.ReadUInt32, 'Read check failed');
+            Assert.AreEqual(Unsignedint32Array[Index], DotNet_BinaryReader.ReadUInt32(), 'Read check failed');
 
         DotNet_BinaryReader.Close();
         DotNet_BinaryWriter.Close();
@@ -311,7 +311,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         String: Text;
         TempChar: Char;
     begin
-        DotNet_SeekOrigin.SeekBegin;
+        DotNet_SeekOrigin.SeekBegin();
 
         // Based on https://github.com/dotnet/corefx/ BinaryWriter.WriteTests.cs BinaryWriter_WriteStringTest
         DotNet_StringBuilder.InitStringBuilder('');
@@ -365,7 +365,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         StringArray[9] := String;
         StringArray[10] := '';
 
-        CreateStream;
+        CreateStream();
         DotNet_BinaryWriter.BinaryWriter(DotNet_Stream);
         DotNet_BinaryReader.BinaryReader(DotNet_Stream);
         for Index := 1 to ArrayLen(StringArray) do
@@ -375,7 +375,7 @@ codeunit 146032 Test_DotNet_BinaryReaderWriter
         DotNet_Stream.Seek(0, DotNet_SeekOrigin);
 
         for Index := 1 to ArrayLen(StringArray) do
-            Assert.AreEqual(StringArray[Index], DotNet_BinaryReader.ReadString, 'Read check failed');
+            Assert.AreEqual(StringArray[Index], DotNet_BinaryReader.ReadString(), 'Read check failed');
 
         DotNet_BinaryReader.Close();
         DotNet_BinaryWriter.Close();

@@ -3,21 +3,19 @@ codeunit 101324 "Create VAT Prod. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Company Type" = "Company Type"::VAT then begin
-                InsertData(NoVATCode, XMiscellaneousWithoutVAT);
-                // NAVCZ
-                InsertData(BaseVATItemCode(), StrSubstNo(XVATItem, BaseVATRate()));
-                InsertData(BaseVATServiceCode(), StrSubstNo(XVATService, BaseVATRate()));
-                InsertData(BaseVATReverseChargeCode(), StrSubstNo(XVATReverseCharge, BaseVATRate()));
-                InsertData(FirstReducedVATItemCode(), StrSubstNo(XVATItem, FirstReducedVATRate()));
-                InsertData(FirstReducedVATServiceCode(), StrSubstNo(XVATService, FirstReducedVATRate()));
-                InsertData(FirstReducedVATReverseChargeCode(), StrSubstNo(XVATReverseCharge, FirstReducedVATRate()));
-                InsertData(SecondReducedVATItemCode(), StrSubstNo(XVATItem, SecondReducedVATRate()));
-                InsertData(SecondReducedVATServiceCode(), StrSubstNo(XVATService, SecondReducedVATRate()));
-                // NAVCZ
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then begin
+            InsertData(DemoDataSetup.NoVATCode(), XMiscellaneousWithoutVAT);
+            // NAVCZ
+            InsertData(DemoDataSetup.BaseVATItemCode(), StrSubstNo(XVATItem, DemoDataSetup.BaseVATRate()));
+            InsertData(DemoDataSetup.BaseVATServiceCode(), StrSubstNo(XVATService, DemoDataSetup.BaseVATRate()));
+            InsertData(DemoDataSetup.BaseVATReverseChargeCode(), StrSubstNo(XVATReverseCharge, DemoDataSetup.BaseVATRate()));
+            InsertData(DemoDataSetup.FirstReducedVATItemCode(), StrSubstNo(XVATItem, DemoDataSetup.FirstReducedVATRate()));
+            InsertData(DemoDataSetup.FirstReducedVATServiceCode(), StrSubstNo(XVATService, DemoDataSetup.FirstReducedVATRate()));
+            InsertData(DemoDataSetup.FirstReducedVATReverseChargeCode(), StrSubstNo(XVATReverseCharge, DemoDataSetup.FirstReducedVATRate()));
+            InsertData(DemoDataSetup.SecondReducedVATItemCode(), StrSubstNo(XVATItem, DemoDataSetup.SecondReducedVATRate()));
+            InsertData(DemoDataSetup.SecondReducedVATServiceCode(), StrSubstNo(XVATService, DemoDataSetup.SecondReducedVATRate()));
+            // NAVCZ
         end;
     end;
 
@@ -27,7 +25,6 @@ codeunit 101324 "Create VAT Prod. Posting Gr."
         XVATItem: Label 'VAT %1% item';
         XVATService: Label 'VAT %1% service';
         XVATReverseCharge: Label 'VAT %1% reverse charge';
-        XNondeductibleVAT: Label 'Non-deductible VAT';
 
     procedure InsertData("Code": Code[10]; Description: Text[50])
     var

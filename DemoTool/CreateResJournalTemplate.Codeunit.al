@@ -29,7 +29,7 @@ codeunit 101206 "Create Res. Journal Template"
     begin
         if "No. Series" <> '' then
             "Create No. Series".InitBaseSeries(
-              "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1, true);
+              "No. Series", "No. Series", NoSeriesDescription, NoSeriesStartNo, NoSeriesEndNo, '', '', 1, Enum::"No. Series Implementation"::Sequence);
 
         "Res. Journal Template".Init();
         "Res. Journal Template".Validate(Name, Name);

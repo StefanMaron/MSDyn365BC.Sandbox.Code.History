@@ -7,7 +7,7 @@ codeunit 101851 "Create Item Charges"
     begin
         DemoDataSetup.Get();
         if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then
-            TaxGroup := DemoDataSetup.BaseVATServiceCode() // NAVCZ
+            TaxGroup := DemoDataSetup.BaseVATServiceCode() // CZ
         else
             TaxGroup := XLABORTok;
         InsertData(XJBFREIGHT, XFreightChargeJBSpedition, XSERVICES, TaxGroup);
