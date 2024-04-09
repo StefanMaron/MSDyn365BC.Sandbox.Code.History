@@ -1981,6 +1981,128 @@
     [Test]
     [HandlerFunctions('StrMenuHandler')]
     [Scope('OnPrem')]
+    procedure SendPaymentForInvoiceWithAppliedCreditMemo()
+    var
+        Customer: Record Customer;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        InStream: InStream;
+        OriginalStr: Text;
+        PaymentNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [Payment] [Credit Memo]
+        // [SCENARIO 505171] Request stamp for LCY payment of the LCY invoice having credit memo applied to it
+        Initialize();
+
+        // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 174.000 MXN (150k + 24k VAT)
+        Customer.Get(CreateCustomer());
+        UpdateCustomerSATPaymentFields(Customer."No.");
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), 1, 0, 16, false, false);
+        GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
+
+        // [GIVEN] Posted Sales Credit Memo applied to the invoice with amount = 58.000 MXN (50k + 8k VAT) 
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::"Credit Memo", Customer."No.", CreatePaymentMethodForSAT());
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItemWithPrice(SalesLine."Unit Price" / 2), 1, 0, 16, false, false);
+        SalesHeader.Validate("Applies-to Doc. Type", SalesHeader."Applies-to Doc. Type"::Invoice);
+        SalesHeader.Validate("Applies-to Doc. No.", SalesInvoiceHeader."No.");
+        SalesHeader.Modify();
+        GetPostedSalesCreditMemo(SalesCrMemoHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
+
+        // [GIVEN] Payment of 116.000 MXN (100k + 16k VAT) is applied to the invoice
+        PaymentNo :=
+          CreatePostPayment(
+            SalesInvoiceHeader."Sell-to Customer No.", SalesInvoiceHeader."No.", -(SalesInvoiceHeader."Amount Including VAT" - SalesCrMemoHeader."Amount Including VAT"), '');
+
+        // [WHEN] Request stamp for the payment
+        RequestStamp(DATABASE::"Cust. Ledger Entry", PaymentNo, ResponseOption::Success, ActionOption::"Request Stamp");
+
+        // [THEN] Payment has 'DoctoRelacionado' node with ImpSaldoAnt=116000.00 ImpPagado=116000.00 ImpSaldoInsoluto=0.00
+        // [THEN] 'TrasladoP' node has attributes BaseP = 100000.000000, ImporteP = 16000.000000
+        ExportPaymentToServerFile(CustLedgerEntry, FileName, CustLedgerEntry."Document Type"::Payment, PaymentNo);
+        InitXMLReaderForPagos20(FileName);
+        CustLedgerEntry.CalcFields("Original String");
+        CustLedgerEntry."Original String".CreateInStream(InStream);
+        InStream.ReadText(OriginalStr);
+        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        VerifyComplementoPago(
+          OriginalStr, SalesInvoiceHeader."Amount Including VAT" - SalesCrMemoHeader."Amount Including VAT", SalesInvoiceHeader."Amount Including VAT" - SalesCrMemoHeader."Amount Including VAT",
+          0.00, SalesInvoiceHeader."Fiscal Invoice Number PAC", '1', 0);
+        VerifyComplementoPagoTrasladoP(
+          OriginalStr, 49,
+          SalesInvoiceHeader.Amount - SalesCrMemoHeader.Amount,
+          SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount - (SalesCrMemoHeader."Amount Including VAT" - SalesCrMemoHeader.Amount), 0.16, 0);
+    end;
+
+    [Test]
+    [HandlerFunctions('StrMenuHandler')]
+    [Scope('OnPrem')]
+    procedure SendPaymentForInvoiceWithCreditMemoAppliedUsingCLE()
+    var
+        Customer: Record Customer;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        InStream: InStream;
+        OriginalStr: Text;
+        PaymentNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [Payment] [Credit Memo]
+        // [SCENARIO 505171] Request stamp for LCY payment of the LCY invoice applied to credit memo
+        Initialize();
+
+        // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 174.000 MXN (150k + 24k VAT)
+        Customer.Get(CreateCustomer());
+        UpdateCustomerSATPaymentFields(Customer."No.");
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), 1, 0, 16, false, false);
+        GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
+
+        // [GIVEN] Posted Sales Credit Memo with amount = 58.000 MXN (50k + 8k VAT) 
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::"Credit Memo", Customer."No.", CreatePaymentMethodForSAT());
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItemWithPrice(SalesLine."Unit Price" / 2), 1, 0, 16, false, false);
+        GetPostedSalesCreditMemo(SalesCrMemoHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
+
+        // [GIVEN] Invoice is appied to the credit memo
+        LibraryERM.ApplyCustomerLedgerEntries(
+          CustLedgerEntry."Document Type"::Invoice, CustLedgerEntry."Document Type"::"Credit Memo",
+          SalesInvoiceHeader."No.", SalesCrMemoHeader."No.");
+
+        // [GIVEN] Payment of 116.000 MXN (100k + 16k VAT) is applied to the invoice
+        PaymentNo :=
+          CreatePostPayment(
+            SalesInvoiceHeader."Sell-to Customer No.", SalesInvoiceHeader."No.", -(SalesInvoiceHeader."Amount Including VAT" - SalesCrMemoHeader."Amount Including VAT"), '');
+
+        // [WHEN] Request stamp for the payment
+        RequestStamp(DATABASE::"Cust. Ledger Entry", PaymentNo, ResponseOption::Success, ActionOption::"Request Stamp");
+
+        // [THEN] Payment has 'DoctoRelacionado' node with ImpSaldoAnt=116000.00 ImpPagado=116000.00 ImpSaldoInsoluto=0.00
+        // [THEN] 'TrasladoP' node has attributes BaseP = 100000.000000, ImporteP = 16000.000000
+        ExportPaymentToServerFile(CustLedgerEntry, FileName, CustLedgerEntry."Document Type"::Payment, PaymentNo);
+        InitXMLReaderForPagos20(FileName);
+        CustLedgerEntry.CalcFields("Original String");
+        CustLedgerEntry."Original String".CreateInStream(InStream);
+        InStream.ReadText(OriginalStr);
+        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        VerifyComplementoPago(
+          OriginalStr, SalesInvoiceHeader."Amount Including VAT" - SalesCrMemoHeader."Amount Including VAT", SalesInvoiceHeader."Amount Including VAT" - SalesCrMemoHeader."Amount Including VAT",
+          0.00, SalesInvoiceHeader."Fiscal Invoice Number PAC", '1', 0);
+        VerifyComplementoPagoTrasladoP(
+          OriginalStr, 49,
+          SalesInvoiceHeader.Amount - SalesCrMemoHeader.Amount,
+          SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount - (SalesCrMemoHeader."Amount Including VAT" - SalesCrMemoHeader.Amount), 0.16, 0);
+    end;
+
+    [Test]
+    [HandlerFunctions('StrMenuHandler')]
+    [Scope('OnPrem')]
     procedure SendPaymentWithGainLosses()
     var
         Customer: Record Customer;
@@ -8290,6 +8412,14 @@
         SalesInvoiceHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         SalesInvoiceHeader.Modify();
         SalesInvoiceHeader.CalcFields(Amount, "Amount Including VAT");
+    end;
+
+    local procedure GetPostedSalesCreditMemo(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; DocumentNo: Code[20]);
+    begin
+        SalesCrMemoHeader.Get(DocumentNo);
+        SalesCrMemoHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
+        SalesCrMemoHeader.Modify();
+        SalesCrMemoHeader.CalcFields(Amount, "Amount Including VAT");
     end;
 
     local procedure GetHeaderFieldValue(TableNo: Integer; DocumentNo: Code[20]; DocumentNoFieldNo: Integer; FieldNo: Integer): Code[10]
