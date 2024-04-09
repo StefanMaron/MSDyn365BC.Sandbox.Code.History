@@ -73,7 +73,7 @@ codeunit 101286 "Create Territory"
         if ("Country Code" = '') or ("Country Code" = DemoDataSetup."Country/Region Code") then
             exit(Code);
 
-        exit(Foreign);
+        exit(Foreign());
     end;
 
     procedure Foreign(): Code[10]

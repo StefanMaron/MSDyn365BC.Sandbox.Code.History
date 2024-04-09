@@ -44,8 +44,8 @@ codeunit 144521 "GovTalkMessage Management Test"
     begin
         Initialize();
         // [GIVEN] GovTalk Setup parameters missing
-        ClearGovTalkParameters;
-        ClearCompanyInformation;
+        ClearGovTalkParameters();
+        ClearCompanyInformation();
         CreateVATReportHeaderForVATReturn(VATReportHeader);
         LibraryLowerPermissions.SetO365Setup();
 
@@ -87,8 +87,8 @@ codeunit 144521 "GovTalkMessage Management Test"
     begin
         Initialize();
         // [GIVEN] GovTalk Setup parameters missing
-        ClearGovTalkParameters;
-        ClearCompanyInformation;
+        ClearGovTalkParameters();
+        ClearCompanyInformation();
         CreateVATReportHeaderForECSales(VATReportHeader);
         LibraryLowerPermissions.SetO365Setup();
 
@@ -151,7 +151,7 @@ codeunit 144521 "GovTalkMessage Management Test"
           XMLDOMManagement.FindNodeTextWithNamespace(GovTalkRequestXMLNode, '//x:SenderID', 'x', GovTalkNameSpaceTxt), '');
         Assert.AreEqual('clear',
           XMLDOMManagement.FindNodeTextWithNamespace(GovTalkRequestXMLNode, '//x:Method', 'x', GovTalkNameSpaceTxt), '');
-        Assert.AreEqual(GovTalkSetup.GetPassword,
+        Assert.AreEqual(GovTalkSetup.GetPassword(),
           XMLDOMManagement.FindNodeTextWithNamespace(GovTalkRequestXMLNode, '//x:Value', 'x', GovTalkNameSpaceTxt), '');
         Assert.AreEqual(
           GovTalkMessageManagement.FormatVATRegNo(CompanyInformation."Country/Region Code", CompanyInformation."VAT Registration No."),
@@ -378,8 +378,8 @@ codeunit 144521 "GovTalkMessage Management Test"
     begin
         Initialize();
         LibraryLowerPermissions.SetO365Setup();
-        ClearCompanyInformation;
-        ClearGovTalkParameters;
+        ClearCompanyInformation();
+        ClearGovTalkParameters();
         CreateVATReportHeaderAndLines(VATReportHeader);
 
         VATReportReleaseReopen.Release(VATReportHeader);
@@ -395,7 +395,7 @@ codeunit 144521 "GovTalkMessage Management Test"
     local procedure Initialize()
     begin
         if not Initialized then begin
-            SetupGovTalkParameters;
+            SetupGovTalkParameters();
             Initialized := true;
         end;
     end;
@@ -410,7 +410,7 @@ codeunit 144521 "GovTalkMessage Management Test"
         CreateVATReportHeader(VATReportHeader, VATReportHeader."VAT Report Config. Code"::"EC Sales List", 'current');
     end;
 
-    local procedure CreateVATReportHeader(var VATReportHeader: Record "VAT Report Header"; VATReportConfigCode: Option; VATReportVersion: Code[10])
+    local procedure CreateVATReportHeader(var VATReportHeader: Record "VAT Report Header"; VATReportConfigCode: Enum "VAT Report Configuration"; VATReportVersion: Code[10])
     begin
         VATReportHeader.Init();
         VATReportHeader."No." := LibraryUtility.GenerateRandomCodeWithLength(
@@ -425,7 +425,7 @@ codeunit 144521 "GovTalkMessage Management Test"
 
     local procedure CreateGovTalkMessage(VATReportHeader: Record "VAT Report Header")
     begin
-        GovTalkMessage.ReportConfigCode := VATReportHeader."VAT Report Config. Code";
+        GovTalkMessage.ReportConfigCode := VATReportHeader."VAT Report Config. Code".AsInteger();
         GovTalkMessage.ReportNo := VATReportHeader."No.";
         GovTalkMessage.PeriodID := GetPeriodID(VATReportHeader."End Date");
         GovTalkMessage.PeriodStart := VATReportHeader."Start Date";

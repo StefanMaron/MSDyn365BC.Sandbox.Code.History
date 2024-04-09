@@ -100,7 +100,7 @@ codeunit 144525 "Test Submit VAT Declare Rqst"
             InsertSingleLine(VATReportHeader."VAT Report Config. Code", VATReportHeader."No.", i, LibraryRandom.RandDec(100, 3));
     end;
 
-    local procedure InsertSingleLine(VATReportConfigCode: Option; ReportNo: Code[20]; LineNo: Integer; Amount: Decimal)
+    local procedure InsertSingleLine(VATReportConfigCode: Enum "VAT Report Configuration"; ReportNo: Code[20]; LineNo: Integer; Amount: Decimal)
     var
         VATStatementReportLine: Record "VAT Statement Report Line";
     begin

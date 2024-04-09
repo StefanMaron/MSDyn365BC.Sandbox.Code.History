@@ -92,11 +92,11 @@ codeunit 146007 Test_DotNet_String
         // [Given] an empty string
         DotNet_String.Set('');
         // [THEN] string length should be 0
-        Assert.AreEqual(0, DotNet_String.Length, 'String length check failed');
+        Assert.AreEqual(0, DotNet_String.Length(), 'String length check failed');
         // [Given] a string 'Test'
         DotNet_String.Set('Test');
         // [THEN] string length should be 4
-        Assert.AreEqual(4, DotNet_String.Length, 'String length check failed');
+        Assert.AreEqual(4, DotNet_String.Length(), 'String length check failed');
     end;
 
     [Test]
@@ -117,7 +117,7 @@ codeunit 146007 Test_DotNet_String
         // [THEN] string actual value must be '          T          '
         DotNet_String.Set(DotNet_String.PadLeft(10, ' '));
         DotNet_String.Set(DotNet_String.PadRight(20, ' '));
-        Assert.AreEqual('         T          ', DotNet_String.ToString, 'String value check failed');
+        Assert.AreEqual('         T          ', DotNet_String.ToString(), 'String value check failed');
     end;
 
     [Test]
@@ -131,7 +131,7 @@ codeunit 146007 Test_DotNet_String
         DotNet_String.Set(' ,T,');
         // [WHEN] when we trim it
         // [THEN] string actual value must be ',T,'
-        Assert.AreEqual(',T,', DotNet_String.Trim, 'String value check failed');
+        Assert.AreEqual(',T,', DotNet_String.Trim(), 'String value check failed');
         DotNet_ArrayChar.CharArray(2);
         DotNet_ArrayChar.SetCharValue(',', 0);
         DotNet_ArrayChar.SetCharValue(' ', 1);
@@ -184,13 +184,13 @@ codeunit 146007 Test_DotNet_String
         // [Given] a string 'ABCDBC'
         DotNet_String.Set('ABCDBC');
         // [WHEN] we convert it to char array and convert back
-        DotNet_String.ToCharArray(0, DotNet_String.Length, DotNet_ArrayChar);
+        DotNet_String.ToCharArray(0, DotNet_String.Length(), DotNet_ArrayChar);
         Clear(DotNet_String);
         DotNet_String.FromCharArray(DotNet_ArrayChar);
         // [THEN] length of string must be 6
-        Assert.AreEqual(6, DotNet_String.Length, 'String length check failed');
+        Assert.AreEqual(6, DotNet_String.Length(), 'String length check failed');
         // [THEN] value of string must be 'ABCDBC'
-        Assert.AreEqual('ABCDBC', DotNet_String.ToString, 'String value check failed');
+        Assert.AreEqual('ABCDBC', DotNet_String.ToString(), 'String value check failed');
     end;
 
     [Test]

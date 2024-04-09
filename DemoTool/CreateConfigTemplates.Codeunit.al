@@ -27,10 +27,10 @@ codeunit 101933 "Create Config. Templates"
         CreateResourceTemplate: Codeunit "Create Resource Template";
     begin
         Initialize();
-        CreateCustomerTemplate.InsertMiniAppData;
-        CreateItemTemplate.InsertMiniAppData;
-        CreateVendorTemplate.InsertMiniAppData;
-        CreateResourceTemplate.InsertResourceData;
+        CreateCustomerTemplate.InsertMiniAppData();
+        CreateItemTemplate.InsertMiniAppData();
+        CreateVendorTemplate.InsertMiniAppData();
+        CreateResourceTemplate.InsertResourceData();
     end;
 
     procedure CreateTemplates()
@@ -40,29 +40,29 @@ codeunit 101933 "Create Config. Templates"
         ConfigTemplateHeaderCode: Code[10];
     begin
         Initialize();
-        ConfigTemplateHeaderCode := CreateCustTemplate('10000', DemoDataSetup.DomesticCode);
+        ConfigTemplateHeaderCode := CreateCustTemplate('10000', DemoDataSetup.DomesticCode());
         CreateTemplateHelper.CreateTemplateSelectionRule(
           DATABASE::Customer, ConfigTemplateHeaderCode, '', 0, 0);
 
-        CreateCustTemplate('31987987', DemoDataSetup.EUCode);
-        CreateCustTemplate('01454545', DemoDataSetup.ForeignCode);
+        CreateCustTemplate('31987987', DemoDataSetup.EUCode());
+        CreateCustTemplate('01454545', DemoDataSetup.ForeignCode());
 
-        ConfigTemplateHeaderCode := CreateVendTemplate('10000', DemoDataSetup.DomesticCode);
+        ConfigTemplateHeaderCode := CreateVendTemplate('10000', DemoDataSetup.DomesticCode());
         CreateTemplateHelper.CreateTemplateSelectionRule(
           DATABASE::Vendor, ConfigTemplateHeaderCode, '', 0, 0);
 
-        CreateVendTemplate('31147896', DemoDataSetup.EUCode);
-        CreateVendTemplate('01254796', DemoDataSetup.ForeignCode);
+        CreateVendTemplate('31147896', DemoDataSetup.EUCode());
+        CreateVendTemplate('01254796', DemoDataSetup.ForeignCode());
 
-        ConfigTemplateHeaderCode := CreateItemTemplate('1896-S', DemoDataSetup.RetailCode);
+        ConfigTemplateHeaderCode := CreateItemTemplate('1896-S', DemoDataSetup.RetailCode());
         CreateTemplateHelper.CreateTemplateSelectionRule(
           DATABASE::Item, ConfigTemplateHeaderCode, '', 0, 0);
 
-        CreateItemTemplate('1900-S', DemoDataSetup.ManufactCode);
+        CreateItemTemplate('1900-S', DemoDataSetup.ManufactCode());
 
-        CreateItemTemplateCU.InsertPostingGroupsItemTemplates;
+        CreateItemTemplateCU.InsertPostingGroupsItemTemplates();
 
-        CreateResourceTemplate.InsertResourceData;
+        CreateResourceTemplate.InsertResourceData();
     end;
 
     local procedure CreateCustTemplate(CustNo: Code[20]; CustPostingGroup: Code[20]): Code[10]

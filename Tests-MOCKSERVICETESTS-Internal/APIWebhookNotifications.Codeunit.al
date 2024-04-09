@@ -45,7 +45,7 @@ codeunit 135088 "API Webhook Notifications"
         BindSubscription(LibraryJobQueue);
         BindSubscription(APIWebhookSendingEvents);
 
-        InitializeDatabaseTableTriggerSetup;
+        InitializeDatabaseTableTriggerSetup();
         Reset();
     end;
 
@@ -85,7 +85,7 @@ codeunit 135088 "API Webhook Notifications"
         APIWebhookSendingEvents.SetApiEnabled(false);
 
         // [WHEN] we INSERT an item
-        CreateItem;
+        CreateItem();
 
         // [THEN] no API Webhook Notification and no Job Queue Entity should be created
         VerifyNotificationNotCreated(SubscriptionID);
@@ -107,7 +107,7 @@ codeunit 135088 "API Webhook Notifications"
         APIWebhookSendingEvents.SetApiEnabled(true);
 
         // [WHEN] we INSERT an item
-        CreateItem;
+        CreateItem();
 
         // [THEN] no API Webhook Notification and no Job Queue Entity should be created
         VerifyNotificationNotCreated(SubscriptionID);
@@ -128,7 +128,7 @@ codeunit 135088 "API Webhook Notifications"
         APIWebhookSendingEvents.SetApiSubscriptionsEnabled(false);
 
         // [WHEN] we INSERT an item
-        CreateItem;
+        CreateItem();
 
         // [THEN] no API Webhook Notification and no Job Queue Entity should be created
         VerifyNotificationNotCreated(SubscriptionID);
@@ -147,7 +147,7 @@ codeunit 135088 "API Webhook Notifications"
         SubscriptionID := CreateItemWebhookSubscription(false);
 
         // [WHEN] we INSERT an item
-        CreateItem;
+        CreateItem();
 
         // [THEN] an API Webhook Notification and a Job Queue Entity should be created
         VerifyNotificationCreated(SubscriptionID, ChangeType::Created, true, true);
@@ -167,7 +167,7 @@ codeunit 135088 "API Webhook Notifications"
         SubscriptionID := CreateDataverseItemWebhookSubscription(false);
 
         // [WHEN] we INSERT an item
-        CreateItem;
+        CreateItem();
 
         // [THEN] an API Webhook Notification and a Job Queue Entity should be created
         VerifyNotificationCreated(SubscriptionID, ChangeType::Created, true, true);
@@ -184,7 +184,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an Item API Webhook Subscription and check if an API Webhook Notification and Job Queue Entry is created on an item modification
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an Item API Webhook Subscription
         SubscriptionID := CreateItemWebhookSubscription(false);
@@ -207,7 +207,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an Item API Webhook Subscription and check if an API Webhook Notification and Job Queue Entry is created on an item modification
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an Item API Webhook Subscription
         InitializeCDSConnectionSetup();
@@ -231,7 +231,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an Item API Webhook Subscription and check if an API Webhook Notification and Job Queue Entry is created on an item renaming
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an Item API Webhook Subscription
         SubscriptionID := CreateItemWebhookSubscription(false);
@@ -254,7 +254,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an Item API Webhook Subscription and check if an API Webhook Notification and Job Queue Entry is created on an item renaming
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an Item API Webhook Subscription
         InitializeCDSConnectionSetup();
@@ -282,7 +282,7 @@ codeunit 135088 "API Webhook Notifications"
         ConfigPackage.Insert(true);
 
         // [GIVEN] a Package API Webhook Subscription
-        SubscriptionID := CreatePackageWebhookSubscription;
+        SubscriptionID := CreatePackageWebhookSubscription();
 
         // [WHEN] we RENAME the package
         ConfigPackage.Rename(CopyStr(LibraryRandom.RandText(MaxStrLen(ConfigPackage.Code)), 1, MaxStrLen(ConfigPackage.Code)));
@@ -303,7 +303,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an Item API Webhook Subscription and check if an API Webhook Notification and Job Queue Entry is created on an item deletion
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an Item API Webhook Subscription
         SubscriptionID := CreateItemWebhookSubscription(false);
@@ -326,7 +326,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an Item API Webhook Subscription and check if an API Webhook Notification and Job Queue Entry is created on an item deletion
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an Item API Webhook Subscription
         InitializeCDSConnectionSetup();
@@ -441,7 +441,7 @@ codeunit 135088 "API Webhook Notifications"
         SubscriptionID := CreateItemWebhookSubscription(true);
 
         // [WHEN] we INSERT the item
-        CreateItem;
+        CreateItem();
 
         // [THEN] no API Webhook Notification and no Job Queue Entity should be created
         VerifyNotificationNotCreated(SubscriptionID);
@@ -461,7 +461,7 @@ codeunit 135088 "API Webhook Notifications"
         SubscriptionID := CreateDataverseItemWebhookSubscription(true);
 
         // [WHEN] we INSERT the item
-        CreateItem;
+        CreateItem();
 
         // [THEN] no API Webhook Notification and no Job Queue Entity should be created
         VerifyNotificationNotCreated(SubscriptionID);
@@ -478,7 +478,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an expired Item API Webhook Subscription and check that an API Webhook Notification is not created on item modification
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an expired Item API Webhook Subscription
         SubscriptionID := CreateItemWebhookSubscription(true);
@@ -501,7 +501,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an expired Item API Webhook Subscription and check that an API Webhook Notification is not created on item modification
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an expired Item API Webhook Subscription
         InitializeCDSConnectionSetup();
@@ -525,7 +525,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an expired Item API Webhook Subscription and check that an API Webhook Notification is not created on an item key renaming
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an expired Item API Webhook Subscription
         SubscriptionID := CreateItemWebhookSubscription(true);
@@ -548,7 +548,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an expired Item API Webhook Subscription and check that an API Webhook Notification is not created on an item key renaming
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an expired Item API Webhook Subscription
         InitializeCDSConnectionSetup();
@@ -572,7 +572,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an expired Item API Webhook Subscription and check that an API Webhook Notification is not created   on item deletion
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an expired Item API Webhook Subscription
         SubscriptionID := CreateItemWebhookSubscription(true);
@@ -595,7 +595,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create an expired Item API Webhook Subscription and check that an API Webhook Notification is not created   on item deletion
         // [GIVEN] an Item
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [GIVEN] an expired Item API Webhook Subscription
         InitializeCDSConnectionSetup();
@@ -618,10 +618,10 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create a broken Item API Webhook Subscription and check that an API Webhook Notification is not created on item creation
         // [GIVEN] a broken Resource URL API Webhook Subscription
         Initialize();
-        SubscriptionID := CreateItemWebhookSubscriptionBrokenResourceURL;
+        SubscriptionID := CreateItemWebhookSubscriptionBrokenResourceURL();
 
         // [WHEN] we CREATE the item
-        CreateItem;
+        CreateItem();
 
         // [THEN] no API Webhook Notification and no Job Queue Entity should be created
         VerifyNotificationNotCreated(SubscriptionID);
@@ -638,8 +638,8 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create a broken Item API Webhook Subscription and check that an API Webhook Notification is not created on item modification
         // [GIVEN] a broken Resource URL API Webhook Subscription and an Item
         Initialize();
-        ItemCode := CreateItem;
-        SubscriptionID := CreateItemWebhookSubscriptionBrokenResourceURL;
+        ItemCode := CreateItem();
+        SubscriptionID := CreateItemWebhookSubscriptionBrokenResourceURL();
 
         // [WHEN] we UPDATE the item
         UpdateItem(ItemCode);
@@ -659,8 +659,8 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create a broken Item API Webhook Subscription and check that an API Webhook Notification is not created on an item key renaming
         // [GIVEN] a broken Resource URL API Webhook Subscription and an Item
         Initialize();
-        ItemCode := CreateItem;
-        SubscriptionID := CreateItemWebhookSubscriptionBrokenResourceURL;
+        ItemCode := CreateItem();
+        SubscriptionID := CreateItemWebhookSubscriptionBrokenResourceURL();
 
         // [WHEN] we RENAME the item
         RenameItem(ItemCode);
@@ -680,8 +680,8 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Create a broken Item API Webhook Subscription and check that an API Webhook Notification is not created on item deletion
         // [GIVEN] a broken Resource URL API Webhook Subscription and an Item
         Initialize();
-        ItemCode := CreateItem;
-        SubscriptionID := CreateItemWebhookSubscriptionBrokenResourceURL;
+        ItemCode := CreateItem();
+        SubscriptionID := CreateItemWebhookSubscriptionBrokenResourceURL();
 
         // [WHEN] we DELETE the item
         DeleteItem(ItemCode);
@@ -700,7 +700,7 @@ codeunit 135088 "API Webhook Notifications"
         Initialize();
 
         // [WHEN] we CREATE the item
-        CreateItem;
+        CreateItem();
 
         // [THEN] no API Webhook Notification and no Job Queue Entity should be created
         VerifyNotificationNotCreated('');
@@ -716,7 +716,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Check that an API Webhook Notification is not created on item modification when API Webhook Subscription doesn't exist
         // [GIVEN] an Item and no API Webhook Subscription
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [WHEN] we UPDATE the item
         UpdateItem(ItemCode);
@@ -735,7 +735,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Check that an API Webhook Notification is not created on an item key renaming when API Webhook Subscription doesn't exist
         // [GIVEN] an Item and no API Webhook Subscription
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [WHEN] we RENAME the item
         RenameItem(ItemCode);
@@ -754,7 +754,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Check that an API Webhook Notification is not created on item deletion when API Webhook Subscription doesn't exist
         // [GIVEN] an Item and no API Webhook Subscription
         Initialize();
-        ItemCode := CreateItem;
+        ItemCode := CreateItem();
 
         // [WHEN] we DELETE the item
         DeleteItem(ItemCode);
@@ -776,13 +776,13 @@ codeunit 135088 "API Webhook Notifications"
         CreateItemWebhookSubscription(false);
 
         // [WHEN] we CREATE one item
-        CreateItem;
+        CreateItem();
 
         // [WHEN] we UPDATE the asociated Job Queue Entity's status to Ready
         MockJobsStatus(JobQueueEntry.Status::Ready, true);
 
         // [WHEN] we CREATE another item
-        CreateItem;
+        CreateItem();
 
         // [THEN] one Job Queue Entity should be created
         VerifyJobQueueEntryOnWebhookSubscription(1);
@@ -803,14 +803,14 @@ codeunit 135088 "API Webhook Notifications"
         APIWebhookSendingEvents.SetDelayTime(500);
 
         // [WHEN] we CREATE one item
-        CreateItem;
+        CreateItem();
 
         // [WHEN] we UPDATE the asociated Job Queue Entity's status to "In Process"
         MockJobsStatus(JobQueueEntry.Status::"In Process", false);
         Sleep(2000);
 
         // [WHEN] we CREATE another item
-        CreateItem;
+        CreateItem();
 
         // [THEN] two Job Queue Entities should be created
         VerifyJobQueueEntryOnWebhookSubscription(2);
@@ -828,10 +828,10 @@ codeunit 135088 "API Webhook Notifications"
         CreateItemWebhookSubscription(false);
         // [GIVEN] Max number of job queue entries
         for I := 1 to 20 do
-            CreateApiWebhookJobQueueEntry(ProcessingTime + I * MillisecondsPerHour, true);
+            CreateApiWebhookJobQueueEntry(ProcessingTime + I * MillisecondsPerHour(), true);
 
         // [WHEN] we CREATE an item
-        CreateItem;
+        CreateItem();
 
         // [THEN] Number of job queue entries still equals to max number of jobs
         VerifyJobQueueEntryOnWebhookSubscription(20);
@@ -851,7 +851,7 @@ codeunit 135088 "API Webhook Notifications"
         CreateItemWebhookSubscription(false);
         // [GIVEN] Max number of job queue entries, one job is hanging
         for I := 1 to 19 do
-            CreateApiWebhookJobQueueEntry(ProcessingTime + I * MillisecondsPerHour, true);
+            CreateApiWebhookJobQueueEntry(ProcessingTime + I * MillisecondsPerHour(), true);
         JobId := CreateApiWebhookJobQueueEntry(ProcessingTime, true);
         JobQueueEntry.Get(JobId);
         MockJobStatus(JobId, JobQueueEntry.Status::"In Process", false);
@@ -874,10 +874,10 @@ codeunit 135088 "API Webhook Notifications"
         // [GIVEN] an Item API Webhook Subscription
         CreateItemWebhookSubscription(false);
         // [GIVEN] A job queue entry with "On Hold" status
-        CreateApiWebhookJobQueueEntry(ProcessingTime - MillisecondsPerHour, false);
+        CreateApiWebhookJobQueueEntry(ProcessingTime - MillisecondsPerHour(), false);
 
         // [WHEN] we CREATE an item
-        CreateItem;
+        CreateItem();
 
         // [THEN] the new Job Queue Entity is created
         VerifyJobQueueEntryOnWebhookSubscription(2);
@@ -894,11 +894,11 @@ codeunit 135088 "API Webhook Notifications"
         // [GIVEN] an Item API Webhook Subscription
         CreateItemWebhookSubscription(false);
         // [GIVEN] an Ready and Scheduled job queue entry with Earliest Start Date/Time in the future 
-        CreateApiWebhookJobQueueEntry(ProcessingTime + MillisecondsPerHour, true);
+        CreateApiWebhookJobQueueEntry(ProcessingTime + MillisecondsPerHour(), true);
         MockJobsStatus(JobQueueEntry.Status::Ready, true);
 
         // [WHEN] we CREATE an item
-        CreateItem;
+        CreateItem();
 
         // [THEN] the new Job Queue Entity is created
         VerifyJobQueueEntryOnWebhookSubscription(2);
@@ -913,10 +913,10 @@ codeunit 135088 "API Webhook Notifications"
         // [GIVEN] an Item API Webhook Subscription
         CreateItemWebhookSubscription(false);
         // [GIVEN] A job queue entry with Ready status
-        CreateApiWebhookJobQueueEntry(ProcessingTime + MillisecondsPerHour, true);
+        CreateApiWebhookJobQueueEntry(ProcessingTime + MillisecondsPerHour(), true);
 
         // [WHEN] we CREATE an item
-        CreateItem;
+        CreateItem();
 
         // [THEN] the new Job Queue Entity is created
         VerifyJobQueueEntryOnWebhookSubscription(2);
@@ -931,7 +931,7 @@ codeunit 135088 "API Webhook Notifications"
         Initialize();
 
         // [WHEN] we CREATE a Job Queue Entry
-        CreateJobQueue;
+        CreateJobQueue();
 
         // [THEN] no API Webhook Notification should be created
         VerifyNotificationNotCreated('');
@@ -946,7 +946,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Check that no API Webhook Notification is created on Job Queue modification
         // [GIVEN] a Job Queue Entity AND no API Webhook Subscription
         Initialize();
-        JobQueueID := CreateJobQueue;
+        JobQueueID := CreateJobQueue();
 
         // [WHEN] we UPDATE the Job Queue Entry
         UpdateJobQueue(JobQueueID);
@@ -964,7 +964,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Check that no API Webhook Notification is created on Job Queue renaming
         // [GIVEN] a Job Queue Entity AND no API Webhook Subscription
         Initialize();
-        JobQueueID := CreateJobQueue;
+        JobQueueID := CreateJobQueue();
 
         // [WHEN] we UPDATE the Job Queue Entry
         RenameJobQueue(JobQueueID);
@@ -982,7 +982,7 @@ codeunit 135088 "API Webhook Notifications"
         // [SCENARIO] Check that no API Webhook Notification is created on Job Queue deletion
         // [GIVEN] a Job Queue Entity AND no API Webhook Subscription
         Initialize();
-        JobQueueID := CreateJobQueue;
+        JobQueueID := CreateJobQueue();
 
         // [WHEN] we DELETE the Job Queue Entry
         DeleteJobQueue(JobQueueID);
@@ -1002,7 +1002,7 @@ codeunit 135088 "API Webhook Notifications"
         // [GIVEN] a Draft Sales Invoice and an API Webhook Subscription to salesInvoices entity
         Initialize();
         CreateDraftSalesInvoice(SalesHeader);
-        SubscriptionID := CreateSalesInvoiceWebhookSubscription;
+        SubscriptionID := CreateSalesInvoiceWebhookSubscription();
 
         // [WHEN] we POST the draft Sales Invoice
         LibrarySales.PostSalesDocument(SalesHeader, false, true);
@@ -1025,7 +1025,7 @@ codeunit 135088 "API Webhook Notifications"
         // [GIVEN] a Draft Sales Invoice and an API Webhook Subscription to salesInvoices entity
         Initialize();
         CreateDraftSalesInvoice(SalesHeader);
-        SubscriptionID := CreateSalesInvoiceWebhookSubscription;
+        SubscriptionID := CreateSalesInvoiceWebhookSubscription();
 
         // [WHEN] create a Posted Sales Invoice and delete the Draft Sales Invoice
         SalesInvoiceHeader.TransferFields(SalesHeader, true);
@@ -1052,7 +1052,7 @@ codeunit 135088 "API Webhook Notifications"
         // [GIVEN] a Draft Sales Credit Memo and an API Webhook Subscription to salesCreditMemos entity
         Initialize();
         CreateDraftSalesCreditMemo(SalesHeader);
-        SubscriptionID := CreateSalesCreditMemoWebhookSubscription;
+        SubscriptionID := CreateSalesCreditMemoWebhookSubscription();
 
         // [WHEN] we POST the draft Sales Credit Memo
         LibrarySales.PostSalesDocument(SalesHeader, false, true);
@@ -1075,7 +1075,7 @@ codeunit 135088 "API Webhook Notifications"
         // [GIVEN] a Draft Sales Credit Memo and an API Webhook Subscription to salesCreditMemos entity
         Initialize();
         CreateDraftSalesCreditMemo(SalesHeader);
-        SubscriptionID := CreateSalesCreditMemoWebhookSubscription;
+        SubscriptionID := CreateSalesCreditMemoWebhookSubscription();
 
         // [WHEN] create a Posted Sales Credit Memo and delete the Draft Sales Credit Memo
         SalesCrMemoHeader.TransferFields(SalesHeader, true);
@@ -1102,7 +1102,7 @@ codeunit 135088 "API Webhook Notifications"
         // [GIVEN] a Draft Purchase Invoice and an API Webhook Subscription to purchaseInvoices entity
         Initialize();
         CreateDraftPurchaseInvoice(PurchaseHeader);
-        SubscriptionID := CreatePurchaseInvoiceWebhookSubscription;
+        SubscriptionID := CreatePurchaseInvoiceWebhookSubscription();
 
         // [WHEN] we POST the draft Purchase Invoice
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true);
@@ -1125,7 +1125,7 @@ codeunit 135088 "API Webhook Notifications"
         // [GIVEN] a Draft Purchase Invoice and an API Webhook Subscription to purchaseInvoices entity
         Initialize();
         CreateDraftPurchaseInvoice(PurchaseHeader);
-        SubscriptionID := CreatePurchaseInvoiceWebhookSubscription;
+        SubscriptionID := CreatePurchaseInvoiceWebhookSubscription();
 
         // [WHEN] create a Posted Purchase Invoice and delete the Draft Purchase Invoice
         PurchInvHeader.TransferFields(PurchaseHeader, true);
@@ -1180,7 +1180,7 @@ codeunit 135088 "API Webhook Notifications"
     var
         JobQueueEntry: Record "Job Queue Entry";
     begin
-        CreateApiWebhookJobCategoryIfMissing;
+        CreateApiWebhookJobCategoryIfMissing();
 
         JobQueueEntry.ID := CreateGuid();
         JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
@@ -1254,7 +1254,7 @@ codeunit 135088 "API Webhook Notifications"
         SubscriptionID := CreateSubscriptionForEntity(ApiWebhookEntity, false);
         if IsExpired then begin
             APIWebhookSubscription.Get(SubscriptionID);
-            APIWebhookSubscription."Expiration Date Time" := ProcessingTime - MillisecondsPerDay;
+            APIWebhookSubscription."Expiration Date Time" := ProcessingTime - MillisecondsPerDay();
             APIWebhookSubscription.Modify();
         end;
         exit(SubscriptionID);
@@ -1270,7 +1270,7 @@ codeunit 135088 "API Webhook Notifications"
         SubscriptionID := CreateSubscriptionForEntity(ApiWebhookEntity, true);
         if IsExpired then begin
             APIWebhookSubscription.Get(SubscriptionID);
-            APIWebhookSubscription."Expiration Date Time" := ProcessingTime - MillisecondsPerDay;
+            APIWebhookSubscription."Expiration Date Time" := ProcessingTime - MillisecondsPerDay();
             APIWebhookSubscription.Modify();
         end;
         exit(SubscriptionID);
@@ -1303,10 +1303,10 @@ codeunit 135088 "API Webhook Notifications"
         APIWebhookSubscription."Entity Group" := ApiWebhookEntity.Group;
         APIWebhookSubscription."Entity Version" := ApiWebhookEntity.Version;
         APIWebhookSubscription."Entity Set Name" := ApiWebhookEntity.Name;
-        APIWebhookSubscription."User Id" := UserSecurityId;
+        APIWebhookSubscription."User Id" := UserSecurityId();
         APIWebhookSubscription."Last Modified Date Time" := ProcessingTime;
         APIWebhookSubscription."Client State" := CopyStr(ClientStateTxt, 1, MaxStrLen(APIWebhookSubscription."Client State"));
-        APIWebhookSubscription."Expiration Date Time" := ProcessingTime + MillisecondsPerDay;
+        APIWebhookSubscription."Expiration Date Time" := ProcessingTime + MillisecondsPerDay();
         APIWebhookSubscription."Source Table Id" := ApiWebhookEntity."Table No.";
         if DataverseSubscription then
             APIWebhookSubscription."Subscription Type" := APIWebhookSubscription."Subscription Type"::Dataverse
@@ -1540,7 +1540,7 @@ codeunit 135088 "API Webhook Notifications"
 
     local procedure CreateDraftSalesInvoice(var SalesHeader: Record "Sales Header"): Guid
     begin
-        LibrarySales.SetAllowDocumentDeletionBeforeDate(WorkDate + 1);
+        LibrarySales.SetAllowDocumentDeletionBeforeDate(WorkDate() + 1);
         LibrarySales.CreateSalesInvoice(SalesHeader);
         ModifySalesHeaderPostingDate(SalesHeader, WorkDate());
         exit(SalesHeader.SystemId);
@@ -1548,7 +1548,7 @@ codeunit 135088 "API Webhook Notifications"
 
     local procedure CreateDraftSalesCreditMemo(var SalesHeader: Record "Sales Header"): Guid
     begin
-        LibrarySales.SetAllowDocumentDeletionBeforeDate(WorkDate + 1);
+        LibrarySales.SetAllowDocumentDeletionBeforeDate(WorkDate() + 1);
         LibrarySales.CreateSalesCreditMemo(SalesHeader);
         ModifySalesHeaderPostingDate(SalesHeader, WorkDate());
         exit(SalesHeader.SystemId);
@@ -1556,7 +1556,7 @@ codeunit 135088 "API Webhook Notifications"
 
     local procedure CreateDraftPurchaseInvoice(var PurchaseHeader: Record "Purchase Header"): Guid
     begin
-        LibraryPurchase.SetAllowDocumentDeletionBeforeDate(WorkDate + 1);
+        LibraryPurchase.SetAllowDocumentDeletionBeforeDate(WorkDate() + 1);
         LibraryPurchase.CreatePurchaseInvoice(PurchaseHeader);
         ModifyPurchaseHeaderPostingDate(PurchaseHeader, WorkDate());
         exit(PurchaseHeader.SystemId);
@@ -1630,8 +1630,8 @@ codeunit 135088 "API Webhook Notifications"
     local procedure Reset()
     begin
         ProcessingTime := CurrentDateTime;
-        ResetApiWebhookSubscriptionsAndNotifications;
-        ResetJobQueueEntries;
+        ResetApiWebhookSubscriptionsAndNotifications();
+        ResetJobQueueEntries();
         APIWebhookNotificationMgt.Reset();
         APIWebhookSendingEvents.Reset();
     end;

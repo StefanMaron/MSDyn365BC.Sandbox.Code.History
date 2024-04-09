@@ -3,15 +3,13 @@ codeunit 118013 "Update Inventory Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, FinishedCode, '992120', '992121');
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, RawMatCode, '992130', '992131');
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, ResaleCode, '992110', '992111');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, FinishedCode, '992120', '992121');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, RawMatCode, '992130', '992131');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, ResaleCode, '992110', '992111');
-        end;
+        DemoDataSetup.Get();
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.FinishedCode(), '992120', '992121');
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.RawMatCode(), '992130', '992131');
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.ResaleCode(), '992110', '992111');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.FinishedCode(), '992120', '992121');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.RawMatCode(), '992130', '992131');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.ResaleCode(), '992110', '992111');
     end;
 
     var
@@ -24,11 +22,9 @@ codeunit 118013 "Update Inventory Posting Setup"
     var
         CreateGLAccount: Codeunit "Create G/L Account";
     begin
-        with DemoDataSetup do begin
-            Get();
-            CreateInventoryPostingSetup.InsertData(XOUTLOG, ResaleCode, CreateGLAccount.GoodsforResale(), '');
-            CreateInventoryPostingSetup.InsertData(XOWNLOG, ResaleCode, CreateGLAccount.GoodsforResale(), '');
-        end;
+        DemoDataSetup.Get();
+        CreateInventoryPostingSetup.InsertData(XOUTLOG, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), '');
+        CreateInventoryPostingSetup.InsertData(XOWNLOG, DemoDataSetup.ResaleCode(), CreateGLAccount.GoodsforResale(), '');
     end;
 }
 

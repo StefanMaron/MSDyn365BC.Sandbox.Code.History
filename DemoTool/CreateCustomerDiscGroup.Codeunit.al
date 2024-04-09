@@ -4,7 +4,7 @@ codeunit 101340 "Create Customer Disc. Group"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        InsertData(DemoDataSetup.RetailCode, XRetail2);
+        InsertData(DemoDataSetup.RetailCode(), XRetail2);
         InsertData(XLARGEACC, XLargeaccount);
     end;
 

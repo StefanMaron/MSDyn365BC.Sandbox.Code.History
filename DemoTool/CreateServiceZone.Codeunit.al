@@ -3,19 +3,16 @@ codeunit 117058 "Create Service Zone"
 
     trigger OnRun()
     begin
-        with ServiceZone do begin
-            InsertData(XE, XEast);
-            InsertData(XM, XMidland);
-            InsertData(XN, XNorth);
-            InsertData(XS, XSouth);
-            InsertData(XSE, XSouthEast);
-            InsertData(XW, XWest);
-            InsertData(XX, XInternationalothercountries);
-        end;
+        InsertData(XE, XEast);
+        InsertData(XM, XMidland);
+        InsertData(XN, XNorth);
+        InsertData(XS, XSouth);
+        InsertData(XSE, XSouthEast);
+        InsertData(XW, XWest);
+        InsertData(XX, XInternationalothercountries);
     end;
 
     var
-        ServiceZone: Record "Service Zone";
         XE: Label 'E';
         XEast: Label 'East';
         XM: Label 'M';

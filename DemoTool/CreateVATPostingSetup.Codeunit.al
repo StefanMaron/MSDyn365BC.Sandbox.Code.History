@@ -3,42 +3,40 @@ codeunit 101325 "Create VAT Posting Setup"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            case "Company Type" of
-                "Company Type"::VAT:
-                    begin
-                        InsertData('', ServicesVATCode, 0, 0, 'E');
-                        InsertData('', GoodsVATCode, 0, 0, 'E');
-                        if "Reduced VAT Rate" > 0 then
-                            InsertData('', ReducedVATCode, 0, 0, 'E');
-                        InsertData('', NoVATCode, 0, 0, 'E');
-                        InsertData(DomesticCode, ServicesVATCode, "Services VAT Rate", 0, 'S');
-                        InsertData(DomesticCode, GoodsVATCode, "Goods VAT Rate", 0, 'S');
-                        InsertData(DomesticCode, NoVATCode, 0, 0, 'E');
-                        if "Data Type" = "Data Type"::Extended then
-                            InsertData(EUCode, ServicesVATCode, "Services VAT Rate", 1, 'S')
-                        else begin
-                            InsertData(EUCode, ServicesVATCodeSRV, "Services VAT Rate", 1, 'S');
-                            InsertData(EUCode, GoodsVATCodeSRV, "Goods VAT Rate", 1, 'S');
-                            InsertData(DomesticCode, ServicesVATCodeSRV, "Services VAT Rate", 0, 'S');
-                        end;
-                        InsertData(EUCode, GoodsVATCode, "Goods VAT Rate", 1, 'S');
-                        InsertData(EUCode, NoVATCode, 0, 0, 'E');
-                        InsertData(ExportCode, ServicesVATCode, 0, 0, 'E');
-                        InsertData(ExportCode, GoodsVATCode, 0, 0, 'E');
-                        InsertData(ExportCode, NoVATCode, 0, 0, 'E');
-                        if "Reduced VAT Rate" > 0 then begin
-                            InsertData(DomesticCode, ReducedVATCode, "Reduced VAT Rate", 0, 'S');
-                            InsertData(EUCode, ReducedVATCode, "Reduced VAT Rate", 1, 'S');
-                            InsertData(ExportCode, ReducedVATCode, 0, 0, 'E');
-                        end;
-                        InsertData(DomesticCode, FullServicesVATCode, 100, 2, 'S');
-                        InsertData(DomesticCode, FullGoodsVATCode, 100, 2, 'S');
+        DemoDataSetup.Get();
+        case DemoDataSetup."Company Type" of
+            DemoDataSetup."Company Type"::VAT:
+                begin
+                    InsertData('', DemoDataSetup.ServicesVATCode(), 0, 0, 'E');
+                    InsertData('', DemoDataSetup.GoodsVATCode(), 0, 0, 'E');
+                    if DemoDataSetup."Reduced VAT Rate" > 0 then
+                        InsertData('', DemoDataSetup.ReducedVATCode(), 0, 0, 'E');
+                    InsertData('', DemoDataSetup.NoVATCode(), 0, 0, 'E');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesVATCode(), DemoDataSetup."Services VAT Rate", 0, 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.GoodsVATCode(), DemoDataSetup."Goods VAT Rate", 0, 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.NoVATCode(), 0, 0, 'E');
+                    if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
+                        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.ServicesVATCode(), DemoDataSetup."Services VAT Rate", 1, 'S')
+                    else begin
+                        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.ServicesVATCodeSRV(), DemoDataSetup."Services VAT Rate", 1, 'S');
+                        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.GoodsVATCodeSRV(), DemoDataSetup."Goods VAT Rate", 1, 'S');
+                        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.ServicesVATCodeSRV(), DemoDataSetup."Services VAT Rate", 0, 'S');
                     end;
-                "Company Type"::"Sales Tax":
-                    InsertSalesTaxData('E');
-            end;
+                    InsertData(DemoDataSetup.EUCode(), DemoDataSetup.GoodsVATCode(), DemoDataSetup."Goods VAT Rate", 1, 'S');
+                    InsertData(DemoDataSetup.EUCode(), DemoDataSetup.NoVATCode(), 0, 0, 'E');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.ServicesVATCode(), 0, 0, 'E');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.GoodsVATCode(), 0, 0, 'E');
+                    InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.NoVATCode(), 0, 0, 'E');
+                    if DemoDataSetup."Reduced VAT Rate" > 0 then begin
+                        InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.ReducedVATCode(), DemoDataSetup."Reduced VAT Rate", 0, 'S');
+                        InsertData(DemoDataSetup.EUCode(), DemoDataSetup.ReducedVATCode(), DemoDataSetup."Reduced VAT Rate", 1, 'S');
+                        InsertData(DemoDataSetup.ExportCode(), DemoDataSetup.ReducedVATCode(), 0, 0, 'E');
+                    end;
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.FullServicesVATCode(), 100, 2, 'S');
+                    InsertData(DemoDataSetup.DomesticCode(), DemoDataSetup.FullGoodsVATCode(), 100, 2, 'S');
+                end;
+            DemoDataSetup."Company Type"::"Sales Tax":
+                InsertSalesTaxData('E');
         end;
     end;
 
@@ -81,12 +79,12 @@ codeunit 101325 "Create VAT Posting Setup"
 
         if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then
             case VATPostingSetup."VAT Prod. Posting Group" of
-                DemoDataSetup.GoodsVATCode:
+                DemoDataSetup.GoodsVATCode():
                     if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
                         SetAccounts(VATPostingSetup, '995610', '995630', '995620', '995615', '995635', '995625')
                     else
                         SetAccounts(VATPostingSetup, CreateGLAccount.SalesVATNormalPayable(), CreateGLAccount.PurchaseVATNormal(), CreateGLAccount.PurchaseVATNormal(), '995615', '995635', '995625');
-                DemoDataSetup.GoodsVATCodeSRV:
+                DemoDataSetup.GoodsVATCodeSRV():
                     begin
                         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
                             SetAccounts(VATPostingSetup, '995610', '995630', '995620', '995615', '995635', '995625')
@@ -94,23 +92,23 @@ codeunit 101325 "Create VAT Posting Setup"
                             SetAccounts(VATPostingSetup, CreateGLAccount.SalesVATNormalPayable(), CreateGLAccount.PurchaseVATNormal(), CreateGLAccount.PurchaseVATNormal(), '995615', '995635', '995625');
                         VATPostingSetup.Validate("EU Service", true);
                     end;
-                DemoDataSetup.ServicesVATCode,
-                DemoDataSetup.ServicesVATCodeSRV,
-                DemoDataSetup.ReducedVATCode:
+                DemoDataSetup.ServicesVATCode(),
+                DemoDataSetup.ServicesVATCodeSRV(),
+                DemoDataSetup.ReducedVATCode():
                     begin
                         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
                             SetAccounts(VATPostingSetup, '995611', '995631', '995621', '995616', '995636', '995626')
                         else
                             SetAccounts(VATPostingSetup, CreateGLAccount.SalesVATReducedPayable(), CreateGLAccount.PurchaseVATReduced(), CreateGLAccount.PurchaseVATReduced(), '995616', '995636', '995626');
-                        if VATPostingSetup."VAT Bus. Posting Group" = DemoDataSetup.EUCode then
+                        if VATPostingSetup."VAT Bus. Posting Group" = DemoDataSetup.EUCode() then
                             VATPostingSetup.Validate("EU Service", true);
                     end;
-                DemoDataSetup.NoVATCode:
+                DemoDataSetup.NoVATCode():
                     if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then
                         SetAccounts(VATPostingSetup, '995610', '995630', '995620', '995615', '995635', '995625')
                     else
                         SetAccounts(VATPostingSetup, CreateGLAccount.SalesVATNormalPayable(), CreateGLAccount.PurchaseVATReduced(), CreateGLAccount.PurchaseVATNormal(), '995615', '995635', '995625');
-                DemoDataSetup.FullServicesVATCode:
+                DemoDataSetup.FullServicesVATCode():
                     if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
                         VATPostingSetup.Validate("Sales VAT Account", CA.Convert('995612'));
                         VATPostingSetup.Validate("Purchase VAT Account", CA.Convert('995632'));
@@ -119,7 +117,7 @@ codeunit 101325 "Create VAT Posting Setup"
                         VATPostingSetup.Validate("Purchase VAT Account", CA.Convert(CreateGLAccount.PurchaseVATReduced()));
                     end
                     ;
-                DemoDataSetup.FullGoodsVATCode:
+                DemoDataSetup.FullGoodsVATCode():
                     if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
                         VATPostingSetup.Validate("Sales VAT Account", CA.Convert('995613'));
                         VATPostingSetup.Validate("Purchase VAT Account", CA.Convert('995633'));
@@ -137,12 +135,12 @@ codeunit 101325 "Create VAT Posting Setup"
     begin
         VATPostingSetup.Validate("Sales VAT Account", CA.Convert(SalesVATAccount));
         VATPostingSetup.Validate("Purchase VAT Account", CA.Convert(PurchaseVATAccount));
-        if VATPostingSetup."VAT Calculation Type" = 1 then
+        if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
             VATPostingSetup.Validate("Reverse Chrg. VAT Acc.", CA.Convert(ReverseChargeVATAcc));
         if VATPostingSetup."Unrealized VAT Type" > 0 then begin
             VATPostingSetup.Validate("Sales VAT Unreal. Account", CA.Convert(SalesVATUnrealAccount));
             VATPostingSetup.Validate("Purch. VAT Unreal. Account", CA.Convert(PurchaseVATUnrealAccount));
-            if VATPostingSetup."VAT Calculation Type" = 1 then
+            if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
                 VATPostingSetup.Validate("Reverse Chrg. VAT Unreal. Acc.", CA.Convert(ReverseChargeVATUnrealAcc));
         end;
     end;

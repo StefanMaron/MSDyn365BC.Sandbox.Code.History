@@ -46,7 +46,7 @@ codeunit 144524 "Test Create VAT Declare Rqst"
         // [THEN] A GovTalkMessage is created
         GovTalkMessage.SetRange(ReportConfigCode, VATReportHeader."VAT Report Config. Code");
         GovTalkMessage.SetRange(ReportNo, VATReportHeader."No.");
-        Assert.IsTrue(GovTalkMessage.FindFirst, '');
+        Assert.IsTrue(GovTalkMessage.FindFirst(), '');
         Assert.AreEqual(VATReportHeader."Start Date", GovTalkMessage.PeriodStart, '');
         Assert.AreEqual(VATReportHeader."End Date", GovTalkMessage.PeriodEnd, '');
         Assert.AreEqual(1000, GovTalkMessage."Polling Count", '');
@@ -86,8 +86,8 @@ codeunit 144524 "Test Create VAT Declare Rqst"
     local procedure Initialize()
     begin
         if not Initialized then begin
-            SetupGovTalkParameters;
-            SetupCompanyInformation;
+            SetupGovTalkParameters();
+            SetupCompanyInformation();
             Initialized := true;
         end;
     end;
@@ -136,7 +136,7 @@ codeunit 144524 "Test Create VAT Declare Rqst"
             InsertSingleLine(VATReportHeader."VAT Report Config. Code", VATReportHeader."No.", i, LibraryRandom.RandDec(100, 3));
     end;
 
-    local procedure InsertSingleLine(ReportType: Option; ReportNo: Code[20]; LineNo: Integer; Amount: Decimal)
+    local procedure InsertSingleLine(ReportType: Enum "VAT Report Configuration"; ReportNo: Code[20]; LineNo: Integer; Amount: Decimal)
     var
         VATStatementReportLine: Record "VAT Statement Report Line";
     begin

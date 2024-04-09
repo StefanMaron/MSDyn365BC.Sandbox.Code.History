@@ -29,10 +29,8 @@ codeunit 101931 "Create Local RapidStart Pack"
     var
         CreateConfigWorksheet: Codeunit "Create Config. Worksheet";
     begin
-        with CreateConfigWorksheet do begin
-            CreateConfigGroup(XLocalSettingsTxt);
-            CreateConfigLine(DATABASE::"Fin. Charge Interest Rate");
-        end;
+        CreateConfigWorksheet.CreateConfigGroup(XLocalSettingsTxt);
+        CreateConfigWorksheet.CreateConfigLine(DATABASE::"Fin. Charge Interest Rate");
     end;
 
     procedure SetFieldsAndFilters(TableID: Integer)

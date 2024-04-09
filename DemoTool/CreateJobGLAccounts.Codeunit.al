@@ -5,19 +5,17 @@ codeunit 101168 "Create Job G/L Accounts"
     var
         CreateGLAccount: Codeunit "Create G/L Account";
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(CreateGLAccount.JobCosts(), XJobCosts, 0, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CreateGLAccount.JobSales(), XJobSales, 0, 0, 2, 0, '', 0, '', '', '', '', true);
-            InsertData(CreateGLAccount.JobCostsApplied(), XJobCostApplied, 0, 0, 2, 0, '', 0, '', '', '', '', true);
-            InsertData(CreateGLAccount.JobSalesApplied(), XJobSalesApplied, 0, 0, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CreateGLAccount.WIPJobCosts(), XWIPJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CreateGLAccount.WIPJobSales(), XWIPJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CreateGLAccount.WIPInvoicedSales(), XInvoicedJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-            InsertData(CreateGLAccount.WIPAccruedCosts(), XAccruedJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-        end;
-        GLAccIndent.Indent;
-        AddCategoriesToGLAccounts;
+        DemoDataSetup.Get();
+        InsertData(CreateGLAccount.JobCosts(), XJobCosts, 0, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CreateGLAccount.JobSales(), XJobSales, 0, 0, 2, 0, '', 0, '', '', '', '', true);
+        InsertData(CreateGLAccount.JobCostsApplied(), XJobCostApplied, 0, 0, 2, 0, '', 0, '', '', '', '', true);
+        InsertData(CreateGLAccount.JobSalesApplied(), XJobSalesApplied, 0, 0, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CreateGLAccount.WIPJobCosts(), XWIPJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CreateGLAccount.WIPJobSales(), XWIPJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CreateGLAccount.WIPInvoicedSales(), XInvoicedJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+        InsertData(CreateGLAccount.WIPAccruedCosts(), XAccruedJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+        GLAccIndent.Indent();
+        AddCategoriesToGLAccounts();
     end;
 
     var
@@ -110,13 +108,13 @@ codeunit 101168 "Create Job G/L Accounts"
         GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
     begin
         case GLAccountCategory.Description of
-            GLAccountCategoryMgt.GetJobsCost:
+            GLAccountCategoryMgt.GetJobsCost():
                 UpdateGLAccounts(GLAccountCategory, CreateGLAccount.JobCosts(), '20301');
-            GLAccountCategoryMgt.GetIncomeJobs:
+            GLAccountCategoryMgt.GetIncomeJobs():
                 UpdateGLAccounts(GLAccountCategory, CreateGLAccount.JobSales(), '10251');
-            GLAccountCategoryMgt.GetOtherIncomeExpense:
+            GLAccountCategoryMgt.GetOtherIncomeExpense():
                 UpdateGLAccounts(GLAccountCategory, CreateGLAccount.JobCostsApplied(), '20400');
-            GLAccountCategoryMgt.GetJobSalesContra:
+            GLAccountCategoryMgt.GetJobSalesContra():
                 UpdateGLAccounts(GLAccountCategory, CreateGLAccount.JobSalesApplied(), '10451');
         end;
     end;

@@ -24,7 +24,7 @@ codeunit 144526 TestIRMark
     begin
         // [SCENARIO] Online submission XML that has the correct IRMark.
         // [GIVEN] FULL XML document that has the header and body which has IRMark element populated with correct value.
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [WHEN] XML is loaded and function CreateIRMark is called
         XMLDocument := XMLDocument.XmlDocument();
@@ -50,7 +50,7 @@ codeunit 144526 TestIRMark
     begin
         // [SCENARIO] Test hashing the password with MD5 for HMRC Authentication.
         // [GIVEN] Password as a text and pre-calculated hashed passwords with different condition.
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [THEN] Empty password should hashed as followed
         Assert.AreEqual('1B2M2Y8AsgTpgAmY7PhCfg==', HMRCSubmissionHelpers.HashPassword(''), '');

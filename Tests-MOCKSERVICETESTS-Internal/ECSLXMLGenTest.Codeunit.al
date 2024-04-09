@@ -32,7 +32,7 @@ codeunit 144527 "ECSL XML Gen. Test"
         VATRegNo := '100001';
         StartDate := DMY2Date(1, 1, 2017);
         EndDate := DMY2Date(31, 3, 2017);
-        InitPrerequisites;
+        InitPrerequisites();
         // [Given] VAT report header
         InitReportHeader(VATReportHeader, StartDate, EndDate);
         VATReportHeader."Period Type" := VATReportHeader."Period Type"::Quarter;
@@ -83,7 +83,7 @@ codeunit 144527 "ECSL XML Gen. Test"
         VATRegNo := '100001';
         StartDate := DMY2Date(1, 1, 2017);
         EndDate := DMY2Date(31, 1, 2017);
-        InitPrerequisites;
+        InitPrerequisites();
 
         // [Given] VAT report header
         InitReportHeader(VATReportHeader, StartDate, EndDate);
@@ -118,7 +118,7 @@ codeunit 144527 "ECSL XML Gen. Test"
         VATReportHeader.Init();
         VATReportHeader."Start Date" := StartDate;
         VATReportHeader."End Date" := EndDate;
-        VATReportHeader."No." := CopyStr(CreateGuid, 2, 20);
+        VATReportHeader."No." := CopyStr(CreateGuid(), 2, 20);
 
         VATReportHeader."Period Type" := VATReportHeader."Period Type"::Month;
         VATReportHeader."Period No." := Date2DMY(StartDate, 2);

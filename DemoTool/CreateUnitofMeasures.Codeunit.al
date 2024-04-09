@@ -29,7 +29,6 @@ codeunit 119005 "Create Unit of Measures"
         XPCS: Label 'PCS';
         XPieces: Label 'Pieces';
         XL: Label 'L';
-        XLiter: Label 'Liter';
         XCAN: Label 'CAN';
         XCanlc: Label 'Can';
         XBOX: Label 'BOX';

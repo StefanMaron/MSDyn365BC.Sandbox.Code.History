@@ -52,10 +52,10 @@ codeunit 144523 "GovTalk Setup Test"
         CompanyInformation.Modify();
 
         // [WHEN] GovTalk Setup page is edited
-        GovTalkSetup.OpenEdit;
+        GovTalkSetup.OpenEdit();
         GovTalkSetup.Username.Value('Username');
         GovTalkSetup.Password.Value('PWD');
-        GovTalkSetup.OK.Invoke;
+        GovTalkSetup.OK().Invoke();
 
         // [THEN] message is shown to also add VAT Reg. No. in Company Information.
         // If not, there is an error because of unused handler
@@ -76,10 +76,10 @@ codeunit 144523 "GovTalk Setup Test"
         CompanyInformation.Modify();
 
         // [WHEN] GovTalk Setup page is edited
-        GovTalkSetup.OpenEdit;
+        GovTalkSetup.OpenEdit();
         GovTalkSetup.Username.Value('Username');
         GovTalkSetup.Password.Value('PWD');
-        GovTalkSetup.Cancel.Invoke;
+        GovTalkSetup.Cancel().Invoke();
 
         // [THEN] page closes, no warnings or errors
         // If not, there is an error because of unused handler
@@ -99,22 +99,22 @@ codeunit 144523 "GovTalk Setup Test"
         Initialize();
 
         // [WHEN] GovTalk Setup page is edited
-        GovTalkSetup.OpenEdit;
+        GovTalkSetup.OpenEdit();
         GovTalkSetup.Username.Value('Username');
         GovTalkSetup.Password.Value('PWD');
-        GovTalkSetup.OK.Invoke;
+        GovTalkSetup.OK().Invoke();
 
         // [THEN] All values are stored successfully, 3rd party notice message is shown.
         GovTalkSetupRecord.FindFirst();
         Assert.AreEqual('Username', GovTalkSetupRecord.Username, 'Username is not set correctly');
-        Assert.AreEqual('PWD', GovTalkSetupRecord.GetPassword, 'Password is not set correctly');
+        Assert.AreEqual('PWD', GovTalkSetupRecord.GetPassword(), 'Password is not set correctly');
     end;
 
     [MessageHandler]
     [Scope('OnPrem')]
     procedure MessageHandler(Message: Text)
     begin
-        Assert.AreEqual(LibraryVariableStorage.DequeueText, Message, 'Invalid message text.');
+        Assert.AreEqual(LibraryVariableStorage.DequeueText(), Message, 'Invalid message text.');
     end;
 
     local procedure Initialize()

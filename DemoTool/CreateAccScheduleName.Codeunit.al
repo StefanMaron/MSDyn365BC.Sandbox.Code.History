@@ -42,7 +42,6 @@ codeunit 101084 "Create Acc. Schedule Name"
         XANALYSIS: Label 'ANALYSIS';
         XBALONLY: Label 'BAL ONLY';
         XCapitalStructure: Label 'Capital Structure';
-        XStandardSchedule: Label 'Standard Schedule';
         XCAMPAIGN: Label 'CAMPAIGN';
         XCampaignAnalysis: Label 'Campaign Analysis';
         XBUDGANALYS: Label 'BUDGANALYS';

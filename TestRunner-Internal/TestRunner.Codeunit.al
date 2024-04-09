@@ -65,7 +65,7 @@ codeunit 130020 "Test Runner"
             Commit();
             Filter := GetView();
             WindowNoOfTestCodeunitTotal := CountTestCodeunitsToRun(TestLine);
-            if not (ChangelistCode.IsEmpty() or UpdateTCM) then
+            if not (ChangelistCode.IsEmpty() or UpdateTCM()) then
                 CodeCoverageMgt.Start(true);
 
             TestProxy.Initialize();
@@ -73,7 +73,7 @@ codeunit 130020 "Test Runner"
             if Find('-') then
                 repeat
                     if "Line Type" = "Line Type"::Codeunit then begin
-                        if UpdateTCM then
+                        if UpdateTCM() then
                             CodeCoverageMgt.Start(true);
 
                         MinLineNo := "Line No.";
@@ -83,9 +83,9 @@ codeunit 130020 "Test Runner"
                         WindowNoOfFunction := 0;
 
                         if TestMgt.ISPUBLISHMODE() then
-                            DeleteChildren;
+                            DeleteChildren();
 
-                        AzureKeyVaultTestLibrary.ClearSecrets; // Cleanup key vault cache
+                        AzureKeyVaultTestLibrary.ClearSecrets(); // Cleanup key vault cache
                         if not Codeunit.Run("Test Codeunit") and
                            TestMgt.ISTESTMODE() and
                            TestSuite."Re-run Failing Codeunits"
@@ -95,14 +95,14 @@ codeunit 130020 "Test Runner"
                             BackupMgt.SetEnabled(false);
                         end;
 
-                        if UpdateTCM then begin
+                        if UpdateTCM() then begin
                             CodeCoverageMgt.Stop();
                             TestMgt.ExtendTestCoverage("Test Codeunit");
                         end;
                     end;
-                until Next = 0;
+                until Next() = 0;
 
-            if not (ChangelistCode.IsEmpty() or UpdateTCM) then begin
+            if not (ChangelistCode.IsEmpty() or UpdateTCM()) then begin
                 CodeCoverageMgt.Stop();
                 Codeunit.Run(Codeunit::"Calculate Changelist Coverage");
             end;
@@ -116,7 +116,7 @@ codeunit 130020 "Test Runner"
     begin
         TestLine.Copy(TestLineNew);
 
-        RunTests;
+        RunTests();
 
         TestLineNew.Copy(TestLine);
     end;
@@ -241,7 +241,7 @@ codeunit 130020 "Test Runner"
             "Start Time" := CurrentDateTime;
             "Finish Time" := CurrentDateTime;
             if TestSuite."Show Test Details" then
-                NoOfSteps := AddTestSteps;
+                NoOfSteps := AddTestSteps();
             if NoOfSteps >= 0 then
                 Insert(true);
         end;
@@ -308,7 +308,7 @@ codeunit 130020 "Test Runner"
                 repeat
                     if "Line No." in [MinLineNo .. MaxLineNo] then
                         exit(true);
-                until Next = 0;
+                until Next() = 0;
             exit(false);
         end;
     end;
@@ -324,7 +324,7 @@ codeunit 130020 "Test Runner"
                 repeat
                     if ("Line Type" = "Line Type"::Codeunit) and Run then
                         NoOfTestCodeunits += 1;
-                until Next = 0;
+                until Next() = 0;
     end;
 
     [Scope('OnPrem')]
@@ -370,7 +370,7 @@ codeunit 130020 "Test Runner"
         WindowNoOfTestCodeunit := NewWindowNoOfTestCodeunit;
         WindowNoOfFunction := NewWindowNoOfFunction;
 
-        if IsTimeForUpdate then begin
+        if IsTimeForUpdate() then begin
             if not WindowIsOpen then
                 OpenWindow();
             Window.Update(1, WindowTestSuite);

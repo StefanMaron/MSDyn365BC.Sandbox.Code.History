@@ -3,9 +3,9 @@ codeunit 101326 "Create VAT Assisted Setup"
 
     trigger OnRun()
     begin
-        AddVatBusPostingGrp;
-        AddVatProdPostingGrp;
-        UpdateAccountsVatRates;
+        AddVatBusPostingGrp();
+        AddVatProdPostingGrp();
+        UpdateAccountsVatRates();
     end;
 
     local procedure AddVatProdPostingGrp()

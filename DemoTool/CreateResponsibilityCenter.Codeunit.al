@@ -4,18 +4,8 @@ codeunit 118020 "Create Responsibility Center"
     trigger OnRun()
     begin
         Resp.DeleteAll();
-        InsertData(
-          XBIRMINGHAM, XCRONUSBirminghamRC,
-          X14MainStreet, '',
-          CreatePostCode.Convert('GB-B27 4KT'), '',
-          '+44-161 818192', '+44-161 818100',
-          XAaronNicholls, XBLUE);
-        InsertData(
-          XLONDON, XCRONUSLondonRC,
-          X22KensingtonStreet, '',
-          CreatePostCode.Convert('GB-N12 5XY'), '',
-          '+44-999 154642', '+44-999 154625',
-          XJackSRichins, '');
+        InsertData(XBIRMINGHAM, XCRONUSBirminghamRC, X14MainStreet, CreatePostCode.Convert('GB-B27 4KT'), '+44-161 818192', '+44-161 818100', XAaronNicholls, XBLUE);
+        InsertData(XLONDON, XCRONUSLondonRC, X22KensingtonStreet, CreatePostCode.Convert('GB-N12 5XY'), '+44-999 154642', '+44-999 154625', XJackSRichins, '');
         ModifyCust('10000', XBIRMINGHAM);
         ModifyCust('50000', XLONDON);
         ModifyVendor('10000', XLONDON);
@@ -28,17 +18,15 @@ codeunit 118020 "Create Responsibility Center"
         CreatePostCode: Codeunit "Create Post Code";
         XBIRMINGHAM: Label 'BIRMINGHAM';
         XCRONUSBirminghamRC: Label 'CRONUS, Birmingham RC.';
-        XMainStreet14: Label 'Main Street, 14';
         XAaronNicholls: Label 'Aaron Nicholls';
         XBLUE: Label 'BLUE';
         XLONDON: Label 'LONDON';
         XCRONUSLondonRC: Label 'CRONUS, London RC.';
-        XKensingtonStreet22: Label 'Kensington Street, 22';
         XJackSRichins: Label 'Jack S. Richins';
         X14MainStreet: Label '14 Main Street';
         X22KensingtonStreet: Label '22 Kensington Street';
 
-    local procedure InsertData("Code": Code[10]; Name: Text[50]; Address: Text[30]; "Address 2": Text[30]; "Post Code": Code[20]; "Country Code": Code[10]; "Phone No.": Text[30]; "Fax No.": Text[30]; Contact: Text[50]; "Location Code": Code[10])
+    local procedure InsertData("Code": Code[10]; Name: Text[50]; Address: Text[30]; "Post Code": Code[20]; "Phone No.": Text[30]; "Fax No.": Text[30]; Contact: Text[50]; "Location Code": Code[10])
     var
         CompanyInformation: Record "Company Information";
     begin
