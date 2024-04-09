@@ -1,0 +1,18 @@
+{
+    "id":  "3f63a3de-6597-4097-9f34-b0ff7f92e6b0",
+    "name":  "DemoTool",
+    "publisher":  "Microsoft",
+    "version":  "23.5.16502.16887",
+    "platform":  "23.0.0.0",
+    "target":  "OnPrem",
+    "dependencies":  [
+
+                     ],
+    "resourceExposurePolicy":  {
+                                   "allowDebugging":  true,
+                                   "allowDownloadingSource":  true,
+                                   "includeSourceInSymbolFile":  true
+                               },
+    "application":  "23.5.0.0",
+    "brief":  "DemoTool (US)"
+}
