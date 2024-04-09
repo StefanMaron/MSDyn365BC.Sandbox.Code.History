@@ -29,6 +29,14 @@ $Versions | Sort-Object -Property Country, Version | % {
     
     git fetch --all
 
+    $RegularBranchExists = git ls-remote --heads origin "refs/heads/$($country)-$($version.Major)"
+
+    if ($RegularBranchExists) { 
+        git push -d origin "$($country)-$($Version.Major)-vNext"
+        git branch -d "$($country)-$($Version.Major)-vNext"
+        return
+    }
+
     $LastCommit = git log --all --grep="$($country)-$($version.ToString())-vNext"
 
     if ($LastCommit.Length -eq 0) {
