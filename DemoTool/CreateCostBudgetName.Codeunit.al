@@ -5,14 +5,12 @@ codeunit 119091 "Create Cost Budget Name"
     var
         CostBudgetName: Record "Cost Budget Name";
     begin
-        with CostBudgetName do begin
-            Init();
-            Name := XDEFAULT;
-            Description := XSTANDARD;
+        CostBudgetName.Init();
+        CostBudgetName.Name := XDEFAULT;
+        CostBudgetName.Description := XSTANDARD;
 
-            if not Insert then
-                Modify();
-        end;
+        if not CostBudgetName.Insert() then
+            CostBudgetName.Modify();
     end;
 
     var

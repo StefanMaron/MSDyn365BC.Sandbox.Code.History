@@ -34,13 +34,17 @@ codeunit 135208 "ML Prediction Management Test"
     procedure TestNotInitialized()
     var
         MLPredictionManagement: Codeunit "ML Prediction Management";
+        ApiUri: Text[250];
+        ApiKey: Text[200];
     begin
         // [SCENARIO] ML Prediction Management throws an error when Uri is not initialized.
 
         // [WHEN] The Prediction Library is not properly initialized
         // [THEN] An error is thrown
-        LibraryLowerPermissions.SetO365Basic;
-        MLPredictionManagement.Initialize('', '123', 12);
+        LibraryLowerPermissions.SetO365Basic();
+        ApiUri := '';
+        ApiKey := '123';
+        MLPredictionManagement.Initialize(ApiUri, ApiKey, 12);
         asserterror MLPredictionManagement.Predict('');
         Assert.ExpectedError(NotInitializedErr);
     end;
@@ -55,7 +59,7 @@ codeunit 135208 "ML Prediction Management Test"
         // [SCENARIO] Using ML Prediction Management with a non record variant leads to an error.
 
         // [GIVEN] The Prediction Library is initialized
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         InitLibraryAndData(TempPredictionData, MLPredictionManagement, MockServiceTrainingUriTxt,
           AzureMLTask::Prediction, false);
 
@@ -79,7 +83,7 @@ codeunit 135208 "ML Prediction Management Test"
         // [SCENARIO] When features and labels are set, correctness of indices are checked.
 
         // [GIVEN] The Prediction Library has a record set
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         MLPredictionManagement.SetRecord(TempPredictionData);
 
         // [WHEN] Features/labels are set
@@ -109,14 +113,14 @@ codeunit 135208 "ML Prediction Management Test"
 
         // [THEN] Only MaxNoFeatures features can be added
         DataTypeManagement.GetRecordRef(TempPredictionData, RecRef);
-        for I := 3 to MLPredictionManagement.MaxNoFeatures + 1 do begin
+        for I := 3 to MLPredictionManagement.MaxNoFeatures() + 1 do begin
             FieldRef := RecRef.FieldIndex(I);
             MLPredictionManagement.AddFeature(FieldRef.Number);
         end;
 
         FieldRef := RecRef.FieldIndex(RecRef.FieldCount);
         asserterror MLPredictionManagement.AddFeature(FieldRef.Number);
-        Assert.ExpectedError(StrSubstNo(TooManyFeaturesErr, MLPredictionManagement.MaxNoFeatures));
+        Assert.ExpectedError(StrSubstNo(TooManyFeaturesErr, MLPredictionManagement.MaxNoFeatures()));
     end;
 
     [Test]
@@ -128,11 +132,13 @@ codeunit 135208 "ML Prediction Management Test"
         MLPredictionManagement: Codeunit "ML Prediction Management";
         Model: Text;
         Quality: Decimal;
+        ApiUri: Text[250];
+        ApiKey: Text[200];
     begin
         // [SCENARIO] When initialization is not performed, errors are thrown.
 
         // [GIVEN] A prediction library
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [WHEN] The library has not been initialized
         // [THEN] An error is thrown
@@ -140,7 +146,9 @@ codeunit 135208 "ML Prediction Management Test"
         Assert.ExpectedError(NotInitializedErr);
 
         // [WHEN] No record has been set
-        MLPredictionManagement.Initialize('https://services.azureml.net', '12', 12);
+        ApiUri := 'https://services.azureml.net';
+        ApiKey := '12';
+        MLPredictionManagement.Initialize(ApiUri, ApiKey, 12);
         // [THEN] An error is thrown
         asserterror MLPredictionManagement.Train(Model, Quality);
         Assert.ExpectedError(NotInitializedErr);
@@ -170,7 +178,7 @@ codeunit 135208 "ML Prediction Management Test"
         // [SCENARIO] When training is performed, training data is written correctly.
 
         // [GIVEN] A data has been prepared for training and the Prediction Library initialized
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         InitLibraryAndData(TempPredictionData, MLPredictionManagement, MockServiceTrainingUriTxt,
           AzureMLTask::Training, false);
 
@@ -195,7 +203,7 @@ codeunit 135208 "ML Prediction Management Test"
         // [SCENARIO] Training returns a model and quality.
 
         // [GIVEN] Data has been prepared for training and the Prediction Library initialized
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         InitLibraryAndData(TempPredictionData, MLPredictionManagement, MockServiceTrainingUriTxt,
           AzureMLTask::Training, false);
 
@@ -203,7 +211,7 @@ codeunit 135208 "ML Prediction Management Test"
         MLPredictionManagement.SetTrainingPercent(0.9);
 
         // [THEN] The correct value is used/retrived
-        Assert.IsTrue(MLPredictionManagement.GetTrainingPercent = 0.9, 'Training percent is not correctly set.');
+        Assert.IsTrue(MLPredictionManagement.GetTrainingPercent() = 0.9, 'Training percent is not correctly set.');
 
         // [WHEN] Training is performed
         MLPredictionManagement.Train(Model, Quality);
@@ -227,7 +235,7 @@ codeunit 135208 "ML Prediction Management Test"
         // [SCENARIO] A trained model can be used for prediction and the prediction is in correct format.
 
         // [GIVEN] Data has been prepared for training and the Prediction Library initialized
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         InitLibraryAndData(TempPredictionData, MLPredictionManagement, MockServiceTrainingUriTxt,
           AzureMLTask::Training, false);
 
@@ -261,7 +269,7 @@ codeunit 135208 "ML Prediction Management Test"
     begin
         // [SCENARIO] A trained model can be used for evaluation.
         // [GIVEN] Data has been prepared for training and the Prediction Library initialized
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         InitLibraryAndData(TempPredictionData, MLPredictionManagement, MockServiceTrainingUriTxt,
           AzureMLTask::Training, false);
 
@@ -292,14 +300,18 @@ codeunit 135208 "ML Prediction Management Test"
         MockHttpResponseMessageHandler: DotNet MockHttpMessageHandler;
         Model: Text;
         Counter: Integer;
+        ApiUri: Text[250];
+        ApiKey: Text[200];
     begin
         // [SCENARIO] A trained model can be ploted.
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         // [GIVEN] A Trained model and an initialized library
-        Model := GetTrainedModel;
+        Model := GetTrainedModel();
         MLPredictionManagement.SetMessageHandler(
           MockHttpResponseMessageHandler.MockHttpMessageHandler(GetResponseFileName(AzureMLTask)));
-        MLPredictionManagement.Initialize(MockServicePlotUriTxt, '', 0);
+        ApiUri := MockServicePlotUriTxt;
+        ApiKey := '';
+        MLPredictionManagement.Initialize(ApiUri, ApiKey, 0);
 
         // [WHEN] PlotModel method is called
         MLPredictionManagement.PlotModel(Model, 'A,B,C,D', 'A,B');
@@ -318,12 +330,16 @@ codeunit 135208 "ML Prediction Management Test"
     procedure TestSetTraininingPercent()
     var
         MLPredictionManagement: Codeunit "ML Prediction Management";
+        ApiUri: Text[250];
+        ApiKey: Text[200];
     begin
         // [SCENARIO] An error is thrown when an incorrect training percentage is set.
 
         // [GIVEN] Data has been prepared for training and the Prediction Library initialized
-        LibraryLowerPermissions.SetO365Basic;
-        MLPredictionManagement.Initialize('', '', 0);
+        LibraryLowerPermissions.SetO365Basic();
+        ApiUri := '';
+        ApiKey := '';
+        MLPredictionManagement.Initialize(ApiUri, ApiKey, 0);
 
         // [WHEN] A too low training percentage is set
         asserterror MLPredictionManagement.SetTrainingPercent(0);
@@ -350,7 +366,7 @@ codeunit 135208 "ML Prediction Management Test"
     begin
         // [SCENARIO] An error from the Azure ML Experiment is parsed correctly.
         // [GIVEN] Data has been prepared for training and the Prediction Library initialized
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         InitLibraryAndData(TempPredictionData, MLPredictionManagement, MockServiceTrainingUriTxt,
           AzureMLTask::Error, false);
 
@@ -393,9 +409,9 @@ codeunit 135208 "ML Prediction Management Test"
     begin
         // [SCENARIO] Call to Send to AzureML increments usage
         // [GIVEN] Data has been prepared for training and the Prediction Library initialized
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
-        EnsureThatMockDataIsFetchedFromKeyVault;
+        EnsureThatMockDataIsFetchedFromKeyVault();
 
         InitLibraryAndData(TempPredictionData, MLPredictionManagement, MockServiceTrainingUriTxt,
           AzureMLTask::Training, true);
@@ -427,9 +443,9 @@ codeunit 135208 "ML Prediction Management Test"
         EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
     begin
         // [SCENARIO] Initializing with Key vault credentials errors out if the usage limit has been reached.
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
-        EnsureThatMockDataIsFetchedFromKeyVault;
+        EnsureThatMockDataIsFetchedFromKeyVault();
 
         // [GIVEN] A usage record exists for Azure ML, with say 1000 seconds of usage which is the same as its original quota
         AzureAIUsage.DeleteAll();
@@ -453,12 +469,16 @@ codeunit 135208 "ML Prediction Management Test"
         TempFeatureLabelData: Record "Feature Label Data" temporary;
         MLPredictionManagement: Codeunit "ML Prediction Management";
         Result: Boolean;
+        ApiUri: Text[250];
+        ApiKey: Text[200];
     begin
         // [SCENARIO] A feature label dataset meets the criteria of sufficient data
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         // [GIVEN] Initialized
-        MLPredictionManagement.Initialize('ApiUri', '', 0);
+        ApiUri := 'ApiUri';
+        ApiKey := '';
+        MLPredictionManagement.Initialize(ApiUri, ApiKey, 0);
 
         // [GIVEN] Data has been prepared for training and the Prediction Library initialized
         MLPredictionManagement.SetRecord(TempFeatureLabelData);
@@ -472,7 +492,7 @@ codeunit 135208 "ML Prediction Management Test"
         CreatePredictionDataWithOnlyLabel(TempFeatureLabelData, 'Q', 4);
 
         // [WHEN] IsDataSufficientForClassification is Invoked
-        Result := MLPredictionManagement.IsDataSufficientForClassification;
+        Result := MLPredictionManagement.IsDataSufficientForClassification();
 
         // [THEN] Does not meet criteria
         Assert.IsFalse(Result, 'Total = 30 & Min Records Required (P, Q) = 2.856943, 40.22662 respectively');
@@ -484,7 +504,7 @@ codeunit 135208 "ML Prediction Management Test"
         CreatePredictionDataWithOnlyLabel(TempFeatureLabelData, 'R', 2);
 
         // [WHEN] IsDataSufficientForClassification is Invoked
-        Result := MLPredictionManagement.IsDataSufficientForClassification;
+        Result := MLPredictionManagement.IsDataSufficientForClassification();
 
         // [THEN] Does not meet criteria
         Assert.IsFalse(Result, 'Total= 30 & Min Records Required (P, Q, R) = 3.212743, 54.63586, 83.43562 respectively');
@@ -496,7 +516,7 @@ codeunit 135208 "ML Prediction Management Test"
         CreatePredictionDataWithOnlyLabel(TempFeatureLabelData, 'R', 9);
 
         // [WHEN] IsDataSufficientForClassification is Invoked
-        Result := MLPredictionManagement.IsDataSufficientForClassification;
+        Result := MLPredictionManagement.IsDataSufficientForClassification();
 
         // [THEN] Meets criteria
         Assert.IsTrue(Result, 'Total = 33 & Min Records Required (P, Q, R) = 9.496985162, 18.07629231, 18.07629231 respectively');
@@ -507,7 +527,7 @@ codeunit 135208 "ML Prediction Management Test"
         CreatePredictionDataWithOnlyLabel(TempFeatureLabelData, 'Q', 18);
 
         // [WHEN] IsDataSufficientForClassification is Invoked
-        Result := MLPredictionManagement.IsDataSufficientForClassification;
+        Result := MLPredictionManagement.IsDataSufficientForClassification();
 
         // [THEN] Meets criteria
         Assert.IsTrue(Result, 'Total = 65 & Min Records Required (P, Q) = 4.483172266, 17.75372756 respectively');
@@ -517,7 +537,7 @@ codeunit 135208 "ML Prediction Management Test"
         CreatePredictionDataWithOnlyLabel(TempFeatureLabelData, 'P', 30);
 
         // [WHEN] IsDataSufficientForClassification is Invoked
-        Result := MLPredictionManagement.IsDataSufficientForClassification;
+        Result := MLPredictionManagement.IsDataSufficientForClassification();
 
         // [THEN] Does not meet criteria
         Assert.IsFalse(Result, 'Total = 30 & labels are only of one kind');
@@ -526,7 +546,7 @@ codeunit 135208 "ML Prediction Management Test"
         TempFeatureLabelData.DeleteAll();
 
         // [WHEN] IsDataSufficientForClassification is Invoked
-        Result := MLPredictionManagement.IsDataSufficientForClassification;
+        Result := MLPredictionManagement.IsDataSufficientForClassification();
 
         // [THEN] Does not meet criteria
         Assert.IsFalse(Result, 'Total = 0');
@@ -537,13 +557,13 @@ codeunit 135208 "ML Prediction Management Test"
         CreatePredictionDataWithOnlyLabel(TempFeatureLabelData, 'Q', 13);
 
         // [WHEN] IsDataSufficientForClassification is Invoked
-        Result := MLPredictionManagement.IsDataSufficientForClassification;
+        Result := MLPredictionManagement.IsDataSufficientForClassification();
 
         // [THEN] Does not meet criteria
         Assert.IsFalse(Result, 'Total training data size is less than 20, which should be insufficient.');
 
         // [WHEN] IsDataSufficientForRegression is Invoked
-        Result := MLPredictionManagement.IsDataSufficientForRegression;
+        Result := MLPredictionManagement.IsDataSufficientForRegression();
 
         // [THEN] Does not meet criteria
         Assert.IsFalse(Result, 'Total training data size is less than 20, which should be insufficient.');
@@ -560,7 +580,7 @@ codeunit 135208 "ML Prediction Management Test"
     begin
         // [SCENARIO] A request is being sent to AML. Types are part of paramaters.
         // [GIVEN] Data has been prepared for training and the Prediction Library initialized
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
         InitLibraryAndData(TempPredictionData, MLPredictionManagement, MockServiceTrainingUriTxt,
           AzureMLTask::Training, false);
 
@@ -585,14 +605,18 @@ codeunit 135208 "ML Prediction Management Test"
         HttpMessageHandler: DotNet MockHttpMessageHandler;
         Model: Text;
         Quality: Decimal;
+        ApiUri: Text[250];
+        ApiKey: Text[200];
     begin
         // [SCENARIO] A request is being sent to AML. A FlowField is in the data
 
         // [GIVEN] Data has been prepared for training with a FlowField feature and label and the Prediction Library initialized
-        LibraryLowerPermissions.SetO365Basic;
+        LibraryLowerPermissions.SetO365Basic();
 
         MLPredictionManagement.SetMessageHandler(HttpMessageHandler.MockHttpMessageHandler(GetResponseFileName(AzureMLTask)));
-        MLPredictionManagement.Initialize(MockServiceTrainingUriTxt, '', 0);
+        ApiUri := MockServiceTrainingUriTxt;
+        ApiKey := '';
+        MLPredictionManagement.Initialize(ApiUri, ApiKey, 0);
         MLPredictionManagement.SetRecord(TempPredictionData);
         MLPredictionManagement.AddFeature(TempPredictionData.FieldNo("Feature E"));
         MLPredictionManagement.AddFeature(TempPredictionData.FieldNo("Feature C"));
@@ -611,7 +635,7 @@ codeunit 135208 "ML Prediction Management Test"
         Assert.AreNotEqual('0', MLPredictionManagement.GetInput(1, 1), 'Feature FlowField is calculated incorrectly.');
 
         // [THEN] FlowField label data is calculated correctly
-        Assert.AreNotEqual('0', MLPredictionManagement.GetInput(1, MLPredictionManagement.MaxNoFeatures + 1),
+        Assert.AreNotEqual('0', MLPredictionManagement.GetInput(1, MLPredictionManagement.MaxNoFeatures() + 1),
           'Label FlowField is calculated incorrectly.');
     end;
 
@@ -619,13 +643,15 @@ codeunit 135208 "ML Prediction Management Test"
     local procedure InitLibraryAndData(var TempPredictionData: Record "Prediction Data" temporary; var MLPredictionManagement: Codeunit "ML Prediction Management"; ApiUri: Text[250]; AzureMLTask: Option; UseStdCredentials: Boolean)
     var
         HttpMessageHandler: DotNet MockHttpMessageHandler;
+        ApiKey: Text[200];
     begin
+        ApiKey := '';
         MLPredictionManagement.SetMessageHandler(HttpMessageHandler.MockHttpMessageHandler(GetResponseFileName(AzureMLTask)));
 
         if UseStdCredentials then
             MLPredictionManagement.InitializeWithKeyVaultCredentials(0)
         else
-            MLPredictionManagement.Initialize(ApiUri, '', 0);
+            MLPredictionManagement.Initialize(ApiUri, ApiKey, 0);
         MLPredictionManagement.SetRecord(TempPredictionData);
         MLPredictionManagement.AddFeature(TempPredictionData.FieldNo("Feature A"));
         MLPredictionManagement.AddFeature(TempPredictionData.FieldNo("Feature C"));
@@ -680,29 +706,28 @@ codeunit 135208 "ML Prediction Management Test"
     begin
         case Task of
             AzureMLTask::Prediction:
-                exit(LibraryUtility.GetInetRoot + GetPredictionFileName);
+                exit(LibraryUtility.GetInetRoot() + GetPredictionFileName());
             AzureMLTask::Training:
-                exit(LibraryUtility.GetInetRoot + GetTrainingFileName);
+                exit(LibraryUtility.GetInetRoot() + GetTrainingFileName());
             AzureMLTask::Evaluation:
-                exit(LibraryUtility.GetInetRoot + GetEvaluationFileName);
+                exit(LibraryUtility.GetInetRoot() + GetEvaluationFileName());
             AzureMLTask::Error:
-                exit(LibraryUtility.GetInetRoot + GetErrorFileName);
+                exit(LibraryUtility.GetInetRoot() + GetErrorFileName());
             AzureMLTask::Plot:
-                exit(LibraryUtility.GetInetRoot + GetPlotFileName);
+                exit(LibraryUtility.GetInetRoot() + GetPlotFileName());
         end;
     end;
 
     local procedure EnsureThatMockDataIsFetchedFromKeyVault()
     var
-        AzureKeyVault: Codeunit "Azure Key Vault";
         AzureKeyVaultTestLibrary: Codeunit "Azure Key Vault Test Library";
         MockAzureKeyvaultSecretProvider: DotNet MockAzureKeyVaultSecretProvider;
         TimeSeriesParams: Text;
     begin
         TimeSeriesParams := '{"ApiKeys":["test"],"Limit":"10","ApiUris":["https://services.azureml.net/workspaces/fc0584f5f74a4aa19a55096fc8ebb2b7"]}'; // non-existing API URI
 
-        MockAzureKeyvaultSecretProvider := MockAzureKeyvaultSecretProvider.MockAzureKeyVaultSecretProvider;
-        MockAzureKeyvaultSecretProvider.AddSecretMapping(StrSubstNo('machinelearning-%1', TenantId), TimeSeriesParams);
+        MockAzureKeyvaultSecretProvider := MockAzureKeyvaultSecretProvider.MockAzureKeyVaultSecretProvider();
+        MockAzureKeyvaultSecretProvider.AddSecretMapping(StrSubstNo('machinelearning-%1', TenantId()), TimeSeriesParams);
         MockAzureKeyvaultSecretProvider.AddSecretMapping('AllowedApplicationSecrets', 'machinelearning');
         MockAzureKeyvaultSecretProvider.AddSecretMapping('machinelearning', TimeSeriesParams);
         AzureKeyVaultTestLibrary.SetAzureKeyVaultSecretProvider(MockAzureKeyvaultSecretProvider);
@@ -730,7 +755,7 @@ codeunit 135208 "ML Prediction Management Test"
         ModelFile: File;
         ModelStream: InStream;
     begin
-        ModelFile.Open(LibraryUtility.GetInetRoot + '\App\Test\Files\Prediction\model.txt');
+        ModelFile.Open(LibraryUtility.GetInetRoot() + '\App\Test\Files\Prediction\model.txt');
         ModelFile.CreateInStream(ModelStream);
         ModelStream.ReadText(Model);
     end;

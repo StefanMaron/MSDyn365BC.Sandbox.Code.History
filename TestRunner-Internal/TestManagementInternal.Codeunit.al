@@ -53,7 +53,7 @@ codeunit 130023 "Test Management Internal"
     begin
         if CodeunitIds.FindSet() then begin
             OpenWindow(StrSubstNo(ImportObjectsMsg, CodeunitIds.Count), CodeunitIds.Count);
-            ActiveSession.Get(ServiceInstanceId, SessionId);
+            ActiveSession.Get(ServiceInstanceId(), SessionId());
             repeat
                 fileName := ExpandEnvVariables(StrSubstNo(TestFilePath, CodeunitIds.Number));
                 StartProcess(
@@ -103,13 +103,13 @@ codeunit 130023 "Test Management Internal"
         [RunOnClient]
         ProcessStartInfo: DotNet "System.Diagnostics.ProcessStartInfo";
     begin
-        Process := Process.Process;
-        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo;
+        Process := Process.Process();
+        ProcessStartInfo := ProcessStartInfo.ProcessStartInfo();
         ProcessStartInfo.FileName(executable);
         ProcessStartInfo.Arguments(arguments);
         Process.StartInfo(ProcessStartInfo);
-        Process.Start;
-        Process.WaitForExit;
+        Process.Start();
+        Process.WaitForExit();
     end;
 }
 

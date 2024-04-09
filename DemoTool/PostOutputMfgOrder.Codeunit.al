@@ -3,7 +3,7 @@ codeunit 119074 "Post Output Mfg. Order"
 
     trigger OnRun()
     begin
-        InitOutputJnl;
+        InitOutputJnl();
         PostOutput('1011001', 19030908D);
         PostOutput('1011002', 19030909D);
     end;
@@ -73,7 +73,7 @@ codeunit 119074 "Post Output Mfg. Order"
                 ProdOrderRoutingLine.SetRange("Routing Reference No.", ProdOrderLine."Routing Reference No.");
                 if ProdOrderRoutingLine.Find('-') then
                     repeat
-                        CreateOutputJnlLine;
+                        CreateOutputJnlLine();
                         ItemJnlPostLine.Run(ItemJnlLine);
                     until ProdOrderRoutingLine.Next() = 0;
             until ProdOrderLine.Next() = 0;

@@ -3,30 +3,28 @@ codeunit 101168 "Create Job G/L Accounts"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Data Type" = "Data Type"::Extended then begin
-                InsertData('50300', XJobCosts, 0, 0, 1, 0, '', 0, '', '', '', '', true);
-                InsertData('40250', XJobSales, 0, 0, 2, 0, '', 0, '', '', '', '', true);
-                InsertData('50399', XJobCostApplied, 0, 0, 2, 0, '', 0, '', '', '', '', true);
-                InsertData('40450', XJobSalesApplied, 0, 0, 1, 0, '', 0, '', '', '', '', true);
-                InsertData('10950', XWIPJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-                InsertData('10910', XWIPJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-                InsertData('10920', XInvoicedJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-                InsertData('10940', XAccruedJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-            end else begin
-                InsertData('17810', XWIPJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-                InsertData('17820', XInvoicedJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-                InsertData('17830', XAccruedJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-                InsertData('17840', XWIPJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
-                InsertData('02980', XJobCosts, 0, 0, 1, 0, '', 0, '', '', '', '', true);
-                InsertData('01880', XJobSales, 0, 0, 2, 0, '', 0, '', '', '', '', true);
-                InsertData('02990', XJobCostApplied, 0, 0, 2, 0, '', 0, '', '', '', '', true);
-                InsertData('01890', XJobSalesApplied, 0, 0, 1, 0, '', 0, '', '', '', '', true);
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
+            InsertData('50300', XJobCosts, 0, 0, 1, 0, '', 0, '', '', '', '', true);
+            InsertData('40250', XJobSales, 0, 0, 2, 0, '', 0, '', '', '', '', true);
+            InsertData('50399', XJobCostApplied, 0, 0, 2, 0, '', 0, '', '', '', '', true);
+            InsertData('40450', XJobSalesApplied, 0, 0, 1, 0, '', 0, '', '', '', '', true);
+            InsertData('10950', XWIPJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+            InsertData('10910', XWIPJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+            InsertData('10920', XInvoicedJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+            InsertData('10940', XAccruedJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+        end else begin
+            InsertData('17810', XWIPJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+            InsertData('17820', XInvoicedJobSales, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+            InsertData('17830', XAccruedJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+            InsertData('17840', XWIPJobCosts, 0, 1, 1, 0, '', 0, '', '', '', '', true);
+            InsertData('02980', XJobCosts, 0, 0, 1, 0, '', 0, '', '', '', '', true);
+            InsertData('01880', XJobSales, 0, 0, 2, 0, '', 0, '', '', '', '', true);
+            InsertData('02990', XJobCostApplied, 0, 0, 2, 0, '', 0, '', '', '', '', true);
+            InsertData('01890', XJobSalesApplied, 0, 0, 1, 0, '', 0, '', '', '', '', true);
         end;
-        GLAccIndent.Indent;
-        AddCategoriesToGLAccounts;
+        GLAccIndent.Indent();
+        AddCategoriesToGLAccounts();
     end;
 
     var
@@ -113,13 +111,13 @@ codeunit 101168 "Create Job G/L Accounts"
         GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
     begin
         case GLAccountCategory.Description of
-            GLAccountCategoryMgt.GetJobsCost:
+            GLAccountCategoryMgt.GetJobsCost():
                 UpdateGLAccounts(GLAccountCategory, '50300', '50301');
-            GLAccountCategoryMgt.GetIncomeJobs:
+            GLAccountCategoryMgt.GetIncomeJobs():
                 UpdateGLAccounts(GLAccountCategory, '40250', '40251');
-            GLAccountCategoryMgt.GetOtherIncomeExpense:
+            GLAccountCategoryMgt.GetOtherIncomeExpense():
                 UpdateGLAccounts(GLAccountCategory, '50399', '50400');
-            GLAccountCategoryMgt.GetJobSalesContra:
+            GLAccountCategoryMgt.GetJobSalesContra():
                 UpdateGLAccounts(GLAccountCategory, '40450', '40451');
         end;
     end;

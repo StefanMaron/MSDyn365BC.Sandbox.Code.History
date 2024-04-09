@@ -206,8 +206,8 @@ page 101900 "Demonstration Data Tool"
             // "Starting Year" is hardcode due to training material
             "Starting Year" := Date2DMY(20090101D, 3) + 1;
             "Working Date" := DMY2Date(1, 1, "Starting Year");
-            SetTaxRates;
-            "Progress Window Design" := ProgressWindowDesign;
+            SetTaxRates();
+            "Progress Window Design" := ProgressWindowDesign();
             Insert(true);
         end;
         Validate("Data Language ID", GlobalLanguage);

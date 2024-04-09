@@ -3,7 +3,7 @@ codeunit 119073 "Post Consumption Mfg. Order"
 
     trigger OnRun()
     begin
-        InitConsumpJnl;
+        InitConsumpJnl();
         PostConsumption('1011001', 19030908D);
         PostConsumption('1011002', 19030909D);
         PostConsumption('1011003', 19030910D);

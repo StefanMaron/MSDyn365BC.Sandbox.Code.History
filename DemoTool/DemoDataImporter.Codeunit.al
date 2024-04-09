@@ -9,7 +9,7 @@ codeunit 101017 "Demo Data Importer"
         TblsArray: DotNet JArray;
         TblObj: DotNet JObject;
     begin
-        CreateGettingStartedData.ImportDemoDataFiles;
+        CreateGettingStartedData.ImportDemoDataFiles();
 
         if DemoDataSetup.Get() then
             LanguageCode := DemoDataSetup."Language Code"
@@ -19,7 +19,7 @@ codeunit 101017 "Demo Data Importer"
         if not DemoDataFile.FindSet() then
             exit;
 
-        CachedRefrencesTable := CachedRefrencesTable.Hashtable;
+        CachedRefrencesTable := CachedRefrencesTable.Hashtable();
 
         repeat
             ReadDemoDataFile(DemoDataFile);
@@ -27,8 +27,8 @@ codeunit 101017 "Demo Data Importer"
             JSONManagement.InitializeObject(JsonTxt);
             JSONManagement.GetJSONObject(JsonObject);
             TblsArray := JsonObject.Item('tables');
-            OptionsTable := OptionsTable.Hashtable;
-            RefrencesTable := RefrencesTable.Hashtable;
+            OptionsTable := OptionsTable.Hashtable();
+            RefrencesTable := RefrencesTable.Hashtable();
             foreach TblObj in TblsArray do
                 ImportTable(TblObj);
         until DemoDataFile.Next() = 0;
@@ -76,7 +76,7 @@ codeunit 101017 "Demo Data Importer"
                 ValToken := JProp.SelectToken('$..' + LanguageCode);
                 TempVar := ValToken.ToString();
             end else
-                TempVar := JProp.Value;
+                TempVar := JProp.Value();
 
             if RefrencesTable.Contains(Format(TableId) + '/' + Format(JProp.Name)) then
                 TempVar := GetRefrencedValue(Format(TableId) + '/' + Format(JProp.Name), Format(TempVar));
@@ -169,11 +169,11 @@ codeunit 101017 "Demo Data Importer"
         TempVar := OptionsJProperty.Name;
         JTok := OptionsJProperty.SelectToken('$..ENU');
         if not IsNull(JTok) then
-            AddOptionsToDic(OptionsTable, JTok.ToString, TableID, Format(TempVar));
+            AddOptionsToDic(OptionsTable, JTok.ToString(), TableID, Format(TempVar));
 
         LocJTok := OptionsJProperty.SelectToken('$..' + LanguageCode);
         if not IsNull(LocJTok) then
-            AddOptionsToDic(OptionsTable, LocJTok.ToString, TableID, Format(TempVar));
+            AddOptionsToDic(OptionsTable, LocJTok.ToString(), TableID, Format(TempVar));
     end;
 
     local procedure InitRefrencesTable(RefJObj: DotNet JObject; TableId: Integer)
@@ -238,8 +238,8 @@ codeunit 101017 "Demo Data Importer"
             exit(RefValue);
 
         RefAdd := RefrencesTable.Item(Key);
-        if CachedRefrencesTable.Contains(RefAdd.ToString + '/' + RefValue) then
-            exit(Format(CachedRefrencesTable.Item(RefAdd.ToString + '/' + RefValue)));
+        if CachedRefrencesTable.Contains(RefAdd.ToString() + '/' + RefValue) then
+            exit(Format(CachedRefrencesTable.Item(RefAdd.ToString() + '/' + RefValue)));
 
         CommaChar := '/';
         Arr := RefAdd.Split(CommaChar.ToCharArray());
@@ -247,7 +247,7 @@ codeunit 101017 "Demo Data Importer"
             Arr.GetValue(0), Arr.GetValue(1), RefValue, LanguageCode);
         TempVar := JsonObject.SelectToken(JsonPath);
         if not IsNull(TempVar) then
-            CachedRefrencesTable.Add(RefAdd.ToString + '/' + RefValue, Format(TempVar));
+            CachedRefrencesTable.Add(RefAdd.ToString() + '/' + RefValue, Format(TempVar));
 
         exit(Format(TempVar));
     end;

@@ -3,8 +3,8 @@ codeunit 101980 "Create Media Repository"
 
     trigger OnRun()
     begin
-        ImportMediaToRepository;
-        ImportInvoicingEmailMedia;
+        ImportMediaToRepository();
+        ImportInvoicingEmailMedia();
     end;
 
     local procedure ImportMediaToRepository()

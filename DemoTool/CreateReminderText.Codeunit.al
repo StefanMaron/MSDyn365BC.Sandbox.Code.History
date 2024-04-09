@@ -4,8 +4,8 @@ codeunit 101294 "Create Reminder Text"
     trigger OnRun()
     begin
         LineNo := 10000;
-        InsertDomestic;
-        InsertForeign;
+        InsertDomestic();
+        InsertForeign();
     end;
 
     var
@@ -22,26 +22,22 @@ codeunit 101294 "Create Reminder Text"
 
     procedure InsertDomestic()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(DomesticCode, 1, 1, XPlsremityourpaymofPCT7asap);
-            InsertData(DomesticCode, 2, 1, XIfthebalisnotrecdwithin10days);
-            InsertData(DomesticCode, 2, 1, Xyouraccwillbesenttoacollagcy);
-            InsertData(DomesticCode, 3, 1, XThisisremindernumberPCT8);
-            InsertData(DomesticCode, 3, 1, XYouracchasnowbeensenttoouratt);
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.DomesticCode(), 1, 1, XPlsremityourpaymofPCT7asap);
+        InsertData(DemoDataSetup.DomesticCode(), 2, 1, XIfthebalisnotrecdwithin10days);
+        InsertData(DemoDataSetup.DomesticCode(), 2, 1, Xyouraccwillbesenttoacollagcy);
+        InsertData(DemoDataSetup.DomesticCode(), 3, 1, XThisisremindernumberPCT8);
+        InsertData(DemoDataSetup.DomesticCode(), 3, 1, XYouracchasnowbeensenttoouratt);
     end;
 
     procedure InsertForeign()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(ForeignCode, 1, 1, XPlsremityourpaymofPCT7asap);
-            InsertData(ForeignCode, 2, 1, XIfthebalisnotrecdwithin10days);
-            InsertData(ForeignCode, 2, 1, Xyouraccwillbesenttoacollagcy);
-            InsertData(ForeignCode, 3, 1, XThisisremindernumberPCT8);
-            InsertData(ForeignCode, 3, 1, XYouracchasnowbeensenttoouratt);
-        end;
+        DemoDataSetup.Get();
+        InsertData(DemoDataSetup.ForeignCode(), 1, 1, XPlsremityourpaymofPCT7asap);
+        InsertData(DemoDataSetup.ForeignCode(), 2, 1, XIfthebalisnotrecdwithin10days);
+        InsertData(DemoDataSetup.ForeignCode(), 2, 1, Xyouraccwillbesenttoacollagcy);
+        InsertData(DemoDataSetup.ForeignCode(), 3, 1, XThisisremindernumberPCT8);
+        InsertData(DemoDataSetup.ForeignCode(), 3, 1, XYouracchasnowbeensenttoouratt);
     end;
 
     procedure InsertData("Code": Code[10]; Level: Integer; Position: Option Starting,Ending; Description: Text[100])
