@@ -3,22 +3,19 @@ codeunit 117059 "Create Resource Service Zone"
 
     trigger OnRun()
     begin
-        with ResourceServiceZone do begin
-            InsertData(XKatherine, XM, 0D, '');
-            InsertData(XKatherine, XN, 0D, '');
-            InsertData(XKatherine, XX, 0D, '');
-            InsertData(XLina, XM, 0D, '');
-            InsertData(XLina, XSE, 0D, '');
-            InsertData(XLina, XW, 19030102D, '');
-            InsertData(XMARTY, XSE, 0D, '');
-            InsertData(XMARTY, XW, 19030102D, '');
-            InsertData(XTerry, XM, 0D, '');
-            InsertData(XTerry, XN, 0D, '');
-        end;
+        InsertData(XKatherine, XM, 0D, '');
+        InsertData(XKatherine, XN, 0D, '');
+        InsertData(XKatherine, XX, 0D, '');
+        InsertData(XLina, XM, 0D, '');
+        InsertData(XLina, XSE, 0D, '');
+        InsertData(XLina, XW, 19030102D, '');
+        InsertData(XMARTY, XSE, 0D, '');
+        InsertData(XMARTY, XW, 19030102D, '');
+        InsertData(XTerry, XM, 0D, '');
+        InsertData(XTerry, XN, 0D, '');
     end;
 
     var
-        ResourceServiceZone: Record "Resource Service Zone";
         XKatherine: Label 'Katherine';
         XM: Label 'M';
         XLina: Label 'Lina';

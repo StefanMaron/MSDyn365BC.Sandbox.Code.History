@@ -22,12 +22,14 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"Delivery Reminder Line");
         ListOfTablesToMigrate.Add(Database::"Delivery Reminder Term");
         ListOfTablesToMigrate.Add(Database::"Delivery Reminder Text");
-        ListOfTablesToMigrate.Add(Database::"Electronic VAT Decl. Setup");
+#if not CLEAN24
         ListOfTablesToMigrate.Add(Database::"Expect. Phys. Inv. Track. Line");
+#endif
         ListOfTablesToMigrate.Add(Database::"Issued Deliv. Reminder Header");
         ListOfTablesToMigrate.Add(Database::"Issued Deliv. Reminder Line");
         ListOfTablesToMigrate.Add(Database::"Key Buffer");
         ListOfTablesToMigrate.Add(Database::"Number Series Buffer");
+#if not CLEAN24
         ListOfTablesToMigrate.Add(Database::"Phys. Inventory Comment Line");
         ListOfTablesToMigrate.Add(Database::"Phys. Inventory Order Header");
         ListOfTablesToMigrate.Add(Database::"Phys. Inventory Order Line");
@@ -35,15 +37,16 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"Phys. Invt. Recording Header");
         ListOfTablesToMigrate.Add(Database::"Phys. Invt. Recording Line");
         ListOfTablesToMigrate.Add(Database::"Phys. Invt. Tracking Buffer");
+#endif        
         ListOfTablesToMigrate.Add(Database::"Place of Dispatcher");
         ListOfTablesToMigrate.Add(Database::"Place of Receiver");
+#if not CLEAN24
         ListOfTablesToMigrate.Add(Database::"Post. Exp. Ph. In. Track. Line");
         ListOfTablesToMigrate.Add(Database::"Post. Phys. Invt. Order Header");
         ListOfTablesToMigrate.Add(Database::"Posted Phys. Invt. Order Line");
         ListOfTablesToMigrate.Add(Database::"Posted Phys. Invt. Rec. Header");
         ListOfTablesToMigrate.Add(Database::"Posted Phys. Invt. Rec. Line");
         ListOfTablesToMigrate.Add(Database::"Posted Phys. Invt. Track. Line");
-        ListOfTablesToMigrate.Add(Database::"Sales VAT Advance Notification");
-        ListOfTablesToMigrate.Add(Database::"Transmission Log Entry");
+#endif
     end;
 }

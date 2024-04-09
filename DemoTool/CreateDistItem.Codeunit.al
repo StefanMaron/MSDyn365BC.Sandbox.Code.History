@@ -3,28 +3,26 @@ codeunit 118838 "Create Dist. Item"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Company Type" = "Company Type"::VAT then
-                TaxCode := GoodsVATCode;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then
+            TaxCode := DemoDataSetup.GoodsVATCode();
 
-            InsertData('LS-75', XLoudspeakerCherry75W, 79.0, 36.0, 0, RetailCode, TaxCode, ResaleCode, 0, 0, false, 0);
-            InsertData('LS-120', XLoudspeakerBlack120W, 88.0, 45.0, 0, RetailCode, TaxCode, ResaleCode, 0, 0, false, 0);
-            InsertData('LS-150', XLoudspeakerCherry150W, 129.0, 72.0, 0, RetailCode, TaxCode, ResaleCode, 0, 0, false, 0);
-            InsertData('LS-10PC', XLoudspeakersWhiteforPC, 59.0, 25.0, 0, RetailCode, TaxCode, ResaleCode, 0, 0, false, 0);
-            InsertData('LS-Man-10', XManualforLoudspeakers, 0.0, 12.0, 0, RetailCode, TaxCode, ResaleCode, 0, 0, false, 0);
-            InsertData('LS-2', XCablesforLoudspeakers, 21.0, 15.0, 0, RetailCode, TaxCode, ResaleCode, 0, 0, false, 0);
-            InsertData('LS-S15', XStandforLoudspeakersLS150, 79.0, 45.0, 0, RetailCode, TaxCode, ResaleCode, 0, 0, false, 0);
-            InsertData('LS-100', XLoudspeaker100WOakwoodDeluxe, 21.0, 15.0, 0, RetailCode, TaxCode, ResaleCode, 1, 1, true, 0);
-            InsertData('LSU-15', XBasespeakerunit15100W, 21.0, 15.0, 0, RetailCode, TaxCode, ResaleCode, 0, 1, true, 0);
-            InsertData('LSU-8', XMiddletonespeakerunit8100W, 21.0, 15.0, 0, RetailCode, TaxCode, ResaleCode, 0, 1, true, 0);
-            InsertData('LSU-4', XTweeterspeakerunit4100W, 21.0, 15.0, 0, RetailCode, TaxCode, ResaleCode, 0, 1, true, 0);
-            InsertData('FF-100', XFrequencyfilterforLS100, 21.0, 15.0, 0, RetailCode, TaxCode, ResaleCode, 0, 1, true, 0);
-            InsertData('C-100', XCablingforLS100, 21.0, 15.0, 0, RetailCode, TaxCode, ResaleCode, 0, 1, true, 0);
-            InsertData('HS-100', XHousingLS100Oakwood120lts, 21.0, 15.0, 0, RetailCode, TaxCode, ResaleCode, 0, 1, true, 0);
-            InsertData('SPK-100', XSpikeforLS100, 21.0, 15.0, 0, RetailCode, TaxCode, ResaleCode, 0, 1, true, 0);
-            InsertData('LS-81', XLoudspeakerWalnut80W, 79.0, 36.0, 0, RetailCode, TaxCode, ResaleCode, 0, 0, false, 0);
-        end;
+        InsertData('LS-75', XLoudspeakerCherry75W, 79.0, 36.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 0, false, 0);
+        InsertData('LS-120', XLoudspeakerBlack120W, 88.0, 45.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 0, false, 0);
+        InsertData('LS-150', XLoudspeakerCherry150W, 129.0, 72.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 0, false, 0);
+        InsertData('LS-10PC', XLoudspeakersWhiteforPC, 59.0, 25.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 0, false, 0);
+        InsertData('LS-Man-10', XManualforLoudspeakers, 0.0, 12.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 0, false, 0);
+        InsertData('LS-2', XCablesforLoudspeakers, 21.0, 15.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 0, false, 0);
+        InsertData('LS-S15', XStandforLoudspeakersLS150, 79.0, 45.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 0, false, 0);
+        InsertData('LS-100', XLoudspeaker100WOakwoodDeluxe, 21.0, 15.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 1, 1, true, 0);
+        InsertData('LSU-15', XBasespeakerunit15100W, 21.0, 15.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 1, true, 0);
+        InsertData('LSU-8', XMiddletonespeakerunit8100W, 21.0, 15.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 1, true, 0);
+        InsertData('LSU-4', XTweeterspeakerunit4100W, 21.0, 15.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 1, true, 0);
+        InsertData('FF-100', XFrequencyfilterforLS100, 21.0, 15.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 1, true, 0);
+        InsertData('C-100', XCablingforLS100, 21.0, 15.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 1, true, 0);
+        InsertData('HS-100', XHousingLS100Oakwood120lts, 21.0, 15.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 1, true, 0);
+        InsertData('SPK-100', XSpikeforLS100, 21.0, 15.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 1, true, 0);
+        InsertData('LS-81', XLoudspeakerWalnut80W, 79.0, 36.0, 0, DemoDataSetup.RetailCode(), TaxCode, DemoDataSetup.ResaleCode(), 0, 0, false, 0);
     end;
 
     var
@@ -51,21 +49,19 @@ codeunit 118838 "Create Dist. Item"
     var
         Item: Record Item;
     begin
-        with Item do begin
-            Validate("No.", ItemNo);
-            Validate(Description, Desc);
-            Validate("Unit Price", UnitPrice);
-            Validate("Unit Cost", UnitCost);
-            Validate("Costing Method", CostingMethod);
-            Validate("Gen. Prod. Posting Group", GenProdPostingGroup);
-            Validate("VAT Prod. Posting Group", VATProdPostingGroup);
-            Validate("Inventory Posting Group", InventoryPostingGroup);
-            Validate("Replenishment System", ReplenishmentSystem);
-            Validate("Reordering Policy", ReorderingPolicy);
-            Validate("Include Inventory", IncludeInventory);
-            Validate("Manufacturing Policy", ManufacturingPolicy);
-            Insert();
-        end;
+        Item.Validate("No.", ItemNo);
+        Item.Validate(Description, Desc);
+        Item.Validate("Unit Price", UnitPrice);
+        Item.Validate("Unit Cost", UnitCost);
+        Item.Validate("Costing Method", CostingMethod);
+        Item.Validate("Gen. Prod. Posting Group", GenProdPostingGroup);
+        Item.Validate("VAT Prod. Posting Group", VATProdPostingGroup);
+        Item.Validate("Inventory Posting Group", InventoryPostingGroup);
+        Item.Validate("Replenishment System", ReplenishmentSystem);
+        Item.Validate("Reordering Policy", ReorderingPolicy);
+        Item.Validate("Include Inventory", IncludeInventory);
+        Item.Validate("Manufacturing Policy", ManufacturingPolicy);
+        Item.Insert();
     end;
 
     procedure ModifyData(ItemNo: Code[20]; BaseUOM: Code[10]; PurchUOM: Code[10]; SalesUOM: Code[10]; PutawayUOM: Code[10])

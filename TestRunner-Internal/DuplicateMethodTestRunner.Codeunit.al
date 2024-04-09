@@ -12,7 +12,7 @@ codeunit 130207 "Duplicate Method Test Runner"
         CompanyWorkDate := WorkDate();
         PreviousCodeunitID := -1;
 
-        TestRunNo := TestResult.LastTestRunNo + 1;
+        TestRunNo := TestResult.LastTestRunNo() + 1;
 
         // Populate Enabled Test Methods table
         CODEUNIT.Run(CODEUNIT::"Test Runner Generator");
@@ -27,7 +27,7 @@ codeunit 130207 "Duplicate Method Test Runner"
                     if PreviousCodeunitID <> EnabledTestMethod."Test Codeunit ID" then begin
                         // Restore backup in between codeunits only - prevent restoration in the same CU as it will be called multiple twice
                         BackupMgt.SetEnabled(true);
-                        BackupMgt.DefaultFixture;
+                        BackupMgt.DefaultFixture();
                         BackupMgt.SetEnabled(false);
 
                         PreviousCodeunitID := EnabledTestMethod."Test Codeunit ID";
@@ -89,7 +89,7 @@ codeunit 130207 "Duplicate Method Test Runner"
             exit;
         end;
 
-        TestResult.Update(Success, EndTime - StartTime, BackupMgt.GetExecutionFlag);
+        TestResult.Update(Success, EndTime - StartTime, BackupMgt.GetExecutionFlag());
 
         if FName = '' then
             exit;

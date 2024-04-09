@@ -10,7 +10,7 @@ codeunit 130202 "Lab Test Runner"
     begin
         SnapTestRunner.RunTests(false, true);
         BackupMgt.SetEnabled(true);
-        BackupMgt.DefaultFixture
+        BackupMgt.DefaultFixture();
     end;
 
     var

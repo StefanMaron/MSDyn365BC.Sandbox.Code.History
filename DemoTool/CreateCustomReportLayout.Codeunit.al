@@ -2,9 +2,9 @@ codeunit 101400 "Create Custom Report Layout"
 {
     trigger OnRun()
     begin
-        UpdateReportSelections;
-        UpdateReportLayoutSelections;
-        UpdateEmailBodySelections;
+        UpdateReportSelections();
+        UpdateReportLayoutSelections();
+        UpdateEmailBodySelections();
     end;
 
     var
@@ -76,8 +76,6 @@ codeunit 101400 "Create Custom Report Layout"
     end;
 
     local procedure UpdateReportLayoutSelections()
-    var
-        DummyReportLayoutSelection: Record "Report Layout Selection";
     begin
         // For rapidstart packages, see 101995 and processing rules to control the defaults.
         UpdateRepLayoutSelection(REPORT::"Standard Sales - Invoice", MS1306BlueSimple);

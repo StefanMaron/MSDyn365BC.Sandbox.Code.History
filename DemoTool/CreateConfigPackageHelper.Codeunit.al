@@ -32,17 +32,15 @@ codeunit 101935 "Create Config. Package Helper"
         DemotoolSystemConstants: Codeunit "Demotool System Constants";
     begin
         DemoDataSetup.Get();
-        with ConfigPackage do begin
-            if not IsEmpty() then
-                DeleteAll(true);
-            Init();
-            Code := DemoDataSetup.GetRSPackageCode;
-            "Package Name" := CopyStr(PRODUCTNAME.Marketing, 1, MaxStrLen("Package Name"));
-            "Language ID" := DemoDataSetup."Data Language ID";
-            "Product Version" := DemotoolSystemConstants.ProductVersion;
-            "Exclude Config. Tables" := ExcludeConfigTables;
-            Insert(true);
-        end;
+        if not ConfigPackage.IsEmpty() then
+            ConfigPackage.DeleteAll(true);
+        ConfigPackage.Init();
+        ConfigPackage.Code := DemoDataSetup.GetRSPackageCode();
+        ConfigPackage."Package Name" := CopyStr(PRODUCTNAME.Marketing(), 1, MaxStrLen(ConfigPackage."Package Name"));
+        ConfigPackage."Language ID" := DemoDataSetup."Data Language ID";
+        ConfigPackage."Product Version" := DemotoolSystemConstants.ProductVersion();
+        ConfigPackage."Exclude Config. Tables" := ExcludeConfigTables;
+        ConfigPackage.Insert(true);
     end;
 
     procedure CreateProcessingRule(RuleNo: Integer; "Action": Option)
@@ -104,7 +102,7 @@ codeunit 101935 "Create Config. Package Helper"
 
     procedure SetParentTableID(TableID: Integer; ParentTableID: Integer)
     begin
-        ConfigPackageTable.Get(GetPackageCode, TableID);
+        ConfigPackageTable.Get(GetPackageCode(), TableID);
         ConfigPackageTable."Parent Table ID" := ParentTableID;
         ConfigPackageTable.Modify();
     end;

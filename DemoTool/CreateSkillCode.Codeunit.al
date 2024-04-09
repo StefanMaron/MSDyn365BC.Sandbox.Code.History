@@ -3,18 +3,15 @@ codeunit 117056 "Create Skill Code"
 
     trigger OnRun()
     begin
-        with SkillCode do begin
-            InsertData(XA, XAccessories);
-            InsertData(XOE, XOfficeEquipment);
-            InsertData(XPC, XBasicPCknowledge);
-            InsertData(XPCS, XPCSoftware);
-            InsertData(XS, XServersandNetworks);
-            InsertData(XSO, XServerSoftware);
-        end;
+        InsertData(XA, XAccessories);
+        InsertData(XOE, XOfficeEquipment);
+        InsertData(XPC, XBasicPCknowledge);
+        InsertData(XPCS, XPCSoftware);
+        InsertData(XS, XServersandNetworks);
+        InsertData(XSO, XServerSoftware);
     end;
 
     var
-        SkillCode: Record "Skill Code";
         XA: Label 'A';
         XAccessories: Label 'Accessories';
         XOE: Label 'OE';

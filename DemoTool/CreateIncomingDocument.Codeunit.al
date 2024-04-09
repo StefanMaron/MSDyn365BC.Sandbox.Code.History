@@ -2,12 +2,12 @@ codeunit 101130 "Create Incoming Document"
 {
     trigger OnRun()
     begin
-        CreateIncomingDocSetup;
+        CreateIncomingDocSetup();
     end;
 
     procedure CreateEvaluationData()
     begin
-        CreateIncomingDocSetup;
+        CreateIncomingDocSetup();
     end;
 
     procedure CreateIncomingDocSetup()

@@ -21,14 +21,12 @@ codeunit 119090 "Create Cost Acct. Jnl Batch"
     var
         CostJournalBatch: Record "Cost Journal Batch";
     begin
-        with CostJournalBatch do begin
-            Init();
-            "Journal Template Name" := TemplateName;
-            Name := BatchName;
-            Description := BatchDescription;
-            if not Insert then
-                Modify();
-        end;
+        CostJournalBatch.Init();
+        CostJournalBatch."Journal Template Name" := TemplateName;
+        CostJournalBatch.Name := BatchName;
+        CostJournalBatch.Description := BatchDescription;
+        if not CostJournalBatch.Insert() then
+            CostJournalBatch.Modify();
     end;
 }
 

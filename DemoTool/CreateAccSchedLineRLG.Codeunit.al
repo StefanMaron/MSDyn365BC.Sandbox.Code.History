@@ -197,7 +197,6 @@ codeunit 161613 "Create Acc. Sched. Line RLG"
         XPL1: Label 'P&L';
         "Line No.": Integer;
         "Previous Schedule Name": Code[10];
-        CA: Codeunit "Make Adjustments";
 
     procedure InsertData("Schedule Name": Code[10]; "Row No.": Code[10]; Description: Text[80]; Totaling: Text[80]; "Totaling Type": Option; NewPage: Boolean; Bold: Boolean; Underline: Boolean; ShowOppositeSign: Boolean)
     var

@@ -151,7 +151,6 @@ codeunit 101023 "Create Vendor"
         X10NorthLakeAvenue: Label '10 North Lake Avenue';
         XMrs: Label 'Mrs.';
         XCarolPhilips: Label 'Carol Philips';
-        XLND: Label 'LND';
         XARDayPropertyManagement: Label 'AR Day Property Management';
         X100DayDrive: Label '100 Day Drive';
         XMr: Label 'Mr.';
@@ -164,7 +163,6 @@ codeunit 101023 "Create Vendor"
         XLewisHomeFurniture: Label 'Lewis Home Furniture';
         X51RadcroftRoad: Label '51 Radcroft Road';
         XJuliaCollins: Label 'Julia Collins';
-        XNE: Label 'NE';
         XGREEN: Label 'GREEN';
         XServiceElectronicsLtd: Label 'Service Electronics Ltd.';
         X172FieldGreen: Label '172 Field Green';
@@ -192,7 +190,6 @@ codeunit 101023 "Create Vendor"
         XBryceJasso: Label 'Bryce Jasso';
         XTobyRhode: Label 'Toby Rhode', Comment = 'CELA approved translation: John Moser';
         XRaymondHillard: Label 'Raymond Hillard', Comment = 'CELA approved translation: Lynn Torres';
-        XDE: Label 'DE';
         XN: Label 'N';
         XW: Label 'W';
         XMID: Label 'MID';

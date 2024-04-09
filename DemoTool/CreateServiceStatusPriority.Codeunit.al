@@ -3,12 +3,10 @@ codeunit 117029 "Create Service Status Priority"
 
     trigger OnRun()
     begin
-        with ServiceStatusPrioritySetup do begin
-            InsertData("Service Order Status"::Pending, Priority::"Medium High");
-            InsertData("Service Order Status"::"In Process", Priority::High);
-            InsertData("Service Order Status"::Finished, Priority::Low);
-            InsertData("Service Order Status"::"On Hold", Priority::"Medium Low");
-        end;
+        InsertData(ServiceStatusPrioritySetup."Service Order Status"::Pending, ServiceStatusPrioritySetup.Priority::"Medium High");
+        InsertData(ServiceStatusPrioritySetup."Service Order Status"::"In Process", ServiceStatusPrioritySetup.Priority::High);
+        InsertData(ServiceStatusPrioritySetup."Service Order Status"::Finished, ServiceStatusPrioritySetup.Priority::Low);
+        InsertData(ServiceStatusPrioritySetup."Service Order Status"::"On Hold", ServiceStatusPrioritySetup.Priority::"Medium Low");
     end;
 
     var

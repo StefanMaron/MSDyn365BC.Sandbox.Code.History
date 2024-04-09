@@ -73,7 +73,7 @@ codeunit 117507 "Create Service Base Calendar"
           XAT, BaseCalChange."Recurring System"::"Annual Recurring", BaseCalChange.Day::" ", true,
           DateToDMY(00031226D), XBoxingDay);
 
-        CreateSpecialHolidays;
+        CreateSpecialHolidays();
     end;
 
     var
@@ -81,23 +81,13 @@ codeunit 117507 "Create Service Base Calendar"
         BaseCalChange: Record "Base Calendar Change";
         BaseCalendar: Record "Base Calendar";
         Date: Record Date;
-        MakeAdjustments: Codeunit "Make Adjustments";
         StartDate: Date;
         XSERVICE: Label 'SERVICE';
         XServiceCalendar: Label 'Service Calendar';
-        XGB: Label 'GB';
-        XGBBaseNationalCalendar: Label 'GB Base National Calendar';
         XWeekend: Label 'Weekend';
         XNewYearsEve: Label 'New Years Eve';
-        XBankHolidayScotlandOnly: Label 'Bank Holiday, Scotland Only';
-        XStPatricksDay: Label 'St Patricks Day';
-        XBattleoftheBoyneDay: Label 'Battle of the Boyne Day';
         XChristmasDay: Label 'Christmas Day';
         XBoxingDay: Label 'Boxing Day';
-        XMayDayBankHoliday: Label 'May Day Bank Holiday';
-        XBankHoliday: Label 'Bank Holiday';
-        XSummerBankHolidayScotland: Label 'Summer Bank Holiday, Scotland';
-        XSummerBankHoliday: Label 'Summer Bank Holiday';
         XAT: Label 'AT';
         XATBaseNationalCalendar: Label 'AT Base National Calendar';
         XNewYearsDay: Label 'New Year''s Day';

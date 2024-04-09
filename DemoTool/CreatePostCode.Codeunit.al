@@ -4,7 +4,7 @@ codeunit 101225 "Create Post Code"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        ImportLocalPostCodes;
+        ImportLocalPostCodes();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Standard then
             exit;
 
@@ -698,7 +698,6 @@ codeunit 101225 "Create Post Code"
         XRecifePE: Label 'Recife PE';
         XBrasiliaDF: Label 'Brasilia DF';
         XCuritibaPR: Label 'Curitiba PR';
-        XPortoAlegreRS: Label 'Porto Alegre RS';
         XWrongPostCode: Label 'Wrong Postcode %1';
         XEningen: Label 'Eningen';
         XHundsheim: Label 'Hundsheim';

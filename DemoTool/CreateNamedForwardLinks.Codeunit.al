@@ -5,7 +5,7 @@ codeunit 119200 "Create Named Forward Links"
     var
         NamedForwardLink: Record "Named Forward Link";
     begin
-        NamedForwardLink.Load;
+        NamedForwardLink.Load();
     end;
 }
 

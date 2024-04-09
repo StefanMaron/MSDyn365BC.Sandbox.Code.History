@@ -30,7 +30,7 @@ codeunit 101931 "Create Local RapidStart Pack"
         DemoDataSetup: Record "Demo Data Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
-        if CreateConfigPackageHelper.GetDataType <> DemoDataSetup."Data Type"::Extended then
+        if CreateConfigPackageHelper.GetDataType() <> DemoDataSetup."Data Type"::Extended then
             case TableID of
                 DATABASE::"General Ledger Setup":
                     CreateConfigPackageHelper.ValidateField(GeneralLedgerSetup.FieldNo("Adjust for Payment Disc."), false);

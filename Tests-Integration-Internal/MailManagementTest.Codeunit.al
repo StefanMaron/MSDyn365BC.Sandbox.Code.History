@@ -36,7 +36,7 @@ codeunit 139134 "Mail Management Test"
         TempEmailItem.SetBodyText('Here');
 
         Assert.IsTrue(MailManagement.IsEnabled(), 'Mail management is not configured');
-        MailManagement.Send(TempEmailItem);
+        MailManagement.Send(TempEmailItem, Enum::"Email Scenario"::Default);
         Assert.IsTrue(MailManagement.IsSent(), 'Mail should be sent');
         Assert.IsFalse(MailManagement.IsCancelled(), 'Mail send was not cancelled');
 
@@ -67,7 +67,7 @@ codeunit 139134 "Mail Management Test"
 
         ConnectorMock.FailOnSend(true);
         Assert.IsTrue(MailManagement.IsEnabled(), 'Mail management is not configured');
-        asserterror Result := MailManagement.Send(TempEmailItem);
+        asserterror Result := MailManagement.Send(TempEmailItem, Enum::"Email Scenario"::Default);
         Assert.IsFalse(Result, 'The mail should not be send based on result');
         Assert.IsFalse(MailManagement.IsSent(), 'Mail should not be send');
         Assert.IsFalse(MailManagement.IsCancelled(), 'Mail cancelled by Outlook not chosen confirmation dialog');
@@ -94,7 +94,7 @@ codeunit 139134 "Mail Management Test"
 
         ConnectorMock.FailOnSend(true);
         Assert.IsTrue(MailManagement.IsEnabled(), 'Mail management is not configured');
-        asserterror MailManagement.Send(TempEmailItem);
+        asserterror MailManagement.Send(TempEmailItem, Enum::"Email Scenario"::Default);
         Assert.IsFalse(MailManagement.IsSent(), 'Mail should be sent');
         Assert.IsFalse(MailManagement.IsCancelled(), 'Mail send was not cancelled');
 
@@ -122,7 +122,7 @@ codeunit 139134 "Mail Management Test"
         TempEmailItem.SetBodyText('Here');
 
         Assert.IsTrue(MailManagement.IsEnabled(), 'Mail management is not configured');
-        MailManagement.Send(TempEmailItem);
+        MailManagement.Send(TempEmailItem, Enum::"Email Scenario"::Default);
         Assert.IsFalse(MailManagement.IsSent(), 'Mail should be sent');
         Assert.IsTrue(MailManagement.IsCancelled(), 'Mail send was not cancelled');
     end;
@@ -320,11 +320,11 @@ codeunit 139134 "Mail Management Test"
 
         // [GIVEN] CC Text and BCC Text are updated on Send Email Dialog
         EnqueueCCAndBCCValues(ActionType::Update, 'abc@abc.com', 'xyz@abc.com');
-        MailManagement.Send(TempEmailItem);
+        MailManagement.Send(TempEmailItem, Enum::"Email Scenario"::Default);
 
         // [WHEN] Open Send Email Dialog again
         EnqueueCCAndBCCValues(ActionType::Validate, '', '');
-        MailManagement.Send(TempEmailItem);
+        MailManagement.Send(TempEmailItem, Enum::"Email Scenario"::Default);
 
         // [THEN] BCC Text and CC Text are empty
         // verified in UpdateValidateMailDialog
@@ -352,11 +352,11 @@ codeunit 139134 "Mail Management Test"
 
         // [GIVEN] CC Text and BCC Text are updated on Send Email Dialog
         EnqueueCCAndBCCValues(ActionType::Update, 'abc@abc.com', 'xyz@abc.com');
-        MailManagement.Send(TempEmailItem);
+        MailManagement.Send(TempEmailItem, Enum::"Email Scenario"::Default);
 
         // [WHEN] Open Send Email Dialog again
         EnqueueCCAndBCCValues(ActionType::Validate, TempEmailItem."Send CC", TempEmailItem."Send BCC");
-        MailManagement.Send(TempEmailItem);
+        MailManagement.Send(TempEmailItem, Enum::"Email Scenario"::Default);
 
         // [THEN] BCC Text and CC Text are equal to "toCC" and "toBCC" respectively
         // verified in UpdateValidateMailDialog
@@ -408,7 +408,7 @@ codeunit 139134 "Mail Management Test"
     local procedure SendEmail(var EmailItem: Record "Email Item"; var MailManagement: Codeunit "Mail Management")
     begin
         Assert.IsTrue(MailManagement.IsEnabled(), 'Mail management is not configured');
-        MailManagement.Send(EmailItem);
+        MailManagement.Send(EmailItem, Enum::"Email Scenario"::Default);
     end;
 
     [ModalPageHandler]

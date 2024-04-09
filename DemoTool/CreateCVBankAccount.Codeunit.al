@@ -30,7 +30,7 @@ codeunit 101287 "Create C/V Bank Account"
           '', '', XCOM, XCommerzBank, XYvonneSchleger, XEickelscheidt67, 'DE-40593', XDE, XEUR, XDEU,
           X49210267511, X49210368024, X6000, X6000600000, '', '');
 
-        PostInsertData;
+        PostInsertData();
     end;
 
     var
@@ -46,21 +46,14 @@ codeunit 101287 "Create C/V Bank Account"
         XEllesboroughRoad47: Label 'Ellesborough Road 47';
         XGB: Label 'GB';
         XGBP: Label 'GBP';
-        XENG: Label 'ENG';
-        X44296696298: Label '+44 296 696298';
-        X44296696504: Label '+44 296 696504';
         XPAR: Label 'PAR';
         XParkHouseBankingGroup: Label 'Park House Banking Group';
         XScottMacDonald: Label 'Scott MacDonald';
         XWickRoad56: Label 'Wick Road 56';
-        X44296311044: Label '+44 296 311044';
-        X44296704144: Label '+44 296 704144';
         XECA: Label 'ECA';
         XECABank: Label 'ECA Bank';
         XSheelaWord: Label 'Sheela Word';
         XAnchorHouse43: Label 'Anchor House 43';
-        X44296196933: Label '+44 296 196933';
-        X44296151727: Label '+44 296 151727';
         XGB54BARC20992012345678: Label 'GB 54 BARC 20992012345678';
         XGB29NWBK60161331926819: Label 'GB 29 NWBK 60161331926819';
         XANT: Label 'ANT';

@@ -151,8 +151,6 @@ codeunit 101018 "Create Customer"
         XMr: Label 'Mr.';
         XAndyTeal: Label 'Andy Teal';
         XBLUE: Label 'BLUE';
-        XMID1: Label 'MID';
-        XMID2: Label 'MID';
         XSelangorianLtd: Label 'Selangorian Ltd.';
         X153ThomasDrive: Label '153 Thomas Drive';
         XMarkMcArthur: Label 'Mark McArthur';
@@ -170,10 +168,6 @@ codeunit 101018 "Create Customer"
         XRED: Label 'RED';
         XGREEN: Label 'GREEN';
         X14DAYS: Label '14 DAYS';
-        XW: Label 'W';
-        XSE: Label 'SE';
-        XN: Label 'N';
-        XS: Label 'S';
         XWHITE: Label 'WHITE';
         XLARGEACC: Label 'LARGE ACC';
         XCM: Label 'CM';
@@ -200,7 +194,6 @@ codeunit 101018 "Create Customer"
         XMeaganBond: Label 'Meagan Bond';
         XIanDeberry: Label 'Ian Deberry';
         XJesseHomer: Label 'Jesse Homer', Comment = 'CELA approved translation: Leonard Weber';
-        XDE: Label 'DE';
         XW1: Label 'W';
         XN1: Label 'N';
         XS1: Label 'S';
@@ -244,9 +237,9 @@ codeunit 101018 "Create Customer"
             "Currency Code":
                 Counter := Counter + 1;
             else begin
-                    PreviousCurrencyCode := "Currency Code";
-                    Counter := 1;
-                end;
+                PreviousCurrencyCode := "Currency Code";
+                Counter := 1;
+            end;
         end;
 
         case (Counter - 1) mod 3 of
@@ -254,7 +247,7 @@ codeunit 101018 "Create Customer"
                 Customer.Validate("Payment Terms Code", X1M8D);
             1:
                 begin
-                    Customer.Validate("Customer Disc. Group", DemoDataSetup.RetailCode);
+                    Customer.Validate("Customer Disc. Group", DemoDataSetup.RetailCode());
                     Customer.Validate("Payment Terms Code", X14DAYS);
                 end;
             2:
@@ -278,22 +271,22 @@ codeunit 101018 "Create Customer"
                 Customer.Validate("Credit Limit (LCY)",
                   Round(
                     CurrencyExchangeRate.ExchangeAmtFCYToLCY(
-                      WorkDate, 'EUR', 3871.17, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'EUR')), 0.01));
+                      WorkDate(), 'EUR', 3871.17, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'EUR')), 0.01));
             '35451236':
                 Customer.Validate("Credit Limit (LCY)",
                   Round(
                     CurrencyExchangeRate.ExchangeAmtFCYToLCY(
-                      WorkDate, 'ISK', 90000, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'ISK')), 0.01));
+                      WorkDate(), 'ISK', 90000, CurrencyExchangeRate.ExchangeRate(WorkDate(), 'ISK')), 0.01));
             '20000':
                 Customer.Validate("Application Method", 1);
             '49633663':
                 Customer.Validate("Invoice Disc. Code", 'A');
         end;
         if ("Country Code" = '') or ("Country Code" = DemoDataSetup."Country/Region Code") then begin
-            Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode);
+            Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode());
             Customer.Validate("Fin. Charge Terms Code", X15DOM);
         end else begin
-            Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode);
+            Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode());
             Customer.Validate("Fin. Charge Terms Code", X20FOR);
         end;
 
@@ -320,6 +313,12 @@ codeunit 101018 "Create Customer"
 
         Customer.Validate("Language Code", CreateLanguage.GetLanguageCode("Country Code"));
         Customer.Validate("Territory Code", CreateTerritory.GetTerritoryCode(Customer."Country/Region Code", "Territory Code"));
+
+        if (DemoDataSetup."Country/Region Code" = "Country Code") then
+            Customer.Validate("Reminder Terms Code", DemoDataSetup.DomesticCode())
+        else
+            Customer.Validate("Reminder Terms Code", DemoDataSetup.ForeignCode());
+
         Customer.Insert(true);
 
         Customer.Validate(Contact, CreateContact.FormatContact(Title, "Contact Name"));

@@ -3,33 +3,31 @@ codeunit 119020 "Create Manufacturing Setup"
 
     trigger OnRun()
     begin
-        with MfgSetup do begin
-            if not Get() then
-                Insert();
-            Validate("Normal Starting Time", 080000T);
-            Validate("Normal Ending Time", 230000T);
-            Validate("Doc. No. Is Prod. Order No.", true);
+        if not MfgSetup.Get() then
+            MfgSetup.Insert();
+        MfgSetup.Validate("Normal Starting Time", 080000T);
+        MfgSetup.Validate("Normal Ending Time", 230000T);
+        MfgSetup.Validate("Doc. No. Is Prod. Order No.", true);
 
-            Validate("Cost Incl. Setup", true);
-            Validate("Planning Warning", true);
-            Validate("Dynamic Low-Level Code", true);
+        MfgSetup.Validate("Cost Incl. Setup", true);
+        MfgSetup.Validate("Planning Warning", true);
+        MfgSetup.Validate("Dynamic Low-Level Code", true);
 
-            "Create No. Series".InitBaseSeries("Work Center Nos.", XWORKCTR, XWorkCenters, XW10, XW99990, '', '', 10, true);
-            "Create No. Series".InitBaseSeries("Machine Center Nos.", XMACHCTR, XMachineCenters, XM10, XM99990, '', '', 10, true);
-            "Create No. Series".InitBaseSeries("Production BOM Nos.", XPRODBOM, XProductionBOMs, XP10, XP99990, '', '', 10, true);
-            "Create No. Series".InitBaseSeries("Routing Nos.", XROUTING, XRoutingslc, XR10, XR99990, '', '', 10, true);
-            "Create No. Series".InitTempSeries("Simulated Order Nos.", XMQUO, XSalesQuote);
-            "Create No. Series".InitFinalSeries("Planned Order Nos.", XMPLAN, XPlannedorders, 1);
-            "Create No. Series".InitFinalSeries("Firm Planned Order Nos.", XMFIRMP, XFirmPlannedorders, 1);
-            "Create No. Series".InitFinalSeries("Released Order Nos.", XMREL, XReleasedorders, 1);
-            "Simulated Order Nos." := XMQUO;
-            "Planned Order Nos." := XMPLAN;
-            "Firm Planned Order Nos." := XMFIRMP;
-            "Released Order Nos." := XMREL;
-            "Combined MPS/MRP Calculation" := true;
-            Evaluate("Default Safety Lead Time", '<1D>');
-            Modify();
-        end;
+        "Create No. Series".InitBaseSeries(MfgSetup."Work Center Nos.", XWORKCTR, XWorkCenters, XW10, XW99990, '', '', 10, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitBaseSeries(MfgSetup."Machine Center Nos.", XMACHCTR, XMachineCenters, XM10, XM99990, '', '', 10, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitBaseSeries(MfgSetup."Production BOM Nos.", XPRODBOM, XProductionBOMs, XP10, XP99990, '', '', 10, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitBaseSeries(MfgSetup."Routing Nos.", XROUTING, XRoutingslc, XR10, XR99990, '', '', 10, Enum::"No. Series Implementation"::Sequence);
+        "Create No. Series".InitTempSeries(MfgSetup."Simulated Order Nos.", XMQUO, XSalesQuote);
+        "Create No. Series".InitFinalSeries(MfgSetup."Planned Order Nos.", XMPLAN, XPlannedorders, 1);
+        "Create No. Series".InitFinalSeries(MfgSetup."Firm Planned Order Nos.", XMFIRMP, XFirmPlannedorders, 1);
+        "Create No. Series".InitFinalSeries(MfgSetup."Released Order Nos.", XMREL, XReleasedorders, 1);
+        MfgSetup."Simulated Order Nos." := XMQUO;
+        MfgSetup."Planned Order Nos." := XMPLAN;
+        MfgSetup."Firm Planned Order Nos." := XMFIRMP;
+        MfgSetup."Released Order Nos." := XMREL;
+        MfgSetup."Combined MPS/MRP Calculation" := true;
+        Evaluate(MfgSetup."Default Safety Lead Time", '<1D>');
+        MfgSetup.Modify();
     end;
 
     var
