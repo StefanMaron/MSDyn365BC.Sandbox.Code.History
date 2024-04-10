@@ -64,6 +64,12 @@ once thats done you need to delete the local reference of the remote branches li
 git branch -d -r origin/us-23
 git branch -d -r origin/us-24
 ```
+if you had one of those branches checked out locally (a local copy of the branch) you want to delete those as well
+```
+git branch -D us-23
+git branch -D us-24
+```
+
 and thats it, now `git fetch` should not pull the branches anymore
 
 ## Disclaimer
