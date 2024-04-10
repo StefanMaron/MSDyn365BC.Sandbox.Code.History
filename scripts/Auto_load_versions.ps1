@@ -29,7 +29,7 @@ $Versions | Sort-Object -Property Country, Version | % {
     
     git fetch --all
 
-    $LastCommit = git log --all --grep="^$($country)-$($version.ToString())"
+    $LastCommit = git log --all --grep="^$($country)-$($version.ToString())$"
 
     if ($LastCommit.Length -eq 0) {
         Write-Host "###############################################"
