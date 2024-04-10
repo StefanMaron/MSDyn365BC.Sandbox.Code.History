@@ -57,6 +57,9 @@ $Versions | Sort-Object -Property Country, Version | % {
         elseif ($Version.Major -gt 15 -and $Version.Minor -gt 5) {
             $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="$($country)-$($version.Major).5" --pretty=format:"%h"
         }
+        elseif ($Version.Major -gt 15 -and $Version.Minor -lt 5) {
+            $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="$($country)-$($version.Major)" --pretty=format:"%h"
+        }
         else {
             $CommitIDLastCUFromPreviousMajor = $null
         }
