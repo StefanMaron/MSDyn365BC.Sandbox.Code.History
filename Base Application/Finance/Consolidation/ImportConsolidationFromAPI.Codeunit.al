@@ -613,8 +613,13 @@ codeunit 102 "Import Consolidation from API"
     end;
 
     local procedure GLAccountToFilter(GLAccountNo: Code[20]): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        URLEncodedGLAccountNo: Text;
     begin
-        exit(StrSubstNo(GLAccountFilterTok, GLAccountNo));
+        URLEncodedGLAccountNo := GLAccountNo;
+        TypeHelper.UrlEncode(URLEncodedGLAccountNo);
+        exit(StrSubstNo(GLAccountFilterTok, URLEncodedGLAccountNo));
     end;
 
     local procedure GetAndSetPostingGLAccounts(ValidateNoPostingsAtClosingDates: Boolean; StartingDate: Date; EndingDate: Date)
