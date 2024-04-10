@@ -4,6 +4,15 @@ This repository holds all versions of the Buisness Central Apps. The purpose is 
 
 There is one separate branch per country-major version.
 
+## Schedule
+
+The repository will automatically update itself from the artifacts once a day:
+
+- Regular/current branches will run at midnight UTC and pull the last 24 hours of artifacts
+- vNext/insider branches will run at 2 am UTC and pull the last 24 hours of artifacts
+
+## Differences
+
 Main differences between the https://github.com/StefanMaron/MSDyn365BC.Code.History repo:
 - Builds on sandbox instead of OnPrem artifacts to include hotfixes
 - localization branches only include the localized code, so some of them are empty, some just have the base app (Check w1 branches for all the other code)
@@ -14,7 +23,8 @@ Main differences between the https://github.com/StefanMaron/MSDyn365BC.Code.Hist
 - Because of the crazy number of versions, I did limit this repo to start with 23.5
 - to keep the size of this repo at least in some boundaries, I decided to not include any translation files.
 
-to reduce the size of the local clone you can use those commands to clone only the branches you need:
+## Partial Clone
+To reduce the size of the local clone you can use those commands to clone only the branches you need:
 
 First, clone with those parameters and set it to whatever branch you need:
 ```
