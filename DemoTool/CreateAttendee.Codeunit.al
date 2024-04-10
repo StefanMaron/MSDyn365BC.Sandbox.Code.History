@@ -29,7 +29,7 @@ codeunit 101574 "Create Attendee"
         Attendee.Validate("Attendee No.", AttendeeNo);
         Attendee."Invitation Response Type" := InvitationResponse;
         Attendee."Invitation Sent" := InvitationSent;
-        Attendee.Insert
+        Attendee.Insert();
     end;
 }
 

@@ -552,7 +552,7 @@ report 1307 "Standard Sales - Credit Memo"
                     column(DocumentNo_ShipmentLine; "Document No.")
                     {
                     }
-                    column(PostingDate_ShipmentLine; Format("Posting Date"))
+                    column(PostingDate_ShipmentLine; "Posting Date")
                     {
                     }
                     column(PostingDate_ShipmentLine_Lbl; FieldCaption("Posting Date"))
@@ -568,9 +568,6 @@ report 1307 "Standard Sales - Credit Memo"
 
                     trigger OnPreDataItem()
                     begin
-                        if not DisplayShipmentInformation then
-                            CurrReport.Break();
-
                         SetRange("Line No.", Line."Line No.");
                     end;
                 }
@@ -974,8 +971,8 @@ report 1307 "Standard Sales - Credit Memo"
 
                 CalcFields("Work Description");
                 ShowWorkDescription := "Work Description".HasValue;
-                CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
-                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
+                CurrReport.Language := LanguageMgt.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := LanguageMgt.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields(Header);
@@ -1091,6 +1088,13 @@ report 1307 "Standard Sales - Credit Memo"
             Caption = 'Standard Sales Credit Memo Email (Word)';
             Summary = 'The Standard Sales Credit Memo Email (Word) provides an email body layout.';
         }
+        layout("StandardSalesCreditMemoBlue.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesCreditMemoBlue.docx';
+            Caption = 'Standard Sales Credit Memo Blue (Word)';
+            Summary = 'The Standard Sales Credit Memo Blue (Word) provides a layout with a blue theme.';
+        }
     }
 
     labels
@@ -1153,12 +1157,11 @@ report 1307 "Standard Sales - Credit Memo"
     var
         GLSetup: Record "General Ledger Setup";
         PaymentMethod: Record "Payment Method";
-        CompanyBankAccount: Record "Bank Account";
         DummyCompanyInfo: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         Cust: Record Customer;
         RespCenter: Record "Responsibility Center";
-        Language: Codeunit Language;
+        LanguageMgt: Codeunit Language;
         FormatAddr: Codeunit "Format Address";
         FormatDocument: Codeunit "Format Document";
         SegManagement: Codeunit SegManagement;
@@ -1236,6 +1239,7 @@ report 1307 "Standard Sales - Credit Memo"
 
     protected var
         CompanyInfo: Record "Company Information";
+        CompanyBankAccount: Record "Bank Account";
         PaymentTerms: Record "Payment Terms";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         ShipmentMethod: Record "Shipment Method";
@@ -1275,32 +1279,39 @@ report 1307 "Standard Sales - Credit Memo"
         LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Cr. Memo") <> '';
     end;
 
-    local procedure InitializeSalesShipmentLine()
+    local procedure InitializeSalesShipmentLine(): Date
     var
         ReturnReceiptHeader: Record "Return Receipt Header";
+        SalesShipmentBuffer2: Record "Sales Shipment Buffer";
     begin
-        if not DisplayShipmentInformation then
-            exit;
-
         if Line."Return Receipt No." <> '' then
             if ReturnReceiptHeader.Get(Line."Return Receipt No.") then
-                exit;
+                exit(ReturnReceiptHeader."Posting Date");
         if Header."Return Order No." = '' then
-            exit;
+            exit(Header."Posting Date");
         if Line.Type = Line.Type::" " then
-            exit;
+            exit(0D);
 
         ShipmentLine.GetLinesForSalesCreditMemoLine(Line, Header);
 
         ShipmentLine.Reset();
         ShipmentLine.SetRange("Line No.", Line."Line No.");
-        if not ShipmentLine.IsEmpty() then begin
+        if ShipmentLine.Find('-') then begin
+            SalesShipmentBuffer2 := ShipmentLine;
+            if not DisplayShipmentInformation then
+                if ShipmentLine.Next() = 0 then begin
+                    ShipmentLine.Get(
+                      SalesShipmentBuffer2."Document No.", SalesShipmentBuffer2."Line No.", SalesShipmentBuffer2."Entry No.");
+                    ShipmentLine.Delete();
+                    exit(SalesShipmentBuffer2."Posting Date");
+                end;
             ShipmentLine.CalcSums(Quantity);
             if ShipmentLine.Quantity <> Line.Quantity then begin
                 ShipmentLine.DeleteAll();
-                exit;
+                exit(Header."Posting Date");
             end;
         end;
+        exit(Header."Posting Date");
     end;
 
     protected procedure IsReportInPreviewMode(): Boolean
@@ -1352,11 +1363,11 @@ report 1307 "Standard Sales - Credit Memo"
         end;
 
         if (TotalInvDiscAmount <> 0) or (TotalAmountVAT <> 0) then
-            ReportTotalsLine.Add(SubtotalLbl, TotalSubTotal, true, false, false);
+            ReportTotalsLine.Add(SubtotalLbl, TotalSubTotal, true, false, false, Header."Currency Code");
         if TotalInvDiscAmount <> 0 then begin
-            ReportTotalsLine.Add(InvDiscountAmtLbl, TotalInvDiscAmount, false, false, false);
+            ReportTotalsLine.Add(InvDiscountAmtLbl, TotalInvDiscAmount, false, false, false, Header."Currency Code");
             if TotalAmountVAT <> 0 then
-                ReportTotalsLine.Add(TotalExclVATText, TotalAmount, true, false, false);
+                ReportTotalsLine.Add(TotalExclVATText, TotalAmount, true, false, false, Header."Currency Code");
         end;
         if TotalAmountVAT <> 0 then begin
             GetTaxSummarizedLines(TempSalesTaxAmountLine);
@@ -1364,7 +1375,7 @@ report 1307 "Standard Sales - Credit Memo"
             TempSalesTaxAmountLine.Ascending(true);
             if TempSalesTaxAmountLine.FindSet() then
                 repeat
-                    ReportTotalsLine.Add(TempSalesTaxAmountLine."Print Description", TempSalesTaxAmountLine."Tax Amount", false, true, false);
+                    ReportTotalsLine.Add(TempSalesTaxAmountLine."Print Description", TempSalesTaxAmountLine."Tax Amount", false, true, false, Header."Currency Code");
                 until TempSalesTaxAmountLine.Next() = 0;
         end;
     end;
@@ -1378,18 +1389,16 @@ report 1307 "Standard Sales - Credit Memo"
 
     local procedure FormatDocumentFields(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     begin
-        with SalesCrMemoHeader do begin
-            FormatDocument.SetTotalLabels("Currency Code", TotalText, TotalInclVATText, TotalExclVATText);
-            FormatDocument.SetSalesPerson(SalespersonPurchaser, "Salesperson Code", SalesPersonText);
-            FormatDocument.SetPaymentTerms(PaymentTerms, "Payment Terms Code", "Language Code");
-            FormatDocument.SetPaymentMethod(PaymentMethod, "Payment Method Code", "Language Code");
-            FormatDocument.SetShipmentMethod(ShipmentMethod, "Shipment Method Code", "Language Code");
+        FormatDocument.SetTotalLabels(SalesCrMemoHeader."Currency Code", TotalText, TotalInclVATText, TotalExclVATText);
+        FormatDocument.SetSalesPerson(SalespersonPurchaser, SalesCrMemoHeader."Salesperson Code", SalesPersonText);
+        FormatDocument.SetPaymentTerms(PaymentTerms, SalesCrMemoHeader."Payment Terms Code", SalesCrMemoHeader."Language Code");
+        FormatDocument.SetPaymentMethod(PaymentMethod, SalesCrMemoHeader."Payment Method Code", SalesCrMemoHeader."Language Code");
+        FormatDocument.SetShipmentMethod(ShipmentMethod, SalesCrMemoHeader."Shipment Method Code", SalesCrMemoHeader."Language Code");
 
-            AppliesToText :=
-              FormatDocument.SetText("Applies-to Doc. No." <> '', StrSubstNo('%1 %2', Format("Applies-to Doc. Type"), "Applies-to Doc. No."));
+        AppliesToText :=
+          FormatDocument.SetText(SalesCrMemoHeader."Applies-to Doc. No." <> '', StrSubstNo('%1 %2', Format(SalesCrMemoHeader."Applies-to Doc. Type"), SalesCrMemoHeader."Applies-to Doc. No."));
 
-            OnAfterFormatDocumentFields(SalesCrMemoHeader);
-        end;
+        OnAfterFormatDocumentFields(SalesCrMemoHeader);
     end;
 
     local procedure FormatLineValues(CurrLine: Record "Sales Cr.Memo Line")

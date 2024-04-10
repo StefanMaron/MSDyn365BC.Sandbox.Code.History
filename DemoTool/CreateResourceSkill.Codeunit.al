@@ -3,40 +3,38 @@ codeunit 117057 "Create Resource Skill"
 
     trigger OnRun()
     begin
-        with ResourceSkill do begin
-            InsertData(Type::Resource, XKatherine, XA);
-            InsertData(Type::Resource, XKatherine, XPC);
-            InsertData(Type::Resource, XKatherine, XPCS);
-            InsertData(Type::Resource, XKatherine, XS);
-            InsertData(Type::Resource, XKatherine, XSO);
-            InsertData(Type::Resource, XLina, XA);
-            InsertData(Type::Resource, XLina, XPC);
-            InsertData(Type::Resource, XMarty, XS);
-            InsertData(Type::Resource, XTerry, XA);
-            InsertData(Type::Resource, XTerry, XPC);
-            InsertData(Type::Resource, XTerry, XS);
-            InsertData(Type::"Service Item Group", XDESKTOP, XA);
-            InsertData(Type::"Service Item Group", XDESKTOP, XPC);
-            InsertData(Type::"Service Item Group", XDESKTOP, XPCS);
-            InsertData(Type::"Service Item Group", XGRAPHICS, XPC);
-            InsertData(Type::"Service Item Group", XGRAPHICS, XPCS);
-            InsertData(Type::"Service Item Group", XNETWCARD, XA);
-            InsertData(Type::"Service Item Group", XNETWCARD, XPC);
-            InsertData(Type::"Service Item Group", XNETWCARD, XPCS);
-            InsertData(Type::"Service Item Group", XOFFICEEQ, XOE);
-            InsertData(Type::"Service Item Group", XSERVER, XA);
-            InsertData(Type::"Service Item Group", XSERVER, XPC);
-            InsertData(Type::"Service Item Group", XSERVER, XPCS);
-            InsertData(Type::"Service Item Group", XSERVER, XS);
-            InsertData(Type::"Service Item Group", XZIPDRIVE, XA);
-            InsertData(Type::"Service Item Group", XZIPDRIVE, XPC);
-            InsertData(Type::"Service Item Group", XMEMORY, XPC);
-            InsertData(Type::"Service Item Group", XHARDDRIVE, XPC);
-            InsertData(Type::Item, '80201', XA);
-            InsertData(Type::Item, '80202', XA);
-            InsertData(Type::Item, '80203', XA);
-            InsertData(Type::Item, '80204', XA);
-        end;
+        InsertData(ResourceSkill.Type::Resource, XKatherine, XA);
+        InsertData(ResourceSkill.Type::Resource, XKatherine, XPC);
+        InsertData(ResourceSkill.Type::Resource, XKatherine, XPCS);
+        InsertData(ResourceSkill.Type::Resource, XKatherine, XS);
+        InsertData(ResourceSkill.Type::Resource, XKatherine, XSO);
+        InsertData(ResourceSkill.Type::Resource, XLina, XA);
+        InsertData(ResourceSkill.Type::Resource, XLina, XPC);
+        InsertData(ResourceSkill.Type::Resource, XMarty, XS);
+        InsertData(ResourceSkill.Type::Resource, XTerry, XA);
+        InsertData(ResourceSkill.Type::Resource, XTerry, XPC);
+        InsertData(ResourceSkill.Type::Resource, XTerry, XS);
+        InsertData(ResourceSkill.Type::"Service Item Group", XDESKTOP, XA);
+        InsertData(ResourceSkill.Type::"Service Item Group", XDESKTOP, XPC);
+        InsertData(ResourceSkill.Type::"Service Item Group", XDESKTOP, XPCS);
+        InsertData(ResourceSkill.Type::"Service Item Group", XGRAPHICS, XPC);
+        InsertData(ResourceSkill.Type::"Service Item Group", XGRAPHICS, XPCS);
+        InsertData(ResourceSkill.Type::"Service Item Group", XNETWCARD, XA);
+        InsertData(ResourceSkill.Type::"Service Item Group", XNETWCARD, XPC);
+        InsertData(ResourceSkill.Type::"Service Item Group", XNETWCARD, XPCS);
+        InsertData(ResourceSkill.Type::"Service Item Group", XOFFICEEQ, XOE);
+        InsertData(ResourceSkill.Type::"Service Item Group", XSERVER, XA);
+        InsertData(ResourceSkill.Type::"Service Item Group", XSERVER, XPC);
+        InsertData(ResourceSkill.Type::"Service Item Group", XSERVER, XPCS);
+        InsertData(ResourceSkill.Type::"Service Item Group", XSERVER, XS);
+        InsertData(ResourceSkill.Type::"Service Item Group", XZIPDRIVE, XA);
+        InsertData(ResourceSkill.Type::"Service Item Group", XZIPDRIVE, XPC);
+        InsertData(ResourceSkill.Type::"Service Item Group", XMEMORY, XPC);
+        InsertData(ResourceSkill.Type::"Service Item Group", XHARDDRIVE, XPC);
+        InsertData(ResourceSkill.Type::Item, '80201', XA);
+        InsertData(ResourceSkill.Type::Item, '80202', XA);
+        InsertData(ResourceSkill.Type::Item, '80203', XA);
+        InsertData(ResourceSkill.Type::Item, '80204', XA);
         RevalidateRelation('80001');
         RevalidateRelation('80002');
         RevalidateRelation('80003');
@@ -97,11 +95,9 @@ codeunit 117057 "Create Resource Skill"
         ResSkillMgt: Codeunit "Resource Skill Mgt.";
         Item: Record Item;
     begin
-        with ResourceSkill do begin
-            Item.Get(ItemNo);
-            ResSkillMgt.SkipValidationDialogs();
-            ResSkillMgt.RevalidateResSkillRelation(Type::Item, ItemNo, Type::"Service Item Group", Item."Service Item Group")
-        end;
+        Item.Get(ItemNo);
+        ResSkillMgt.SkipValidationDialogs();
+        ResSkillMgt.RevalidateResSkillRelation(ResourceSkill.Type::Item, ItemNo, ResourceSkill.Type::"Service Item Group", Item."Service Item Group")
     end;
 }
 

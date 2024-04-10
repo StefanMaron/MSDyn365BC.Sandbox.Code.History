@@ -14,7 +14,7 @@ codeunit 118230 "Create Data Exch. Column Def"
             Path := TemporaryPath() + '\..\' + 'PostingExchangeDefinitions'
         else
             Path := DemoDataSetup."Path to Picture Folder" + 'PostingExchangeDefinitions';
-            
+
         DirectoryInfo := DirectoryInfo.DirectoryInfo(Path);
 
         if DirectoryInfo.Exists then begin
@@ -29,9 +29,9 @@ codeunit 118230 "Create Data Exch. Column Def"
                 if FileInfo.Length > 0 then
                     ImportDataExchDef(FileInfo.FullName);
             end;
-            CreateBankExportImportSetup;
+            CreateBankExportImportSetup();
             ExportDataExchDef(Path);
-            PopulateDataExchangeTypesTable;
+            PopulateDataExchangeTypesTable();
         end else
             Error(NoDirectoryErr);
     end;

@@ -3,22 +3,20 @@ codeunit 101599 "Create Interact. Templ. Setup"
 
     trigger OnRun()
     begin
-        with InteractionTmplSetup do begin
-            Get();
-            FillSalesTemplateCodes;
-            FillPurchTemplateCodes;
-            Validate("Serv Ord Create", XSVORDC);
-            Validate("Serv Ord Post", XSVORDP);
-            Validate("E-Mails", XEMAIL);
-            Validate("Cover Sheets", XCOVERSH);
-            Validate("Outg. Calls", XOUTGOING);
-            Validate("Service Contract", XSVCONTR);
-            Validate("Service Contract Quote", XSVCONTRQ);
-            Validate("Service Quote", XSVQUOTE);
-            Validate("Meeting Invitation", XMEETINV);
-            Validate("E-Mail Draft", XEMAILDTxt);
-            Modify();
-        end;
+        InteractionTmplSetup.Get();
+        FillSalesTemplateCodes();
+        FillPurchTemplateCodes();
+        InteractionTmplSetup.Validate("Serv Ord Create", XSVORDC);
+        InteractionTmplSetup.Validate("Serv Ord Post", XSVORDP);
+        InteractionTmplSetup.Validate("E-Mails", XEMAIL);
+        InteractionTmplSetup.Validate("Cover Sheets", XCOVERSH);
+        InteractionTmplSetup.Validate("Outg. Calls", XOUTGOING);
+        InteractionTmplSetup.Validate("Service Contract", XSVCONTR);
+        InteractionTmplSetup.Validate("Service Contract Quote", XSVCONTRQ);
+        InteractionTmplSetup.Validate("Service Quote", XSVQUOTE);
+        InteractionTmplSetup.Validate("Meeting Invitation", XMEETINV);
+        InteractionTmplSetup.Validate("E-Mail Draft", XEMAILDTxt);
+        InteractionTmplSetup.Modify();
     end;
 
     var
@@ -56,49 +54,43 @@ codeunit 101599 "Create Interact. Templ. Setup"
 
     procedure InsertMiniAppData()
     begin
-        with InteractionTmplSetup do begin
-            Get();
-            Validate("E-Mails", XEMAIL);
-            Validate("E-Mail Draft", XEMAILDTxt);
-            Validate("Cover Sheets", XCOVERSH);
-            Validate("Outg. Calls", XOUTGOING);
-            Validate("Meeting Invitation", XMEETINV);
-            FillSalesTemplateCodes;
-            FillPurchTemplateCodes;
-            Modify();
-        end;
+        InteractionTmplSetup.Get();
+        InteractionTmplSetup.Validate("E-Mails", XEMAIL);
+        InteractionTmplSetup.Validate("E-Mail Draft", XEMAILDTxt);
+        InteractionTmplSetup.Validate("Cover Sheets", XCOVERSH);
+        InteractionTmplSetup.Validate("Outg. Calls", XOUTGOING);
+        InteractionTmplSetup.Validate("Meeting Invitation", XMEETINV);
+        FillSalesTemplateCodes();
+        FillPurchTemplateCodes();
+        InteractionTmplSetup.Modify();
     end;
 
     local procedure FillSalesTemplateCodes()
     begin
-        with InteractionTmplSetup do begin
-            Validate("Sales Invoices", XSINVOICE);
-            Validate("Sales Cr. Memo", XSCMEMO);
-            Validate("Sales Ord. Cnfrmn.", XSORDERCF);
-            Validate("Sales Draft Invoices", XSDRAFTIN);
-            Validate("Sales Quotes", XSQUOTE);
-            Validate("Sales Blnkt. Ord", XSBORDER);
-            Validate("Sales Shpt. Note", XSSHIP);
-            Validate("Sales Statement", XSSTATM);
-            Validate("Sales Rmdr.", XSREMIND);
-            Validate("Sales Return Order", XSRETORD);
-            Validate("Sales Finance Charge Memo", XSFINCHG);
-            Validate("Sales Return Receipt", XSRETRCP);
-        end;
+        InteractionTmplSetup.Validate("Sales Invoices", XSINVOICE);
+        InteractionTmplSetup.Validate("Sales Cr. Memo", XSCMEMO);
+        InteractionTmplSetup.Validate("Sales Ord. Cnfrmn.", XSORDERCF);
+        InteractionTmplSetup.Validate("Sales Draft Invoices", XSDRAFTIN);
+        InteractionTmplSetup.Validate("Sales Quotes", XSQUOTE);
+        InteractionTmplSetup.Validate("Sales Blnkt. Ord", XSBORDER);
+        InteractionTmplSetup.Validate("Sales Shpt. Note", XSSHIP);
+        InteractionTmplSetup.Validate("Sales Statement", XSSTATM);
+        InteractionTmplSetup.Validate("Sales Rmdr.", XSREMIND);
+        InteractionTmplSetup.Validate("Sales Return Order", XSRETORD);
+        InteractionTmplSetup.Validate("Sales Finance Charge Memo", XSFINCHG);
+        InteractionTmplSetup.Validate("Sales Return Receipt", XSRETRCP);
     end;
 
     local procedure FillPurchTemplateCodes()
     begin
-        with InteractionTmplSetup do begin
-            Validate("Purch Invoices", XPINVOICE);
-            Validate("Purch Cr Memos", XPCMEMO);
-            Validate("Purch. Orders", XPORDER);
-            Validate("Purch. Quotes", XPQUOTE);
-            Validate("Purch Blnkt Ord", XPBORDER);
-            Validate("Purch. Rcpt.", XPRECEIPT);
-            Validate("Purch. Return Shipment", XPRTSHIP);
-            Validate("Purch. Return Ord. Cnfrmn.", XPRTORDC);
-        end;
+        InteractionTmplSetup.Validate("Purch Invoices", XPINVOICE);
+        InteractionTmplSetup.Validate("Purch Cr Memos", XPCMEMO);
+        InteractionTmplSetup.Validate("Purch. Orders", XPORDER);
+        InteractionTmplSetup.Validate("Purch. Quotes", XPQUOTE);
+        InteractionTmplSetup.Validate("Purch Blnkt Ord", XPBORDER);
+        InteractionTmplSetup.Validate("Purch. Rcpt.", XPRECEIPT);
+        InteractionTmplSetup.Validate("Purch. Return Shipment", XPRTSHIP);
+        InteractionTmplSetup.Validate("Purch. Return Ord. Cnfrmn.", XPRTORDC);
     end;
 }
 

@@ -132,7 +132,7 @@
         Initialize();
 
         // Setup
-        PostedDocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        PostedDocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
 
         // Exercise
         RequestStamp(TableNo, PostedDocumentNo, Response, Action);
@@ -183,7 +183,7 @@
         Initialize();
 
         // Setup
-        PostedDocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        PostedDocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
 
         // Exercise
         RequestStamp(TableNo, PostedDocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -426,7 +426,7 @@
         Initialize();
 
         // Setup
-        PostedDocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        PostedDocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
 
         // Exercise
         if Response = ResponseOption::Success then
@@ -480,7 +480,7 @@
         Initialize();
 
         // Setup
-        PostedDocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        PostedDocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
 
         // Exercise
         RequestStamp(TableNo, PostedDocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -555,10 +555,10 @@
         PaymentNo: Code[20];
     begin
         // [SCENARIO 422335] Cancel customer payment
-        Initialize;
+        Initialize();
 
         // [GIVEN] Payment with 'Stamp Received' status
-        PaymentNo := CreatePostPayment(CreateCustomer, '', -LibraryRandom.RandIntInRange(1000, 2000), '');
+        PaymentNo := CreatePostPayment(CreateCustomer(), '', -LibraryRandom.RandIntInRange(1000, 2000), '');
         UpdateDocumentFieldValue(
           DATABASE::"Cust. Ledger Entry", CustLedgerEntry.FieldNo("Document No."), PaymentNo,
           CustLedgerEntry.FieldNo("Electronic Document Status"), CustLedgerEntry."Electronic Document Status"::"Stamp Received");
@@ -611,7 +611,7 @@
         Initialize();
 
         // Setup
-        PostedDocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        PostedDocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
 
         // Exercise
         RequestStamp(TableNo, PostedDocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -742,7 +742,7 @@
         Initialize();
 
         // [GIVEN] Sales Invoice with Cancel In Progress status
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         UpdateSalesInvoiceCancellation(SalesInvoiceHeader);
 
         // [WHEN] Run Cancel document with Mark as Canceled option
@@ -816,10 +816,10 @@
         // [FEATURE] [Cancel]
         // [SCENARIO 470702] Cancel invoice with time expiration
         Initialize();
-        UpdateGLSetupTimeExpiration(true);
+        UpdateGLSetupTimeExpiration();
 
         // [GIVEN] Sales Invoice has "Stamp Received" status and a stamp received 12 hours ago
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         SalesInvoiceHeader."Electronic Document Status" := SalesInvoiceHeader."Electronic Document Status"::"Stamp Received";
         SalesInvoiceHeader."Date/Time Stamp Received" := GetDateTimeInDaysAgo(0.5);
         SalesInvoiceHeader."CFDI Cancellation Reason Code" := FindCancellationReasonCode(false);
@@ -849,7 +849,7 @@
         // [FEATURE] [Cancel]
         // [SCENARIO 470702] Run request cancellation batch for two invoices with time expiration
         Initialize();
-        UpdateGLSetupTimeExpiration(true);
+        UpdateGLSetupTimeExpiration();
 
         SalesInvoiceHeader1.SetFilter("CFDI Cancellation ID", '<>%1', '');
         SalesInvoiceHeader1.ModifyAll("Electronic Document Status", SalesInvoiceHeader1."Electronic Document Status"::Canceled);
@@ -988,7 +988,7 @@
         Initialize();
 
         // Setup
-        DocumentNo := CreateDoc(TableNo, CreatePaymentMethodForSAT);
+        DocumentNo := CreateDoc(TableNo, CreatePaymentMethodForSAT());
 
         // Exercise
         LibraryVariableStorage.Enqueue(true);
@@ -996,7 +996,7 @@
         PostAndPrint(TableNo, DocumentNo);
 
         // Verify - that the right number of confirm handlers was executed
-        LibraryVariableStorage.AssertEmpty;
+        LibraryVariableStorage.AssertEmpty();
     end;
 
     local procedure PostAndPrintCFDIDisabledTest(TableNo: Integer)
@@ -1017,7 +1017,7 @@
         PostAndPrint(TableNo, DocumentNo);
 
         // Verify - that the right number of confirm handlers was executed
-        LibraryVariableStorage.AssertEmpty;
+        LibraryVariableStorage.AssertEmpty();
     end;
 
     [Test]
@@ -1086,7 +1086,7 @@
         Initialize();
 
         // Exercise
-        CreateBasicSalesDocument(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomerNoDiscount);
+        CreateBasicSalesDocument(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomerNoDiscount());
 
         // Verify
         SalesHeader.TestField("Payment Method Code");
@@ -1102,7 +1102,7 @@
         Initialize();
 
         // Exercise
-        CreateBasicSalesDocument(SalesHeader, SalesHeader."Document Type"::"Credit Memo", CreateCustomerNoDiscount);
+        CreateBasicSalesDocument(SalesHeader, SalesHeader."Document Type"::"Credit Memo", CreateCustomerNoDiscount());
 
         // Verify
         SalesHeader.TestField("Payment Method Code", '');
@@ -1118,7 +1118,7 @@
         Initialize();
 
         // Exercise
-        CreateBasicServiceDocument(ServiceHeader, ServiceHeader."Document Type"::Order, CreateCustomerNoDiscount);
+        CreateBasicServiceDocument(ServiceHeader, ServiceHeader."Document Type"::Order, CreateCustomerNoDiscount());
 
         // Verify
         ServiceHeader.TestField("Payment Method Code");
@@ -1134,7 +1134,7 @@
         Initialize();
 
         // Exercise
-        CreateBasicServiceDocument(ServiceHeader, ServiceHeader."Document Type"::"Credit Memo", CreateCustomerNoDiscount);
+        CreateBasicServiceDocument(ServiceHeader, ServiceHeader."Document Type"::"Credit Memo", CreateCustomerNoDiscount());
 
         // Verify
         ServiceHeader.TestField("Payment Method Code", '');
@@ -1149,7 +1149,7 @@
         Initialize();
 
         // Setup
-        CreateBasicSalesDocument(SalesHeader, SalesHeader."Document Type"::"Credit Memo", CreateCustomerNoDiscount);
+        CreateBasicSalesDocument(SalesHeader, SalesHeader."Document Type"::"Credit Memo", CreateCustomerNoDiscount());
 
         // Exercise
         asserterror LibrarySales.PostSalesDocument(SalesHeader, true, true);
@@ -1167,7 +1167,7 @@
         Initialize();
 
         // Setup
-        CreateBasicServiceDocument(ServiceHeader, ServiceHeader."Document Type"::"Credit Memo", CreateCustomerNoDiscount);
+        CreateBasicServiceDocument(ServiceHeader, ServiceHeader."Document Type"::"Credit Memo", CreateCustomerNoDiscount());
 
         // Exercise
         asserterror LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
@@ -1195,7 +1195,7 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 1000 in local currency
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
         UpdateCustomerSATPaymentFields(SalesInvoiceHeader."Sell-to Customer No.");
 
@@ -1203,7 +1203,7 @@
         PaymentNo :=
           CreatePostPayment(
             SalesInvoiceHeader."Sell-to Customer No.", SalesInvoiceHeader."No.", -SalesInvoiceHeader."Amount Including VAT", '');
-        SalesInvoiceHeader."Payment Terms Code" := CreatePaymentTermsForSAT;
+        SalesInvoiceHeader."Payment Terms Code" := CreatePaymentTermsForSAT();
         SalesInvoiceHeader.Modify();
         // [GIVEN] Customer has Payment Method with '99' SAT Code
         Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
@@ -1276,7 +1276,7 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 1000 in local currency
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
         UpdateCustomerSATPaymentFields(SalesInvoiceHeader."Sell-to Customer No.");
 
@@ -1335,7 +1335,7 @@
 
         // [GIVEN] Posted Service Invoice with "Amount Including VAT" = 1000 in local currency
         ServiceInvoiceHeader.Get(
-          CreateAndPostServiceDoc(ServiceHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostServiceDoc(ServiceHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
         ServiceInvoiceHeader.CalcFields("Amount Including VAT");
         UpdateCustomerSATPaymentFields(ServiceInvoiceHeader."Customer No.");
 
@@ -1343,7 +1343,7 @@
         PaymentNo :=
           CreatePostPayment(
             ServiceInvoiceHeader."Customer No.", ServiceInvoiceHeader."No.", -ServiceInvoiceHeader."Amount Including VAT", '');
-        ServiceInvoiceHeader."Payment Terms Code" := CreatePaymentTermsForSAT;
+        ServiceInvoiceHeader."Payment Terms Code" := CreatePaymentTermsForSAT();
         ServiceInvoiceHeader.Modify();
 
         // [WHEN] Request stamp for the payment
@@ -1383,7 +1383,7 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 1000 in foreign currency "USD"
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         Customer.Validate("Currency Code",
           LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), LibraryRandom.RandIntInRange(10, 20), LibraryRandom.RandIntInRange(10, 20)));
         Customer.Modify(true);
@@ -1440,7 +1440,7 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 1000 in foreign currency "USD" with Exch. Rate = 20
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         Customer.Validate("Currency Code",
           LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), LibraryRandom.RandIntInRange(10, 20), LibraryRandom.RandIntInRange(10, 20)));
         Customer.Modify(true);
@@ -1463,7 +1463,7 @@
 
         // [THEN] 'Pagos/Totales' node has attribute 'MontoTotalPagos' = 20000.00
         // [THEN] 'Complemento' node created with attribute 'MonedaP' = 'USD', 'TipoCambioP' = 20.000000
-        // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 1000.00 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1 (TFS 503112)
+        // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 1000.00 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000 (TFS 497940)
         InitXMLReaderForPagos20(FileName);
         CustLedgerEntry.CalcFields("Original String");
         CustLedgerEntry."Original String".CreateInStream(InStream);
@@ -1474,7 +1474,7 @@
             OriginalStr,
             CustLedgerEntry."Amount (LCY)", Customer."Currency Code",
             FormatDecimal(Round(1 / CustLedgerEntry."Original Currency Factor", 0.000001), 6),
-            CustLedgerEntry.Amount, Customer."Currency Code", '1', CustLedgerEntry.Amount, 29);
+            CustLedgerEntry.Amount, Customer."Currency Code", '1.0000000000', CustLedgerEntry.Amount, 29);
     end;
 
     [Test]
@@ -1825,7 +1825,7 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 233,352.56 USD / 4,325,421.37 MXN with Exch. Rate = 18.6428
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         UpdateCustomerSATPaymentFields(Customer."No.");
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
         SalesHeader.Validate("Posting Date", WorkDate() - 1);
@@ -1834,7 +1834,7 @@
         SalesHeader.Validate("Currency Factor", 1 / 18.6428);
         SalesHeader.Modify();
         SalesHeader.Modify(true);
-        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem, 1, 0, 16, false, false);
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), 1, 0, 16, false, false);
         SalesLine.Validate("Unit Price", 201166.0);
         SalesLine.Modify(true);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
@@ -1895,11 +1895,11 @@
         Initialize();
 
         // [GIVEN] Posted Sales order with two lines, the second line has Qty. to Ship = 0
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         UpdateCustomerSATPaymentFields(Customer."No.");
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.", CreatePaymentMethodForSAT());
-        CreateSalesLineItem(SalesLine1, SalesHeader, CreateItem, 1, 0, 16, false, false);
-        CreateSalesLineItem(SalesLine2, SalesHeader, CreateItem, 1, 0, 16, false, false);
+        CreateSalesLineItem(SalesLine1, SalesHeader, CreateItem(), 1, 0, 16, false, false);
+        CreateSalesLineItem(SalesLine2, SalesHeader, CreateItem(), 1, 0, 16, false, false);
         SalesLine2.Validate("Qty. to Ship", 0);
         SalesLine2.Modify(true);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
@@ -1938,7 +1938,6 @@
         SalesLine1: Record "Sales Line";
         SalesLine2: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
-        VATPostingSetup: Record "VAT Posting Setup";
         CustLedgerEntry: Record "Cust. Ledger Entry";
         InStream: InStream;
         OriginalStr: Text;
@@ -1950,12 +1949,12 @@
         Initialize();
 
         // [GIVEN] Posted Sales invoice with two lines of different VAT identifiers and VAT = 16%
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         UpdateCustomerSATPaymentFields(Customer."No.");
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.", CreatePaymentMethodForSAT());
-        CreateSalesLineItem(SalesLine1, SalesHeader, CreateItem, 1, 0, 16, false, false);
+        CreateSalesLineItem(SalesLine1, SalesHeader, CreateItem(), 1, 0, 16, false, false);
         CreateSalesLineItemWithVATSetup(
-          SalesLine2, SalesHeader, CreateItem,
+          SalesLine2, SalesHeader, CreateItem(),
           CreateVATPostingSetup(SalesHeader."VAT Bus. Posting Group", 16, false, false), 1, LibraryRandom.RandIntInRange(100, 200), 0);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
 
@@ -2125,19 +2124,19 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 407.51 "USD" / 8150.20 MXN with Exch. Rate = 20
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         Customer.Validate("Currency Code",
-          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate - 1, 1 / 20, 1 / 20));
+          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate() - 1, 1 / 20, 1 / 20));
         Customer.Modify(true);
         UpdateCustomerSATPaymentFields(Customer."No.");
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
-        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem, 1, 0, 16, false, false);
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), 1, 0, 16, false, false);
         SalesLine.Validate("Unit Price", 351.3);
         SalesLine.Modify(true);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
 
         // [GIVEN] Payment with amount of -407.51 USD/ 8476.21 MXN with Exch. Rate = 20.8 is applied to the invoice
-        LibraryERM.CreateExchangeRate(Customer."Currency Code", WorkDate, 1 / 20.8, 1 / 20.8);
+        LibraryERM.CreateExchangeRate(Customer."Currency Code", WorkDate(), 1 / 20.8, 1 / 20.8);
         PaymentNo :=
           CreatePostPayment(
             SalesInvoiceHeader."Sell-to Customer No.", SalesInvoiceHeader."No.",
@@ -2149,7 +2148,7 @@
 
         // [THEN] 'Pagos/Totales' node has attribute 'MontoTotalPagos' = 8150.20
         // [THEN] 'Complemento' node created with attribute 'MonedaP' = 'USD', 'TipoCambioP' = 20.800005
-        // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 407.51 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1 (TFS 503112)
+        // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 407.51 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000
         // [THEN] TrasladoP nose has attributes BaseP = 351.300000, ImporteP = 56.210000
         InitXMLReaderForPagos20(FileName);
         CustLedgerEntry.CalcFields("Original String");
@@ -2160,7 +2159,7 @@
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
           8476.21, Customer."Currency Code", '20.800005',
-          407.51, Customer."Currency Code", '1', 407.51, 29);
+          407.51, Customer."Currency Code", '1.0000000000', 407.51, 29);
         VerifyComplementoPagoTrasladoP(OriginalStr, 49, 351.3, 56.21, 0.16, 0);
     end;
 
@@ -2184,7 +2183,7 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice in LCY has line 1 of Amount = 4000 and VAT Amount = 640 and line 2 of Amount = 900 with VAT exempt
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         UpdateCustomerSATPaymentFields(Customer."No.");
         CreateSalesHeaderForCustomer(
           SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
@@ -2198,7 +2197,7 @@
         PaymentNo :=
           CreatePostPaymentFCY(
             SalesInvoiceHeader."Sell-to Customer No.", -615.62, -5540.0,
-            LibraryERM.CreateCurrencyWithExchangeRate(WorkDate, 1 / 8.999058, 1 / 8.999058));
+            LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), 1 / 8.999058, 1 / 8.999058));
         LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, CustLedgerEntry."Document Type"::Payment, PaymentNo);
         LibraryERM.ApplyCustomerLedgerEntries(
           CustLedgerEntry."Document Type"::Payment, CustLedgerEntry."Document Type"::Invoice,
@@ -2245,13 +2244,13 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 407.51 in foreign currency "USD" with Exch. Rate = 20
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         Customer.Validate("Currency Code",
-          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate, 1 / 20, 1 / 20));
+          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), 1 / 20, 1 / 20));
         Customer.Modify(true);
         UpdateCustomerSATPaymentFields(Customer."No.");
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
-        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem, 1, 0, 16, false, false);
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), 1, 0, 16, false, false);
         SalesLine.Validate("Unit Price", 351.3);
         SalesLine.Modify(true);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
@@ -2268,7 +2267,7 @@
 
         // [THEN] 'Pagos/Totales' node has attribute 'MontoTotalPagos' = 8150.20
         // [THEN] 'Complemento' node created with attribute 'MonedaP' = 'USD', 'TipoCambioP' = 20.000000
-        // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 407.51 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1 (TFS 503112)
+        // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 407.51 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000
         // [THEN] TrasladoP nose has attributes BaseP = 351.300000, ImporteP = 56.210000
         InitXMLReaderForPagos20(FileName);
         CustLedgerEntry.CalcFields("Original String");
@@ -2279,7 +2278,7 @@
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
           8150.2, Customer."Currency Code", '20.000000',
-          407.51, Customer."Currency Code", '1', 407.51, 29);
+          407.51, Customer."Currency Code", '1.0000000000', 407.51, 29);
         VerifyComplementoPagoTrasladoP(OriginalStr, 49, 351.3, 56.21, 0.16, 0);
     end;
 
@@ -2303,13 +2302,13 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 205.80 in USD / 1852.01 MXN with Exch. Rate = 20
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         Customer.Validate("Currency Code",
-          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate, 1 / 8.999077, 1 / 8.999077));
+          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), 1 / 8.999077, 1 / 8.999077));
         Customer.Modify(true);
         UpdateCustomerSATPaymentFields(Customer."No.");
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
-        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem, 1, 0, 16, false, false);
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), 1, 0, 16, false, false);
         SalesLine.Validate("Unit Price", 177.41);
         SalesLine.Modify(true);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
@@ -2326,7 +2325,7 @@
 
         // [THEN] 'Pagos/Totales' node has attribute 'MontoTotalPagos' = 1852.01
         // [THEN] 'Complemento' node created with attribute 'MonedaP' = 'USD', 'TipoCambioP' = 8.999077
-        // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 205.80 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1 (TFS 503112)
+        // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 205.80 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000
         // [THEN] TrasladoP nose has attributes BaseP = 177.410000, ImporteP = 28.390000
         InitXMLReaderForPagos20(FileName);
         CustLedgerEntry.CalcFields("Original String");
@@ -2337,7 +2336,7 @@
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
           1852.01, Customer."Currency Code", '8.999077',
-          205.8, Customer."Currency Code", '1', 205.8, 29);
+          205.8, Customer."Currency Code", '1.0000000000', 205.8, 29);
         VerifyComplementoPagoTrasladoP(OriginalStr, 49, 177.41, 28.39, 0.16, 0);
     end;
 
@@ -2362,32 +2361,32 @@
         Initialize();
 
         // [GIVEN] Four posted Sales Invoices with "Amount Including VAT" = 14112.63, 48678.02, 11895.48, 125064.24, VAT% = 16
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         UpdateCustomerSATPaymentFields(Customer."No.");
         VATProdPostingGroup := CreateVATPostingSetup(Customer."VAT Bus. Posting Group", 16, false, false);
 
         PaymentNo := CreatePostPayment(Customer."No.", '', -199750.37, '');
 
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
-        CreateSalesLineItemWithVATSetup(SalesLine, SalesHeader, CreateItem, VATProdPostingGroup, 1, 12166.06, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine, SalesHeader, CreateItem(), VATProdPostingGroup, 1, 12166.06, 0);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
         LibraryERM.ApplyCustomerLedgerEntries(
           CustLedgerEntry."Document Type"::Payment, CustLedgerEntry."Document Type"::Invoice, PaymentNo, SalesInvoiceHeader."No.");
 
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
-        CreateSalesLineItemWithVATSetup(SalesLine, SalesHeader, CreateItem, VATProdPostingGroup, 1, 41963.81, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine, SalesHeader, CreateItem(), VATProdPostingGroup, 1, 41963.81, 0);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
         LibraryERM.ApplyCustomerLedgerEntries(
           CustLedgerEntry."Document Type"::Payment, CustLedgerEntry."Document Type"::Invoice, PaymentNo, SalesInvoiceHeader."No.");
 
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
-        CreateSalesLineItemWithVATSetup(SalesLine, SalesHeader, CreateItem, VATProdPostingGroup, 1, 10254.72, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine, SalesHeader, CreateItem(), VATProdPostingGroup, 1, 10254.72, 0);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
         LibraryERM.ApplyCustomerLedgerEntries(
           CustLedgerEntry."Document Type"::Payment, CustLedgerEntry."Document Type"::Invoice, PaymentNo, SalesInvoiceHeader."No.");
 
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
-        CreateSalesLineItemWithVATSetup(SalesLine, SalesHeader, CreateItem, VATProdPostingGroup, 1, 107814.0, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine, SalesHeader, CreateItem(), VATProdPostingGroup, 1, 107814.0, 0);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
         LibraryERM.ApplyCustomerLedgerEntries(
           CustLedgerEntry."Document Type"::Payment, CustLedgerEntry."Document Type"::Invoice, PaymentNo, SalesInvoiceHeader."No.");
@@ -2403,7 +2402,7 @@
         CustLedgerEntry."Original String".CreateInStream(InStream);
         InStream.ReadText(OriginalStr);
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
-        // [THEN] EquivalenciaDR = 1.0000000000 (TFS 503112)
+
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
           199750.37, 'MXN', '1',
@@ -2431,13 +2430,13 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with "Amount Including VAT" = 325.14 in foreign currency "USD"
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         UpdateCustomerSATPaymentFields(Customer."No.");
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
         SalesHeader.Validate(
-          "Currency Code", LibraryERM.CreateCurrencyWithExchangeRate(WorkDate, 1 / 8.9991, 1 / 8.9991));
+          "Currency Code", LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), 1 / 8.9991, 1 / 8.9991));
         SalesHeader.Modify(true);
-        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem, 1, 0, 16, false, false);
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), 1, 0, 16, false, false);
         SalesLine.Validate("Unit Price", 280.288);
         SalesLine.Modify(true);
         GetPostedSalesInvoice(SalesInvoiceHeader, LibrarySales.PostSalesDocument(SalesHeader, true, true));
@@ -2551,7 +2550,6 @@
         PaymentNo: Code[20];
         OriginalStr: Text;
         FileName: Text;
-        i: Integer;
     begin
         // [FEATURE] [Payment]
         // [SCENARIO 466899] Request stamp for FCY payment applied to six FCY invoices having 'correction of remaining amount' application entry
@@ -2601,7 +2599,7 @@
 
         // [THEN] 'Pagos/Totales' node has attribute 'MontoTotalPagos' = 688345.24
         // [THEN] 'Pagos/Pago' node created with attribute 'MonedaP' = 'USD', 'TipoCambioP' = 1
-        // [THEN] 'Pagos/Pago/DoctoRelacionado' node has attributes 'Monto' = 35319.68, 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000 (TFS 503112)
+        // [THEN] 'Pagos/Pago/DoctoRelacionado' node has attributes 'Monto' = 35319.68, 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000
         // [THEN] TrasladoP nose has attributes BaseP = 30448.000000, ImpuestoP = 4871.680000
         InitXMLReaderForPagos20(FileName);
         CustLedgerEntry.CalcFields("Original String");
@@ -3166,7 +3164,7 @@
     begin
         // [FEATURE] [Sales] [Rounding] [RoundingModel 1]
         // [SCENARIO 446557] Request Stamp for Sales Invoice USD line having decimal price
-        Initialize;
+        Initialize();
 
         // [GIVEN] Posted Sales Invoice USD Qty = 1, Unit price = 444.489
         Customer.Get(CreateCustomer());
@@ -3275,7 +3273,7 @@
         VerifyTotalImpuestos(
           OriginalStr, 'TotalImpuestosTrasladados', 2362.36, 87);
 
-        LibraryVariableStorage.AssertEmpty;
+        LibraryVariableStorage.AssertEmpty();
     end;
 
     [Test]
@@ -3293,16 +3291,16 @@
     begin
         // [FEATURE] [Sales] [Rounding]
         // [SCENARIO 472193] Request Stamp for Sales Invoice with three lines
-        Initialize;
+        Initialize();
 
         // [GIVEN] Posted Sales Invoice with next Qty/Unit price.
         // [GIVEN] Line 1: 1796.256/ 7.44, Line 2: 771.12/ 5.70, Line 3: 680.4/ 4.35
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         VATProdPostingGroup := CreateVATPostingSetup(Customer."VAT Bus. Posting Group", 16, false, false);
-        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT);
-        CreateSalesLineItemWithVATSetup(SalesLine[1], SalesHeader, CreateItem, VATProdPostingGroup, 1796.256, 7.44, 0);
-        CreateSalesLineItemWithVATSetup(SalesLine[2], SalesHeader, CreateItem, VATProdPostingGroup, 771.12, 5.7, 0);
-        CreateSalesLineItemWithVATSetup(SalesLine[3], SalesHeader, CreateItem, VATProdPostingGroup, 680.4, 4.35, 0);
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
+        CreateSalesLineItemWithVATSetup(SalesLine[1], SalesHeader, CreateItem(), VATProdPostingGroup, 1796.256, 7.44, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine[2], SalesHeader, CreateItem(), VATProdPostingGroup, 771.12, 5.7, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine[3], SalesHeader, CreateItem(), VATProdPostingGroup, 680.4, 4.35, 0);
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
         SalesInvoiceHeader.CalcFields("Original String", "Original Document XML", Amount, "Amount Including VAT");
 
@@ -3313,8 +3311,8 @@
         RequestStamp(
           DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
         UnbindSubscription(MXCFDI);
-        NameValueBuffer.Delete;
-        SalesInvoiceHeader.Find;
+        NameValueBuffer.Delete();
+        SalesInvoiceHeader.Find();
         SalesInvoiceHeader.CalcFields("Original String", "Original Document XML", "Signed Document XML");
 
         InitXMLReaderForSalesDocumentCFDI(SalesInvoiceHeader, SalesInvoiceHeader.FieldNo("Original Document XML"));
@@ -3365,7 +3363,7 @@
 
         // [GIVEN] Posted Sales Invoice where CFDI Relation Documents has Fiscal Invoice Numbers "UUID1", "UUID2", "UUID3" for CFDI Relation = '04'
         SalesInvoiceHeader.Get(
-          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
 
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         SalesInvoiceLine.FindFirst();
@@ -3376,7 +3374,7 @@
         for i := 1 to ArrayLen(CFDIRelationDocument) do
             CreateCFDIRelationDocument(
               CFDIRelationDocument[i], DATABASE::"Sales Invoice Header", 0, SalesInvoiceHeader."No.",
-              SalesInvoiceHeader."Bill-to Customer No.", LibraryUtility.GenerateGUID, LibraryUtility.GenerateGUID());
+              SalesInvoiceHeader."Bill-to Customer No.", LibraryUtility.GenerateGUID(), LibraryUtility.GenerateGUID());
 
         // [WHEN] Request Stamp for the Sales Invoice
         RequestStamp(
@@ -3432,7 +3430,7 @@
 
         // [GIVEN] Posted and stamped Sales Invoice with Fiscal Invoice Number = "UUID-Inv"
         SalesInvoiceHeader.Get(
-          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
         RequestStamp(
           DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
         SalesInvoiceHeader.Find();
@@ -3488,7 +3486,7 @@
 
         // [GIVEN] Posted and stamped Sales Invoice with Fiscal Invoice Number = "UUID-Inv"
         SalesInvoiceHeader.Get(
-          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
         RequestStamp(
           DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
         SalesInvoiceHeader.Find();
@@ -3501,7 +3499,7 @@
         for i := 1 to ArrayLen(CFDIRelationDocument) do
             CreateCFDIRelationDocument(
               CFDIRelationDocument[i], DATABASE::"Sales Cr.Memo Header", 0, SalesCrMemoHeader."No.",
-              SalesCrMemoHeader."Bill-to Customer No.", LibraryUtility.GenerateGUID, LibraryUtility.GenerateGUID());
+              SalesCrMemoHeader."Bill-to Customer No.", LibraryUtility.GenerateGUID(), LibraryUtility.GenerateGUID());
 
         // [WHEN] Request Stamp for the Credit Memo
         RequestStamp(
@@ -3608,7 +3606,7 @@
 
         // [GIVEN] Posted and stamped Sales Invoice with Fiscal Invoice Number = "UUID-Inv"
         SalesInvoiceHeader.Get(
-          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
         RequestStamp(
           DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
         SalesInvoiceHeader.Find();
@@ -3621,7 +3619,7 @@
         for i := 1 to ArrayLen(CFDIRelationDocument) do
             CreateCFDIRelationDocument(
               CFDIRelationDocument[i], DATABASE::"Sales Cr.Memo Header", 0, SalesCrMemoHeader."No.",
-              SalesCrMemoHeader."Bill-to Customer No.", LibraryUtility.GenerateGUID, LibraryUtility.GenerateGUID());
+              SalesCrMemoHeader."Bill-to Customer No.", LibraryUtility.GenerateGUID(), LibraryUtility.GenerateGUID());
         // [GIVEN] CFDI Relation Documents has Sales Invoice with "UUID-Inv"
         CreateCFDIRelationDocument(
           CFDIRelationDocumentInv, DATABASE::"Sales Cr.Memo Header", 0, SalesCrMemoHeader."No.",
@@ -3673,7 +3671,7 @@
 
         // [GIVEN] Posted and stamped Service Invoice with Fiscal Invoice Number = "UUID-Inv"
         ServiceInvoiceHeader.Get(
-          CreateAndPostServiceDoc(ServiceHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostServiceDoc(ServiceHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
         RequestStamp(
           DATABASE::"Service Invoice Header", ServiceInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
         ServiceInvoiceHeader.Find();
@@ -3686,7 +3684,7 @@
         for i := 1 to ArrayLen(CFDIRelationDocument) do
             CreateCFDIRelationDocument(
               CFDIRelationDocument[i], DATABASE::"Service Cr.Memo Header", 0, ServiceCrMemoHeader."No.",
-              ServiceCrMemoHeader."Bill-to Customer No.", LibraryUtility.GenerateGUID, LibraryUtility.GenerateGUID());
+              ServiceCrMemoHeader."Bill-to Customer No.", LibraryUtility.GenerateGUID(), LibraryUtility.GenerateGUID());
 
         // [WHEN] Request Stamp for the Credit Memo
         RequestStamp(
@@ -3736,7 +3734,7 @@
 
         // [GIVEN] Posted and stamped Service Invoice with Fiscal Invoice Number = "UUID-Inv"
         ServiceInvoiceHeader.Get(
-          CreateAndPostServiceDoc(ServiceHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostServiceDoc(ServiceHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
         RequestStamp(
           DATABASE::"Service Invoice Header", ServiceInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
         ServiceInvoiceHeader.Find();
@@ -3749,7 +3747,7 @@
         for i := 1 to ArrayLen(CFDIRelationDocument) do
             CreateCFDIRelationDocument(
               CFDIRelationDocument[i], DATABASE::"Service Cr.Memo Header", 0, ServiceCrMemoHeader."No.",
-              ServiceCrMemoHeader."Bill-to Customer No.", LibraryUtility.GenerateGUID, LibraryUtility.GenerateGUID());
+              ServiceCrMemoHeader."Bill-to Customer No.", LibraryUtility.GenerateGUID(), LibraryUtility.GenerateGUID());
         // [GIVEN] CFDI Relation Documents has Service Invoice with "UUID-Inv"
         CreateCFDIRelationDocument(
           CFDIRelationDocumentInv, DATABASE::"Service Cr.Memo Header", 0, ServiceCrMemoHeader."No.",
@@ -3857,7 +3855,7 @@
         TableNo := DATABASE::"Sales Invoice Header";
 
         // [GIVEN] Sales Invoice has 'Ship-To City' and 'Ship-to Post Code' with Time Zone offset = 2h
-        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
@@ -3890,7 +3888,7 @@
         TableNo := DATABASE::"Sales Cr.Memo Header";
 
         // [GIVEN] Sales Credit memo has 'Sell-To City' and 'Sell-to Post Code' with Time Zone offset = 2h
-        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, SalesCrMemoHeader.FieldNo("No."), DocumentNo,
@@ -3923,7 +3921,7 @@
         TableNo := DATABASE::"Service Invoice Header";
 
         // [GIVEN] Service Invoice has 'Bill-To City' and 'Bill-to Post Code' with Time Zone offset = 2h
-        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, ServiceInvoiceHeader.FieldNo("No."), DocumentNo,
@@ -3956,7 +3954,7 @@
         TableNo := DATABASE::"Service Cr.Memo Header";
 
         // [GIVEN] Service Credit Memo  has Customer with Post Code of Time Zone offset = 2h
-        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, ServiceCrMemoHeader.FieldNo("No."), DocumentNo,
@@ -3990,7 +3988,7 @@
         Initialize();
 
         // [GIVEN] Sales Invoice
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
 
         // [GIVEN] Applied Payment has Customer with Post Code of Time Zone offset = 2h
@@ -4028,7 +4026,7 @@
         TableNo := DATABASE::"Sales Invoice Header";
 
         // [GIVEN] Stamped Sales Invoice has 'Ship-To City' and 'Ship-to Post Code' with Time Zone offset = 2h
-        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         UpdateDocumentFieldValue(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
           SalesInvoiceHeader.FieldNo("Electronic Document Status"), SalesInvoiceHeader."Electronic Document Status"::"Stamp Received");
@@ -4063,7 +4061,7 @@
         Initialize();
 
         // [GIVEN] Sales Invoice
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
 
         // [GIVEN] Applied and stamped Payment has Customer with Post Code of Time Zone offset = 2h
@@ -4104,7 +4102,7 @@
         TableNo := DATABASE::"Sales Invoice Header";
 
         // [GIVEN] Stamped Sales Invoice has 'Ship-To City' and 'Ship-to Post Code' with Time Zone offset = 2h
-        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         UpdateDocumentFieldValue(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
           SalesInvoiceHeader.FieldNo("Electronic Document Status"), SalesInvoiceHeader."Electronic Document Status"::"Stamp Received");
@@ -4139,7 +4137,7 @@
         Initialize();
 
         // [GIVEN] Sales Invoice
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
 
         // [GIVEN] Applied and stamped Payment has Customer with Post Code of Time Zone offset = 2h
@@ -4183,10 +4181,10 @@
         GeneralLedgerSetup.Modify();
 
         // [GIVEN] Posted Sales Invoice
-        DocumentNo := CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT());
 
         // [WHEN] Request Stamp Sales Invoice
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(DATABASE::"Sales Invoice Header", DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
 
@@ -4225,10 +4223,10 @@
         CompanyInformation.Modify();
 
         // [GIVEN] Posted Sales Invoice
-        DocumentNo := CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT());
 
         // [WHEN] Request Stamp Sales Invoice
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(DATABASE::"Sales Invoice Header", DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
 
@@ -4275,10 +4273,10 @@
         PACWebServiceDetail.DeleteAll();
 
         // [GIVEN] Posted Sales Invoice
-        DocumentNo := CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT());
 
         // [WHEN] Request Stamp Sales Invoice
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(DATABASE::"Sales Invoice Header", DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
 
@@ -4317,10 +4315,10 @@
         PACWebServiceDetail.ModifyAll(Address, '');
 
         // [GIVEN] Posted Sales Invoice
-        DocumentNo := CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT());
 
         // [WHEN] Request Stamp Sales Invoice
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(DATABASE::"Sales Invoice Header", DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
 
@@ -4348,14 +4346,14 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice when Customer has blank values in "RFC No." and "Country/Region Code"
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         Customer.Get(SalesInvoiceHeader."Bill-to Customer No.");
         Customer."RFC No." := '';
         Customer."Country/Region Code" := '';
         Customer.Modify();
 
         // [WHEN] Request Stamp Sales Invoice
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(
             DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
@@ -4380,7 +4378,7 @@
 
         // [GIVEN] Posted Sales Invoice with blank fields "Document Date", "Payment Terms Code", "Payment Method Code",
         // [GIVEN] "Bill-to Address", "Bill-to Post Code", "CFDI Purpose", "CFDI Relation"
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         SalesInvoiceHeader."Document Date" := 0D;
         SalesInvoiceHeader."Payment Terms Code" := '';
         SalesInvoiceHeader."Payment Method Code" := '';
@@ -4391,7 +4389,7 @@
         SalesInvoiceHeader.Modify();
 
         // [WHEN] Request Stamp Sales Invoice
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(
             DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
@@ -4435,7 +4433,7 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice where SAT code is not specified for Payment Terms and Payment Methods
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         PaymentTerms.Get(SalesInvoiceHeader."Payment Terms Code");
         PaymentTerms."SAT Payment Term" := '';
         PaymentTerms.Modify();
@@ -4444,7 +4442,7 @@
         PaymentMethod.Modify();
 
         // [WHEN] Request Stamp Sales Invoice
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(
             DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
@@ -4471,7 +4469,7 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice has line with blank Description, "Unit Price", "Amount Including VAT", "Unit of Measure Code"
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         SalesInvoiceLine.FindFirst();
         SalesInvoiceLine.Description := '';
@@ -4481,7 +4479,7 @@
         SalesInvoiceLine.Modify();
 
         // [WHEN] Request Stamp Sales Invoice
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(
             DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
@@ -4518,7 +4516,7 @@
 
         // [GIVEN] Posted Sales Invoice has lines with type G/L Account
         // [GIVEN] Item and Unit Of Measure with blank SAT codes
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT));
+        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         SalesInvoiceLine.FindFirst();
         Item.Get(SalesInvoiceLine."No.");
@@ -4535,7 +4533,7 @@
         SalesInvoiceLineGL.Insert();
 
         // [WHEN] Request Stamp Sales Invoice
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(
             DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
@@ -4589,7 +4587,7 @@
         SalesInvoiceLine.FindSet();
 
         // [WHEN] Request Stamp Sales Invoice
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(
             DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
@@ -4701,7 +4699,7 @@
         SalesHeader.Get(
           SalesHeader."Document Type"::Invoice,
           CreateSalesDocForCustomerWithVAT(
-            SalesHeader."Document Type"::Invoice, CreateCustomer, CreatePaymentMethodForSAT, 0, false, false));
+            SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT(), 0, false, false));
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
 
         // [WHEN] Request Stamp for the Sales Invoice
@@ -4747,7 +4745,7 @@
         SalesHeader.Get(
           SalesHeader."Document Type"::Invoice,
           CreateSalesDocForCustomerWithVAT(
-            SalesHeader."Document Type"::Invoice, CreateCustomer, CreatePaymentMethodForSAT, 0, true, false));
+            SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT(), 0, true, false));
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
 
         // [WHEN] Request Stamp for the Sales Invoice
@@ -4786,7 +4784,7 @@
         SalesHeader.Get(
           SalesHeader."Document Type"::Invoice,
           CreateSalesDocForCustomerWithVAT(
-            SalesHeader."Document Type"::Invoice, CreateCustomer, CreatePaymentMethodForSAT, 0, false, true));
+            SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT(), 0, false, true));
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
 
         // [WHEN] Request Stamp for the Sales Invoice
@@ -4823,7 +4821,7 @@
         // [GIVEN] Posted Sales Invoice with two lines
         // [GIVEN] First line of Amount = 100, VAT Amount = 10, second line of Amount = 100, VAT Amount = 20
         CreateSalesHeaderForCustomer(
-          SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer, CreatePaymentMethodForSAT());
+          SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT());
         CreateSalesLineItem(
           SalesLine, SalesHeader, CreateItemWithPrice(LibraryRandom.RandIntInRange(100, 200)),
           1, 0, LibraryRandom.RandIntInRange(10, 15), false, false);
@@ -4902,7 +4900,7 @@
         SalesHeader.Get(
           SalesHeader."Document Type"::Invoice,
           CreateSalesDocForCustomerWithVAT(
-            SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT, 16, false, false));
+            SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT(), 16, false, false));
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.FindFirst();
@@ -4980,7 +4978,7 @@
         Customer.Modify(true);
         ServiceHeader.Get(
           ServiceHeader."Document Type"::Invoice,
-          CreateServiceDocForCustomer(ServiceHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT));
+          CreateServiceDocForCustomer(ServiceHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT()));
         ServiceLine.SetRange("Document Type", ServiceHeader."Document Type");
         ServiceLine.SetRange("Document No.", ServiceHeader."No.");
         ServiceLine.FindFirst();
@@ -5041,7 +5039,7 @@
 
         // [GIVEN] Posted Sales Invoice
         SalesInvoiceHeader.Get(
-          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
 
         // [WHEN] Export Electronic Document as PDF
         asserterror SalesInvoiceHeader.ExportEDocumentPDF();
@@ -5064,7 +5062,7 @@
 
         // [GIVEN] Posted Sales Credit Memo
         SalesCrMemoHeader.Get(
-          CreateAndPostSalesDoc(SalesHeader."Document Type"::"Credit Memo", CreatePaymentMethodForSAT));
+          CreateAndPostSalesDoc(SalesHeader."Document Type"::"Credit Memo", CreatePaymentMethodForSAT()));
 
         // [WHEN] Export Electronic Document as PDF
         asserterror SalesCrMemoHeader.ExportEDocumentPDF();
@@ -5087,7 +5085,7 @@
 
         // [GIVEN] Posted Service Invoice
         ServiceInvoiceHeader.Get(
-          CreateAndPostServiceDoc(ServiceHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostServiceDoc(ServiceHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
 
         // [WHEN] Export Electronic Document as PDF
         asserterror ServiceInvoiceHeader.ExportEDocumentPDF();
@@ -5110,7 +5108,7 @@
 
         // [GIVEN] Posted Service Credit Memo
         ServiceCrMemoHeader.Get(
-          CreateAndPostServiceDoc(ServiceHeader."Document Type"::"Credit Memo", CreatePaymentMethodForSAT));
+          CreateAndPostServiceDoc(ServiceHeader."Document Type"::"Credit Memo", CreatePaymentMethodForSAT()));
 
         // [WHEN] Export Electronic Document as PDF
         asserterror ServiceCrMemoHeader.ExportEDocumentPDF();
@@ -5135,7 +5133,7 @@
 
         // [GIVEN] Posted and stamped Sales Invoice
         SalesInvoiceHeader.Get(
-          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
         RequestStamp(
           DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
         SalesInvoiceHeader.Find();
@@ -5166,7 +5164,7 @@
 
         // [GIVEN] Posted and stamped Sales Credit Memo
         SalesCrMemoHeader.Get(
-          CreateAndPostSalesDoc(SalesHeader."Document Type"::"Credit Memo", CreatePaymentMethodForSAT));
+          CreateAndPostSalesDoc(SalesHeader."Document Type"::"Credit Memo", CreatePaymentMethodForSAT()));
         RequestStamp(
           DATABASE::"Sales Cr.Memo Header", SalesCrMemoHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
         SalesCrMemoHeader.Find();
@@ -5197,7 +5195,7 @@
 
         // [GIVEN] Posted and stamped Service Invoice
         ServiceInvoiceHeader.Get(
-          CreateAndPostServiceDoc(ServiceHeader."Document Type"::Invoice, CreatePaymentMethodForSAT));
+          CreateAndPostServiceDoc(ServiceHeader."Document Type"::Invoice, CreatePaymentMethodForSAT()));
         RequestStamp(
           DATABASE::"Service Invoice Header", ServiceInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
         ServiceInvoiceHeader.Find();
@@ -5228,7 +5226,7 @@
 
         // [GIVEN] Posted and stamped Service Credit Memo
         ServiceCrMemoHeader.Get(
-          CreateAndPostServiceDoc(ServiceHeader."Document Type"::"Credit Memo", CreatePaymentMethodForSAT));
+          CreateAndPostServiceDoc(ServiceHeader."Document Type"::"Credit Memo", CreatePaymentMethodForSAT()));
         RequestStamp(
           DATABASE::"Service Cr.Memo Header", ServiceCrMemoHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
         ServiceCrMemoHeader.Find();
@@ -5260,7 +5258,7 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with fixed asset "FA"
-        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer, CreatePaymentMethodForSAT);
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT());
         FANo := CreateSalesLineFixedAsset(SalesHeader, 0, false, false);
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
 
@@ -5297,7 +5295,7 @@
         Initialize();
 
         // [GIVEN] Posted Sales Credit Memo with fixed asset "FA"
-        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::"Credit Memo", CreateCustomer, CreatePaymentMethodForSAT);
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::"Credit Memo", CreateCustomer(), CreatePaymentMethodForSAT());
         FANo := CreateSalesLineFixedAsset(SalesHeader, 0, false, false);
         MockFADisposalEntry(FANo);
         SalesCrMemoHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
@@ -5336,8 +5334,8 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice with G/L Account line "GLAcc"
-        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer, CreatePaymentMethodForSAT);
-        GLAccount.Get(LibraryERM.CreateGLAccountWithSalesSetup);
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT());
+        GLAccount.Get(LibraryERM.CreateGLAccountWithSalesSetup());
         GLAccount."SAT Classification Code" := LibraryUtility.GenerateRandomCode(GLAccount.FieldNo("SAT Classification Code"), DATABASE::"G/L Account");
         GLAccount.Modify(true);
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::"G/L Account", GLAccount."No.", 1);
@@ -5360,7 +5358,7 @@
 
         // [THEN] 'Concepto' node has attributes 'ClaveProdServ' = SAT Classification Code of the G/L Account, 'NoIdentificacion' = "GLAcc", 'ClaveUnidad' = 'E48'
         // [THEN] String for digital stamp has 'ClaveProdServ' = SAT Classification Code of theG/L Account, 'NoIdentificacion' = "GLAcc", 'ClaveUnidad' = 'E48'
-        VerifyCFDIConceptoFields(OriginalStr, GLAccount."No.", SATUtilities.GetSATUnitOfMeasureGLAccount, 1);
+        VerifyCFDIConceptoFields(OriginalStr, GLAccount."No.", SATUtilities.GetSATUnitOfMeasureGLAccount(), 1);
     end;
 
     [Test]
@@ -5384,7 +5382,7 @@
         NameValueBuffer.ID := CODEUNIT::"MX CFDI";
         NameValueBuffer.Name := '20 16 1742 0001871'; // value for signed string is separated with 1 space
         NameValueBuffer.Value := '20  16  1742  0001871'; // formatted as 2/2/4/7 digits separated with 2 spaces
-        NameValueBuffer.Insert;
+        NameValueBuffer.Insert();
 
         // [WHEN] Request Stamp for the Sales Invoice with NumeroPedimento
         BindSubscription(MXCFDI);
@@ -5577,9 +5575,9 @@
         // [GIVEN] Retention Line with Amount = -100, Retention VAT % = 10
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT());
         CreateSalesLineItem(
-          SalesLine, SalesHeader, CreateItem, LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
+          SalesLine, SalesHeader, CreateItem(), LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
         CreateSalesLineItem(
-          SalesLineRetention, SalesHeader, CreateItem, -LibraryRandom.RandIntInRange(1, 10), 0, 0, false, false);
+          SalesLineRetention, SalesHeader, CreateItem(), -LibraryRandom.RandIntInRange(1, 10), 0, 0, false, false);
         SalesLineRetention."Retention Attached to Line No." := SalesLine."Line No.";
         SalesLineRetention."Retention VAT %" := LibraryRandom.RandIntInRange(10, 16);
         SalesLineRetention.Modify();
@@ -5642,9 +5640,9 @@
         // [GIVEN] Retention Line with Amount = -100, Retention VAT % = 10
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::"Credit Memo", CreateCustomer(), CreatePaymentMethodForSAT());
         CreateSalesLineItem(
-          SalesLine, SalesHeader, CreateItem, LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
+          SalesLine, SalesHeader, CreateItem(), LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
         CreateSalesLineItem(
-          SalesLineRetention, SalesHeader, CreateItem, -LibraryRandom.RandIntInRange(1, 10), 0, 0, false, false);
+          SalesLineRetention, SalesHeader, CreateItem(), -LibraryRandom.RandIntInRange(1, 10), 0, 0, false, false);
         SalesLineRetention."Retention Attached to Line No." := SalesLine."Line No.";
         SalesLineRetention."Retention VAT %" := LibraryRandom.RandIntInRange(10, 16);
         SalesLineRetention.Modify();
@@ -5708,7 +5706,7 @@
         // [GIVEN] Retention Line 1 with Amount = -7800, Retention VAT % = 10
         // [GIVEN] Retention Line 2 with Amount = -8319.948, Retention VAT % = 10.6666
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT());
-        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem, 1, 0, 16, false, false);
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), 1, 0, 16, false, false);
         SalesLine.Validate("Unit Price", 78000);
         SalesLine.Modify(true);
         CreateRetentionSalesLine(
@@ -5789,7 +5787,7 @@
         // [GIVEN] First line has Amount = 500, VAT Amount = 80, Quantity = 1
         // [GIVEN] First line has Amount = 1000, VAT Amount = 160, Quantity = 0
         CreateSalesHeaderForCustomer(
-          SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer, CreatePaymentMethodForSAT());
+          SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT());
         CreateSalesLineItem(
           SalesLine, SalesHeader, CreateItemWithPrice(LibraryRandom.RandIntInRange(100, 200)), 1, 0, 16, false, false);
         SalesLine.Validate(Quantity, 0);
@@ -5921,7 +5919,7 @@
         // [WHEN] Request Stamp for the Sales Invoice
         RequestStamp(
           DATABASE::"Sales Invoice Header", SalesInvoiceHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
-        SalesInvoiceHeader.Find;
+        SalesInvoiceHeader.Find();
         SalesInvoiceHeader.CalcFields("Original String", "Original Document XML", Amount, "Amount Including VAT");
 
         InitXMLReaderForSalesDocumentCCE(SalesInvoiceHeader, SalesInvoiceHeader.FieldNo("Original Document XML"));
@@ -5971,9 +5969,9 @@
         // [GIVEN] Line 1: item1/ qty = 2, price = 13, VAT = 0
         // [GIVEN] Line 2: item2/ qty = 4, price = 15, VAT = 0
         // [GIVEN] USD exchange rate = 17.825200
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         Customer.Validate("Currency Code",
-          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate, 1 / 17.6723, 1 / 17.6723));
+          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), 1 / 17.6723, 1 / 17.6723));
         Customer.Modify(true);
         CreateSalesHeaderForCustomer(
           SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
@@ -5982,9 +5980,9 @@
         UpdateSalesHeaderForeignTrade(SalesHeader);
 
         VATProdPostingGroup := CreateVATPostingSetup(Customer."VAT Bus. Posting Group", 0, false, false);
-        CreateSalesLineItemWithVATSetup(SalesLine1, SalesHeader, CreateItem, VATProdPostingGroup, 2, 13, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine1, SalesHeader, CreateItem(), VATProdPostingGroup, 2, 13, 0);
         UpdateSalesLineForeingTrade(SalesLine1);
-        CreateSalesLineItemWithVATSetup(SalesLine2, SalesHeader, CreateItem, VATProdPostingGroup, 4, 15, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine2, SalesHeader, CreateItem(), VATProdPostingGroup, 4, 15, 0);
         UpdateSalesLineForeingTrade(SalesLine2);
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
 
@@ -6031,9 +6029,9 @@
         // [GIVEN] Line 1: item1/ qty = 2, price = 13, VAT = 16
         // [GIVEN] Line 2: item2/ qty = 4, price = 15, VAT = 16
         // [GIVEN] USD exchange rate = 17.567300
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         Customer.Validate("Currency Code",
-          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate, 1 / 17.0, 1 / 17.0));
+          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), 1 / 17.0, 1 / 17.0));
         Customer.Modify(true);
         CreateSalesHeaderForCustomer(
           SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
@@ -6042,9 +6040,9 @@
         UpdateSalesHeaderForeignTrade(SalesHeader);
 
         VATProdPostingGroup := CreateVATPostingSetup(Customer."VAT Bus. Posting Group", 0, false, false);
-        CreateSalesLineItemWithVATSetup(SalesLine1, SalesHeader, CreateItem, VATProdPostingGroup, 2, 13, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine1, SalesHeader, CreateItem(), VATProdPostingGroup, 2, 13, 0);
         UpdateSalesLineForeingTrade(SalesLine1);
-        CreateSalesLineItemWithVATSetup(SalesLine2, SalesHeader, CreateItem, VATProdPostingGroup, 4, 15, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine2, SalesHeader, CreateItem(), VATProdPostingGroup, 4, 15, 0);
         UpdateSalesLineForeingTrade(SalesLine2);
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
 
@@ -6091,9 +6089,9 @@
         // [GIVEN] Line 1: item1/ qty = 2, price = 13, VAT = 0
         // [GIVEN] Line 2: item2/ qty = 4, price = 15, VAT = 0
         // [GIVEN] USD exchange rate = 17.567300
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         Customer.Validate("Currency Code",
-          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate, 1 / 20.0, 1 / 20.0));
+          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), 1 / 20.0, 1 / 20.0));
         Customer.Modify(true);
         CreateSalesHeaderForCustomer(
           SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
@@ -6102,9 +6100,9 @@
         UpdateSalesHeaderForeignTrade(SalesHeader);
 
         VATProdPostingGroup := CreateVATPostingSetup(Customer."VAT Bus. Posting Group", 0, false, false);
-        CreateSalesLineItemWithVATSetup(SalesLine1, SalesHeader, CreateItem, VATProdPostingGroup, 2, 13, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine1, SalesHeader, CreateItem(), VATProdPostingGroup, 2, 13, 0);
         UpdateSalesLineForeingTrade(SalesLine1);
-        CreateSalesLineItemWithVATSetup(SalesLine2, SalesHeader, CreateItem, VATProdPostingGroup, 4, 15, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine2, SalesHeader, CreateItem(), VATProdPostingGroup, 4, 15, 0);
         UpdateSalesLineForeingTrade(SalesLine2);
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
 
@@ -6151,9 +6149,9 @@
         // [GIVEN] Line 1: item/ qty = 2, price = 13, VAT = 0
         // [GIVEN] Line 2: item/ qty = 4, price = 15, VAT = 0
         // [GIVEN] USD exchange rate = 17.506300
-        Customer.Get(CreateCustomer);
+        Customer.Get(CreateCustomer());
         Customer.Validate("Currency Code",
-          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate, 1 / 18.6232, 1 / 18.6232));
+          LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), 1 / 18.6232, 1 / 18.6232));
         Customer.Modify(true);
         CreateSalesHeaderForCustomer(
           SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
@@ -6162,7 +6160,7 @@
         UpdateSalesHeaderForeignTrade(SalesHeader);
 
         VATProdPostingGroup := CreateVATPostingSetup(Customer."VAT Bus. Posting Group", 0, false, false);
-        CreateSalesLineItemWithVATSetup(SalesLine1, SalesHeader, CreateItem, VATProdPostingGroup, 2, 13, 0);
+        CreateSalesLineItemWithVATSetup(SalesLine1, SalesHeader, CreateItem(), VATProdPostingGroup, 2, 13, 0);
         UpdateSalesLineForeingTrade(SalesLine1);
         CreateSalesLineItemWithVATSetup(SalesLine2, SalesHeader, SalesLine1."No.", VATProdPostingGroup, 4, 15, 0);
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
@@ -6203,15 +6201,15 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice
-        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer, CreatePaymentMethodForSAT);
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT());
         CreateSalesLineItem(
-          SalesLine, SalesHeader, CreateItem, LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
+          SalesLine, SalesHeader, CreateItem(), LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
 
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
         SalesShipmentHeader.SetRange("Sell-to Customer No.", SalesHeader."Sell-to Customer No.");
         SalesShipmentHeader.FindFirst();
         // [GIVEN] Fixed Asset in Vehicle field has "SCT SCT Permission No." and "SCT Permission Type" blank
-        FixedAsset.Get(CreateVehicle);
+        FixedAsset.Get(CreateVehicle());
         FixedAsset."SCT Permission No." := '';
         FixedAsset."SCT Permission Type" := '';
         FixedAsset.Modify();
@@ -6219,7 +6217,7 @@
         SalesShipmentHeader.Modify();
 
         // [WHEN] Request Stamp for the Sales Shipment
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(
             DATABASE::"Sales Shipment Header", SalesShipmentHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
@@ -6236,10 +6234,10 @@
 
         // [THEN] Error Messages page shows error for blank values in "SCT Permission Type" and "SCT Permission No." (TFS 449447)
         ErrorMessages.FILTER.SetFilter("Record ID", Format(FixedAsset.RecordId));
-        ErrorMessages.First;
+        ErrorMessages.First();
         ErrorMessages.Description.AssertEquals(
           StrSubstNo(IfEmptyErr, FixedAsset.FieldCaption("SCT Permission Type"), FixedAsset.RecordId));
-        ErrorMessages.Next;
+        ErrorMessages.Next();
         ErrorMessages.Description.AssertEquals(
           StrSubstNo(IfEmptyErr, FixedAsset.FieldCaption("SCT Permission No."), FixedAsset.RecordId));
     end;
@@ -6311,7 +6309,7 @@
         CreateTransferShipment(TransferShipmentHeader, TransferLine, LocationFrom, LocationTo, Item."No.");
 
         // [WHEN] Request Stamp for the Transfer Shipment
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror
           RequestStamp(
             DATABASE::"Transfer Shipment Header", TransferShipmentHeader."No.", ResponseOption::Success, ActionOption::"Request Stamp");
@@ -6390,9 +6388,9 @@
 
         // [GIVEN] Posted Sales Invoice
         Customer.get(CreateCustomer());
-        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT);
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
         CreateSalesLineItem(
-          SalesLine, SalesHeader, CreateItem, LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
+          SalesLine, SalesHeader, CreateItem(), LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
         SalesShipmentHeader.SetRange("Sell-to Customer No.", SalesHeader."Sell-to Customer No.");
         SalesShipmentHeader.FindFirst();
@@ -6580,9 +6578,9 @@
         Initialize();
 
         // [GIVEN] Posted Sales Invoice
-        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer, CreatePaymentMethodForSAT);
+        CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT());
         CreateSalesLineItem(
-          SalesLine, SalesHeader, CreateItem, LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
+          SalesLine, SalesHeader, CreateItem(), LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
         SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
         SalesShipmentHeader.SetRange("Sell-to Customer No.", SalesHeader."Sell-to Customer No.");
         SalesShipmentHeader.FindFirst();
@@ -6714,7 +6712,7 @@
         PostCode: Record "Post Code";
     begin
         LibrarySetupStorage.Restore();
-        SetupPACService;
+        SetupPACService();
         LibraryVariableStorage.Clear();
 
         NameValueBuffer.SetRange(Name, Format(CODEUNIT::"MX CFDI"));
@@ -6722,16 +6720,16 @@
         if NameValueBuffer.Get(CODEUNIT::"MX CFDI") then
             NameValueBuffer.Delete();
         PostCode.ModifyAll("Time Zone", '');
-        SetupCompanyInformation;
+        SetupCompanyInformation();
         ClearLastError();
 
         if isInitialized then
             exit;
 
-        LibrarySales.SetCreditWarningsToNoWarnings;
+        LibrarySales.SetCreditWarningsToNoWarnings();
         LibrarySetupStorage.Save(DATABASE::"General Ledger Setup");
         LibrarySetupStorage.Save(DATABASE::"Company Information");
-        SATUtilities.PopulateSATInformation;
+        SATUtilities.PopulateSATInformation();
         isInitialized := true;
         Commit();
     end;
@@ -6760,7 +6758,7 @@
                     RecordRef.SetTable(SalesInvoiceHeader);
                     SalesInvoiceHeader."CFDI Cancellation Reason Code" := FindCancellationReasonCode(false);
                     SalesInvoiceHeader.Modify(true);
-                    SalesInvoiceHeader.CancelEDocument;
+                    SalesInvoiceHeader.CancelEDocument();
                 end;
             DATABASE::"Sales Cr.Memo Header":
                 begin
@@ -6770,7 +6768,7 @@
                     RecordRef.SetTable(SalesCrMemoHeader);
                     SalesCrMemoHeader."CFDI Cancellation Reason Code" := FindCancellationReasonCode(false);
                     SalesCrMemoHeader.Modify(true);
-                    SalesCrMemoHeader.CancelEDocument;
+                    SalesCrMemoHeader.CancelEDocument();
                 end;
             DATABASE::"Service Invoice Header":
                 begin
@@ -6780,7 +6778,7 @@
                     RecordRef.SetTable(ServiceInvoiceHeader);
                     ServiceInvoiceHeader."CFDI Cancellation Reason Code" := FindCancellationReasonCode(false);
                     ServiceInvoiceHeader.Modify(true);
-                    ServiceInvoiceHeader.CancelEDocument;
+                    ServiceInvoiceHeader.CancelEDocument();
                 end;
             DATABASE::"Service Cr.Memo Header":
                 begin
@@ -6790,7 +6788,7 @@
                     RecordRef.SetTable(ServiceCrMemoHeader);
                     ServiceCrMemoHeader."CFDI Cancellation Reason Code" := FindCancellationReasonCode(false);
                     ServiceCrMemoHeader.Modify(true);
-                    ServiceCrMemoHeader.CancelEDocument;
+                    ServiceCrMemoHeader.CancelEDocument();
                 end;
             DATABASE::"Cust. Ledger Entry":
                 begin
@@ -6800,7 +6798,7 @@
                     RecordRef.SetTable(CustLedgerEntry);
                     CustLedgerEntry."CFDI Cancellation Reason Code" := FindCancellationReasonCode(false);
                     CustLedgerEntry.Modify(true);
-                    CustLedgerEntry.CancelEDocument;
+                    CustLedgerEntry.CancelEDocument();
                 end;
             DATABASE::"Sales Shipment Header":
                 begin
@@ -6810,7 +6808,7 @@
                     RecordRef.SetTable(SalesShipmentHeader);
                     SalesShipmentHeader."CFDI Cancellation Reason Code" := FindCancellationReasonCode(false);
                     SalesShipmentHeader.Modify(true);
-                    SalesShipmentHeader.CancelEDocument;
+                    SalesShipmentHeader.CancelEDocument();
                 end;
             DATABASE::"Transfer Shipment Header":
                 begin
@@ -6820,7 +6818,7 @@
                     RecordRef.SetTable(TransferShipmentHeader);
                     TransferShipmentHeader."CFDI Cancellation Reason Code" := FindCancellationReasonCode(false);
                     TransferShipmentHeader.Modify(true);
-                    TransferShipmentHeader.CancelEDocument;
+                    TransferShipmentHeader.CancelEDocument();
                 end;
         end;
     end;
@@ -6922,12 +6920,12 @@
             DATABASE::"Sales Shipment Header":
                 begin
                     PostedDocumentNo := CreateAndPostSalesDoc(SalesHeader."Document Type"::Invoice, PaymentMethodCode);
-                    CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer, CreatePaymentMethodForSAT);
+                    CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer(), CreatePaymentMethodForSAT());
                     CreateSalesLineItem(
-                      SalesLine, SalesHeader, CreateItem, LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
+                      SalesLine, SalesHeader, CreateItem(), LibraryRandom.RandIntInRange(100, 200), 0, 0, false, false);
                     LibrarySales.PostSalesDocument(SalesHeader, true, true);
                     SalesShipmentHeader.SetRange("Sell-to Customer No.", SalesHeader."Sell-to Customer No.");
-                    SalesShipmentHeader.FindFirst;
+                    SalesShipmentHeader.FindFirst();
                     UpdateSalesShipmentForCartaPorte(SalesShipmentHeader);
                     PostedDocumentNo := SalesShipmentHeader."No.";
                 end;
@@ -6941,41 +6939,41 @@
         end;
     end;
 
-    local procedure CreateSalesDocWithPaymentMethodCode(DocumentType: Option; PaymentMethodCode: Code[10]): Code[20]
+    local procedure CreateSalesDocWithPaymentMethodCode(DocumentType: Enum "Sales Document Type"; PaymentMethodCode: Code[10]): Code[20]
     var
         SalesHeader: Record "Sales Header";
     begin
         SalesHeader.Get(
-          DocumentType, CreateSalesDocForCustomer(DocumentType, CreateCustomer, PaymentMethodCode));
+          DocumentType, CreateSalesDocForCustomer(DocumentType, CreateCustomer(), PaymentMethodCode));
         exit(SalesHeader."No.");
     end;
 
-    local procedure CreateSalesDocForCustomer(DocumentType: Option; CustomerNo: Code[20]; PaymentMethodCode: Code[10]): Code[20]
+    local procedure CreateSalesDocForCustomer(DocumentType: Enum "Sales Document Type"; CustomerNo: Code[20]; PaymentMethodCode: Code[10]): Code[20]
     begin
         exit(
           CreateSalesDocForCustomerWithVAT(DocumentType, CustomerNo, PaymentMethodCode, LibraryRandom.RandIntInRange(10, 20), false, false));
     end;
 
-    local procedure CreateSalesDocForCustomerWithVAT(DocumentType: Option; CustomerNo: Code[20]; PaymentMethodCode: Code[10]; VATPct: Decimal; IsVATExempt: Boolean; IsNoTaxable: Boolean): Code[20]
+    local procedure CreateSalesDocForCustomerWithVAT(DocumentType: Enum "Sales Document Type"; CustomerNo: Code[20]; PaymentMethodCode: Code[10]; VATPct: Decimal; IsVATExempt: Boolean; IsNoTaxable: Boolean): Code[20]
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
     begin
         CreateSalesHeaderForCustomer(SalesHeader, DocumentType, CustomerNo, PaymentMethodCode);
         CreateSalesLineItem(
-          SalesLine, SalesHeader, CreateItem, LibraryRandom.RandInt(10), 0, VATPct, IsVATExempt, IsNoTaxable);
+          SalesLine, SalesHeader, CreateItem(), LibraryRandom.RandInt(10), 0, VATPct, IsVATExempt, IsNoTaxable);
         exit(SalesHeader."No.");
     end;
 
-    local procedure CreateSalesHeaderForCustomer(var SalesHeader: Record "Sales Header"; DocumentType: Option; CustomerNo: Code[20]; PaymentMethodCode: Code[10]): Code[20]
+    local procedure CreateSalesHeaderForCustomer(var SalesHeader: Record "Sales Header"; DocumentType: Enum "Sales Document Type"; CustomerNo: Code[20]; PaymentMethodCode: Code[10]): Code[20]
     begin
         LibrarySales.CreateSalesHeader(SalesHeader, DocumentType, CustomerNo);
-        SalesHeader.Validate("Payment Terms Code", CreatePaymentTermsForSAT);
+        SalesHeader.Validate("Payment Terms Code", CreatePaymentTermsForSAT());
         SalesHeader.Validate("Payment Method Code", PaymentMethodCode);
         SalesHeader.Validate("Bill-to Address", SalesHeader."Sell-to Customer No.");
         SalesHeader.Validate("Bill-to Post Code", SalesHeader."Sell-to Customer No.");
-        SalesHeader.Validate("CFDI Purpose", CreateCFDIPurpose);
-        SalesHeader.Validate("CFDI Relation", CreateCFDIRelation);
+        SalesHeader.Validate("CFDI Purpose", CreateCFDIPurpose());
+        SalesHeader.Validate("CFDI Relation", CreateCFDIRelation());
         SalesHeader.Modify(true);
     end;
 
@@ -7019,13 +7017,13 @@
         exit(FADepreciationBook."FA No.");
     end;
 
-    local procedure CreateAndPostSalesDoc(DocumentType: Option; PaymentMethodCode: Code[10]) PostedDocumentNo: Code[20]
+    local procedure CreateAndPostSalesDoc(DocumentType: Enum "Sales Document Type"; PaymentMethodCode: Code[10]) PostedDocumentNo: Code[20]
     var
         SalesHeader: Record "Sales Header";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
+        NoSeries: Codeunit "No. Series";
     begin
         SalesHeader.Get(DocumentType, CreateSalesDocWithPaymentMethodCode(DocumentType, PaymentMethodCode));
-        PostedDocumentNo := NoSeriesManagement.GetNextNo(SalesHeader."Posting No. Series", WorkDate(), false);
+        PostedDocumentNo := NoSeries.PeekNextNo(SalesHeader."Posting No. Series");
         LibrarySales.PostSalesDocument(SalesHeader, true, true);
     end;
 
@@ -7037,7 +7035,7 @@
         SalesHeader.Get(
           SalesHeader."Document Type"::Invoice,
           CreateSalesDocForCustomerWithVAT(
-            SalesHeader."Document Type"::Invoice, CustomerNo, CreatePaymentMethodForSAT, 16, false, false));
+            SalesHeader."Document Type"::Invoice, CustomerNo, CreatePaymentMethodForSAT(), 16, false, false));
         SalesHeader.Modify(true);
         InvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
         LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, CustLedgerEntry."Document Type"::Invoice, InvoiceNo);
@@ -7060,7 +7058,7 @@
 
     local procedure CreateRetentionSalesLine(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; LineNo: Integer; Quantity: Decimal; BaseAmount: Decimal; RetentionVATPct: Decimal)
     begin
-        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem, Quantity, 0, 0, false, false);
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), Quantity, 0, 0, false, false);
         SalesLine.Validate("Retention Attached to Line No.", LineNo);
         SalesLine.Validate("Retention VAT %", RetentionVATPct);
         SalesLine.Validate("Unit Price", BaseAmount * RetentionVATPct / 100);
@@ -7073,65 +7071,65 @@
     begin
         SalesHeader.Get(
           SalesHeader."Document Type"::"Credit Memo",
-          CreateSalesDocForCustomer(SalesHeader."Document Type"::"Credit Memo", CustomerNo, CreatePaymentMethodForSAT));
+          CreateSalesDocForCustomer(SalesHeader."Document Type"::"Credit Memo", CustomerNo, CreatePaymentMethodForSAT()));
         SalesHeader.Validate("Applies-to Doc. Type", SalesHeader."Applies-to Doc. Type"::Invoice);
         SalesHeader.Validate("Applies-to Doc. No.", InvoiceNo);
         SalesHeader.Modify(true);
         exit(LibrarySales.PostSalesDocument(SalesHeader, true, true));
     end;
 
-    local procedure CreateServiceDocWithPaymentMethodCode(DocumentType: Option; PaymentMethodCode: Code[10]): Code[20]
+    local procedure CreateServiceDocWithPaymentMethodCode(DocumentType: Enum "Service Document Type"; PaymentMethodCode: Code[10]): Code[20]
     var
         ServiceHeader: Record "Service Header";
     begin
         ServiceHeader.Get(
-          DocumentType, CreateServiceDocForCustomer(DocumentType, CreateCustomer, PaymentMethodCode));
+          DocumentType, CreateServiceDocForCustomer(DocumentType, CreateCustomer(), PaymentMethodCode));
         exit(ServiceHeader."No.");
     end;
 
-    local procedure CreateServiceDocForCustomer(DocumentType: Option; CustomerNo: Code[20]; PaymentMethodCode: Code[10]): Code[20]
+    local procedure CreateServiceDocForCustomer(DocumentType: Enum "Service Document Type"; CustomerNo: Code[20]; PaymentMethodCode: Code[10]): Code[20]
     var
         ServiceHeader: Record "Service Header";
         ServiceLine: Record "Service Line";
     begin
         LibraryService.CreateServiceHeader(ServiceHeader, DocumentType, CustomerNo);
-        ServiceHeader.Validate("Payment Terms Code", CreatePaymentTermsForSAT);
+        ServiceHeader.Validate("Payment Terms Code", CreatePaymentTermsForSAT());
         ServiceHeader.Validate("Bill-to Address", ServiceHeader."Customer No.");
         ServiceHeader.Validate("Bill-to Post Code", ServiceHeader."Customer No.");
         ServiceHeader.Validate("Payment Method Code", PaymentMethodCode);
-        ServiceHeader.Validate("CFDI Purpose", CreateCFDIPurpose);
-        ServiceHeader.Validate("CFDI Relation", CreateCFDIRelation);
+        ServiceHeader.Validate("CFDI Purpose", CreateCFDIPurpose());
+        ServiceHeader.Validate("CFDI Relation", CreateCFDIRelation());
         ServiceHeader.Modify(true);
         LibraryService.CreateServiceLine(
-          ServiceLine, ServiceHeader, ServiceLine.Type::Item, CreateItem);
+          ServiceLine, ServiceHeader, ServiceLine.Type::Item, CreateItem());
         ServiceLine.Validate(Description, ServiceLine."No.");
         ServiceLine.Validate(Quantity, LibraryRandom.RandInt(10));
         ServiceLine.Modify(true);
         exit(ServiceHeader."No.");
     end;
 
-    local procedure CreateAndPostServiceDoc(DocumentType: Option; PaymentMethodCode: Code[10]) PostedDocumentNo: Code[20]
+    local procedure CreateAndPostServiceDoc(DocumentType: Enum "Service Document Type"; PaymentMethodCode: Code[10]) PostedDocumentNo: Code[20]
     var
         ServiceHeader: Record "Service Header";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
+        NoSeries: Codeunit "No. Series";
     begin
         ServiceHeader.Get(DocumentType, CreateServiceDocWithPaymentMethodCode(DocumentType, PaymentMethodCode));
-        PostedDocumentNo := NoSeriesManagement.GetNextNo(ServiceHeader."Posting No. Series", WorkDate(), false);
+        PostedDocumentNo := NoSeries.PeekNextNo(ServiceHeader."Posting No. Series");
         LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
     end;
 
     local procedure CreatePostApplyServiceCrMemo(CustomerNo: Code[20]; InvoiceNo: Code[20]) PostedDocumentNo: Code[20]
     var
         ServiceHeader: Record "Service Header";
-        NoSeriesManagement: Codeunit NoSeriesManagement;
+        NoSeries: Codeunit "No. Series";
     begin
         ServiceHeader.Get(
           ServiceHeader."Document Type"::"Credit Memo",
-          CreateServiceDocForCustomer(ServiceHeader."Document Type"::"Credit Memo", CustomerNo, CreatePaymentMethodForSAT));
+          CreateServiceDocForCustomer(ServiceHeader."Document Type"::"Credit Memo", CustomerNo, CreatePaymentMethodForSAT()));
         ServiceHeader.Validate("Applies-to Doc. Type", ServiceHeader."Applies-to Doc. Type"::Invoice);
         ServiceHeader.Validate("Applies-to Doc. No.", InvoiceNo);
         ServiceHeader.Modify(true);
-        PostedDocumentNo := NoSeriesManagement.GetNextNo(ServiceHeader."Posting No. Series", WorkDate(), false);
+        PostedDocumentNo := NoSeries.PeekNextNo(ServiceHeader."Posting No. Series");
         LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
     end;
 
@@ -7140,7 +7138,7 @@
         Customer: Record Customer;
     begin
         LibrarySales.CreateCustomer(Customer);
-        Customer.Validate("E-Mail", LibraryUtility.GenerateRandomEmail);
+        Customer.Validate("E-Mail", LibraryUtility.GenerateRandomEmail());
         Customer.Validate("RFC No.", GenerateString(12));  // Valid RFC No.
         Customer.Validate("Country/Region Code", GetCountryRegion());
         Customer."SAT Tax Regime Classification" :=
@@ -7232,7 +7230,7 @@
         TransferLine.Modify();
         LibraryInventory.CreateInventoryPostingSetup(
           InventoryPostingSetup, LocationInTransit.Code, TransferLine."Inventory Posting Group");
-        InventoryPostingSetup.Validate("Inventory Account", LibraryERM.CreateGLAccountNo);
+        InventoryPostingSetup.Validate("Inventory Account", LibraryERM.CreateGLAccountNo());
         InventoryPostingSetup.Modify(true);
         LibraryInventory.PostTransferHeader(TransferHeader, true, false);
         TransferShipmentHeader.SetRange("Transfer-from Code", LocationFrom.Code);
@@ -7408,7 +7406,7 @@
     begin
         LibraryERM.CreateVATProductPostingGroup(VATProductPostingGroup);
         LibraryERM.CreateVATPostingSetup(VATPostingSetup, VATBusPostingGroup, VATProductPostingGroup.Code);
-        VATPostingSetup.Validate("Sales VAT Account", LibraryERM.CreateGLAccountNo);
+        VATPostingSetup.Validate("Sales VAT Account", LibraryERM.CreateGLAccountNo());
         VATPostingSetup.Validate("VAT %", VATPct);
         VATPostingSetup.Validate("CFDI VAT Exemption", IsVATExempt);
         if IsVATExempt then
@@ -7425,10 +7423,10 @@
         Employee: Record Employee;
     begin
         Employee.Init();
-        Employee."No." := LibraryUtility.GenerateGUID;
-        Employee.Validate("First Name", LibraryUtility.GenerateGUID);
+        Employee."No." := LibraryUtility.GenerateGUID();
+        Employee.Validate("First Name", LibraryUtility.GenerateGUID());
         Employee.Validate("RFC No.", 'HEGJ820506M10');
-        Employee.Validate("License No.", LibraryUtility.GenerateGUID);
+        Employee.Validate("License No.", LibraryUtility.GenerateGUID());
         Employee.Insert();
         CFDITransportOperator.Init();
         CFDITransportOperator."Document Table ID" := TableID;
@@ -7490,7 +7488,7 @@
         end;
     end;
 
-    local procedure PostSalesDocBlankPaymentMethodCode(DocumentType: Option)
+    local procedure PostSalesDocBlankPaymentMethodCode(DocumentType: Enum "Sales Document Type")
     var
         SalesHeader: Record "Sales Header";
         DocumentNo: Code[20];
@@ -7506,7 +7504,7 @@
         Assert.ExpectedError(MissingSalesPaymentMethodCodeExceptionErr);
     end;
 
-    local procedure PostServiceDocBlankPaymentMethodCode(DocumentType: Option)
+    local procedure PostServiceDocBlankPaymentMethodCode(DocumentType: Enum "Service Document Type")
     var
         ServiceHeader: Record "Service Header";
         DocumentNo: Code[20];
@@ -7522,7 +7520,7 @@
         Assert.ExpectedError(MissingServicePaymentMethodCodeExceptionErr);
     end;
 
-    local procedure PostSalesDocBlankUnitOfMeasureCode(DocumentType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order")
+    local procedure PostSalesDocBlankUnitOfMeasureCode(DocumentType: Enum "Sales Document Type")
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
@@ -7531,7 +7529,7 @@
         // Setup
         SetupPACEnvironment(GLSetup."PAC Environment"::Test);
 
-        DocumentNo := CreateSalesDocWithPaymentMethodCode(DocumentType, CreatePaymentMethodForSAT);
+        DocumentNo := CreateSalesDocWithPaymentMethodCode(DocumentType, CreatePaymentMethodForSAT());
         SalesHeader.Get(DocumentType, DocumentNo);
 
         // Verify
@@ -7543,7 +7541,7 @@
         Assert.ExpectedError(MissingSalesUnitOfMeasureExcErr);
     end;
 
-    local procedure PostServiceDocBlankUnitOfMeasureCode(DocumentType: Option Quote,"Order",Invoice,"Credit Memo")
+    local procedure PostServiceDocBlankUnitOfMeasureCode(DocumentType: Enum "Service Document Type")
     var
         ServiceHeader: Record "Service Header";
         ServiceLine: Record "Service Line";
@@ -7552,7 +7550,7 @@
         // Setup
         SetupPACEnvironment(GLSetup."PAC Environment"::Test);
 
-        DocumentNo := CreateServiceDocWithPaymentMethodCode(DocumentType, CreatePaymentMethodForSAT);
+        DocumentNo := CreateServiceDocWithPaymentMethodCode(DocumentType, CreatePaymentMethodForSAT());
         ServiceHeader.Get(DocumentType, DocumentNo);
 
         ServiceLine.SetRange("Document Type", DocumentType);
@@ -7566,9 +7564,9 @@
 
     local procedure PostServiceDocument(var ServiceHeader: Record "Service Header") PostedDocumentNo: Code[20]
     var
-        NoSeriesManagement: Codeunit NoSeriesManagement;
+        NoSeries: Codeunit "No. Series";
     begin
-        PostedDocumentNo := NoSeriesManagement.GetNextNo(ServiceHeader."Posting No. Series", WorkDate(), false);
+        PostedDocumentNo := NoSeries.PeekNextNo(ServiceHeader."Posting No. Series");
         LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
     end;
 
@@ -7626,7 +7624,7 @@
                     TempBlob.ToRecordRef(RecordRef, SalesInvoiceHeader.FieldNo("Signed Document XML"));
                     RecordRef.SetTable(SalesInvoiceHeader);
                     SalesInvoiceHeader.Modify(true);
-                    SalesInvoiceHeader.RequestStampEDocument;
+                    SalesInvoiceHeader.RequestStampEDocument();
                 end;
             DATABASE::"Sales Cr.Memo Header":
                 begin
@@ -7635,7 +7633,7 @@
                     TempBlob.ToRecordRef(RecordRef, SalesCrMemoHeader.FieldNo("Signed Document XML"));
                     RecordRef.SetTable(SalesCrMemoHeader);
                     SalesCrMemoHeader.Modify(true);
-                    SalesCrMemoHeader.RequestStampEDocument;
+                    SalesCrMemoHeader.RequestStampEDocument();
                 end;
             DATABASE::"Service Invoice Header":
                 begin
@@ -7644,7 +7642,7 @@
                     TempBlob.ToRecordRef(RecordRef, ServiceInvoiceHeader.FieldNo("Signed Document XML"));
                     RecordRef.SetTable(ServiceInvoiceHeader);
                     ServiceInvoiceHeader.Modify(true);
-                    ServiceInvoiceHeader.RequestStampEDocument;
+                    ServiceInvoiceHeader.RequestStampEDocument();
                 end;
             DATABASE::"Service Cr.Memo Header":
                 begin
@@ -7653,7 +7651,7 @@
                     TempBlob.ToRecordRef(RecordRef, ServiceCrMemoHeader.FieldNo("Signed Document XML"));
                     RecordRef.SetTable(ServiceCrMemoHeader);
                     ServiceCrMemoHeader.Modify(true);
-                    ServiceCrMemoHeader.RequestStampEDocument;
+                    ServiceCrMemoHeader.RequestStampEDocument();
                 end;
             DATABASE::"Sales Shipment Header":
                 begin
@@ -7662,7 +7660,7 @@
                     TempBlob.ToRecordRef(RecordRef, SalesShipmentHeader.FieldNo("Signed Document XML"));
                     RecordRef.SetTable(SalesShipmentHeader);
                     SalesShipmentHeader.Modify(true);
-                    SalesShipmentHeader.RequestStampEDocument;
+                    SalesShipmentHeader.RequestStampEDocument();
                 end;
             DATABASE::"Transfer Shipment Header":
                 begin
@@ -7671,7 +7669,7 @@
                     TempBlob.ToRecordRef(RecordRef, TransferShipmentHeader.FieldNo("Signed Document XML"));
                     RecordRef.SetTable(TransferShipmentHeader);
                     TransferShipmentHeader.Modify(true);
-                    TransferShipmentHeader.RequestStampEDocument;
+                    TransferShipmentHeader.RequestStampEDocument();
                 end;
             DATABASE::"Cust. Ledger Entry":
                 begin
@@ -7700,7 +7698,7 @@
         CompanyInformation.Validate(City, PostCode.City);
         CompanyInformation.Validate("Post Code", PostCode.Code);
         CompanyInformation.Validate("SAT Postal Code", Format(LibraryRandom.RandIntInRange(10000, 99999)));
-        CompanyInformation.Validate("E-Mail", LibraryUtility.GenerateRandomEmail);
+        CompanyInformation.Validate("E-Mail", LibraryUtility.GenerateRandomEmail());
         CompanyInformation.Validate("Tax Scheme", LibraryUtility.GenerateGUID());
         CompanyInformation."SAT Tax Regime Classification" :=
           LibraryUtility.GenerateRandomCode(
@@ -7708,7 +7706,7 @@
         CompanyInformation.Modify(true);
     end;
 
-    local procedure SendSalesStampRequestBlankTaxSchemeError(DocumentType: Option; TableNo: Integer)
+    local procedure SendSalesStampRequestBlankTaxSchemeError(DocumentType: Enum "Sales Document Type"; TableNo: Integer)
     var
         CompanyInfo: Record "Company Information";
         ErrorMessages: TestPage "Error Messages";
@@ -7722,16 +7720,16 @@
         CompanyInfo.Modify(true);
 
         // Exercise
-        PostedDocumentNo := CreateAndPostSalesDoc(DocumentType, CreatePaymentMethodForSAT);
+        PostedDocumentNo := CreateAndPostSalesDoc(DocumentType, CreatePaymentMethodForSAT());
 
         // Verify
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror RequestStamp(TableNo, PostedDocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
         ErrorMessages.Description.AssertEquals(
           StrSubstNo(IfEmptyErr, CompanyInfo.FieldCaption("Tax Scheme"), CompanyInfo.RecordId));
     end;
 
-    local procedure SendServiceStampRequestBlankTaxSchemeError(DocumentType: Option; TableNo: Integer)
+    local procedure SendServiceStampRequestBlankTaxSchemeError(DocumentType: Enum "Service Document Type"; TableNo: Integer)
     var
         CompanyInfo: Record "Company Information";
         ErrorMessages: TestPage "Error Messages";
@@ -7745,16 +7743,16 @@
         CompanyInfo.Modify(true);
 
         // Exercise
-        PostedDocumentNo := CreateAndPostServiceDoc(DocumentType, CreatePaymentMethodForSAT);
+        PostedDocumentNo := CreateAndPostServiceDoc(DocumentType, CreatePaymentMethodForSAT());
 
         // Verify
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror RequestStamp(TableNo, PostedDocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
         ErrorMessages.Description.AssertEquals(
           StrSubstNo(IfEmptyErr, CompanyInfo.FieldCaption("Tax Scheme"), CompanyInfo.RecordId));
     end;
 
-    local procedure SendSalesStampRequestBlankCountryCodeError(DocumentType: Option; TableNo: Integer)
+    local procedure SendSalesStampRequestBlankCountryCodeError(DocumentType: Enum "Sales Document Type"; TableNo: Integer)
     var
         CompanyInfo: Record "Company Information";
         ErrorMessages: TestPage "Error Messages";
@@ -7768,10 +7766,10 @@
         CompanyInfo.Modify();
 
         // Exercise
-        PostedDocumentNo := CreateAndPostSalesDoc(DocumentType, CreatePaymentMethodForSAT);
+        PostedDocumentNo := CreateAndPostSalesDoc(DocumentType, CreatePaymentMethodForSAT());
 
         // Verify
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror RequestStamp(TableNo, PostedDocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
         ErrorMessages.Description.AssertEquals(
           StrSubstNo(IfEmptyErr, CompanyInfo.FieldCaption(City), CompanyInfo.RecordId));
@@ -7783,7 +7781,7 @@
           StrSubstNo(IfEmptyErr, CompanyInfo.FieldCaption("Post Code"), CompanyInfo.RecordId));
     end;
 
-    local procedure SendServiceStampRequestBlankCountryCodeError(DocumentType: Option; TableNo: Integer)
+    local procedure SendServiceStampRequestBlankCountryCodeError(DocumentType: Enum "Service Document Type"; TableNo: Integer)
     var
         CompanyInfo: Record "Company Information";
         ErrorMessages: TestPage "Error Messages";
@@ -7797,10 +7795,10 @@
         CompanyInfo.Modify(true);
 
         // Exercise
-        PostedDocumentNo := CreateAndPostServiceDoc(DocumentType, CreatePaymentMethodForSAT);
+        PostedDocumentNo := CreateAndPostServiceDoc(DocumentType, CreatePaymentMethodForSAT());
 
         // Verify
-        ErrorMessages.Trap;
+        ErrorMessages.Trap();
         asserterror RequestStamp(TableNo, PostedDocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
         ErrorMessages.Description.AssertEquals(
           StrSubstNo(IfEmptyErr, CompanyInfo.FieldCaption(City), CompanyInfo.RecordId));
@@ -7826,41 +7824,35 @@
         PACWebServiceDetail: Record "PAC Web Service Detail";
         ReportSelections: Record "Report Selections";
     begin
-        with PACWebService do begin
-            Init();
-            Validate(Code, LibraryUtility.GenerateRandomCode(FieldNo(Code), DATABASE::"PAC Web Service"));
-            Validate(Name, Code);
-            Certificate := CreateIsolatedCertificate;
-            Insert(true);
-        end;
+        PACWebService.Init();
+        PACWebService.Validate(Code, LibraryUtility.GenerateRandomCode(PACWebService.FieldNo(Code), DATABASE::"PAC Web Service"));
+        PACWebService.Validate(Name, PACWebService.Code);
+        PACWebService.Certificate := CreateIsolatedCertificate();
+        PACWebService.Insert(true);
 
-        with PACWebServiceDetail do begin
-            Init();
-            Validate("PAC Code", PACWebService.Code);
-            Validate(Environment, Environment::Test);
+        PACWebServiceDetail.Init();
+        PACWebServiceDetail.Validate("PAC Code", PACWebService.Code);
+        PACWebServiceDetail.Validate(Environment, PACWebServiceDetail.Environment::Test);
 
-            Validate("Method Name", LibraryUtility.GenerateRandomCode(FieldNo("Method Name"), DATABASE::"PAC Web Service Detail"));
-            Validate(Address, LibraryUtility.GenerateRandomCode(FieldNo(Address), DATABASE::"PAC Web Service Detail"));
+        PACWebServiceDetail.Validate("Method Name", LibraryUtility.GenerateRandomCode(PACWebServiceDetail.FieldNo("Method Name"), DATABASE::"PAC Web Service Detail"));
+        PACWebServiceDetail.Validate(Address, LibraryUtility.GenerateRandomCode(PACWebServiceDetail.FieldNo(Address), DATABASE::"PAC Web Service Detail"));
 
-            Validate(Type, Type::"Request Stamp");
-            Insert(true);
+        PACWebServiceDetail.Validate(Type, PACWebServiceDetail.Type::"Request Stamp");
+        PACWebServiceDetail.Insert(true);
 
-            Validate(Type, Type::Cancel);
-            Insert(true);
-        end;
+        PACWebServiceDetail.Validate(Type, PACWebServiceDetail.Type::Cancel);
+        PACWebServiceDetail.Insert(true);
 
-        with GLSetup do begin
-            Get();
-            Validate("PAC Code", PACWebService.Code);
-            Validate("PAC Environment", PACWebServiceDetail.Environment);
-            Validate("Sim. Signature", true);
-            Validate("Sim. Send", true);
-            Validate("Sim. Request Stamp", true);
-            Validate("Send PDF Report", true);
-            "SAT Certificate" := CreateIsolatedCertificate;
-            "CFDI Enabled" := true;
-            Modify(true);
-        end;
+        GLSetup.Get();
+        GLSetup.Validate("PAC Code", PACWebService.Code);
+        GLSetup.Validate("PAC Environment", PACWebServiceDetail.Environment);
+        GLSetup.Validate("Sim. Signature", true);
+        GLSetup.Validate("Sim. Send", true);
+        GLSetup.Validate("Sim. Request Stamp", true);
+        GLSetup.Validate("Send PDF Report", true);
+        GLSetup."SAT Certificate" := CreateIsolatedCertificate();
+        GLSetup."CFDI Enabled" := true;
+        GLSetup.Modify(true);
 
         SetupReportSelection(ReportSelections.Usage::"S.Invoice", 10477);
         SetupReportSelection(ReportSelections.Usage::"S.Cr.Memo", 10476);
@@ -7868,7 +7860,7 @@
         SetupReportSelection(ReportSelections.Usage::"SM.Credit Memo", 10478);
     end;
 
-    local procedure SetupReportSelection(UsageOption: Option; ReportID: Integer)
+    local procedure SetupReportSelection(UsageOption: Enum "Report Selection Usage"; ReportID: Integer)
     var
         ReportSelections: Record "Report Selections";
     begin
@@ -8299,7 +8291,7 @@
         InStr.ReadText(OriginalStringText);
     end;
 
-    local procedure ExportPaymentToServerFile(var CustLedgerEntry: Record "Cust. Ledger Entry"; var FileName: Text; DocumentType: Option; DocumentNo: Code[20])
+    local procedure ExportPaymentToServerFile(var CustLedgerEntry: Record "Cust. Ledger Entry"; var FileName: Text; DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20])
     var
         TempBlob: Codeunit "Temp Blob";
         FileManagement: Codeunit "File Management";
@@ -8599,7 +8591,7 @@
         Initialize();
 
         // Setup
-        DocumentNo := CreateAndPostDoc(HeaderTableNo, CreatePaymentMethodForSAT);
+        DocumentNo := CreateAndPostDoc(HeaderTableNo, CreatePaymentMethodForSAT());
 
         // Exercise
         OriginalStringText := CreateOriginalStringText(HeaderTableNo, DocumentNo);
@@ -8798,7 +8790,7 @@
         Location.Modify();
     end;
 
-    local procedure UpdateGLSetupTimeExpiration(Expiration: Boolean)
+    local procedure UpdateGLSetupTimeExpiration()
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
@@ -9357,7 +9349,7 @@
           StrSubstNo(IncorrectOriginalStrValueErr, 'TotalDistRec', OriginalStr));
 
         // Ubicaciones
-        CompanyInformation.Get;
+        CompanyInformation.Get();
         LibraryXPathXMLReader.VerifyAttributeValue(
           'cfdi:Complemento/cartaporte30:CartaPorte/cartaporte30:Ubicaciones/cartaporte30:Ubicacion',
           'RFCRemitenteDestinatario', CompanyInformation."RFC Number"); // RFCRemitenteDestinatario
@@ -9522,7 +9514,7 @@
     var
         RowValue: Variant;
     begin
-        LibraryReportDataset.LoadDataSetFile;
+        LibraryReportDataset.LoadDataSetFile();
         LibraryReportDataset.AssertElementWithValueExists('DocumentNo', DocumentNo);
         LibraryReportDataset.AssertElementWithValueExists('TransferRFCNo', 'XAXX010101000');
         LibraryReportDataset.AssertElementWithValueExists('FolioText', FiscalInvoiceNumber);
@@ -9552,7 +9544,7 @@
             LibraryXPathXMLReader.VerifyAttributeValue('Cancelacion/Folios/Folio', 'FolioSustitucion', FolioSustitucion);
     end;
 
-    local procedure CreateBasicSalesDocument(var SalesHeader: Record "Sales Header"; DocumentType: Option; CustomerNo: Code[20])
+    local procedure CreateBasicSalesDocument(var SalesHeader: Record "Sales Header"; DocumentType: Enum "Sales Document Type"; CustomerNo: Code[20])
     var
         Item: Record Item;
         SalesLine: Record "Sales Line";
@@ -9562,7 +9554,7 @@
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", LibraryRandom.RandInt(10));
     end;
 
-    local procedure CreateBasicServiceDocument(var ServiceHeader: Record "Service Header"; DocumentType: Option; CustomerNo: Code[20])
+    local procedure CreateBasicServiceDocument(var ServiceHeader: Record "Service Header"; DocumentType: Enum "Service Document Type"; CustomerNo: Code[20])
     var
         Item: Record Item;
         ServiceLine: Record "Service Line";
@@ -9717,15 +9709,15 @@
         MockFailure(TempBlob);
         FieldRef := DocumentHeaderRecordRef.Field(10025);
         TempBlob.ToFieldRef(FieldRef);
-        DocumentHeaderRecordRef.Modify;
+        DocumentHeaderRecordRef.Modify();
 
         case NameValueBuffer.Value of
             '1':
-                NameValueBuffer.Delete;
+                NameValueBuffer.Delete();
             '2':
                 begin
                     NameValueBuffer.Value := '1';
-                    NameValueBuffer.Modify;
+                    NameValueBuffer.Modify();
                 end;
         end;
     end;

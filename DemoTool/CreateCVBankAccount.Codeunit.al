@@ -30,7 +30,7 @@ codeunit 101287 "Create C/V Bank Account"
           '', '', XCOM, XCommerzBank, XYvonneSchleger, XEickelscheidt67, 'DE-40593', XDE, XEUR, XDEU,
           X49210267511, X49210368024, X6000, X6000600000, '', '');
 
-        PostInsertData;
+        PostInsertData();
     end;
 
     var

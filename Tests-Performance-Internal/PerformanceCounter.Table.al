@@ -1,6 +1,7 @@
 table 130015 "Performance Counter"
 {
     ReplicateData = false;
+    DataClassification = CustomerContent;
 
     fields
     {
@@ -49,7 +50,7 @@ table 130015 "Performance Counter"
         if not PerformanceCounter.Get(CounterName) then begin
             PerformanceCounter.Init();
             PerformanceCounter.Name := CounterName;
-            PerformanceCounter.Insert
+            PerformanceCounter.Insert();
         end;
 
         PerformanceCounter.IsValid := PerformanceCounter."Start Time" = 0T;

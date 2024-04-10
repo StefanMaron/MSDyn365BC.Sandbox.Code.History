@@ -30,7 +30,6 @@ codeunit 118801 "Create Catalog Item"
         PurchasingCodes: Record Purchasing;
         Manuf: Record Manufacturer;
         NonStock: Record "Nonstock Item";
-        NonStocksSeqNo: Code[10];
         XCALLIN: Label 'CALL IN';
         Xthisordermustbecalledin: Label 'This order must be called in';
         XDROPSHIP: Label 'DROP SHIP';
@@ -75,9 +74,8 @@ codeunit 118801 "Create Catalog Item"
 
     procedure InsertNonStockData("Mfr. Code": Code[5]; "Vendor No.": Code[20]; "Vendor Item No.": Code[20]; Description: Text[30]; UOM: Text[10]; "Published Cost": Decimal; "Negotiated Cost": Decimal; "Unit Price": Decimal; "Gross Weight": Decimal; "Net Weight": Decimal; "Bar Code": Code[20])
     begin
-        NonStocksSeqNo := IncStr(NonStocksSeqNo);
         NonStock.Init();
-        NonStock.Validate("Entry No.", NonStocksSeqNo);
+        NonStock.Validate("Entry No.", '');
         NonStock.Validate("Manufacturer Code", "Mfr. Code");
         NonStock.Validate("Vendor No.", "Vendor No.");
         NonStock.Validate("Vendor Item No.", "Vendor Item No.");

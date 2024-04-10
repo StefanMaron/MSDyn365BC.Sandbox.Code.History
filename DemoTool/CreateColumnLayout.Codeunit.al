@@ -5,29 +5,29 @@ codeunit 101334 "Create Column Layout"
     begin
         InsertEvaluationData();
 
-        InsertData(XACTBUD, 'A', XNetChange, 1, 0, 0, '', '', false, 0, 0);
-        InsertData(XACTBUD, 'B', XBudget, 1, 1, 0, '', '', false, 0, 0);
-        InsertData(XACTBUD, 'C', XVariance, 0, 0, 0, XAB, '', false, 0, 0);
-        InsertData(XACTBUD, 'D', XAB, 0, 0, 0, XAB100, '', false, 0, 0);
+        InsertData(XACTBUD, 'A', XNetChange, 1, 0, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
+        InsertData(XACTBUD, 'B', XBudget, 1, 1, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
+        InsertData(XACTBUD, 'C', XVariance, 0, 0, "Account Schedule Amount Type"::"Net Amount", XAB, '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
+        InsertData(XACTBUD, 'D', XAB, 0, 0, "Account Schedule Amount Type"::"Net Amount", XAB100, '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
         SetHideCurrencySymbol(XACTBUD, 40000);
 
-        InsertData(XBUDGANALYS, XN, XNetChange, 1, 0, 0, '', '', false, 0, 0);
-        InsertData(XBUDGANALYS, XB, XBudget, 1, 1, 0, '', '', false, 0, 0);
-        InsertData(XBUDGANALYS, '', Text004, 0, 0, 0, Text000, '', false, 0, 0);
-        InsertData(XBUDGANALYS, '', XNetChangeLastYear, 1, 0, 0, '', '<-1Y>', false, 0, 0);
+        InsertData(XBUDGANALYS, XN, XNetChange, 1, 0, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
+        InsertData(XBUDGANALYS, XB, XBudget, 1, 1, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
+        InsertData(XBUDGANALYS, '', Text004, 0, 0, "Account Schedule Amount Type"::"Net Amount", Text000, '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
+        InsertData(XBUDGANALYS, '', XNetChangeLastYear, 1, 0, "Account Schedule Amount Type"::"Net Amount", '', '<-1Y>', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
         SetHideCurrencySymbol(XBUDGANALYS, 30000);
 
-        InsertData(Text006, '', Text007, 1, 0, 0, '', '', false, 0, 0);
-        InsertData(Text006, '', Text008, 4, 0, 0, '', '', false, 0, 0);
-        InsertData(Text009, Text010, Text007, 0, 1, 0, '', '', false, 0, 0);
-        InsertData(Text009, '', '', 0, 0, 0, Text011, '', true, 0, 1);
-        InsertData(Text009, Text012, Text008, 4, 0, 0, '', '', false, 0, 0);
-        InsertData(Text009, '', '', 0, 0, 0, Text013, '', true, 0, 1);
-        InsertData(Text014, Text015, Text016, 4, 0, 0, '', '', false, 0, 1);
-        InsertData(Text014, '', '', 0, 0, 0, Text017, '', true, 0, 1);
-        InsertData(Text014, Text018, Text019, 4, 0, 0, '', '<-1Y>', false, 0, 1);
-        InsertData(Text014, '', '', 0, 0, 0, Text020, '', true, 0, 1);
-        InsertData(Text014, Text021, Text022, 0, 0, 0, Text023, '', false, 0, 1);
+        InsertData(Text006, '', Text007, 1, 0, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
+        InsertData(Text006, '', Text008, 4, 0, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
+        InsertData(Text009, Text010, Text007, 0, 1, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
+        InsertData(Text009, '', '', 0, 0, "Account Schedule Amount Type"::"Net Amount", Text011, '', true, "Column Layout Show"::Always, "Analysis Rounding Factor"::"1");
+        InsertData(Text009, Text012, Text008, 4, 0, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
+        InsertData(Text009, '', '', 0, 0, "Account Schedule Amount Type"::"Net Amount", Text013, '', true, "Column Layout Show"::Always, "Analysis Rounding Factor"::"1");
+        InsertData(Text014, Text015, Text016, 4, 0, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::"1");
+        InsertData(Text014, '', '', 0, 0, "Account Schedule Amount Type"::"Net Amount", Text017, '', true, "Column Layout Show"::Always, "Analysis Rounding Factor"::"1");
+        InsertData(Text014, Text018, Text019, 4, 0, "Account Schedule Amount Type"::"Net Amount", '', '<-1Y>', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::"1");
+        InsertData(Text014, '', '', 0, 0, "Account Schedule Amount Type"::"Net Amount", Text020, '', true, "Column Layout Show"::Always, "Analysis Rounding Factor"::"1");
+        InsertData(Text014, Text021, Text022, 0, 0, "Account Schedule Amount Type"::"Net Amount", Text023, '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::"1");
     end;
 
     var
@@ -71,7 +71,6 @@ codeunit 101334 "Create Column Layout"
         XNetChange: Label 'Net Change';
         XB: Label 'B';
         XBudget: Label 'Budget';
-        XVariancePERCENT: Label 'Variance%';
         XACTBUD: Label 'Act/Bud';
         XVariance: Label 'Variance';
         XAB: Label 'A-B';
@@ -86,14 +85,14 @@ codeunit 101334 "Create Column Layout"
         InsertDataLight(XCASHFLOW, 'S20', XAmountUntilDate, ColumnLayout."Column Type"::"Balance at Date".AsInteger());
         InsertDataLight(XCASHFLOW, 'S30', XEntireFiscalYear, ColumnLayout."Column Type"::"Entire Fiscal Year".AsInteger());
         InsertDataLight(XDEGREE, 'S10', XKeyFigure, ColumnLayout."Column Type"::"Balance at Date".AsInteger());
-        InsertData(XDEFAULT, '', XNetChangeDebit, 1, 0, 0, '', '', false, 2, 0);
-        InsertData(XDEFAULT, '', XNetChangeCredit, 1, 0, 0, '', '', true, 3, 0);
-        InsertData(XDEFAULT, '', XBalanceatDateDebit, 2, 0, 0, '', '', false, 2, 0);
-        InsertData(XDEFAULT, '', XBalanceatDateCredit, 2, 0, 0, '', '', true, 3, 0);
-        InsertData(Text002, '', Text003, 2, 0, 0, '', '', false, 0, 0);
+        InsertData(XDEFAULT, '', XNetChangeDebit, 1, 0, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::"When Positive", "Analysis Rounding Factor"::None);
+        InsertData(XDEFAULT, '', XNetChangeCredit, 1, 0, "Account Schedule Amount Type"::"Net Amount", '', '', true, "Column Layout Show"::"When Negative", "Analysis Rounding Factor"::None);
+        InsertData(XDEFAULT, '', XBalanceatDateDebit, 2, 0, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::"When Positive", "Analysis Rounding Factor"::None);
+        InsertData(XDEFAULT, '', XBalanceatDateCredit, 2, 0, "Account Schedule Amount Type"::"Net Amount", '', '', true, "Column Layout Show"::"When Negative", "Analysis Rounding Factor"::None);
+        InsertData(Text002, '', Text003, 2, 0, "Account Schedule Amount Type"::"Net Amount", '', '', false, "Column Layout Show"::Always, "Analysis Rounding Factor"::None);
     end;
 
-    procedure InsertData("Column Layout Name": Code[10]; "Column No.": Code[10]; "Column Header": Text[30]; "Column Type": Option Formula,"Net Change","Balance at Date","Beginning Balance","Year to Date"," Rest of Fiscal Year","Entire Fiscal Year"; "Ledger Entry Type": Option Entries,"Budget Entries"; "Amount Type": Option "Net Amount","Debit Amount.Credit Amount"; Formula: Code[80]; "Comparison Date Formula": Code[10]; "Show Opposite Sign": Boolean; Show: Option Always,never,"When Positive","When Negative"; "Rounding Factor": Option "None","1","1000","1000000")
+    procedure InsertData("Column Layout Name": Code[10]; "Column No.": Code[10]; "Column Header": Text[30]; "Column Type": Option Formula,"Net Change","Balance at Date","Beginning Balance","Year to Date"," Rest of Fiscal Year","Entire Fiscal Year"; "Ledger Entry Type": Option Entries,"Budget Entries"; "Amount Type": Enum "Account Schedule Amount Type"; Formula: Code[80]; "Comparison Date Formula": Code[10]; "Show Opposite Sign": Boolean; Show: Enum "Column Layout Show"; "Rounding Factor": Enum "Analysis Rounding Factor")
     var
         "Column Layout": Record "Column Layout";
     begin

@@ -11,7 +11,7 @@ codeunit 101270 "Create Bank Account"
             InsertData(
               XWWBEUR, XWorldWideBank, X1HighHolborn, CreatePostCode.Convert('GB-WC1 3DG'),
               XGrantCulbertson, XEUR, XCURRENCIES, '99-33-456', 'BG99999', XGB80RBOS16173241116737);
-            SetSEPAExport;
+            SetSEPAExport();
             InsertData(
               XWWBOPERATING, XWorldWideBank, X1HighHolborn, CreatePostCode.Convert('GB-WC1 3DG'),
               XGrantCulbertson, '', XOPERATING, '99-99-888', 'BG99999', '');
@@ -70,14 +70,8 @@ codeunit 101270 "Create Bank Account"
         XOF: Label 'OF';
         XGB80RBOS16173241116737: Label 'GB 80 RBOS 161732 41116737';
         XWWBTRANSFERSTxt: Label 'WWB-TRANSFERS', Locked = true;
-        XBankDataConvExportFmtTxt: Label 'BANKDATACONVSERVCT', Locked = true;
-        XCTMSGTxt: Label 'CT-MSG', Locked = true;
-        XCTMessageIDTxt: Label 'Credit Transfer Msg. ID';
-        XDataConvBankNameTxt: Label 'Demo Bank GB', Locked = true;
-        XBankDataConvImpFmtTxt: Label 'BANKDATACONVSERVSTMT', Locked = true;
-        XGB29RBOS60161331926819Txt: Label 'GB29 RBOS 6016 1331 9268 19', Locked = true;
-        XCHECKING: Label 'CHECKING', Comment = 'To be translated.';
-        XSAVINGS: Label 'SAVINGS', Comment = 'To be translated.';
+        XCHECKING: Label 'CHECKING', Comment = 'To be translated.', MaxLength = 20;
+        XSAVINGS: Label 'SAVINGS', Comment = 'To be translated.', MaxLength = 20;
         PmtRecNoSeriesTok: Label 'PREC', Locked = true;
         PmtRecNoSeriesDescriptionTxt: Label 'Payment Reconciliation Journals';
         PmtRecNoSeriesStartNoTok: Label 'PREC001', Locked = true;
@@ -113,7 +107,7 @@ codeunit 101270 "Create Bank Account"
                       Round(
                         -8000000 * DemoDataSetup."Local Currency Factor",
                         1000 * DemoDataSetup."Local Precision Factor"));
-                    "Create No. Series".InitBaseSeries(BankAcc."Pmt. Rec. No. Series", PmtRecNoSeriesTok, PmtRecNoSeriesDescriptionTxt, PmtRecNoSeriesStartNoTok, PmtRecNoSeriesEndNoTok, PmtRecNoSeriesStartNoTok, '', 1, true);
+                    "Create No. Series".InitBaseSeries(BankAcc."Pmt. Rec. No. Series", PmtRecNoSeriesTok, PmtRecNoSeriesDescriptionTxt, PmtRecNoSeriesStartNoTok, PmtRecNoSeriesEndNoTok, PmtRecNoSeriesStartNoTok, '', 1, Enum::"No. Series Implementation"::Sequence);
                     BankAcc."Last Check No." := '199';
                     BankAcc."Last Statement No." := '23';
                     BankAcc."Last Remittance Advice No." := '1';
@@ -127,12 +121,12 @@ codeunit 101270 "Create Bank Account"
         BankAcc.Insert(true);
     end;
 
-    internal procedure GetSavingsBankAccountCode(): Text
+    internal procedure GetSavingsBankAccountCode(): Code[20]
     begin
         exit(XSAVINGS);
     end;
 
-    internal procedure GetCheckingBankAccountCode(): Text
+    internal procedure GetCheckingBankAccountCode(): Code[20]
     begin
         exit(XCHECKING);
     end;

@@ -874,37 +874,72 @@ codeunit 134781 "Test OAuth 2.0 WebService"
     end;
 
     local procedure SetOAuthSetupTestTokens(var OAuth20Setup: Record "OAuth 2.0 Setup"; ClientToken: Text; AccessToken: Text)
+    var
+        ClientSecret: SecretText;
+        RefreshTokenSecret: SecretText;
+        ClientTokenSecret: SecretText;
+        AccessTokenSecret: SecretText;
+        ClientSecretText: Text;
+        RefreshTokenText: Text;
     begin
-        with OAuth20Setup do begin
-            SetToken("Client ID", ClientToken);
-            SetToken("Client Secret", 'Dummy Test Client Secret');
-            SetToken("Access Token", AccessToken);
-            SetToken("Refresh Token", 'Dummy Test Refresh Token');
-        end;
+        ClientSecretText := 'Dummy Test Client Secret';
+        RefreshTokenText := 'Dummy Test Refresh Token';
+        ClientSecret := ClientSecretText;
+        RefreshTokenSecret := RefreshTokenText;
+        ClientTokenSecret := ClientToken;
+        AccessTokenSecret := AccessToken;
+
+        OAuth20Setup.SetToken(OAuth20Setup."Client ID", ClientTokenSecret);
+        OAuth20Setup.SetToken(OAuth20Setup."Client Secret", ClientSecret);
+        OAuth20Setup.SetToken(OAuth20Setup."Access Token", AccessTokenSecret);
+        OAuth20Setup.SetToken(OAuth20Setup."Refresh Token", RefreshTokenSecret);
     end;
 
+    [NonDebuggable]
     local procedure InvokeRequestAccessToken(OAuth20Setup: Record "OAuth 2.0 Setup"; VAR MessageText: Text; VAR AccessToken: Text; VAR RefreshToken: Text): Boolean
     VAR
         OAuth20Mgt: Codeunit "OAuth 2.0 Mgt.";
+        AuthCodeText: Text;
+        AuthCode: SecretText;
+        AccessTokenSecretText: SecretText;
+        RefreshTokenSecretText: SecretText;
     begin
-        exit(
-          OAuth20Mgt.RequestAccessToken(
-            OAuth20Setup, MessageText, 'TestAuthCode',
-            OAuth20Setup.GetToken(OAuth20Setup."Client ID"),
-            OAuth20Setup.GetToken(OAuth20Setup."Client Secret"),
-            AccessToken, RefreshToken));
+        AuthCodeText := 'TestAuthCode';
+        AuthCode := AuthCodeText;
+        AccessTokenSecretText := AccessToken;
+        RefreshTokenSecretText := RefreshToken;
+        if OAuth20Mgt.RequestAccessToken(
+            OAuth20Setup, MessageText, AuthCode,
+            OAuth20Setup.GetTokenAsSecretText(OAuth20Setup."Client ID").Unwrap(),
+            OAuth20Setup.GetTokenAsSecretText(OAuth20Setup."Client Secret"),
+            AccessTokenSecretText, RefreshTokenSecretText) then begin
+            AccessToken := AccessTokenSecretText.Unwrap();
+            RefreshToken := RefreshTokenSecretText.Unwrap();
+            exit(true);
+        end;
+        exit(false);
     end;
 
-    local procedure InvokeRefreshAccessToken(OAuth20Setup: Record "OAuth 2.0 Setup"; VAR MessageText: Text; VAR AccessToken: Text; VAR RefreshToken: Text): Boolean
-    VAR
+    [NonDebuggable]
+    local procedure InvokeRefreshAccessToken(OAuth20Setup: Record "OAuth 2.0 Setup"; var MessageText: Text; var AccessToken: Text; var RefreshToken: Text): Boolean
+    var
         OAuth20Mgt: Codeunit "OAuth 2.0 Mgt.";
+        AccessTokenSecretText: SecretText;
+        RefreshTokenSecretText: SecretText;
     begin
-        exit(
-          OAuth20Mgt.RefreshAccessToken(
+        AccessTokenSecretText := AccessToken;
+        RefreshTokenSecretText := RefreshToken;
+        if OAuth20Mgt.RefreshAccessToken(
             OAuth20Setup, MessageText,
-            OAuth20Setup.GetToken(OAuth20Setup."Client ID"),
-            OAuth20Setup.GetToken(OAuth20Setup."Client Secret"),
-            AccessToken, RefreshToken));
+            OAuth20Setup.GetTokenAsSecretText(OAuth20Setup."Client ID").Unwrap(),
+            OAuth20Setup.GetTokenAsSecretText(OAuth20Setup."Client Secret"),
+            AccessTokenSecretText, RefreshTokenSecretText) then begin
+            AccessToken := AccessTokenSecretText.Unwrap();
+            RefreshToken := RefreshTokenSecretText.Unwrap();
+            exit(true);
+        end;
+        exit(false);
+
     end;
 
     local procedure InvokeRequestFromCOD(OAuth20Setup: Record "OAuth 2.0 Setup"; OriginalRequestJson: Text; VAR ResponseJson: Text; VAR HttpError: Text): Boolean
@@ -914,7 +949,7 @@ codeunit 134781 "Test OAuth 2.0 WebService"
         exit(
           OAuth20Mgt.InvokeRequest(
             OAuth20Setup, OriginalRequestJson, ResponseJson, HttpError,
-            OAuth20Setup.GetToken(OAuth20Setup."Access Token"), false));
+            OAuth20Setup.GetTokenAsSecretText(OAuth20Setup."Access Token"), false));
     end;
 
     local procedure GetRequestJsonTestString(Method: Text): Text

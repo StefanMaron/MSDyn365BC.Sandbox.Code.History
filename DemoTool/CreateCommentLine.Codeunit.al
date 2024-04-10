@@ -3,7 +3,7 @@ codeunit 101097 "Create Comment Line"
 
     trigger OnRun()
     begin
-        InsertData;
+        InsertData();
     end;
 
     var

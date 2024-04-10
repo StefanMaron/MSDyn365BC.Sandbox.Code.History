@@ -5,13 +5,13 @@
     <Cmt Name="LcxAdmin" />
     <Cmt Name="Rccx" />
   </OwnedComments>
-  <Item ItemId=";Codeunit 3543016557 - NamedType 2674703996" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 3543016557 - NamedType 2527805110" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Backup or restore database]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test Granules - NamedType BackupRestoreDataDescription)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test Granules - NamedType BackupRestoreDataDescriptionLbl)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3543016557 - NamedType 507048487" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
