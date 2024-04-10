@@ -48,7 +48,7 @@ $Versions | Sort-Object -Property Country, Version | % {
             $CommitIDLastCUFromPreviousMajor = $null
         }
 
-        $BranchAlreadyExists = ((git branch --list -r "*$($country)-$($Version.Major)*") -ne $null) -or ((git branch --list "*$($country)-$($Version.Major)*") -ne $null)
+        $BranchAlreadyExists = ((git branch --list -r "origin/$($country)-$($Version.Major)") -ne $null) -or ((git branch --list "$($country)-$($Version.Major)") -ne $null)
 
         if ($BranchAlreadyExists) {
             git switch "$($country)-$($Version.Major)"
