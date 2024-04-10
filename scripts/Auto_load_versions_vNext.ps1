@@ -39,7 +39,7 @@ $Versions | Sort-Object -Property Country, Version | % {
     #     return
     # }
 
-    $LastCommit = git log --all --grep="$($country)-$($version.ToString())-vNext"
+    $LastCommit = git log --all --grep="^$($country)-$($version.ToString())-vNext"
 
     if ($LastCommit.Length -eq 0) {
         Write-Host "###############################################"
@@ -54,16 +54,16 @@ $Versions | Sort-Object -Property Country, Version | % {
         $CommitIDLastCUFromPreviousMajor = $null
 
         if ($Version.Major -gt 15 -and $Version.Minor -eq 0) {
-            $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="$($country)-$($version.Major - 1).5" --pretty=format:"%h"
+            $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="^$($country)-$($version.Major - 1).5" --pretty=format:"%h"
             if (!$CommitIDLastCUFromPreviousMajor) {
-                $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="$($country)-$($version.Major - 1).[0-9]*.[0-9]*.[0-9]*$" --pretty=format:"%h"
+                $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="^$($country)-$($version.Major - 1).[0-9]*.[0-9]*.[0-9]*$" --pretty=format:"%h"
             }
         }
         elseif ($Version.Major -gt 15 -and $Version.Minor -gt 5) {
-            $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="$($country)-$($version.Major).5" --pretty=format:"%h"
+            $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="^$($country)-$($version.Major).5" --pretty=format:"%h"
         }
         elseif ($Version.Major -gt 15 -and $Version.Minor -lt 5) {
-            $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="$($country)-$($version.Major)" --pretty=format:"%h"
+            $CommitIDLastCUFromPreviousMajor = git log --all -n 1 --grep="^$($country)-$($version.Major)" --pretty=format:"%h"
         }
         else {
             $CommitIDLastCUFromPreviousMajor = $null
