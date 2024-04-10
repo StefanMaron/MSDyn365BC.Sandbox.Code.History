@@ -4,6 +4,12 @@ This repository holds all versions of the Buisness Central Apps. The purpose is 
 
 There is one separate branch per country-major version.
 
+Go the one of the `w1` branches to find most of the code:  
+https://github.com/StefanMaron/MSDyn365BC.Sandbox.Code.History/branches/all?query=w1
+
+Check out the country specific branches to view the localized base app. For example `DE`:  
+https://github.com/StefanMaron/MSDyn365BC.Sandbox.Code.History/branches/all?query=de
+
 ## Schedule
 
 The repository will automatically update itself from the artifacts once a day:
