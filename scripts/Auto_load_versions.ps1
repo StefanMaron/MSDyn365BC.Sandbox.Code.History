@@ -5,7 +5,7 @@
 $ErrorActionPreference = "SilentlyContinue"
 
 [System.Collections.ArrayList]$Versions = @()
-Get-BCArtifactUrl -select All -Type Sandbox -country $country  | % {
+Get-BCArtifactUrl -select All -Type Sandbox -country $country -after ([DateTime]::Today.AddDays(-1)) | % {
     [System.Uri]$Url = $_
     $TempString = $Url.AbsolutePath
     [version]$Version = $TempString.Split('/')[2]
