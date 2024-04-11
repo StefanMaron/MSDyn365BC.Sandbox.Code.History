@@ -29,7 +29,7 @@ Main differences between the https://github.com/StefanMaron/MSDyn365BC.Code.Hist
 - Because of the crazy number of versions, I did limit this repo to start with 23.5
 - to keep the size of this repo at least in some boundaries, I decided to not include any translation files.
 
-## Partial Clone
+## Partial Clone (Subset of Branches)
 To reduce the size of the local clone you can use those commands to clone only the branches you need:
 
 First, clone with those parameters and set it to whatever branch you need:
@@ -77,6 +77,21 @@ git branch -D us-24
 ```
 
 and thats it, now `git fetch` should not pull the branches anymore
+
+## Partial Clone (Shallow Clone)
+To further reduce the size of your local repository, you can also utilize the `--depth` parameter with the `git clone` command.
+This creates a shallow clone, fetching only the most recent commits up to the specified depth, thereby ignoring the entire history that you might not need.
+
+For instance, to clone only the latest commit (depth of 1), you would use the following command:
+
+```
+git clone -b w1-24 --depth 1 https://github.com/StefanMaron/MSDyn365BC.Sandbox.Code.History
+```
+
+> [!TIP]
+> Using `--depth` implies `--single-branch` unless `--no-single-branch` is given to fetch the histories near the tips of all branches.
+
+Later, you can deepen your clone with `git fetch --deepen` or convert it to a complete clone using `git fetch --unshallow`.
 
 ## Disclaimer
 
