@@ -93,7 +93,6 @@ $Versions | Sort-Object -Property Country, Version | % {
             $LocalizationPath = $Paths
             $PlatformPath = ''
         }
-        $TargetPathOfVersion = $LocalizationPath
 
         #Localization folder        
         $TargetPathOfVersion = (Join-Path $LocalizationPath (Get-ChildItem -Path $LocalizationPath -filter "Applications.$($country.ToUpper())")[0].Name)

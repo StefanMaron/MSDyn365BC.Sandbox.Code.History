@@ -72,7 +72,6 @@ $Versions | Sort-Object -Property Country, Version | % {
             $LocalizationPath = $Paths
             $PlatformPath = ''
         }
-        $TargetPathOfVersion = $LocalizationPath
 
         #Localization folder
         
