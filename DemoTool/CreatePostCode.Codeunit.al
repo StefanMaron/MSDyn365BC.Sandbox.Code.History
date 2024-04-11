@@ -4,7 +4,7 @@ codeunit 101225 "Create Post Code"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        ImportLocalPostCodes;
+        ImportLocalPostCodes();
         if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Standard then
             exit;
 
@@ -566,13 +566,6 @@ codeunit 101225 "Create Post Code"
         XBrasov: Label 'Brasov';
         XSibiu: Label 'Sibiu';
         XBucuresti: Label 'Bucuresti';
-        XStockholm: Label 'Stockholm';
-        XHalmstad: Label 'Halmstad';
-        XGoteborg: Label 'Goteborg', Comment = 'Translate';
-        XKinnared: Label 'Kinnared';
-        XJonkobing: Label 'Jonkobing', Comment = 'Translate';
-        XNorrkobing: Label 'Norrkobing', Comment = 'Translate';
-        XSundsvall: Label 'Sundsvall';
         XSingapore: Label 'Singapore';
         XLjubljana: Label 'Ljubljana';
         XMaribor: Label 'Maribor';

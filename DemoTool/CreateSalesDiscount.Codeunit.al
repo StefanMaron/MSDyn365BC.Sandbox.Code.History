@@ -1,4 +1,4 @@
-#if not CLEAN21
+#if not CLEAN23
 codeunit 101020 "Create Sales Discount"
 {
     ObsoleteState = Pending;
@@ -7,18 +7,16 @@ codeunit 101020 "Create Sales Discount"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(SalesLineDisc."Sales Type"::"Customer Disc. Group", RetailCode, FinishedCode, 0, 10);
-            InsertData(SalesLineDisc."Sales Type"::"Customer Disc. Group", RetailCode, RawMatCode, 0, 15);
-            InsertData(SalesLineDisc."Sales Type"::"Customer Disc. Group", XLARGEACC, FinishedCode, 0, 15);
-            InsertData(SalesLineDisc."Sales Type"::"Customer Disc. Group", XLARGEACC, RawMatCode, 0, 20);
-            InsertData(SalesLineDisc."Sales Type"::"Customer Disc. Group", XLARGEACC, ResaleCode, 0, 5);
-            InsertData(SalesLineDisc."Sales Type"::"All Customers", '', XA, 5, 15);
-            InsertData(SalesLineDisc."Sales Type"::"All Customers", '', XA, 15, 25);
-            InsertData(SalesLineDisc."Sales Type"::"All Customers", '', XB, 25, 15);
-            InsertData(SalesLineDisc."Sales Type"::"All Customers", '', XB, 100, 25);
-        end;
+        DemoDataSetup.Get();
+        InsertData(SalesLineDisc."Sales Type"::"Customer Disc. Group", DemoDataSetup.RetailCode(), DemoDataSetup.FinishedCode(), 0, 10);
+        InsertData(SalesLineDisc."Sales Type"::"Customer Disc. Group", DemoDataSetup.RetailCode(), DemoDataSetup.RawMatCode(), 0, 15);
+        InsertData(SalesLineDisc."Sales Type"::"Customer Disc. Group", XLARGEACC, DemoDataSetup.FinishedCode(), 0, 15);
+        InsertData(SalesLineDisc."Sales Type"::"Customer Disc. Group", XLARGEACC, DemoDataSetup.RawMatCode(), 0, 20);
+        InsertData(SalesLineDisc."Sales Type"::"Customer Disc. Group", XLARGEACC, DemoDataSetup.ResaleCode(), 0, 5);
+        InsertData(SalesLineDisc."Sales Type"::"All Customers", '', XA, 5, 15);
+        InsertData(SalesLineDisc."Sales Type"::"All Customers", '', XA, 15, 25);
+        InsertData(SalesLineDisc."Sales Type"::"All Customers", '', XB, 25, 15);
+        InsertData(SalesLineDisc."Sales Type"::"All Customers", '', XB, 100, 25);
     end;
 
     var

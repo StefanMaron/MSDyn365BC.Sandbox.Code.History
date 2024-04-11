@@ -41,7 +41,7 @@ codeunit 130024 "Test Project Management"
             until TestLine.Next() = 0;
 
         XMLDataFile := FileMgt.ServerTempFileName('');
-        FileFilter := GetFileDialogFilter;
+        FileFilter := GetFileDialogFilter();
         ToFile := 'PROJECT.xml';
         ProjectXML.Save(XMLDataFile);
 
@@ -121,7 +121,7 @@ codeunit 130024 "Test Project Management"
 
     local procedure UploadXMLPackage(ServerFileName: Text): Boolean
     begin
-        exit(Upload('Import project', '', GetFileDialogFilter, '', ServerFileName));
+        exit(Upload('Import project', '', GetFileDialogFilter(), '', ServerFileName));
     end;
 }
 

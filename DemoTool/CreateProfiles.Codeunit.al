@@ -4,7 +4,6 @@ codeunit 101994 "Create Profiles"
     trigger OnRun()
     var
         AllProfile: Record "All Profile";
-        EmptyGuid: Guid;
     begin
         DemoDataSetup.Get();
 

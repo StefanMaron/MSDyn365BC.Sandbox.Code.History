@@ -39,28 +39,6 @@ codeunit 101258 "Create Transaction Type"
 
     var
         "Transaction Type": Record "Transaction Type";
-        XOrdinarypurchasesale: Label 'Ordinary purchase/sale';
-        XPurchsaleafterinspectiontrial: Label 'Purchase/sale after inspection/trial';
-        XBarterExchanges: Label 'Barter/Exchanges';
-        XFinancialleasing: Label 'Financial leasing';
-        XReturnofprevrecdshippedgoods: Label 'Return of previously recd./shipped goods';
-        XExchangeofreturnedgoods: Label 'Exchange of returned goods';
-        XExchangeofnonreturnedgoods: Label 'Exchange of non-returned goods';
-        XGoodsusedinEUaidprograms: Label 'Goods used in EU aid programs';
-        XOtherpublicsupport: Label 'Other public support';
-        XOtherprivatesupport: Label 'Other (private) support';
-        XProcessingundercontract: Label 'Processing under contract';
-        XForrepairmaintenancewithfee: Label 'For repair/maintenance with fee';
-        XForrepmaintwithoutcharge: Label 'For repair/maintenance without charge';
-        XAftercontractwork: Label 'After contract work';
-        XAfterrepairmaintenancewithfee: Label 'After repair/maintenance with fee';
-        XAfterrepmaintwithoutcharge: Label 'After repair/maintenance without charge';
-        XOperationalleasing: Label 'Operational leasing';
-        XJointdefenseprojects: Label 'Joint defense projects';
-        XConstructionmatcovbycontract: Label 'Construction materials covered by contract';
-        XEUgoodssameownsenttoprivstor: Label 'EU goods (same owner) sent to private storage';
-        XEUgoodsrecdforprivatestorage: Label 'EU goods received for private storage';
-        XOther: Label 'Other';
         XPurchasesaleofcommodities: Label 'Purchase/sale of Commodities';
         XReturnreplacementofommodities: Label 'Return/replacement of Commodities';
         XDeleveriesfordevelopment: Label 'Deliveries for development assistance programmes/aid deliveries';

@@ -9,8 +9,8 @@ codeunit 101247 "Create Intrastat Demo Data"
     var
         IntraJnlManagement: Codeunit IntraJnlManagement;
     begin
-        CreateSetup;
-        CreateJnlTemplate;
+        CreateSetup();
+        CreateJnlTemplate();
         IntraJnlManagement.CreateDefaultAdvancedIntrastatSetup();
     end;
 

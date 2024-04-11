@@ -3,18 +3,16 @@ codeunit 101324 "Create VAT Prod. Posting Gr."
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            if "Company Type" = "Company Type"::VAT then begin
-                TestField("Goods VAT Rate");
-                TestField("Services VAT Rate");
-                InsertData(GoodsVATCode, StrSubstNo(XMiscellaneousVAT, "Goods VAT Rate"));
-                InsertData(ServicesVATCode, StrSubstNo(XMiscellaneousVAT, "Services VAT Rate"));
-                InsertData(NoVATCode, XMiscellaneousWithoutVAT);
-                if "Reduced VAT Rate" > 0 then
-                    InsertData(ReducedVATCode, StrSubstNo(XMiscellaneousVAT, "Reduced VAT Rate"));
-                InsertData(XONLY, XManuallyposted);
-            end;
+        DemoDataSetup.Get();
+        if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::VAT then begin
+            DemoDataSetup.TestField("Goods VAT Rate");
+            DemoDataSetup.TestField("Services VAT Rate");
+            InsertData(DemoDataSetup.GoodsVATCode(), StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Goods VAT Rate"));
+            InsertData(DemoDataSetup.ServicesVATCode(), StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Services VAT Rate"));
+            InsertData(DemoDataSetup.NoVATCode(), XMiscellaneousWithoutVAT);
+            if DemoDataSetup."Reduced VAT Rate" > 0 then
+                InsertData(DemoDataSetup.ReducedVATCode(), StrSubstNo(XMiscellaneousVAT, DemoDataSetup."Reduced VAT Rate"));
+            InsertData(XONLY, XManuallyposted);
         end;
     end;
 

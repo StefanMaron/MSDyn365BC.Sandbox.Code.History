@@ -6,10 +6,11 @@ codeunit 101998 "Create Customer Template"
     end;
 
     var
-        xBlankDescrTxt: Label 'Blank Customer Card', Comment = 'Translate.';
-        xCashDescriptionTxt: Label 'Cash-Payment / Retail Customer (Cash)', Comment = 'Translate.';
         DemoDataSetup: Record "Demo Data Setup";
         Customer: Record Customer;
+        CreateTemplateHelper: Codeunit "Create Template Helper";
+        xBlankDescrTxt: Label 'Blank Customer Card', Comment = 'Translate.';
+        xCashDescriptionTxt: Label 'Cash-Payment / Retail Customer (Cash)', Comment = 'Translate.';
         xPrivateDescriptionTxt: Label 'Private Customer (Giro)', Comment = 'Translate.';
         xBusinessDescriptionTxt: Label 'Business-to-Business Customer (Bank)', Comment = 'Translate.';
         xEuDescriptionTxt: Label 'EU Customer (EUR, Bank)', Comment = 'Translate.';
@@ -21,51 +22,42 @@ codeunit 101998 "Create Customer Template"
         xGIROTxt: Label 'GIRO', Comment = 'To be translated.';
         xBANKTxt: Label 'BANK', Comment = 'To be translated.';
         xCASHCAPTxt: Label 'CASH', Comment = 'Translated.';
-        CreateTemplateHelper: Codeunit "Create Template Helper";
 
     procedure InsertMiniAppData()
     var
         ConfigTemplateHeader: Record "Config. Template Header";
-        CreateTemplateHelper: Codeunit "Create Template Helper";
     begin
-        with DemoDataSetup do begin
-            Get();
+        DemoDataSetup.Get();
+        // Blank Template
+        InsertTemplateHeader(ConfigTemplateHeader, xBlankDescrTxt);
+        // Cash-Payment/Retail Customer customer template
+        InsertTemplateHeader(ConfigTemplateHeader, GetCustomerTemplateDescriptionCashCustomer());
+        InsertAddressInfo(ConfigTemplateHeader, DemoDataSetup."Country/Region Code");
+        InsertPostingInfo(ConfigTemplateHeader, DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode());
+        InsertPricingInfo(ConfigTemplateHeader, true, true, Customer."Contact Type"::Person);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, xCODTxt, xCASHCAPTxt, '', '', true);
 
-            // Blank Template
-            InsertTemplateHeader(ConfigTemplateHeader, xBlankDescrTxt);
-
-            // Cash-Payment/Retail Customer customer template
-            InsertTemplateHeader(ConfigTemplateHeader, GetCustomerTemplateDescriptionCashCustomer);
-            InsertAddressInfo(ConfigTemplateHeader, "Country/Region Code");
-            InsertPostingInfo(ConfigTemplateHeader, DomesticCode, DomesticCode, DomesticCode);
-            InsertPricingInfo(ConfigTemplateHeader, true, true, Customer."Contact Type"::Person);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, xCODTxt, xCASHCAPTxt, '', '', true);
-
-            CreateTemplateHelper.CreateTemplateSelectionRule(
-              DATABASE::Customer, ConfigTemplateHeader.Code, '', 0, 0);
-
-            // Private customer template
-            InsertTemplateHeader(ConfigTemplateHeader, xPrivateDescriptionTxt);
-            InsertAddressInfo(ConfigTemplateHeader, "Country/Region Code");
-            InsertPostingInfo(ConfigTemplateHeader, DomesticCode, DomesticCode, DomesticCode);
-            InsertPricingInfo(ConfigTemplateHeader, true, true, Customer."Contact Type"::Person);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X14DAYSTxt, xGIROTxt, '', '', true);
-
-            // Business customer template
-            InsertTemplateHeader(ConfigTemplateHeader, xBusinessDescriptionTxt);
-            InsertAddressInfo(ConfigTemplateHeader, "Country/Region Code");
-            InsertPostingInfo(ConfigTemplateHeader, DomesticCode, DomesticCode, DomesticCode);
-            InsertPricingInfo(ConfigTemplateHeader, true, false, Customer."Contact Type"::Company);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X1M8DTxt, xBANKTxt, '', '', true);
-
-            // EU customer template
-            InsertTemplateHeader(ConfigTemplateHeader, xEuDescriptionTxt);
-            InsertAddressInfo(ConfigTemplateHeader, '');
-            InsertPostingInfo(ConfigTemplateHeader, EUCode, EUCode, EUCode);
-            InsertPricingInfo(ConfigTemplateHeader, true, false, Customer."Contact Type"::Company);
-            InsertForeignTradeInfo(ConfigTemplateHeader, xEURTxt);
-            InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X14DAYSTxt, xBANKTxt, '', '', true);
-        end;
+        CreateTemplateHelper.CreateTemplateSelectionRule(
+          DATABASE::Customer, ConfigTemplateHeader.Code, '', 0, 0);
+        // Private customer template
+        InsertTemplateHeader(ConfigTemplateHeader, xPrivateDescriptionTxt);
+        InsertAddressInfo(ConfigTemplateHeader, DemoDataSetup."Country/Region Code");
+        InsertPostingInfo(ConfigTemplateHeader, DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode());
+        InsertPricingInfo(ConfigTemplateHeader, true, true, Customer."Contact Type"::Person);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X14DAYSTxt, xGIROTxt, '', '', true);
+        // Business customer template
+        InsertTemplateHeader(ConfigTemplateHeader, xBusinessDescriptionTxt);
+        InsertAddressInfo(ConfigTemplateHeader, DemoDataSetup."Country/Region Code");
+        InsertPostingInfo(ConfigTemplateHeader, DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode());
+        InsertPricingInfo(ConfigTemplateHeader, true, false, Customer."Contact Type"::Company);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X1M8DTxt, xBANKTxt, '', '', true);
+        // EU customer template
+        InsertTemplateHeader(ConfigTemplateHeader, xEuDescriptionTxt);
+        InsertAddressInfo(ConfigTemplateHeader, '');
+        InsertPostingInfo(ConfigTemplateHeader, DemoDataSetup.EUCode(), DemoDataSetup.EUCode(), DemoDataSetup.EUCode());
+        InsertPricingInfo(ConfigTemplateHeader, true, false, Customer."Contact Type"::Company);
+        InsertForeignTradeInfo(ConfigTemplateHeader, xEURTxt);
+        InsertPaymentsInfo(ConfigTemplateHeader, xManualTxt, X14DAYSTxt, xBANKTxt, '', '', true);
     end;
 
     local procedure InsertTemplateHeader(var ConfigTemplateHeader: Record "Config. Template Header"; Description: Text[50])
@@ -88,7 +80,7 @@ codeunit 101998 "Create Customer Template"
         CreateTemplateHelper.CreateTemplateLine(ConfigTemplateHeader, Customer.FieldNo("Customer Posting Group"), CustomerGroup);
     end;
 
-    local procedure InsertPricingInfo(var ConfigTemplateHeader: Record "Config. Template Header"; AlowLine: Boolean; PriceWithVAT: Boolean; CustomerContactType: Option Company,Person)
+    local procedure InsertPricingInfo(var ConfigTemplateHeader: Record "Config. Template Header"; AlowLine: Boolean; PriceWithVAT: Boolean; CustomerContactType: Enum "Contact Type")
     begin
         CreateTemplateHelper.CreateTemplateLine(ConfigTemplateHeader, Customer.FieldNo("Allow Line Disc."), Format(AlowLine));
         CreateTemplateHelper.CreateTemplateLine(ConfigTemplateHeader, Customer.FieldNo("Prices Including VAT"), Format(PriceWithVAT));

@@ -3,12 +3,10 @@ codeunit 118821 "Dist. Modify Purchase Setup"
 
     trigger OnRun()
     begin
-        with "Purchases & Payables Setup" do begin
-            Get();
-            "Create No. Series".InitTempSeries("Order Nos.", XPORDD, XPurchaseOrderDist, 6);
-            "Order Nos." := XPORDD;
-            Modify();
-        end;
+        "Purchases & Payables Setup".Get();
+        "Create No. Series".InitTempSeries("Purchases & Payables Setup"."Order Nos.", XPORDD, XPurchaseOrderDist, 6);
+        "Purchases & Payables Setup"."Order Nos." := XPORDD;
+        "Purchases & Payables Setup".Modify();
     end;
 
     var
@@ -20,11 +18,9 @@ codeunit 118821 "Dist. Modify Purchase Setup"
 
     procedure Finalize()
     begin
-        with "Purchases & Payables Setup" do begin
-            Get();
-            "Order Nos." := XPORD;
-            Modify();
-        end;
+        "Purchases & Payables Setup".Get();
+        "Purchases & Payables Setup"."Order Nos." := XPORD;
+        "Purchases & Payables Setup".Modify();
     end;
 }
 

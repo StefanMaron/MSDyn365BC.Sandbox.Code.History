@@ -24,7 +24,7 @@ page 130029 "Get Coverage"
                 trigger OnValidate()
                 begin
                     SdAppPath := '';
-                    SetPaths
+                    SetPaths();
                 end;
             }
             field(FromDateTime; FromDateTime)
@@ -65,7 +65,7 @@ page 130029 "Get Coverage"
 
     trigger OnOpenPage()
     begin
-        SetPaths;
+        SetPaths();
     end;
 
     var
@@ -114,9 +114,9 @@ page 130029 "Get Coverage"
     begin
         if SdAppPath = '' then
             if CountryCode = CountryCode::W1 then
-                SdAppPath := GetChangelistCode.GetSdPath + '/BaseApp/...'
+                SdAppPath := GetChangelistCode.GetSdPath() + '/BaseApp/...'
             else
-                SdAppPath := GetChangelistCode.GetSDRootPath + 'GDL/' + Format(CountryCode) + '/DevBase/BaseApp/...';
+                SdAppPath := GetChangelistCode.GetSDRootPath() + 'GDL/' + Format(CountryCode) + '/DevBase/BaseApp/...';
 
         if ToDateTime = 0DT then
             ToDateTime := CreateDateTime(Today, 0T);

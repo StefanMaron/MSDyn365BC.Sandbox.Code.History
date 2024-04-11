@@ -5,18 +5,16 @@ codeunit 118842 "Create Dist. Customer"
     var
         CreatePostCode: Codeunit "Create Post Code";
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(
-              '60000', XBlanemarkHifiShop, X28BakerStreet, CreatePostCode.Convert('GB-W1 3AL'), "Country/Region Code",
-              XBlanemarkHifiShop, XOF, XLondon, DomesticCode, DomesticCode, DomesticCode, 0, X30DAYS, DomesticCode, X1POINT5DOM, XWHITE);
-            InsertData(
-              '61000', XFairwaySound, X159Fairway, CreatePostCode.Convert('GB-W2 8HG'), "Country/Region Code",
-              XFairwaySound, XJO, XLondon, DomesticCode, DomesticCode, DomesticCode, 0, X1M8D, DomesticCode, X1POINT5DOM, XWHITE);
-            InsertData(
-              '62000', XTheDeviceShop, X273BasinStreet, CreatePostCode.Convert('GB-N16 34Z'), "Country/Region Code",
-              XTheDeviceShop, XJO, XLondon, DomesticCode, DomesticCode, DomesticCode, 0, X14Days, DomesticCode, X1POINT5DOM, XWHITE);
-        end;
+        DemoDataSetup.Get();
+        InsertData(
+          '60000', XBlanemarkHifiShop, X28BakerStreet, CreatePostCode.Convert('GB-W1 3AL'), DemoDataSetup."Country/Region Code",
+          XBlanemarkHifiShop, XOF, XLondon, DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), 0, X30DAYS, DemoDataSetup.DomesticCode(), X1POINT5DOM, XWHITE);
+        InsertData(
+          '61000', XFairwaySound, X159Fairway, CreatePostCode.Convert('GB-W2 8HG'), DemoDataSetup."Country/Region Code",
+          XFairwaySound, XJO, XLondon, DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), 0, X1M8D, DemoDataSetup.DomesticCode(), X1POINT5DOM, XWHITE);
+        InsertData(
+          '62000', XTheDeviceShop, X273BasinStreet, CreatePostCode.Convert('GB-N16 34Z'), DemoDataSetup."Country/Region Code",
+          XTheDeviceShop, XJO, XLondon, DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), DemoDataSetup.DomesticCode(), 0, X14Days, DemoDataSetup.DomesticCode(), X1POINT5DOM, XWHITE);
 
         ModifyData('60000', true, 1, 0, XEXW, 'DHL');
         ModifyData('61000', true, 1, 1, XEXW, 'FEDEX');
