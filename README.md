@@ -91,7 +91,7 @@ git clone -b w1-24 --depth 1 https://github.com/StefanMaron/MSDyn365BC.Sandbox.C
 > [!TIP]
 > Using `--depth` implies `--single-branch` unless `--no-single-branch` is given to fetch the histories near the tips of all branches.
 
-Later, you can deepen your clone with `git fetch --deepen` or convert it to a complete clone using `git fetch --unshallow`.
+Later, you can deepen your clone by 3 commits (or any other number of commits) with `git fetch --deepen 3` or convert it to a complete clone using `git fetch --unshallow`.
 
 ## Disclaimer
 
