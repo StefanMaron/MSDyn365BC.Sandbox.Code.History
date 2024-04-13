@@ -2,6 +2,7 @@ namespace System.Environment.Configuration;
 
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.Reporting;
+using System.Reflection;
 
 codeunit 5409 "Feature - Report Selection" implements "Feature Data Update"
 {
@@ -79,6 +80,7 @@ codeunit 5409 "Feature - Report Selection" implements "Feature Data Update"
         CustomReportLayout: Record "Custom Report Layout";
         TenantReportLayout: Record "Tenant Report Layout";
         ReportLayoutSelection: Record "Report Layout Selection";
+        ReportMetadata: Record "Report Metadata";
         TenantReportLayoutSelection: Record "Tenant Report Layout Selection";
         InStreamLayout: Instream;
     begin
@@ -87,7 +89,7 @@ codeunit 5409 "Feature - Report Selection" implements "Feature Data Update"
             repeat
                 TenantReportLayout.Init();
                 CustomReportLayout.CalcFields(Layout);
-                if CustomReportLayout.Layout.HasValue then begin
+                if ReportMetadata.Get(CustomReportLayout."Report ID") and CustomReportLayout.Layout.HasValue then begin
                     CustomReportLayout.Layout.CreateInStream(InStreamLayout);
                     TenantReportLayout.Layout.ImportStream(InStreamLayout, CustomReportLayout.Description);
 
