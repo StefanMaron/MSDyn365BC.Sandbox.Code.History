@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    }
+  },
   "folders": [
     {
       "path": "./Email - Microsoft 365 Connector/Test/Email - Microsoft 365 Connector Tests"
@@ -243,13 +251,5 @@
     {
       "path": "./system application/test/System Application Test/Extension Management/testArtifacts"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "allint.enabled": false,
-    "al.enableCodeAnalysis": false
-  }
+  ]
 }
