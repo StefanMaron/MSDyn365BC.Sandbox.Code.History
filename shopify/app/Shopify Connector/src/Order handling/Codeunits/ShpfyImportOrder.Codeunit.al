@@ -645,6 +645,7 @@ codeunit 30161 "Shpfy Import Order"
         JToken: JsonToken;
     begin
         OrderLineAttribute.SetRange("Order Id", ShopifyOrderId);
+        OrderLineAttribute.SetRange("Order Line Id", OrderLineId);
         if not OrderLineAttribute.IsEmpty then
             OrderLineAttribute.DeleteAll();
         foreach JToken in JCustomAttributtes do begin
