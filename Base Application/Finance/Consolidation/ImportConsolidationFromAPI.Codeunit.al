@@ -627,6 +627,8 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
         GLAccount: Record "G/L Account";
         TempAccountingPeriod: Record "Accounting Period" temporary;
         TypeHelper: Codeunit "Type Helper";
+        RecordRef: RecordRef;
+        FieldRef: FieldRef;
         JsonToken: JsonToken;
         PropertyJsonToken: JsonToken;
     begin
@@ -643,7 +645,9 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
             if ValidateNoPostingsAtClosingDates then
                 CheckNoPostingsAtClosingDates(GLAccount."No.", TempAccountingPeriod);
             JsonToken.AsObject().Get('consolidationTranslationMethod', PropertyJsonToken);
-            GLAccount."Consol. Translation Method" := TypeHelper.GetOptionNoFromTableField(PropertyJsonToken.AsValue().AsText(), Database::"G/L Account", GLAccount.FieldNo("Consol. Translation Method"));
+            RecordRef.Open(Database::"G/L Account");
+            FieldRef := RecordRef.Field(GLAccount.FieldNo("Consol. Translation Method"));
+            GLAccount."Consol. Translation Method" := TypeHelper.GetOptionNo(PropertyJsonToken.AsValue().AsText(), FieldRef.OptionMembers);
             JsonToken.AsObject().Get('consolidationDebitAccount', PropertyJsonToken);
             GLAccount."Consol. Debit Acc." := CopyStr(PropertyJsonToken.AsValue().AsCode(), 1, MaxStrLen(GLAccount."Consol. Debit Acc."));
             JsonToken.AsObject().Get('consolidationCreditAccount', PropertyJsonToken);
