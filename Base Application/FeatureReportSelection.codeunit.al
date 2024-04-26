@@ -7,6 +7,7 @@ using System.Reflection;
 codeunit 5409 "Feature - Report Selection" implements "Feature Data Update"
 {
     Permissions = TableData "Feature Data Update Status" = rm;
+    TableNo = "Tenant Report Layout";
 
     // The Data upgrade codeunit for Platform Based Report Selection
     var
@@ -14,6 +15,12 @@ codeunit 5409 "Feature - Report Selection" implements "Feature Data Update"
         FeatureDataUpdateMgt: Codeunit "Feature Data Update Mgt.";
         DescriptionTxt: Label 'If you enable platform based report selection, all user-added layouts from the Custom Report Layout table will be migrated to the Report Layouts table.';
         CustomReportLayoutTok: Label 'CRL';
+
+    // We wrap the insertion into a codeunit.run to catch any platform validation error
+    trigger OnRun()
+    begin
+        if Rec.Insert() then; // Might have been added earlier        
+    end;
 
     procedure IsDataUpdateRequired(): Boolean;
     begin
@@ -112,20 +119,21 @@ codeunit 5409 "Feature - Report Selection" implements "Feature Data Update"
                     if (CustomReportLayout."File Extension" <> '') and (TenantReportLayout."Layout Format" = TenantReportLayout."Layout Format"::Custom) then
                         TenantReportLayout."MIME Type" := 'reportlayout/' + CustomReportLayout."File Extension";
 
-                    if TenantReportLayout.Insert() then; // Might have been added earlier
-
-                    ReportLayoutSelection.SetRange("Report ID", CustomReportLayout."Report ID");
-                    ReportLayoutSelection.SetRange("Custom Report Layout Code", CustomReportLayout.Code);
-                    if ReportLayoutSelection.FindSet(true) then
-                        repeat
-                            TenantReportLayoutSelection.Init();
-                            TenantReportLayoutSelection."App ID" := TenantReportLayout."App ID";
-                            TenantReportLayoutSelection."Company Name" := TenantReportLayout."Company Name";
-                            TenantReportLayoutSelection."Layout Name" := TenantReportLayout.Name;
-                            TenantReportLayoutSelection."Report ID" := TenantReportLayout."Report ID";
-                            if TenantReportLayoutSelection.Insert() then
-                                if ReportLayoutSelection.Delete() then;
-                        until ReportLayoutSelection.Next() = 0;
+                    Commit();
+                    if Codeunit.Run(Codeunit::"Feature - Report Selection", TenantReportLayout) then begin // Inserts TenantReportLayout and catches any platform validation error
+                        ReportLayoutSelection.SetRange("Report ID", CustomReportLayout."Report ID");
+                        ReportLayoutSelection.SetRange("Custom Report Layout Code", CustomReportLayout.Code);
+                        if ReportLayoutSelection.FindSet(true) then
+                            repeat
+                                TenantReportLayoutSelection.Init();
+                                TenantReportLayoutSelection."App ID" := TenantReportLayout."App ID";
+                                TenantReportLayoutSelection."Company Name" := TenantReportLayout."Company Name";
+                                TenantReportLayoutSelection."Layout Name" := TenantReportLayout.Name;
+                                TenantReportLayoutSelection."Report ID" := TenantReportLayout."Report ID";
+                                if TenantReportLayoutSelection.Insert() then
+                                    if ReportLayoutSelection.Delete() then;
+                            until ReportLayoutSelection.Next() = 0;
+                    end;
                 end;
             until CustomReportLayout.Next() = 0;
     end;
