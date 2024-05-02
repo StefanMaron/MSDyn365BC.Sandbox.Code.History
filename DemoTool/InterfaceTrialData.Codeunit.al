@@ -25,6 +25,7 @@ codeunit 122000 "Interface Trial Data"
         CreateGenJournalBatch: Codeunit "Create Gen. Journal Batch";
         CreateCashFlowData: Codeunit "Create Cash Flow Data";
         CreateFAPostingGroup: Codeunit "Create FA Posting Group";
+        CreateFASubClass: Codeunit "Create FA Subclass";
         CreateFALocation: Codeunit "Create FA Location";
         Window: Dialog;
 
@@ -154,6 +155,8 @@ codeunit 122000 "Interface Trial Data"
         RunCodeunit(CODEUNIT::"Create FA Ins. Jnl. Template");
         RunCodeunit(CODEUNIT::"Create FA Ins. Jnl. Batch");
         CreateFAPostingGroup.CreateTrialData();
+        RunCodeunit(CODEUNIT::"Create FA Class");
+        CreateFASubclass.CreateTrialData();
         RunCodeunit(CODEUNIT::"Create Depreciation Book");
         RunCodeunit(CODEUNIT::"Create FA Insurance Type");
         RunCodeunit(CODEUNIT::"Create FA Journal Setup");
