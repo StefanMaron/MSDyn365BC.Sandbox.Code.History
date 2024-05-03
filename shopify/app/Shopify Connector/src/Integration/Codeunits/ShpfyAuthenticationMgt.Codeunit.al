@@ -213,4 +213,14 @@ codeunit 30199 "Shpfy Authentication Mgt."
         NavApp.GetCurrentModuleInfo(CallerModuleInfo);
         ExtensionManagement.ConfigureExtensionHttpClientRequestsAllowance(CallerModuleInfo.PackageId(), true);
     end;
+
+    internal procedure CheckScopeChange(Shop: Record "Shpfy Shop"): Boolean
+    var
+        RegisteredStoreNew: Record "Shpfy Registered Store New";
+    begin
+        if RegisteredStoreNew.Get(Shop.GetStoreName()) then
+            exit(RegisteredStoreNew."Actual Scope" <> ScopeTxt);
+
+        exit(false);
+    end;
 }

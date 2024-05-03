@@ -861,7 +861,7 @@ table 30102 "Shpfy Shop"
         exit(true);
     end;
 
-    local procedure GetStoreName() Store: Text
+    internal procedure GetStoreName() Store: Text
     begin
         Store := "Shopify URL".ToLower();
         if Store.Contains(':') then
