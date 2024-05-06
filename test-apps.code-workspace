@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false,
-    "allint.enabled": false
-  },
   "folders": [
     {
       "path": "./EmailLogging/Test/_Exclude_Email Logging Using Graph API Tests"
@@ -251,5 +243,13 @@
     {
       "path": "./simplifiedbankstatementimport/test/Simplified Bank Statement Import Test"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    }
+  }
 }
