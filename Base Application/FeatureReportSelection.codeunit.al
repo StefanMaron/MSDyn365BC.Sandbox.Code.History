@@ -16,12 +16,6 @@ codeunit 5409 "Feature - Report Selection" implements "Feature Data Update"
         DescriptionTxt: Label 'If you enable platform based report selection, all user-added layouts from the Custom Report Layout table will be migrated to the Report Layouts table.';
         CustomReportLayoutTok: Label 'CRL';
 
-    // We wrap the insertion into a codeunit.run to catch any platform validation error
-    trigger OnRun()
-    begin
-        if Rec.Insert() then; // Might have been added earlier        
-    end;
-
     procedure IsDataUpdateRequired(): Boolean;
     begin
         // Data upgrade is not required if the Custom report layout table is empty.
@@ -82,18 +76,27 @@ codeunit 5409 "Feature - Report Selection" implements "Feature Data Update"
             InsertDocumentEntry(Database::"Custom Report Layout", CustomReportLayout.TableCaption(), NoOfNonUpdatedLayouts);
     end;
 
-    internal procedure MigrateCustomReportLayouts()
+    procedure MigrateCustomReportLayouts()
     var
-        CustomReportLayout: Record "Custom Report Layout";
+        NonFilteredCustomReportLayout: Record "Custom Report Layout";
+    begin
+        MigrateCustomReportLayouts(NonFilteredCustomReportLayout);
+    end;
+
+    procedure MigrateCustomReportLayouts(var CustomReportLayout: Record "Custom Report Layout")
+    var
         TenantReportLayout: Record "Tenant Report Layout";
         ReportLayoutSelection: Record "Report Layout Selection";
         ReportMetadata: Record "Report Metadata";
         TenantReportLayoutSelection: Record "Tenant Report Layout Selection";
         InStreamLayout: Instream;
+        ProgressDlg: Dialog;
     begin
+        ProgressDlg.Open('#1#########################################');
         CustomReportLayout.SetRange("Built-In", false);
         if CustomReportLayout.FindSet() then
             repeat
+                ProgressDlg.Update(1, CustomReportLayout.Code + ' - ' + CustomReportLayout.Description);
                 TenantReportLayout.Init();
                 CustomReportLayout.CalcFields(Layout);
                 if ReportMetadata.Get(CustomReportLayout."Report ID") and CustomReportLayout.Layout.HasValue then begin
@@ -119,8 +122,7 @@ codeunit 5409 "Feature - Report Selection" implements "Feature Data Update"
                     if (CustomReportLayout."File Extension" <> '') and (TenantReportLayout."Layout Format" = TenantReportLayout."Layout Format"::Custom) then
                         TenantReportLayout."MIME Type" := 'reportlayout/' + CustomReportLayout."File Extension";
 
-                    Commit();
-                    if Codeunit.Run(Codeunit::"Feature - Report Selection", TenantReportLayout) then begin // Inserts TenantReportLayout and catches any platform validation error
+                    if TenantReportLayout.Insert() then begin
                         ReportLayoutSelection.SetRange("Report ID", CustomReportLayout."Report ID");
                         ReportLayoutSelection.SetRange("Custom Report Layout Code", CustomReportLayout.Code);
                         if ReportLayoutSelection.FindSet(true) then
@@ -136,6 +138,7 @@ codeunit 5409 "Feature - Report Selection" implements "Feature Data Update"
                     end;
                 end;
             until CustomReportLayout.Next() = 0;
+        ProgressDlg.Close();
     end;
 
     local procedure InsertDocumentEntry(TableID: Integer; TableName: Text; RecordCount: Integer)
