@@ -343,8 +343,7 @@ codeunit 13 "Gen. Jnl.-Post Batch"
         if GLRegNo <> 0 then
             UpdateAndDeleteLines(GenJnlLine);
 
-        if GenJnlBatch."No. Series" <> '' then
-            NoSeriesBatch.SaveState();
+        NoSeriesBatch.SaveState();
 
         DeleteDimBalBatch(GenJnlLine, true);
 
