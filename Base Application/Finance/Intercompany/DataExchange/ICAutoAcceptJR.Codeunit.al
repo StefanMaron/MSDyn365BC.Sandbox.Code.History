@@ -24,7 +24,7 @@ codeunit 536 "IC Auto Accept JR"
         ICMapping: Codeunit "IC Mapping";
     begin
         if not ICPartner.Get(Rec."Record ID to Process") then
-            Error('IC Partner not found');
+            Error(ICPartnerNotFoundErr);
 
         if not ICPartner."Auto. Accept Transactions" then
             exit;
@@ -51,12 +51,13 @@ codeunit 536 "IC Auto Accept JR"
         ICInboxTransaction.SetRange("Transaction Source", SelectedICInboxTransaction."Transaction Source");
         ICInboxTransaction.SetRange("Document Type", SelectedICInboxTransaction."Document Type");
         Codeunit.Run(Codeunit::"IC Inbox Outbox Subscribers", SelectedICInboxTransaction);
-        if not ICInboxTransaction.Get() then
+        if ICInboxTransaction.IsEmpty() then
             exit(true);
         exit(false);
     end;
 
     var
         AutoAcceptEventNameTok: Label 'IC Crossenvironment Auto Accept', Locked = true;
+        ICPartnerNotFoundErr: Label 'IC Partner not found';
 }
 
