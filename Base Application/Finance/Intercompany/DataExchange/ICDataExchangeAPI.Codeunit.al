@@ -1002,7 +1002,6 @@ codeunit 561 "IC Data Exchange API" implements "IC Data Exchange"
         if JobQueueEntry.Count() >= 2 then begin
             JobQueueEntry.FindSet();
             repeat
-                JobQueueEntry.CancelTask();
                 JobQueueEntry.Cancel();
             until JobQueueEntry.Next() = 0;
         end;
@@ -1151,6 +1150,8 @@ codeunit 561 "IC Data Exchange API" implements "IC Data Exchange"
     var
         ICPartner: Record "IC Partner";
     begin
+        ICPartner.LoadFields("Data Exchange Type");
+        ICPartner.ReadIsolation := IsolationLevel::ReadCommitted;
         ICPartner.SetRange(Name, PartnerCompanyName);
         if ICPartner.FindFirst() then
             exit(ICPartner."Data Exchange Type" = Enum::"IC Data Exchange Type"::API);
@@ -1174,6 +1175,8 @@ codeunit 561 "IC Data Exchange API" implements "IC Data Exchange"
         OperationID := CreateGuid();
         AssignOperationIDToBufferObjects(ICInboxTransaction, OperationID);
 
+        ICSetup.LoadFields("IC Partner Code");
+        ICSetup.ReadIsolation := IsolationLevel::ReadCommitted;
         ICSetup.Get();
         ICOutgoingNotification."Operation ID" := OperationID;
         ICOutgoingNotification."Source IC Partner Code" := ICSetup."IC Partner Code";
