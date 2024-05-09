@@ -158,8 +158,7 @@ codeunit 23 "Item Jnl.-Post Batch"
                 HandleRecurringLine(ItemJnlLine)
             else
                 HandleNonRecurringLine(ItemJnlLine, OldEntryType);
-            if ItemJnlBatch."No. Series" <> '' then
-                NoSeriesBatch.SaveState();
+            NoSeriesBatch.SaveState();
         end;
 
         if PhysInvtCount then
