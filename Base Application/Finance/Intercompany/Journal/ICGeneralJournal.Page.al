@@ -1162,8 +1162,7 @@ page 610 "IC General Journal"
         UpdateBalance();
         EnableApplyEntriesAction();
         SetControlAppearance();
-        if GenJournalBatch.Get(GetGenJournalTemplateName(), CurrentJnlBatchName) then
-            GeneralJournal.SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser, EnabledGeneralJournalBatchWorkflowsExist, EnabledGeneralJournalLineWorkflowsExist);
+        GeneralJournal.SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser, EnabledGeneralJournalBatchWorkflowsExist, EnabledGeneralJournalLineWorkflowsExist);
         SetJobQueueVisibility();
         ApprovalMgmt.GetGenJnlBatchApprovalStatus(Rec, GeneralJournalBatchApprovalStatus, EnabledGeneralJournalBatchWorkflowsExist);
     end;
@@ -1272,14 +1271,6 @@ page 610 "IC General Journal"
         DimVisible6: Boolean;
         DimVisible7: Boolean;
         DimVisible8: Boolean;
-
-    local procedure GetGenJournalTemplateName(): Code[10]
-    begin
-        if Rec.GetFilter("Journal Template Name") = '' then
-            exit('');
-
-        exit(Rec.GetRangeMax("Journal Template Name"));
-    end;
 
     local procedure UpdateBalance()
     begin
