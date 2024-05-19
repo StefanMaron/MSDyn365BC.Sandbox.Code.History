@@ -762,8 +762,11 @@ report 25 "Account Schedule"
         AnalysisView: Record "Analysis View";
         GLSetup: Record "General Ledger Setup";
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
+        AccSchedName: Code[10];
         AccSchedNameHidden: Code[10];
+        FinancialReportName: Code[10];
         FinancialReportDescription: Text;
+        ColumnLayoutName: Code[10];
         ColumnLayoutNameHidden: Code[10];
         GLBudgetName: Code[10];
         StartDateEnabled: Boolean;
@@ -846,9 +849,6 @@ report 25 "Account Schedule"
 
     protected var
         AccSchedManagement: Codeunit AccSchedManagement;
-        AccSchedName: Code[10];
-        ColumnLayoutName: Code[10];
-        FinancialReportName: Code[10];
         LineSkipped: Boolean;
         UseAmtsInAddCurr: Boolean;
 
