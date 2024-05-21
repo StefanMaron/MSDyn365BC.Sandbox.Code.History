@@ -2946,7 +2946,6 @@ table 5902 "Service Line"
         ServiceWarehouseMgt: Codeunit "Service Warehouse Mgt.";
         FieldCausedPriceCalculation: Integer;
         Select: Integer;
-        CalledFromServiceItemLine: Boolean;
         FullAutoReservation: Boolean;
         HideReplacementDialog: Boolean;
         Text022: Label 'The %1 cannot be greater than the %2 set on the %3.';
@@ -3339,14 +3338,12 @@ table 5902 "Service Line"
         end;
 
         if "Exclude Contract Discount" then
-            if ((CurrFieldNo = FieldNo("Fault Reason Code")) or CalledFromServiceItemLine) and (not "Exclude Warranty") then
+            if (CurrFieldNo = FieldNo("Fault Reason Code")) and (not "Exclude Warranty") then
                 Discounts[2] := "Line Discount %"
             else
                 Discounts[2] := 0
         else
             Discounts[2] := "Contract Disc. %";
-
-        SetCalledFromServiceItemLine(false);
 
         ServHeader.Get(Rec."Document Type", Rec."Document No.");
 
@@ -3424,8 +3421,6 @@ table 5902 "Service Line"
         GetPriceCalculationHandler(PriceType::Sale, ServiceHeader, PriceCalculation);
         PriceCalculation.PickDiscount();
         GetLineWithCalculatedPrice(PriceCalculation);
-
-        OnAfterPickDiscount(Rec, PriceCalculation);
     end;
 
     procedure PickPrice()
@@ -3437,8 +3432,6 @@ table 5902 "Service Line"
         GetPriceCalculationHandler(PriceType::Sale, ServiceHeader, PriceCalculation);
         PriceCalculation.PickPrice();
         GetLineWithCalculatedPrice(PriceCalculation);
-
-        OnAfterPickPrice(Rec, PriceCalculation);
     end;
 
     procedure CountDiscount(ShowAll: Boolean): Integer;
@@ -6217,11 +6210,6 @@ table 5902 "Service Line"
         exit(Result);
     end;
 
-    procedure SetCalledFromServiceItemLine(CallFromServiceItemLine: Boolean)
-    begin
-        CalledFromServiceItemLine := CallFromServiceItemLine;
-    end;
-
     #region Blocked Item/Item Variant Notifications
     local procedure GetBlockedItemNotificationID(): Guid
     begin
@@ -7056,16 +7044,6 @@ table 5902 "Service Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAddItems(var ServiceLine: Record "Service Line"; SelectionFilter: Text; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPickDiscount(var ServiceLine: Record "Service Line"; var PriceCalculation: Interface "Price Calculation")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPickPrice(var ServiceLine: Record "Service Line"; var PriceCalculation: Interface "Price Calculation")
     begin
     end;
 }
