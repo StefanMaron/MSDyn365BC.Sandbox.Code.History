@@ -35,15 +35,18 @@ table 30138 "Shpfy Registered Store New"
         }
     }
 
+    [NonDebuggable]
     [Scope('OnPrem')]
-    internal procedure SetAccessToken(AccessToken: SecretText)
+    internal procedure SetAccessToken(AccessToken: Text)
     begin
         IsolatedStorage.Set('AccessToken(' + Rec.SystemId + ')', AccessToken, DataScope::Module);
     end;
 
+    [NonDebuggable]
     [Scope('OnPrem')]
-    internal procedure GetAccessToken() Result: SecretText
+    internal procedure GetAccessToken() Result: Text
     begin
-        if not IsolatedStorage.Get('AccessToken(' + Rec.SystemId + ')', DataScope::Module, Result) then;
+        if not IsolatedStorage.Get('AccessToken(' + Rec.SystemId + ')', DataScope::Module, Result) then
+            exit('');
     end;
 }
