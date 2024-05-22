@@ -391,17 +391,14 @@ codeunit 30103 "Shpfy Communication Mgt."
         HttpContent: HttpContent;
         ContentHttpHeaders: HttpHeaders;
         HttpHeaders: HttpHeaders;
-        ClearAccessToken: Text;
-        AccessToken: SecretText;
+        AccessToken: Text;
     begin
         HttpRequestMsg.SetRequestUri(url);
         HttpRequestMsg.GetHeaders(HttpHeaders);
 
 
-        if IsTestInProgress then begin
-            CommunicationEvents.OnGetAccessToken(ClearAccessToken);
-            AccessToken := ClearAccessToken;
-        end
+        if IsTestInProgress then
+            CommunicationEvents.OnGetAccessToken(AccessToken)
         else
             AccessToken := Shop.GetAccessToken();
 
@@ -571,16 +568,19 @@ codeunit 30103 "Shpfy Communication Mgt."
     /// SetTestInProgress.
     /// </summary>
     /// <param name="TestInProgress">Boolean.</param>
+    [NonDebuggable]
     internal procedure SetTestInProgress(TestInProgress: Boolean)
     begin
         IsTestInProgress := TestInProgress;
     end;
 
+    [NonDebuggable]
     internal procedure GetTestInProgress(): Boolean
     begin
         exit(IsTestInProgress);
     end;
 
+    [NonDebuggable]
     internal procedure GetShopRecord() ShopifyShop: Record "Shpfy Shop";
     begin
         if not ShopifyShop.Get(Shop.Code) then

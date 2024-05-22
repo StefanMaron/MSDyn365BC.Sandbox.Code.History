@@ -239,7 +239,7 @@ page 30113 "Shpfy Order"
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    ToolTip = 'Specifies the order''s status in terms of fulfilled line items. Valid values are: fulfilled, in progress, open, pending fulfillment, restocked, unfulfilled, partially fulfilled, on hold.';
+                    ToolTip = 'Specifies the order''s status in terms of fulfilled line items. Valid values are: fulfilled, in progress, open, pending fulfillment, restocked, unfulfilled, partially fulfilled.';
                 }
                 field(ReturnStatus; Rec."Return Status")
                 {
