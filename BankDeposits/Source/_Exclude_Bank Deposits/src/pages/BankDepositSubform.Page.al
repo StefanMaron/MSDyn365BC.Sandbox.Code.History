@@ -95,11 +95,6 @@ page 1693 "Bank Deposit Subform"
                     ToolTip = 'Specifies the number of the bank deposit document.';
                     Editable = not DepositIsLumpSum;
                 }
-                field("External Document No."; Rec."External Document No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the external document number for this line, such as a check number.';
-                }
                 field("Credit Amount"; Rec."Credit Amount")
                 {
                     ApplicationArea = Basic, Suite;

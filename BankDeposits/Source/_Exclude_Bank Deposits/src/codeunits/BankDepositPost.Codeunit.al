@@ -115,11 +115,7 @@ codeunit 1690 "Bank Deposit-Post"
         Commit();
         BankDepositPost.SetCurrentDeposit(Rec);
         BindSubscription(BankDepositPost);
-        if not GenJnlPostBatch.Run(GenJournalLine) then begin
-            CleanPostedBankDepositHeaderAndLines(Rec."No.");
-            Commit();
-            Error(GetLastErrorText());
-        end;
+        GenJnlPostBatch.Run(GenJournalLine);
         UnbindSubscription(BankDepositPost);
         if Rec."Post as Lump Sum" then begin
             BankDepositPost.GetLumpSumBalanceEntry(GLEntry);
@@ -206,8 +202,6 @@ codeunit 1690 "Bank Deposit-Post"
                 GenJournalLine."Bal. Account Type" := GenJournalLine."Bal. Account Type"::"Bank Account";
                 GenJournalLine."Bal. Account No." := BankDepositHeader."Bank Account No.";
             end;
-            if GenJournalLine."Credit Amount" < 0 then
-                GenJournalLine.Correction := false;
             GenJournalLine.Validate(Amount);
             AssignVATDateIfEmpty(GenJournalLine);
             TotalAmountLCY += GenJournalLine."Amount (LCY)";
@@ -398,23 +392,6 @@ codeunit 1690 "Bank Deposit-Post"
         end;
     end;
 
-    local procedure CleanPostedBankDepositHeaderAndLines(BankDepositNo: Code[20])
-    var
-        BankAccCommentLine: Record "Bank Acc. Comment Line";
-        PostedBankDepositHeaderLocal: Record "Posted Bank Deposit Header";
-        PostedBankDepositLine: Record "Posted Bank Deposit Line";
-    begin
-        PostedBankDepositLine.SetRange("Bank Deposit No.", BankDepositNo);
-        PostedBankDepositLine.DeleteAll();
-        if not PostedBankDepositHeaderLocal.Get(BankDepositNo) then
-            exit;
-        BankAccCommentLine.SetRange("Table Name", BankAccCommentLine."Table Name"::"Posted Bank Deposit Header");
-        BankAccCommentLine.SetRange("Bank Account No.", PostedBankDepositHeaderLocal."Bank Account No.");
-        BankAccCommentLine.SetRange("No.", PostedBankDepositHeaderLocal."No.");
-        BankAccCommentLine.DeleteAll();
-        PostedBankDepositHeaderLocal.Delete();
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Batch", 'OnBeforePostGenJnlLine', '', false, false)]
     local procedure OnBeforePostGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; CommitIsSuppressed: Boolean; var Posted: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var PostingGenJournalLine: Record "Gen. Journal Line")
     begin
@@ -450,13 +427,12 @@ codeunit 1690 "Bank Deposit-Post"
         PostedBankDepositLine."Document No." := PostingGenJournalLine."Document No.";
         PostedBankDepositLine.Description := PostingGenJournalLine.Description;
         PostedBankDepositLine."Currency Code" := PostingGenJournalLine."Currency Code";
-        PostedBankDepositLine.Amount := -PostingGenJournalLine.Amount;
+        PostedBankDepositLine.Amount := PostingGenJournalLine."Credit Amount";
         PostedBankDepositLine."Posting Group" := PostingGenJournalLine."Posting Group";
         PostedBankDepositLine."Shortcut Dimension 1 Code" := PostingGenJournalLine."Shortcut Dimension 1 Code";
         PostedBankDepositLine."Shortcut Dimension 2 Code" := PostingGenJournalLine."Shortcut Dimension 2 Code";
         PostedBankDepositLine."Dimension Set ID" := PostingGenJournalLine."Dimension Set ID";
         PostedBankDepositLine."Posting Date" := CurrentBankDepositHeader."Posting Date";
-        PostedBankDepositLine."External Document No." := PostingGenJournalLine."External Document No.";
         case PostingGenJournalLine."Account Type" of
             PostingGenJournalLine."Account Type"::"G/L Account",
             PostingGenJournalLine."Account Type"::"Bank Account":
