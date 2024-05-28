@@ -743,7 +743,7 @@ codeunit 408 DimensionManagement
         OnAfterUpdateDefaultDim(TableID, No, GlobalDim1Code, GlobalDim2Code);
     end;
 
-    procedure GetDefaultDimID(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; SourceCode: Code[20]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20]; InheritFromDimSetID: Integer; InheritFromTableNo: Integer): Integer
+    procedure GetDefaultDimID(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; SourceCode: Code[20]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20]; InheritFromDimSetID: Integer; InheritFromTableNo: Integer) Result: Integer
     var
         DimVal: Record "Dimension Value";
         DefaultDimPriority1: Record "Default Dimension Priority";
@@ -763,7 +763,10 @@ codeunit 408 DimensionManagement
         No: Code[20];
         DimSource: Dictionary of [Integer, Code[20]];
     begin
-        OnBeforeGetDefaultDimIDProcedure(DefaultDimSource, SourceCode, GlobalDim1Code, GlobalDim2Code, InheritFromDimSetID, InheritFromTableNo, DimVal);
+        IsHandled := false;
+        OnBeforeGetDefaultDimIDProcedure(DefaultDimSource, SourceCode, GlobalDim1Code, GlobalDim2Code, InheritFromDimSetID, InheritFromTableNo, DimVal, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
 
         GetGLSetup(GLSetupShortcutDimCode);
         IsHandled := false;
@@ -2765,6 +2768,7 @@ codeunit 408 DimensionManagement
         ConfirmManagement: Codeunit "Confirm Management";
         Confirmed: Boolean;
         IsHandled: Boolean;
+        ConfirmHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeAddDefaultDimensionAllowedDimensionValue(DimensionValue, IsHandled);
@@ -2779,7 +2783,9 @@ codeunit 408 DimensionManagement
         if DefaultDimension.IsEmpty() then
             exit;
 
-        Confirmed := ConfirmManagement.GetResponseOrDefault(StrSubstNo(AllowedDimensionValueConfirmTxt, DimensionValue.Code, DefaultDimension.FieldCaption("Allowed Values Filter"), DefaultDimension.Count()), false);
+        OnAllowedDimensionValueConfirm(DimensionValue, DefaultDimension, Confirmed, ConfirmHandled);
+        if not ConfirmHandled then
+            Confirmed := ConfirmManagement.GetResponseOrDefault(StrSubstNo(AllowedDimensionValueConfirmTxt, DimensionValue.Code, DefaultDimension.FieldCaption("Allowed Values Filter"), DefaultDimension.Count()), false);
 
         DefaultDimension.FindSet(true);
         repeat
@@ -3389,7 +3395,7 @@ codeunit 408 DimensionManagement
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetDefaultDimIDProcedure(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; SourceCode: Code[20]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20]; InheritFromDimSetID: Integer; InheritFromTableNo: Integer; var DimVal: Record "Dimension Value")
+    local procedure OnBeforeGetDefaultDimIDProcedure(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; SourceCode: Code[20]; var GlobalDim1Code: Code[20]; var GlobalDim2Code: Code[20]; InheritFromDimSetID: Integer; InheritFromTableNo: Integer; var DimVal: Record "Dimension Value"; var Result: Integer; var IsHandled: Boolean)
     begin
     end;
 
@@ -3420,6 +3426,11 @@ codeunit 408 DimensionManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckDimValueOnBeforeCheckDimValBlocked(DimCode: Code[20]; DimValCode: Code[20]; var Result: Boolean; var IsHandled: Boolean; var DimensionValue: Record "Dimension Value")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAllowedDimensionValueConfirm(var DimensionValue: Record "Dimension Value"; var DefaultDimension: Record "Default Dimension"; var Confirmed: Boolean; var ConfirmHandled: Boolean);
     begin
     end;
 }
