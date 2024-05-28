@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -57,6 +57,14 @@ codeunit 2202 "Azure Key Vault Impl."
     begin
         // Gets the certificate as a base 64 encoded string from the key vault, given a CertificateName.
 
+        Certificate := GetCertificateFromClient(CertificateName);
+    end;
+
+    [NonDebuggable]
+    procedure GetAzureKeyVaultCertificate(CertificateName: Text; var Certificate: SecretText)
+
+    begin
+        // Gets the certificate as a base 64 encoded string from the key vault, given a CertificateName.
         Certificate := GetCertificateFromClient(CertificateName);
     end;
 
