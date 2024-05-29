@@ -559,16 +559,10 @@ report 94 "Close Income Statement"
         PostingDescription: Text[100];
         ClosePerBusUnit: Boolean;
 
-    local procedure ValidateEndDate(RealMode: Boolean) Result: Boolean
+    local procedure ValidateEndDate(RealMode: Boolean): Boolean
     var
         OK: Boolean;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeValidateEndDate(EndDateReq, FiscalYearStartDate, FiscYearClosingDate, OK, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         if EndDateReq = 0D then
             exit;
 
@@ -773,11 +767,6 @@ report 94 "Close Income Statement"
 
     [IntegrationEvent(false, false)]
     local procedure OnGLEntryOnPostDataItemOnAfterHandleGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; var TempEntryNoAmountBuf: Record "Entry No. Amount Buffer" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateEndDate(EndDateReq: Date; var FiscalYearStartDate: Date; var FiscYearClosingDate: Date; var OK: Boolean; var Result: Boolean; var IsHandled: Boolean);
     begin
     end;
 }
