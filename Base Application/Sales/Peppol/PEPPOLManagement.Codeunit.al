@@ -261,12 +261,6 @@ codeunit 1605 "PEPPOL Management"
         OnAfterGetAccountingSupplierPartyContact(SalesHeader, ContactID, ContactName, Telephone, Telefax, ElectronicMail);
     end;
 
-    procedure GetAccountingSupplierPartyIdentificationID(SalesHeader: Record "Sales Header"; var PartyIdentificationID: Text)
-    begin
-        PartyIdentificationID := '';
-        OnAfterGetAccountingSupplierPartyIdentificationID(SalesHeader, PartyIdentificationID);
-    end;
-
     procedure GetAccountingCustomerPartyInfo(SalesHeader: Record "Sales Header"; var CustomerEndpointID: Text; var CustomerSchemeID: Text; var CustomerPartyIdentificationID: Text; var CustomerPartyIDSchemeID: Text; var CustomerName: Text)
     begin
         GetAccountingCustomerPartyInfoByFormat(
@@ -483,27 +477,9 @@ codeunit 1605 "PEPPOL Management"
         OnAfterGetPaymentMeansPayeeFinancialAcc(CompanyInfo, PayeeFinancialAccountID, PaymentMeansSchemeID);
     end;
 
-    procedure GetPaymentMeansPayeeFinancialAccBIS(SalesHeader: Record "Sales Header"; var PayeeFinancialAccountID: Text; var FinancialInstitutionBranchID: Text)
-    var
-        CompanyInfo: Record "Company Information";
-    begin
-        CompanyInfo.Get();
-        if CompanyInfo.IBAN <> '' then
-            PayeeFinancialAccountID := DelChr(CompanyInfo.IBAN, '=', ' ')
-        else
-            if CompanyInfo."Bank Account No." <> '' then
-                PayeeFinancialAccountID := CompanyInfo."Bank Account No.";
-        FinancialInstitutionBranchID := CompanyInfo."Bank Branch No.";
-
-        OnAfterGetPaymentMeansPayeeFinancialAccBIS(SalesHeader, PayeeFinancialAccountID, FinancialInstitutionBranchID);
-    end;
-
-#if not CLEAN25
-    [Obsolete('Replaced by GetPaymentMeansPayeeFinancialAccBIS with SalesHeader parameter.', '25.0')]
     procedure GetPaymentMeansPayeeFinancialAccBIS(var PayeeFinancialAccountID: Text; var FinancialInstitutionBranchID: Text)
     var
         CompanyInfo: Record "Company Information";
-        SalesHeader: Record "Sales Header";
     begin
         CompanyInfo.Get();
         if CompanyInfo.IBAN <> '' then
@@ -513,9 +489,8 @@ codeunit 1605 "PEPPOL Management"
                 PayeeFinancialAccountID := CompanyInfo."Bank Account No.";
         FinancialInstitutionBranchID := CompanyInfo."Bank Branch No.";
 
-        OnAfterGetPaymentMeansPayeeFinancialAccBIS(SalesHeader, PayeeFinancialAccountID, FinancialInstitutionBranchID);
+        OnAfterGetPaymentMeansPayeeFinancialAccBIS(PayeeFinancialAccountID, FinancialInstitutionBranchID);
     end;
-#endif
 
     procedure GetPaymentMeansFinancialInstitutionAddr(var FinancialInstitutionStreetName: Text; var AdditionalStreetName: Text; var FinancialInstitutionCityName: Text; var FinancialInstitutionPostalZone: Text; var FinancialInstCountrySubentity: Text; var FinancialInstCountryIdCode: Text; var FinancialInstCountryListID: Text)
     begin
@@ -797,12 +772,6 @@ codeunit 1605 "PEPPOL Management"
         InvLnDeliveryCountrySubentity := '';
         InvLnDeliveryCountryIdCode := '';
         InvLineDeliveryCountryListID := GetISO3166_1Alpha2();
-    end;
-
-    procedure GetDeliveryPartyName(SalesHeader: Record "Sales Header"; var DeliveryPartyName: Text)
-    begin
-        DeliveryPartyName := '';
-        OnAfterGetDeliveryPartyName(SalesHeader, DeliveryPartyName);
     end;
 
     procedure GetLineAllowanceChargeInfo(SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; var InvLnAllowanceChargeIndicator: Text; var InvLnAllowanceChargeReason: Text; var InvLnAllowanceChargeAmount: Text; var InvLnAllowanceChargeAmtCurrID: Text)
@@ -1472,11 +1441,6 @@ codeunit 1605 "PEPPOL Management"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetDeliveryPartyName(SalesHeader: Record "Sales Header"; var DeliveryPartyNameValue: Text)
-    begin
-    end;
-
 #if not CLEAN23
     [Obsolete('Replaced by event OnAfterGetLegalMonetaryInfoWithInvRounding()', '23.0')]
     [IntegrationEvent(false, false)]
@@ -1516,7 +1480,7 @@ codeunit 1605 "PEPPOL Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGetPaymentMeansPayeeFinancialAccBIS(SalesHeader: Record "Sales Header";var PayeeFinancialAccountID: Text; var FinancialInstitutionBranchID: Text)
+    local procedure OnAfterGetPaymentMeansPayeeFinancialAccBIS(var PayeeFinancialAccountID: Text; var FinancialInstitutionBranchID: Text)
     begin
     end;
 
@@ -1567,11 +1531,6 @@ codeunit 1605 "PEPPOL Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetAccountingSupplierPartyInfoByFormat(var SupplierEndpointID: Text; var SupplierSchemeID: Text; var SupplierName: Text; IsBISBilling: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetAccountingSupplierPartyIdentificationID(SalesHeader: Record "Sales Header"; var PartyIdentificationID: Text)
     begin
     end;
 }
