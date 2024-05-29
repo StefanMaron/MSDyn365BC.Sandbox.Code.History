@@ -75,7 +75,8 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
             AOAIChatCompletionParams.SetMaxTokens(BankRecAIMatchingImpl.MaxTokens());
             AOAIChatCompletionParams.SetTemperature(0);
             InputWithReservedWordsFound := false;
-            GetCompletionResponse(AOAIChatMessages, BankAccReconciliationLine, TempBankStatementMatchingBuffer, GLAccount, AzureOpenAI, AOAIChatCompletionParams, AOAIOperationResponse);
+            AOAIChatMessages.AddSystemMessage(BuildBankRecCompletionPrompt(BuildMostAppropriateGLAccountPromptTask(), BuildBankRecStatementLines(BankAccReconciliationLine, TempBankStatementMatchingBuffer), BuildGLAccounts(GLAccount)));
+            AzureOpenAI.GenerateChatCompletion(AOAIChatMessages, AOAIChatCompletionParams, AOAIOperationResponse);
             if AOAIOperationResponse.IsSuccess() then
                 CompletionAnswerTxt := AOAIOperationResponse.GetResult()
             else begin
@@ -87,13 +88,6 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
         end;
         BankAccReconciliationLine.MarkedOnly(false);
         exit(Result);
-    end;
-
-    [NonDebuggable]
-    local procedure GetCompletionResponse(var AOAIChatMessages: Codeunit "AOAI Chat Messages"; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; var GLAccount: Record "G/L Account"; var AzureOpenAI: Codeunit "Azure OpenAi"; var AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params"; var AOAIOperationResponse: Codeunit "AOAI Operation Response")
-    begin
-        AOAIChatMessages.AddSystemMessage(BuildBankRecCompletionPrompt(BuildMostAppropriateGLAccountPromptTask(), BuildBankRecStatementLines(BankAccReconciliationLine, TempBankStatementMatchingBuffer), BuildGLAccounts(GLAccount)).Unwrap());
-        AzureOpenAI.GenerateChatCompletion(AOAIChatMessages, AOAIChatCompletionParams, AOAIOperationResponse);
     end;
 
     procedure ProcessCompletionAnswer(var CompletionAnswerTxt: Text; var Result: Dictionary of [Integer, Code[20]])
@@ -168,13 +162,13 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
         PAGE.RunModal(PAGE::"Text-to-Account Mapping", TextToAccMapping);
     end;
 
-    procedure BuildMostAppropriateGLAccountPromptTask(): SecretText
+    [NonDebuggable]
+    procedure BuildMostAppropriateGLAccountPromptTask(): Text
     var
         BankRecAIMatchingImpl: Codeunit "Bank Rec. AI Matching Impl.";
-        CompletionTaskTxt: SecretText;
-        CompletionTaskPartTxt: SecretText;
+        CompletionTaskTxt: Text;
+        CompletionTaskPartTxt: Text;
         CompletionTaskBuildingFromKeyVaultFailed: Boolean;
-        ConcatSubstrTok: Label '%1%2', Locked = true;
     begin
         if BankRecAIMatchingImpl.GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAITransToGLAccount1') then
             CompletionTaskTxt := CompletionTaskPartTxt
@@ -182,27 +176,27 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
         if BankRecAIMatchingImpl.GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAITransToGLAccount2') then
-            CompletionTaskTxt := SecretStrSubstNo(ConcatSubstrTok, CompletionTaskTxt, CompletionTaskPartTxt)
+            CompletionTaskTxt += CompletionTaskPartTxt
         else
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
         if BankRecAIMatchingImpl.GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAITransToGLAccount3') then
-            CompletionTaskTxt := SecretStrSubstNo(ConcatSubstrTok, CompletionTaskTxt, CompletionTaskPartTxt)
+            CompletionTaskTxt += CompletionTaskPartTxt
         else
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
         if BankRecAIMatchingImpl.GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAITransToGLAccount4') then
-            CompletionTaskTxt := SecretStrSubstNo(ConcatSubstrTok, CompletionTaskTxt, CompletionTaskPartTxt)
+            CompletionTaskTxt += CompletionTaskPartTxt
         else
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
         if BankRecAIMatchingImpl.GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAITransToGLAccount5') then
-            CompletionTaskTxt := SecretStrSubstNo(ConcatSubstrTok, CompletionTaskTxt, CompletionTaskPartTxt)
+            CompletionTaskTxt += CompletionTaskPartTxt
         else
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
         if BankRecAIMatchingImpl.GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAITransToGLAccount6') then
-            CompletionTaskTxt := SecretStrSubstNo(ConcatSubstrTok, CompletionTaskTxt, CompletionTaskPartTxt)
+            CompletionTaskTxt += CompletionTaskPartTxt
         else
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
@@ -373,16 +367,11 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
         end;
     end;
 
-    procedure BuildBankRecCompletionPrompt(TaskPrompt: SecretText; StatementLine: Text; GLAccounts: Text): SecretText
-    var
-        CompletionPrompt: SecretText;
-        ConcatSubstrTok: Label '%1%2', Locked = true;
+    procedure BuildBankRecCompletionPrompt(taskPrompt: Text; StatementLine: Text; GLAccounts: Text): Text
     begin
         GLAccounts += '"""\n';
         StatementLine += '"""\n';
-        CompletionPrompt := SecretStrSubstNo(ConcatSubstrTok, TaskPrompt, StatementLine);
-        CompletionPrompt := SecretStrSubstNo(ConcatSubstrTok, CompletionPrompt, GLAccounts);
-        exit(CompletionPrompt);
+        exit(taskPrompt + StatementLine + GLAccounts);
     end;
 
     procedure FoundInputWithReservedWords(): Boolean
