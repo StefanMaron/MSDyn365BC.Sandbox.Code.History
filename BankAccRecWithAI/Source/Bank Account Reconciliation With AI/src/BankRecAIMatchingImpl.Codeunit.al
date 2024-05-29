@@ -92,26 +92,28 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         exit(taskPrompt + StatementLines + LedgerLines);
     end;
 
-    procedure BuildBankRecLedgerEntries(var LedgerLines: Text; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary): Text
+    procedure BuildBankRecLedgerEntries(var LedgerLines: Text; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var CandidateLedgerEntryNos: List of [Integer]): Text
     begin
         if (LedgerLines = '') then
             LedgerLines := '**Ledger Entries**:\n"""\n';
 
         repeat
-            if not HasReservedWords(TempBankAccLedgerEntryMatchingBuffer.Description) then begin
-                LedgerLines += '#Id: ' + Format(TempBankAccLedgerEntryMatchingBuffer."Entry No.");
-                if TempBankAccLedgerEntryMatchingBuffer."Document No." <> '' then
-                    LedgerLines += ', DocumentNo: ' + TempBankAccLedgerEntryMatchingBuffer."Document No.";
-                LedgerLines += ', Description: ' + TempBankAccLedgerEntryMatchingBuffer.Description;
-                if TempBankAccLedgerEntryMatchingBuffer."Payment Reference" <> '' then
-                    LedgerLines += ', PaymentReference: ' + TempBankAccLedgerEntryMatchingBuffer."Payment Reference";
-                if TempBankAccLedgerEntryMatchingBuffer."External Document No." <> '' then
-                    LedgerLines += ', ExtDocNo: ' + TempBankAccLedgerEntryMatchingBuffer."External Document No.";
-                LedgerLines += ', Amount: ' + Format(TempBankAccLedgerEntryMatchingBuffer."Remaining Amount", 0, 9);
-                LedgerLines += ', Date: ' + Format(TempBankAccLedgerEntryMatchingBuffer."Posting Date", 0, 9);
-                LedgerLines += '\n';
-            end else
-                InputWithReservedWordsFound := true;
+            if not CandidateLedgerEntryNos.Contains(TempBankAccLedgerEntryMatchingBuffer."Entry No.") then
+                if not HasReservedWords(TempBankAccLedgerEntryMatchingBuffer.Description) then begin
+                    LedgerLines += '#Id: ' + Format(TempBankAccLedgerEntryMatchingBuffer."Entry No.");
+                    if TempBankAccLedgerEntryMatchingBuffer."Document No." <> '' then
+                        LedgerLines += ', DocumentNo: ' + TempBankAccLedgerEntryMatchingBuffer."Document No.";
+                    LedgerLines += ', Description: ' + TempBankAccLedgerEntryMatchingBuffer.Description;
+                    if TempBankAccLedgerEntryMatchingBuffer."Payment Reference" <> '' then
+                        LedgerLines += ', PaymentReference: ' + TempBankAccLedgerEntryMatchingBuffer."Payment Reference";
+                    if TempBankAccLedgerEntryMatchingBuffer."External Document No." <> '' then
+                        LedgerLines += ', ExtDocNo: ' + TempBankAccLedgerEntryMatchingBuffer."External Document No.";
+                    LedgerLines += ', Amount: ' + Format(TempBankAccLedgerEntryMatchingBuffer."Remaining Amount", 0, 9);
+                    LedgerLines += ', Date: ' + Format(TempBankAccLedgerEntryMatchingBuffer."Posting Date", 0, 9);
+                    LedgerLines += '\n';
+                    CandidateLedgerEntryNos.Add(TempBankAccLedgerEntryMatchingBuffer."Entry No.");
+                end else
+                    InputWithReservedWordsFound := true;
         until (TempBankAccLedgerEntryMatchingBuffer.Next() = 0);
     end;
 
@@ -373,6 +375,7 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         BankRecLineDescription: Text;
         AmountEquals: Boolean;
         EntryAddedToTop5: Boolean;
+        CandidateLedgerEntryNos: List of [Integer];
     begin
         NewLineChar := 10;
         TempBankAccLedgerEntryMatchingBuffer.RESET();
@@ -448,7 +451,7 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
                 TopBankLedgerEntriesFilterTxt := BuildLedgerEntriesFilter(TopLedgerEntries, TopSimilarityScore);
                 TempBankAccLedgerEntryMatchingBuffer.SetFilter("Entry No.", TopBankLedgerEntriesFilterTxt);
                 TempBankAccLedgerEntryMatchingBuffer.FindSet();
-                BuildBankRecLedgerEntries(BankRecLedgerEntriesTxt, TempBankAccLedgerEntryMatchingBuffer);
+                BuildBankRecLedgerEntries(BankRecLedgerEntriesTxt, TempBankAccLedgerEntryMatchingBuffer, CandidateLedgerEntryNos);
 
                 CompletePromptTokenCount := TaskPromptTokenCount + ApproximateTokenCount(BankRecStatementLinesTxt) + ApproximateTokenCount(BankRecLedgerEntriesTxt);
                 if (CompletePromptTokenCount >= PromptSizeThreshold()) then begin
@@ -458,6 +461,7 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
                     CreateCompletionAndMatch(CompletionPromptTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
                     BankRecStatementLinesTxt := '';
                     BankRecLedgerEntriesTxt := '';
+                    Clear(CandidateLedgerEntryNos);
                 end;
             until (BankAccReconciliationLine.Next() = 0);
 
