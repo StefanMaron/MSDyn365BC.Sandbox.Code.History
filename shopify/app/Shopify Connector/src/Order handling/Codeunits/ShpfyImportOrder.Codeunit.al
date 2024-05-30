@@ -219,6 +219,7 @@ codeunit 30161 "Shpfy Import Order"
             OrderHeader."Presentment Subtotal Amount" -= RefundLine."Presentment Subtotal Amount";
             OrderHeader."VAT Amount" -= RefundLine."Total Tax Amount";
             OrderHeader."Presentment VAT Amount" -= RefundLine."Presentment Total Tax Amount";
+            OrderEvents.OnAfterConsiderRefundsInQuantityAndAmounts(OrderHeader, OrderLine, RefundLine);
         until OrderLine.Next() = 0;
         OrderHeader.Modify();
     end;
