@@ -3,7 +3,6 @@ namespace Microsoft.Sales.Receivables;
 query 1310 "Cust. Ledg. Entry Sales"
 {
     Caption = 'Cust. Ledg. Entry Sales';
-    DataAccessIntent = ReadOnly;
 
     elements
     {
