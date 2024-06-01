@@ -1185,7 +1185,6 @@
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
         Customer: Record Customer;
-        InStream: InStream;
         OriginalStr: Text;
         FileName: Text;
         PaymentNo: Code[20];
@@ -1237,10 +1236,7 @@
         // [THEN] String for digital stamp has 'ValorUnitario' = 0, 'Importe' = 0  (TFS 329513)
         // [THEN] Original stamp string has NumParcialidad (partial payment number) = '1' (TFS 363806)
         // [THEN] String for digital stamp has 'FormaDePagoP' = '03' (TFS 375439)          
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
         Assert.AreEqual('0', SelectStr(23, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'ValorUnitario', OriginalStr));
         Assert.AreEqual('0', SelectStr(24, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Importe', OriginalStr));
         Assert.AreEqual('1', SelectStr(36, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumParcialidad', OriginalStr));
@@ -1265,7 +1261,6 @@
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         FileName: Text;
         OriginalStr: Text;
         PaymentNo1: Code[20];
@@ -1309,10 +1304,7 @@
           'cfdi:Complemento/pago20:Pagos/pago20:Pago/pago20:DoctoRelacionado', 'NumParcialidad', '2');
 
         // [THEN] Original stamp string has NumParcialidad (partial payment number) = '2' (363806)
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
         Assert.AreEqual('2', SelectStr(36, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumParcialidad', OriginalStr));
     end;
 
@@ -1324,7 +1316,6 @@
         ServiceInvoiceHeader: Record "Service Invoice Header";
         ServiceHeader: Record "Service Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         FileName: Text;
         PaymentNo: Code[20];
@@ -1356,10 +1347,7 @@
           'cfdi:Complemento/pago20:Pagos/pago20:Pago/pago20:DoctoRelacionado', 'NumParcialidad', '1');
 
         // [THEN] Original stamp string has NumParcialidad (partial payment number) = '1' (TFS 363806)
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
         Assert.AreEqual('1', SelectStr(38, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumParcialidad', OriginalStr));
     end;
 
@@ -1373,7 +1361,6 @@
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
         DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
-        InStream: InStream;
         OriginalStr: Text;
         FileName: Text;
         PaymentNo: Code[20];
@@ -1408,10 +1395,7 @@
         // [THEN] 'Pagos/Pago' node created with attribute 'MonedaP' = 'MXN', 'TipoCambioP' = 1
         // [THEN] 'Pagos/Pago/DoctoRelacionado' node has attributes 'Monto' = 1000.00, 'MonedaDR' = 'USD', 'EquivalenciaDR' = 12.345670
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         VerifyComplementoPagoAmountWithCurrency(
             OriginalStr,
@@ -1430,7 +1414,6 @@
         SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         FileName: Text;
         PaymentNo: Code[20];
@@ -1465,10 +1448,7 @@
         // [THEN] 'Complemento' node created with attribute 'MonedaP' = 'USD', 'TipoCambioP' = 20.000000
         // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 1000.00 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000 (TFS 497940)
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         VerifyComplementoPagoAmountWithCurrency(
             OriginalStr,
@@ -1485,7 +1465,6 @@
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntryInv: array[3] of Record "Cust. Ledger Entry";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         FileName: Text;
         CustomerNo: Code[20];
@@ -1521,11 +1500,7 @@
         // [THEN] ImpSaldoAnt = 100, 200, 300,  for each invoice respectively, ImpSaldoInsoluto = 0.
         // [THEN] IdDocumento = "Fiscal Invoice Number PAC" for each invoice.
         InitXMLReaderForPagos20(FileName);
-
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         for i := 1 to ArrayLen(CustLedgerEntryInv) do begin
             SalesInvoiceHeader.Get(CustLedgerEntryInv[i]."Document No.");
@@ -1544,7 +1519,6 @@
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntryInv: array[3] of Record "Cust. Ledger Entry";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         FileName: Text;
         CustomerNo: Code[20];
@@ -1581,11 +1555,7 @@
         // [THEN] ImpSaldoInsoluto = 0 for 1st and 2nd invoice, ImpSaldoInsoluto = 150 for 3rd invoice.
         // [THEN] IdDocumento = "Fiscal Invoice Number PAC" for each invoice.
         InitXMLReaderForPagos20(FileName);
-
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         for i := 1 to ArrayLen(CustLedgerEntryInv) - 1 do begin
             SalesInvoiceHeader.Get(CustLedgerEntryInv[i]."Document No.");
@@ -1612,7 +1582,6 @@
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntryInv: array[3] of Record "Cust. Ledger Entry";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         FileName: Text;
         CustomerNo: Code[20];
@@ -1656,11 +1625,7 @@
         // [THEN] ImpSaldoInsoluto = 0 for 1st and 2nd invoice, ImpSaldoInsoluto = 150 for 3rd invoice.
         // [THEN] IdDocumento = "Fiscal Invoice Number PAC" for each invoice.
         InitXMLReaderForPagos20(FileName);
-
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         for i := 1 to ArrayLen(CustLedgerEntryInv) - 1 do begin
             SalesInvoiceHeader.Get(CustLedgerEntryInv[i]."Document No.");
@@ -1687,7 +1652,6 @@
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntryInv: array[3] of Record "Cust. Ledger Entry";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         FileName: Text;
         CustomerNo: Code[20];
@@ -1712,6 +1676,7 @@
         PaymentNo := CreatePostPayment(CustomerNo, '', -CustLedgerEntryInv[1].Amount / 2, '');
         LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, CustLedgerEntry."Document Type"::Payment, PaymentNo);
         CustLedgerEntry."Date/Time Stamped" := Format(WorkDate());
+        CustLedgerEntry."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         CustLedgerEntry.Modify();
         LibraryERM.ApplyCustomerLedgerEntries(
           CustLedgerEntry."Document Type"::Payment, CustLedgerEntryInv[1]."Document Type"::Invoice,
@@ -1732,16 +1697,11 @@
         // [THEN] Second invoice line has NumParcialidad='1' ImpSaldoAnt='200' ImpPagado='200' ImpSaldoInsoluto='0.00'
         // [THEN] Third invoice line has NumParcialidad='1' ImpSaldoAnt='300' ImpPagado='150' ImpSaldoInsoluto='150'
         InitXMLReaderForPagos20(FileName);
-
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         SalesInvoiceHeader.Get(CustLedgerEntryInv[1]."Document No.");
         VerifyComplementoPago(
           OriginalStr,
-          //CustLedgerEntryInv[1].Amount / 2, 
           CustLedgerEntryInv[1].Amount - Round(CustLedgerEntryInv[1].Amount / 2),
           CustLedgerEntryInv[1].Amount - Round(CustLedgerEntryInv[1].Amount / 2), 0,
           SalesInvoiceHeader."Fiscal Invoice Number PAC", '2', 0);
@@ -1814,7 +1774,6 @@
         SalesLine: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         PaymentNo1: Code[20];
         PaymentNo2: Code[20];
@@ -1857,19 +1816,15 @@
         // [THEN] Second invoice has 'DoctoRelacionado' node with ImpSaldoAnt=186662.73 ImpPagado=22663.14 ImpSaldoInsoluto=163999.59
         ExportPaymentToServerFile(CustLedgerEntry, FileName, CustLedgerEntry."Document Type"::Payment, PaymentNo1);
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
+
         VerifyComplementoPago(
           OriginalStr, 233352.56, 46689.83, 186662.73, SalesInvoiceHeader."Fiscal Invoice Number PAC", '1', 0);
 
         ExportPaymentToServerFile(CustLedgerEntry, FileName, CustLedgerEntry."Document Type"::Payment, PaymentNo2);
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
+
         VerifyComplementoPago(
           OriginalStr, 186662.73, 22663.14, 163999.59, SalesInvoiceHeader."Fiscal Invoice Number PAC", '2', 0);
     end;
@@ -1885,7 +1840,6 @@
         SalesLine2: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         PaymentNo: Code[20];
         FileName: Text;
@@ -1916,10 +1870,7 @@
         // [THEN] 'Pagos/Totales' node has attribute 'MontoTotalPagos' with the amount for the payment 
         // [THEN] One TrasladoP node has created with the amounts according to the invoice
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         VerifyComplementoPago(
           OriginalStr, SalesLine1."Amount Including VAT", SalesLine1."Amount Including VAT", 0, SalesInvoiceHeader."Fiscal Invoice Number PAC", '1', 0);
@@ -1939,7 +1890,6 @@
         SalesLine2: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         PaymentNo: Code[20];
         FileName: Text;
@@ -1970,10 +1920,7 @@
         // [THEN] 'Pagos/Totales' node has attribute 'MontoTotalPagos' with the amount for the payment 
         // [THEN] One TrasladoP node has created with the amounts according to the invoice
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         VerifyComplementoPago(
           OriginalStr, SalesInvoiceHeader."Amount Including VAT", SalesInvoiceHeader."Amount Including VAT", 0, SalesInvoiceHeader."Fiscal Invoice Number PAC", '1', 0);
@@ -1993,7 +1940,6 @@
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         PaymentNo: Code[20];
         FileName: Text;
@@ -2029,10 +1975,8 @@
         // [THEN] 'TrasladoP' node has attributes BaseP = 100000.000000, ImporteP = 16000.000000
         ExportPaymentToServerFile(CustLedgerEntry, FileName, CustLedgerEntry."Document Type"::Payment, PaymentNo);
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
+
         VerifyComplementoPago(
           OriginalStr, SalesInvoiceHeader."Amount Including VAT" - SalesCrMemoHeader."Amount Including VAT", SalesInvoiceHeader."Amount Including VAT" - SalesCrMemoHeader."Amount Including VAT",
           0.00, SalesInvoiceHeader."Fiscal Invoice Number PAC", '1', 0);
@@ -2053,7 +1997,6 @@
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         PaymentNo: Code[20];
         FileName: Text;
@@ -2091,10 +2034,8 @@
         // [THEN] 'TrasladoP' node has attributes BaseP = 100000.000000, ImporteP = 16000.000000
         ExportPaymentToServerFile(CustLedgerEntry, FileName, CustLedgerEntry."Document Type"::Payment, PaymentNo);
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
+
         VerifyComplementoPago(
           OriginalStr, SalesInvoiceHeader."Amount Including VAT" - SalesCrMemoHeader."Amount Including VAT", SalesInvoiceHeader."Amount Including VAT" - SalesCrMemoHeader."Amount Including VAT",
           0.00, SalesInvoiceHeader."Fiscal Invoice Number PAC", '1', 0);
@@ -2107,6 +2048,90 @@
     [Test]
     [HandlerFunctions('StrMenuHandler')]
     [Scope('OnPrem')]
+    procedure SendPaymentClosingPartiallyAppliedInvoice()
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        CustLedgerEntryInv: array[2] of Record "Cust. Ledger Entry";
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        OriginalStr: Text;
+        FileName: Text;
+        CustomerNo: Code[20];
+        PaymentNo1, PaymentNo2 : Code[20];
+        i: Integer;
+    begin
+        // [FEATURE] [Sales] [Payment]
+        // [SCENARIO 536623] Request stamp for payment that closes the invoice that is partially applied to a larger payment
+        Initialize();
+
+        // [GIVEN] Two posted Sales Invoices with "Amount Including VAT" = 100, 200
+        CustomerNo := CreateCustomer();
+        UpdateCustomerSATPaymentFields(CustomerNo);
+        for i := 1 to ArrayLen(CustLedgerEntryInv) do begin
+            CreateAndPostSalesInvoice(CustLedgerEntryInv[i], CustomerNo);
+            GetPostedSalesInvoice(SalesInvoiceHeader, CustLedgerEntryInv[i]."Document No.");
+        end;
+
+        // [GIVEN] Payment "Pmt1" with amount of -250 (100/2 + 200)
+        PaymentNo1 := CreatePostPayment(CustomerNo, '', -CustLedgerEntryInv[1].Amount / 2 - CustLedgerEntryInv[2].Amount, '');
+        LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, CustLedgerEntry."Document Type"::Payment, PaymentNo1);
+
+        // [GIVEN] Payment "Pmt1" is applied to the first invoice with amount of 50
+        LibraryERM.SetAppliestoIdCustomer(CustLedgerEntry);
+        LibraryERM.SetAppliestoIdCustomer(CustLedgerEntryInv[1]);
+        CustLedgerEntryInv[1].CalcFields(Amount);
+        CustLedgerEntryInv[1].Validate("Amount to Apply", CustLedgerEntryInv[1].Amount / 2);
+        CustLedgerEntryInv[1].Modify(true);
+        LibraryERM.PostCustLedgerApplication(CustLedgerEntry);
+
+        // [GIVEN] Payment "Pmt1" is applied to the second invoice
+        LibraryERM.ApplyCustomerLedgerEntries(
+          CustLedgerEntry."Document Type"::Payment, CustLedgerEntryInv[2]."Document Type"::Invoice,
+          PaymentNo1, CustLedgerEntryInv[2]."Document No.");
+
+        // [GIVEN] Payment "Pmt2" with amount = -50 (100/2) is applied to the invoice 1
+        PaymentNo2 := CreatePostPayment(CustomerNo, '', -CustLedgerEntryInv[1].Amount / 2, '');
+        LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, CustLedgerEntry."Document Type"::Payment, PaymentNo2);
+        LibraryERM.ApplyCustomerLedgerEntries(
+          CustLedgerEntry."Document Type"::Payment, CustLedgerEntryInv[1]."Document Type"::Invoice,
+          PaymentNo2, CustLedgerEntryInv[1]."Document No.");
+
+        // [WHEN] Request stamp for the payments
+        RequestStamp(DATABASE::"Cust. Ledger Entry", PaymentNo1, ResponseOption::Success, ActionOption::"Request Stamp");
+        RequestStamp(DATABASE::"Cust. Ledger Entry", PaymentNo2, ResponseOption::Success, ActionOption::"Request Stamp");
+
+        // [THEN] First payment has a line for first invoice with NumParcialidad='1' ImpSaldoAnt='100' ImpPagado='50' ImpSaldoInsoluto='50'
+        // [THEN] First payment has a line for second invoice with NumParcialidad='1' ImpSaldoAnt='200' ImpPagado='200' ImpSaldoInsoluto='0'
+        ExportPaymentToServerFile(CustLedgerEntry, FileName, CustLedgerEntry."Document Type"::Payment, PaymentNo1);
+        InitXMLReaderForPagos20(FileName);
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
+
+        SalesInvoiceHeader.Get(CustLedgerEntryInv[1]."Document No.");
+        VerifyComplementoPago(
+          OriginalStr,
+          CustLedgerEntryInv[1].Amount, CustLedgerEntryInv[1].Amount / 2, CustLedgerEntryInv[1].Amount / 2,
+          SalesInvoiceHeader."Fiscal Invoice Number PAC", '1', 0);
+
+        SalesInvoiceHeader.Get(CustLedgerEntryInv[2]."Document No.");
+        VerifyComplementoPago(
+          OriginalStr,
+          CustLedgerEntryInv[2].Amount, CustLedgerEntryInv[2].Amount, 0,
+          SalesInvoiceHeader."Fiscal Invoice Number PAC", '1', 1);
+
+        // [THEN] Second payment has a line for first invoice with NumParcialidad='2' ImpSaldoAnt='50' ImpPagado='50' ImpSaldoInsoluto='0.00'
+        ExportPaymentToServerFile(CustLedgerEntry, FileName, CustLedgerEntry."Document Type"::Payment, PaymentNo2);
+        InitXMLReaderForPagos20(FileName);
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
+
+        SalesInvoiceHeader.Get(CustLedgerEntryInv[1]."Document No.");
+        VerifyComplementoPago(
+          OriginalStr,
+          CustLedgerEntryInv[1].Amount / 2, CustLedgerEntryInv[1].Amount / 2, 0,
+          SalesInvoiceHeader."Fiscal Invoice Number PAC", '2', 0);
+    end;
+
+    [Test]
+    [HandlerFunctions('StrMenuHandler')]
+    [Scope('OnPrem')]
     procedure SendPaymentWithGainLosses()
     var
         Customer: Record Customer;
@@ -2114,7 +2139,6 @@
         SalesLine: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         PaymentNo: Code[20];
         FileName: Text;
@@ -2151,10 +2175,7 @@
         // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 407.51 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000
         // [THEN] TrasladoP nose has attributes BaseP = 351.300000, ImporteP = 56.210000
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
@@ -2173,7 +2194,6 @@
         SalesLine: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         PaymentNo: Code[20];
         FileName: Text;
@@ -2207,10 +2227,7 @@
         RequestStamp(DATABASE::"Cust. Ledger Entry", PaymentNo, ResponseOption::Success, ActionOption::"Request Stamp");
         ExportPaymentToServerFile(CustLedgerEntry, FileName, CustLedgerEntry."Document Type"::Payment, PaymentNo);
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         // [THEN] 'Pagos/Totales' node has attribute 'MontoTotalPagos' = 5540.00
         // [THEN] 'Complemento' node created with attribute 'MonedaP' = 'USD', 'TipoCambioP' = 8.999058
@@ -2234,7 +2251,6 @@
         SalesLine: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         PaymentNo: Code[20];
         FileName: Text;
@@ -2270,10 +2286,7 @@
         // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 407.51 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000
         // [THEN] TrasladoP nose has attributes BaseP = 351.300000, ImporteP = 56.210000
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
@@ -2292,7 +2305,6 @@
         SalesLine: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         PaymentNo: Code[20];
         FileName: Text;
@@ -2328,10 +2340,7 @@
         // [THEN] 'DoctoRelacionado' node has attribute 'Monto' = 205.80 , 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000
         // [THEN] TrasladoP nose has attributes BaseP = 177.410000, ImporteP = 28.390000
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
@@ -2350,7 +2359,6 @@
         SalesLine: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         VATProdPostingGroup: Code[20];
         OriginalStr: Text;
         FileName: Text;
@@ -2398,10 +2406,8 @@
         // [THEN] MontoTotalPagos = 199750.37
         // [THEN] TrasladoP nose has attributes BaseP = 172198.590000, ImpuestoP = 27551.780000
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
+
 
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
@@ -2420,7 +2426,6 @@
         SalesLine: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         OriginalStr: Text;
         PaymentNo: Code[20];
         FileName: Text;
@@ -2459,10 +2464,7 @@
         // [THEN] 'Pagos/Pago/DoctoRelacionado' node has attributes 'Monto' = 2925.97, 'MonedaDR' = 'USD', 'EquivalenciaDR' = 0.111122
         // [THEN] TrasladoP nose has attributes BaseP = 2522.362808, ImpuestoP = 403.610446
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
@@ -2478,7 +2480,6 @@
     var
         Customer: Record Customer;
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         VATProdPostingGroup: Code[20];
         OriginalStr: Text;
         PaymentNo: Code[20];
@@ -2525,10 +2526,7 @@
         // [THEN] 'Pagos/Pago/DoctoRelacionado' node has attributes 'Monto' = 161040.35, 'MonedaDR' = 'USD', 'EquivalenciaDR' = 0.046850
         // [THEN] TrasladoP nose has attributes BaseP = 138826.040554, ImpuestoP = 22212.166488
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
@@ -2544,7 +2542,6 @@
     var
         Customer: Record Customer;
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        InStream: InStream;
         VATProdPostingGroup: Code[20];
         InvoiceNo: List of [Code[20]];
         PaymentNo: Code[20];
@@ -2602,10 +2599,7 @@
         // [THEN] 'Pagos/Pago/DoctoRelacionado' node has attributes 'Monto' = 35319.68, 'MonedaDR' = 'USD', 'EquivalenciaDR' = 1.0000000000
         // [THEN] TrasladoP nose has attributes BaseP = 30448.000000, ImpuestoP = 4871.680000
         InitXMLReaderForPagos20(FileName);
-        CustLedgerEntry.CalcFields("Original String");
-        CustLedgerEntry."Original String".CreateInStream(InStream);
-        InStream.ReadText(OriginalStr);
-        OriginalStr := ConvertStr(OriginalStr, '|', ',');
+        InitOriginalStringFromCustLedgerEntry(CustLedgerEntry, OriginalStr);
 
         VerifyComplementoPagoAmountWithCurrency(
           OriginalStr,
@@ -8580,6 +8574,16 @@
         LibraryXPathXMLReader.AddAdditionalNamespace('cfdi', 'http://www.sat.gob.mx/cfd/4');
         LibraryXPathXMLReader.AddAdditionalNamespace('cartaporte30', 'http://www.sat.gob.mx/CartaPorte30');
         LibraryXPathXMLReader.AddAdditionalNamespace('cce11', 'http://www.sat.gob.mx/ComercioExterior11');
+    end;
+
+    local procedure InitOriginalStringFromCustLedgerEntry(var CustLedgerEntry: Record "Cust. Ledger Entry"; var OriginalStr: Text)
+    var
+        InStream: InStream;
+    begin
+        CustLedgerEntry.CalcFields("Original String");
+        CustLedgerEntry."Original String".CreateInStream(InStream);
+        InStream.ReadText(OriginalStr);
+        OriginalStr := ConvertStr(OriginalStr, '|', ',');
     end;
 
     local procedure OriginalStringMandatoryFields(HeaderTableNo: Integer; LineTableNo: Integer; DocumentNoFieldNo: Integer; CustomerFieldNo: Integer; CFDIPurposeFieldNo: Integer; CFDIRelationFieldNo: Integer; PaymentMethodCodeFieldNo: Integer; PaymentTermsCodeFieldNo: Integer; UnitOfMeasureCodeFieldNo: Integer; RelationIdx: Integer)
