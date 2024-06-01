@@ -5161,36 +5161,20 @@ codeunit 10145 "E-Invoice Mgt."
     var
         DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
         CustLedgerEntryLoc: Record "Cust. Ledger Entry";
-        CustLedgerEntryLoc2: Record "Cust. Ledger Entry";
-        DetailedCustLedgEntryAppln: Record "Detailed Cust. Ledg. Entry";
     begin
         StampedAmount := 0;
         PaymentNo := 1;
         DetailedCustLedgEntry.SetRange("Cust. Ledger Entry No.", CustLedgerEntry."Entry No.");
-        DetailedCustLedgEntry.SetRange("Initial Document Type", DetailedCustLedgEntry."Initial Document Type"::Invoice);
+        DetailedCustLedgEntry.SetFilter("Entry Type", '<>%1', DetailedCustLedgEntry."Entry Type"::"Initial Entry");
         DetailedCustLedgEntry.SetRange(Unapplied, false);
-        if DetailedCustLedgEntry.FindFirst() then begin
-            CustLedgerEntryLoc.SetRange("Entry No.", DetailedCustLedgEntry."Cust. Ledger Entry No.");
-            if CustLedgerEntryLoc.FindFirst() then begin
-                CustLedgerEntryLoc2.SetRange("Closed by Entry No.", CustLedgerEntryLoc."Entry No.");
-                CustLedgerEntryLoc2.SetFilter("Date/Time Stamped", '<>%1', '');
-                CustLedgerEntryLoc2.SetCurrentKey("Entry No.");
-                if CustLedgerEntryLoc2.FindSet() then
-                    repeat
+        if DetailedCustLedgEntry.FindSet() then
+            repeat
+                if CustLedgerEntryLoc.Get(DetailedCustLedgEntry."Applied Cust. Ledger Entry No.") then
+                    if CustLedgerEntryLoc."Fiscal Invoice Number PAC" <> '' then begin
+                        StampedAmount += DetailedCustLedgEntry.Amount;
                         PaymentNo += 1;
-                        if ConvertCurrency(CustLedgerEntryLoc."Currency Code") = ConvertCurrency(CustLedgerEntryLoc2."Currency Code") then
-                            StampedAmount += CustLedgerEntryLoc2."Closed by Amount"
-                        else begin
-                            DetailedCustLedgEntryAppln.SetRange("Entry Type", DetailedCustLedgEntryAppln."Entry Type"::Application);
-                            DetailedCustLedgEntryAppln.SetRange("Cust. Ledger Entry No.", CustLedgerEntryLoc."Entry No.");
-                            DetailedCustLedgEntryAppln.SetRange("Applied Cust. Ledger Entry No.", CustLedgerEntryLoc2."Entry No.");
-                            DetailedCustLedgEntryAppln.SetRange(Unapplied, false);
-                            if DetailedCustLedgEntryAppln.FindFirst() then
-                                StampedAmount += DetailedCustLedgEntryAppln.Amount;
-                        end;
-                    until CustLedgerEntryLoc2.Next() = 0;
-            end;
-        end;
+                    end;
+            until DetailedCustLedgEntry.Next() = 0;
     end;
 
     local procedure SendPayment(var CustLedgerEntry: Record "Cust. Ledger Entry")
