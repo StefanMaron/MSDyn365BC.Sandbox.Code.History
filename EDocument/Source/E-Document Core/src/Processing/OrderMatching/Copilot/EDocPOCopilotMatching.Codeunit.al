@@ -140,16 +140,6 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
     var
         AIMatchingImpl: Codeunit "E-Doc. PO Copilot Matching";
         AzureOpenAI: Codeunit "Azure OpenAI";
-    begin
-        AIMatchingImpl.RegisterAICapability();
-        if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"E-Document Matching Assistance", true) then
-            exit(false);
-
-        exit(true);
-    end;
-
-    procedure IsCopilotVisible(): Boolean
-    var
         EnvironmentInformation: Codeunit "Environment Information";
     begin
         if not EnvironmentInformation.IsSaaSInfrastructure() then
@@ -159,6 +149,10 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
             exit(false);
 
         if not IsSupportedLanguage() then
+            exit(false);
+
+        AIMatchingImpl.RegisterAICapability();
+        if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"E-Document Matching Assistance", true) then
             exit(false);
 
         exit(true);
