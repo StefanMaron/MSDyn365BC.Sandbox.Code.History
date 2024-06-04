@@ -8,8 +8,7 @@ using Microsoft.Foundation.Navigate;
 codeunit 5891 "Feature-GLCurrencyRevaluation" implements "Feature Data Update"
 {
     Access = Internal;
-    Permissions = TableData "Feature Data Update Status" = rm,
-                  TableData "G/L Entry" = m;
+    Permissions = TableData "Feature Data Update Status" = rm;
     ObsoleteReason = 'Feature G/L Currency Revaluation will be enabled by default in version 27.0.';
     ObsoleteState = Pending;
     ObsoleteTag = '24.0';
