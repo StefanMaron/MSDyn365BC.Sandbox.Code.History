@@ -105,7 +105,6 @@ codeunit 8912 "Environment Cleanup Subs"
 
         SatisfactionSurveyMgt.ResetState();
         FlowServiceConfiguration.ModifyAll("Flow Service", FlowServiceConfiguration."Flow Service"::"Testing Service (TIP 1)");
-        Commit();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearDatabaseConfig', '', false, false)]
