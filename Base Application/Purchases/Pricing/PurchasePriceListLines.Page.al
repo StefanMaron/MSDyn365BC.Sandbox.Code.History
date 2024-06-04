@@ -357,7 +357,7 @@ page 7011 "Purchase Price List Lines"
         exit('Subordinate');
     end;
 
-    protected procedure SetEditable()
+    local procedure SetEditable()
     begin
         AmountTypeIsEditable := Rec."Asset Type" <> Rec."Asset Type"::"Item Discount Group";
         AmountEditable := Rec.IsAmountSupported();
