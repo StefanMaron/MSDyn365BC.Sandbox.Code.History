@@ -438,7 +438,6 @@ codeunit 1252 "Match Bank Rec. Lines"
             CandidatesBankStatementMatchingBuffer.SetRange("Entry No.");
             exit(true);
         end;
-        CandidatesBankStatementMatchingBuffer.FindFirst();
         Result := MatchIsBetter(ToAddBankStatementMatchingBuffer, CandidatesBankStatementMatchingBuffer);
         CandidatesBankStatementMatchingBuffer.SetRange("Entry No.");
         exit(Result);
