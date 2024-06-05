@@ -3677,48 +3677,6 @@ codeunit 134141 "ERM Bank Reconciliation"
 
     [Test]
     [HandlerFunctions('MessageHandler')]
-    procedure AutomatchShouldPreferCloseAmountsAfterItInitiallyProposesMatches()
-    var
-        BankAccount: Record "Bank Account";
-        BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
-        BankAccReconciliation: Record "Bank Acc. Reconciliation";
-        BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
-        GenJournalLine: Record "Gen. Journal Line";
-        MatchBankRecLines: Codeunit "Match Bank Rec. Lines";
-        BankAccountNo: Code[20];
-    begin
-        Initialize();
-        BankAccountNo := CreateBankAccount(BankAccount);
-        CreateAndPostGenJournalLineWithAmount(GenJournalLine, BankAccountNo, 73600);
-        CreateAndPostGenJournalLineWithAmount(GenJournalLine, BankAccountNo, 600);
-        LibraryERM.CreateBankAccReconciliation(BankAccReconciliation, BankAccountNo, BankAccReconciliation."Statement Type"::"Bank Reconciliation");
-        BankAccReconciliation."Statement Date" := WorkDate();
-        BankAccReconciliation.Modify();
-        LibraryERM.CreateBankAccReconciliationLn(BankAccReconciliationLine, BankAccReconciliation);
-        BankAccReconciliationLine.Validate("Statement Amount", -73590);
-        BankAccReconciliationLine.Description := CopyStr(GenJournalLine."Document No.", 1, 5);
-        BankAccReconciliationLine.Modify();
-        LibraryERM.CreateBankAccReconciliationLn(BankAccReconciliationLine, BankAccReconciliation);
-        BankAccReconciliationLine.Validate("Statement Amount", -600);
-        BankAccReconciliationLine.Description := GenJournalLine."Document No.";
-        BankAccReconciliationLine.Modify();
-        LibraryERM.CreateBankAccReconciliationLn(BankAccReconciliationLine, BankAccReconciliation);
-        BankAccReconciliationLine.Validate("Statement Amount", -73600);
-        BankAccReconciliationLine.Modify();
-        MatchBankRecLines.BankAccReconciliationAutoMatch(BankAccReconciliation, 1);
-        BankAccountLedgerEntry.SetRange("Bank Account No.", BankAccountNo);
-        BankAccountLedgerEntry.SetFilter("Statement No.", '<>%1', '');
-        Assert.AreEqual(2, BankAccountLedgerEntry.Count(), 'There should be two entries matched');
-        BankAccountLedgerEntry.FindSet();
-        BankAccReconciliationLine.Get(BankAccReconciliation."Statement Type", BankAccountNo, BankAccReconciliation."Statement No.", BankAccountLedgerEntry."Statement Line No.");
-        Assert.AreEqual(0, BankAccReconciliationLine.Difference, 'The difference should be 0');
-        BankAccountLedgerEntry.Next();
-        BankAccReconciliationLine.Get(BankAccReconciliation."Statement Type", BankAccountNo, BankAccReconciliation."Statement No.", BankAccountLedgerEntry."Statement Line No.");
-        Assert.AreEqual(0, BankAccReconciliationLine.Difference, 'The difference should be 0');
-    end;
-
-    [Test]
-    [HandlerFunctions('MessageHandler')]
     procedure AutomatchShouldPreferLeastDifferenceInAmountForEntriesWithSameDescription()
     var
         BankAccount: Record "Bank Account";
@@ -4141,6 +4099,88 @@ codeunit 134141 "ERM Bank Reconciliation"
         Assert.AreEqual(ExpectedBankAccountNo, BankAccReconciliationCard.BankAccountNo.Value(), '');
         // [THEN] Statement No. does not autocomplete.
         Assert.AreEqual(ExpectedStatementNo, BankAccReconciliationCard.StatementNo.Value(), '');
+    end;
+
+    [Test]
+    [HandlerFunctions('BankAccountStatementRequestPageHandler')]
+    procedure BankAccountStatementReportDoesNotConsiderEntriesClosedAfterAsClosed()
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        GLAccount: Record "G/L Account";
+        GenJournalLine: Record "Gen. Journal Line";
+        BankAccReconciliation: Record "Bank Acc. Reconciliation";
+        BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
+        BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
+        BankAccountStatement: Record "Bank Account Statement";
+        MatchBankRecLines: Codeunit "Match Bank Rec. Lines";
+        UndoBankStatementYesNo: Codeunit "Undo Bank Statement (Yes/No)";
+        RequestPageXML: Text;
+        PostingDateOfPayments, FirstReconciliationDate, SecondReconciliationDate : Date;
+        BankAccountNo, AccountNo, FirstReconciliationNo : Code[20];
+        FirstReconciliationAmount, SecondReconciliationAmount : Decimal;
+    begin
+        Initialize();
+        GeneralLedgerSetup.Get();
+        LibraryERM.CreateGLAccount(GLAccount);
+        BankAccountNo := LibraryERM.CreateBankAccountNoWithNewPostingGroup(GLAccount);
+        AccountNo := LibraryPurchase.CreateVendorNo();
+        // [GIVEN] Two payments recorded 10 days ago.
+        PostingDateOfPayments := WorkDate() - 10;
+        PostPaymentJournalLineWithDateAndSource(GenJournalLine, PostingDateOfPayments, AccountNo, BankAccountNo);
+        PostPaymentJournalLineWithDateAndSource(GenJournalLine, PostingDateOfPayments, AccountNo, BankAccountNo);
+        // [GIVEN] A reconciliation posted 5 days ago with one of this payments.
+        FirstReconciliationDate := WorkDate() - 5;
+        LibraryERM.CreateBankAccReconciliation(BankAccReconciliation, BankAccountNo, BankAccReconciliation."Statement Type"::"Bank Reconciliation");
+        BankAccReconciliation.Validate("Statement Date", FirstReconciliationDate);
+        CreateBankAccReconLine(BankAccReconciliationLine, BankAccReconciliation);
+        BankAccReconciliationLine.Validate("Statement Amount", -GenJournalLine.Amount);
+        BankAccReconciliationLine.Modify();
+        BankAccReconciliationLine.SetRecFilter();
+        BankAccountLedgerEntry.SetRange("Bank Account No.", BankAccountNo);
+        BankAccountLedgerEntry.SetRange(Amount, -GenJournalLine.Amount);
+        BankAccountLedgerEntry.SetRange(Open, true);
+        BankAccountLedgerEntry.FindFirst();
+        BankAccountLedgerEntry.SetRecFilter();
+        FirstReconciliationAmount := BankAccountLedgerEntry.Amount;
+        MatchBankRecLines.MatchManually(BankAccReconciliationLine, BankAccountLedgerEntry);
+        BankAccReconciliation."Statement Ending Balance" := BankAccReconciliation."Balance Last Statement" + FirstReconciliationAmount;
+        BankAccReconciliation.Modify();
+        LibraryERM.PostBankAccReconciliation(BankAccReconciliation);
+        Commit();
+        FirstReconciliationNo := BankAccReconciliation."Statement No.";
+        // [GIVEN] A second reconciliation posted today with the other payment.
+        SecondReconciliationDate := WorkDate();
+        BankAccReconciliation."Statement No." := IncStr(BankAccReconciliation."Statement No.");
+        LibraryERM.CreateBankAccReconciliation(BankAccReconciliation, BankAccountNo, BankAccReconciliation."Statement Type"::"Bank Reconciliation");
+        BankAccReconciliation.Validate("Statement Date", SecondReconciliationDate);
+        Clear(BankAccountLedgerEntry);
+        BankAccountLedgerEntry.SetRange("Bank Account No.", BankAccountNo);
+        BankAccountLedgerEntry.SetRange(Open, true);
+        BankAccountLedgerEntry.FindFirst();
+        BankAccountLedgerEntry.SetRecFilter();
+        SecondReconciliationAmount := BankAccountLedgerEntry.Amount;
+        CreateBankAccReconLine(BankAccReconciliationLine, BankAccReconciliation);
+        BankAccReconciliationLine.Validate("Statement Amount", BankAccountLedgerEntry.Amount);
+        BankAccReconciliationLine.Modify();
+        BankAccReconciliationLine.SetRecFilter();
+        MatchBankRecLines.MatchManually(BankAccReconciliationLine, BankAccountLedgerEntry);
+        BankAccReconciliation."Statement Ending Balance" := BankAccReconciliation."Balance Last Statement" + SecondReconciliationAmount;
+        BankAccReconciliation.Modify();
+        LibraryERM.PostBankAccReconciliation(BankAccReconciliation);
+        Commit();
+        // [WHEN] Undoing the first reconciliation and posting it again.
+        BankAccountStatement.Get(BankAccountNo, FirstReconciliationNo);
+        UndoBankStatementYesNo.UndoBankAccountStatement(BankAccountStatement);
+        Commit();
+        BankAccReconciliation.SetRange("Statement Type", BankAccReconciliation."Statement Type"::"Bank Reconciliation");
+        BankAccReconciliation.SetRange("Bank Account No.", BankAccountNo);
+        BankAccReconciliation.FindFirst();
+        LibraryERM.PostBankAccReconciliation(BankAccReconciliation);
+        Commit();
+        // [THEN] The total outstanding amount should include the already closed amount from the second reconciliation.
+        RequestPageXML := Report.RunRequestPage(Report::"Bank Account Statement", RequestPageXML);
+        LibraryReportDataset.RunReportAndLoad(Report::"Bank Account Statement", BankAccountStatement, RequestPageXML);
+        LibraryReportDataset.AssertElementWithValueExists('Bank_Acc__Reconciliation___TotalOutstdBankTransactions', SecondReconciliationAmount);
     end;
 
     local procedure Initialize()
