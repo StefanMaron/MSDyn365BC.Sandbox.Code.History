@@ -15,7 +15,6 @@ codeunit 5612 "Calculate Custom 1 Depr."
 
     var
         FA: Record "Fixed Asset";
-        FALedgEntry: Record "FA Ledger Entry";
         DeprBook: Record "Depreciation Book";
         FADeprBook: Record "FA Depreciation Book";
         FAPostingTypeSetup: Record "FA Posting Type Setup";
@@ -77,7 +76,6 @@ codeunit 5612 "Calculate Custom 1 Depr."
         NumberOfDays3 := 0;
         Custom1NumberOfDays3 := 0;
         DeprBookCode := DeprBookCode2;
-        FALedgEntry.LockTable();
         FA.Get(FANo);
         DeprBook.Get(DeprBookCode);
         if not FADeprBook.Get(FANo, DeprBookCode) then
@@ -337,6 +335,7 @@ codeunit 5612 "Calculate Custom 1 Depr."
         FALedgEntry.SetRange("Depreciation Book Code", DeprBookCode);
         FALedgEntry.SetRange("Part of Book Value", true);
         FALedgEntry.SetRange("FA Posting Date", 0D, Custom1DeprUntil);
+        FALedgEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         FALedgEntry.CalcSums(Amount);
         if (Sign = -1) and (FALedgEntry.Amount > 0) then
             Error(
