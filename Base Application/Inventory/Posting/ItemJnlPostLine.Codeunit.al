@@ -5601,6 +5601,7 @@ then
         ValueEntry: Record "Value Entry";
     begin
         ValueEntry.SetCurrentKey("Item Ledger Entry Type", "Order No.", "Valuation Date");
+        ValueEntry.SetLoadFields("Valuation Date");
         ValueEntry.SetRange("Order Type", ValueEntry."Order Type"::Production);
         ValueEntry.SetRange("Order No.", ItemLedgerEntry."Order No.");
         ValueEntry.SetRange("Order Line No.", ItemLedgerEntry."Order Line No.");
