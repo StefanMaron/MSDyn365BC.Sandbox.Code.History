@@ -9,7 +9,6 @@ using Microsoft.Inventory.Transfer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 using Microsoft.Service.History;
-using System.Reflection;
 
 codeunit 10151 "E-Invoice Cancel Request Batch"
 {
@@ -321,11 +320,8 @@ codeunit 10151 "E-Invoice Cancel Request Batch"
     end;
 
     local procedure GetDateTime72HoursAgo(): DateTime
-    var
-        TypeHelper: Codeunit "Type Helper";
     begin
-        exit(
-            TypeHelper.GetCurrentDateTimeInUserTimeZone() - 3 * 24 * 3600 * 1000);
+        exit(CurrentDateTime - 3 * 24 * 3600 * 1000);
     end;
 }
 
