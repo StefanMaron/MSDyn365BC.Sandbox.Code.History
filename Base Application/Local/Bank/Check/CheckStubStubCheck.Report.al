@@ -1340,7 +1340,7 @@ report 10401 "Check (Stub/Stub/Check)"
                         CheckDateText := Text010;
                 end;
 
-                OnAfterOnAfterGetRecordOfGenJnlLine(GenJnlLine, RemitAddress, CheckToAddr, BalancingType, ApplyMethod, OneCheckPrVendor);
+                OnAfterOnAfterGetRecordOfGenJnlLine(GenJnlLine, RemitAddress, CheckToAddr, BalancingType, ApplyMethod);
             end;
 
             trigger OnPreDataItem()
@@ -1943,7 +1943,7 @@ report 10401 "Check (Stub/Stub/Check)"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterOnAfterGetRecordOfGenJnlLine(GenJournalLine: Record "Gen. Journal Line"; var RemitAddress: Record "Remit Address"; var CheckToAddr: array[8] of Text[100]; BalancingType: Enum "Gen. Journal Account Type"; ApplyMethod: Option; var OneCheckPrVendor: Boolean)
+    local procedure OnAfterOnAfterGetRecordOfGenJnlLine(GenJournalLine: Record "Gen. Journal Line"; var RemitAddress: Record "Remit Address"; var CheckToAddr: array[8] of Text[100]; BalancingType: Enum "Gen. Journal Account Type"; ApplyMethod: Option)
     begin
     end;
 }
