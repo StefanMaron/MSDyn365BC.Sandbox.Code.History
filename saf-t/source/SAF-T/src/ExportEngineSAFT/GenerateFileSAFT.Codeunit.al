@@ -82,7 +82,6 @@ codeunit 5289 "Generate File SAF-T"
         InvoiceTypeTxt: label 'Invoice', Locked = true;
         CreditMemoTypeTxt: label 'CrMemo', Locked = true;
         SAFTExportTok: label 'Audit File Export SAFT', Locked = true;
-        NATxt: Label 'NA', Comment = 'Stands for Not Applicable';
 
     procedure GenerateFileContent(var AuditFileExportLine: Record "Audit File Export Line"; var TempBlob: Codeunit "Temp Blob")
     var
@@ -1228,7 +1227,7 @@ codeunit 5289 "Generate File SAF-T"
         else
             TransactionTypeValue := Format(GLEntry."Document Type");
         XmlHelper.AppendXmlNode('TransactionType', SAFTDataMgt.GetSAFTShortText(TransactionTypeValue));
-        XmlHelper.AppendXmlNode('Description', GetGLEntryDescription(GLEntry));
+        XmlHelper.AppendXmlNode('Description', GLEntry.Description);
         XmlHelper.AppendXmlNode('BatchID', Format(GLEntry."Transaction No."));
         if GLEntry."Last Modified DateTime" = 0DT then
             SystemEntryDate := GLEntry."Posting Date"
@@ -1275,7 +1274,9 @@ codeunit 5289 "Generate File SAF-T"
                         XmlHelper.AppendXmlNode('SupplierID', GLEntry."Source No.");
                 end;
         end;
-        XmlHelper.AppendXmlNode('Description', GetGLEntryDescription(GLEntry));
+        if GLEntry.Description = '' then
+            GLEntry.Description := GLEntry."G/L Account No.";
+        XmlHelper.AppendXmlNode('Description', GLEntry.Description);
         SAFTDataMgt.GetAmountInfoFromGLEntry(AmountXMLNode, Amount, GLEntry);
         ExportAmountWithCurrencyInfo(AmountXMLNode, GLEntry."G/L Account No.", CurrencyCode, ExchangeRate, Amount);
         if (GLEntry."VAT Bus. Posting Group" <> '') or (GLEntry."VAT Prod. Posting Group" <> '') then begin
@@ -2814,15 +2815,6 @@ codeunit 5289 "Generate File SAF-T"
             ReceivablesAccounts.Add(CustomerPostingGroup.Code, CustomerPostingGroup."Receivables Account");
             ReceivablesAcc := CustomerPostingGroup."Receivables Account";
         end;
-    end;
-
-    local procedure GetGLEntryDescription(var GLEntry: Record "G/L Entry") Description: Text
-    begin
-        Description := GLEntry.Description;
-        if Description = '' then
-            Description := GLEntry."G/L Account No.";
-        if Description = '' then
-            Description := NATxt;
     end;
 
     local procedure UpdateDataSourceInProgressDialog(DataSourceCaption: Text)
