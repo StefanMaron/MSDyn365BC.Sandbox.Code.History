@@ -30,7 +30,6 @@ codeunit 134117 "Price Lists UI"
         ViewExistingTxt: Label 'View Existing Prices and Discounts...';
         AllLinesVerifiedMsg: Label 'All price list lines which were modified by you were verified.';
         AmountTypeNotAlowedErr: Label '%1 is not allowed for %2.', Comment = '%1 - Amount type, %2 - source type';
-        TestFieldErr: Label '%1 must have a value', Comment = '%1 = Field Caption';
 
     [Test]
     procedure T000_SalesPriceListsPageIsNotEditable()
@@ -829,6 +828,7 @@ codeunit 134117 "Price Lists UI"
     end;
 
     [Test]
+    [HandlerFunctions('ConfirmYesHandler')]
     procedure T016_SalesStatusFromDraftToActiveWithBlankAssetNo()
     var
         PriceListHeader: Record "Price List Header";
@@ -848,12 +848,14 @@ codeunit 134117 "Price Lists UI"
         PriceListLine.Modify();
         SalesPriceList.OpenEdit();
 
-        Commit();
-
         // [WHEN] Change Status to 'Active' (answer 'Yes' to confirmation)
-        asserterror SalesPriceList.Status.SetValue(PriceListHeader.Status::Active);
+        SalesPriceList.Status.SetValue(PriceListHeader.Status::Active);
 
-        Assert.ExpectedError(StrSubstNo(TestFieldErr, PriceListLine.FieldCaption("Asset No.")));
+        // [THEN] The price list line is active, where "Asset Type" is Item, "Asset No." is <blank>
+        PriceListLine.Find();
+        PriceListLine.TestField(Status, "Price Status"::Active);
+        PriceListLine.TestField("Asset Type", "Price Asset Type"::Item);
+        PriceListLine.TestField("Asset No.", '');
     end;
 
     [Test]
