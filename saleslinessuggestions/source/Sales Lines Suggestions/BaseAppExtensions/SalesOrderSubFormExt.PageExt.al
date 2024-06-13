@@ -44,7 +44,10 @@ pageextension 7278 "Sales Order Sub Form Ext" extends "Sales Order Subform"
 
     trigger OnOpenPage()
     begin
-        SLSActionVisibility := SalesLineAISuggestionImp.CheckSupportedLanguages()
+        if SalesLineAISuggestionImp.CheckSupportedApplicationFamily() and SalesLineAISuggestionImp.CheckSupportedLanguages() then
+            SLSActionVisibility := true
+        else
+            SLSActionVisibility := false;
     end;
 
     var

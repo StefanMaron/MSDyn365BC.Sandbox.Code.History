@@ -4,22 +4,18 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Document;
 
-using System.AI;
 using System.Telemetry;
 
-codeunit 7283 "Document Lookup Function" implements "AOAI Function"
+codeunit 7283 "Document Lookup Function" implements SalesAzureOpenAITools
 {
     Access = Internal;
 
     var
-        SourceDocumentRecordId: RecordId;
-        SearchQuery: Text;
-        FunctionNameLbl: Label 'lookup_from_document', Locked = true;
         DocumentLookUpLbl: Label 'function_call: lookup_from_document', Locked = true;
         SourceDocumentRecordIDLbl: Label 'SourceDocumentRecordID', Locked = true;
 
     [NonDebuggable]
-    procedure GetPrompt(): JsonObject
+    procedure GetToolPrompt(): JsonObject
     var
         Prompt: Codeunit "SLS Prompts";
         PromptJson: JsonObject;
@@ -29,7 +25,7 @@ codeunit 7283 "Document Lookup Function" implements "AOAI Function"
     end;
 
     [NonDebuggable]
-    procedure Execute(Arguments: JsonObject): Variant
+    procedure ToolCall(Arguments: JsonObject; CustomDimension: Dictionary of [Text, Text]): Variant
     var
         TempSalesLineAiSuggestion: Record "Sales Line AI Suggestions" temporary;
         SalesLineAISuggestionImpl: Codeunit "Sales Lines Suggestions Impl.";
@@ -43,6 +39,8 @@ codeunit 7283 "Document Lookup Function" implements "AOAI Function"
         DocumentNo: Text;
         StartDateTxt: Text;
         EndDateTxt: Text;
+        SourceDocumentRecIdTxt: Text;
+        SearchQuery: Text;
     begin
         if Arguments.Get('results', ItemResults) then begin
             ItemResultsArray := ItemResults.AsArray();
@@ -53,10 +51,13 @@ codeunit 7283 "Document Lookup Function" implements "AOAI Function"
                 exit(TempSalesLineAiSuggestion);
             end;
 
+            CustomDimension.Get(SourceDocumentRecordIDLbl, SourceDocumentRecIdTxt);
+            CustomDimension.Get('SearchQuery', SearchQuery);
+
             DocumentLookupSubType := DocLookupType;
             FeatureTelemetryCD.Add('Document Type', DocLookupType.Names().Get(DocLookupType.Ordinals.IndexOf(DocLookupType.AsInteger())));
 
-            if SearchSalesDocument(TempSalesLineAiSuggestion, DocumentLookupSubType, Format(SourceDocumentRecordId), DocumentNo, StartDateTxt, EndDateTxt) then begin
+            if SearchSalesDocument(TempSalesLineAiSuggestion, DocumentLookupSubType, SourceDocumentRecIdTxt, DocumentNo, StartDateTxt, EndDateTxt) then begin
                 FeatureTelemetry.LogUsage('0000ME0', SalesLineAISuggestionImpl.GetFeatureName(), DocumentLookUpLbl, FeatureTelemetryCD);
                 if TempSalesLineAiSuggestion.Count = 0 then
                     NotificationManager.SendNotification(SalesLineAISuggestionImpl.GetNoSalesLinesSuggestionsMsg());
@@ -71,21 +72,6 @@ codeunit 7283 "Document Lookup Function" implements "AOAI Function"
             NotificationManager.SendNotification(SalesLineAISuggestionImpl.GetChatCompletionResponseErr());
         end;
         exit(TempSalesLineAiSuggestion);
-    end;
-
-    procedure GetName(): Text
-    begin
-        exit(FunctionNameLbl);
-    end;
-
-    procedure SetSearchQuery(NewSearchQuery: Text)
-    begin
-        SearchQuery := NewSearchQuery;
-    end;
-
-    procedure SetSourceDocumentRecordId(NewSourceDocumentRecordId: RecordId)
-    begin
-        SourceDocumentRecordId := NewSourceDocumentRecordId;
     end;
 
     [TryFunction]
