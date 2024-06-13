@@ -136,7 +136,11 @@ codeunit 30166 "Shpfy Process Order"
             if ShopifyOrderHeader."Work Description".HasValue then
                 SalesHeader.SetWorkDescription(ShopifyOrderHeader.GetWorkDescription());
         end;
+#if not CLEAN24
         OrdersAPI.AddOrderAttribute(ShopifyOrderHeader, 'BC Doc. No.', SalesHeader."No.", ShopifyShop);
+#else
+        OrdersAPI.AddOrderAttribute(ShopifyOrderHeader, 'BC Doc. No.', SalesHeader."No.");
+#endif
         DocLinkToBCDoc.Init();
         DocLinkToBCDoc."Shopify Document Type" := "Shpfy Shop Document Type"::"Shopify Shop Order";
         DocLinkToBCDoc."Shopify Document Id" := ShopifyOrderHeader."Shopify Order Id";
