@@ -7,7 +7,6 @@ using Microsoft.Integration.Graph;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Document;
-using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using System.EMail;
 using System.Utilities;
@@ -27,7 +26,6 @@ codeunit 5467 "PDF Document Management"
         UnpostedPurchaseInvoiceErr: Label 'You must post purchase invoice %1 before generating the PDF document.', Comment = '%1 - sales credit memo id';
         BlobEmptyErr: Label 'Opening the file failed.';
         CreditMemoTxt: Label 'Credit Memo';
-        CustomerStatementTxt: Label 'Customer Statement';
         PurchaseInvoiceTxt: Label 'Purchase Invoice';
 
     [Scope('OnPrem')]
@@ -140,7 +138,6 @@ codeunit 5467 "PDF Document Management"
         PurchInvHeader: Record "Purch. Inv. Header";
         ReportSelections: Record "Report Selections";
         PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
-        Customer: Record Customer;
         DocumentMailing: Codeunit "Document-Mailing";
         SalesInvoiceAggregator: Codeunit "Sales Invoice Aggregator";
         PurchInvAggregator: Codeunit "Purch. Inv. Aggregator";
@@ -200,15 +197,6 @@ codeunit 5467 "PDF Document Management"
                         DocumentFound := true;
                     end;
                 end;
-            DocumentType::"Customer Statement":
-                if Customer.GetBySystemId(DocumentId) then begin
-                    Customer.SetRange("No.", Customer."No.");
-                    ReportUsage := "Report Selection Usage"::"C.Statement";
-                    ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, Customer, Customer."No.");
-                    DocumentMailing.GetAttachmentFileName(Name, Customer."No.", CustomerStatementTxt, ReportUsage.AsInteger());
-                    DocumentFound := true;
-                end else
-                    DocumentFound := false;
             DocumentType::"Purchase Invoice":
                 begin
                     if PurchaseHeader.GetBySystemId(DocumentId) then
