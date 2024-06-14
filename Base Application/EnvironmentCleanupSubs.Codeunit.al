@@ -37,14 +37,6 @@ codeunit 8912 "Environment Cleanup Subs"
         nullGUID: Guid;
     begin
         // For behavior in all cases of copying a new env.
-        if CompanyName() <> CompanyName then begin
-            OCRServiceSetup.ChangeCompany(CompanyName);
-            DocExchServiceSetup.ChangeCompany(CompanyName);
-            CurrExchRateUpdateSetup.ChangeCompany(CompanyName);
-            VATRegNoSrvConfig.ChangeCompany(CompanyName);
-            ServiceConnection.ChangeCompany(CompanyName);
-            ExchangeSync.ChangeCompany(CompanyName);
-        end;
 
         OCRServiceSetup.ModifyAll("Password Key", nullGUID);
 
@@ -54,7 +46,7 @@ codeunit 8912 "Environment Cleanup Subs"
 
         VATRegNoSrvConfig.ModifyAll(Enabled, false);
 
-        CleanCDSIntegration(CompanyName);
+        CleanCDSIntegration();
 
         ServiceConnection.ModifyAll(Status, ServiceConnection.Status::Disabled);
 #if not CLEAN22
@@ -76,7 +68,7 @@ codeunit 8912 "Environment Cleanup Subs"
 
     end;
 
-    local procedure CleanCDSIntegration(var CompanyName: Text)
+    local procedure CleanCDSIntegration()
     var
         CDSConnectionSetup: Record "CDS Connection Setup";
         CRMConnectionSetup: Record "CRM Connection Setup";
@@ -86,11 +78,6 @@ codeunit 8912 "Environment Cleanup Subs"
         TableKey: Codeunit "Table Key";
         DisableCleanup: Boolean;
     begin
-        if CompanyName() <> CompanyName then begin
-            CDSConnectionSetup.ChangeCompany(CompanyName);
-            CRMConnectionSetup.ChangeCompany(CompanyName);
-        end;
-
         // Here we delete the setup records
         CDSConnectionSetup.DeleteAll();
         CRMConnectionSetup.DeleteAll();
