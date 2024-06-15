@@ -26,12 +26,9 @@ codeunit 4507 "Email - OAuth Client" implements "Email - OAuth Client v2"
     [NonDebuggable]
     [Obsolete('Replaced by GetAccessToken with SecretText data type for AccessToken parameter.', '24.0')]
     procedure GetAccessToken(var AccessToken: Text)
-    var
-        CallerModuleInfo: ModuleInfo;
     begin
-        NavApp.GetCallerModuleInfo(CallerModuleInfo);
 #pragma warning disable AL0432
-        TryGetAccessTokenInternal(AccessToken, CallerModuleInfo);
+        TryGetAccessTokenInternal(AccessToken);
 #pragma warning restore AL0432
     end;
 
@@ -39,11 +36,8 @@ codeunit 4507 "Email - OAuth Client" implements "Email - OAuth Client v2"
     [Obsolete('Replaced by GetAccessToken with SecretText data type for AccessToken parameter.', '24.0')]
 
     procedure TryGetAccessToken(var AccessToken: Text): Boolean
-    var
-        CallerModuleInfo: ModuleInfo;
     begin
-        NavApp.GetCallerModuleInfo(CallerModuleInfo);
-        exit(TryGetAccessTokenInternal(AccessToken, CallerModuleInfo));
+        exit(TryGetAccessTokenInternal(AccessToken));
     end;
 #endif
 
@@ -53,46 +47,25 @@ codeunit 4507 "Email - OAuth Client" implements "Email - OAuth Client v2"
     /// <param name="AccessToken">Out parameter with the Access token of the account</param>
     [NonDebuggable]
     procedure GetAccessToken(var AccessToken: SecretText)
-    var
-        CallerModuleInfo: ModuleInfo;
     begin
-        NavApp.GetCallerModuleInfo(CallerModuleInfo);
-        TryGetAccessTokenInternal(AccessToken, CallerModuleInfo);
+        TryGetAccessTokenInternal(AccessToken);
     end;
 
     [NonDebuggable]
     procedure TryGetAccessToken(var AccessToken: SecretText): Boolean
-    var
-        CallerModuleInfo: ModuleInfo;
     begin
-        NavApp.GetCallerModuleInfo(CallerModuleInfo);
-        exit(TryGetAccessTokenInternal(AccessToken, CallerModuleInfo));
-    end;
-
-    local procedure CheckIfThirdParty(CallerModuleInfo: ModuleInfo)
-    var
-        EnvironmentInformation: Codeunit "Environment Information";
-        CurrentModuleInfo: ModuleInfo;
-    begin
-        NavApp.GetCurrentModuleInfo(CurrentModuleInfo);
-
-        if EnvironmentInformation.IsSaaSInfrastructure() <> true then
-            exit;
-
-        if CallerModuleInfo.Publisher <> CurrentModuleInfo.Publisher then
-            Error(ThirdPartyExtensionsNotAllowedErr);
+        exit(TryGetAccessTokenInternal(AccessToken));
     end;
 
 #if not CLEAN24
     // Interfaces do not support properties for the procedures, so using an internal function
     [TryFunction]
     [NonDebuggable]
-    local procedure TryGetAccessTokenInternal(var AccessToken: Text; CallerModuleInfo: ModuleInfo)
+    local procedure TryGetAccessTokenInternal(var AccessToken: Text)
     var
         Token: SecretText;
     begin
-        CheckIfThirdParty(CallerModuleInfo);
-        TryGetAccessTokenInternal(Token, CallerModuleInfo);
+        TryGetAccessTokenInternal(Token);
         if not Token.IsEmpty() then
             AccessToken := Token.Unwrap();
     end;
@@ -101,14 +74,13 @@ codeunit 4507 "Email - OAuth Client" implements "Email - OAuth Client v2"
     // Interfaces do not support properties for the procedures, so using an internal function
     [TryFunction]
     [NonDebuggable]
-    local procedure TryGetAccessTokenInternal(var AccessToken: SecretText; CallerModuleInfo: ModuleInfo)
+    local procedure TryGetAccessTokenInternal(var AccessToken: SecretText)
     var
         AzureAdMgt: Codeunit "Azure AD Mgt.";
         UrlHelper: Codeunit "Url Helper";
         EnvironmentInformation: Codeunit "Environment Information";
         OAuthErr: Text;
     begin
-        CheckIfThirdParty(CallerModuleInfo);
         Initialize();
 
         ClearLastError();
@@ -193,5 +165,4 @@ codeunit 4507 "Email - OAuth Client" implements "Email - OAuth Client v2"
         CouldNotGetAccessTokenErr: Label 'Could not get access token.';
         EmailCategoryLbl: Label 'EmailOAuth', Locked = true;
         CouldNotAcquireAccessTokenErr: Label 'Failed to acquire access token.', Locked = true;
-        ThirdPartyExtensionsNotAllowedErr: Label 'Third-party extensions are restricted from obtaining access tokens. Please contact your system administrator.';
 }
