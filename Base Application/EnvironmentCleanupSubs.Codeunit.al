@@ -76,7 +76,7 @@ codeunit 8912 "Environment Cleanup Subs"
 
     end;
 
-    local procedure CleanCDSIntegration(var CompanyName: Text)
+    local procedure CleanCDSIntegration(CompanyName: Text)
     var
         CDSConnectionSetup: Record "CDS Connection Setup";
         CRMConnectionSetup: Record "CRM Connection Setup";
@@ -89,9 +89,6 @@ codeunit 8912 "Environment Cleanup Subs"
         if CompanyName() <> CompanyName then begin
             CDSConnectionSetup.ChangeCompany(CompanyName);
             CRMConnectionSetup.ChangeCompany(CompanyName);
-            CDSIntegrationSyncJob.ChangeCompany(CompanyName);
-            CDSIntegrationsSyncJobErrors.ChangeCompany(CompanyName);
-            CRMIntegrationRecord.ChangeCompany(CompanyName);
         end;
 
         // Here we delete the setup records
