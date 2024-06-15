@@ -503,8 +503,7 @@ table 81 "Gen. Journal Line"
                     if ("Currency Code" <> xRec."Currency Code") or
                        ("Posting Date" <> xRec."Posting Date") or
                        (CurrFieldNo = FieldNo("Currency Code")) or
-                       ("Currency Factor" = 0) or
-                       ("Currency Factor" <> CurrExchRate.ExchangeRate("Posting Date", "Currency Code"))
+                       ("Currency Factor" = 0)
                     then begin
                         OnValidateCurrencyCodeOnBeforeUpdateCurrencyFactor(Rec, CurrExchRate);
                         "Currency Factor" := CurrExchRate.ExchangeRate("Posting Date", "Currency Code");
@@ -2495,7 +2494,6 @@ table 81 "Gen. Journal Line"
                 JobPlanningLine.SetRange("No.", "Account No.");
                 JobPlanningLine.SetRange("Usage Link", true);
                 JobPlanningLine.SetRange("System-Created Entry", false);
-                OnLookupJobPlanningLineNoOnAfterJobPlanningLineSetFilter(JobPlanningLine, Rec);
 
                 if PAGE.RunModal(0, JobPlanningLine) = ACTION::LookupOK then
                     Validate("Job Planning Line No.", JobPlanningLine."Line No.");
@@ -2504,13 +2502,7 @@ table 81 "Gen. Journal Line"
             trigger OnValidate()
             var
                 JobPlanningLine: Record "Job Planning Line";
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateJobPlanningLineNo(Rec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if "Job Planning Line No." <> 0 then begin
                     JobPlanningLine.Get("Job No.", "Job Task No.", "Job Planning Line No.");
                     JobPlanningLine.TestField("Job No.", "Job No.");
@@ -3661,7 +3653,6 @@ table 81 "Gen. Journal Line"
         PrevDocNo: Code[20];
         FirstDocNo: Code[20];
         TempFirstDocNo: Code[20];
-        PrecDocTypeInv: Boolean;
         First: Boolean;
         IsHandled: Boolean;
         PrevPostingDate: Date;
@@ -3694,14 +3685,12 @@ table 81 "Gen. Journal Line"
                 if not First and
                     ((GenJnlLine2."Document No." <> PrevDocNo) or
                       (GenJnlLine2."Posting Date" <> PrevPostingDate) or
-                      ((GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice) and PrecDocTypeInv) or
                     ((GenJnlLine2."Bal. Account No." <> '') and (GenJnlLine2."Document No." = ''))) and
                     not LastGenJnlLine.EmptyLine()
                 then
                     DocNo := IncStr(DocNo);
                 PrevDocNo := GenJnlLine2."Document No.";
                 PrevPostingDate := GenJnlLine2."Posting Date";
-                PrecDocTypeInv := GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice;
                 if GenJnlLine2."Document No." <> '' then begin
                     if GenJnlLine2."Applies-to ID" = GenJnlLine2."Document No." then
                         GenJnlLine2.RenumberAppliesToID(GenJnlLine2, GenJnlLine2."Document No.", DocNo);
@@ -3888,7 +3877,7 @@ table 81 "Gen. Journal Line"
         OnAfterUpdateSource(Rec, CurrFieldNo);
     end;
 
-    protected procedure CheckGLAcc(GLAcc: Record "G/L Account")
+    local procedure CheckGLAcc(GLAcc: Record "G/L Account")
     begin
         OnBeforeCheckGLAcc(GLAcc, Rec);
 
@@ -4233,7 +4222,7 @@ table 81 "Gen. Journal Line"
             if (xRec.Amount <> 0) or (xRec."Applies-to Doc. No." <> '') or (xRec."Applies-to ID" <> '') then
                 PaymentToleranceMgt.PmtTolGenJnl(Rec);
         end;
-        if ((CurrFieldNo = fieldno(Amount)) or (CurrFieldNo = FieldNo("Amount (LCY)"))) and (Amount = 0) and (("Applies-to ID" <> '') or ("Applies-to Doc. No." <> '')) then begin
+        if (CurrFieldNo = fieldno(Amount)) and (Amount = 0) and (("Applies-to ID" <> '') or ("Applies-to Doc. No." <> '')) then begin
             if ("Applies-to ID" <> '') then
                 Validate("Applies-to ID", '');
             if ("Applies-to Doc. No." <> '') then
@@ -4277,7 +4266,6 @@ table 81 "Gen. Journal Line"
           DimMgt.EditDimensionSet(
             Rec, "Dimension Set ID", StrSubstNo('%1 %2 %3', "Journal Template Name", "Journal Batch Name", "Line No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-        OnShowDimensionsOnAfterEditDimensionSet(Rec, OldDimSetID);
 
         IsChanged := OldDimSetID <> "Dimension Set ID";
     end;
@@ -5212,7 +5200,7 @@ table 81 "Gen. Journal Line"
     begin
         UpdateDocumentTypeAndAppliesTo(DocType, DocNo);
 
-        if ("Applies-to Doc. Type" = "Applies-to Doc. Type"::Invoice) and ("Document Type" = "Document Type"::Payment) then
+        if("Applies-to Doc. Type" = "Applies-to Doc. Type"::Invoice) and ("Document Type" = "Document Type"::Payment) then
             "Applies-to Ext. Doc. No." := ExtDocNo;
     end;
 
@@ -5636,7 +5624,6 @@ table 81 "Gen. Journal Line"
                         OnSetJournalLineFieldsFromApplicationOnAfterFindFirstVendLedgEntryWithAppliesToID(Rec, VendLedgEntry);
                         VendLedgEntry.SetRange("Exported to Payment File", true);
                         "Exported to Payment File" := VendLedgEntry.FindFirst();
-                        SetRecipientBankAccount(VendLedgEntry."Recipient Bank Account");
                     end
                 end else
                     if "Applies-to Doc. No." <> '' then
@@ -5644,7 +5631,6 @@ table 81 "Gen. Journal Line"
                             OnSetJournalLineFieldsFromApplicationOnAfterFindFirstVendLedgEntryWithAppliesToDocNo(Rec, VendLedgEntry);
                             "Exported to Payment File" := VendLedgEntry."Exported to Payment File";
                             "Applies-to Ext. Doc. No." := VendLedgEntry."External Document No.";
-                            SetRecipientBankAccount(VendLedgEntry."Recipient Bank Account");
                         end;
             AccType::Employee:
                 if "Applies-to ID" <> '' then begin
@@ -6576,7 +6562,7 @@ table 81 "Gen. Journal Line"
         OnAfterCopyGenJnlLineFromPaymentEmplLedgEntry(EmployeeLedgerEntry, Rec);
     end;
 
-    procedure CopyVATSetupToJnlLines(): Boolean
+    local procedure CopyVATSetupToJnlLines(): Boolean
     begin
         if ("Journal Template Name" <> '') and ("Journal Batch Name" <> '') then
             if GenJnlBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
@@ -7547,15 +7533,6 @@ table 81 "Gen. Journal Line"
         ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(Rec);
         if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
             ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(GenJournalBatch);
-    end;
-
-    local procedure SetRecipientBankAccount(RecipientBankAccount: Code[20])
-    var
-    begin
-        if RecipientBankAccount = '' then
-            exit;
-
-        Validate("Recipient Bank Account", RecipientBankAccount);
     end;
 
     [IntegrationEvent(false, false)]
@@ -9364,10 +9341,7 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyDocumentFields(var GenJournalLine: Record "Gen. Journal Line"; DocType: Enum "Gen. Journal Document Type"; DocNo: Code[20];
-                                                                                                           ExtDocNo: Text[35];
-                                                                                                           SourceCode: Code[10];
-                                                                                                           NoSeriesCode: Code[20])
+    local procedure OnAfterCopyDocumentFields(var GenJournalLine: Record "Gen. Journal Line"; DocType: Enum "Gen. Journal Document Type"; DocNo: Code[20]; ExtDocNo: Text[35]; SourceCode: Code[10]; NoSeriesCode: Code[20])
     begin
     end;
 
@@ -9478,21 +9452,6 @@ table 81 "Gen. Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckGLAcc(var GLAccount: Record "G/L Account"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnLookupJobPlanningLineNoOnAfterJobPlanningLineSetFilter(var JobPlanningLine: Record "Job Planning Line"; var GenJournalLine: Record "Gen. Journal Line");
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateJobPlanningLineNo(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnShowDimensionsOnAfterEditDimensionSet(var GenJournalLine: Record "Gen. Journal Line"; OldDimensionSetId: Integer)
     begin
     end;
 }
