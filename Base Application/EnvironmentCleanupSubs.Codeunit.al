@@ -89,6 +89,9 @@ codeunit 8912 "Environment Cleanup Subs"
         if CompanyName() <> CompanyName then begin
             CDSConnectionSetup.ChangeCompany(CompanyName);
             CRMConnectionSetup.ChangeCompany(CompanyName);
+            CDSIntegrationSyncJob.ChangeCompany(CompanyName);
+            CDSIntegrationsSyncJobErrors.ChangeCompany(CompanyName);
+            CRMIntegrationRecord.ChangeCompany(CompanyName);
         end;
 
         // Here we delete the setup records
