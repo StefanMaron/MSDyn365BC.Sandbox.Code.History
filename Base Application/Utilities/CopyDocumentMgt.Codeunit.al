@@ -1501,7 +1501,6 @@ codeunit 6620 "Copy Document Mgt."
         InvDiscountAmount: Decimal;
         IsHandled: Boolean;
         ShouldValidateQuantityMoveNegLines: Boolean;
-        ShouldInitToSalesLine: Boolean;
     begin
         CopyThisLine := true;
         IsHandled := false;
@@ -1531,9 +1530,7 @@ codeunit 6620 "Copy Document Mgt."
         OnCopySalesDocLineOnBeforeSetSalesHeader(ToSalesHeader, ToSalesLine, FromSalesHeader, FromSalesLine, NextLineNo);
 
         ToSalesLine.SetSalesHeader(ToSalesHeader);
-        ShouldInitToSalesLine := RecalculateLines and not FromSalesLine."System-Created Entry";
-        OnCopySalesDocLineOnBeforeInitToSalesLine(ToSalesLine, FromSalesLine, ShouldInitToSalesLine);
-        if ShouldInitToSalesLine then begin
+        if RecalculateLines and not FromSalesLine."System-Created Entry" then begin
             ToSalesLine.Init();
             OnAfterInitToSalesLine(ToSalesLine);
         end else begin
@@ -1731,7 +1728,6 @@ codeunit 6620 "Copy Document Mgt."
         FromSalesCommentDocTypeInt: Integer;
         ShouldGetUnitCost: Boolean;
         IsHandled: Boolean;
-        ShouldRecalculateSalesLine: Boolean;
     begin
         OnBeforeUpdateSalesLine(
           ToSalesHeader, ToSalesLine, FromSalesHeader, FromSalesLine,
@@ -1739,9 +1735,7 @@ codeunit 6620 "Copy Document Mgt."
 
         FromSalesCommentDocTypeInt := DeferralTypeForSalesDoc(FromSalesDocType.AsInteger());
         CopyPostedDeferral := false;
-        ShouldRecalculateSalesLine := RecalculateLines and not FromSalesLine."System-Created Entry";
-        OnUpdateSalesLineOnBeforeValidateToSalesLine(ToSalesHeader, ToSalesLine, FromSalesHeader, FromSalesLine, ShouldRecalculateSalesLine);
-        if ShouldRecalculateSalesLine then begin
+        if RecalculateLines and not FromSalesLine."System-Created Entry" then begin
             OnUpdateSalesLineOnBeforeRecalculateSalesLine(ToSalesLine, FromSalesLine);
             RecalculateSalesLine(ToSalesHeader, ToSalesLine, FromSalesHeader, FromSalesLine, CopyThisLine);
             if IsDeferralToBeCopied(
@@ -8198,11 +8192,6 @@ codeunit 6620 "Copy Document Mgt."
             SkipCopyFromDescription := true;
     end;
 
-    procedure SetCopyExtendedText(CopyExtendedText: Boolean)
-    begin
-        CopyExtText := CopyExtendedText;
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAddPurchDocLine(var TempDocPurchaseLine: Record "Purchase Line" temporary; BufferLineNo: Integer; DocumentNo: Code[20]; DocumentLineNo: Integer)
     begin
@@ -10467,16 +10456,6 @@ codeunit 6620 "Copy Document Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckFromPurchaseHeader(PurchaseHeaderFrom: Record "Purchase Header"; PurchaseHeaderTo: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopySalesDocLineOnBeforeInitToSalesLine(var ToSalesLine: Record "Sales Line"; FromSalesLine: Record "Sales Line"; var ShouldInitToSalesLine: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateSalesLineOnBeforeValidateToSalesLine(var ToSalesHeader: Record "Sales Header"; var ToSalesLine: Record "Sales Line"; var FromSalesHeader: Record "Sales Header"; var FromSalesLine: Record "Sales Line"; var ShouldRecalculateSalesLine: Boolean)
     begin
     end;
 }
