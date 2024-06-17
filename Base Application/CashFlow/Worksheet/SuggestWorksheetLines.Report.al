@@ -894,7 +894,6 @@ report 840 "Suggest Worksheet Lines"
         CFWorksheetLine2."Shortcut Dimension 2 Code" := GLAcc."Global Dimension 2 Code";
         CFWorksheetLine2."Shortcut Dimension 1 Code" := GLAcc."Global Dimension 1 Code";
         CFWorksheetLine2.MoveDefualtDimToJnlLineDim(DATABASE::"G/L Account", GLAcc."No.", CFWorksheetLine2."Dimension Set ID");
-        OnInsertCFLineForGLAccountOnBeforeInsertTempCFWorksheetLine(CFWorksheetLine2, "Cash Flow Forecast", "Cash Flow Account");
         InsertTempCFWorksheetLine(CFWorksheetLine2, 0);
     end;
 
@@ -992,7 +991,6 @@ report 840 "Suggest Worksheet Lines"
         else
             CFWorksheetLine2."Payment Terms Code" := '';
 
-        OnInsertCFLineForVendorLedgEntryOnBeforeInsertTempCFWorksheetLine(CFWorksheetLine2, "Cash Flow Forecast", "Vendor Ledger Entry");
         InsertTempCFWorksheetLine(CFWorksheetLine2, MaxPmtTolerance);
     end;
 
@@ -1100,7 +1098,6 @@ report 840 "Suggest Worksheet Lines"
             else
                 CFWorksheetLine2."Payment Terms Code" := SalesHeader."Payment Terms Code";
 
-            OnInsertCFLineForSalesLineOnBeforeInsertTempCFWorksheetLine(CFWorksheetLine2, "Cash Flow Forecast", "Sales Line");
             InsertTempCFWorksheetLine(CFWorksheetLine2, 0);
         end;
     end;
@@ -1161,7 +1158,6 @@ report 840 "Suggest Worksheet Lines"
         CFWorksheetLine2."Shortcut Dimension 2 Code" := SaleFixedAsset."Global Dimension 2 Code";
         CFWorksheetLine2."Shortcut Dimension 1 Code" := SaleFixedAsset."Global Dimension 1 Code";
         CFWorksheetLine2.MoveDefualtDimToJnlLineDim(DATABASE::"Fixed Asset", SaleFixedAsset."No.", CFWorksheetLine2."Dimension Set ID");
-        OnInsertCFLineForFixedAssetsDisposalOnBeforeInsertTempCFWorksheetLine(CFWorksheetLine2, "Cash Flow Forecast", SaleFixedAsset);
         InsertTempCFWorksheetLine(CFWorksheetLine2, 0);
     end;
 
@@ -1183,7 +1179,6 @@ report 840 "Suggest Worksheet Lines"
         then
             DateLastExecution := "Cash Flow Manual Expense"."Ending Date";
         ExecutionDate := "Cash Flow Manual Expense"."Starting Date";
-        OnInsertCFLineForManualExpenseOnBeforeInsertManualData(CFWorksheetLine2, "Cash Flow Forecast", "Cash Flow Manual Expense");
         if Format("Cash Flow Manual Expense"."Recurring Frequency") <> '' then begin
             if DateLastExecution = 0D then begin
                 NeedsManualPmtUpdate := true;
@@ -1217,9 +1212,6 @@ report 840 "Suggest Worksheet Lines"
         then
             DateLastExecution := "Cash Flow Manual Revenue"."Ending Date";
         ExecutionDate := "Cash Flow Manual Revenue"."Starting Date";
-
-        OnInsertCFLineForManualRevenueOnBeforeInsertManualData(CFWorksheetLine2, "Cash Flow Forecast", "Cash Flow Manual Revenue");
-
         if Format("Cash Flow Manual Revenue"."Recurring Frequency") <> '' then begin
             if DateLastExecution = 0D then begin
                 NeedsManualPmtUpdate := true;
@@ -1304,7 +1296,6 @@ report 840 "Suggest Worksheet Lines"
             else
                 CFWorksheetLine2."Payment Terms Code" := ServiceHeader."Payment Terms Code";
 
-            OnInsertCFLineForServiceLineOnBeforeInsertTempCFWorksheetLine(CFWorksheetLine2, "Cash Flow Forecast", "Service Line");
             InsertTempCFWorksheetLine(CFWorksheetLine2, 0);
         end;
     end;
@@ -1350,12 +1341,11 @@ report 840 "Suggest Worksheet Lines"
             CFWorksheetLine2."Document No." := "Job Planning Line"."Document No.";
             CFWorksheetLine2."Amount (LCY)" := GetJobPlanningAmountForCFLine("Job Planning Line");
 
-            OnInsertCFLineForJobPlanningLineOnBeforeInsertTempCFWorksheetLine(CFWorksheetLine2, Job, "Cash Flow Forecast", "Job Planning Line");
             InsertTempCFWorksheetLine(CFWorksheetLine2, 0);
         end;
     end;
 
-    procedure InsertCFLineForTax(SourceTableNum: Integer)
+    local procedure InsertCFLineForTax(SourceTableNum: Integer)
     var
         TaxPayableDate: Date;
         SourceNo: Code[20];
@@ -1516,7 +1506,7 @@ report 840 "Suggest Worksheet Lines"
             InsertTempCFWorksheetLine(CFWorksheetLine2, 0);
     end;
 
-    procedure GetSubPostingGLAccounts(var GLAccount: Record "G/L Account"; var TempGLAccount: Record "G/L Account" temporary)
+    local procedure GetSubPostingGLAccounts(var GLAccount: Record "G/L Account"; var TempGLAccount: Record "G/L Account" temporary)
     var
         SubGLAccount: Record "G/L Account";
     begin
@@ -1546,12 +1536,12 @@ report 840 "Suggest Worksheet Lines"
         until GLAccount.Next() = 0;
     end;
 
-    procedure SetCashFlowDate(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; CashFlowDate: Date)
+    local procedure SetCashFlowDate(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; CashFlowDate: Date)
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSetCashFlowDate(CashFlowWorksheetLine, IsHandled, SelectionCashFlowForecast);
+        OnBeforeSetCashFlowDate(CashFlowWorksheetLine, IsHandled);
         if IsHandled then
             exit;
 
@@ -1812,20 +1802,15 @@ report 840 "Suggest Worksheet Lines"
     local procedure GetTaxAmountFromSource(SourceTableNum: Integer): Decimal
     var
         CashFlowManagement: Codeunit "Cash Flow Management";
-        TaxAmount: Decimal;
     begin
         case SourceTableNum of
             DATABASE::"Sales Header":
-                TaxAmount := CashFlowManagement.GetTaxAmountFromSalesOrder("Sales Header");
+                exit(CashFlowManagement.GetTaxAmountFromSalesOrder("Sales Header"));
             DATABASE::"Purchase Header":
-                TaxAmount := CashFlowManagement.GetTaxAmountFromPurchaseOrder("Purchase Header");
+                exit(CashFlowManagement.GetTaxAmountFromPurchaseOrder("Purchase Header"));
             DATABASE::"VAT Entry":
-                TaxAmount := "VAT Entry".Amount;
+                exit("VAT Entry".Amount);
         end;
-
-        OnAfterGetTaxAmountFromSource(SourceTableNum, "Sales Header", "Purchase Header", "VAT Entry", TaxAmount);
-
-        exit(TaxAmount);
     end;
 
     local procedure IsDateBeforeStartOfCurrentPeriod(Date: Date): Boolean
@@ -1850,7 +1835,7 @@ report 840 "Suggest Worksheet Lines"
                 Error(CircularRefsErr, GetCircularRefErrorMessage(AccountPair));
     end;
 
-    procedure ClearCircularRefData()
+    local procedure ClearCircularRefData()
     begin
         Clear(TotalAccounts);
         Clear(TotalAccountPairs);
@@ -1937,7 +1922,7 @@ report 840 "Suggest Worksheet Lines"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetCashFlowDate(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; var IsHandled: Boolean; SelectionCashFlowForecast: Record "Cash Flow Forecast")
+    local procedure OnBeforeSetCashFlowDate(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1967,57 +1952,12 @@ report 840 "Suggest Worksheet Lines"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertTempCFWorksheetLineOnBeforeCalculateCFAmountAndCFDate(var TempCashFlowWorksheetLine: Record "Cash Flow Worksheet Line" temporary; var IsHandled: Boolean);
+    local procedure OnInsertTempCFWorksheetLineOnBeforeCalculateCFAmountAndCFDate(TempCashFlowWorksheetLine: Record "Cash Flow Worksheet Line" temporary; var IsHandled: Boolean);
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertCFLineForPurchaseLineOnBeforeInsertTempCFWorksheetLine(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertCFLineForServiceLineOnBeforeInsertTempCFWorksheetLine(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; CashFlowForecast: Record "Cash Flow Forecast"; ServiceLine: Record "Service Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertCFLineForManualRevenueOnBeforeInsertManualData(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; CashFlowForecast: Record "Cash Flow Forecast"; CashFlowManualRevenue: Record "Cash Flow Manual Revenue")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertCFLineForManualExpenseOnBeforeInsertManualData(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; CashFlowForecast: Record "Cash Flow Forecast"; CashFlowManualExpense: Record "Cash Flow Manual Expense")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertCFLineForJobPlanningLineOnBeforeInsertTempCFWorksheetLine(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; Job: Record Job; CashFlowForecast: Record "Cash Flow Forecast"; JobPlanningLine: Record "Job Planning Line");
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetTaxAmountFromSource(SourceTableNum: Integer; SalesHeader: Record "Sales Header"; PurchaseHeader: Record "Purchase Header"; VATEntry: Record "VAT Entry"; var TaxAmount: Decimal);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertCFLineForFixedAssetsDisposalOnBeforeInsertTempCFWorksheetLine(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; CashFlowForecast: Record "Cash Flow Forecast"; SaleFixedAsset: Record "Fixed Asset")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertCFLineForSalesLineOnBeforeInsertTempCFWorksheetLine(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; CashFlowForecast: Record "Cash Flow Forecast"; SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertCFLineForVendorLedgEntryOnBeforeInsertTempCFWorksheetLine(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; CashFlowForecast: Record "Cash Flow Forecast"; VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertCFLineForGLAccountOnBeforeInsertTempCFWorksheetLine(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; CashFlowForecast: Record "Cash Flow Forecast"; CashFlowAccount: Record "Cash Flow Account");
     begin
     end;
 }

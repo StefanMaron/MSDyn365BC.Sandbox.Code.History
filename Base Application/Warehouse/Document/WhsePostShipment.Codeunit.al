@@ -100,10 +100,7 @@ codeunit 5763 "Whse.-Post Shipment"
     begin
         WhseShptLine.SetCurrentKey(WhseShptLine."No.");
         WhseShptLine.SetRange("No.", WhseShptLine."No.");
-        IsHandled := false;
-        OnBeforeCheckWhseShptLines(WhseShptLine, WhseShptHeader, Invoice, SuppressCommit, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeCheckWhseShptLines(WhseShptLine, WhseShptHeader, Invoice, SuppressCommit);
         WhseShptLine.SetFilter("Qty. to Ship", '>0');
         OnRunOnAfterWhseShptLineSetFilters(WhseShptLine);
         if WhseShptLine.Find('-') then
@@ -118,13 +115,9 @@ codeunit 5763 "Whse.-Post Shipment"
                     CheckItemTrkgPicked(WhseShptLine);
                 if Location."Bin Mandatory" then
                     WhseShptLine.TestField("Bin Code");
-                if not WhseShptLine."Assemble to Order" then begin
-                    IsHandled := false;
-                    OnCodeOnBeforeCheckFullATOPosted(WhseShptLine, IsHandled);
-                    if not IsHandled then
-                        if not WhseShptLine.FullATOPosted() then
-                            Error(FullATONotPostedErr, WhseShptLine."No.", WhseShptLine."Line No.");
-                end;
+                if not WhseShptLine."Assemble to Order" then
+                    if not WhseShptLine.FullATOPosted() then
+                        Error(FullATONotPostedErr, WhseShptLine."No.", WhseShptLine."Line No.");
 
                 OnAfterCheckWhseShptLine(WhseShptLine);
             until WhseShptLine.Next() = 0
@@ -872,10 +865,8 @@ codeunit 5763 "Whse.-Post Shipment"
             ServiceInvHeader.PrintRecords(false);
 
         ServiceShptHeader.MarkedOnly(true);
-        if not ServiceShptHeader.IsEmpty() then begin
+        if not ServiceShptHeader.IsEmpty() then
             ServiceShptHeader.PrintRecords(false);
-            OnPrintDocumentsOnAfterPrintServiceShipment(ServiceShptHeader."No.");
-        end;
     end;
 
     procedure PostUpdateWhseDocuments(var WhseShptHeaderParam: Record "Warehouse Shipment Header")
@@ -1295,7 +1286,7 @@ codeunit 5763 "Whse.-Post Shipment"
                         ModifyLine := SalesLine."Return Qty. to Receive" <> -WhseShptLine."Qty. to Ship";
                         if ModifyLine then begin
                             SalesLine.Validate("Return Qty. to Receive", -WhseShptLine."Qty. to Ship");
-                            OnHandleSalesLineOnAfterValidateRetQtytoReceive(SalesLine, WhseShptLine, Invoice);
+                            OnHandleSalesLineOnAfterValidateRetQtytoReceive(SalesLine, WhseShptLine);
                             if Invoice then
                                 SalesLine.Validate(
                                   "Qty. to Invoice",
@@ -1350,7 +1341,6 @@ codeunit 5763 "Whse.-Post Shipment"
         PurchLine: Record "Purchase Line";
         ModifyLine: Boolean;
         IsHandled: Boolean;
-        ShouldModifyExpectedReceiptDate: Boolean;
     begin
         IsHandled := false;
         OnBeforeHandlePurchaseLine(WhseShptLine, PurchLine, WhseShptHeader, ModifyLine, IsHandled, Invoice);
@@ -1385,17 +1375,13 @@ codeunit 5763 "Whse.-Post Shipment"
                                   WhseShptLine."Qty. to Ship" + PurchLine."Return Qty. Shipped" - PurchLine."Quantity Invoiced");
                         end;
                     end;
-
-                    ShouldModifyExpectedReceiptDate :=
-                      (WhseShptHeader."Shipment Date" <> 0D) and
-                      (PurchLine."Expected Receipt Date" <> WhseShptHeader."Shipment Date") and
-                      (WhseShptLine."Qty. to Ship" = WhseShptLine."Qty. Outstanding");
-                    OnHandlePurchLineOnAfterCalcShouldModifyExpectedReceiptDate(WhseShptHeader, WhseShptLine, PurchLine, ShouldModifyExpectedReceiptDate);
-                    if ShouldModifyExpectedReceiptDate then begin
+                    if (WhseShptHeader."Shipment Date" <> 0D) and
+                       (PurchLine."Expected Receipt Date" <> WhseShptHeader."Shipment Date") and
+                       (WhseShptLine."Qty. to Ship" = WhseShptLine."Qty. Outstanding")
+                    then begin
                         PurchLine."Expected Receipt Date" := WhseShptHeader."Shipment Date";
                         ModifyLine := true;
                     end;
-
                     if PurchLine."Bin Code" <> WhseShptLine."Bin Code" then begin
                         PurchLine."Bin Code" := WhseShptLine."Bin Code";
                         ModifyLine := true;
@@ -1417,7 +1403,6 @@ codeunit 5763 "Whse.-Post Shipment"
         TransLine: Record "Transfer Line";
         ModifyLine: Boolean;
         IsHandled: Boolean;
-        ShouldModifyShipmentDate: Boolean;
     begin
         IsHandled := false;
         OnBeforeHandleTransferLine(WhseShptLine, TransLine, WhseShptHeader, ModifyLine, IsHandled);
@@ -1437,17 +1422,13 @@ codeunit 5763 "Whse.-Post Shipment"
                         if ModifyLine then
                             ValidateTransferLineQtyToShip(TransLine, WhseShptLine);
                     end;
-
-                    ShouldModifyShipmentDate :=
-                      (WhseShptHeader."Shipment Date" <> 0D) and
-                      (TransLine."Shipment Date" <> WhseShptHeader."Shipment Date") and
-                      (WhseShptLine."Qty. to Ship" = WhseShptLine."Qty. Outstanding");
-                    OnHandleTransferLineOnAfterCalcShouldModifyShipmentDate(WhseShptHeader, WhseShptLine, TransLine, ShouldModifyShipmentDate);
-                    if ShouldModifyShipmentDate then begin
+                    if (WhseShptHeader."Shipment Date" <> 0D) and
+                       (TransLine."Shipment Date" <> WhseShptHeader."Shipment Date") and
+                       (WhseShptLine."Qty. to Ship" = WhseShptLine."Qty. Outstanding")
+                    then begin
                         TransLine."Shipment Date" := WhseShptHeader."Shipment Date";
                         ModifyLine := true;
                     end;
-
                     if TransLine."Transfer-from Bin Code" <> WhseShptLine."Bin Code" then begin
                         TransLine."Transfer-from Bin Code" := WhseShptLine."Bin Code";
                         ModifyLine := true;
@@ -1481,13 +1462,7 @@ codeunit 5763 "Whse.-Post Shipment"
     var
         ServLine: Record "Service Line";
         ModifyLine: Boolean;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeHandleServiceLine(WhseShptLine, ServLine, ModifyLine, IsHandled);
-        if IsHandled then
-            exit;
-
         ServLine.SetRange("Document Type", WhseShptLine."Source Subtype");
         ServLine.SetRange("Document No.", WhseShptLine."Source No.");
         if ServLine.Find('-') then
@@ -1990,7 +1965,7 @@ codeunit 5763 "Whse.-Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckWhseShptLines(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; Invoice: Boolean; var SuppressCommit: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeCheckWhseShptLines(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; Invoice: Boolean; var SuppressCommit: Boolean)
     begin
     end;
 
@@ -2090,7 +2065,7 @@ codeunit 5763 "Whse.-Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnHandleSalesLineOnAfterValidateRetQtytoReceive(var SalesLine: Record "Sales Line"; var WhseShptLine: Record "Warehouse Shipment Line"; Invoice: Boolean);
+    local procedure OnHandleSalesLineOnAfterValidateRetQtytoReceive(var SalesLine: Record "Sales Line"; var WhseShptLine: Record "Warehouse Shipment Line");
     begin
     end;
 
@@ -2201,11 +2176,6 @@ codeunit 5763 "Whse.-Post Shipment"
 
     [IntegrationEvent(false, false)]
     local procedure OnPrintDocumentsOnAfterPrintSalesShipment(ShipmentNo: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPrintDocumentsOnAfterPrintServiceShipment(ServiceShipmentNo: Code[20])
     begin
     end;
 
@@ -2341,26 +2311,6 @@ codeunit 5763 "Whse.-Post Shipment"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnAfterWhseShptLineSetFilters(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeHandleServiceLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var ServiceLine: Record "Service Line"; var ModifyLine: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnHandlePurchLineOnAfterCalcShouldModifyExpectedReceiptDate(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var PurchaseLine: Record "Purchase Line"; var ShouldModifyExpectedReceiptDate: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnHandleTransferLineOnAfterCalcShouldModifyShipmentDate(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var TransferLine: Record "Transfer Line"; var ShouldModifyShipmentDate: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforeCheckFullATOPosted(WarehouseShipmentLine: Record "Warehouse Shipment Line"; var IsHandled: Boolean)
     begin
     end;
 }
