@@ -4,21 +4,17 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Document;
 
-using System.AI;
 using System.Telemetry;
 
-codeunit 7285 "Search Items Function" implements "AOAI Function"
+codeunit 7285 "Search Items Function" implements SalesAzureOpenAITools
 {
     Access = Internal;
 
     var
-        SearchQuery: Text;
-        SearchStyle: Enum "Search Style";
-        FunctionNameLbl: Label 'search_items', Locked = true;
         SearchItemsLbl: Label 'function_call: search_items', Locked = true;
 
     [NonDebuggable]
-    procedure GetPrompt(): JsonObject
+    procedure GetToolPrompt(): JsonObject
     var
         Prompt: Codeunit "SLS Prompts";
         PromptJson: JsonObject;
@@ -28,7 +24,7 @@ codeunit 7285 "Search Items Function" implements "AOAI Function"
     end;
 
     [NonDebuggable]
-    procedure Execute(Arguments: JsonObject): Variant
+    procedure ToolCall(Arguments: JsonObject; CustomDimension: Dictionary of [Text, Text]): Variant
     var
         TempSalesLineAiSuggestion: Record "Sales Line AI Suggestions" temporary;
         SearchUtility: Codeunit "Search";
@@ -37,10 +33,17 @@ codeunit 7285 "Search Items Function" implements "AOAI Function"
         NotificationManager: Codeunit "Notification Manager";
         ItemsResults: JsonToken;
         ItemResultsArray: JsonArray;
+        SearchStyle: Enum "Search Style";
+        SearchStyleTxt: Text;
+        SearchQuery: Text;
         SearchIntentLbl: Label 'Add products to a sales order.', Locked = true;
     begin
         if Arguments.Get('results', ItemsResults) then begin
             ItemResultsArray := ItemsResults.AsArray();
+            CustomDimension.Get('SearchQuery', SearchQuery);
+            CustomDimension.Get('SearchStyle', SearchStyleTxt);
+            Evaluate(SearchStyle, SearchStyleTxt);
+
             if SearchUtility.SearchMultiple(ItemResultsArray, SearchStyle, SearchIntentLbl, SearchQuery, 1, 25, false, true, TempSalesLineAiSuggestion) then begin
                 FeatureTelemetry.LogUsage('0000ME2', SalesLineAISuggestionImpl.GetFeatureName(), SearchItemsLbl);
                 if TempSalesLineAiSuggestion.Count = 0 then
@@ -57,20 +60,5 @@ codeunit 7285 "Search Items Function" implements "AOAI Function"
         end;
 
         exit(TempSalesLineAiSuggestion);
-    end;
-
-    procedure GetName(): Text
-    begin
-        exit(FunctionNameLbl);
-    end;
-
-    procedure SetSearchQuery(NewSearchQuery: Text)
-    begin
-        SearchQuery := NewSearchQuery;
-    end;
-
-    procedure SetSearchStyle(NewSearchStyle: Enum "Search Style")
-    begin
-        SearchStyle := NewSearchStyle;
     end;
 }
