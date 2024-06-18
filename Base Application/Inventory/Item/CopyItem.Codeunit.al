@@ -83,10 +83,9 @@ codeunit 730 "Copy Item"
     begin
         if TempCopyItemBuffer."Target No. Series" <> '' then begin
             OnBeforeInitSeries(SourceItem, InventorySetup);
-            InventorySetup.TestField("Item Nos.");
             TargetItem."No." := NoSeries.GetNextNo(TempCopyItemBuffer."Target No. Series");
-            TargetItem."No. Series" := TempCopyItemBuffer."Target No. Series";
         end else begin
+            InventorySetup.TestField("Item Nos.");
             NoSeries.TestManual(InventorySetup."Item Nos.");
 
             if CopyCounter > 1 then
