@@ -36,19 +36,17 @@ codeunit 139785 "SLS Test Utility"
         result.ReadFrom(data);
     end;
 
+
     // Completion functions
     [TryFunction]
     local procedure TryGetCompletion(var CompletionAnswerTxt: SecretText; UserSearchTest: Text)
     var
-        TempSalesLineAISuggestions: Record "Sales Line AI Suggestions" temporary;
-        SalesHeader: Record "Sales Header";
         SalesLineAISuggestionImpl: Codeunit "Sales Lines Suggestions Impl.";
         Prompt: Codeunit "SLS Prompts";
         IntentSystemPrompt: SecretText;
-        SearchStyle: Enum "Search Style";
     begin
         IntentSystemPrompt := Prompt.GetSLSSystemPrompt();
-        CompletionAnswerTxt := SalesLineAISuggestionImpl.AICall(IntentSystemPrompt, UserSearchTest, SearchStyle, SalesHeader, TempSalesLineAISuggestions);
+        CompletionAnswerTxt := SalesLineAISuggestionImpl.AICall(IntentSystemPrompt, UserSearchTest);
     end;
 
     procedure RepeatAtMost100TimesToFetchCompletion(var CompletionAnswerTxt: SecretText; UserSearchTest: Text)
@@ -165,6 +163,9 @@ codeunit 139785 "SLS Test Utility"
         Assert.AreEqual(ExpectedEndDate, DocumentTypeToken.AsValue().AsText(), 'End date is not correct');
     end;
 
+
     var
         Assert: Codeunit Assert;
+
+
 }
