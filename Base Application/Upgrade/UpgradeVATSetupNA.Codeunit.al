@@ -41,7 +41,7 @@ codeunit 104156 "Upgrade VAT Setup NA"
             repeat
                 UserSetup."Allow VAT Date From" := 0D;
                 UserSetup."Allow VAT Date To" := 0D;
-                if UserSetup.Modify() then;
+                UserSetup.Modify();
             until UserSetup.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(GetVATSetupAllowVATDateUSCATag());
