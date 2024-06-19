@@ -481,7 +481,6 @@ table 81 "Gen. Journal Line"
             trigger OnValidate()
             var
                 BankAcc: Record "Bank Account";
-                AccCurrencyCode: Code[10];
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -506,12 +505,11 @@ table 81 "Gen. Journal Line"
 
                 if "Currency Code" <> '' then begin
                     GetCurrency();
-                    AccCurrencyCode := GetAccCurrencyCode();
                     if ("Currency Code" <> xRec."Currency Code") or
                        ("Posting Date" <> xRec."Posting Date") or
                        (CurrFieldNo = FieldNo("Currency Code")) or
                        ("Currency Factor" = 0) or
-                       (("Currency Code" <> AccCurrencyCode) and (AccCurrencyCode <> ''))
+                       ("Currency Factor" <> CurrExchRate.ExchangeRate("Posting Date", "Currency Code"))
                     then begin
                         OnValidateCurrencyCodeOnBeforeUpdateCurrencyFactor(Rec, CurrExchRate);
                         "Currency Factor" := CurrExchRate.ExchangeRate("Posting Date", "Currency Code");
@@ -5999,6 +5997,7 @@ table 81 "Gen. Journal Line"
                         OnSetJournalLineFieldsFromApplicationOnAfterFindFirstVendLedgEntryWithAppliesToID(Rec, VendLedgEntry);
                         VendLedgEntry.SetRange("Exported to Payment File", true);
                         "Exported to Payment File" := VendLedgEntry.FindFirst();
+                        SetRecipientBankAccount(VendLedgEntry."Recipient Bank Account");
                     end
                 end else
                     if "Applies-to Doc. No." <> '' then
@@ -6007,6 +6006,7 @@ table 81 "Gen. Journal Line"
                             "Exported to Payment File" := VendLedgEntry."Exported to Payment File";
                             "Applies-to Ext. Doc. No." := VendLedgEntry."External Document No.";
                             RecBankAccount := VendLedgEntry."Recipient Bank Account";
+                            SetRecipientBankAccount(VendLedgEntry."Recipient Bank Account");
                         end;
             AccType::Employee:
                 if "Applies-to ID" <> '' then begin
@@ -7983,46 +7983,13 @@ table 81 "Gen. Journal Line"
             ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(GenJournalBatch);
     end;
 
-    local procedure GetAccCurrencyCode() CurrencyCode: Code[10]
+    local procedure SetRecipientBankAccount(RecipientBankAccount: Code[20])
     var
-        Customer: Record Customer;
-        Vendor: Record Vendor;
-        Employee: Record Employee;
-        BankAccount: Record "Bank Account";
-        ICPartner: Record "IC Partner";
     begin
-        if ("Account No." = '') or ("Currency Code" = '') then
+        if RecipientBankAccount = '' then
             exit;
 
-        case "Account Type" of
-            "Account Type"::Customer:
-                begin
-                    Customer.Get("Account No.");
-                    CurrencyCode := Customer."Currency Code";
-                end;
-            "Account Type"::Vendor:
-                begin
-                    Vendor.Get("Account No.");
-                    CurrencyCode := Vendor."Currency Code";
-                end;
-            "Account Type"::Employee:
-                begin
-                    Employee.Get("Account No.");
-                    CurrencyCode := Employee."Currency Code";
-                end;
-            "Account Type"::"Bank Account":
-                begin
-                    BankAccount.Get("Account No.");
-                    CurrencyCode := BankAccount."Currency Code";
-                end;
-            "Account Type"::"IC Partner":
-                begin
-                    ICPartner.Get("Account No.");
-                    CurrencyCode := ICPartner."Currency Code";
-                end;
-        end;
-
-        exit(CurrencyCode);
+        Validate("Recipient Bank Account", RecipientBankAccount);
     end;
 
     [IntegrationEvent(false, false)]
