@@ -108,7 +108,7 @@ page 6325 "Power BI Embedded Report Part"
                         if not (ClientTypeManagement.GetCurrentClientType() in [ClientType::Phone, ClientType::Windows]) then begin
                             if ReportFrameRatio = '' then
                                 ReportFrameRatio := PowerBiServiceMgt.GetMainPageRatio();
-                            CurrPage.PowerBIAddin.InitializeFrame(FullPageMode, ReportFrameRatio);
+                            CurrPage.PowerBIAddin.InitializeFrame(false, ReportFrameRatio);
                         end;
 
 #if not CLEAN23
@@ -273,7 +273,7 @@ page 6325 "Power BI Embedded Report Part"
                     ShowCaption = false;
                     Style = StrongAccent;
                     StyleExpr = true;
-                    ToolTip = 'Specifies that the user can reload the page part. If reports have been deployed in the background, reloading the page part will make them visible.';
+                    ToolTip = 'Specifies that the user can refresh the page part. If reports have been deployed in the background, refreshing the page part will make them visible.';
 
                     trigger OnDrillDown()
                     var
@@ -300,10 +300,10 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Select Report';
-                ToolTip = 'Select the report.';
-                Image = SelectChart;
-                Visible = not LockedToFirstElement;
                 Enabled = PageState <> PageState::GetStarted;
+                Visible = not LockedToFirstElement;
+                Image = SelectChart;
+                ToolTip = 'Select the report.';
 
                 trigger OnAction()
                 begin
@@ -338,10 +338,10 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Previous';
-                ToolTip = 'Go to the previous Power BI element.';
-                Image = PreviousSet;
-                Visible = not LockedToFirstElement;
                 Enabled = PageState = PageState::ElementVisible;
+                Visible = not LockedToFirstElement;
+                Image = PreviousSet;
+                ToolTip = 'Go to the previous Power BI element.';
 
                 trigger OnAction()
                 begin
@@ -363,10 +363,10 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Next';
-                ToolTip = 'Go to the next Power BI element.';
-                Image = NextSet;
-                Visible = not LockedToFirstElement;
                 Enabled = PageState = PageState::ElementVisible;
+                Visible = not LockedToFirstElement;
+                Image = NextSet;
+                ToolTip = 'Go to the next Power BI element.';
 
                 trigger OnAction()
                 begin
@@ -413,10 +413,9 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Expand';
-                ToolTip = 'Opens the currently selected element in a larger page.';
-                Image = PowerBI;
-                Visible = not FullPageMode;
                 Enabled = PageState = PageState::ElementVisible;
+                Image = PowerBI;
+                ToolTip = 'Opens the currently selected element in a larger page.';
 
                 trigger OnAction()
                 var
@@ -437,9 +436,9 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Reload';
-                ToolTip = 'Reloads the Power BI subpage.';
-                Image = Refresh;
                 Enabled = PageState <> PageState::GetStarted;
+                Image = Refresh;
+                ToolTip = 'Reloads the Power BI subpage.';
 
                 trigger OnAction()
                 begin
@@ -450,9 +449,9 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Upload Report';
-                ToolTip = 'Uploads a report from a PBIX file.';
                 Image = Add;
-                Visible = IsSaaSUser and not FullPageMode;
+                ToolTip = 'Uploads a report from a PBIX file.';
+                Visible = IsSaaSUser;
                 Enabled = (PageState = PageState::ElementVisible) or (PageState = PageState::NoElementSelected) or (PageState = PageState::NoElementSelectedButDeploying) or (PageState = PageState::ShouldDeploy);
 
                 trigger OnAction()
@@ -465,9 +464,8 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Reset My Reports';
-                ToolTip = 'Resets all Power BI setup in Business Central, for the current user. Reports in your Power BI workspaces are not affected and need to be removed manually.';
                 Image = Reuse;
-                Visible = not FullPageMode;
+                ToolTip = 'Resets all Power BI setup in Business Central, for the current user. Reports in your Power BI workspaces are not affected and need to be removed manually.';
 
                 trigger OnAction()
                 var
@@ -509,9 +507,9 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Reset Reports for All Users';
-                ToolTip = 'Resets all Power BI setup in Business Central, for all users. Reports in your Power BI workspaces are not affected and need to be removed manually.';
                 Image = Reuse;
-                Visible = IsPBIAdmin and not FullPageMode;
+                ToolTip = 'Resets all Power BI setup in Business Central, for all users. Reports in your Power BI workspaces are not affected and need to be removed manually.';
+                Visible = IsPBIAdmin;
 
                 trigger OnAction()
                 var
@@ -649,7 +647,7 @@ page 6325 "Power BI Embedded Report Part"
         UnsupportedElementTypeErr: Label 'Displaying Power BI elements of type %1 is currently not supported.', Comment = '%1 = an element type, such as Report or Workspace';
         ReportsDeployingMsg: Label 'We are uploading a demo report to Power BI in the background for you. Once the upload finishes, choose Refresh to see it in this page.\\If you have already reports in your Power BI workspace, you can choose Select Reports instead.';
         StillDeployingMsg: Label 'We are still uploading your demo report. Once the upload finishes, choose Refresh again to see it in this page.\\If you have already reports in your Power BI workspace, you can choose Select Reports instead.';
-        RefreshPartTxt: Label 'Reload';
+        RefreshPartTxt: Label 'Refresh';
         SelectReportsTxt: Label 'Select reports';
 #if not CLEAN23
         ReportCaptionTxt: Label '%1 (Workspace: %2)', Comment = '%1: a report name, for example "Top customers by sales"; %2: a Power BI workspace name, for example "Contoso"';
@@ -662,7 +660,6 @@ page 6325 "Power BI Embedded Report Part"
         ErrorMessageText: Text;
         IsSaaSUser: Boolean;
         IsPBIAdmin: Boolean;
-        FullPageMode: Boolean;
         IsPartVisible: Boolean;
         LockedToFirstElement: Boolean;
         // Telemetry labels
@@ -914,11 +911,6 @@ page 6325 "Power BI Embedded Report Part"
     procedure InitPageRatio(ReportFrameRatioInput: Text)
     begin
         ReportFrameRatio := ReportFrameRatioInput;
-    end;
-
-    procedure SetFullPageMode(NewFullPageMode: Boolean)
-    begin
-        FullPageMode := NewFullPageMode;
     end;
 
     procedure SetPageContext(InputContext: Text)
