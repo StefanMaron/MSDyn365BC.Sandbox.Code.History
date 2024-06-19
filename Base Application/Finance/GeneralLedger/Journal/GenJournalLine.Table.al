@@ -479,7 +479,6 @@ table 81 "Gen. Journal Line"
             trigger OnValidate()
             var
                 BankAcc: Record "Bank Account";
-                AccCurrencyCode: Code[10];
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -504,12 +503,11 @@ table 81 "Gen. Journal Line"
 
                 if "Currency Code" <> '' then begin
                     GetCurrency();
-                    AccCurrencyCode := GetAccCurrencyCode();
                     if ("Currency Code" <> xRec."Currency Code") or
                        ("Posting Date" <> xRec."Posting Date") or
                        (CurrFieldNo = FieldNo("Currency Code")) or
                        ("Currency Factor" = 0) or
-                       (("Currency Code" <> AccCurrencyCode) and (AccCurrencyCode <> ''))
+                       ("Currency Factor" <> CurrExchRate.ExchangeRate("Posting Date", "Currency Code"))
                     then begin
                         OnValidateCurrencyCodeOnBeforeUpdateCurrencyFactor(Rec, CurrExchRate);
                         "Currency Factor" := CurrExchRate.ExchangeRate("Posting Date", "Currency Code");
@@ -7535,48 +7533,6 @@ table 81 "Gen. Journal Line"
         ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(Rec);
         if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
             ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(GenJournalBatch);
-    end;
-
-    local procedure GetAccCurrencyCode() CurrencyCode: Code[10]
-    var
-        Customer: Record Customer;
-        Vendor: Record Vendor;
-        Employee: Record Employee;
-        BankAccount: Record "Bank Account";
-        ICPartner: Record "IC Partner";
-    begin
-        if ("Account No." = '') or ("Currency Code" = '') then
-            exit;
-
-        case "Account Type" of
-            "Account Type"::Customer:
-                begin
-                    Customer.Get("Account No.");
-                    CurrencyCode := Customer."Currency Code";
-                end;
-            "Account Type"::Vendor:
-                begin
-                    Vendor.Get("Account No.");
-                    CurrencyCode := Vendor."Currency Code";
-                end;
-            "Account Type"::Employee:
-                begin
-                    Employee.Get("Account No.");
-                    CurrencyCode := Employee."Currency Code";
-                end;
-            "Account Type"::"Bank Account":
-                begin
-                    BankAccount.Get("Account No.");
-                    CurrencyCode := BankAccount."Currency Code";
-                end;
-            "Account Type"::"IC Partner":
-                begin
-                    ICPartner.Get("Account No.");
-                    CurrencyCode := ICPartner."Currency Code";
-                end;
-        end;
-
-        exit(CurrencyCode);
     end;
 
     [IntegrationEvent(false, false)]
