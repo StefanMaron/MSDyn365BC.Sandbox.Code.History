@@ -989,17 +989,11 @@ codeunit 13 "Gen. Jnl.-Post Batch"
     end;
 
     local procedure CopyGenJnlLineBalancingData(var GenJnlLineTo: Record "Gen. Journal Line"; var GenJnlLineFrom: Record "Gen. Journal Line")
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCopyGenJnlLineBalancingData(IsHandled, GenJnlLineTo, GenJnlLineFrom);
-        if not IsHandled then begin
-            GenJnlLineTo."Bill-to/Pay-to No." := GenJnlLineFrom."Bill-to/Pay-to No.";
-            GenJnlLineTo."Ship-to/Order Address Code" := GenJnlLineFrom."Ship-to/Order Address Code";
-            GenJnlLineTo."VAT Registration No." := GenJnlLineFrom."VAT Registration No.";
-            GenJnlLineTo."Country/Region Code" := GenJnlLineFrom."Country/Region Code";
-        end;
+        GenJnlLineTo."Bill-to/Pay-to No." := GenJnlLineFrom."Bill-to/Pay-to No.";
+        GenJnlLineTo."Ship-to/Order Address Code" := GenJnlLineFrom."Ship-to/Order Address Code";
+        GenJnlLineTo."VAT Registration No." := GenJnlLineFrom."VAT Registration No.";
+        GenJnlLineTo."Country/Region Code" := GenJnlLineFrom."Country/Region Code";
 
         OnAfterCopyGenJnlLineBalancingData(GenJnlLineTo, GenJnlLineFrom);
     end;
@@ -2261,11 +2255,6 @@ codeunit 13 "Gen. Jnl.-Post Batch"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcReversePostingDate(var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCopyGenJnlLineBalancingData(var IsHandled: Boolean; GenJnlLineTo: Record "Gen. Journal Line"; GenJnlLineFrom: Record "Gen. Journal Line")
     begin
     end;
 }
