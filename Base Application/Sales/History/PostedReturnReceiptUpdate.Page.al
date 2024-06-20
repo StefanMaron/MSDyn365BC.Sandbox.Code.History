@@ -18,7 +18,6 @@ page 1353 "Posted Return Receipt - Update"
         {
             group(General)
             {
-                Caption = 'General';
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = SalesReturnOrder;
