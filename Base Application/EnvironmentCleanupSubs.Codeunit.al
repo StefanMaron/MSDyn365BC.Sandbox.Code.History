@@ -76,7 +76,7 @@ codeunit 8912 "Environment Cleanup Subs"
 
     end;
 
-    local procedure CleanCDSIntegration(CompanyName: Text)
+    local procedure CleanCDSIntegration(var CompanyName: Text)
     var
         CDSConnectionSetup: Record "CDS Connection Setup";
         CRMConnectionSetup: Record "CRM Connection Setup";
