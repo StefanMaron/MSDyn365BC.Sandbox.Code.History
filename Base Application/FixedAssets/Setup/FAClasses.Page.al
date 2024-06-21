@@ -8,7 +8,6 @@ page 5615 "FA Classes"
     PageType = List;
     SourceTable = "FA Class";
     UsageCategory = Administration;
-    AnalysisModeEnabled = false;
 
     layout
     {
