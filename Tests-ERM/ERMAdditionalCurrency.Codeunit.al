@@ -26,7 +26,7 @@ codeunit 134043 "ERM Additional Currency"
         ExchRateWasAdjustedTxt: Label 'One or more currency exchange rates have been adjusted.';
         AdjustExchRateDefaultDescTxt: Label 'Adjmt. of %1 %2, Ex.Rate Adjust.', Locked = true;
         BankExchRateAdjustedErr: Label 'Bank Exch Rate should be Adjusted for %1', Comment = '%1 = Bank Account No.';
-        AmountLCYError: Label 'Amount LCY must be %1.', Comment = '%1 = Amount (LCY)';
+        AmountLCYError: Label 'Amount LCY must be %1.';
 
     [Test]
     [Scope('OnPrem')]
@@ -1157,6 +1157,7 @@ codeunit 134043 "ERM Additional Currency"
     procedure AmountLCYShouldNotResetAfterEnteringBalAccNoWithCurrency()
     var
         Currency: Record Currency;
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
         GenJournalTemplate: Record "Gen. Journal Template";
         GenJournalBatch: Record "Gen. Journal Batch";
         Customer: Record Customer;
@@ -1169,7 +1170,8 @@ codeunit 134043 "ERM Additional Currency"
 
         // [GIVEN] Setup: Create a Currency with it's exchange rate and G/L Account
         LibraryERM.CreateCurrency(Currency);
-        LibraryERM.CreateExchangeRate(Currency.Code, WorkDate(), LibraryRandom.RandInt(10), LibraryRandom.RandInt(20));
+        LibraryERM.CreateRandomExchangeRate(Currency.Code);
+        GetOrCreateCurrencyExchangeRate(Currency.Code, CurrencyExchangeRate);
         LibraryERM.CreateGLAccount(GLAccount);
 
         // [GIVEN] Create Customer with Currency
@@ -1994,6 +1996,15 @@ codeunit 134043 "ERM Additional Currency"
         Assert.IsTrue(BankAccountLedgerEntry.Count > 1, StrSubstNo(BankExchRateAdjustedErr, BankAccountNo[1]));
         BankAccountLedgerEntry.SetRange("Document No.", BankAccountNo[2]);
         Assert.IsFalse(BankAccountLedgerEntry.Count > 1, StrSubstNo(BankExchRateAdjustedErr, BankAccountNo[2]));
+    end;
+
+    local procedure GetOrCreateCurrencyExchangeRate(CurrencyCode: Code[10]; var CurrencyExchangeRate: Record "Currency Exchange Rate")
+    begin
+        if CurrencyExchangeRate.Get(CurrencyCode, LibraryERM.FindEarliestDateForExhRate()) then
+            exit;
+        CurrencyExchangeRate."Currency Code" := CurrencyCode;
+        CurrencyExchangeRate."Starting Date" := LibraryERM.FindEarliestDateForExhRate();
+        CurrencyExchangeRate.Insert();
     end;
 
     [ModalPageHandler]
