@@ -487,10 +487,6 @@ report 11603 "Calculate GST Settlement"
 
                     trigger OnPreDataItem()
                     begin
-                        if Post and GenJnlPostLine.IsGLEntryInconsistent() then begin
-                            GenJnlPostLine.ShowInconsistentEntries();
-                            error('');
-                        end;
                         Clear(GenJnlPostLine);
                         Clear(TotalAmt);
                     end;
@@ -548,10 +544,6 @@ report 11603 "Calculate GST Settlement"
                 trigger OnPostDataItem()
                 begin
                     if Post then begin
-                        if GenJnlPostLine.IsGLEntryInconsistent() then begin
-                            GenJnlPostLine.ShowInconsistentEntries();
-                            error('');
-                        end;
                         "BAS Calculation Sheet".Settled := true;
                         "BAS Calculation Sheet".Modify();
                     end;
