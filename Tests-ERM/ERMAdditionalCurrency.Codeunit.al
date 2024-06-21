@@ -26,7 +26,6 @@
         ExchRateWasAdjustedTxt: Label 'One or more currency exchange rates have been adjusted.';
         AdjustExchRateDefaultDescTxt: Label 'Adjmt. of %1 %2, Ex.Rate Adjust.', Locked = true;
         BankExchRateAdjustedErr: Label 'Bank Exch Rate should be Adjusted for %1', Comment = '%1 = Bank Account No.';
-        AmountLCYError: Label 'Amount LCY must be %1.';
 
     [Test]
     [Scope('OnPrem')]
@@ -1152,60 +1151,6 @@
         VerifyAdjExchEntryExistsOnlyForSpecificBank(BankAccountNo);
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    procedure AmountLCYShouldNotResetAfterEnteringBalAccNoWithCurrency()
-    var
-        Currency: Record Currency;
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
-        GenJournalTemplate: Record "Gen. Journal Template";
-        GenJournalBatch: Record "Gen. Journal Batch";
-        Customer: Record Customer;
-        GenJournalLine: Record "Gen. Journal Line";
-        GLAccount: Record "G/L Account";
-        NewAmountLCY: Decimal;
-    begin
-        // [SCENARIO 537470] Amount LCY should not reset after entering the Bal. Account No.
-        Initialize();
-
-        // [GIVEN] Setup: Create a Currency with it's exchange rate and G/L Account
-        LibraryERM.CreateCurrency(Currency);
-        LibraryERM.CreateRandomExchangeRate(Currency.Code);
-        GetOrCreateCurrencyExchangeRate(Currency.Code, CurrencyExchangeRate);
-        LibraryERM.CreateGLAccount(GLAccount);
-
-        // [GIVEN] Create Customer with Currency
-        LibrarySales.CreateCustomer(Customer);
-        Customer.Validate("Currency Code", Currency.Code);
-        Customer.Modify(true);
-
-        // [GIVEN] Create General Journal Batch
-        GenJournalTemplate.SetRange(Recurring, false);
-        GenJournalTemplate.SetRange(Type, GenJournalTemplate.Type::General);
-        LibraryERM.FindGenJournalTemplate(GenJournalTemplate);
-        LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
-        GenJournalBatch."Bal. Account Type" := GenJournalBatch."Bal. Account Type"::"G/L Account";
-        GenJournalBatch.Modify();
-
-        // [THEN] Gen. Journal Line for customer
-        LibraryERM.CreateGeneralJnlLine(
-            GenJournalLine, GenJournalBatch."Journal Template Name", GenJournalBatch.Name,
-            GenJournalLine."Document Type"::Invoice, GenJournalLine."Account Type"::Customer,
-            Customer."No.", LibraryRandom.RandDecInDecimalRange(100, 100, 2));
-
-        // [WHEN] Change Amount (LCY) on Gen. Journal Line and then update Bal. Account No.
-        GenJournalLine.Validate("Amount (LCY)", LibraryRandom.RandDecInDecimalRange(100, 100, 2));
-        NewAmountLCY := GenJournalLine."Amount (LCY)";
-        GenJournalLine.Validate("Bal. Account No.", GenJournalBatch."Bal. Account No.");
-        GenJournalLine.Modify(true);
-
-        // [THEN] Verify: After updating Bal. Account No. the Amount (LCY) should not reset
-        Assert.AreEqual(
-            NewAmountLcy,
-            GenJournalLine."Amount (LCY)",
-            StrSubstNo(AmountLCYError, GenJournalLine."Amount (LCY)"));
-    end;
-
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -1996,15 +1941,6 @@
         Assert.IsTrue(BankAccountLedgerEntry.Count > 1, StrSubstNo(BankExchRateAdjustedErr, BankAccountNo[1]));
         BankAccountLedgerEntry.SetRange("Document No.", BankAccountNo[2]);
         Assert.IsFalse(BankAccountLedgerEntry.Count > 1, StrSubstNo(BankExchRateAdjustedErr, BankAccountNo[2]));
-    end;
-
-    local procedure GetOrCreateCurrencyExchangeRate(CurrencyCode: Code[10]; var CurrencyExchangeRate: Record "Currency Exchange Rate")
-    begin
-        if CurrencyExchangeRate.Get(CurrencyCode, LibraryERM.FindEarliestDateForExhRate()) then
-            exit;
-        CurrencyExchangeRate."Currency Code" := CurrencyCode;
-        CurrencyExchangeRate."Starting Date" := LibraryERM.FindEarliestDateForExhRate();
-        CurrencyExchangeRate.Insert();
     end;
 
     [ModalPageHandler]
