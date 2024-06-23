@@ -3983,7 +3983,6 @@ table 81 "Gen. Journal Line"
         PrevDocNo: Code[20];
         FirstDocNo: Code[20];
         TempFirstDocNo: Code[20];
-        PrecDocTypeInv: Boolean;
         First: Boolean;
         IsHandled: Boolean;
         PrevPostingDate: Date;
@@ -4016,14 +4015,12 @@ table 81 "Gen. Journal Line"
                 if not First and
                     ((GenJnlLine2."Document No." <> PrevDocNo) or
                       (GenJnlLine2."Posting Date" <> PrevPostingDate) or
-                      ((GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice) and PrecDocTypeInv) or
                     ((GenJnlLine2."Bal. Account No." <> '') and (GenJnlLine2."Document No." = ''))) and
                     not LastGenJnlLine.EmptyLine()
                 then
                     DocNo := IncStr(DocNo);
                 PrevDocNo := GenJnlLine2."Document No.";
                 PrevPostingDate := GenJnlLine2."Posting Date";
-                PrecDocTypeInv := GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice;
                 if GenJnlLine2."Document No." <> '' then begin
                     if GenJnlLine2."Applies-to ID" = GenJnlLine2."Document No." then
                         GenJnlLine2.RenumberAppliesToID(GenJnlLine2, GenJnlLine2."Document No.", DocNo);
@@ -5999,6 +5996,7 @@ table 81 "Gen. Journal Line"
                         OnSetJournalLineFieldsFromApplicationOnAfterFindFirstVendLedgEntryWithAppliesToID(Rec, VendLedgEntry);
                         VendLedgEntry.SetRange("Exported to Payment File", true);
                         "Exported to Payment File" := VendLedgEntry.FindFirst();
+                        SetRecipientBankAccount(VendLedgEntry."Recipient Bank Account");
                     end
                 end else
                     if "Applies-to Doc. No." <> '' then
@@ -6007,6 +6005,7 @@ table 81 "Gen. Journal Line"
                             "Exported to Payment File" := VendLedgEntry."Exported to Payment File";
                             "Applies-to Ext. Doc. No." := VendLedgEntry."External Document No.";
                             RecBankAccount := VendLedgEntry."Recipient Bank Account";
+                            SetRecipientBankAccount(VendLedgEntry."Recipient Bank Account");
                         end;
             AccType::Employee:
                 if "Applies-to ID" <> '' then begin
@@ -7981,6 +7980,15 @@ table 81 "Gen. Journal Line"
         ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(Rec);
         if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
             ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(GenJournalBatch);
+    end;
+
+    local procedure SetRecipientBankAccount(RecipientBankAccount: Code[20])
+    var
+    begin
+        if RecipientBankAccount = '' then
+            exit;
+
+        Validate("Recipient Bank Account", RecipientBankAccount);
     end;
 
     local procedure GetAccCurrencyCode() CurrencyCode: Code[10]
