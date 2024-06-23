@@ -40,7 +40,6 @@ report 302 "Get Demand To Reserve"
                 SetFilter("Variant Code", FilterItem.GetFilter("Variant Filter"));
                 SetFilter("Location Code", FilterItem.GetFilter("Location Filter"));
                 SetFilter("Shipment Date", FilterItem.GetFilter("Date Filter"));
-                SetFilter(Reserve, '<>%1', SalesOrderLine.Reserve::Never);
 
                 FilterGroup(2);
                 if DateFilter <> '' then
@@ -55,7 +54,6 @@ report 302 "Get Demand To Reserve"
             trigger OnAfterGetRecord()
             var
                 Item: Record Item;
-                IsHandled: Boolean;
             begin
                 if not IsInventoriableItem() then
                     CurrReport.Skip();
@@ -73,12 +71,10 @@ report 302 "Get Demand To Reserve"
                         CurrReport.Skip();
                 end;
 
-                IsHandled := false;
-                OnSalesOrderLineOnAfterGetRecordOnBeforeSetTempSalesLine(SalesOrderLine, IsHandled);
-                if not IsHandled then begin
-                    TempSalesLine := SalesOrderLine;
-                    TempSalesLine.Insert();
-                end;
+                OnSalesOrderLineOnAfterGetRecordOnBeforeSetTempSalesLine(SalesOrderLine);
+
+                TempSalesLine := SalesOrderLine;
+                TempSalesLine.Insert();
             end;
         }
         dataitem(TransferOrderLine; "Transfer Line")
@@ -144,7 +140,6 @@ report 302 "Get Demand To Reserve"
                 SetFilter("Variant Code", FilterItem.GetFilter("Variant Filter"));
                 SetFilter("Location Code", FilterItem.GetFilter("Location Filter"));
                 SetFilter("Needed by Date", FilterItem.GetFilter("Date Filter"));
-                SetFilter(Reserve, '<>%1', ServiceOrderLine.Reserve::Never);
 
                 FilterGroup(2);
                 if DateFilter <> '' then
@@ -195,7 +190,6 @@ report 302 "Get Demand To Reserve"
                 SetFilter("Variant Code", FilterItem.GetFilter("Variant Filter"));
                 SetFilter("Location Code", FilterItem.GetFilter("Location Filter"));
                 SetFilter("Planning Date", FilterItem.GetFilter("Date Filter"));
-                SetFilter(Reserve, '<>%1', JobPlanningLine.Reserve::Never);
 
                 FilterGroup(2);
                 if DateFilter <> '' then
@@ -247,7 +241,6 @@ report 302 "Get Demand To Reserve"
                 SetFilter("Variant Code", FilterItem.GetFilter("Variant Filter"));
                 SetFilter("Location Code", FilterItem.GetFilter("Location Filter"));
                 SetFilter("Due Date", FilterItem.GetFilter("Date Filter"));
-                SetFilter(Reserve, '<>%1', AssemblyLine.Reserve::Never);
 
                 FilterGroup(2);
                 if DateFilter <> '' then
@@ -552,7 +545,7 @@ report 302 "Get Demand To Reserve"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSalesOrderLineOnAfterGetRecordOnBeforeSetTempSalesLine(var OrderSalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnSalesOrderLineOnAfterGetRecordOnBeforeSetTempSalesLine(var OrderSalesLine: Record "Sales Line")
     begin
     end;
 }
