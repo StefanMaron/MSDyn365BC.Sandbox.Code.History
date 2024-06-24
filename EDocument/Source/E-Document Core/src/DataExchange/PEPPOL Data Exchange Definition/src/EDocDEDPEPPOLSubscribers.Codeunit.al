@@ -271,7 +271,6 @@ codeunit 6162 "E-Doc. DED PEPPOL Subscribers"
                             NetworkID);
 
                         PEPPOLMgt.GetPaymentMeansPayeeFinancialAccBIS(
-                            SalesHeader,
                             PayeeFinancialAccountID,
                             FinancialInstitutionBranchID);
                     end;
