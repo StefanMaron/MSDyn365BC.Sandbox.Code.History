@@ -24,7 +24,7 @@ page 130456 "Test Role Center"
             {
                 ApplicationArea = All;
                 Caption = 'Test Runner';
-                RunObject = page "AL Test Tool";
+                RunObject = Page "AL Test Tool";
                 ToolTip = 'Specifies the action for invoking Test Runner page';
             }
         }
