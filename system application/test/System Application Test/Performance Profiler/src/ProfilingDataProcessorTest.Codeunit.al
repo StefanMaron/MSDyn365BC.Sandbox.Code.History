@@ -127,7 +127,7 @@ codeunit 135014 "Profiling Data Processor Test"
     var
         ProfilingNode: Record "Profiling Node";
         VerificationProfilingNode: Record "Profiling Node";
-        TableViewFilter: Text;
+        TableViewFilter: text;
     begin
         // [GIVEN] Expected profile nodes
         PerfProfilerTestLibrary.InsertProfilingNode(VerificationProfilingNode,
