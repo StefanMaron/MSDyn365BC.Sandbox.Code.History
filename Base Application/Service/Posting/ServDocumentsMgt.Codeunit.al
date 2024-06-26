@@ -10,7 +10,6 @@ using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.EServices.EDocument;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Ledger;
@@ -1394,13 +1393,6 @@ codeunit 5988 "Serv-Documents Mgt."
     procedure InsertValueEntryRelation()
     begin
         ServITRMgt.InsertValueEntryRelation(TempValueEntryRelation);
-    end;
-
-    procedure UpdateIncomingDocument(IncomingDocNo: Integer; PostingDate: Date; PostedDocNo: Code[20])
-    var
-        IncomingDocument: Record "Incoming Document";
-    begin
-        IncomingDocument.UpdateIncomingDocumentFromPosting(IncomingDocNo, PostingDate, PostedDocNo);
     end;
 
     local procedure CheckIfServDuplicateLine(var CurrentServLine: Record "Service Line")
