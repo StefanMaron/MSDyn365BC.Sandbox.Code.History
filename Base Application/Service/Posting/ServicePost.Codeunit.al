@@ -137,13 +137,10 @@ codeunit 5980 "Service-Post"
                 WhseShip := not TempWarehouseShipmentHeader.IsEmpty();
             end;
             if Invoice then
-                if ServiceHeader."Document Type" in [ServiceHeader."Document Type"::Order, ServiceHeader."Document Type"::Invoice] then begin
-                    ServInvoiceNo := ServDocumentsMgt.PrepareInvoiceHeader(Window);
-                    ServDocumentsMgt.UpdateIncomingDocument(ServiceHeader."Incoming Document Entry No.", ServiceHeader."Posting Date", ServInvoiceNo);
-                end else begin
+                if ServiceHeader."Document Type" in [ServiceHeader."Document Type"::Order, ServiceHeader."Document Type"::Invoice] then
+                    ServInvoiceNo := ServDocumentsMgt.PrepareInvoiceHeader(Window)
+                else
                     ServCrMemoNo := ServDocumentsMgt.PrepareCrMemoHeader(Window);
-                    ServDocumentsMgt.UpdateIncomingDocument(ServiceHeader."Incoming Document Entry No.", ServiceHeader."Posting Date", ServCrMemoNo);
-                end;
 
             if WhseShip then begin
                 WarehouseShipmentHeader.Get(TempWarehouseShipmentHeader."No.");
@@ -563,7 +560,6 @@ codeunit 5980 "Service-Post"
         end;
     end;
 
-    [Scope('OnPrem')]
     procedure SendPostedDocumentRecord(ServiceHeader: Record "Service Header"; var DocumentSendingProfile: Record "Document Sending Profile")
     var
         ServiceInvHeader: Record "Service Invoice Header";
