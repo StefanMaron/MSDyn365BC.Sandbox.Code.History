@@ -25,12 +25,11 @@ page 30135 "Shpfy Authentication"
             usercontrol(OAuthIntegration; OAuthControlAddIn)
             {
                 ApplicationArea = All;
-
                 trigger AuthorizationCodeRetrieved(Code: Text)
                 begin
                     SetProperties(Code);
 
-                    if Hmac().IsEmpty() then
+                    if Hmac() = '' then
                         AuthError := AuthError + NoStateErr;
 
                     CurrPage.Close();
@@ -44,87 +43,95 @@ page 30135 "Shpfy Authentication"
 
                 trigger ControlAddInReady();
                 begin
-                    StartAuthorization();
+                    CurrPage.OAuthIntegration.StartAuthorization(OAuthRequestUrl);
                 end;
             }
         }
     }
 
     [NonDebuggable]
-    local procedure StartAuthorization()
-    begin
-        CurrPage.OAuthIntegration.StartAuthorization(OAuthRequestUrl.Unwrap());
-    end;
-
-    internal procedure SetOAuth2Properties(AuthRequestUrl: SecretText)
+    internal procedure SetOAuth2Properties(AuthRequestUrl: Text)
     begin
         OAuthRequestUrl := AuthRequestUrl;
     end;
 
-    internal procedure Hmac(): SecretText
+    [NonDebuggable]
+    internal procedure Hmac(): Text
     begin
-        exit(AuthCodeHmac);
-    end;
-
-    internal procedure Store(): Text
-    begin
-        exit(AuthCodeShop);
-    end;
-
-    internal procedure GetAuthorizationCode(): SecretText
-    begin
-        exit(AuthCodeCode);
-    end;
-
-    internal procedure State(): Integer
-    begin
-        exit(AuthCodeState);
+        exit(GetPropertyFromCode('hmac'));
     end;
 
     [NonDebuggable]
-    local procedure SetProperties(Code: SecretText)
+    internal procedure Store(): Text
+    begin
+        exit(GetPropertyFromCode('shop'));
+    end;
+
+    [NonDebuggable]
+    internal procedure Timestamp(): Text
+    begin
+        exit(GetPropertyFromCode('timestamp'));
+    end;
+
+    [NonDebuggable]
+    internal procedure GetAuthorizationCode(): Text
+    begin
+        exit(GetPropertyFromCode('code'));
+    end;
+
+    [NonDebuggable]
+    internal procedure Host(): Text
+    begin
+        exit(GetPropertyFromCode('host'));
+    end;
+
+    [NonDebuggable]
+    internal procedure State(): Integer
     var
-        Response: Text;
-        ParmValue, PropertyKey, PropertyValue : Text;
+        StateValue: Integer;
+    begin
+        if Evaluate(StateValue, GetPropertyFromCode('state')) then
+            exit(StateValue);
+    end;
+
+    [NonDebuggable]
+    local procedure SetProperties(Code: Text)
+    var
+        ParmValue: Text;
         ParmValues: List of [Text];
     begin
-        if Code.IsEmpty() then
+        Clear(OAuthProperties);
+        if Code = '' then
             exit;
 
-        Response := Code.Unwrap();
+        if Code.EndsWith('#') then
+            Code := CopyStr(Code, 1, StrLen(Code) - 1);
 
-        if Response.EndsWith('#') then
-            Response := CopyStr(Response, 1, StrLen(Response) - 1);
+        ParmValues := Code.Split('&');
+        foreach ParmValue in ParmValues do
+            OAuthProperties.Add(ParmValue.Split('=').Get(1), ParmValue.Split('=').Get(2));
+    end;
 
-        ParmValues := Response.Split('&');
-        foreach ParmValue in ParmValues do begin
-            PropertyKey := ParmValue.Split('=').Get(1);
-            PropertyValue := ParmValue.Split('=').Get(2);
-            case PropertyKey of
-                'hmac':
-                    AuthCodeHmac := PropertyValue;
-                'shop':
-                    AuthCodeShop := PropertyValue;
-                'code':
-                    AuthCodeCode := PropertyValue;
-                'state':
-                    Evaluate(AuthCodeState, PropertyValue);
-            end;
-        end;
+    [NonDebuggable]
+    local procedure GetPropertyFromCode(Property: Text): Text
+    begin
+        if OAuthProperties.ContainsKey(Property) then
+            exit(OAuthProperties.Get(Property));
     end;
 
     [Scope('OnPrem')]
+    [NonDebuggable]
     procedure GetAuthError(): Text
     begin
         exit(AuthError);
     end;
 
     var
-        OAuthRequestUrl: SecretText;
-        AuthCodeHmac: SecretText;
-        AuthCodeShop: Text;
-        AuthCodeCode: SecretText;
-        AuthCodeState: Integer;
+        [NonDebuggable]
+        OAuthRequestUrl: Text;
+        [NonDebuggable]
+        OAuthProperties: Dictionary of [Text, Text];
+        [NonDebuggable]
         AuthError: Text;
         NoStateErr: Label 'No state has been returned.';
         AuthCodeErrorLbl: Label 'Error: %1, description: %2', Comment = '%1 = The authorization error message, %2 = The authorization error description';
