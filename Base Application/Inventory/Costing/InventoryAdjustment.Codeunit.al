@@ -235,10 +235,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
                 GetItem(Item."No.");
                 UpDateWindow(WindowAdjmtLevel, Item."No.", WindowAdjust, WindowFWLevel, WindowEntry, 0);
 
-                IsHandled := false;
-                OnBeforeCollectItemLedgerEntryTypesUsed(Item, IsHandled);
-                if IsHandled then
-                    CollectItemLedgerEntryTypesUsed(Item."No.");
+                CollectItemLedgerEntryTypesUsed(Item."No.");
 
                 OnMakeSingleLevelAdjmtOnBeforeCollectAvgCostAdjmtEntryPointToUpdate(TheItem);
                 CollectAvgCostAdjmtEntryPointToUpdate(TempAvgCostAdjmtEntryPoint, TheItem."No.");
@@ -3156,7 +3153,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
     local procedure OnEliminateRndgResidualOnBeforeCheckHasNewCost(InbndItemLedgerEntry: Record "Item Ledger Entry"; ValueEntry: Record "Value Entry"; RndgCost: Decimal; RndgCostACY: Decimal; var IsHandled: Boolean)
     begin
     end;
-
+    
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAdjustItem(var TheItem: Record Item)
     begin
@@ -3165,11 +3162,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
     [IntegrationEvent(false, false)]
     local procedure OnAfterAdjustItem(var TheItem: Record Item)
     begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCollectItemLedgerEntryTypesUsed(var Item: Record Item; var IsHandled: Boolean)
-    begin
-    end;
+    end;    
 }
 
