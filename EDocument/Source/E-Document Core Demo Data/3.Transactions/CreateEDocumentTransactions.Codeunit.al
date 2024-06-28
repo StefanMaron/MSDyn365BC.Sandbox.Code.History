@@ -3,8 +3,6 @@ codeunit 5376 "Create E-Document Transactions"
     InherentEntitlements = X;
     InherentPermissions = X;
     EventSubscriberInstance = Manual;
-    Permissions = tabledata "Sales Invoice Header" = rimd,
-                  tabledata "Sales Invoice Line" = rimd;
 
 
     trigger OnRun()
