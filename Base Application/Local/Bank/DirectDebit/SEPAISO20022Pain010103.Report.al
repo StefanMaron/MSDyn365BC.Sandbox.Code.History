@@ -198,9 +198,8 @@ report 11000012 "SEPA ISO20022 Pain 01.01.03"
         LocalFunctionalityMgt: Codeunit "Local Functionality Mgt.";
         XMLNewChild: DotNet XmlNode;
         XMLParent: DotNet XmlNode;
-        StreetName: Text[70];
-        PostalCode: Text[16];
-        TownName: Text[35];
+        AddrLine1: Text[110];
+        AddrLine2: Text[60];
         PaymentInformationId: Text[60];
         TotalAmount: Text[50];
         LineCount: Text[20];
@@ -283,20 +282,14 @@ report 11000012 "SEPA ISO20022 Pain 01.01.03"
         AddElement(XMLNodeCurr, 'Nm', CompanyInfo.Name, '', XMLNewChild);
         AddElement(XMLNodeCurr, 'PstlAdr', '', '', XMLNewChild);
         XMLNodeCurr := XMLNewChild;
-        if not Worldpayment then begin
-            StreetName := CopyStr(DelChr(CompanyInfo.Address, '<>') + ' ' + DelChr(CompanyInfo."Address 2", '<>'), 1, MaxStrLen(StreetName));
-            PostalCode := CopyStr(DelChr(CompanyInfo."Post Code", '<>'), 1, MaxStrLen(PostalCode));
-            TownName := CopyStr(DelChr(CompanyInfo.City, '<>'), 1, MaxStrLen(TownName));
 
-            if StreetName <> '' then
-                AddElement(XMLNodeCurr, 'StrtNm', StreetName, '', XMLNewChild);
-            if PostalCode <> '' then
-                AddElement(XMLNodeCurr, 'PstCd', PostalCode, '', XMLNewChild);
-            if TownName <> '' then
-                AddElement(XMLNodeCurr, 'TwnNm', TownName, '', XMLNewChild);
-        end;
         AddElement(XMLNodeCurr, 'Ctry', CopyStr(CompanyInfo."Country/Region Code", 1, 2), '', XMLNewChild);
-
+        if not Worldpayment then begin
+            AddrLine1 := DelChr(CompanyInfo.Address, '<>') + ' ' + DelChr(CompanyInfo."Address 2", '<>');
+            AddElement(XMLNodeCurr, 'AdrLine', CopyStr(AddrLine1, 1, 70), '', XMLNewChild);
+            AddrLine2 := DelChr(CompanyInfo."Post Code", '<>') + ' ' + DelChr(CompanyInfo.City, '<>');
+            AddElement(XMLNodeCurr, 'AdrLine', CopyStr(AddrLine2, 1, 70), '', XMLNewChild);
+        end;
         XMLNodeCurr := XMLNodeCurr.ParentNode;
         XMLNodeCurr := XMLNodeCurr.ParentNode;
 
