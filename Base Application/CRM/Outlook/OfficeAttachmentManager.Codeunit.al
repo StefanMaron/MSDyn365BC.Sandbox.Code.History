@@ -1,6 +1,7 @@
 namespace Microsoft.CRM.Outlook;
 
 using Microsoft.Sales.Posting;
+using System.Email;
 
 codeunit 1629 "Office Attachment Manager"
 {
@@ -11,19 +12,19 @@ codeunit 1629 "Office Attachment Manager"
     end;
 
     var
-        ContentString: Text;
+        UrlOrContentString: Text;
         NameString: Text;
         Body: Text;
         "Count": Integer;
 
-    procedure Add(FileContent: Text; FileName: Text; BodyText: Text)
+    procedure Add(FileUrlOrContent: Text; FileName: Text; BodyText: Text)
     begin
-        if ContentString <> '' then begin
-            ContentString += '|';
+        if UrlOrContentString <> '' then begin
+            UrlOrContentString += '|';
             NameString += '|';
         end;
 
-        ContentString += FileContent;
+        UrlOrContentString += FileUrlOrContent;
         NameString += FileName;
         if Body = '' then
             Body := BodyText;
@@ -38,14 +39,14 @@ codeunit 1629 "Office Attachment Manager"
     procedure Done()
     begin
         Count := 0;
-        ContentString := '';
+        UrlOrContentString := '';
         NameString := '';
         Body := '';
     end;
 
     procedure GetFiles(): Text
     begin
-        exit(ContentString);
+        exit(UrlOrContentString);
     end;
 
     procedure GetNames(): Text
@@ -55,8 +56,10 @@ codeunit 1629 "Office Attachment Manager"
 
     [Scope('OnPrem')]
     procedure GetBody(): Text
+    var
+        MailMgt: Codeunit "Mail Management";
     begin
-        exit(Body);
+        exit(MailMgt.ImageBase64ToUrl(Body));
     end;
 
     procedure IncrementCount(NewCount: Integer)
