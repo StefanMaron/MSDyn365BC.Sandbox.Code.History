@@ -17,7 +17,6 @@ using Microsoft.Purchases.Vendor;
 using System;
 using System.IO;
 using System.Xml;
-using System.Utilities;
 
 report 13403 "Export SEPA Payment File"
 {
@@ -45,16 +44,10 @@ report 13403 "Export SEPA Payment File"
             end;
 
             trigger OnPostDataItem()
-            var
-                XmlDoc: XmlDocument;
-                XMLDocText: Text;
-                BlobOutStream: OutStream;
             begin
-                XmlDocument.ReadFrom(XMLDomDoc.OuterXml, XmlDoc);
-                TempBlob.CreateOutStream(BlobOutStream, TextEncoding::UTF8);
-                XMLDoc.WriteTo(XMLDocText);
-                BlobOutStream.WriteText(XMLDocText);
+                XMLDomDoc.Save(TmpFileNameServer);
                 Clear(XMLDomDoc);
+                FormatOutput();
             end;
 
             trigger OnPreDataItem()
@@ -115,13 +108,11 @@ report 13403 "Export SEPA Payment File"
 
     trigger OnPostReport()
     var
-        BlobInStream: InStream;
         CancelDownload: Boolean;
     begin
-        OnBeforeDownloadFromBlob(TempBlob, CancelDownload);
+        OnBeforeFileDownload(XMLFileNameServer, CancelDownload);
         if not CancelDownload then begin
-            TempBlob.CreateInStream(BlobInStream);
-            DownloadFromStream(BlobInStream, '', '', '', FileName);
+            FileMgt.DownloadHandler(XMLFileNameServer, '', '', '', FileName);
             Message(Text13400, FileName);
         end;
     end;
@@ -143,12 +134,11 @@ report 13403 "Export SEPA Payment File"
         GLSetup: Record "General Ledger Setup";
         FileMgt: Codeunit "File Management";
         XMLDomMgt: Codeunit "XML DOM Management";
-        TempBlob: Codeunit "Temp Blob";
         XMLDomDoc: DotNet XmlDocument;
         XMLNodeCurr: DotNet XmlNode;
-        XMLFileNameServer: Text;
-        TmpFileNameServer: Text;
-        FileName: Text;
+        XMLFileNameServer: Text[250];
+        TmpFileNameServer: Text[250];
+        FileName: Text[250];
         MessageId: Text[20];
         Text13400: Label 'Transfer File %1 Created Successfully.';
         Text13403: Label 'There is nothing to send.';
@@ -407,7 +397,7 @@ report 13403 "Export SEPA Payment File"
         RefPaymentExported."Transfer Time" := Time;
         RefPaymentExported."Batch Code" := MessageId;
         RefPaymentExported."Payment Execution Date" := RefPaymentExported."Payment Date";
-        RefPaymentExported."File Name" := CopyStr(FileName, 1, MaxStrLen(RefPaymentExported."File Name"));
+        RefPaymentExported."File Name" := FileName;
         RefPaymentExported.Modify();
         RefPaymentExported.MarkAffiliatedAsTransferred();
 
@@ -455,6 +445,31 @@ report 13403 "Export SEPA Payment File"
 
                 ControlSum += RefPaymentExported.Amount;
             until RefPaymentExported.Next() = 0;
+    end;
+
+    local procedure FormatOutput()
+    var
+        File: File;
+        NewFile: File;
+        InStream: InStream;
+        OutStream: OutStream;
+        Char: Char;
+        NeedsCRLF: Boolean;
+    begin
+        File.TextMode(true);
+        File.Open(TmpFileNameServer);
+        File.CreateInStream(InStream);
+        NewFile.Create(XMLFileNameServer);
+        NewFile.CreateOutStream(OutStream);
+        NeedsCRLF := false;
+        repeat
+            InStream.Read(Char);
+            if AddCRLF(Char, NeedsCRLF) then
+                OutStream.WriteText();
+            OutStream.Write(Char);
+        until InStream.EOS;
+        File.Close();
+        NewFile.Close();
     end;
 
     [Scope('OnPrem')]
@@ -510,16 +525,9 @@ report 13403 "Export SEPA Payment File"
             exit(GLSetup."LCY Code");
         exit(CurrencyCode);
     end;
-#if not CLEAN25
-    [IntegrationEvent(false, false)]
-    [Obsolete('File is not downloaded anymore, use OnBeforeDownloadFromBlob event to get xml file content.', '25.0')]
-    local procedure OnBeforeFileDownload(FileName: Text; var CancelDownload: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeDownloadFromBlob(var TempBlob: Codeunit "Temp Blob"; var CancelDownload: Boolean)
+    local procedure OnBeforeFileDownload(FileName: Text; var CancelDownload: Boolean)
     begin
     end;
 }
