@@ -347,10 +347,7 @@ page 242 "Consolidate Wizard"
                 trigger OnAction()
                 begin
                     ConsolidateBusinessUnits.ValidateConsolidationParameters(TempConsolidationProcess, Rec, true);
-                    if not ConsolidateBusinessUnits.ValidateAndRunConsolidation(TempConsolidationProcess, Rec) then begin
-                        CurrPage.Close();
-                        Error(GetLastErrorText());
-                    end;
+                    ConsolidateBusinessUnits.StartConsolidation(TempConsolidationProcess, Rec);
                     Message(ConsolidationScheduledMsg);
                     CurrPage.Close();
                 end;
@@ -376,7 +373,7 @@ page 242 "Consolidate Wizard"
                             SetNextActionEnabled();
                             exit;
                         end;
-                        ConsolidateBusinessUnits.ValidateBusinessUnitsToConsolidate(Rec, false);
+                        ConsolidateBusinessUnits.ValidateBusinessUnitsToConsolidate(Rec);
                         if not BusinessUnitsToConsolidateNeedCurrencyTranslation() then
                             Step += 1;
                     end;
