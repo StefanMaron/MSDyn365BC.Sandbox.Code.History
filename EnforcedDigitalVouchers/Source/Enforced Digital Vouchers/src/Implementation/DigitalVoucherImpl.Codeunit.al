@@ -412,7 +412,10 @@ codeunit 5579 "Digital Voucher Impl."
             exit;
         if not SalesHeader.Invoice then
             exit;
-        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
+        if SalesInvoiceHeader."No." <> '' then
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
+        if SalesCrMemoHeader."No." <> '' then
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesCrMemoHeader);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Service-Post", 'OnAfterPostServiceDoc', '', true, true)]
@@ -441,7 +444,10 @@ codeunit 5579 "Digital Voucher Impl."
     begin
         if not DigitalVoucherFeature.IsFeatureEnabled() then
             exit;
-        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
+        if SalesInvoiceHeader."No." <> '' then
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
+        if SalesCrMemoHeader."No." <> '' then
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesCrMemoHeader);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnAfterFinalizePostingOnBeforeCommit', '', true, true)]
@@ -453,7 +459,10 @@ codeunit 5579 "Digital Voucher Impl."
             exit;
         if not PurchHeader.Invoice then
             exit;
-        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
+        if PurchInvHeader."No." <> '' then
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
+        if PurchCrMemoHdr."No." <> '' then
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchCrMemoHdr);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purchase-Post Prepayments", 'OnAfterPostPrepayments', '', true, true)]
@@ -461,7 +470,10 @@ codeunit 5579 "Digital Voucher Impl."
     begin
         if not DigitalVoucherFeature.IsFeatureEnabled() then
             exit;
-        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
+        if PurchInvHeader."No." <> '' then
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
+        if PurchCrMemoHdr."No." <> '' then
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchCrMemoHdr);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Batch", 'OnProcessLinesOnAfterPostGenJnlLines', '', true, true)]
