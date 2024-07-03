@@ -13,7 +13,6 @@ using System.Diagnostics;
 using System.Security.User;
 #if not CLEAN24
 using System.Environment.Configuration;
-using System.Environment;
 #endif
 
 page 20 "General Ledger Entries"
@@ -401,6 +400,7 @@ page 20 "General Ledger Entries"
             {
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
+                UpdatePropagation = Both;
                 SubPageLink = "Posting Date" = field("Posting Date"), "Document No." = field("Document No.");
             }
             part(GLEntriesPart; "G/L Entries Part")
@@ -802,7 +802,6 @@ page 20 "General Ledger Entries"
     var
         GLSetup: Record "General Ledger Setup";
 #if not CLEAN24
-        ClientTypeManagement: Codeunit "Client Type Management";
         FeatureKeyManagement: Codeunit "Feature Key Management";
 #endif
     begin
@@ -810,11 +809,7 @@ page 20 "General Ledger Entries"
         AmountVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Debit/Credit Only");
         DebitCreditVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Amount Only");
 #if not CLEAN24
-        if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::SOAP, CLIENTTYPE::OData, CLIENTTYPE::ODataV4, ClientType::Api]
-        then
-            SourceCurrencyVisible := false
-        else
-            SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
+        SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
 #endif
     end;
 
