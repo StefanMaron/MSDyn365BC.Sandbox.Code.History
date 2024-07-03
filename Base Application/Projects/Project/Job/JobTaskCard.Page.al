@@ -632,13 +632,13 @@ page 1003 "Job Task Card"
             group(ActionGroupFS)
             {
                 Caption = 'Dynamics 365 Field Service';
-                Enabled = FSActionGroupEnabled;
+                Visible = FSIntegrationEnabled;
                 action(CRMGoToProduct)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Project Task in Field Service';
                     Image = CoupledItem;
-                    ToolTip = 'Open the coupled Dynamics 365 Field Service entity.';
+                    ToolTip = 'Open the coupled Dynamics 365 Field Service project task.';
 
                     trigger OnAction()
                     var
@@ -772,22 +772,19 @@ page 1003 "Job Task Card"
         BillToContact: Record Contact;
         FormatAddress: Codeunit "Format Address";
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
+        ShipToOptions: Enum "Sales Ship-to Options";
+        BillToOptions: Enum "Sales Bill-to Options";
         FSIntegrationEnabled: Boolean;
-        FSActionGroupEnabled: Boolean;
         CRMIsCoupledToRecord: Boolean;
+        PerTaskBillingFieldsVisible: Boolean;
         BillToInformationEditable: Boolean;
         InvoiceCurrencyCodeEditable: Boolean;
+        ShouldSearchForCustByName: Boolean;
         IsBillToCountyVisible: Boolean;
         IsSellToCountyVisible: Boolean;
         IsShipToCountyVisible: Boolean;
         ExtendedPriceEnabled: Boolean;
         EmptyShipToCodeErr: Label 'The Code field can only be empty if you select Custom Address in the Ship-to field.';
-
-    protected var
-        ShipToOptions: Enum "Sales Ship-to Options";
-        BillToOptions: Enum "Sales Bill-to Options";
-        ShouldSearchForCustByName: Boolean;
-        PerTaskBillingFieldsVisible: Boolean;
 
     trigger OnAfterGetCurrRecord()
     begin
@@ -828,8 +825,6 @@ page 1003 "Job Task Card"
 
         if CRMIntegrationManagement.IsCRMIntegrationEnabled() then
             FSIntegrationEnabled := FSConnectionSetup.IsEnabled();
-
-        FSActionGroupEnabled := FSIntegrationEnabled and (Rec."Job Task Type" = Rec."Job Task Type"::Posting) and Job."Apply Usage Link";
     end;
 
     local procedure UpdateShipToBillToGroupVisibility()
