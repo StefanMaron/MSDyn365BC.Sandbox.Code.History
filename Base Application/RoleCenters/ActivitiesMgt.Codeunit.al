@@ -41,7 +41,6 @@ codeunit 1311 "Activities Mgt."
             if ActivitiesCue.Get() then
                 if not IsPassedCueData(ActivitiesCue) then
                     exit(ActivitiesCue."Overdue Sales Invoice Amount");
-        CustLedgerEntry.SetLoadFields("Remaining Amt. (LCY)");
         SetFilterOverdueSalesInvoice(CustLedgerEntry, CalledFromWebService);
         CustLedgerEntry.SetAutoCalcFields("Remaining Amt. (LCY)");
         if CustLedgerEntry.FindSet() then
@@ -99,7 +98,6 @@ codeunit 1311 "Activities Mgt."
             if ActivitiesCue.Get() then
                 if not IsPassedCueData(ActivitiesCue) then
                     exit(ActivitiesCue."Overdue Purch. Invoice Amount");
-        VendorLedgerEntry.SetLoadFields("Remaining Amt. (LCY)");
         SetFilterOverduePurchaseInvoice(VendorLedgerEntry, CalledFromWebService);
         VendorLedgerEntry.SetAutoCalcFields("Remaining Amt. (LCY)");
         if VendorLedgerEntry.FindSet() then
@@ -214,7 +212,6 @@ codeunit 1311 "Activities Mgt."
         SumCollectionDays: Integer;
         CountInvoices: Integer;
     begin
-        CustLedgerEntry.SetLoadFields("Posting Date", "Closed at Date");
         GetPaidSalesInvoices(CustLedgerEntry);
         if CustLedgerEntry.FindSet() then begin
             repeat
@@ -232,8 +229,8 @@ codeunit 1311 "Activities Mgt."
         SalesHeader: Record "Sales Header";
     begin
         Number := 0;
-        SalesHeader.SetLoadFields("Document Type", "No.");
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+        SalesHeader.SetLoadFields("Document Type", "No.");
         if SalesHeader.FindSet() then
             repeat
                 if SalesHeader.GetQtyReservedFromStockState() = Enum::"Reservation From Stock"::Full then
@@ -247,6 +244,7 @@ codeunit 1311 "Activities Mgt."
         SalesHeader: Record "Sales Header";
     begin
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+        SalesHeader.SetLoadFields("Document Type", "No.");
         if SalesHeader.FindSet() then
             repeat
                 if SalesHeader.GetQtyReservedFromStockState() = Enum::"Reservation From Stock"::Full then
@@ -318,7 +316,6 @@ codeunit 1311 "Activities Mgt."
         if not SetGLAccountsFilterForARAccounts(GLAccount) then
             exit(0);
         GLEntries.SetFilter("G/L Account No.", CreateFilterForGLAccounts(GLAccount));
-        GLEntries.SetRange("Business Unit Code", '');
         GLEntries.CalcSums(Amount);
         exit(GLEntries.Amount);
     end;
@@ -329,7 +326,6 @@ codeunit 1311 "Activities Mgt."
     begin
         if not SetGLAccountsFilterForARAccounts(GLAccount) then
             Page.Run(Page::"General Ledger Setup");
-        GLAccount.SetFilter("Business Unit Filter", ' = %1', '');
         PAGE.Run(PAGE::"Chart of Accounts", GLAccount);
     end;
 

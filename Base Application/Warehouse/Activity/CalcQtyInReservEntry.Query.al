@@ -44,8 +44,8 @@ query 7320 CalcQtyInReservEntry
 
         if WhseItemTrackingSetup."Package No." <> '' then
             if WhseItemTrackingSetup."Package No. Required" then
-                SetRange(Package_No_, WhseItemTrackingSetup."Package No.")
+                SetRange(Package_No_, WhseItemTrackingSetup."Lot No.")
             else
-                SetFilter(Package_No_, '%1|%2', WhseItemTrackingSetup."Package No.", '');
+                SetFilter(Package_No_, '%1|%2', WhseItemTrackingSetup."Lot No.", '');
     end;
 }
