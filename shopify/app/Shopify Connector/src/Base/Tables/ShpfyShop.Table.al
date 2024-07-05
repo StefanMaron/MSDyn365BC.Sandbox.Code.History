@@ -815,8 +815,9 @@ table 30102 "Shpfy Shop"
         CurrencyExchangeRateNotDefinedErr: Label 'The specified currency must have exchange rates configured. If your online shop uses the same currency as Business Central then leave the field empty.';
         AutoCreateErrorMsg: Label 'You cannot turn "%1" off if "%2" is set to the value of "%3".', Comment = '%1 = Field Caption of "Auto Create Orders", %2 = Field Caption of "Return and Refund Process", %3 = Field Value of "Return and Refund Process"';
 
+    [NonDebuggable]
     [Scope('OnPrem')]
-    internal procedure GetAccessToken() Result: SecretText
+    internal procedure GetAccessToken() Result: Text
     var
         AuthenticationMgt: Codeunit "Shpfy Authentication Mgt.";
         Store: Text;
@@ -827,6 +828,7 @@ table 30102 "Shpfy Shop"
             exit(AuthenticationMgt.GetAccessToken(Store));
     end;
 
+    [NonDebuggable]
     [Scope('OnPrem')]
     internal procedure RequestAccessToken()
     var
@@ -838,6 +840,7 @@ table 30102 "Shpfy Shop"
             AuthenticationMgt.InstallShopifyApp(Store);
     end;
 
+    [NonDebuggable]
     [Scope('OnPrem')]
     internal procedure HasAccessToken(): Boolean
     var

@@ -414,7 +414,7 @@ codeunit 139515 "Digital Vouchers Tests"
         for i := 1 to ArrayLen(GenJournalLine) do
             LibraryJournals.CreateGenJournalLine(
                 GenJournalLine[i], GenJournalTemplate.Name, GenJournalBatch.Name,
-                GenJournalLine[i]."Document Type"::" ", GenJournalLine[i]."Account Type"::"G/L Account",
+                GenJournalLine[i]."Document Type"::Invoice, GenJournalLine[i]."Account Type"::"G/L Account",
                 LibraryERM.CreateGLAccountNo(), GenJournalLine[i]."Bal. Account Type"::"G/L Account",
                 LibraryERM.CreateGLAccountNo(), LibraryRandom.RandDec(100, 2));
         GenJournalLineToPost.SetRange("Journal Template Name", GenJournalTemplate.Name);
