@@ -254,92 +254,6 @@ codeunit 139515 "Digital Vouchers Tests"
     end;
 
     [Test]
-    [HandlerFunctions('StrMenuHandler,VerifyNoAttachmentsInEmailEditorModalPageHandler')]
-    procedure PostSalesDocAndSendEmailWithDigitalVoucherAutomaticallyGenerated()
-    var
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        DigVouchersDisableEnforce: Codeunit "Dig. Vouchers Disable Enforce";
-    begin
-        // [SCENARIO 537262] The automatically generated digital voucher is not suggested as an attachment during emailing
-
-        BindSubscription(DigVouchersDisableEnforce);
-        // [GIVEN] Email account is set up
-        LibraryWorkflow.SetUpEmailAccount();
-        BindActiveDirectoryMockEvents();
-        // [GIVEN] Sales shipment report selections without attachment
-        PrepareSalesShipmentReportSelectionsForEmailBodyWithoutAttachment();
-        // [GIVEN] Digital voucher feature is enabled
-        EnableDigitalVoucherFeature();
-        // [GIVEN] Digital voucher entry setup for sales document is "Attachment" and "Generate Automatically" option is enabled
-        InitSetupGenerateAutomatically("Digital Voucher Entry Type"::"Sales Document", "Digital Voucher Check Type"::Attachment);
-
-        // [GIVEN] Sales Order
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, '');
-        LibrarySales.CreateSalesLineWithUnitPrice(
-            SalesLine, SalesHeader, LibraryInventory.CreateItemNo(),
-            LibraryRandom.RandDec(100, 2), LibraryRandom.RandInt(100));
-
-        // [GIVEN] Custom report selection for the customer for email body
-        CreateCustomReportSelectionForCustomer(SalesHeader."Sell-to Customer No.", "Report Selection Usage"::"S.Shipment", Report::"Sales - Shipment");
-
-        LibraryVariableStorage.Enqueue(1); // option for posting only shipment
-        LibraryVariableStorage.Enqueue(3); // option for emailing to discard and not send any email
-        // [WHEN] Post sales order and send email
-        LibrarySales.PostSalesDocumentAndEmail(SalesHeader, true, true);
-
-        // [THEN] No attachments are suggested in the E-mail editor
-        // Verified in the VerifyNoAttachmentsInEmailEditorModalPageHandler
-
-        UnbindSubscription(DigVouchersDisableEnforce);
-    end;
-
-    [Test]
-    procedure PostMultipleGeneralJournalLinesWithGenerateAutomaticallyOption()
-    var
-        GenJournalLine: array[2] of Record "Gen. Journal Line";
-        GenJournalLineToPost: Record "Gen. Journal Line";
-        GenJournalTemplate: Record "Gen. Journal Template";
-        GenJournalBatch: Record "Gen. Journal Batch";
-        IncomingDocument: Record "Incoming Document";
-        DigVouchersEnableEnforce: Codeunit "Dig. Vouchers Enable Enforce";
-        i: Integer;
-    begin
-        // [SCENARIO 537486] Stan can post multiple general journals lines with different documents and digital voucher set to by automatically generated
-
-        Initialize();
-        BindSubscription(DigVouchersEnableEnforce);
-        // [GIVEN] Digital voucher entry setup for general journal is "Attachment" and "Generate Automatically" option is enabled
-        InitSetupGenerateAutomatically("Digital Voucher Entry Type"::"General Journal", "Digital Voucher Check Type"::Attachment);
-        // [GIVEN] General journal lines with the same template and batch are created
-        // [GIVEN] General journal line "X" with "Posting Date" = 01.01.2024 and "Document No." = "X"
-        // [GIVEN] General journal line "Y" with "Posting Date" = 01.01.2024 and "Document No." = "Y"
-        LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
-        GenJournalTemplate.Validate("Force Doc. Balance", false);
-        GenJournalTemplate.Modify(true);
-        LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
-        for i := 1 to ArrayLen(GenJournalLine) do
-            LibraryJournals.CreateGenJournalLine(
-                GenJournalLine[i], GenJournalTemplate.Name, GenJournalBatch.Name,
-                GenJournalLine[i]."Document Type"::" ", GenJournalLine[i]."Account Type"::"G/L Account",
-                LibraryERM.CreateGLAccountNo(), GenJournalLine[i]."Bal. Account Type"::"G/L Account",
-                LibraryERM.CreateGLAccountNo(), LibraryRandom.RandDec(100, 2));
-        GenJournalLineToPost.SetRange("Journal Template Name", GenJournalTemplate.Name);
-        GenJournalLineToPost.SetRange("Journal Batch Name", GenJournalBatch.Name);
-        GenJournalLineToPost.FindSet();
-        // [WHEN] Post both general journal lines
-        Codeunit.Run(Codeunit::"Gen. Jnl.-Post Batch", GenJournalLineToPost);
-
-        // [THEN] Two digital vouchers generated for each combination of "Document No." and "Posting Date"
-        for i := 1 to ArrayLen(GenJournalLine) do
-            Assert.IsTrue(
-                IncomingDocument.FindByDocumentNoAndPostingDate(
-                    IncomingDocument, GenJournalLine[i]."Document No.", Format(GenJournalLine[i]."Posting Date")),
-                'Digital voucher has not been generated');
-        UnbindSubscription(DigVouchersEnableEnforce);
-    end;
-
-    [Test]
     [HandlerFunctions('ConfirmHandler,ErrorMessagePageHandler')]
     procedure PostGeneralJournalLineWithRequiredAttachmentAndNoDigitalVoucher()
     var
@@ -429,6 +343,92 @@ codeunit 139515 "Digital Vouchers Tests"
         // Verified in the ErrorMessagePageHandler
 
         LibraryVariableStorage.AssertEmpty();
+        UnbindSubscription(DigVouchersDisableEnforce);
+    end;
+
+    [Test]
+    [HandlerFunctions('StrMenuHandler,VerifyNoAttachmentsInEmailEditorModalPageHandler')]
+    procedure PostSalesDocAndSendEmailWithDigitalVoucherAutomaticallyGenerated()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        DigVouchersDisableEnforce: Codeunit "Dig. Vouchers Disable Enforce";
+    begin
+        // [SCENARIO 537262] The automatically generated digital voucher is not suggested as an attachment during emailing
+
+        BindSubscription(DigVouchersDisableEnforce);
+        // [GIVEN] Email account is set up
+        LibraryWorkflow.SetUpEmailAccount();
+        BindActiveDirectoryMockEvents();
+        // [GIVEN] Sales shipment report selections without attachment
+        PrepareSalesShipmentReportSelectionsForEmailBodyWithoutAttachment();
+        // [GIVEN] Digital voucher feature is enabled
+        EnableDigitalVoucherFeature();
+        // [GIVEN] Digital voucher entry setup for sales document is "Attachment" and "Generate Automatically" option is enabled
+        InitSetupGenerateAutomatically("Digital Voucher Entry Type"::"Sales Document", "Digital Voucher Check Type"::Attachment);
+
+        // [GIVEN] Sales Order
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, '');
+        LibrarySales.CreateSalesLineWithUnitPrice(
+            SalesLine, SalesHeader, LibraryInventory.CreateItemNo(),
+            LibraryRandom.RandDec(100, 2), LibraryRandom.RandInt(100));
+
+        // [GIVEN] Custom report selection for the customer for email body
+        CreateCustomReportSelectionForCustomer(SalesHeader."Sell-to Customer No.", "Report Selection Usage"::"S.Shipment", Report::"Sales - Shipment");
+
+        LibraryVariableStorage.Enqueue(1); // option for posting only shipment
+        LibraryVariableStorage.Enqueue(3); // option for emailing to discard and not send any email
+        // [WHEN] Post sales order and send email
+        LibrarySales.PostSalesDocumentAndEmail(SalesHeader, true, true);
+
+        // [THEN] No attachments are suggested in the E-mail editor
+        // Verified in the VerifyNoAttachmentsInEmailEditorModalPageHandler
+
+        UnbindSubscription(DigVouchersDisableEnforce);
+    end;
+
+    [Test]
+    procedure PostMultipleGeneralJournalLinesWithGenerateAutomaticallyOption()
+    var
+        GenJournalLine: array[2] of Record "Gen. Journal Line";
+        GenJournalLineToPost: Record "Gen. Journal Line";
+        GenJournalTemplate: Record "Gen. Journal Template";
+        GenJournalBatch: Record "Gen. Journal Batch";
+        IncomingDocument: Record "Incoming Document";
+        DigVouchersDisableEnforce: Codeunit "Dig. Vouchers Disable Enforce";
+        i: Integer;
+    begin
+        // [SCENARIO 537486] Stan can post multiple general journals lines with different documents and digital voucher set to by automatically generated
+
+        Initialize();
+        BindSubscription(DigVouchersDisableEnforce);
+        // [GIVEN] Digital voucher entry setup for general journal is "Attachment" and "Generate Automatically" option is enabled
+        InitSetupGenerateAutomatically("Digital Voucher Entry Type"::"General Journal", "Digital Voucher Check Type"::Attachment);
+        // [GIVEN] General journal lines with the same template and batch are created
+        // [GIVEN] General journal line "X" with "Posting Date" = 01.01.2024 and "Document No." = "X"
+        // [GIVEN] General journal line "Y" with "Posting Date" = 01.01.2024 and "Document No." = "Y"
+        LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
+        GenJournalTemplate.Validate("Force Doc. Balance", false);
+        GenJournalTemplate.Modify(true);
+        LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
+        for i := 1 to ArrayLen(GenJournalLine) do
+            LibraryJournals.CreateGenJournalLine(
+                GenJournalLine[i], GenJournalTemplate.Name, GenJournalBatch.Name,
+                GenJournalLine[i]."Document Type"::Invoice, GenJournalLine[i]."Account Type"::"G/L Account",
+                LibraryERM.CreateGLAccountNo(), GenJournalLine[i]."Bal. Account Type"::"G/L Account",
+                LibraryERM.CreateGLAccountNo(), LibraryRandom.RandDec(100, 2));
+        GenJournalLineToPost.SetRange("Journal Template Name", GenJournalTemplate.Name);
+        GenJournalLineToPost.SetRange("Journal Batch Name", GenJournalBatch.Name);
+        GenJournalLineToPost.FindSet();
+        // [WHEN] Post both general journal lines
+        Codeunit.Run(Codeunit::"Gen. Jnl.-Post Batch", GenJournalLineToPost);
+
+        // [THEN] Two digital vouchers generated for each combination of "Document No." and "Posting Date"
+        for i := 1 to ArrayLen(GenJournalLine) do
+            Assert.IsTrue(
+                IncomingDocument.FindByDocumentNoAndPostingDate(
+                    IncomingDocument, GenJournalLine[i]."Document No.", Format(GenJournalLine[i]."Posting Date")),
+                'Digital voucher has not been generated');
         UnbindSubscription(DigVouchersDisableEnforce);
     end;
 
