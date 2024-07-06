@@ -18,7 +18,6 @@ page 1352 "Posted Return Shpt. - Update"
         {
             group(General)
             {
-                Caption = 'General';
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = PurchReturnOrder;
