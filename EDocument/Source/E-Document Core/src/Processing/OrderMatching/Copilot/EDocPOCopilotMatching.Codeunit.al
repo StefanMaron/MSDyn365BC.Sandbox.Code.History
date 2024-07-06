@@ -6,6 +6,7 @@ using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
 using Microsoft.eServices.EDocument.OrderMatch;
 using System.Environment;
+using Microsoft.eServices.EDocument;
 using System.Telemetry;
 using System.Upgrade;
 using System.Globalization;
@@ -170,10 +171,18 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
     end;
 
     procedure SumUnitCostForAIMatches(var TempAIProposalBuffer: Record "E-Doc. PO Match Prop. Buffer" temporary) Sum: Decimal
+    var
+        EDocument: Record "E-Document";
+        EDocumentImportHelper: Codeunit "E-Document Import Helper";
+        RoundPrecision, Discount, DiscountedUnitCost : Decimal;
     begin
         if TempAIProposalBuffer.FindSet() then
             repeat
-                Sum += TempAIProposalBuffer."Matched Quantity" * TempAIProposalBuffer."E-Document Direct Unit Cost";
+                EDocument.Get(TempAIProposalBuffer."E-Document Entry No.");
+                RoundPrecision := EDocumentImportHelper.GetCurrencyRoundingPrecision(EDocument."Currency Code");
+                Discount := Round((TempAIProposalBuffer."E-Document Direct Unit Cost" * TempAIProposalBuffer."E-Document Line Discount") / 100, RoundPrecision);
+                DiscountedUnitCost := TempAIProposalBuffer."E-Document Direct Unit Cost" - Discount;
+                Sum += TempAIProposalBuffer."Matched Quantity" * DiscountedUnitCost;
             until TempAIProposalBuffer.Next() = 0;
     end;
 
