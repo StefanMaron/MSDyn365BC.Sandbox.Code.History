@@ -2676,8 +2676,6 @@ table 167 Job
             JobPlanningLine.UpdateAllAmounts();
             JobPlanningLine.Modify(true);
         until JobPlanningLine.Next() = 0;
-
-        OnAfterUpdateCostPricesOnRelatedJobPlanningLines(Job);
     end;
 
     local procedure CheckBillToCustomerAssosEntriesExist(var Job: Record Job; var xJob: Record Job)
@@ -2697,11 +2695,11 @@ table 167 Job
 
     local procedure ThrowAssociatedEntriesExistError(var Job: Record Job; xJob: Record Job; CallingFieldNo: Integer; FieldCaption: Text)
     var
-        IsHandled: Boolean;
+        IsHanled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeThrowAssociatedEntriesExistError(Job, xJob, CallingFieldNo, CurrFieldNo, IsHandled);
-        if IsHandled then
+        IsHanled := false;
+        OnBeforeThrowAssociatedEntriesExistError(Job, xJob, CallingFieldNo, CurrFieldNo, IsHanled);
+        if IsHanled then
             exit;
 
         Error(AssociatedEntriesExistErr, FieldCaption, TableCaption);
@@ -2824,13 +2822,7 @@ table 167 Job
         Contact: Record Contact;
         ContactBusinessRelation: Record "Contact Business Relation";
         ContactBusinessRelationFound: Boolean;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateSellToCust(Rec, ContactNo, IsHandled);
-        if IsHandled then
-            exit;
-
         if not Contact.Get(ContactNo) then begin
             "Sell-to Contact" := '';
             exit;
@@ -3338,16 +3330,6 @@ table 167 Job
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterShipToAddressEqualsSellToAddress(var Job: Record Job; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateCostPricesOnRelatedJobPlanningLines(var Job: Record Job)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateSellToCust(var Job: Record Job; var ContactNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
 }
