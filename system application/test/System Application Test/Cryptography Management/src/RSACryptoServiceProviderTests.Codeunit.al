@@ -37,15 +37,12 @@ codeunit 132613 RSACryptoServiceProviderTests
         KeyXml: XmlDocument;
         Root: XmlElement;
         Node: XmlNode;
-        KeyXmlSecretText: SecretText;
-        KeyXmlText: Text;
+        KeyXmlText: SecretText;
     begin
         RSACryptoServiceProvider.InitializeRSA(2048);
-        KeyXmlSecretText := RSACryptoServiceProvider.ToSecretXmlString(true);
-        KeyXmlText := RSACryptoServiceProvider.PublicKeyToXmlString();
+        KeyXmlText := RSACryptoServiceProvider.ToSecretXmlString(true);
 
-        LibraryAssert.IsTrue(XmlDocument.ReadFrom(KeyXmlText, KeyXml), 'RSA pubilc key is not valid xml data.');
-        LibraryAssert.IsTrue(XmlDocument.ReadFrom(GetXmlString(KeyXmlSecretText), KeyXml), 'RSA key is not valid xml data.');
+        LibraryAssert.IsTrue(XmlDocument.ReadFrom(GetXmlString(KeyXmlText), KeyXml), 'RSA key is not valid xml data.');
         LibraryAssert.IsTrue(KeyXml.GetRoot(Root), 'Could not get Root element of key.');
 
         LibraryAssert.IsTrue(Root.SelectSingleNode('Modulus', Node), 'Could not find <Modulus> in key.');

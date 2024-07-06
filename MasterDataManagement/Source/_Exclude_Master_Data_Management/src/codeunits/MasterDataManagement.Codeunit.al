@@ -328,19 +328,13 @@ codeunit 7233 "Master Data Management"
         IntegrationSystemIDFieldRef: FieldRef;
         IntegrationRecordSystemId: Guid;
         IsHandled: Boolean;
-        SourceCompanyName: Text[30];
     begin
         OnGetIntegrationSystemIdFromRecRef(IntegrationRecordRef, IntegrationRecordSystemId, IsHandled);
         if IsHandled then
             exit(IntegrationRecordSystemId);
 
         MasterDataManagementSetup.Get();
-
-        OnSetSourceCompanyName(SourceCompanyName, IntegrationRecordRef.Number());
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        IntegrationRecordRef.ChangeCompany(SourceCompanyName);
-
+        IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         IntegrationSystemIDFieldRef := IntegrationRecordRef.Field(IntegrationRecordRef.SystemIdNo());
         exit(IntegrationSystemIDFieldRef.Value);
     end;
@@ -353,7 +347,6 @@ codeunit 7233 "Master Data Management"
         TextKey: Text;
         Found: Boolean;
         IsHandled: Boolean;
-        SourceCompanyName: Text[30];
     begin
         OnGetIntegrationRecordRefByIntegrationSystemId(IntegrationTableMapping, ID, IntegrationRecordRef, Found, IsHandled);
         if IsHandled then
@@ -361,20 +354,16 @@ codeunit 7233 "Master Data Management"
 
         IntegrationRecordRef.Close();
         MasterDataManagementSetup.Get();
-        OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
         if ID.IsGuid then begin
             IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-            IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+            IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
             IDFieldRef := IntegrationRecordRef.Field(IntegrationTableMapping."Integration Table UID Fld. No.");
             IDFieldRef.SetFilter(ID);
             exit(IntegrationRecordRef.FindFirst());
         end;
 
         if ID.IsRecordId then begin
-            IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-            IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+            IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
             RecordID := ID;
             if RecordID.TableNo = IntegrationTableMapping."Table ID" then
                 exit(IntegrationRecordRef.Get(ID));
@@ -382,7 +371,7 @@ codeunit 7233 "Master Data Management"
 
         if ID.IsText then begin
             IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-            IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+            IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
             IDFieldRef := IntegrationRecordRef.Field(IntegrationTableMapping."Integration Table UID Fld. No.");
             TextKey := ID;
             IDFieldRef.SetFilter('%1', TextKey);
@@ -685,7 +674,6 @@ codeunit 7233 "Master Data Management"
         LocalRecordRef: RecordRef;
         IntegrationRecordRef: RecordRef;
         CountFailed: Integer;
-        SourceCompanyName: Text[30];
     begin
         AddIntegrationTableMapping(IntegrationTableMapping);
         IntegrationTableMapping.SetTableFilter(LocalTableFilter);
@@ -701,10 +689,7 @@ codeunit 7233 "Master Data Management"
         end else begin
             MasterDataManagementSetup.Get();
             IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-            OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-            if SourceCompanyName = '' then
-                SourceCompanyName := MasterDataManagementSetup."Company Name";
-            IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+            IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
             IntegrationRecordRef.SetView(IntegrationTableFilter);
             if IntegrationRecordRef.FindSet() then
                 repeat
@@ -889,14 +874,10 @@ codeunit 7233 "Master Data Management"
         MasterDataManagementSetup: Record "Master Data Management Setup";
         RecordRef: RecordRef;
         FieldRef: FieldRef;
-        SourceCompanyName: Text[30];
     begin
         MasterDataManagementSetup.Get();
         RecordRef.Open(TableNo);
-        OnSetSourceCompanyName(SourceCompanyName, TableNo);
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        RecordRef.ChangeCompany(SourceCompanyName);
+        RecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         FieldRef := RecordRef.Field(IdFiledNo);
         FieldRef.SetRange(IntegrationSystemId);
         View := RecordRef.GetView();
@@ -910,15 +891,11 @@ codeunit 7233 "Master Data Management"
         RecordRef: RecordRef;
         FieldRef: FieldRef;
         IntegrationSystemIdFilter: Text;
-        SourceCompanyName: Text[30];
     begin
         MasterDataManagementSetup.Get();
         IntegrationSystemIdFilter := IntegrationRecordSynch.JoinIDs(IntegrationSystemIds, '|');
         RecordRef.Open(TableNo);
-        OnSetSourceCompanyName(SourceCompanyName, TableNo);
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        RecordRef.ChangeCompany(SourceCompanyName);
+        RecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         FieldRef := RecordRef.Field(IdFiledNo);
         FieldRef.SetFilter(IntegrationSystemIdFilter);
         View := RecordRef.GetView();
@@ -2050,7 +2027,6 @@ codeunit 7233 "Master Data Management"
         IntegrationRecordManagement: Codeunit "Integration Record Management";
         IntegrationTableUidFieldRef: FieldRef;
         IntegrationTableUid: Variant;
-        SourceCompanyName: Text[30];
     begin
         if IntegrationTableConnectionType <> IntegrationTableConnectionType::ExternalSQL then
             exit;
@@ -2061,10 +2037,7 @@ codeunit 7233 "Master Data Management"
         OnGetIntegrationRecordSystemId(SourceRecordRef, IntegrationTableUid, IsHandled);
         if not IsHandled then begin
             MasterDataManagementSetup.Get();
-            OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-            if SourceCompanyName = '' then
-                SourceCompanyName := MasterDataManagementSetup."Company Name";
-            SourceRecordRef.ChangeCompany(SourceCompanyName);
+            SourceRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
             IntegrationTableUidFieldRef := SourceRecordRef.Field(IntegrationTableMapping."Integration Table UID Fld. No.");
             IntegrationTableUid := IntegrationTableUidFieldRef.Value();
         end;
@@ -2106,7 +2079,6 @@ codeunit 7233 "Master Data Management"
         MasterDataManagementSetup: Record "Master Data Management Setup";
         IsHandled: Boolean;
         Found: Boolean;
-        SourceCompanyName: Text[30];
     begin
         OnGetIntegrationRecordRefFromCoupling(IntegrationTableID, MasterDataMgtCoupling, RecRef, Found, IsHandled);
         if IsHandled then
@@ -2117,10 +2089,7 @@ codeunit 7233 "Master Data Management"
 
         MasterDataManagementSetup.Get();
         RecRef.Open(IntegrationTableID);
-        OnSetSourceCompanyName(SourceCompanyName, IntegrationTableID);
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        RecRef.ChangeCompany(SourceCompanyName);
+        RecRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         exit(RecRef.GetBySystemId(MasterDataMgtCoupling."Integration System ID"));
     end;
 
@@ -2144,7 +2113,6 @@ codeunit 7233 "Master Data Management"
         MasterDataManagementSetup: Record "Master Data Management Setup";
         RecRef: RecordRef;
         RecId: RecordId;
-        SourceCompanyName: Text[30];
     begin
         Clear(MasterDataMgtCoupling."Integration System ID");
         MasterDataManagementSetup.Get();
@@ -2153,10 +2121,7 @@ codeunit 7233 "Master Data Management"
         if MasterDataMgtCoupling.FindFirst() then
             if MasterDataMgtCoupling.FindRecordId(RecId) then begin
                 RecRef.Open(RecId.TableNo());
-                OnSetSourceCompanyName(SourceCompanyName, RecId.TableNo());
-                if SourceCompanyName = '' then
-                    SourceCompanyName := MasterDataManagementSetup."Company Name";
-                RecRef.ChangeCompany(SourceCompanyName);
+                RecRef.ChangeCompany(MasterDataManagementSetup."Company Name");
                 Found := RecRef.Get(RecId);
             end;
     end;
@@ -2169,35 +2134,31 @@ codeunit 7233 "Master Data Management"
         MasterDataManagementSetup: Record "Master Data Management Setup";
         IntegrationRecRef: RecordRef;
         IntegrationRecRefCount: Integer;
-        SourceCompanyName: Text[30];
     begin
         MasterDataManagementSetup.Get();
-        OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Table ID");
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
         IntegrationRecRef.Open(IntegrationTableMapping."Integration Table ID");
-        IntegrationRecRef.ChangeCompany(SourceCompanyName);
+        IntegrationRecRef.ChangeCompany(MasterDataManagementSetup."Company Name");
 
         case IntegrationTableMapping."Integration Table ID" of
             Database::Vendor:
                 begin
                     IntegrationVendor.Reset();
                     IntegrationVendor.SetView(GetIntegrationTableMappingView(DATABASE::Vendor));
-                    IntegrationVendor.ChangeCompany(SourceCompanyName);
+                    IntegrationVendor.ChangeCompany(MasterDataManagementSetup."Company Name");
                     IntegrationRecRefCount := IntegrationVendor.Count();
                 end;
             Database::Customer:
                 begin
                     IntegrationCustomer.Reset();
                     IntegrationCustomer.SetView(GetIntegrationTableMappingView(DATABASE::Customer));
-                    IntegrationCustomer.ChangeCompany(SourceCompanyName);
+                    IntegrationCustomer.ChangeCompany(MasterDataManagementSetup."Company Name");
                     IntegrationRecRefCount := IntegrationCustomer.Count();
                 end;
             Database::Contact:
                 begin
                     IntegrationContact.Reset();
                     IntegrationContact.SetView(GetIntegrationTableMappingView(DATABASE::Contact));
-                    IntegrationContact.ChangeCompany(SourceCompanyName);
+                    IntegrationContact.ChangeCompany(MasterDataManagementSetup."Company Name");
                     IntegrationRecRefCount := IntegrationContact.Count();
                 end;
             else
@@ -2282,7 +2243,6 @@ codeunit 7233 "Master Data Management"
         IntegrationRecordRef: RecordRef;
         IntegrationSystemIdFieldRef: FieldRef;
         IntegrationTableView: Text;
-        SourceCompanyName: Text[30];
     begin
         MasterDataManagementSetup.Get();
         IntegrationTableMapping.SetRange(Status, IntegrationTableMapping.Status::Enabled);
@@ -2294,10 +2254,7 @@ codeunit 7233 "Master Data Management"
                 IntegrationRecordRef.Close();
                 IntegrationTableView := IntegrationTableMapping.GetIntegrationTableFilter();
                 IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-                OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-                if SourceCompanyName = '' then
-                    SourceCompanyName := MasterDataManagementSetup."Company Name";
-                IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+                IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
                 IntegrationSystemIdFieldRef := IntegrationRecordRef.Field(IntegrationRecordRef.SystemIdNo);
                 IntegrationRecordRef.SetView(IntegrationTableView);
                 IntegrationSystemIdFieldRef.SetRange(MasterDataMgtCoupling."Integration System ID");
@@ -2456,9 +2413,5 @@ codeunit 7233 "Master Data Management"
         // append the names of the custom table mappings to the IntegrationTableMappingFilter: it is an 'or' filter, so concatenate the names by |
     end;
 
-    [IntegrationEvent(false, false)]
-    internal procedure OnSetSourceCompanyName(var SourceCompanyName: Text[30]; TableID: Integer)
-    begin
-    end;
 }
 

@@ -686,27 +686,11 @@ page 30113 "Shpfy Order"
                             ProcessShopifyOrders.ClearProcessedDocuments(Rec);
                     end;
                 }
-                action(MarkConflictAsResolved)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Mark Conflict as Resolved';
-                    Enabled = Rec."Has Order State Error";
-                    Image = Approval;
-                    ToolTip = 'Mark the conflict as resolved.';
-
-                    trigger OnAction()
-                    var
-                        ImportOrder: Codeunit "Shpfy Import Order";
-                    begin
-                        ImportOrder.MarkOrderConflictAsResolved(Rec);
-                        Rec.Modify();
-                    end;
-                }
                 action(ForceSync)
                 {
                     ApplicationArea = All;
                     Image = Refresh;
-                    Caption = 'Sync order from Shopify';
+                    Caption = 'Synch order from Shopify';
                     ToolTip = 'Update your Shopify Order with the current data from Shopify.';
 
                     trigger OnAction()
