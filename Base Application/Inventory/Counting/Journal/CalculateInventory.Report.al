@@ -380,7 +380,7 @@ report 790 "Calculate Inventory"
         ItemJnlLine := NewItemJnlLine;
     end;
 
-    procedure ValidatePostingDate()
+    local procedure ValidatePostingDate()
     var
         NoSeries: Codeunit "No. Series";
     begin
