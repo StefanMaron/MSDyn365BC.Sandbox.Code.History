@@ -133,7 +133,6 @@ codeunit 5051 SegManagement
                     TempDeliverySorter."Language Code" := SegmentLine."Language Code";
                     TempDeliverySorter."Word Template Code" := InteractionLogEntry."Word Template Code";
                     TempDeliverySorter."Wizard Action" := InteractionTemplate."Wizard Action";
-                    TempDeliverySorter."Force Hide Email Dialog" := true;
                     OnBeforeDeliverySorterInsert(TempDeliverySorter, SegmentLine);
                     TempDeliverySorter.Insert();
                 end;
@@ -271,7 +270,6 @@ codeunit 5051 SegManagement
             TempDeliverySorter."Send Word Docs. as Attmt." := false;
             TempDeliverySorter."Language Code" := SegmentLine."Language Code";
             TempDeliverySorter."Wizard Action" := WizardAction;
-            TempDeliverySorter."Force Hide Email Dialog" := true;
             OnLogInteractionOnBeforeTempDeliverySorterInsert(TempDeliverySorter, SegmentLine, InteractionLogEntry);
             TempDeliverySorter.Insert();
             AttachmentManagement.Send(TempDeliverySorter);
@@ -312,13 +310,9 @@ codeunit 5051 SegManagement
 
         InteractionTemplate.Get(InteractTmplCode);
 
-        IsHandled := false;
-        OnLogDocumentOnBeforeTestTmplLanguage(InteractTmplCode, IsHandled);
-        if not IsHandled then begin
-            InteractionTmplLanguage.SetRange("Interaction Template Code", InteractTmplCode);
-            if InteractionTmplLanguage.FindFirst() then
-                Error(InteractionTemplateAssignedLanguageErr, InteractTmplCode, InteractionTmplLanguage."Language Code");
-        end;
+        InteractionTmplLanguage.SetRange("Interaction Template Code", InteractTmplCode);
+        if InteractionTmplLanguage.FindFirst() then
+            Error(InteractionTemplateAssignedLanguageErr, InteractTmplCode, InteractionTmplLanguage."Language Code");
 
         if Description = '' then
             Description := InteractionTemplate.Description;
@@ -584,7 +578,6 @@ codeunit 5051 SegManagement
             if CampaignEntry.Description = '' then
                 CampaignEntry.Description := InteractionsLbl;
         end;
-        OnAfterCopyFieldsToCampaignEntry(CampaignEntry, SegmentLine);
     end;
 
     local procedure FindInteractTmplSetupCaption(DocumentType: Enum "Interaction Log Entry Document Type") InteractTmplSetupCaption: Text[80]
@@ -946,16 +939,6 @@ codeunit 5051 SegManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckSegmentLine(var SegmentLine: Record "Segment Line"; Deliver: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnLogDocumentOnBeforeTestTmplLanguage(InteractTmplCode: Code[10]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyFieldsToCampaignEntry(var CampaignEntry: Record "Campaign Entry"; var SegmentLine: Record "Segment Line")
     begin
     end;
 }
