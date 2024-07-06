@@ -655,7 +655,6 @@ codeunit 5812 "Calculate Standard Cost"
     var
         RtngLine: Record "Routing Line";
         RtngHeader: Record "Routing Header";
-        IsHandled: Boolean;
     begin
         if RtngLine.CertifiedRoutingVersionExists(RtngHeaderNo, CalculationDate) then begin
             if RtngLine."Version Code" = '' then begin
@@ -664,10 +663,8 @@ codeunit 5812 "Calculate Standard Cost"
             end;
 
             repeat
-                IsHandled := false;
-                OnCalcRtngCostOnBeforeCalcRtngLineCost(RtngLine, ParentItem, LogErrors, IsHandled);
-                if not IsHandled then
-                    CalcRtngLineCost(RtngLine, MfgItemQtyBase, SLCap, SLSub, SLCapOvhd);
+                OnCalcRtngCostOnBeforeCalcRtngLineCost(RtngLine, ParentItem);
+                CalcRtngLineCost(RtngLine, MfgItemQtyBase, SLCap, SLSub, SLCapOvhd);
             until RtngLine.Next() = 0;
         end;
     end;
@@ -1140,7 +1137,7 @@ codeunit 5812 "Calculate Standard Cost"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCalcRtngCostOnBeforeCalcRtngLineCost(var RoutingLine: Record "Routing Line"; ParentItem: Record Item; var LogErrors: Boolean; var IsHandled: Boolean)
+    local procedure OnCalcRtngCostOnBeforeCalcRtngLineCost(var RoutingLine: Record "Routing Line"; ParentItem: Record Item)
     begin
     end;
 
