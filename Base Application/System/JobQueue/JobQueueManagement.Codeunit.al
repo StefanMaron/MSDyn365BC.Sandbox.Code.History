@@ -242,7 +242,7 @@ codeunit 456 "Job Queue Management"
         if not JobQueueCategory.WritePermission() then
             exit;
 
-        JobQueueEntry.ReadIsolation(IsolationLevel::ReadCommitted);
+        JobQueueEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
         JobQueueEntry.SetFilter("Job Queue Category Code", '<>''''');
         JobQueueEntry.SetRange(Status, JobQueueEntry.Status::Waiting);
         JobQueueEntry.SetLoadFields("Job Queue Category Code");
