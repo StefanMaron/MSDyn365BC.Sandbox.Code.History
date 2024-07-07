@@ -1195,6 +1195,7 @@ codeunit 5988 "Serv-Documents Mgt."
             if ServShptItemLine.Find('-') then
                 repeat
                     ServiceShipmentItemLine2.Init();
+                    OnFinalizeShipmentDocumentOnBeforeCopyServiceShipmentItemLine(ServShptItemLine);
                     ServiceShipmentItemLine2.Copy(ServShptItemLine);
                     ServiceShipmentItemLine2.Insert();
                 until ServShptItemLine.Next() = 0;
@@ -2931,6 +2932,11 @@ codeunit 5988 "Serv-Documents Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnFinalizeShipmentDocumentOnAfterInserServiceShipmentLine(var ServiceShipmentLine2: Record "Service Shipment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFinalizeShipmentDocumentOnBeforeCopyServiceShipmentItemLine(var ServiceShipmentItemLine: Record "Service Shipment Item Line")
     begin
     end;
 }
