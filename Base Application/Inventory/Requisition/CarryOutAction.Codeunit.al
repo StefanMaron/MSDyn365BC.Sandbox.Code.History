@@ -32,7 +32,6 @@ codeunit 99000813 "Carry Out Action"
     var
         IsHandled: Boolean;
     begin
-        OnBeforeRun(Rec);
         ProductionExist := true;
         AssemblyExist := true;
         case TrySourceType of
@@ -2038,11 +2037,6 @@ codeunit 99000813 "Carry Out Action"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertProdOrderLineOnBeforeValidateUnitCost(var RequisitionLine: Record "Requisition Line"; ProductionOrder: Record "Production Order"; var ProdOrderLine: Record "Prod. Order Line"; Item: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRun(var Rec: Record "Requisition Line")
     begin
     end;
 }
