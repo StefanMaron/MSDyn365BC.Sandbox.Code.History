@@ -583,10 +583,6 @@ table 254 "VAT Entry"
         {
             Caption = 'Ignore In SII';
         }
-        field(10726; "One Stop Shop Reporting"; Boolean)
-        {
-            Caption = 'One Stop Shop Reporting';
-        }
     }
 
     keys
@@ -662,9 +658,6 @@ table 254 "VAT Entry"
         {
         }
         key(Key21; "G/L Acc. No.")
-        {
-        }
-        key(Key22; Type, Closed, "VAT Bus. Posting Group", "VAT Prod. Posting Group", Reversed, "Posting Date", "G/L Acc. No.", "VAT Reporting Date")
         {
         }
     }
