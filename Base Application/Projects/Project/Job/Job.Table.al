@@ -25,6 +25,8 @@ using Microsoft.Projects.Project.Journal;
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Projects.Project.Setup;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Integration.FieldService;
 using Microsoft.Projects.Project.WIP;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.TimeSheet;
@@ -227,6 +229,15 @@ table 167 Job
         field(24; Blocked; Enum "Job Blocked")
         {
             Caption = 'Blocked';
+
+            trigger OnValidate()
+            var
+                FSConnectionSetup: Record "FS Connection Setup";
+            begin
+                if Rec.Blocked <> Rec.Blocked::" " then
+                    if FSConnectionSetup.IsEnabled() then
+                        MoveFilterOnProjectTaskMapping();
+            end;
         }
         field(29; "Last Date Modified"; Date)
         {
@@ -756,6 +767,7 @@ table 167 Job
                 JobPlanningLine: Record "Job Planning Line";
                 JobLedgerEntry: Record "Job Ledger Entry";
                 JobUsageLink: Record "Job Usage Link";
+                FSConnectionSetup: Record "FS Connection Setup";
                 NewApplyUsageLink: Boolean;
             begin
                 if "Apply Usage Link" then begin
@@ -783,6 +795,9 @@ table 167 Job
                         RefreshModifiedRec();
                         "Apply Usage Link" := NewApplyUsageLink;
                     end;
+
+                    if FSConnectionSetup.IsEnabled() then
+                        MoveFilterOnProjectTaskMapping();
                 end;
             end;
         }
@@ -2661,8 +2676,6 @@ table 167 Job
             JobPlanningLine.UpdateAllAmounts();
             JobPlanningLine.Modify(true);
         until JobPlanningLine.Next() = 0;
-
-        OnAfterUpdateCostPricesOnRelatedJobPlanningLines(Job);
     end;
 
     local procedure CheckBillToCustomerAssosEntriesExist(var Job: Record Job; var xJob: Record Job)
@@ -2682,11 +2695,11 @@ table 167 Job
 
     local procedure ThrowAssociatedEntriesExistError(var Job: Record Job; xJob: Record Job; CallingFieldNo: Integer; FieldCaption: Text)
     var
-        IsHandled: Boolean;
+        IsHanled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeThrowAssociatedEntriesExistError(Job, xJob, CallingFieldNo, CurrFieldNo, IsHandled);
-        if IsHandled then
+        IsHanled := false;
+        OnBeforeThrowAssociatedEntriesExistError(Job, xJob, CallingFieldNo, CurrFieldNo, IsHanled);
+        if IsHanled then
             exit;
 
         Error(AssociatedEntriesExistErr, FieldCaption, TableCaption);
@@ -2809,13 +2822,7 @@ table 167 Job
         Contact: Record Contact;
         ContactBusinessRelation: Record "Contact Business Relation";
         ContactBusinessRelationFound: Boolean;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateSellToCust(Rec, ContactNo, IsHandled);
-        if IsHandled then
-            exit;
-
         if not Contact.Get(ContactNo) then begin
             "Sell-to Contact" := '';
             exit;
@@ -2972,6 +2979,39 @@ table 167 Job
             exit;
 
         JobTask.ModifyAll("Invoice Currency Code", '');
+    end;
+
+    local procedure MoveFilterOnProjectTaskMapping()
+    var
+        IntegrationTableMapping: Record "Integration Table Mapping";
+        JobTask: Record "Job Task";
+    begin
+        if Rec.Blocked <> Rec.Blocked::" " then
+            exit;
+
+        IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::Dataverse);
+        IntegrationTableMapping.SetRange("Delete After Synchronization", false);
+        IntegrationTableMapping.SetRange("Table ID", Database::"Job Task");
+        IntegrationTableMapping.SetRange("Integration Table ID", Database::"FS Project Task");
+        if not IntegrationTableMapping.FindFirst() then
+            exit;
+
+        JobTask.SetRange("Job No.", Rec."No.");
+        JobTask.SetCurrentKey(SystemCreatedAt);
+        JobTask.SetAscending(SystemCreatedAt, true);
+        if not JobTask.FindFirst() then
+            exit;
+
+        if JobTask.SystemCreatedAt = 0DT then begin
+            IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." := 0DT;
+            IntegrationTableMapping.Modify();
+            exit;
+        end;
+
+        if IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." > JobTask.SystemCreatedAt then begin
+            IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." := JobTask.SystemCreatedAt;
+            IntegrationTableMapping.Modify();
+        end;
     end;
 
     local procedure ConfirmDeletion()
@@ -3290,16 +3330,6 @@ table 167 Job
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterShipToAddressEqualsSellToAddress(var Job: Record Job; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateCostPricesOnRelatedJobPlanningLines(var Job: Record Job)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateSellToCust(var Job: Record Job; var ContactNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
 }
