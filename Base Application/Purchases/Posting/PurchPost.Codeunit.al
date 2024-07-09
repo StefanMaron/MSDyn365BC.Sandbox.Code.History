@@ -3398,19 +3398,16 @@ codeunit 90 "Purch.-Post"
                     PurchLine."VAT Base Amount" := 0;
                 end else begin
                     PurchLine.Amount := PurchLine.CalcLineAmount();
-                    IsHandled := false;
-                    OnDivideAmountOnBeforeCalcVATBaseAmount(PurchHeader, PurchLine, TempVATAmountLine, TempVATAmountLineRemainder, Currency, IsHandled);
-                    if not IsHandled then
-                        if (PurchLine."VAT %" <> 0) and (TempVATAmountLine.CalcLineAmount() <> 0) then begin
-                            TempVATAmountLineRemainder."VAT Base (Lowered)" +=
-                              TempVATAmountLine."VAT Base" * (1 - PurchHeader."VAT Base Discount %" / 100) *
-                              PurchLine.CalcLineAmount() / TempVATAmountLine.CalcLineAmount();
-                            PurchLine."VAT Base Amount" :=
-                              Round(TempVATAmountLineRemainder."VAT Base (Lowered)", Currency."Amount Rounding Precision");
-                            TempVATAmountLineRemainder."VAT Base (Lowered)" :=
-                              TempVATAmountLineRemainder."VAT Base (Lowered)" - PurchLine."VAT Base Amount";
-                        end else
-                            PurchLine."VAT Base Amount" := PurchLine.Amount;
+                    if (PurchLine."VAT %" <> 0) and (TempVATAmountLine.CalcLineAmount() <> 0) then begin
+                        TempVATAmountLineRemainder."VAT Base (Lowered)" +=
+                          TempVATAmountLine."VAT Base" * (1 - PurchHeader."VAT Base Discount %" / 100) *
+                          PurchLine.CalcLineAmount() / TempVATAmountLine.CalcLineAmount();
+                        PurchLine."VAT Base Amount" :=
+                          Round(TempVATAmountLineRemainder."VAT Base (Lowered)", Currency."Amount Rounding Precision");
+                        TempVATAmountLineRemainder."VAT Base (Lowered)" :=
+                          TempVATAmountLineRemainder."VAT Base (Lowered)" - PurchLine."VAT Base Amount";
+                    end else
+                        PurchLine."VAT Base Amount" := PurchLine.Amount;
                     OnDivideAmountOnAfterCalcVATBaseAmount(PurchLine);
                     if TempVATAmountLine."VAT Base" = 0 then
                         TempVATAmountLineRemainder."VAT Amount" := 0
@@ -3429,22 +3426,19 @@ codeunit 90 "Purch.-Post"
                       TempVATAmountLineRemainder."VAT Amount" - PurchLine."Amount Including VAT" + PurchLine.Amount;
                 end;
 
-            IsHandled := false;
-            OnDivideAmountOnBeforeCalcPmtDiscountAmount(PurchHeader, PurchLine, TempVATAmountLine, TempVATAmountLineRemainder, Currency, IsHandled);
-            if not IsHandled then
-                if TempVATAmountLine.CalcLineAmount() <> 0 then begin
-                    if GLSetup."Adjust for Payment Disc." then
-                        PmtDiscountBase := TempVATAmountLine."Amount Including VAT"
-                    else
-                        PmtDiscountBase := TempVATAmountLine."VAT Base";
-                    TempVATAmountLineRemainder."Pmt. Discount Amount" +=
-                      PmtDiscountBase * PurchHeader."Payment Discount %" / 100 *
-                      PurchLine.CalcLineAmount() / TempVATAmountLine.CalcLineAmount();
-                    PurchLine."Pmt. Discount Amount" :=
-                      Round(TempVATAmountLineRemainder."Pmt. Discount Amount", Currency."Amount Rounding Precision");
-                    TempVATAmountLineRemainder."Pmt. Discount Amount" :=
-                      TempVATAmountLineRemainder."Pmt. Discount Amount" - PurchLine."Pmt. Discount Amount";
-                end;
+            if TempVATAmountLine.CalcLineAmount() <> 0 then begin
+                if GLSetup."Adjust for Payment Disc." then
+                    PmtDiscountBase := TempVATAmountLine."Amount Including VAT"
+                else
+                    PmtDiscountBase := TempVATAmountLine."VAT Base";
+                TempVATAmountLineRemainder."Pmt. Discount Amount" +=
+                  PmtDiscountBase * PurchHeader."Payment Discount %" / 100 *
+                  PurchLine.CalcLineAmount() / TempVATAmountLine.CalcLineAmount();
+                PurchLine."Pmt. Discount Amount" :=
+                  Round(TempVATAmountLineRemainder."Pmt. Discount Amount", Currency."Amount Rounding Precision");
+                TempVATAmountLineRemainder."Pmt. Discount Amount" :=
+                  TempVATAmountLineRemainder."Pmt. Discount Amount" - PurchLine."Pmt. Discount Amount";
+            end;
             NonDeductibleVAT.DivideNonDeductibleVATInPurchaseLine(
                 PurchLine, TempVATAmountLineRemainder, TempVATAmountLine, Currency, PurchLine.CalcLineAmount(), TempVATAmountLine.CalcLineAmount());
 
@@ -3531,7 +3525,7 @@ codeunit 90 "Purch.-Post"
         xPurchLine := PurchaseLine;
         PurchLineACY := PurchaseLine;
         IsHandled := false;
-        OnRoundAmountOnBeforeCalculateLCYAmounts(xPurchLine, PurchLineACY, PurchaseHeader, IsHandled, TotalPurchLine, TotalPurchLineLCY, PurchaseLine);
+        OnRoundAmountOnBeforeCalculateLCYAmounts(xPurchLine, PurchLineACY, PurchaseHeader, IsHandled);
         if not IsHandled then
             if PurchaseHeader."Currency Code" <> '' then
                 RoundAmountInCurrency(PurchaseHeader, PurchaseLine);
@@ -3841,13 +3835,9 @@ codeunit 90 "Purch.-Post"
                  BlanketOrderPurchLine."Document Type"::"Blanket Order", PurchLine."Blanket Order No.",
                  PurchLine."Blanket Order Line No.")
             then begin
-                IsHandled := false;
-                OnUpdateBlanketOrderLineOnBeforeCheckBlanketOrderPurchLine(BlanketOrderPurchLine, PurchLine, IsHandled);
-                if not IsHandled then begin
-                    BlanketOrderPurchLine.TestField(Type, PurchLine.Type);
-                    BlanketOrderPurchLine.TestField("No.", PurchLine."No.");
-                    BlanketOrderPurchLine.TestField("Buy-from Vendor No.", PurchLine."Buy-from Vendor No.");
-                end;
+                BlanketOrderPurchLine.TestField(Type, PurchLine.Type);
+                BlanketOrderPurchLine.TestField("No.", PurchLine."No.");
+                BlanketOrderPurchLine.TestField("Buy-from Vendor No.", PurchLine."Buy-from Vendor No.");
                 OnUpdateBlanketOrderLineOnAfterCheckBlanketOrderPurchLine(BlanketOrderPurchLine, PurchLine);
 
                 ModifyLine := false;
@@ -3968,7 +3958,7 @@ codeunit 90 "Purch.-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), IsHandled, PurchaseHeader, GenJnlLineDocNo, PreviewMode);
+        OnBeforeUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), IsHandled, PurchaseHeader);
         if IsHandled then
             exit;
 
@@ -3987,7 +3977,7 @@ codeunit 90 "Purch.-Post"
                 end;
         end;
 
-        OnAfterUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), GenJnlLineDocNo, PreviewMode, PurchaseHeader);
+        OnAfterUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), GenJnlLineDocNo, PreviewMode);
     end;
 
 #if not CLEAN23
@@ -6071,7 +6061,6 @@ codeunit 90 "Purch.-Post"
         if not (ItemJournalLine.IsPurchaseReturn() or NonInventoriableItem) then begin
             TempTrackingSpecification.SetRange("Serial No.", TempReservEntryJobCons."Serial No.");
             TempTrackingSpecification.SetRange("Lot No.", TempReservEntryJobCons."Lot No.");
-            TempTrackingSpecification.SetRange("Package No.", TempReservEntryJobCons."Package No.");
             if TempTrackingSpecification.FindFirst() then
                 TempReservEntryJobCons."Appl.-to Item Entry" := TempTrackingSpecification."Item Ledger Entry No.";
         end;
@@ -7886,8 +7875,7 @@ codeunit 90 "Purch.-Post"
                                 TempInvoicePostBufferReverseCharge := TempInvoicePostBuffer;
                                 if TempInvoicePostBufferReverseCharge.Find() then begin
                                     VATAmountRemainder += VATAmount;
-                                    if VATBaseAmount <> 0 then
-                                        TempInvoicePostBuffer."VAT Amount" := Round(VATAmountRemainder, CurrencyDocument."Amount Rounding Precision");
+                                    TempInvoicePostBuffer."VAT Amount" := Round(VATAmountRemainder, CurrencyDocument."Amount Rounding Precision");
                                     VATAmountRemainder -= TempInvoicePostBuffer."VAT Amount";
 
                                     if PurchHeader."Currency Code" <> '' then
@@ -7896,8 +7884,7 @@ codeunit 90 "Purch.-Post"
                                                 PurchHeader.GetUseDate(), PurchHeader."Currency Code", TempInvoicePostBuffer."VAT Amount", PurchHeader."Currency Factor"));
 
                                     VATAmountACYRemainder += VATAmountACY;
-                                    if VATBaseAmountACY <> 0 then
-                                        TempInvoicePostBuffer."VAT Amount (ACY)" := Round(VATAmountACYRemainder, Currency."Amount Rounding Precision");
+                                    TempInvoicePostBuffer."VAT Amount (ACY)" := Round(VATAmountACYRemainder, Currency."Amount Rounding Precision");
                                     VATAmountACYRemainder -= TempInvoicePostBuffer."VAT Amount (ACY)";
 
                                     TempInvoicePostBuffer."VAT Base Amount" := Round(TempInvoicePostBuffer."VAT Base Amount" * (1 - PurchHeader."VAT Base Discount %" / 100));
@@ -9351,7 +9338,7 @@ codeunit 90 "Purch.-Post"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnAfterPostUpdateInvoiceLine(var PurchaseLine: Record "Purchase Line" temporary)
     begin
     end;
@@ -9559,7 +9546,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Integer; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean; var PurchaseHeader: Record "Purchase Header")
+    local procedure OnAfterUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Integer; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean)
     begin
     end;
 
@@ -10212,7 +10199,7 @@ codeunit 90 "Purch.-Post"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Option; var IsHandled: Boolean; var PurchaseHeader: Record "Purchase Header"; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean)
+    local procedure OnBeforeUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Option; var IsHandled: Boolean; var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 
@@ -10947,7 +10934,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRoundAmountOnBeforeCalculateLCYAmounts(var xPurchLine: Record "Purchase Line"; var PurchLineACY: Record "Purchase Line"; PurchHeader: Record "Purchase Header"; var IsHandled: Boolean; TotalPurchaseLine: Record "Purchase Line"; TotalPurchaseLineLCY: Record "Purchase Line"; var PurchaseLine: Record "Purchase Line")
+    local procedure OnRoundAmountOnBeforeCalculateLCYAmounts(var xPurchLine: Record "Purchase Line"; var PurchLineACY: Record "Purchase Line"; PurchHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 
@@ -11816,20 +11803,4 @@ codeunit 90 "Purch.-Post"
     local procedure OnPostItemJnlLineOnAfterSetCheckApplToItemEntry(PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnDivideAmountOnBeforeCalcVATBaseAmount(PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var TempVATAmountLine: Record "VAT Amount Line" temporary; var TempVATAmountLineRemainder: Record "VAT Amount Line" temporary; Currency: Record Currency; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnDivideAmountOnBeforeCalcPmtDiscountAmount(PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var TempVATAmountLine: Record "VAT Amount Line" temporary; var TempVATAmountLineRemainder: Record "VAT Amount Line" temporary; Currency: Record Currency; var IsHandled: Boolean)
-    begin
-    end;
-    
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateBlanketOrderLineOnBeforeCheckBlanketOrderPurchLine(var BlanketOrderPurchaseLine: Record "Purchase Line"; PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
-    begin
-    end;
-   
 }
