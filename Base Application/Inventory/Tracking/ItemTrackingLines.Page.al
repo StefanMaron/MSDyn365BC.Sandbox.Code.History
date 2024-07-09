@@ -40,6 +40,7 @@ page 6510 "Item Tracking Lines"
         {
             usercontrol(BarcodeControl; CameraBarcodeScannerProviderAddIn)
             {
+
                 ApplicationArea = All;
 
                 trigger ControlAddInReady(IsSupported: Boolean)
@@ -337,7 +338,6 @@ page 6510 "Item Tracking Lines"
                         ItemTrackingDataCollection.AssistEditTrackingNo(Rec,
                             DoSearchForSupply((CurrentSignFactor * SourceQuantityArray[1] < 0) and not InsertIsBlocked),
                             CurrentSignFactor, "Item Tracking Type"::"Lot No.", MaxQuantity);
-                        OnAfterLotNoAssistEditOnBeforeClearBinCode(Rec, ForBinCode);
                         Rec."Bin Code" := '';
                         OnAssistEditLotNoOnBeforeCurrPageUdate(Rec, xRec);
                         CurrPage.Update();
@@ -1106,9 +1106,7 @@ page 6510 "Item Tracking Lines"
         ConfirmManagement: Codeunit "Confirm Management";
         IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeQueryClosePage(Rec, TotalTrackingSpecification, TempReservEntry, UndefinedQtyArray, SourceQuantityArray, CurrentRunMode, IsHandled);
-        if (not UpdateUndefinedQty()) and (not IsHandled) then
+        if not UpdateUndefinedQty() then
             exit(Confirm(Text006));
 
         if (CountLinesWithQtyZero() > 0) then
@@ -1370,36 +1368,26 @@ page 6510 "Item Tracking Lines"
     var
         ItemLedgerEntryType: Enum "Item Ledger Entry Type";
     begin
-        if InboundIsSet then
-            exit(Inbound);
-
         case Rec."Source Type" of
             Database::"Item Journal Line":
                 case Rec."Source Subtype" of
-                    ItemLedgerEntryType::Purchase.AsInteger(), ItemLedgerEntryType::"Positive Adjmt.".AsInteger(), ItemLedgerEntryType::Output.AsInteger(), ItemLedgerEntryType::"Assembly Output".AsInteger():
-                        exit(not (Rec."Qty. to Handle (Base)" < 0));
-                    ItemLedgerEntryType::Sale.AsInteger(), ItemLedgerEntryType::"Negative Adjmt.".AsInteger(), ItemLedgerEntryType::Consumption.AsInteger(), ItemLedgerEntryType::"Assembly Consumption".AsInteger():
-                        exit(Rec."Qty. to Handle (Base)" < 0)
+                    ItemLedgerEntryType::Purchase.AsInteger(), ItemLedgerEntryType::"Positive Adjmt.".AsInteger():
+                        exit(true);
+                    ItemLedgerEntryType::Sale.AsInteger(), ItemLedgerEntryType::"Negative Adjmt.".AsInteger():
+                        exit(false);
                     else
                         Error(ItemTrackingSubTypeErr);
                 end;
             Database::"Sales Line":
-                if Rec."Source Subtype" in [Enum::"Sales Document Type"::"Credit Memo".AsInteger(), Enum::"Sales Document Type"::"Return Order".AsInteger()] then
-                    exit(not (Rec."Qty. to Handle (Base)" < 0))
+                if Rec."Source Subtype" = Enum::"Sales Document Type"::Order.AsInteger() then
+                    exit(false)
                 else
-                    exit(Rec."Qty. to Handle (Base)" < 0);
+                    Error(ItemTrackingSubTypeErr);
             Database::"Purchase Line":
-                if Rec."Source Subtype" in [Enum::"Purchase Document Type"::"Credit Memo".AsInteger(), Enum::"Purchase Document Type"::"Return Order".AsInteger()] then
-                    exit(Rec."Qty. to Handle (Base)" < 0)
+                if Rec."Source Subtype" = Enum::"Purchase Document Type"::Order.AsInteger() then
+                    exit(true)
                 else
-                    exit(not (Rec."Qty. to Handle (Base)" < 0));
-            Database::"Prod. Order Line":
-                exit(not (Rec."Qty. to Handle (Base)" < 0));
-            Database::"Assembly Line":
-                if Rec."Source Subtype" in [Enum::"Assembly Document Type"::Order.AsInteger(), Enum::"Assembly Document Type"::Quote.AsInteger(), Enum::"Assembly Document Type"::"Blanket Order".AsInteger()] then
-                    exit(Rec."Quantity (Base)" < 0)
-                else
-                    exit(false);
+                    Error(ItemTrackingSubTypeErr);
             else
                 Error(ItemTrackingTypeErr);
         end;
@@ -1739,7 +1727,6 @@ page 6510 "Item Tracking Lines"
             CurrentRunMode := CurrentRunMode::Transfer;
         end;
 
-        OnSetSourceSpecOnBeforeAddToGlobalRecordSet(TempTrackingSpecification, ForBinCode);
         AddToGlobalRecordSet(TempTrackingSpecification);
         AddToGlobalRecordSet(TempTrackingSpecification2);
         CalculateSums();
@@ -2861,7 +2848,6 @@ page 6510 "Item Tracking Lines"
             Error(Text008);
 
         GetItem(Rec."Item No.");
-        OnAssignSerialNoBatchOnAfterGetItem(Item);
 
         if CreateLotNo then begin
             Rec.TestField("Lot No.", '');
@@ -2934,7 +2920,6 @@ page 6510 "Item Tracking Lines"
             OnAssignTrackingNoOnAfterCalcQtyToCreate(Rec, SourceTrackingSpecification, TotalTrackingSpecification, QtyToCreate, Rec.FieldNo("Lot No."));
 
             GetItem(Rec."Item No.");
-            OnAssignLotNoOnAfterGetItem(Item);
 
             Rec.Validate("Quantity Handled (Base)", 0);
             Rec.Validate("Quantity Invoiced (Base)", 0);
@@ -3414,7 +3399,7 @@ page 6510 "Item Tracking Lines"
         MaxQuantity := UndefinedQtyArray[1];
         if MaxQuantity * CurrentSignFactor > 0 then
             MaxQuantity := 0;
-        SetBinCode();
+        Rec."Bin Code" := ForBinCode;
         OnSelectEntriesOnBeforeSelectMultipleTrackingNo(ItemTrackingDataCollection, CurrentSignFactor);
         ItemTrackingDataCollection.SelectMultipleTrackingNo(Rec, MaxQuantity, CurrentSignFactor);
         Rec."Bin Code" := '';
@@ -3451,18 +3436,6 @@ page 6510 "Item Tracking Lines"
         UpdateUndefinedQtyArray();
         Rec.CopyFilters(xTrackingSpec);
         CurrPage.Update(false);
-    end;
-
-    local procedure SetBinCode()
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeSetBinCode(Rec, ForBinCode, IsHandled);
-        if IsHandled then
-            exit;
-
-        Rec."Bin Code" := ForBinCode;
     end;
 
     procedure SetInbound(NewInbound: Boolean)
@@ -4394,36 +4367,6 @@ page 6510 "Item Tracking Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAssignPackageNo(var TrackingSpecification: Record "Tracking Specification"; var TempItemTrackingSpecificationInsert: Record "Tracking Specification" temporary; SourceQuantityArray: array[5] of Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAssignLotNoOnAfterGetItem(var Item: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAssignSerialNoBatchOnAfterGetItem(var Item: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetBinCode(var TrackingSpecification: Record "Tracking Specification"; var ForBinCode: Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeQueryClosePage(var TrackingSpecification: Record "Tracking Specification"; var TotalItemTrackingLine: Record "Tracking Specification"; var TempReservationEntry: Record "Reservation Entry" temporary; var UndefinedQtyArray: array[3] of Decimal; var SourceQuantityArray: array[5] of Decimal; var CurrentRunMode: Enum "Item Tracking Run Mode"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetSourceSpecOnBeforeAddToGlobalRecordSet(var TempTrackingSpecification: Record "Tracking Specification" temporary; ForBinCode: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterLotNoAssistEditOnBeforeClearBinCode(var TrackingSpecification: Record "Tracking Specification"; var ForBinCode: Code[20])
     begin
     end;
 }
