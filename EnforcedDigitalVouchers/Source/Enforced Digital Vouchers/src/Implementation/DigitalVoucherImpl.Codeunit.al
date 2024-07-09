@@ -93,6 +93,7 @@ codeunit 5579 "Digital Voucher Impl."
         DigitalVoucherCheck.GenerateDigitalVoucherForPostedDocument(DigitalVoucherEntrySetup."Entry Type", RecRef);
     end;
 
+    [CommitBehavior(CommitBehavior::Ignore)]
     procedure GenerateDigitalVoucherForDocument(RecRef: RecordRef)
     var
         SalesInvHeader: Record "Sales Invoice Header";
