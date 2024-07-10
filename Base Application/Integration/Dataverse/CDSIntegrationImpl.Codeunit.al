@@ -5154,6 +5154,62 @@ codeunit 7201 "CDS Integration Impl."
         Page.Run(Page::"Job Queue Entries", JobQueueEntry);
     end;
 
+    internal procedure CleanCDSIntegration()
+    begin
+        CleanCDSIntegration(CompanyName());
+    end;
+
+    internal procedure CleanCDSIntegration(CompanyName: Text)
+    var
+        CDSConnectionSetup: Record "CDS Connection Setup";
+        CRMConnectionSetup: Record "CRM Connection Setup";
+        CRMIntegrationRecord: Record "CRM Integration Record";
+        IntegrationSyncJob: Record "Integration Synch. Job";
+        IntegrationsSyncJobErrors: Record "Integration Synch. Job Errors";
+        TableKey: Codeunit "Table Key";
+        DisableIntegrationSyncJobCleanup: Boolean;
+        DisableIntegrationRecordCleanup: Boolean;
+    begin
+        if CompanyName() <> CompanyName then begin
+            CDSConnectionSetup.ChangeCompany(CompanyName);
+            CRMConnectionSetup.ChangeCompany(CompanyName);
+            IntegrationSyncJob.ChangeCompany(CompanyName);
+            IntegrationsSyncJobErrors.ChangeCompany(CompanyName);
+            CRMIntegrationRecord.ChangeCompany(CompanyName);
+        end;
+
+        // Here we delete the setup records
+        CDSConnectionSetup.DeleteAll();
+        CRMConnectionSetup.DeleteAll();
+
+        // Here we delete the integration links
+        OnBeforeCleanCRMIntegrationSyncJob(DisableIntegrationSyncJobCleanup);
+        if not DisableIntegrationSyncJobCleanup then begin
+            // Deleting all jobs can timeout so disable the keys before deleting
+            TableKey.DisableAll(Database::"Integration Synch. Job");
+            IntegrationSyncJob.DeleteAll();
+            TableKey.DisableAll(Database::"Integration Synch. Job Errors");
+            IntegrationsSyncJobErrors.DeleteAll();
+        end;
+
+        OnBeforeCleanCRMIntegrationRecords(DisableIntegrationRecordCleanup);
+        if not DisableIntegrationRecordCleanup then begin
+            // Deleting all couplings can timeout so disable the keys before deleting
+            TableKey.DisableAll(Database::"CRM Integration Record");
+            CRMIntegrationRecord.DeleteAll();
+        end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCleanCRMIntegrationRecords(var DisableIntegrationRecordCleanup: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCleanCRMIntegrationSyncJob(var DisableIntegrationSyncJobCleanup: Boolean)
+    begin
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Integration Synch. Job Errors", 'OnIsDataIntegrationEnabled', '', false, false)]
     local procedure IsDataIntegrationEnabled(var IsIntegrationEnabled: Boolean)
     begin
