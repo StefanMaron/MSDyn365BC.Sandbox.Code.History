@@ -1,7 +1,6 @@
 namespace System.Environment;
 
 using Microsoft.CRM.Outlook;
-using Microsoft.Integration.SyncEngine;
 #if not CLEAN22
 using Microsoft.CRM.Setup;
 #endif
@@ -9,13 +8,11 @@ using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.VAT.Registration;
 using Microsoft.Integration.Dataverse;
-using Microsoft.Integration.D365Sales;
 using Microsoft.Utilities;
 using System.DataAdministration;
 using System.Threading;
 using System.Automation;
 using System.Feedback;
-using System.Reflection;
 
 codeunit 8912 "Environment Cleanup Subs"
 {
@@ -34,6 +31,7 @@ codeunit 8912 "Environment Cleanup Subs"
 #endif
         ExchangeSync: Record "Exchange Sync";
         JobQueueManagement: Codeunit "Job Queue Management";
+        CDSIntegrationImpl: Codeunit "CDS Integration Impl.";
         nullGUID: Guid;
     begin
         // For behavior in all cases of copying a new env.
@@ -54,7 +52,7 @@ codeunit 8912 "Environment Cleanup Subs"
 
         VATRegNoSrvConfig.ModifyAll(Enabled, false);
 
-        CleanCDSIntegration(CompanyName);
+        CDSIntegrationImpl.CleanCDSIntegration(CompanyName);
 
         ServiceConnection.ModifyAll(Status, ServiceConnection.Status::Disabled);
 #if not CLEAN22
@@ -74,41 +72,6 @@ codeunit 8912 "Environment Cleanup Subs"
 
         // Prod to prod copy cleanup code goes here
 
-    end;
-
-    local procedure CleanCDSIntegration(var CompanyName: Text)
-    var
-        CDSConnectionSetup: Record "CDS Connection Setup";
-        CRMConnectionSetup: Record "CRM Connection Setup";
-        CRMIntegrationRecord: Record "CRM Integration Record";
-        CDSIntegrationSyncJob: Record "Integration Synch. Job";
-        CDSIntegrationsSyncJobErrors: Record "Integration Synch. Job Errors";
-        TableKey: Codeunit "Table Key";
-        DisableCleanup: Boolean;
-    begin
-        if CompanyName() <> CompanyName then begin
-            CDSConnectionSetup.ChangeCompany(CompanyName);
-            CRMConnectionSetup.ChangeCompany(CompanyName);
-            CDSIntegrationSyncJob.ChangeCompany(CompanyName);
-            CDSIntegrationsSyncJobErrors.ChangeCompany(CompanyName);
-            CRMIntegrationRecord.ChangeCompany(CompanyName);
-        end;
-
-        // Here we delete the setup records
-        CDSConnectionSetup.DeleteAll();
-        CRMConnectionSetup.DeleteAll();
-
-        // Here we delete the integration links
-        CDSIntegrationSyncJob.DeleteAll();
-        CDSIntegrationsSyncJobErrors.DeleteAll();
-
-        OnBeforeCleanCRMIntegrationRecords(DisableCleanup);
-        if DisableCleanup then
-            exit;
-
-        // Deleting all couplings can timeout so disable the keys before deleting
-        TableKey.DisableAll(Database::"CRM Integration Record");
-        CRMIntegrationRecord.DeleteAll();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearDatabaseConfig', '', false, false)]
@@ -133,10 +96,5 @@ codeunit 8912 "Environment Cleanup Subs"
 
         // Prod to prod copy cleanup code goes here
 
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCleanCRMIntegrationRecords(var DisableCleanup: Boolean)
-    begin
     end;
 }
