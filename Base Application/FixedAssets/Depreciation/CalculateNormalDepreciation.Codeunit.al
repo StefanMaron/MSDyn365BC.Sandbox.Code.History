@@ -273,7 +273,7 @@ codeunit 5611 "Calculate Normal Depreciation"
                     // Reserved for implementation of country specific methods
                     else
                         OnCalculateDeprAmountOnDeprMethodCaseLastEntry(
-                            FADeprBook, BookValue, DeprBasis, DeprYears, DaysInFiscalYear, NumberOfDays, Amount, DateFromProjection, UntilDate, DeprMethod);
+                            FADeprBook, BookValue, DeprBasis, DeprYears, DaysInFiscalYear, NumberOfDays, Amount, DateFromProjection, UntilDate);
                 end;
             OnCalculateDeprAmountOnAfterAssignAmountLastEntry(FADeprBook, UntilDate, DateFromProjection, BookValue, UseHalfYearConvention, DaysInFiscalYear, NumberOfDays);
         end
@@ -313,7 +313,7 @@ codeunit 5611 "Calculate Normal Depreciation"
                     // Reserved for implementation of country specific
                     else
                         OnCalculateDeprAmountOnDeprMethodCaseLastDeprEntry(
-                            FADeprBook, BookValue, DeprBasis, DeprYears, DaysInFiscalYear, NumberOfDays, Amount, DateFromProjection, UntilDate, DeprMethod);
+                            FADeprBook, BookValue, DeprBasis, DeprYears, DaysInFiscalYear, NumberOfDays, Amount, DateFromProjection, UntilDate);
                 end;
                 DepreciationCalc.GetDeprPeriod(
                   FA."No.", DeprBookCode, UntilDate, StartingDate, EndingDate, NumberOfDays, Year365Days);
@@ -565,7 +565,7 @@ codeunit 5611 "Calculate Normal Depreciation"
         DeprBasis := FADeprBook."Depreciable Basis";
         SalvageValue := FADeprBook."Salvage Value";
 
-        OnAfterBookValueRecalculateBookValue(FA, DeprBook, FALedgEntry, DeprBasis, BookValue, EndingDate, FADeprBook."Disposal Date", FADeprBook, DateFromProjection, SalvageValue);
+        OnAfterBookValueRecalculateBookValue(FA, DeprBook, FALedgEntry, DeprBasis, BookValue, EndingDate, FADeprBook."Disposal Date", FADeprBook, DateFromProjection);
 
         BookValue2 := BookValue;
         SalvageValue2 := SalvageValue;
@@ -976,7 +976,7 @@ codeunit 5611 "Calculate Normal Depreciation"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterBookValueRecalculateBookValue(FixedAsset: Record "Fixed Asset"; DeprBook: Record "Depreciation Book"; FAledgEntry2: Record "FA Ledger Entry"; var DeprBasis: Decimal; var BookValue: Decimal; var DeprEndingDate: Date; DisposalDate: Date; var FADepreciationBook: Record "FA Depreciation Book"; DateFromProjection: Date; var SalvageValue: Decimal)
+    local procedure OnAfterBookValueRecalculateBookValue(FixedAsset: Record "Fixed Asset"; DeprBook: Record "Depreciation Book"; FAledgEntry2: Record "FA Ledger Entry"; var DeprBasis: Decimal; var BookValue: Decimal; var DeprEndingDate: Date; DisposalDate: Date; var FADepreciationBook: Record "FA Depreciation Book"; DateFromProjection: Date)
     begin
     end;
 
@@ -1063,12 +1063,12 @@ codeunit 5611 "Calculate Normal Depreciation"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnCalculateDeprAmountOnDeprMethodCaseLastEntry(FADepreciationBook: Record "FA Depreciation Book"; BookValue: Decimal; DeprBasis: Decimal; DeprYears: Decimal; DaysInFiscalYear: Integer; NumberOfDays: Integer; var Amount: Decimal; DateFromProjection: Date; UntilDate: Date; DeprMethod: Enum "FA Depr. Method Internal")
+    local procedure OnCalculateDeprAmountOnDeprMethodCaseLastEntry(FADepreciationBook: Record "FA Depreciation Book"; BookValue: Decimal; DeprBasis: Decimal; DeprYears: Decimal; DaysInFiscalYear: Integer; NumberOfDays: Integer; var Amount: Decimal; DateFromProjection: Date; UntilDate: Date)
     begin
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnCalculateDeprAmountOnDeprMethodCaseLastDeprEntry(FADepreciationBook: Record "FA Depreciation Book"; BookValue: Decimal; DeprBasis: Decimal; DeprYears: Decimal; DaysInFiscalYear: Integer; NumberOfDays: Integer; var Amount: Decimal; DateFromProjection: Date; UntilDate: Date; DeprMethod: Enum "FA Depr. Method Internal")
+    local procedure OnCalculateDeprAmountOnDeprMethodCaseLastDeprEntry(FADepreciationBook: Record "FA Depreciation Book"; BookValue: Decimal; DeprBasis: Decimal; DeprYears: Decimal; DaysInFiscalYear: Integer; NumberOfDays: Integer; var Amount: Decimal; DateFromProjection: Date; UntilDate: Date)
     begin
     end;
 
