@@ -15,7 +15,6 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 #if not CLEAN24
 using System.Environment.Configuration;
-using System.Environment;
 #endif
 using System.IO;
 
@@ -184,7 +183,6 @@ page 17 "G/L Account Card"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the general posting type to use when posting to this account.';
-                    ValuesAllowed = " ", Purchase, Sale;
                 }
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
@@ -247,7 +245,7 @@ page 17 "G/L Account Card"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Source Currency Posting';
-                    ToolTip = 'Specifies how the system will validate posting of entries containing currencies. Blank will allow all currencies to be posted to the account. Same Code will only allow the currency specified in Source Currency Code. Multiple currencies will allow only posting of currencies selected in Source currency code. Local currency only allow posting without a Currency code.';
+                    ToolTip = 'Specifies which source currencies can be posted to this account.';
 #if not CLEAN24
                     Visible = SourceCurrencyVisible;
 #endif
@@ -814,16 +812,11 @@ page 17 "G/L Account Card"
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
 #if not CLEAN24
         FeatureKeyManagement: Codeunit "Feature Key Management";
-        ClientTypeManagement: Codeunit "Client Type Management";
 #endif
     begin
         ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
 #if not CLEAN24
-        if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::SOAP, CLIENTTYPE::OData, CLIENTTYPE::ODataV4, ClientType::Api]
-then
-            SourceCurrencyVisible := false
-        else
-            SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
+        SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
 #endif
     end;
 }
