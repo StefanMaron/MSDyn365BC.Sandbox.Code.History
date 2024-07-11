@@ -286,7 +286,7 @@
   </Item>
   <Item ItemId=";Codeunit 2859947066 - NamedType 210726671" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Because of circular references, the program cannot calculate a formula.]]></Val>
+      <Val><![CDATA[This can be caused by recursive function calls]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
