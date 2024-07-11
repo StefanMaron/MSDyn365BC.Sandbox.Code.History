@@ -13,7 +13,6 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 #if not CLEAN24
 using System.Environment.Configuration;
-using System.Environment;
 #endif
 using System.IO;
 
@@ -777,7 +776,6 @@ page 17 "G/L Account Card"
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
 #if not CLEAN24
         FeatureKeyManagement: Codeunit "Feature Key Management";
-        ClientTypeManagement: Codeunit "Client Type Management";
 #endif
     begin
         ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
@@ -785,11 +783,7 @@ page 17 "G/L Account Card"
         IsAutomaticAccountCodesEnabled := FeatureKeyManagement.IsAutomaticAccountCodesEnabled();
 #endif
 #if not CLEAN24
-        if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::SOAP, CLIENTTYPE::OData, CLIENTTYPE::ODataV4, ClientType::Api]
-then
-            SourceCurrencyVisible := false
-        else
-            SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
+        SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
 #endif
     end;
 }
