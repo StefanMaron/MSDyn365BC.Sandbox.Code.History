@@ -15,7 +15,6 @@ using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
 #if not CLEAN24
 using System.Environment.Configuration;
-using System.Environment;
 #endif
 
 page 16 "Chart of Accounts"
@@ -757,7 +756,6 @@ page 16 "Chart of Accounts"
 #if not CLEAN24
         ISCoreAppSetup: Record "IS Core App Setup";
         FeatureKeyManagement: Codeunit "Feature Key Management";
-        ClientTypeManagement: Codeunit "Client Type Management";
 #endif
     begin
         GLSetup.Get();
@@ -766,11 +764,6 @@ page 16 "Chart of Accounts"
 #if not CLEAN24
         IsISCoreAppEnabled := ISCoreAppSetup.IsEnabled();
         SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
-        if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::SOAP, CLIENTTYPE::OData, CLIENTTYPE::ODataV4, ClientType::Api]
-        then
-            SourceCurrencyVisible := false
-        else
-            SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
 #endif
     end;
 }
