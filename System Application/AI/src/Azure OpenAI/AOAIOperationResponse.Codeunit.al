@@ -4,6 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.AI;
 
+using System;
+
 /// <summary>
 /// The status and result of an operation.
 /// </summary>
@@ -14,7 +16,6 @@ codeunit 7770 "AOAI Operation Response"
     InherentPermissions = X;
 
     var
-        AOAIFunctionResponse: Codeunit "AOAI Function Response";
         StatusCode: Integer;
         Success: Boolean;
         Result: Text;
@@ -56,29 +57,14 @@ codeunit 7770 "AOAI Operation Response"
         exit(Error);
     end;
 
-    /// <summary>
-    /// Get whether the operation was a function call.
-    /// </summary>
-    /// <returns>True if it was a function call, false otherwise.</returns>
-    procedure IsFunctionCall(): Boolean
+    internal procedure SetOperationResponse(var ALCopilotOperationResponse: DotNet ALCopilotOperationResponse)
     begin
-        exit(AOAIFunctionResponse.IsFunctionCall());
-    end;
+        Success := ALCopilotOperationResponse.IsSuccess();
+        StatusCode := ALCopilotOperationResponse.StatusCode;
+        Result := ALCopilotOperationResponse.Result();
+        Error := ALCopilotOperationResponse.ErrorText();
 
-    /// <summary>
-    /// Get the function response codeunit which contains the response details.
-    /// </summary>
-    /// <returns>The codeunit which contains response details for the function call.</returns>
-    procedure GetFunctionResponse(): Codeunit "AOAI Function Response"
-    begin
-        exit(AOAIFunctionResponse);
-    end;
-
-    internal procedure SetOperationResponse(NewSuccess: Boolean; NewStatusCode: Integer; NewResult: Text; NewError: Text)
-    begin
-        Success := NewSuccess;
-        StatusCode := NewStatusCode;
-        Result := NewResult;
-        Error := NewError;
+        if Error = '' then
+            Error := GetLastErrorText();
     end;
 }
