@@ -128,7 +128,6 @@ page 5879 "Phys. Inventory Recording"
                         PhysInvtRecordHeader.Copy(Rec);
 
                         ExportPhysInvtRecording.Set(PhysInvtRecordHeader);
-                        ExportPhysInvtRecording.TextEncoding(TextEncoding::UTF8);
                         ExportPhysInvtRecording.Run();
                         Clear(ExportPhysInvtRecording);
                     end;
