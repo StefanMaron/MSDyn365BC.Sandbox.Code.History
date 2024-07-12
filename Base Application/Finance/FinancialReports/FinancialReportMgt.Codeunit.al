@@ -219,7 +219,7 @@ codeunit 18 "Financial Report Mgt."
         end;
     end;
 
-    internal procedure RenameColumnLayoutInPackage(PackageCode: Code[20]; OldName: Code[10]; NewName: Code[10])
+    local procedure RenameColumnLayoutInPackage(PackageCode: Code[20]; OldName: Code[10]; NewName: Code[10])
     var
         ColumnLayoutName: Record "Column Layout Name";
         ColumnLayout: Record "Column Layout";
