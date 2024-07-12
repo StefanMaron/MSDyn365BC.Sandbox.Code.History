@@ -434,7 +434,7 @@ codeunit 5477 "Sales Invoice Aggregator"
         NonWhiteListedFieldsFound := false;
         if TempFieldBuffer.findset() then
             repeat
-                if TempFieldBuffer."Field ID" in [SalesInvoiceEntityAggregate.FieldNo("Due Date"), SalesInvoiceEntityAggregate.FieldNo("Promised Pay Date"), SalesInvoiceEntityAggregate.FieldNo("Dispute Status"), SalesInvoiceEntityAggregate.FieldNo("Dispute Status Id")] then
+                if TempFieldBuffer."Field ID" in [SalesInvoiceEntityAggregate.FieldNo("Due Date"), SalesInvoiceEntityAggregate.FieldNo("Promised Pay Date"), SalesInvoiceEntityAggregate.FieldNo("Dispute Status")] then
                     WhiteListedFieldsFound := true
                 else
                     NonWhiteListedFieldsFound := true;
