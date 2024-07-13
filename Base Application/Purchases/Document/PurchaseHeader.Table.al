@@ -130,7 +130,11 @@ table 38 "Purchase Header"
                 "VAT Registration No." := Vend."VAT Registration No.";
                 Validate("Lead Time Calculation", Vend."Lead Time Calculation");
                 "Shipment Method Code" := Vend."Shipment Method Code";
-                "Responsibility Center" := UserSetupMgt.GetRespCenter(1, Vend."Responsibility Center");
+
+                IsHandled := false;
+                OnValidateBuyFromVendorNoOnBeforeAssignResponsibilityCenter(Rec, xRec, CurrFieldNo, IsHandled);
+                if not IsHandled then
+                    "Responsibility Center" := UserSetupMgt.GetRespCenter(1, Vend."Responsibility Center");
                 ValidateEmptySellToCustomerAndLocation();
                 OnAfterCopyBuyFromVendorFieldsFromVendor(Rec, Vend, xRec);
 
@@ -759,7 +763,6 @@ table 38 "Purchase Header"
             trigger OnValidate()
             var
                 StandardCodesMgt: Codeunit "Standard Codes Mgt.";
-                XRecOfSameRec, CurrencyCodeChanged : Boolean;
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -767,21 +770,19 @@ table 38 "Purchase Header"
                 if IsHandled then
                     exit;
 
-                XRecOfSameRec := (xRec."No." = Rec."No.") and (xRec."Document Type" = Rec."Document Type");
-                CurrencyCodeChanged := ("Currency Code" <> xRec."Currency Code") and XRecOfSameRec;
-                if (not (CurrFieldNo in [0, FieldNo("Posting Date")])) or CurrencyCodeChanged then
+                if not (CurrFieldNo in [0, FieldNo("Posting Date")]) or ("Currency Code" <> xRec."Currency Code") then
                     TestStatusOpen();
 
                 ResetInvoiceDiscountValue();
 
-                if (CurrFieldNo <> FieldNo("Currency Code")) and (not CurrencyCodeChanged) then
-                    UpdateCurrencyFactor(CurrencyCodeChanged)
+                if (CurrFieldNo <> FieldNo("Currency Code")) and ("Currency Code" = xRec."Currency Code") then
+                    UpdateCurrencyFactor()
                 else
                     if "Currency Code" <> xRec."Currency Code" then
-                        UpdateCurrencyFactor(CurrencyCodeChanged)
+                        UpdateCurrencyFactor()
                     else
                         if "Currency Code" <> '' then begin
-                            UpdateCurrencyFactor(CurrencyCodeChanged);
+                            UpdateCurrencyFactor();
                             if "Currency Factor" <> xRec."Currency Factor" then
                                 ConfirmCurrencyFactorUpdate();
                         end;
@@ -881,7 +882,7 @@ table 38 "Purchase Header"
                                         PurchLine."Line Amount" := PurchLine.Amount + PurchLine."Inv. Discount Amount";
                                 UpdatePrepmtAmounts(PurchLine);
                             end;
-                            OnValidatePricesIncludingVATOnBeforePurchLineModify(PurchHeader, PurchLine, Currency, RecalculatePrice);
+                            OnValidatePricesIncludingVATOnBeforePurchLineModify(Rec, PurchLine, Currency, RecalculatePrice);
                             PurchLine.Modify();
                         until PurchLine.Next() = 0;
                     end;
@@ -3074,7 +3075,10 @@ table 38 "Purchase Header"
 
         UpdateInboundWhseHandlingTime();
 
-        "Responsibility Center" := UserSetupMgt.GetRespCenter(1, "Responsibility Center");
+        IsHandled := false;
+        OnInitRecordOnBeforeAssignResponsibilityCenter(Rec, IsHandled);
+        if not IsHandled then
+            "Responsibility Center" := UserSetupMgt.GetRespCenter(1, "Responsibility Center");
         GetNextArchiveDocOccurrenceNo();
 
         OnAfterInitRecord(Rec);
@@ -3404,7 +3408,7 @@ table 38 "Purchase Header"
         Contact.FilterGroup(0);
     end;
 
-    internal procedure PerformManualRelease(var PurchaseHeader: Record "Purchase Header")
+    procedure PerformManualRelease(var PurchaseHeader: Record "Purchase Header")
     var
         BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
         NoOfSelected: Integer;
@@ -3421,7 +3425,7 @@ table 38 "Purchase Header"
         PurchaseHeader.FilterGroup(PrevFilterGroup);
     end;
 
-    internal procedure PerformManualRelease()
+    procedure PerformManualRelease()
     var
         ReleasePurchDoc: Codeunit "Release Purchase Document";
     begin
@@ -3431,7 +3435,7 @@ table 38 "Purchase Header"
         end;
     end;
 
-    internal procedure PerformManualReopen(var PurchaseHeader: Record "Purchase Header")
+    procedure PerformManualReopen(var PurchaseHeader: Record "Purchase Header")
     var
         BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
         NoOfSelected: Integer;
@@ -3799,11 +3803,6 @@ table 38 "Purchase Header"
     end;
 
     procedure UpdateCurrencyFactor()
-    begin
-        UpdateCurrencyFactor(Rec."Currency Code" <> xRec."Currency Code");
-    end;
-
-    local procedure UpdateCurrencyFactor(CurrencyCodeChanged: Boolean)
     var
         UpdateCurrencyExchangeRates: Codeunit "Update Currency Exchange Rates";
         Updated: Boolean;
@@ -3821,13 +3820,13 @@ table 38 "Purchase Header"
 
             if UpdateCurrencyExchangeRates.ExchangeRatesForCurrencyExist(CurrencyDate, "Currency Code") then begin
                 "Currency Factor" := CurrExchRate.ExchangeRate(CurrencyDate, "Currency Code");
-                if CurrencyCodeChanged then
+                if "Currency Code" <> xRec."Currency Code" then
                     RecreatePurchLines(FieldCaption("Currency Code"));
             end else
                 UpdateCurrencyExchangeRates.ShowMissingExchangeRatesNotification("Currency Code");
         end else begin
             "Currency Factor" := 0;
-            if CurrencyCodeChanged then
+            if "Currency Code" <> xRec."Currency Code" then
                 RecreatePurchLines(FieldCaption("Currency Code"));
         end;
 
@@ -5087,9 +5086,12 @@ table 38 "Purchase Header"
 
     procedure PrepareOpeningDocumentStatistics()
     var
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        PurchaseHeader: Record "Purchase Header";
+        [SecurityFiltering(SecurityFilter::Ignored)]
         PurchaseLine: Record "Purchase Line";
     begin
-        if not WritePermission() or not PurchaseLine.WritePermission() then
+        if not PurchaseHeader.WritePermission() or not PurchaseLine.WritePermission() then
             Error(StatisticsInsuffucientPermissionsErr);
 
         CalcInvDiscForHeader();
@@ -8165,6 +8167,16 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeHasMixedDropShipment(var PurchaseHeader: Record "Purchase Header"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateBuyFromVendorNoOnBeforeAssignResponsibilityCenter(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitRecordOnBeforeAssignResponsibilityCenter(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 }
