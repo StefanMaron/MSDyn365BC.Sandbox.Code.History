@@ -792,7 +792,6 @@ table 38 "Purchase Header"
             trigger OnValidate()
             var
                 StandardCodesMgt: Codeunit "Standard Codes Mgt.";
-                XRecOfSameRec, CurrencyCodeChanged : Boolean;
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -800,21 +799,19 @@ table 38 "Purchase Header"
                 if IsHandled then
                     exit;
 
-                XRecOfSameRec := (xRec."No." = Rec."No.") and (xRec."Document Type" = Rec."Document Type");
-                CurrencyCodeChanged := ("Currency Code" <> xRec."Currency Code") and XRecOfSameRec;
-                if (not (CurrFieldNo in [0, FieldNo("Posting Date")])) or CurrencyCodeChanged then
+                if not (CurrFieldNo in [0, FieldNo("Posting Date")]) or ("Currency Code" <> xRec."Currency Code") then
                     TestStatusOpen();
 
                 ResetInvoiceDiscountValue();
 
-                if (CurrFieldNo <> FieldNo("Currency Code")) and (not CurrencyCodeChanged) then
-                    UpdateCurrencyFactor(CurrencyCodeChanged)
+                if (CurrFieldNo <> FieldNo("Currency Code")) and ("Currency Code" = xRec."Currency Code") then
+                    UpdateCurrencyFactor()
                 else
                     if "Currency Code" <> xRec."Currency Code" then
-                        UpdateCurrencyFactor(CurrencyCodeChanged)
+                        UpdateCurrencyFactor()
                     else
                         if "Currency Code" <> '' then begin
-                            UpdateCurrencyFactor(CurrencyCodeChanged);
+                            UpdateCurrencyFactor();
                             if "Currency Factor" <> xRec."Currency Factor" then
                                 ConfirmCurrencyFactorUpdate();
                         end;
@@ -3753,11 +3750,6 @@ table 38 "Purchase Header"
     end;
 
     procedure UpdateCurrencyFactor()
-    begin
-        UpdateCurrencyFactor(Rec."Currency Code" <> xRec."Currency Code");
-    end;
-
-    local procedure UpdateCurrencyFactor(CurrencyCodeChanged: Boolean)
     var
         UpdateCurrencyExchangeRates: Codeunit "Update Currency Exchange Rates";
         Updated: Boolean;
@@ -3775,13 +3767,13 @@ table 38 "Purchase Header"
 
             if UpdateCurrencyExchangeRates.ExchangeRatesForCurrencyExist(CurrencyDate, "Currency Code") then begin
                 "Currency Factor" := CurrExchRate.ExchangeRate(CurrencyDate, "Currency Code");
-                if CurrencyCodeChanged then
+                if "Currency Code" <> xRec."Currency Code" then
                     RecreatePurchLines(FieldCaption("Currency Code"));
             end else
                 UpdateCurrencyExchangeRates.ShowMissingExchangeRatesNotification("Currency Code");
         end else begin
             "Currency Factor" := 0;
-            if CurrencyCodeChanged then
+            if "Currency Code" <> xRec."Currency Code" then
                 RecreatePurchLines(FieldCaption("Currency Code"));
         end;
 
@@ -4076,6 +4068,7 @@ table 38 "Purchase Header"
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if PurchLinesExist() then
@@ -7098,6 +7091,11 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdatePurchLinesByChangedFieldName(PurchHeader: Record "Purchase Header"; var PurchLine: Record "Purchase Line"; ChangedFieldName: Text[100]; ChangedFieldNo: Integer; xPurchaseHeader: Record "Purchase Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var PurcasehHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header")
     begin
     end;
 
