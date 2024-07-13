@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.Bank.DirectDebit;
 
-using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
 using Microsoft.Foundation.Company;
 
@@ -380,7 +379,7 @@ xmlport 1010 "SEPA DD pain.008.001.02"
             PaymentExportDataGroup.Amount += PaymentExportData.Amount;
         until PaymentExportData.Next() = 0;
         InsertPmtGroup(PaymentGroupNo);
-        GetOrgIdOthrId(PaymentExportData."Sender Bank Account Code");
+        CreditorNo := PaymentExportData.GetSenderCreditorNo();
     end;
 
     local procedure IsNewGroup(): Boolean
@@ -411,14 +410,6 @@ xmlport 1010 "SEPA DD pain.008.001.02"
             StrSubstNo('%1/%2', PaymentExportData."Message ID", PaymentGroupNo),
             1, MaxStrLen(PaymentExportDataGroup."Payment Information ID"));
         PaymentExportDataGroup.Insert();
-    end;
-
-    local procedure GetOrgIdOthrId(BankAccountNo: Code[20])
-    var
-        BankAccount: Record "Bank Account";
-    begin
-        BankAccount.Get(BankAccountNo);
-        CreditorNo := BankAccount."Creditor No.";
     end;
 }
 
