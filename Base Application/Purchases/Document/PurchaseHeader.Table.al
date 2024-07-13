@@ -769,6 +769,7 @@ table 38 "Purchase Header"
             trigger OnValidate()
             var
                 StandardCodesMgt: Codeunit "Standard Codes Mgt.";
+                XRecOfSameRec, CurrencyCodeChanged : Boolean;
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -776,19 +777,21 @@ table 38 "Purchase Header"
                 if IsHandled then
                     exit;
 
-                if not (CurrFieldNo in [0, FieldNo("Posting Date")]) or ("Currency Code" <> xRec."Currency Code") then
+                XRecOfSameRec := (xRec."No." = Rec."No.") and (xRec."Document Type" = Rec."Document Type");
+                CurrencyCodeChanged := ("Currency Code" <> xRec."Currency Code") and XRecOfSameRec;
+                if (not (CurrFieldNo in [0, FieldNo("Posting Date")])) or CurrencyCodeChanged then
                     TestStatusOpen();
 
                 ResetInvoiceDiscountValue();
 
-                if (CurrFieldNo <> FieldNo("Currency Code")) and ("Currency Code" = xRec."Currency Code") then
-                    UpdateCurrencyFactor()
+                if (CurrFieldNo <> FieldNo("Currency Code")) and (not CurrencyCodeChanged) then
+                    UpdateCurrencyFactor(CurrencyCodeChanged)
                 else
                     if "Currency Code" <> xRec."Currency Code" then
-                        UpdateCurrencyFactor()
+                        UpdateCurrencyFactor(CurrencyCodeChanged)
                     else
                         if "Currency Code" <> '' then begin
-                            UpdateCurrencyFactor();
+                            UpdateCurrencyFactor(CurrencyCodeChanged);
                             if "Currency Factor" <> xRec."Currency Factor" then
                                 ConfirmCurrencyFactorUpdate();
                         end;
@@ -3638,6 +3641,11 @@ table 38 "Purchase Header"
     end;
 
     procedure UpdateCurrencyFactor()
+    begin
+        UpdateCurrencyFactor(Rec."Currency Code" <> xRec."Currency Code");
+    end;
+
+    local procedure UpdateCurrencyFactor(CurrencyCodeChanged: Boolean)
     var
         UpdateCurrencyExchangeRates: Codeunit "Update Currency Exchange Rates";
         Updated: Boolean;
@@ -3657,7 +3665,7 @@ table 38 "Purchase Header"
             if "Vendor Exchange Rate (ACY)" = 0 then
                 if UpdateCurrencyExchangeRates.ExchangeRatesForCurrencyExist(CurrencyDate, "Currency Code") then begin
                     "Currency Factor" := CurrExchRate.ExchangeRate(CurrencyDate, "Currency Code");
-                    if "Currency Code" <> xRec."Currency Code" then
+                    if CurrencyCodeChanged then
                         RecreatePurchLines(FieldCaption("Currency Code"));
                 end else
                     UpdateCurrencyExchangeRates.ShowMissingExchangeRatesNotification("Currency Code")
@@ -3666,7 +3674,7 @@ table 38 "Purchase Header"
                     GLSetup."Additional Reporting Currency", "Vendor Exchange Rate (ACY)");
         end else begin
             "Currency Factor" := 0;
-            if "Currency Code" <> xRec."Currency Code" then
+            if CurrencyCodeChanged then
                 RecreatePurchLines(FieldCaption("Currency Code"));
         end;
 
