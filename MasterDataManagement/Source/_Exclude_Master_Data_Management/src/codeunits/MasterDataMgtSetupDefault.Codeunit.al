@@ -1455,7 +1455,6 @@ codeunit 7230 "Master Data Mgt. Setup Default"
     var
         JobQueueEntry: Record "Job Queue Entry";
         MasterDataManagement: Codeunit "Master Data Management";
-        SynchronizationTableRecRef: RecordRef;
         IsHandled: Boolean;
     begin
         MasterDataManagement.OnHandleRecreateJobQueueEntryFromIntegrationTableMapping(JobQueueEntry, IntegrationTableMapping, IsHandled);
@@ -1471,11 +1470,8 @@ codeunit 7230 "Master Data Mgt. Setup Default"
         JobQueueEntry."Object ID to Run" := Codeunit::"Integration Synch. Job Runner";
         JobQueueEntry."Record ID to Process" := IntegrationTableMapping.RecordId();
         JobQueueEntry."Run in User Session" := false;
-        if IntegrationTableMapping."Table ID" <> 0 then begin
-            SynchronizationTableRecRef.Open(IntegrationTableMapping."Table ID");
-            JobQueueEntry.Description := CopyStr(StrSubstNo(JobQueueEntryNameTok, SynchronizationTableRecRef.Caption(), ServiceName), 1, MaxStrLen(JobQueueEntry.Description));
-        end else
-            JobQueueEntry.Description := CopyStr(StrSubstNo(JobQueueEntryNameTok, IntegrationTableMapping.Name, ServiceName), 1, MaxStrLen(JobQueueEntry.Description));
+        JobQueueEntry.Description :=
+          CopyStr(StrSubstNo(JobQueueEntryNameTok, IntegrationTableMapping.Name, ServiceName), 1, MaxStrLen(JobQueueEntry.Description));
         JobQueueEntry."Maximum No. of Attempts to Run" := 10;
         JobQueueEntry.Status := JobQueueEntry.Status::Ready;
         JobQueueEntry."Rerun Delay (sec.)" := 30;
@@ -1486,8 +1482,6 @@ codeunit 7230 "Master Data Mgt. Setup Default"
             JobQueueEntry."Job Queue Category Code" := CustomerContactJobQueueCategoryLbl
         else
             JobQueueEntry."Job Queue Category Code" := JobQueueCategoryLbl;
-
-        OnBeforeInsertJobQueueEntryForSynchronizationTable(JobQueueEntry, IntegrationTableMapping, ShouldRecreateJobQueueEntry);
         if ShouldRecreateJobQueueEntry then
             Codeunit.Run(Codeunit::"Job Queue - Enqueue", JobQueueEntry)
         else begin
@@ -1674,17 +1668,12 @@ codeunit 7230 "Master Data Mgt. Setup Default"
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeResetTableMapping(var IntegrationTableMappingName: Code[20]; var ShouldRecreateJobQueueEntry: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeResetTableMapping(var IntegrationTableMappingName: Code[20]; var ShouldRecreateJobQueueEntry: Boolean; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterResetTableMapping(var IntegrationTableMappingName: Code[20]; var ShouldRecreateJobQueueEntry: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertJobQueueEntryForSynchronizationTable(var JobQueueEntry: Record "Job Queue Entry"; var IntegrationTableMapping: Record "Integration Table Mapping"; var ShouldScheduleJobQueueEntry: Boolean);
     begin
     end;
 }
