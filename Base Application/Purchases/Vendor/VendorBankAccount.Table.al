@@ -328,12 +328,9 @@ table 288 "Vendor Bank Account"
     trigger OnModify()
     var
         Confirmed: Boolean;
-        SkipConfirm: Boolean;
     begin
         if IBAN = '' then begin
-            SkipConfirm := false;
-            OnModifyOnIBANIsEmpty(Rec, SkipConfirm);
-            if not GuiAllowed or SkipConfirm then
+            if not GuiAllowed then
                 Confirmed := true
             else
                 Confirmed := Confirm(StrSubstNo('%1%2', Text12100, Text12101), false);
@@ -447,11 +444,6 @@ table 288 "Vendor Bank Account"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidatePostCode(var VendorBankAccount: Record "Vendor Bank Account"; var PostCodeRec: Record "Post Code"; CurrentFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnModifyOnIBANIsEmpty(var VendorBankAccount: Record "Vendor Bank Account"; var SkipConfirm: Boolean)
     begin
     end;
 }
