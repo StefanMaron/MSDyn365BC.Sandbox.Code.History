@@ -931,10 +931,7 @@ table 370 "Excel Buffer"
             // DO NOT TRANSLATE: Budget is used to define an Excel worksheet name. You must refer to Excel rules to change this term.
             11:
                 exit(Text022);
-            // DO NOT TRANSLATE: CostAcc is used to define an Excel range name. You must refer to Excel rules to change this term.
-            12:
-                exit('!');
-            // ! is the Excel code for reference to sheet.
+        // DO NOT TRANSLATE: CostAcc is used to define an Excel range name. You must refer to Excel rules to change this term.
         end;
     end;
 
@@ -1205,16 +1202,6 @@ table 370 "Excel Buffer"
           GetExcelReference(4) + RangeStartXlCol + GetExcelReference(4) + RangeStartXlRow +
           ':' +
           GetExcelReference(4) + RangeEndXlCol + GetExcelReference(4) + RangeEndXlRow);
-    end;
-
-    procedure CreateValidationRule(Range: Code[20]; SheetName: Text[250])
-    begin
-        XlWrkShtWriter.AddRangeDataValidation(
-            Range,
-            SheetName + GetExcelReference(12) +
-            GetExcelReference(4) + RangeStartXlCol + GetExcelReference(4) + RangeStartXlRow +
-            ':' +
-            GetExcelReference(4) + RangeEndXlCol + GetExcelReference(4) + RangeEndXlRow);
     end;
 
     procedure QuitExcel()
