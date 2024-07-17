@@ -169,7 +169,6 @@ codeunit 502 OAuth2Impl
         PermissionGrantError := OAuth2ControlAddIn.GetAuthError();
     end;
 
-#pragma warning disable AS0105
     [NonDebuggable]
     [TryFunction]
     [Obsolete('Use AcquireTokenByAuthorizationCode with SecretText data type for AccessToken.', '24.0')]
@@ -187,10 +186,8 @@ codeunit 502 OAuth2Impl
     procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; ResourceUrl: Text; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: Text; var AuthCodeErr: Text)
     var
         SecretAccessToken: SecretText;
-        CertificateSecret: SecretText;
     begin
-        CertificateSecret := Certificate;
-        AcquireTokenByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, OAuthAuthorityUrl, RedirectURL, ResourceUrl, PromptInteraction, SecretAccessToken, AuthCodeErr);
+        AcquireTokenByAuthorizationCodeWithCertificate(ClientId, Certificate, OAuthAuthorityUrl, RedirectURL, ResourceUrl, PromptInteraction, SecretAccessToken, AuthCodeErr);
         AccessToken := SecretAccessToken.Unwrap();
     end;
 
@@ -210,11 +207,9 @@ codeunit 502 OAuth2Impl
     [Obsolete('Use AcquireTokenByAuthorizationCodeWithCertificate with SecretText data type for AccessToken.', '24.0')]
     procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: Text; var AuthCodeErr: Text)
     var
-        CertificateSecret: SecretText;
         SecretAccessToken: SecretText;
     begin
-        CertificateSecret := Certificate;
-        AcquireTokenByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, SecretAccessToken, AuthCodeErr);
+        AcquireTokenByAuthorizationCodeWithCertificate(ClientId, Certificate, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, SecretAccessToken, AuthCodeErr);
         AccessToken := SecretAccessToken.Unwrap();
     end;
 
@@ -234,11 +229,9 @@ codeunit 502 OAuth2Impl
     [Obsolete('Use AcquireTokensByAuthorizationCodeWithCertificate with SecretText data type for AccessToken.', '24.0')]
     procedure AcquireTokensByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: Text; var IdToken: Text; var AuthCodeErr: Text)
     var
-        CertificateSecret: SecretText;
         SecretAccessToken: SecretText;
     begin
-        CertificateSecret := Certificate;
-        AcquireTokensByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, SecretAccessToken, IdToken, AuthCodeErr);
+        AcquireTokensByAuthorizationCodeWithCertificate(ClientId, Certificate, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, SecretAccessToken, IdToken, AuthCodeErr);
         AccessToken := SecretAccessToken.Unwrap();
     end;
 
@@ -258,11 +251,9 @@ codeunit 502 OAuth2Impl
     [Obsolete('Use AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate with SecretText data type for AccessToken.', '24.0')]
     procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: Text; var TokenCache: Text; var Error: Text)
     var
-        CertificateSecret: SecretText;
         SecretAccessToken: SecretText;
     begin
-        CertificateSecret := Certificate;
-        AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, SecretAccessToken, TokenCache, Error);
+        AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId, Certificate, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, SecretAccessToken, TokenCache, Error);
         AccessToken := SecretAccessToken.Unwrap();
     end;
 
@@ -282,11 +273,9 @@ codeunit 502 OAuth2Impl
     [Obsolete('Use AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate with SecretText data type for AccessToken.', '24.0')]
     procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: Text; var IdToken: Text; var TokenCache: Text; var Error: Text)
     var
-        CertificateSecret: SecretText;
         SecretAccessToken: SecretText;
     begin
-        CertificateSecret := Certificate;
-        AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, SecretAccessToken, IdToken, TokenCache, Error);
+        AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId, Certificate, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, SecretAccessToken, IdToken, TokenCache, Error);
         AccessToken := SecretAccessToken.Unwrap();
     end;
 
@@ -388,11 +377,9 @@ codeunit 502 OAuth2Impl
     [Obsolete('Use AcquireTokenFromCacheWithCertificate with SecretText data type for AccessToken.', '24.0')]
     procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: Text)
     var
-        CertificateSecret: SecretText;
         SecretAccessToken: SecretText;
     begin
-        CertificateSecret := Certificate;
-        AcquireTokenFromCacheWithCertificate(RedirectURL, ClientId, CertificateSecret, OAuthAuthorityUrl, ResourceURL, SecretAccessToken);
+        AcquireTokenFromCacheWithCertificate(RedirectURL, ClientId, Certificate, OAuthAuthorityUrl, ResourceURL, SecretAccessToken);
         AccessToken := SecretAccessToken.Unwrap();
     end;
 
@@ -412,11 +399,9 @@ codeunit 502 OAuth2Impl
     [Obsolete('Use AcquireTokenFromCacheWithCertificate with SecretText data type for AccessToken.', '24.0')]
     procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: Text)
     var
-        CertificateSecret: SecretText;
         SecretAccessToken: SecretText;
     begin
-        CertificateSecret := Certificate;
-        AcquireTokenFromCacheWithCertificate(RedirectURL, ClientId, CertificateSecret, OAuthAuthorityUrl, Scopes, SecretAccessToken);
+        AcquireTokenFromCacheWithCertificate(RedirectURL, ClientId, Certificate, OAuthAuthorityUrl, Scopes, SecretAccessToken);
         AccessToken := SecretAccessToken.Unwrap();
     end;
 
@@ -436,11 +421,9 @@ codeunit 502 OAuth2Impl
     [Obsolete('Use AcquireTokensFromCacheWithCertificate with SecretText data type for AccessToken.', '24.0')]
     procedure AcquireTokensFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: Text; var IdToken: Text)
     var
-        CertificateSecret: SecretText;
         SecretAccessToken: SecretText;
     begin
-        CertificateSecret := Certificate;
-        AcquireTokensFromCacheWithCertificate(RedirectURL, ClientId, CertificateSecret, OAuthAuthorityUrl, Scopes, SecretAccessToken, IdToken);
+        AcquireTokensFromCacheWithCertificate(RedirectURL, ClientId, Certificate, OAuthAuthorityUrl, Scopes, SecretAccessToken, IdToken);
         AccessToken := SecretAccessToken.Unwrap();
     end;
 
@@ -449,12 +432,31 @@ codeunit 502 OAuth2Impl
     [Obsolete('Use AcquireTokensWithCertificate with SecretText data type for AccessToken.', '24.0')]
     procedure AcquireTokensWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: Text; var IdToken: Text)
     var
-        CertificateSecret: SecretText;
         SecretAccessToken: SecretText;
     begin
-        CertificateSecret := Certificate;
-        AcquireTokensWithCertificate(RedirectURL, ClientId, CertificateSecret, OAuthAuthorityUrl, Scopes, SecretAccessToken, IdToken);
+        AcquireTokensWithCertificate(RedirectURL, ClientId, Certificate, OAuthAuthorityUrl, Scopes, SecretAccessToken, IdToken);
         AccessToken := SecretAccessToken.Unwrap();
+    end;
+
+    [TryFunction]
+    procedure AcquireTokensWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
+    var
+        CertificatePassword: SecretText;
+    begin
+        AcquireTokensWithCertificate(RedirectURL, ClientId, Certificate, CertificatePassword, OAuthAuthorityUrl, Scopes, AccessToken, IdToken);
+    end;
+
+    [TryFunction]
+    procedure AcquireTokensWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
+    var
+        ScopesArray: DotNet StringArray;
+        CompoundToken: DotNet CompoundTokenInfo;
+    begin
+        FillScopesArray(Scopes, ScopesArray);
+        Initialize(OAuthAuthorityUrl, RedirectURL);
+        CompoundToken := AuthFlow.ALAcquireApplicationTokensWithCertificate(ClientId, Certificate, CertificatePassword, OAuthAuthorityUrl, ScopesArray);
+        AccessToken := CompoundToken.AccessToken;
+        IdToken := CompoundToken.IdToken;
     end;
 
     [NonDebuggable]
@@ -480,302 +482,6 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    [Obsolete('Use AcquireTokenByAuthorizationCodeWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; ResourceUrl: Text; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, RedirectURL, ResourceUrl, PromptInteraction, AccessToken, AuthCodeErr);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenByAuthorizationCodeWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; ResourceUrl: Text; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, RedirectURL, ResourceUrl, PromptInteraction, AccessToken, AuthCodeErr);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenByAuthorizationCodeWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, AccessToken, AuthCodeErr);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenByAuthorizationCodeWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, AccessToken, AuthCodeErr);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensByAuthorizationCodeWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokensByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var AuthCodeErr: Text)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, AccessToken, IdToken, AuthCodeErr);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensByAuthorizationCodeWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokensByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var AuthCodeErr: Text)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, AccessToken, IdToken, AuthCodeErr);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var TokenCache: Text; var Error: Text)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, AccessToken, TokenCache, Error);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var TokenCache: Text; var Error: Text)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, AccessToken, TokenCache, Error);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text; var Error: Text)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, AccessToken, IdToken, TokenCache, Error);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text; var Error: Text)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, RedirectURL, Scopes, PromptInteraction, AccessToken, IdToken, TokenCache, Error);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenFromCacheWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenFromCacheWithCertificate(RedirectURL, ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, ResourceURL, AccessToken);
-    end;
-
-    [NonDebuggable]
-    [TryFunction]
-    [Obsolete('Use AcquireTokenFromCacheWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenFromCacheWithCertificate(RedirectURL, ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, ResourceURL, AccessToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenFromCacheWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenFromCacheWithCertificate(RedirectURL, ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, Scopes, AccessToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenFromCacheWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenFromCacheWithCertificate(RedirectURL, ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, Scopes, AccessToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensFromCacheWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokensFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensFromCacheWithCertificate(RedirectURL, ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, Scopes, AccessToken, IdToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensFromCacheWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokensFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensFromCacheWithCertificate(RedirectURL, ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, Scopes, AccessToken, IdToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokensWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensWithCertificate(RedirectURL, ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, Scopes, AccessToken, IdToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokensWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensWithCertificate(RedirectURL, ClientId, CertificateSecret, CertificatePassword, OAuthAuthorityUrl, Scopes, AccessToken, IdToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenByAuthorizationCodeWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; RedirectUrl: Text; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, CertificateSecret, CertificatePassword, RedirectUrl, OAuthAuthorityUrl, ResourceURL, AccessToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenByAuthorizationCodeWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, CertificateSecret, CertificatePassword, RedirectUrl, OAuthAuthorityUrl, ResourceURL, AccessToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenByAuthorizationCodeWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, CertificateSecret, CertificatePassword, RedirectUrl, OAuthAuthorityUrl, Scopes, AccessToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenByAuthorizationCodeWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, CertificateSecret, CertificatePassword, RedirectUrl, OAuthAuthorityUrl, Scopes, AccessToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensByAuthorizationCodeWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokensByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, CertificateSecret, CertificatePassword, RedirectUrl, OAuthAuthorityUrl, Scopes, AccessToken, IdToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensByAuthorizationCodeWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokensByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, CertificateSecret, CertificatePassword, RedirectUrl, OAuthAuthorityUrl, Scopes, AccessToken, IdToken);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var TokenCache: Text)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, CertificateSecret, CertificatePassword, RedirectUrl, OAuthAuthorityUrl, Scopes, AccessToken, TokenCache);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var TokenCache: Text)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, CertificateSecret, CertificatePassword, RedirectUrl, OAuthAuthorityUrl, Scopes, AccessToken, TokenCache);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate with SecretText data type for AccessToken and Certificate.', '25.0')]
-    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text)
-    var
-        CertificateSecret: SecretText;
-        CertificatePassword: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, CertificateSecret, CertificatePassword, RedirectUrl, OAuthAuthorityUrl, Scopes, AccessToken, IdToken, TokenCache);
-    end;
-
-    [TryFunction]
-    [Obsolete('Use AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate with SecretText data type for AccessToken, Certificate and CertificatePassword.', '25.0')]
-    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text)
-    var
-        CertificateSecret: SecretText;
-    begin
-        CertificateSecret := Certificate;
-        AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, CertificateSecret, CertificatePassword, RedirectUrl, OAuthAuthorityUrl, Scopes, AccessToken, IdToken, TokenCache);
-    end;
-#pragma warning restore AS0105
-
-    [TryFunction]
     procedure AcquireTokenByAuthorizationCode(ClientId: Text; ClientSecret: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; ResourceUrl: Text; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
     var
         AuthRequestUrl: Text;
@@ -798,7 +504,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; ResourceUrl: Text; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
+    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; ResourceUrl: Text; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
     var
         CertificatePassword: SecretText;
     begin
@@ -806,7 +512,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; ResourceUrl: Text; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
+    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; ResourceUrl: Text; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
     var
         AuthRequestUrl: Text;
         AuthCode: Text;
@@ -847,7 +553,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
+    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
     var
         CertificatePassword: SecretText;
     begin
@@ -855,7 +561,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
+    procedure AcquireTokenByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var AuthCodeErr: Text)
     var
         AuthRequestUrl: Text;
         AuthCode: Text;
@@ -893,7 +599,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var AuthCodeErr: Text)
+    procedure AcquireTokensByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var AuthCodeErr: Text)
     var
         CertificatePassword: SecretText;
     begin
@@ -901,7 +607,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var AuthCodeErr: Text)
+    procedure AcquireTokensByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var AuthCodeErr: Text)
     var
         AuthRequestUrl: Text;
         AuthCode: Text;
@@ -939,7 +645,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var TokenCache: Text; var Error: Text)
+    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var TokenCache: Text; var Error: Text)
     var
         CertificatePassword: SecretText;
     begin
@@ -947,7 +653,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var TokenCache: Text; var Error: Text)
+    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var TokenCache: Text; var Error: Text)
     var
         AuthRequestUrl: Text;
         AuthCode: Text;
@@ -985,7 +691,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text; var Error: Text)
+    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text; var Error: Text)
     var
         CertificatePassword: SecretText;
     begin
@@ -993,7 +699,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text; var Error: Text)
+    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scopes: List of [Text]; PromptInteraction: Enum "Prompt Interaction"; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text; var Error: Text)
     var
         AuthRequestUrl: Text;
         AuthCode: Text;
@@ -1141,15 +847,16 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: SecretText; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
+    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
     var
         CertificatePassword: SecretText;
     begin
         AcquireTokenFromCacheWithCertificate(RedirectURL, ClientId, Certificate, CertificatePassword, OAuthAuthorityUrl, ResourceURL, AccessToken);
     end;
 
+    [NonDebuggable]
     [TryFunction]
-    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
+    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
     begin
         Initialize(OAuthAuthorityUrl, RedirectURL);
         AccessToken := AuthFlow.ALAcquireTokenFromCacheWithCertificate(ClientId, Certificate, CertificatePassword, ResourceURL);
@@ -1166,7 +873,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
+    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
     var
         CertificatePassword: SecretText;
     begin
@@ -1174,7 +881,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
+    procedure AcquireTokenFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
     var
         ScopesArray: DotNet StringArray;
     begin
@@ -1197,7 +904,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
+    procedure AcquireTokensFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
     var
         CertificatePassword: SecretText;
     begin
@@ -1205,7 +912,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
+    procedure AcquireTokensFromCacheWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
     var
         ScopesArray: DotNet StringArray;
         CompoundToken: DotNet CompoundTokenInfo;
@@ -1218,7 +925,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
+    procedure AcquireTokensWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
     var
         CertificatePassword: SecretText;
     begin
@@ -1226,7 +933,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
+    procedure AcquireTokensWithCertificate(RedirectURL: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
     var
         ScopesArray: DotNet StringArray;
         CompoundToken: DotNet CompoundTokenInfo;
@@ -1266,7 +973,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
+    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; RedirectUrl: Text; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
     var
         CertificatePassword: SecretText;
     begin
@@ -1274,7 +981,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
+    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; ResourceURL: Text; var AccessToken: SecretText)
     begin
         AccessToken := AuthFlow.ALAcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode, ClientId, Certificate, CertificatePassword, ResourceURL);
     end;
@@ -1289,7 +996,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
+    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
     var
         CertificatePassword: SecretText;
     begin
@@ -1297,7 +1004,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
+    procedure AcquireTokenByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText)
     var
         ScopesArray: DotNet StringArray;
     begin
@@ -1318,7 +1025,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
+    procedure AcquireTokensByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
     var
         CertificatePassword: SecretText;
     begin
@@ -1326,7 +1033,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
+    procedure AcquireTokensByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text)
     var
         ScopesArray: DotNet StringArray;
         CompoundToken: DotNet CompoundTokenInfo;
@@ -1347,7 +1054,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var TokenCache: Text)
+    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var TokenCache: Text)
     var
         CertificatePassword: SecretText;
     begin
@@ -1355,7 +1062,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var TokenCache: Text)
+    procedure AcquireTokenAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var TokenCache: Text)
     var
         ScopesArray: DotNet StringArray;
     begin
@@ -1376,7 +1083,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text)
+    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text)
     var
         CertificatePassword: SecretText;
     begin
@@ -1384,7 +1091,7 @@ codeunit 502 OAuth2Impl
     end;
 
     [TryFunction]
-    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: SecretText; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text)
+    procedure AcquireTokensAndTokenCacheByAuthorizationCodeWithCertificate(AuthorizationCode: Text; ClientId: Text; Certificate: Text; CertificatePassword: SecretText; RedirectUrl: Text; OAuthAuthorityUrl: Text; Scopes: List of [Text]; var AccessToken: SecretText; var IdToken: Text; var TokenCache: Text)
     var
         ScopesArray: DotNet StringArray;
         CompoundToken: DotNet CompoundTokenInfo;
