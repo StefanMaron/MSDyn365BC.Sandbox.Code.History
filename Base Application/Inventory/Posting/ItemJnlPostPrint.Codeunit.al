@@ -96,7 +96,7 @@ codeunit 242 "Item Jnl.-Post+Print"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforePrintItemRegister(ItemReg, ItemJnlTemplate, IsHandled, ItemJnlLine);
+        OnBeforePrintItemRegister(ItemReg, ItemJnlTemplate, IsHandled);
         if IsHandled then
             exit;
 
@@ -109,7 +109,7 @@ codeunit 242 "Item Jnl.-Post+Print"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforePrintWhseRegister(WhseReg, ItemJnlTemplate, IsHandled, ItemJnlLine);
+        OnBeforePrintWhseRegister(WhseReg, ItemJnlTemplate, IsHandled);
         if IsHandled then
             exit;
 
@@ -128,12 +128,12 @@ codeunit 242 "Item Jnl.-Post+Print"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePrintItemRegister(ItemRegister: Record "Item Register"; ItemJournalTemplate: Record "Item Journal Template"; var IsHandled: Boolean; ItemJournalLine: Record "Item Journal Line")
+    local procedure OnBeforePrintItemRegister(ItemRegister: Record "Item Register"; ItemJournalTemplate: Record "Item Journal Template"; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePrintWhseRegister(WarehouseRegister: Record "Warehouse Register"; ItemJournalTemplate: Record "Item Journal Template"; var IsHandled: Boolean; ItemJournalLine: Record "Item Journal Line")
+    local procedure OnBeforePrintWhseRegister(WarehouseRegister: Record "Warehouse Register"; ItemJournalTemplate: Record "Item Journal Template"; var IsHandled: Boolean)
     begin
     end;
 
