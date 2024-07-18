@@ -119,7 +119,6 @@ codeunit 144009 "ERM Cash Bank Giro Journal"
         SelectDimensionCodeErr: Label 'Select a Dimension Value Code for the Dimension Code %1 for Customer %2.';
         DimensionValueErr: Label 'Invalid Dimension Value';
         VATDateOutOfVATDatesErr: Label 'The VAT Date is not within the range of allowed VAT dates.';
-        AppliesToIdErr: Label 'Applies to ID must not be same after 10000 lines.';
 
     [Test]
     [Scope('OnPrem')]
@@ -4036,65 +4035,29 @@ codeunit 144009 "ERM Cash Bank Giro Journal"
     end;
 
     [Test]
-    procedure AppliesToIdChangeAfter10000LinesofCBGStatementLine()
+    procedure UseManualNoSeriesForBankGiroJournal()
     var
-        GLAccount: Record "G/L Account";
-        GenJournalBatch: Record "Gen. Journal Batch";
-        GenJournalTemplate: Record "Gen. Journal Template";
         CBGStatementLine: Record "CBG Statement Line";
-        CBGStatement: Record "CBG Statement";
+        GenJournalTemplate: Record "Gen. Journal Template";
+        NoSeries: Record "No. Series";
         DocumentNo: Code[20];
-        BankAccountNo: Code[20];
-        AppliesToID: Code[20];
     begin
-        // [SCENARIO: 521221] Generate and increase Applies-to ID after 10000 line.
-        Initialize();
+        // [GIVEN] The Journal Template No. Series allows Manual document Nos.
+        GenJournalTemplate.Name := 'Manual Jnl';
+        LibraryUtility.CreateNoSeries(NoSeries, false, true, false);
+        GenJournalTemplate."No. Series" := NoSeries.Code;
+        GenJournalTemplate.Insert();
 
-        // [GIVEN] Create Bank Account with details.
-        CreateBankAccountWithDetails();
-
-        // [GIVEN] Create a GL Accout.
-        LibraryERM.CreateGLAccount(GLAccount);
-
-        // [GIVEN] Select a General Journal Batch.
-        SelectGenJournalBatch(GenJournalBatch);
-
-        // [GIVEN] Get Bank Account No. by posting a journal.
-        BankAccountNo := LibraryERM.CreateBankAccountNo();
-
-        // [GIVEN] Get General Journal Template and Validate the Balancing Account Type and Account No.
-        GenJournalTemplate.Get(GenJournalBatch."Journal Template Name");
-        GenJournalTemplate.Validate("Bal. Account Type", GenJournalTemplate."Bal. Account Type"::"Bank Account");
-        GenJournalTemplate.Validate("Bal. Account No.", BankAccountNo);
-        GenJournalTemplate.Modify(true);
-
-        // [GIVEN] Get Document No into a Variable using Random No Series Code.
-        DocumentNo := LibraryERM.CreateNoSeriesCode();
-
-        // [GIVEN] Create CBG Statement Header.
-        CBGStatement.Init();
-        CBGStatement.Validate("Journal Template Name", GenJournalBatch."Journal Template Name");
-        CBGStatement."Document No." := DocumentNo;
-        CBGStatement.Insert(true);
-
-
-        // [GIVEN] Create CBG Statement Line using the Header.
-        CBGStatementLine.Init();
-        CBGStatementLine.Validate("Journal Template Name", GenJournalBatch."Journal Template Name");
-        CBGStatementLine.Validate("No.", CBGStatement."No.");
-        CBGStatementLine.Validate("Account Type", CBGStatementLine."Account Type"::Customer);
+        // [GIVEN] A giro journal with a document No. Already set
+        DocumentNo := '1234';
         CBGStatementLine."Document No." := DocumentNo;
-        CBGStatementLine."Applies-to ID" := CopyStr(CBGStatementLine."Applies-to ID", 1, 4) + '-00010000';
-        CBGStatementLine.Insert(true);
+        CBGStatementLine."Journal Template Name" := GenJournalTemplate.Name;
 
-        // [GIVEN] Call New Applies to ID function to increase the Applies To ID Code.
-        AppliesToID := CBGStatementLine."New Applies-to ID"();
+        // [WHEN] The document No. is generated
+        CBGStatementLine.GenerateDocumentNo();
 
-        // [THEN] Check if the Applies to ID has increased after 10000.
-        Assert.AreEqual(
-            AppliesToID,
-            IncStr(CBGStatementLine."Applies-to ID"),
-            AppliesToIdErr);
+        // [THEN] The document No. is not changed
+        Assert.AreEqual(DocumentNo, CBGStatementLine."Document No.", 'Document No. was not set manually');
     end;
 
     local procedure Initialize()
