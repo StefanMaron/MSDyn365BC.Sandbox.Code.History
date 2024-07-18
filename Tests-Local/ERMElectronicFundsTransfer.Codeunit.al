@@ -48,6 +48,7 @@
         CheckTransmittedErr: Label '%1 must have a value in %2: %3=%4, %5=%6, %7=%8. It cannot be zero or empty', Locked = true;
         CheckExportedErr: Label 'Check Exported must be true.';
         DocumentNoBlankErr: Label 'Document No. must be blank.';
+        IsInitialized: Boolean;
 
     [Test]
     [HandlerFunctions('ExportElectronicPaymentsXMLRequestPageHandler')]
@@ -2743,10 +2744,31 @@
     var
         EFTExport: Record "EFT Export";
     begin
-        LibraryERMCountryData.CreateVATData();
         LibraryVariableStorage.Clear();
         ModifyFederalIdCompanyInformation(LibraryUtility.GenerateGUID());
         EFTExport.DeleteAll();
+
+        if IsInitialized then
+            exit;
+
+        LibraryERMCountryData.CreateVATData();
+        CreateCountryRegion('US');
+        CreateCountryRegion('CA');
+        CreateCountryRegion('MX');
+
+        IsInitialized := true;
+    end;
+
+    local procedure CreateCountryRegion(CountryRegionCode: Code[10])
+    var
+        CountryRegion: Record "Country/Region";
+    begin
+        if not CountryRegion.Get(CountryRegionCode) then begin
+            CountryRegion.Code := CountryRegionCode;
+            CountryRegion.Insert();
+        end;
+        CountryRegion."ISO Code" := CopyStr(CountryRegionCode, 1, MaxStrLen(CountryRegion."ISO Code"));
+        CountryRegion.Modify();
     end;
 
     local procedure ValidateEFTCAHeader(Line: Text)
