@@ -1,8 +1,8 @@
 ﻿namespace Microsoft.Bank.DirectDebit;
 
+using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
 using Microsoft.Foundation.Company;
-using System.Telemetry;
 
 xmlport 1010 "SEPA DD pain.008.001.02"
 {
@@ -334,12 +334,7 @@ xmlport 1010 "SEPA DD pain.008.001.02"
     }
 
     trigger OnPreXmlPort()
-    var
-        FeatureTelemetry: Codeunit "Feature Telemetry";
-        SEPADDExportFile: Codeunit "SEPA DD-Export File";
     begin
-        FeatureTelemetry.LogUptake('0000N21', SEPADDExportFile.FeatureName(), Enum::"Feature Uptake Status"::Used);
-        FeatureTelemetry.LogUsage('0000N22', SEPADDExportFile.FeatureName(), 'XmlPort SEPA DD pain.008.001.02');
         InitData();
     end;
 
@@ -385,7 +380,7 @@ xmlport 1010 "SEPA DD pain.008.001.02"
             PaymentExportDataGroup.Amount += PaymentExportData.Amount;
         until PaymentExportData.Next() = 0;
         InsertPmtGroup(PaymentGroupNo);
-        CreditorNo := PaymentExportData.GetSenderCreditorNo();
+        GetOrgIdOthrId(PaymentExportData."Sender Bank Account Code");
     end;
 
     local procedure IsNewGroup(): Boolean
@@ -416,6 +411,14 @@ xmlport 1010 "SEPA DD pain.008.001.02"
             StrSubstNo('%1/%2', PaymentExportData."Message ID", PaymentGroupNo),
             1, MaxStrLen(PaymentExportDataGroup."Payment Information ID"));
         PaymentExportDataGroup.Insert();
+    end;
+
+    local procedure GetOrgIdOthrId(BankAccountNo: Code[20])
+    var
+        BankAccount: Record "Bank Account";
+    begin
+        BankAccount.Get(BankAccountNo);
+        CreditorNo := BankAccount."Creditor No.";
     end;
 }
 
