@@ -3,7 +3,6 @@ namespace Microsoft.Manufacturing.Journal;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Inventory.Requisition;
-using Microsoft.Inventory.Item;
 using Microsoft.Manufacturing.Planning;
 using System.Security.User;
 
@@ -62,12 +61,8 @@ page 99000886 "Subcontracting Worksheet"
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
 
                     trigger OnValidate()
-                    var
-                        Item: Record "Item";
                     begin
                         ReqJnlManagement.GetDescriptionAndRcptName(Rec, Description2, BuyFromVendorName);
-                        if Rec."Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field("Accept Action Message"; Rec."Accept Action Message")
@@ -105,21 +100,6 @@ page 99000886 "Subcontracting Worksheet"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies additional text describing the entry, or a remark about the requisition worksheet line.';
                     Visible = false;
-                }
-                field("Variant Code"; Rec."Variant Code")
-                {
-                    ApplicationArea = Manufacturing;
-                    ToolTip = 'Specifies the variant of the item on the line.';
-                    Visible = false;
-                    ShowMandatory = VariantCodeMandatory;
-
-                    trigger OnValidate()
-                    var
-                        Item: Record "Item";
-                    begin
-                        if Rec."Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
-                    end;
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
@@ -402,14 +382,6 @@ page 99000886 "Subcontracting Worksheet"
         ReqJnlManagement.GetDescriptionAndRcptName(Rec, Description2, BuyFromVendorName);
     end;
 
-    trigger OnAfterGetRecord()
-    var
-        Item: Record Item;
-    begin
-        if Rec."Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
-    end;
-
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         ReqJnlManagement.SetUpNewLine(Rec, xRec);
@@ -436,7 +408,6 @@ page 99000886 "Subcontracting Worksheet"
         ReqJnlManagement: Codeunit ReqJnlManagement;
         CurrentJnlBatchName: Code[10];
         OpenedFromBatch: Boolean;
-        VariantCodeMandatory: Boolean;
 
     protected var
         Description2: Text[100];
