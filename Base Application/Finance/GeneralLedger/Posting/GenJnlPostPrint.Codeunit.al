@@ -90,7 +90,8 @@ codeunit 232 "Gen. Jnl.-Post+Print"
             Commit();
             OnAfterPostJournalBatch(GenJnlLine);
 
-            PrintJournal();
+            RecRefToPrint.GetTable(GenJnlLine);
+            BatchPostingPrintMgt.PrintJournal(RecRefToPrint);
             BatchPostingPrintMgt.PrintOtherDocuments(GenJnlLine, PrintWHT, false);
 
             if not HideDialog then
@@ -116,19 +117,6 @@ codeunit 232 "Gen. Jnl.-Post+Print"
             GenJnlLine.FilterGroup(0);
             GenJnlLine."Line No." := 1;
         end;
-    end;
-
-    local procedure PrintJournal()
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforePrintJournalBatch(GenJnlLine, IsHandled);
-        if IsHandled then
-            exit;
-
-        RecRefToPrint.GetTable(GenJnlLine);
-        BatchPostingPrintMgt.PrintJournal(RecRefToPrint);
     end;
 
     [IntegrationEvent(false, false)]
@@ -158,11 +146,6 @@ codeunit 232 "Gen. Jnl.-Post+Print"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterOnRun(var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePrintJournalBatch(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
 }
