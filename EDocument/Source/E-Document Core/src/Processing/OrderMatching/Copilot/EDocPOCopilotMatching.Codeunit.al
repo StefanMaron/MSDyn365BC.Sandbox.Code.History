@@ -110,7 +110,7 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
         Session.LogMessage('0000MOT', AttempToUseCopilotMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
 
         // Generate OpenAI Completion
-        AzureOpenAI.SetAuthorization(Enum::"AOAI Model Type"::"Chat Completions", AOAIDeployments.GetGPT4Latest());
+        AzureOpenAI.SetAuthorization(Enum::"AOAI Model Type"::"Chat Completions", AOAIDeployments.GetGPT4Preview());
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"E-Document Matching Assistance");
 
         AOAIChatCompletionParams.SetMaxTokens(MaxTokens());
@@ -290,7 +290,7 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
 
     local procedure PrepareEDocumentLineStatement(var TempEDocumentImportedLine: Record "E-Doc. Imported Line" temporary; var EDocumentImportLinesTxt: Text)
     begin
-        EDocumentImportLinesTxt += '- EID: ' + Format(TempEDocumentImportedLine."Line No.");
+        EDocumentImportLinesTxt += 'EID: ' + Format(TempEDocumentImportedLine."Line No.");
         EDocumentImportLinesTxt += ', Description: ' + TempEDocumentImportedLine.Description;
         EDocumentImportLinesTxt += ', Unit of Measure: ' + TempEDocumentImportedLine."Unit of Measure Code";
         if TempEDocumentImportedLine."Line Discount %" <> 0 then
@@ -305,7 +305,7 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
         if PurchaseOrderLines.FindSet() then
             repeat
                 if not PurchaseLineTxt.Contains('PID: ' + Format(PurchaseOrderLines."Line No.")) then begin
-                    PurchaseLineTxt += '- PID: ' + Format(PurchaseOrderLines."Line No.");
+                    PurchaseLineTxt += 'PID: ' + Format(PurchaseOrderLines."Line No.");
                     PurchaseLineTxt += ', Description: ' + PurchaseOrderLines.Description;
                     PurchaseLineTxt += ', Unit of Measure: ' + PurchaseOrderLines."Unit of Measure Code";
                     if PurchaseOrderLines."Line Discount %" <> 0 then
