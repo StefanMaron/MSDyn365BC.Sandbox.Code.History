@@ -44,7 +44,7 @@ report 4409 "EXR Customer Top List"
 
     requestpage
     {
-        AboutText = 'This report contains aggregated sales (LCY) and balance (LCY) data for the top number of customers selected. The data is aggregated for the period specified in the request page''s Datefilter parameter.';
+        AboutText = 'This report shows sale information for Customers over the selected period of time, summarized by the supplied period length, limited by how many Customers you would like included.';
         AboutTitle = 'Customer - Top Trends';
         SaveValues = true;
         layout
@@ -87,10 +87,9 @@ report 4409 "EXR Customer Top List"
     {
         layout(CustomerTopTrendExcel)
         {
-            Caption = 'Customer - Top Trends Excel';
+            Caption = 'Customer - Top Trends Excel (Preview)';
             LayoutFile = './ReportLayouts/Excel/Customer/CustomerTopListExcel.xlsx';
             Type = Excel;
-            Summary = 'Built in layout for the Customer - Top Trends excel report. This report contains aggregated sales (LCY) and balance (LCY) data for the top number of customers selected. Report uses Query connections.';
         }
     }
     labels
