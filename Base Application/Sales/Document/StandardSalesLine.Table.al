@@ -6,7 +6,6 @@ namespace Microsoft.Sales.Document;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
-using Microsoft.Finance.AllocationAccount;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
@@ -56,8 +55,6 @@ table 171 "Standard Sales Line"
             if (Type = const(Resource)) Resource
             else
             if (Type = const("Fixed Asset")) "Fixed Asset"
-            else
-            if (Type = const("Allocation Account")) "Allocation Account"
             else
             if (Type = const("Charge (Item)")) "Item Charge";
 
