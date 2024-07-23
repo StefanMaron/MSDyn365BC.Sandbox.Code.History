@@ -6314,8 +6314,8 @@ table 37 "Sales Line"
         QtyToHandle: Decimal;
         AmtToHandle: Decimal;
         AmountToInvoice: Decimal;
-        AmountLCY: Decimal;
-        AmountACY: Decimal;
+        ValueLCY: Decimal;
+        ValueACY: Decimal;
         RoundingLineInserted: Boolean;
         CurrencyFactor: Decimal;
         UseDate: Date;
@@ -6440,18 +6440,8 @@ table 37 "Sales Line"
                                 VATAmountLine.SumLine(
                                   AmtToHandle, Round(SalesLine."Inv. Discount Amount" * QtyToHandle / SalesLine.Quantity, Currency."Amount Rounding Precision"),
                                   SalesLine."VAT Difference", SalesLine."Allow Invoice Disc.", SalesLine."Prepayment Line");
-                                AmountToInvoice := SalesLine.Amount * QtyToHandle / SalesLine.Quantity;
                             end;
                     end;
-
-                    if SalesHeader."Currency Code" = GLSetup."Additional Reporting Currency" then
-                        VATAmountLine."Amount (ACY)" += SalesLine.Amount
-                    else begin
-                        AmountLCY := CurrExchRate.ExchangeAmtFCYToLCY(UseDate, SalesHeader."Currency Code", Round(AmountToInvoice, Currency."Amount Rounding Precision"), SalesHeader."Currency Factor");
-                        AmountACY := CurrExchRate.ExchangeAmtLCYToFCY(UseDate, GLSetup."Additional Reporting Currency", Round(AmountLCY, Currency."Amount Rounding Precision"), CurrencyFactor);
-                        VATAmountLine."Amount (ACY)" += Round(AmountACY, AddCurrency."Amount Rounding Precision");
-                    end;
-                    VATAmountLine.Modify();
 
                     TotalVATAmount += SalesLine."Amount Including VAT" - SalesLine.Amount;
                     TotalVATBase += SalesLine.Amount;
@@ -6595,6 +6585,25 @@ table 37 "Sales Line"
                     TotalVATBase := TotalVATBase - VATAmountLine."VAT Base";
                 end;
                 VATAmountLine."Calculated VAT Amount" := VATAmountLine."VAT Amount" - VATAmountLine."VAT Difference";
+                if GLSetup."Additional Reporting Currency" <> '' then
+                    if SalesHeader."Currency Code" = GLSetup."Additional Reporting Currency" then begin
+                        VATAmountLine."Amount (ACY)" := VATAmountLine."VAT Base";
+                        VATAmountLine."VAT Base (ACY)" := VATAmountLine."VAT Base";
+                        VATAmountLine."VAT Amount (ACY)" := VATAmountLine."VAT Amount";
+                        VATAmountLine."Amount Including VAT (ACY)" := VATAmountLine."Amount Including VAT";
+                    end else begin
+                        ValueLCY := CurrExchRate.ExchangeAmtFCYtoLCY(UseDate, SalesHeader."Currency Code", VATAmountLine."VAT Base", SalesHeader."Currency Factor");
+                        ValueACY := Round(CurrExchRate.ExchangeAmtLCYToFCY(UseDate, GLSetup."Additional Reporting Currency", ValueLCY, CurrencyFactor), AddCurrency."Amount Rounding Precision");
+                        VATAmountLine."Amount (ACY)" := ValueACY;
+                        VATAmountLine."VAT Base (ACY)" := ValueACY;
+                        ValueLCY := CurrExchRate.ExchangeAmtFCYtoLCY(UseDate, SalesHeader."Currency Code", VATAmountLine."VAT Amount", SalesHeader."Currency Factor");
+                        ValueACY := Round(CurrExchRate.ExchangeAmtLCYToFCY(UseDate, GLSetup."Additional Reporting Currency", ValueLCY, CurrencyFactor), AddCurrency."Amount Rounding Precision");
+                        VATAmountLine."VAT Amount (ACY)" := ValueACY;
+                        ValueLCY := CurrExchRate.ExchangeAmtFCYtoLCY(UseDate, SalesHeader."Currency Code", VATAmountLine."Amount Including VAT", SalesHeader."Currency Factor");
+                        ValueACY := Round(CurrExchRate.ExchangeAmtLCYToFCY(UseDate, GLSetup."Additional Reporting Currency", ValueLCY, CurrencyFactor), AddCurrency."Amount Rounding Precision");
+                        VATAmountLine."Amount Including VAT (ACY)" := ValueACY;
+                    end;
+
                 VATAmountLine.Modify();
             until VATAmountLine.Next() = 0;
 
