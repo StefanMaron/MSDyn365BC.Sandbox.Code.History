@@ -1576,7 +1576,7 @@ table 37 "Sales Line"
                     end;
 
                 IsHandled := false;
-                OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(Rec, VATPostingSetup, IsHandled);
+                OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(Rec, VATPostingSetup, IsHandled, xRec, SalesHeader);
                 if not IsHandled then
                     if SalesHeader."Prices Including VAT" and (Type in [Type::Item, Type::Resource]) then
                         Validate("Unit Price",
@@ -6267,6 +6267,7 @@ table 37 "Sales Line"
                             if not SalesLine."Prepayment Line" then
                                 SalesLine.UpdatePrepmtAmounts();
                             UpdateBaseAmounts(NewAmount, Round(NewAmountIncludingVAT, Currency."Amount Rounding Precision"), NewVATBaseAmount);
+                            OnUpdateVATOnLinesOnAfterUpdateBaseAmounts(SalesHeader, SalesLine, TempVATAmountLineRemainder, VATAmountLine, Currency);
                         end;
                         SalesLine.InitOutstanding();
                         if SalesLine.Type = SalesLine.Type::"Charge (Item)" then
@@ -6314,8 +6315,8 @@ table 37 "Sales Line"
         QtyToHandle: Decimal;
         AmtToHandle: Decimal;
         AmountToInvoice: Decimal;
-        ValueLCY: Decimal;
-        ValueACY: Decimal;
+        AmountLCY: Decimal;
+        AmountACY: Decimal;
         RoundingLineInserted: Boolean;
         CurrencyFactor: Decimal;
         UseDate: Date;
@@ -6355,6 +6356,7 @@ table 37 "Sales Line"
         if SalesLine.FindSet() then
             repeat
                 if not SalesLine.ZeroAmountLine(QtyType) then begin
+                    OnCalcVATAmountLinesOnBeforeProcessSalesLine(SalesLine);
                     if (SalesLine.Type = SalesLine.Type::"G/L Account") and not SalesLine."Prepayment Line" and SalesLine."System-Created Entry" and not RoundingLineInserted then
                         RoundingLineInserted := (SalesLine."No." = SalesLine.GetCPGInvRoundAcc(SalesHeader));
                     if SalesLine."VAT Calculation Type" in
@@ -6366,9 +6368,11 @@ table 37 "Sales Line"
                       GLSetup.CheckFullGSTonPrepayment(SalesLine."VAT Bus. Posting Group", SalesLine."VAT Prod. Posting Group");
                     if not VATAmountLine.Get(
                          SalesLine."VAT Identifier", SalesLine."VAT Calculation Type", SalesLine."Tax Group Code", false, SalesLine."Line Amount" >= 0, FullGST)
-                    then
+                    then begin
                         VATAmountLine.InsertNewLine(
                           SalesLine."VAT Identifier", SalesLine."VAT Calculation Type", SalesLine."Tax Group Code", false, SalesLine."VAT %", SalesLine."Line Amount" >= 0, false, FullGST, 0);
+                        OnCalcVATAmountLinesOnAfterInsertNewVATAmountLine(SalesLine, VATAmountLine);
+                    end;
 
                     OnCalcVATAmountLinesOnBeforeQtyTypeCase(VATAmountLine, SalesLine, SalesHeader);
                     case QtyType of
@@ -6440,8 +6444,18 @@ table 37 "Sales Line"
                                 VATAmountLine.SumLine(
                                   AmtToHandle, Round(SalesLine."Inv. Discount Amount" * QtyToHandle / SalesLine.Quantity, Currency."Amount Rounding Precision"),
                                   SalesLine."VAT Difference", SalesLine."Allow Invoice Disc.", SalesLine."Prepayment Line");
+                                AmountToInvoice := SalesLine.Amount * QtyToHandle / SalesLine.Quantity;
                             end;
                     end;
+
+                    if SalesHeader."Currency Code" = GLSetup."Additional Reporting Currency" then
+                        VATAmountLine."Amount (ACY)" += SalesLine.Amount
+                    else begin
+                        AmountLCY := CurrExchRate.ExchangeAmtFCYToLCY(UseDate, SalesHeader."Currency Code", Round(AmountToInvoice, Currency."Amount Rounding Precision"), SalesHeader."Currency Factor");
+                        AmountACY := CurrExchRate.ExchangeAmtLCYToFCY(UseDate, GLSetup."Additional Reporting Currency", Round(AmountLCY, Currency."Amount Rounding Precision"), CurrencyFactor);
+                        VATAmountLine."Amount (ACY)" += Round(AmountACY, AddCurrency."Amount Rounding Precision");
+                    end;
+                    VATAmountLine.Modify();
 
                     TotalVATAmount += SalesLine."Amount Including VAT" - SalesLine.Amount;
                     TotalVATBase += SalesLine.Amount;
@@ -6585,25 +6599,6 @@ table 37 "Sales Line"
                     TotalVATBase := TotalVATBase - VATAmountLine."VAT Base";
                 end;
                 VATAmountLine."Calculated VAT Amount" := VATAmountLine."VAT Amount" - VATAmountLine."VAT Difference";
-                if GLSetup."Additional Reporting Currency" <> '' then
-                    if SalesHeader."Currency Code" = GLSetup."Additional Reporting Currency" then begin
-                        VATAmountLine."Amount (ACY)" := VATAmountLine."VAT Base";
-                        VATAmountLine."VAT Base (ACY)" := VATAmountLine."VAT Base";
-                        VATAmountLine."VAT Amount (ACY)" := VATAmountLine."VAT Amount";
-                        VATAmountLine."Amount Including VAT (ACY)" := VATAmountLine."Amount Including VAT";
-                    end else begin
-                        ValueLCY := CurrExchRate.ExchangeAmtFCYtoLCY(UseDate, SalesHeader."Currency Code", VATAmountLine."VAT Base", SalesHeader."Currency Factor");
-                        ValueACY := Round(CurrExchRate.ExchangeAmtLCYToFCY(UseDate, GLSetup."Additional Reporting Currency", ValueLCY, CurrencyFactor), AddCurrency."Amount Rounding Precision");
-                        VATAmountLine."Amount (ACY)" := ValueACY;
-                        VATAmountLine."VAT Base (ACY)" := ValueACY;
-                        ValueLCY := CurrExchRate.ExchangeAmtFCYtoLCY(UseDate, SalesHeader."Currency Code", VATAmountLine."VAT Amount", SalesHeader."Currency Factor");
-                        ValueACY := Round(CurrExchRate.ExchangeAmtLCYToFCY(UseDate, GLSetup."Additional Reporting Currency", ValueLCY, CurrencyFactor), AddCurrency."Amount Rounding Precision");
-                        VATAmountLine."VAT Amount (ACY)" := ValueACY;
-                        ValueLCY := CurrExchRate.ExchangeAmtFCYtoLCY(UseDate, SalesHeader."Currency Code", VATAmountLine."Amount Including VAT", SalesHeader."Currency Factor");
-                        ValueACY := Round(CurrExchRate.ExchangeAmtLCYToFCY(UseDate, GLSetup."Additional Reporting Currency", ValueLCY, CurrencyFactor), AddCurrency."Amount Rounding Precision");
-                        VATAmountLine."Amount Including VAT (ACY)" := ValueACY;
-                    end;
-
                 VATAmountLine.Modify();
             until VATAmountLine.Next() = 0;
 
@@ -10647,7 +10642,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(var SalesLine: Record "Sales Line"; VATPostingSetup: Record "VAT Posting Setup"; var IsHandled: Boolean)
+    local procedure OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(var SalesLine: Record "Sales Line"; VATPostingSetup: Record "VAT Posting Setup"; var IsHandled: Boolean; xSalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -11551,6 +11546,21 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckLocationOnWMSOnBeforeCaseDocumentType(var SalesLine: Record "Sales Line"; DialogText: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcVATAmountLinesOnBeforeProcessSalesLine(var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcVATAmountLinesOnAfterInsertNewVATAmountLine(var SalesLine: Record "Sales Line"; var VATAmountLine: Record "VAT Amount Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateVATOnLinesOnAfterUpdateBaseAmounts(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempVATAmountLine: Record "VAT Amount Line" temporary; var VATAmountLine: Record "VAT Amount Line"; Currency: Record Currency)
     begin
     end;
 }
