@@ -8,7 +8,6 @@ page 5652 "Insurance Journal Templates"
     PageType = List;
     SourceTable = "Insurance Journal Template";
     UsageCategory = Administration;
-    AnalysisModeEnabled = false;
 
     layout
     {
