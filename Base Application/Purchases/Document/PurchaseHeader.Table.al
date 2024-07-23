@@ -195,8 +195,11 @@ table 38 "Purchase Header"
 
                 OnValidateBuyFromVendorNoOnAfterUpdateBuyFromCont(Rec, xRec, CurrFieldNo, SkipBuyFromContact);
 
-                if (xRec."Buy-from Vendor No." <> '') and (xRec."Buy-from Vendor No." <> "Buy-from Vendor No.") then
+                if (xRec."Buy-from Vendor No." <> '') and (xRec."Buy-from Vendor No." <> "Buy-from Vendor No.") then begin
                     Rec.RecallModifyAddressNotification(GetModifyVendorAddressNotificationId());
+                    if Rec."Remit-to Code" <> '' then
+                        Rec.Validate("Remit-to Code", '');
+                end;
             end;
         }
         field(3; "No."; Code[20])
