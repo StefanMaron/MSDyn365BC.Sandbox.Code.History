@@ -609,7 +609,7 @@ codeunit 134979 "Reminder Automation Tests"
         // [THEN] The reminder automation sends the issued reminders
         VerifyJobWasSuccesfull(ReminderActionGroup);
         NumberOfSentEmails := 1;
-        VerifyRemindersSentForCustomer(Customer, NumberOfSentEmails, SendEmailMock);
+        VerifyRemindersSentForCustomer(Customer, NumberOfSentEmails, SendEmailMock, false);
     end;
 
     [HandlerFunctions('NewReminderActionModalPageHandler,CreateRemindersSetupModalPageHandler,IssueRemindersSetupModalPageHandler,SendRemindersSetupModalPageHandler,SelectRemTermsAutomationHandler')]
@@ -653,8 +653,8 @@ codeunit 134979 "Reminder Automation Tests"
         // [THEN] The reminder automation sends the issued reminders
         VerifyJobWasSuccesfull(ReminderActionGroup);
         TotalNumberOfSentEmails := 2;
-        VerifyRemindersSentForCustomer(FirstCustomer, TotalNumberOfSentEmails, SendEmailMock);
-        VerifyRemindersSentForCustomer(SecondCustomer, TotalNumberOfSentEmails, SendEmailMock);
+        VerifyRemindersSentForCustomer(FirstCustomer, TotalNumberOfSentEmails, SendEmailMock, false);
+        VerifyRemindersSentForCustomer(SecondCustomer, TotalNumberOfSentEmails, SendEmailMock, false);
     end;
 
     [HandlerFunctions('NewReminderActionModalPageHandler,CreateRemindersSetupModalPageHandler,IssueRemindersSetupModalPageHandler,SelectRemTermsAutomationHandler')]
@@ -738,7 +738,7 @@ codeunit 134979 "Reminder Automation Tests"
 
         // [THEN] The reminder automation creates issued reminders
         TotalNumberOfSentEmails := 1;
-        VerifyRemindersSentForCustomer(Customer, TotalNumberOfSentEmails, SendEmailMock);
+        VerifyRemindersSentForCustomer(Customer, TotalNumberOfSentEmails, SendEmailMock, false);
 
         // [WHEN] User runs the issue reminder automation again
         if JobQueueEntry.Find() then
@@ -750,9 +750,89 @@ codeunit 134979 "Reminder Automation Tests"
         UnbindSubscription(SecondRunSendEmailMock);
 
         // [THEN] The reminder automation will not create any additional entries and issued entries will stay the same
-        VerifyRemindersSentForCustomer(Customer, TotalNumberOfSentEmails, SendEmailMock);
+        VerifyRemindersSentForCustomer(Customer, TotalNumberOfSentEmails, SendEmailMock, false);
         SecondRunSendEmailMock.GetEmailsSent(TempEmaiiItemSent);
         Assert.AreEqual(0, TempEmaiiItemSent.Count(), 'No emails should be sent on the second run');
+    end;
+
+    [Test]
+    procedure TestSendReminderByEmailWithAttachment()
+    var
+        Customer: Record Customer;
+        ReminderTerms: Record "Reminder Terms";
+        ReminderHeader: Record "Reminder Header";
+        IssuedReminderHeader: Record "Issued Reminder Header";
+        SendEmailMock: Codeunit "Send Email Mock";
+        LanguageCode: Code[10];
+    begin
+        // [FEATURE] [Issued Reminders]
+        // [SCENARIO 539690] Set file name from "File Name" on "Reminder Attachment Text"
+        Initialize();
+
+        // [GIVEN] Create reminder term with levels
+        CreateReminderTermsWithLevels(ReminderTerms, GetDefaultDueDatePeriodForReminderLevel(), Any.IntegerInRange(2, 5));
+
+        // [GIVEN] Create reminder attachment text, file name = XXX, language code = Y
+        LanguageCode := LibraryERM.GetAnyLanguageDifferentFromCurrent();
+        CreateReminderAttachmentText(ReminderTerms, LanguageCode);
+
+        // [GIVEN] Create a customer X with overdue entries
+        CreateCustomerWithOverdueEntries(Customer, ReminderTerms, Any.IntegerInRange(2, 5));
+
+        // [GIVEN] Set language code Y for customer X
+        Customer."Language Code" := LanguageCode;
+        Customer.Modify();
+
+        // [GIVEN] Create and issue reminder for customer X 
+        CreateAndIssueReminder(ReminderHeader, Customer."No.");
+
+        // [WHEN] Run action "Send by mail" on issued reminder
+        IssuedReminderHeader.SetRange("Pre-Assigned No.", ReminderHeader."No.");
+        IssuedReminderHeader.FindFirst();
+        BindSubscription(SendEmailMock);
+        SendEmailMock.AddSupportedScenario(Enum::"Email Scenario"::Reminder);
+        IssuedReminderHeader.PrintRecords(false, true, false);
+        UnbindSubscription(SendEmailMock);
+
+        // [THEN] The issued reminder has been sent on mail with file name XXX
+        VerifyRemindersSentForCustomer(Customer, 1, SendEmailMock, true);
+    end;
+
+    local procedure CreateReminderAttachmentText(ReminderTerms: Record "Reminder Terms"; LanguageCode: Code[10])
+    var
+        ReminderLevel: Record "Reminder Level";
+        ReminderAttachmentText: Record "Reminder Attachment Text";
+    begin
+        ReminderAttachmentText.Id := CreateGuid();
+        ReminderAttachmentText."Language Code" := LanguageCode;
+#pragma warning disable AA0139
+        ReminderAttachmentText."File Name" := LibraryRandom.RandText(20);
+#pragma warning restore AA0139
+        ReminderAttachmentText.Insert();
+
+        ReminderLevel.SetRange("Reminder Terms Code", ReminderTerms.Code);
+        ReminderLevel.FindFirst();
+        ReminderLevel."Reminder Attachment Text" := ReminderAttachmentText.Id;
+        ReminderLevel.Modify();
+
+        LibraryVariableStorage.Enqueue(ReminderAttachmentText."File Name" + '.pdf');
+    end;
+
+    local procedure CreateAndIssueReminder(var ReminderHeader: Record "Reminder Header"; CustomerNo: Code[20])
+    var
+        SuggestReminderLines: Report "Suggest Reminder Lines";
+    begin
+        LibraryERM.CreateReminderHeader(ReminderHeader);
+        ReminderHeader.Validate("Customer No.", CustomerNo);
+        ReminderHeader.Modify(true);
+
+        ReminderHeader.SetRange("No.", ReminderHeader."No.");
+        SuggestReminderLines.SetTableView(ReminderHeader);
+        SuggestReminderLines.UseRequestPage(false);
+        SuggestReminderLines.Run();
+
+        ReminderHeader.SetRecFilter();
+        Report.RunModal(Report::"Issue Reminders", false, true, ReminderHeader);
     end;
 
     local procedure GetDefaultDueDatePeriodForReminderLevel(): Integer
@@ -792,10 +872,13 @@ codeunit 134979 "Reminder Automation Tests"
         Assert.AreNotEqual(0, IssuedReminderLines."Remaining Amount", 'The issues reminder lines were created with wrong Remaining Amount.');
     end;
 
-    local procedure VerifyRemindersSentForCustomer(var Customer: Record Customer; TotalNumberOfRemindersSent: Integer; SendEmailMock: Codeunit "Send Email Mock")
+    local procedure VerifyRemindersSentForCustomer(var Customer: Record Customer; TotalNumberOfRemindersSent: Integer; SendEmailMock: Codeunit "Send Email Mock"; CheckFileName: Boolean)
     var
         IssuedReminderHeader: Record "Issued Reminder Header";
         TempEmailItemSent: Record "Email Item" temporary;
+        TempBlobList: Codeunit "Temp Blob List";
+        AttachmentNames: List of [Text];
+        AttachmentName: Text;
         BlankDate: Date;
         IssuedReminderEmailCount: Integer;
     begin
@@ -815,6 +898,12 @@ codeunit 134979 "Reminder Automation Tests"
         TempEmailItemSent.SetRange("Send to", Customer."E-Mail");
         Assert.IsTrue(TempEmailItemSent.FindFirst(), 'The email was not sent to the customer');
         Assert.IsTrue(TempEmailItemSent.HasAttachments(), 'The email has no attachments');
+
+        if CheckFileName then begin
+            TempEmailItemSent.GetAttachments(TempBlobList, AttachmentNames);
+            AttachmentNames.Get(1, AttachmentName);
+            Assert.AreEqual(AttachmentName, LibraryVariableStorage.DequeueText(), 'The file name is not correct.');
+        end;
     end;
 
 
@@ -1073,6 +1162,7 @@ codeunit 134979 "Reminder Automation Tests"
         LibrarySales: Codeunit "Library - Sales";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryErm: Codeunit "Library - ERM";
+        LibraryRandom: Codeunit "Library - Random";
         Assert: Codeunit Assert;
         Any: Codeunit Any;
         IsInitialized: Boolean;
