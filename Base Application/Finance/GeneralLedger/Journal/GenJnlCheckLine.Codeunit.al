@@ -86,12 +86,8 @@ codeunit 11 "Gen. Jnl.-Check Line"
         ICBankAccount: Record "IC Bank Account";
         ErrorMessageHandler: Codeunit "Error Message Handler";
         ErrorContextElement: Codeunit "Error Context Element";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeRunCheck(GenJnlLine, OverrideDimErr, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeRunCheck(GenJnlLine);
 
         if LogErrorMode then begin
             ErrorMessageMgt.Activate(ErrorMessageHandler);
@@ -112,7 +108,25 @@ codeunit 11 "Gen. Jnl.-Check Line"
 
         TestDocumentNo(GenJnlLine);
 
-        TestAccountAndBalAccountType(GenJnlLine);
+        if (GenJnlLine."Account Type" in
+            [GenJnlLine."Account Type"::Customer,
+             GenJnlLine."Account Type"::Vendor,
+             GenJnlLine."Account Type"::"Fixed Asset",
+             GenJnlLine."Account Type"::"IC Partner"]) and
+           (GenJnlLine."Bal. Account Type" in
+            [GenJnlLine."Bal. Account Type"::Customer,
+             GenJnlLine."Bal. Account Type"::Vendor,
+             GenJnlLine."Bal. Account Type"::"Fixed Asset",
+             GenJnlLine."Bal. Account Type"::"IC Partner"])
+        then
+            Error(
+                ErrorInfo.Create(
+                    StrSubstNo(
+                    Text002,
+                    GenJnlLine.FieldCaption("Account Type"), GenJnlLine.FieldCaption("Bal. Account Type")),
+                true,
+                GenJnlLine,
+                GenJnlLine.FieldNo("Account Type")));
 
         if GenJnlLine."Bal. Account No." = '' then
             GenJnlLine.TestField("Account No.", ErrorInfo.Create());
@@ -171,7 +185,8 @@ codeunit 11 "Gen. Jnl.-Check Line"
             GenJnlLine.TestField("Payment Discount %", 0, ErrorInfo.Create());
         end;
 
-        TestAppliesToID(GenJnlLine);
+        if GenJnlLine."Applies-to Doc. No." <> '' then
+            GenJnlLine.TestField("Applies-to ID", '', ErrorInfo.Create());
 
         if (GenJnlLine."Account Type" <> GenJnlLine."Account Type"::"Bank Account") and
            (GenJnlLine."Bal. Account Type" <> GenJnlLine."Bal. Account Type"::"Bank Account")
@@ -220,49 +235,6 @@ codeunit 11 "Gen. Jnl.-Check Line"
             exit;
 
         GenJournalLine.TestField("Document No.", ErrorInfo.Create());
-    end;
-
-    local procedure TestAccountAndBalAccountType(var GenJnlLine: Record "Gen. Journal Line")
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeTestAccountAndBalAccountType(GenJnlLine, IsHandled);
-        if IsHandled then
-            exit;
-
-        if (GenJnlLine."Account Type" in
-                 [GenJnlLine."Account Type"::Customer,
-                  GenJnlLine."Account Type"::Vendor,
-                  GenJnlLine."Account Type"::"Fixed Asset",
-                  GenJnlLine."Account Type"::"IC Partner"]) and
-                (GenJnlLine."Bal. Account Type" in
-                 [GenJnlLine."Bal. Account Type"::Customer,
-                  GenJnlLine."Bal. Account Type"::Vendor,
-                  GenJnlLine."Bal. Account Type"::"Fixed Asset",
-                  GenJnlLine."Bal. Account Type"::"IC Partner"])
-             then
-            Error(
-                ErrorInfo.Create(
-                    StrSubstNo(
-                    Text002,
-                    GenJnlLine.FieldCaption("Account Type"), GenJnlLine.FieldCaption("Bal. Account Type")),
-                true,
-                GenJnlLine,
-                GenJnlLine.FieldNo("Account Type")));
-    end;
-
-    local procedure TestAppliesToID(var GenJnlLine: Record "Gen. Journal Line")
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeTestAppliesToID(GenJnlLine, IsHandled);
-        if IsHandled then
-            exit;
-
-        if GenJnlLine."Applies-to Doc. No." <> '' then
-            GenJnlLine.TestField("Applies-to ID", '', ErrorInfo.Create());
     end;
 
     procedure GetErrors(var NewTempErrorMessage: Record "Error Message" temporary)
@@ -636,22 +608,8 @@ codeunit 11 "Gen. Jnl.-Check Line"
            (GenJnlLine."Bank Payment Type" = GenJnlLine."Bank Payment Type"::"Electronic Payment-IAT")
         then begin
             GenJnlLine.TestField("Exported to Payment File", true, ErrorInfo.Create());
-            if CheckTransmitted(GenJnlLine) then
-                GenJnlLine.TestField("Check Transmitted", true, ErrorInfo.Create());
+            GenJnlLine.TestField("Check Transmitted", true, ErrorInfo.Create());
         end;
-    end;
-
-    local procedure CheckTransmitted(GenJnlLine: Record "Gen. Journal Line"): Boolean
-    var
-        BankAccount: Record "Bank Account";
-    begin
-        if GenJnlLine."Account Type" = GenJnlLine."Account Type"::"Bank Account" then
-            if BankAccount.Get(GenJnlLine."Account No.") then
-                exit(BankAccount."Check Transmitted");
-        if GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::"Bank Account" then
-            if BankAccount.Get(GenJnlLine."Bal. Account No.") then
-                exit(BankAccount."Check Transmitted");
-        exit(false);
     end;
 
     local procedure CheckJobNoIsEmpty(GenJnlLine: Record "Gen. Journal Line")
@@ -1265,22 +1223,12 @@ codeunit 11 "Gen. Jnl.-Check Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeRunCheck(var GenJournalLine: Record "Gen. Journal Line"; OverrideDimErr: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeRunCheck(var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestDocumentNo(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTestAccountAndBalAccountType(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTestAppliesToID(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
 
