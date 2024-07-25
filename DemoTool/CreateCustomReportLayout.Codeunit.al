@@ -99,6 +99,7 @@ codeunit 101400 "Create Custom Report Layout"
         TenantReportLayoutSelection.Init();
         TenantReportLayoutSelection."Report ID" := ReportID;
         TenantReportLayoutSelection."Layout Name" := ReportLayoutName;
+        TenantReportLayoutSelection."App ID" := ReportLayoutList."Application ID";
 
         if not TenantReportLayoutSelection.Insert(true) then
             TenantReportLayoutSelection.Modify(true);
