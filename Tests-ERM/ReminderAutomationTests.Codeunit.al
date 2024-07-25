@@ -615,7 +615,7 @@ codeunit 134979 "Reminder Automation Tests"
         // [THEN] The reminder automation sends the issued reminders
         VerifyJobWasSuccesfull(ReminderActionGroup);
         NumberOfSentEmails := 1;
-        VerifyRemindersSentForCustomer(Customer, NumberOfSentEmails, SendEmailMock);
+        VerifyRemindersSentForCustomer(Customer, NumberOfSentEmails, SendEmailMock, false);
     end;
 
     [HandlerFunctions('NewReminderActionModalPageHandler,CreateRemindersSetupModalPageHandler,IssueRemindersSetupModalPageHandler,SendRemindersSetupModalPageHandler,SelectRemTermsAutomationHandler')]
@@ -659,8 +659,8 @@ codeunit 134979 "Reminder Automation Tests"
         // [THEN] The reminder automation sends the issued reminders
         VerifyJobWasSuccesfull(ReminderActionGroup);
         TotalNumberOfSentEmails := 2;
-        VerifyRemindersSentForCustomer(FirstCustomer, TotalNumberOfSentEmails, SendEmailMock);
-        VerifyRemindersSentForCustomer(SecondCustomer, TotalNumberOfSentEmails, SendEmailMock);
+        VerifyRemindersSentForCustomer(FirstCustomer, TotalNumberOfSentEmails, SendEmailMock, false);
+        VerifyRemindersSentForCustomer(SecondCustomer, TotalNumberOfSentEmails, SendEmailMock, false);
     end;
 
     [HandlerFunctions('NewReminderActionModalPageHandler,CreateRemindersSetupModalPageHandler,IssueRemindersSetupModalPageHandler,SelectRemTermsAutomationHandler')]
@@ -744,7 +744,7 @@ codeunit 134979 "Reminder Automation Tests"
 
         // [THEN] The reminder automation creates issued reminders
         TotalNumberOfSentEmails := 1;
-        VerifyRemindersSentForCustomer(Customer, TotalNumberOfSentEmails, SendEmailMock);
+        VerifyRemindersSentForCustomer(Customer, TotalNumberOfSentEmails, SendEmailMock, false);
 
         // [WHEN] User runs the issue reminder automation again
         if JobQueueEntry.Find() then
@@ -756,7 +756,7 @@ codeunit 134979 "Reminder Automation Tests"
         UnbindSubscription(SecondRunSendEmailMock);
 
         // [THEN] The reminder automation will not create any additional entries and issued entries will stay the same
-        VerifyRemindersSentForCustomer(Customer, TotalNumberOfSentEmails, SendEmailMock);
+        VerifyRemindersSentForCustomer(Customer, TotalNumberOfSentEmails, SendEmailMock, false);
         SecondRunSendEmailMock.GetEmailsSent(TempEmaiiItemSent);
         Assert.AreEqual(0, TempEmaiiItemSent.Count(), 'No emails should be sent on the second run');
     end;
@@ -801,7 +801,7 @@ codeunit 134979 "Reminder Automation Tests"
         UnbindSubscription(SendEmailMock);
 
         // [THEN] The issued reminder has been sent on mail with file name XXX
-        VerifyReminderMailWithAttachmentSentForCustomer(Customer, 1, SendEmailMock);
+        VerifyRemindersSentForCustomer(Customer, 1, SendEmailMock, true);
     end;
 
     local procedure CreateReminderAttachmentText(ReminderTerms: Record "Reminder Terms"; LanguageCode: Code[10])
@@ -811,7 +811,9 @@ codeunit 134979 "Reminder Automation Tests"
     begin
         ReminderAttachmentText.Id := CreateGuid();
         ReminderAttachmentText."Language Code" := LanguageCode;
-        ReminderAttachmentText."File Name" := CopyStr(LibraryRandom.RandText(20),1,MaxStrLen(ReminderAttachmentText."File Name"));
+#pragma warning disable AA0139
+        ReminderAttachmentText."File Name" := LibraryRandom.RandText(20);
+#pragma warning restore AA0139
         ReminderAttachmentText.Insert();
 
         ReminderLevel.SetRange("Reminder Terms Code", ReminderTerms.Code);
@@ -876,10 +878,13 @@ codeunit 134979 "Reminder Automation Tests"
         Assert.AreNotEqual(0, IssuedReminderLines."Remaining Amount", 'The issues reminder lines were created with wrong Remaining Amount.');
     end;
 
-    local procedure VerifyRemindersSentForCustomer(var Customer: Record Customer; TotalNumberOfRemindersSent: Integer; SendEmailMock: Codeunit "Send Email Mock")
+    local procedure VerifyRemindersSentForCustomer(var Customer: Record Customer; TotalNumberOfRemindersSent: Integer; SendEmailMock: Codeunit "Send Email Mock"; CheckFileName: Boolean)
     var
         IssuedReminderHeader: Record "Issued Reminder Header";
         TempEmailItemSent: Record "Email Item" temporary;
+        TempBlobList: Codeunit "Temp Blob List";
+        AttachmentNames: List of [Text];
+        AttachmentName: Text;
         BlankDate: Date;
         IssuedReminderEmailCount: Integer;
     begin
@@ -899,25 +904,14 @@ codeunit 134979 "Reminder Automation Tests"
         TempEmailItemSent.SetRange("Send to", Customer."E-Mail");
         Assert.IsTrue(TempEmailItemSent.FindFirst(), 'The email was not sent to the customer');
         Assert.IsTrue(TempEmailItemSent.HasAttachments(), 'The email has no attachments');
+
+        if CheckFileName then begin
+            TempEmailItemSent.GetAttachments(TempBlobList, AttachmentNames);
+            AttachmentNames.Get(1, AttachmentName);
+            Assert.AreEqual(AttachmentName, LibraryVariableStorage.DequeueText(), 'The file name is not correct.');
+        end;
     end;
 
-    local procedure VerifyReminderMailWithAttachmentSentForCustomer(var Customer: Record Customer; TotalNumberOfRemindersSent: Integer; SendEmailMock: Codeunit "Send Email Mock")
-    var
-        TempEmailItemSent: Record "Email Item" temporary;
-        TempBlobList: Codeunit "Temp Blob List";
-        AttachmentNames: List of [Text];
-        AttachmentName: Text;
-    begin
-        SendEmailMock.GetEmailsSent(TempEmailItemSent);
-        Assert.AreEqual(TempEmailItemSent.Count(), TotalNumberOfRemindersSent, 'The number of emails sent was not correct');
-        TempEmailItemSent.SetRange("Send to", Customer."E-Mail");
-        Assert.IsTrue(TempEmailItemSent.FindFirst(), 'The email was not sent to the customer');
-        Assert.IsTrue(TempEmailItemSent.HasAttachments(), 'The email has no attachments');
-
-        TempEmailItemSent.GetAttachments(TempBlobList, AttachmentNames);
-        AttachmentNames.Get(1, AttachmentName);
-        Assert.AreEqual(AttachmentName, LibraryVariableStorage.DequeueText(), 'The file name is not correct.');
-    end;
 
     local procedure IncludeReminderTermsInFilter(var ReminderAutomationCard: TestPage "Reminder Automation Card"; var ReminderTerms: Record "Reminder Terms")
     begin
