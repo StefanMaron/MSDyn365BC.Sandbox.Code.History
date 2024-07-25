@@ -117,18 +117,14 @@ codeunit 7006 "Price Helper - V16"
         PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
         PriceWorksheetLine: Record "Price Worksheet Line";
-        SkipDeletePriceListHeader: Boolean;
     begin
-        SkipDeletePriceListHeader := false;
-        OnBeforeDeletePrices(SourceType, SourceNo, ParentSourceNo, SkipDeletePriceListHeader);
+        OnBeforeDeletePrices(SourceType, SourceNo, ParentSourceNo);
 
-        if not SkipDeletePriceListHeader then begin
-            PriceListHeader.SetRange("Source Type", SourceType);
-            PriceListHeader.SetRange("Parent Source No.", ParentSourceNo);
-            PriceListHeader.SetRange("Source No.", SourceNo);
-            if not PriceListHeader.IsEmpty() then
-                PriceListHeader.DeleteAll();
-        end;
+        PriceListHeader.SetRange("Source Type", SourceType);
+        PriceListHeader.SetRange("Parent Source No.", ParentSourceNo);
+        PriceListHeader.SetRange("Source No.", SourceNo);
+        if not PriceListHeader.IsEmpty() then
+            PriceListHeader.DeleteAll();
 
         PriceListLine.SetRange("Source Type", SourceType);
         PriceListLine.SetRange("Parent Source No.", ParentSourceNo);
@@ -791,7 +787,7 @@ codeunit 7006 "Price Helper - V16"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeDeletePrices(SourceType: Enum "Price Source Type"; SourceNo: Code[20]; ParentSourceNo: Code[20]; var SkipDeletePriceListHeader: Boolean);
+    local procedure OnBeforeDeletePrices(SourceType: Enum "Price Source Type"; SourceNo: Code[20]; ParentSourceNo: Code[20]);
     begin
     end;
 
