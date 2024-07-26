@@ -1588,6 +1588,106 @@ codeunit 141008 "ERM - Miscellaneous APAC"
         Assert.AreEqual(ExpectedAmountACY, TempVATAmountLine."Amount (ACY)", '');
     end;
 
+    [Test]
+    [HandlerFunctions('PurchaseStatisticsHandler')]
+    procedure ChangedVATAmountACYOnPurchaseStatistics()
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
+        VATPostingSetup: Record "VAT Posting Setup";
+        NewVATAmount: Decimal;
+    begin
+        // [SCENARIO 542548] VAT Amount (ACY) on Purchase Statistics is changed when changing VAT amount
+        Initialize();
+        
+        // [GIVEN] "Max. VAT Difference Allowed" = 1
+        LibraryERM.SetMaxVATDifferenceAllowed(LibraryRandom.RandIntInRange(1, 1));
+        // [GIVEN] Set VAT posting setup for VAT = 10%
+        LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+        LibraryERM.UpdateVATPostingSetup(VATPostingSetup, 10);
+        // [GIVEN] "Allow VAT Difference" = true
+        LibraryPurchase.SetAllowVATDifference(true);
+
+        // [GIVEN] Create Purchase Invoice with VAT amount = 10.1
+        LibraryPurchase.CreatePurchHeader(
+            PurchaseHeader, PurchaseHeader."Document Type"::Invoice,
+            LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group"));
+        LibraryPurchase.CreatePurchaseLine(
+        PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account",
+        LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostingSetup, "General Posting Type"::Purchase), 1);
+        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 1));
+        PurchaseLine.Modify();
+
+        // [WHEN] Change VAT Amount to 10 on Purchase Statistics
+        // True means update VAT Amount to get some VAT Difference
+        NewVATAmount := PurchaseLine."Amount Including VAT" - PurchaseLine."Amount" - LibraryERM.GetAmountRoundingPrecision();
+        LibraryVariableStorage.Enqueue(true);
+        LibraryVariableStorage.Enqueue(NewVATAmount);
+        PurchaseHeader.OpenDocumentStatistics();
+
+        // [THEN] VAT Amount (ACY) is changed and saved when reopening Statistic page
+        // [THEN] VAT Difference (ACY) is calculated correctly
+        // false means don't update VAT Amount (ACY) after Statistic page reopened.
+        LibraryVariableStorage.Enqueue(false);
+        PurchaseHeader.OpenDocumentStatistics();
+
+        PurchaseLine.Get(PurchaseLine."Document Type", PurchaseLine."Document No.", PurchaseLine."Line No.");
+        GetPurchaseVATAmountLine(PurchaseHeader, TempVATAmountLine);
+        TempVATAmountLine.TestField("VAT Difference (ACY)", TempVATAmountLine."VAT Amount (ACY)" - TempVATAmountLine."Calculated VAT Amount (ACY)");
+        TempVATAmountLine.TestField("VAT Amount (ACY)", PurchaseLine."Amount Including VAT (ACY)" - PurchaseLine."Amount (ACY)");
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('PurchaseStatisticsWithErrorHandler')]
+    procedure ChangedVATAmountACYWithErrorOnPurchaseStatistics()
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        MaxVATDifferenceAllowed: Decimal;
+        NewVATAmount: Decimal;
+        VATDifferenceErr: Label 'The total VAT Difference (ACY) for a document must not exceed the value %1 in the Max. VAT Difference Allowed field.', Locked = true;
+    begin
+        // [SCENARIO 542548] VAT Amount on Purchase Statistics can be changed within max allowed VAT difference
+        Initialize();
+
+        // [GIVEN] "Max. VAT Difference Allowed" = 1
+        MaxVATDifferenceAllowed := LibraryRandom.RandIntInRange(1, 1);
+        LibraryERM.SetMaxVATDifferenceAllowed(MaxVATDifferenceAllowed);
+        // [GIVEN] Set VAT posting setup for VAT = 10%
+        LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+        LibraryERM.UpdateVATPostingSetup(VATPostingSetup, 10);
+        // [GIVEN] "Allow VAT Difference" = true
+        LibraryPurchase.SetAllowVATDifference(true);
+        // [GIVEN] Clear additional reporting currency
+        LibraryERM.SetAddReportingCurrency('');
+
+        // [GIVEN] Create Purchase Invoice with VAT amount = 10.1, "Vendor Exchange Rate (ACY)" = 0.5
+        LibraryPurchase.CreatePurchHeader(
+            PurchaseHeader, PurchaseHeader."Document Type"::Invoice,
+            LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group"));
+        LibraryPurchase.CreatePurchaseLine(
+        PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account",
+        LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostingSetup, "General Posting Type"::Purchase), 1);
+        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 1));
+        PurchaseLine.Modify();
+
+        // [GIVEN] Set "Vendor Exchange Rate (ACY)" on purchase invoice
+        PurchaseHeader."Vendor Exchange Rate (ACY)" := LibraryRandom.RandDec(1, 2);
+        PurchaseHeader.Modify();
+
+        // [WHEN] Change VAT Amount to 11.1 on Purchase Statistics
+        NewVATAmount := PurchaseLine."Amount Including VAT" - PurchaseLine."Amount" + MaxVATDifferenceAllowed;
+        LibraryVariableStorage.Enqueue(NewVATAmount);
+        PurchaseHeader.OpenDocumentStatistics();
+
+        // [THEN] The error is executed, the VAT amount cannot be changed with the VAT difference bigger than "Max Allowed VAT Difference" * "Vendor Exchange Rate (ACY)"
+        Assert.ExpectedError(StrSubstNo(VATDifferenceErr, MaxVATDifferenceAllowed * PurchaseHeader."Vendor Exchange Rate (ACY)"));
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
     local procedure Initialize()
     var
         LibraryApplicationArea: Codeunit "Library - Application Area";
@@ -2299,6 +2399,15 @@ codeunit 141008 "ERM - Miscellaneous APAC"
         LibraryReportValidation.DeleteObjectOptions(CurrentSaveValuesId);
     end;
 
+    local procedure GetPurchaseVATAmountLine(PurchaseHeader: Record "Purchase Header"; var VATAmountLine: Record "VAT Amount Line")
+    var
+        TempPurchaseLine: Record "Purchase Line" temporary;
+        PurchPost: Codeunit "Purch.-Post";
+    begin
+        PurchPost.GetPurchLines(PurchaseHeader, TempPurchaseLine, 0);
+        TempPurchaseLine.CalcVATAmountLines(0, PurchaseHeader, TempPurchaseLine, VATAmountLine);
+    end;
+
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure AUNZStatementRequestPageHandler(var AUNZStatement: TestRequestPage "AU/NZ Statement")
@@ -2315,6 +2424,24 @@ codeunit 141008 "ERM - Miscellaneous APAC"
           "Date Filter",
           StrSubstNo('%1..%2', Format(WorkDate()), LibraryRandom.RandDateFrom(WorkDate(), LibraryRandom.RandIntInRange(10, 100))));
         AUNZStatement.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
+    end;
+
+    [ModalPageHandler]
+    procedure PurchaseStatisticsHandler(var PurchaseStatistics: TestPage "Purchase Statistics")
+    var
+        UpdateVATAmount: Boolean;
+    begin
+        UpdateVATAmount := LibraryVariableStorage.DequeueBoolean();
+        if UpdateVATAmount then
+            PurchaseStatistics.SubForm."VAT Amount".SetValue(LibraryVariableStorage.DequeueDecimal());
+        PurchaseStatistics.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure PurchaseStatisticsWithErrorHandler(var PurchaseStatistics: TestPage "Purchase Statistics")
+    begin
+        asserterror PurchaseStatistics.SubForm."VAT Amount".SetValue(LibraryVariableStorage.DequeueDecimal());
+        PurchaseStatistics.OK().Invoke();
     end;
 }
 
