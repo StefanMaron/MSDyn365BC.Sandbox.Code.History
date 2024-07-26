@@ -21,6 +21,8 @@ codeunit 160100 "Create EB"
         XTransactionsOfGoods: Label 'Transactions of goods crossing national borders';
         XReimbursement: Label 'Reimbursement';
         XEU3PartyTradeTransit: Label 'EU 3 Party Trade - Transit';
+        XNonEuroPaymentDescTxt: Label 'Parties share fees.';
+        XEuroPaymentDescTxt: Label 'Sender pays fees.';
 
     procedure CreateTrialData()
     begin
@@ -98,9 +100,13 @@ codeunit 160100 "Create EB"
           ExportProtocol."Export Object Type"::Report, ExportProtocol."Code Expenses"::BEN);
         InsertExportProtocol('International-OUR', 'The sender pays the fees for an intl. payment.', 2000003, 2000002, '',
           ExportProtocol."Export Object Type"::Report, ExportProtocol."Code Expenses"::OUR);
-        InsertExportProtocol('SEPA', 'Sender pays fees for a Single European Payment.', 2000004, 2000005, '',
+        InsertExportProtocol('SEPA', XEuroPaymentDescTxt, Codeunit::"Check SEPA Payments", Report::"File SEPA Payments", '',
           ExportProtocol."Export Object Type"::Report, ExportProtocol."Code Expenses"::SHA);
-        InsertExportProtocol('Non-Euro SEPA', 'Parties share fees for a non-euro payment.', 2000005, 2000006, '',
+        InsertExportProtocol('Non-Euro SEPA', XNonEuroPaymentDescTxt, Codeunit::"Check Non Euro SEPA Payments", Report::"File Non Euro SEPA Payments", '',
+          ExportProtocol."Export Object Type"::Report, ExportProtocol."Code Expenses"::SHA);
+        InsertExportProtocol('SEPA00100109', XEuroPaymentDescTxt, Codeunit::"Check SEPA Payments", Report::"File SEPA 001.001.09 Pmts", '',
+          ExportProtocol."Export Object Type"::Report, ExportProtocol."Code Expenses"::SHA);
+        InsertExportProtocol('NONEURO SEPA00100109', XNonEuroPaymentDescTxt, Codeunit::"Check Non Euro SEPA Payments", Report::"File FCY SEPA 001.001.09 Pmts", '',
           ExportProtocol."Export Object Type"::Report, ExportProtocol."Code Expenses"::SHA);
         InsertExportProtocol('Zero', 'The sending bank decides who pays the bank fees.', 0, 1000, '',
           ExportProtocol."Export Object Type"::XMLPort, ExportProtocol."Code Expenses"::" ");
