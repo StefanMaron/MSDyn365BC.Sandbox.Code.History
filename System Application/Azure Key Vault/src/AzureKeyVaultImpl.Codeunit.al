@@ -76,7 +76,6 @@ codeunit 2202 "Azure Key Vault Impl."
     procedure GetAzureKeyVaultCertificate(CertificateName: Text; var Certificate: SecretText)
     begin
         // Gets the certificate as a base 64 encoded string from the key vault, given a CertificateName.
-
         Certificate := GetCertificateFromClient(CertificateName);
     end;
 
