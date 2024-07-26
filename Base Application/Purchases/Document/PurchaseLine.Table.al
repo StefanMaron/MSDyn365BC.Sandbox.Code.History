@@ -7018,6 +7018,19 @@ table 39 "Purchase Line"
                                         (1 - PurchHeader."VAT Base Discount %" / 100),
                                         Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
                                     VATAmountLine."Amount Including VAT" := VATAmountLine."VAT Base" + VATAmountLine."VAT Amount";
+                                    VATAmountLine."VAT Base (ACY)" :=
+                                          Round(
+                                            (VATAmountLine."Line Amount" - VATAmountLine."Invoice Discount Amount") / (1 + VATAmountLine."VAT %" / 100),
+                                            Currency."Amount Rounding Precision") - VATAmountLine."VAT Difference (ACY)";
+                                    VATAmountLine."VAT Amount (ACY)" :=
+                                      VATAmountLine."VAT Difference (ACY)" +
+                                      Round(
+                                        PrevVatAmountLine."VAT Amount (ACY)" +
+                                        (VATAmountLine."Line Amount" - VATAmountLine."Invoice Discount Amount" - VATAmountLine."VAT Base (ACY)" - VATAmountLine."VAT Difference (ACY)") *
+                                        (1 - PurchHeader."VAT Base Discount %" / 100),
+                                        Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
+                                    VATAmountLine."Amount Including VAT (ACY)" := VATAmountLine."VAT Base (ACY)" + VATAmountLine."VAT Amount (ACY)";
+
                                 end;
                                 if VATAmountLine.Positive then
                                     PrevVatAmountLine.Init()
