@@ -4,12 +4,12 @@ codeunit 101293 "Create Reminder Level"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        InsertData(DemoDataSetup.DomesticCode(), 1, '<2D>', 43, '<7D>');
-        InsertData(DemoDataSetup.DomesticCode(), 2, '<2D>', 86, '<7D>');
-        InsertData(DemoDataSetup.DomesticCode(), 3, '<2D>', 128, '<7D>');
-        InsertData(DemoDataSetup.ForeignCode(), 1, '<3D>', 0, '<7D>');
-        InsertData(DemoDataSetup.ForeignCode(), 2, '<3D>', 0, '<7D>');
-        InsertData(DemoDataSetup.ForeignCode(), 3, '<3D>', 0, '<7D>');
+        InsertData(DemoDataSetup.DomesticCode(), 1, '<5D>', 43, '<1M>');
+        InsertData(DemoDataSetup.DomesticCode(), 2, '<1M>', 86, '<1M>');
+        InsertData(DemoDataSetup.DomesticCode(), 3, '<1M>', 128, '<1M>');
+        InsertData(DemoDataSetup.ForeignCode(), 1, '<7D>', 0, '<1M>');
+        InsertData(DemoDataSetup.ForeignCode(), 2, '<1M>', 0, '<1M>');
+        InsertData(DemoDataSetup.ForeignCode(), 3, '<1M>', 0, '<1M>');
     end;
 
     var
