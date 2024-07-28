@@ -37,22 +37,13 @@ codeunit 380 "Bank Acc. Recon. Test"
         end;
     end;
 
-    internal procedure SetOutstandingFilters(BankAccReconciliation: Record "Bank Acc. Reconciliation"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
+    local procedure SetOutstandingFilters(BankAccReconciliation: Record "Bank Acc. Reconciliation"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
     begin
         BankAccountLedgerEntry.SetRange("Bank Account No.", BankAccReconciliation."Bank Account No.");
-        BankAccountLedgerEntry.SetFilter("Closed at Date", '%1 | > %2', 0D, BankAccReconciliation."Statement Date");
-        BankAccountLedgerEntry.SetFilter("Statement No.", '<> %1', BankAccReconciliation."Statement No.");
-        BankAccountLedgerEntry.SetRange(Reversed, false);
+        BankAccountLedgerEntry.SetRange(Open, true);
+        BankAccountLedgerEntry.SetRange("Statement Status", BankAccountLedgerEntry."Statement Status"::Open);
         if BankAccReconciliation."Statement Date" <> 0D then
             BankAccountLedgerEntry.SetRange("Posting Date", 0D, BankAccReconciliation."Statement Date");
-    end;
-
-    local procedure TotalOfClosedEntriesWithNoClosedAtDate(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"): Decimal
-    begin
-        BankAccountLedgerEntry.SetRange("Closed at Date", 0D);
-        BankAccountLedgerEntry.SetRange(Open, false);
-        BankAccountLedgerEntry.CalcSums(Amount);
-        exit(BankAccountLedgerEntry.Amount);
     end;
 
     procedure TotalOutstandingBankTransactions(BankAccReconciliation: Record "Bank Acc. Reconciliation"): Decimal
@@ -67,7 +58,6 @@ codeunit 380 "Bank Acc. Recon. Test"
 
         BankAccountLedgerEntry.CalcSums(Amount);
         Total := BankAccountLedgerEntry.Amount;
-        Total -= TotalOfClosedEntriesWithNoClosedAtDate(BankAccountLedgerEntry);
 
         if BankAccReconciliation."Statement Type" = BankAccReconciliation."Statement Type"::"Payment Application" then begin
             // When the BankAccReconciliation is created from the Payment Reconciliation Journal:
@@ -104,7 +94,6 @@ codeunit 380 "Bank Acc. Recon. Test"
 
         BankAccountLedgerEntry.CalcSums(Amount);
         Total := BankAccountLedgerEntry.Amount;
-        Total -= TotalOfClosedEntriesWithNoClosedAtDate(BankAccountLedgerEntry);
 
         if BankAccReconciliation."Statement Type" = BankAccReconciliation."Statement Type"::"Payment Application" then begin
             // When the BankAccReconciliation is created from the Payment Reconciliation Journal:
