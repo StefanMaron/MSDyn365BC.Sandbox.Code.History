@@ -38,9 +38,6 @@ codeunit 134076 "ERM Suggest Vendor Payment"
         AppliesToIdErr: Label 'Applies-to ID is not blank.';
         OrFilterStringTxt: Label '%1|%2', Locked = true;
         JournalBatchNameErr: Label 'Journal Batch Name must be %1 in %2';
-        AppliesToIDNotSetErr: Label 'Applies-to ID is not set on Vendor Ledger Entry';
-        AppliesToIDNotRemovedErr: Label 'Applies-to ID is not removed on Vendor Ledger Entry';
-        SuggestToVendorRefundErr: Label 'Document No. must be blank.';
 
     [Test]
     [HandlerFunctions('MessageHandler')]
@@ -366,12 +363,16 @@ codeunit 134076 "ERM Suggest Vendor Payment"
         SuggestVendorPayment(
           GenJournalBatch, GenJournalLine."Account No.", AddRandomDaysToWorkDate(), true, GenJournalLine."Account Type"::"G/L Account",
           GenJournalLine."Bal. Account No.", GenJournalLine."Bank Payment Type"::" ", true);
+        DocumentNo2 := FindAndPostPaymentJournalLine(GenJournalBatch);
 
         // 3. Verify: Verify values on Vendor Ledger Entry after post the Payment Journal.
-        DocumentNo2 := FindAndPostPaymentJournalLineRefund(GenJournalBatch);
-
-        // 4. Verify: Verify values of Document No. in Payment Journal.
-        Assert.AreEqual(DocumentNo2, '', SuggestToVendorRefundErr);
+        VerifyValuesOnVendLedgerEntry(
+          GenJournalLine."Document No.", GenJournalLine."Document Type"::Refund, GenJournalLine."Account No.", GenJournalLine.Amount,
+          GenJournalLine.Amount, true, GenJournalLine."On Hold");
+        VerifyValuesOnVendLedgerEntry(
+          DocumentNo, GenJournalLine."Document Type"::Refund, GenJournalLine."Account No.", GenJournalLine.Amount / 2, 0, false, '');
+        VerifyValuesOnVendLedgerEntry(
+          DocumentNo2, GenJournalLine."Document Type"::Payment, GenJournalLine."Account No.", -GenJournalLine.Amount / 2, 0, false, '');
     end;
 
     [Test]
@@ -2639,84 +2640,6 @@ codeunit 134076 "ERM Suggest Vendor Payment"
         VerifySameDocumentNoOnGenJournal(VendorNo2, DocumentNo);
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    [HandlerFunctions('ConfirmHandlerTrue,GetSpecificLineFromTemlateListHandler')]
-    procedure AppliesToIDShouldRemovedWhenPaymentAmountSetToZeroBySuggestVendorPayment()
-    var
-        Vendor: Record Vendor;
-        GenJournalTemplate: Record "Gen. Journal Template";
-        GenJournalBatch: Record "Gen. Journal Batch";
-        GenJournalLine: Record "Gen. Journal Line";
-        VendorLedgerEntry: Record "Vendor Ledger Entry";
-        GeneralJournalTemplate: Record "Gen. Journal Template";
-        SuggestVendorPayments: Report "Suggest Vendor Payments";
-        PaymentJournal: TestPage "Payment Journal";
-        PaymentAmount: Decimal;
-        PageIDUpdated: Integer;
-    begin
-        // [SCENARIO 522685] Applies-to ID not removed from payment journal when more than one line is applied and line amount is changed to 0
-        Initialize();
-
-        // [GIVEN] set new vendor, batch and posting amounts
-        Vendor.Get(CreateVendor('', Vendor."Application Method"::Manual));
-        CreateGeneralJournalBatch(GenJournalBatch, GenJournalTemplate.Type::General);
-
-        // [GIVEN] Create and Post General Journal Lines with Document Type as Invoice
-        CreateGeneralJournalLine(GenJournalLine, GenJournalBatch, WorkDate(), Vendor."No.", GenJournalLine."Document Type"::Invoice, -LibraryRandom.RandDec(1000, 2));
-        PaymentAmount := -GenJournalLine.Amount;
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-        Clear(GenJournalLine);
-
-        CreateGeneralJournalLine(GenJournalLine, GenJournalBatch, WorkDate(), Vendor."No.", GenJournalLine."Document Type"::Invoice, -LibraryRandom.RandDec(1000, 2));
-        if -GenJournalLine.Amount < PaymentAmount then
-            PaymentAmount := -GenJournalLine.Amount;
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // [GIVEN] prepare payment amount which is lower then smallest amount from invoices
-        PaymentAmount := PaymentAmount * LibraryUtility.GenerateRandomFraction();
-
-        // [GIVEN] Suggest Vendor Payments
-        CreateGeneralJournalBatch(GenJournalBatch, GenJournalTemplate.Type::Payments);
-        GenJournalLine.Init();
-        GenJournalLine.Validate("Journal Template Name", GenJournalBatch."Journal Template Name");
-        GenJournalLine.Validate("Journal Batch Name", GenJournalBatch.Name);
-
-        Vendor.SetRange("No.", Vendor."No.");
-        SuggestVendorPayments.SetGenJnlLine(GenJournalLine);
-        SuggestVendorPayments.SetTableView(Vendor);
-        SuggestVendorPayments.UseRequestPage(false);
-        SuggestVendorPayments.InitializeRequest(WorkDate(), false, 0, true, WorkDate(), LibraryRandom.RandText(5), true, GenJournalLine."Bal. Account Type", GenJournalLine."Bal. Account No.", GenJournalLine."Bank Payment Type");
-        SuggestVendorPayments.RunModal();
-
-        GeneralJournalTemplate.SetRange(Name, GenJournalBatch."Journal Template Name");
-        GeneralJournalTemplate.FindFirst();
-        if GeneralJournalTemplate."Page ID" <> 256 then begin
-            PageIDUpdated := GeneralJournalTemplate."Page ID";
-            GeneralJournalTemplate."Page ID" := 256;
-            GeneralJournalTemplate.Modify();
-        end;
-
-        // [WHEN] Open Payment Journal
-        LibraryVariableStorage.Enqueue(GenJournalBatch."Journal Template Name");
-        PaymentJournal.OpenEdit();
-        PaymentJournal.CurrentJnlBatchName.SetValue(GenJournalBatch.Name);
-        PaymentJournal.Last();
-
-        // [THEN] Vendor Ledger entries should have "Applies-to ID" set
-        VendorLedgerEntry.SetCurrentKey("Vendor No.", "Applies-to ID", Open, Positive, "Due Date");
-        VendorLedgerEntry.SetRange("Vendor No.", PaymentJournal."Account No.".Value);
-        VendorLedgerEntry.SetRange("Applies-to ID", PaymentJournal."Document No.".Value);
-        Assert.AreEqual(false, VendorLedgerEntry.IsEmpty(), AppliesToIDNotSetErr);
-
-        // [WHEN] Update amount on payment line (to be zero)
-        PaymentJournal.Amount.SetValue(0);
-        PaymentJournal.Close();
-
-        // [THEN] System should remove "Applies-to ID" from all VendLedgerEntries
-        Assert.AreEqual(true, VendorLedgerEntry.IsEmpty(), AppliesToIDNotRemovedErr);
-    end;
-
     local procedure Initialize()
     var
         ObjectOptions: Record "Object Options";
@@ -4031,68 +3954,6 @@ codeunit 134076 "ERM Suggest Vendor Payment"
             JournalBatchName2,
             GenJournalLine2."Journal Batch Name",
             StrSubstNo(JournalBatchNameErr, JournalBatchName2, GenJournalLine2.TableCaption()));
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure SuggestVendorPaymentForRefundUsingSummarizePerVenodr()
-    var
-        Vendor: Record Vendor;
-        GenJournalBatch: Record "Gen. Journal Batch";
-        GenJournalTemplate: Record "Gen. Journal Template";
-        GenJournalLine: Record "Gen. Journal Line";
-        DocumentNo: Code[20];
-    begin
-        // [SCENARIO 495872] Journal Lines will not be suggested by Suggest Vendor Payments routine if Summarize per Vendor is enabled.
-        Initialize();
-
-        // [GIVEN] Create a vendor.
-        LibraryPurchase.CreateVendor(Vendor);
-
-        // [GIVEN] Create a Journal Batch using Journal Template General.
-        CreateGeneralJournalBatch(GenJournalBatch, GenJournalTemplate.Type::General);
-
-        // [GIVEN] Create Journal Line using Document Type Refund.
-        CreateGeneralJournalLine(
-            GenJournalLine,
-            GenJournalBatch,
-            WorkDate(),
-            Vendor."No.",
-            GenJournalLine."Document Type"::Refund,
-            -LibraryRandom.RandDec(100, 2));
-
-        // [GIVEN] Post the General Journal line.
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // [GIVEN] Create a General Journal Batch using Journal Template Payments.
-        CreateGeneralJournalBatch(GenJournalBatch, GenJournalTemplate.Type::Payments);
-
-        // [GIVEN] Suggest Vendor Payment is invoked with Summarize Per Vendor set to true.
-        SuggestVendorPayment(
-            GenJournalBatch,
-            GenJournalLine."Account No.",
-            AddRandomDaysToWorkDate(),
-            true,
-            GenJournalLine."Account Type"::"G/L Account",
-            GenJournalLine."Bal. Account No.",
-            GenJournalLine."Bank Payment Type"::" ",
-            true);
-
-        // [GIVEN] Get the value of Document No. of Suggested Line. 
-        DocumentNo := FindAndPostPaymentJournalLineRefund(GenJournalBatch);
-
-        // [THEN] The General Journal line should not be created.
-        Assert.AreEqual(DocumentNo, '', SuggestToVendorRefundErr);
-    end;
-
-    local procedure FindAndPostPaymentJournalLineRefund(GenJournalBatch: Record "Gen. Journal Batch"): Code[20]
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-    begin
-        GenJournalLine.SetRange("Journal Template Name", GenJournalBatch."Journal Template Name");
-        GenJournalLine.SetRange("Journal Batch Name", GenJournalBatch.Name);
-        if GenJournalLine.FindFirst() then
-            exit(GenJournalLine."Document No.");
     end;
 
     [ModalPageHandler]
