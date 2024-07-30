@@ -968,14 +968,14 @@ table 77 "Report Selections"
 
     local procedure GetNextJobQueueParam(var Parameter: Text): Text
     var
-        I: Integer;
+        i: Integer;
         Result: Text;
     begin
-        I := StrPos(Parameter, '|');
-        if I > 0 then
-            Result := CopyStr(Parameter, 1, I - 1);
-        if (I + 1) < StrLen(Parameter) then
-            Parameter := CopyStr(Parameter, I + 1);
+        i := StrPos(Parameter, '|');
+        if i > 0 then
+            Result := CopyStr(Parameter, 1, i - 1);
+        if (i + 1) < StrLen(Parameter) then
+            Parameter := CopyStr(Parameter, i + 1);
         exit(Result);
     end;
 
@@ -1568,7 +1568,7 @@ table 77 "Report Selections"
                         TempAttachReportSelections.SaveReportAsPDFInTempBlob(TempBlob, TempAttachReportSelections."Report ID", DocumentRecord, TempAttachReportSelections."Custom Report Layout Code", ReportUsage);
                     TempBlob.CreateInStream(AttachmentStream);
 
-                    OnSendEmailDirectlyOnBeforeEmailWithAttachment(RecordVariant, TempAttachReportSelections, TempBlob, DocumentMailing, DocNo, DocName, EmailAddress);
+                    OnSendEmailDirectlyOnBeforeEmailWithAttachment(RecordVariant, TempAttachReportSelections, TempBlob, DocumentMailing);
                     AllEmailsWereSuccessful :=
                         AllEmailsWereSuccessful and
                         DocumentMailing.EmailFile(
@@ -1819,7 +1819,6 @@ table 77 "Report Selections"
     var
         ReportLayoutSelectionLocal: Record "Report Layout Selection";
         CustomLayoutReporting: Codeunit "Custom Layout Reporting";
-        CustomerStatementSub: codeunit "Customer Statement Subscr";
         LastUsedParameters: Text;
         IsHandled: Boolean;
         OutStream: OutStream;
@@ -1829,9 +1828,7 @@ table 77 "Report Selections"
             ReportLayoutSelectionLocal.SetTempLayoutSelectedName(Rec."Report Layout Name", Rec."Report Layout AppID")
         else
             ReportLayoutSelectionLocal.SetTempLayoutSelected(LayoutCode);
-        BindSubscription(CustomerStatementSub);
         OnBeforeSaveReportAsPDF(ReportID, RecordVariant, LayoutCode, IsHandled, '', ReportUsage, true, TempBlob, Rec);
-        UnbindSubscription(CustomerStatementSub);
         if not IsHandled then begin
             TempBlob.CreateOutStream(OutStream);
             LastUsedParameters := CustomLayoutReporting.GetReportRequestPageParameters(ReportID);
@@ -2420,7 +2417,7 @@ table 77 "Report Selections"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSendEmailDirectlyOnBeforeEmailWithAttachment(RecordVariant: Variant; ReportSelection: Record "Report Selections"; var TempBlob: Codeunit "Temp Blob"; var DocumentMailing: Codeunit "Document-Mailing"; DocumentNo: Code[20]; DocumentName: Text[150]; EmailAddress: Text[250])
+    local procedure OnSendEmailDirectlyOnBeforeEmailWithAttachment(RecordVariant: Variant; ReportSelection: Record "Report Selections"; var TempBlob: Codeunit "Temp Blob"; var DocumentMailing: Codeunit "Document-Mailing")
     begin
     end;
 
