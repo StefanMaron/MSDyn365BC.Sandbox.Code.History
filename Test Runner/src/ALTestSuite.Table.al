@@ -8,10 +8,9 @@ namespace System.TestTools.TestRunner;
 table 130451 "AL Test Suite"
 {
     DataCaptionFields = Name, Description;
-    LookupPageId = "AL Test Suites";
+    LookupPageID = "AL Test Suites";
     ReplicateData = false;
-    Permissions = tabledata "AL Test Suite" = rimd,
-                  tabledata "Test Method Line" = rimd;
+    Permissions = TableData "AL Test Suite" = rimd, TableData "Test Method Line" = rimd;
 
     fields
     {
