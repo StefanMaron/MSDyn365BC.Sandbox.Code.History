@@ -1126,7 +1126,6 @@ report 1322 "Standard Purchase - Order"
 
         trigger OnOpenPage()
         begin
-            InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
     }
@@ -1312,8 +1311,8 @@ report 1322 "Standard Purchase - Order"
         BodyLbl: Label 'The purchase order is attached to this message.';
         OrderDateLbl: Label 'Order Date';
         UnitPriceLbl: Label 'Unit Price (LCY)';
-        JobNoLbl: Label 'Project No.';
-        JobTaskNoLbl: Label 'Project Task No.';
+        JobNoLbl: Label 'Job No.';
+        JobTaskNoLbl: Label 'Job Task No.';
         PromisedReceiptDateLbl: Label 'Promised Receipt Date';
         RequestedReceiptDateLbl: Label 'Requested Receipt Date';
         ExpectedReceiptDateLbl: Label 'Expected Receipt Date';
