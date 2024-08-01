@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./Business Foundation Test Libraries"
@@ -133,18 +141,10 @@
       "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./System Application/Email/src/Test Email"
     }
-  ],
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    }
-  }
+  ]
 }
