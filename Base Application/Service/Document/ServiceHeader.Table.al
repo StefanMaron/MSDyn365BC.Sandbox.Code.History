@@ -3004,7 +3004,6 @@ table 5900 "Service Header"
         OldDimSetID := "Dimension Set ID";
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
 
-        OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(Rec, xRec);
         if ServItemLineExists() or ServLineExists() then
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
 
@@ -5637,11 +5636,6 @@ table 5900 "Service Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateBillToCustomerNoOnBeforeRecreateServLines(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header");
     begin
     end;
 
