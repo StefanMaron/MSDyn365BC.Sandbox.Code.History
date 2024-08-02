@@ -128,6 +128,12 @@ report 1407 "Bank Account Statement"
             {
                 DataItemLink = "Bank Account No." = field("Bank Account No."), "Statement No." = field("Statement No.");
                 DataItemTableView = sorting("Bank Account No.", "Statement No.", "Statement Line No.");
+                column(Statement_No_BnkAcStmtLine; "Statement No.")
+                {
+                }
+                column(Statement_Line_No_BnkAcStmtLine; "Statement Line No.")
+                {
+                }
                 column(TrnsctnDte_BnkAcStmtLin; Format("Transaction Date"))
                 {
                 }
@@ -253,7 +259,8 @@ report 1407 "Bank Account Statement"
                 if "Bank Account Statement"."Statement Date" <> 0D then
                     G_L_BalanceCaptionTxt := G_L_BalanceCaptionTxt + AtLbl + format("Statement Date");
 
-                GatherOutstandingTransactions("Bank Account No.");
+                if PrintOutstandingTransactions then
+                    GatherOutstandingTransactions("Bank Account No.");
             end;
         }
     }
