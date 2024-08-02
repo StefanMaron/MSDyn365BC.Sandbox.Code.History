@@ -62,15 +62,13 @@ table 5901 "Service Item Line"
                 ServContractList: Page "Serv. Contr. List (Serv. Item)";
                 IsHandled: Boolean;
                 ShouldFindServContractLine: Boolean;
-                DoExit: Boolean;
             begin
                 if "Loaner No." <> '' then
                     Error(Text055, FieldCaption("Service Item No."),
                       FieldCaption("Loaner No."), "Loaner No.");
 
                 IsHandled := false;
-                DoExit := false;
-                OnValidateServiceItemNoOnBeforeCheckXRecServiceItemNo(Rec, xRec, ServLine, ServItem, IsHandled, DoExit);
+                OnValidateServiceItemNoOnBeforeCheckXRecServiceItemNo(Rec, xRec, ServLine, ServItem, IsHandled);
                 if not IsHandled then
                     if "Service Item No." <> xRec."Service Item No." then begin
                         if CheckServLineExist() then
@@ -89,9 +87,6 @@ table 5901 "Service Item Line"
 
                         exit;
                     end;
-
-                if DoExit then
-                    exit;
 
                 if "Service Item No." = '' then begin
                     if xRec."Service Item No." <> "Service Item No." then begin
@@ -1052,7 +1047,6 @@ table 5901 "Service Item Line"
                 SetFilterForType();
                 if ServLine.Find('-') then
                     repeat
-                        ServLine.SetCalledFromServiceItemLine(true);
                         ServLine.Validate("Fault Reason Code", "Fault Reason Code");
                         ServLine.Modify();
                     until ServLine.Next() = 0;
@@ -2574,7 +2568,7 @@ table 5901 "Service Item Line"
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            OnShowDimensionsOnBeforeServiceItemLineModify(Rec, xRec);
+            OnShowDimensionsOnBeforeServiceItemLineModify(Rec);
             Modify();
             if ServLineExists() then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
@@ -2963,7 +2957,7 @@ table 5901 "Service Item Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateServiceItemNoOnBeforeCheckXRecServiceItemNo(var ServiceItemLine: Record "Service Item Line"; xServiceItemLine: Record "Service Item Line"; var ServLine: Record "Service Line"; var ServItem: Record "Service Item"; var IsHandled: Boolean; var DoExit: Boolean)
+    local procedure OnValidateServiceItemNoOnBeforeCheckXRecServiceItemNo(var ServiceItemLine: Record "Service Item Line"; xServiceItemLine: Record "Service Item Line"; var ServLine: Record "Service Line"; var ServItem: Record "Service Item"; var IsHandled: Boolean)
     begin
     end;
 
@@ -3083,7 +3077,7 @@ table 5901 "Service Item Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnShowDimensionsOnBeforeServiceItemLineModify(var ServiceItemLine: Record "Service Item Line"; xServiceItemLine: Record "Service Item Line")
+    local procedure OnShowDimensionsOnBeforeServiceItemLineModify(var ServiceItemLine: Record "Service Item Line")
     begin
     end;
 
