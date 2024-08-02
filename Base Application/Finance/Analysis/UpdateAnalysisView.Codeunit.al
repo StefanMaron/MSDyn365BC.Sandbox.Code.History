@@ -227,7 +227,7 @@ codeunit 410 "Update Analysis View"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateEntriesForGLAccount(TempAnalysisViewEntry, AnalysisView, LastGLEntryNo, NoOfEntries, IsHandled, ShowProgressWindow);
+        OnBeforeUpdateEntriesForGLAccount(TempAnalysisViewEntry, AnalysisView, LastGLEntryNo, NoOfEntries, IsHandled);
         if IsHandled then
             exit;
 
@@ -709,7 +709,7 @@ codeunit 410 "Update Analysis View"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeUpdateEntriesForGLAccount(var TempAnalysisViewEntry: Record "Analysis View Entry" temporary; AnalysisView: Record "Analysis View"; LastGLEntryNo: Integer; var NoOfEntries: Integer; var IsHandled: Boolean; ShowProgressWindow: Boolean)
+    local procedure OnBeforeUpdateEntriesForGLAccount(var TempAnalysisViewEntry: Record "Analysis View Entry" temporary; AnalysisView: Record "Analysis View"; LastGLEntryNo: Integer; var NoOfEntries: Integer; var IsHandled: Boolean)
     begin
     end;
 
