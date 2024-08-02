@@ -541,55 +541,61 @@ codeunit 139769 "Bank Deposit Posting Tests"
         Assert.AreEqual(-Amount, PostedBankDepositHeader."Total Deposit Lines", 'The total amount of the deposit should be the sum of the lines');
     end;
 
-
     [Test]
     [HandlerFunctions('GeneralJournalBatchesPageHandler,ConfirmHandler')]
-    procedure PostedBankDepositReportShowsCustomerApplications()
+    procedure NavigatePageOfAPostedBankDepositShowsRelatedEntries()
     var
-        Item: Record Item;
-        TaxGroup: Record "Tax Group";
-        Customer: Record Customer;
         BankDepositHeader: Record "Bank Deposit Header";
-        PostedBankDepositLine: Record "Posted Bank Deposit Line";
-        SalesLine: Record "Sales Line";
+        GLAccount: Record "G/L Account";
+        Customer: Record Customer;
+        GenJournalBatch: Record "Gen. Journal Batch";
+        GenJournalTemplate: Record "Gen. Journal Template";
         GenJournalLine: Record "Gen. Journal Line";
+        BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
         CustLedgerEntry: Record "Cust. Ledger Entry";
-        PaymentCustLedgerEntry: Record "Cust. Ledger Entry";
-        AppliedCustLedgerEntry: Record "Cust. Ledger Entry" temporary;
-        BankDeposit: Report "Bank Deposit";
-        EntryApplicationMgt: Codeunit "Entry Application Mgt";
-        InvoiceEntryNo: Integer;
+        BankDeposit: TestPage "Bank Deposit";
+        PostedBankDeposit: TestPage "Posted Bank Deposit";
+        Navigate: TestPage Navigate;
+        BankEntryFound, CustomerEntryFound : Boolean;
+        TableName: Text;
     begin
-        // [SCENARIO 542679] Applications are correctly retrieved for posted bank deposits
-        // [GIVEN] A posted bank deposit fully applied to an open sales document.
+        // [SCENARIO 537831] Related entries are shown on the Navigate page of a posted bank deposit
         Initialize();
-        LibraryERM.CreateTaxGroup(TaxGroup);
+        // [GIVEN] A Posted Bank Deposit with a G/L Account and a Customer.
+        CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Type::"Bank Deposits");
+        CreateBankDepositHeaderWithBankAccount(BankDepositHeader, GenJournalBatch);
+        BankDepositHeader."Total Deposit Amount" := 1000;
+        BankDepositHeader.Modify();
+        BankDeposit.Trap();
+        BankDepositHeader.SetRecFilter();
+        Page.Run(Page::"Bank Deposit", BankDepositHeader);
+        LibraryERM.CreateGLAccount(GLAccount);
+        BankDeposit.Subform."Account Type".SetValue(GenJournalLine."Account Type"::"G/L Account");
+        BankDeposit.Subform."Account No.".SetValue(GLAccount."No.");
+        BankDeposit.Subform."Credit Amount".SetValue(-10);
+        BankDeposit.Subform.Next();
         LibrarySales.CreateCustomer(Customer);
-        LibraryInventory.CreateItem(Item);
-        CreateAndPostSalesDocument(
-          SalesLine, Customer."No.", SalesLine."Document Type"::Order, SalesLine.Type::Item, Item."No.",
-          LibraryRandom.RandInt(10), LibraryRandom.RandDec(100, 2));
-        CreateBankDeposit(
-          BankDepositHeader, SalesLine."Sell-to Customer No.", GenJournalLine."Account Type"::Customer, -1);
-        CustLedgerEntry.SetRange("Customer No.", Customer."No.");
-        CustLedgerEntry.FindLast();
-        InvoiceEntryNo := CustLedgerEntry."Entry No.";
-        UpdateGenJournalLine(BankDepositHeader, SalesLine);
-        UpdateBankDepositHeaderWithAmount(BankDepositHeader);
+        BankDeposit.Subform."Account Type".SetValue(GenJournalLine."Account Type"::Customer);
+        BankDeposit.Subform."Account No.".SetValue(Customer."No.");
+        BankDeposit.Subform."Credit Amount".SetValue(1010);
+        PostedBankDeposit.Trap();
+        BankDeposit.Post.Invoke();
+        // [WHEN] Navigate action is invoked from the posted bank deposit
+        Navigate.Trap();
+        PostedBankDeposit."&Navigate".Invoke();
 
-        PostBankDeposit(BankDepositHeader);
-
-        // [WHEN] Getting the applied customer ledger entries as the report does
-        PostedBankDepositLine.SetRange("Bank Deposit No.", BankDepositHeader."No.");
-        PostedBankDepositLine.FindFirst();
-        BankDeposit.FilterDepositCustLedgerEntry(PostedBankDepositLine, PaymentCustLedgerEntry);
-        // [THEN] Only one entry is attached to the deposit line
-        Assert.AreEqual(1, PaymentCustLedgerEntry.Count, 'Only one entry should be found attached to this deposit line.');
-        PaymentCustLedgerEntry.FindFirst();
-        // [THEN] Only one invoice entry is found as applied
-        EntryApplicationMgt.GetAppliedCustEntries(AppliedCustLedgerEntry, PaymentCustLedgerEntry, false);
-        Assert.AreEqual(1, AppliedCustLedgerEntry.Count, 'There should be one invoice found as applied to this deposit line.');
-        Assert.AreEqual(AppliedCustLedgerEntry."Entry No.", InvoiceEntryNo, 'The found entry should be the invoice.');
+        repeat
+            TableName := Navigate."Table Name".Value();
+            case TableName of
+                BankAccountLedgerEntry.TableCaption():
+                    BankEntryFound := true;
+                CustLedgerEntry.TableCaption():
+                    CustomerEntryFound := true;
+            end;
+        until (not Navigate.Next());
+        // [THEN] The entries posted are found.
+        Assert.IsTrue(BankEntryFound, 'Bank Account Ledger Entry should be found');
+        Assert.IsTrue(CustomerEntryFound, 'Customer Ledger Entry should be found');
     end;
 
     local procedure Initialize()
