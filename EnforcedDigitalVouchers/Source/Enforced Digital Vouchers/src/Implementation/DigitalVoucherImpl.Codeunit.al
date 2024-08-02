@@ -30,6 +30,13 @@ using System.Utilities;
 
 codeunit 5579 "Digital Voucher Impl."
 {
+    Permissions = TableData "Sales Invoice Header" = m,
+                  Tabledata "Sales Cr.Memo Header" = m,
+                  Tabledata "Service Invoice Header" = m,
+                  Tabledata "Service Cr.Memo Header" = m,
+                  Tabledata "Purch. Inv. Header" = m,
+                  Tabledata "Purch. Cr. Memo Hdr." = m;
+
     var
         DigitalVoucherFeature: Codeunit "Digital Voucher Feature";
         DigitalVoucherEntry: Codeunit "Digital Voucher Entry";

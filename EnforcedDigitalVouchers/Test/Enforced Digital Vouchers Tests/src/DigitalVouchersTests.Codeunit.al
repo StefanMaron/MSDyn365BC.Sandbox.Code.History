@@ -14,6 +14,7 @@ codeunit 139515 "Digital Vouchers Tests"
         LibraryInventory: Codeunit "Library - Inventory";
         LibrarySales: Codeunit "Library - Sales";
         LibraryRandom: Codeunit "Library - Random";
+        LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
         Assert: Codeunit Assert;
         LibraryWorkflow: Codeunit "Library - Workflow";
         ActiveDirectoryMockEvents: Codeunit "Active Directory Mock Events";
@@ -760,6 +761,8 @@ codeunit 139515 "Digital Vouchers Tests"
         InitializeReportSelectionPurchaseInvoice();
         // [GIVEN] Digital voucher entry setup for purchase document is "Attachment", "Generate Automatically" is enabled
         InitSetupGenerateAutomatically("Digital Voucher Entry Type"::"Purchase Document", "Digital Voucher Check Type"::Attachment);
+        LibraryLowerPermissions.SetO365Setup();
+        LibraryLowerPermissions.AddPurchDocsPost();
         // [WHEN] Post purchase invoice
         PurchInvHeader.Get(ReceiveAndInvoicePurchaseInvoice());
         // [THEN] "No. Printed" is 0 for the posted purchase invoice
@@ -785,6 +788,8 @@ codeunit 139515 "Digital Vouchers Tests"
         InitializeReportSelectionPurchaseCrMemo();
         // [GIVEN] Digital voucher entry setup for purchase document is "Attachment", "Generate Automatically" is enabled
         InitSetupGenerateAutomatically("Digital Voucher Entry Type"::"Purchase Document", "Digital Voucher Check Type"::Attachment);
+        LibraryLowerPermissions.SetO365Setup();
+        LibraryLowerPermissions.AddPurchDocsPost();
         // [WHEN] Post purchase credit memo
         PurchCrMemoHdr.Get(ShipAndInvoicePurchaseCrMemo());
         // [THEN] "No. Printed" is 0 for the posted purchase credit memo
@@ -810,6 +815,8 @@ codeunit 139515 "Digital Vouchers Tests"
         InitializeReportSelectionSalesInvoice();
         // [GIVEN] Digital voucher entry setup for sales document is "Attachment", "Generate Automatically" is enabled
         InitSetupGenerateAutomatically("Digital Voucher Entry Type"::"Sales Document", "Digital Voucher Check Type"::Attachment);
+        LibraryLowerPermissions.SetO365Setup();
+        LibraryLowerPermissions.AddSalesDocsPost();
         // [WHEN] Post sales invoice
         SalesInvHeader.Get(ShipAndInvoiceSalesInvoice());
         // [THEN] "No. Printed" is 0 for the posted sales invoice
@@ -817,6 +824,7 @@ codeunit 139515 "Digital Vouchers Tests"
 
         NotificationLifecycleMgt.RecallAllNotifications();
         UnbindSubscription(DigVouchersDisableEnforce);
+        LibraryLowerPermissions.SetOutsideO365Scope();
     end;
 
     [Test]
@@ -835,6 +843,8 @@ codeunit 139515 "Digital Vouchers Tests"
         InitializeReportSelectionSalesCrMemo();
         // [GIVEN] Digital voucher entry setup for sales document is "Attachment", "Generate Automatically" is enabled
         InitSetupGenerateAutomatically("Digital Voucher Entry Type"::"Sales Document", "Digital Voucher Check Type"::Attachment);
+        LibraryLowerPermissions.SetO365Setup();
+        LibraryLowerPermissions.AddSalesDocsPost();
         // [WHEN] Post sales credit memo
         SalesCrMemoHeader.Get(ReceiveAndInvoiceSalesCrMemo());
         // [THEN] "No. Printed" is 0 for the posted sales credit memo
@@ -860,6 +870,10 @@ codeunit 139515 "Digital Vouchers Tests"
         InitializeReportSelectionServiceInvoice();
         // [GIVEN] Digital voucher entry setup for sales document is "Attachment", "Generate Automatically" is enabled
         InitSetupGenerateAutomatically("Digital Voucher Entry Type"::"Sales Document", "Digital Voucher Check Type"::Attachment);
+        LibraryLowerPermissions.SetO365Setup();
+        LibraryLowerPermissions.AddO365WhseEdit();
+        LibraryLowerPermissions.AddAccountPayables();
+        LibraryLowerPermissions.AddO365ServiceMgtEdit();
         // [WHEN] Post service invoice
         ServInvHeader.Get(PostServiceInvoice());
         // [THEN] "No. Printed" is 0 for the posted service invoice
@@ -885,6 +899,10 @@ codeunit 139515 "Digital Vouchers Tests"
         InitializeReportSelectionServiceCrMemo();
         // [GIVEN] Digital voucher entry setup for sales document is "Attachment", "Generate Automatically" is enabled
         InitSetupGenerateAutomatically("Digital Voucher Entry Type"::"Sales Document", "Digital Voucher Check Type"::Attachment);
+        LibraryLowerPermissions.SetO365Setup();
+        LibraryLowerPermissions.AddO365WhseEdit();
+        LibraryLowerPermissions.AddAccountPayables();
+        LibraryLowerPermissions.AddO365ServiceMgtEdit();
         // [WHEN] Post service credit memo
         ServCrMemoHeader.Get(PostServiceCrMemo());
         // [THEN] "No. Printed" is 0 for the posted service credit memo
