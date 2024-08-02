@@ -228,6 +228,7 @@ table 287 "Customer Bank Account"
         field(27000; "Bank Code"; Code[3])
         {
             Caption = 'Bank Code';
+            Numeric = true;
         }
     }
 
