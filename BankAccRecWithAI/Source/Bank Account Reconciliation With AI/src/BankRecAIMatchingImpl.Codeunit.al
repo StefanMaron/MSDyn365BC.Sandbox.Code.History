@@ -14,12 +14,12 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
     InherentPermissions = X;
     InherentEntitlements = X;
 
-    [NonDebuggable]
-    procedure BuildBankRecCompletionTask(IncludeFewShotExample: Boolean): Text
+    procedure BuildBankRecCompletionTask(IncludeFewShotExample: Boolean): SecretText
     var
-        CompletionTaskTxt: Text;
-        CompletionTaskPartTxt: Text;
+        CompletionTaskTxt: SecretText;
+        CompletionTaskPartTxt: SecretText;
         CompletionTaskBuildingFromKeyVaultFailed: Boolean;
+        ConcatSubstrTok: Label '%1%2', Locked = true;
     begin
         if GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAIMatching1') then
             CompletionTaskTxt := CompletionTaskPartTxt
@@ -27,27 +27,27 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
         if GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAIMatching2') then
-            CompletionTaskTxt += CompletionTaskPartTxt
+            CompletionTaskTxt := SecretStrSubstNo(ConcatSubstrTok, CompletionTaskTxt, CompletionTaskPartTxt)
         else
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
         if GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAIMatching3') then
-            CompletionTaskTxt += CompletionTaskPartTxt
+            CompletionTaskTxt := SecretStrSubstNo(ConcatSubstrTok, CompletionTaskTxt, CompletionTaskPartTxt)
         else
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
         if GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAIMatching4') then
-            CompletionTaskTxt += CompletionTaskPartTxt
+            CompletionTaskTxt := SecretStrSubstNo(ConcatSubstrTok, CompletionTaskTxt, CompletionTaskPartTxt)
         else
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
         if GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAIMatching5') then
-            CompletionTaskTxt += CompletionTaskPartTxt
+            CompletionTaskTxt := SecretStrSubstNo(ConcatSubstrTok, CompletionTaskTxt, CompletionTaskPartTxt)
         else
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
         if GetAzureKeyVaultSecret(CompletionTaskPartTxt, 'BankAccRecAIMatching6') then
-            CompletionTaskTxt += CompletionTaskPartTxt
+            CompletionTaskTxt := SecretStrSubstNo(ConcatSubstrTok, CompletionTaskTxt, CompletionTaskPartTxt)
         else
             CompletionTaskBuildingFromKeyVaultFailed := true;
 
@@ -57,39 +57,51 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         end;
 
         if (IncludeFewShotExample) then begin
-            CompletionTaskTxt += '\n**Example 1**:\n';
-            CompletionTaskTxt += 'Statement Line: Id: 1, Description: A, Amount: 100, Date: 2023-07-01\n';
-            CompletionTaskTxt += 'Ledger Entry: Id: 11, DocumentNo: 111, Description: A, Amount: 100, Date: 2023-07-01\n';
-            CompletionTaskTxt += 'Matches: (1, [11])\n';
-            CompletionTaskTxt += '\n**Example 2**:\n';
-            CompletionTaskTxt += 'Statement Line: Id: 2, Description: B, Amount: 200, Date: 2023-07-02\n';
-            CompletionTaskTxt += 'Ledger Entry: Id: 22, DocumentNo: 222, Description: B, Amount: 100, Date: 2023-07-02\n';
-            CompletionTaskTxt += 'Ledger Entry: Id: 23, DocumentNo: 223, Description: B, Amount: 100, Date: 2023-07-02\n';
-            CompletionTaskTxt += 'Matches: (2, [22, 23])\n\n';
-            CompletionTaskTxt += '\n**Example 3**:\n';
-            CompletionTaskTxt += 'Statement Line: Id: 3, Description: C, Amount: 237, Date: 2023-07-02\n';
-            CompletionTaskTxt += 'Ledger Entry: Id: 32, DocumentNo: 322, Description: D, Amount: 205, Date: 2023-07-02\n';
-            CompletionTaskTxt += 'Ledger Entry: Id: 33, DocumentNo: 323, Description: E, Amount: 237, Date: 2023-07-02\n';
-            CompletionTaskTxt += 'Matches: (3, [33])\n\n';
-            CompletionTaskTxt += '\n**Example 4**:\n';
-            CompletionTaskTxt += 'Statement Line: Id: 4, Description: F, Amount: 248, Date: 2023-07-02\n';
-            CompletionTaskTxt += 'Ledger Entry: Id: 42, DocumentNo: 422, Description: G, Amount: 248, Date: 2023-07-02\n';
-            CompletionTaskTxt += 'Ledger Entry: Id: 43, DocumentNo: 423, Description: H, Amount: 248, Date: 2023-07-03\n';
-            CompletionTaskTxt += '\n**Example 5**:\n';
-            CompletionTaskTxt += 'Statement Line: Id: 5, Description: I 522, Amount: 248, Date: 2023-07-02\n';
-            CompletionTaskTxt += 'Statement Line: Id: 6, Description: I 522, Amount: 100, Date: 2023-07-05\n';
-            CompletionTaskTxt += 'Ledger Entry: Id: 52, DocumentNo: 522, Description: J, Amount: 348, Date: 2023-07-02\n';
-            CompletionTaskTxt += 'Matches: (5, [52]), (6, [52])\n\n';
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, '\n**Example 1**:\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Statement Line: Id: 1, Description: A, Amount: 100, Date: 2023-07-01\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 11, DocumentNo: 111, Description: A, Amount: 100, Date: 2023-07-01\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Matches: (1, [11])\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, '\n**Example 2**:\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Statement Line: Id: 2, Description: B, Amount: 200, Date: 2023-07-02\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 22, DocumentNo: 222, Description: B, Amount: 100, Date: 2023-07-02\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 23, DocumentNo: 223, Description: B, Amount: 100, Date: 2023-07-02\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Matches: (2, [22, 23])\n\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, '\n**Example 3**:\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Statement Line: Id: 3, Description: C, Amount: 237, Date: 2023-07-02\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 32, DocumentNo: 322, Description: D, Amount: 205, Date: 2023-07-02\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 33, DocumentNo: 323, Description: E, Amount: 237, Date: 2023-07-02\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Matches: (3, [33])\n\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, '\n**Example 4**:\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Statement Line: Id: 4, Description: F, Amount: 248, Date: 2023-07-02\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 42, DocumentNo: 422, Description: G, Amount: 248, Date: 2023-07-02\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 43, DocumentNo: 423, Description: H, Amount: 248, Date: 2023-07-03\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, '\n**Example 5**:\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Statement Line: Id: 5, Description: I 522, Amount: 248, Date: 2023-07-02\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Statement Line: Id: 6, Description: I 522, Amount: 100, Date: 2023-07-05\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 52, DocumentNo: 522, Description: J, Amount: 348, Date: 2023-07-02\n');
+            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Matches: (5, [52]), (6, [52])\n\n');
         end;
-        CompletionTaskTxt += '\n\n';
+        CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, '\n\n');
         exit(CompletionTaskTxt);
     end;
 
-    procedure BuildBankRecCompletionPrompt(taskPrompt: Text; StatementLines: Text; LedgerLines: Text): Text
+    local procedure AddCompletionPromptLine(Completion: SecretText; NewPromptLine: Text): SecretText
+    var
+        ConcatSubstrTok: Label '%1%2', Locked = true;
+    begin
+        exit(SecretStrSubstNo(ConcatSubstrTok, Completion, NewPromptLine));
+    end;
+
+    procedure BuildBankRecCompletionPrompt(TaskPrompt: SecretText; StatementLines: Text; LedgerLines: Text): SecretText
+    var
+        CompletionPrompt: SecretText;
+        ConcatSubstrTok: Label '%1%2', Locked = true;
     begin
         LedgerLines += '"""\n**Matches**:'; // close the ledger lines section
         StatementLines += '"""\n'; // close the statement lines section
-        exit(taskPrompt + StatementLines + LedgerLines);
+        CompletionPrompt := SecretStrSubstNo(ConcatSubstrTok, TaskPrompt, StatementLines);
+        CompletionPrompt := SecretStrSubstNo(ConcatSubstrTok, CompletionPrompt, LedgerLines);
+        exit(CompletionPrompt);
     end;
 
     procedure BuildBankRecLedgerEntries(var LedgerLines: Text; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var CandidateLedgerEntryNos: List of [Integer]): Text
@@ -140,14 +152,15 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         until (BankAccReconciliationLine.Next() = 0);
     end;
 
-    procedure ApproximateTokenCount(TextInput: Text): Decimal
+    [NonDebuggable]
+    procedure ApproximateTokenCount(TextInput: SecretText): Decimal
     var
         AverageWordsPerToken: Decimal;
         TokenCount: Integer;
         WordsInInput: Integer;
     begin
         AverageWordsPerToken := 0.6; // Based on OpenAI estimate
-        WordsInInput := TextInput.Split(' ', ',', '.', '!', '?', ';', ':', '/n').Count;
+        WordsInInput := TextInput.Unwrap().Split(' ', ',', '.', '!', '?', ';', ':', '/n').Count;
         TokenCount := Round(WordsInInput / AverageWordsPerToken, 1);
         exit(TokenCount);
     end;
@@ -191,15 +204,14 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         exit(4000);
     end;
 
-    [NonDebuggable]
-    internal procedure GetAzureKeyVaultSecret(var SecretValue: Text; SecretName: Text): Boolean;
+    internal procedure GetAzureKeyVaultSecret(var SecretValue: SecretText; SecretName: Text): Boolean;
     var
         AzureKeyVault: Codeunit "Azure Key Vault";
     begin
         if not AzureKeyVault.GetAzureKeyVaultSecret(SecretName, SecretValue) then
             exit(false);
 
-        if SecretValue = '' then
+        if SecretValue.IsEmpty() then
             exit(false);
 
         exit(true);
@@ -263,7 +275,8 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         exit(TopBankLedgerEntriesFilterTxt);
     end;
 
-    procedure CreateCompletionAndMatch(CompletionPromptTxt: Text; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; DaysTolerance: Integer): Integer
+    [NonDebuggable]
+    procedure CreateCompletionAndMatch(CompletionPromptTxt: SecretText; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; DaysTolerance: Integer): Integer
     var
         AzureOpenAI: Codeunit "Azure OpenAi";
         AOAIDeployments: Codeunit "AOAI Deployments";
@@ -272,7 +285,9 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         AOAIChatMessages: Codeunit "AOAI Chat Messages";
         CompletionAnswerTxt: Text;
         NumberOfFoundMatches: Integer;
+        NewLineChar: Char;
     begin
+        NewLineChar := 10;
         NumberOfFoundMatches := 0;
 
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"Bank Account Reconciliation") then
@@ -283,7 +298,7 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Bank Account Reconciliation");
         AOAIChatCompletionParams.SetMaxTokens(MaxTokens());
         AOAIChatCompletionParams.SetTemperature(0);
-        AOAIChatMessages.AddSystemMessage(CompletionPromptTxt);
+        AOAIChatMessages.AddSystemMessage(CompletionPromptTxt.Unwrap().Replace('\n', NewLineChar));
         AzureOpenAI.GenerateChatCompletion(AOAIChatMessages, AOAIChatCompletionParams, AOAIOperationResponse);
         if AOAIOperationResponse.IsSuccess() then
             CompletionAnswerTxt := AOAIOperationResponse.GetResult()
@@ -363,12 +378,11 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         TopLedgerEntries: array[5] of Record "Ledger Entry Matching Buffer";
         LocalBankAccountLedgerEntry: Record "Bank Account Ledger Entry";
         FeatureTelemetry: Codeunit "Feature Telemetry";
-        CompletionTaskTxt: Text;
-        CompletionPromptTxt: Text;
+        CompletionTaskTxt: SecretText;
+        CompletionPromptTxt: SecretText;
         BankRecLedgerEntriesTxt: Text;
         BankRecStatementLinesTxt: Text;
         TopBankLedgerEntriesFilterTxt: Text;
-        NewLineChar: Char;
         i, j, CompletePromptTokenCount, TaskPromptTokenCount : Integer;
         SimilarityScore: Decimal;
         TopSimilarityScore: array[5] of Decimal;
@@ -377,7 +391,6 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         EntryAddedToTop5: Boolean;
         CandidateLedgerEntryNos: List of [Integer];
     begin
-        NewLineChar := 10;
         TempBankAccLedgerEntryMatchingBuffer.RESET();
         TempBankStatementMatchingBuffer.RESET();
         BankAccReconciliationLine.SetFilter(Difference, '<>0');
@@ -457,7 +470,6 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
                 if (CompletePromptTokenCount >= PromptSizeThreshold()) then begin
                     Session.LogMessage('0000LFK', TelemetryApproximateTokenCountExceedsLimitTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
                     CompletionPromptTxt := BuildBankRecCompletionPrompt(CompletionTaskTxt, BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
-                    CompletionPromptTxt := CompletionPromptTxt.Replace('\n', NewLineChar);
                     CreateCompletionAndMatch(CompletionPromptTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
                     BankRecStatementLinesTxt := '';
                     BankRecLedgerEntriesTxt := '';
@@ -468,7 +480,6 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
             // If BankRecStatementLinesTxt and BankRecLedgerEntriesTxt are not empty, then we need to generate a prompt for the remaining records
             if (BankRecStatementLinesTxt <> '') and (BankRecLedgerEntriesTxt <> '') then begin
                 CompletionPromptTxt := BuildBankRecCompletionPrompt(CompletionTaskTxt, BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
-                CompletionPromptTxt := CompletionPromptTxt.Replace('\n', NewLineChar);
                 CreateCompletionAndMatch(CompletionPromptTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
             end;
 
