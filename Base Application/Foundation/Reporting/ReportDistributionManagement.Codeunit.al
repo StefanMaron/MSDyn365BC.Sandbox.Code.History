@@ -331,8 +331,6 @@ codeunit 452 "Report Distribution Management"
                     Job := DocumentVariant;
                     Customer.Get(Job."Bill-to Customer No.");
                 end;
-            else
-                OnGetBillToCustomerOnUnhandledTableNo(DocumentRecordRef, Customer);
         end;
 
         OnAfterGetBillToCustomer(Customer, DocumentVariant);
@@ -585,11 +583,6 @@ codeunit 452 "Report Distribution Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnVANDocumentReportOnBeforeRunDeliveryCodeunit(var RecordExportBuffer: Record "Record Export Buffer")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetBillToCustomerOnUnhandledTableNo(DocumentRecordRef: RecordRef; var Customer: Record Customer)
     begin
     end;
 }
