@@ -50,7 +50,6 @@ codeunit 231 "Gen. Jnl.-Post"
         HideDialog: Boolean;
         PrintWHT: Boolean;
         IsHandled: Boolean;
-        ShouldExit: Boolean;
     begin
         HideDialog := false;
         OnBeforeCode(GenJnlLine, HideDialog);
@@ -69,11 +68,7 @@ codeunit 231 "Gen. Jnl.-Post"
         OnCodeOnAfterCheckTemplate(GenJnlLine);
 
         IsHandled := false;
-        ShouldExit := false;
-        OnCodeOnBeforeConfirmPostJournalLinesResponse(GenJnlLine, IsHandled, ShouldExit);
-        if ShouldExit then
-            exit;
-
+        OnCodeOnBeforeConfirmPostJournalLinesResponse(GenJnlLine, IsHandled);
         if not IsHandled then
             if not (PreviewMode or HideDialog) then
                 if not ConfirmManagement.GetResponseOrDefault(Text001, true) then
@@ -90,8 +85,6 @@ codeunit 231 "Gen. Jnl.-Post"
         if not HideDialog then
             if not GenJnlPostBatch.ConfirmPostingUnvoidableChecks(GenJnlLine."Journal Batch Name", GenJnlLine."Journal Template Name") then
                 exit;
-
-        OnCodeOnAfterConfirmPostingUnvoidableChecks(GenJnlLine);
 
         TempJnlBatchName := GenJnlLine."Journal Batch Name";
 
@@ -210,17 +203,12 @@ codeunit 231 "Gen. Jnl.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforeConfirmPostJournalLinesResponse(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean; var ShouldExit: Boolean)
+    local procedure OnCodeOnBeforeConfirmPostJournalLinesResponse(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterOnRun(var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCodeOnAfterConfirmPostingUnvoidableChecks(var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 }
