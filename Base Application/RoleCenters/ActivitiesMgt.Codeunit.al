@@ -329,7 +329,6 @@ codeunit 1311 "Activities Mgt."
     begin
         if not SetGLAccountsFilterForARAccounts(GLAccount) then
             Page.Run(Page::"General Ledger Setup");
-        GLAccount.SetFilter("Business Unit Filter", ' = %1', '');
         PAGE.Run(PAGE::"Chart of Accounts", GLAccount);
     end;
 
