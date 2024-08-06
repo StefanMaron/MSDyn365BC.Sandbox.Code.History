@@ -1896,18 +1896,14 @@ table 5050 Contact
     local procedure CreateLink(CreateForm: Integer; BusRelCode: Code[10]; "Table": Enum "Contact Business Relation Link To Table")
     var
         TempContBusRel: Record "Contact Business Relation" temporary;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCreateLink(Rec, TempContBusRel, CreateForm, BusRelCode, Table, IsHandled);
-        if not IsHandled then begin
-            TempContBusRel."Contact No." := "No.";
-            TempContBusRel."Business Relation Code" := BusRelCode;
-            TempContBusRel."Link to Table" := Table;
-            TempContBusRel.Insert();
-            if PAGE.RunModal(CreateForm, TempContBusRel) = ACTION::LookupOK then; // enforce look up mode dialog
-            TempContBusRel.DeleteAll();
-        end;
+        OnBeforeCreateLink(Rec, TempContBusRel, CreateForm, BusRelCode, Table);
+        TempContBusRel."Contact No." := "No.";
+        TempContBusRel."Business Relation Code" := BusRelCode;
+        TempContBusRel."Link to Table" := Table;
+        TempContBusRel.Insert();
+        if PAGE.RunModal(CreateForm, TempContBusRel) = ACTION::LookupOK then; // enforce look up mode dialog
+        TempContBusRel.DeleteAll();
         OnAfterCreateLink(Rec, xRec, CreateForm);
     end;
 
@@ -2317,13 +2313,8 @@ table 5050 Contact
         OppEntry: Record "Opportunity Entry";
         SalesHeader: Record "Sales Header";
         Task: Record "To-do";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateCompanyNo(Rec, xRec, IsHandled);
-        if IsHandled then
-            exit;
-
+        OnBeforeUpdateCompanyNo(Rec, xRec);
         if Cont.Get("No.") then begin
             if xRec."Company No." <> '' then begin
                 Opp.SetCurrentKey("Contact Company No.", "Contact No.");
@@ -3400,7 +3391,7 @@ table 5050 Contact
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateLink(var Contact: Record Contact; var TempContBusRel: Record "Contact Business Relation"; var CreateForm: Integer; var BusRelCode: Code[10]; var Table: Enum "Contact Business Relation Link To Table"; var IsHandled: Boolean)
+    local procedure OnBeforeCreateLink(var Contact: Record Contact; var TempContBusRel: Record "Contact Business Relation"; var CreateForm: Integer; var BusRelCode: Code[10]; var Table: Enum "Contact Business Relation Link To Table")
     begin
     end;
 
@@ -3720,7 +3711,7 @@ table 5050 Contact
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateCompanyNo(var Contact: Record Contact; xContact: Record Contact; var IsHandled: Boolean)
+    local procedure OnBeforeUpdateCompanyNo(var Contact: Record Contact; xContact: Record Contact)
     begin
     end;
 
