@@ -445,9 +445,6 @@ codeunit 90 "Purch.-Post"
         ItemChargeZeroAmountErr: Label 'The amount for item charge %1 cannot be 0.', Comment = '%1 = Item Charge No.';
         ConfirmUsageWithBlankLineTypeQst: Label 'Usage will not be linked to the project planning line because the Line Type field is empty.\\Do you want to continue?';
         ConfirmUsageWithBlankJobPlanningLineNoQst: Label 'Usage will not be linked to the project planning line because the Project Planning Line No field is empty.\\Do you want to continue?';
-#if not CLEAN25        
-        TotalToDeferErr: Label 'The sum of the deferred amounts must be equal to the amount in the Amount to Defer field.';
-#endif        
 
     local procedure GetZeroPurchLineRecID(PurchHeader: Record "Purchase Header"; var PurchLineRecID: RecordId)
     var
@@ -3508,7 +3505,7 @@ codeunit 90 "Purch.-Post"
         xPurchLine := PurchaseLine;
         PurchLineACY := PurchaseLine;
         IsHandled := false;
-        OnRoundAmountOnBeforeCalculateLCYAmounts(xPurchLine, PurchLineACY, PurchaseHeader, IsHandled, TotalPurchLine, TotalPurchLineLCY, PurchaseLine);
+        OnRoundAmountOnBeforeCalculateLCYAmounts(xPurchLine, PurchLineACY, PurchaseHeader, IsHandled);
         if not IsHandled then
             if PurchaseHeader."Currency Code" <> '' then
                 RoundAmountInCurrency(PurchaseHeader, PurchaseLine);
@@ -3934,7 +3931,7 @@ codeunit 90 "Purch.-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), IsHandled, PurchaseHeader, GenJnlLineDocNo, PreviewMode);
+        OnBeforeUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), IsHandled, PurchaseHeader);
         if IsHandled then
             exit;
 
@@ -3953,7 +3950,7 @@ codeunit 90 "Purch.-Post"
                 end;
         end;
 
-        OnAfterUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), GenJnlLineDocNo, PreviewMode, PurchaseHeader);
+        OnAfterUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), GenJnlLineDocNo, PreviewMode);
     end;
 
 #if not CLEAN23
@@ -7484,7 +7481,6 @@ codeunit 90 "Purch.-Post"
     local procedure FillDeferralPostingBuffer(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; InvoicePostBuffer: Record "Invoice Post. Buffer"; RemainAmtToDefer: Decimal; RemainAmtToDeferACY: Decimal; DeferralAccount: Code[20]; PurchAccount: Code[20])
     var
         DeferralTemplate: Record "Deferral Template";
-        IsDeferralAmountCheck: boolean;
     begin
         if PurchLine."Deferral Code" <> '' then begin
             DeferralTemplate.Get(PurchLine."Deferral Code");
@@ -7496,7 +7492,6 @@ codeunit 90 "Purch.-Post"
                     DeferralUtilities.FilterDeferralLines(
                       TempDeferralLine, "Deferral Document Type"::Purchase.AsInteger(), '', '',
                       PurchLine."Document Type".AsInteger(), PurchLine."Document No.", PurchLine."Line No.");
-
                     // Remainder\Initial deferral pair
                     DeferralPostBuffer.PreparePurch(PurchLine, GenJnlLineDocNo);
                     DeferralPostBuffer."Posting Date" := PurchHeader."Posting Date";
@@ -7516,12 +7511,6 @@ codeunit 90 "Purch.-Post"
                     if TempDeferralLine.FindSet() then
                         repeat
                             if (TempDeferralLine."Amount (LCY)" <> 0) or (TempDeferralLine.Amount <> 0) then begin
-
-                                if not IsDeferralAmountCheck then begin
-                                    CheckDeferralAmount(TempDeferralLine);
-                                    IsDeferralAmountCheck := true;
-                                end;
-
                                 DeferralPostBuffer.PreparePurch(PurchLine, GenJnlLineDocNo);
                                 DeferralPostBuffer.InitFromDeferralLine(TempDeferralLine);
                                 if PurchLine.IsCreditDocType() then
@@ -7842,8 +7831,7 @@ codeunit 90 "Purch.-Post"
                                 TempInvoicePostBufferReverseCharge := TempInvoicePostBuffer;
                                 if TempInvoicePostBufferReverseCharge.Find() then begin
                                     VATAmountRemainder += VATAmount;
-                                    if VATBaseAmount <> 0 then
-                                        TempInvoicePostBuffer."VAT Amount" := Round(VATAmountRemainder, CurrencyDocument."Amount Rounding Precision");
+                                    TempInvoicePostBuffer."VAT Amount" := Round(VATAmountRemainder, CurrencyDocument."Amount Rounding Precision");
                                     VATAmountRemainder -= TempInvoicePostBuffer."VAT Amount";
 
                                     if PurchHeader."Currency Code" <> '' then
@@ -7852,8 +7840,7 @@ codeunit 90 "Purch.-Post"
                                                 PurchHeader.GetUseDate(), PurchHeader."Currency Code", TempInvoicePostBuffer."VAT Amount", PurchHeader."Currency Factor"));
 
                                     VATAmountACYRemainder += VATAmountACY;
-                                    if VATBaseAmountACY <> 0 then
-                                        TempInvoicePostBuffer."VAT Amount (ACY)" := Round(VATAmountACYRemainder, Currency."Amount Rounding Precision");
+                                    TempInvoicePostBuffer."VAT Amount (ACY)" := Round(VATAmountACYRemainder, Currency."Amount Rounding Precision");
                                     VATAmountACYRemainder -= TempInvoicePostBuffer."VAT Amount (ACY)";
 
                                     TempInvoicePostBuffer."VAT Base Amount" := Round(TempInvoicePostBuffer."VAT Base Amount" * (1 - PurchHeader."VAT Base Discount %" / 100));
@@ -9069,27 +9056,6 @@ codeunit 90 "Purch.-Post"
             NoSeries.TestField("Default Nos.", true);
     end;
 
-#if not CLEAN25 
-    local procedure CheckDeferralAmount(DeferralLine: Record "Deferral Line")
-    var
-        DeferralHeader: Record "Deferral Header";
-    begin
-        if not DeferralHeader.Get(
-            DeferralLine."Deferral Doc. Type",
-            DeferralLine."Gen. Jnl. Template Name",
-            DeferralLine."Gen. Jnl. Batch Name",
-            DeferralLine."Document Type",
-            DeferralLine."Document No.",
-            DeferralLine."Line No.")
-        then
-            exit;
-
-        DeferralHeader.CalcFields("Schedule Line Total");
-        if DeferralHeader."Schedule Line Total" <> DeferralHeader."Amount to Defer" then
-            Error(TotalToDeferErr);
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnArchiveSalesOrdersOnBeforeSalesOrderLineModify(var SalesOrderLine: Record "Sales Line"; var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary)
     begin
@@ -9544,7 +9510,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Integer; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean; var PurchaseHeader: Record "Purchase Header")
+    local procedure OnAfterUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Integer; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean)
     begin
     end;
 
@@ -10205,7 +10171,7 @@ codeunit 90 "Purch.-Post"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Option; var IsHandled: Boolean; var PurchaseHeader: Record "Purchase Header"; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean)
+    local procedure OnBeforeUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Option; var IsHandled: Boolean; var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 
@@ -10940,7 +10906,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRoundAmountOnBeforeCalculateLCYAmounts(var xPurchLine: Record "Purchase Line"; var PurchLineACY: Record "Purchase Line"; PurchHeader: Record "Purchase Header"; var IsHandled: Boolean; TotalPurchaseLine: Record "Purchase Line"; TotalPurchaseLineLCY: Record "Purchase Line"; var PurchaseLine: Record "Purchase Line")
+    local procedure OnRoundAmountOnBeforeCalculateLCYAmounts(var xPurchLine: Record "Purchase Line"; var PurchLineACY: Record "Purchase Line"; PurchHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 
