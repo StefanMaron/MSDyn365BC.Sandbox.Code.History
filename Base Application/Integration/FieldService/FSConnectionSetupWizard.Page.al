@@ -2,7 +2,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-#if not CLEAN25
 namespace Microsoft.Integration.FieldService;
 
 using Microsoft.Integration.Dataverse;
@@ -18,9 +17,6 @@ page 6421 "FS Connection Setup Wizard"
     PageType = NavigatePage;
     SourceTable = "FS Connection Setup";
     SourceTableTemporary = true;
-    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '25.0';
 
     layout
     {
@@ -507,4 +503,4 @@ page 6421 "FS Connection Setup Wizard"
         Rec.Validate("Proxy Version", CRMIntegrationManagement.GetLastProxyVersionItem());
     end;
 }
-#endif
+
