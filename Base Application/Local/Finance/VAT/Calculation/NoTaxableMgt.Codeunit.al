@@ -53,7 +53,6 @@ codeunit 10740 "No Taxable Mgt."
         VATSetupPageNotificationTxt: Label 'Incorrect VAT Posting Setup on the page.';
         VATSetupRoleCenterNotificationTxt: Label 'Incorrect VAT Posting Setup on the role center.';
 #endif
-        NonEURSetupErr: label 'You must set either local currency code or additional reporting currency in General Ledger Setup to EUR.';
 
     local procedure CreateNoTaxableEntriesPurchInvoice(GenJournalLine: Record "Gen. Journal Line"; TransactionNo: Integer): Boolean
     var
@@ -493,17 +492,16 @@ codeunit 10740 "No Taxable Mgt."
             GenBusPostGroup := GenBusPostGrFieldRef.Value();
             GenProdPostGroup := GenProdPostGrFieldRef.Value();
 
-            if VATPostingSetup.Get(VATBusPostGroup, VATProdPostGroup) then
-                if VATPostingSetup.IsNoTaxable() then begin
-                    if Format(LineType) = Format(DummyPurchInvLine.Type::"G/L Account") then
-                        NotIn347 := GLAccount.Get(LineNo) and GLAccount."Ignore in 347 Report";
-                    InsertNoTaxableEntry(
-                      NoTaxableEntry, NoTaxableEntry.Type::Purchase, Sign * LineAmount, VATPostingSetup."EU Service", NotIn347, 0, 0,
-                      VATPostingSetup."VAT Calculation Type", VATBusPostGroup, VATProdPostGroup,
-                      GenBusPostGroup, GenProdPostGroup, VATPostingSetup."Ignore In SII");
-                    UpdateAmountsInCurrency(NoTaxableEntry);
-                end;
-            until PostedLineRecRef.Next() = 0;
+            if VATPostingSetup.Get(VATBusPostGroup, VATProdPostGroup) and VATPostingSetup.IsNoTaxable() then begin
+                if Format(LineType) = Format(DummyPurchInvLine.Type::"G/L Account") then
+                    NotIn347 := GLAccount.Get(LineNo) and GLAccount."Ignore in 347 Report";
+                InsertNoTaxableEntry(
+                  NoTaxableEntry, NoTaxableEntry.Type::Purchase, Sign * LineAmount, VATPostingSetup."EU Service", NotIn347, 0, 0,
+                  VATPostingSetup."VAT Calculation Type", VATBusPostGroup, VATProdPostGroup,
+                  GenBusPostGroup, GenProdPostGroup, VATPostingSetup."Ignore In SII");
+                UpdateAmountsInCurrency(NoTaxableEntry);
+            end;
+        until PostedLineRecRef.Next() = 0;
     end;
 
     local procedure InsertNoTaxableEntriesFromSalesLines(var PostedLineRecRef: RecordRef; NoTaxableEntry: Record "No Taxable Entry"; Sign: Integer)
@@ -547,19 +545,18 @@ codeunit 10740 "No Taxable Mgt."
             GenBusPostGroup := GenBusPostGrFieldRef.Value();
             GenProdPostGroup := GenProdPostGrFieldRef.Value();
 
-            if VATPostingSetup.Get(VATBusPostGroup, VATProdPostGroup) then
-                if VATPostingSetup.IsNoTaxable() then begin
-                    if Format(LineType) = Format(DummySalesInvoiceLine.Type::"G/L Account") then
-                        NotIn347 := GLAccount.Get(LineNo) and GLAccount."Ignore in 347 Report";
-                    if VATProductPostingGroup.Get(VATPostingSetup."VAT Prod. Posting Group") then;
-                    InsertNoTaxableEntry(
-                      NoTaxableEntry, NoTaxableEntry.Type::Sale, Sign * LineAmount, VATPostingSetup."EU Service", NotIn347,
-                      VATPostingSetup."No Taxable Type", VATProductPostingGroup."Delivery Operation Code",
-                      VATPostingSetup."VAT Calculation Type", VATBusPostGroup, VATProdPostGroup,
-                      GenBusPostGroup, GenProdPostGroup, VATPostingSetup."Ignore In SII");
-                    UpdateAmountsInCurrency(NoTaxableEntry);
-                end;
-            until PostedLineRecRef.Next() = 0;
+            if VATPostingSetup.Get(VATBusPostGroup, VATProdPostGroup) and VATPostingSetup.IsNoTaxable() then begin
+                if Format(LineType) = Format(DummySalesInvoiceLine.Type::"G/L Account") then
+                    NotIn347 := GLAccount.Get(LineNo) and GLAccount."Ignore in 347 Report";
+                if VATProductPostingGroup.Get(VATPostingSetup."VAT Prod. Posting Group") then;
+                InsertNoTaxableEntry(
+                  NoTaxableEntry, NoTaxableEntry.Type::Sale, Sign * LineAmount, VATPostingSetup."EU Service", NotIn347,
+                  VATPostingSetup."No Taxable Type", VATProductPostingGroup."Delivery Operation Code",
+                  VATPostingSetup."VAT Calculation Type", VATBusPostGroup, VATProdPostGroup,
+                  GenBusPostGroup, GenProdPostGroup, VATPostingSetup."Ignore In SII");
+                UpdateAmountsInCurrency(NoTaxableEntry);
+            end;
+        until PostedLineRecRef.Next() = 0;
     end;
 
     local procedure InsertNoTaxableEntriesFromGenLedgEntry(NoTaxableEntry: Record "No Taxable Entry"; EntryAmount: Decimal; Sign: Integer)
@@ -652,51 +649,31 @@ codeunit 10740 "No Taxable Mgt."
     local procedure CalcNoTaxableAmountCustomer(var NoTaxableNormalAmountSales: array[3] of Decimal; var NormalAmount: Decimal; var EUServiceAmount: Decimal; var EU3PartyAmount: Decimal; CustomerNo: Code[20]; FromDate: Date; ToDate: Date; FilterString: Text; SplitByDelivery: Boolean)
     var
         NoTaxableEntry: Record "No Taxable Entry";
-        AmountInACY: Boolean;
     begin
         NoTaxableEntry.FilterNoTaxableEntriesForSourceWithVATReportingDate(
           "General Posting Type"::Sale.AsInteger(), CustomerNo, "Gen. Journal Document Type"::Invoice.AsInteger(),
           FromDate, ToDate, FilterString);
         if NoTaxableEntry.IsEmpty() then
             exit;
-       
-        AmountInACY := ReportAmountInACY();
 
         NoTaxableEntry.SetRange("EU Service", true);
-        if AmountInACY then begin
-            NoTaxableEntry.CalcSums("Amount (ACY)");
-            EUServiceAmount += NoTaxableEntry."Amount (ACY)"
-        end else begin
-            NoTaxableEntry.CalcSums("Amount (LCY)");
-            EUServiceAmount += NoTaxableEntry."Amount (LCY)"
-        end;
+        NoTaxableEntry.CalcSums(Amount);
+        EUServiceAmount += NoTaxableEntry.Amount;
 
         NoTaxableEntry.SetRange("EU Service", false);
         NoTaxableEntry.SetRange("EU 3-Party Trade", true);
-        if AmountInACY then begin
-            NoTaxableEntry.CalcSums("Amount (ACY)");
-            EU3PartyAmount += NoTaxableEntry."Amount (ACY)"
-        end else begin
-            NoTaxableEntry.CalcSums("Amount (LCY)");
-            EU3PartyAmount += NoTaxableEntry."Amount (LCY)"
-        end;
+        NoTaxableEntry.CalcSums(Amount);
+        EU3PartyAmount += NoTaxableEntry.Amount;
 
         NoTaxableEntry.SetRange("EU 3-Party Trade", false);
-        if not SplitByDelivery then
-            if AmountInACY then begin
-                NoTaxableEntry.CalcSums("Amount (ACY)");
-                NormalAmount += NoTaxableEntry."Amount (ACY)"
-            end else begin
-                NoTaxableEntry.CalcSums("Amount (LCY)");
-                NormalAmount += NoTaxableEntry."Amount (LCY)"
-            end
-        else begin
+        if not SplitByDelivery then begin
+            NoTaxableEntry.CalcSums(Amount);
+            NormalAmount += NoTaxableEntry.Amount;
+        end else begin
             if NoTaxableEntry.FindSet() then
                 repeat
-                    if AmountInACY then
-                        NoTaxableNormalAmountSales[MapDeliveryOperationCode(NoTaxableEntry."Delivery Operation Code")] += NoTaxableEntry."Amount (ACY)"
-                    else
-                        NoTaxableNormalAmountSales[MapDeliveryOperationCode(NoTaxableEntry."Delivery Operation Code")] += NoTaxableEntry."Amount (LCY)"
+                    NoTaxableNormalAmountSales[MapDeliveryOperationCode(NoTaxableEntry."Delivery Operation Code")] +=
+                      NoTaxableEntry.Amount;
                 until NoTaxableEntry.Next() = 0;
         end;
     end;
@@ -705,7 +682,6 @@ codeunit 10740 "No Taxable Mgt."
     procedure CalcNoTaxableAmountVendor(var NormalAmount: Decimal; var EUServiceAmount: Decimal; VendorNo: Code[20]; FromDate: Date; ToDate: Date; FilterString: Text[1024])
     var
         NoTaxableEntry: Record "No Taxable Entry";
-        AmountInACY: Boolean;
     begin
         NoTaxableEntry.FilterNoTaxableEntriesForSourceWithVATReportingDate(
           "General Posting Type"::Purchase.AsInteger(), VendorNo, "Gen. Journal Document Type"::Invoice.AsInteger(),
@@ -713,37 +689,13 @@ codeunit 10740 "No Taxable Mgt."
         if NoTaxableEntry.IsEmpty() then
             exit;
 
-        AmountInACY := ReportAmountInACY();
-
         NoTaxableEntry.SetRange("EU Service", false);
-        if AmountInACY then begin
-            NoTaxableEntry.CalcSums("Amount (ACY)");
-            NormalAmount += NoTaxableEntry."Amount (ACY)";
-        end else begin
-            NoTaxableEntry.CalcSums("Amount (LCY)");
-            NormalAmount += NoTaxableEntry."Amount (LCY)";
-        end;
+        NoTaxableEntry.CalcSums(Amount);
+        NormalAmount += NoTaxableEntry.Amount;
 
         NoTaxableEntry.SetRange("EU Service", true);
-        if AmountInACY then begin
-            NoTaxableEntry.CalcSums("Amount (ACY)");
-            EUServiceAmount += NoTaxableEntry."Amount (ACY)";
-        end else begin
-            NoTaxableEntry.CalcSums("Amount (LCY)");
-            EUServiceAmount += NoTaxableEntry."Amount (LCY)";
-        end;
-    end;
-
-    local procedure ReportAmountInACY(): Boolean
-    begin
-        GeneralLedgerSetup.Get();
-        if GeneralLedgerSetup."LCY Code" <> 'EUR' then
-            if GeneralLedgerSetup."Additional Reporting Currency" <> 'EUR' then
-                Error(NonEURSetupErr)
-            else
-                exit(true);
-
-        exit(false);
+        NoTaxableEntry.CalcSums(Amount);
+        EUServiceAmount += NoTaxableEntry.Amount;
     end;
 
     local procedure ConvertAmountFCYtoLCY(Amount: Decimal; PostingDate: Date; CurrencyCode: Code[10]; CurrencyFactor: Decimal): Decimal
