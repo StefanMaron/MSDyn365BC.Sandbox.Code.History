@@ -1787,7 +1787,7 @@ codeunit 136145 "Service Contracts II"
         Description := StrSubstNo(
             DescriptionLbl,
             CalcDate('<-CM>', ContractExpirationDate),
-            ContractExpirationDate);
+            CalcDate('<CM>', ContractExpirationDate));
 
         // [WHEN] Find last Service Invoice Line.
         FindlastServiceLine(ServiceContractHeader, ServiceHeader, ServiceLine);
