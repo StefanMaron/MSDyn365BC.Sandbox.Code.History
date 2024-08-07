@@ -212,7 +212,7 @@ page 402 "Sales Order Statistics"
                     Importance = Additional;
                     ToolTip = 'Specifies the difference between the original cost and the total adjusted cost of the items in the sales document.';
 
-                    trigger OnDrillDown()
+                    trigger OnLookup(var Text: Text): Boolean
                     begin
                         Rec.LookupAdjmtValueEntries(0);
                     end;
@@ -424,7 +424,7 @@ page 402 "Sales Order Statistics"
                     Importance = Additional;
                     ToolTip = 'Specifies the difference between the original cost and the total adjusted cost of the items in the sales document.';
 
-                    trigger OnDrillDown()
+                    trigger OnLookup(var Text: Text): Boolean
                     begin
                         Rec.LookupAdjmtValueEntries(1);
                     end;
@@ -448,15 +448,6 @@ page 402 "Sales Order Statistics"
                             RefreshOnAfterGetRecord();
                         end;
                     end;
-                }
-                field("Amount Excl. Prepayment"; TotalSalesLine[2]."Line Amount" - PrepmtTotalAmount)
-                {
-                    ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = Rec."Currency Code";
-                    AutoFormatType = 1;
-                    Caption = 'Amount Excl. Prepayment';
-                    Editable = false;
-                    ToolTip = 'Specifies the difference between Amount Excl. VAT and Prepayment Amount Excl. VAT.';
                 }
             }
             group(Shipping)
@@ -906,7 +897,6 @@ page 402 "Sales Order Statistics"
                 TotalAmount1[i] := TotalSalesLine[i].Amount;
                 TotalAmount2[i] := TotalSalesLine[i]."Amount Including VAT";
             end;
-            OnRefreshOnAfterGetRecordOnAfterSetTotalAmounts(TotalAmount1, TotalAmount2, TotalSalesLine);
         end;
 
         OnAfterCalculateTotalAmounts(TempSalesLine, TempVATAmountLine1);
@@ -957,20 +947,15 @@ page 402 "Sales Order Statistics"
     var
         CurrExchRate: Record "Currency Exchange Rate";
         UseDate: Date;
-        IsHandled: Boolean;
     begin
         TotalSalesLine[IndexNo]."Inv. Discount Amount" := VATAmountLine.GetTotalInvDiscAmount();
         TotalAmount1[IndexNo] := TotalSalesLine[IndexNo]."Line Amount" - TotalSalesLine[IndexNo]."Inv. Discount Amount";
-        OnUpdateHeaderInfoOnAfterSetTotalAmount(IndexNo, TotalAmount1, TotalSalesLine);
         VATAmount[IndexNo] := VATAmountLine.GetTotalVATAmount();
         if Rec."Prices Including VAT" then begin
             TotalAmount1[IndexNo] := VATAmountLine.GetTotalAmountInclVAT();
             TotalAmount2[IndexNo] := TotalAmount1[IndexNo] - VATAmount[IndexNo];
-            IsHandled := false;
-            OnUpdateHeaderInfoOnBeforeSetLineAmount(TotalSalesLine, TotalAmount1, IndexNo, IsHandled);
-            if not IsHandled then
-                TotalSalesLine[IndexNo]."Line Amount" :=
-                  TotalAmount1[IndexNo] + TotalSalesLine[IndexNo]."Inv. Discount Amount";
+            TotalSalesLine[IndexNo]."Line Amount" :=
+              TotalAmount1[IndexNo] + TotalSalesLine[IndexNo]."Inv. Discount Amount";
         end else
             TotalAmount2[IndexNo] := TotalAmount1[IndexNo] + VATAmount[IndexNo];
 
@@ -1249,21 +1234,6 @@ page 402 "Sales Order Statistics"
 
     [IntegrationEvent(true, false)]
     local procedure OnUpdateHeaderInfoOnBeforeSetAmount(IndexNo: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRefreshOnAfterGetRecordOnAfterSetTotalAmounts(var TotalAmount1: array[3] of Decimal; var TotalAmount2: array[3] of Decimal; var TotalSalesLine: array[3] of Record "sales line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateHeaderInfoOnAfterSetTotalAmount(IndexNo: Integer; var TotalAmount1: array[3] of Decimal; var TotalSalesLine: array[3] of Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateHeaderInfoOnBeforeSetLineAmount(var TotalSalesLine: array[3] of Record "Sales Line"; var TotalAmount1: array[3] of Decimal; IndexNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
