@@ -317,7 +317,6 @@ table 288 "Vendor Bank Account"
         VendorLedgerEntry.SetRange("Vendor No.", "Vendor No.");
         VendorLedgerEntry.SetRange("Recipient Bank Account", Code);
         VendorLedgerEntry.SetRange(Open, true);
-        OnDeleteOnAfterSetFilters(Rec, VendorLedgerEntry);
         if not VendorLedgerEntry.IsEmpty() then
             Error(BankAccDeleteErr);
         if Vendor.Get("Vendor No.") and (Vendor."Preferred Bank Account Code" = Code) then begin
@@ -329,12 +328,9 @@ table 288 "Vendor Bank Account"
     trigger OnModify()
     var
         Confirmed: Boolean;
-        SkipConfirm: Boolean;
     begin
         if IBAN = '' then begin
-            SkipConfirm := false;
-            OnModifyOnIBANIsEmpty(Rec, SkipConfirm);
-            if not GuiAllowed or SkipConfirm then
+            if not GuiAllowed then
                 Confirmed := true
             else
                 Confirmed := Confirm(StrSubstNo('%1%2', Text12100, Text12101), false);
@@ -448,16 +444,6 @@ table 288 "Vendor Bank Account"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidatePostCode(var VendorBankAccount: Record "Vendor Bank Account"; var PostCodeRec: Record "Post Code"; CurrentFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-    
-    [IntegrationEvent(false, false)]
-    local procedure OnDeleteOnAfterSetFilters(var VendorBankAccount: Record "Vendor Bank Account"; var VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnModifyOnIBANIsEmpty(var VendorBankAccount: Record "Vendor Bank Account"; var SkipConfirm: Boolean)
     begin
     end;
 }
