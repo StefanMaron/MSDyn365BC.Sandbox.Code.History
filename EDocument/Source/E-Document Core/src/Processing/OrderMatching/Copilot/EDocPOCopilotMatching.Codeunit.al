@@ -114,7 +114,7 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
         Session.LogMessage('0000MOT', AttempToUseCopilotMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
 
         // Generate OpenAI Completion
-        AzureOpenAI.SetAuthorization(Enum::"AOAI Model Type"::"Chat Completions", AOAIDeployments.GetGPT4Latest());
+        AzureOpenAI.SetAuthorization(Enum::"AOAI Model Type"::"Chat Completions", AOAIDeployments.GetGPT4Preview());
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"E-Document Matching Assistance");
 
         AOAIChatCompletionParams.SetMaxTokens(MaxTokens());
@@ -141,6 +141,16 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
     var
         AIMatchingImpl: Codeunit "E-Doc. PO Copilot Matching";
         AzureOpenAI: Codeunit "Azure OpenAI";
+    begin
+        AIMatchingImpl.RegisterAICapability();
+        if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"E-Document Matching Assistance", true) then
+            exit(false);
+
+        exit(true);
+    end;
+
+    procedure IsCopilotVisible(): Boolean
+    var
         EnvironmentInformation: Codeunit "Environment Information";
     begin
         if not EnvironmentInformation.IsSaaSInfrastructure() then
@@ -150,10 +160,6 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
             exit(false);
 
         if not IsSupportedLanguage() then
-            exit(false);
-
-        AIMatchingImpl.RegisterAICapability();
-        if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"E-Document Matching Assistance", true) then
             exit(false);
 
         exit(true);
