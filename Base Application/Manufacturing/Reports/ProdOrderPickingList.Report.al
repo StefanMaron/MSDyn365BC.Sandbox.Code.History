@@ -126,8 +126,6 @@ report 99000766 "Prod. Order - Picking List"
 
     trigger OnPreReport()
     begin
-        OnBeforeOnPreReport(Item);
-
         ItemFilter := Item.GetFilters();
         ComponentFilter := "Prod. Order Component".GetFilters();
     end;
@@ -141,10 +139,5 @@ report 99000766 "Prod. Order - Picking List"
         CurrReportPageNoCaptLbl: Label 'Page';
         ProdOrderDescCaptionLbl: Label 'Name';
         ProdOrderCompDueDateCaptLbl: Label 'Due Date';
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnPreReport(var Item: Record Item)
-    begin
-    end;
 }
 
