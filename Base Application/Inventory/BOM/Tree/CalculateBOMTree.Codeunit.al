@@ -297,7 +297,7 @@ codeunit 5870 "Calculate BOM Tree"
         ProdBOMLine.SetFilter("Starting Date", '%1|..%2', 0D, ParentBOMBuffer."Needed by Date");
         ProdBOMLine.SetFilter("Ending Date", '%1|%2..', 0D, ParentBOMBuffer."Needed by Date");
         IsHandled := false;
-        OnBeforeFilterByQuantityPer(ProdBOMLine, IsHandled, ParentBOMBuffer);
+        OnBeforeFilterByQuantityPer(ProdBOMLine, IsHandled);
         if not IsHandled then
             if TreeType = TreeType::Availability then
                 ProdBOMLine.SetFilter("Quantity per", '>%1', 0);
@@ -404,7 +404,7 @@ codeunit 5870 "Calculate BOM Tree"
                             OnGenerateProdCompSubTreeOnBeforeBOMBufferModify(BOMBuffer, ParentBOMBuffer, ParentItem);
                             BOMBuffer.Modify();
                         end;
-                        OnGenerateProdCompSubTreeOnAfterBOMBufferModify(BOMBuffer, RoutingLine, LotSize, ParentItem, ParentBOMBuffer, TreeType);
+                        OnGenerateProdCompSubTreeOnAfterBOMBufferModify(BOMBuffer, RoutingLine, LotSize, ParentItem, ParentBOMBuffer);
                     end;
                 until RoutingLine.Next() = 0;
                 FoundSubTree := true;
@@ -714,11 +714,9 @@ codeunit 5870 "Calculate BOM Tree"
             end;
             BOMBuffer.RoundCosts(1 / LotSize);
         end else
-            if IsProductionOrAssemblyItem(BOMBuffer."No.") then begin
+            if HasBomStructure(BOMBuffer."No.") then begin
                 BOMBuffer.CalcOvhdCost();
                 BOMBuffer.RoundCosts(1 / LotSize);
-                if not HasBomStructure(BOMBuffer."No.") then
-                    BOMBuffer.GetItemUnitCost();
             end else
                 if BOMBuffer.Type = BOMBuffer.Type::Item then begin
                     BOMBuffer.RoundCosts(1 / LotSize);
@@ -1000,16 +998,6 @@ codeunit 5870 "Calculate BOM Tree"
         end;
     end;
 
-    local procedure IsProductionOrAssemblyItem(ItemNo: Code[20]): Boolean
-    var
-        Item: Record Item;
-    begin
-        if not Item.Get(ItemNo) then
-            exit(false);
-
-        exit(Item.IsMfgItem() or Item.IsAssemblyItem());
-    end;
-
     procedure SetItemFilter(var Item: Record Item)
     begin
         ItemFilter.CopyFilters(Item);
@@ -1080,7 +1068,7 @@ codeunit 5870 "Calculate BOM Tree"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFilterByQuantityPer(var ProductionBOMLine: Record "Production BOM Line"; var IsHandled: Boolean; BOMBuffer: Record "BOM Buffer")
+    local procedure OnBeforeFilterByQuantityPer(var ProductionBOMLine: Record "Production BOM Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1157,7 +1145,7 @@ codeunit 5870 "Calculate BOM Tree"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGenerateProdCompSubTreeOnAfterBOMBufferModify(var BOMBuffer: Record "BOM Buffer"; RoutingLine: Record "Routing Line"; LotSize: Decimal; ParentItem: Record Item; ParentBOMBuffer: Record "BOM Buffer"; TreeType: Option)
+    local procedure OnGenerateProdCompSubTreeOnAfterBOMBufferModify(var BOMBuffer: Record "BOM Buffer"; RoutingLine: Record "Routing Line"; LotSize: Decimal; ParentItem: Record Item; ParentBOMBuffer: Record "BOM Buffer")
     begin
     end;
 
