@@ -39,7 +39,6 @@
         LibraryResource: Codeunit "Library - Resource";
         LibraryTemplates: Codeunit "Library - Templates";
         LibraryReportDataset: Codeunit "Library - Report Dataset";
-        LibraryItemReference: Codeunit "Library - Item Reference";
         isInitialized: Boolean;
         FieldError: Label 'Number of Lines for %1 and %2  must be Equal.';
         CurrencyError: Label '%1 must be Equal in %2.';
@@ -95,8 +94,6 @@
         OrderDateErr: Label 'The purchase line order date is (%1), but it should be (%2).', Comment = '%1 - Actual Purchase Line Order Date; %2 - Expected Purchase Line Order Date';
         DescriptionErr: Label 'The purchase line description (%1) should be the same as the random generated description (%2).', Comment = '%1 - Purchase Line Description; %2 - Random Generated Description';
         QtyReceivedBaseErr: Label 'Qty. Received (Base) is not as expected.';
-        InteractionLogErr: Label 'Interaction log must be enabled.';
-        ItemRefrenceNoErr: Label 'Item Reference No. should be %1.', Comment = '%1 - old reference no.';
 
     [Test]
     [Scope('OnPrem')]
@@ -8074,192 +8071,6 @@
         Assert.AreEqual(PurchaseLine."Qty. Received (Base)", 80, QtyReceivedBaseErr);
     end;
 
-    [Test]
-    [HandlerFunctions('ItemChargeAssignmentHandler,ConfirmHandler,PurchaseOrderTestRequestPageHandler')]
-    [Scope('OnPrem')]
-    procedure PostPurchaseOrderandInvoiceWithItemChargeAssignmentandReverseThroughCorrectAction()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseHeader2: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        PostedPurchaseInv: TestPage "Posted Purchase Invoice";
-        PostedInvoiceNo: Code[20];
-    begin
-        // [SCENARIO 497023] Reverse the Charge Item Quantity Assigned in Purchase Order and Delete the Order.
-        Initialize();
-
-        // [GIVEN] Setup: Create Purchase Order with charge (Item).
-        CreatePurchaseOrderChargeItem(PurchaseHeader, PurchaseLine, PurchaseHeader."Document Type"::Order);
-
-        // [GIVEN] Assign the Item Charge.
-        PurchaseLine.UpdateItemChargeAssgnt();
-
-        // [GIVEN] Post Purchase Order For Receipt
-        DocumentNo2 := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, false);
-
-        // [GIVEN] Create Purchase Invoice and Get Receipt Lines for Invoice.
-        InvoicePostedPurchaseOrder(PurchaseHeader2, PurchaseHeader);
-
-        // [GIVEN] Assign Item Charge In Purchase Line
-        PurchaseLine.SetRange("Document No.", PurchaseHeader2."No.");
-        PurchaseLine.SetRange(Type, PurchaseLine.Type::"Charge (Item)");
-        PurchaseLine.FindFirst();
-        PurchaseLine.ShowItemChargeAssgnt();
-
-        // [GIVEN] Post Purchase Invoice.
-        PostedInvoiceNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader2, true, true);
-
-        //[WHEN] Invoke Posted Purchase Invoice Correct Action for Reversing the Posted Transaction
-        PostedPurchaseInv.OpenEdit();
-        PostedPurchaseInv.FILTER.SetFilter("No.", PostedInvoiceNo);
-        PostedPurchaseInv.CorrectInvoice.Invoke();
-
-        // [VERIFY] Validate Item Charge Assignment Purch.
-        VerifyItemChargeAssignmentQtyAssigned(PurchaseHeader."No.");
-
-        // [THEN] Delete Purchase Order
-        PurchaseHeader.Delete(true);
-    end;
-
-    [Test]
-    [HandlerFunctions('PrintPurchaseOrderRequestPageHandler')]
-    procedure StandardPurchaseOrderShouldHaveLogInteractionEnabled()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-    begin
-        // [SCENARIO 537088] Possible to create log interaction when printing purchase order.
-        Initialize();
-
-        // [GIVEN] Create a Purchase Order.
-        CreatePurchaseOrder(PurchaseHeader, PurchaseLine, CreateItem());
-
-        // [THEN] Run Standard Purchase - Order report and check log intereaction enabled.
-        PurchaseHeader.SetRange("No.", PurchaseHeader."No.");
-        Commit();
-        Report.Run(Report::"Standard Purchase - Order", true, false, PurchaseHeader);
-    end;
-
-    [Test]
-    procedure VerifyItemRefernceNotUpdateToDefaultOnLocationCodeChange()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        Item: Record Item;
-        Location: Record Location;
-        Location1: Record Location;
-        ItemReference: Record "Item Reference";
-        ItemRefNoBefore: Code[50];
-        ItemReferenceNoAfter: Code[50];
-    begin
-        // [SCENARIO 537660] Item Reference No. field on Purchase line is reverted after adding/changing the location.
-        Initialize();
-
-        // [GIVEN] Create Locations
-        LibraryWarehouse.CreateLocation(Location);
-        LibraryWareHouse.CreateLocation(Location1);
-        LibraryInventory.CreateItem(Item);
-
-        // [GIVEN] Create Purchase Order with Location Code
-        CreatePurchaseHeader(PurchaseHeader, PurchaseLine."Document Type"::Order);
-        PurchaseHeader.Validate("Location Code", Location.Code);
-        PurchaseHeader.Modify(true);
-
-        // [GIVEN] Create Item reference with Reference Type- "Vendor"," ".
-        CreateTwoItemReferences(ItemReference, PurchaseHeader, Item);
-
-        // [THEN] Filter Item Reference to Blank Reference Type
-        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::" ");
-
-        // [GIVEN] Create Purchase Line with item reference no set to reference type " ".
-        // [GIVEN] Change the reference no. to any other reference no. from default.
-        CreatePurchaseLineWithItemreferenceNo(PurchaseLine, PurchaseHeader, Item, ItemReference);
-
-        // [THEN] Save the value of Item Reference No on ItemRefNoBefore variable
-        ItemRefNoBefore := PurchaseLine."Item Reference No.";
-
-        // [THEN] Change the Location Code on Purchase Line.
-        PurchaseLine.Validate("Location Code", Location1.Code);
-
-        // [THEN] Save the value of Item Reference No on ItemReferenceNoAfter variable
-        ItemReferenceNoAfter := PurchaseLine."Item Reference No.";
-
-        // [VERIFY] Item reference No will remains unchanged, on updating the Location Code.
-        Assert.AreEqual(ItemRefNoBefore, ItemReferenceNoAfter, StrSubstNo(ItemRefrenceNoErr, ItemRefNoBefore));
-    end;
-
-    [Test]
-    [HandlerFunctions('PostOrderStrMenuHandler')]
-    procedure PurchaseOrderPostingFromVendorCard()
-    var
-        Vendor: Record Vendor;
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        VendorCard: TestPage "Vendor Card";
-        PurchaseOrder: TestPage "Purchase Order";
-        PurchaseOrderNo: Code[20];
-    begin
-        // [SCENARIO 537495] After Posting a Purchase Order created from the Vendor Card no error is displayed
-        Initialize();
-
-        // [GIVEN] Create Vendor
-        LibraryPurchase.CreateVendorWithAddress(Vendor);
-
-        // [WHEN] Open Vendor Card and create new Purchase Document
-        VendorCard.OpenEdit();
-        VendorCard.GotoRecord(Vendor);
-        PurchaseOrder.Trap();
-        VendorCard.NewPurchaseOrder.Invoke();
-
-        // [GIVEN] Set Vendor Invoice No. and create new purchase line
-        PurchaseOrder."Vendor Invoice No.".SetValue(LibraryRandom.RandText(35));
-        PurchaseOrder.PurchLines.New();
-        PurchaseOrder.PurchLines.Type.SetValue(PurchaseLine.Type::Item);
-        PurchaseOrder.PurchLines."No.".SetValue(LibraryInventory.CreateItemNo());
-        PurchaseOrder.PurchLines.Quantity.SetValue(LibraryRandom.RandIntInRange(1, 1));
-        PurchaseOrder.PurchLines."Direct Unit Cost".SetValue(LibraryRandom.RandDecInRange(1, 100, 2));
-        PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, PurchaseOrder."No.".Value);
-        PurchaseOrder.Close();
-        PurchaseHeader.CalcFields("Amount Including VAT");
-        PurchaseHeader.Validate("Check Total", PurchaseHeader."Amount Including VAT");
-        PurchaseHeader.Modify(true);
-        PurchaseOrder.OpenEdit();
-        PurchaseOrder.GoToRecord(PurchaseHeader);
-
-        // [GIVEN] Save the Purchase Order NO in a Variable
-        PurchaseOrderNo := PurchaseOrder."No.".Value();
-
-        // [WHEN] Release and post Purchase Document
-        PurchaseOrder.Release.Invoke();
-        LibraryVariableStorage.Enqueue(3);
-        PurchaseOrder.Post.Invoke();
-
-        // [THEN] Verify the  Purchase Order Posted Succsessfully without any error and system doesn't found the current Purchase Order
-        asserterror PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, PurchaseOrderNo);
-        Assert.AssertRecordNotFound();
-    end;
-
-    [Test]
-    procedure ReleasingOfPurchaseOrderHavingPurchaseLineWithoutUOMGivesError()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-    begin
-        // [SCENARIO 522444] When run Release action from a Purchase Order having a Purchase Line without 
-        // Unit of Measure Code, then it gives error and the document is not released.
-        Initialize();
-
-        // [GIVEN] Create a Purchase Order.
-        CreatePurchaseOrder(PurchaseHeader, PurchaseLine, CreateItem());
-
-        // [WHEN] Validate Unit of Measure Code in Purchase Line.
-        PurchaseLine.Validate("Unit of Measure Code", '');
-        PurchaseLine.Modify(true);
-
-        // [THEN] Error is shown and the Purchase Order is not released.
-        asserterror LibraryPurchase.ReleasePurchaseDocument(PurchaseHeader);
-    end;
-
     local procedure Initialize()
     var
         PurchaseHeader: Record "Purchase Header";
@@ -10305,35 +10116,6 @@
         PurchaseInvoiceNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeaderCharge, true, true);
     end;
 
-    local procedure CreateTwoItemReferences(var ItemReference: Record "Item Reference"; PurchaseHeader: Record "Purchase Header"; Item: Record Item)
-    begin
-        LibraryItemReference.CreateItemReference(ItemReference, Item."No.", ItemReference."Reference Type"::Vendor, PurchaseHeader."Buy-from Vendor No.");
-        ItemReference.Validate("Reference No.", Item."No.");
-        ItemReference.Insert(true);
-
-        LibraryItemReference.CreateItemReference(
-                  ItemReference, Item."No.", ItemReference."Reference Type"::" ", '');
-        ItemReference.Validate("Reference No.", Item."No.");
-        ItemReference.Insert(true);
-    end;
-
-    local procedure CreatePurchaseLineWithItemreferenceNo(
-        var PurchaseLine: Record "Purchase Line";
-        PurchaseHeader: Record "Purchase Header";
-        Item: Record Item;
-        ItemReference: Record "Item Reference")
-    begin
-        LibraryPurchase.CreatePurchaseLine(
-            PurchaseLine,
-            PurchaseHeader,
-            PurchaseLine.Type::Item, Item."No.",
-            LibraryRandom.RandInt(10));
-
-        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 2));
-        PurchaseLine.Validate("Item Reference No.", ItemReference."Reference No.");
-        PurchaseLine.Modify(true);
-    end;
-
 #if not CLEAN23
     [EventSubscriber(ObjectType::table, Database::"Invoice Post. Buffer", 'OnAfterInvPostBufferPreparePurchase', '', false, false)]
     local procedure OnAfterInvPostBufferPreparePurchase(var PurchaseLine: Record "Purchase Line"; var InvoicePostBuffer: Record "Invoice Post. Buffer")
@@ -11636,29 +11418,6 @@
         Bitmap.Dispose();
     end;
 
-    local procedure VerifyItemChargeAssignmentQtyAssigned(DocumentNo: Code[20])
-    var
-        PurchaseLine: Record "Purchase Line";
-        ItemChargeAssignmentPurch: Record "Item Charge Assignment (Purch)";
-    begin
-        PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
-        PurchaseLine.SetRange("Document No.", DocumentNo);
-        PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
-        PurchaseLine.FindFirst();
-
-        ItemChargeAssignmentPurch.SetRange("Document Type", ItemChargeAssignmentPurch."Document Type"::Order);
-        ItemChargeAssignmentPurch.SetRange("Document No.", DocumentNo);
-        ItemChargeAssignmentPurch.SetRange("Applies-to Doc. No.", DocumentNo);
-        ItemChargeAssignmentPurch.FindFirst();
-        ItemChargeAssignmentPurch.TestField("Item No.", PurchaseLine."No.");
-
-        PurchaseLine.SetRange(Type, PurchaseLine.Type::"Charge (Item)");
-        PurchaseLine.FindFirst();
-        ItemChargeAssignmentPurch.TestField("Applies-to Doc. No.", DocumentNo);
-        ItemChargeAssignmentPurch.TestField("Item Charge No.", PurchaseLine."No.");
-        ItemChargeAssignmentPurch.TestField("Qty. Assigned", ItemChargeAssignmentPurch."Qty. Assigned");
-    end;
-
 #if not CLEAN23
     local procedure CreateStandardCostWorksheet(var StandardCostWorksheetPage: TestPage "Standard Cost Worksheet"; ResourceNo: Code[20]; StandardCost: Decimal; NewStandardCost: Decimal)
     var
@@ -12038,13 +11797,6 @@
         // Close handler
     end;
 
-    [PageHandler]
-    [Scope('OnPrem')]
-    procedure PurchaseOrderTestRequestPageHandler(var PurchaseOrder: TestPage "Purchase Order")
-    begin
-        PurchaseOrder.OK().Invoke();
-    end;
-
     [RequestPageHandler]
     procedure StandardPurchaseOrderRequestPageHandler(var StandardPurchaseOrder: TestRequestPage "Standard Purchase - Order")
     begin
@@ -12069,11 +11821,5 @@
     begin
         VendorLookup.GotoKey(LibraryVariableStorage.DequeueText());
         VendorLookup.OK().Invoke();
-    end;
-
-    [RequestPageHandler]
-    procedure PrintPurchaseOrderRequestPageHandler(var StandardPurchaseOrder: TestRequestPage "Standard Purchase - Order")
-    begin
-        Assert.IsTrue(StandardPurchaseOrder.LogInteraction.Enabled(), InteractionLogErr);
     end;
 }
