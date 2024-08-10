@@ -1094,13 +1094,11 @@ table 81 "Gen. Journal Line"
 
             trigger OnValidate()
             begin
-                if "Applies-to ID" <> xRec."Applies-to ID" then
-                    if ShouldClearCustVendApplnEntry() then
-                        ClearCustVendApplnEntry();
+                if ("Applies-to ID" <> xRec."Applies-to ID") and (xRec."Applies-to ID" <> '') and HasNoMultipleLine() then
+                    ClearCustVendApplnEntry();
                 SetJournalLineFieldsFromApplication();
             end;
         }
-
         field(50; "Business Unit Code"; Code[20])
         {
             Caption = 'Business Unit Code';
@@ -1497,6 +1495,9 @@ table 81 "Gen. Journal Line"
                    ("Bank Payment Type" <> "Bank Payment Type"::" ")
                 then
                     FieldError("Account Type");
+
+                if Rec."Bank Payment Type" <> xRec."Bank Payment Type" then
+                    Rec.DeletePaymentFileErrors();
             end;
         }
         field(71; "VAT Base Amount"; Decimal)
@@ -3361,9 +3362,6 @@ table 81 "Gen. Journal Line"
         {
             IncludedFields = Amount;
         }
-        key(key11; "Document No.", "Account No.", "Applies-to ID")
-        {
-        }
     }
 
     fieldgroups
@@ -3472,9 +3470,8 @@ table 81 "Gen. Journal Line"
         if not IsHandled then
             TestField("Check Printed", false);
 
-        if ("Applies-to ID" = '') then
-            if ShouldClearCustVendApplnEntry() then
-                ClearCustVendApplnEntry();
+        if ("Applies-to ID" = '') and (xRec."Applies-to ID" <> '') and HasNoMultipleLine() then
+            ClearCustVendApplnEntry();
     end;
 
     trigger OnRename()
@@ -3909,6 +3906,7 @@ table 81 "Gen. Journal Line"
         PrevDocNo: Code[20];
         FirstDocNo: Code[20];
         TempFirstDocNo: Code[20];
+        PrecDocTypeInv: Boolean;
         First: Boolean;
         IsHandled: Boolean;
         PrevPostingDate: Date;
@@ -3941,12 +3939,14 @@ table 81 "Gen. Journal Line"
                 if not First and
                     ((GenJnlLine2."Document No." <> PrevDocNo) or
                       (GenJnlLine2."Posting Date" <> PrevPostingDate) or
+                      ((GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice) and PrecDocTypeInv) or
                     ((GenJnlLine2."Bal. Account No." <> '') and (GenJnlLine2."Document No." = ''))) and
                     not LastGenJnlLine.EmptyLine()
                 then
                     DocNo := IncStr(DocNo);
                 PrevDocNo := GenJnlLine2."Document No.";
                 PrevPostingDate := GenJnlLine2."Posting Date";
+                PrecDocTypeInv := GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice;
                 if GenJnlLine2."Document No." <> '' then begin
                     if GenJnlLine2."Applies-to ID" = GenJnlLine2."Document No." then
                         GenJnlLine2.RenumberAppliesToID(GenJnlLine2, GenJnlLine2."Document No.", DocNo);
@@ -7989,11 +7989,12 @@ table 81 "Gen. Journal Line"
     begin
         GenJnlLine2.SetRange("Journal Template Name", "Journal Template Name");
         GenJnlLine2.SetRange("Journal Batch Name", "Journal Batch Name");
-        GenJnlLine2.SetFilter("Line No.", '<>%1', "Line No.");
         GenJnlLine2.SetRange("Document No.", "Document No.");
         GenJnlLine2.SetRange("Account No.", xRec."Account No.");
         GenJnlLine2.SetRange("Applies-to ID", xRec."Applies-to ID");
-        exit(GenJnlLine2.IsEmpty());
+        GenJnlLine2.SetFilter("Line No.", '<>%1', "Line No.");
+        if GenJnlLine2.Count = 0 then
+            exit(true);
     end;
 
     local procedure CheckOpenApprovalEntryExistForCurrentUser()
@@ -9519,13 +9520,6 @@ table 81 "Gen. Journal Line"
         PaymentJnlExportErrorText: Record "Payment Jnl. Export Error Text";
     begin
         PaymentJnlExportErrorText.DeleteJnlLineErrorsWhenRecDeleted(Rec);
-    end;
-
-    local procedure ShouldClearCustVendApplnEntry(): Boolean
-    begin
-        if xRec."Applies-to ID" = '' then
-            exit(false);
-        exit(HasNoMultipleLine());
     end;
 
     [IntegrationEvent(false, false)]
