@@ -376,7 +376,6 @@ codeunit 370 "Bank Acc. Reconciliation Post"
     var
         IsHandled: Boolean;
     begin
-        IsHandled := false;
         OnBeforeCloseBankAccLedgEntry(BankAccReconLine, AppliedAmount, IsHandled);
         if IsHandled then
             exit;
@@ -604,13 +603,7 @@ codeunit 370 "Bank Acc. Reconciliation Post"
     end;
 
     local procedure UpdateBank(BankAccRecon: Record "Bank Acc. Reconciliation"; Amt: Decimal)
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateBank(BankAccRecon, BankAcc, IsHandled, Amt, PostedStamentNo);
-        if IsHandled then
-            exit;
         BankAcc.LockTable();
         BankAcc.Get(BankAccRecon."Bank Account No.");
         BankAcc.TestField(Blocked, false);
@@ -1014,11 +1007,6 @@ codeunit 370 "Bank Acc. Reconciliation Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferToBankStmtOnBeforeBankAccStmtLineInsert(var BankAccStmtLine: Record "Bank Account Statement Line"; BankAccReconLine: Record "Bank Acc. Reconciliation Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateBank(var BankAccRecon: Record "Bank Acc. Reconciliation"; var BankAccount: Record "Bank Account"; var IsHandled: Boolean; Amt: Decimal; PostedStamentNo: Code[20])
     begin
     end;
 
