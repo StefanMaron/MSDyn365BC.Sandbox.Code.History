@@ -4341,7 +4341,7 @@ codeunit 7201 "CDS Integration Impl."
         Notification.Send();
     end;
 
-    procedure SendMultipleCompaniesNotification()
+    internal procedure SendMultipleCompaniesNotification()
     var
         MyNotifications: Record "My Notifications";
         Notification: Notification;
@@ -4643,7 +4643,7 @@ codeunit 7201 "CDS Integration Impl."
         exit(false);
     end;
 
-    procedure MultipleCompaniesConnected(): Boolean
+    internal procedure MultipleCompaniesConnected(): Boolean
     var
         CDSCompanyCount: Integer;
     begin
@@ -5154,11 +5154,6 @@ codeunit 7201 "CDS Integration Impl."
         Page.Run(Page::"Job Queue Entries", JobQueueEntry);
     end;
 
-    procedure LearnMoreDisablingCRMConnection(ErrorInfo: ErrorInfo)
-    begin
-        Hyperlink('https://go.microsoft.com/fwlink/?linkid=2206514');
-    end;
-
     internal procedure CleanCDSIntegration()
     begin
         CleanCDSIntegration(CompanyName());
@@ -5182,11 +5177,9 @@ codeunit 7201 "CDS Integration Impl."
             IntegrationsSyncJobErrors.ChangeCompany(CompanyName);
             CRMIntegrationRecord.ChangeCompany(CompanyName);
         end;
-
         // Here we delete the setup records
         CDSConnectionSetup.DeleteAll();
         CRMConnectionSetup.DeleteAll();
-
         // Here we delete the integration links
         OnBeforeCleanCRMIntegrationSyncJob(DisableIntegrationSyncJobCleanup);
         if not DisableIntegrationSyncJobCleanup then begin
@@ -5196,7 +5189,6 @@ codeunit 7201 "CDS Integration Impl."
             TableKey.DisableAll(Database::"Integration Synch. Job Errors");
             IntegrationsSyncJobErrors.DeleteAll();
         end;
-
         OnBeforeCleanCRMIntegrationRecords(DisableIntegrationRecordCleanup);
         if not DisableIntegrationRecordCleanup then begin
             // Deleting all couplings can timeout so disable the keys before deleting
@@ -5209,7 +5201,7 @@ codeunit 7201 "CDS Integration Impl."
     local procedure OnBeforeCleanCRMIntegrationRecords(var DisableIntegrationRecordCleanup: Boolean)
     begin
     end;
-
+    
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCleanCRMIntegrationSyncJob(var DisableIntegrationSyncJobCleanup: Boolean)
     begin
