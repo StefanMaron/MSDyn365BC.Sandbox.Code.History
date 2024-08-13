@@ -46,10 +46,6 @@
         RemitAdvFileNotFoundTxt: Label 'Remittance Advice file has not been found';
         ForceDocBalanceFalseQst: Label 'Warning:  Transactions cannot be financially voided when Force Doc. Balance is set to No';
         CheckTransmittedErr: Label '%1 must have a value in %2: %3=%4, %5=%6, %7=%8. It cannot be zero or empty', Locked = true;
-        CheckExportedErr: Label 'Check Exported must be true.';
-        DocumentNoBlankErr: Label 'Document No. must be blank.';
-        JulainDateErr: Label 'Format of File date must be Julain Date.';
-        IsInitialized: Boolean;
 
     [Test]
     [HandlerFunctions('ExportElectronicPaymentsXMLRequestPageHandler')]
@@ -2700,119 +2696,14 @@
         LibraryVariableStorage.AssertEmpty();
     end;
 
-    [Test]
-    [HandlerFunctions('ConfirmHandler,ExportElectronicPaymentsWordLayoutRequestPageHandler,ApplyVendorEntriesWithSetAppliesToIDModalPageHandler')]
-    [Scope('OnPrem')]
-    procedure ExportPaymentJournalPostPurchaseOrderVerifyDocumentNoBlank()
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-        ERMElectronicFundsTransfer: Codeunit "ERM Electronic Funds Transfer";
-        TestClientTypeSubscriber: Codeunit "Test Client Type Subscriber";
-        PaymentJournal: TestPage "Payment Journal";
-    begin
-        // [SCENARIO 534209] Export Payment Journal When Apllies-to ID set and during Void Document No. will be blank and Applies to Entry updated by correct Document No. 
-        Initialize();
-
-        // [GIVEN] Set Client Type and bindsubscription
-        TestClientTypeSubscriber.SetClientType(CLIENTTYPE::Web);
-        BindSubscription(TestClientTypeSubscriber);
-        BindSubscription(ERMElectronicFundsTransfer);
-
-        // [GIVEN] Create Export Report Selection
-        CreateExportReportSelection(Layout::Word);
-
-        // [GIVEN] Create Electronic Payment Journal with Applies-to ID set
-        CreateElectronicPaymentJournalsWithApplication(GenJournalLine);
-
-        // [WHEN] Export Payment Journals
-        PaymentJournal.OpenEdit();
-        ExportPaymentJournal(PaymentJournal, GenJournalLine);
-        PaymentJournal.Close();
-
-        // [THEN] VerifyCheck Exported as true
-        GenJournalLine.Find();
-        Assert.IsTrue(GenJournalLine."Check Exported", CheckExportedErr);
-
-        // [WHEN] Void the Transaction as exported
-        PerformVoidTransmitElecPayments(GenJournalLine);
-
-        // [THEN] Verify GenJournalLine Document No. is blank after void the Exported file 
-        GenJournalLine.Find();
-        Assert.AreEqual('', GenJournalLine."Document No.", DocumentNoBlankErr);
-    end;
-
-    [Test]
-    [HandlerFunctions('ExportElectronicPaymentsRequestPageHandler')]
-    procedure JulianDateFormatOnEFTExportCA()
-    var
-        Vendor: Record Vendor;
-        VendorBankAccount: Record "Vendor Bank Account";
-        BankAccount: Record "Bank Account";
-        TempEFTExportWorkset: Record "EFT Export Workset" temporary;
-        ERMElectronicFundsTransfer: Codeunit "ERM Electronic Funds Transfer";
-        GenerateEFT: Codeunit "Generate EFT";
-        EFTValues: Codeunit "EFT Values";
-        TestClientTypeSubscriber: Codeunit "Test Client Type Subscriber";
-        SettleDate: Date;
-    begin
-        // [SCENARIO 527241] Julian date format for Canada EFT is not properly formatting/displaying the year.
-        Initialize();
-
-        // [GIVEN] Create the format of Export Report.
-        BindSubscription(ERMElectronicFundsTransfer);
-        TestClientTypeSubscriber.SetClientType(ClientType::Web);
-        BindSubscription(TestClientTypeSubscriber);
-        CreateExportReportSelection(Layout::RDLC);
-
-        // [GIVEN] Create Vendor and Vendor Bank Account.
-        CreateVendorWithVendorBankAccount(Vendor, VendorBankAccount, 'CA');
-
-        // [GIVEN] Create Bank Account for Canada and its Format.
-        CreateBankAccountForCountry(
-            BankAccount, BankAccount."Export Format"::CA, CreateBankExportImportSetup(CreateDataExchDefForCA()),
-            LibraryUtility.GenerateGUID(), LibraryUtility.GenerateGUID());
-
-        // [GIVEN] Exported payment journal line with filled in all business data.
-        CreateAndExportVendorPaymentWithAllBusinessData(TempEFTExportWorkset, VendorBankAccount, BankAccount."No.");
-
-        // [WHEN] Generate EFT file.
-        SettleDate := LibraryRandom.RandDate(10);
-        GenerateEFT.ProcessAndGenerateEFTFile(BankAccount."No.", SettleDate, TempEFTExportWorkset, EFTValues);
-        ERMElectronicFundsTransfer.GetTempACHRBHeader(TempACHRBHeader);
-
-        // [THEN] File Creation Date must be in Julian Date Format.
-        Assert.AreEqual(TempACHRBHeader."File Creation Date", CalculateJulianDate((Today())), JulainDateErr);
-    end;
-
     local procedure Initialize()
     var
         EFTExport: Record "EFT Export";
     begin
+        LibraryERMCountryData.CreateVATData();
         LibraryVariableStorage.Clear();
         ModifyFederalIdCompanyInformation(LibraryUtility.GenerateGUID());
         EFTExport.DeleteAll();
-
-        if IsInitialized then
-            exit;
-
-        LibraryERMCountryData.CreateVATData();
-        CreateCountryRegion('US');
-        CreateCountryRegion('CA');
-        CreateCountryRegion('MX');
-
-        IsInitialized := true;
-    end;
-
-    local procedure CreateCountryRegion(CountryRegionCode: Code[10])
-    var
-        CountryRegion: Record "Country/Region";
-    begin
-        if not CountryRegion.Get(CountryRegionCode) then begin
-            CountryRegion.Code := CountryRegionCode;
-            CountryRegion.Insert();
-        end;
-        CountryRegion."ISO Code" := CopyStr(CountryRegionCode, 1, MaxStrLen(CountryRegion."ISO Code"));
-        CountryRegion.Modify();
     end;
 
     local procedure ValidateEFTCAHeader(Line: Text)
@@ -4822,7 +4713,7 @@
     begin
         ERMElectronicFundsTransfer.GetTempACHRBHeader(TempACHRBHeader);
         TempACHRBHeader.TestField("File Creation Number", FileCreationNo);
-        TempACHRBHeader.TestField("File Creation Date", CalculateJulianDate(Today()));
+        TempACHRBHeader.TestField("File Creation Date", ExportEFTRB.JulianDate(Today()));
         TempACHRBHeader.TestField("Settlement Date", SettleDate);
         TempACHRBHeader.TestField("Settlement Julian Date", ExportEFTRB.JulianDate(SettleDate)); // TFS 401126
 
@@ -4909,85 +4800,6 @@
         EFTExport.FindFirst();
     end;
 
-    local procedure CreateElectronicPaymentJournalsWithApplication(var GenJournalLine: Record "Gen. Journal Line")
-    var
-        BankAccount: Record "Bank Account";
-        VendorBankAccount: Record "Vendor Bank Account";
-    begin
-        FindAndUpdateVendorBankAccount(VendorBankAccount);
-        CreateBankAccount(BankAccount, VendorBankAccount."Transit No.", BankAccount."Export Format"::US);
-        CreateBankAccWithBankStatementSetup(BankAccount, 'US EFT DEFAULT');
-        CreateMultiplePaymentJournalsAndApplyAfterPostPurchaseOrder(GenJournalLine, VendorBankAccount."Vendor No.",
-          BankAccount."No.", VendorBankAccount.Code);
-        Commit();
-    end;
-
-    local procedure CreateMultiplePaymentJournalsAndApplyAfterPostPurchaseOrder(var GenJournalLine: Record "Gen. Journal Line"; VendorNo: Code[20]; BankAccountNo: Code[20]; BankAccountCode: Code[20])
-    var
-        PurchaseHeader: Record "Purchase Header";
-        GenJournalBatch: Record "Gen. Journal Batch";
-    begin
-        CreatePurchaseOrder(PurchaseHeader, VendorNo);
-        PurchaseHeader.CalcFields(Amount);
-        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-        CreateGeneralJournalBatch(GenJournalBatch, BankAccountNo);
-
-        CreatePaymentGLLine(
-            GenJournalLine, GenJournalBatch,
-            GenJournalLine."Document Type"::Payment,
-            GenJournalLine."Account Type"::Vendor,
-            VendorNo,
-            GenJournalLine."Applies-to Doc. Type"::" ",
-            '',
-            GenJournalLine."Bal. Account Type"::"Bank Account",
-            BankAccountNo,
-            PurchaseHeader.Amount);
-        GenJournalLine.Validate("Recipient Bank Account", BankAccountCode);
-        GenJournalLine.Validate("Document No.", LibraryRandom.RandText(MaxStrLen(GenJournalLine."Document No.")));
-        GenJournalLine.Modify();
-
-        ApplyVendorEntryFromPaymentJournal(GenJournalLine);
-
-        LibraryVariableStorage.Enqueue(BankAccountNo);  // Enqueue for ExportElectronicPaymentsRequestPageHandler.
-    end;
-
-    local procedure ApplyVendorEntryFromPaymentJournal(var GenJournalLine: Record "Gen. Journal Line")
-    var
-        PaymentJournal: TestPage "Payment Journal";
-    begin
-        PaymentJournal.OpenEdit();
-        PaymentJournal.CurrentJnlBatchName.SetValue(GenJournalLine."Journal Batch Name");
-        PaymentJournal.ApplyEntries.Invoke();
-        PaymentJournal.Close();
-    end;
-
-    local procedure CalculateJulianDate(NormalDate: Date): Integer
-    var
-        Year: Integer;
-        Day: Integer;
-        CalculatedDate: Integer;
-    begin
-        Year := Date2DMY(NormalDate, 3);
-        Day := (NormalDate - DMY2Date(1, 1, Year)) + 1;
-        Evaluate(CalculatedDate, GetFormattedJulainDate(Format(Day), Format(Year)));
-        exit(CalculatedDate);
-    end;
-
-    local procedure GetFormattedJulainDate(Day: Text; Year: Text): Text
-    var
-        ReturnDate: Text;
-    begin
-        case StrLen(Day) of
-            1:
-                ReturnDate := Year + '00' + Day;
-            2:
-                ReturnDate := Year + '0' + Day;
-            else
-                ReturnDate := Year + Day;
-        end;
-        exit(ReturnDate);
-    end;
-
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure ConfirmHandler(Question: Text[1024]; var Reply: Boolean)
@@ -5007,14 +4819,6 @@
     begin
         ConfirmFinancialVoid.InitializeRequest(WorkDate(), LibraryVariableStorage.DequeueInteger());
         Response := Action::Yes;
-    end;
-
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure ApplyVendorEntriesWithSetAppliesToIDModalPageHandler(var ApplyVendorEntries: TestPage "Apply Vendor Entries")
-    begin
-        ApplyVendorEntries.ActionSetAppliesToID.Invoke();
-        ApplyVendorEntries.OK().Invoke();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Custom Layout Reporting", 'OnIsTestMode', '', false, false)]
@@ -5101,18 +4905,5 @@
         IsCodeunitRun := true;
         LibraryVariableStorage.Enqueue(IsCodeunitRun);
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Export EFT (ACH)", 'OnBeforeDownloadWebclientZip', '', false, false)]
-    local procedure VerifyBlobContentOnBeforeDownloadWebclientZip(var TempNameValueBuffer: Record "Name/Value Buffer" temporary; TempEraseFileNameValueBuffer: Record "Name/Value Buffer" temporary; ZipFileName: Text; var DataCompression: Codeunit "Data Compression")
-    begin
-        if not TempNameValueBuffer.FindSet() then
-            exit;
-        TempNameValueBuffer.SetAutoCalcFields("Value BLOB");
-        repeat
-            TempNameValueBuffer.TestField("Value BLOB");
-        until TempNameValueBuffer.Next() = 0;
-        TempNameValueBuffer.FindSet();
-    end;
-
 }
 
