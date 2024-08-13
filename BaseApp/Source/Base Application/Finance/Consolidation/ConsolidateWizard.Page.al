@@ -347,10 +347,7 @@ page 242 "Consolidate Wizard"
                 trigger OnAction()
                 begin
                     ConsolidateBusinessUnits.ValidateConsolidationParameters(TempConsolidationProcess, Rec, true);
-                    if not ConsolidateBusinessUnits.ValidateAndRunConsolidation(TempConsolidationProcess, Rec) then begin
-                        CurrPage.Close();
-                        Error(GetLastErrorText());
-                    end;
+                    ConsolidateBusinessUnits.StartConsolidation(TempConsolidationProcess, Rec);
                     Message(ConsolidationScheduledMsg);
                     CurrPage.Close();
                 end;
@@ -376,7 +373,7 @@ page 242 "Consolidate Wizard"
                             SetNextActionEnabled();
                             exit;
                         end;
-                        ConsolidateBusinessUnits.ValidateBusinessUnitsToConsolidate(Rec, false);
+                        ConsolidateBusinessUnits.ValidateBusinessUnitsToConsolidate(Rec);
                         if not BusinessUnitsToConsolidateNeedCurrencyTranslation() then
                             Step += 1;
                     end;
@@ -571,13 +568,11 @@ page 242 "Consolidate Wizard"
 
     local procedure UpdateCurrentRecState()
     begin
-        if (Step = 1) or (Step = 2) then begin
+        if Step = 1 then begin
             if Rec."Default Data Import Method" = Rec."Default Data Import Method"::Database then
                 CompanyName := Rec."Company Name";
             if Rec."Default Data Import Method" = Rec."Default Data Import Method"::API then
                 CompanyName := Rec."External Company Name";
-        end;
-        if Step = 1 then begin
             UpdateCurrentRecAccessGrantedState();
             LastConsolidationEndingDate := ConsolidateBusinessUnits.GetLastConsolidationEndingDate(Rec);
         end;
