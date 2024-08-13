@@ -6868,7 +6868,7 @@ table 81 "Gen. Journal Line"
         Validate("Deferral Code", GLAcc."Default Deferral Template Code");
 
         GLSetup.Get();
-        if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+        if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
             "Currency Code" := GLAcc."Source Currency Code";
 
         OnAfterAccountNoOnValidateGetGLAccount(Rec, GLAcc, CurrFieldNo);
@@ -6919,7 +6919,7 @@ table 81 "Gen. Journal Line"
                 ClearBalancePostingGroups();
 
         GLSetup.Get();
-        if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+        if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
             "Currency Code" := GLAcc."Source Currency Code";
 
         OnAfterAccountNoOnValidateGetGLBalAccount(Rec, GLAcc, CurrFieldNo);
