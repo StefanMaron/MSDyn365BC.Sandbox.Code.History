@@ -491,7 +491,6 @@ codeunit 135098 "OCR Master Data Sync Tests"
         OCRServiceSetup."Default OCR Doc. Template" := 'BLANK';
 
         OCRServiceSetup.Validate("Master Data Sync Enabled", SyncEnabled);
-        OCRServiceSetup.Modify();
         OCRServiceSetup.Validate(Enabled, ServiceEnabled);
 
         OCRServiceSetup.Modify();
