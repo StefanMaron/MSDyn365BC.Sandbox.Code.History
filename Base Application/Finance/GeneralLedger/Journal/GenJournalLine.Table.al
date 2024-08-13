@@ -6978,14 +6978,14 @@ table 81 "Gen. Journal Line"
 #if not CLEAN24
         if FeatureKeyManagement.IsGLCurrencyRevaluationEnabled() then begin
             GLSetup.Get();
-            if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+            if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
                 "Currency Code" := GLAcc."Source Currency Code";
         end else
             if CheckGLForeignCurrMgtPermission() or (CopyStr(SerialNumber, 7, 3) = '000') then
                 GLForeignCurrMgt.GetCurrCode("Account No.", Rec);
 #else
         GLSetup.Get();
-        if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+        if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
             "Currency Code" := GLAcc."Source Currency Code";
 #endif
 
@@ -7039,14 +7039,14 @@ table 81 "Gen. Journal Line"
 #if not CLEAN24
         if FeatureKeyManagement.IsGLCurrencyRevaluationEnabled() then begin
             GLSetup.Get();
-            if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+            if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
                 "Currency Code" := GLAcc."Source Currency Code";
         end else
             if CheckGLForeignCurrMgtPermission() then
                 GLForeignCurrMgt.GetCurrCode("Bal. Account No.", Rec);
 #else
         GLSetup.Get();
-        if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+        if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
             "Currency Code" := GLAcc."Source Currency Code";
 #endif
 
