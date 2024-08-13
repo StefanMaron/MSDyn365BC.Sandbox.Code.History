@@ -1514,6 +1514,9 @@ table 81 "Gen. Journal Line"
                    ("Bank Payment Type" <> "Bank Payment Type"::" ")
                 then
                     FieldError("Account Type");
+
+                if Rec."Bank Payment Type" <> xRec."Bank Payment Type" then
+                    Rec.DeletePaymentFileErrors();
             end;
         }
         field(71; "VAT Base Amount"; Decimal)
@@ -3996,6 +3999,7 @@ table 81 "Gen. Journal Line"
         PrevDocNo: Code[20];
         FirstDocNo: Code[20];
         TempFirstDocNo: Code[20];
+        PrecDocTypeInv: Boolean;
         First: Boolean;
         IsHandled: Boolean;
         PrevPostingDate: Date;
@@ -4028,12 +4032,14 @@ table 81 "Gen. Journal Line"
                 if not First and
                     ((GenJnlLine2."Document No." <> PrevDocNo) or
                       (GenJnlLine2."Posting Date" <> PrevPostingDate) or
+                      ((GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice) and PrecDocTypeInv) or
                     ((GenJnlLine2."Bal. Account No." <> '') and (GenJnlLine2."Document No." = ''))) and
                     not LastGenJnlLine.EmptyLine()
                 then
                     DocNo := IncStr(DocNo);
                 PrevDocNo := GenJnlLine2."Document No.";
                 PrevPostingDate := GenJnlLine2."Posting Date";
+                PrecDocTypeInv := GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice;
                 if GenJnlLine2."Document No." <> '' then begin
                     if GenJnlLine2."Applies-to ID" = GenJnlLine2."Document No." then
                         GenJnlLine2.RenumberAppliesToID(GenJnlLine2, GenJnlLine2."Document No.", DocNo);
@@ -7271,7 +7277,7 @@ table 81 "Gen. Journal Line"
         Validate("Deferral Code", GLAcc."Default Deferral Template Code");
 
         GLSetup.Get();
-        if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
+        if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
             "Currency Code" := GLAcc."Source Currency Code";
 
         OnAfterAccountNoOnValidateGetGLAccount(Rec, GLAcc, CurrFieldNo);
@@ -7322,7 +7328,7 @@ table 81 "Gen. Journal Line"
                 ClearBalancePostingGroups();
 
         GLSetup.Get();
-        if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
+        if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
             "Currency Code" := GLAcc."Source Currency Code";
 
         OnAfterAccountNoOnValidateGetGLBalAccount(Rec, GLAcc, CurrFieldNo);
