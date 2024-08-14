@@ -3912,7 +3912,6 @@ table 81 "Gen. Journal Line"
         PrevDocNo: Code[20];
         FirstDocNo: Code[20];
         TempFirstDocNo: Code[20];
-        PrecDocTypeInv: Boolean;
         First: Boolean;
         IsHandled: Boolean;
         PrevPostingDate: Date;
@@ -3945,14 +3944,12 @@ table 81 "Gen. Journal Line"
                 if not First and
                     ((GenJnlLine2."Document No." <> PrevDocNo) or
                       (GenJnlLine2."Posting Date" <> PrevPostingDate) or
-                      ((GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice) and PrecDocTypeInv) or
                     ((GenJnlLine2."Bal. Account No." <> '') and (GenJnlLine2."Document No." = ''))) and
                     not LastGenJnlLine.EmptyLine()
                 then
                     DocNo := IncStr(DocNo);
                 PrevDocNo := GenJnlLine2."Document No.";
                 PrevPostingDate := GenJnlLine2."Posting Date";
-                PrecDocTypeInv := GenJnlLine2."Document Type" = GenJnlLine2."Document Type"::Invoice;
                 if GenJnlLine2."Document No." <> '' then begin
                     if GenJnlLine2."Applies-to ID" = GenJnlLine2."Document No." then
                         GenJnlLine2.RenumberAppliesToID(GenJnlLine2, GenJnlLine2."Document No.", DocNo);
