@@ -12,7 +12,6 @@ page 8747 "New Financial Report"
             group(FinancialReportGroup)
             {
                 Caption = 'Financial Report';
-                Visible = ShowFinancialReportNames;
                 field(SourceFinancialReport; OldName[1])
                 {
                     ApplicationArea = Basic, Suite;
@@ -44,7 +43,6 @@ page 8747 "New Financial Report"
             group(AccountSheduleGroup)
             {
                 Caption = 'Row Definition';
-                Visible = ShowRowNames;
                 field(SourceAccountScheduleName; OldName[2])
                 {
                     ApplicationArea = Basic, Suite;
@@ -109,7 +107,7 @@ page 8747 "New Financial Report"
     var
         OldName: array[3] of Code[10];
         NewName: array[3] of Code[10];
-        ShowFinancialReportNames, ShowRowNames, ShowColumnLayout : Boolean;
+        ShowColumnLayout: Boolean;
         AlreadyExistsFinancialReportTxt: Text;
         AlreadyExistsAccountScheduleTxt: Text;
         AlreadyExistsColumnLayoutTxt: Text;
@@ -125,8 +123,6 @@ page 8747 "New Financial Report"
         NewName[2] := AccSchedName;
         OldName[3] := ColumnLayout;
         NewName[3] := ColumnLayout;
-        ShowFinancialReportNames := FinancialReportName <> '';
-        ShowRowNames := AccSchedName <> '';
         ShowColumnLayout := ColumnLayout <> '';
         CheckAlreadyExists();
     end;

@@ -42,7 +42,7 @@ codeunit 5579 "Digital Voucher Impl."
         DigitalVoucherEntry: Codeunit "Digital Voucher Entry";
         AssistedSetupTxt: Label 'Set up a digital voucher feature';
         AssistedSetupDescriptionTxt: Label 'In some countries authorities require to make sure that for every single general ledger register ther is a digital vouchers assigned.';
-        AssistedSetupHelpTxt: Label 'https://learn.microsoft.com/en-us/dynamics365/business-central/across-how-setup-digital-vouchers', Locked = true;
+        AssistedSetupHelpTxt: Label 'https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-setup-use-service-declaration', Locked = true;
         CannotRemoveReferenceRecordFromIncDocErr: Label 'Cannot remove the reference record from the incoming document because it is used for the enforced digital voucher functionality';
         CannotChangeIncomDocWithEnforcedDigitalVoucherErr: Label 'Cannot change incoming document with the enforced digital voucher functionality';
         DigitalVoucherFileTxt: Label 'DigitalVoucher_%1_%2_%3.pdf', Comment = '%1 = doc type; %2 = posting date; %3 = doc no.';
@@ -208,7 +208,7 @@ codeunit 5579 "Digital Voucher Impl."
         IncomingDocumentAttachment.Modify();
     end;
 
-    procedure CheckDigitalVoucherForDocument(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecRef: RecordRef): Boolean
+    procedure CheckDigitalVoucherForDocument(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecRef: RecordRef) Checked: Boolean
     var
         DigitalVoucherEntrySetup: Record "Digital Voucher Entry Setup";
         IncomingDocument: Record "Incoming Document";
@@ -221,7 +221,7 @@ codeunit 5579 "Digital Voucher Impl."
             exit(true);
         if DigitalVoucherEntrySetup."Generate Automatically" then
             exit(true);
-        SourceCodeSetup.Get();
+            SourceCodeSetup.Get();
         if IsPaymentReconciliationJournal(DigitalVoucherEntrySetup."Entry Type", RecRef) then
             exit(true);
         exit(false);
@@ -495,7 +495,7 @@ codeunit 5579 "Digital Voucher Impl."
         if not SalesHeader.Invoice then
             exit;
         if SalesInvoiceHeader."No." <> '' then
-        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
         if SalesCrMemoHeader."No." <> '' then
             HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesCrMemoHeader);
     end;
@@ -527,7 +527,7 @@ codeunit 5579 "Digital Voucher Impl."
         if not DigitalVoucherFeature.IsFeatureEnabled() then
             exit;
         if SalesInvoiceHeader."No." <> '' then
-        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
         if SalesCrMemoHeader."No." <> '' then
             HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesCrMemoHeader);
     end;
@@ -542,7 +542,7 @@ codeunit 5579 "Digital Voucher Impl."
         if not PurchHeader.Invoice then
             exit;
         if PurchInvHeader."No." <> '' then
-        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
         if PurchCrMemoHdr."No." <> '' then
             HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchCrMemoHdr);
     end;
@@ -553,7 +553,7 @@ codeunit 5579 "Digital Voucher Impl."
         if not DigitalVoucherFeature.IsFeatureEnabled() then
             exit;
         if PurchInvHeader."No." <> '' then
-        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
+            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
         if PurchCrMemoHdr."No." <> '' then
             HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchCrMemoHdr);
     end;
