@@ -146,6 +146,7 @@ table 472 "Job Queue Entry"
                 ReportLayoutSelection: Record "Report Layout Selection";
                 InitServerPrinterTable: Codeunit "Init. Server Printer Table";
                 EnvironmentInfo: Codeunit "Environment Information";
+                IsHandled: Boolean;
             begin
                 TestField("Object Type to Run", "Object Type to Run"::Report);
 
@@ -160,8 +161,12 @@ table 472 "Job Queue Entry"
                 end;
                 if "Report Output Type" = "Report Output Type"::Print then begin
                     if EnvironmentInfo.IsSaaS() then begin
-                        "Report Output Type" := "Report Output Type"::PDF;
-                        Message(NoPrintOnSaaSMsg);
+                        IsHandled := false;
+                        OnValidateReportOutputTypeOnBeforeShowPrintNotAllowedInSaaS(Rec, IsHandled);
+                        if not IsHandled then begin
+                            "Report Output Type" := "Report Output Type"::PDF;
+                            Message(NoPrintOnSaaSMsg);
+                        end;
                     end else
                         "Printer Name" := InitServerPrinterTable.FindClosestMatchToClientDefaultPrinter("Object ID to Run");
                 end else
@@ -1707,6 +1712,11 @@ table 472 "Job Queue Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsReadyToStart(var JobQueueEntry: Record "Job Queue Entry"; var ReadyToStart: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateReportOutputTypeOnBeforeShowPrintNotAllowedInSaaS(var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
     begin
     end;
 }
