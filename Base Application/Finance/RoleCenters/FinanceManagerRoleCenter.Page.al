@@ -1006,9 +1006,7 @@ page 8901 "Finance Manager Role Center"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Reconciliation';
-                        Image = BankAccountRec;
-                        RunObject = Report "Bank Account Reconciliation";
-                        ToolTip = 'Prepare to print a report of bank ledger entries that are not recorded so that it helps in bank reconciliation. This report reconciles the balance of a defined bank account as at a defined date. The report displays open bank ledger entries as either unpresented checks or deposits not recorded.';
+                        RunObject = Report "Create Check Installments";
                     }
                     action("Deposit Slip")
                     {
