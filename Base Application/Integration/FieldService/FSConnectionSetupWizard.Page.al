@@ -2,7 +2,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-#if not CLEAN25
 namespace Microsoft.Integration.FieldService;
 
 using Microsoft.Integration.Dataverse;
@@ -18,9 +17,6 @@ page 6421 "FS Connection Setup Wizard"
     PageType = NavigatePage;
     SourceTable = "FS Connection Setup";
     SourceTableTemporary = true;
-    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '25.0';
 
     layout
     {
@@ -281,7 +277,7 @@ page 6421 "FS Connection Setup Wizard"
                     Page.Run(Page::"FS Connection Setup");
                     GuidedExperience.CompleteAssistedSetup(ObjectType::Page, PAGE::"FS Connection Setup Wizard");
                     Commit();
-                    FeatureTelemetry.LogUptake('0000MBD', 'Dynamics 365 Field Service Integration', Enum::"Feature Uptake Status"::"Set up");
+                    FeatureTelemetry.LogUptake('0000MBD', 'Dynamics 365 Field Service', Enum::"Feature Uptake Status"::"Set up");
                     CurrPage.Close();
                 end;
             }
@@ -305,7 +301,7 @@ page 6421 "FS Connection Setup Wizard"
         CRMConnectionSetup.Get();
         FSConnectionSetup.LoadConnectionStringElementsFromCDSConnectionSetup();
         FeatureTelemetry.LogUptake('0000MBE', 'Dataverse', Enum::"Feature Uptake Status"::Discovered);
-        FeatureTelemetry.LogUptake('0000MBF', 'Dynamics 365 Field Service Integration', Enum::"Feature Uptake Status"::Discovered);
+        FeatureTelemetry.LogUptake('0000MBF', 'Dynamics 365 Field Service', Enum::"Feature Uptake Status"::Discovered);
 
         Rec.Init();
         if FSConnectionSetup.Get() then begin
@@ -507,4 +503,4 @@ page 6421 "FS Connection Setup Wizard"
         Rec.Validate("Proxy Version", CRMIntegrationManagement.GetLastProxyVersionItem());
     end;
 }
-#endif
+
