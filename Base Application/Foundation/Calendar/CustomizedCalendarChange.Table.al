@@ -266,15 +266,8 @@ table 7602 "Customized Calendar Change"
         OnAfterCalcCalendarCode(Rec);
     end;
 
-    procedure IsDateCustomized(TargetDate: date) Result: Boolean
-    var
-        IsHandled: Boolean;
+    procedure IsDateCustomized(TargetDate: date): Boolean
     begin
-        IsHandled := false;
-        OnBeforeIsDateCustomized(Rec, TargetDate, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         case "Recurring System" of
             "Recurring System"::" ":
                 exit(TargetDate = Date);
@@ -297,11 +290,6 @@ table 7602 "Customized Calendar Change"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckEntryLine(var CustomizedCalendarChange: Record "Customized Calendar Change"; xCustomizedCalendarChange: Record "Customized Calendar Change")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsDateCustomized(var CustomizedCalendarChange: Record "Customized Calendar Change"; TargetDate: Date; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
