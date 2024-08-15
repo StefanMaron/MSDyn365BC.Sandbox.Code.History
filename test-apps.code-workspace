@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false,
-    "allint.enabled": false
-  },
   "folders": [
     {
       "path": "./APIV1/Test/_Exclude_APIV1_ Tests"
@@ -251,5 +243,13 @@
     {
       "path": "./vatgroupmanagement/test/VAT Group Management Tests"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeActions": false,
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false,
+    "search.exclude": {
+      "**.xlf": true
+    }
+  }
 }
