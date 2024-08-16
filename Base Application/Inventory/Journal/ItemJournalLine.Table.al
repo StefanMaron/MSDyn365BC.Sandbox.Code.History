@@ -3698,7 +3698,6 @@ table 83 "Item Journal Line"
         else
             ReservEntry.SetSourceFilter(Database::"Item Journal Line", "Entry Type".AsInteger(), "Journal Template Name", "Line No.", SourceKey);
         ReservEntry.SetSourceFilter("Journal Batch Name", 0);
-        OnAfterSetReservEntrySourceFilters(ReservEntry, SourceKey);
     end;
 
     internal procedure IsSourceSales(): Boolean
@@ -3958,7 +3957,7 @@ table 83 "Item Journal Line"
             Rec, "Dimension Set ID", StrSubstNo('%1 %2 %3', "Journal Template Name", "Journal Batch Name", "Line No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
-        OnAfterShowDimensions(Rec, xRec);
+        OnAfterShowDimensions(Rec);
     end;
 
     procedure ShowReclasDimensions()
@@ -4740,7 +4739,6 @@ table 83 "Item Journal Line"
                 if TempTrackingSpecification."Serial No." <> '' then begin
                     "Serial No." := TempTrackingSpecification."Serial No.";
                     "Lot No." := TempTrackingSpecification."Lot No.";
-                    "Package No." := TempTrackingSpecification."Package No.";
                     "Expiration Date" := TempTrackingSpecification."Expiration Date";
                 end;
             TrackingType::"Lot No.":
@@ -5441,7 +5439,7 @@ table 83 "Item Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterShowDimensions(var ItemJournalLine: Record "Item Journal Line"; var xItemJournalLine: Record "Item Journal Line")
+    local procedure OnAfterShowDimensions(var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
@@ -5537,11 +5535,6 @@ table 83 "Item Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckSerialNoQty(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetReservEntrySourceFilters(var ReservationEntry: Record "Reservation Entry"; SourceKey: Boolean);
     begin
     end;
 }
