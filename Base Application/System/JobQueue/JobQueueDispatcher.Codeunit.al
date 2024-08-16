@@ -26,7 +26,7 @@ codeunit 448 "Job Queue Dispatcher"
             if not IsWithinStartEndTime(Rec) then
                 Reschedule(Rec)
             else
-                if WaitForOthersWithSameCategory(Rec) then 
+                if WaitForOthersWithSameCategory(Rec) then
                     RescheduleAsWaiting(Rec)
                 else begin
                     HandleRequest(Rec);
@@ -102,6 +102,11 @@ codeunit 448 "Job Queue Dispatcher"
             exit(true);
 
         CurrTime := DT2Time(CurrentDateTime);
+
+        // Starting time > Ending time -> roll-over midnight, e.g. from 23:00 - 02:00
+        if (CurrJobQueueEntry."Ending Time" <> 0T) and (CurrJobQueueEntry."Starting Time" > CurrJobQueueEntry."Ending Time") then
+            exit((CurrTime >= CurrJobQueueEntry."Starting Time") or (CurrTime <= CurrJobQueueEntry."Ending Time"));
+
         // Start and end time set, check if current time is within the range
         if (CurrJobQueueEntry."Starting Time" <> 0T) and (CurrJobQueueEntry."Ending Time" <> 0T) then
             if CurrJobQueueEntry."Starting Time" <> CurrJobQueueEntry."Ending Time" then
