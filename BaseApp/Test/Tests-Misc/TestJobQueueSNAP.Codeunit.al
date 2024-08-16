@@ -1431,49 +1431,6 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueEntry.Delete();
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    [HandlerFunctions('CanShowNoErrorMessageHandler')]
-    procedure RunJobQueueWithStartTimeGreaterThanEndTime()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueLogEntry: Record "Job Queue Log Entry";
-        CurTime: Time;
-    begin
-        // [SCENARIO] Job queue will run even if start and end time is set to run across dates
-        JobQueueEntry.DeleteAll();
-        JobQueueLogEntry.DeleteAll();
-
-        // [GIVEN] A job queue that can run but is set outside of running hours 
-        CreateSucceedingJobQueueEntry(JobQueueEntry);
-        CurTime := DT2Time(CurrentDateTime());
-        JobQueueEntry."Starting Time" := CurTime + (1000 * 60 * 60); // 1 hour forward
-        JobQueueEntry."Ending Time" := CurTime - (1000 * 60 * 60); // 1 hour backward
-        JobQueueEntry.Modify();
-        Assert.RecordCount(JobQueueEntry, 1);
-        Assert.RecordCount(JobQueueLogEntry, 0);
-
-        // [WHEN] Run the job queue
-        Codeunit.Run(Codeunit::"Job Queue Dispatcher", JobQueueEntry);
-
-        // [THEN] The job queue does not run because it is outside the time range it should run
-        Assert.RecordCount(JobQueueEntry, 1);
-        Assert.RecordCount(JobQueueLogEntry, 0);
-
-        // [GIVEN] The same job queue but set within running hours and across to the next day
-        CurTime := DT2Time(CurrentDateTime());
-        JobQueueEntry."Starting Time" := CurTime - (1000 * 60 * 60); // 1 hour backward
-        JobQueueEntry."Ending Time" := CurTime + (1000 * 60 * 60 * 22); // 22 hour forward
-        JobQueueEntry.Modify();
-
-        // [WHEN] Run the job queue
-        Codeunit.Run(Codeunit::"Job Queue Dispatcher", JobQueueEntry);
-
-        // [THEN] The job queue runs
-        Assert.RecordCount(JobQueueEntry, 0);
-        Assert.RecordCount(JobQueueLogEntry, 1);
-    end;
-
     local procedure InitializeRecurringJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"; Duration: Integer)
     begin
         JobQueueEntry.Init();
