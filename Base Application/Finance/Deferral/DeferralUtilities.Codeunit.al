@@ -704,7 +704,6 @@ codeunit 1720 "Deferral Utilities"
         Changed: Boolean;
         IsHandled: Boolean;
     begin
-        OnBeforeOpenLineScheduleEdit(DeferralCode, DeferralDocType, GenJnlTemplateName, GenJnlBatchName, DocumentType, DocumentNo, LineNo, Amount, PostingDate, Description, CurrencyCode);
         if DeferralCode = '' then
             Message(SelectDeferralCodeMsg)
         else
@@ -1123,11 +1122,6 @@ codeunit 1720 "Deferral Utilities"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostedDeferralLineInsert(var PostedDeferralLine: Record "Posted Deferral Line"; GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenLineScheduleEdit(DeferralCode: Code[10]; DeferralDocType: Integer; GenJnlTemplateName: Code[10]; GenJnlBatchName: Code[10]; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; Amount: Decimal; PostingDate: Date; Description: Text[100]; CurrencyCode: Code[10])
     begin
     end;
 
