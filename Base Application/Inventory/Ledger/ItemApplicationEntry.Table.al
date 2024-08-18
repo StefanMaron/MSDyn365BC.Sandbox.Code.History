@@ -126,7 +126,6 @@ table 339 "Item Application Entry"
         TempVisitedItemApplnEntry: Record "Item Application Entry" temporary;
         TempItemLedgEntryInChainNo: Record "Integer" temporary;
         SearchedItemLedgerEntry: Record "Item Ledger Entry";
-        ItemLedgerEntryTypesUsed: Dictionary of [Enum "Item Ledger Entry Type", Boolean];
         TrackChain: Boolean;
         MaxValuationDate: Date;
 
@@ -162,11 +161,7 @@ table 339 "Item Application Entry"
         SetRange("Transferred-from Entry No.", InbndItemLedgEntryNo);
         if IsCostApplication then
             SetRange("Cost Application", true);
-        if IsEmpty() then
-            exit(false);
-
-        FindSet();
-        exit(true);
+        exit(FindSet());
     end;
 
     procedure AppliedInbndEntryExists(OutbndItemLedgEntryNo: Integer; IsCostApplication: Boolean): Boolean
@@ -425,9 +420,6 @@ table 339 "Item Application Entry"
     var
         ItemApplnEntry: Record "Item Application Entry";
     begin
-        if not ItemLedgerEntryTypeIsUsed("Item Ledger Entry Type"::Transfer) then
-            exit(false);
-
         if ItemApplnEntry.AppliedInbndTransEntryExists(EntryNo, false) then
             exit(CheckCyclicFwdToAppliedEntries(CheckItemLedgEntry, ItemApplnEntry, EntryNo, false));
         exit(false);
@@ -537,7 +529,6 @@ table 339 "Item Application Entry"
         ItemLedgEntryInChain.DeleteAll();
         DummyItemLedgEntry.Init();
         DummyItemLedgEntry."Entry No." := -1;
-        DummyItemLedgEntry.CollectItemLedgerEntryTypesUsed(ItemLedgerEntryTypesUsed, '');
         CheckIsCyclicalLoop(DummyItemLedgEntry, FromItemLedgEntry);
         if TempItemLedgEntryInChainNo.FindSet() then
             repeat
@@ -650,7 +641,6 @@ table 339 "Item Application Entry"
 
         ItemApplnEntry.SetCurrentKey("Inbound Item Entry No.");
         ItemApplnEntry.SetRange("Inbound Item Entry No.", ItemLedgEntry."Entry No.");
-        OnSetOutboundsNotUpdatedOnAfterSetFilters(ItemApplnEntry);
         ItemApplnEntry.ModifyAll("Outbound Entry is Updated", false);
     end;
 
@@ -724,14 +714,6 @@ table 339 "Item Application Entry"
         exit(not TempItemLedgerEntry.IsEmpty())
     end;
 
-    local procedure ItemLedgerEntryTypeIsUsed(ItemLedgerEntryType: Enum "Item Ledger Entry Type"): Boolean
-    begin
-        if not ItemLedgerEntryTypesUsed.ContainsKey(ItemLedgerEntryType) then
-            exit(true);
-
-        exit(ItemLedgerEntryTypesUsed.Get(ItemLedgerEntryType));
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFixed(ItemApplicationEntry: Record "Item Application Entry"; var Result: Boolean; var IsHandled: Boolean)
     begin
@@ -744,11 +726,6 @@ table 339 "Item Application Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckCyclicProdCyclicalLoop(var ItemApplicationEntry: Record "Item Application Entry"; CheckItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetOutboundsNotUpdatedOnAfterSetFilters(var ItemApplicationEntry: Record "Item Application Entry")
     begin
     end;
 }
