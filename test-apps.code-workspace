@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeActions": false,
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false,
+    "search.exclude": {
+      "**.xlf": true
+    }
+  },
   "folders": [
     {
       "path": "./Performance Toolkit Tests"
@@ -135,13 +143,5 @@
     {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
     }
-  ],
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "allint.enabled": false,
-    "al.enableCodeActions": false
-  }
+  ]
 }
