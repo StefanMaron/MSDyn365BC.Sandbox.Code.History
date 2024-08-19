@@ -2015,8 +2015,8 @@
     local procedure CreateAppliedFCYPaymentGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; var InvoiceGenJournalLine: Record "Gen. Journal Line")
     begin
         with GenJournalLine do begin
-            LibraryERM.CreateGeneralJnlLine(
-              GenJournalLine, InvoiceGenJournalLine."Journal Template Name", InvoiceGenJournalLine."Journal Batch Name",
+        LibraryERM.CreateGeneralJnlLine(
+          GenJournalLine, InvoiceGenJournalLine."Journal Template Name", InvoiceGenJournalLine."Journal Batch Name",
               "Document Type"::Payment, "Account Type"::Vendor, InvoiceGenJournalLine."Account No.", -InvoiceGenJournalLine.Amount);
             Validate("Posting Date", WorkDate() + 10);
             Validate("Currency Code", InvoiceGenJournalLine."Currency Code");
