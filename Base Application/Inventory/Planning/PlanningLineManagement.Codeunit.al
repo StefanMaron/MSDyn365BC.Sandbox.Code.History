@@ -618,8 +618,6 @@ codeunit 99000809 "Planning Line Management"
         PlanningComponent.Validate("Unit of Measure Code", ProdBOMLine."Unit of Measure Code");
         PlanningComponent."Quantity per" := ProdBOMLine."Quantity per" * LineQtyPerUOM / ItemQtyPerUOM;
         PlanningComponent.Validate("Routing Link Code", ProdBOMLine."Routing Link Code");
-        OnTransferBOMOnBeforeGetDefaultBin(PlanningComponent, ProdBOMLine, ReqLine, SKU);
-        PlanningComponent.GetDefaultBin();
         PlanningComponent.Length := ProdBOMLine.Length;
         PlanningComponent.Width := ProdBOMLine.Width;
         PlanningComponent.Weight := ProdBOMLine.Weight;
@@ -637,6 +635,9 @@ codeunit 99000809 "Planning Line Management"
             PlanningComponent.Critical := Item2.Critical;
 
         PlanningComponent."Flushing Method" := CompSKU."Flushing Method";
+        OnTransferBOMOnBeforeGetDefaultBin(PlanningComponent, ProdBOMLine, ReqLine, SKU);
+        PlanningComponent.GetDefaultBin();
+
         if SetPlanningLevelCode(PlanningComponent, ProdBOMLine, SKU, CompSKU) then
             PlanningComponent."Planning Level Code" := ReqLine."Planning Level" + 1;
 
