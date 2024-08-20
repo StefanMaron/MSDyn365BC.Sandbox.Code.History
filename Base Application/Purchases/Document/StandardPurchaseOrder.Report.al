@@ -993,7 +993,6 @@ report 1322 "Standard Purchase - Order"
 
         trigger OnOpenPage()
         begin
-            InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
     }
