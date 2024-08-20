@@ -202,12 +202,9 @@ table 38 "Purchase Header"
 
                 OnValidateBuyFromVendorNoOnAfterUpdateBuyFromCont(Rec, xRec, CurrFieldNo, SkipBuyFromContact);
 
-                if (xRec."Buy-from Vendor No." <> '') and (xRec."Buy-from Vendor No." <> "Buy-from Vendor No.") then begin
+                if (xRec."Buy-from Vendor No." <> '') and (xRec."Buy-from Vendor No." <> "Buy-from Vendor No.") then
                     Rec.RecallModifyAddressNotification(GetModifyVendorAddressNotificationId());
-                    if Rec."Remit-to Code" <> '' then
-                        Rec.Validate("Remit-to Code", '');
-                end;
-		
+
                 if xRec."Buy-from Vendor No." = "Buy-from Vendor No." then
                     UpdatePurchLinesByFieldNo(FieldNo("Buy-from Vendor No."), CurrFieldNo <> 0);
             end;
@@ -4299,7 +4296,6 @@ table 38 "Purchase Header"
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if PurchLinesExist() then
@@ -7497,11 +7493,6 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdatePurchLinesByChangedFieldName(PurchHeader: Record "Purchase Header"; var PurchLine: Record "Purchase Line"; ChangedFieldName: Text[100]; ChangedFieldNo: Integer; xPurchaseHeader: Record "Purchase Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var PurcasehHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header")
     begin
     end;
 
