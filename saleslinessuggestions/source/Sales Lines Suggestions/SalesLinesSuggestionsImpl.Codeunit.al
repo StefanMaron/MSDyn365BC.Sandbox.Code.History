@@ -84,17 +84,19 @@ codeunit 7275 "Sales Lines Suggestions Impl."
     end;
 
     internal procedure GenerateSalesLineSuggestions(SearchQuery: Text; SearchStyle: Enum "Search Style"; SourceSalesHeader: Record "Sales Header"; var TempSalesLineAiSuggestion: Record "Sales Line AI Suggestions" temporary)
+    var
+        CompletionAnswerTxt: Text;
     begin
-        AICall(BuildIntentSystemPrompt(), SearchQuery, SearchStyle, SourceSalesHeader, TempSalesLineAiSuggestion);
+        CompletionAnswerTxt := AICall(BuildIntentSystemPrompt(), SearchQuery);
+        ProcessCompletionAnswer(CompletionAnswerTxt, SearchQuery, SearchStyle, SourceSalesHeader, TempSalesLineAiSuggestion);
     end;
 
     [NonDebuggable]
-    internal procedure AICall(SystemPromptTxt: SecretText; SearchQuery: Text; SearchStyle: Enum "Search Style"; SourceSalesHeader: Record "Sales Header"; var TempSalesLineAiSuggestion: Record "Sales Line AI Suggestions" temporary): Text
+    internal procedure AICall(SystemPromptTxt: SecretText; SearchQuery: Text): Text
     var
         AzureOpenAI: Codeunit "Azure OpenAi";
         AOAIDeployments: Codeunit "AOAI Deployments";
         AOAIOperationResponse: Codeunit "AOAI Operation Response";
-        AOAIFunctionResponse: Codeunit "AOAI Function Response";
         AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params";
         AOAIChatMessages: Codeunit "AOAI Chat Messages";
         DocumentLookup: Codeunit "Document Lookup Function";
@@ -105,8 +107,7 @@ codeunit 7275 "Sales Lines Suggestions Impl."
         TelemetryCD: Dictionary of [Text, Text];
         StartDateTime: DateTime;
         DurationAsBigInt: BigInteger;
-        EmptyArguments: JsonObject;
-        CompletionAnswer: Text;
+        CompletionAnswerTxt: Text;
         ResponseErr: Label 'Response error code: %1', Comment = '%1 = Error code', Locked = true;
     begin
         if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"Sales Lines Suggestions") then
@@ -119,14 +120,9 @@ codeunit 7275 "Sales Lines Suggestions Impl."
         AOAIChatCompletionParams.SetMaxTokens(MaxTokens());
         AOAIChatCompletionParams.SetTemperature(0);
 
-        SearchItemsFunction.SetSearchQuery(SearchQuery);
-        SearchItemsFunction.SetSearchStyle(SearchStyle);
-        DocumentLookup.SetSearchQuery(SearchQuery);
-        DocumentLookup.SetSourceDocumentRecordId(SourceSalesHeader.RecordId);
-
-        AOAIChatMessages.AddTool(MagicFunction);
-        AOAIChatMessages.AddTool(SearchItemsFunction);
-        AOAIChatMessages.AddTool(DocumentLookup);
+        AOAIChatMessages.AddTool(MagicFunction.GetToolPrompt());
+        AOAIChatMessages.AddTool(SearchItemsFunction.GetToolPrompt());
+        AOAIChatMessages.AddTool(DocumentLookup.GetToolPrompt());
         AOAIChatMessages.SetToolChoice('auto');
 
         AOAIChatMessages.SetPrimarySystemMessage(SystemPromptTxt);
@@ -138,30 +134,85 @@ codeunit 7275 "Sales Lines Suggestions Impl."
         TelemetryCD.Add('Response time', Format(DurationAsBigInt));
 
         if AOAIOperationResponse.IsSuccess() then begin
-            CompletionAnswer := AOAIOperationResponse.GetResult();
-            if AOAIOperationResponse.IsFunctionCall() then begin
-                AOAIFunctionResponse := AOAIOperationResponse.GetFunctionResponse();
-                FeatureTelemetry.LogUsage('0000MED', GetFeatureName(), 'Call Chat Completion API', TelemetryCD);
-
-                if AOAIFunctionResponse.IsSuccess() then
-                    TempSalesLineAiSuggestion.Copy(AOAIFunctionResponse.GetResult(), true)
-                else begin
-                    MagicFunction.Execute(EmptyArguments);
-                    FeatureTelemetry.LogError('0000ME9', GetFeatureName(), 'Process function_call', 'Function not supported, defaulting to magic_function');
-                end
-            end else begin
-                if AOAIOperationResponse.GetResult() = '' then
-                    FeatureTelemetry.LogError('0000ME8', GetFeatureName(), 'Call Chat Completion API', 'Completion answer is empty', '', TelemetryCD)
-                else
-                    FeatureTelemetry.LogError('0000MEA', GetFeatureName(), 'Process function_call', 'function_call not found in the completion answer');
+            CompletionAnswerTxt := AOAIOperationResponse.GetResult();
+            if CompletionAnswerTxt = '' then begin
+                FeatureTelemetry.LogError('0000ME8', GetFeatureName(), 'Call Chat Completion API', 'Completion answer is empty', '', TelemetryCD);
                 NotificationManager.SendNotification(ChatCompletionResponseErr);
-            end;
-        end else begin
+            end
+            else
+                FeatureTelemetry.LogUsage('0000MED', GetFeatureName(), 'Call Chat Completion API', TelemetryCD);
+        end
+        else begin
             FeatureTelemetry.LogError('0000ME7', GetFeatureName(), 'Call Chat Completion API', StrSubstNo(ResponseErr, AOAIOperationResponse.GetStatusCode()), '', TelemetryCD);
             NotificationManager.SendNotification(ChatCompletionResponseErr);
         end;
 
-        exit(CompletionAnswer);
+        exit(CompletionAnswerTxt);
+    end;
+
+    [NonDebuggable]
+    local procedure ProcessCompletionAnswer(CompletionAnswerTxt: Text; SearchQuery: Text; SearchStyle: Enum "Search Style"; SourceSalesHeader: Record "Sales Header"; var TempSalesLineAiSuggestion: Record "Sales Line AI Suggestions" temporary)
+    var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
+        NotificationManager: Codeunit "Notification Manager";
+        CustomDimension: Dictionary of [Text, Text];
+        AnswerJson: JsonObject;
+        ArgumentJson: JsonObject;
+        ToolsArrayToken: JsonToken;
+        ToolType: JsonToken;
+        Tool: JsonToken;
+        Function: JsonToken;
+        FunctionName: JsonToken;
+        FunctionArgument: JsonToken;
+        Tools: Interface SalesAzureOpenAITools;
+        SupportedTools: Enum "Sales Supported Tools";
+        Result: Variant;
+    begin
+        if CompletionAnswerTxt = '' then
+            exit;
+
+        AnswerJson.ReadFrom(CompletionAnswerTxt);
+        CustomDimension.Add('SearchQuery', SearchQuery);
+        CustomDimension.Add('SearchStyle', Format(SearchStyle));
+        CustomDimension.Add('SourceDocumentRecordID', Format(SourceSalesHeader.RecordId));
+
+        if AnswerJson.Get('tool_calls', ToolsArrayToken) then
+            foreach Tool in ToolsArrayToken.AsArray() do begin
+                Tool.AsObject().Get('type', ToolType);
+                if ToolType.AsValue().asText() = 'function' then begin
+                    Tool.AsObject().Get('function', Function);
+                    Function.AsObject().Get('name', FunctionName);
+                    Function.AsObject().Get('arguments', FunctionArgument);
+
+                    if Evaluate(SupportedTools, FunctionName.AsValue().asText()) then
+                        Tools := SupportedTools
+                    else begin
+                        Tools := SupportedTools::magic_function;
+                        FeatureTelemetry.LogError('0000ME9', GetFeatureName(), 'Process function_call', 'Function not supported, defaulting to magic_function');
+                    end;
+                    ArgumentJson.ReadFrom(FunctionArgument.AsValue().AsText());
+                    Result := Tools.ToolCall(ArgumentJson, CustomDimension);
+
+                    if Result.IsRecord then
+                        TempSalesLineAiSuggestion.Copy(Result, true);
+                end;
+                break;
+            end
+        else begin
+            FeatureTelemetry.LogError('0000MEA', GetFeatureName(), 'Process function_call', 'function_call not found in the completion answer');
+            NotificationManager.SendNotification(ChatCompletionResponseErr);
+        end;
+    end;
+
+    procedure CheckSupportedApplicationFamily(): Boolean
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        ApplicationFamily: Text;
+    begin
+        ApplicationFamily := EnvironmentInformation.GetApplicationFamily();
+        if ApplicationFamily = 'CA' then   //Disabled for Canada due to legal reasons
+            exit(false);
+        exit(true);
     end;
 
     procedure CheckSupportedLanguages(): Boolean
@@ -173,9 +224,8 @@ codeunit 7275 "Sales Lines Suggestions Impl."
         LanguageSelection.SetLoadFields("Language Tag");
         LanguageSelection.SetRange("Language ID", UserSessionSettings.LanguageId());
         if LanguageSelection.FindFirst() then
-            if LanguageSelection."Language Tag".StartsWith('pt-') then
-                exit(false);
-        exit(true);
+            if LanguageSelection."Language Tag".StartsWith('en-') then
+                exit(true);
     end;
 
     procedure RegisterCapability()
@@ -185,8 +235,9 @@ codeunit 7275 "Sales Lines Suggestions Impl."
         DocUrlLbl: Label 'https://go.microsoft.com/fwlink/?linkid=2261665', Locked = true;
     begin
         if EnvironmentInformation.IsSaaSInfrastructure() then
-            if not CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Sales Lines Suggestions") then
-                CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"Sales Lines Suggestions", DocUrlLbl);
+            if CheckSupportedApplicationFamily() then
+                if not CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Sales Lines Suggestions") then
+                    CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"Sales Lines Suggestions", DocUrlLbl);
 
     end;
 

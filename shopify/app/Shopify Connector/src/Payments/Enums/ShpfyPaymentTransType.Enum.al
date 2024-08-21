@@ -56,8 +56,5 @@ enum 30127 "Shpfy Payment Trans. Type"
     {
         Caption = 'Payment Refund';
     }
-    value(12; "Shop Cash Credit")
-    {
-        Caption = 'Shop Cash Credit';
-    }
+
 }
