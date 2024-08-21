@@ -61,12 +61,6 @@ page 1004 "Job Task List"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the project posting group of the task.';
                 }
-                field("Coupled to Dataverse"; Rec."Coupled to Dataverse")
-                {
-                    ApplicationArea = Jobs;
-                    Visible = FSIntegrationEnabled;
-                    ToolTip = 'Specifies if the project task is coupled to an entity in Field Service.';
-                }
             }
         }
         area(factboxes)
@@ -130,13 +124,13 @@ page 1004 "Job Task List"
             group(ActionGroupFS)
             {
                 Caption = 'Dynamics 365 Field Service';
-                Enabled = FSActionGroupEnabled;
+                Visible = FSIntegrationEnabled;
                 action(CRMGoToProduct)
                 {
                     ApplicationArea = Suite;
-                    Caption = 'Project Task in Field Service';
+                    Caption = 'Product';
                     Image = CoupledItem;
-                    ToolTip = 'Open the coupled Dynamics 365 Field Service entity.';
+                    ToolTip = 'Open the coupled Dynamics 365 Field Service product.';
 
                     trigger OnAction()
                     var
@@ -164,14 +158,14 @@ page 1004 "Job Task List"
                 {
                     Caption = 'Coupling', Comment = 'Coupling is a noun';
                     Image = LinkAccount;
-                    ToolTip = 'Create, change, or delete a coupling between the Business Central record and a Dynamics 365 Field Service entity.';
+                    ToolTip = 'Create, change, or delete a coupling between the Business Central record and a Dynamics 365 Field Service record.';
                     action(ManageCRMCoupling)
                     {
                         AccessByPermission = TableData "CRM Integration Record" = IM;
                         ApplicationArea = Suite;
                         Caption = 'Set Up Coupling';
                         Image = LinkAccount;
-                        ToolTip = 'Create or modify the coupling to a Dynamics 365 Field Service entity.';
+                        ToolTip = 'Create or modify the coupling to a Dynamics 365 Field Service product.';
 
                         trigger OnAction()
                         var
@@ -187,7 +181,7 @@ page 1004 "Job Task List"
                         Caption = 'Delete Coupling';
                         Enabled = CRMIsCoupledToRecord;
                         Image = UnLinkAccount;
-                        ToolTip = 'Delete the coupling to a Dynamics 365 Field Service entity.';
+                        ToolTip = 'Delete the coupling to a Dynamics 365 Field Service product.';
 
                         trigger OnAction()
                         var
@@ -202,7 +196,7 @@ page 1004 "Job Task List"
                     ApplicationArea = Suite;
                     Caption = 'Synchronization Log';
                     Image = Log;
-                    ToolTip = 'View integration synchronization jobs for this table.';
+                    ToolTip = 'View integration synchronization jobs for the resource table.';
 
                     trigger OnAction()
                     var
@@ -364,20 +358,6 @@ page 1004 "Job Task List"
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    var
-        Job: Record Job;
-        CRMCouplingManagement: Codeunit "CRM Coupling Management";
-    begin
-        if FSIntegrationEnabled then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
-
-        if not Job.Get(Rec."Job No.") then
-            FSActionGroupEnabled := false
-        else
-            FSActionGroupEnabled := FSIntegrationEnabled and (Rec."Job Task Type" = Rec."Job Task Type"::Posting) and Job."Apply Usage Link";
-    end;
-
     trigger OnAfterGetRecord()
     begin
         StyleIsStrong := Rec."Job Task Type" <> Rec."Job Task Type"::Posting;
@@ -394,7 +374,6 @@ page 1004 "Job Task List"
     var
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
         FSIntegrationEnabled: Boolean;
-        FSActionGroupEnabled: Boolean;
         CRMIsCoupledToRecord: Boolean;
         StyleIsStrong: Boolean;
 }
