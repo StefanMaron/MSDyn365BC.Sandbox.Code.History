@@ -87,10 +87,8 @@ codeunit 7800 "Azure Functions Authentication"
     procedure CreateOAuth2WithCert(Endpoint: Text; AuthenticationCode: Text; ClientId: Text; Cert: SecretText; OAuthAuthorityUrl: Text; RedirectURL: Text; Scope: Text): Interface "Azure Functions Authentication"
     var
         AzureFunctionsOAuth2Cert: Codeunit "Azure Functions OAuth2 Cert";
-        Scopes: List of [Text];
     begin
-        Scopes.Add(Scope);
-        AzureFunctionsOAuth2Cert.SetAuthParameters(Endpoint, AuthenticationCode, ClientId, Cert, OAuthAuthorityUrl, RedirectURL, Scopes);
+        AzureFunctionsOAuth2Cert.SetAuthParameters(Endpoint, AuthenticationCode, ClientId, Cert, OAuthAuthorityUrl, RedirectURL, Scope);
         exit(AzureFunctionsOAuth2Cert);
     end;
 }
