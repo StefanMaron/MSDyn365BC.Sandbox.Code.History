@@ -497,24 +497,17 @@ codeunit 144049 "ERM Payment Management"
     [Scope('OnPrem')]
     procedure PaymentInProgressTrueOnCustomerCard()
     var
-        Customer: Record Customer;
+        CustomerCard: TestPage "Customer Card";
         PaymentInProgressLCY: Decimal;
     begin
         // Verify Payment In Progress Amount on Customer Card when Payment In Progress field is set to True on Payment Status.
 
-        // [GIVEN] Create Customer X
-        // [GIVEN] Create and post Sales Invoice for Customer X
-        // [GIVEN] Create Payment Class
-        // [GIVEN] Create Setup of Payment Class and Create Payment Slip with True for Payment In Progress field in Payment Status
+        // Setup and Exercise.
         Initialize();
-        PaymentInProgressLCY := PaymentInProgressOnCustomer(Customer, true);
+        PaymentInProgressLCY := PaymentInProgressOnCustomer(CustomerCard, true);  // Using True for Payment In Progress field in Payment Status.
 
-        // [WHEN] Calculate Payment in progress (LCY) for Customer X
-        Customer.CalcFields("Payment in progress (LCY)");
-
-        // [THEN] Payment in progress (LCY) for Customer X and the amount on payment lines for account no. = X are equal
-        Assert.AreEqual(Customer."Payment in progress (LCY)", PaymentInProgressLCY,
-            StrSubstNo(ValueIsIncorrectErr, Customer."Payment in progress (LCY)", Customer.FieldCaption("Payment in progress (LCY)")));
+        // Verify.
+        CustomerCard."Payment in progress (LCY)".AssertEquals(PaymentInProgressLCY);
     end;
 
     [Test]
@@ -522,26 +515,19 @@ codeunit 144049 "ERM Payment Management"
     [Scope('OnPrem')]
     procedure PaymentInProgressFalseOnCustomerCard()
     var
-        Customer: Record Customer;
+        CustomerCard: TestPage "Customer Card";
     begin
         // Verify Payment In Progress Amount on Customer Card when Payment In Progress field is set to False on Payment Status.
 
-        // [GIVEN] Create Customer X
-        // [GIVEN] Create and post Sales Invoice for Customer X
-        // [GIVEN] Create Payment Class
-        // [GIVEN] Create Setup of Payment Class and Create Payment Slip with False for Payment In Progress field in Payment Status
+        // Setup and Exercise.
         Initialize();
-        PaymentInProgressOnCustomer(Customer, false);
+        PaymentInProgressOnCustomer(CustomerCard, false);  // Using False  for Payment In Progress field in Payment Status.
 
-        // [WHEN] Calculate Payment in progress (LCY) for Customer X
-        Customer.CalcFields("Payment in progress (LCY)");
-
-        // [THEN] Payment in progress (LCY) for Customer X is 0
-        Assert.AreEqual(Customer."Payment in progress (LCY)", 0,
-            StrSubstNo(ValueIsIncorrectErr, Customer."Payment in progress (LCY)", Customer.FieldCaption("Payment in progress (LCY)")));
+        // Verify.
+        CustomerCard."Payment in progress (LCY)".AssertEquals(0);
     end;
 
-    local procedure PaymentInProgressOnCustomer(var Customer: Record Customer; PaymentInProgress: Boolean): Decimal
+    local procedure PaymentInProgressOnCustomer(var CustomerCard: TestPage "Customer Card"; PaymentInProgress: Boolean): Decimal
     var
         PaymentClass: Record "Payment Class";
         PaymentLine: Record "Payment Line";
@@ -560,8 +546,8 @@ codeunit 144049 "ERM Payment Management"
         // Verify: Verify Payment In Progress Amount on Customer Card.
         PaymentLine.SetRange("Payment Class", PaymentClass.Code);
         PaymentLine.FindFirst();
-
-        Customer.Get(PaymentLine."Account No.");
+        CustomerCard.OpenEdit();
+        CustomerCard.FILTER.SetFilter("No.", PaymentLine."Account No.");
         exit(-PaymentLine.Amount);
     end;
 
