@@ -37,7 +37,6 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
     procedure CreateReservation(ProdOrderComponent: Record "Prod. Order Component"; Description: Text[100]; ExpectedReceiptDate: Date; Quantity: Decimal; QuantityBase: Decimal; ForReservationEntry: Record "Reservation Entry")
     var
         ShipmentDate: Date;
-        IsHandled: Boolean;
     begin
         if FromTrackingSpecification."Source Type" = 0 then
             Error(Text004);
@@ -59,17 +58,12 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
             ExpectedReceiptDate := ProdOrderComponent."Due Date";
         end;
 
-        IsHandled := false;
-        OnCreateReservationOnBeforeCreateReservEntry(ProdOrderComponent, Quantity, QuantityBase, ForReservationEntry, FromTrackingSpecification, IsHandled, ExpectedReceiptDate, Description, ShipmentDate);
-        if not IsHandled then begin
-            CreateReservEntry.CreateReservEntryFor(
-                Database::"Prod. Order Component", ProdOrderComponent.Status.AsInteger(),
-                ProdOrderComponent."Prod. Order No.", '', ProdOrderComponent."Prod. Order Line No.",
-                ProdOrderComponent."Line No.", ProdOrderComponent."Qty. per Unit of Measure",
-                Quantity, QuantityBase, ForReservationEntry);
-            CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
-        end;
-
+        CreateReservEntry.CreateReservEntryFor(
+            Database::"Prod. Order Component", ProdOrderComponent.Status.AsInteger(),
+            ProdOrderComponent."Prod. Order No.", '', ProdOrderComponent."Prod. Order Line No.",
+            ProdOrderComponent."Line No.", ProdOrderComponent."Qty. per Unit of Measure",
+            Quantity, QuantityBase, ForReservationEntry);
+        CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
         CreateReservEntry.CreateReservEntry(
             ProdOrderComponent."Item No.", ProdOrderComponent."Variant Code", ProdOrderComponent."Location Code",
             Description, ExpectedReceiptDate, ShipmentDate, 0);
@@ -811,11 +805,6 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
 
     [IntegrationEvent(false, false)]
     local procedure OnCallItemTrackingOnBeforeItemTrackingLinesRunModal(var ProdOrderComponent: Record "Prod. Order Component"; var ItemTrackingLines: Page "Item Tracking Lines")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateReservationOnBeforeCreateReservEntry(var ProdOrderComponent: Record "Prod. Order Component"; var Quantity: Decimal; var QuantityBase: Decimal; var ReservationEntry: Record "Reservation Entry"; var FromTrackingSpecification: Record "Tracking Specification"; var IsHandled: Boolean; ExpectedReceiptDate: Date; Description: Text[100]; ShipmentDate: Date)
     begin
     end;
 }
