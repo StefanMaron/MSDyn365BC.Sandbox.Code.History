@@ -1364,35 +1364,25 @@ codeunit 134918 "ERM Sales/Purchase Application"
     procedure DocumentAmountInPurchJnlAcceptsMaxThreeDecimalPlacesValue()
     var
         Vendor: Record Vendor;
-        Currency: Record Currency;
         PurchaseJournal: TestPage "Purchase Journal";
         DocumentAmount: Decimal;
     begin
         // [SCENARIO 534464] Document Amount field in Purchase Journal accepts a value of maximum 3 decimal places.
-        // [SCENARIO 544673] Document amount field respects Currency Code Decimal places settings
         Initialize();
 
-        // [GIVEN] Create a Currency with amount rounding precision and decimal places allowing for 3 decimal places.
-        Currency.Get(LibraryERM.CreateCurrencyWithExchangeRate(0D, LibraryRandom.RandDec(10, 2), LibraryRandom.RandDec(10, 2)));
-        Currency."Amount Decimal Places" := '3:3';
-        Currency."Amount Rounding Precision" := 0.001;
-        Currency.Modify();
-
-        // [GIVEN] Create a Vendor with the Currency Code.
+        // [GIVEN] Create a Vendor.
         LibraryPurchase.CreateVendor(Vendor);
-        Vendor.Validate("Currency Code", Currency.Code);
-        Vendor.Modify();
 
-        // [GIVEN] Open Purchase Journal and enter Vendor No.
+        // [GIVEN] Open Purchase Journal.
         PurchaseJournal.OpenView();
         PurchaseJournal.New();
         PurchaseJournal."Account Type".SetValue("Gen. Journal Account Type"::Vendor);
         PurchaseJournal."Account No.".SetValue(Vendor."No.");
 
-        // [GIVEN] Document Amount for line has 3 decimal places.
+        // [GIVEN] Generate and save Document Amount in a Variable.
         DocumentAmount := LibraryRandom.RandDecInRange(1, 4, 3);
 
-        // [WHEN] Set Document Amount field in Purchase Journal.
+        // [WHEN] Set value of 3 decimal places in Document Amount field in Purchase Journal.
         PurchaseJournal.DocumentAmount.SetValue(DocumentAmount);
 
         // [THEN] Document Amount in Purchase Journal has a value of 3 decimal places.
