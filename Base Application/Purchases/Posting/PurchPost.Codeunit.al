@@ -2981,8 +2981,7 @@ codeunit 90 "Purch.-Post"
             IsHandled := false;
             OnFinalizePostingOnBeforeUpdateWhseDocuments(PurchHeader, WhseRcptHeader, TempWhseRcptHeader, WhseShptHeader, TempWhseShptHeader, WhseReceive, WhseShip, IsHandled);
             if not IsHandled then
-                if not PreviewMode then
-                    UpdateWhseDocuments();
+                UpdateWhseDocuments();
             WhsePurchRelease.Release(PurchHeader);
             UpdateItemChargeAssgnt(PurchHeader);
             OnFinalizePostingOnAfterUpdateItemChargeAssgnt(PurchHeader, TempDropShptPostBuffer, EverythingInvoiced, TempPurchLine, TempPurchLineGlobal, GenJnlPostLine);
@@ -3015,8 +3014,7 @@ codeunit 90 "Purch.-Post"
             OnFinalizePostingOnBeforeUpdateAfterPosting(PurchHeader, TempDropShptPostBuffer, EverythingInvoiced, IsHandled, TempPurchLine);
             if not IsHandled then begin
                 UpdateAfterPosting(PurchHeader);
-                if not PreviewMode then
-                    UpdateWhseDocuments();
+                UpdateWhseDocuments();
                 if not OrderArchived then
                     ArchiveManagement.AutoArchivePurchDocument(PurchHeader);
                 DeleteApprovalEntries(PurchHeader);
@@ -3193,7 +3191,7 @@ codeunit 90 "Purch.-Post"
         end;
 
         DeferralUtilities.AdjustTotalAmountForDeferralsNoBase(
-          PurchLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, PurchLine."Inv. Discount Amount" + PurchLine."Line Discount Amount", PurchLineACY."Inv. Discount Amount" + PurchLineACY."Line Discount Amount");
+          PurchLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY);
 
         IsHandled := false;
         OnBeforeInvoicePostingBufferSetAmounts(
@@ -3493,7 +3491,7 @@ codeunit 90 "Purch.-Post"
         xPurchLine := PurchaseLine;
         PurchLineACY := PurchaseLine;
         IsHandled := false;
-        OnRoundAmountOnBeforeCalculateLCYAmounts(xPurchLine, PurchLineACY, PurchaseHeader, IsHandled, TotalPurchLine, TotalPurchLineLCY, PurchaseLine);
+        OnRoundAmountOnBeforeCalculateLCYAmounts(xPurchLine, PurchLineACY, PurchaseHeader, IsHandled);
         if not IsHandled then
             if PurchaseHeader."Currency Code" <> '' then
                 RoundAmountInCurrency(PurchaseHeader, PurchaseLine);
@@ -3919,7 +3917,7 @@ codeunit 90 "Purch.-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), IsHandled, PurchaseHeader, GenJnlLineDocNo, PreviewMode);
+        OnBeforeUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), IsHandled, PurchaseHeader);
         if IsHandled then
             exit;
 
@@ -3938,7 +3936,7 @@ codeunit 90 "Purch.-Post"
                 end;
         end;
 
-        OnAfterUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), GenJnlLineDocNo, PreviewMode, PurchaseHeader);
+        OnAfterUpdatePurchaseHeader(VendorLedgerEntry, PurchInvHeader, PurchCrMemoHeader, GenJnlLineDocType.AsInteger(), GenJnlLineDocNo, PreviewMode);
     end;
 
 #if not CLEAN23
@@ -6237,8 +6235,6 @@ codeunit 90 "Purch.-Post"
     end;
 
     local procedure UpdateInvoicedQtyOnPurchRcptLine(var PurchInvHeader: Record "Purch. Inv. Header"; var PurchRcptLine: Record "Purch. Rcpt. Line"; var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; QtyToBeInvoiced: Decimal; QtyToBeInvoicedBase: Decimal; TrackingSpecificationExists: Boolean; var TempTrackingSpecification: Record "Tracking Specification" temporary)
-    var
-        IsHandled: Boolean;
     begin
         OnBeforeUpdateInvoicedQtyOnPurchRcptLine(
           PurchRcptLine, QtyToBeInvoiced, QtyToBeInvoicedBase, SuppressCommit, PurchInvHeader, PurchaseHeader, PurchaseLine);
@@ -6246,11 +6242,7 @@ codeunit 90 "Purch.-Post"
         PurchRcptLine."Quantity Invoiced" := PurchRcptLine."Quantity Invoiced" + QtyToBeInvoiced;
         PurchRcptLine."Qty. Invoiced (Base)" := PurchRcptLine."Qty. Invoiced (Base)" + QtyToBeInvoicedBase;
         PurchRcptLine."Qty. Rcd. Not Invoiced" := PurchRcptLine.Quantity - PurchRcptLine."Quantity Invoiced";
-
-        IsHandled := false;
-        OnBeforeModifyInvoicedQtyOnPurchRcptLine(PurchRcptLine, IsHandled);
-        if not IsHandled then
-            PurchRcptLine.Modify();
+        PurchRcptLine.Modify();
 
         OnAfterUpdateInvoicedQtyOnPurchRcptLine(
           PurchInvHeader, PurchRcptLine, PurchaseLine, TempTrackingSpecification, TrackingSpecificationExists,
@@ -6924,8 +6916,6 @@ codeunit 90 "Purch.-Post"
     end;
 
     local procedure InsertSalesShptLine(SalesShptHeader: Record "Sales Shipment Header"; SalesOrderLine: Record "Sales Line"; DropShptPostBuffer: Record "Drop Shpt. Post. Buffer"; var SalesShptLine: Record "Sales Shipment Line")
-    var
-        IsHandled: Boolean;
     begin
         SalesShptLine.Init();
         SalesShptLine.TransferFields(SalesOrderLine);
@@ -6943,9 +6933,8 @@ codeunit 90 "Purch.-Post"
             SalesShptLine."Item Shpt. Entry No." := DropShptPostBuffer."Item Shpt. Entry No.";
             SalesShptLine."Item Charge Base Amount" := SalesOrderLine."Line Amount";
         end;
-        OnBeforeSalesShptLineInsert(SalesShptLine, SalesShptHeader, SalesOrderLine, SuppressCommit, DropShptPostBuffer, IsHandled);
-        if not IsHandled then
-            SalesShptLine.Insert();
+        OnBeforeSalesShptLineInsert(SalesShptLine, SalesShptHeader, SalesOrderLine, SuppressCommit, DropShptPostBuffer);
+        SalesShptLine.Insert();
         OnAfterSalesShptLineInsert(SalesShptLine, SalesShptHeader, SalesOrderLine, SuppressCommit, DropShptPostBuffer, TempPurchLineGlobal);
     end;
 
@@ -7399,10 +7388,8 @@ codeunit 90 "Purch.-Post"
                                 SalesShptLine."Document No." := SalesShptHeader."No.";
                                 SalesShptLine."Order No." := SalesOrderLine."Document No.";
                                 SalesShptLine."Order Line No." := SalesOrderLine."Line No.";
-                                Clear(IsHandled);
-                                OnBeforeSalesShptLineInsert(SalesShptLine, SalesShptHeader, SalesOrderLine, SuppressCommit, TempDropShptPostBuffer, IsHandled);
-                                if not IsHandled then
-                                    SalesShptLine.Insert();
+                                OnBeforeSalesShptLineInsert(SalesShptLine, SalesShptHeader, SalesOrderLine, SuppressCommit, TempDropShptPostBuffer);
+                                SalesShptLine.Insert();
                                 OnAfterSalesShptLineInsert(SalesShptLine, SalesShptHeader, SalesOrderLine, SuppressCommit, TempDropShptPostBuffer, TempPurchLineGlobal);
                             until SalesOrderLine.Next() = 0;
                         OnPostCombineSalesOrderShipmentOnAfterProcessDropShptPostBuffer(TempDropShptPostBuffer, PurchRcptHeader, SalesShptLine, TempTrackingSpecification);
@@ -7828,8 +7815,7 @@ codeunit 90 "Purch.-Post"
                                 TempInvoicePostBufferReverseCharge := TempInvoicePostBuffer;
                                 if TempInvoicePostBufferReverseCharge.Find() then begin
                                     VATAmountRemainder += VATAmount;
-                                    if VATBaseAmount <> 0 then
-                                        TempInvoicePostBuffer."VAT Amount" := Round(VATAmountRemainder, CurrencyDocument."Amount Rounding Precision");
+                                    TempInvoicePostBuffer."VAT Amount" := Round(VATAmountRemainder, CurrencyDocument."Amount Rounding Precision");
                                     VATAmountRemainder -= TempInvoicePostBuffer."VAT Amount";
 
                                     if PurchHeader."Currency Code" <> '' then
@@ -7838,8 +7824,7 @@ codeunit 90 "Purch.-Post"
                                                 PurchHeader.GetUseDate(), PurchHeader."Currency Code", TempInvoicePostBuffer."VAT Amount", PurchHeader."Currency Factor"));
 
                                     VATAmountACYRemainder += VATAmountACY;
-                                    if VATBaseAmountACY <> 0 then
-                                        TempInvoicePostBuffer."VAT Amount (ACY)" := Round(VATAmountACYRemainder, Currency."Amount Rounding Precision");
+                                    TempInvoicePostBuffer."VAT Amount (ACY)" := Round(VATAmountACYRemainder, Currency."Amount Rounding Precision");
                                     VATAmountACYRemainder -= TempInvoicePostBuffer."VAT Amount (ACY)";
 
                                     TempInvoicePostBuffer."VAT Base Amount" := Round(TempInvoicePostBuffer."VAT Base Amount" * (1 - PurchHeader."VAT Base Discount %" / 100));
@@ -9501,7 +9486,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Integer; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean; var PurchaseHeader: Record "Purchase Header")
+    local procedure OnAfterUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Integer; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean)
     begin
     end;
 
@@ -9952,7 +9937,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSalesShptLineInsert(var SalesShptLine: Record "Sales Shipment Line"; SalesShptHeader: Record "Sales Shipment Header"; SalesLine: Record "Sales Line"; CommitIsSupressed: Boolean; DropShptPostBuffer: Record "Drop Shpt. Post. Buffer"; var IsHandled: Boolean)
+    local procedure OnBeforeSalesShptLineInsert(var SalesShptLine: Record "Sales Shipment Line"; SalesShptHeader: Record "Sales Shipment Header"; SalesLine: Record "Sales Line"; CommitIsSupressed: Boolean; DropShptPostBuffer: Record "Drop Shpt. Post. Buffer")
     begin
     end;
 
@@ -10154,7 +10139,7 @@ codeunit 90 "Purch.-Post"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Option; var IsHandled: Boolean; var PurchaseHeader: Record "Purchase Header"; GenJnlLineDocNo: Code[20]; PreviewMode: Boolean)
+    local procedure OnBeforeUpdatePurchaseHeader(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; GenJnlLineDocType: Option; var IsHandled: Boolean; var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 
@@ -10889,7 +10874,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRoundAmountOnBeforeCalculateLCYAmounts(var xPurchLine: Record "Purchase Line"; var PurchLineACY: Record "Purchase Line"; PurchHeader: Record "Purchase Header"; var IsHandled: Boolean; TotalPurchaseLine: Record "Purchase Line"; TotalPurchaseLineLCY: Record "Purchase Line"; var PurchaseLine: Record "Purchase Line")
+    local procedure OnRoundAmountOnBeforeCalculateLCYAmounts(var xPurchLine: Record "Purchase Line"; var PurchLineACY: Record "Purchase Line"; PurchHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 
@@ -11761,11 +11746,6 @@ codeunit 90 "Purch.-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateBlanketOrderLineOnBeforeCheckBlanketOrderPurchLine(var BlanketOrderPurchaseLine: Record "Purchase Line"; PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeModifyInvoicedQtyOnPurchRcptLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; var IsHandled: Boolean)
     begin
     end;
 }
