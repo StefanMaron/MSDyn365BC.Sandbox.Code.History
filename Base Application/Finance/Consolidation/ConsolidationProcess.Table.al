@@ -70,13 +70,4 @@ table 1830 "Consolidation Process"
             Clustered = true;
         }
     }
-
-    trigger OnDelete()
-    var
-        BusUnitInConsProcess: Record "Bus. Unit In Cons. Process";
-    begin
-        BusUnitInConsProcess.SetRange("Consolidation Process Id", Id);
-        BusUnitInConsProcess.DeleteAll();
-    end;
-
 }
