@@ -29,11 +29,6 @@ table 1544 "Flow User Environment Buffer"
             Caption = 'Enabled';
             DataClassification = SystemMetadata;
         }
-        field(5; Linked; Boolean)
-        {
-            Caption = 'Linked';
-            DataClassification = SystemMetadata;
-        }
     }
 
     keys
@@ -48,3 +43,4 @@ table 1544 "Flow User Environment Buffer"
     {
     }
 }
+
