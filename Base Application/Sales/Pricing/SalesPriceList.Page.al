@@ -43,8 +43,7 @@ page 7016 "Sales Price List"
 
                         trigger OnValidate()
                         begin
-                            if Rec.Code <> '' then
-                                CurrPage.Update();
+                            CurrPage.Update();
                         end;
                     }
                     field(Description; Rec.Description)
