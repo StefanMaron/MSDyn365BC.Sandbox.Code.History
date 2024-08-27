@@ -354,7 +354,6 @@ table 904 "Assemble-to-Order Link"
             end;
     end;
 
-
     internal procedure UpdateAsmBinCodeFromJobPlanningLine(JobPlanningLine: Record "Job Planning Line")
     var
         Window: Dialog;
