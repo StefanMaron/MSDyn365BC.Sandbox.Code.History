@@ -159,12 +159,9 @@ table 339 "Item Application Entry"
         Reset();
         SetCurrentKey("Transferred-from Entry No.", "Cost Application");
         SetRange("Transferred-from Entry No.", InbndItemLedgEntryNo);
-        SetRange("Cost Application", IsCostApplication, true);
-        if IsEmpty() then
-            exit(false);
-
-        FindSet();
-        exit(true);
+        if IsCostApplication then
+            SetRange("Cost Application", true);
+        exit(FindSet());
     end;
 
     procedure AppliedInbndEntryExists(OutbndItemLedgEntryNo: Integer; IsCostApplication: Boolean): Boolean

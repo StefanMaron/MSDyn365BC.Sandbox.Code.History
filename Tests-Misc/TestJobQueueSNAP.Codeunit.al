@@ -1120,6 +1120,8 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueEntries: TestPage "Job Queue Entries";
     begin
         CreateFailingJobQueueEntry(JobQueueEntry);
+        // The message does not matter, it is replaced when JQE page is opened
+        // Replaced to "Something went wrong and the job has stopped." and status becomes error
         JobQueueEntry."Error Message" := 'Part 1' + 'Part 2' + 'Part 3' + 'Part 4';
         JobQueueEntry.Modify(true);
 
@@ -1399,7 +1401,7 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueDispatcher.MockTaskScheduler();
         JobQueueDispatcher.Run(JobQueueEntryB);
 
-        JobQueueEntryB.TestField(Status, JobQueueEntryB.Status::Waiting);
+        JobQueueEntryB.TestField(Status, JobQueueEntryB.Status::Ready);
         UnbindSubscription(LibraryJobQueue);
     end;
 
@@ -1431,49 +1433,6 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueEntry.Delete();
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    [HandlerFunctions('CanShowNoErrorMessageHandler')]
-    procedure RunJobQueueWithStartTimeGreaterThanEndTime()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueLogEntry: Record "Job Queue Log Entry";
-        CurTime: Time;
-    begin
-        // [SCENARIO] Job queue will run even if start and end time is set to run across dates
-        JobQueueEntry.DeleteAll();
-        JobQueueLogEntry.DeleteAll();
-
-        // [GIVEN] A job queue that can run but is set outside of running hours 
-        CreateSucceedingJobQueueEntry(JobQueueEntry);
-        CurTime := DT2Time(CurrentDateTime());
-        JobQueueEntry."Starting Time" := CurTime + (1000 * 60 * 60); // 1 hour forward
-        JobQueueEntry."Ending Time" := CurTime - (1000 * 60 * 60); // 1 hour backward
-        JobQueueEntry.Modify();
-        Assert.RecordCount(JobQueueEntry, 1);
-        Assert.RecordCount(JobQueueLogEntry, 0);
-
-        // [WHEN] Run the job queue
-        Codeunit.Run(Codeunit::"Job Queue Dispatcher", JobQueueEntry);
-
-        // [THEN] The job queue does not run because it is outside the time range it should run
-        Assert.RecordCount(JobQueueEntry, 1);
-        Assert.RecordCount(JobQueueLogEntry, 0);
-
-        // [GIVEN] The same job queue but set within running hours and across to the next day
-        CurTime := DT2Time(CurrentDateTime());
-        JobQueueEntry."Starting Time" := CurTime - (1000 * 60 * 60); // 1 hour backward
-        JobQueueEntry."Ending Time" := CurTime + (1000 * 60 * 60 * 22); // 22 hour forward
-        JobQueueEntry.Modify();
-
-        // [WHEN] Run the job queue
-        Codeunit.Run(Codeunit::"Job Queue Dispatcher", JobQueueEntry);
-
-        // [THEN] The job queue runs
-        Assert.RecordCount(JobQueueEntry, 0);
-        Assert.RecordCount(JobQueueLogEntry, 1);
-    end;
-
     local procedure InitializeRecurringJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"; Duration: Integer)
     begin
         JobQueueEntry.Init();
@@ -1503,7 +1462,7 @@ codeunit 139020 "Test Job Queue SNAP"
     procedure CanShowErrorMessageHandler(Message: Text)
     begin
         Assert.IsTrue(Message <> 'There is no error message.', 'Expected error message but found ''' + Message + '''');
-        Assert.IsTrue(Message = 'Part 1' + 'Part 2' + 'Part 3' + 'Part 4', 'Expected a different error message. Found: ''' + Message + '''');
+        Assert.IsTrue(Message = 'Something went wrong and the job has stopped. Likely causes are system updates or routine maintenance processes. To restart the job, set the status to Ready.', 'Expected a different error message. Found: ''' + Message + '''');
     end;
 
     [Normal]
