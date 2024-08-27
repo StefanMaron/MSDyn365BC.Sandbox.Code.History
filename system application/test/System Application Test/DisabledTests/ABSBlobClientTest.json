@@ -9,12 +9,6 @@
         "bug":  "488813",
         "codeunitId":  132920,
         "codeunitName":  "ABS Blob Client Test",
-        "method":  "PutMultipleBlocksTextToSingleBlobTest"
-    },
-    {
-        "bug":  "488813",
-        "codeunitId":  132920,
-        "codeunitName":  "ABS Blob Client Test",
         "method":  "ListBlobsTest"
     },
     {
