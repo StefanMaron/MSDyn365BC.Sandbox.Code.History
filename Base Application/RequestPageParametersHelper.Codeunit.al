@@ -4,6 +4,8 @@ using System;
 using System.Reflection;
 using System.Utilities;
 using System.Xml;
+using System.IO;
+using System.Globalization;
 
 codeunit 1530 "Request Page Parameters Helper"
 {
@@ -45,6 +47,8 @@ codeunit 1530 "Request Page Parameters Helper"
     procedure OpenPageToGetFilter(MainRecordRef: RecordRef; var SelectionFilterOutStream: OutStream; ExistingFilters: Text): Boolean
     var
         RequestPageParametersHelper: Codeunit "Request Page Parameters Helper";
+        TranslationHelper: Codeunit "Translation Helper";
+        Language: Codeunit Language;
         RequestFilterPageBuilder: FilterPageBuilder;
         RequestPageView: Text;
     begin
@@ -55,7 +59,9 @@ codeunit 1530 "Request Page Parameters Helper"
         if not RequestFilterPageBuilder.RunModal() then
             exit(false);
 
+        TranslationHelper.SetGlobalLanguageById(Language.GetDefaultApplicationLanguageId());
         RequestPageView := RequestPageParametersHelper.GetViewFromDynamicRequestPage(RequestFilterPageBuilder, CopyStr(MainRecordRef.Caption(), 1, 20), MainRecordRef.Number);
+        TranslationHelper.RestoreGlobalLanguage();
 
         SelectionFilterOutStream.WriteText(RequestPageView);
         exit(true);
