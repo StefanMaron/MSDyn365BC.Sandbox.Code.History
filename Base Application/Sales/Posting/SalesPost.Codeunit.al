@@ -2946,7 +2946,8 @@ codeunit 80 "Sales-Post"
             InsertTrackingSpecification(SalesHeader);
             PostUpdateOrderLine(SalesHeader);
             UpdateAssociatedPurchaseOrder(TempDropShptPostBuffer, SalesHeader);
-            UpdateWhseDocuments(SalesHeader, EverythingInvoiced);
+            if not PreviewMode then
+                UpdateWhseDocuments(SalesHeader, EverythingInvoiced);
             WhseSalesRelease.Release(SalesHeader);
             UpdateItemChargeAssgnt(SalesHeader);
             OnFinalizePostingOnAfterUpdateItemChargeAssgnt(SalesHeader, TempDropShptPostBuffer, GenJnlPostLine);
@@ -2997,7 +2998,8 @@ codeunit 80 "Sales-Post"
             end;
             UpdateAfterPosting(SalesHeader);
             UpdateEmailParameters(SalesHeader);
-            UpdateWhseDocuments(SalesHeader, EverythingInvoiced);
+            if not PreviewMode then
+                UpdateWhseDocuments(SalesHeader, EverythingInvoiced);
             if not OrderArchived then begin
                 ArchiveManagement.AutoArchiveSalesDocument(SalesHeader);
                 OrderArchived := true;
@@ -3157,7 +3159,7 @@ codeunit 80 "Sales-Post"
 
         OnFillInvoicePostingBufferOnBeforeDeferrals(SalesLine, TotalAmount, TotalAmountACY, SalesHeader.GetUseDate());
         DeferralUtilities.AdjustTotalAmountForDeferralsNoBase(
-          SalesLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY);
+          SalesLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, SalesLine."Inv. Discount Amount" + SalesLine."Line Discount Amount", SalesLineACY."Inv. Discount Amount" + SalesLineACY."Line Discount Amount");
 
         OnBeforeInvoicePostingBufferSetAmounts(
           SalesLine, TempInvoicePostBuffer, InvoicePostBuffer,
@@ -3644,6 +3646,7 @@ codeunit 80 "Sales-Post"
         else
             ProfitPct := Round(ProfitLCY / TotalSalesLineLCY.Amount * 100, 0.1);
         VATAmount := TotalSalesLine."Amount Including VAT" - TotalSalesLine.Amount;
+        OnSumSalesLinesTempOnAfterVatAmountSet(VATAmount, TotalSalesLine);
         if TotalSalesLine."VAT %" = 0 then
             VATAmountText := VATAmountTxt
         else
@@ -12140,6 +12143,11 @@ codeunit 80 "Sales-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckATOLink(SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false,false)]
+    local procedure OnSumSalesLinesTempOnAfterVatAmountSet(var VATAmount: Decimal; var TotalSalesLine: Record "Sales Line")
     begin
     end;
 }
