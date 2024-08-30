@@ -20,7 +20,6 @@ page 1354 "Pstd. Sales Cr. Memo - Update"
         {
             group(General)
             {
-                Caption = 'General';
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Basic, Suite;
