@@ -6,10 +6,6 @@ using Microsoft.Foundation.Period;
 
 codeunit 2670 "Variable Allocation Mgt."
 {
-    var
-        NoAccountingPeriodDefinedErr: Label 'The next accounting period for workdate %1 is not defined.\Verify the accounting period setup.', Comment = '%1 - Represents the date.';
-        PreviousYearIsNotDefinedErr: Label 'Previous year is not defined in accounting period.';
-
     internal procedure CalculateAmountDistributions(var AllocationAccount: Record "Allocation Account"; AmountToDistribute: Decimal; var AmountDistributions: Dictionary of [Guid, Decimal]; var ShareDistributions: Dictionary of [Guid, Decimal]; PostingDate: Date; CurrencyCode: Code[10])
     var
         AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
@@ -65,7 +61,11 @@ codeunit 2670 "Variable Allocation Mgt."
 
         foreach AccountSystemID in ShareDistributions.Keys() do begin
             ShareDistributions.Get(AccountSystemID, AmountDistribution);
-            FixedDistributions.Add(AccountSystemID, AmountDistribution);
+            if AmountDistribution <= 0 then begin
+                FixedDistributions.Add(AccountSystemID, 0);
+                TotalBalance -= AmountDistribution;
+            end else
+                FixedDistributions.Add(AccountSystemID, AmountDistribution);
         end;
         exit;
     end;
@@ -80,16 +80,15 @@ codeunit 2670 "Variable Allocation Mgt."
         Clear(TotalBalance);
         Clear(ShareDistributions);
         AllocAccountDistribution.SetRange("Allocation Account No.", AllocationAccount."No.");
-        if AllocAccountDistribution.IsEmpty() then
+        if not AllocAccountDistribution.FindSet() then
             exit;
 
-        if AllocAccountDistribution.FindSet() then
-            repeat
-                CalculateDateFilterForDistributionAccount(AllocAccountDistribution, StartDate, EndDate, PostingDate);
-                GetAccountBalance(AllocAccountDistribution, StartDate, EndDate, AccountBalance, ShareDistributions, TotalBalance);
-                ShareDistributions.Add(AllocAccountDistribution.SystemId, AccountBalance);
-                TotalBalance += AccountBalance;
-            until AllocAccountDistribution.Next() = 0;
+        repeat
+            CalculateDateFilterForDistributionAccount(AllocAccountDistribution, StartDate, EndDate, PostingDate);
+            GetAccountBalance(AllocAccountDistribution, StartDate, EndDate, AccountBalance, ShareDistributions, TotalBalance);
+            ShareDistributions.Add(AllocAccountDistribution.SystemId, AccountBalance);
+            TotalBalance += AccountBalance;
+        until AllocAccountDistribution.Next() = 0;
     end;
 
     internal procedure GetAccountBalance(var AllocAccountDistribution: Record "Alloc. Account Distribution"; StartDate: Date; EndDate: Date; var AccountBalance: Decimal; var ShareDistributions: Dictionary of [Guid, Decimal]; TotalBalance: Decimal)
@@ -335,4 +334,8 @@ codeunit 2670 "Variable Allocation Mgt."
     local procedure OnGetAccountBalance(var AllocAccountDistribution: Record "Alloc. Account Distribution"; StartDate: Date; EndDate: Date; var AccountBalance: Decimal; var ShareDistributions: Dictionary of [Guid, Decimal]; var TotalBalance: Decimal; var Handled: Boolean);
     begin
     end;
+
+    var
+        NoAccountingPeriodDefinedErr: Label 'The next accounting period for workdate %1 is not defined.\Verify the accounting period setup.', Comment = '%1 - Represents the date.';
+        PreviousYearIsNotDefinedErr: Label 'Previous year is not defined in accounting period.';
 }
