@@ -363,7 +363,7 @@ report 7318 "Whse.-Shipment - Create Pick"
         GetLocation(WhseShptLine."Location Code");
 
         SortingMethod := SortActivity.AsInteger();
-        OnAfterSetWhseShipmentLine(WhseShptLine, WhseShptHeader, SortingMethod, AssignedIDReq);
+        OnAfterSetWhseShipmentLine(WhseShptLine, WhseShptHeader, SortingMethod);
         SortActivity := "Whse. Activity Sorting Method".FromInteger(SortingMethod);
     end;
 
@@ -493,7 +493,7 @@ report 7318 "Whse.-Shipment - Create Pick"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterSetWhseShipmentLine(WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header"; var SortActivity: Option; var AssignedID: Code[50])
+    local procedure OnAfterSetWhseShipmentLine(WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header"; var SortActivity: Option)
     begin
     end;
 
