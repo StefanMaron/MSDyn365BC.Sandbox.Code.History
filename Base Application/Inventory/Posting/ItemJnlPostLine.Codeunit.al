@@ -2122,7 +2122,10 @@ codeunit 22 "Item Jnl.-Post Line"
         if IsHandled then
             exit;
 
-        if FromItemLedgEntry."Serial No." <> '' then
+        ItemTrackingSetup2.CopyTrackingFromItemTrackingCodeSpecificTracking(ItemTrackingCode);
+        ItemTrackingSetup2.CopyTrackingFromItemLedgerEntry(FromItemLedgEntry);
+
+        if (FromItemLedgEntry."Serial No." <> '') and (ItemTrackingSetup2."Serial No. Required") then
             ToItemLedgEntry.SetCurrentKey("Serial No.", "Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date")
         else
             ToItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date");
@@ -2137,8 +2140,7 @@ codeunit 22 "Item Jnl.-Post Line"
             ToItemLedgEntry.SetRange("Document Type", FromItemLedgEntry."Document Type");
             ToItemLedgEntry.SetRange("Document No.", FromItemLedgEntry."Document No.");
         end;
-        ItemTrackingSetup2.CopyTrackingFromItemTrackingCodeSpecificTracking(ItemTrackingCode);
-        ItemTrackingSetup2.CopyTrackingFromItemLedgerEntry(FromItemLedgEntry);
+
         ToItemLedgEntry.SetTrackingFilterFromItemTrackingSetupIfRequired(ItemTrackingSetup2);
         if (Location.Get(FromItemLedgEntry."Location Code") and Location."Use As In-Transit") or
            (FromItemLedgEntry."Location Code" = '') and
