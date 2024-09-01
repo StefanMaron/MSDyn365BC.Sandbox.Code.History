@@ -602,6 +602,11 @@ table 81 "Gen. Journal Line"
                     Validate("Bal. VAT %");
                     UpdateLineBalance();
                 end;
+
+                if JobTaskIsSet() then begin
+                    CreateTempJobJnlLine();
+                    UpdatePricesFromJobJnlLine();
+                end;
             end;
         }
         field(17; "Balance (LCY)"; Decimal)
@@ -3289,6 +3294,8 @@ table 81 "Gen. Journal Line"
         SpecialSymbolsTok: Label '=|&@()<>', Locked = true;
         MustUseAllGLAccountsAsDestinationAccountsAllocAccErr: Label 'To use Allocation Accounts in combination with deferrals, the selected Allocation Account must have only G/L Accounts as destination types, no other types are allowed.';
         CannotChangePostingGroupForAccountTypeErr: Label 'Posting group cannot be changed for Account Type %1.', Comment = '%1 - account type';
+        RestrictLineUsageDetailsTxt: Label 'The restriction was imposed because the line requires approval.';
+        RestrictBatchUsageDetailsTxt: Label 'The restriction was imposed because the journal batch requires approval.';
 
     protected var
         Currency: Record Currency;
@@ -3667,9 +3674,13 @@ table 81 "Gen. Journal Line"
                 end;
                 GenJnlLine3.Get(GenJnlLine2."Journal Template Name", GenJnlLine2."Journal Batch Name", GenJnlLine2."Line No.");
                 CheckJobQueueStatus(GenJnlLine3);
-                GenJnlLine3."Document No." := DocNo;
-                GenJnlLine3.Modify();
-                OnRenumberDocNoOnLinesOnAfterModifyGenJnlLine3(DocNo, GenJnlLine3);
+                if GenJnlLine3."Document No." <> DocNo then begin
+                    GenJnlLine3."Document No." := DocNo;
+                    GenJnlLine3.Modify();
+                    RestrictGenJournalLine(GenJnlLine3);
+                    OnRenumberDocNoOnLinesOnAfterModifyGenJnlLine3(DocNo, GenJnlLine3);
+                end;
+
                 First := false;
                 LastGenJnlLine := GenJnlLine2;
             until GenJnlLine2.Next() = 0;
@@ -4238,6 +4249,8 @@ table 81 "Gen. Journal Line"
         OnShowDimensionsOnAfterEditDimensionSet(Rec, OldDimSetID);
 
         IsChanged := OldDimSetID <> "Dimension Set ID";
+
+        OnAfterShowDimensions(Rec, xRec, OldDimSetID, IsChanged);
     end;
 
     procedure SwitchLinesWithErrorsFilter(var ShowAllLinesEnabled: Boolean)
@@ -7521,6 +7534,22 @@ table 81 "Gen. Journal Line"
         exit(CurrencyCode);
     end;
 
+    local procedure RestrictGenJournalLine(var GenJournalLine: Record "Gen. Journal Line")
+    var
+        GenJournalBatch: Record "Gen. Journal Batch";
+        RecordRestrictionMgt: Codeunit "Record Restriction Mgt.";
+    begin
+        if GenJournalLine."System-Created Entry" or GenJournalLine.IsTemporary then
+            exit;
+
+        if ApprovalsMgmt.IsGeneralJournalLineApprovalsWorkflowEnabled(GenJournalLine) then
+            RecordRestrictionMgt.RestrictRecordUsage(GenJournalLine, RestrictLineUsageDetailsTxt);
+
+        if GenJournalBatch.Get(GenJournalLine."Journal Template Name", GenJournalLine."Journal Batch Name") then
+            if ApprovalsMgmt.IsGeneralJournalBatchApprovalsWorkflowEnabled(GenJournalBatch) then
+                RecordRestrictionMgt.RestrictRecordUsage(GenJournalLine, RestrictBatchUsageDetailsTxt);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAccountNoOnValidateOnBeforeCreateDim(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
@@ -9082,6 +9111,12 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnAfterShowDimensions(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; OldDimSetID: Integer; var IsChanged: Boolean)
+    begin
+    end;
+
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeShowDimensions(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
@@ -9222,7 +9257,7 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateCurrencyCodeOnBeforeUpdateCurrencyFactor(var GenJournalLine: Record "Gen. Journal Line"; CurrExchRate: Record "Currency Exchange Rate")
+    local procedure OnValidateCurrencyCodeOnBeforeUpdateCurrencyFactor(var GenJournalLine: Record "Gen. Journal Line"; var CurrExchRate: Record "Currency Exchange Rate")
     begin
     end;
 
