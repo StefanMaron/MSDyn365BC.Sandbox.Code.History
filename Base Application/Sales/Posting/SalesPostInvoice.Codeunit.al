@@ -183,7 +183,7 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
 
         SalesPostInvoiceEvents.RunOnPrepareLineOnBeforeAdjustTotalAmounts(SalesLine, TotalAmount, TotalAmountACY, SalesHeader.GetUseDate());
         DeferralUtilities.AdjustTotalAmountForDeferralsNoBase(
-            SalesLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, SalesLine."Inv. Discount Amount" + SalesLine."Line Discount Amount", SalesLineACY."Inv. Discount Amount" + SalesLineACY."Line Discount Amount");
+            SalesLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY);
 
         IsHandled := false;
         SalesPostInvoiceEvents.RunOnPrepareLineOnBeforeSetAmounts(
