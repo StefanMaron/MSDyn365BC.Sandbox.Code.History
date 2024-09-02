@@ -2238,10 +2238,8 @@ codeunit 136603 "ERM RS Package Operations"
         ConfigPackage: Record "Config. Package";
         ConfigPackageTable: Record "Config. Package Table";
         SalesHeader: Record "Sales Header";
-        Base64Convert: Codeunit "Base64 Convert";
         WorkDescription: Text;
         LineCounter: Integer;
-        InStream: InStream;
     begin
         // [FEATURE] [Excel]
         // [SCENARIO] Blob fields are exported to Excel as configured.
@@ -2274,11 +2272,9 @@ codeunit 136603 "ERM RS Package Operations"
             repeat
                 LibraryReportValidation.VerifyCellValueByRef('A', LineCounter, 1, Format(SalesHeader."Document Type"));
                 LibraryReportValidation.VerifyCellValueByRef('B', LineCounter, 1, SalesHeader."No.");
-                SalesHeader.CalcFields("Work Description");
-                SalesHeader."Work Description".CreateInStream(InStream, TextEncoding::UTF8);
-                InStream.Read(WorkDescription);
+                WorkDescription := SalesHeader.GetWorkDescription();
                 if WorkDescription <> '' then
-                    LibraryReportValidation.VerifyCellValueByRef('C', LineCounter, 1, Base64Convert.ToBase64(WorkDescription, TextEncoding::UTF8));
+                    LibraryReportValidation.VerifyCellValueByRef('C', LineCounter, 1, SalesHeader.GetWorkDescription());
                 LineCounter += 1;
             until SalesHeader.Next() = 0;
     end;
