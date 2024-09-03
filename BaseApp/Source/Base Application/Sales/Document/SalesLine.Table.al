@@ -59,6 +59,7 @@ using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Structure;
+using System.Telemetry;
 using System.Utilities;
 using System.Environment.Configuration;
 
@@ -1572,7 +1573,7 @@ table 37 "Sales Line"
                     end;
 
                 IsHandled := false;
-                OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(Rec, VATPostingSetup, IsHandled, xRec, SalesHeader);
+                OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(Rec, VATPostingSetup, IsHandled);
                 if not IsHandled then
                     if SalesHeader."Prices Including VAT" and (Type in [Type::Item, Type::Resource]) then
                         Validate("Unit Price",
@@ -1853,6 +1854,7 @@ table 37 "Sales Line"
 
             trigger OnValidate()
             var
+                FeatureTelemetry: Codeunit "Feature Telemetry";
                 IsHandled: Boolean;
             begin
                 TestStatusOpen();
@@ -1861,6 +1863,9 @@ table 37 "Sales Line"
                 OnValidatePrepaymentPercentageOnBeforeUpdatePrepmtSetupFields(Rec, IsHandled);
                 if IsHandled then
                     exit;
+
+                FeatureTelemetry.LogUptake('0000KQB', 'Prepayment Sales', Enum::"Feature Uptake Status"::Used);
+                FeatureTelemetry.LogUsage('0000KQC', 'Prepayment Sales', 'Prepayment added');
 
                 UpdatePrepmtSetupFields();
 
@@ -2354,6 +2359,7 @@ table 37 "Sales Line"
             TableRelation = if (Type = const(Item), "Document Type" = filter(<> "Credit Memo" & <> "Return Order")) "Item Variant".Code where("Item No." = field("No."), Blocked = const(false), "Sales Blocked" = const(false))
             else
             if (Type = const(Item), "Document Type" = filter("Credit Memo" | "Return Order")) "Item Variant".Code where("Item No." = field("No."), Blocked = const(false));
+            ValidateTableRelation = false;
 
             trigger OnValidate()
             var
@@ -2367,11 +2373,14 @@ table 37 "Sales Line"
                     IsHandled := false;
                     OnValidateVariantCodeBeforeCheckBlocked(Rec, IsHandled);
                     if not IsHandled then begin
-                        ItemVariant.SetLoadFields("Sales Blocked");
+                        ItemVariant.SetLoadFields(Blocked, "Sales Blocked");
                         ItemVariant.Get(Rec."No.", Rec."Variant Code");
+                        ItemVariant.TestField(Blocked, false);
                         if ItemVariant."Sales Blocked" then
                             if IsCreditDocType() then
-                                SendBlockedItemVariantNotification();
+                                SendBlockedItemVariantNotification()
+                            else
+                                Error(SalesBlockedErr, ItemVariant.TableCaption(), StrSubstNo(ItemVariantPrimaryKeyLbl, ItemVariant."Item No.", ItemVariant.Code), ItemVariant.FieldCaption("Sales Blocked"));
                     end;
                 end;
                 TestStatusOpen();
@@ -2383,6 +2392,7 @@ table 37 "Sales Line"
 
                     TestField("Return Qty. Rcd. Not Invd.", 0);
                     TestField("Return Receipt No.", '');
+
 
                     InitItemAppl(false);
                 end;
@@ -3480,7 +3490,7 @@ table 37 "Sales Line"
         }
         key(Key21; "Document Type", "Document No.", Type, "No.", "System-Created Entry")
         {
-            IncludedFields = Quantity, "Outstanding Qty. (Base)";
+            IncludedFields = Quantity;
         }
         key(Key22; "Document No.", Type, "No.")
         {
@@ -3728,7 +3738,8 @@ table 37 "Sales Line"
         SelectNonstockItemErr: Label 'You can only select a catalog item for an empty line.';
         CommentLbl: Label 'Comment';
         LineDiscountPctErr: Label 'The value in the Line Discount % field must be between 0 and 100.';
-        SalesBlockedErr: Label 'You cannot sell %1 %2 because the %3 check box is selected on the %1 card.', Comment = '%1 - Table Caption (Item), %2 - Item No., %3 - Field Caption';
+        SalesBlockedErr: Label 'You cannot sell %1 %2 because the %3 check box is selected on the %1 card.', Comment = '%1 - Table Caption (item/variant), %2 - Item No./Variant Code, %3 - Field Caption';
+        ItemVariantPrimaryKeyLbl: Label '%1, %2', Comment = '%1 - Item No., %2 - Variant Code', Locked = true;
         CannotChangePrepaidServiceChargeErr: Label 'You cannot change the line because it will affect service charges that are already invoiced as part of a prepayment.';
         LineAmountInvalidErr: Label 'You have set the line amount to a value that results in a discount that is not valid. Consider increasing the unit price instead.';
         LineInvoiceDiscountAmountResetTok: Label 'The value in the Inv. Discount Amount field in %1 has been cleared.', Comment = '%1 - Record ID';
@@ -5755,7 +5766,6 @@ table 37 "Sales Line"
         ItemChargeAssgnts: Page "Item Charge Assignment (Sales)";
         ItemChargeAssgntLineAmt: Decimal;
         IsHandled: Boolean;
-        DoCreateDocChargeAssgnForReturnReceiptNo: Boolean;
     begin
         Get("Document Type", "Document No.", "Line No.");
         TestField("No.");
@@ -5800,9 +5810,7 @@ table 37 "Sales Line"
             ItemChargeAssgntLineAmt :=
               Round(ItemChargeAssgntLineAmt * ("Qty. to Invoice" / Quantity), Currency."Amount Rounding Precision");
 
-        DoCreateDocChargeAssgnForReturnReceiptNo := IsCreditDocType();
-        OnShowItemChargeAssgntOnBeforeCreateDocChargeAssgn(Rec, DoCreateDocChargeAssgnForReturnReceiptNo);
-        if DoCreateDocChargeAssgnForReturnReceiptNo then
+        if IsCreditDocType() then
             AssignItemChargeSales.CreateDocChargeAssgn(ItemChargeAssgntSales, "Return Receipt No.")
         else
             AssignItemChargeSales.CreateDocChargeAssgn(ItemChargeAssgntSales, "Shipment No.");
@@ -6148,7 +6156,6 @@ table 37 "Sales Line"
                             if not SalesLine."Prepayment Line" then
                                 SalesLine.UpdatePrepmtAmounts();
                             UpdateBaseAmounts(NewAmount, Round(NewAmountIncludingVAT, Currency."Amount Rounding Precision"), NewVATBaseAmount);
-                            OnUpdateVATOnLinesOnAfterUpdateBaseAmounts(SalesHeader, SalesLine, TempVATAmountLineRemainder, VATAmountLine, Currency);
                         end;
                         SalesLine.InitOutstanding();
                         if SalesLine.Type = SalesLine.Type::"Charge (Item)" then
@@ -6213,7 +6220,6 @@ table 37 "Sales Line"
         if SalesLine.FindSet() then
             repeat
                 if not SalesLine.ZeroAmountLine(QtyType) then begin
-                    OnCalcVATAmountLinesOnBeforeProcessSalesLine(SalesLine);
                     if (SalesLine.Type = SalesLine.Type::"G/L Account") and not SalesLine."Prepayment Line" and SalesLine."System-Created Entry" and not RoundingLineInserted then
                         RoundingLineInserted := (SalesLine."No." = SalesLine.GetCPGInvRoundAcc(SalesHeader));
                     if SalesLine."VAT Calculation Type" in
@@ -6222,11 +6228,9 @@ table 37 "Sales Line"
                         SalesLine."VAT %" := 0;
                     if not VATAmountLine.Get(
                          SalesLine."VAT Identifier", SalesLine."VAT Calculation Type", SalesLine."Tax Group Code", false, SalesLine."Line Amount" >= 0)
-                    then begin
+                    then
                         VATAmountLine.InsertNewLine(
                           SalesLine."VAT Identifier", SalesLine."VAT Calculation Type", SalesLine."Tax Group Code", false, SalesLine."VAT %", SalesLine."Line Amount" >= 0, false, 0);
-                        OnCalcVATAmountLinesOnAfterInsertNewVATAmountLine(SalesLine, VATAmountLine);
-                    end;
 
                     OnCalcVATAmountLinesOnBeforeQtyTypeCase(VATAmountLine, SalesLine, SalesHeader);
                     case QtyType of
@@ -7750,29 +7754,24 @@ table 37 "Sales Line"
     procedure CheckLocationOnWMS()
     var
         DialogText: Text;
-        IsHandled: Boolean;
     begin
         if (Type = Type::Item) and IsInventoriableItem() then begin
             DialogText := Text035;
-            if "Quantity (Base)" <> 0 then begin
-                IsHandled := false;
-                OnCheckLocationOnWMSOnBeforeCaseDocumentType(Rec, DialogText, IsHandled);
-                if not IsHandled then
-                    case "Document Type" of
-                        "Document Type"::Invoice:
-                            if "Shipment No." = '' then
-                                if Location.Get("Location Code") and Location."Directed Put-away and Pick" then begin
-                                    DialogText += Location.GetRequirementText(Location.FieldNo("Require Shipment"));
-                                    Error(Text016, DialogText, FieldCaption("Line No."), "Line No.");
-                                end;
-                        "Document Type"::"Credit Memo":
-                            if "Return Receipt No." = '' then
-                                if Location.Get("Location Code") and Location."Directed Put-away and Pick" then begin
-                                    DialogText += Location.GetRequirementText(Location.FieldNo("Require Receive"));
-                                    Error(Text016, DialogText, FieldCaption("Line No."), "Line No.");
-                                end;
-                    end;
-            end;
+            if "Quantity (Base)" <> 0 then
+                case "Document Type" of
+                    "Document Type"::Invoice:
+                        if "Shipment No." = '' then
+                            if Location.Get("Location Code") and Location."Directed Put-away and Pick" then begin
+                                DialogText += Location.GetRequirementText(Location.FieldNo("Require Shipment"));
+                                Error(Text016, DialogText, FieldCaption("Line No."), "Line No.");
+                            end;
+                    "Document Type"::"Credit Memo":
+                        if "Return Receipt No." = '' then
+                            if Location.Get("Location Code") and Location."Directed Put-away and Pick" then begin
+                                DialogText += Location.GetRequirementText(Location.FieldNo("Require Receive"));
+                                Error(Text016, DialogText, FieldCaption("Line No."), "Line No.");
+                            end;
+                end;
         end;
     end;
 
@@ -8011,7 +8010,6 @@ table 37 "Sales Line"
             "VAT %" := Round(100 * VATAmount / BaseAmount, 0.00001)
         else
             "VAT %" := 0;
-        OnAfterUpdateVATPercent(Rec);
     end;
 
     procedure ShowDeferrals(PostingDate: Date; CurrencyCode: Code[10]) ReturnValue: Boolean
@@ -9291,11 +9289,6 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateVATPercent(var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnUpdateUnitPriceByFieldOnBeforeValidateUnitPrice(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; CalledByFieldNo: Integer; CurrFieldNo: Integer; var Handled: Boolean)
     begin
     end;
@@ -10076,7 +10069,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(var SalesLine: Record "Sales Line"; VATPostingSetup: Record "VAT Posting Setup"; var IsHandled: Boolean; xSalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header")
+    local procedure OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(var SalesLine: Record "Sales Line"; VATPostingSetup: Record "VAT Posting Setup"; var IsHandled: Boolean)
     begin
     end;
 
@@ -10949,11 +10942,6 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnShowItemChargeAssgntOnBeforeCreateDocChargeAssgn(SalesLine: Record "Sales Line"; var DoCreateDocChargeAssgnForReturnReceiptNo: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateDeferralAmounts(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
@@ -10980,26 +10968,6 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateUnitPrice(var SalesLine: Record "Sales Line"; CurrentFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCheckLocationOnWMSOnBeforeCaseDocumentType(var SalesLine: Record "Sales Line"; DialogText: Text; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcVATAmountLinesOnBeforeProcessSalesLine(var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcVATAmountLinesOnAfterInsertNewVATAmountLine(var SalesLine: Record "Sales Line"; var VATAmountLine: Record "VAT Amount Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateVATOnLinesOnAfterUpdateBaseAmounts(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempVATAmountLine: Record "VAT Amount Line" temporary; var VATAmountLine: Record "VAT Amount Line"; Currency: Record Currency)
     begin
     end;
 }
