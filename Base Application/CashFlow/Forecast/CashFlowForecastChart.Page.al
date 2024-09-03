@@ -15,14 +15,6 @@ page 869 "Cash Flow Forecast Chart"
     {
         area(content)
         {
-            group(Disclaimer)
-            {
-                Caption = ' ';
-                ShowCaption = false;
-                Editable = false;
-                Visible = IsCashFlowSetUp;
-                InstructionalText = 'AI generated suggestions may not always be accurate. Please validate results for correctness before using content provided.';
-            }
             field(StatusText; StatusText)
             {
                 ApplicationArea = Basic, Suite;
