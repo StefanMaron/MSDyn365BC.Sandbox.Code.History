@@ -65,13 +65,13 @@ codeunit 5706 "TransferOrder-Post (Yes/No)"
             until (TransferLine.Next() = 0) or (DefaultNumber > 0);
     end;
 
-    local procedure GetPostingOptions(var DefaultNumber: Integer; var Selection: Option " ",Shipment,Receipt; var PostShipment: Boolean; var PostReceipt: Boolean; var PostTransfer: Boolean)
+    local procedure GetPostingOptions(var DefaultNumber: Integer; var Selection: Option " ",Shipment,Receipt; var PostShipment: boolean; var PostReceipt: boolean; var PostTransfer: boolean)
     var
         InventorySetup: Record "Inventory Setup";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeGetPostingOptions(TransHeader, Selection, PostShipment, PostReceipt, IsHandled, PostTransfer, DefaultNumber, PostBatch, PreviewMode);
+        OnBeforeGetPostingOptions(TransHeader, Selection, PostShipment, PostReceipt, IsHandled, PostTransfer);
         if IsHandled then
             exit;
 
@@ -106,7 +106,7 @@ codeunit 5706 "TransferOrder-Post (Yes/No)"
         end;
     end;
 
-    procedure PostTransferOrder(PostShipment: Boolean; PostReceipt: Boolean; PostTransfer: Boolean)
+    procedure PostTransferOrder(PostShipment: boolean; PostReceipt: boolean; PostTransfer: boolean)
     var
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         TransferOrderPostReceipt: Codeunit "TransferOrder-Post Receipt";
@@ -192,7 +192,7 @@ codeunit 5706 "TransferOrder-Post (Yes/No)"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetPostingOptions(TransferHeader: Record "Transfer Header"; Selection: Option; var PostShipment: Boolean; var PostReceipt: Boolean; var IsHandled: Boolean; var PostTransfer: Boolean; var DefaultNumber: Integer; PostBatch: Boolean; PreviewMode: Boolean)
+    local procedure OnBeforeGetPostingOptions(TransferHeader: Record "Transfer Header"; Selection: Option; var PostShipment: Boolean; var PostReceipt: Boolean; var IsHandled: Boolean; var PostTransfer: Boolean);
     begin
     end;
 
