@@ -3253,7 +3253,7 @@ codeunit 80 "Sales-Post"
 
         OnFillInvoicePostingBufferOnBeforeDeferrals(SalesLine, TotalAmount, TotalAmountACY, SalesHeader.GetUseDate());
         DeferralUtilities.AdjustTotalAmountForDeferrals(
-          SalesLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, TotalVATBase, TotalVATBaseACY, SalesLine."Inv. Discount Amount" + SalesLine."Line Discount Amount", SalesLineACY."Inv. Discount Amount" + SalesLineACY."Line Discount Amount");
+          SalesLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, TotalVATBase, TotalVATBaseACY);
 
         OnBeforeInvoicePostingBufferSetAmounts(
           SalesLine, TempInvoicePostBuffer, InvoicePostBuffer,

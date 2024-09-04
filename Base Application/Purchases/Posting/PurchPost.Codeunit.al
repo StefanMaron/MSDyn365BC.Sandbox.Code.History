@@ -3311,7 +3311,7 @@ codeunit 90 "Purch.-Post"
         end;
 
         DeferralUtilities.AdjustTotalAmountForDeferrals(
-          PurchLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, TotalVATBase, TotalVATBaseACY, PurchLine."Inv. Discount Amount" + PurchLine."Line Discount Amount", PurchLineACY."Inv. Discount Amount" + PurchLineACY."Line Discount Amount");
+          PurchLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, TotalVATBase, TotalVATBaseACY);
 
         IsHandled := false;
         OnBeforeInvoicePostingBufferSetAmounts(
