@@ -44,13 +44,11 @@ codeunit 85 "Sales Post Batch via Job Queue"
             repeat
                 TotalDocumentsCount += 1;
                 SetJobQueueStatus(SalesHeader, SalesHeader."Job Queue Status"::Posting);
-                OnPostSalesBatchOnBeforeRunSalesPost(SalesHeader);
                 if not Codeunit.Run(Codeunit::"Sales-Post", SalesHeader) then begin
                     SetJobQueueStatus(SalesHeader, SalesHeader."Job Queue Status"::Error);
                     ErrorMessageManagement.LogLastError();
                     ErrorPostDocumentsCount += 1;
                 end else begin
-                    OnPostSalesBatchOnAfterRunSalesPost(SalesHeader);
                     SetJobQueueStatus(SalesHeader, SalesHeader."Job Queue Status"::" ");
                     if SalesReceivablesSetup."Post & Print with Job Queue" then
                         if SalesHeader."Print Posted Documents" then
@@ -180,13 +178,7 @@ codeunit 85 "Sales Post Batch via Job Queue"
         ReportSelections: Record "Report Selections";
         ErrorMessageManagement: Codeunit "Error Message Management";
         PrintingErrorExists: Boolean;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforePrintDocument(ReportUsage, RecRef, SalesHeader, JobQueueEntry, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         ReportSelections.Reset();
         ReportSelections.SetRange(Usage, ReportUsage);
         ReportSelections.FindSet();
@@ -258,21 +250,6 @@ codeunit 85 "Sales Post Batch via Job Queue"
 
     [IntegrationEvent(false, false)]
     local procedure OnPrintToPDFOnBeforeReportRun(ReportId: Integer; RecRef: RecordRef; var OStream: OutStream; var IsSuccess: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostSalesBatchOnBeforeRunSalesPost(var SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostSalesBatchOnAfterRunSalesPost(var SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePrintDocument(ReportUsage: Enum "Report Selection Usage"; RecRef: RecordRef; SalesHeader: Record "Sales Header"; JobQueueEntry: Record "Job Queue Entry"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
