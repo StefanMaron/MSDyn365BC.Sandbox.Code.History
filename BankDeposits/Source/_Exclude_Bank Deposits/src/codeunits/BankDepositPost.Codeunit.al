@@ -101,8 +101,6 @@ codeunit 1690 "Bank Deposit-Post"
 
         if GenJournalLine.Count() = 0 then
             Error(EmptyDepositErr);
-        if Rec."Post as Lump Sum" and (GenJournalLine.Count() = 1) then
-            Rec."Post as Lump Sum" := false;
 
         TotalAmountLCY := ModifyGenJournalLinesForBankDepositPosting(Rec, GenJournalTemplate."Force Doc. Balance");
         if Rec."Post as Lump Sum" then
@@ -423,14 +421,6 @@ codeunit 1690 "Bank Deposit-Post"
             exit;
         end;
         OnBeforePostGenJournalLine(PostingGenJournalLine, CurrentBankDepositHeader, GenJnlPostLine);
-    end;
-
-    // For deposits (revenue, payments) and  not for registering expenses, which you're supposed to keep separate from deposits (according to GAAPs)
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Batch", 'OnBeforeCheckGenPostingType', '', false, false)]
-    local procedure OnBeforeCheckGenPostingType(GenJnlLine: Record "Gen. Journal Line"; AccountType: Enum "Gen. Journal Account Type"; var IsHandled: Boolean)
-    begin
-        if CurrentBankDepositHeader."Post as Lump Sum" then
-            IsHandled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Batch", 'OnAfterPostGenJnlLine', '', false, false)]
