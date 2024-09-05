@@ -178,7 +178,7 @@ page 12161 "Declaration of Intent Export"
         ExportFlags[6] := false;
     end;
 
-    protected var
+    var
         VATExemption: Record "VAT Exemption";
         AmountToDeclare: Decimal;
         CeilingType: Option "Fixed",Mobile;
