@@ -26,6 +26,7 @@ codeunit 138025 "O365 Correct Purchase Invoice"
         LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryRandom: Codeunit "Library - Random";
         IsInitialized: Boolean;
+        AmountPurchInvErr: Label 'Amount must have a value in Purch. Inv. Header';
         ShippedQtyReturnedCorrectErr: Label 'You cannot correct this posted purchase invoice because item %1 %2 has already been fully or partially returned.', Comment = '%1 = Item no. %2 = Item description.';
         ShippedQtyReturnedCancelErr: Label 'You cannot cancel this posted purchase invoice because item %1 %2 has already been fully or partially returned.', Comment = '%1 = Item no. %2 = Item description.';
         ReasonCodeErr: Label 'Canceling the invoice failed because of the following error: \\Reason Code must have a value in Purchase Header: Document Type=Credit Memo, No.=%1. It cannot be zero or empty.';
@@ -1128,7 +1129,10 @@ codeunit 138025 "O365 Correct Purchase Invoice"
         CreateAndPostPurchaseInvForNewItemAndVendor(Item, Item.Type::Inventory, Vendor, 0, -1, PurchInvHeader);
 
         // EXERCISE
-        CorrectPostedPurchInvoice.CancelPostedInvoiceStartNewInvoice(PurchInvHeader, PurchaseHeaderTmp);
+        asserterror CorrectPostedPurchInvoice.CancelPostedInvoiceStartNewInvoice(PurchInvHeader, PurchaseHeaderTmp);
+
+        // VERIFY
+        Assert.ExpectedError(AmountPurchInvErr);
     end;
 
     [Test]
@@ -1472,11 +1476,13 @@ codeunit 138025 "O365 Correct Purchase Invoice"
         // [SCENARIO 352180] Posted Purchase Invoice with zero amount line cannot be corrected
         Initialize();
 
-        // [WHEN] Posted Purchase Invoice with 1 line and Unit Cost/Line Amount = 0
+        // [GIVEN] Posted Purchase Invoice with 1 line and Unit Cost/Line Amount = 0
         CreateAndPostPurchaseInvForNewItemAndVendor(Item, Type::Inventory, Vendor, 0, 1, PurchInvoiceHeader);
 
-        // [THEN] Invoice is corrected
-        CorrectPostedPurchInvoice.TestCorrectInvoiceIsAllowed(PurchInvoiceHeader, FALSE);
+        // [WHEN] Invoice is corrected
+        // [THEN] Error message 'Amount must have a value in Purchase Invoice Header' appears
+        asserterror CorrectPostedPurchInvoice.TestCorrectInvoiceIsAllowed(PurchInvoiceHeader, FALSE);
+        Assert.ExpectedError(AmountPurchInvErr);
     end;
 
     [Test]
