@@ -436,7 +436,6 @@ codeunit 950 "Time Sheet Management"
         TimeSheetLineArchive: Record "Time Sheet Line Archive";
         TimeSheetLines: Page "Time Sheet Lines";
         NextLineNo: Integer;
-        IsArchive: Boolean;
     begin
         TimeSheetLines.LookupMode := true;
         TimeSheetLines.Editable(false);
@@ -457,30 +456,20 @@ codeunit 950 "Time Sheet Management"
         if TempTimeSheetLine.Count() = 1 then begin
             TempTimeSheetLine.FindFirst();
             if TempTimeSheetLine.Posted then begin
-                TimeSheetLineArchive.SetLoadFields("Time Sheet No.", "Line No.");
-                IsArchive := TimeSheetLineArchive.Get(TempTimeSheetLine."Time Sheet No.", TempTimeSheetLine."Line No.");
-                if IsArchive then begin
-                    if not CheckUserWantAllLinesFromOneTimeSheetHeaderArchive(TempTimeSheetLine) then
-                        exit;
-                end else
-                    if not CheckUserWantAllLinesFromOneTimeSheetHeader(TempTimeSheetLine) then
-                        exit;
+                if not CheckUserWantAllLinesFromOneTimeSheetHeaderArchive(TempTimeSheetLine) then
+                    exit;
             end else
                 if not CheckUserWantAllLinesFromOneTimeSheetHeader(TempTimeSheetLine) then
                     exit;
         end;
-        TimeSheetLineArchive.SetLoadFields();
 
         if TempTimeSheetLine.FindSet() then
             repeat
                 if not TempTimeSheetLine.Posted then
                     CopyTimeSheetLine(ToTimeSheetHeader, TempTimeSheetLine, CopyComments, NextLineNo)
                 else begin
-                    IsArchive := TimeSheetLineArchive.Get(TempTimeSheetLine."Time Sheet No.", TempTimeSheetLine."Line No.");
-                    if IsArchive then
-                        CopyTimeSheetLineArchive(ToTimeSheetHeader, TimeSheetLineArchive, CopyComments, NextLineNo)
-                    else
-                        CopyTimeSheetLine(ToTimeSheetHeader, TempTimeSheetLine, CopyComments, NextLineNo)
+                    TimeSheetLineArchive.Get(TempTimeSheetLine."Time Sheet No.", TempTimeSheetLine."Line No.");
+                    CopyTimeSheetLineArchive(ToTimeSheetHeader, TimeSheetLineArchive, CopyComments, NextLineNo);
                 end;
             until TempTimeSheetLine.Next() = 0;
     end;
@@ -641,7 +630,6 @@ codeunit 950 "Time Sheet Management"
     var
         ToTimeSheetDetail: Record "Time Sheet Detail";
         FromTimeSheetDetail: Record "Time Sheet Detail";
-        IsHandled: Boolean;
     begin
         FromTimeSheetDetail.SetRange("Time Sheet No.", FromTimeSheetLine."Time Sheet No.");
         FromTimeSheetDetail.SetRange("Time Sheet Line No.", FromTimeSheetLine."Line No.");
@@ -655,10 +643,7 @@ codeunit 950 "Time Sheet Management"
                 ToTimeSheetDetail.Status := "Time Sheet Status"::Open;
                 ToTimeSheetDetail.Posted := false;
                 ToTimeSheetDetail."Posted Quantity" := 0;
-                IsHandled := false;
-                OnBeforeTimeSheetDetailInsert(ToTimeSheetDetail, FromTimeSheetDetail, IsHandled);
-                if not IsHandled then
-                    ToTimeSheetDetail.Insert();
+                ToTimeSheetDetail.Insert();
             until FromTimeSheetDetail.Next() = 0;
     end;
 
@@ -706,7 +691,6 @@ codeunit 950 "Time Sheet Management"
             ToTimeSheetLine.Description := FromTimeSheetLineArchive.Description;
             ToTimeSheetLine.Chargeable := FromTimeSheetLineArchive.Chargeable;
             ToTimeSheetLine."Work Type Code" := FromTimeSheetLineArchive."Work Type Code";
-            OnCopyTimeSheetLineArchiveOnBeforeToTimeSheetLineInsert(ToTimeSheetLine, FromTimeSheetLineArchive);
             ToTimeSheetLine.Insert();
 
             CopyTimeSheetLineArchiveDetails(ToTimeSheetLine, FromTimeSheetLineArchive);
@@ -1323,7 +1307,6 @@ codeunit 950 "Time Sheet Management"
                 ServiceLine.Validate("Qty. to Consume", QtyToPost);
             ServiceLine."Planned Delivery Date" := TimeSheetDetail.Date;
             ServiceLine.Validate("Work Type Code", TimeSheetLine."Work Type Code");
-            OnAddServLinesFromTSDetailOnBeforeInsertServiceLine(ServiceLine, LineNo, ServiceHeader, TimeSheetDetail);
             ServiceLine.Insert();
         end;
     end;
@@ -1483,21 +1466,6 @@ codeunit 950 "Time Sheet Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckTimeSheetLineFieldsVisible(var WorkTypeCodeVisible: Boolean; var JobFieldsVisible: Boolean; var ChargeableVisible: Boolean; var ServiceOrderNoVisible: Boolean; var AbsenceCauseVisible: Boolean; var AssemblyOrderNoVisible: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAddServLinesFromTSDetailOnBeforeInsertServiceLine(var ServiceLine: Record Microsoft.Service.Document."Service Line"; var LineNo: Integer; ServiceHeader: Record Microsoft.Service.Document."Service Header"; TimeSheetDetail: Record "Time Sheet Detail")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTimeSheetDetailInsert(var ToTimeSheetDetail: Record "Time Sheet Detail"; FromTimeSheetDetail: Record "Time Sheet Detail"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyTimeSheetLineArchiveOnBeforeToTimeSheetLineInsert(var ToTimeSheetLine: Record "Time Sheet Line"; FromTimeSheetLineArchive: Record "Time Sheet Line Archive")
     begin
     end;
 }
