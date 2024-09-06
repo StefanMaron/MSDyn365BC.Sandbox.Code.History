@@ -141,6 +141,16 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
     var
         AIMatchingImpl: Codeunit "E-Doc. PO Copilot Matching";
         AzureOpenAI: Codeunit "Azure OpenAI";
+    begin
+        AIMatchingImpl.RegisterAICapability();
+        if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"E-Document Matching Assistance", true) then
+            exit(false);
+
+        exit(true);
+    end;
+
+    procedure IsCopilotVisible(): Boolean
+    var
         EnvironmentInformation: Codeunit "Environment Information";
     begin
         if not EnvironmentInformation.IsSaaSInfrastructure() then
@@ -150,10 +160,6 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
             exit(false);
 
         if not IsSupportedLanguage() then
-            exit(false);
-
-        AIMatchingImpl.RegisterAICapability();
-        if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"E-Document Matching Assistance", true) then
             exit(false);
 
         exit(true);
@@ -362,7 +368,7 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
         AzureKeyVault: Codeunit "Azure Key Vault";
         Prompt: SecretText;
     begin
-        if AzureKeyVault.GetAzureKeyVaultSecret('EDocumentMappingPromptV2', Prompt) then
+        if AzureKeyVault.GetAzureKeyVaultSecret('EDocumentMappingPrompt', Prompt) then
             exit(Prompt);
 
         Session.LogMessage('0000MOV', FailedToGetPromptSecretErr, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
