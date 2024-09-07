@@ -6,7 +6,6 @@ namespace Microsoft.Bank.ElectronicFundsTransfer;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Finance.GeneralLedger.Setup;
-using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
@@ -246,7 +245,7 @@ codeunit 10095 "Export EFT (RB)"
         AcctLanguage := Vendor."Bank Communication";
         RecipientAddress := CopyStr(Vendor.Address, 1, 35) + ' ' + CopyStr(Vendor."Address 2", 1, 35);
         RecipientCity := Vendor.City;
-        RecipientCountryCode := GetCountryISOCode(Vendor."Country/Region Code");
+        RecipientCountryCode := Vendor."Country/Region Code";
         RecipientCounty := Vendor.County;
         RecipientPostCode := Vendor."Post Code";
 
@@ -257,7 +256,7 @@ codeunit 10095 "Export EFT (RB)"
         RecipientTransitNo := VendorBankAccount."Transit No.";
         RecipientBankAcctNo := VendorBankAccount."Bank Account No.";
         RecipientBankAcctCurrencyCode := VendorBankAccount."Currency Code";
-        RecipientBankAcctCountryCode := GetCountryISOCode(VendorBankAccount."Country/Region Code");
+        RecipientBankAcctCountryCode := VendorBankAccount."Country/Region Code";
     end;
 
     local procedure GetRecipientDataFromCustomer(var TempEFTExportWorkset: Record "EFT Export Workset" temporary)
@@ -279,7 +278,7 @@ codeunit 10095 "Export EFT (RB)"
         AcctLanguage := Customer."Bank Communication";
         RecipientAddress := CopyStr(Customer.Address, 1, 35) + ' ' + CopyStr(Customer."Address 2", 1, 35);
         RecipientCity := Customer.City;
-        RecipientCountryCode := GetCountryISOCode(Customer."Country/Region Code");
+        RecipientCountryCode := Customer."Country/Region Code";
         RecipientCounty := Customer.County;
         RecipientPostCode := Customer."Post Code";
 
@@ -290,7 +289,7 @@ codeunit 10095 "Export EFT (RB)"
         RecipientTransitNo := CustomerBankAccount."Transit No.";
         RecipientBankAcctNo := CustomerBankAccount."Bank Account No.";
         RecipientBankAcctCurrencyCode := CustomerBankAccount."Currency Code";
-        RecipientBankAcctCountryCode := GetCountryISOCode(CustomerBankAccount."Country/Region Code");
+        RecipientBankAcctCountryCode := CustomerBankAccount."Country/Region Code"
     end;
 
     procedure JulianDate(NormalDate: Date): Integer
@@ -368,7 +367,7 @@ codeunit 10095 "Export EFT (RB)"
         ACHRBDetail.AD1Address := CopyStr(CompanyInformation.Address, 1, 35) + ' ' +
           CopyStr(CompanyInformation."Address 2", 1, 35);
         ACHRBDetail."AD1City State" := CompanyInformation.City + '*' + CompanyInformation.County + '\';
-        ACHRBDetail."AD1Region Code/Post Code" := GetCountryISOCode(CompanyInformation."Country/Region Code") + '*' +
+        ACHRBDetail."AD1Region Code/Post Code" := CompanyInformation."Country/Region Code" + '*' +
           CompanyInformation."Post Code" + '\';
 
         if IsParent then
@@ -403,14 +402,6 @@ codeunit 10095 "Export EFT (RB)"
     begin
         FindDataExchColumnDef(DataExchColumnDef, DataExchEntryNo, FieldName);
         exit(DataExchColumnDef."Data Format");
-    end;
-
-    local procedure GetCountryISOCode(CountryRegionCode: Code[10]): Code[2]
-    var
-        CountryRegion: Record "Country/Region";
-    begin
-        if CountryRegion.Get(CountryRegionCode) then
-            exit(CountryRegion."ISO Code");
     end;
 
     [Scope('OnPrem')]
