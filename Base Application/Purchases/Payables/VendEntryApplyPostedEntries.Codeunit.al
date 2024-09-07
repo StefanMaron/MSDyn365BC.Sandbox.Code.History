@@ -176,7 +176,6 @@ codeunit 227 "VendEntry-Apply Posted Entries"
         EntryNoBeforeApplication := FindLastApplDtldVendLedgEntry();
 
         GenJnlPostLine.SetIDBillSettlement(BeAppliedToBill(VendLedgEntry));
-        GenJnlPostLine.SetIDInvoiceSettlement(BeAppliedToInvoice(VendLedgEntry));
 
         OnBeforePostApplyVendLedgEntry(GenJnlLine, VendLedgEntry, GenJnlPostLine, ApplyUnapplyParameters);
         GenJnlPostLine.VendPostApplyVendLedgEntry(GenJnlLine, VendLedgEntry);
@@ -516,7 +515,7 @@ codeunit 227 "VendEntry-Apply Posted Entries"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnApplyVendEntryFormEntryOnAfterVendLedgEntrySetFilters(VendLedgEntry, ApplyingVendLedgEntry, IsHandled, VendEntryApplID);
+        OnApplyVendEntryFormEntryOnAfterVendLedgEntrySetFilters(VendLedgEntry, ApplyingVendLedgEntry, IsHandled);
         if IsHandled then
             exit;
 
@@ -586,22 +585,6 @@ codeunit 227 "VendEntry-Apply Posted Entries"
         VendLedgEntry3.SetRange("Document Type", VendLedgEntry2."Document Type"::Bill);
         if not VendLedgEntry3.IsEmpty() then
             exit(true);
-        exit(false);
-    end;
-
-    local procedure BeAppliedToInvoice(VendLedgEntry2: Record "Vendor Ledger Entry"): Boolean
-    var
-        VendLedgEntry3: Record "Vendor Ledger Entry";
-    begin
-        if VendLedgEntry2."Applies-to ID" = '' then
-            exit(false);
-
-        VendLedgEntry3.SetCurrentKey("Applies-to ID", "Document Type");
-        VendLedgEntry3.SetRange("Applies-to ID", VendLedgEntry2."Applies-to ID");
-        VendLedgEntry3.SetRange("Document Type", VendLedgEntry2."Document Type"::Invoice);
-        if not VendLedgEntry3.IsEmpty() then
-            exit(true);
-
         exit(false);
     end;
 
@@ -740,7 +723,7 @@ codeunit 227 "VendEntry-Apply Posted Entries"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyVendEntryFormEntryOnAfterVendLedgEntrySetFilters(var VendorLedgEntry: Record "Vendor Ledger Entry"; var ApplyToVendLedgEntry: Record "Vendor Ledger Entry"; var IsHandled: Boolean; var VendEntryApplID: Code[50]);
+    local procedure OnApplyVendEntryFormEntryOnAfterVendLedgEntrySetFilters(var VendorLedgEntry: Record "Vendor Ledger Entry"; var ApplyToVendLedgEntry: Record "Vendor Ledger Entry"; var IsHandled: Boolean);
     begin
     end;
 
