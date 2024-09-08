@@ -2,9 +2,9 @@
 
 using System.Automation;
 using System.Environment;
+using System.IO;
 using System.Security.User;
 using System.Telemetry;
-using System.Utilities;
 
 codeunit 456 "Job Queue Management"
 {
@@ -172,8 +172,6 @@ codeunit 456 "Job Queue Management"
         JobQueueEntry."Recurring Job" := false;
         JobQueueEntry.Status := JobQueueEntry.Status::"Ready";
         JobQueueEntry."Job Queue Category Code" := '';
-        JobQueueEntry."Starting Time" := 0T;
-        JobQueueEntry."Ending Time" := 0T;
         clear(JobQueueEntry."Expiration Date/Time");
         clear(JobQueueEntry."System Task ID");
         JobQueueEntry.Insert(true);
@@ -208,7 +206,7 @@ codeunit 456 "Job Queue Management"
         Window.Close();
         if JobQueueEntry.Find() then
             if JobQueueEntry.Delete() then;
-        JobQueueLogEntry.SetRange(ID, JobQueueEntry.ID);
+        JobQueueLogEntry.SetRange(ID, JobQueueEntry.id);
         if JobQueueLogEntry.FindFirst() then
             if JobQueueLogEntry.Status = JobQueueLogEntry.Status::Success then
                 Message(ExecuteEndSuccessMsg, JobQueueLogEntry.Status)
@@ -232,96 +230,51 @@ codeunit 456 "Job Queue Management"
         end;
     end;
 
-    procedure CheckAndRefreshCategoryRecoveryTasks()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueCategory: Record "Job Queue Category";
-        Categories: List of [Code[10]];
-        Category: Code[10];
-    begin
-        if not JobQueueEntry.WritePermission() then
-            exit;
-        if not JobQueueCategory.WritePermission() then
-            exit;
-
-        JobQueueEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
-        JobQueueEntry.SetFilter("Job Queue Category Code", '<>''''');
-        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::Waiting);
-        JobQueueEntry.SetLoadFields("Job Queue Category Code");
-        if not JobQueueEntry.FindSet() then
-            exit;
-
-        repeat
-            if not Categories.Contains(JobQueueEntry."Job Queue Category Code") then
-                Categories.Add(JobQueueEntry."Job Queue Category Code");
-        until JobQueueEntry.Next() = 0;
-
-        JobQueueCategory.ReadIsolation(IsolationLevel::ReadUncommitted);
-        foreach Category in Categories do
-            if JobQueueCategory.Get(Category) then
-                if not IsNullGuid(JobQueueCategory."Recovery Task Id") then
-                    if not TaskScheduler.TaskExists(JobQueueCategory."Recovery Task Id") then
-                        JobQueueEntry.RefreshRecoveryTask(JobQueueCategory);
-    end;
-
     /// <summary>
     /// To find stale jobs (in process jobs with no scheduled tasks) and set them to error state.
     /// For both JQE and JQLE
     /// </summary>
-    procedure FindStaleJobsAndSetError()
+    internal procedure FindStaleJobsAndSetError()
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueLogEntry: Record "Job Queue Log Entry";
-        JobQueueEntry2: Record "Job Queue Entry";
-        JobQueueLogEntry2: Record "Job Queue Log Entry";
     begin
-        if Session.CurrentClientType() <> ClientType::Background then
-            exit;
-
-        // Find all in process job queue entries
-        JobQueueEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
-        JobQueueEntry.SetLoadFields(ID, "System Task ID", "User Service Instance ID", "User Session ID", Status);
-        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
-        JobQueueEntry.SetRange(Scheduled, false);
-        JobQueueEntry.SetFilter(SystemModifiedAt, '<%1', CurrentDateTime() - GetCheckDelayInMinutes());  // Not modified in the last 10 minutes
-        JobQueueEntry2.ReadIsolation(IsolationLevel::UpdLock);
-        if JobQueueEntry.FindSet() then
-            repeat
-                // Check if job is still running or stale
-                // JQE is stale if it has task no longer exists
-                // If stale, set to error
-                if not TaskScheduler.TaskExists(JobQueueEntry."System Task ID") then
-                    if HasNoActiveSession(JobQueueEntry."User Service Instance ID", JobQueueEntry."User Session ID") then begin
-                        JobQueueEntry2.Get(JobQueueEntry.ID);
+        if JobQueueEntry.WritePermission() then begin
+            // Find all in process job queue entries
+            JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
+            if JobQueueEntry.FindSet() then
+                repeat
+                    // Check if job is still running or stale
+                    // JQE is stale if it has task no longer exists
+                    // If stale, set to error
+                    if not TaskScheduler.TaskExists(JobQueueEntry."System Task ID") then begin
                         JobQueueEntry.SetError(JobSomethingWentWrongMsg);
-                        OnFindStaleJobsAndSetErrorOnAfterSetError(JobQueueEntry2);
 
-                        StaleJobQueueEntryTelemetry(JobQueueEntry2);
+                        StaleJobQueueEntryTelemetry(JobQueueEntry);
                     end;
-            until JobQueueEntry.Next() = 0;
+                until JobQueueEntry.Next() = 0;
+        end;
 
-        // Find all in process job queue log entries
-        JobQueueLogEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
-        JobQueueLogEntry.SetLoadFields("Entry No.", ID);
-        JobQueueLogEntry.SetRange(Status, JobQueueLogEntry.Status::"In Process");
-        JobQueueLogEntry.SetFilter(SystemModifiedAt, '<%1', CurrentDateTime() - GetCheckDelayInMinutes());  // Not modified in the last 10 minutes
-        JobQueueLogEntry2.ReadIsolation(IsolationLevel::UpdLock);
-        if JobQueueLogEntry.FindSet() then
-            repeat
-                if not JobQueueEntry.Get(JobQueueLogEntry.ID) or (JobQueueEntry.Status = JobQueueEntry.Status::Error) then begin
-                    JobQueueLogEntry2.Get(JobQueueLogEntry."Entry No.");
-                    JobQueueLogEntry2.Status := JobQueueLogEntry2.Status::Error;
-                    JobQueueLogEntry2."Error Message" := JobSomethingWentWrongMsg;
-                    JobQueueLogEntry2.Modify();
+        if JobQueueLogEntry.WritePermission() then begin
+            // Find all in process job queue log entries
+            JobQueueLogEntry.SetRange(Status, JobQueueLogEntry.Status::"In Process");
+            if JobQueueLogEntry.FindSet() then
+                repeat
+                    // Check if job should be processed
+                    if ShouldProcessStaleJobQueueLogEntries(JobQueueLogEntry) then
+                        // Check if job is still running or stale
+                        // JQLE is stale if it has no task or active session
+                        // If stale, set to error
+                        if not TaskScheduler.TaskExists(JobQueueLogEntry."System Task ID") or
+                            HasNoActiveSession(JobQueueLogEntry."User Service Instance ID", JobQueueLogEntry."User Session ID") then begin
+                            JobQueueLogEntry.Status := JobQueueLogEntry.Status::Error;
+                            JobQueueLogEntry."Error Message" := JobSomethingWentWrongMsg;
+                            JobQueueLogEntry.Modify();
 
-                    StaleJobQueueLogEntryTelemetry(JobQueueLogEntry2);
-                end;
-            until JobQueueLogEntry.Next() = 0;
-    end;
-
-    local procedure GetCheckDelayInMinutes(): Integer
-    begin
-        exit(1000 * 60 * 10); // 10 minutes
+                            StaleJobQueueLogEntryTelemetry(JobQueueLogEntry);
+                        end;
+                until JobQueueLogEntry.Next() = 0;
+        end;
     end;
 
     local procedure HasNoActiveSession(ServerInstanceID: Integer; SessionID: Integer): Boolean
@@ -420,15 +373,20 @@ codeunit 456 "Job Queue Management"
         exit(0);
     end;
 
-    local procedure DeleteErrorMessageRegister(RegisterId: Guid)
-    var
-        ErrorMessageRegister: Record "Error Message Register";
+    /// <summary>
+    /// Due to certain usages of JQLE, we need to determine if the log entry is from normal usage
+    /// Abnormal usages like assisted company setup should be ignored
+    /// </summary>
+    local procedure ShouldProcessStaleJobQueueLogEntries(JobQueueLogEntry: Record "Job Queue Log Entry") Process: Boolean
     begin
-        if IsNullGuid(RegisterId) then
-            exit;
+        // Default true, to process stale jobs
+        Process := true;
 
-        ErrorMessageRegister.SetRange(ID, RegisterId);
-        ErrorMessageRegister.DeleteAll(true);
+        if JobQueueLogEntry."Object Type to Run" = JobQueueLogEntry."Object Type to Run"::Codeunit then
+            case JobQueueLogEntry."Object ID to Run" of
+                Codeunit::"Import Config. Package Files":
+                    Process := false;
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reporting Triggers", 'ScheduleReport', '', false, false)]
@@ -464,11 +422,6 @@ codeunit 456 "Job Queue Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunJobQueueEntryOnceOnAfterJobQueueEntryInsert(SelectedJobQueueEntry: Record "Job Queue Entry"; JobQueueEntry: Record "Job Queue Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFindStaleJobsAndSetErrorOnAfterSetError(var JobQueueEntry: Record "Job Queue Entry")
     begin
     end;
 }
