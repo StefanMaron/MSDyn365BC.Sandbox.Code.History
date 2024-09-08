@@ -45,8 +45,8 @@ codeunit 7772 "Azure OpenAI Impl"
         EmptyMetapromptErr: Label 'The metaprompt has not been set, please provide a metaprompt.';
         MetapromptLoadingErr: Label 'Metaprompt not found.';
         EnabledKeyTok: Label 'AOAI-Enabled', Locked = true;
-        AllowlistedTenantsAkvKeyTok: Label 'AOAI-Allow-1P-Auth', Locked = true;
         FunctionCallingFunctionNotFoundErr: Label 'Function call not found, %1.', Comment = '%1 is the name of the function';
+        AllowlistedTenantsAkvKeyTok: Label 'AOAI-Allow-1P-Auth', Locked = true;
         TelemetryGenerateTextCompletionLbl: Label 'Generate Text Completion', Locked = true;
         TelemetryGenerateEmbeddingLbl: Label 'Generate Embedding', Locked = true;
         TelemetryGenerateChatCompletionLbl: Label 'Generate Chat Completion', Locked = true;
@@ -60,9 +60,9 @@ codeunit 7772 "Azure OpenAI Impl"
         TelemetryProhibitedCharactersTxt: Label 'Prohibited characters were removed from the prompt.', Locked = true;
         TelemetryTokenCountLbl: Label 'Metaprompt token count: %1, Prompt token count: %2, Total token count: %3', Comment = '%1 is the number of tokens in the metaprompt, %2 is the number of tokens in the prompt, %3 is the total number of tokens', Locked = true;
         TelemetryMetapromptRetrievalErr: Label 'Unable to retrieve metaprompt from Azure Key Vault.', Locked = true;
+        TelemetryFunctionCallingFailedErr: Label 'Function calling failed for function: %1', Comment = '%1 is the name of the function', Locked = true;
         TelemetryEmptyTenantIdErr: Label 'Empty or malformed tenant ID.', Locked = true;
         TelemetryTenantAllowlistedMsg: Label 'The current tenant is allowlisted for first party auth.', Locked = true;
-        TelemetryFunctionCallingFailedErr: Label 'Function calling failed for function: %1', Comment = '%1 is the name of the function', Locked = true;
 
     procedure IsEnabled(Capability: Enum "Copilot Capability"; CallerModuleInfo: ModuleInfo): Boolean
     begin
@@ -692,5 +692,4 @@ codeunit 7772 "Azure OpenAI Impl"
         Session.LogMessage('0000MLE', TelemetryTenantAllowlistedMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CopilotCapabilityImpl.GetAzureOpenAICategory());
         exit(true);
     end;
-
 }
