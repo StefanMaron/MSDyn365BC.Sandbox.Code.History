@@ -33,9 +33,6 @@
         "General Ledger Setup"."Local Address Format" := "General Ledger Setup"."Local Address Format"::"Post Code+City";
         "General Ledger Setup"."Show Amounts" := "General Ledger Setup"."Show Amounts"::"Amount Only";
         "General Ledger Setup"."Hide Payment Method Code" := true;
-        GLAccountCategory.SetRange(Description, GLAccountCategoryMgt.GetAR());
-        if GLAccountCategory.FindFirst() then
-            "General Ledger Setup"."Acc. Receivables Category" := GLAccountCategory."Entry No.";
         "General Ledger Setup".Modify();
         VATRegistrationLogMgt.InitServiceSetup();
     end;
@@ -44,10 +41,8 @@
         "General Ledger Setup": Record "General Ledger Setup";
         DemoDataSetup: Record "Demo Data Setup";
         Currency: Record Currency;
-        GLAccountCategory: Record "G/L Account Category";
         "Create No. Series": Codeunit "Create No. Series";
         VATRegistrationLogMgt: Codeunit "VAT Registration Log Mgt.";
-        GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
         XDEPARTMENT: Label 'DEPARTMENT';
         XPROJECT: Label 'PROJECT';
         XCUSTOMERGROUP: Label 'CUSTOMERGROUP';
@@ -77,9 +72,6 @@
         "General Ledger Setup"."Show Amounts" := "General Ledger Setup"."Show Amounts"::"Amount Only";
         "General Ledger Setup"."Enable Data Check" := true;
         "General Ledger Setup"."Hide Payment Method Code" := true;
-        GLAccountCategory.SetRange(Description, GLAccountCategoryMgt.GetAR());
-        if GLAccountCategory.FindFirst() then
-            "General Ledger Setup"."Acc. Receivables Category" := GLAccountCategory."Entry No.";
         "General Ledger Setup".Modify();
         VATRegistrationLogMgt.InitServiceSetup();
     end;
@@ -91,9 +83,6 @@
         "General Ledger Setup".Validate("Global Dimension 2 Code", XCUSTOMERGROUP);
         "General Ledger Setup"."Max. VAT Difference Allowed" := 10;
         "General Ledger Setup"."Hide Payment Method Code" := true;
-        GLAccountCategory.SetRange(Description, GLAccountCategoryMgt.GetAR());
-        if GLAccountCategory.FindFirst() then
-            "General Ledger Setup"."Acc. Receivables Category" := GLAccountCategory."Entry No.";
         "General Ledger Setup".Modify();
     end;
 
