@@ -171,14 +171,10 @@ codeunit 7008 "Price Calculation Buffer Mgt."
     procedure ConvertAmountByTax(var PriceListLine: Record "Price List Line"; var Amount: Decimal)
     var
         VATPostingSetup: Record "VAT Posting Setup";
-        IsHandled: Boolean;
     begin
         if PriceListLine."Price Includes VAT" then begin
             VATPostingSetup.Get(PriceListLine."VAT Bus. Posting Gr. (Price)", PriceCalculationBuffer."VAT Prod. Posting Group");
-            IsHandled := false;
-            OnConvertAmountByTaxOnAfterVATPostingSetupGet(VATPostingSetup, Amount, IsHandled);
-            if IsHandled then
-                exit;
+            OnConvertAmountByTaxOnAfterVATPostingSetupGet(VATPostingSetup);
 
             case VATPostingSetup."VAT Calculation Type" of
                 VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT":
@@ -340,7 +336,7 @@ codeunit 7008 "Price Calculation Buffer Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnConvertAmountByTaxOnAfterVATPostingSetupGet(var VATPostingSetup: Record "VAT Posting Setup"; var Amount: Decimal; var IsHandled: Boolean)
+    local procedure OnConvertAmountByTaxOnAfterVATPostingSetupGet(var VATPostingSetup: Record "VAT Posting Setup")
     begin
     end;
 
