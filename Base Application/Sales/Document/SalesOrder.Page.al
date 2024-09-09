@@ -345,11 +345,6 @@ page 42 "Sales Order"
                     ApplicationArea = RelationshipMgmt;
                     Importance = Additional;
                     ToolTip = 'Specifies the number of the campaign that the document is linked to.';
-                    trigger OnValidate()
-                    begin
-                        if Rec."Campaign No." <> xRec."Campaign No." then
-                            CurrPage.Update();
-                    end;
                 }
                 field("Opportunity No."; Rec."Opportunity No.")
                 {
@@ -2693,6 +2688,8 @@ page 42 "Sales Order"
         IsOfficeHost: Boolean;
         CanCancelApprovalForRecord: Boolean;
         JobQueuesUsed: Boolean;
+        ShowQuoteNo: Boolean;
+        DocumentIsPosted: Boolean;
         DocumentIsScheduledForPosting: Boolean;
         OpenPostedSalesOrderQst: Label 'The order is posted as number %1 and moved to the Posted Sales Invoices window.\\Do you want to open the posted invoice?', Comment = '%1 = posted document number';
         PaymentServiceVisible: Boolean;
@@ -2723,8 +2720,6 @@ page 42 "Sales Order"
         ShipToOptions: Enum "Sales Ship-to Options";
         BillToOptions: Enum "Sales Bill-to Options";
         CallNotificationCheck: Boolean;
-        DocumentIsPosted: Boolean;
-        ShowQuoteNo: Boolean;
 
     local procedure ActivateFields()
     begin
