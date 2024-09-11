@@ -17,7 +17,6 @@ using Microsoft.Service.Item;
 using Microsoft.Service.Ledger;
 using Microsoft.Service.Setup;
 using Microsoft.Utilities;
-using System.Reflection;
 using System.Security.User;
 using System.Utilities;
 
@@ -554,7 +553,6 @@ codeunit 5940 ServContractManagement
         TotalServLineLCY: Record "Service Line";
         ServContractAccGr: Record "Service Contract Account Group";
         IsHandled: Boolean;
-        LatestInvToDate: Date;
     begin
         IsHandled := false;
         OnBeforeCreateServiceLine(ServHeader, ContractType, ContractNo, InvFromDate, InvToDate, ServiceApplyEntry, SignningContract, IsHandled);
@@ -586,7 +584,6 @@ codeunit 5940 ServContractManagement
         end;
         AppliedGLAccount := GLAcc."No.";
 
-        LatestInvToDate := InvToDate;
         if ServiceLedgerEntry.Get(ServiceApplyEntry) then begin
             ServiceLedgerEntry.SetRange("Entry No.", ServiceApplyEntry, ServiceLedgerEntry."Apply Until Entry No.");
             if ServiceLedgerEntry.FindSet() then
@@ -594,8 +591,6 @@ codeunit 5940 ServContractManagement
                     if ServiceLedgerEntry.Prepaid then begin
                         InvFromDate := ServiceLedgerEntry."Posting Date";
                         InvToDate := CalcDate('<CM>', InvFromDate);
-                        if InvToDate > LatestInvToDate then
-                            InvToDate := LatestInvToDate;
                     end;
                     ServLedgEntryToServiceLine(
                       TotalServLine,
@@ -1225,7 +1220,6 @@ codeunit 5940 ServContractManagement
         WDate: Date;
         OldWDate: Date;
         IsHandled: Boolean;
-        DateExpression: Text[10];
     begin
         IsHandled := false;
         OnBeforeNoOfMonthsAndMPartsInPeriod(Day1, Day2, CheckMParts, MonthsAndMParts, IsHandled);
@@ -1240,15 +1234,14 @@ codeunit 5940 ServContractManagement
 
         WDate := CalcDate('<-CM>', Day1);
         repeat
-            DateExpression := GetDateExpression(Day1);
-            OldWDate := CalcDate(DateExpression, WDate);
+            OldWDate := CalcDate('<CM>', WDate);
             if WDate < Day1 then
                 WDate := Day1;
             if OldWDate > Day2 then
                 OldWDate := Day2;
             if (WDate <> CalcDate('<-CM>', WDate)) or (OldWDate <> CalcDate('<CM>', OldWDate)) then
                 MonthsAndMParts := MonthsAndMParts +
-                  (OldWDate - WDate + 1) / (CalcDate(DateExpression, OldWDate) - CalcDate('<-CM>', WDate) + 1)
+                  (OldWDate - WDate + 1) / (CalcDate('<CM>', OldWDate) - CalcDate('<-CM>', WDate) + 1)
             else
                 MonthsAndMParts := MonthsAndMParts + 1;
             WDate := CalcDate('<CM>', OldWDate) + 1;
@@ -2488,17 +2481,7 @@ codeunit 5940 ServContractManagement
         end;
     end;
 
-    local procedure GetDateExpression(Day1: Date): Text[10]
-    var
-        TypeHelper: Codeunit "Type Helper";
-    begin
-        if (Date2DMY(Day1, 2) = 2) and TypeHelper.IsLeapYear(Day1) then
-            exit('<CM-1D>');
-
-        exit('<CM>');
-    end;
-
-    #region Service Item Blocked checks
+    # region Service Item Blocked checks
     internal procedure CheckServiceItemBlockedForServiceContract(var ServiceContractLine: Record "Service Contract Line")
     var
         ServiceItem: Record "Service Item";
