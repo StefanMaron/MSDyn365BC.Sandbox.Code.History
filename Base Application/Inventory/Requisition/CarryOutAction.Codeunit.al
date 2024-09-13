@@ -32,7 +32,6 @@ codeunit 99000813 "Carry Out Action"
     var
         IsHandled: Boolean;
     begin
-        OnBeforeRun(Rec);
         ProductionExist := true;
         AssemblyExist := true;
         case TrySourceType of
@@ -382,7 +381,7 @@ codeunit 99000813 "Carry Out Action"
             ReservationManagement.AutoTrack(PurchaseLine."Outstanding Qty. (Base)");
 
             PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
-            OnPurchOrderChgAndResheduleOnAfterGetPurchHeader(PurchaseHeader, PurchaseLine, RequisitionLine);
+            OnPurchOrderChgAndResheduleOnAfterGetPurchHeader(PurchaseHeader);
             PrintPurchaseOrder(PurchaseHeader);
         end else
             Error(CouldNotChangeSupplyTxt, RequisitionLine."Ref. Order No.", RequisitionLine."Ref. Line No.");
@@ -1006,37 +1005,16 @@ codeunit 99000813 "Carry Out Action"
     end;
 
     procedure PrintTransferOrders()
-    var
-        TransferHeader: Record "Transfer Header";
-        ReportSelections: Record "Report Selections";
-        SelectionFilterManagement: Codeunit SelectionFilterManagement;
-        RecordRefToPrint: RecordRef;
-        RecordRefToHeader: RecordRef;
-        TransferOrderNoFilter: Text;
     begin
         CarryOutAction.GetTransferOrdersToPrint(TempTransferHeaderToPrint);
+        if TempTransferHeaderToPrint.FindSet() then begin
+            PrintOrder := true;
+            repeat
+                PrintTransferOrder(TempTransferHeaderToPrint);
+            until TempTransferHeaderToPrint.Next() = 0;
 
-        case TempTransferHeaderToPrint.Count() of
-            0:
-                exit;
-            1:
-                begin
-                    PrintOrder := true;
-                    TempTransferHeaderToPrint.FindFirst();
-                    PrintTransferOrder(TempTransferHeaderToPrint);
-                end;
-            else begin
-                RecordRefToPrint.GetTable(TempTransferHeaderToPrint);
-                RecordRefToHeader.GetTable(TransferHeader);
-                TransferOrderNoFilter := SelectionFilterManagement.CreateFilterFromTempTable(RecordRefToPrint, RecordRefToHeader, TransferHeader.FieldNo("No."));
-
-                TransferHeader.SetFilter("No.", TransferOrderNoFilter);
-                OnPrintTransferOrderOnBeforePrintWithDialogWithCheckForCust(ReportSelections);
-                ReportSelections.PrintWithDialogWithCheckForCust(Enum::"Report Selection Usage"::Inv1, TransferHeader, false, 0);
-            end;
+            TempTransferHeaderToPrint.DeleteAll();
         end;
-
-        TempTransferHeaderToPrint.DeleteAll();
     end;
 
     procedure PrintTransferOrder(TransferHeader: Record "Transfer Header")
@@ -1658,7 +1636,6 @@ codeunit 99000813 "Carry Out Action"
         ProductionBOMHeader: Record "Production BOM Header";
         ProdOrderLine: Record "Prod. Order Line";
         ProdOrderCompCmtLine: Record "Prod. Order Comp. Cmt Line";
-        ProductionBOMLine: Record "Production BOM Line";
         VersionManagement: Codeunit VersionManagement;
         ActiveVersionCode: Code[20];
     begin
@@ -1669,21 +1646,15 @@ codeunit 99000813 "Carry Out Action"
 
         ActiveVersionCode := VersionManagement.GetBOMVersion(ProductionBOMHeader."No.", WorkDate(), true);
 
-        ProductionBOMLine.SetRange("Production BOM No.", ProductionBOMHeader."No.");
-        ProductionBOMLine.SetRange(Type, ProductionBOMLine.Type::Item);
-        ProductionBOMLine.SetRange("No.", ProdOrderComponent."Item No.");
-        if ProductionBOMLine.FindSet() then
+        ProductionBOMCommentLine.SetRange("Production BOM No.", ProductionBOMHeader."No.");
+        ProductionBOMCommentLine.SetRange("BOM Line No.", ProdOrderComponent."Line No.");
+        ProductionBOMCommentLine.SetRange("Version Code", ActiveVersionCode);
+        if ProductionBOMCommentLine.FindSet() then
             repeat
-                ProductionBOMCommentLine.SetRange("Production BOM No.", ProductionBOMHeader."No.");
-                ProductionBOMCommentLine.SetRange("BOM Line No.", ProductionBOMLine."Line No.");
-                ProductionBOMCommentLine.SetRange("Version Code", ActiveVersionCode);
-                if ProductionBOMCommentLine.FindSet() then
-                    repeat
-                        ProdOrderCompCmtLine.CopyFromProdBOMComponent(ProductionBOMCommentLine, ProdOrderComponent);
-                        if not ProdOrderCompCmtLine.Insert() then
-                            ProdOrderCompCmtLine.Modify();
-                    until ProductionBOMCommentLine.Next() = 0;
-            until ProductionBOMLine.Next() = 0;
+                ProdOrderCompCmtLine.CopyFromProdBOMComponent(ProductionBOMCommentLine, ProdOrderComponent);
+                if not ProdOrderCompCmtLine.Insert() then
+                    ProdOrderCompCmtLine.Modify();
+            until ProductionBOMCommentLine.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]
@@ -1897,7 +1868,7 @@ codeunit 99000813 "Carry Out Action"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPurchOrderChgAndResheduleOnAfterGetPurchHeader(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var RequisitionLine: Record "Requisition Line")
+    local procedure OnPurchOrderChgAndResheduleOnAfterGetPurchHeader(var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 
@@ -2038,11 +2009,6 @@ codeunit 99000813 "Carry Out Action"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertProdOrderLineOnBeforeValidateUnitCost(var RequisitionLine: Record "Requisition Line"; ProductionOrder: Record "Production Order"; var ProdOrderLine: Record "Prod. Order Line"; Item: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRun(var Rec: Record "Requisition Line")
     begin
     end;
 }
