@@ -2,7 +2,6 @@ namespace Microsoft.Bank.Reconciliation.Test;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Ledger;
-using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Bank.Reconciliation;
 using Microsoft.Finance.GeneralLedger.Account;
 using System.TestLibraries.Utilities;
@@ -200,9 +199,6 @@ codeunit 139777 "Bank Rec. With AI Tests"
         TempBankAccRecAIProposal: Record "Bank Acc. Rec. AI Proposal" temporary;
         TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary;
         GLAccount: Record "G/L Account";
-        GenJournalTemplate: Record "Gen. Journal Template";
-        GenJournalBatch: Record "Gen. Journal Batch";
-        TransToGLAccJnlBatch: Record "Trans. to G/L Acc. Jnl. Batch";
         BankRecTransToAcc: Codeunit "Bank Acc. Rec. Trans. to Acc.";
         PostingDate: Date;
         BankAccountNo: Code[20];
@@ -220,8 +216,6 @@ codeunit 139777 "Bank Rec. With AI Tests"
         // Setup.
         CreateInputData(PostingDate, BankAccountNo, StatementNo, DocumentNo, Description, Amount);
         LibraryERM.CreateGLAccount(GLAccount);
-        LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
-        LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
         GLAccount.Validate("Direct Posting", true);
         GLAccount.Modify();
         CreateBankAccRec(BankAccReconciliation, BankAccountNo, StatementNo);
@@ -235,8 +229,6 @@ codeunit 139777 "Bank Rec. With AI Tests"
         TempBankAccRecAIProposal."Statement Type" := BankAccReconciliation."Statement Type";
         TempBankAccRecAIProposal."Bank Account No." := BankAccReconciliation."Bank Account No.";
         TempBankAccRecAIProposal."Statement No." := BankAccReconciliation."Statement No.";
-        TempBankAccRecAIProposal."Journal Template Name" := GenJournalTemplate.Name;
-        TempBankAccRecAIProposal."Journal Batch Name" := GenJournalBatch.Name;
         TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(1);
         TempBankAccRecAIProposal."Transaction Date" := PostingDate;
         TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
@@ -253,12 +245,7 @@ codeunit 139777 "Bank Rec. With AI Tests"
         TempBankAccRecAIProposal.Difference := Amount;
         TempBankAccRecAIProposal.Insert();
         TempBankAccRecAIProposal.FindSet();
-        TransToGLAccJnlBatch.Init();
-        TransToGLAccJnlBatch."Journal Template Name" := GenJournalTemplate.Name;
-        TransToGLAccJnlBatch."Journal Batch Name" := GenJournalBatch.Name;
-        TransToGLAccJnlBatch.Insert();
-
-        BankRecTransToAcc.PostNewPaymentsToProposedGLAccounts(TempBankAccRecAIProposal, TempBankStatementMatchingBuffer, TransToGLAccJnlBatch);
+        BankRecTransToAcc.PostNewPaymentsToProposedGLAccounts(TempBankAccRecAIProposal, TempBankStatementMatchingBuffer);
 
         // Assert
         BankAccountLedgerEntry.SetRange("Statement No.", BankAccReconciliation."Statement No.");
