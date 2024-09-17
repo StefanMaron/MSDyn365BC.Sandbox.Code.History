@@ -3190,7 +3190,6 @@ table 5900 "Service Header"
         OldDimSetID := "Dimension Set ID";
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
 
-        OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(Rec, xRec);
         if ServItemLineExists() or ServLineExists() then
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
 
@@ -4026,9 +4025,9 @@ table 5900 "Service Header"
                 NoSeriesMgt.RaiseObsoleteOnBeforeInitSeries("No. Series", xRec."No. Series", "Posting Date", "No.", "No. Series", IsHandled);
                 if not IsHandled then begin
 #endif
-                    if NoSeries.AreRelated("No. Series", xRec."No. Series") then
-                        "No. Series" := xRec."No. Series";
-                    "No." := NoSeries.GetNextNo("No. Series", "Posting Date");
+                if NoSeries.AreRelated("No. Series", xRec."No. Series") then
+                    "No. Series" := xRec."No. Series";
+                "No." := NoSeries.GetNextNo("No. Series", "Posting Date");
 #if not CLEAN24
                     NoSeriesMgt.RaiseObsoleteOnAfterInitSeries("No. Series", GetNoSeriesCode(), "Posting Date", "No.");
                 end;
@@ -5854,11 +5853,6 @@ table 5900 "Service Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateBillToCustomerNoOnBeforeRecreateServLines(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header");
     begin
     end;
 

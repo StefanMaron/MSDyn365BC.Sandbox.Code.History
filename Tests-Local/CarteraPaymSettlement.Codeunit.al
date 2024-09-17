@@ -15,7 +15,6 @@ codeunit 147501 "Cartera Paym. Settlement"
         LibraryCarteraCommon: Codeunit "Library - Cartera Common";
         LibraryCarteraPayables: Codeunit "Library - Cartera Payables";
         LibraryCarteraReceivables: Codeunit "Library - Cartera Receivables";
-        LibraryDimension: Codeunit "Library - Dimension";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryERM: Codeunit "Library - ERM";
@@ -41,7 +40,6 @@ codeunit 147501 "Cartera Paym. Settlement"
         BillGroupNotPrintedMsg: Label 'This %1 has not been printed. Do you want to continue?';
         RejectBillTxt: Label '%1 documents have been rejected.';
         SettlementCompletedSuccessfullyMsg: Label '%1 documents totaling %2 have been settled.';
-        RecipientErr: Label '%1 must be %2 in %3.', Comment = '%1=Vendor Bank Account Code in Vendor Ledger Entry,%2=Vendor bank account,%3=Table Caption';
 
     [Test]
     [HandlerFunctions('ConfirmHandlerYes,MessageHandler')]
@@ -72,96 +70,6 @@ codeunit 147501 "Cartera Paym. Settlement"
 
         // Teardown
         LibraryVariableStorage.AssertEmpty();
-    end;
-
-    [Test]
-    [HandlerFunctions('CarteraDocumnets,ConfirmHandlerCartera,MessageHandlerCartera,SettleDocsInPostedPOModalPageHandler')]
-    procedure PassReciptBankAccountIntoVenodrLedgerAsPerSelectedVendorBankAccount()
-    var
-        Vendor: Record Vendor;
-        BankAccount: Record "Bank Account";
-        VendorBankAccount: array[2] of Record "Vendor Bank Account";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        VATPostingSetup: Record "VAT Posting Setup";
-        PaymentOrder: Record "Payment Order";
-        VendorLedgerEntry: Record "Vendor Ledger Entry";
-        PaymentMethod: Record "Payment Method";
-        DocumentNo: Code[20];
-    begin
-        // [SCENARIO 506309] he Vendor Bank Account is incorrect in the Payment entry generated from a Payment Order in case it is different than the Preferred Vendor Bank Account on the Vendor Card in the Spanish version.
-        Initialize();
-
-        // [GIVEN] Create Vendor with Cartera Payment.
-        LibraryCarteraPayables.CreateCarteraVendorUseBillToCarteraPayment(Vendor, '');
-
-        // [GIVEN] Create Cartera Vendor Bank Account for the Vendor.
-        LibraryCarteraPayables.CreateVendorBankAccount(Vendor, '');
-
-        // [GIVEN] Create two different Vendor Bank Account.
-        LibraryPurchase.CreateVendorBankAccount(VendorBankAccount[1], Vendor."No.");
-        LibraryPurchase.CreateVendorBankAccount(VendorBankAccount[2], Vendor."No.");
-
-        // [GIVEN] Add to Prefered Vendor Bank Account to Vendor.
-        Vendor.Validate("Preferred Bank Account Code", VendorBankAccount[1].Code);
-        Vendor.Modify(true);
-
-        // [GIVEN] Validate Credit bills as false and and Invoice to Cartera to true and bill type to blank.
-        PaymentMethod.Get(Vendor."Payment Method Code");
-        PaymentMethod.Validate("Create Bills", false);
-        PaymentMethod.Validate("Invoices to Cartera", true);
-        PaymentMethod.Validate("Bill Type", PaymentMethod."Bill Type"::" ");
-        PaymentMethod.Modify(true);
-
-        // [GIVEN] Create Bank Account.
-        LibraryCarteraPayables.CreateBankAccount(BankAccount, '');
-
-        // [GIVEN] Create Purchase Header.
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, Vendor."No.");
-
-        // [GIVEN] Add VAT Posting Setup of the Vendor.
-        CreateVATPostingSetup(VATPostingSetup, Vendor."VAT Bus. Posting Group", LibraryRandom.RandInt(9));
-
-        // [GIVEN] Validate Venfor Bank Acc Code to different from Preffered Bank Account in Vendor.
-        PurchaseHeader.Validate("Vendor Bank Acc. Code", VendorBankAccount[2].Code);
-        PurchaseHeader.Modify(true);
-
-        // [GIVEN] Add Purchase Line into Purchase Header.
-        LibraryPurchase.CreatePurchaseLine(
-          PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, LibraryInventory.CreateItemNo(), 1);
-        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 2));
-        PurchaseLine.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
-        PurchaseLine.Modify(true);
-
-        // [GIVEN] Post Purchase Order and store Invoice No. 
-        DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-
-        // [GIVEN] Create Cartera Payment Order.
-        LibraryCarteraPayables.CreateCarteraPaymentOrder(BankAccount, PaymentOrder, '');
-
-        // [GIVEN] Add the document into Payment Order.
-        AddCarteraDocumentToPaymentOrder(PaymentOrder."No.", DocumentNo);
-        PaymentOrder.Validate("Export Electronic Payment", false);
-        PaymentOrder.Modify(true);
-
-        // [GIVEN] Post Cartera Payment Order.
-        LibraryCarteraPayables.PostCarteraPaymentOrder(PaymentOrder);
-
-        // [GIVEN] Invoke Settlement and Settle
-        InvokeTotalSettlementOnPaymentOrder(PaymentOrder."No.");
-
-        // [THEN] Check if Vendor ledger entry Recipient Bank Account matches to the changed one.
-        VendorLedgerEntry.SetRange("Vendor No.", Vendor."No.");
-        VendorLedgerEntry.SetRange("Document No.", PaymentOrder."No.");
-        VendorLedgerEntry.FindLast();
-        Assert.AreEqual(
-            VendorLedgerEntry."Recipient Bank Account",
-            VendorBankAccount[2].Code,
-            StrSubstNo(
-                RecipientErr,
-                VendorLedgerEntry."Recipient Bank Account",
-                VendorBankAccount[2].Code,
-                VendorLedgerEntry.TableCaption()));
     end;
 
     [Test]
@@ -1174,42 +1082,6 @@ codeunit 147501 "Cartera Paym. Settlement"
         LibraryVariableStorage.AssertEmpty();
     end;
 
-    [Test]
-    [HandlerFunctions('ConfirmHandlerYes,MessageHandler,BatchSettlementRequestPageHandler')]
-    procedure DimesionSetIdMustBeSameWhilePaymentOrderBatchSettlement()
-    var
-        BankAccount: Record "Bank Account";
-        CarteraDoc: Record "Cartera Doc.";
-        PaymentOrder: Record "Payment Order";
-        Vendor: Record Vendor;
-        PostedPaymentOrder: Record "Posted Payment Order";
-        PostedPaymentOrdersTestPage: TestPage "Posted Payment Orders Select.";
-    begin
-        // [SCENIRIO 523854] Issue when selecting Dimension Value Code for Dim Code XX for Bank Acc. XX..." error if you try to Batch Settlement a Payment Order posted with Code Mandatory/Same Code Dim.
-        Initialize();
-
-        // [GIVEN] Payment Order is created with Vendor, Bank Account and Currency.
-        PreparePaymentOrderWithDimension(Vendor, BankAccount, CarteraDoc, PaymentOrder, LocalCurrencyCode);
-
-        // [GIVEN] The Payment Order is then Posted.
-        PostPaymentOrderLCY(PaymentOrder);
-
-        // [GIVEN] Open Posted Payment Orders page from Cartera - Periodic Activities section.
-        PostedPaymentOrdersTestPage.OpenView();
-        PostedPaymentOrder.Get(PaymentOrder."No.");
-        PostedPaymentOrdersTestPage.GotoRecord(PostedPaymentOrder);
-
-        // [GIVEN] Batch Settlement Message is Enqueued.
-        LibraryVariableStorage.Enqueue(StrSubstNo(BatchSettlementPOMsg, 1, 1, CarteraDoc."Remaining Amt. (LCY)"));
-
-        // [GIVEN] Batch Settlement action is invoked.
-        PostedPaymentOrdersTestPage.BatchSettlement.Invoke();
-
-        // [THEN] Verify the Cartera Document is posted.
-        VerifyCarteraDocIsClosedAsHonored(CarteraDoc);
-        LibraryVariableStorage.AssertEmpty();
-    end;
-
     local procedure Initialize()
     begin
         LibraryReportDataset.Reset();
@@ -1710,87 +1582,6 @@ codeunit 147501 "Cartera Paym. Settlement"
         Assert.IsTrue(GLEntry.Next() = 0, 'There should not be any more G/L Entries');
     end;
 
-    local procedure AddCarteraDocumentToPaymentOrder(PaymentOrderNo: Code[20]; DocumentNo: Code[20])
-    var
-        PaymentOrders: TestPage "Payment Orders";
-    begin
-        LibraryVariableStorage.Enqueue(DocumentNo); // for CarteraDocumentsActionModalPageHandler
-
-        // Open the PaymentOrder page pointing to the created Payment Order record
-        PaymentOrders.OpenEdit();
-        PaymentOrders.GotoKey(PaymentOrderNo);
-
-        // Insert a Payable Cartera Document using the Page Part 'Docs'
-        PaymentOrders.Docs.Insert.Invoke();
-
-        // Save the changes, as the cartera document has been added to the Payment Order
-        PaymentOrders.OK().Invoke();
-    end;
-
-    local procedure PreparePaymentOrderWithDimension(var Vendor: Record Vendor; var BankAccount: Record "Bank Account"; var CarteraDoc: Record "Cartera Doc."; var PaymentOrder: Record "Payment Order"; CurrencyCode: Code[10])
-    var
-        Dimension: Record Dimension;
-        DimensionValue: Record "Dimension Value";
-        DefaultDimension: Record "Default Dimension";
-        DocumentNo: Code[20];
-    begin
-        // [GIVEN] Venodr is created with Curreny Code.
-        LibraryCarteraPayables.CreateCarteraVendorUseInvoicesToCarteraPayment(Vendor, CurrencyCode);
-
-        // [GIVEN] Dimension is created , Dimension Value is added and Default dimension is added into Vendor.
-        LibraryDimension.CreateDimension(Dimension);
-        LibraryDimension.CreateDimensionValue(DimensionValue, Dimension.Code);
-        LibraryDimension.CreateDefaultDimension(DefaultDimension, Database::Vendor, Vendor."No.", Dimension.Code, DimensionValue.Code);
-        DefaultDimension.Validate("Value Posting", DefaultDimension."Value Posting"::"Same Code");
-        DefaultDimension.Modify(true);
-        Vendor.Modify(true);
-
-        // [GIVEN] Vendor Bank Account is created with Currency Code.
-        LibraryCarteraPayables.CreateVendorBankAccount(Vendor, CurrencyCode);
-
-        // [GIVEN] Payable Cartera Order is created and stored in Variable.
-        DocumentNo := LibraryCarteraPayables.CreateCarteraPayableDocument(Vendor);
-
-        // [THEN] Payment Order is Created with Default dimesion.
-        CreatePaymentOrderWithDimension(BankAccount, PaymentOrder, CarteraDoc, DocumentNo, Vendor, CurrencyCode);
-    end;
-
-    local procedure CreatePaymentOrderWithDimension(var BankAccount: Record "Bank Account"; var PaymentOrder: Record "Payment Order"; var CarteraDoc: Record "Cartera Doc."; DocumentNo: Code[20]; Vendor: Record Vendor; CurrencyCode: Code[10])
-    begin
-        // [GIVEN] Cartera Payment Order is made with Bank Account And Currency.
-        if CurrencyCode = LocalCurrencyCode then begin
-            LibraryCarteraPayables.CreateCarteraPaymentOrder(BankAccount, PaymentOrder, LocalCurrencyCode);
-            UpdateDefaultDimensionIntoBankAccount(BankAccount);
-        end else begin
-            LibraryCarteraPayables.CreateBankAccount(BankAccount, CurrencyCode);
-            UpdateDefaultDimensionIntoBankAccount(BankAccount);
-            CreatePaymentOrderThroughPage(CurrencyCode, BankAccount."No.", PaymentOrder);
-        end;
-
-        // [GIVEN] Payment Order is added to cartera Document and Validated Export Electronic Payment and Elect Pmts Exported to true.
-        LibraryCarteraPayables.AddPaymentOrderToCarteraDocument(CarteraDoc, DocumentNo, Vendor."No.", PaymentOrder."No.");
-
-        PaymentOrder.Validate("Export Electronic Payment", true);
-        PaymentOrder.Validate("Elect. Pmts Exported", true);
-        PaymentOrder.Modify(true);
-    end;
-
-    local procedure UpdateDefaultDimensionIntoBankAccount(BankAccount: Record "Bank Account")
-    var
-        Dimension: Record Dimension;
-        DimensionValue: Record "Dimension Value";
-        DefaultDimension: Record "Default Dimension";
-    begin
-        // [GIVEN] Bank Account is Created with Default dimesion.
-        LibraryDimension.CreateDimension(Dimension);
-        LibraryDimension.CreateDimensionValue(DimensionValue, Dimension.Code);
-        LibraryDimension.CreateDefaultDimension(DefaultDimension, Database::"Bank Account", BankAccount."No.", Dimension.Code, DimensionValue.Code);
-        DefaultDimension.Validate("Value Posting", DefaultDimension."Value Posting"::"Code Mandatory");
-        DefaultDimension.Modify(true);
-        BankAccount.Modify(true);
-    end;
-
-
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure SettleDocsInPostedPOModalPageHandler(var SettleDocsInPostedPOModalPageHandler: TestRequestPage "Settle Docs. in Posted PO")
@@ -1886,25 +1677,5 @@ codeunit 147501 "Cartera Paym. Settlement"
     begin
         RejectDocs.OK().Invoke();
     end;
-
-    [ModalPageHandler]
-    procedure CarteraDocumnets(var CarteraDocuments: TestPage "Cartera Documents")
-    begin
-        CarteraDocuments.OK().Invoke();
-    end;
-
-    [ConfirmHandler]
-    procedure ConfirmHandlerCartera(Question: Text[1024]; var Reply: Boolean)
-    var
-    begin
-        Reply := true;
-    end;
-
-    [MessageHandler]
-    procedure MessageHandlerCartera(Message: Text[1024])
-    var
-    begin
-    end;
-
 }
 
