@@ -2642,8 +2642,6 @@ codeunit 134988 "ERM Purchase Reports III"
     local procedure SetupPrepaymentPurchaseDoc(var PurchaseLine: Record "Purchase Line"; VendorNo: Code[20])
     var
         PurchaseHeader: Record "Purchase Header";
-        GeneralPostingSetup: Record "General Posting Setup";
-        GLAccount: Record "G/L Account";
     begin
         // Setup.
         CreatePurchaseDocument(
@@ -2652,12 +2650,6 @@ codeunit 134988 "ERM Purchase Reports III"
         PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
         PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
         PurchaseLine.FindFirst();
-
-        GeneralPostingSetup.Get(PurchaseLine."Gen. Bus. Posting Group", PurchaseLine."Gen. Prod. Posting Group");
-        GLAccount.Get(GeneralPostingSetup."Purch. Prepayments Account");
-        GLAccount."VAT Prod. Posting Group" := PurchaseLine."VAT Prod. Posting Group";
-        GLAccount.Modify();
-
         PurchaseLine.Validate("Prepayment %", LibraryRandom.RandDec(10, 2));
         PurchaseLine.Modify(true);
 
@@ -2942,37 +2934,27 @@ codeunit 134988 "ERM Purchase Reports III"
     local procedure VerifyPurchaseInvoiceReportVATAmountInLCY(DocumentNo: Code[20])
     var
         VATEntry: Record "VAT Entry";
-        RowNo: Integer;
     begin
-        LibraryReportDataset.LoadDataSetFile();
+        with LibraryReportDataset do begin
+            LoadDataSetFile();
+            MoveToRow(RowCount() - 2);
+        end;
 
-        VATEntry.SetRange(Type, VATEntry.Type::Purchase);
-        VATEntry.SetRange("Document Type", "Gen. Journal Document Type"::Invoice);
-        VATEntry.SetRange("Document No.", DocumentNo);
-        VATEntry.FindLast();
-
-        RowNo := LibraryReportDataset.FindRow('VALVATAmtLCY', Round(VATEntry.Amount, LibraryERM.GetAmountRoundingPrecision()));
-        Assert.IsTrue(RowNo > 0, StrSubstNo(RowNotFoundErr, 'VALVATAmtLCY', VATEntry.Amount));
-        RowNo := LibraryReportDataset.FindRow('VALVATBaseLCY', Round(VATEntry.Base, LibraryERM.GetAmountRoundingPrecision()));
-        Assert.IsTrue(RowNo > 0, StrSubstNo(RowNotFoundErr, 'VALVATBaseLCY', VATEntry.Base));
+        VerifyPurchaseReportVATAmount(
+          VATEntry."Document Type"::Invoice, DocumentNo, 1, 'VALVATAmtLCY', 'VALVATBaseLCY');
     end;
 
     local procedure VerifyPurchaseCreditMemoReportVATAmountInLCY(DocumentNo: Code[20])
     var
         VATEntry: Record "VAT Entry";
-        RowNo: Integer;
     begin
-        LibraryReportDataset.LoadDataSetFile();
+        with LibraryReportDataset do begin
+            LoadDataSetFile();
+            MoveToRow(RowCount() - 2);
+        end;
 
-        VATEntry.SetRange(Type, VATEntry.Type::Purchase);
-        VATEntry.SetRange("Document Type", "Gen. Journal Document Type"::"Credit Memo");
-        VATEntry.SetRange("Document No.", DocumentNo);
-        VATEntry.FindLast();
-
-        RowNo := LibraryReportDataset.FindRow('VALVATAmountLCY', Round(-VATEntry.Amount, LibraryERM.GetAmountRoundingPrecision()));
-        Assert.IsTrue(RowNo > 0, StrSubstNo(RowNotFoundErr, 'VALVATAmountLCY', -VATEntry.Amount));
-        RowNo := LibraryReportDataset.FindRow('VALVATBaseLCY', Round(-VATEntry.Base, LibraryERM.GetAmountRoundingPrecision()));
-        Assert.IsTrue(RowNo > 0, StrSubstNo(RowNotFoundErr, 'VALVATBaseLCY', -VATEntry.Base));
+        VerifyPurchaseReportVATAmount(
+          VATEntry."Document Type"::"Credit Memo", DocumentNo, -1, 'VALVATAmountLCY', 'VALVATBaseLCY');
     end;
 
     local procedure VerifyPurchaseReportVATAmount(DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; Sign: Integer; VATAmountElementName: Text; VATBaseAmountElementName: Text)
