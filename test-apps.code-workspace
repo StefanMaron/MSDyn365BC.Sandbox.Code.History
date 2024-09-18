@@ -49,6 +49,9 @@
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests"
     },
     {
+      "path": "./EDocument/Test/E-Document Core Tests"
+    },
+    {
       "path": "./Sustainability/Test/Sustainability Tests"
     },
     {
@@ -86,9 +89,6 @@
     },
     {
       "path": "./MasterDataManagement/Test/_Exclude_Master_Data_Management_Tests"
-    },
-    {
-      "path": "./EDocument Core/Test/E-Document Core Tests"
     },
     {
       "path": "./ExternalEvents/test/_Exclude_Business_Events_Test"
@@ -269,11 +269,11 @@
     }
   ],
   "settings": {
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
-    },
-    "al.enableCodeActions": false,
-    "allint.enabled": false,
-    "al.enableCodeAnalysis": false
+    }
   }
 }
