@@ -1511,7 +1511,7 @@ table 5050 Contact
         RMSetup.Get();
         RMSetup.TestField("Contact Nos.");
         if NoSeries.LookupRelatedNoSeries(RMSetup."Contact Nos.", OldCont."No. Series", Cont."No. Series") then begin
-            Cont."No." := NoSeries.GetNextNo(Cont."No. Series");
+            "No." := NoSeries.GetNextNo(Cont."No. Series");
             OnAssistEditOnAfterNoSeriesMgtSetSeries(Cont, OldCont);
             Rec := Cont;
             exit(true);
@@ -1936,33 +1936,32 @@ table 5050 Contact
 
     procedure ShowBusinessRelation(LinkToTable: Enum "Contact Business Relation Link To Table"; All: Boolean)
     var
-        ContactBusinessRelation: Record "Contact Business Relation";
+        ContBusRel: Record "Contact Business Relation";
         RecSelected: Boolean;
         IsHandled: Boolean;
     begin
-        FilterBusinessRelations(ContactBusinessRelation, LinkToTable, All);
-        OnShowBusinessRelationOnAfterFilterBusinessRelations(Rec, ContactBusinessRelation, LinkToTable, All);
-        if ContactBusinessRelation.IsEmpty() then begin
+        FilterBusinessRelations(ContBusRel, LinkToTable, All);
+        if ContBusRel.IsEmpty() then begin
             ShowBusinessRelations();
             exit;
         end;
 
-        if ContactBusinessRelation.Count() = 1 then
-            RecSelected := ContactBusinessRelation.FindFirst()
+        if ContBusRel.Count() = 1 then
+            RecSelected := ContBusRel.FindFirst()
         else begin
-            Page.Run(Page::"Contact Business Relations", ContactBusinessRelation);
+            PAGE.Run(PAGE::"Contact Business Relations", ContBusRel);
             exit;
         end;
 
         IsHandled := false;
-        OnShowCustVendBankOnBeforeRunPage(Rec, RecSelected, ContactBusinessRelation, IsHandled);
+        OnShowCustVendBankOnBeforeRunPage(Rec, RecSelected, ContBusRel, IsHandled);
         if IsHandled then
             exit;
 
         if RecSelected then
-            ContactBusinessRelation.ShowRelatedCardPage();
+            ContBusRel.ShowRelatedCardPage();
 
-        OnAfterShowCustVendBank(Rec, ContactBusinessRelation, RecSelected);
+        OnAfterShowCustVendBank(Rec, ContBusRel, RecSelected);
     end;
 
     procedure ShowBusinessRelations()
@@ -3927,11 +3926,6 @@ table 5050 Contact
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateBankAccountLink(var Contact: Record Contact; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnShowBusinessRelationOnAfterFilterBusinessRelations(var Rec: Record Contact; var ContactBusinessRelation: Record "Contact Business Relation"; ContactBusinessRelationLinkToTable: Enum "Contact Business Relation Link To Table"; All: Boolean)
     begin
     end;
 }
