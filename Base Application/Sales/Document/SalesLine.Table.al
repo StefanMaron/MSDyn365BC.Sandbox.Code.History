@@ -3997,13 +3997,7 @@ table 37 "Sales Line"
     procedure CalcShipmentDateForLocation()
     var
         CustomCalendarChange: array[2] of Record "Customized Calendar Change";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCalcShipmentDateForLocation(Rec, xRec, IsHandled);
-        if IsHandled then
-            exit;
-
         CustomCalendarChange[1].SetSource(CalChange."Source Type"::Location, "Location Code", '', '');
         "Shipment Date" := CalendarMgmt.CalcDateBOC('', SalesHeader."Shipment Date", CustomCalendarChange, false);
     end;
@@ -5564,12 +5558,8 @@ table 37 "Sales Line"
     var
         ItemListPage: Page "Item List";
         SelectionFilter: Text;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeSelectMultipleItems(Rec, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeSelectMultipleItems(Rec);
 
         if IsCreditDocType() then
             SelectionFilter := ItemListPage.SelectActiveItems()
@@ -8743,8 +8733,7 @@ table 37 "Sales Line"
     begin
         ItemTempl.Get(NonstockItem."Item Templ. Code");
         ItemTempl.TestField("Gen. Prod. Posting Group");
-        if ItemTempl.Type = ItemTempl.Type::Inventory then
-            ItemTempl.TestField("Inventory Posting Group");
+        ItemTempl.TestField("Inventory Posting Group");
     end;
 
     local procedure CheckQuoteCustomerTemplateCode(SalesHeader: Record "Sales Header")
@@ -9605,7 +9594,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSelectMultipleItems(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnBeforeSelectMultipleItems(var SalesLine: Record "Sales Line")
     begin
     end;
 
@@ -11089,11 +11078,6 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateVATOnLinesOnAfterUpdateBaseAmounts(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempVATAmountLine: Record "VAT Amount Line" temporary; var VATAmountLine: Record "VAT Amount Line"; Currency: Record Currency)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcShipmentDateForLocation(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 }
