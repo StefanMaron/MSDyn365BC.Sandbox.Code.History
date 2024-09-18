@@ -370,14 +370,14 @@ table 7200 "CDS Connection Setup"
     procedure GetPassword(): Text
     var
         IsolatedStorageManagement: Codeunit "Isolated Storage Management";
-        Value: SecretText;
+        Value: Text;
     begin
         if IsTemporary() then
             exit(TempUserPassword);
 
         if not IsNullGuid("User Password Key") then
             if IsolatedStorageManagement.Get("User Password Key", DATASCOPE::Company, Value) then
-                exit(Value.Unwrap());
+                exit(Value);
 
         exit('');
     end;
