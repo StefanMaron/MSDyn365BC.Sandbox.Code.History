@@ -395,8 +395,7 @@ table 7347 "Internal Movement Line"
         BinContent.FilterGroup(2);
         BinContent.SetRange("Location Code", "Location Code");
         BinContent.FilterGroup(0);
-        if "Item No." <> '' then
-            BinContent.SetRange("Item No.", "Item No.");
+        BinContent.SetFilter("Item No.", "Item No.");
         if "Variant Code" <> '' then begin
             TestField("Item No.");
             BinContent.SetRange("Variant Code", "Variant Code");
