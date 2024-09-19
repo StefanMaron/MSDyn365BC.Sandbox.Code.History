@@ -137,19 +137,13 @@ codeunit 2000040 "Coda Import Management"
             SWIFTCode := DelChr(CopyStr(CodBankStmtSrcLine.Data, 61, 11));
         VId[2] := DelChr(CopyStr(CodBankStmtSrcLine.Data, 72, 11), '>', ' ');
         CodBankStmtSrcLine."Transaction Date" := DDMMYY2Date(CopyStr(CodBankStmtSrcLine.Data, 6, 6), false);
-
-        OnAfterParseHeaderRecord(CodBankStmtSrcLine);
     end;
 
-    procedure CheckOldBalance(var CodedBankStmtSrcLine: Record "CODA Statement Source Line") OK: Boolean
+    procedure CheckOldBalance(var CodedBankStmtSrcLine: Record "CODA Statement Source Line"): Boolean
     var
         BankAccountNo: Text[30];
         IBANNumber: Text[34];
-        IsHandled: Boolean;
     begin
-        OnBeforeCheckOldBalance(CodedBankStmtSrcLine, OK, IsHandled);
-        if IsHandled then
-            exit(OK);
         CodBankStmtSrcLine := CodedBankStmtSrcLine;
         Evaluate(CodBankStmtSrcLine."Statement No.", CopyStr(CodBankStmtSrcLine.Data, 3, 3));
         BankAccountNo :=
@@ -522,20 +516,9 @@ codeunit 2000040 "Coda Import Management"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterParseHeaderRecord(var CODAStatementSourceLine: Record "CODA Statement Source Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
+    [IntegrationEvent(false, false)]    
     local procedure OnAfterCheckOldBalance(var CodaStatementSourceLine: Record "CODA Statement Source Line")
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckOldBalance(var CODAStatementSourceLine: Record "CODA Statement Source Line"; var OK: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
 }
 
