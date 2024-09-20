@@ -836,8 +836,6 @@ codeunit 6610 "FS Int. Table Subscriber"
         if not FSConnectionSetup.IsEnabled() then
             exit;
 
-        Codeunit.Run(Codeunit::"CRM Integration Management");
-
         JobUsageLink.SetRange("Entry No.", JobLedgerEntry."Entry No.");
         if not JobUsageLink.FindFirst() then begin
             Session.LogMessage('0000MN8', NoProjectUsageLinkTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
@@ -870,6 +868,7 @@ codeunit 6610 "FS Int. Table Subscriber"
             exit;
         if not FSWorkOrderService.WritePermission() then
             exit;
+        Codeunit.Run(Codeunit::"CRM Integration Management");
         if FSWorkOrderProduct.Get(CRMIntegrationRecord."CRM ID") then begin
             FSWorkOrderProduct.QuantityConsumed += JobPlanningLine.Quantity;
             if not TryModifyWorkOrderProduct(FSWorkOrderProduct) then begin
@@ -888,7 +887,7 @@ codeunit 6610 "FS Int. Table Subscriber"
                         if JobPlanningLine."Line Type" <> JobPlanningLine."Line Type"::Budget then
                             exit;
 
-            FSWorkOrderService.DurationConsumed += Round((60 * JobPlanningLine.Quantity), 1, '=');
+            FSWorkOrderService.DurationConsumed += (60 * JobPlanningLine.Quantity);
             if not TryModifyWorkOrderService(FSWorkOrderService) then begin
                 Session.LogMessage('0000MN0', UnableToModifyWOSTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
                 ClearLastError();
