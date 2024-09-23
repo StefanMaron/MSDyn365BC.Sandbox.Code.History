@@ -190,7 +190,6 @@ report 1407 "Bank Account Statement"
             }
             dataitem(OutstandingBankTransaction; "Bank Account Ledger Entry")
             {
-                DataItemTableView = sorting("Entry No.");
                 UseTemporary = true;
                 column(Outstanding_BankTransaction_PostingDate; Format("Posting Date"))
                 {
@@ -231,7 +230,6 @@ report 1407 "Bank Account Statement"
             }
             dataitem(OutstandingCheck; "Bank Account Ledger Entry")
             {
-                DataItemTableView = sorting("Entry No.");
                 UseTemporary = true;
                 column(Outstanding_Check_PostingDate; Format("Posting Date"))
                 {
@@ -350,19 +348,15 @@ report 1407 "Bank Account Statement"
         TempBankAccountReconciliation."Statement No." := "Bank Account Statement"."Statement No.";
         TempBankAccountReconciliation."Statement Date" := "Bank Account Statement"."Statement Date";
         BankAccReconTest.SetOutstandingFilters(TempBankAccountReconciliation, BankAccountLedgerEntry);
-        BankAccountLedgerEntry.SetFilter(SystemCreatedAt, '..%1', "Bank Account Statement".SystemCreatedAt);
-        if BankAccountLedgerEntry.IsEmpty() then
-            exit;
-
         BankAccountLedgerEntry.SetAutoCalcFields("Check Ledger Entries");
-        if BankAccountLedgerEntry.FindSet() then
-            repeat
-                if BankAccReconTest.CheckBankAccountLedgerEntryFilters(BankAccountLedgerEntry, TempBankAccountReconciliation."Statement No.") then
-                    if (BankAccountLedgerEntry."Closed at Date" <> 0D) or BankAccountLedgerEntry.Open then
-                        if BankAccountLedgerEntry."Check Ledger Entries" <> 0 then
-                            OutstandingCheck.CopyFromBankAccLedgerEntry(BankAccountLedgerEntry, "Bank Account Statement"."Statement No.")
-                        else
-                            OutstandingBankTransaction.CopyFromBankAccLedgerEntry(BankAccountLedgerEntry, "Bank Account Statement"."Statement No.")
-            until BankAccountLedgerEntry.Next() = 0;
+        if not BankAccountLedgerEntry.FindSet() then
+            exit;
+        repeat
+            if (BankAccountLedgerEntry."Closed at Date" <> 0D) or BankAccountLedgerEntry.Open then
+                if BankAccountLedgerEntry."Check Ledger Entries" <> 0 then
+                    OutstandingCheck.CopyFromBankAccLedgerEntry(BankAccountLedgerEntry, "Bank Account Statement"."Statement No.")
+                else
+                    OutstandingBankTransaction.CopyFromBankAccLedgerEntry(BankAccountLedgerEntry, "Bank Account Statement"."Statement No.")
+        until BankAccountLedgerEntry.Next() = 0;
     end;
 }
