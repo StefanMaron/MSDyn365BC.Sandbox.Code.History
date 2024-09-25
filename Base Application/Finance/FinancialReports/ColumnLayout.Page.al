@@ -4,16 +4,14 @@ using Microsoft.CostAccounting.Account;
 
 page 489 "Column Layout"
 {
-    AboutTitle = 'About (Financial Report) Column Definition';
-    AboutText = 'Use a column definition to specify the columns to include in a report. For example, you can design a report layout to compare net change and balance for the same period this year and last year. You can have up to 15 columns in a column definition. For example, multiple columns are useful for displaying budgets for 12 months with a column that shows the total.';
-    AnalysisModeEnabled = false;
     ApplicationArea = Basic, Suite;
     AutoSplitKey = true;
-    Caption = '(Financial Report) Column Definitions';
+    Caption = 'Column Definition';
     DataCaptionFields = "Column Layout Name";
     PageType = Worksheet;
     SourceTable = "Column Layout";
-    UsageCategory = None;
+    AnalysisModeEnabled = false;
+    UsageCategory = Administration;
 
     layout
     {
@@ -26,7 +24,7 @@ page 489 "Column Layout"
                 Caption = 'Name';
                 Lookup = true;
                 TableRelation = "Column Layout Name".Name;
-                ToolTip = 'Specifies the unique name (code) of the column definition.';
+                ToolTip = 'Specifies the name of the record.';
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
