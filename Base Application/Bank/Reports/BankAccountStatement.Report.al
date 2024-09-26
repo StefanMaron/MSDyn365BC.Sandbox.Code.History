@@ -357,7 +357,7 @@ report 1407 "Bank Account Statement"
         BankAccountLedgerEntry.SetAutoCalcFields("Check Ledger Entries");
         if BankAccountLedgerEntry.FindSet() then
             repeat
-                if BankAccReconTest.CheckBankAccountLedgerEntryFilters(BankAccountLedgerEntry, TempBankAccountReconciliation."Statement No.") then
+                if BankAccReconTest.CheckBankAccountLedgerEntryFilters(BankAccountLedgerEntry, TempBankAccountReconciliation."Statement No.", TempBankAccountReconciliation."Statement Date") then
                     if (BankAccountLedgerEntry."Closed at Date" <> 0D) or BankAccountLedgerEntry.Open then
                         if BankAccountLedgerEntry."Check Ledger Entries" <> 0 then
                             OutstandingCheck.CopyFromBankAccLedgerEntry(BankAccountLedgerEntry, "Bank Account Statement"."Statement No.")
