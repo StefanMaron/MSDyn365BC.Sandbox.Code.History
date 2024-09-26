@@ -692,7 +692,7 @@ report 1408 "Bank Acc. Recon. - Test"
         BankAccountLedgerEntry.SetAutoCalcFields("Check Ledger Entries");
         if BankAccountLedgerEntry.FindSet() then
             repeat
-                if BankAccReconTest.CheckBankAccountLedgerEntryFilters(BankAccountLedgerEntry, "Bank Acc. Reconciliation"."Statement No.") then
+                if BankAccReconTest.CheckBankAccountLedgerEntryFilters(BankAccountLedgerEntry, "Bank Acc. Reconciliation"."Statement No.", "Bank Acc. Reconciliation"."Statement Date") then
                     if BankAccountLedgerEntry."Check Ledger Entries" <> 0 then begin
                         RemainingAmt := BankAccountLedgerEntry.Amount -
                           OutstandingPayment.GetAppliedAmount(BankAccountLedgerEntry."Entry No.");
