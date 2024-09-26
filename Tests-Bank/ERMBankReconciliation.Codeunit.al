@@ -3070,6 +3070,8 @@ codeunit 134141 "ERM Bank Reconciliation"
         LibraryReportDataset.AssertElementWithValueExists('Amt1_BankAccStmtLineStmt', -ClosedBankPaymentAmount);
 
         // [THEN] "OP" and "OC" appear as outstanding
+        LibraryReportDataset.AssertElementWithValueExists('Bank_Acc__Reconciliation___TotalOutstdBankTransactions', OutstandingBankPaymentAmount);
+        LibraryReportDataset.AssertElementWithValueExists('Bank_Acc__Reconciliation___TotalOutstdPayments', OutstandingCheckAmount);
         LibraryReportDataset.AssertElementWithValueExists('Outstanding_BankTransaction_Amount', OutstandingBankPaymentAmount);
         LibraryReportDataset.AssertElementWithValueExists('Outstanding_Check_Amount', OutstandingCheckAmount);
     end;
@@ -4368,6 +4370,7 @@ codeunit 134141 "ERM Bank Reconciliation"
         // [SCENARIO 543178] Show outstanding bank transactions on bank account reconsiliation test report
         // [GIVEN] Bank Account X
         Initialize();
+        BankAccReconciliation[1].DeleteAll();
         BankAccountLedgerEntry[1].DeleteAll();
         LibraryERM.CreateGLAccount(GLAccount);
         BankAccountNo := LibraryERM.CreateBankAccountNoWithNewPostingGroup(GLAccount);
