@@ -641,7 +641,7 @@ page 408 "G/L Balance by Dimension"
         PeriodPageMgt: Codeunit PeriodPageManagement;
         Found: Boolean;
     begin
-        OnBeforeFindRec(DimOption, DimVal, GLAcc);
+        OnBeforeFindRec(DimOption, DimVal);
         case DimOption of
             DimOption::"G/L Account":
                 begin
@@ -713,7 +713,7 @@ page 408 "G/L Balance by Dimension"
         PeriodPageMgt: Codeunit PeriodPageManagement;
         ResultSteps: Integer;
     begin
-        OnBeforeNextRec(DimOption, DimVal, GLAcc);
+        OnBeforeNextRec(DimOption, DimVal);
         case DimOption of
             DimOption::"G/L Account":
                 begin
@@ -923,12 +923,12 @@ page 408 "G/L Balance by Dimension"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindRec(DimOption: Option; var DimensionValue: Record "Dimension Value"; var GLAccount: Record "G/L Account")
+    local procedure OnBeforeFindRec(DimOption: Option; var DimensionValue: Record "Dimension Value")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeNextRec(DimOption: Option; var DimensionValue: Record "Dimension Value"; var GLAccount: Record "G/L Account")
+    local procedure OnBeforeNextRec(DimOption: Option; var DimensionValue: Record "Dimension Value")
     begin
     end;
 
