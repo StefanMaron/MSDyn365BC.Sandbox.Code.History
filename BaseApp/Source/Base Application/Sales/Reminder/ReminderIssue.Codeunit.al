@@ -63,8 +63,17 @@ codeunit 393 "Reminder-Issue"
                 if GenJnlBatch.Name = '' then
                     Error(MissingJournalFieldErr, TempGenJnlLine.FieldCaption("Journal Batch Name"));
             end;
+        if not DimMgt.CheckDimIDComb(GlobalReminderHeader."Dimension Set ID") then
+            Error(
+              DimensionCombinationIsBlockedErr,
+              GlobalReminderHeader.TableCaption, GlobalReminderHeader."No.", DimMgt.GetDimCombErr());
 
-        CheckDimensions();
+        TableID[1] := DATABASE::Customer;
+        No[1] := GlobalReminderHeader."Customer No.";
+        if not DimMgt.CheckDimValuePosting(TableID, No, GlobalReminderHeader."Dimension Set ID") then
+            Error(
+              DimensionCausedErrorTxt,
+              GlobalReminderHeader.TableCaption, GlobalReminderHeader."No.", DimMgt.GetDimValuePostingErr());
 
         CustPostingGr.Get(GlobalReminderHeader."Customer Posting Group");
         CalcAndEnsureAmountsNotEmpty();
@@ -112,7 +121,7 @@ codeunit 393 "Reminder-Issue"
         end;
 
         Clear(GenJnlPostLine);
-        if TempGenJnlLine.FindSet() then
+        if TempGenJnlLine.Find('-') then
             repeat
                 GenJnlLine2 := TempGenJnlLine;
                 SetGenJnlLine2Dim();
@@ -131,7 +140,7 @@ codeunit 393 "Reminder-Issue"
                 FinChrgTerms."Interest Calculation"::"All Entries"]
             then begin
                 ReminderLine.SetRange(Type, ReminderLine.Type::"Customer Ledger Entry");
-                if ReminderLine.FindSet() then
+                if ReminderLine.Find('-') then
                     repeat
                         UpdateCustLedgEntriesCalculateInterest(ReminderLine."Entry No.", GlobalReminderHeader."Currency Code");
                     until ReminderLine.Next() = 0;
@@ -169,28 +178,6 @@ codeunit 393 "Reminder-Issue"
 
         ErrorMessageMgt.PopContext(ErrorContextElement);
         OnAfterIssueReminder(GlobalReminderHeader, GlobalIssuedReminderHeader."No.", GenJnlPostLine);
-    end;
-
-    local procedure CheckDimensions()
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCheckDimensions(GlobalReminderHeader, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimMgt.CheckDimIDComb(GlobalReminderHeader."Dimension Set ID") then
-            Error(
-              DimensionCombinationIsBlockedErr,
-              GlobalReminderHeader.TableCaption, GlobalReminderHeader."No.", DimMgt.GetDimCombErr());
-
-        TableID[1] := DATABASE::Customer;
-        No[1] := GlobalReminderHeader."Customer No.";
-        if not DimMgt.CheckDimValuePosting(TableID, No, GlobalReminderHeader."Dimension Set ID") then
-            Error(
-              DimensionCausedErrorTxt,
-              GlobalReminderHeader.TableCaption, GlobalReminderHeader."No.", DimMgt.GetDimValuePostingErr());
     end;
 
     var
@@ -532,7 +519,7 @@ codeunit 393 "Reminder-Issue"
     begin
         ReminderLine.SetRange("Reminder No.", ReminderHeader."No.");
         ReminderLine.SetRange("Detailed Interest Rates Entry", false);
-        if ReminderLine.FindSet() then
+        if ReminderLine.Find('-') then
             repeat
                 case ReminderLine.Type of
                     ReminderLine.Type::" ":
@@ -658,11 +645,6 @@ codeunit 393 "Reminder-Issue"
 
         if Customer.Blocked = Customer.Blocked::All then
             Error(CustomerBlockedErr, Customer.FieldCaption(Blocked), Customer.Blocked, Customer.TableCaption(), CustomerNo);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckDimensions(var ReminderHeader: Record "Reminder Header"; var IsHandled: Boolean)
-    begin
     end;
 
     [IntegrationEvent(false, false)]
