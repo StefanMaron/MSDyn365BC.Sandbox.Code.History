@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./shopify/test/Shopify Connector Test"
@@ -243,13 +251,5 @@
     {
       "path": "./paymentpractices/test/Payment Practices Tests"
     }
-  ],
-  "settings": {
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "al.enableCodeActions": false
-  }
+  ]
 }
