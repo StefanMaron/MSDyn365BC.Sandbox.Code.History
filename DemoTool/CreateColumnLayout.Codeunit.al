@@ -67,20 +67,15 @@ codeunit 101334 "Create Column Layout"
         InsertData(XDEFAULT, '', XBalanceatDateCredit, 2, 0, "Account Schedule Amount Type"::"Net Amount", '', '', true, "Column Layout Show"::"When Negative", "Analysis Rounding Factor"::None);
     end;
 
-    procedure InsertData(ColumnLayoutName: Code[10]; "Column No.": Code[10]; "Column Header": Text[30]; "Column Type": Option Formula,"Net Change","Balance at Date","Beginning Balance","Year to Date"," Rest of Fiscal Year","Entire Fiscal Year"; "Ledger Entry Type": Option Entries,"Budget Entries"; "Amount Type": Enum "Account Schedule Amount Type"; Formula: Code[80]; "Comparison Date Formula": Code[10]; "Show Opposite Sign": Boolean; Show: Enum "Column Layout Show"; "Rounding Factor": Enum "Analysis Rounding Factor")
-    begin
-        InsertData(ColumnLayoutName, "Column No.", "Column Header", "Column Type", "Ledger Entry Type", "Amount Type", Formula, "Comparison Date Formula", "Show Opposite Sign", Show, "Rounding Factor", '', 0);
-    end;
-
-    procedure InsertData(ColumnLayoutName: Code[10]; "Column No.": Code[10]; "Column Header": Text[30]; "Column Type": Option Formula,"Net Change","Balance at Date","Beginning Balance","Year to Date"," Rest of Fiscal Year","Entire Fiscal Year"; "Ledger Entry Type": Option Entries,"Budget Entries"; "Amount Type": Enum "Account Schedule Amount Type"; Formula: Code[80]; "Comparison Date Formula": Code[10]; "Show Opposite Sign": Boolean; Show: Enum "Column Layout Show"; "Rounding Factor": Enum "Analysis Rounding Factor"; ComparisonPeriodFormula: Code[20]; ComparisonPeriodFormulaLCID: Integer)
+    procedure InsertData("Column Layout Name": Code[10]; "Column No.": Code[10]; "Column Header": Text[30]; "Column Type": Option Formula,"Net Change","Balance at Date","Beginning Balance","Year to Date"," Rest of Fiscal Year","Entire Fiscal Year"; "Ledger Entry Type": Option Entries,"Budget Entries"; "Amount Type": Enum "Account Schedule Amount Type"; Formula: Code[80]; "Comparison Date Formula": Code[10]; "Show Opposite Sign": Boolean; Show: Enum "Column Layout Show"; "Rounding Factor": Enum "Analysis Rounding Factor")
     var
         "Column Layout": Record "Column Layout";
     begin
         "Column Layout".Init();
-        "Column Layout".Validate("Column Layout Name", ColumnLayoutName);
-        if "Previous Column Layout Name" <> ColumnLayoutName then begin
+        "Column Layout".Validate("Column Layout Name", "Column Layout Name");
+        if "Previous Column Layout Name" <> "Column Layout Name" then begin
             "Line No." := 10000;
-            "Previous Column Layout Name" := ColumnLayoutName;
+            "Previous Column Layout Name" := "Column Layout Name";
         end else
             "Line No." := "Line No." + 10000;
         "Column Layout".Validate("Line No.", "Line No.");
@@ -95,8 +90,6 @@ codeunit 101334 "Create Column Layout"
         "Column Layout".Validate("Show Opposite Sign", "Show Opposite Sign");
         "Column Layout".Validate(Show, Show);
         "Column Layout".Validate("Rounding Factor", "Rounding Factor");
-        "Column Layout".Validate("Comparison Period Formula LCID", ComparisonPeriodFormulaLCID);
-        "Column Layout"."Comparison Period Formula" := ComparisonPeriodFormula;
         "Column Layout".Insert();
     end;
 
