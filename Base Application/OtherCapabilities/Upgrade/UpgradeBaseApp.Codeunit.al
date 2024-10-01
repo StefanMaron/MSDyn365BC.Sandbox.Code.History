@@ -35,7 +35,6 @@ using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Task;
 using Microsoft.Foundation.UOM;
 using Microsoft.HumanResources.Employee;
-using Microsoft.HumanResources.Payables;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Entity;
@@ -97,16 +96,13 @@ using System.Upgrade;
 using System.Utilities;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Setup;
-using Microsoft.Bank.Setup;
-using Microsoft.Bank.DirectDebit;
 
 codeunit 104000 "Upgrade - BaseApp"
 {
     Subtype = Upgrade;
     Permissions =
         TableData "User Group Plan" = rimd,
-        TableData "Cust. Ledger Entry" = rm,
-        TableData "Employee Ledger Entry" = rm;
+        TableData "Cust. Ledger Entry" = rm;
 
     var
         HybridDeployment: Codeunit "Hybrid Deployment";
@@ -230,7 +226,6 @@ codeunit 104000 "Upgrade - BaseApp"
         UpdateProductionSourceCode();
         UpgradeICGLAccountNoInPostedGenJournalLine();
         UpgradeICGLAccountNoInStandardGeneralJournalLine();
-        UpgradeBankExportImportSetup();
         UpgradePurchasesPayablesAndSalesReceivablesSetups();
         UpgradeLocationBinPolicySetups();
         UpgradeInventorySetupAllowInvtAdjmt();
@@ -241,8 +236,6 @@ codeunit 104000 "Upgrade - BaseApp"
 #endif
         UpgradeVATSetupAllowVATDate();
         CopyItemSalesBlockedToServiceBlocked();
-        SetEmployeeLedgerEntryCurrencyFactor();
-        UpgradeCountryVATSchemeDK();
     end;
 
     local procedure ClearTemporaryTables()
@@ -285,27 +278,6 @@ codeunit 104000 "Upgrade - BaseApp"
         ParallelSessionEntry.DeleteAll();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetClearTemporaryTablesUpgradeTag());
-    end;
-
-    local procedure UpgradeBankExportImportSetup()
-    var
-        BankExportImportSetup: Record "Bank Export/Import Setup";
-        CompanyInitialize: Codeunit "Company-Initialize";
-        UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
-    begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetBankExportImportSetupSEPACT09UpgradeTag()) then
-            exit;
-
-        if not BankExportImportSetup.Get(CompanyInitialize.GetSEPACT09Code()) then
-            CompanyInitialize.InsertBankExportImportSetup(CompanyInitialize.GetSEPACT09Code(), CompanyInitialize.GetSEPACT09Name(), BankExportImportSetup.Direction::Export,
-              CODEUNIT::"SEPA CT-Export File", XMLPORT::"SEPA CT pain.001.001.09", CODEUNIT::"SEPA CT-Check Line");
-
-        if not BankExportImportSetup.Get(CompanyInitialize.GetSEPADD08Code()) then
-            CompanyInitialize.InsertBankExportImportSetup(CompanyInitialize.GetSEPADD08Code(), CompanyInitialize.GetSEPADD08Name(), BankExportImportSetup.Direction::Export,
-              CODEUNIT::"SEPA DD-Export File", XMLPORT::"SEPA DD pain.008.001.08", CODEUNIT::"SEPA DD-Check Line");
-
-        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetBankExportImportSetupSEPACT09UpgradeTag());
     end;
 
     internal procedure UpgradeWordTemplateTables()
@@ -3921,43 +3893,6 @@ codeunit 104000 "Upgrade - BaseApp"
         end;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCopyItemSalesBlockedToServiceBlockedUpgradeTag());
-    end;
-
-    local procedure SetEmployeeLedgerEntryCurrencyFactor()
-    var
-        EmployeeLedgerEntry: Record "Employee Ledger Entry";
-        UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
-        EmployeeLedgerEntryDataTransfer: DataTransfer;
-    begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetEmployeeLedgerEntryCurrencyFactorUpgradeTag()) then
-            exit;
-
-        EmployeeLedgerEntryDataTransfer.SetTables(Database::"Employee Ledger Entry", Database::"Employee Ledger Entry");
-        EmployeeLedgerEntryDataTransfer.AddSourceFilter(EmployeeLedgerEntry.FieldNo("Original Currency Factor"), '=%1', 0);
-        EmployeeLedgerEntryDataTransfer.AddConstantValue(1.0, EmployeeLedgerEntry.FieldNo("Original Currency Factor"));
-        EmployeeLedgerEntryDataTransfer.AddConstantValue(1.0, EmployeeLedgerEntry.FieldNo("Adjusted Currency Factor"));
-        EmployeeLedgerEntryDataTransfer.UpdateAuditFields := false;
-        EmployeeLedgerEntryDataTransfer.CopyFields();
-        Clear(EmployeeLedgerEntryDataTransfer);
-
-        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetEmployeeLedgerEntryCurrencyFactorUpgradeTag());
-    end;
-
-    local procedure UpgradeCountryVATSchemeDK()
-    var
-        CountryRegion: Record "Country/Region";
-        UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
-    begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCountryVATSchemeDKTag()) then
-            exit;
-
-        CountryRegion.SetRange("ISO Code", 'DK'); // ISO 3166 Country Codes
-        if not CountryRegion.IsEmpty() then
-            CountryRegion.ModifyAll("VAT Scheme", '0184'); // ISO 6523 ICD Codes
-
-        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCountryVATSchemeDKTag());
     end;
 
     [IntegrationEvent(false, false)]
