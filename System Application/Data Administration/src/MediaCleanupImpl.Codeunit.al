@@ -165,7 +165,6 @@ codeunit 1928 "Media Cleanup Impl."
         SplitList: List of [List of [Guid]];
         MediaSetOrphans: List of [Guid];
         MediaOrphanSubList: List of [Guid];
-        TenantMediaFilter: Text;
     begin
         if not TenantMediaSet.WritePermission() then
             exit;
@@ -173,12 +172,9 @@ codeunit 1928 "Media Cleanup Impl."
         MediaSetOrphans := MediaSet.FindOrphans();
         SplitListIntoSubLists(MediaSetOrphans, 10, SplitList);
         foreach MediaOrphanSubList in SplitList do begin
-            TenantMediaFilter := CreateOrFilter(MediaOrphanSubList);
-            if TenantMediaFilter <> '' then begin
-                TenantMediaSet.SetFilter(ID, TenantMediaFilter);
-                TenantMediaSet.DeleteAll();
-                Commit(); // Ensure we keep the progress even on timeout (in case of large amounts of detached media).
-            end;
+            TenantMediaSet.SetFilter(ID, CreateOrFilter(MediaOrphanSubList));
+            TenantMediaSet.DeleteAll();
+            Commit(); // Ensure we keep the progress even on timeout (in case of large amounts of detached media).
         end;
     end;
 
@@ -189,7 +185,6 @@ codeunit 1928 "Media Cleanup Impl."
         SplitList: List of [List of [Guid]];
         MediaOrphans: List of [Guid];
         MediaOrphanSubList: List of [Guid];
-        TenantMediaFilter: Text;
     begin
         if not TenantMedia.WritePermission() then
             exit;
@@ -197,12 +192,9 @@ codeunit 1928 "Media Cleanup Impl."
         MediaOrphans := Media.FindOrphans();
         SplitListIntoSubLists(MediaOrphans, 100, SplitList);
         foreach MediaOrphanSubList in SplitList do begin
-            TenantMediaFilter := CreateOrFilter(MediaOrphanSubList);
-            if TenantMediaFilter <> '' then begin
-                TenantMedia.SetFilter(ID, TenantMediaFilter);
-                TenantMedia.DeleteAll();
-                Commit(); // Ensure we keep the progress even on timeout (in case of large amounts of detached media).
-            end;
+            TenantMedia.SetFilter(ID, CreateOrFilter(MediaOrphanSubList));
+            TenantMedia.DeleteAll();
+            Commit(); // Ensure we keep the progress even on timeout (in case of large amounts of detached media).
         end;
     end;
 
