@@ -646,8 +646,6 @@ table 5405 "Production Order"
         RefreshRecord: Boolean;
     begin
         if Status = Status::Released then begin
-            ConfirmDeletion();
-
             ItemLedgEntry.SetRange("Order Type", ItemLedgEntry."Order Type"::Production);
             ItemLedgEntry.SetRange("Order No.", "No.");
             if not ItemLedgEntry.IsEmpty() then
@@ -778,7 +776,6 @@ table 5405 "Production Order"
         UpdateEndDate: Boolean;
         Text010: Label 'You may have changed a dimension.\\Do you want to update the lines?';
         Text011: Label 'You cannot change Finished Production Order dimensions.';
-        ConfirmDeleteQst: Label 'The items have been picked. If you delete the Production Order, then the items will remain in the operation area until you put them away.\Related item tracking information that is defined during the pick will be deleted.\Are you sure that you want to delete the Production Order?';
 
     protected var
         HideValidationDialog: Boolean;
@@ -927,7 +924,6 @@ table 5405 "Production Order"
         ProdOrderLine.LockTable();
         ProdOrderLine.SetRange(Status, Status);
         ProdOrderLine.SetRange("Prod. Order No.", "No.");
-        ProdOrderLine.SuspendDeletionCheck(true);
         ProdOrderLine.DeleteAll(true);
     end;
 
@@ -1069,7 +1065,6 @@ table 5405 "Production Order"
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if Status = Status::Finished then
                 Error(Text011);
             Modify();
@@ -1352,9 +1347,6 @@ table 5405 "Production Order"
           DimMgt.EditDimensionSet(
             Rec, "Dimension Set ID", StrSubstNo('%1 %2', TableCaption(), "No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-
-        OnShowDocDimOnAfterSetDimensionSetID(Rec, xRec);
-
         if OldDimSetID <> "Dimension Set ID" then begin
             if Status = Status::Finished then
                 Error(Text011);
@@ -1381,8 +1373,7 @@ table 5405 "Production Order"
 
         if NewParentDimSetID = OldParentDimSetID then
             exit;
-
-        if not ConfirmUpdateAllLineDim(NewParentDimSetID, OldParentDimSetID) then
+        if not Confirm(Text010) then
             exit;
 
         ProdOrderLine.Reset();
@@ -1401,16 +1392,6 @@ table 5405 "Production Order"
                     ProdOrderLine.UpdateProdOrderCompDim(NewDimSetID, OldDimSetID);
                 end;
             until ProdOrderLine.Next() = 0;
-    end;
-
-    local procedure ConfirmUpdateAllLineDim(NewParentDimSetID: Integer; OldParentDimSetID: Integer) Confirmed: Boolean;
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeConfirmUpdateAllLineDim(Rec, xRec, NewParentDimSetID, OldParentDimSetID, Confirmed, IsHandled);
-        if not IsHandled then
-            Confirmed := Confirm(Text010);
     end;
 
     procedure IsStatusLessThanReleased(): Boolean
@@ -1477,22 +1458,6 @@ table 5405 "Production Order"
             else
                 exit(Result::Partial);
         end;
-    end;
-
-    local procedure ConfirmDeletion()
-    var
-        ProdOrderComponent: Record "Prod. Order Component";
-        Confirmed: Boolean;
-    begin
-        ProdOrderComponent.SetRange("Prod. Order No.", "No.");
-        if ProdOrderComponent.FindSet() then
-            repeat
-                if (ProdOrderComponent."Expected Quantity" - ProdOrderComponent."Remaining Quantity") < ProdOrderComponent."Qty. Picked" then begin
-                    if not Confirm(ConfirmDeleteQst) then
-                        Error('');
-                    Confirmed := true;
-                end;
-            until (ProdOrderComponent.Next() = 0) or Confirmed;
     end;
 
     [IntegrationEvent(false, false)]
@@ -1657,21 +1622,6 @@ table 5405 "Production Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertOnBeforeStatusCheck(var ProductionOrder: Record "Production Order"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeConfirmUpdateAllLineDim(var ProductionOrder: Record "Production Order"; var xProductionOrder: Record "Production Order"; NewParentDimSetID: Integer; OldParentDimSetID: Integer; var Confirmed: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var ProductionOrder: Record "Production Order"; var xProductionOrder: Record "Production Order")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnShowDocDimOnAfterSetDimensionSetID(var ProductionOrder: Record "Production Order"; xProductionOrder: Record "Production Order")
     begin
     end;
 }
