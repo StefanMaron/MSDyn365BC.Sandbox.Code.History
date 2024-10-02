@@ -25,7 +25,7 @@ codeunit 134331 "ERM Purchase Payables"
         LibraryService: Codeunit "Library - Service";
         LibraryFixedAsset: Codeunit "Library - Fixed Asset";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
-#if not CLEAN23
+#if not CLEAN25
         LibraryCosting: Codeunit "Library - Costing";
         LibraryApplicationArea: Codeunit "Library - Application Area";
 #endif
@@ -39,9 +39,8 @@ codeunit 134331 "ERM Purchase Payables"
         AmountErr: Label '%1 must be %2 in %3.', Comment = '%1=Field;%2=Value;%3=Table';
         FilterMsg: Label 'There should be record within the filter.';
         NoFilterMsg: Label 'There should be no record within the filter.';
-        PurchaseLineFactBoxErr: Label 'Type must be equal to ''%1''  in Purchase Line: Document Type=%2, Document No.=%3, Line No.=%4. Current value is ''%5''.', Comment = '%1=Type;%2=Document Type;%3=Document No.;%4= Line No.;%5=Current value.';
         PurchOrderArchiveRespCenterErr: Label 'Purchase Order Archives displays documents for Responisbility Center that should not be shown for current user';
-#if not CLEAN23
+#if not CLEAN25
         PurchaseDocStatusErr: Label 'Status must be equal to ''Open''  in Purchase Header: Document Type=%1, No.=%2. Current value is ''Released''';
         MultipleVendorsSelectedErr: Label 'More than one vendor uses these purchase prices. To copy prices, the Vendor No. Filter field must contain one vendor only.';
         InvalidItemNoFilterErr: Label 'Invalid Item No. filter for page %1.', Comment = '%1 - page caption';
@@ -939,7 +938,7 @@ codeunit 134331 "ERM Purchase Payables"
         VerifyPurchaseOrder(PurchaseHeaderNo, VendorNo, ItemNo, Quantity);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure PurchasePriceAndLineDiscount()
@@ -1066,7 +1065,7 @@ codeunit 134331 "ERM Purchase Payables"
         VerifyVATAmount(DocumentNo);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure StartingDateAsWorkDateOnPurchasePrice()
@@ -1272,7 +1271,7 @@ codeunit 134331 "ERM Purchase Payables"
         SetPurchAllowMultiplePostingGroups(false);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure PurchasePriceMinimumQuantityWithMaxValue()
@@ -1388,7 +1387,7 @@ codeunit 134331 "ERM Purchase Payables"
         asserterror PurchaseOrder.Control3.PurchasePrices.DrillDown();
 
         // [THEN] Update fails with an error: "Status must be equal to Open in Purchase Header"
-        Assert.ExpectedError(StrSubstNo(PurchaseDocStatusErr, PurchaseHeader."Document Type", PurchaseHeader."No."));
+        Assert.ExpectedTestFieldError(PurchaseHeader.FieldCaption(Status), Format(PurchaseHeader.Status::Open));
     end;
 
     [Test]
@@ -1631,7 +1630,7 @@ codeunit 134331 "ERM Purchase Payables"
         PurchaseLine.TestField("No.", StandardText.Code);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure UI_CannotCopyPricesWhenVendorNoFilterHasMultipleVendors()
@@ -1863,7 +1862,7 @@ codeunit 134331 "ERM Purchase Payables"
         VendorLedgerEntry.TestField("Inv. Discount (LCY)", -InvDiscAmount);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure PurchPricesAndDiscountsActionsFromItemCard()
@@ -2422,7 +2421,7 @@ codeunit 134331 "ERM Purchase Payables"
         Assert.AreEqual(DateFormula, ReversedDateFormula, DateFormulaReverseErr);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure PurchPriceWithZeroDirectUnitCost()
@@ -2964,9 +2963,7 @@ codeunit 134331 "ERM Purchase Payables"
         asserterror OpenPurchaseLinefactBox(PurchaseHeader2);
 
         // Verify: Verify Error when open purchase line fact box with created G/L Line purchase document.
-        Assert.ExpectedError(StrSubstNo(PurchaseLineFactBoxErr, PurchaseLine2.Type::Item, PurchaseLine."Document Type",
-            PurchaseLine2."Document No.", PurchaseLine2."Line No.",
-            PurchaseLine2.Type::"G/L Account"));
+        Assert.ExpectedTestFieldError(PurchaseLine2.FieldCaption(Type), Format(PurchaseLine2.Type::Item));
     end;
 
     local procedure UpdateGeneralLedgerSetup(VATDifferenceAllowed: Decimal): Decimal
@@ -3035,7 +3032,7 @@ codeunit 134331 "ERM Purchase Payables"
         PurchaseLine.Modify(true);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchaseLineDiscount(var PurchaseLineDiscount: Record "Purchase Line Discount"; PurchasePrice: Record "Purchase Price")
     begin
         LibraryERM.CreateLineDiscForVendor(
@@ -3045,6 +3042,7 @@ codeunit 134331 "ERM Purchase Payables"
         PurchaseLineDiscount.Modify(true);
     end;
 #endif
+
     local procedure CreatePurchaseDoc(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; DocType: Enum "Purchase Document Type"; VendorNo: Code[20])
     begin
         LibraryPurchase.CreatePurchHeader(PurchaseHeader, DocType, VendorNo);
@@ -3072,7 +3070,7 @@ codeunit 134331 "ERM Purchase Payables"
         exit(NoSeries.PeekNextNo(PurchaseHeader."Posting No. Series"));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchaseOrder(var PurchaseLine: Record "Purchase Line"; PurchasePrice: Record "Purchase Price")
     var
         PurchaseHeader: Record "Purchase Header";
@@ -3086,6 +3084,7 @@ codeunit 134331 "ERM Purchase Payables"
           PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, PurchasePrice."Item No.", PurchasePrice."Minimum Quantity" * 2);
     end;
 #endif
+
     local procedure CreatePurchaseOrderWithItem(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line")
     begin
         LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, LibraryPurchase.CreateVendorNo());
@@ -3107,7 +3106,7 @@ codeunit 134331 "ERM Purchase Payables"
         exit(PurchaseOrderNo);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchasePrice(var PurchasePrice: Record "Purchase Price")
     var
         Item: Record Item;
@@ -3121,6 +3120,7 @@ codeunit 134331 "ERM Purchase Payables"
         PurchasePrice.Modify(true);
     end;
 #endif
+
     local procedure CreatePurchaseLineFromPurchaseOrderPage(ItemNo: Code[20]; PurchaseHeaderNo: Code[20]; VendorNo: Code[20]; Quantity: Decimal)
     var
         PurchaseLine: Record "Purchase Line";
@@ -3368,7 +3368,7 @@ codeunit 134331 "ERM Purchase Payables"
         exit(ResponsibilityCenter.Code);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreatePurchasePriceWithMinimumQuantity(var PurchasePrice: Record "Purchase Price"; MinQty: Decimal)
     begin
         PurchasePrice.Init();
@@ -3394,7 +3394,7 @@ codeunit 134331 "ERM Purchase Payables"
         exit(PurchaseHeader.GetStatusStyleText());
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure OpenPurchasePricesPage(var PurchasePrices: TestPage "Purchase Prices"; VendorNo: Code[20]; StartingDateFilter: Text[30])
     var
         VendorList: TestPage "Vendor List";
@@ -3406,6 +3406,7 @@ codeunit 134331 "ERM Purchase Payables"
         PurchasePrices.StartingDateFilter.SetValue(StartingDateFilter);
     end;
 #endif
+
     local procedure OpenPurchaseLinefactBox(PurchaseHeader: Record "Purchase Header")
     var
         PurchaseOrder: TestPage "Purchase Order";
@@ -3455,7 +3456,7 @@ codeunit 134331 "ERM Purchase Payables"
         LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, LineType, No, LibraryRandom.RandInt(10));
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure StartingDateOnPurchasePrice(StartingDateFilter: Text[1]; StartingDate: Date)
     var
         Vendor: Record Vendor;
@@ -3667,7 +3668,7 @@ codeunit 134331 "ERM Purchase Payables"
         VATEntry.TestField(Amount, ExpectedAmount);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure VerifyCopiedPurchPrice(CopiedFromPurchasePrice: Record "Purchase Price"; VendNo: Code[20])
     var
         PurchasePrice: Record "Purchase Price";
@@ -3884,7 +3885,7 @@ codeunit 134331 "ERM Purchase Payables"
         VATAmountLine."VAT Amount".SetValue(VATAmount);
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure GetPurchasePricePageHandler(var GetPurchasePrice: TestPage "Get Purchase Price") // Native
@@ -3893,6 +3894,7 @@ codeunit 134331 "ERM Purchase Payables"
         GetPurchasePrice.OK().Invoke();
     end;
 #endif
+
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure GetPriceLinePageHandler(var GetPriceLine: TestPage "Get Price Line")
@@ -3901,7 +3903,7 @@ codeunit 134331 "ERM Purchase Payables"
         GetPriceLine.OK().Invoke();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure PurchPricesSelectPriceOfVendorModalPageHandler(var PurchasePrices: TestPage "Purchase Prices")
@@ -3979,7 +3981,7 @@ codeunit 134331 "ERM Purchase Payables"
         Choice := LibraryVariableStorage.DequeueInteger();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure NewPurchPriceMPH(var PurchasePrices: TestPage "Purchase Prices")

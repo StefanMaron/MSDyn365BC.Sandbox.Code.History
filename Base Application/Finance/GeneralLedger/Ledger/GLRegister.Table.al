@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Finance.GeneralLedger.Ledger;
+namespace Microsoft.Finance.GeneralLedger.Ledger;
 
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Finance.WithholdingTax;

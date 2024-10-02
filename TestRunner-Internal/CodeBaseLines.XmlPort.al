@@ -10,7 +10,7 @@ xmlport 130004 "Code Base Lines"
             tableelement("Code Coverage"; "Code Coverage")
             {
                 XmlName = 'CodeCoverage';
-                SourceTableView = sorting("Object Type", "Object ID", "Line No.") order(Ascending);
+                SourceTableView = sorting("Object Type", "Object ID", "Line No.") order(ascending);
                 fieldelement(ObjectType; "Code Coverage"."Object Type")
                 {
                 }

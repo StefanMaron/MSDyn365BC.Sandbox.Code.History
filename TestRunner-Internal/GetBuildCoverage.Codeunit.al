@@ -6,13 +6,11 @@ codeunit 130029 "Get Build Coverage"
         GetCoverage: Page "Get Coverage";
         MergedTestCoveragePath: Text;
     begin
-        with GetCoverage do begin
-            LookupMode := true;
-            if RunModal() <> ACTION::LookupOK then
-                exit;
+        GetCoverage.LookupMode := true;
+        if GetCoverage.RunModal() <> ACTION::LookupOK then
+            exit;
 
-            Initialize(GetFromDateTime(), GetToDateTime(), GetSnapQueueID(), GetCountryCode(), GetSdAppPath());
-        end;
+        Initialize(GetCoverage.GetFromDateTime(), GetCoverage.GetToDateTime(), GetCoverage.GetSnapQueueID(), GetCoverage.GetCountryCode(), GetCoverage.GetSdAppPath());
 
         MergedTestCoveragePath := UnzipAndCCMergeTestResults(SnapQueueID, CountryCode);
 
@@ -110,15 +108,13 @@ codeunit 130029 "Get Build Coverage"
             'Eng\Core\Enlistment\start.ps1',
             'Eng\Normal\Tools\CALCodeCoverage\ProcessCoverageResults.ps1'));
 
-        with SystemDiagnosticsProcess do begin
-            Start();
+        SystemDiagnosticsProcess.Start();
 
-            errorText := DelChr(StandardError.ReadToEnd(), '<>', ' ');
+        errorText := DelChr(SystemDiagnosticsProcess.StandardError.ReadToEnd(), '<>', ' ');
 
-            WaitForExit();
+        SystemDiagnosticsProcess.WaitForExit();
 
-            Close();
-        end;
+        SystemDiagnosticsProcess.Close();
 
         if errorText <> '' then
             Error(errorText);
@@ -149,15 +145,13 @@ codeunit 130029 "Get Build Coverage"
             'Eng\Core\Enlistment\start.ps1',
             'Build\Application\GetSDChanges.ps1'));
 
-        with SystemDiagnosticsProcess do begin
-            Start();
+        SystemDiagnosticsProcess.Start();
 
-            errorText := DelChr(StandardError.ReadToEnd(), '<>', ' ');
+        errorText := DelChr(SystemDiagnosticsProcess.StandardError.ReadToEnd(), '<>', ' ');
 
-            WaitForExit();
+        SystemDiagnosticsProcess.WaitForExit();
 
-            Close();
-        end;
+        SystemDiagnosticsProcess.Close();
 
         if errorText <> '' then
             Error(errorText);
@@ -165,16 +159,14 @@ codeunit 130029 "Get Build Coverage"
 
     local procedure InitSd(var SystemDiagnosticsProcess: DotNet Process; command: Text)
     begin
-        with SystemDiagnosticsProcess do begin
-            SystemDiagnosticsProcess := Process();
-            StartInfo.FileName('powershell.exe');
-            StartInfo.Arguments(command);
-            StartInfo.UseShellExecute := false;
-            StartInfo.RedirectStandardError := true;
-            StartInfo.RedirectStandardOutput := false;
+        SystemDiagnosticsProcess := SystemDiagnosticsProcess.Process();
+        SystemDiagnosticsProcess.StartInfo.FileName('powershell.exe');
+        SystemDiagnosticsProcess.StartInfo.Arguments(command);
+        SystemDiagnosticsProcess.StartInfo.UseShellExecute := false;
+        SystemDiagnosticsProcess.StartInfo.RedirectStandardError := true;
+        SystemDiagnosticsProcess.StartInfo.RedirectStandardOutput := false;
 
-            StartInfo.CreateNoWindow := true;
-        end;
+        SystemDiagnosticsProcess.StartInfo.CreateNoWindow := true;
     end;
 
     local procedure ConvertDateTimeToSdDateTime(FromDateTime: DateTime): Text[30]
@@ -227,14 +219,12 @@ codeunit 130029 "Get Build Coverage"
         GetCoverage: Page "Get Coverage";
         MergedTestCoveragePath: Text;
     begin
-        with GetCoverage do begin
-            Init(true);
-            LookupMode := true;
-            if RunModal() <> ACTION::LookupOK then
-                exit;
+        GetCoverage.Init(true);
+        GetCoverage.LookupMode := true;
+        if GetCoverage.RunModal() <> ACTION::LookupOK then
+            exit;
 
-            Initialize(0DT, 0DT, GetSnapQueueID(), GetCountryCode(), '');
-        end;
+        Initialize(0DT, 0DT, GetCoverage.GetSnapQueueID(), GetCoverage.GetCountryCode(), '');
 
         MergedTestCoveragePath := UnzipAndCCMergeTestResults(SnapQueueID, CountryCode);
 

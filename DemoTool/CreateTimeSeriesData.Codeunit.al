@@ -65,7 +65,7 @@ codeunit 119300 "Create Time Series Data"
         Evaluate(MaxNumberOfInvoices, TempXMLBufferSales.GetAttributeValue('MaxNumberOfInvoicesPerPeriod'));
         Evaluate(Periods, TempXMLBufferSales.GetAttributeValue('Periods'));
         TempXMLBufferSales.FindChildElements(TempXMLBufferSales);
-        if TempXMLBufferSales.FindSet() then begin
+        if TempXMLBufferSales.FindSet() then
             repeat
                 TempXMLBufferSales.FindChildElements(TempXMLBufferPeriods);
                 ItemNo := CopyStr(TempXMLBufferSales.GetAttributeValue('item'), 1, MaxStrLen(ItemNo));
@@ -82,7 +82,6 @@ codeunit 119300 "Create Time Series Data"
                         Period += 1;
                     until TempXMLBufferPeriods.Next() = 0;
             until TempXMLBufferSales.Next() = 0;
-        end
     end;
 
     local procedure CalculatePurchSalesQty(var TempQuantityAllocationBuffer: Record "Quantity Allocation Buffer" temporary; var ItemSalesData: Record "Item Sales Data" temporary; Period: Integer)
