@@ -2670,13 +2670,10 @@ codeunit 137152 "SCM Warehouse - Receiving"
         // [WHEN] Create Put-away for Item "I" from Posted Whse. Receipt
         CreatePutAwayFromPutAwayWorksheet(
           WhseWorksheetLine, Location.Code, Item."No.", Item."No.", 0, "Whse. Activity Sorting Method"::None, false);
-
         // [THEN] Put-away is created using BinContent "B".
-        with WarehouseActivityLine do begin
-            FindWarehouseActivityLine(
-              WarehouseActivityLine, "Source Document"::"Purchase Order", PurchaseHeader."No.", "Activity Type"::"Put-away");
-            TestField("Unit of Measure Code", ItemUnitOfMeasure.Code);
-        end;
+        FindWarehouseActivityLine(
+          WarehouseActivityLine, WarehouseActivityLine."Source Document"::"Purchase Order", PurchaseHeader."No.", WarehouseActivityLine."Activity Type"::"Put-away");
+        WarehouseActivityLine.TestField("Unit of Measure Code", ItemUnitOfMeasure.Code);
     end;
 
     [Test]
@@ -2740,18 +2737,14 @@ codeunit 137152 "SCM Warehouse - Receiving"
 
         // [GIVEN] Bin Content with "Item Unit of Measure" = "Y"
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
-        with BinContent do begin
-            "Location Code" := LocationWhite.Code;
-            "Unit of Measure Code" := UnitOfMeasure.Code;
-            Insert();
-
-            // [WHEN] Calculate Field "Pick Quantity (Base)" on Bin Content
-            SetFilterOnUnitOfMeasure();
-            CalcFields("Pick Quantity (Base)");
-
-            // [THEN] "Pick Quantity (Base)" = 0
-            Assert.AreEqual(0, "Pick Quantity (Base)", PickQuantityBaseErr);
-        end;
+        BinContent."Location Code" := LocationWhite.Code;
+        BinContent."Unit of Measure Code" := UnitOfMeasure.Code;
+        BinContent.Insert();
+        // [WHEN] Calculate Field "Pick Quantity (Base)" on Bin Content
+        BinContent.SetFilterOnUnitOfMeasure();
+        BinContent.CalcFields("Pick Quantity (Base)");
+        // [THEN] "Pick Quantity (Base)" = 0
+        Assert.AreEqual(0, BinContent."Pick Quantity (Base)", PickQuantityBaseErr);
     end;
 
     [Test]
@@ -2775,18 +2768,14 @@ codeunit 137152 "SCM Warehouse - Receiving"
 
         // [GIVEN] Bin Content with "Item Unit of Measure" = "Y"
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
-        with BinContent do begin
-            "Location Code" := Location.Code;
-            "Unit of Measure Code" := UnitOfMeasure.Code;
-            Insert();
-
-            // [WHEN] Calculate Field "Pick Quantity (Base)" on Bin Content
-            SetFilterOnUnitOfMeasure();
-            CalcFields("Pick Quantity (Base)");
-
-            // [THEN] "Pick Quantity (Base)" = "Q"
-            Assert.AreEqual(WarehouseActivityLine."Qty. Outstanding (Base)", "Pick Quantity (Base)", PickQuantityBaseErr);
-        end;
+        BinContent."Location Code" := Location.Code;
+        BinContent."Unit of Measure Code" := UnitOfMeasure.Code;
+        BinContent.Insert();
+        // [WHEN] Calculate Field "Pick Quantity (Base)" on Bin Content
+        BinContent.SetFilterOnUnitOfMeasure();
+        BinContent.CalcFields("Pick Quantity (Base)");
+        // [THEN] "Pick Quantity (Base)" = "Q"
+        Assert.AreEqual(WarehouseActivityLine."Qty. Outstanding (Base)", BinContent."Pick Quantity (Base)", PickQuantityBaseErr);
     end;
 
     [Test]
@@ -3029,17 +3018,18 @@ codeunit 137152 "SCM Warehouse - Receiving"
         // [WHEN] Purchase order is released, warehouse receipt is for the order is posted.
         CreatePurchaseOrderAndPostWarehouseReceipt(
           PurchaseHeader, Location.Code, Item."No.", LibraryRandom.RandInt(10), Item."Base Unit of Measure");
-
         // [THEN] Put-away is created.
         // [THEN] Bin Content does not exist for the bin, into which items will be placed.
-        with WarehouseActivityLine do begin
-            FilterWarehouseActivityLines(
-              WarehouseActivityLine, "Source Document"::"Purchase Order", PurchaseHeader."No.", '', "Activity Type"::"Put-away");
-            SetRange("Action Type", "Action Type"::Place);
-            FindFirst();
+        FilterWarehouseActivityLines(
+          WarehouseActivityLine, WarehouseActivityLine."Source Document"::"Purchase Order", PurchaseHeader."No.", '', WarehouseActivityLine."Activity Type"::"Put-away");
+        WarehouseActivityLine.SetRange("Action Type", WarehouseActivityLine."Action Type"::Place);
+        WarehouseActivityLine.FindFirst();
+        WarehouseActivityLine.DeleteBinContent(Enum::"Warehouse Action Type"::Place.AsInteger());
 
-            FilterBinContent(BinContent, "Location Code", "Bin Code", "Item No.");
-            Assert.RecordIsEmpty(BinContent);
+        FilterBinContent(BinContent, WarehouseActivityLine."Location Code", WarehouseActivityLine."Bin Code", WarehouseActivityLine."Item No.");
+        if BinContent.FindFirst() then begin
+            BinContent.CalcFields(Quantity);
+            Assert.AreEqual(0, BinContent.Quantity, 'Bin Content must be empty.');
         end;
     end;
 
@@ -3074,17 +3064,18 @@ codeunit 137152 "SCM Warehouse - Receiving"
           PostedWhseReceiptLine, PostedWhseReceiptLine."Source Document"::"Purchase Order", PurchaseHeader."No.", Item."No.", '');
         PostedWhseReceiptLine.SetHideValidationDialog(true);
         PostedWhseReceiptLine.CreatePutAwayDoc(PostedWhseReceiptLine, '');
-
         // [THEN] Put-away is created.
         // [THEN] Bin Content does not exist for the bin, into which items will be placed.
-        with WarehouseActivityLine do begin
-            FilterWarehouseActivityLines(
-              WarehouseActivityLine, "Source Document"::"Purchase Order", PurchaseHeader."No.", '', "Activity Type"::"Put-away");
-            SetRange("Action Type", "Action Type"::Place);
-            FindFirst();
+        FilterWarehouseActivityLines(
+          WarehouseActivityLine, WarehouseActivityLine."Source Document"::"Purchase Order", PurchaseHeader."No.", '', WarehouseActivityLine."Activity Type"::"Put-away");
+        WarehouseActivityLine.SetRange("Action Type", WarehouseActivityLine."Action Type"::Place);
+        WarehouseActivityLine.FindFirst();
+        WarehouseActivityLine.DeleteBinContent(Enum::"Warehouse Action Type"::Place.AsInteger());
 
-            FilterBinContent(BinContent, "Location Code", "Bin Code", "Item No.");
-            Assert.RecordIsEmpty(BinContent);
+        FilterBinContent(BinContent, WarehouseActivityLine."Location Code", WarehouseActivityLine."Bin Code", WarehouseActivityLine."Item No.");
+        if BinContent.FindFirst() then begin
+            BinContent.CalcFields(Quantity);
+            Assert.AreEqual(0, BinContent.Quantity, 'Bin Content must be empty.');
         end;
     end;
 
@@ -3121,15 +3112,12 @@ codeunit 137152 "SCM Warehouse - Receiving"
         // [WHEN] Create and post warehouse receipt from a purchase order for item "I". That creates a put-away.
         CreatePurchaseOrderAndPostWarehouseReceipt(
           PurchaseHeader, Location.Code, Item."No.", LibraryRandom.RandInt(10), Item."Base Unit of Measure");
-
         // [THEN] "Bin Code" on the put-away line is equal to "B1", instead of "B2".
-        with WarehouseActivityLine do begin
-            FilterWarehouseActivityLines(
-              WarehouseActivityLine, "Source Document"::"Purchase Order", PurchaseHeader."No.", '', "Activity Type"::"Put-away");
-            SetRange("Action Type", "Action Type"::Place);
-            FindFirst();
-            TestField("Bin Code", Bin[1].Code);
-        end;
+        FilterWarehouseActivityLines(
+          WarehouseActivityLine, WarehouseActivityLine."Source Document"::"Purchase Order", PurchaseHeader."No.", '', WarehouseActivityLine."Activity Type"::"Put-away");
+        WarehouseActivityLine.SetRange("Action Type", WarehouseActivityLine."Action Type"::Place);
+        WarehouseActivityLine.FindFirst();
+        WarehouseActivityLine.TestField("Bin Code", Bin[1].Code);
     end;
 
     [Test]
@@ -4487,12 +4475,10 @@ codeunit 137152 "SCM Warehouse - Receiving"
         WarehouseReceiptLine: Record "Warehouse Receipt Line";
     begin
         GetSourceDocumentOnWarehouseReceipt(WarehouseReceiptHeader, Location.Code, true, false, false, ItemNo, ItemNo);
-        with WarehouseReceiptLine do begin
-            FindWarehouseReceiptLine(WarehouseReceiptLine, "Source Document"::"Purchase Order", PurchaseHeaderNo, Location.Code);
-            "Bin Code" := Location."Shipment Bin Code";
-            Modify();
-            OpenItemTrackingLines(); // Assign "Lot No." through ItemTrackingFromReceiptHandler
-        end;
+        FindWarehouseReceiptLine(WarehouseReceiptLine, WarehouseReceiptLine."Source Document"::"Purchase Order", PurchaseHeaderNo, Location.Code);
+        WarehouseReceiptLine."Bin Code" := Location."Shipment Bin Code";
+        WarehouseReceiptLine.Modify();
+        WarehouseReceiptLine.OpenItemTrackingLines(); // Assign "Lot No." through ItemTrackingFromReceiptHandler
         LibraryWarehouse.PostWhseReceipt(WarehouseReceiptHeader);
     end;
 
@@ -5122,15 +5108,13 @@ codeunit 137152 "SCM Warehouse - Receiving"
         UnitOfMeasure: Record "Unit of Measure";
     begin
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
-        with WarehouseActivityLine do begin
-            "Activity Type" := "Activity Type"::"Invt. Pick";
-            "No." := LibraryUtility.GenerateGUID();
-            "Location Code" := LocationCode;
-            "Action Type" := "Action Type"::Take;
-            "Unit of Measure Code" := UnitOfMeasure.Code;
-            "Qty. Outstanding (Base)" := LibraryRandom.RandDec(10, 2);
-            Insert();
-        end;
+        WarehouseActivityLine."Activity Type" := WarehouseActivityLine."Activity Type"::"Invt. Pick";
+        WarehouseActivityLine."No." := LibraryUtility.GenerateGUID();
+        WarehouseActivityLine."Location Code" := LocationCode;
+        WarehouseActivityLine."Action Type" := WarehouseActivityLine."Action Type"::Take;
+        WarehouseActivityLine."Unit of Measure Code" := UnitOfMeasure.Code;
+        WarehouseActivityLine."Qty. Outstanding (Base)" := LibraryRandom.RandDec(10, 2);
+        WarehouseActivityLine.Insert();
     end;
 
     local procedure CreateWarehouseReceiptHeaderWithLocation(var WarehouseReceiptHeader: Record "Warehouse Receipt Header"; LocationCode: Code[10])
@@ -5452,13 +5436,11 @@ codeunit 137152 "SCM Warehouse - Receiving"
     begin
         CreateWarehouseShipmentHeaderWithLocation(WarehouseShipmentHeader, LocationCode);
         LibraryWarehouse.CreateWarehouseSourceFilter(WarehouseSourceFilter, WarehouseSourceFilter.Type::Outbound);
-        with WarehouseSourceFilter do begin
-            Validate("Sales Orders", SalesOrders);
-            Validate("Outbound Transfers", OutboundTransfers);
-            Validate("Purchase Return Orders", PurchaseReturnOrders);
-            Validate("Item No. Filter", ItemNo);
-            Modify(true);
-        end;
+        WarehouseSourceFilter.Validate("Sales Orders", SalesOrders);
+        WarehouseSourceFilter.Validate("Outbound Transfers", OutboundTransfers);
+        WarehouseSourceFilter.Validate("Purchase Return Orders", PurchaseReturnOrders);
+        WarehouseSourceFilter.Validate("Item No. Filter", ItemNo);
+        WarehouseSourceFilter.Modify(true);
         LibraryWarehouse.GetSourceDocumentsShipment(WarehouseShipmentHeader, WarehouseSourceFilter, LocationCode);
     end;
 
@@ -5988,12 +5970,10 @@ codeunit 137152 "SCM Warehouse - Receiving"
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        with ItemLedgerEntry do begin
-            SetRange("Item No.", ItemNo);
-            SetRange("Entry Type", "Entry Type"::Purchase);
-            SetFilter("Lot No.", LotNo);
-            Assert.AreEqual(Count, ItemLedgerEntryCount, ItemLedgerEntryErr)
-        end;
+        ItemLedgerEntry.SetRange("Item No.", ItemNo);
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Purchase);
+        ItemLedgerEntry.SetFilter("Lot No.", LotNo);
+        Assert.AreEqual(ItemLedgerEntry.Count, ItemLedgerEntryCount, ItemLedgerEntryErr)
     end;
 
     local procedure VerifyItemLedgerEntry(ItemNo: Code[20]; Quantity: Decimal; RemainingQuantity: Decimal)

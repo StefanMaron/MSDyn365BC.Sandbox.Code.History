@@ -115,19 +115,17 @@ codeunit 130022 "Test Management"
         FromAllObjWithCaption: Record AllObjWithCaption;
         TestLine: Record "Test Line";
     begin
-        with ToAllObjWithCaption do begin
-            FromAllObjWithCaption.SetRange("Object Type", "Object Type"::Codeunit);
-            FromAllObjWithCaption.SetRange("Object Subtype", 'Test');
-            FromAllObjWithCaption.SetFilter("Object ID", '132500..149999');
-            if FromAllObjWithCaption.Find('-') then
-                repeat
-                    TestLine.SetRange("Test Codeunit", FromAllObjWithCaption."Object ID");
-                    if not OnlyThoseNotInAnySuite or not TestLine.FindFirst() then begin
-                        ToAllObjWithCaption := FromAllObjWithCaption;
-                        Insert();
-                    end;
-                until FromAllObjWithCaption.Next() = 0;
-        end;
+        FromAllObjWithCaption.SetRange("Object Type", ToAllObjWithCaption."Object Type"::Codeunit);
+        FromAllObjWithCaption.SetRange("Object Subtype", 'Test');
+        FromAllObjWithCaption.SetFilter("Object ID", '132500..149999');
+        if FromAllObjWithCaption.Find('-') then
+            repeat
+                TestLine.SetRange("Test Codeunit", FromAllObjWithCaption."Object ID");
+                if not OnlyThoseNotInAnySuite or not TestLine.FindFirst() then begin
+                    ToAllObjWithCaption := FromAllObjWithCaption;
+                    ToAllObjWithCaption.Insert();
+                end;
+            until FromAllObjWithCaption.Next() = 0;
 
         exit(ToAllObjWithCaption.Find('-'));
     end;
@@ -215,14 +213,12 @@ codeunit 130022 "Test Management"
     var
         TestSuite: Record "Test Suite";
     begin
-        with TestSuite do begin
-            NewSuiteName := DefaultTxt;
-            Init();
-            Validate(Name, NewSuiteName);
-            Validate(Description, DefaultSuiteTxt);
-            Validate(Export, false);
-            Insert(true);
-        end;
+        NewSuiteName := DefaultTxt;
+        TestSuite.Init();
+        TestSuite.Validate(Name, NewSuiteName);
+        TestSuite.Validate(Description, DefaultSuiteTxt);
+        TestSuite.Validate(Export, false);
+        TestSuite.Insert(true);
     end;
 
     local procedure RefreshSuite(TestSuite: Record "Test Suite"; var AllObjWithCaption: Record AllObjWithCaption)
@@ -230,19 +226,17 @@ codeunit 130022 "Test Management"
         TestLine: Record "Test Line";
         LineNo: Integer;
     begin
-        with TestLine do begin
-            LineNo := LineNo + 10000;
+        LineNo := LineNo + 10000;
 
-            Init();
-            Validate("Test Suite", TestSuite.Name);
-            Validate("Line No.", LineNo);
-            Validate("Line Type", "Line Type"::Group);
-            Validate(Name, DefaultSuiteTxt);
-            Validate(Run, true);
-            Insert(true);
+        TestLine.Init();
+        TestLine.Validate("Test Suite", TestSuite.Name);
+        TestLine.Validate("Line No.", LineNo);
+        TestLine.Validate("Line Type", TestLine."Line Type"::Group);
+        TestLine.Validate(Name, DefaultSuiteTxt);
+        TestLine.Validate(Run, true);
+        TestLine.Insert(true);
 
-            AddTestCodeunits(TestSuite, AllObjWithCaption);
-        end;
+        AddTestCodeunits(TestSuite, AllObjWithCaption);
     end;
 
     [Scope('OnPrem')]
@@ -291,36 +285,34 @@ codeunit 130022 "Test Management"
         AllObj: Record AllObj;
         CodeunitIsValid: Boolean;
     begin
-        with TestLine do begin
-            if TestLineExists(TestSuiteName, TestCodeunitId) then
-                exit;
+        if TestLineExists(TestSuiteName, TestCodeunitId) then
+            exit;
 
-            Init();
-            Validate("Test Suite", TestSuiteName);
-            Validate("Line No.", LineNo);
-            Validate("Line Type", "Line Type"::Codeunit);
-            Validate("Test Codeunit", TestCodeunitId);
-            Validate(Run, true);
+        TestLine.Init();
+        TestLine.Validate("Test Suite", TestSuiteName);
+        TestLine.Validate("Line No.", LineNo);
+        TestLine.Validate("Line Type", TestLine."Line Type"::Codeunit);
+        TestLine.Validate("Test Codeunit", TestCodeunitId);
+        TestLine.Validate(Run, true);
 
-            Insert(true);
+        TestLine.Insert(true);
 
-            AllObj.SetRange("Object Type", AllObj."Object Type"::Codeunit);
-            AllObj.SetRange("Object ID", TestCodeunitId);
-            if not IsNullGuid(AllObj."App Package ID") then
-                CodeunitIsValid := true;
+        AllObj.SetRange("Object Type", AllObj."Object Type"::Codeunit);
+        AllObj.SetRange("Object ID", TestCodeunitId);
+        if not IsNullGuid(AllObj."App Package ID") then
+            CodeunitIsValid := true;
 
-            if not CodeunitIsValid then
-                CodeunitIsValid := AllObj.FindFirst();
+        if not CodeunitIsValid then
+            CodeunitIsValid := AllObj.FindFirst();
 
-            if CodeunitIsValid then begin
-                SETPUBLISHMODE();
-                SetRecFilter();
-                CODEUNIT.Run(CODEUNIT::"Test Runner", TestLine);
-            end else begin
-                Validate(Result, Result::Failure);
-                Validate("First Error", ObjectNotCompiledErr);
-                Modify(true);
-            end;
+        if CodeunitIsValid then begin
+            SETPUBLISHMODE();
+            TestLine.SetRecFilter();
+            CODEUNIT.Run(CODEUNIT::"Test Runner", TestLine);
+        end else begin
+            TestLine.Validate(Result, TestLine.Result::Failure);
+            TestLine.Validate("First Error", ObjectNotCompiledErr);
+            TestLine.Modify(true);
         end;
     end;
 
@@ -476,10 +468,8 @@ codeunit 130022 "Test Management"
             OnRunDefinition := LowerString.StartsWith('trigger ') and LowerString.Contains(' onrun()');
         case true of
             LowerString.StartsWith('//'):
-                begin
-                    if not IsGWTTag(LowerString) then
-                        exit(false);
-                end;
+                if not IsGWTTag(LowerString) then
+                    exit(false);
             FunctionDefinition:
                 begin
                     Flag[3] := false;
@@ -643,15 +633,14 @@ codeunit 130022 "Test Management"
                 LineNoFilter := LineNoFilter + Separator + GetLineNoFilter(TestLine, Selection::Codeunit);
                 LastCodeunitID := TestLine."Test Codeunit";
                 CodeunitIsMarked := true;
-            end else begin
+            end else
                 if LastCodeunitID <> TestLine."Test Codeunit" then begin
                     LastCodeunitID := TestLine."Test Codeunit";
                     LineNoFilter := LineNoFilter + Separator + GetLineNoFilter(TestLine, Selection::"Function");
                     CodeunitIsMarked := false;
                 end else
                     if not CodeunitIsMarked then
-                        LineNoFilter := LineNoFilter + Separator + Format(TestLine."Line No.")
-            end;
+                        LineNoFilter := LineNoFilter + Separator + Format(TestLine."Line No.");
             Separator := '|';
         until TestLine.Next() = 0;
 

@@ -1,10 +1,10 @@
 ﻿namespace System.Threading;
 
 using System.Automation;
+using System.Utilities;
 using System.Environment;
 using System.Security.User;
 using System.Telemetry;
-using System.Utilities;
 
 codeunit 456 "Job Queue Management"
 {
@@ -28,6 +28,13 @@ codeunit 456 "Job Queue Management"
 
     trigger OnRun()
     begin
+    end;
+
+    internal procedure CheckUserInJobQueueAdminList(UserName: Text): Boolean
+    var
+        JobQueueAdminList: Record "Job Queue Notified Admin";
+    begin
+        exit(JobQueueAdminList.Get(UserName));
     end;
 
     procedure CreateJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
@@ -486,6 +493,35 @@ codeunit 456 "Job Queue Management"
         Session.LogMessage('0000FNM', JobQueueStatusChangeTxt, Verbosity::Normal, DataClassification::OrganizationIdentifiableInformation, TelemetryScope::ExtensionPublisher, Dimensions);
 
         GlobalLanguage(CurrentLanguage);
+
+        if Rec."Error Message Register Id" <> xRec."Error Message Register Id" then
+            DeleteErrorMessageRegister(xRec."Error Message Register Id");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure OnBeforeDeleteJobQueueEntry(var Rec: Record "Job Queue Entry"; RunTrigger: Boolean)
+    var
+        JobQueueLogEntry: Record "Job Queue Log Entry";
+    begin
+        if IsNullGuid(Rec."Error Message Register Id") then
+            exit;
+
+        JobQueueLogEntry.SetRange("Error Message Register Id", Rec."Error Message Register Id");
+        if JobQueueLogEntry.IsEmpty() then
+            DeleteErrorMessageRegister(Rec."Error Message Register Id");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Log Entry", 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure OnBeforeDeleteJobQueueLogEntry(var Rec: Record "Job Queue Log Entry"; RunTrigger: Boolean)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        if IsNullGuid(Rec."Error Message Register Id") then
+            exit;
+
+        JobQueueEntry.SetRange("Error Message Register Id", Rec."Error Message Register Id");
+        if JobQueueEntry.IsEmpty() then
+            DeleteErrorMessageRegister(Rec."Error Message Register Id");
     end;
 
     /// <Summary>Used for test. Sets the minimum age of stale job queue entries and job queue log entries.</Summary>

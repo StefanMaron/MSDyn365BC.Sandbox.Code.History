@@ -58,57 +58,56 @@ codeunit 130020 "Test Runner"
         TestProxy: Codeunit "Test Proxy";
         AzureKeyVaultTestLibrary: Codeunit "Azure Key Vault Test Library";
     begin
-        with TestLine do begin
-            OpenWindow();
-            ModifyAll(Result, Result::" ");
-            ModifyAll("First Error", '');
-            Commit();
-            Filter := GetView();
-            WindowNoOfTestCodeunitTotal := CountTestCodeunitsToRun(TestLine);
-            if not (ChangelistCode.IsEmpty() or UpdateTCM()) then
-                CodeCoverageMgt.Start(true);
+        OpenWindow();
+        TestLine.ModifyAll(Result, TestLine.Result::" ");
+        TestLine.ModifyAll("First Error", '');
+        Commit();
+        Filter := TestLine.GetView();
+        WindowNoOfTestCodeunitTotal := CountTestCodeunitsToRun(TestLine);
+        if not (ChangelistCode.IsEmpty() or UpdateTCM()) then
+            CodeCoverageMgt.Start(true);
 
-            TestProxy.Initialize();
+        TestProxy.Initialize();
 
-            if Find('-') then
-                repeat
-                    if "Line Type" = "Line Type"::Codeunit then begin
-                        if UpdateTCM() then
-                            CodeCoverageMgt.Start(true);
+        if TestLine.Find('-') then
+            repeat
+                if TestLine."Line Type" = TestLine."Line Type"::Codeunit then begin
+                    if UpdateTCM() then
+                        CodeCoverageMgt.Start(true);
 
-                        MinLineNo := "Line No.";
-                        MaxLineNo := GetMaxCodeunitLineNo(WindowNoOfFunctionTotal);
-                        if Run then
-                            WindowNoOfTestCodeunit += 1;
-                        WindowNoOfFunction := 0;
+                    MinLineNo := TestLine."Line No.";
+                    MaxLineNo := TestLine.GetMaxCodeunitLineNo(WindowNoOfFunctionTotal);
+                    if TestLine.Run then
+                        WindowNoOfTestCodeunit += 1;
+                    WindowNoOfFunction := 0;
 
-                        if TestMgt.ISPUBLISHMODE() then
-                            DeleteChildren();
+                    if TestMgt.ISPUBLISHMODE() then
+                        TestLine.DeleteChildren();
 
-                        AzureKeyVaultTestLibrary.ClearSecrets(); // Cleanup key vault cache
-                        if not Codeunit.Run("Test Codeunit") and
-                           TestMgt.ISTESTMODE() and
-                           TestSuite."Re-run Failing Codeunits"
-                        then begin
-                            BackupMgt.SetEnabled(true);
-                            Codeunit.Run("Test Codeunit");
-                            BackupMgt.SetEnabled(false);
-                        end;
-
-                        if UpdateTCM() then begin
-                            CodeCoverageMgt.Stop();
-                            TestMgt.ExtendTestCoverage("Test Codeunit");
-                        end;
+                    AzureKeyVaultTestLibrary.ClearSecrets();
+                    // Cleanup key vault cache
+                    if not Codeunit.Run(TestLine."Test Codeunit") and
+                       TestMgt.ISTESTMODE() and
+                       TestSuite."Re-run Failing Codeunits"
+                    then begin
+                        BackupMgt.SetEnabled(true);
+                        Codeunit.Run(TestLine."Test Codeunit");
+                        BackupMgt.SetEnabled(false);
                     end;
-                until Next() = 0;
 
-            if not (ChangelistCode.IsEmpty() or UpdateTCM()) then begin
-                CodeCoverageMgt.Stop();
-                Codeunit.Run(Codeunit::"Calculate Changelist Coverage");
-            end;
+                    if UpdateTCM() then begin
+                        CodeCoverageMgt.Stop();
+                        TestMgt.ExtendTestCoverage(TestLine."Test Codeunit");
+                    end;
+                end;
+            until TestLine.Next() = 0;
 
-            CloseWindow();
+        if not (ChangelistCode.IsEmpty() or UpdateTCM()) then begin
+            CodeCoverageMgt.Stop();
+            Codeunit.Run(Codeunit::"Calculate Changelist Coverage");
         end;
+
+        CloseWindow();
     end;
 
     [Scope('OnPrem')]
@@ -232,19 +231,17 @@ codeunit 130020 "Test Runner"
     var
         NoOfSteps: Integer;
     begin
-        with TestLineFunction do begin
-            TestLineFunction := TestLine;
-            "Line No." := MaxLineNo + 1;
-            "Line Type" := "Line Type"::"Function";
-            Validate("Function", FunctionName);
-            Run := TestLine.Run;
-            "Start Time" := CurrentDateTime;
-            "Finish Time" := CurrentDateTime;
-            if TestSuite."Show Test Details" then
-                NoOfSteps := AddTestSteps();
-            if NoOfSteps >= 0 then
-                Insert(true);
-        end;
+        TestLineFunction := TestLine;
+        TestLineFunction."Line No." := MaxLineNo + 1;
+        TestLineFunction."Line Type" := TestLineFunction."Line Type"::"Function";
+        TestLineFunction.Validate("Function", FunctionName);
+        TestLineFunction.Run := TestLine.Run;
+        TestLineFunction."Start Time" := CurrentDateTime;
+        TestLineFunction."Finish Time" := CurrentDateTime;
+        if TestSuite."Show Test Details" then
+            NoOfSteps := TestLineFunction.AddTestSteps();
+        if NoOfSteps >= 0 then
+            TestLineFunction.Insert(true);
         MaxLineNo := MaxLineNo + NoOfSteps + 1;
         exit(NoOfSteps >= 0);
     end;
@@ -252,65 +249,57 @@ codeunit 130020 "Test Runner"
     [Scope('OnPrem')]
     procedure UpdateCodeunit(IsOnAfterTestRun: Boolean; IsSuccessOnAfterTestRun: Boolean)
     begin
-        with TestLine do begin
-            if not IsOnAfterTestRun then begin
-                if TestMgt.ISTESTMODE() and (Result = Result::" ") then
-                    Result := Result::Skipped;
-            end else
-                if TestMgt.ISPUBLISHMODE() and IsSuccessOnAfterTestRun then
-                    Result := Result::" "
-                else
-                    if Result <> Result::Failure then begin
-                        if not IsSuccessOnAfterTestRun then begin
-                            "First Error" := CopyStr(GetLastErrorText, 1, MaxStrLen("First Error"));
-                            Result := Result::Failure
-                        end else
-                            Result := Result::Success;
-                    end;
-            "Finish Time" := CurrentDateTime;
-            Modify();
-        end;
+        if not IsOnAfterTestRun then begin
+            if TestMgt.ISTESTMODE() and (TestLine.Result = TestLine.Result::" ") then
+                TestLine.Result := TestLine.Result::Skipped;
+        end else
+            if TestMgt.ISPUBLISHMODE() and IsSuccessOnAfterTestRun then
+                TestLine.Result := TestLine.Result::" "
+            else
+                if TestLine.Result <> TestLine.Result::Failure then
+                    if not IsSuccessOnAfterTestRun then begin
+                        TestLine."First Error" := CopyStr(GetLastErrorText, 1, MaxStrLen(TestLine."First Error"));
+                        TestLine.Result := TestLine.Result::Failure
+                    end else
+                        TestLine.Result := TestLine.Result::Success;
+        TestLine."Finish Time" := CurrentDateTime;
+        TestLine.Modify();
     end;
 
     [Scope('OnPrem')]
     procedure UpdateTestFunction(IsOnAfterTestRun: Boolean; IsSuccessOnAfterTestRun: Boolean)
     begin
-        with TestLineFunction do begin
-            if not Find() then
-                exit;
+        if not TestLineFunction.Find() then
+            exit;
 
-            if not IsOnAfterTestRun then begin
-                "Start Time" := CurrentDateTime;
-                Result := Result::Skipped;
-            end else begin
-                if not IsSuccessOnAfterTestRun then begin
-                    "First Error" := CopyStr(GetLastErrorText, 1, MaxStrLen("First Error"));
-                    Result := Result::Failure
-                end else
-                    Result := TestLine.Result::Success;
-            end;
+        if not IsOnAfterTestRun then begin
+            TestLineFunction."Start Time" := CurrentDateTime;
+            TestLineFunction.Result := TestLineFunction.Result::Skipped;
+        end else
+            if not IsSuccessOnAfterTestRun then begin
+                TestLineFunction."First Error" := CopyStr(GetLastErrorText, 1, MaxStrLen(TestLineFunction."First Error"));
+                TestLineFunction.Result := TestLineFunction.Result::Failure
+            end else
+                TestLineFunction.Result := TestLine.Result::Success;
 
-            "Finish Time" := CurrentDateTime;
-            Modify();
-        end;
+        TestLineFunction."Finish Time" := CurrentDateTime;
+        TestLineFunction.Modify();
     end;
 
     [Scope('OnPrem')]
     procedure TryFindTestFunctionInGroup(FunctionName: Text[128]): Boolean
     begin
-        with TestLineFunction do begin
-            Reset();
-            SetView(Filter);
-            SetRange("Test Suite", TestLine."Test Suite");
-            SetRange("Test Codeunit", TestLine."Test Codeunit");
-            SetRange("Function", FunctionName);
-            if Find('-') then
-                repeat
-                    if "Line No." in [MinLineNo .. MaxLineNo] then
-                        exit(true);
-                until Next() = 0;
-            exit(false);
-        end;
+        TestLineFunction.Reset();
+        TestLineFunction.SetView(Filter);
+        TestLineFunction.SetRange("Test Suite", TestLine."Test Suite");
+        TestLineFunction.SetRange("Test Codeunit", TestLine."Test Codeunit");
+        TestLineFunction.SetRange("Function", FunctionName);
+        if TestLineFunction.Find('-') then
+            repeat
+                if TestLineFunction."Line No." in [MinLineNo .. MaxLineNo] then
+                    exit(true);
+            until TestLineFunction.Next() = 0;
+        exit(false);
     end;
 
     [Scope('OnPrem')]
@@ -319,12 +308,11 @@ codeunit 130020 "Test Runner"
         if not TestMgt.ISTESTMODE() then
             exit;
 
-        with TestLine do
-            if Find('-') then
-                repeat
-                    if ("Line Type" = "Line Type"::Codeunit) and Run then
-                        NoOfTestCodeunits += 1;
-                until Next() = 0;
+        if TestLine.Find('-') then
+            repeat
+                if (TestLine."Line Type" = TestLine."Line Type"::Codeunit) and TestLine.Run then
+                    NoOfTestCodeunits += 1;
+            until TestLine.Next() = 0;
     end;
 
     [Scope('OnPrem')]
