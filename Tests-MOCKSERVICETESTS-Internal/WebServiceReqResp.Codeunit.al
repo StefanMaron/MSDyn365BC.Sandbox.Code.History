@@ -40,6 +40,7 @@ codeunit 132580 "Web Service Req./Resp."
         BodyInStream: InStream;
         BodyOutStream: OutStream;
         ResponseText: Text;
+        DummyPassword: Text;
     begin
         // [SCENARIO 1] Get the bank names.
         // [GIVEN] Service URL on Bank Data Conv. Setup table.
@@ -56,8 +57,9 @@ codeunit 132580 "Web Service Req./Resp."
         // Exercise
         BodyTempBlob.CreateInStream(BodyInStream);
         //           BankDataConvServiceSetup.Get();
+        DummyPassword := 'DemoPassword';
         SOAPWebServiceRequestMgt.SetGlobals(BodyInStream,
-          MockServiceURLTxt, 'DemoUser', 'DemoPassword');
+          MockServiceURLTxt, 'DemoUser', DummyPassword);
 
         if not SOAPWebServiceRequestMgt.SendRequestToWebService() then
             SOAPWebServiceRequestMgt.ProcessFaultResponse('');
@@ -86,6 +88,7 @@ codeunit 132580 "Web Service Req./Resp."
         BodyInStream: InStream;
         ResponseInStream: InStream;
         ResponseText: Text;
+        DummyPassword: Text;
     begin
         // [SCENARIO 2] Get a payment export data response.
         // [GIVEN] Sample data for a sample AMC bank.
@@ -99,8 +102,9 @@ codeunit 132580 "Web Service Req./Resp."
 
         // Setup
         BodyTempBlob.CreateInStream(BodyInStream);
+        DummyPassword := 'DemoPassword';
         SOAPWebServiceRequestMgt.SetGlobals(BodyInStream,
-            MockServiceURLTxt, 'DemoUser', 'DemoPassword');
+            MockServiceURLTxt, 'DemoUser', DummyPassword);
         //                 BankDataConvServiceSetup."Service URL", BankDataConvServiceSetup."User Name", BankDataConvServiceSetup.GetPassword());
 
         // Exercise
