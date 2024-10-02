@@ -299,9 +299,6 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Media Repository");
         RunCodeunit(CODEUNIT::"Create Excel Templates");
         RunCodeunit(Codeunit::"Create Word Templates");
-#if not CLEAN22
-        RunCodeunit(CODEUNIT::"Create Intrastat Demo Data");
-#endif
         RunCodeunit(CODEUNIT::"Create Incoming Document");
         RunCodeunit(CODEUNIT::"Create Text To Account Mapping");
         RunCodeunit(CODEUNIT::"Create Late Payment Model");

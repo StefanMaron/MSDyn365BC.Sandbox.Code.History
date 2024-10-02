@@ -79,9 +79,6 @@ codeunit 160700 "Create SE"
     trigger OnRun()
     begin
         InsertMiniAppData();
-#if not CLEAN22
-        CreateAutoAccGroups();
-#endif
     end;
 
     var
@@ -89,12 +86,6 @@ codeunit 160700 "Create SE"
         XONLY: Label 'ONLY';
         XGoteborgTxt: Label 'GÔÇØteborg';
         TransportMethod: Record "Transport Method";
-#if not CLEAN22
-        xOfficeSuppliesperDepartment: Label 'Office Supplies per Department';
-        xADM: Label 'ADM';
-        xSALES: Label 'SALES';
-        xPROD: Label 'PROD';
-#endif
         XTurnoverinSweden: Label 'A. Sales subject to VAT or withdrawals excl. VAT';
         XSalesinSweden25: Label 'National Sale 25%';
         XSalesinSweden12: Label 'National Sale 12 %';
@@ -358,47 +349,6 @@ codeunit 160700 "Create SE"
 #endif
         CompInfo.Modify();
     end;
-
-#if not CLEAN22
-#pragma warning disable AS0072
-    [Obsolete('moved to extension', '22.0')]
-#pragma warning restore AS0072
-    procedure CreateAutoAccGroups()
-    var
-        AutoAccGrHeader: Record "Automatic Acc. Header";
-        AutoAccGrLine: Record "Automatic Acc. Line";
-    begin
-        AutoAccGrHeader."No." := '6230';
-        AutoAccGrHeader.Description := xOfficeSuppliesperDepartment;
-        AutoAccGrHeader.Insert();
-
-        AutoAccGrLine."Automatic Acc. No." := '6230';
-        AutoAccGrLine."Line No." := 10000;
-        AutoAccGrLine."Allocation %" := -100;
-        AutoAccGrLine.Insert(true);
-
-        AutoAccGrLine."Automatic Acc. No." := '6230';
-        AutoAccGrLine."Line No." := 20000;
-        AutoAccGrLine.Validate("G/L Account No.", '6230');
-        AutoAccGrLine."Allocation %" := 60;
-        AutoAccGrLine.Validate("Shortcut Dimension 1 Code", xADM);
-        AutoAccGrLine.Insert(true);
-
-        AutoAccGrLine."Automatic Acc. No." := '6230';
-        AutoAccGrLine."Line No." := 30000;
-        AutoAccGrLine.Validate("G/L Account No.", '6230');
-        AutoAccGrLine."Allocation %" := 30;
-        AutoAccGrLine.Validate("Shortcut Dimension 1 Code", xSALES);
-        AutoAccGrLine.Insert(true);
-
-        AutoAccGrLine."Automatic Acc. No." := '6230';
-        AutoAccGrLine."Line No." := 40000;
-        AutoAccGrLine.Validate("G/L Account No.", '6230');
-        AutoAccGrLine."Allocation %" := 10;
-        AutoAccGrLine.Validate("Shortcut Dimension 1 Code", xPROD);
-        AutoAccGrLine.Insert(true);
-    end;
-#endif
 
     procedure InsertMiniAppData()
     begin

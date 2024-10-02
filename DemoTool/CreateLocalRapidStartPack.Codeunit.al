@@ -12,10 +12,6 @@ codeunit 101931 "Create Local RapidStart Pack"
 
     procedure CreateTables()
     begin
-#if NOT CLEAN22
-        CreateTable(DATABASE::"Automatic Acc. Header");
-        CreateTable(DATABASE::"Automatic Acc. Line");
-#endif
     end;
 
     procedure CreateTable(TableID: Integer)
