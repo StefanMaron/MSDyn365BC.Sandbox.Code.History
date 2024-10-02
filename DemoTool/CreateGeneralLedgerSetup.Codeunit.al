@@ -10,10 +10,9 @@ codeunit 101098 "Create General Ledger Setup"
 
         "General Ledger Setup".Validate("Allow Posting From", 0D);
         "General Ledger Setup".Validate("Allow Posting To", 0D);
-        if DemoDataSetup."Advanced Setup" then begin
+        if DemoDataSetup."Advanced Setup" then
             if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::"Sales Tax" then
                 "General Ledger Setup".Validate("Summarize G/L Entries", true);
-        end;
         "General Ledger Setup".Validate("Adjust for Payment Disc.", DemoDataSetup."Adjust for Payment Discount");
         "General Ledger Setup".Validate("Global Dimension 1 Code", XDEPARTMENT);
         "General Ledger Setup".Validate("Global Dimension 2 Code", XPROJECT);

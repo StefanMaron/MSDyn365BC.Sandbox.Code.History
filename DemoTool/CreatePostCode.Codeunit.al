@@ -1,4 +1,4 @@
-codeunit 101225 "Create Post Code"
+﻿codeunit 101225 "Create Post Code"
 {
 
     trigger OnRun()
@@ -755,11 +755,9 @@ codeunit 101225 "Create Post Code"
             CountryCodeLength := StrLen(DemoDataSetup."Country/Region Code");
             case CopyStr(PostCode, 1, CountryCodeLength) of
                 'US', 'CA', 'MX':
-                    begin
-                        if StrLen(PostCode) >= CountryCodeLength then
-                            if (CopyStr(PostCode, CountryCodeLength + 4, 1) in [' ', '-']) then
-                                PostCode := DelStr(PostCode, 1, CountryCodeLength + 4);
-                    end;
+                    if StrLen(PostCode) >= CountryCodeLength then
+                        if (CopyStr(PostCode, CountryCodeLength + 4, 1) in [' ', '-']) then
+                            PostCode := DelStr(PostCode, 1, CountryCodeLength + 4);
                 else
                     if StrLen(PostCode) >= CountryCodeLength then
                         if (CopyStr(PostCode, 1, CountryCodeLength) = DemoDataSetup."Country/Region Code") and

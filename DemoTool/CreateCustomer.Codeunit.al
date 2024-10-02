@@ -217,9 +217,9 @@ codeunit 101018 "Create Customer"
             "Currency Code":
                 Counter := Counter + 1;
             else begin
-                    PreviousCurrencyCode := "Currency Code";
-                    Counter := 1;
-                end;
+                PreviousCurrencyCode := "Currency Code";
+                Counter := 1;
+            end;
         end;
 
         case (Counter - 1) mod 3 of
