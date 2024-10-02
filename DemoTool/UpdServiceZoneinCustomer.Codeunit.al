@@ -1,4 +1,4 @@
-codeunit 117561 "Upd. Service Zone in Customer"
+﻿codeunit 117561 "Upd. Service Zone in Customer"
 {
 
     trigger OnRun()
@@ -37,11 +37,10 @@ codeunit 117561 "Upd. Service Zone in Customer"
                             Cust."Service Zone Code" := XN;
                             Cust.Modify();
                         end;
-                    else begin
-                            if Cust."Currency Code" <> '' then begin
-                                Cust."Service Zone Code" := XX;
-                                Cust.Modify();
-                            end;
+                    else
+                        if Cust."Currency Code" <> '' then begin
+                            Cust."Service Zone Code" := XX;
+                            Cust.Modify();
                         end;
                 end;
             until Cust.Next() = 0;

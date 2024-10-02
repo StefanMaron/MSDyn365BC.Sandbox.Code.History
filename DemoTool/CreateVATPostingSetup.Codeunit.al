@@ -1,4 +1,4 @@
-codeunit 101325 "Create VAT Posting Setup"
+﻿codeunit 101325 "Create VAT Posting Setup"
 {
 
     trigger OnRun()
@@ -82,19 +82,17 @@ codeunit 101325 "Create VAT Posting Setup"
                         SetAccounts(VATPostingSetup, CreateGLAccount.SalesVATNormalPayable(), CreateGLAccount.PurchaseVATNormal(), CreateGLAccount.MiscVATPayable(), '', '', '');
                 DemoDataSetup.ServicesVATCode(),
                 DemoDataSetup.ReducedVATCode():
-                    begin
-                        if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
-                            if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
-                                SetAccounts(VATPostingSetup, '995611', '995626', '995621', '995616', '995636', '995626')
-                            else
-                                SetAccounts(VATPostingSetup, '995611', '995631', '995621', '995616', '995636', '995626');
-                            if VATPostingSetup."VAT Bus. Posting Group" = DemoDataSetup.EUCode() then
-                                VATPostingSetup.Validate("EU Service", true);
-                        end else begin
-                            SetAccounts(VATPostingSetup, CreateGLAccount.SalesVATReducedPayable(), CreateGLAccount.PurchaseVATReduced(), CreateGLAccount.MiscVATPayable(), '', '', '');
-                            if VATPostingSetup."VAT Bus. Posting Group" = DemoDataSetup.EUCode() then
-                                VATPostingSetup.Validate("EU Service", true);
-                        end;
+                    if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin
+                        if VATPostingSetup."VAT Calculation Type" = VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT" then
+                            SetAccounts(VATPostingSetup, '995611', '995626', '995621', '995616', '995636', '995626')
+                        else
+                            SetAccounts(VATPostingSetup, '995611', '995631', '995621', '995616', '995636', '995626');
+                        if VATPostingSetup."VAT Bus. Posting Group" = DemoDataSetup.EUCode() then
+                            VATPostingSetup.Validate("EU Service", true);
+                    end else begin
+                        SetAccounts(VATPostingSetup, CreateGLAccount.SalesVATReducedPayable(), CreateGLAccount.PurchaseVATReduced(), CreateGLAccount.MiscVATPayable(), '', '', '');
+                        if VATPostingSetup."VAT Bus. Posting Group" = DemoDataSetup.EUCode() then
+                            VATPostingSetup.Validate("EU Service", true);
                     end;
                 DemoDataSetup.NoVATCode():
                     if DemoDataSetup."Data Type" = DemoDataSetup."Data Type"::Extended then begin

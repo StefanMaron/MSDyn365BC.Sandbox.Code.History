@@ -3,7 +3,7 @@ codeunit 101257 "Create VAT Statement Name"
 
     trigger OnRun()
     begin
-        InsertData(XVAT, XUSTVA, XVatStatementGermany, true);
+        InsertData(XVAT, XUSTVA, XVatStatementGermany);
     end;
 
     var
@@ -11,7 +11,7 @@ codeunit 101257 "Create VAT Statement Name"
         XUSTVA: Label 'USTVA';
         XVatStatementGermany: Label 'VAT Statement Germany';
 
-    procedure InsertData("Statement Template Name": Code[10]; Name: Code[10]; Description: Text[50]; "Sales VAT Adv. Notification": Boolean)
+    procedure InsertData("Statement Template Name": Code[10]; Name: Code[10]; Description: Text[50])
     var
         "VAT Statement Name": Record "VAT Statement Name";
     begin
@@ -19,7 +19,6 @@ codeunit 101257 "Create VAT Statement Name"
         "VAT Statement Name".Validate("Statement Template Name", "Statement Template Name");
         "VAT Statement Name".Validate(Name, Name);
         "VAT Statement Name".Validate(Description, Description);
-        "VAT Statement Name".Validate("Sales VAT Adv. Notification", "Sales VAT Adv. Notification");
         "VAT Statement Name".Insert();
     end;
 }

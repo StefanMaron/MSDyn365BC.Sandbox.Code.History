@@ -40,7 +40,7 @@ table 132209 "Perf Profiler Events Test"
         }
         field(10; Total; Decimal)
         {
-            CalcFormula = Sum("Perf Profiler Events Test".Duration where(Indentation = const(0),
+            CalcFormula = sum("Perf Profiler Events Test".Duration where(Indentation = const(0),
                                                                           "Session ID" = field("Session ID"),
                                                                           Statement = filter(<> '*2000000207*User AL Code*' & <> '*2000000071*User AL Code*')));
             FieldClass = FlowField;
@@ -55,7 +55,7 @@ table 132209 "Perf Profiler Events Test"
         }
         field(12; "Total SQL Query Duration"; Decimal)
         {
-            CalcFormula = Sum("Perf Profiler Events Test".Duration where("Object Type" = const(TableData),
+            CalcFormula = sum("Perf Profiler Events Test".Duration where("Object Type" = const(TableData),
                                                                           "Object ID" = const(0),
                                                                           "Session ID" = field("Session ID"),
                                                                           Statement = filter(<> '*2000000207*User AL Code*' & <> '*2000000071*User AL Code*')));
@@ -63,7 +63,7 @@ table 132209 "Perf Profiler Events Test"
         }
         field(13; "Total SQL Query Hit Count"; Integer)
         {
-            CalcFormula = Sum("Perf Profiler Events Test".HitCount where("Object Type" = const(TableData),
+            CalcFormula = sum("Perf Profiler Events Test".HitCount where("Object Type" = const(TableData),
                                                                           "Object ID" = const(0),
                                                                           "Session ID" = field("Session ID"),
                                                                           Statement = filter(<> '*2000000207*User AL Code*' & <> '*2000000071*User AL Code*')));
@@ -116,7 +116,7 @@ table 132209 "Perf Profiler Events Test"
         }
         field(21; "Total MD SQL Query Hit Count"; Integer)
         {
-            CalcFormula = Sum("Perf Profiler Events Test".HitCount where("Object Type" = const(TableData),
+            CalcFormula = sum("Perf Profiler Events Test".HitCount where("Object Type" = const(TableData),
                                                                           "Object ID" = const(0),
                                                                           "Session ID" = field("Session ID"),
                                                                           Statement = filter('*2000000207*User AL Code*' | '*2000000071*User AL Code*')));
