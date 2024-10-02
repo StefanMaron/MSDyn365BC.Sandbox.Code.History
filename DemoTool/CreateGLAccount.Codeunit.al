@@ -1354,10 +1354,8 @@ codeunit 101015 "Create G/L Account"
                     //UpdateGLAccounts(GLAccountCategory, '999410', '999410');
                 end;
             GLAccountCategory."Account Category"::"Cost of Goods Sold":
-                begin
-                    UpdateGLAccounts(GLAccountCategory, '5000', '5799');
-                    //UpdateGLAccounts(GLAccountCategory, '997705', '997795');
-                end;
+                UpdateGLAccounts(GLAccountCategory, '5000', '5799');
+            //UpdateGLAccounts(GLAccountCategory, '997705', '997795');
             GLAccountCategory."Account Category"::Expense:
                 begin
                     UpdateGLAccounts(GLAccountCategory, '6000', '7290');
@@ -1455,10 +1453,8 @@ codeunit 101015 "Create G/L Account"
             GLAccountCategoryMgt.GetCash():
                 UpdateGLAccounts(GLAccountCategory, '1003', '1099');
             GLAccountCategoryMgt.GetAR():
-                begin
-                    UpdateGLAccounts(GLAccountCategory, '1200', '1290');
-                    //UpdateGLAccounts(GLAccountCategory, '995620', '995631');
-                end;
+                UpdateGLAccounts(GLAccountCategory, '1200', '1290');
+            //UpdateGLAccounts(GLAccountCategory, '995620', '995631');
             GLAccountCategoryMgt.GetPrepaidExpenses():
                 begin
                     UpdateGLAccounts(GLAccountCategory, '1400', '1400');

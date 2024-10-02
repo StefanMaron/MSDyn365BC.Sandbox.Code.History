@@ -472,6 +472,7 @@ codeunit 135098 "OCR Master Data Sync Tests"
     local procedure Initialize(ServiceEnabled: Boolean; SyncEnabled: Boolean; DeleteSyncJob: Boolean)
     var
         OCRServiceSetup: Record "OCR Service Setup";
+        DummySecret: Text;
     begin
         DisableTask();
         OCRMasterDataSyncEvents.SetPortionSize(0);
@@ -484,8 +485,10 @@ codeunit 135098 "OCR Master Data Sync Tests"
         OCRServiceSetup.Insert(true);
 
         OCRServiceSetup."User Name" := 'cronus.admin';
-        OCRServiceSetup.SavePassword(OCRServiceSetup."Password Key", '#Ey^VDI$B$53.8');
-        OCRServiceSetup.SavePassword(OCRServiceSetup."Authorization Key", '2e9dfdaf60ee4569a2444a1fc3d16685');
+        DummySecret := '#Ey^VDI$B$53.8';
+        OCRServiceSetup.SavePassword(OCRServiceSetup."Password Key", DummySecret);
+        DummySecret := '2e9dfdaf60ee4569a2444a1fc3d16685';
+        OCRServiceSetup.SavePassword(OCRServiceSetup."Authorization Key", DummySecret);
 
         OCRServiceSetup."Service URL" := 'https://localhost:8080/OCR';
         OCRServiceSetup."Default OCR Doc. Template" := 'BLANK';

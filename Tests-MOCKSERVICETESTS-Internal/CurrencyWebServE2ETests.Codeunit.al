@@ -683,29 +683,27 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         DataExchMapping: Record "Data Exch. Mapping";
         TransformationRule: Record "Transformation Rule";
     begin
-        with CurrExchRateFileMgt do begin
-            CreateExchMappingHeader(DataExchLineDef);
-            // Create Mapping using sample xml
-            DataExchMapping.Get(DataExchLineDef."Data Exch. Def Code", DataExchLineDef.Code, GetMappingTable());
-            CreateExchMappingLine(
-              DataExchMapping, GetCurrencyCodeXMLElement(), GetCurrencyCodeFieldNo(),
-              DummyDataExchColumnDef."Data Type"::Text, 1, '', '');
-            CreateExchMappingLine(
-              DataExchMapping, GetStartingDateXMLElement(), GetStartingDateFieldNo(),
-              DummyDataExchColumnDef."Data Type"::Date, 1, '', '');
+        CreateExchMappingHeader(DataExchLineDef);
+        // Create Mapping using sample xml
+        DataExchMapping.Get(DataExchLineDef."Data Exch. Def Code", DataExchLineDef.Code, CurrExchRateFileMgt.GetMappingTable());
+        CreateExchMappingLine(
+          DataExchMapping, CurrExchRateFileMgt.GetCurrencyCodeXMLElement(), CurrExchRateFileMgt.GetCurrencyCodeFieldNo(),
+          DummyDataExchColumnDef."Data Type"::Text, 1, '', '');
+        CreateExchMappingLine(
+          DataExchMapping, CurrExchRateFileMgt.GetStartingDateXMLElement(), CurrExchRateFileMgt.GetStartingDateFieldNo(),
+          DummyDataExchColumnDef."Data Type"::Date, 1, '', '');
 
-            TransformationRule.CreateDefaultTransformations();
-            TransformationRule.Get(TransformationRule.GetDanishDecimalFormatCode());
+        TransformationRule.CreateDefaultTransformations();
+        TransformationRule.Get(TransformationRule.GetDanishDecimalFormatCode());
 
-            CreateExchMappingLine(
-              DataExchMapping, GetRelationalExchRateXMLElement(), GetRelationalExchRateFieldNo(),
-              DummyDataExchColumnDef."Data Type"::Decimal, 1,
-              TransformationRule.Code, '');
-            CreateExchMappingLine(
-              DataExchMapping, GetExchRateXMLElement(), GetExchRateFieldNo(),
-              DummyDataExchColumnDef."Data Type"::Decimal, GetRelationalExhangeRate(),
-              TransformationRule.Code, '');
-        end;
+        CreateExchMappingLine(
+          DataExchMapping, CurrExchRateFileMgt.GetRelationalExchRateXMLElement(), CurrExchRateFileMgt.GetRelationalExchRateFieldNo(),
+          DummyDataExchColumnDef."Data Type"::Decimal, 1,
+          TransformationRule.Code, '');
+        CreateExchMappingLine(
+          DataExchMapping, CurrExchRateFileMgt.GetExchRateXMLElement(), CurrExchRateFileMgt.GetExchRateFieldNo(),
+          DummyDataExchColumnDef."Data Type"::Decimal, CurrExchRateFileMgt.GetRelationalExhangeRate(),
+          TransformationRule.Code, '');
     end;
 
     local procedure MapXE_BankDataExch(var DataExchLineDef: Record "Data Exch. Line Def")
@@ -1470,31 +1468,28 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
     var
         Currency: Record Currency;
     begin
-        with Currency do
-            if not Get(CurrencyCode) then begin
-                Init();
-                Validate(Code, CurrencyCode);
-                Validate(Description, CopyStr(CurrencyName, 1, MaxStrLen(Description)));
-                Insert();
-            end;
+        if not Currency.Get(CurrencyCode) then begin
+            Currency.Init();
+            Currency.Validate(Code, CurrencyCode);
+            Currency.Validate(Description, CopyStr(CurrencyName, 1, MaxStrLen(Currency.Description)));
+            Currency.Insert();
+        end;
     end;
 
     local procedure InsertCurrencyExchRate(var CurrExchRate: Record "Currency Exchange Rate"; CurrencyCode: Code[10]; Date: Date; Rate: Decimal)
     begin
         if Rate = 0 then
             exit;
-        with CurrExchRate do begin
-            Init();
-            Validate("Currency Code", CurrencyCode);
-            Validate("Starting Date", Date);
+        CurrExchRate.Init();
+        CurrExchRate.Validate("Currency Code", CurrencyCode);
+        CurrExchRate.Validate("Starting Date", Date);
 
-            Validate("Relational Exch. Rate Amount", CurrExchRateFileMgt.GetRelationalExhangeRate());
-            Validate("Exchange Rate Amount", Rate);
+        CurrExchRate.Validate("Relational Exch. Rate Amount", CurrExchRateFileMgt.GetRelationalExhangeRate());
+        CurrExchRate.Validate("Exchange Rate Amount", Rate);
 
-            Validate("Relational Adjmt Exch Rate Amt", "Relational Exch. Rate Amount");
-            Validate("Adjustment Exch. Rate Amount", Rate);
-            Insert();
-        end;
+        CurrExchRate.Validate("Relational Adjmt Exch Rate Amt", CurrExchRate."Relational Exch. Rate Amount");
+        CurrExchRate.Validate("Adjustment Exch. Rate Amount", Rate);
+        CurrExchRate.Insert();
     end;
 
     local procedure CreateExchDef(DataExchDefCode: Code[20]; FileType: Option; ReadingWritingCodeunit: Integer)
@@ -1537,35 +1532,31 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         DataExchFieldMapping: Record "Data Exch. Field Mapping";
         DataExchColumnDef: Record "Data Exch. Column Def";
     begin
-        with DataExchColumnDef do begin
-            SetRange("Data Exch. Def Code", DataExchMapping."Data Exch. Def Code");
-            SetRange("Data Exch. Line Def Code", DataExchMapping."Data Exch. Line Def Code");
-            if NewDefaultValue <> '' then begin
-                if FindLast() then begin
-                    Init();
-                    "Column No." += 10000;
-                    Insert();
-                end
-            end else begin
-                SetRange(Name, FromColumnName);
-                FindFirst();
-            end;
-            Validate("Data Type", DataType);
-            Modify(true);
+        DataExchColumnDef.SetRange("Data Exch. Def Code", DataExchMapping."Data Exch. Def Code");
+        DataExchColumnDef.SetRange("Data Exch. Line Def Code", DataExchMapping."Data Exch. Line Def Code");
+        if NewDefaultValue <> '' then begin
+            if DataExchColumnDef.FindLast() then begin
+                DataExchColumnDef.Init();
+                DataExchColumnDef."Column No." += 10000;
+                DataExchColumnDef.Insert();
+            end
+        end else begin
+            DataExchColumnDef.SetRange(Name, FromColumnName);
+            DataExchColumnDef.FindFirst();
         end;
+        DataExchColumnDef.Validate("Data Type", DataType);
+        DataExchColumnDef.Modify(true);
 
-        with DataExchFieldMapping do begin
-            Init();
-            Validate("Data Exch. Def Code", DataExchMapping."Data Exch. Def Code");
-            Validate("Data Exch. Line Def Code", DataExchMapping."Data Exch. Line Def Code");
-            Validate("Table ID", DataExchMapping."Table ID");
-            Validate("Column No.", DataExchColumnDef."Column No.");
-            Validate("Field ID", ToFieldNo);
-            Validate(Multiplier, NewMultiplier);
-            Validate("Transformation Rule", NewTransformationCode);
-            Validate("Default Value", NewDefaultValue);
-            Insert(true);
-        end;
+        DataExchFieldMapping.Init();
+        DataExchFieldMapping.Validate("Data Exch. Def Code", DataExchMapping."Data Exch. Def Code");
+        DataExchFieldMapping.Validate("Data Exch. Line Def Code", DataExchMapping."Data Exch. Line Def Code");
+        DataExchFieldMapping.Validate("Table ID", DataExchMapping."Table ID");
+        DataExchFieldMapping.Validate("Column No.", DataExchColumnDef."Column No.");
+        DataExchFieldMapping.Validate("Field ID", ToFieldNo);
+        DataExchFieldMapping.Validate(Multiplier, NewMultiplier);
+        DataExchFieldMapping.Validate("Transformation Rule", NewTransformationCode);
+        DataExchFieldMapping.Validate("Default Value", NewDefaultValue);
+        DataExchFieldMapping.Insert(true);
     end;
 
     local procedure CreateECBCurrencyExchRateFile(var CurrExchRate: Record "Currency Exchange Rate"; Date: Date) ResultFileName: Text
@@ -1654,36 +1645,32 @@ codeunit 134272 "Currency Web Serv. E2E Tests"
         ActualCurrExchRate: Record "Currency Exchange Rate";
     begin
         ExpectedCurrExchRate.FindSet();
-        with ActualCurrExchRate do begin
-            FindSet();
-            repeat
-                Assert.AreEqual(ExpectedCurrExchRate."Currency Code", "Currency Code", 'Wrong Currency Code');
-                Assert.AreEqual(ExpectedCurrExchRate."Starting Date", "Starting Date", 'Wrong Starting Date');
+        ActualCurrExchRate.FindSet();
+        repeat
+            Assert.AreEqual(ExpectedCurrExchRate."Currency Code", ActualCurrExchRate."Currency Code", 'Wrong Currency Code');
+            Assert.AreEqual(ExpectedCurrExchRate."Starting Date", ActualCurrExchRate."Starting Date", 'Wrong Starting Date');
 
-                Assert.AreEqual(ExpectedCurrExchRate."Exchange Rate Amount", "Exchange Rate Amount", 'Wrong Exchange Rate Amount');
-                Assert.AreEqual(
-                  ExpectedCurrExchRate."Relational Exch. Rate Amount", "Relational Exch. Rate Amount", 'Wrong Relational Exch. Rate Amount');
-                Assert.AreEqual(
-                  ExpectedCurrExchRate."Adjustment Exch. Rate Amount", "Adjustment Exch. Rate Amount", 'Wrong Adjustment Exch. Rate Amount');
-                Assert.AreEqual(
-                  ExpectedCurrExchRate."Relational Adjmt Exch Rate Amt", "Relational Adjmt Exch Rate Amt",
-                  'Wrong Relational Adjmt Exch Rate Amt');
-                Assert.AreEqual(ExpectedCurrExchRate."Fix Exchange Rate Amount", "Fix Exchange Rate Amount", 'Wrong Fix Exchange Rate Amount');
+            Assert.AreEqual(ExpectedCurrExchRate."Exchange Rate Amount", ActualCurrExchRate."Exchange Rate Amount", 'Wrong Exchange Rate Amount');
+            Assert.AreEqual(
+              ExpectedCurrExchRate."Relational Exch. Rate Amount", ActualCurrExchRate."Relational Exch. Rate Amount", 'Wrong Relational Exch. Rate Amount');
+            Assert.AreEqual(
+              ExpectedCurrExchRate."Adjustment Exch. Rate Amount", ActualCurrExchRate."Adjustment Exch. Rate Amount", 'Wrong Adjustment Exch. Rate Amount');
+            Assert.AreEqual(
+              ExpectedCurrExchRate."Relational Adjmt Exch Rate Amt", ActualCurrExchRate."Relational Adjmt Exch Rate Amt",
+              'Wrong Relational Adjmt Exch Rate Amt');
+            Assert.AreEqual(ExpectedCurrExchRate."Fix Exchange Rate Amount", ActualCurrExchRate."Fix Exchange Rate Amount", 'Wrong Fix Exchange Rate Amount');
 
-                ExpectedCurrExchRate.Delete();
-                if ExpectedCurrExchRate.Next() <> 0 then;
-            until Next() = 0;
-        end;
+            ExpectedCurrExchRate.Delete();
+            if ExpectedCurrExchRate.Next() <> 0 then;
+        until ActualCurrExchRate.Next() = 0;
     end;
 
     local procedure VerifyCurrExchRateOnPage(var CurrencyExchangeRates: TestPage "Currency Exchange Rates"; ExpectedCode: Code[10]; ExpectedExchangeRateAmount: Decimal; ExpectedStartingDate: Date; ExpectedRelationalExchRateAmount: Decimal)
     begin
-        with CurrencyExchangeRates do begin
-            Assert.AreEqual(ExpectedCode, "Currency Code".Value, 'Wrong code value was mapped for the first record');
-            Assert.AreEqual(ExpectedExchangeRateAmount, "Exchange Rate Amount".AsDecimal(), 'Wrong exchange rate amount was provided');
-            Assert.AreEqual(ExpectedStartingDate, "Starting Date".AsDate(), 'Wrong date was provided');
-            Assert.AreEqual(ExpectedRelationalExchRateAmount, "Relational Exch. Rate Amount".AsDecimal(), 'Wrong Amount was provided');
-        end
+        Assert.AreEqual(ExpectedCode, CurrencyExchangeRates."Currency Code".Value, 'Wrong code value was mapped for the first record');
+        Assert.AreEqual(ExpectedExchangeRateAmount, CurrencyExchangeRates."Exchange Rate Amount".AsDecimal(), 'Wrong exchange rate amount was provided');
+        Assert.AreEqual(ExpectedStartingDate, CurrencyExchangeRates."Starting Date".AsDate(), 'Wrong date was provided');
+        Assert.AreEqual(ExpectedRelationalExchRateAmount, CurrencyExchangeRates."Relational Exch. Rate Amount".AsDecimal(), 'Wrong Amount was provided');
     end;
 
     local procedure VerifyCurrExchRatesOnPage(var CurrencyExchangeRates: TestPage "Currency Exchange Rates"; ExpectedExchangeRateAmount: Decimal; ExpectedStartingDate: Date)

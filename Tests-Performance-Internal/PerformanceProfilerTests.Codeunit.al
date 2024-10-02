@@ -243,7 +243,7 @@
         CustomerCard.Close();
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure TestOpenCustomerCardSalesPricesAndDiscountPerformance()
@@ -2042,7 +2042,7 @@
           BankAccount."No.", BankAccReconciliation."Statement Type"::"Bank Reconciliation");
     end;
 
-#if not CLEAN23
+#if not CLEAN25
     local procedure CreateCustomerDiscountWithSalesLineDiscount(var Customer: Record "Customer"; var SalesLineDiscount: Record "Sales Line Discount"; Item: Record Item)
     begin
         CreateSalesLineDiscount(

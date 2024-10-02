@@ -265,9 +265,7 @@ codeunit 101023 "Create Vendor"
                     Vendor.Validate("Payment Terms Code", X30DAYS);
                 end;
             '40000':
-                begin
-                    Vendor.Validate("Payment Terms Code", X30DAYS);
-                end;
+                Vendor.Validate("Payment Terms Code", X30DAYS);
             '50000':
                 begin
                     Vendor.Validate("Payment Terms Code", X30DAYS);

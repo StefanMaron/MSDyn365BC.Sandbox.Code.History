@@ -177,7 +177,6 @@ codeunit 141038 "ERM VAT - Details"
 
         // [GIVEN] Currency with "Exchange Rate Amount" = 7
         CreateCurrencyWithExchRateAmount(CurrencyCode);
-        UpdateGenLedgSetupAddReportingCurrency(CurrencyCode);
         // [GIVEN] VAT Posting Setup with "VAT %" = 20%
         // [GIVEN] Purchase invoice with 2 lines
         // [GIVEN] Amount of first line = 10
@@ -278,11 +277,6 @@ codeunit 141038 "ERM VAT - Details"
         exit(Round(Amount / 100 * ValueProc, Precision));
     end;
 
-    local procedure GetPercent(Amount: Decimal; ValueProc: Decimal): Decimal
-    begin
-        exit(Amount / 100 * ValueProc);
-    end;
-
     local procedure VerifyGLEntry(DocumentNo: Code[20]; AmountIncludingVATCredit: Decimal; AmountIncludingVATDebit: Decimal)
     var
         GLEntry: Record "G/L Entry";
@@ -308,14 +302,12 @@ codeunit 141038 "ERM VAT - Details"
     var
         VATEntry: Record "VAT Entry";
     begin
-        with VATEntry do begin
-            SetRange("Document No.", DocumentNo);
-            SetRange("Bill-to/Pay-to No.", VendCustNo);
-            SetRange(Base, LineBase);
-            FindFirst();
-            TestField("Additional-Currency Amount", VATAmountACY);
-            TestField("Additional-Currency Base", VATBaseACY);
-        end;
+        VATEntry.SetRange("Document No.", DocumentNo);
+        VATEntry.SetRange("Bill-to/Pay-to No.", VendCustNo);
+        VATEntry.SetRange(Base, LineBase);
+        VATEntry.FindFirst();
+        VATEntry.TestField("Additional-Currency Amount", VATAmountACY);
+        VATEntry.TestField("Additional-Currency Base", VATBaseACY);
     end;
 
     local procedure VerifyPostedSalesVATEntries(DocumentNo: Code[20]; CurrencyCode: Code[10]; CustomerNo: Code[20])
@@ -351,7 +343,7 @@ codeunit 141038 "ERM VAT - Details"
         repeat
             VerifyVATEntryACY(
               DocumentNo, PurchInvLine.Amount,
-              Round(GetPercent(PurchInvLine.Amount, PurchInvLine."VAT %") * CurrencyFactor, CurrAmountRoundingPrecision),
+              Round(GetRoundedPercent(PurchInvLine.Amount, PurchInvLine."VAT %", CurrAmountRoundingPrecision) * CurrencyFactor, CurrAmountRoundingPrecision),
               Round(PurchInvLine.Amount * CurrencyFactor, CurrAmountRoundingPrecision), VendorNo);
         until PurchInvLine.Next() = 0;
     end;

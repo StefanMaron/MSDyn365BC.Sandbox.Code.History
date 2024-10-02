@@ -332,13 +332,9 @@ codeunit 101018 "Create Customer"
                     Customer.Validate("Payment Terms Code", X30DAYS);
                 end;
             '30000':
-                begin
-                    Customer.Validate("Payment Terms Code", X30DAYS);
-                end;
+                Customer.Validate("Payment Terms Code", X30DAYS);
             '40000':
-                begin
-                    Customer.Validate("Payment Terms Code", X30DAYS);
-                end;
+                Customer.Validate("Payment Terms Code", X30DAYS);
             '50000':
                 begin
                     Customer.Validate("Payment Terms Code", X30DAYS);
