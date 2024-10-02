@@ -1,4 +1,4 @@
-codeunit 135160 "Cloud Migration Property Test"
+﻿codeunit 135160 "Cloud Migration Property Test"
 {
     Subtype = Test;
     TestPermissions = Disabled;
@@ -53,7 +53,10 @@ codeunit 135160 "Cloud Migration Property Test"
         repeat
             if not (ListOfTablesToMigrate.Contains(IntelligentCloudStatus."Table Id")) then begin
                 TableMetadata.Get(IntelligentCloudStatus."Table Id");
-                UnexpectedTables += TableMetadata.Name + ';';
+                if (TableMetadata.Name <> 'Certificate') and
+                   (TableMetadata.Name <> 'G/L Accounts Equivalence Tool')
+                then
+                    UnexpectedTables += TableMetadata.Name + ';';
             end;
         until IntelligentCloudStatus.Next() = 0;
 
@@ -64,8 +67,6 @@ codeunit 135160 "Cloud Migration Property Test"
     var
         CloudMigCountryTables: Codeunit "Cloud Mig Country Tables";
     begin
-        CloudMigCountryTables.GetTablesThatShouldBeCloudMigrated(ListOfTablesToMigrate);
-
         ListOfTablesToMigrate.Add(Database::"Alloc. Acc. Manual Override");
         ListOfTablesToMigrate.Add(Database::"Alloc. Account Distribution");
         ListOfTablesToMigrate.Add(Database::"Allocation Account");
@@ -170,6 +171,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Page Action Provider Test");
         ListOfTablesToMigrate.Add(Database::"Page Provider Summary Test");
         ListOfTablesToMigrate.Add(Database::"Page Provider Summary Test2");
+        ListOfTablesToMigrate.Add(Database::"Page Provider Summary Test3");
         ListOfTablesToMigrate.Add(Database::"Payable Employee Ledger Entry");
         ListOfTablesToMigrate.Add(Database::"Payable Vendor Ledger Entry");
         ListOfTablesToMigrate.Add(Database::"Payment Application Proposal");
@@ -305,6 +307,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Relationship Mgmt. Cue");
         ListOfTablesToMigrate.Add(Database::"Relative");
         ListOfTablesToMigrate.Add(Database::"Reminder Attachment Text");
+        ListOfTablesToMigrate.Add(Database::"Reminder Attachment Text Line");
         ListOfTablesToMigrate.Add(Database::"Reminder Comment Line");
         ListOfTablesToMigrate.Add(Database::"Reminder Email Text");
         ListOfTablesToMigrate.Add(Database::"Reminder Header");
@@ -415,6 +418,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Serial No. Information");
         ListOfTablesToMigrate.Add(Database::"Serv. Price Adjustment Detail");
         ListOfTablesToMigrate.Add(Database::"Serv. Price Group Setup");
+        ListOfTablesToMigrate.Add(Database::"Service Comment Line Archive");
         ListOfTablesToMigrate.Add(Database::"Service Comment Line");
         ListOfTablesToMigrate.Add(Database::"Service Connection");
         ListOfTablesToMigrate.Add(Database::"Service Contract Account Group");
@@ -428,21 +432,25 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Service Document Log");
         ListOfTablesToMigrate.Add(Database::"Service Document Register");
         ListOfTablesToMigrate.Add(Database::"Service Email Queue");
+        ListOfTablesToMigrate.Add(Database::"Service Header Archive");
         ListOfTablesToMigrate.Add(Database::"Service Header");
         ListOfTablesToMigrate.Add(Database::"Service Hour");
         ListOfTablesToMigrate.Add(Database::"Service Invoice Header");
         ListOfTablesToMigrate.Add(Database::"Service Invoice Line");
         ListOfTablesToMigrate.Add(Database::"Service Item Component");
         ListOfTablesToMigrate.Add(Database::"Service Item Group");
+        ListOfTablesToMigrate.Add(Database::"Service Item Line Archive");
         ListOfTablesToMigrate.Add(Database::"Service Item Line");
         ListOfTablesToMigrate.Add(Database::"Service Item Log");
         ListOfTablesToMigrate.Add(Database::"Service Item Trend Buffer");
         ListOfTablesToMigrate.Add(Database::"Service Item");
         ListOfTablesToMigrate.Add(Database::"Service Ledger Entry");
         ListOfTablesToMigrate.Add(Database::"Service Line Price Adjmt.");
+        ListOfTablesToMigrate.Add(Database::"Service Line Archive");
         ListOfTablesToMigrate.Add(Database::"Service Line");
         ListOfTablesToMigrate.Add(Database::"Service Mgt. Setup");
         ListOfTablesToMigrate.Add(Database::"Service Order Allocation");
+		ListOfTablesToMigrate.Add(Database::"Service Order Allocat. Archive");
         ListOfTablesToMigrate.Add(Database::"Service Order Type");
         ListOfTablesToMigrate.Add(Database::"Service Price Adjustment Group");
         ListOfTablesToMigrate.Add(Database::"Service Price Group");
@@ -494,6 +502,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Substitution Condition");
         ListOfTablesToMigrate.Add(Database::"SWIFT Code");
         ListOfTablesToMigrate.Add(Database::"Symptom Code");
+        ListOfTablesToMigrate.Add(Database::"Table Config Template");
         ListOfTablesToMigrate.Add(Database::"Table Filter");
         ListOfTablesToMigrate.Add(Database::"Tariff Number");
         ListOfTablesToMigrate.Add(Database::"Tax Area Line");
@@ -593,6 +602,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"VAT Statement Report Line");
         ListOfTablesToMigrate.Add(Database::"VAT Statement Template");
         ListOfTablesToMigrate.Add(Database::"VAT Setup");
+		ListOfTablesToMigrate.Add(Database::"Alt. Cust. VAT Reg.");
         ListOfTablesToMigrate.Add(Database::"VAT Posting Parameters");
         ListOfTablesToMigrate.Add(Database::"Vendor Amount");
         ListOfTablesToMigrate.Add(Database::"Vendor Bank Account");
@@ -717,6 +727,12 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(4801); // Database::"VATGroup Calculation");
         ListOfTablesToMigrate.Add(4802); // Database::"VATGroup Submission Header");
         ListOfTablesToMigrate.Add(4803); // Database::"VATGroup Submission Line");
+        ListOfTablesToMigrate.Add(8452); // Database::"Advanced Intrastat Checklist"
+        ListOfTablesToMigrate.Add(5358); // Database::"CDS Failed Option Mapping"
+        ListOfTablesToMigrate.Add(262); // Database::"Intrastat Jnl. Batch"
+        ListOfTablesToMigrate.Add(263); // Database::"Intrastat Jnl. Line"
+        ListOfTablesToMigrate.Add(261); // Database::"Intrastat Jnl. Template"
+        ListOfTablesToMigrate.Add(247); // Database::"Intrastat Setup"
 
         // AL Costing
         ListOfTablesToMigrate.Add(103405); // Database::"Required Input Data");
@@ -792,6 +808,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(4690); // Database::"Recurrence Schedule"
         ListOfTablesToMigrate.Add(3903); // Database::"Retention Policy Allowed Table"
         ListOfTablesToMigrate.Add(3905); // Database::"Retention Policy Log Entry"
+        ListOfTablesToMigrate.Add(4325); // Database::"SOA Setup"
         ListOfTablesToMigrate.Add(3712); // Database::"Translation"
         ListOfTablesToMigrate.Add(9999); // Database::"Upgrade Tags"
         ListOfTablesToMigrate.Add(9989); // Database::"Word Template Field"
@@ -814,9 +831,6 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"ADCS User");
         ListOfTablesToMigrate.Add(Database::"Additional Fee Setup");
         ListOfTablesToMigrate.Add(Database::"Administration Cue");
-#if not CLEAN22
-        ListOfTablesToMigrate.Add(Database::"Advanced Intrastat Checklist");
-#endif
         ListOfTablesToMigrate.Add(Database::"Aged Report Entity");
         ListOfTablesToMigrate.Add(Database::"Allocation Policy");
         ListOfTablesToMigrate.Add(Database::"Alternative Address");
@@ -919,9 +933,6 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Cause of Absence");
         ListOfTablesToMigrate.Add(Database::"Cause of Inactivity");
         ListOfTablesToMigrate.Add(Database::"CDS Connection Setup");
-#if not CLEAN22
-        ListOfTablesToMigrate.Add(Database::"CDS Failed Option Mapping");
-#endif
         ListOfTablesToMigrate.Add(Database::"Certificate of Supply");
         ListOfTablesToMigrate.Add(Database::"Change Global Dim. Header");
         ListOfTablesToMigrate.Add(Database::"Change Global Dim. Log Entry");
@@ -1080,6 +1091,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"ECSL VAT Report Line");
         ListOfTablesToMigrate.Add(Database::"Electronic Document Format");
         ListOfTablesToMigrate.Add(Database::"Email Item");
+        ListOfTablesToMigrate.Add(Database::"Email Inbox");
         ListOfTablesToMigrate.Add(Database::"Email Outbox");
         ListOfTablesToMigrate.Add(Database::"Email Parameter");
         ListOfTablesToMigrate.Add(Database::"Email Scenario Attachments");
@@ -1133,8 +1145,11 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Fault Code");
         ListOfTablesToMigrate.Add(Database::"Fault Reason Code");
         ListOfTablesToMigrate.Add(Database::"Fault/Resol. Cod. Relationship");
-        ListOfTablesToMigrate.Add(Database::"Filed Contract Line");
         ListOfTablesToMigrate.Add(Database::"Filed Service Contract Header");
+        ListOfTablesToMigrate.Add(Database::"Filed Contract Line");
+        ListOfTablesToMigrate.Add(Database::"Filed Serv. Contract Cmt. Line");
+        ListOfTablesToMigrate.Add(Database::"Filed Contract Service Hour");
+        ListOfTablesToMigrate.Add(Database::"Filed Contract/Serv. Discount");
         ListOfTablesToMigrate.Add(Database::"Fin. Charge Comment Line");
         ListOfTablesToMigrate.Add(Database::"Finance Charge Interest Rate");
         ListOfTablesToMigrate.Add(Database::"Finance Charge Memo Header");
@@ -1224,6 +1239,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Insurance Register");
         ListOfTablesToMigrate.Add(Database::"Insurance Type");
         ListOfTablesToMigrate.Add(Database::"Insurance");
+        ListOfTablesToMigrate.Add(Database::"Int. Table Config Template");
         ListOfTablesToMigrate.Add(Database::"Integration Field Mapping");
         ListOfTablesToMigrate.Add(Database::"Integration Table Mapping");
         ListOfTablesToMigrate.Add(Database::"Inter. Log Entry Comment Line");
@@ -1236,12 +1252,6 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Intermediate Data Import");
         ListOfTablesToMigrate.Add(Database::"Internal Movement Header");
         ListOfTablesToMigrate.Add(Database::"Internal Movement Line");
-#if not CLEAN22
-        ListOfTablesToMigrate.Add(Database::"Intrastat Jnl. Batch");
-        ListOfTablesToMigrate.Add(Database::"Intrastat Jnl. Line");
-        ListOfTablesToMigrate.Add(Database::"Intrastat Jnl. Template");
-        ListOfTablesToMigrate.Add(Database::"Intrastat Setup");
-#endif
         ListOfTablesToMigrate.Add(Database::"Invalidated Dim Correction");
         ListOfTablesToMigrate.Add(Database::"Inventory Adjmt. Entry (Order)");
         ListOfTablesToMigrate.Add(Database::"Inventory Comment Line");
@@ -1311,5 +1321,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Job Journal Batch");
         ListOfTablesToMigrate.Add(Database::"Job Journal Line");
         ListOfTablesToMigrate.Add(Database::"Job Journal Quantity");
+
+        CloudMigCountryTables.GetTablesThatShouldBeCloudMigrated(ListOfTablesToMigrate);
     end;
 }

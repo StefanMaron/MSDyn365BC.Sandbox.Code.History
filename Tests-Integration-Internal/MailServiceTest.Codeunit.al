@@ -442,32 +442,28 @@ codeunit 139111 "Mail Service Test"
         CustomReportSelection: Record "Custom Report Selection";
         CustomReportLayout: Record "Custom Report Layout";
     begin
-        with CustomReportSelection do begin
-            Init();
-            Validate("Source Type", Database::Customer);
-            Validate("Source No.", CustomerNo);
-            Validate(Usage, ReportSelectionUsage);
-            Validate(Sequence, 1);
-            Validate("Report ID", ReportID);
-            Validate("Use for Email Body", true);
-            Validate(
-                "Email Body Layout Code", CustomReportLayout.InitBuiltInLayout("Report ID", CustomReportLayout.Type::Word.AsInteger()));
-            Insert(true);
-        end;
+        CustomReportSelection.Init();
+        CustomReportSelection.Validate("Source Type", Database::Customer);
+        CustomReportSelection.Validate("Source No.", CustomerNo);
+        CustomReportSelection.Validate(Usage, ReportSelectionUsage);
+        CustomReportSelection.Validate(Sequence, 1);
+        CustomReportSelection.Validate("Report ID", ReportID);
+        CustomReportSelection.Validate("Use for Email Body", true);
+        CustomReportSelection.Validate(
+            "Email Body Layout Code", CustomReportLayout.InitBuiltInLayout(CustomReportSelection."Report ID", CustomReportLayout.Type::Word.AsInteger()));
+        CustomReportSelection.Insert(true);
     end;
 
     local procedure CreateEmailPdfDefaultDocumentSendingProfile();
     var
         DocumentSendingProfile: Record "Document Sending Profile";
     begin
-        with DocumentSendingProfile do begin
-            Init();
-            Code := LibraryUtility.GenerateGUID();
-            "E-Mail" := "E-Mail"::"Yes (Prompt for Settings)";
-            "E-Mail Attachment" := "E-Mail Attachment"::PDF;
-            Default := true;
-            Insert();
-        end;
+        DocumentSendingProfile.Init();
+        DocumentSendingProfile.Code := LibraryUtility.GenerateGUID();
+        DocumentSendingProfile."E-Mail" := DocumentSendingProfile."E-Mail"::"Yes (Prompt for Settings)";
+        DocumentSendingProfile."E-Mail Attachment" := DocumentSendingProfile."E-Mail Attachment"::PDF;
+        DocumentSendingProfile.Default := true;
+        DocumentSendingProfile.Insert();
     end;
 
     local procedure CreateAndPostSalesReturnOrder() PostedDocNo: Code[20]
@@ -527,26 +523,22 @@ codeunit 139111 "Mail Service Test"
         IssuedFinChargeMemoLine: Record "Issued Fin. Charge Memo Line";
     begin
         LibrarySales.CreateCustomer(Customer);
-        with IssuedFinChargeMemoHeader do begin
-            Init();
-            Validate("No.", LibraryUtility.GenerateGUID());
-            Validate("Customer No.", Customer."No.");
-            "Posting Date" := WorkDate();
-            "Document Date" := WorkDate();
-            "Due Date" := WorkDate();
-            "Customer Posting Group" := FindCustomerPostingGroup();
-            "VAT Bus. Posting Group" := Customer."VAT Bus. Posting Group";
-            Insert(false);
-        end;
+        IssuedFinChargeMemoHeader.Init();
+        IssuedFinChargeMemoHeader.Validate("No.", LibraryUtility.GenerateGUID());
+        IssuedFinChargeMemoHeader.Validate("Customer No.", Customer."No.");
+        IssuedFinChargeMemoHeader."Posting Date" := WorkDate();
+        IssuedFinChargeMemoHeader."Document Date" := WorkDate();
+        IssuedFinChargeMemoHeader."Due Date" := WorkDate();
+        IssuedFinChargeMemoHeader."Customer Posting Group" := FindCustomerPostingGroup();
+        IssuedFinChargeMemoHeader."VAT Bus. Posting Group" := Customer."VAT Bus. Posting Group";
+        IssuedFinChargeMemoHeader.Insert(false);
 
-        with IssuedFinChargeMemoLine do begin
-            Init();
-            "Finance Charge Memo No." := IssuedFinChargeMemoHeader."No.";
-            "Line No." := LibraryUtility.GetNewRecNo(IssuedFinChargeMemoLine, FieldNo(IssuedFinChargeMemoLine."Line No."));
-            Amount := LibraryRandom.RandDecInRange(100, 200, 2);
-            Type := Type::"Customer Ledger Entry";
-            Insert(false);
-        end;
+        IssuedFinChargeMemoLine.Init();
+        IssuedFinChargeMemoLine."Finance Charge Memo No." := IssuedFinChargeMemoHeader."No.";
+        IssuedFinChargeMemoLine."Line No." := LibraryUtility.GetNewRecNo(IssuedFinChargeMemoLine, IssuedFinChargeMemoLine.FieldNo(IssuedFinChargeMemoLine."Line No."));
+        IssuedFinChargeMemoLine.Amount := LibraryRandom.RandDecInRange(100, 200, 2);
+        IssuedFinChargeMemoLine.Type := IssuedFinChargeMemoLine.Type::"Customer Ledger Entry";
+        IssuedFinChargeMemoLine.Insert(false);
     end;
 
     local procedure MockIssuedReminder(var IssuedReminderHeader: Record "Issued Reminder Header")
@@ -559,26 +551,22 @@ codeunit 139111 "Mail Service Test"
             Customer."E-Mail" := 'a@b.c';
             Customer.Modify();
         end;
-        with IssuedReminderHeader do begin
-            Init();
-            Validate("No.", LibraryUtility.GenerateGUID());
-            Validate("Customer No.", Customer."No.");
-            "Posting Date" := Today;
-            "Document Date" := Today;
-            "Due Date" := Today;
-            "Customer Posting Group" := FindCustomerPostingGroup();
-            "VAT Bus. Posting Group" := Customer."VAT Bus. Posting Group";
-            Insert(false);
-        end;
+        IssuedReminderHeader.Init();
+        IssuedReminderHeader.Validate("No.", LibraryUtility.GenerateGUID());
+        IssuedReminderHeader.Validate("Customer No.", Customer."No.");
+        IssuedReminderHeader."Posting Date" := Today;
+        IssuedReminderHeader."Document Date" := Today;
+        IssuedReminderHeader."Due Date" := Today;
+        IssuedReminderHeader."Customer Posting Group" := FindCustomerPostingGroup();
+        IssuedReminderHeader."VAT Bus. Posting Group" := Customer."VAT Bus. Posting Group";
+        IssuedReminderHeader.Insert(false);
 
-        with IssuedReminderLine do begin
-            Init();
-            "Reminder No." := IssuedReminderHeader."No.";
-            "Line No." := 1;
-            Amount := 17;
-            Type := Type::"Customer Ledger Entry";
-            Insert(false);
-        end;
+        IssuedReminderLine.Init();
+        IssuedReminderLine."Reminder No." := IssuedReminderHeader."No.";
+        IssuedReminderLine."Line No." := 1;
+        IssuedReminderLine.Amount := 17;
+        IssuedReminderLine.Type := IssuedReminderLine.Type::"Customer Ledger Entry";
+        IssuedReminderLine.Insert(false);
     end;
 
     local procedure VerifySubjectAndAttachmentName(ExpectedSubject: Text; ExpectedAttachmentName: Text)

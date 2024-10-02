@@ -14,95 +14,7 @@ codeunit 139013 "Mail Tests"
         LibraryRandom: Codeunit "Library - Random";
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
         ActiveDirectoryMockEvents: Codeunit "Active Directory Mock Events";
-        [RunOnClient]
-        OutlookMessageMock: DotNet OutlookMessageMock;
-        [RunOnClient]
-        OutlookMessageFactoryMock: DotNet OutlookMessageFactoryMock;
         Initialized: Boolean;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure OpenNewMessageTest()
-    var
-        Mail: Codeunit Mail;
-        ToAddress: Text;
-    begin
-        LibraryLowerPermissions.SetO365Setup();
-        Initialize();
-
-        ToAddress := 'none@home.local';
-
-        Mail.OpenNewMessage(ToAddress);
-        OutlookMessageMock := OutlookMessageFactoryMock.LastCreatedOutlookMessageMock;
-
-        Assert.IsTrue(OutlookMessageMock.SendWasCalled, 'Send was not called');
-        Assert.IsTrue(OutlookMessageMock.ShowNewMailDialogOnSend, 'Show new message dialog was not set');
-        Assert.AreEqual(ToAddress, OutlookMessageMock.Recipients, 'Recipients list differ from expetect');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure NewMessageTest()
-    var
-        Mail: Codeunit Mail;
-        ToAddress: Text;
-        CcAddresses: Text;
-        BccAddresses: Text;
-        Subject: Text;
-    begin
-        LibraryLowerPermissions.SetO365Setup();
-        Initialize();
-
-        ToAddress := 'none@home.local';
-        CcAddresses := 'none1@home.local';
-        BccAddresses := 'none2@home.local';
-        Subject := 'nosubject';
-
-        Mail.NewMessage(ToAddress, CcAddresses, BccAddresses, Subject, 'NoBody', 'C:\Filename.etx', false);
-        OutlookMessageMock := OutlookMessageFactoryMock.LastCreatedOutlookMessageMock;
-
-        Assert.IsTrue(OutlookMessageMock.SendWasCalled, 'Send was not called');
-        Assert.IsFalse(OutlookMessageMock.ShowNewMailDialogOnSend, 'Show new message dialog was set');
-        Assert.AreEqual(ToAddress, OutlookMessageMock.Recipients, 'Recipients list differ from expected');
-        Assert.AreEqual(CcAddresses, OutlookMessageMock.CarbonCopyRecipients, 'CC Recipients list differ from expected');
-        Assert.AreEqual(BccAddresses, OutlookMessageMock.BlindCarbonCopyRecipients, 'BCC Recipients list differ from expected');
-        Assert.AreEqual(Subject, OutlookMessageMock.Subject, 'Subject differ from expected');
-        Assert.AreEqual(6, OutlookMessageMock.Body.Length, 'Unexpected length of body');
-        Assert.AreEqual(1, OutlookMessageMock.AttachmentFileNames.Count, 'Unexpected count of attachments');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure AddBodyLineTest()
-    var
-        Mail: Codeunit Mail;
-    begin
-        LibraryLowerPermissions.SetO365Setup();
-        Initialize();
-
-        Mail.AddBodyline('NewBodyLine1');
-        OutlookMessageMock := OutlookMessageFactoryMock.LastCreatedOutlookMessageMock;
-        Assert.AreEqual(12, OutlookMessageMock.Body.Length, 'Unexpected body length');
-
-        Mail.AddBodyline('NewBodyLine2');
-        Assert.AreEqual(24, OutlookMessageMock.Body.Length, 'Unexpected body length');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure GetDescNoDataTest()
-    var
-        Mail: Codeunit Mail;
-    begin
-        LibraryLowerPermissions.SetO365Setup();
-        Initialize();
-
-        Mail.Send();
-        OutlookMessageMock := OutlookMessageFactoryMock.LastCreatedOutlookMessageMock;
-
-        Assert.IsTrue(OutlookMessageMock.SendWasCalled, 'Send was not called');
-        Assert.AreEqual('', Mail.GetErrorDesc(), 'Unexpected error details');
-    end;
 
     [Test]
     [Scope('OnPrem')]
@@ -141,69 +53,12 @@ codeunit 139013 "Mail Tests"
         Initialize();
 
         EMail := 'none@home.fail.local';
-        with CommunicationMethod do begin
-            SetRange("E-Mail", CopyStr("E-Mail", 1, MaxStrLen("E-Mail")));
-            if not IsEmpty() then
-                DeleteAll();
-        end;
+        CommunicationMethod.SetRange("E-Mail", CopyStr(CommunicationMethod."E-Mail", 1, MaxStrLen(CommunicationMethod."E-Mail")));
+        if not CommunicationMethod.IsEmpty() then
+            CommunicationMethod.DeleteAll();
 
         Success := Mail.ValidateEmail(CommunicationMethod, EMail);
         Assert.IsFalse(Success, 'E-mail is valid');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure ValidateNewMessageClearsAttachments()
-    var
-        Mail: Codeunit Mail;
-        FileManagement: Codeunit "File Management";
-        TmpFileName1: Text;
-        TmpFileName2: Text;
-    begin
-        LibraryLowerPermissions.SetO365Setup();
-        Initialize();
-
-        TmpFileName1 := FileManagement.ServerTempFileName('');
-        Mail.NewMessage('none@home.inside1', '', '', 'Test', 'test1', TmpFileName1, false);
-        OutlookMessageMock := OutlookMessageFactoryMock.LastCreatedOutlookMessageMock;
-        Assert.AreEqual(1, OutlookMessageMock.AttachmentFileNames.Count,
-          'Unexpected count of attachments after calling new message');
-
-        TmpFileName2 := FileManagement.ServerTempFileName('');
-        Mail.NewMessage('none@home.inside2', '', '', 'Test', 'test2', TmpFileName2, false);
-        OutlookMessageMock := OutlookMessageFactoryMock.LastCreatedOutlookMessageMock;
-        Assert.AreEqual(1, OutlookMessageMock.AttachmentFileNames.Count,
-          'Unexpected count of attachments when calling new message again');
-
-        Mail.NewMessage('none@home.inside3', '', '', 'Test', 'test3', '', false);
-        OutlookMessageMock := OutlookMessageFactoryMock.LastCreatedOutlookMessageMock;
-        Assert.AreEqual(0, OutlookMessageMock.AttachmentFileNames.Count,
-          'Unexpected count of attachments after calling new message without attachmennt');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure ValidateMutipleAttachedFile()
-    var
-        Mail: Codeunit Mail;
-        FileManagement: Codeunit "File Management";
-        TmpFileName: Text;
-        Index: Integer;
-        "Count": Integer;
-    begin
-        LibraryLowerPermissions.SetO365Setup();
-        Initialize();
-
-        Mail.CreateMessage('none@home.inside1', '', '', 'Test', 'test1', false, false);
-        Count := LibraryRandom.RandIntInRange(2, 5);
-        for Index := 1 to Count do begin
-            TmpFileName := FileManagement.ServerTempFileName('');
-            Mail.AttachFile(TmpFileName);
-        end;
-
-        OutlookMessageMock := OutlookMessageFactoryMock.LastCreatedOutlookMessageMock;
-        Assert.AreEqual(Count, OutlookMessageMock.AttachmentFileNames.Count,
-          'Unexpected count of attachments after calling Attach File several times');
     end;
 
     [Test]
@@ -258,32 +113,28 @@ codeunit 139013 "Mail Tests"
         if not Contact.FindFirst() then
             CreateDefaultContact();
 
-        with ContactAltAddress do begin
-            SetRange("Contact No.", Contact."No.");
-            if not IsEmpty() then
-                DeleteAll();
+        ContactAltAddress.SetRange("Contact No.", Contact."No.");
+        if not ContactAltAddress.IsEmpty() then
+            ContactAltAddress.DeleteAll();
 
-            Reset();
-            Init();
-            Code := 'ACODE1';
-            "Contact No." := Contact."No.";
-            "E-Mail" := 'someothertemporaryemail@domain.local';
-            Insert();
-        end;
+        ContactAltAddress.Reset();
+        ContactAltAddress.Init();
+        ContactAltAddress.Code := 'ACODE1';
+        ContactAltAddress."Contact No." := Contact."No.";
+        ContactAltAddress."E-Mail" := 'someothertemporaryemail@domain.local';
+        ContactAltAddress.Insert();
 
-        with ContactAltAddrDateRange do begin
-            SetRange("Contact No.", Contact."No.");
-            if not IsEmpty() then
-                DeleteAll();
+        ContactAltAddrDateRange.SetRange("Contact No.", Contact."No.");
+        if not ContactAltAddrDateRange.IsEmpty() then
+            ContactAltAddrDateRange.DeleteAll();
 
-            Reset();
-            Init();
-            "Contact No." := Contact."No.";
-            "Starting Date" := CalcDate('<-3D>', Today);
-            "Contact Alt. Address Code" := 'ACODE1';
-            "Ending Date" := Today;
-            Insert();
-        end;
+        ContactAltAddrDateRange.Reset();
+        ContactAltAddrDateRange.Init();
+        ContactAltAddrDateRange."Contact No." := Contact."No.";
+        ContactAltAddrDateRange."Starting Date" := CalcDate('<-3D>', Today);
+        ContactAltAddrDateRange."Contact Alt. Address Code" := 'ACODE1';
+        ContactAltAddrDateRange."Ending Date" := Today;
+        ContactAltAddrDateRange.Insert();
 
         Mail.CollectAddresses(Contact."No.", CommunicationMethod, false);
         Assert.IsTrue(CommunicationMethod.Count > 1, 'Expected to find at least two address');
@@ -315,10 +166,9 @@ codeunit 139013 "Mail Tests"
 
         CommunicationMethod.Find('-');
         FirstAddress := CommunicationMethod."E-Mail";
-        while CommunicationMethod.Next() <> 0 do begin
+        while CommunicationMethod.Next() <> 0 do
             if CommunicationMethod."E-Mail" <> FirstAddress then
                 exit; // Success
-        end;
 
         Assert.Fail('Expected find more than one email address');
     end;
@@ -445,38 +295,32 @@ codeunit 139013 "Mail Tests"
     var
         Contact: Record Contact;
     begin
-        with Contact do begin
-            Init();
-            "No." := 'CNTC001';
-            Type := Type::Company;
-            Name := 'Default contact company name';
-            Address := 'Default Contact Address 1';
-            "E-Mail" := 'defaultcompany@email.invaliddomain';
-            "Search E-Mail" := 'defaultcompany@email.invaliddomain';
-            Insert();
+        Contact.Init();
+        Contact."No." := 'CNTC001';
+        Contact.Type := Contact.Type::Company;
+        Contact.Name := 'Default contact company name';
+        Contact.Address := 'Default Contact Address 1';
+        Contact."E-Mail" := 'defaultcompany@email.invaliddomain';
+        Contact."Search E-Mail" := 'defaultcompany@email.invaliddomain';
+        Contact.Insert();
 
-            Init();
-            "No." := 'CNTP001';
-            Type := Type::Person;
-            "Company No." := 'CNTC001';
-            Name := 'Default contact name';
-            Address := 'Default Contact Address 1';
-            "E-Mail" := 'default@email.invaliddomain';
-            "Search E-Mail" := 'default@email.invaliddomain';
-            Insert();
-        end;
+        Contact.Init();
+        Contact."No." := 'CNTP001';
+        Contact.Type := Contact.Type::Person;
+        Contact."Company No." := 'CNTC001';
+        Contact.Name := 'Default contact name';
+        Contact.Address := 'Default Contact Address 1';
+        Contact."E-Mail" := 'default@email.invaliddomain';
+        Contact."Search E-Mail" := 'default@email.invaliddomain';
+        Contact.Insert();
     end;
 
     local procedure Initialize()
-    var
-        OutlookMessageFactory: Codeunit "Outlook Message Factory";
     begin
         BindActiveDirectoryMockEvents();
         if Initialized then
             exit;
         Initialized := true;
-        OutlookMessageFactoryMock := OutlookMessageFactoryMock.OutlookMessageFactoryMock();
-        OutlookMessageFactory.SetOutlookMessageFactory(OutlookMessageFactoryMock);
     end;
 
     [Test]

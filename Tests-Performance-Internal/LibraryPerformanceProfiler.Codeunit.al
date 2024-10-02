@@ -123,7 +123,7 @@ codeunit 132209 "Library - Performance Profiler"
 
         PerfProfilerEventsTest.SetFilter(Statement, '<> *2000000207*User AL Code* & <> *2000000071*User AL Code*');
 
-        if PerfProfilerEventsTest.FindSet() then begin
+        if PerfProfilerEventsTest.FindSet() then
             repeat
                 OutStream.WriteText(
                   StrSubstNo(
@@ -144,7 +144,6 @@ codeunit 132209 "Library - Performance Profiler"
                     ));
                 AddLineBreak(OutStream);
             until PerfProfilerEventsTest.Next() = 0;
-        end;
 
         PerfProfilerEventsTest.CalcFields(
           Total, "Total SQL Queries", "Total SQL Query Duration", "Total SQL Query Hit Count", "Max SQL Query Duration",
