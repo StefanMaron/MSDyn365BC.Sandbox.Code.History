@@ -219,9 +219,9 @@ codeunit 101018 "Create Customer"
             "Currency Code":
                 Counter := Counter + 1;
             else begin
-                    PreviousCurrencyCode := "Currency Code";
-                    Counter := 1;
-                end;
+                PreviousCurrencyCode := "Currency Code";
+                Counter := 1;
+            end;
         end;
 
         case (Counter - 1) mod 3 of
@@ -281,12 +281,11 @@ codeunit 101018 "Create Customer"
         Customer.Validate("Customer Posting Group", CreateCurrency.GetPostingGroup("Country Code"));
         Customer.Validate("Gen. Bus. Posting Group", CreateCurrency.GetBusPostingGroup("Country Code"));
         if DemoDataSetup."Company Type" = DemoDataSetup."Company Type"::"Sales Tax" then
-            if "Currency Code" = '' then begin
+            if "Currency Code" = '' then
                 if TaxArea.Get(Customer.County) then begin
                     Customer.Validate("Tax Area Code", TaxArea.Code);
                     Customer.Validate("Tax Liable", true);
-                end
-            end;
+                end;
 
         Customer.Validate("Language Code", CreateLanguage.GetLanguageCode("Country Code"));
         Customer.Validate("Territory Code", CreateTerritory.GetTerritoryCode(Customer."Country/Region Code", "Territory Code"));

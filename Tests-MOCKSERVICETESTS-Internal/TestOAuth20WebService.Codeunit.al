@@ -824,22 +824,20 @@ codeunit 134781 "Test OAuth 2.0 WebService"
 
     local procedure CreateCustomOAuthSetup(var OAuth20Setup: Record "OAuth 2.0 Setup"; NewStatus: Option; ClientToken: Text; AccessToken: Text; AccessTokenDueDateTime: DateTime)
     begin
-        with OAuth20Setup do begin
-            Code := LibraryUtility.GenerateGUID();
-            Status := NewStatus;
-            Description := LibraryUtility.GenerateGUID();
-            "Service URL" := 'https://localhost:8080/oauth20';
-            "Redirect URL" := 'https://TestRedirectURL';
-            Scope := LibraryUtility.GenerateGUID();
-            "Authorization URL Path" := '/TestAuthorizationURLPath';
-            "Access Token URL Path" := '/TestAccessTokenURLPath';
-            "Refresh Token URL Path" := '/TestRefreshTokenURLPath';
-            "Authorization Response Type" := LibraryUtility.GenerateGUID();
-            "Token DataScope" := "Token DataScope"::Company;
-            SetOAuthSetupTestTokens(OAuth20Setup, ClientToken, AccessToken);
-            "Access Token Due DateTime" := AccessTokenDueDateTime;
-            Insert();
-        end;
+        OAuth20Setup.Code := LibraryUtility.GenerateGUID();
+        OAuth20Setup.Status := NewStatus;
+        OAuth20Setup.Description := LibraryUtility.GenerateGUID();
+        OAuth20Setup."Service URL" := 'https://localhost:8080/oauth20';
+        OAuth20Setup."Redirect URL" := 'https://TestRedirectURL';
+        OAuth20Setup.Scope := LibraryUtility.GenerateGUID();
+        OAuth20Setup."Authorization URL Path" := '/TestAuthorizationURLPath';
+        OAuth20Setup."Access Token URL Path" := '/TestAccessTokenURLPath';
+        OAuth20Setup."Refresh Token URL Path" := '/TestRefreshTokenURLPath';
+        OAuth20Setup."Authorization Response Type" := LibraryUtility.GenerateGUID();
+        OAuth20Setup."Token DataScope" := OAuth20Setup."Token DataScope"::Company;
+        SetOAuthSetupTestTokens(OAuth20Setup, ClientToken, AccessToken);
+        OAuth20Setup."Access Token Due DateTime" := AccessTokenDueDateTime;
+        OAuth20Setup.Insert();
     end;
 
     local procedure OpenOAuthSetupPage(var OAuth20SetupPage: TestPage "OAuth 2.0 Setup"; OAuth20Setup: Record "OAuth 2.0 Setup")
@@ -850,12 +848,10 @@ codeunit 134781 "Test OAuth 2.0 WebService"
 
     local procedure UpdateDailyLimit(var OAuth20Setup: Record "OAuth 2.0 Setup"; NewDailyLimit: Integer; NewDailyCount: Integer; NewLatestDateTime: DateTime)
     begin
-        with OAuth20Setup do begin
-            "Daily Limit" := NewDailyLimit;
-            "Daily Count" := NewDailyCount;
-            "Latest Datetime" := NewLatestDateTime;
-            Modify();
-        end;
+        OAuth20Setup."Daily Limit" := NewDailyLimit;
+        OAuth20Setup."Daily Count" := NewDailyCount;
+        OAuth20Setup."Latest Datetime" := NewLatestDateTime;
+        OAuth20Setup.Modify();
     end;
 
     local procedure ReadHttpLogDetails(OAuth20Setup: Record "OAuth 2.0 Setup"): Text
@@ -865,11 +861,9 @@ codeunit 134781 "Test OAuth 2.0 WebService"
         InStream: InStream;
     begin
         OAuth20Setup.Find();
-        with ActivityLog do begin
-            Get(OAuth20Setup."Activity Log ID");
-            CalcFields("Detailed Info");
-            "Detailed Info".CreateInStream(InStream);
-        end;
+        ActivityLog.Get(OAuth20Setup."Activity Log ID");
+        ActivityLog.CalcFields("Detailed Info");
+        ActivityLog."Detailed Info".CreateInStream(InStream);
         exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.CRLFSeparator()));
     end;
 
@@ -1033,13 +1027,11 @@ codeunit 134781 "Test OAuth 2.0 WebService"
         else
             ExpectedStatusOption := ActivityLog.Status::Failed;
 
-        with ActivityLog do begin
-            Get(OAuth20Setup."Activity Log ID");
-            TestField(Status, ExpectedStatusOption);
-            TestField(Context, StrSubstNo('OAuth 2.0 %1', OAuth20Setup.Code));
-            TestField(Description, CopyStr(ExpectedDescription, 1, MaxStrLen(Description)));
-            TestField("Activity Message", CopyStr(ExpectedActivityMessage, 1, MaxStrLen("Activity Message")));
-        end;
+        ActivityLog.Get(OAuth20Setup."Activity Log ID");
+        ActivityLog.TestField(Status, ExpectedStatusOption);
+        ActivityLog.TestField(Context, StrSubstNo('OAuth 2.0 %1', OAuth20Setup.Code));
+        ActivityLog.TestField(Description, CopyStr(ExpectedDescription, 1, MaxStrLen(ActivityLog.Description)));
+        ActivityLog.TestField("Activity Message", CopyStr(ExpectedActivityMessage, 1, MaxStrLen(ActivityLog."Activity Message")));
     end;
 
     local procedure VerifyHttpLogWithMaskedContents(OAuth20Setup: Record "OAuth 2.0 Setup"; ExpectedMethod: Text; ExpectedStatus: Integer; ExpectedReason: Text)
@@ -1121,12 +1113,10 @@ codeunit 134781 "Test OAuth 2.0 WebService"
 
     procedure VerifyDailyLimit(OAuth20Setup: Record "OAuth 2.0 Setup"; ExpectedDailyLimit: Integer; ExpectedDailyCount: Integer)
     begin
-        with OAuth20Setup do begin
-            Find();
-            TestField("Daily Limit", ExpectedDailyLimit);
-            TestField("Daily Count", ExpectedDailyCount);
-            Assert.IsTrue(CurrentDateTime() - "Latest Datetime" < 1000 * 60, ''); // < 1 min
-        end;
+        OAuth20Setup.Find();
+        OAuth20Setup.TestField("Daily Limit", ExpectedDailyLimit);
+        OAuth20Setup.TestField("Daily Count", ExpectedDailyCount);
+        Assert.IsTrue(CurrentDateTime() - OAuth20Setup."Latest Datetime" < 1000 * 60, ''); // < 1 min
     end;
 
     internal procedure AssertBlankedJsonValue(JToken: JsonToken; Path: Text)

@@ -38,34 +38,33 @@ codeunit 130026 "Get Changelist Code"
         CheckObjectHasCode: Boolean;
         CheckTriggerHasCode: Boolean;
     begin
-        with ChangelistCode do
-            if FindSet() then
-                repeat
-                    case "Line Type" of
-                        "Line Type"::Object:
-                            begin
-                                if CheckTriggerHasCode then
-                                    RemoveTrigger(TriggerChangelistCode);
-                                if CheckObjectHasCode then
-                                    RemoveObject(ObjectChangelistCode);
-                                ObjectChangelistCode := ChangelistCode;
-                                CheckTriggerHasCode := false;
-                                CheckObjectHasCode := true;
-                            end;
-                        "Line Type"::"Trigger/Function":
-                            begin
-                                if CheckTriggerHasCode then
-                                    RemoveTrigger(TriggerChangelistCode);
-                                TriggerChangelistCode := ChangelistCode;
-                                CheckTriggerHasCode := true;
-                            end;
-                        "Line Type"::Empty:
-                            ;
-                        else
+        if ChangelistCode.FindSet() then
+            repeat
+                case ChangelistCode."Line Type" of
+                    ChangelistCode."Line Type"::Object:
+                        begin
+                            if CheckTriggerHasCode then
+                                RemoveTrigger(TriggerChangelistCode);
+                            if CheckObjectHasCode then
+                                RemoveObject(ObjectChangelistCode);
+                            ObjectChangelistCode := ChangelistCode;
                             CheckTriggerHasCode := false;
-                            CheckObjectHasCode := false;
-                    end;
-                until Next() = 0;
+                            CheckObjectHasCode := true;
+                        end;
+                    ChangelistCode."Line Type"::"Trigger/Function":
+                        begin
+                            if CheckTriggerHasCode then
+                                RemoveTrigger(TriggerChangelistCode);
+                            TriggerChangelistCode := ChangelistCode;
+                            CheckTriggerHasCode := true;
+                        end;
+                    ChangelistCode."Line Type"::Empty:
+                        ;
+                    else
+                        CheckTriggerHasCode := false;
+                        CheckObjectHasCode := false;
+                end;
+            until ChangelistCode.Next() = 0;
 
         if CheckTriggerHasCode then
             RemoveTrigger(TriggerChangelistCode);
@@ -508,13 +507,11 @@ codeunit 130026 "Get Changelist Code"
         ChangelistCode: Record "Changelist Code";
     begin
         ChangelistCode := TriggerChangelistCode;
-        with ChangelistCode do begin
-            SetRange("Object Type", "Object Type");
-            SetRange("Object No.", "Object No.");
-            repeat
-                Delete();
-            until ((Next() = 0) or ("Line Type" = "Line Type"::"Trigger/Function"))
-        end;
+        ChangelistCode.SetRange("Object Type", ChangelistCode."Object Type");
+        ChangelistCode.SetRange("Object No.", ChangelistCode."Object No.");
+        repeat
+            ChangelistCode.Delete();
+        until ((ChangelistCode.Next() = 0) or (ChangelistCode."Line Type" = ChangelistCode."Line Type"::"Trigger/Function"))
     end;
 
     local procedure RemoveObject(ChangelistCode: Record "Changelist Code")

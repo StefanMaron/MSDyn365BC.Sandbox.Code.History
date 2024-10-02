@@ -4,6 +4,8 @@ using System.IO;
 
 codeunit 448 "Job Queue Dispatcher"
 {
+    InherentPermissions = X;
+
     Permissions = TableData "Job Queue Entry" = rimd,
                   TableData "Job Queue Category" = rm;
     TableNo = "Job Queue Entry";
