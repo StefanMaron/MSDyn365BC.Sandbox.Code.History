@@ -52,9 +52,8 @@ codeunit 101931 "Create Local RapidStart Pack"
         CreateTable(Database::"Reg. No. Service Config CZL");
         CreateTable(Database::"Advance Letter Template CZZ");
 
-        if CreateConfigPackageHelper.GetCompanyType() = DemoDataSetup."Company Type"::VAT then begin
+        if CreateConfigPackageHelper.GetCompanyType() = DemoDataSetup."Company Type"::VAT then
             CreateTable(Database::"VAT Attribute Code CZL");
-        end;
     end;
 
     procedure CreateTable(TableID: Integer)

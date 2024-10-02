@@ -3,7 +3,7 @@ codeunit 163529 "Create VAT Period CZL"
 
     trigger OnRun()
     begin
-        InsertData(MakeAdjustments.AdjustDate(19020101D), MakeAdjustments.AdjustDate(19040101D));
+        InsertData(MakeAdjustments.AdjustDate(19010101D), MakeAdjustments.AdjustDate(19040101D));
     end;
 
     var

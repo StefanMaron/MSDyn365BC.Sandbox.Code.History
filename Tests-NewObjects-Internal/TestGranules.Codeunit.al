@@ -256,7 +256,7 @@ codeunit 132532 "Test Granules"
         PermissionSet.SetFilter("Role ID", D365PermissionSetPrefixFilterTok);
         PermissionSet.FindSet();
         repeat
-            if not (PermissionSet."Role ID" in [XO365FULLTxt, D365AccountantsTxt, D365CompanyHubTxt, XO365EXTENSIONMGTTxt, XO365BACKUPRESTORETxt, ProfileManagementTok, D365MonitorFieldsTok, XRetentionPolSetupTok, XSnapshotDebugTok, XAttachDebuggingTok, D365AutomationTok, D365DIMCORRECTIONTok, D365CreateFieldsTok]) then
+            if not (PermissionSet."Role ID" in [XO365FULLTxt, D365AccountantsTxt, D365CompanyHubTxt, XO365BACKUPRESTORETxt, ProfileManagementTok, D365MonitorFieldsTok, XRetentionPolSetupTok, XSnapshotDebugTok, XAttachDebuggingTok, D365AutomationTok, D365DIMCORRECTIONTok, D365CreateFieldsTok]) then
                 CopyPSToTemp(TempAllO365ExpandedPermission, PermissionSet."Role ID");
         until PermissionSet.Next() = 0;
 
@@ -280,7 +280,7 @@ codeunit 132532 "Test Granules"
         PermissionSet.SetFilter("Role ID", D365EssentialPermissionSetFilterTok);
         PermissionSet.FindSet();
         repeat
-            if not (PermissionSet."Role ID" in [XO365FULLTxt, D365AccountantsTxt, D365CompanyHubTxt, XO365EXTENSIONMGTTxt, XO365PREMIUMBUSTxt, ReadTok, XO365BACKUPRESTORETxt, ProfileManagementTok, D365MonitorFieldsTok, XRetentionPolSetupTok, XSnapshotDebugTok, XAttachDebuggingTok, D365AutomationTok, D365DIMCORRECTIONTok, D365CreateFieldsTok]) then
+            if not (PermissionSet."Role ID" in [XO365FULLTxt, D365AccountantsTxt, D365CompanyHubTxt, XO365PREMIUMBUSTxt, ReadTok, XO365BACKUPRESTORETxt, ProfileManagementTok, D365MonitorFieldsTok, XRetentionPolSetupTok, XSnapshotDebugTok, XAttachDebuggingTok, D365AutomationTok, D365DIMCORRECTIONTok, D365CreateFieldsTok]) then
                 CopyPSToTemp(TempAllO365ExpandedPermission, PermissionSet."Role ID");
         until PermissionSet.Next() = 0;
 
@@ -668,4 +668,3 @@ codeunit 132532 "Test Granules"
         exit(RoleID in [XO365FULLTxt, XO365BUSFULLTxt, XO365PREMIUMBUSTxt, D365AccountantsTxt, D365CompanyHubTxt, ReadTok, XTEAMMEMBERTxt, BasicISVTok, D365AutomationTok, D365DIMCORRECTIONTok]);
     end;
 }
-

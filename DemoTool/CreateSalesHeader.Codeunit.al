@@ -76,14 +76,7 @@ codeunit 101036 "Create Sales Header"
         "Sales Header"."Currency Factor" :=
           CurrencyExchRate.ExchangeRate(WorkDate(), "Sales Header"."Currency Code");
         // NAVCZ
-#if not CLEAN22
-#pragma warning disable AL0432
-        "Sales Header".Validate("VAT Date CZL", "Sales Header"."Posting Date");
-#pragma warning restore AL0432
-#else
         "Sales Header".Validate("VAT Reporting Date", "Sales Header"."Posting Date");
-#endif
-
         "Sales Header"."VAT Currency Factor CZL" := "Sales Header"."Currency Factor";
         // NAVCZ
 

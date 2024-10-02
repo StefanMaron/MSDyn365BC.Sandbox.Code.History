@@ -38,13 +38,6 @@ codeunit 163533 "Create Stat. Report. Setup CZL"
           StatutoryReportingSetupCZL."VAT Control Report Nos.", XVCR, XVATControlReport, XVCR001, '', '', '', 1);
         CreateNoSeries.InitBaseSeries2(
           StatutoryReportingSetupCZL."VIES Declaration Nos.", XVIES, XVIESDeclaration, XVIES16001, '', '', '', 1);
-#if not CLEAN22
-#pragma warning disable AL0432
-        CreateNoSeries.InitBaseSeries2(
-          StatutoryReportingSetupCZL."Intrastat Declaration Nos.", XINTR, XIntrastat, XINTRS001, '', '', '', 1);
-        SetDefaultNos(StatutoryReportingSetupCZL."Intrastat Declaration Nos.", false);
-#pragma warning restore AL0432
-#endif
         StatutoryReportingSetupCZL.Modify();
     end;
 
@@ -72,13 +65,6 @@ codeunit 163533 "Create Stat. Report. Setup CZL"
         XVIES: Label 'VIES';
         XVIESDeclaration: Label 'VIES Declaration';
         XVIES16001: Label 'VIES16001';
-#if not CLEAN22
-#pragma warning disable AL0432
-        XINTR: Label 'INTR', Comment = 'Intrastat';
-        XIntrastat: Label 'Intrastat';
-        XINTRS001: Label 'INTRS001';
-#pragma warning restore AL0432
-#endif
         X461: Label '461';
         X3003: Label '3003';
 
@@ -118,14 +104,6 @@ codeunit 163533 "Create Stat. Report. Setup CZL"
         StatutoryReportingSetupCZL."VIES Number of Lines" := 20;
         StatutoryReportingSetupCZL.Validate("VIES Declaration Export No.", Xmlport::"VIES Declaration CZL");
         StatutoryReportingSetupCZL.Validate("VIES Declaration Report No.", Report::"VIES Declaration CZL");
-#if not CLEAN22
-#pragma warning disable AL0432
-        StatutoryReportingSetupCZL.Validate("Get Tariff No. From", StatutoryReportingSetupCZL."Get Tariff No. From"::"Item Card");
-        StatutoryReportingSetupCZL.Validate("Get Net Weight From", StatutoryReportingSetupCZL."Get Net Weight From"::"Item Card");
-        StatutoryReportingSetupCZL.Validate("Get Country/Region of Origin", StatutoryReportingSetupCZL."Get Country/Region of Origin"::"Item Card");
-        StatutoryReportingSetupCZL.Validate("Intrastat Rounding Type", StatutoryReportingSetupCZL."Intrastat Rounding Type"::Up);
-#pragma warning restore AL0432
-#endif
         StatutoryReportingSetupCZL.Validate("VAT Control Report Xml Format", StatutoryReportingSetupCZL."VAT Control Report Xml Format"::"03_01_03");
 
         CreateNoSeries.InitBaseSeries(
@@ -134,13 +112,6 @@ codeunit 163533 "Create Stat. Report. Setup CZL"
           StatutoryReportingSetupCZL."VAT Control Report Nos.", XVCR, XVATControlReport, XVCR001, '', '', '', 1);
         CreateNoSeries.InitBaseSeries2(
           StatutoryReportingSetupCZL."VIES Declaration Nos.", XVIES, XVIESDeclaration, XVIES16001, '', '', '', 1);
-#if not CLEAN22
-#pragma warning disable AL0432
-        CreateNoSeries.InitBaseSeries2(
-          StatutoryReportingSetupCZL."Intrastat Declaration Nos.", XINTR, XIntrastat, XINTRS001, '', '', '', 1);
-        SetDefaultNos(StatutoryReportingSetupCZL."Intrastat Declaration Nos.", false);
-#pragma warning restore AL0432
-#endif
         StatutoryReportingSetupCZL.Modify();
     end;
 

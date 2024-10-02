@@ -297,9 +297,6 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Media Repository");
         RunCodeunit(CODEUNIT::"Create Excel Templates");
         RunCodeunit(Codeunit::"Create Word Templates");
-#if not CLEAN22
-        RunCodeunit(CODEUNIT::"Create Intrastat Demo Data");
-#endif
         RunCodeunit(CODEUNIT::"Create Incoming Document");
         RunCodeunit(CODEUNIT::"Create Text To Account Mapping");
         RunCodeunit(CODEUNIT::"Create Late Payment Model");
@@ -525,13 +522,7 @@ codeunit 110000 "Interface Basis Data"
                             DateDisplacement := '1';
                         SalesHeader."Posting Date" := CalcDate('<' + DateDisplacement + 'D>', SalesHeader."Posting Date");
                         // NAVCZ
-#if not CLEAN22
-#pragma warning disable AL0432
-                        SalesHeader.Validate("VAT Date CZL", SalesHeader."Posting Date");
-#pragma warning restore AL0432
-#else
                         SalesHeader.Validate("VAT Reporting Date", SalesHeader."Posting Date");
-#endif
                         SalesHeader."VAT Currency Factor CZL" := SalesHeader."Currency Factor";
                         // NAVCZ
                         SalesHeader.Modify();

@@ -99,7 +99,7 @@ codeunit 101325 "Create VAT Posting Setup"
                     begin
                         SetAccounts(VATPostingSetup, '995610', '995630', '995620', '995615', '995635', '995625');
                         VATPostingSetup."VAT Rate CZL" := VATPostingSetup."VAT Rate CZL"::Base;
-                        if VATPostingSetup."VAT Prod. Posting Group" in [DemoDataSetup.BaseVATServiceCode(), DemoDataSetup.BaseVATItemCode()] then begin
+                        if VATPostingSetup."VAT Prod. Posting Group" in [DemoDataSetup.BaseVATServiceCode(), DemoDataSetup.BaseVATItemCode()] then
                             case VATPostingSetup."VAT Bus. Posting Group" of
                                 DemoDataSetup.DomesticCode(), '':
                                     begin
@@ -116,7 +116,6 @@ codeunit 101325 "Create VAT Posting Setup"
                                         VATPostingSetup."Purch. Adv. Letter Account CZZ" := CA.Convert('992420');
                                     end;
                             end;
-                        end;
 
                         if (VATPostingSetup."VAT Bus. Posting Group" = DemoDataSetup.NPCode()) and
                            (VATPostingSetup."VAT Prod. Posting Group" = DemoDataSetup.BaseVATItemCode())
@@ -133,7 +132,7 @@ codeunit 101325 "Create VAT Posting Setup"
                     begin
                         SetAccounts(VATPostingSetup, '995613', '995636', '995622', '995613', '995636', '995613');
                         VATPostingSetup."VAT Rate CZL" := VATPostingSetup."VAT Rate CZL"::Reduced;
-                        if VATPostingSetup."VAT Prod. Posting Group" in [DemoDataSetup.FirstReducedVATServiceCode(), DemoDataSetup.FirstReducedVATItemCode()] then begin
+                        if VATPostingSetup."VAT Prod. Posting Group" in [DemoDataSetup.FirstReducedVATServiceCode(), DemoDataSetup.FirstReducedVATItemCode()] then
                             case VATPostingSetup."VAT Bus. Posting Group" of
                                 DemoDataSetup.DomesticCode(), '':
                                     begin
@@ -150,7 +149,6 @@ codeunit 101325 "Create VAT Posting Setup"
                                         VATPostingSetup."Purch. Adv. Letter Account CZZ" := CA.Convert('992420');
                                     end;
                             end;
-                        end;
 
                         if (VATPostingSetup."VAT Bus. Posting Group" = DemoDataSetup.NPCode()) and
                            (VATPostingSetup."VAT Prod. Posting Group" = DemoDataSetup.FirstReducedVATItemCode())

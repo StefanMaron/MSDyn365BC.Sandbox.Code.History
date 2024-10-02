@@ -706,9 +706,9 @@
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
         PurchasesPayablesSetup.Get();
         // [WHEN] Set "Report Output Type" = Print
-        ASSERTERROR PurchasesPayablesSetup.Validate("Report Output Type", PurchasesPayablesSetup."Report Output Type"::Print);
+        asserterror PurchasesPayablesSetup.Validate("Report Output Type", PurchasesPayablesSetup."Report Output Type"::Print);
         // [THEN] Error, "Report Output Type" must be PDF
-        Assert.ExpectedError('Report Output Type must be equal to ''PDF''  in Purchases & Payables Setup');
+        Assert.ExpectedTestFieldError(PurchasesPayablesSetup.FieldCaption("Report Output Type"), Format(PurchasesPayablesSetup."Report Output Type"::PDF));
     end;
 
     [Test]
@@ -725,12 +725,12 @@
         CreateInvoiceReportSelection();
 
         // [GIVEN] Two invoices
-        CreatePurchaseDocument(PurchaseHeader[1], PurchaseHeader[1]."Document Type"::Invoice, FALSE);
-        CreatePurchaseDocument(PurchaseHeader[2], PurchaseHeader[2]."Document Type"::Invoice, FALSE);
+        CreatePurchaseDocument(PurchaseHeader[1], PurchaseHeader[1]."Document Type"::Invoice, false);
+        CreatePurchaseDocument(PurchaseHeader[2], PurchaseHeader[2]."Document Type"::Invoice, false);
 
         // [WHEN] Batch post two invoices (set Print = TRUE in BatchPostSalesInvoicesPrintRequestPageHandler)
         RunBatchPostPurchase(
-          PurchaseHeader[1]."Document Type", PurchaseHeader[1]."No." + '|' + PurchaseHeader[2]."No.", 0D, FALSE);
+          PurchaseHeader[1]."Document Type", PurchaseHeader[1]."No." + '|' + PurchaseHeader[2]."No.", 0D, false);
 
         // [THEN] 'Print' checkbox is not visible, so number "Purchase - Invoice" report runs = 0 (calculated in PurchaseInvoiceReportHandler)
         Assert.AreEqual(0, LibraryVariableStorage.DequeueInteger(), 'Number of printed invoice is not correct');
@@ -755,12 +755,12 @@
         CreateInvoiceReportSelection();
 
         // [GIVEN] Two invoices
-        CreatePurchaseDocument(PurchaseHeader[1], PurchaseHeader[1]."Document Type"::Invoice, FALSE);
-        CreatePurchaseDocument(PurchaseHeader[2], PurchaseHeader[2]."Document Type"::Invoice, FALSE);
+        CreatePurchaseDocument(PurchaseHeader[1], PurchaseHeader[1]."Document Type"::Invoice, false);
+        CreatePurchaseDocument(PurchaseHeader[2], PurchaseHeader[2]."Document Type"::Invoice, false);
 
         // [WHEN] Batch post two invoices (set Print = TRUE in BatchPostSalesInvoicesPrintRequestPageHandler)
         RunBatchPostPurchase(
-          PurchaseHeader[1]."Document Type", PurchaseHeader[1]."No." + '|' + PurchaseHeader[2]."No.", 0D, FALSE);
+          PurchaseHeader[1]."Document Type", PurchaseHeader[1]."No." + '|' + PurchaseHeader[2]."No.", 0D, false);
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(PurchaseHeader[1].RecordId);
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(PurchaseHeader[2].RecordId);
 
@@ -1354,7 +1354,7 @@
         ReportSelections.Init();
         ReportSelections.Usage := ReportSelections.Usage::"P.Invoice";
         ReportSelections."Report ID" := REPORT::"Purchase - Invoice";
-        If ReportSelections.Insert() Then;
+        if ReportSelections.Insert() then;
     end;
 
     local procedure FindAndRunJobQueueEntryByRecord(var PurchaseHeader: Record "Purchase Header")
@@ -1594,7 +1594,7 @@
         PostingDate: Variant;
         DocumentNoFilter: Variant;
         PrintVisible: Boolean;
-    BEGIN
+    begin
         LibraryVariableStorage.Dequeue(DocumentNoFilter);
         LibraryVariableStorage.Dequeue(PostingDate);
 
@@ -1603,19 +1603,19 @@
 
         PrintVisible := BatchPostPurchaseInvoices.PrintDoc.Visible();
         if PrintVisible then
-            BatchPostPurchaseInvoices.PrintDoc.SETVALUE(TRUE);
+            BatchPostPurchaseInvoices.PrintDoc.SetValue(true);
         BatchPostPurchaseInvoices.OK().Invoke();
 
         LibraryVariableStorage.Enqueue(PrintVisible);
         LibraryVariableStorage.Enqueue(0); // initialize report run counter
-    END;
+    end;
 
     [ReportHandler]
     [Scope('OnPrem')]
-    PROCEDURE PurchaseInvoiceReportHandler(var PurchaseInvoice: Report "Purchase - Invoice");
-    BEGIN
+    procedure PurchaseInvoiceReportHandler(var PurchaseInvoice: Report "Purchase - Invoice");
+    begin
         LibraryVariableStorage.Enqueue(LibraryVariableStorage.DequeueInteger() + 1);
-    END;
+    end;
 
     [MessageHandler]
     [Scope('OnPrem')]

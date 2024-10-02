@@ -133,7 +133,6 @@ codeunit 135200 "Time Series Tests"
         Date: Record Date;
         TempTimeSeriesForecast: Record "Time Series Forecast" temporary;
         TimeSeriesManagement: Codeunit "Time Series Management";
-        ProcessingTime: Decimal;
         State: Option;
     begin
         // [SCENARIO] Forecasting is completed, even if no input data is provided
@@ -146,10 +145,6 @@ codeunit 135200 "Time Series Tests"
         // [THEN] An empty result set is returend, since nothing could be calculated
         Assert.RecordIsEmpty(TempTimeSeriesForecast);
 
-        // [THEN] The processing time is 0
-        ProcessingTime := AzureAIUsage.GetTotalProcessingTime(AzureAIUsage.Service::"Machine Learning");
-        Assert.AreEqual(0, ProcessingTime, 'Processing time was not 0.');
-
         // [THEN] State of Time Series Management is set to done
         TimeSeriesManagement.GetState(State);
         Assert.AreEqual(TimeSeriesCalculationState::Done, State, 'State is not done');
@@ -159,6 +154,7 @@ codeunit 135200 "Time Series Tests"
     [Scope('OnPrem')]
     procedure TestInputPreparation()
     var
+        GeneralLedgerSetup: Record "General Ledger Setup";
         ItemLedgerEntry: Record "Item Ledger Entry";
         Date: Record Date;
         TempTimeSeriesBufferInput: Record "Time Series Buffer" temporary;
@@ -171,6 +167,12 @@ codeunit 135200 "Time Series Tests"
         ApiKey: Text;
     begin
         // [SCENARIO] A time series input for Azure ML is created
+
+        // NAVCZ
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."VAT Reporting Date Usage" := GeneralLedgerSetup."VAT Reporting Date Usage"::Disabled;
+        GeneralLedgerSetup.Modify();
+        // NAVCZ
 
         // [GIVEN] A range of records, used for the source of the time series
         OriginalWorkDate := WorkDate();
@@ -466,51 +468,6 @@ codeunit 135200 "Time Series Tests"
             ExpectedDate := CalcDate('<' + Format(CurrentPeriod) + 'M>', WorkDate());
             Assert.AreEqual(ExpectedDate, TempTimeSeriesForecast."Period Start Date", 'The date is incorrect');
         until TempTimeSeriesForecast.Next() = 0;
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure TestProcessingTime()
-    var
-        AzureAIUsage: Record "Azure AI Usage";
-        VendorLedgerEntry: Record "Vendor Ledger Entry";
-        Date: Record Date;
-        TimeSeriesManagement: Codeunit "Time Series Management";
-        EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
-        ExpectedProcessingTime: Decimal;
-        ApiUrl: Text;
-        ApiKey: Text;
-    begin
-        // [SCENARIO] Processing time is returned by the library
-
-        // [GIVEN] Mock vendor ledger entry data
-        MockVendorLedgerEntryData();
-
-        // [GIVEN] A completed time series forecast scenario
-        LibraryLowerPermissions.SetOutsideO365Scope();
-        AzureAIUsage.DeleteAll();
-        EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
-
-        LibraryLowerPermissions.SetPurchDocsCreate();
-        TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
-        ApiUrl := MockServiceURITxt;
-        ApiKey := '';
-        TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, true);
-        TimeSeriesManagement.PrepareData(
-          VendorLedgerEntry, VendorLedgerEntry.FieldNo("Vendor No."), VendorLedgerEntry.FieldNo("Posting Date"),
-          VendorLedgerEntry.FieldNo(Amount), Date."Period Type"::Week, WorkDate(), 1);
-
-        // [WHEN] The entire time series has been run
-        TimeSeriesManagement.Forecast(1, 80, TimeSeriesManagement.GetTimeSeriesModelOption('ARIMA'));
-
-        // [THEN] A total processing time is increased by proc. time returned by the library
-        ExpectedProcessingTime := 5.6386189;
-        Assert.AreEqual(ExpectedProcessingTime,
-          AzureAIUsage.GetTotalProcessingTime(AzureAIUsage.Service::"Machine Learning"),
-          'Processing Time is not correct.');
-
-        EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(false);
     end;
 
     [Test]

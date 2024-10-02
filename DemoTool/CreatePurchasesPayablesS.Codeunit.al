@@ -94,11 +94,6 @@ codeunit 101312 "Create Purchases & Payables S."
         // NAVCZ
         "Purchases & Payables Setup"."Invoice Rounding" := false;
         "Purchases & Payables Setup"."Allow VAT Difference" := true;
-#if not CLEAN22
-#pragma warning disable AL0432
-        "Purchases & Payables Setup"."Def. Orig. Doc. VAT Date CZL" := "Purchases & Payables Setup"."Def. Orig. Doc. VAT Date CZL"::"Posting Date";
-#pragma warning restore AL0432
-#endif
         "Purchases & Payables Setup"."Copy Vendor Name to Entries" := true;
         "Purchases & Payables Setup"."Allow Multiple Posting Groups" := true;
         // NAVCZ

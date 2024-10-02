@@ -287,13 +287,7 @@ codeunit 117000 "Interface Service Management"
           CurrencyExchRate.ExchangeRate(WorkDate(), SalesHeader."Currency Code");
 
         // CZ
-#if not CLEAN22
-#pragma warning disable AL0432
-        SalesHeader.Validate("VAT Date CZL", SalesHeader."Posting Date");
-#pragma warning restore AL0432
-#else
         SalesHeader.Validate("VAT Reporting Date", SalesHeader."Posting Date");
-#endif
         SalesHeader."VAT Currency Factor CZL" := SalesHeader."Currency Factor";
         // CZ
 

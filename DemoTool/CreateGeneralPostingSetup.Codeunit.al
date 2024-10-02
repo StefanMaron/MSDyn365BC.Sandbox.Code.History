@@ -257,24 +257,22 @@ codeunit 101252 "Create General Posting Setup"
             case GeneralPostingSetup."Gen. Prod. Posting Group" of
                 DemoDataSetup.RawMatCode(),
                 DemoDataSetup.ManufactCode():
-                    begin
-                        case GeneralPostingSetup."Gen. Bus. Posting Group" of
-                            DemoDataSetup.DomesticCode():
-                                begin
-                                    GeneralPostingSetup.Validate("Purch. Line Disc. Account", CA.Convert('997240'));
-                                    GeneralPostingSetup.Validate("Purch. Inv. Disc. Account", CA.Convert('997240'));
-                                end;
-                            DemoDataSetup.EUCode():
-                                begin
-                                    GeneralPostingSetup.Validate("Purch. Line Disc. Account", CA.Convert('997220'));
-                                    GeneralPostingSetup.Validate("Purch. Inv. Disc. Account", CA.Convert('997220'));
-                                end;
-                            DemoDataSetup.ExportCode():
-                                begin
-                                    GeneralPostingSetup.Validate("Purch. Line Disc. Account", CA.Convert('997230'));
-                                    GeneralPostingSetup.Validate("Purch. Inv. Disc. Account", CA.Convert('997230'));
-                                end;
-                        end;
+                    case GeneralPostingSetup."Gen. Bus. Posting Group" of
+                        DemoDataSetup.DomesticCode():
+                            begin
+                                GeneralPostingSetup.Validate("Purch. Line Disc. Account", CA.Convert('997240'));
+                                GeneralPostingSetup.Validate("Purch. Inv. Disc. Account", CA.Convert('997240'));
+                            end;
+                        DemoDataSetup.EUCode():
+                            begin
+                                GeneralPostingSetup.Validate("Purch. Line Disc. Account", CA.Convert('997220'));
+                                GeneralPostingSetup.Validate("Purch. Inv. Disc. Account", CA.Convert('997220'));
+                            end;
+                        DemoDataSetup.ExportCode():
+                            begin
+                                GeneralPostingSetup.Validate("Purch. Line Disc. Account", CA.Convert('997230'));
+                                GeneralPostingSetup.Validate("Purch. Inv. Disc. Account", CA.Convert('997230'));
+                            end;
                     end;
                 DemoDataSetup.ServicesCode():
                     begin

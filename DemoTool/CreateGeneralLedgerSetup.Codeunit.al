@@ -40,6 +40,8 @@ codeunit 101098 "Create General Ledger Setup"
         "General Ledger Setup"."Check Posting Debit/Credit CZL" := true;
         "General Ledger Setup"."Print VAT specification in LCY" := true;
         "General Ledger Setup"."Max. VAT Difference Allowed" := 0.5;
+        "General Ledger Setup"."VAT Reporting Date Usage" := "General Ledger Setup"."VAT Reporting Date Usage"::"Enabled (Prevent modification)";
+        "General Ledger Setup"."Def. Orig. Doc. VAT Date CZL" := "General Ledger Setup"."Def. Orig. Doc. VAT Date CZL"::"Posting Date";
         // NAVCZ
         "General Ledger Setup"."EMU Currency" := DemoDataSetup."LCY an EMU Currency";
         "General Ledger Setup"."Local Address Format" := "General Ledger Setup"."Local Address Format"::"Post Code+City";
@@ -102,11 +104,6 @@ codeunit 101098 "Create General Ledger Setup"
         "General Ledger Setup"."Closed Per. Entry Pos.Date CZL" := CA.AdjustDate(19020101D);
         "Create No. Series".InitBaseSeries2(
             "General Ledger Setup"."Acc. Schedule Results Nos. CZL", XASRESULTS, XResultsOfAccountingSchedules, 'USV00001', 'USV99999', '', '', 1);
-#if not CLEAN22
-#pragma warning disable AL0432
-        "General Ledger Setup"."Use VAT Date CZL" := true;
-#pragma warning restore AL0432
-#endif
         "General Ledger Setup"."VAT Reporting Date Usage" := "General Ledger Setup"."VAT Reporting Date Usage"::"Enabled (Prevent modification)";
         "General Ledger Setup"."Def. Orig. Doc. VAT Date CZL" := "General Ledger Setup"."Def. Orig. Doc. VAT Date CZL"::"Posting Date";
         "General Ledger Setup"."Check Posting Debit/Credit CZL" := true;
