@@ -602,7 +602,6 @@ codeunit 139020 "Test Job Queue SNAP"
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueDispatcher: Codeunit "Job Queue Dispatcher";
-        TestJobQueueSnap: Codeunit "Test Job Queue SNAP";
         NewRunDateTime: DateTime;
         DateFormula: DateFormula;
     begin
@@ -615,12 +614,12 @@ codeunit 139020 "Test Job Queue SNAP"
         Evaluate(DateFormula, '<1D + CM>');
         JobQueueEntry.Validate("Next Run Date Formula", DateFormula);
         // [GIVEN] Subscribed to COD448.OnBeforeCalcNextRecurringRunDateTime
-        BindSubscription(TestJobQueueSnap); // to run OnBeforeCalcNextRecurringRunDateTime, that returns '01.01.01 00:00'
+        BindSubscription(this); // to run OnBeforeCalcNextRecurringRunDateTime, that returns '01.01.01 00:00'
 
         // [WHEN] Run COD448.CalcNextRunTimeForRecurringJob
         NewRunDateTime := JobQueueDispatcher.CalcNextRunTimeForRecurringJob(JobQueueEntry, JobQueueEntry."Earliest Start Date/Time");
 
-        UnBindSubscription(TestJobQueueSnap);
+        UnBindSubscription(this);
 
         // [THEN] Calculated value is '01.01.01 00:00'
         Assert.AreEqual(CreateDateTime(20010101D, 0T), NewRunDateTime, 'wrong new run datetime');
@@ -1144,6 +1143,8 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueEntries: TestPage "Job Queue Entries";
     begin
         CreateFailingJobQueueEntry(JobQueueEntry);
+        // The message does not matter, it is replaced when JQE page is opened
+        // Replaced to "Something went wrong and the job has stopped." and status becomes error
         JobQueueEntry."Error Message" := 'Part 1' + 'Part 2' + 'Part 3' + 'Part 4';
         JobQueueEntry.Modify(true);
 
@@ -1470,10 +1471,11 @@ codeunit 139020 "Test Job Queue SNAP"
 
         // [GIVEN] A job queue that can run but is set outside of running hours 
         CreateSucceedingJobQueueEntry(JobQueueEntry);
-        CurTime := DT2Time(CurrentDateTime());
+        CurTime := CurrentDateTime().Time;
         JobQueueEntry."Starting Time" := CurTime + (1000 * 60 * 60); // 1 hour forward
         JobQueueEntry."Ending Time" := CurTime - (1000 * 60 * 60); // 1 hour backward
         JobQueueEntry.Modify();
+
         Assert.RecordCount(JobQueueEntry, 1);
         Assert.RecordCount(JobQueueLogEntry, 0);
 
@@ -1496,8 +1498,7 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueEntry.SetFilter("Object ID to Run", '<>%1', Codeunit::"Job Queue Cleanup Tasks");
         JobQueueEntry.FindFirst();
         JobQueueEntry.SetRange("Object ID to Run");
-
-        CurTime := DT2Time(CurrentDateTime());
+        CurTime := CurrentDateTime().Time;
         JobQueueEntry."Starting Time" := CurTime - (1000 * 60 * 60); // 1 hour backward
         JobQueueEntry."Ending Time" := CurTime + (1000 * 60 * 60 * 22); // 22 hour forward
         JobQueueEntry.Modify();
@@ -1516,7 +1517,6 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueLogEntry: Record "Job Queue Log Entry";
         JobQueueCategory: Record "Job Queue Category";
-        TestJobQueueSnap: Codeunit "Test Job Queue SNAP";
         OrgTaskID: Guid;
     begin
         // [SCENARIO] Job queue cleanup will remove stale jobs
@@ -1539,10 +1539,10 @@ codeunit 139020 "Test Job Queue SNAP"
         Assert.RecordCount(JobQueueLogEntry, 0);
 
         // [WHEN] Run the job queue cleanup runs more than 10 minutes later
-        BindSubscription(TestJobQueueSnap); // to run OnGetCheckDelayInMinutes
+        BindSubscription(this); // to run OnGetCheckDelayInMinutes
         Sleep(1000);  // Just to be sure some time has passed
         Codeunit.Run(Codeunit::"Job Queue Cleanup Tasks", JobQueueEntry);
-        UnBindSubscription(TestJobQueueSnap);
+        UnBindSubscription(this);
 
         // [THEN] The job queue entry is set to 'error'
         JobQueueEntry.SetRange(Status, JobQueueEntry.Status::Error);
@@ -1612,8 +1612,6 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
         JobQueueEntry."Object ID to Run" := 132453;
         JobQueueEntry.Status := JobQueueEntry.Status::"In Process";
-        // Do not set "User Service Instance ID", that is set is a separate session
-        JobQueueEntry."User Session ID" := SessionId();
         JobQueueEntry.Insert(true);
     end;
 

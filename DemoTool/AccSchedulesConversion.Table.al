@@ -17,7 +17,7 @@ table 160801 "Acc. Schedules Conversion"
         }
         field(3; "Totaling (Old)"; Text[80])
         {
-            CalcFormula = Lookup("Acc. Schedule Line".Totaling where("Schedule Name" = field("Schedule Name"),
+            CalcFormula = lookup("Acc. Schedule Line".Totaling where("Schedule Name" = field("Schedule Name"),
                                                                       "Line No." = field("Line No.")));
             Caption = 'Totaling (Old)';
             Editable = false;
@@ -29,7 +29,7 @@ table 160801 "Acc. Schedules Conversion"
         }
         field(5; "Row No."; Code[10])
         {
-            CalcFormula = Lookup("Acc. Schedule Line"."Row No." where("Schedule Name" = field("Schedule Name"),
+            CalcFormula = lookup("Acc. Schedule Line"."Row No." where("Schedule Name" = field("Schedule Name"),
                                                                        "Line No." = field("Line No.")));
             Caption = 'Row No.';
             Editable = false;
@@ -37,7 +37,7 @@ table 160801 "Acc. Schedules Conversion"
         }
         field(6; Description; Text[80])
         {
-            CalcFormula = Lookup("Acc. Schedule Line".Description where("Schedule Name" = field("Schedule Name"),
+            CalcFormula = lookup("Acc. Schedule Line".Description where("Schedule Name" = field("Schedule Name"),
                                                                          "Line No." = field("Line No.")));
             Caption = 'Description';
             Editable = false;

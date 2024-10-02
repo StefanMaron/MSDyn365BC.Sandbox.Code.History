@@ -16,7 +16,7 @@ table 160802 "Analysis Conversion"
         }
         field(4; Name; Text[50])
         {
-            CalcFormula = Lookup("Analysis View".Name where(Code = field("Analysis Code")));
+            CalcFormula = lookup("Analysis View".Name where(Code = field("Analysis Code")));
             Caption = 'Name';
             Editable = false;
             FieldClass = FlowField;
