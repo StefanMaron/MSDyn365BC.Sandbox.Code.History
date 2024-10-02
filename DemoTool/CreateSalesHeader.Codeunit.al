@@ -71,9 +71,6 @@ codeunit 101036 "Create Sales Header"
         CA: Codeunit "Make Adjustments";
         i: Integer;
         "Date Displacement": Text[1];
-#if not CLEAN22
-        XCENTRAL: Label 'CENTRAL';
-#endif
         XBEE: Label 'BEE';
         XFACTORING: Label 'FACTORING';
         X14DAYS: Label '14 DAYS';
@@ -93,11 +90,8 @@ codeunit 101036 "Create Sales Header"
         //IF "Sell-to Customer No." = '50000' THEN
         //  "Sales Header"."Job No." := XGUILDFORD10CR;
         if "Sales Header"."Sell-to Customer No." = '40000' then begin
-#if not CLEAN22
-            "Sales Header"."Pay-at Code" := XCENTRAL;
-#endif
             "Sales Header"."Cust. Bank Acc. Code" := XBEE;
-            //if ("Posting Date" = 12010003D) OR ("Posting Date" = 11010003D) OR ("Posting Date" = 20010003D) THEN BEGIN
+            //if ("Posting Date" = 12010003D) or ("Posting Date" = 11010003D) or ("Posting Date" = 20010003D) THEN BEGIN
             if ("Posting Date" = 19030112D) or ("Posting Date" = 19030111D) or ("Posting Date" = 19030120D) then begin
                 "Sales Header"."Payment Method Code" := XFACTORING;
                 "Sales Header"."Payment Terms Code" := X14DAYS;

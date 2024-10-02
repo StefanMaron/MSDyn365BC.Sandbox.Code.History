@@ -201,7 +201,7 @@ table 130021 "Test Line"
         if not TestMgt.FindCALCodeLine("Test Codeunit", "Function", TempCodeCoverage) then
             exit(-1);
         if TempCodeCoverage.FindSet() then begin
-            if GetFeatureTags(TempCodeCoverage, FeatureTags) then begin
+            if GetFeatureTags(TempCodeCoverage, FeatureTags) then
                 if "Function" = 'OnRun' then begin
                     "Feature Tags" := CopyStr(FeatureTags, 1, MaxStrLen("Feature Tags"));
                     CodeunitTestLine := Rec;
@@ -210,7 +210,6 @@ table 130021 "Test Line"
                     CodeunitTestLine.Modify();
                 end else
                     "Feature Tags" := CopyStr(FeatureTags + ' ' + "Feature Tags", 1, MaxStrLen("Feature Tags"));
-            end;
             StepTestLine."Line No." := "Line No.";
             TempCodeCoverage.SetRange("Line Type", 5); // step tags
             if TempCodeCoverage.FindSet() then
@@ -274,22 +273,20 @@ table 130021 "Test Line"
             exit;
 
         CopyOfTestLine.Copy(TestLine);
-        with TestLine do begin
-            Reset();
-            SetRange("Test Suite", "Test Suite");
-            repeat
-                OutOfGroup :=
-                  (Next(-1) = 0) or
-                  ("Test Codeunit" <> CopyOfTestLine."Test Codeunit");
+        TestLine.Reset();
+        TestLine.SetRange("Test Suite", TestLine."Test Suite");
+        repeat
+            OutOfGroup :=
+              (TestLine.Next(-1) = 0) or
+              (TestLine."Test Codeunit" <> CopyOfTestLine."Test Codeunit");
 
-                if (("Line Type" in ["Line Type"::Group, "Line Type"::Codeunit]) or ("Function" = 'OnRun')) and
-                   not Run
-                then begin
-                    Run := true;
-                    Modify();
-                end;
-            until OutOfGroup;
-        end;
+            if ((TestLine."Line Type" in [TestLine."Line Type"::Group, TestLine."Line Type"::Codeunit]) or (TestLine."Function" = 'OnRun')) and
+               not TestLine.Run
+            then begin
+                TestLine.Run := true;
+                TestLine.Modify();
+            end;
+        until OutOfGroup;
         TestLine.Copy(CopyOfTestLine);
     end;
 
@@ -302,14 +299,12 @@ table 130021 "Test Line"
             exit;
 
         CopyOfTestLine.Copy(TestLine);
-        with TestLine do begin
-            Reset();
-            SetRange("Test Suite", "Test Suite");
-            SetFilter("Line Type", '<%1', "Line Type"::SCENARIO);
-            while (Next() <> 0) and not ("Line Type" in ["Line Type"::Group, CopyOfTestLine."Line Type"]) do begin
-                Run := CopyOfTestLine.Run;
-                Modify();
-            end;
+        TestLine.Reset();
+        TestLine.SetRange("Test Suite", TestLine."Test Suite");
+        TestLine.SetFilter("Line Type", '<%1', TestLine."Line Type"::SCENARIO);
+        while (TestLine.Next() <> 0) and not (TestLine."Line Type" in [TestLine."Line Type"::Group, CopyOfTestLine."Line Type"]) do begin
+            TestLine.Run := CopyOfTestLine.Run;
+            TestLine.Modify();
         end;
         TestLine.Copy(CopyOfTestLine);
     end;
@@ -319,16 +314,14 @@ table 130021 "Test Line"
     var
         TestLine: Record "Test Line";
     begin
-        with TestLine do begin
-            Copy(Rec);
-            Reset();
-            SetRange("Test Suite", "Test Suite");
+        TestLine.Copy(Rec);
+        TestLine.Reset();
+        TestLine.SetRange("Test Suite", TestLine."Test Suite");
 
-            MinLineNo := "Line No.";
-            repeat
-                MinLineNo := "Line No.";
-            until (Level < 2) or (Next(-1) = 0);
-        end;
+        MinLineNo := TestLine."Line No.";
+        repeat
+            MinLineNo := TestLine."Line No.";
+        until (TestLine.Level < 2) or (TestLine.Next(-1) = 0);
     end;
 
     [Scope('OnPrem')]
@@ -336,15 +329,13 @@ table 130021 "Test Line"
     var
         TestLine: Record "Test Line";
     begin
-        with TestLine do begin
-            Copy(Rec);
-            Reset();
-            SetRange("Test Suite", "Test Suite");
+        TestLine.Copy(Rec);
+        TestLine.Reset();
+        TestLine.SetRange("Test Suite", TestLine."Test Suite");
 
-            MaxLineNo := "Line No.";
-            while (Next() <> 0) and (Level >= Rec.Level) do
-                MaxLineNo := "Line No.";
-        end;
+        MaxLineNo := TestLine."Line No.";
+        while (TestLine.Next() <> 0) and (TestLine.Level >= Rec.Level) do
+            MaxLineNo := TestLine."Line No.";
     end;
 
     [Scope('OnPrem')]
@@ -355,16 +346,14 @@ table 130021 "Test Line"
         TestField("Test Codeunit");
         NoOfFunctions := 0;
 
-        with TestLine do begin
-            Copy(Rec);
-            Reset();
-            SetRange("Test Suite", "Test Suite");
-            MaxLineNo := "Line No.";
-            while (Next() <> 0) and ("Line Type" in ["Line Type"::"Function" .. "Line Type"::"THEN"]) do begin
-                MaxLineNo := "Line No.";
-                if Run then
-                    NoOfFunctions += 1;
-            end;
+        TestLine.Copy(Rec);
+        TestLine.Reset();
+        TestLine.SetRange("Test Suite", TestLine."Test Suite");
+        MaxLineNo := TestLine."Line No.";
+        while (TestLine.Next() <> 0) and (TestLine."Line Type" in [TestLine."Line Type"::"Function" .. TestLine."Line Type"::"THEN"]) do begin
+            MaxLineNo := TestLine."Line No.";
+            if TestLine.Run then
+                NoOfFunctions += 1;
         end;
     end;
 

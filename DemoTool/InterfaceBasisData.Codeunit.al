@@ -142,18 +142,12 @@ codeunit 110000 "Interface Basis Data"
         "Create Currency".ModifyData();
 
         RunCodeunit(CODEUNIT::"Create Customer");
-#if not CLEAN22
-        RunCodeunit(CODEUNIT::"Create Customer Pmt. Address");
-#endif
         RunCodeunit(CODEUNIT::"Create Customer Rating");
         RunCodeunit(CODEUNIT::"Crear Sufijo Banco");
         RunCodeunit(CODEUNIT::"Create Ship-to Address");
         RunCodeunit(CODEUNIT::"Create Vendor");
         RunCodeunit(CODEUNIT::"Create Order Address");
         RunCodeunit(CODEUNIT::"Create C/V Bank Account");
-#if not CLEAN22
-        RunCodeunit(CODEUNIT::"Create Vendor Pmt. Address");
-#endif
         RunCodeunit(CODEUNIT::"Create Item");
         RunCodeunit(CODEUNIT::"Create Item Translation");
 
@@ -310,9 +304,6 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Media Repository");
         RunCodeunit(CODEUNIT::"Create Excel Templates");
         RunCodeunit(Codeunit::"Create Word Templates");
-#if not CLEAN22
-        RunCodeunit(CODEUNIT::"Create Intrastat Demo Data");
-#endif
         RunCodeunit(CODEUNIT::"Create Incoming Document");
         RunCodeunit(CODEUNIT::"Create Text To Account Mapping");
         RunCodeunit(CODEUNIT::"Create Late Payment Model");
@@ -496,7 +487,7 @@ codeunit 110000 "Interface Basis Data"
         PurchCalcDiscount: Codeunit "Purch.-Calc.Discount";
     begin
         PurchaseHeader.SetRange("Posting Date", Date);
-        if PurchaseHeader.Find('-') then begin
+        if PurchaseHeader.Find('-') then
             repeat
                 PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
                 PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
@@ -512,7 +503,6 @@ codeunit 110000 "Interface Basis Data"
                 PurchPost.Run(PurchaseHeader);
                 Clear(PurchPost);
             until PurchaseHeader.Next() = 0;
-        end;
     end;
 
     procedure ShipSales(Date: Date)
@@ -524,7 +514,7 @@ codeunit 110000 "Interface Basis Data"
         DateDisplacement: Text[1];
     begin
         SalesHeader.SetRange("Posting Date", Date);
-        if SalesHeader.Find('-') then begin
+        if SalesHeader.Find('-') then
             repeat
                 if SalesHeader."Document Type" = SalesHeader."Document Type"::Order then begin
                     DateDisplacement := CopyStr(SalesHeader."No.", StrLen(SalesHeader."No."), 1);
@@ -560,7 +550,6 @@ codeunit 110000 "Interface Basis Data"
                     end;
                 end;
             until SalesHeader.Next() = 0;
-        end;
     end;
 
     procedure InvoiceSales(Date: Date)
@@ -571,7 +560,7 @@ codeunit 110000 "Interface Basis Data"
         SalesCalcDiscount: Codeunit "Sales-Calc. Discount";
     begin
         SalesHeader.SetRange("Posting Date", Date);
-        if SalesHeader.Find('-') then begin
+        if SalesHeader.Find('-') then
             repeat
                 SalesLine.Reset();
                 SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -590,7 +579,6 @@ codeunit 110000 "Interface Basis Data"
                     Clear(SalesPost);
                 end;
             until SalesHeader.Next() = 0;
-        end;
     end;
 
     procedure PostGeneralJournalLines(Date: Date)
@@ -648,7 +636,7 @@ codeunit 110000 "Interface Basis Data"
         GenJournalLine.Reset();
         GenJournalLine.SetRange("Posting Date", Date);
         GenJournalLine.SetFilter(Quantity, '<>0');
-        if GenJournalLine.Find('-') then begin
+        if GenJournalLine.Find('-') then
             repeat
                 case GenJournalLine."Account Type" of
                     GenJournalLine."Account Type"::Customer:
@@ -659,7 +647,6 @@ codeunit 110000 "Interface Basis Data"
                         ProcessBankAccountOpeningEntries(GenJournalLine, Allocated2920, Allocated5310);
                 end;
             until GenJournalLine.Next() = 0;
-        end;
     end;
 
     local procedure ProcessCustomerOpeningEntries(var GenJournalLine: Record "Gen. Journal Line"; var Allocated2310: Decimal; var Allocated2320: Decimal)
@@ -828,7 +815,7 @@ codeunit 110000 "Interface Basis Data"
         CopyGLBudget: Report "Copy G/L Budget";
         DateFilter: Text[30];
     begin
-        if Dim.Find('-') then begin
+        if Dim.Find('-') then
             repeat
                 SelectedDim."User ID" := UserId;
                 SelectedDim."Object Type" := 3;
@@ -836,7 +823,6 @@ codeunit 110000 "Interface Basis Data"
                 SelectedDim."Dimension Code" := Dim.Code;
                 SelectedDim.Insert();
             until Dim.Next() = 0;
-        end;
 
         if DemoDataSetup."Test Demonstration Company" = true then begin
             DateFilter :=

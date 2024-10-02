@@ -1,4 +1,4 @@
-codeunit 101018 "Create Customer"
+﻿codeunit 101018 "Create Customer"
 {
 
     trigger OnRun()
@@ -239,7 +239,7 @@ codeunit 101018 "Create Customer"
                     Counter := 1;
                 end;
         end;
-        if Customer."No." <> '40000' then begin
+        if Customer."No." <> '40000' then
             case (Counter - 1) mod 3 of
                 0:
                     begin
@@ -261,8 +261,8 @@ codeunit 101018 "Create Customer"
                         Customer.Validate("Payment Terms Code", XCM);
                         Customer.Validate("Payment Method Code", XBANK);
                     end;
-            end;
-        end else begin
+            end
+        else begin
             Customer.Validate("Customer Disc. Group", XLARGEACC);
             Customer.Validate("Payment Terms Code", X3X30DAYS);
             Customer.Validate("Payment Method Code", XEFECTO);
