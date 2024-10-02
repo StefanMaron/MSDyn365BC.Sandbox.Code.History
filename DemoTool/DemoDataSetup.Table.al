@@ -86,8 +86,8 @@ table 101900 "Demo Data Setup"
         field(51; "Data Language ID"; Integer)
         {
             Caption = 'Data Language ID';
-            TableRelation = "Windows Language" WHERE("Globally Enabled" = CONST(true),
-                                                      "STX File Exist" = CONST(true));
+            TableRelation = "Windows Language" where("Globally Enabled" = const(true),
+                                                      "STX File Exist" = const(true));
 
             trigger OnValidate()
             begin
@@ -99,7 +99,7 @@ table 101900 "Demo Data Setup"
         }
         field(52; "Data Language Name"; Text[80])
         {
-            CalcFormula = Lookup("Windows Language".Name where("Language ID" = field("Data Language ID")));
+            CalcFormula = lookup("Windows Language".Name where("Language ID" = field("Data Language ID")));
             Caption = 'Data Language Name';
             Editable = false;
             FieldClass = FlowField;
