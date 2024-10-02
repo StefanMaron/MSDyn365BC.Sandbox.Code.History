@@ -14,7 +14,7 @@ xmlport 130005 "Coverage Results Detailed"
             tableelement("Code Coverage"; "Code Coverage")
             {
                 XmlName = 'CodeCoverage';
-                SourceTableView = sorting("Object Type", "Object ID", "Line No.") order(Ascending);
+                SourceTableView = sorting("Object Type", "Object ID", "Line No.") order(ascending);
                 textelement(CheckinID)
                 {
                 }

@@ -3,10 +3,9 @@ codeunit 135161 "Cloud Mig Country Tables"
     procedure GetTablesThatShouldBeCloudMigrated(var ListOfTablesToMigrate: List of [Integer])
     begin
         ListOfTablesToMigrate.Add(Database::"Bank Directory");
-#if not CLEAN22
-        ListOfTablesToMigrate.Add(Database::"Certificate");
-#endif
+#if not CLEAN25
         ListOfTablesToMigrate.Add(Database::"DACH Report Selections");
+#endif
         ListOfTablesToMigrate.Add(Database::"Data Exp. Primary Key Buffer");
         ListOfTablesToMigrate.Add(Database::"Data Export Buffer");
         ListOfTablesToMigrate.Add(Database::"Data Export Record Definition");

@@ -1,13 +1,8 @@
 {
-  "settings": {
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false
-  },
   "folders": [
+    {
+      "path": "./AI Test Toolkit"
+    },
     {
       "path": "./Business Foundation Test Libraries"
     },
@@ -114,6 +109,9 @@
       "path": "./Tests-SCM"
     },
     {
+      "path": "./Tests-Service"
+    },
+    {
       "path": "./Tests-SINGLESERVER"
     },
     {
@@ -138,6 +136,9 @@
       "path": "./Tests-Workflow"
     },
     {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
       "path": "./Base Application/System/DevTools/CALTest"
     },
     {
@@ -145,6 +146,17 @@
     },
     {
       "path": "./System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false
+  }
 }
