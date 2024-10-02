@@ -18,9 +18,6 @@ codeunit 101314 "Create Resources Setup"
                   NoSeries."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence)
             else
                 ResourcesSetup."Time Sheet Nos." := XTS;
-#if not CLEAN22
-        ResourcesSetup."Use New Time Sheet Experience" := true;
-#endif
         ResourcesSetup.Modify();
     end;
 

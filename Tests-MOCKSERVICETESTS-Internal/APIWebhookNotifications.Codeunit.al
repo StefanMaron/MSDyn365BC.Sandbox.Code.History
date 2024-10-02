@@ -52,6 +52,7 @@ codeunit 135088 "API Webhook Notifications"
     local procedure InitializeCDSConnectionSetup()
     var
         CDSConnectionSetup: Record "CDS Connection Setup";
+        ClientSecret: Text;
     begin
         CDSConnectionSetup.DeleteAll();
         CDSConnectionSetup."Business Events Enabled" := true;
@@ -59,7 +60,8 @@ codeunit 135088 "API Webhook Notifications"
         CDSConnectionSetup."Authentication Type" := CDSConnectionSetup."Authentication Type"::Office365;
         CDSConnectionSetup.Insert();
         CDSConnectionSetup.Validate("Client Id", 'ClientId');
-        CDSConnectionSetup.SetClientSecret('ClientSecret');
+        ClientSecret := 'ClientSecret';
+        CDSConnectionSetup.SetClientSecret(ClientSecret);
         CDSConnectionSetup.Validate("Redirect URL", 'RedirectURL');
         CDSConnectionSetup.Modify();
     end;

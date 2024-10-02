@@ -1,4 +1,4 @@
-codeunit 119027 "Create Routing Lines"
+﻿codeunit 119027 "Create Routing Lines"
 {
 
     trigger OnRun()
@@ -74,9 +74,7 @@ codeunit 119027 "Create Routing Lines"
         if RoutingNo = '2000' then begin
             case OperationNo of
                 '10':
-                    begin
-                        RtngLine.Validate("WIP Item", false);
-                    end;
+                    RtngLine.Validate("WIP Item", false);
                 '20':
                     begin
                         RtngLine.Validate("Standard Task Code", '1');

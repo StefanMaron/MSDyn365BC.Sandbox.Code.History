@@ -38,9 +38,6 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"Goods Appearance");
         ListOfTablesToMigrate.Add(Database::"Incl. in VAT Report Error Log");
         ListOfTablesToMigrate.Add(Database::"Interest on Arrears");
-#if not CLEAN22
-        ListOfTablesToMigrate.Add(Database::"Intra - form Buffer");
-#endif
         ListOfTablesToMigrate.Add(Database::"Issued Customer Bill Header");
         ListOfTablesToMigrate.Add(Database::"Issued Customer Bill Line");
         ListOfTablesToMigrate.Add(Database::"Item Cost History");
