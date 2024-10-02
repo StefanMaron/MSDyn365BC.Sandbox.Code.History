@@ -388,9 +388,9 @@ codeunit 101018 "Create Customer"
         Customer.Modify(true);
     end;
 
-    local procedure SetTaxLiable("Code": Code[20])
+    local procedure SetTaxLiable(CustomerNo: Code[20])
     begin
-        Customer.Get(Code);
+        Customer.Get(CustomerNo);
         Customer."Tax Liable" := true;
         Customer.Modify(true);
     end;

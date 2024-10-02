@@ -224,12 +224,10 @@ codeunit 139094 "Local Performance Tests"
     local procedure CreateGenJournalBatch(var GenJournalBatch: Record "Gen. Journal Batch"; BalAccountNo: Code[20])
     begin
         LibraryERM.CreateGenJournalBatch(GenJournalBatch, LibraryPaymentExport.SelectPaymentJournalTemplate());
-        with GenJournalBatch do begin
-            "Bal. Account Type" := "Bal. Account Type"::"Bank Account";
-            "Bal. Account No." := BalAccountNo;
-            "Allow Payment Export" := true;
-            Modify();
-        end;
+        GenJournalBatch."Bal. Account Type" := GenJournalBatch."Bal. Account Type"::"Bank Account";
+        GenJournalBatch."Bal. Account No." := BalAccountNo;
+        GenJournalBatch."Allow Payment Export" := true;
+        GenJournalBatch.Modify();
     end;
 
     local procedure CreateSalesDocumentPrepayment(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; CustomerNo: Code[20]; ItemNo: Code[20])

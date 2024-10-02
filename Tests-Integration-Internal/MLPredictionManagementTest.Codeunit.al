@@ -401,8 +401,10 @@ codeunit 135208 "ML Prediction Management Test"
     var
         TempPredictionData: Record "Prediction Data" temporary;
         AzureAIUsage: Record "Azure AI Usage";
+        AzureAIUsageImpl: Codeunit "Azure AI Usage Impl.";
         MLPredictionManagement: Codeunit "ML Prediction Management";
         EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
+        AzureAIService: Enum "Azure AI Service";
         Model: Text;
         Quality: Decimal;
         LastDateTimeUpdated: DateTime;
@@ -418,7 +420,8 @@ codeunit 135208 "ML Prediction Management Test"
 
         // [GIVEN] A usage record exists for Azure ML, with say 1000 seconds of usage
         AzureAIUsage.DeleteAll();
-        AzureAIUsage.GetSingleInstance(AzureAIUsage.Service::"Machine Learning");
+
+        AzureAIUsageImpl.GetSingleInstance(AzureAIService::"Machine Learning", AzureAIUsage);
         AzureAIUsage."Total Resource Usage" := 3;
         LastDateTimeUpdated := CurrentDateTime - 1000;
         AzureAIUsage."Last DateTime Updated" := LastDateTimeUpdated;
@@ -428,7 +431,7 @@ codeunit 135208 "ML Prediction Management Test"
         MLPredictionManagement.Train(Model, Quality);
 
         // [THEN] Usage is incremented with the processing time
-        AzureAIUsage.GetSingleInstance(AzureAIUsage.Service::"Machine Learning");
+        AzureAIUsageImpl.GetSingleInstance(AzureAIService::"Machine Learning", AzureAIUsage);
         Assert.IsTrue(AzureAIUsage."Total Resource Usage" > 3, 'Processing time has not increased');
 
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(false);
@@ -439,8 +442,10 @@ codeunit 135208 "ML Prediction Management Test"
     procedure TestInitializeWithKeyVaultCredentialsChecksForExcessUsage()
     var
         AzureAIUsage: Record "Azure AI Usage";
+        AzureAIUsageImpl: Codeunit "Azure AI Usage Impl.";
         MLPredictionManagement: Codeunit "ML Prediction Management";
         EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
+        AzureAIService: Enum "Azure AI Service";
     begin
         // [SCENARIO] Initializing with Key vault credentials errors out if the usage limit has been reached.
         LibraryLowerPermissions.SetO365Basic();
@@ -449,7 +454,7 @@ codeunit 135208 "ML Prediction Management Test"
 
         // [GIVEN] A usage record exists for Azure ML, with say 1000 seconds of usage which is the same as its original quota
         AzureAIUsage.DeleteAll();
-        AzureAIUsage.GetSingleInstance(AzureAIUsage.Service::"Machine Learning");
+        AzureAIUsageImpl.GetSingleInstance(AzureAIService::"Machine Learning", AzureAIUsage);
         AzureAIUsage."Total Resource Usage" := AzureAIUsage."Original Resource Limit" + 1;
         AzureAIUsage.Modify();
 

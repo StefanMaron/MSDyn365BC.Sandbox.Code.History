@@ -1185,7 +1185,7 @@ codeunit 101015 "Create G/L Account"
         InsertData(CurrencyLosses(), CurrencyLossesName(), 0, 0, 0, '', 1, '', '', '', '', true);
         InsertData(TotalMiscExpenses(), TotalMiscExpensesName(), 4, 0, 0, '90000..91999', 1, '', '', '', '', true);
         InsertData(TOTALEXPENSES(), TOTALEXPENSESName(), 4, 0, 0, '60001..98990', 1, '', '', '', '', true);
-        InsertData(NETINCOME(), NETINCOMEName(), 2, 0, 0, TOTALINCOME() + '|' + TOTALCOSTOFGOODSSOLD() + '|' + TOTALEXPENSES(), 0, '', '', '', '', true);
+        InsertData(NETINCOME(), NETINCOMEName(), 2, 0, 0, '40000..49999|50000..59999|60000..99999', 0, '', '', '', '', true);
     end;
 
     procedure AddBalanceSheetForMini()
@@ -1273,7 +1273,7 @@ codeunit 101015 "Create G/L Account"
         InsertData(Otherbankaccounts(), OtherbankaccountsName(), 0, 1, 0, '', 0, '', '', '', '', true);
         InsertData(CertificateofDeposit(), CertificateofDepositName(), 0, 1, 0, '', 0, '', '', '', '', true);
         InsertData(TotalCashandBank(), TotalCashandBankName(), 4, 1, 0, '18000..18999', 0, '', '', '', '', true);
-        InsertData(TotalAssets(), TotalAssetsName(), 4, 1, 0, '10001..19999', 0, '', '', '', '', true);
+        InsertData(TotalAssets(), TotalAssetsName(), 4, 1, 0, '11000..19999', 0, '', '', '', '', true);
         InsertData(Liability(), LiabilityName(), 3, 1, 0, '', 0, '', '', '', '', true);
         InsertData(Long_TermLiabilities(), Long_TermLiabilitiesName(), 3, 1, 0, '', 0, '', '', '', '', true);
         InsertData(BondsandDebentureLoans(), BondsandDebentureLoansName(), 0, 1, 0, '', 0, '', '', '', '', true);
@@ -1559,6 +1559,8 @@ codeunit 101015 "Create G/L Account"
                 UpdateGLAccounts(GLAccountCategory, '16100', '16600');
             GLAccountCategoryMgt.GetInventory():
                 UpdateGLAccounts(GLAccountCategory, '14000', '14999');
+            GLAccountCategoryMgt.GetAR():
+                UpdateGLAccounts(GLAccountCategory, '15000', '15200');
             GLAccountCategoryMgt.GetEquipment():
                 UpdateGLAccounts(GLAccountCategory, '12210', '12299');
             GLAccountCategoryMgt.GetAccumDeprec():
