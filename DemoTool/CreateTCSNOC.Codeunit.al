@@ -4,32 +4,30 @@ codeunit 101227 "Create TCS NOC"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('A', XA, false);
-            InsertData('B', XB, false);
-            InsertData('C', XC, false);
-            InsertData('D', XD, false);
-            InsertData('E', XE, false);
-            InsertData('F', XF, false);
-            InsertData('G', XG, false);
-            InsertData('H', XH, false);
-            InsertData('I', XI, false);
-            InsertData('L', XL, false);
-            InsertData('M', XM, false);
-            InsertData('1H', X1H, true);
+        DemoDataSetup.Get();
+        InsertData('A', XA, false);
+        InsertData('B', XB, false);
+        InsertData('C', XC, false);
+        InsertData('D', XD, false);
+        InsertData('E', XE, false);
+        InsertData('F', XF, false);
+        InsertData('G', XG, false);
+        InsertData('H', XH, false);
+        InsertData('I', XI, false);
+        InsertData('L', XL, false);
+        InsertData('M', XM, false);
+        InsertData('1H', X1H, true);
 
-            CreateTCSPostingSetup('A', DMY2Date(1, 1, 2010), '5971');
-            CreateTCSPostingSetup('B', DMY2Date(1, 1, 2010), '5972');
-            CreateTCSPostingSetup('C', DMY2Date(1, 1, 2010), '5973');
-            CreateTCSPostingSetup('D', DMY2Date(1, 1, 2010), '5974');
-            CreateTCSPostingSetup('E', DMY2Date(1, 1, 2010), '5975');
-            CreateTCSPostingSetup('F', DMY2Date(1, 1, 2010), '5976');
-            CreateTCSPostingSetup('G', DMY2Date(1, 1, 2010), '5977');
-            CreateTCSPostingSetup('H', DMY2Date(1, 1, 2010), '5978');
-            CreateTCSPostingSetup('I', DMY2Date(1, 1, 2010), '5979');
-            CreateTCSPostingSetup('1H', DMY2Date(1, 10, 2020), '5978');
-        end;
+        CreateTCSPostingSetup('A', DMY2Date(1, 1, 2010), '5971');
+        CreateTCSPostingSetup('B', DMY2Date(1, 1, 2010), '5972');
+        CreateTCSPostingSetup('C', DMY2Date(1, 1, 2010), '5973');
+        CreateTCSPostingSetup('D', DMY2Date(1, 1, 2010), '5974');
+        CreateTCSPostingSetup('E', DMY2Date(1, 1, 2010), '5975');
+        CreateTCSPostingSetup('F', DMY2Date(1, 1, 2010), '5976');
+        CreateTCSPostingSetup('G', DMY2Date(1, 1, 2010), '5977');
+        CreateTCSPostingSetup('H', DMY2Date(1, 1, 2010), '5978');
+        CreateTCSPostingSetup('I', DMY2Date(1, 1, 2010), '5979');
+        CreateTCSPostingSetup('1H', DMY2Date(1, 10, 2020), '5978');
     end;
 
     var
@@ -54,32 +52,30 @@ codeunit 101227 "Create TCS NOC"
 
     local procedure AddTCSNOCForMini()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('A', XA, false);
-            InsertData('B', XB, false);
-            InsertData('C', XC, false);
-            InsertData('D', XD, false);
-            InsertData('E', XE, false);
-            InsertData('F', XF, false);
-            InsertData('G', XG, false);
-            InsertData('H', XH, false);
-            InsertData('I', XI, false);
-            InsertData('L', XL, false);
-            InsertData('M', XM, false);
-            InsertData('1H', X1H, true);
+        DemoDataSetup.Get();
+        InsertData('A', XA, false);
+        InsertData('B', XB, false);
+        InsertData('C', XC, false);
+        InsertData('D', XD, false);
+        InsertData('E', XE, false);
+        InsertData('F', XF, false);
+        InsertData('G', XG, false);
+        InsertData('H', XH, false);
+        InsertData('I', XI, false);
+        InsertData('L', XL, false);
+        InsertData('M', XM, false);
+        InsertData('1H', X1H, true);
 
-            CreateTCSPostingSetup('A', DMY2Date(1, 4, 2019), '5971');
-            CreateTCSPostingSetup('B', DMY2Date(1, 4, 2019), '5972');
-            CreateTCSPostingSetup('C', DMY2Date(1, 4, 2019), '5973');
-            CreateTCSPostingSetup('D', DMY2Date(1, 4, 2019), '5974');
-            CreateTCSPostingSetup('E', DMY2Date(1, 4, 2019), '5975');
-            CreateTCSPostingSetup('F', DMY2Date(1, 4, 2019), '5976');
-            CreateTCSPostingSetup('G', DMY2Date(1, 4, 2019), '5977');
-            CreateTCSPostingSetup('H', DMY2Date(1, 4, 2019), '5978');
-            CreateTCSPostingSetup('I', DMY2Date(1, 4, 2019), '5979');
-            CreateTCSPostingSetup('1H', DMY2Date(1, 10, 2020), '5978');
-        end;
+        CreateTCSPostingSetup('A', DMY2Date(1, 4, 2019), '5971');
+        CreateTCSPostingSetup('B', DMY2Date(1, 4, 2019), '5972');
+        CreateTCSPostingSetup('C', DMY2Date(1, 4, 2019), '5973');
+        CreateTCSPostingSetup('D', DMY2Date(1, 4, 2019), '5974');
+        CreateTCSPostingSetup('E', DMY2Date(1, 4, 2019), '5975');
+        CreateTCSPostingSetup('F', DMY2Date(1, 4, 2019), '5976');
+        CreateTCSPostingSetup('G', DMY2Date(1, 4, 2019), '5977');
+        CreateTCSPostingSetup('H', DMY2Date(1, 4, 2019), '5978');
+        CreateTCSPostingSetup('I', DMY2Date(1, 4, 2019), '5979');
+        CreateTCSPostingSetup('1H', DMY2Date(1, 10, 2020), '5978');
     end;
 
     procedure InsertData(Code: Code[20]; Description: Text[100]; TCSOnReceipt: Boolean)

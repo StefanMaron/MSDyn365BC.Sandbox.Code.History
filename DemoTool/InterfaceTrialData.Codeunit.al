@@ -172,9 +172,6 @@ codeunit 122000 "Interface Trial Data"
         RunCodeunit(CODEUNIT::"Create Custom Report Layout");
         RunCodeunit(CODEUNIT::"Create Cue Setup");
         RunCodeunit(CODEUNIT::"Create O365 HTML Templates");
-#if not CLEAN22
-        RunCodeunit(CODEUNIT::"Create Intrastat Demo Data");
-#endif
         RunCodeunit(CODEUNIT::"Create Tariff Number");
         RunCodeunit(CODEUNIT::"Create Transaction Type");
         CreateItemJournalTemplate.InsertMiniAppData();

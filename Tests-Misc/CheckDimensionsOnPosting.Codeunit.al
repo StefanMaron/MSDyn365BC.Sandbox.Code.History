@@ -2352,10 +2352,9 @@ codeunit 134486 "Check Dimensions On Posting"
         // [GIVEN] Gen. Journal Template "GJT", Gen. Journal Batch "GJB", Line No. "1000".
         LibraryERM.CreateGenJournalTemplate(GenJnlTemplate);
         LibraryERM.CreateGenJournalBatch(GenJnlBatch, GenJnlTemplate.Name);
-        with GenJnlLine do
-            LibraryERM.CreateGeneralJnlLineWithBalAcc(
-              GenJnlLine, GenJnlTemplate.Name, GenJnlBatch.Name, "Document Type"::" ", "Account Type"::"G/L Account", GLAccNo[1],
-              "Bal. Account Type"::"G/L Account", GLAccNo[2], LibraryRandom.RandInt(100));
+        LibraryERM.CreateGeneralJnlLineWithBalAcc(
+            GenJnlLine, GenJnlTemplate.Name, GenJnlBatch.Name, GenJnlLine."Document Type"::" ", GenJnlLine."Account Type"::"G/L Account", GLAccNo[1],
+            GenJnlLine."Bal. Account Type"::"G/L Account", GLAccNo[2], LibraryRandom.RandInt(100));
 
         // [WHEN] Gen. Journal Line is posted.
         asserterror LibraryERM.PostGeneralJnlLine(GenJnlLine);

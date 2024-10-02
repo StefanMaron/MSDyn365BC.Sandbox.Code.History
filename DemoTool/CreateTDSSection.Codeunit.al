@@ -3,36 +3,34 @@ codeunit 101017 "Create TDS Section"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(X194C, X194CContractor, '94C', '');
-            InsertData(XS, XSContractorSingletransaction, '94C', '194C');
-            InsertData(XC, XCContractorConsolidatedPaymentDuringtheFY, '94C', '194C');
-            InsertData(X194J, X194JProfessionalFees, '94J', '');
-            InsertData(X194JPF, X194JPFProfessionalFees, '94J', '194J');
-            InsertData(X194JTF, X194JTFTechnicalFeeswef01042020, '94J', '194J');
-            InsertData(X194JCC, X194JCCPaymenttocallcentreoperatorwef01062017, '94J', '194J');
-            InsertData(X194JDF, X194JDFDirectorsfees, '94J', '194J');
-            InsertData(X194I, X194IRent, '94I', '');
-            InsertData(X194IPM, X194IPMRentPlantMachinery, '94I', '194I');
-            InsertData(X194ILB, X194ILBRentLandorbuildingorfurnitureorfitting, '94I', '194I');
-            InsertData(X195, X195PayabletoNonResidents, '195', '');
-            InsertData(X194A, X194AInterest, '94A', '');
-            InsertData(X194ABP, X194ABPInterestonBankandPostOfficedeposits, '94A', '194A');
-            InsertData(X194AOT, X194AOTInterestanyother, '94A', '194A');
+        DemoDataSetup.Get();
+        InsertData(X194C, X194CContractor, '94C', '');
+        InsertData(XS, XSContractorSingletransaction, '94C', '194C');
+        InsertData(XC, XCContractorConsolidatedPaymentDuringtheFY, '94C', '194C');
+        InsertData(X194J, X194JProfessionalFees, '94J', '');
+        InsertData(X194JPF, X194JPFProfessionalFees, '94J', '194J');
+        InsertData(X194JTF, X194JTFTechnicalFeeswef01042020, '94J', '194J');
+        InsertData(X194JCC, X194JCCPaymenttocallcentreoperatorwef01062017, '94J', '194J');
+        InsertData(X194JDF, X194JDFDirectorsfees, '94J', '194J');
+        InsertData(X194I, X194IRent, '94I', '');
+        InsertData(X194IPM, X194IPMRentPlantMachinery, '94I', '194I');
+        InsertData(X194ILB, X194ILBRentLandorbuildingorfurnitureorfitting, '94I', '194I');
+        InsertData(X195, X195PayabletoNonResidents, '195', '');
+        InsertData(X194A, X194AInterest, '94A', '');
+        InsertData(X194ABP, X194ABPInterestonBankandPostOfficedeposits, '94A', '194A');
+        InsertData(X194AOT, X194AOTInterestanyother, '94A', '194A');
 
-            CreateTDSPostingSetup(XS, DMY2Date(1, 1, 2010), '5931', '2451');
-            CreateTDSPostingSetup(XC, DMY2Date(1, 1, 2010), '5931', '2451');
-            CreateTDSPostingSetup(X194JPF, DMY2Date(1, 1, 2010), '5932', '2452');
-            CreateTDSPostingSetup(X194JTF, DMY2Date(1, 1, 2010), '5932', '2452');
-            CreateTDSPostingSetup(X194JCC, DMY2Date(1, 1, 2010), '5932', '2452');
-            CreateTDSPostingSetup(X194JDF, DMY2Date(1, 1, 2010), '5932', '2452');
-            CreateTDSPostingSetup(X194IPM, DMY2Date(1, 1, 2010), '5933', '2453');
-            CreateTDSPostingSetup(X194ILB, DMY2Date(1, 1, 2010), '5933', '2453');
-            CreateTDSPostingSetup(X195, DMY2Date(1, 1, 2010), '5934', '');
-            CreateTDSPostingSetup(X194ABP, DMY2Date(1, 1, 2010), '5935', '2454');
-            CreateTDSPostingSetup(X194AOT, DMY2Date(1, 1, 2010), '5935', '2454');
-        end;
+        CreateTDSPostingSetup(XS, DMY2Date(1, 1, 2010), '5931', '2451');
+        CreateTDSPostingSetup(XC, DMY2Date(1, 1, 2010), '5931', '2451');
+        CreateTDSPostingSetup(X194JPF, DMY2Date(1, 1, 2010), '5932', '2452');
+        CreateTDSPostingSetup(X194JTF, DMY2Date(1, 1, 2010), '5932', '2452');
+        CreateTDSPostingSetup(X194JCC, DMY2Date(1, 1, 2010), '5932', '2452');
+        CreateTDSPostingSetup(X194JDF, DMY2Date(1, 1, 2010), '5932', '2452');
+        CreateTDSPostingSetup(X194IPM, DMY2Date(1, 1, 2010), '5933', '2453');
+        CreateTDSPostingSetup(X194ILB, DMY2Date(1, 1, 2010), '5933', '2453');
+        CreateTDSPostingSetup(X195, DMY2Date(1, 1, 2010), '5934', '');
+        CreateTDSPostingSetup(X194ABP, DMY2Date(1, 1, 2010), '5935', '2454');
+        CreateTDSPostingSetup(X194AOT, DMY2Date(1, 1, 2010), '5935', '2454');
     end;
 
     var
@@ -76,24 +74,22 @@ codeunit 101017 "Create TDS Section"
 
     local procedure AddTDSSectionForMini()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData(X194C, X194CContractor, '94C', '');
-            InsertData(XS, XSContractorSingletransaction, '94C', '194C');
-            InsertData(XC, XCContractorConsolidatedPaymentDuringtheFY, '94C', '194C');
-            InsertData(X194J, X194JProfessionalFees, '94J', '');
-            InsertData(X194JPF, X194JPFProfessionalFees, '94J', '194J');
-            InsertData(X194JTF, X194JTFTechnicalFeeswef01042020, '94J', '194J');
-            InsertData(X194JCC, X194JCCPaymenttocallcentreoperatorwef01062017, '94J', '194J');
-            InsertData(X194JDF, X194JDFDirectorsfees, '94J', '194J');
-            InsertData(X194I, X194IRent, '94I', '');
-            InsertData(X194IPM, X194IPMRentPlantMachinery, '94I', '194I');
-            InsertData(X194ILB, X194ILBRentLandorbuildingorfurnitureorfitting, '94I', '194I');
-            InsertData(X195, X195PayabletoNonResidents, '195', '195');
-            InsertData(X194A, X194AInterest, '94A', '');
-            InsertData(X194ABP, X194ABPInterestonBankandPostOfficedeposits, '94A', '194A');
-            InsertData(X194AOT, X194AOTInterestanyother, '94A', '194A');
-        end;
+        DemoDataSetup.Get();
+        InsertData(X194C, X194CContractor, '94C', '');
+        InsertData(XS, XSContractorSingletransaction, '94C', '194C');
+        InsertData(XC, XCContractorConsolidatedPaymentDuringtheFY, '94C', '194C');
+        InsertData(X194J, X194JProfessionalFees, '94J', '');
+        InsertData(X194JPF, X194JPFProfessionalFees, '94J', '194J');
+        InsertData(X194JTF, X194JTFTechnicalFeeswef01042020, '94J', '194J');
+        InsertData(X194JCC, X194JCCPaymenttocallcentreoperatorwef01062017, '94J', '194J');
+        InsertData(X194JDF, X194JDFDirectorsfees, '94J', '194J');
+        InsertData(X194I, X194IRent, '94I', '');
+        InsertData(X194IPM, X194IPMRentPlantMachinery, '94I', '194I');
+        InsertData(X194ILB, X194ILBRentLandorbuildingorfurnitureorfitting, '94I', '194I');
+        InsertData(X195, X195PayabletoNonResidents, '195', '195');
+        InsertData(X194A, X194AInterest, '94A', '');
+        InsertData(X194ABP, X194ABPInterestonBankandPostOfficedeposits, '94A', '194A');
+        InsertData(X194AOT, X194AOTInterestanyother, '94A', '194A');
     end;
 
     procedure InsertData(Code: Code[20]; Description: Text[100]; eCode: Code[10]; ParentSection: Code[20])

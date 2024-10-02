@@ -5,20 +5,18 @@ codeunit 101119 "Create TDS Rates"
     var
         TaxTypeCode: Code[20];
     begin
-        with DemoDataSetup do begin
-            Get();
-            TaxTypeCode := 'TDS';
-            InsertData(TaxTypeCode, 'S', 'IND', '2010-01-01', '', '', '', '', '0.75', '20', '0', '0', '0', '0', '30000', '0');
-            InsertData(TaxTypeCode, 'S', 'HUF', '2010-01-01', '', '', '', '', '0.75', '20', '0', '0', '0', '0', '30000', '0');
-            InsertData(TaxTypeCode, 'S', 'COM', '2010-01-01', '', '', '', '', '1.5', '20', '0', '0', '0', '0', '30000', '0');
-            InsertData(TaxTypeCode, '194J-PF', 'IND', '2010-01-01', '', '', '', '', '7.5', '20', '0', '0', '0', '0', '30000', '0');
-            InsertData(TaxTypeCode, '194J-PF', 'COM', '2010-01-01', '', '', '', '', '7.5', '20', '0', '0', '0', '0', '30000', '0');
-            InsertData(TaxTypeCode, '194I-LB', 'IND', '2010-01-01', '', '', '', '', '7.6', '20', '0', '0', '0', '0', '240000', '0');
-            InsertData(TaxTypeCode, '194I-LB', 'COM', '2010-01-01', '', '', '', '', '7.6', '20', '0', '0', '0', '0', '240000', '0');
-            InsertData(TaxTypeCode, '195', 'NRI', '2010-01-01', '', '16', 'A', 'US', '10.4', '20', '0', '0', '0', '0', '0', '0');
+        DemoDataSetup.Get();
+        TaxTypeCode := 'TDS';
+        InsertData(TaxTypeCode, 'S', 'IND', '2010-01-01', '', '', '', '', '0.75', '20', '0', '0', '0', '0', '30000', '0');
+        InsertData(TaxTypeCode, 'S', 'HUF', '2010-01-01', '', '', '', '', '0.75', '20', '0', '0', '0', '0', '30000', '0');
+        InsertData(TaxTypeCode, 'S', 'COM', '2010-01-01', '', '', '', '', '1.5', '20', '0', '0', '0', '0', '30000', '0');
+        InsertData(TaxTypeCode, '194J-PF', 'IND', '2010-01-01', '', '', '', '', '7.5', '20', '0', '0', '0', '0', '30000', '0');
+        InsertData(TaxTypeCode, '194J-PF', 'COM', '2010-01-01', '', '', '', '', '7.5', '20', '0', '0', '0', '0', '30000', '0');
+        InsertData(TaxTypeCode, '194I-LB', 'IND', '2010-01-01', '', '', '', '', '7.6', '20', '0', '0', '0', '0', '240000', '0');
+        InsertData(TaxTypeCode, '194I-LB', 'COM', '2010-01-01', '', '', '', '', '7.6', '20', '0', '0', '0', '0', '240000', '0');
+        InsertData(TaxTypeCode, '195', 'NRI', '2010-01-01', '', '16', 'A', 'US', '10.4', '20', '0', '0', '0', '0', '0', '0');
 
-            EnableTaxType(TaxTypeCode, true);
-        end;
+        EnableTaxType(TaxTypeCode, true);
     end;
 
     var

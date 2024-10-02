@@ -43,17 +43,11 @@ xmlport 130007 "Code Coverage Internal"
                     // Adjust the "Code Coverage Status" for AzureDevOps
                     case "Code Coverage"."Code Coverage Status" of
                         "Code Coverage"."Code Coverage Status"::Covered:
-                            begin
-                                CoverageStatus := AzureDevOpsCovered;
-                            end;
+                            CoverageStatus := AzureDevOpsCovered;
                         "Code Coverage"."Code Coverage Status"::NotCovered:
-                            begin
-                                CoverageStatus := AzureDevOpsNotCovered;
-                            end;
+                            CoverageStatus := AzureDevOpsNotCovered;
                         "Code Coverage"."Code Coverage Status"::PartiallyCovered:
-                            begin
-                                CoverageStatus := AzureDevOpsPartiallyCovered;
-                            end;
+                            CoverageStatus := AzureDevOpsPartiallyCovered;
                     end;
                 end;
             }

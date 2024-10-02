@@ -3,18 +3,16 @@ codeunit 101121 "Create Nature Of Remittance"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
+        DemoDataSetup.Get();
 
-            InsertData('16', XDIVIDEND);
-            InsertData('21', copystr(XFEESFORTECHNICALSERVICESFEESFORINCLUDEDSERVICES, 1, 50));
-            InsertData('27', XINTERESTPAYMENT);
-            InsertData('28', XINVESTMENTINCOME);
-            InsertData('31', XLONGTERMCAPITALGAINS);
-            InsertData('49', XROYALTY);
-            InsertData('52', XSHORTTERMCAPITALGAINS);
-            InsertData('99', copystr(XOTHERINCOMEOTHERNOTINTHENATUREOFINCOME, 1, 50));
-        end;
+        InsertData('16', XDIVIDEND);
+        InsertData('21', copystr(XFEESFORTECHNICALSERVICESFEESFORINCLUDEDSERVICES, 1, 50));
+        InsertData('27', XINTERESTPAYMENT);
+        InsertData('28', XINVESTMENTINCOME);
+        InsertData('31', XLONGTERMCAPITALGAINS);
+        InsertData('49', XROYALTY);
+        InsertData('52', XSHORTTERMCAPITALGAINS);
+        InsertData('99', copystr(XOTHERINCOMEOTHERNOTINTHENATUREOFINCOME, 1, 50));
     end;
 
     var
@@ -35,17 +33,15 @@ codeunit 101121 "Create Nature Of Remittance"
 
     local procedure AddNatureOfremittanceForMini()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('16', XDIVIDEND);
-            InsertData('21', XFEESFORTECHNICALSERVICESFEESFORINCLUDEDSERVICES);
-            InsertData('27', XINTERESTPAYMENT);
-            InsertData('28', XINVESTMENTINCOME);
-            InsertData('31', XLONGTERMCAPITALGAINS);
-            InsertData('49', XROYALTY);
-            InsertData('52', XSHORTTERMCAPITALGAINS);
-            InsertData('99', XOTHERINCOMEOTHERNOTINTHENATUREOFINCOME);
-        end;
+        DemoDataSetup.Get();
+        InsertData('16', XDIVIDEND);
+        InsertData('21', XFEESFORTECHNICALSERVICESFEESFORINCLUDEDSERVICES);
+        InsertData('27', XINTERESTPAYMENT);
+        InsertData('28', XINVESTMENTINCOME);
+        InsertData('31', XLONGTERMCAPITALGAINS);
+        InsertData('49', XROYALTY);
+        InsertData('52', XSHORTTERMCAPITALGAINS);
+        InsertData('99', XOTHERINCOMEOTHERNOTINTHENATUREOFINCOME);
     end;
 
     procedure InsertData(Code: Code[20]; Description: Text[50])

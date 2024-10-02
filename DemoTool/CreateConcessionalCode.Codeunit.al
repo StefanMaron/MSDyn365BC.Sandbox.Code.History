@@ -2,18 +2,16 @@ codeunit 101123 "Create Concessional Code"
 {
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
+        DemoDataSetup.Get();
 
-            InsertData('A', XA);
-            InsertData('B', XB);
-            InsertData('C', XC);
-            InsertData('T', XT);
-            InsertData('Y', XY);
-            InsertData('S', XS);
-            InsertData('Z', XZ);
-            InsertData('R', XR);
-        end;
+        InsertData('A', XA);
+        InsertData('B', XB);
+        InsertData('C', XC);
+        InsertData('T', XT);
+        InsertData('Y', XY);
+        InsertData('S', XS);
+        InsertData('Z', XZ);
+        InsertData('R', XR);
     end;
 
     var
@@ -35,17 +33,15 @@ codeunit 101123 "Create Concessional Code"
 
     local procedure AddCOncessionalCodeForMini()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('A', XA);
-            InsertData('B', XB);
-            InsertData('C', XC);
-            InsertData('T', XT);
-            InsertData('Y', XY);
-            InsertData('S', XS);
-            InsertData('Z', XZ);
-            InsertData('R', XR);
-        end;
+        DemoDataSetup.Get();
+        InsertData('A', XA);
+        InsertData('B', XB);
+        InsertData('C', XC);
+        InsertData('T', XT);
+        InsertData('Y', XY);
+        InsertData('S', XS);
+        InsertData('Z', XZ);
+        InsertData('R', XR);
     end;
 
     procedure InsertData(Code: Code[20]; Description: Text[50])

@@ -68,9 +68,8 @@ codeunit 120554 "Create FA Depr. Setups IN"
             FAAccountingPeriodIncTax.Validate("Starting Date", "Starting Date");
             if (Date2DMY("Starting Date", 1) = 1) and
                (Date2DMY("Starting Date", 2) = 4)
-            then begin
+            then
                 FAAccountingPeriodIncTax."New Fiscal Year" := true;
-            end;
             FAAccountingPeriodIncTax.Name := FORMAT(FAAccountingPeriodIncTax."Starting Date", 0, '<Month Text>');
             FAAccountingPeriodIncTax.Insert();
             "Starting Date" := CalcDate('<1M>', "Starting Date");

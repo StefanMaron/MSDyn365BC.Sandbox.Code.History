@@ -4,28 +4,26 @@ codeunit 120539 "Create GST Rates"
     var
         TaxTypeCode: Code[20];
     begin
-        with DemoDataSetup do begin
-            Get();
-            TaxTypeCode := 'GST';
+        DemoDataSetup.Get();
+        TaxTypeCode := 'GST';
 
-            InsertData(TaxTypeCode, '0988001', '0988', '', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
-            InsertData(TaxTypeCode, '0988001', '0988', 'HR', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
-            InsertData(TaxTypeCode, '0988001', '0988', 'DL', 'DL', '2010-01-01', '2025-01-01', '9', '9', '0', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '0988001', '0988', '', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '0988001', '0988', 'HR', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '0988001', '0988', 'DL', 'DL', '2010-01-01', '2025-01-01', '9', '9', '0', '0', 'false', 'false');
 
-            InsertData(TaxTypeCode, '0989001', '0989', '', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
-            InsertData(TaxTypeCode, '0989001', '0989', 'HR', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
-            InsertData(TaxTypeCode, '0989001', '0989', 'DL', 'DL', '2010-01-01', '2025-01-01', '9', '9', '0', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '0989001', '0989', '', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '0989001', '0989', 'HR', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '0989001', '0989', 'DL', 'DL', '2010-01-01', '2025-01-01', '9', '9', '0', '0', 'false', 'false');
 
-            InsertData(TaxTypeCode, '2089001', '2089', '', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
-            InsertData(TaxTypeCode, '2089001', '2089', 'HR', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
-            InsertData(TaxTypeCode, '2089001', '2089', 'DL', 'DL', '2010-01-01', '2025-01-01', '9', '9', '0', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '2089001', '2089', '', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '2089001', '2089', 'HR', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '2089001', '2089', 'DL', 'DL', '2010-01-01', '2025-01-01', '9', '9', '0', '0', 'false', 'false');
 
-            InsertData(TaxTypeCode, '2090001', '2090', '', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
-            InsertData(TaxTypeCode, '2090001', '2090', 'HR', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
-            InsertData(TaxTypeCode, '2090001', '2090', 'DL', 'DL', '2010-01-01', '2025-01-01', '9', '9', '0', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '2090001', '2090', '', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '2090001', '2090', 'HR', 'DL', '2010-01-01', '2025-01-01', '0', '0', '18', '0', 'false', 'false');
+        InsertData(TaxTypeCode, '2090001', '2090', 'DL', 'DL', '2010-01-01', '2025-01-01', '9', '9', '0', '0', 'false', 'false');
 
-            EnableTaxType(TaxTypeCode, true);
-        end;
+        EnableTaxType(TaxTypeCode, true);
     end;
 
     var

@@ -43,9 +43,8 @@ codeunit 120538 "Create Tax Accounting Period"
             TaxAccountPeriod.Validate("Starting Date", "Starting Date");
             if (Date2DMY("Starting Date", 1) = 1) and
                (Date2DMY("Starting Date", 2) = 4)
-            then begin
+            then
                 TaxAccountPeriod."New Fiscal Year" := true;
-            end;
             TaxAccountPeriod.Name := FORMAT(TaxAccountPeriod."Starting Date", 0, '<Month Text>');
             TaxAccountPeriod."Ending Date" := CalcDate('<CM>', TaxAccountPeriod."Starting Date");
             case Date2DMY("Starting Date", 2) of

@@ -3,12 +3,10 @@ codeunit 101223 "Create TCAN No"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
+        DemoDataSetup.Get();
 
-            InsertData('DELN03830B', XBlueLocationLbl);
-            InsertData('RED0897580', XRedLocationLbl);
-        end;
+        InsertData('DELN03830B', XBlueLocationLbl);
+        InsertData('RED0897580', XRedLocationLbl);
     end;
 
     var
@@ -23,11 +21,9 @@ codeunit 101223 "Create TCAN No"
 
     local procedure AddTANNoForMini()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('DELN03830B', XBlueLocationLbl);
-            InsertData('RED0897580', XRedLocationLbl);
-        end;
+        DemoDataSetup.Get();
+        InsertData('DELN03830B', XBlueLocationLbl);
+        InsertData('RED0897580', XRedLocationLbl);
     end;
 
     procedure InsertData(Code: Code[20]; Description: Text[50])

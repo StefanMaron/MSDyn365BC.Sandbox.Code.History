@@ -3,12 +3,10 @@ codeunit 101120 "Create Act Applicable"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
+        DemoDataSetup.Get();
 
-            InsertData('A', XTDSrateasperIncomeTaxActLbl);
-            InsertData('B', XTDSrateasperDTAALbl);
-        end;
+        InsertData('A', XTDSrateasperIncomeTaxActLbl);
+        InsertData('B', XTDSrateasperDTAALbl);
     end;
 
     var
@@ -23,11 +21,9 @@ codeunit 101120 "Create Act Applicable"
 
     local procedure AddTANNoForMini()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('A', XTDSrateasperIncomeTaxActLbl);
-            InsertData('B', XTDSrateasperDTAALbl);
-        end;
+        DemoDataSetup.Get();
+        InsertData('A', XTDSrateasperIncomeTaxActLbl);
+        InsertData('B', XTDSrateasperDTAALbl);
     end;
 
     procedure InsertData(Code: Code[20]; Description: Text[50])

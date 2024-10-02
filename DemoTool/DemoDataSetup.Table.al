@@ -81,7 +81,7 @@ table 101900 "Demo Data Setup"
         }
         field(52; "Data Language Name"; Text[80])
         {
-            CalcFormula = Lookup("Windows Language".Name where("Language ID" = field("Data Language ID")));
+            CalcFormula = lookup("Windows Language".Name where("Language ID" = field("Data Language ID")));
             Editable = false;
             FieldClass = FlowField;
         }

@@ -3,12 +3,10 @@ codeunit 101016 "Create TAN No"
 
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
+        DemoDataSetup.Get();
 
-            InsertData('BLU0897580', XBlueLocationLbl);
-            InsertData('REDN03830B', XRedLocationLbl);
-        end;
+        InsertData('BLU0897580', XBlueLocationLbl);
+        InsertData('REDN03830B', XRedLocationLbl);
     end;
 
     var
@@ -23,11 +21,9 @@ codeunit 101016 "Create TAN No"
 
     local procedure AddTANNoForMini()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('BLU0897580', XBlueLocationLbl);
-            InsertData('REDN03830B', XRedLocationLbl);
-        end;
+        DemoDataSetup.Get();
+        InsertData('BLU0897580', XBlueLocationLbl);
+        InsertData('REDN03830B', XRedLocationLbl);
     end;
 
     procedure InsertData(Code: Code[20]; Description: Text[50])

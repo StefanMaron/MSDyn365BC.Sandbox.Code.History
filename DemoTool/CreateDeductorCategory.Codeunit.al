@@ -2,25 +2,23 @@ codeunit 101124 "Create Deductor Category"
 {
     trigger OnRun()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('A', XA, false, false, false, false, false);
-            InsertData('S', XS, true, true, true, false, true);
-            InsertData('D', XD, true, true, false, true, true);
-            InsertData('E', XE, true, true, true, false, true);
-            InsertData('G', XG, true, true, false, true, true);
-            InsertData('H', XH, true, true, true, false, true);
-            InsertData('L', XL, true, true, false, false, true);
-            InsertData('N', XN, true, true, true, false, true);
-            InsertData('K', XK, false, false, false, false, true);
-            InsertData('M', XM, false, false, false, false, true);
-            InsertData('P', XP, false, false, false, false, true);
-            InsertData('T', XT, false, false, false, false, true);
-            InsertData('J', XJ, false, false, false, false, true);
-            InsertData('B', XB, false, false, false, false, true);
-            InsertData('Q', XQ, false, false, false, false, true);
-            InsertData('F', XF, false, false, false, false, true);
-        end;
+        DemoDataSetup.Get();
+        InsertData('A', XA, false, false, false, false, false);
+        InsertData('S', XS, true, true, true, false, true);
+        InsertData('D', XD, true, true, false, true, true);
+        InsertData('E', XE, true, true, true, false, true);
+        InsertData('G', XG, true, true, false, true, true);
+        InsertData('H', XH, true, true, true, false, true);
+        InsertData('L', XL, true, true, false, false, true);
+        InsertData('N', XN, true, true, true, false, true);
+        InsertData('K', XK, false, false, false, false, true);
+        InsertData('M', XM, false, false, false, false, true);
+        InsertData('P', XP, false, false, false, false, true);
+        InsertData('T', XT, false, false, false, false, true);
+        InsertData('J', XJ, false, false, false, false, true);
+        InsertData('B', XB, false, false, false, false, true);
+        InsertData('Q', XQ, false, false, false, false, true);
+        InsertData('F', XF, false, false, false, false, true);
     end;
 
     var
@@ -51,25 +49,23 @@ codeunit 101124 "Create Deductor Category"
 
     local procedure AddDeductoreCategoryForMini()
     begin
-        with DemoDataSetup do begin
-            Get();
-            InsertData('A', XA, false, false, false, false, false);
-            InsertData('S', XS, true, true, true, false, true);
-            InsertData('D', XD, true, true, false, true, true);
-            InsertData('E', XE, true, true, true, false, true);
-            InsertData('G', XG, true, true, false, true, true);
-            InsertData('H', XH, true, true, true, false, true);
-            InsertData('L', XL, true, true, false, false, true);
-            InsertData('N', XN, true, true, true, false, true);
-            InsertData('K', XK, false, false, false, false, true);
-            InsertData('M', XM, false, false, false, false, true);
-            InsertData('P', XP, false, false, false, false, true);
-            InsertData('T', XT, false, false, false, false, true);
-            InsertData('J', XJ, false, false, false, false, true);
-            InsertData('B', XB, false, false, false, false, true);
-            InsertData('Q', XQ, false, false, false, false, true);
-            InsertData('F', XF, false, false, false, false, true);
-        end;
+        DemoDataSetup.Get();
+        InsertData('A', XA, false, false, false, false, false);
+        InsertData('S', XS, true, true, true, false, true);
+        InsertData('D', XD, true, true, false, true, true);
+        InsertData('E', XE, true, true, true, false, true);
+        InsertData('G', XG, true, true, false, true, true);
+        InsertData('H', XH, true, true, true, false, true);
+        InsertData('L', XL, true, true, false, false, true);
+        InsertData('N', XN, true, true, true, false, true);
+        InsertData('K', XK, false, false, false, false, true);
+        InsertData('M', XM, false, false, false, false, true);
+        InsertData('P', XP, false, false, false, false, true);
+        InsertData('T', XT, false, false, false, false, true);
+        InsertData('J', XJ, false, false, false, false, true);
+        InsertData('B', XB, false, false, false, false, true);
+        InsertData('Q', XQ, false, false, false, false, true);
+        InsertData('F', XF, false, false, false, false, true);
     end;
 
     procedure InsertData(Code: Code[1]; Description: Text[50]; PAO: Boolean; DDO: Boolean; StateMandatory: Boolean; MinistryMandate: Boolean; TransferVoucherMandate: Boolean)

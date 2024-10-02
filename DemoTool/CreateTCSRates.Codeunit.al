@@ -4,16 +4,14 @@ codeunit 120541 "Create TCS Rates"
     var
         TaxTypeCode: Code[20];
     begin
-        with DemoDataSetup do begin
-            Get();
-            TaxTypeCode := 'TCS';
-            InsertData(TaxTypeCode, 'A', 'COM', '', '2010-01-01', '1', '0', '5', '0', '0', '0', '0', '0', 'No');
-            InsertData(TaxTypeCode, 'A', 'IND', '', '2010-01-01', '1', '0', '5', '0', '0', '0', '0', '0', 'No');
-            InsertData(TaxTypeCode, 'A', 'NRI', '', '2010-01-01', '1', '10', '5', '4', '0', '5000000', '0', '0', 'No');
-            InsertData(TaxTypeCode, '1H', 'COM', '', '2020-10-01', '0.075', '0', '1', '0', '0', '5000000', '0', '0', 'Yes');
+        DemoDataSetup.Get();
+        TaxTypeCode := 'TCS';
+        InsertData(TaxTypeCode, 'A', 'COM', '', '2010-01-01', '1', '0', '5', '0', '0', '0', '0', '0', 'No');
+        InsertData(TaxTypeCode, 'A', 'IND', '', '2010-01-01', '1', '0', '5', '0', '0', '0', '0', '0', 'No');
+        InsertData(TaxTypeCode, 'A', 'NRI', '', '2010-01-01', '1', '10', '5', '4', '0', '5000000', '0', '0', 'No');
+        InsertData(TaxTypeCode, '1H', 'COM', '', '2020-10-01', '0.075', '0', '1', '0', '0', '5000000', '0', '0', 'Yes');
 
-            EnableTaxType(TaxTypeCode, true);
-        end;
+        EnableTaxType(TaxTypeCode, true);
     end;
 
     var
