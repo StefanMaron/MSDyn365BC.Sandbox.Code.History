@@ -11,8 +11,6 @@ codeunit 101296 "Create Reminder Communication"
         SecondLevelGuid := CreateGuid();
         ThirdLevelGuid := CreateGuid();
 
-        InsertReminderLevelsCommunications('ENC');
-        InsertReminderLevelsCommunications('ENG');
         InsertReminderLevelsCommunications('ENU');
         UpdateReminderLevel(DemoDataSetup.DomesticCode(), 1, FirstLevelGuid);
         UpdateReminderLevel(DemoDataSetup.DomesticCode(), 2, SecondLevelGuid);
@@ -65,14 +63,28 @@ codeunit 101296 "Create Reminder Communication"
     local procedure InsertReminderAttachmentText(SelectedID: Guid; LanguageCode: Code[10]; SourceType: Enum "Reminder Text Source Type"; EndingLineText: Text[100])
     var
         ReminderAttachmentText: Record "Reminder Attachment Text";
+        ReminderAttachmentTextLine: Record "Reminder Attachment Text Line";
+        ReminderAttachmentTextLine2: Record "Reminder Attachment Text Line";
     begin
         ReminderAttachmentText.ID := SelectedID;
         ReminderAttachmentText."Language Code" := LanguageCode;
         ReminderAttachmentText.Validate("Source Type", SourceType);
         ReminderAttachmentText.Validate("File Name", AttachmentFileNameLbl);
         ReminderAttachmentText.Validate("Inline Fee Description", AttachmentInlineFeeDescriptionLbl);
-        ReminderAttachmentText.Validate("Ending Line", EndingLineText);
         ReminderAttachmentText.Insert(true);
+
+        ReminderAttachmentTextLine.Id := SelectedID;
+        ReminderAttachmentTextLine."Language Code" := LanguageCode;
+        ReminderAttachmentTextLine.Position := ReminderAttachmentTextLine.Position::"Ending Line";
+        ReminderAttachmentTextLine.Text := EndingLineText;
+        ReminderAttachmentTextLine2.SetRange(Id, SelectedID);
+        ReminderAttachmentTextLine2.SetRange("Language Code", LanguageCode);
+        ReminderAttachmentTextLine2.SetRange(Position, ReminderAttachmentTextLine2.Position::"Ending Line");
+        if ReminderAttachmentTextLine2.FindLast() then
+            ReminderAttachmentTextLine."Line No." := ReminderAttachmentTextLine2."Line No." + 10000
+        else
+            ReminderAttachmentTextLine."Line No." := 10000;
+        ReminderAttachmentTextLine.Insert(true);
     end;
 
     local procedure InsertReminderEmailText(SelectedID: Guid; LanguageCode: Code[10]; SourceType: Enum "Reminder Text Source Type"; BodyText: Text)

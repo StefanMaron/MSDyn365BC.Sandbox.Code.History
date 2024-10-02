@@ -34,7 +34,7 @@ xmlport 130006 "Coverage Results Summary"
             tableelement("Code Coverage"; "Code Coverage")
             {
                 XmlName = 'ObjectCodeCoverage';
-                SourceTableView = sorting("Object Type", "Object ID", "Line No.") ORDER(Ascending) WHERE("Line Type" = const(Object));
+                SourceTableView = sorting("Object Type", "Object ID", "Line No.") order(ascending) where("Line Type" = const(Object));
                 textelement(CheckinID)
                 {
                 }
