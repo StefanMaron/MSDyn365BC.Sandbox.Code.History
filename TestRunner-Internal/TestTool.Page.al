@@ -155,7 +155,7 @@ page 130021 "Test Tool"
                     DrillDown = false;
                     Editable = false;
                     Style = Unfavorable;
-                    StyleExpr = TRUE;
+                    StyleExpr = true;
                 }
                 field(Duration; "Finish Time" - "Start Time")
                 {
