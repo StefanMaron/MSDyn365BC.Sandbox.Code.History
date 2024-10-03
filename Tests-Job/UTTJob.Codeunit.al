@@ -1705,7 +1705,7 @@ codeunit 136350 "UT T Job"
     end;
 
     [Test]
-    [HandlerFunctions('PurchOrderFromJobModalPageHandler')]
+    [HandlerFunctions('PurchOrderFromJobModalPageHandlerWithQtyCheck')]
     procedure CreatePurchaseOrderFromJobTaskWhenItIsCreatedAlready()
     var
         Vendor: Record Vendor;
@@ -1738,6 +1738,8 @@ codeunit 136350 "UT T Job"
 
         // [WHEN] Create Purchase Order from Job Planning Lines for Job Y
         LibraryVariableStorage.Enqueue(Vendor."No.");
+        JobPlanningLine.CalcFields("Reserved Qty. (Base)");
+        LibraryVariableStorage.Enqueue(JobPlanningLine."Remaining Qty. (Base)" - JobPlanningLine."Reserved Qty. (Base)");
         PurchaseOrder.Trap();
         JobPlanningLines.Trap();
         JobCard.OpenEdit();
@@ -2306,6 +2308,14 @@ codeunit 136350 "UT T Job"
         PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
         if PurchOrderFromSalesOrder.Next() then
             PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
+        PurchOrderFromSalesOrder.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure PurchOrderFromJobModalPageHandlerWithQtyCheck(var PurchOrderFromSalesOrder: TestPage "Purch. Order From Sales Order")
+    begin
+        PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
+        Assert.AreEqual(LibraryVariableStorage.DequeueDecimal(), PurchOrderFromSalesOrder."Demand Quantity".AsDecimal(), 'Demand Quantity not matched');
         PurchOrderFromSalesOrder.OK().Invoke();
     end;
 
