@@ -30,6 +30,7 @@ codeunit 136350 "UT T Job"
         LibraryRandom: Codeunit "Library - Random";
         LibraryMarketing: Codeunit "Library - Marketing";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
+        LibraryItemTracking: Codeunit "Library - Item Tracking";
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryInventory: Codeunit "Library - Inventory";
         IsInitialized: Boolean;
@@ -525,6 +526,44 @@ codeunit 136350 "UT T Job"
         MockJobLedgEntryWithTotalCostLCY(Job."No.", UsageCost);
 
         InvokeUpdateOverBudgetValueFunctionWithVerification(false, InputCost, false);
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes,ItemTrackingLinesAssignSNModalPageHandler,EnterQuantityToCreateModalPageHandler')]
+    procedure JobPlanningLineLinkedWithNegativeQtyPurchaseLine()
+    var
+        Vendor: Record Vendor;
+        Item: Record Item;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
+    begin
+        Initialize();
+
+        // [GIVEN] Create Vendor
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Create Item with SN Tracking
+        LibraryInventory.CreateTrackedItem(Item, '', LibraryUtility.GetGlobalNoSeriesCode(), CreateSNItemTrackingCode());
+        //LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Job with Job Task and Job Planning Line
+        CreateJobAndJobTask();
+        CreateJobPlanningLineWithItem(JobPlanningLine."Line Type"::"Both Budget and Billable", Item."No.", 0);
+
+        // [GIVEN] Create Purchase Header and Purchase Line linked with Job, with negative quantity and assign SN
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, '');
+        CreatePurchaseLineForJobPlanningLine(PurchaseHeader, PurchaseLine, JobPlanningLine, -1);
+        PurchaseLine.OpenItemTrackingLines();
+
+        // [WHEN] Post the purchase receipt
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, false);
+
+        // [THEN] It is possible to UNDO Purchase Receipt Line
+        PurchRcptLine.SetRange("No.", Item."No.");
+        PurchRcptLine.FindFirst();
+        PurchRcptLine.SetRecFilter();
+        Codeunit.Run(Codeunit::"Undo Purchase Receipt Line", PurchRcptLine);
     end;
 
     [Test]
@@ -2225,6 +2264,23 @@ codeunit 136350 "UT T Job"
           DimValue2Code, JobTask."Global Dimension 2 Code", JobTask.FieldCaption("Global Dimension 2 Code"));
     end;
 
+    local procedure CreatePurchaseLineForJobPlanningLine(Purchaseheader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; JobPlanningLine: Record "Job Planning Line"; Qty: Decimal)
+    begin
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, JobPlanningLine."No.", Qty);
+        PurchaseLine.Validate("Job No.", JobPlanningLine."Job No.");
+        PurchaseLine.Validate("Job Task No.", JobPlanningLine."Job Task No.");
+        PurchaseLine.Validate("Job Planning Line No.", JobPlanningLine."Line No.");
+        PurchaseLine.Modify(true);
+    end;
+
+    local procedure CreateSNItemTrackingCode(): Code[10]
+    var
+        ItemTrackingCode: Record "Item Tracking Code";
+    begin
+        LibraryItemTracking.CreateItemTrackingCode(ItemTrackingCode, true, false);
+        exit(ItemTrackingCode.Code);
+    end;
+
     local procedure VerifyJobDefaultDimensionsFromCustDefaultDimensions(JobNo: Code[20]; CustomerNo: Code[20])
     var
         JobDefaultDimension: Record "Default Dimension";
@@ -2301,6 +2357,19 @@ codeunit 136350 "UT T Job"
         CustomerLookup.OK().Invoke();
     end;
 
+    [ModalPageHandler]
+    [Scope('OnPrem')]
+    procedure ItemTrackingLinesAssignSNModalPageHandler(var ItemTrackingLines: TestPage "Item Tracking Lines")
+    begin
+        ItemTrackingLines."Assign &Serial No.".Invoke();
+        ItemTrackingLines.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure EnterQuantityToCreateModalPageHandler(var EnterQuantityToCreate: TestPage "Enter Quantity to Create")
+    begin
+        EnterQuantityToCreate.OK().Invoke();
+    end;
 
     [ModalPageHandler]
     procedure PurchOrderFromJobModalPageHandler(var PurchOrderFromSalesOrder: TestPage "Purch. Order From Sales Order")
