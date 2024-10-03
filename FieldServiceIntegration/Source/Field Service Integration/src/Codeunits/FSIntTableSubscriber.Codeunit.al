@@ -496,15 +496,11 @@ codeunit 6610 "FS Int. Table Subscriber"
     begin
         case FSConnectionSetup."Line Post Rule" of
             "FS Work Order Line Post Rule"::LineUsed:
-                if FSWorkOrderProduct.LineStatus = FSWorkOrderProduct.LineStatus::Used then begin
+                if FSWorkOrderProduct.LineStatus = FSWorkOrderProduct.LineStatus::Used then
                     JobJnlPostLine.RunWithCheck(JobJournalLine);
-                    JobJournalLine.Delete(true);
-                end;
             "FS Work Order Line Post Rule"::WorkOrderCompleted:
-                if FSWorkOrderProduct.WorkOrderStatus in [FSWorkOrderProduct.WorkOrderStatus::Completed] then begin
+                if FSWorkOrderProduct.WorkOrderStatus in [FSWorkOrderProduct.WorkOrderStatus::Completed] then
                     JobJnlPostLine.RunWithCheck(JobJournalLine);
-                    JobJournalLine.Delete(true);
-                end;
             else
                 exit;
         end;
@@ -533,7 +529,6 @@ codeunit 6610 "FS Int. Table Subscriber"
     begin
         JobJournalLineId := JobJournalLine.SystemId;
         JobJnlPostLine.RunWithCheck(JobJournalLine);
-        JobJournalLine.Delete(true);
 
         // Work Order Services couple to two Project Journal Lines (one budget line for the resource and one billable line for the item of type service)
         // we must find the other coupled lines and post them as well.
@@ -541,11 +536,9 @@ codeunit 6610 "FS Int. Table Subscriber"
         CRMIntegrationRecord.SetRange("CRM ID", FSWorkOrderService.WorkOrderServiceId);
         if CRMIntegrationRecord.FindSet() then
             repeat
-                if CRMIntegrationRecord."Integration ID" <> JobJournalLineId then
-                    if CorrelatedJobJournalLine.GetBySystemId(CRMIntegrationRecord."Integration ID") then begin
+                if CRMIntegrationRecord."Integration ID" <> JobJournalLine.SystemId then
+                    if CorrelatedJobJournalLine.GetBySystemId(CRMIntegrationRecord."Integration ID") then
                         JobJnlPostLine.RunWithCheck(CorrelatedJobJournalLine);
-                        CorrelatedJobJournalLine.Delete(true);
-                    end;
             until CRMIntegrationRecord.Next() = 0;
     end;
 
