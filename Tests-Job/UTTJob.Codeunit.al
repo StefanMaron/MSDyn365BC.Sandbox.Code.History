@@ -48,6 +48,7 @@ codeunit 136350 "UT T Job"
         PlanningLinesNotUpdatedMsg: Label 'You have changed %1 on the project task, but it has not been changed on the existing project planning lines.', Comment = '%1 = a Field Caption like Location Code';
         UpdatePlanningLinesManuallyMsg: Label 'You must update the existing project planning lines manually.';
         SplitMessageTxt: Label '%1\%2', Comment = 'Some message text 1.\Some message text 2.', Locked = true;
+        DPPLocationErr: Label 'You cannot create purchase orders for items that are set up for directed put-away and pick. You can activate and select Reserve field from personalization in order to finish this task.';
 
     [Test]
     [Scope('OnPrem')]
@@ -1744,6 +1745,47 @@ codeunit 136350 "UT T Job"
     end;
 
     [Test]
+    [HandlerFunctions('PurchOrderFromJobModalPageHandlerWithDPPLocation')]
+    procedure VerifyErrorOnCreatePurchaseOrderFromJobForDPPLocation()
+    var
+        Vendor: Record Vendor;
+        Item: Record Item;
+        Location: Record Location;
+        PurchaseOrder: TestPage "Purchase Order";
+        JobCard: TestPage "Job Card";
+    begin
+        // [SCENARIO 549866] Verify error on create Purchase Order from Job for DPP Location
+        Initialize();
+
+        // [GIVEN] Create Vendor
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Create Item
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Directed Put-away and Pick Location
+        LibraryWarehouse.CreateFullWMSLocation(Location, 1);
+
+        // [GIVEN] Create Job with Job Task
+        CreateJobAndJobTask();
+
+        // [GIVEN] Create Job Planning Line
+        CreateJobPlanningLineWithItem(JobPlanningLine."Line Type"::"Both Budget and Billable", Item."No.", 1);
+        JobPlanningLine.Validate("Location Code", Location.Code);
+        JobPlanningLine.Modify(true);
+
+        // [WHEN] Create Purchase Order from Job
+        LibraryVariableStorage.Enqueue(Vendor."No.");
+        PurchaseOrder.Trap();
+        JobCard.OpenEdit();
+        JobCard.GotoRecord(Job);
+        asserterror JobCard.CreatePurchaseOrder.Invoke();
+
+        // [THEN] Verify error
+        Assert.ExpectedError(DPPLocationErr);
+    end;
+
+    [Test]
     [HandlerFunctions('PurchOrderFromJobModalPageHandlerWithQtyCheck')]
     procedure CreatePurchaseOrderFromJobTaskWhenItIsCreatedAlready()
     var
@@ -2377,6 +2419,13 @@ codeunit 136350 "UT T Job"
         PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
         if PurchOrderFromSalesOrder.Next() then
             PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
+        PurchOrderFromSalesOrder.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure PurchOrderFromJobModalPageHandlerWithDPPLocation(var PurchOrderFromSalesOrder: TestPage "Purch. Order From Sales Order")
+    begin
+        PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
         PurchOrderFromSalesOrder.OK().Invoke();
     end;
 
