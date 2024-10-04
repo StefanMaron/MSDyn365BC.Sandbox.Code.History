@@ -2,6 +2,7 @@ namespace Microsoft.Bank.Deposit;
 
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.Reporting;
+using Microsoft.Finance.GeneralLedger.Ledger;
 
 page 1694 "Posted Bank Deposit"
 {
@@ -80,7 +81,7 @@ page 1694 "Posted Bank Deposit"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the currency code of the bank account that the deposit was deposited in.';
                 }
-                field(Reversed; Rec.IsReversed())
+                field(Reversed; GLRegisterReversed)
                 {
                     ApplicationArea = Suite;
                     Editable = false;
@@ -229,9 +230,26 @@ page 1694 "Posted Bank Deposit"
     }
 
     var
+        GLRegisterReversed: Text;
         BankDepositReportSelectionErr: Label 'Bank deposit report has not been set up.';
         UndoPostingQst: Label 'This will reverse all ledger entries that are related to the lines of the bank deposit. Do you want to continue?';
         BankDepositNonGUISessionErr: Label 'To undo the posting of a bank deposit, you must sign in to Business Central from a web browser.';
+        YesTxt: Label 'Yes';
+        NoTxt: Label 'No';
+
+    trigger OnAfterGetCurrRecord()
+    var
+        GLRegister: Record "G/L Register";
+        GLRegNo: Integer;
+    begin
+        GLRegisterReversed := NoTxt;
+
+        if Rec.FindGLRegisterNo(GLRegNo) then begin
+            GLRegister.Get(GLRegNo);
+            if GLRegister.Reversed then
+                GLRegisterReversed := YesTxt;
+        end;
+    end;
 
     local procedure GetDifference(): Decimal
     begin
