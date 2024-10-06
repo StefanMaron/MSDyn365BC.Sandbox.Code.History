@@ -1929,14 +1929,9 @@ codeunit 6500 "Item Tracking Management"
                         Qty := -TempTrackingSpecification."Qty. to Handle (Base)";
                         if RegPickNo <> '' then begin
                             RegisteredWhseActLine.SetRange("Activity Type", RegisteredWhseActLine."Activity Type"::Pick);
-                            if TempTrackingSpecification."Source Type" = Database::"Prod. Order Component" then
-                                RegisteredWhseActLine.SetSourceFilter(
-                                    TempTrackingSpecification."Source Type", TempTrackingSpecification."Source Subtype",
-                                    TempTrackingSpecification."Source ID", TempTrackingSpecification."Source Prod. Order Line", TempTrackingSpecification."Source Ref. No.", true)
-                            else
-                                RegisteredWhseActLine.SetSourceFilter(
-                                    TempTrackingSpecification."Source Type", TempTrackingSpecification."Source Subtype",
-                                    TempTrackingSpecification."Source ID", TempTrackingSpecification."Source Ref. No.", -1, true);
+                            RegisteredWhseActLine.SetSourceFilter(
+                              TempTrackingSpecification."Source Type", TempTrackingSpecification."Source Subtype",
+                              TempTrackingSpecification."Source ID", TempTrackingSpecification."Source Ref. No.", -1, true);
                             RegisteredWhseActLine.SetTrackingFilterFromSpec(TempTrackingSpecification);
                             RegisteredWhseActLine.SetFilter("No.", '<> %1', RegPickNo);
                             if not RegisteredWhseActLine.FindFirst() then
@@ -2127,20 +2122,16 @@ codeunit 6500 "Item Tracking Management"
 
         if ItemLedgEntry.GetFilters() <> '' then
             ItemLedgEntry.Reset();
-        ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Lot No.", "Package No.", "Serial No.");
+        ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Lot No.", "Serial No.");
         ItemLedgEntry.SetRange("Item No.", ItemNo);
         ItemLedgEntry.SetRange("Variant Code", VariantCode);
-        ItemLedgEntry.SetRange(Positive, true);
-        if (ItemTrackingSetup."Lot No." <> '') or (ItemTrackingSetup."Package No." <> '') then begin
-            if ItemTrackingSetup."Lot No." <> '' then
-                ItemLedgEntry.SetRange("Lot No.", ItemTrackingSetup."Lot No.");
-            if ItemTrackingSetup."Package No." <> '' then
-                ItemLedgEntry.SetRange("Package No.", ItemTrackingSetup."Package No.");
-        end else
+        if ItemTrackingSetup."Lot No." <> '' then
+            ItemLedgEntry.SetRange("Lot No.", ItemTrackingSetup."Lot No.")
+        else
             if ItemTrackingSetup."Serial No." <> '' then
                 ItemLedgEntry.SetRange("Serial No.", ItemTrackingSetup."Serial No.");
-        EntryFound := ItemLedgEntry.FindLast();
-        exit(EntryFound);
+        ItemLedgEntry.SetRange(Positive, true);
+        exit(ItemLedgEntry.FindLast());
     end;
 
     procedure WhseItemTrackingLineExists(TemplateName: Code[10]; BatchName: Code[10]; LocationCode: Code[10]; LineNo: Integer; var WhseItemTrackingLine: Record "Whse. Item Tracking Line"): Boolean
@@ -2158,7 +2149,7 @@ codeunit 6500 "Item Tracking Management"
             WhseItemTrackingLine.SetRange("Source Ref. No.", LineNo);
         WhseItemTrackingLine.SetRange("Source Prod. Order Line", 0);
 
-        exit(not WhseItemTrackingLine.IsEmpty());
+        exit(not WhseItemTrackingLine.IsEmpty);
     end;
 
     procedure ExistingExpirationDate(ItemNo: Code[20]; VariantCode: Code[20]; ItemTrackingSetup: Record "Item Tracking Setup"; TestMultiple: Boolean; var EntriesExist: Boolean) ExpiryDate: Date
@@ -2380,7 +2371,6 @@ codeunit 6500 "Item Tracking Management"
                 SumLot += TempTrackingSpecification."Quantity (Base)";
             until TempTrackingSpecification.Next() = 0;
         TempTrackingSpecification := TempTrackingSpecification2;
-        TempTrackingSpecification.SetRange("New Lot No.");
         exit(SumLot);
     end;
 
@@ -2845,7 +2835,7 @@ codeunit 6500 "Item Tracking Management"
                 OnRegisterNewItemTrackingLinesOnBeforeCannotMatchItemTrackingError(
                     TempTrackingSpec, QtyToHandleToNewRegister, QtyToHandleInItemTracking, QtyToHandleOnSourceDocLine, IsHandled);
                 if not IsHandled then
-                    if QtyToHandleToNewRegister + QtyToHandleInItemTracking > Abs(QtyToHandleOnSourceDocLine) then
+                    if QtyToHandleToNewRegister + QtyToHandleInItemTracking > QtyToHandleOnSourceDocLine then
                         Error(CannotMatchItemTrackingErr,
                             TempTrackingSpec."Source ID", TempTrackingSpec."Source Ref. No.",
                             TempTrackingSpec."Item No.", TempTrackingSpec.Description);
@@ -2859,8 +2849,6 @@ codeunit 6500 "Item Tracking Management"
                 OnRegisterNewItemTrackingLinesOnAfterClearItemTrackingLines(ItemTrackingLines);
                 ItemTrackingLines.SetCalledFromSynchWhseItemTrkg(true);
                 ItemTrackingLines.SetBlockCommit(ItemTrackingLinesBlockCommit);
-                if QtyToHandleOnSourceDocLine < 0 then
-                    ItemTrackingLines.SetSignFactor(-1);
                 OnRegisterNewItemTrackingLinesOnBeforeRegisterItemTrackingLines(TempTrackingSpecification, ItemTrackingLines);
                 ItemTrackingLines.RegisterItemTrackingLines(TrackingSpec, TrackingSpec."Creation Date", TempTrackingSpec);
                 TempTrackingSpec.ClearSourceFilter();
@@ -3335,9 +3323,7 @@ codeunit 6500 "Item Tracking Management"
         ReservEntry.SetFilter("Item Tracking", '<>%1', ReservEntry."Item Tracking"::None);
 
         OnItemTrackingExistsOnDocumentLineOnBeforeExit(TrackingSpecification, ReservEntry);
-        if not TrackingSpecification.IsEmpty() then
-            exit(true);
-        exit(not ReservEntry.IsEmpty());
+        exit(not TrackingSpecification.IsEmpty() or not ReservEntry.IsEmpty());
     end;
 
     procedure CalcQtyToHandleForTrackedQtyOnDocumentLine(SourceType: Integer; SourceSubtype: Option; SourceID: Code[20]; SourceRefNo: Integer) Result: Decimal
