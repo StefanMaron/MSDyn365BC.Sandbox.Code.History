@@ -906,14 +906,14 @@ codeunit 4810 IntrastatReportManagement
         ItemUOM.Modify(true);
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     procedure IsFeatureEnabled() IsEnabled: Boolean
-    var
-        FeatureMgtFacade: Codeunit "Feature Management Facade";
     begin
-        IsEnabled := FeatureMgtFacade.IsEnabled(GetIntrastatFeatureKeyId());
+        IsEnabled := true;
         OnAfterCheckFeatureEnabled(IsEnabled);
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     procedure NotifyUserAboutIntrastatFeature()
     var
         MyNotifications: Record "My Notifications";
@@ -931,11 +931,13 @@ codeunit 4810 IntrastatReportManagement
             end;
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     procedure LearnMore(HostNotification: Notification)
     begin
         Hyperlink(LearnMoreLinkTok);
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     procedure DisableNotification(HostNotification: Notification)
     var
         MyNotifications: Record "My Notifications";
@@ -979,11 +981,13 @@ codeunit 4810 IntrastatReportManagement
                 StrSubstNo(SupplementaryUnitUpdateNotificationDescriptionTxt, Item.FieldCaption("Supplementary Unit of Measure"), Item.FieldCaption("Tariff No.")), false);
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     procedure ShowNotEnabledMessage(PageCaption: Text)
     begin
         Message(FeatureNotEnabledMessageTxt, PageCaption);
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     procedure ShowFeatureEnabledMessage(OldPageCaption: Text; NewPageCaption: Text)
     begin
         Message(NewFeatureEnabledMessageTxt, OldPageCaption, NewPageCaption);
@@ -1005,11 +1009,13 @@ codeunit 4810 IntrastatReportManagement
             exit(Vendor."Partner Type" = "Partner Type"::Person);
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     local procedure GetIntrastatFeatureKeyId(): Text[50]
     begin
         exit(IntrastatFeatureKeyIdTok);
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     local procedure GetIntrastatFeatureAwarenessNotificationId(): Guid;
     begin
         exit(IntrastatFeatureAwarenessNotificationIdTok);
@@ -1020,11 +1026,13 @@ codeunit 4810 IntrastatReportManagement
         exit(SupplementaryUnitUpdateNotificationIdTok);
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     local procedure GetAppId(): Guid;
     begin
         exit(IntrastatCoreAppIdTok);
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     local procedure IsInstalledByAppId(AppID: Guid): Boolean
     var
         NAVAppInstalledApp: Record "NAV App Installed App";
@@ -1093,6 +1101,7 @@ codeunit 4810 IntrastatReportManagement
     begin
     end;
 
+    [Obsolete('Pending removal.', '25.0')]
     [IntegrationEvent(true, false)]
     local procedure OnAfterCheckFeatureEnabled(var IsEnabled: Boolean)
     begin
