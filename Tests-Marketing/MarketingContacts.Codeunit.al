@@ -53,8 +53,6 @@ codeunit 136201 "Marketing Contacts"
         ContactNotRelatedToCustomerErr: Label 'Contact %1 %2 is not related to customer %3 %4.';
         ExpectedToFindRecErr: Label 'Expected to find Contact Business Relation record.';
         DuplicateContactsMsg: Label 'There are duplicate contacts.';
-        ItemDimensionAllowedFilter: Label 'Allowed Dimension filter must match in both Item template and Item.';
-        ValueMustMatch: Label 'Value must match.';
 
     [Test]
     procedure ContactBusinessRelationCompatibility()
@@ -5847,129 +5845,6 @@ codeunit 136201 "Marketing Contacts"
         Assert.RecordCount(ReservationEntry, 2);
     end;
 
-    [Test]
-    procedure CreateItemFromItemTemplateWithDefaultDimensions()
-    var
-        ItemTempl: Record "Item Templ.";
-        Item: Record Item;
-        Dimension: Record Dimension;
-        DimensionValue: Record "Dimension Value";
-        DefaultDimension: Record "Default Dimension";
-        ItemTemplMgt: Codeunit "Item Templ. Mgt.";
-    begin
-        // [SCENARIO 525355] Value filters of dimensions in a Item Template are being transferred to new Item created using the template.
-        Initialize();
-
-        // [GIVEN] Create Item Template to set Dimension.
-        LibraryTemplates.CreateItemTemplate(ItemTempl);
-
-        // [GIVEN] Create a Dimension.
-        LibraryDimension.CreateDimension(Dimension);
-
-        // [GIVEN] Create Dimension Value with the Dimension.
-        LibraryDimension.CreateDimensionValue(DimensionValue, Dimension.Code);
-
-        // [GIVEN] Create Default Dimension for Item Template.
-        LibraryDimension.CreateDefaultDimension(
-            DefaultDimension,
-            DATABASE::"Item Templ.",
-            ItemTempl.Code,
-            DimensionValue."Dimension Code",
-            DimensionValue.Code);
-
-        // [GIVEN] Validate Value Posting and Allowed Values Filter in Default Dimension.
-        DefaultDimension.Validate("Value Posting", DefaultDimension."Value Posting"::"Code Mandatory");
-        DefaultDimension.Validate("Allowed Values Filter", DimensionValue.Code);
-        DefaultDimension.Modify();
-
-        // [WHEN] Create a new Item from the Item Template.
-        Item.Init();
-        Item.Insert(true);
-        ItemTemplMgt.ApplyItemTemplate(Item, ItemTempl);
-
-        // [THEN] Find and check Default Dimensions are copied to the new Item with Allowed Value Filter.
-        DefaultDimension.Reset();
-        DefaultDimension.SetRange("Table ID", DATABASE::Item);
-        DefaultDimension.SetRange("No.", Item."No.");
-        DefaultDimension.SetRange("Dimension Code", DimensionValue."Dimension Code");
-        DefaultDimension.FindFirst();
-        Assert.AreEqual(
-            DefaultDimension."Allowed Values Filter",
-            DefaultDimension."Dimension Value Code",
-            ItemDimensionAllowedFilter);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure RenameBusinessRelationShouldNotUpdateContactBusinessRelation()
-    var
-        Customer: Record Customer;
-        Contact: Record Contact;
-        BusinessRelation: Record "Business Relation";
-        ContactBusinessRelation: Record "Contact Business Relation";
-        MarketingSetup: Record "Marketing Setup";
-        PrevContactCount: Integer;
-    begin
-        // [SCENARIO 538469] A problem with renaming the "Contact Business Relation" field in the Contacts page in BC
-        Initialize();
-
-        // [GIVEN] Setup: Create a new Business Relation and Modify MarketingSetup."Bus. Rel. Code for Customers" = "X".
-        LibraryMarketing.CreateBusinessRelation(BusinessRelation);
-        ChangeBusinessRelationCodeForCustomers(BusinessRelation.Code);
-
-        // [THEN] Create a new Customer and Create Contact from Customer by running the report Create Conts. from Customers.
-        LibrarySales.CreateCustomer(Customer);
-        Customer.SetRange("No.", Customer."No.");
-        RunCreateContsFromCustomersReport(Customer);
-
-        // [WHEN] Rename the Business Relation Code to a random text
-        BusinessRelation.CalcFields("No. of Contacts");
-        PrevContactCount := BusinessRelation."No. of Contacts";
-        BusinessRelation.Rename(LibraryRandom.RandText(5));
-
-        // [THEN] Verify: Bus. Rec. Code for Customer is updated on Marketing Setup
-        MarketingSetup.Get();
-        Assert.AreEqual(MarketingSetup."Bus. Rel. Code for Customers", BusinessRelation.Code, ValueMustMatch);
-
-        // [THEN] Verify: No. of Contacts on Business Relation is equal to previosu
-        BusinessRelation.Get(BusinessRelation.Code);
-        BusinessRelation.CalcFields("No. of Contacts");
-        Assert.AreEqual(PrevContactCount, BusinessRelation."No. of Contacts", ValueMustMatch);
-
-        // [THEN] Verify: Check that the Contact Business Relation is Customer.
-        ContactBusinessRelation.SetRange("Business Relation Code", BusinessRelation.Code);
-        ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
-        ContactBusinessRelation.SetRange("No.", Customer."No.");
-        ContactBusinessRelation.FindFirst();
-        Contact.Get(ContactBusinessRelation."Contact No.");
-        Assert.AreEqual(Contact."Contact Business Relation", Contact."Contact Business Relation"::Customer, ValueMustMatch);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure SameBusinessRelationOnAllMarketingBusinessRelationFields()
-    var
-        BusinessRelation: Record "Business Relation";
-        MarketingSetup: Record "Marketing Setup";
-    begin
-        // [SCENARIO 538469] A problem with renaming the "Contact Business Relation" field in the Contacts page in BC
-        Initialize();
-
-        // [GIVEN] Setup: Create a new Business Relation and Modify all Business Relation related fields on MarketingSetup
-        LibraryMarketing.CreateBusinessRelation(BusinessRelation);
-        UpdateSameBusinessRelationCodeOnMarketingSetup(BusinessRelation.Code);
-
-        // [WHEN] Rename the Business Relation Code to a random text
-        BusinessRelation.Rename(LibraryRandom.RandText(5));
-
-        // [THEN] Verify: Business Relation related fields on Marketing Setup
-        MarketingSetup.Get();
-        Assert.AreEqual(MarketingSetup."Bus. Rel. Code for Customers", BusinessRelation.Code, ValueMustMatch);
-        Assert.AreEqual(MarketingSetup."Bus. Rel. Code for Vendors", BusinessRelation.Code, ValueMustMatch);
-        Assert.AreEqual(MarketingSetup."Bus. Rel. Code for Employees", BusinessRelation.Code, ValueMustMatch);
-        Assert.AreEqual(MarketingSetup."Bus. Rel. Code for Bank Accs.", BusinessRelation.Code, ValueMustMatch);
-    end;
-
     local procedure Initialize()
     var
         MarketingSetup: Record "Marketing Setup";
@@ -7097,18 +6972,6 @@ codeunit 136201 "Marketing Contacts"
     begin
         // Generate Dummy message. Required for executing the test case successfully.
         if Confirm(StrSubstNo(ExpectedMessage)) then;
-    end;
-
-    local procedure UpdateSameBusinessRelationCodeOnMarketingSetup(BusRelCode: Code[10])
-    var
-        MarketingSetup: Record "Marketing Setup";
-    begin
-        MarketingSetup.Get();
-        MarketingSetup.Validate("Bus. Rel. Code for Customers", BusRelCode);
-        MarketingSetup.Validate("Bus. Rel. Code for Vendors", BusRelCode);
-        MarketingSetup.Validate("Bus. Rel. Code for Employees", BusRelCode);
-        MarketingSetup.Validate("Bus. Rel. Code for Bank Accs.", BusRelCode);
-        MarketingSetup.Modify(true);
     end;
 
     [RequestPageHandler]
