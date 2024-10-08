@@ -2,7 +2,6 @@ namespace Microsoft.Purchases.Document;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
-using Microsoft.Finance.AllocationAccount;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
@@ -52,8 +51,6 @@ table 174 "Standard Purchase Line"
             if (Type = const("Fixed Asset")) "Fixed Asset"
             else
             if (Type = const("Charge (Item)")) "Item Charge"
-            else
-            if (Type = const("Allocation Account")) "Allocation Account"
             else
             if (Type = const(Resource)) Resource;
 
