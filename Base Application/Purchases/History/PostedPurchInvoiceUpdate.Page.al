@@ -18,7 +18,6 @@ page 1351 "Posted Purch. Invoice - Update"
         {
             group(General)
             {
-                Caption = 'General';
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Basic, Suite;
