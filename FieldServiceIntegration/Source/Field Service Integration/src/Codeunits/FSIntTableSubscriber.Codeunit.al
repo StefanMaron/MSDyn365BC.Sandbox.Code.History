@@ -953,7 +953,10 @@ codeunit 6610 "FS Int. Table Subscriber"
                         Error(CoupledToDeletedErr, FSWorkOrderProduct.FieldCaption(Product), Format(FSWorkOrderProduct.Product), Item.TableCaption());
 
                     JobJournalLine.Validate("Entry Type", JobJournalLine."Entry Type"::Usage);
-                    JobJournalLine.Validate("Line Type", JobJournalLine."Line Type"::Billable);
+                    if Item.Type = Item.Type::"Non-Inventory" then
+                        JobJournalLine.Validate("Line Type", JobJournalLine."Line Type"::" ")
+                    else
+                        JobJournalLine.Validate("Line Type", JobJournalLine."Line Type"::Billable);
                     // set Item, but for work order products we must keep its Business Central Unit Cost
                     JobJournalLine.Validate("No.", Item."No.");
                     JobJournalLine.Validate(Description, CopyStr(FSWorkOrderProduct.Name, 1, MaxStrLen(JobJournalLine.Description)));
