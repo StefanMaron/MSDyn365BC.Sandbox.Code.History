@@ -698,7 +698,9 @@ report 12119 "Depreciation Book"
                     TotalInventoryYear[k] += ReclassAmount[k];
                     TotalReclassAmount[k] += ReclassAmount[k];
                 end;
-                CalcTotals();
+                FillTempFALedgEntry();
+                CalcTotals(true, TotalSubclass);
+                CalcTotals(false, TotalClass);
                 UpdateTotals();
                 CreateGroupTotals();
                 if FixedAsset.Next() = 0 then
@@ -712,6 +714,7 @@ report 12119 "Depreciation Book"
                 PrevInventoryYear := 0;
                 Printyear := false;
                 NextFALedgEntryNo := 1;
+                TempFALedgEntry.DeleteAll();
 
                 for k := 1 to 14 do begin
                     TotalSubclass[k] := 0;
@@ -876,6 +879,7 @@ report 12119 "Depreciation Book"
         FASubclass: Record "FA Subclass";
         FixedAsset2: Record "Fixed Asset";
         FAsset2: Record "Fixed Asset";
+        TempFALedgEntry: Record "FA Ledger Entry" temporary;
         FixedAsset: Record "Fixed Asset";
         FAGenReport: Codeunit "FA General Report";
         DeprBookCode: Code[10];
@@ -1083,17 +1087,39 @@ report 12119 "Depreciation Book"
         exit(StartingDate - 1);
     end;
 
-    local procedure CalcTotals()
+    local procedure CalcTotals(Subclass: Boolean; var TotalAmount: array[14] of Decimal)
     var
-        EntryType: Integer;
+        Type: Integer;
     begin
-        for EntryType := 1 to 14 do begin
-            TotalClass[EntryType] := TotalClass[EntryType] + Total[EntryType];
-            TotalSubclass[EntryType] := TotalSubclass[EntryType] + Total[EntryType];
-            if EntryType in [1 .. 4] then begin
-                TotalClass[EntryType] += ReclassAmount[EntryType];
-                TotalSubclass[EntryType] += ReclassAmount[EntryType];
-            end;
+        for Type := 1 to 14 do begin
+            TempFALedgEntry.Reset();
+            if Subclass then
+                TempFALedgEntry.SetRange("FA Subclass Code", "Fixed Asset"."FA Subclass Code");
+            TempFALedgEntry.SetRange("FA Class Code", "Fixed Asset"."FA Class Code");
+            TempFALedgEntry.SetRange("Transaction No.", Type);
+            TempFALedgEntry.SetRange("FA No.", "Fixed Asset"."No.");
+            if TempFALedgEntry.FindSet() then
+                repeat
+                    TotalAmount[Type] := TotalAmount[Type] + TempFALedgEntry.Amount;
+                until TempFALedgEntry.Next() = 0;
+            if Type in [1 .. 4] then
+                TotalAmount[Type] += ReclassAmount[Type];
+        end;
+    end;
+
+    local procedure FillTempFALedgEntry()
+    var
+        x: Integer;
+    begin
+        for x := 1 to 14 do begin
+            TempFALedgEntry."Entry No." := NextFALedgEntryNo;
+            TempFALedgEntry."FA No." := "Fixed Asset"."No.";
+            TempFALedgEntry."FA Class Code" := "Fixed Asset"."FA Class Code";
+            TempFALedgEntry."FA Subclass Code" := "Fixed Asset"."FA Subclass Code";
+            TempFALedgEntry."Transaction No." := x;
+            TempFALedgEntry.Amount := Total[x];
+            TempFALedgEntry.Insert();
+            NextFALedgEntryNo := NextFALedgEntryNo + 1;
         end;
     end;
 
