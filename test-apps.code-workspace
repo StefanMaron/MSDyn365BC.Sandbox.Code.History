@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeActions": false,
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
@@ -291,13 +299,5 @@
     {
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false
-  }
+  ]
 }
