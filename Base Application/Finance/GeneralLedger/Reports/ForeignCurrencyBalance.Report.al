@@ -100,16 +100,16 @@ report 503 "Foreign Currency Balance"
             }
             dataitem("Bank Account"; "Bank Account")
             {
-                DataItemLink = "Currency Code" = field(Code), "Date Filter" = field("Date Filter");
+                DataItemLink = "Currency Code" = field(Code);
                 DataItemTableView = sorting("No.");
                 column(BankAccCurrentBalanceLCY; BankAccCurrentBalanceLCY)
                 {
                     AutoFormatType = 1;
                 }
-                column(BankAccountBalanceLCY; "Balance at Date (LCY)")
+                column(BankAccountBalanceLCY; "Balance (LCY)")
                 {
                 }
-                column(BankAccountBalance; "Balance at Date")
+                column(BankAccountBalance; Balance)
                 {
                 }
                 column(BalLcyBankAccCurrBalLcy; "Balance (LCY)" - BankAccCurrentBalanceLCY)
@@ -125,18 +125,18 @@ report 503 "Foreign Currency Balance"
 
                 trigger OnAfterGetRecord()
                 begin
-                    CalcFields(Balance, "Balance (LCY)", "Balance at Date", "Balance at Date (LCY)");
-                    if ("Balance at Date" = 0) and ("Balance at Date (LCY)" = 0) then
+                    CalcFields(Balance, "Balance (LCY)");
+                    if (Balance = 0) and ("Balance (LCY)" = 0) then
                         CurrReport.Skip();
                     BankAccCurrentBalanceLCY :=
                       Round(
                         CurrExchRate.ExchangeAmtFCYToLCY(
-                          WorkDate(), Currency.Code, "Balance at Date",
+                          WorkDate(), Currency.Code, Balance,
                           CurrExchRate.ExchangeRate(
                             WorkDate(), Currency.Code)));
 
-                    CalcTotalBalance += "Balance at Date";
-                    CalcTotalBalanceLCY += "Balance at Date (LCY)";
+                    CalcTotalBalance += Balance;
+                    CalcTotalBalanceLCY += "Balance (LCY)";
                     CalcTotalCurrentBalanceLCY += BankAccCurrentBalanceLCY;
                 end;
 
@@ -182,10 +182,10 @@ report 503 "Foreign Currency Balance"
                 begin
                     TotalBalance :=
                       Currency."Customer Balance" - Currency."Vendor Balance" +
-                      "Bank Account"."Balance at Date";
+                      "Bank Account".Balance;
                     TotalBalanceLCY :=
                       Currency."Customer Balance (LCY)" - Currency."Vendor Balance (LCY)" +
-                      "Bank Account"."Balance at Date (LCY)";
+                      "Bank Account"."Balance (LCY)";
 
                     TotalCurrentBalanceLCY := CustCurrentBalanceLCY - VendCurrentBalanceLCY + BankAccCurrentBalanceLCY;
 
