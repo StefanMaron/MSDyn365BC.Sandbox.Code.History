@@ -118,10 +118,8 @@ page 7251 "Bank Acc. Rec. AI Proposal Sub"
             TempInitialBankAccRecAIProposal.SetFilter("Bank Account Ledger Entry No.", '<>0');
             if TempInitialBankAccRecAIProposal.FindSet() then
                 repeat
-                    if BankAccountLedgerEntry.Get(TempInitialBankAccRecAIProposal."Bank Account Ledger Entry No.") then begin
-                        OnBeforeOpenProposedRecordOnBeforeCopyFromBankAccLedgerEntry(TempBankAccountLedgerEntry, BankAccountLedgerEntry);
+                    if BankAccountLedgerEntry.Get(TempInitialBankAccRecAIProposal."Bank Account Ledger Entry No.") then
                         TempBankAccountLedgerEntry.CopyFromBankAccLedgerEntry(BankAccountLedgerEntry, '');
-                    end;
                 until TempInitialBankAccRecAIProposal.Next() = 0;
 
             Page.Run(Page::"Bank Account Ledger Entries", TempBankAccountLedgerEntry);
@@ -221,9 +219,4 @@ page 7251 "Bank Acc. Rec. AI Proposal Sub"
         ApplyToMultipleLedgerEntriesTxt: label 'Apply to multiple entries. Drill down to see more.';
         TelemetryUserSavingProposalTxt: label 'User saving Copilot proposal in Text-toAccount Mapping table', Locked = true;
         TelemetryUserChangedProposalTxt: label 'User changed Copilot proposal for transfering to G/L Account', Locked = true;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenProposedRecordOnBeforeCopyFromBankAccLedgerEntry(var TempBankAccountLedgerEntry: Record "Bank Account Ledger Entry" temporary; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
-    begin
-    end;
 }
