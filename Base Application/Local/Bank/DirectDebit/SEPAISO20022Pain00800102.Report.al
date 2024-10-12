@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -11,7 +11,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Utilities;
 using System;
 using System.IO;
-using System.Telemetry;
 using System.Text;
 using System.Xml;
 
@@ -75,15 +74,6 @@ report 11000013 "SEPA ISO20022 Pain 008.001.02"
     labels
     {
     }
-
-    trigger OnPreReport()
-    var
-        FeatureTelemetry: Codeunit "Feature Telemetry";
-        SEPADDExportFile: Codeunit "SEPA DD-Export File";     
-    begin
-        FeatureTelemetry.LogUptake('0000N2L', SEPADDExportFile.FeatureName(), Enum::"Feature Uptake Status"::Used);
-        FeatureTelemetry.LogUsage('0000N2M', SEPADDExportFile.FeatureName(), 'Report (NL) SEPA ISO20022 Pain 008.001.02');
-    end;
 
     var
         CompanyInfo: Record "Company Information";
