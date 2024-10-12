@@ -27,42 +27,39 @@ report 291 "Delete Invd Blnkt Sales Orders"
 
             trigger OnAfterGetRecord()
             var
-                SalesBlanketOrderLine: Record "Sales Line";
-                SalesLineFromBlanketOrder: Record "Sales Line";
-                SalesCommentLine: Record "Sales Comment Line";
-                AssembleToOrderLink: Record "Assemble-to-Order Link";
-                ArchiveManagement: Codeunit ArchiveManagement;
+                ATOLink: Record "Assemble-to-Order Link";
             begin
                 OnSalesHeaderOnBeforeOnAfterGetRecord("Sales Header");
 
                 if GuiAllowed() then
-                    ProgressDialog.Update(1, "No.");
+                    Window.Update(1, "No.");
 
-                SalesBlanketOrderLine.SetRange("Document Type", "Document Type");
-                SalesBlanketOrderLine.SetRange("Document No.", "No.");
-                SalesBlanketOrderLine.SetFilter("Quantity Invoiced", '<>0');
-                if SalesBlanketOrderLine.FindFirst() then begin
-                    SalesBlanketOrderLine.SetRange("Quantity Invoiced");
-                    SalesBlanketOrderLine.SetFilter("Outstanding Quantity", '<>0');
-                    OnAfterSetSalesLineFilters(SalesBlanketOrderLine);
-                    if not SalesBlanketOrderLine.FindFirst() then begin
-                        SalesBlanketOrderLine.SetRange("Outstanding Quantity");
-                        SalesBlanketOrderLine.SetFilter("Qty. Shipped Not Invoiced", '<>0');
-                        if not SalesBlanketOrderLine.FindFirst() then begin
-                            SalesBlanketOrderLine.LockTable();
-                            if not SalesBlanketOrderLine.FindFirst() then begin
-                                SalesBlanketOrderLine.SetRange("Qty. Shipped Not Invoiced");
-                                SalesLineFromBlanketOrder.SetRange("Blanket Order No.", "No.");
-                                if SalesLineFromBlanketOrder.IsEmpty() then begin
+                SalesLine.Reset();
+                SalesLine.SetRange("Document Type", "Document Type");
+                SalesLine.SetRange("Document No.", "No.");
+                SalesLine.SetFilter("Quantity Invoiced", '<>0');
+                if SalesLine.FindFirst() then begin
+                    SalesLine.SetRange("Quantity Invoiced");
+                    SalesLine.SetFilter("Outstanding Quantity", '<>0');
+                    OnAfterSetSalesLineFilters(SalesLine);
+                    if not SalesLine.FindFirst() then begin
+                        SalesLine.SetRange("Outstanding Quantity");
+                        SalesLine.SetFilter("Qty. Shipped Not Invoiced", '<>0');
+                        if not SalesLine.FindFirst() then begin
+                            SalesLine.LockTable();
+                            if not SalesLine.FindFirst() then begin
+                                SalesLine.SetRange("Qty. Shipped Not Invoiced");
+                                SalesLine2.SetRange("Blanket Order No.", "No.");
+                                if not SalesLine2.FindFirst() then begin
                                     ArchiveManagement.AutoArchiveSalesDocument("Sales Header");
-                                    SalesBlanketOrderLine.SetFilter("Qty. to Assemble to Order", '<>0');
-                                    if SalesBlanketOrderLine.FindSet() then
+                                    SalesLine.SetFilter("Qty. to Assemble to Order", '<>0');
+                                    if SalesLine.FindSet() then
                                         repeat
-                                            AssembleToOrderLink.DeleteAsmFromSalesLine(SalesBlanketOrderLine);
-                                        until SalesBlanketOrderLine.Next() = 0;
-                                    SalesBlanketOrderLine.SetRange("Qty. to Assemble to Order");
-                                    OnBeforeDeleteSalesLines(SalesBlanketOrderLine);
-                                    SalesBlanketOrderLine.DeleteAll();
+                                            ATOLink.DeleteAsmFromSalesLine(SalesLine);
+                                        until SalesLine.Next() = 0;
+                                    SalesLine.SetRange("Qty. to Assemble to Order");
+                                    OnBeforeDeleteSalesLines(SalesLine);
+                                    SalesLine.DeleteAll();
 
                                     SalesCommentLine.SetRange("Document Type", "Document Type");
                                     SalesCommentLine.SetRange("No.", "No.");
@@ -84,14 +81,35 @@ report 291 "Delete Invd Blnkt Sales Orders"
             trigger OnPreDataItem()
             begin
                 if GuiAllowed() then
-                    ProgressDialog.Open(ProcessingProgressTxt);
+                    Window.Open(Text000);
             end;
         }
     }
 
+    requestpage
+    {
+
+        layout
+        {
+        }
+
+        actions
+        {
+        }
+    }
+
+    labels
+    {
+    }
+
     var
-        ProgressDialog: Dialog;
-        ProcessingProgressTxt: Label 'Processing blanket sales orders #1##########', Comment = '%1 - Blanket Sales Order No.';
+        SalesLine: Record "Sales Line";
+        SalesLine2: Record "Sales Line";
+        SalesCommentLine: Record "Sales Comment Line";
+        ArchiveManagement: Codeunit ArchiveManagement;
+        Window: Dialog;
+
+        Text000: Label 'Processing sales orders #1##########';
 
     local procedure DeleteApprovalEntries(SalesHeader: Record "Sales Header")
     var
