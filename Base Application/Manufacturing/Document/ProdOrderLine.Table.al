@@ -938,7 +938,6 @@ table 5406 "Prod. Order Line"
         IgnoreErrors: Boolean;
         ErrorOccured: Boolean;
         CalledFromComponent: Boolean;
-        CalledFromHeader: Boolean;
 
     procedure DeleteRelations()
     var
@@ -975,11 +974,8 @@ table 5406 "Prod. Order Line"
         ProdOrderComp.SetRange("Prod. Order Line No.", "Line No.");
         IsHandled := false;
         OnDeleteRelationsOnBeforeProdOrderCompDeleteAll(ProdOrderComp, Blocked, IsHandled);
-        if not IsHandled then begin
-            if CalledFromHeader then
-                ProdOrderComp.SuspendDeletionCheck(true);
+        if not IsHandled then
             ProdOrderComp.DeleteAll(true);
-        end;
 
         if not CalledFromComponent then begin
             ProdOrderComp.SetRange("Prod. Order Line No.");
@@ -1187,8 +1183,6 @@ table 5406 "Prod. Order Line"
           DimMgt.EditDimensionSet(
             Rec, "Dimension Set ID", StrSubstNo('%1 %2 %3', Status, "Prod. Order No.", "Line No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-
-        OnShowDimensionsOnAfterEditDimensionSet(Rec, OldDimSetID);
         if OldDimSetID <> "Dimension Set ID" then begin
             Modify();
             if ProdOrderCompExist() then
@@ -1570,11 +1564,6 @@ table 5406 "Prod. Order Line"
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, CurrFieldNo);
     end;
 
-    procedure SuspendDeletionCheck(Suspend: Boolean)
-    begin
-        CalledFromHeader := Suspend;
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var ProdOrderLine: Record "Prod. Order Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CallingFieldNo: Integer)
     begin
@@ -1772,11 +1761,6 @@ table 5406 "Prod. Order Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateEndingTimeOnBeforeRecalculate(var ProdOrderLine: Record "Prod. Order Line"; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnShowDimensionsOnAfterEditDimensionSet(var ProdOrderLine: Record "Prod. Order Line"; OldDimSetID: Integer)
     begin
     end;
 }
