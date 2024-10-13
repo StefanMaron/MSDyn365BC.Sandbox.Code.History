@@ -45,7 +45,7 @@ report 4404 "EXR Vendor Top List"
 
     requestpage
     {
-        AboutText = 'This report contains aggregated purchase (LCY) and balance (LCY) data for the top number of vendors selected. The data is aggregated for the period specified in the request page''s Datefilter parameter.';
+        AboutText = 'This report shows purchase information for vendors over the selected period of time, summarized by the supplied period length, limited by how many vendors you would like included.';
         AboutTitle = 'Vendor - Top Trends';
         SaveValues = true;
         layout
@@ -88,10 +88,9 @@ report 4404 "EXR Vendor Top List"
     {
         layout(VendorTopTrendExcel)
         {
-            Type = Excel;
-            Caption = 'Vendor - Top Trends Excel';
+            Caption = 'Vendor - Top Trends Excel (Preview)';
             LayoutFile = './ReportLayouts/Excel/Vendor/VendorTopListExcel.xlsx';
-            Summary = 'Built in layout for the Vendor - Top Trends excel report. This report contains aggregated purchase (LCY) and balance (LCY) data for the top number of vendors selected. Report uses Query connections.';
+            Type = Excel;
         }
     }
     labels
