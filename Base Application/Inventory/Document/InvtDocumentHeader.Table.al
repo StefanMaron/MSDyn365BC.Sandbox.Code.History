@@ -261,8 +261,6 @@ table 5850 "Invt. Document Header"
         IsHandled: Boolean;
 #endif
     begin
-        OnBeforeInsert(Rec, xRec);
-
         InvtSetup.Get();
         if "No." = '' then begin
             TestNoSeries();
@@ -353,8 +351,6 @@ table 5850 "Invt. Document Header"
 
     procedure AssistEdit(OldInvtDocHeader: Record "Invt. Document Header"): Boolean
     begin
-        OnBeforeAssistEdit(Rec, OldInvtDocHeader);
-
         InvtSetup.Get();
         TestNoSeries();
         if NoSeries.LookupRelatedNoSeries(GetNoSeriesCode(), OldInvtDocHeader."No. Series", "No. Series") then begin
@@ -379,28 +375,24 @@ table 5850 "Invt. Document Header"
         end;
     end;
 
-    local procedure GetNoSeriesCode() NoSeriesCode: Code[20]
+    local procedure GetNoSeriesCode(): Code[20]
     begin
         case "Document Type" of
             "Document Type"::Receipt:
-                NoSeriesCode := InvtSetup."Invt. Receipt Nos.";
+                exit(InvtSetup."Invt. Receipt Nos.");
             "Document Type"::Shipment:
-                NoSeriesCode := InvtSetup."Invt. Shipment Nos.";
+                exit(InvtSetup."Invt. Shipment Nos.");
         end;
-
-        OnAfterGetNoSeriesCode(Rec, NoSeriesCode);
     end;
 
-    local procedure GetPostingNoSeriesCode() PostingNos: Code[20]
+    local procedure GetPostingNoSeriesCode(): Code[20]
     begin
         case "Document Type" of
             "Document Type"::Receipt:
-                PostingNos := InvtSetup."Posted Invt. Receipt Nos.";
+                exit(InvtSetup."Posted Invt. Receipt Nos.");
             "Document Type"::Shipment:
-                PostingNos := InvtSetup."Posted Invt. Shipment Nos.";
+                exit(InvtSetup."Posted Invt. Shipment Nos.");
         end;
-
-        OnAfterGetPostingNoSeriesCode(Rec, PostingNos);
     end;
 
     procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
@@ -578,26 +570,6 @@ table 5850 "Invt. Document Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitRecord(var InvtDocumentHeader: Record "Invt. Document Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeAssistEdit(var InvtDocumentHeader: Record "Invt. Document Header"; OldInvtDocumentHeader: Record "Invt. Document Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetPostingNoSeriesCode(var InvtDocumentHeader: Record "Invt. Document Header"; var PostingNos: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetNoSeriesCode(var InvtDocumentHeader: Record "Invt. Document Header"; var NoSeriesCode: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsert(var InvtDocumentHeader: Record "Invt. Document Header"; xInvtDocumentHeader: Record "Invt. Document Header")
     begin
     end;
 }
