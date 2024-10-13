@@ -172,19 +172,17 @@ codeunit 414 "Release Sales Document"
         SalesLine.SetRange(Type, SalesLine.Type::Item);
         if SalesLine.FindSet() then
             repeat
-                if SalesLine.IsInventoriableItem() then begin
-                    if InvtSetup."Location Mandatory" then begin
+                if InvtSetup."Location Mandatory" then
+                    if SalesLine.IsInventoriableItem() then begin
                         IsHandled := false;
                         OnCodeOnBeforeSalesLineCheck(SalesLine, IsHandled);
                         if not IsHandled then
                             SalesLine.TestField("Location Code");
                     end;
-                    SalesLine.TestField("Unit of Measure Code");
-                end;
                 if Item.Get(SalesLine."No.") then
                     if Item.IsVariantMandatory() then
                         SalesLine.TestField("Variant Code");
-                OnCodeOnAfterSalesLineCheck(SalesLine, SalesHeader, Item);
+                OnCodeOnAfterSalesLineCheck(SalesLine, SalesHeader);
             until SalesLine.Next() = 0;
         SalesLine.SetFilter(Type, '>0');
     end;
@@ -497,7 +495,7 @@ codeunit 414 "Release Sales Document"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnAfterSalesLineCheck(var SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header"; var Item: Record "Item")
+    local procedure OnCodeOnAfterSalesLineCheck(var SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header")
     begin
     end;
 
