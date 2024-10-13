@@ -7,7 +7,6 @@ namespace Microsoft.Integration.Dataverse;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Utilities;
-using System;
 using System.Environment;
 using System.Privacy;
 using System.Security.Encryption;
@@ -71,10 +70,6 @@ table 7200 "CDS Connection Setup"
             var
                 CRMConnectionSetup: Record "CRM Connection Setup";
                 CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
-                MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-                MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-                MyALAuditCategory: DotNet ALAuditCategory;
-                CDSConnectionConsentLbl: Label 'CDS Connection Setup - consent provided by UserSecurityId %1.', Locked = true;
             begin
                 if not "Is Enabled" then begin
                     if CRMConnectionSetup.Get() then
@@ -85,7 +80,7 @@ table 7200 "CDS Connection Setup"
                 end;
 
                 Session.LogMessage('0000CDS', CDSConnEnabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
-                MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(CDSConnectionConsentLbl, UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 4, 0);
+
 
                 if IsTemporary() then begin
                     CDSIntegrationImpl.CheckConnectionRequiredFields(Rec, false);
@@ -375,14 +370,14 @@ table 7200 "CDS Connection Setup"
     procedure GetPassword(): Text
     var
         IsolatedStorageManagement: Codeunit "Isolated Storage Management";
-        Value: SecretText;
+        Value: Text;
     begin
         if IsTemporary() then
             exit(TempUserPassword);
 
         if not IsNullGuid("User Password Key") then
             if IsolatedStorageManagement.Get("User Password Key", DATASCOPE::Company, Value) then
-                exit(Value.Unwrap());
+                exit(Value);
 
         exit('');
     end;
@@ -584,23 +579,22 @@ table 7200 "CDS Connection Setup"
 
     end;
 
+    [Scope('OnPrem')]
     procedure EnsureCRMConnectionSetupIsDisabled()
     var
         CRMConnectionSetup: Record "CRM Connection Setup";
-        ErrorInfo: ErrorInfo;
     begin
-        OnEnsureConnectionSetupIsDisabled();
+        if not CRMConnectionSetup.Get() then
+            exit;
 
-        if CRMConnectionSetup.Get() then
-            if CRMConnectionSetup.IsEnabled() then
-                if CRMConnectionSetup."Server Address" <> TestServerAddressTok then begin
-                    Session.LogMessage('0000D3R', CRMConnEnabledTelemetryErr, Verbosity::Warning, DataClassification::CustomerContent, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
-                    ErrorInfo.Message := CRMConnEnabledErr;
-                    ErrorInfo.AddAction(LearnMoreLbl, Codeunit::"CDS Integration Impl.", 'LearnMoreDisablingCRMConnection', LearnMoreDescriptionLbl);
-                    ErrorInfo.AddNavigationAction(ShowCRMConnectionSetupLbl, ShowCRMConnectionSetupDescLbl);
-                    ErrorInfo.PageNo(Page::"CRM Connection Setup");
-                    Error(ErrorInfo);
-                end;
+        if not CRMConnectionSetup.IsEnabled() then
+            exit;
+
+        if CRMConnectionSetup."Server Address" = TestServerAddressTok then
+            exit;
+
+        Session.LogMessage('0000D3R', CRMConnEnabledTelemetryErr, Verbosity::Warning, DataClassification::CustomerContent, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
+        Error(CRMConnEnabledErr);
     end;
 
     local procedure UpdateCDSJobQueueEntriesStatus()
@@ -640,11 +634,6 @@ table 7200 "CDS Connection Setup"
         exit(100);
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnEnsureConnectionSetupIsDisabled()
-    begin
-    end;
-
     var
         CDSIntegrationImpl: Codeunit "CDS Integration Impl.";
         CDSIntegrationMgt: Codeunit "CDS Integration Mgt.";
@@ -665,8 +654,4 @@ table 7200 "CDS Connection Setup"
         TransferringConnectionValuesFromCRMConnectionsetupTxt: Label 'Transferring connection string values from Dynamics 365 sales connection setup to Dataverse connection setup', Locked = true;
         TestServerAddressTok: Label '@@test@@', Locked = true;
         DefaultingToDataverseServiceClientTxt: Label 'Defaulting to DataverseServiceClient', Locked = true;
-        LearnMoreLbl: Label 'Learn more';
-        LearnMoreDescriptionLbl: Label 'Read more about disabling connection.';
-        ShowCRMConnectionSetupLbl: Label 'Sales Integration Setup';
-        ShowCRMConnectionSetupDescLbl: Label 'Shows Dynamics 365 Sales Integration Setup page where you can disable the connection.';
 }
