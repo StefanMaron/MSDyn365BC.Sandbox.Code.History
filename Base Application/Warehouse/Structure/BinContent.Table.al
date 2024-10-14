@@ -838,7 +838,7 @@ table 7302 "Bin Content"
         end;
 
         QtyAvailToPickBase := CalcTotalQtyAvailToTake(DecreaseQtyBase);
-        OnCheckDecreaseBinContentOnAfterCalcTotalQtyAvailToTake(WhseActivLine, QtyAvailToPickBase, DecreaseQtyBase, Rec);
+        OnCheckDecreaseBinContentOnAfterCalcTotalQtyAvailToTake(WhseActivLine, QtyAvailToPickBase, DecreaseQtyBase);
         if QtyAvailToPickBase < QtyBase then begin
             GetItem("Item No.");
             QtyAvailToPick :=
@@ -1589,7 +1589,7 @@ table 7302 "Bin Content"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCheckDecreaseBinContentOnAfterCalcTotalQtyAvailToTake(var WarehouseActivityLine: Record "Warehouse Activity Line"; var QtyAvailToPickBase: Decimal; var DecreaseQtyBase: Decimal; var BinContent: Record "Bin Content")
+    local procedure OnCheckDecreaseBinContentOnAfterCalcTotalQtyAvailToTake(var WarehouseActivityLine: Record "Warehouse Activity Line"; var QtyAvailToPickBase: Decimal; var DecreaseQtyBase: Decimal)
     begin
     end;
 
