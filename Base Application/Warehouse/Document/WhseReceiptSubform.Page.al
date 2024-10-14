@@ -391,8 +391,6 @@ page 5769 "Whse. Receipt Subform"
         CODEUNIT.Run(CODEUNIT::"Whse.-Post Receipt (Yes/No)", WhseRcptLine);
         Rec.Reset();
         Rec.SetCurrentKey("No.", "Sorting Sequence No.");
-
-        OnAfterWhsePostRcptYesNo(Rec);
         CurrPage.Update(false);
     end;
 
@@ -424,8 +422,6 @@ page 5769 "Whse. Receipt Subform"
         WhseRcptLine.Copy(Rec);
         CODEUNIT.Run(CODEUNIT::"Whse.-Post Receipt + Pr. Pos.", WhseRcptLine);
         Rec.Reset();
-
-        OnAfterWhsePostRcptPrintPostedRcpt(Rec);
         CurrPage.Update(false);
     end;
 
@@ -473,16 +469,6 @@ page 5769 "Whse. Receipt Subform"
         OverReceiptMgt: Codeunit "Over-Receipt Mgt.";
     begin
         OverReceiptAllowed := OverReceiptMgt.IsOverReceiptAllowed();
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterWhsePostRcptPrintPostedRcpt(var WarehouseReceiptLine: Record "Warehouse Receipt Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterWhsePostRcptYesNo(var WarehouseReceiptLine: Record "Warehouse Receipt Line")
-    begin
     end;
 }
 
