@@ -294,6 +294,8 @@ codeunit 80 "Sales-Post"
         EmptyIdFoundLbl: Label 'Empty line id found.', Locked = true;
         ItemReservDisruptionLbl: Label 'Confirm Item Reservation Disruption', Locked = true;
         ItemChargeZeroAmountErr: Label 'The amount for item charge %1 cannot be 0.', Comment = '%1 = Item Charge No.';
+        SuppressCommitErr: Label 'Commit is blocked when %1 %2 is used.', Comment = '%1 = Date Order, %2 = Number Series';
+        DateOrderSeriesUsed: Boolean;
 
     internal procedure RunWithCheck(var SalesHeader2: Record "Sales Header")
     var
@@ -667,6 +669,7 @@ codeunit 80 "Sales-Post"
 
     local procedure CheckAndUpdate(var SalesHeader: Record "Sales Header")
     var
+        DummyNoSeries: Record "No. Series";
         ModifyHeader: Boolean;
         RefreshTempLinesNeeded: Boolean;
     begin
@@ -677,7 +680,7 @@ codeunit 80 "Sales-Post"
         if SalesHeader.Ship then
             InitPostATOs(SalesHeader);
 
-        if not HideProgressWindow then
+        if GuiAllowed() and not HideProgressWindow then
             InitProgressWindow(SalesHeader);
 
         // Update
@@ -686,7 +689,10 @@ codeunit 80 "Sales-Post"
             CreatePrepaymentLineForCreditMemo(SalesHeader);
         end;
 
+        DateOrderSeriesUsed := false;
         ModifyHeader := UpdatePostingNos(SalesHeader);
+        if DateOrderSeriesUsed then
+            SuppressCommit := true;
 
         if SalesHeader.Invoice and (SalesHeader."Operation Occurred Date" < GLSetup."Last Gen. Jour. Printing Date") then
             SalesHeader.FieldError(SalesHeader."Operation Occurred Date", StrSubstNo(Text1130007Err, GLSetup."Last Gen. Jour. Printing Date"));
@@ -694,6 +700,9 @@ codeunit 80 "Sales-Post"
         DropShipOrder := UpdateAssosOrderPostingNos(SalesHeader);
 
         OnBeforePostCommitSalesDoc(SalesHeader, GenJnlPostLine, PreviewMode, ModifyHeader, SuppressCommit, TempSalesLineGlobal);
+        if DateOrderSeriesUsed and (not SuppressCommit) then
+            Error(SuppressCommitErr, DummyNoSeries.FieldCaption("Date Order"), DummyNoSeries.TableCaption());
+
         if not PreviewMode and ModifyHeader then begin
             SalesHeader.Modify();
             if not SuppressCommit then
@@ -2508,7 +2517,8 @@ codeunit 80 "Sales-Post"
                     SalesHeader.TestField("Shipping No. Series");
                     SalesHeader."Shipping No." := NoSeries.GetNextNo(SalesHeader."Shipping No. Series", SalesHeader."Posting Date");
                     ModifyHeader := true;
-
+                    if NoSeries.IsNoSeriesInDateOrder(SalesHeader."Shipping No. Series") then
+                        DateOrderSeriesUsed := true;
                     // Check for posting conflicts.
                     if SalesShptHeader.Get(SalesHeader."Shipping No.") then
                         Error(SalesShptHeaderConflictErr, SalesHeader."Shipping No.");
@@ -2590,6 +2600,8 @@ codeunit 80 "Sales-Post"
             then
                 if not PreviewMode then begin
                     SalesHeader."Posting No." := NoSeriesCodeunit.GetNextNo(SalesHeader."Posting No. Series", SalesHeader."Posting Date");
+                    if NoSeriesCodeunit.IsNoSeriesInDateOrder(SalesHeader."Posting No. Series") then
+                        DateOrderSeriesUsed := true;
                     ModifyHeader := true;
                 end;
             if PreviewMode then begin
@@ -2627,6 +2639,8 @@ codeunit 80 "Sales-Post"
                     SalesHeader.TestField("Return Receipt No. Series");
                     SalesHeader."Return Receipt No." := NoSeries.GetNextNo(SalesHeader."Return Receipt No. Series", SalesHeader."Posting Date");
                     ModifyHeader := true;
+                    if NoSeries.IsNoSeriesInDateOrder(SalesHeader."Return Receipt No. Series") then
+                        DateOrderSeriesUsed := true;
                     // Check for posting conflicts.
                     if ReturnRcptHeader.Get(SalesHeader."Return Receipt No.") then
                         Error(SalesReturnRcptHeaderConflictErr, SalesHeader."Return Receipt No.")
@@ -2984,7 +2998,8 @@ codeunit 80 "Sales-Post"
             InsertTrackingSpecification(SalesHeader);
             PostUpdateOrderLine(SalesHeader);
             UpdateAssociatedPurchaseOrder(TempDropShptPostBuffer, SalesHeader);
-            UpdateWhseDocuments(SalesHeader, EverythingInvoiced);
+            if not PreviewMode then
+                UpdateWhseDocuments(SalesHeader, EverythingInvoiced);
             WhseSalesRelease.Release(SalesHeader);
             UpdateItemChargeAssgnt(SalesHeader);
             OnFinalizePostingOnAfterUpdateItemChargeAssgnt(SalesHeader, TempDropShptPostBuffer, GenJnlPostLine);
@@ -3035,7 +3050,8 @@ codeunit 80 "Sales-Post"
             end;
             UpdateAfterPosting(SalesHeader);
             UpdateEmailParameters(SalesHeader);
-            UpdateWhseDocuments(SalesHeader, EverythingInvoiced);
+            if not PreviewMode then
+                UpdateWhseDocuments(SalesHeader, EverythingInvoiced);
             if not OrderArchived then begin
                 ArchiveManagement.AutoArchiveSalesDocument(SalesHeader);
                 OrderArchived := true;
@@ -3195,7 +3211,7 @@ codeunit 80 "Sales-Post"
 
         OnFillInvoicePostingBufferOnBeforeDeferrals(SalesLine, TotalAmount, TotalAmountACY, SalesHeader.GetUseDate());
         DeferralUtilities.AdjustTotalAmountForDeferralsNoBase(
-          SalesLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY);
+          SalesLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, SalesLine."Inv. Discount Amount" + SalesLine."Line Discount Amount", SalesLineACY."Inv. Discount Amount" + SalesLineACY."Line Discount Amount");
 
         OnBeforeInvoicePostingBufferSetAmounts(
           SalesLine, TempInvoicePostBuffer, InvoicePostBuffer,
@@ -3221,7 +3237,7 @@ codeunit 80 "Sales-Post"
         if SalesLine."Deferral Code" <> '' then begin
             OnBeforeFillDeferralPostingBuffer(
               SalesLine, InvoicePostBuffer, TempInvoicePostBuffer, SalesHeader.GetUseDate(), InvDefLineNo, DeferralLineNo, SuppressCommit);
-            FillDeferralPostingBuffer(SalesHeader, SalesLine, InvoicePostBuffer, AmtToDefer, AmtToDeferACY, DeferralAccount, SalesAccount);
+            FillDeferralPostingBuffer(SalesHeader, SalesLine, InvoicePostBuffer, AmtToDefer, AmtToDeferACY, DeferralAccount, SalesAccount, SalesLine."Inv. Discount Amount" + SalesLine."Line Discount Amount", SalesLineACY."Inv. Discount Amount" + SalesLineACY."Line Discount Amount");
             OnAfterFillDeferralPostingBuffer(
               SalesLine, InvoicePostBuffer, TempInvoicePostBuffer, SalesHeader.GetUseDate(), InvDefLineNo, DeferralLineNo, SuppressCommit);
         end;
@@ -3682,6 +3698,7 @@ codeunit 80 "Sales-Post"
         else
             ProfitPct := Round(ProfitLCY / TotalSalesLineLCY.Amount * 100, 0.1);
         VATAmount := TotalSalesLine."Amount Including VAT" - TotalSalesLine.Amount;
+        OnSumSalesLinesTempOnAfterVatAmountSet(VATAmount, TotalSalesLine);
         if TotalSalesLine."VAT %" = 0 then
             VATAmountText := VATAmountTxt
         else
@@ -5867,7 +5884,6 @@ codeunit 80 "Sales-Post"
 
     local procedure GetInvoicePostingParameters()
     begin
-        Clear(InvoicePostingParameters);
         InvoicePostingParameters."Document Type" := GenJnlLineDocType;
         InvoicePostingParameters."Document No." := GenJnlLineDocNo;
         InvoicePostingParameters."External Document No." := GenJnlLineExtDocNo;
@@ -8765,7 +8781,7 @@ codeunit 80 "Sales-Post"
     end;
 
 #if not CLEAN23
-    local procedure FillDeferralPostingBuffer(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; InvoicePostBuffer: Record "Invoice Post. Buffer"; RemainAmtToDefer: Decimal; RemainAmtToDeferACY: Decimal; DeferralAccount: Code[20]; SalesAccount: Code[20])
+    local procedure FillDeferralPostingBuffer(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; InvoicePostBuffer: Record "Invoice Post. Buffer"; RemainAmtToDefer: Decimal; RemainAmtToDeferACY: Decimal; DeferralAccount: Code[20]; SalesAccount: Code[20]; DiscountAmount: Decimal; DiscountAmountACY: Decimal)
     var
         DeferralTemplate: Record "Deferral Template";
     begin
@@ -8786,7 +8802,7 @@ codeunit 80 "Sales-Post"
                 DeferralPostBuffer."Period Description" := DeferralTemplate."Period Description";
                 DeferralPostBuffer."Deferral Line No." := InvDefLineNo;
                 DeferralPostBuffer.PrepareInitialAmounts(
-                  InvoicePostBuffer.Amount, InvoicePostBuffer."Amount (ACY)", RemainAmtToDefer, RemainAmtToDeferACY, SalesAccount, DeferralAccount);
+                  InvoicePostBuffer.Amount, InvoicePostBuffer."Amount (ACY)", RemainAmtToDefer, RemainAmtToDeferACY, SalesAccount, DeferralAccount, DiscountAmount, DiscountAmountACY);
                 DeferralPostBuffer.Update(DeferralPostBuffer);
                 if (RemainAmtToDefer <> 0) or (RemainAmtToDeferACY <> 0) then begin
                     DeferralPostBuffer.PrepareRemainderSales(
@@ -12404,6 +12420,11 @@ codeunit 80 "Sales-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckATOLink(SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSumSalesLinesTempOnAfterVatAmountSet(var VATAmount: Decimal; var TotalSalesLine: Record "Sales Line")
     begin
     end;
 }
