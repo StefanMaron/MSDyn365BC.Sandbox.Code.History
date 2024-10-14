@@ -543,11 +543,6 @@ page 7352 "Put-away Worksheet"
         WhseDocumentType := Rec."Whse. Document Type";
     end;
 
-    trigger OnAfterGetRecord()
-    begin
-        WhseDocumentType := Rec."Whse. Document Type";
-    end;
-
     trigger OnDeleteRecord(): Boolean
     begin
         ItemDescription := '';
