@@ -19,7 +19,7 @@
         LibraryWorkflow: Codeunit "Library - Workflow";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryERM: Codeunit "Library - ERM";
-        IsInitialized, HideEmailDialog : Boolean;
+        IsInitialized: Boolean;
         IsMailManagementOnBeforeIsEnabledActive: Boolean;
         MailingJobCategoryCodeTok: Label 'SENDINV', Comment = 'Must be max. 10 chars and no spacing. (Send Invoice)';
         CannotSendEmailErr: Label 'You cannot send the email.\Verify that the email settings are correct.', Locked = true;
@@ -389,7 +389,6 @@
     begin
         // [SCENARIO 421871] Send Posted Sales Invoice when Customer's email and email from Document Layout are blank and Document Sending Profile has E-Mail = "Yes (Use Default Settings)".
         Initialize();
-        HideEmailDialog := false;
         LibraryWorkflow.SetUpEmailAccount();
         ConnectorMock.FailOnSend(true);
 
@@ -607,7 +606,6 @@
 
     local procedure Initialize()
     begin
-        HideEmailDialog := true;
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"Document Mailing Tests");
         LibraryVariableStorage.Clear();
 
@@ -861,12 +859,6 @@
     begin
         Assert.AreEqual(KeepDraftOrDiscardPageQst, Instruction, '');
         Choice := 2;    // discard email
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Mail Management", 'OnSendViaEmailModuleOnBeforeOpenInEditorModally', '', false, false)]
-    local procedure OnSendViaEmailModuleOnBeforeOpenInEditorModally(EmailScenario: Enum "Email Scenario"; var TempEmailAccount: Record "Email Account" temporary; var Message: Codeunit "Email Message"; var HideMailDialog: Boolean)
-    begin
-        HideMailDialog := HideEmailDialog;
     end;
 }
 
