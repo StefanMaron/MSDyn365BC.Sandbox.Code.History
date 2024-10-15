@@ -5335,6 +5335,7 @@ codeunit 22 "Item Jnl.-Post Line"
                 InventoryAdjmtEntryOrder."Order Type"::Assembly:
                     begin
                         if OrderLineNo = 0 then begin
+                            AssemblyHeader.SetLoadFields("Item No.");
                             AssemblyHeader.Get(AssemblyHeader."Document Type"::Order, OrderNo);
                             InventoryAdjmtEntryOrder.SetAsmOrder(AssemblyHeader);
                         end;
