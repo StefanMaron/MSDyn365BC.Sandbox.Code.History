@@ -2522,10 +2522,7 @@ table 37 "Sales Line"
             begin
                 TestJobPlanningLine();
                 TestStatusOpen();
-                TestField("Quantity Shipped", 0);
-                TestField("Qty. Shipped (Base)", 0);
-                TestField("Return Qty. Received", 0);
-                TestField("Return Qty. Received (Base)", 0);
+                TestQuantityFieldsOnValidateUnitOfMeasure();
                 if "Unit of Measure Code" <> xRec."Unit of Measure Code" then begin
                     TestField("Shipment No.", '');
                     TestField("Return Receipt No.", '');
@@ -5936,10 +5933,11 @@ table 37 "Sales Line"
 
         Clear(SalesHeader);
         TestStatusOpen();
-        if ItemSubstitutionMgt.ItemSubstGet(Rec) then
+        if ItemSubstitutionMgt.ItemSubstGet(Rec) then begin
+            Rec.Validate("Location Code");
             if TransferExtendedText.SalesCheckIfAnyExtText(Rec, false) then
                 TransferExtendedText.InsertSalesExtText(Rec);
-
+        end;
         OnAfterShowItemSub(Rec);
     end;
 
@@ -10073,6 +10071,20 @@ table 37 "Sales Line"
             StrSubstNo(QtyShipActionDescriptionLbl, Rec.FieldCaption("Qty. to Ship"), Rec.Quantity)));
     end;
 
+    local procedure TestQuantityFieldsOnValidateUnitOfMeasure()
+    var
+        IsHandled: Boolean;
+    begin
+        OnBeforeTestQuantityFieldsOnValidateUnitOfMeasure(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        TestField("Quantity Shipped", 0);
+        TestField("Qty. Shipped (Base)", 0);
+        TestField("Return Qty. Received", 0);
+        TestField("Return Qty. Received (Base)", 0);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var SalesLine: Record "Sales Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
@@ -12028,6 +12040,11 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcShipmentDateForLocation(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestQuantityFieldsOnValidateUnitOfMeasure(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 }
