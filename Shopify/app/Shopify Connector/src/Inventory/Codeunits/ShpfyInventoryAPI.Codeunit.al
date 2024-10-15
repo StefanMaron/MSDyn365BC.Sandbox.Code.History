@@ -222,10 +222,12 @@ codeunit 30195 "Shpfy Inventory API"
         VariantId: BigInteger;
         Stock: Decimal;
         JArray: JsonArray;
+        JQuantities: JsonArray;
         JInventoryItem: JsonObject;
         JNode: JsonObject;
         JProduct: JsonObject;
         JVariant: JsonObject;
+        JQuantity: JsonToken;
         JItem: JsonToken;
         JValue: JsonValue;
         Cursor: Text;
@@ -237,10 +239,12 @@ codeunit 30195 "Shpfy Inventory API"
                 else
                     Clear(Cursor);
                 if JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node') then begin
-                    if JsonHelper.GetJsonValue(JNode, JValue, 'quantities.quantity') then
-                        Stock := JValue.AsInteger()
-                    else
-                        Stock := 0;
+                    if JsonHelper.GetJsonArray(JNode, JQuantities, 'quantities') then
+                        if JQuantities.Get(0, JQuantity) then
+                            if JsonHelper.GetJsonValue(JQuantity, JValue, 'quantity') then
+                                Stock := JValue.AsInteger()
+                            else
+                                Stock := 0;
                     InventoryItemId := 0;
                     VariantId := 0;
                     ProductId := 0;
