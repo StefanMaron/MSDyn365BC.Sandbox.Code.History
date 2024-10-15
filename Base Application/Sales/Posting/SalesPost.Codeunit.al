@@ -321,6 +321,8 @@ codeunit 80 "Sales-Post"
         if IsHandled then
             exit;
 
+        GetSalesHeader(SalesHeader2);
+
         if not GuiAllowed then
             LockTimeout(false);
 
@@ -3714,6 +3716,16 @@ codeunit 80 "Sales-Post"
     local procedure Increment(var Number: Decimal; Number2: Decimal)
     begin
         Number := Number + Number2;
+    end;
+
+    local procedure GetSalesHeader(var SalesHeader: Record "Sales Header")
+    var
+        SalesHeaderCopy: Record "Sales Header";
+    begin
+        SalesHeaderCopy := SalesHeader;
+        SalesHeader.ReadIsolation := IsolationLevel::ReadCommitted;
+        SalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.");
+        SalesHeader := SalesHeaderCopy;
     end;
 
     procedure GetSalesLines(var SalesHeader: Record "Sales Header"; var NewSalesLine: Record "Sales Line"; QtyType: Option General,Invoicing,Shipping)
@@ -8390,9 +8402,6 @@ codeunit 80 "Sales-Post"
             if not TempTrackingSpecification.FindFirst() then
                 TempTrackingSpecification.Init();
         end;
-
-        PreciseTotalChargeAmt := 0;
-        RoundedPrevTotalChargeAmt := 0;
 
         ShouldProcessReceipt := SalesLine.IsCreditDocType();
         OnPostItemTrackingOnAfterCalcShouldProcessReceipt(SalesHeader, SalesLine, ShouldProcessReceipt, ItemJnlRollRndg);
