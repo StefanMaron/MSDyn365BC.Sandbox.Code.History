@@ -27,6 +27,7 @@ codeunit 1621 "PEPPOL Service Validation"
         SalesHeader."Shipment Date" := SalesHeader."Posting Date";
         PEPPOLValidation.CheckSalesDocument(SalesHeader);
         ServiceLine.SetRange("Document No.", ServiceHeader."No.");
+        OnAfterSetServiceLineFilter(ServiceLine, ServiceHeader);
         if ServiceLine.FindSet() then
             repeat
                 PEPPOLManagement.TransferLineToSalesLine(ServiceLine, SalesLine);
@@ -96,6 +97,11 @@ codeunit 1621 "PEPPOL Service Validation"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckServiceCreditMemoOnBeforeCheckSalesDocumentLine(var SalesLine: Record "Sales Line"; ServiceCrMemoLine: Record "Service Cr.Memo Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetServiceLineFilter(var ServiceLine: Record "Service Line"; ServiceHeader: Record "Service Header")
     begin
     end;
 }

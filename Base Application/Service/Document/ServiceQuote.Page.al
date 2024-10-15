@@ -866,8 +866,7 @@ page 5964 "Service Quote"
                 trigger OnAction()
                 begin
                     CurrPage.Update();
-                    CODEUNIT.Run(CODEUNIT::"Serv-Quote to Order (Yes/No)", Rec);
-                    CurrPage.Update();
+                    Codeunit.Run(Codeunit::"Serv-Quote to Order (Yes/No)", Rec);
                 end;
             }
             action("&Print")
