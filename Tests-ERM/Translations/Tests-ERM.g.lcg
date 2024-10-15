@@ -194,6 +194,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Doc. Backgr. Error Handling - NamedType ReturnQtyToReceiveErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 682729763 - NamedType 4266379167" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Cash Flow Worksheet Line must not be found.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Edit Posted Documents - NamedType CashFlowWorkSheetLineMustNotBeFoundErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 682729763 - NamedType 2871896518" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Unexpected Gross Weight shown.]]></Val>
@@ -1713,6 +1722,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[%1  text value]D;]A;(LookupHint=Codeunit ERM Consolidation - NamedType LegalEntityIDLineTok)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 187546204 - NamedType 2751571763" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 must be %2 in %3]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Starting Date, %2 = WorkDate, %3 = Consolidate Wizard]D;]A;(LookupHint=Codeunit ERM Consolidation - NamedType StartingDateErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 187546204 - NamedType 1749115446" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -3783,6 +3801,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM MIR Test - NamedType ValueMustEqualMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2480070618 - NamedType 462034013" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Posting Group is not editable in General Journal page]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Multiple Posting Groups - NamedType PostingGroupNonEditableErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2516795050 - NamedType 90657030" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -14898,6 +14925,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test RED Setup Gen. Jnl. - NamedType WrongAllowDeferralPostingDatesErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 518006362 - Method 3039364185 - NamedType 3870762580" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Deferral amounts cannot be 0]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test RED Setup Gen. Jnl. - Method PostPurchaseInvoiceWithAllocationAccountAndUserDefinedDeferralWithError - NamedType ZeroDeferralAmtErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 518006362 - Method 2450948280 - NamedType 3870762580" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
