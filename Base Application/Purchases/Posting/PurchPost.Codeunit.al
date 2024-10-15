@@ -126,6 +126,8 @@ codeunit 90 "Purch.-Post"
         if IsHandled then
             exit;
 
+        GetPurchaseHeader(PurchaseHeader2);
+
         if not GuiAllowed then
             LockTimeout(false);
 
@@ -3685,6 +3687,16 @@ codeunit 90 "Purch.-Post"
     local procedure Increment(var Number: Decimal; Number2: Decimal)
     begin
         Number := Number + Number2;
+    end;
+
+    local procedure GetPurchaseHeader(var PurchaseHeader: Record "Purchase Header")
+    var
+        PurchaseHeaderCopy: Record "Purchase Header";
+    begin
+        PurchaseHeaderCopy := PurchaseHeader;
+        PurchaseHeader.ReadIsolation := IsolationLevel::ReadCommitted;
+        PurchaseHeader.Get(PurchaseHeader."Document Type", PurchaseHeader."No.");
+        PurchaseHeader := PurchaseHeaderCopy;
     end;
 
     procedure GetPurchLines(var PurchHeader: Record "Purchase Header"; var PurchLine: Record "Purchase Line"; QtyType: Option General,Invoicing,Shipping)
@@ -7949,11 +7961,6 @@ codeunit 90 "Purch.-Post"
             if not TempTrackingSpecification.FindFirst() then
                 TempTrackingSpecification.Init();
         end;
-
-        PreciseTotalChargeAmt := 0;
-        PreciseTotalChargeAmtACY := 0;
-        RoundedPrevTotalChargeAmt := 0;
-        RoundedPrevTotalChargeAmtACY := 0;
 
         ShouldProcessShipment := PurchHeader.IsCreditDocType();
         OnPostItemTrackingOnAfterCalcShouldProcessShipment(PurchHeader, PurchLine, ShouldProcessShipment);
