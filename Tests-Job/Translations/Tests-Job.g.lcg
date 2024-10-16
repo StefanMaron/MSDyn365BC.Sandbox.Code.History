@@ -1274,6 +1274,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = Caption of the Task Billing Method field value; %2 = Caption of the Task Billing Method field; %3 = Caption of the Project table]D;]A;(LookupHint=Codeunit Jobs - Multiple Customers - NamedType UpdateBillingMethodErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3185217834 - NamedType 185258747" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You have changed a customer. Prices and costs needs to be updated on a related lines.\\Do you want to update related lines?]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Jobs - Multiple Customers - NamedType UpdateBillToCustMsg)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3185217834 - NamedType 1203146651" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You must update the existing project tasks manually.]]></Val>
