@@ -72,11 +72,10 @@ codeunit 7769 "AOAI Deployments Impl"
 
     local procedure GetDeploymentName(DeploymentName: Text; CallerModuleInfo: ModuleInfo): Text
     var
-        AzureOpenAiImpl: Codeunit "Azure OpenAI Impl";
         CurrentModuleInfo: ModuleInfo;
     begin
         NavApp.GetCurrentModuleInfo(CurrentModuleInfo);
-        if (CallerModuleInfo.Publisher <> CurrentModuleInfo.Publisher) and not AzureOpenAiImpl.IsTenantAllowlistedForFirstPartyCopilotCalls() then
+        if (CallerModuleInfo.Publisher <> CurrentModuleInfo.Publisher) then
             Error(UnableToGetDeploymentNameErr);
 
         exit(DeploymentName);
