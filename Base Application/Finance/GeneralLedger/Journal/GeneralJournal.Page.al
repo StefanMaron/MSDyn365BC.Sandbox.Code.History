@@ -1164,15 +1164,12 @@ page 39 "General Journal"
 
                     trigger OnAction()
                     var
-                        BackupRec: Record "Gen. Journal Line";
                         GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
                     begin
                         if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
                             Error(ActionOnlyAllowedForAllocationAccountsErr);
 
-                        BackupRec.Copy(Rec);
-                        BackupRec.SetRecFilter();
-                        GenJournalAllocAccMgt.CreateLines(BackupRec);
+                        GenJournalAllocAccMgt.CreateLines(Rec);
                         Rec.Delete();
                         CurrPage.Update(false);
                     end;
@@ -2113,6 +2110,8 @@ page 39 "General Journal"
         ApprovalMgmt: Codeunit "Approvals Mgmt.";
         ChangeExchangeRate: Page "Change Exchange Rate";
         GLReconcile: Page Reconciliation;
+        AccName: Text[100];
+        BalAccName: Text[100];
         GenJnlBatchApprovalStatus: Text[20];
         GenJnlLineApprovalStatus: Text[20];
         Balance: Decimal;
@@ -2168,8 +2167,6 @@ page 39 "General Journal"
         UseAllocationAccountNumber: Boolean;
 
     protected var
-        AccName: Text[100];
-        BalAccName: Text[100];
         CurrentJnlBatchName: Code[10];
         ApplyEntriesActionEnabled: Boolean;
         IsSimplePage: Boolean;
