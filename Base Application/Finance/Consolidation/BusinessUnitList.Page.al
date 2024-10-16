@@ -344,6 +344,7 @@ page 240 "Business Unit List"
                     Image = JobJournal;
                     ToolTip = 'Shows the consolidation runs.';
                     RunObject = Page "Consolidations in Progress";
+                    Visible = IsSaaS;
                 }
                 action(Setup)
                 {
