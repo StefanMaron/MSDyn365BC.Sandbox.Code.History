@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Test for the Shopify Connector extension",
   "description": "Test for the Shopify Connector extension",
-  "version": "25.0.23364.25481",
+  "version": "25.0.23364.25488",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
   "help": "https://go.microsoft.com/fwlink/?linkid=2179727",
@@ -71,6 +71,10 @@
     {
       "from": 139645,
       "to": 139649
+    },
+    {
+      "from": 139695,
+      "to": 139699
     }
   ],
   "target": "OnPrem",
