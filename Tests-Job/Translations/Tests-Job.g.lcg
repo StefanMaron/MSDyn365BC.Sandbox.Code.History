@@ -2183,6 +2183,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT T Job Planning Line - NamedType TestFieldErrorCodeTxt)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3251676635 - NamedType 2786395298" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 must be %2 in %3]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Unit Cost (LCY), %2 = Unit Cost of Item, %3 = Job Planning Line]D;]A;(LookupHint=Codeunit UT T Job Planning Line - NamedType UnitCostLCYErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 112391371 - NamedType 2080896394" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The Project Task cannot be modified because the project has associated project WIP entries.]]></Val>
