@@ -5767,6 +5767,7 @@ table 39 "Purchase Line"
                     NonDeductibleVAT.CheckPrepmtVATPostingSetup(VATPostingSetup);
                 end else
                     Clear(VATPostingSetup);
+                OnAfterGetPostingSetup(Rec, VATPostingSetup);
             end;
             if ("Prepayment VAT %" <> 0) and ("Prepayment VAT %" <> VATPostingSetup."VAT %") and ("Prepmt. Amt. Inv." <> 0) then
                 Error(CannotChangePrepmtAmtDiffVAtPctErr);
@@ -11994,6 +11995,11 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterReversedInternalLeadTimeDays(PurchaseLine: Record "Purchase Line"; PurchDate: Date; ReversedWhseHandlingTime: DateFormula; var TotalDays: DateFormula)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetPostingSetup(var PurchaseLine: Record "Purchase Line"; var VATPostingSetup: Record "VAT Posting Setup")
     begin
     end;
 }
