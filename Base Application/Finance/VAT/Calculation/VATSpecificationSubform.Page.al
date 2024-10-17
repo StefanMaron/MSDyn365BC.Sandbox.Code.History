@@ -7,6 +7,8 @@ namespace Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using System.Reflection;
 using Microsoft.Purchases.Setup;
 using Microsoft.Service.Document;
 
@@ -96,39 +98,7 @@ page 576 "VAT Specification Subform"
                             else
                                 Error(Text000, Rec.FieldCaption("VAT Amount"), Text003);
 
-                        GLSetup.Get();
-                        if GLSetup."Additional Reporting Currency" <> '' then
-                            AddCurrency.Get(GLSetup."Additional Reporting Currency");
-                        if PurchHeader1."Posting Date" <> 0D then begin
-                            if (PurchHeader1."Vendor Exchange Rate (ACY)" <> 0) and (PurchHeader1."Currency Code" = '') then begin
-                                CurrencyFactor :=
-                                  CurrExchRate.ExchangeRateFactorFRS21(
-                                    PurchHeader1."Posting Date", GLSetup."Additional Reporting Currency", PurchHeader1."Vendor Exchange Rate (ACY)")
-                            end else
-                                CurrencyFactor :=
-                                  CurrExchRate.ExchangeRate(
-                                    PurchHeader1."Posting Date", GLSetup."Additional Reporting Currency");
-
-                            Rec."VAT Amount (ACY)" :=
-                              Round(
-                                CurrExchRate.ExchangeAmtLCYToFCY(
-                                  PurchHeader1."Posting Date", GLSetup."Additional Reporting Currency",
-                                  Round(CurrExchRate.ExchangeAmtFCYToLCY(
-                                      PurchHeader1."Posting Date", PurchHeader1."Currency Code", Rec."VAT Amount",
-                                      PurchHeader1."Currency Factor"), AddCurrency."Amount Rounding Precision"), CurrencyFactor),
-                                AddCurrency."Amount Rounding Precision");
-                        end;
-
-                        if PricesIncludingVAT then begin
-                            Rec."VAT Base" := Rec."Amount Including VAT" - Rec."VAT Amount";
-                            Rec."VAT Base (ACY)" := Rec."Amount Including VAT (ACY)" - Rec."VAT Amount (ACY)";
-                        end else begin
-                            Rec."Amount Including VAT" := Rec."VAT Amount" + Rec."VAT Base";
-                            Rec."Amount Including VAT (ACY)" := Rec."VAT Amount (ACY)" + Rec."VAT Base (ACY)";
-                        end;
-
-                        FormCheckVATDifference();
-                        ModifyRec();
+                        CalculateACYVATAmounts();
                     end;
                 }
                 field("Calculated VAT Amount"; Rec."Calculated VAT Amount")
@@ -279,6 +249,7 @@ page 576 "VAT Specification Subform"
         Currency: Record Currency;
         ServHeader: Record "Service Header";
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
+        SourceHeader: Variant;
         CurrencyCode: Code[10];
         AllowVATDifference: Boolean;
         AllowVATDifferenceOnThisTab: Boolean;
@@ -362,6 +333,7 @@ page 576 "VAT Specification Subform"
         VATAmountLine2: Record "VAT Amount Line";
         TotalVATDifference: Decimal;
         TotalVATDifferenceACY: Decimal;
+        Factor: Decimal;
     begin
         Rec.CheckVATDifference(CurrencyCode, AllowVATDifference);
         VATAmountLine2 := Rec;
@@ -378,10 +350,13 @@ page 576 "VAT Specification Subform"
               Text001, Rec.FieldCaption("VAT Difference"),
               Currency."Max. VAT Difference Allowed", Currency.FieldCaption("Max. VAT Difference Allowed"));
 
-        if TotalVATDifferenceACY > (Currency."Max. VAT Difference Allowed" * PurchHeader1."Vendor Exchange Rate (ACY)") then
+        Factor := PurchHeader1."Vendor Exchange Rate (ACY)";
+        if Factor = 0 then
+            Factor := 1;
+        if TotalVATDifferenceACY > (Currency."Max. VAT Difference Allowed" * Factor) then
             Error(
               Text001, Rec.FieldCaption("VAT Difference (ACY)"),
-              Currency."Max. VAT Difference Allowed" * PurchHeader1."Vendor Exchange Rate (ACY)",
+              Currency."Max. VAT Difference Allowed" * Factor,
               Currency.FieldCaption("Max. VAT Difference Allowed"));
     end;
 
@@ -401,6 +376,34 @@ page 576 "VAT Specification Subform"
             end;
     end;
 
+    local procedure CalculateACYVATAmounts()
+    var
+        SalesHeader: Record "Sales Header";
+        DataTypeManagement: Codeunit "Data Type Management";
+        RecRef: RecordRef;
+    begin
+        GLSetup.Get();
+        if GLSetup."Additional Reporting Currency" <> '' then
+            AddCurrency.Get(GLSetup."Additional Reporting Currency");
+
+        if DataTypeManagement.GetRecordRef(SourceHeader, RecRef) then begin
+            if SalesHeader.Get(RecRef.RecordId) then
+                UpdateVATAmountACY(SalesHeader."Posting Date", SalesHeader."Currency Code", SalesHeader."Currency Factor", 0)
+        end else
+            UpdateVATAmountACY(PurchHeader1."Posting Date", PurchHeader1."Currency Code", PurchHeader1."Currency Factor", PurchHeader1."Vendor Exchange Rate (ACY)");
+
+        if PricesIncludingVAT then begin
+            Rec."VAT Base" := Rec."Amount Including VAT" - Rec."VAT Amount";
+            Rec."VAT Base (ACY)" := Rec."Amount Including VAT (ACY)" - Rec."VAT Amount (ACY)";
+        end else begin
+            Rec."Amount Including VAT" := Rec."VAT Amount" + Rec."VAT Base";
+            Rec."Amount Including VAT (ACY)" := Rec."VAT Amount (ACY)" + Rec."VAT Base (ACY)";
+        end;
+
+        FormCheckVATDifference();
+        ModifyRec();
+    end;
+
     procedure SetParentControl(ID: Integer)
     begin
         ParentControl := ID;
@@ -412,9 +415,39 @@ page 576 "VAT Specification Subform"
         ServHeader := ServiceHeader;
     end;
 
+    procedure SetSourceHeader(NewSourceHeader: Variant)
+    begin
+        SourceHeader := NewSourceHeader;
+    end;
+
     procedure SetCurrentTabNo(TabNo: Integer)
     begin
         CurrentTabNo := TabNo;
+    end;
+
+    local procedure UpdateVATAmountACY(PostingDate: Date; HeaderCurrencyCode: Code[10]; HeaderCurrencyFactor: Decimal; VendorExchangeRateACY: Decimal)
+    begin
+        if PostingDate = 0D then
+            exit;
+
+        if (VendorExchangeRateACY <> 0) and (HeaderCurrencyCode = '') then
+            CurrencyFactor :=
+              CurrExchRate.ExchangeRateFactorFRS21(
+                PostingDate, GLSetup."Additional Reporting Currency", VendorExchangeRateACY)
+        else
+            CurrencyFactor :=
+              CurrExchRate.ExchangeRate(
+               PostingDate, GLSetup."Additional Reporting Currency");
+
+        Rec."VAT Amount (ACY)" :=
+          Round(
+            CurrExchRate.ExchangeAmtLCYToFCY(
+             PostingDate, GLSetup."Additional Reporting Currency",
+              Round(CurrExchRate.ExchangeAmtFCYToLCY(
+                  PostingDate, HeaderCurrencyCode, Rec."VAT Amount",
+                  HeaderCurrencyFactor), AddCurrency."Amount Rounding Precision"), CurrencyFactor),
+            AddCurrency."Amount Rounding Precision");
+        Rec."VAT Difference (ACY)" := Rec."VAT Amount (ACY)" - Rec."Calculated VAT Amount (ACY)";
     end;
 
     [IntegrationEvent(false, false)]
@@ -432,5 +465,6 @@ page 576 "VAT Specification Subform"
     begin
         PurchHeader1.Get(PurchHeader."Document Type", PurchHeader."No.");
     end;
+
 }
 
