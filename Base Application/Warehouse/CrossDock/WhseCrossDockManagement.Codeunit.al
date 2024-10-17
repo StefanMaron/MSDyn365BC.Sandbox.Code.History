@@ -64,8 +64,6 @@ codeunit 5780 "Whse. Cross-Dock Management"
         if TemplateName <> '' then
             exit;
 
-        OnCalculateCrossDockLinesOnAfterSetTemplate(WhseCrossDockOpportunity, NewTemplateName, NewNameNo, NewLocationCode);
-
         SeparateWhseRcptLinesWthSpecOrder(TempWarehouseReceiptLineNoSpecOrder, TempWarehouseReceiptLineWithSpecOrder, TempItemVariant);
         FilterCrossDockOpp(WhseCrossDockOpportunity);
         CalcCrossDockWithoutSpecOrder(WhseCrossDockOpportunity, TempWarehouseReceiptLineNoSpecOrder, TempItemVariant);
@@ -309,7 +307,6 @@ codeunit 5780 "Whse. Cross-Dock Management"
         BinContent.SetRange("Item No.", ItemNo);
         BinContent.SetRange("Variant Code", VariantCode);
         BinContent.SetRange("Cross-Dock Bin", true);
-        OnCalcCrossDockedItemsOnAfterSetBinContentFilters(BinContent);
         if BinContent.Find('-') then
             repeat
                 QtyAvailToPickBase := BinContent.CalcQtyAvailToPick(0);
@@ -331,7 +328,6 @@ codeunit 5780 "Whse. Cross-Dock Management"
         PostedWhseReceiptLine.SetRange("Variant Code", VariantCode);
         PostedWhseReceiptLine.SetFilter(Status, '%1|%2', PostedWhseReceiptLine.Status::" ", PostedWhseReceiptLine.Status::"Partially Put Away");
         PostedWhseReceiptLine.SetFilter("Cross-Dock Bin Code", '<>%1', '');
-        OnCalcCrossDockReceivedNotCrossDockedOnAfterPostedWhseReceiptLineSetFilters(PostedWhseReceiptLine);
         if PostedWhseReceiptLine.FindSet() then
             repeat
                 // calculate received, yet not put-away quantity, that is assumed to be put-away in a cross-dock bin
@@ -450,8 +446,6 @@ codeunit 5780 "Whse. Cross-Dock Management"
         WarehouseReceiptLine.SetRange("No.", NameNo);
         WarehouseReceiptLine.SetRange("Location Code", LocationCode);
         WarehouseReceiptLine.SetFilter("Qty. to Receive", '>0');
-
-        OnAfterFilterWhseRcptLine(WarehouseReceiptLine, NameNo, LocationCode);
     end;
 
     procedure FilterCrossDockOpp(var WhseCrossDockOpportunity: Record "Whse. Cross-Dock Opportunity")
@@ -552,7 +546,7 @@ codeunit 5780 "Whse. Cross-Dock Management"
                 SalesLine.SetRange("Line No.", PurchaseLine."Special Order Sales Line No.");
             end else
                 SalesLine.SetRange("Special Order", false);
-            OnCalcCrossDockToSalesOrderOnAfterSalesLineSetFilters(SalesLine, WhseCrossDockOpportunity, QtyOnPick, QtyPicked, ItemNo, VariantCode, LocationCode, CrossDockDate, LineNo, NameNo);
+            OnCalcCrossDockToSalesOrderOnAfterSalesLineSetFilters(SalesLine, WhseCrossDockOpportunity, QtyOnPick, QtyPicked, ItemNo, VariantCode, LocationCode, CrossDockDate, LineNo);
             if SalesLine.Find('-') then
                 repeat
                     if WarehouseRequest.Get(WarehouseRequest.Type::Outbound, SalesLine."Location Code", Database::"Sales Line", SalesLine."Document Type", SalesLine."Document No.") and
@@ -770,7 +764,7 @@ codeunit 5780 "Whse. Cross-Dock Management"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnCalcCrossDockToSalesOrderOnAfterSalesLineSetFilters(var SalesLine: Record "Sales Line"; var WhseCrossDockOpp: Record "Whse. Cross-Dock Opportunity"; var QtyOnPick: Decimal; var QtyPicked: Decimal; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; CrossDockDate: Date; LineNo: Integer; NameNo: Code[20])
+    local procedure OnCalcCrossDockToSalesOrderOnAfterSalesLineSetFilters(var SalesLine: Record "Sales Line"; var WhseCrossDockOpp: Record "Whse. Cross-Dock Opportunity"; var QtyOnPick: Decimal; var QtyPicked: Decimal; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; CrossDockDate: Date; LineNo: Integer)
     begin
     end;
 
@@ -861,26 +855,6 @@ codeunit 5780 "Whse. Cross-Dock Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcCrossDockToServiceOrder(var WhseCrossDockOpportunity: Record "Whse. Cross-Dock Opportunity"; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; CrossDockDate: Date; var QtyOnPick: Decimal; var QtyPicked: Decimal; LineNo: Integer; SourceType2: Integer; PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFilterWhseRcptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; NameNo: Code[20]; LocationCode: Code[10])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalculateCrossDockLinesOnAfterSetTemplate(var WhseCrossDockOpportunity: Record "Whse. Cross-Dock Opportunity"; NewTemplateName: Code[10]; NewNameNo: Code[20]; NewLocationCode: Code[10])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcCrossDockedItemsOnAfterSetBinContentFilters(var BinContent: Record "Bin Content")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcCrossDockReceivedNotCrossDockedOnAfterPostedWhseReceiptLineSetFilters(var PostedWhseReceiptLine: Record "Posted Whse. Receipt Line")
     begin
     end;
 }
