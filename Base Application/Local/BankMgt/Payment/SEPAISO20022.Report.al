@@ -179,7 +179,6 @@ report 10883 "SEPA ISO20022"
         XMLNewChild: DotNet XmlNode;
         AddressLine1: Text[151];
         AddressLine2: Text[60];
-        EndtoEndIdTxt: Text[30];
         UstrdRemitInfo: Text[140];
     begin
         AddElement(XMLNodeCurr, 'PmtInf', '', '', XMLNewChild);
@@ -250,11 +249,7 @@ report 10883 "SEPA ISO20022"
                 AddElement(XMLNodeCurr, 'PmtId', '', '', XMLNewChild);
                 XMLNodeCurr := XMLNewChild;
 
-                EndtoEndIdTxt := PaymentLine."Document No.";
-                if DelChr(EndtoEndIdTxt, '<>') = '' then
-                    EndtoEndIdTxt := 'NOTPROVIDED';
-
-                AddElement(XMLNodeCurr, 'EndToEndId', CopyStr(EndtoEndIdTxt, 1, 35), '', XMLNewChild);
+                AddElement(XMLNodeCurr, 'EndToEndId', GetEndToEndId(PaymentLine), '', XMLNewChild);
                 XMLNodeCurr := XMLNodeCurr.ParentNode;
 
                 AddElement(XMLNodeCurr, 'Amt', '', '', XMLNewChild);
@@ -500,10 +495,26 @@ report 10883 "SEPA ISO20022"
         exit(UstrdRemitInfo);
     end;
 
+    local procedure GetEndToEndId(PaymentLine: Record "Payment Line") EndtoEndIdTxt: Text[35]
+    begin
+        EndtoEndIdTxt := PaymentLine."Document No.";
+        if DelChr(EndtoEndIdTxt, '<>') = '' then
+            EndtoEndIdTxt := 'NOTPROVIDED';
+
+        OnAfterGetEndToEndId(PaymentLine, EndtoEndIdTxt);
+
+        exit(CopyStr(EndtoEndIdTxt, 1, 35));
+    end;
+
     [Scope('OnPrem')]
     procedure SetFilePath(FilePath: Text)
     begin
         ServerFileName := FilePath;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetEndToEndId(PaymentLine: Record "Payment Line"; var EndtoEndIdTxt: Text)
+    begin
     end;
 
     [IntegrationEvent(false, false)]
