@@ -5733,7 +5733,8 @@ table 39 "Purchase Line"
             TestField("No.");
             NonDeductibleVAT.CheckPrepmtWithNonDeductubleVATInPurchaseLine(Rec);
             VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
-            VATPostingSetup.TestField("VAT Calculation Type", "VAT Calculation Type");
+                VATPostingSetup.TestField("VAT Calculation Type", "VAT Calculation Type");
+            OnAfterGetPostingSetup(Rec, VATPostingSetup);
             if ("Prepayment VAT %" <> 0) and ("Prepayment VAT %" <> VATPostingSetup."VAT %") and ("Prepmt. Amt. Inv." <> 0) then
                 Error(CannotChangePrepmtAmtDiffVAtPctErr);
             "Prepayment VAT %" := VATPostingSetup."VAT %";
@@ -11870,6 +11871,11 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterReversedInternalLeadTimeDays(PurchaseLine: Record "Purchase Line"; PurchDate: Date; ReversedWhseHandlingTime: DateFormula; var TotalDays: DateFormula)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetPostingSetup(var PurchaseLine: Record "Purchase Line"; var VATPostingSetup: Record "VAT Posting Setup")
     begin
     end;
 }
