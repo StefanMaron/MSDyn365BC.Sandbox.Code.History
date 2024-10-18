@@ -20,7 +20,7 @@ enumextension 1876 "Manual Setup Category Ext" extends "Manual Setup Category"
     }
     value(4; Jobs)
     {
-        Caption = 'Projects';
+        Caption = 'Jobs';
     }
     value(5; "Fixed Assets")
     {
