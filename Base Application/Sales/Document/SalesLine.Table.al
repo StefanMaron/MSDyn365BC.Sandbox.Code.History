@@ -6222,7 +6222,7 @@ table 37 "Sales Line"
         CurrencyFactor: Decimal;
     begin
         GetGLSetup();
-        CurrencyFactor := GetCurrencyFactorACY(AddCurrency);
+        CurrencyFactor := GetCurrencyFactorACY(AddCurrency, SalesHeader);
 
         if IsUpdateVATOnLinesHandled(SalesHeader, SalesLine, VATAmountLine, QtyType, LineWasModified) then
             exit(LineWasModified);
@@ -9445,6 +9445,22 @@ table 37 "Sales Line"
             CurrExchRate.ExchangeRate(
             GetDate(), GLSetup."Additional Reporting Currency"));
     end;
+    local procedure GetCurrencyFactorACY(var AddCurrency: Record Currency; CurrSalesHeader: Record "Sales Header"): Decimal
+    begin
+        GetGLSetup();
+        if GLSetup."Additional Reporting Currency" = '' then
+            exit;
+
+        if Rec."Document No." = '' then begin
+            Rec."Document Type" := CurrSalesHeader."Document Type";
+            Rec."Document No." := CurrSalesHeader."No.";
+        end;
+        AddCurrency.Get(GLSetup."Additional Reporting Currency");
+        exit(
+            CurrExchRate.ExchangeRate(
+            GetDate(), GLSetup."Additional Reporting Currency"));
+    end;
+
     procedure CalcBaseQty(Qty: Decimal; FromFieldName: Text; ToFieldName: Text): Decimal
     begin
         OnBeforeCalcBaseQty(Rec, Qty, FromFieldName, ToFieldName);
