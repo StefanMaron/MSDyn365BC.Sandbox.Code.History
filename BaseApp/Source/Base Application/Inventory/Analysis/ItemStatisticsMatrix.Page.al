@@ -650,6 +650,7 @@ page 9223 "Item Statistics Matrix"
         ItemChargesFilter: Text;
         PeriodInitialized: Boolean;
         PerUnit: Boolean;
+        IncludeExpected: Boolean;
         Qty: Decimal;
         CellAmount: Decimal;
         Text002: Label 'Period';
@@ -691,9 +692,6 @@ page 9223 "Item Statistics Matrix"
         Field31Visible: Boolean;
         Field32Visible: Boolean;
         NameIndent: Integer;
-
-    protected var
-        IncludeExpected: Boolean;
 
     local procedure IntegerLineSetFilter()
     begin
@@ -1062,11 +1060,9 @@ page 9223 "Item Statistics Matrix"
 
     local procedure Calculate(SetColumnFilter: Boolean) Amount: Decimal
     begin
-        OnBeforeCalculate(ItemBuffer, Amount, Qty, Rec.Name, SetColumnFilter);
-
         case ItemBuffer."Line Option" of
             ItemBuffer."Line Option"::"Profit Calculation",
-            ItemBuffer."Line Option"::"Cost Specification":
+  ItemBuffer."Line Option"::"Cost Specification":
                 case Rec.Name of
                     ItemBuffer.FieldCaption("Sales (LCY)"):
                         Amount := CalcSalesAmount(SetColumnFilter);
@@ -1300,11 +1296,6 @@ page 9223 "Item Statistics Matrix"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalculate(var ItemBuffer: Record "Item Statistics Buffer"; SetColumnFilter: Boolean; var Amount: Decimal; Name: Text[100]; SalesAmount: Decimal);
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeCalculate(var ItemStatisticsBuffer: Record "Item Statistics Buffer"; var Amount: Decimal; var Qty: Decimal; Name: Text; SetColumnFilter: Boolean)
     begin
     end;
 }
