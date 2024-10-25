@@ -237,7 +237,7 @@ codeunit 5345 "Integration Rec. Synch. Invoke"
             OnAfterInsertRecord(IntegrationTableMapping, SourceRecordRef, DestinationRecordRef);
             if DestinationRecordRef.Number() = IntegrationTableMapping."Table ID" then
                 // refetch the local record as subscribers to the OnAfterInsertRecord above could update it
-                if DestinationRecordRef.GetBySystemId(DestinationRecordRef.Field(DestinationRecordRef.SystemIdNo).Value()) then;
+                DestinationRecordRef.GetBySystemId(DestinationRecordRef.Field(DestinationRecordRef.SystemIdNo).Value());
             UpdateIntegrationRecordTimestamp(
               IntegrationTableMapping, SourceRecordRef, DestinationRecordRef, IntegrationTableConnectionType, JobId);
         end;
@@ -258,7 +258,7 @@ codeunit 5345 "Integration Rec. Synch. Invoke"
             if DestinationRecordRef.Number() = IntegrationTableMapping."Table ID" then
                 // refetch the local record as subscribers to the OnAfterModifyRecord above could update it
                 // for example, this is the case while synching customers and vendors
-                if DestinationRecordRef.GetBySystemId(DestinationRecordRef.Field(DestinationRecordRef.SystemIdNo).Value()) then;
+                DestinationRecordRef.GetBySystemId(DestinationRecordRef.Field(DestinationRecordRef.SystemIdNo).Value());
             UpdateIntegrationRecordTimestamp(
               IntegrationTableMapping, SourceRecordRef, DestinationRecordRef, IntegrationTableConnectionType, JobId, BothModified);
         end else begin
@@ -464,7 +464,7 @@ codeunit 5345 "Integration Rec. Synch. Invoke"
             IsDestinationDeleted := not IntegrationTableMapping.GetRecordRef(IDValueVariant, DestinationRecordRef);
     end;
 
-    procedure PrepareNewDestination(var IntegrationTableMapping: Record "Integration Table Mapping"; var RecordRef: RecordRef; var CoupledRecordRef: RecordRef)
+    internal procedure PrepareNewDestination(var IntegrationTableMapping: Record "Integration Table Mapping"; var RecordRef: RecordRef; var CoupledRecordRef: RecordRef)
     begin
         CoupledRecordRef.Close();
 
