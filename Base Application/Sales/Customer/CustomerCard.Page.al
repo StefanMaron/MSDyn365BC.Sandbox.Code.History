@@ -1,4 +1,4 @@
-﻿ namespace Microsoft.Sales.Customer;
+﻿namespace Microsoft.Sales.Customer;
 
 using Microsoft.Bank.DirectDebit;
 using Microsoft.Bank.Payment;
@@ -2237,19 +2237,6 @@ page 21 "Customer Card"
                     RunReport(REPORT::"Aged Accounts Receivable NA", Rec."No.");
                 end;
             }
-            action("Report Customer - Labels")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Customer - Labels';
-                Image = "Report";
-                ToolTip = 'View mailing labels with the customers'' names and addresses.';
-                Visible = false;
-
-                trigger OnAction()
-                begin
-                    RunReport(REPORT::"Customer - Labels", Rec."No.");
-                end;
-            }
             action("Customer Labels")
             {
                 ApplicationArea = Basic, Suite;
@@ -2746,12 +2733,7 @@ page 21 "Customer Card"
     var
         CustomerCardCalculations: Codeunit "Customer Card Calculations";
         Args: Dictionary of [Text, Text];
-        IsHandled: Boolean;
     begin
-        OnBeforeStartBackgroundCalculations(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         if Rec."No." = PrevCustNo then
             exit;
         PrevCustNo := Rec."No.";
@@ -3126,11 +3108,6 @@ page 21 "Customer Card"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnOpenPage(var Customer: Record Customer)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeStartBackgroundCalculations(var Customer: Record Customer; var IsHandled: Boolean)
     begin
     end;
 }
