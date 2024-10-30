@@ -381,7 +381,6 @@ codeunit 5804 ItemCostManagement
         NeedCalcPreciseAmt: Boolean;
         NeedCalcPreciseAmtACY: Boolean;
         AvgCostCalculated: Boolean;
-        IsHandled: Boolean;
     begin
         OnBeforeCalculateAverageCost(Item, AverageCost, AverageCostACY, AvgCostCalculated);
         if AvgCostCalculated then
@@ -415,14 +414,12 @@ codeunit 5804 ItemCostManagement
             AverageCost := CostAmt / AverageQty;
             AverageCostACY := CostAmtACY / AverageQty;
 
-            Clear(IsHandled);
-            OnCalculateAverageCostOnAfterCalculateAverage(Item, AverageCost, AverageCostACY, IsHandled);
-            if not IsHandled then begin
-                if AverageCost < 0 then
-                    AverageCost := 0;
-                if AverageCostACY < 0 then
-                    AverageCostACY := 0;
-            end;
+            OnCalculateAverageCostOnAfterCalculateAverage(Item, AverageCost, AverageCostACY);
+
+            if AverageCost < 0 then
+                AverageCost := 0;
+            if AverageCostACY < 0 then
+                AverageCostACY := 0;
         end else begin
             AverageCost := 0;
             AverageCostACY := 0;
@@ -774,7 +771,7 @@ codeunit 5804 ItemCostManagement
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCalculateAverageCostOnAfterCalculateAverage(var Item: Record Item; var AverageCost: Decimal; var AverageCostACY: Decimal; var IsHandled: Boolean)
+    local procedure OnCalculateAverageCostOnAfterCalculateAverage(var Item: Record Item; var AverageCost: Decimal; var AverageCostACY: Decimal)
     begin
     end;
 

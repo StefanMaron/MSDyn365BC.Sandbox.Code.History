@@ -5,8 +5,6 @@
 
 namespace System.Security.AccessControl;
 
-using System;
-
 /// <summary>
 /// View and edit the permission sets associated with a security group.
 /// </summary>
@@ -117,13 +115,7 @@ page 9868 "Security Group Permission Sets"
     }
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
-    var
-        MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-        MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-        MyALAuditCategory: DotNet ALAuditCategory;
     begin
-        if Rec."Role ID" <> '' then
-            MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(PermissionSetAddedToSecurityGroupLbl, Rec."Role ID", UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 2, 0);
         exit(Rec."Role ID" <> '');
     end;
 
@@ -146,6 +138,5 @@ page 9868 "Security Group Permission Sets"
 
     var
         PageCaptionExpression: Text;
-        PermissionSetAddedToSecurityGroupLbl: Label 'The permission set %1 has been added to the security group by UserSecurityId %2.', Locked = true;
 }
 

@@ -380,6 +380,7 @@ report 1007 "Job - Transaction Detail"
         JobTotalLineAmount: array[2] of Decimal;
         JobFilter: Text;
         JobLedgEntryFilter: Text;
+        CurrencyFieldReq: Option "Local Currency","Foreign Currency";
         I: Integer;
         JobTransactionDetailCaptionLbl: Label 'Project - Transaction Detail';
         PageNoCaptionLbl: Label 'Page';
@@ -389,9 +390,6 @@ report 1007 "Job - Transaction Detail"
         TotalSaleCaptionLbl: Label 'Total Sale';
         UsageCaptionLbl: Label 'Usage';
         SalesCaptionLbl: Label 'Sales';
-
-    protected var
-        CurrencyFieldReq: Option "Local Currency","Foreign Currency";
 
     procedure InitializeRequest(NewCurrencyField: Option "Local Currency","Foreign Currency")
     begin
