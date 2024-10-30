@@ -5220,7 +5220,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
                                         GenJournalLine,
                                         VendPostingGr.GetPayablesAccount(), -DetailedCVLedgEntryBuffer."Amount (LCY)", 0,
                                         DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode);
-                                end;
+                                end else
+                                    PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
                             else
                                 PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
                         end;
@@ -9519,7 +9520,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
                    (VendorLedgerEntry."Document Type" in [VendorLedgerEntry."Document Type"::Invoice, VendorLedgerEntry."Document Type"::Bill])
                 then begin
                     VendorPostingGroup.Get(VendorLedgerEntry."Vendor Posting Group");
-                    DocAmountLCY := Abs(DetailedCVLedgEntryBuffer.Amount);
+                    DocAmountLCY := Abs(DetailedCVLedgEntryBuffer."Amount (LCY)");
                     PostPayableDocs(GenJournalLine, VendorPostingGroup);
                 end;
             until DetailedCVLedgEntryBuffer.Next() = 0;
