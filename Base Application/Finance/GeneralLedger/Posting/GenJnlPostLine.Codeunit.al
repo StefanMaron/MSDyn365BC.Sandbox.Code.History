@@ -4393,7 +4393,10 @@ codeunit 12 "Gen. Jnl.-Post Line"
             if GLSetup."Unrealized VAT" or
                (GLSetup."Prepayment Unrealized VAT" and NewCVLedgEntryBuf.Prepayment)
             then
-                if IsNotPayment(NewCVLedgEntryBuf."Document Type") and
+                if (IsNotPayment(NewCVLedgEntryBuf."Document Type") or
+                    (NewCVLedgEntryBuf."Document Type" = NewCVLedgEntryBuf."Document Type"::Bill)) and
+                   (not (NewVendLedgEntry."Document Status" = NewVendLedgEntry."Document Status"::Redrawn)) and
+                   (not FromClosedDoc) and
                    (NewRemainingAmtBeforeAppln - NewCVLedgEntryBuf."Remaining Amount" <> 0)
                 then begin
                     NewVendLedgEntry.CopyFromCVLedgEntryBuffer(NewCVLedgEntryBuf);
@@ -4949,7 +4952,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
                                         GenJournalLine,
                                         VendPostingGr.GetPayablesAccount(), -DetailedCVLedgEntryBuffer."Amount (LCY)", 0,
                                         DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode);
-                                end;
+                                end else
+                                    PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
                             else
                                 PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
                         end;
@@ -9028,7 +9032,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
                    (VendorLedgerEntry."Document Type" in [VendorLedgerEntry."Document Type"::Invoice, VendorLedgerEntry."Document Type"::Bill])
                 then begin
                     VendorPostingGroup.Get(VendorLedgerEntry."Vendor Posting Group");
-                    DocAmountLCY := Abs(DetailedCVLedgEntryBuffer.Amount);
+                    DocAmountLCY := Abs(DetailedCVLedgEntryBuffer."Amount (LCY)");
                     PostPayableDocs(GenJournalLine, VendorPostingGroup);
                 end;
             until DetailedCVLedgEntryBuffer.Next() = 0;
