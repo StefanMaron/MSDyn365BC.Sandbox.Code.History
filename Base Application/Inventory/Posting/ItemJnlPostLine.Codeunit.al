@@ -2026,7 +2026,7 @@ codeunit 22 "Item Jnl.-Post Line"
                         OldItemLedgEntry."Applied Entry to Adjust" := true;
                 end;
 
-                OnApplyItemLedgEntryOnBeforeOldItemLedgEntryModify(ItemLedgEntry, OldItemLedgEntry, ItemJnlLine);
+                OnApplyItemLedgEntryOnBeforeOldItemLedgEntryModify(ItemLedgEntry, OldItemLedgEntry, ItemJnlLine, AverageTransfer);
                 OldItemLedgEntry.Modify();
                 AutoTrack(OldItemLedgEntry, true);
 
@@ -2239,7 +2239,7 @@ codeunit 22 "Item Jnl.-Post Line"
         OldItemLedgerEntry."Remaining Quantity" := OldItemLedgerEntry."Remaining Quantity" + AppliedQty;
         OldItemLedgerEntry.Open := OldItemLedgerEntry."Remaining Quantity" <> 0;
 
-        OnAfterUpdateOldItemLedgerEntryRemainingQuantity(OldItemLedgerEntry, AppliedQty);
+        OnAfterUpdateOldItemLedgerEntryRemainingQuantity(OldItemLedgerEntry, AppliedQty, GlobalItemLedgEntry, AverageTransfer);
     end;
 
     local procedure EnsureValueEntryLoaded(var ValueEntry: Record "Value Entry"; ItemLedgEntry: Record "Item Ledger Entry")
@@ -6276,7 +6276,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateOldItemLedgerEntryRemainingQuantity(var OldItemLedgerEntry: Record "Item Ledger Entry"; AppliedQuantity: Decimal)
+    local procedure OnAfterUpdateOldItemLedgerEntryRemainingQuantity(var OldItemLedgerEntry: Record "Item Ledger Entry"; AppliedQuantity: Decimal; var GlobalItemLedgEntry: Record "Item Ledger Entry"; var AverageTransfer: Boolean)
     begin
     end;
 
@@ -6601,7 +6601,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyItemLedgEntryOnBeforeOldItemLedgEntryModify(var ItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line")
+    local procedure OnApplyItemLedgEntryOnBeforeOldItemLedgEntryModify(var ItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line"; var AverageTransfer: Boolean)
     begin
     end;
 
