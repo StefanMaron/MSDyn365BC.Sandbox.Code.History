@@ -43,7 +43,6 @@ codeunit 2200 "Azure Key Vault"
     /// <remarks>As a best practice, you should only store secrets in a key vault. For example, avoid storing information that can be available elsewhere, such as configuration details or URLs.</remarks>
     [TryFunction]
     [Scope('OnPrem')]
-    [NonDebuggable]
     procedure GetAzureKeyVaultSecret(SecretName: Text; var Secret: SecretText)
     begin
         AzureKeyVaultImpl.GetAzureKeyVaultSecret(SecretName, Secret);
