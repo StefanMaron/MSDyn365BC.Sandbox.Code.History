@@ -582,8 +582,11 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
     local procedure MatchIsAcceptable(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; MatchedLineNoTxt: Text; MatchedEntryNoTxt: Text): Boolean
     var
         LocalBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
+        RecordMatchMng: Codeunit "Record Match Mgt.";
         MatchedEntryNo: Integer;
         MatchedLineNo: Integer;
+        BankRecLineDescription: Text;
+        SimilarityScore: Decimal;
     begin
         if not Evaluate(MatchedEntryNo, MatchedEntryNoTxt) then
             exit(false);
@@ -600,6 +603,20 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
             exit(false);
 
         if not SameSign(LocalBankAccReconciliationLine.Difference, TempLedgerEntryMatchingBuffer."Remaining Amount") then
+            exit(false);
+
+        // if amount matches exactly, the match is acceptable
+        if LocalBankAccReconciliationLine.Difference = TempLedgerEntryMatchingBuffer."Remaining Amount" then
+            exit(true);
+
+        // if description doesn't match at least on a substring of 3, the match is not acceptable
+        BankRecLineDescription := LocalBankAccReconciliationLine.Description;
+        if LocalBankAccReconciliationLine."Additional Transaction Info" <> '' then
+            BankRecLineDescription += (' ' + LocalBankAccReconciliationLine."Additional Transaction Info");
+        BankRecLineDescription := RemoveShortWords(CopyStr(BankRecLineDescription, 1, 250));
+
+        SimilarityScore := RecordMatchMng.CalculateStringNearness(RemoveShortWords(TempLedgerEntryMatchingBuffer."Description" + ' ' + TempLedgerEntryMatchingBuffer."Document No." + ' ' + TempLedgerEntryMatchingBuffer."External Document No." + ' ' + TempLedgerEntryMatchingBuffer."Payment Reference"), CopyStr(BankRecLineDescription, 1, 250), 3, 100) / 100.0;
+        if SimilarityScore = 0 then
             exit(false);
 
         exit(true)
