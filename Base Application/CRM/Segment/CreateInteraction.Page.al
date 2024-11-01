@@ -692,7 +692,6 @@ page 5077 "Create Interaction"
                 end;
             Step::"Step 4":
                 begin
-                    Rec.ProcessInterLogEntryComments(InteractionLogEntry."Entry No.");
                     InteractionLogEntry.Modify();
                     CurrPage.Close();
                 end;

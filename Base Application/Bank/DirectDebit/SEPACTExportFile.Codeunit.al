@@ -24,12 +24,6 @@ codeunit 1220 "SEPA CT-Export File"
 
     var
         ExportToServerFile: Boolean;
-        FeatureNameTxt: label 'SEPA Credit Transfer Export', locked = true;
-
-    internal procedure FeatureName(): Text
-    begin
-        exit(FeatureNameTxt)
-    end;
 
     [Scope('OnPrem')]
     procedure Export(var GenJnlLine: Record "Gen. Journal Line"; XMLPortID: Integer; FileName: Text) Result: Boolean
