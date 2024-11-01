@@ -52,7 +52,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
         FeatureTelemetry: Codeunit "Feature Telemetry";
         Window: Dialog;
         ItemApplicationChain: Dictionary of [Integer, List of [Integer]];
-        ItemLedgerEntryTypesUsed: Dictionary of [Enum "Item Ledger Entry Type", Boolean];
         WindowUpdateDateTime: DateTime;
         PostingDateForClosedPeriod: Date;
         LevelNo: array[3] of Integer;
@@ -234,11 +233,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
                 Item := TheItem;
                 GetItem(Item."No.");
                 UpDateWindow(WindowAdjmtLevel, Item."No.", WindowAdjust, WindowFWLevel, WindowEntry, 0);
-
-                IsHandled := false;
-                OnBeforeCollectItemLedgerEntryTypesUsed(Item, IsHandled);
-                if IsHandled then
-                    CollectItemLedgerEntryTypesUsed(Item."No.");
 
                 OnMakeSingleLevelAdjmtOnBeforeCollectAvgCostAdjmtEntryPointToUpdate(TheItem);
                 CollectAvgCostAdjmtEntryPointToUpdate(TempAvgCostAdjmtEntryPoint, TheItem."No.");
@@ -612,9 +606,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
     var
         ItemApplnEntry: Record "Item Application Entry";
     begin
-        if not ItemLedgerEntryTypeIsUsed("Item Ledger Entry Type"::Transfer) then
-            exit;
-
         if ItemApplnEntry.AppliedInbndTransEntryExists(ItemLedgEntryNo, true) then
             repeat
                 AdjustAppliedInbndTransEntries(ItemApplnEntry, Recursion);
@@ -1012,7 +1003,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
             TempInvtAdjmtBuf.CalcItemLedgEntryCost(InbndItemLedgEntry."Entry No.", false);
             ValueEntry.CalcItemLedgEntryCost(InbndItemLedgEntry."Entry No.", false);
             ValueEntry.AddCost(TempInvtAdjmtBuf);
-            OnEliminateRndgResidualOnAfterCalcInboundCost(ValueEntry, InbndItemLedgEntry."Entry No.");
 
             TempRndgResidualBuf.SetRange("Item Ledger Entry No.", InbndItemLedgEntry."Entry No.");
             TempRndgResidualBuf.SetRange("Completely Invoiced", false);
@@ -2741,21 +2731,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
         exit(not TempItemLedgerEntry.IsEmpty());
     end;
 
-    local procedure CollectItemLedgerEntryTypesUsed(ItemNo: Code[20])
-    var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-    begin
-        ItemLedgerEntry.CollectItemLedgerEntryTypesUsed(ItemLedgerEntryTypesUsed, StrSubstNo('''%1''', ItemNo));
-    end;
-
-    local procedure ItemLedgerEntryTypeIsUsed(ItemLedgerEntryType: Enum "Item Ledger Entry Type"): Boolean
-    begin
-        if not ItemLedgerEntryTypesUsed.ContainsKey(ItemLedgerEntryType) then
-            exit(true);
-
-        exit(ItemLedgerEntryTypesUsed.Get(ItemLedgerEntryType));
-    end;
-
     // Extension interface for local procedures
 
     procedure CallInitializeAdjmt()
@@ -3157,7 +3132,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
     local procedure OnEliminateRndgResidualOnBeforeCheckHasNewCost(InbndItemLedgerEntry: Record "Item Ledger Entry"; ValueEntry: Record "Value Entry"; RndgCost: Decimal; RndgCostACY: Decimal; var IsHandled: Boolean)
     begin
     end;
-
+    
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAdjustItem(var TheItem: Record Item)
     begin
@@ -3166,16 +3141,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
     [IntegrationEvent(false, false)]
     local procedure OnAfterAdjustItem(var TheItem: Record Item)
     begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnEliminateRndgResidualOnAfterCalcInboundCost(var ValueEntry: Record "Value Entry"; InbndItemLedgEntryNo: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCollectItemLedgerEntryTypesUsed(var Item: Record Item; var IsHandled: Boolean)
-    begin
-    end;
+    end;    
 }
 
