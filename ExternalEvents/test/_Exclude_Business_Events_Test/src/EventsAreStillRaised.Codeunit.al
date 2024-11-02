@@ -1,4 +1,4 @@
-codeunit 139641 "Events Are Still Raised"
+Codeunit 139641 "Events Are Still Raised"
 {
     Subtype = Test;
     TestPermissions = Disabled;
