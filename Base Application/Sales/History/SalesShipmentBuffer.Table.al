@@ -313,8 +313,6 @@ table 7190 "Sales Shipment Buffer"
         SalesInvoiceLine.SetRange("Shipment Line No.", SalesShipmentLine."Line No.");
         SalesInvoiceLine.CalcSums(Quantity);
         SalesShipmentLine.Quantity := SalesShipmentLine.Quantity - SalesInvoiceLine.Quantity;
-
-        OnAfterCorrectShipment(SalesInvoiceLine, SalesShipmentLine);
     end;
 
     local procedure CorrectReceipt(var ReturnReceiptLine: Record "Return Receipt Line")
@@ -326,18 +324,6 @@ table 7190 "Sales Shipment Buffer"
         SalesCrMemoLine.SetRange("Return Receipt Line No.", ReturnReceiptLine."Line No.");
         SalesCrMemoLine.CalcSums(Quantity);
         ReturnReceiptLine.Quantity := ReturnReceiptLine.Quantity - SalesCrMemoLine.Quantity;
-
-        OnAfterCorrectReceipt(SalesCrMemoLine, ReturnReceiptLine);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCorrectShipment(var SalesInvoiceLine: Record "Sales Invoice Line"; var SalesShipmentLine: Record "Sales Shipment Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCorrectReceipt(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var ReturnReceiptLine: Record "Return Receipt Line")
-    begin
     end;
 }
 
