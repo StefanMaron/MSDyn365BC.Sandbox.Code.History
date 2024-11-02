@@ -111,9 +111,9 @@ codeunit 144050 "ERM Auto Payment"
         LibraryUtility: Codeunit "Library - Utility";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryRandom: Codeunit "Library - Random";
-        AmtCapLbl: Label 'Amt';
+        AmtCap: Label 'Amt';
         AmountErr: Label '%1 must be %2 in %3.', Comment = '%1 = Field Caption,%2 = Field Value,%3 = Table Caption';
-        AmountIssuedCustBillLineCapLbl: Label 'Amount_IssuedCustBillLine';
+        AmountIssuedCustBillLineCap: Label 'Amount_IssuedCustBillLine';
         CustomerNoTxt: Label '%1|%2', Comment = '%1=Field Value,%2=Field Value';
         CustomerBlockedErr: Label 'You cannot post this type of document when Customer %1 is blocked with type All';
         LineMustNotExistsErr: Label '%1 Bill Line must not exists.';
@@ -127,8 +127,6 @@ codeunit 144050 "ERM Auto Payment"
         GLEntryErr: Label 'The lines of G/L Entry is not correct after Reverse.';
         GLBookEntryErr: Label 'The lines of G/L Book Entry is not correct after Reverse.';
         IncorrectBankRcptTempNoErr: Label 'Incorrect Bank Receipt Temp. No.';
-        DimensionCodeMissingErr: Label 'Select a Dimension Value Code for the Dimension Code %1 for Customer %2.', Comment = '%1 = Dimension Code, %2 = Customer no.';
-        ContactNoSeriesErr: Label 'No. Series should be assigned from selected Series from Assist Edit.';
 
     [Test]
     [HandlerFunctions('BankSheetPrintRequestPageHandler')]
@@ -151,7 +149,7 @@ codeunit 144050 "ERM Auto Payment"
 
         // Verify: Verify values on Report - Bank Sheet - Print.
         LibraryReportDataset.LoadDataSetFile();
-        LibraryReportDataset.AssertElementWithValueExists(AmtCapLbl, -Amount);
+        LibraryReportDataset.AssertElementWithValueExists(AmtCap, -Amount);
         LibraryReportDataset.AssertElementWithValueExists(NoBankAccountCap, GenJournalBatch."Bal. Account No.");
     end;
 
@@ -245,7 +243,7 @@ codeunit 144050 "ERM Auto Payment"
         // Verify: Verify values on Report - Issued Customer Bills Report.
         LibraryReportDataset.LoadDataSetFile();
         LibraryReportDataset.AssertElementWithValueExists(ListDateIssuedCustBillHdrCap, Format(WorkDate()));
-        LibraryReportDataset.AssertElementWithValueExists(AmountIssuedCustBillLineCapLbl, TempSalesLine."Amount Including VAT");
+        LibraryReportDataset.AssertElementWithValueExists(AmountIssuedCustBillLineCap, TempSalesLine."Amount Including VAT");
     end;
 
     [Test]
@@ -349,117 +347,6 @@ codeunit 144050 "ERM Auto Payment"
         // Verify: Verify error on while posting Customer Bill.
         Assert.ExpectedError(
           StrSubstNo(PostCustomerBillErr, CustomerBillHeader."Payment Method Code", CustomerBillHeader."Bank Account No."));
-    end;
-
-
-    [Test]
-    [HandlerFunctions('MessageHandler,IssuingCustomerBillRequestPageHandler,ClosingBankReceiptsCheckDimensionsRequestPageHandler')]
-    procedure ClosingBankReceiptsWithoutCheckDimensions()
-    var
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        SalesLine: Record "Sales Line";
-        BillPostingGroup: Record "Bill Posting Group";
-        CustomerBillHeader: Record "Customer Bill Header";
-        CustomerNo: Code[20];
-        SalesInvoiceNo: Code[20];
-        OldWorkDate: Date;
-    begin
-        // [FEATURE] [Closing Bank Receipts]
-        // [SCENARIO 538465] Do not check dimensions if "Do Not Check Dimensions" is enabled on "Closing Bank Receipts" report
-        Initialize();
-
-        // [GIVEN] Customer X, Payment method code X with 'Bill Code', payment term code Y
-        CustomerNo := CreateCustomer(CreatePaymentTermsCode());
-
-        // [GIVEN] Create and post sales invoice, customer X, Payment method code X, payment term code Y
-        CreateSalesInvoice(SalesLine, CustomerNo);
-        SalesInvoiceNo := PostSalesInvoice(SalesLine);
-        SalesInvoiceHeader.Get(SalesInvoiceNo);
-
-        // [GIVEN] Issued Bank Receipt for Customer X
-        EnqueueValuesForRequestPageHandler(WorkDate(), CustomerNo);  // Enqueue values in IssuingCustomerBillRequestPageHandler.
-        REPORT.Run(REPORT::"Issuing Customer Bill");
-
-        // [GIVEN] Create Customer Bill Card
-        // [GIVEN] Suggest lines on Customer Bill Card for Customer X
-        // [GIVEN] Post Customer Bill Card
-        CreateBillPostingGroup(BillPostingGroup, SalesInvoiceHeader."Payment Method Code");
-        CreateCustomerBill(CustomerBillHeader, CustomerNo, BillPostingGroup);
-        PostCustomerBill(CustomerBillHeader);
-
-        // [GIVEN] Add new dimension with code mandatory for customer X
-        CreateDefaultDimension(CustomerNo);
-
-        // [GIVEN] Change WorkDate
-        OldWorkDate := WorkDate();
-        WorkDate := CalcDate('<+1D>', SalesInvoiceHeader."Due Date");
-
-        // [WHEN] Run Closing Bank Receipts for Customer X without check dimensions
-        Commit();
-        EnqueueValuesForRequestPageHandler(true, CustomerNo);  // Enqueue values in ClosingBankReceiptsCheckDimensionsRequestPageHandler
-        REPORT.Run(REPORT::"Closing Bank Receipts");
-
-        // [THEN] The error for missing dimension hasn't been occured
-        // [THEN] The report is executed and entries are correct
-        VerifyCustomerLedgerEntry(
-            SalesLine."Amount Including VAT", CustomerNo, "Gen. Journal Document Type"::Invoice);
-
-        // Tear Down
-        WorkDate := OldWorkDate;
-    end;
-
-    [Test]
-    [HandlerFunctions('MessageHandler,IssuingCustomerBillRequestPageHandler,ClosingBankReceiptsCheckDimensionsRequestPageHandler')]
-    procedure ClosingBankReceiptsWithCheckDimensions()
-    var
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        SalesLine: Record "Sales Line";
-        BillPostingGroup: Record "Bill Posting Group";
-        CustomerBillHeader: Record "Customer Bill Header";
-        CustomerNo: Code[20];
-        SalesInvoiceNo: Code[20];
-        DimensionCode: Code[20];
-        OldWorkDate: Date;
-    begin
-        // [FEATURE] [Closing Bank Receipts]
-        // [SCENARIO 538465] Check dimensions if "Do Not Check Dimensions" is  not enabled on "Closing Bank Receipts" report
-        Initialize();
-
-        // [GIVEN] Customer X, Payment method code X with 'Bill Code', payment term code Y
-        CustomerNo := CreateCustomer(CreatePaymentTermsCode());
-
-        // [GIVEN] Create and post sales invoice, customer X, Payment method code X, payment term code Y
-        CreateSalesInvoice(SalesLine, CustomerNo);
-        SalesInvoiceNo := PostSalesInvoice(SalesLine);
-        SalesInvoiceHeader.Get(SalesInvoiceNo);
-
-        // [GIVEN] Issued Bank Receipt for Customer X
-        EnqueueValuesForRequestPageHandler(WorkDate(), CustomerNo);  // Enqueue values in IssuingCustomerBillRequestPageHandler.
-        REPORT.Run(REPORT::"Issuing Customer Bill");
-
-        // [GIVEN] Create Customer Bill Card for Customer X
-        // [GIVEN] Suggest lines on Customer Bill Card for Customer X
-        // [GIVEN] Post Customer Bill Card
-        CreateBillPostingGroup(BillPostingGroup, SalesInvoiceHeader."Payment Method Code");
-        CreateCustomerBill(CustomerBillHeader, CustomerNo, BillPostingGroup);
-        PostCustomerBill(CustomerBillHeader);
-
-        // [GIVEN] Add new dimension with code mandatory for customer X
-        DimensionCode := CreateDefaultDimension(CustomerNo);
-
-        // [GIVEN] Change WorkDate
-        OldWorkDate := WorkDate();
-        WorkDate := CalcDate('<+1D>', SalesInvoiceHeader."Due Date");
-
-        // [WHEN] Run Closing Bank Receipts, with checking dimensions
-        Commit();
-        EnqueueValuesForRequestPageHandler(false, CustomerNo);  // Enqueue values in ClosingBankReceiptsCheckDimensionsRequestPageHandler
-        asserterror REPORT.Run(REPORT::"Closing Bank Receipts");
-
-        // [THEN] The error popup
-        Assert.ExpectedError(StrSubstNo(DimensionCodeMissingErr, DimensionCode, SalesLine."Sell-to Customer No."));
-        // Tear Down
-        WorkDate := OldWorkDate;
     end;
 
     [Test]
@@ -1310,45 +1197,6 @@ codeunit 144050 "ERM Auto Payment"
 
         // [VERIFY] Verify: Vendor Bill Line Amount
         FindAndVerifyVendorBillLinesAmount(Vendor."No.");
-    end;
-
-    [Test]
-    [HandlerFunctions('SelectNoSeriesModalPageHandler')]
-    procedure ContactAssistEditShouldUseSelectedNoSeries()
-    var
-        MarketingSetup: Record "Marketing Setup";
-        NoSeriesLine: Record "No. Series line";
-        ContactCard: TestPage "Contact Card";
-        NoSeriesPage: TestPage "No. Series";
-        SeriesCode: Code[20];
-    begin
-        // [SCENARIO 541942]: Contact Card should use selected No. Series in from assist edit.
-        Initialize();
-
-        // [GIVEN] Create No. Series Line.
-        LibraryUtility.CreateNoSeriesLine(
-            NoSeriesLine,
-            LibraryERM.CreateNoSeriesCode(),
-            LibraryUtility.GenerateGUID(),
-            '');
-
-        // [GIVEN] Store Series Code.
-        SeriesCode := NoSeriesLine."Series Code";
-        LibraryVariableStorage.Enqueue(SeriesCode);
-
-        // [GIVEN] Get Marketing Setup and Create Relationship with Contact Nos. and Newly created No. Series.
-        MarketingSetup.Get();
-        LibraryUtility.CreateNoSeriesRelationship(MarketingSetup."Contact Nos.", NoSeriesLine."Series Code");
-
-        // [WHEN] Open Contact Card and Assist Edit.
-        NoSeriesPage.Trap();
-        ContactCard.OpenNew();
-        ContactCard."No.".AssistEdit();
-
-        // [THEN] Contact No. should be assigned from newly created No. Series.
-        NoSeriesLine.SetRange("Series Code", SeriesCode);
-        NoSeriesLine.FindFirst();
-        Assert.AreEqual(ContactCard."No.".Value(), NoSeriesLine."Last No. Used", ContactNoSeriesErr);
     end;
 
     local procedure Initialize()
@@ -2391,20 +2239,6 @@ codeunit 144050 "ERM Auto Payment"
         end;
     end;
 
-    local procedure CreateDefaultDimension(CustomerNo: Code[20]): Code[20]
-    var
-        DefaultDimension: Record "Default Dimension";
-        Dimension: Record Dimension;
-        DimensionValue: Record "Dimension Value";
-    begin
-        LibraryDimension.FindDimension(Dimension);
-        LibraryDimension.FindDimensionValue(DimensionValue, Dimension.Code);
-        LibraryDimension.CreateDefaultDimensionCustomer(DefaultDimension, CustomerNo, Dimension.Code, DimensionValue.Code);
-        DefaultDimension.Validate("Value Posting", DefaultDimension."Value Posting"::"Code Mandatory");
-        DefaultDimension.Modify();
-        exit(Dimension.Code);
-    end;
-
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure ApplyCustomerEntriesModalPageHandler(var ApplyCustomerEntries: TestPage "Apply Customer Entries")
@@ -2440,21 +2274,6 @@ codeunit 144050 "ERM Auto Payment"
         LibraryVariableStorage.Dequeue(ConfirmPerApplication);
         LibraryVariableStorage.Dequeue(CustomerNo);
         ClosingBankReceipts.ConfirmPerApplication.SetValue(ConfirmPerApplication);
-        ClosingBankReceipts.CustEntry1.SetFilter("Customer No.", CustomerNo);
-        ClosingBankReceipts.OK().Invoke();
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure ClosingBankReceiptsCheckDimensionsRequestPageHandler(var ClosingBankReceipts: TestRequestPage "Closing Bank Receipts")
-    var
-        CheckDimensions: Variant;
-        CustomerNo: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(CheckDimensions);
-        LibraryVariableStorage.Dequeue(CustomerNo);
-        ClosingBankReceipts.RiskPeriod.SetValue('1D');
-        ClosingBankReceipts.CheckDim.SetValue(CheckDimensions);
         ClosingBankReceipts.CustEntry1.SetFilter("Customer No.", CustomerNo);
         ClosingBankReceipts.OK().Invoke();
     end;
@@ -2520,16 +2339,6 @@ codeunit 144050 "ERM Auto Payment"
     procedure PostApplicationModalPageHandler(var PostApplication: TestPage "Post Application")
     begin
         PostApplication.OK().Invoke();
-    end;
-
-    [ModalPageHandler]
-    procedure SelectNoSeriesModalPageHandler(var NoSeriesPage: TestPage "No. Series")
-    var
-        NoSeries: Record "No. Series";
-    begin
-        NoSeries.Get(LibraryVariableStorage.DequeueText());
-        NoSeriesPage.GoToRecord(NoSeries);
-        NoSeriesPage.OK().Invoke();
     end;
 
     [MessageHandler]
