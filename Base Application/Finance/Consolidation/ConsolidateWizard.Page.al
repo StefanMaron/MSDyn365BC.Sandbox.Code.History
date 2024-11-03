@@ -33,11 +33,7 @@ page 242 "Consolidate Wizard"
                     trigger OnValidate()
                     begin
                         if TempConsolidationProcess."Starting Date" = ClosingDate(TempConsolidationProcess."Starting Date") then
-                            TempConsolidationProcess."Ending Date" := TempConsolidationProcess."Starting Date"
-                        else
-                            if (TempConsolidationProcess."Ending Date" <> 0D) and (TempConsolidationProcess."Ending Date" = ClosingDate(TempConsolidationProcess."Ending Date")) then
-                                TempConsolidationProcess."Ending Date" := 0D;
-
+                            TempConsolidationProcess."Ending Date" := TempConsolidationProcess."Starting Date";
                         if (TempConsolidationProcess."Starting Date" <> 0D) and (TempConsolidationProcess."Ending Date" <> 0D) then
                             ConsolidateBusinessUnits.ValidateDatesForConsolidation(TempConsolidationProcess."Starting Date", TempConsolidationProcess."Ending Date", true);
                         UpdateBusinessUnitDefaultConsolidateState();
@@ -55,11 +51,7 @@ page 242 "Consolidate Wizard"
                     trigger OnValidate()
                     begin
                         if TempConsolidationProcess."Ending Date" = ClosingDate(TempConsolidationProcess."Ending Date") then
-                            TempConsolidationProcess."Starting Date" := TempConsolidationProcess."Ending Date"
-                        else
-                            if (TempConsolidationProcess."Starting Date" <> 0D) and (TempConsolidationProcess."Starting Date" = ClosingDate(TempConsolidationProcess."Starting Date")) then
-                                TempConsolidationProcess."Starting Date" := 0D;
-
+                            TempConsolidationProcess."Starting Date" := TempConsolidationProcess."Ending Date";
                         if (TempConsolidationProcess."Starting Date" <> 0D) and (TempConsolidationProcess."Ending Date" <> 0D) then
                             ConsolidateBusinessUnits.ValidateDatesForConsolidation(TempConsolidationProcess."Starting Date", TempConsolidationProcess."Ending Date", true);
                         UpdateBusinessUnitDefaultConsolidateState();
