@@ -221,7 +221,7 @@ codeunit 5579 "Digital Voucher Impl."
             exit(true);
         if DigitalVoucherEntrySetup."Generate Automatically" then
             exit(true);
-            SourceCodeSetup.Get();
+        SourceCodeSetup.Get();
         if IsPaymentReconciliationJournal(DigitalVoucherEntrySetup."Entry Type", RecRef) then
             exit(true);
         exit(false);
