@@ -797,10 +797,11 @@ table 7311 "Warehouse Journal Line"
         OnSetUpNewLineOnAfterWhseJnlLineSetFilters(Rec, WhseJnlLine, LastWhseJnlLine);
         if WhseJnlLine.FindFirst() then begin
             WhseJnlBatch.Get(
-              "Journal Template Name", "Journal Batch Name", "Location Code");
+              "Journal Template Name", "Journal Batch Name", LastWhseJnlLine."Location Code");
             "Registering Date" := LastWhseJnlLine."Registering Date";
             "Whse. Document No." := LastWhseJnlLine."Whse. Document No.";
             "Entry Type" := LastWhseJnlLine."Entry Type";
+            "Location Code" := LastWhseJnlLine."Location Code";
         end else begin
             "Registering Date" := WorkDate();
             GetWhseJnlBatch();
