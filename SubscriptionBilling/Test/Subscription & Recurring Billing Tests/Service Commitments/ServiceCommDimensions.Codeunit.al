@@ -9,7 +9,7 @@ using Microsoft.Projects.Project.Job;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.Dimension;
 
-codeunit 148160 "Service Comm. Dimensions"
+codeunit 139882 "Service Comm. Dimensions"
 {
     Subtype = Test;
     TestPermissions = Disabled;
@@ -39,8 +39,6 @@ codeunit 148160 "Service Comm. Dimensions"
         DimensionValue: Record "Dimension Value";
         LibrarySales: Codeunit "Library - Sales";
         LibraryPurchase: Codeunit "Library - Purchase";
-        LibraryERMCountryData: Codeunit "Library - ERM Country Data";
-        LibraryTestInitialize: Codeunit "Library - Test Initialize";
         ContractTestLibrary: Codeunit "Contract Test Library";
         LibraryRandom: Codeunit "Library - Random";
         LibraryJob: Codeunit "Library - Job";
@@ -49,13 +47,27 @@ codeunit 148160 "Service Comm. Dimensions"
         ItemDimSetID: Integer;
         DimSetIDArr: array[10] of Integer;
         NewDimSetID: Integer;
-        IsInitialized: Boolean;
+
+    local procedure Reset()
+    begin
+        ClearAll();
+        ContractTestLibrary.InitContractsApp();
+    end;
+
+    local procedure CreateServiceObjectItemWithDimensions()
+    var
+        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
+    begin
+        ContractTestLibrary.CreateServiceObjectItem(Item, false);
+        ContractTestLibrary.CreateDefaultDimensionValueForTable(Database::Item, Item."No.");
+        DimMgt.AddDimSource(DefaultDimSource, Database::Item, Item."No.");
+        ItemDimSetID := DimMgt.GetDefaultDimID(DefaultDimSource, '', Item."Global Dimension 1 Code", Item."Global Dimension 2 Code", 0, Database::Item);
+    end;
 
     [Test]
     procedure ExpectEqualServiceCommitmentAndItemDimensionSetIDOnCreateServiceObject()
     begin
-        Initialize();
-
+        Reset();
         CreateServiceObjectItemWithDimensions();
         ContractTestLibrary.CreateServiceObjectWithItemAndWithServiceCommitment(ServiceObject, Enum::"Invoicing Via"::Contract, false, Item, 1, 0);
 
@@ -64,13 +76,13 @@ codeunit 148160 "Service Comm. Dimensions"
         ServiceCommitment.TestField("Dimension Set ID", ItemDimSetID);
     end;
 
+    // xxx
     [Test]
     procedure ExpectEqualSalesLineAndServiceCommitmentDimensionSetIDOnShipSalesOrder()
     var
         ServiceCommPackageLine: Record "Service Comm. Package Line";
     begin
-        Initialize();
-
+        Reset();
         ContractTestLibrary.CreateServiceObjectItemWithServiceCommitments(Item);
         ServiceCommPackageLine.FindFirst();
         repeat
@@ -104,7 +116,7 @@ codeunit 148160 "Service Comm. Dimensions"
     begin
         // Test: When using a Invoicing Item, Dimensions on the Service commitment should be merged between Service Object Item and Invoicing Item.
         // Invoicing Item Dimensions should be prioritized
-        Initialize();
+        Reset();
 
         // Create Invoicing Item + Dimensions
         ContractTestLibrary.CreateItemWithServiceCommitmentOption(InvoicingItem, InvoicingItem."Service Commitment Option"::"Invoicing Item");
@@ -147,8 +159,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure TestTransferDimensionsFromCustContractHeaderToServiceCommitment()
     begin
-        Initialize();
-
+        Reset();
         CreateServiceObjectItemWithDimensions();
         ContractTestLibrary.CreateServiceObjectWithItemAndWithServiceCommitment(ServiceObject, Enum::"Invoicing Via"::Contract, false, Item, 1, 0);
         DimSetIDArr[2] := ItemDimSetID;
@@ -171,8 +182,7 @@ codeunit 148160 "Service Comm. Dimensions"
     var
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
-        Initialize();
-
+        Reset();
         ContractTestLibrary.CreateServiceObjectWithItemAndWithServiceCommitment(ServiceObject, Enum::"Invoicing Via"::Contract, false, Item, 1, 0);
 
         ContractTestLibrary.CreateCustomer(Customer);
@@ -199,8 +209,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure ExpectEqualItemAndServiceCommitmentDimensionSetIDOnDeleteCustomerContractLine()
     begin
-        Initialize();
-
+        Reset();
         CreateServiceObjectItemWithDimensions();
         ContractTestLibrary.CreateServiceObjectWithItemAndWithServiceCommitment(ServiceObject, Enum::"Invoicing Via"::Contract, false, Item, 1, 0);
 
@@ -221,8 +230,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure TestTransferDimensionsFromVendContractHeaderToServiceCommitment()
     begin
-        Initialize();
-
+        Reset();
         CreateServiceObjectItemWithDimensions();
         ContractTestLibrary.CreateServiceObjectWithItemAndWithServiceCommitment(ServiceObject, Enum::"Invoicing Via"::Contract, false, Item, 1, 1);
         DimSetIDArr[2] := ItemDimSetID;
@@ -245,8 +253,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure ExpectEqualItemAndServiceCommitmentDimensionSetIDOnDeleteVendorContractLine()
     begin
-        Initialize();
-
+        Reset();
         CreateServiceObjectItemWithDimensions();
         ContractTestLibrary.CreateServiceObjectWithItemAndWithServiceCommitment(ServiceObject, Enum::"Invoicing Via"::Contract, false, Item, 1, 1);
 
@@ -266,8 +273,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure CheckBillingLineUpdateRequiredForVendContractOnAfterUpdateServiceCommitmentDimension()
     begin
-        Initialize();
-
+        Reset();
         ContractTestLibrary.CreateVendorContractAndCreateContractLinesAndBillingProposal(VendorContract, ServiceObject, '', VendorBillingTemplate);
 
         ServiceCommitment.SetRange("Service Object No.", ServiceObject."No.");
@@ -284,8 +290,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure CheckBillingLineUpdateRequiredForCustContractOnAfterUpdateServiceCommDimension()
     begin
-        Initialize();
-
+        Reset();
         ContractTestLibrary.CreateCustomerContractAndCreateContractLinesAndBillingProposal(CustomerContract, ServiceObject, '', CustomerBillingTemplate);
 
         ServiceCommitment.SetRange("Service Object No.", ServiceObject."No.");
@@ -302,8 +307,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('CreateCustomerBillingDocsContractPageHandler,MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure ExpectEqualDimensionSetIDSalesLineAndCustContractLine()
     begin
-        Initialize();
-
+        Reset();
         CreateSalesBillingDocuments();
         BillingLine.FindLast();
 
@@ -327,8 +331,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('CreateVendorBillingDocsContractPageHandler,MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure ExpectEqualDimensionSetIDPurchaseLineAndVendContractLine()
     begin
-        Initialize();
-
+        Reset();
         CreatePurchaseBillingDocuments();
         BillingLine.FindLast();
 
@@ -349,8 +352,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('CreateCustomerBillingDocsContractPageHandler,MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure CheckCustomerContractDeferralsDimension()
     begin
-        Initialize();
-
+        Reset();
         CreateSalesBillingDocuments();
         BillingLine.FindLast();
 
@@ -378,8 +380,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('CreateVendorBillingDocsContractPageHandler,MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure CheckVendorContractDeferralsDimension()
     begin
-        Initialize();
-
+        Reset();
         CreatePurchaseBillingDocuments();
         BillingLine.FindLast();
 
@@ -409,14 +410,7 @@ codeunit 148160 "Service Comm. Dimensions"
     var
         DimensionSetEntry: Record "Dimension Set Entry";
     begin
-        Initialize();
-
-        // [WHEN] Auto Insert Customer Contract Dimension Value is enabled
-        ContractTestLibrary.SetAutomaticDimentions(true);
-
-        // [WHEN] Customer Contract dimension value is created
-        ContractTestLibrary.InsertCustomerContractDimensionCode();
-
+        Reset();
         ContractTestLibrary.CreateServiceObjectWithItemAndWithServiceCommitment(ServiceObject, Enum::"Invoicing Via"::Contract, false, Item, 1, 1);
         ContractTestLibrary.CreateCustomer(Customer);
         ServiceObject."End-User Customer No." := Customer."No.";
@@ -452,8 +446,7 @@ codeunit 148160 "Service Comm. Dimensions"
     [HandlerFunctions('MessageHandler,ExchangeRateSelectionModalPageHandler')]
     procedure ExpectErrorOnMergeCustomerContractLineWithDifferentServiceCommitments()
     begin
-        Initialize();
-
+        Reset();
         ContractTestLibrary.CreateServiceObjectWithItemAndWithServiceCommitment(ServiceObject, Enum::"Invoicing Via"::Contract, false, Item, 1, 1);
 
         ContractTestLibrary.CreateCustomer(Customer);
@@ -476,14 +469,7 @@ codeunit 148160 "Service Comm. Dimensions"
         CustomerContract2: Record "Customer Contract";
         DimensionSetEntry: Record "Dimension Set Entry";
     begin
-        Initialize();
-
-        // [WHEN] Auto Insert Customer Contract Dimension Value is enabled
-        ContractTestLibrary.SetAutomaticDimentions(true);
-
-        // [WHEN] Customer Contract dimension value is created
-        ContractTestLibrary.InsertCustomerContractDimensionCode();
-
+        Reset();
         //Create Service Commitment Template with two packages
         //Assign packages to different customer and vendor contracts
         //Expect the customer contract dimension to be assigned only to vendor service commitment from the same package
@@ -535,33 +521,6 @@ codeunit 148160 "Service Comm. Dimensions"
             DimensionSetEntry.FindFirst();
             DimensionSetEntry.TestField("Dimension Value Code", CustomerContract."No.");
         until ServiceCommitment.Next() = 0;
-    end;
-
-    local procedure Initialize()
-    begin
-        LibraryTestInitialize.OnTestInitialize(Codeunit::"Service Comm. Dimensions");
-        ClearAll();
-        ContractTestLibrary.InitContractsApp();
-
-        if IsInitialized then
-            exit;
-
-        LibraryTestInitialize.OnBeforeTestSuiteInitialize(Codeunit::"Service Comm. Dimensions");
-        LibraryERMCountryData.UpdatePurchasesPayablesSetup();
-        LibraryERMCountryData.UpdateSalesReceivablesSetup();
-        LibraryERMCountryData.CreateVATData();
-        IsInitialized := true;
-        LibraryTestInitialize.OnAfterTestSuiteInitialize(Codeunit::"Service Comm. Dimensions");
-    end;
-
-    local procedure CreateServiceObjectItemWithDimensions()
-    var
-        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-    begin
-        ContractTestLibrary.CreateServiceObjectItem(Item, false);
-        ContractTestLibrary.CreateDefaultDimensionValueForTable(Database::Item, Item."No.");
-        DimMgt.AddDimSource(DefaultDimSource, Database::Item, Item."No.");
-        ItemDimSetID := DimMgt.GetDefaultDimID(DefaultDimSource, '', Item."Global Dimension 1 Code", Item."Global Dimension 2 Code", 0, Database::Item);
     end;
 
     local procedure CreateSalesBillingDocuments()
