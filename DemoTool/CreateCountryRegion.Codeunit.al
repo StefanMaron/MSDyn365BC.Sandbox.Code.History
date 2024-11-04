@@ -34,7 +34,7 @@
         InsertData('DE', XGermany, '276', 'DE', 'DE', 3, 1, '9930', '');
         InsertVATRegNoFormat('DE', 10000, 'DE#########');
         InsertVATRegNoFormat('DE', 20000, '#########');
-        InsertData('DK', XDenmark, '208', 'DK', 'DK', 0, 1, '0190', '');
+        InsertData('DK', XDenmark, '208', 'DK', 'DK', 0, 1, '0184', '');
         InsertVATRegNoFormat('DK', 10000, 'DK########');
         InsertVATRegNoFormat('DK', 20000, '########');
         InsertData('ES', XSpain, '724', 'ES', 'ES', 0, 1, '9920', '');
