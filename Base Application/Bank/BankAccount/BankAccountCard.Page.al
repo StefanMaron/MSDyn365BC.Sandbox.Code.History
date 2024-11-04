@@ -498,12 +498,6 @@ page 370 "Bank Account Card"
                         ValidateExportFormats();
                     end;
                 }
-                field(CheckTransmitted; Rec."Check Transmitted")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Visible = false;
-                }
-
                 field("Positive Pay Export Code"; Rec."Positive Pay Export Code")
                 {
                     ApplicationArea = Basic, Suite;
