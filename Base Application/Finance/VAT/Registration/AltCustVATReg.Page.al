@@ -48,7 +48,7 @@ page 212 "Alt. Cust. VAT Reg."
     }
 
     var
-        FeatureNameTxt: Label 'Alternative Customer VAT Registration', Locked = true;
+        FeatureNameTxt: Label 'Alternative Customer VAT Registration';
 
     trigger OnOpenPage();
     var
