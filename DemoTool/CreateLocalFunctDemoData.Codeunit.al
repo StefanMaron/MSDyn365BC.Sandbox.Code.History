@@ -85,6 +85,8 @@ codeunit 160000 "Create Local Funct. Demo Data"
         XSEPACAMTDesc: Label 'SEPA CAMT Bank Statements';
         XGenericSEPATxt: Label 'Generic SEPA';
         XGenericSEPADescTxt: Label 'Generic Payment File';
+        XGenericSEPA09Txt: Label 'Generic SEPA09';
+        XGenericSEPADesc09Txt: Label 'SEPA CT pain.001.001.09', Locked = true;
 
     procedure CreatePostCodeRanges()
     var
@@ -366,7 +368,8 @@ codeunit 160000 "Create Local Funct. Demo Data"
         CreateExportProtocol(XBTL91, XABNAMROForeignPaymts, 11000007, 11000004, 11000007, 'c:\temp\btl%1.txt');
         CreateExportProtocol(XBBV, XRABOForeignPaymts, 11000008, 11000004, 11000008, 'c:\temp\bbv%1.txt');
         CreateExportProtocol(XPAYMUL, XPAYMUL, 11000009, 11000004, 11000009, '');
-        CreateExportProtocol(XGenericSEPATxt, XGenericSEPADescTxt, 11000007, 11000004, 11000012, '');
+        CreateExportProtocol(XGenericSEPATxt, XGenericSEPADescTxt, Codeunit::"Check BTL91", Report::Docket, Report::"SEPA ISO20022 Pain 01.01.03", '');
+        CreateExportProtocol(XGenericSEPA09Txt, XGenericSEPADesc09Txt, Codeunit::"Check BTL91", Report::Docket, Report::"SEPA ISO20022 Pain 01.01.09", '');
     end;
 
     procedure CreateExportProtocol("Code": Code[20]; Description: Text[30]; CheckID: Integer; DocketID: Integer; ExportID: Integer; FileNames: Text[80])
