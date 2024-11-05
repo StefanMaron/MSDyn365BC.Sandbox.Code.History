@@ -505,7 +505,6 @@ table 99000764 "Routing Line"
         VersionMgt: Codeunit VersionManagement;
         CheckRoutingLines: Codeunit "Check Routing Lines";
         RtngVersionCode: Code[20];
-        IsHandled: Boolean;
     begin
         if RtngHeaderNo = '' then
             exit(false);
@@ -513,11 +512,10 @@ table 99000764 "Routing Line"
         RtngHeader.Get(RtngHeaderNo);
         RtngVersionCode := VersionMgt.GetRtngVersion(RtngHeaderNo, CalculationDate, true);
 
-        IsHandled := false;
-        OnCertifiedRoutingVersionExistsOnBeforeCalculate(RtngVersionCode, RtngHeaderNo, CalculationDate, IsHandled);
-        if not IsHandled then
-            if CheckRoutingLines.NeedsCalculation(RtngHeader, RtngVersionCode) then
-                CheckRoutingLines.Calculate(RtngHeader, RtngVersionCode);
+        OnCertifiedRoutingVersionExistsOnBeforeCalculate(RtngVersionCode, RtngHeaderNo, CalculationDate);
+
+        if CheckRoutingLines.NeedsCalculation(RtngHeader, RtngVersionCode) then
+            CheckRoutingLines.Calculate(RtngHeader, RtngVersionCode);
 
         SetRange("Routing No.", RtngHeaderNo);
         SetRange("Version Code", RtngVersionCode);
@@ -565,7 +563,7 @@ table 99000764 "Routing Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCertifiedRoutingVersionExistsOnBeforeCalculate(var RtngVersionCode: Code[20]; var RtngHeaderNo: Code[20]; CalculationDate: Date; var IsHandled: Boolean)
+    local procedure OnCertifiedRoutingVersionExistsOnBeforeCalculate(var RtngVersionCode: Code[20]; var RtngHeaderNo: Code[20]; CalculationDate: Date)
     begin
     end;
 
