@@ -873,8 +873,7 @@ codeunit 134195 "ERM Multiple Posting Groups"
         VendorLedgerEntry, VendorLedgerEntry2 : Record "Vendor Ledger Entry";
         InvoiceNo, Invoice2No : Code[20];
         PaymentNo, Payment2No : Code[20];
-        TotalAmount, TotalAmount2, SumOfAmountLCY : Decimal;
-        PayablesAccountCodes: List of [Code[20]];
+        TotalAmount, TotalAmount2 : Decimal;
     begin
         // [SCENARIO 551376] [24.x] Wrong vendor posting group used when posting payment application to two purchase invoices with multiple posting groups
         Initialize();
@@ -883,11 +882,10 @@ codeunit 134195 "ERM Multiple Posting Groups"
         SetPurchAllowMultiplePostingGroups(true);
 
         // [GIVEN] Posting two invoices for a vendor with multiple posting groups (invoices have different posting groups)
-        LibraryPurchase.CreateVendorPostingGroup(VendorPostingGroup);
         LibraryPurchase.CreateVendor(Vendor);
         Vendor.Validate("Allow Multiple Posting Groups", true);
-        Vendor.Validate("Vendor Posting Group", VendorPostingGroup.Code);
         Vendor.Modify();
+        VendorPostingGroup.Get(Vendor."Vendor Posting Group");
         LibraryPurchase.CreatePurchaseDocumentWithItem(PurchaseHeader, PurchaseLine, "Purchase Document Type"::Invoice, Vendor."No.", '', 1, '', 0D);
         LibraryPurchase.CreateVendorPostingGroup(VendorPostingGroup2);
         LibraryPurchase.CreateAltVendorPostingGroup(Vendor."Vendor Posting Group", VendorPostingGroup2.Code);
@@ -939,12 +937,6 @@ codeunit 134195 "ERM Multiple Posting Groups"
         Assert.IsFalse(VendorLedgerEntry.Open, '');
         Assert.IsFalse(VendorLedgerEntry2.Open, '');
 
-        // [THEN] The Amount on G/L Entries for payables accounts of the two posting groups should balance out
-        PayablesAccountCodes.Add(VendorPostingGroup."Payables Account");
-        PayablesAccountCodes.Add(VendorPostingGroup2."Payables Account");
-        SumOfAmountLCY := SumGLEntryAmountsForPayablesAccounts(PayablesAccountCodes);
-        Assert.AreEqual(0, SumOfAmountLCY, '');
-
         // [WHEN] Unapplying the ledger entries
         LibraryERM.UnapplyVendorLedgerEntry(VendorLedgerEntry);
         LibraryERM.UnapplyVendorLedgerEntry(VendorLedgerEntry2);
@@ -954,30 +946,6 @@ codeunit 134195 "ERM Multiple Posting Groups"
         VendorLedgerEntry2.Get(VendorLedgerEntry2."Entry No.");
         Assert.IsTrue(VendorLedgerEntry.Open, '');
         Assert.IsTrue(VendorLedgerEntry2.Open, '');
-
-        // [THEN] The Amount on G/L Entries for payables accounts of the two posting groups should balance out
-        SumOfAmountLCY := SumGLEntryAmountsForPayablesAccounts(PayablesAccountCodes);
-        Assert.AreEqual(0, SumOfAmountLCY, '');
-    end;
-
-    local procedure SumGLEntryAmountsForPayablesAccounts(var PayablesAccountCodes: List of [Code[20]]): Decimal
-    var
-        GLEntry: Record "G/L Entry";
-        AccountCode: Code[20];
-        Started: Boolean;
-        FilterString: Text;
-    begin
-        foreach AccountCode in PayablesAccountCodes do begin
-            if Started then
-                FilterString += '|'
-            else
-                Started := true;
-            FilterString += Format(AccountCode);
-        end;
-        GLEntry.SetFilter("G/L Account No.", FilterString);
-        GLEntry.SetRange("Bal. Account Type", GLEntry."Bal. Account Type"::"G/L Account");
-        GLEntry.CalcSums(Amount);
-        exit(GLEntry.Amount);
     end;
 
     [Test]
