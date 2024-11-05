@@ -5236,7 +5236,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
                                         GenJournalLine,
                                         VendPostingGr.GetPayablesAccount(), -DetailedCVLedgEntryBuffer."Amount (LCY)", 0,
                                         DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode);
-                                end;
+                                end else
+                                    PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
                             else
                                 PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
                         end;
