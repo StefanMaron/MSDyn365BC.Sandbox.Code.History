@@ -5,6 +5,9 @@
 namespace System.AI;
 
 using System;
+using System.Azure.Identity;
+using System.Azure.KeyVault;
+using System.Environment;
 
 /// <summary>
 /// Store the authorization information for the AOAI service.
@@ -22,61 +25,37 @@ codeunit 7767 "AOAI Authorization"
         Deployment: Text;
         [NonDebuggable]
         ApiKey: SecretText;
-        [NonDebuggable]
-        ManagedResourceDeployment: Text;
-        ResourceUtilization: Enum "AOAI Resource Utilization";
+        EmptyTenantIdTelemetryMsg: Label 'Empty or malformed tenant ID.', Locked = true;
+        TenantIsAllowListedTelemetryMsg: Label 'The current tenant is allowlisted for first party auth.', Locked = true;
+        AllowlistedTenantsAkvKeyTok: Label 'AOAI-Allow-1P-Auth', Locked = true;
 
     [NonDebuggable]
     procedure IsConfigured(CallerModule: ModuleInfo): Boolean
     var
-        AzureOpenAiImpl: Codeunit "Azure OpenAI Impl";
         CurrentModule: ModuleInfo;
         ALCopilotFunctions: DotNet ALCopilotFunctions;
     begin
         NavApp.GetCurrentModuleInfo(CurrentModule);
 
-        case ResourceUtilization of
-            Enum::"AOAI Resource Utilization"::"First Party":
-                exit((ManagedResourceDeployment <> '') and ALCopilotFunctions.IsPlatformAuthorizationConfigured(CallerModule.Publisher(), CurrentModule.Publisher()));
-            Enum::"AOAI Resource Utilization"::"Self-Managed":
-                exit((Deployment <> '') and (Endpoint <> '') and (not ApiKey.IsEmpty()));
-            Enum::"AOAI Resource Utilization"::"Microsoft Managed":
-                exit((Deployment <> '') and (Endpoint <> '') and (not ApiKey.IsEmpty()) and (ManagedResourceDeployment <> '') and AzureOpenAiImpl.IsTenantAllowlistedForFirstPartyCopilotCalls());
-        end;
+        if Deployment = '' then
+            exit(false);
 
-        exit(false);
+        if (Endpoint = '') and ApiKey.IsEmpty() then
+            exit(IsTenantAllowlistedForPlatformAuthorization()
+                or ALCopilotFunctions.IsPlatformAuthorizationConfigured(CallerModule.Publisher(), CurrentModule.Publisher()));
+
+        if (Endpoint = '') or ApiKey.IsEmpty() then
+            exit(false);
+
+        exit(true);
     end;
 
     [NonDebuggable]
-    procedure SetMicrosoftManagedAuthorization(NewEndpoint: Text; NewDeployment: Text; NewApiKey: SecretText; NewManagedResourceDeployment: Text)
+    procedure SetAuthorization(NewEndpoint: Text; NewDeployment: Text; NewApiKey: SecretText)
     begin
-        ClearVariables();
-
-        ResourceUtilization := Enum::"AOAI Resource Utilization"::"Microsoft Managed";
         Endpoint := NewEndpoint;
         Deployment := NewDeployment;
         ApiKey := NewApiKey;
-        ManagedResourceDeployment := NewManagedResourceDeployment;
-    end;
-
-    [NonDebuggable]
-    procedure SetSelfManagedAuthorization(NewEndpoint: Text; NewDeployment: Text; NewApiKey: SecretText)
-    begin
-        ClearVariables();
-
-        ResourceUtilization := Enum::"AOAI Resource Utilization"::"Self-Managed";
-        Endpoint := NewEndpoint;
-        Deployment := NewDeployment;
-        ApiKey := NewApiKey;
-    end;
-
-    [NonDebuggable]
-    procedure SetFirstPartyAuthorization(NewDeployment: Text)
-    begin
-        ClearVariables();
-
-        ResourceUtilization := Enum::"AOAI Resource Utilization"::"First Party";
-        ManagedResourceDeployment := NewDeployment;
     end;
 
     [NonDebuggable]
@@ -98,22 +77,33 @@ codeunit 7767 "AOAI Authorization"
     end;
 
     [NonDebuggable]
-    procedure GetManagedResourceDeployment(): SecretText
+    local procedure IsTenantAllowlistedForPlatformAuthorization(): Boolean
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        CopilotCapabilityImpl: Codeunit "Copilot Capability Impl";
+        AzureKeyVault: Codeunit "Azure Key Vault";
+        AzureAdTenant: Codeunit "Azure AD Tenant";
+        AllowlistedTenants: Text;
+        EntraTenantIdAsText: Text;
+        EntraTenantIdAsGuid: Guid;
     begin
-        exit(ManagedResourceDeployment);
-    end;
+        if not EnvironmentInformation.IsSaaSInfrastructure() then
+            exit(false);
 
-    procedure GetResourceUtilization(): Enum "AOAI Resource Utilization"
-    begin
-        exit(ResourceUtilization);
-    end;
+        if (not AzureKeyVault.GetAzureKeyVaultSecret(AllowlistedTenantsAkvKeyTok, AllowlistedTenants)) or (AllowlistedTenants.Trim() = '') then
+            exit(false);
 
-    local procedure ClearVariables()
-    begin
-        Clear(Endpoint);
-        Clear(ApiKey);
-        Clear(Deployment);
-        Clear(ManagedResourceDeployment);
-        Clear(ResourceUtilization);
+        EntraTenantIdAsText := AzureAdTenant.GetAadTenantId();
+
+        if (EntraTenantIdAsText = '') or not Evaluate(EntraTenantIdAsGuid, EntraTenantIdAsText) or IsNullGuid(EntraTenantIdAsGuid) then begin
+            Session.LogMessage('0000MLN', EmptyTenantIdTelemetryMsg, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CopilotCapabilityImpl.GetAzureOpenAICategory());
+            exit(false);
+        end;
+
+        if not AllowlistedTenants.Contains(EntraTenantIdAsText) then
+            exit(false);
+
+        Session.LogMessage('0000MLE', TenantIsAllowListedTelemetryMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CopilotCapabilityImpl.GetAzureOpenAICategory());
+        exit(true);
     end;
 }
