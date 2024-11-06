@@ -452,11 +452,12 @@ codeunit 99000774 "Calculate Routing Line"
 
         if ProdOrderRoutingLine."Schedule Manually" and (TimeType = TimeType::"Run Time") then begin
             OnLoadCapForwardOnScheduleManuallyOnBeforeCheckDateTimes(ProdOrderRoutingLine, CapType, CapNo, TimeType, ProdStartingDate, ProdStartingTime, RemainNeedQty, RunStartingDateTime, RunEndingDateTime);
-            if ProdOrderRoutingLine."Run Time" <> 0 then
-                if (RunEndingDateTime < RunStartingDateTime) or
-                    ((RunEndingDateTime = RunStartingDateTime) and (ProdOrderRoutingLine."Input Quantity" <> 0))
-                then
-                    Error(Text005);
+            if (RunEndingDateTime < RunStartingDateTime) or
+               ((RunEndingDateTime = RunStartingDateTime) and
+                (ProdOrderRoutingLine."Run Time" <> 0) and
+                (ProdOrderRoutingLine."Input Quantity" <> 0))
+            then
+                Error(Text005);
             TotalAvailCapacity :=
               AvailableCapacity(CapType, CapNo, RunStartingDateTime, RunEndingDateTime);
             if TotalAvailCapacity = 0 then begin
@@ -759,11 +760,8 @@ codeunit 99000774 "Calculate Routing Line"
                     TempProdOrderRoutingLine.GetBySystemId(ProdOrderRoutingLine2.SystemId);
                     TempProdOrderRoutingLine.Copy(ProdOrderRoutingLine2);
                     TempProdOrderRoutingLine.Modify();
-                    WorkCenterQueueTime.Get(ProdOrderRoutingLine2."Work Center No.");
-                    if WorkCenterQueueTime."Queue Time" <> 0 then begin
-                        ProdEndingDate := ProdStartingDate;
-                        ProdEndingTime := ProdStartingTime;
-                    end;
+                    ProdEndingDate := ProdStartingDate;
+                    ProdEndingTime := ProdStartingTime;
                     ProdOrderRoutingLine3 := ProdOrderRoutingLine2;
                 end;
 
@@ -1276,7 +1274,7 @@ codeunit 99000774 "Calculate Routing Line"
         ProdOrderLine.SetRange("Prod. Order No.", ProdOrderRoutingLine."Prod. Order No.");
         ProdOrderLine.SetRange("Routing Reference No.", ProdOrderRoutingLine."Routing Reference No.");
         ProdOrderLine.SetRange("Routing No.", ProdOrderRoutingLine."Routing No.");
-        ProdOrderLine.SetLoadFields("Quantity (Base)", "Scrap %", "Prod. Order No.", "Line No.", Status, "Routing No.", "Routing Version Code", "Ending Date", "Ending Time");
+        ProdOrderLine.SetLoadFields("Quantity (Base)", "Scrap %", "Prod. Order No.", "Line No.", Status);
         OnCalculateRoutingLineOnAfterProdOrderLineSetFilters(ProdOrderLine, ProdOrder, ProdOrderRoutingLine);
         if ProdOrderLine.Find('-') then begin
             ExpectedOperOutput := 0;
