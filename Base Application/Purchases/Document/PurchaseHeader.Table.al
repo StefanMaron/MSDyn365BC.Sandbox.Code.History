@@ -1781,19 +1781,14 @@ table 38 "Purchase Header"
                 if "VAT Base Discount %" > GLSetup."VAT Tolerance %" then begin
                     if GetHideValidationDialog() or not GuiAllowed then
                         Confirmed := true
-                    else begin
-                        IsHandled := false;
-                        OnValidateVATBaseDiscountOnBeforeConfirm(Rec, IsHandled, Confirmed);
-                        if not IsHandled then
-                            Confirmed :=
-                              Confirm(
-                                Text007 +
-                                Text008, false,
-                                FieldCaption("VAT Base Discount %"),
-                                GLSetup.FieldCaption("VAT Tolerance %"),
-                                GLSetup.TableCaption());
-                    end;
-
+                    else
+                        Confirmed :=
+                          Confirm(
+                            Text007 +
+                            Text008, false,
+                            FieldCaption("VAT Base Discount %"),
+                            GLSetup.FieldCaption("VAT Tolerance %"),
+                            GLSetup.TableCaption());
                     if not Confirmed then
                         "VAT Base Discount %" := xRec."VAT Base Discount %";
                 end;
@@ -3531,14 +3526,11 @@ table 38 "Purchase Header"
     procedure PerformManualRelease()
     var
         ReleasePurchDoc: Codeunit "Release Purchase Document";
-        IsHandled: Boolean;
     begin
-        OnBeforePerformManualRelease(Rec, IsHandled);
-        if not IsHandled then
-            if Rec.Status <> Rec.Status::Released then begin
-                ReleasePurchDoc.PerformManualRelease(Rec);
-                Commit();
-            end;
+        if Rec.Status <> Rec.Status::Released then begin
+            ReleasePurchDoc.PerformManualRelease(Rec);
+            Commit();
+        end;
     end;
 
     procedure PerformManualReopen(var PurchaseHeader: Record "Purchase Header")
@@ -3995,17 +3987,12 @@ table 38 "Purchase Header"
     procedure ConfirmCurrencyFactorUpdate(): Boolean
     var
         ForceConfirm: Boolean;
-        IsHandled: Boolean;
     begin
         OnBeforeConfirmUpdateCurrencyFactor(Rec, HideValidationDialog, ForceConfirm);
         if GetHideValidationDialog() or not GuiAllowed or ForceConfirm then
             Confirmed := true
-        else begin
-            IsHandled := false;
-            OnConfirmCurrencyFactorUpdateOnBeforeConfirm(Rec, IsHandled, Confirmed);
-            if not IsHandled then
-                Confirmed := Confirm(Text022, false);
-        end;
+        else
+            Confirmed := Confirm(Text022, false);
         if Confirmed then
             Validate("Currency Factor")
         else
@@ -4805,7 +4792,7 @@ table 38 "Purchase Header"
         if not GetHideValidationDialog() then begin
             DefaultAnswer := true;
             OnUpdateAllLineDimOnBeforeConfirmUpdateAllLineDim(Rec, DefaultAnswer);
-            if not ConfirmManagement.GetResponseOrDefault(Text051, DefaultAnswer) then
+            if not ConfirmManagement.GetResponseOrDefault(Text051, true) then
                 exit;
         end;
 
@@ -4863,7 +4850,6 @@ table 38 "Purchase Header"
         if VendLedgEntry.FindFirst() then begin
             if VendLedgEntry."Amount to Apply" = 0 then begin
                 VendLedgEntry.CalcFields("Remaining Amount");
-                OnSetAmountToApplyAfterOnCalcRemainingAmount(VendLedgEntry);
                 VendLedgEntry."Amount to Apply" := VendLedgEntry."Remaining Amount";
             end else
                 VendLedgEntry."Amount to Apply" := 0;
@@ -5142,18 +5128,13 @@ table 38 "Purchase Header"
     procedure IsApprovedForPosting() Approved: Boolean
     var
         PrepaymentMgt: Codeunit "Prepayment Mgt.";
-        IsHandled: Boolean;
     begin
         if ApprovalsMgmt.PrePostApprovalCheckPurch(Rec) then begin
             TestPurchasePrepayment();
             Approved := true;
             if "Document Type" = "Document Type"::Order then
-                if PrepaymentMgt.TestPurchasePayment(Rec) then begin
-                    IsHandled := false;
-                    OnIsApprovedForPostingOnBeforeError(Rec, IsHandled, Approved);
-                    if not IsHandled then
-                        Error(Text054, "Document Type", "No.");
-                end;
+                if PrepaymentMgt.TestPurchasePayment(Rec) then
+                    Error(Text054, "Document Type", "No.");
             OnAfterIsApprovedForPosting(Rec, Approved);
         end;
     end;
@@ -6007,15 +5988,16 @@ table 38 "Purchase Header"
         OnAfterUpdatePayToAddressFromBuyFromAddress(Rec, xRec, FieldNumber);
     end;
 
-    local procedure PayToAddressEqualsOldBuyFromAddress() Result: Boolean
+    local procedure PayToAddressEqualsOldBuyFromAddress(): Boolean
     begin
-        Result := (xRec."Buy-from Address" = "Pay-to Address") and
+        if (xRec."Buy-from Address" = "Pay-to Address") and
            (xRec."Buy-from Address 2" = "Pay-to Address 2") and
            (xRec."Buy-from City" = "Pay-to City") and
            (xRec."Buy-from County" = "Pay-to County") and
            (xRec."Buy-from Post Code" = "Pay-to Post Code") and
-           (xRec."Buy-from Country/Region Code" = "Pay-to Country/Region Code");
-        OnAfterPayToAddressEqualsOldBuyFromAddress(Rec, xRec, Result);
+           (xRec."Buy-from Country/Region Code" = "Pay-to Country/Region Code")
+        then
+            exit(true);
     end;
 
     /// <summary>
@@ -8926,36 +8908,6 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateAllLineDimOnBeforeConfirmUpdateAllLineDim(var PurchaseHeader: Record "Purchase Header"; var DefaultAnswer: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetAmountToApplyAfterOnCalcRemainingAmount(var VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePerformManualRelease(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateVATBaseDiscountOnBeforeConfirm(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var Confirmed: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnConfirmCurrencyFactorUpdateOnBeforeConfirm(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var Confirmed: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnIsApprovedForPostingOnBeforeError(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var Approved: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPayToAddressEqualsOldBuyFromAddress(PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var Result: Boolean)
     begin
     end;
 }
