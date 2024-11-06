@@ -128,13 +128,8 @@ page 7290 "Sales Line From Attachment"
         TotalCopiedLines := 0;
         if CloseAction = CloseAction::OK then begin
             TotalCopiedLines := TempGlobalSalesLineAISuggestion.Count();
-            if TotalCopiedLines > 0 then begin
+            if TotalCopiedLines > 0 then
                 SalesLineUtility.CopySalesLineToDoc(GlobalSalesHeader, TempGlobalSalesLineAISuggestion);
-                if SalesLineUtility.CheckIfSuggestedLinesContainErrors(TempGlobalSalesLineAISuggestion) then begin
-                    CurrPage.Update(false);
-                    exit(false);
-                end;
-            end;
             // Save the mapping used for generating the sales lines
             GlobalFileHandler.Finalize(GlobalFileHandlerResult);
         end;
