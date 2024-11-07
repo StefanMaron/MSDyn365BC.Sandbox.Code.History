@@ -24,12 +24,6 @@ codeunit 1220 "SEPA CT-Export File"
 
     var
         ExportToServerFile: Boolean;
-        FeatureNameTxt: label 'SEPA Credit Transfer Export', locked = true;
-
-    internal procedure FeatureName(): Text
-    begin
-        exit(FeatureNameTxt)
-    end;
 
     procedure Export(var GenJnlLine: Record "Gen. Journal Line"; XMLPortID: Integer) Result: Boolean
     var
@@ -51,18 +45,11 @@ codeunit 1220 "SEPA CT-Export File"
         XMLPORT.Export(XMLPortID, OutStr, GenJnlLine);
 
         if CHMgt.IsSwissSEPACTExport(GenJnlLine) then
-            case XMLPortID of
-               XMLPort::"SEPA CT pain.001.001.03":
-                    CHMgt.ReplaceXMLNamespaceCaption(
-                      TempBlob,
-                      'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03',
-                      'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd  pain.001.001.03.ch.02.xsd');
-               XMLPort::"SEPA CT pain.001.001.09":
-                    CHMgt.ReplaceXMLNamespaceCaption(
-                      TempBlob,
-                      'urn:iso:std:iso:20022:tech:xsd:pain.001.001.09',
-                      'urn:iso:std:iso:20022:tech:xsd:pain.001.001.09" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09 pain.001.001.09.ch.03.xsd');
-            end;
+            CHMgt.ReplaceXMLNamespaceCaption(
+              TempBlob,
+              'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03',
+              'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd  pain.001.001.03.ch.02.xsd');
+
         CreditTransferRegister.FindLast();
         UseCommonDialog := not ExportToServerFile;
         OnBeforeBLOBExport(TempBlob, CreditTransferRegister, UseCommonDialog, FileCreated, IsHandled);
