@@ -32,6 +32,18 @@ codeunit 8067 "Customer Deferrals Mngmt."
 #if not CLEAN25
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnFillInvoicePostingBufferOnBeforeSetAccount, '', false, false)]
     local procedure SetSalesAccountOnAfterSetAmounts(SalesLine: Record "Sales Line"; var SalesAccount: Code[20])
+    begin
+        SetSalesAccountForDeferrals(SalesLine, SalesAccount);
+    end;
+#endif
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Post Invoice Events", OnPrepareLineOnBeforeSetAccount, '', false, false)]
+    local procedure SetSalesAccountForNewPostingEngine(SalesLine: Record "Sales Line"; var SalesAccount: Code[20])
+    begin
+        SetSalesAccountForDeferrals(SalesLine, SalesAccount);
+    end;
+
+    local procedure SetSalesAccountForDeferrals(SalesLine: Record "Sales Line"; var SalesAccount: Code[20])
     var
         CustContractHeader: Record "Customer Contract";
         GeneralPostingSetup: Record "General Posting Setup";
@@ -52,7 +64,6 @@ codeunit 8067 "Customer Deferrals Mngmt."
             SalesAccount := GeneralPostingSetup."Cust. Contr. Deferral Account";
         end;
     end;
-#endif
 #if not CLEAN25
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnFillInvoicePostingBufferOnBeforeSetLineDiscAccount, '', false, false)]
     local procedure SetLineDiscountAccountForCustomerContractDeferrals(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var LineDiscAccount: Code[20]; var IsHandled: Boolean)
@@ -63,6 +74,16 @@ codeunit 8067 "Customer Deferrals Mngmt."
         end;
     end;
 #endif
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Post Invoice Events", OnPrepareLineOnBeforeSetLineDiscAccount, '', false, false)]
+    local procedure SetLineDiscountAccountForNewPostingEngine(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var InvDiscAccount: Code[20]; var IsHandled: Boolean)
+    begin
+        if IsCustomerContractWithDeferrals(SalesLine) then begin
+            InvDiscAccount := GenPostingSetup."Cust. Contr. Deferral Account";
+            IsHandled := true;
+        end;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnPostSalesLineOnBeforeInsertInvoiceLine, '', false, false)]
     local procedure InsertCustomerDeferralsFromSalesInvoice(SalesHeader: Record "Sales Header"; xSalesLine: Record "Sales Line"; SalesInvHeader: Record "Sales Invoice Header")
     begin
