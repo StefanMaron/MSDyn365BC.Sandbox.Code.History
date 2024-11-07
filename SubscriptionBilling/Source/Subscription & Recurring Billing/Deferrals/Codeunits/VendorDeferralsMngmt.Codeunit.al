@@ -33,18 +33,6 @@ codeunit 8068 "Vendor Deferrals Mngmt."
 #if not CLEAN25
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", OnFillInvoicePostingBufferOnBeforeSetAccount, '', false, false)]
     local procedure SetPurchaseAccountOnAfterSetAmounts(PurchaseLine: Record "Purchase Line"; var PurchAccount: Code[20])
-    begin
-        SetPurchaseAccountForDeferrals(PurchaseLine, PurchAccount);
-    end;
-#endif
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch. Post Invoice Events", OnPrepareLineOnBeforeSetAccount, '', false, false)]
-    local procedure SetPurchaseAccountForNewPostingEngine(PurchLine: Record "Purchase Line"; var SalesAccount: Code[20])
-    begin
-        SetPurchaseAccountForDeferrals(PurchLine, SalesAccount);
-    end;
-
-    local procedure SetPurchaseAccountForDeferrals(PurchaseLine: Record "Purchase Line"; var PurchAccount: Code[20])
     var
         VendContractHeader: Record "Vendor Contract";
         GeneralPostingSetup: Record "General Posting Setup";
@@ -68,6 +56,7 @@ codeunit 8068 "Vendor Deferrals Mngmt."
             PurchAccount := GeneralPostingSetup."Vend. Contr. Deferral Account";
         end;
     end;
+#endif
 #if not CLEAN25
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", OnFillInvoicePostBufferOnAfterInitAmounts, '', false, false)]
     local procedure SetVendorContractDeferralLinePosting(PurchLine: Record "Purchase Line")
@@ -88,15 +77,6 @@ codeunit 8068 "Vendor Deferrals Mngmt."
         if VendorContractDeferralLinePosting then begin
             GeneralPostingSetup.Get(TempPurchaseLine."Gen. Bus. Posting Group", TempPurchaseLine."Gen. Prod. Posting Group");
             AccountNo := GeneralPostingSetup."Vend. Contr. Deferral Account";
-            IsHandled := true;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch. Post Invoice Events", OnPrepareLineOnBeforeSetLineDiscAccount, '', false, false)]
-    local procedure SetLineDiscAccountForNewPostingEngine(PurchLine: Record "Purchase Line"; GenPostingSetup: Record "General Posting Setup"; var InvDiscAccount: Code[20]; var IsHandled: Boolean)
-    begin
-        if IsVendorContractWithDeferrals(PurchLine) then begin
-            InvDiscAccount := GenPostingSetup."Vend. Contr. Deferral Account";
             IsHandled := true;
         end;
     end;
