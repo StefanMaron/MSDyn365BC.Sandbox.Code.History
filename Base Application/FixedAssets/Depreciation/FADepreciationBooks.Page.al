@@ -14,7 +14,6 @@ page 5619 "FA Depreciation Books"
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "FA Depreciation Book";
-    AnalysisModeEnabled = false;
 
     layout
     {
