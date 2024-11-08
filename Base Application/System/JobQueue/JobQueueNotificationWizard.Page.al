@@ -16,7 +16,7 @@ page 1179 "Job Queue Notification Wizard"
 {
     PageType = NavigatePage;
     RefreshOnActivate = true;
-    Caption = 'Set Up Job Queue Notifications';
+    Caption = 'Set Up Job Queue notifications';
     SourceTable = "Job Queue Notification Setup";
     Editable = true;
     Extensible = false;
@@ -249,12 +249,6 @@ page 1179 "Job Queue Notification Wizard"
                 {
                     Caption = 'To enable notifications using Power Automate:';
                     Visible = PowerAutomateFlowNotification;
-                    field(CreateFlowFromTemplateTip; CreateFlowFromTemplateTipLbl)
-                    {
-                        ApplicationArea = All;
-                        Editable = false;
-                        ShowCaption = false;
-                    }
                     field(CreateFlowFromTemplate; CreateFlowFromTemplateLbl)
                     {
                         ApplicationArea = All;
@@ -373,8 +367,7 @@ page 1179 "Job Queue Notification Wizard"
         VTAndBEEnabledLbl: Label 'Virtual tables and Business Events are enabled.';
         VTAndBEDisabledLbl: Label 'Virtual tables and Business Events are disabled.';
 #endif
-        CreateFlowFromTemplateTipLbl: Label 'You can set up automated flow to be used to notify users of Job Queue issues on Job Queue Entries page.';
-        CreateFlowFromTemplateLbl: Label 'Open Job Queue Entries page to create an automated flow for Job Queue failure notification.';
+        CreateFlowFromTemplateLbl: Label 'Create an automated flow from Job Queue Notification template.';
         Threshold1MustBeGreaterThanOrEqualTo0Err: Label 'Threshold 1 must be greater than or equal to 0.';
         Threshold2MustBeGreaterThanOrEqualTo0Err: Label 'Threshold 2 must be greater than or equal to 0.';
         Threshold1MustBeLessThanOrEqualToThreshold2Err: Label 'Threshold 1 must be less than or equal to Threshold 2.';
