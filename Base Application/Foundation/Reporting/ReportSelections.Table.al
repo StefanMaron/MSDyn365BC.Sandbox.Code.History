@@ -298,14 +298,14 @@ table 77 "Report Selections"
 
     var
         ReportSelection2: Record "Report Selections";
-        ReportLayoutSelection: Record "Report Layout Selection";
-        FileManagement: Codeunit "File Management";
         MustSelectAndEmailBodyOrAttahmentErr: Label 'You must select an email body or attachment in report selection for %1.', Comment = '%1 = Usage, for example Sales Invoice';
         EmailBodyIsAlreadyDefinedErr: Label 'An email body is already defined for %1.', Comment = '%1 = Usage, for example Sales Invoice';
         CannotBeUsedAsAnEmailBodyErr: Label 'Report %1 uses the %2 which cannot be used as an email body.', Comment = '%1 = Report ID,%2 = Type';
+        ReportLayoutSelection: Record "Report Layout Selection";
         AccountNoTok: Label '''%1''', Locked = true;
         MailingJobCategoryTok: Label 'Sending invoices via email';
         MailingJobCategoryCodeTok: Label 'SENDINV', Comment = 'Must be max. 10 chars and no spacing. (Send Invoice)';
+        FileManagement: Codeunit "File Management";
         RecordDoesNotMatchErr: Label 'The record that will be sent does not match the original record. The original record was changed or deleted. Please verify that the record exists, or try to re-send the remittance advice from the vendor ledger entries.';
         JobQueueParameterStringTok: Label '%1|%2|%3|%4|%5|%6', Locked = true;
         ReportSelectionsMustBeTemporaryErr: Label 'The Report Selections parameter must be temporary.';
@@ -864,7 +864,7 @@ table 77 "Report Selections"
     var
         TempBodyReportSelections: Record "Report Selections" temporary;
         FoundVendorEmailAddress: Text[250];
-        IsHandled, EmailBodyUsageFound : Boolean;
+        IsHandled: Boolean;
     begin
         ServerEmailBodyFilePath := '';
 
@@ -878,12 +878,10 @@ table 77 "Report Selections"
 
         if not FindEmailBodyUsageForVend(ReportUsage, VendorNo, TempBodyReportSelections) then begin
             IsHandled := false;
-            EmailBodyUsageFound := false;
             OnGetEmailBodyVendorTextOnAfterNotFindEmailBodyUsage(
-              ReportUsage.AsInteger(), RecordVariant, VendorNo, TempBodyReportSelections, IsHandled, EmailBodyUsageFound);
-            if not EmailBodyUsageFound then
-                if IsHandled then
-                    exit(true);
+              ReportUsage.AsInteger(), RecordVariant, VendorNo, TempBodyReportSelections, IsHandled);
+            if IsHandled then
+                exit(true);
             exit(false);
         end;
 
@@ -1095,9 +1093,9 @@ table 77 "Report Selections"
 
     local procedure CanSaveReportAsPDF(ReportId: Integer) Result: Boolean
     var
-        ReportLayoutSelectionLocal: Record "Report Layout Selection";
+        ReportLayoutSelection: Record "Report Layout Selection";
     begin
-        Result := ReportLayoutSelectionLocal.HasLayoutOfType(ReportId, ReportLayoutType::RDLC) or ReportLayoutSelectionLocal.HasLayoutOfType(ReportId, ReportLayoutType::Word);
+        Result := ReportLayoutSelection.HasLayoutOfType(ReportId, ReportLayoutType::RDLC) or ReportLayoutSelection.HasLayoutOfType(ReportId, ReportLayoutType::Word);
         OnAfterCanSaveReportAsPDF(ReportId, Result);
     end;
 
@@ -1363,7 +1361,7 @@ table 77 "Report Selections"
             end;
 
             OnSendEmailDirectlyOnBeforeSendFiles(
-              ReportUsage.AsInteger(), RecordVariant, DefaultEmailAddress, TempAttachReportSelections, CustomReportSelection, Rec);
+              ReportUsage.AsInteger(), RecordVariant, DefaultEmailAddress, TempAttachReportSelections, CustomReportSelection);
             OfficeAttachmentManager.IncrementCount(TempAttachReportSelections.Count - 1);
             repeat
                 IsHandled := false;
@@ -1893,15 +1891,7 @@ table 77 "Report Selections"
     end;
 
     procedure ConvertReportUsageToSalesDocumentType(var DocumentType: Enum "Sales Document Type"; ReportUsage: Enum "Report Selection Usage"): Boolean
-    var
-        IsHandled: Boolean;
-        Result: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeConvertReportUsageToSalesDocumentType(Rec, DocumentType, ReportUsage, IsHandled, Result);
-        if IsHandled then
-            exit(Result);
-
         case ReportUsage of
             Usage::"S.Invoice", Usage::"S.Invoice Draft", Usage::"P.Invoice":
                 DocumentType := "Sales Document Type"::Invoice;
@@ -2220,7 +2210,7 @@ table 77 "Report Selections"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetEmailBodyVendorTextOnAfterNotFindEmailBodyUsage(ReportUsage: Integer; RecordVariant: Variant; CustNo: Code[20]; var TempBodyReportSelections: Record "Report Selections" temporary; var IsHandled: Boolean; var EmailBodyUsageFound: Boolean)
+    local procedure OnGetEmailBodyVendorTextOnAfterNotFindEmailBodyUsage(ReportUsage: Integer; RecordVariant: Variant; CustNo: Code[20]; var TempBodyReportSelections: Record "Report Selections" temporary; var IsHandled: Boolean)
     begin
     end;
 
@@ -2235,7 +2225,7 @@ table 77 "Report Selections"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSendEmailDirectlyOnBeforeSendFiles(ReportUsage: Integer; RecordVariant: Variant; var DefaultEmailAddress: Text[250]; var TempAttachReportSelections: Record "Report Selections" temporary; var CustomReportSelection: Record "Custom Report Selection"; var ReportSelections: Record "Report Selections")
+    local procedure OnSendEmailDirectlyOnBeforeSendFiles(ReportUsage: Integer; RecordVariant: Variant; var DefaultEmailAddress: Text[250]; var TempAttachReportSelections: Record "Report Selections" temporary; var CustomReportSelection: Record "Custom Report Selection")
     begin
     end;
 
@@ -2386,11 +2376,6 @@ table 77 "Report Selections"
 
     [IntegrationEvent(false, false)]
     local procedure OnSendEmailDirectlyOnAfterSetFieldName(DocumentTableID: Integer; var FieldName: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeConvertReportUsageToSalesDocumentType(var ReportSelections: Record "Report Selections"; var DocumentType: Enum "Sales Document Type"; ReportUsage: Enum "Report Selection Usage"; var IsHandled: Boolean; var Result: Boolean)
     begin
     end;
 }
