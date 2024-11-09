@@ -7989,7 +7989,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         if (DocAmountLCY = 0) or ((DocAmountLCY <> 0) and (CollDocAmountLCY <> 0)) then
             exit(VendPostingGr.GetBillsInPmtOrderAccount());
 
-        if (IDInvoiceSettlement) and (not IDBillSettlement) and (MultiplePostingGroups) then
+        if (IDInvoiceSettlement) and (not IDBillSettlement) then
             if DocAmountLCY <> 0 then
                 exit(VendPostingGr.GetPayablesAccount());
 
