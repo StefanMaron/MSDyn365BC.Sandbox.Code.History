@@ -249,7 +249,6 @@ codeunit 134310 "Workflow Respo. Lib. Tests"
 
         // Exercise
         WorkflowMgt.ExecuteResponses(PurchaseHeader, PurchaseHeader, FirstWorkflowStepInstance);
-        Commit();
 
         // Verify
         PurchInvNo := PurchaseHeader."No.";
@@ -300,7 +299,6 @@ codeunit 134310 "Workflow Respo. Lib. Tests"
 
         // Exercise
         WorkflowMgt.ExecuteResponses(SalesHeader, SalesHeader, FirstWorkflowStepInstance);
-        Commit();
 
         // Verify
         SalesInvNo := SalesHeader."No.";
