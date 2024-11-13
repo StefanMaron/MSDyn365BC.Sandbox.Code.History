@@ -51,6 +51,7 @@ codeunit 6610 "FS Int. Table Subscriber"
         InsufficientPermissionsTxt: Label 'Insufficient permissions.', Locked = true;
         NoProjectUsageLinkTxt: Label 'Unable to find Project Usage Link.', Locked = true;
         NoProjectPlanningLineTxt: Label 'Unable to find Project Planning Line.', Locked = true;
+        MultiCompanySyncEnabledTxt: Label 'Multi-Company Synch Enabled', Locked = true;
         FSEntitySynchTxt: Label 'Synching a field service entity.', Locked = true;
 
 
@@ -405,6 +406,8 @@ codeunit 6610 "FS Int. Table Subscriber"
     var
         FSConnectionSetup: Record "FS Connection Setup";
         IntegrationTableMapping: Record "Integration Table Mapping";
+        IntegrationFieldMapping: Record "Integration Field Mapping";
+        ProjectJournalLine: Record "Job Journal Line";
         FSSetupDefaults: Codeunit "FS Setup Defaults";
     begin
         if not Rec."Location Mandatory" then
@@ -413,10 +416,15 @@ codeunit 6610 "FS Int. Table Subscriber"
         if not FSConnectionSetup.IsEnabled() then
             exit;
 
-        if IntegrationTableMapping.Get('LOCATION') then
-            exit;
+        if not IntegrationTableMapping.Get('LOCATION') then
+            FSSetupDefaults.ResetLocationMapping(FSConnectionSetup, 'LOCATION', true, true);
 
-        FSSetupDefaults.ResetLocationMapping(FSConnectionSetup, 'LOCATION', true, true);
+        IntegrationFieldMapping.SetFilter("Integration Table Mapping Name", 'PJLINE-WORDERPRODUCT');
+        IntegrationFieldMapping.SetRange("Field No.", ProjectJournalLine.FieldNo("Location Code"));
+        if IntegrationFieldMapping.IsEmpty() then begin
+            FSSetupDefaults.SetLocationFieldMapping(true);
+            FSSetupDefaults.ResetProjectJournalLineWOProductMapping(FSConnectionSetup, 'PJLINE-WORDERPRODUCT', true);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"CRM Setup Defaults", 'OnResetItemProductMappingOnAfterInsertFieldsMapping', '', false, false)]
@@ -1167,6 +1175,7 @@ codeunit 6610 "FS Int. Table Subscriber"
     local procedure LogTelemetryOnAfterInitSynchJob(ConnectionType: TableConnectionType; IntegrationTableID: Integer)
     var
         FSConnectionSetup: Record "FS Connection Setup";
+        IntegrationTableMapping: Record "Integration Table Mapping";
         FeatureTelemetry: Codeunit "Feature Telemetry";
         IntegrationRecordRef: RecordRef;
         TelemetryCategories: Dictionary of [Text, Text];
@@ -1175,8 +1184,25 @@ codeunit 6610 "FS Int. Table Subscriber"
         if ConnectionType <> TableConnectionType::CRM then
             exit;
 
-        if not FSConnectionSetup.IsEnabled() then
+        if FSConnectionSetup.IsEnabled() then
             exit;
+
+        IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::Dataverse);
+        IntegrationTableMapping.SetRange("Delete After Synchronization", false);
+        IntegrationTableMapping.SetRange("Multi Company Synch. Enabled", true);
+        IntegrationTableMapping.SetRange("Table ID", IntegrationTableID);
+        if not IntegrationTableMapping.IsEmpty() then begin
+            FeatureTelemetry.LogUptake('0000LCO', 'Dataverse Multi-Company Synch', Enum::"Feature Uptake Status"::Used);
+            FeatureTelemetry.LogUsage('0000LCQ', 'Dataverse Multi-Company Synch', 'Entity sync');
+            Session.LogMessage('0000LCS', MultiCompanySyncEnabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
+        end;
+        IntegrationTableMapping.SetRange("Table ID");
+        IntegrationTableMapping.SetRange("Integration Table ID", IntegrationTableID);
+        if not IntegrationTableMapping.IsEmpty() then begin
+            FeatureTelemetry.LogUptake('0000LCP', 'Dataverse Multi-Company Synch', Enum::"Feature Uptake Status"::Used);
+            FeatureTelemetry.LogUsage('0000LCR', 'Dataverse Multi-Company Synch', 'Entity sync');
+            Session.LogMessage('0000LCT', MultiCompanySyncEnabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
+        end;
 
         TelemetryCategories.Add('Category', CategoryTok);
         TelemetryCategories.Add('IntegrationTableID', Format(IntegrationTableID));
