@@ -35,6 +35,6 @@ enum 89 "Gen. Journal Template Type"
     }
     value(7; Jobs)
     {
-        Caption = 'Projects';
+        Caption = 'Jobs';
     }
 }
