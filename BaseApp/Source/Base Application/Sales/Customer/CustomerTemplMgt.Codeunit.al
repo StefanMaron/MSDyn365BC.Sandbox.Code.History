@@ -291,7 +291,6 @@ codeunit 1381 "Customer Templ. Mgt."
 
         InsertTemplateFromCustomer(CustomerTempl, Customer);
         InsertDimensions(CustomerTempl.Code, Customer."No.", Database::"Customer Templ.", Database::Customer);
-        OnCreateTemplateFromCustomerOnAfterInsertTemplateFromCustomer(CustomerTempl, Customer);
         CustomerTempl.Get(CustomerTempl.Code);
         ShowCustomerTemplCard(CustomerTempl);
     end;
@@ -582,11 +581,6 @@ codeunit 1381 "Customer Templ. Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateCustomerFromTemplateOnBeforeInitCustomerNo(var Customer: Record Customer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateTemplateFromCustomerOnAfterInsertTemplateFromCustomer(var CustomerTempl: Record "Customer Templ."; Customer: Record Customer)
     begin
     end;
 

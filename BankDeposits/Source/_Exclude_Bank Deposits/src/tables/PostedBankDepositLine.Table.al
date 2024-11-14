@@ -3,7 +3,6 @@ namespace Microsoft.Bank.Deposit;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Finance.Currency;
-using Microsoft.Foundation.AuditCodes;
 using Microsoft.Finance.Dimension;
 using Microsoft.Bank.Ledger;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -121,11 +120,6 @@ table 1692 "Posted Bank Deposit Line"
         field(17; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
-        }
-        field(18; "Reason Code"; Code[10])
-        {
-            Caption = 'Reason Code';
-            TableRelation = "Reason Code";
         }
         field(480; "Dimension Set ID"; Integer)
         {
