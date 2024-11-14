@@ -152,19 +152,6 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         until (BankAccReconciliationLine.Next() = 0);
     end;
 
-    [NonDebuggable]
-    procedure ApproximateTokenCount(TextInput: SecretText): Decimal
-    var
-        AverageWordsPerToken: Decimal;
-        TokenCount: Integer;
-        WordsInInput: Integer;
-    begin
-        AverageWordsPerToken := 0.6; // Based on OpenAI estimate
-        WordsInInput := TextInput.Unwrap().Split(' ', ',', '.', '!', '?', ';', ':', '/n').Count;
-        TokenCount := Round(WordsInInput / AverageWordsPerToken, 1);
-        exit(TokenCount);
-    end;
-
     procedure RemoveShortWords(Text: Text[250]): Text[250];
     var
         Words: List of [Text];
@@ -400,10 +387,11 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
             FeatureTelemetry.LogUsage('0000LF6', FeatureName(), 'Match proposals');
             // Initialize the counts
             CompletionTaskTxt := BuildBankRecCompletionTask(true);
-            TaskPromptTokenCount := ApproximateTokenCount(CompletionTaskTxt);
+            TaskPromptTokenCount := AOAIToken.GetGPT4TokenCount(CompletionTaskTxt);
 
             // Iterate through each statement line
             BankAccReconciliationLine.FindSet();
+            InputWithReservedWordsFound := false;
             repeat
                 // Find the top 5 ledger entries closest to the statement line
                 TempBankAccLedgerEntryMatchingBuffer.RESET();
@@ -452,8 +440,6 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
 
                 until (TempBankAccLedgerEntryMatchingBuffer.Next() = 0);
 
-                InputWithReservedWordsFound := false;
-
                 // Generate Prompt using the Statement Line and the Top 5 Ledger Entries
                 BankAccReconciliationLineCopy.Copy(BankAccReconciliationLine);
                 BankAccReconciliationLineCopy.SetFilter("Statement Line No.", '=%1', BankAccReconciliationLine."Statement Line No.");
@@ -466,7 +452,7 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
                 TempBankAccLedgerEntryMatchingBuffer.FindSet();
                 BuildBankRecLedgerEntries(BankRecLedgerEntriesTxt, TempBankAccLedgerEntryMatchingBuffer, CandidateLedgerEntryNos);
 
-                CompletePromptTokenCount := TaskPromptTokenCount + ApproximateTokenCount(BankRecStatementLinesTxt) + ApproximateTokenCount(BankRecLedgerEntriesTxt);
+                CompletePromptTokenCount := TaskPromptTokenCount + AOAIToken.GetGPT4TokenCount(BankRecStatementLinesTxt) + AOAIToken.GetGPT4TokenCount(BankRecLedgerEntriesTxt);
                 if (CompletePromptTokenCount >= PromptSizeThreshold()) then begin
                     Session.LogMessage('0000LFK', TelemetryApproximateTokenCountExceedsLimitTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
                     CompletionPromptTxt := BuildBankRecCompletionPrompt(CompletionTaskTxt, BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
@@ -635,6 +621,7 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
     end;
 
     var
+        AOAIToken: Codeunit "AOAI Token";
         MatchedByCopilotTxt: label 'Matched by Copilot based on semantic similarity.', Comment = 'Copilot is a Microsoft service name and must not be translated';
         ConstructingPromptFailedErr: label 'There was an error with sending the call to Copilot. Log a Business Central support request about this.', Comment = 'Copilot is a Microsoft service name and must not be translated';
         TelemetryConstructingPromptFailedErr: label 'There was an error with constructing the chat completion prompt from the Key Vault.', Locked = true;
