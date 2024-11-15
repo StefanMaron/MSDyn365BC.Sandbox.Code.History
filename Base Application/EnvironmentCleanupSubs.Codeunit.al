@@ -1,6 +1,9 @@
 namespace System.Environment;
 
 using Microsoft.CRM.Outlook;
+#if not CLEAN22
+using Microsoft.CRM.Setup;
+#endif
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.VAT.Registration;
@@ -23,6 +26,9 @@ codeunit 8912 "Environment Cleanup Subs"
         CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup";
         VATRegNoSrvConfig: Record "VAT Reg. No. Srv Config";
         ServiceConnection: Record "Service Connection";
+#if not CLEAN22
+        MarketingSetup: Record "Marketing Setup";
+#endif
         ExchangeSync: Record "Exchange Sync";
         JobQueueManagement: Codeunit "Job Queue Management";
         CDSIntegrationImpl: Codeunit "CDS Integration Impl.";
@@ -49,6 +55,9 @@ codeunit 8912 "Environment Cleanup Subs"
         CDSIntegrationImpl.CleanCDSIntegration(CompanyName);
 
         ServiceConnection.ModifyAll(Status, ServiceConnection.Status::Disabled);
+#if not CLEAN22
+        MarketingSetup.ModifyAll("Exchange Service URL", '');
+#endif
         ExchangeSync.ModifyAll(Enabled, false);
 
         JobQueueManagement.SetRecurringJobsOnHold(CompanyName);
