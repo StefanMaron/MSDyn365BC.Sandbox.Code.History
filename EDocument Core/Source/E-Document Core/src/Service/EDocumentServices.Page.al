@@ -16,7 +16,6 @@ page 6103 "E-Document Services"
     CardPageID = "E-Document Service";
     PageType = List;
     SourceTable = "E-Document Service";
-    AdditionalSearchTerms = 'EServices,Service';
     DataCaptionFields = Code;
     Editable = false;
     InsertAllowed = false;
