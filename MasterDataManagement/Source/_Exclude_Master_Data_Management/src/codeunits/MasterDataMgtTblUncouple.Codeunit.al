@@ -63,7 +63,6 @@ codeunit 7236 "Master Data Mgt. Tbl. Uncouple"
 
     local procedure UncoupleFilteredLocalRecords(var IntegrationTableMapping: Record "Integration Table Mapping"; var IntegrationTableSynch: Codeunit "Integration Table Synch."; var TempMasterDataMgtCoupling: Record "Master Data Mgt. Coupling" temporary)
     var
-        MasterDataMgtCoupling: Record "Master Data Mgt. Coupling";
         LocalRecordRef: RecordRef;
         IntegrationRecordRef: RecordRef;
     begin
@@ -71,8 +70,7 @@ codeunit 7236 "Master Data Mgt. Tbl. Uncouple"
         IntegrationTableMapping.SetRecordRefFilter(LocalRecordRef);
         if LocalRecordRef.FindSet() then
             repeat
-                MasterDataMgtCoupling.Reset();
-                if TempMasterDataMgtCoupling.FindRowFromLocalSystemID(LocalRecordRef.Field(LocalRecordRef.SystemIdNo()).Value(), MasterDataMgtCoupling) then begin
+                if TempMasterDataMgtCoupling.IsLocalSystemIdCoupled(LocalRecordRef.Field(LocalRecordRef.SystemIdNo()).Value()) then begin
                     Clear(IntegrationRecordRef);
                     IntegrationTableSynch.Uncouple(LocalRecordRef, IntegrationRecordRef);
                 end;
@@ -82,17 +80,12 @@ codeunit 7236 "Master Data Mgt. Tbl. Uncouple"
     local procedure UncoupleFilteredIntegrationRecords(var IntegrationTableMapping: Record "Integration Table Mapping"; var IntegrationTableSynch: Codeunit "Integration Table Synch."; var TempMasterDataMgtCoupling: Record "Master Data Mgt. Coupling" temporary)
     var
         MasterDataManagementSetup: Record "Master Data Management Setup";
-        MasterDataManagement: Codeunit "Master Data Management";
         LocalRecordRef: RecordRef;
         IntegrationRecordRef: RecordRef;
-        SourceCompanyName: Text[30];
     begin
         MasterDataManagementSetup.Get();
         IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-        MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Table ID");
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+        IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         IntegrationTableMapping.SetIntRecordRefFilter(IntegrationRecordRef);
         if IntegrationRecordRef.FindSet() then
             repeat
