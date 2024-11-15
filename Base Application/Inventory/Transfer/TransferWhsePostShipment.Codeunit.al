@@ -368,6 +368,8 @@ codeunit 5748 "Transfer Whse. Post Shipment"
                     TransferShipmentHeader.Get(DocumentEntryToPrint."Document No.");
                     TransferShipmentHeader.Mark(true);
                 until DocumentEntryToPrint.Next() = 0;
+
+            TransferShipmentHeader.MarkedOnly(true);
             TransferShipmentHeader.PrintRecords(false);
         end;
     end;
