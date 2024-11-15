@@ -1,8 +1,4 @@
-// ------------------------------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-// ------------------------------------------------------------------------------------------------
-namespace Microsoft.Foundation.Company;
+﻿namespace Microsoft.Foundation.Company;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.EServices.OnlineMap;
@@ -369,14 +365,12 @@ page 1 "Company Information"
                 field(ABN; Rec.ABN)
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the New Zealand Business Number.';
-                    Caption = 'NZBN';
+                    ToolTip = 'Specifies the Australian Business Number.';
                 }
                 field("ABN Division Part No."; Rec."ABN Division Part No.")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the New Zealand Business Number Division Part Number.';
-                    Caption = 'NZBN Division Part No.';
+                    ToolTip = 'Specifies the Australian Business Number Division Part Number.';
                 }
                 field("Tax Period"; Rec."Tax Period")
                 {
