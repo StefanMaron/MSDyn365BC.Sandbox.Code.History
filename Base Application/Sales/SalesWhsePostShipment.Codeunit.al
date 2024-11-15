@@ -508,6 +508,8 @@ codeunit 5746 "Sales Whse. Post Shipment"
                     SalesInvoiceHeader.Get(DocumentEntryToPrint."Document No.");
                     SalesInvoiceHeader.Mark(true);
                 until DocumentEntryToPrint.Next() = 0;
+
+            SalesInvoiceHeader.MarkedOnly(true);
             SalesInvoiceHeader.PrintRecords(false);
         end;
 
@@ -518,6 +520,8 @@ codeunit 5746 "Sales Whse. Post Shipment"
                     SalesShipmentHeader.Get(DocumentEntryToPrint."Document No.");
                     SalesShipmentHeader.Mark(true);
                 until DocumentEntryToPrint.Next() = 0;
+
+            SalesShipmentHeader.MarkedOnly(true);
             SalesShipmentHeader.PrintRecords(false);
             OnPrintDocumentsOnAfterPrintSalesShipment(SalesShipmentHeader."No.");
 #if not CLEAN25
