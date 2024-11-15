@@ -343,7 +343,6 @@ table 290 "VAT Amount Line"
             "VAT Realized" += VATAmountLine."VAT Realized";
             "Amount Paid" += VATAmountLine."Amount Paid";
             "Calculated VAT Amount" += VATAmountLine."Calculated VAT Amount";
-            "Calculated VAT Amount (ACY)" += VATAmountLine."Calculated VAT Amount (ACY)";
             NonDeductibleVAT.Increment(Rec, VATAmountLine);
             OnInsertLineOnBeforeModify(Rec, VATAmountLine);
             Modify();
@@ -634,9 +633,7 @@ table 290 "VAT Amount Line"
             "Amount Including VAT" := "VAT Base" + "VAT Amount";
         end;
         "Calculated VAT Amount" := "VAT Amount";
-        "Calculated VAT Amount (ACY)" := "VAT Amount (ACY)";
         "VAT Difference" := 0;
-        "VAT Difference (ACY)" := 0;
         NonDeductibleVAT.Update(Rec, Currency);
         Modified := true;
 
@@ -920,13 +917,6 @@ table 290 "VAT Amount Line"
         "Calculated VAT Amount" :=
           PurchInvLine."Amount Including VAT" - PurchInvLine.Amount - PurchInvLine."VAT Difference";
         "VAT Difference" := PurchInvLine."VAT Difference";
-        "VAT Base (ACY)" := PurchInvLine."VAT Base (ACY)";
-        "VAT Amount (ACY)" := PurchInvLine."Amount Including VAT (ACY)" - "Amount (ACY)";
-        "Amount Including VAT (ACY)" := PurchInvLine."Amount Including VAT (ACY)";
-        "Amount (ACY)" := PurchInvLine."Amount (ACY)";
-        "VAT Difference (ACY)" := PurchInvLine."VAT Difference (ACY)";
-        "Calculated VAT Amount (ACY)" :=
-          PurchInvLine."Amount Including VAT (ACY)" - PurchInvLine."Amount (ACY)" - PurchInvLine."VAT Difference (ACY)";
         NonDeductibleVAT.CopyNonDedVATFromPurchInvLineToVATAmountLine(Rec, PurchInvLine);
 
         OnAfterCopyFromPurchInvLine(Rec, PurchInvLine);
@@ -979,13 +969,6 @@ table 290 "VAT Amount Line"
         "Calculated VAT Amount" :=
           SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine.Amount - SalesInvoiceLine."VAT Difference";
         "VAT Difference" := SalesInvoiceLine."VAT Difference";
-        "VAT Base (ACY)" := SalesInvoiceLine."VAT Base (ACY)";
-        "VAT Amount (ACY)" := SalesInvoiceLine."Amount Including VAT (ACY)" - "Amount (ACY)";
-        "Amount Including VAT (ACY)" := SalesInvoiceLine."Amount Including VAT (ACY)";
-        "Amount (ACY)" := SalesInvoiceLine."Amount (ACY)";
-        "VAT Difference (ACY)" := SalesInvoiceLine."VAT Difference (ACY)";
-        "Calculated VAT Amount (ACY)" :=
-          SalesInvoiceLine."Amount Including VAT (ACY)" - SalesInvoiceLine."Amount (ACY)" - SalesInvoiceLine."VAT Difference (ACY)";
 
         OnAfterCopyFromSalesInvLine(Rec, SalesInvoiceLine);
     end;
@@ -1006,13 +989,6 @@ table 290 "VAT Amount Line"
         Quantity := SalesCrMemoLine."Quantity (Base)";
         "Calculated VAT Amount" := SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine.Amount - SalesCrMemoLine."VAT Difference";
         "VAT Difference" := SalesCrMemoLine."VAT Difference";
-        "VAT Base (ACY)" := SalesCrMemoLine."VAT Base (ACY)";
-        "VAT Amount (ACY)" := SalesCrMemoLine."Amount Including VAT (ACY)" - "Amount (ACY)";
-        "Amount Including VAT (ACY)" := SalesCrMemoLine."Amount Including VAT (ACY)";
-        "Amount (ACY)" := SalesCrMemoLine."Amount (ACY)";
-        "VAT Difference (ACY)" := SalesCrMemoLine."VAT Difference (ACY)";
-        "Calculated VAT Amount (ACY)" :=
-          SalesCrMemoLine."Amount Including VAT (ACY)" - SalesCrMemoLine."Amount (ACY)" - SalesCrMemoLine."VAT Difference (ACY)";
 
         OnAfterCopyFromSalesCrMemoLine(Rec, SalesCrMemoLine);
     end;
