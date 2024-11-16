@@ -2400,6 +2400,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         NonDedTotalVATAmount := 0;
         NonDedTotalVATAmountACY := 0;
 
+        VATEntry2.ReadIsolation := IsolationLevel::ReadUncommitted;
         VATEntry2.Reset();
         VATEntry2.SetCurrentKey("Transaction No.");
         VATEntry2.SetRange("Transaction No.", OldCVLedgEntryBuf."Transaction No.");
@@ -3807,6 +3808,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
 
         PaidAmount := CustLedgEntry2."Amount (LCY)" - CustLedgEntry2."Remaining Amt. (LCY)";
         OnCustUnrealizedVATOnAfterCalcPaidAmount(GenJnlLine, CustLedgEntry2, SettledAmount, PaidAmount);
+        VATEntry2.ReadIsolation := IsolationLevel::ReadUncommitted;
         VATEntry2.Reset();
         VATEntry2.SetCurrentKey("Transaction No.");
         VATEntry2.SetRange("Transaction No.", CustLedgEntry2."Transaction No.");
@@ -4971,6 +4973,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         if IsHandled then
             exit;
 
+        VATEntry2.ReadIsolation := IsolationLevel::ReadUncommitted;
         VATEntry2.Reset();
         VATEntry2.SetCurrentKey("Transaction No.");
         VATEntry2.SetRange("Transaction No.", VendLedgEntry2."Transaction No.");
