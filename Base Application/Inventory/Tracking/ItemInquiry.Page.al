@@ -50,11 +50,9 @@ page 6530 "Item Inquiry"
         end else begin
             ItemReference.SetRange("Reference Type", Enum::"Item Reference Type"::"Bar Code");
             ItemReference.SetFilter("Reference No.", BarcodeNo);
-            ItemReference.SetLoadFields("Item No.");
             if ItemReference.FindFirst() then begin
                 Item.Reset();
-                if ItemReference."Item No." <> '' then
-                    Item.SetRange("No.", ItemReference."Item No.");
+                Item.SetFilter("No.", ItemReference."Item No.");
                 if Item.Find('-') then begin
                     ItemCard.SetRecord(Item);
                     ItemCard.Run();
