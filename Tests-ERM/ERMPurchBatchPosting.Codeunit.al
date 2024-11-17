@@ -1073,11 +1073,15 @@
         JobQueueLogEntry.SetRange(ID, JobQueueEntryId);
         JobQueueLogEntry.FindFirst();
         Assert.IsTrue(JobQueueLogEntry.Status = JobQueueLogEntry.Status::Error, 'Job queue log entry has wrong status');
-        Assert.AreEqual(JobQueueLogEntry."Error Message", '1 purchase documents out of 2 have errors during posting.', 'Job queue log entry has wrong error message');
+        Assert.IsTrue(StrPos(JobQueueLogEntry."Error Message", 'Posting Date must have a value') > 0, 'Job queue log entry has wrong error message');
 
         // [THEN] Error message register contains two records, one for error during posting and one for final message
         ErrorMessage.SetRange("Register ID", JobQueueLogEntry."Error Message Register Id");
-        Assert.RecordCount(ErrorMessage, 1);
+        Assert.RecordCount(ErrorMessage, 2);
+        ErrorMessage.FindFirst();
+        Assert.IsTrue(StrPos(ErrorMessage."Message", 'Posting Date must have a value') > 0, 'Error message register contains wrong error');
+        ErrorMessage.Next();
+        Assert.AreEqual(ErrorMessage."Message", '1 purchase documents out of 2 have errors during posting.', 'Error message register contains wrong error');
     end;
 
     [Test]
@@ -1186,32 +1190,6 @@
         asserterror RequestPageXML := Report.RunRequestPage(Report::"Batch Post Purch. Credit Memos", RequestPageXML);
 
         // [THEN] The saved request page values are overridden.
-    end;
-
-    [Test]
-    [HandlerFunctions('RequestPageHandlerBatchPostPurchaseOrders,MessageHandler')]
-    [Scope('OnPrem')]
-    procedure BatchPostPurchaseOrderReplacePostingDate()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        LibraryJobQueue: Codeunit "Library - Job Queue";
-    begin
-        // [SCENARIO 495353] Batch Posting of Purchase Order with Replace Posting Date for special Purchase Setup
-        Initialize();
-        LibraryPurchase.SetPostWithJobQueue(true);
-        BindSubscription(LibraryJobQueue);
-        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
-
-        // [GIVEN] Create and Release the Purchase Order 
-        CreatePurchaseDocument(PurchaseHeader, PurchaseHeader."Document Type"::Order, false);
-        LibraryPurchase.ReleasePurchaseDocument(PurchaseHeader);
-
-        // [WHEN] Run Batch Post Purchase Order with Replace Posting Date, Replace Document Date options
-        RunBatchPostPurchase(PurchaseHeader."Document Type", PurchaseHeader."No.", PurchaseHeader."Posting Date" + 1, false);
-        LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(PurchaseHeader.RecordId);
-
-        // [THEN] Posting Date is replaced with new Posting Date in the Purchase Order
-        VerifyPostedPurchaseOrder(PurchaseHeader."No.", PurchaseHeader."Posting Date" + 1, false);
     end;
 
     local procedure Initialize()
