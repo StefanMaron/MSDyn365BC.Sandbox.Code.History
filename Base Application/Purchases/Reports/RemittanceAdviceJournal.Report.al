@@ -461,6 +461,7 @@ report 399 "Remittance Advice - Journal"
 
     var
         GLSetup: Record "General Ledger Setup";
+        CompanyInfo: Record "Company Information";
         Vend: Record Vendor;
         TempVend: Record Vendor temporary;
         CurrExchRate: Record "Currency Exchange Rate";
@@ -474,6 +475,8 @@ report 399 "Remittance Advice - Journal"
         PaidAmount: Decimal;
         AppliedDebitAmounts: Decimal;
         VendorTotal: Decimal;
+        VendorAddr: array[8] of Text[100];
+        CompanyAddr: array[8] of Text[100];
         CheckNo: Code[20];
         RemittanceAdviceCaptionLbl: Label 'Remittance Advice';
         PhoneNoCaptionLbl: Label 'Phone No.';
@@ -495,10 +498,7 @@ report 399 "Remittance Advice - Journal"
         TotalCaptionLbl: Label 'Total';
 
     protected var
-        CompanyInfo: Record "Company Information";
         TempAppliedVendLedgEntry: Record "Vendor Ledger Entry" temporary;
-        VendorAddr: array[8] of Text[100];
-        CompanyAddr: array[8] of Text[100];
 
     local procedure CurrencyCode(SrcCurrCode: Code[10]): Code[10]
     begin
