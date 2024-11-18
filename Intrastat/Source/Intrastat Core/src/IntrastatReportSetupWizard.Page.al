@@ -129,11 +129,6 @@ page 4815 "Intrastat Report Setup Wizard"
                         ApplicationArea = BasicEU, BasicCH, BasicNO;
                         ToolTip = 'Specifies for which type of line Partner''s VAT registration number is updated.';
                     }
-                    field("Def. Country Code for Item Tr."; Rec."Def. Country Code for Item Tr.")
-                    {
-                        ApplicationArea = BasicEU, BasicCH, BasicNO;
-                        ToolTip = 'Specifies the default source of country code for item tracking.';
-                    }
                     group(Numbering)
                     {
                         Caption = 'Numbering';
