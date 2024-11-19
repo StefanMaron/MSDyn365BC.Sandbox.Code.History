@@ -137,11 +137,9 @@ codeunit 1814 "Assisted Setup Subscribers"
         SetupPaymentServicesShortTitleTxt: Label 'Set up payment services', MaxLength = 50;
         SetupPaymentServicesHelpTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2115183', Locked = true;
         SetupPaymentServicesDescriptionTxt: Label 'Connect to a payment service so that your customers can pay you electronically.';
-#if not CLEAN25
         SetupConsolidationReportingTitleTxt: Label 'Process Consolidations';
         SetupConsolidationReportingShortTitleTxt: Label 'Consolidate companies', MaxLength = 50;
         SetupConsolidationReportingDescriptionTxt: Label 'Consolidate the general ledger entries of two or more separate companies (subsidiaries) into a consolidated company.';
-#endif
         AccessAllFeaturesTxt: Label 'Access all features';
         VideoAccessAllFeaturesTxt: Label 'https://go.microsoft.com/fwlink/?linkid=857610', Locked = true;
         AnalyzeDataUsingAccSchedulesTxt: Label 'Analyze data using account schedules';
@@ -357,7 +355,6 @@ codeunit 1814 "Assisted Setup Subscribers"
         GlobalLanguage(Language.GetDefaultApplicationLanguageId());
         GuidedExperience.AddTranslationForSetupObjectTitle(GuidedExperienceType::"Assisted Setup", ObjectType::Page,
             Page::"Payment Services", Language.GetDefaultApplicationLanguageId(), SetupPaymentServicesTitleTxt);
-#if not CLEAN25
         GlobalLanguage(CurrentGlobalLanguage);
 
         GuidedExperience.InsertAssistedSetup(SetupConsolidationReportingTitleTxt, SetupConsolidationReportingShortTitleTxt, SetupConsolidationReportingDescriptionTxt, 5, ObjectType::Page,
@@ -365,7 +362,6 @@ codeunit 1814 "Assisted Setup Subscribers"
         GlobalLanguage(Language.GetDefaultApplicationLanguageId());
         GuidedExperience.AddTranslationForSetupObjectTitle(GuidedExperienceType::"Assisted Setup", ObjectType::Page,
             Page::"Company Consolidation Wizard", Language.GetDefaultApplicationLanguageId(), SetupConsolidationReportingTitleTxt);
-#endif
         GlobalLanguage(CurrentGlobalLanguage);
 
         GuidedExperience.InsertAssistedSetup(SetupJobQueueNotificationTitleTxt, SetupJobQueueNotificationShortTitleTxt, SetupJobQueueNotificationDescriptionTxt, 5, ObjectType::Page,
