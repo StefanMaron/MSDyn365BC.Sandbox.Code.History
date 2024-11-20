@@ -162,7 +162,6 @@ table 5407 "Prod. Order Component"
                 GetPlanningParameters: Codeunit "Planning-Get Parameters";
                 SubcontractingManagement: Codeunit SubcontractingManagement;
                 ShouldUpdateLocation: Boolean;
-                IsHandled: Boolean;
             begin
                 UpdateExpectedQuantity();
 
@@ -181,13 +180,9 @@ table 5407 "Prod. Order Component"
                         "Due Time" := ProdOrderRtngLine."Starting Time";
                         if SubcontractorPrices.ReadPermission then
                             if (ProdOrderRtngLine.Type = ProdOrderRtngLine.Type::"Work Center") then
-                                if SubcontractingManagement.GetSubcontractor(ProdOrderRtngLine."No.", Vendor) then begin
-                                    IsHandled := false;
-                                    OnValidateRoutingLinkCodeOnBeforeSubcontractorProcurementCheck(Rec, Vendor, IsHandled);
-                                    if not IsHandled then
-                                        if Vendor."Subcontractor Procurement" then
-                                            Validate("Location Code", Vendor."Subcontracting Location Code");
-                                end;
+                                if SubcontractingManagement.GetSubcontractor(ProdOrderRtngLine."No.", Vendor) then
+                                    if Vendor."Subcontractor Procurement" then
+                                        Validate("Location Code", Vendor."Subcontracting Location Code");
                     end;
                 end else begin
                     ShouldUpdateLocation := xRec."Routing Link Code" <> '';
@@ -1000,8 +995,6 @@ table 5407 "Prod. Order Component"
         if Status = Status::Finished then
             Error(Text000);
         if Status = Status::Released then begin
-            ConfirmDeletion();
-
             ItemLedgEntry.SetCurrentKey("Order Type", "Order No.", "Order Line No.", "Entry Type", "Prod. Order Comp. Line No.");
             ItemLedgEntry.SetRange("Order Type", ItemLedgEntry."Order Type"::Production);
             ItemLedgEntry.SetRange("Order No.", "Prod. Order No.");
@@ -1106,12 +1099,10 @@ table 5407 "Prod. Order Component"
         Text99000007: Label 'You cannot change flushing method to %1 because a pick has already been created for production order component %2.';
         Text99000008: Label 'You cannot change flushing method to %1 because production order component %2 has already been picked.';
         Text99000009: Label 'Automatic reservation is not possible.\Do you want to reserve items manually?';
-        ConfirmDeleteQst: Label '%1 = %2 is greater than %3 = %4. If you delete the %5, the items will remain in the operation area until you put them away.\Related Item Tracking information defined during pick will be deleted.\Do you still want to delete the %5?', Comment = '%1 = FieldCaption("Qty. Picked"), %2 = "Qty. Picked", %3 = Qty. Posted, %4 = ("Expected Quantity" - "Remaining Quantity"), %5 = TableCaption';
         IgnoreErrors: Boolean;
         ErrorOccured: Boolean;
         SubcontractorPrices: Record "Subcontractor Prices";
         WarningRaised: Boolean;
-        CalledFromHeader: Boolean;
 
     procedure Caption(): Text
     var
@@ -1862,7 +1853,6 @@ table 5407 "Prod. Order Component"
           DimMgt.EditDimensionSet(
             Rec, "Dimension Set ID", StrSubstNo('%1 %2 %3', Status, "Prod. Order No.", "Prod. Order Line No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-        OnAfterShowDimensions(Rec, xRec);
     end;
 
     procedure SetIgnoreErrors()
@@ -2026,30 +2016,6 @@ table 5407 "Prod. Order Component"
         if Item."No." <> "Item No." then
             Item.Get("Item No.");
         exit(Item.IsInventoriableType());
-    end;
-
-    local procedure ConfirmDeletion()
-    begin
-        if CalledFromHeader then
-            exit;
-
-        if ("Expected Quantity" - "Remaining Quantity") < "Qty. Picked" then
-            if not Confirm(
-                StrSubstNo(
-                    ConfirmDeleteQst,
-                    FieldCaption("Qty. Picked"),
-                    "Qty. Picked",
-                    'Qty. Posted',
-                    ("Expected Qty. (Base)" - "Remaining Qty. (Base)"),
-                    TableCaption),
-                false)
-            then
-                Error('');
-    end;
-
-    procedure SuspendDeletionCheck(Suspend: Boolean)
-    begin
-        CalledFromHeader := Suspend;
     end;
 
     [IntegrationEvent(false, false)]
@@ -2326,16 +2292,5 @@ table 5407 "Prod. Order Component"
     local procedure OnCheckIfProdOrderCompMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock"; var Result: Boolean)
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateRoutingLinkCodeOnBeforeSubcontractorProcurementCheck(var ProdOrderComponent: Record "Prod. Order Component"; Vendor: Record Vendor; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterShowDimensions(var ProdOrderComponent: Record "Prod. Order Component"; xProdOrderComponent: Record "Prod. Order Component")
-    begin
-    end;
-
 }
 
