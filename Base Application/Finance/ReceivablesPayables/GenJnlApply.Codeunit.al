@@ -84,7 +84,6 @@ codeunit 225 "Gen. Jnl.-Apply"
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
         ApplyCustEntries: Page "Apply Customer Entries";
-        PreviousAppliesToID: Code[50];
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -101,7 +100,6 @@ codeunit 225 "Gen. Jnl.-Apply"
             CustLedgEntry.SetRange("Document Type", GenJnlLine."Document Type"::Payment);
         end;
         OnSelectCustLedgEntryOnAfterSetFilters(CustLedgEntry, GenJnlLine);
-        PreviousAppliesToID := GenJnlLine."Applies-to ID";
         if GenJnlLine."Applies-to ID" = '' then
             GenJnlLine."Applies-to ID" := GenJnlLine."Document No.";
         if GenJnlLine."Applies-to ID" = '' then
@@ -113,8 +111,6 @@ codeunit 225 "Gen. Jnl.-Apply"
         ApplyCustEntries.SetTableView(CustLedgEntry);
         ApplyCustEntries.LookupMode(true);
         Selected := ApplyCustEntries.RunModal() = ACTION::LookupOK;
-        if not Selected then
-            GenJnlLine."Applies-to ID" := PreviousAppliesToID;
         CustomAppliesToId := ApplyCustEntries.GetCustomAppliesToID();
         Clear(ApplyCustEntries);
 
