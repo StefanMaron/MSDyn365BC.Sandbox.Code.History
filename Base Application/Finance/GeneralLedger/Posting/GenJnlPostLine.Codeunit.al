@@ -5245,7 +5245,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
                                         VendPostingGr.GetPayablesAccount(), -DetailedCVLedgEntryBuffer."Amount (LCY)", 0,
                                         DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode);
                                 end else
-                                    PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
+                                    if LedgEntryInserted then
+                                        PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
                             else
                                 PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
                         end;
@@ -5326,7 +5327,13 @@ codeunit 12 "Gen. Jnl.-Post Line"
         AccNo: Code[20];
     begin
         if MultiplePostingGroups and (DetailedCVLedgEntryBuffer."Entry Type" = DetailedCVLedgEntryBuffer."Entry Type"::Application) then
-            AccNo := GetVendDtldCVLedgEntryBufferAccNo(GenJournalLine, DetailedCVLedgEntryBuffer)
+            if DetailedCVLedgEntryBuffer."Initial Document Type" = DetailedCVLedgEntryBuffer."Initial Document Type"::Bill then
+                AccNo := VendPostingGr."Payables Account"
+            else
+                if (GenJournalLine."Document Type" = GenJournalLine."Document Type"::Payment) and (GenJournalLine."Applies-to Doc. No." <> '') and (DetailedCVLedgEntryBuffer."Document Type" = DetailedCVLedgEntryBuffer."Document Type"::Payment) then
+                    AccNo := VendPostingGr."Payables Account"
+                else
+                    AccNo := GetVendDtldCVLedgEntryBufferAccNo(GenJournalLine, DetailedCVLedgEntryBuffer)
         else
             AccNo := GetDtldVendLedgEntryAccNo(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, 0, false);
         PostDtldCVLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, AccNo, AdjAmount, false);
@@ -5350,7 +5357,13 @@ codeunit 12 "Gen. Jnl.-Post Line"
             exit;
 
         if MultiplePostingGroups and (DetailedCVLedgEntryBuffer."Entry Type" = DetailedCVLedgEntryBuffer."Entry Type"::Application) then
-            AccNo := GetVendDtldCVLedgEntryBufferAccNo(GenJournalLine, DetailedCVLedgEntryBuffer)
+            if DetailedCVLedgEntryBuffer."Initial Document Type" = DetailedCVLedgEntryBuffer."Initial Document Type"::Bill then
+                AccNo := VendPostingGr."Payables Account"
+            else
+                if (GenJournalLine."Document Type" = GenJournalLine."Document Type"::Payment) and (GenJournalLine."Applies-to Doc. No." <> '') and (DetailedCVLedgEntryBuffer."Document Type" = DetailedCVLedgEntryBuffer."Document Type"::Payment) then
+                    AccNo := VendPostingGr."Payables Account"
+                else
+                    AccNo := GetVendDtldCVLedgEntryBufferAccNo(GenJournalLine, DetailedCVLedgEntryBuffer)
         else
             AccNo := GetDtldVendLedgEntryAccNo(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, OriginalTransactionNo, true);
         DetailedCVLedgEntryBuffer."Gen. Posting Type" := DetailedCVLedgEntryBuffer."Gen. Posting Type"::Purchase;
