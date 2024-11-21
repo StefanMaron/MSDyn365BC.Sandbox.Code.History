@@ -574,9 +574,6 @@ table 32 "Item Ledger Entry"
         key(Key21; SystemModifiedAt)
         {
         }
-        key(Key25; "Entry Type", "Item No.")
-        {
-        }
     }
 
     fieldgroups
