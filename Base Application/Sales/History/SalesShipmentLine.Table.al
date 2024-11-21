@@ -744,8 +744,11 @@ table 111 "Sales Shipment Line"
         else
             NextLineNo := 10000;
 
-        if SalesInvHeader."No." <> TempSalesLine."Document No." then
-            SalesInvHeader.Get(TempSalesLine."Document Type", TempSalesLine."Document No.");
+        IsHandled := false;
+        OnInsertInvLineFromShptLineOnBeforeSalesHeaderGet(SalesInvHeader, Rec, TempSalesLine, IsHandled);
+        if not IsHandled then
+            if SalesInvHeader."No." <> TempSalesLine."Document No." then
+                SalesInvHeader.Get(TempSalesLine."Document Type", TempSalesLine."Document No.");
 
         if SalesLine."Shipment No." <> "Document No." then begin
 
@@ -901,14 +904,15 @@ table 111 "Sales Shipment Line"
                 SetRange(Type, Type::" ");
             end;
         until (Next() = 0) or ("Attached to Line No." = 0);
-        OnInsertInvLineFromShptLineOnAfterInsertAllLines(Rec, SalesLine);
-
-        if SalesOrderHeader.Get(SalesOrderHeader."Document Type"::Order, "Order No.") then begin
-            if not SalesOrderHeader."Get Shipment Used" then begin
-                SalesOrderHeader."Get Shipment Used" := true;
-                SalesOrderHeader.Modify();
+        IsHandled := false;
+        OnInsertInvLineFromShptLineOnAfterInsertAllLines(Rec, SalesLine, IsHandled);
+        if not IsHandled then
+            if SalesOrderHeader.Get(SalesOrderHeader."Document Type"::Order, "Order No.") then begin
+                if not SalesOrderHeader."Get Shipment Used" then begin
+                    SalesOrderHeader."Get Shipment Used" := true;
+                    SalesOrderHeader.Modify();
+                end;
             end;
-        end;
     end;
 
     procedure GetSalesInvLines(var TempSalesInvLine: Record "Sales Invoice Line" temporary)
@@ -1282,7 +1286,7 @@ table 111 "Sales Shipment Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnAfterInsertAllLines(SalesShipmentLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line")
+    local procedure OnInsertInvLineFromShptLineOnAfterInsertAllLines(SalesShipmentLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1293,6 +1297,11 @@ table 111 "Sales Shipment Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertInvLineFromShptLineOnBeforeAssigneSalesLine(var SalesShipmentLine: Record "Sales Shipment Line"; SalesHeaderInv: Record "Sales Header"; SalesHeaderOrder: Record "Sales Header"; var SalesLine: Record "Sales Line"; var SalesOrderLine: Record "Sales Line"; Currency: Record Currency)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertInvLineFromShptLineOnBeforeSalesHeaderGet(var SalesHeader: Record "Sales Header"; SalesShipmentLine: Record "Sales Shipment Line"; var TempSalesLine: Record "Sales Line" temporary; var IsHandled: Boolean)
     begin
     end;
 }
