@@ -20,7 +20,6 @@ page 6752 "Reminder Automation Card"
         {
             group(General)
             {
-                Caption = 'General';
                 field(Code; Rec.Code)
                 {
                     ApplicationArea = All;
