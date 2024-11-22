@@ -40,7 +40,6 @@ report 302 "Get Demand To Reserve"
                 SetFilter("Variant Code", FilterItem.GetFilter("Variant Filter"));
                 SetFilter("Location Code", FilterItem.GetFilter("Location Filter"));
                 SetFilter("Shipment Date", FilterItem.GetFilter("Date Filter"));
-                SetFilter(Reserve, '<>%1', SalesOrderLine.Reserve::Never);
 
                 FilterGroup(2);
                 if DateFilter <> '' then
@@ -55,7 +54,6 @@ report 302 "Get Demand To Reserve"
             trigger OnAfterGetRecord()
             var
                 Item: Record Item;
-                IsHandled: Boolean;
             begin
                 if not IsInventoriableItem() then
                     CurrReport.Skip();
@@ -73,12 +71,10 @@ report 302 "Get Demand To Reserve"
                         CurrReport.Skip();
                 end;
 
-                IsHandled := false;
-                OnSalesOrderLineOnAfterGetRecordOnBeforeSetTempSalesLine(SalesOrderLine, IsHandled);
-                if not IsHandled then begin
-                    TempSalesLine := SalesOrderLine;
-                    TempSalesLine.Insert();
-                end;
+                OnSalesOrderLineOnAfterGetRecordOnBeforeSetTempSalesLine(SalesOrderLine);
+
+                TempSalesLine := SalesOrderLine;
+                TempSalesLine.Insert();
             end;
         }
         dataitem(TransferOrderLine; "Transfer Line")
@@ -110,7 +106,6 @@ report 302 "Get Demand To Reserve"
             trigger OnAfterGetRecord()
             var
                 Item: Record Item;
-                IsHandled: Boolean;
             begin
                 if not CheckIfTransferLineMeetsReservedFromStockSetting("Outstanding Qty. (Base)", ReservedFromStock)
                 then
@@ -125,12 +120,8 @@ report 302 "Get Demand To Reserve"
                         CurrReport.Skip();
                 end;
 
-                IsHandled := false;
-                OnTransferOrderLineOnAfterGetRecordOnBeforeSetTempTransferLine(TransferOrderLine, IsHandled);
-                if not IsHandled then begin
-                    TempTransferLine := TransferOrderLine;
-                    TempTransferLine.Insert();
-                end;
+                TempTransferLine := TransferOrderLine;
+                TempTransferLine.Insert();
             end;
         }
         dataitem(ServiceOrderLine; "Service Line")
@@ -149,7 +140,6 @@ report 302 "Get Demand To Reserve"
                 SetFilter("Variant Code", FilterItem.GetFilter("Variant Filter"));
                 SetFilter("Location Code", FilterItem.GetFilter("Location Filter"));
                 SetFilter("Needed by Date", FilterItem.GetFilter("Date Filter"));
-                SetFilter(Reserve, '<>%1', ServiceOrderLine.Reserve::Never);
 
                 FilterGroup(2);
                 if DateFilter <> '' then
@@ -164,7 +154,6 @@ report 302 "Get Demand To Reserve"
             trigger OnAfterGetRecord()
             var
                 Item: Record Item;
-                IsHandled: Boolean;
             begin
                 if not IsInventoriableItem() then
                     CurrReport.Skip();
@@ -182,12 +171,8 @@ report 302 "Get Demand To Reserve"
                         CurrReport.Skip();
                 end;
 
-                IsHandled := false;
-                OnServiceOrderLineOnAfterGetRecordOnBeforeSetTempServiceLine(ServiceOrderLine, IsHandled);
-                if not IsHandled then begin
-                    TempServiceLine := ServiceOrderLine;
-                    TempServiceLine.Insert();
-                end;
+                TempServiceLine := ServiceOrderLine;
+                TempServiceLine.Insert();
             end;
         }
         dataitem(JobPlanningLine; "Job Planning Line")
@@ -205,7 +190,6 @@ report 302 "Get Demand To Reserve"
                 SetFilter("Variant Code", FilterItem.GetFilter("Variant Filter"));
                 SetFilter("Location Code", FilterItem.GetFilter("Location Filter"));
                 SetFilter("Planning Date", FilterItem.GetFilter("Date Filter"));
-                SetFilter(Reserve, '<>%1', JobPlanningLine.Reserve::Never);
 
                 FilterGroup(2);
                 if DateFilter <> '' then
@@ -220,7 +204,6 @@ report 302 "Get Demand To Reserve"
             trigger OnAfterGetRecord()
             var
                 Item: Record Item;
-                IsHandled: Boolean;
             begin
                 if not IsInventoriableItem() then
                     CurrReport.Skip();
@@ -238,12 +221,8 @@ report 302 "Get Demand To Reserve"
                         CurrReport.Skip();
                 end;
 
-                IsHandled := false;
-                OnJobPlanningLineOnAfterGetRecordOnBeforeSetTempJobPlanningLine(JobPlanningLine, IsHandled);
-                if not IsHandled then begin
-                    TempJobPlanningLine := JobPlanningLine;
-                    TempJobPlanningLine.Insert();
-                end;
+                TempJobPlanningLine := JobPlanningLine;
+                TempJobPlanningLine.Insert();
             end;
         }
         dataitem(AssemblyLine; "Assembly Line")
@@ -262,7 +241,6 @@ report 302 "Get Demand To Reserve"
                 SetFilter("Variant Code", FilterItem.GetFilter("Variant Filter"));
                 SetFilter("Location Code", FilterItem.GetFilter("Location Filter"));
                 SetFilter("Due Date", FilterItem.GetFilter("Date Filter"));
-                SetFilter(Reserve, '<>%1', AssemblyLine.Reserve::Never);
 
                 FilterGroup(2);
                 if DateFilter <> '' then
@@ -277,7 +255,6 @@ report 302 "Get Demand To Reserve"
             trigger OnAfterGetRecord()
             var
                 Item: Record Item;
-                IsHandled: Boolean;
             begin
                 if not IsInventoriableItem() then
                     CurrReport.Skip();
@@ -295,12 +272,8 @@ report 302 "Get Demand To Reserve"
                         CurrReport.Skip();
                 end;
 
-                IsHandled := false;
-                OnAssemblyLineOnAfterGetRecordOnBeforeSetTempAssemblyLine(AssemblyLine, IsHandled);
-                if not IsHandled then begin
-                    TempAssemblyLine := AssemblyLine;
-                    TempAssemblyLine.Insert();
-                end;
+                TempAssemblyLine := AssemblyLine;
+                TempAssemblyLine.Insert();
             end;
         }
         dataitem(ProdOrderComponent; "Prod. Order Component")
@@ -332,7 +305,6 @@ report 302 "Get Demand To Reserve"
             trigger OnAfterGetRecord()
             var
                 Item: Record Item;
-                IsHandled: Boolean;
             begin
                 if not IsInventoriableItem() then
                     CurrReport.Skip();
@@ -350,12 +322,8 @@ report 302 "Get Demand To Reserve"
                         CurrReport.Skip();
                 end;
 
-                IsHandled := false;
-                OnProdOrderComponentOnAfterGetRecordOnBeforeSetTempProdOrderComponent(ProdOrderComponent, IsHandled);
-                if not IsHandled then begin
-                    TempProdOrderComponent := ProdOrderComponent;
-                    TempProdOrderComponent.Insert();
-                end;
+                TempProdOrderComponent := ProdOrderComponent;
+                TempProdOrderComponent.Insert();
             end;
         }
     }
@@ -577,32 +545,7 @@ report 302 "Get Demand To Reserve"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSalesOrderLineOnAfterGetRecordOnBeforeSetTempSalesLine(var OrderSalesLine: Record "Sales Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnTransferOrderLineOnAfterGetRecordOnBeforeSetTempTransferLine(var TransferLine: Record "Transfer Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnServiceOrderLineOnAfterGetRecordOnBeforeSetTempServiceLine(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnJobPlanningLineOnAfterGetRecordOnBeforeSetTempJobPlanningLine(var JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAssemblyLineOnAfterGetRecordOnBeforeSetTempAssemblyLine(var AssemblyLine: Record "Assembly Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnProdOrderComponentOnAfterGetRecordOnBeforeSetTempProdOrderComponent(var ProdOrderComponent: Record "Prod. Order Component"; var IsHandled: Boolean)
+    local procedure OnSalesOrderLineOnAfterGetRecordOnBeforeSetTempSalesLine(var OrderSalesLine: Record "Sales Line")
     begin
     end;
 }
