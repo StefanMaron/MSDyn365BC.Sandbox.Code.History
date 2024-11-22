@@ -217,14 +217,13 @@ codeunit 5579 "Digital Voucher Impl."
     begin
         GetDigitalVoucherEntrySetup(DigitalVoucherEntrySetup, DigitalVoucherEntryType);
         VoucherAttached := GetIncomingDocumentRecordFromRecordRef(IncomingDocument, RecRef);
-        if VoucherAttached then
-            exit(true);
-        if DigitalVoucherEntrySetup."Generate Automatically" then
-            exit(true);
-        SourceCodeSetup.Get();
-        if IsPaymentReconciliationJournal(DigitalVoucherEntrySetup."Entry Type", RecRef) then
-            exit(true);
-        exit(false);
+        Checked := VoucherAttached or DigitalVoucherEntrySetup."Generate Automatically";
+        if not Checked then begin
+            SourceCodeSetup.Get();
+            Checked :=
+                Checked or IsPaymentReconciliationJournal(DigitalVoucherEntrySetup."Entry Type", RecRef);
+        end;
+        exit(Checked);
     end;
 
     procedure CheckIncomingDocumentChange(Rec: Record "Incoming Document Attachment")
