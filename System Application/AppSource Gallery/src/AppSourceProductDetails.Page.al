@@ -14,7 +14,7 @@ page 2516 "AppSource Product Details"
     PageType = Card;
     ApplicationArea = All;
     Editable = false;
-    Caption = 'App overview';
+    Caption = 'App Overview';
     DataCaptionExpression = AppSourceJsonUtilities.GetStringValue(ProductObject, 'displayName');
 
     InherentEntitlements = X;
@@ -65,7 +65,6 @@ page 2516 "AppSource Product Details"
                 {
                     Caption = 'Last Modified Date Time';
                     ToolTip = 'Specifies the date the offer was last updated.';
-                    Visible = false;
                 }
             }
             group(DescriptionGroup)
@@ -156,10 +155,10 @@ page 2516 "AppSource Product Details"
         {
             action(OpenInAppSource)
             {
-                Caption = 'View on AppSource';
+                Caption = 'View in AppSource';
                 Scope = Page;
-                Image = Info;
-                ToolTip = 'Opens the app on AppSource.';
+                Image = Open;
+                ToolTip = 'Opens the app offer in the AppSource marketplace.';
 
                 trigger OnAction()
                 begin
@@ -189,9 +188,9 @@ page 2516 "AppSource Product Details"
 
             action(InstallFromAppSource)
             {
-                Caption = 'Install from AppSource';
+                Caption = 'Install From AppSource';
                 Scope = Page;
-                Image = Download;
+                Image = Insert;
                 ToolTip = 'Installs the app from Microsoft AppSource.';
                 Enabled = (not CurrentRecordCanBeUninstalled) and (not CurrentRecordCanBeInstalled);
                 Visible = (not CurrentRecordCanBeUninstalled) and (not CurrentRecordCanBeInstalled);
