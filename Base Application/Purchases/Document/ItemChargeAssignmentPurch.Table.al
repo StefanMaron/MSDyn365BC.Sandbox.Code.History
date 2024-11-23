@@ -56,7 +56,6 @@ table 5805 "Item Charge Assignment (Purch)"
             trigger OnValidate()
             var
                 PurchasePayablesSetup: Record "Purchases & Payables Setup";
-                IsHandled: Boolean;
             begin
                 PurchasePayablesSetup.Get();
                 PurchLine.Get("Document Type", "Document No.", "Document Line No.");
@@ -64,10 +63,7 @@ table 5805 "Item Charge Assignment (Purch)"
                     if PurchasePayablesSetup."Default Qty. to Receive" <> PurchasePayablesSetup."Default Qty. to Receive"::Blank then
                         PurchLine.TestField("Qty. to Invoice");
 
-                IsHandled := false;
-                OnValidateQtyToAssignOnBeforeTestFieldAppliesToDocLineNo(Rec, IsHandled);
-                if not IsHandled then
-                    TestField("Applies-to Doc. Line No.");
+                TestField("Applies-to Doc. Line No.");
                 if ("Qty. to Assign" <> 0) and ("Applies-to Doc. Type" = "Document Type") then
                     if PurchLineInvoiced() then
                         Error(CannotAssignToInvoicedErr, PurchLine.TableCaption());
@@ -229,11 +225,6 @@ table 5805 "Item Charge Assignment (Purch)"
         SetRange("Applies-to Doc. Line No.", AppliesToDocumentLineNo);
         if FindFirst() then
             error(ItemChargeDeletionErr, "Document Type", "Document No.", "Item No.");
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateQtyToAssignOnBeforeTestFieldAppliesToDocLineNo(var ItemChargeAssignmentPurch: Record "Item Charge Assignment (Purch)"; var IsHandled: Boolean)
-    begin
     end;
 }
 
