@@ -18,7 +18,6 @@ page 1357 "Pstd. Purch. Cr.Memo - Update"
         {
             group(General)
             {
-                Caption = 'General';
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Basic, Suite;
