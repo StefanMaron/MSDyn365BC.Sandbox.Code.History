@@ -207,7 +207,7 @@ page 160 "Sales Statistics"
                     Editable = false;
                     ToolTip = 'Specifies the difference between the original cost and the total adjusted cost of the items in the sales document.';
 
-                    trigger OnDrillDown()
+                    trigger OnLookup(var Text: Text): Boolean
                     begin
                         Rec.LookupAdjmtValueEntries(0);
                     end;
@@ -379,9 +379,8 @@ page 160 "Sales Statistics"
 
     local procedure SetVATSpecification()
     begin
-        CurrPage.Subform.Page.SetSourceHeader(Rec);
-        CurrPage.SubForm.Page.SetTempVATAmountLine(TempVATAmountLine);
-        CurrPage.SubForm.Page.InitGlobals(
+        CurrPage.SubForm.PAGE.SetTempVATAmountLine(TempVATAmountLine);
+        CurrPage.SubForm.PAGE.InitGlobals(
           Rec."Currency Code", AllowVATDifference, AllowVATDifference,
           Rec."Prices Including VAT", AllowInvDisc, Rec."VAT Base Discount %");
     end;
