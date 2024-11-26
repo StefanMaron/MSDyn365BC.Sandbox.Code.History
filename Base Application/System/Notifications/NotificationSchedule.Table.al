@@ -2,6 +2,7 @@
 
 using System.Azure.Identity;
 using System.Security.User;
+using System.Reflection;
 using System.Threading;
 
 table 1513 "Notification Schedule"
@@ -131,7 +132,7 @@ table 1513 "Notification Schedule"
     end;
 
     var
-        NotifyNowDescriptionTxt: Label 'Instant Notification Job';
+        NotifyNowDescriptionTxt: Label 'Instant Notification Job', MaxLength = 30;
         NoPermissionsErr: Label 'You are not allowed to send notifications, but your system administrator can give you permission to do so. Specifically, ask for the %1 for the %2 table.', Comment = '%1 Permission Type; %2 Table Name';
         NotifyNowLbl: Label 'NOTIFYNOW', Locked = true;
         WritePermissionTok: Label 'Insert, Modify, and Delete permissions';
@@ -276,22 +277,49 @@ table 1513 "Notification Schedule"
 
     procedure CalculateExecutionTime(DateTime: DateTime): DateTime
     begin
+        if Rec.Recurrence <> Rec.Recurrence::Instantly then
+            DateTime := CalculateRecipientDateTime(DateTime);
+
         case Recurrence of
             Recurrence::Instantly:
                 exit(CurrentDateTime);
             Recurrence::Daily,
           Recurrence::Weekly:
-                exit(GetScheduledWeekDay(DateTime, Time));
+                exit(CalculateClientTimeFromRecTimezone(GetScheduledWeekDay(DateTime, Time)));
             Recurrence::Monthly:
                 case "Monthly Notification Date" of
                     "Monthly Notification Date"::"First Workday":
-                        exit(GetScheduledFirstWorkdateOfMonth(DateTime, Time));
+                        exit(CalculateClientTimeFromRecTimezone(GetScheduledFirstWorkdateOfMonth(DateTime, Time)));
                     "Monthly Notification Date"::"Last Workday":
-                        exit(GetScheduledLastWorkdateOfMonth(DateTime, Time));
+                        exit(CalculateClientTimeFromRecTimezone(GetScheduledLastWorkdateOfMonth(DateTime, Time)));
                     "Monthly Notification Date"::Custom:
-                        exit(GetScheduledCustomWorkdateOfMonth(DateTime, Time, "Date of Month"));
+                        exit(CalculateClientTimeFromRecTimezone(GetScheduledCustomWorkdateOfMonth(DateTime, Time, "Date of Month")));
                 end;
         end;
+    end;
+
+    local procedure CalculateRecipientDateTime(DateTime: DateTime): DateTime
+    var
+        UserPersonalization: Record "User Personalization";
+        TypeHelper: Codeunit "Type Helper";
+    begin
+        UserPersonalization.SetFilter("User ID", Rec."User ID");
+        if not UserPersonalization.FindFirst() then
+            exit(DateTime);
+
+        exit(TypeHelper.ConvertDateTimeFromUTCToTimeZone(DateTime, UserPersonalization."Time Zone"));
+    end;
+
+    local procedure CalculateClientTimeFromRecTimezone(DateTime: DateTime): DateTime
+    var
+        UserPersonalization: Record "User Personalization";
+        TypeHelper: Codeunit "Type Helper";
+    begin
+        UserPersonalization.SetFilter("User ID", Rec."User ID");
+        if not UserPersonalization.FindFirst() then
+            exit(DateTime);
+        // Convert the time from the requester's timezone to utc then to the recipient's timezone
+        exit(TypeHelper.ConvertDateTimeFromInputTimeZoneToClientTimezone(DateTime, UserPersonalization."Time Zone"));
     end;
 
     local procedure Schedule(RecipientUserID: Code[50])
@@ -345,7 +373,7 @@ table 1513 "Notification Schedule"
         if AzureAdUserManagement.IsUserDelegated(UserSecurityId()) then // can't use JQ
             SendNotificationInForeground()
         else begin
-            JobQueueCategory.InsertRec(NotifyNowLbl, NotifyNowDescriptionTxt);
+            JobQueueCategory.InsertRec(NotifyNowLbl, CopyStr(NotifyNowDescriptionTxt, 1, 30));
             JobQueueEntry.ScheduleJobQueueEntryForLater(
               CODEUNIT::"Notification Entry Dispatcher", OneMinuteFromNow(), NotifyNowLbl, '');
         end;
