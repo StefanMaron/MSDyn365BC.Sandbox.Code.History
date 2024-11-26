@@ -35,6 +35,15 @@ codeunit 8051 "Sub. Billing Installation"
     var
         ServiceContractSetup: Record "Service Contract Setup";
         ServiceContractSetupModified: Boolean;
+        CustomerContractCodeLbl: Label 'CUSTCONTR', MaxLength = 20;
+        CustomerContractDescriptionLbl: Label 'Customer Contracts';
+        CustomerContractNoSeriesLineLbl: Label 'CUC', MaxLength = 14;
+        VendorContractCodeLbl: Label 'VENDCONTR', MaxLength = 20;
+        VendorContractDescriptionLbl: Label 'Vendor Contracts';
+        VendorContractNoSeriesLineLbl: Label 'VEC', MaxLength = 14;
+        ServiceObjectCodeLbl: Label 'SERVOBJECT', MaxLength = 20;
+        ServiceObjectDescriptionLbl: Label 'Service Objects';
+        ServiceObjectNoSeriesLineLbl: Label 'SOBJ', MaxLength = 14;
     begin
         if not ServiceContractSetup.Get() then begin
             ServiceContractSetup.Init();
@@ -103,6 +112,8 @@ codeunit 8051 "Sub. Billing Installation"
     local procedure InitGeneralLedgerSetup()
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
+        CustContractDimensionCodeLbl: Label 'CUSTOMERCONTRACT';
+        CustContractDimensionDescriptionLbl: Label 'Customer Contract Dimension';
     begin
         if not GeneralLedgerSetup.Get() then begin
             GeneralLedgerSetup.Init();
@@ -121,7 +132,6 @@ codeunit 8051 "Sub. Billing Installation"
     begin
         if Dimension.Get(DimensionCode) then
             exit;
-
         Dimension.Init();
         Dimension.Validate(Code, DimensionCode);
         Dimension.Name := CopyStr(DimensionName, 1, MaxStrLen(Dimension.Name));
@@ -137,7 +147,7 @@ codeunit 8051 "Sub. Billing Installation"
     begin
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"Update Serv. Comm. Term. Dates");
-        if not JobQueueEntry.IsEmpty then
+        if not JobQueueEntry.IsEmpty() then
             exit;
 
         JobQueueEntry.Init();
@@ -169,6 +179,8 @@ codeunit 8051 "Sub. Billing Installation"
     local procedure FindOrCreateSourceCode(): Code[10]
     var
         SourceCode: Record "Source Code";
+        ContractDeferralReleaseCodeLbl: Label 'CONTDEFREL', MaxLength = 10;
+        ContractDeferralsReleaseDescriptionLbl: Label 'Contract Deferrals Release';
     begin
         if not SourceCode.Get(ContractDeferralReleaseCodeLbl) then begin
             SourceCode.Init();
@@ -182,39 +194,29 @@ codeunit 8051 "Sub. Billing Installation"
     local procedure InitializeBillingTemplates()
     var
         BillingTemplate: Record "Billing Template";
+        CustomerBillingTemplateDescriptionTxt: Label 'Sample template for customer billing';
+        VendorBillingTemplateDescriptionTxt: Label 'Sample template for vendor billing';
+        CustomerLbl: Label 'Customer';
+        VendorLbl: Label 'Vendor';
     begin
-        if not BillingTemplate.IsEmpty then
+        if not BillingTemplate.IsEmpty() then
             exit;
 
-        BillingTemplate.Init();
-        BillingTemplate.Code := CustomerLbl;
-        BillingTemplate.Description := CustomerBillingTemplateDescriptionTxt;
-        BillingTemplate.Partner := "Service Partner"::Customer;
-        BillingTemplate.Insert(false);
+        if not BillingTemplate.Get(CustomerLbl) then
+            InsertBillingTemplate(CustomerLbl, CustomerBillingTemplateDescriptionTxt, "Service Partner"::Customer);
 
-        BillingTemplate.Init();
-        BillingTemplate.Code := VendorLbl;
-        BillingTemplate.Description := VendorBillingTemplateDescriptionTxt;
-        BillingTemplate.Partner := "Service Partner"::Vendor;
-        BillingTemplate.Insert(false);
+        Clear(BillingTemplate);
+        if not BillingTemplate.Get(VendorLbl) then
+            InsertBillingTemplate(VendorLbl, VendorBillingTemplateDescriptionTxt, "Service Partner"::Vendor);
     end;
 
+    local procedure InsertBillingTemplate(BillingTemplateCode: Code[20]; BillingTemplateDescription: Text[80]; ServicePartner: Enum "Service Partner")
     var
-        CustomerLbl: Label 'Customer';
-        CustomerBillingTemplateDescriptionTxt: Label 'Sample template for customer billing';
-        CustomerContractCodeLbl: Label 'CUSTCONTR';
-        CustomerContractDescriptionLbl: Label 'Customer Contracts';
-        CustomerContractNoSeriesLineLbl: Label 'CUC';
-        VendorLbl: Label 'Vendor';
-        VendorBillingTemplateDescriptionTxt: Label 'Sample template for vendor billing';
-        VendorContractCodeLbl: Label 'VENDCONTR';
-        VendorContractDescriptionLbl: Label 'Vendor Contracts';
-        VendorContractNoSeriesLineLbl: Label 'VEC';
-        ServiceObjectCodeLbl: Label 'SERVOBJECT';
-        ServiceObjectDescriptionLbl: Label 'Service Objects';
-        ServiceObjectNoSeriesLineLbl: Label 'SOBJ';
-        CustContractDimensionCodeLbl: Label 'CUSTOMERCONTRACT';
-        CustContractDimensionDescriptionLbl: Label 'Customer Contract Dimension';
-        ContractDeferralReleaseCodeLbl: Label 'CONTDEFREL';
-        ContractDeferralsReleaseDescriptionLbl: Label 'Contract Deferrals Release';
+        BillingTemplate: Record "Billing Template";
+    begin
+        BillingTemplate.Code := BillingTemplateCode;
+        BillingTemplate.Description := CopyStr(BillingTemplateDescription, 1, MaxStrLen(BillingTemplate.Description));
+        BillingTemplate.Partner := ServicePartner;
+        BillingTemplate.Insert(false);
+    end;
 }
