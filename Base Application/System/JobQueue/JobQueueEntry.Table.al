@@ -17,7 +17,8 @@ table 472 "Job Queue Entry"
     DrillDownPageID = "Job Queue Entries";
     LookupPageID = "Job Queue Entries";
     Permissions = TableData "Job Queue Entry" = rimd,
-                  TableData "Job Queue Log Entry" = rimd;
+                  TableData "Job Queue Log Entry" = rimd,
+                  TableData "Job Queue Category" = rm;
     ReplicateData = false;
     DataClassification = CustomerContent;
 
@@ -146,6 +147,7 @@ table 472 "Job Queue Entry"
                 ReportLayoutSelection: Record "Report Layout Selection";
                 InitServerPrinterTable: Codeunit "Init. Server Printer Table";
                 EnvironmentInfo: Codeunit "Environment Information";
+                IsHandled: Boolean;
             begin
                 TestField("Object Type to Run", "Object Type to Run"::Report);
 
@@ -160,8 +162,12 @@ table 472 "Job Queue Entry"
                 end;
                 if "Report Output Type" = "Report Output Type"::Print then begin
                     if EnvironmentInfo.IsSaaS() then begin
-                        "Report Output Type" := "Report Output Type"::PDF;
-                        Message(NoPrintOnSaaSMsg);
+                        IsHandled := false;
+                        OnValidateReportOutputTypeOnBeforeShowPrintNotAllowedInSaaS(Rec, IsHandled);
+                        if not IsHandled then begin
+                            "Report Output Type" := "Report Output Type"::PDF;
+                            Message(NoPrintOnSaaSMsg);
+                        end;
                     end else
                         "Printer Name" := InitServerPrinterTable.FindClosestMatchToClientDefaultPrinter("Object ID to Run");
                 end else
@@ -171,6 +177,7 @@ table 472 "Job Queue Entry"
         field(11; "Maximum No. of Attempts to Run"; Integer)
         {
             Caption = 'Maximum No. of Attempts to Run';
+            MaxValue = 10;
         }
         field(12; "No. of Attempts to Run"; Integer)
         {
@@ -1029,15 +1036,20 @@ table 472 "Job Queue Entry"
         JobQueueLogEntry: Record "Job Queue Log Entry";
         TelemetrySubscribers: Codeunit "Telemetry Subscribers";
         IsHandled: Boolean;
+        ExtraWaitTimeInMs: Integer;
     begin
         IsHandled := false;
         OnBeforeHandleExecutionError(Rec, IsHandled);
         if IsHandled then
             exit;
 
-        if Rec."Maximum No. of Attempts to Run" > Rec."No. of Attempts to Run" then begin
+        if (Rec."Maximum No. of Attempts to Run" > Rec."No. of Attempts to Run") and (Rec."No. of Attempts to Run" < 10) then begin
             Rec."No. of Attempts to Run" += 1;
-            Rec."Earliest Start Date/Time" := CurrentDateTime + 1000 * Rec."Rerun Delay (sec.)";
+            if Rec."No. of Attempts to Run" > 7 then
+                ExtraWaitTimeInMs := 6 * 60 * 60 * 1000  // 6 hours
+            else
+                ExtraWaitTimeInMs := Power(10, Rec."No. of Attempts to Run");
+            Rec."Earliest Start Date/Time" := CurrentDateTime + 1000 * Rec."Rerun Delay (sec.)" + ExtraWaitTimeInMs;
             EnqueueTask();
         end else begin
             SetStatusValue(Rec.Status::Error);
@@ -1495,6 +1507,7 @@ table 472 "Job Queue Entry"
         JobQueueEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         JobQueueEntry.SetRange("Job Queue Category Code", JobQueueCategory.Code);
         JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
+        JobQueueEntry.SetFilter(ID, '<>%1', Rec.ID);
         exit(not JobQueueEntry.IsEmpty);
     end;
 
@@ -1537,6 +1550,8 @@ table 472 "Job Queue Entry"
                 JobQueueEntry.SetError(NoTaskErr);
                 WaitingJobsExist := JobQueueEntry.FindFirst();
             end;
+        if OneActivated then
+            Commit();
         if JobQueueCategoryExist and OneActivated then
             RefreshRecoveryTask(JobQueueCategory);
         exit(OneActivated);
@@ -1544,15 +1559,29 @@ table 472 "Job Queue Entry"
 
     internal procedure RefreshRecoveryTask(var JobQueueCategory: Record "Job Queue Category")
     begin
-        if not IsNullGuid(JobQueueCategory."Recovery Task Id") and (JobQueueCategory."Recovery Task Start Time" > 0DT) and (JobQueueCategory."Recovery Task Start Time" > CurrentDateTime() + 300000) then  // not first time and more than 5 min. to go?
+        if not IsNullGuid(JobQueueCategory."Recovery Task Id") and (JobQueueCategory."Recovery Task Start Time" > CurrentDateTime() + 5 * 60 * 1000) then  // not first time and more than 5 min. to go?
             exit;
 
         if not IsNullGuid(JobQueueCategory."Recovery Task Id") then
             if TaskScheduler.TaskExists(JobQueueCategory."Recovery Task Id") then
                 TaskScheduler.CancelTask(JobQueueCategory."Recovery Task Id");
-        JobQueueCategory."Recovery Task Start Time" := CurrentDateTime() + 4 * 60 * 60 * 1000; // 4 hours from now
-        JobQueueCategory."Recovery Task Id" := TaskScheduler.CreateTask(Codeunit::"Job Queue Category Scheduler", Codeunit::"Job Queue Category Scheduler", true, CompanyName(), JobQueueCategory."Recovery Task Start Time", JobQueueCategory.RecordId());
+        JobQueueCategory."Recovery Task Start Time" := CurrentDateTime() + 20 * 60 * 1000; // 20 minutes from now
+        JobQueueCategory."Recovery Task Id" := TaskScheduler.CreateTask(Codeunit::"Job Queue Category Scheduler", 0, true, CompanyName(), JobQueueCategory."Recovery Task Start Time", JobQueueCategory.RecordId());
         JobQueueCategory.Modify();
+    end;
+
+    internal procedure ActivateNextJobInCategoryIfAny()
+    var
+        Success: Boolean;
+        NoOfAttempts: Integer;
+    begin
+        if Rec."Job Queue Category Code" = '' then
+            exit;
+        Commit();
+        while not Success and (NoOfAttempts < 3) do begin
+            Success := Codeunit.Run(Codeunit::"Job Queue Activate Next", Rec); // wrapper of ActivateNextJobInCategory()
+            NoOfAttempts += 1;
+        end;
     end;
 
     internal procedure ActivateNextJobInCategory()
@@ -1707,6 +1736,11 @@ table 472 "Job Queue Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsReadyToStart(var JobQueueEntry: Record "Job Queue Entry"; var ReadyToStart: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateReportOutputTypeOnBeforeShowPrintNotAllowedInSaaS(var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
     begin
     end;
 }
