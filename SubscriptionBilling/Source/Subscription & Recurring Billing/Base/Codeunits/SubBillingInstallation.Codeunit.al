@@ -3,8 +3,6 @@ namespace Microsoft.SubscriptionBilling;
 using System.Threading;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.AuditCodes;
-using Microsoft.Finance.GeneralLedger.Setup;
-using Microsoft.Finance.Dimension;
 
 codeunit 8051 "Sub. Billing Installation"
 {
@@ -22,7 +20,6 @@ codeunit 8051 "Sub. Billing Installation"
     procedure InitializeSetupTables()
     begin
         InitServiceContractSetup();
-        InitGeneralLedgerSetup();
         InitSourceCodeSetup();
     end;
 
@@ -66,10 +63,6 @@ codeunit 8051 "Sub. Billing Installation"
               CreateNoSeries(ServiceObjectCodeLbl, ServiceObjectDescriptionLbl, ServiceObjectNoSeriesLineLbl);
             ServiceContractSetupModified := true;
         end;
-        if not ServiceContractSetup."Aut. Insert C. Contr. DimValue" then begin
-            ServiceContractSetup."Aut. Insert C. Contr. DimValue" := true;
-            ServiceContractSetupModified := true;
-        end;
         if (ServiceContractSetup."Contract Invoice Description" = ServiceContractSetup."Contract Invoice Description"::" ") or
            ((ServiceContractSetup."Contract Invoice Description" <> Enum::"Contract Invoice Text Type"::"Billing Period") and
             (ServiceContractSetup."Contract Invoice Add. Line 1" <> Enum::"Contract Invoice Text Type"::"Billing Period") and
@@ -107,37 +100,6 @@ codeunit 8051 "Sub. Billing Installation"
         NoSeriesLine.Insert(true);
 
         exit(NoSeries.Code);
-    end;
-
-    local procedure InitGeneralLedgerSetup()
-    var
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        CustContractDimensionCodeLbl: Label 'CUSTOMERCONTRACT';
-        CustContractDimensionDescriptionLbl: Label 'Customer Contract Dimension';
-    begin
-        if not GeneralLedgerSetup.Get() then begin
-            GeneralLedgerSetup.Init();
-            GeneralLedgerSetup.Insert(false);
-        end;
-        if GeneralLedgerSetup."Dimension Code Cust. Contr." = '' then begin
-            CreateDimension(CustContractDimensionCodeLbl, CustContractDimensionDescriptionLbl, CustContractDimensionDescriptionLbl, CustContractDimensionDescriptionLbl);
-            GeneralLedgerSetup."Dimension Code Cust. Contr." := CustContractDimensionCodeLbl;
-            GeneralLedgerSetup.Modify(false);
-        end;
-    end;
-
-    internal procedure CreateDimension(DimensionCode: Code[20]; DimensionName: Text; DimensionCodeCaption: Text; DimensionFilterCaption: Text)
-    var
-        Dimension: Record Dimension;
-    begin
-        if Dimension.Get(DimensionCode) then
-            exit;
-        Dimension.Init();
-        Dimension.Validate(Code, DimensionCode);
-        Dimension.Name := CopyStr(DimensionName, 1, MaxStrLen(Dimension.Name));
-        Dimension."Code Caption" := CopyStr(DimensionCodeCaption, 1, MaxStrLen(Dimension."Code Caption"));
-        Dimension."Filter Caption" := CopyStr(DimensionFilterCaption, 1, MaxStrLen(Dimension."Filter Caption"));
-        Dimension.Insert(true);
     end;
 
     local procedure InitUpdateServicesDatesJobQueueEntry()
