@@ -114,23 +114,23 @@ page 332 "No. Series Generation"
             {
                 Caption = 'Prepare for next year';
 
-                action(PrepareForNextYear)
+                action(SetupForNextYear)
                 {
-                    Caption = 'Prepare number series for the next year';
+                    Caption = 'Set up number series for the next year';
                     ToolTip = 'Sample prompt for setting up number series for the next year.';
                     trigger OnAction()
                     begin
-                        InputText := PrepareForNextYearLbl;
+                        InputText := SetupForNextYearLbl;
                         CurrPage.Update();
                     end;
                 }
-                action(PrepareModuleForNextYear)
+                action(SetupModuleForNextYear)
                 {
-                    Caption = 'Prepare number series for the [sales] module for the next year';
+                    Caption = 'Set up number series for the [sales] module for the next year';
                     ToolTip = 'Sample prompt for setting up number series for a specific module for the next year. Replace [sales] with the module you want to set up number series for.';
                     trigger OnAction()
                     begin
-                        InputText := PrepareModuleForNextYearLbl;
+                        InputText := SetupModuleForNextYearLbl;
                         CurrPage.Update();
                     end;
                 }
@@ -178,8 +178,8 @@ page 332 "No. Series Generation"
         CreateNoSeriesForModuleWithPatternLbl: Label 'Create number series for [specify here] module in the format ';
         CreateNoSeriesForCompanyLbl: Label 'Create numbers series for the new company';
         ChangeNumberLbl: Label 'Change the [specify here] number to ';
-        PrepareForNextYearLbl: Label 'Prepare number series for the next year';
-        PrepareModuleForNextYearLbl: Label 'Prepare number series for the [specify here] module for the next year';
+        SetupForNextYearLbl: Label 'Set up number series for the next year';
+        SetupModuleForNextYearLbl: Label 'Set up number series for the [specify here] module for the next year';
 
     trigger OnAfterGetCurrRecord()
     begin
