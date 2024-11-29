@@ -2,15 +2,12 @@ namespace Microsoft.Finance.FinancialReports;
 
 page 103 "Account Schedule Names"
 {
-    AboutTitle = 'About (Financial Report) Row Definitions';
-    AboutText = 'Row definitions in financial reports provide a place for calculations that can''t be made directly in the chart of accounts. For example, you can create subtotals for groups of accounts and then include that total in other totals. You can also calculate intermediate steps that aren''t shown in the final report.';
-    AdditionalSearchTerms = 'Account Schedules';
-    AnalysisModeEnabled = false;
     ApplicationArea = Basic, Suite;
-    Caption = '(Financial Report) Row Definitions';
+    Caption = 'Row Definitions';
     PageType = List;
     SourceTable = "Acc. Schedule Name";
-    UsageCategory = ReportsAndAnalysis;
+    AdditionalSearchTerms = 'Account Schedules';
+    UsageCategory = Lists;
 
     layout
     {
@@ -22,12 +19,12 @@ page 103 "Account Schedule Names"
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the unique name (code) of the financial report row definition. You can use up to 10 characters.';
+                    ToolTip = 'Specifies the name of the row definition.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies a description of the financial report row definition. The description is not shown on the final report but is used to provide more context when using the definition.';
+                    ToolTip = 'Specifies a description for the row definition.';
                 }
 #if not CLEAN22
                 field("Default Column Layout"; Rec."Default Column Layout")
@@ -43,7 +40,7 @@ page 103 "Account Schedule Names"
                 field("Analysis View Name"; Rec."Analysis View Name")
                 {
                     ApplicationArea = Suite;
-                    ToolTip = 'Specifies the name of the analysis view you want the row definition to use. This field is optional.';
+                    ToolTip = 'Specifies the name of the analysis view you want the row definitions to be based on.';
                 }
                 field("Financial Period Description"; Rec."Financial Period Description")
                 {
@@ -144,7 +141,7 @@ page 103 "Account Schedule Names"
                 Caption = 'Export Row Definition';
                 Image = Export;
                 Scope = Repeater;
-                ToolTip = 'Export settings for the selected row definition to a RapidStart configuration package. Exporting a row definition lets you share it with another business unit.';
+                ToolTip = 'Export settings for the selected rows definition to a RapidStart configuration package. Exporting a rows definitions lets you share it with another business unit.';
 
                 trigger OnAction()
                 begin
@@ -221,16 +218,16 @@ page 103 "Account Schedule Names"
                     ObsoleteTag = '22.0';
                 }
 #endif
+                actionref(CopyAccountSchedule_Promoted; CopyAccountSchedule)
+                {
+                }
+                actionref(ExportAccountSchedule_Promoted; ExportAccountSchedule)
+                {
+                }
+                actionref(ImportAccountSchedule_Promoted; ImportAccountSchedule)
+                {
+                }
             }
-            group(CopyExportImport)
-            {
-                Caption = 'Copy/Export/Import';
-
-                actionref(CopyAccountSchedule_Promoted; CopyAccountSchedule) { }
-                actionref(ExportAccountSchedule_Promoted; ExportAccountSchedule) { }
-                actionref(ImportAccountSchedule_Promoted; ImportAccountSchedule) { }
-            }
-
             group(Category_Category4)
             {
                 Caption = 'Print/Send', Comment = 'Generated from the PromotedActionCategories property index 3.';
