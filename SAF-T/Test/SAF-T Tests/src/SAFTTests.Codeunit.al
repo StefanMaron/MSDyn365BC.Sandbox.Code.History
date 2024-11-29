@@ -40,7 +40,6 @@ codeunit 139511 "SAF-T Tests"
         Initialize();
         Customer.DeleteAll();
         Vendor.DeleteAll();
-        ClearSourceCode();
 
         // [GIVEN] Audit File Export Format "SAF-T" set up.
 
@@ -83,7 +82,6 @@ codeunit 139511 "SAF-T Tests"
         // [SCENARIO 495176] "TransactionID" xml node contains the concatenated value of the "Posting Date" and "Document No." fields of the G/L Entry
         Initialize();
         GLEntry.DeleteAll();
-        ClearSourceCode();
 
         // [GIVEN] Audit File Export Format "SAF-T" set up.
 
@@ -128,7 +126,6 @@ codeunit 139511 "SAF-T Tests"
         VendorLedgerEntry.DeleteAll();
         SalesInvoiceHeader.DeleteAll();
         PurchInvHeader.DeleteAll();
-        ClearSourceCode();
 
         // [GIVEN] Audit File Export Format "SAF-T" set up.
 
@@ -175,7 +172,6 @@ codeunit 139511 "SAF-T Tests"
 
         Initialize();
         GLEntry.DeleteAll();
-        ClearSourceCode();
 
         SAFTTestsHelper.CreateGLAccMappingWithLine(GLAccountMappingLine);
 
@@ -231,7 +227,6 @@ codeunit 139511 "SAF-T Tests"
         Initialize();
         Vendor.DeleteAll();
         VendLedgEntry.DeleteAll();
-        ClearSourceCode();
 
         // [GIVEN] SAF-T Setup with "Starting Date" = 01.01.2023
         SAFTTestsHelper.CreateGLAccMappingWithLine(GLAccountMappingLine);
@@ -280,7 +275,6 @@ codeunit 139511 "SAF-T Tests"
         Initialize();
         Vendor.DeleteAll();
         VendLedgEntry.DeleteAll();
-        ClearSourceCode();
 
         // [GIVEN] SAF-T Setup with "Starting Date" = 01.01.2023
         SAFTTestsHelper.CreateGLAccMappingWithLine(GLAccountMappingLine);
@@ -332,7 +326,6 @@ codeunit 139511 "SAF-T Tests"
         Initialize();
         GLEntry.DeleteAll();
         BankAccLedgEntry.DeleteAll();
-        ClearSourceCode();
 
         // [GIVEN] Audit File Export Format "SAF-T" set up.
 
@@ -593,17 +586,6 @@ codeunit 139511 "SAF-T Tests"
         LibraryXPathXMLReader.VerifyNodeValueByXPathWithIndex('/AuditFile/SourceDocuments/Payments/Payment/Line/SupplierID', GenJournalLineVend."Account No.", 0);
         LibraryXPathXMLReader.VerifyNodeValueByXPathWithIndex('/AuditFile/SourceDocuments/Payments/Payment/Line/PaymentLineAmount/Amount', GetSAFTMonetaryDecimal(GenJournalLineVend.Amount), 1);
         LibraryXPathXMLReader.VerifyNodeValueByXPathWithIndex('/AuditFile/SourceDocuments/Payments/Payment/DocumentTotals/GrossTotal', GetSAFTMonetaryDecimal(GenJournalLineVend.Amount), 1);
-    end;
-
-    local procedure ClearSourceCode()
-    var
-        SourceCode: Record "Source Code";
-    begin
-        SourceCode.SetRange("Source Code SAF-T", '');
-        if SourceCode.IsEmpty() then
-            exit;
-
-        SourceCode.DeleteAll();
     end;
 
     [ConfirmHandler]
