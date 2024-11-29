@@ -50,11 +50,6 @@ codeunit 265 "Feature Key Management"
     begin
         exit(FeatureManagementFacade.IsEnabled(GetExtensibleExchangeRateAdjustmentFeatureKey()));
     end;
-
-    procedure IsExtensibleExchangeRateAdjustmentEnabled(AllowInsert: Boolean): Boolean
-    begin
-        exit(FeatureManagementFacade.IsEnabled(GetExtensibleExchangeRateAdjustmentFeatureKey(), AllowInsert));
-    end;
 #endif
 
 #if not CLEAN23
@@ -170,13 +165,6 @@ codeunit 265 "Feature Key Management"
                 FeatureTelemetry.LogUptake('0000JRA', ExtensibleInvoicePostingEngineLbl, Enum::"Feature Uptake Status"::Discovered);
             EU3PartyTradePurchaseTxt:
                 FeatureTelemetry.LogUptake('0000JRC', EU3PartyTradePurchaseTxt, Enum::"Feature Uptake Status"::Discovered);
-        end;
-#endif
-#if not CLEAN24
-        // Log feature uptake
-        case FeatureKey.ID of
-            GLCurrencyRevaluationTxt:
-                FeatureTelemetry.LogUptake('0000JRR', GLCurrencyRevaluationTxt, Enum::"Feature Uptake Status"::Discovered);
         end;
 #endif
     end;
