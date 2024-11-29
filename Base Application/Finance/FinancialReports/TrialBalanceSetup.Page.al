@@ -23,7 +23,6 @@ page 1394 "Trial Balance Setup"
             }
             group(General)
             {
-                Caption = 'General';
                 field("Account Schedule Name"; Rec."Account Schedule Name")
                 {
                     ApplicationArea = All;
