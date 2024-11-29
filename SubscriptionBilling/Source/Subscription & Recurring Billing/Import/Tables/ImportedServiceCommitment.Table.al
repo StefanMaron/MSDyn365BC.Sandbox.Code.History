@@ -2,7 +2,7 @@ namespace Microsoft.SubscriptionBilling;
 
 using Microsoft.Inventory.Item;
 using Microsoft.Finance.Currency;
-using System.Security.User;
+using System.Security.AccessControl;
 
 table 8009 "Imported Service Commitment"
 {
@@ -213,7 +213,7 @@ table 8009 "Imported Service Commitment"
         {
             Caption = 'Processed by';
             DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "User Setup";
+            TableRelation = User."User Name";
             Editable = false;
             ValidateTableRelation = false;
         }

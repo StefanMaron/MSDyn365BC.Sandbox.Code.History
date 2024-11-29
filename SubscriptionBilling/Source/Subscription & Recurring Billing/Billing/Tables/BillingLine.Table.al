@@ -1,5 +1,6 @@
 namespace Microsoft.SubscriptionBilling;
 
+using System.Security.AccessControl;
 using Microsoft.Utilities;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
@@ -8,7 +9,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Finance.Currency;
-using System.Security.User;
 
 table 8061 "Billing Line"
 {
@@ -30,7 +30,7 @@ table 8061 "Billing Line"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
-            TableRelation = "User Setup";
+            TableRelation = User."User Name";
         }
         field(10; "Partner No."; Code[20])
         {
