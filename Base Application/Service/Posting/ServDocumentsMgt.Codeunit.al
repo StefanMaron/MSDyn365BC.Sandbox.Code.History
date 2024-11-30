@@ -267,7 +267,6 @@ codeunit 5988 "Serv-Documents Mgt."
                     if Ship and (ServLine."Qty. to Ship" <> 0) or Invoice and (ServLine."Qty. to Invoice" <> 0) then
                         ServOrderMgt.CheckServItemRepairStatus(ServHeader, ServItemLine, ServLine);
 
-                OnPostDocumentLinesOnAfterCheckServItemRepairStatus(ServLine);
                 ServLineOld := ServLine;
                 if ServLine."Spare Part Action" in
                    [ServLine."Spare Part Action"::"Component Replaced",
@@ -440,15 +439,11 @@ codeunit 5988 "Serv-Documents Mgt."
                 else begin
                     BiggestLineNo := ServAmountsMgt.MAX(ServAmountsMgt.GetLastLineNo(ServLine), ServLine."Line No.");
                     LastLineRetrieved := ServLine.Next() = 0;
-
                     // ServLine
-                    IsHandled := false;
-                    OnPostDocumentLinesOnBeforeInvoiceRounding(ServHeader, ServLine, TotalServiceLine, ServAmountsMgt, LastLineRetrieved, BiggestLineNo, IsHandled);
-                    if not IsHandled then
-                        if LastLineRetrieved and SalesSetup."Invoice Rounding" then
-                            ServAmountsMgt.InvoiceRounding(ServHeader, ServLine, TotalServiceLine,
-                              LastLineRetrieved, false, BiggestLineNo);
-                end;
+                    if LastLineRetrieved and SalesSetup."Invoice Rounding" then
+                        ServAmountsMgt.InvoiceRounding(ServHeader, ServLine, TotalServiceLine,
+                          LastLineRetrieved, false, BiggestLineNo);
+                end; // With ServLine
                 ErrorMessageMgt.PopContext(ErrorContextElementPostLine);
             until LastLineRetrieved;
 
@@ -523,25 +518,22 @@ codeunit 5988 "Serv-Documents Mgt."
             end;
 #endif
             // post Balancing account
-            IsHandled := false;
-            OnPostDocumentLinesOnBeforePostBalancingEntry(ServHeader, ServLine, TotalServiceLine, ServPostingJnlsMgt, GenJnlLineDocType, GenJnlLineDocNo, GenJnlLineExtDocNo, InvoicePostingInterface, Window, IsHandled);
-            if not IsHandled then
-                if ServHeader."Bal. Account No." <> '' then begin
-                    Window.Update(5, 1);
+            if ServHeader."Bal. Account No." <> '' then begin
+                Window.Update(5, 1);
 #if not CLEAN23
-                    if UseLegacyInvoicePosting() then begin
-                        ServPostingJnlsMgt.SetPostingDate(ServHeader."Posting Date");
-                        ServPostingJnlsMgt.PostBalancingEntry(
-                            TotalServiceLine, TotalServiceLineLCY, GenJnlLineDocType.AsInteger(), GenJnlLineDocNo, GenJnlLineExtDocNo);
-                    end else begin
+                if UseLegacyInvoicePosting() then begin
+                    ServPostingJnlsMgt.SetPostingDate(ServHeader."Posting Date");
+                    ServPostingJnlsMgt.PostBalancingEntry(
+                        TotalServiceLine, TotalServiceLineLCY, GenJnlLineDocType.AsInteger(), GenJnlLineDocNo, GenJnlLineExtDocNo);
+                end else begin
 #endif
-                        InvoicePostingInterface.SetParameters(InvoicePostingParameters);
-                        InvoicePostingInterface.SetTotalLines(TotalServiceLine, TotalServiceLineLCY);
-                        ServPostingJnlsMgt.PostBalancingEntry(ServHeader, InvoicePostingInterface);
+                    InvoicePostingInterface.SetParameters(InvoicePostingParameters);
+                    InvoicePostingInterface.SetTotalLines(TotalServiceLine, TotalServiceLineLCY);
+                    ServPostingJnlsMgt.PostBalancingEntry(ServHeader, InvoicePostingInterface);
 #if not CLEAN23
-                    end;
-#endif
                 end;
+#endif
+            end;
         end;
 
         MakeInvtAdjustment();
@@ -1208,7 +1200,6 @@ codeunit 5988 "Serv-Documents Mgt."
             if ServShptItemLine.Find('-') then
                 repeat
                     ServiceShipmentItemLine2.Init();
-                    OnFinalizeShipmentDocumentOnBeforeCopyServiceShipmentItemLine(ServShptItemLine);
                     ServiceShipmentItemLine2.Copy(ServShptItemLine);
                     ServiceShipmentItemLine2.Insert();
                 until ServShptItemLine.Next() = 0;
@@ -1587,28 +1578,22 @@ codeunit 5988 "Serv-Documents Mgt."
     end;
 
     procedure CheckAndBlankQtys(ServDocType: Integer)
-    var
-        SkipCheckContractNoAndShipmentNo: Boolean;
-        SkipCheckUnitOfMeasureCode: Boolean;
     begin
         ServLine.Reset();
         OnCheckAndBlankQtysOnAfterServLineSetFilters(ServLine);
         if ServLine.Find('-') then
             repeat
-                SkipCheckContractNoAndShipmentNo := false;
-                SkipCheckUnitOfMeasureCode := false;
-                OnCheckAndBlankQtysOnBeforeCheckServLine(ServLine, SkipCheckContractNoAndShipmentNo, SkipCheckUnitOfMeasureCode);
+                OnCheckAndBlankQtysOnBeforeCheckServLine(ServLine);
                 // Service Charge line should not be tested.
-                if (ServLine.Type <> ServLine.Type::" ") and not ServLine."System-Created Entry" and not SkipCheckContractNoAndShipmentNo then begin
+                if (ServLine.Type <> ServLine.Type::" ") and not ServLine."System-Created Entry" then begin
                     if ServDocType = Database::"Service Contract Header" then
                         ServLine.TestField("Contract No.");
                     if ServDocType = Database::"Service Header" then
                         ServLine.TestField("Shipment No.");
                 end;
 
-                if not SkipCheckUnitOfMeasureCode then
-                    if (ServLine.Type = ServLine.Type::Item) and (ServLine."No." <> '') and (ServLine."Qty. Shipped (Base)" = 0) and (ServLine."Qty. Consumed (Base)" = 0) then
-                        ServLine.TestField("Unit of Measure Code");
+                if (ServLine.Type = ServLine.Type::Item) and (ServLine."No." <> '') and (ServLine."Qty. Shipped (Base)" = 0) and (ServLine."Qty. Consumed (Base)" = 0) then
+                    ServLine.TestField("Unit of Measure Code");
 
                 if ServLine."Qty. per Unit of Measure" = 0 then
                     ServLine."Qty. per Unit of Measure" := 1;
@@ -1742,7 +1727,7 @@ codeunit 5988 "Serv-Documents Mgt."
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSetNoSeries(ServHeader, Invoice, Consume, Result, IsHandled, PServHeader, Ship);
+        OnBeforeSetNoSeries(ServHeader, Invoice, Consume, Result, IsHandled);
         if IsHandled then
             exit(Result);
 
@@ -2688,7 +2673,7 @@ codeunit 5988 "Serv-Documents Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCheckAndBlankQtysOnBeforeCheckServLine(var ServiceLine: Record "Service Line"; var SkipCheckContractNoAndShipmentNo: Boolean; var SkipCheckUnitOfMeasureCode: Boolean)
+    local procedure OnCheckAndBlankQtysOnBeforeCheckServLine(var ServiceLine: Record "Service Line")
     begin
     end;
 
@@ -2841,7 +2826,7 @@ codeunit 5988 "Serv-Documents Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetNoSeries(var ServHeader: Record "Service Header" temporary; Invoice: Boolean; Consume: Boolean; var Result: Boolean; var IsHandled: Boolean; var PServiceHeader: Record "Service Header"; Ship: Boolean)
+    local procedure OnBeforeSetNoSeries(var ServHeader: Record "Service Header" temporary; Invoice: Boolean; Consume: Boolean; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -2952,26 +2937,6 @@ codeunit 5988 "Serv-Documents Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnFinalizeShipmentDocumentOnAfterInserServiceShipmentLine(var ServiceShipmentLine2: Record "Service Shipment Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFinalizeShipmentDocumentOnBeforeCopyServiceShipmentItemLine(var ServiceShipmentItemLine: Record "Service Shipment Item Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDocumentLinesOnAfterCheckServItemRepairStatus(var ServiceLine: Record "Service Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDocumentLinesOnBeforePostBalancingEntry(ServiceHeader: Record "Service Header"; ServiceLine: Record "Service Line"; var TotalServiceLine: Record "Service Line"; var ServPostingJournalsMgt: Codeunit "Serv-Posting Journals Mgt."; GenJnlLineDocType: Enum "Gen. Journal Document Type"; GenJnlLineDocNo: Code[20]; GenJnlLineExtDocNo: Code[35]; var InvoicePostingInterface: Interface "Invoice Posting"; var Window: Dialog; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDocumentLinesOnBeforeInvoiceRounding(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var TotalServiceLine: Record "Service Line"; var ServAmountsMgt: Codeunit "Serv-Amounts Mgt."; var LastLineRetrieved: Boolean; BiggestLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
