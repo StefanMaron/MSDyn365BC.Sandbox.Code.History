@@ -239,19 +239,11 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
 
     procedure BuildBankRecStatementLines(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary): Text
     var
-        GLAccount: Record "G/L Account";
         BankRecAIMatchingImpl: Codeunit "Bank Rec. AI Matching Impl.";
         LocalStatementLines: Text;
-        InitialGLAccountFound: Boolean;
-        InitialGLAccountInsertDone: Boolean;
     begin
         if (LocalStatementLines = '') then
             LocalStatementLines := '**Statement Lines**:\n"""\n';
-
-        GLAccount.SetRange("Direct Posting", true);
-        if GLAccount.FindFirst() then
-            if not BankRecAIMatchingImpl.HasReservedWords(GLAccount.Name) then
-                InitialGLAccountFound := true;
 
         BankAccReconciliationLine.Ascending(true);
         if BankAccReconciliationLine.FindSet() then
@@ -260,15 +252,6 @@ codeunit 7251 "Bank Acc. Rec. Trans. to Acc."
                     TempBankStatementMatchingBuffer.Reset();
                     TempBankStatementMatchingBuffer.SetRange("Line No.", BankAccReconciliationLine."Statement Line No.");
                     if TempBankStatementMatchingBuffer.IsEmpty() then begin
-                        if InitialGLAccountFound then
-                            if not InitialGLAccountInsertDone then begin
-                                if BankAccReconciliationLine."Statement Line No." > 1 then begin
-                                    LocalStatementLines += '#Id: ' + Format(BankAccReconciliationLine."Statement Line No." - 1);
-                                    LocalStatementLines += ', Description: ' + GLAccount.Name;
-                                    LocalStatementLines += '\n';
-                                end;
-                                InitialGLAccountInsertDone := true;
-                            end;
                         LocalStatementLines += '#Id: ' + Format(BankAccReconciliationLine."Statement Line No.");
                         LocalStatementLines += ', Description: ' + BankAccReconciliationLine.Description;
                         LocalStatementLines += '\n';
