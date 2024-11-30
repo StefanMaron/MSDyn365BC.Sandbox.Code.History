@@ -756,7 +756,7 @@ table 5990 "Service Shipment Header"
         field(9001; "Quote No."; Code[20])
         {
             Caption = 'Quote No.';
-        }
+        }	
         field(11790; "Registration No."; Text[20])
         {
             Caption = 'Registration No.';
@@ -890,15 +890,8 @@ table 5990 "Service Shipment Header"
     procedure PrintRecords(ShowRequestForm: Boolean)
     var
         ReportSelection: Record "Report Selections";
-        IsHandled: Boolean;
     begin
         ServShptHeader.Copy(Rec);
-
-        IsHandled := false;
-        OnBeforePrintRecords(ServShptHeader, ShowRequestForm, IsHandled);
-        if IsHandled then
-            exit;
-
         ReportSelection.PrintWithDialogForCust(
           ReportSelection.Usage::"SM.Shipment", ServShptHeader, ShowRequestForm, ServShptHeader.FieldNo("Bill-to Customer No."));
     end;
@@ -937,11 +930,6 @@ table 5990 "Service Shipment Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetSecurityFilterOnRespCenter(var ServiceShipmentHeader: Record "Service Shipment Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePrintRecords(var ServiceShipmentHeader: Record "Service Shipment Header"; ShowRequestForm: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
