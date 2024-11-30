@@ -51,6 +51,7 @@ codeunit 9109 "SharePoint Request Helper"
         OperationResponse := SendRequest(PrepareRequestMsg("Http Request Type"::DELETE, SharePointUriBuilder));
     end;
 
+    [NonDebuggable]
     local procedure PrepareRequestMsg(HttpRequestType: Enum "Http Request Type"; SharePointUriBuilder: Codeunit "SharePoint Uri Builder") RequestMessage: HttpRequestMessage
     var
         Headers: HttpHeaders;
@@ -62,6 +63,7 @@ codeunit 9109 "SharePoint Request Helper"
         Headers.Add('User-Agent', GetUserAgentString());
     end;
 
+    [NonDebuggable]
     local procedure PrepareRequestMsg(HttpRequestType: Enum "Http Request Type"; SharePointUriBuilder: Codeunit "SharePoint Uri Builder"; SharePointHttpContent: Codeunit "SharePoint Http Content") RequestMessage: HttpRequestMessage
     var
         Headers: HttpHeaders;
@@ -97,6 +99,7 @@ codeunit 9109 "SharePoint Request Helper"
         end;
     end;
 
+    [NonDebuggable]
     local procedure SendRequest(HttpRequestMessage: HttpRequestMessage) OperationResponse: Codeunit "SharePoint Operation Response"
     var
         HttpResponseMessage: HttpResponseMessage;
