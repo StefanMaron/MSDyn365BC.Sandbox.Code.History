@@ -76,7 +76,6 @@ codeunit 7231 "Integration Master Data Synch."
         TableFilter: Text;
         FilterList: List of [Text];
         IsHandled: Boolean;
-        SourceCompanyName: Text[30];
     begin
         OnFindModifiedIntegrationRecords(TempIntegrationRecordRef, IntegrationTableMapping, FailedNotSkippedIdDictionary, IsHandled);
         if IsHandled then
@@ -85,10 +84,7 @@ codeunit 7231 "Integration Master Data Synch."
         MasterDataManagementSetup.Get();
         SplitIntegrationTableFilter(IntegrationTableMapping, FilterList);
         IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-        MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+        IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         foreach TableFilter in FilterList do begin
             IntegrationTableMapping.SetIntRecordRefFilter(IntegrationRecordRef, TableFilter);
             if IntegrationRecordRef.FindSet() then
@@ -161,14 +157,12 @@ codeunit 7231 "Integration Master Data Synch."
     var
         MasterDataManagementSetup: Record "Master Data Management Setup";
         IntegrationRecordSynch: Codeunit "Integration Record Synch.";
-        MasterDataManagement: Codeunit "Master Data Management";
         IntegrationRecordRef: RecordRef;
         IntegrationableView: Text;
         IntegrationSystemIDFilter: Text;
         Found: Boolean;
         IsHandled: Boolean;
         IntegrationSystemIDFilterList: List of [Text];
-        SourceCompanyName: Text[30];
     begin
         OnFindFailedNotSkippedIntegrationRecords(TempIntegrationRecordRef, IntegrationTableMapping, TempMasterDataMgtCoupling, IntegrationSystemIDDictionary, Found, IsHandled);
         if (IsHandled) then
@@ -177,10 +171,7 @@ codeunit 7231 "Integration Master Data Synch."
         MasterDataManagementSetup.Get();
         IntegrationableView := IntegrationTableMapping.GetIntegrationTableFilter();
         IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-        MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+        IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         IntegrationRecordRef.SetView(IntegrationableView);
         IntegrationSystemIDFilter := IntegrationRecordRef.Field(IntegrationTableMapping."Integration Table UID Fld. No.").GetFilter();
         IntegrationRecordRef.Close();
@@ -207,12 +198,10 @@ codeunit 7231 "Integration Master Data Synch."
     local procedure CacheFilteredIntegrationRecords(var IntegrationSystemIDFilterList: List of [Text]; IntegrationTableMapping: Record "Integration Table Mapping"; var TempIntegrationRecordRef: RecordRef): Boolean
     var
         MasterDataManagementSetup: Record "Master Data Management Setup";
-        MasterDataManagement: Codeunit "Master Data Management";
         IntegrationRecordRef: RecordRef;
         IntegrationSystemIDFilter: Text;
         Cached: Boolean;
         IsHandled: Boolean;
-        SourceCompanyName: Text[30];
     begin
         OnCacheFilteredIntegrationRecords(IntegrationSystemIDFilterList, IntegrationTableMapping, TempIntegrationRecordRef, Cached, IsHandled);
         if (IsHandled) then
@@ -222,10 +211,7 @@ codeunit 7231 "Integration Master Data Synch."
         foreach IntegrationSystemIDFilter in IntegrationSystemIDFilterList do
             if IntegrationSystemIDFilter <> '' then begin
                 IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-                MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-                if SourceCompanyName = '' then
-                    SourceCompanyName := MasterDataManagementSetup."Company Name";
-                IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+                IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
                 IntegrationRecordRef.Field(IntegrationTableMapping."Integration Table UID Fld. No.").SetFilter(IntegrationSystemIDFilter);
                 if IntegrationRecordRef.FindSet() then
                     repeat
@@ -260,7 +246,6 @@ codeunit 7231 "Integration Master Data Synch."
         RecordID: RecordID;
         IntegrationSystemID: Guid;
         IsHandled: Boolean;
-        SourceCompanyName: Text[30];
     begin
         case GetSourceType(SourceID) of
             SupportedSourceType::RecordID:
@@ -282,13 +267,9 @@ codeunit 7231 "Integration Master Data Synch."
                     MasterDataManagement.OnGetIntegrationRecordRefBySystemId(IntegrationTableMapping, RecordRef, IntegrationSystemID, IsHandled);
                     if not IsHandled then begin
                         MasterDataManagementSetup.Get();
-                        MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-                        if SourceCompanyName = '' then
-                            SourceCompanyName := MasterDataManagementSetup."Company Name";
-                        RecordRef.Open(IntegrationTableMapping."Integration Table ID");
-                        RecordRef.ChangeCompany(SourceCompanyName);
+                        RecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
                         if not RecordRef.GetBySystemId(IntegrationSystemID) then
-                            exit(false);
+                            Error(RecordNotFoundErr, IntegrationTableMapping.GetExtendedIntegrationTableCaption(), IntegrationSystemID);
                     end;
                     exit(IntegrationTableMapping.FindFilteredRec(RecordRef, OutOfMapFilter));
                 end;
