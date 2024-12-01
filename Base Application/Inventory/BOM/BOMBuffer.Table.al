@@ -1079,7 +1079,7 @@ table 5870 "BOM Buffer"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeIsLowLevelOk(Rec, Result, IsHandled, LogWarning, BOMWarningLog);
+        OnBeforeIsLowLevelOk(Rec, Result, IsHandled);
         if IsHandled then
             exit(Result);
 
@@ -1227,7 +1227,7 @@ table 5870 "BOM Buffer"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeIsBOMOk(Rec, Result, IsHandled, LogWarning, BOMWarningLog);
+        OnBeforeIsBOMOk(Rec, Result, IsHandled);
         if IsHandled then
             exit(Result);
 
@@ -1359,12 +1359,12 @@ table 5870 "BOM Buffer"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsBOMOk(var BOMBuffer: Record "BOM Buffer"; var Result: Boolean; var IsHandled: Boolean; var LogWarning: Boolean; var BOMWarningLog: Record "BOM Warning Log")
+    local procedure OnBeforeIsBOMOk(var BOMBuffer: Record "BOM Buffer"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsLowLevelOk(var BOMBuffer: Record "BOM Buffer"; var Result: Boolean; var IsHandled: Boolean; var LogWarning: Boolean; var BOMWarningLog: Record "BOM Warning Log")
+    local procedure OnBeforeIsLowLevelOk(var BOMBuffer: Record "BOM Buffer"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 

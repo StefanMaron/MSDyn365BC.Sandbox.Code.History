@@ -1606,7 +1606,7 @@ table 37 "Sales Line"
                     end;
 
                 IsHandled := false;
-                OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(Rec, VATPostingSetup, IsHandled, xRec, SalesHeader);
+                OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(Rec, VATPostingSetup, IsHandled);
                 if not IsHandled then
                     if SalesHeader."Prices Including VAT" and (Type in [Type::Item, Type::Resource]) then
                         Validate("Unit Price",
@@ -4035,13 +4035,7 @@ table 37 "Sales Line"
     procedure CalcShipmentDateForLocation()
     var
         CustomCalendarChange: array[2] of Record "Customized Calendar Change";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCalcShipmentDateForLocation(Rec, xRec, IsHandled);
-        if IsHandled then
-            exit;
-
         CustomCalendarChange[1].SetSource(CalChange."Source Type"::Location, "Location Code", '', '');
         "Shipment Date" := CalendarMgmt.CalcDateBOC('', SalesHeader."Shipment Date", CustomCalendarChange, false);
     end;
@@ -5622,12 +5616,8 @@ table 37 "Sales Line"
     var
         ItemListPage: Page "Item List";
         SelectionFilter: Text;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeSelectMultipleItems(Rec, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeSelectMultipleItems(Rec);
 
         if IsCreditDocType() then
             SelectionFilter := ItemListPage.SelectActiveItems()
@@ -6272,7 +6262,6 @@ table 37 "Sales Line"
                             if not SalesLine."Prepayment Line" then
                                 SalesLine.UpdatePrepmtAmounts();
                             UpdateBaseAmounts(NewAmount, Round(NewAmountIncludingVAT, Currency."Amount Rounding Precision"), NewVATBaseAmount);
-                            OnUpdateVATOnLinesOnAfterUpdateBaseAmounts(SalesHeader, SalesLine, TempVATAmountLineRemainder, VATAmountLine, Currency);
                         end;
                         SalesLine.InitOutstanding();
                         if SalesLine.Type = SalesLine.Type::"Charge (Item)" then
@@ -6337,7 +6326,6 @@ table 37 "Sales Line"
         if SalesLine.FindSet() then
             repeat
                 if not SalesLine.ZeroAmountLine(QtyType) then begin
-                    OnCalcVATAmountLinesOnBeforeProcessSalesLine(SalesLine);
                     if (SalesLine.Type = SalesLine.Type::"G/L Account") and not SalesLine."Prepayment Line" and SalesLine."System-Created Entry" and not RoundingLineInserted then
                         RoundingLineInserted := (SalesLine."No." = SalesLine.GetCPGInvRoundAcc(SalesHeader));
                     if SalesLine."VAT Calculation Type" in
@@ -6346,11 +6334,9 @@ table 37 "Sales Line"
                         SalesLine."VAT %" := 0;
                     if not VATAmountLine.Get(
                          SalesLine."VAT Identifier", SalesLine."VAT Calculation Type", SalesLine."Tax Group Code", SalesLine."Tax Area Code", false, SalesLine."Line Amount" >= 0)
-                    then begin
+                    then
                         VATAmountLine.InsertNewLine(
                           SalesLine."VAT Identifier", SalesLine."VAT Calculation Type", SalesLine."Tax Group Code", SalesLine."Tax Area Code", false, SalesLine."VAT %", SalesLine."Line Amount" >= 0, false, 0);
-		    	        OnCalcVATAmountLinesOnAfterInsertNewVATAmountLine(SalesLine, VATAmountLine);
-                    end;
 
                     OnCalcVATAmountLinesOnBeforeQtyTypeCase(VATAmountLine, SalesLine, SalesHeader);
                     case QtyType of
@@ -8182,7 +8168,6 @@ table 37 "Sales Line"
             "VAT %" := Round(100 * VATAmount / BaseAmount, 0.00001)
         else
             "VAT %" := 0;
-        OnAfterUpdateVATPercent(Rec);
     end;
 
     procedure ShowDeferrals(PostingDate: Date; CurrencyCode: Code[10]) ReturnValue: Boolean
@@ -8475,10 +8460,8 @@ table 37 "Sales Line"
         Currency2: Record Currency;
     begin
         Currency2.InitRoundingPrecision();
-        if Rec."VAT Calculation Type" = Rec."VAT Calculation Type"::"Full VAT" then
-            Rec."Shipped Not Inv. (LCY) No VAT" := 0
-        else
-            Rec."Shipped Not Inv. (LCY) No VAT" := Round("Shipped Not Invoiced (LCY)" / (1 + "VAT %" / 100), Currency2."Amount Rounding Precision");
+        "Shipped Not Inv. (LCY) No VAT" :=
+          Round("Shipped Not Invoiced (LCY)" / (1 + "VAT %" / 100), Currency2."Amount Rounding Precision");
     end;
 
     procedure ClearSalesHeader()
@@ -8839,8 +8822,7 @@ table 37 "Sales Line"
     begin
         ItemTempl.Get(NonstockItem."Item Templ. Code");
         ItemTempl.TestField("Gen. Prod. Posting Group");
-        if ItemTempl.Type = ItemTempl.Type::Inventory then
-            ItemTempl.TestField("Inventory Posting Group");
+        ItemTempl.TestField("Inventory Posting Group");
     end;
 
     local procedure CheckQuoteCustomerTemplateCode(SalesHeader: Record "Sales Header")
@@ -9476,11 +9458,6 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateVATPercent(var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnUpdateUnitPriceByFieldOnBeforeValidateUnitPrice(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; CalledByFieldNo: Integer; CurrFieldNo: Integer; var Handled: Boolean)
     begin
     end;
@@ -9701,7 +9678,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSelectMultipleItems(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnBeforeSelectMultipleItems(var SalesLine: Record "Sales Line")
     begin
     end;
 
@@ -10261,7 +10238,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(var SalesLine: Record "Sales Line"; VATPostingSetup: Record "VAT Posting Setup"; var IsHandled: Boolean; xSalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header")
+    local procedure OnValidateVATProdPostingGroupOnBeforeUpdateUnitPrice(var SalesLine: Record "Sales Line"; VATPostingSetup: Record "VAT Posting Setup"; var IsHandled: Boolean)
     begin
     end;
 
@@ -11170,26 +11147,6 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckLocationOnWMSOnBeforeCaseDocumentType(var SalesLine: Record "Sales Line"; DialogText: Text; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcVATAmountLinesOnBeforeProcessSalesLine(var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcVATAmountLinesOnAfterInsertNewVATAmountLine(var SalesLine: Record "Sales Line"; var VATAmountLine: Record "VAT Amount Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateVATOnLinesOnAfterUpdateBaseAmounts(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempVATAmountLine: Record "VAT Amount Line" temporary; var VATAmountLine: Record "VAT Amount Line"; Currency: Record Currency)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcShipmentDateForLocation(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 }
