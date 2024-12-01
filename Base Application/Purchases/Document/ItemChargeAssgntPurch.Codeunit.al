@@ -371,7 +371,7 @@ codeunit 5805 "Item Charge Assgnt. (Purch.)"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeAssignItemCharges(PurchLine, TotalQtyToAssign, TotalAmtToAssign, IsHandled, TotalQtyToHandle, TotalAmtToHandle, SelectionTxt);
+        OnBeforeAssignItemCharges(PurchLine, TotalQtyToAssign, TotalAmtToAssign, IsHandled);
         if IsHandled then
             exit;
 
@@ -739,7 +739,6 @@ codeunit 5805 "Item Charge Assgnt. (Purch.)"
 
             Clear(DecimalArray);
             case TempItemChargeAssgntPurch."Applies-to Doc. Type" of
-                TempItemChargeAssgntPurch."Applies-to Doc. Type"::Quote,
                 TempItemChargeAssgntPurch."Applies-to Doc. Type"::Order,
                 TempItemChargeAssgntPurch."Applies-to Doc. Type"::Invoice,
                 TempItemChargeAssgntPurch."Applies-to Doc. Type"::"Return Order",
@@ -949,7 +948,7 @@ codeunit 5805 "Item Charge Assgnt. (Purch.)"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeAssignItemCharges(var PurchaseLine: Record "Purchase Line"; TotalQtyToAssign: Decimal; TotalAmtToAssign: Decimal; var IsHandled: Boolean; TotalQtyToHandle: Decimal; TotalAmtToHandle: Decimal; SelectionTxt: Text)
+    local procedure OnBeforeAssignItemCharges(var PurchaseLine: Record "Purchase Line"; TotalQtyToAssign: Decimal; TotalAmtToAssign: Decimal; var IsHandled: Boolean)
     begin
     end;
 
