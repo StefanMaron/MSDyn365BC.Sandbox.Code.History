@@ -110,7 +110,6 @@ report 722 "Phys. Inventory List"
                     column(QtyCalculated_ItemJnlLin; "Qty. (Calculated)")
                     {
                         IncludeCaption = true;
-                        AutoFormatType = 1;
                     }
                     column(BinCode_ItemJournalLine; "Bin Code")
                     {
