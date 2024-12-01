@@ -104,6 +104,7 @@ codeunit 7237 "Master Data Mgt. Subscribers"
     [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', false, false)]
     local procedure CleanupSetupAfterCreatedNewCompanyByCopyCompany(NewCompanyName: Text[30])
     var
+        MasterDataMgtSubscriber: Record "Master Data Mgt. Subscriber";
         MasterDataMgtCoupling: Record "Master Data Mgt. Coupling";
         MasterDataManagementSetup: Record "Master Data Management Setup";
     begin
@@ -111,6 +112,8 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         MasterDataMgtCoupling.DeleteAll();
         MasterDataManagementSetup.ChangeCompany(NewCompanyName);
         MasterDataManagementSetup.DeleteAll();
+        MasterDataMgtSubscriber.ChangeCompany(NewCompanyName);
+        MasterDataMgtSubscriber.DeleteAll();
     end;
 
     internal procedure HandleOnFindingIfJobNeedsToBeRun(var Sender: Record "Job Queue Entry"; var Result: Boolean)
@@ -120,6 +123,7 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         MasterDataManagement: Codeunit "Master Data Management";
         RecRef: RecordRef;
         IsHandled: Boolean;
+        SourceCompanyName: Text[30];
     begin
         if Result then
             exit;
@@ -130,7 +134,10 @@ codeunit 7237 "Master Data Mgt. Subscribers"
                 MasterDataManagement.OnSetIntegrationTableFilter(IntegrationTableMapping, RecRef, IsHandled);
                 if not IsHandled then begin
                     RecRef.Open(IntegrationTableMapping."Integration Table ID", false);
-                    RecRef.ChangeCOmpany(MasterDataManagementSetup."Company Name");
+                    MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
+                    if SourceCompanyName = '' then
+                        SourceCompanyName := MasterDataManagementSetup."Company Name";
+                    RecRef.ChangeCompany(SourceCompanyName);
                     IntegrationTableMapping.SetIntRecordRefFilter(RecRef);
                 end;
                 if not RecRef.IsEmpty() then
@@ -187,6 +194,7 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         MasterDataManagement: Codeunit "Master Data Management";
         PageManagement: Codeunit "Page Management";
         RecRef: RecordRef;
+        SourceCompanyName: Text[30];
     begin
         if not MasterDataManagement.IsEnabled() then
             exit;
@@ -198,7 +206,10 @@ codeunit 7237 "Master Data Mgt. Subscribers"
             exit;
 
         RecRef.Open(RecordId.TableNo);
-        RecRef.ChangeCompany(MasterDataManagementSetup."Company Name");
+        MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, RecordId.TableNo);
+        if SourceCompanyName = '' then
+            SourceCompanyName := MasterDataManagementSetup."Company Name";
+        RecRef.ChangeCompany(SourceCompanyName);
         IsHandled := RecRef.Get(RecordId);
         PageManagement.PageRun(RecRef);
     end;
@@ -380,6 +391,7 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         MasterDataManagement: Codeunit "Master Data Management";
         BeforeRenameDestinationRecordRef: RecordRef;
         IsHandled: Boolean;
+        SourceCompanyName: Text[30];
     begin
         if not MasterDataManagement.IsEnabled() then
             exit;
@@ -390,7 +402,10 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         MasterDataManagementSetup.Get();
         MasterDataManagement.OnGetIntegrationRecordRef(IntegrationTableMapping, SourceRecordRef, IsHandled);
         if not IsHandled then begin
-            SourceRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
+            MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Table ID");
+            if SourceCompanyName = '' then
+                SourceCompanyName := MasterDataManagementSetup."Company Name";
+            SourceRecordRef.ChangeCompany(SourceCompanyName);
             SourceRecordRef.GetBySystemId(SourceRecordRef.Field(SourceRecordRef.SystemIdNo()).Value());
         end;
         BeforeRenameDestinationRecordRef.Open(DestinationRecordRef.Number());
@@ -547,13 +562,17 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         ModifiedFieldRef: FieldRef;
         IsHandled: Boolean;
         IntRecSystemId: Guid;
+        SourceCompanyName: Text[30];
     begin
         MasterDataManagementSetup.Get();
         IntegrationRecordRef.Open(FromRecordRef.Number, false);
         IntRecSystemId := FromRecordRef.Field(FromRecordRef.SystemIdNo).Value();
         MasterDataManagement.OnGetIntegrationRecordRefBySystemId(IntegrationTableMapping, IntegrationRecordRef, IntRecSystemId, IsHandled);
         if not IsHandled then begin
-            IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
+            MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Table ID");
+            if SourceCompanyName = '' then
+                SourceCompanyName := MasterDataManagementSetup."Company Name";
+            IntegrationRecordRef.ChangeCompany(SourceCompanyName);
             IntegrationRecordRef.GetBySystemId(IntRecSystemId);
         end;
         if FromRecordRef.Number() = IntegrationTableMapping."Integration Table ID" then begin
@@ -570,10 +589,11 @@ codeunit 7237 "Master Data Mgt. Subscribers"
     var
         MasterDataManagementSetup: Record "Master Data Management Setup";
         ContactBusinessRelation: Record "Contact Business Relation";
-        Company: Record COmpany;
+        Company: Record Company;
         LocalContact: Record Contact;
         IntegrationTableMapping: Record "Integration Table Mapping";
         MasterDataManagement: Codeunit "Master Data Management";
+        SourceCompanyName: Text[30];
     begin
         if not MasterDataManagement.IsEnabled() then
             exit;
@@ -581,7 +601,11 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         if not MasterDataManagementSetup.Get() then
             exit;
 
-        if not Company.Get(MasterDataManagementSetup."Company Name") then
+        MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, Database::Contact);
+        if SourceCompanyName = '' then
+            SourceCompanyName := MasterDataManagementSetup."Company Name";
+
+        if not Company.Get(SourceCompanyName) then
             exit;
 
         IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::"Master Data Management");
@@ -592,7 +616,7 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         if IntegrationTableMapping.IsEmpty() then
             exit;
 
-        if not ContactBusinessRelation.ChangeCompany(MasterDataManagementSetup."Company Name") then
+        if not ContactBusinessRelation.ChangeCompany(SourceCompanyName) then
             exit;
 
         ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
@@ -614,6 +638,7 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         LocalContact: Record Contact;
         IntegrationTableMapping: Record "Integration Table Mapping";
         MasterDataManagement: Codeunit "Master Data Management";
+        SourceCompanyName: Text[30];
     begin
         if not MasterDataManagement.IsEnabled() then
             exit;
@@ -621,7 +646,11 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         if not MasterDataManagementSetup.Get() then
             exit;
 
-        if not Company.Get(MasterDataManagementSetup."Company Name") then
+        MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, Database::Contact);
+        if SourceCompanyName = '' then
+            SourceCompanyName := MasterDataManagementSetup."Company Name";
+
+        if not Company.Get(SourceCompanyName) then
             exit;
 
         IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::"Master Data Management");
@@ -632,7 +661,7 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         if IntegrationTableMapping.IsEmpty() then
             exit;
 
-        if not ContactBusinessRelation.ChangeCompany(MasterDataManagementSetup."Company Name") then
+        if not ContactBusinessRelation.ChangeCompany(SourceCompanyName) then
             exit;
 
         ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Vendor);
@@ -654,6 +683,7 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         LocalContact: Record Contact;
         IntegrationTableMapping: Record "Integration Table Mapping";
         MasterDataManagement: Codeunit "Master Data Management";
+        SourceCompanyName: Text[30];
     begin
         if not MasterDataManagement.IsEnabled() then
             exit;
@@ -661,7 +691,11 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         if not MasterDataManagementSetup.Get() then
             exit;
 
-        if not Company.Get(MasterDataManagementSetup."Company Name") then
+        MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, Database::Contact);
+        if SourceCompanyName = '' then
+            SourceCompanyName := MasterDataManagementSetup."Company Name";
+
+        if not Company.Get(SourceCompanyName) then
             exit;
 
         IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::"Master Data Management");
@@ -672,7 +706,7 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         if IntegrationTableMapping.IsEmpty() then
             exit;
 
-        if not ContactBusinessRelation.ChangeCompany(MasterDataManagementSetup."Company Name") then
+        if not ContactBusinessRelation.ChangeCompany(SourceCompanyName) then
             exit;
 
         ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::"Bank Account");
@@ -739,12 +773,14 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         DestinationTenantMedia: Record "Tenant Media";
         SourceItem: Record Item;
         DestinationItem: Record Item;
+        MasterDataManagement: Codeunit "Master Data Management";
         MediaInStream: InStream;
         MediaOutStream: OutStream;
         DestinationItemMediaIds: List of [Guid];
         MediaId: Guid;
         i: Integer;
         MediaItemInserted: Boolean;
+        SourceCompanyName: Text[30];
     begin
         if not MasterDataManagementSetup.Get() then
             exit;
@@ -771,7 +807,10 @@ codeunit 7237 "Master Data Mgt. Subscribers"
         SourceRecordRef.SetTable(SourceItem);
         DestinationRecordRef.SetTable(DestinationItem);
         MasterDataManagementSetup.Get();
-        SourceItem.ChangeCompany(MasterDataManagementSetup."Company Name");
+        MasterDataManagement.OnSetSourceCompanyName(SourceCompanyName, Database::Item);
+        if SourceCompanyName = '' then
+            SourceCompanyName := MasterDataManagementSetup."Company Name";
+        SourceItem.ChangeCompany(SourceCompanyName);
 
         // remove all the media from Destination item
         for i := 1 to DestinationItem.Picture.Count() do
