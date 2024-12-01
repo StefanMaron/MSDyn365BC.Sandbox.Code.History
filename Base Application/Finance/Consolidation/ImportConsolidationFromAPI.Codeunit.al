@@ -622,15 +622,11 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
     var
         JsonToken: JsonToken;
         PropertyJsonToken: JsonToken;
-        DimensionCode: Code[20];
     begin
         foreach JsonToken in GetDimensions(Filter) do begin
             JsonToken.AsObject().Get('code', PropertyJsonToken);
-            DimensionCode := CopyStr(PropertyJsonToken.AsValue().AsCode(), 1, MaxStrLen(DimensionCode));
-            if not DimensionInOtherCompany.Get(DimensionCode) then begin
-                DimensionInOtherCompany.Code := DimensionCode;
-                DimensionInOtherCompany.Insert();
-            end;
+            DimensionInOtherCompany.Code := CopyStr(PropertyJsonToken.AsValue().AsCode(), 1, MaxStrLen(DimensionInOtherCompany.Code));
+            DimensionInOtherCompany.Insert();
         end;
     end;
 
