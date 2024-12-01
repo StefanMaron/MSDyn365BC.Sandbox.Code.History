@@ -252,7 +252,6 @@ page 8882 "Email Outbox"
         RecallThrottledEmailNotification();
         if ExistThrottledEmail(Rec) then
             ShowThrottledEmailInformation();
-        EmailImpl.ShowAdminViewPolicyInEffectNotification();
     end;
 
     local procedure ExistThrottledEmail(EmailOutbox: Record "Email Outbox"): Boolean
