@@ -5,6 +5,7 @@
 namespace Microsoft.Purchases.Reports;
 
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Bank.BankAccount;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using System.Utilities;
@@ -375,17 +376,26 @@ report 10748 "Vendor - Overdue Payments"
                     FindAppliedPayments("Entry No.");
                     FindOpenInvoices("Entry No.");
 
-                    InvoicesCountPerVendor += 1;
-                    InvoicesTotalCount += 1;
+                    if "Document Type" = "Document Type"::Invoice then begin
+                        InvoicesCountPerVendor += 1;
+                        InvoicesTotalCount += 1;
+                    end;
 
                     LegalDueDate := CalcMaxDueDate("Vendor Ledger Entry");
-                    if (not Open) and ("Closed at Date" <= LegalDueDate) then begin
+                    if (not Open) and ("Closed at Date" <= LegalDueDate) and (not CheckIfCreateBills("Vendor Ledger Entry")) then begin
                         InvPaidWithinLegalDueDateCountPerVendor += 1;
                         InvPaidWithinLegalDueDateTotalCount += 1;
                     end;
 
-                    InvoicesPaidToTotalCountPctPerVendor := 100 * InvPaidWithinLegalDueDateCountPerVendor / InvoicesCountPerVendor;
-                    InvoicesPaidToTotalCountPct := 100 * InvPaidWithinLegalDueDateTotalCount / InvoicesTotalCount;
+                    if InvoicesCountPerVendor <> 0 then
+                        InvoicesPaidToTotalCountPctPerVendor := 100 * InvPaidWithinLegalDueDateCountPerVendor / InvoicesCountPerVendor
+                    else
+                        InvoicesPaidToTotalCountPctPerVendor := 0;
+
+                    if InvoicesTotalCount <> 0 then
+                        InvoicesPaidToTotalCountPct := 100 * InvPaidWithinLegalDueDateTotalCount / InvoicesTotalCount
+                    else
+                        InvoicesPaidToTotalCountPct := 0;
                 end;
             }
 
@@ -758,6 +768,19 @@ report 10748 "Vendor - Overdue Payments"
         if TotalAmount = 0 then
             exit(0);
         exit(WeightedExceededAmount / Abs(TotalAmount));
+    end;
+
+    local procedure CheckIfCreateBills(var VendorLedgerEntry: Record "Vendor Ledger Entry"): Boolean
+    var
+        PaymentMethod: Record "Payment Method";
+    begin
+        if (VendorLedgerEntry.Open) or (VendorLedgerEntry."Document Type" <> VendorLedgerEntry."Document Type"::Invoice) then
+            exit(false);
+
+        if not PaymentMethod.Get("Vendor Ledger Entry"."Payment Method Code") then
+            exit(false);
+
+        exit(PaymentMethod."Create Bills");
     end;
 
     [Scope('OnPrem')]
