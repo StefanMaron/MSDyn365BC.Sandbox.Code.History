@@ -593,9 +593,7 @@ table 36 "Sales Header"
                   "Prepmt. Cr. Memo No.", "Prepmt. Cr. Memo No. Series",
                   FieldCaption("Prepmt. Cr. Memo No."), FieldCaption("Prepmt. Cr. Memo No. Series"));
 
-                GLSetup.Get();
-                GLSetup.UpdateVATDate("Posting Date", Enum::"VAT Reporting Date"::"Posting Date", "VAT Reporting Date");
-                Validate("VAT Reporting Date");
+                UpdateVATReportingDate(FieldNo("Posting Date"));
 
                 IsHandled := false;
                 OnValidatePostingDateOnBeforeAssignDocumentDate(Rec, IsHandled);
@@ -1675,9 +1673,7 @@ table 36 "Sales Header"
                 if IsHandled then
                     exit;
 
-                GLSetup.Get();
-                GLSetup.UpdateVATDate("Document Date", Enum::"VAT Reporting Date"::"Document Date", "VAT Reporting Date");
-                Validate("VAT Reporting Date");
+                UpdateVATReportingDate(FieldNo("Document Date"));
 
                 if xRec."Document Date" <> "Document Date" then
                     UpdateDocumentDate := true;
@@ -4574,6 +4570,7 @@ table 36 "Sales Header"
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if SalesLinesExist() then
@@ -5848,7 +5845,13 @@ table 36 "Sales Header"
         ErrorContextElement: Codeunit "Error Context Element";
         ErrorMessageMgt: Codeunit "Error Message Management";
         ErrorMessageHandler: Codeunit "Error Message Handler";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSendToPosting(Rec, IsSuccess, IsHandled, PostingCodeunitID);
+        if IsHandled then
+            exit(IsSuccess);
+
         if not IsApprovedForPosting() then
             exit;
 
@@ -5919,7 +5922,13 @@ table 36 "Sales Header"
     var
         SalesHeader: Record "Sales Header";
         Opportunity: Record Opportunity;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeLinkSalesDocWithOpportunity(Rec, OldOpportunityNo, IsHandled);
+        if IsHandled then
+            exit;
+
         if "Opportunity No." <> OldOpportunityNo then begin
             if "Opportunity No." <> '' then
                 if Opportunity.Get("Opportunity No.") then begin
@@ -6197,8 +6206,13 @@ table 36 "Sales Header"
     end;
 
     procedure PrepareOpeningDocumentStatistics()
+    var
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        SalesHeader2: Record "Sales Header";
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        SalesLine2: Record "Sales Line";
     begin
-        if not WritePermission() or not SalesLine.WritePermission() then
+        if not SalesHeader2.WritePermission() or not SalesLine2.WritePermission() then
             Error(StatisticsInsuffucientPermissionsErr);
 
         CalcInvDiscForHeader();
@@ -8329,6 +8343,7 @@ table 36 "Sales Header"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCreditMemoHeader: Record "Sales Cr.Memo Header";
         CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
+        IsHandled: Boolean;
     begin
         SalesInvoiceHeader.SetLoadFields("No.");
         if not SalesInvoiceHeader.Get(Rec."Applies-to Doc. No.") then
@@ -8339,6 +8354,12 @@ table 36 "Sales Header"
             exit;
         if IsNotFullyCancelled(SalesCreditMemoHeader) then
             exit;
+
+        IsHandled := false;
+        OnBeforeUpdateSalesOrderLineIfExist(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         CorrectPostedSalesInvoice.UpdateSalesOrderLineIfExist(SalesCreditMemoHeader."No.");
     end;
 
@@ -8380,6 +8401,28 @@ table 36 "Sales Header"
             else
                 exit(Result::Partial);
         end;
+    end;
+
+    local procedure UpdateVATReportingDate(CalledByFieldNo: Integer)
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeUpdateVATReportingDate(Rec, CalledByFieldNo, IsHandled);
+        if IsHandled then
+            exit;
+
+        if not (CalledByFieldNo in [FieldNo("Posting Date"), FieldNo("Document Date")]) then
+            exit;
+
+        GLSetup.GetRecordOnce();
+        case CalledByFieldNo of
+            FieldNo("Posting Date"):
+                GLSetup.UpdateVATDate("Posting Date", Enum::"VAT Reporting Date"::"Posting Date", "VAT Reporting Date");
+            FieldNo("Document Date"):
+                GLSetup.UpdateVATDate("Document Date", Enum::"VAT Reporting Date"::"Document Date", "VAT Reporting Date");
+        end;
+        Validate("VAT Reporting Date");
     end;
 
     [IntegrationEvent(false, false)]
@@ -8594,6 +8637,11 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateOpportunityLinkOnBeforeModify(var Opportunity: Record Opportunity; var SalesHeader: Record "Sales Header"; SalesDocumentType: Option; SalesHeaderNo: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -10197,6 +10245,26 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidatePaymentDiscount(var SalesHeader: Record "Sales Header"; CurrentFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateSalesOrderLineIfExist(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLinkSalesDocWithOpportunity(var SalesHeader: Record "Sales Header"; OldOpportunityNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateVATReportingDate(var SalesHeader: Record "Sales Header"; CalledByFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendToPosting(var SalesHeader: Record "Sales Header"; var IsSuccess: Boolean; var IsHandled: Boolean; PostingCodeunitID: Integer)
     begin
     end;
 }
