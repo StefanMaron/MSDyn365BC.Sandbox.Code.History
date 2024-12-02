@@ -354,10 +354,9 @@ table 39 "Purchase Line"
                 IsHandled: Boolean;
             begin
                 TestStatusOpen();
-                IsHandled := false;
-                OnValidateLocationCodeOnAfterTestStatusOpen(Rec, xRec, IsHandled);
+                OnValidateLocationCodeOnAfterTestStatusOpen(Rec);
                 if xRec."Location Code" <> "Location Code" then begin
-                    if ("Prepmt. Amt. Inv." <> 0) and (not IsHandled) then
+                    if "Prepmt. Amt. Inv." <> 0 then
                         if not ConfirmManagement.GetResponseOrDefault(
                              StrSubstNo(
                                Text046, FieldCaption("Direct Unit Cost"), FieldCaption("Location Code"), PRODUCTNAME.Full()), true)
@@ -899,7 +898,7 @@ table 39 "Purchase Line"
                     "VAT Calculation Type"::"Reverse Charge VAT":
                         begin
                             "VAT Base Amount" :=
-                              Round(Amount * (1 - GetVatBaseDiscountPct(PurchHeader) / 100), Currency."Amount Rounding Precision");
+                              Round(Amount * (1 - PurchHeader."VAT Base Discount %" / 100), Currency."Amount Rounding Precision");
                             "Amount Including VAT" :=
                               Round(Amount + "VAT Base Amount" * "VAT %" / 100, Currency."Amount Rounding Precision");
                             UpdateACYAmounts(PurchHeader);
@@ -957,10 +956,10 @@ table 39 "Purchase Line"
                             Amount :=
                               Round(
                                 "Amount Including VAT" /
-                                (1 + (1 - GetVatBaseDiscountPct(PurchHeader) / 100) * "VAT %" / 100),
+                                (1 + (1 - PurchHeader."VAT Base Discount %" / 100) * "VAT %" / 100),
                                 Currency."Amount Rounding Precision");
                             "VAT Base Amount" :=
-                              Round(Amount * (1 - GetVatBaseDiscountPct(PurchHeader) / 100), Currency."Amount Rounding Precision");
+                              Round(Amount * (1 - PurchHeader."VAT Base Discount %" / 100), Currency."Amount Rounding Precision");
                             OnValidateAmountIncludingVATOnAfterCalculateNormalVAT(Rec, PurchHeader, Currency);
                         end;
                     "VAT Calculation Type"::"Full VAT":
@@ -4472,12 +4471,6 @@ table 39 "Purchase Line"
         exit(QtyToReceiveBase);
     end;
 
-    internal procedure GetVatBaseDiscountPct(PurchaseHeader: Record "Purchase Header") Result: Decimal
-    begin
-        Result := PurchaseHeader."VAT Base Discount %";
-        OnAfterGetVatBaseDiscountPct(Rec, PurchaseHeader, Result);
-    end;
-
     procedure CalcInvDiscToInvoice()
     var
         OldInvDiscAmtToInv: Decimal;
@@ -4980,9 +4973,8 @@ table 39 "Purchase Line"
     local procedure UpdateDirectUnitCostByField(CalledByFieldNo: Integer)
     var
         BlanketOrderPurchaseLine: Record "Purchase Line";
-        PriceCalculation: Interface "Price Calculation";
         IsHandled: Boolean;
-        ShouldExit: Boolean;
+        PriceCalculation: Interface "Price Calculation";
     begin
         if not IsPriceCalcCalledByField(CalledByFieldNo) then
             exit;
@@ -4995,9 +4987,9 @@ table 39 "Purchase Line"
         if (CurrFieldNo <> 0) and ("Prod. Order No." <> '') then
             UpdateAmounts();
 
-        ShouldExit := ((CalledByFieldNo <> CurrFieldNo) and (CurrFieldNo <> 0)) or ("Prod. Order No." <> '');
-        OnUpdateDirectUnitCostByFieldOnAfterCalcShouldExit(Rec, xRec, CalledByFieldNo, CurrFieldNo, ShouldExit);
-        if ShouldExit then
+        if ((CalledByFieldNo <> CurrFieldNo) and (CurrFieldNo <> 0)) or
+           ("Prod. Order No." <> '')
+        then
             exit;
 
         case Type of
@@ -5029,7 +5021,7 @@ table 39 "Purchase Line"
 
         OnUpdateDirectUnitCostByFieldOnBeforeUpdateItemReference(Rec, CalledByFieldNo);
         if Type = Type::Item then
-            if CalledByFieldNo in [FieldNo("No."), FieldNo("Variant Code")] then
+            if CalledByFieldNo in [FieldNo("No."), FieldNo("Variant Code"), FieldNo("Location Code")] then
                 UpdateItemReference();
 
         ClearFieldCausedPriceCalculation();
@@ -5391,12 +5383,12 @@ table 39 "Purchase Line"
                               TotalAmount;
                             "VAT Base Amount" :=
                               Round(
-                                Amount * (1 - GetVatBaseDiscountPct(PurchHeader) / 100),
+                                Amount * (1 - PurchHeader."VAT Base Discount %" / 100),
                                 Currency."Amount Rounding Precision");
                             "Amount Including VAT" :=
                               TotalLineAmount + "Line Amount" -
                               Round(
-                                (TotalAmount + Amount) * (GetVatBaseDiscountPct(PurchHeader) / 100) * "VAT %" / 100,
+                                (TotalAmount + Amount) * (PurchHeader."VAT Base Discount %" / 100) * "VAT %" / 100,
                                 Currency."Amount Rounding Precision", Currency.VATRoundingDirection()) -
                               TotalAmountInclVAT - TotalInvDiscAmount - "Inv. Discount Amount";
                             NonDeductibleVAT.Update(Rec, Currency);
@@ -5440,11 +5432,11 @@ table 39 "Purchase Line"
                         begin
                             Amount := Round(CalcLineAmount(), Currency."Amount Rounding Precision");
                             "VAT Base Amount" :=
-                              Round(Amount * (1 - GetVatBaseDiscountPct(PurchHeader) / 100), Currency."Amount Rounding Precision");
+                              Round(Amount * (1 - PurchHeader."VAT Base Discount %" / 100), Currency."Amount Rounding Precision");
                             "Amount Including VAT" :=
                               TotalAmount + Amount +
                               Round(
-                                (TotalAmount + Amount) * (1 - GetVatBaseDiscountPct(PurchHeader) / 100) * "VAT %" / 100,
+                                (TotalAmount + Amount) * (1 - PurchHeader."VAT Base Discount %" / 100) * "VAT %" / 100,
                                 Currency."Amount Rounding Precision", Currency.VATRoundingDirection()) -
                               TotalAmountInclVAT + TotalVATDifference;
                             "Amount (ACY)" :=
@@ -5717,12 +5709,8 @@ table 39 "Purchase Line"
     var
         ItemListPage: Page "Item List";
         SelectionFilter: Text;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeSelectMultipleItems(Rec, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeSelectMultipleItems(Rec);
 
         if IsCreditDocType() then
             SelectionFilter := ItemListPage.SelectActiveItems()
@@ -6543,8 +6531,6 @@ table 39 "Purchase Line"
         CalendarMgmt.ReverseDateFormula(ReversedWhseHandlingTime, "Inbound Whse. Handling Time");
         Evaluate(
           TotalDays, '<' + Format(PurchDate - CalcDate(ReversedWhseHandlingTime, CalcDate(ReversedSafetyLeadTime, PurchDate))) + 'D>');
-
-        OnAfterReversedInternalLeadTimeDays(Rec, PurchDate, ReversedWhseHandlingTime, TotalDays);
         exit(Format(TotalDays));
     end;
 
@@ -6694,7 +6680,7 @@ table 39 "Purchase Line"
                                   Round(VATAmount, Currency."Amount Rounding Precision");
                                 NewVATBaseAmount :=
                                   Round(
-                                    NewAmount * (1 - GetVatBaseDiscountPct(PurchHeader) / 100),
+                                    NewAmount * (1 - PurchHeader."VAT Base Discount %" / 100),
                                     Currency."Amount Rounding Precision");
                             end else begin
                                 if PurchLine."VAT Calculation Type" = PurchLine."VAT Calculation Type"::"Full VAT" then begin
@@ -6725,7 +6711,7 @@ table 39 "Purchase Line"
                                     NewAmountACY := PurchLine."Amount (ACY)";
                                     NewVATBaseAmount :=
                                       Round(
-                                        NewAmount * (1 - GetVatBaseDiscountPct(PurchHeader) / 100),
+                                        NewAmount * (1 - PurchHeader."VAT Base Discount %" / 100),
                                         Currency."Amount Rounding Precision");
                                     NewVATBaseAmountACY :=
                                       Round(
@@ -7999,7 +7985,6 @@ table 39 "Purchase Line"
                 "Qty. to Receive (Base)" := 0;
             end;
         end;
-        OnAfterClearQtyIfBlank(Rec, xRec, PurchSetup);
     end;
 
     procedure ShowLineComments()
@@ -8751,7 +8736,6 @@ table 39 "Purchase Line"
             "Shortcut Dimension 1 Code" := DimValue1;
             "Shortcut Dimension 2 Code" := DimValue2;
         end;
-        OnAfterUpdateDimensionsFromJobTask(Rec);
     end;
 
     local procedure UpdateItemReference()
@@ -10422,7 +10406,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSelectMultipleItems(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    local procedure OnBeforeSelectMultipleItems(var PurchaseLine: Record "Purchase Line")
     begin
     end;
 
@@ -11084,7 +11068,7 @@ table 39 "Purchase Line"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateLineAmount(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; Currency: Record Currency; var LineAmountChanged: Boolean; var IsHandled: Boolean)
     begin
     end;
@@ -11270,7 +11254,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateLocationCodeOnAfterTestStatusOpen(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    local procedure OnValidateLocationCodeOnAfterTestStatusOpen(var PurchaseLine: Record "Purchase Line")
     begin
     end;
 
@@ -11674,31 +11658,6 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeConfirmReceivedShippedItemDimChange(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetVatBaseDiscountPct(var PurchaseLine: Record "Purchase Line"; var PurchaseHeader: Record "Purchase Header"; var Result: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateDirectUnitCostByFieldOnAfterCalcShouldExit(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; CalledByFieldNo: Integer; CurrFieldNo: Integer; var ShouldExit: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateDimensionsFromJobTask(var PurchaseLine: Record "Purchase Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterClearQtyIfBlank(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; PurchasePayablesSetup: Record "Purchases & Payables Setup")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterReversedInternalLeadTimeDays(PurchaseLine: Record "Purchase Line"; PurchDate: Date; ReversedWhseHandlingTime: DateFormula; var TotalDays: DateFormula)
     begin
     end;
 }
