@@ -1929,14 +1929,9 @@ codeunit 6500 "Item Tracking Management"
                         Qty := -TempTrackingSpecification."Qty. to Handle (Base)";
                         if RegPickNo <> '' then begin
                             RegisteredWhseActLine.SetRange("Activity Type", RegisteredWhseActLine."Activity Type"::Pick);
-                            if TempTrackingSpecification."Source Type" = Database::"Prod. Order Component" then
-                                RegisteredWhseActLine.SetSourceFilter(
-                                    TempTrackingSpecification."Source Type", TempTrackingSpecification."Source Subtype",
-                                    TempTrackingSpecification."Source ID", TempTrackingSpecification."Source Prod. Order Line", TempTrackingSpecification."Source Ref. No.", true)
-                            else
-                                RegisteredWhseActLine.SetSourceFilter(
-                                    TempTrackingSpecification."Source Type", TempTrackingSpecification."Source Subtype",
-                                    TempTrackingSpecification."Source ID", TempTrackingSpecification."Source Ref. No.", -1, true);
+                            RegisteredWhseActLine.SetSourceFilter(
+                              TempTrackingSpecification."Source Type", TempTrackingSpecification."Source Subtype",
+                              TempTrackingSpecification."Source ID", TempTrackingSpecification."Source Ref. No.", -1, true);
                             RegisteredWhseActLine.SetTrackingFilterFromSpec(TempTrackingSpecification);
                             RegisteredWhseActLine.SetFilter("No.", '<> %1', RegPickNo);
                             if not RegisteredWhseActLine.FindFirst() then
@@ -2845,7 +2840,7 @@ codeunit 6500 "Item Tracking Management"
                 OnRegisterNewItemTrackingLinesOnBeforeCannotMatchItemTrackingError(
                     TempTrackingSpec, QtyToHandleToNewRegister, QtyToHandleInItemTracking, QtyToHandleOnSourceDocLine, IsHandled);
                 if not IsHandled then
-                    if QtyToHandleToNewRegister + QtyToHandleInItemTracking > Abs(QtyToHandleOnSourceDocLine) then
+                    if QtyToHandleToNewRegister + QtyToHandleInItemTracking > QtyToHandleOnSourceDocLine then
                         Error(CannotMatchItemTrackingErr,
                             TempTrackingSpec."Source ID", TempTrackingSpec."Source Ref. No.",
                             TempTrackingSpec."Item No.", TempTrackingSpec.Description);
@@ -2859,8 +2854,6 @@ codeunit 6500 "Item Tracking Management"
                 OnRegisterNewItemTrackingLinesOnAfterClearItemTrackingLines(ItemTrackingLines);
                 ItemTrackingLines.SetCalledFromSynchWhseItemTrkg(true);
                 ItemTrackingLines.SetBlockCommit(ItemTrackingLinesBlockCommit);
-                if QtyToHandleOnSourceDocLine < 0 then
-                    ItemTrackingLines.SetSignFactor(-1);
                 OnRegisterNewItemTrackingLinesOnBeforeRegisterItemTrackingLines(TempTrackingSpecification, ItemTrackingLines);
                 ItemTrackingLines.RegisterItemTrackingLines(TrackingSpec, TrackingSpec."Creation Date", TempTrackingSpec);
                 TempTrackingSpec.ClearSourceFilter();

@@ -893,15 +893,14 @@ table 111 "Sales Shipment Line"
                 SetRange(Type, Type::" ");
             end;
         until (Next() = 0) or ("Attached to Line No." = 0);
-        IsHandled := false;
-        OnInsertInvLineFromShptLineOnAfterInsertAllLines(Rec, SalesLine, IsHandled);
-        if not IsHandled then
-            if SalesOrderHeader.Get(SalesOrderHeader."Document Type"::Order, "Order No.") then begin
-                if not SalesOrderHeader."Get Shipment Used" then begin
-                    SalesOrderHeader."Get Shipment Used" := true;
-                    SalesOrderHeader.Modify();
-                end;
+        OnInsertInvLineFromShptLineOnAfterInsertAllLines(Rec, SalesLine);
+
+        if SalesOrderHeader.Get(SalesOrderHeader."Document Type"::Order, "Order No.") then begin
+            if not SalesOrderHeader."Get Shipment Used" then begin
+                SalesOrderHeader."Get Shipment Used" := true;
+                SalesOrderHeader.Modify();
             end;
+        end;
     end;
 
     procedure GetSalesInvLines(var TempSalesInvLine: Record "Sales Invoice Line" temporary)
@@ -1275,7 +1274,7 @@ table 111 "Sales Shipment Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnAfterInsertAllLines(SalesShipmentLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnInsertInvLineFromShptLineOnAfterInsertAllLines(SalesShipmentLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line")
     begin
     end;
 
