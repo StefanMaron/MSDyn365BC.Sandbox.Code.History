@@ -208,7 +208,7 @@ codeunit 5579 "Digital Voucher Impl."
         IncomingDocumentAttachment.Modify();
     end;
 
-    procedure CheckDigitalVoucherForDocument(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecRef: RecordRef) Checked: Boolean
+    procedure CheckDigitalVoucherForDocument(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecRef: RecordRef): Boolean
     var
         DigitalVoucherEntrySetup: Record "Digital Voucher Entry Setup";
         IncomingDocument: Record "Incoming Document";
@@ -495,7 +495,7 @@ codeunit 5579 "Digital Voucher Impl."
         if not SalesHeader.Invoice then
             exit;
         if SalesInvoiceHeader."No." <> '' then
-            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
+        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
         if SalesCrMemoHeader."No." <> '' then
             HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesCrMemoHeader);
     end;
@@ -527,7 +527,7 @@ codeunit 5579 "Digital Voucher Impl."
         if not DigitalVoucherFeature.IsFeatureEnabled() then
             exit;
         if SalesInvoiceHeader."No." <> '' then
-            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
+        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesInvoiceHeader);
         if SalesCrMemoHeader."No." <> '' then
             HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Sales Document", SalesCrMemoHeader);
     end;
@@ -542,7 +542,7 @@ codeunit 5579 "Digital Voucher Impl."
         if not PurchHeader.Invoice then
             exit;
         if PurchInvHeader."No." <> '' then
-            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
+        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
         if PurchCrMemoHdr."No." <> '' then
             HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchCrMemoHdr);
     end;
@@ -553,7 +553,7 @@ codeunit 5579 "Digital Voucher Impl."
         if not DigitalVoucherFeature.IsFeatureEnabled() then
             exit;
         if PurchInvHeader."No." <> '' then
-            HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
+        HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchInvHeader);
         if PurchCrMemoHdr."No." <> '' then
             HandleDigitalVoucherForPostedDocument("Digital Voucher Entry Type"::"Purchase Document", PurchCrMemoHdr);
     end;
