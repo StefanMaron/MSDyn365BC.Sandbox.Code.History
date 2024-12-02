@@ -25,6 +25,8 @@ using Microsoft.Projects.Project.Journal;
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Projects.Project.Setup;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Integration.FieldService;
 using Microsoft.Projects.Project.WIP;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.TimeSheet;
@@ -140,6 +142,7 @@ table 167 Job
             trigger OnValidate()
             var
                 JobPlanningLine: Record "Job Planning Line";
+                TimeSheetLine: Record "Time Sheet Line";
                 ATOLink: Record "Assemble-to-Order Link";
                 JobPlanningLineReserve: Codeunit "Job Planning Line-Reserve";
                 ConfirmManagement: Codeunit "Confirm Management";
@@ -158,17 +161,17 @@ table 167 Job
                     if xRec.Status = xRec.Status::Completed then begin
                         IsHandled := false;
                         OnValidateStatusOnBeforeConfirm(Rec, xRec, UndidCompleteStatus, IsHandled);
-                        if not IsHandled then
-                            if ConfirmManagement.GetResponseOrDefault(StatusChangeQst, true) then begin
+                        if not IsHandled then begin
+                            if ConfirmManagement.GetResponseOrDefault(StatusChangeQst, true) then
                                 Validate(Complete, false);
-                                UndidCompleteStatus := true;
-                            end else
-                                Status := xRec.Status;
+                            UndidCompleteStatus := true;
+                        end else
+                            Status := xRec.Status;
                     end;
                     Modify();
 
                     ATOLink.CheckIfAssembleToOrderLinkExist(Rec);
-                    CheckIfTimeSheetLineLinkExist();
+                    TimeSheetLine.CheckIfTimeSheetLineLinkExist(Rec);
 
                     JobPlanningLine.SetCurrentKey("Job No.");
                     JobPlanningLine.SetRange("Job No.", "No.");
@@ -226,6 +229,15 @@ table 167 Job
         field(24; Blocked; Enum "Job Blocked")
         {
             Caption = 'Blocked';
+
+            trigger OnValidate()
+            var
+                FSConnectionSetup: Record "FS Connection Setup";
+            begin
+                if Rec.Blocked <> Rec.Blocked::" " then
+                    if FSConnectionSetup.IsEnabled() then
+                        MoveFilterOnProjectTaskMapping();
+            end;
         }
         field(29; "Last Date Modified"; Date)
         {
@@ -755,6 +767,7 @@ table 167 Job
                 JobPlanningLine: Record "Job Planning Line";
                 JobLedgerEntry: Record "Job Ledger Entry";
                 JobUsageLink: Record "Job Usage Link";
+                FSConnectionSetup: Record "FS Connection Setup";
                 NewApplyUsageLink: Boolean;
             begin
                 if "Apply Usage Link" then begin
@@ -782,6 +795,9 @@ table 167 Job
                         RefreshModifiedRec();
                         "Apply Usage Link" := NewApplyUsageLink;
                     end;
+
+                    if FSConnectionSetup.IsEnabled() then
+                        MoveFilterOnProjectTaskMapping();
                 end;
             end;
         }
@@ -2481,7 +2497,7 @@ table 167 Job
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSellToCustomerNoUpdated(Job, xJob, CurrFieldNo, IsHandled, SkipSellToContact);
+        OnBeforeSellToCustomerNoUpdated(Job, xJob, CurrFieldNo, IsHandled);
         if IsHandled then
             exit;
         if Job."Sell-to Customer No." <> '' then begin
@@ -2644,8 +2660,6 @@ table 167 Job
     var
         JobPlanningLine: Record "Job Planning Line";
         ConfirmManagement: Codeunit "Confirm Management";
-        ConfirmResult: Boolean;
-        IsHandled: Boolean;
     begin
         JobPlanningLine.SetRange("Job No.", Job."No.");
         JobPlanningLine.SetFilter(Type, '<>%1', JobPlanningLine.Type::Text);
@@ -2653,14 +2667,7 @@ table 167 Job
         if JobPlanningLine.IsEmpty() then
             exit;
 
-        IsHandled := false;
-        OnUpdateCostPricesOnRelatedJobPlanningLinesOnBeforeConfirmUpdate(Job, ConfirmResult, IsHandled);
-        if not IsHandled then begin
-        if not Job.GetHideValidationDialog() then
-            if not ConfirmResult then
-                ConfirmResult := ConfirmManagement.GetResponseOrDefault(UpdateCostPricesOnRelatedLinesQst, true);
-        end;
-        if not ConfirmResult then
+        if not ConfirmManagement.GetResponseOrDefault(UpdateCostPricesOnRelatedLinesQst, true) then
             exit;
 
         JobPlanningLine.FindSet(true);
@@ -2982,6 +2989,39 @@ table 167 Job
         JobTask.ModifyAll("Invoice Currency Code", '');
     end;
 
+    local procedure MoveFilterOnProjectTaskMapping()
+    var
+        IntegrationTableMapping: Record "Integration Table Mapping";
+        JobTask: Record "Job Task";
+    begin
+        if Rec.Blocked <> Rec.Blocked::" " then
+            exit;
+
+        IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::Dataverse);
+        IntegrationTableMapping.SetRange("Delete After Synchronization", false);
+        IntegrationTableMapping.SetRange("Table ID", Database::"Job Task");
+        IntegrationTableMapping.SetRange("Integration Table ID", Database::"FS Project Task");
+        if not IntegrationTableMapping.FindFirst() then
+            exit;
+
+        JobTask.SetRange("Job No.", Rec."No.");
+        JobTask.SetCurrentKey(SystemCreatedAt);
+        JobTask.SetAscending(SystemCreatedAt, true);
+        if not JobTask.FindFirst() then
+            exit;
+
+        if JobTask.SystemCreatedAt = 0DT then begin
+            IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." := 0DT;
+            IntegrationTableMapping.Modify();
+            exit;
+        end;
+
+        if IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." > JobTask.SystemCreatedAt then begin
+            IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." := JobTask.SystemCreatedAt;
+            IntegrationTableMapping.Modify();
+        end;
+    end;
+
     local procedure ConfirmDeletion()
     var
         JobPlanningLine: Record "Job Planning Line";
@@ -2996,19 +3036,6 @@ table 167 Job
                     Confirmed := true;
                 end;
             until (JobPlanningLine.Next() = 0) or Confirmed;
-    end;
-
-    local procedure CheckIfTimeSheetLineLinkExist()
-    var
-        TimeSheetLine: Record "Time Sheet Line";
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCheckIfTimeSheetLineLinkExist(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
-        TimeSheetLine.CheckIfTimeSheetLineLinkExist(Rec);
     end;
 
     [IntegrationEvent(true, false)]
@@ -3190,7 +3217,7 @@ table 167 Job
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSellToCustomerNoUpdated(var Job: Record Job; var xJob: Record Job; CallingFieldNo: Integer; var IsHandled: Boolean; var SkipSellToContact: Boolean)
+    local procedure OnBeforeSellToCustomerNoUpdated(var Job: Record Job; var xJob: Record Job; CallingFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
@@ -3321,16 +3348,6 @@ table 167 Job
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateSellToCust(var Job: Record Job; var ContactNo: Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateCostPricesOnRelatedJobPlanningLinesOnBeforeConfirmUpdate(var Job: Record Job; var ConfirmResult: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckIfTimeSheetLineLinkExist(var Job: Record Job; var IsHandled: Boolean)
     begin
     end;
 }
