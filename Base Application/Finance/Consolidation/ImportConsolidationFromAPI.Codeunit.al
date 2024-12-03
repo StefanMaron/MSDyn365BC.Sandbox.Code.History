@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Finance.Consolidation;
+namespace Microsoft.Finance.Consolidation;
 
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
@@ -21,8 +21,9 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
 
     var
         ConsolidationSetup: Record "Consolidation Setup";
-        CurrentAADTenantId: Text;
+        AADTenantId: Text;
         BusinessUnitAPIBaseUrl: Text;
+        LogRequests: Boolean;
         UrlNotBCMsg: Label 'The URL provided is not in the businesscentral.dynamics.com domain. Do you want to continue?';
         BusinessUnitNotConfiguredForAPIErr: Label 'Business unit %1 is not configured for API import. You can configure it in the "Business Unit" card page.', Comment = '%1 - Business unit code';
         EntriesAtClosingDateErr: Label 'Entries posted in a closing date %1 were found while consolidating G/L account %2', Comment = '%1 - Closing date, %2 - G/L account no.';
@@ -79,8 +80,8 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
     var
         StorageKey, Token : Text;
     begin
-        SetAADTenantId(BusinessUnit."AAD Tenant ID");
-        StorageKey := IsolatedStorageKey(CurrentAADTenantId);
+        SetAPIParameters(BusinessUnit."AAD Tenant ID", BusinessUnit."Log Requests");
+        StorageKey := IsolatedStorageKey(AADTenantId);
         Token := GetToken(CurrentAuthorityUrl());
         if (not EncryptionEnabled()) or (StrLen(Token) > 215) then
             IsolatedStorage.Set(StorageKey, Token, DataScope::Company)
@@ -107,8 +108,8 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
     local procedure CurrentAuthorityUrl(): Text
     begin
         if IsPPE() then
-            exit(StrSubstNo(PPEAuthorityURLTok, CurrentAADTenantId));
-        exit(StrSubstNo(AuthorityURLTok, CurrentAADTenantId));
+            exit(StrSubstNo(PPEAuthorityURLTok, AADTenantId));
+        exit(StrSubstNo(AuthorityURLTok, AADTenantId));
     end;
 
     local procedure IsPPE(): Boolean
@@ -125,7 +126,7 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
         JsonObject: JsonObject;
         JsonToken: JsonToken;
     begin
-        SetAADTenantId(BusinessUnit."AAD Tenant ID");
+        SetAPIParameters(BusinessUnit."AAD Tenant ID", BusinessUnit."Log Requests");
         if not IsStoredTokenValidForBusinessUnit(BusinessUnit) then
             AcquireTokenAndStoreInIsolatedStorage(BusinessUnit);
 
@@ -235,14 +236,15 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
         exit(LowerCase(Guid).Replace('{', '').Replace('}', ''));
     end;
 
-    local procedure IsolatedStorageKey(AADTenantID: Text): Text
+    local procedure IsolatedStorageKey(AADTenantIDOfBusinessUnit: Text): Text
     begin
-        exit('fc-' + AADTenantID);
+        exit('fc-' + AADTenantIDOfBusinessUnit);
     end;
 
-    local procedure SetAADTenantId(NewAADTenantId: Guid)
+    local procedure SetAPIParameters(NewAADTenantID: Guid; NewLogRequests: Boolean)
     begin
-        CurrentAADTenantId := GuidToText(NewAADTenantId);
+        AADTenantId := GuidToText(NewAADTenantID);
+        LogRequests := NewLogRequests;
     end;
 
     [NonDebuggable()]
@@ -306,7 +308,7 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
     var
         StorageKey, Token : Text;
     begin
-        StorageKey := IsolatedStorageKey(CurrentAADTenantId);
+        StorageKey := IsolatedStorageKey(AADTenantId);
         if IsolatedStorage.Contains(StorageKey, DataScope::Company) then
             IsolatedStorage.Get(StorageKey, DataScope::Company, Token);
         exit(HttpGetText(Uri, Token, StatusCode, StatusReasonPhrase));
@@ -330,7 +332,28 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
         StatusCode := HttpResponseMessage.HttpStatusCode();
         StatusReasonPhrase := HttpResponseMessage.ReasonPhrase();
         HttpResponseMessage.Content().ReadAs(Response);
+        LogRequestIfLoggingEnabled(Uri, Response, StatusCode);
         exit(Response);
+    end;
+
+    local procedure LogRequestIfLoggingEnabled(Uri: Text; Response: Text; StatusCode: Integer)
+    var
+        ConsolidationLogEntry: Record "Consolidation Log Entry";
+        OutStream: OutStream;
+    begin
+        if not LogRequests then
+            exit;
+        ConsolidationLogEntry."Status Code" := StatusCode;
+        ConsolidationLogEntry."Request URI Preview" := CopyStr(Uri, 1, MaxStrLen(ConsolidationLogEntry."Request URI Preview"));
+        ConsolidationLogEntry.Insert();
+        ConsolidationLogEntry."Request URI".CreateOutStream(OutStream, TextEncoding::UTF8);
+        OutStream.WriteText(Uri);
+        ConsolidationLogEntry.Modify();
+        Clear(OutStream);
+        ConsolidationLogEntry.Response.CreateOutStream(OutStream, TextEncoding::UTF8);
+        OutStream.WriteText(Response);
+        ConsolidationLogEntry.Modify();
+        Commit();
     end;
 
     local procedure HttpGetTextWithStatusHandling(Uri: Text): Text
@@ -373,7 +396,7 @@ codeunit 102 "Import Consolidation from API" implements "Import Consolidation Da
         if (BusinessUnit."BC API URL" = '') or IsNullGuid(BusinessUnit."External Company Id") then
             Error(BusinessUnitNotConfiguredForAPIErr, BusinessUnit.Code);
 
-        SetAADTenantId(BusinessUnit."AAD Tenant ID");
+        SetAPIParameters(BusinessUnit."AAD Tenant ID", BusinessUnit."Log Requests");
         SetBusinessUnitAPIBaseUrl(BusinessUnit);
 
         if GeneralLedgerSetup."Journal Templ. Name Mandatory" then
