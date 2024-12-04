@@ -137,7 +137,6 @@ codeunit 5522 "Order Planning Mgt."
         TempUnplannedDemand.SetRange("Demand Line No.");
         TempUnplannedDemand.SetRange("Demand Ref. No.");
         TempUnplannedDemand.SetRange(Level, 1);
-        OnInsertDemandLinesOnBeforeFindUnplannedDemand(TempUnplannedDemand, ReqLine);
         TempUnplannedDemand.Find('-');
         HeaderExists := false;
 
@@ -624,11 +623,6 @@ codeunit 5522 "Order Planning Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnPrepareRequisitionRecordOnBeforeDeleteAll(var RequisitionLine: Record "Requisition Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertDemandLinesOnBeforeFindUnplannedDemand(var TempUnplannedDemand: Record "Unplanned Demand" temporary; var RequisitionLine: Record "Requisition Line")
     begin
     end;
 }
