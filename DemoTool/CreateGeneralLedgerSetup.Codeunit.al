@@ -37,6 +37,9 @@ codeunit 101098 "Create General Ledger Setup"
         "General Ledger Setup"."Enable VAT Registration No." := true;
         "General Ledger Setup"."Post Dated Journal Template" := XPOSTDATED;
         "General Ledger Setup"."Post Dated Journal Batch" := XDEFAULT;
+        GLAccountCategory.SetRange(Description, GLAccountCategoryMgt.GetAR());
+        if GLAccountCategory.FindFirst() then
+            "General Ledger Setup"."Acc. Receivables Category" := GLAccountCategory."Entry No.";
         "General Ledger Setup".Modify();
         VATRegistrationLogMgt.InitServiceSetup();
     end;
@@ -45,8 +48,10 @@ codeunit 101098 "Create General Ledger Setup"
         "General Ledger Setup": Record "General Ledger Setup";
         DemoDataSetup: Record "Demo Data Setup";
         Currency: Record Currency;
+        GLAccountCategory: Record "G/L Account Category";
         "Create No. Series": Codeunit "Create No. Series";
         VATRegistrationLogMgt: Codeunit "VAT Registration Log Mgt.";
+        GLAccountCategoryMgt: Codeunit "G/L Account Category Mgt.";
         XDEPARTMENT: Label 'DEPARTMENT';
         XPROJECT: Label 'PROJECT';
         XCUSTOMERGROUP: Label 'CUSTOMERGROUP';
@@ -78,6 +83,9 @@ codeunit 101098 "Create General Ledger Setup"
         "General Ledger Setup"."Address Validation" := "General Ledger Setup"."Address Validation"::"Post Code & City";
         "General Ledger Setup"."Enable IRD No." := true;
         "General Ledger Setup"."Enable VAT Registration No." := true;
+        GLAccountCategory.SetRange(Description, GLAccountCategoryMgt.GetAR());
+        if GLAccountCategory.FindFirst() then
+            "General Ledger Setup"."Acc. Receivables Category" := GLAccountCategory."Entry No.";
         "General Ledger Setup".Modify();
         VATRegistrationLogMgt.InitServiceSetup();
     end;
@@ -87,6 +95,9 @@ codeunit 101098 "Create General Ledger Setup"
         "General Ledger Setup".Get();
         "General Ledger Setup".Validate("Global Dimension 1 Code", XDEPARTMENT);
         "General Ledger Setup".Validate("Global Dimension 2 Code", XCUSTOMERGROUP);
+        GLAccountCategory.SetRange(Description, GLAccountCategoryMgt.GetAR());
+        if GLAccountCategory.FindFirst() then
+            "General Ledger Setup"."Acc. Receivables Category" := GLAccountCategory."Entry No.";
         "General Ledger Setup".Modify();
     end;
 
