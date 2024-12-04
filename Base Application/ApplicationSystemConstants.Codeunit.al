@@ -13,7 +13,7 @@ codeunit 9015 "Application System Constants"
     procedure OriginalApplicationVersion() ApplicationVersion: Text[248]
     begin
         // Should be 'Build Version' with ! on both sides.
-        ApplicationVersion := 'FR Business Central 24.4';
+        ApplicationVersion := 'FR Business Central 24.5';
     end;
 
     procedure ApplicationVersion() ApplicationVersion: Text[248]
@@ -49,7 +49,7 @@ codeunit 9015 "Application System Constants"
     begin
         // Should be 'Build branch' with ! on both sides.
         // Will return a string representing the name of the internal branch that generated the build.
-        exit('NAV244');
+        exit('NAV245');
     end;
 
     procedure PlatformProductVersion(): Text[80]
