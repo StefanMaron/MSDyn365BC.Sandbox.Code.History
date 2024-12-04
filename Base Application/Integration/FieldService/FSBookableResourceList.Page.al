@@ -2,7 +2,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-#if not CLEAN25
 namespace Microsoft.Integration.FieldService;
 
 using Microsoft.Integration.Dataverse;
@@ -10,14 +9,13 @@ using Microsoft.Projects.Resources.Resource;
 
 page 6423 "FS Bookable Resource List"
 {
+    ApplicationArea = Suite;
     Caption = 'Bookable Resources - Dynamics 365 Field Service';
     Editable = false;
     PageType = List;
     SourceTable = "FS Bookable Resource";
     SourceTableView = sorting(Name);
-    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '25.0';
+    UsageCategory = Lists;
 
     layout
     {
@@ -59,22 +57,6 @@ page 6423 "FS Bookable Resource List"
     {
         area(processing)
         {
-            action(CreateFromFS)
-            {
-                ApplicationArea = Suite;
-                Caption = 'Create in Business Central';
-                Image = NewResource;
-                ToolTip = 'Generate the entity from the Field Service bookable resource.';
-
-                trigger OnAction()
-                var
-                    FSBookableResource: Record "FS Bookable Resource";
-                    CRMIntegrationManagement: Codeunit "CRM Integration Management";
-                begin
-                    CurrPage.SetSelectionFilter(FSBookableResource);
-                    CRMIntegrationManagement.CreateNewRecordsFromSelectedCRMRecords(FSBookableResource);
-                end;
-            }
             action(ShowOnlyUncoupled)
             {
                 ApplicationArea = Suite;
@@ -106,9 +88,6 @@ page 6423 "FS Bookable Resource List"
             {
                 Caption = 'Process';
 
-                actionref(CreateFromFS_Promoted; CreateFromFS)
-                {
-                }
                 actionref(ShowOnlyUncoupled_Promoted; ShowOnlyUncoupled)
                 {
                 }
@@ -165,4 +144,4 @@ page 6423 "FS Bookable Resource List"
         CurrentlyCoupledFSBookableResource := FSBookableResource;
     end;
 }
-#endif
+
