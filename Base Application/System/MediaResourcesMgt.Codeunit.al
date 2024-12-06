@@ -9,6 +9,7 @@ codeunit 9755 "Media Resources Mgt."
     begin
     end;
 
+    [Scope('OnPrem')]
     procedure InsertMediaFromInstream(MediaResourceCode: Code[50]; MediaInstream: InStream): Boolean
     var
         MediaResources: Record "Media Resources";
@@ -22,6 +23,7 @@ codeunit 9755 "Media Resources Mgt."
         exit(MediaResources.Insert(true));
     end;
 
+    [Scope('OnPrem')]
     procedure InsertMediaFromFile(MediaResourceCode: Code[50]; FileName: Text): Boolean
     var
         MediaResources: Record "Media Resources";
@@ -35,6 +37,7 @@ codeunit 9755 "Media Resources Mgt."
         exit(MediaResources.Insert(true));
     end;
 
+    [Scope('OnPrem')]
     procedure InsertMediaSetFromFile(MediaResourceCode: Code[50]; FileName: Text): Boolean
     var
         MediaResources: Record "Media Resources";
@@ -48,6 +51,7 @@ codeunit 9755 "Media Resources Mgt."
         exit(MediaResources.Insert(true));
     end;
 
+    [Scope('OnPrem')]
     procedure InsertBLOBFromFile(FilePath: Text; FileName: Text): Code[50]
     var
         MediaResources: Record "Media Resources";
@@ -74,6 +78,7 @@ codeunit 9755 "Media Resources Mgt."
         exit(MediaResourceCode);
     end;
 
+    [Scope('OnPrem')]
     procedure InsertBlobFromText(MediaResourcesCode: Code[50]; BlobContent: Text): Boolean
     var
         MediaResources: Record "Media Resources";
@@ -90,6 +95,7 @@ codeunit 9755 "Media Resources Mgt."
         exit(MediaResources.Insert(true));
     end;
 
+    [Scope('OnPrem')]
     procedure ReadTextFromMediaResource(MediaResourcesCode: Code[50]) MediaText: Text
     var
         MediaResources: Record "Media Resources";
