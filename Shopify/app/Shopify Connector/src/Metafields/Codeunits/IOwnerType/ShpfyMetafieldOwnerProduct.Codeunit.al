@@ -16,7 +16,6 @@ codeunit 30334 "Shpfy Metafield Owner Product" implements "Shpfy IMetafield Owne
         JResponse: JsonToken;
         JMetafields: JsonArray;
         JNode: JsonObject;
-        JProduct: JsonObject;
         JItem: JsonToken;
         Id: BigInteger;
         UpdatedAt: DateTime;
@@ -24,14 +23,13 @@ codeunit 30334 "Shpfy Metafield Owner Product" implements "Shpfy IMetafield Owne
         Parameters.Add('ProductId', Format(OwnerId));
         GraphQLType := GraphQLType::ProductMetafieldIds;
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
-        if JsonHelper.GetJsonObject(JResponse, JProduct, 'data.product') then
-            if JsonHelper.GetJsonArray(JResponse, JMetafields, 'data.product.metafields.edges') then
-                foreach JItem in JMetafields do
-                    if JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node') then begin
-                        Id := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JNode, 'legacyResourceId'));
-                        UpdatedAt := JsonHelper.GetValueAsDateTime(JNode, 'updatedAt');
-                        MetafieldIds.Add(Id, UpdatedAt);
-                    end;
+        if JsonHelper.GetJsonArray(JResponse, JMetafields, 'data.product.metafields.edges') then
+            foreach JItem in JMetafields do
+                if JsonHelper.GetJsonObject(JItem.AsObject(), JNode, 'node') then begin
+                    Id := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JNode, 'legacyResourceId'));
+                    UpdatedAt := JsonHelper.GetValueAsDateTime(JNode, 'updatedAt');
+                    MetafieldIds.Add(Id, UpdatedAt);
+                end;
     end;
 
     procedure GetShopCode(OwnerId: BigInteger): Code[20]
