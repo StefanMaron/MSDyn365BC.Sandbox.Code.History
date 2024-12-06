@@ -203,7 +203,6 @@ report 12109 "Account Book Sheet - Print"
             dataitem(PageCounter; "Integer")
             {
                 DataItemTableView = sorting(Number) where(Number = const(1));
-                PrintOnlyIfDetail = true;
                 column(StartOnHand; StartOnHand)
                 {
                     AutoFormatType = 1;
