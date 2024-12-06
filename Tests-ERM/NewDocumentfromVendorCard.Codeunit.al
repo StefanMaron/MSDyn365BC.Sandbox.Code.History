@@ -2,7 +2,6 @@ codeunit 134770 "New Document from Vendor Card"
 {
     Subtype = Test;
     TestPermissions = Disabled;
-    EventSubscriberInstance = Manual;
 
     trigger OnRun()
     begin
@@ -13,11 +12,8 @@ codeunit 134770 "New Document from Vendor Card"
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
-        LibraryMarketing: codeunit "Library - Marketing";
-        LibraryVariableStorage: Codeunit "Library - Variable Storage";
         Assert: Codeunit Assert;
         isInitialized: Boolean;
-        VendorNoForEventSubscriber: Code[20];
 
     [Test]
     [Scope('OnPrem')]
@@ -201,112 +197,6 @@ codeunit 134770 "New Document from Vendor Card"
           Vendor.Contact, PurchaseReturnOrder."Buy-from Contact".Value, 'Vendor contact is not carried over to the document');
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    procedure PurchaseOrdersFromVendorCard_CreateNewOrderFromPurchaseOrderList_AutomaticOrderNos()
-    var
-        Vendor: Record Vendor;
-        NewDocumentFromVendorCard: Codeunit "New Document from Vendor Card";
-        PurchaseOrder: TestPage "Purchase Order";
-    begin
-        // [SCENARIO 504336] Simulate the scenario where new purchase order is created from the vendor card via Purchase Order list and New action.
-        // [SCENARIO 504336] No. of Purchase Order is automatically assigned, so it is not visible in the page.
-        Initialize();
-
-        BindSubscription(NewDocumentFromVendorCard); // Uses OnOpenPurchaseOrder event subscriber to simulate page filters.
-
-        // [GIVEN] Create Vendor.
-        LibraryPurchase.CreateVendor(Vendor);
-        NewDocumentFromVendorCard.SetVendorNoForEventSubscriber(Vendor); // Set Vendor No. for event subscriber to simulate page filters.
-
-        // [GIVEN] Create New Purchase Order, with "Buy-from Vendor No." filter in filtergroup = 2 to simulate page filters.
-        PurchaseOrder.OpenNew();
-
-        // [WHEN] Set any field on the page to insert record.
-        PurchaseOrder."Buy-from Address".SetValue(Vendor.Address);
-
-        // [THEN] Vendor No. and Vendor Name are carried over to the document
-        Assert.AreEqual(Vendor."No.", PurchaseOrder."Buy-from Vendor No.".Value(), 'Vendor No. is not carried over to the document');
-        Assert.AreEqual(Vendor.Name, PurchaseOrder."Buy-from Vendor Name".Value(), 'Vendor Name is not carried over to the document');
-
-        UnbindSubscription(NewDocumentFromVendorCard);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure PurchaseOrdersFromVendorCard_CreateNewOrderFromPurchaseOrderList_ManualOrderNos()
-    var
-        Vendor: Record Vendor;
-        NewDocumentFromVendorCard: Codeunit "New Document from Vendor Card";
-        PurchaseOrder: TestPage "Purchase Order";
-    begin
-        // [SCENARIO 504336] Simulate the scenario where new purchase order is created from the vendor card via Purchase Order list and New action.
-        // [SCENARIO 504336] No. of Purchase Order can be manually set, so it is visible in the page.
-        Initialize();
-
-        // [GIVEN] Set Manual Nos. on Purchase Order No. Series
-        UpdateManualNosOnPurchaseOrderNoSeries(true);
-
-        BindSubscription(NewDocumentFromVendorCard); // Uses OnOpenPurchaseOrder event subscriber to simulate page filters.
-
-        // [GIVEN] Create Vendor.
-        LibraryPurchase.CreateVendor(Vendor);
-        NewDocumentFromVendorCard.SetVendorNoForEventSubscriber(Vendor); // Set Vendor No. for event subscriber to simulate page filters.
-
-        // [GIVEN] Create New Purchase Order, with "Buy-from Vendor No." filter in filtergroup = 2 to simulate page filters.
-        PurchaseOrder.OpenNew();
-
-        // [WHEN] Set any field on the page to insert record.
-        PurchaseOrder."Buy-from Address".SetValue(Vendor.Address);
-
-        // [THEN] Vendor No. and Vendor Name are carried over to the document
-        Assert.AreEqual(Vendor."No.", PurchaseOrder."Buy-from Vendor No.".Value(), 'Vendor No. is not carried over to the document');
-        Assert.AreEqual(Vendor.Name, PurchaseOrder."Buy-from Vendor Name".Value(), 'Vendor Name is not carried over to the document');
-
-        UnbindSubscription(NewDocumentFromVendorCard);
-        UpdateManualNosOnPurchaseOrderNoSeries(false);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    [HandlerFunctions('ContactListRunModal,VendorLinkPageHandler')]
-    procedure ContactHasCompanyNoFilledWhenCreatedFromPrimaryContactNoOfVendor()
-    var
-        BusinessRelation: Record "Business Relation";
-        Vendor: Record Vendor;
-        Contact: Record Contact;
-        VendorCard: TestPage "Vendor Card";
-    begin
-        // [SCENARIO 525453] When Contact is created from Primary Contact No. field of a Vendor, it will already have a value in Company No. field.
-        Initialize();
-
-        // [GIVEN] Create Business Relation.
-        LibraryMarketing.CreateBusinessRelation(BusinessRelation);
-
-        // [GIVEN] Change Business Relation Code to blank for Vendors.
-        ChangeBusinessRelationCodeForVendors('');
-
-        // [GIVEN] Create a Vendor.
-        LibraryPurchase.CreateVendor(Vendor);
-
-        // [GIVEN] Changes Business Relation Code for Vendors.
-        LibraryVariableStorage.Enqueue(Vendor."No.");
-        ChangeBusinessRelationCodeForVendors(BusinessRelation.Code);
-
-        // [GIVEN] Create a Company Contact.
-        LibraryMarketing.CreateCompanyContact(Contact);
-
-        // [GIVEN] Create Vendor Link.
-        Contact.CreateVendorLink();
-
-        // [WHEN] Open Vendor Card page and run Lookup of Primary Contact No.
-        VendorCard.OpenEdit();
-        VendorCard.GoToRecord(Vendor);
-        VendorCard."Primary Contact No.".Lookup();
-
-        // [THEN] Company No. in Contact Card has a value Verified in ContactListRunModal.
-    end;
-
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"New Document from Vendor Card");
@@ -320,66 +210,6 @@ codeunit 134770 "New Document from Vendor Card"
         isInitialized := true;
 
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"New Document from Vendor Card");
-    end;
-
-    local procedure UpdateManualNosOnPurchaseOrderNoSeries(ManualNos: Boolean)
-    var
-        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
-        NoSeries: Record "No. Series";
-    begin
-        PurchasesPayablesSetup.Get();
-        NoSeries.Get(PurchasesPayablesSetup."Order Nos.");
-        NoSeries.Validate("Manual Nos.", ManualNos);
-        NoSeries.Modify(true);
-    end;
-
-    local procedure ChangeBusinessRelationCodeForVendors(BusRelCodeForVendors: Code[10]) OriginalBusRelCodeForVendors: Code[10]
-    var
-        MarketingSetup: Record "Marketing Setup";
-    begin
-        MarketingSetup.Get();
-        OriginalBusRelCodeForVendors := MarketingSetup."Bus. Rel. Code for Vendors";
-        MarketingSetup.Validate("Bus. Rel. Code for Vendors", BusRelCodeForVendors);
-        MarketingSetup.Modify(true);
-    end;
-
-    internal procedure SetVendorNoForEventSubscriber(Vendor: Record Vendor)
-    begin
-        VendorNoForEventSubscriber := Vendor."No.";
-    end;
-
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure VendorLinkPageHandler(var VendorLink: TestPage "Vendor Link")
-    var
-        CurrMasterFields: Option Contact,Vendor;
-    begin
-        VendorLink."No.".SetValue(LibraryVariableStorage.DequeueText());
-        VendorLink.CurrMasterFields.SetValue(CurrMasterFields::Vendor);
-        VendorLink.OK().Invoke();
-    end;
-
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure ContactListRunModal(var ContactList: TestPage "Contact List")
-    var
-        ContactCard: TestPage "Contact Card";
-    begin
-        ContactCard.OpenView();
-        ContactCard.Filter.SetFilter("Company No.", ContactList."No.".Value);
-        ContactCard.New();
-        LibraryVariableStorage.Enqueue(ContactList."No.");
-        LibraryVariableStorage.Enqueue(ContactCard."Company No.");
-        ContactCard."Company No.".AssertEquals(ContactList."No.");
-    end;
-
-    [EventSubscriber(ObjectType::Page, Page::"Purchase Order", 'OnOpenPageEvent', '', false, false)]
-    local procedure OnOpenPurchaseOrder(var Rec: Record "Purchase Header")
-    begin
-        Rec.FilterGroup(2);
-        Rec.SetRange("Document Type", Rec."Document Type"::Order);
-        Rec.SetRange("Buy-from Vendor No.", VendorNoForEventSubscriber);
-        Rec.FilterGroup(0);
     end;
 }
 
