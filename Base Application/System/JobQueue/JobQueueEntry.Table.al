@@ -17,8 +17,7 @@ table 472 "Job Queue Entry"
     DrillDownPageID = "Job Queue Entries";
     LookupPageID = "Job Queue Entries";
     Permissions = TableData "Job Queue Entry" = rimd,
-                  TableData "Job Queue Log Entry" = rimd,
-                  TableData "Job Queue Category" = rm;
+                  TableData "Job Queue Log Entry" = rimd;
     ReplicateData = false;
     DataClassification = CustomerContent;
 
@@ -147,7 +146,6 @@ table 472 "Job Queue Entry"
                 ReportLayoutSelection: Record "Report Layout Selection";
                 InitServerPrinterTable: Codeunit "Init. Server Printer Table";
                 EnvironmentInfo: Codeunit "Environment Information";
-                IsHandled: Boolean;
             begin
                 TestField("Object Type to Run", "Object Type to Run"::Report);
 
@@ -162,12 +160,8 @@ table 472 "Job Queue Entry"
                 end;
                 if "Report Output Type" = "Report Output Type"::Print then begin
                     if EnvironmentInfo.IsSaaS() then begin
-                        IsHandled := false;
-                        OnValidateReportOutputTypeOnBeforeShowPrintNotAllowedInSaaS(Rec, IsHandled);
-                        if not IsHandled then begin
-                            "Report Output Type" := "Report Output Type"::PDF;
-                            Message(NoPrintOnSaaSMsg);
-                        end;
+                        "Report Output Type" := "Report Output Type"::PDF;
+                        Message(NoPrintOnSaaSMsg);
                     end else
                         "Printer Name" := InitServerPrinterTable.FindClosestMatchToClientDefaultPrinter("Object ID to Run");
                 end else
@@ -177,7 +171,6 @@ table 472 "Job Queue Entry"
         field(11; "Maximum No. of Attempts to Run"; Integer)
         {
             Caption = 'Maximum No. of Attempts to Run';
-            MaxValue = 10;
         }
         field(12; "No. of Attempts to Run"; Integer)
         {
@@ -188,8 +181,8 @@ table 472 "Job Queue Entry"
         {
             Caption = 'Status';
             Editable = false;
-            OptionCaption = 'Ready,In Process,Error,On Hold,Finished,On Hold with Inactivity Timeout,Waiting';
-            OptionMembers = Ready,"In Process",Error,"On Hold",Finished,"On Hold with Inactivity Timeout",Waiting;
+            OptionCaption = 'Ready,In Process,Error,On Hold,Finished,On Hold with Inactivity Timeout';
+            OptionMembers = Ready,"In Process",Error,"On Hold",Finished,"On Hold with Inactivity Timeout";
         }
         field(14; Priority; Integer)
         {
@@ -505,19 +498,6 @@ table 472 "Job Queue Entry"
             ObsoleteTag = '23.0';
             ObsoleteReason = 'The recovery job is no longer needed.';
         }
-        field(56; "Entry No."; BigInteger)
-        {
-            Caption = 'Entry No.';
-            AutoIncrement = true;
-            DataClassification = SystemMetadata;
-        }
-        field(57; "Priority Within Category"; Enum "Job Queue Priority")
-        {
-            Caption = 'Priority';
-            ToolTip = 'Specifies the priority of the job within the category. Is only used when the job has a Category Code';
-            InitValue = Normal;
-            DataClassification = SystemMetadata;
-        }
     }
 
     keys
@@ -526,7 +506,7 @@ table 472 "Job Queue Entry"
         {
             Clustered = true;
         }
-        key(Key2; "Job Queue Category Code", "Priority Within Category", "Entry No.")
+        key(Key2; "Job Queue Category Code")
         {
             IncludedFields = Status, "User ID", "System Task ID", "Object Type to Run", "Object ID to Run", "Earliest Start Date/Time";
         }
@@ -602,40 +582,15 @@ table 472 "Job Queue Entry"
 
     procedure DoesExistLocked(): Boolean
     begin
-        Rec.ReadIsolation(IsolationLevel::UpdLock);
-        exit(Rec.Get(ID));
+        LockTable();
+        exit(Get(ID));
     end;
 
     procedure RefreshLocked()
     begin
         SetLoadFields();
-        if not Rec.GetRecLockedExtendedTimeout() then begin
-            Rec.ReadIsolation(IsolationLevel::UpdLock);
-            Rec.Get(ID);  // one last try, and then throw the lock timeout error
-        end;
-    end;
-
-    /// <summary>
-    /// Allow up to three lock time-outs = 90 seconds, in order to reduce lock timeouts
-    ///</summary>    
-    procedure GetRecLockedExtendedTimeout(): Boolean
-    var
-        i: Integer;
-    begin
-        Rec.ReadIsolation(IsolationLevel::ReadUncommitted);
-        if not Rec.Find() then
-            exit(false);
-        Rec.ReadIsolation(IsolationLevel::UpdLock);
-        for i := 1 to 3 do
-            if TryGetRecordLocked(Rec) then
-                exit(true);
-        exit(false);
-    end;
-
-    [TryFunction]
-    local procedure TryGetRecordLocked(var JobQueueEntry: Record "Job Queue Entry")
-    begin
-        JobQueueEntry.Find();
+        LockTable();
+        Get(ID);
     end;
 
     procedure IsExpired(AtDateTime: DateTime): Boolean
@@ -652,7 +607,7 @@ table 472 "Job Queue Entry"
         if IsHandled then
             exit(Result);
 
-        exit(Status in [Status::Ready, Status::Waiting, Status::"In Process", Status::"On Hold with Inactivity Timeout"]);
+        exit(Status in [Status::Ready, Status::"In Process", Status::"On Hold with Inactivity Timeout"]);
     end;
 
     procedure ShowErrorMessage()
@@ -721,6 +676,7 @@ table 472 "Job Queue Entry"
     begin
         Status := Status::Error;
         "Error Message" := DeletedEntryErr;
+        Modify();
     end;
 
     procedure FinalizeRun()
@@ -897,21 +853,23 @@ table 472 "Job Queue Entry"
         TaskGUID: Guid;
         IsHandled: Boolean;
         JobTimeout: Duration;
-#if not CLEAN25
         ShouldChangeUserID: Boolean;
-#endif
     begin
         CheckRequiredPermissions();
+        ShouldChangeUserID := "User ID" <> UserId();
+        OnScheduleTaskOnAfterCalcShouldChangeUserID(Rec, ShouldChangeUserID);
+        if ShouldChangeUserID then begin
+            "User ID" := UserId();
+            Modify(true);
+        end;
         IsHandled := false;
         OnBeforeScheduleTask(Rec, TaskGUID, IsHandled);
         if IsHandled then
             exit(TaskGUID);
+
         if not IsNullGuid(TaskGUID) then
             exit(TaskGUID);
 
-#if not CLEAN25
-        OnScheduleTaskOnAfterCalcShouldChangeUserID(Rec, ShouldChangeUserID);
-#endif
         if Rec."Job Timeout" <> 0 then
             JobTimeout := Rec."Job Timeout"
         else
@@ -1060,20 +1018,15 @@ table 472 "Job Queue Entry"
         JobQueueLogEntry: Record "Job Queue Log Entry";
         TelemetrySubscribers: Codeunit "Telemetry Subscribers";
         IsHandled: Boolean;
-        ExtraWaitTimeInMs: Integer;
     begin
         IsHandled := false;
         OnBeforeHandleExecutionError(Rec, IsHandled);
         if IsHandled then
             exit;
 
-        if (Rec."Maximum No. of Attempts to Run" > Rec."No. of Attempts to Run") and (Rec."No. of Attempts to Run" < 10) then begin
+        if Rec."Maximum No. of Attempts to Run" > Rec."No. of Attempts to Run" then begin
             Rec."No. of Attempts to Run" += 1;
-            if Rec."No. of Attempts to Run" > 7 then
-                ExtraWaitTimeInMs := 6 * 60 * 60 * 1000  // 6 hours
-            else
-                ExtraWaitTimeInMs := Power(10, Rec."No. of Attempts to Run");
-            Rec."Earliest Start Date/Time" := CurrentDateTime + 1000 * Rec."Rerun Delay (sec.)" + ExtraWaitTimeInMs;
+            Rec."Earliest Start Date/Time" := CurrentDateTime + 1000 * Rec."Rerun Delay (sec.)";
             EnqueueTask();
         end else begin
             SetStatusValue(Rec.Status::Error);
@@ -1306,7 +1259,7 @@ table 472 "Job Queue Entry"
         OldParams := GetReportParameters();
         Params := REPORT.RunRequestPage("Object ID to Run", OldParams);
 
-        if(Params <> '') and (Params <> OldParams) then begin
+        if (Params <> '') and (Params <> OldParams) then begin
             "User ID" := UserId();
             SetReportParameters(Params);
         end;
@@ -1505,132 +1458,6 @@ table 472 "Job Queue Entry"
         OnFindingIfJobNeedsToBeRun(Result);
     end;
 
-    internal procedure RemoveFailedJobs(OnlyForCurrentUser: Boolean)
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        FailedJobQueueEntry: Query "Failed Job Queue Entry";
-        DeleteQst: Label 'Do you want to delete failed, non-recurring jobs (keeps jobs that failed within the last 30 minutes)?';
-    begin
-        if not Confirm(DeleteQst) then
-            exit;
-        // Don't remove jobs that have just failed (i.e. last 30 sec)
-        FailedJobQueueEntry.SetRange(End_Date_Time, 0DT, CurrentDateTime - 30000);
-        if OnlyForCurrentUser then
-            FailedJobQueueEntry.SetRange(UserID, UserId());
-        FailedJobQueueEntry.Open();
-
-        while FailedJobQueueEntry.Read() do
-            if JobQueueEntry.Get(FailedJobQueueEntry.ID) then
-                JobQueueEntry.Delete(true);
-    end;
-
-    local procedure AnyActivateJobInCategory(var JobQueueCategory: Record "Job Queue Category"): Boolean
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-    begin
-        JobQueueEntry.ReadIsolation(IsolationLevel::ReadCommitted);
-        JobQueueEntry.SetRange("Job Queue Category Code", JobQueueCategory.Code);
-        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
-        JobQueueEntry.SetFilter(ID, '<>%1', Rec.ID);
-        exit(not JobQueueEntry.IsEmpty);
-    end;
-
-    internal procedure AnyReadyJobInCategory(var JobQueueCategory: Record "Job Queue Category"): Boolean
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-    begin
-        JobQueueEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
-        JobQueueEntry.SetRange("Job Queue Category Code", JobQueueCategory.Code);
-        JobQueueEntry.SetFilter(Status, '%1|%2', JobQueueEntry.Status::"In Process", JobQueueEntry.Status::Ready);
-        exit(not JobQueueEntry.IsEmpty);
-    end;
-
-    internal procedure ActivateNextJobInCategory(var JobQueueCategory: Record "Job Queue Category"): Boolean
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueCategoryCode: Code[10];
-        OneActivated: Boolean;
-        JobQueueCategoryExist: Boolean;
-        WaitingJobsExist: Boolean;
-        NoTaskErr: Label 'The task was not found in the task scheduler.';
-    begin
-        JobQueueCategoryCode := JobQueueCategory.Code;
-        JobQueueCategory.ReadIsolation(IsolationLevel::UpdLock);
-        JobQueueCategoryExist := JobQueueCategory.Get(JobQueueCategoryCode);
-        JobQueueEntry.SetLoadFields(ID, "Job Queue Category Code", Status, "Entry No.", "Priority Within Category", "System Task ID");
-        JobQueueEntry.ReadIsolation(IsolationLevel::ReadCommitted);
-        JobQueueEntry.SetRange("Job Queue Category Code", JobQueueCategoryCode);
-        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::Waiting);
-        JobQueueEntry.SetFilter("Expiration Date/Time", '%1|>=%2', 0DT, CurrentDateTime());
-        JobQueueEntry.SetCurrentKey("Job Queue Category Code", "Priority Within Category", "Entry No.");
-        WaitingJobsExist := JobQueueEntry.FindFirst();
-        while WaitingJobsExist and not OneActivated do
-            if TaskScheduler.TaskExists(JobQueueEntry."System Task ID") then begin
-                JobQueueEntry.Status := JobQueueEntry.Status::Ready;
-                JobQueueEntry.Modify();
-                TaskScheduler.SetTaskReady(JobQueueEntry."System Task ID");
-                OneActivated := true;
-            end else begin
-                JobQueueEntry.SetError(NoTaskErr);
-                WaitingJobsExist := JobQueueEntry.FindFirst();
-            end;
-        if OneActivated then
-            Commit();
-        if JobQueueCategoryExist and OneActivated then
-            RefreshRecoveryTask(JobQueueCategory);
-        exit(OneActivated);
-    end;
-
-    internal procedure RefreshRecoveryTask(var JobQueueCategory: Record "Job Queue Category")
-    begin
-        if not IsNullGuid(JobQueueCategory."Recovery Task Id") and (JobQueueCategory."Recovery Task Start Time" > CurrentDateTime() + 5 * 60 * 1000) then  // not first time and more than 5 min. to go?
-            exit;
-
-        if not IsNullGuid(JobQueueCategory."Recovery Task Id") then
-            if TaskScheduler.TaskExists(JobQueueCategory."Recovery Task Id") then
-                TaskScheduler.CancelTask(JobQueueCategory."Recovery Task Id");
-        JobQueueCategory."Recovery Task Start Time" := CurrentDateTime() + 20 * 60 * 1000; // 20 minutes from now
-        JobQueueCategory."Recovery Task Id" := TaskScheduler.CreateTask(Codeunit::"Job Queue Category Scheduler", 0, true, CompanyName(), JobQueueCategory."Recovery Task Start Time", JobQueueCategory.RecordId());
-        JobQueueCategory.Modify();
-    end;
-
-    internal procedure ActivateNextJobInCategoryIfAny()
-    var
-        Success: Boolean;
-        NoOfAttempts: Integer;
-    begin
-        if Rec."Job Queue Category Code" = '' then
-            exit;
-        Commit();
-        while not Success and (NoOfAttempts < 3) do begin
-            Success := Codeunit.Run(Codeunit::"Job Queue Activate Next", Rec); // wrapper of ActivateNextJobInCategory()
-            NoOfAttempts += 1;
-        end;
-    end;
-
-    internal procedure ActivateNextJobInCategory()
-    var
-        JobQueueCategory: Record "Job Queue Category";
-    begin
-        if Rec."Job Queue Category Code" = '' then
-            exit;
-        JobQueueCategory.Code := Rec."Job Queue Category Code";
-        if not AnyActivateJobInCategory(JobQueueCategory) then
-            if ActivateNextJobInCategory(JobQueueCategory) then;
-    end;
-
-    internal procedure SetPriority(NewPriority: Enum "Job Queue Priority")
-    var
-        ChangePriorityErr: Label 'You cannot change priority of a job that is in process.';
-    begin
-        if Rec."Priority Within Category" = NewPriority then
-            exit;
-        if Rec.Status = Rec.Status::"In Process" then
-            Error(ChangePriorityErr);
-        Rec."Priority Within Category" := NewPriority;
-        Rec.Modify();
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterReschedule(var JobQueueEntry: Record "Job Queue Entry")
     begin
@@ -1716,13 +1543,11 @@ table 472 "Job Queue Entry"
     begin
     end;
 
-#if not CLEAN25
-    [Obsolete('Function ScheduleTask no longer changes user ID.', '25.0')]
     [IntegrationEvent(false, false)]
     local procedure OnScheduleTaskOnAfterCalcShouldChangeUserID(var JobQueueEntry: Record "Job Queue Entry"; var ShouldChangeUserID: Boolean)
     begin
     end;
-#endif
+
     [IntegrationEvent(false, false)]
     local procedure OnSetXmlContentOnBeforeModify(var JobQueueEntry: Record "Job Queue Entry"; var Params: Text)
     begin
@@ -1760,11 +1585,6 @@ table 472 "Job Queue Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsReadyToStart(var JobQueueEntry: Record "Job Queue Entry"; var ReadyToStart: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateReportOutputTypeOnBeforeShowPrintNotAllowedInSaaS(var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
     begin
     end;
 }
