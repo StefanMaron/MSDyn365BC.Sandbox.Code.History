@@ -527,10 +527,10 @@ codeunit 5836 "Cost Calculation Management"
         if IsHandled then
             exit(Result);
 
-        if ProdOrderComp."Flushing Method" = ProdOrderComp."Flushing Method"::"Pick + Backward" then
-            CompQtyBasePerMfgQtyBase := (ProdOrderComp."Quantity per" * ProdOrderComp."Qty. per Unit of Measure") / ProdOrderLine."Qty. per Unit of Measure"
+        if ProdOrderComp."Flushing Method" = ProdOrderComp."Flushing Method"::Backward then
+            CompQtyBasePerMfgQtyBase := (ProdOrderComp."Quantity" * ProdOrderComp."Qty. per Unit of Measure") / ProdOrderLine."Qty. per Unit of Measure"
         else
-            CompQtyBasePerMfgQtyBase := (ProdOrderComp."Quantity" * ProdOrderComp."Qty. per Unit of Measure") / ProdOrderLine."Qty. per Unit of Measure";
+            CompQtyBasePerMfgQtyBase := (ProdOrderComp."Quantity per" * ProdOrderComp."Qty. per Unit of Measure") / ProdOrderLine."Qty. per Unit of Measure";
 
         if (ProdOrderComp."Calculation Formula" = ProdOrderComp."Calculation Formula"::"Fixed Quantity") and (OutputQtyBase <> 0) then
             exit(CalcQtyAdjdForBOMScrap(CompQtyBasePerMfgQtyBase, ProdOrderComp."Scrap %"))
@@ -754,12 +754,7 @@ codeunit 5836 "Cost Calculation Management"
     var
         PostedQtyBase: Decimal;
         RemQtyToCalcBase: Decimal;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCalcSalesLineCostLCY(SalesLine, QtyType, IsHandled, TotalAdjCostLCY);
-        if IsHandled then
-            exit;
         case SalesLine."Document Type" of
             SalesLine."Document Type"::Order, SalesLine."Document Type"::Invoice:
                 if ((SalesLine."Quantity Shipped" <> 0) or (SalesLine."Shipment No." <> '')) and
@@ -774,7 +769,7 @@ codeunit 5836 "Cost Calculation Management"
         end;
     end;
 
-    procedure CalcSalesLineShptAdjCostLCY(SalesLine: Record "Sales Line"; QtyType: Option General,Invoicing; var TotalAdjCostLCY: Decimal; var PostedQtyBase: Decimal; var RemQtyToCalcBase: Decimal)
+    local procedure CalcSalesLineShptAdjCostLCY(SalesLine: Record "Sales Line"; QtyType: Option General,Invoicing; var TotalAdjCostLCY: Decimal; var PostedQtyBase: Decimal; var RemQtyToCalcBase: Decimal)
     var
         SalesShptLine: Record "Sales Shipment Line";
         UOMMgt: Codeunit "Unit of Measure Management";
@@ -790,7 +785,6 @@ codeunit 5836 "Cost Calculation Management"
             SalesShptLine.SetRange("Order Line No.", SalesLine."Line No.");
         end;
         SalesShptLine.SetRange(Correction, false);
-        OnCalcSalesLineShptAdjCostLCYBeforeSalesShptLineFind(SalesShptLine, SalesLine);
         if QtyType = QtyType::Invoicing then begin
             SalesShptLine.SetFilter(SalesShptLine."Qty. Shipped Not Invoiced", '<>0');
             RemQtyToCalcBase := SalesLine."Qty. to Invoice (Base)" - SalesLine."Qty. to Ship (Base)";
@@ -834,7 +828,7 @@ codeunit 5836 "Cost Calculation Management"
             until (SalesShptLine.Next() = 0) or (RemQtyToCalcBase = 0);
     end;
 
-    procedure CalcSalesLineRcptAdjCostLCY(SalesLine: Record "Sales Line"; QtyType: Option General,Invoicing; var TotalAdjCostLCY: Decimal; var PostedQtyBase: Decimal; var RemQtyToCalcBase: Decimal)
+    local procedure CalcSalesLineRcptAdjCostLCY(SalesLine: Record "Sales Line"; QtyType: Option General,Invoicing; var TotalAdjCostLCY: Decimal; var PostedQtyBase: Decimal; var RemQtyToCalcBase: Decimal)
     var
         ReturnRcptLine: Record "Return Receipt Line";
         UOMMgt: Codeunit "Unit of Measure Management";
@@ -1101,7 +1095,6 @@ codeunit 5836 "Cost Calculation Management"
         ValueEntry.SetFilter("Global Dimension 1 Code", Customer.GetFilter("Global Dimension 1 Filter"));
         ValueEntry.SetFilter("Global Dimension 2 Code", Customer.GetFilter("Global Dimension 2 Filter"));
         ValueEntry.SetFilter("Entry Type", '<> %1', ValueEntry."Entry Type"::Revaluation);
-        OnCalcCustActualCostLCYOnAfterFilterValueEntry(Customer, ValueEntry);
         ValueEntry.CalcSums("Cost Amount (Actual)");
         CostAmt := ValueEntry."Cost Amount (Actual)";
 
@@ -1111,7 +1104,6 @@ codeunit 5836 "Cost Calculation Management"
         ResLedgerEntry.SetFilter("Posting Date", Customer.GetFilter("Date Filter"));
         ResLedgerEntry.SetFilter("Global Dimension 1 Code", Customer.GetFilter("Global Dimension 1 Filter"));
         ResLedgerEntry.SetFilter("Global Dimension 2 Code", Customer.GetFilter("Global Dimension 2 Filter"));
-        OnCalcCustActualCostLCYOnAfterFilterResLedgerEntry(Customer, ResLedgerEntry);
         ResLedgerEntry.CalcSums(ResLedgerEntry."Total Cost");
         CostAmt += ResLedgerEntry."Total Cost";
     end;
@@ -1433,32 +1425,12 @@ codeunit 5836 "Cost Calculation Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcSalesLineCostLCY(SalesLine: Record "Sales Line"; QtyType: Option General,Invoicing; var IsHandled: Boolean; var TotalAdjCostLCY: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcSalesLineShptAdjCostLCYBeforeSalesShptLineFind(var SalesShptLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnFindRountingLineOnAfterRoutingLineSetFilters(var RoutingLine: Record "Routing Line"; ProdBOMLine: Record "Production BOM Line"; CalculationDate: Date; RoutingNo: Code[20])
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcOutputQtyBaseOnPurchOrder(ProdOrderLine: Record "Prod. Order Line"; ProdOrderRtngLine: Record "Prod. Order Routing Line"; var OutstandingBaseQty: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcCustActualCostLCYOnAfterFilterValueEntry(var Customer: Record Customer; var ValueEntry: Record "Value Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcCustActualCostLCYOnAfterFilterResLedgerEntry(var Customer: Record Customer; var ResLedgerEntry: Record "Res. Ledger Entry")
     begin
     end;
 }
