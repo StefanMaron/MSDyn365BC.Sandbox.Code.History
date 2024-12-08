@@ -2512,8 +2512,8 @@ codeunit 10145 "E-Invoice Mgt."
         AddNodeCompanyInfo(XMLDoc, XMLCurrNode);
         // Receptor
         AddNodeReceptor(
-              XMLDoc, XMLCurrNode, Customer, Customer."CFDI Customer Name", TempDocumentHeader."Bill-to/Pay-To Post Code", TempDocumentHeader."CFDI Purpose");
-
+          XMLDoc, XMLCurrNode, Customer, Customer."CFDI Customer Name",
+          GetSATPostalCode(TempDocumentHeader."SAT Address ID", Customer."Location Code", Customer."Post Code"), TempDocumentHeader."CFDI Purpose");
         // Conceptos
         AddElementCFDI(XMLCurrNode, 'Conceptos', '', DocNameSpace, XMLNewChild);
         XMLCurrNode := XMLNewChild;
@@ -2525,7 +2525,7 @@ codeunit 10145 "E-Invoice Mgt."
                 AddElementCFDI(XMLCurrNode, 'Concepto', '', DocNameSpace, XMLNewChild);
                 XMLCurrNode := XMLNewChild;
                 AddAttribute(
-                  XMLDoc, XMLCurrNode, 'ClaveProdServ', SATUtilities.GetSATClassification(TempDocumentLine.Type, TempDocumentLine."No."));
+                  XMLDoc, XMLCurrNode, 'ClaveProdServ', SATUtilities.GetSATItemClassification(TempDocumentLine.Type, TempDocumentLine."No."));
                 AddAttribute(XMLDoc, XMLCurrNode, 'NoIdentificacion', TempDocumentLine."No.");
                 AddAttribute(XMLDoc, XMLCurrNode, 'Cantidad', Format(TempDocumentLine.Quantity, 0, 9));
                 AddAttribute(XMLDoc, XMLCurrNode, 'ClaveUnidad', SATUtilities.GetSATUnitofMeasure(TempDocumentLine."Unit of Measure Code"));
@@ -2610,8 +2610,8 @@ codeunit 10145 "E-Invoice Mgt."
         AddNodeCompanyInfo(XMLDoc, XMLCurrNode);
         // Receptor
         AddNodeReceptor(
-              XMLDoc, XMLCurrNode, Customer, Customer."CFDI Customer Name", TempDocumentHeader."Bill-to/Pay-To Post Code", TempDocumentHeader."CFDI Purpose");
-
+          XMLDoc, XMLCurrNode, Customer, Customer."CFDI Customer Name",
+          GetSATPostalCode(TempDocumentHeader."SAT Address ID", Customer."Location Code", Customer."Post Code"), TempDocumentHeader."CFDI Purpose");
         // Conceptos
         AddElementCFDI(XMLCurrNode, 'Conceptos', '', DocNameSpace, XMLNewChild);
         XMLCurrNode := XMLNewChild;
@@ -2623,7 +2623,7 @@ codeunit 10145 "E-Invoice Mgt."
                 AddElementCFDI(XMLCurrNode, 'Concepto', '', DocNameSpace, XMLNewChild);
                 XMLCurrNode := XMLNewChild;
                 AddAttribute(
-                  XMLDoc, XMLCurrNode, 'ClaveProdServ', SATUtilities.GetSATClassification(TempDocumentLine.Type, TempDocumentLine."No."));
+                  XMLDoc, XMLCurrNode, 'ClaveProdServ', SATUtilities.GetSATItemClassification(TempDocumentLine.Type, TempDocumentLine."No."));
                 AddAttribute(XMLDoc, XMLCurrNode, 'NoIdentificacion', TempDocumentLine."No.");
                 AddAttribute(XMLDoc, XMLCurrNode, 'Cantidad', Format(TempDocumentLine.Quantity, 0, 9));
                 AddAttribute(XMLDoc, XMLCurrNode, 'ClaveUnidad', SATUtilities.GetSATUnitofMeasure(TempDocumentLine."Unit of Measure Code"));
@@ -2691,7 +2691,8 @@ codeunit 10145 "E-Invoice Mgt."
 
         // Receptor
         AddNodeReceptor(
-              XMLDoc, XMLCurrNode, Customer, Customer."CFDI Customer Name", TempDocumentHeader."Bill-to/Pay-To Post Code", TempDocumentHeader."CFDI Purpose");
+          XMLDoc, XMLCurrNode, Customer, Customer."CFDI Customer Name",
+          GetSATPostalCode(TempDocumentHeader."SAT Address ID", Customer."Location Code", Customer."Post Code"), TempDocumentHeader."CFDI Purpose");
 
         // Conceptos
         AddElementCFDI(XMLCurrNode, 'Conceptos', '', DocNameSpace, XMLNewChild);
@@ -2756,8 +2757,8 @@ codeunit 10145 "E-Invoice Mgt."
         AddNodeCompanyInfo(XMLDoc, XMLCurrNode);
         // Receptor
         AddNodeReceptor(
-              XMLDoc, XMLCurrNode, Customer, Customer."CFDI Customer Name", TempDocumentHeader."Bill-to/Pay-To Post Code", 'P01');
-
+          XMLDoc, XMLCurrNode, Customer, Customer."CFDI Customer Name",
+          GetSATPostalCode(TempDocumentHeader."SAT Address ID", Customer."Location Code", Customer."Post Code"), 'P01');
         // Conceptos
         AddElementCFDI(XMLCurrNode, 'Conceptos', '', DocNameSpace, XMLNewChild);
         XMLCurrNode := XMLNewChild;
@@ -2834,7 +2835,7 @@ codeunit 10145 "E-Invoice Mgt."
                 AddElementCFDI(XMLCurrNode, 'Concepto', '', CFDINamespaceTxt, XMLNewChild);
                 XMLCurrNode := XMLNewChild;
                 AddAttribute(
-                  XMLDoc, XMLCurrNode, 'ClaveProdServ', SATUtilities.GetSATClassification(TempDocumentLine.Type, TempDocumentLine."No."));
+                  XMLDoc, XMLCurrNode, 'ClaveProdServ', SATUtilities.GetSATItemClassification(TempDocumentLine.Type, TempDocumentLine."No."));
                 AddAttribute(XMLDoc, XMLCurrNode, 'NoIdentificacion', TempDocumentLine."No.");
                 AddAttribute(XMLDoc, XMLCurrNode, 'Cantidad', Format(TempDocumentLine.Quantity, 0, 9));
                 AddAttribute(XMLDoc, XMLCurrNode, 'ClaveUnidad', SATUtilities.GetSATUnitofMeasure(TempDocumentLine."Unit of Measure Code"));
@@ -2923,7 +2924,7 @@ codeunit 10145 "E-Invoice Mgt."
                     Item.Get(TempDocumentLine."No.")
                 else
                     Item.Init();
-                SATClassificationCode := SATUtilities.GetSATClassification(TempDocumentLine.Type, TempDocumentLine."No.");
+                SATClassificationCode := SATUtilities.GetSATItemClassification(TempDocumentLine.Type, TempDocumentLine."No.");
                 AddElementCartaPorte(XMLCurrNode, 'Mercancia', '', CartaPorteNamespaceTxt, XMLNewChild);
                 XMLCurrNode := XMLNewChild;
                 AddAttribute(XMLDoc, XMLCurrNode, 'BienesTransp', SATClassificationCode);
@@ -3189,12 +3190,13 @@ codeunit 10145 "E-Invoice Mgt."
         AddStrCompanyInfo(OutStream);
         // Customer information (Receptor)
         AddStrReceptor(
-              OutStream, Customer, Customer."CFDI Customer Name", TempDocumentHeader."Bill-to/Pay-To Post Code", TempDocumentHeader."CFDI Purpose");
+          OutStream, Customer, Customer."CFDI Customer Name",
+          GetSATPostalCode(TempDocumentHeader."SAT Address ID", Customer."Location Code", Customer."Post Code"), TempDocumentHeader."CFDI Purpose");
 
         FilterDocumentLines(TempDocumentLine, TempDocumentHeader."No.");
         if TempDocumentLine.FindSet() then
             repeat
-                WriteOutStr(OutStream, SATUtilities.GetSATClassification(TempDocumentLine.Type, TempDocumentLine."No.") + '|');
+                WriteOutStr(OutStream, SATUtilities.GetSATItemClassification(TempDocumentLine.Type, TempDocumentLine."No.") + '|');
                 // ClaveProdServ
                 WriteOutStr(OutStream, TempDocumentLine."No." + '|');
                 // NoIdentificacion
@@ -3278,13 +3280,14 @@ codeunit 10145 "E-Invoice Mgt."
         AddStrCompanyInfo(OutStream);
         // Customer information (Receptor)
         AddStrReceptor(
-              OutStream, Customer, Customer."CFDI Customer Name", TempDocumentHeader."Bill-to/Pay-To Post Code", TempDocumentHeader."CFDI Purpose");
+          OutStream, Customer, Customer."CFDI Customer Name",
+          GetSATPostalCode(TempDocumentHeader."SAT Address ID", Customer."Location Code", Customer."Post Code"), TempDocumentHeader."CFDI Purpose");
 
         FilterDocumentLines(TempDocumentLine, TempDocumentHeader."No.");
 
         if TempDocumentLine.FindSet() then
             repeat
-                WriteOutStr(OutStream, SATUtilities.GetSATClassification(TempDocumentLine.Type, TempDocumentLine."No.") + '|');
+                WriteOutStr(OutStream, SATUtilities.GetSATItemClassification(TempDocumentLine.Type, TempDocumentLine."No.") + '|');
                 // ClaveProdServ
                 WriteOutStr(OutStream, TempDocumentLine."No." + '|');
                 // NoIdentificacion
@@ -3353,7 +3356,8 @@ codeunit 10145 "E-Invoice Mgt."
 
         // Customer information (Receptor)
         AddStrReceptor(
-              OutStream, Customer, Customer."CFDI Customer Name", TempDocumentHeader."Bill-to/Pay-To Post Code", TempDocumentHeader."CFDI Purpose");
+          OutStream, Customer, Customer."CFDI Customer Name",
+          GetSATPostalCode(TempDocumentHeader."SAT Address ID", Customer."Location Code", Customer."Post Code"), TempDocumentHeader."CFDI Purpose");
 
         // Write the one line
         WriteOutStr(OutStream, '84111506|'); // ClaveProdServ // 84111506 “Servicios de facturación”
@@ -3417,7 +3421,8 @@ codeunit 10145 "E-Invoice Mgt."
         AddStrCompanyInfo(OutStream);
         // Customer information (Receptor)	    
         AddStrReceptor(
-              OutStream, Customer, Customer."CFDI Customer Name", TempDocumentHeader."Bill-to/Pay-To Post Code", 'P01');
+          OutStream, Customer, Customer."CFDI Customer Name",
+          GetSATPostalCode(TempDocumentHeader."SAT Address ID", Customer."Location Code", Customer."Post Code"), 'P01');
 
         WriteOutStr(OutStream, '84111506|');
         // ClaveProdServ
@@ -3479,7 +3484,7 @@ codeunit 10145 "E-Invoice Mgt."
         FilterDocumentLines(TempDocumentLine, TempDocumentHeader."No.");
         if TempDocumentLine.FindSet() then
             repeat
-                WriteOutStr(OutStream, SATUtilities.GetSATClassification(TempDocumentLine.Type, TempDocumentLine."No.") + '|'); // ClaveProdServ
+                WriteOutStr(OutStream, SATUtilities.GetSATItemClassification(TempDocumentLine.Type, TempDocumentLine."No.") + '|'); // ClaveProdServ
                 WriteOutStr(OutStream, TempDocumentLine."No." + '|'); // NoIdentificacion
                 WriteOutStr(OutStream, Format(TempDocumentLine.Quantity, 0, 9) + '|'); // Cantidad
                 WriteOutStr(OutStream, SATUtilities.GetSATUnitofMeasure(TempDocumentLine."Unit of Measure Code") + '|'); // ClaveUnidad
@@ -3542,7 +3547,7 @@ codeunit 10145 "E-Invoice Mgt."
                     Item.Get(TempDocumentLine."No.")
                 else
                     Item.Init();
-                SATClassificationCode := SATUtilities.GetSATClassification(TempDocumentLine.Type, TempDocumentLine."No.");
+                SATClassificationCode := SATUtilities.GetSATItemClassification(TempDocumentLine.Type, TempDocumentLine."No.");
                 WriteOutStr(OutStream, SATClassificationCode + '|'); // BienesTransp
                 WriteOutStr(OutStream, EncodeString(TempDocumentLine.Description) + '|'); // Descripcion
                 WriteOutStr(OutStream, Format(TempDocumentLine.Quantity, 0, 9) + '|'); // Cantidad
@@ -5643,7 +5648,7 @@ codeunit 10145 "E-Invoice Mgt."
         Customer: Record Customer;
     begin
         Customer.Get(DetailedCustLedgEntry."Customer No.");
-        SATPostalCode := Customer."Post Code";
+        SATPostalCode := GetSATPostalCode(0, Customer."Location Code", Customer."Post Code");
     end;
 
     local procedure GetPmtCustDtldEntry(var DetailedCustLedgEntryPmt: Record "Detailed Cust. Ledg. Entry"; EntryNo: Integer)
@@ -6505,17 +6510,19 @@ IsVATExemptLine(TempDocumentLine));
         exit(false);
     end;
 
-    local procedure MapServiceTypeToTempDocType(Type: Enum "Service Line Type") LineType: Enum "Sales Line Type"
+    local procedure MapServiceTypeToTempDocType(Type: Enum "Service Line Type"): Integer
+    var
+        TrueType: Option " ","G/L Account",Item,Resource,"Fixed Asset","Charge (Item)";
     begin
         case Type of
             Type::Item:
-                exit(LineType::Item);
+                exit(TrueType::Item);
             Type::Resource:
-                exit(LineType::Resource);
+                exit(TrueType::Resource);
             Type::"G/L Account":
-                exit(LineType::"G/L Account");
+                exit(TrueType::"G/L Account");
             else
-                exit(LineType::" ");
+                exit(TrueType::" ");
         end;
     end;
 
@@ -6544,6 +6551,20 @@ IsVATExemptLine(TempDocumentLine));
             else
                 exit(2);
         end;
+    end;
+
+    local procedure GetSATPostalCode(SATAddressID: Integer; LocationCode: Code[10]; PostCode: Code[20]): Code[20]
+    var
+        Location: Record Location;
+        SATAddress: Record "SAT Address";
+    begin
+        if SATAddress.Get(SATAddressID) then
+            exit(SATAddress.GetSATPostalCode());
+
+        if Location.Get(LocationCode) then
+            exit(Location.GetSATPostalCode());
+
+        exit(PostCode);
     end;
 
     local procedure GetTransferDestinationData(var Location: Record Location; var DestinationRFCNo: Code[30]; var ForeignRegId: Code[30]; var FiscalResidence: Code[10]; TempDocumentHeader: Record "Document Header" temporary; Customer: Record Customer)
@@ -7055,6 +7076,7 @@ IsVATExemptLine(TempDocumentLine));
         PaymentMethod: Record "Payment Method";
         SATPaymentTerm: Record "SAT Payment Term";
         SATPaymentMethod: Record "SAT Payment Method";
+        Customer: Record Customer;
     begin
         TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("No."), TempErrorMessage."Message Type"::Error);
         TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("Document Date"), TempErrorMessage."Message Type"::Error);
@@ -7082,6 +7104,9 @@ IsVATExemptLine(TempDocumentLine));
         TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("Bill-to/Pay-To Post Code"), TempErrorMessage."Message Type"::Error);
         TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("CFDI Purpose"), TempErrorMessage."Message Type"::Error);
         TempErrorMessage.LogIfEmpty(DocumentVariant, DocumentHeader.FieldNo("CFDI Export Code"), TempErrorMessage."Message Type"::Error);
+        Customer.GET(DocumentHeader."Bill-to/Pay-To No.");
+        if GetSATPostalCode(DocumentHeader."SAT Address ID", Customer."Location Code", Customer."Post Code") = '0' then
+            TempErrorMessage.LogSimpleMessage(TempErrorMessage."Message Type"::Warning, StrSubstNo(ValueIsNotDefinedErr, 'SAT Postal Code', DocumentHeader.RecordId));
         if SourceCode = SourceCodeSetup."Deleted Document" then
             TempErrorMessage.LogSimpleMessage(TempErrorMessage."Message Type"::Error, Text007);
         if (DocumentHeader."CFDI Purpose" = 'PPD') and (DocumentHeader."CFDI Relation" = '03') then
