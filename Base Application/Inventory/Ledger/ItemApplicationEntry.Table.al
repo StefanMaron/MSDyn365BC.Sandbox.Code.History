@@ -159,12 +159,9 @@ table 339 "Item Application Entry"
         Reset();
         SetCurrentKey("Transferred-from Entry No.", "Cost Application");
         SetRange("Transferred-from Entry No.", InbndItemLedgEntryNo);
-        SetRange("Cost Application", IsCostApplication, true);
-        if IsEmpty() then
-            exit(false);
-
-        FindSet();
-        exit(true);
+        if IsCostApplication then
+            SetRange("Cost Application", true);
+        exit(FindSet());
     end;
 
     procedure AppliedInbndEntryExists(OutbndItemLedgEntryNo: Integer; IsCostApplication: Boolean): Boolean
@@ -644,7 +641,6 @@ table 339 "Item Application Entry"
 
         ItemApplnEntry.SetCurrentKey("Inbound Item Entry No.");
         ItemApplnEntry.SetRange("Inbound Item Entry No.", ItemLedgEntry."Entry No.");
-        OnSetOutboundsNotUpdatedOnAfterSetFilters(ItemApplnEntry);
         ItemApplnEntry.ModifyAll("Outbound Entry is Updated", false);
     end;
 
@@ -730,11 +726,6 @@ table 339 "Item Application Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckCyclicProdCyclicalLoop(var ItemApplicationEntry: Record "Item Application Entry"; CheckItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetOutboundsNotUpdatedOnAfterSetFilters(var ItemApplicationEntry: Record "Item Application Entry")
     begin
     end;
 }
