@@ -1150,6 +1150,7 @@ report 595 "Adjust Exchange Rates"
     var
         EnvironmentInformation: Codeunit "Environment Information";
         FeatureKeyManagement: Codeunit "Feature Key Management";
+        RunNewVersion: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1157,11 +1158,14 @@ report 595 "Adjust Exchange Rates"
         if IsHandled then
             exit;
 
-        if not EnvironmentInformation.IsOnPrem() then
-            if FeatureKeyManagement.IsExtensibleExchangeRateAdjustmentEnabled(false) then begin
+        if not EnvironmentInformation.IsOnPrem() then begin
+            RunNewVersion := FeatureKeyManagement.IsExtensibleExchangeRateAdjustmentEnabled();
+            Commit();
+            if RunNewVersion then begin
                 Report.Run(Report::"Exch. Rate Adjustment");
                 CurrReport.Quit();
             end;
+        end;
     end;
 
     trigger OnPostReport()
@@ -2417,7 +2421,7 @@ report 595 "Adjust Exchange Rates"
 
         case ValuationMethod of
             ValuationMethod::"Lowest Value":
-                 if (CurrAdjAmount >= Abs(CustLedgerEntry."Remaining Amt. (LCY)")) and (not Application) then
+                if (CurrAdjAmount >= 0) and (not Application) then
                     CurrReport.Skip();
             ValuationMethod::"BilMoG (Germany)":
                 if not Application then
@@ -2598,7 +2602,7 @@ report 595 "Adjust Exchange Rates"
 
         case ValuationMethod of
             ValuationMethod::"Lowest Value":
-                if (CurrAdjAmount >= Abs(VendLedgerEntry."Original Amt. (LCY)")) and (not Application) then
+                if (CurrAdjAmount >= 0) and (not Application) then
                     CurrReport.Skip();
             ValuationMethod::"BilMoG (Germany)":
                 if not Application then
