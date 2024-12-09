@@ -2,6 +2,7 @@
 
 using Microsoft.Assembly.Document;
 using Microsoft.Foundation.UOM;
+using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
@@ -93,7 +94,7 @@ codeunit 99000832 "Sales Line-Reserve"
         end;
 
         IsHandled := false;
-        OnCreateReservationOnBeforeCreateReservEntry(SalesLine, Quantity, QuantityBase, ForReservationEntry, IsHandled);
+        OnCreateReservationOnBeforeCreateReservEntry(SalesLine, Quantity, QuantityBase, ForReservationEntry, IsHandled, FromTrackingSpecification, ExpectedReceiptDate, Description, ShipmentDate);
         if not IsHandled then begin
             CreateReservEntry.CreateReservEntryFor(
                 Database::"Sales Line", SalesLine."Document Type".AsInteger(),
@@ -299,7 +300,8 @@ codeunit 99000832 "Sales Line-Reserve"
 
         if NewSalesLine."Qty. per Unit of Measure" <> OldSalesLine."Qty. per Unit of Measure" then
             ReservationManagement.ModifyUnitOfMeasure();
-        if NewSalesLine."Outstanding Qty. (Base)" * OldSalesLine."Outstanding Qty. (Base)" < 0 then
+        if (NewSalesLine."Outstanding Qty. (Base)" * OldSalesLine."Outstanding Qty. (Base)" < 0) or
+            CheckQuantityReducedOnSalesLine(NewSalesLine, OldSalesLine) then
             ReservationManagement.DeleteReservEntries(true, 0)
         else
             ReservationManagement.DeleteReservEntries(false, NewSalesLine."Outstanding Qty. (Base)");
@@ -1025,6 +1027,7 @@ codeunit 99000832 "Sales Line-Reserve"
         if MatchThisTable(ForReservEntry."Source Type") then begin
             CreateReservationSetFrom(TrackingSpecification);
             SourceRecRef.SetTable(SalesLine);
+            OnCreateReservationOnBeforeCreateReservation(SalesLine, TrackingSpecification, Description, ExpectedDate, Quantity, QuantityBase, ForReservEntry);
             CreateReservation(SalesLine, Description, ExpectedDate, Quantity, QuantityBase, ForReservEntry);
         end;
     end;
@@ -1173,6 +1176,21 @@ codeunit 99000832 "Sales Line-Reserve"
                                            Enum::"Reservation Summary Type"::"Sales Return Order".AsInteger()] then
             UpdateStatistics(
                 CalcReservEntry, ReservSummEntry, AvailabilityDate, Enum::"Sales Document Type".FromInteger(ReservSummEntry."Entry No." - 31), Positive, TotalQuantity);
+    end;
+
+    local procedure CheckQuantityReducedOnSalesLine(NewSalesLine: Record "Sales Line"; OldSalesLine: Record "Sales Line"): Boolean
+    var
+        Item: Record Item;
+    begin
+        if (NewSalesLine.Type <> NewSalesLine.Type::Item) or (NewSalesLine.Quantity = 0) then
+            exit(false);
+
+        Item.SetLoadFields(Reserve, "Costing Method");
+        Item.Get(NewSalesLine."No.");
+        if (Item.Reserve <> Item.Reserve::Always) or (Item."Costing Method" <> Item."Costing Method"::FIFO) then
+            exit(false);
+
+        exit(NewSalesLine.Quantity < OldSalesLine.Quantity);
     end;
 
     [IntegrationEvent(false, false)]
@@ -1336,7 +1354,7 @@ codeunit 99000832 "Sales Line-Reserve"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateReservationOnBeforeCreateReservEntry(var SalesLine: Record "Sales Line"; var Quantity: Decimal; var QuantityBase: Decimal; var ForReservEntry: Record "Reservation Entry"; var IsHandled: Boolean)
+    local procedure OnCreateReservationOnBeforeCreateReservEntry(var SalesLine: Record "Sales Line"; var Quantity: Decimal; var QuantityBase: Decimal; var ForReservEntry: Record "Reservation Entry"; var IsHandled: Boolean; var FromTrackingSpecification: Record "Tracking Specification"; ExpectedReceiptDate: Date; Description: Text[100]; ShipmentDate: Date)
     begin
     end;
 
@@ -1347,6 +1365,11 @@ codeunit 99000832 "Sales Line-Reserve"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDeleteLine(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateReservationOnBeforeCreateReservation(var SalesLine: Record "Sales Line"; var TrackingSpecification: Record "Tracking Specification"; var Description: Text[100]; var ExpectedDate: Date; var Quantity: Decimal; var QuantityBase: Decimal; var ReservationEntry: Record "Reservation Entry")
     begin
     end;
 }
