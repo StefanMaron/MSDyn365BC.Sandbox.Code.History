@@ -43,7 +43,8 @@ page 7016 "Sales Price List"
 
                         trigger OnValidate()
                         begin
-                            CurrPage.Update();
+                            if Rec.Code <> '' then
+                                CurrPage.Update();
                         end;
                     }
                     field(Description; Rec.Description)
@@ -244,6 +245,7 @@ page 7016 "Sales Price List"
                             trigger OnValidate()
                             begin
                                 CurrPage.Lines.Page.SetHeader(Rec);
+                                CurrPage.Update(true);
                             end;
                         }
                         field(AllowInvoiceDisc; Rec."Allow Invoice Disc.")
