@@ -57,6 +57,11 @@ table 1830 "Consolidation Process"
             Caption = 'Dimensions to Transfer';
             DataClassification = CustomerContent;
         }
+        field(10; "Error"; Text[2048])
+        {
+            Caption = 'Error';
+            DataClassification = SystemMetadata;
+        }
     }
     keys
     {
@@ -65,4 +70,13 @@ table 1830 "Consolidation Process"
             Clustered = true;
         }
     }
+
+    trigger OnDelete()
+    var
+        BusUnitInConsProcess: Record "Bus. Unit In Cons. Process";
+    begin
+        BusUnitInConsProcess.SetRange("Consolidation Process Id", Id);
+        BusUnitInConsProcess.DeleteAll();
+    end;
+
 }

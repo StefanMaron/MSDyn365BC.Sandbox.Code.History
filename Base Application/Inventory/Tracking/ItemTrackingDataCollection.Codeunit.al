@@ -272,7 +272,10 @@ codeunit 6501 "Item Tracking Data Collection"
         ItemTrackingSummaryForm.SetCurrentBinAndItemTrkgCode(CurrBinCode, CurrItemTrackingCode);
 
         // Run preselection on form
-        ItemTrackingSummaryForm.AutoSelectTrackingNo();
+        IsHandled := false;
+        OnSelectMultipleTrackingNoOnBeforeAutoSelectTrackingNo(IsHandled);
+        if not IsHandled then
+            ItemTrackingSummaryForm.AutoSelectTrackingNo();
 
         Window.Close();
 
@@ -337,7 +340,7 @@ codeunit 6501 "Item Tracking Data Collection"
                 OnLookupTrackingAvailabilityOnSetFiltersElseCase(
                     TempGlobalEntrySummary, TempGlobalReservEntry, TempTrackingSpecification, ItemTrackingSummaryForm, LookupMode);
         end;
-
+        OnLookupTrackingAvailabilityOnBeforeSetSources(TempGlobalEntrySummary, TempTrackingSpecification, LookupMode);
         ItemTrackingSummaryForm.SetSources(TempGlobalReservEntry, TempGlobalEntrySummary);
         ItemTrackingSummaryForm.SetCurrentBinAndItemTrkgCode(CurrBinCode, CurrItemTrackingCode);
         ItemTrackingSummaryForm.LookupMode(false);
@@ -368,7 +371,7 @@ codeunit 6501 "Item Tracking Data Collection"
         ReservEntry: Record "Reservation Entry";
         TempReservEntry: Record "Reservation Entry" temporary;
         TempTrackingSpecification2: Record "Tracking Specification" temporary;
-        LotNo: Code[50];
+        LotNo, PackageNo : Code[50];
     begin
         LastSummaryEntryNo := 0;
         LastReservEntryNo := 2147483647;
@@ -403,6 +406,7 @@ codeunit 6501 "Item Tracking Data Collection"
         OnRetrieveLookupDataOnBeforeTransferToTempRec(TempTrackingSpecification, TempReservEntry, ItemLedgEntry, FullDataSet);
 
         LotNo := '';
+        PackageNo := '';
         if FullDataSet then begin
             TransferReservEntryToTempRec(TempReservEntry, TempTrackingSpecification);
             TransferItemLedgToTempRec(ItemLedgEntry, TempTrackingSpecification);
@@ -420,9 +424,19 @@ codeunit 6501 "Item Tracking Data Collection"
                         TransferItemLedgToTempRec(ItemLedgEntry, TempTrackingSpecification);
                     end;
 
+                    ItemLedgEntry.ClearTrackingFilter();
+                    TempReservEntry.ClearTrackingFilter();
+                    if (TempTrackingSpecification."Package No." <> '') and (TempTrackingSpecification."Package No." <> PackageNo) then begin
+                        PackageNo := TempTrackingSpecification."Package No.";
+                        ItemLedgEntry.SetRange("Package No.", TempTrackingSpecification."Package No.");
+                        TempReservEntry.SetRange("Package No.", TempTrackingSpecification."Package No.");
+                        TransferReservEntryToTempRec(TempReservEntry, TempTrackingSpecification);
+                        TransferItemLedgToTempRec(ItemLedgEntry, TempTrackingSpecification);
+                    end;
+
                     OnRetrieveLookupDataOnAfterBuildNonSerialDataSet(TempTrackingSpecification, ItemLedgEntry, TempReservEntry);
 
-                    if (TempTrackingSpecification."Lot No." = '') and (TempTrackingSpecification."Serial No." <> '') then begin
+                    if (TempTrackingSpecification."Lot No." = '') and (TempTrackingSpecification."Package No." = '') and (TempTrackingSpecification."Serial No." <> '') then begin
                         ItemLedgEntry.SetTrackingFilterFromSpec(TempTrackingSpecification);
                         TempReservEntry.SetTrackingFilterFromSpec(TempTrackingSpecification);
                         TransferReservEntryToTempRec(TempReservEntry, TempTrackingSpecification);
@@ -567,7 +581,7 @@ codeunit 6501 "Item Tracking Data Collection"
             OnCreateEntrySummary2OnAfterAssignTrackingFromReservEntry(TempGlobalEntrySummary, TempReservEntry);
             TempGlobalEntrySummary."Non Serial Tracking" := TempGlobalEntrySummary.HasNonSerialTracking();
             TempGlobalEntrySummary."Bin Active" := CurrBinCode <> '';
-            OnBeforeUpdateBinContent(TempGlobalEntrySummary, TempReservEntry);
+            OnBeforeUpdateBinContent(TempGlobalEntrySummary, TempReservEntry, CurrBinCode, CurrItemTrackingCode);
             UpdateBinContent(TempGlobalEntrySummary);
 
             // If consumption/output fill in double entry value here:
@@ -984,6 +998,11 @@ codeunit 6501 "Item Tracking Data Collection"
         WhseItemTrackingSetup: Record "Item Tracking Setup";
         IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnUpdateBinContentOnBeforeUpdateBinContent(TempEntrySummary, CurrItemTrackingCode, IsHandled);
+        if IsHandled then
+            exit;
+
         if CurrBinCode = '' then
             exit;
 
@@ -1567,7 +1586,7 @@ codeunit 6501 "Item Tracking Data Collection"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateBinContent(var TempEntrySummary: Record "Entry Summary" temporary; var TempReservationEntry: Record "Reservation Entry" temporary)
+    local procedure OnBeforeUpdateBinContent(var TempEntrySummary: Record "Entry Summary" temporary; var TempReservationEntry: Record "Reservation Entry" temporary; var CurrBinCode: Code[20]; var CurrItemTrackingCode: Record "Item Tracking Code")
     begin
     end;
 
@@ -1723,6 +1742,21 @@ codeunit 6501 "Item Tracking Data Collection"
 
     [IntegrationEvent(false, false)]
     local procedure OnAddSelectedTrackingToDataSetOnAfterSetTrackingFilterFromEntrySummary(var TempTrackingSpecification: Record "Tracking Specification" temporary; var TempGlobalEntrySummary: Record "Entry Summary" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLookupTrackingAvailabilityOnBeforeSetSources(var TempGlobalEntrySummary: Record "Entry Summary" temporary; TempTrackingSpecification: Record "Tracking Specification" temporary; ItemTrackingType: Enum "Item Tracking Type")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateBinContentOnBeforeUpdateBinContent(var TempEntrySummary: Record "Entry Summary" temporary; ItemTrackingCode: Record "Item Tracking Code"; var IsHandled: boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSelectMultipleTrackingNoOnBeforeAutoSelectTrackingNo(var SkipAutoSelectTrackingNo: boolean)
     begin
     end;
 }
