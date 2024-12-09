@@ -14,8 +14,9 @@ using System.IO;
 
 codeunit 5051 SegManagement
 {
-    Permissions = tableData "Interaction Log Entry" = rimd,
+    Permissions = tabledata "Interaction Log Entry" = rimd,
                   tabledata "Interaction Template" = r,
+                  tabledata "Inter. Log Entry Comment Line" = rd,
                   tabledata Contact = r;
 
     trigger OnRun()
@@ -133,6 +134,7 @@ codeunit 5051 SegManagement
                     TempDeliverySorter."Language Code" := SegmentLine."Language Code";
                     TempDeliverySorter."Word Template Code" := InteractionLogEntry."Word Template Code";
                     TempDeliverySorter."Wizard Action" := InteractionTemplate."Wizard Action";
+                    TempDeliverySorter."Force Hide Email Dialog" := true;
                     OnBeforeDeliverySorterInsert(TempDeliverySorter, SegmentLine);
                     TempDeliverySorter.Insert();
                 end;
@@ -240,14 +242,18 @@ codeunit 5051 SegManagement
             InteractionLogEntry.InsertRecord();
             NextInteractLogEntryNo := InteractionLogEntry."Entry No.";
         end else begin
-            InteractionLogEntry.Get(SegmentLine."Line No.");
-            OnLogInteractionOnAfterGetInteractLogEntryFromSegmentLine(InteractionLogEntry, SegmentLine, Postponed);
-            InteractionLogEntry.CopyFromSegment(SegmentLine);
-            InteractionLogEntry.Postponed := Postponed;
-            OnLogInteractionOnBeforeInteractionLogEntryModify(InteractionLogEntry);
-            InteractionLogEntry.Modify();
-            InterLogEntryCommentLine.SetRange("Entry No.", InteractionLogEntry."Entry No.");
-            InterLogEntryCommentLine.DeleteAll();
+            IsHandled := false;
+            OnLogInteractionOnBeforeInteractLogEntryGet(NextInteractLogEntryNo, SegmentLine, Postponed, IsHandled);
+            if not IsHandled then begin
+                InteractionLogEntry.Get(SegmentLine."Line No.");
+                OnLogInteractionOnAfterGetInteractLogEntryFromSegmentLine(InteractionLogEntry, SegmentLine, Postponed);
+                InteractionLogEntry.CopyFromSegment(SegmentLine);
+                InteractionLogEntry.Postponed := Postponed;
+                OnLogInteractionOnBeforeInteractionLogEntryModify(InteractionLogEntry);
+                InteractionLogEntry.Modify();
+                InterLogEntryCommentLine.SetRange("Entry No.", InteractionLogEntry."Entry No.");
+                InterLogEntryCommentLine.DeleteAll();
+            end;
         end;
 
         if TempInterLogEntryCommentLine.FindSet() then
@@ -258,6 +264,8 @@ codeunit 5051 SegManagement
                 OnLogInteractionOnBeforeInterLogEntryCommentLineInsert(InterLogEntryCommentLine);
                 InterLogEntryCommentLine.Insert();
             until TempInterLogEntryCommentLine.Next() = 0;
+
+        OnLogInteractionOnAfterInterLogEntryCommentLineInsert(InterLogEntryCommentLine, SegmentLine, NextInteractLogEntryNo);
 
         if Deliver and (SegmentLine."Correspondence Type".AsInteger() <> 0) and (not Postponed) then begin
             InteractionLogEntry."Delivery Status" := InteractionLogEntry."Delivery Status"::"In Progress";
@@ -270,6 +278,7 @@ codeunit 5051 SegManagement
             TempDeliverySorter."Send Word Docs. as Attmt." := false;
             TempDeliverySorter."Language Code" := SegmentLine."Language Code";
             TempDeliverySorter."Wizard Action" := WizardAction;
+            TempDeliverySorter."Force Hide Email Dialog" := true;
             OnLogInteractionOnBeforeTempDeliverySorterInsert(TempDeliverySorter, SegmentLine, InteractionLogEntry);
             TempDeliverySorter.Insert();
             AttachmentManagement.Send(TempDeliverySorter);
@@ -310,9 +319,13 @@ codeunit 5051 SegManagement
 
         InteractionTemplate.Get(InteractTmplCode);
 
-        InteractionTmplLanguage.SetRange("Interaction Template Code", InteractTmplCode);
-        if InteractionTmplLanguage.FindFirst() then
-            Error(InteractionTemplateAssignedLanguageErr, InteractTmplCode, InteractionTmplLanguage."Language Code");
+        IsHandled := false;
+        OnLogDocumentOnBeforeTestTmplLanguage(InteractTmplCode, IsHandled);
+        if not IsHandled then begin
+            InteractionTmplLanguage.SetRange("Interaction Template Code", InteractTmplCode);
+            if InteractionTmplLanguage.FindFirst() then
+                Error(InteractionTemplateAssignedLanguageErr, InteractTmplCode, InteractionTmplLanguage."Language Code");
+        end;
 
         if Description = '' then
             Description := InteractionTemplate.Description;
@@ -418,7 +431,7 @@ codeunit 5051 SegManagement
 
     procedure FindInteractionTemplateCode(DocumentType: Enum "Interaction Log Entry Document Type") InteractTmplCode: Code[10]
     begin
-        if not InteractionTemplateSetup.ReadPermission then
+        if not InteractionTemplateSetup.ReadPermission() then
             exit('');
         if InteractionTemplateSetup.Get() then
             case DocumentType of
@@ -490,7 +503,13 @@ codeunit 5051 SegManagement
         Campaign: Record Campaign;
         InteractionTemplate: Record "Interaction Template";
         ContactAltAddress: Record "Contact Alt. Address";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckSegmentLine(SegmentLine, Deliver, IsHandled);
+        if IsHandled then
+            exit;
+
         SegmentLine.TestField(Date);
         SegmentLine.TestField("Contact No.");
         Contact.Get(SegmentLine."Contact No.");
@@ -572,6 +591,7 @@ codeunit 5051 SegManagement
             if CampaignEntry.Description = '' then
                 CampaignEntry.Description := InteractionsLbl;
         end;
+        OnAfterCopyFieldsToCampaignEntry(CampaignEntry, SegmentLine);
     end;
 
     local procedure FindInteractTmplSetupCaption(DocumentType: Enum "Interaction Log Entry Document Type") InteractTmplSetupCaption: Text[80]
@@ -683,6 +703,29 @@ codeunit 5051 SegManagement
             "Interaction Log Entry Document Type"::"Sales Inv.".AsInteger(),
             SalesInvoiceHeader."No.", 0, 0, Database::Contact, SalesInvoiceHeader."Bill-to Contact No.", SalesInvoiceHeader."Salesperson Code",
             CampaignTargetGroup."Campaign No.", SalesInvoiceHeader."Posting Description", '');
+    end;
+
+    procedure InterLogEntryCommentLineInsert(var TempInterLogEntryCommentLine: Record "Inter. Log Entry Comment Line"; InteractionLogEntryNo: Integer)
+    var
+        InterLogEntryCommentLine: Record "Inter. Log Entry Comment Line";
+    begin
+        DeleteExistingInteractionLogEntryComments(InteractionLogEntryNo);
+        if TempInterLogEntryCommentLine.FindSet() then
+            repeat
+                InterLogEntryCommentLine.Init();
+                InterLogEntryCommentLine := TempInterLogEntryCommentLine;
+                InterLogEntryCommentLine."Entry No." := InteractionLogEntryNo;
+                InterLogEntryCommentLine.Insert();
+            until TempInterLogEntryCommentLine.Next() = 0;
+    end;
+
+    local procedure DeleteExistingInteractionLogEntryComments(InteractionLogEntryNo: Integer)
+    var
+        InterLogEntryCommentLine: Record "Inter. Log Entry Comment Line";
+    begin
+        InterLogEntryCommentLine.SetRange("Entry No.", InteractionLogEntryNo);
+        if not InterLogEntryCommentLine.IsEmpty() then
+            InterLogEntryCommentLine.DeleteAll();
     end;
 
     local procedure GetNextLoggedSegmentEntryNo(): Integer
@@ -906,6 +949,31 @@ codeunit 5051 SegManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnLogSegmentOnBeforeInitLoggedSegment(SegmentHeader: Record "Segment Header"; Deliver: Boolean; Followup: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckSegmentLine(var SegmentLine: Record "Segment Line"; Deliver: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLogDocumentOnBeforeTestTmplLanguage(InteractTmplCode: Code[10]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyFieldsToCampaignEntry(var CampaignEntry: Record "Campaign Entry"; var SegmentLine: Record "Segment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLogInteractionOnAfterInterLogEntryCommentLineInsert(var InterLogEntryCommentLine: Record "Inter. Log Entry Comment Line"; SegmentLine: Record "Segment Line"; NextInteractLogEntryNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLogInteractionOnBeforeInteractLogEntryGet(var NextInteractLogEntryNo: Integer; SegmentLine: Record "Segment Line"; Postponed: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
