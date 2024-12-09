@@ -465,7 +465,7 @@ page 5530 "Item Availability by Event"
     var
         ManufacturingSetup: Record "Manufacturing Setup";
     begin
-        OnBeforeOnOpenPage(IncludeBlanketOrders, PeriodType);
+        OnBeforeOnOpenPage(IncludeBlanketOrders, PeriodType, Item, LocationFilter);
         if ItemIsSet() then
             InitAndCalculatePeriodEntries()
         else
@@ -603,9 +603,20 @@ page 5530 "Item Availability by Event"
 
     procedure SetItem(var NewItem: Record Item)
     begin
+        CheckItemRecordIsAccessible(NewItem);
         Item.Copy(NewItem);
         UpdateItemRequestFields(Item);
         OnAfterSetItem(Item);
+    end;
+
+    local procedure CheckItemRecordIsAccessible(var NewItem: Record Item)
+    var
+        CheckItem: Record Item;
+    begin
+        if (NewItem."No." <> '') then begin
+            CheckItem.SetLoadFields("No.");
+            CheckItem.Get(NewItem."No.");
+        end;
     end;
 
     procedure SetForecastName(NewForcastName: Code[10])
@@ -648,7 +659,7 @@ page 5530 "Item Availability by Event"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnOpenPage(var IncludeBlanketOrders: Boolean; var PeriodType: Option)
+    local procedure OnBeforeOnOpenPage(var IncludeBlanketOrders: Boolean; var PeriodType: Option; var Item: Record Item; var LocationFilter: Text)
     begin
     end;
 
