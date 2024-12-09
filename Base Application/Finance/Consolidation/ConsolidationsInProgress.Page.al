@@ -8,8 +8,7 @@ page 245 "Consolidations in Progress"
     SourceTableView = order(descending);
     PageType = List;
     InsertAllowed = false;
-    ModifyAllowed = false;
-    DeleteAllowed = true;
+    Editable = false;
 
     layout
     {
@@ -41,29 +40,6 @@ page 245 "Consolidations in Progress"
                     Caption = 'Scheduled At';
                     ToolTip = 'Date and time when the consolidation was scheduled';
                 }
-            }
-        }
-    }
-    actions
-    {
-        area(Processing)
-        {
-            action(SeeDetails)
-            {
-                ApplicationArea = All;
-                Caption = 'See Details';
-                ToolTip = 'See details of the consolidation process';
-                RunPageOnRec = true;
-                Scope = Repeater;
-                Image = ViewDetails;
-
-                trigger OnAction()
-                var
-                    ConsProcessDetails: Page "Cons. Process Details";
-                begin
-                    ConsProcessDetails.SetConsolidationProcess(Rec.Id);
-                    ConsProcessDetails.Run();
-                end;
             }
         }
     }
