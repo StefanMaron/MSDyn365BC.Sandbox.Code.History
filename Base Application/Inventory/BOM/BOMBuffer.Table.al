@@ -872,6 +872,20 @@ table 5870 "BOM Buffer"
         OnAfterGetItemCosts(Rec, Item);
     end;
 
+    procedure GetItemUnitCost()
+    var
+        Item: Record Item;
+    begin
+        TestField(Type, Type::Item);
+        Item.Get("No.");
+
+        "Unit Cost" := Item."Unit Cost";
+        "Single-Level Material Cost" :=
+          RoundUnitAmt(Item."Unit Cost", UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code") * "Qty. per Top Item");
+        "Rolled-up Material Cost" :=
+          RoundUnitAmt(Item."Unit Cost", UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code") * "Qty. per Top Item");
+    end;
+
     procedure GetResCosts()
     var
         Res: Record Resource;
@@ -1065,7 +1079,7 @@ table 5870 "BOM Buffer"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeIsLowLevelOk(Rec, Result, IsHandled);
+        OnBeforeIsLowLevelOk(Rec, Result, IsHandled, LogWarning, BOMWarningLog);
         if IsHandled then
             exit(Result);
 
@@ -1213,7 +1227,7 @@ table 5870 "BOM Buffer"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeIsBOMOk(Rec, Result, IsHandled);
+        OnBeforeIsBOMOk(Rec, Result, IsHandled, LogWarning, BOMWarningLog);
         if IsHandled then
             exit(Result);
 
@@ -1345,12 +1359,12 @@ table 5870 "BOM Buffer"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsBOMOk(var BOMBuffer: Record "BOM Buffer"; var Result: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeIsBOMOk(var BOMBuffer: Record "BOM Buffer"; var Result: Boolean; var IsHandled: Boolean; var LogWarning: Boolean; var BOMWarningLog: Record "BOM Warning Log")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsLowLevelOk(var BOMBuffer: Record "BOM Buffer"; var Result: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeIsLowLevelOk(var BOMBuffer: Record "BOM Buffer"; var Result: Boolean; var IsHandled: Boolean; var LogWarning: Boolean; var BOMWarningLog: Record "BOM Warning Log")
     begin
     end;
 
