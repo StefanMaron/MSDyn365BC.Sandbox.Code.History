@@ -660,6 +660,7 @@ codeunit 22 "Item Jnl.-Post Line"
             WorkCenter.TestField(Blocked, false);
 
             ApplyCapNeed(ItemJnlLine."Setup Time (Base)", ItemJnlLine."Run Time (Base)");
+            OnPostOutputForProdOrderOnAfterApplyCapNeed(ItemJnlLine, ValuedQty);
         end;
 
         if ItemJnlLine."Operation No." <> '' then
@@ -852,7 +853,7 @@ codeunit 22 "Item Jnl.-Post Line"
             end;
         end;
 
-        OnInsertConsumpEntryOnBeforePostItem(ItemJnlLine, ProdOrderComp);
+        OnInsertConsumpEntryOnBeforePostItem(ItemJnlLine, ProdOrderComp, PostWhseJnlLine, WhseJnlLine);
 
         PostItem();
         if PostWhseJnlLine then
@@ -901,7 +902,13 @@ codeunit 22 "Item Jnl.-Post Line"
         TimeToAllocate: Decimal;
         PrevSetupTime: Decimal;
         PrevRunTime: Decimal;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnApplyCapNeed(ItemJnlLine, PostedSetupTime, PostedRunTime, IsHandled);
+        if IsHandled then
+            exit;
+
         ProdOrderCapNeed.LockTable();
         ProdOrderCapNeed.Reset();
         ProdOrderCapNeed.SetCurrentKey(
@@ -2019,7 +2026,7 @@ codeunit 22 "Item Jnl.-Post Line"
                         OldItemLedgEntry."Applied Entry to Adjust" := true;
                 end;
 
-                OnApplyItemLedgEntryOnBeforeOldItemLedgEntryModify(ItemLedgEntry, OldItemLedgEntry, ItemJnlLine);
+                OnApplyItemLedgEntryOnBeforeOldItemLedgEntryModify(ItemLedgEntry, OldItemLedgEntry, ItemJnlLine, AverageTransfer);
                 OldItemLedgEntry.Modify();
                 AutoTrack(OldItemLedgEntry, true);
 
@@ -2232,7 +2239,7 @@ codeunit 22 "Item Jnl.-Post Line"
         OldItemLedgerEntry."Remaining Quantity" := OldItemLedgerEntry."Remaining Quantity" + AppliedQty;
         OldItemLedgerEntry.Open := OldItemLedgerEntry."Remaining Quantity" <> 0;
 
-        OnAfterUpdateOldItemLedgerEntryRemainingQuantity(OldItemLedgerEntry, AppliedQty);
+        OnAfterUpdateOldItemLedgerEntryRemainingQuantity(OldItemLedgerEntry, AppliedQty, GlobalItemLedgEntry, AverageTransfer);
     end;
 
     local procedure EnsureValueEntryLoaded(var ValueEntry: Record "Value Entry"; ItemLedgEntry: Record "Item Ledger Entry")
@@ -5279,7 +5286,7 @@ codeunit 22 "Item Jnl.-Post Line"
             (((not ValueEntry."Expected Cost") and ((ValueEntry."Cost Amount (Actual)" <> 0) or (ValueEntry."Cost Amount (Actual) (ACY)" <> 0))) or
             (InvtSetup."Expected Cost Posting to G/L" and ((ValueEntry."Cost Amount (Expected)" <> 0) or (ValueEntry."Cost Amount (Expected) (ACY)" <> 0))));
 
-        OnAfterIsPostToGL(ValueEntry, Result);
+        OnAfterIsPostToGL(ValueEntry, Result, PostToGL);
     end;
 
     local procedure IsWarehouseReclassification(ItemJournalLine: Record "Item Journal Line"): Boolean
@@ -6269,7 +6276,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateOldItemLedgerEntryRemainingQuantity(var OldItemLedgerEntry: Record "Item Ledger Entry"; AppliedQuantity: Decimal)
+    local procedure OnAfterUpdateOldItemLedgerEntryRemainingQuantity(var OldItemLedgerEntry: Record "Item Ledger Entry"; AppliedQuantity: Decimal; var GlobalItemLedgEntry: Record "Item Ledger Entry"; var AverageTransfer: Boolean)
     begin
     end;
 
@@ -6594,7 +6601,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyItemLedgEntryOnBeforeOldItemLedgEntryModify(var ItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line")
+    local procedure OnApplyItemLedgEntryOnBeforeOldItemLedgEntryModify(var ItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line"; var AverageTransfer: Boolean)
     begin
     end;
 
@@ -6689,7 +6696,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertConsumpEntryOnBeforePostItem(var ItemJournalLine: Record "Item Journal Line"; ProdOrderComponent: Record "Prod. Order Component")
+    local procedure OnInsertConsumpEntryOnBeforePostItem(var ItemJournalLine: Record "Item Journal Line"; ProdOrderComponent: Record "Prod. Order Component"; PostWhseJnlLine: Boolean; var WarehouseJournalLine: Record "Warehouse Journal Line")
     begin
     end;
 
@@ -7271,7 +7278,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterIsPostToGL(ValueEntry: Record "Value Entry"; var Result: Boolean)
+    local procedure OnAfterIsPostToGL(ValueEntry: Record "Value Entry"; var Result: Boolean; PostToGL: Boolean)
     begin
     end;
 
@@ -7851,7 +7858,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnPostOutputOnBeforeInsertCostValueEntries(var ItemJournalLine: Record "Item Journal Line"; var CapacityLedgerEntry: Record "Capacity Ledger Entry"; ValuedQty: Decimal; var DirCostAmt: Decimal; var IndirCostAmt: Decimal)
+    local procedure OnPostOutputOnBeforeInsertCostValueEntries(var ItemJournalLine: Record "Item Journal Line"; var CapacityLedgerEntry: Record "Capacity Ledger Entry"; var ValuedQty: Decimal; var DirCostAmt: Decimal; var IndirCostAmt: Decimal)
     begin
     end;
 
@@ -7862,6 +7869,16 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnApplyItemLedgEntryOnAfterSetLoadFieldsOnReservEntry(var ReservationEntry: Record "Reservation Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnApplyCapNeed(var ItemJnlLine: Record "Item Journal Line"; var PostedSetupTime: Decimal; var PostedRunTime: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostOutputForProdOrderOnAfterApplyCapNeed(var ItemJnlLine: Record "Item Journal Line"; var ValuedQty: Decimal)
     begin
     end;
 }
