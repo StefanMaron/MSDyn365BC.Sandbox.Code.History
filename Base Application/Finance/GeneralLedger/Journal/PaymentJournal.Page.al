@@ -2427,13 +2427,7 @@ page 256 "Payment Journal"
         SmallestLineAmountToApply: Decimal;
         JournalAmount: Decimal;
         AmountToApply: Decimal;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCheckAmountMatchedToAppliedLines(Rec, IsHandled);
-        if isHandled then
-            exit;
-
         if Rec."Document Type" <> Rec."Document Type"::"Payment" then
             exit;
 
@@ -2602,11 +2596,6 @@ page 256 "Payment Journal"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeSuggestVendorPaymentsAction(var GenJournalLine: Record "Gen. Journal Line"; var IsHanlded: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeCheckAmountMatchedToAppliedLines(var GenJournalLine: Record "Gen. Journal Line"; var IsHanlded: Boolean)
     begin
     end;
 }
