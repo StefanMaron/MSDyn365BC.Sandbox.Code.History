@@ -13,7 +13,6 @@ page 5705 "Location Card Part"
         {
             group(General)
             {
-                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
