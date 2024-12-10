@@ -580,9 +580,6 @@ table 32 "Item Ledger Entry"
         key(Key23; SystemModifiedAt)
         {
         }
-        key(Key25; "Entry Type", "Item No.")
-        {
-        }
     }
 
     fieldgroups

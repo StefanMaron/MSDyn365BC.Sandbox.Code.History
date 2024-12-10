@@ -465,7 +465,7 @@ page 5530 "Item Availability by Event"
     var
         ManufacturingSetup: Record "Manufacturing Setup";
     begin
-        OnBeforeOnOpenPage(IncludeBlanketOrders, PeriodType, Item, LocationFilter);
+        OnBeforeOnOpenPage(IncludeBlanketOrders, PeriodType);
         if ItemIsSet() then
             InitAndCalculatePeriodEntries()
         else
@@ -659,7 +659,7 @@ page 5530 "Item Availability by Event"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnOpenPage(var IncludeBlanketOrders: Boolean; var PeriodType: Option; var Item: Record Item; var LocationFilter: Text)
+    local procedure OnBeforeOnOpenPage(var IncludeBlanketOrders: Boolean; var PeriodType: Option)
     begin
     end;
 
