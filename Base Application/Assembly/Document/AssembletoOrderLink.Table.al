@@ -134,7 +134,6 @@ table 904 "Assemble-to-Order Link"
     var
         SalesLine2: Record "Sales Line";
         InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)";
-        PostedATOLink: Record "Posted Assemble-to-Order Link";
         IsHandled: Boolean;
         ShouldDeleteAsm: Boolean;
     begin
@@ -150,16 +149,10 @@ table 904 "Assemble-to-Order Link"
                 OnUpdateAsmOnAfterCalcShouldDeleteAsm(NewSalesLine, ShouldDeleteAsm);
                 if ShouldDeleteAsm then begin
                     DeleteAsmFromSalesLine(NewSalesLine);
-                    if "Assembly Document Type" = "Assembly Document Type"::Order then begin
-                        InvtAdjmtEntryOrder.SetLoadFields("Order Type", "Order No.");
-                        InvtAdjmtEntryOrder.SetRange("Order Type", InvtAdjmtEntryOrder."Order Type"::Assembly);
-                        InvtAdjmtEntryOrder.SetRange("Order No.", "Assembly Document No.");
-                        if not InvtAdjmtEntryOrder.IsEmpty() then begin
-                            PostedATOLink.SetRange("Assembly Order No.", "Assembly Document No.");
-                            if PostedATOLink.IsEmpty() then
-                                Insert();
-                        end;
-                    end;
+                    InvtAdjmtEntryOrder.SetRange("Order Type", InvtAdjmtEntryOrder."Order Type"::Assembly);
+                    InvtAdjmtEntryOrder.SetRange("Order No.", "Assembly Document No.");
+                    if ("Assembly Document Type" = "Assembly Document Type"::Order) and not InvtAdjmtEntryOrder.IsEmpty() then
+                        Insert();
                     exit;
                 end;
                 if not GetAsmHeader() then begin
@@ -433,14 +426,11 @@ table 904 "Assemble-to-Order Link"
         Window: Dialog;
         QtyTracked: Decimal;
         QtyTrackedBase: Decimal;
-        ShowWindow: Boolean;
     begin
         GetAsmHeader();
-        ShowWindow := GuiAllowed();
-        OnSynchronizeAsmFromSalesLineOnAfterGetAsmHeader(NewSalesLine, AsmHeader, ShowWindow);
+        OnSynchronizeAsmFromSalesLineOnAfterGetAsmHeader(NewSalesLine, AsmHeader);
 
-        if ShowWindow then
-            Window.Open(GetWindowOpenTextSale(NewSalesLine));
+        Window.Open(GetWindowOpenTextSale(NewSalesLine));
 
         CaptureItemTracking(TempTrackingSpecification, QtyTracked, QtyTrackedBase);
 
@@ -480,8 +470,7 @@ table 904 "Assemble-to-Order Link"
         RestoreItemTracking(TempTrackingSpecification, NewSalesLine);
 
         NewSalesLine.CheckAsmToOrder(AsmHeader);
-        if ShowWindow then
-            Window.Close();
+        Window.Close();
 
         AsmHeader.SetWarningsOn();
         AsmHeader.ShowDueDateBeforeWorkDateMsg();
@@ -643,15 +632,8 @@ table 904 "Assemble-to-Order Link"
            (AsmHeader."Remaining Quantity (Base)" <> AsmHeader."Reserved Qty. (Base)")));
     end;
 
-    local procedure NeedsSynchronization(JobPlanningLine: Record "Job Planning Line") Result: Boolean
-    var
-        IsHandled: Boolean;
+    local procedure NeedsSynchronization(JobPlanningLine: Record "Job Planning Line"): Boolean
     begin
-        IsHandled := false;
-        OnBeforeNeedsSynchronizationForProjectPlanningLine(AsmHeader, JobPlanningLine, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         GetAsmHeader();
         AsmHeader.CalcFields("Reserved Qty. (Base)");
         exit(
@@ -1929,11 +1911,6 @@ table 904 "Assemble-to-Order Link"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeNeedsSynchronizationForProjectPlanningLine(AssemblyHeader: Record "Assembly Header"; JobPlanningLine: Record "Job Planning Line"; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRemoveTrackingFromReservation(var ReservEntry: Record "Reservation Entry"; ItemTrackingCode: Code[10])
     begin
@@ -2005,7 +1982,7 @@ table 904 "Assemble-to-Order Link"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSynchronizeAsmFromSalesLineOnAfterGetAsmHeader(var NewSalesLine: Record "Sales Line"; var AssemblyHeader: Record "Assembly Header"; var ShowWindow: Boolean)
+    local procedure OnSynchronizeAsmFromSalesLineOnAfterGetAsmHeader(var NewSalesLine: Record "Sales Line"; var AssemblyHeader: Record "Assembly Header")
     begin
     end;
 
