@@ -32,7 +32,6 @@ codeunit 99000813 "Carry Out Action"
     var
         IsHandled: Boolean;
     begin
-        OnBeforeRun(Rec);
         ProductionExist := true;
         AssemblyExist := true;
         case TrySourceType of
@@ -382,7 +381,7 @@ codeunit 99000813 "Carry Out Action"
             ReservationManagement.AutoTrack(PurchaseLine."Outstanding Qty. (Base)");
 
             PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
-            OnPurchOrderChgAndResheduleOnAfterGetPurchHeader(PurchaseHeader, PurchaseLine, RequisitionLine);
+            OnPurchOrderChgAndResheduleOnAfterGetPurchHeader(PurchaseHeader);
             PrintPurchaseOrder(PurchaseHeader);
         end else
             Error(CouldNotChangeSupplyTxt, RequisitionLine."Ref. Order No.", RequisitionLine."Ref. Line No.");
@@ -1897,7 +1896,7 @@ codeunit 99000813 "Carry Out Action"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPurchOrderChgAndResheduleOnAfterGetPurchHeader(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var RequisitionLine: Record "Requisition Line")
+    local procedure OnPurchOrderChgAndResheduleOnAfterGetPurchHeader(var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 
@@ -2038,11 +2037,6 @@ codeunit 99000813 "Carry Out Action"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertProdOrderLineOnBeforeValidateUnitCost(var RequisitionLine: Record "Requisition Line"; ProductionOrder: Record "Production Order"; var ProdOrderLine: Record "Prod. Order Line"; Item: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRun(var Rec: Record "Requisition Line")
     begin
     end;
 }
