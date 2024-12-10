@@ -10,8 +10,7 @@ page 5655 "Insurance Journal Batches"
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "Insurance Journal Batch";
-    AnalysisModeEnabled = false;
-    
+
     layout
     {
         area(content)
