@@ -315,6 +315,9 @@ table 36 "Sales Header"
 
                 if xRec."Bill-to Customer No." <> "Bill-to Customer No." then
                     SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
+
+                if Rec."Sell-to Customer No." <> Rec."Bill-to Customer No." then
+                    UpdateShipToSalespersonCode();
             end;
         }
         field(5; "Bill-to Name"; Text[100])
@@ -3062,11 +3065,7 @@ table 36 "Sales Header"
         SalesLine.Reset();
         SalesLine.LockTable();
 
-        WhseRequest.SetRange("Source Type", DATABASE::"Sales Line");
-        WhseRequest.SetRange("Source Subtype", "Document Type");
-        WhseRequest.SetRange("Source No.", "No.");
-        if not WhseRequest.IsEmpty() then
-            WhseRequest.DeleteAll(true);
+        DeleteWarehouseRequest();
 
         DeleteAllSalesLines();
 
@@ -4344,6 +4343,7 @@ table 36 "Sales Header"
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if SalesLinesExist() then
@@ -4786,10 +4786,13 @@ table 36 "Sales Header"
             "Sell-to County" := Cont.County;
             "Sell-to Country/Region Code" := Cont."Country/Region Code";
         end;
-        if ("Sell-to Customer No." = "Bill-to Customer No.") or
-           ("Bill-to Customer No." = '')
-        then
-            Validate("Bill-to Contact No.", "Sell-to Contact No.");
+        Clear(IsHandled);
+        OnUpdateSellToCustOnBeforeValidateBillToContactNo(Rec, IsHandled);
+        if not IsHandled then
+            if ("Sell-to Customer No." = "Bill-to Customer No.") or
+               ("Bill-to Customer No." = '')
+            then
+                Validate("Bill-to Contact No.", "Sell-to Contact No.");
 
         OnAfterUpdateSellToCust(Rec, Cont);
     end;
@@ -5603,7 +5606,13 @@ table 36 "Sales Header"
         ErrorContextElement: Codeunit "Error Context Element";
         ErrorMessageMgt: Codeunit "Error Message Management";
         ErrorMessageHandler: Codeunit "Error Message Handler";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSendToPosting(Rec, IsSuccess, IsHandled, PostingCodeunitID);
+        if IsHandled then
+            exit(IsSuccess);
+
         if not IsApprovedForPosting() then
             exit;
 
@@ -5613,8 +5622,20 @@ table 36 "Sales Header"
         IsSuccess := CODEUNIT.Run(PostingCodeunitID, Rec);
 
         OnSendToPostingOnAfterPost(Rec);
-        if not IsSuccess then
+        if not IsSuccess then begin
+            if Rec.Status <> Rec.Status::Released then
+                DeleteWarehouseRequest();
             ErrorMessageHandler.ShowErrors();
+        end;
+    end;
+
+    local procedure DeleteWarehouseRequest()
+    begin
+        WhseRequest.SetRange("Source Type", DATABASE::"Sales Line");
+        WhseRequest.SetRange("Source Subtype", "Document Type");
+        WhseRequest.SetRange("Source No.", "No.");
+        if not WhseRequest.IsEmpty() then
+            WhseRequest.DeleteAll(true);
     end;
 
     procedure CancelBackgroundPosting()
@@ -7472,6 +7493,7 @@ table 36 "Sales Header"
     procedure UpdateShipToSalespersonCode()
     var
         ShipToAddress: Record "Ship-to Address";
+        SalespersonCode: Code[20];
         IsHandled: Boolean;
         IsSalesPersonCodeAssigned: Boolean;
     begin
@@ -7484,7 +7506,8 @@ table 36 "Sales Header"
             ShipToAddress.SetLoadFields("Salesperson Code");
             ShipToAddress.Get("Sell-to Customer No.", "Ship-to Code");
             if ShipToAddress."Salesperson Code" <> '' then begin
-                SetSalespersonCode(ShipToAddress."Salesperson Code", "Salesperson Code");
+                SetSalespersonCode(ShipToAddress."Salesperson Code", SalespersonCode);
+                Validate("Salesperson Code", SalespersonCode);
                 IsSalesPersonCodeAssigned := true;
             end;
         end;
@@ -7495,7 +7518,10 @@ table 36 "Sales Header"
             if not IsHandled then
                 if ("Bill-to Customer No." <> '') then begin
                     GetCust("Bill-to Customer No.");
-                    SetSalespersonCode(Customer."Salesperson Code", "Salesperson Code");
+                    SetSalespersonCode(Customer."Salesperson Code", SalespersonCode);
+                    Validate("Salesperson Code", SalespersonCode);
+                    if Rec."Sell-to Customer No." <> '' then
+                        GetCust(Rec."Sell-to Customer No.");
                 end else
                     SetDefaultSalesperson();
         end;
@@ -8139,20 +8165,17 @@ table 36 "Sales Header"
         QtyReservedFromStock: Decimal;
     begin
         QtyReservedFromStock := SalesLineReserve.GetReservedQtyFromInventory(Rec);
+        if QtyReservedFromStock = 0 then
+            exit(Result::None);
 
         SalesLineLocal.SetRange("Document Type", "Document Type");
         SalesLineLocal.SetRange("Document No.", "No.");
         SalesLineLocal.SetRange(Type, SalesLineLocal.Type::Item);
         SalesLineLocal.CalcSums("Outstanding Qty. (Base)");
 
-        case QtyReservedFromStock of
-            0:
-                exit(Result::None);
-            SalesLineLocal."Outstanding Qty. (Base)":
-                exit(Result::Full);
-            else
-                exit(Result::Partial);
-        end;
+        if QtyReservedFromStock = SalesLineLocal."Outstanding Qty. (Base)" then
+            exit(Result::Full);
+        exit(Result::Partial);
     end;
 
     local procedure UpdateVATReportingDate(CalledByFieldNo: Integer)
@@ -8389,6 +8412,11 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateOpportunityLinkOnBeforeModify(var Opportunity: Record Opportunity; var SalesHeader: Record "Sales Header"; SalesDocumentType: Option; SalesHeaderNo: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -10007,6 +10035,16 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateVATReportingDate(var SalesHeader: Record "Sales Header"; CalledByFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSendToPosting(var SalesHeader: Record "Sales Header"; var IsSuccess: Boolean; var IsHandled: Boolean; PostingCodeunitID: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateSellToCustOnBeforeValidateBillToContactNo(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 }
