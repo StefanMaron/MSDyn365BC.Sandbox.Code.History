@@ -1490,8 +1490,7 @@ report 840 "Suggest Worksheet Lines"
                   PurchaseLine."Prepmt. Amt. Inv.", PurchHeader2."Currency Factor"),
                 Currency."Amount Rounding Precision");
         end else
-            if GetPurchaseAmountForCFLine(PurchaseLine) <> 0 then
-                PrepmtAmtInvLCY := PurchaseLine."Prepmt. Amt. Inv.";
+            PrepmtAmtInvLCY := PurchaseLine."Prepmt. Amt. Inv.";
 
         Currency.InitRoundingPrecision();
         if PurchHeader2."Prices Including VAT" then
