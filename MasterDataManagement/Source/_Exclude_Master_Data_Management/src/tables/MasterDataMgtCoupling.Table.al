@@ -247,15 +247,7 @@ table 7231 "Master Data Mgt. Coupling"
     var
         MasterDataMgtCoupling: Record "Master Data Mgt. Coupling";
     begin
-        MasterDataMgtCoupling.SetCurrentKey("Local System ID");
-        MasterDataMgtCoupling.SetFilter("Local System ID", LocalSystemId);
-        if MasterDataMgtCoupling.FindSet() then
-            repeat
-                if MasterDataMgtCoupling."Local System ID" <> MasterDataMgtCoupling."Integration System ID" then
-                    exit(true);
-            until MasterDataMgtCoupling.Next() = 0;
-
-        exit(false);
+        exit(FindRowFromLocalSystemID(LocalSystemId, MasterDataMgtCoupling));
     end;
 
     internal procedure IsIntegrationSystemIdCoupled(IntegrationSystemId: Guid; IntegrationTableID: Integer): Boolean
