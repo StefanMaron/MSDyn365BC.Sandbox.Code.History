@@ -39,7 +39,6 @@ codeunit 86 "Sales-Quote to Order"
             Cust.CheckBlockedCustOnDocs(Cust, Rec."Document Type"::Order, true, false);
         end;
         Rec.CalcFields("Amount Including VAT", "Work Description");
-        OnRunOnAfterCalcAmountIncludingVAT(Rec);
 
         Rec.ValidateSalesPersonOnSalesHeader(Rec, true, false);
 
@@ -516,11 +515,6 @@ codeunit 86 "Sales-Quote to Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferQuoteToOrderLinesOnAfterSalesOrderLineReserve(var SalesLineOrder: Record "Sales Line"; SalesLineQuote: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRunOnAfterCalcAmountIncludingVAT(var SalesHeader: Record "Sales Header")
     begin
     end;
 }
