@@ -18,7 +18,7 @@ codeunit 134252 "Match Bank Reconciliation - UT"
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
         LibraryERM: Codeunit "Library - ERM";
         isInitialized: Boolean;
-        MatchSummaryMsg: Label '%1 reconciliation lines out of %2 are matched.', Comment = '%1 = Matched lines count, %2 = Total lines count';
+        MatchSummaryMsg: Label '%1 reconciliation lines out of %2 are matched.';
         WrongValueOfFieldErr: Label 'Wrong value of field.';
         MatchedManuallyTxt: Label 'This statement line was matched manually.';
 
@@ -1033,8 +1033,8 @@ codeunit 134252 "Match Bank Reconciliation - UT"
         TempBankAccountLedgerEntry: Record "Bank Account Ledger Entry" temporary;
         BankAccReconciliation: Record "Bank Acc. Reconciliation";
         BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
-        MatchBankRecLines: Codeunit "Match Bank Rec. Lines";
         BankAccReconciliationPage: TestPage "Bank Acc. Reconciliation";
+        MatchBankRecLines: Codeunit "Match Bank Rec. Lines";
         PostingDate: Date;
         BankAccountNo: Code[20];
         StatementNo: Code[20];
@@ -1168,8 +1168,8 @@ codeunit 134252 "Match Bank Reconciliation - UT"
         StatementNo: Code[20];
         DocumentNo: Code[20];
         Description: Text[50];
-        GibberishText: Text[50];
         DocumentNoAsInt: Integer;
+        GibberishText: Text;
         Amount: Decimal;
         BankAccReconciliationLineNo: Integer;
     begin
@@ -1208,8 +1208,8 @@ codeunit 134252 "Match Bank Reconciliation - UT"
         StatementNo: Code[20];
         DocumentNo: Code[20];
         Description: Text[50];
-        GibberishText: Text[50];
         DocumentNoAsInt: Integer;
+        GibberishText: Text;
         Amount: Decimal;
         BankAccReconciliationLineNo: Integer;
     begin
@@ -1249,7 +1249,7 @@ codeunit 134252 "Match Bank Reconciliation - UT"
         StatementNo: Code[20];
         DocumentNo: Code[20];
         Description: Text[50];
-        RandomDescText: Text;
+        RendomDescText: Text;
         Amount: Decimal;
         DateRange: Integer;
         ExpectedMatchedLineNo: Integer;
@@ -1260,14 +1260,14 @@ codeunit 134252 "Match Bank Reconciliation - UT"
         Initialize();
         CreateInputData(PostingDate, BankAccountNo, StatementNo, DocumentNo, Description, Amount);
         DateRange := LibraryRandom.RandIntInRange(2, 10);
-        RandomDescText := LibraryUtility.GenerateRandomAlphabeticText(2, 0);
+        RendomDescText := LibraryUtility.GenerateRandomAlphabeticText(2, 0);
         // [GIVEN] Bank Acc Ledger Enrty exists with Desc = "123456"
-        Description := RandomDescText + ' ' + Description;
+        Description := RendomDescText + ' ' + Description;
         // [GIVEN] Bank Account Reconcilition for this bank is created
         ExpectedMatchedEntryNo := CreateBankAccLedgerEntry(BankAccountNo, PostingDate, DocumentNo, '', Amount, Description);
         // [GIVEN] Create a Bank Acc Reconciliation Line with differen Descriptions, with matching amount
         CreateBankAccRec(BankAccReconciliation, BankAccountNo, StatementNo);
-        CreateBankAccRecLine(BankAccReconciliation, PostingDate, RandomDescText, '', Amount);
+        CreateBankAccRecLine(BankAccReconciliation, PostingDate, RendomDescText, '', Amount);
         // [GIVEN] Exercise, run Match Bank Entries report for Bank Account Reconciliation
         ExpectedMatchedLineNo := CreateBankAccRecLine(BankAccReconciliation, PostingDate, Description, '', Amount);
         LibraryVariableStorage.Enqueue(DateRange);
@@ -1408,14 +1408,12 @@ codeunit 134252 "Match Bank Reconciliation - UT"
     var
         BankAccReconciliation: Record "Bank Acc. Reconciliation";
         BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
-        BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
         LibraryApplicationArea: Codeunit "Library - Application Area";
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"Match Bank Reconciliation - UT");
         LibraryApplicationArea.EnableFoundationSetup();
         BankAccReconciliationLine.DeleteAll();
         BankAccReconciliation.DeleteAll();
-        BankAccountLedgerEntry.DeleteAll();
 
         if isInitialized then
             exit;
@@ -1435,6 +1433,7 @@ codeunit 134252 "Match Bank Reconciliation - UT"
     var
         BankAccountPostingGroup: Record "Bank Account Posting Group";
         BankContUpdate: Codeunit "BankCont-Update";
+        LibraryERM: Codeunit "Library - ERM";
     begin
         LibraryERM.FindBankAccountPostingGroup(BankAccountPostingGroup);
         BankAccount.Init();
@@ -1550,7 +1549,7 @@ codeunit 134252 "Match Bank Reconciliation - UT"
         exit(BankAccountLedgerEntry."Entry No.");
     end;
 
-    local procedure GenerateNonMatchingNumberAndText(var Number: Integer; var GeneratedText: Text[50])
+    local procedure GenerateNonMatchingNumberAndText(var Number: Integer; var GeneratedText: Text)
     var
         SmallNumber: Integer;
         i: Integer;
@@ -1674,7 +1673,7 @@ codeunit 134252 "Match Bank Reconciliation - UT"
         BankAccountLedgerEntry.SetRange(Open, true);
         Assert.IsTrue(BankAccountLedgerEntry.IsEmpty, 'There should be no entries left.');
 
-        asserterror BankAccReconciliation.FindFirst();
+        asserterror BankAccReconciliation.Find();
     end;
 
     local procedure CreateBankAccRecWithStatementDate(
