@@ -2,7 +2,6 @@ codeunit 101400 "Create Custom Report Layout"
 {
     trigger OnRun()
     begin
-        InsertEmailLayouts();
         UpdateReportSelections();
         UpdateReportLayoutSelections();
         UpdateEmailBodySelections();
@@ -23,7 +22,15 @@ codeunit 101400 "Create Custom Report Layout"
         MS1302Default: Label 'StandardSalesProFormaInv.docx', Locked = true;
         MS1308BlueSimple: Label 'SimpleSalesShipment.docx', Locked = true;
         MS1309BlueSimple: Label 'SimpleSalesReturnReceipt.docx', Locked = true;
-        DefaultEmailBodyTxt: Label 'Default - Email Body';
+        CZ31014Email: Label 'SalesAdvanceLetterEmail.docx', Locked = true;
+        CZ31015Email: Label 'SalesAdvanceVATDocEmail.docx', Locked = true;
+        CZ31018Email: Label 'SalesInvoicewithAdvEmail.docx', Locked = true;
+        CZ31182Email: Label 'ReminderEmail.docx', Locked = true;
+        CZ31185Email: Label 'PurchaseOrderEmail.docx', Locked = true;
+        CZ31186Email: Label 'SalesQuoteEmail.docx', Locked = true;
+        CZ31187Email: Label 'SalesOrderConfirmationEmail.docx', Locked = true;
+        CZ31189Email: Label 'SalesInvoiceEmail.docx', Locked = true;
+        CZ31190Email: Label 'SalesCreditMemoEmail.docx', Locked = true;
 
     local procedure AddEmailBodyLayout(ReportID: Integer; ReportLayoutName: Text)
     var
@@ -43,82 +50,6 @@ codeunit 101400 "Create Custom Report Layout"
         end;
     end;
 
-    local procedure AddEmailBodyLayoutCustom(ReportID: Integer; LayoutName: Text[80])
-    var
-        ReportSelections: Record "Report Selections";
-        CustomReportLayout: Record "Custom Report Layout";
-    begin
-        CustomReportLayout.SetRange(Description, LayoutName);
-        CustomReportLayout.SetRange("Report ID", ReportID);
-        if not CustomReportLayout.FindFirst() then
-            exit;
-
-        ReportSelections.SetRange("Report ID", ReportID);
-        if ReportSelections.FindFirst() then begin
-            ReportSelections.Validate("Use for Email Body", true);
-            ReportSelections.Validate("Email Body Layout Code", CustomReportLayout.Code);
-            ReportSelections.Modify(true);
-        end;
-    end;
-
-    local procedure InsertEmailLayouts()
-    begin
-        // NAVCZ
-        InsertData(REPORT::"Sales - Advance Letter CZZ", 'REP31014_Default_Email.docx', DefaultEmailBodyTxt, 'CZ-31014-Email_Def');
-        InsertData(REPORT::"Sales - Advance VAT Doc. CZZ", 'REP31015_Default_Email.docx', DefaultEmailBodyTxt, 'CZ-31015-Email_Def');
-        InsertData(REPORT::"Sales - Invoice with Adv. CZZ", 'REP31018_Default_Email.docx', DefaultEmailBodyTxt, 'CZ-31018-Email_Def');
-        InsertData(REPORT::"Reminder CZL", 'REP31182_Default_Email.docx', DefaultEmailBodyTxt, 'CZ-31182-Email_Def');
-        InsertData(REPORT::"Purchase Order CZL", 'REP31185_Default_Email.docx', DefaultEmailBodyTxt, 'CZ-31185-Email_Def');
-        InsertData(REPORT::"Sales Quote CZL", 'REP31186_Default_Email.docx', DefaultEmailBodyTxt, 'CZ-31186-Email_Def');
-        InsertData(REPORT::"Sales Order Confirmation CZL", 'REP31187_Default_Email.docx', DefaultEmailBodyTxt, 'CZ-31187-Email_Def');
-        InsertData(REPORT::"Sales Invoice CZL", 'REP31189_Default_Email.docx', DefaultEmailBodyTxt, 'CZ-31189-Email_Def');
-        InsertData(REPORT::"Sales Credit Memo CZL", 'REP31190_Default_Email.docx', DefaultEmailBodyTxt, 'CZ-31190-Email_Def');
-        // NAVCZ
-    end;
-
-    local procedure InsertData(ReportID: Integer; FileName: Text; LayoutName: Text[250]; CustomReportLayoutCode: Code[20])
-    var
-        CustomReportLayout: Record "Custom Report Layout";
-        File: File;
-        LayoutInStream: InStream;
-        LayoutOutStream: OutStream;
-        XmlPartOutStream: OutStream;
-        FilePath: Text;
-        WordXmlPart: Text;
-    begin
-        // Check for an existing item with the given report ID and layout name, don't insert if it's already there.
-        CustomReportLayout.SetRange("Report ID", ReportID);
-        CustomReportLayout.SetRange(Description, LayoutName);
-        CustomReportLayout.SetRange(Type, CustomReportLayout.Type::Word);
-
-        if CustomReportLayout.FindFirst() then
-            exit;
-        CustomReportLayout.Init();
-        CustomReportLayout.Code := CustomReportLayoutCode;
-        CustomReportLayout."Report ID" := ReportID;
-        CustomReportLayout.Description := LayoutName;
-        CustomReportLayout.Type := CustomReportLayout.Type::Word;
-        CustomReportLayout."Built-In" := false;
-
-        if not CustomReportLayout.Insert(true) then
-            exit;
-
-        FilePath := 'WordTemplates\' + FileName;
-        File.Open(FilePath);
-        File.CreateInStream(LayoutInStream);
-        CustomReportLayout.Layout.CreateOutStream(LayoutOutStream);
-        CopyStream(LayoutOutStream, LayoutInStream);
-        File.Close();
-
-        WordXmlPart := REPORT.WordXmlPart(ReportID, true);
-        if WordXmlPart <> '' then begin
-            CustomReportLayout."Custom XML Part".CreateOutStream(XmlPartOutStream, TEXTENCODING::UTF16);
-            XmlPartOutStream.Write(WordXmlPart);
-        end;
-
-        CustomReportLayout.Modify();
-    end;
-
     local procedure UpdateEmailBodySelections()
     begin
         // Add default email body layouts to the report selections
@@ -131,15 +62,15 @@ codeunit 101400 "Create Custom Report Layout"
         AddEmailBodyLayout(REPORT::"Standard Purchase - Order", Format(MS1322EmailDef));
         AddEmailBodyLayout(REPORT::Reminder, Format(MS117EmailDef));
         // NAVCZ
-        AddEmailBodyLayoutCustom(REPORT::"Sales - Advance Letter CZZ", DefaultEmailBodyTxt);
-        AddEmailBodyLayoutCustom(REPORT::"Sales - Advance VAT Doc. CZZ", DefaultEmailBodyTxt);
-        AddEmailBodyLayoutCustom(REPORT::"Sales - Invoice with Adv. CZZ", DefaultEmailBodyTxt);
-        AddEmailBodyLayoutCustom(REPORT::"Reminder CZL", DefaultEmailBodyTxt);
-        AddEmailBodyLayoutCustom(REPORT::"Purchase Order CZL", DefaultEmailBodyTxt);
-        AddEmailBodyLayoutCustom(REPORT::"Sales Quote CZL", DefaultEmailBodyTxt);
-        AddEmailBodyLayoutCustom(REPORT::"Sales Order Confirmation CZL", DefaultEmailBodyTxt);
-        AddEmailBodyLayoutCustom(REPORT::"Sales Invoice CZL", DefaultEmailBodyTxt);
-        AddEmailBodyLayoutCustom(REPORT::"Sales Credit Memo CZL", DefaultEmailBodyTxt);
+        AddEmailBodyLayout(REPORT::"Sales - Advance Letter CZZ", CZ31014Email);
+        AddEmailBodyLayout(REPORT::"Sales - Advance VAT Doc. CZZ", CZ31015Email);
+        AddEmailBodyLayout(REPORT::"Sales - Invoice with Adv. CZZ", CZ31018Email);
+        AddEmailBodyLayout(REPORT::"Reminder CZL", CZ31182Email);
+        AddEmailBodyLayout(REPORT::"Purchase Order CZL", CZ31185Email);
+        AddEmailBodyLayout(REPORT::"Sales Quote CZL", CZ31186Email);
+        AddEmailBodyLayout(REPORT::"Sales Order Confirmation CZL", CZ31187Email);
+        AddEmailBodyLayout(REPORT::"Sales Invoice CZL", CZ31189Email);
+        AddEmailBodyLayout(REPORT::"Sales Credit Memo CZL", CZ31190Email);
         // NAVCZ
     end;
 
@@ -188,9 +119,9 @@ codeunit 101400 "Create Custom Report Layout"
         TenantReportLayoutSelection.Init();
         TenantReportLayoutSelection."Report ID" := ReportID;
         TenantReportLayoutSelection."Layout Name" := ReportLayoutName;
+        TenantReportLayoutSelection."App ID" := ReportLayoutList."Application ID";
 
         if not TenantReportLayoutSelection.Insert(true) then
             TenantReportLayoutSelection.Modify(true);
     end;
 }
-
