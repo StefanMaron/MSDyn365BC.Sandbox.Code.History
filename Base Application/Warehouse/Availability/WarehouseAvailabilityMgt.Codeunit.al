@@ -120,7 +120,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         if TrackingSpecification."Package No." <> '' then
             CalcRsvQtyOnPicksShipsWithIT.SetRange(Package_No_, TrackingSpecification."Package No.");
 
-        OnBeforeOpenCalcRsvQtyOnPickShipWithITQuery(CalcRsvQtyOnPicksShipsWithIT);
         CalcRsvQtyOnPicksShipsWithIT.Open();
 
         while CalcRsvQtyOnPicksShipsWithIT.Read() do begin
@@ -1053,11 +1052,6 @@ codeunit 7314 "Warehouse Availability Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcQtyPickedNotShipped(SourceType: Integer; SourceSubType: Option; SourceID: Code[20]; SourceRefNo: Integer; var QtyPickedNotShippedBase: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenCalcRsvQtyOnPickShipWithITQuery(var CalcRsvQtyOnPicksShipsWithIT: Query CalcRsvQtyOnPicksShipsWithIT)
     begin
     end;
 }
