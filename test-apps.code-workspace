@@ -288,6 +288,9 @@
       "path": "./RecommendedApps/Test/Recommended Apps Tests"
     },
     {
+      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
+    },
+    {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
