@@ -42,7 +42,7 @@ codeunit 134198 "Price Worksheet Line UT"
         ParentSourceNoMustBeBlankErr: Label 'Assign-to Parent No. must be equal to ''''';
         SourceNoMustBeFilledErr: Label 'Assign-to No. must have a value';
         SourceNoMustBeBlankErr: Label 'Assign-to No. must be equal to ''''';
-        SourceGroupJobErr: Label 'Source Group must be equal to ''Project''';
+        SourceGroupJobErr: Label 'Source Group must be equal to ''Job''';
         IsInitialized: Boolean;
 
     [Test]
@@ -2661,7 +2661,7 @@ codeunit 134198 "Price Worksheet Line UT"
         PriceWorksheetLine."Asset No." := 'ACC';
         // [WHEN] Set "Cost Factor" as 1
         asserterror PriceWorksheetLine.Validate("Cost Factor", 1);
-        // [THEN] Error message: 'Source Group must be equal to Project'
+        // [THEN] Error message: 'Source Group must be equal to Job'
         Assert.ExpectedError(SourceGroupJobErr);
     end;
 
