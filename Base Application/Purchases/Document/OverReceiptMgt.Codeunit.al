@@ -205,10 +205,7 @@ codeunit 8510 "Over-Receipt Mgt."
     begin
         if not IsOverReceiptAllowed() then
             exit;
-
-        if not PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, DocumentNo) then
-            exit;
-
+        PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, DocumentNo);
         PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
         PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
         PurchaseLine.SetFilter("Over-Receipt Quantity", '<>0');
