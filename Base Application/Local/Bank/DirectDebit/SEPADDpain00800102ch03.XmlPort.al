@@ -317,12 +317,7 @@ xmlport 11501 "SEPA DD pain.008.001.02.ch03"
     }
 
     trigger OnPreXmlPort()
-    var
-        FeatureTelemetry: Codeunit "Feature Telemetry";
-        SEPADDExportFile: Codeunit "SEPA DD-Export File";
     begin
-        FeatureTelemetry.LogUptake('0000N21', SEPADDExportFile.FeatureName(), Enum::"Feature Uptake Status"::Used);
-        FeatureTelemetry.LogUsage('0000N22', SEPADDExportFile.FeatureName(), 'XmlPort (CH) SEPA DD pain.008.001.02.ch03');
         InitData();
     end;
 
