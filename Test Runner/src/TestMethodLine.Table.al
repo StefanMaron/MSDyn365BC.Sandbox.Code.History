@@ -11,8 +11,7 @@ table 130450 "Test Method Line"
 {
     DataClassification = CustomerContent;
     ReplicateData = false;
-    Permissions = tabledata "AL Test Suite" = rimd,
-                  tabledata "Test Method Line" = rimd;
+    Permissions = TableData "AL Test Suite" = rimd, TableData "Test Method Line" = rimd;
 
     fields
     {
@@ -115,11 +114,11 @@ table 130450 "Test Method Line"
         {
             DataClassification = CustomerContent;
         }
-        field(52; "Error Message"; Blob)
+        field(52; "Error Message"; BLOB)
         {
             DataClassification = CustomerContent;
         }
-        field(53; "Error Call Stack"; Blob)
+        field(53; "Error Call Stack"; BLOB)
         {
             DataClassification = CustomerContent;
         }
