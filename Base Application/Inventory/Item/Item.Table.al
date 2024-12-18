@@ -1906,7 +1906,6 @@ table 27 Item
             trigger OnValidate()
             var
                 EmptyDateFormula: DateFormula;
-                IsHandled: Boolean;
             begin
                 if "Item Tracking Code" <> '' then
                     TestField(Type, Type::Inventory);
@@ -1919,11 +1918,8 @@ table 27 Item
                 if not ItemTrackingCode2.Get(xRec."Item Tracking Code") then
                     Clear(ItemTrackingCode2);
 
-                IsHandled := false;
-                OnValidateItemTrackingCodeOnBeforeTestNoEntriesExist(Rec, xRec, CurrFieldNo, IsHandled);
                 if ItemTrackingCode.IsSpecificTrackingChanged(ItemTrackingCode2) then
-                    if not IsHandled then
-                        TestNoEntriesExist(FieldCaption("Item Tracking Code"));
+                    TestNoEntriesExist(FieldCaption("Item Tracking Code"));
 
                 if ItemTrackingCode.IsWarehouseTrackingChanged(ItemTrackingCode2) then
                     TestNoWhseEntriesExist(FieldCaption("Item Tracking Code"));
@@ -3328,16 +3324,7 @@ table 27 Item
     local procedure CheckStdCostWksh(CurrentFieldNo: Integer)
     var
         StandardCostWorksheet: Record "Standard Cost Worksheet";
-        IsHandled: Boolean;
     begin
-        if "No." = '' then
-            exit;
-
-        IsHandled := false;
-        OnBeforeCheckStdCostWksh(Rec, CurrentFieldNo, IsHandled);
-        if IsHandled then
-            exit;
-
         StandardCostWorksheet.Reset();
         StandardCostWorksheet.SetRange(Type, StandardCostWorksheet.Type::Item);
         StandardCostWorksheet.SetRange("No.", "No.");
@@ -3714,7 +3701,7 @@ table 27 Item
         end;
     end;
 
-    procedure CalcVAT(): Decimal
+    local procedure CalcVAT(): Decimal
     begin
         if "Price Includes VAT" then begin
             VATPostingSetup.Get("VAT Bus. Posting Gr. (Price)", "VAT Prod. Posting Group");
@@ -4019,8 +4006,6 @@ table 27 Item
             exit;
 
         "Item Category Id" := ItemCategory.SystemId;
-
-        OnAfterUpdateItemCategoryId(Rec, ItemCategory);
     end;
 
     procedure UpdateTaxGroupId()
@@ -4541,21 +4526,6 @@ table 27 Item
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateTypeOnBeforeCheckExistsItemLedgerEntry(var Item: Record Item; xItem: Record Item; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckStdCostWksh(var Item: Record Item; CurrentFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateItemTrackingCodeOnBeforeTestNoEntriesExist(var Item: Record Item; xItem: Record Item; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateItemCategoryId(var Item: Record Item; var ItemCategory: Record "Item Category")
     begin
     end;
 }
