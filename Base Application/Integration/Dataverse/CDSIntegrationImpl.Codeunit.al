@@ -4341,7 +4341,7 @@ codeunit 7201 "CDS Integration Impl."
         Notification.Send();
     end;
 
-    internal procedure SendMultipleCompaniesNotification()
+    procedure SendMultipleCompaniesNotification()
     var
         MyNotifications: Record "My Notifications";
         Notification: Notification;
@@ -4643,7 +4643,7 @@ codeunit 7201 "CDS Integration Impl."
         exit(false);
     end;
 
-    internal procedure MultipleCompaniesConnected(): Boolean
+    procedure MultipleCompaniesConnected(): Boolean
     var
         CDSCompanyCount: Integer;
     begin
@@ -5152,6 +5152,11 @@ codeunit 7201 "CDS Integration Impl."
     begin
         JobQueueEntry.SetRange("Job Queue Category Code", EnableCDSVirtualTablesJobQueueCategoryTxt);
         Page.Run(Page::"Job Queue Entries", JobQueueEntry);
+    end;
+
+    procedure LearnMoreDisablingCRMConnection(ErrorInfo: ErrorInfo)
+    begin
+        Hyperlink('https://go.microsoft.com/fwlink/?linkid=2206514');
     end;
 
     internal procedure CleanCDSIntegration()
