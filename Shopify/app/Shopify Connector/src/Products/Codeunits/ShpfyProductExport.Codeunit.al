@@ -704,9 +704,6 @@ codeunit 30178 "Shpfy Product Export"
         ShpfyVariant: Record "Shpfy Variant";
         MetafieldAPI: Codeunit "Shpfy Metafield API";
     begin
-        if OnlyUpdatePrice then
-            exit;
-
         MetafieldAPI.CreateOrUpdateMetafieldsInShopify(Database::"Shpfy Product", ProductId);
 
         ShpfyVariant.SetRange("Product Id", ProductId);
