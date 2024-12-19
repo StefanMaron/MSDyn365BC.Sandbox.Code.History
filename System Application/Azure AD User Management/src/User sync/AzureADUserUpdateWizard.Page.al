@@ -5,7 +5,6 @@
 
 namespace System.Azure.Identity;
 
-using System;
 using System.Utilities;
 using System.Environment.Configuration;
 using System.Security.User;
@@ -289,11 +288,7 @@ page 9515 "Azure AD User Update Wizard"
                 var
                     AzureADUserSyncImpl: Codeunit "Azure AD User Sync Impl.";
                     GuidedExperience: Codeunit "Guided Experience";
-                    MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-                    MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-                    MyALAuditCategory: DotNet ALAuditCategory;
                     SuccessCount: Integer;
-                    UpdateUsersfromMicrosoft365RunLbl: Label 'Update users from Microsoft 365 wizard has been run by the UserSecurityId %1.', Locked = true;
                 begin
                     Rec.Reset();
                     SuccessCount := AzureADUserSyncImpl.ApplyUpdatesFromAzureGraph(Rec);
@@ -301,7 +296,6 @@ page 9515 "Azure AD User Update Wizard"
                     Rec.DeleteAll();
 
                     GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"Azure AD User Update Wizard");
-                    MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(UpdateUsersfromMicrosoft365RunLbl, UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 2, 0);
 
                     MakeAllGroupsInvisible();
                     FinishedVisible := true;
@@ -369,7 +363,7 @@ page 9515 "Azure AD User Update Wizard"
     var
         UserPermissions: Codeunit "User Permissions";
     begin
-        if not (UserPermissions.CanManageUsersOnTenant(UserSecurityId()) and UserPermissions.IsSuper(UserSecurityId())) then
+        if not UserPermissions.CanManageUsersOnTenant(UserSecurityId()) then
             Error(CannotUpdateUsersFromOfficeErr);
 
         MakeAllGroupsInvisible();
