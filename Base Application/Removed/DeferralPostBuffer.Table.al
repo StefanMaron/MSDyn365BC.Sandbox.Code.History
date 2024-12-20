@@ -72,7 +72,7 @@ table 1703 "Deferral Post. Buffer"
         }
         field(11; "Job No."; Code[20])
         {
-            Caption = 'Project No.';
+            Caption = 'Job No.';
             DataClassification = SystemMetadata;
         }
         field(12; "Posting Date"; Date)
