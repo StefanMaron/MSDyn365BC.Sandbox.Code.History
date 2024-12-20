@@ -42,7 +42,7 @@ enum 5531 "Inventory Page Data Type"
     }
     value(9; Job)
     {
-        Caption = 'Project';
+        Caption = 'Job';
     }
     value(10; Forecast)
     {
