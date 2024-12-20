@@ -658,7 +658,6 @@ codeunit 5704 "TransferOrder-Post Shipment"
             repeat
                 ReserveTransLine.TransferTransferToTransfer(
                   FromTransLine, ToTransLine, -TempHandlingSpecification."Quantity (Base)", Enum::"Transfer Direction"::Inbound, TempHandlingSpecification);
-                OnTransferTrackingOnAfterTransferToTransfer(TempHandlingSpecification, FromTransLine, ToTransLine);
                 TransferQty += TempHandlingSpecification."Quantity (Base)";
             until TempHandlingSpecification.Next() = 0;
             TempHandlingSpecification.DeleteAll();
@@ -1183,11 +1182,6 @@ codeunit 5704 "TransferOrder-Post Shipment"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferTrackingOnBeforeReserveTransferToTransfer(var FromTransferLine: Record "Transfer Line"; var ToTransferLine: Record "Transfer Line"; TransferQty: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnTransferTrackingOnAfterTransferToTransfer(var TempHandlingTrackingSpecification: Record "Tracking Specification"; var FromTransferLine: Record "Transfer Line"; var ToTransferLine: Record "Transfer Line")
     begin
     end;
 }
