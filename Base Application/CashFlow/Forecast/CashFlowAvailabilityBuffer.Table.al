@@ -65,7 +65,7 @@ table 930 "Cash Flow Availability Buffer"
         }
         field(20; Job; Decimal)
         {
-            Caption = 'Project';
+            Caption = 'Job';
         }
         field(21; Tax; Decimal)
         {
