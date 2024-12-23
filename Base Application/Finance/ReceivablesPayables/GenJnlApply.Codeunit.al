@@ -76,11 +76,10 @@ codeunit 225 "Gen. Jnl.-Apply"
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
         ApplyCustEntries: Page "Apply Customer Entries";
-        PreviousAppliesToID: Code[50];
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSelectCustLedgEntry(GenJnlLine, AccNo, Selected, IsHandled, CustomAppliesToId);
+        OnBeforeSelectCustLedgEntry(GenJnlLine, AccNo, Selected, IsHandled);
         if IsHandled then
             exit(Selected);
 
@@ -93,7 +92,6 @@ codeunit 225 "Gen. Jnl.-Apply"
             CustLedgEntry.SetRange("Document Type", GenJnlLine."Document Type"::Payment);
         end;
         OnSelectCustLedgEntryOnAfterSetFilters(CustLedgEntry, GenJnlLine);
-        PreviousAppliesToID := GenJnlLine."Applies-to ID";
         if GenJnlLine."Applies-to ID" = '' then
             GenJnlLine."Applies-to ID" := GenJnlLine."Document No.";
         if GenJnlLine."Applies-to ID" = '' then
@@ -105,8 +103,6 @@ codeunit 225 "Gen. Jnl.-Apply"
         ApplyCustEntries.SetTableView(CustLedgEntry);
         ApplyCustEntries.LookupMode(true);
         Selected := ApplyCustEntries.RunModal() = ACTION::LookupOK;
-        if not Selected then
-            GenJnlLine."Applies-to ID" := PreviousAppliesToID;
         CustomAppliesToId := ApplyCustEntries.GetCustomAppliesToID();
         Clear(ApplyCustEntries);
 
@@ -120,7 +116,7 @@ codeunit 225 "Gen. Jnl.-Apply"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSelectVendLedgEntry(GenJnlLine, AccNo, Selected, IsHandled, CustomAppliesToId);
+        OnBeforeSelectVendLedgEntry(GenJnlLine, AccNo, Selected, IsHandled);
         if IsHandled then
             exit(Selected);
 
@@ -178,14 +174,7 @@ codeunit 225 "Gen. Jnl.-Apply"
     end;
 
     local procedure UpdateCustLedgEntry(var CustLedgEntry: Record "Cust. Ledger Entry")
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateCustLedgEntry(CustLedgEntry, GenJnlLine, IsHandled);
-        if IsHandled then
-            exit;
-
         CustLedgEntry.CalcFields("Remaining Amount");
         CustLedgEntry."Remaining Amount" :=
           CurrExchRate.ExchangeAmount(
@@ -205,14 +194,7 @@ codeunit 225 "Gen. Jnl.-Apply"
     end;
 
     local procedure UpdateVendLedgEntry(var VendLedgEntry: Record "Vendor Ledger Entry")
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateVendLedgEntry(VendLedgEntry, GenJnlLine, IsHandled);
-        if IsHandled then
-            exit;
-
         VendLedgEntry.CalcFields("Remaining Amount");
         VendLedgEntry."Remaining Amount" :=
           CurrExchRate.ExchangeAmount(
@@ -229,8 +211,6 @@ codeunit 225 "Gen. Jnl.-Apply"
             VendLedgEntry."Amount to Apply", VendLedgEntry."Currency Code", GenJnlLine."Currency Code", GenJnlLine."Posting Date");
         VendLedgEntry."Amount to Apply" :=
           Round(VendLedgEntry."Amount to Apply", Currency."Amount Rounding Precision");
-
-        OnAfterUpdateVendLedgEntry(GenJnlLine, VendLedgEntry);
     end;
 
     local procedure UpdateEmployeeLedgEntry(var EmplLedgEntry: Record "Employee Ledger Entry")
@@ -447,7 +427,6 @@ codeunit 225 "Gen. Jnl.-Apply"
         TempApplyingVendorLedgerEntry."Currency Code" := GenJournalLine."Currency Code";
         TempApplyingVendorLedgerEntry.Amount := GenJournalLine.Amount;
         TempApplyingVendorLedgerEntry."Remaining Amount" := GenJournalLine.Amount;
-        OnSetVendApplIdAPIOnBeforeCheckPostingDate(TempApplyingVendorLedgerEntry, GenJournalLine, VendorLedgerEntry);
         if TempApplyingVendorLedgerEntry."Posting Date" < VendorLedgerEntry."Posting Date" then
             Error(
                 EarlierPostingDateErr, TempApplyingVendorLedgerEntry."Document Type", TempApplyingVendorLedgerEntry."Document No.",
@@ -502,7 +481,6 @@ codeunit 225 "Gen. Jnl.-Apply"
                 TempVendorLedgerEntry.DeleteAll();
                 if (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::Customer) or (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::Vendor) then
                     GenJnlLine.Amount := -GenJnlLine.Amount;
-                OnApplyVendorLedgerEntryAPIOnBeforeValidateAmount(GenJnlLine);
                 GenJnlLine.Validate(Amount);
             end else
                 repeat
@@ -573,7 +551,6 @@ codeunit 225 "Gen. Jnl.-Apply"
                 TempVendorLedgerEntry.DeleteAll();
                 if (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::Customer) or (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::Vendor) then
                     GenJnlLine.Amount := -GenJnlLine.Amount;
-                OnApplyVendorLedgerEntryOnBeforeValidateAmount(GenJnlLine);
                 GenJnlLine.Validate(Amount);
             end else
                 repeat
@@ -594,7 +571,6 @@ codeunit 225 "Gen. Jnl.-Apply"
                 end;
             GenJnlLine."Applies-to Doc. Type" := GenJnlLine."Applies-to Doc. Type"::" ";
             GenJnlLine."Applies-to Doc. No." := '';
-            OnApplyVendorLedgerEntryOnAfterSetGenJnlLineAppliesToDocNo(GenJnlLine, VendLedgEntry);
         end else
             GenJnlLine."Applies-to ID" := '';
 
@@ -832,7 +808,7 @@ codeunit 225 "Gen. Jnl.-Apply"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSelectCustLedgEntry(var GenJournalLine: Record "Gen. Journal Line"; var AccNo: Code[20]; var Selected: Boolean; var IsHandled: Boolean; var CustomAppliesToId: Code[50])
+    local procedure OnBeforeSelectCustLedgEntry(var GenJournalLine: Record "Gen. Journal Line"; var AccNo: Code[20]; var Selected: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -842,7 +818,7 @@ codeunit 225 "Gen. Jnl.-Apply"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSelectVendLedgEntry(var GenJournalLine: Record "Gen. Journal Line"; var AccNo: Code[20]; var Selected: Boolean; var IsHandled: Boolean; var CustomAppliesToId: Code[50])
+    local procedure OnBeforeSelectVendLedgEntry(var GenJournalLine: Record "Gen. Journal Line"; var AccNo: Code[20]; var Selected: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -902,11 +878,6 @@ codeunit 225 "Gen. Jnl.-Apply"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyVendorLedgerEntryOnAfterSetGenJnlLineAppliesToDocNo(var GenJournalLine: Record "Gen. Journal Line"; var VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnApplyVendorLedgerEntryOnBeforeCheckAgainstApplnCurrencyAmountNotZero(GenJournalLine: Record "Gen. Journal Line"; VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
@@ -917,42 +888,12 @@ codeunit 225 "Gen. Jnl.-Apply"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyCustomerLedgerEntryOnAfterSetCustomerAppliesToDocNo(var GenJournalLine: Record "Gen. Journal Line"; var CustLedgerEntry: Record "Cust. Ledger Entry")
+    local procedure OnApplyCustomerLedgerEntryOnAfterSetCustomerAppliesToDocNo(var GenJournalLine: Record "Gen. Journal Line"; CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnApplyVendorLedgerEntryOnAfterSetVendorAppliesToDocNo(var GenJournalLine: Record "Gen. Journal Line"; VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateCustLedgEntry(var CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateVendLedgEntry(var VendorLedgerEntry: Record "Vendor Ledger Entry"; GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateVendLedgEntry(var GenJournalLine: Record "Gen. Journal Line"; var VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnApplyVendorLedgerEntryAPIOnBeforeValidateAmount(var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnApplyVendorLedgerEntryOnBeforeValidateAmount(var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetVendApplIdAPIOnBeforeCheckPostingDate(var TempApplyingVendorLedgerEntry: Record "Vendor Ledger Entry"; var GenJournalLine: Record "Gen. Journal Line"; var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 }
