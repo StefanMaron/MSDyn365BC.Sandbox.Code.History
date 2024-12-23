@@ -174,15 +174,6 @@ page 20 "General Ledger Entries"
                     Visible = SourceCurrencyVisible;
 #endif
                 }
-                field("Source Currency VAT Amount"; Rec."Source Currency VAT Amount")
-                {
-                    ApplicationArea = VAT;
-                    Editable = false;
-                    ToolTip = 'Specifies the source currency VAT amount for general ledger entries.';
-#if not CLEAN24
-                    Visible = SourceCurrencyVisible;
-#endif
-                }
                 field("Add.-Currency Debit Amount"; Rec."Add.-Currency Debit Amount")
                 {
                     ApplicationArea = Basic, Suite;
@@ -425,7 +416,6 @@ page 20 "General Ledger Entries"
             {
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
-                UpdatePropagation = Both;
                 SubPageLink = "Posting Date" = field("Posting Date"), "Document No." = field("Document No.");
             }
             part(GLEntriesPart; "G/L Entries Part")
