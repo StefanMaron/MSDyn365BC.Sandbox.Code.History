@@ -379,9 +379,6 @@ report 6 "Trial Balance"
 
     requestpage
     {
-        AboutTitle = 'About Trial Balance';
-        AboutText = 'View a snapshot of your chart of accounts with a balance at date and net change in the specified period.';
-
         layout
         {
             area(content)
