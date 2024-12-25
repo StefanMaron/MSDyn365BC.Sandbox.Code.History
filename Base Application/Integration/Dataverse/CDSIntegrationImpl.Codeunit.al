@@ -5177,9 +5177,11 @@ codeunit 7201 "CDS Integration Impl."
             IntegrationsSyncJobErrors.ChangeCompany(CompanyName);
             CRMIntegrationRecord.ChangeCompany(CompanyName);
         end;
+
         // Here we delete the setup records
         CDSConnectionSetup.DeleteAll();
         CRMConnectionSetup.DeleteAll();
+
         // Here we delete the integration links
         OnBeforeCleanCRMIntegrationSyncJob(DisableIntegrationSyncJobCleanup);
         if not DisableIntegrationSyncJobCleanup then begin
@@ -5189,6 +5191,7 @@ codeunit 7201 "CDS Integration Impl."
             TableKey.DisableAll(Database::"Integration Synch. Job Errors");
             IntegrationsSyncJobErrors.DeleteAll();
         end;
+
         OnBeforeCleanCRMIntegrationRecords(DisableIntegrationRecordCleanup);
         if not DisableIntegrationRecordCleanup then begin
             // Deleting all couplings can timeout so disable the keys before deleting
@@ -5201,7 +5204,7 @@ codeunit 7201 "CDS Integration Impl."
     local procedure OnBeforeCleanCRMIntegrationRecords(var DisableIntegrationRecordCleanup: Boolean)
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCleanCRMIntegrationSyncJob(var DisableIntegrationSyncJobCleanup: Boolean)
     begin
