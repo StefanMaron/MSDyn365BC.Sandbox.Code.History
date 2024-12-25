@@ -5,7 +5,6 @@
 
 namespace System.Privacy;
 
-using System;
 using System.Reflection;
 
 codeunit 1753 "Data Classification Mgt. Impl."
@@ -20,7 +19,6 @@ codeunit 1753 "Data Classification Mgt. Impl."
     var
         DataSensitivityOptionStringTxt: Label 'Unclassified,Sensitive,Personal,Company Confidential,Normal', Comment = 'It needs to be translated as the field Data Sensitivity on Page 1751 Data Classification WorkSheet and field Data Sensitivity of Table 1180 Data Privacy Entities';
         LegalDisclaimerTxt: Label 'Microsoft is providing this Data Classification feature as a matter of convenience only. It''s your responsibility to classify the data appropriately and comply with any laws and regulations that are applicable to you. Microsoft disclaims all responsibility towards any claims related to your classification of the data.';
-        DataSensitivitySetLbl: Label 'The Data sensitivity value %1 has been set for Company Name %2, Table No %3, Field No %4 by UserSecurityId %5.', Locked = true;
 
     procedure PopulateDataSensitivityTable()
     var
@@ -41,27 +39,17 @@ codeunit 1753 "Data Classification Mgt. Impl."
     procedure InsertDataSensitivityForField(TableNo: Integer; FieldNo: Integer; DataSensitivityOption: Option)
     var
         DataSensitivity: Record "Data Sensitivity";
-        MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-        MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-        MyALAuditCategory: DotNet ALAuditCategory;
     begin
-        if IsSupportedTable(TableNo) then begin
-            DataSensitivity.Init();
-            DataSensitivity."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(DataSensitivity."Company Name"));
-            DataSensitivity."Table No" := TableNo;
-            DataSensitivity."Field No" := FieldNo;
-            DataSensitivity."Data Sensitivity" := DataSensitivityOption;
-            DataSensitivity.Insert();
-            MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(DataSensitivitySetLbl, DataSensitivity."Data Sensitivity", DataSensitivity."Company Name",
-                DataSensitivity."Table No", DataSensitivity."Field No", UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 3, 0);
-        end;
+        DataSensitivity.Init();
+        DataSensitivity."Company Name" := CopyStr(CompanyName(), 1, MaxStrLen(DataSensitivity."Company Name"));
+        DataSensitivity."Table No" := TableNo;
+        DataSensitivity."Field No" := FieldNo;
+        DataSensitivity."Data Sensitivity" := DataSensitivityOption;
+        DataSensitivity.Insert();
     end;
 
     procedure SetSensitivities(var DataSensitivity: Record "Data Sensitivity"; Sensitivity: Option)
     var
-        MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-        MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-        MyALAuditCategory: DotNet ALAuditCategory;
         Now: DateTime;
     begin
         // MODIFYALL does not result in a bulk query for this table,looping through the records performs faster
@@ -73,8 +61,6 @@ codeunit 1753 "Data Classification Mgt. Impl."
                 DataSensitivity."Last Modified By" := UserSecurityId();
                 DataSensitivity."Last Modified" := Now;
                 DataSensitivity.Modify();
-                MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(DataSensitivitySetLbl, DataSensitivity."Data Sensitivity", DataSensitivity."Company Name",
-                    DataSensitivity."Table No", DataSensitivity."Field No", UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 3, 0);
             until DataSensitivity.Next() = 0;
     end;
 
@@ -410,19 +396,6 @@ codeunit 1753 "Data Classification Mgt. Impl."
         DataSensitivity.FilterGroup(2);
         DataSensitivity.SetRange("Table No", TableNo);
         Page.RunModal(Page::"Data Classification Worksheet", DataSensitivity);
-    end;
-
-    procedure IsSupportedTable(TableNo: Integer): Boolean
-    var
-        TableMetadata: Record "Table Metadata";
-    begin
-        if TableMetadata.Get(TableNo) then
-            if (TableMetadata.ObsoleteState = TableMetadata.ObsoleteState::Removed) or (TableMetadata.TableType <> TableMetadata.TableType::Normal) then
-                exit(false)
-            else
-                exit(true);
-
-        exit(false);
     end;
 }
 
