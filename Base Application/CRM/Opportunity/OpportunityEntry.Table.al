@@ -628,7 +628,6 @@ table 5093 "Opportunity Entry"
     var
         CreateNewTask: Boolean;
         CancelOldTask: Boolean;
-        IsHandled: Boolean;
     begin
         CancelOldTask := "Cancel Old To Do";
         CreateNewTask := "Action Taken" <> "Action Taken"::Updated;
@@ -636,10 +635,7 @@ table 5093 "Opportunity Entry"
         "Cancel Old To Do" := false;
         UpdateEstimates();
         "Action Type" := "Action Type"::" ";
-        IsHandled := false;
-        OnFinishWizard2OnBeforeValidateSalesCycleStageDescription(OppEntry, IsHandled);
-        if not IsHandled then
-            "Sales Cycle Stage Description" := '';
+        "Sales Cycle Stage Description" := '';
         OppEntry := Rec;
         InsertEntry(OppEntry, CancelOldTask, CreateNewTask);
         OnFinishWizard2OnAfterInsertEntry(OppEntry);
@@ -1101,11 +1097,6 @@ table 5093 "Opportunity Entry"
 
     [IntegrationEvent(true, false)]
     local procedure OnStartWizard2OnBeforeRunModalPage(var OpportunityEntry: Record "Opportunity Entry"; xOpportunityEntry: Record "Opportunity Entry"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFinishWizard2OnBeforeValidateSalesCycleStageDescription(var OpportunityEntry: Record "Opportunity Entry"; var IsHandled: Boolean)
     begin
     end;
 }
