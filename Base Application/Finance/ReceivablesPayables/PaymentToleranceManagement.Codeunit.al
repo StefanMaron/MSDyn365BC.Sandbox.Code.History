@@ -2188,6 +2188,7 @@ codeunit 426 "Payment Tolerance Management"
         AcceptedEntryTolAmount := Sign * Math.Min(Abs(ExpectedEntryTolAmount), Abs(MaxPmtTolAmount));
     end;
 
+    [Scope('OnPrem')]
     procedure SetBatchMode(NewBatchMode: Boolean)
     begin
         BatchMode := NewBatchMode;
