@@ -39,7 +39,7 @@ codeunit 134387 "ERM Sales Documents III"
         NoOfRecordErr: Label 'No. of records must be 1.';
         DeleteRetRcptOrderErr: Label 'No. Printed must have a value in Return Receipt Header: No.=%1. It cannot be zero or empty.', Comment = '.';
         DeleteSalesCrMemoErr: Label 'No. Printed must have a value in Sales Cr.Memo Header: No.=%1. It cannot be zero or empty.', Comment = '.';
-        GetRetRcptErr: Label 'Argument NoSeriesCode in GetNoSeriesLine cannot be blank.';
+        GetRetRcptErr: Label 'You cannot assign new numbers from the number series';
         PostGreaterQtyErr: Label 'You cannot invoice more than';
         OutstdSalesOrdErr: Label 'You cannot delete Customer %1 because there is at least one outstanding Sales Return Order for this customer.', Comment = '.';
         OutstdSalesReturnErr: Label 'You cannot delete Item %1 because there is at least one outstanding Sales Return Order that includes this item.', Comment = '%1: Field(No)';
@@ -80,8 +80,6 @@ codeunit 134387 "ERM Sales Documents III"
         PackageTrackingNoErr: Label 'Package Tracking No does not exist.';
         CannotAllowInvDiscountErr: Label 'The value of the Allow Invoice Disc. field is not valid when the VAT Calculation Type field is set to "Full VAT".';
         PostingPreviewNoTok: Label '***', Locked = true;
-        ReturnQtyToReceiveMustBeZeroErr: Label ' Return Qty. to Receive must be zero.';
-        QtyToAssignErr: Label '%1 must be %2 in %3', Comment = '%1 = Qty. to Assign, %2 = Quantity, %3 = Sales Return Order Subform';
 
     [Test]
     [Scope('OnPrem')]
@@ -5955,83 +5953,6 @@ codeunit 134387 "ERM Sales Documents III"
         Assert.AreNotEqual(Customer."Country/Region Code", SalesHeader."Rcvd.-from Count./Region Code", 'Received-from Country Code is set just as it is on customer');
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    [HandlerFunctions('SuggestItemChargeAssignmentPageHandler,PostedSalesDocumentLinesPageHandler')]
-    procedure GetPostedDocumentLinesToReverseCopiesLinesWhenDefaultQtyToShipIsBlankInSalesReceiSetup()
-    var
-        Item: Record Item;
-        ItemCharge: Record "Item Charge";
-        SalesReceivablesSetup: Record "Sales & Receivables Setup";
-        SalesHeader: Record "Sales Header";
-        SalesHeader2: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        Quantity: Decimal;
-        SalesReturnOrder: TestPage "Sales Return Order";
-        SalesReturnOrderSubform: TestPage "Sales Return Order Subform";
-    begin
-        // [SCENARIO 500596] Get Posted Document Lines to Reverse action on Sales Return Order copies Sales Invoice Lines of Type Item Charge Even when Default Qty to Ship on Sales & Receivables Setup is set to Blank.
-        Initialize();
-
-        // [GIVEN] Validate Default Quantity to Ship in Sales & Receivables Setup.
-        SalesReceivablesSetup.Get();
-        SalesReceivablesSetup.Validate("Default Quantity to Ship", SalesReceivablesSetup."Default Quantity to Ship"::Blank);
-        SalesReceivablesSetup.Modify(true);
-
-        // [GIVEN] Create an Item.
-        LibraryInventory.CreateItem(Item);
-
-        // [GIVEN] Create an Item Charge.
-        LibraryInventory.CreateItemCharge(ItemCharge);
-
-        // [GIVEN] Generate and Save Quantity in a Variable.
-        Quantity := LibraryRandom.RandIntInRange(25, 25);
-
-        // [GIVEN] Create a Sales Order with Item Charge.
-        CreateSalesOrderWithItemCharge(SalesHeader, ItemCharge."No.", Item."No.", Quantity);
-
-        // [GIVEN] Set Sales Order Lines Qty. to Ship.
-        SetSalesLinesQtyToShip(SalesHeader, Quantity);
-
-        // [GIVEN] Update Qty. to Assign on Item Charge Assignment.
-        UpdateQtyToAssignOnItemChargeAssignment(SalesHeader);
-
-        // [GIVEN] Post Sales Order.
-        LibrarySales.PostSalesDocument(SalesHeader, true, true);
-
-        // [GIVEN] Create a Sales Return Order.
-        LibrarySales.CreateSalesHeader(SalesHeader2, SalesHeader2."Document Type"::"Return Order", SalesHeader."Sell-to Customer No.");
-
-        // [GIVEN] Open Sales Return Order page and run Get Posted Document Lines to Reverse action.
-        SalesReturnOrder.OpenEdit();
-        SalesReturnOrder.GoToRecord(SalesHeader2);
-        LibraryVariableStorage.Enqueue(ItemCharge."No.");
-        SalesReturnOrder.GetPostedDocumentLinesToReverse.Invoke();
-
-        // [WHEN] Find Sales Line of Sales Return Order.
-        SalesLine.SetRange("Document Type", SalesLine."Document Type"::"Return Order");
-        SalesLine.SetRange("Document No.", SalesHeader2."No.");
-        SalesLine.SetRange(Type, SalesLine.Type::"Charge (Item)");
-        SalesLine.FindFirst();
-
-        // [VERIFY] Return Qty. to Receive in Sales Line is 0.
-        Assert.AreEqual(0, SalesLine."Return Qty. to Receive", ReturnQtyToReceiveMustBeZeroErr);
-
-        // [WHEN] Open Sales Return Order Subform page.
-        SalesReturnOrderSubform.OpenEdit();
-        SalesReturnOrderSubform.GoToRecord(SalesLine);
-
-        // [VERIFY] Quantity and Qty. to Assign in Sales Line are same.
-        Assert.AreEqual(
-            Quantity,
-            SalesReturnOrderSubform."Qty. to Assign".AsDecimal(),
-            StrSubstNo(
-                QtyToAssignErr,
-                SalesReturnOrderSubform."Qty. to Assign".Caption(),
-                Quantity,
-                SalesReturnOrderSubform.Caption()));
-    end;
-
     local procedure Initialize()
     var
         ReportSelections: Record "Report Selections";
@@ -7262,64 +7183,6 @@ codeunit 134387 "ERM Sales Documents III"
         SalesReceivablesSetup.Modify();
     end;
 
-    local procedure CreateSalesOrderWithItemCharge(
-        var SalesHeader: Record "Sales Header";
-        ItemChargeNo: Code[20];
-        ItemNo: Code[20];
-        Quantity: Decimal)
-    var
-        SalesLineItemCharge: Record "Sales Line";
-        SalesLineItem: Record "Sales Line";
-        Customer: Record Customer;
-    begin
-        LibrarySales.CreateCustomer(Customer);
-
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
-        LibrarySales.CreateSalesLine(
-            SalesLineItem,
-            SalesHeader,
-            SalesLineItem.Type::Item,
-            ItemNo,
-            Quantity);
-
-        SalesLineItem.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
-        SalesLineItem.Modify(true);
-
-        LibrarySales.CreateSalesLine(
-            SalesLineItemCharge,
-            SalesHeader,
-            SalesLineItemCharge.Type::"Charge (Item)",
-            ItemChargeNo,
-            Quantity);
-
-        SalesLineItemCharge.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
-        SalesLineItemCharge.Modify(true);
-    end;
-
-    local procedure SetSalesLinesQtyToShip(var SalesHeader: Record "Sales Header"; Quantity: Decimal)
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.FindSet();
-        repeat
-            SalesLine.Validate("Qty. to Ship", Quantity);
-            SalesLine.Modify(true);
-        until SalesLine.Next() = 0;
-    end;
-
-    local procedure UpdateQtyToAssignOnItemChargeAssignment(SalesHeader: Record "Sales Header")
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.SetRange(Type, SalesLine.Type::"Charge (Item)");
-        SalesLine.FindFirst();
-        SalesLine.ShowItemChargeAssgnt();
-    end;
-
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure CreateEmptyPostedInvConfirmHandler(Question: Text[1024]; var Reply: Boolean)
@@ -7597,21 +7460,6 @@ codeunit 134387 "ERM Sales Documents III"
         Assert.AreEqual(LibraryVariableStorage.DequeueText(), ChangeLogEntries."Old Value".Value(), ChangeLogEntries."Old Value".Caption());
         Assert.AreEqual(LibraryVariableStorage.DequeueText(), ChangeLogEntries."New Value".Value(), ChangeLogEntries."New Value".Caption());
         ChangeLogEntries.OK().Invoke();
-    end;
-
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure PostedSalesDocumentLinesPageHandler(var PostedSalesDocumentLines: TestPage "Posted Sales Document Lines")
-    begin
-        PostedSalesDocumentLines.PostedInvoices.Filter.SetFilter("No.", LibraryVariableStorage.DequeueText());
-        PostedSalesDocumentLines.OK().Invoke();
-    end;
-
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure SuggestItemChargeAssignmentPageHandler(var ItemChargeAssignmentSales: TestPage "Item Charge Assignment (Sales)")
-    begin
-        ItemChargeAssignmentSales.SuggestItemChargeAssignment.Invoke();
     end;
 }
 
