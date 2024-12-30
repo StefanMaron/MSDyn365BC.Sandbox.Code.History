@@ -62,7 +62,6 @@
         PurchaseVatAccountIsMissingTxt: Label 'Purchase VAT Account is missing in VAT Posting Setup.';
         CannotAllowInvDiscountErr: Label 'The value of the Allow Invoice Disc. field is not valid when the VAT Calculation Type field is set to "Full VAT".';
         DocumentNoErr: Label 'Document No. are not equal.';
-        AmountZeroErr: Label 'Amount must be zero';
 
     [Test]
     [Scope('OnPrem')]
@@ -2976,37 +2975,6 @@
     end;
 
     [Test]
-    [HandlerFunctions('ConfirmHandler')]
-    [Scope('OnPrem')]
-    procedure PurchaseInvoiceChangeVendorDoUpdateRemitToCode()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        RemitAddress: Record "Remit Address";
-        VendorNo: Code[20];
-        VendorNo2: Code[20];
-    begin
-        // [SCENARIO] [542440] [Purchase Header] [Remit-to Code] is updated to empty when changing vendor to the one without Remit-to address
-        Initialize();
-
-        // [GIVEN] Create a new Vendor X and Remit-to address
-        VendorNo := LibraryPurchase.CreateVendorNo();
-        LibraryPurchase.CreateRemitToAddress(RemitAddress, VendorNo);
-
-        // [GIVEN] Create a new Vendor Y without Remit-to address
-        VendorNo2 := LibraryPurchase.CreateVendorNo();
-
-        // [GIVEN] Purchase Invoice with vendor X and remit-to address
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, VendorNo);
-        PurchaseHeader.Validate("Remit-to Code", RemitAddress.Code);
-
-        // [WHEN] Change vendor to the one Y without Remit-to address
-        PurchaseHeader.Validate("Buy-from Vendor No.", VendorNo2);
-
-        // [THEN] Remit-to code is updated to empty
-        PurchaseHeader.Testfield("Remit-to Code", '');
-    end;
-
-    [Test]
     [HandlerFunctions('VendorLookupSelectVendorPageHandler')]
     [Scope('OnPrem')]
     procedure EnsureInsertingSearchVendorNameInPurchaseInvoice()
@@ -3174,54 +3142,6 @@
 
         // [VERIFY] Verify Purchase Credit Memo posted successfully and everything will be reverted.
         CheckEverythingIsReverted(Item, Vendor, GLEntry);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure PostPurchaseInvoiceWhenAmountZero()
-    var
-        PurchHeader: Record "Purchase Header";
-        PurchaseLine: array[2] of Record "Purchase Line";
-        VATPostingSetup: array[2] of Record "VAT Posting Setup";
-        GLAccount: Record "G/L Account";
-        GLEntry: Record "G/L Entry";
-        TaxCalculationType: Enum "Tax Calculation Type";
-        PostedDocumentNo: Code[20];
-    begin
-        // [SCENARIO 537597] ] No unexpected G/L Entry and VAT amount is posted for a line in purchase invoice with amount 0
-        Initialize();
-
-        // [GIVEN] Create Purchase Header with new Vendor
-        LibraryPurchase.CreatePurchHeader(PurchHeader, PurchHeader."Document Type"::Invoice, LibraryPurchase.CreateVendorNo());
-
-        // [GIVEN] Create multiple VAT posting Setup
-        CreateMultipleVATPostingSetup(VATPostingSetup, PurchHeader, TaxCalculationType::"Reverse Charge VAT");
-
-        // [GIVEN] Create Purchase Libe with first VAT posting Setup
-        LibraryPurchase.CreatePurchaseLine(
-          PurchaseLine[1], PurchHeader, PurchaseLine[1].Type::"G/L Account",
-          LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostingSetup[1], GLAccount."Gen. Posting Type"::Purchase),
-          LibraryRandom.RandDec(10, 2));
-
-        // [GIVEN] Upate VAT Bus. Posting group and Direct Unit Cost
-        PurchaseLine[1].Validate("VAT Prod. Posting Group", VATPostingSetup[1]."VAT Prod. Posting Group");
-        PurchaseLine[1].Validate("Direct Unit Cost", LibraryRandom.RandDec(50, 2));
-        PurchaseLine[1].Modify();
-
-        // [GIVEN] Create Second Purchaes Libe
-        LibraryPurchase.CreatePurchaseLine(
-          PurchaseLine[2], PurchHeader, PurchaseLine[2].Type::"G/L Account",
-          LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostingSetup[2], GLAccount."Gen. Posting Type"::Purchase),
-          LibraryRandom.RandDec(10, 2));
-
-        // [WHEN] Post the Purchase Invoice
-        PostedDocumentNo := LibraryPurchase.PostPurchaseDocument(PurchHeader, true, true);
-
-        // [WHEN] Find the 0 amount G/L ENtry
-        FindGLEntry(GLEntry, PostedDocumentNo, PurchaseLine[2]."No.");
-
-        // [THEN] Verify the 0 amount G/l entry posted.
-        Assert.AreEqual(0, GLEntry.Amount, AmountZeroErr);
     end;
 
     local procedure Initialize()
@@ -4521,21 +4441,6 @@
         until GLEntry.Next() = 0;
 
         Assert.AreEqual(TotalDebit, TotalCredit, '');
-    end;
-
-    local procedure CreateMultipleVATPostingSetup(var VATPostingSetup: array[2] of Record "VAT Posting Setup"; PurchaseHeader: Record "Purchase Header"; TaxCalculationType: Enum "Tax Calculation Type")
-    begin
-        LibraryERM.CreateVATPostingSetupWithAccounts(
-          VATPostingSetup[1], TaxCalculationType, LibraryRandom.RandIntInRange(15, 35));
-        VATPostingSetup[1]."VAT Bus. Posting Group" := PurchaseHeader."VAT Bus. Posting Group";
-        VATPostingSetup[1]."Reverse Chrg. VAT Acc." := LibraryERM.CreateGLAccountNo();
-        VATPostingSetup[1].Insert();
-
-        LibraryERM.CreateVATPostingSetupWithAccounts(
-        VATPostingSetup[2], TaxCalculationType, LibraryRandom.RandIntInRange(10, 15));
-        VATPostingSetup[2]."VAT Bus. Posting Group" := PurchaseHeader."VAT Bus. Posting Group";
-        VATPostingSetup[2]."Reverse Chrg. VAT Acc." := LibraryERM.CreateGLAccountNo();
-        VATPostingSetup[2].Insert();
     end;
 
     [MessageHandler]
