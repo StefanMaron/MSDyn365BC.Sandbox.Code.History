@@ -105,7 +105,7 @@ report 790 "Calculate Inventory"
                     Item.CopyFilter("Bin Filter", WhseEntry."Bin Code");
 
                     if ColumnDim = '' then
-                        TempDimBufIn.SetFilter("Table ID", '%1|%2', DATABASE::Item, Database::Location)
+                        TempDimBufIn.SetRange("Table ID", DATABASE::Item)
                     else
                         TempDimBufIn.SetRange("Table ID", DATABASE::"Item Ledger Entry");
                     TempDimBufIn.SetRange("Entry No.");
@@ -332,6 +332,7 @@ report 790 "Calculate Inventory"
     end;
 
     var
+        WhseEntry: Record "Warehouse Entry";
         SourceCodeSetup: Record "Source Code Setup";
         DimSetEntry: Record "Dimension Set Entry";
         OldWhseEntry: Record "Warehouse Entry";
@@ -358,7 +359,6 @@ report 790 "Calculate Inventory"
         Text003: Label 'Retain Dimensions';
 
     protected var
-        WhseEntry: Record "Warehouse Entry";
         ItemJnlBatch: Record "Item Journal Batch";
         ItemJnlLine: Record "Item Journal Line";
         Location: Record Location;
@@ -380,7 +380,7 @@ report 790 "Calculate Inventory"
         ItemJnlLine := NewItemJnlLine;
     end;
 
-    procedure ValidatePostingDate()
+    local procedure ValidatePostingDate()
     var
         NoSeries: Codeunit "No. Series";
     begin
@@ -420,7 +420,7 @@ report 790 "Calculate Inventory"
             end;
             NextLineNo := NextLineNo + 10000;
             ShouldInsertItemJnlLine := (Quantity2 <> 0) or ZeroQty;
-            OnInsertItemJnlLineOnAfterCalcShouldInsertItemJnlLine(ItemNo, VariantCode2, DimEntryNo2, BinCode2, Quantity2, PhysInvQuantity, ZeroQty, ShouldInsertItemJnlLine, Location, NextLineNo);
+            OnInsertItemJnlLineOnAfterCalcShouldInsertItemJnlLine(ItemNo, VariantCode2, DimEntryNo2, BinCode2, Quantity2, PhysInvQuantity, ZeroQty, ShouldInsertItemJnlLine, Location);
             if ShouldInsertItemJnlLine then begin
                 if (Quantity2 = 0) and Location."Bin Mandatory" and not Location."Directed Put-away and Pick"
                 then
@@ -479,7 +479,7 @@ report 790 "Calculate Inventory"
                         ReserveWarehouse(ItemJnlLine);
 
                 if ColumnDim = '' then
-                    DimEntryNo2 := CreateDimFromDefault();
+                    DimEntryNo2 := CreateDimFromItemDefault();
 
                 if DimBufMgt.GetDimensions(DimEntryNo2, TempDimBufOut) then begin
                     TempDimSetEntry.Reset();
@@ -787,15 +787,7 @@ report 790 "Calculate Inventory"
     end;
 
     local procedure ItemBinLocationIsCalculated(BinCode: Code[20]): Boolean
-    var
-        IsHandled: Boolean;
-        IsCalculated: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeItemBinLocationIsCalculated("Item Ledger Entry", IsHandled, IsCalculated);
-        if IsHandled then
-            exit(IsCalculated);
-
         TempQuantityOnHandBuffer.Reset();
         TempQuantityOnHandBuffer.SetRange("Item No.", "Item Ledger Entry"."Item No.");
         TempQuantityOnHandBuffer.SetRange("Variant Code", "Item Ledger Entry"."Variant Code");
@@ -929,21 +921,20 @@ report 790 "Calculate Inventory"
         end;
     end;
 
-    local procedure CreateDimFromDefault() DimEntryNo: Integer
+    local procedure CreateDimFromItemDefault() DimEntryNo: Integer
     var
         DefaultDimension: Record "Default Dimension";
     begin
-        DefaultDimension.SetFilter("No.", '%1|%2', TempQuantityOnHandBuffer."Item No.", TempQuantityOnHandBuffer."Location Code");
-        DefaultDimension.SetFilter("Table ID", '%1|%2', DATABASE::Item, DATABASE::Location);
+        DefaultDimension.SetRange("No.", TempQuantityOnHandBuffer."Item No.");
+        DefaultDimension.SetRange("Table ID", DATABASE::Item);
         DefaultDimension.SetFilter("Dimension Value Code", '<>%1', '');
         if DefaultDimension.FindSet() then
             repeat
-                InsertDim(DefaultDimension."Table ID", 0, DefaultDimension."Dimension Code", DefaultDimension."Dimension Value Code");
+                InsertDim(DATABASE::Item, 0, DefaultDimension."Dimension Code", DefaultDimension."Dimension Value Code");
             until DefaultDimension.Next() = 0;
 
         DimEntryNo := DimBufMgt.InsertDimensions(TempDimBufIn);
-
-        TempDimBufIn.SetFilter("Table ID", '%1|%2', DATABASE::Item, Database::Location);
+        TempDimBufIn.SetRange("Table ID", DATABASE::Item);
         TempDimBufIn.DeleteAll();
     end;
 
@@ -993,7 +984,7 @@ report 790 "Calculate Inventory"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnInsertItemJnlLineOnAfterCalcShouldInsertItemJnlLine(ItemNo: Code[20]; VariantCode2: Code[10]; DimEntryNo2: Integer; BinCode2: Code[20]; Quantity2: Decimal; PhysInvQuantity: Decimal; ZeroQty: Boolean; var ShouldInsertItemJnlLine: Boolean; Location: Record Location; var NextLineNo: Integer)
+    local procedure OnInsertItemJnlLineOnAfterCalcShouldInsertItemJnlLine(ItemNo: Code[20]; VariantCode2: Code[10]; DimEntryNo2: Integer; BinCode2: Code[20]; Quantity2: Decimal; PhysInvQuantity: Decimal; ZeroQty: Boolean; var ShouldInsertItemJnlLine: Boolean; Location: Record Location)
     begin
     end;
 
@@ -1022,7 +1013,7 @@ report 790 "Calculate Inventory"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeRetrieveBuffer(var TempInventoryBuffer: Record "Inventory Buffer" temporary; ItemLedgerEntry: Record "Item Ledger Entry"; BinCode: Code[20]; DimEntryNo: Integer; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
@@ -1129,11 +1120,6 @@ report 790 "Calculate Inventory"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcWhseQtyOnAfterGetWhseItemTrkgSetup(LocationCode: Code[10]; var ItemTrackingSetup: Record "Item Tracking Setup")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeItemBinLocationIsCalculated(ItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean; var IsCalculated: Boolean)
     begin
     end;
 }
