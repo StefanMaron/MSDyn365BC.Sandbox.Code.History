@@ -182,8 +182,6 @@ codeunit 5366 "CRM Archived Sales Orders Job"
             Modified := true;
         end;
 
-        OnUpdateCRMSalesorderdetailOnBeforeModify(CRMSalesorderdetail, SalesLineArchive);
-
         if Modified then
             CRMSalesorderdetail.Modify();
     end;
@@ -262,10 +260,5 @@ codeunit 5366 "CRM Archived Sales Orders Job"
         end;
 
         CRMSalesorderdetail.Insert();
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateCRMSalesorderdetailOnBeforeModify(var CRMSalesorderdetail: Record "CRM Salesorderdetail"; SalesLineArchive: Record "Sales Line Archive")
-    begin
     end;
 }
