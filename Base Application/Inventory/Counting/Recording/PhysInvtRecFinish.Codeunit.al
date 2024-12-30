@@ -53,12 +53,8 @@ codeunit 5876 "Phys. Invt. Rec.-Finish"
         PhysInvtRecordLine.SetRange("Order No.", PhysInvtRecordHeader."Order No.");
         PhysInvtRecordLine.SetRange("Recording No.", PhysInvtRecordHeader."Recording No.");
         PhysInvtRecordLine.SetFilter("Item No.", '<>%1', '');
-        if not PhysInvtRecordLine.Find('-') then begin
-            IsHandled := false;
-            OnCodeOnBeforeNoPhysInvtRecordLineError(PhysInvtRecordHeader, IsHandled);
-            if not IsHandled then
-                Error(NoLinesRecordedErr);
-        end;
+        if not PhysInvtRecordLine.Find('-') then
+            Error(NoLinesRecordedErr);
 
         if not HideProgressWindow then begin
             Window.Open('#1#################################\\' + FinishingLinesMsg);
@@ -215,11 +211,6 @@ codeunit 5876 "Phys. Invt. Rec.-Finish"
 
     [IntegrationEvent(false, false)]
     local procedure OnCodeOnBeforeSetStatusToFinished(var PhysInvtRecordHeader: Record "Phys. Invt. Record Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforeNoPhysInvtRecordLineError(var PhysInvtRecordHeader: Record "Phys. Invt. Record Header"; var IsHandled: Boolean)
     begin
     end;
 }
