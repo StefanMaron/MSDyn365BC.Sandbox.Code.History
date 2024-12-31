@@ -2,7 +2,7 @@
     "id":  "3f63a3de-6597-4097-9f34-b0ff7f92e6b0",
     "name":  "DemoTool",
     "publisher":  "Microsoft",
-    "version":  "23.5.16502.28302",
+    "version":  "23.5.16502.28390",
     "platform":  "23.0.0.0",
     "target":  "OnPrem",
     "dependencies":  [
