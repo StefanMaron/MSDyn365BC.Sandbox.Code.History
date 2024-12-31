@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false
-  },
   "folders": [
     {
       "path": "./System Application/Test/System Application Test Library"
@@ -126,121 +118,13 @@
       "path": "./ExternalEvents/test/_Exclude_Business_Events_Test"
     },
     {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
-    },
-    {
       "path": "./SAF-T/Test/SAF-T Tests"
     },
     {
       "path": "./ServiceDeclaration/Test/Service Declaration Tests"
     },
     {
-      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
-    },
-    {
       "path": "./APIV2/Test/_Exclude_APIV2_ Tests"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Bank"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Cash Flow"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Cost Accounting"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-CRM integration"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Data Exchange"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Dimension"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-ERM"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Fixed Asset"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-General Journal"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Graph"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Integration"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Invoicing"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Job"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Local"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Marketing"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Misc"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Monitor Sensitive Fields"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Permissions"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Physical Inventory"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Prepayment"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Rapid Start"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Report"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Resource"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Reverse"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-SCM"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Service"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-SINGLESERVER"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-SMB"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-TestLibraries"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Upgrade"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-User"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-VAT"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Workflow"
-    },
-    {
-      "path": "./BaseApp/Source/Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./MasterDataManagement/Test Library/_Exclude_Master_Data_Management_Test_Library"
@@ -256,6 +140,108 @@
     },
     {
       "path": "./EnforcedDigitalVouchers/Test/Enforced Digital Vouchers Tests"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Bank"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Cash Flow"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Cost Accounting"
+    },
+    {
+      "path": "./baseapp/Test/Tests-CRM integration"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Data Exchange"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Dimension"
+    },
+    {
+      "path": "./baseapp/Test/Tests-ERM"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Fixed Asset"
+    },
+    {
+      "path": "./baseapp/Test/Tests-General Journal"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Graph"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Integration"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Invoicing"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Job"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Local"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Marketing"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Misc"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Monitor Sensitive Fields"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Permissions"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Physical Inventory"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Prepayment"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Rapid Start"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Report"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Resource"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Reverse"
+    },
+    {
+      "path": "./baseapp/Test/Tests-SCM"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Service"
+    },
+    {
+      "path": "./baseapp/Test/Tests-SINGLESERVER"
+    },
+    {
+      "path": "./baseapp/Test/Tests-SMB"
+    },
+    {
+      "path": "./baseapp/Test/Tests-TestLibraries"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Upgrade"
+    },
+    {
+      "path": "./baseapp/Test/Tests-User"
+    },
+    {
+      "path": "./baseapp/Test/Tests-VAT"
+    },
+    {
+      "path": "./baseapp/Test/Tests-Workflow"
+    },
+    {
+      "path": "./baseapp/source/Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./ReviewGLEntries/Test/_Exclude_Review_General_Ledger_Entries_Tests"
@@ -288,9 +274,6 @@
       "path": "./RecommendedApps/Test/Recommended Apps Tests"
     },
     {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
-    },
-    {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
@@ -308,5 +291,13 @@
     {
       "path": "./Email - Current User Connector/Test/Email - Current User Connector Tests"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false
+  }
 }
