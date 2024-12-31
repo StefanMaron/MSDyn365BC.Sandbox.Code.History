@@ -254,8 +254,6 @@ codeunit 10752 "SII Doc. Upload Management"
         ResponseText: Text;
         IsHandled: Boolean;
     begin
-        if IsNull(XMLDoc) then
-            exit;
         OnBeforePostExecutePendingRequests(SIIDocUploadState, TempSIIHistoryBuffer, SIISession, XMLDoc.OuterXML, IsInvokeSoapRequest, SkipPrePost, IsHandled);
         if IsHandled then
             exit;
