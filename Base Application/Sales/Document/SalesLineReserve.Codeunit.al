@@ -292,7 +292,6 @@ codeunit 99000832 "Sales Line-Reserve"
     local procedure DeleteSalesReservEntries(var NewSalesLine: Record "Sales Line"; var OldSalesLine: Record "Sales Line")
     var
         IsHandled: Boolean;
-        ShouldDeleteAllReservationEntries: Boolean;
     begin
         IsHandled := false;
         OnBeforeDeleteSalesReservEntries(NewSalesLine, OldSalesLine, ReservationManagement, IsHandled);
@@ -301,12 +300,8 @@ codeunit 99000832 "Sales Line-Reserve"
 
         if NewSalesLine."Qty. per Unit of Measure" <> OldSalesLine."Qty. per Unit of Measure" then
             ReservationManagement.ModifyUnitOfMeasure();
-
-        ShouldDeleteAllReservationEntries := NewSalesLine."Outstanding Qty. (Base)" * OldSalesLine."Outstanding Qty. (Base)" < 0;
-        if not ShouldDeleteAllReservationEntries then
-            ShouldDeleteAllReservationEntries := CheckQuantityReducedOnSalesLine(NewSalesLine, OldSalesLine);
-
-        if ShouldDeleteAllReservationEntries then
+        if (NewSalesLine."Outstanding Qty. (Base)" * OldSalesLine."Outstanding Qty. (Base)" < 0) or
+            CheckQuantityReducedOnSalesLine(NewSalesLine, OldSalesLine) then
             ReservationManagement.DeleteReservEntries(true, 0)
         else
             ReservationManagement.DeleteReservEntries(false, NewSalesLine."Outstanding Qty. (Base)");
@@ -1187,13 +1182,12 @@ codeunit 99000832 "Sales Line-Reserve"
     var
         Item: Record Item;
     begin
-        if (NewSalesLine.Type <> NewSalesLine.Type::Item) or (NewSalesLine.Quantity = 0) or (NewSalesLine.Reserve <> NewSalesLine.Reserve::Always) then
+        if (NewSalesLine.Type <> NewSalesLine.Type::Item) or (NewSalesLine.Quantity = 0) then
             exit(false);
 
-        Item.SetLoadFields("Costing Method");
+        Item.SetLoadFields(Reserve, "Costing Method");
         Item.Get(NewSalesLine."No.");
-
-        if Item."Costing Method" <> Item."Costing Method"::FIFO then
+        if (Item.Reserve <> Item.Reserve::Always) or (Item."Costing Method" <> Item."Costing Method"::FIFO) then
             exit(false);
 
         exit(NewSalesLine.Quantity < OldSalesLine.Quantity);
