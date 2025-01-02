@@ -49,10 +49,10 @@
       "path": "./EU3PartyTradePurchase/test/EU 3-Party Trade Purchase Tests"
     },
     {
-      "path": "./Shopify/test/Shopify Connector Test"
+      "path": "./EDocument/Test/E-Document Core Tests"
     },
     {
-      "path": "./EDocument Core/Test/E-Document Core Tests"
+      "path": "./Shopify/test/Shopify Connector Test"
     },
     {
       "path": "./testframework/testlibraries"
@@ -269,10 +269,10 @@
     }
   ],
   "settings": {
-    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
     },
+    "al.enableCodeActions": false,
     "al.enableCodeAnalysis": false,
     "allint.enabled": false
   }

@@ -70,7 +70,7 @@ codeunit 6218 "Sustainability Calc. Mgt."
     begin
         FilterGLEntry(SustainAccountCategory, FromDate, ToDate, GLEntry);
         GLEntry.CalcSums(Amount);
-        exit(Abs(GLEntry.Amount));
+        exit(GLEntry.Amount);
     end;
 
     internal procedure CollectGeneralLedgerAmount(var SustainabilityJnlLine: Record "Sustainability Jnl. Line")

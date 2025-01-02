@@ -179,6 +179,7 @@ page 623 "Unapply Customer Entries"
 
                 trigger OnAction()
                 var
+                    ApplyUnapplyParameters: Record "Apply Unapply Parameters";
                     CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
                     ConfirmManagement: Codeunit "Confirm Management";
                 begin
@@ -207,6 +208,7 @@ page 623 "Unapply Customer Entries"
 
                 trigger OnAction()
                 var
+                    ApplyUnapplyParameters: Record "Apply Unapply Parameters";
                     CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
                 begin
                     if Rec.IsEmpty() then
@@ -247,7 +249,6 @@ page 623 "Unapply Customer Entries"
     protected var
         DtldCustLedgEntry2: Record "Detailed Cust. Ledg. Entry";
         Cust: Record Customer;
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
         DocNo: Code[20];
         PostingDate: Date;
         CustLedgEntryNo: Integer;
