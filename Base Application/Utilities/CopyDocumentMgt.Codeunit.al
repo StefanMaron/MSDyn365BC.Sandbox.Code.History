@@ -3845,7 +3845,6 @@ codeunit 6620 "Copy Document Mgt."
         SplitLine: Boolean;
         CopyLine: Boolean;
         InsertDocNoLine: Boolean;
-        IsHandled: Boolean;
     begin
         OnBeforeCopyPurchRcptLinesToDoc(ToPurchHeader, FromPurchRcptLine);
         MissingExCostRevLink := false;
@@ -3859,11 +3858,8 @@ codeunit 6620 "Copy Document Mgt."
                     UpdateWindow(1, FromLineCounter);
                 if FromPurchRcptHeader."No." <> FromPurchRcptLine."Document No." then begin
                     FromPurchRcptHeader.Get(FromPurchRcptLine."Document No.");
-                    IsHandled := false;
-                    OnCopyPurchRcptLinesToDocOnBeforeTestFieldPricesIncludingVAT(ToPurchHeader, IncludeHeader, RecalculateLines, FromPurchRcptHeader, IsHandled);
-                    if not IsHandled then
-                        if OriginalPurchHeader.Get(OriginalPurchHeader."Document Type"::Order, FromPurchRcptHeader."Order No.") then
-                            OriginalPurchHeader.TestField("Prices Including VAT", ToPurchHeader."Prices Including VAT");
+                    if OriginalPurchHeader.Get(OriginalPurchHeader."Document Type"::Order, FromPurchRcptHeader."Order No.") then
+                        OriginalPurchHeader.TestField("Prices Including VAT", ToPurchHeader."Prices Including VAT");
                     TransferOldExtLines.ClearLineNumbers();
                 end;
                 FromPurchHeader.TransferFields(FromPurchRcptHeader);
@@ -4007,10 +4003,7 @@ codeunit 6620 "Copy Document Mgt."
                     UpdateWindow(1, FromLineCounter);
                 if FromPurchInvHeader."No." <> FromPurchInvLine."Document No." then begin
                     FromPurchInvHeader.Get(FromPurchInvLine."Document No.");
-                    IsHandled := false;
-                    OnCopyPurchInvLinesToDocOnBeforeTestFieldPricesIncludingVAT(ToPurchHeader, IncludeHeader, RecalculateLines, FromPurchInvHeader, IsHandled);
-                    if not IsHandled then
-                        FromPurchInvHeader.TestField("Prices Including VAT", ToPurchHeader."Prices Including VAT");
+                    FromPurchInvHeader.TestField("Prices Including VAT", ToPurchHeader."Prices Including VAT");
                     TransferOldExtLines.ClearLineNumbers();
                 end;
                 FromPurchHeader.TransferFields(FromPurchInvHeader);
@@ -4168,7 +4161,6 @@ codeunit 6620 "Copy Document Mgt."
         SplitLine: Boolean;
         FillExactCostRevLink: Boolean;
         ShouldCopyItemTrackingEntries: Boolean;
-        IsHandled: Boolean;
     begin
         MissingExCostRevLink := false;
         InitCurrency(ToPurchHeader."Currency Code");
@@ -4188,10 +4180,7 @@ codeunit 6620 "Copy Document Mgt."
                     UpdateWindow(1, FromLineCounter);
                 if FromPurchCrMemoHeader."No." <> FromPurchCrMemoLine."Document No." then begin
                     FromPurchCrMemoHeader.Get(FromPurchCrMemoLine."Document No.");
-                    IsHandled := false;
-                    OnCopyPurchCrMemoLinesToDocOnBeforeTestFieldPricesIncludingVAT(ToPurchHeader, IncludeHeader, RecalculateLines, FromPurchCrMemoHeader, IsHandled);
-                    if not IsHandled then
-                        FromPurchCrMemoHeader.TestField("Prices Including VAT", ToPurchHeader."Prices Including VAT");
+                    FromPurchCrMemoHeader.TestField("Prices Including VAT", ToPurchHeader."Prices Including VAT");
                     TransferOldExtLines.ClearLineNumbers();
                 end;
                 FromPurchHeader.TransferFields(FromPurchCrMemoHeader);
@@ -4339,7 +4328,6 @@ codeunit 6620 "Copy Document Mgt."
         FillExactCostRevLink: Boolean;
         CopyLine: Boolean;
         InsertDocNoLine: Boolean;
-        IsHandled: Boolean;
     begin
         MissingExCostRevLink := false;
         InitCurrency(ToPurchHeader."Currency Code");
@@ -4354,11 +4342,8 @@ codeunit 6620 "Copy Document Mgt."
                     UpdateWindow(1, FromLineCounter);
                 if FromReturnShptHeader."No." <> FromReturnShptLine."Document No." then begin
                     FromReturnShptHeader.Get(FromReturnShptLine."Document No.");
-                    IsHandled := false;
-                    OnCopyPurchReturnShptLinesToDocOnBeforeTestFieldPricesIncludingVAT(ToPurchHeader, IncludeHeader, RecalculateLines, FromReturnShptHeader, IsHandled);
-                    if not IsHandled then
-                        if OriginalPurchHeader.Get(OriginalPurchHeader."Document Type"::"Return Order", FromReturnShptHeader."Return Order No.") then
-                            OriginalPurchHeader.TestField("Prices Including VAT", ToPurchHeader."Prices Including VAT");
+                    if OriginalPurchHeader.Get(OriginalPurchHeader."Document Type"::"Return Order", FromReturnShptHeader."Return Order No.") then
+                        OriginalPurchHeader.TestField("Prices Including VAT", ToPurchHeader."Prices Including VAT");
                     TransferOldExtLines.ClearLineNumbers();
                 end;
                 FromPurchHeader.TransferFields(FromReturnShptHeader);
@@ -10460,26 +10445,6 @@ codeunit 6620 "Copy Document Mgt."
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeInsertOldPurchDocNoLineProcedure(ToPurchHeader: Record "Purchase Header"; var ToPurchLine: Record "Purchase Line"; OldDocType: Option; OldDocNo: Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyPurchRcptLinesToDocOnBeforeTestFieldPricesIncludingVAT(var ToPurchaseHeader: Record "Purchase Header"; IncludeHeader: Boolean; RecalculateLines: Boolean; var FromPurchRcptHeader: Record "Purch. Rcpt. Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyPurchInvLinesToDocOnBeforeTestFieldPricesIncludingVAT(var ToPurchaseHeader: Record "Purchase Header"; IncludeHeader: Boolean; RecalculateLines: Boolean; var FromPurchInvHeader: Record "Purch. Inv. Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyPurchCrMemoLinesToDocOnBeforeTestFieldPricesIncludingVAT(var ToPurchaseHeader: Record "Purchase Header"; IncludeHeader: Boolean; RecalculateLines: Boolean; var FromPurchCrMemoHeader: Record "Purch. Cr. Memo Hdr."; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyPurchReturnShptLinesToDocOnBeforeTestFieldPricesIncludingVAT(var ToPurchaseHeader: Record "Purchase Header"; IncludeHeader: Boolean; RecalculateLines: Boolean; var FromReturnShptHeader: Record "Return Shipment Header"; var IsHandled: Boolean)
     begin
     end;
 }
