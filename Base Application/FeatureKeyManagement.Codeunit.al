@@ -50,11 +50,6 @@ codeunit 265 "Feature Key Management"
     begin
         exit(FeatureManagementFacade.IsEnabled(GetExtensibleExchangeRateAdjustmentFeatureKey()));
     end;
-
-    procedure IsExtensibleExchangeRateAdjustmentEnabled(AllowInsert: Boolean): Boolean
-    begin
-        exit(FeatureManagementFacade.IsEnabled(GetExtensibleExchangeRateAdjustmentFeatureKey(), AllowInsert));
-    end;
 #endif
 
 #if not CLEAN23
