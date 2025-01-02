@@ -1657,8 +1657,7 @@ page 6510 "Item Tracking Lines"
         ReservEntry."Source Type" := TrackingSpecification."Source Type";
         ReservEntry."Source Subtype" := TrackingSpecification."Source Subtype";
         ReservEntry."Source ID" := TrackingSpecification."Source ID";
-        if CurrentSignFactor = 0 then
-            CurrentSignFactor := CreateReservEntry.SignFactor(ReservEntry);
+        CurrentSignFactor := CreateReservEntry.SignFactor(ReservEntry);
         CurrentSourceCaption := ReservEntry.TextCaption();
         CurrentSourceType := ReservEntry."Source Type";
 
@@ -1801,11 +1800,6 @@ page 6510 "Item Tracking Lines"
     procedure SetSecondSourceRowID(RowID: Text[250])
     begin
         SecondSourceRowID := RowID;
-    end;
-
-    procedure SetSignFactor(NewSignFactor: Integer)
-    begin
-        CurrentSignFactor := NewSignFactor;
     end;
 
     protected procedure AddReservEntriesToTempRecSet(var ReservEntry: Record "Reservation Entry"; var TempTrackingSpecification: Record "Tracking Specification" temporary; SwapSign: Boolean; Color: Integer)
