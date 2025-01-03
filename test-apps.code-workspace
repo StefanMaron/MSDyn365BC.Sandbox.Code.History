@@ -152,11 +152,11 @@
     }
   ],
   "settings": {
-    "search.exclude": {
-      "**.xlf": true
-    },
     "al.enableCodeAnalysis": false,
     "al.enableCodeActions": false,
-    "allint.enabled": false
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    }
   }
 }
