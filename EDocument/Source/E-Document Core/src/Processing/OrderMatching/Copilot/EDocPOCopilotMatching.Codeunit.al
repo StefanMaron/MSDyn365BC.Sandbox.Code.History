@@ -27,8 +27,8 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
         SuccessfulRequestMsg: Label 'E-Document Chat Completion was successful', Locked = true;
         AttempToUseCopilotMsg: Label 'Attempting to use E-Docoument matching assistance ', Locked = true;
         FailedToGetPromptSecretErr: Label 'Failed to get the prompt secret from Azure Key Vault', Locked = true;
+        FunctionTxt: Label '{ "type": "function", "function" : { "name": "%1" }}', Locked = true;
         NoLinesCouldBeMatchedMsg: Label 'No matches were found for Copilot because the conditions regarding prices or quantities have not been met.';
-        FunctionCallErr: Label 'Function call to %1 failed', Comment = '%1 = Function name';
 
     [NonDebuggable]
     procedure MatchWithCopilot(var TempEDocumentImportedLine: Record "E-Doc. Imported Line" temporary; var TempPurchaseLine: Record "Purchase Line" temporary; var TempAIProposalBuffer: Record "E-Doc. PO Match Prop. Buffer" temporary) IsRequestSuccessful: Boolean
@@ -91,13 +91,18 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
 
     [NonDebuggable]
     procedure Match(var TempAIProposalBuffer: Record "E-Doc. PO Match Prop. Buffer" temporary; var TempEDocumentImportedLine: Record "E-Doc. Imported Line" temporary; var TempPurchaseLine: Record "Purchase Line" temporary; CompletionPromptTxt: SecretText; UserInputTxt: Text): Boolean
+    var
+        CompletionAnswerTxt: Text;
+        NumberOfFoundMatches: Integer;
     begin
-        Match(CompletionPromptTxt, UserInputTxt, TempAIProposalBuffer, TempEDocumentImportedLine, TempPurchaseLine);
+        CompletionAnswerTxt := Match(CompletionPromptTxt, UserInputTxt);
+        if CompletionAnswerTxt <> '' then
+            ProcessAnswer(TempAIProposalBuffer, TempEDocumentImportedLine, TempPurchaseLine, CompletionAnswerTxt, NumberOfFoundMatches);
         exit(true)
     end;
 
     [NonDebuggable]
-    procedure Match(CompletionPromptTxt: SecretText; UserInputTxt: Text; var TempAIProposalBuffer: Record "E-Doc. PO Match Prop. Buffer" temporary; var TempEDocumentImportedLine: Record "E-Doc. Imported Line" temporary; var TempPurchaseLine: Record "Purchase Line" temporary) NumberOfFoundMatches: Integer
+    procedure Match(CompletionPromptTxt: SecretText; UserInputTxt: Text): Text
     var
         AzureOpenAI: Codeunit "Azure OpenAi";
         AOAIDeployments: Codeunit "AOAI Deployments";
@@ -105,7 +110,6 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
         EDocAIMatchingFunction: Codeunit "E-Doc. PO AOAI Function";
         AOAIChatMessages: Codeunit "AOAI Chat Messages";
         AOAIOperationResponse: Codeunit "AOAI Operation Response";
-        AOAIFunctionResponse: Codeunit "AOAI Function Response";
     begin
         Session.LogMessage('0000MOT', AttempToUseCopilotMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
 
@@ -116,10 +120,8 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
         AOAIChatCompletionParams.SetMaxTokens(MaxTokens());
         AOAIChatCompletionParams.SetTemperature(0);
 
-        EDocAIMatchingFunction.SetRecords(TempEDocumentImportedLine, TempPurchaseLine);
-
-        AOAIChatMessages.AddTool(EDocAIMatchingFunction);
-        AOAIChatMessages.SetFunctionAsToolChoice(EDocAIMatchingFunction.GetName());
+        AOAIChatMessages.AddTool(EDocAIMatchingFunction.GetToolPrompt());
+        AOAIChatMessages.SetToolChoice(StrSubstNo(FunctionTxt, EDocAIMatchingFunction.FunctionName()));
 
         AOAIChatMessages.SetPrimarySystemMessage(CompletionPromptTxt);
         AOAIChatMessages.AddUserMessage(UserInputTxt);
@@ -127,17 +129,7 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
         AzureOpenAI.GenerateChatCompletion(AOAIChatMessages, AOAIChatCompletionParams, AOAIOperationResponse);
         if AOAIOperationResponse.IsSuccess() then begin
             Session.LogMessage('0000MOU', SuccessfulRequestMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
-
-            if AOAIOperationResponse.IsFunctionCall() then begin
-                AOAIFunctionResponse := AOAIOperationResponse.GetFunctionResponse();
-                if AOAIFunctionResponse.IsSuccess() then begin
-                    TempAIProposalBuffer.Copy(AOAIFunctionResponse.GetResult(), true);
-                    Session.LogMessage('0000MMJ', StrSubstNo(MatchingCountTxt, NumberOfFoundMatches), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', FeatureName());
-                end else
-                    FeatureTelemetry.LogError('0000MTC', FeatureName(), 'FunctionCall', StrSubstNo(FunctionCallErr, AOAIFunctionResponse.GetFunctionName()))
-            end else
-                FeatureTelemetry.LogError('0000MJD', FeatureName(), 'ProcessAnswer', 'tool_calls not found in the completion answer');
-
+            exit(AOAIOperationResponse.GetResult());
         end
         else begin
             Session.LogMessage('0000MFN', StrSubstNo(NotSuccessfulRequestErr, AOAIOperationResponse.GetStatusCode(), AOAIOperationResponse.GetError()), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
@@ -149,22 +141,19 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
     var
         AIMatchingImpl: Codeunit "E-Doc. PO Copilot Matching";
         AzureOpenAI: Codeunit "Azure OpenAI";
-    begin
-        AIMatchingImpl.RegisterAICapability();
-        if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"E-Document Matching Assistance", true) then
-            exit(false);
-
-        exit(true);
-    end;
-
-    procedure IsCopilotVisible(): Boolean
-    var
         EnvironmentInformation: Codeunit "Environment Information";
     begin
         if not EnvironmentInformation.IsSaaSInfrastructure() then
             exit(false);
 
+        if not IsSupportedApplicationFamily() then
+            exit(false);
+
         if not IsSupportedLanguage() then
+            exit(false);
+
+        AIMatchingImpl.RegisterAICapability();
+        if not AzureOpenAI.IsEnabled(Enum::"Copilot Capability"::"E-Document Matching Assistance", true) then
             exit(false);
 
         exit(true);
@@ -223,9 +212,60 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
         LanguageSelection.SetLoadFields("Language Tag");
         LanguageSelection.SetRange("Language ID", UserSessionSettings.LanguageId());
         if LanguageSelection.FindFirst() then
-            if LanguageSelection."Language Tag".StartsWith('pt-') then
-                exit(false);
+            if LanguageSelection."Language Tag".StartsWith('en-') then
+                exit(true);
+        exit(false);
+    end;
+
+    local procedure IsSupportedApplicationFamily(): Boolean
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+        ApplicationFamily: Text;
+    begin
+        ApplicationFamily := EnvironmentInformation.GetApplicationFamily();
+        if ApplicationFamily = 'CA' then   //Disabled for Canada due to legal reasons
+            exit(false);
         exit(true);
+    end;
+
+    [NonDebuggable]
+    local procedure ProcessAnswer(var TempAIProposalBuffer: Record "E-Doc. PO Match Prop. Buffer" temporary; var TempEDocumentImportedLine: Record "E-Doc. Imported Line" temporary; var TempPurchaseLine: Record "Purchase Line" temporary; CompletionAnswerTxt: Text; var NumberOfFoundMatches: Integer)
+    var
+        EDocAIMatchingFunction: Codeunit "E-Doc. PO AOAI Function";
+        CustomDimension: Dictionary of [Text, Text];
+        ArgumentsJson: JsonObject;
+        AnswerJson: JsonObject;
+        ToolsArrayToken: JsonToken;
+        ToolType: JsonToken;
+        Tool: JsonToken;
+        Function: JsonToken;
+        FunctionName: JsonToken;
+        FunctionArgument: JsonToken;
+        Result: Variant;
+    begin
+        AnswerJson.ReadFrom(CompletionAnswerTxt);
+
+        EDocAIMatchingFunction.SetRecords(TempEDocumentImportedLine, TempPurchaseLine);
+
+        if AnswerJson.Get('tool_calls', ToolsArrayToken) then
+            foreach Tool in ToolsArrayToken.AsArray() do begin
+                Tool.AsObject().Get('type', ToolType);
+                if ToolType.AsValue().asText() = 'function' then begin
+                    Tool.AsObject().Get('function', Function);
+                    Function.AsObject().Get('name', FunctionName);
+                    Function.AsObject().Get('arguments', FunctionArgument);
+
+                    ArgumentsJson.ReadFrom(FunctionArgument.AsValue().AsText());
+                    Result := EDocAIMatchingFunction.ToolCall(ArgumentsJson, CustomDimension);
+                    EDocAIMatchingFunction.GetRecord(TempAIProposalBuffer);
+                end;
+                break;
+            end
+        else
+            FeatureTelemetry.LogError('0000MJD', FeatureName(), 'ProcessAnswer', 'tool_calls not found in the completion answer');
+
+        NumberOfFoundMatches := TempAIProposalBuffer.Count();
+        Session.LogMessage('0000MMJ', StrSubstNo(MatchingCountTxt, NumberOfFoundMatches), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', FeatureName());
     end;
 
     local procedure GroundCopilotMatching(var TempEDocumentImportedLine: Record "E-Doc. Imported Line" temporary; var TempPurchaseLine: Record "Purchase Line" temporary; var TempAIProposalBuffer: Record "E-Doc. PO Match Prop. Buffer" temporary)
@@ -320,7 +360,7 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
     local procedure GetSystemPrompt(): SecretText
     var
         AzureKeyVault: Codeunit "Azure Key Vault";
-        Prompt: Text;
+        Prompt: SecretText;
     begin
         if AzureKeyVault.GetAzureKeyVaultSecret('EDocumentMappingPromptV2', Prompt) then
             exit(Prompt);
