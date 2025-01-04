@@ -2,7 +2,7 @@
   "id": "3f63a3de-6597-4097-9f34-b0ff7f92e6b0",
   "name": "DemoTool",
   "publisher": "Microsoft",
-  "version": "24.4.22295.28433",
+  "version": "24.5.23489.28436",
   "platform": "24.0.0.0",
   "target": "OnPrem",
   "dependencies": [
@@ -10,7 +10,7 @@
       "id": "275032ba-04a6-457f-bc79-1ffe6cb63596",
       "name": "SE Core",
       "publisher": "Microsoft",
-      "version": "24.4.0.0"
+      "version": "24.5.0.0"
     }
   ],
   "resourceExposurePolicy": {
@@ -18,6 +18,6 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "24.4.0.0",
+  "application": "24.5.0.0",
   "brief": "DemoTool (SE)"
 }
