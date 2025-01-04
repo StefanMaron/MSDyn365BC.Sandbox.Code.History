@@ -69,7 +69,7 @@ table 226 "VAT Reg. No. Srv. Template"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeFindTemplate(VATRegistrationLog, IsHandled, Result, Rec);
+        OnBeforeFindTemplate(VATRegistrationLog, IsHandled, Result);
         if IsHandled then
             exit(Result);
 
@@ -132,7 +132,7 @@ table 226 "VAT Reg. No. Srv. Template"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindTemplate(VATRegistrationLog: Record "VAT Registration Log"; var IsHandled: Boolean; var Result: Code[20]; var VATRegNoSrvTemplate: Record "VAT Reg. No. Srv. Template")
+    local procedure OnBeforeFindTemplate(VATRegistrationLog: Record "VAT Registration Log"; var IsHandled: Boolean; var Result: Code[20])
     begin
     end;
 }
