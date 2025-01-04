@@ -804,8 +804,6 @@ Fields!GenJnlTempName.Value</Value>
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="DocumentNo">
-                                            <CanGrow>true</CanGrow>
-                                            <CanShrink>true</CanShrink>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -1118,8 +1116,6 @@ Fields!GenJnlTempName.Value</Value>
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="PrnDocno">
-                                            <CanGrow>true</CanGrow>
-                                            <CanShrink>true</CanShrink>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
