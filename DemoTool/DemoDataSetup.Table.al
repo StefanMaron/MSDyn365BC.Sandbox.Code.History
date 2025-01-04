@@ -407,8 +407,8 @@ table 101900 "Demo Data Setup"
         case "Company Type" of
             "Company Type"::VAT:
                 begin
-                    "Goods VAT Rate" := 16;
-                    "Services VAT Rate" := 8;
+                    "Goods VAT Rate" := 15;
+                    "Services VAT Rate" := 10;
                     "Reduced VAT Rate" := 0;
                 end;
             "Company Type"::"Sales Tax":
