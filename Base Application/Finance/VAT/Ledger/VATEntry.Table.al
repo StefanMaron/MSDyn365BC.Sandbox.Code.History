@@ -804,6 +804,12 @@ table 254 "VAT Entry"
         key(Key21; "G/L Acc. No.")
         {
         }
+        key(Key22; Type, Closed, "VAT Bus. Posting Group", "VAT Prod. Posting Group", Reversed, "Posting Date", "G/L Acc. No.", "VAT Reporting Date")
+        {
+        }
+        key(Key12100; Type, Closed, "Tax Liable", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Operation Occurred Date", "VAT Period")
+        {
+        }
     }
 
     fieldgroups
