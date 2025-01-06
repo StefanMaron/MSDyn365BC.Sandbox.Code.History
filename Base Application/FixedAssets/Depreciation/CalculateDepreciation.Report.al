@@ -175,7 +175,7 @@ report 5692 "Calculate Depreciation"
                         OnAfterFAInsertGLAccGetBalAcc(GenJnlLine, GenJnlNextLineNo, BalAccount, TempGenJnlLine);
                     until TempGenJnlLine.Next() = 0;
                 OnAfterPostDataItem();
-                if NeedCommit and not SuppressCommit then
+                if NeedCommit then
                     Commit();
             end;
         }
@@ -351,8 +351,6 @@ report 5692 "Calculate Depreciation"
     begin
         ActivateErrorMessageHandling("Fixed Asset");
 
-        GeneralLedgerSetup.Get();
-
         DeprBook.Get(DeprBookCode);
         if DeprUntilDate = 0D then
             Error(Text000, FAJnlLine.FieldCaption("FA Posting Date"));
@@ -405,7 +403,6 @@ report 5692 "Calculate Depreciation"
         FAJnlLineCreatedCount: Integer;
         GenJnlLineCreatedCount: Integer;
         DeprUntilDateModified: Boolean;
-        SuppressCommit: Boolean;
 
         Text000: Label 'You must specify %1.';
         Text001: Label 'Force No. of Days must be activated.';
@@ -451,11 +448,6 @@ report 5692 "Calculate Depreciation"
 
         if GuiAllowed then
             ErrorMessageMgt.Activate(ErrorMessageHandler);
-    end;
-
-    procedure SetSuppressCommit(NewSuppressCommmit: Boolean)
-    begin
-        SuppressCommit := NewSuppressCommmit;
     end;
 
     [IntegrationEvent(false, false)]
