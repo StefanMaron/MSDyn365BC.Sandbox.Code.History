@@ -603,12 +603,25 @@ table 901 "Assembly Line"
             if (Type = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("No."));
 
             trigger OnValidate()
+            var
+                UOMMgt: Codeunit "Unit of Measure Management";
             begin
                 AssemblyWarehouseMgt.AssemblyLineVerifyChange(Rec, xRec);
                 TestStatusOpen();
 
                 GetItemResource();
-                SetQtyPerUoMAndQtyRoundingPrecision();
+                case Type of
+                    Type::Item:
+                        begin
+                            "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
+                            "Qty. Rounding Precision" := UOMMgt.GetQtyRoundingPrecision(Item, "Unit of Measure Code");
+                            "Qty. Rounding Precision (Base)" := UOMMgt.GetQtyRoundingPrecision(Item, Item."Base Unit of Measure");
+                        end;
+                    Type::Resource:
+                        "Qty. per Unit of Measure" := UOMMgt.GetResQtyPerUnitOfMeasure(Resource, "Unit of Measure Code");
+                    else
+                        "Qty. per Unit of Measure" := 1;
+                end;
 
                 CheckItemAvailable(FieldNo("Unit of Measure Code"));
                 "Unit Cost" := GetUnitCost();
@@ -2026,30 +2039,6 @@ table 901 "Assembly Line"
                 Error('');
     end;
 
-    local procedure SetQtyPerUoMAndQtyRoundingPrecision()
-    var
-        UnitOfMeasureManagement: Codeunit "Unit of Measure Management";
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeSetQtyPerUoMAndQtyRoundingPrecision(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
-        case Type of
-            Type::Item:
-                begin
-                    "Qty. per Unit of Measure" := UnitOfMeasureManagement.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
-                    "Qty. Rounding Precision" := UnitOfMeasureManagement.GetQtyRoundingPrecision(Item, "Unit of Measure Code");
-                    "Qty. Rounding Precision (Base)" := UnitOfMeasureManagement.GetQtyRoundingPrecision(Item, Item."Base Unit of Measure");
-                end;
-            Type::Resource:
-                "Qty. per Unit of Measure" := UnitOfMeasureManagement.GetResQtyPerUnitOfMeasure(Resource, "Unit of Measure Code");
-            else
-                "Qty. per Unit of Measure" := 1;
-        end;
-    end;
-
     procedure SuspendDeletionCheck(Suspend: Boolean)
     begin
         CalledFromHeader := Suspend;
@@ -2272,11 +2261,6 @@ table 901 "Assembly Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckIfAssemblyLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetQtyPerUoMAndQtyRoundingPrecision(var AssemblyLine: Record "Assembly Line"; var IsHandled: Boolean)
     begin
     end;
 }
