@@ -3,6 +3,7 @@ namespace System.Integration.PowerBI;
 using System.Environment;
 using System.Telemetry;
 using System.Utilities;
+using System.Environment.Configuration;
 using System.Integration;
 
 page 6325 "Power BI Embedded Report Part"
@@ -48,7 +49,7 @@ page 6325 "Power BI Embedded Report Part"
 
                         PowerBIEmbedSetupWizard.SetContext(PageContext);
                         if PowerBIEmbedSetupWizard.RunModal() <> Action::Cancel then
-                            ReloadPageState(true);
+                            ReloadPageState();
                     end;
                 }
                 field(OptInImageField; MediaResources."Media Reference")
@@ -108,7 +109,7 @@ page 6325 "Power BI Embedded Report Part"
                         if not (ClientTypeManagement.GetCurrentClientType() in [ClientType::Phone, ClientType::Windows]) then begin
                             if ReportFrameRatio = '' then
                                 ReportFrameRatio := PowerBiServiceMgt.GetMainPageRatio();
-                            CurrPage.PowerBIAddin.InitializeFrame(false, ReportFrameRatio);
+                            CurrPage.PowerBIAddin.InitializeFrame(FullPageMode, ReportFrameRatio);
                         end;
 
 #if not CLEAN23
@@ -142,7 +143,7 @@ page 6325 "Power BI Embedded Report Part"
                     trigger ErrorOccurred(Operation: Text; ErrorText: Text)
                     begin
                         LogEmbedError(Operation);
-                        ShowError(ErrorText);
+                        ShowError(Operation, ErrorText);
                     end;
 
                     trigger ReportPageChanged(newPage: Text; newPageFilters: Text)
@@ -175,15 +176,22 @@ page 6325 "Power BI Embedded Report Part"
                 }
             }
 #endif
+#if not CLEAN25
             group(ErrorGroup)
             {
                 ShowCaption = false;
-                Visible = PageState = PageState::ErrorVisible;
-
+                Visible = false;
+                ObsoleteReason = 'Error messages are now shown as page notifications.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '25.0';
                 label(Spacer)
                 {
                     ApplicationArea = All;
                     Caption = ' ';
+                    Visible = false;
+                    ObsoleteReason = 'Error messages are now shown as page notifications.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
                 }
                 field(ErrorMessageText; ErrorMessageText)
                 {
@@ -192,8 +200,13 @@ page 6325 "Power BI Embedded Report Part"
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the error message from Power BI.';
+                    Visible = false;
+                    ObsoleteReason = 'Error messages are now shown as page notifications.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
                 }
             }
+#endif
             group(NoReportGroup)
             {
                 ShowCaption = false;
@@ -273,14 +286,14 @@ page 6325 "Power BI Embedded Report Part"
                     ShowCaption = false;
                     Style = StrongAccent;
                     StyleExpr = true;
-                    ToolTip = 'Specifies that the user can refresh the page part. If reports have been deployed in the background, refreshing the page part will make them visible.';
+                    ToolTip = 'Specifies that the user can reload the page part. If reports have been deployed in the background, reloading the page part will make them visible.';
 
                     trigger OnDrillDown()
                     var
                         PreviousPageState: Option;
                     begin
                         PreviousPageState := PageState;
-                        ReloadPageState(true);
+                        ReloadPageState();
 
                         CurrPage.Update(false);
 
@@ -300,10 +313,10 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Select Report';
-                Enabled = PageState <> PageState::GetStarted;
-                Visible = not LockedToFirstElement;
-                Image = SelectChart;
                 ToolTip = 'Select the report.';
+                Image = SelectChart;
+                Visible = not LockedToFirstElement;
+                Enabled = PageState <> PageState::GetStarted;
 
                 trigger OnAction()
                 begin
@@ -338,10 +351,10 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Previous';
-                Enabled = PageState = PageState::ElementVisible;
-                Visible = not LockedToFirstElement;
-                Image = PreviousSet;
                 ToolTip = 'Go to the previous Power BI element.';
+                Image = PreviousSet;
+                Visible = not LockedToFirstElement;
+                Enabled = PageState = PageState::ElementVisible;
 
                 trigger OnAction()
                 begin
@@ -363,10 +376,10 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Next';
-                Enabled = PageState = PageState::ElementVisible;
-                Visible = not LockedToFirstElement;
-                Image = NextSet;
                 ToolTip = 'Go to the next Power BI element.';
+                Image = NextSet;
+                Visible = not LockedToFirstElement;
+                Enabled = PageState = PageState::ElementVisible;
 
                 trigger OnAction()
                 begin
@@ -405,7 +418,7 @@ page 6325 "Power BI Embedded Report Part"
                     PowerBIManagement.LookupMode(true);
                     PowerBIManagement.Run();
 
-                    ReloadPageState(false);
+                    ReloadPageState();
                 end;
             }
 #endif
@@ -413,9 +426,10 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Expand';
-                Enabled = PageState = PageState::ElementVisible;
-                Image = PowerBI;
                 ToolTip = 'Opens the currently selected element in a larger page.';
+                Image = PowerBI;
+                Visible = not FullPageMode;
+                Enabled = PageState = PageState::ElementVisible;
 
                 trigger OnAction()
                 var
@@ -428,7 +442,7 @@ page 6325 "Power BI Embedded Report Part"
 #endif
                     PowerBIElementCard.Run();
 
-                    ReloadPageState(false);
+                    ReloadPageState();
                     FeatureTelemetry.LogUsage('0000L09', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), 'Power BI element expanded', GetTelemetryDimensions());
                 end;
             }
@@ -436,36 +450,37 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Reload';
-                Enabled = PageState <> PageState::GetStarted;
-                Image = Refresh;
                 ToolTip = 'Reloads the Power BI subpage.';
+                Image = Refresh;
+                Enabled = PageState <> PageState::GetStarted;
 
                 trigger OnAction()
                 begin
-                    ReloadPageState(true);
+                    ReloadPageState();
                 end;
             }
             action("Upload Report")
             {
                 ApplicationArea = All;
                 Caption = 'Upload Report';
-                Image = Add;
                 ToolTip = 'Uploads a report from a PBIX file.';
-                Visible = IsSaaSUser;
+                Image = Add;
+                Visible = IsSaaSUser and not FullPageMode;
                 Enabled = (PageState = PageState::ElementVisible) or (PageState = PageState::NoElementSelected) or (PageState = PageState::NoElementSelectedButDeploying) or (PageState = PageState::ShouldDeploy);
 
                 trigger OnAction()
                 begin
                     Page.RunModal(Page::"Upload Power BI Report");
-                    ReloadPageState(false);
+                    ReloadPageState();
                 end;
             }
             action("Reset My Reports")
             {
                 ApplicationArea = All;
                 Caption = 'Reset My Reports';
-                Image = Reuse;
                 ToolTip = 'Resets all Power BI setup in Business Central, for the current user. Reports in your Power BI workspaces are not affected and need to be removed manually.';
+                Image = Reuse;
+                Visible = not FullPageMode;
 
                 trigger OnAction()
                 var
@@ -497,7 +512,7 @@ page 6325 "Power BI Embedded Report Part"
                         PowerBIReportUploads.DeleteAll();
 
                         Commit();
-                        ReloadPageState(true);
+                        ReloadPageState();
 
                         FeatureTelemetry.LogUptake('0000LSO', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), Enum::"Feature Uptake Status"::Undiscovered);
                     end;
@@ -507,9 +522,9 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Reset Reports for All Users';
-                Image = Reuse;
                 ToolTip = 'Resets all Power BI setup in Business Central, for all users. Reports in your Power BI workspaces are not affected and need to be removed manually.';
-                Visible = IsPBIAdmin;
+                Image = Reuse;
+                Visible = IsPBIAdmin and not FullPageMode;
 
                 trigger OnAction()
                 var
@@ -549,7 +564,7 @@ page 6325 "Power BI Embedded Report Part"
                         end;
 
                         Commit();
-                        ReloadPageState(true);
+                        ReloadPageState();
 
                         FeatureTelemetry.LogUptake('0000L03', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), Enum::"Feature Uptake Status"::Undiscovered);
                     end;
@@ -598,7 +613,7 @@ page 6325 "Power BI Embedded Report Part"
 #endif
         Rec.FilterGroup(PreviousFilterGroup);
 
-        ReloadPageState(false);
+        ReloadPageState();
 
 #if not CLEAN23
         if PowerBIDisplayedElement.IsEmpty() then
@@ -638,6 +653,7 @@ page 6325 "Power BI Embedded Report Part"
         PowerBiFilterHelper: Codeunit "Power BI Filter Helper";
         ClientTypeManagement: Codeunit "Client Type Management";
         FeatureTelemetry: Codeunit "Feature Telemetry";
+        ErrorNotificationMsg: Label 'An error occurred while loading Power BI. Your Power BI embedded content might not work. Here are the error details: "%1:%2"', Comment = '%1: A short error code. %2: The tecnical details of the error.';
         ResetReportsQst: Label 'This action will clear some or all of the Power BI report setup for all users in the company you''re currently working with. Note: This action doesn''t delete reports in Power BI workspaces.';
         ResetReportsCurrentUserQst: Label 'This action will clear all of your Power BI report setup in the company you''re currently working with. Note: This action doesn''t delete reports in Power BI workspaces.\\Do you want to continue?';
         ResetReportsOptionsTxt: Label 'Clear Power BI report selections for all pages and users,Reset the entire Power BI report setup', Comment = 'A comma-separated list of options';
@@ -647,19 +663,22 @@ page 6325 "Power BI Embedded Report Part"
         UnsupportedElementTypeErr: Label 'Displaying Power BI elements of type %1 is currently not supported.', Comment = '%1 = an element type, such as Report or Workspace';
         ReportsDeployingMsg: Label 'We are uploading a demo report to Power BI in the background for you. Once the upload finishes, choose Refresh to see it in this page.\\If you have already reports in your Power BI workspace, you can choose Select Reports instead.';
         StillDeployingMsg: Label 'We are still uploading your demo report. Once the upload finishes, choose Refresh again to see it in this page.\\If you have already reports in your Power BI workspace, you can choose Select Reports instead.';
-        RefreshPartTxt: Label 'Refresh';
+        RefreshPartTxt: Label 'Reload';
         SelectReportsTxt: Label 'Select reports';
 #if not CLEAN23
         ReportCaptionTxt: Label '%1 (Workspace: %2)', Comment = '%1: a report name, for example "Top customers by sales"; %2: a Power BI workspace name, for example "Contoso"';
 #endif
-        PageState: Option GetStarted,ShouldDeploy,NoElementSelected,NoElementSelectedButDeploying,ElementVisible,ErrorVisible;
+        PageState: Option GetStarted,ShouldDeploy,NoElementSelected,NoElementSelectedButDeploying,ElementVisible;
         ReportFrameRatio: Text;
         AvailableReportLevelFilters: JsonArray;
         PageContext: Text[30];
         AddInReady: Boolean;
+#if not CLEAN25
         ErrorMessageText: Text;
+#endif
         IsSaaSUser: Boolean;
         IsPBIAdmin: Boolean;
+        FullPageMode: Boolean;
         IsPartVisible: Boolean;
         LockedToFirstElement: Boolean;
         // Telemetry labels
@@ -669,17 +688,12 @@ page 6325 "Power BI Embedded Report Part"
         ReportsResetTelemetryMsg: Label 'User has reset Power BI setup for everyone, option chosen: %1', Locked = true;
         ReportsResetUserTelemetryMsg: Label 'User has reset their own Power BI setup.', Locked = true;
 
-
-    local procedure ReloadPageState(ClearError: Boolean)
+    local procedure ReloadPageState()
     var
         PowerBIContextSettings: Record "Power BI Context Settings";
         PowerBIReportSynchronizer: Codeunit "Power BI Report Synchronizer";
     begin
-        if PageState = PageState::ErrorVisible then
-            if ClearError then
-                Clear(PageState)
-            else
-                exit;
+        ClearNotifications();
 
         PowerBIContextSettings.SetRange(UserSID, UserSecurityId());
         if PowerBIContextSettings.IsEmpty() then begin
@@ -751,12 +765,13 @@ page 6325 "Power BI Embedded Report Part"
         AccessToken := PowerBiServiceMgt.GetEmbedAccessToken();
 
         if AccessToken = '' then begin
-            ShowError(GetLastErrorText());
+            ShowError('EmptyToken', GetLastErrorText());
             exit;
         end;
 
 #if not CLEAN23
         PowerBIContextSettings.CreateOrUpdateSelectedElement(PowerBIDisplayedElement);
+        ClearNotifications();
         case PowerBIDisplayedElement.ElementType of
             "Power BI Element Type"::"Report":
                 begin
@@ -780,10 +795,11 @@ page 6325 "Power BI Embedded Report Part"
                     CurrPage.PowerBIAddin.EmbedDashboardTile(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId, TileId, AccessToken);
                 end;
             else
-                ShowError(StrSubstNo(UnsupportedElementTypeErr, PowerBIDisplayedElement.ElementType));
+                ShowError('UnsupportedElementType', StrSubstNo(UnsupportedElementTypeErr, PowerBIDisplayedElement.ElementType));
         end;
 #else
         PowerBIContextSettings.CreateOrUpdateSelectedElement(Rec);
+        ClearNotifications();
         case Rec.ElementType of
             "Power BI Element Type"::"Report":
                 begin
@@ -807,7 +823,7 @@ page 6325 "Power BI Embedded Report Part"
                     CurrPage.PowerBIAddin.EmbedDashboardTile(Rec.ElementEmbedUrl, DashboardId, TileId, AccessToken);
                 end;
             else
-                ShowError(StrSubstNo(UnsupportedElementTypeErr, Rec.ElementType));
+                ShowError('UnsupportedElementType', StrSubstNo(UnsupportedElementTypeErr, Rec.ElementType));
         end;
 #endif
     end;
@@ -820,14 +836,28 @@ page 6325 "Power BI Embedded Report Part"
         PowerBIWSReportSelection.LookupMode(true);
         PowerBIWSReportSelection.RunModal();
 
-        ReloadPageState(true);
+        ReloadPageState();
     end;
 
-    local procedure ShowError(NewErrorMessageText: Text)
+    local procedure ShowError(ErrorCategory: Text; ErrorMessage: Text)
+    var
+        PowerBIContextSettings: Record "Power BI Context Settings";
+        NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
+        Notif: Notification;
     begin
-        PageState := PageState::ErrorVisible;
-        ErrorMessageText := NewErrorMessageText;
-        CurrPage.Update(false);
+        Notif.Id := CreateGuid();
+        Notif.Message(StrSubstNo(ErrorNotificationMsg, ErrorCategory, ErrorMessage));
+        Notif.Scope := NotificationScope::LocalScope;
+
+        NotificationLifecycleMgt.SendNotification(Notif, PowerBIContextSettings.RecordId());
+    end;
+
+    local procedure ClearNotifications()
+    var
+        PowerBIContextSettings: Record "Power BI Context Settings";
+        NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
+    begin
+        NotificationLifecycleMgt.RecallNotificationsForRecord(PowerBIContextSettings.RecordId(), true);
     end;
 
     local procedure LoadOptInImage()
@@ -911,6 +941,11 @@ page 6325 "Power BI Embedded Report Part"
     procedure InitPageRatio(ReportFrameRatioInput: Text)
     begin
         ReportFrameRatio := ReportFrameRatioInput;
+    end;
+
+    procedure SetFullPageMode(NewFullPageMode: Boolean)
+    begin
+        FullPageMode := NewFullPageMode;
     end;
 
     procedure SetPageContext(InputContext: Text)
