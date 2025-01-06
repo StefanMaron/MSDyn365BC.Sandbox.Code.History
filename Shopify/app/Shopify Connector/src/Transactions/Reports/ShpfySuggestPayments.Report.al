@@ -176,13 +176,9 @@ report 30118 "Shpfy Suggest Payments"
     end;
 
     trigger OnPostReport()
-    var
-        GenJnlManagement: Codeunit GenJnlManagement;
     begin
-        if not IsGenJournalLineSet then begin
-            GenJournalBatch.Get(GeneralJournalTemplateName, GeneralJournalBatchName);
-            GenJnlManagement.TemplateSelectionFromBatch(GenJournalBatch);
-        end;
+        if not IsGenJournalLineSet then
+            Page.Run(Page::"Cash Receipt Journal");
     end;
 
     internal procedure SetGenJournalLine(NewGenJournalLine: Record "Gen. Journal Line")
@@ -399,15 +395,8 @@ report 30118 "Shpfy Suggest Payments"
     begin
         if PaymentMethod.Get(PaymentMethodCode) then begin
             GenJournalLine.Validate("Payment Method Code", PaymentMethodCode);
-            if PaymentMethod."Bal. Account No." <> '' then begin
-                case PaymentMethod."Bal. Account Type" of
-                    PaymentMethod."Bal. Account Type"::"Bank Account":
-                        GenJournalLine.Validate("Bal. Account Type", GenJournalLine."Bal. Account Type"::"Bank Account");
-                    PaymentMethod."Bal. Account Type"::"G/L Account":
-                        GenJournalLine.Validate("Bal. Account Type", GenJournalLine."Bal. Account Type"::"G/L Account");
-                end;
-                GenJournalLine.Validate("Bal. Account No.", PaymentMethod."Bal. Account No.");
-            end;
+            GenJournalLine.Validate("Bal. Account Type", PaymentMethod."Bal. Account Type");
+            GenJournalLine.Validate("Bal. Account No.", PaymentMethod."Bal. Account No.");
         end;
     end;
 
