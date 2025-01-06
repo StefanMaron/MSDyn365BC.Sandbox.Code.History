@@ -35,6 +35,7 @@ using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Task;
 using Microsoft.Foundation.UOM;
 using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Payables;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Entity;
@@ -98,17 +99,19 @@ using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Service.Setup;
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Bank.Ledger;
-using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Setup;
+using Microsoft.Bank.Setup;
+using Microsoft.Bank.DirectDebit;
 
 codeunit 104000 "Upgrade - BaseApp"
 {
     Subtype = Upgrade;
     Permissions =
         TableData "User Group Plan" = rimd,
-        TableData "Cust. Ledger Entry" = rm;
+        TableData "Cust. Ledger Entry" = rm,
+        TableData "Employee Ledger Entry" = rm;
 
     var
         EnvironmentInformation: Codeunit "Environment Information";
@@ -133,6 +136,8 @@ codeunit 104000 "Upgrade - BaseApp"
         ProductionOrderLbl: Label 'PRODUCTION', Locked = true;
         ProductionOrderTxt: Label 'Production Order', Locked = true;
         ServiceBlockedAlreadySetLbl: Label 'CopyItemSalesBlockedToServiceBlocked skipped. %1 already set for at least one record in table %2.', Comment = '%1 = Field Caption, %2 = Table Caption', Locked = true;
+        XNonEuroPaymentDescTxt: Label 'Parties share fees.';
+        XEuroPaymentDescTxt: Label 'Sender pays fees.';
 
     trigger OnCheckPreconditionsPerDatabase()
     begin
@@ -249,6 +254,7 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeOptionMapping();
         UpdateProductionSourceCode();
         UpgradeICGLAccountNoInPostedGenJournalLine();
+        UpgradeBankExportImportSetup();
         UpgradePurchasesPayablesAndSalesReceivablesSetups();
         UpgradeLocationBinPolicySetups();
         UpgradeInventorySetupAllowInvtAdjmt();
@@ -259,6 +265,8 @@ codeunit 104000 "Upgrade - BaseApp"
 #endif
         UpgradeVATSetupAllowVATDate();
         CopyItemSalesBlockedToServiceBlocked();
+        SetEmployeeLedgerEntryCurrencyFactor();
+        UpgradeCountryVATSchemeDK();
     end;
 
     local procedure ClearTemporaryTables()
@@ -301,6 +309,49 @@ codeunit 104000 "Upgrade - BaseApp"
         ParallelSessionEntry.DeleteAll();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetClearTemporaryTablesUpgradeTag());
+    end;
+
+    local procedure UpgradeBankExportImportSetup()
+    var
+        BankExportImportSetup: Record "Bank Export/Import Setup";
+        ExportProtocol: Record "Export Protocol";
+        CompanyInitialize: Codeunit "Company-Initialize";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetBankExportImportSetupSEPACT09UpgradeTag()) then
+            exit;
+
+        if not BankExportImportSetup.Get(CompanyInitialize.GetSEPACT09Code()) then
+            CompanyInitialize.InsertBankExportImportSetup(CompanyInitialize.GetSEPACT09Code(), CompanyInitialize.GetSEPACT09Name(), BankExportImportSetup.Direction::Export,
+              CODEUNIT::"SEPA CT-Export File", XMLPORT::"SEPA CT pain.001.001.09", CODEUNIT::"SEPA CT-Check Line");
+
+        if not BankExportImportSetup.Get(CompanyInitialize.GetSEPADD08Code()) then
+            CompanyInitialize.InsertBankExportImportSetup(CompanyInitialize.GetSEPADD08Code(), CompanyInitialize.GetSEPADD08Name(), BankExportImportSetup.Direction::Export,
+              CODEUNIT::"SEPA DD-Export File", XMLPORT::"SEPA DD pain.008.001.08", CODEUNIT::"SEPA DD-Check Line");
+
+        if not ExportProtocol.Get('SEPA00100109') then
+            InsertExportProtocol('SEPA00100109', XEuroPaymentDescTxt, Codeunit::"Check SEPA Payments", Report::"File SEPA 001.001.09 Pmts", '', ExportProtocol."Export Object Type"::Report, ExportProtocol."Code Expenses"::SHA);
+
+        if not ExportProtocol.Get('NONEURO SEPA00100109') then
+            InsertExportProtocol('NONEURO SEPA00100109', XNonEuroPaymentDescTxt, Codeunit::"Check Non Euro SEPA Payments", Report::"File FCY SEPA 001.001.09 Pmts", '', ExportProtocol."Export Object Type"::Report, ExportProtocol."Code Expenses"::SHA);
+
+       UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetBankExportImportSetupSEPACT09UpgradeTag());
+    end;
+
+    local procedure InsertExportProtocol(ExpenseCode: Code[20]; ExpenseDescription: Text[50]; CheckObjectID: Integer; ExportObjectID: Integer; ExportNoSeries: Code[20]; ExportObjectType: Option; CodeExpense: Option)
+    var
+        ExportProtocol: Record "Export Protocol";
+    begin
+        ExportProtocol.Init();
+        ExportProtocol.Code := ExpenseCode;
+        ExportProtocol.Description := ExpenseDescription;
+        ExportProtocol.Validate("Check Object ID", CheckObjectID);
+        ExportProtocol."Export Object ID" := ExportObjectID;
+        ExportProtocol."Export No. Series" := ExportNoSeries;
+        ExportProtocol."Export Object Type" := ExportObjectType;
+        ExportProtocol."Code Expenses" := CodeExpense;
+        ExportProtocol.Insert();
     end;
 
     internal procedure UpgradeWordTemplateTables()
@@ -4319,6 +4370,43 @@ codeunit 104000 "Upgrade - BaseApp"
         end;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCopyItemSalesBlockedToServiceBlockedUpgradeTag());
+    end;
+
+    local procedure SetEmployeeLedgerEntryCurrencyFactor()
+    var
+        EmployeeLedgerEntry: Record "Employee Ledger Entry";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        EmployeeLedgerEntryDataTransfer: DataTransfer;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetEmployeeLedgerEntryCurrencyFactorUpgradeTag()) then
+            exit;
+
+        EmployeeLedgerEntryDataTransfer.SetTables(Database::"Employee Ledger Entry", Database::"Employee Ledger Entry");
+        EmployeeLedgerEntryDataTransfer.AddSourceFilter(EmployeeLedgerEntry.FieldNo("Original Currency Factor"), '=%1', 0);
+        EmployeeLedgerEntryDataTransfer.AddConstantValue(1.0, EmployeeLedgerEntry.FieldNo("Original Currency Factor"));
+        EmployeeLedgerEntryDataTransfer.AddConstantValue(1.0, EmployeeLedgerEntry.FieldNo("Adjusted Currency Factor"));
+        EmployeeLedgerEntryDataTransfer.UpdateAuditFields := false;
+        EmployeeLedgerEntryDataTransfer.CopyFields();
+        Clear(EmployeeLedgerEntryDataTransfer);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetEmployeeLedgerEntryCurrencyFactorUpgradeTag());
+    end;
+    
+    local procedure UpgradeCountryVATSchemeDK()
+    var
+        CountryRegion: Record "Country/Region";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCountryVATSchemeDKTag()) then
+            exit;
+
+        CountryRegion.SetRange("ISO Code", 'DK'); // ISO 3166 Country Codes
+        if not CountryRegion.IsEmpty() then
+            CountryRegion.ModifyAll("VAT Scheme", '0184'); // ISO 6523 ICD Codes
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCountryVATSchemeDKTag());
     end;
 
     [IntegrationEvent(false, false)]
