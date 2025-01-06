@@ -1,17 +1,19 @@
 {
-  "id": "80e80fa9-7100-4885-852c-ac6b053298dd",
-  "name": "Russian language (Russia)",
-  "publisher": "Microsoft",
-  "version": "24.5.23489.28436",
-  "dependencies": [],
-  "target": "Cloud",
-  "showMyCode": true,
-  "brief": "This application adds the Russian language (Russia) to Dynamics 365 Business Central",
-  "description": "Dynamics 365 Business Central is available in many languages. By installing this application you add the capability of showing the base application in the Russian language (Russia)",
-  "logo": "ExtensionLogo.png",
-  "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
-  "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
-  "help": "https://go.microsoft.com/fwlink/?linkid=2115116",
-  "url": "https://www.microsoft.com/en-us/dynamics365/contact-us",
-  "application": "24.5.0.0"
+    "id":  "80e80fa9-7100-4885-852c-ac6b053298dd",
+    "name":  "Russian language (Russia)",
+    "publisher":  "Microsoft",
+    "version":  "24.0.16410.28473",
+    "dependencies":  [
+
+                     ],
+    "target":  "Cloud",
+    "showMyCode":  true,
+    "brief":  "This application adds the Russian language (Russia) to Dynamics 365 Business Central",
+    "description":  "Dynamics 365 Business Central is available in many languages. By installing this application you add the capability of showing the base application in the Russian language (Russia)",
+    "logo":  "ExtensionLogo.png",
+    "privacyStatement":  "https://go.microsoft.com/fwlink/?LinkId=724009",
+    "EULA":  "https://go.microsoft.com/fwlink/?linkid=2009120",
+    "help":  "https://go.microsoft.com/fwlink/?linkid=2115116",
+    "url":  "https://www.microsoft.com/en-us/dynamics365/contact-us",
+    "application":  "24.0.0.0"
 }
