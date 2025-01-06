@@ -622,6 +622,11 @@ table 81 "Gen. Journal Line"
                     Validate("Bal. VAT %");
                     UpdateLineBalance();
                 end;
+
+                if JobTaskIsSet() then begin
+                    CreateTempJobJnlLine();
+                    UpdatePricesFromJobJnlLine();
+                end;
             end;
         }
         field(17; "Balance (LCY)"; Decimal)
@@ -1099,11 +1104,13 @@ table 81 "Gen. Journal Line"
 
             trigger OnValidate()
             begin
-                if ("Applies-to ID" <> xRec."Applies-to ID") and (xRec."Applies-to ID" <> '') and HasNoMultipleLine() then
-                    ClearCustVendApplnEntry();
+                if "Applies-to ID" <> xRec."Applies-to ID" then
+                    if ShouldClearCustVendApplnEntry() then
+                        ClearCustVendApplnEntry();
                 SetJournalLineFieldsFromApplication();
             end;
         }
+
         field(50; "Business Unit Code"; Code[20])
         {
             Caption = 'Business Unit Code';
@@ -3183,6 +3190,9 @@ table 81 "Gen. Journal Line"
         {
             IncludedFields = Amount;
         }
+        key(key11; "Document No.", "Account No.", "Applies-to ID")
+        {
+        }
     }
 
     fieldgroups
@@ -3287,8 +3297,9 @@ table 81 "Gen. Journal Line"
         if not IsHandled then
             TestField("Check Printed", false);
 
-        if ("Applies-to ID" = '') and (xRec."Applies-to ID" <> '') and HasNoMultipleLine() then
-            ClearCustVendApplnEntry();
+        if ("Applies-to ID" = '') then
+            if ShouldClearCustVendApplnEntry() then
+                ClearCustVendApplnEntry();
     end;
 
     trigger OnRename()
@@ -3389,6 +3400,8 @@ table 81 "Gen. Journal Line"
         SpecialSymbolsTok: Label '=|&@()<>', Locked = true;
         MustUseAllGLAccountsAsDestinationAccountsAllocAccErr: Label 'To use Allocation Accounts in combination with deferrals, the selected Allocation Account must have only G/L Accounts as destination types, no other types are allowed.';
         CannotChangePostingGroupForAccountTypeErr: Label 'Posting group cannot be changed for Account Type %1.', Comment = '%1 - account type';
+        RestrictLineUsageDetailsTxt: Label 'The restriction was imposed because the line requires approval.';
+        RestrictBatchUsageDetailsTxt: Label 'The restriction was imposed because the journal batch requires approval.';
 
     protected var
         Currency: Record Currency;
@@ -3767,9 +3780,13 @@ table 81 "Gen. Journal Line"
                 end;
                 GenJnlLine3.Get(GenJnlLine2."Journal Template Name", GenJnlLine2."Journal Batch Name", GenJnlLine2."Line No.");
                 CheckJobQueueStatus(GenJnlLine3);
-                GenJnlLine3."Document No." := DocNo;
-                GenJnlLine3.Modify();
-                OnRenumberDocNoOnLinesOnAfterModifyGenJnlLine3(DocNo, GenJnlLine3);
+                if GenJnlLine3."Document No." <> DocNo then begin
+                    GenJnlLine3."Document No." := DocNo;
+                    GenJnlLine3.Modify();
+                    RestrictGenJournalLine(GenJnlLine3);
+                    OnRenumberDocNoOnLinesOnAfterModifyGenJnlLine3(DocNo, GenJnlLine3);
+                end;
+
                 First := false;
                 LastGenJnlLine := GenJnlLine2;
             until GenJnlLine2.Next() = 0;
@@ -4347,6 +4364,8 @@ table 81 "Gen. Journal Line"
         OnShowDimensionsOnAfterEditDimensionSet(Rec, OldDimSetID);
 
         IsChanged := OldDimSetID <> "Dimension Set ID";
+
+        OnAfterShowDimensions(Rec, xRec, OldDimSetID, IsChanged);
     end;
 
     procedure SwitchLinesWithErrorsFilter(var ShowAllLinesEnabled: Boolean)
@@ -6959,14 +6978,14 @@ table 81 "Gen. Journal Line"
 #if not CLEAN24
         if FeatureKeyManagement.IsGLCurrencyRevaluationEnabled() then begin
             GLSetup.Get();
-            if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+            if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
                 "Currency Code" := GLAcc."Source Currency Code";
         end else
             if CheckGLForeignCurrMgtPermission() or (CopyStr(SerialNumber, 7, 3) = '000') then
                 GLForeignCurrMgt.GetCurrCode("Account No.", Rec);
 #else
         GLSetup.Get();
-        if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+        if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
             "Currency Code" := GLAcc."Source Currency Code";
 #endif
 
@@ -7020,14 +7039,14 @@ table 81 "Gen. Journal Line"
 #if not CLEAN24
         if FeatureKeyManagement.IsGLCurrencyRevaluationEnabled() then begin
             GLSetup.Get();
-            if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+            if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
                 "Currency Code" := GLAcc."Source Currency Code";
         end else
             if CheckGLForeignCurrMgtPermission() then
                 GLForeignCurrMgt.GetCurrCode("Bal. Account No.", Rec);
 #else
         GLSetup.Get();
-        if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+        if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
             "Currency Code" := GLAcc."Source Currency Code";
 #endif
 
@@ -7649,12 +7668,11 @@ table 81 "Gen. Journal Line"
     begin
         GenJnlLine2.SetRange("Journal Template Name", "Journal Template Name");
         GenJnlLine2.SetRange("Journal Batch Name", "Journal Batch Name");
+        GenJnlLine2.SetFilter("Line No.", '<>%1', "Line No.");
         GenJnlLine2.SetRange("Document No.", "Document No.");
         GenJnlLine2.SetRange("Account No.", xRec."Account No.");
         GenJnlLine2.SetRange("Applies-to ID", xRec."Applies-to ID");
-        GenJnlLine2.SetFilter("Line No.", '<>%1', "Line No.");
-        if GenJnlLine2.Count = 0 then
-            exit(true);
+        exit(GenJnlLine2.IsEmpty());
     end;
 
     local procedure CheckOpenApprovalEntryExistForCurrentUser()
@@ -7706,6 +7724,22 @@ table 81 "Gen. Journal Line"
         end;
 
         exit(CurrencyCode);
+    end;
+
+    local procedure RestrictGenJournalLine(var GenJournalLine: Record "Gen. Journal Line")
+    var
+        GenJournalBatch: Record "Gen. Journal Batch";
+        RecordRestrictionMgt: Codeunit "Record Restriction Mgt.";
+    begin
+        if GenJournalLine."System-Created Entry" or GenJournalLine.IsTemporary then
+            exit;
+
+        if ApprovalsMgmt.IsGeneralJournalLineApprovalsWorkflowEnabled(GenJournalLine) then
+            RecordRestrictionMgt.RestrictRecordUsage(GenJournalLine, RestrictLineUsageDetailsTxt);
+
+        if GenJournalBatch.Get(GenJournalLine."Journal Template Name", GenJournalLine."Journal Batch Name") then
+            if ApprovalsMgmt.IsGeneralJournalBatchApprovalsWorkflowEnabled(GenJournalBatch) then
+                RecordRestrictionMgt.RestrictRecordUsage(GenJournalLine, RestrictBatchUsageDetailsTxt);
     end;
 
     [IntegrationEvent(false, false)]
@@ -9166,6 +9200,13 @@ table 81 "Gen. Journal Line"
         PaymentJnlExportErrorText.DeleteJnlLineErrorsWhenRecDeleted(Rec);
     end;
 
+    local procedure ShouldClearCustVendApplnEntry(): Boolean
+    begin
+        if xRec."Applies-to ID" = '' then
+            exit(false);
+        exit(HasNoMultipleLine());
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var GenJournalLine: Record "Gen. Journal Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FromFieldNo: Integer)
     begin
@@ -9260,6 +9301,12 @@ table 81 "Gen. Journal Line"
     local procedure OnAfterCreateDim(var GenJournalLine: Record "Gen. Journal Line"; CurrFieldNo: Integer; xGenJournalLine: Record "Gen. Journal Line"; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterShowDimensions(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; OldDimSetID: Integer; var IsChanged: Boolean)
+    begin
+    end;
+
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowDimensions(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
@@ -9402,7 +9449,7 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateCurrencyCodeOnBeforeUpdateCurrencyFactor(var GenJournalLine: Record "Gen. Journal Line"; CurrExchRate: Record "Currency Exchange Rate")
+    local procedure OnValidateCurrencyCodeOnBeforeUpdateCurrencyFactor(var GenJournalLine: Record "Gen. Journal Line"; var CurrExchRate: Record "Currency Exchange Rate")
     begin
     end;
 

@@ -134,7 +134,11 @@ table 38 "Purchase Header"
                 "Registration No." := CopyStr(Vend."Registration Number", 1, MaxStrLen("Registration No."));
                 Validate("Lead Time Calculation", Vend."Lead Time Calculation");
                 "Shipment Method Code" := Vend."Shipment Method Code";
-                "Responsibility Center" := UserSetupMgt.GetRespCenter(1, Vend."Responsibility Center");
+
+                IsHandled := false;
+                OnValidateBuyFromVendorNoOnBeforeAssignResponsibilityCenter(Rec, xRec, CurrFieldNo, IsHandled);
+                if not IsHandled then
+                    "Responsibility Center" := UserSetupMgt.GetRespCenter(1, Vend."Responsibility Center");
                 ValidateEmptySellToCustomerAndLocation();
                 OnAfterCopyBuyFromVendorFieldsFromVendor(Rec, Vend, xRec);
 
@@ -187,8 +191,11 @@ table 38 "Purchase Header"
 
                 OnValidateBuyFromVendorNoOnAfterUpdateBuyFromCont(Rec, xRec, CurrFieldNo, SkipBuyFromContact);
 
-                if (xRec."Buy-from Vendor No." <> '') and (xRec."Buy-from Vendor No." <> "Buy-from Vendor No.") then
+                if (xRec."Buy-from Vendor No." <> '') and (xRec."Buy-from Vendor No." <> "Buy-from Vendor No.") then begin
                     Rec.RecallModifyAddressNotification(GetModifyVendorAddressNotificationId());
+                    if Rec."Remit-to Code" <> '' then
+                        Rec.Validate("Remit-to Code", '');
+                end;
             end;
         }
         field(3; "No."; Code[20])
@@ -886,7 +893,7 @@ table 38 "Purchase Header"
                                         PurchLine."Line Amount" := PurchLine.Amount + PurchLine."Inv. Discount Amount";
                                 UpdatePrepmtAmounts(PurchLine);
                             end;
-                            OnValidatePricesIncludingVATOnBeforePurchLineModify(PurchHeader, PurchLine, Currency, RecalculatePrice);
+                            OnValidatePricesIncludingVATOnBeforePurchLineModify(Rec, PurchLine, Currency, RecalculatePrice);
                             PurchLine.Modify();
                         until PurchLine.Next() = 0;
                     end;
@@ -2927,7 +2934,10 @@ table 38 "Purchase Header"
 
         UpdateInboundWhseHandlingTime();
 
-        "Responsibility Center" := UserSetupMgt.GetRespCenter(1, "Responsibility Center");
+        IsHandled := false;
+        OnInitRecordOnBeforeAssignResponsibilityCenter(Rec, IsHandled);
+        if not IsHandled then
+            "Responsibility Center" := UserSetupMgt.GetRespCenter(1, "Responsibility Center");
         GetNextArchiveDocOccurrenceNo();
 
         OnAfterInitRecord(Rec);
@@ -3257,7 +3267,7 @@ table 38 "Purchase Header"
         Contact.FilterGroup(0);
     end;
 
-    internal procedure PerformManualRelease(var PurchaseHeader: Record "Purchase Header")
+    procedure PerformManualRelease(var PurchaseHeader: Record "Purchase Header")
     var
         BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
         NoOfSelected: Integer;
@@ -3274,7 +3284,7 @@ table 38 "Purchase Header"
         PurchaseHeader.FilterGroup(PrevFilterGroup);
     end;
 
-    internal procedure PerformManualRelease()
+    procedure PerformManualRelease()
     var
         ReleasePurchDoc: Codeunit "Release Purchase Document";
     begin
@@ -3284,7 +3294,7 @@ table 38 "Purchase Header"
         end;
     end;
 
-    internal procedure PerformManualReopen(var PurchaseHeader: Record "Purchase Header")
+    procedure PerformManualReopen(var PurchaseHeader: Record "Purchase Header")
     var
         BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
         NoOfSelected: Integer;
@@ -3978,6 +3988,7 @@ table 38 "Purchase Header"
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if PurchLinesExist() then
@@ -4943,9 +4954,12 @@ table 38 "Purchase Header"
 
     procedure PrepareOpeningDocumentStatistics()
     var
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        PurchaseHeader: Record "Purchase Header";
+        [SecurityFiltering(SecurityFilter::Ignored)]
         PurchaseLine: Record "Purchase Line";
     begin
-        if not WritePermission() or not PurchaseLine.WritePermission() then
+        if not PurchaseHeader.WritePermission() or not PurchaseLine.WritePermission() then
             Error(StatisticsInsuffucientPermissionsErr);
 
         CalcInvDiscForHeader();
@@ -7000,6 +7014,11 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var PurcasehHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterValidateShortcutDimCode(var PurchHeader: Record "Purchase Header"; xPurchHeader: Record "Purchase Header"; FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
     end;
@@ -8021,6 +8040,16 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeHasMixedDropShipment(var PurchaseHeader: Record "Purchase Header"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateBuyFromVendorNoOnBeforeAssignResponsibilityCenter(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitRecordOnBeforeAssignResponsibilityCenter(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 }
