@@ -1224,7 +1224,6 @@ table 23 Vendor
                 ContBusRel: Record "Contact Business Relation";
                 TempVend: Record Vendor temporary;
             begin
-                Cont.FilterGroup(2);
                 ContBusRel.SetCurrentKey("Link to Table", "No.");
                 ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Vendor);
                 ContBusRel.SetRange("No.", "No.");
@@ -2505,11 +2504,10 @@ table 23 Vendor
         VendorWithoutQuote: Text;
         VendorFilterFromStart: Text;
         VendorFilterContains: Text;
-        ShowCreateVendorOption, IsHandled : Boolean;
+        IsHandled: Boolean;
     begin
-        ShowCreateVendorOption := true;
         IsHandled := false;
-        OnBeforeGetVendorNoOpenCard(VendorText, ShowVendorCard, VendorNo, IsHandled, ShowCreateVendorOption);
+        OnBeforeGetVendorNoOpenCard(VendorText, ShowVendorCard, VendorNo, IsHandled);
         if IsHandled then
             exit(VendorNo);
 
@@ -2569,15 +2567,12 @@ table 23 Vendor
         OnGetVendorNoOpenCardOnBeforeSelectVendor(Vendor);
         if Vendor.Count = 0 then begin
             if Vendor.WritePermission then
-                if ShowCreateVendorOption then
-                    case StrMenu(StrSubstNo('%1,%2', StrSubstNo(CreateNewVendTxt, VendorText), SelectVendTxt), 1, VendNotRegisteredTxt) of
-                        0:
-                            Error(SelectVendorErr);
-                        1:
-                            exit(CreateNewVendor(CopyStr(VendorText, 1, MaxStrLen(Vendor.Name)), ShowVendorCard));
-                    end
-                else
-                    exit('');
+                case StrMenu(StrSubstNo('%1,%2', StrSubstNo(CreateNewVendTxt, VendorText), SelectVendTxt), 1, VendNotRegisteredTxt) of
+                    0:
+                        Error(SelectVendorErr);
+                    1:
+                        exit(CreateNewVendor(CopyStr(VendorText, 1, MaxStrLen(Vendor.Name)), ShowVendorCard));
+                end;
             Vendor.Reset();
             NoFiltersApplied := true;
         end;
@@ -3075,7 +3070,7 @@ table 23 Vendor
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetVendorNoOpenCard(VendorText: Text; ShowVendorCard: Boolean; var VendorNo: Code[20]; var IsHandled: Boolean; var ShowCreateVendorOption: Boolean)
+    local procedure OnBeforeGetVendorNoOpenCard(VendorText: Text; ShowVendorCard: Boolean; var VendorNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
 
