@@ -38,7 +38,7 @@ codeunit 7233 "Master Data Management"
                   tabledata "Master Data Management Setup" = r;
 
     var
-        CachedDoesJobActOnTable: Dictionary of [Text, Boolean];
+
         IntegrationTableMappingNotFoundErr: Label 'No %1 was found for table %2.', Comment = '%1 = Integration Table Mapping caption, %2 = Table caption for the table which is not mapped';
         UpdateNowUniDirectionQst: Label 'Send data update to source company.,Get data update from source company.';
         UpdateNowBiDirectionQst: Label 'Send data update to source company.,Get data update from source company.,Merge data.';
@@ -328,19 +328,13 @@ codeunit 7233 "Master Data Management"
         IntegrationSystemIDFieldRef: FieldRef;
         IntegrationRecordSystemId: Guid;
         IsHandled: Boolean;
-        SourceCompanyName: Text[30];
     begin
         OnGetIntegrationSystemIdFromRecRef(IntegrationRecordRef, IntegrationRecordSystemId, IsHandled);
         if IsHandled then
             exit(IntegrationRecordSystemId);
 
         MasterDataManagementSetup.Get();
-
-        OnSetSourceCompanyName(SourceCompanyName, IntegrationRecordRef.Number());
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        IntegrationRecordRef.ChangeCompany(SourceCompanyName);
-
+        IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         IntegrationSystemIDFieldRef := IntegrationRecordRef.Field(IntegrationRecordRef.SystemIdNo());
         exit(IntegrationSystemIDFieldRef.Value);
     end;
@@ -353,7 +347,6 @@ codeunit 7233 "Master Data Management"
         TextKey: Text;
         Found: Boolean;
         IsHandled: Boolean;
-        SourceCompanyName: Text[30];
     begin
         OnGetIntegrationRecordRefByIntegrationSystemId(IntegrationTableMapping, ID, IntegrationRecordRef, Found, IsHandled);
         if IsHandled then
@@ -361,20 +354,16 @@ codeunit 7233 "Master Data Management"
 
         IntegrationRecordRef.Close();
         MasterDataManagementSetup.Get();
-        OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
         if ID.IsGuid then begin
             IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-            IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+            IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
             IDFieldRef := IntegrationRecordRef.Field(IntegrationTableMapping."Integration Table UID Fld. No.");
             IDFieldRef.SetFilter(ID);
             exit(IntegrationRecordRef.FindFirst());
         end;
 
         if ID.IsRecordId then begin
-            IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-            IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+            IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
             RecordID := ID;
             if RecordID.TableNo = IntegrationTableMapping."Table ID" then
                 exit(IntegrationRecordRef.Get(ID));
@@ -382,7 +371,7 @@ codeunit 7233 "Master Data Management"
 
         if ID.IsText then begin
             IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-            IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+            IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
             IDFieldRef := IntegrationRecordRef.Field(IntegrationTableMapping."Integration Table UID Fld. No.");
             TextKey := ID;
             IDFieldRef.SetFilter('%1', TextKey);
@@ -685,7 +674,6 @@ codeunit 7233 "Master Data Management"
         LocalRecordRef: RecordRef;
         IntegrationRecordRef: RecordRef;
         CountFailed: Integer;
-        SourceCompanyName: Text[30];
     begin
         AddIntegrationTableMapping(IntegrationTableMapping);
         IntegrationTableMapping.SetTableFilter(LocalTableFilter);
@@ -701,10 +689,7 @@ codeunit 7233 "Master Data Management"
         end else begin
             MasterDataManagementSetup.Get();
             IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-            OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-            if SourceCompanyName = '' then
-                SourceCompanyName := MasterDataManagementSetup."Company Name";
-            IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+            IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
             IntegrationRecordRef.SetView(IntegrationTableFilter);
             if IntegrationRecordRef.FindSet() then
                 repeat
@@ -889,14 +874,10 @@ codeunit 7233 "Master Data Management"
         MasterDataManagementSetup: Record "Master Data Management Setup";
         RecordRef: RecordRef;
         FieldRef: FieldRef;
-        SourceCompanyName: Text[30];
     begin
         MasterDataManagementSetup.Get();
         RecordRef.Open(TableNo);
-        OnSetSourceCompanyName(SourceCompanyName, TableNo);
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        RecordRef.ChangeCompany(SourceCompanyName);
+        RecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         FieldRef := RecordRef.Field(IdFiledNo);
         FieldRef.SetRange(IntegrationSystemId);
         View := RecordRef.GetView();
@@ -910,15 +891,11 @@ codeunit 7233 "Master Data Management"
         RecordRef: RecordRef;
         FieldRef: FieldRef;
         IntegrationSystemIdFilter: Text;
-        SourceCompanyName: Text[30];
     begin
         MasterDataManagementSetup.Get();
         IntegrationSystemIdFilter := IntegrationRecordSynch.JoinIDs(IntegrationSystemIds, '|');
         RecordRef.Open(TableNo);
-        OnSetSourceCompanyName(SourceCompanyName, TableNo);
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        RecordRef.ChangeCompany(SourceCompanyName);
+        RecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         FieldRef := RecordRef.Field(IdFiledNo);
         FieldRef.SetFilter(IntegrationSystemIdFilter);
         View := RecordRef.GetView();
@@ -1561,13 +1538,11 @@ codeunit 7233 "Master Data Management"
         MasterDataManagementSetup: Record "Master Data Management Setup";
         MasterDataMgtSubscriber: Record "Master Data Mgt. Subscriber";
         JobQueueEntry: Record "Job Queue Entry";
-        JobQueueEntryUpdate: Record "Job Queue Entry";
         ScheduledTask: Record "Scheduled Task";
         DataUpgradeMgt: Codeunit "Data Upgrade Mgt.";
         NewEarliestStartDateTime: DateTime;
         ShouldReactivateJob: Boolean;
         CurrentCompanyName: Text;
-        RescheduleOffsetInMs: Integer;
     begin
         if not MasterDataMgtSubscriber.ReadPermission() then
             exit;
@@ -1575,20 +1550,10 @@ codeunit 7233 "Master Data Management"
         if not MasterDataMgtSubscriber.FindSet() then
             exit;
 
-        if not UserCanRescheduleJob() then
-            exit;
-
-        // reschedule the synch job in 30 seconds from now, to give time to the user to make further changes
-        RescheduleOffSetInMs := 30000;
-        OnBeforeRescheduleJobQueueEntries(TableNo, RescheduleOffSetInMs);
-        if RescheduleOffSetInMs < 5000 then
-            RescheduleOffSetInMs := 5000;
-
         CurrentCompanyName := CompanyName();
         repeat
             if MasterDataManagementSetup.ChangeCompany(MasterDataMgtSubscriber."Company Name") then begin
                 JobQueueEntry.ChangeCompany(MasterDataMgtSubscriber."Company Name");
-                JobQueueEntryUpdate.ChangeCompany(MasterDataMgtSubscriber."Company Name");
                 if MasterDataManagementSetup.Get() then
                     ShouldReactivateJob := MasterDataManagementSetup."Is Enabled" and (MasterDataManagementSetup."Company Name" = CurrentCompanyName)
                 else
@@ -1598,37 +1563,29 @@ codeunit 7233 "Master Data Management"
                     if IsDataSynchRecord(TableNo, MasterDataMgtSubscriber."Company Name") then
                         if not IsEventDrivenReschedulingDisabled(TableNo, MasterDataMgtSubscriber."Company Name") then
                             if not DataUpgradeMgt.IsUpgradeInProgress() then begin
-                                JobQueueEntryUpdate.ReadIsolation := IsolationLevel::UpdLock;
                                 JobQueueEntry.Reset();
                                 JobQueueEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
-                                JobQueueEntry.SetLoadFields(Status, "System Task ID", "Object Type to Run", "Object ID to Run", "Record ID to Process", Description);
                                 JobQueueEntry.SetFilter(Status, Format(JobQueueEntry.Status::Ready) + '|' + Format(JobQueueEntry.Status::"On Hold with Inactivity Timeout"));
-                                JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-                                JobQueueEntry.SetFilter("Object ID to Run", '%1|%2|%3', Codeunit::"Integration Synch. Job Runner", Codeunit::"Int. Coupling Job Runner", Codeunit::"Int. Uncouple Job Runner");
                                 JobQueueEntry.SetRange("Recurring Job", true);
-                                JobQueueEntry.SetFilter("Parameter String", '%1|%2', '', Format(TableNo));
-                                JobQueueEntry.SetRange(Scheduled, true);
-                                if JobQueueEntry.FindSet() then
-                                    repeat
-                                        // The rescheduled task might start while the current transaction is not committed yet.
-                                        // Therefore the task will restart with a delay to lower a risk of use of "old" data.
-                                        ScheduledTask.ReadIsolation := IsolationLevel::ReadUncommitted;
-                                        NewEarliestStartDateTime := CurrentDateTime() + RescheduleOffSetInMs;
-                                        if DoesJobActOnTable(JobQueueEntry, TableNo, MasterDataMgtSubscriber."Company Name") then
+                                if UserCanRescheduleJob() then
+                                    if JobQueueEntry.FindSet() then
+                                        repeat
+                                            // The rescheduled task might start while the current transaction is not committed yet.
+                                            // Therefore the task will restart with a delay to lower a risk of use of "old" data.
+                                            ScheduledTask.ReadIsolation := IsolationLevel::ReadUncommitted;
+                                            NewEarliestStartDateTime := CurrentDateTime() + 2000;
                                             if ScheduledTask.Get(JobQueueEntry."System Task ID") then
-                                                if (NewEarliestStartDateTime + RescheduleOffSetInMs) < ScheduledTask."Not Before" then
-                                                    if TaskScheduler.SetTaskReady(ScheduledTask.ID, NewEarliestStartDateTime) then begin
-                                                        JobQueueEntryUpdate.ID := JobQueueEntry.ID;
-                                                        if JobQueueEntryUpdate.GetRecLockedExtendedTimeout() then
-                                                            if JobQueueEntryUpdate.Status in [JobQueueEntry.Status::Ready, JobQueueEntry.Status::"On Hold with Inactivity Timeout"] then begin
-                                                                JobQueueEntryUpdate.Status := JobQueueEntry.Status::Ready;
-                                                                JobQueueEntryUpdate."Earliest Start Date/Time" := NewEarliestStartDateTime;
-                                                                JobQueueEntryUpdate."Parameter String" := Format(TableNo);
-                                                                JobQueueEntryUpdate.Modify();
+                                                if (NewEarliestStartDateTime + 5000) < ScheduledTask."Not Before" then
+                                                    if DoesJobActOnTable(JobQueueEntry, TableNo, MasterDataMgtSubscriber."Company Name") then
+                                                        if TaskScheduler.SetTaskReady(ScheduledTask.ID, NewEarliestStartDateTime) then
+                                                            if JobQueueEntry.Find() then begin
+                                                                JobQueueEntry.RefreshLocked();
+                                                                JobQueueEntry.Status := JobQueueEntry.Status::Ready;
+                                                                JobQueueEntry."Earliest Start Date/Time" := NewEarliestStartDateTime;
+                                                                JobQueueEntry.Modify();
                                                                 Session.LogMessage('0000JB1', StrSubstNo(RescheduledTaskTxt, Format(ScheduledTask.ID), Format(JobQueueEntry.ID), JobQueueEntry.Description, Format(NewEarliestStartDateTime)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
                                                             end;
-                                                    end;
-                                    until JobQueueEntry.Next() = 0;
+                                        until JobQueueEntry.Next() = 0;
                             end
             end
         until MasterDataMgtSubscriber.Next() = 0;
@@ -1638,16 +1595,7 @@ codeunit 7233 "Master Data Management"
     var
         IntegrationTableMapping: Record "Integration Table Mapping";
         RecRef: RecordRef;
-        CacheKey: Text;
-        ActsOnTable: Boolean;
     begin
-        if JobQueueEntry."Record ID to Process".TableNo <> DATABASE::"Integration Table Mapping" then
-            exit(false);
-
-        CacheKey := CompanyName + '$' + Format(JobQueueEntry.ID) + '$' + Format(TableNo);
-        if CachedDoesJobActOnTable.ContainsKey(CacheKey) then
-            exit(CachedDoesJobActOnTable.Get(CacheKey));
-
         if not TryOpen(RecRef, DATABASE::"Integration Table Mapping") then
             exit(false);
 
@@ -1655,13 +1603,12 @@ codeunit 7233 "Master Data Management"
             exit(false);
 
         IntegrationTableMapping.ChangeCompany(CompanyName);
-        if JobQueueEntry."Record ID to Process".TableNo = DATABASE::"Integration Table Mapping" then begin
-            if RecRef.Get(JobQueueEntry."Record ID to Process") then
-                RecRef.SetTable(IntegrationTableMapping);
-            ActsOnTable := IntegrationTableMapping."Table ID" = TableNo;
+        if RecRef.Get(JobQueueEntry."Record ID to Process") and
+           (RecRef.Number = DATABASE::"Integration Table Mapping")
+        then begin
+            RecRef.SetTable(IntegrationTableMapping);
+            exit(IntegrationTableMapping."Table ID" = TableNo);
         end;
-        CachedDoesJobActOnTable.Add(CacheKey, ActsOnTable);
-        exit(ActsOnTable);
     end;
 
     internal procedure UserCanRescheduleJob(): Boolean
@@ -2080,7 +2027,6 @@ codeunit 7233 "Master Data Management"
         IntegrationRecordManagement: Codeunit "Integration Record Management";
         IntegrationTableUidFieldRef: FieldRef;
         IntegrationTableUid: Variant;
-        SourceCompanyName: Text[30];
     begin
         if IntegrationTableConnectionType <> IntegrationTableConnectionType::ExternalSQL then
             exit;
@@ -2091,10 +2037,7 @@ codeunit 7233 "Master Data Management"
         OnGetIntegrationRecordSystemId(SourceRecordRef, IntegrationTableUid, IsHandled);
         if not IsHandled then begin
             MasterDataManagementSetup.Get();
-            OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-            if SourceCompanyName = '' then
-                SourceCompanyName := MasterDataManagementSetup."Company Name";
-            SourceRecordRef.ChangeCompany(SourceCompanyName);
+            SourceRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
             IntegrationTableUidFieldRef := SourceRecordRef.Field(IntegrationTableMapping."Integration Table UID Fld. No.");
             IntegrationTableUid := IntegrationTableUidFieldRef.Value();
         end;
@@ -2136,7 +2079,6 @@ codeunit 7233 "Master Data Management"
         MasterDataManagementSetup: Record "Master Data Management Setup";
         IsHandled: Boolean;
         Found: Boolean;
-        SourceCompanyName: Text[30];
     begin
         OnGetIntegrationRecordRefFromCoupling(IntegrationTableID, MasterDataMgtCoupling, RecRef, Found, IsHandled);
         if IsHandled then
@@ -2147,10 +2089,7 @@ codeunit 7233 "Master Data Management"
 
         MasterDataManagementSetup.Get();
         RecRef.Open(IntegrationTableID);
-        OnSetSourceCompanyName(SourceCompanyName, IntegrationTableID);
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
-        RecRef.ChangeCompany(SourceCompanyName);
+        RecRef.ChangeCompany(MasterDataManagementSetup."Company Name");
         exit(RecRef.GetBySystemId(MasterDataMgtCoupling."Integration System ID"));
     end;
 
@@ -2174,7 +2113,6 @@ codeunit 7233 "Master Data Management"
         MasterDataManagementSetup: Record "Master Data Management Setup";
         RecRef: RecordRef;
         RecId: RecordId;
-        SourceCompanyName: Text[30];
     begin
         Clear(MasterDataMgtCoupling."Integration System ID");
         MasterDataManagementSetup.Get();
@@ -2183,10 +2121,7 @@ codeunit 7233 "Master Data Management"
         if MasterDataMgtCoupling.FindFirst() then
             if MasterDataMgtCoupling.FindRecordId(RecId) then begin
                 RecRef.Open(RecId.TableNo());
-                OnSetSourceCompanyName(SourceCompanyName, RecId.TableNo());
-                if SourceCompanyName = '' then
-                    SourceCompanyName := MasterDataManagementSetup."Company Name";
-                RecRef.ChangeCompany(SourceCompanyName);
+                RecRef.ChangeCompany(MasterDataManagementSetup."Company Name");
                 Found := RecRef.Get(RecId);
             end;
     end;
@@ -2199,35 +2134,31 @@ codeunit 7233 "Master Data Management"
         MasterDataManagementSetup: Record "Master Data Management Setup";
         IntegrationRecRef: RecordRef;
         IntegrationRecRefCount: Integer;
-        SourceCompanyName: Text[30];
     begin
         MasterDataManagementSetup.Get();
-        OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Table ID");
-        if SourceCompanyName = '' then
-            SourceCompanyName := MasterDataManagementSetup."Company Name";
         IntegrationRecRef.Open(IntegrationTableMapping."Integration Table ID");
-        IntegrationRecRef.ChangeCompany(SourceCompanyName);
+        IntegrationRecRef.ChangeCompany(MasterDataManagementSetup."Company Name");
 
         case IntegrationTableMapping."Integration Table ID" of
             Database::Vendor:
                 begin
                     IntegrationVendor.Reset();
                     IntegrationVendor.SetView(GetIntegrationTableMappingView(DATABASE::Vendor));
-                    IntegrationVendor.ChangeCompany(SourceCompanyName);
+                    IntegrationVendor.ChangeCompany(MasterDataManagementSetup."Company Name");
                     IntegrationRecRefCount := IntegrationVendor.Count();
                 end;
             Database::Customer:
                 begin
                     IntegrationCustomer.Reset();
                     IntegrationCustomer.SetView(GetIntegrationTableMappingView(DATABASE::Customer));
-                    IntegrationCustomer.ChangeCompany(SourceCompanyName);
+                    IntegrationCustomer.ChangeCompany(MasterDataManagementSetup."Company Name");
                     IntegrationRecRefCount := IntegrationCustomer.Count();
                 end;
             Database::Contact:
                 begin
                     IntegrationContact.Reset();
                     IntegrationContact.SetView(GetIntegrationTableMappingView(DATABASE::Contact));
-                    IntegrationContact.ChangeCompany(SourceCompanyName);
+                    IntegrationContact.ChangeCompany(MasterDataManagementSetup."Company Name");
                     IntegrationRecRefCount := IntegrationContact.Count();
                 end;
             else
@@ -2312,7 +2243,6 @@ codeunit 7233 "Master Data Management"
         IntegrationRecordRef: RecordRef;
         IntegrationSystemIdFieldRef: FieldRef;
         IntegrationTableView: Text;
-        SourceCompanyName: Text[30];
     begin
         MasterDataManagementSetup.Get();
         IntegrationTableMapping.SetRange(Status, IntegrationTableMapping.Status::Enabled);
@@ -2324,10 +2254,7 @@ codeunit 7233 "Master Data Management"
                 IntegrationRecordRef.Close();
                 IntegrationTableView := IntegrationTableMapping.GetIntegrationTableFilter();
                 IntegrationRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-                OnSetSourceCompanyName(SourceCompanyName, IntegrationTableMapping."Integration Table ID");
-                if SourceCompanyName = '' then
-                    SourceCompanyName := MasterDataManagementSetup."Company Name";
-                IntegrationRecordRef.ChangeCompany(SourceCompanyName);
+                IntegrationRecordRef.ChangeCompany(MasterDataManagementSetup."Company Name");
                 IntegrationSystemIdFieldRef := IntegrationRecordRef.Field(IntegrationRecordRef.SystemIdNo);
                 IntegrationRecordRef.SetView(IntegrationTableView);
                 IntegrationSystemIdFieldRef.SetRange(MasterDataMgtCoupling."Integration System ID");
@@ -2486,14 +2413,5 @@ codeunit 7233 "Master Data Management"
         // append the names of the custom table mappings to the IntegrationTableMappingFilter: it is an 'or' filter, so concatenate the names by |
     end;
 
-    [IntegrationEvent(false, false)]
-    internal procedure OnSetSourceCompanyName(var SourceCompanyName: Text[30]; TableID: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRescheduleJobQueueEntries(TableNo: Integer; var RescheduleOffSetInMs: Integer)
-    begin
-    end;
 }
 
