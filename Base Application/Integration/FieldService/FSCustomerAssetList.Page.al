@@ -2,7 +2,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-#if not CLEAN25
 namespace Microsoft.Integration.FieldService;
 
 using Microsoft.Integration.Dataverse;
@@ -12,14 +11,13 @@ using System.Environment.Configuration;
 
 page 6422 "FS Customer Asset List"
 {
+    ApplicationArea = Suite;
     Caption = 'Customer Assets - Dynamics 365 Field Service';
     Editable = false;
     PageType = List;
     SourceTable = "FS Customer Asset";
     SourceTableView = sorting(Name);
-    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '25.0';
+    UsageCategory = Lists;
 
     layout
     {
@@ -183,4 +181,4 @@ page 6422 "FS Customer Asset List"
         CurrentlyCoupledFSCustomerAsset := FSCustomerAsset;
     end;
 }
-#endif
+
