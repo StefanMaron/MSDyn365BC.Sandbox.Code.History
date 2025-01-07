@@ -548,8 +548,7 @@ codeunit 10750 "SII XML Creator"
               ((InvoiceType in [GetF2InvoiceType(), 'F4']) and
                (TempServVATEntryCalcNonExempt.Count + TempGoodsVATEntryCalcNonExempt.Count = 1)) or
               (SIIDocUploadState."Sales Special Scheme Code" in [SIIDocUploadState."Sales Special Scheme Code"::"03 Special System",
-                                                                 SIIDocUploadState."Sales Special Scheme Code"::"05 Travel Agencies",
-                                                                 SIIDocUploadState."Sales Special Scheme Code"::"09 Travel Agency Services"]);
+                                                                 SIIDocUploadState."Sales Special Scheme Code"::"05 Travel Agencies"]);
             DataTypeManagement.GetRecordRef(CustLedgerEntry, CustLedgerEntryRecRef);
             CalculateTotalVatAndBaseAmounts(CustLedgerEntryRecRef, TotalBase, TotalNonExemptBase, TotalVATAmount);
             if AddNodeForTotals then begin
@@ -892,7 +891,7 @@ codeunit 10750 "SII XML Creator"
         TempXMLNode: DotNet XmlNode;
         IDType: Text[30];
     begin
-        OnFillThirdPartyIdOnBeforeAssignValues(SIIDocUploadState, CountryCode, Name, VatNo, IsIntraCommunity);
+        OnFillThirdPartyIdOnBeforeAssignValues(SIIDocUploadState, CountryCode, Name, VatNo);
 
         if VatNo = '' then
             VatNo := BackupVatId;
@@ -1101,7 +1100,6 @@ codeunit 10750 "SII XML Creator"
         // Generating XML node for NonExempt part
         TempVATEntryCalculatedNonExempt.Reset();
         TempVATEntryCalculatedNonExempt.SetCurrentKey("VAT %", "EC %");
-        TempVATEntryCalculatedNonExempt.SetRange("One Stop Shop Reporting", false);
         if TempVATEntryCalculatedNonExempt.FindSet() then begin
             AddTipoDesgloseDetailHeader(
               TipoDesgloseXMLNode, DesgloseFacturaXMLNode, DomesticXMLNode, DesgloseTipoOperacionXMLNode,
@@ -1114,14 +1112,13 @@ codeunit 10750 "SII XML Creator"
                   VATXMLNode, TempVATEntryCalculatedNonExempt, true, -1, not IsService, NonExemptTransactionType, RegimeCodes, 'CuotaRepercutida');
             until TempVATEntryCalculatedNonExempt.Next() = 0;
         end;
-        TempVATEntryCalculatedNonExempt.SetRange("One Stop Shop Reporting");
 
         if not NonTaxHandled then begin
             Clear(DomesticXMLNode);
             Clear(EUServiceXMLNode);
             Clear(NonEUServiceXMLNode);
             HandleNonTaxableVATEntries(
-              TempVATEntryCalculatedNonExempt, CustLedgerEntry,
+              CustLedgerEntry,
               TipoDesgloseXMLNode, DesgloseFacturaXMLNode, DomesticXMLNode, DesgloseTipoOperacionXMLNode,
               EUXMLNode, IsService, DomesticCustomer, RegimeCodes);
             Clear(DomesticXMLNode);
@@ -1374,7 +1371,6 @@ codeunit 10750 "SII XML Creator"
             TempVATEntryPerPercent.SetCurrentKey("VAT %", "EC %");
             if not DomesticCustomer then
                 TempVATEntryPerPercent.SetRange("EU Service", EUService);
-            TempVATEntryPerPercent.SetRange("One Stop Shop Reporting", false);
             EntriesFound := TempVATEntryPerPercent.FindSet();
             if not EntriesFound then
                 TempVATEntryPerPercent.Init();
@@ -1396,20 +1392,19 @@ codeunit 10750 "SII XML Creator"
                     until TempVATEntryPerPercent.Next() = 0;
                 end;
             end;
-            TempVATEntryPerPercent.SetRange("One Stop Shop Reporting");
+            TempVATEntryPerPercent.DeleteAll();
             if not NonTaxHandled then begin
                 Clear(DomesticXMLNode);
                 Clear(EUServiceXMLNode);
                 Clear(NonEUServiceXMLNode);
                 HandleNonTaxableVATEntries(
-                  TempVATEntryPerPercent, CustLedgerEntry,
+                  CustLedgerEntry,
                   TipoDesgloseXMLNode, DesgloseFacturaXMLNode, DomesticXMLNode, DesgloseTipoOperacionXMLNode,
                   EUXMLNode, EUService, DomesticCustomer, RegimeCodes);
                 Clear(DomesticXMLNode);
             end;
             Clear(EUXMLNode);
             Clear(VATXMLNode);
-            TempVATEntryPerPercent.DeleteAll();
         end;
     end;
 
@@ -1712,9 +1707,7 @@ codeunit 10750 "SII XML Creator"
 
         TotalAmount := Abs(OldTotalBase + OldTotalVATAmount) - Abs(TotalBase + TotalVATAmount);
         if CustLedgerEntry."Document Type" = CustLedgerEntry."Document Type"::Invoice then
-            if not (CopyStr(Format(SIIDocUploadState."Sales Invoice Type"), 1, 2) in ['R1', 'R2', 'R3', 'R4', 'R5']) then
-                TotalAmount := -TotalAmount;
-
+            TotalAmount := -TotalAmount;
         if IncludeImporteTotalNode() then
             XMLDOMManagement.AddElementWithPrefix(
               XMLNode, 'ImporteTotal', FormatNumber(TotalAmount), 'sii', SiiTxt,
@@ -1748,15 +1741,14 @@ codeunit 10750 "SII XML Creator"
         if SIIManagement.FindVatEntriesFromLedger(CustLedgerEntryRecRef, NewVATEntry) then
             repeat
                 BuildVATEntrySource(
-                    ExemptExists, ExemptionCausePresent, ExemptionCode, ExemptionBaseAmounts,
-                    TempVATEntryPerPercent, NonExemptTransactionType, NewVATEntry, CustLedgerEntry."Posting Date", not DomesticCustomer);
+                  ExemptExists, ExemptionCausePresent, ExemptionCode, ExemptionBaseAmounts,
+                  TempVATEntryPerPercent, NonExemptTransactionType, NewVATEntry, CustLedgerEntry."Posting Date", not DomesticCustomer);
             until NewVATEntry.Next() = 0;
 
         XMLDOMManagement.AddElementWithPrefix(XMLNode, 'TipoDesglose', '', 'sii', SiiTxt, XMLNode);
         TipoDesgloseXMLNode := XMLNode;
         TempVATEntryPerPercent.Reset();
         TempVATEntryPerPercent.SetCurrentKey("VAT %", "EC %");
-        TempVATEntryPerPercent.SetRange("One Stop Shop Reporting", false);
         NormalVATEntriesFound := TempVATEntryPerPercent.FindSet();
         if NormalVATEntriesFound or ExemptExists then
             AddTipoDesgloseDetailHeader(
@@ -1801,10 +1793,9 @@ codeunit 10750 "SII XML Creator"
                 XMLDOMManagement.FindNode(VATXMLNode, '..', VATXMLNode);
             until TempVATEntryPerPercent.Next() = 0;
         end;
-        TempVATEntryPerPercent.SetRange("One Stop Shop Reporting");
 
         HandleReplacementNonTaxableVATEntries(
-          TempVATEntryPerPercent, CustLedgerEntry, OldCustLedgerEntry,
+          CustLedgerEntry, OldCustLedgerEntry,
           TipoDesgloseXMLNode, DesgloseFacturaXMLNode, DomesticXMLNode, DesgloseTipoOperacionXMLNode,
           EUXMLNode, false, DomesticCustomer, RegimeCodes);
     end;
@@ -1857,7 +1848,6 @@ codeunit 10750 "SII XML Creator"
 
     local procedure GetClaveRegimenNodeSales(var RegimeCodes: array[3] of Code[2]; SIIDocUploadState: Record "SII Doc. Upload State"; CustLedgerEntry: Record "Cust. Ledger Entry"; Customer: Record Customer)
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
         SIIInitialDocUpload: Codeunit "SII Initial Doc. Upload";
         CustLedgerEntryRecRef: RecordRef;
         IsHandled: Boolean;
@@ -1867,13 +1857,12 @@ codeunit 10750 "SII XML Creator"
         if IsHandled then
             exit;
 
-        GeneralLedgerSetup.Get();
         if SIIInitialDocUpload.DateWithinInitialUploadPeriod(CustLedgerEntry."Posting Date") then begin
             RegimeCodes[1] := '16';
             exit;
         end;
         DataTypeManagement.GetRecordRef(CustLedgerEntry, CustLedgerEntryRecRef);
-        if (SIIManagement.IsLedgerCashFlowBased(CustLedgerEntryRecRef)) and (GeneralLedgerSetup."VAT Cash Regime") then begin
+        if SIIManagement.IsLedgerCashFlowBased(CustLedgerEntryRecRef) then begin
             RegimeCodes[1] := '07';
             exit;
         end;
@@ -1890,7 +1879,6 @@ codeunit 10750 "SII XML Creator"
 
     local procedure GetClaveRegimenNodePurchases(var RegimeCodes: array[3] of Code[2]; SIIDocUploadState: Record "SII Doc. Upload State"; VendorLedgerEntry: Record "Vendor Ledger Entry"; Vendor: Record Vendor)
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
         SIIInitialDocUpload: Codeunit "SII Initial Doc. Upload";
         VendorLedgerEntryRecRef: RecordRef;
         IsHandled: Boolean;
@@ -1900,13 +1888,12 @@ codeunit 10750 "SII XML Creator"
         if IsHandled then
             exit;
 
-        GeneralLedgerSetup.Get();
         if SIIInitialDocUpload.DateWithinInitialUploadPeriod(VendorLedgerEntry."Posting Date") then begin
             RegimeCodes[1] := '14';
             exit;
         end;
         DataTypeManagement.GetRecordRef(VendorLedgerEntry, VendorLedgerEntryRecRef);
-        if (SIIManagement.IsLedgerCashFlowBased(VendorLedgerEntryRecRef)) and (GeneralLedgerSetup."VAT Cash Regime") then begin
+        if SIIManagement.IsLedgerCashFlowBased(VendorLedgerEntryRecRef) then begin
             RegimeCodes[1] := '07';
             exit;
         end;
@@ -2376,7 +2363,7 @@ codeunit 10750 "SII XML Creator"
           (not SIIInitialDocUpload.DateWithinInitialUploadPeriod(PostingDate)));
     end;
 
-    local procedure HandleNonTaxableVATEntries(var TempVATEntry: Record "VAT Entry" temporary; CustLedgerEntry: Record "Cust. Ledger Entry"; var TipoDesgloseXMLNode: DotNet XmlNode; var DesgloseFacturaXMLNode: DotNet XmlNode; var DomesticXMLNode: DotNet XmlNode; var DesgloseTipoOperacionXMLNode: DotNet XmlNode; var EUXMLNode: DotNet XmlNode; IsService: Boolean; DomesticCustomer: Boolean; RegimeCodes: array[3] of Code[2])
+    local procedure HandleNonTaxableVATEntries(CustLedgerEntry: Record "Cust. Ledger Entry"; var TipoDesgloseXMLNode: DotNet XmlNode; var DesgloseFacturaXMLNode: DotNet XmlNode; var DomesticXMLNode: DotNet XmlNode; var DesgloseTipoOperacionXMLNode: DotNet XmlNode; var EUXMLNode: DotNet XmlNode; IsService: Boolean; DomesticCustomer: Boolean; RegimeCodes: array[3] of Code[2])
     var
         CustNo: Code[20];
         Amount: array[2] of Decimal;
@@ -2392,13 +2379,12 @@ codeunit 10750 "SII XML Creator"
                 Amount[i], CustNo, CustLedgerEntry."Document Type".AsInteger(), CustLedgerEntry."Document No.",
                 CustLedgerEntry."Posting Date", IsService, true, IsLocalRule, false);
         end;
-        UpdateAmountBufferWithOneStopShop(HasEntries, Amount, TempVATEntry);
         ExportNonTaxableVATEntries(
           TipoDesgloseXMLNode, DesgloseFacturaXMLNode, DomesticXMLNode,
           DesgloseTipoOperacionXMLNode, EUXMLNode, IsService, DomesticCustomer, HasEntries, RegimeCodes, Amount);
     end;
 
-    local procedure HandleReplacementNonTaxableVATEntries(var TempVATEntry: Record "VAT Entry" temporary; CustLedgerEntry: Record "Cust. Ledger Entry"; OldCustLedgerEntry: Record "Cust. Ledger Entry"; var TipoDesgloseXMLNode: DotNet XmlNode; var DesgloseFacturaXMLNode: DotNet XmlNode; var DomesticXMLNode: DotNet XmlNode; var DesgloseTipoOperacionXMLNode: DotNet XmlNode; var EUXMLNode: DotNet XmlNode; IsService: Boolean; DomesticCustomer: Boolean; RegimeCodes: array[3] of Code[2])
+    local procedure HandleReplacementNonTaxableVATEntries(CustLedgerEntry: Record "Cust. Ledger Entry"; OldCustLedgerEntry: Record "Cust. Ledger Entry"; var TipoDesgloseXMLNode: DotNet XmlNode; var DesgloseFacturaXMLNode: DotNet XmlNode; var DomesticXMLNode: DotNet XmlNode; var DesgloseTipoOperacionXMLNode: DotNet XmlNode; var EUXMLNode: DotNet XmlNode; IsService: Boolean; DomesticCustomer: Boolean; RegimeCodes: array[3] of Code[2])
     var
         CustNo: Code[20];
         OldAmount: Decimal;
@@ -2420,21 +2406,9 @@ codeunit 10750 "SII XML Creator"
                 OldCustLedgerEntry."Posting Date", IsService, true, IsLocalRule);
             ReplacementAmount[i] := Abs(OldAmount + Amount);
         end;
-        UpdateAmountBufferWithOneStopShop(HasEntries, ReplacementAmount, TempVATEntry);
         ExportNonTaxableVATEntries(
           TipoDesgloseXMLNode, DesgloseFacturaXMLNode, DomesticXMLNode, DesgloseTipoOperacionXMLNode, EUXMLNode, IsService, DomesticCustomer,
           HasEntries, RegimeCodes, ReplacementAmount);
-    end;
-
-    local procedure UpdateAmountBufferWithOneStopShop(var HasEntries: array[2] of Boolean; var Amount: array[2] of Decimal; var TempVATEntry: Record "VAT Entry" temporary)
-    begin
-        TempVATEntry.SetRange("One Stop Shop Reporting", true);
-        TempVATEntry.CalcSums(Amount);
-        TempVATEntry.SetRange("One Stop Shop Reporting");
-        if TempVATEntry.Amount = 0 then
-            exit;
-        HasEntries[2] := true;
-        Amount[2] += TempVATEntry.Amount;
     end;
 
     local procedure ExportNonTaxableVATEntries(var TipoDesgloseXMLNode: DotNet XmlNode; var DesgloseFacturaXMLNode: DotNet XmlNode; var DomesticXMLNode: DotNet XmlNode; var DesgloseTipoOperacionXMLNode: DotNet XmlNode; var EUXMLNode: DotNet XmlNode; IsService: Boolean; DomesticCustomer: Boolean; HasEntries: array[2] of Boolean; RegimeCodes: array[3] of Code[2]; Amount: array[2] of Decimal)
@@ -2618,8 +2592,6 @@ codeunit 10750 "SII XML Creator"
         ECPercent: Decimal;
         ECAmount: Decimal;
         VATPctText: Text;
-        XmlNodeInnerXml: Text;
-        IsHandled: Boolean;
     begin
         TempVATEntry.SetRange("VAT %", TempVATEntry."VAT %");
         TempVATEntry.SetRange("EC %", TempVATEntry."EC %");
@@ -2665,11 +2637,6 @@ codeunit 10750 "SII XML Creator"
         OnFillDetalleIVANodeOnAfterGenerateRecargoEquivalenciaNodes(XMLNode, TempVATEntry);
 
         XMLDOMManagement.FindNode(XMLNode, '..', XMLNode);
-
-        XmlNodeInnerXml := XMLNode.InnerXml();
-        OnAfterFillDetalleIVANode(XmlNodeInnerXml, TempVATEntry, UseSign, Sign, FillEUServiceNodes, NonExemptTransactionType, RegimeCodes, AmountNodeName, IsHandled);
-        if IsHandled then
-            XMLNode.InnerXml(XmlNodeInnerXml);
     end;
 
     local procedure FillOperationDescription(var XMLNode: DotNet XmlNode; OperationDescription: Text; PostingDate: Date; LedgerEntryDescription: Text)
@@ -2943,11 +2910,6 @@ codeunit 10750 "SII XML Creator"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterFillDetalleIVANode(var XmlNodeInnerXml: Text; TempVATEntry: Record "VAT Entry" temporary; UseSign: Boolean; Sign: Integer; FillEUServiceNodes: Boolean; NonExemptTransactionType: Option S1,S2,S3,Initial; RegimeCodes: array[3] of Code[2]; AmountNodeName: Text; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnAfterGetCustomerByGLSetup(var Customer: Record Customer; CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
@@ -3098,7 +3060,7 @@ codeunit 10750 "SII XML Creator"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFillThirdPartyIdOnBeforeAssignValues(SIIDocUploadState: Record "SII Doc. Upload State"; var CountryCode: Code[20]; var Name: Text; var VatNo: Code[20]; IsIntraCommunity: Boolean)
+    local procedure OnFillThirdPartyIdOnBeforeAssignValues(SIIDocUploadState: Record "SII Doc. Upload State"; var CountryCode: Code[20]; var Name: Text; var VatNo: Code[20])
     begin
     end;
 
