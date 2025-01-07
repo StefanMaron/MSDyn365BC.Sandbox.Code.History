@@ -2,14 +2,18 @@ namespace Microsoft.PowerBIReports;
 
 using System.Integration.PowerBI;
 
-page 37031 "Bin Contents"
+#pragma warning disable AS0125
+#pragma warning disable AS0030
+page 37042 "PowerBI Work Center Load"
+#pragma warning restore AS0030
+#pragma warning restore AS0125
 {
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     PageType = Card;
-    Caption = 'Bin Contents';
-    AboutTitle = 'About Bin Contents';
-    AboutText = 'The Bin Contents report provides a detailed view of item quantities by bin code and location. It includes additional information such as warehouse quantity, pick and put-away quantities, and both negative and positive adjustments, offering a comprehensive overview of bin movements and inventory management within the warehouse.';
+    Caption = 'Work Center Load';
+    AboutTitle = 'About Work Center Load';
+    AboutText = 'View the percentage of production order time assigned vs Available Capacity for each Work Centre Group and/or Work Centre in a specified period. Allows you to determine if a Work Centre is overloaded and requires rescheduling.';
     Extensible = false;
 
     layout
@@ -57,7 +61,7 @@ page 37031 "Bin Contents"
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageTok: Label 'ReportSection12b3ff23621e20c1398d', Locked = true;
+        ReportPageTok: Label 'ReportSection83a7395d207d5b47b1a4', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()
@@ -65,7 +69,7 @@ page 37031 "Bin Contents"
         PowerBIReportsSetup: Record "PowerBI Reports Setup";
     begin
         SetupHelper.EnsureUserAcceptedPowerBITerms();
-        ReportId := SetupHelper.GetReportIdAndEnsureSetup(CurrPage.Caption(), PowerBIReportsSetup.FieldNo("Inventory Report Id"));
+        ReportId := SetupHelper.GetReportIdAndEnsureSetup(CurrPage.Caption(), PowerBIReportsSetup.FieldNo("Manufacturing Report Id"));
     end;
 }
 

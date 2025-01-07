@@ -2,14 +2,18 @@ namespace Microsoft.PowerBIReports;
 
 using System.Integration.PowerBI;
 
-page 36995 "General Ledger Entries"
+#pragma warning disable AS0125
+#pragma warning disable AS0030
+page 37049 "PowerBI Released Prod. Orders"
+#pragma warning restore AS0030
+#pragma warning restore AS0125
 {
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     PageType = Card;
-    Caption = 'General Ledger Entries';
-    AboutTitle = 'About General Ledger Entries';
-    AboutText = 'The General Ledger Entries report provides granular detail about the entries posted to the general ledger. ';
+    Caption = 'Released Production Orders';
+    AboutTitle = 'About Released Production Orders';
+    AboutText = 'View how your released production orders are tracking by comparing Expected Quantity vs Finished Quantity';
     Extensible = false;
 
     layout
@@ -57,7 +61,7 @@ page 36995 "General Ledger Entries"
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageTok: Label 'ReportSectionfdc853c4230265e530cc', Locked = true;
+        ReportPageTok: Label 'ReportSectionc2dea8def8e17bcc1d69', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()
@@ -65,7 +69,7 @@ page 36995 "General Ledger Entries"
         PowerBIReportsSetup: Record "PowerBI Reports Setup";
     begin
         SetupHelper.EnsureUserAcceptedPowerBITerms();
-        ReportId := SetupHelper.GetReportIdAndEnsureSetup(CurrPage.Caption(), PowerBIReportsSetup.FieldNo("Finance Report Id"));
+        ReportId := SetupHelper.GetReportIdAndEnsureSetup(CurrPage.Caption(), PowerBIReportsSetup.FieldNo("Manufacturing Report Id"));
     end;
 }
 

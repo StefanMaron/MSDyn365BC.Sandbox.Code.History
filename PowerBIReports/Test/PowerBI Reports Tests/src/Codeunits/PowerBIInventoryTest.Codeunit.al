@@ -639,7 +639,7 @@ codeunit 139877 "PowerBI Inventory Test"
         Commit();
 
         // [WHEN] Get request for item ledger entries is made
-        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Inventory.PowerBIReports."Item Ledger Entries", '');
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Inventory.PowerBIReports."Item Ledger Entries - PBI API", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddODataQueryParameter('$filter', 'itemNo eq ''' + Format(SalesLine."No.") + ''' OR itemNo eq ''' + Format(PurchLine."No.") + '''');
         UriBuilder.GetUri(Uri);
