@@ -6,7 +6,7 @@ pageextension 8051 "Customer Card" extends "Customer Card"
 {
     actions
     {
-        addlast(creation)
+        addafter(NewSalesCreditMemo)
         {
             action(NewContract)
             {
@@ -14,7 +14,7 @@ pageextension 8051 "Customer Card" extends "Customer Card"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Contract';
                 Image = FileContract;
-                RunObject = page "Customer Contract";
+                RunObject = Page "Customer Contract";
                 RunPageLink = "Sell-to Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a contract for the customer.';

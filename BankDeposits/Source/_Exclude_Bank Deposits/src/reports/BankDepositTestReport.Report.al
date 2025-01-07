@@ -450,15 +450,6 @@ report 1691 "Bank Deposit Test Report"
                             else
                                 ApplicationText := '';
 
-                            if RemainingAmountToApply <= 0 then
-                                CurrReport.Skip();
-                            if CustomerLedgerEntryBalances.ContainsKey("Cust. Ledger Entry"."Entry No.") then begin
-                                if CustomerLedgerEntryBalances.Get("Cust. Ledger Entry"."Entry No.") <= 0 then
-                                    CurrReport.Skip();
-                            end
-                            else
-                                CustomerLedgerEntryBalances.Add("Cust. Ledger Entry"."Entry No.", 0);
-
                             CalcFields("Remaining Amount");
                             if "Currency Code" <> Currency.Code then begin
                                 "Remaining Amount" :=
@@ -514,7 +505,6 @@ report 1691 "Bank Deposit Test Report"
                                 AmountApplied := AmountDue;
                             RemainingAmountToApply := RemainingAmountToApply - AmountPaid;
                             TotalAmountApplied := TotalAmountApplied + AmountApplied;
-                            CustomerLedgerEntryBalances.Set("Cust. Ledger Entry"."Entry No.", "Cust. Ledger Entry"."Remaining Amount" - AmountApplied);
                         end;
 
                         trigger OnPreDataItem()
@@ -588,15 +578,6 @@ report 1691 "Bank Deposit Test Report"
 
                         trigger OnAfterGetRecord()
                         begin
-                            if RemainingAmountToApply <= 0 then
-                                CurrReport.Skip();
-                            if VendorLedgerEntryBalances.ContainsKey("Vendor Ledger Entry"."Entry No.") then begin
-                                if VendorLedgerEntryBalances.Get("Vendor Ledger Entry"."Entry No.") <= 0 then
-                                    CurrReport.Skip();
-                            end
-                            else
-                                VendorLedgerEntryBalances.Add("Vendor Ledger Entry"."Entry No.", 0);
-
                             CalcFields("Remaining Amount");
                             if "Currency Code" <> Currency.Code then begin
                                 "Remaining Amount" :=
@@ -652,7 +633,6 @@ report 1691 "Bank Deposit Test Report"
                                 AmountApplied := AmountDue;
                             RemainingAmountToApply := RemainingAmountToApply - AmountPaid;
                             TotalAmountApplied := TotalAmountApplied + AmountApplied;
-                            VendorLedgerEntryBalances.Set("Vendor Ledger Entry"."Entry No.", "Vendor Ledger Entry"."Remaining Amount" - AmountApplied);
                         end;
 
                         trigger OnPreDataItem()
@@ -1051,8 +1031,6 @@ report 1691 "Bank Deposit Test Report"
         ApplicationTxt: Label 'Application';
         Dim1Number: Integer;
         Dim2Number: Integer;
-        CustomerLedgerEntryBalances: Dictionary of [Integer, Decimal];
-        VendorLedgerEntryBalances: Dictionary of [Integer, Decimal];
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         To_Be_Deposited_InCaptionLbl: Label 'To Be Deposited In';
         Bank_Deposit_Header___Bank_Account_No__CaptionLbl: Label 'Bank Account No.';
