@@ -2,7 +2,7 @@
     "id":  "9d71307c-b6e4-4a16-b5ca-6d1314bd3ee2",
     "name":  "BuildTools",
     "publisher":  "Microsoft",
-    "version":  "23.5.16502.28390",
+    "version":  "23.5.16502.28499",
     "platform":  "23.0.0.0",
     "target":  "OnPrem",
     "dependencies":  [
