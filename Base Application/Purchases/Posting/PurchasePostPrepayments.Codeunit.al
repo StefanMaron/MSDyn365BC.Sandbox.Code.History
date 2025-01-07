@@ -990,9 +990,7 @@ codeunit 444 "Purchase-Post Prepayments"
                           PurchHeader, PrepmtInvLineBuf2, TotalPrepmtInvLineBuffer, TotalPrepmtInvLineBufferDummy);
                     TempPurchaseLine := PurchLine;
                     TempPurchaseLine.Insert();
-                end
-                else
-                    OnBuildInvLineBufferOnPrepmtAmountZero(PurchHeader, PurchLine, PrepmtInvLineBuf2, PrepmtInvLineBuf, TempPurchaseLine);
+                end;
             until PurchLine.Next() = 0;
         if PurchSetup."Invoice Rounding" then
             if InsertInvoiceRounding(
@@ -1962,11 +1960,6 @@ codeunit 444 "Purchase-Post Prepayments"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckOpenPrepaymentLines(var PurchaseHeader: Record "Purchase Header"; DocumentType: Option; var Found: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBuildInvLineBufferOnPrepmtAmountZero(PurchaseHeader: Record "Purchase Header"; PurchaseLine: Record "Purchase Line"; var PrepaymentInvLineBuffer2: Record "Prepayment Inv. Line Buffer"; var PrepaymentInvLineBuffer: Record "Prepayment Inv. Line Buffer"; var TempPurchaseLineSource: Record "Purchase Line" temporary);
     begin
     end;
 
