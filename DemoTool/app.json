@@ -1,18 +1,16 @@
 {
-    "id":  "3f63a3de-6597-4097-9f34-b0ff7f92e6b0",
-    "name":  "DemoTool",
-    "publisher":  "Microsoft",
-    "version":  "24.2.20227.28491",
-    "platform":  "24.0.0.0",
-    "target":  "OnPrem",
-    "dependencies":  [
-
-                     ],
-    "resourceExposurePolicy":  {
-                                   "allowDebugging":  true,
-                                   "allowDownloadingSource":  true,
-                                   "includeSourceInSymbolFile":  true
-                               },
-    "application":  "24.2.0.0",
-    "brief":  "DemoTool (ES)"
+  "id": "3f63a3de-6597-4097-9f34-b0ff7f92e6b0",
+  "name": "DemoTool",
+  "publisher": "Microsoft",
+  "version": "24.3.21374.28486",
+  "platform": "24.0.0.0",
+  "target": "OnPrem",
+  "dependencies": [],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": true,
+    "includeSourceInSymbolFile": true
+  },
+  "application": "24.3.0.0",
+  "brief": "DemoTool (ES)"
 }

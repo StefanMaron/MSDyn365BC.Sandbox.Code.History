@@ -1,10 +1,10 @@
 {
-    "id":  "9d71307c-b6e4-4a16-b5ca-6d1314bd3ee2",
-    "name":  "BuildTools",
-    "publisher":  "Microsoft",
-    "version":  "24.2.20227.28491",
-    "platform":  "24.0.0.0",
-    "application":  "24.2.0.0",
-    "target":  "Cloud",
-    "showMyCode":  true
+  "id": "9d71307c-b6e4-4a16-b5ca-6d1314bd3ee2",
+  "name": "BuildTools",
+  "publisher": "Microsoft",
+  "version": "24.3.21374.28486",
+  "platform": "24.0.0.0",
+  "application": "24.3.0.0",
+  "target": "Cloud",
+  "showMyCode": true
 }
