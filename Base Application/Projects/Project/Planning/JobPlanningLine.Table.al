@@ -7,7 +7,6 @@ using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
-using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.UOM;
@@ -121,11 +120,9 @@ table 1003 "Job Planning Line"
             if (Type = const("G/L Account")) "G/L Account"
             else
             if (Type = const(Text)) "Standard Text";
-            ValidateTableRelation = false;
 
             trigger OnValidate()
             begin
-                "No." := FindOrCreateRecordByNo("No.");
                 ValidateModification(xRec."No." <> "No.", Rec.FieldNo("No."));
 
                 CheckUsageLinkRelations();
@@ -507,9 +504,6 @@ table 1003 "Job Planning Line"
             begin
                 if "Line Type" = "Line Type"::Billable then
                     FieldError("Line Type");
-
-                if (not "Usage Link") and ("Qty. to Assemble" <> 0) then
-                    FieldError("Usage Link");
 
                 if ("Qty. to Assemble" <> Quantity) and ("Qty. to Assemble" <> 0) and WhsePickReqForLocation() then
                     FieldError("Qty. to Assemble", StrSubstNo(DifferentQtyToAssembleErr, FieldCaption(Quantity)));
@@ -2033,7 +2027,7 @@ table 1003 "Job Planning Line"
         GetJob();
         if (Type = Type::Item) and Item.Get("No.") then
             if Item."Costing Method" = Item."Costing Method"::Standard then
-                if RetrieveCostPrice(CurrFieldNo) or (CurrFieldNo = FieldNo("Unit Price")) then begin
+                if RetrieveCostPrice(CurrFieldNo) then begin
                     if GetSKU() then
                         "Unit Cost (LCY)" := Round(SKU."Unit Cost" * "Qty. per Unit of Measure", UnitAmountRoundingPrecision)
                     else
@@ -2042,7 +2036,7 @@ table 1003 "Job Planning Line"
                 end else
                     RecalculateAmounts(Job."Exch. Calculation (Cost)", xRec."Unit Cost", "Unit Cost", "Unit Cost (LCY)")
             else
-                if RetrieveCostPrice(CurrFieldNo) or (CurrFieldNo = FieldNo("Unit Price")) then begin
+                if RetrieveCostPrice(CurrFieldNo) then begin
                     CalculateRetrievedCost(RetrievedCost);
                     "Unit Cost" := ConvertAmountToFCY(RetrievedCost, UnitAmountRoundingPrecisionFCY);
                     "Unit Cost (LCY)" := Round(RetrievedCost, UnitAmountRoundingPrecision);
@@ -3230,16 +3224,11 @@ table 1003 "Job Planning Line"
     end;
 
     local procedure AddItem(var NewJobPlanningLine: Record "Job Planning Line"; ItemNo: Code[20])
-    var
-        TransferExtendedText: Codeunit "Transfer Extended Text";
     begin
         NewJobPlanningLine."Line No." += 10000;
         NewJobPlanningLine.Validate(Type, NewJobPlanningLine.Type::Item);
         NewJobPlanningLine.Validate("No.", ItemNo);
         NewJobPlanningLine.Insert(true);
-
-        if TransferExtendedText.JobCheckIfAnyExtText(NewJobPlanningLine, false) then
-            TransferExtendedText.InsertJobExtText(NewJobPlanningLine);
     end;
 
     local procedure InitNewLine(var NewJobPlanningLine: Record "Job Planning Line")
@@ -3317,33 +3306,6 @@ table 1003 "Job Planning Line"
         PurchaseLine.SetRange("Job No.", "Job No.");
         PurchaseLine.SetRange("Job Task No.", "Job Task No.");
         PurchaseLine.SetRange("Job Planning Line No.", "Line No.");
-    end;
-
-    local procedure FindOrCreateRecordByNo(SourceNo: Code[20]): Code[20]
-    var
-        Item2: Record Item;
-        FindRecordManagement: Codeunit "Find Record Management";
-        FoundNo: Text;
-    begin
-        if Type = Type::Item then begin
-            if Item2.TryGetItemNoOpenCardWithView(FoundNo, SourceNo, false, true, false, '') then
-                exit(CopyStr(FoundNo, 1, MaxStrLen("No.")))
-        end else
-            exit(FindRecordManagement.FindNoFromTypedValue(GetType(Type), "No.", false));
-
-        exit(SourceNo);
-    end;
-
-    local procedure GetType(JobPlanningLineType: Enum "Job Planning Line Type"): Integer
-    begin
-        if JobPlanningLineType = JobPlanningLineType::Text then
-            exit(0);
-        if JobPlanningLineType = JobPlanningLineType::"G/L Account" then
-            exit(1);
-        if JobPlanningLineType = JobPlanningLineType::Item then
-            exit(2);
-        if JobPlanningLineType = JobPlanningLineType::Resource then
-            exit(3);
     end;
 
     [IntegrationEvent(false, false)]
