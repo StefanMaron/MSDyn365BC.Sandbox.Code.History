@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false,
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./AI Test Toolkit"
@@ -150,13 +158,5 @@
     {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
     }
-  ],
-  "settings": {
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false
-  }
+  ]
 }
