@@ -583,7 +583,7 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
             Error(AllocationAccountMustOnlyDistributeToGLAccountsErr);
     end;
 
-    procedure TransferDimensionSetID(var PurchaseLine: Record "Purchase Line"; var AllocationLine: Record "Allocation Line"; ModifiedByUser: Boolean)
+    local procedure TransferDimensionSetID(var PurchaseLine: Record "Purchase Line"; var AllocationLine: Record "Allocation Line"; ModifiedByUser: Boolean)
     var
         DimensionManagement: Codeunit DimensionManagement;
         DimensionSetIDArr: array[10] of Integer;
@@ -620,7 +620,7 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
         until AllocationAccountPurchaseLine.Next() = 0;
     end;
 
-    procedure VerifySelectedAllocationAccountNo(var PurchaseLine: Record "Purchase Line")
+    internal procedure VerifySelectedAllocationAccountNo(var PurchaseLine: Record "Purchase Line")
     var
         AllocationAccount: Record "Allocation Account";
     begin
