@@ -1,11 +1,11 @@
 {
   "settings": {
-    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
     },
+    "al.enableCodeActions": false,
     "allint.enabled": false,
-    "al.enableCodeActions": false
+    "al.enableCodeAnalysis": false
   },
   "folders": [
     {
@@ -135,10 +135,10 @@
       "path": "./Tests-Workflow"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./System Application/Email/src/Test Email"
     },
     {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
