@@ -2,14 +2,14 @@
     "id":  "f19ff748-0eb7-45e0-bac1-a79ff422c4bc",
     "name":  "Tests-DotNet-Internal",
     "publisher":  "Microsoft",
-    "version":  "24.1.18927.28488",
+    "version":  "24.2.20227.28491",
     "platform":  "24.0.0.0",
     "dependencies":  [
                          {
                              "id":  "5d86850b-0d76-4eca-bd7b-951ad998e997",
                              "name":  "Tests-TestLibraries",
                              "publisher":  "Microsoft",
-                             "version":  "24.1.0.0"
+                             "version":  "24.2.0.0"
                          }
                      ],
     "target":  "OnPrem",
@@ -18,6 +18,6 @@
                                    "allowDownloadingSource":  true,
                                    "includeSourceInSymbolFile":  true
                                },
-    "application":  "24.1.0.0",
+    "application":  "24.2.0.0",
     "brief":  "Tests-DotNet-Internal (IN)"
 }
