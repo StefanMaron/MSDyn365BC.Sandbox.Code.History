@@ -1,6 +1,6 @@
 namespace Microsoft.PowerBIReports;
 
-query 36950 "Dimension Set Entries"
+query 36950 "PowerBI Dimension Set Entries"
 {
     Access = Internal;
     Caption = 'Power BI Dimension Set Entries';

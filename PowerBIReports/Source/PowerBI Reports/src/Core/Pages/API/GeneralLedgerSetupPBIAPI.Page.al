@@ -2,11 +2,10 @@ namespace Microsoft.PowerBIReports;
 
 using Microsoft.Finance.GeneralLedger.Setup;
 
-page 36956 "General Ledger Setup"
+page 36956 "General Ledger Setup - PBI API"
 {
     PageType = API;
-    // IMPORTANT: do not change the caption - see slice 546954
-    Caption = 'General Ledger Setup', Comment = 'IMPORTANT: Use the same translation as in BaseApp''s page "General Ledger Setup" id: "Page 4050813720 - Property 2879900210" ';
+    Caption = 'General Ledger Setup';
     APIPublisher = 'microsoft';
     APIGroup = 'analytics';
     APIVersion = 'v0.5';

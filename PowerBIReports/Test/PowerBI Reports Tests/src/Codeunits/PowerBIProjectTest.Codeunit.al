@@ -226,7 +226,7 @@ codeunit 139879 "PowerBI Project Test"
         Commit();
 
         // [WHEN] Get request for job ledger entries is made
-        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Projects.PowerBIReports."Job Ledger Entries", '');
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Projects.PowerBIReports."Job Ledger Entries - PBI API", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.GetUri(Uri);
         UriBuilder.AddODataQueryParameter('$filter', StrSubstNo('jobNo eq ''%1''', Job."No."));

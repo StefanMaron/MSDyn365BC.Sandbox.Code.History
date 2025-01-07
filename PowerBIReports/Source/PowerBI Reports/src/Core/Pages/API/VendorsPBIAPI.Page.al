@@ -2,11 +2,10 @@ namespace Microsoft.PowerBIReports;
 
 using Microsoft.Purchases.Vendor;
 
-page 36959 Vendors
+page 36959 "Vendors - PBI API"
 {
     PageType = API;
-    // IMPORTANT: do not change the caption - see slice 546954
-    Caption = 'Vendors', Comment = 'Only for RU: Use the same translation as the "Vendors" page in BaseApp.';
+    Caption = 'Power BI Vendors';
     APIPublisher = 'microsoft';
     APIGroup = 'analytics';
     APIVersion = 'v0.5';

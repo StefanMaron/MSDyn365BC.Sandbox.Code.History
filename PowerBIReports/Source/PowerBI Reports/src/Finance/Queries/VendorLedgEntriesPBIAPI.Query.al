@@ -3,7 +3,7 @@ namespace Microsoft.Finance.PowerBIReports;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.History;
 
-query 36963 "Vendor Ledger Entries"
+query 36963 "Vendor Ledg. Entries - PBI API"
 {
     Access = Internal;
     QueryType = API;

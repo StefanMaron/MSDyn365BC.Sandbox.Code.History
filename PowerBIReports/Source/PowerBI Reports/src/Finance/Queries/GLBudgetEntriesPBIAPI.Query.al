@@ -2,7 +2,7 @@ namespace Microsoft.Finance.PowerBIReports;
 
 using Microsoft.Finance.GeneralLedger.Budget;
 
-query 36960 "G/L Budget Entries"
+query 36960 "G/L Budget Entries - PBI API"
 {
     Access = Internal;
     QueryType = API;

@@ -3,7 +3,7 @@ namespace Microsoft.PowerBIReports;
 using Microsoft.Finance.GeneralLedger.Setup;
 
 
-query 36951 "Dimension Sets"
+query 36951 "PowerBI Dimension Sets"
 {
     // ***This is an internal query which is no longer directly exposed to Power BI***
     // ***This Query is used internally to refresh and store data in Table 57699 - Power BI Dim. Set Entry***

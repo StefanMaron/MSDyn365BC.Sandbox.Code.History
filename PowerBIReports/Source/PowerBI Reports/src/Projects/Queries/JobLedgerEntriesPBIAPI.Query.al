@@ -2,7 +2,7 @@ namespace Microsoft.Projects.PowerBIReports;
 
 using Microsoft.Projects.Project.Ledger;
 
-query 36992 "Job Ledger Entries"
+query 36992 "Job Ledger Entries - PBI API"
 {
     Access = Internal;
     QueryType = API;

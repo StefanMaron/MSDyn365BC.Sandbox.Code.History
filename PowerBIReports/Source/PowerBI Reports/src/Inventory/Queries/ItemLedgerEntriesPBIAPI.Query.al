@@ -2,7 +2,7 @@ namespace Microsoft.Inventory.PowerBIReports;
 
 using Microsoft.Inventory.Ledger;
 
-query 36968 "Item Ledger Entries"
+query 36968 "Item Ledger Entries - PBI API"
 {
     Access = Internal;
     Caption = 'Power BI Item Ledger Entries';

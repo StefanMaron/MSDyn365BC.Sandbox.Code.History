@@ -2,7 +2,7 @@ namespace Microsoft.PowerBIReports;
 
 using Microsoft.Inventory.Item;
 
-query 36953 Items
+query 36953 "Items - PBI API"
 {
     Access = Internal;
     Caption = 'Power BI Items';

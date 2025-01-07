@@ -81,7 +81,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for vendor ledger entry is made
-        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Finance.PowerBIReports."Vendor Ledger Entries", '');
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Finance.PowerBIReports."Vendor Ledg. Entries - PBI API", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', StrSubstNo('vleEntryNo eq %1', VendorLedgerEntry."Entry No."));
         UriBuilder.GetUri(Uri);
@@ -346,7 +346,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for G/L budget entry is made
-        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Finance.PowerBIReports."G/L Budget Entries", '');
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Finance.PowerBIReports."G/L Budget Entries - PBI API", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', StrSubstNo('budgetName eq ''%1''', GLBudgetEntry."Budget Name"));
         UriBuilder.GetUri(Uri);
