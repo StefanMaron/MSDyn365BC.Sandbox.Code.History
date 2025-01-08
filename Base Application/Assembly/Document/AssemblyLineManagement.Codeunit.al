@@ -405,11 +405,9 @@ codeunit 905 "Assembly Line Management"
                         TempAssemblyLine.SetRange(Type, TempAssemblyLine.Type::Item);
                         TempAssemblyLine.SetFilter("Location Code", '<>%1', AsmHeader."Location Code");
                         if not TempAssemblyLine.IsEmpty() then
-                            if GuiAllowed then begin
+                            if GuiAllowed then
                                 if Confirm(StrSubstNo(Text001, TempAssemblyLine.FieldCaption("Location Code")), false) then
                                     UpdateLocation := true;
-                            end else
-                                UpdateLocation := true;
                         TempAssemblyLine.SetRange("Location Code");
                         TempAssemblyLine.SetRange(Type);
                     end;

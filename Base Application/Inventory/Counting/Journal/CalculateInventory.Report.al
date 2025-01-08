@@ -332,6 +332,7 @@ report 790 "Calculate Inventory"
     end;
 
     var
+        WhseEntry: Record "Warehouse Entry";
         SourceCodeSetup: Record "Source Code Setup";
         DimSetEntry: Record "Dimension Set Entry";
         OldWhseEntry: Record "Warehouse Entry";
@@ -358,7 +359,6 @@ report 790 "Calculate Inventory"
         Text003: Label 'Retain Dimensions';
 
     protected var
-        WhseEntry: Record "Warehouse Entry";
         ItemJnlBatch: Record "Item Journal Batch";
         ItemJnlLine: Record "Item Journal Line";
         Location: Record Location;
@@ -380,7 +380,7 @@ report 790 "Calculate Inventory"
         ItemJnlLine := NewItemJnlLine;
     end;
 
-    procedure ValidatePostingDate()
+    local procedure ValidatePostingDate()
     var
         NoSeries: Codeunit "No. Series";
     begin
@@ -787,15 +787,7 @@ report 790 "Calculate Inventory"
     end;
 
     local procedure ItemBinLocationIsCalculated(BinCode: Code[20]): Boolean
-    var
-        IsHandled: Boolean;
-        IsCalculated: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeItemBinLocationIsCalculated("Item Ledger Entry", IsHandled, IsCalculated);
-        if IsHandled then
-            exit(IsCalculated);
-
         TempQuantityOnHandBuffer.Reset();
         TempQuantityOnHandBuffer.SetRange("Item No.", "Item Ledger Entry"."Item No.");
         TempQuantityOnHandBuffer.SetRange("Variant Code", "Item Ledger Entry"."Variant Code");
@@ -1021,7 +1013,7 @@ report 790 "Calculate Inventory"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeRetrieveBuffer(var TempInventoryBuffer: Record "Inventory Buffer" temporary; ItemLedgerEntry: Record "Item Ledger Entry"; BinCode: Code[20]; DimEntryNo: Integer; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
@@ -1128,11 +1120,6 @@ report 790 "Calculate Inventory"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcWhseQtyOnAfterGetWhseItemTrkgSetup(LocationCode: Code[10]; var ItemTrackingSetup: Record "Item Tracking Setup")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeItemBinLocationIsCalculated(ItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean; var IsCalculated: Boolean)
     begin
     end;
 }
