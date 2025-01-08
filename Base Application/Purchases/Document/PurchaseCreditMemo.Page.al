@@ -540,7 +540,7 @@ page 52 "Purchase Credit Memo"
                 {
                     ApplicationArea = Location;
                     Importance = Additional;
-                    ToolTip = 'Specifies the location where the items are to be shipped. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
+                    ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
                 }
                 field(Correction; Rec.Correction)
                 {
