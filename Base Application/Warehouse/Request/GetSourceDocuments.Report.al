@@ -960,7 +960,7 @@ report 5753 "Get Source Documents"
         Message(StrSubstNo(Text004Msg, ActivitiesCreated) + SpecialHandlingMessage);
     end;
 
-    [IntegrationEvent(true, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnAfterCreateRcptHeader(var WarehouseReceiptHeader: Record "Warehouse Receipt Header"; WarehouseRequest: Record "Warehouse Request"; PurchaseLine: Record "Purchase Line")
     begin
     end;
