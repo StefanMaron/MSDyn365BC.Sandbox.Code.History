@@ -5,7 +5,7 @@
       "**.xlf": true
     },
     "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "al.enableCodeActions": false
+    "al.enableCodeActions": false,
+    "allint.enabled": false
   }
 }
