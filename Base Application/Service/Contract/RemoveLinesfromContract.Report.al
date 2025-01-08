@@ -48,7 +48,7 @@ report 6034 "Remove Lines from Contract"
             begin
                 if DeleteLinesOption = DeleteLinesOption::"Print Only" then begin
                     Clear(ExpiredContractLinesTest);
-                    ExpiredContractLinesTest.InitVariables(RemoveLinesToDate, ReasonCodeRec.Code);
+                    ExpiredContractLinesTest.InitVariables(RemoveLinesToDate, ReasonCode);
                     ExpiredContractLinesTest.SetTableView("Service Contract Line");
                     ExpiredContractLinesTest.RunModal();
                     CurrReport.Break();
@@ -58,7 +58,7 @@ report 6034 "Remove Lines from Contract"
                     Error(RemoveLinesToDateNotDefinedErr);
                 ServiceMgtSetup.Get();
                 if ServiceMgtSetup."Use Contract Cancel Reason" then
-                    if ReasonCodeRec.Code = '' then
+                    if ReasonCode = '' then
                         Error(ReasonCodeNotDefinedErr);
                 SetFilter("Contract Expiration Date", '<>%1&<=%2', 0D, RemoveLinesToDate);
 
@@ -98,7 +98,7 @@ report 6034 "Remove Lines from Contract"
 
                         trigger OnValidate()
                         begin
-                            ReasonCodeRec.Get(ReasonCodeRec.Code);
+                            ReasonCodeRec.Get(ReasonCode);
                         end;
                     }
                     field("Reason Code"; ReasonCodeRec.Description)
@@ -152,6 +152,7 @@ report 6034 "Remove Lines from Contract"
         ReasonCodeRec: Record "Reason Code";
         CreateCreditfromContractLines: Codeunit CreateCreditfromContractLines;
         RemoveLinesToDate: Date;
+        ReasonCode: Code[10];
         DeleteLinesOption: Option "Delete Lines","Print Only";
         ProgressDialog: Dialog;
         i: Integer;
