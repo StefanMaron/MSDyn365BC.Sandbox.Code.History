@@ -37,7 +37,7 @@ codeunit 6102 "E-Doc. Export"
         if IsHandled then
             exit;
 
-        DocumentSendingProfile := EDocumentProcessing.GetDocSendingProfileForDocRef(EDocSourceRecRef);
+        DocumentSendingProfile := EDocumentHelper.GetDocSendingProfileForDocRef(EDocSourceRecRef);
         if (DocumentSendingProfile."Electronic Document" = DocumentSendingProfile."Electronic Document"::"Extended E-Document Service Flow") and (not WorkFlow.Get(DocumentSendingProfile."Electronic Service Flow")) then
             Error(DocumentSendingProfileWithWorkflowErr, DocumentSendingProfile."Electronic Service Flow", Format(DocumentSendingProfile."Electronic Document"::"Extended E-Document Service Flow"), DocumentSendingProfile.Code);
         WorkFlow.TestField(Enabled);
@@ -69,7 +69,7 @@ codeunit 6102 "E-Doc. Export"
             exit;
 
         IsDocumentTypeSupported := false;
-        DocumentSendingProfile := EDocumentProcessing.GetDocSendingProfileForDocRef(SourceDocumentHeader);
+        DocumentSendingProfile := EDocumentHelper.GetDocSendingProfileForDocRef(SourceDocumentHeader);
         if EDocWorkFlowProcessing.DoesFlowHasEDocService(EDocumentService, DocumentSendingProfile."Electronic Service Flow") then
             if EDocumentService.FindSet() then
                 repeat
@@ -84,45 +84,38 @@ codeunit 6102 "E-Doc. Export"
             OnAfterCreateEDocument(EDocument, SourceDocumentHeader);
 
             EDocumentLog.InsertLog(EDocument, Enum::"E-Document Service Status"::Created);
-            EDocumentProcessing.InsertServiceStatus(EDocument, EDocumentService, Enum::"E-Document Service Status"::Created);
-            EDocumentProcessing.ModifyEDocumentStatus(EDocument, Enum::"E-Document Service Status"::Created);
 
             EDocumentBackgroundJobs.StartEDocumentCreatedFlow(EDocument);
         end;
     end;
 
-    internal procedure ExportEDocument(var EDocument: Record "E-Document"; var EDocumentService: Record "E-Document Service") Success: Boolean
+    internal procedure ExportEDocument(var EDocument: Record "E-Document"; var EDocService: Record "E-Document Service") Success: Boolean
     var
         TempEDocMapping: Record "E-Doc. Mapping" temporary;
-        EDocLog: Record "E-Document Log";
         EDocumentLog: Codeunit "E-Document Log";
         TempBlob: Codeunit "Temp Blob";
         SourceDocumentHeaderMapped, SourceDocumentLineMapped : RecordRef;
         SourceDocumentHeader, SourceDocumentLines : RecordRef;
-        EDocServiceStatus: Enum "E-Document Service Status";
-        ErrorCount: Integer;
+        EDocLogEntryNo, ErrorCount : Integer;
     begin
         SourceDocumentHeader.Get(EDocument."Document Record ID");
-        EDocumentProcessing.GetLines(EDocument, SourceDocumentLines);
-        MapEDocument(SourceDocumentHeader, SourceDocumentLines, EDocumentService, SourceDocumentHeaderMapped, SourceDocumentLineMapped, TempEDocMapping, false);
+        EDocumentHelper.GetLines(EDocument, SourceDocumentLines);
+        MapEDocument(SourceDocumentHeader, SourceDocumentLines, EDocService, SourceDocumentHeaderMapped, SourceDocumentLineMapped, TempEDocMapping, false);
 
         ErrorCount := EDocumentErrorHelper.ErrorMessageCount(EDocument);
-        CreateEDocument(EDocumentService, EDocument, SourceDocumentHeaderMapped, SourceDocumentLineMapped, TempBlob);
+        CreateEDocument(EDocService, EDocument, SourceDocumentHeaderMapped, SourceDocumentLineMapped, TempBlob);
         Success := EDocumentErrorHelper.ErrorMessageCount(EDocument) = ErrorCount;
-        if Success then
-            EDocServiceStatus := Enum::"E-Document Service Status"::Exported
-        else
-            EDocServiceStatus := Enum::"E-Document Service Status"::"Export Error";
-
-        EDocLog := EDocumentLog.InsertLog(EDocument, EDocumentService, TempBlob, EDocServiceStatus);
-        EDocumentLog.InsertMappingLog(EDocLog, TempEDocMapping);
-        EDocumentProcessing.ModifyServiceStatus(EDocument, EDocumentService, EDocServiceStatus);
-        EDocumentProcessing.ModifyEDocumentStatus(EDocument, EDocServiceStatus);
+        if Success then begin
+            EDocLogEntryNo := EDocumentLog.InsertLog(EDocument, EDocService, TempBlob, Enum::"E-Document Service Status"::Exported);
+            EDocumentLog.InsertMappingLog(EDocLogEntryNo, TempEDocMapping);
+        end else
+            EDocumentLog.InsertLog(EDocument, EDocService, Enum::"E-Document Service Status"::"Export Error");
     end;
 
     internal procedure ExportEDocumentBatch(var EDocuments: Record "E-Document"; var EDocService: Record "E-Document Service"; var TempEDocMappingLogs: Record "E-Doc. Mapping Log" temporary; var TempBlob: Codeunit "Temp Blob"; var EDocumentsErrorCount: Dictionary of [Integer, Integer])
     var
         TempEDocMapping: Record "E-Doc. Mapping" temporary;
+        EDocumentLog: Codeunit "E-Document Log";
         SourceDocumentHeaderMapped, SourceDocumentLineMapped : RecordRef;
         SourceDocumentHeader, SourceDocumentLines : RecordRef;
         I: Integer;
@@ -132,19 +125,18 @@ codeunit 6102 "E-Doc. Export"
         repeat
             TempEDocMapping.DeleteAll();
             SourceDocumentHeader.Get(EDocuments."Document Record ID");
-            EDocumentProcessing.GetLines(EDocuments, SourceDocumentLines);
+            EDocumentHelper.GetLines(EDocuments, SourceDocumentLines);
             MapEDocument(SourceDocumentHeader, SourceDocumentLines, EDocService, SourceDocumentHeaderMapped, SourceDocumentLineMapped, TempEDocMapping, false);
             if TempEDocMapping.FindSet() then
                 repeat
                     TempEDocMappingLogs.InitFromMapping(TempEDocMapping);
-                    TempEDocMappingLogs."Entry No." := I; // We need to set key for temp record when inserting
+                    TempEDocMappingLogs."Entry No." := I;
                     TempEDocMappingLogs.Validate("E-Doc Entry No.", EDocuments."Entry No");
                     TempEDocMappingLogs.Insert();
                     I += 1;
                 until TempEDocMapping.Next() = 0;
             SourceDocumentLines.Close();
-            EDocumentProcessing.ModifyServiceStatus(EDocuments, EDocService, Enum::"E-Document Service Status"::Created);
-            EDocumentProcessing.ModifyEDocumentStatus(EDocuments, Enum::"E-Document Service Status"::Created);
+            EDocumentLog.UpdateServiceStatus(EDocuments, EDocService, Enum::"E-Document Service Status"::Created);
             EDocumentsErrorCount.Add(EDocuments."Entry No", EDocumentErrorHelper.ErrorMessageCount(EDocuments));
         until EDocuments.Next() = 0;
 
@@ -196,7 +188,7 @@ codeunit 6102 "E-Doc. Export"
         EDocument.Init();
         EDocument.Validate("Document Record ID", SourceDocumentHeader.RecordId);
         EDocument.Validate(Status, EDocument.Status::"In Progress");
-        DocumentSendingProfile.Get(EDocumentProcessing.GetDocSendingProfileForDocRef(SourceDocumentHeader).Code);
+        DocumentSendingProfile.Get(EDocumentHelper.GetDocSendingProfileForDocRef(SourceDocumentHeader).Code);
         EDocument."Document Sending Profile" := DocumentSendingProfile.Code;
         EDocument."Workflow Code" := DocumentSendingProfile."Electronic Service Flow";
         EDocument.Direction := EDocument.Direction::Outgoing;
@@ -327,14 +319,14 @@ codeunit 6102 "E-Doc. Export"
     begin
         // Commit before create document with error handling
         Commit();
-        EDocumentProcessing.GetTelemetryDimensions(EDocService, EDocument, TelemetryDimensions);
+        EDocumentHelper.GetTelemetryDimensions(EDocService, EDocument, TelemetryDimensions);
         Telemetry.LogMessage('0000LBF', EDocTelemetryCreateScopeStartLbl, Verbosity::Normal, DataClassification::OrganizationIdentifiableInformation, TelemetryScope::All, TelemetryDimensions);
 
+        Clear(EDocumentCreate);
         EDocumentCreate.SetSource(EDocService, EDocument, SourceDocumentHeader, SourceDocumentLines, TempBlob);
         if not EDocumentCreate.Run() then
             EDocumentErrorHelper.LogSimpleErrorMessage(EDocument, GetLastErrorText());
 
-        EDocumentCreate.GetSource(EDocument);
         Telemetry.LogMessage('0000LBG', EDocTelemetryCreateScopeEndLbl, Verbosity::Normal, DataClassification::OrganizationIdentifiableInformation, TelemetryScope::All);
     end;
 
@@ -346,7 +338,7 @@ codeunit 6102 "E-Doc. Export"
     begin
         // Commit before create document with error handling
         Commit();
-        EDocumentProcessing.GetTelemetryDimensions(EDocService, EDocument, TelemetryDimensions);
+        EDocumentHelper.GetTelemetryDimensions(EDocService, EDocument, TelemetryDimensions);
         Telemetry.LogMessage('0000LBH', EDocTelemetryCreateBatchScopeStartLbl, Verbosity::Normal, DataClassification::OrganizationIdentifiableInformation, TelemetryScope::All, TelemetryDimensions);
 
         Clear(EDocumentCreate);
@@ -359,8 +351,6 @@ codeunit 6102 "E-Doc. Export"
             until EDocument.Next() = 0;
         end;
 
-        // Read E-Document from database as multiple docs could be modified inside EDocumentCreate;
-        EDocument.FindSet();
         Telemetry.LogMessage('0000LBI', EDocTelemetryCreateBatchScopeEndLbl, Verbosity::Normal, DataClassification::OrganizationIdentifiableInformation, TelemetryScope::All);
     end;
 
@@ -468,7 +458,7 @@ codeunit 6102 "E-Doc. Export"
     end;
 
     var
-        EDocumentProcessing: Codeunit "E-Document Processing";
+        EDocumentHelper: Codeunit "E-Document Processing";
         EDocumentErrorHelper: Codeunit "E-Document Error Helper";
         Telemetry: Codeunit Telemetry;
         EDocumentInterface: Interface "E-Document";

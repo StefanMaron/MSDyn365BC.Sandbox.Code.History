@@ -35,7 +35,6 @@ permissionset 36951 "PowerBi Report Basic"
         page "Date Setup" = X,
         page "General Ledger Setup - PBI API" = X,
         page Locations = X,
-        page "Power BI Selection Lookup" = X,
         page "Purchasing Scorecard" = X,
         page "Salesperson/Purchasers" = X,
         page "PowerBI Reports Setup" = X,

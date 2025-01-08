@@ -3,7 +3,7 @@ namespace Microsoft.Integration.Shopify;
 page 30138 "Shpfy Languages"
 {
     ApplicationArea = All;
-    Caption = 'Shopify Languages';
+    Caption = 'Shpfy Languages';
     PageType = List;
     SourceTable = "Shpfy Language";
     UsageCategory = None;
