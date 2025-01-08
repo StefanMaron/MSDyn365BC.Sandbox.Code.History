@@ -26,7 +26,7 @@ page 36995 "PowerBI General Ledg. Entries"
 
                 trigger ControlAddInReady()
                 begin
-                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageTok);
+                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
@@ -61,7 +61,7 @@ page 36995 "PowerBI General Ledg. Entries"
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageTok: Label 'ReportSectionfdc853c4230265e530cc', Locked = true;
+        ReportPageLbl: Label 'ReportSectionfdc853c4230265e530cc', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()
