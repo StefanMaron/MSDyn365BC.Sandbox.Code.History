@@ -1496,7 +1496,6 @@ table 167 Job
             if not IsHandled then begin
 #endif
                 "No. Series" := JobsSetup."Job Nos.";
-                OnInitJobNoOnAfterAssignNoSeries(Rec, xRec, JobsSetup);
                 if NoSeries.AreRelated("No. Series", xRec."No. Series") then
                     "No. Series" := xRec."No. Series";
                 "No." := NoSeries.GetNextNo("No. Series");
@@ -3348,11 +3347,6 @@ table 167 Job
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckIfTimeSheetLineLinkExist(var Job: Record Job; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInitJobNoOnAfterAssignNoSeries(var Job: Record Job; var xJob: Record Job; var JobsSetup: Record "Jobs Setup")
     begin
     end;
 }
