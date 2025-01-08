@@ -138,14 +138,7 @@ table 5207 "Employee Absence"
     }
 
     trigger OnInsert()
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeOnInsert(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         EmployeeAbsence.SetCurrentKey("Entry No.");
         if EmployeeAbsence.FindLast() then
             "Entry No." := EmployeeAbsence."Entry No." + 1
@@ -170,11 +163,6 @@ table 5207 "Employee Absence"
     begin
         HumanResourcesSetup.Get();
         HumanResourcesSetup.TestField("Base Unit of Measure");
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnInsert(var EmployeeAbsence: Record "Employee Absence"; var IsHandled: Boolean)
-    begin
     end;
 }
 
