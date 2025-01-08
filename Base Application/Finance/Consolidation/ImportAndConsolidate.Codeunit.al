@@ -33,7 +33,6 @@ codeunit 107 "Import and Consolidate"
         NoSeries: Codeunit "No. Series";
         ConsolidationMethod: Interface "Consolidation Method";
         ImportConsolidationData: Interface "Import Consolidation Data";
-        IsHandled: Boolean;
     begin
         if ConsolidationProcess.Status <> ConsolidationProcess.Status::NotStarted then
             exit;
@@ -77,12 +76,8 @@ codeunit 107 "Import and Consolidate"
                 BusUnitInConsProcess.Modify();
                 Commit();
                 Clear(ImportConsolidationFromDB);
-                IsHandled := false;
-                OnImportAndConsolidateOnBeforeSetConsolidationProcessParameters(ConsolidationProcess, BusUnitInConsProcess, IsHandled);
-                if not IsHandled then begin
-                    ImportConsolidationFromDB.SetConsolidationProcessParameters(ConsolidationProcess, BusUnitInConsProcess);
-                    ImportConsolidationFromDB.Execute('');
-                end;
+                ImportConsolidationFromDB.SetConsolidationProcessParameters(ConsolidationProcess, BusUnitInConsProcess);
+                ImportConsolidationFromDB.Execute('');
                 BusUnitInConsProcess.Status := BusUnitInConsProcess.Status::Finished;
                 BusUnitInConsProcess.Modify();
                 Commit();
@@ -101,11 +96,6 @@ codeunit 107 "Import and Consolidate"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetBusinessUnitConsolidationImplementations(BusinessUnit: Record "Business Unit"; BusUnitInConsProcess: Record "Bus. Unit In Cons. Process"; var ImportConsolidationDataImplementation: Interface "Import Consolidation Data"; var ConsolidationMethodImplementation: Interface "Consolidation Method")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnImportAndConsolidateOnBeforeSetConsolidationProcessParameters(var ConsolidationProcess: Record "Consolidation Process"; var BusUnitInConsProcess: Record "Bus. Unit In Cons. Process"; var IsHandled: Boolean)
     begin
     end;
 
