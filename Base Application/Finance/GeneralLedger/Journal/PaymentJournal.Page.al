@@ -1461,15 +1461,12 @@ page 256 "Payment Journal"
 
                     trigger OnAction()
                     var
-                        BackupRec: Record "Gen. Journal Line";
                         GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
                     begin
                         if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
                             Error(ActionOnlyAllowedForAllocationAccountsErr);
 
-                        BackupRec.Copy(Rec);
-                        BackupRec.SetRecFilter();
-                        GenJournalAllocAccMgt.CreateLines(BackupRec);
+                        GenJournalAllocAccMgt.CreateLines(Rec);
                         Rec.Delete();
                         CurrPage.Update(false);
                     end;
@@ -2044,6 +2041,7 @@ page 256 "Payment Journal"
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
         RepCreateEFTFile: Report "Create EFT File";
+        GenJnlManagement: Codeunit GenJnlManagement;
         CheckManagement: Codeunit CheckManagement;
         JournalErrorsMgt: Codeunit "Journal Errors Mgt.";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
@@ -2052,6 +2050,8 @@ page 256 "Payment Journal"
         ChangeExchangeRate: Page "Change Exchange Rate";
         WHTManagement: Codeunit WHTManagement;
         PostDatedCheckMgt: Codeunit PostDatedCheckMgt;
+        AccName: Text[100];
+        BalAccName: Text[100];
         GenJnlBatchApprovalStatus: Text[20];
         GenJnlLineApprovalStatus: Text[20];
         Balance: Decimal;
@@ -2101,10 +2101,8 @@ page 256 "Payment Journal"
         VoidCheckQst: Label 'Void Check %1?', Comment = '%1 - check number';
         VoidAllPrintedChecksQst: Label 'Void all printed checks?';
         GeneratingPaymentsMsg: Label 'Generating Payment file...';
-        AmountToApplyMissMatchMsg: Label 'Amount assigned on Apply Entries (%1) is bigger then the amount on the line (%2). System will remove all related Applies-to ID. Do you want to proceed?', Comment = '%1 - Amount to apply, %2 - Amount on the line';
 
     protected var
-        GenJnlManagement: Codeunit GenJnlManagement;
         ShortcutDimCode: array[8] of Code[20];
         CurrentJnlBatchName: Code[10];
         DimVisible1: Boolean;
@@ -2116,8 +2114,6 @@ page 256 "Payment Journal"
         DimVisible7: Boolean;
         DimVisible8: Boolean;
         ApplyEntriesActionEnabled: Boolean;
-        AccName: Text[100];
-        BalAccName: Text[100];
 
     local procedure CheckForPmtJnlErrors()
     var
@@ -2171,7 +2167,7 @@ page 256 "Payment Journal"
         exit(GenJournalLine.FindSet());
     end;
 
-    procedure SetControlAppearanceFromBatch()
+    protected procedure SetControlAppearanceFromBatch()
     begin
         SetApprovalStateForBatch();
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
@@ -2285,14 +2281,14 @@ page 256 "Payment Journal"
         SmallestLineAmountToApply: Decimal;
         JournalAmount: Decimal;
         AmountToApply: Decimal;
+        AmountToApplyMissMatchMsg: Label 'Amount assigned on Apply Entries (%1) is bigger then the amount on the line (%2). System will remove all related Applies-to ID. Do you want to proceed?', Comment = '%1 - Amount to apply, %2 - Amount on the line';
     begin
         if Rec."Document Type" <> Rec."Document Type"::"Payment" then
             exit;
 
         if not (((xRec.Amount <> 0) and (xRec.Amount <> Rec.Amount) and (Rec.Amount <> 0))
             or ((xRec."Amount (LCY)" <> 0) and (xRec."Amount (LCY)" <> Rec."Amount (LCY)") and (Rec."Amount (LCY)" <> 0))) then
-            if AmountZeroConfirmation() then
-                exit;
+            exit;
 
         AmountToApply := 0;
         SmallestLineAmountToApply := 0;
@@ -2350,25 +2346,10 @@ page 256 "Payment Journal"
 
         case Rec."Account Type" of
             Rec."Account Type"::Customer:
-                begin
-                    CustEntrySetApplId.RemoveApplId(CustLedgEntryMarkedToApply, Rec."Applies-to ID");
-                    Rec.Validate("Applies-to ID", '');
-                end;
+                CustEntrySetApplId.RemoveApplId(CustLedgEntryMarkedToApply, Rec."Applies-to ID");
             Rec."Account Type"::Vendor:
-                begin
-                    VendEntrySetApplId.RemoveApplId(VendorLedgerEntryMarkedToApply, Rec."Applies-to ID");
-                    Rec.Validate("Applies-to ID", '');
-                end;
+                VendEntrySetApplId.RemoveApplId(VendorLedgerEntryMarkedToApply, Rec."Applies-to ID");
         end;
-    end;
-
-    local procedure AmountZeroConfirmation(): Boolean
-    begin
-        if (xRec."Applies-to ID" <> '') then
-            if not Confirm(AmountToApplyMissMatchMsg, false, xRec.Amount, Rec.Amount) then
-                Error('');
-
-        exit(true);
     end;
 
 #if not CLEAN22

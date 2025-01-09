@@ -364,7 +364,7 @@ codeunit 80 "Sales-Post"
 
         OnRunOnBeforeFinalizePosting(
           SalesHeader, SalesShptHeader, SalesInvHeader, SalesCrMemoHeader, ReturnRcptHeader, GenJnlPostLine, SuppressCommit,
-          GenJnlLineExtDocNo, EverythingInvoiced, GenJnlLineDocNo, SrcCode, PreviewMode);
+          GenJnlLineExtDocNo, EverythingInvoiced, GenJnlLineDocNo, SrcCode);
 
         if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"]) then
             EnableAggregateTableUpdate(DisableAggregateTableUpdate);
@@ -774,7 +774,7 @@ codeunit 80 "Sales-Post"
 
         CheckVATDate(SalesHeader);
 
-        OnCheckAndUpdateOnBeforeSetPostingFlags(SalesHeader, TempSalesLineGlobal, ModifyHeader, HideProgressWindow);
+        OnCheckAndUpdateOnBeforeSetPostingFlags(SalesHeader, TempSalesLineGlobal, ModifyHeader);
 
         if LogErrorMode then
             SetLogErrorModePostingFlags(SalesHeader)
@@ -3288,10 +3288,8 @@ codeunit 80 "Sales-Post"
 
     local procedure DivideAmount(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; QtyType: Option General,Invoicing,Shipping; SalesLineQty: Decimal; var TempVATAmountLine: Record "VAT Amount Line" temporary; var TempVATAmountLineRemainder: Record "VAT Amount Line" temporary; IncludePrepayments: Boolean)
     var
-        AddCurrency: Record Currency;
         OriginalDeferralAmount: Decimal;
         DivideFactor: Decimal;
-        CurrencyFactor: Decimal;
         FullGST: Boolean;
         IsHandled: Boolean;
     begin
@@ -3305,7 +3303,6 @@ codeunit 80 "Sales-Post"
         if IsHandled then
             exit;
 
-        CurrencyFactor := GetCurrencyFactorACY(SalesHeader, AddCurrency);
         if (SalesLineQty = 0) or (SalesLine."Unit Price" = 0) then begin
             SalesLine."Line Amount" := 0;
             SalesLine."Line Discount Amount" := 0;
@@ -3313,9 +3310,6 @@ codeunit 80 "Sales-Post"
             SalesLine."VAT Base Amount" := 0;
             SalesLine.Amount := 0;
             SalesLine."Amount Including VAT" := 0;
-            SalesLine."Amount (ACY)" := 0;
-            SalesLine."VAT Base (ACY)" := 0;
-            SalesLine."Amount Including VAT (ACY)" := 0;
             OnDivideAmountOnAfterInitAmount(SalesHeader, SalesLine, SalesLineQty);
         end else begin
             OriginalDeferralAmount := SalesLine.GetDeferralAmount();
@@ -3408,23 +3402,16 @@ codeunit 80 "Sales-Post"
                             SalesLine."VAT Base Amount" := TempVATAmountLine."VAT Base"
                         else
                             CalcVATBaseAmount(SalesHeader, SalesLine, TempVATAmountLine, TempVATAmountLineRemainder);
-                        if TempVATAmountLine."VAT Base" = 0 then begin
-                            TempVATAmountLineRemainder."VAT Amount" := 0;
-                            TempVATAmountLineRemainder."VAT Amount (ACY)" := 0;
-                        end else
-                            if SalesLine."Prepayment Line" and FullGST then begin
+                        if TempVATAmountLine."VAT Base" = 0 then
+                            TempVATAmountLineRemainder."VAT Amount" := 0
+                        else
+                            if SalesLine."Prepayment Line" and FullGST then
                                 TempVATAmountLineRemainder."VAT Amount" +=
                                     TempVATAmountLine."VAT Amount" * SalesLine.CalcLineAmount() /
-                                    (TempVATAmountLine."Line Amount" - SalesLine."Inv. Discount Amount");
-                                TempVATAmountLineRemainder."VAT Amount (ACY)" +=
-                                    TempVATAmountLine."VAT Amount (ACY)" * SalesLine.CalcLineAmount() / 
-                                    (TempVATAmountLine."Line Amount" - SalesLine."Inv. Discount Amount");
-                            end else begin
+                                    (TempVATAmountLine."Line Amount" - SalesLine."Inv. Discount Amount")
+                            else
                                 TempVATAmountLineRemainder."VAT Amount" +=
                                     TempVATAmountLine."VAT Amount" * SalesLine.CalcLineAmount() / TempVATAmountLine.CalcLineAmount();
-                                TempVATAmountLineRemainder."VAT Amount (ACY)" +=
-                          TempVATAmountLine."VAT Amount (ACY)" * SalesLine.CalcLineAmount() / TempVATAmountLine.CalcLineAmount();
-                            end;
                         if SalesLine."Line Discount %" <> 100 then
                             SalesLine."Amount Including VAT" :=
                                 SalesLine.Amount + Round(TempVATAmountLineRemainder."VAT Amount", Currency."Amount Rounding Precision")
@@ -3432,23 +3419,6 @@ codeunit 80 "Sales-Post"
                             SalesLine."Amount Including VAT" := 0;
                         TempVATAmountLineRemainder."VAT Amount" :=
                             TempVATAmountLineRemainder."VAT Amount" - SalesLine."Amount Including VAT" + SalesLine.Amount;
-                        if SalesLine."Currency Code" <> GLSetup."Additional Reporting Currency" then begin
-                            SalesLine."Amount (ACY)" :=
-                              Round(
-                                CurrExchRate.ExchangeAmtLCYToFCY(
-                                  SalesHeader."Posting Date", GLSetup."Additional Reporting Currency",
-                                  Round(CurrExchRate.ExchangeAmtFCYToLCY(
-                                      SalesHeader."Posting Date", SalesLine."Currency Code", SalesLine.Amount,
-                                      SalesHeader."Currency Factor"), Currency."Amount Rounding Precision"), CurrencyFactor),
-                                AddCurrency."Amount Rounding Precision");
-                            SalesLine."VAT Base (ACY)" :=
-                              Round(
-                                SalesLine."Amount (ACY)" * (1 - SalesHeader."VAT Base Discount %" / 100), Currency."Amount Rounding Precision");
-                            SalesLine."Amount Including VAT (ACY)" :=
-                              SalesLine."Amount (ACY)" + Round(TempVATAmountLineRemainder."VAT Amount (ACY)", Currency."Amount Rounding Precision");
-                            TempVATAmountLineRemainder."VAT Amount (ACY)" :=
-                              TempVATAmountLineRemainder."VAT Amount (ACY)" - SalesLine."Amount Including VAT (ACY)" + SalesLine."Amount (ACY)";
-                        end;
                     end;
 
             OnDivideAmountOnBeforeTempVATAmountLineRemainderModify(SalesHeader, SalesLine, TempVATAmountLine, TempVATAmountLineRemainder, Currency);
@@ -3493,8 +3463,6 @@ codeunit 80 "Sales-Post"
 
     local procedure RoundAmount(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; SalesLineQty: Decimal)
     var
-        AddCurrency: Record Currency;
-        CurrencyFactor: Decimal;
         NoVAT: Boolean;
         IsHandled: Boolean;
     begin
@@ -3516,7 +3484,6 @@ codeunit 80 "Sales-Post"
         OnRoundAmountOnAfterAssignSalesLines(xSalesLine, SalesLineACY, SalesHeader, IsHandled);
         if not IsHandled then
             if SalesHeader."Currency Code" <> '' then begin
-                CurrencyFactor := GetCurrencyFactorACY(SalesHeader, AddCurrency);
                 NoVAT := SalesLine.Amount = SalesLine."Amount Including VAT";
                 SalesLine."Amount Including VAT" :=
                   Round(
@@ -3562,14 +3529,6 @@ codeunit 80 "Sales-Post"
                     SalesHeader.GetUseDate(), SalesHeader."Currency Code",
                     TotalSalesLine."VAT Base Amount", SalesHeader."Currency Factor") -
                   TotalSalesLineLCY."VAT Base Amount";
-                SalesLine."Amount (ACY)" :=
-                    Round(SalesLine."Amount (ACY)", AddCurrency."Amount Rounding Precision");
-                SalesLine."VAT Difference (ACY)" :=
-                    Round(SalesLine."VAT Difference (ACY)", AddCurrency."Amount Rounding Precision");
-                SalesLine."VAT Base (ACY)" :=
-                    Round(SalesLine."VAT Base (ACY)", AddCurrency."Amount Rounding Precision");
-                SalesLine."Amount Including VAT (ACY)" :=
-                    Round(SalesLine."Amount Including VAT (ACY)", AddCurrency."Amount Rounding Precision");
             end;
         IsHandled := false;
         OnRoundAmountOnBeforeIncrAmount(SalesHeader, SalesLine, SalesLineQty, TotalSalesLine, TotalSalesLineLCY, xSalesLine, IsHandled);
@@ -3596,10 +3555,6 @@ codeunit 80 "Sales-Post"
         SalesLine."Amount Including VAT" := -SalesLine."Amount Including VAT";
         SalesLine."Line Discount Amount" := -SalesLine."Line Discount Amount";
         SalesLine."Inv. Discount Amount" := -SalesLine."Inv. Discount Amount";
-        SalesLine."Amount (ACY)" := -SalesLine."Amount (ACY)";
-        SalesLine."VAT Base (ACY)" := -SalesLine."VAT Base (ACY)";
-        SalesLine."VAT Difference (ACY)" := -SalesLine."VAT Difference (ACY)";
-        SalesLine."Amount Including VAT (ACY)" := -SalesLine."Amount Including VAT (ACY)";
         OnAfterReverseAmount(SalesLine);
     end;
 
@@ -3676,10 +3631,6 @@ codeunit 80 "Sales-Post"
         Increment(TotalSalesLine."VAT Base Amount", SalesLine."VAT Base Amount");
         Increment(TotalSalesLine."VAT Difference", SalesLine."VAT Difference");
         Increment(TotalSalesLine."Amount Including VAT", SalesLine."Amount Including VAT");
-        Increment(TotalSalesLine."VAT Base (ACY)", SalesLine."VAT Base (ACY)");
-        Increment(TotalSalesLine."VAT Difference (ACY)", SalesLine."VAT Difference (ACY)");
-        Increment(TotalSalesLine."Amount Including VAT (ACY)", SalesLine."Amount Including VAT (ACY)");
-        Increment(TotalSalesLine."Amount (ACY)", SalesLine."Amount (ACY)");
         Increment(TotalSalesLine."Line Discount Amount", SalesLine."Line Discount Amount");
         Increment(TotalSalesLine."Inv. Discount Amount", SalesLine."Inv. Discount Amount");
         Increment(TotalSalesLine."Inv. Disc. Amount to Invoice", SalesLine."Inv. Disc. Amount to Invoice");
@@ -6368,7 +6319,7 @@ codeunit 80 "Sales-Post"
         IsHandled := false;
         OnBeforeUpdateQtyToBeInvoicedForReturnReceipt(
             QtyToBeInvoiced, QtyToBeInvoicedBase, TrackingSpecificationExists, SalesLine, ReturnReceiptLine,
-            InvoicingTrackingSpecification, RemQtyToBeInvoiced, RemQtyToBeInvoicedBase, IsHandled);
+            InvoicingTrackingSpecification, QtyToBeInvoiced, QtyToBeInvoicedBase, IsHandled);
         if IsHandled then
             exit;
 
@@ -6379,8 +6330,6 @@ codeunit 80 "Sales-Post"
             QtyToBeInvoiced := RemQtyToBeInvoiced - SalesLine."Return Qty. to Receive";
             QtyToBeInvoicedBase := RemQtyToBeInvoicedBase - SalesLine."Return Qty. to Receive (Base)";
         end;
-        OnUpdateQtyToBeInvoicedForReturnReceiptOnAfterSetQtyToBeInvoiced(TrackingSpecificationExists, QtyToBeInvoiced, QtyToBeInvoicedBase, RemQtyToBeInvoiced, RemQtyToBeInvoicedBase, SalesLine);
-
         if Abs(QtyToBeInvoiced) >
            Abs(ReturnReceiptLine.Quantity - ReturnReceiptLine."Quantity Invoiced")
         then begin
@@ -8348,7 +8297,7 @@ codeunit 80 "Sales-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforePostItemTracking(SalesHeader, SalesLine, TrackingSpecificationExists, TempTrackingSpecification, IsHandled, TempItemLedgEntryNotInvoiced, HasATOShippedNotInvoiced, PreciseTotalChargeAmt, RoundedPrevTotalChargeAmt, RemQtyToBeInvoiced, ItemJnlRollRndg);
+        OnBeforePostItemTracking(SalesHeader, SalesLine, TrackingSpecificationExists, TempTrackingSpecification, IsHandled, TempItemLedgEntryNotInvoiced, HasATOShippedNotInvoiced, PreciseTotalChargeAmt, RoundedPrevTotalChargeAmt, RemQtyToBeInvoiced);
         if IsHandled then
             exit;
 
@@ -8363,7 +8312,7 @@ codeunit 80 "Sales-Post"
         RoundedPrevTotalChargeAmt := 0;
 
         ShouldProcessReceipt := SalesLine.IsCreditDocType();
-        OnPostItemTrackingOnAfterCalcShouldProcessReceipt(SalesHeader, SalesLine, ShouldProcessReceipt, ItemJnlRollRndg);
+        OnPostItemTrackingOnAfterCalcShouldProcessReceipt(SalesHeader, SalesLine, ShouldProcessReceipt);
         if ShouldProcessReceipt then begin
             ShouldPostItemTrackingForReceipt :=
                 (Abs(RemQtyToBeInvoiced) > Abs(SalesLine."Return Qty. to Receive")) or
@@ -8639,18 +8588,14 @@ codeunit 80 "Sales-Post"
                 UpdateRemainingQtyToBeInvoiced(SalesShptLine, RemQtyToInvoiceCurrLine, RemQtyToInvoiceCurrLineBase);
                 UpdateChargeItemSalesShptLineGenProdPostingGroup(SalesShptLine);
                 OnPostItemTrackingForShipmentOnAfterUpdateSalesShptLineFields(SalesShptLine, SalesLine);
-                IsHandled := false;
-                OnPostItemTrackingForShipmentOnBeforeTestLineFields(SalesShptLine, SalesLine, IsHandled);
-                if not IsHandled then begin
-                    SalesShptLine.TestField("Sell-to Customer No.", SalesLine."Sell-to Customer No.");
-                    SalesShptLine.TestField(Type, SalesLine.Type);
-                    SalesShptLine.TestField("No.", SalesLine."No.");
-                    SalesShptLine.TestField("Gen. Bus. Posting Group", SalesLine."Gen. Bus. Posting Group");
-                    SalesShptLine.TestField("Gen. Prod. Posting Group", SalesLine."Gen. Prod. Posting Group");
-                    CheckJobNoOnShptLineEqualToSales(SalesShptLine, SalesLine);
-                    SalesShptLine.TestField("Unit of Measure Code", SalesLine."Unit of Measure Code");
-                    SalesShptLine.TestField("Variant Code", SalesLine."Variant Code");
-                end;
+                SalesShptLine.TestField("Sell-to Customer No.", SalesLine."Sell-to Customer No.");
+                SalesShptLine.TestField(Type, SalesLine.Type);
+                SalesShptLine.TestField("No.", SalesLine."No.");
+                SalesShptLine.TestField("Gen. Bus. Posting Group", SalesLine."Gen. Bus. Posting Group");
+                SalesShptLine.TestField("Gen. Prod. Posting Group", SalesLine."Gen. Prod. Posting Group");
+                CheckJobNoOnShptLineEqualToSales(SalesShptLine, SalesLine);
+                SalesShptLine.TestField("Unit of Measure Code", SalesLine."Unit of Measure Code");
+                SalesShptLine.TestField("Variant Code", SalesLine."Variant Code");
                 if -SalesLine."Qty. to Invoice" * SalesShptLine.Quantity < 0 then
                     SalesLine.FieldError("Qty. to Invoice", ShipmentSameSignErr);
 
@@ -8895,7 +8840,7 @@ codeunit 80 "Sales-Post"
             until TempSalesLine.Next() = 0;
         CRMSalesDocumentPostingMgt.CheckShippedOrders(TempSalesOrderHeader);
 
-        OnAfterPostUpdateInvoiceLine(TempSalesLine, SalesHeader);
+        OnAfterPostUpdateInvoiceLine(TempSalesLine);
     end;
 
     local procedure PostUpdateOrderNo(var SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -9104,28 +9049,6 @@ codeunit 80 "Sales-Post"
         OnAfterGetAmountsForDeferral(SalesLine, AmtToDefer, AmtToDeferACY, DeferralAccount);
     end;
 #endif
-    [Scope('OnPrem')]
-    procedure GetCurrencyFactorACY(SalesHeader: Record "Sales Header"; var AddCurrency: Record Currency): Decimal
-    begin
-        GLSetup.Get();
-        if GLSetup."Additional Reporting Currency" = '' then
-            exit;
-
-        AddCurrency.Get(GLSetup."Additional Reporting Currency");
-        exit(
-            CurrExchRate.ExchangeRate(
-            GetDate(SalesHeader), GLSetup."Additional Reporting Currency"));
-    end;
-
-    [Scope('OnPrem')]
-    procedure GetDate(SalesHeader: Record "Sales Header"): Date
-    begin
-        if (SalesHeader."Document Type" in [SalesHeader."Document Type"::"Blanket Order", SalesHeader."Document Type"::Quote]) and
-           (SalesHeader."Posting Date" = 0D)
-        then
-            exit(WorkDate());
-        exit(SalesHeader."Posting Date");
-    end;
 
     local procedure CheckMandatoryHeaderFields(var SalesHeader: Record "Sales Header")
     var
@@ -9749,7 +9672,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterPostUpdateInvoiceLine(var TempSalesLine: Record "Sales Line" temporary; var SalesHeader: Record "Sales Header")
+    local procedure OnAfterPostUpdateInvoiceLine(var TempSalesLine: Record "Sales Line" temporary)
     begin
     end;
 
@@ -10452,16 +10375,16 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforePostItemTracking(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TrackingSpecificationExists: Boolean; var TempTrackingSpecification: Record "Tracking Specification" temporary; var IsHandled: Boolean; TempItemLedgEntryNotInvoiced: Record "Item Ledger Entry" temporary; HasATOShippedNotInvoiced: Boolean; var PreciseTotalChargeAmt: Decimal; var RoundedPrevTotalChargeAmt: Decimal; RemQtyToBeInvoiced: Decimal; var ItemJnlRollRndg: Boolean)
+    local procedure OnBeforePostItemTracking(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TrackingSpecificationExists: Boolean; var TempTrackingSpecification: Record "Tracking Specification" temporary; var IsHandled: Boolean; TempItemLedgEntryNotInvoiced: Record "Item Ledger Entry" temporary; HasATOShippedNotInvoiced: Boolean; var PreciseTotalChargeAmt: Decimal; var RoundedPrevTotalChargeAmt: Decimal; RemQtyToBeInvoiced: Decimal)
     begin
     end;
 
-    [IntegrationEvent(true, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnBeforePostItemTrackingCheckReturnReceipt(SalesLine: Record "Sales Line"; RemQtyToBeInvoiced: Decimal; var IsHandled: Boolean)
     begin
     end;
 
-    [IntegrationEvent(true, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnBeforePostItemTrackingCheckShipment(SalesLine: Record "Sales Line"; RemQtyToBeInvoiced: Decimal; var IsHandled: Boolean)
     begin
     end;
@@ -11484,7 +11407,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnCheckAndUpdateOnBeforeSetPostingFlags(var SalesHeader: Record "Sales Header"; var TempSalesLineGlobal: Record "Sales Line" temporary; var ModifyHeader: Boolean; var HideProgressWindow: Boolean);
+    local procedure OnCheckAndUpdateOnBeforeSetPostingFlags(var SalesHeader: Record "Sales Header"; var TempSalesLineGlobal: Record "Sales Line" temporary; var ModifyHeader: Boolean);
     begin
     end;
 
@@ -11966,7 +11889,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnBeforeFinalizePosting(var SalesHeader: Record "Sales Header"; var SalesShipmentHeader: Record "Sales Shipment Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var ReturnReceiptHeader: Record "Return Receipt Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; CommitIsSuppressed: Boolean; GenJnlLineExtDocNo: Code[35]; var EverythingInvoiced: Boolean; GenJnlLineDocNo: Code[20]; SrcCode: Code[10]; PreviewMode: Boolean)
+    local procedure OnRunOnBeforeFinalizePosting(var SalesHeader: Record "Sales Header"; var SalesShipmentHeader: Record "Sales Shipment Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var ReturnReceiptHeader: Record "Return Receipt Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; CommitIsSuppressed: Boolean; GenJnlLineExtDocNo: Code[35]; var EverythingInvoiced: Boolean; GenJnlLineDocNo: Code[20]; SrcCode: Code[10])
     begin
     end;
 
@@ -12471,7 +12394,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostItemTrackingOnAfterCalcShouldProcessReceipt(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var ShouldProcessReceipt: Boolean; var ItemJnlRollRndg: Boolean)
+    local procedure OnPostItemTrackingOnAfterCalcShouldProcessReceipt(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var ShouldProcessReceipt: Boolean)
     begin
     end;
 
@@ -12722,16 +12645,6 @@ codeunit 80 "Sales-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidatePostingAndDocumentDateOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; var ModifyHeader: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostItemTrackingForShipmentOnBeforeTestLineFields(var SalesShipmentLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateQtyToBeInvoicedForReturnReceiptOnAfterSetQtyToBeInvoiced(TrackingSpecificationExists: Boolean; var QtyToBeInvoiced: Decimal; var QtyToBeInvoicedBase: Decimal; RemQtyToBeInvoiced: Decimal; RemQtyToBeInvoicedBase: Decimal; var SalesLine: Record "Sales Line")
     begin
     end;
 }
