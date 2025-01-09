@@ -445,9 +445,6 @@ codeunit 90 "Purch.-Post"
         ItemChargeZeroAmountErr: Label 'The amount for item charge %1 cannot be 0.', Comment = '%1 = Item Charge No.';
         ConfirmUsageWithBlankLineTypeQst: Label 'Usage will not be linked to the project planning line because the Line Type field is empty.\\Do you want to continue?';
         ConfirmUsageWithBlankJobPlanningLineNoQst: Label 'Usage will not be linked to the project planning line because the Project Planning Line No field is empty.\\Do you want to continue?';
-#if not CLEAN25        
-        TotalToDeferErr: Label 'The sum of the deferred amounts must be equal to the amount in the Amount to Defer field.';
-#endif        
 
     local procedure GetZeroPurchLineRecID(PurchHeader: Record "Purchase Header"; var PurchLineRecID: RecordId)
     var
@@ -3807,13 +3804,9 @@ codeunit 90 "Purch.-Post"
                  BlanketOrderPurchLine."Document Type"::"Blanket Order", PurchLine."Blanket Order No.",
                  PurchLine."Blanket Order Line No.")
             then begin
-                IsHandled := false;
-                OnUpdateBlanketOrderLineOnBeforeCheckBlanketOrderPurchLine(BlanketOrderPurchLine, PurchLine, IsHandled);
-                if not IsHandled then begin
-                    BlanketOrderPurchLine.TestField(Type, PurchLine.Type);
-                    BlanketOrderPurchLine.TestField("No.", PurchLine."No.");
-                    BlanketOrderPurchLine.TestField("Buy-from Vendor No.", PurchLine."Buy-from Vendor No.");
-                end;
+                BlanketOrderPurchLine.TestField(Type, PurchLine.Type);
+                BlanketOrderPurchLine.TestField("No.", PurchLine."No.");
+                BlanketOrderPurchLine.TestField("Buy-from Vendor No.", PurchLine."Buy-from Vendor No.");
                 OnUpdateBlanketOrderLineOnAfterCheckBlanketOrderPurchLine(BlanketOrderPurchLine, PurchLine);
 
                 ModifyLine := false;
@@ -6037,7 +6030,6 @@ codeunit 90 "Purch.-Post"
         if not (ItemJournalLine.IsPurchaseReturn() or NonInventoriableItem) then begin
             TempTrackingSpecification.SetRange("Serial No.", TempReservEntryJobCons."Serial No.");
             TempTrackingSpecification.SetRange("Lot No.", TempReservEntryJobCons."Lot No.");
-            TempTrackingSpecification.SetRange("Package No.", TempReservEntryJobCons."Package No.");
             if TempTrackingSpecification.FindFirst() then
                 TempReservEntryJobCons."Appl.-to Item Entry" := TempTrackingSpecification."Item Ledger Entry No.";
         end;
@@ -7484,7 +7476,6 @@ codeunit 90 "Purch.-Post"
     local procedure FillDeferralPostingBuffer(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; InvoicePostBuffer: Record "Invoice Post. Buffer"; RemainAmtToDefer: Decimal; RemainAmtToDeferACY: Decimal; DeferralAccount: Code[20]; PurchAccount: Code[20])
     var
         DeferralTemplate: Record "Deferral Template";
-        IsDeferralAmountCheck: boolean;
     begin
         if PurchLine."Deferral Code" <> '' then begin
             DeferralTemplate.Get(PurchLine."Deferral Code");
@@ -7496,7 +7487,6 @@ codeunit 90 "Purch.-Post"
                     DeferralUtilities.FilterDeferralLines(
                       TempDeferralLine, "Deferral Document Type"::Purchase.AsInteger(), '', '',
                       PurchLine."Document Type".AsInteger(), PurchLine."Document No.", PurchLine."Line No.");
-
                     // Remainder\Initial deferral pair
                     DeferralPostBuffer.PreparePurch(PurchLine, GenJnlLineDocNo);
                     DeferralPostBuffer."Posting Date" := PurchHeader."Posting Date";
@@ -7516,12 +7506,6 @@ codeunit 90 "Purch.-Post"
                     if TempDeferralLine.FindSet() then
                         repeat
                             if (TempDeferralLine."Amount (LCY)" <> 0) or (TempDeferralLine.Amount <> 0) then begin
-
-                                if not IsDeferralAmountCheck then begin
-                                    CheckDeferralAmount(TempDeferralLine);
-                                    IsDeferralAmountCheck := true;
-                                end;
-
                                 DeferralPostBuffer.PreparePurch(PurchLine, GenJnlLineDocNo);
                                 DeferralPostBuffer.InitFromDeferralLine(TempDeferralLine);
                                 if PurchLine.IsCreditDocType() then
@@ -9067,27 +9051,6 @@ codeunit 90 "Purch.-Post"
             NoSeries.TestField("Default Nos.", true);
     end;
 
-#if not CLEAN25 
-    local procedure CheckDeferralAmount(DeferralLine: Record "Deferral Line")
-    var
-        DeferralHeader: Record "Deferral Header";
-    begin
-        if not DeferralHeader.Get(
-            DeferralLine."Deferral Doc. Type",
-            DeferralLine."Gen. Jnl. Template Name",
-            DeferralLine."Gen. Jnl. Batch Name",
-            DeferralLine."Document Type",
-            DeferralLine."Document No.",
-            DeferralLine."Line No.")
-        then
-            exit;
-
-        DeferralHeader.CalcFields("Schedule Line Total");
-        if DeferralHeader."Schedule Line Total" <> DeferralHeader."Amount to Defer" then
-            Error(TotalToDeferErr);
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnArchiveSalesOrdersOnBeforeSalesOrderLineModify(var SalesOrderLine: Record "Sales Line"; var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary)
     begin
@@ -9326,7 +9289,7 @@ codeunit 90 "Purch.-Post"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnAfterPostUpdateInvoiceLine(var PurchaseLine: Record "Purchase Line" temporary)
     begin
     end;
@@ -11805,11 +11768,6 @@ codeunit 90 "Purch.-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostItemJnlLineOnAfterSetCheckApplToItemEntry(PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateBlanketOrderLineOnBeforeCheckBlanketOrderPurchLine(var BlanketOrderPurchaseLine: Record "Purchase Line"; PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
 }
