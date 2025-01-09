@@ -26,6 +26,11 @@ codeunit 6164 "E-Doc. Line Matching"
 
 
     procedure RunMatching(var EDocument: Record "E-Document")
+    begin
+        RunMatching(EDocument, false);
+    end;
+
+    procedure RunMatching(var EDocument: Record "E-Document"; WithCopilot: Boolean)
     var
         EDocService: Record "E-Document Service";
         EDocServiceStatus: Record "E-Document Service Status";
@@ -38,6 +43,7 @@ codeunit 6164 "E-Doc. Line Matching"
         EDocServiceStatus.Get(EDocument."Entry No", EDocService.Code);
         EDocServiceStatus.TestField(Status, Enum::"E-Document Service Status"::"Order Linked");
         EDocOrderLineMatching.SetTempRecord(EDocument);
+        EDocOrderLineMatching.SetAutoRunCopilot(WithCopilot);
         EDocOrderLineMatching.Run();
     end;
 
