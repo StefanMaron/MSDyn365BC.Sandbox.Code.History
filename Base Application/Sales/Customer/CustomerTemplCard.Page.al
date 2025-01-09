@@ -15,7 +15,6 @@ page 1382 "Customer Templ. Card"
         {
             group(General)
             {
-                Caption = 'General';
                 field(Code; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
