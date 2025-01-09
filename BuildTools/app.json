@@ -2,9 +2,9 @@
   "id": "9d71307c-b6e4-4a16-b5ca-6d1314bd3ee2",
   "name": "BuildTools",
   "publisher": "Microsoft",
-  "version": "25.2.27733.28580",
-  "platform": "25.2.0.0",
-  "application": "25.2.0.0",
+  "version": "25.0.23364.28590",
+  "platform": "25.0.0.0",
+  "application": "25.0.0.0",
   "target": "Cloud",
   "showMyCode": true
 }
