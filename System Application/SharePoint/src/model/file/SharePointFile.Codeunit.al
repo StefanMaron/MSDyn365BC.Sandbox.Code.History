@@ -11,6 +11,7 @@ codeunit 9106 "SharePoint File"
     InherentEntitlements = X;
     InherentPermissions = X;
 
+    [NonDebuggable]
     procedure Parse(Payload: Text; var SharePointFile: Record "SharePoint File" temporary)
     var
         JObject: JsonObject;
@@ -19,6 +20,7 @@ codeunit 9106 "SharePoint File"
             Parse(JObject, SharePointFile);
     end;
 
+    [NonDebuggable]
     procedure ParseSingleReturnValue(Payload: Text; var SharePointFile: Record "SharePoint File" temporary)
     var
         JObject: JsonObject;
@@ -32,6 +34,7 @@ codeunit 9106 "SharePoint File"
             end;
     end;
 
+    [NonDebuggable]
     procedure ParseSingle(Payload: Text; var SharePointFile: Record "SharePoint File" temporary)
     var
         JObject: JsonObject;
@@ -40,6 +43,7 @@ codeunit 9106 "SharePoint File"
             SharePointFile := ParseSingle(JObject);
     end;
 
+    [NonDebuggable]
     procedure Parse(Payload: JsonObject; var SharePointFile: Record "SharePoint File" temporary)
     var
         JToken: JsonToken;
@@ -51,6 +55,7 @@ codeunit 9106 "SharePoint File"
             end;
     end;
 
+    [NonDebuggable]
     local procedure ParseSingle(Payload: JsonObject) SharePointFile: Record "SharePoint File" temporary
     var
         SharePointClient: Codeunit "SharePoint Client";
