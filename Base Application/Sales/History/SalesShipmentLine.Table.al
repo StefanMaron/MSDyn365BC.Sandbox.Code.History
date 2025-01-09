@@ -737,11 +737,8 @@ table 111 "Sales Shipment Line"
         else
             NextLineNo := 10000;
 
-        IsHandled := false;
-        OnInsertInvLineFromShptLineOnBeforeSalesHeaderGet(SalesInvHeader, Rec, TempSalesLine, IsHandled);
-        if not IsHandled then
-            if SalesInvHeader."No." <> TempSalesLine."Document No." then
-                SalesInvHeader.Get(TempSalesLine."Document Type", TempSalesLine."Document No.");
+        if SalesInvHeader."No." <> TempSalesLine."Document No." then
+            SalesInvHeader.Get(TempSalesLine."Document Type", TempSalesLine."Document No.");
 
         if SalesLine."Shipment No." <> "Document No." then begin
 
@@ -807,8 +804,6 @@ table 111 "Sales Shipment Line"
                 end else
                     Error(Text001);
             end;
-
-            OnInsertInvLineFromShptLineOnBeforeAssigneSalesLine(Rec, SalesInvHeader, SalesOrderHeader, SalesLine, SalesOrderLine, Currency);
 
             SalesLine := SalesOrderLine;
             SalesLine."Line No." := NextLineNo;
@@ -1289,16 +1284,6 @@ table 111 "Sales Shipment Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetSecurityFilterOnRespCenter(var SalesShipmentLine: Record "Sales Shipment Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnBeforeAssigneSalesLine(var SalesShipmentLine: Record "Sales Shipment Line"; SalesHeaderInv: Record "Sales Header"; SalesHeaderOrder: Record "Sales Header"; var SalesLine: Record "Sales Line"; var SalesOrderLine: Record "Sales Line"; Currency: Record Currency)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnBeforeSalesHeaderGet(var SalesHeader: Record "Sales Header"; SalesShipmentLine: Record "Sales Shipment Line"; var TempSalesLine: Record "Sales Line" temporary; var IsHandled: Boolean)
     begin
     end;
 }
