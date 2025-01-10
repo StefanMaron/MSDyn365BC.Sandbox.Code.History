@@ -216,7 +216,6 @@ codeunit 1313 "Correct Posted Purch. Invoice"
 
         if CreateCreditMemo(PurchInvHeader) then begin
             CreateCopyDocument(PurchInvHeader, PurchaseHeader, PurchaseHeader."Document Type"::Invoice, true);
-            OnCancelPostedInvoiceStartNewInvoiceOnAfterCreateCorrPurchaseInvoice(PurchaseHeader, PurchInvHeader);
             Commit();
         end;
     end;
@@ -224,6 +223,7 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     procedure TestCorrectInvoiceIsAllowed(var PurchInvHeader: Record "Purch. Inv. Header"; Cancelling: Boolean)
     begin
         CancellingOnly := Cancelling;
+        TestPurchaseInvoiceHeaderAmount(PurchInvHeader, Cancelling);
         TestIfPostingIsAllowed(PurchInvHeader);
         TestIfInvoiceIsCorrectedOnce(PurchInvHeader);
         TestIfInvoiceIsNotCorrectiveDoc(PurchInvHeader);
@@ -265,13 +265,7 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     var
         PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
         CancelledDocument: Record "Cancelled Document";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeSetTrackInfoForCancellation(PurchInvHeader, IsHandled);
-        if IsHandled then
-            exit;
-
         PurchCrMemoHdr.SetRange("Applies-to Doc. No.", PurchInvHeader."No.");
         if PurchCrMemoHdr.FindLast() then
             CancelledDocument.InsertPurchInvToCrMemoCancelledDocument(PurchInvHeader."No.", PurchCrMemoHdr."No.");
@@ -436,6 +430,19 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     begin
         if CancelledDocument.FindPurchCorrectiveInvoice(PurchInvHeader."No.") then
             ErrorHelperHeader(Enum::"Correct Purch. Inv. Error Type"::IsCorrective, PurchInvHeader);
+    end;
+
+    local procedure TestPurchaseInvoiceHeaderAmount(var PurchInvHeader: Record "Purch. Inv. Header"; Cancelling: Boolean)
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeTestPurchaseInvoiceHeaderAmount(PurchInvHeader, Cancelling, IsHandled);
+        if IsHandled then
+            exit;
+
+        PurchInvHeader.CalcFields(Amount);
+        PurchInvHeader.TestField(Amount);
     end;
 
     local procedure TestIfPostingIsAllowed(PurchInvHeader: Record "Purch. Inv. Header")
@@ -808,7 +815,6 @@ codeunit 1313 "Correct Posted Purch. Invoice"
                 PurchInvLine.GetItemLedgEntries(TempItemLedgerEntry, false);
                 if PurchaseLine.Get(PurchaseLine."Document Type"::Order, PurchInvLine."Order No.", PurchInvLine."Order Line No.") then begin
                     UpdatePurchaseOrderLineInvoicedQuantity(PurchaseLine, PurchInvLine.Quantity, PurchInvLine."Quantity (Base)");
-                    UpdateReverseItemChargeAssignment(PurchaseLine, PurchInvLine.Quantity);
                     TempItemLedgerEntry.SetFilter("Item Tracking", '<>%1', TempItemLedgerEntry."Item Tracking"::None.AsInteger());
                     UndoPostingManagement.RevertPostedItemTracking(TempItemLedgerEntry, PurchaseLine."Expected Receipt Date", true);
                 end;
@@ -853,23 +859,6 @@ codeunit 1313 "Correct Posted Purch. Invoice"
             Result := Item.IsInventoriableType();
 
         OnAfterIsCheckDirectCostAppliedAccount(PurchInvLine, Result);
-    end;
-
-    local procedure UpdateReverseItemChargeAssignment(PurchaseLine: Record "Purchase Line"; CancelledQuantity: Decimal)
-    var
-        ItemChargeAssgnt: Record "Item Charge Assignment (Purch)";
-        ItemChargeAssignment: Codeunit "Item Charge Assgnt. (Purch.)";
-    begin
-        if PurchaseLine.Type = PurchaseLine.Type::"Charge (Item)" then
-            exit;
-
-        ItemChargeAssgnt.SetLoadFields("Applies-to Doc. No.", "Applies-to Doc. Line No.", "Item No.", "Qty. Assigned");
-        ItemChargeAssgnt.SetRange("Applies-to Doc. No.", PurchaseLine."Document No.");
-        ItemChargeAssgnt.SetRange("Applies-to Doc. Line No.", PurchaseLine."Line No.");
-        ItemChargeAssgnt.SetRange("Item No.", PurchaseLine."No.");
-        ItemChargeAssgnt.SetFilter("Qty. Assigned", '<>%1', 0);
-        if ItemChargeAssgnt.FindFirst() then
-            ItemChargeAssignment.ReverseItemChargeAssgnt(ItemChargeAssgnt, CancelledQuantity);
     end;
 
     [IntegrationEvent(false, false)]
@@ -962,19 +951,8 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     begin
     end;
 
-    [Obsolete('OnBeforeTestPurchaseInvoiceHeaderAmount is not supported anymore.', '25.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestPurchaseInvoiceHeaderAmount(var PurchInvHeader: Record "Purch. Inv. Header"; Cancelling: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCancelPostedInvoiceStartNewInvoiceOnAfterCreateCorrPurchaseInvoice(var PurchaseHeader: Record "Purchase Header"; var PurchInvHeader: Record "Purch. Inv. Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetTrackInfoForCancellation(var PurchInvHeader: Record "Purch. Inv. Header"; var IsHandled: Boolean)
     begin
     end;
 }
