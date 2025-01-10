@@ -17,7 +17,6 @@ page 8009 "Imported Service Commitments"
                 field("Service Object No."; Rec."Service Object No.")
                 {
                     ToolTip = 'Specifies the Service Object, the Service Commitment will be created for.';
-                    ShowMandatory = true;
                 }
                 field("Service Object Line No."; Rec."Service Commitment Entry No.")
                 {
@@ -55,7 +54,6 @@ page 8009 "Imported Service Commitments"
                 field("Service Start Date"; Rec."Service Start Date")
                 {
                     ToolTip = 'Specifies the date from which the service is valid and will be invoiced.';
-                    ShowMandatory = true;
                 }
                 field("Service End Date"; Rec."Service End Date")
                 {
@@ -92,7 +90,6 @@ page 8009 "Imported Service Commitments"
                 field("Billing Base Period"; Rec."Billing Base Period")
                 {
                     ToolTip = 'Specifies for which period the Service Amount is valid. If you enter 1M here, a period of one month, or 12M, a period of 1 year, to which Service Amount refers to.';
-                    ShowMandatory = true;
                 }
                 field("Invoicing via"; Rec."Invoicing via")
                 {
@@ -119,7 +116,6 @@ page 8009 "Imported Service Commitments"
                 field("Billing Rhythm"; Rec."Billing Rhythm")
                 {
                     ToolTip = 'Specifies the Dateformula for hythm in which the service is invoiced. Using a Dateformula rhythm can be, for example, a monthly, a quarterly or a yearly invoicing.';
-                    ShowMandatory = true;
                 }
                 field("Discount Amount (LCY)"; Rec."Discount Amount (LCY)")
                 {
