@@ -2,7 +2,7 @@
   "id": "3f63a3de-6597-4097-9f34-b0ff7f92e6b0",
   "name": "DemoTool",
   "publisher": "Microsoft",
-  "version": "24.3.21374.28674",
+  "version": "24.4.22295.28656",
   "platform": "24.0.0.0",
   "target": "OnPrem",
   "dependencies": [],
@@ -11,6 +11,6 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "24.3.0.0",
+  "application": "24.4.0.0",
   "brief": "DemoTool (NL)"
 }
