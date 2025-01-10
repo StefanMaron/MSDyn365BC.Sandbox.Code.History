@@ -1047,12 +1047,8 @@ table 472 "Job Queue Entry"
         "Last Ready State" := CurrentDateTime();
         "User Language ID" := Language.GetLanguageIdOrDefault(Language.GetUserLanguageCode());
         if SetupUserId then
-            "User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
+            "User ID" := UserId();
         "No. of Attempts to Run" := 0;
-        if Status = Status::Ready then begin
-            "Error Message" := '';
-            clear("Error Message Register Id");
-        end;
         if "Job Timeout" = 0 then
             "Job Timeout" := DefaultJobTimeout();
 
