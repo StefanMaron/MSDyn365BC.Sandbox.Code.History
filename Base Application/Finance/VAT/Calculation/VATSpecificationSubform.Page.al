@@ -229,7 +229,6 @@ page 576 "VAT Specification Subform"
         Currency: Record Currency;
         ServHeader: Record "Service Header";
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
-        SourceHeader: Variant;
         CurrencyCode: Code[10];
         AllowVATDifference: Boolean;
         AllowVATDifferenceOnThisTab: Boolean;
@@ -350,11 +349,6 @@ page 576 "VAT Specification Subform"
         ServHeader := ServiceHeader;
     end;
 
-    procedure SetSourceHeader(NewSourceHeader: Variant)
-    begin
-        SourceHeader := NewSourceHeader;
-    end;
-    
     procedure SetCurrentTabNo(TabNo: Integer)
     begin
         CurrentTabNo := TabNo;
