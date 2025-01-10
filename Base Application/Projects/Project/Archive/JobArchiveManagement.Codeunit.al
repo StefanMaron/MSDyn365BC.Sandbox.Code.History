@@ -34,7 +34,7 @@ codeunit 5139 "Job Archive Management"
         MissingJobErr: Label 'Project %1 does not exist anymore.\It is not possible to restore the Project.', Comment = '%1 = Project No.';
         CompletedJobStatusErr: Label 'Status must not be Completed in order to restore the Project: No. = %1', Comment = '%1 = Project No.';
         JobLedgerEntryExistErr: Label 'Project Ledger Entries exist for Project No. %1.\It is not possible to restore the Project.', Comment = '%1 = Project No.';
-        SalesInvoiceExistErr: Label 'Outstanding Sales Invoice exists for Project No. %1.\It is not possible to restore the Project.', Comment = '%1 = Project No.';
+        SalesInvoiceExistErr: Label 'Outstanding Sales Invoice exist for Project No. %1.\It is not possible to restore the Project.', Comment = '%1 = Project No.';
 
     procedure AutoArchiveJob(var Job: Record Job)
     var
@@ -198,7 +198,6 @@ codeunit 5139 "Job Archive Management"
             Job.Init();
             Job."No." := JobArchive."No.";
             Job.TransferFields(JobArchive);
-            OnRestoreJobOnBeforeInsertJob(JobArchive, Job);
             Job.Insert(true);
             RecordLinkManagement.CopyLinks(JobArchive, Job);
             Job.Modify(true);
@@ -247,7 +246,6 @@ codeunit 5139 "Job Archive Management"
 
         JobTask.Init();
         JobTask.TransferFields(JobTaskArchive);
-        OnRestoreSingleJobTaskOnBeforeInsertJobTask(JobTaskArchive, JobTask);
         JobTask.Insert(true);
         RecordLinkManagement.CopyLinks(JobTaskArchive, JobTask);
         JobTask.Modify(true);
@@ -266,7 +264,6 @@ codeunit 5139 "Job Archive Management"
             repeat
                 JobPlanningLine.Init();
                 JobPlanningLine.TransferFields(JobPlanningLineArchive);
-                OnRestoreJobPlanningLinesOnBeforeInsertJobPlanningLine(JobPlanningLineArchive, JobPlanningLine);
                 JobPlanningLine.Insert(true);
                 RecordLinkManagement.CopyLinks(JobPlanningLineArchive, JobPlanningLine);
                 JobPlanningLine.Modify(true);
@@ -365,21 +362,6 @@ codeunit 5139 "Job Archive Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckJobRestorePermissions(JobArchive: Record "Job Archive"; var Job: Record Job)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRestoreSingleJobTaskOnBeforeInsertJobTask(var JobTaskArchive: Record "Job Task Archive"; var JobTask: Record "Job Task")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRestoreJobPlanningLinesOnBeforeInsertJobPlanningLine(var JobPlanningLineArchive: Record "Job Planning Line Archive"; var JobPlanningLine: Record "Job Planning Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRestoreJobOnBeforeInsertJob(JobArchive: Record "Job Archive"; var Job: Record Job)
     begin
     end;
 }
