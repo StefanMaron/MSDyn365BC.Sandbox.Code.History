@@ -6,7 +6,7 @@ pageextension 8057 "Vendor List" extends "Vendor List"
 {
     actions
     {
-        addlast(creation)
+        addafter(NewPurchaseCrMemo)
         {
             action(NewContract)
             {
@@ -14,7 +14,7 @@ pageextension 8057 "Vendor List" extends "Vendor List"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Contract';
                 Image = FileContract;
-                RunObject = page "Vendor Contract";
+                RunObject = Page "Vendor Contract";
                 RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a contract for the vendor.';
