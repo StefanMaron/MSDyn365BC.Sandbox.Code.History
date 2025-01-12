@@ -271,15 +271,8 @@ xmlport 1001 "SEPA CT pain.001.001.09"
                         }
                         textelement(Cdtr)
                         {
-                            textelement(Nm)
+                            fieldelement(Nm; PaymentExportData."Recipient Name")
                             {
-                                XmlName = 'Nm';
-
-                                trigger OnBeforePassVariable()
-                                begin
-                                    Nm := CopyStr(PaymentExportData."Recipient Name", 1, 70);
-                                end;
-
                             }
                             textelement(cdtrpstladr)
                             {
@@ -407,7 +400,7 @@ xmlport 1001 "SEPA CT pain.001.001.09"
     trigger OnPreXmlPort()
     var
         FeatureTelemetry: Codeunit "Feature Telemetry";
-        SEPACTExportFile: Codeunit "SEPA CT-Export File";
+        SEPACTExportFile: Codeunit "SEPA CT-Export File";     
     begin
         FeatureTelemetry.LogUptake('0000N1Z', SEPACTExportFile.FeatureName(), Enum::"Feature Uptake Status"::Used);
         FeatureTelemetry.LogUsage('0000N20', SEPACTExportFile.FeatureName(), 'XmlPort SEPA CT pain.001.001.09');
