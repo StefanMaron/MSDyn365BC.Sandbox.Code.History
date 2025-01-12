@@ -45,6 +45,9 @@
       "path": "./SimplifiedBankStatementImport/Test/Simplified Bank Statement Import Test"
     },
     {
+      "path": "./EDocument Core/Test/E-Document Core Tests"
+    },
+    {
       "path": "./BankDeposits/Test/_Exclude_Bank Deposits Tests"
     },
     {
@@ -61,9 +64,6 @@
     },
     {
       "path": "./APIV1/Test/_Exclude_APIV1_ Tests"
-    },
-    {
-      "path": "./EDocument/Test/E-Document Core Tests"
     },
     {
       "path": "./Email - Current User Connector/Test/Email - Current User Connector Tests"
