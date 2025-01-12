@@ -4,7 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.FieldService;
 
-#if not CLEAN25
 using Microsoft.CRM.Outlook;
 using Microsoft.Foundation.UOM;
 using Microsoft.Integration.Dataverse;
@@ -18,7 +17,6 @@ using System.Environment.Configuration;
 using System.Security.Encryption;
 using System.Threading;
 using Microsoft.Projects.Resources.Resource;
-#endif
 
 table 6418 "FS Connection Setup"
 {
@@ -28,14 +26,6 @@ table 6418 "FS Connection Setup"
     InherentPermissions = rX;
     DataClassification = CustomerContent;
     ReplicateData = true;
-    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
-#if not CLEAN25
-    ObsoleteState = Pending;
-    ObsoleteTag = '25.0';
-#else
-    ObsoleteState = Removed;
-    ObsoleteTag = '28.0';
-#endif
 
     fields
     {
@@ -48,7 +38,7 @@ table 6418 "FS Connection Setup"
         {
             DataClassification = OrganizationIdentifiableInformation;
             Caption = 'Field Service URL';
-#if not CLEAN25
+
             trigger OnValidate()
             var
                 EnvironmentInfo: Codeunit "Environment Information";
@@ -62,13 +52,12 @@ table 6418 "FS Connection Setup"
                         "Authentication Type" := "Authentication Type"::AD;
                 UpdateConnectionString();
             end;
-#endif
         }
         field(3; "User Name"; Text[250])
         {
             Caption = 'User Name';
             DataClassification = EndUserIdentifiableInformation;
-#if not CLEAN25
+
             trigger OnValidate()
             begin
                 "User Name" := DelChr("User Name", '<>');
@@ -76,20 +65,18 @@ table 6418 "FS Connection Setup"
                 UpdateDomainName();
                 UpdateConnectionString();
             end;
-#endif
         }
         field(4; "User Password Key"; Guid)
         {
             Caption = 'User Password Key';
             DataClassification = EndUserPseudonymousIdentifiers;
-#if not CLEAN25
+
             trigger OnValidate()
             begin
                 if not IsTemporary() then
                     if "User Password Key" <> xRec."User Password Key" then
                         xRec.DeletePassword();
             end;
-#endif
         }
         field(59; "Restore Connection"; Boolean)
         {
@@ -100,7 +87,7 @@ table 6418 "FS Connection Setup"
         {
             DataClassification = SystemMetadata;
             Caption = 'Is Enabled';
-#if not CLEAN25
+
             trigger OnValidate()
             var
                 CRMConnectionSetup: Record "CRM Connection Setup";
@@ -126,7 +113,6 @@ table 6418 "FS Connection Setup"
                 end else
                     Session.LogMessage('0000MAU', CRMConnDisabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
             end;
-#endif
         }
         field(63; "FS Version"; Text[30])
         {
@@ -142,12 +128,11 @@ table 6418 "FS Connection Setup"
         {
             Caption = 'Proxy Version';
             DataClassification = SystemMetadata;
-#if not CLEAN25
+
             trigger OnValidate()
             begin
                 UpdateProxyVersionInConnectionString();
             end;
-#endif
         }
         field(118; CurrencyDecimalPrecision; Integer)
         {
@@ -160,9 +145,7 @@ table 6418 "FS Connection Setup"
             DataClassification = SystemMetadata;
             Caption = 'Currency';
             Description = 'Unique identifier of the base currency of the organization.';
-#if not CLEAN25
             TableRelation = "CRM Transactioncurrency".TransactionCurrencyId;
-#endif
         }
         field(133; BaseCurrencyPrecision; Integer)
         {
@@ -184,7 +167,7 @@ table 6418 "FS Connection Setup"
             Caption = 'Authentication Type';
             OptionCaption = 'OAuth 2.0,AD,IFD,OAuth';
             OptionMembers = Office365,AD,IFD,OAuth;
-#if not CLEAN25
+
             trigger OnValidate()
             begin
                 case "Authentication Type" of
@@ -195,7 +178,6 @@ table 6418 "FS Connection Setup"
                 end;
                 UpdateConnectionString();
             end;
-#endif
         }
         field(136; "Connection String"; Text[250])
         {
@@ -222,25 +204,19 @@ table 6418 "FS Connection Setup"
         {
             DataClassification = SystemMetadata;
             Caption = 'Project Journal Template';
-#if not CLEAN25
             TableRelation = "Job Journal Template";
-#endif
         }
         field(201; "Job Journal Batch"; Code[10])
         {
             DataClassification = SystemMetadata;
             Caption = 'Project Journal Batch';
-#if not CLEAN25
             TableRelation = "Job Journal Batch".Name where("Journal Template Name" = field("Job Journal Template"));
-#endif
         }
         field(202; "Hour Unit of Measure"; Code[10])
         {
             DataClassification = SystemMetadata;
             Caption = 'Hour Unit of Measure';
-#if not CLEAN25
             TableRelation = "Unit of Measure";
-#endif
         }
         field(203; "Line Synch. Rule"; Enum "FS Work Order Line Synch. Rule")
         {
@@ -265,7 +241,7 @@ table 6418 "FS Connection Setup"
     fieldgroups
     {
     }
-#if not CLEAN25
+
     trigger OnModify()
     begin
         if IsTemporary() then
@@ -1131,6 +1107,5 @@ table 6418 "FS Connection Setup"
     local procedure OnBeforeVerifyBaseCurrencyMatchesLCY(var IsHandled: Boolean)
     begin
     end;
-#endif
 }
 
