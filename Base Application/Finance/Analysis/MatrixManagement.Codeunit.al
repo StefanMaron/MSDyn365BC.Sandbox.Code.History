@@ -324,8 +324,6 @@ codeunit 9200 "Matrix Management"
             Error(Text003);
         end;
 
-        OnGeneratePeriodMatrixDataOnBeforeFindDateBasedOnStepType(SetWanted, Calendar, PeriodType);
-
         case "Matrix Page Step Type".FromInteger(SetWanted) of
             "Matrix Page Step Type"::Initial:
                 begin
@@ -576,11 +574,6 @@ codeunit 9200 "Matrix Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnGeneratePeriodMatrixDataOnBeforeAdjustPeriodWithDateFilter(DateFilter: Text; var TempPeriodRecords: array[32] of Record Date temporary; var CurrSetLength: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGeneratePeriodMatrixDataOnBeforeFindDateBasedOnStepType(SetWanted: Option; var CalendarDate: Record Date; PeriodType: Enum "Analysis Period Type")
     begin
     end;
 }
