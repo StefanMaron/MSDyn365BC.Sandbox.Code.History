@@ -53,8 +53,17 @@ codeunit 395 "FinChrgMemo-Issue"
                 if GenJnlBatch.Name = '' then
                     Error(MissingJournalFieldErr, TempGenJnlLine.FieldCaption("Journal Batch Name"));
             end;
+        if not DimMgt.CheckDimIDComb(FinChrgMemoHeader."Dimension Set ID") then
+            Error(
+              Text002,
+              FinChrgMemoHeader.TableCaption, FinChrgMemoHeader."No.", DimMgt.GetDimCombErr());
 
-        CheckDimensions();
+        TableID[1] := DATABASE::Customer;
+        No[1] := FinChrgMemoHeader."Customer No.";
+        if not DimMgt.CheckDimValuePosting(TableID, No, FinChrgMemoHeader."Dimension Set ID") then
+            Error(
+              Text003,
+              FinChrgMemoHeader.TableCaption, FinChrgMemoHeader."No.", DimMgt.GetDimValuePostingErr());
 
         Customer.Get(FinChrgMemoHeader."Customer No.");
         Customer.TestField("Customer Posting Group");
@@ -81,7 +90,7 @@ codeunit 395 "FinChrgMemo-Issue"
 
         FinChrgMemoLine.SetRange("Finance Charge Memo No.", FinChrgMemoHeader."No.");
         FinChrgMemoLine.SetRange("Detailed Interest Rates Entry", false);
-        if FinChrgMemoLine.FindSet() then
+        if FinChrgMemoLine.Find('-') then
             repeat
                 case FinChrgMemoLine.Type of
                     FinChrgMemoLine.Type::" ":
@@ -111,7 +120,7 @@ codeunit 395 "FinChrgMemo-Issue"
                             TotalAmount := TotalAmount - TempGenJnlLine.Amount;
                             TotalAmountLCY := TotalAmountLCY - TempGenJnlLine."Balance (LCY)";
                             TempGenJnlLine."Bill-to/Pay-to No." := FinChrgMemoHeader."Customer No.";
-                            OnRunOnBeforeGLAccountGenJnlLineInsert(TempGenJnlLine, FinChrgMemoLine);
+                            OnRunOnBeforeGLAccountGenJnlLineInsert(TempGenJnlLine);
                             TempGenJnlLine.Insert();
                             OnRunOnAfterGLAccountGenJnlLineInsert(TempGenJnlLine);
                         end;
@@ -127,8 +136,6 @@ codeunit 395 "FinChrgMemo-Issue"
                 end;
                 OnAfterGetFinChrgMemoLine(FinChrgMemoLine, DocNo, CurrencyExchangeRate.ExchangeRate(FinChrgMemoHeader."Posting Date", FinChrgMemoHeader."Currency Code"));
             until FinChrgMemoLine.Next() = 0;
-
-        OnAfterCalculateFinChrgMemoInterestAmounts(FinChrgMemoHeader, TempGenJnlLine, FinChrgMemoInterestAmount, FinChrgMemoInterestVATAmount);
 
         if (FinChrgMemoInterestAmount <> 0) and FinChrgMemoHeader."Post Interest" then begin
             InitGenJnlLine(TempGenJnlLine."Account Type"::"G/L Account", CustomerPostingGroup.GetInterestAccount(), true);
@@ -151,7 +158,7 @@ codeunit 395 "FinChrgMemo-Issue"
             TempGenJnlLine.Insert();
             OnRunOnAfterTotalGenJnlLineInsert(TempGenJnlLine);
         end;
-        if TempGenJnlLine.FindSet() then
+        if TempGenJnlLine.Find('-') then
             repeat
                 GenJnlLine2 := TempGenJnlLine;
                 SetDimensions(GenJnlLine2, FinChrgMemoHeader);
@@ -170,7 +177,7 @@ codeunit 395 "FinChrgMemo-Issue"
                 FinChrgTerms."Interest Calculation"::"All Entries"]
             then begin
                 FinChrgMemoLine.SetRange(Type, FinChrgMemoLine.Type::"Customer Ledger Entry");
-                if FinChrgMemoLine.FindSet() then
+                if FinChrgMemoLine.Find('-') then
                     repeat
                         UpdateCustLedgEntriesCalculateInterest(FinChrgMemoLine."Entry No.", FinChrgMemoHeader."Document Date");
                     until FinChrgMemoLine.Next() = 0;
@@ -206,28 +213,6 @@ codeunit 395 "FinChrgMemo-Issue"
         FinChrgMemoHeader.Delete();
 
         OnAfterIssueFinChargeMemo(FinChrgMemoHeader, IssuedFinChrgMemoHeader."No.");
-    end;
-
-    local procedure CheckDimensions()
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCheckDimensions(FinChrgMemoHeader, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimMgt.CheckDimIDComb(FinChrgMemoHeader."Dimension Set ID") then
-            Error(
-              Text002,
-              FinChrgMemoHeader.TableCaption, FinChrgMemoHeader."No.", DimMgt.GetDimCombErr());
-
-        TableID[1] := DATABASE::Customer;
-        No[1] := FinChrgMemoHeader."Customer No.";
-        if not DimMgt.CheckDimValuePosting(TableID, No, FinChrgMemoHeader."Dimension Set ID") then
-            Error(
-              Text003,
-              FinChrgMemoHeader.TableCaption, FinChrgMemoHeader."No.", DimMgt.GetDimValuePostingErr());
     end;
 
     var
@@ -490,11 +475,6 @@ codeunit 395 "FinChrgMemo-Issue"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCalculateFinChrgMemoInterestAmounts(var FinChargeMemoHeader: Record "Finance Charge Memo Header"; var TempGenJournalLine: Record "Gen. Journal Line" temporary; var FinChrgMemoInterestAmount: Decimal; var FinChrgMemoInterestVATAmount: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnAfterInitGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; FinChargeMemoHeader: Record "Finance Charge Memo Header"; var SrcCode: Code[10])
     begin
     end;
@@ -511,11 +491,6 @@ codeunit 395 "FinChrgMemo-Issue"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterTestDeleteHeader(var IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header"; FinanceChargeMemoHeader: Record "Finance Charge Memo Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckDimensions(var FinChargeMemoHeader: Record "Finance Charge Memo Header"; var IsHandled: Boolean)
     begin
     end;
 
@@ -570,7 +545,7 @@ codeunit 395 "FinChrgMemo-Issue"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnBeforeGLAccountGenJnlLineInsert(var GenJournalLine: Record "Gen. Journal Line"; FinanceChargeMemoLine: Record "Finance Charge Memo Line")
+    local procedure OnRunOnBeforeGLAccountGenJnlLineInsert(var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 
