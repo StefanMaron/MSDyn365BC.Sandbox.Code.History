@@ -97,11 +97,7 @@ codeunit 99000809 "Planning Line Management"
         WorkCenter: Record "Work Center";
         SubcontractorPrices: Record "Subcontractor Prices";
         SubcontractingPricesMgt: Codeunit SubcontractingPricesMgt;
-        IsHandled: Boolean;	
     begin
-        OnBeforeTransferRoutingLine(PlanningRoutingLine, ReqLine, RoutingLine, IsHandled);
-        if IsHandled then
-            exit;
         PlanningRoutingLine.TransferFromReqLine(ReqLine);
         PlanningRoutingLine.TransferFromRoutingLine(RoutingLine);
 
@@ -218,7 +214,7 @@ codeunit 99000809 "Planning Line Management"
                               (1 + ProdBOMLine[Level]."Scrap %" / 100) *
                               LineQtyPerUOM / ItemQtyPerUOM;
 
-                        OnTransferBOMOnAfterCalculateReqQty(ReqQty, ProdBOMLine[Level], PlanningRtngLine2, LineQtyPerUOM, ItemQtyPerUOM);
+                        OnTransferBOMOnAfterCalculateReqQty(ReqQty, ProdBOMLine[Level]);
                         case ProdBOMLine[Level].Type of
                             ProdBOMLine[Level].Type::Item:
                                 begin
@@ -622,6 +618,8 @@ codeunit 99000809 "Planning Line Management"
         PlanningComponent.Validate("Unit of Measure Code", ProdBOMLine."Unit of Measure Code");
         PlanningComponent."Quantity per" := ProdBOMLine."Quantity per" * LineQtyPerUOM / ItemQtyPerUOM;
         PlanningComponent.Validate("Routing Link Code", ProdBOMLine."Routing Link Code");
+        OnTransferBOMOnBeforeGetDefaultBin(PlanningComponent, ProdBOMLine, ReqLine, SKU);
+        PlanningComponent.GetDefaultBin();
         PlanningComponent.Length := ProdBOMLine.Length;
         PlanningComponent.Width := ProdBOMLine.Width;
         PlanningComponent.Weight := ProdBOMLine.Weight;
@@ -639,9 +637,6 @@ codeunit 99000809 "Planning Line Management"
             PlanningComponent.Critical := Item2.Critical;
 
         PlanningComponent."Flushing Method" := CompSKU."Flushing Method";
-        OnTransferBOMOnBeforeGetDefaultBin(PlanningComponent, ProdBOMLine, ReqLine, SKU);
-        PlanningComponent.GetDefaultBin();
-
         if SetPlanningLevelCode(PlanningComponent, ProdBOMLine, SKU, CompSKU) then
             PlanningComponent."Planning Level Code" := ReqLine."Planning Level" + 1;
 
@@ -1137,7 +1132,7 @@ codeunit 99000809 "Planning Line Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnTransferBOMOnAfterCalculateReqQty(var ReqQty: Decimal; ProductionBOMLine: Record "Production BOM Line"; PlanningRoutingLine: Record "Planning Routing Line"; LineQtyPerUOM: Decimal; ItemQtyPerUOM: Decimal);
+    local procedure OnTransferBOMOnAfterCalculateReqQty(var ReqQty: Decimal; ProductionBOMLine: Record "Production BOM Line");
     begin
     end;
 
@@ -1168,11 +1163,6 @@ codeunit 99000809 "Planning Line Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetPlanningLevelCode(var PlanningComponent: Record "Planning Component"; var ProdBOMLine: Record "Production BOM Line"; var SKU: Record "Stockkeeping Unit"; var ComponentSKU: Record "Stockkeeping Unit"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTransferRoutingLine(var PlanningRoutingLine: Record "Planning Routing Line"; RequisitionLine: Record "Requisition Line"; RoutingLine: Record "Routing Line"; var IsHandled: Boolean)
     begin
     end;
 }
