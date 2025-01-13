@@ -655,7 +655,6 @@ codeunit 5812 "Calculate Standard Cost"
     var
         RtngLine: Record "Routing Line";
         RtngHeader: Record "Routing Header";
-        IsHandled: Boolean;
     begin
         if RtngLine.CertifiedRoutingVersionExists(RtngHeaderNo, CalculationDate) then begin
             if RtngLine."Version Code" = '' then begin
@@ -664,10 +663,8 @@ codeunit 5812 "Calculate Standard Cost"
             end;
 
             repeat
-                IsHandled := false;
-                OnCalcRtngCostOnBeforeCalcRtngLineCost(RtngLine, ParentItem, LogErrors, IsHandled);
-                if not IsHandled then
-                    CalcRtngLineCost(RtngLine, MfgItemQtyBase, SLCap, SLSub, SLCapOvhd);
+                OnCalcRtngCostOnBeforeCalcRtngLineCost(RtngLine, ParentItem);
+                CalcRtngLineCost(RtngLine, MfgItemQtyBase, SLCap, SLSub, SLCapOvhd);
             until RtngLine.Next() = 0;
         end;
     end;
@@ -805,7 +802,6 @@ codeunit 5812 "Calculate Standard Cost"
                       CostCalcMgt.CalcDirUnitCost(
                         StdCostWksh."New Standard Cost", StdCostWksh."New Overhead Rate", StdCostWksh."New Indirect Cost %");
                 end;
-            OnGetMachineCenterOnBeforeAssignMachineCenterToTemp(MachineCenter, TempItem, StdCostWkshName);
             TempMachineCenter := MachineCenter;
             TempMachineCenter.Insert();
         end;
@@ -838,7 +834,6 @@ codeunit 5812 "Calculate Standard Cost"
                             StdCostWksh."New Indirect Cost %");
                 end;
 
-            OnGetResCostOnBeforeAssignPriceListLineToTemp(PriceListLine, TempItem, StdCostWkshName);
             TempPriceListLine := PriceListLine;
             NextPriceListLineNo += 1;
             TempPriceListLine."Line No." := NextPriceListLineNo;
@@ -1004,7 +999,6 @@ codeunit 5812 "Calculate Standard Cost"
 
         UnitCost := RoutingLine."Unit Cost per";
         CalcRoutingCostPerUnit(RoutingLine.Type, RoutingLine."No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation);
-        OnCalcRtngLineCostOnAfterCalcRoutingCostPerUnit(RoutingLine, WorkCenter, MfgItemQtyBase, UnitCostCalculation);
         CostTime :=
           CostCalculationMgt.CalculateCostTime(
             MfgItemQtyBase,
@@ -1141,7 +1135,7 @@ codeunit 5812 "Calculate Standard Cost"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCalcRtngCostOnBeforeCalcRtngLineCost(var RoutingLine: Record "Routing Line"; ParentItem: Record Item; var LogErrors: Boolean; var IsHandled: Boolean)
+    local procedure OnCalcRtngCostOnBeforeCalcRtngLineCost(var RoutingLine: Record "Routing Line"; ParentItem: Record Item)
     begin
     end;
 
@@ -1190,21 +1184,6 @@ codeunit 5812 "Calculate Standard Cost"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcProdBOMCostOnBeforeCalcCompItemQtyBase(var ProductionBOMLine: Record "Production BOM Line"; var ParentItem: Record Item; CalculationDate: Date; MfgItem: Record Item; MfgItemQtyBase: Decimal; IsTypeItem: Boolean; var CompItemQtyBase: Decimal; RtngNo: Code[20]; UOMFactor: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetResCostOnBeforeAssignPriceListLineToTemp(var PriceListLine: Record "Price List Line"; var TempItem: Record Item temporary; StdCostWkshName: Text[50])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetMachineCenterOnBeforeAssignMachineCenterToTemp(var MachineCenter: Record "Machine Center"; var TempItem: Record Item temporary; StdCostWkshName: Text[50])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcRtngLineCostOnAfterCalcRoutingCostPerUnit(RoutingLine: Record "Routing Line"; WorkCenter: Record "Work Center"; var MfgItemQtyBase: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type")
     begin
     end;
 }
