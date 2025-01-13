@@ -2776,9 +2776,7 @@ table 18 Customer
     procedure CreateNewCustomer(CustomerName: Text[100]; ShowCustomerCard: Boolean) NewCustomerCode: Code[20]
     var
         Customer: Record Customer;
-        xRecCustomer: Record Customer;
         CustomerTemplMgt: Codeunit "Customer Templ. Mgt.";
-        WorkflowEventHandling: Codeunit "Workflow Event Handling";
         CustomerCard: Page "Customer Card";
         IsHandled: Boolean;
     begin
@@ -2795,8 +2793,6 @@ table 18 Customer
                 Customer.Name := CustomerName;
                 Customer.Modify(true);
             end;
-
-        WorkflowEventHandling.RunWorkflowOnCustomerChanged(Customer, xRecCustomer, false);
 
         Commit();
         if not ShowCustomerCard then
