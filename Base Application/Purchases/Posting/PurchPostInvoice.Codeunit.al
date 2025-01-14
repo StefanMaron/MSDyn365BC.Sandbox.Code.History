@@ -235,7 +235,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
 
         PurchPostInvoiceEvents.RunOnPrepareLineOnBeforeAdjustTotalAmounts(PurchLine, TotalAmount, TotalAmountACY, PurchHeader.GetUseDate());
         DeferralUtilities.AdjustTotalAmountForDeferralsNoBase(
-          PurchLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, PurchLine."Inv. Discount Amount" + PurchLine."Line Discount Amount", PurchLineACY."Inv. Discount Amount" + PurchLineACY."Line Discount Amount");
+          PurchLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY);
 
         IsHandled := false;
         PurchPostInvoiceEvents.RunOnPrepareLineOnBeforeSetAmounts(
@@ -277,7 +277,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
                 PurchLine, InvoicePostingBuffer, PurchHeader.GetUseDate(), InvDefLineNo, DeferralLineNo, SuppressCommit);
             PrepareDeferralLine(
                 PurchHeader, PurchLine, InvoicePostingBuffer.Amount, InvoicePostingBuffer."Amount (ACY)",
-                AmtToDefer, AmtToDeferACY, DeferralAccount, PurchAccount, PurchLine."Inv. Discount Amount" + PurchLine."Line Discount Amount", PurchLineACY."Inv. Discount Amount" + PurchLineACY."Line Discount Amount");
+                AmtToDefer, AmtToDeferACY, DeferralAccount, PurchAccount);
             PurchPostInvoiceEvents.RunOnPrepareLineOnAfterPrepareDeferralLine(
                 PurchLine, InvoicePostingBuffer, PurchHeader.GetUseDate(), InvDefLineNo, DeferralLineNo, SuppressCommit);
         end;
@@ -880,7 +880,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
             until InvoicePostingBuffer.Next() = 0;
     end;
 
-    local procedure PrepareDeferralLine(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; AmountLCY: Decimal; AmountACY: Decimal; RemainAmtToDefer: Decimal; RemainAmtToDeferACY: Decimal; DeferralAccount: Code[20]; PurchAccount: Code[20]; DiscountAmount: Decimal; DiscountAmountACY: Decimal)
+    local procedure PrepareDeferralLine(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; AmountLCY: Decimal; AmountACY: Decimal; RemainAmtToDefer: Decimal; RemainAmtToDeferACY: Decimal; DeferralAccount: Code[20]; PurchAccount: Code[20])
     var
         DeferralTemplate: Record "Deferral Template";
         DeferralPostingBuffer: Record "Deferral Posting Buffer";
@@ -904,7 +904,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
                     DeferralPostingBuffer, PurchHeader, PurchLine, AmountLCY, AmountACY,
                     RemainAmtToDefer, RemainAmtToDeferACY, DeferralAccount, PurchAccount);
                 DeferralPostingBuffer.PrepareInitialAmounts(
-                  AmountLCY, AmountACY, RemainAmtToDefer, RemainAmtToDeferACY, PurchAccount, DeferralAccount, DiscountAmount, DiscountAmountACY);
+                  AmountLCY, AmountACY, RemainAmtToDefer, RemainAmtToDeferACY, PurchAccount, DeferralAccount);
                 DeferralPostingBuffer.Update(DeferralPostingBuffer);
                 if (RemainAmtToDefer <> 0) or (RemainAmtToDeferACY <> 0) then begin
                     DeferralPostingBuffer.PrepareRemainderPurchase(
