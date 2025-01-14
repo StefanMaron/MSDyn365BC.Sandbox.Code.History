@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -71,7 +71,6 @@ using Microsoft.Warehouse.Setup;
 using System.Automation;
 using System.Utilities;
 using System.Environment.Configuration;
-using System.Telemetry;
 
 codeunit 90 "Purch.-Post"
 {
@@ -373,7 +372,6 @@ codeunit 90 "Purch.-Post"
         UOMMgt: Codeunit "Unit of Measure Management";
         ApplicationAreaMgmt: Codeunit "Application Area Mgmt.";
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
-        FeatureTelemetry: Codeunit "Feature Telemetry";
         InvoicePostingInterface: Interface "Invoice Posting";
         IsInterfaceInitialized: Boolean;
         Window: Dialog;
@@ -471,9 +469,7 @@ codeunit 90 "Purch.-Post"
         ConfirmUsageWithBlankJobPlanningLineNoQst: Label 'Usage will not be linked to the project planning line because the Project Planning Line No field is empty.\\Do you want to continue?';
 #if not CLEAN25        
         TotalToDeferErr: Label 'The sum of the deferred amounts must be equal to the amount in the Amount to Defer field.';
-#endif
-        ReverseChargeFeatureNameTok: Label 'Reverse Charge GB', Locked = true;
-        ReverseChargeEventNameTok: Label 'Reverse Charge GB has been used', Locked = true;
+#endif        
 
     /// <summary>
     /// Generates a record id for an 'empty' line
@@ -1046,7 +1042,7 @@ codeunit 90 "Purch.-Post"
 
         IsHandled := false;
         OnPostPurchLineOnBeforeInsertReceiptLine(
-            PurchHeader, PurchLine, IsHandled, PurchRcptHeader, RoundingLineInserted, CostBaseAmount, xPurchLine, ReturnShptHeader, TempTrackingSpecification, ItemLedgShptEntryNo, SrcCode, PreviewMode);
+            PurchHeader, PurchLine, IsHandled, PurchRcptHeader, RoundingLineInserted, CostBaseAmount, xPurchLine, ReturnShptHeader, TempTrackingSpecification, ItemLedgShptEntryNo, SrcCode, PreviewMode, WhseRcptHeader, WhseReceive, WhseShip, GenJnlPostLine, GenJnlLineDocNo);
         if not IsHandled then
             if (PurchRcptHeader."No." <> '') and (PurchLine."Receipt No." = '') and
                not RoundingLineInserted and not PurchLine."Prepayment Line"
@@ -1082,7 +1078,6 @@ codeunit 90 "Purch.-Post"
                             (TempPurchLine2."Amount Including VAT" - TempPurchLine2.Amount) *
                             TempPurchLine2."Qty. to Invoice" / TempPurchLine2.Quantity,
                             Currency."Amount Rounding Precision");
-                        FeatureTelemetry.LogUsage('0000OJN', ReverseChargeFeatureNameTok, ReverseChargeEventNameTok);
                     end;
                     SetInvoiceOrderNo(PurchLine, PurchInvLine);
 
@@ -1368,7 +1363,7 @@ codeunit 90 "Purch.-Post"
 
             TempDropShptPostBuffer."Item Shpt. Entry No." :=
               PostAssocItemJnlLine(PurchHeader, PurchLine, TempDropShptPostBuffer.Quantity, TempDropShptPostBuffer."Quantity (Base)");
-            OnBeforeTempDropShptPostBufferInsert(TempDropShptPostBuffer, PurchLine);
+            OnBeforeTempDropShptPostBufferInsert(TempDropShptPostBuffer, PurchLine, ItemLedgShptEntryNo);
             TempDropShptPostBuffer.Insert();
         end;
 
@@ -1512,7 +1507,7 @@ codeunit 90 "Purch.-Post"
         IsHandled := false;
         OnBeforePostItemJnlLine(
           PurchHeader, PurchLine, QtyToBeReceived, QtyToBeReceivedBase, QtyToBeInvoiced, QtyToBeInvoicedBase,
-          ItemLedgShptEntryNo, ItemChargeNo, TrackingSpecification, SuppressCommit, IsHandled, ItemJnlPostLine, Result);
+          ItemLedgShptEntryNo, ItemChargeNo, TrackingSpecification, SuppressCommit, IsHandled, ItemJnlPostLine, Result, WhseRcptHeader);
         if IsHandled then
             exit(Result);
 
@@ -2402,7 +2397,7 @@ codeunit 90 "Purch.-Post"
             Error(RelatedItemLedgEntriesNotFoundErr)
     end;
 
-    local procedure PostAssocItemJnlLine(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; QtyToBeShipped: Decimal; QtyToBeShippedBase: Decimal): Integer
+    procedure PostAssocItemJnlLine(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; QtyToBeShipped: Decimal; QtyToBeShippedBase: Decimal): Integer
     var
         ItemJnlLine: Record "Item Journal Line";
         TempHandlingSpecification2: Record "Tracking Specification" temporary;
@@ -8170,7 +8165,7 @@ codeunit 90 "Purch.-Post"
             OnValidatePostingAndDocumentDateOnBeforeTestPostingDate(PurchaseHeader, PostingDateExists, SkipTestPostingDate);
             if not SkipTestPostingDate then
                 PurchaseHeader.TestPostingDate(PostingDateExists);
-        end;
+        end;    
 
         OnValidatePostingAndDocumentDateOnBeforePurchaseHeaderModify(PurchaseHeader, ModifyHeader);
         if ModifyHeader then
@@ -10561,7 +10556,7 @@ codeunit 90 "Purch.-Post"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostItemJnlLine(PurchHeader: Record "Purchase Header"; var PurchLine: Record "Purchase Line"; var QtyToBeReceived: Decimal; var QtyToBeReceivedBase: Decimal; var QtyToBeInvoiced: Decimal; var QtyToBeInvoicedBase: Decimal; var ItemLedgShptEntryNo: Integer; var ItemChargeNo: Code[20]; var TrackingSpecification: Record "Tracking Specification"; CommitIsSupressed: Boolean; var IsHandled: Boolean; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line"; var Result: Integer)
+    local procedure OnBeforePostItemJnlLine(PurchHeader: Record "Purchase Header"; var PurchLine: Record "Purchase Line"; var QtyToBeReceived: Decimal; var QtyToBeReceivedBase: Decimal; var QtyToBeInvoiced: Decimal; var QtyToBeInvoicedBase: Decimal; var ItemLedgShptEntryNo: Integer; var ItemChargeNo: Code[20]; var TrackingSpecification: Record "Tracking Specification"; CommitIsSupressed: Boolean; var IsHandled: Boolean; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line"; var Result: Integer; var WarehouseReceiptHeader: Record "Warehouse Receipt Header")
     begin
     end;
 
@@ -10681,7 +10676,7 @@ codeunit 90 "Purch.-Post"
     end;
 #endif
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeTempDropShptPostBufferInsert(var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary; PurchaseLine: Record "Purchase Line")
+    local procedure OnBeforeTempDropShptPostBufferInsert(var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary; PurchaseLine: Record "Purchase Line"; var ItemLedgShptEntryNo: Integer)
     begin
     end;
 
@@ -11338,7 +11333,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnPostPurchLineOnBeforeInsertReceiptLine(PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; PurchRcptHeader: Record "Purch. Rcpt. Header"; RoundingLineInserted: Boolean; CostBaseAmount: Decimal; xPurchaseLine: Record "Purchase Line"; var ReturnShipmentHeader: Record "Return Shipment Header"; var TempTrackingSpecification: Record "Tracking Specification" temporary; var ItemLedgShptEntryNo: Integer; SrcCode: Code[10]; PreviewMode: Boolean);
+    local procedure OnPostPurchLineOnBeforeInsertReceiptLine(PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; PurchRcptHeader: Record "Purch. Rcpt. Header"; RoundingLineInserted: Boolean; CostBaseAmount: Decimal; xPurchaseLine: Record "Purchase Line"; var ReturnShipmentHeader: Record "Return Shipment Header"; var TempTrackingSpecification: Record "Tracking Specification" temporary; var ItemLedgShptEntryNo: Integer; SrcCode: Code[10]; PreviewMode: Boolean; var WarehouseReceiptHeader: Record "Warehouse Receipt Header"; WhseReceive: Boolean; WhseShip: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; GenJnlLineDocNo: Code[20]);
     begin
     end;
 
