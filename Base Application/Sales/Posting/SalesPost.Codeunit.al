@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -76,7 +76,6 @@ using System.Automation;
 using System.Utilities;
 using System.Environment.Configuration;
 using System.Email;
-using System.Telemetry;
 
 codeunit 80 "Sales-Post"
 {
@@ -202,7 +201,6 @@ codeunit 80 "Sales-Post"
         DeferralUtilities: Codeunit "Deferral Utilities";
         UOMMgt: Codeunit "Unit of Measure Management";
         ApplicationAreaMgmt: Codeunit "Application Area Mgmt.";
-        FeatureTelemetry: Codeunit "Feature Telemetry";
         InvoicePostingInterface: Interface "Invoice Posting";
         IsInterfaceInitalized: Boolean;
         Window: Dialog;
@@ -291,8 +289,6 @@ codeunit 80 "Sales-Post"
         ItemReservDisruptionLbl: Label 'Confirm Item Reservation Disruption', Locked = true;
         ItemChargeZeroAmountErr: Label 'The amount for item charge %1 cannot be 0.', Comment = '%1 = Item Charge No.';
         SuppressCommitErr: Label 'Commit is blocked when %1 %2 is used.', Comment = '%1 = Date Order, %2 = Number Series';
-        ReverseChargeFeatureNameTok: Label 'Reverse Charge GB', Locked = true;
-        ReverseChargeEventNameTok: Label 'Reverse Charge GB has been used', Locked = true;
         DateOrderSeriesUsed: Boolean;	
 #if not CLEAN25        
         TotalToDeferErr: Label 'The sum of the deferred amounts must be equal to the amount in the Amount to Defer field.';
@@ -537,7 +533,7 @@ codeunit 80 "Sales-Post"
         if SalesHeader.Invoice then
             PostInvoice(SalesHeader, CustLedgEntry);
 
-        OnRunOnBeforePostICGenJnl(SalesHeader, SalesInvHeader, SalesCrMemoHeader, GenJnlPostLine, SrcCode, GenJnlLineDocType, GenJnlLineDocNo);
+        OnRunOnBeforePostICGenJnl(SalesHeader, SalesInvHeader, SalesCrMemoHeader, GenJnlPostLine, SrcCode, GenJnlLineDocType, GenJnlLineDocNo, ReturnRcptHeader, PreviewMode);
 
         if ICGenJnlLineNo > 0 then
             PostICGenJnl();
@@ -1040,7 +1036,6 @@ codeunit 80 "Sales-Post"
                         SalesLine."Qty. to Invoice" / SalesLine.Quantity, Currency."Amount Rounding Precision");
                     SalesLine.SuspendStatusCheck(true);
                     SalesLine.Validate("VAT Bus. Posting Group", SalesSetup."Reverse Charge VAT Posting Gr.");
-                    FeatureTelemetry.LogUsage('0000OJO', ReverseChargeFeatureNameTok, ReverseChargeEventNameTok);
                 end;
                 DivideAmount(SalesHeader, SalesLine, 1, SalesLine."Qty. to Invoice", TempVATAmountLine, TempVATAmountLineRemainder);
             end;
@@ -9936,7 +9931,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnBeforePostICGenJnl(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var SrcCode: Code[10]; var GenJnlLineDocType: Enum "Gen. Journal Document Type"; GenJnlLineDocNo: Code[20])
+    local procedure OnRunOnBeforePostICGenJnl(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var SrcCode: Code[10]; var GenJnlLineDocType: Enum "Gen. Journal Document Type"; GenJnlLineDocNo: Code[20]; var ReturnReceiptHeader: Record "Return Receipt Header"; var PreviewMode: Boolean)
     begin
     end;
 
@@ -10643,10 +10638,11 @@ codeunit 80 "Sales-Post"
           BatchProcessingMgt.GetBooleanParameter(
             SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Replace Document Date", ReplaceDocumentDate) and
           BatchProcessingMgt.GetDateParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Posting Date", PostingDate);
-        OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(PostingDateExists, ReplacePostingDate, ReplaceDocumentDate, PostingDate, SalesHeader, ModifyHeader);
 
         VATDateExists := BatchProcessingMgt.GetBooleanParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Replace VAT Date", ReplaceVATDate);
         BatchProcessingMgt.GetDateParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"VAT Date", VATDate);
+
+        OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(PostingDateExists, ReplacePostingDate, ReplaceDocumentDate, PostingDate, SalesHeader, ModifyHeader, VATDateExists, ReplaceVATDate, VATDate);
 
         if PostingDateExists and (ReplacePostingDate or (SalesHeader."Posting Date" = 0D)) then begin
             SalesHeader."Posting Date" := PostingDate;
@@ -12225,7 +12221,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(var PostingDateExists: Boolean; var ReplacePostingDate: Boolean; var ReplaceDocumentDate: Boolean; var PostingDate: Date; var SalesHeader: Record "Sales Header"; var ModifyHeader: Boolean)
+    local procedure OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(var PostingDateExists: Boolean; var ReplacePostingDate: Boolean; var ReplaceDocumentDate: Boolean; var PostingDate: Date; var SalesHeader: Record "Sales Header"; var ModifyHeader: Boolean; var VATDateExists: Boolean; var ReplaceVATDate: Boolean; var VATDate: Date)
     begin
     end;
 
