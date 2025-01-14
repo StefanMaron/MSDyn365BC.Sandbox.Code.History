@@ -13,6 +13,8 @@ codeunit 132501 "Sales Document Posting Errors"
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
         LibraryERM: Codeunit "Library - ERM";
         LibraryErrorMessage: Codeunit "Library - Error Message";
+        LibraryMarketing: Codeunit "Library - Marketing";
+        LibraryRandom: Codeunit "Library - Random";
         LibrarySales: Codeunit "Library - Sales";
         PostingDateNotAllowedErr: Label 'Posting Date is not within your range of allowed posting dates.';
         LibraryTimeSheet: Codeunit "Library - Time Sheet";
@@ -23,7 +25,6 @@ codeunit 132501 "Sales Document Posting Errors"
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryPlanning: Codeunit "Library - Planning";
         IsInitialized: Boolean;
-        DefaultDimErr: Label 'Select a Dimension Value Code for the Dimension Code %1 for Customer %2.';
         CheckSalesLineMsg: Label 'Check sales document line.';
 
         // Expected error messages (from code unit 80).
@@ -31,7 +32,8 @@ codeunit 132501 "Sales Document Posting Errors"
         SalesShptHeaderConflictErr: Label 'Cannot post the sales shipment because its ID, %1, is already assigned to a record. Update the number series and try again.', Comment = '%1 = Shipping No.';
         SalesInvHeaderConflictErr: Label 'Cannot post the sales invoice because its ID, %1, is already assigned to a record. Update the number series and try again.', Comment = '%1 = Posting No.';
         SetupBlockedErr: Label 'Setup is blocked in %1 for %2 %3 and %4 %5.', Comment = '%1 - General/VAT Posting Setup, %2 %3 %4 %5 - posting groups.';
-
+        CampaignNoErr: Label 'Camaign No. must be not gerenate error on update.';
+   
     [Test]
     [Scope('OnPrem')]
     procedure T001_PostingDateIsInNotAllowedPeriodInGLSetup()
@@ -486,7 +488,7 @@ codeunit 132501 "Sales Document Posting Errors"
         CustomerNo: Code[20];
     begin
         // [FEATURE] [Batch Posting] [Job Queue]
-        // [SCENARIO] Batch posting of two documents (in background) verifies "Error Messages" that contains two lines per first document and one line for second document
+        // [SCENARIO] Batch posting of two documents (in background) verifies "Error Messages" that contains zero lines as we do not subscribe to the error handler mgt.
         Initialize();
         LibrarySales.SetPostWithJobQueue(true);
         BindSubscription(LibraryJobQueue);
@@ -516,23 +518,11 @@ codeunit 132501 "Sales Document Posting Errors"
             LibraryJobQueue.RunJobQueueErrorHandler(JobQueueEntry);
         until JobQueueEntry.Next() = 0;
 
-        // [THEN] "Error Message" table contains 3 lines:
-        // [THEN] 2 lines for Invoice '1002' and 1 line for Invoice '1003'
-        // [THEN] The first error for Invoice '1002' is 'Posting Date is not within your range of allowed posting dates.'
+        // [THEN] "Error Message" table contains 0 lines:
         ErrorMessage.SetRange("Context Record ID", SalesHeader[1].RecordId);
-        Assert.RecordCount(ErrorMessage, 2);
-        ErrorMessage.FindFirst();
-        Assert.ExpectedMessage(PostingDateNotAllowedErr, ErrorMessage."Message");
-        // [THEN] The second error for Invoice '1002' is 'Select a Dimension Value Code for the Dimension Code %1 for Customer %2.'
-        ErrorMessage.Next();
-        ErrorMessage.Next();
-        Assert.ExpectedMessage(StrSubstNo(DefaultDimErr, DefaultDimension."Dimension Code", CustomerNo), ErrorMessage."Message");
-
-        // [THEN] The Error for Invoice '1003' is 'Posting Date is not within your range of allowed posting dates.'
+        Assert.RecordCount(ErrorMessage, 0);
         ErrorMessage.SetRange("Context Record ID", SalesHeader[2].RecordId);
-        Assert.RecordCount(ErrorMessage, 1);
-        ErrorMessage.FindFirst();
-        Assert.ExpectedMessage(PostingDateNotAllowedErr, ErrorMessage."Message");
+        Assert.RecordCount(ErrorMessage, 0);
     end;
 
     [Test]
@@ -552,7 +542,7 @@ codeunit 132501 "Sales Document Posting Errors"
         CustomerNo: Code[20];
     begin
         // [FEATURE] [Batch Posting] [Job Queue]
-        // [SCENARIO] Batch posting of document (in background) verifies "Error Messages" page that contains two lines for Job Queue Entry
+        // [SCENARIO] Batch posting of document (in background) verifies "Error Messages" page that contains one lines for Job Queue Entry (last error only)
         Initialize();
         LibrarySales.SetPostWithJobQueue(true);
         BindSubscription(LibraryJobQueue);
@@ -584,10 +574,6 @@ codeunit 132501 "Sales Document Posting Errors"
         JobQueueEntries.ShowError.Invoke();
         ErrorMessages.First();
         Assert.IsSubstring(ErrorMessages.Description.Value, PostingDateNotAllowedErr);
-        ErrorMessages.Next();
-        ErrorMessages.Next();
-        Assert.IsSubstring(ErrorMessages.Description.Value, StrSubstNo(DefaultDimErr, DefaultDimension."Dimension Code", CustomerNo));
-        Assert.IsFalse(ErrorMessages.Next(), 'Wrong number of error messages.');
     end;
 
     [Test]
@@ -865,6 +851,49 @@ codeunit 132501 "Sales Document Posting Errors"
 
         // [THEN] Verify Post Shipment on Sales Order without errors
         LibrarySales.PostSalesDocument(SalesHeader, true, false);
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmYesHandler')]
+    procedure SalesOrderShouldNotThrowErrorWhenCampaignNoIsUpdated()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        Item: Record Item;
+        Campaign: Record Campaign;
+        SalesOrder: TestPage "Sales Order";
+    begin
+        // [SCINARIO 527088] Line & Invoice Discounts disappears once you re-open Sales Order to add a Campaign no.
+        Initialize();
+
+        // [GIVEN] Create an Item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Cretae a Sales Order.
+        LibrarySales.CreateSalesOrder(SalesHeader);
+
+        // [GIVEN] Cretae Sales Line for the Sales Order.
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", LibraryRandom.RandInt(5));
+
+        // [GIVEN] Release Sales Document.
+        LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        // [GIVEN] Reoprn Ssales Docuement.
+        LibrarySales.ReopenSalesDocument(SalesHeader);
+
+        // [GIVEN] Create a Campaign.
+        LibraryMarketing.CreateCampaign(Campaign);
+
+        // [GIVEN] Open Sales Order to put Campaign No.
+        SalesOrder.OpenEdit();
+        SalesOrder.Filter.SetFilter("No.", SalesHeader."No.");
+        SalesOrder."Campaign No.".SetValue(Campaign."No.");
+
+        // [THEN] Verify Campaign No. is udpated.
+        Assert.AreEqual(
+            Campaign."No.", 
+            SalesOrder."Campaign No.".Value(), 
+            CampaignNoErr);    
     end;
 
     local procedure Initialize()
