@@ -33,7 +33,7 @@ codeunit 30335 "Shpfy Metafield Owner Variant" implements "Shpfy IMetafield Owne
                         MetafieldIds.Add(Id, UpdatedAt);
                     end;
     end;
-
+    
     procedure GetShopCode(OwnerId: BigInteger): Code[20]
     var
         Variant: Record "Shpfy Variant";
