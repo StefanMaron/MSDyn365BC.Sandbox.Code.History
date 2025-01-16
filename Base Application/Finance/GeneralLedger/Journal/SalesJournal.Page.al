@@ -449,7 +449,7 @@ page 253 "Sales Journal"
                 field("Sales/Purch. (LCY)"; Rec."Sales/Purch. (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the line''s net amount (the amount excluding VAT) if you are using this journal line for an invoice. The field is important for customer and vendor statistics, but it has no significance for posting. You can either fill in the field or it will be calculated automatically once you fill in the Account No. and Bal. Account No. fields';
+                    ToolTip = 'Specifies the line''s net amount (the amount excluding VAT) if you are using this journal line for an invoice.';
                     Visible = false;
                 }
                 field("Profit (LCY)"; Rec."Profit (LCY)")
@@ -1034,15 +1034,12 @@ page 253 "Sales Journal"
 
                     trigger OnAction()
                     var
-                        BackupRec: Record "Gen. Journal Line";
                         GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
                     begin
                         if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
                             Error(ActionOnlyAllowedForAllocationAccountsErr);
 
-                        BackupRec.Copy(Rec);
-                        BackupRec.SetRecFilter();
-                        GenJournalAllocAccMgt.CreateLines(BackupRec);
+                        GenJournalAllocAccMgt.CreateLines(Rec);
                         Rec.Delete();
                         CurrPage.Update(false);
                     end;
@@ -1524,6 +1521,9 @@ page 253 "Sales Journal"
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
         ApprovalMgmt: Codeunit "Approvals Mgmt.";
         ChangeExchangeRate: Page "Change Exchange Rate";
+        CurrentJnlBatchName: Code[10];
+        AccName: Text[100];
+        BalAccName: Text[100];
         GenJnlBatchApprovalStatus: Text[20];
         GenJnlLineApprovalStatus: Text[20];
         Balance: Decimal;
@@ -1577,9 +1577,6 @@ page 253 "Sales Journal"
         DimVisible6: Boolean;
         DimVisible7: Boolean;
         DimVisible8: Boolean;
-        CurrentJnlBatchName: Code[10];
-        AccName: Text[100];
-        BalAccName: Text[100];
 
     local procedure UpdateBalance()
     var
@@ -1672,7 +1669,7 @@ page 253 "Sales Journal"
         OnAfterSetDimensionsVisibility();
     end;
 
-    protected procedure SetJobQueueVisibility()
+    local procedure SetJobQueueVisibility()
     begin
         JobQueueVisible := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
         JobQueuesUsed := GeneralLedgerSetup.JobQueueActive();
