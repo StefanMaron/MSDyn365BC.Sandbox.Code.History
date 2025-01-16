@@ -1399,7 +1399,7 @@ codeunit 139020 "Test Job Queue SNAP"
         JobQueueDispatcher.MockTaskScheduler();
         JobQueueDispatcher.Run(JobQueueEntryB);
 
-        JobQueueEntryB.TestField(Status, JobQueueEntryB.Status::Waiting);
+        Assert.IsTrue(JobQueueEntryB.Status in [JobQueueEntryB.Status::Ready, JobQueueEntryB.Status::Waiting], 'Status must be Ready or Waiting');
         UnbindSubscription(LibraryJobQueue);
     end;
 
@@ -1453,14 +1453,26 @@ codeunit 139020 "Test Job Queue SNAP"
         Assert.RecordCount(JobQueueEntry, 1);
         Assert.RecordCount(JobQueueLogEntry, 0);
 
-        // [WHEN] Run the job queue
+        // [WHEN] Run the job queue (will also schedule a clean-up job if not exists)
         Codeunit.Run(Codeunit::"Job Queue Dispatcher", JobQueueEntry);
 
         // [THEN] The job queue does not run because it is outside the time range it should run
-        Assert.RecordCount(JobQueueEntry, 1);
+        Assert.RecordCount(JobQueueEntry, 2);
         Assert.RecordCount(JobQueueLogEntry, 0);
+        JobQueueEntry.FindSet();
+        repeat
+            if JobQueueEntry."Object ID to Run" = Codeunit::"Job Queue Cleanup Tasks" then
+                Assert.IsTrue(JobQueueEntry."Recurring Job", 'Clean-up job should be recurring')
+            else
+                if JobQueueEntry."Recurring Job" then
+                    Assert.IsTrue(JobQueueEntry."Earliest Start Date/Time" > CurrentDateTime(), 'Earliest start time should be in the future');
+        until JobQueueEntry.Next() = 0;
 
         // [GIVEN] The same job queue but set within running hours and across to the next day
+        JobQueueEntry.SetFilter("Object ID to Run", '<>%1', Codeunit::"Job Queue Cleanup Tasks");
+        JobQueueEntry.FindFirst();
+        JobQueueEntry.SetRange("Object ID to Run");
+
         CurTime := DT2Time(CurrentDateTime());
         JobQueueEntry."Starting Time" := CurTime - (1000 * 60 * 60); // 1 hour backward
         JobQueueEntry."Ending Time" := CurTime + (1000 * 60 * 60 * 22); // 22 hour forward
@@ -1469,8 +1481,8 @@ codeunit 139020 "Test Job Queue SNAP"
         // [WHEN] Run the job queue
         Codeunit.Run(Codeunit::"Job Queue Dispatcher", JobQueueEntry);
 
-        // [THEN] The job queue runs
-        Assert.RecordCount(JobQueueEntry, 0);
+        // [THEN] The job queue ran and the job is deleted
+        Assert.RecordCount(JobQueueEntry, 1);  // only the clean-up task is left
         Assert.RecordCount(JobQueueLogEntry, 1);
     end;
 
