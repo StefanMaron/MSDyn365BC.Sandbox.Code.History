@@ -47,13 +47,14 @@ codeunit 6225 "Sust. Purchase Subscriber"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Preview", 'OnAfterBindSubscription', '', false, false)]
     local procedure OnAfterBindSubscription()
     begin
-        TryBindPostingPreviewHandler();
+        SustPreviewPostInstance.Initialize();
+        BindSubscription(SustPreviewPostingHandler);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Gen. Jnl.-Post Preview", 'OnAfterUnbindSubscription', '', false, false)]
     local procedure OnAfterUnbindSubscription()
     begin
-        TryUnbindPostingPreviewHandler();
+        UnbindSubscription(SustPreviewPostingHandler);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", 'OnBeforePostUpdateOrderLineModifyTempLine', '', false, false)]
@@ -208,22 +209,8 @@ codeunit 6225 "Sust. Purchase Subscriber"
             exit(true);
     end;
 
-    local procedure TryBindPostingPreviewHandler(): Boolean
     var
         SustPreviewPostingHandler: Codeunit "Sust. Preview Posting Handler";
         SustPreviewPostInstance: Codeunit "Sust. Preview Post Instance";
-    begin
-        SustPreviewPostInstance.Initialize();
-        exit(SustPreviewPostingHandler.TryBindPostingPreviewHandler());
-    end;
-
-    local procedure TryUnbindPostingPreviewHandler(): Boolean
-    var
-        SustPreviewPostingHandler: Codeunit "Sust. Preview Posting Handler";
-    begin
-        exit(SustPreviewPostingHandler.TryUnbindPostingPreviewHandler());
-    end;
-
-    var
         EmissionMustNotBeZeroErr: Label 'The Emission fields must have a value that is not 0.';
 }
