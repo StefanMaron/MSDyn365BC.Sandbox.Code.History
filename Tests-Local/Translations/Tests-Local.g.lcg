@@ -2678,15 +2678,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM No Taxable VAT - NamedType VATBufferBaseCap)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2056835225 - NamedType 546742772" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Entries count must matched with expected value %1.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM No Taxable VAT - NamedType VATEntryMustExistMsgLbl)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 2056835225 - NamedType 3465506657" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[VAT Entry must not exist.]]></Val>
@@ -3776,15 +3767,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SII Corrective Documents - NamedType CorrectedInvoiceNoMustHaveValueErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2120928477 - NamedType 3088887303" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The XML document was not generated properly.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SII Corrective Documents - NamedType IncorrectXMLDocErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 2120928477 - NamedType 2437985021" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[//soapenv:Body/siiRL:SuministroLRFacturasRecibidas/siiRL:RegistroLRFacturasRecibidas/siiRL:FacturaRecibida/sii:DesgloseFactura/sii:DesgloseIVA/sii:DetalleIVA/]]></Val>
@@ -4388,15 +4370,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SII Payments - NamedType XPathSalesCobroTok)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2175542957 - NamedType 3088887303" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The XML document was not generated properly.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SII Period Tests - NamedType IncorrectXMLDocErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3849314057 - NamedType 1588784175" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You cannot specify more than three special scheme codes for each document.]]></Val>
@@ -4899,15 +4872,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test VAT Registration No. - NamedType NoAlphanumericErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2971784732 - NamedType 1428717091" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Value of 80 character should be accepted in AEATTransference File.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test VAT Statement - NamedType AEATTransferenceValueErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2971784732 - NamedType 863404764" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
