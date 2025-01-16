@@ -1222,6 +1222,7 @@ page 9305 "Sales Order List"
 
     trigger OnInit()
     begin
+        CurrPage.PowerBIEmbeddedReportPart.PAGE.InitPageRatio(PowerBIServiceMgt.GetFactboxRatio());
         CurrPage.PowerBIEmbeddedReportPart.PAGE.SetPageContext(CurrPage.ObjectId(false));
     end;
 
@@ -1249,6 +1250,7 @@ page 9305 "Sales Order List"
     var
         DocPrint: Codeunit "Document-Print";
         ReportPrint: Codeunit "Test Report-Print";
+        PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
         Usage: Option "Order Confirmation","Work Order","Pick Instruction";
         JobQueueActive: Boolean;
         OnlyShowHeadersWithVat: Boolean;
