@@ -9,18 +9,9 @@
 
 var embed = null;
 var activePage = null;
-var legacySettingsObject = null;
+var settingsObject = null;
 var models = null;
 var pbiAuthToken = null;
-// Settings:
-var _showBookmarkSelection = false;
-var _showFilters = false;
-var _showPageSelection = false;
-var _showZoomBar = false;
-var _forceTransparentBackground = false;
-var _forceFitToPage = false;
-var _addBottomPadding = false;
-var _localeSettings = {};
 
 function Initialize() {
     models = window['powerbi-client'].models;
@@ -110,7 +101,7 @@ function EditMode() {
 
 function InitializeFrame(fullpage, ratio) {
     // OBSOLETE
-    legacySettingsObject = {
+    settingsObject = {
         panes: {
             bookmarks: {
                 visible: false
@@ -335,35 +326,12 @@ function SetPage(pageName) {
     });
 }
 
-function SetLocale(newLocale) {
-    _localeSettings = {
-        language: newLocale
-    }
-}
-
 function SetToken(authToken) {
     pbiAuthToken = authToken;
 }
 
 function SetSettings(showBookmarkSelection, showFilters, showPageSelection, showZoomBar, forceTransparentBackground, forceFitToPage, addBottomPadding) {
-    _showBookmarkSelection = showBookmarkSelection;
-    _showFilters = showFilters;
-    _showPageSelection = showPageSelection;
-    _showZoomBar = showZoomBar;
-    _forceTransparentBackground = forceTransparentBackground;
-    _forceFitToPage = forceFitToPage;
-    _addBottomPadding = addBottomPadding;
-}
-
-// Internal functions
-
-function CompileSettings() {
-    if (legacySettingsObject) {
-        // Already initialized. This case is only used for backwards compatibility.
-        return legacySettingsObject;
-    }
-
-    if (_addBottomPadding) {
+    if (addBottomPadding) {
         var iframe = window.frameElement;
         iframe.style.paddingBottom = '42px';
     }
@@ -372,17 +340,17 @@ function CompileSettings() {
         iframe.style.removeProperty('paddingBottom');
     }
 
-    var settingsObject = {
+    settingsObject = {
         panes: {
             bookmarks: {
-                visible: _showBookmarkSelection
+                visible: showBookmarkSelection
             },
             filters: {
-                visible: _showFilters,
+                visible: showFilters,
                 expanded: false
             },
             pageNavigation: {
-                visible: _showPageSelection
+                visible: showPageSelection
             },
             fields: { // In edit mode, allows selecting fields to add to the report
                 visible: false
@@ -400,36 +368,24 @@ function CompileSettings() {
 
         bars: {
             statusBar: {
-                visible: _showZoomBar
+                visible: showZoomBar
             }
-        },
-
-        localeSettings: _localeSettings
+        }
     }
 
-    if (_forceTransparentBackground) {
+    if (forceTransparentBackground) {
         settingsObject.background = models.BackgroundType.Transparent;
     }
 
-    if (_forceFitToPage) {
+    if (forceFitToPage) {
         settingsObject.layoutType = models.LayoutType.Custom;
         settingsObject.customLayout = {
             displayOption: models.DisplayOption.FitToPage
         }
     }
-
-    return settingsObject;
 }
 
-function ExtractBootstrapConfiguration(embedConfiguration) {
-    return {
-        type: embedConfiguration.type,
-        hostname: GetHost(embedConfiguration.embedUrl),
-        settings: {
-            localeSettings: embedConfiguration.settings.localeSettings
-        }
-    };
-}
+// Internal functions
 
 function ClearEmbedGlobals() {
     embed = null;
@@ -447,7 +403,7 @@ function InitializeEmbedConfig() {
 
         viewMode: models.ViewMode.View,
         permissions: models.Permissions.All,
-        settings: CompileSettings()
+        settings: settingsObject
     };
 
     return embedConfiguration;
@@ -458,12 +414,10 @@ function DisplayEmbed(embedConfiguration) {
 
     powerbi.reset(reportContainer);
 
-
     // NOTE: Bootstrap is here to work around an issue with how the powerbi.js library handles ScoreCards.
     // ScoreCards are classified as Reports, but have different URL structure. If we call powerbi.embed directly on a ScoreCard, the library
     // tries to load non-existing ScoreCard resources. Bootstrapping without the final URL forces the library to load the correct Report resources.
-    var bootstrapConfiguration = ExtractBootstrapConfiguration(embedConfiguration);
-    powerbi.bootstrap(reportContainer, bootstrapConfiguration);
+    powerbi.bootstrap(reportContainer, { type: embedConfiguration.type, hostname: GetHost(embedConfiguration.embedUrl) });
 
     embed = powerbi.embed(reportContainer, embedConfiguration);
 }
