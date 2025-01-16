@@ -419,11 +419,10 @@ codeunit 5376 "Create E-Document Transactions"
     local procedure CreateEDoc(var TempBlob: Codeunit "Temp Blob"): Record "E-Document";
     var
         EDocument: Record "E-Document";
+        EDocumentLogRecord: Record "E-Document Log";
         EDocService: Record "E-Document Service";
-        EDocServiceStatus: Record "E-Document Service Status";
         CreateEDocumentSetup: Codeunit "Create E-Document Setup";
         EDocumentLog: Codeunit "E-Document Log Helper";
-
     begin
         EDocument.Init();
         EDocument."Entry No" := 0;
@@ -432,13 +431,7 @@ codeunit 5376 "Create E-Document Transactions"
         EDocument.Insert();
 
         EDocService.Get(CreateEDocumentSetup.EDocService());
-        EDocumentLog.InsertLog(EDocument, EDocService, TempBlob, Enum::"E-Document Service Status"::Imported);
-        EDocServiceStatus.Init();
-        EDocServiceStatus."E-Document Entry No" := EDocument."Entry No";
-        EDocServiceStatus."E-Document Service Code" := EDocService.Code;
-        EDocServiceStatus.Status := Enum::"E-Document Service Status"::Imported;
-        EDocServiceStatus.Insert();
-
+        EDocumentLogRecord.Get(EDocumentLog.InsertLog(EDocument, EDocService, TempBlob, Enum::"E-Document Service Status"::Imported));
         exit(EDocument);
     end;
 
