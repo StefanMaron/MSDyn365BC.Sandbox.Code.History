@@ -504,6 +504,7 @@ codeunit 11000006 "CBG Statement Reconciliation"
         end;
     end;
 
+    [Scope('OnPrem')]
     procedure ResetNumbers()
     begin
         NumberOfDocumentNumbers := 0;
