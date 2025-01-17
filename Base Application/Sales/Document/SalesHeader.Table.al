@@ -195,7 +195,7 @@ table 36 "Sales Header"
 
                 UpdateShipToCodeFromCust();
                 IsHandled := false;
-                OnValidateSellToCustomerNoOnBeforeValidateLocationCode(Rec, Customer, IsHandled, xRec);
+                OnValidateSellToCustomerNoOnBeforeValidateLocationCode(Rec, Customer, IsHandled);
                 if not IsHandled then
                     LocationCode := "Location Code";
 
@@ -972,14 +972,7 @@ table 36 "Sales Header"
             TableRelation = "Customer Discount Group";
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateCustomerDiscGroup(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
-
                 TestStatusOpen();
                 MessageIfSalesLinesExist(FieldCaption("Customer Disc. Group"));
             end;
@@ -1680,7 +1673,6 @@ table 36 "Sales Header"
 
                 if UpdateDocumentDate and ("Document Type" = "Document Type"::Quote) and ("Document Date" <> 0D) then
                     CalcQuoteValidUntilDate();
-                UpdateDocumentDate := false;
             end;
         }
         field(100; "External Document No."; Code[35])
@@ -3445,14 +3437,14 @@ table 36 "Sales Header"
                 NoSeriesMgt2.RaiseObsoleteOnBeforeInitSeries(NoSeriesCode, xRec."No. Series", "Posting Date", "No.", "No. Series", IsHandled);
                 if not IsHandled then begin
 #endif
-                    "No. Series" := NoSeriesCode;
-                    if NoSeries.AreRelated("No. Series", xRec."No. Series") then
-                        "No. Series" := xRec."No. Series";
+                "No. Series" := NoSeriesCode;
+                if NoSeries.AreRelated("No. Series", xRec."No. Series") then
+                    "No. Series" := xRec."No. Series";
+                "No." := NoSeries.GetNextNo("No. Series", "Posting Date");
+                SalesHeader2.ReadIsolation(IsolationLevel::ReadUncommitted);
+                SalesHeader2.SetLoadFields("No.");
+                while SalesHeader2.Get("Document Type", "No.") do
                     "No." := NoSeries.GetNextNo("No. Series", "Posting Date");
-                    SalesHeader2.ReadIsolation(IsolationLevel::ReadUncommitted);
-                    SalesHeader2.SetLoadFields("No.");
-                    while SalesHeader2.Get("Document Type", "No.") do
-                        "No." := NoSeries.GetNextNo("No. Series", "Posting Date");
 #if not CLEAN24
                     NoSeriesMgt2.RaiseObsoleteOnAfterInitSeries("No. Series", NoSeriesCode, "Posting Date", "No.");
                 end;
@@ -4521,7 +4513,7 @@ table 36 "Sales Header"
                         FieldNo("Shipping Agent Code"):
                             SalesLine.Validate("Shipping Agent Code", "Shipping Agent Code");
                         FieldNo("Shipping Agent Service Code"):
-                            if (SalesLine."No." <> '') and (SalesLine."Shipping Agent Code" <> '') then
+                            if SalesLine."No." <> '' then
                                 SalesLine.Validate("Shipping Agent Service Code", "Shipping Agent Service Code");
                         FieldNo("Shipping Time"):
                             if SalesLine."No." <> '' then
@@ -6005,7 +5997,6 @@ table 36 "Sales Header"
                 CustCheckCreditLimit.SalesHeaderCheck(Rec);
 
             CalcFields("Amount Including VAT");
-            OnCheckCreditLimitOnAfterCreditLimitCheck(Rec);
         end;
     end;
 
@@ -7176,32 +7167,6 @@ table 36 "Sales Header"
         Commit();
     end;
 
-    procedure BatchConfirmUpdatePostingDate(ReplacePostingDate: Boolean; PostingDateReq: Date; ReplaceVATDate: Boolean; VATDateReq: Date; ReplaceDocDate: Boolean)
-    begin
-        if not ReplacePostingDate then
-            exit;
-        if (PostingDateReq = "Posting Date") then
-            exit;
-        if DeferralHeadersExist() then
-            exit;
-
-        if ReplacePostingDate then begin
-            "Posting Date" := PostingDateReq;
-            Validate("Currency Code");
-        end;
-
-        if ReplaceVATDate then
-            "VAT Reporting Date" := VATDateReq;
-
-        if ReplacePostingDate and ReplaceDocDate and ("Document Date" <> PostingDateReq) then begin
-            UpdateDocumentDate := true;
-            Validate("Document Date", PostingDateReq);
-        end;
-
-        Commit();
-    end;
-
-
     /// <summary>
     /// Retrieves the name of the payment service assigned to the document.
     /// </summary>
@@ -7990,7 +7955,6 @@ table 36 "Sales Header"
     var
         OutStream: OutStream;
     begin
-        OnBeforeSetWorkDescription(Rec, NewWorkDescription);
         Clear("Work Description");
         "Work Description".CreateOutStream(OutStream, TEXTENCODING::UTF8);
         OutStream.WriteText(NewWorkDescription);
@@ -8139,14 +8103,11 @@ table 36 "Sales Header"
     procedure PerformManualRelease()
     var
         ReleaseSalesDoc: Codeunit "Release Sales Document";
-        IsHandled: Boolean;
     begin
-        OnBeforePerformManualRelease(Rec, IsHandled);
-        if not IsHandled then
-            if Rec.Status <> Rec.Status::Released then begin
-                ReleaseSalesDoc.PerformManualRelease(Rec);
-                Commit();
-            end;
+        if Rec.Status <> Rec.Status::Released then begin
+            ReleaseSalesDoc.PerformManualRelease(Rec);
+            Commit();
+        end;
     end;
 
     /// <summary>
@@ -9091,12 +9052,7 @@ table 36 "Sales Header"
     procedure CreateDimFromDefaultDim(FieldNo: Integer)
     var
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCreateDimFromDefaultDim(Rec, FieldNo, IsHandled);
-        if IsHandled then
-            exit;
         InitDefaultDimensionSources(DefaultDimSource, FieldNo);
         CreateDim(DefaultDimSource);
     end;
@@ -9326,15 +9282,10 @@ table 36 "Sales Header"
         CorrectPostedSalesInvoice.UpdateSalesOrderLineIfExist(SalesCreditMemoHeader."No.");
     end;
 
-    local procedure IsNotFullyCancelled(var SalesCreditMemoHeader: Record "Sales Cr.Memo Header") Result: Boolean
+    local procedure IsNotFullyCancelled(var SalesCreditMemoHeader: Record "Sales Cr.Memo Header"): Boolean
     var
         CustLedgerEntry, ClosedCustLedgerEntry : Record "Cust. Ledger Entry";
-        IsHandled: Boolean;
     begin
-        OnBeforeIsNotFullyCancelled(SalesCreditMemoHeader, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         if SalesCreditMemoHeader."Cust. Ledger Entry No." = 0 then
             exit(true);
 
@@ -10971,7 +10922,7 @@ table 36 "Sales Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateSellToCustomerNoOnBeforeValidateLocationCode(var SalesHeader: Record "Sales Header"; var Cust: Record Customer; var IsHandled: Boolean; xSalesHeader: Record "Sales Header")
+    local procedure OnValidateSellToCustomerNoOnBeforeValidateLocationCode(var SalesHeader: Record "Sales Header"; var Cust: Record Customer; var IsHandled: Boolean)
     begin
     end;
 
@@ -11245,36 +11196,6 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateSellToCustOnBeforeValidateBillToContactNo(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePerformManualRelease(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsNotFullyCancelled(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCheckCreditLimitOnAfterCreditLimitCheck(var SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateDimFromDefaultDim(var Rec: Record "Sales Header"; FieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateCustomerDiscGroup(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; CurrentFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetWorkDescription(var SalesHeader: Record "Sales Header"; var NewWorkDescription: Text)
     begin
     end;
 }
