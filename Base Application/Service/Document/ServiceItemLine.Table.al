@@ -2551,6 +2551,8 @@ table 5901 "Service Item Line"
             Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup."Service Management",
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", ServHeader."Dimension Set ID", Database::"Service Header");
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+
+        OnAfterCreateDim(Rec, CurrFieldNo, xRec, DefaultDimSource);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -2574,7 +2576,7 @@ table 5901 "Service Item Line"
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            OnShowDimensionsOnBeforeServiceItemLineModify(Rec);
+            OnShowDimensionsOnBeforeServiceItemLineModify(Rec, xRec);
             Modify();
             if ServLineExists() then
                 UpdateAllLineDim("Dimension Set ID", OldDimSetID);
@@ -3083,7 +3085,7 @@ table 5901 "Service Item Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnShowDimensionsOnBeforeServiceItemLineModify(var ServiceItemLine: Record "Service Item Line")
+    local procedure OnShowDimensionsOnBeforeServiceItemLineModify(var ServiceItemLine: Record "Service Item Line"; xServiceItemLine: Record "Service Item Line")
     begin
     end;
 
@@ -3189,6 +3191,11 @@ table 5901 "Service Item Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateResponseTimeHours(var ServiceItemLine: Record "Service Item Line"; var ResponseTimeHours: Decimal; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateDim(var ServiceItemLine: Record "Service Item Line"; CallingFieldNo: Integer; xServiceItemLine: Record "Service Item Line"; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]);
     begin
     end;
 }

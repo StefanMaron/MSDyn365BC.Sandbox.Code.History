@@ -57,6 +57,7 @@ codeunit 1720 "Deferral Utilities"
         DeferralLineAmount: Dictionary of [RecordId, Decimal];
         AdjustedStartDate: Date;
         AdjustedDeferralAmount: Decimal;
+        TotalDeferralLineAmount: Decimal;
         IsHandled: Boolean;
         RedistributeDeferralSchedule: Boolean;
     begin
@@ -82,7 +83,7 @@ codeunit 1720 "Deferral Utilities"
         if RedistributeDeferralSchedule then
             SaveUserDefinedDeferralLineAmounts(
                 DeferralDocType, GenJnlTemplateName, GenJnlBatchName, DocumentType,
-                DocumentNo, LineNo, CalcMethod, DeferralLineAmount);
+                DocumentNo, LineNo, CalcMethod, DeferralLineAmount, TotalDeferralLineAmount);
 
         SetDeferralRecords(
             DeferralHeader, DeferralDocType, GenJnlTemplateName, GenJnlBatchName, DocumentType, DocumentNo, LineNo,
@@ -101,11 +102,11 @@ codeunit 1720 "Deferral Utilities"
         end;
 
         if RedistributeDeferralSchedule then
-            RedistributeDeferralLines(DeferralLine, DeferralLineAmount, DeferralHeader);
+            RedistributeDeferralLines(DeferralLine, DeferralLineAmount, DeferralHeader, TotalDeferralLineAmount);
         OnAfterCreateDeferralSchedule(DeferralHeader, DeferralLine, DeferralTemplate, CalcMethod);
     end;
 
-    local procedure SaveUserDefinedDeferralLineAmounts(DeferralDocType: Integer; GenJnlTemplateName: Code[10]; GenJnlBatchName: Code[10]; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; CalcMethod: Enum "Deferral Calculation Method"; var DeferralLineAmount: Dictionary of [RecordId, Decimal])
+    local procedure SaveUserDefinedDeferralLineAmounts(DeferralDocType: Integer; GenJnlTemplateName: Code[10]; GenJnlBatchName: Code[10]; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; CalcMethod: Enum "Deferral Calculation Method"; var DeferralLineAmount: Dictionary of [RecordId, Decimal]; var TotalDeferralLineAmount: Decimal)
     var
         DeferralHeader: Record "Deferral Header";
         DeferralLine: Record "Deferral Line";
@@ -123,6 +124,8 @@ codeunit 1720 "Deferral Utilities"
 
         Clear(DeferralLineAmount);
         SaveDeferralLineAmounts(DeferralLine, DeferralLineAmount);
+        DeferralLine.CalcSums(Amount);
+        TotalDeferralLineAmount := DeferralLine.Amount;
     end;
 
     local procedure SaveDeferralLineAmounts(var DeferralLine: Record "Deferral Line"; var DeferralLineAmount: Dictionary of [RecordId, Decimal])
@@ -133,7 +136,7 @@ codeunit 1720 "Deferral Utilities"
             until DeferralLine.Next() = 0;
     end;
 
-    local procedure RedistributeDeferralLines(var DeferralLine: Record "Deferral Line"; DeferralLineAmount: Dictionary of [RecordId, Decimal]; DeferralHeader: Record "Deferral Header")
+    local procedure RedistributeDeferralLines(var DeferralLine: Record "Deferral Line"; DeferralLineAmount: Dictionary of [RecordId, Decimal]; DeferralHeader: Record "Deferral Header"; InitialAmountToDefer: Decimal)
     var
         InitialDeferralLineAmount: Decimal;
         TotalDeferralLineAmount: Decimal;
@@ -146,7 +149,7 @@ codeunit 1720 "Deferral Utilities"
             repeat
                 if DeferralLineAmount.ContainsKey(DeferralLine.RecordId) then begin
                     InitialDeferralLineAmount := DeferralLineAmount.Get(DeferralLine.RecordId);
-                    DeferralLine.Validate(Amount, Round(DeferralHeader."Amount to Defer" / 100 * InitialDeferralLineAmount, AmountRoundingPrecision));
+                    DeferralLine.Validate(Amount, Round(DeferralHeader."Amount to Defer" / InitialAmountToDefer * InitialDeferralLineAmount, AmountRoundingPrecision));
                     DeferralLine.Modify(true);
                     TotalDeferralLineAmount += DeferralLine.Amount;
                 end;
@@ -766,6 +769,7 @@ codeunit 1720 "Deferral Utilities"
         Changed: Boolean;
         IsHandled: Boolean;
     begin
+        OnBeforeOpenLineScheduleEdit(DeferralCode, DeferralDocType, GenJnlTemplateName, GenJnlBatchName, DocumentType, DocumentNo, LineNo, Amount, PostingDate, Description, CurrencyCode);
         if DeferralCode = '' then
             Message(SelectDeferralCodeMsg)
         else
@@ -952,10 +956,15 @@ codeunit 1720 "Deferral Utilities"
 
     procedure AdjustTotalAmountForDeferrals(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; var TotalVATBase: Decimal; var TotalVATBaseACY: Decimal)
     begin
+        AdjustTotalAmountForDeferrals(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, TotalVATBase, TotalVATBaseACY, 0, 0);
+    end;
+
+    procedure AdjustTotalAmountForDeferrals(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; var TotalVATBase: Decimal; var TotalVATBaseACY: Decimal; DiscountAmount: Decimal; DiscountAmountACY: Decimal)
+    begin
         TotalVATBase := TotalAmount;
         TotalVATBaseACY := TotalAmountACY;
         if DeferralCode <> '' then
-            if (AmtToDefer = TotalAmount) and (AmtToDeferACY = TotalAmountACY) then begin
+            if (AmtToDefer = TotalAmount - DiscountAmount) and (AmtToDeferACY = TotalAmountACY - DiscountAmountACY) then begin
                 AmtToDefer := 0;
                 AmtToDeferACY := 0;
             end else begin
@@ -963,13 +972,18 @@ codeunit 1720 "Deferral Utilities"
                 TotalAmountACY := TotalAmountACY - AmtToDeferACY;
             end;
 
-        OnAfterAdjustTotalAmountForDeferrals(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY);
+        OnAfterAdjustTotalAmountForDeferrals(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, DiscountAmount, DiscountAmountACY);
     end;
 
     procedure AdjustTotalAmountForDeferralsNoBase(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal)
     begin
+        AdjustTotalAmountForDeferralsNoBase(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, 0, 0);
+    end;
+
+    procedure AdjustTotalAmountForDeferralsNoBase(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; DiscountAmount: Decimal; DiscountAmountACY: Decimal)
+    begin
         if DeferralCode <> '' then
-            if (AmtToDefer = TotalAmount) and (AmtToDeferACY = TotalAmountACY) then begin
+            if (AmtToDefer = TotalAmount - DiscountAmount) and (AmtToDeferACY = TotalAmountACY - DiscountAmountACY) then begin
                 AmtToDefer := 0;
                 AmtToDeferACY := 0;
             end else begin
@@ -977,7 +991,7 @@ codeunit 1720 "Deferral Utilities"
                 TotalAmountACY := TotalAmountACY - AmtToDeferACY;
             end;
 
-        OnAfterAdjustTotalAmountForDeferrals(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY);
+        OnAfterAdjustTotalAmountForDeferrals(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, DiscountAmount, DiscountAmountACY);
     end;
 
     procedure CheckDeferralConditionForGenJournal(var GenJournalLine: Record "Gen. Journal Line")
@@ -1188,7 +1202,12 @@ codeunit 1720 "Deferral Utilities"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterAdjustTotalAmountForDeferrals(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal);
+    local procedure OnBeforeOpenLineScheduleEdit(DeferralCode: Code[10]; DeferralDocType: Integer; GenJnlTemplateName: Code[10]; GenJnlBatchName: Code[10]; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; Amount: Decimal; PostingDate: Date; Description: Text[100]; CurrencyCode: Code[10])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterAdjustTotalAmountForDeferrals(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; DiscountAmount: Decimal; DiscountAmountACY: Decimal);
     begin
     end;
 
