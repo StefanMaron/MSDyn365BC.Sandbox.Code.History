@@ -4221,8 +4221,12 @@ codeunit 134152 "ERM Intercompany II"
         MockICInboxSalesHeaderWithShipToCountryRegionAndCounty(ICInboxSalesHeader, Customer);
         MockICInboxSalesLine(
           ICInboxSalesLine, ICInboxSalesHeader, ItemNo[1], UnitPrice, Qty, Round(AmtInclVAT, LibraryERM.GetAmountRoundingPrecision(), '>'));
+        ICInboxSalesLine.Validate("Unit of Measure Code", FindItemUnitOfMeasureCode(ItemNo[1]));
+        ICInboxSalesLine.Modify(true);
         MockICInboxSalesLine(
           ICInboxSalesLine, ICInboxSalesHeader, ItemNo[2], UnitPrice, Qty, Round(AmtInclVAT, LibraryERM.GetAmountRoundingPrecision(), '<'));
+        ICInboxSalesLine.Validate("Unit of Measure Code", FindItemUnitOfMeasureCode(ItemNo[2]));
+        ICInboxSalesLine.Modify(true);
 
         // [WHEN] Create and release a new sales order from the intercompany inbox.
         ICInboxOutboxMgt.CreateSalesDocument(ICInboxSalesHeader, false, WorkDate());
@@ -4525,6 +4529,70 @@ codeunit 134152 "ERM Intercompany II"
 
         // [THEN] Purchase invoice 1 has the same invoice discount amount as sales invoice 1 in partner company
         VerifyInvoiceDiscountOnPurchaseLine(ReceivedPurchaseHeader, SalesInvoiceNo, ItemNo);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure VATDifferenceOnReceivedSalesDocShouldBeIncludedOnPurchaseDocumentForICCustomer()
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        SendGLAccount: Record "G/L Account";
+        ReceiveGLAccount: Record "G/L Account";
+        ICOutboxTransaction: Record "IC Outbox Transaction";
+        ICInboxTransaction: Record "IC Inbox Transaction";
+        ICInboxPurchaseHeader: Record "IC Inbox Purchase Header";
+        MaxAllowedVATDifference: Decimal;
+        VendorNo: Code[20];
+    begin
+        // [SCENARIO 524493] [All-E] When making intercompany invoices a VAT difference is included in the sales invoice
+        Initialize();
+        LibraryLowerPermissions.SetIntercompanyPostingsSetup();
+        LibraryLowerPermissions.AddO365Setup();
+        LibraryLowerPermissions.AddPurchDocsCreate();
+        LibraryLowerPermissions.AddSalesDocsPost();
+        LibraryLowerPermissions.AddIntercompanyPostingsEdit();
+        LibraryLowerPermissions.AddeRead();
+
+        // [GIVEN] "VAT Difference" is allowed in setup
+        MaxAllowedVATDifference := LibraryRandom.RandIntInRange(5, 10);
+        LibraryERM.SetMaxVATDifferenceAllowed(MaxAllowedVATDifference);
+        LibrarySales.SetAllowVATDifference(true);
+
+        // [GIVEN] G/L Account 'X' with Default IC Partner G/L Account Number = 'Y'.
+        // [GIVEN] G/L Account 'Y' with Default IC Partner G/L Account Number = 'X'.
+        CreatePairOfSendReceiveGLAcc(SendGLAccount, ReceiveGLAccount);
+
+        // [GIVEN] IC Vendor.
+        VendorNo := CreateICVendorWithVATBusPostingGroup(SendGLAccount."VAT Bus. Posting Group");
+
+        // [GIVEN] Sales Order for IC Customer.
+        LibrarySales.CreateSalesHeader(
+          SalesHeader,
+          SalesHeader."Document Type"::Order,
+          CreateICCustomerWithVATBusPostingGroup(SendGLAccount."VAT Bus. Posting Group"));
+
+        // [GIVEN] Sales Line with 'X', "Description 2" is 'A'
+        LibrarySales.CreateSalesLine(
+          SalesLine, SalesHeader, SalesLine.Type::"G/L Account", SendGLAccount."No.",
+          LibraryRandom.RandDecInRange(100, 200, 2));
+        SalesLine."Description 2" := LibraryUtility.GenerateGUID();
+        SalesLine.Validate("VAT Difference", MaxAllowedVATDifference);
+        SalesLine.Modify();
+
+        // [GIVEN] Send Sales Order.
+        SendICSalesDocument(
+          SalesHeader, GetICPartnerFromVendor(VendorNo), ICOutboxTransaction, ICInboxTransaction, ICInboxPurchaseHeader);
+
+        // [WHEN] Receive Purchase Order.
+        ReceiveICPurchaseDocument(
+          PurchaseHeader, SalesHeader, ICOutboxTransaction, ICInboxTransaction, ICInboxPurchaseHeader, VendorNo);
+        FindPurchLine(PurchaseLine, PurchaseHeader);
+
+        // [THEN] Verify VAT Difference on Purchase Line is Same as it was set on Sales Line 
+        PurchaseLine.TestField("VAT Difference", SalesLine."VAT Difference");
     end;
 
     local procedure Initialize()
@@ -6860,6 +6928,14 @@ codeunit 134152 "ERM Intercompany II"
         PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
         PurchaseLine.SetRange("No.", ItemNo);
         PurchaseLine.FindFirst();
+    end;
+
+    local procedure FindItemUnitOfMeasureCode(ItemNo: Code[20]): Code[10]
+    var
+        Item: Record Item;
+    begin
+        Item.Get(ItemNo);
+        exit(Item."Base Unit of Measure");
     end;
 }
 

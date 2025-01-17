@@ -1,5 +1,6 @@
 namespace System.Integration.PowerBI;
 using System.Telemetry;
+using System.Environment.Configuration;
 
 page 6323 "Power BI Element Card"
 {
@@ -16,62 +17,67 @@ page 6323 "Power BI Element Card"
     {
         area(content)
         {
+            usercontrol(PowerBIManagement; PowerBIManagement)
+            {
+                ApplicationArea = All;
+
+                trigger ControlAddInReady()
+                begin
+                    InitializeAddIn();
+                end;
+
+                trigger ReportLoaded(ReportFilters: Text; ActivePageName: Text; activePageFilters: Text; CorrelationId: Text)
+                begin
+                    LogCorrelationIdForEmbedType(CorrelationId, Enum::"Power BI Element Type"::Report);
+                end;
+
+                trigger DashboardLoaded(CorrelationId: Text)
+                begin
+                    LogCorrelationIdForEmbedType(CorrelationId, Enum::"Power BI Element Type"::Dashboard);
+                end;
+
+                trigger DashboardTileLoaded(CorrelationId: Text)
+                begin
+                    LogCorrelationIdForEmbedType(CorrelationId, Enum::"Power BI Element Type"::"Dashboard Tile");
+                end;
+
+                trigger ReportVisualLoaded(CorrelationId: Text)
+                begin
+                    LogCorrelationIdForEmbedType(CorrelationId, Enum::"Power BI Element Type"::"Report Visual");
+                end;
+
+                trigger ErrorOccurred(Operation: Text; ErrorText: Text)
+                begin
+                    LogEmbedError(Operation);
+                    ShowError(Operation, ErrorText);
+                end;
+
+                trigger ReportPageChanged(newPage: Text; newPageFilters: Text)
+                begin
+                    if PowerBIDisplayedElement.IsTemporary() then
+                        exit;
+
+                    PowerBIDisplayedElement.ReportPage := CopyStr(newPage, 1, MaxStrLen(PowerBIDisplayedElement.ReportPage));
+                    if not PowerBIDisplayedElement.Modify(true) then
+                        Session.LogMessage('0000LK8', FailedToUpdatePageTelemetryMsg, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
+                end;
+            }
+#if not CLEAN25
             group(ReportGroup)
             {
                 ShowCaption = false;
-                Visible = not HasError;
-
-                usercontrol(PowerBIManagement; PowerBIManagement)
-                {
-                    ApplicationArea = All;
-
-                    trigger ControlAddInReady()
-                    begin
-                        InitializeAddIn();
-                    end;
-
-                    trigger ReportLoaded(ReportFilters: Text; ActivePageName: Text; activePageFilters: Text; CorrelationId: Text)
-                    begin
-                        LogCorrelationIdForEmbedType(CorrelationId, Enum::"Power BI Element Type"::Report);
-                    end;
-
-                    trigger DashboardLoaded(CorrelationId: Text)
-                    begin
-                        LogCorrelationIdForEmbedType(CorrelationId, Enum::"Power BI Element Type"::Dashboard);
-                    end;
-
-                    trigger DashboardTileLoaded(CorrelationId: Text)
-                    begin
-                        LogCorrelationIdForEmbedType(CorrelationId, Enum::"Power BI Element Type"::"Dashboard Tile");
-                    end;
-
-                    trigger ReportVisualLoaded(CorrelationId: Text)
-                    begin
-                        LogCorrelationIdForEmbedType(CorrelationId, Enum::"Power BI Element Type"::"Report Visual");
-                    end;
-
-                    trigger ErrorOccurred(Operation: Text; ErrorText: Text)
-                    begin
-                        LogEmbedError(Operation);
-                        ShowError(ErrorText);
-                    end;
-
-                    trigger ReportPageChanged(newPage: Text; newPageFilters: Text)
-                    begin
-                        if PowerBIDisplayedElement.IsTemporary() then
-                            exit;
-
-                        PowerBIDisplayedElement.ReportPage := CopyStr(newPage, 1, MaxStrLen(PowerBIDisplayedElement.ReportPage));
-                        if not PowerBIDisplayedElement.Modify(true) then
-                            Session.LogMessage('0000LK8', FailedToUpdatePageTelemetryMsg, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
-                    end;
-                }
+                Visible = false;
+                ObsoleteReason = 'This group has been removed and its content is now directly added to the content area of the page.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '25.0';
             }
             group(ErrorGroup)
             {
                 ShowCaption = false;
-                Visible = HasError;
-
+                Visible = false;
+                ObsoleteReason = 'Error messages are now shown as page notifications.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '25.0';
                 field(ErrorMessageText; ErrorMessageText)
                 {
                     ApplicationArea = All;
@@ -79,8 +85,13 @@ page 6323 "Power BI Element Card"
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the error message from Power BI.';
+                    Visible = false;
+                    ObsoleteReason = 'Error messages are now shown as page notifications.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '25.0';
                 }
             }
+#endif
         }
     }
 
@@ -117,15 +128,17 @@ page 6323 "Power BI Element Card"
     trigger OnOpenPage()
     begin
         if not PowerBIServiceMgt.IsUserReadyForPowerBI() then
-            ShowError(UnauthorizedErr);
+            ShowError('Unauthorized', UnauthorizedErr);
     end;
 
     var
         PowerBIDisplayedElement: Record "Power BI Displayed Element";
         PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
         FeatureTelemetry: Codeunit "Feature Telemetry";
-        HasError: Boolean;
+#if not CLEAN25
         ErrorMessageText: Text;
+#endif
+        ErrorNotificationMsg: Label 'An error occurred while loading Power BI. Your Power BI embedded content might not work. Here are the error details: "%1: %2"', Comment = '%1: a short error code. %2: a verbose error message in english';
         UnsupportedElementTypeErr: Label 'Displaying Power BI elements of type %1 is currently not supported.', Comment = '%1 = an element type, such as Report or Workspace';
         UnauthorizedErr: Label 'You do not have a Power BI account. If you have just activated a license, it might take several minutes for the changes to be effective in Power BI.';
         FailedToUpdatePageTelemetryMsg: Label 'Failed to update the page for the Power BI report.', Locked = true;
@@ -137,56 +150,54 @@ page 6323 "Power BI Element Card"
         PowerBIDisplayedElement := InputPowerBIDisplayedElement;
     end;
 
-    local procedure ShowError(NewErrorMessageText: Text)
+    local procedure ShowError(ErrorCategory: Text; ErrorMessage: Text)
+    var
+        PowerBIContextSettings: Record "Power BI Context Settings";
+        NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
+        Notif: Notification;
     begin
-        HasError := true;
-        ErrorMessageText := NewErrorMessageText;
+        Notif.Id := CreateGuid();
+        Notif.Message(StrSubstNo(ErrorNotificationMsg, ErrorCategory, ErrorMessage));
+        Notif.Scope := NotificationScope::LocalScope;
+
+        NotificationLifecycleMgt.SendNotification(Notif, PowerBIContextSettings.RecordId());
     end;
 
-    [NonDebuggable]
     local procedure InitializeAddIn()
     var
-        AccessToken: Text;
         DashboardId: Guid;
         ReportId: Guid;
         TileId: Guid;
         PageName: Text[200];
         VisualName: Text[200];
     begin
-        AccessToken := PowerBiServiceMgt.GetEmbedAccessToken();
-
-        if AccessToken = '' then begin
-            ShowError(GetLastErrorText());
-            exit;
-        end;
-
-        CurrPage.PowerBIManagement.InitializeFrame(true, '');
+        CurrPage.PowerBIManagement.SetSettings(false, PowerBIDisplayedElement.ShowPanesInExpandedMode, PowerBIDisplayedElement.ShowPanesInExpandedMode, false, false, false, true);
+        PowerBiServiceMgt.InitializeAddinToken(CurrPage.PowerBIManagement);
 
         if PowerBIDisplayedElement.ElementEmbedUrl <> '' then
             case PowerBIDisplayedElement.ElementType of
                 "Power BI Element Type"::"Report":
                     begin
                         PowerBIDisplayedElement.ParseReportKey(ReportId);
-                        CurrPage.PowerBIManagement.EmbedReportWithOptions(PowerBIDisplayedElement.ElementEmbedUrl, ReportId,
-                                AccessToken, PowerBIDisplayedElement.ReportPage, PowerBIDisplayedElement.ShowPanesInExpandedMode);
+                        CurrPage.PowerBIManagement.EmbedPowerBIReport(PowerBIDisplayedElement.ElementEmbedUrl, ReportId, PowerBIDisplayedElement.ReportPage);
                     end;
                 "Power BI Element Type"::"Report Visual":
                     begin
                         PowerBIDisplayedElement.ParseReportVisualKey(ReportId, PageName, VisualName);
-                        CurrPage.PowerBIManagement.EmbedReportVisual(PowerBIDisplayedElement.ElementEmbedUrl, ReportId, PageName, VisualName, AccessToken);
+                        CurrPage.PowerBIManagement.EmbedPowerBIReportVisual(PowerBIDisplayedElement.ElementEmbedUrl, ReportId, PageName, VisualName);
                     end;
                 "Power BI Element Type"::Dashboard:
                     begin
                         PowerBIDisplayedElement.ParseDashboardKey(DashboardId);
-                        CurrPage.PowerBIManagement.EmbedDashboard(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId, AccessToken);
+                        CurrPage.PowerBIManagement.EmbedPowerBIDashboard(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId);
                     end;
                 "Power BI Element Type"::"Dashboard Tile":
                     begin
                         PowerBIDisplayedElement.ParseDashboardTileKey(DashboardId, TileId);
-                        CurrPage.PowerBIManagement.EmbedDashboardTile(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId, TileId, AccessToken);
+                        CurrPage.PowerBIManagement.EmbedPowerBIDashboardTile(PowerBIDisplayedElement.ElementEmbedUrl, DashboardId, TileId);
                     end;
                 else
-                    ShowError(StrSubstNo(UnsupportedElementTypeErr, PowerBIDisplayedElement.ElementType));
+                    ShowError('UnsupportedElementType', StrSubstNo(UnsupportedElementTypeErr, PowerBIDisplayedElement.ElementType));
             end;
 
         FeatureTelemetry.LogUsage('0000LSN', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), 'Power BI element loaded', PowerBIDisplayedElement.GetTelemetryDimensions());
