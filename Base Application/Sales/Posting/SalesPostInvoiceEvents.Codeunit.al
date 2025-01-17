@@ -479,13 +479,13 @@ codeunit 825 "Sales Post Invoice Events"
     begin
     end;
 
-    procedure RunOnPrepareLineOnAfterUpdateInvoicePostingBuffer(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
+    procedure RunOnPrepareLineOnAfterUpdateInvoicePostingBuffer(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
     begin
         OnPrepareLineOnAfterUpdateInvoicePostingBuffer(SalesHeader, SalesLine, InvoicePostingBuffer, TempInvoicePostingBuffer);
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterUpdateInvoicePostingBuffer(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
+    local procedure OnPrepareLineOnAfterUpdateInvoicePostingBuffer(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
     begin
     end;
 
@@ -591,26 +591,6 @@ codeunit 825 "Sales Post Invoice Events"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePrepareInvoicePostingBuffer(var SalesLine: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    procedure RunOnPrepareDeferralLineOnBeforeDeferralPostingBufferUpdate(var DeferralPostBuffer: Record "Deferral Posting Buffer"; var TempDeferralLine: Record "Deferral Line"; var AmountToDefer: Decimal)
-    begin
-        OnPrepareDeferralLineOnBeforeDeferralPostingBufferUpdate(DeferralPostBuffer, TempDeferralLine, AmountToDefer);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareDeferralLineOnBeforeDeferralPostingBufferUpdate(var DeferralPostBuffer: Record "Deferral Posting Buffer"; var TempDeferralLine: Record "Deferral Line"; var AmountToDefer: Decimal)
-    begin
-    end;
-
-    procedure RunOnAfterPrepareDeferralLine(var DeferralPostBuffer: Record "Deferral Posting Buffer"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; GenJnlLineDocNo: Code[20]; DeferralAccount: Code[20]; SalesAccount: Code[20]; InvDefLineNo: Integer; DeferralLineNo: Integer; var AmountToDefer: Decimal)
-    begin
-        OnAfterPrepareDeferralLine(DeferralPostBuffer, SalesHeader, SalesLine, GenJnlLineDocNo, DeferralAccount, SalesAccount, InvDefLineNo, DeferralLineNo, AmountToDefer);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPrepareDeferralLine(var DeferralPostBuffer: Record "Deferral Posting Buffer"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; GenJnlLineDocNo: Code[20]; DeferralAccount: Code[20]; SalesAccount: Code[20]; InvDefLineNo: Integer; DeferralLineNo: Integer; var AmountToDefer: Decimal)
     begin
     end;
 }
