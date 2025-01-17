@@ -53,13 +53,7 @@ codeunit 4410 "Trial Balance"
     end;
 
     local procedure InsertDimensionFiltersFromDimensionValues(var DimensionValue: Record "Dimension Value"; var DimensionFilters: List of [Code[20]])
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeInsertDimensionFiltersFromDimensionValues(DimensionValue, DimensionFilters, IsHandled);
-        if IsHandled then
-            exit;
         DimensionFilters.Add('');
         if not DimensionValue.FindSet() then
             exit;
@@ -125,7 +119,6 @@ codeunit 4410 "Trial Balance"
 
     local procedure InsertTrialBalanceDataForGLAccountWithFilters(var GLAccount: Record "G/L Account"; Dimension1ValueCode: Code[20]; Dimension2ValueCode: Code[20]; BusinessUnitCode: Code[20]; var TrialBalanceData: Record "EXR Trial Balance Buffer"; var Dimension1Values: Record "Dimension Value" temporary; var Dimension2Values: Record "Dimension Value" temporary)
     begin
-        Clear(TrialBalanceData);
         GlAccount.CalcFields("Net Change", "Balance at Date", "Additional-Currency Net Change", "Add.-Currency Balance at Date", "Budgeted Amount", "Budget at Date");
         TrialBalanceData."G/L Account No." := GlAccount."No.";
         TrialBalanceData."Dimension 1 Code" := Dimension1ValueCode;
@@ -168,10 +161,5 @@ codeunit 4410 "Trial Balance"
         DimensionValue.FindFirst();
         InsertedDimensionValues.Copy(DimensionValue);
         InsertedDimensionValues.Insert();
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeInsertDimensionFiltersFromDimensionValues(var DimensionValue: Record "Dimension Value"; var DimensionFilters: List of [Code[20]]; var IsHandled: Boolean)
-    begin
     end;
 }

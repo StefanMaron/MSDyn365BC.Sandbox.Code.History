@@ -49,9 +49,10 @@ codeunit 8067 "Customer Deferrals Mngmt."
         GeneralPostingSetup: Record "General Posting Setup";
         BillingLine: Record "Billing Line";
     begin
-        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromSalesDocumentType(SalesLine."Document Type"), SalesLine."Document No.", SalesLine."Line No.");
-        if not BillingLine.FindFirst() then
+        if not SalesLine.IsLineAttachedToBillingLine() then
             exit;
+        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromSalesDocumentType(SalesLine."Document Type"), SalesLine."Document No.", SalesLine."Line No.");
+        BillingLine.FindFirst();
         CustContractHeader.Get(BillingLine."Contract No.");
 
         GeneralPostingSetup.Get(SalesLine."Gen. Bus. Posting Group", SalesLine."Gen. Prod. Posting Group");
@@ -89,18 +90,10 @@ codeunit 8067 "Customer Deferrals Mngmt."
         InsertContractDeferrals(SalesHeader, xSalesLine, SalesInvHeader."No.");
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnPostSalesLineOnBeforeInsertCrMemoLine, '', false, false)]
-    local procedure InsertCustomerDeferralsFromSalesCrMemoOnPostSalesLineOnBeforeInsertCrMemoLine(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var IsHandled: Boolean; xSalesLine: Record "Sales Line"; SalesCrMemoHeader: Record "Sales Cr.Memo Header")
-    var
-        SalesDocuments: Codeunit "Sales Documents";
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnAfterSalesCrMemoHeaderInsert, '', false, false)]
+    local procedure InsertCustomerDeferralsFromSalesCrMemo(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; SalesHeader: Record "Sales Header")
     begin
-        if (xSalesLine.Quantity >= 0) or (xSalesLine."Unit Price" >= 0) then
-            exit;
-
-        if SalesDocuments.GetAppliesToDocNo(SalesHeader) <> '' then
-            exit;
-
-        InsertContractDeferrals(SalesHeader, xSalesLine, SalesCrMemoHeader."No.");
+        ReleaseAndCreditCustomerContractDeferrals(SalesHeader, SalesCrMemoHeader);
     end;
 
     local procedure InsertContractDeferrals(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; DocumentNo: Code[20])
@@ -116,14 +109,15 @@ codeunit 8067 "Customer Deferrals Mngmt."
             exit;
         if SalesLine.Quantity = 0 then
             exit;
+        if not SalesLine.IsLineAttachedToBillingLine() then
+            exit;
         if SalesLine."Recurring Billing from" > SalesLine."Recurring Billing to" then
             exit;
         if not (SalesLine."Document Type" in [Enum::"Sales Document Type"::Invoice, Enum::"Sales Document Type"::"Credit Memo"]) then
             exit;
 
         BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromSalesDocumentType(SalesLine."Document Type"), SalesLine."Document No.", SalesLine."Line No.");
-        if not BillingLine.FindFirst() then
-            exit;
+        BillingLine.FindFirst();
         CustContractHeader.Get(BillingLine."Contract No.");
         if CustContractHeader."Without Contract Deferrals" then
             exit;
@@ -306,13 +300,7 @@ codeunit 8067 "Customer Deferrals Mngmt."
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", OnAfterSalesCrMemoLineInsert, '', false, false)]
-    local procedure InsertCustomerDeferralsFromSalesCrMemo(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; SalesHeader: Record "Sales Header")
-    begin
-        ReleaseAndCreditCustomerContractDeferrals(SalesHeader, SalesCrMemoLine);
-    end;
-
-    local procedure ReleaseAndCreditCustomerContractDeferrals(SalesHeader: Record "Sales Header"; var SalesCrMemoLine: Record "Sales Cr.Memo Line")
+    local procedure ReleaseAndCreditCustomerContractDeferrals(SalesHeader: Record "Sales Header"; SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     var
         InvoiceCustContractDeferral: Record "Customer Contract Deferral";
         CreditMemoCustContractDeferral: Record "Customer Contract Deferral";
@@ -325,17 +313,15 @@ codeunit 8067 "Customer Deferrals Mngmt."
         if SalesDocuments.IsInvoiceCredited(AppliesToDocNo) then
             exit;
         InvoiceCustContractDeferral.FilterOnDocumentTypeAndDocumentNo(Enum::"Rec. Billing Document Type"::Invoice, AppliesToDocNo);
-        InvoiceCustContractDeferral.SetRange("Contract No.", SalesCrMemoLine."Contract No.");
-        InvoiceCustContractDeferral.SetRange("Contract Line No.", SalesCrMemoLine."Contract Line No.");
         if InvoiceCustContractDeferral.FindSet() then begin
             ContractDeferralRelease.GetAndTestSourceCode();
             ContractDeferralRelease.SetAllowGUI(false);
             repeat
                 CreditMemoCustContractDeferral := InvoiceCustContractDeferral;
                 CreditMemoCustContractDeferral."Document Type" := Enum::"Rec. Billing Document Type"::"Credit Memo";
-                CreditMemoCustContractDeferral."Document No." := SalesCrMemoLine."Document No.";
+                CreditMemoCustContractDeferral."Document No." := SalesCrMemoHeader."No.";
                 CreditMemoCustContractDeferral."Posting Date" := InvoiceCustContractDeferral."Posting Date";
-                CreditMemoCustContractDeferral."Document Posting Date" := SalesCrMemoLine."Posting Date";
+                CreditMemoCustContractDeferral."Document Posting Date" := SalesCrMemoHeader."Posting Date";
                 CreditMemoCustContractDeferral."Deferral Base Amount" := InvoiceCustContractDeferral."Deferral Base Amount" * -1;
                 CreditMemoCustContractDeferral.Amount := InvoiceCustContractDeferral.Amount * -1;
                 CreditMemoCustContractDeferral."Discount Amount" := InvoiceCustContractDeferral."Discount Amount" * -1;
@@ -346,11 +332,11 @@ codeunit 8067 "Customer Deferrals Mngmt."
                 CreditMemoCustContractDeferral.Insert(false);
                 SalesInvoiceLine.Get(InvoiceCustContractDeferral."Document No.", InvoiceCustContractDeferral."Document Line No.");
                 if not InvoiceCustContractDeferral.Released then begin
-                    ContractDeferralRelease.SetRequestPageParameters(InvoiceCustContractDeferral."Posting Date", SalesCrMemoLine."Posting Date");
+                    ContractDeferralRelease.SetRequestPageParameters(InvoiceCustContractDeferral."Posting Date", SalesCrMemoHeader."Posting Date");
                     ContractDeferralRelease.ReleaseCustomerContractDeferralAndInsertTempGenJournalLine(InvoiceCustContractDeferral, SalesInvoiceLine."Gen. Bus. Posting Group", SalesInvoiceLine."Gen. Prod. Posting Group");
                     ContractDeferralRelease.PostTempGenJnlLineBufferForCustomerDeferrals();
                 end;
-                ContractDeferralRelease.SetRequestPageParameters(CreditMemoCustContractDeferral."Posting Date", SalesCrMemoLine."Posting Date");
+                ContractDeferralRelease.SetRequestPageParameters(CreditMemoCustContractDeferral."Posting Date", SalesCrMemoHeader."Posting Date");
                 ContractDeferralRelease.ReleaseCustomerContractDeferralAndInsertTempGenJournalLine(CreditMemoCustContractDeferral, SalesInvoiceLine."Gen. Bus. Posting Group", SalesInvoiceLine."Gen. Prod. Posting Group");
                 ContractDeferralRelease.PostTempGenJnlLineBufferForCustomerDeferrals();
 
@@ -365,9 +351,10 @@ codeunit 8067 "Customer Deferrals Mngmt."
         CustomerContractHeader: Record "Customer Contract";
         BillingLine: Record "Billing Line";
     begin
-        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromSalesDocumentType(SalesLine."Document Type"), SalesLine."Document No.", SalesLine."Line No.");
-        if not BillingLine.FindFirst() then
+        if not SalesLine.IsLineAttachedToBillingLine() then
             exit;
+        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromSalesDocumentType(SalesLine."Document Type"), SalesLine."Document No.", SalesLine."Line No.");
+        BillingLine.FindFirst();
 
         CustomerContractHeader.Get(BillingLine."Contract No.");
         exit(not CustomerContractHeader."Without Contract Deferrals");

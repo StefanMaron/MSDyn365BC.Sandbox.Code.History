@@ -79,12 +79,6 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
             CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Statement Line: Id: 6, Description: I 522, Amount: 100, Date: 2023-07-05\n');
             CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 52, DocumentNo: 522, Description: J, Amount: 348, Date: 2023-07-02\n');
             CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Matches: (5, [52]), (6, [52])\n\n');
-            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, '\n**Example 6**:\n');
-            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Statement Line: Id: 7, Description: ABCD 3, Amount: 250, Date: 2023-07-02\n');
-            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Statement Line: Id: 8, Description: ABCD, Amount: 248, Date: 2023-07-05\n');
-            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 62, DocumentNo: 622, Description: ABCD 3, Amount: 248, Date: 2023-07-02\n');
-            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Ledger Entry: Id: 63, DocumentNo: 623, Description: ABCD Amount: 248, Date: 2023-07-02\n');
-            CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, 'Matches: (7, [62]), (8, [63])\n\n');
         end;
         CompletionTaskTxt := AddCompletionPromptLine(CompletionTaskTxt, '\n\n');
         exit(CompletionTaskTxt);
@@ -107,19 +101,6 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         CompletionPrompt := SecretStrSubstNo(ConcatSubstrTok, TaskPrompt, StatementLines);
         CompletionPrompt := SecretStrSubstNo(ConcatSubstrTok, CompletionPrompt, LedgerLines);
         exit(CompletionPrompt);
-    end;
-
-    procedure BuildBankRecCompletionPromptUserMessage(StatementLines: Text; LedgerLines: Text): SecretText
-    var
-        UserMessageTxt: SecretText;
-        EmptyText: SecretText;
-        ConcatSubstrTok: Label '%1%2', Locked = true;
-    begin
-        LedgerLines += '"""\n**Matches**:'; // close the ledger lines section
-        StatementLines += '"""\n'; // close the statement lines section
-        UserMessageTxt := SecretStrSubstNo(ConcatSubstrTok, EmptyText, StatementLines);
-        UserMessageTxt := SecretStrSubstNo(ConcatSubstrTok, UserMessageTxt, LedgerLines);
-        exit(UserMessageTxt);
     end;
 
     procedure BuildBankRecLedgerEntries(var LedgerLines: Text; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var CandidateLedgerEntryNos: List of [Integer]): Text
@@ -281,15 +262,7 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
     end;
 
     [NonDebuggable]
-    procedure CreateCompletionAndMatch(CompletionTaskTxt: SecretText; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; DaysTolerance: Integer): Integer
-    var
-        EmptyText: SecretText;
-    begin
-        exit(CreateCompletionAndMatch(CompletionTaskTxt, EmptyText, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance));
-    end;
-
-    [NonDebuggable]
-    procedure CreateCompletionAndMatch(CompletionTaskTxt: SecretText; UserMessageTxt: SecretText; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; DaysTolerance: Integer): Integer
+    procedure CreateCompletionAndMatch(CompletionPromptTxt: SecretText; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; DaysTolerance: Integer): Integer
     var
         AzureOpenAI: Codeunit "Azure OpenAi";
         AOAIDeployments: Codeunit "AOAI Deployments";
@@ -311,9 +284,7 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Bank Account Reconciliation");
         AOAIChatCompletionParams.SetMaxTokens(MaxTokens());
         AOAIChatCompletionParams.SetTemperature(0);
-        AOAIChatMessages.AddSystemMessage(CompletionTaskTxt.Unwrap().Replace('\n', NewLineChar));
-        if not UserMessageTxt.IsEmpty() then
-            AOAIChatMessages.AddUserMessage(UserMessageTxt.Unwrap().Replace('\n', NewLineChar));
+        AOAIChatMessages.AddSystemMessage(CompletionPromptTxt.Unwrap().Replace('\n', NewLineChar));
         AzureOpenAI.GenerateChatCompletion(AOAIChatMessages, AOAIChatCompletionParams, AOAIOperationResponse);
         if AOAIOperationResponse.IsSuccess() then
             CompletionAnswerTxt := AOAIOperationResponse.GetResult()
@@ -393,7 +364,8 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         TopLedgerEntries: array[5] of Record "Ledger Entry Matching Buffer";
         LocalBankAccountLedgerEntry: Record "Bank Account Ledger Entry";
         FeatureTelemetry: Codeunit "Feature Telemetry";
-        CompletionTaskTxt, UserMessageTxt : SecretText;
+        CompletionTaskTxt: SecretText;
+        CompletionPromptTxt: SecretText;
         BankRecLedgerEntriesTxt: Text;
         BankRecStatementLinesTxt: Text;
         TopBankLedgerEntriesFilterTxt: Text;
@@ -482,8 +454,8 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
                 CompletePromptTokenCount := TaskPromptTokenCount + AOAIToken.GetGPT4TokenCount(BankRecStatementLinesTxt) + AOAIToken.GetGPT4TokenCount(BankRecLedgerEntriesTxt);
                 if (CompletePromptTokenCount >= PromptSizeThreshold()) then begin
                     Session.LogMessage('0000LFK', TelemetryApproximateTokenCountExceedsLimitTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
-                    UserMessageTxt := BuildBankRecCompletionPromptUserMessage(BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
-                    CreateCompletionAndMatch(CompletionTaskTxt, UserMessageTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
+                    CompletionPromptTxt := BuildBankRecCompletionPrompt(CompletionTaskTxt, BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
+                    CreateCompletionAndMatch(CompletionPromptTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
                     BankRecStatementLinesTxt := '';
                     BankRecLedgerEntriesTxt := '';
                     Clear(CandidateLedgerEntryNos);
@@ -492,8 +464,8 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
 
             // If BankRecStatementLinesTxt and BankRecLedgerEntriesTxt are not empty, then we need to generate a prompt for the remaining records
             if (BankRecStatementLinesTxt <> '') and (BankRecLedgerEntriesTxt <> '') then begin
-                UserMessageTxt := BuildBankRecCompletionPromptUserMessage(BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
-                CreateCompletionAndMatch(CompletionTaskTxt, UserMessageTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
+                CompletionPromptTxt := BuildBankRecCompletionPrompt(CompletionTaskTxt, BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
+                CreateCompletionAndMatch(CompletionPromptTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
             end;
 
             TempBankStatementMatchingBuffer.Reset();
@@ -518,30 +490,17 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
     end;
 
     procedure HasReservedWords(Input: Text): Boolean
-    var
-        LowerCaseNoSpacesInput: Text;
     begin
-        LowerCaseNoSpacesInput := LowerCase(Input).Replace(' ', '');
-
-        if StrPos(LowerCaseNoSpacesInput, '<|im_start|>') > 0 then
+        if StrPos(LowerCase(Input), '<|im_start|>') > 0 then
             exit(true);
 
-        if StrPos(LowerCaseNoSpacesInput, '<|im_end|>') > 0 then
+        if StrPos(LowerCase(Input), '<|im_end|>') > 0 then
             exit(true);
 
-        if StrPos(LowerCaseNoSpacesInput, '<|start|>') > 0 then
+        if StrPos(LowerCase(Input), '<|start|>') > 0 then
             exit(true);
 
-        if StrPos(LowerCaseNoSpacesInput, '<|end|>') > 0 then
-            exit(true);
-
-        if StrPos(LowerCaseNoSpacesInput, '**task**') > 0 then
-            exit(true);
-
-        if StrPos(LowerCaseNoSpacesInput, '[system]') > 0 then
-            exit(true);
-
-        if StrPos(LowerCaseNoSpacesInput, 'system:') > 0 then
+        if StrPos(LowerCase(Input), '<|end|>') > 0 then
             exit(true);
 
         exit(false)
@@ -609,8 +568,11 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
     local procedure MatchIsAcceptable(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; MatchedLineNoTxt: Text; MatchedEntryNoTxt: Text): Boolean
     var
         LocalBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
+        RecordMatchMng: Codeunit "Record Match Mgt.";
         MatchedEntryNo: Integer;
         MatchedLineNo: Integer;
+        BankRecLineDescription: Text;
+        SimilarityScore: Decimal;
     begin
         if not Evaluate(MatchedEntryNo, MatchedEntryNoTxt) then
             exit(false);
@@ -627,6 +589,20 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
             exit(false);
 
         if not SameSign(LocalBankAccReconciliationLine.Difference, TempLedgerEntryMatchingBuffer."Remaining Amount") then
+            exit(false);
+
+        // if amount matches exactly, the match is acceptable
+        if LocalBankAccReconciliationLine.Difference = TempLedgerEntryMatchingBuffer."Remaining Amount" then
+            exit(true);
+
+        // if description doesn't match at least on a substring of 3, the match is not acceptable
+        BankRecLineDescription := LocalBankAccReconciliationLine.Description;
+        if LocalBankAccReconciliationLine."Additional Transaction Info" <> '' then
+            BankRecLineDescription += (' ' + LocalBankAccReconciliationLine."Additional Transaction Info");
+        BankRecLineDescription := RemoveShortWords(CopyStr(BankRecLineDescription, 1, 250));
+
+        SimilarityScore := RecordMatchMng.CalculateStringNearness(RemoveShortWords(TempLedgerEntryMatchingBuffer."Description" + ' ' + TempLedgerEntryMatchingBuffer."Document No." + ' ' + TempLedgerEntryMatchingBuffer."External Document No." + ' ' + TempLedgerEntryMatchingBuffer."Payment Reference"), CopyStr(BankRecLineDescription, 1, 250), 3, 100) / 100.0;
+        if SimilarityScore = 0 then
             exit(false);
 
         exit(true)
