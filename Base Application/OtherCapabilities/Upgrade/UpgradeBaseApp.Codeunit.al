@@ -155,6 +155,8 @@ codeunit 104000 "Upgrade - BaseApp"
 
     trigger OnUpgradePerCompany()
     begin
+        CleanupServiceConnectionTable();
+        
         if not HybridDeployment.VerifyCanStartUpgrade(CompanyName()) then
             exit;
 
@@ -251,6 +253,13 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeTimesheetExperience();
 #endif
         UpgradeVATSetupAllowVATDate();
+    end;
+
+    local procedure CleanupServiceConnectionTable()
+    var
+        ServiceConnection: Record "Service Connection";
+    begin
+        ServiceConnection.DeleteAll();
     end;
 
     local procedure ClearTemporaryTables()
