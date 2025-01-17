@@ -208,7 +208,7 @@ page 6013 "Resource Capacity Settings"
                         if Holiday then
                             NewCapacity := TempCapacity
                         else
-                            NewCapacity := TempCapacity - SelectCapacity(CustomizedCalendarChange);
+                            NewCapacity := TempCapacity - SelectCapacity();
 
                         if NewCapacity <> 0 then begin
                             ResCapacityEntry2.Reset();
@@ -288,15 +288,8 @@ page 6013 "Resource Capacity Settings"
         Text007: Label 'The capacity for %1 day was changed successfully.';
         Text008: Label 'The capacity change was unsuccessful.';
 
-    local procedure SelectCapacity(var CustomizedCalendarChange: Record "Customized Calendar Change") Hours: Decimal
-    var
-        IsHandled: Boolean;
+    local procedure SelectCapacity() Hours: Decimal
     begin
-        IsHandled := false;
-        OnBeforeSelectCapacity(TempDate, CustomizedCalendarChange, WorkTemplateRec, Hours, IsHandled);
-        if IsHandled then
-            exit(Hours);
-
         case Date2DWY(TempDate, 1) of
             1:
                 Hours := WorkTemplateRec.Monday;
@@ -338,11 +331,6 @@ page 6013 "Resource Capacity Settings"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetCalendar(var Resource: Record Resource; var CustomizedCalendarChange: Record "Customized Calendar Change"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSelectCapacity(TempDate: Date; var CustomizedCalendarChange: Record "Customized Calendar Change"; var WorkTemplateRec: Record "Work-Hour Template"; var Hours: Decimal; var IsHandled: Boolean)
     begin
     end;
 }
