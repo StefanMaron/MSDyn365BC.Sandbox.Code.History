@@ -126,6 +126,7 @@ table 339 "Item Application Entry"
         TempVisitedItemApplnEntry: Record "Item Application Entry" temporary;
         TempItemLedgEntryInChainNo: Record "Integer" temporary;
         SearchedItemLedgerEntry: Record "Item Ledger Entry";
+        ItemLedgerEntryTypesUsed: Dictionary of [Enum "Item Ledger Entry Type", Boolean];
         TrackChain: Boolean;
         MaxValuationDate: Date;
 
@@ -161,7 +162,11 @@ table 339 "Item Application Entry"
         SetRange("Transferred-from Entry No.", InbndItemLedgEntryNo);
         if IsCostApplication then
             SetRange("Cost Application", true);
-        exit(FindSet());
+        if IsEmpty() then
+            exit(false);
+
+        FindSet();
+        exit(true);
     end;
 
     procedure AppliedInbndEntryExists(OutbndItemLedgEntryNo: Integer; IsCostApplication: Boolean): Boolean
@@ -420,6 +425,9 @@ table 339 "Item Application Entry"
     var
         ItemApplnEntry: Record "Item Application Entry";
     begin
+        if not ItemLedgerEntryTypeIsUsed("Item Ledger Entry Type"::Transfer) then
+            exit(false);
+
         if ItemApplnEntry.AppliedInbndTransEntryExists(EntryNo, false) then
             exit(CheckCyclicFwdToAppliedEntries(CheckItemLedgEntry, ItemApplnEntry, EntryNo, false));
         exit(false);
@@ -529,6 +537,7 @@ table 339 "Item Application Entry"
         ItemLedgEntryInChain.DeleteAll();
         DummyItemLedgEntry.Init();
         DummyItemLedgEntry."Entry No." := -1;
+        DummyItemLedgEntry.CollectItemLedgerEntryTypesUsed(ItemLedgerEntryTypesUsed, '');
         CheckIsCyclicalLoop(DummyItemLedgEntry, FromItemLedgEntry);
         if TempItemLedgEntryInChainNo.FindSet() then
             repeat
@@ -712,6 +721,14 @@ table 339 "Item Application Entry"
         TempItemLedgerEntry.Insert();
         TempItemLedgerEntry.CopyFilters(SearchedItemLedgerEntry);
         exit(not TempItemLedgerEntry.IsEmpty())
+    end;
+
+    local procedure ItemLedgerEntryTypeIsUsed(ItemLedgerEntryType: Enum "Item Ledger Entry Type"): Boolean
+    begin
+        if not ItemLedgerEntryTypesUsed.ContainsKey(ItemLedgerEntryType) then
+            exit(true);
+
+        exit(ItemLedgerEntryTypesUsed.Get(ItemLedgerEntryType));
     end;
 
     [IntegrationEvent(false, false)]
