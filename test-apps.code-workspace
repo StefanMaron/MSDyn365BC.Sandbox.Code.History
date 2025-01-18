@@ -55,6 +55,9 @@
       "path": "./EssentialBusinessHeadlines/Test/Essential Business Headlines Test"
     },
     {
+      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
+    },
+    {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
