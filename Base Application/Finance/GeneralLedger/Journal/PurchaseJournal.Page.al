@@ -255,6 +255,7 @@ page 254 "Purchase Journal"
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = Rec."Currency Code";
+                    AutoFormatType = 1;
                     Caption = 'Document Amount';
                     ToolTip = 'Specifies the total amount (including VAT) that the journal line consists of.';
 
