@@ -194,10 +194,7 @@ page 868 "Cash Flow Forecast Statistics"
         if Rec."Manual Payments To" <> 0D then
             CurrentDate := Rec."Manual Payments To";
 
-        if Rec."Manual Payments From" <> 0D then
-            Rec.SetCashFlowDateFilter(Rec."Manual Payments From", CurrentDate)
-        else
-            Rec.SetCashFlowDateFilter(0D, CurrentDate);
+        Rec.SetCashFlowDateFilter(0D, CurrentDate);
     end;
 
     var
