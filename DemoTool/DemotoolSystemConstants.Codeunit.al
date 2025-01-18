@@ -11,7 +11,7 @@ codeunit 110500 "Demotool System Constants"
     procedure ProductVersion(): Text[80]
     begin
         // Should be 'Build Product Version' with ! on both sides.
-        exit('NAV25.2');
+        exit('NAV25.0');
     end;
 }
 
