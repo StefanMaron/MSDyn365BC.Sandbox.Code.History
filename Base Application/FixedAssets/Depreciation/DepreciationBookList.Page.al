@@ -12,7 +12,6 @@ page 5611 "Depreciation Book List"
     PageType = List;
     SourceTable = "Depreciation Book";
     UsageCategory = Administration;
-    AnalysisModeEnabled = false;
 
     layout
     {
