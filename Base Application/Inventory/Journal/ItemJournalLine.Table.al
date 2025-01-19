@@ -812,13 +812,7 @@ table 83 "Item Journal Line"
             TableRelation = Location;
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                OnBeforeValidateNewLocationCode(Rec, xRec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 TestField("Entry Type", "Entry Type"::Transfer);
                 if "New Location Code" <> xRec."New Location Code" then begin
                     "New Bin Code" := '';
@@ -2571,13 +2565,12 @@ table 83 "Item Journal Line"
         PhysInvtEntered: Boolean;
         UnitCost: Decimal;
 
-    procedure EmptyLine() Result: Boolean
+    procedure EmptyLine(): Boolean
     begin
-        Result :=
+        exit(
           (Quantity = 0) and
           ((TimeIsEmpty() and ("Item No." = '')) or
-           ("Value Entry Type" = "Value Entry Type"::Revaluation));
-        OnAfterEmptyLine(Rec, Result);
+           ("Value Entry Type" = "Value Entry Type"::Revaluation)));
     end;
 
     procedure IsValueEntryForDeletedItem(): Boolean
@@ -3733,10 +3726,9 @@ table 83 "Item Journal Line"
         exit(("Setup Time" = 0) and ("Run Time" = 0) and ("Stop Time" <> 0));
     end;
 
-    procedure OutputValuePosting() Result: Boolean
+    procedure OutputValuePosting(): Boolean
     begin
-        Result := TimeIsEmpty() and ("Invoiced Quantity" <> 0) and not Subcontracting;
-        OnAfterOutputValuePosting(Rec, Result);
+        exit(TimeIsEmpty() and ("Invoiced Quantity" <> 0) and not Subcontracting);
     end;
 
     procedure TimeIsEmpty(): Boolean
@@ -3803,7 +3795,6 @@ table 83 "Item Journal Line"
         else
             ReservEntry.SetSourceFilter(Database::"Item Journal Line", "Entry Type".AsInteger(), "Journal Template Name", "Line No.", SourceKey);
         ReservEntry.SetSourceFilter("Journal Batch Name", 0);
-        OnAfterSetReservEntrySourceFilters(ReservEntry, SourceKey);
     end;
 
     internal procedure IsSourceSales(): Boolean
@@ -3827,16 +3818,12 @@ table 83 "Item Journal Line"
         exit(not ReservEntry.IsEmpty);
     end;
 
-    procedure ItemPosting() Result: Boolean
+    procedure ItemPosting(): Boolean
     var
         ProdOrderRoutingLine: Record "Prod. Order Routing Line";
         NextOperationNoIsEmpty: Boolean;
         IsHandled: Boolean;
     begin
-        OnBeforeItemPosting(Rec, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         if ("Entry Type" = "Entry Type"::Output) and ("Output Quantity" <> 0) and ("Operation No." <> '') then begin
             GetProdOrderRoutingLine(ProdOrderRoutingLine);
             IsHandled := false;
@@ -3965,7 +3952,6 @@ table 83 "Item Journal Line"
         ProdOrderComp."Item No." := "Item No.";
 
         ProdOrderCompLineList.LookupMode(true);
-        OnLookupProdOrderCompOnBeforeSetTableView(ProdOrderComp, Rec);
         ProdOrderCompLineList.SetTableView(ProdOrderComp);
         ProdOrderCompLineList.SetRecord(ProdOrderComp);
 
@@ -4068,7 +4054,7 @@ table 83 "Item Journal Line"
             Rec, "Dimension Set ID", StrSubstNo('%1 %2 %3', "Journal Template Name", "Journal Batch Name", "Line No."),
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
-        OnAfterShowDimensions(Rec, xRec);
+        OnAfterShowDimensions(Rec);
     end;
 
     procedure ShowReclasDimensions()
@@ -4850,7 +4836,6 @@ table 83 "Item Journal Line"
                 if TempTrackingSpecification."Serial No." <> '' then begin
                     "Serial No." := TempTrackingSpecification."Serial No.";
                     "Lot No." := TempTrackingSpecification."Lot No.";
-                    "Package No." := TempTrackingSpecification."Package No.";
                     "Expiration Date" := TempTrackingSpecification."Expiration Date";
                 end;
             TrackingType::"Lot No.":
@@ -5551,7 +5536,7 @@ table 83 "Item Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterShowDimensions(var ItemJournalLine: Record "Item Journal Line"; var xItemJournalLine: Record "Item Journal Line")
+    local procedure OnAfterShowDimensions(var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
@@ -5649,35 +5634,4 @@ table 83 "Item Journal Line"
     local procedure OnBeforeCheckSerialNoQty(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetReservEntrySourceFilters(var ReservationEntry: Record "Reservation Entry"; SourceKey: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterEmptyLine(var ItemJournalLine: Record "Item Journal Line"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterOutputValuePosting(var ItemJournalLine: Record "Item Journal Line"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeItemPosting(var ItemJournalLine: Record "Item Journal Line"; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateNewLocationCode(var ItemJournalLine: Record "Item Journal Line"; xItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnLookupProdOrderCompOnBeforeSetTableView(var ProdOrderComponent: Record "Prod. Order Component"; var ItemJournalLine: Record "Item Journal Line")
-    begin
-    end;
-
 }
