@@ -2,8 +2,11 @@
 
 using Microsoft.Finance.AllocationAccount;
 using Microsoft.Finance.Dimension;
+using System.Automation;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Posting;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.GeneralLedger.Account;
 
 codeunit 2678 "Sales Alloc. Acc. Mgt."
 {
@@ -122,6 +125,25 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
                 Error('');
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Approvals Mgmt.", 'OnAfterCheckSalesApprovalPossible', '', false, false)]
+    local procedure HandleAfterCheckSalesApprovalPossible(var SalesHeader: Record "Sales Header")
+    var
+        ContainsAllocationLines: Boolean;
+    begin
+        VerifyLinesFromDocument(SalesHeader, ContainsAllocationLines);
+        if not ContainsAllocationLines then
+            exit;
+
+        if not GuiAllowed() then
+            Error(ReplaceAllocationLinesBeforeSendingToApprovalErr);
+
+        if not Confirm(ReplaceAllocationLinesBeforeSendingToApprovalQst) then
+            Error(ReplaceAllocationLinesBeforeSendingToApprovalErr);
+
+        CreateLinesFromDocument(SalesHeader);
+        Commit();
+        if SalesHeader.Find() then;
+    end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeModifyEvent', '', false, false)]
     local procedure CheckBeforeModifyLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; RunTrigger: Boolean)
@@ -228,6 +250,7 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
         ExistingAccountSalesLine: Record "Sales Line";
         AllocationLine: Record "Allocation Line";
         AllocationAccount: Record "Allocation Account";
+        DescriptionChanged: Boolean;
         NextLineNo: Integer;
         LastLineNo: Integer;
         Increment: Integer;
@@ -264,9 +287,10 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
         ExistingAccountSalesLine.ReadIsolation := IsolationLevel::ReadUncommitted;
         ExistingAccountSalesLine.SetAutoCalcFields("Alloc. Acc. Modified by User");
         ExistingAccountSalesLine.GetBySystemId(AllocationAccountSalesLine.SystemId);
+        DescriptionChanged := GetDescriptionChanged(ExistingAccountSalesLine.Description, ExistingAccountSalesLine.Type, ExistingAccountSalesLine."No.");
 
         repeat
-            CreatedLines.Add(CreateSalesLine(ExistingAccountSalesLine, AllocationLine, LastLineNo, Increment, AllocationAccount));
+            CreatedLines.Add(CreateSalesLine(ExistingAccountSalesLine, AllocationLine, LastLineNo, Increment, AllocationAccount, DescriptionChanged));
         until AllocationLine.Next() = 0;
 
         FixQuantityRounding(CreatedLines, ExistingAccountSalesLine, AllocationAccount);
@@ -312,7 +336,7 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
         end;
     end;
 
-    local procedure CreateSalesLine(var AllocationSalesLine: Record "Sales Line"; var AllocationLine: Record "Allocation Line"; var LastLineNo: Integer; Increment: Integer; var AllocationAccount: Record "Allocation Account"): Guid
+    local procedure CreateSalesLine(var AllocationSalesLine: Record "Sales Line"; var AllocationLine: Record "Allocation Line"; var LastLineNo: Integer; Increment: Integer; var AllocationAccount: Record "Allocation Account"; var DescriptionChanged: Boolean): Guid
     var
         SalesLine: Record "Sales Line";
         AllocAccHandleDocPost: Codeunit "Alloc. Acc. Handle Doc. Post";
@@ -330,19 +354,76 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
         SalesLine.Validate("No.", AllocationLine."Destination Account Number");
         UnbindSubscription(AllocAccHandleDocPost);
 
+        if DescriptionChanged then begin
+            if AllocationSalesLine.Description <> '' then
+                SalesLine.Description := AllocationSalesLine.Description;
+            if AllocationSalesLine."Description 2" <> '' then
+                SalesLine."Description 2" := AllocationSalesLine."Description 2";
+        end;
+
         MoveAmounts(SalesLine, AllocationSalesLine, AllocationLine, AllocationAccount);
         MoveQuantities(SalesLine, AllocationSalesLine);
 
         SalesLine."Deferral Code" := AllocationSalesLine."Deferral Code";
-
+        CopyDeferralSchedule(SalesLine, AllocationSalesLine);
         TransferDimensionSetID(SalesLine, AllocationLine, AllocationSalesLine."Alloc. Acc. Modified by User");
         SalesLine."Allocation Account No." := AllocationLine."Allocation Account No.";
         SalesLine."Selected Alloc. Account No." := '';
         OnBeforeCreateSalesLine(SalesLine, AllocationLine, AllocationSalesLine);
+        BindSubscription(AllocAccHandleDocPost);
         SalesLine.Insert(true);
+        UnbindSubscription(AllocAccHandleDocPost);
         LastLineNo := SalesLine."Line No.";
         RedistributeQuantitiesIfNeededMoveQuantities(SalesLine, AllocationSalesLine, AllocationLine, AllocationAccount);
         exit(SalesLine.SystemId);
+    end;
+
+    local procedure CopyDeferralSchedule(SalesLine: Record "Sales Line"; AllocationSalesLine: Record "Sales Line")
+    var
+        DeferralTemplate: Record "Deferral Template";
+        DeferralHeader: Record "Deferral Header";
+        DeferralLine: Record "Deferral Line";
+        NewDeferralHeader: Record "Deferral Header";
+        NewDeferralLine: Record "Deferral Line";
+        DeferralUtilities: Codeunit "Deferral Utilities";
+    begin
+        if SalesLine."Deferral Code" = '' then
+            exit;
+
+        if not DeferralTemplate.Get(SalesLine."Deferral Code") then
+            exit;
+
+        if DeferralTemplate."Calc. Method" <> DeferralTemplate."Calc. Method"::"User-Defined" then
+            exit;
+
+        if NewDeferralHeader.Get("Deferral Document Type"::Sales, '', '', SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.") then
+            exit;
+
+        if not DeferralHeader.Get("Deferral Document Type"::Sales, '', '', SalesLine."Document Type", SalesLine."Document No.", AllocationSalesLine."Line No.") then
+            exit;
+
+        NewDeferralHeader.TransferFields(DeferralHeader);
+        NewDeferralHeader."Line No." := SalesLine."Line No.";
+        NewDeferralHeader.Insert();
+
+        DeferralUtilities.FilterDeferralLines(NewDeferralLine, NewDeferralHeader."Deferral Doc. Type".AsInteger(),
+                    NewDeferralHeader."Gen. Jnl. Template Name", NewDeferralHeader."Gen. Jnl. Batch Name",
+                    NewDeferralHeader."Document Type", NewDeferralHeader."Document No.", NewDeferralHeader."Line No.");
+        if not NewDeferralLine.IsEmpty() then
+            exit;
+
+        DeferralUtilities.FilterDeferralLines(DeferralLine, DeferralHeader."Deferral Doc. Type".AsInteger(),
+                    DeferralHeader."Gen. Jnl. Template Name", DeferralHeader."Gen. Jnl. Batch Name",
+                    DeferralHeader."Document Type", DeferralHeader."Document No.", DeferralHeader."Line No.");
+        if DeferralLine.IsEmpty() then
+            exit;
+
+        if DeferralLine.FindSet() then
+            repeat
+                NewDeferralLine.TransferFields(DeferralLine);
+                NewDeferralLine."Line No." := NewDeferralHeader."Line No.";
+                NewDeferralLine.Insert();
+            until DeferralLine.Next() = 0;
     end;
 
     local procedure MoveQuantities(var SalesLine: Record "Sales Line"; var AllocationSalesLine: Record "Sales Line")
@@ -603,6 +684,34 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
         VerifyAllocationAccount(AllocationAccount);
     end;
 
+    local procedure GetDescriptionChanged(ExistingDescription: Text; AccountType: Enum "Sales Line Type"; AccountValue: Code[20]): Boolean
+    var
+        GLAccount: Record "G/L Account";
+        AllocationAccount: Record "Allocation Account";
+        ExpectedDescription: Text;
+    begin
+        case AccountType of
+            AccountType::"G/L Account":
+                begin
+                    if not GLAccount.Get(AccountValue) then
+                        exit(false);
+
+                    ExpectedDescription := GLAccount.Name;
+                end;
+            AccountType::"Allocation Account":
+                begin
+                    if not AllocationAccount.Get(AccountValue) then
+                        exit(false);
+
+                    ExpectedDescription := AllocationAccount.Name;
+                end;
+            else
+                exit(false);
+        end;
+
+        exit(ExistingDescription <> ExpectedDescription);
+    end;
+
     local procedure VerifySalesLine(var SalesLine: Record "Sales Line")
     var
         AllocationAccount: Record "Allocation Account";
@@ -642,4 +751,6 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
         DeleteManualOverridesQst: Label 'Modifying the line will delete all manual overrides for allocation account.\\Do you want to continue?';
         InvalidAccountTypeForInheritFromParentErr: Label 'Selected account type - %1 cannot be used for allocation accounts that have inherit from parent defined.', Comment = '%1 - Account type, e.g. G/L Account, Customer, Vendor, Bank Account, Fixed Asset, Item, Resource, Charge, Project, or Blank.';
         MustProvideAccountNoForInheritFromParentErr: Label 'You must provide an account number for allocation account with inherit from parent defined.';
+        ReplaceAllocationLinesBeforeSendingToApprovalErr: Label 'You must replace allocation lines before sending the document to approval.';
+        ReplaceAllocationLinesBeforeSendingToApprovalQst: Label 'Document contains allocation lines.\\Do you want to replace them before sending the document to approval?';
 }
