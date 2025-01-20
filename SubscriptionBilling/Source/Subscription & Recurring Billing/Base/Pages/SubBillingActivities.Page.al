@@ -15,7 +15,6 @@ page 8085 "Sub. Billing Activities"
     ShowFilter = false;
     SourceTable = "Subscription Billing Cue";
     ApplicationArea = Basic, Suite;
-    Permissions = tabledata "Subscription Billing Cue" = rimd;
 
     layout
     {
@@ -192,7 +191,7 @@ page 8085 "Sub. Billing Activities"
     var
         ServiceContractSetup: Record "Service Contract Setup";
     begin
-        if not ServiceContractSetup.Get() then begin
+        if not ServiceContractSetup.get() then begin
             ServiceContractSetup.Init();
             ServiceContractSetup.Insert();
         end;
