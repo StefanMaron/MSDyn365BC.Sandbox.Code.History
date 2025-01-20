@@ -49,10 +49,12 @@ page 1850 "Sales Forecast"
                     ColumndDate: Date;
                     XValueString: JsonToken;
                 begin
-                    point.Get('XValueString', XValueString);
-                    if Evaluate(ColumndDate, XValueString.AsValue().AsText()) then
-                        if MSSalesForecast.Get(Rec."No.", ColumndDate) then
-                            Message(ExpectedSalesMsg, MSSalesForecast.Quantity, MSSalesForecast.Delta);
+                    with MSSalesForecast do begin
+                        point.Get('XValueString', XValueString);
+                        if Evaluate(ColumndDate, XValueString.AsValue().AsText()) then
+                            if Get("No.", ColumndDate) then
+                                Message(ExpectedSalesMsg, Quantity, Delta);
+                    end;
                 end;
 
                 trigger AddInReady()
@@ -120,7 +122,7 @@ page 1850 "Sales Forecast"
                 var
                     SalesForecastNotifier: Codeunit "Sales Forecast Notifier";
                 begin
-                    SalesForecastNotifier.CreateAndShowPurchaseInvoice(Rec."No.");
+                    SalesForecastNotifier.CreateAndShowPurchaseInvoice("No.");
                 end;
             }
             action("Create Purchase Order")
@@ -134,7 +136,7 @@ page 1850 "Sales Forecast"
                 var
                     SalesForecastNotifier: Codeunit "Sales Forecast Notifier";
                 begin
-                    SalesForecastNotifier.CreateAndShowPurchaseOrder(Rec."No.");
+                    SalesForecastNotifier.CreateAndShowPurchaseOrder("No.");
                 end;
             }
             action("Show Inventory Forecast")
@@ -272,26 +274,28 @@ page 1850 "Sales Forecast"
         RunningInventory: Decimal;
     begin
         ForecastWithHighVariance := false;
-        Rec.CalcFields(Inventory);
-        RunningInventory := Rec.Inventory;
+        CalcFields(Inventory);
+        RunningInventory := Inventory;
 
-        MSSalesForecast.SetRange(Date, WorkDate(), EndingDate);
-        if MSSalesForecast.FindSet() then
-            repeat
-                if CheckVariancePerc(MSSalesForecast) then begin
-                    SetStatusText(StatusType::" ");
-                    BusinessChartBuffer.AddColumn(Format(MSSalesForecast.Date));
-                    BusinessChartBuffer.SetValue(InventoryForecastTxt, ColumnNo, RunningInventory);
-                    RunningInventory -= MSSalesForecast.Quantity;
-                    ColumnNo += 1;
-                end else begin
-                    ForecastWithHighVariance := true;
-                    if ColumnNo = 0 then
-                        SetStatusText(StatusType::"No columns due to high variance")
-                    else
-                        SetStatusText(StatusType::"Limited columns due to high variance");
-                end;
-            until (MSSalesForecast.Next() = 0) or ForecastWithHighVariance;
+        with BusinessChartBuffer do begin
+            MSSalesForecast.SetRange(Date, WorkDate(), EndingDate);
+            if MSSalesForecast.FindSet() then
+                repeat
+                    if CheckVariancePerc(MSSalesForecast) then begin
+                        SetStatusText(StatusType::" ");
+                        AddColumn(Format(MSSalesForecast.Date));
+                        SetValue(InventoryForecastTxt, ColumnNo, RunningInventory);
+                        RunningInventory -= MSSalesForecast.Quantity;
+                        ColumnNo += 1;
+                    end else begin
+                        ForecastWithHighVariance := true;
+                        if ColumnNo = 0 then
+                            SetStatusText(StatusType::"No columns due to high variance")
+                        else
+                            SetStatusText(StatusType::"Limited columns due to high variance");
+                    end;
+                until (MSSalesForecast.Next() = 0) or ForecastWithHighVariance;
+        end;
     end;
 
     local procedure AddSalesForecastedData(var BusinessChartBuffer: Record "Business Chart Buffer"; var MSSalesForecast: Record "MS - Sales Forecast"; var ColumnNo: Integer)
@@ -300,36 +304,40 @@ page 1850 "Sales Forecast"
     begin
         ForecastWithHighVariance := false;
 
-        MSSalesForecast.SetRange(Date, WorkDate(), EndingDate);
+        with BusinessChartBuffer do begin
+            MSSalesForecast.SetRange(Date, WorkDate(), EndingDate);
 
-        if IsForecastZero(MSSalesForecast) then
-            exit;
-        if MSSalesForecast.FindSet() then
-            repeat
-                if CheckVariancePerc(MSSalesForecast) then begin
-                    SetStatusText(StatusType::" ");
-                    BusinessChartBuffer.AddColumn(Format(MSSalesForecast.Date));
-                    BusinessChartBuffer.SetValue(SalesForecastTxt, ColumnNo, MSSalesForecast.Quantity);
-                    ColumnNo += 1;
-                end else begin
-                    ForecastWithHighVariance := true;
-                    if ColumnNo = 0 then
-                        SetStatusText(StatusType::"No columns due to high variance")
-                    else
-                        SetStatusText(StatusType::"Limited columns due to high variance");
-                end;
-            until (MSSalesForecast.Next() = 0) or ForecastWithHighVariance;
+            if IsForecastZero(MSSalesForecast) then
+                exit;
+            if MSSalesForecast.FindSet() then
+                repeat
+                    if CheckVariancePerc(MSSalesForecast) then begin
+                        SetStatusText(StatusType::" ");
+                        AddColumn(Format(MSSalesForecast.Date));
+                        SetValue(SalesForecastTxt, ColumnNo, MSSalesForecast.Quantity);
+                        ColumnNo += 1;
+                    end else begin
+                        ForecastWithHighVariance := true;
+                        if ColumnNo = 0 then
+                            SetStatusText(StatusType::"No columns due to high variance")
+                        else
+                            SetStatusText(StatusType::"Limited columns due to high variance");
+                    end;
+                until (MSSalesForecast.Next() = 0) or ForecastWithHighVariance;
+        end;
     end;
 
     local procedure AddSalesHistoricData(var BusinessChartBuffer: Record "Business Chart Buffer"; var MSSalesForecast: Record "MS - Sales Forecast"; var ColumnNo: Integer)
     begin
-        MSSalesForecast.SetFilter(Date, '>%1 & <%2', StartingDate, WorkDate());
-        if MSSalesForecast.FindSet() then
-            repeat
-                BusinessChartBuffer.AddColumn(Format(MSSalesForecast.Date));
-                BusinessChartBuffer.SetValue(SalesForecastTxt, ColumnNo, MSSalesForecast.Quantity);
-                ColumnNo += 1;
-            until MSSalesForecast.Next() = 0;
+        with BusinessChartBuffer do begin
+            MSSalesForecast.SetFilter(Date, '>%1 & <%2', StartingDate, WorkDate());
+            if MSSalesForecast.FindSet() then
+                repeat
+                    AddColumn(Format(MSSalesForecast.Date));
+                    SetValue(SalesForecastTxt, ColumnNo, MSSalesForecast.Quantity);
+                    ColumnNo += 1;
+                until MSSalesForecast.Next() = 0;
+        end;
     end;
 
     local procedure CheckVariancePerc(MSSalesForecast: Record "MS - Sales Forecast"): Boolean
@@ -355,11 +363,13 @@ page 1850 "Sales Forecast"
     var
         MSSalesForecastHelper: Record "MS - Sales Forecast";
     begin
-        MSSalesForecastHelper.CopyFilters(MSSalesForecast);
-        MSSalesForecastHelper.SetFilter(Quantity, '<>%1', 0);
-        if MSSalesForecastHelper.IsEmpty() then begin
-            SetStatusText(StatusType::"Zero Forecast");
-            exit(true);
+        with MSSalesForecastHelper do begin
+            CopyFilters(MSSalesForecast);
+            SetFilter(Quantity, '<>%1', 0);
+            if IsEmpty() then begin
+                SetStatusText(StatusType::"Zero Forecast");
+                exit(true);
+            end;
         end;
 
         exit(false);
@@ -387,25 +397,26 @@ page 1850 "Sales Forecast"
         MSSalesForecast: Record "MS - Sales Forecast";
     begin
         MSSalesForecast.SetRange("Forecast Data", MSSalesForecast."Forecast Data"::Result);
-        MSSalesForecast.SetRange("Item No.", Rec."No.");
+        MSSalesForecast.SetRange("Item No.", "No.");
 
         exit(not MSSalesForecast.IsEmpty());
     end;
 
     local procedure GetTimeSeriesPeriodType(): Text[1]
     begin
-        case MSSalesForecastParameter."Time Series Period Type" of
-            MSSalesForecastParameter."Time Series Period Type"::Day:
-                exit('D');
-            MSSalesForecastParameter."Time Series Period Type"::Week:
-                exit('W');
-            MSSalesForecastParameter."Time Series Period Type"::Month:
-                exit('M');
-            MSSalesForecastParameter."Time Series Period Type"::Quarter:
-                exit('Q');
-            MSSalesForecastParameter."Time Series Period Type"::Year:
-                exit('Y');
-        end;
+        with MSSalesForecastParameter do
+            case "Time Series Period Type" of
+                "Time Series Period Type"::Day:
+                    exit('D');
+                "Time Series Period Type"::Week:
+                    exit('W');
+                "Time Series Period Type"::Month:
+                    exit('M');
+                "Time Series Period Type"::Quarter:
+                    exit('Q');
+                "Time Series Period Type"::Year:
+                    exit('Y');
+            end;
     end;
 
     local procedure InitializeLabels()
@@ -416,7 +427,7 @@ page 1850 "Sales Forecast"
 
     local procedure IsForecastUpdated(): Boolean
     begin
-        if MSSalesForecastParameter.Get(Rec."No.") then
+        if MSSalesForecastParameter.Get("No.") then
             if LastUpdatedValue <> MSSalesForecastParameter."Last Updated" then
                 exit(true);
         exit(false);
@@ -428,23 +439,27 @@ page 1850 "Sales Forecast"
         ColumnNo: Integer;
     begin
         // prepare source data
-        MSSalesForecast.SetRange("Item No.", Rec."No.");
+        MSSalesForecast.SetRange("Item No.", "No.");
         SetDateRange();
 
-        BusinessChartBuffer.Initialize();
-        ColumnNo := 0;
-        // 1. Measures & Axis
-        DefineMasuresAndAxis(BusinessChartBuffer);
+        with BusinessChartBuffer do begin
+            Initialize();
+            ColumnNo := 0;
 
-        if not NeedsUpdate then
-            exit;
-        // 2. historic data until current period
-        AddSalesHistoricData(BusinessChartBuffer, MSSalesForecast, ColumnNo);
-        // 3. forecasted data
-        if ForecastType = ForecastType::Sales then
-            AddSalesForecastedData(BusinessChartBuffer, MSSalesForecast, ColumnNo)
-        else
-            AddInventoryForecastedData(BusinessChartBuffer, MSSalesForecast, ColumnNo);
+            // 1. Measures & Axis
+            DefineMasuresAndAxis(BusinessChartBuffer);
+
+            if not NeedsUpdate then
+                exit;
+            // 2. historic data until current period
+            AddSalesHistoricData(BusinessChartBuffer, MSSalesForecast, ColumnNo);
+
+            // 3. forecasted data
+            if ForecastType = ForecastType::Sales then
+                AddSalesForecastedData(BusinessChartBuffer, MSSalesForecast, ColumnNo)
+            else
+                AddInventoryForecastedData(BusinessChartBuffer, MSSalesForecast, ColumnNo);
+        end;
     end;
 
     local procedure SetDateRange()
@@ -482,7 +497,7 @@ page 1850 "Sales Forecast"
 
         TimeSeriesManagement.SetMaximumHistoricalPeriods(MSSalesForecastSetup."Historical Periods");
         TimeSeriesManagement.SetMinimumHistoricalPeriods(5);
-        SalesForecastHandler.SetItemLedgerEntryFilters(ItemLedgerEntry, Rec."No.");
+        SalesForecastHandler.SetItemLedgerEntryFilters(ItemLedgerEntry, "No.");
 
         HasMinimumHistory := TimeSeriesManagement.HasMinimumHistoricalData(
             NumberOfPeriodsToPredict,
@@ -490,14 +505,14 @@ page 1850 "Sales Forecast"
             ItemLedgerEntry.FieldNo("Posting Date"),
             MSSalesForecastSetup."Period Type",
             WorkDate());
-        OnAfterHasMinimumSIHistData(Rec."No.", HasMinimumHistoryLoc, NumberOfPeriodsWithHistoryLoc, MSSalesForecastSetup."Period Type", WorkDate(), StatusType);
-        HasMinimumHistory := (HasMinimumHistory or HasMinimumHistoryLoc);
+        OnAfterHasMinimumSIHistData("No.", HasMinimumHistoryLoc, NumberOfPeriodsWithHistoryLoc, MSSalesForecastSetup."Period Type", WorkDate(), StatusType);
+        HasMinimumHistory := (HasMinimumHistory OR HasMinimumHistoryLoc);
         if not HasMinimumHistory then begin
             SetStatusText(StatusType::"Not enough historical data");
             exit;
         end;
         // check if forecast exists in DB
-        if not MSSalesForecastParameter.Get(Rec."No.") then
+        if not MSSalesForecastParameter.Get("No.") then
             // enough ledger entries, forecast not updated
             if not ForecastAvailable() then begin
                 SetStatusText(StatusType::"No Forecast available");
@@ -517,7 +532,7 @@ page 1850 "Sales Forecast"
         end;
 
         VariancePercSetup := MSSalesForecastSetup."Variance %";
-        MSSalesForecast.SetRange("Item No.", Rec."No.");
+        MSSalesForecast.SetRange("Item No.", "No.");
         MSSalesForecast.SetRange("Forecast Data", MSSalesForecast."Forecast Data"::Result);
         MSSalesForecast.SetFilter("Variance %", '<=%1', VariancePercSetup);
         if MSSalesForecast.IsEmpty() then
@@ -568,7 +583,7 @@ page 1850 "Sales Forecast"
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnAfterHasMinimumSIHistData(ItemNo: Code[20]; var HasMinimumHistoryLoc: boolean; var NumberOfPeriodsWithHistoryLoc: Integer; PeriodType: Integer; ForecastStartDate: Date; var StatusType: Option " ","No columns due to high variance","Limited columns due to high variance","Forecast expired","Forecast period type changed","Not enough historical data","Zero Forecast","No Forecast available");
+    procedure OnAfterHasMinimumSIHistData(ItemNo: Code[20]; VAR HasMinimumHistoryLoc: boolean; VAR NumberOfPeriodsWithHistoryLoc: Integer; PeriodType: Integer; ForecastStartDate: Date; VAR StatusType: Option " ","No columns due to high variance","Limited columns due to high variance","Forecast expired","Forecast period type changed","Not enough historical data","Zero Forecast","No Forecast available");
     begin
     end;
 
