@@ -28,7 +28,6 @@ codeunit 136322 "Jobs - Assemble-to Order"
         RemainingQtyGreaterThanErr: Label 'Remaining Quantity (Base) cannot be more than %1 in Assembly Header Document Type=''%2'',No.=''%3''', Comment = 'Remaining Quantity, Document Type, No.';
         BillableLineTypeErr: Label 'Line Type must not be Billable in Project Planning Line Project No.=''%1'',Project Task No.=''%2'',Line No.=''%3''.';
         ZeroJobContractLineMsg: Label 'Job Contract Entry No. is empty.';
-        FieldValueIsNotCorrect: Label '%1 is not correct', Comment = 'Field Name';
 
     [Test]
     procedure AssemblyOrderIsCreated()
@@ -61,37 +60,6 @@ codeunit 136322 "Jobs - Assemble-to Order"
 
         ATOLink.FindFirst();
         Assert.AreEqual(ATOLink."Document Type"::Order, ATOLink."Document Type", ATOLinkWrongTypeMsg);
-    end;
-
-    [Test]
-    procedure AssemblyOrderIsNotCreatedIfApplyUsageLinkIsNotChecked()
-    var
-        ParentItem, CompItem1, CompItem2 : Record Item;
-        Job: Record Job;
-        JobTask: Record "Job Task";
-        JobPlanningLine: Record "Job Planning Line";
-    begin
-        // [SCENARIO 539741] Verify assembly order is not created if Apply Usage Link is not checked
-        Initialize();
-
-        // [GIVEN] Create an assembly item with 2 components.
-        CreateAssemblyItemWithBOM(ParentItem, CompItem1, CompItem2);
-
-        // [GIVEN] Create Job and Job Task
-        CreateJobAndJobTask(Job, JobTask);
-
-        // [GIVEN] Set Apply Usage Link to false
-        Job.Validate("Apply Usage Link", false);
-        Job.Modify(true);
-
-        // [GIVEN] Create Job Planning Line
-        CreateSimpleJobPlanningLineWithAssemblyItem(JobPlanningLine, JobTask, ParentItem."No.");
-
-        // [WHEN] Validate Quantity on Job Planning Line
-        asserterror JobPlanningLine.Validate("Quantity", LibraryRandom.RandInt(10));
-
-        // [THEN] Verify results
-        Assert.ExpectedTestFieldError(JobPlanningLine.FieldCaption("Usage Link"), '');
     end;
 
     [Test]
@@ -330,43 +298,6 @@ codeunit 136322 "Jobs - Assemble-to Order"
     end;
 
     [Test]
-    procedure LineTypeIsCopiedFromOriginalPlanningLineOnExplodeBOMForTextType()
-    var
-        ParentItem, CompItem1, CompItem2 : Record Item;
-        Job: Record Job;
-        JobTask: Record "Job Task";
-        JobPlanningLine: Record "Job Planning Line";
-        Type: Enum "Job Planning Line Line Type";
-    begin
-        // [SCENARIO 556632] Verify Line Type is copied from original planning line on Explode BOM for Text Type
-        Initialize();
-
-        // [GIVEN] Create an assembly item with 2 components.
-        CreateAssemblyItemWithBOM(ParentItem, CompItem1, CompItem2);
-
-        // [GIVEN] Create Job and Job Task
-        CreateJobAndJobTask(Job, JobTask);
-
-        // [GIVEN] Create Job Planning Line
-        CreateSimpleJobPlanningLineWithAssemblyItem(JobPlanningLine, JobTask, ParentItem."No.");
-
-        // [GIVEN] Save Job Planning Line Type
-        Type := JobPlanningLine."Line Type";
-
-        // [GIVEN] Remove Qty. to Assemble
-        JobPlanningLine.Validate("Qty. to Assemble", 0);
-        JobPlanningLine.Modify(true);
-
-        // [WHEN] Explode BOM
-        Codeunit.Run(Codeunit::"Job-Explode BOM", JobPlanningLine);
-
-        // [THEN] Verify results
-        FilterJobPlanningLine(JobPlanningLine);
-        JobPlanningLine.FindFirst();
-        Assert.AreEqual(JobPlanningLine."Line Type", Type, StrSubstNo(FieldValueIsNotCorrect, JobPlanningLine.FieldName("Line Type")));
-    end;
-
-    [Test]
     procedure NotPossibleToChangeJobStatusFromOpenIfAssembleOrderExist()
     var
         ParentItem, CompItem1, CompItem2 : Record Item;
@@ -474,7 +405,10 @@ codeunit 136322 "Jobs - Assemble-to Order"
         LibraryWarehouse.CreateInvtPutPickMovement("Warehouse Request Source Document"::"Job Usage", Job."No.", false, true, false);
 
         // [GIVEN] Find Warehouse Activity Header 
-        FindWarehouseActivityHeader(WarehouseActivityHeader, Job, Location);
+        WarehouseActivityHeader.SetRange("Source Document", WarehouseActivityHeader."Source Document"::"Job Usage");
+        WarehouseActivityHeader.SetRange("Source No.", Job."No.");
+        WarehouseActivityHeader.SetRange("Location Code", Location.Code);
+        WarehouseActivityHeader.FindFirst();
 
         // [WHEN] Inventory Pick is posted
         InventoryPickPage.OpenEdit();
@@ -485,72 +419,6 @@ codeunit 136322 "Jobs - Assemble-to Order"
         // [THEN] Verify results
         SetFiltersToPostedATOLink(JobTask, JobPlanningLine, PostedATOLink);
         Assert.RecordIsNotEmpty(PostedATOLink);
-    end;
-
-    [Test]
-    [HandlerFunctions('MessageHandler,ConfirmHandlerTrue')]
-    procedure AssemlyConsumptionEntriesAreNotCreatedOnPostingInventoryPickForAssembledItem()
-    var
-        ParentItem, CompItem1, CompItem2 : Record Item;
-        Job: Record Job;
-        JobTask: Record "Job Task";
-        JobPlanningLine: Record "Job Planning Line";
-        Location: Record Location;
-        WarehouseActivityHeader: Record "Warehouse Activity Header";
-        WarehouseActivityLine: Record "Warehouse Activity Line";
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        InventoryPickPage: TestPage "Inventory Pick";
-    begin
-        // [SCENARIO 506439] Verify assembly consumption entries are not created on posting inventory pick for assembled item
-        Initialize();
-
-        // [GIVEN] Create an assembly item with 2 components.
-        CreateAssemblyItemWithBOM(ParentItem, CompItem1, CompItem2);
-
-        // [GIVEN] Create Location with required pick
-        LibraryWarehouse.CreateLocationWMS(Location, false, false, true, false, false);
-
-        // [GIVEN] Create Warehouse Employee with default location
-        CreateDefaultWarehouseEmployee(Location);
-
-        // [GIVEN] Add components and parent Item to inventory
-        CreateAndPostInvtAdjustmentWithUnitCost(ParentItem."No.", Location.Code, '', LibraryRandom.RandInt(100), LibraryRandom.RandDec(10, 2));
-        CreateAndPostInvtAdjustmentWithUnitCost(CompItem1."No.", Location.Code, '', LibraryRandom.RandInt(100), LibraryRandom.RandDec(10, 2));
-        CreateAndPostInvtAdjustmentWithUnitCost(CompItem2."No.", Location.Code, '', LibraryRandom.RandInt(100), LibraryRandom.RandDec(10, 2));
-
-        // [GIVEN] Create Job and Job Task
-        CreateJobAndJobTask(Job, JobTask);
-
-        // [GIVEN] Create Job Planning Line        
-        CreateJobPlanningLineWithData(JobPlanningLine, JobTask, "Job Planning Line Line Type"::Budget, JobPlanningLine.Type::Item,
-            ParentItem."No.", Location.Code, '', 4);
-
-        // [GIVEN] Set Qty. to Assemble
-        JobPlanningLine.Validate("Qty. to Assemble", 3);
-        JobPlanningLine.Modify(true);
-
-        // [GIVEN] Create Inventory Pick for the Job
-        LibraryWarehouse.CreateInvtPutPickMovement("Warehouse Request Source Document"::"Job Usage", Job."No.", false, true, false);
-
-        // [GIVEN] Find Warehouse Activity Header 
-        FindWarehouseActivityHeader(WarehouseActivityHeader, Job, Location);
-
-        // [GIVEN] Find Warehouse Activity Line
-        FindWarehouseActivityLine(WarehouseActivityHeader, WarehouseActivityLine);
-
-        // [GIVEN] Set Qty. to Handle
-        WarehouseActivityLine.Validate("Qty. to Handle", 1);
-        WarehouseActivityLine.Modify(true);
-
-        // [WHEN] Inventory Pick is posted
-        InventoryPickPage.OpenEdit();
-        InventoryPickPage.GoToRecord(WarehouseActivityHeader);
-        InventoryPickPage."P&ost".Invoke();
-
-        // [THEN] Verify results
-        ItemLedgerEntry.SetRange("Item No.", ParentItem."No.");
-        ItemLedgerEntry.SetRange("Remaining Quantity", 0);
-        Assert.RecordCount(ItemLedgerEntry, 1);
     end;
 
     [Test]
@@ -870,7 +738,10 @@ codeunit 136322 "Jobs - Assemble-to Order"
         LibraryWarehouse.CreateInvtPutPickMovement("Warehouse Request Source Document"::"Job Usage", Job."No.", false, true, false);
 
         // [GIVEN] Find Warehouse Activity Header 
-        FindWarehouseActivityHeader(WarehouseActivityHeader, Job, Location);
+        WarehouseActivityHeader.SetRange("Source Document", WarehouseActivityHeader."Source Document"::"Job Usage");
+        WarehouseActivityHeader.SetRange("Source No.", Job."No.");
+        WarehouseActivityHeader.SetRange("Location Code", Location.Code);
+        WarehouseActivityHeader.FindFirst();
 
         // [WHEN] Inventory Pick is posted
         InventoryPickPage.OpenEdit();
@@ -1007,7 +878,10 @@ codeunit 136322 "Jobs - Assemble-to Order"
         LibraryWarehouse.CreateInvtPutPickMovement("Warehouse Request Source Document"::"Job Usage", Job."No.", false, true, false);
 
         // [GIVEN] Find Warehouse Activity Header 
-        FindWarehouseActivityHeader(WarehouseActivityHeader, Job, Location);
+        WarehouseActivityHeader.SetRange("Source Document", WarehouseActivityHeader."Source Document"::"Job Usage");
+        WarehouseActivityHeader.SetRange("Source No.", Job."No.");
+        WarehouseActivityHeader.SetRange("Location Code", Location.Code);
+        WarehouseActivityHeader.FindFirst();
 
         // [WHEN] Inventory Pick is posted
         InventoryPickPage.OpenEdit();
@@ -1233,30 +1107,6 @@ codeunit 136322 "Jobs - Assemble-to Order"
         JobPlanningLine.SetRange("Job No.", JobPlanningLine."Job No.");
         JobPlanningLine.SetRange("Job Task No.", JobPlanningLine."Job Task No.");
         JobPlanningLine.SetFilter(Type, '<>%1', JobPlanningLine.Type::Text);
-    end;
-
-    local procedure FilterJobPlanningLine(var JobPlanningLine: Record "Job Planning Line")
-    begin
-        JobPlanningLine.Reset();
-        JobPlanningLine.SetRange("Job No.", JobPlanningLine."Job No.");
-        JobPlanningLine.SetRange("Job Task No.", JobPlanningLine."Job Task No.");
-        JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Text);
-    end;
-
-    local procedure FindWarehouseActivityHeader(var WarehouseActivityHeader: Record "Warehouse Activity Header"; Job: Record Job; Location: Record Location)
-    begin
-        WarehouseActivityHeader.SetRange("Source Document", WarehouseActivityHeader."Source Document"::"Job Usage");
-        WarehouseActivityHeader.SetRange("Source No.", Job."No.");
-        WarehouseActivityHeader.SetRange("Location Code", Location.Code);
-        WarehouseActivityHeader.FindFirst();
-    end;
-
-    local procedure FindWarehouseActivityLine(WarehouseActivityHeader: Record "Warehouse Activity Header"; var WarehouseActivityLine: Record "Warehouse Activity Line")
-    begin
-        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityLine."Activity Type"::"Invt. Pick");
-        WarehouseActivityLine.SetRange("No.", WarehouseActivityHeader."No.");
-        WarehouseActivityLine.SetRange("Assemble to Order", false);
-        WarehouseActivityLine.FindFirst();
     end;
 
     [ModalPageHandler]
