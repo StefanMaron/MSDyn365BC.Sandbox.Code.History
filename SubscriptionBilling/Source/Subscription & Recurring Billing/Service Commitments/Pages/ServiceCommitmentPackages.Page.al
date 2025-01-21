@@ -39,7 +39,7 @@ page 8057 "Service Commitment Packages"
             {
                 Caption = 'Assigned Items';
                 Image = ItemLedger;
-                RunObject = page "Assigned Items";
+                RunObject = Page "Assigned Items";
                 RunPageLink = Code = field(Code);
                 ToolTip = 'Shows items related to a package.';
             }

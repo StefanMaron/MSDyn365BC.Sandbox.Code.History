@@ -42,7 +42,6 @@ codeunit 1690 "Bank Deposit-Post"
         PostingDate: Date;
         DocumentType: Enum "Gen. Journal Document Type";
         TotalAmountLCY: Decimal;
-        ShowDialog: Boolean;
     begin
         FeatureTelemetry.LogUptake('0000IG4', 'Bank Deposit', Enum::"Feature Uptake Status"::Used);
         FeatureTelemetry.LogUsage('0000IG5', 'Bank Deposit', 'Bank deposit posted');
@@ -138,11 +137,9 @@ codeunit 1690 "Bank Deposit-Post"
 
         UpdateAnalysisView.UpdateAll(0, true);
 
-        ShowDialog := true;
-        OnAfterBankDepositPost(Rec, PostedBankDepositHeader, ShowDialog);
+        OnAfterBankDepositPost(Rec, PostedBankDepositHeader);
 
-        if ShowDialog then
-            Page.Run(Page::"Posted Bank Deposit", PostedBankDepositHeader);
+        Page.Run(Page::"Posted Bank Deposit", PostedBankDepositHeader);
     end;
 
     local procedure InsertLumpSumGenJournalLine(BankDepositHeader: Record "Bank Deposit Header"; DocumentType: Enum "Gen. Journal Document Type"; DocumentDate: Date; TotalAmountLCY: Decimal)
@@ -222,8 +219,7 @@ codeunit 1690 "Bank Deposit-Post"
         GenJournalLine."Source Type" := GenJournalLine."Source Type"::"Bank Account";
         GenJournalLine."Source No." := BankDepositHeader."Bank Account No.";
         GenJournalLine."Source Currency Code" := BankDepositHeader."Currency Code";
-        if BankDepositHeader."Reason Code" <> '' then
-            GenJournalLine."Reason Code" := BankDepositHeader."Reason Code";
+        GenJournalLine."Reason Code" := BankDepositHeader."Reason Code";
         GenJournalLine."Source Currency Amount" := SourceCurrencyAmount;
     end;
 
@@ -467,7 +463,6 @@ codeunit 1690 "Bank Deposit-Post"
         PostedBankDepositLine."Dimension Set ID" := PostingGenJournalLine."Dimension Set ID";
         PostedBankDepositLine."Posting Date" := CurrentBankDepositHeader."Posting Date";
         PostedBankDepositLine."External Document No." := PostingGenJournalLine."External Document No.";
-        PostedBankDepositLine."Reason Code" := PostingGenJournalLine."Reason Code";
         case PostingGenJournalLine."Account Type" of
             PostingGenJournalLine."Account Type"::"G/L Account",
             PostingGenJournalLine."Account Type"::"Bank Account":
@@ -500,7 +495,7 @@ codeunit 1690 "Bank Deposit-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterBankDepositPost(BankDepositHeader: Record "Bank Deposit Header"; var PostedBankDepositHeader: Record "Posted Bank Deposit Header"; var ShowDialog: Boolean)
+    local procedure OnAfterBankDepositPost(BankDepositHeader: Record "Bank Deposit Header"; var PostedBankDepositHeader: Record "Posted Bank Deposit Header")
     begin
     end;
 
