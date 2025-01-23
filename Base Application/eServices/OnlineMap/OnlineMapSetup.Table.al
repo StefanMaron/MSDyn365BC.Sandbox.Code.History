@@ -4,7 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.eServices.OnlineMap;
 
-using System;
 using System.Privacy;
 
 table 800 "Online Map Setup"
@@ -42,15 +41,9 @@ table 800 "Online Map Setup"
             trigger OnValidate()
             var
                 CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
-                MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-                MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-                MyALAuditCategory: DotNet ALAuditCategory;
-                OnlineMapSetupEnabledLbl: Label 'Online Map Setup enabled by UserSecurityId %1', Locked = true;
             begin
-                if not xRec."Enabled" and Rec."Enabled" then begin
+                if not xRec."Enabled" and Rec."Enabled" then
                     Rec."Enabled" := CustomerConsentMgt.ConfirmUserConsentToMicrosoftService();
-                    MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(OnlineMapSetupEnabledLbl, UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 4, 0);
-                end;
             end;
         }
     }
