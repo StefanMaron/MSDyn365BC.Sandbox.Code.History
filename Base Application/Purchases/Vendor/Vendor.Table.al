@@ -1224,7 +1224,6 @@ table 23 Vendor
                 ContBusRel: Record "Contact Business Relation";
                 TempVend: Record Vendor temporary;
             begin
-                Cont.FilterGroup(2);
                 ContBusRel.SetCurrentKey("Link to Table", "No.");
                 ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Vendor);
                 ContBusRel.SetRange("No.", "No.");
@@ -1994,14 +1993,14 @@ table 23 Vendor
             NoSeriesMgt.RaiseObsoleteOnBeforeInitSeries(PurchSetup."Vendor Nos.", xRec."No. Series", 0D, "No.", "No. Series", IsHandled);
             if not IsHandled then begin
 #endif
-                "No. Series" := PurchSetup."Vendor Nos.";
-                if NoSeries.AreRelated("No. Series", xRec."No. Series") then
-                    "No. Series" := xRec."No. Series";
+            "No. Series" := PurchSetup."Vendor Nos.";
+            if NoSeries.AreRelated("No. Series", xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            "No." := NoSeries.GetNextNo("No. Series");
+            Vendor.ReadIsolation(IsolationLevel::ReadUncommitted);
+            Vendor.SetLoadFields("No.");
+            while Vendor.Get("No.") do
                 "No." := NoSeries.GetNextNo("No. Series");
-                Vendor.ReadIsolation(IsolationLevel::ReadUncommitted);
-                Vendor.SetLoadFields("No.");
-                while Vendor.Get("No.") do
-                    "No." := NoSeries.GetNextNo("No. Series");
 #if not CLEAN24
                 NoSeriesMgt.RaiseObsoleteOnAfterInitSeries("No. Series", PurchSetup."Vendor Nos.", 0D, "No.");
             end;
@@ -2449,6 +2448,7 @@ table 23 Vendor
           "Amt. Rcd. Not Invoiced (LCY)" + "Outstanding Invoices (LCY)" - GetInvoicedPrepmtAmountLCY());
     end;
 
+    [Scope('OnPrem')]
     procedure GetTaxCode(): Code[20]
     begin
         if "Fiscal Code" <> '' then
@@ -2505,11 +2505,10 @@ table 23 Vendor
         VendorWithoutQuote: Text;
         VendorFilterFromStart: Text;
         VendorFilterContains: Text;
-        ShowCreateVendorOption, IsHandled : Boolean;
+        IsHandled: Boolean;
     begin
-        ShowCreateVendorOption := true;
         IsHandled := false;
-        OnBeforeGetVendorNoOpenCard(VendorText, ShowVendorCard, VendorNo, IsHandled, ShowCreateVendorOption);
+        OnBeforeGetVendorNoOpenCard(VendorText, ShowVendorCard, VendorNo, IsHandled);
         if IsHandled then
             exit(VendorNo);
 
@@ -2569,15 +2568,12 @@ table 23 Vendor
         OnGetVendorNoOpenCardOnBeforeSelectVendor(Vendor);
         if Vendor.Count = 0 then begin
             if Vendor.WritePermission then
-                if ShowCreateVendorOption then
-                    case StrMenu(StrSubstNo('%1,%2', StrSubstNo(CreateNewVendTxt, VendorText), SelectVendTxt), 1, VendNotRegisteredTxt) of
-                        0:
-                            Error(SelectVendorErr);
-                        1:
-                            exit(CreateNewVendor(CopyStr(VendorText, 1, MaxStrLen(Vendor.Name)), ShowVendorCard));
-                    end
-                else
-                    exit('');
+                case StrMenu(StrSubstNo('%1,%2', StrSubstNo(CreateNewVendTxt, VendorText), SelectVendTxt), 1, VendNotRegisteredTxt) of
+                    0:
+                        Error(SelectVendorErr);
+                    1:
+                        exit(CreateNewVendor(CopyStr(VendorText, 1, MaxStrLen(Vendor.Name)), ShowVendorCard));
+                end;
             Vendor.Reset();
             NoFiltersApplied := true;
         end;
@@ -2624,9 +2620,7 @@ table 23 Vendor
     local procedure CreateNewVendor(VendorName: Text[100]; ShowVendorCard: Boolean) Result: Code[20]
     var
         Vendor: Record Vendor;
-        xRecVendor: Record Vendor;
         VendorTemplMgt: Codeunit "Vendor Templ. Mgt.";
-        WorkflowEventHandling: Codeunit "Workflow Event Handling";
         VendorCard: Page "Vendor Card";
         IsHandled: Boolean;
     begin
@@ -2640,9 +2634,6 @@ table 23 Vendor
 
         Vendor.Name := VendorName;
         Vendor.Modify(true);
-
-        WorkflowEventHandling.RunWorkflowOnVendorChanged(Vendor, xRecVendor, false);
-
         Commit();
         if not ShowVendorCard then
             exit(Vendor."No.");
@@ -3075,7 +3066,7 @@ table 23 Vendor
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetVendorNoOpenCard(VendorText: Text; ShowVendorCard: Boolean; var VendorNo: Code[20]; var IsHandled: Boolean; var ShowCreateVendorOption: Boolean)
+    local procedure OnBeforeGetVendorNoOpenCard(VendorText: Text; ShowVendorCard: Boolean; var VendorNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
 
