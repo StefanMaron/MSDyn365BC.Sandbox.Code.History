@@ -32,7 +32,6 @@ page 171 "Standard Sales Code Subform"
 
                     trigger OnValidate()
                     begin
-                        UpdateTypeText();
                         TypeOnAfterValidate();
                     end;
                 }
@@ -240,7 +239,6 @@ page 171 "Standard Sales Code Subform"
     trigger OnAfterGetCurrRecord()
     begin
         CurrPageIsEditable := CurrPage.Editable;
-        UpdateTypeText();
     end;
 
     trigger OnAfterGetRecord()
@@ -265,11 +263,6 @@ page 171 "Standard Sales Code Subform"
         UpdateTypeText();
 
         Clear(ShortcutDimCode);
-    end;
-
-    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
-    begin
-        UpdateTypeText();
     end;
 
     trigger OnOpenPage()

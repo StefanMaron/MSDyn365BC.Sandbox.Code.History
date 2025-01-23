@@ -21,7 +21,6 @@ page 6761 "Issue Reminders Setup"
         {
             group(General)
             {
-                Caption = 'General';
                 field(Code; Rec.Code)
                 {
                     ApplicationArea = All;
