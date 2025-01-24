@@ -189,7 +189,7 @@ page 8052 "Customer Contract"
                     ApplicationArea = Suite;
                     Importance = Additional;
                     QuickEntry = false;
-                    ToolTip = 'Specifies whether deferrals should be generated for the contract. If the field is activated, no deferrals are generated and the invoices are posted directly to profit or loss.';
+                    ToolTip = 'Indicates whether deferrals should be generated for the contract. If the field is activated, no deferrals are generated and the invoices are posted directly to profit or loss.';
                 }
                 field("Exclude from Price Update"; Rec.DefaultExcludeFromPriceUpdate)
                 {
@@ -613,9 +613,9 @@ page 8052 "Customer Contract"
                     Caption = 'Customer';
                     Enabled = IsCustomerOrContactNotEmpty;
                     Image = Customer;
-                    RunObject = page "Customer Card";
+                    RunObject = Page "Customer Card";
                     RunPageLink = "No." = field("Sell-to Customer No.");
-                    ShortcutKey = 'Shift+F7';
+                    ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer on the customer contract.';
                 }
                 action(Dimensions)
@@ -624,7 +624,7 @@ page 8052 "Customer Contract"
                     ApplicationArea = Dimensions;
                     Caption = 'Dimensions';
                     Image = Dimensions;
-                    ShortcutKey = 'Alt+D';
+                    ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
 
                     trigger OnAction()
@@ -638,7 +638,7 @@ page 8052 "Customer Contract"
                     ToolTip = 'Customer Contract Deferrals.';
                     Image = LedgerEntries;
                     ShortcutKey = 'Ctrl+F7';
-                    RunObject = page "Customer Contract Deferrals";
+                    RunObject = Page "Customer Contract Deferrals";
                     RunPageView = sorting("Contract No.");
                     RunPageLink = "Contract No." = field("No.");
                 }
