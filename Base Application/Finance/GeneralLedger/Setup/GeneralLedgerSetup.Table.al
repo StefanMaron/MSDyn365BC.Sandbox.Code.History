@@ -27,7 +27,6 @@ using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
-using System;
 using System.Environment;
 using System.Globalization;
 using System.IO;
@@ -913,7 +912,7 @@ table 98 "General Ledger Setup"
             TableRelation = "G/L Account Category";
             Caption = 'Account Receivables G/L Account Category';
         }
-        field(191; "App. Dimension Posting"; Enum "Exch. Rate Adjmt. Dimensions")
+	    field(191; "App. Dimension Posting"; Enum "Exch. Rate Adjmt. Dimensions")
         {
             Caption = 'Dimension Posting';
             DataClassification = CustomerContent;
@@ -973,15 +972,9 @@ table 98 "General Ledger Setup"
             trigger OnValidate()
             var
                 CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
-                MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-                MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-                MyALAuditCategory: DotNet ALAuditCategory;
-                CFDIConsentProvidedLbl: Label 'CFDI - consent provided.', Locked = true;
             begin
                 if "CFDI Enabled" THEN
                     "CFDI Enabled" := CustomerConsentMgt.ConfirmUserConsent();
-                if "CFDI Enabled" then
-                    MyCustomerAuditLoggerALHelper.LogAuditMessage(CFDIConsentProvidedLbl, MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 4, 0);
             end;
         }
         field(10010; "Sim. Signature"; Boolean)
