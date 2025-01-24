@@ -15,7 +15,7 @@ codeunit 4700 "VAT Group Communication"
     var
         VATReportSetup: Record "VAT Report Setup";
         NoVATSetupErr: Label 'The VAT Report Setup could not be found.';
-        BearerTokenFromCacheErr: Label 'The Bearer token could not be retrieved from cache. Please refresh the VAT Group bearer token by logging in the %1 page', Comment = '%1 the caption of a page.';
+        BearerTokenFromCacheErr: Label 'The OAuth2 token could not be retrieved from cache. Choose the action Renew OAuth2 Token on the page %1 and log in to get a new token.', Comment = '%1 the caption of a page.';
         OAuthFailedNoErr: label 'Authorization has failed with an unexpected error.';
         OAuthFailedErr: Label 'Authorization has failed with the error %1', Comment = '%1 is the error description.';
         URLAppendixCompanyLbl: Label '/api/microsoft/vatgroup/v1.0/companies(name=''%1'')', Locked = true;
@@ -129,8 +129,8 @@ codeunit 4700 "VAT Group Communication"
         PromptInteraction: Enum "Prompt Interaction";
         Scopes: List of [Text];
         FirstPartyAppId: Text;
-        FirstPartyAppCertificate: Text;
-        BearerToken: Text;
+        FirstPartyAppCertificate: SecretText;
+        BearerToken: SecretText;
         AuthError: Text;
     begin
         if not VATReportSetup.Get() then
@@ -145,7 +145,7 @@ codeunit 4700 "VAT Group Communication"
             ResourceURL := GetResourceURL();
         end;
 
-        if (FirstPartyAppId <> '') and (FirstPartyAppCertificate <> '') then begin
+        if (FirstPartyAppId <> '') and (not FirstPartyAppCertificate.IsEmpty()) then begin
             Session.LogMessage('0000MXQ', AttemptingAuthCodeTokenWithCertTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', VATGroupTok, 'AppId', FirstPartyAppId);
             OAuth2.AcquireTokenByAuthorizationCodeWithCertificate(FirstPartyAppId, FirstPartyAppCertificate, AuthorityURL, RedirectURL, ResourceURL, PromptInteraction::Login, BearerToken, AuthError)
         end else begin
@@ -154,7 +154,7 @@ codeunit 4700 "VAT Group Communication"
             OAuth2.AcquireTokenByAuthorizationCode(ClientId, ClientSecret, AuthorityURL, RedirectURL, Scopes, PromptInteraction::Login, BearerToken, AuthError);
         end;
 
-        if BearerToken <> '' then begin
+        if not BearerToken.IsEmpty() then begin
             Message(BearerTokenSuccessMsg);
             exit;
         end;
@@ -169,17 +169,17 @@ codeunit 4700 "VAT Group Communication"
     end;
 
     [NonDebuggable]
-    local procedure GetBearerTokenFromCache(): Text
+    local procedure GetBearerTokenFromCache(): SecretText
     var
         OAuth2: Codeunit OAuth2;
         EnvironmentInformation: Codeunit "Environment Information";
         VATReportSetupPage: Page "VAT Report Setup";
         Scopes: List of [Text];
-        BearerToken: Text;
+        BearerToken: SecretText;
         AKVClientId: Text;
         AKVClientSecret: Text;
         FirstPartyAppId: Text;
-        FirstPartyAppCertificate: Text;
+        FirstPartyAppCertificate: SecretText;
         ResourceURL: Text;
     begin
         if not VATReportSetup.Get() then
@@ -190,7 +190,7 @@ codeunit 4700 "VAT Group Communication"
             FirstPartyAppId := GetFirstPartyAppId();
             FirstPartyAppCertificate := GetFirstPartyAppCertificate();
             ResourceURL := GetResourceURL();
-            if (FirstPartyAppId <> '') and (FirstPartyAppCertificate <> '') then begin
+            if (FirstPartyAppId <> '') and (not FirstPartyAppCertificate.IsEmpty()) then begin
                 Session.LogMessage('0000MXS', AttemptingAuthCodeTokenFromCacheWithCertTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', VATGroupTok, 'AppId', FirstPartyAppId);
                 OAuth2.AcquireAuthorizationCodeTokenFromCacheWithCertificate(FirstPartyAppId, FirstPartyAppCertificate, GetRedirectURL(), GetOAuthAuthorityURL(), ResourceURL, BearerToken)
             end else begin
@@ -208,7 +208,7 @@ codeunit 4700 "VAT Group Communication"
                 BearerToken);
         end;
 
-        if BearerToken = '' then
+        if BearerToken.IsEmpty() then
             Error(BearerTokenFromCacheErr, VATReportSetupPage.Caption());
 
         exit(BearerToken);
@@ -258,12 +258,11 @@ codeunit 4700 "VAT Group Communication"
         exit(AppId);
     end;
 
-    [NonDebuggable]
-    local procedure GetFirstPartyAppCertificate(): Text;
+    local procedure GetFirstPartyAppCertificate(): SecretText;
     var
         AzureKeyVault: Codeunit "Azure Key Vault";
         EnvironmentInformation: Codeunit "Environment Information";
-        Certificate: Text;
+        Certificate: SecretText;
         CertificateName: Text;
     begin
         if EnvironmentInformation.IsSaaSInfrastructure() then
