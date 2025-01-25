@@ -120,7 +120,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         if TrackingSpecification."Package No." <> '' then
             CalcRsvQtyOnPicksShipsWithIT.SetRange(Package_No_, TrackingSpecification."Package No.");
 
-        OnBeforeOpenCalcRsvQtyOnPickShipWithITQuery(CalcRsvQtyOnPicksShipsWithIT);
         CalcRsvQtyOnPicksShipsWithIT.Open();
 
         while CalcRsvQtyOnPicksShipsWithIT.Read() do begin
@@ -816,23 +815,22 @@ codeunit 7314 "Warehouse Availability Mgt."
 
     local procedure CalcQtyOutstandingPick(SourceType: Integer; SourceSubType: Option; SourceID: Code[20]; SourceRefNo: Integer; SourceProdOrderLine: Integer; var WarehouseActivityLine: Record "Warehouse Activity Line"): Decimal
     var
-        WarehouseActivityLineForCalc: Record "Warehouse Activity Line";
+        WhseActivityLine: Record "Warehouse Activity Line";
     begin
         if SourceType = Database::"Prod. Order Component" then
-            WarehouseActivityLineForCalc.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceProdOrderLine, SourceRefNo, true)
+            WhseActivityLine.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceProdOrderLine, SourceRefNo, true)
         else
-            WarehouseActivityLineForCalc.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceRefNo, -1, true);
-        WarehouseActivityLineForCalc.SetFilter("Action Type", '%1|%2', WarehouseActivityLineForCalc."Action Type"::Take, WarehouseActivityLineForCalc."Action Type"::" ");
-        OnCalcQtyOutstandingPickOnAfterSetFilters(WarehouseActivityLineForCalc, SourceType, SourceSubType, SourceID, SourceRefNo, SourceProdOrderLine);
+            WhseActivityLine.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceRefNo, -1, true);
+        WhseActivityLine.SetFilter("Action Type", '%1|%2', WhseActivityLine."Action Type"::Take, WhseActivityLine."Action Type"::" ");
+        OnCalcQtyOutstandingPickOnAfterSetFilters(WhseActivityLine, SourceType, SourceSubType, SourceID, SourceRefNo, SourceProdOrderLine);
 
-        WarehouseActivityLineForCalc.CalcSums("Qty. Outstanding (Base)");
+        WhseActivityLine.CalcSums("Qty. Outstanding (Base)");
 
         // For not yet committed warehouse activity lines
-        WarehouseActivityLine.CopyFilters(WarehouseActivityLineForCalc);
+        WarehouseActivityLine.CopyFilters(WhseActivityLine);
         WarehouseActivityLine.CalcSums("Qty. Outstanding (Base)");
-        OnCalcQtyOutstandingPickOnAfterCalcSums(WarehouseActivityLine, WarehouseActivityLineForCalc);
 
-        exit(WarehouseActivityLineForCalc."Qty. Outstanding (Base)" + WarehouseActivityLine."Qty. Outstanding (Base)");
+        exit(WhseActivityLine."Qty. Outstanding (Base)" + WarehouseActivityLine."Qty. Outstanding (Base)");
     end;
 
     procedure CalcQtyAvailToTakeOnWhseWorksheetLine(WhseWorksheetLine: Record "Whse. Worksheet Line") AvailQtyBase: Decimal
@@ -993,7 +991,7 @@ codeunit 7314 "Warehouse Availability Mgt."
             AvailabilityType::Variant:
                 ItemAvailabilityFormsMgt.ShowItemAvailabilityByVariant(Item, WhseRcptLine.FieldCaption(WhseRcptLine."Variant Code"), WhseRcptLine."Variant Code", NewVariantCode);
             AvailabilityType::Location:
-                ItemAvailabilityFormsMgt.ShowItemAvailabilityByLocation(Item, '', WhseRcptLine."Location Code", NewLocationCode);
+                ItemAvailabilityFormsMgt.ShowItemAvailabilityByLocation(Item, WhseRcptLine.FieldCaption(WhseRcptLine."Location Code"), WhseRcptLine."Location Code", NewLocationCode);
             AvailabilityType::"Event":
                 ItemAvailabilityFormsMgt.ShowItemAvailabilityByEvent(Item, WhseRcptLine.FieldCaption(WhseRcptLine."Due Date"), WhseRcptLine."Due Date", NewDate, false);
             AvailabilityType::BOM:
@@ -1032,7 +1030,7 @@ codeunit 7314 "Warehouse Availability Mgt."
             AvailabilityType::Variant:
                 ItemAvailabilityFormsMgt.ShowItemAvailabilityByVariant(Item, WhseActivLine.FieldCaption(WhseActivLine."Variant Code"), WhseActivLine."Variant Code", NewVariantCode);
             AvailabilityType::Location:
-                ItemAvailabilityFormsMgt.ShowItemAvailabilityByLocation(Item, '', WhseActivLine."Location Code", NewLocationCode);
+                ItemAvailabilityFormsMgt.ShowItemAvailabilityByLocation(Item, WhseActivLine.FieldCaption(WhseActivLine."Location Code"), WhseActivLine."Location Code", NewLocationCode);
             AvailabilityType::"Event":
                 ItemAvailabilityFormsMgt.ShowItemAvailabilityByEvent(Item, WhseActivLine.FieldCaption(WhseActivLine."Due Date"), WhseActivLine."Due Date", NewDate, false);
             AvailabilityType::BOM:
@@ -1054,16 +1052,6 @@ codeunit 7314 "Warehouse Availability Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcQtyPickedNotShipped(SourceType: Integer; SourceSubType: Option; SourceID: Code[20]; SourceRefNo: Integer; var QtyPickedNotShippedBase: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenCalcRsvQtyOnPickShipWithITQuery(var CalcRsvQtyOnPicksShipsWithIT: Query CalcRsvQtyOnPicksShipsWithIT)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcQtyOutstandingPickOnAfterCalcSums(var WarehouseActivityLine: Record "Warehouse Activity Line"; var WarehouseActivityLineForCalc: Record "Warehouse Activity Line");
     begin
     end;
 }
