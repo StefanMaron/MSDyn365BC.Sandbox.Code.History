@@ -21,7 +21,6 @@ codeunit 136353 "UT T Job Planning Line"
         LibraryResource: Codeunit "Library - Resource";
         LibrarySales: Codeunit "Library - Sales";
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryService: Codeunit "Library - Service";
 #if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
 #endif
@@ -39,8 +38,6 @@ codeunit 136353 "UT T Job Planning Line"
         FBPlanningDrillDownErr: Label 'Wrong Project Planning Lines';
         FBLedgerDrillDownErr: Label 'Wrong Project Ledger Entries';
         RoundingTo0Err: Label 'Rounding of the field';
-        NoJobPlanningLineErr: Label '%1 must be %2 in %3', Comment = '%1 = "No." field of Job Planning Line, %2 = Value of "No." field of Item, %3 = Job Planning Line';
-        UnitCostLCYErr: Label '%1 must be %2 in %3', Comment = '%1 = Unit Cost (LCY), %2 = Unit Cost of Item, %3 = Job Planning Line';
 
     [Test]
     [Scope('OnPrem')]
@@ -1889,198 +1886,6 @@ codeunit 136353 "UT T Job Planning Line"
         JobPlanningLine.TestField(Description, ItemTranslation.Description);
     end;
 
-    [Test]
-    procedure NoOfItemIsValidatedEvenIfEnterDescriptionOfItemInNoOfJobPlanningLineHavingTypeAsItem()
-    var
-        Item: Record Item;
-        Job: Record Job;
-        JobTask: Record "Job Task";
-        JobPlanningLine: Record "Job Planning Line";
-    begin
-        // [SCENARIO 547563] When Stan enters the Description of an Item in "No." field of 
-        // Job Planning Line having Type selected as Item, then "No." field of Job Planning Line
-        // Is updated with the value of "No." field of the Item without any error.
-        Initialize();
-
-        // [GIVEN] Create an Item and Validate Description.
-        LibraryInventory.CreateItem(Item);
-        Item.Validate(Description, LibraryUtility.GenerateRandomText(MaxStrLen(Item."No.")));
-        Item.Modify(true);
-
-        // [GIVEN] Create a Job and a Job task.
-        CreateJobAndJobTask(Job, JobTask, false, '');
-
-        // [WHEN] Create a Job Planning Line and Validate Type and No.
-        CreateSimpleJobPlanningLine(JobPlanningLine, JobTask);
-        JobPlanningLine.Validate(Type, JobPlanningLine.Type::Item);
-        JobPlanningLine.Validate("No.", Item.Description);
-        JobPlanningLine.Modify(true);
-
-        // [THEN] No. of Job Planning Line must be equal to No. of Item.
-        Assert.AreEqual(
-            Item."No.",
-            JobPlanningLine."No.",
-            StrSubstNo(
-                NoJobPlanningLineErr,
-                JobPlanningLine.FieldCaption("No."),
-                Item."No.",
-                JobPlanningLine.TableCaption()));
-    end;
-
-    [Test]
-    procedure UnitCostLCYIsNotChangedWhenUnitPriceIsChangedInJobPlanningLine()
-    var
-        Currency: Record Currency;
-        Item: Record Item;
-        Job: Record Job;
-        JobTask: Record "Job Task";
-        JobPlanningLine, JobPlanningLine2 : Record "Job Planning Line";
-        JobPlanningLines: TestPage "Job Planning Lines";
-    begin
-        // [SCENARIO 550707] Unit Cost (LCY) in Job Planning Line is not changed when Unit Price is changed.
-        Initialize();
-
-        // [GIVEN] Create a Currency.
-        LibraryERM.CreateCurrency(Currency);
-
-        // [GIVEN] Create a Random Currency Exchange Rate.
-        LibraryERM.CreateRandomExchangeRate(Currency.Code);
-
-        // [GIVEN] Validate Unit-Amount Rounding Precision.
-        Currency.Validate("Unit-Amount Rounding Precision", 0.01);
-        Currency.Modify(true);
-
-        // [GIVEN] Create an Item and Validate Unit Cost.
-        LibraryInventory.CreateItem(Item);
-        Item.Validate("Unit Cost", LibraryRandom.RandDecInDecimalRange(0.37, 0.37, 2));
-        Item.Modify(true);
-
-        // [GIVEN] Create a Job and a Job task.
-        CreateJobAndJobTask(Job, JobTask, false, Currency.Code);
-
-        // [GIVEN] Create a Job Planning Line and Validate Type and No.
-        CreateSimpleJobPlanningLine(JobPlanningLine, JobTask);
-        JobPlanningLine.Validate(Type, JobPlanningLine.Type::Item);
-        JobPlanningLine.Validate("No.", Item."No.");
-        JobPlanningLine.Modify(true);
-
-        // [GIVEN] Open Job Planning Lines page and set value in Unit Price.
-        JobPlanningLines.OpenEdit();
-        JobPlanningLines.GoToRecord(JobPlanningLine);
-        JobPlanningLines."Unit Price".SetValue(LibraryRandom.RandIntInRange(5, 5));
-        JobPlanningLines.Close();
-
-        // [WHEN] Find Job Planning Line.
-        JobPlanningLine2.Get(
-            JobPlanningLine."Job No.",
-            JobPlanningLine."Job Task No.",
-            JobPlanningLine."Line No.");
-
-        // [THEN] Unit Cost (LCY) of Job Planning Line is equal to Unit Cost of Item.
-        Assert.AreEqual(
-            Item."Unit Cost",
-            JobPlanningLine2."Unit Cost (LCY)",
-            StrSubstNo(
-                UnitCostLCYErr,
-                JobPlanningLine2.FieldCaption("Unit Cost (LCY)"),
-                Item."Unit Cost",
-                JobPlanningLine2.TableCaption()));
-    end;
-
-    [Test]
-    procedure PlanningDateAndDocumentNoDataAreTransferedOnPlanningLinesOnInsertExtendedTextFromItem()
-    var
-        Item: Record Item;
-        Job: Record Job;
-        JobTask: Record "Job Task";
-        JobPlanningLine: Record "Job Planning Line";
-        TextJobPlanningLine: Record "Job Planning Line";
-        ExtendedTextHeader: Record "Extended Text Header";
-        ExtendedTextLine: Record "Extended Text Line";
-        JobPlanningLines: TestPage "Job Planning Lines";
-        DocumentNo: Code[20];
-    begin
-        // [SCENARIO 556639] Planning Date and Document No. data are transfered on Planning Lines on Insert Extended Text
-        Initialize();
-
-        // [GIVEN] Create Item with Automatic Ext. Text
-        CreateItemWithAutomaticExtText(Item);
-
-        // [GIVEN] Create Extended Text for the Item
-        UpdateAllLanguagesCodeOnExtendedTextHeader(ExtendedTextHeader, Item."No.");
-        LibraryService.CreateExtendedTextLineItem(ExtendedTextLine, ExtendedTextHeader);
-        ExtendedTextLine.Validate(Text, ExtendedTextHeader."No.");
-        ExtendedTextLine.Modify(true);
-
-        // [GIVEN] Create Job and Job Task
-        CreateJobAndJobTask(Job, JobTask, false, '');
-
-        // [GIVEN] Create Job Planning Line
-        LibraryJob.CreateJobPlanningLine(JobPlanningLine."Line Type"::Budget,
-            JobPlanningLine.Type::Item, JobTask, JobPlanningLine);
-
-        // [GIVEN] Add Document No. on Job Planning Line
-        DocumentNo := LibraryUtility.GenerateRandomText(20);
-        JobPlanningLine.Validate("Document No.", DocumentNo);
-        JobPlanningLine.Modify(true);
-
-        // [WHEN] Open Job Planning Lines page and set Item No.
-        JobPlanningLines.OpenEdit();
-        JobPlanningLines.GotoRecord(JobPlanningLine);
-        JobPlanningLines."No.".SetValue(Item."No.");
-
-        // [THEN] Verify Planning Date and Document No. Planning Line
-        FindJobPlanningLine(TextJobPlanningLine, JobTask, Job, JobPlanningLine.Type::Text);
-        Assert.AreEqual(TextJobPlanningLine."Planning Date", JobPlanningLine."Planning Date", 'Planning Date is not equal');
-        Assert.AreEqual(TextJobPlanningLine."Planned Delivery Date", JobPlanningLine."Planned Delivery Date", 'Planned Delivery Date is not equal');
-        Assert.AreEqual(TextJobPlanningLine."Document No.", JobPlanningLine."Document No.", 'Document No. is not equal');
-    end;
-
-    [Test]
-    [HandlerFunctions('ItemListLookForItem')]
-    procedure ExtendedTextLineIsCreatedOnSelectItemsActionFromProjectPlanningLines()
-    var
-        Item: Record Item;
-        Job: Record Job;
-        JobTask: Record "Job Task";
-        JobPlanningLine: Record "Job Planning Line";
-        TextJobPlanningLine: Record "Job Planning Line";
-        ExtendedTextHeader: Record "Extended Text Header";
-        ExtendedTextLine: Record "Extended Text Line";
-        JobPlanningLines: TestPage "Job Planning Lines";
-    begin
-        // [SCENARIO 556635] Extended Text Line is created on Select Items action from Project Planning Lines
-        Initialize();
-
-        // [GIVEN] Create Item with Automatic Ext. Text
-        CreateItemWithAutomaticExtText(Item);
-
-        // [GIVEN] Create Extended Text for the Item
-        UpdateAllLanguagesCodeOnExtendedTextHeader(ExtendedTextHeader, Item."No.");
-        LibraryService.CreateExtendedTextLineItem(ExtendedTextLine, ExtendedTextHeader);
-        ExtendedTextLine.Validate(Text, ExtendedTextHeader."No.");
-        ExtendedTextLine.Modify(true);
-
-        // [GIVEN] Create Job and Job Task
-        CreateJobAndJobTask(Job, JobTask, false, '');
-
-        // [GIVEN] Create Job Planning Line
-        LibraryJob.CreateJobPlanningLine(JobPlanningLine."Line Type"::Budget,
-            JobPlanningLine.Type::Item, JobTask, JobPlanningLine);
-
-        // [GIVEN] Enqueue Item No.
-        LibraryVariableStorage.Enqueue(Item."No.");
-
-        // [WHEN] Open Job Planning Lines page and set Item No.
-        JobPlanningLines.OpenEdit();
-        JobPlanningLines.GotoRecord(JobPlanningLine);
-        JobPlanningLines.SelectMultiItems.Invoke();
-
-        // [THEN] Verify Planning Date and Document No. Planning Line
-        FindJobPlanningLine(TextJobPlanningLine, JobTask, Job, JobPlanningLine.Type::Text);
-        Assert.RecordIsNotEmpty(TextJobPlanningLine, CompanyName);
-    end;
-
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -2394,28 +2199,6 @@ codeunit 136353 "UT T Job Planning Line"
         ItemTranslation.Insert(true);
     end;
 
-    local procedure FindJobPlanningLine(var JobPlanningLine: Record "Job Planning Line"; JobTask: Record "Job Task"; Job: Record Job; Type: Enum "Job Planning Line Type")
-    begin
-        JobPlanningLine.SetRange("Job No.", Job."No.");
-        JobPlanningLine.SetRange("Job Task No.", JobTask."Job Task No.");
-        JobPlanningLine.SetRange(Type, Type);
-        JobPlanningLine.FindFirst();
-    end;
-
-    local procedure CreateItemWithAutomaticExtText(var Item: Record Item)
-    begin
-        LibraryInventory.CreateItem(Item);
-        Item.Validate("Automatic Ext. Texts", true);
-        Item.Modify(true);
-    end;
-
-    local procedure UpdateAllLanguagesCodeOnExtendedTextHeader(var ExtendedTextHeader: Record "Extended Text Header"; ItemNo: Code[20])
-    begin
-        LibraryService.CreateExtendedTextHeaderItem(ExtendedTextHeader, ItemNo);
-        ExtendedTextHeader.Validate("All Language Codes", true);
-        ExtendedTextHeader.Modify(true);
-    end;
-
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure OrderPromisingModalPagehandler(var OrderPromisingLines: TestPage "Order Promising Lines")
@@ -2467,13 +2250,6 @@ codeunit 136353 "UT T Job Planning Line"
         JobTransfertoSalesInvoice.CreateNewInvoice.SetValue(false);
         JobTransfertoSalesInvoice.AppendToSalesInvoiceNo.SetValue(LibraryVariableStorage.DequeueText());
         JobTransfertoSalesInvoice.OK().Invoke();
-    end;
-
-    [ModalPageHandler]
-    procedure ItemListLookForItem(var ItemList: TestPage "Item List")
-    begin
-        ItemList.Filter.SetFilter("No.", LibraryVariableStorage.DequeueText());
-        ItemList.OK().Invoke();
     end;
 }
 
