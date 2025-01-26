@@ -1347,8 +1347,6 @@
     procedure PrintExternalDocNoOnDraftSalesInvoiceReport()
     var
         SalesHeader: Record "Sales Header";
-        ExtDocNoRowNo: Integer;
-        ExtDocColNo: Integer;
     begin
         // [FEATURE] [Invoice]
         // [SCENARIO 257521] External Document Number is printed in report "Standard Sales - Draft Invoice".
@@ -1366,8 +1364,7 @@
 
         // [THEN] Saved Excel file contains "External Doc No.".
         LibraryReportValidation.OpenExcelFile();
-        LibraryReportValidation.FindRowNoColumnNoByValueOnWorksheet('External Document No.', 1, ExtDocNoRowNo, ExtDocColNo);
-        LibraryReportValidation.VerifyCellValue(ExtDocNoRowNo, ExtDocColNo + 4, SalesHeader."External Document No.");
+        LibraryReportValidation.VerifyCellValue(21, 18, SalesHeader."External Document No.");
     end;
 
     [Test]
@@ -4923,7 +4920,6 @@
     local procedure SetRDLCReportLayout(ReportID: Integer)
     var
         ReportLayoutSelection: Record "Report Layout Selection";
-        TenantReportLayoutSelection: Record "Tenant Report Layout Selection";
     begin
         ReportLayoutSelection.SetRange("Report ID", ReportID);
         ReportLayoutSelection.SetRange("Company Name", CompanyName);
@@ -4938,13 +4934,6 @@
             ReportLayoutSelection."Custom Report Layout Code" := '';
             ReportLayoutSelection.Insert();
         end;
-
-        TenantReportLayoutSelection.Init();
-        TenantReportLayoutSelection."Company Name" := CompanyName();
-        TenantReportLayoutSelection."Layout Name" := ReportLayoutSelection."Report Name";
-        TenantReportLayoutSelection."Report ID" := ReportID;
-        if not TenantReportLayoutSelection.Insert(true) then
-            TenantReportLayoutSelection.Modify(true);
     end;
 
     local procedure UpdateSalesReceivablesSetup(var OldDefaultPostingDate: Enum "Default Posting Date"; DefaultPostingDate: Enum "Default Posting Date")
