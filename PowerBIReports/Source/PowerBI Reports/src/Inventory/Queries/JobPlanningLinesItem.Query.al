@@ -5,7 +5,7 @@ using Microsoft.Projects.Project.Planning;
 query 36969 "Job Planning Lines - Item"
 {
     Access = Internal;
-    Caption = 'Power BI Project Planning Lines';
+    Caption = 'Power BI Job Planning Lines';
     QueryType = API;
     APIPublisher = 'microsoft';
     APIGroup = 'analytics';

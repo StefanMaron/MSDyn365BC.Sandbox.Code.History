@@ -237,7 +237,7 @@ page 6166 "E-Doc. PO Copilot Prop"
                 RoundPrecision := EDocumentImportHelper.GetCurrencyRoundingPrecision(EDocument."Currency Code");
                 Discount := Round((EDocOrderMatches."E-Document Direct Unit Cost" * EDocOrderMatches."Line Discount %") / 100, RoundPrecision);
                 DiscountedUnitCost := EDocOrderMatches."E-Document Direct Unit Cost" - Discount;
-                Sum += EDocOrderMatches."Precise Quantity" * DiscountedUnitCost;
+                Sum += EDocOrderMatches.Quantity * DiscountedUnitCost;
             until EDocOrderMatches.Next() = 0;
     end;
 
@@ -246,7 +246,7 @@ page 6166 "E-Doc. PO Copilot Prop"
         TempAIProposalBuffer2: Record "E-Doc. PO Match Prop. Buffer" temporary;
         EDocLineNos: List of [Integer];
         EDocLineNo: Integer;
-        Sum: Decimal;
+        Sum: Integer;
     begin
         if TempAIProposalBuffer.FindSet() then
             repeat
