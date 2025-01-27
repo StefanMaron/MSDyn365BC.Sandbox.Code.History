@@ -6,7 +6,7 @@ pageextension 8055 "Item List" extends "Item List"
 {
     layout
     {
-        addbefore(Control1900383207)
+        addfirst(factboxes)
         {
             part(ItemServCommitmentsFactbox; "Item Serv. Commitments Factbox")
             {
@@ -33,7 +33,7 @@ pageextension 8055 "Item List" extends "Item List"
                 end;
             }
         }
-        addlast(Category_Category4)
+        addfirst(Category_Category4)
         {
             actionref(ServiceCommitments_Promoted; ServiceCommitments)
             {
