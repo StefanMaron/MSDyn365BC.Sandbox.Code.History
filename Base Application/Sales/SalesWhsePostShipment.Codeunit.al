@@ -315,19 +315,13 @@ codeunit 5746 "Sales Whse. Post Shipment"
         end;
     end;
 
-    local procedure UpdateAttachedLine(var SalesLine: Record "Sales Line"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var ModifyLine: Boolean) Result: Boolean
+    local procedure UpdateAttachedLine(var SalesLine: Record "Sales Line"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var ModifyLine: Boolean): Boolean
     var
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
         WhseShptLine2: Record "Warehouse Shipment Line";
         ItemChargeAssignmentSales: Record "Item Charge Assignment (Sales)";
         QtyToHandle: Decimal;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateAttachedLine(SalesLine, WarehouseShipmentLine, ModifyLine, IsHandled, Result);
-        if IsHandled then
-            exit(Result);
-
         SalesReceivablesSetup.Get();
         if SalesReceivablesSetup."Auto Post Non-Invt. via Whse." <> SalesReceivablesSetup."Auto Post Non-Invt. via Whse."::"Attached/Assigned" then
             exit(false);
@@ -357,7 +351,6 @@ codeunit 5746 "Sales Whse. Post Shipment"
             QtyToHandle := SalesLine."Outstanding Quantity";
         end;
 
-        OnUpdateAttachedLineOnBeforeModifyLine(SalesLine, WarehouseShipmentLine, ModifyLine, QtyToHandle);
         if SalesLine."Document Type" = SalesLine."Document Type"::Order then begin
             ModifyLine := SalesLine."Qty. to Ship" <> QtyToHandle;
             if ModifyLine then
@@ -659,16 +652,6 @@ codeunit 5746 "Sales Whse. Post Shipment"
 
     [IntegrationEvent(false, false)]
     local procedure OnPrintDocumentsOnAfterPrintSalesShipment(ShipmentNo: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateAttachedLine(var SalesLine: Record "Sales Line"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var ModifyLine: Boolean; var IsHandled: Boolean; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateAttachedLineOnBeforeModifyLine(var SalesLine: Record "Sales Line"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var ModifyLine: Boolean; var QtyToHandle: Decimal)
     begin
     end;
 }
