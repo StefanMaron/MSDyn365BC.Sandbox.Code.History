@@ -148,12 +148,6 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
-    },
-    {
-      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
-    },
-    {
       "path": "./ExcelReports/Test/Dynamics BC Excel Reports Tests"
     },
     {
@@ -286,9 +280,6 @@
       "path": "./Email - Current User Connector/Test/Email - Current User Connector Tests"
     },
     {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
-    },
-    {
       "path": "./Email - Outlook REST API/Test"
     },
     {
@@ -302,9 +293,9 @@
     }
   ],
   "settings": {
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
     "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
+    "allint.enabled": false,
     "search.exclude": {
       "**.xlf": true
     }
