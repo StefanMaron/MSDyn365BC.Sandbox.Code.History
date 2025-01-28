@@ -10,12 +10,10 @@ codeunit 450 "Job Queue Error Handler"
 
     trigger OnRun()
     begin
-        if Rec."Job Queue Category Code" <> '' then
-            Rec.ActivateNextJobInCategoryIfAny();
-        if Rec.GetRecLockedExtendedTimeout() then begin
-            Rec.Status := Rec.Status::Error;
-            LogError(Rec);
-        end;
+        if not Rec.DoesExistLocked() then
+            exit;
+        Rec.Status := Rec.Status::Error;
+        LogError(Rec);
     end;
 
     var
@@ -52,8 +50,6 @@ codeunit 450 "Job Queue Error Handler"
             JobQueueLogEntry."Error Message" := JobQueueEntry."Error Message";
             JobQueueLogEntry.SetErrorCallStack(GetLastErrorCallStack()); // Need to save callstack before deleted above
             JobQueueLogEntry.Status := JobQueueLogEntry.Status::Error;
-            if JobQueueLogEntry."End Date/Time" = 0DT then
-                JobQueueLogEntry."End Date/Time" := CurrentDateTime();
             JobQueueLogEntry.Modify();
 #if CLEAN24
         end;
