@@ -27,7 +27,8 @@ page 1318 "Account Receivables KPIs"
                         CustomerLedgerEntries: Page "Customer Ledger Entries";
                     begin
                         CustLedgerEntry.SetRange(Open, true);
-                        CustLedgerEntry.SetFilter("Due Date", '<=%1', Today());
+                        CustLedgerEntry.SetFilter("Remaining Amount", '>%1', 0);
+                        CustLedgerEntry.SetFilter("Due Date", '<=%1', WorkDate());
                         CustomerLedgerEntries.SetTableView(CustLedgerEntry);
                         CustomerLedgerEntries.Run();
                     end;
@@ -42,14 +43,14 @@ page 1318 "Account Receivables KPIs"
                         CustomerLedgerEntries: Page "Customer Ledger Entries";
                     begin
                         CustLedgerEntry.SetRange(Open, true);
+                        CustLedgerEntry.SetFilter("Remaining Amount", '>%1', 0);
                         CustomerLedgerEntries.SetTableView(CustLedgerEntry);
                         CustomerLedgerEntries.Run();
                     end;
                 }
-                field("A/R Accounts Balance"; ActivitiesMgt.CalcARAccountsBalances())
+                field("A/R Accounts Balance"; Rec."AR Accounts Balance")
                 {
                     ApplicationArea = All;
-                    Caption = 'A/R Accounts Balance';
                     ToolTip = 'Specifies the sum of the accounts that have the account receivables account category. You can configure which account category is considered for Account Receivables in the General Ledger Setup page.';
 
                     trigger OnDrillDown()
@@ -57,7 +58,7 @@ page 1318 "Account Receivables KPIs"
                         ActivitiesMgt.DrillDownCalcARAccountsBalances();
                     end;
                 }
-                field("Average Collection Days"; ActivitiesMgt.CalcAverageCollectionDays())
+                field("Average Collection Days"; AverageCollectionDays)
                 {
                     ApplicationArea = All;
                     Caption = 'Average Collection Days';
@@ -90,13 +91,14 @@ page 1318 "Account Receivables KPIs"
         ActivitiesCue: Record "Activities Cue";
         ActivitiesMgt: Codeunit "Activities Mgt.";
         SalesInvoicesDueNextWeekStyleExpr: Text;
+        AverageCollectionDays: Decimal;
 
-    trigger OnOpenPage()
+    trigger OnInit()
     var
         CuesAndKPIs: Codeunit "Cues And KPIs";
         SalesInvoicesDueNextWeekStyle: Enum "Cues And KPIs Style";
     begin
-        Rec.SetRange("Overdue Date Filter", 0D, Today());
+        Rec.SetRange("Overdue Date Filter", 0D, WorkDate());
         if not Rec.Get() then begin
             Clear(Rec);
             Rec.Insert();
@@ -106,10 +108,16 @@ page 1318 "Account Receivables KPIs"
             ActivitiesCue.Insert();
             Commit();
         end;
-
         ActivitiesCue.SetFilter("Due Next Week Filter", '%1..%2', CalcDate('<1D>', Today), CalcDate('<1W>', Today));
         ActivitiesCue.CalcFields("Sales Invoices Due Next Week");
         CuesAndKPIs.SetCueStyle(Database::"Activities Cue", ActivitiesCue.FieldNo("Sales Invoices Due Next Week"), ActivitiesCue."Sales Invoices Due Next Week", SalesInvoicesDueNextWeekStyle);
         SalesInvoicesDueNextWeekStyleExpr := Format(SalesInvoicesDueNextWeekStyle);
+        Rec."AR Accounts Balance" := ActivitiesMgt.CalcARAccountsBalances();
+        Rec.Modify();
+    end;
+
+    trigger OnOpenPage()
+    begin
+        AverageCollectionDays := ActivitiesMgt.CalcAverageCollectionDays();
     end;
 }
