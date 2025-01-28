@@ -1091,11 +1091,13 @@ table 81 "Gen. Journal Line"
 
             trigger OnValidate()
             begin
-                if ("Applies-to ID" <> xRec."Applies-to ID") and (xRec."Applies-to ID" <> '') and HasNoMultipleLine() then
-                    ClearCustVendApplnEntry();
+                if "Applies-to ID" <> xRec."Applies-to ID" then
+                    if ShouldClearCustVendApplnEntry() then
+                        ClearCustVendApplnEntry();
                 SetJournalLineFieldsFromApplication();
             end;
         }
+
         field(50; "Business Unit Code"; Code[20])
         {
             Caption = 'Business Unit Code';
@@ -3133,6 +3135,9 @@ table 81 "Gen. Journal Line"
         {
             IncludedFields = Amount;
         }
+        key(key11; "Document No.", "Account No.", "Applies-to ID")
+        {
+        }
     }
 
     fieldgroups
@@ -3231,8 +3236,9 @@ table 81 "Gen. Journal Line"
         if not IsHandled then
             TestField("Check Printed", false);
 
-        if ("Applies-to ID" = '') and (xRec."Applies-to ID" <> '') and HasNoMultipleLine() then
-            ClearCustVendApplnEntry();
+        if ("Applies-to ID" = '') then
+            if ShouldClearCustVendApplnEntry() then
+                ClearCustVendApplnEntry();
     end;
 
     trigger OnRename()
@@ -6833,7 +6839,7 @@ table 81 "Gen. Journal Line"
         Validate("Deferral Code", GLAcc."Default Deferral Template Code");
 
         GLSetup.Get();
-        if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+        if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
             "Currency Code" := GLAcc."Source Currency Code";
 
         OnAfterAccountNoOnValidateGetGLAccount(Rec, GLAcc, CurrFieldNo);
@@ -6884,7 +6890,7 @@ table 81 "Gen. Journal Line"
                 ClearBalancePostingGroups();
 
         GLSetup.Get();
-        if ("Currency Code" = '') or ("Currency Code" = GLSetup."LCY Code") then
+        if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
             "Currency Code" := GLAcc."Source Currency Code";
 
         OnAfterAccountNoOnValidateGetGLBalAccount(Rec, GLAcc, CurrFieldNo);
@@ -7501,12 +7507,11 @@ table 81 "Gen. Journal Line"
     begin
         GenJnlLine2.SetRange("Journal Template Name", "Journal Template Name");
         GenJnlLine2.SetRange("Journal Batch Name", "Journal Batch Name");
+        GenJnlLine2.SetFilter("Line No.", '<>%1', "Line No.");
         GenJnlLine2.SetRange("Document No.", "Document No.");
         GenJnlLine2.SetRange("Account No.", xRec."Account No.");
         GenJnlLine2.SetRange("Applies-to ID", xRec."Applies-to ID");
-        GenJnlLine2.SetFilter("Line No.", '<>%1', "Line No.");
-        if GenJnlLine2.Count = 0 then
-            exit(true);
+        exit(GenJnlLine2.IsEmpty());
     end;
 
     local procedure CheckOpenApprovalEntryExistForCurrentUser()
@@ -9025,6 +9030,13 @@ table 81 "Gen. Journal Line"
         PaymentJnlExportErrorText: Record "Payment Jnl. Export Error Text";
     begin
         PaymentJnlExportErrorText.DeleteJnlLineErrorsWhenRecDeleted(Rec);
+    end;
+
+    local procedure ShouldClearCustVendApplnEntry(): Boolean
+    begin
+        if xRec."Applies-to ID" = '' then
+            exit(false);
+        exit(HasNoMultipleLine());
     end;
 
     [IntegrationEvent(false, false)]
