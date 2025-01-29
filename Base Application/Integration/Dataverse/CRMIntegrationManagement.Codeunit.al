@@ -2013,19 +2013,8 @@ codeunit 5330 "CRM Integration Management"
     end;
 
     local procedure SynchFromIntegrationTable(IntegrationTableMapping: Record "Integration Table Mapping"; CRMID: Guid)
-    var
-        CRMRecordRef: RecordRef;
-        CRMFieldRef: FieldRef;
-        CRMTableView: Text;
     begin
-        CRMRecordRef.Open(IntegrationTableMapping."Integration Table ID");
-        CRMRecordRef.SetView(IntegrationTableMapping.GetIntegrationTableFilter());
-        CRMFieldRef := CRMRecordRef.Field(IntegrationTableMapping."Integration Table UID Fld. No.");
-        CRMFieldRef.SetRange(CRMID);
-        CRMTableView := CRMRecordRef.GetView();
-        CRMRecordRef.Close();
-
-        IntegrationTableMapping.SetIntegrationTableFilter(CRMTableView);
+        IntegrationTableMapping.SetIntegrationTableFilter(GetTableViewForGuid(IntegrationTableMapping."Integration Table ID", IntegrationTableMapping."Integration Table UID Fld. No.", CRMID));
         IntegrationTableMapping.Direction := IntegrationTableMapping.Direction::FromIntegrationTable;
         AddIntegrationTableMapping(IntegrationTableMapping);
         Commit();
@@ -4502,7 +4491,7 @@ codeunit 5330 "CRM Integration Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnGetIntegrationTableMappingFromCRMIDOnBeforeFindTableID(var IntegrationTableMapping: Record "Integration Table Mapping"; var TableID: Integer; CRMID: Guid; var IsHandled: Boolean)
+    local procedure OnGetIntegrationTableMappingFromCRMIDOnBeforeFindTableID(var IntegrationTableMapping: Record "Integration Table Mapping"; TableID: Integer; CRMID: Guid; var IsHandled: Boolean)
     begin
     end;
 

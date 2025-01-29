@@ -165,7 +165,6 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetFixedAssetResponsibleEmployeeIdUpgradeTag());
         PerCompanyUpgradeTags.Add(GetCopyItemSalesBlockedToServiceBlockedUpgradeTag());
         PerCompanyUpgradeTags.Add(GetJobTaskReportSelectionUpgradeTag());
-        PerCompanyUpgradeTags.Add(GetEmployeeLedgerEntryCurrencyFactorUpgradeTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerDatabaseUpgradeTags', '', false, false)]
@@ -1191,10 +1190,5 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetCopyItemSalesBlockedToServiceBlockedUpgradeTag(): Code[250]
     begin
         exit('MS-378441_CopyItemSalesBlockedToServiceBlockedUpgradeTag-20240401');
-    end;
-
-    internal procedure GetEmployeeLedgerEntryCurrencyFactorUpgradeTag(): Code[250]
-    begin
-        exit('MS-GIT-768_CopyItemSalesBlockedToServiceBlockedUpgradeTag-20240516');
     end;
 }
