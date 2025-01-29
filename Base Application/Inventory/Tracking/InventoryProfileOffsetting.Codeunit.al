@@ -1449,7 +1449,6 @@ codeunit 99000854 "Inventory Profile Offsetting"
         NeedOfPublishSurplus: Boolean;
         IsHandled: Boolean;
         DemandForAdditionalProfile: Boolean;
-        ProcessSupplyBeforeStartDate: Boolean;
     begin
         ReqLine.Reset();
         ReqLine.SetRange("Worksheet Template Name", CurrTemplateName);
@@ -1591,13 +1590,6 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
                     SupplyInvtProfile.SetFilter("Untracked Quantity", '>=0');
                     SupplyExists := SupplyInvtProfile.FindSet();
-
-                    ProcessSupplyBeforeStartDate := SupplyExists;
-                    while ProcessSupplyBeforeStartDate do begin
-                        if (SupplyInvtProfile."Due Date" < PlanningStartDate) and (SupplyInvtProfile."Due Date" > 0D) and (SupplyInvtProfile."Untracked Quantity" = 0) then
-                            SupplyExists := SupplyInvtProfile.Next() <> 0;
-                        ProcessSupplyBeforeStartDate := SupplyExists and (SupplyInvtProfile."Due Date" < PlanningStartDate) and (SupplyInvtProfile."Due Date" > 0D) and (SupplyInvtProfile."Untracked Quantity" = 0);
-                    end;
 
                     SupplyInvtProfile.SetRange("Untracked Quantity");
                     SupplyInvtProfile.SetRange("Due Date");
@@ -2336,8 +2328,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
                               TempSKU."Reorder Quantity";
                 end;
 
-            if ((TempSKU."Replenishment System" = TempSKU."Replenishment System"::"Prod. Order") and (TempSKU."Manufacturing Policy" = TempSKU."Manufacturing Policy"::"Make-to-Stock"))
-                or (TempSKU."Replenishment System" = TempSKU."Replenishment System"::Purchase) then
+            if not ((TempSKU."Reordering Policy" = TempSKU."Reordering Policy"::"Lot-for-Lot")
+                and (TempSKU."Manufacturing Policy" = TempSKU."Manufacturing Policy"::"Make-to-Order")) then
                 ReorderQty += AdjustReorderQty(ReorderQty, TempSKU, SupplyInvtProfile."Line No.", SupplyInvtProfile."Min. Quantity");
             SupplyInvtProfile."Max. Quantity" := TempSKU."Maximum Order Quantity";
         end;
