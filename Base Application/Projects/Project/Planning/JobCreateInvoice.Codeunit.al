@@ -113,11 +113,9 @@ codeunit 1002 "Job Create-Invoice"
                 repeat
                     JobPlanningLine.SetFilter("Job No.", JobPlanningLine2."Job No.");
                     JobPlanningLine.SetFilter("Job Task No.", JobPlanningLine2."Job Task No.");
+                    JobPlanningLine.SetFilter("Line No.", '%1', JobPlanningLine2."Line No.");
                     JobPlanningLine.FindFirst();
                     CreateSalesInvoiceLines(JobPlanningLine."Job No.", JobPlanningLine, InvoiceNo, NewInvoice, PostingDate, DocumentDate, CrMemo);
-                    JobPlanningLine2.SetRange("Job Task No.", JobPlanningLine2."Job Task No.");
-                    JobPlanningLine2.FindLast();
-                    JobPlanningLine2.SetRange("Job Task No.");
                 until JobPlanningLine2.Next() = 0;
             end;
 
@@ -410,7 +408,7 @@ codeunit 1002 "Job Create-Invoice"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateNewInvoice(JobTask, InvoicePerTask, OldJobNo, OldJobTaskNo, LastJobTask, NewInvoice, IsHandled, TempJobPlanningLine);
+        OnBeforeCreateNewInvoice(JobTask, InvoicePerTask, OldJobNo, OldJobTaskNo, LastJobTask, NewInvoice, IsHandled);
         if IsHandled then
             exit(NewInvoice);
 
@@ -516,8 +514,6 @@ codeunit 1002 "Job Create-Invoice"
         SelectionFilterMgt: Codeunit SelectionFilterManagement;
         RecRef: RecordRef;
         JobTaskFilter: Text;
-        ExitValue: Boolean;
-        IsHandled: Boolean;
     begin
         if Job."Task Billing Method" = Job."Task Billing Method"::"One customer" then
             exit;
@@ -540,9 +536,6 @@ codeunit 1002 "Job Create-Invoice"
                 JobPlanningLineInvoice.SetRange("Job No.", Job."No.");
                 JobPlanningLineInvoice.SetRange("Job Task No.", JobTask2."Job Task No.");
                 JobPlanningLineInvoice.SetRange("Document Type", JobPlanningLineInvoice."Document Type"::Invoice);
-                OnBeforeFindJobPlanningLineInvoice(JobTask, JobPlanningLineInvoice, SalesHeader, ExitValue, Ishandled);
-                if IsHandled then
-                    exit(ExitValue);
                 if JobPlanningLineInvoice.FindFirst() then begin
                     SalesHeader.Get(SalesHeader."Document Type"::Invoice, JobPlanningLineInvoice."Document No.");
                     exit(true);
@@ -1081,7 +1074,6 @@ codeunit 1002 "Job Create-Invoice"
     procedure TestExchangeRate(var JobPlanningLine: Record "Job Planning Line"; PostingDate: Date)
     var
         CurrencyExchangeRate: Record "Currency Exchange Rate";
-        ShouldValidateCurrencyCode: Boolean;
     begin
         OnBeforeTestExchangeRate(JobPlanningLine, PostingDate, UpdateExchangeRates, CurrencyExchangeRate);
 
@@ -1094,11 +1086,7 @@ codeunit 1002 "Job Create-Invoice"
                 if UpdateExchangeRates then begin
                     JobPlanningLine."Currency Date" := PostingDate;
                     JobPlanningLine."Document Date" := PostingDate;
-
-                    ShouldValidateCurrencyCode := true;
-                    OnTestExchangeRateOnBeforeValidateCurrencyDate(JobPlanningLine, PostingDate, CurrencyExchangeRate, ShouldValidateCurrencyCode);
-                    if ShouldValidateCurrencyCode then
-                        JobPlanningLine.Validate("Currency Date");
+                    JobPlanningLine.Validate("Currency Date");
                     JobPlanningLine."Last Date Modified" := Today;
                     JobPlanningLine."User ID" := CopyStr(UserId(), 1, MaxStrLen(JobPlanningLine."User ID"));
                     JobPlanningLine.Modify(true);
@@ -1275,7 +1263,7 @@ codeunit 1002 "Job Create-Invoice"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateNewInvoice(var JobTask: Record "Job Task"; InvoicePerTask: Boolean; var OldJobNo: Code[20]; var OldJobTaskNo: Code[20]; LastJobTask: Boolean; var NewInvoice: Boolean; var IsHandled: Boolean; var TempJobPlanningLine: Record "Job Planning Line" temporary)
+    local procedure OnBeforeCreateNewInvoice(var JobTask: Record "Job Task"; InvoicePerTask: Boolean; var OldJobNo: Code[20]; var OldJobTaskNo: Code[20]; LastJobTask: Boolean; var NewInvoice: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -1540,16 +1528,6 @@ codeunit 1002 "Job Create-Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetCustomerNo(var Job: Record Job; var JobPlanningLine: Record "Job Planning Line"; SellToCustomerNo: Boolean; var CustomerNo: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnTestExchangeRateOnBeforeValidateCurrencyDate(var JobPlanningLine: Record "Job Planning Line"; PostingDate: Date; var CurrencyExchangeRate: Record "Currency Exchange Rate"; var ShouldValidateCurrencyCode: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindJobPlanningLineInvoice(JobTask: Record "Job Task"; var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; var SalesHeader: Record "Sales Header"; var ExitValue: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
