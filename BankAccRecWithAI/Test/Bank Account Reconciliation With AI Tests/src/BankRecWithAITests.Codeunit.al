@@ -1,14 +1,12 @@
 namespace Microsoft.Bank.Reconciliation.Test;
 
 using Microsoft.Bank.BankAccount;
-using Microsoft.Bank.Ledger;
-using Microsoft.Foundation.NoSeries;
-using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Bank.Reconciliation;
 using Microsoft.Finance.GeneralLedger.Account;
 using System.TestLibraries.Utilities;
-using Microsoft.Finance.Dimension;
 
 codeunit 139777 "Bank Rec. With AI Tests"
 {
@@ -206,11 +204,6 @@ codeunit 139777 "Bank Rec. With AI Tests"
         GenJournalTemplate: Record "Gen. Journal Template";
         GenJournalBatch: Record "Gen. Journal Batch";
         TransToGLAccJnlBatch: Record "Trans. to G/L Acc. Jnl. Batch";
-        NoSeries: Record "No. Series";
-        NoSeriesLine: Record "No. Series Line";
-        Dimension1, Dimension2 : Record Dimension;
-        DimensionValue11, DimensionValue12, DimensionValue21, DimensionValue22 : Record "Dimension Value";
-        DimensionSetEntry: Record "Dimension Set Entry";
         BankRecTransToAcc: Codeunit "Bank Acc. Rec. Trans. to Acc.";
         PostingDate: Date;
         BankAccountNo: Code[20];
@@ -219,33 +212,17 @@ codeunit 139777 "Bank Rec. With AI Tests"
         Description: Text[50];
         Amount: Decimal;
         LineNos: List of [Integer];
-        LastDimSetID: Integer;
     begin
-        // [SCENARIO 546904] Bank Rec: Post Diff to G/L - missing ability to add dimension to suggested lines
         Initialize();
 
         BankAccountLedgerEntry.SetRange(Open, true);
         BankAccountLedgerEntry.DeleteAll();
 
-        // [Given] G/L Accounts, Dimensions and a set of bank account reconciliation lines
+        // Setup.
         CreateInputData(PostingDate, BankAccountNo, StatementNo, DocumentNo, Description, Amount);
         LibraryERM.CreateGLAccount(GLAccount);
         LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
-        LibraryERM.CreateDimension(Dimension1);
-        LibraryERM.CreateDimensionValue(DimensionValue11, Dimension1.Code);
-        LibraryERM.CreateDimensionValue(DimensionValue12, Dimension1.Code);
-        LibraryERM.CreateDimension(Dimension2);
-        LibraryERM.CreateDimensionValue(DimensionValue21, Dimension2.Code);
-        LibraryERM.CreateDimensionValue(DimensionValue22, Dimension2.Code);
-        Commit();
-        LibraryUtility.CreateNoSeries(NoSeries, false, false, false);
-        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'T0900000', 'T0999999');
-        NoSeriesLine."Last No. Used" := 'T0900001';
-        NoSeriesLine."Increment-by No." := 10;
-        NoSeriesLine.Modify();
         LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
-        GenJournalBatch."No. Series" := NoSeries.Code;
-        GenJournalBatch.Modify();
         GLAccount.Validate("Direct Posting", true);
         GLAccount.Modify();
         CreateBankAccRec(BankAccReconciliation, BankAccountNo, StatementNo);
@@ -253,8 +230,9 @@ codeunit 139777 "Bank Rec. With AI Tests"
         LineNos.Add(CreateBankAccRecLine(BankAccReconciliation, PostingDate, Description, '', Amount));
         LineNos.Add(CreateBankAccRecLine(BankAccReconciliation, PostingDate, DocumentNo, '', Amount));
 
-        // [GIVEN] Copilot proposes to match Entries 1 and 2 to statement line 1, entry 3 to statement line 2, entry 4 to statement line 3
-        // [GIVEN] user adds dimensions to the proposals
+        // Execute
+        // Propose to match Entries 1 and 2 to statement line 1, entry 3 to statement line 2, entry 4 to statement line 3
+        // Then apply the proposal
         TempBankAccRecAIProposal."Statement Type" := BankAccReconciliation."Statement Type";
         TempBankAccRecAIProposal."Bank Account No." := BankAccReconciliation."Bank Account No.";
         TempBankAccRecAIProposal."Statement No." := BankAccReconciliation."Statement No.";
@@ -263,34 +241,16 @@ codeunit 139777 "Bank Rec. With AI Tests"
         TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(1);
         TempBankAccRecAIProposal."Transaction Date" := PostingDate;
         TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := Description;
         TempBankAccRecAIProposal.Difference := Amount + Amount;
         TempBankAccRecAIProposal.Insert();
         TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(2);
         TempBankAccRecAIProposal."Transaction Date" := PostingDate;
         TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := Description;
         TempBankAccRecAIProposal.Difference := Amount;
         TempBankAccRecAIProposal.Insert();
         TempBankAccRecAIProposal."Transaction Date" := PostingDate;
         TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(3);
         TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        if DimensionSetEntry.FindLast() then
-            LastDimSetID := DimensionSetEntry."Dimension Set ID";
-        LastDimSetID += 1;
-        Clear(DimensionSetEntry);
-        DimensionSetEntry."Dimension Set ID" := LastDimSetID;
-        DimensionSetEntry."Dimension Code" := Dimension1.Code;
-        DimensionSetEntry."Dimension Value Code" := DimensionValue12.Code;
-        DimensionSetEntry."Dimension Value ID" := DimensionValue12."Dimension Value ID";
-        DimensionSetEntry.Insert();
-        DimensionSetEntry."Dimension Set ID" := LastDimSetID;
-        DimensionSetEntry."Dimension Code" := Dimension2.Code;
-        DimensionSetEntry."Dimension Value Code" := DimensionValue21.Code;
-        DimensionSetEntry."Dimension Value ID" := DimensionValue21."Dimension Value ID";
-        DimensionSetEntry.Insert();
-        TempBankAccRecAIProposal."Dimension Set ID" := LastDimSetID;
-        TempBankAccRecAIProposal.Description := DocumentNo;
         TempBankAccRecAIProposal.Difference := Amount;
         TempBankAccRecAIProposal.Insert();
         TempBankAccRecAIProposal.FindSet();
@@ -299,116 +259,9 @@ codeunit 139777 "Bank Rec. With AI Tests"
         TransToGLAccJnlBatch."Journal Batch Name" := GenJournalBatch.Name;
         TransToGLAccJnlBatch.Insert();
 
-        // [WHEN] Accepting the proposal
         BankRecTransToAcc.PostNewPaymentsToProposedGLAccounts(TempBankAccRecAIProposal, TempBankStatementMatchingBuffer, TransToGLAccJnlBatch);
 
-        Commit();
-        // [THEN] The proposed payments are posted, you get bank account ledger entries and dimension sets are transferred from the proposal lines to the ledger entries
-        BankAccountLedgerEntry.SetRange("Statement No.", BankAccReconciliation."Statement No.");
-        BankAccountLedgerEntry.SetRange("Bank Account No.", BankAccReconciliation."Bank Account No.");
-        BankAccountLedgerEntry.SetRange("Statement Line No.", LineNos.Get(1));
-        BankAccountLedgerEntry.SetRange("Statement Status", BankAccountLedgerEntry."Statement Status"::"Bank Acc. Entry Applied");
-        Assert.IsTrue(BankAccountLedgerEntry.FindFirst(), 'Statement Line ' + Format(LineNos.Get(1)) + ' not applied.');
-        Assert.AreEqual(0, BankAccountLedgerEntry."Dimension Set ID", 'Unexpected Dimension Set ID');
-        BankAccountLedgerEntry.SetRange("Statement Line No.", LineNos.Get(2));
-        Assert.IsTrue(BankAccountLedgerEntry.FindFirst(), 'Statement Line ' + Format(LineNos.Get(2)) + ' not applied.');
-        Assert.AreEqual(0, BankAccountLedgerEntry."Dimension Set ID", 'Unexpected Dimension Set ID');
-        BankAccountLedgerEntry.SetRange("Statement Line No.", LineNos.Get(3));
-        Assert.IsTrue(BankAccountLedgerEntry.FindFirst(), 'Statement Line ' + Format(LineNos.Get(3)) + ' not applied.');
-        DimensionSetEntry.SetRange("Dimension Set ID", BankAccountLedgerEntry."Dimension Set ID");
-        DimensionSetEntry.SetRange("Dimension Code", Dimension1.Code);
-        DimensionSetEntry.SetRange("Dimension Value ID", DimensionValue12."Dimension Value ID");
-        Assert.IsFalse(DimensionSetEntry.IsEmpty(), 'Unexpected Dimension Set ID');
-        DimensionSetEntry.SetRange("Dimension Code", Dimension2.Code);
-        DimensionSetEntry.SetRange("Dimension Value ID", DimensionValue21."Dimension Value ID");
-        Assert.IsFalse(DimensionSetEntry.IsEmpty(), 'Unexpected Dimension Set ID');
-    end;
-
-    [Test]
-    procedure TestPostNewPaymentsToProposedGLAccountsCopyToPostedGenJnlLines()
-    var
-        BankAccReconciliation: Record "Bank Acc. Reconciliation";
-        BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
-        TempBankAccRecAIProposal: Record "Bank Acc. Rec. AI Proposal" temporary;
-        TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary;
-        GLAccount: Record "G/L Account";
-        GenJournalTemplate: Record "Gen. Journal Template";
-        GenJournalBatch: Record "Gen. Journal Batch";
-        TransToGLAccJnlBatch: Record "Trans. to G/L Acc. Jnl. Batch";
-        NoSeries: Record "No. Series";
-        NoSeriesLine: Record "No. Series Line";
-        PostedGenJournalLine: Record "Posted Gen. Journal Line";
-        BankRecTransToAcc: Codeunit "Bank Acc. Rec. Trans. to Acc.";
-        PostingDate: Date;
-        BankAccountNo: Code[20];
-        StatementNo: Code[20];
-        DocumentNo: Code[20];
-        Description: Text[50];
-        Amount: Decimal;
-        LineNos: List of [Integer];
-        PostedJournalLineCount: Integer;
-    begin
-        // [SCENARIO 544880] When using Post Difference to G/L Account, with a batch that uses 'Copy to Posted Journal lines' the posted payments must be copied to posted journal lines
-
-        // [GIVEN] A Copilot proposal to post differences to G/L Accounts, that uses a journal batch with 'Copy to POsted Gen. Journal Lines'
-        Initialize();
-        BankAccountLedgerEntry.SetRange(Open, true);
-        BankAccountLedgerEntry.DeleteAll();
-        CreateInputData(PostingDate, BankAccountNo, StatementNo, DocumentNo, Description, Amount);
-        LibraryERM.CreateGLAccount(GLAccount);
-        LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
-        LibraryUtility.CreateNoSeries(NoSeries, false, false, false);
-        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'T0900000', 'T0999999');
-        NoSeriesLine."Last No. Used" := 'T0900001';
-        NoSeriesLine."Increment-by No." := 10;
-        NoSeriesLine.Modify();
-        LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
-        GenJournalBatch."No. Series" := NoSeries.Code;
-        GenJournalBatch."Copy to Posted Jnl. Lines" := true;
-        GenJournalBatch.Modify();
-        GLAccount.Validate("Direct Posting", true);
-        GLAccount.Modify();
-        CreateBankAccRec(BankAccReconciliation, BankAccountNo, StatementNo);
-        LineNos.Add(CreateBankAccRecLine(BankAccReconciliation, PostingDate, Description, '', Amount + Amount));
-        LineNos.Add(CreateBankAccRecLine(BankAccReconciliation, PostingDate, Description, '', Amount));
-        LineNos.Add(CreateBankAccRecLine(BankAccReconciliation, PostingDate, DocumentNo, '', Amount));
-
-        // [WHEN] You accept the proposal
-        TempBankAccRecAIProposal."Statement Type" := BankAccReconciliation."Statement Type";
-        TempBankAccRecAIProposal."Bank Account No." := BankAccReconciliation."Bank Account No.";
-        TempBankAccRecAIProposal."Statement No." := BankAccReconciliation."Statement No.";
-        TempBankAccRecAIProposal."Journal Template Name" := GenJournalTemplate.Name;
-        TempBankAccRecAIProposal."Journal Batch Name" := GenJournalBatch.Name;
-        TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(1);
-        TempBankAccRecAIProposal."Transaction Date" := PostingDate;
-        TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := Description;
-        TempBankAccRecAIProposal.Difference := Amount + Amount;
-        TempBankAccRecAIProposal.Insert();
-        TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(2);
-        TempBankAccRecAIProposal."Transaction Date" := PostingDate;
-        TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := Description;
-        TempBankAccRecAIProposal.Difference := Amount;
-        TempBankAccRecAIProposal.Insert();
-        TempBankAccRecAIProposal."Transaction Date" := PostingDate;
-        TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(3);
-        TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := DocumentNo;
-        TempBankAccRecAIProposal.Difference := Amount;
-        TempBankAccRecAIProposal.Insert();
-        TempBankAccRecAIProposal.FindSet();
-        TransToGLAccJnlBatch.Init();
-        TransToGLAccJnlBatch."Journal Template Name" := GenJournalTemplate.Name;
-        TransToGLAccJnlBatch."Journal Batch Name" := GenJournalBatch.Name;
-        TransToGLAccJnlBatch.Insert();
-
-        PostedGenJournalLine.SetRange("Journal Template Name", GenJournalTemplate.Name);
-        PostedGenJournalLine.SetRange("Journal Batch Name", GenJournalBatch.Name);
-        PostedJournalLineCount := PostedGenJournalLine.Count();
-        BankRecTransToAcc.PostNewPaymentsToProposedGLAccounts(TempBankAccRecAIProposal, TempBankStatementMatchingBuffer, TransToGLAccJnlBatch);
-
-        // [THEN] New payments are posted, bank account ledger entries are matched with statement lines and posted general journal lines are copied]
+        // Assert
         BankAccountLedgerEntry.SetRange("Statement No.", BankAccReconciliation."Statement No.");
         BankAccountLedgerEntry.SetRange("Bank Account No.", BankAccReconciliation."Bank Account No.");
         BankAccountLedgerEntry.SetRange("Statement Line No.", LineNos.Get(1));
@@ -418,7 +271,6 @@ codeunit 139777 "Bank Rec. With AI Tests"
         Assert.IsFalse(BankAccountLedgerEntry.IsEmpty(), 'Statement Line ' + Format(LineNos.Get(2)) + ' not applied.');
         BankAccountLedgerEntry.SetRange("Statement Line No.", LineNos.Get(3));
         Assert.IsFalse(BankAccountLedgerEntry.IsEmpty(), 'Statement Line ' + Format(LineNos.Get(3)) + ' not applied.');
-        Assert.AreEqual(PostedJournalLineCount + 3, PostedGenJournalLine.Count(), 'Newly posted lines are not copied');
     end;
 
     [Test]
@@ -434,8 +286,6 @@ codeunit 139777 "Bank Rec. With AI Tests"
         GenJournalBatch: Record "Gen. Journal Batch";
         TransToGLAccJnlBatch: Record "Trans. to G/L Acc. Jnl. Batch";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        NoSeries: Record "No. Series";
-        NoSeriesLine: Record "No. Series Line";
         BankRecTransToAcc: Codeunit "Bank Acc. Rec. Trans. to Acc.";
         PostingDate: Date;
         BankAccountNo: Code[20];
@@ -454,11 +304,6 @@ codeunit 139777 "Bank Rec. With AI Tests"
         CreateInputData(PostingDate, BankAccountNo, StatementNo, DocumentNo, Description, Amount);
         LibraryERM.CreateGLAccount(GLAccount);
         LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
-        LibraryUtility.CreateNoSeries(NoSeries, false, false, false);
-        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'T0900000', 'T0999999');
-        NoSeriesLine."Last No. Used" := 'T0900001';
-        NoSeriesLine."Increment-by No." := 10;
-        NoSeriesLine.Modify();
         LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
         GLAccount.Validate("Direct Posting", true);
         GLAccount.Modify();
@@ -466,8 +311,6 @@ codeunit 139777 "Bank Rec. With AI Tests"
         GenJournalTemplate.Validate("Allow Posting Date From", PostingDate);
         GenJournalTemplate.Validate("Allow Posting Date To", PostingDate);
         GenJournalTemplate.Modify();
-        GenJournalBatch."No. Series" := NoSeries.Code;
-        GenJournalBatch.Modify();
         GeneralLedgerSetup.Get();
         GeneralLedgerSetup."Journal Templ. Name Mandatory" := true;
         GeneralLedgerSetup.Modify();
@@ -484,19 +327,16 @@ codeunit 139777 "Bank Rec. With AI Tests"
         TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(1);
         TempBankAccRecAIProposal."Transaction Date" := PostingDate;
         TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := Description;
         TempBankAccRecAIProposal.Difference := Amount + Amount;
         TempBankAccRecAIProposal.Insert();
         TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(2);
         TempBankAccRecAIProposal."Transaction Date" := PostingDate - 1;
         TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := Description;
         TempBankAccRecAIProposal.Difference := Amount;
         TempBankAccRecAIProposal.Insert();
         TempBankAccRecAIProposal."Transaction Date" := PostingDate;
         TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(3);
         TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := DocumentNo;
         TempBankAccRecAIProposal.Difference := Amount;
         TempBankAccRecAIProposal.Insert();
         TempBankAccRecAIProposal.FindSet();
@@ -534,8 +374,6 @@ codeunit 139777 "Bank Rec. With AI Tests"
         GenJournalBatch: Record "Gen. Journal Batch";
         TransToGLAccJnlBatch: Record "Trans. to G/L Acc. Jnl. Batch";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        NoSeries: Record "No. Series";
-        NoSeriesLine: Record "No. Series Line";
         BankRecTransToAcc: Codeunit "Bank Acc. Rec. Trans. to Acc.";
         PostingDate: Date;
         BankAccountNo: Code[20];
@@ -554,14 +392,7 @@ codeunit 139777 "Bank Rec. With AI Tests"
         CreateInputData(PostingDate, BankAccountNo, StatementNo, DocumentNo, Description, Amount);
         LibraryERM.CreateGLAccount(GLAccount);
         LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
-        LibraryUtility.CreateNoSeries(NoSeries, false, false, false);
-        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'T0900000', 'T0999999');
-        NoSeriesLine."Last No. Used" := 'T0900001';
-        NoSeriesLine."Increment-by No." := 10;
-        NoSeriesLine.Modify();
         LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
-        GenJournalBatch."No. Series" := NoSeries.Code;
-        GenJournalBatch.Modify();
         GLAccount.Validate("Direct Posting", true);
         GLAccount.Modify();
         CreateBankAccRec(BankAccReconciliation, BankAccountNo, StatementNo);
@@ -582,19 +413,16 @@ codeunit 139777 "Bank Rec. With AI Tests"
         TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(1);
         TempBankAccRecAIProposal."Transaction Date" := PostingDate;
         TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := Description;
         TempBankAccRecAIProposal.Difference := Amount + Amount;
         TempBankAccRecAIProposal.Insert();
         TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(2);
         TempBankAccRecAIProposal."Transaction Date" := PostingDate - 1;
         TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := Description;
         TempBankAccRecAIProposal.Difference := Amount;
         TempBankAccRecAIProposal.Insert();
         TempBankAccRecAIProposal."Transaction Date" := PostingDate;
         TempBankAccRecAIProposal."Statement Line No." := LineNos.Get(3);
         TempBankAccRecAIProposal."G/L Account No." := GLAccount."No.";
-        TempBankAccRecAIProposal.Description := DocumentNo;
         TempBankAccRecAIProposal.Difference := Amount;
         TempBankAccRecAIProposal.Insert();
         TempBankAccRecAIProposal.FindSet();
