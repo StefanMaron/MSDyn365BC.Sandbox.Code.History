@@ -258,7 +258,6 @@ codeunit 1303 "Correct Posted Sales Invoice"
         FromJobPlanningLine.FindFirst();
 
         ToJobPlanningLine.InitFromJobPlanningLine(FromJobPlanningLine, -SalesLine.Quantity);
-        OnCreateJobPlanningLineOnAfterInitFromJobPlanningLine(ToJobPlanningLine, FromJobPlanningLine, SalesLine);
         JobPlanningLineInvoice.InitFromJobPlanningLine(ToJobPlanningLine);
         JobPlanningLineInvoice.InitFromSales(SalesHeader, SalesHeader."Posting Date", SalesLine."Line No.");
         JobPlanningLineInvoice.Insert();
@@ -284,6 +283,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
     begin
         CancellingOnly := Cancelling;
 
+        TestSalesInvoiceHeaderAmount(SalesInvoiceHeader, Cancelling);
         TestIfPostingIsAllowed(SalesInvoiceHeader);
         TestIfInvoiceIsCorrectedOnce(SalesInvoiceHeader);
         TestIfInvoiceIsNotCorrectiveDoc(SalesInvoiceHeader);
@@ -300,6 +300,19 @@ codeunit 1303 "Correct Posted Sales Invoice"
         TestNotSalesPrepaymentlInvoice(SalesInvoiceHeader);
 
         OnAfterTestCorrectInvoiceIsAllowed(SalesInvoiceHeader, Cancelling);
+    end;
+
+    local procedure TestSalesInvoiceHeaderAmount(var SalesInvoiceHeader: Record "Sales Invoice Header"; Cancelling: Boolean)
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeTestSalesInvoiceHeaderAmount(SalesInvoiceHeader, Cancelling, IsHandled);
+        if IsHandled then
+            exit;
+
+        SalesInvoiceHeader.CalcFields(Amount);
+        SalesInvoiceHeader.TestField(Amount);
     end;
 
     local procedure ShowInvoiceAppliedNotification(SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -982,13 +995,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
         SalesLine: Record "Sales Line";
         SalesInvoiceLine: Record "Sales Invoice Line";
         UndoPostingManagement: Codeunit "Undo Posting Management";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateSalesOrderLinesFromCancelledInvoice(SalesInvoiceHeaderNo, IsHandled);
-        if IsHandled then
-            exit;
-
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeaderNo);
         if SalesInvoiceLine.FindSet() then
             repeat
@@ -1198,7 +1205,6 @@ codeunit 1303 "Correct Posted Sales Invoice"
     begin
     end;
 
-    [Obsolete('OnBeforeTestSalesInvoiceHeaderAmount is not supported anymore.', '25.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestSalesInvoiceHeaderAmount(var SalesInvoiceHeader: Record "Sales Invoice Header"; Cancelling: Boolean; var IsHandled: Boolean)
     begin
@@ -1296,16 +1302,6 @@ codeunit 1303 "Correct Posted Sales Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnTestGenPostingSetupOnBeforeTestTypeItem(SalesInvoiceLine: Record "Sales Invoice Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateSalesOrderLinesFromCancelledInvoice(SalesInvoiceHeaderNo: Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateJobPlanningLineOnAfterInitFromJobPlanningLine(var ToJobPlanningLine: Record "Job Planning Line"; FromJobPlanningLine: Record "Job Planning Line"; SalesLine: Record "Sales Line")
     begin
     end;
 }
