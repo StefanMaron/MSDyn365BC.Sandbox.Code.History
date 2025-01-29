@@ -279,14 +279,14 @@ codeunit 10860 "Payment Management"
             if PayNum = '' then begin
                 i := 10000;
 #if not CLEAN24
-                NoSeriesMgt.RaiseObsoleteOnBeforeInitSeries(Step."Header Nos. Series", '', 0D, ToBord."No.", ToBord."No. Series", IsHandled);
-                if not IsHandled then begin
+                    NoSeriesMgt.RaiseObsoleteOnBeforeInitSeries(Step."Header Nos. Series", '', 0D, ToBord."No.", ToBord."No. Series", IsHandled);
+                    if not IsHandled then begin
 #endif
-                    ToBord."No. Series" := Step."Header Nos. Series";
-                    ToBord."No." := NoSeries.GetNextNo(ToBord."No. Series");
+                        ToBord."No. Series" := Step."Header Nos. Series";
+                        ToBord."No." := NoSeries.GetNextNo(ToBord."No. Series");
 #if not CLEAN24
-                    NoSeriesMgt.RaiseObsoleteOnAfterInitSeries(ToBord."No. Series", Step."Header Nos. Series", 0D, ToBord."No.");
-                end;
+                        NoSeriesMgt.RaiseObsoleteOnAfterInitSeries(ToBord."No. Series", Step."Header Nos. Series", 0D, ToBord."No.");
+                    end;
 #endif
                 ToBord."Payment Class" := FromPaymentLine."Payment Class";
                 ToBord."Status No." := Step."Next Status";
@@ -387,8 +387,13 @@ codeunit 10860 "Payment Management"
                 else begin
                     if (InvPostingBuffer[1].Sign = InvPostingBuffer[1].Sign::Positive) and
                        (PaymentLine."Entry No. Debit" = 0) and (PaymentLine."Entry No. Credit" = 0)
-                    then
-                        PaymentLine.TestField("Document No.");
+                    then begin
+                        PaymentClass.Get(PaymentHeader."Payment Class");
+                        if PaymentClass."Line No. Series" = '' then
+                            PaymentLine.TestField("Document No.", NoSeriesBatch.GetNextNo(PaymentHeader."No. Series", PaymentLine."Posting Date"))
+                        else
+                            PaymentLine.TestField("Document No.", NoSeriesBatch.GetNextNo(PaymentClass."Line No. Series", PaymentLine."Posting Date"));
+                    end;
                     InvPostingBuffer[1]."Document No." := PaymentLine."Document No.";
                 end;
                 InvPostingBuffer[1]."Header Document No." := PaymentHeader."No.";
@@ -1169,7 +1174,7 @@ codeunit 10860 "Payment Management"
         GenJnlLine."Shortcut Dimension 2 Code" := InvPostingBuffer[1]."Global Dimension 2 Code";
         GenJnlLine."Dimension Set ID" := InvPostingBuffer[1]."Dimension Set ID";
 
-        OnPostInvPostingBufferOnBeforeGenJnlPostLineRunWithCheck(GenJnlLine, PaymentHeader, PaymentClass, PaymentLine);
+        OnPostInvPostingBufferOnBeforeGenJnlPostLineRunWithCheck(GenJnlLine, PaymentHeader, PaymentClass);
         GenJnlPostLine.RunWithCheck(GenJnlLine);
         GLEntry.SetRange("Document Type", GenJnlLine."Document Type");
         GLEntry.SetRange("Document No.", GenJnlLine."Document No.");
@@ -1234,7 +1239,7 @@ codeunit 10860 "Payment Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostInvPostingBufferOnBeforeGenJnlPostLineRunWithCheck(var GenJnlLine: Record "Gen. Journal Line"; var PaymentHeader: Record "Payment Header"; var PaymentClass: Record "Payment Class"; PaymentLine: Record "Payment Line")
+    local procedure OnPostInvPostingBufferOnBeforeGenJnlPostLineRunWithCheck(var GenJnlLine: Record "Gen. Journal Line"; var PaymentHeader: Record "Payment Header"; var PaymentClass: Record "Payment Class")
     begin
     end;
 
