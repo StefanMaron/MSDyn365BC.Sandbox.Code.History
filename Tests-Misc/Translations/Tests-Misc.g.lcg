@@ -1481,6 +1481,42 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Company Creation Wizard Tests - NamedType CompanyAlreadyExistsErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 939512300 - NamedType 873881197" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Create a company with the Advanced functionality scope containing everything you need to evaluate]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Company Creation Wizard Tests - NamedType FinExtendedTextTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 939512300 - NamedType 1189484866" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Advanced Experience / Cronus Company Sample Data / Setup Data]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Company Creation Wizard Tests - NamedType FinExtendedTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 939512300 - NamedType 3674737090" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Create a company with the desired experience for companies with any process complexity]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Company Creation Wizard Tests - NamedType NoDataExtendedTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 939512300 - NamedType 1384765907" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[No Sample Data / No Setup Data]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Company Creation Wizard Tests - NamedType NoDataTxt)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 939512300 - NamedType 984350027" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The company has not yet been created.\\Are you sure that you want to exit?]]></Val>
@@ -3922,11 +3958,11 @@
   </Item>
   <Item ItemId=";Codeunit 2785749549 - NamedType 2456682063" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The selected file '%1' has no content. Please choose another file.]]></Val>
+      <Val><![CDATA[The selected file has no content. Please choose another file.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1=FileName]D;]A;(LookupHint=Codeunit Document Attachment Tests - NamedType NoContentErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Document Attachment Tests - NamedType NoContentErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2785749549 - NamedType 1753349657" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -4559,15 +4595,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Hybrid Deployment Test - NamedType InstanceIdTxt)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3733281102 - NamedType 1456683102" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Incoming Document Type does not match.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Imp. Inc.Doc. Attachment Tests - NamedType IncomingRelatedDocTypeNotMatchErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 1115262795 - NamedType 1336244853" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[ZIP archive file cannot be created.]]></Val>
@@ -4577,24 +4604,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Import Item Pictures Test - NamedType CannotCreateZIPErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 761554929 - NamedType 799399287" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Incoming Document must be found.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Inc Doc Attachment Overview UT - NamedType IncomingDocMustBeFoundErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 761554929 - NamedType 2910522905" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Remove Incoming Document action must be Disable]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Inc Doc Attachment Overview UT - NamedType RemoveIncoDocIsEnabledErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 761554929 - NamedType 2979181423" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Supporting Attachments]]></Val>
@@ -4602,15 +4611,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Inc Doc Attachment Overview UT - NamedType SupportingAttachmentsTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 761554929 - NamedType 871351867" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[View Incoming Document action is not enabled]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Inc Doc Attachment Overview UT - NamedType ViewIncoDocIsNotEnabledErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 4245486081 - NamedType 614457637" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
