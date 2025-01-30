@@ -591,7 +591,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
                     ResetSalesOrderLineFromCRMSalesorderdetail(SourceRecordRef, DestinationRecordRef);
                     ApplySalesOrderDiscounts(SourceRecordRef, DestinationRecordRef);
-                    ChangeValidateSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
+                    ChangeSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
                     SetOrderNumberAndDocOccurenceNumber(SourceRecordRef, DestinationRecordRef);
                     CreateSalesOrderNotes(SourceRecordRef, DestinationRecordRef);
                 end;
@@ -732,29 +732,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         SourceRecordRef.GetTable(SalesHeader);
     end;
 
-    local procedure ChangeValidateSalesOrderStatus(var SourceRecordRef: RecordRef; NewStatus: Enum "Sales Document Status")
-    var
-        SalesHeader: Record "Sales Header";
-        CRMConnectionSetup: Record "CRM Connection Setup";
-        ReleaseSalesDocument: Codeunit "Release Sales Document";
-    begin
-        if not CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then
-            exit;
-
-        SalesHeader.GetBySystemId(SourceRecordRef.Field(SourceRecordRef.SystemIdNo).Value());
-
-        OnChangeSalesOrderStatusOnBeforeCompareStatus(SalesHeader, NewStatus);
-        if SalesHeader.Status = NewStatus then
-            exit;
-
-        if NewStatus = SalesHeader.Status::Released then
-            ReleaseSalesDocument.PerformManualRelease(SalesHeader)
-        else
-            ReleaseSalesDocument.PerformManualReopen(SalesHeader);
-
-        SourceRecordRef.GetTable(SalesHeader);
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Integration Rec. Synch. Invoke", 'OnBeforeModifyRecord', '', false, false)]
     procedure OnBeforeModifyRecord(IntegrationTableMapping: Record "Integration Table Mapping"; SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
     var
@@ -815,7 +792,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
                     ResetSalesOrderLineFromCRMSalesorderdetail(SourceRecordRef, DestinationRecordRef);
                     ApplySalesOrderDiscounts(SourceRecordRef, DestinationRecordRef);
-                    ChangeValidateSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
+                    ChangeSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
                     CreateSalesOrderNotes(SourceRecordRef, DestinationRecordRef);
                 end;
         end;
@@ -1760,7 +1737,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                     if CRMSalesorderdetail.IsEmpty() then begin
                         CRMIntegrationRecord.Delete();
                         SalesLine2.GetBySystemId(SalesLine.SystemId);
-                        SalesLine2.Delete(true);
+                        Salesline2.Delete();
                     end;
                 end;
             until SalesLine.Next() = 0;
@@ -2862,9 +2839,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         SourceRecordRef.SetTable(CRMSalesorderdetail);
         DestinationRecordRef.SetTable(SalesLine);
 
-        if IsNullGuid(CRMSalesorderdetail.ProductId) then
-            exit;
-
         CRMProduct.Get(CRMSalesorderdetail.ProductId);
         case CRMProduct.ProductTypeCode of
             CRMProduct.ProductTypeCode::SalesInventory:
@@ -3059,12 +3033,9 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         if not IsNullGuid(CRMSalesorder.QuoteId) then
             if CRMQuote.Get(CRMSalesOrder.QuoteId) then begin
                 QuoteSalesHeader.SetRange("Your Reference", CRMQuote.QuoteNumber);
-
-                OnBeforeFindQuoteSalesHeader(QuoteSalesHeader);
                 if QuoteSalesHeader.FindLast() then begin
                     SalesHeader."Quote No." := QuoteSalesHeader."No.";
                     ArchiveManagement.ArchSalesDocumentNoConfirm(QuoteSalesHeader);
-                    OnAfterArchSalesDocumentNoConfirm(QuoteSalesHeader);
                 end;
             end;
         DestinationRecordRef.GetTable(SalesHeader);
@@ -3224,16 +3195,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
 
     [IntegrationEvent(false, false)]
     local procedure OnApplySalesLineTaxOnBeforeSetTax(var CRMSalesorderdetail: Record "CRM Salesorderdetail"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterArchSalesDocumentNoConfirm(var QuoteSalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindQuoteSalesHeader(var QuoteSalesHeader: Record "Sales Header")
     begin
     end;
 }
