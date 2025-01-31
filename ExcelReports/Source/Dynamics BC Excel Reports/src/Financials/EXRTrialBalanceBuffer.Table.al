@@ -44,14 +44,10 @@ table 4402 "EXR Trial Balance Buffer"
 
             trigger OnValidate()
             begin
-                if ("Net Change" > 0) then begin
-                    Validate("Net Change (Debit)", "Net Change");
-                    Validate("Net Change (Credit)", 0);
-                end
-                else begin
+                if ("Net Change" > 0) then
+                    Validate("Net Change (Debit)", "Net Change")
+                else
                     Validate("Net Change (Credit)", -"Net Change");
-                    Validate("Net Change (Debit)", 0);
-                end;
             end;
         }
         field(11; "Net Change (Debit)"; Decimal)
@@ -68,14 +64,10 @@ table 4402 "EXR Trial Balance Buffer"
 
             trigger OnValidate()
             begin
-                if ("Balance" > 0) then begin
-                    Validate("Balance (Debit)", "Balance");
-                    Validate("Balance (Credit)", 0);
-                end
-                else begin
+                if ("Balance" > 0) then
+                    Validate("Balance (Debit)", "Balance")
+                else
                     Validate("Balance (Credit)", -"Balance");
-                    Validate("Balance (Debit)", 0);
-                end;
             end;
         }
         field(14; "Balance (Debit)"; Decimal)
@@ -108,14 +100,10 @@ table 4402 "EXR Trial Balance Buffer"
 
             trigger OnValidate()
             begin
-                if ("Last Period Net" > 0) then begin
-                    Validate("Last Period Net (Debit)", "Last Period Net");
-                    Validate("Last Period Net (Credit)", 0);
-                end
-                else begin
+                if ("Last Period Net" > 0) then
+                    Validate("Last Period Net (Debit)", "Last Period Net")
+                else
                     Validate("Last Period Net (Credit)", -"Last Period Net");
-                    Validate("Last Period Net (Debit)", 0);
-                end;
             end;
         }
         field(51; "Last Period Net (Debit)"; Decimal)
@@ -132,14 +120,10 @@ table 4402 "EXR Trial Balance Buffer"
 
             trigger OnValidate()
             begin
-                if ("Last Period Bal." > 0) then begin
-                    Validate("Last Period Bal. (Debit)", "Last Period Bal.");
-                    Validate("Last Period Bal. (Credit)", 0);
-                end
-                else begin
+                if ("Last Period Bal." > 0) then
+                    Validate("Last Period Bal. (Debit)", "Last Period Bal.")
+                else
                     Validate("Last Period Bal. (Credit)", -"Last Period Bal.");
-                    Validate("Last Period Bal. (Debit)", 0);
-                end;
             end;
         }
         field(61; "Last Period Bal. (Debit)"; Decimal)
@@ -172,14 +156,10 @@ table 4402 "EXR Trial Balance Buffer"
 
             trigger OnValidate()
             begin
-                if ("Net Change" > 0) then begin
-                    Validate("Net Change (Debit) (ACY)", "Net Change (ACY)");
-                    Validate("Net Change (Credit) (ACY)", 0);
-                end
-                else begin
+                if ("Net Change" > 0) then
+                    Validate("Net Change (Debit) (ACY)", "Net Change (ACY)")
+                else
                     Validate("Net Change (Credit) (ACY)", -"Net Change (ACY)");
-                    Validate("Net Change (Debit) (ACY)", 0);
-                end;
             end;
         }
         field(111; "Net Change (Debit) (ACY)"; Decimal)
@@ -196,14 +176,10 @@ table 4402 "EXR Trial Balance Buffer"
 
             trigger OnValidate()
             begin
-                if ("Balance" > 0) then begin
-                    Validate("Balance (Debit) (ACY)", "Balance (ACY)");
-                    Validate("Balance (Credit) (ACY)", 0);
-                end
-                else begin
+                if ("Balance" > 0) then
+                    Validate("Balance (Debit) (ACY)", "Balance (ACY)")
+                else
                     Validate("Balance (Credit) (ACY)", -"Balance (ACY)");
-                    Validate("Balance (Debit) (ACY)", 0);
-                end;
             end;
         }
         field(114; "Balance (Debit) (ACY)"; Decimal)
@@ -220,14 +196,10 @@ table 4402 "EXR Trial Balance Buffer"
 
             trigger OnValidate()
             begin
-                if ("Last Period Net" > 0) then begin
-                    Validate("Last Period Net (Debit) (ACY)", "Last Period Net (ACY)");
-                    Validate("Last Period Net (Credit) (ACY)", 0);
-                end
-                else begin
+                if ("Last Period Net" > 0) then
+                    Validate("Last Period Net (Debit) (ACY)", "Last Period Net (ACY)")
+                else
                     Validate("Last Period Net (Credit) (ACY)", -"Last Period Net (ACY)");
-                    Validate("Last Period Net (Debit) (ACY)", 0);
-                end;
             end;
         }
         field(151; "Last Period Net (Debit) (ACY)"; Decimal)
@@ -244,14 +216,10 @@ table 4402 "EXR Trial Balance Buffer"
 
             trigger OnValidate()
             begin
-                if ("Last Period Bal." > 0) then begin
-                    Validate("Last Period Bal. (Debit) (ACY)", "Last Period Bal. (ACY)");
-                    Validate("Last Period Bal. (Cred.) (ACY)", 0);
-                end
-                else begin
+                if ("Last Period Bal." > 0) then
+                    Validate("Last Period Bal. (Debit) (ACY)", "Last Period Bal. (ACY)")
+                else
                     Validate("Last Period Bal. (Cred.) (ACY)", -"Last Period Bal. (ACY)");
-                    Validate("Last Period Bal. (Debit) (ACY)", 0);
-                end;
             end;
         }
         field(161; "Last Period Bal. (Debit) (ACY)"; Decimal)
