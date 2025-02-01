@@ -148,6 +148,9 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
+      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
+    },
+    {
       "path": "./ExcelReports/Test/Dynamics BC Excel Reports Tests"
     },
     {
@@ -278,6 +281,9 @@
     },
     {
       "path": "./Email - Current User Connector/Test/Email - Current User Connector Tests"
+    },
+    {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./Email - Outlook REST API/Test"
