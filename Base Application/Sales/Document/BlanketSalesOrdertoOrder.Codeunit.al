@@ -30,7 +30,6 @@ codeunit 87 "Blanket Sales Order to Order"
         CreditLimitExceeded: Boolean;
         IsHandled: Boolean;
         SuppressCommit: Boolean;
-        ProcessLine: Boolean;
     begin
         OnBeforeRun(Rec, HideValidationDialog, SuppressCommit);
 
@@ -63,9 +62,7 @@ codeunit 87 "Blanket Sales Order to Order"
             TempSalesLine.DeleteAll();
             repeat
                 OnBeforeHandlingBlanketOrderSalesLine(BlanketOrderSalesLine);
-                ProcessLine := (BlanketOrderSalesLine.Type = BlanketOrderSalesLine.Type::" ") or (BlanketOrderSalesLine."Qty. to Ship" <> 0);
-                OnBeforeProcessBlanketOrderSalesLine(BlanketOrderSalesLine, ProcessLine);
-                if ProcessLine then begin
+                if (BlanketOrderSalesLine.Type = BlanketOrderSalesLine.Type::" ") or (BlanketOrderSalesLine."Qty. to Ship" <> 0) then begin
                     SalesLine.SetCurrentKey("Document Type", "Blanket Order No.", "Blanket Order Line No.");
                     SalesLine.SetRange("Blanket Order No.", BlanketOrderSalesLine."Document No.");
                     SalesLine.SetRange("Blanket Order Line No.", BlanketOrderSalesLine."Line No.");
@@ -559,11 +556,6 @@ codeunit 87 "Blanket Sales Order to Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnAfterCheckAvailability(var SalesLine: Record "Sales Line"; var BlanketOrderSalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeProcessBlanketOrderSalesLine(var BlanketOrderSalesLine: Record "Sales Line"; var ProcessLine: Boolean);
     begin
     end;
 }
