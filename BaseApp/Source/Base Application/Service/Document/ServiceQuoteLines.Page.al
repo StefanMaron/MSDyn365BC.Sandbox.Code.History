@@ -797,7 +797,6 @@ page 5966 "Service Quote Lines"
         OnBeforeOnOpenPage(Rec, FaultAreaCodeVisible, SymptomCodeVisible, FaultCodeVisible, ResolutionCodeVisible, IsHandled);
         if not IsHandled then begin
             Clear(SelectionFilter);
-            OnOpenPageOnBeforeSetSelectionFilter(SelectionFilter);
             SetSelectionFilter();
 
             ServMgtSetup.Get();
@@ -936,11 +935,6 @@ page 5966 "Service Quote Lines"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterInitialize(var ServiceLine: Record "Service Line"; var ServItemLineNo: Integer; var SelectionFilter: Option "All Service Lines","Lines per Selected Service Item","Lines Not Item Related");
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnOpenPageOnBeforeSetSelectionFilter(var SelectionFilter: Option "All Service Lines","Lines per Selected Service Item","Lines Not Item Related");
     begin
     end;
 }

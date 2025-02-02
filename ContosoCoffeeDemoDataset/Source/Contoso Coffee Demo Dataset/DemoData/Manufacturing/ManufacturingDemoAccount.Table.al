@@ -9,7 +9,6 @@ table 4761 "Manufacturing Demo Account"
     ObsoleteState = Removed;
     ObsoleteTag = '26.0';
 #endif
-    ReplicateData = false;
 
     fields
     {

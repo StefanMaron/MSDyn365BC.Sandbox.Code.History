@@ -735,13 +735,7 @@ table 81 "Gen. Journal Line"
             Caption = 'Applies-to Doc. Type';
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateAppliesToDocType(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
                 if "Applies-to Doc. Type" <> xRec."Applies-to Doc. Type" then
                     Validate("Applies-to Doc. No.", '');
             end;
@@ -795,12 +789,7 @@ table 81 "Gen. Journal Line"
                 CustLedgEntry: Record "Cust. Ledger Entry";
                 VendLedgEntry: Record "Vendor Ledger Entry";
                 TempGenJnlLine: Record "Gen. Journal Line" temporary;
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateAppliesToDocNo(Rec, xRec, CurrFieldNo, SuppressCommit, IsHandled);
-                if IsHandled then
-                    exit;
                 if SuppressCommit then
                     PaymentToleranceMgt.SetSuppressCommit(true);
 
@@ -904,7 +893,6 @@ table 81 "Gen. Journal Line"
 
                 if "Applies-to Doc. Type" = "Applies-to Doc. Type"::Invoice then
                     UpdateAppliesToInvoiceID();
-                OnAfterValidateAppliesToDocNo(Rec, xRec, CurrFieldNo, SuppressCommit);
             end;
         }
         field(38; "Due Date"; Date)
@@ -2942,10 +2930,6 @@ table 81 "Gen. Journal Line"
             Caption = 'Bal. Non-Deductible VAT Amount LCY';
             Editable = false;
         }
-        field(6230; "Non-Ded. VAT FA Cost"; Boolean)
-        {
-            Caption = 'Non-Ded. VAT FA Cost';
-        }
         field(8000; Id; Guid)
         {
             Caption = 'Id';
@@ -3170,7 +3154,7 @@ table 81 "Gen. Journal Line"
         SetLastModifiedDateTime();
 
         IsHandled := false;
-        OnModifyOnBeforeTestCheckPrinted(Rec, xRec, IsHandled);
+        OnModifyOnBeforeTestCheckPrinted(Rec, IsHandled);
         if not IsHandled then
             TestField("Check Printed", false);
 
@@ -3669,7 +3653,6 @@ table 81 "Gen. Journal Line"
         PrevDocNo: Code[20];
         FirstDocNo: Code[20];
         TempFirstDocNo: Code[20];
-        PrevCustVendNo: Code[20];
         First: Boolean;
         IsHandled: Boolean;
         PrevPostingDate: Date;
@@ -3702,14 +3685,12 @@ table 81 "Gen. Journal Line"
                 if not First and
                     ((GenJnlLine2."Document No." <> PrevDocNo) or
                       (GenJnlLine2."Posting Date" <> PrevPostingDate) or
-                      (not (GetCustVendNo(GenJnlLine2) in [PrevCustVendNo, ''])) or
                     ((GenJnlLine2."Bal. Account No." <> '') and (GenJnlLine2."Document No." = ''))) and
                     not LastGenJnlLine.EmptyLine()
                 then
                     DocNo := IncStr(DocNo);
                 PrevDocNo := GenJnlLine2."Document No.";
                 PrevPostingDate := GenJnlLine2."Posting Date";
-                PrevCustVendNo := GetCustVendNo(GenJnlLine2);
                 if GenJnlLine2."Document No." <> '' then begin
                     if GenJnlLine2."Applies-to ID" = GenJnlLine2."Document No." then
                         GenJnlLine2.RenumberAppliesToID(GenJnlLine2, GenJnlLine2."Document No.", DocNo);
@@ -5107,7 +5088,6 @@ table 81 "Gen. Journal Line"
 
             if Amount = 0 then begin
                 CustLedgEntry.CalcFields("Remaining Amount");
-                OnGetCustLedgerEntryOnAfterCalcRemainingAmount(CustLedgEntry);
 
                 if "Posting Date" <= CustLedgEntry."Pmt. Discount Date" then
                     Amount := -(CustLedgEntry."Remaining Amount" - CustLedgEntry."Remaining Pmt. Disc. Possible")
@@ -5155,7 +5135,6 @@ table 81 "Gen. Journal Line"
 
             if Amount = 0 then begin
                 VendLedgEntry.CalcFields("Remaining Amount");
-                OnGetVendLedgerEntryOnAfterCalcRemainingAmount(VendLedgEntry);
 
                 if "Posting Date" <= VendLedgEntry."Pmt. Discount Date" then
                     Amount := -(VendLedgEntry."Remaining Amount" - VendLedgEntry."Remaining Pmt. Disc. Possible")
@@ -5859,7 +5838,7 @@ table 81 "Gen. Journal Line"
         OnAfterCleanLine(Rec, xRec);
     end;
 
-    procedure ReplaceDescription() Result: Boolean
+    local procedure ReplaceDescription() Result: Boolean
     var
         IsHandled: Boolean;
     begin
@@ -7048,14 +7027,6 @@ table 81 "Gen. Journal Line"
         OnAfterAccountNoOnValidateGetVendorAccount(Rec, Vend, CurrFieldNo);
     end;
 
-    local procedure GetCustVendNo(GenJnlLineToCheck: Record "Gen. Journal Line"): Code[20]
-    begin
-        if GenJnlLineToCheck."Account Type" in [GenJnlLineToCheck."Account Type"::Customer, GenJnlLineToCheck."Account Type"::Vendor] then
-            exit(GenJnlLineToCheck."Account No.");
-        if GenJnlLineToCheck."Bal. Account Type" in [GenJnlLineToCheck."Bal. Account Type"::Customer, GenJnlLineToCheck."Bal. Account Type"::Vendor] then
-            exit(GenJnlLineToCheck."Bal. Account No.");
-    end;
-
     local procedure CheckConfirmDifferentVendorAndPayToVendor(Vend: Record Vendor; AccountNo: Code[20])
     var
         ConfirmManagement: Codeunit "Confirm Management";
@@ -7206,7 +7177,7 @@ table 81 "Gen. Journal Line"
                 "Currency Code" := BankAcc."Currency Code";
         ClearBalancePostingGroups();
 
-        OnAfterAccountNoOnValidateGetBankBalAccount(Rec, xRec, BankAcc, CurrFieldNo);
+        OnAfterAccountNoOnValidateGetBankBalAccount(Rec, BankAcc, CurrFieldNo);
     end;
 
     local procedure GetFAAccount()
@@ -7859,7 +7830,7 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterAccountNoOnValidateGetBankBalAccount(var GenJournalLine: Record "Gen. Journal Line"; var xGenJournalLine: Record "Gen. Journal Line"; var BankAccount: Record "Bank Account"; CallingFieldNo: Integer)
+    local procedure OnAfterAccountNoOnValidateGetBankBalAccount(var GenJournalLine: Record "Gen. Journal Line"; var BankAccount: Record "Bank Account"; CallingFieldNo: Integer)
     begin
     end;
 
@@ -8392,7 +8363,7 @@ table 81 "Gen. Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnModifyOnBeforeTestCheckPrinted(var GenJournalLine: Record "Gen. Journal Line"; var xGenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    local procedure OnModifyOnBeforeTestCheckPrinted(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -9635,31 +9606,6 @@ table 81 "Gen. Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnShowDimensionsOnAfterEditDimensionSet(var GenJournalLine: Record "Gen. Journal Line"; OldDimensionSetId: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetVendLedgerEntryOnAfterCalcRemainingAmount(var VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetCustLedgerEntryOnAfterCalcRemainingAmount(var CustLedgerEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateAppliesToDocType(var GenJnlLine: Record "Gen. Journal Line"; xGenJnlLine: Record "Gen. Journal Line"; CurrentFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateAppliesToDocNo(var GenJnlLine: Record "Gen. Journal Line"; xGenJnlLine: Record "Gen. Journal Line"; CurrentFieldNo: Integer; var SuppressCommit: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterValidateAppliesToDocNo(var GenJnlLine: Record "Gen. Journal Line"; xGenJnlLine: Record "Gen. Journal Line"; CurrentFieldNo: Integer; var SuppressCommit: Boolean)
     begin
     end;
 }
