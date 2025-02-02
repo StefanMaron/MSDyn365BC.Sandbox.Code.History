@@ -175,15 +175,12 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetLocationGranularWarehouseHandlingSetupsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetVATSetupUpgradeTag());
         PerCompanyUpgradeTags.Add(GetVATSetupAllowVATDateTag());
-        PerCompanyUpgradeTags.Add(GetBankExportImportSetupSEPACT09UpgradeTag());
         PerCompanyUpgradeTags.Add(GetSalesShipmentCustomerIdUpgradeTag());
         PerCompanyUpgradeTags.Add(GetCustomReportLayoutUpgradeTag());
         PerCompanyUpgradeTags.Add(GetFixedAssetLocationIdUpgradeTag());
         PerCompanyUpgradeTags.Add(GetFixedAssetResponsibleEmployeeIdUpgradeTag());
         PerCompanyUpgradeTags.Add(GetCopyItemSalesBlockedToServiceBlockedUpgradeTag());
         PerCompanyUpgradeTags.Add(GetJobTaskReportSelectionUpgradeTag());
-        PerCompanyUpgradeTags.Add(GetEmployeeLedgerEntryCurrencyFactorUpgradeTag());
-        PerCompanyUpgradeTags.Add(GetCountryVATSchemeDKTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerDatabaseUpgradeTags', '', false, false)]
@@ -780,11 +777,6 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-396184-CleanTemporaryTables-20210427');
     end;
 
-    internal procedure GetBankExportImportSetupSEPACT09UpgradeTag(): Code[250]
-    begin
-        exit('MS-533446-BankExportImportSetupSEPACT09-20240528');
-    end;
-
     internal procedure GetDimSetEntryGlobalDimNoUpgradeTag(): Code[250]
     begin
         exit('MS-396220-DimSetEntryGlobalDimNo-20210503');
@@ -1289,15 +1281,5 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetCopyItemSalesBlockedToServiceBlockedUpgradeTag(): Code[250]
     begin
         exit('MS-378441_CopyItemSalesBlockedToServiceBlockedUpgradeTag-20240401');
-    end;
-
-    internal procedure GetEmployeeLedgerEntryCurrencyFactorUpgradeTag(): Code[250]
-    begin
-        exit('MS-GIT-768_CopyItemSalesBlockedToServiceBlockedUpgradeTag-20240516');
-    end;
-
-    internal procedure GetCountryVATSchemeDKTag(): Code[250]
-    begin
-        exit('MS-GetCountryVATSchemeDKTag-20240624');
     end;
 }
