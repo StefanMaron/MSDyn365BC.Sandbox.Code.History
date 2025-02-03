@@ -101,8 +101,6 @@ report 99000757 "Where-Used (Top Level)"
 
             trigger OnPreDataItem()
             begin
-                OnBeforeOnPreDataItemItem(Item);
-
                 ItemFilter := GetFilters();
             end;
         }
@@ -156,10 +154,5 @@ report 99000757 "Where-Used (Top Level)"
         WhereUsedListItemNoCaptLbl: Label 'No.';
         WhereUsedListDescCaptLbl: Label 'Description';
         WhereUsedListQtyNeededCaptLbl: Label 'Exploded Quantity.';
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnPreDataItemItem(var Item: Record Item)
-    begin
-    end;
 }
 
