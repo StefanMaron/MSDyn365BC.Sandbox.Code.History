@@ -13,7 +13,7 @@ page 8001 "Create Billing Document"
         {
             group(DateFields)
             {
-                Caption = 'Billing';
+                Caption = 'Dates';
                 field(BillingDate; BillingDate)
                 {
                     Caption = 'Billing Date';
@@ -23,12 +23,7 @@ page 8001 "Create Billing Document"
                 {
                     Caption = 'Billing To';
                     ToolTip = 'Specifies the date to which the service is billed.';
-
                 }
-            }
-            group(Posting)
-            {
-                Caption = 'Posting';
                 field(DocumentDate; DocumentDate)
                 {
                     Caption = 'Document Date';

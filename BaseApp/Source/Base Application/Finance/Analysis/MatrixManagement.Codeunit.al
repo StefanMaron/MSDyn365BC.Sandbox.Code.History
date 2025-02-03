@@ -280,8 +280,6 @@ codeunit 9200 "Matrix Management"
                         RecRef.Get(RecRef.RecordId);
                     end;
                 end;
-            else
-                OnMatrixPageStepTypeInGenerateMatrixDataExtended(SetWanted, MaximumSetLength, RecRef);
         end;
 
         RecordPosition := RecRef.GetPosition();
@@ -404,7 +402,7 @@ codeunit 9200 "Matrix Management"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeGeneratePeriodAndCaption(PeriodType, Calendar, IsHandled, UseNameForCaption, CurrSetLength, CaptionSet, PeriodRecords);
+        OnBeforeGeneratePeriodAndCaption(PeriodType, Calendar, IsHandled, UseNameForCaption);
         if IsHandled then
             exit;
 
@@ -554,7 +552,7 @@ codeunit 9200 "Matrix Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGeneratePeriodAndCaption(PeriodType: Enum "Analysis Period Type"; Calendar: Record Date; var IsHandled: Boolean; UseNameForCaption: Boolean; var CurrSetLength: Integer; var CaptionSet: array[32] of Text[80]; var PeriodRecords: array[32] of Record Date temporary)
+    local procedure OnBeforeGeneratePeriodAndCaption(PeriodType: Enum "Analysis Period Type"; Calendar: Record Date; var IsHandled: Boolean; UseNameForCaption: Boolean)
     begin
     end;
 
@@ -585,11 +583,6 @@ codeunit 9200 "Matrix Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnGeneratePeriodMatrixDataOnBeforeFindDateBasedOnStepType(SetWanted: Option; var CalendarDate: Record Date; PeriodType: Enum "Analysis Period Type")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnMatrixPageStepTypeInGenerateMatrixDataExtended(SetWanted: Option; MaximumSetLength: Integer; var RecRef: RecordRef)
     begin
     end;
 }
