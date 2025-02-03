@@ -306,8 +306,10 @@ report 12121 "G/L Book - Print"
                             Descr := BankAccount.Name;
                         end;
                     "Source Type"::"Fixed Asset":
-                        if FA.Get("Source No.") then
+                        begin
+                            FA.Get("Source No.");
                             Descr := FA.Description;
+                        end;
                 end;
 
                 if (not CurrReport.Preview) and
