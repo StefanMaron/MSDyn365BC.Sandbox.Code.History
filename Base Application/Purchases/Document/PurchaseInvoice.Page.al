@@ -364,14 +364,7 @@ page 51 "Purchase Invoice"
                     ToolTip = 'Specifies the currency code for amounts on the purchase lines.';
 
                     trigger OnAssistEdit()
-                    var
-                        IsHandled: Boolean;
                     begin
-                        IsHandled := false;
-                        OnBeforeCurrencyCodeOnAssistEdit(Rec, xRec, IsHandled);
-                        if IsHandled then
-                            exit;
-
                         Clear(ChangeExchangeRate);
                         if Rec."Posting Date" <> 0D then
                             ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", Rec."Posting Date")
@@ -1926,7 +1919,7 @@ page 51 "Purchase Invoice"
         IsPurchaseLinesEditable: Boolean;
         RejectICPurchaseInvoiceEnabled: Boolean;
         VATDateEnabled: Boolean;
-        
+
     protected var
         ShipToOptions: Option "Default (Company Address)",Location,"Custom Address";
         PayToOptions: Option "Default (Vendor)","Another Vendor","Custom Address";
@@ -1985,7 +1978,7 @@ page 51 "Purchase Invoice"
         if IsHandled then
             exit;
 
-                if PostingCodeunitID <> CODEUNIT::"Purch.-Post (Yes/No)" then
+        if PostingCodeunitID <> CODEUNIT::"Purch.-Post (Yes/No)" then
             exit;
 
         case Navigate of
@@ -2126,9 +2119,10 @@ page 51 "Purchase Invoice"
     begin
         if (Rec."Last Posting No." <> '') and (Rec."Last Posting No." <> xLastPostingNo) then
             PurchInvHeader.SetRange("No.", Rec."Last Posting No.")
-        else
+        else begin
             PurchInvHeader.SetRange("Pre-Assigned No.", PreAssignedNo);
-
+            PurchInvHeader.SetRange("Order No.", '');
+        end;
         if PurchInvHeader.FindFirst() then
             if InstructionMgt.ShowConfirm(StrSubstNo(OpenPostedPurchaseInvQst, PurchInvHeader."No."),
                  InstructionMgt.ShowPostedConfirmationMessageCode())
@@ -2244,11 +2238,6 @@ page 51 "Purchase Invoice"
 
     [IntegrationEvent(true, false)]
     local procedure OnQueryClosePageOnAfterCalcShowConfirmCloseUnposted(var PurchaseHeader: Record "Purchase Header"; var ShowConfirmCloseUnposted: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCurrencyCodeOnAssistEdit(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 }
