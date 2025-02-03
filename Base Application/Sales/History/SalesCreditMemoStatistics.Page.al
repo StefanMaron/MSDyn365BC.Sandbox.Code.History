@@ -152,7 +152,7 @@ page 398 "Sales Credit Memo Statistics"
                     Caption = 'Cost Adjmt. Amount (LCY)';
                     ToolTip = 'Specifies the difference between the original cost and the total adjusted cost of the items in the posted sales credit memo.';
 
-                    trigger OnDrillDown()
+                    trigger OnLookup(var Text: Text): Boolean
                     begin
                         Rec.LookupAdjmtValueEntries();
                     end;
