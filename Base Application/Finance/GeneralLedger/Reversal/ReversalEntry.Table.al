@@ -209,6 +209,13 @@ table 179 "Reversal Entry"
             Caption = 'Source Currency Amount';
             DataClassification = CustomerContent;
         }
+        field(32; "Source Currency VAT Amount"; Decimal)
+        {
+            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 1;
+            Caption = 'Source Currency VAT Amount';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -293,7 +300,7 @@ table 179 "Reversal Entry"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeReverseEntries(Number, RevType, IsHandled, HideDialog, Rec);
+        OnBeforeReverseEntries(Number, RevType, IsHandled, HideDialog, Rec, HideWarningDialogs);
         if IsHandled then
             exit;
 
@@ -819,7 +826,7 @@ table 179 "Reversal Entry"
         PAGE.Run(0, GlobalVATEntry);
     end;
 
-    procedure Caption(): Text
+    procedure Caption() Result: Text
     var
         GLAccount: Record "G/L Account";
         Customer: Record Customer;
@@ -828,7 +835,13 @@ table 179 "Reversal Entry"
         BankAccount: Record "Bank Account";
         FixedAsset: Record "Fixed Asset";
         NewCaption: Text;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCaption(Rec, Result, IsHandled);
+        if IsHandled then
+            exit;
+
         case "Entry Type" of
             "Entry Type"::"G/L Account":
                 begin
@@ -1343,6 +1356,7 @@ table 179 "Reversal Entry"
         "Debit Amount (LCY)" := GLEntry."Debit Amount";
         "Credit Amount (LCY)" := GLEntry."Credit Amount";
         "VAT Amount" := GLEntry."VAT Amount";
+        "Source Currency VAT Amount" := GLEntry."Source Currency VAT Amount";
         "Document Type" := GLEntry."Document Type";
         "Document No." := GLEntry."Document No.";
         "Bal. Account Type" := GLEntry."Bal. Account Type";
@@ -1718,7 +1732,7 @@ table 179 "Reversal Entry"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeReverseEntries(Number: Integer; RevType: Integer; var IsHandled: Boolean; HideDialog: Boolean; var ReversalEntry: Record "Reversal Entry")
+    local procedure OnBeforeReverseEntries(Number: Integer; RevType: Integer; var IsHandled: Boolean; HideDialog: Boolean; var ReversalEntry: Record "Reversal Entry"; var HideWarningDialogs: Boolean)
     begin
     end;
 
@@ -1739,6 +1753,11 @@ table 179 "Reversal Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertFromVendLedgEntryOnBeforeTempReversalEntryInsert(var TempReversalEntry: Record "Reversal Entry" temporary; VendorLedgerEntry: Record "Vendor Ledger Entry");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCaption(ReversalEntry: Record "Reversal Entry"; var Result: Text; var IsHandled: Boolean)
     begin
     end;
 
