@@ -7,7 +7,6 @@ namespace Microsoft.Projects.TimeSheet;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Journal;
-using Microsoft.Projects.Project.Setup;
 using Microsoft.Projects.Resources.Resource;
 
 report 952 "Suggest Job Jnl. Lines"
@@ -90,7 +89,6 @@ report 952 "Suggest Job Jnl. Lines"
 
     trigger OnPostReport()
     var
-        JobsSetup: Record "Jobs Setup";
         NoSeries: Codeunit "No. Series";
         TimeSheetMgt: Codeunit "Time Sheet Management";
         NextDocNo: Code[20];
@@ -104,13 +102,10 @@ report 952 "Suggest Job Jnl. Lines"
             JobJnlLine.LockTable();
             JobJnlTemplate.Get(JobJnlLine."Journal Template Name");
             JobJnlBatch.Get(JobJnlLine."Journal Template Name", JobJnlLine."Journal Batch Name");
-            JobsSetup.SetLoadFields("Document No. Is Job No.");
-            JobsSetup.Get();
-            if not JobsSetup."Document No. Is Job No." then
-                if JobJnlBatch."No. Series" = '' then
-                    NextDocNo := ''
-                else
-                    NextDocNo := NoSeries.PeekNextNo(JobJnlBatch."No. Series", TempTimeSheetLine."Time Sheet Starting Date");
+            if JobJnlBatch."No. Series" = '' then
+                NextDocNo := ''
+            else
+                NextDocNo := NoSeries.PeekNextNo(JobJnlBatch."No. Series", TempTimeSheetLine."Time Sheet Starting Date");
 
             JobJnlLine.SetRange("Journal Template Name", JobJnlLine."Journal Template Name");
             JobJnlLine.SetRange("Journal Batch Name", JobJnlLine."Journal Batch Name");
@@ -144,10 +139,8 @@ report 952 "Suggest Job Jnl. Lines"
                             if TempTimeSheetLine."Work Type Code" <> '' then
                                 JobJnlLine.Validate("Work Type Code", TempTimeSheetLine."Work Type Code");
                             JobJnlLine.Validate("Posting Date", TimeSheetDetail.Date);
-                            if not JobsSetup."Document No. Is Job No." then begin
-                                JobJnlLine."Document No." := NextDocNo;
-                                NextDocNo := IncStr(NextDocNo);
-                            end;
+                            JobJnlLine."Document No." := NextDocNo;
+                            NextDocNo := IncStr(NextDocNo);
                             JobJnlLine."Posting No. Series" := JobJnlBatch."Posting No. Series";
                             JobJnlLine.Description := TempTimeSheetLine.Description;
                             JobJnlLine.Validate(Quantity, QtyToPost);
