@@ -364,7 +364,7 @@
                           <Paragraph>
                             <TextRuns>
                               <TextRun>
-                                <Value>Descripción</Value>
+                                <Value>Descripci�n</Value>
                                 <Style />
                               </TextRun>
                             </TextRuns>
@@ -715,7 +715,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Núm Licencia</Value>
+                                      <Value>N�m Licencia</Value>
                                       <Style />
                                     </TextRun>
                                   </TextRuns>
@@ -746,7 +746,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Dirección</Value>
+                                      <Value>Direcci�n</Value>
                                       <Style />
                                     </TextRun>
                                   </TextRuns>
@@ -1093,7 +1093,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Tipo de Ubicación</Value>
+                                      <Value>Tipo de UbicaciÝn</Value>
                                       <Style>
                                         <FontStyle>Normal</FontStyle>
                                         <FontWeight>Normal</FontWeight>
@@ -1129,7 +1129,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>ID Ubicación</Value>
+                                      <Value>ID UbicaciÝn</Value>
                                       <Style>
                                         <FontStyle>Normal</FontStyle>
                                         <FontWeight>Normal</FontWeight>
@@ -1201,7 +1201,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Dirección</Value>
+                                      <Value>Direcci�n</Value>
                                       <Style>
                                         <FontStyle>Normal</FontStyle>
                                         <FontFamily>Times New Roman</FontFamily>
@@ -1671,7 +1671,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Mercancías</Value>
+                                      <Value>Mercanc�as</Value>
                                       <Style>
                                         <FontStyle>Normal</FontStyle>
                                         <FontFamily>Times New Roman</FontFamily>
@@ -1834,7 +1834,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Descripción</Value>
+                                      <Value>Descripci�n</Value>
                                       <Style>
                                         <FontStyle>Normal</FontStyle>
                                         <FontWeight>Normal</FontWeight>
@@ -2405,7 +2405,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Número de póliza</Value>
+                                      <Value>N�mero de p�liza</Value>
                                       <Style>
                                         <FontStyle>Normal</FontStyle>
                                         <FontWeight>Normal</FontWeight>
@@ -2441,7 +2441,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Número de permiso SCT</Value>
+                                      <Value>N�mero de permiso SCT</Value>
                                       <Style>
                                         <FontStyle>Normal</FontStyle>
                                         <FontWeight>Normal</FontWeight>
@@ -2659,7 +2659,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Configuración Vehicular</Value>
+                                      <Value>Configuraci�n Vehicular</Value>
                                       <Style>
                                         <FontStyle>Normal</FontStyle>
                                         <FontWeight>Normal</FontWeight>
@@ -2698,7 +2698,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>A¤o Modelo VM</Value>
+                                      <Value>A�o Modelo VM</Value>
                                       <Style>
                                         <FontStyle>Normal</FontStyle>
                                         <FontWeight>Normal</FontWeight>
@@ -2845,7 +2845,7 @@
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Número de placa</Value>
+                                      <Value>N�mero de placa</Value>
                                       <Style>
                                         <FontStyle>Normal</FontStyle>
                                         <FontWeight>Normal</FontWeight>
@@ -3252,7 +3252,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>Fecha de emisión</Value>
+                      <Value>Fecha de emisi�n</Value>
                       <Style>
                         <Format>d</Format>
                       </Style>
@@ -3308,7 +3308,7 @@
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>Lugar de emisión</Value>
+                      <Value>Lugar de emisi�n</Value>
                       <Style>
                         <Format>d</Format>
                       </Style>
