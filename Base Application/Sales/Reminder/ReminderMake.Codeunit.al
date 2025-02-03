@@ -54,7 +54,6 @@ codeunit 392 "Reminder-Make"
             ReminderLine.DeleteAll();
         end;
 
-        OnCodeOnBeforeGetReminderTerms(GlobalCustomer, GlobalCustLedgEntry, CustLedgEntryLastIssuedReminderLevelFilter);
         GetReminderTerms();
         if HeaderExists then
             RetVal := MakeReminder(GlobalReminderHeader."Currency Code")
@@ -157,8 +156,7 @@ codeunit 392 "Reminder-Make"
             exit(false);
         TempCustLedgerEntryOnHold.DeleteAll();
 
-        if not FindAndMarkReminderCandidates(GlobalCustLedgEntry, ReminderLevel, CustAmount, MakeDoc, MaxReminderLevel, MaxLineLevel) then
-            exit(false);
+        FindAndMarkReminderCandidates(GlobalCustLedgEntry, ReminderLevel, CustAmount, MakeDoc, MaxReminderLevel, MaxLineLevel);
 
         ReminderLevel.SetRange("Reminder Terms Code", GlobalReminderTerms.Code);
         ReminderLevel.SetRange("No.", 1, MaxLineLevel);
@@ -312,7 +310,7 @@ codeunit 392 "Reminder-Make"
         end;
     end;
 
-    local procedure FindAndMarkReminderCandidates(var CustLedgEntry: Record "Cust. Ledger Entry"; var ReminderLevel: Record "Reminder Level"; var CustAmount: Decimal; var MakeDoc: Boolean; var MaxReminderLevel: Integer; var MaxLineLevel: Integer) Result: Boolean
+    local procedure FindAndMarkReminderCandidates(var CustLedgEntry: Record "Cust. Ledger Entry"; var ReminderLevel: Record "Reminder Level"; var CustAmount: Decimal; var MakeDoc: Boolean; var MaxReminderLevel: Integer; var MaxLineLevel: Integer)
     var
         IsHandled: Boolean;
     begin
@@ -320,9 +318,9 @@ codeunit 392 "Reminder-Make"
         OnBeforeFindAndMarkReminderCandidates(
             ReminderLevel, GlobalReminderHeaderReq, GlobalReminderTerms, GlobalReminderEntry,
             CustLedgEntry, TempCustLedgerEntryOnHold, CustLedgEntryLastIssuedReminderLevelFilter, CustAmount,
-            MakeDoc, MaxReminderLevel, MaxLineLevel, OverdueEntriesOnly, IncludeEntriesOnHold, IsHandled, Result);
+            MakeDoc, MaxReminderLevel, MaxLineLevel, OverdueEntriesOnly, IncludeEntriesOnHold, IsHandled);
         if IsHandled then
-            exit(Result);
+            exit;
 
         repeat
             FilterCustLedgEntries(ReminderLevel);
@@ -340,13 +338,6 @@ codeunit 392 "Reminder-Make"
                             end;
                 until CustLedgEntry.Next() = 0;
         until ReminderLevel.Next(-1) = 0;
-
-        IsHandled := false;
-        OnAfterFindAndMarkReminderCandidates(GlobalCustLedgEntry, ReminderLevel, CustAmount, MakeDoc, MaxReminderLevel, MaxLineLevel, IsHandled, Result);
-        if IsHandled then
-            exit(Result);
-
-        exit(true);
     end;
 
     local procedure MarkReminderCandidate(var CustLedgEntry: Record "Cust. Ledger Entry"; var ReminderLevel: Record "Reminder Level"; var CustAmount: Decimal; var MakeDoc: Boolean; var MaxReminderLevel: Integer; var MaxLineLevel: Integer)
@@ -540,7 +531,6 @@ codeunit 392 "Reminder-Make"
             exit;
 
         CustLedgEntry.CalcFields("Remaining Amount");
-        OnAddLineFeeForCustLedgEntryOnAfterCalcRemainingAmount(CustLedgEntry);
         LineFeeAmount := ReminderLevel.GetAdditionalFee(CustLedgEntry."Remaining Amount",
             GlobalReminderHeader."Currency Code", true, GlobalReminderHeader."Posting Date");
         if LineFeeAmount = 0 then
@@ -685,11 +675,6 @@ codeunit 392 "Reminder-Make"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAddLineFeeForCustLedgEntryOnAfterCalcRemainingAmount(var CustLedgerEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnAddLineFeeForCustLedgEntryOnReminderLineInsert(var ReminderLine: Record "Reminder Line")
     begin
     end;
@@ -715,7 +700,7 @@ codeunit 392 "Reminder-Make"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindAndMarkReminderCandidates(var ReminderLevel: Record "Reminder Level"; ReminderHeaderReq: Record "Reminder Header"; ReminderTerms: Record "Reminder Terms"; var ReminderEntry: Record "Reminder/Fin. Charge Entry"; var CustLedgEntry: Record "Cust. Ledger Entry"; var TempCustLedgEntryOnHold: Record "Cust. Ledger Entry" temporary; var CustLedgEntryLastIssuedReminderLevelFilter: Text; var CustAmount: Decimal; var MakeDoc: Boolean; var MaxReminderLevel: Integer; var MaxLineLevel: Integer; OverdueEntriesOnly: Boolean; IncludeEntriesOnHold: Boolean; var IsHandled: Boolean; var Result: Boolean)
+    local procedure OnBeforeFindAndMarkReminderCandidates(var ReminderLevel: Record "Reminder Level"; ReminderHeaderReq: Record "Reminder Header"; ReminderTerms: Record "Reminder Terms"; var ReminderEntry: Record "Reminder/Fin. Charge Entry"; var CustLedgEntry: Record "Cust. Ledger Entry"; var TempCustLedgEntryOnHold: Record "Cust. Ledger Entry"; var CustLedgEntryLastIssuedReminderLevelFilter: Text; var CustAmount: Decimal; var MakeDoc: Boolean; var MaxReminderLevel: Integer; var MaxLineLevel: Integer; OverdueEntriesOnly: Boolean; IncludeEntriesOnHold: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -765,17 +750,7 @@ codeunit 392 "Reminder-Make"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforeGetReminderTerms(Customer: Record Customer; CustLedgerEntry: Record "Cust. Ledger Entry"; CustLedgEntryLastIssuedReminderLevelFilter: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnFindAndMarkReminderCandidatesOnBeforeCustLedgEntryLoop(var CustLedgerEntry: Record "Cust. Ledger Entry"; var ReminderHeader: Record "Reminder Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFindAndMarkReminderCandidates(CustLedgEntry: Record "Cust. Ledger Entry"; ReminderLevel: Record "Reminder Level"; CustAmount: Decimal; MakeDoc: Boolean; MaxReminderLevel: Integer; MaxLineLevel: Integer; var IsHandled: Boolean; var Result: Boolean)
     begin
     end;
 
