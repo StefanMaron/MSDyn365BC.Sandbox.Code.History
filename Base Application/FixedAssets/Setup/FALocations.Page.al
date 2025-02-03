@@ -8,7 +8,6 @@ page 5617 "FA Locations"
     PageType = List;
     SourceTable = "FA Location";
     UsageCategory = Administration;
-    AnalysisModeEnabled = false;
 
     layout
     {
