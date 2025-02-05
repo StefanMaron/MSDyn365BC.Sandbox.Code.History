@@ -4,7 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.Currency;
 
-using System;
 using System.Integration;
 using System.IO;
 using System.Privacy;
@@ -49,10 +48,6 @@ table 1650 "Curr. Exch. Rate Update Setup"
             trigger OnValidate()
             var
                 CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
-                MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-                MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-                MyALAuditCategory: DotNet ALAuditCategory;
-                CurrExchRateUpdateConsentProvidedLbl: Label 'Curr. Exch. Rate Update Setup - consent provided by UserSecurityId %1.', Locked = true;
             begin
                 if not xRec."Enabled" and Rec."Enabled" then
                     Rec."Enabled" := CustomerConsentMgt.ConfirmUserConsent();
@@ -62,7 +57,6 @@ table 1650 "Curr. Exch. Rate Update Setup"
                     VerifyDataExchangeLineDefinition();
                     AutoUpdateExchangeRates();
                     LogTelemetryWhenServiceEnabled();
-                    MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(CurrExchRateUpdateConsentProvidedLbl, UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 4, 0);
                 end else
                     LogTelemetryWhenServiceDisabled();
             end;
