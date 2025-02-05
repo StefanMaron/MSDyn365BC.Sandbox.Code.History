@@ -177,7 +177,6 @@ codeunit 141038 "ERM VAT - Details"
 
         // [GIVEN] Currency with "Exchange Rate Amount" = 7
         CreateCurrencyWithExchRateAmount(CurrencyCode);
-        UpdateGenLedgSetupAddReportingCurrency(CurrencyCode);
         // [GIVEN] VAT Posting Setup with "VAT %" = 20%
         // [GIVEN] Purchase invoice with 2 lines
         // [GIVEN] Amount of first line = 10
@@ -278,11 +277,6 @@ codeunit 141038 "ERM VAT - Details"
         exit(Round(Amount / 100 * ValueProc, Precision));
     end;
 
-    local procedure GetPercent(Amount: Decimal; ValueProc: Decimal): Decimal
-    begin
-        exit(Amount / 100 * ValueProc);
-    end;
-
     local procedure VerifyGLEntry(DocumentNo: Code[20]; AmountIncludingVATCredit: Decimal; AmountIncludingVATDebit: Decimal)
     var
         GLEntry: Record "G/L Entry";
@@ -327,14 +321,16 @@ codeunit 141038 "ERM VAT - Details"
     begin
         CurrAmountRoundingPrecision := LibraryERM.GetCurrencyAmountRoundingPrecision(CurrencyCode);
         CurrencyFactor := CurrencyExchangeRate.GetCurrentCurrencyFactor(CurrencyCode);
-        SalesInvLine.SetRange("Document No.", DocumentNo);
-        SalesInvLine.FindSet();
-        repeat
-            VerifyVATEntryACY(
-              DocumentNo, -SalesInvLine.Amount,
-              -Round(GetRoundedPercent(SalesInvLine.Amount, SalesInvLine."VAT %", CurrAmountRoundingPrecision) * CurrencyFactor, CurrAmountRoundingPrecision),
-              -Round(SalesInvLine.Amount * CurrencyFactor, CurrAmountRoundingPrecision), CustomerNo);
-        until SalesInvLine.Next() = 0;
+        with SalesInvLine do begin
+            SetRange("Document No.", DocumentNo);
+            FindSet();
+            repeat
+                VerifyVATEntryACY(
+                  DocumentNo, -Amount,
+                  -Round(GetRoundedPercent(Amount, "VAT %", CurrAmountRoundingPrecision) * CurrencyFactor, CurrAmountRoundingPrecision),
+                  -Round(Amount * CurrencyFactor, CurrAmountRoundingPrecision), CustomerNo);
+            until Next() = 0;
+        end;
     end;
 
     local procedure VerifyPostedPurchVATEntries(DocumentNo: Code[20]; CurrencyCode: Code[10]; VendorNo: Code[20])
@@ -346,14 +342,16 @@ codeunit 141038 "ERM VAT - Details"
     begin
         CurrAmountRoundingPrecision := LibraryERM.GetCurrencyAmountRoundingPrecision(CurrencyCode);
         CurrencyFactor := CurrencyExchangeRate.GetCurrentCurrencyFactor(CurrencyCode);
-        PurchInvLine.SetRange("Document No.", DocumentNo);
-        PurchInvLine.FindSet();
-        repeat
-            VerifyVATEntryACY(
-              DocumentNo, PurchInvLine.Amount,
-              Round(GetPercent(PurchInvLine.Amount, PurchInvLine."VAT %") * CurrencyFactor, CurrAmountRoundingPrecision),
-              Round(PurchInvLine.Amount * CurrencyFactor, CurrAmountRoundingPrecision), VendorNo);
-        until PurchInvLine.Next() = 0;
+        with PurchInvLine do begin
+            SetRange("Document No.", DocumentNo);
+            FindSet();
+            repeat
+                VerifyVATEntryACY(
+                  DocumentNo, Amount,
+                  Round(GetRoundedPercent(Amount, "VAT %", CurrAmountRoundingPrecision) * CurrencyFactor, CurrAmountRoundingPrecision),
+                  Round(Amount * CurrencyFactor, CurrAmountRoundingPrecision), VendorNo);
+            until Next() = 0;
+        end;
     end;
 }
 
