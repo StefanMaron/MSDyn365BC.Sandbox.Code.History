@@ -37,7 +37,6 @@ codeunit 1385 "Vendor Templ. Mgt."
 
         Vendor.SetInsertFromTemplate(true);
         Vendor.Init();
-        OnCreateVendorFromTemplateOnBeforeInitVendorNo(Vendor);
         InitVendorNo(Vendor, VendorTempl);
         Vendor.Insert(true);
         Vendor.SetInsertFromTemplate(false);
@@ -150,8 +149,6 @@ codeunit 1385 "Vendor Templ. Mgt."
                 DestDefaultDimension.Validate("Dimension Code", SourceDefaultDimension."Dimension Code");
                 DestDefaultDimension.Validate("Dimension Value Code", SourceDefaultDimension."Dimension Value Code");
                 DestDefaultDimension.Validate("Value Posting", SourceDefaultDimension."Value Posting");
-                if (SourceDefaultDimension."Value Posting" = SourceDefaultDimension."Value Posting"::"Code Mandatory") and (SourceDefaultDimension."Allowed Values Filter" <> '') then
-                    DestDefaultDimension.Validate("Allowed Values Filter", SourceDefaultDimension."Allowed Values Filter");
                 if not DestDefaultDimension.Get(DestDefaultDimension."Table ID", DestDefaultDimension."No.", DestDefaultDimension."Dimension Code") then
                     DestDefaultDimension.Insert(true);
             until SourceDefaultDimension.Next() = 0;
@@ -336,13 +333,7 @@ codeunit 1385 "Vendor Templ. Mgt."
     procedure InitVendorNo(var Vendor: Record Vendor; VendorTempl: Record "Vendor Templ.")
     var
         NoSeries: Codeunit "No. Series";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeInitVendorNo(Vendor, VendorTempl, IsHandled);
-        if IsHandled then
-            exit;
-
         if VendorTempl."No. Series" = '' then
             exit;
 
@@ -566,16 +557,6 @@ codeunit 1385 "Vendor Templ. Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsOpenBlankCardConfirmed(var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitVendorNo(var Vendor: Record Vendor; VendorTempl: Record "Vendor Templ."; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateVendorFromTemplateOnBeforeInitVendorNo(var Vendor: Record Vendor)
     begin
     end;
 
