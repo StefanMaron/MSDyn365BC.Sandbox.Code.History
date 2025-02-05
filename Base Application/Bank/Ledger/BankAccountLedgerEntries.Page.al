@@ -447,9 +447,10 @@ page 372 "Bank Account Ledger Entries"
         SetDimVisibility();
         BankAccount.SetLoadFields("Currency Code");
         if Rec.GetFilter("Bank Account No.") <> '' then begin
-            Rec.CopyFilter("Bank Account No.", BankAccount."No.");
-            if BankAccount.FindFirst() then
+            if BankAccount.Get(Rec.GetRangeMin("Bank Account No.")) then
                 IsForeignCurrency := BankAccount."Currency Code" <> '';
+            BankAccount.Reset();
+            Rec.CopyFilter("Bank Account No.", BankAccount."No.");
         end;
         GLSetup.SetLoadFields("Show Amounts");
         GLSetup.Get();
