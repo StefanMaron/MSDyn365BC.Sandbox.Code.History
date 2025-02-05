@@ -144,6 +144,57 @@ codeunit 139769 "Bank Deposit Posting Tests"
 
     [Test]
     [HandlerFunctions('GeneralJournalBatchesPageHandler,ConfirmHandler')]
+    procedure PostBankDepositAsLumpSumOneLine()
+    var
+        GLAccount: Record "G/L Account";
+        Vendor: Record Vendor;
+        BankDepositHeader: Record "Bank Deposit Header";
+        PostedBankDepositLine: Record "Posted Bank Deposit Line";
+        GenJournalLine: Record "Gen. Journal Line";
+        SourceCodeSetup: Record "Source Code Setup";
+        GLEntry: Record "G/L Entry";
+        TransactionNo: Integer;
+    begin
+        // Verify G/L Entry after post Deposit with Unchecked Force Doc. Balance.
+
+        // Setup: Create GL Account and Vendor, create Bank Deposit with Account Type GL, Vendor.
+        Initialize();
+        LibraryERM.CreateGLAccount(GLAccount);
+        LibraryPurchase.CreateVendor(Vendor);
+        CreateBankDeposit(BankDepositHeader, GLAccount."No.", GenJournalLine."Account Type"::"G/L Account", -1, GenJournalLine."Document Type"::" ");
+
+        // Update Total Deposit Amount on header, set Post as Lump Sum to true and post Bank Deposit.
+        UpdateBankDepositHeaderWithAmount(BankDepositHeader);
+        BankDepositHeader."Post as Lump Sum" := true;
+        BankDepositHeader.Modify();
+        SourceCodeSetup.Get();
+        SourceCodeSetup."Bank Deposit" := 'BankDep';
+        SourceCodeSetup.Modify();
+
+        // Exercise.
+        PostBankDeposit(BankDepositHeader);
+
+        // Verify: Verify G/L Entry after post Deposit with Unchecked Force Doc. Balance.
+        GLEntry.SetRange("Document No.", BankDepositHeader."No.");
+        GLEntry.SetRange(Amount, BankDepositHeader."Total Deposit Amount");
+        GLEntry.FindFirst();
+        GLEntry.TestField("Document Type", GLEntry."Document Type"::" ");
+
+        // Verify all entries are in the same transaction
+        PostedBankDepositLine.SetRange("Bank Deposit No.", BankDepositHeader."No.");
+        TransactionNo := 0;
+        PostedBankDepositLine.FindSet();
+        repeat
+            GLEntry.Reset();
+            GLEntry.Get(PostedBankDepositLine."Entry No.");
+            if TransactionNo = 0 then
+                TransactionNo := GLEntry."Transaction No.";
+            Assert.AreEqual(GLEntry."Transaction No.", TransactionNo, 'All GLEntries should be in the same transaction');
+        until PostedBankDepositLine.Next() = 0;
+    end;
+
+    [Test]
+    [HandlerFunctions('GeneralJournalBatchesPageHandler,ConfirmHandler')]
     procedure PostingAsLumpSumInDifferentDocumentsShouldntBePossible()
     var
         GLAccount: Record "G/L Account";
