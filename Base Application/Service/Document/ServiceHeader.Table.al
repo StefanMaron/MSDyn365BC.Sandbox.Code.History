@@ -307,6 +307,9 @@ table 5900 "Service Header"
 
                 if not SkipBillToContact then
                     UpdateBillToCont("Bill-to Customer No.");
+
+                if Rec."Customer No." <> Rec."Bill-to Customer No." then
+                    UpdateShipToSalespersonCode();
             end;
         }
         field(5; "Bill-to Name"; Text[100])
@@ -3004,6 +3007,7 @@ table 5900 "Service Header"
         OldDimSetID := "Dimension Set ID";
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
 
+        OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(Rec, xRec);
         if ServItemLineExists() or ServLineExists() then
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
 
@@ -4777,6 +4781,7 @@ table 5900 "Service Header"
     procedure UpdateShipToSalespersonCode()
     var
         ShipToAddress: Record "Ship-to Address";
+        SalespersonCode: Code[20];
         IsHandled: Boolean;
         IsSalesPersonCodeAssigned: Boolean;
     begin
@@ -4789,7 +4794,8 @@ table 5900 "Service Header"
             ShipToAddress.SetLoadFields("Salesperson Code");
             ShipToAddress.Get("Customer No.", "Ship-to Code");
             if ShipToAddress."Salesperson Code" <> '' then begin
-                SetSalespersonCode(ShipToAddress."Salesperson Code", "Salesperson Code");
+                SetSalespersonCode(ShipToAddress."Salesperson Code", SalespersonCode);
+                Validate("Salesperson Code", SalespersonCode);
                 IsSalesPersonCodeAssigned := true;
             end;
         end;
@@ -4800,7 +4806,10 @@ table 5900 "Service Header"
             if not IsHandled then
                 if ("Bill-to Customer No." <> '') then begin
                     GetCust("Bill-to Customer No.");
-                    SetSalespersonCode(Cust."Salesperson Code", "Salesperson Code");
+                    SetSalespersonCode(Cust."Salesperson Code", SalespersonCode);
+                    Validate("Salesperson Code", SalespersonCode);
+                    if Rec."Customer No." <> '' then
+                        GetCust(Rec."Customer No.");
                 end else
                     SetDefaultSalesperson();
         end;
@@ -5636,6 +5645,11 @@ table 5900 "Service Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateBillToCustomerNoOnBeforeRecreateServLines(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header");
     begin
     end;
 
