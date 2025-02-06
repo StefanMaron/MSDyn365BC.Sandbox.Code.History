@@ -71,7 +71,7 @@ page 5990 Troubleshooting
                         TblshtgSetup.Reset();
                         TblshtgSetup.SetCurrentKey("Troubleshooting No.");
                         TblshtgSetup.SetRange("Troubleshooting No.", Rec."No.");
-                        Page.RunModal(Page::"Troubleshooting Setup", TblshtgSetup);
+                        PAGE.RunModal(PAGE::"Troubleshooting Setup", TblshtgSetup)
                     end;
                 }
             }
@@ -80,24 +80,19 @@ page 5990 Troubleshooting
 
     trigger OnOpenPage()
     begin
-        if PageCaptionPrefix <> '' then
-            CurrPage.Caption := PageCaptionPrefix + ' - ' + CurrPage.Caption();
+        if CaptionCode <> '' then
+            CurrPage.Caption := CaptionCode + ' ' + CaptionDescription + ' - ' + CurrPage.Caption;
     end;
 
     var
         TblshtgSetup: Record "Troubleshooting Setup";
-        PageCaptionPrefix: Text;
+        CaptionCode: Code[20];
+        CaptionDescription: Text[30];
 
     procedure SetCaption(CaptionCode2: Code[20]; CaptionDescription2: Text[30])
     begin
-        PageCaptionPrefix := '';
-        if CaptionCode2 <> '' then
-            PageCaptionPrefix := CaptionCode2 + ' ' + CaptionDescription2;
-    end;
-
-    procedure SetPageCaptionPrefix(PageCaptionPrefixToSet: Text)
-    begin
-        PageCaptionPrefix := PageCaptionPrefixToSet;
+        CaptionCode := CaptionCode2;
+        CaptionDescription := CaptionDescription2;
     end;
 }
 
