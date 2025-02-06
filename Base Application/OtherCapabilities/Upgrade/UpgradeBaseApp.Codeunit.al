@@ -13,6 +13,7 @@ using Microsoft.CRM.Team;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
 using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Setup;
 using Microsoft.EServices.EDocument;
 using Microsoft.EServices.OnlineMap;
 using Microsoft.Finance.Currency;
@@ -32,6 +33,7 @@ using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Task;
 using Microsoft.Foundation.UOM;
 using Microsoft.HumanResources.Employee;
+using Microsoft.Inventory.Costing;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Entity;
@@ -147,8 +149,8 @@ codeunit 104000 "Upgrade - BaseApp"
 
     trigger OnUpgradePerCompany()
     begin
-        CleanupServiceConnectionTable();
-        
+        CleanupTempTables();
+
         if not HybridDeployment.VerifyCanStartUpgrade(CompanyName()) then
             exit;
 
@@ -232,11 +234,17 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeVATSetupAllowVATDate();
     end;
 
-    local procedure CleanupServiceConnectionTable()
+    local procedure CleanupTempTables()
     var
+        AccSchedCellValue: Record "Acc. Sched. Cell Value";
+        InvtPostingBuffer: Record "Invt. Posting Buffer";
         ServiceConnection: Record "Service Connection";
+        PaymentReportingArgument: Record "Payment Reporting Argument";
     begin
         ServiceConnection.DeleteAll();
+        PaymentReportingArgument.DeleteAll();
+        AccSchedCellValue.DeleteAll();
+        InvtPostingBuffer.DeleteAll();
     end;
 
     local procedure ClearTemporaryTables()
