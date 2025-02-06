@@ -304,7 +304,7 @@ codeunit 135086 "Power BI REST Tests"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Azure AD Auth Flow", 'OnAcquireTokenFromCache', '', false, false)]
     local procedure InjectAccessTokenCache(ResourceName: Text; var AccessToken: Text)
     begin
-        if ResourceName <> 'https://analysis.windows.net/powerbi/api' then
+        if ResourceName <> 'https://api.fabric.microsoft.com' then
             Error('Unexpected resource name.');
 
         if MockServiceToken = '' then
