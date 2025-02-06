@@ -27,7 +27,7 @@ codeunit 36961 "Setup Helper"
     procedure GetReportIdAndEnsureSetup(ReportName: Text; FieldId: Integer): Guid
     var
         PowerBiReportsSetup: Record "PowerBI Reports Setup";
-        AssistedSetup: Page "PowerBI Assisted Setup";
+        AssistedSetup: Page "Assisted Setup";
 
         RecRef: RecordRef;
         FldRef: FieldRef;
