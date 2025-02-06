@@ -119,7 +119,7 @@ table 156 Resource
         }
         field(10; "Job Title"; Text[30])
         {
-            Caption = 'Job Title';
+            Caption = 'Project Title';
         }
         field(11; Education; Text[30])
         {
@@ -951,17 +951,11 @@ table 156 Resource
             Filter := GetQuotedCode(UnitofMeasureCode);
     end;
 
-    local procedure ExistUnprocessedTimeSheets() Result: Boolean
+    local procedure ExistUnprocessedTimeSheets(): Boolean
     var
         TimeSheetHeader: Record "Time Sheet Header";
         TimeSheetLine: Record "Time Sheet Line";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeExistUnprocessedTimeSheets(Rec, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         TimeSheetHeader.SetCurrentKey("Resource No.");
         TimeSheetHeader.SetRange("Resource No.", "No.");
         if TimeSheetHeader.FindSet() then
@@ -1108,11 +1102,6 @@ table 156 Resource
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateTimeSheets(var Resource: Record "Resource"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeExistUnprocessedTimeSheets(Resource: Record Resource; var Result: Boolean; var IsHandled: boolean);
     begin
     end;
 }
