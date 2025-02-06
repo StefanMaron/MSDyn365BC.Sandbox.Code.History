@@ -190,7 +190,7 @@ table 6550 "Whse. Item Tracking Line"
         {
             Caption = 'Source Type Filter';
             FieldClass = FlowFilter;
-            OptionCaption = ' ,Receipt,Shipment,Internal Put-away,Internal Pick,Production,Movement Worksheet,Assembly,Project';
+            OptionCaption = ' ,Receipt,Shipment,Internal Put-away,Internal Pick,Production,Movement Worksheet,Assembly,Job';
             OptionMembers = " ",Receipt,Shipment,"Internal Put-away","Internal Pick",Production,"Movement Worksheet",Assembly,Job;
         }
         field(91; "Qty. Registered (Base)"; Decimal)
