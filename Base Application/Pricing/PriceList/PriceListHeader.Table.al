@@ -403,14 +403,7 @@ table 7000 "Price List Header"
 
     procedure IsEditable() Result: Boolean;
     begin
-        case Status of
-            Status::Draft:
-                exit(true);
-            Status::Active:
-                exit(IsAllowedEditingActivePrice());
-            else
-                exit(false);
-        end;
+        Result := (Status = Status::Draft) or (Status = Status::Active) and IsAllowedEditingActivePrice();
     end;
 
     local procedure IsAllowedEditingActivePrice(): Boolean;
@@ -563,10 +556,7 @@ table 7000 "Price List Header"
         xAmountType: Enum "Price Amount Type";
     begin
         xAmountType := "Amount Type";
-        if "Source Type" in ["Source Type"::"Customer Disc. Group", "Source Type"::"Customer Price Group"] then
-            "Amount Type" := PriceSource.GetDefaultAmountType()
-        else
-            "Amount Type" := CalcAmountType();
+        "Amount Type" := CalcAmountType();
         if "Amount Type" <> xAmountType then
             Modify()
     end;
