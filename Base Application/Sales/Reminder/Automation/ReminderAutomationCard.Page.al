@@ -20,19 +20,11 @@ page 6752 "Reminder Automation Card"
         {
             group(General)
             {
-                Caption = 'General';
                 field(Code; Rec.Code)
                 {
                     ApplicationArea = All;
-                    NotBlank = true;
                     Caption = 'Code';
                     ToolTip = 'Specifies a unique code for the reminder action group.';
-
-                    trigger OnValidate()
-                    begin
-                        if Rec.Code <> '' then
-                            CurrPage.ReminderActionsPart.Page.EnableActions();
-                    end;
                 }
                 field(Description; Rec.Description)
                 {
@@ -331,8 +323,6 @@ page 6752 "Reminder Automation Card"
     trigger OnAfterGetCurrRecord()
     begin
         RefreshGlobals();
-        if Rec.Code <> '' then
-            CurrPage.ReminderActionsPart.Page.EnableActions();
     end;
 
     trigger OnOpenPage()
