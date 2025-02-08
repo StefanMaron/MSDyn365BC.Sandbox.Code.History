@@ -360,7 +360,6 @@ report 7391 "Whse. Get Bin Content"
         ItemTrackingSetup: Record "Item Tracking Setup";
         WarehouseEntry: Record "Warehouse Entry";
         TempTrackingSpecification: Record "Tracking Specification" temporary;
-        WhseItemTrackingSetup: Record "Item Tracking Setup";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         ItemJnlLineReserve: Codeunit "Item Jnl. Line-Reserve";
         TransferLineReserve: Codeunit "Transfer Line-Reserve";
@@ -375,18 +374,13 @@ report 7391 "Whse. Get Bin Content"
             exit;
 
         Clear(ItemTrackingMgt);
-        if not ItemTrackingMgt.GetWhseItemTrkgSetup(BinContent."Item No.", WhseItemTrackingSetup) then
+        if not ItemTrackingMgt.GetWhseItemTrkgSetup(BinContent."Item No.") then
             exit;
 
         WarehouseEntry.Reset();
-        if WhseItemTrackingSetup."Serial No. Required" then
-            WarehouseEntry.SetCurrentKey(
-                "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
-                "Package No.", "Serial No.", "Entry Type", Dedicated)
-        else
-            WarehouseEntry.SetCurrentKey(
-              "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
-              "Lot No.", "Package No.", "Serial No.", "Entry Type", Dedicated);
+        WarehouseEntry.SetCurrentKey(
+          "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
+          "Lot No.", "Package No.", "Serial No.", "Entry Type", Dedicated);
         WarehouseEntry.SetRange("Item No.", BinContent."Item No.");
         WarehouseEntry.SetRange("Bin Code", BinContent."Bin Code");
         WarehouseEntry.SetRange("Location Code", BinContent."Location Code");
@@ -422,7 +416,8 @@ report 7391 "Whse. Get Bin Content"
                         end;
                     end;
                     WarehouseEntry.Find('+');
-                    WarehouseEntry.ClearTrackingFilter();
+                    if WarehouseEntry.Quantity > 0 then
+                        WarehouseEntry.ClearTrackingFilter();
                 end;
                 if DestinationType2 in [DestinationType2::ItemJournalLine, DestinationType2::TransferHeader] then
                     InsertTempTrackingSpecification(WarehouseEntry, TrackedQtyToEmptyBase, TempTrackingSpecification);
