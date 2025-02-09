@@ -2,7 +2,11 @@ namespace Microsoft.PowerBIReports;
 
 using Microsoft.Purchases.Vendor;
 
+#pragma warning disable AS0125
+#pragma warning disable AS0030
 page 36959 "Vendors - PBI API"
+#pragma warning restore AS0030
+#pragma warning restore AS0125
 {
     PageType = API;
     Caption = 'Power BI Vendors';
