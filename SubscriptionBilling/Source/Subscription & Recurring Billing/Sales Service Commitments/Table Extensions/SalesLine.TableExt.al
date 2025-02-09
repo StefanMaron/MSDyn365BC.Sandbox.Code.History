@@ -94,12 +94,8 @@ tableextension 8054 "Sales Line" extends "Sales Line"
         modify("Line Discount %")
         {
             trigger OnAfterValidate()
-            var
-                SalesServiceCommitmentMgmt: Codeunit "Sales Service Commitment Mgmt.";
             begin
                 UpdateSalesServiceCommitmentCalculationBaseAmount(Rec, xRec);
-                if Rec."Line Discount %" <> xRec."Line Discount %" then
-                    SalesServiceCommitmentMgmt.NotifyIfDiscountIsNotTransferredFromSalesLine(Rec);
             end;
         }
         modify("Customer Price Group")
@@ -124,12 +120,8 @@ tableextension 8054 "Sales Line" extends "Sales Line"
         modify("Allow Invoice Disc.")
         {
             trigger OnAfterValidate()
-            var
-                Item: Record Item;
             begin
-                if Rec."Allow Invoice Disc." then
-                    if IsServiceCommitmentItem() then
-                        Error(Item.GetDoNotAllowInvoiceDiscountForServiceCommitmentItemErrorText());
+                ErrorIfItemIsServiceCommitmentItem();
             end;
         }
     }
@@ -218,13 +210,16 @@ tableextension 8054 "Sales Line" extends "Sales Line"
         end;
     end;
 
-    internal procedure IsServiceCommitmentItem(): Boolean
+    local procedure ErrorIfItemIsServiceCommitmentItem()
+    var
+        Item: Record Item;
     begin
-        if (Rec.Type <> Rec.Type::Item) or ("No." = '') then
-            exit(false);
-        if Rec."Service Commitment Option".AsInteger() = 0 then
-            Rec.CalcFields("Service Commitment Option");
-        exit(Rec."Service Commitment Option" = "Item Service Commitment Type"::"Service Commitment Item");
+        if Rec.Type <> Rec.Type::Item then
+            exit;
+        if Rec."Allow Invoice Disc." then
+            if Item.Get(Rec."No.") then
+                if Item.IsServiceCommitmentItem() then
+                    Error(Item.GetDoNotAllowInvoiceDiscountForServiceCommitmentItemErrorText());
     end;
 
     local procedure ErrorIfServiceObjectTypeCannotBeSelectedManually()
@@ -305,7 +300,9 @@ tableextension 8054 "Sales Line" extends "Sales Line"
     var
         BillingLine: Record "Billing Line";
     begin
-        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromSalesDocumentType(Rec."Document Type"), Rec."Document No.", Rec."Line No.");
+        BillingLine.SetRange("Document Type", BillingLine.GetBillingDocumentTypeFromSalesDocumentType(Rec."Document Type"));
+        BillingLine.SetRange("Document No.", Rec."Document No.");
+        BillingLine.SetRange("Document Line No.", Rec."Line No.");
         exit(not BillingLine.IsEmpty());
     end;
 
