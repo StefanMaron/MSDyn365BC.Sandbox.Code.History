@@ -414,6 +414,7 @@ codeunit 99000774 "Calculate Routing Line"
         CalendarEntry.SetCapacityFilters(CapType, CapNo);
         CalendarEntry.SetRange("Ending Date-Time", 0DT, CreateDateTime(ProdEndingDate + 1, ProdEndingTime));
         CalendarEntry.SetRange("Starting Date-Time", 0DT, CreateDateTime(ProdEndingDate, ProdEndingTime));
+        OnLoadCapBackOnAfterSetCalendarEntryFilters(CalendarEntry);
 
         CreateLoadBack(TimeType, Write);
 
@@ -446,6 +447,7 @@ codeunit 99000774 "Calculate Routing Line"
             CalendarEntry.SetFilter("Ending Date-Time", '>=%1', CreateDateTime(ProdStartingDate, ProdStartingTime));
 
         if ProdOrderRoutingLine."Schedule Manually" and (TimeType = TimeType::"Run Time") then begin
+            OnLoadCapForwardOnScheduleManuallyOnBeforeCheckDateTimes(ProdOrderRoutingLine, CapType, CapNo, TimeType, ProdStartingDate, ProdStartingTime, RemainNeedQty, RunStartingDateTime, RunEndingDateTime);
             if (RunEndingDateTime < RunStartingDateTime) or
                ((RunEndingDateTime = RunStartingDateTime) and
                 (ProdOrderRoutingLine."Run Time" <> 0) and
@@ -1376,6 +1378,7 @@ codeunit 99000774 "Calculate Routing Line"
         CalendarEntry.SetCapacityFilters(ProdOrderRoutingLine.Type, ProdOrderRoutingLine."No.");
         CalendarEntry.SetFilter("Starting Date-Time", '<= %1', ProdEndingDateTime);
         CalendarEntry.SetFilter("Ending Date-Time", '<= %1', ProdEndingDateTimeAddOneDay);
+        OnFinitelyLoadCapBackOnAfterSetCalendarEntryFilters(CalendarEntry);
         if CalendarEntry.Find('+') then
             repeat
                 if (EndTime > CalendarEntry."Ending Time") or (EndTime < CalendarEntry."Starting Time") or
@@ -1672,7 +1675,13 @@ codeunit 99000774 "Calculate Routing Line"
     local procedure UpdateTimesBack(var AvailTime: Decimal; var AvailCap: Decimal; var TimetoProgram: Decimal; var StartTime: Time; EndTime: Time)
     var
         RoundedTimetoProgram: Decimal;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateTimesBack(CalendarEntry, ProdOrderRoutingLine, AvailTime, AvailCap, TimetoProgram, StartTime, EndTime, ConCurrCap, Workcenter, RemainNeedQty, IsHandled);
+        if IsHandled then
+            exit;
+
         AvailTime :=
           Round(AvailTime / CalendarMgt.TimeFactor(Workcenter."Unit of Measure Code") *
             CalendarEntry.Efficiency / 100 * ConCurrCap, Workcenter."Calendar Rounding Precision");
@@ -1690,7 +1699,13 @@ codeunit 99000774 "Calculate Routing Line"
     local procedure UpdateTimesForward(var AvailTime: Decimal; var AvailCap: Decimal; var TimetoProgram: Decimal; StartTime: Time; var EndTime: Time)
     var
         RoundedTimetoProgram: Decimal;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateTimesForward(CalendarEntry, ProdOrderRoutingLine, AvailTime, AvailCap, TimetoProgram, StartTime, EndTime, ConCurrCap, Workcenter, RemainNeedQty, IsHandled);
+        if IsHandled then
+            exit;
+
         AvailTime :=
           Round(AvailTime / CalendarMgt.TimeFactor(Workcenter."Unit of Measure Code") *
             CalendarEntry.Efficiency / 100 * ConCurrCap, Workcenter."Calendar Rounding Precision");
@@ -1815,6 +1830,7 @@ codeunit 99000774 "Calculate Routing Line"
     begin
         CalendarEntry2 := OldCalendarEntry;
         CalendarEntry2.SetRange(Date, CalendarEntry2.Date);
+        OnReturnNextCalendarEntryOnAfterSetCalendarEntryDateFilter(CalendarEntry);
 
         if Direction = Direction::Backward then begin
             CalendarEntry2.Find('-');           // rewind within the same day
@@ -2279,6 +2295,36 @@ codeunit 99000774 "Calculate Routing Line"
 
     [IntegrationEvent(false, false)]
     procedure OnBeforeCalculateRoutingLine(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; Direction: Option Forward,Backward; CalcStartEndDate: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLoadCapForwardOnScheduleManuallyOnBeforeCheckDateTimes(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; CapType: Enum "Capacity Type"; CapNo: Code[20]; TimeType: Enum "Routing Time Type"; var ProdStartingDate: Date; var ProdStartingTime: Time; RemainNeedQty: Decimal; var RunStartingDateTime: DateTime; var RunEndingDateTime: DateTime)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateTimesBack(CalendarEntry: Record "Calendar Entry"; ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var AvailTime: Decimal; var AvailCap: Decimal; var TimetoProgram: Decimal; var StartTime: Time; EndTime: Time; ConCurrCap: Decimal; Workcenter: Record "Work Center"; var RemainNeedQty: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateTimesForward(CalendarEntry: Record "Calendar Entry"; ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var AvailTime: Decimal; var AvailCap: Decimal; var TimetoProgram: Decimal; var StartTime: Time; EndTime: Time; ConCurrCap: Decimal; Workcenter: Record "Work Center"; var RemainNeedQty: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReturnNextCalendarEntryOnAfterSetCalendarEntryDateFilter(var CalendarEntry: Record "Calendar Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFinitelyLoadCapBackOnAfterSetCalendarEntryFilters(var CalendarEntry: Record "Calendar Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLoadCapBackOnAfterSetCalendarEntryFilters(var CalendarEntry: Record "Calendar Entry")
     begin
     end;
 }
