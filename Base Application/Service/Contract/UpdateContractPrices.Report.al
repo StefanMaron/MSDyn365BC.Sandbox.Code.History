@@ -23,7 +23,6 @@ report 6031 "Update Contract Prices"
             trigger OnAfterGetRecord()
             var
                 NumberOfPeriods: Integer;
-                IsHandled: Boolean;
             begin
                 ServContract.Get("Contract Type", "Contract No.");
                 ServContract.SuspendStatusCheck(true);
@@ -76,16 +75,12 @@ report 6031 "Update Contract Prices"
                       TotContractLinesAmount - ServContract."Annual Amount", '');
 
                     ServContract."Annual Amount" := TotContractLinesAmount;
-                    IsHandled := false;
-                    OnBeforeCalcAnnualAmt(ServContract, IsHandled);
-                    if not IsHandled then begin
-                        NumberOfPeriods := ReturnNoOfPer(ServContract."Invoice Period");
-                        if NumberOfPeriods = 0 then
-                            ServContract."Amount per Period" := 0
-                        else
-                            ServContract."Amount per Period" :=
-                                Round(ServContract."Annual Amount" / NumberOfPeriods, Currency."Amount Rounding Precision");
-                    end;
+                    NumberOfPeriods := ReturnNoOfPer(ServContract."Invoice Period");
+                    if NumberOfPeriods = 0 then
+                        ServContract."Amount per Period" := 0
+                    else
+                        ServContract."Amount per Period" :=
+                            Round(ServContract."Annual Amount" / NumberOfPeriods, Currency."Amount Rounding Precision");
                     if OldAnnualAmount <> ServContract."Annual Amount" then
                         ServContract."Print Increase Text" := true;
                     ServContract.Modify();
@@ -208,11 +203,6 @@ report 6031 "Update Contract Prices"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeServiceContractLineModify(var ServiceContractLine: Record "Service Contract Line"; ServiceContractHeader: Record "Service Contract Header"; UpdateToDate: Date; PriceUpdPct: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcAnnualAmt(var ServiceContractHeader: Record "Service Contract Header"; var IsHandled: Boolean)
     begin
     end;
 }
