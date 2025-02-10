@@ -18,7 +18,7 @@ page 8080 "Closed Cust. Cont. Line Subp."
             {
                 field(Closed; Rec.Closed)
                 {
-                    ToolTip = 'Specifies that the associated service has ended.';
+                    ToolTip = 'Indicates that the associated service has ended.';
                     trigger OnValidate()
                     begin
                         CurrPage.Update();
