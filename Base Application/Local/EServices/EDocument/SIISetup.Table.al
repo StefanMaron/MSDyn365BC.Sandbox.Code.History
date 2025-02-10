@@ -4,7 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.EServices.EDocument;
 
-using System;
 using System.Privacy;
 using System.Security.Encryption;
 using System.Telemetry;
@@ -28,11 +27,7 @@ table 10751 "SII Setup"
             trigger OnValidate()
             var
                 CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
-                MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-                MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-                MyALAuditCategory: DotNet ALAuditCategory;
                 IsHandled: Boolean;
-                SIISetupConsentProvidedLbl: Label 'SII Setup - consent provided.', Locked = true;
             begin
                 IsHandled := false;
                 OnBeforeValidateEnabled(Rec, IsHandled);
@@ -43,8 +38,6 @@ table 10751 "SII Setup"
                     Error(CannotEnableWithoutCertificateErr);
                 IF Enabled then
                     Enabled := CustomerConsentMgt.ConfirmUserConsent();
-                if Enabled then
-                    MyCustomerAuditLoggerALHelper.LogAuditMessage(SIISetupConsentProvidedLbl, MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 4, 0);
             end;
         }
         field(3; Certificate; BLOB)
