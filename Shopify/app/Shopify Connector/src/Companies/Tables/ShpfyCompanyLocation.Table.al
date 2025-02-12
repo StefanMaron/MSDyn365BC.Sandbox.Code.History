@@ -68,11 +68,6 @@ table 30151 "Shpfy Company Location"
             Caption = 'Province Name';
             DataClassification = CustomerContent;
         }
-        field(12; "Tax Registration Id"; Text[150])
-        {
-            Caption = 'Tax Registration Id';
-            DataClassification = CustomerContent;
-        }
     }
     keys
     {

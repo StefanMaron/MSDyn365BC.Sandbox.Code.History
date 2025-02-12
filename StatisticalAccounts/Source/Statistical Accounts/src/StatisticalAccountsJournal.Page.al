@@ -32,7 +32,6 @@ page 2633 "Statistical Accounts Journal"
                     begin
                         CurrPage.SaveRecord();
                         Rec.LookupBatchName(CurrentJnlBatchName, Rec);
-                        CurrPage.Update(false)
                     end;
 
                     trigger OnValidate()

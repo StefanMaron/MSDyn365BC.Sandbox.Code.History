@@ -24,6 +24,7 @@ codeunit 30189 "Shpfy Variant API"
         Product: Record "Shpfy Product";
         Variant: Record "Shpfy Variant";
         ProductImport: Codeunit "Shpfy Product Import";
+
     begin
         Found := FindShopifyVariantBySKU(ShopifyVariant);
         if not Found then
@@ -40,17 +41,17 @@ codeunit 30189 "Shpfy Variant API"
                     Product.Modify();
                 end;
             end;
-            if Variant.Get(ShopifyVariant.Id) then begin
+            if Variant.Get(ShopifyVariant.Id) then
                 if IsNullGuid(Variant."Item Variant SystemId") then begin
                     Variant."Item Variant SystemId" := ShopifyVariant."Item Variant SystemId";
                     Variant."Item SystemId" := ShopifyVariant."Item SystemId";
                     Variant.Modify();
+                end
+                else begin
+                    Clear(Variant);
+                    Variant := ShopifyVariant;
+                    Variant.Insert();
                 end;
-            end else begin
-                Clear(Variant);
-                Variant := ShopifyVariant;
-                Variant.Insert();
-            end;
         end;
     end;
 

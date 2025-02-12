@@ -15,11 +15,6 @@ codeunit 139613 "Shpfy Webhooks Subscriber"
         JDeleteWebhook := DeleteWebhook;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Shpfy Webhooks Mgt.", 'OnScheduleWebhookNotificationTask', '', true, false)]
-    local procedure OnScheduleWebhookNotificationTask(var IsTestInProgress: Boolean)
-    begin
-        IsTestInProgress := true;
-    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Shpfy Communication Events", 'OnClientSend', '', true, false)]
     local procedure OnClientSend(HttpRequestMessage: HttpRequestMessage; var HttpResponseMessage: HttpResponseMessage)
