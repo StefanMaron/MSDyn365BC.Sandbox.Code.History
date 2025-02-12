@@ -7,7 +7,6 @@ namespace Microsoft.Integration.Dataverse;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Utilities;
-using System;
 using System.Environment;
 using System.Privacy;
 using System.Security.Encryption;
@@ -71,10 +70,6 @@ table 7200 "CDS Connection Setup"
             var
                 CRMConnectionSetup: Record "CRM Connection Setup";
                 CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
-                MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-                MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-                MyALAuditCategory: DotNet ALAuditCategory;
-                CDSConnectionConsentLbl: Label 'CDS Connection Setup - consent provided by UserSecurityId %1.', Locked = true;
             begin
                 if not "Is Enabled" then begin
                     if CRMConnectionSetup.Get() then
@@ -85,7 +80,7 @@ table 7200 "CDS Connection Setup"
                 end;
 
                 Session.LogMessage('0000CDS', CDSConnEnabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
-                MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(CDSConnectionConsentLbl, UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 4, 0);
+
 
                 if IsTemporary() then begin
                     CDSIntegrationImpl.CheckConnectionRequiredFields(Rec, false);
@@ -375,14 +370,14 @@ table 7200 "CDS Connection Setup"
     procedure GetPassword(): Text
     var
         IsolatedStorageManagement: Codeunit "Isolated Storage Management";
-        Value: SecretText;
+        Value: Text;
     begin
         if IsTemporary() then
             exit(TempUserPassword);
 
         if not IsNullGuid("User Password Key") then
             if IsolatedStorageManagement.Get("User Password Key", DATASCOPE::Company, Value) then
-                exit(Value.Unwrap());
+                exit(Value);
 
         exit('');
     end;
