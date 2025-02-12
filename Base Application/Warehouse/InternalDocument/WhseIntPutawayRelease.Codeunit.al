@@ -26,7 +26,6 @@ codeunit 7316 "Whse. Int. Put-away Release"
         Location: Record Location;
         WhsePutawayRqst: Record "Whse. Put-away Request";
         WhseInternalPutawayLine: Record "Whse. Internal Put-away Line";
-        SuppressCommit: Boolean;
     begin
         if WhseInternalPutAwayHeader.Status = WhseInternalPutAwayHeader.Status::Released then
             exit;
@@ -62,9 +61,7 @@ codeunit 7316 "Whse. Int. Put-away Release"
         WhsePutawayRqst.SetRange(Status, WhseInternalPutAwayHeader.Status::Open);
         WhsePutawayRqst.DeleteAll(true);
 
-        OnReleaseOnBeforeCommit(WhseInternalPutAwayHeader, SuppressCommit);
-        if not SuppressCommit then
-            Commit();
+        Commit();
     end;
 
     procedure Reopen(WhseInternalPutAwayHeader: Record "Whse. Internal Put-away Header")
@@ -86,7 +83,6 @@ codeunit 7316 "Whse. Int. Put-away Release"
         WhseActivLine.SetRange("Whse. Document No.", WhseInternalPutAwayHeader."No.");
         WhseActivLine.SetRange("Whse. Document Type", WhseActivLine."Whse. Document Type"::"Internal Put-away");
         WhseActivLine.SetRange("Activity Type", WhseActivLine."Activity Type"::"Put-away");
-        OnReopenOnBeforeWhseActivLineIsEmpty(WhseInternalPutAwayHeader, WhseActivLine);
         if not WhseActivLine.IsEmpty() then
             Error(Text002);
 
@@ -118,16 +114,6 @@ codeunit 7316 "Whse. Int. Put-away Release"
           WhseInternalPutAwayHeader."Document Status" = WhseInternalPutAwayHeader."Document Status"::"Completely Put Away";
         if not WhsePutawayRqst.Insert() then
             WhsePutawayRqst.Modify();
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnReopenOnBeforeWhseActivLineIsEmpty(WhseInternalPutAwayHeader: Record "Whse. Internal Put-away Header"; var WarehouseActivityLine: Record "Warehouse Activity Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnReleaseOnBeforeCommit(WhseInternalPutAwayHeader: Record "Whse. Internal Put-away Header"; var SuppressCommit: Boolean)
-    begin
     end;
 }
 
