@@ -1521,9 +1521,6 @@ table 81 "Gen. Journal Line"
                    ("Bank Payment Type" <> "Bank Payment Type"::" ")
                 then
                     FieldError("Account Type");
-
-                if Rec."Bank Payment Type" <> xRec."Bank Payment Type" then
-                    Rec.DeletePaymentFileErrors();
             end;
         }
         field(71; "VAT Base Amount"; Decimal)
