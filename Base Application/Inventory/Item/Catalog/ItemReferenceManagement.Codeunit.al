@@ -29,7 +29,6 @@ codeunit 5720 "Item Reference Management"
 
     procedure EnterSalesItemReference(var SalesLine2: Record "Sales Line")
     var
-        SalesLineBeforeChanges: Record "Sales Line";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -39,7 +38,6 @@ codeunit 5720 "Item Reference Management"
 
         if SalesLine2.Type = SalesLine2.Type::Item then begin
             FindItemReferenceForSalesLine(SalesLine2);
-            SalesLineBeforeChanges.Copy(SalesLine2);
 
             if Found then begin
                 SalesLine2."Item Reference No." := GlobalItemReference."Reference No.";
@@ -50,7 +48,7 @@ codeunit 5720 "Item Reference Management"
                     SalesLine2."Description 2" := GlobalItemReference."Description 2";
                 end;
                 SalesLine2."Item Reference Type No." := GlobalItemReference."Reference Type No.";
-                OnAfterSalesItemReferenceFound(SalesLine2, GlobalItemReference, SalesLineBeforeChanges);
+                OnAfterSalesItemReferenceFound(SalesLine2, GlobalItemReference);
             end else begin
                 SalesLine2."Item Reference No." := '';
                 SalesLine2."Item Reference Type" := SalesLine2."Item Reference Type"::" ";
@@ -59,15 +57,15 @@ codeunit 5720 "Item Reference Management"
                     GlobalItemVariant.Get(SalesLine2."No.", SalesLine2."Variant Code");
                     SalesLine2.Description := GlobalItemVariant.Description;
                     SalesLine2."Description 2" := GlobalItemVariant."Description 2";
-                    OnEnterSalesItemReferenceOnAfterFillDescriptionFromItemVariant(SalesLine2, GlobalItemVariant, SalesLineBeforeChanges);
+                    OnEnterSalesItemReferenceOnAfterFillDescriptionFromItemVariant(SalesLine2, GlobalItemVariant);
                 end else begin
                     GlobalItem.Get(SalesLine2."No.");
                     SalesLine2.Description := GlobalItem.Description;
                     SalesLine2."Description 2" := GlobalItem."Description 2";
-                    OnEnterSalesItemReferenceOnAfterFillDescriptionFromItem(SalesLine2, GlobalItem, SalesLineBeforeChanges);
+                    OnEnterSalesItemReferenceOnAfterFillDescriptionFromItem(SalesLine2, GlobalItem);
                 end;
                 SalesLine2.GetItemTranslation();
-                OnAfterSalesItemItemRefNotFound(SalesLine2, GlobalItemVariant, SalesLineBeforeChanges);
+                OnAfterSalesItemItemRefNotFound(SalesLine2, GlobalItemVariant);
             end;
         end;
     end;
@@ -543,7 +541,7 @@ codeunit 5720 "Item Reference Management"
         case SalesLine.Type of
             SalesLine.Type::Item:
                 begin
-                    SalesLine.SetSalesHeader(SalesHeader);
+                    SalesLine.GetSalesHeader();
                     ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
                     ItemReference2.SetFilter("Reference Type", '%1|%2', ItemReference2."Reference Type"::Customer, ItemReference2."Reference Type"::" ");
                     ItemReference2.SetFilter("Reference Type No.", '%1|%2', SalesHeader."Sell-to Customer No.", '');
@@ -562,7 +560,7 @@ codeunit 5720 "Item Reference Management"
                 end;
             SalesLine.Type::"G/L Account", SalesLine.Type::Resource:
                 begin
-                    SalesLine.SetSalesHeader(SalesHeader);
+                    SalesLine.GetSalesHeader();
                     SalesHeader.TestField("Sell-to IC Partner Code");
                     if PAGE.RunModal(PAGE::"IC G/L Account List", ICGLAcc) = ACTION::LookupOK then
                         SalesLine."Item Reference No." := ICGLAcc."No.";
@@ -972,12 +970,12 @@ codeunit 5720 "Item Reference Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterSalesItemReferenceFound(var SalesLine: Record "Sales Line"; ItemReference: Record "Item Reference"; SalesLineBeforeChanges: Record "Sales Line")
+    local procedure OnAfterSalesItemReferenceFound(var SalesLine: Record "Sales Line"; ItemReference: Record "Item Reference")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterSalesItemItemRefNotFound(var SalesLine: Record "Sales Line"; var ItemVariant: Record "Item Variant"; SalesLineBeforeChanges: Record "Sales Line")
+    local procedure OnAfterSalesItemItemRefNotFound(var SalesLine: Record "Sales Line"; var ItemVariant: Record "Item Variant")
     begin
     end;
 
@@ -1210,12 +1208,12 @@ codeunit 5720 "Item Reference Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnEnterSalesItemReferenceOnAfterFillDescriptionFromItem(var SalesLine: Record "Sales Line"; var Item: Record Item; SalesLineBeforeChanges: Record "Sales Line")
+    local procedure OnEnterSalesItemReferenceOnAfterFillDescriptionFromItem(var SalesLine: Record "Sales Line"; var Item: Record Item);
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnEnterSalesItemReferenceOnAfterFillDescriptionFromItemVariant(var SalesLine: Record "Sales Line"; var ItemVariant: Record "Item Variant"; SalesLineBeforeChanges: Record "Sales Line")
+    local procedure OnEnterSalesItemReferenceOnAfterFillDescriptionFromItemVariant(var SalesLine: Record "Sales Line"; var ItemVariant: Record "Item Variant");
     begin
     end;
 
