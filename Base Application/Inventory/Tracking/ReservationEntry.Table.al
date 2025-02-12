@@ -293,9 +293,6 @@ table 337 "Reservation Entry"
         {
             IncludedFields = "Reservation Status", "Quantity (Base)", "Lot No.", "Package No.", Binding;
         }
-        key(Key12; Positive, "Reservation Status", "Source Type")
-        {
-        }
     }
 
     fieldgroups
