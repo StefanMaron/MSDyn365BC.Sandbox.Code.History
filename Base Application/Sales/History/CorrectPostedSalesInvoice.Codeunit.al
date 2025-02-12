@@ -33,7 +33,6 @@ codeunit 1303 "Correct Posted Sales Invoice"
     trigger OnRun()
     var
         SalesHeader: Record "Sales Header";
-        NoSeries: Codeunit "No. Series";
         IsHandled: Boolean;
     begin
         UnapplyCostApplication(Rec."No.");
@@ -45,13 +44,9 @@ codeunit 1303 "Correct Posted Sales Invoice"
         if SalesInvoiceLinesContainJob(Rec."No.") then
             CreateAndProcessJobPlanningLines(SalesHeader);
 
-        SuppressCommit := not NoSeries.IsNoSeriesInDateOrder(SalesHeader."Posting No. Series");
-
         IsHandled := false;
-        OnRunOnBeforePostCorrectiveSalesCrMemo(Rec, SalesHeader, IsHandled, SuppressCommit);
+        OnRunOnBeforePostCorrectiveSalesCrMemo(Rec, SalesHeader, IsHandled);
         if not IsHandled then begin
-            if not SuppressCommit then
-                Commit();
             CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
             SetTrackInfoForCancellation(Rec);
             UpdateSalesOrderLinesFromCancelledInvoice(Rec."No.");
@@ -64,7 +59,6 @@ codeunit 1303 "Correct Posted Sales Invoice"
     var
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
         CancellingOnly: Boolean;
-        SuppressCommit: Boolean;
 
         PostedInvoiceIsPaidCorrectErr: Label 'You cannot correct this posted sales invoice because it is fully or partially paid.\\To reverse a paid sales invoice, you must manually create a sales credit memo.';
         PostedInvoiceIsPaidCancelErr: Label 'You cannot cancel this posted sales invoice because it is fully or partially paid.\\To reverse a paid sales invoice, you must manually create a sales credit memo.';
@@ -291,6 +285,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
     begin
         CancellingOnly := Cancelling;
 
+        TestSalesInvoiceHeaderAmount(SalesInvoiceHeader, Cancelling);
         TestIfPostingIsAllowed(SalesInvoiceHeader);
         TestIfInvoiceIsCorrectedOnce(SalesInvoiceHeader);
         TestIfInvoiceIsNotCorrectiveDoc(SalesInvoiceHeader);
@@ -307,6 +302,19 @@ codeunit 1303 "Correct Posted Sales Invoice"
         TestNotSalesPrepaymentlInvoice(SalesInvoiceHeader);
 
         OnAfterTestCorrectInvoiceIsAllowed(SalesInvoiceHeader, Cancelling);
+    end;
+
+    local procedure TestSalesInvoiceHeaderAmount(var SalesInvoiceHeader: Record "Sales Invoice Header"; Cancelling: Boolean)
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeTestSalesInvoiceHeaderAmount(SalesInvoiceHeader, Cancelling, IsHandled);
+        if IsHandled then
+            exit;
+
+        SalesInvoiceHeader.CalcFields(Amount);
+        SalesInvoiceHeader.TestField(Amount);
     end;
 
     local procedure ShowInvoiceAppliedNotification(SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -1226,7 +1234,6 @@ codeunit 1303 "Correct Posted Sales Invoice"
     begin
     end;
 
-    [Obsolete('OnBeforeTestSalesInvoiceHeaderAmount is not supported anymore.', '25.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestSalesInvoiceHeaderAmount(var SalesInvoiceHeader: Record "Sales Invoice Header"; Cancelling: Boolean; var IsHandled: Boolean)
     begin
@@ -1308,7 +1315,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnBeforePostCorrectiveSalesCrMemo(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"; var IsHandled: Boolean; var SuppressCommit: Boolean)
+    local procedure OnRunOnBeforePostCorrectiveSalesCrMemo(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 
