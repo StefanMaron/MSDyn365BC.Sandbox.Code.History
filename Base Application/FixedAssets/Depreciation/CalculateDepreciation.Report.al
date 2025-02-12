@@ -397,8 +397,6 @@ report 5692 "Calculate Depreciation"
     begin
         ActivateErrorMessageHandling("Fixed Asset");
 
-        GeneralLedgerSetup.Get();
-
         Clear(DeprBook2);
         DeprBook.Get(DeprBookCode);
 
