@@ -237,7 +237,7 @@ page 8025 "Contract Price Update"
                 Image = Refresh;
                 Scope = Page;
                 ToolTip = 'Refreshes the current view.';
-                ShortcutKey = 'F5';
+                ShortCutKey = 'F5';
                 trigger OnAction()
                 begin
                     InitTempTable();
