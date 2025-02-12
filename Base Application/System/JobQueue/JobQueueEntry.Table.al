@@ -1051,7 +1051,7 @@ table 472 "Job Queue Entry"
         "No. of Attempts to Run" := 0;
         if Status = Status::Ready then begin
             "Error Message" := '';
-            Clear("Error Message Register Id");
+            clear("Error Message Register Id");
         end;
         if "Job Timeout" = 0 then
             "Job Timeout" := DefaultJobTimeout();
@@ -1343,7 +1343,7 @@ table 472 "Job Queue Entry"
         OldParams := GetReportParameters();
         Params := REPORT.RunRequestPage("Object ID to Run", OldParams);
 
-        if (Params <> '') and (Params <> OldParams) then begin
+        if(Params <> '') and (Params <> OldParams) then begin
             "User ID" := UserId();
             SetReportParameters(Params);
         end;
