@@ -884,6 +884,57 @@ codeunit 144102 "Test SEPA PAIN 008.001.02"
         XMLReadHelper.VerifyNodeAbsence('//ns:Document/ns:CstmrCdtTrfInitn/ns:PmtInf/ns:CdtTrfTxInf/ns:Cdtr/ns:PstlAdr/ns:TwnNm');
     end;
 
+    [Test]
+    [HandlerFunctions('ProposalLineConfirmHandler,ProposalProcessedMsgHandler,GetProposalEntriesRequestPageHandler')]
+    procedure StreetTownAndPostCodeNodesWhenExportSepaIso20022Pain03AndWorldPaymentNotSetForDbtr()
+    var
+        BankAccount: Record "Bank Account";
+        Vendor: Record Vendor;
+        TransactionMode: Record "Transaction Mode";
+        StreetName: Text[70];
+        PostalCode: Text[16];
+        TownName: Text[35];
+    begin
+        // [SCENARIO 527709] Verify StrtNm, PstCd and TwnNm at Dbtor section
+        Initialize();
+
+        // [GIVEN] Update address at CompanyInformation
+        UpdateCompanyInfoAddress();
+
+        // [GIVEN] Save NameSpace
+        NameSpace := 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03';
+
+        // [GIVEN] Create Export Protocol
+        CreateExportProtocol(Report::"SEPA ISO20022 Pain 01.01.03", Codeunit::"Check SEPA ISO20022");
+
+        // [GIVEN] Create SEPA Vendor
+        SetUpSEPAVendorWithVendorBankAccount(BankAccount, Vendor, '');
+
+        // [GIVEN] Update WorldPayment as false in Transaction Mode
+        UpdateWorldPaymentOnTransactionMode(TransactionMode."Account Type"::Vendor, Vendor."Transaction Mode Code", false);
+
+        // [GIVEN] Post Purchase Invoice
+        CreateAndPostPurchaseInvoice(Vendor."No.");
+
+        // [GIVEN] Get Posted Entries
+        GetEntriesAtDate(CalcDate('<3D>', WorkDate()));
+
+        // [GIVEN] Process the proposal
+        ProcessProposals(BankAccount."No.");
+
+        // [WHEN] Export Payment History using "SEPA ISO20022 Pain 01.01.03" report.
+        ExportSEPAFile(BankAccount."No.");
+
+        // [GIVEN] Get Company Address from Company Information
+        GetCompanyAddress(StreetName, PostalCode, TownName);
+
+        // [THEN] Verify the Address, Postcode and City at CompanyInformation will be shown in xml at Dbtor side
+        XMLReadHelper.Initialize(ExportFileName, NameSpace);
+        XMLReadHelper.VerifyNodeValueByXPath('//ns:Document/ns:CstmrCdtTrfInitn/ns:PmtInf/ns:Dbtr/ns:PstlAdr/ns:StrtNm', StreetName);
+        XMLReadHelper.VerifyNodeValueByXPath('//ns:Document/ns:CstmrCdtTrfInitn/ns:PmtInf/ns:Dbtr/ns:PstlAdr/ns:PstCd', PostalCode);
+        XMLReadHelper.VerifyNodeValueByXPath('//ns:Document/ns:CstmrCdtTrfInitn/ns:PmtInf/ns:Dbtr/ns:PstlAdr/ns:TwnNm', TownName);
+    end;
+
     local procedure Initialize()
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
@@ -1698,6 +1749,57 @@ codeunit 144102 "Test SEPA PAIN 008.001.02"
         InStream.Read(ReadText, 5);
         File.Close();
         Assert.AreEqual(CheckString, ReadText, WrongSymbolFoundErr);
+    end;
+
+    local procedure CreateExportProtocol(ExportID: Integer; CheckID: Integer)
+    begin
+        ExportProtocol.Init();
+        ExportProtocol.Validate(Code, LibraryUtility.GenerateGUID());
+        ExportProtocol.Validate("Check ID", CheckID);
+        ExportProtocol.Validate("Export ID", ExportID);
+        ExportProtocol.Validate("Docket ID", 11000004);
+        ExportProtocol.Validate("Default File Names", ExportFileName);
+        ExportProtocol.Insert(true);
+    end;
+
+    local procedure UpdateCompanyInfoAddress();
+    var
+        CompanyInfo: Record "Company Information";
+        Address: Text[100];
+        PostCode: Code[20];
+        City: Text[30];
+    begin
+        Address := CopyStr(LibraryUtility.GenerateRandomXMLText(MaxStrLen(Address)), 1, MaxStrLen(Address));
+        PostCode := CopyStr(LibraryUtility.GenerateRandomXMLText(MaxStrLen(PostCode)), 1, MaxStrLen(PostCode));
+        City := CopyStr(LibraryUtility.GenerateRandomXMLText(MaxStrLen(City)), 1, MaxStrLen(City));
+
+        CompanyInfo.Get();
+        CompanyInfo.Validate(Address, CopyStr(Address, 1, 50));
+        CompanyInfo.Validate("Address 2", CopyStr(Address, 51, 100));
+        CompanyInfo."Post Code" := PostCode;
+        CompanyInfo.City := City;
+        CompanyInfo.Modify();
+    end;
+
+    local procedure GetCompanyAddress(var StreetName: Text[70]; var PostalCode: Text[16]; var TownName: Text[35])
+    var
+        CompanyInfo: Record "Company Information";
+    begin
+        CompanyInfo.Get();
+        StreetName := CopyStr(DelChr(CompanyInfo.Address, '<>') + ' ' + DelChr(CompanyInfo."Address 2", '<>'), 1, MaxStrLen(StreetName));
+        PostalCode := CopyStr(DelChr(CompanyInfo."Post Code", '<>'), 1, MaxStrLen(PostalCode));
+        TownName := CopyStr(DelChr(CompanyInfo.City, '<>'), 1, MaxStrLen(TownName));
+    end;
+
+    local procedure SetUpSEPAVendorWithVendorBankAccount(var BankAccount: Record "Bank Account"; var Vendor: Record Vendor; CurrencyCode: Code[10])
+    var
+        TransactionMode: Record "Transaction Mode";
+    begin
+        CreateSEPABankAccount(BankAccount);
+        SetUpTransactionMode(
+          TransactionMode, BankAccount."No.", "Partner Type".FromInteger(LibraryRandom.RandIntInRange(1, 2)), TransactionMode."Account Type"::Vendor);
+        CreateVendorWithBankAccount(
+          Vendor, BankAccount, TransactionMode.Code, TransactionMode."Partner Type", CurrencyCode);
     end;
 
     [ConfirmHandler]
