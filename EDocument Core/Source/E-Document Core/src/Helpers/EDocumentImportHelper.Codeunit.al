@@ -248,7 +248,8 @@ codeunit 6109 "E-Document Import Helper"
         LineAmount := LineAmountFieldRef.Value();
 
         LineDiscountAmount := (LineQuantity * LineDirectUnitCost) - LineAmount;
-        LineDiscountAmountFieldRef.Value(LineDiscountAmount);
+
+        LineDiscountAmountFieldRef.Value(Format(LineDiscountAmount, 0, 9));
     end;
 
     /// <summary>
@@ -589,26 +590,6 @@ codeunit 6109 "E-Document Import Helper"
     procedure SetHideDialogs(Hide: Boolean)
     begin
         EDocumentImport.SetHideDialogs(Hide);
-    end;
-
-    /// <summary>
-    /// Use it to find attachment file extension when importing E-Document.
-    /// </summary>
-    procedure DetermineFileType(MimeType: Text): Text
-    begin
-        case MimeType of
-            'image/jpeg':
-                exit('jpeg');
-            'image/png':
-                exit('png');
-            'application/pdf':
-                exit('pdf');
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'application/vnd.oasis.opendocument.spreadsheet':
-                exit('xlsx');
-            else
-                exit('');
-        end;
     end;
 
     local procedure TryFindLeastBlockedVendorNoByVendorBankAcc(var VendorBankAccount: record "Vendor Bank Account"): Code[20]

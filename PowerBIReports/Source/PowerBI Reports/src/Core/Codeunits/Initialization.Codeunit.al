@@ -32,22 +32,14 @@ codeunit 36951 Initialization
     end;
 
     procedure InitialisePBIWorkingDays()
-    var
-        MondayLbl: Label 'Monday';
-        TuesdayLbl: Label 'Tuesday';
-        WednesdayLbl: Label 'Wednesday';
-        ThursdayLbl: Label 'Thursday';
-        FridayLbl: Label 'Friday';
-        SaturdayLbl: Label 'Saturday';
-        SundayLbl: Label 'Sunday';
     begin
-        InsertWorkingDay(0, SundayLbl, false);
-        InsertWorkingDay(1, MondayLbl, true);
-        InsertWorkingDay(2, TuesdayLbl, true);
-        InsertWorkingDay(3, WednesdayLbl, true);
-        InsertWorkingDay(4, ThursdayLbl, true);
-        InsertWorkingDay(5, FridayLbl, true);
-        InsertWorkingDay(6, SaturdayLbl, false);
+        InsertWorkingDay(0, 'Sunday', false);
+        InsertWorkingDay(1, 'Monday', true);
+        InsertWorkingDay(2, 'Tuesday', true);
+        InsertWorkingDay(3, 'Wednesday', true);
+        InsertWorkingDay(4, 'Thursday', true);
+        InsertWorkingDay(5, 'Friday', true);
+        InsertWorkingDay(6, 'Saturday', false);
     end;
 
     local procedure InsertWorkingDay(DayNumber: Integer; DayName: Text[50]; Working: Boolean)
@@ -106,7 +98,7 @@ codeunit 36951 Initialization
     procedure InitDimSetEntryLastUpdated()
     var
         PBISetup: Record "PowerBI Reports Setup";
-        PBIDimSetEntry: Record "PowerBI Flat Dim. Set Entry";
+        PBIDimSetEntry: Record "Dimension Set Entry";
     begin
         if PBIDimSetEntry.IsEmpty() then
             exit;
