@@ -1495,14 +1495,15 @@ codeunit 5940 ServContractManagement
 
     procedure InitCodeUnit()
     var
-        ServiceLedgEntry: Record "Service Ledger Entry";
+        ServLedgEntry: Record "Service Ledger Entry";
         SourceCodeSetup: Record "Source Code Setup";
         KeepFromWarrEntryNo: Integer;
         KeepToWarrEntryNo: Integer;
     begin
-        ServiceLedgEntry.LockTable();
-        if ServiceLedgEntry.FindLast() then
-            NextEntry := ServiceLedgEntry."Entry No." + 1
+        ServLedgEntry.Reset();
+        ServLedgEntry.LockTable();
+        if ServLedgEntry.FindLast() then
+            NextEntry := ServLedgEntry."Entry No." + 1
         else
             NextEntry := 1;
 
@@ -1519,13 +1520,11 @@ codeunit 5940 ServContractManagement
         ServiceRegister."From Entry No." := NextEntry;
         ServiceRegister."From Warranty Entry No." := KeepFromWarrEntryNo;
         ServiceRegister."To Warranty Entry No." := KeepToWarrEntryNo;
-        ServiceRegister."Creation Date" := Today();
-        ServiceRegister."Creation Time" := Time();
+        ServiceRegister."Creation Date" := Today;
+        ServiceRegister."Creation Time" := Time;
         SourceCodeSetup.Get();
         ServiceRegister."Source Code" := SourceCodeSetup."Service Management";
-        ServiceRegister."User ID" := CopyStr(UserId(), 1, MaxStrLen(ServiceLedgEntry."User ID"));
-
-        OnAfterInitCodeUnit(ServiceRegister);
+        ServiceRegister."User ID" := CopyStr(UserId(), 1, MaxStrLen(ServLedgEntry."User ID"));
     end;
 
     procedure FinishCodeunit()
@@ -1946,26 +1945,18 @@ codeunit 5940 ServContractManagement
     local procedure FillTempServiceLedgerEntries(ServiceContractHeader: Record "Service Contract Header")
     var
         ServiceLedgerEntry: Record "Service Ledger Entry";
-        DoInsertTempServiceLedgerEntry: Boolean;
     begin
         if TempServLedgEntriesIsSet then
             exit;
-
         TempServLedgEntry.DeleteAll();
-
         ServiceLedgerEntry.SetRange("Service Contract No.", ServiceContractHeader."Contract No.");
         ServiceLedgerEntry.SetRange("Entry Type", ServiceLedgerEntry."Entry Type"::Sale);
         if not ServiceLedgerEntry.FindSet() then
             exit;
         repeat
-            DoInsertTempServiceLedgerEntry := true;
-            OnFillTempServiceLedgerEntriesOAfterCalcDoInsertTempServiceLedgerEntry(ServiceLedgerEntry, DoInsertTempServiceLedgerEntry);
-            if DoInsertTempServiceLedgerEntry then begin
-                TempServLedgEntry := ServiceLedgerEntry;
-                TempServLedgEntry.Insert();
-            end;
+            TempServLedgEntry := ServiceLedgerEntry;
+            TempServLedgEntry.Insert();
         until ServiceLedgerEntry.Next() = 0;
-
         TempServLedgEntriesIsSet := true;
     end;
 
@@ -2408,7 +2399,7 @@ codeunit 5940 ServContractManagement
     var
         ServContractHeader: Record "Service Contract Header";
         Index: Integer;
-        IsHandled, ShouldUpdatePaymentsCount : Boolean;
+        IsHandled: Boolean;
     begin
         if CountOfEntryLoop = 0 then
             exit;
@@ -2421,9 +2412,6 @@ codeunit 5940 ServContractManagement
             ServContractHeader.Get(ServContractLine."Contract Type", ServContractLine."Contract No.");
             CheckMParts := true;
         end;
-
-        OnInsertMultipleServLedgEntriesOnUpdateDateFieldsBeforeCalcNonDistrAmount(InvFrom, DueDate, NoOfPayments);
-
         NonDistrAmount[AmountType::Amount] :=
           -CalcContractLineAmount(ServContractLine."Line Amount", InvFrom, DueDate);
         NonDistrAmount[AmountType::UnitPrice] :=
@@ -2432,15 +2420,11 @@ codeunit 5940 ServContractManagement
           CalcContractLineAmount(ServContractLine."Line Cost", InvFrom, DueDate);
         NonDistrAmount[AmountType::DiscAmount] :=
           CalcContractLineAmount(ServContractLine."Line Discount Amount", InvFrom, DueDate);
-
         ServLedgEntry."Service Item No. (Serviced)" := ServContractLine."Service Item No.";
         ServLedgEntry."Item No. (Serviced)" := ServContractLine."Item No.";
         ServLedgEntry."Serial No. (Serviced)" := ServContractLine."Serial No.";
         DueDate := NextInvDate;
-
-        ShouldUpdatePaymentsCount := CheckMParts and (NoOfPayments > 1);
-        OnInsertMultipleServLedgEntriesOnBeforeUpdatePaymentsCount(CheckMParts, NoOfPayments, CountOfEntryLoop, ShouldUpdatePaymentsCount);
-        if ShouldUpdatePaymentsCount then begin
+        if CheckMParts and (NoOfPayments > 1) then begin
             NoOfPayments := NoOfPayments - 1;
             // the count of invoice lines should never exceed the count of payments
             if CountOfEntryLoop > NoOfPayments then
@@ -2450,16 +2434,13 @@ codeunit 5940 ServContractManagement
         if AddingNewLines then
             DueDate := InvFrom;
         for Index := 1 to CountOfEntryLoop do begin
-            IsHandled := false;
-            OnInsertMultipleServLedgEntriesOnBeforeSetServLedgEntryAmounts(ServLedgEntry, InvRoundedAmount, NonDistrAmount, NoOfPayments, Index, CountOfEntryLoop, AmountRoundingPrecision, DueDate, IsHandled);
-            if not IsHandled then
-                SetServLedgEntryAmounts(
-                  ServLedgEntry, InvRoundedAmount,
-                  NonDistrAmount[AmountType::Amount] / (NoOfPayments + 1 - Index),
-                  NonDistrAmount[AmountType::UnitPrice] / (NoOfPayments + 1 - Index),
-                  NonDistrAmount[AmountType::UnitCost] / (NoOfPayments + 1 - Index),
-                  NonDistrAmount[AmountType::DiscAmount] / (NoOfPayments + 1 - Index),
-                  AmountRoundingPrecision);
+            SetServLedgEntryAmounts(
+              ServLedgEntry, InvRoundedAmount,
+              NonDistrAmount[AmountType::Amount] / (NoOfPayments + 1 - Index),
+              NonDistrAmount[AmountType::UnitPrice] / (NoOfPayments + 1 - Index),
+              NonDistrAmount[AmountType::UnitCost] / (NoOfPayments + 1 - Index),
+              NonDistrAmount[AmountType::DiscAmount] / (NoOfPayments + 1 - Index),
+              AmountRoundingPrecision);
             ServLedgEntry."Cost Amount" := ServLedgEntry."Charged Qty." * ServLedgEntry."Unit Cost";
 
             NonDistrAmount[AmountType::Amount] -= ServLedgEntry."Amount (LCY)";
@@ -2478,7 +2459,6 @@ codeunit 5940 ServContractManagement
             ServLedgEntry.Insert();
             NextEntry += 1;
             DueDate := CalcDate('<1M>', DueDate);
-            OnInsertMultipleServLedgEntriesOnAfterSetDueDate(Index, DueDate, ServLedgEntry, CountOfEntryLoop, InvRoundedAmount, NonDistrAmount, ServHeader, AmountRoundingPrecision);
         end;
     end;
 
@@ -3142,36 +3122,6 @@ codeunit 5940 ServContractManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateOrGetCreditHeaderOnAfterCopyFromCustomer(var ServiceHeader: Record "Service Header"; ServiceContract: Record "Service Contract Header"; Customer: Record Customer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInitCodeUnit(var ServiceRegister: Record "Service Register")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFillTempServiceLedgerEntriesOAfterCalcDoInsertTempServiceLedgerEntry(ServiceLedgerEntry: Record "Service Ledger Entry"; var DoInsertTempServiceLedgerEntry: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertMultipleServLedgEntriesOnUpdateDateFieldsBeforeCalcNonDistrAmount(var InvoiceFrom: Date; var DueDate: Date; NoOfPayments: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertMultipleServLedgEntriesOnBeforeUpdatePaymentsCount(CheckMonthParts: Boolean; var NoOfPayments: Integer; var CountOfEntryLoop: Integer; var ShouldUpdatePaymentsCount: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertMultipleServLedgEntriesOnBeforeSetServLedgEntryAmounts(var ServiceLedgerEntry: Record "Service Ledger Entry"; var InvRoundedAmount: array[4] of Decimal; NonDistrAmount: array[4] of Decimal; NoOfPayments: Integer; Index: Integer; CountOfEntryLoop: Integer; AmountRoundingPrecision: Decimal; DueDate: Date; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertMultipleServLedgEntriesOnAfterSetDueDate(Index: Integer; var DueDate: Date; ServiceLedgerEntry: Record "Service Ledger Entry"; CountOfEntryLoop: Integer; InvRoundedAmount: array[4] of Decimal; var NonDistrAmount: array[4] of Decimal; var ServiceHeader: Record "Service Header"; AmountRoundingPrecision: Decimal)
     begin
     end;
 }
