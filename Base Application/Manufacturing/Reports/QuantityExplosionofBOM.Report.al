@@ -237,11 +237,6 @@ report 99000753 "Quantity Explosion of BOM"
     {
     }
 
-    trigger OnPreReport()
-    begin
-        OnBeforeOnPreReport(Item);
-    end;
-
     var
         Text000: Label 'As of ';
         ProdBOM: Record "Production BOM Header";
@@ -270,10 +265,5 @@ report 99000753 "Quantity Explosion of BOM"
     protected var
         BomComponent: array[99] of Record "Production BOM Line";
         Level: Integer;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnPreReport(var Item: Record Item)
-    begin
-    end;
 }
 
