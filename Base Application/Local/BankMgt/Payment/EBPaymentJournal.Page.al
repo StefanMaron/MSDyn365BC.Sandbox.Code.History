@@ -622,6 +622,7 @@ page 2000001 "EB Payment Journal"
 
     var
         ExportProtocol: Record "Export Protocol";
+        SuggestPayments: Report "Suggest Vendor Payments EB";
         PmtJrnlMgt: Codeunit PmtJrnlManagement;
         CurrentJnlBatchName: Code[10];
         AccName: Text[100];
@@ -642,7 +643,6 @@ page 2000001 "EB Payment Journal"
     protected var
         ExportProtocolCode: Code[20];
         BankAccountCodeFilter: Code[1024];
-        SuggestPayments: Report "Suggest Vendor Payments EB";
 
     local procedure UpdateAmount()
     begin
