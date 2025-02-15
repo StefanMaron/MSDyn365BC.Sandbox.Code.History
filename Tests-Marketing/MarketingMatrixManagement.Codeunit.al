@@ -45,7 +45,7 @@ codeunit 136211 "Marketing Matrix Management"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Task: Record "To-do";
         TempTask: Record "To-do" temporary;
-        Tasks: TestPage Microsoft.CRM.Analysis.Tasks;
+        Tasks: TestPage Tasks;
         TableOption: Option Salesperson,Team,Campaign,Contact;
     begin
         // Test Tasks matrix with Show as Lines Salesperson after creation of Task for Salesperson.
@@ -79,7 +79,7 @@ codeunit 136211 "Marketing Matrix Management"
         Team: Record Team;
         Task: Record "To-do";
         TempTask: Record "To-do" temporary;
-        Tasks: TestPage Microsoft.CRM.Analysis.Tasks;
+        Tasks: TestPage Tasks;
         TableOption: Option Salesperson,Team,Campaign,Contact;
     begin
         // Test Tasks matrix with Show as Lines Team after creation of Task for Team.
@@ -113,7 +113,7 @@ codeunit 136211 "Marketing Matrix Management"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Task: Record "To-do";
         TempTask: Record "To-do" temporary;
-        Tasks: TestPage Microsoft.CRM.Analysis.Tasks;
+        Tasks: TestPage Tasks;
         CampaignNo: Code[20];
         TableOption: Option Salesperson,Team,Campaign,Contact;
     begin
@@ -149,7 +149,7 @@ codeunit 136211 "Marketing Matrix Management"
         Contact: Record Contact;
         Task: Record "To-do";
         TempTask: Record "To-do" temporary;
-        Tasks: TestPage Microsoft.CRM.Analysis.Tasks;
+        Tasks: TestPage Tasks;
         TableOption: Option Salesperson,Team,Campaign,Contact;
     begin
         // Test Tasks matrix with Show as Lines Contact after creation of Task for Contact.
@@ -183,7 +183,7 @@ codeunit 136211 "Marketing Matrix Management"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Task: Record "To-do";
         TempTask: Record "To-do" temporary;
-        Tasks: TestPage Microsoft.CRM.Analysis.Tasks;
+        Tasks: TestPage Tasks;
         StatusFilter: Option " ","Not Started","In Progress",Completed,Waiting,Postponed;
         TableOption: Option Salesperson,Team,Campaign,Contact;
     begin
@@ -270,7 +270,7 @@ codeunit 136211 "Marketing Matrix Management"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Task: Record "To-do";
         TempTask: Record "To-do" temporary;
-        Tasks: TestPage Microsoft.CRM.Analysis.Tasks;
+        Tasks: TestPage Tasks;
         TableOption: Option Salesperson,Team,Campaign,Contact;
     begin
         // 1. Setup: Create Salesperson, Task for Salesperson and Change the Status of to-do as per parameter.
@@ -307,7 +307,7 @@ codeunit 136211 "Marketing Matrix Management"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         Task: Record "To-do";
         TempTask: Record "To-do" temporary;
-        Tasks: TestPage Microsoft.CRM.Analysis.Tasks;
+        Tasks: TestPage Tasks;
         StatusFilter: Option " ","Not Started","In Progress",Completed,Waiting,Postponed;
         TableOption: Option Salesperson,Team,Campaign,Contact;
     begin
@@ -844,7 +844,7 @@ codeunit 136211 "Marketing Matrix Management"
 
     local procedure OpenShowMatrixTask(FilterContactNo: Code[20])
     var
-        Tasks: TestPage Microsoft.CRM.Analysis.Tasks;
+        Tasks: TestPage Tasks;
         OutputOption: Option "No. of To-dos","Contact No.";
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period";
     begin
