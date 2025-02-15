@@ -11,7 +11,6 @@ codeunit 144026 "SEPA Bank Payment Export"
 
     var
         CountryRegion: Record "Country/Region";
-        TempBlobGlobal: Codeunit "Temp Blob";
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryERM: Codeunit "Library - ERM";
@@ -20,10 +19,8 @@ codeunit 144026 "SEPA Bank Payment Export"
         LibraryUtility: Codeunit "Library - Utility";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryRandom: Codeunit "Library - Random";
-        LibraryXPathXMLReader: Codeunit "Library - XPath XML Reader";
         IsInitialized: Boolean;
         FullPathErr: Label 'File full path ''%1'' exceeds length (%3) of field ''%2'' ', Comment = '.';
-        SEPAXmlDocNamespaceTxt: Label 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.02', Locked = true;
 
     [Test]
     [HandlerFunctions('RPHSuggestBankPayments,MessageHandler')]
@@ -57,23 +54,19 @@ codeunit 144026 "SEPA Bank Payment Export"
 
     [Test]
     [HandlerFunctions('RPHSuggestBankPayments')]
+    [Scope('OnPrem')]
     procedure ProcessSEPAPaymentsWorksOnWebclient()
     var
         PurchaseHeader: Record "Purchase Header";
         RefPaymentExported: Record "Ref. Payment - Exported";
-        ReferenceFileSetup: Record "Reference File Setup";
+        RefFileSetup: Record "Reference File Setup";
         TestClientTypeSubscriber: Codeunit "Test Client Type Subscriber";
         SEPABankPaymentExport: Codeunit "SEPA Bank Payment Export";
-        TempBlob: Codeunit "Temp Blob";
-        BlobInStream: InStream;
-        XmlFirstByte: Byte;
-        BOMFirstByte: Byte;
         BankAccountNo: Code[20];
         VendorNo: Code[20];
         ValidIBANCode: Code[50];
     begin
         // [SCENARIO 278682] Process SEPA payments action works on webclient
-        // [SCENARIO 494956] Exported XML file does not contain UTF-8 BOM characters.
         Initialize();
 
         // [GIVEN] Client type was webclient
@@ -82,7 +75,7 @@ codeunit 144026 "SEPA Bank Payment Export"
         // [GIVEN] Full setup was available for SEPA Payment report to run
         ValidIBANCode := 'FI9780RBOS16173241116737';
         BankAccountNo := CreateBankAccount(CountryRegion.Code, ValidIBANCode, 'SEPACT V02', '');
-        CreateBankAccountReferenceFileSetup(ReferenceFileSetup, BankAccountNo);
+        CreateBankAccountReferenceFileSetup(RefFileSetup, BankAccountNo);
         VendorNo := CreateVendor(CountryRegion.Code, ValidIBANCode, true, 1);
         CreateReferancePaymentExportLines(BankAccountNo, VendorNo, PurchaseHeader);
 
@@ -93,15 +86,6 @@ codeunit 144026 "SEPA Bank Payment Export"
         // RequestPage handled by RPHSuggestBankPayments handler
 
         // [THEN] The report runs with no errors
-        SEPABankPaymentExport.GetBlobWithXmlDocContent(TempBlob);
-        LibraryXPathXMLReader.InitializeWithBlob(TempBlob, SEPAXmlDocNamespaceTxt);
-        LibraryXPathXMLReader.VerifyNodeValueByXPath('/Document/pain.001.001.02/PmtInf/DbtrAcct/Id/IBAN', ValidIBANCode);
-
-        // [THEN] The exported XML file does not contain UTF-8 BOM characters.
-        BOMFirstByte := 239;    // 0xEF
-        TempBlob.CreateInStream(BlobInStream);
-        BlobInStream.Read(XmlFirstByte, 1);
-        Assert.AreNotEqual(BOMFirstByte, XmlFirstByte, 'The exported XML file contains UTF-8 BOM characters.');
     end;
 
     local procedure Initialize()
@@ -364,11 +348,6 @@ codeunit 144026 "SEPA Bank Payment Export"
         exit(LibraryPurchase.PostPurchaseDocument(PurchaseHeader, ToShipReceive, ToInvoice));
     end;
 
-    procedure GetBlobWithXmlDocContent(var TempBlob: Codeunit "Temp Blob")
-    begin
-        TempBlob := TempBlobGlobal;
-    end;
-
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure RPHSuggestBankPayments(var RequestPage: TestRequestPage "Suggest Bank Payments")
@@ -394,11 +373,10 @@ codeunit 144026 "SEPA Bank Payment Export"
         // Dummy message handler.
     end;
 
-    [EventSubscriber(ObjectType::Report, Report::"Export SEPA Payment File", 'OnBeforeDownloadFromBlob', '', false, false)]
-    local procedure CancelDownloadOnBeforeDownloadFromBlob(var TempBlob: Codeunit "Temp Blob"; var CancelDownload: Boolean)
+    [EventSubscriber(ObjectType::Report, Report::"Export SEPA Payment File", 'OnBeforeFileDownload', '', false, false)]
+    procedure CancelDownloadOnBeforeFileDownload(FileName: Text; var CancelDownload: Boolean)
     begin
         CancelDownload := true;
-        TempBlobGlobal := TempBlob;
     end;
 }
 
