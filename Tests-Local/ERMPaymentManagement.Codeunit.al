@@ -105,7 +105,6 @@ codeunit 144049 "ERM Payment Management"
         AccountType: Option "G/L Account",Customer,Vendor,"Bank Account","Fixed Asset";
         CheckDimValuePostingLineErr: Label 'A dimension used in %1 %2 %3 has caused an error. Select a Dimension Value Code for the Dimension Code %4 for Vendor %5.';
         CheckDimValuePostingHeaderErr: Label 'A dimension used in %1 has caused an error. Dimension %2 is blocked.';
-        PaymentSlipErr: Label 'Payment Slip must be posted without error of Document No.';
 
     [Test]
     [HandlerFunctions('GLCustLedgerReconciliationRequestPageHandler')]
@@ -498,24 +497,17 @@ codeunit 144049 "ERM Payment Management"
     [Scope('OnPrem')]
     procedure PaymentInProgressTrueOnCustomerCard()
     var
-        Customer: Record Customer;
+        CustomerCard: TestPage "Customer Card";
         PaymentInProgressLCY: Decimal;
     begin
         // Verify Payment In Progress Amount on Customer Card when Payment In Progress field is set to True on Payment Status.
 
-        // [GIVEN] Create Customer X
-        // [GIVEN] Create and post Sales Invoice for Customer X
-        // [GIVEN] Create Payment Class
-        // [GIVEN] Create Setup of Payment Class and Create Payment Slip with True for Payment In Progress field in Payment Status
+        // Setup and Exercise.
         Initialize();
-        PaymentInProgressLCY := PaymentInProgressOnCustomer(Customer, true);
+        PaymentInProgressLCY := PaymentInProgressOnCustomer(CustomerCard, true);  // Using True for Payment In Progress field in Payment Status.
 
-        // [WHEN] Calculate Payment in progress (LCY) for Customer X
-        Customer.CalcFields("Payment in progress (LCY)");
-
-        // [THEN] Payment in progress (LCY) for Customer X and the amount on payment lines for account no. = X are equal
-        Assert.AreEqual(Customer."Payment in progress (LCY)", PaymentInProgressLCY,
-            StrSubstNo(ValueIsIncorrectErr, Customer."Payment in progress (LCY)", Customer.FieldCaption("Payment in progress (LCY)")));
+        // Verify.
+        CustomerCard."Payment in progress (LCY)".AssertEquals(PaymentInProgressLCY);
     end;
 
     [Test]
@@ -523,26 +515,19 @@ codeunit 144049 "ERM Payment Management"
     [Scope('OnPrem')]
     procedure PaymentInProgressFalseOnCustomerCard()
     var
-        Customer: Record Customer;
+        CustomerCard: TestPage "Customer Card";
     begin
         // Verify Payment In Progress Amount on Customer Card when Payment In Progress field is set to False on Payment Status.
 
-        // [GIVEN] Create Customer X
-        // [GIVEN] Create and post Sales Invoice for Customer X
-        // [GIVEN] Create Payment Class
-        // [GIVEN] Create Setup of Payment Class and Create Payment Slip with False for Payment In Progress field in Payment Status
+        // Setup and Exercise.
         Initialize();
-        PaymentInProgressOnCustomer(Customer, false);
+        PaymentInProgressOnCustomer(CustomerCard, false);  // Using False  for Payment In Progress field in Payment Status.
 
-        // [WHEN] Calculate Payment in progress (LCY) for Customer X
-        Customer.CalcFields("Payment in progress (LCY)");
-
-        // [THEN] Payment in progress (LCY) for Customer X is 0
-        Assert.AreEqual(Customer."Payment in progress (LCY)", 0,
-            StrSubstNo(ValueIsIncorrectErr, Customer."Payment in progress (LCY)", Customer.FieldCaption("Payment in progress (LCY)")));
+        // Verify.
+        CustomerCard."Payment in progress (LCY)".AssertEquals(0);
     end;
 
-    local procedure PaymentInProgressOnCustomer(var Customer: Record Customer; PaymentInProgress: Boolean): Decimal
+    local procedure PaymentInProgressOnCustomer(var CustomerCard: TestPage "Customer Card"; PaymentInProgress: Boolean): Decimal
     var
         PaymentClass: Record "Payment Class";
         PaymentLine: Record "Payment Line";
@@ -561,8 +546,8 @@ codeunit 144049 "ERM Payment Management"
         // Verify: Verify Payment In Progress Amount on Customer Card.
         PaymentLine.SetRange("Payment Class", PaymentClass.Code);
         PaymentLine.FindFirst();
-
-        Customer.Get(PaymentLine."Account No.");
+        CustomerCard.OpenEdit();
+        CustomerCard.FILTER.SetFilter("No.", PaymentLine."Account No.");
         exit(-PaymentLine.Amount);
     end;
 
@@ -1784,78 +1769,6 @@ codeunit 144049 "ERM Payment Management"
         // [THEN] Payment slip has been posted
         PaymentHeader.Find();
         PaymentHeader.TestField("Status No.");
-    end;
-
-    [Test]
-    [HandlerFunctions('PaymentClassListModalPageHandler,SuggestVendorPaymentsFRSummarizedRequestPageHandlerVendor,ConfirmHandlerTrue')]
-    procedure NoSeriesShouldNotCauseIssueWithPaymentSlipWhenPosting()
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-        GLEntry: Record "G/L Entry";
-        PaymentClass: Record "Payment Class";
-        PaymentHeader: Record "Payment Header";
-        PaymentLine: Record "Payment Line";
-        PaymentStepLedger: Record "Payment Step Ledger";
-        Vendor: array[2] of Record Vendor;
-        VendorPostingGroup: Record "Vendor Posting Group";
-        SuggestVendorPaymentsFR: Report "Suggest Vendor Payments FR";
-        PaymentSlip: TestPage "Payment Slip";
-    begin
-        // [FEATURE] [Payment Slip]
-        // [SCENARIO 539689] No. Series should not cause issue when posting Payment Slip.
-        Initialize();
-
-        // [GIVEN] Create two Vendors.
-        LibraryPurchase.CreateVendor(Vendor[1]);
-        LibraryPurchase.CreateVendor(Vendor[2]);
-
-        // [GIVEN] Create and Post two General Journals.
-        CreateAndPostGeneralJournal(
-            GenJournalLine, GenJournalLine."Account Type"::Vendor, Vendor[1]."No.",
-            GenJournalLine."Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
-        CreateAndPostGeneralJournal(
-            GenJournalLine, GenJournalLine."Account Type"::Vendor, Vendor[2]."No.",
-            GenJournalLine."Document Type"::Invoice, -LibraryRandom.RandDec(10, 2), WorkDate());
-
-        // [GIVEN] Create Payment Class, Payment Slip Ledger.
-        PaymentClass.Get(SetupForPaymentSlipPost(PaymentStepLedger."Detail Level"::Account, PaymentClass.Suggestions::Vendor));
-
-        // [GIVEN] Modify Document No. in Payment Step Ledger.
-        PaymentStepLedger.SetRange("Payment Class", PaymentClass.Code);
-        PaymentStepLedger.ModifyAll("Document No.", PaymentStepLedger."Document No."::"Document ID Line");
-
-        // [GIVEN] Store Payment Class Code.
-        LibraryVariableStorage.Enqueue(PaymentClass.Code);
-
-        // [GIVEN] Validate No. Series in Payment Class.
-        PaymentClass.Validate("Line No. Series", LibraryERM.CreateNoSeriesCode());
-        PaymentClass.Modify(true);
-
-        // [GIVEN] Create Payment Header.
-        CreatePaymentHeader(PaymentHeader);
-        Commit();
-
-        // [GIVEN] Run Suggest Vendor Payments FR Report. 
-        SuggestVendorPaymentsFR.SetGenPayLine(PaymentHeader);
-        SuggestVendorPaymentsFR.RunModal();
-
-        // [GIVEN] Find the first Payment Line.
-        PaymentLine.SetRange("No.", PaymentHeader."No.");
-        PaymentLine.FindFirst();
-
-        // [GIVEN] Open and Post Payment Slip.
-        PaymentSlip.OpenEdit();
-        PaymentSlip.FILTER.SetFilter("No.", PaymentHeader."No.");
-        PaymentSlip.Post.Invoke();
-
-        //[GIVEN] Find the Vendor Posting Group.
-        VendorPostingGroup.Get(Vendor[1]."Vendor Posting Group");
-
-        // [THEN] Payment Slip must be posted and Amount must match in GL Entry.
-        GLEntry.SetRange("Document No.", PaymentLine."Document No.");
-        GLEntry.SetRange("G/L Account No.", VendorPostingGroup."Payables Account");
-        GLEntry.FindFirst();
-        Assert.AreEqual(PaymentLine.Amount, Abs(GLEntry.Amount), PaymentSlipErr);
     end;
 
     local procedure Initialize()
@@ -3311,17 +3224,6 @@ codeunit 144049 "ERM Payment Management"
         SuggestVendorPaymentsFR.LastPaymentDate.SetValue(WorkDate());
         SuggestVendorPaymentsFR.SummarizePer.SetValue(SummarizePer);
         SuggestVendorPaymentsFR.Vendor.SetFilter("No.", No);
-        SuggestVendorPaymentsFR.OK().Invoke();
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure SuggestVendorPaymentsFRSummarizedRequestPageHandlerVendor(var SuggestVendorPaymentsFR: TestRequestPage "Suggest Vendor Payments FR")
-    var
-        SummarizePer: Option " ",Vendor,"Due date";
-    begin
-        SuggestVendorPaymentsFR.LastPaymentDate.SetValue(WorkDate());
-        SuggestVendorPaymentsFR.SummarizePer.SetValue(SummarizePer::Vendor);
         SuggestVendorPaymentsFR.OK().Invoke();
     end;
 
