@@ -324,14 +324,13 @@ codeunit 5611 "Calculate Normal Depreciation"
         end;
 
         IsHandled := false;
-        OnAfterCalculateFinalAmount(DeprBook, Amount, IsHandled, FA, UntilDate, BookValue);
+        OnAfterCalculateFinalAmount(DeprBook, Amount, IsHandled);
         if not IsHandled then
             if Amount >= 0 then
                 exit(0);
 
         IsHandled := false;
         OnCalculateDeprAmountOnBeforeCalculateDeprAmount(FA, SkipOnZero, DeprBookCode, Amount, BookValue2, SalvageValue2, EndingBookValue, FinalRoundingAmount, IsHandled);
-
         if IsHandled then
             exit(Amount);
 
@@ -994,7 +993,7 @@ codeunit 5611 "Calculate Normal Depreciation"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCalculateFinalAmount(DepreBook: Record "Depreciation Book"; var Amount: Decimal; var IsHandled: Boolean; FA: Record "Fixed Asset"; UntilDate: Date; BookValue: Decimal)
+    local procedure OnAfterCalculateFinalAmount(DepreBook: Record "Depreciation Book"; var Amount: Decimal; var IsHandled: Boolean)
     begin
     end;
 
