@@ -302,11 +302,8 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
                 InvoicePostingBuffer."VAT Base Amount" := Round(PurchLine."VAT Base Amount", Currency."Amount Rounding Precision");
                 InvoicePostingBuffer."VAT Base Amount (ACY)" := Round(PurchLineACY."VAT Base Amount", Currency."Amount Rounding Precision");
             end;
-
-        IsHandled := false;
-        PurchPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, PurchLine, TempInvoicePostingBuffer, FALineNo, InvDefLineNo, DeferralLineNo, IsHandled);
-        if not IsHandled then
-            UpdateInvoicePostingBuffer(InvoicePostingBuffer);
+        PurchPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, PurchLine);
+        UpdateInvoicePostingBuffer(InvoicePostingBuffer);
 
         PurchPostInvoiceEvents.RunOnPrepareLineOnAfterUpdateInvoicePostingBuffer(
             PurchHeader, PurchLine, InvoicePostingBuffer, TempInvoicePostingBuffer);
