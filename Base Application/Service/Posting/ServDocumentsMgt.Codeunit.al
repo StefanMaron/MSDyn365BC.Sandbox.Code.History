@@ -265,6 +265,7 @@ codeunit 5988 "Serv-Documents Mgt."
             if ServLine.Find('-') then
                 repeat
                     ServLine.TestField(Description);
+                    OnPostDocumentLinesOnBeforeSalesTaxLineToSalesTaxCalc(ServLine, ServHeader);
                     if ServLine."VAT Calculation Type" = ServLine."VAT Calculation Type"::"Sales Tax" then begin
                         if ServLine."Tax Area Code" <> '' then begin
                             if SalesTaxCountry = SalesTaxCountry::NoTax then
@@ -1331,6 +1332,7 @@ codeunit 5988 "Serv-Documents Mgt."
             if ServShptItemLine.Find('-') then
                 repeat
                     ServiceShipmentItemLine2.Init();
+                    OnFinalizeShipmentDocumentOnBeforeCopyServiceShipmentItemLine(ServShptItemLine);
                     ServiceShipmentItemLine2.Copy(ServShptItemLine);
                     ServiceShipmentItemLine2.Insert();
                 until ServShptItemLine.Next() = 0;
@@ -3171,6 +3173,16 @@ codeunit 5988 "Serv-Documents Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnFinalizeShipmentDocumentOnAfterInserServiceShipmentLine(var ServiceShipmentLine2: Record "Service Shipment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostDocumentLinesOnBeforeSalesTaxLineToSalesTaxCalc(ServiceLine: Record "Service Line" temporary; ServiceHeader: Record "Service Header" temporary)
+    begin
+    end;
+    
+    [IntegrationEvent(false, false)]
+    local procedure OnFinalizeShipmentDocumentOnBeforeCopyServiceShipmentItemLine(var ServiceShipmentItemLine: Record "Service Shipment Item Line")
     begin
     end;
 }
