@@ -167,12 +167,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
     procedure RunWithCheck(var GenJnlLine2: Record "Gen. Journal Line"): Integer
     var
         GenJnlLine: Record "Gen. Journal Line";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeRunWithCheck(GenJnlLine, GenJnlLine2, GLEntryNo, IsHandled);
-        if IsHandled then
-            exit(GLEntryNo);
+        OnBeforeRunWithCheck(GenJnlLine, GenJnlLine2);
 
         GenJnlLine.Copy(GenJnlLine2);
         Code(GenJnlLine, true);
@@ -190,12 +186,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
     procedure RunWithoutCheck(var GenJnlLine2: Record "Gen. Journal Line"): Integer
     var
         GenJnlLine: Record "Gen. Journal Line";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeRunWithoutCheck(GenJnlLine, GenJnlLine2, GLEntryNo, isHandled);
-        if IsHandled then
-            exit(GLEntryNo);
+        OnBeforeRunWithoutCheck(GenJnlLine, GenJnlLine2);
 
         GenJnlLine.Copy(GenJnlLine2);
         Code(GenJnlLine, false);
@@ -1122,8 +1114,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
             IsHandled := false;
             OnPostGLAccOnBeforeInsertGLEntry(GenJnlLine, GLEntry, IsHandled, Balancing);
             if not IsHandled then
-                if not ((GenJnlLine."Deferral Code" <> '') and (GenJnlLine.Amount = 0)) then
-                    InsertGLEntry(GenJnlLine, GLEntry, true);
+                InsertGLEntry(GenJnlLine, GLEntry, true);
             IsHandled := false;
             OnPostGLAccOnBeforePostJob(GenJnlLine, GLEntry, IsHandled, Balancing);
             if not IsHandled then
@@ -2492,9 +2483,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
                 NewCVLedgEntryBuf, OldCVLedgEntryBuf2, DtldCVLedgEntryBuf, GenJnlLine, PmtTolLCY, PmtTolAddCurr,
                 NextTransactionNo, FirstNewVATEntryNo, DtldCVLedgEntryBuf."Entry Type"::"Payment Tolerance (VAT Excl.)");
 
-        OnBeforeInitDetailedCVLedgEntryBufCalcPmtTolerance(
-            NewCVLedgEntryBuf, OldCVLedgEntryBuf, OldCVLedgEntryBuf2,
-            DtldCVLedgEntryBuf, GenJnlLine, PmtTolAmtToBeApplied, NextTransactionNo, FirstNewVATEntryNo, PmtTol, PmtTolLCY, PmtTolAddCurr);
         DtldCVLedgEntryBuf.InitDetailedCVLedgEntryBuf(
             GenJnlLine, NewCVLedgEntryBuf, DtldCVLedgEntryBuf,
             DtldCVLedgEntryBuf."Entry Type"::"Payment Tolerance", PmtTol, PmtTolLCY, PmtTolAddCurr, 0, 0, 0);
@@ -8087,12 +8075,12 @@ codeunit 12 "Gen. Jnl.-Post Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeRunWithCheck(var GenJournalLine: Record "Gen. Journal Line"; var GenJournalLine2: Record "Gen. Journal Line"; var GLEntryNo: Integer; var IsHandled: Boolean);
+    local procedure OnBeforeRunWithCheck(var GenJournalLine: Record "Gen. Journal Line"; var GenJournalLine2: Record "Gen. Journal Line");
     begin
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeRunWithoutCheck(var GenJournalLine: Record "Gen. Journal Line"; var GenJournalLine2: Record "Gen. Journal Line"; var GLEntryNo: Integer; var IsHandled: Boolean);
+    local procedure OnBeforeRunWithoutCheck(var GenJournalLine: Record "Gen. Journal Line"; var GenJournalLine2: Record "Gen. Journal Line");
     begin
     end;
 
@@ -10456,9 +10444,5 @@ codeunit 12 "Gen. Jnl.-Post Line"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitDetailedCVLedgEntryBufCalcPmtTolerance(var NewCVLedgEntryBuf: Record "CV Ledger Entry Buffer"; var OldCVLedgEntryBuf: Record "CV Ledger Entry Buffer"; var OldCVLedgEntryBuf2: Record "CV Ledger Entry Buffer"; var DtldCVLedgEntryBuf: Record "Detailed CV Ledg. Entry Buffer"; GenJnlLine: Record "Gen. Journal Line"; var PmtTolAmtToBeApplied: Decimal; NextTransactionNo: Integer; FirstNewVATEntryNo: Integer; var PmtTol: Decimal; var PmtTolLCY: Decimal; var PmtTolAddCurr: Decimal)
-    begin
-    end;
 }
 
