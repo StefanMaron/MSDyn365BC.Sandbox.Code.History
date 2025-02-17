@@ -192,8 +192,7 @@ codeunit 144072 "UT COD VAT Exemption"
         // Verify: Verify expected error code, actual error: VAT Plafond Amount exceeded.
         Assert.ExpectedErrorCode(DialogErr);
 
-        // Delete only if commited by purch-post
-        if VATPlafondPeriod.Delete() then;
+        VATPlafondPeriod.Delete();
     end;
 
     [Test]
