@@ -11,7 +11,7 @@ pageextension 8076 "Sales Order Subform" extends "Sales Order Subform"
             field("Service Commitments"; Rec."Service Commitments")
             {
                 ApplicationArea = All;
-                ToolTip = 'Shows the number of service commitments (Subscription Billing) for the sales line.';
+                ToolTip = 'Shows the number of service commitments for the sales line.';
             }
             field("Customer Contract No."; CustomerContractNo)
             {
@@ -47,24 +47,24 @@ pageextension 8076 "Sales Order Subform" extends "Sales Order Subform"
     }
     actions
     {
-        addlast("Related Information")
+        addfirst(processing)
         {
             action(ShowSalesServiceCommitments)
             {
                 ApplicationArea = All;
                 Caption = 'Service Commitments';
                 Image = AllLines;
-                RunObject = page "Sales Service Commitments";
+                RunObject = Page "Sales Service Commitments";
                 RunPageLink = "Document Type" = field("Document Type"), "Document No." = field("Document No."), "Document Line No." = field("Line No.");
                 ToolTip = 'Shows the service commitments for the sales line.';
             }
         }
-        addlast("F&unctions")
+        addlast("&Line")
         {
             action(AddSalesServiceCommitment)
             {
                 ApplicationArea = All;
-                Caption = 'Add Service Commitments';
+                Caption = 'Add Service';
                 Image = ExpandDepositLine;
                 ToolTip = 'Shows all service commitments for the item. Service commitments can be added, changed or removed.';
 
