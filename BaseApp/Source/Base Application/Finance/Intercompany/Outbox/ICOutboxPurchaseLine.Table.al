@@ -68,13 +68,6 @@ table 429 "IC Outbox Purchase Line"
             AutoFormatType = 1;
             Caption = 'Line Discount Amount';
         }
-        field(29; Amount; Decimal)
-        {
-            AutoFormatExpression = Rec."Currency Code";
-            AutoFormatType = 1;
-            Caption = 'Amount';
-            Editable = false;
-        }
         field(30; "Amount Including VAT"; Decimal)
         {
             AutoFormatExpression = Rec."Currency Code";
@@ -91,13 +84,6 @@ table 429 "IC Outbox Purchase Line"
         field(54; "Indirect Cost %"; Decimal)
         {
             Caption = 'Indirect Cost %';
-            Editable = false;
-        }
-        field(69; "Inv. Discount Amount"; Decimal)
-        {
-            AutoFormatExpression = Rec."Currency Code";
-            AutoFormatType = 1;
-            Caption = 'Inv. Discount Amount';
             Editable = false;
         }
         field(73; "Drop Shipment"; Boolean)
@@ -131,13 +117,6 @@ table 429 "IC Outbox Purchase Line"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Amount';
-            Editable = false;
-        }
-        field(104; "VAT Difference"; Decimal)
-        {
-            AutoFormatExpression = Rec."Currency Code";
-            AutoFormatType = 1;
-            Caption = 'VAT Difference';
             Editable = false;
         }
         field(107; "IC Partner Ref. Type"; Enum "IC Partner Reference Type")
