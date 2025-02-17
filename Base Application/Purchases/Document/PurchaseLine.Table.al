@@ -347,9 +347,10 @@ table 39 "Purchase Line"
                 IsHandled: Boolean;
             begin
                 TestStatusOpen();
-                OnValidateLocationCodeOnAfterTestStatusOpen(Rec);
+                IsHandled := false;
+                OnValidateLocationCodeOnAfterTestStatusOpen(Rec, xRec, IsHandled);
                 if xRec."Location Code" <> "Location Code" then begin
-                    if "Prepmt. Amt. Inv." <> 0 then
+                    if ("Prepmt. Amt. Inv." <> 0) and (not IsHandled) then
                         if not ConfirmManagement.GetResponseOrDefault(
                              StrSubstNo(
                                Text046, FieldCaption("Direct Unit Cost"), FieldCaption("Location Code"), PRODUCTNAME.Full()), true)
@@ -5562,8 +5563,12 @@ table 39 "Purchase Line"
     var
         ItemListPage: Page "Item List";
         SelectionFilter: Text;
+        IsHandled: Boolean;
     begin
-        OnBeforeSelectMultipleItems(Rec);
+        IsHandled := false;
+        OnBeforeSelectMultipleItems(Rec, IsHandled);
+        if IsHandled then
+            exit;
 
         if IsCreditDocType() then
             SelectionFilter := ItemListPage.SelectActiveItems()
@@ -6384,6 +6389,8 @@ table 39 "Purchase Line"
         CalendarMgmt.ReverseDateFormula(ReversedWhseHandlingTime, "Inbound Whse. Handling Time");
         Evaluate(
           TotalDays, '<' + Format(PurchDate - CalcDate(ReversedWhseHandlingTime, CalcDate(ReversedSafetyLeadTime, PurchDate))) + 'D>');
+
+        OnAfterReversedInternalLeadTimeDays(Rec, PurchDate, ReversedWhseHandlingTime, TotalDays);
         exit(Format(TotalDays));
     end;
 
@@ -7431,6 +7438,7 @@ table 39 "Purchase Line"
                 "Qty. to Receive (Base)" := 0;
             end;
         end;
+        OnAfterClearQtyIfBlank(Rec, xRec, PurchSetup);
     end;
 
     procedure ShowLineComments()
@@ -9670,7 +9678,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSelectMultipleItems(var PurchaseLine: Record "Purchase Line")
+    local procedure OnBeforeSelectMultipleItems(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -10332,7 +10340,7 @@ table 39 "Purchase Line"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnBeforeUpdateLineAmount(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; Currency: Record Currency; var LineAmountChanged: Boolean; var IsHandled: Boolean)
     begin
     end;
@@ -10518,7 +10526,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateLocationCodeOnAfterTestStatusOpen(var PurchaseLine: Record "Purchase Line")
+    local procedure OnValidateLocationCodeOnAfterTestStatusOpen(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -10937,6 +10945,16 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateDimensionsFromJobTask(var PurchaseLine: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterClearQtyIfBlank(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; PurchasePayablesSetup: Record "Purchases & Payables Setup")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterReversedInternalLeadTimeDays(PurchaseLine: Record "Purchase Line"; PurchDate: Date; ReversedWhseHandlingTime: DateFormula; var TotalDays: DateFormula)
     begin
     end;
 }
