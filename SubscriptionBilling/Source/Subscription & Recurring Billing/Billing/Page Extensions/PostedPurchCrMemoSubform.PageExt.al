@@ -6,7 +6,7 @@ pageextension 8074 "Posted Purch Cr. Memo Subform" extends "Posted Purch. Cr. Me
 {
     actions
     {
-        addlast("&Line")
+        addlast(Processing)
         {
             action(ShowArchivedBillingLines)
             {
