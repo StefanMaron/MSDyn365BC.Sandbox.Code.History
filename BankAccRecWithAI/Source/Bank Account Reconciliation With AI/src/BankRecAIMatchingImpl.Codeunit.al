@@ -178,7 +178,9 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
                 TempBankAccLedgerEntryMatchingBuffer.SetRange("Posting Date", FromDate, ToDate);
             end;
 
-            TempBankAccLedgerEntryMatchingBuffer.FindSet();
+            if not TempBankAccLedgerEntryMatchingBuffer.FindSet() then
+                exit(true);
+
             BuildBankRecLedgerEntries(LocaLedgerEntryLines, TempBankAccLedgerEntryMatchingBuffer, LocalCandidateEntryNos);
 
             // if ledger entry part of the prompt is small enough, we are done
