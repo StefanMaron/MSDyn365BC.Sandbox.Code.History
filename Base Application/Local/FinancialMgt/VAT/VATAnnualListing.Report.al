@@ -393,11 +393,17 @@ report 11308 "VAT Annual Listing"
         VATCustomer: Record Customer;
         Buffer: Record "VAT Entry" temporary;
         CheckVatNo: Codeunit VATLogicalTests;
+        Country: Code[10];
+        IncludeCountry: Option All,Specific;
         VAT1: Text[30];
         VAT2: Text[30];
         VatRegNoFilter: Text[250];
+        WrongVATRegNoList: Boolean;
+        VATAnnualList: Boolean;
+        intYear: Integer;
         No: Integer;
         I: Integer;
+        Minimum: Decimal;
         WBase: Decimal;
         WAmount: Decimal;
         WTotBase: Decimal;
@@ -415,14 +421,6 @@ report 11308 "VAT Annual Listing"
         TotalCaptionLbl: Label 'Total';
         IsCreditMemoWithAppliedInvoice: Boolean;
         PreviousYear: Integer;
-
-    protected var
-        WrongVATRegNoList: Boolean;
-        VATAnnualList: Boolean;
-        intYear: Integer;
-        Minimum: Decimal;
-        IncludeCountry: Option All,Specific;
-        Country: Code[10];
 
     trigger OnInitReport()
     begin
