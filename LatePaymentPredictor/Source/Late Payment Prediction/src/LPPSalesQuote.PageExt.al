@@ -19,7 +19,7 @@ pageextension 1955 "LPP Sales Quote" extends "Sales Quote"
                 var
                     LPPredictionMgt: Codeunit "LP Prediction Mgt.";
                 begin
-                    Rec.CheckAmountMoreThanZero();
+                    CheckAmountMoreThanZero();
                     LPPredictionMgt.PredictLateShowResult(Rec);
                 end;
 

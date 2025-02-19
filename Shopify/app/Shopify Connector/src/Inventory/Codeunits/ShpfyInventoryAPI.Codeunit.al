@@ -50,11 +50,7 @@ codeunit 30195 "Shpfy Inventory API"
 
             StockCalculationFactory(StockCalculation, ShopLocation."Stock Calculation");
             SalesUOM := Item."Sales Unit of Measure";
-
-            if StockCalculation is "Shpfy Extended Stock Calculation" then
-                Stock := (StockCalculation as "Shpfy Extended Stock Calculation").GetStock(Item, ShopLocation)
-            else
-                Stock := StockCalculation.GetStock(Item);
+            Stock := StockCalculation.GetStock(Item);
 
             case ShopifyVariant."UoM Option Id" of
                 1:

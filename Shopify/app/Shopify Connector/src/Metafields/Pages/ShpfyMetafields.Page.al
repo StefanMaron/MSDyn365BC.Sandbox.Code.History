@@ -42,9 +42,6 @@ page 30163 "Shpfy Metafields"
                     var
                         IMetafieldType: Interface "Shpfy IMetafield Type";
                     begin
-                        if not IsPageEditable then
-                            exit;
-
                         IMetafieldType := Rec.Type;
 
                         if IMetafieldType.HasAssistEdit() then
