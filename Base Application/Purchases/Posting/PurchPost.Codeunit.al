@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -1237,14 +1237,10 @@ codeunit 90 "Purch.-Post"
         if UseLegacyInvoicePosting() then
             PostVendorEntry(
                 PurchHeader, TotalPurchLine, TotalPurchLineLCY, GenJnlLineDocType, GenJnlLineDocNo, GenJnlLineExtDocNo, SrcCode)
-        else begin
+        else
 #endif
-            InvoicePostingInterface.SetParameters(InvoicePostingParameters);
-            InvoicePostingInterface.SetTotalLines(TotalPurchLine, TotalPurchLineLCY);
             InvoicePostingInterface.PostLedgerEntry(PurchHeader, GenJnlPostLine);
-#if not CLEAN23
-        end;
-#endif
+
         UpdatePurchaseHeader(VendLedgEntry, PurchHeader);
 
         // Balancing account
