@@ -3,7 +3,6 @@ namespace Microsoft.PowerBIReports;
 table 36950 "Dimension Set Entry"
 {
     Access = Internal;
-    ReplicateData = false;
     // IMPORTANT: do not change the caption - see slice 546954
     Caption = 'Dimension Set Entry', Comment = 'IMPORTANT: Use the same translation as in BaseApp''s table "Dimension Set Entry" id: "Table 3998843106 - Property 2879900210" ';
 
