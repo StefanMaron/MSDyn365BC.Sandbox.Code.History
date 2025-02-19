@@ -64,43 +64,32 @@ codeunit 101308 "Create No. Series"
     end;
 
     internal procedure InsertSeries(var SeriesCode: Code[20]; "Code": Code[20]; Description: Text[100]; "Starting No.": Code[20]; "Ending No.": Code[20]; "Last Number Used": Code[20]; "Warning No.": Code[20]; "Increment-by No.": Integer; "Manual Nos.": Boolean; Implementation: Enum "No. Series Implementation")
-    begin
-        InsertSeries(Code, Description, "Manual Nos.");
-        InsertSeriesLine(Code, 10000, 0D, "Starting No.", "Ending No.", "Last Number Used", "Warning No.", "Increment-by No.", Implementation);
-
-        SeriesCode := Code;
-    end;
-
-    internal procedure InsertSeries(Code: Code[20]; Description: Text[100]; ManualNos: Boolean)
     var
         NoSeries: Record "No. Series";
+        NoSeriesLine: Record "No. Series Line";
     begin
         NoSeries.Init();
         NoSeries.Code := Code;
         NoSeries.Description := Description;
         NoSeries."Default Nos." := true;
-        NoSeries."Manual Nos." := ManualNos;
+        NoSeries."Manual Nos." := "Manual Nos.";
         if not NoSeries.Insert() then
             NoSeries.Modify();
-    end;
 
-    internal procedure InsertSeriesLine(SeriesCode: Code[20]; LineNo: Integer; StartingDate: Date; StartingNo: Code[20]; EndingNo: Code[20]; LastNumberUsed: Code[20]; WarningNo: Code[20]; IncrementByNo: Integer; Implementation: Enum "No. Series Implementation")
-    var
-        NoSeriesLine: Record "No. Series Line";
-    begin
         NoSeriesLine.Init();
-        NoSeriesLine."Series Code" := SeriesCode;
-        NoSeriesLine."Starting Date" := StartingDate;
-        NoSeriesLine.Validate("Starting No.", StartingNo);
-        NoSeriesLine.Validate("Ending No.", EndingNo);
-        NoSeriesLine.Validate("Last No. Used", LastNumberUsed);
-        if WarningNo <> '' then
-            NoSeriesLine.Validate("Warning No.", WarningNo);
-        NoSeriesLine.Validate("Increment-by No.", IncrementByNo);
+        NoSeriesLine."Series Code" := NoSeries.Code;
+        NoSeriesLine.Validate("Starting No.", "Starting No.");
+        NoSeriesLine.Validate("Ending No.", "Ending No.");
+        NoSeriesLine.Validate("Last No. Used", "Last Number Used");
+        if "Warning No." <> '' then
+            NoSeriesLine.Validate("Warning No.", "Warning No.");
+        NoSeriesLine.Validate("Increment-by No.", "Increment-by No.");
         NoSeriesLine.Validate(Implementation, Implementation);
-        NoSeriesLine."Line No." := LineNo;
+        NoSeriesLine."Line No." := 10000;
         if not NoSeriesLine.Insert() then
             NoSeriesLine.Modify();
+
+        SeriesCode := Code;
     end;
 
     procedure InsertRelation("Code": Code[20]; "Series Code": Code[20])
