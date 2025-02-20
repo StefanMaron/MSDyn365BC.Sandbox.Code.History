@@ -23,14 +23,6 @@ table 5161 "Contoso Demo Data Module"
         {
             Caption = 'Data Level';
         }
-        field(4; Install; Boolean)
-        {
-            Caption = 'Install';
-        }
-        field(5; "Is Setup Company"; Boolean)
-        {
-            Caption = 'Setup Company';
-        }
     }
 
     keys

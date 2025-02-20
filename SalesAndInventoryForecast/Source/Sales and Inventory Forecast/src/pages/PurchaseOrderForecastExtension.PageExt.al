@@ -16,7 +16,7 @@ pageextension 1856 PurchaseOrderForecastExtension extends "Purchase Order"
             {
                 ApplicationArea = Suite;
                 Provider = PurchLines;
-                SubPageLink = "No." = field("No.");
+                SubPageLink = "No." = Field("No.");
                 UpdatePropagation = Both;
             }
         }

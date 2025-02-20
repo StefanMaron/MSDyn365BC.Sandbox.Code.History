@@ -22,7 +22,7 @@ page 37001 "Sales Moving Annual Total"
 
                 trigger ControlAddInReady()
                 begin
-                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
+                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageTok);
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
@@ -57,7 +57,7 @@ page 37001 "Sales Moving Annual Total"
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageLbl: Label 'ReportSection713e48d18640066bc508', Locked = true;
+        ReportPageTok: Label 'ReportSection713e48d18640066bc508', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()
