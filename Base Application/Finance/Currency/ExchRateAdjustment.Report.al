@@ -275,6 +275,8 @@ report 596 "Exch. Rate Adjustment"
                 AdjBank := true;
             end;
 
+            PreviewPosting := true;
+
             GeneralLedgerSetup.Get();
             IsJournalTemplNameVisible := GeneralLedgerSetup."Journal Templ. Name Mandatory";
 
