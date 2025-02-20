@@ -6,7 +6,6 @@ using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Family;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
-using System.Utilities;
 
 report 99001025 "Refresh Production Order"
 {
@@ -23,42 +22,26 @@ report 99001025 "Refresh Production Order"
 
             trigger OnAfterGetRecord()
             var
-                ProductionOrder: Record "Production Order";
                 ProdOrderLine: Record "Prod. Order Line";
-                ProdOrderRoutingLine: Record "Prod. Order Routing Line";
-                ProdOrderComponent: Record "Prod. Order Component";
-                ProdOrderStatusManagement: Codeunit "Prod. Order Status Management";
-                WhseProductionRelease: Codeunit "Whse.-Production Release";
-                WhseOutputProdRelease: Codeunit "Whse.-Output Prod. Release";
-                ConfirmManagement: Codeunit "Confirm Management";
+                ProdOrderRtngLine: Record "Prod. Order Routing Line";
+                ProdOrderComp: Record "Prod. Order Component";
+                ProdOrder: Record "Production Order";
+                ProdOrderStatusMgt: Codeunit "Prod. Order Status Management";
                 RoutingNo: Code[20];
                 ErrorOccured: Boolean;
                 IsHandled: Boolean;
-                Confirmed: Boolean;
             begin
                 if Status = Status::Finished then
                     CurrReport.Skip();
 
                 TestField("Due Date");
 
-                if CalcLines then
-                    if IsComponentPicked("Production Order") then begin
-                        IsHandled := false;
-                        OnProductionOrderOnAfterGetRecordOnBeforeAlreadyPickedLinesConfirm("Production Order", HideValidationDialog, Confirmed, IsHandled);
-                        if not IsHandled then
-                            if HideValidationDialog then
-                                Confirmed := true
-                            else
-                                Confirmed := ConfirmManagement.GetResponseOrDefault(StrSubstNo(AlreadyPickedLinesQst, "No."), false);
+                if CalcLines and IsComponentPicked("Production Order") then
+                    if not Confirm(StrSubstNo(DeletePickedLinesQst, "No.")) then
+                        CurrReport.Skip();
 
-                        if not Confirmed then
-                            CurrReport.Skip();
-                    end;
-
-                if not HideValidationDialog then begin
-                    ProgressDialog.Update(1, Status);
-                    ProgressDialog.Update(2, "No.");
-                end;
+                Window.Update(1, Status);
+                Window.Update(2, "No.");
 
                 RoutingNo := GetRoutingNo("Production Order");
                 UpdateRoutingNo("Production Order", RoutingNo);
@@ -82,21 +65,21 @@ report 99001025 "Refresh Production Order"
                             if ProdOrderLine.Find('-') then
                                 repeat
                                     if CalcRoutings then begin
-                                        ProdOrderRoutingLine.SetRange(Status, Status);
-                                        ProdOrderRoutingLine.SetRange("Prod. Order No.", "No.");
-                                        ProdOrderRoutingLine.SetRange("Routing Reference No.", ProdOrderLine."Routing Reference No.");
-                                        ProdOrderRoutingLine.SetRange("Routing No.", ProdOrderLine."Routing No.");
-                                        if ProdOrderRoutingLine.FindSet(true) then
+                                        ProdOrderRtngLine.SetRange(Status, Status);
+                                        ProdOrderRtngLine.SetRange("Prod. Order No.", "No.");
+                                        ProdOrderRtngLine.SetRange("Routing Reference No.", ProdOrderLine."Routing Reference No.");
+                                        ProdOrderRtngLine.SetRange("Routing No.", ProdOrderLine."Routing No.");
+                                        if ProdOrderRtngLine.FindSet(true) then
                                             repeat
-                                                ProdOrderRoutingLine.SetSkipUpdateOfCompBinCodes(true);
-                                                ProdOrderRoutingLine.Delete(true);
-                                            until ProdOrderRoutingLine.Next() = 0;
+                                                ProdOrderRtngLine.SetSkipUpdateOfCompBinCodes(true);
+                                                ProdOrderRtngLine.Delete(true);
+                                            until ProdOrderRtngLine.Next() = 0;
                                     end;
                                     if CalcComponents then begin
-                                        ProdOrderComponent.SetRange(Status, Status);
-                                        ProdOrderComponent.SetRange("Prod. Order No.", "No.");
-                                        ProdOrderComponent.SetRange("Prod. Order Line No.", ProdOrderLine."Line No.");
-                                        ProdOrderComponent.DeleteAll(true);
+                                        ProdOrderComp.SetRange(Status, Status);
+                                        ProdOrderComp.SetRange("Prod. Order No.", "No.");
+                                        ProdOrderComp.SetRange("Prod. Order Line No.", ProdOrderLine."Line No.");
+                                        ProdOrderComp.DeleteAll(true);
                                     end;
                                 until ProdOrderLine.Next() = 0;
                             if ProdOrderLine.Find('-') then
@@ -109,7 +92,7 @@ report 99001025 "Refresh Production Order"
                                     IsHandled := false;
                                     OnBeforeCalcProdOrderLine(ProdOrderLine, Direction, CalcLines, CalcRoutings, CalcComponents, IsHandled, ErrorOccured);
                                     if not IsHandled then
-                                        if not CalculateProdOrder.Calculate(ProdOrderLine, Direction, CalcRoutings, CalcComponents, false, false) then
+                                        if not CalcProdOrder.Calculate(ProdOrderLine, Direction, CalcRoutings, CalcComponents, false, false) then
                                             ErrorOccured := true;
                                 until ProdOrderLine.Next() = 0;
                         end;
@@ -122,24 +105,23 @@ report 99001025 "Refresh Production Order"
                 end;
 
                 if Status = Status::Released then begin
-                    ProdOrderStatusManagement.FlushProdOrder("Production Order", Status, WorkDate());
-                    WhseProductionRelease.Release("Production Order");
+                    ProdOrderStatusMgt.FlushProdOrder("Production Order", Status, WorkDate());
+                    WhseProdRelease.Release("Production Order");
                     if CreateInbRqst then
                         WhseOutputProdRelease.Release("Production Order");
                 end;
 
                 OnAfterRefreshProdOrder("Production Order", ErrorOccured);
                 if ErrorOccured then
-                    Message(SpecialWarehouseHandlingRequiredErr, ProductionOrder.TableCaption(), ProdOrderLine.FieldCaption("Bin Code"));
+                    Message(Text005, ProdOrder.TableCaption(), ProdOrderLine.FieldCaption("Bin Code"));
             end;
 
             trigger OnPreDataItem()
             begin
-                if not HideValidationDialog then
-                    ProgressDialog.Open(
-                      ProcessingProgressTxt +
-                      ProcessingProductionOrderStatusLbl +
-                      ProcessingProductionOrderNoLbl);
+                Window.Open(
+                  Text000 +
+                  Text001 +
+                  Text002);
             end;
         }
     }
@@ -188,7 +170,7 @@ report 99001025 "Refresh Production Order"
                             begin
                                 if not CalcRoutings then
                                     if CalcLines then
-                                        Error(RoutingsMustBeCalculatedErr);
+                                        Error(Text003);
                             end;
                         }
                         field(CalcComponents; CalcComponents)
@@ -201,7 +183,7 @@ report 99001025 "Refresh Production Order"
                             begin
                                 if not CalcComponents then
                                     if CalcLines then
-                                        Error(ComponentNeedMustBeCalculatedErr);
+                                        Error(Text004);
                             end;
                         }
                     }
@@ -219,101 +201,114 @@ report 99001025 "Refresh Production Order"
             }
         }
 
+        actions
+        {
+        }
+
         trigger OnInit()
         begin
             CalcLines := true;
             CalcRoutings := true;
             CalcComponents := true;
 
-            OnAfterOnInit(Direction, CalcLines, CalcRoutings, CalcComponents, CreateInbRqst, HideValidationDialog);
+            OnAfterOnInit(Direction, CalcLines, CalcRoutings, CalcComponents, CreateInbRqst);
         end;
+    }
+
+    labels
+    {
     }
 
     trigger OnInitReport()
     begin
         Direction := Direction::Backward;
-        if not GuiAllowed() then
-            SetHideValidationDialog(true);
-
         OnAfterInitReport();
     end;
 
     var
-        CalculateProdOrder: Codeunit "Calculate Prod. Order";
+#pragma warning disable AA0074
+        Text000: Label 'Refreshing Production Orders...\\';
+#pragma warning disable AA0470
+        Text001: Label 'Status         #1##########\';
+        Text002: Label 'No.            #2##########';
+#pragma warning restore AA0470
+        Text003: Label 'Routings must be calculated, when lines are calculated.';
+        Text004: Label 'Component Need must be calculated, when lines are calculated.';
+#pragma warning restore AA0074
+        CalcProdOrder: Codeunit "Calculate Prod. Order";
         CreateProdOrderLines: Codeunit "Create Prod. Order Lines";
-#pragma warning disable AA0204
+        WhseProdRelease: Codeunit "Whse.-Production Release";
+        WhseOutputProdRelease: Codeunit "Whse.-Output Prod. Release";
+        Window: Dialog;
         Direction: Option Forward,Backward;
         CalcLines: Boolean;
         CalcRoutings: Boolean;
         CalcComponents: Boolean;
         CreateInbRqst: Boolean;
-#pragma warning restore AA0204
-        HideValidationDialog: Boolean;
-        ProgressDialog: Dialog;
-        ProcessingProgressTxt: Label 'Refreshing Production Orders...\\';
-        ProcessingProductionOrderStatusLbl: Label 'Status         #1##########\', Comment = '%1 = Production Order Status';
-        ProcessingProductionOrderNoLbl: Label 'No.            #2##########', Comment = '%1 = Production Order No.';
-        RoutingsMustBeCalculatedErr: Label 'Routings must be calculated, when lines are calculated.';
-        ComponentNeedMustBeCalculatedErr: Label 'Component Need must be calculated, when lines are calculated.';
-        SpecialWarehouseHandlingRequiredErr: Label 'One or more of the lines on this %1 require special warehouse handling. The %2 for these lines has been set to blank.', Comment = '%1 = Production Order caption, %2 = Bin Code';
-        AlreadyPickedLinesQst: Label 'Components for production order %1 have already been picked. Do you want to continue?', Comment = '%1 = Production Order No.; Example: Components for production order 101001 have already been picked. Do you want to continue?';
+#pragma warning disable AA0074
+#pragma warning disable AA0470
+        Text005: Label 'One or more of the lines on this %1 require special warehouse handling. The %2 for these lines has been set to blank.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
+#pragma warning disable AA0470
+        DeletePickedLinesQst: Label 'Components for production order %1 have already been picked. Do you want to continue?', Comment = 'Production order no.: Components for production order 101001 have already been picked. Do you want to continue?';
+#pragma warning restore AA0470
 
     local procedure CheckReservationExist()
     var
-        ProdOrderLine: Record "Prod. Order Line";
-        ProdOrderComponent: Record "Prod. Order Component";
+        ProdOrderLine2: Record "Prod. Order Line";
+        ProdOrderComp2: Record "Prod. Order Component";
     begin
         // Not allowed to refresh if reservations exist
         if not (CalcLines or CalcComponents) then
             exit;
 
-        ProdOrderLine.SetRange(Status, "Production Order".Status);
-        ProdOrderLine.SetRange("Prod. Order No.", "Production Order"."No.");
-        if ProdOrderLine.Find('-') then
+        ProdOrderLine2.SetRange(Status, "Production Order".Status);
+        ProdOrderLine2.SetRange("Prod. Order No.", "Production Order"."No.");
+        if ProdOrderLine2.Find('-') then
             repeat
                 if CalcLines then begin
-                    ProdOrderLine.CalcFields("Reserved Qty. (Base)");
-                    if ProdOrderLine."Reserved Qty. (Base)" <> 0 then
+                    ProdOrderLine2.CalcFields("Reserved Qty. (Base)");
+                    if ProdOrderLine2."Reserved Qty. (Base)" <> 0 then
                         if ShouldCheckReservedQty(
-                             ProdOrderLine."Prod. Order No.", 0, Database::"Prod. Order Line",
-                             ProdOrderLine.Status, ProdOrderLine."Line No.", Database::"Prod. Order Component")
+                             ProdOrderLine2."Prod. Order No.", 0, Database::"Prod. Order Line",
+                             ProdOrderLine2.Status, ProdOrderLine2."Line No.", Database::"Prod. Order Component")
                         then
-                            ProdOrderLine.TestField("Reserved Qty. (Base)", 0);
+                            ProdOrderLine2.TestField("Reserved Qty. (Base)", 0);
                 end;
 
                 if CalcComponents then begin
-                    ProdOrderComponent.SetRange(Status, ProdOrderLine.Status);
-                    ProdOrderComponent.SetRange("Prod. Order No.", ProdOrderLine."Prod. Order No.");
-                    ProdOrderComponent.SetRange("Prod. Order Line No.", ProdOrderLine."Line No.");
-                    ProdOrderComponent.SetAutoCalcFields("Reserved Qty. (Base)");
-                    if ProdOrderComponent.Find('-') then
+                    ProdOrderComp2.SetRange(Status, ProdOrderLine2.Status);
+                    ProdOrderComp2.SetRange("Prod. Order No.", ProdOrderLine2."Prod. Order No.");
+                    ProdOrderComp2.SetRange("Prod. Order Line No.", ProdOrderLine2."Line No.");
+                    ProdOrderComp2.SetAutoCalcFields("Reserved Qty. (Base)");
+                    if ProdOrderComp2.Find('-') then
                         repeat
-                            OnCheckReservationExistOnBeforeCheckProdOrderComp2ReservedQtyBase(ProdOrderComponent);
-                            if ProdOrderComponent."Reserved Qty. (Base)" <> 0 then
+                            OnCheckReservationExistOnBeforeCheckProdOrderComp2ReservedQtyBase(ProdOrderComp2);
+                            if ProdOrderComp2."Reserved Qty. (Base)" <> 0 then
                                 if ShouldCheckReservedQty(
-                                     ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Line No.",
-                                     Database::"Prod. Order Component", ProdOrderComponent.Status,
-                                     ProdOrderComponent."Prod. Order Line No.", Database::"Prod. Order Line")
+                                     ProdOrderComp2."Prod. Order No.", ProdOrderComp2."Line No.",
+                                     Database::"Prod. Order Component", ProdOrderComp2.Status,
+                                     ProdOrderComp2."Prod. Order Line No.", Database::"Prod. Order Line")
                                 then
-                                    ProdOrderComponent.TestField("Reserved Qty. (Base)", 0);
-                        until ProdOrderComponent.Next() = 0;
+                                    ProdOrderComp2.TestField("Reserved Qty. (Base)", 0);
+                        until ProdOrderComp2.Next() = 0;
                 end;
-            until ProdOrderLine.Next() = 0;
+            until ProdOrderLine2.Next() = 0;
     end;
 
-    local procedure ShouldCheckReservedQty(ProductionOrderNo: Code[20]; LineNo: Integer; SourceType: Integer; ProductionOrderStatus: Enum "Production Order Status"; ProductionOrderLineNo: Integer; ReservationSourceType: Integer): Boolean
+    local procedure ShouldCheckReservedQty(ProdOrderNo: Code[20]; LineNo: Integer; SourceType: Integer; Status: Enum "Production Order Status"; ProdOrderLineNo: Integer; SourceType2: Integer): Boolean
     var
-        ReservationEntry: Record "Reservation Entry";
+        ReservEntry: Record "Reservation Entry";
     begin
-        ReservationEntry.SetSourceFilter(SourceType, ProductionOrderStatus.AsInteger(), ProductionOrderNo, LineNo, true);
-        ReservationEntry.SetSourceFilter('', ProductionOrderLineNo);
-        ReservationEntry.SetRange("Reservation Status", ReservationEntry."Reservation Status"::Reservation);
-        ReservationEntry.SetLoadFields("Source Type", "Source ID", "Source Subtype");
-        if ReservationEntry.FindFirst() then begin
-            ReservationEntry.Get(ReservationEntry."Entry No.", not ReservationEntry.Positive);
+        ReservEntry.SetSourceFilter(SourceType, Status.AsInteger(), ProdOrderNo, LineNo, true);
+        ReservEntry.SetSourceFilter('', ProdOrderLineNo);
+        ReservEntry.SetRange("Reservation Status", ReservEntry."Reservation Status"::Reservation);
+        if ReservEntry.FindFirst() then begin
+            ReservEntry.Get(ReservEntry."Entry No.", not ReservEntry.Positive);
             exit(
-              not ((ReservationEntry."Source Type" = ReservationSourceType) and
-                   (ReservationEntry."Source ID" = ProductionOrderNo) and (ReservationEntry."Source Subtype" = ProductionOrderStatus.AsInteger())));
+              not ((ReservEntry."Source Type" = SourceType2) and
+                   (ReservEntry."Source ID" = ProdOrderNo) and (ReservEntry."Source Subtype" = Status.AsInteger())));
         end;
 
         exit(false);
@@ -334,21 +329,19 @@ report 99001025 "Refresh Production Order"
         end;
     end;
 
-    local procedure CheckProductionBOMStatus(ProductionBOMNo: Code[20]; ProductionBOMVersionNo: Code[20])
+    local procedure CheckProductionBOMStatus(ProdBOMNo: Code[20]; ProdBOMVersionNo: Code[20])
     var
         ProductionBOMHeader: Record "Production BOM Header";
         ProductionBOMVersion: Record "Production BOM Version";
     begin
-        if ProductionBOMNo = '' then
+        if ProdBOMNo = '' then
             exit;
 
-        if ProductionBOMVersionNo = '' then begin
-            ProductionBOMHeader.SetLoadFields(Status);
-            ProductionBOMHeader.Get(ProductionBOMNo);
+        if ProdBOMVersionNo = '' then begin
+            ProductionBOMHeader.Get(ProdBOMNo);
             ProductionBOMHeader.TestField(Status, ProductionBOMHeader.Status::Certified);
         end else begin
-            ProductionBOMVersion.SetLoadFields(Status);
-            ProductionBOMVersion.Get(ProductionBOMNo, ProductionBOMVersionNo);
+            ProductionBOMVersion.Get(ProdBOMNo, ProdBOMVersionNo);
             ProductionBOMVersion.TestField(Status, ProductionBOMVersion.Status::Certified);
         end;
     end;
@@ -362,11 +355,9 @@ report 99001025 "Refresh Production Order"
             exit;
 
         if RoutingVersionNo = '' then begin
-            RoutingHeader.SetLoadFields(Status);
             RoutingHeader.Get(RoutingNo);
             RoutingHeader.TestField(Status, RoutingHeader.Status::Certified);
         end else begin
-            RoutingVersion.SetLoadFields(Status);
             RoutingVersion.Get(RoutingNo, RoutingVersionNo);
             RoutingVersion.TestField(Status, RoutingVersion.Status::Certified);
         end;
@@ -381,49 +372,39 @@ report 99001025 "Refresh Production Order"
         CreateInbRqst := CreateInbRqst2;
     end;
 
-    procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
-    begin
-        HideValidationDialog := NewHideValidationDialog;
-    end;
-
-    local procedure IsComponentPicked(ProductionOrder: Record "Production Order"): Boolean
+    local procedure IsComponentPicked(ProdOrder: Record "Production Order"): Boolean
     var
-        ProdOrderComponent: Record "Prod. Order Component";
+        ProdOrderComp: Record "Prod. Order Component";
     begin
-        ProdOrderComponent.SetRange(Status, ProductionOrder.Status);
-        ProdOrderComponent.SetRange("Prod. Order No.", ProductionOrder."No.");
-        ProdOrderComponent.SetFilter("Qty. Picked", '<>0');
-        exit(not ProdOrderComponent.IsEmpty());
+        ProdOrderComp.SetRange(Status, ProdOrder.Status);
+        ProdOrderComp.SetRange("Prod. Order No.", ProdOrder."No.");
+        ProdOrderComp.SetFilter("Qty. Picked", '<>0');
+        exit(not ProdOrderComp.IsEmpty);
     end;
 
-    local procedure GetRoutingNo(ProductionOrder: Record "Production Order") RoutingNo: Code[20]
+    local procedure GetRoutingNo(ProdOrder: Record "Production Order") RoutingNo: Code[20]
     var
         Item: Record Item;
         StockkeepingUnit: Record "Stockkeeping Unit";
         Family: Record Family;
     begin
-        RoutingNo := ProductionOrder."Routing No.";
-        case ProductionOrder."Source Type" of
-            ProductionOrder."Source Type"::Item:
+        RoutingNo := ProdOrder."Routing No.";
+        case ProdOrder."Source Type" of
+            ProdOrder."Source Type"::Item:
                 begin
-                    Item.SetLoadFields("Routing No.");
-                    if Item.Get(ProductionOrder."Source No.") then
+                    if Item.Get(ProdOrder."Source No.") then
                         RoutingNo := Item."Routing No.";
-                    StockkeepingUnit.SetLoadFields("Routing No.");
-                    if StockkeepingUnit.Get(ProductionOrder."Location Code", ProductionOrder."Source No.", ProductionOrder."Variant Code") and
+                    if StockkeepingUnit.Get(ProdOrder."Location Code", ProdOrder."Source No.", ProdOrder."Variant Code") and
                         (StockkeepingUnit."Routing No." <> '')
                     then
                         RoutingNo := StockkeepingUnit."Routing No.";
                 end;
-            ProductionOrder."Source Type"::Family:
-                begin
-                    Family.SetLoadFields("Routing No.");
-                    if Family.Get(ProductionOrder."Source No.") then
-                        RoutingNo := Family."Routing No.";
-                end;
+            ProdOrder."Source Type"::Family:
+                if Family.Get(ProdOrder."Source No.") then
+                    RoutingNo := Family."Routing No.";
         end;
 
-        OnAfterGetRoutingNo(ProductionOrder, RoutingNo);
+        OnAfterGetRoutingNo(ProdOrder, RoutingNo);
     end;
 
     [IntegrationEvent(false, false)]
@@ -437,7 +418,7 @@ report 99001025 "Refresh Production Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterOnInit(var Direction: Option; var CalcLines: Boolean; var CalcRoutings: Boolean; var CalcComponents: Boolean; var CreateInbRqst: Boolean; var HideValidationDialog: Boolean)
+    local procedure OnAfterOnInit(var Direction: Option; var CalcLines: Boolean; var CalcRoutings: Boolean; var CalcComponents: Boolean; var CreateInbRqst: Boolean)
     begin
     end;
 
@@ -478,11 +459,6 @@ report 99001025 "Refresh Production Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnProductionOrderOnAfterGetRecordOnAfterCalcRoutingsOrComponents(var ProductionOrder: Record "Production Order"; CalcLines: Boolean; CalcRoutings: Boolean; CalcComponents: Boolean; var ErrorOccured: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnProductionOrderOnAfterGetRecordOnBeforeAlreadyPickedLinesConfirm(var ProductionOrder: Record "Production Order"; HideValidationDialog: Boolean; var Confirmed: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
