@@ -806,7 +806,7 @@ table 32 "Item Ledger Entry"
 
     procedure CalculateRemQuantity(ItemLedgEntryNo: Integer; PostingDate: Date) RemQty: Decimal
     var
-        ItemApplicationEntry: Record "Item Application Entry";
+        ItemApplnEntry: Record "Item Application Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -814,10 +814,15 @@ table 32 "Item Ledger Entry"
         if IsHandled then
             exit(RemQty);
 
-        ItemApplicationEntry.SetRange("Inbound Item Entry No.", ItemLedgEntryNo);
-        ItemApplicationEntry.SetFilter("Posting Date", '<=%1', PostingDate);
-        ItemApplicationEntry.CalcSums(Quantity);
-        RemQty := ItemApplicationEntry.Quantity;
+        ItemApplnEntry.SetCurrentKey("Inbound Item Entry No.");
+        ItemApplnEntry.SetRange("Inbound Item Entry No.", ItemLedgEntryNo);
+        RemQty := 0;
+        if ItemApplnEntry.FindSet() then
+            repeat
+                if ItemApplnEntry."Posting Date" <= PostingDate then
+                    RemQty += ItemApplnEntry.Quantity;
+            until ItemApplnEntry.Next() = 0;
+        exit(RemQty);
     end;
 
     procedure VerifyOnInventory()
