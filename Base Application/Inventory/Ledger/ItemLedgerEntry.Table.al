@@ -580,9 +580,6 @@ table 32 "Item Ledger Entry"
         key(Key23; SystemModifiedAt)
         {
         }
-        key(Key25; "Entry Type", "Item No.")
-        {
-        }
     }
 
     fieldgroups
@@ -1073,23 +1070,6 @@ table 32 "Item Ledger Entry"
         TestField("Lot No.", TrackingSpecification."Lot No.");
 
         OnAfterTestTrackingEqualToTrackingSpec(Rec, TrackingSpecification);
-    end;
-
-    procedure CollectItemLedgerEntryTypesUsed(var ItemLedgerEntryTypesUsed: Dictionary of [Enum "Item Ledger Entry Type", Boolean]; ItemNoFilter: Text)
-    var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        ItemLedgerEntryType: Enum "Item Ledger Entry Type";
-        i: Integer;
-    begin
-        Clear(ItemLedgerEntryTypesUsed);
-
-        if ItemNoFilter <> '' then
-            ItemLedgerEntry.SetFilter("Item No.", ItemNoFilter);
-        foreach i in "Item Ledger Entry Type".Ordinals() do begin
-            ItemLedgerEntryType := "Item Ledger Entry Type".FromInteger(i);
-            ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntryType);
-            ItemLedgerEntryTypesUsed.Add(ItemLedgerEntryType, not ItemLedgerEntry.IsEmpty());
-        end;
     end;
 
     [IntegrationEvent(false, false)]
