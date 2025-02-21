@@ -6359,8 +6359,8 @@ codeunit 22 "Item Jnl.-Post Line"
 
         exit(JobPlanningLineReserve.FindReservEntry(JobPlanningLine, ReservationEntry));
     end;
-    
-    local procedure GetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry: Record "Item Ledger Entry"): Integer
+
+    local procedure GetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry: Record "Item Ledger Entry"): Decimal
     var
         ReservationEntry: Record "Reservation Entry";
         ReservationEntry2: Record "Reservation Entry";
