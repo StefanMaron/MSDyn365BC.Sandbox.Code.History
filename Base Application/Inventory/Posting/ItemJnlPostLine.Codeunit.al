@@ -241,6 +241,7 @@ codeunit 22 "Item Jnl.-Post Line"
 
         OnCodeOnBeforeRunCheck(ItemJnlCheckLine, ItemJnlLine);
         ItemJnlCheckLine.RunCheck(ItemJnlLine);
+        OnCodeOnAfterRunCheck(ItemJnlLine);
 
         if ItemJnlLine."Document Date" = 0D then
             ItemJnlLine."Document Date" := ItemJnlLine."Posting Date";
@@ -6330,8 +6331,8 @@ codeunit 22 "Item Jnl.-Post Line"
 
         exit(JobPlanningLineReserve.FindReservEntry(JobPlanningLine, ReservationEntry));
     end;
-
-    local procedure GetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry: Record "Item Ledger Entry"): Decimal
+    
+    local procedure GetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry: Record "Item Ledger Entry"): Integer
     var
         ReservationEntry: Record "Reservation Entry";
         ReservationEntry2: Record "Reservation Entry";
@@ -8387,6 +8388,11 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeProcedureInsertCapLedgEntry(var ItemJournalLine: Record "Item Journal Line"; var CapacityLedgerEntry: Record "Capacity Ledger Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnAfterRunCheck(var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 }
