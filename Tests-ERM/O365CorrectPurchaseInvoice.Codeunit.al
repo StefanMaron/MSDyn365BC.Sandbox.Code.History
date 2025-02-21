@@ -1113,7 +1113,7 @@ codeunit 138025 "O365 Correct Purchase Invoice"
     end;
 
     [Test]
-    [HandlerFunctions('ConfirmHandler,PurchaseCreditMemoPageHandler')]
+    [Scope('OnPrem')]
     procedure TestInvoiceLineLessThanZero()
     var
         Vendor: Record Vendor;
@@ -1123,7 +1123,7 @@ codeunit 138025 "O365 Correct Purchase Invoice"
         CorrectPostedPurchInvoice: Codeunit "Correct Posted Purch. Invoice";
     begin
         Initialize();
-        LibraryVariableStorage.Enqueue(true); // Confirm to open credit memo
+
         CreateAndPostPurchaseInvForNewItemAndVendor(Item, Item.Type::Inventory, Vendor, 0, -1, PurchInvHeader);
 
         // EXERCISE
@@ -2142,12 +2142,6 @@ codeunit 138025 "O365 Correct Purchase Invoice"
                 Resource.DeleteAll();
         end;
         LibraryLowerPermissions.SetO365Full();
-    end;
-
-    [PageHandler]
-    procedure PurchaseCreditMemoPageHandler(var PurchaseCreditMemo: TestPage "Purchase Credit Memo")
-    begin
-        PurchaseCreditMemo.Close();
     end;
 }
 
