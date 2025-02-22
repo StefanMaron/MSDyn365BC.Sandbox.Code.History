@@ -733,7 +733,6 @@ codeunit 135208 "ML Prediction Management Test"
 
         MockAzureKeyvaultSecretProvider := MockAzureKeyvaultSecretProvider.MockAzureKeyVaultSecretProvider();
         MockAzureKeyvaultSecretProvider.AddSecretMapping(StrSubstNo('machinelearning-%1', TenantId()), TimeSeriesParams);
-        MockAzureKeyvaultSecretProvider.AddSecretMapping('AllowedApplicationSecrets', 'machinelearning');
         MockAzureKeyvaultSecretProvider.AddSecretMapping('machinelearning', TimeSeriesParams);
         AzureKeyVaultTestLibrary.SetAzureKeyVaultSecretProvider(MockAzureKeyvaultSecretProvider);
     end;
