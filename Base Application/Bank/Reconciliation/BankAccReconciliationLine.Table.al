@@ -344,6 +344,9 @@ table 274 "Bank Acc. Reconciliation Line"
     end;
 
     var
+        BankAccLedgEntry: Record "Bank Account Ledger Entry";
+        CheckLedgEntry: Record "Check Ledger Entry";
+        BankAccRecon: Record "Bank Acc. Reconciliation";
         BankAccSetStmtNo: Codeunit "Bank Acc. Entry Set Recon.-No.";
         DimMgt: Codeunit DimensionManagement;
         ConfirmManagement: Codeunit "Confirm Management";
@@ -364,11 +367,6 @@ table 274 "Bank Acc. Reconciliation Line"
         AppliedManuallyStatusTxt: Label 'Applied Manually';
         ReviewedStatusTxt: Label 'Application Reviewed';
         PaymentRecJournalFeatureNameTelemetryTxt: Label 'Payment Reconciliation', Locked = true;
-
-    protected var
-        BankAccLedgEntry: Record "Bank Account Ledger Entry";
-        CheckLedgEntry: Record "Check Ledger Entry";
-        BankAccRecon: Record "Bank Acc. Reconciliation";
 
     internal procedure GetPaymentRecJournalTelemetryFeatureName(): Text
     begin
@@ -586,7 +584,7 @@ table 274 "Bank Acc. Reconciliation Line"
         BankAccRecMatchBuffer.SetRange("Statement Line No.", Rec."Statement Line No.");
     end;
 
-    protected procedure RemoveApplication()
+    local procedure RemoveApplication()
     var
         BankAccRecMatchBuffer: Record "Bank Acc. Rec. Match Buffer";
         BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
@@ -607,6 +605,7 @@ table 274 "Bank Acc. Reconciliation Line"
                 BankAccRecMatchBuffer.Delete();
             end;
         end;
+
 
         BankAccRecMatchBuffer.Reset();
         BankAccRecMatchBuffer.SetRange("Ledger Entry No.", BankAccLedgEntry."Entry No.");
@@ -1237,13 +1236,7 @@ table 274 "Bank Acc. Reconciliation Line"
     var
         PostedPaymentReconLine: Record "Posted Payment Recon. Line";
         BankAccountStatementLine: Record "Bank Account Statement Line";
-        ReturnValue: Boolean;
-        IsHandled: Boolean;
     begin
-        OnBeforeIsTransactionPostedAndReconciled(Rec, ReturnValue, IsHandled);
-        if IsHandled then
-            exit(ReturnValue);
-
         if "Transaction ID" <> '' then begin
             PostedPaymentReconLine.SetRange("Bank Account No.", "Bank Account No.");
             PostedPaymentReconLine.SetRange("Transaction ID", "Transaction ID");
@@ -1469,11 +1462,6 @@ table 274 "Bank Acc. Reconciliation Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnDisplayApplicationOnAfterBankAccLedgEntrySetFilters(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var BankAccLedgEntry: Record "Bank Account Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsTransactionPostedAndReconciled(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var ReturnValue: Boolean; var IsHandled: Boolean)
     begin
     end;
 
