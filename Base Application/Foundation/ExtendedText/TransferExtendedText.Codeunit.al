@@ -289,7 +289,6 @@ codeunit 378 "Transfer Extended Text"
             exit;
 
         LineSpacing := 10; // New fixed Line Spacing method
-        OnInsertSalesExtTextRetLastOnAfterSetLineSpacing(LineSpacing);
 
         ToSalesLine.Reset();
         ToSalesLine.SetRange("Document Type", SalesLine."Document Type");
@@ -369,11 +368,8 @@ codeunit 378 "Transfer Extended Text"
                 ToReminderLine.Description := TempExtTextLine.Text;
                 ToReminderLine."Attached to Line No." := ReminderLine."Line No.";
                 ToReminderLine."Line Type" := ReminderLine."Line Type";
-
-                IsHandled := false;
-                OnBeforeToReminderLineInsert(ToReminderLine, ReminderLine, TempExtTextLine, NextLineNo, LineSpacing, IsHandled);
-                if not IsHandled then
-                    ToReminderLine.Insert();
+                OnBeforeToReminderLineInsert(ToReminderLine, ReminderLine, TempExtTextLine);
+                ToReminderLine.Insert();
             until TempExtTextLine.Next() = 0;
             MakeUpdateRequired := true;
         end;
@@ -412,11 +408,8 @@ codeunit 378 "Transfer Extended Text"
                 NextLineNo := NextLineNo + LineSpacing;
                 ToFinChrgMemoLine.Description := TempExtTextLine.Text;
                 ToFinChrgMemoLine."Attached to Line No." := FinChrgMemoLine."Line No.";
-
-                IsHandled := false;
-                OnInsertFinChrgMemoExtTextOnBeforeToFinChrgMemoLineInsert(ToFinChrgMemoLine, FinChrgMemoLine, TempExtTextLine, NextLineNo, LineSpacing, IsHandled);
-                if not IsHandled then
-                    ToFinChrgMemoLine.Insert();
+                OnInsertFinChrgMemoExtTextOnBeforeToFinChrgMemoLineInsert(ToFinChrgMemoLine, FinChrgMemoLine, TempExtTextLine, NextLineNo, LineSpacing);
+                ToFinChrgMemoLine.Insert();
             until TempExtTextLine.Next() = 0;
             MakeUpdateRequired := true;
         end;
@@ -466,11 +459,8 @@ codeunit 378 "Transfer Extended Text"
                 NextLineNo := NextLineNo + LineSpacing;
                 ToPurchLine.Description := TempExtTextLine.Text;
                 ToPurchLine."Attached to Line No." := PurchLine."Line No.";
-
-                IsHandled := false;
-                OnBeforeToPurchLineInsert(ToPurchLine, PurchLine, TempExtTextLine, NextLineNo, LineSpacing, IsHandled);
-                if not IsHandled then
-                    ToPurchLine.Insert();
+                OnBeforeToPurchLineInsert(ToPurchLine, PurchLine, TempExtTextLine, NextLineNo, LineSpacing);
+                ToPurchLine.Insert();
             until TempExtTextLine.Next() = 0;
             MakeUpdateRequired := true;
         end;
@@ -481,25 +471,17 @@ codeunit 378 "Transfer Extended Text"
     local procedure DeleteSalesLines(var SalesLine: Record "Sales Line"): Boolean
     var
         SalesLine2: Record "Sales Line";
-        IsHandled: Boolean;
-        Found: Boolean;
     begin
         SalesLine2.SetRange("Document Type", SalesLine."Document Type");
         SalesLine2.SetRange("Document No.", SalesLine."Document No.");
         SalesLine2.SetRange("Attached to Line No.", SalesLine."Line No.");
         OnDeleteSalesLinesOnAfterSetFilters(SalesLine2, SalesLine);
         SalesLine2 := SalesLine;
-        Found := false;
         if SalesLine2.Find('>') then begin
             repeat
-                IsHandled := false;
-                OnDeleteSalesLinesOnBeforeDelete(SalesLine, SalesLine2, IsHandled);
-                if not IsHandled then begin
-                    SalesLine2.Delete(true);
-                    Found := true;
-                end;
+                SalesLine2.Delete(true);
             until SalesLine2.Next() = 0;
-            exit(Found);
+            exit(true);
         end;
     end;
 
@@ -748,7 +730,6 @@ codeunit 378 "Transfer Extended Text"
                 ToServiceLine.Description := TempExtTextLine.Text;
                 ToServiceLine."Attached to Line No." := ServiceLine."Line No.";
                 ToServiceLine."Service Item No." := ServiceLine."Service Item No.";
-
                 IsHandled := false;
                 OnInsertServExtTextOnBeforeToServiceLineInsert(ServiceLine, ToServiceLine, TempExtTextLine, NextLineNo, LineSpacing, IsHandled);
                 if not IsHandled then
@@ -791,8 +772,6 @@ codeunit 378 "Transfer Extended Text"
                         AutoText := Res."Automatic Ext. Texts";
             end;
 
-        OnJobCheckIfAnyExtTextOnAfterCheckAutoText(JobPlanningLine, AutoText, Unconditionally);
-
         if not AutoText then
             exit;
 
@@ -802,8 +781,6 @@ codeunit 378 "Transfer Extended Text"
 
         ExtTextHeader.SetRange("Table Name", JobPlanningLine.Type);
         ExtTextHeader.SetRange("No.", JobPlanningLine."No.");
-
-        OnJobCheckIfAnyExtTextOnBeforeReadExtTextLines(ExtTextHeader, Job, JobPlanningLine, Unconditionally, MakeUpdateRequired);
         exit(ReadExtTextLines(ExtTextHeader, JobPlanningLine."Document Date", Job."Language Code"));
     end;
 
@@ -814,7 +791,6 @@ codeunit 378 "Transfer Extended Text"
         JobPlanningLine2.SetRange("Job No.", JobPlanningLine."Job No.");
         JobPlanningLine2.SetRange("Job Task No.", JobPlanningLine."Job Task No.");
         JobPlanningLine2.SetRange("Attached to Line No.", JobPlanningLine."Line No.");
-        OnDeleteJobPlanningLinesOnAfterSetFilters(JobPlanningLine2, JobPlanningLine);
         JobPlanningLine2 := JobPlanningLine;
         if JobPlanningLine2.Find('>') then begin
             repeat
@@ -834,10 +810,7 @@ codeunit 378 "Transfer Extended Text"
     procedure InsertJobExtTextRetLast(var JobPlanningLine: Record "Job Planning Line"; var LastInsertedJobPlanningLine: Record "Job Planning Line")
     var
         ToJobPlanningLine: Record "Job Planning Line";
-        IsHandled: Boolean;
     begin
-        OnBeforeInsertJobExtTextRetLast(JobPlanningLine, TempExtTextLine, MakeUpdateRequired);
-
         LineSpacing := 10; // New fixed Line Spacing method
 
         ToJobPlanningLine.Reset();
@@ -857,11 +830,7 @@ codeunit 378 "Transfer Extended Text"
                 NextLineNo := NextLineNo + LineSpacing;
                 ToJobPlanningLine.Description := TempExtTextLine.Text;
                 ToJobPlanningLine."Attached to Line No." := JobPlanningLine."Line No.";
-
-                IsHandled := false;
-                OnInsertJobExtTextRetLastOnBeforeToJobPlanningLineInsert(ToJobPlanningLine, JobPlanningLine, TempExtTextLine, NextLineNo, LineSpacing, IsHandled);
-                if not IsHandled then
-                    ToJobPlanningLine.Insert();
+                ToJobPlanningLine.Insert();
             until TempExtTextLine.Next() = 0;
             MakeUpdateRequired := true;
         end;
@@ -885,7 +854,7 @@ codeunit 378 "Transfer Extended Text"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeToPurchLineInsert(var ToPurchLine: Record "Purchase Line"; PurchLine: Record "Purchase Line"; TempExtTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeToPurchLineInsert(var ToPurchLine: Record "Purchase Line"; PurchLine: Record "Purchase Line"; TempExtTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer)
     begin
     end;
 
@@ -900,7 +869,7 @@ codeunit 378 "Transfer Extended Text"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeToReminderLineInsert(var ToReminderLine: Record "Reminder Line"; ReminderLine: Record "Reminder Line"; TempExtTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeToReminderLineInsert(var ToReminderLine: Record "Reminder Line"; ReminderLine: Record "Reminder Line"; TempExtTextLine: Record "Extended Text Line" temporary)
     begin
     end;
 
@@ -1038,7 +1007,7 @@ codeunit 378 "Transfer Extended Text"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertFinChrgMemoExtTextOnBeforeToFinChrgMemoLineInsert(var ToFinanceChargeMemoLine: Record "Finance Charge Memo Line"; FinanceChargeMemoLine: Record "Finance Charge Memo Line"; TempExtendedTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer; var IsHandled: Boolean)
+    local procedure OnInsertFinChrgMemoExtTextOnBeforeToFinChrgMemoLineInsert(var ToFinanceChargeMemoLine: Record "Finance Charge Memo Line"; FinanceChargeMemoLine: Record "Finance Charge Memo Line"; TempExtendedTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer)
     begin
     end;
 
@@ -1074,41 +1043,6 @@ codeunit 378 "Transfer Extended Text"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeServCheckIfAnyExtText(var ServiceLine: Record "Service Line"; Unconditionally: Boolean; var MakeUpdateRequired: Boolean; var AutoText: Boolean; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnDeleteSalesLinesOnBeforeDelete(var SalesLine: Record "Sales Line"; var SalesLineToDelete: Record "Sales Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertJobExtTextRetLast(var JobPlanningLine: Record "Job Planning Line"; var TempExtendedTextLine: Record "Extended Text Line" temporary; var MakeUpdateRequired: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnJobCheckIfAnyExtTextOnBeforeReadExtTextLines(var ExtendedTextHeader: Record "Extended Text Header"; var Job: Record Job; var JobPlanningLine: Record "Job Planning Line"; Unconditionally: Boolean; var MakeUpdateRequired: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertJobExtTextRetLastOnBeforeToJobPlanningLineInsert(var ToJobPlanningLine: Record "Job Planning Line"; JobPlanningLine: Record "Job Planning Line"; TempExtendedTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnDeleteJobPlanningLinesOnAfterSetFilters(var ToJobPlanningLine: Record "Job Planning Line"; FromJobPlanningLine: Record "Job Planning Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnJobCheckIfAnyExtTextOnAfterCheckAutoText(var JobPlanningLine: Record "Job Planning Line"; var AutoText: Boolean; Unconditionally: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertSalesExtTextRetLastOnAfterSetLineSpacing(var LineSpacing: Integer)
     begin
     end;
 }
