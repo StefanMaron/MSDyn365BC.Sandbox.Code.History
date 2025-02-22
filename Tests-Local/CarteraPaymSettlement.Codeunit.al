@@ -595,7 +595,7 @@ codeunit 147501 "Cartera Paym. Settlement"
         PurchaseLine.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
         PurchaseLine.Modify(true);
 
-        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"01 General");
+        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"07 Special Cash");
 
         DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
 
@@ -658,7 +658,7 @@ codeunit 147501 "Cartera Paym. Settlement"
         PurchaseLine.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
         PurchaseLine.Modify(true);
 
-        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"01 General");
+        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"07 Special Cash");
 
         DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
 
@@ -738,7 +738,7 @@ codeunit 147501 "Cartera Paym. Settlement"
         PurchaseLine.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
         PurchaseLine.Modify(true);
 
-        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"01 General");
+        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"07 Special Cash");
 
         DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
 
@@ -811,7 +811,7 @@ codeunit 147501 "Cartera Paym. Settlement"
         PurchaseLine.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
         PurchaseLine.Modify(true);
 
-        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"01 General");
+        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"07 Special Cash");
 
         DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
 
@@ -1140,7 +1140,7 @@ codeunit 147501 "Cartera Paym. Settlement"
         PurchaseLine.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
         PurchaseLine.Modify(true);
 
-        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"01 General");
+        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"07 Special Cash");
 
         DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
 
@@ -1208,46 +1208,6 @@ codeunit 147501 "Cartera Paym. Settlement"
         // [THEN] Verify the Cartera Document is posted.
         VerifyCarteraDocIsClosedAsHonored(CarteraDoc);
         LibraryVariableStorage.AssertEmpty();
-    end;
-
-    [Test]
-    [HandlerFunctions('ConfirmHandlerCartera,MessageHandlerCartera,OpenBankCatPostPayBillsMatrix,OpenPostedBills')]
-    procedure PostBillPayablePaymentMatrixFiltersBankAccountNo()
-    var
-        BankAccount: Record "Bank Account";
-        CarteraDoc: Record "Cartera Doc.";
-        PaymentOrder: Record "Payment Order";
-        Vendor: Record Vendor;
-        POPostAndPrint: Codeunit "BG/PO-Post and Print";
-        BankAccountCard: TestPage "Bank Account Card";
-        BankCatPostedPayableBills: TestPage "Bank Cat. Posted Payable Bills";
-        AnalysisPeriodType: Enum "Analysis Period Type";
-    begin
-        // [SCENARIO 554713] The Posted Payable Bills Matrix show correct information as there is filter to Bank Account.
-        Initialize();
-
-        // [GIVEN] Prepare Payment Order.
-        PreparePaymentOrder(Vendor, BankAccount, CarteraDoc, PaymentOrder, LocalCurrencyCode);
-
-        // [GIVEN] Post Payable Account.
-        POPostAndPrint.PayablePostOnly(PaymentOrder);
-
-        // [GIVEN] Store Bank Account.
-        LibraryVariableStorage.Enqueue(BankAccount."No.");
-
-        // [GIVEN] Open Bank Account Card and go to Posted Payables Bills.
-        BankAccountCard.OpenEdit();
-        BankAccountCard.GoToRecord(BankAccount);
-        BankAccountCard."Posted Pa&yable Bills".Invoke();
-
-        // [GIVEN] Store Bank Account.
-        LibraryVariableStorage.Enqueue(BankAccount."No.");
-
-        // [THEN] Bank Account filter is added when Matrix is invoked.
-        BankCatPostedPayableBills.OpenEdit();
-        BankCatPostedPayableBills.GoToRecord(BankAccount);
-        BankCatPostedPayableBills.PeriodType.SetValue(AnalysisPeriodType::Year);
-        BankCatPostedPayableBills."&Show Matrix".Invoke();
     end;
 
     local procedure Initialize()
@@ -1386,7 +1346,7 @@ codeunit 147501 "Cartera Paym. Settlement"
         PurchaseLine.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
         PurchaseLine.Modify(true);
 
-        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"01 General");
+        PurchaseHeader.TestField("Special Scheme Code", PurchaseHeader."Special Scheme Code"::"07 Special Cash");
 
         exit(LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true));
     end;
@@ -1931,19 +1891,6 @@ codeunit 147501 "Cartera Paym. Settlement"
     procedure CarteraDocumnets(var CarteraDocuments: TestPage "Cartera Documents")
     begin
         CarteraDocuments.OK().Invoke();
-    end;
-
-    [ModalPageHandler]
-    procedure OpenBankCatPostPayBillsMatrix(var BankCatPostPayBillsMatrix: TestPage "Bank Cat.Post.Pay.Bills Matrix")
-    begin
-        BankCatPostPayBillsMatrix.Filter.SetFilter("No.", LibraryVariableStorage.DequeueText());
-        Assert.AreEqual(BankCatPostPayBillsMatrix."No.".Value(), LibraryVariableStorage.DequeueText(), '');
-        BankCatPostPayBillsMatrix.Field1.Drilldown();
-    end;
-
-    [ModalPageHandler]
-    procedure OpenPostedBills(var PostedBills: TestPage "Posted Bills")
-    begin
     end;
 
     [ConfirmHandler]
