@@ -123,6 +123,9 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
+      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
+    },
+    {
       "path": "./EU3PartyTradePurchase/test/EU 3-Party Trade Purchase Tests"
     },
     {
