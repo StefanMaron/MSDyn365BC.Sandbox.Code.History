@@ -74,8 +74,8 @@ codeunit 1928 "Media Cleanup Impl."
                 repeat
                     if TenantMedia.Get(TenantMediaSet."Media ID".MediaId()) then begin
                         TempTenantMediaVar := TenantMedia;
-                        if TempTenantMediaVar.Insert() then
-                            MediaLoaded += 1;
+                        TempTenantMediaVar.Insert();
+                        MediaLoaded += 1;
                         if MediaLoaded >= RecordLimit then
                             exit(false);
                     end;
@@ -160,36 +160,26 @@ codeunit 1928 "Media Cleanup Impl."
 
     procedure DeleteDetachedTenantMediaSet()
     var
-        [SecurityFiltering(SecurityFilter::Ignored)]
         TenantMediaSet: Record "Tenant Media Set";
-        SplitList: List of [List of [Guid]];
         MediaSetOrphans: List of [Guid];
-        MediaOrphanSubList: List of [Guid];
-        TenantMediaFilter: Text;
+        Orphan: Guid;
     begin
         if not TenantMediaSet.WritePermission() then
             exit;
 
         MediaSetOrphans := MediaSet.FindOrphans();
-        SplitListIntoSubLists(MediaSetOrphans, 10, SplitList);
-        foreach MediaOrphanSubList in SplitList do begin
-            TenantMediaFilter := CreateOrFilter(MediaOrphanSubList);
-            if TenantMediaFilter <> '' then begin
-                TenantMediaSet.SetFilter(ID, TenantMediaFilter);
-                TenantMediaSet.DeleteAll();
-                Commit(); // Ensure we keep the progress even on timeout (in case of large amounts of detached media).
-            end;
+        foreach Orphan in MediaSetOrphans do begin
+            TenantMediaSet.SetRange(ID, Orphan);
+            TenantMediaSet.DeleteAll();
         end;
     end;
 
     procedure DeleteDetachedTenantMedia()
     var
-        [SecurityFiltering(SecurityFilter::Ignored)]
         TenantMedia: Record "Tenant Media";
         SplitList: List of [List of [Guid]];
         MediaOrphans: List of [Guid];
         MediaOrphanSubList: List of [Guid];
-        TenantMediaFilter: Text;
     begin
         if not TenantMedia.WritePermission() then
             exit;
@@ -197,12 +187,9 @@ codeunit 1928 "Media Cleanup Impl."
         MediaOrphans := Media.FindOrphans();
         SplitListIntoSubLists(MediaOrphans, 100, SplitList);
         foreach MediaOrphanSubList in SplitList do begin
-            TenantMediaFilter := CreateOrFilter(MediaOrphanSubList);
-            if TenantMediaFilter <> '' then begin
-                TenantMedia.SetFilter(ID, TenantMediaFilter);
-                TenantMedia.DeleteAll();
-                Commit(); // Ensure we keep the progress even on timeout (in case of large amounts of detached media).
-            end;
+            TenantMedia.SetFilter(ID, CreateOrFilter(MediaOrphanSubList));
+            TenantMedia.DeleteAll();
+            Commit(); // Ensure we keep the progress even on timeout (in case of large amounts of detached media).
         end;
     end;
 
@@ -244,7 +231,6 @@ codeunit 1928 "Media Cleanup Impl."
         FilterText := FilterText.TrimEnd('|');
     end;
 
-    // 322, 100 will result in [[1, 100], [101, 200], [201, 300], [301, 322]]
     local procedure SplitListIntoSubLists(var InputList: List of [Guid]; SubListCount: Integer; var SplitList: List of [List of [Guid]])
     var
         Math: Codeunit Math;
@@ -253,7 +239,7 @@ codeunit 1928 "Media Cleanup Impl."
         From: Integer;
         ToInt: Integer;
     begin
-        for ListNumber := 0 to Round(InputList.Count() / SubListCount, 1) do begin
+        for ListNumber := 0 to Round(InputList.Count() / SubListCount, 1) - 1 do begin
             Clear(SubList);
             From := ListNumber * SubListCount + 1;
             ToInt := Math.Min(SubListCount, InputList.Count() - ListNumber * SubListCount);
