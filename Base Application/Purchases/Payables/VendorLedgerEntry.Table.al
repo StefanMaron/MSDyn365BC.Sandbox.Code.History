@@ -444,7 +444,6 @@ table 25 "Vendor Ledger Entry"
             begin
                 TestField(Open, true);
                 CalcFields(Amount, "Remaining Amount");
-                OnValidateMaxPaymentToleranceBeforeError(Rec);
 
                 if "Max. Payment Tolerance" * Amount < 0 then
                     FieldError("Max. Payment Tolerance", StrSubstNo(MustHaveSameSignErr, FieldCaption(Amount)));
@@ -723,6 +722,10 @@ table 25 "Vendor Ledger Entry"
         key(Key25; "Vendor No.", "Posting Date", "Applies-to ID")
         {
             IncludedFields = "Currency Code", "Amount to Apply", Open;
+        }
+        key(Key26; "Applies-to ID")
+        {
+            IncludedFields = "Accepted Payment Tolerance";
         }
     }
 
@@ -1115,11 +1118,6 @@ table 25 "Vendor Ledger Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterRecalculateAmounts(var VendorLedgerEntry: Record "Vendor Ledger Entry"; FromCurrencyCode: Code[10]; ToCurrencyCode: Code[10]; PostingDate: Date)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateMaxPaymentToleranceBeforeError(var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 
