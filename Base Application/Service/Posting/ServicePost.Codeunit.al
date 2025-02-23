@@ -334,26 +334,14 @@ codeunit 5980 "Service-Post"
             TestServLinePostingDate(PassedServiceHeader."Document Type", PassedServiceHeader."No.", PassedServiceHeader."Journal Templ. Name")
         else
             if PassedServiceHeader."Posting Date" <> PassedServiceLine."Posting Date" then begin
-                CheckDateNotAllowedForServiceLine(PassedServiceHeader, PassedServiceLine);
+                if PassedServiceLine.Type <> PassedServiceLine.Type::" " then
+                    if GenJnlCheckLine.DateNotAllowed(PassedServiceLine."Posting Date", PassedServiceHeader."Journal Templ. Name") then
+                        PassedServiceLine.FieldError("Posting Date", ErrorInfo.Create(Text007, true));
+
                 if GenJnlCheckLine.DateNotAllowed(PassedServiceHeader."Posting Date", PassedServiceHeader."Journal Templ. Name") then
                     PassedServiceHeader.FieldError(PassedServiceHeader."Posting Date", ErrorInfo.Create(Text007, true));
             end;
         PassedServiceHeader.TestMandatoryFields(PassedServiceLine);
-    end;
-
-    local procedure CheckDateNotAllowedForServiceLine(var PassedServiceHeader: Record "Service Header"; var PassedServiceLine: Record "Service Line")
-    var
-        GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCheckDateNotAllowedForServiceLine(PassedServiceLine, IsHandled);
-        if IsHandled then
-            exit;
-
-        if PassedServiceLine.Type <> PassedServiceLine.Type::" " then
-            if GenJnlCheckLine.DateNotAllowed(PassedServiceLine."Posting Date", PassedServiceHeader."Journal Templ. Name") then
-                PassedServiceLine.FieldError("Posting Date", ErrorInfo.Create(Text007, true));
     end;
 
     procedure SetPostingDate(NewReplacePostingDate: Boolean; NewReplaceDocumentDate: Boolean; NewPostingDate: Date)
@@ -592,6 +580,7 @@ codeunit 5980 "Service-Post"
         end;
     end;
 
+    [Scope('OnPrem')]
     procedure SendPostedDocumentRecord(ServiceHeader: Record "Service Header"; var DocumentSendingProfile: Record "Document Sending Profile")
     var
         ServiceInvHeader: Record "Service Invoice Header";
@@ -757,11 +746,6 @@ codeunit 5980 "Service-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidatePostingAndDocumentDate(var ServiceHeader: Record "Service Header"; var PostingDateExists: Boolean; var ReplacePostingDate: Boolean; var ReplaceDocumentDate: Boolean; var PostingDate: Date)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckDateNotAllowedForServiceLine(var PassedServiceLine: Record "Service Line"; var IsHandled: Boolean)
     begin
     end;
 }
