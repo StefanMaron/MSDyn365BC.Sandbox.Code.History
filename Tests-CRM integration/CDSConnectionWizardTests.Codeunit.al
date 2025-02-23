@@ -292,6 +292,7 @@ codeunit 139194 "CDS Connection Wizard Tests"
     begin
         LibraryVariableStorage.Clear();
         LibraryAzureKVMockMgmt.InitMockAzureKeyvaultSecretProvider();
+        LibraryAzureKVMockMgmt.EnsureSecretNameIsAllowed('SmtpSetup');
         AssistedSetupTestLibrary.DeleteAll();
         AssistedSetupTestLibrary.CallOnRegister();
         CDSConnectionSetup.DeleteAll();
