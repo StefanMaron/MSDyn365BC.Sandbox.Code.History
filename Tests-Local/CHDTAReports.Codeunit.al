@@ -961,6 +961,7 @@
         CompanyInformation.Get();
 
         LibraryAzureKVMockMgmt.InitMockAzureKeyvaultSecretProvider();
+        LibraryAzureKVMockMgmt.EnsureSecretNameIsAllowed('SmtpSetup');
         LibraryERMCountryData.CreateVATData();
         LibraryERMCountryData.UpdateAccountInVendorPostingGroups();
         LibraryERMCountryData.UpdateGeneralPostingSetup();
