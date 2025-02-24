@@ -2,6 +2,7 @@
 
 using System.Environment.Configuration;
 using System.IO;
+using System.Telemetry;
 using System.Utilities;
 
 page 1501 Workflow
@@ -262,7 +263,9 @@ page 1501 Workflow
     trigger OnOpenPage()
     var
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
+        FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
+        FeatureTelemetry.LogUptake('0000GDO', 'Workflows', Enum::"Feature Uptake Status"::Discovered);
         IsNotTemplate := not Rec.Template;
         InstancesExist := false;
         ArchiveExists := false;

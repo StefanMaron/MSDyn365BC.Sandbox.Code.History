@@ -485,7 +485,6 @@ codeunit 9100 "SharePoint Client"
     /// Updates metadata field for list item.
     /// </summary>
     /// <param name="ListTitle">The title of the list.</param>
-    /// <param name="ItemId">The GUID of the item.</param>
     /// <param name="ListItemEntityTypeFullName">The Entity Type for the list. Parameter can be found on a list object (ListItemEntityType).</param>
     /// <param name="FieldName">The name of the metadata field.</param>
     /// <param name="FieldValue">Value.</param>
@@ -498,8 +497,7 @@ codeunit 9100 "SharePoint Client"
     /// <summary>
     /// Updates metadata field for list item.
     /// </summary>
-    /// <param name="ListId">The GUID of the list.</param>
-    /// <param name="ItemId">The GUID of the item.</param>
+    /// <param name="ListTitle">The GUID of the list.</param>
     /// <param name="ListItemEntityTypeFullName">The Entity Type for the list. Parameter can be found on a list object (ListItemEntityType).</param>
     /// <param name="FieldName">The name of the metadata field.</param>
     /// <param name="FieldValue">Value.</param>
