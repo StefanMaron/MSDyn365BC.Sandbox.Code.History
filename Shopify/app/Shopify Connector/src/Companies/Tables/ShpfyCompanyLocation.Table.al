@@ -58,13 +58,11 @@ table 30151 "Shpfy Company Location"
             DataClassification = CustomerContent;
             Editable = false;
         }
-#pragma warning disable AS0086
-        field(10; "Province Code"; Code[10])
+        field(10; "Province Code"; Code[2])
         {
             Caption = 'Province';
             DataClassification = CustomerContent;
         }
-#pragma warning restore AS0086
         field(11; "Province Name"; Text[50])
         {
             Caption = 'Province Name';
