@@ -136,27 +136,27 @@
       "path": "./Tests-Workflow"
     },
     {
+      "path": "./Test Runner/src/DataDrivenTest"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
       "path": "./Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
       "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
     }
   ],
   "settings": {
     "allint.enabled": false,
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
-    }
+    },
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
   }
 }
