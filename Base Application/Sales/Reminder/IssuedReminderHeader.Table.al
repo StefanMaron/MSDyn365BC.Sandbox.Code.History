@@ -199,8 +199,7 @@ table 297 "Issued Reminder Header"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CalcFormula = sum("Issued Reminder Line".Amount where("Reminder No." = field("No."),
-                                                                  Type = const("G/L Account"),
-                                                                  "Line Type" = filter(<> "Not Due")));
+                                                                   Type = const("G/L Account")));
             Caption = 'Additional Fee';
             Editable = false;
             FieldClass = FlowField;
@@ -210,8 +209,7 @@ table 297 "Issued Reminder Header"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CalcFormula = sum("Issued Reminder Line"."VAT Amount" where("Reminder No." = field("No."),
-                                                                        "Detailed Interest Rates Entry" = const(false),
-                                                                        "Line Type" = filter(<> "Not Due")));
+                                                                         "Detailed Interest Rates Entry" = const(false)));
             Caption = 'VAT Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -475,13 +473,11 @@ table 297 "Issued Reminder Header"
     var
         IssuedReminderLine: Record "Issued Reminder Line";
         ReminderInterestAmount: Decimal;
-        InterestAmountTotal: Decimal;
-        VATAmountTotal: Decimal;
-        RemainingAmountTotal: Decimal;
+        NNC_InterestAmountTotal: Decimal;
+        NNC_VATAmountTotal: Decimal;
+        NNC_RemainingAmountTotal: Decimal;
     begin
         IssuedReminderLine.SetRange("Reminder No.", Rec."No.");
-
-        IssuedReminderLine.ReadIsolation := IsolationLevel::ReadCommitted;
         if IssuedReminderLine.IsEmpty() then
             exit(0);
 
@@ -497,11 +493,11 @@ table 297 "Issued Reminder Header"
                     ReminderInterestAmount := IssuedReminderLine.Amount;
             end;
 
-            InterestAmountTotal += ReminderInterestAmount;
-            RemainingAmountTotal += IssuedReminderLine."Remaining Amount";
-            VATAmountTotal += IssuedReminderLine."VAT Amount";
+            NNC_InterestAmountTotal += ReminderInterestAmount;
+            NNC_RemainingAmountTotal += IssuedReminderLine."Remaining Amount";
+            NNC_VATAmountTotal += IssuedReminderLine."VAT Amount";
         until IssuedReminderLine.Next() = 0;
-        exit(RemainingAmountTotal + InterestAmountTotal + VATAmountTotal);
+        exit(NNC_RemainingAmountTotal + NNC_InterestAmountTotal + NNC_VATAmountTotal);
     end;
 
     [IntegrationEvent(false, false)]
