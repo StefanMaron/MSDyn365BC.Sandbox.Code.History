@@ -879,11 +879,6 @@ codeunit 7322 "Create Inventory Pick/Movement"
             NextLineNo := 10000;
     end;
 
-    procedure SetWhseActivHeader(WhseActivHeader: Record "Warehouse Activity Header")
-    begin
-        CurrWarehouseActivityHeader := WhseActivHeader;
-    end;
-
     procedure RunCreatePickOrMoveLine(NewWarehouseActivityLine: Record "Warehouse Activity Line"; var RemQtyToPickBase: Decimal; OutstandingQtyBase: Decimal; ReservationExists: Boolean)
     begin
         OnBeforeRunCreatePickOrMoveLine(CurrWarehouseActivityHeader, CurrWarehouseRequest);
@@ -973,7 +968,8 @@ codeunit 7322 "Create Inventory Pick/Movement"
                         if ITQtyToPickBase > 0 then begin
                             NewWarehouseActivityLine.CopyTrackingFromSpec(TempTrackingSpecification);
                             if NewWarehouseActivityLine.TrackingExists() then
-                                UpdateExpirationDate(NewWarehouseActivityLine, EntriesExist);
+                                NewWarehouseActivityLine."Expiration Date" :=
+                                    ItemTrackingManagement.ExistingExpirationDate(NewWarehouseActivityLine, false, EntriesExist);
 
                             OnCreatePickOrMoveLineFromHandlingSpec(NewWarehouseActivityLine, TempTrackingSpecification, EntriesExist);
 
@@ -1231,7 +1227,6 @@ codeunit 7322 "Create Inventory Pick/Movement"
         QtyReservedOnPickShip: Decimal;
         QtyOnDedicatedBins: Decimal;
         QtyBlocked: Decimal;
-        SourceLineNo: Integer;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1257,12 +1252,10 @@ codeunit 7322 "Create Inventory Pick/Movement"
                     WarehouseActivityLine."Location Code", WarehouseActivityLine."Item No.", WarehouseActivityLine."Variant Code", WhseActivLineItemTrackingSetup);
         end;
 
-        SourceLineNo := GetSourceLineNo(WarehouseActivityLine);
-
         LineReservedQty :=
             WarehouseAvailabilityMgt.CalcLineReservedQtyOnInvt(
                 WarehouseActivityLine."Source Type", WarehouseActivityLine."Source Subtype", WarehouseActivityLine."Source No.",
-                SourceLineNo, WarehouseActivityLine."Source Subline No.", true, WhseItemTrackingSetup, TempWarehouseActivityLine2);
+                WarehouseActivityLine."Source Line No.", WarehouseActivityLine."Source Subline No.", true, WhseItemTrackingSetup, TempWarehouseActivityLine2);
 
         QtyReservedOnPickShip :=
             WarehouseAvailabilityMgt.CalcReservQtyOnPicksShips(
@@ -1379,7 +1372,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
                 exit(SetFilterJobPlanningLine(JobPlanningLine, CurrJob));
             else begin
                 IsHandled := false;
-                OnCheckSourceDocForWhseRequest(CurrWarehouseRequest, SourceDocRecordRef, CurrWarehouseActivityHeader, CheckLineExist, Result, IsHandled, IsInvtMovement, WarehouseSourceFilter, ApplyAdditionalSourceDocFilters);
+                OnCheckSourceDocForWhseRequest(CurrWarehouseRequest, SourceDocRecordRef, CurrWarehouseActivityHeader, CheckLineExist, Result, IsHandled);
                 if IsHandled then
                     exit(Result);
             end;
@@ -1419,7 +1412,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
                 CreatePickOrMoveFromJobPlanning(CurrJob);
             else
                 OnAutoCreatePickOrMoveFromWhseRequest(
-                    CurrWarehouseRequest, SourceDocRecordRef, LineCreated, CurrWarehouseActivityHeader, CurrLocation, HideDialog, CompleteShipment, CheckLineExist, IsInvtMovement, WarehouseSourceFilter, ApplyAdditionalSourceDocFilters);
+                    CurrWarehouseRequest, SourceDocRecordRef, LineCreated, CurrWarehouseActivityHeader, CurrLocation, HideDialog, CompleteShipment, CheckLineExist);
         end;
 
         if LineCreated then begin
@@ -2315,25 +2308,6 @@ codeunit 7322 "Create Inventory Pick/Movement"
             until ReservationEntry.Next() = 0;
     end;
 
-    local procedure UpdateExpirationDate(var WarehouseActivityLine: Record "Warehouse Activity Line"; var EntriesExist: Boolean)
-    var
-        ItemTrackingMgt: Codeunit "Item Tracking Management";
-        ExpirationDate: Date;
-    begin
-        ExpirationDate := ItemTrackingMgt.ExistingExpirationDate(WarehouseActivityLine, false, EntriesExist);
-
-        if ExpirationDate <> 0D then
-            WarehouseActivityLine."Expiration Date" := ExpirationDate;
-    end;
-
-    local procedure GetSourceLineNo(WarehouseActivityLine: Record "Warehouse Activity Line"): Integer
-    begin
-        if WarehouseActivityLine."Source Type" <> Database::Job then
-            exit(WarehouseActivityLine."Source Line No.");
-
-        exit(-1);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterAutoCreatePickOrMove(var WarehouseRequest: Record "Warehouse Request"; LineCreated: Boolean; var WarehouseActivityHeader: Record "Warehouse Activity Header"; Location: Record Location; HideDialog: Boolean)
     begin
@@ -2615,7 +2589,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCheckSourceDocForWhseRequest(var WarehouseRequest: Record "Warehouse Request"; SourceDocRecRef: RecordRef; WhseActivHeader: Record "Warehouse Activity Header"; CheckLineExist: Boolean; var Result: Boolean; var IsHandled: Boolean; IsInvtMovement: Boolean; WarehouseSourceFilter: Record "Warehouse Source Filter"; ApplyAdditionalSourceDocFilters: Boolean)
+    local procedure OnCheckSourceDocForWhseRequest(var WarehouseRequest: Record "Warehouse Request"; SourceDocRecRef: RecordRef; WhseActivHeader: Record "Warehouse Activity Header"; CheckLineExist: Boolean; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -2629,8 +2603,8 @@ codeunit 7322 "Create Inventory Pick/Movement"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
-    local procedure OnAutoCreatePickOrMoveFromWhseRequest(var WarehouseRequest: Record "Warehouse Request"; SourceDocRecRef: RecordRef; var LineCreated: Boolean; WhseActivityHeader: Record "Warehouse Activity Header"; Location: Record Location; HideDialog: Boolean; var CompleteShipment: Boolean; CheckLineExist: Boolean; IsInvtMovement: Boolean; WarehouseSourceFilter: Record "Warehouse Source Filter"; ApplyAdditionalSourceDocFilters: Boolean);
+    [IntegrationEvent(false, false)]
+    local procedure OnAutoCreatePickOrMoveFromWhseRequest(var WarehouseRequest: Record "Warehouse Request"; SourceDocRecRef: RecordRef; var LineCreated: Boolean; WhseActivityHeader: Record "Warehouse Activity Header"; Location: Record Location; HideDialog: Boolean; var CompleteShipment: Boolean; CheckLineExist: Boolean);
     begin
     end;
 

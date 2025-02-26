@@ -11,7 +11,6 @@ page 5633 "FA Journal Batches"
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "FA Journal Batch";
-    AnalysisModeEnabled = false;
 
     layout
     {
