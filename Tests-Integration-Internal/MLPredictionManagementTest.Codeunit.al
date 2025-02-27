@@ -701,9 +701,8 @@ codeunit 135208 "ML Prediction Management Test"
     begin
         TimeSeriesParams := '{"ApiKeys":["test"],"Limit":"10","ApiUris":["https://services.azureml.net/workspaces/fc0584f5f74a4aa19a55096fc8ebb2b7"]}'; // non-existing API URI
 
-        MockAzureKeyvaultSecretProvider := MockAzureKeyvaultSecretProvider.MockAzureKeyVaultSecretProvider;
-        MockAzureKeyvaultSecretProvider.AddSecretMapping(StrSubstNo('machinelearning-%1', TenantId), TimeSeriesParams);
-        MockAzureKeyvaultSecretProvider.AddSecretMapping('AllowedApplicationSecrets', 'machinelearning');
+        MockAzureKeyvaultSecretProvider := MockAzureKeyvaultSecretProvider.MockAzureKeyVaultSecretProvider();
+        MockAzureKeyvaultSecretProvider.AddSecretMapping(StrSubstNo('machinelearning-%1', TenantId()), TimeSeriesParams);
         MockAzureKeyvaultSecretProvider.AddSecretMapping('machinelearning', TimeSeriesParams);
         AzureKeyVaultTestLibrary.SetAzureKeyVaultSecretProvider(MockAzureKeyvaultSecretProvider);
     end;
