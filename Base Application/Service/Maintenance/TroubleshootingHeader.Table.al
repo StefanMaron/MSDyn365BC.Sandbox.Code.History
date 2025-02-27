@@ -191,8 +191,7 @@ table 5943 "Troubleshooting Header"
         MarkTroubleShtgHeader(TblshtgSetup);
         TblshtgHeader2.MarkedOnly(true);
         Clear(Troubleshooting);
-        if Format(TblshtgSetup.Type) <> '' then
-            Troubleshooting.SetPageCaptionPrefix(Format(TblshtgSetup.Type) + ' ' + TblshtgSetup."No.");
+        Troubleshooting.SetCaption(Format(TblshtgSetup.Type), TblshtgSetup."No.");
         Troubleshooting.SetRecord(TblshtgHeader);
         Troubleshooting.SetTableView(TblshtgHeader2);
         Troubleshooting.Editable := false;
