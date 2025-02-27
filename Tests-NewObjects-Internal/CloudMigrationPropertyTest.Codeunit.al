@@ -984,7 +984,6 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"CRM Annotation Buffer");
         ListOfTablesToMigrate.Add(Database::"CRM Annotation Coupling");
         ListOfTablesToMigrate.Add(Database::"CRM Connection Setup");
-        ListOfTablesToMigrate.Add(Database::"FS Connection Setup");
         ListOfTablesToMigrate.Add(Database::"CRM Full Synch. Review Line");
         ListOfTablesToMigrate.Add(Database::"CRM Integration Record");
         ListOfTablesToMigrate.Add(Database::"CRM Option Mapping");
@@ -1146,6 +1145,9 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Financial Report");
         ListOfTablesToMigrate.Add(Database::"Financial Report User Filters");
         ListOfTablesToMigrate.Add(Database::"Fixed Asset");
+#if not CLEAN25
+        ListOfTablesToMigrate.Add(Database::"FS Connection Setup");
+#endif
         ListOfTablesToMigrate.Add(Database::"G/L - Item Ledger Relation");
         ListOfTablesToMigrate.Add(Database::"G/L Acc. Balance Buffer");
         ListOfTablesToMigrate.Add(Database::"G/L Acc. Balance/Budget Buffer");
