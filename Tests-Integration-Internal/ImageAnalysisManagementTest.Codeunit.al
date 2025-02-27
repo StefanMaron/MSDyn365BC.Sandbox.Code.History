@@ -794,8 +794,7 @@ codeunit 135206 "Image Analysis Management Test"
         AzureKeyVault: Codeunit "Azure Key Vault";
         AzureKeyVaultTestLibrary: Codeunit "Azure Key Vault Test Library";
     begin
-        MockAzureKeyvaultSecretProvider := MockAzureKeyvaultSecretProvider.MockAzureKeyVaultSecretProvider;
-        MockAzureKeyvaultSecretProvider.AddSecretMapping('AllowedApplicationSecrets', 'cognitive-vision-params');
+        MockAzureKeyvaultSecretProvider := MockAzureKeyvaultSecretProvider.MockAzureKeyVaultSecretProvider();
         MockAzureKeyvaultSecretProvider.AddSecretMapping(
           'cognitive-vision-params', StrSubstNo(KeyvaultValueTxt, ApiKey, ApiEndpoint, ImageAnalysisPeriodType, ImageAnalysisLimit));
 
