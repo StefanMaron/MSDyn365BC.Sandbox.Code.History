@@ -251,23 +251,17 @@ codeunit 1105 "Transfer GL Entries to CA"
         CostJnlLine: Record "Cost Journal Line";
         CAJnlPostLine: Codeunit "CA Jnl.-Post Line";
         Window2: Dialog;
-        HideDialog: Boolean;
     begin
         TempCostJnlLine.Reset();
-        HideDialog := false;
-        OnBeforePostCostJournalLinesOpenDialog(TempCostJnlLine, HideDialog);
-        if not HideDialog then
-            Window2.Open(Text006);
+        Window2.Open(Text006);
         TempCostJnlLine.SetCurrentKey("G/L Entry No.");
         if TempCostJnlLine.FindSet() then
             repeat
-                if not HideDialog then
-                    Window2.Update(1, TempCostJnlLine."Line No.");
+                Window2.Update(1, TempCostJnlLine."Line No.");
                 CostJnlLine := TempCostJnlLine;
                 CAJnlPostLine.RunWithCheck(CostJnlLine);
             until TempCostJnlLine.Next() = 0;
-        if not HideDialog then
-            Window2.Close();
+        Window2.Close();
     end;
 
     local procedure GetCostAccSetup()
@@ -361,11 +355,6 @@ codeunit 1105 "Transfer GL Entries to CA"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSkipGLEntry(GLEntry: Record "G/L Entry"; var ReturnValue: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostCostJournalLinesOpenDialog(var TempCostJnlLine: Record "Cost Journal Line" temporary; var HideDialog: Boolean)
     begin
     end;
 
