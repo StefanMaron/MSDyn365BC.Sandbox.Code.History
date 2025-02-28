@@ -150,6 +150,7 @@ codeunit 86 "Sales-Quote to Order"
             SalesOrderHeader."VAT Registration No." := Customer."VAT Registration No.";
 
         SalesOrderHeader."VAT Reporting Date" := GlSetup.GetVATDate(SalesOrderHeader."Posting Date", SalesOrderHeader."Document Date");
+        SalesOrderHeader.Validate("Posting Date");
 
         SalesHeader.CalcFields("Work Description");
         SalesOrderHeader."Work Description" := SalesHeader."Work Description";
@@ -490,7 +491,7 @@ codeunit 86 "Sales-Quote to Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnTransferQuoteToOrderLinesOnBeforeUpdatePrepaymentPct(var SalesQuoteLine: Record "Sales Line"; var SalesQuoteHeader: Record "Sales Header"; var SalesOrderLine: Record "Sales Line"; var SalesOrderHeader: Record "Sales Header"; Customer: Record Customer)
+    local procedure OnTransferQuoteToOrderLinesOnBeforeUpdatePrepaymentPct(var SalesQuoteLine: Record "Sales Line"; var SalesQuoteHeader: Record "Sales Header"; var SalesOrderLine: Record "Sales Line"; var SalesOrderHeader: Record "Sales Header"; var Customer: Record Customer)
     begin
     end;
 
