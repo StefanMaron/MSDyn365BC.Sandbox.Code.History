@@ -8,7 +8,6 @@ namespace Microsoft.Finance.ExcelReports;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Company;
-using Microsoft.ExcelReports;
 
 report 4407 "EXR Trial Bal. Prev Year Excel"
 {
@@ -117,16 +116,12 @@ report 4407 "EXR Trial Bal. Prev Year Excel"
     begin
         TrialBalancePreviousYearData.SecurityFiltering(SecurityFilter::Filtered);
         CompanyInformation.Get();
-        ExcelReportsTelemetry.LogReportUsage(Report::"EXR Trial Bal. Prev Year Excel");
 
         FromDate := TrialBalancePreviousYearData.GetRangeMin("Date Filter");
         ToDate := TrialBalancePreviousYearData.GetRangeMax("Date Filter");
         PriorFromDate := CalcDate('<-1Y>', FromDate + 1) - 1;
         PriorToDate := CalcDate('<-1Y>', ToDate + 1) - 1;
     end;
-
-    var
-        ExcelReportsTelemetry: Codeunit "Excel Reports Telemetry";
 
     protected var
         CompanyInformation: Record "Company Information";
