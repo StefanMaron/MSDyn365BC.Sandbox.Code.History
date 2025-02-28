@@ -14,8 +14,9 @@ using System.IO;
 
 codeunit 5051 SegManagement
 {
-    Permissions = tableData "Interaction Log Entry" = rimd,
+    Permissions = tabledata "Interaction Log Entry" = rimd,
                   tabledata "Interaction Template" = r,
+                  tabledata "Inter. Log Entry Comment Line" = rd,
                   tabledata Contact = r;
 
     trigger OnRun()
@@ -418,7 +419,7 @@ codeunit 5051 SegManagement
 
     procedure FindInteractionTemplateCode(DocumentType: Enum "Interaction Log Entry Document Type") InteractTmplCode: Code[10]
     begin
-        if not InteractionTemplateSetup.ReadPermission then
+        if not InteractionTemplateSetup.ReadPermission() then
             exit('');
         if InteractionTemplateSetup.Get() then
             case DocumentType of
@@ -490,7 +491,13 @@ codeunit 5051 SegManagement
         Campaign: Record Campaign;
         InteractionTemplate: Record "Interaction Template";
         ContactAltAddress: Record "Contact Alt. Address";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckSegmentLine(SegmentLine, Deliver, IsHandled);
+        if IsHandled then
+            exit;
+
         SegmentLine.TestField(Date);
         SegmentLine.TestField("Contact No.");
         Contact.Get(SegmentLine."Contact No.");
@@ -683,6 +690,29 @@ codeunit 5051 SegManagement
             "Interaction Log Entry Document Type"::"Sales Inv.".AsInteger(),
             SalesInvoiceHeader."No.", 0, 0, Database::Contact, SalesInvoiceHeader."Bill-to Contact No.", SalesInvoiceHeader."Salesperson Code",
             CampaignTargetGroup."Campaign No.", SalesInvoiceHeader."Posting Description", '');
+    end;
+
+    procedure InterLogEntryCommentLineInsert(var TempInterLogEntryCommentLine: Record "Inter. Log Entry Comment Line"; InteractionLogEntryNo: Integer)
+    var
+        InterLogEntryCommentLine: Record "Inter. Log Entry Comment Line";
+    begin
+        DeleteExistingInteractionLogEntryComments(InteractionLogEntryNo);
+        if TempInterLogEntryCommentLine.FindSet() then
+            repeat
+                InterLogEntryCommentLine.Init();
+                InterLogEntryCommentLine := TempInterLogEntryCommentLine;
+                InterLogEntryCommentLine."Entry No." := InteractionLogEntryNo;
+                InterLogEntryCommentLine.Insert();
+            until TempInterLogEntryCommentLine.Next() = 0;
+    end;
+
+    local procedure DeleteExistingInteractionLogEntryComments(InteractionLogEntryNo: Integer)
+    var
+        InterLogEntryCommentLine: Record "Inter. Log Entry Comment Line";
+    begin
+        InterLogEntryCommentLine.SetRange("Entry No.", InteractionLogEntryNo);
+        if not InterLogEntryCommentLine.IsEmpty() then
+            InterLogEntryCommentLine.DeleteAll();
     end;
 
     local procedure GetNextLoggedSegmentEntryNo(): Integer
@@ -906,6 +936,11 @@ codeunit 5051 SegManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnLogSegmentOnBeforeInitLoggedSegment(SegmentHeader: Record "Segment Header"; Deliver: Boolean; Followup: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckSegmentLine(var SegmentLine: Record "Segment Line"; Deliver: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
