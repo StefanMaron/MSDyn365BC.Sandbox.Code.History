@@ -121,8 +121,7 @@ report 12110 "Vendor Sheet - Print"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = sorting(Number) order(ascending) where(Number = const(1));
-                PrintOnlyIfDetail = true;
+                DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = const(1));
                 column(StartOnHand; StartOnHand)
                 {
                     AutoFormatType = 1;
