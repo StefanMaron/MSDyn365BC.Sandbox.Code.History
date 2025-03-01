@@ -74,7 +74,7 @@ codeunit 1521 "Workflow Response Handling"
         ApplyNewValuesTxt: Label 'Apply the new values.';
         DiscardNewValuesTxt: Label 'Discard the new values.';
         EnableJobQueueEntryResponseDescTxt: Label 'Enable the job queue entry.';
-        UnknownRecordErr: Label 'Unknown record type.';
+
         // Telemetry strings
         WorkflowResponseStartTelemetryTxt: Label 'Workflow response: Start Scope', Locked = true;
         WorkflowResponseEndTelemetryTxt: Label 'Workflow response: End Scope', Locked = true;
@@ -96,8 +96,8 @@ codeunit 1521 "Workflow Response Handling"
         AddResponseToLibrary(PostDocumentCode(), 0, PostDocumentTxt, 'GROUP 0');
         AddResponseToLibrary(PostDocumentAsyncCode(), 0, BackgroundDocumentPostTxt, 'GROUP 0');
 
-        AddResponseToLibrary(CreatePmtLineForPostedPurchaseDocAsyncCode(), Database::"Purch. Inv. Header", CreatePmtLineAsyncTxt, 'GROUP 1');
-        AddResponseToLibrary(CreatePmtLineForPostedPurchaseDocCode(), Database::"Purch. Inv. Header", CreatePmtLineTxt, 'GROUP 1');
+        AddResponseToLibrary(CreatePmtLineForPostedPurchaseDocAsyncCode(), DATABASE::"Purch. Inv. Header", CreatePmtLineAsyncTxt, 'GROUP 1');
+        AddResponseToLibrary(CreatePmtLineForPostedPurchaseDocCode(), DATABASE::"Purch. Inv. Header", CreatePmtLineTxt, 'GROUP 1');
 
         AddResponseToLibrary(CreateOverdueNotificationCode(), 0, CreateOverdueNotifTxt, 'GROUP 2');
         AddResponseToLibrary(CheckCustomerCreditLimitCode(), 0, CheckCustomerCreditLimitTxt, 'GROUP 0');
@@ -612,45 +612,22 @@ codeunit 1521 "Workflow Response Handling"
     begin
     end;
 
-    local procedure CreateNotificationEntry(WorkflowStepInstance: Record "Workflow Step Instance"; var Variant: Variant)
+    local procedure CreateNotificationEntry(WorkflowStepInstance: Record "Workflow Step Instance"; ApprovalEntry: Record "Approval Entry")
     var
-        ApprovalEntry: Record "Approval Entry";
         WorkflowStepArgument: Record "Workflow Step Argument";
         NotificationEntry: Record "Notification Entry";
-        RecRef: RecordRef;
         IsHandled: Boolean;
     begin
-        RecRef.GetTable(Variant);
-        case RecRef.Number of
-            Database::"Approval Entry":
-                begin
-                    ApprovalEntry := Variant;
-                    IsHandled := false;
-                    OnBeforeCreateNotificationEntry(WorkflowStepInstance, ApprovalEntry, IsHandled);
-                    if IsHandled then
-                        exit;
+        IsHandled := false;
+        OnBeforeCreateNotificationEntry(WorkflowStepInstance, ApprovalEntry, IsHandled);
+        if IsHandled then
+            exit;
 
-                    if WorkflowStepArgument.Get(WorkflowStepInstance.Argument) then
-                        NotificationEntry.CreateNotificationEntry(WorkflowStepArgument."Notification Entry Type", WorkflowStepArgument.GetNotificationUserID(ApprovalEntry), ApprovalEntry, WorkflowStepArgument."Link Target Page", WorkflowStepArgument."Custom Link", CopyStr(UserId(), 1, 50));
-                end;
-            Database::"Incoming Document",
-            Database::"Gen. Journal Line",
-            Database::"Purchase Header",
-            Database::"Purch. Inv. Header":
-                if WorkflowStepArgument.Get(WorkflowStepInstance.Argument) then
-                    if WorkflowStepArgument."Notify Sender" then
-                        NotificationEntry.CreateNotificationEntry(WorkflowStepArgument."Notification Entry Type", CopyStr(UserId(), 1, 50), Variant, WorkflowStepArgument."Link Target Page", WorkflowStepArgument."Custom Link", CopyStr(UserId(), 1, 50))
-                    else
-                        NotificationEntry.CreateNotificationEntry(WorkflowStepArgument."Notification Entry Type", WorkflowStepArgument."Notification User ID", Variant, WorkflowStepArgument."Link Target Page", WorkflowStepArgument."Custom Link", CopyStr(UserId(), 1, 50));
-            else begin
-                ApprovalEntry.SetRange("Record ID to Approve", RecRef.RecordId);
-                if ApprovalEntry.FindFirst() then begin
-                    Variant := ApprovalEntry;
-                    CreateNotificationEntry(WorkflowStepInstance, Variant);
-                end else
-                    Error(UnknownRecordErr);
-            end;
-        end;
+        if WorkflowStepArgument.Get(WorkflowStepInstance.Argument) then
+            NotificationEntry.CreateNotificationEntry(
+                WorkflowStepArgument."Notification Entry Type",
+                WorkflowStepArgument.GetNotificationUserID(ApprovalEntry), ApprovalEntry, WorkflowStepArgument."Link Target Page",
+                WorkflowStepArgument."Custom Link", UserID);
     end;
 
     local procedure ReleaseDocument(var Variant: Variant)
@@ -668,25 +645,25 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Approval Entry":
+            DATABASE::"Approval Entry":
                 begin
                     ApprovalEntry := Variant;
                     TargetRecRef.Get(ApprovalEntry."Record ID to Approve");
                     Variant := TargetRecRef;
                     ReleaseDocument(Variant);
                 end;
-            Database::"Workflow Webhook Entry":
+            DATABASE::"Workflow Webhook Entry":
                 begin
                     WorkflowWebhookEntry := Variant;
                     TargetRecRef.Get(WorkflowWebhookEntry."Record ID");
                     Variant := TargetRecRef;
                     ReleaseDocument(Variant);
                 end;
-            Database::"Purchase Header":
+            DATABASE::"Purchase Header":
                 ReleasePurchaseDocument.PerformManualCheckAndRelease(Variant);
-            Database::"Sales Header":
+            DATABASE::"Sales Header":
                 ReleaseSalesDocument.PerformManualCheckAndRelease(Variant);
-            Database::"Incoming Document":
+            DATABASE::"Incoming Document":
                 ReleaseIncomingDocument.PerformManualRelease(Variant);
             else begin
                 OnReleaseDocument(RecRef, Handled);
@@ -710,25 +687,25 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Approval Entry":
+            DATABASE::"Approval Entry":
                 begin
                     ApprovalEntry := Variant;
                     TargetRecRef.Get(ApprovalEntry."Record ID to Approve");
                     Variant := TargetRecRef;
                     OpenDocument(Variant);
                 end;
-            Database::"Workflow Webhook Entry":
+            DATABASE::"Workflow Webhook Entry":
                 begin
                     WorkflowWebhookEntry := Variant;
                     TargetRecRef.Get(WorkflowWebhookEntry."Record ID");
                     Variant := TargetRecRef;
                     OpenDocument(Variant);
                 end;
-            Database::"Purchase Header":
+            DATABASE::"Purchase Header":
                 ReleasePurchaseDocument.Reopen(Variant);
-            Database::"Sales Header":
+            DATABASE::"Sales Header":
                 ReleaseSalesDocument.Reopen(Variant);
-            Database::"Incoming Document":
+            DATABASE::"Incoming Document":
                 ReleaseIncomingDocument.Reopen(Variant);
             else begin
                 OnOpenDocument(RecRef, Handled);
@@ -793,7 +770,7 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Approval Entry":
+            DATABASE::"Approval Entry":
                 ApprovalsMgmt.SendApprovalRequestFromApprovalEntry(Variant, WorkflowStepInstance);
             else
                 ApprovalsMgmt.SendApprovalRequestFromRecord(RecRef, WorkflowStepInstance);
@@ -809,7 +786,7 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Approval Entry":
+            DATABASE::"Approval Entry":
                 begin
                     ApprovalEntry := Variant;
                     RecRef.Get(ApprovalEntry."Record ID to Approve");
@@ -829,7 +806,7 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Approval Entry":
+            DATABASE::"Approval Entry":
                 begin
                     ApprovalEntry := Variant;
                     RecRef.Get(ApprovalEntry."Record ID to Approve");
@@ -849,7 +826,7 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Approval Entry":
+            DATABASE::"Approval Entry":
                 begin
                     ApprovalEntry := Variant;
                     RecRef.Get(ApprovalEntry."Record ID to Approve");
@@ -870,13 +847,13 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Purchase Header":
+            DATABASE::"Purchase Header":
                 begin
                     PurchaseHeader := Variant;
                     PurchaseHeader.TestField(Status, PurchaseHeader.Status::Released);
                     JobQueueEntry.ScheduleJobQueueEntry(CODEUNIT::"Purchase Post via Job Queue", PurchaseHeader.RecordId);
                 end;
-            Database::"Sales Header":
+            DATABASE::"Sales Header":
                 begin
                     SalesHeader := Variant;
                     SalesHeader.TestField(Status, SalesHeader.Status::Released);
@@ -895,9 +872,9 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Purchase Header":
+            DATABASE::"Purchase Header":
                 CODEUNIT.Run(CODEUNIT::"Purch.-Post", Variant);
-            Database::"Sales Header":
+            DATABASE::"Sales Header":
                 CODEUNIT.Run(CODEUNIT::"Sales-Post", Variant);
             else begin
                 IsHandled := false;
@@ -934,7 +911,7 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Sales Header":
+            DATABASE::"Sales Header":
                 begin
                     SalesHeader := Variant;
                     SalesHeader.CheckAvailableCreditLimit();
@@ -950,7 +927,7 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Gen. Journal Batch":
+            DATABASE::"Gen. Journal Batch":
                 begin
                     GenJournalBatch := Variant;
                     GenJournalBatch.CheckBalance();
@@ -966,9 +943,9 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Sales Header":
+            DATABASE::"Sales Header":
                 ApprovalsMgmt.CreateAndAutomaticallyApproveRequest(RecRef, WorkflowStepInstance);
-            Database::Customer:
+            DATABASE::Customer:
                 ApprovalsMgmt.CreateAndAutomaticallyApproveRequest(RecRef, WorkflowStepInstance);
         end;
     end;
@@ -1008,30 +985,30 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(Variant);
 
         case RecRef.Number of
-            Database::"Approval Entry":
+            DATABASE::"Approval Entry":
                 begin
                     RecordRestrictionMgt.AllowRecordUsage(Variant);
                     RecRef.SetTable(ApprovalEntry);
                     RecRef.Get(ApprovalEntry."Record ID to Approve");
                     AllowRecordUsage(RecRef);
                 end;
-            Database::"Workflow Webhook Entry":
+            DATABASE::"Workflow Webhook Entry":
                 begin
                     RecRef.SetTable(WorkflowWebhookEntry);
                     RecRef.Get(WorkflowWebhookEntry."Record ID");
                     AllowRecordUsage(RecRef);
                 end;
-            Database::"Gen. Journal Batch":
+            DATABASE::"Gen. Journal Batch":
                 begin
                     RecRef.SetTable(GenJournalBatch);
                     RecordRestrictionMgt.AllowGenJournalBatchUsage(GenJournalBatch);
                 end;
-            Database::"Item Journal Batch":
+            DATABASE::"Item Journal Batch":
                 begin
                     RecRef.SetTable(ItemJournalBatch);
                     RecordRestrictionMgt.AllowItemJournalBatchUsage(ItemJournalBatch);
                 end;
-            Database::"FA Journal Batch":
+            DATABASE::"FA Journal Batch":
                 begin
                     RecRef.SetTable(FAJournalBatch);
                     RecordRestrictionMgt.AllowFAJournalBatchUsage(FAJournalBatch);
@@ -1317,7 +1294,7 @@ codeunit 1521 "Workflow Response Handling"
         RecRef.GetTable(VariantRecord);
 
         case RecRef.Number of
-            Database::"Approval Entry":
+            DATABASE::"Approval Entry":
                 begin
                     ApprovalEntry := VariantRecord;
                     RecRef := ApprovalEntry."Record ID to Approve".GetRecord();
