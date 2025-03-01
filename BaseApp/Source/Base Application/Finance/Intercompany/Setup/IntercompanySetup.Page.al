@@ -24,7 +24,6 @@ page 653 "Intercompany Setup"
         {
             group(General)
             {
-                Caption = 'General';
                 field("IC Partner Code"; Rec."IC Partner Code")
                 {
                     ApplicationArea = Intercompany;
