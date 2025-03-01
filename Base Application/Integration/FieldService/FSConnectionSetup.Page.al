@@ -2,7 +2,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-#if not CLEAN25
 namespace Microsoft.Integration.FieldService;
 
 using Microsoft.Integration.Dataverse;
@@ -15,16 +14,16 @@ using Microsoft.Projects.Project.Journal;
 
 page 6420 "FS Connection Setup"
 {
+    AccessByPermission = TableData "FS Connection Setup" = IM;
+    ApplicationArea = Suite;
     Caption = 'Dynamics 365 Field Service Integration Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     ShowFilter = false;
     SourceTable = "FS Connection Setup";
+    UsageCategory = Administration;
     AdditionalSearchTerms = 'Dynamics 365 Field Service Connection Setup';
-    ObsoleteReason = 'Field Service is moved to Field Service Integration app.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '25.0';
 
     layout
     {
@@ -57,7 +56,7 @@ page 6420 "FS Connection Setup"
                     begin
                         CurrPage.Update(true);
                         if Rec."Is Enabled" then begin
-                            FeatureTelemetry.LogUptake('0000MB9', 'Dynamics 365 Field Service Integration', Enum::"Feature Uptake Status"::"Set up");
+                            FeatureTelemetry.LogUptake('0000MB9', 'Dynamics 365 Field Service', Enum::"Feature Uptake Status"::"Set up");
                             Session.LogMessage('0000MBC', CRMConnEnabledOnPageTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
 
                             if (Rec."Server Address" <> '') and (Rec."Server Address" <> TestServerAddressTok) then
@@ -365,7 +364,7 @@ page 6420 "FS Connection Setup"
         MultipleCompaniesDetected: Boolean;
     begin
         FeatureTelemetry.LogUptake('0000MBA', 'Dataverse', Enum::"Feature Uptake Status"::Discovered);
-        FeatureTelemetry.LogUptake('0000MBB', 'Dynamics 365 Field Service Integration', Enum::"Feature Uptake Status"::Discovered);
+        FeatureTelemetry.LogUptake('0000MBB', 'Dynamics 365 Field Service', Enum::"Feature Uptake Status"::Discovered);
         Rec.EnsureCDSConnectionIsEnabled();
         Rec.EnsureCRMConnectionIsEnabled();
 
@@ -509,4 +508,4 @@ page 6420 "FS Connection Setup"
         Rec.Validate("Proxy Version", CRMIntegrationManagement.GetLastProxyVersionItem());
     end;
 }
-#endif
+
