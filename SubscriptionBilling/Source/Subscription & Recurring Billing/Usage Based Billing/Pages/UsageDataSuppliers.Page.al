@@ -62,7 +62,7 @@ page 8044 "Usage Data Suppliers"
                 ToolTip = 'Opens the "Usage data imports" related to the supplier.';
                 Image = PutawayLines;
                 Scope = repeater;
-                RunObject = page "Usage Data Imports";
+                RunObject = Page "Usage Data Imports";
                 RunPageLink = "Supplier No." = field("No.");
             }
         }

@@ -27,19 +27,4 @@ tableextension 8061 "Purchase Header" extends "Purchase Header"
     begin
         exit(GetLastLineNo() + 10000);
     end;
-
-    internal procedure SetRecurringBilling()
-    begin
-        Rec.Validate("Recurring Billing", true);
-        Rec.Modify(false);
-    end;
-
-    internal procedure RunGetVendorContractLines()
-    var
-        GetVendorContractLines: Page "Get Vendor Contract Lines";
-    begin
-        GetVendorContractLines.LookupMode(true);
-        GetVendorContractLines.SetPurchaseHeader(Rec);
-        GetVendorContractLines.RunModal();
-    end;
 }
