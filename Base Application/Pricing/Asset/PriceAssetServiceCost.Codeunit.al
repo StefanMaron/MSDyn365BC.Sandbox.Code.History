@@ -125,17 +125,10 @@ codeunit 7045 "Price Asset - Service Cost" implements "Price Asset"
                     PriceAsset."Unit Price" := 0;
                 end;
         end;
-
-        OnAfterFillAdditionalFields(PriceAsset, ServiceCost);
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterPutRelatedAssetsToList(PriceAsset: Record "Price Asset"; var PriceAssetList: Codeunit "Price Asset List")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFillAdditionalFields(var PriceAsset: Record "Price Asset"; ServiceCost: Record "Service Cost")
     begin
     end;
 }

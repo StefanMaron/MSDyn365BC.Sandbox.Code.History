@@ -45,6 +45,8 @@ codeunit 101270 "Create Bank Account"
         XSEPACTMessageIDTxt: Label 'SEPA Credit Transfer Msg. ID', Comment = 'Msg. = Message';
         XSEPADDMSGTxt: Label 'SEPADD-MSG', Comment = 'SEPA Direct Debit Message';
         XSEPADDMessageIDTxt: Label 'SEPA Direct Debit Msg. ID', Comment = 'Msg. = Message';
+        XSEPACTTxt: Label 'SEPACT', Comment = 'SEPA Credit Transfer';
+        XSEPADDTxt: Label 'SEPADD', Comment = 'SEPA Direct Debit';
         XNBL: Label 'NBL';
         XNewBankofLondon: Label 'New Bank of London';
         X4BakerStreet: Label '4 Baker Street';
@@ -142,11 +144,10 @@ codeunit 101270 "Create Bank Account"
     local procedure SetSEPAExport()
     var
         CreateNoSeries: Codeunit "Create No. Series";
-        CompanyInitialize: Codeunit "Company-Initialize";
     begin
-        BankAcc."Payment Export Format" := CompanyInitialize.GetSEPACT09Code();
+        BankAcc."Payment Export Format" := XSEPACTTxt;
         CreateNoSeries.InitTempSeries(BankAcc."Credit Transfer Msg. Nos.", XSEPACTMSGTxt, XSEPACTMessageIDTxt);
-        BankAcc."SEPA Direct Debit Exp. Format" := CompanyInitialize.GetSEPADD08Code();
+        BankAcc."SEPA Direct Debit Exp. Format" := XSEPADDTxt;
         CreateNoSeries.InitTempSeries(BankAcc."Direct Debit Msg. Nos.", XSEPADDMSGTxt, XSEPADDMessageIDTxt);
         BankAcc.Modify();
     end;
