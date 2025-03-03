@@ -61,12 +61,6 @@ codeunit 131009 "Library - Setup Storage"
         Save(DATABASE::"Manufacturing Setup");
     end;
 
-    [Scope('OnPrem')]
-    procedure SaveVATSetup()
-    begin
-        Save(Database::"VAT Setup");
-    end;
-
     procedure Restore()
     var
         RecordRefSource: RecordRef;
