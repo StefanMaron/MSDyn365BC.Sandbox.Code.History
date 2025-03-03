@@ -4,8 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.AI;
 
-using System;
-
 /// <summary>
 /// Page for listing the Copilot Capabilities which are Generally Available.
 /// </summary>
@@ -90,16 +88,11 @@ page 7774 "Copilot Capabilities GA"
                 Scope = Repeater;
 
                 trigger OnAction()
-                var
-                    MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-                    MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-                    MyALAuditCategory: DotNet ALAuditCategory;
                 begin
                     Rec.Status := Rec.Status::Active;
                     Rec.Modify(true);
 
                     CopilotCapabilityImpl.SendActivateTelemetry(Rec.Capability, Rec."App Id");
-                    MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(CopilotFeatureActivatedLbl, Rec.Capability, Rec."App Id", UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 4, 0);
                 end;
             }
             action(Deactivate)
@@ -114,9 +107,6 @@ page 7774 "Copilot Capabilities GA"
                 trigger OnAction()
                 var
                     CopilotDeactivate: Page "Copilot Deactivate Capability";
-                    MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-                    MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-                    MyALAuditCategory: DotNet ALAuditCategory;
                 begin
                     CopilotDeactivate.SetCaption(Format(Rec.Capability));
                     if CopilotDeactivate.RunModal() = Action::OK then begin
@@ -124,7 +114,6 @@ page 7774 "Copilot Capabilities GA"
                         Rec.Modify(true);
 
                         CopilotCapabilityImpl.SendDeactivateTelemetry(Rec.Capability, Rec."App Id", CopilotDeactivate.GetReason());
-                        MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(CopilotFeatureDeactivatedLbl, Rec.Capability, Rec."App Id", UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 4, 0);
                     end;
                 end;
             }
@@ -173,8 +162,6 @@ page 7774 "Copilot Capabilities GA"
         CapabilityEnabled: Boolean;
         DataMovementEnabled: Boolean;
         SupplementalTermsLinkTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2236010', Locked = true;
-        CopilotFeatureDeactivatedLbl: Label 'The copilot/AI capability %1, App Id %2 has been deactivated by the UserSecurityId %3.', Locked = true;
-        CopilotFeatureActivatedLbl: Label 'The copilot/AI capability %1, App Id %2 has been activated by the UserSecurityId %3.', Locked = true;
 
     internal procedure SetDataMovement(Value: Boolean)
     begin
