@@ -265,6 +265,9 @@
       "path": "./ExcelReports/Test/Dynamics BC Excel Reports Tests"
     },
     {
+      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
+    },
+    {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
