@@ -515,8 +515,8 @@ codeunit 8800 "Custom Layout Reporting"
             OutputType::XML:
                 SaveAsReport(DataRecRef, ReportID, REPORTFORMAT::Xml);
         end;
-
-        ReportLayoutSelection.ClearTempLayoutSelected();
+        if CustomReportLayoutCode <> '' then
+            ReportLayoutSelection.ClearTempLayoutSelected();
 
         CustomReportSelection.Validate("Report ID", ReportID);
         LogAndClearLastError(CustomReportSelection."Report Caption", DataRecRef.RecordId);
