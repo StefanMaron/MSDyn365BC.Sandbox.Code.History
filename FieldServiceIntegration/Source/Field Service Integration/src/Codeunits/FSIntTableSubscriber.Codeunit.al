@@ -496,11 +496,15 @@ codeunit 6610 "FS Int. Table Subscriber"
     begin
         case FSConnectionSetup."Line Post Rule" of
             "FS Work Order Line Post Rule"::LineUsed:
-                if FSWorkOrderProduct.LineStatus = FSWorkOrderProduct.LineStatus::Used then
+                if FSWorkOrderProduct.LineStatus = FSWorkOrderProduct.LineStatus::Used then begin
                     JobJnlPostLine.RunWithCheck(JobJournalLine);
+                    JobJournalLine.Delete(true);
+                end;
             "FS Work Order Line Post Rule"::WorkOrderCompleted:
-                if FSWorkOrderProduct.WorkOrderStatus in [FSWorkOrderProduct.WorkOrderStatus::Completed] then
+                if FSWorkOrderProduct.WorkOrderStatus in [FSWorkOrderProduct.WorkOrderStatus::Completed] then begin
                     JobJnlPostLine.RunWithCheck(JobJournalLine);
+                    JobJournalLine.Delete(true);
+                end;
             else
                 exit;
         end;
@@ -529,6 +533,7 @@ codeunit 6610 "FS Int. Table Subscriber"
     begin
         JobJournalLineId := JobJournalLine.SystemId;
         JobJnlPostLine.RunWithCheck(JobJournalLine);
+        JobJournalLine.Delete(true);
 
         // Work Order Services couple to two Project Journal Lines (one budget line for the resource and one billable line for the item of type service)
         // we must find the other coupled lines and post them as well.
@@ -536,9 +541,11 @@ codeunit 6610 "FS Int. Table Subscriber"
         CRMIntegrationRecord.SetRange("CRM ID", FSWorkOrderService.WorkOrderServiceId);
         if CRMIntegrationRecord.FindSet() then
             repeat
-                if CRMIntegrationRecord."Integration ID" <> JobJournalLine.SystemId then
-                    if CorrelatedJobJournalLine.GetBySystemId(CRMIntegrationRecord."Integration ID") then
+                if CRMIntegrationRecord."Integration ID" <> JobJournalLineId then
+                    if CorrelatedJobJournalLine.GetBySystemId(CRMIntegrationRecord."Integration ID") then begin
                         JobJnlPostLine.RunWithCheck(CorrelatedJobJournalLine);
+                        CorrelatedJobJournalLine.Delete(true);
+                    end;
             until CRMIntegrationRecord.Next() = 0;
     end;
 
@@ -836,6 +843,8 @@ codeunit 6610 "FS Int. Table Subscriber"
         if not FSConnectionSetup.IsEnabled() then
             exit;
 
+        Codeunit.Run(Codeunit::"CRM Integration Management");
+
         JobUsageLink.SetRange("Entry No.", JobLedgerEntry."Entry No.");
         if not JobUsageLink.FindFirst() then begin
             Session.LogMessage('0000MN8', NoProjectUsageLinkTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
@@ -868,7 +877,6 @@ codeunit 6610 "FS Int. Table Subscriber"
             exit;
         if not FSWorkOrderService.WritePermission() then
             exit;
-        Codeunit.Run(Codeunit::"CRM Integration Management");
         if FSWorkOrderProduct.Get(CRMIntegrationRecord."CRM ID") then begin
             FSWorkOrderProduct.QuantityConsumed += JobPlanningLine.Quantity;
             if not TryModifyWorkOrderProduct(FSWorkOrderProduct) then begin
@@ -887,7 +895,7 @@ codeunit 6610 "FS Int. Table Subscriber"
                         if JobPlanningLine."Line Type" <> JobPlanningLine."Line Type"::Budget then
                             exit;
 
-            FSWorkOrderService.DurationConsumed += (60 * JobPlanningLine.Quantity);
+            FSWorkOrderService.DurationConsumed += Round((60 * JobPlanningLine.Quantity), 1, '=');
             if not TryModifyWorkOrderService(FSWorkOrderService) then begin
                 Session.LogMessage('0000MN0', UnableToModifyWOSTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
                 ClearLastError();
@@ -945,12 +953,10 @@ codeunit 6610 "FS Int. Table Subscriber"
                         Error(CoupledToDeletedErr, FSWorkOrderProduct.FieldCaption(Product), Format(FSWorkOrderProduct.Product), Item.TableCaption());
 
                     JobJournalLine.Validate("Entry Type", JobJournalLine."Entry Type"::Usage);
-                    if Item.Type = Item.Type::"Non-Inventory" then
-                        JobJournalLine.Validate("Line Type", JobJournalLine."Line Type"::" ")
-                    else
-                        JobJournalLine.Validate("Line Type", JobJournalLine."Line Type"::Billable);
+                    JobJournalLine.Validate("Line Type", JobJournalLine."Line Type"::Billable);
                     // set Item, but for work order products we must keep its Business Central Unit Cost
                     JobJournalLine.Validate("No.", Item."No.");
+                    JobJournalLine.Validate(Description, CopyStr(FSWorkOrderProduct.Name, 1, MaxStrLen(JobJournalLine.Description)));
                     JobJournalLine.Validate("Unit Cost", Item."Unit Cost");
                     JobJournalLine.Validate(Quantity, FSQuantity - QuantityCurrentlyConsumed);
                     JobJournalLine.Validate("Unit Price", Item."Unit Price");
