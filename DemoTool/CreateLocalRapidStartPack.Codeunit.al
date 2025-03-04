@@ -19,6 +19,7 @@ codeunit 101931 "Create Local RapidStart Pack"
             CreateTable(Database::"Payment Order Header CZB");
             CreateTableChild(Database::"Payment Order Line CZB", Database::"Payment Order Header CZB");
             CreateTable(Database::"VAT Period CZL");
+            CreateTable(Database::"VAT Return Period");
             CreateTable(Database::"Company Official CZL");
             CreateTable(Database::"EET Business Premises CZL");
             CreateTable(Database::"EET Cash Register CZL");
