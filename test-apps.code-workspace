@@ -1,11 +1,11 @@
 {
+  "folders": [],
   "settings": {
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeActions": false,
     "al.enableCodeAnalysis": false,
     "allint.enabled": false
-  },
-  "folders": []
+  }
 }
