@@ -8,22 +8,12 @@ tableextension 36955 "Setup - Projects" extends "PowerBI Reports Setup"
     {
         field(36962; "Job Ledger Entry Start Date"; Date)
         {
-            Caption = 'Project Ledger Entry Start Date';
+            Caption = 'Job Ledger Entry Start Date';
             DataClassification = CustomerContent;
         }
         field(36963; "Job Ledger Entry End Date"; Date)
         {
-            Caption = 'Project Ledger Entry End Date';
-            DataClassification = CustomerContent;
-        }
-        field(36976; "Projects Report Id"; Guid)
-        {
-            Caption = 'Projects Report ID';
-            DataClassification = CustomerContent;
-        }
-        field(36977; "Projects Report Name"; Text[200])
-        {
-            Caption = 'Projects Report Name';
+            Caption = 'Job Ledger Entry End Date';
             DataClassification = CustomerContent;
         }
     }
