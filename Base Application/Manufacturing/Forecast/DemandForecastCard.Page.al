@@ -291,7 +291,6 @@ page 2901 "Demand Forecast Card"
     trigger OnOpenPage()
     begin
         IsEditable := CurrPage.Editable;
-        Rec.CheckDateFilterIsValid();
         SetMatrixColumns("Matrix Page Step Type"::Initial);
     end;
 
