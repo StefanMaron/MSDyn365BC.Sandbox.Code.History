@@ -2,9 +2,7 @@ namespace System.Security.AccessControl;
 
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
-#if not CLEAN25
 using Microsoft.Integration.FieldService;
-#endif
 using Microsoft.Sales.Customer;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.CRM.Interaction;
@@ -83,7 +81,6 @@ permissionset 618 "D365 DYN CRM READ"
                   tabledata "CRM Transactioncurrency" = R,
                   tabledata "CRM Uom" = R,
                   tabledata "CRM Uomschedule" = R,
-#if not CLEAN25
                   tabledata "FS Connection Setup" = R,
                   tabledata "FS Bookable Resource" = R,
                   tabledata "FS Bookable Resource Booking" = R,
@@ -98,7 +95,6 @@ permissionset 618 "D365 DYN CRM READ"
                   tabledata "FS Work Order Service" = R,
                   tabledata "FS Work Order Substatus" = R,
                   tabledata "FS Work Order Type" = R,
-#endif
                   tabledata "Customer Templ." = R,
                   tabledata "Vendor Templ." = R,
                   tabledata "Integration Field Mapping" = R,
