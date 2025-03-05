@@ -252,14 +252,9 @@ codeunit 6363 "Pagero API Requests"
         exit(Content);
     end;
 
-    local procedure GetSendMode(ExternalConnectionSetup: Record "E-Doc. Ext. Connection Setup") Value: Text
-    var
-        Index: Integer;
-        ListOfNames: List of [Text];
+    local procedure GetSendMode(ExternalConnectionSetup: Record "E-Doc. Ext. Connection Setup"): Text
     begin
-        Index := ExternalConnectionSetup."Send Mode".AsInteger();
-        ListOfNames := ExternalConnectionSetup."Send Mode".Names();
-        ListOfNames.Get(Index + 1, Value); // AL index is 1-based
+        exit(Format(ExternalConnectionSetup."Send Mode"));
     end;
 
     local procedure GetDocumentType(EDocument: Record "E-Document"): Text
