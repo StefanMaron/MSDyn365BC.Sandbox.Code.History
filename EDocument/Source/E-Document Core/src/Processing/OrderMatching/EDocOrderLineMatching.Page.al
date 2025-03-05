@@ -8,7 +8,7 @@ using System.Telemetry;
 page 6167 "E-Doc. Order Line Matching"
 {
     Caption = 'Purchase Order Matching';
-    DataCaptionExpression = 'Purchase Order ' + Rec."Order No.";
+    DataCaptionExpression = StrSubstNo(GlobalDataCaptionExpressionTxt, Rec."Order No.");
     PageType = Card;
     ApplicationArea = All;
     SourceTable = "E-Document";
@@ -116,6 +116,7 @@ page 6167 "E-Doc. Order Line Matching"
                 ApplicationArea = All;
                 Image = SparkleFilled;
                 Visible = CopilotActionVisible;
+                Enabled = CopilotActionEnabled;
 
                 trigger OnAction()
                 begin
@@ -220,21 +221,18 @@ page 6167 "E-Doc. Order Line Matching"
         FeatureTelemetry: Codeunit "Feature Telemetry";
         EDocMatchOrderLines: Codeunit "E-Doc. Line Matching";
         DiscountNotification, CostNotification : Notification;
-        CopilotActionVisible, AutoRunCopilot : Boolean;
+        CopilotActionVisible, CopilotActionEnabled, AutoRunCopilot : Boolean;
         LineDiscountVaryMatchMsg: Label 'Matched e-document lines (%1) has Line Discount % different from matched purchase order line. Please verify matches are correct.', Comment = '%1 - Line number';
         LineCostVaryMatchMsg: Label 'Matched e-document lines (%1) has Direct Unit Cost different from matched purchase order line. Please verify matches are correct.', Comment = '%1 - Line number';
         NoMatchesFoundMsg: Label 'Copilot could not find any line matches. Please review manually';
+        GlobalDataCaptionExpressionTxt: Label 'Purchase Order %1', Comment = '%1 - Purchase order number';
 
     trigger OnOpenPage()
     var
         EDocPOMatching: Codeunit "E-Doc. PO Copilot Matching";
     begin
-        CopilotActionVisible := EDocPOMatching.IsCopilotEnabled();
-    end;
-
-    trigger OnInit()
-    begin
-        AutoRunCopilot := true;
+        CopilotActionVisible := EDocPOMatching.IsCopilotVisible();
+        CopilotActionEnabled := EDocPOMatching.IsCopilotEnabled();
     end;
 
     trigger OnAfterGetRecord()
@@ -247,7 +245,7 @@ page 6167 "E-Doc. Order Line Matching"
 
         OpenPurchaseHeader();
 
-        if CopilotActionVisible and AutoRunCopilot then begin
+        if CopilotActionEnabled and CopilotActionVisible and AutoRunCopilot then begin
             AutoRunCopilot := false;
             EDocOrderMatch.SetRange("E-Document Entry No.", Rec."Entry No");
             if EDocOrderMatch.IsEmpty() then
@@ -395,6 +393,11 @@ page 6167 "E-Doc. Order Line Matching"
         Rec.TransferFields(EDocument);
         Rec.SystemId := EDocument.SystemId;
         Rec.Insert(false);
+    end;
+
+    internal procedure SetAutoRunCopilot(CopilotToRun: Boolean)
+    begin
+        AutoRunCopilot := CopilotToRun;
     end;
 
 }
