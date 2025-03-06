@@ -6,7 +6,6 @@ page 5638 "FA Reclass. Jnl. Template List"
     Editable = false;
     PageType = List;
     SourceTable = "FA Reclass. Journal Template";
-    AnalysisModeEnabled = false;
 
     layout
     {
