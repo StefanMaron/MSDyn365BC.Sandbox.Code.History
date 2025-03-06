@@ -59,7 +59,7 @@ table 2670 "Allocation Account"
 
         if GuiAllowed() then
             if not Confirm(ConfirmDeleteQst) then
-                Error('');
+                exit;
 
         AllocAccountDistribution.DeleteAll();
     end;
