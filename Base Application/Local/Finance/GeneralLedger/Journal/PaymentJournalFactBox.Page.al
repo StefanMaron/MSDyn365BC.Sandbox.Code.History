@@ -345,8 +345,6 @@ page 35517 "Payment Journal FactBox"
             end;
 
             VendLedgEntry.CalcFields("Remaining Amount", "Remaining Amt. (LCY)");
-            OnUpdateInfoBoxAfterCalcRemainingAmount(VendLedgEntry);
-
             CurrOeRemainAmountFC := -VendLedgEntry."Remaining Amount";
             CurrPmtDiscount := -VendLedgEntry."Remaining Pmt. Disc. Possible";
             CurrPmtDiscount :=
@@ -424,11 +422,6 @@ page 35517 "Payment Journal FactBox"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateInfoBoxOnAfterSetVendLedgEntryFilters(var GenJournalLine: Record "Gen. Journal Line"; var VendorLedgerEntry: Record "Vendor Ledger Entry"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateInfoBoxAfterCalcRemainingAmount(var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 }
