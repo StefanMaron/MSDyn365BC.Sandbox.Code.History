@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Service.History;
+namespace Microsoft.Service.History;
 
 page 1356 "Posted Service Inv. - Update"
 {
