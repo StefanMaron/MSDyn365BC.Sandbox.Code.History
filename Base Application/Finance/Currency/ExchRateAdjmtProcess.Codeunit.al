@@ -563,7 +563,6 @@ codeunit 699 "Exch. Rate Adjmt. Process"
                 Type, Closed, "Tax Jurisdiction Code", "Use Tax", "Posting Date");
         VATEntry.SetRange(Closed, false);
         VATEntry.SetRange("Posting Date", StartDate, EndDate);
-        OnAfterSetVATEntryFilters(VATEntry);
     end;
 
     local procedure ProcessCustomerAdjustment(var Customer: Record Customer)
@@ -1231,13 +1230,7 @@ codeunit 699 "Exch. Rate Adjmt. Process"
     var
         CustLedgerEntry2: Record "Cust. Ledger Entry";
         DtldCustLedgEntry2: Record "Detailed Cust. Ledg. Entry";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforePrepareTempCustLedgEntry(CustLedgerEntry2, TempCustLedgerEntry, Customer, IsHandled);
-        if IsHandled then
-            exit;
-
         TempCustLedgerEntry.DeleteAll();
 
         Currency.CopyFilter(Code, CustLedgerEntry2."Currency Code");
@@ -1280,12 +1273,7 @@ codeunit 699 "Exch. Rate Adjmt. Process"
     var
         VendorLedgerEntry2: Record "Vendor Ledger Entry";
         DtldVendLedgEntry2: Record "Detailed Vendor Ledg. Entry";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforePrepareTempVendLedgEntry(VendorLedgerEntry2, TempVendorLedgerEntry, Vendor, IsHandled);
-        if IsHandled then
-            exit;
         TempVendorLedgerEntry.DeleteAll();
 
         Currency.CopyFilter(Code, VendorLedgerEntry2."Currency Code");
@@ -1334,14 +1322,12 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         Currency.CopyFilter(Code, EmployeeLedgerEntry2."Currency Code");
         EmployeeLedgerEntry2.FilterGroup(2);
         EmployeeLedgerEntry2.SetFilter("Currency Code", '<>%1', '');
-        OnPrepareTempEmplLedgEntryOnAfterSetEmplLedgerEntryFilters(EmployeeLedgerEntry2);
         EmployeeLedgerEntry2.FilterGroup(0);
 
         DtldEmplLedgEntry2.Reset();
         DtldEmplLedgEntry2.SetCurrentKey("Employee No.", "Posting Date", "Entry Type");
         DtldEmplLedgEntry2.SetRange("Employee No.", Employee."No.");
         DtldEmplLedgEntry2.SetRange("Posting Date", CalcDate('<+1D>', ExchRateAdjmtParameters."End Date"), DMY2Date(31, 12, 9999));
-        OnPrepareTempEmplLedgEntryOnAfterSetDtldEmplLedgerEntryFilters(DtldEmplLedgEntry2);
         if DtldEmplLedgEntry2.Find('-') then
             repeat
                 EmployeeLedgerEntry2."Entry No." := DtldEmplLedgEntry2."Employee Ledger Entry No.";
@@ -1358,7 +1344,6 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         EmployeeLedgerEntry2.SetRange("Employee No.", Employee."No.");
         EmployeeLedgerEntry2.SetRange(Open, true);
         EmployeeLedgerEntry2.SetRange("Posting Date", 0D, ExchRateAdjmtParameters."End Date");
-        OnPrepareTempEmplLedgEntryOnAfterSetEmplLedgerEntryFilters(EmployeeLedgerEntry2);
         if EmployeeLedgerEntry2.Find('-') then
             repeat
                 TempEmployeeLedgerEntry."Entry No." := EmployeeLedgerEntry2."Entry No.";
@@ -1755,7 +1740,6 @@ codeunit 699 "Exch. Rate Adjmt. Process"
                     GenJournalLine."Shortcut Dimension 1 Code" := GetGlobalDimVal(GLSetup."Global Dimension 1 Code", DimensionSetEntry);
                     GenJournalLine."Shortcut Dimension 2 Code" := GetGlobalDimVal(GLSetup."Global Dimension 2 Code", DimensionSetEntry);
                     GenJournalLine."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
-                    OnSetPostingDimensionsOnCaseSourceEntryDimensions(GenJournalLine, DimensionSetEntry);
                 end;
             "Exch. Rate Adjmt. Dimensions"::"G/L Account Dimensions":
                 if GenJournalLine."Account Type" = "Gen. Journal Account Type"::"G/L Account" then begin
@@ -2841,11 +2825,6 @@ codeunit 699 "Exch. Rate Adjmt. Process"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterSetVATEntryFilters(var VATEntry: Record "VAT Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnAdjustCustomerLedgerEntryOnBeforeInitDtldCustLedgEntry(var Customer: Record Customer; CusLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
@@ -3015,28 +2994,4 @@ codeunit 699 "Exch. Rate Adjmt. Process"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareTempEmplLedgEntryOnAfterSetEmplLedgerEntryFilters(var EmployeeLedgerEntry: Record "Employee Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareTempEmplLedgEntryOnAfterSetDtldEmplLedgerEntryFilters(var DetailedEmployeeLedgerEntry: Record "Detailed Employee Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetPostingDimensionsOnCaseSourceEntryDimensions(var GenJournalLine: Record "Gen. Journal Line"; var DimensionSetEntry: Record "Dimension Set Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePrepareTempCustLedgEntry(var CustLedgerEntry: Record "Cust. Ledger Entry"; var TempCustLedgerEntry: Record "Cust. Ledger Entry" temporary; Customer: Record Customer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePrepareTempVendLedgEntry(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var TempVendorLedgerEntry: Record "Vendor Ledger Entry" temporary; Vendor: Record Vendor; var IsHandled: Boolean)
-    begin
-    end;
 }
