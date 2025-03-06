@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -21,7 +21,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Utilities;
 using System.Globalization;
 using System.Utilities;
-using System.Telemetry;
 
 report 10576 "Order GB"
 {
@@ -706,10 +705,7 @@ report 10576 "Order GB"
             }
 
             trigger OnAfterGetRecord()
-            var
-                FeatureTelemetry: Codeunit "Feature Telemetry";
             begin
-                FeatureTelemetry.LogUsage('0000OJF', FeatureNameTok, EventNameTok);
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
                 CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
@@ -948,8 +944,5 @@ report 10576 "Order GB"
         PaymentDetailsCaptionLbl: Label 'Payment Details';
         VendNoCaptionLbl: Label 'Vendor No.';
         ShiptoAddressCaptionLbl: Label 'Ship-to Address';
-        FeatureNameTok: Label 'Order GB', Locked = true;
-        EventNameTok: Label 'Order GB report has been used', Locked = true;
-
 }
 
