@@ -18,7 +18,6 @@ using Microsoft.Service.Ledger;
 using Microsoft.Service.Setup;
 using Microsoft.Utilities;
 using System.Environment.Configuration;
-using System.Reflection;
 using System.Security.User;
 using System.Utilities;
 
@@ -563,7 +562,6 @@ codeunit 5940 ServContractManagement
         TotalServLineLCY: Record "Service Line";
         ServContractAccGr: Record "Service Contract Account Group";
         IsHandled: Boolean;
-        LatestInvToDate: Date;
     begin
         IsHandled := false;
         OnBeforeCreateServiceLine(ServHeader, ContractType, ContractNo, InvFromDate, InvToDate, ServiceApplyEntry, SignningContract, IsHandled);
@@ -595,7 +593,6 @@ codeunit 5940 ServContractManagement
         end;
         AppliedGLAccount := GLAcc."No.";
 
-        LatestInvToDate := InvToDate;
         if ServiceLedgerEntry.Get(ServiceApplyEntry) then begin
             ServiceLedgerEntry.SetRange("Entry No.", ServiceApplyEntry, ServiceLedgerEntry."Apply Until Entry No.");
             if ServiceLedgerEntry.FindSet() then
@@ -603,8 +600,6 @@ codeunit 5940 ServContractManagement
                     if ServiceLedgerEntry.Prepaid then begin
                         InvFromDate := ServiceLedgerEntry."Posting Date";
                         InvToDate := CalcDate('<CM>', InvFromDate);
-                        if InvToDate > LatestInvToDate then
-                            InvToDate := LatestInvToDate;
                     end;
                     ServLedgEntryToServiceLine(
                       TotalServLine,
@@ -1245,7 +1240,6 @@ codeunit 5940 ServContractManagement
         WDate: Date;
         OldWDate: Date;
         IsHandled: Boolean;
-        DateExpression: Text[10];
     begin
         IsHandled := false;
         OnBeforeNoOfMonthsAndMPartsInPeriod(Day1, Day2, CheckMParts, MonthsAndMParts, IsHandled);
@@ -1260,15 +1254,14 @@ codeunit 5940 ServContractManagement
 
         WDate := CalcDate('<-CM>', Day1);
         repeat
-            DateExpression := GetDateExpression(Day1);
-            OldWDate := CalcDate(DateExpression, WDate);
+            OldWDate := CalcDate('<CM>', WDate);
             if WDate < Day1 then
                 WDate := Day1;
             if OldWDate > Day2 then
                 OldWDate := Day2;
             if (WDate <> CalcDate('<-CM>', WDate)) or (OldWDate <> CalcDate('<CM>', OldWDate)) then
                 MonthsAndMParts := MonthsAndMParts +
-                  (OldWDate - WDate + 1) / (CalcDate(DateExpression, OldWDate) - CalcDate('<-CM>', WDate) + 1)
+                  (OldWDate - WDate + 1) / (CalcDate('<CM>', OldWDate) - CalcDate('<-CM>', WDate) + 1)
             else
                 MonthsAndMParts := MonthsAndMParts + 1;
             WDate := CalcDate('<CM>', OldWDate) + 1;
@@ -2324,11 +2317,6 @@ codeunit 5940 ServContractManagement
     end;
 
     local procedure PostPartialServLedgEntry(var InvAmountRounded: array[4] of Decimal; ServContractLine: Record "Service Contract Line"; ServHeader: Record "Service Header"; InvFrom: Date; InvTo: Date; DueDate: Date; AmtRoundingPrecision: Decimal) YearContractCorrection: Boolean
-    var
-        AmountLCY: Decimal;
-        UnitPrice: Decimal;
-        UnitCost: Decimal;
-        ContractDiscAmt: Decimal;
     begin
         OnBeforePostPartialServLedgEntry(ServLedgEntry, ServContractLine);
         ServLedgEntry."Service Item No. (Serviced)" := ServContractLine."Service Item No.";
@@ -2342,12 +2330,13 @@ codeunit 5940 ServContractManagement
         end else
             YearContractCorrection := false;
 
-        CalcAndSetRemainingAmount(
-            ServLedgEntry, ServContractLine, AmountLCY, UnitPrice, UnitCost,
-            ContractDiscAmt, InvFrom, InvTo, AmtRoundingPrecision);
         SetServLedgEntryAmounts(
-            ServLedgEntry, InvAmountRounded, AmountLCY, UnitPrice,
-            UnitCost, ContractDiscAmt, AmtRoundingPrecision);
+          ServLedgEntry, InvAmountRounded,
+          -CalcContractLineAmount(ServContractLine."Line Amount", InvFrom, InvTo),
+          -CalcContractLineAmount(ServContractLine."Line Value", InvFrom, InvTo),
+          -CalcContractLineAmount(ServContractLine."Line Cost", InvFrom, InvTo),
+          -CalcContractLineAmount(ServContractLine."Line Discount Amount", InvFrom, InvTo),
+          AmtRoundingPrecision);
         ServLedgEntry."Entry No." := NextEntry;
         UpdateServLedgEntryAmount(ServLedgEntry, ServHeader);
         ServLedgEntry."Posting Date" := DueDate;
@@ -2512,49 +2501,7 @@ codeunit 5940 ServContractManagement
         end;
     end;
 
-    local procedure GetDateExpression(Day1: Date): Text[10]
-    var
-        TypeHelper: Codeunit "Type Helper";
-    begin
-        if (Date2DMY(Day1, 2) = 2) and TypeHelper.IsLeapYear(Day1) then
-            exit('<CM-1D>');
-
-        exit('<CM>');
-    end;
-
-    local procedure CalcAndSetRemainingAmount(ServLedgerEntry: Record "Service Ledger Entry"; ServContractLine: Record "Service Contract Line"; var AmountLCY: Decimal; var UnitPrice: Decimal; var UnitCost: Decimal; var ContractDiscAmt: Decimal; InvFrom: Date; InvTo: Date; AmtRoundingPrecision: Decimal)
-    var
-        ServiceLedgerEntry: Record "Service Ledger Entry";
-        ServiceContractHeader: Record "Service Contract Header";
-        RemainingAmount: Decimal;
-    begin
-        ServiceContractHeader.Get(ServContractLine."Contract Type", ServContractLine."Contract No.");
-        ServiceLedgerEntry.SetRange("Service Contract No.", ServContractLine."Contract No.");
-        ServiceLedgerEntry.SetRange("Document No.", ServLedgerEntry."Document No.");
-        if ServiceLedgerEntry.FindSet() then begin
-            ServiceLedgerEntry.CalcSums(Amount);
-            RemainingAmount := ServiceContractHeader."Annual Amount" - Abs(ServiceLedgerEntry.Amount);
-        end;
-
-        AmountLCY := Round(-CalcContractLineAmount(ServContractLine."Line Amount", InvFrom, InvTo), AmtRoundingPrecision);
-        UnitPrice := Round(-CalcContractLineAmount(ServContractLine."Line Value", InvFrom, InvTo), AmtRoundingPrecision);
-        UnitCost := Round(-CalcContractLineAmount(ServContractLine."Line Cost", InvFrom, InvTo), AmtRoundingPrecision);
-        ContractDiscAmt := Round(-CalcContractLineAmount(ServContractLine."Line Discount Amount", InvFrom, InvTo), AmtRoundingPrecision);
-
-        if RemainingAmount = 0 then
-            exit;
-
-        if (AmountLCY <> 0) and ((Abs(AmountLCY) - Abs(RemainingAmount)) = AmtRoundingPrecision) then
-            AmountLCY := -RemainingAmount;
-        if (UnitPrice <> 0) and ((Abs(UnitPrice) - Abs(RemainingAmount)) = AmtRoundingPrecision) then
-            UnitPrice := -RemainingAmount;
-        if (UnitCost <> 0) and ((Abs(UnitCost) - Abs(RemainingAmount)) = AmtRoundingPrecision) then
-            UnitCost := -RemainingAmount;
-        if (ContractDiscAmt <> 0) and ((Abs(ContractDiscAmt) - Abs(RemainingAmount)) = AmtRoundingPrecision) then
-            ContractDiscAmt := -RemainingAmount;
-    end;
-
-    #region Service Item Blocked checks
+    # region Service Item Blocked checks
     internal procedure CheckServiceItemBlockedForServiceContract(var ServiceContractLine: Record "Service Contract Line")
     var
         ServiceItem: Record "Service Item";
@@ -2654,7 +2601,7 @@ codeunit 5940 ServContractManagement
     end;
 
     [IntegrationEvent(false, false)]
-   local procedure OnBeforeCreateServiceLine(ServiceHeader: Record "Service Header"; ContractType: Enum "Service Contract Type"; ContractNo: Code[20]; InvFromDate: Date; InvToDate: Date; ServiceApplyEntry: Integer; SigningContract: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeCreateServiceLine(ServiceHeader: Record "Service Header"; ContractType: Enum "Service Contract Type"; ContractNo: Code[20]; InvFromDate: Date; InvToDate: Date; ServiceApplyEntry: Integer; SigningContract: Boolean; var IsHandled: Boolean)
     begin
     end;
 
