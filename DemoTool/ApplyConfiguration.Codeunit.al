@@ -61,7 +61,7 @@ codeunit 101940 "Apply Configuration"
         else
             ConfigurationPackageFile.SetFilter(Code, '*' + Format(DataType) + '*');
 
-        CODEUNIT.Run(CODEUNIT::"Import Config Package Files", ConfigurationPackageFile);
+        CODEUNIT.Run(CODEUNIT::"Import Config. Package Files", ConfigurationPackageFile);
     end;
 
     local procedure SetupAndRunAssistedCompanySetup(DataType: Option Evaluation,Standard)
@@ -111,13 +111,6 @@ codeunit 101940 "Apply Configuration"
     begin
         PackLanguageCode := PackLanguage;
         ApplyStandardConfiguration();
-    end;
-
-    procedure CleanUpConfigPackages()
-    var
-        ConfigurationPackageFile: Record "Configuration Package File";
-    begin
-        ConfigurationPackageFile.DeleteAll();
     end;
 }
 
