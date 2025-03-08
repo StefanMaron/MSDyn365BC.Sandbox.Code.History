@@ -123,19 +123,19 @@ page 2516 "AppSource Product Details"
                 {
                     Caption = 'Legal Terms Uri';
                     ToolTip = 'Specifies the legal terms of the offer.';
-                    ExtendedDatatype = URL;
+                    ExtendedDatatype = Url;
                 }
                 field(Links_PrivacyPolicyUri; AppSourceJsonUtilities.GetStringValue(ProductObject, 'privacyPolicyUri'))
                 {
                     Caption = 'Privacy Policy Uri';
                     ToolTip = 'Specifies the privacy policy of the offer.';
-                    ExtendedDatatype = URL;
+                    ExtendedDatatype = Url;
                 }
                 field(Links_SupportUri; AppSourceJsonUtilities.GetStringValue(ProductObject, 'supportUri'))
                 {
                     Caption = 'Support Uri';
                     ToolTip = 'Specifies the support Uri of the offer.';
-                    ExtendedDatatype = URL;
+                    ExtendedDatatype = Url;
                 }
             }
         }
@@ -208,7 +208,7 @@ page 2516 "AppSource Product Details"
                 Enabled = CurrentRecordCanBeUninstalled;
                 Image = Delete;
                 ToolTip = 'Uninstalls the app.';
-                AccessByPermission = tabledata "Installed Application" = d;
+                AccessByPermission = TableData "Installed Application" = d;
 
                 trigger OnAction()
                 begin
@@ -313,9 +313,9 @@ page 2516 "AppSource Product Details"
         AvailabilityObject: JsonObject;
         TermItem: JsonToken;
         ArrayItem: JsonArray;
-        i: Integer;
-        Currency: Text;
-        Monthly, Yearly : Decimal;
+        i: integer;
+        Currency: text;
+        Monthly, Yearly : decimal;
         FreeTrial: Boolean;
         PriceText: Text;
     begin
@@ -363,13 +363,13 @@ page 2516 "AppSource Product Details"
         exit(true);
     end;
 
-    local procedure GetTerms(Terms: JsonArray; var Monthly: Decimal; var Yearly: Decimal; var Currency: Text)
+    local procedure GetTerms(Terms: JsonArray; var Monthly: decimal; var Yearly: decimal; var Currency: Text)
     var
         Item: JsonToken;
         PriceToken: JsonToken;
         Price: JsonObject;
         PriceValue: Decimal;
-        i: Integer;
+        i: integer;
     begin
         for i := 0 to Terms.Count() do
             if (Terms.Get(i, Item)) then begin
