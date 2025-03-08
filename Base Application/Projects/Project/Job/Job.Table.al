@@ -25,6 +25,8 @@ using Microsoft.Projects.Project.Journal;
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Projects.Project.Setup;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Integration.FieldService;
 using Microsoft.Projects.Project.WIP;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.TimeSheet;
@@ -227,6 +229,15 @@ table 167 Job
         field(24; Blocked; Enum "Job Blocked")
         {
             Caption = 'Blocked';
+
+            trigger OnValidate()
+            var
+                FSConnectionSetup: Record "FS Connection Setup";
+            begin
+                if Rec.Blocked <> Rec.Blocked::" " then
+                    if FSConnectionSetup.IsEnabled() then
+                        MoveFilterOnProjectTaskMapping();
+            end;
         }
         field(29; "Last Date Modified"; Date)
         {
@@ -756,6 +767,7 @@ table 167 Job
                 JobPlanningLine: Record "Job Planning Line";
                 JobLedgerEntry: Record "Job Ledger Entry";
                 JobUsageLink: Record "Job Usage Link";
+                FSConnectionSetup: Record "FS Connection Setup";
                 NewApplyUsageLink: Boolean;
             begin
                 if "Apply Usage Link" then begin
@@ -783,6 +795,9 @@ table 167 Job
                         RefreshModifiedRec();
                         "Apply Usage Link" := NewApplyUsageLink;
                     end;
+
+                    if FSConnectionSetup.IsEnabled() then
+                        MoveFilterOnProjectTaskMapping();
                 end;
             end;
         }
@@ -1275,8 +1290,6 @@ table 167 Job
     var
         WhseRequest: Record "Warehouse Request";
     begin
-        ConfirmDeletion();
-
         MoveEntries.MoveJobEntries(Rec);
 
         JobArchiveManagement.AutoArchiveJob(Rec);
@@ -1390,7 +1403,6 @@ table 167 Job
         UpdateBillingMethodQst: Label 'This change will make a difference to how project tasks are billed. This is irreversible. Do you want to continue?';
         UpdateBillingMethodErr: Label 'You cannot select %1 in %2, because one or more Project Tasks exist for this %3.', Comment = '%1 = Caption of the Task Billing Method field value; %2 = Caption of the Task Billing Method field; %3 = Caption of the Project table';
         UpdateCostPricesOnRelatedLinesQst: Label 'You have changed a customer. Prices and costs needs to be updated on a related lines.\\Do you want to update related lines?';
-        ConfirmDeleteQst: Label 'The items have been picked. If you delete the Job, then the items will remain in the operation area until you put them away.\Related item tracking information that is defined during the pick will be deleted.\Are you sure that you want to delete the Job?';
 
     protected var
 #if not CLEAN24
@@ -1611,18 +1623,6 @@ table 167 Job
         JobLedgEntry.SetRange("Job No.", "No.");
         JobLedgEntry.SetRange("Entry Type", JobLedgEntry."Entry Type"::Sale);
         Result := not JobLedgEntry.IsEmpty();
-    end;
-
-    procedure SalesLineExist() Result: Boolean
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        if "No." = '' then
-            exit(false);
-
-        SalesLine.SetCurrentKey("Job No.");
-        SalesLine.SetRange("Job No.", "No.");
-        Result := not SalesLine.IsEmpty();
     end;
 
     procedure JobPlanningLineExist() Result: Boolean
@@ -2223,7 +2223,6 @@ table 167 Job
 
         JobTask.SetCurrentKey("Job No.");
         JobTask.SetRange("Job No.", "No.");
-        JobTask.SuspendDeletionCheck(true);
         JobTask.DeleteAll(true);
     end;
 
@@ -2413,18 +2412,18 @@ table 167 Job
         OnAfterCalcJobTaskLinesEditable(Rec, IsEditable);
     end;
 
-    procedure ShipToAddressEqualsSellToAddress() Result: Boolean
+    procedure ShipToAddressEqualsSellToAddress(): Boolean
     begin
-        Result :=
-          ("Sell-to Address" = "Ship-to Address") and
+        if ("Sell-to Address" = "Ship-to Address") and
           ("Sell-to Address 2" = "Ship-to Address 2") and
           ("Sell-to City" = "Ship-to City") and
           ("Sell-to County" = "Ship-to County") and
           ("Sell-to Post Code" = "Ship-to Post Code") and
           ("Sell-to Country/Region Code" = "Ship-to Country/Region Code") and
-          ("Sell-to Contact" = "Ship-to Contact");
-
-        OnAfterShipToAddressEqualsSellToAddress(Rec, Result);
+          ("Sell-to Contact" = "Ship-to Contact")
+        then
+            exit(true);
+        exit(false);
     end;
 
     procedure BillToAddressEqualsSellToAddress(): Boolean
@@ -2454,8 +2453,6 @@ table 167 Job
         Rec."Ship-to Country/Region Code" := Rec."Sell-to Country/Region Code";
         Rec."Ship-to Contact" := Rec."Sell-to Contact";
         Rec."Ship-to Code" := '';
-
-        OnAfterSyncShipToWithSellTo(Rec);
     end;
 
     procedure ShipToNameEqualsSellToName(): Boolean
@@ -2661,8 +2658,6 @@ table 167 Job
             JobPlanningLine.UpdateAllAmounts();
             JobPlanningLine.Modify(true);
         until JobPlanningLine.Next() = 0;
-
-        OnAfterUpdateCostPricesOnRelatedJobPlanningLines(Job);
     end;
 
     local procedure CheckBillToCustomerAssosEntriesExist(var Job: Record Job; var xJob: Record Job)
@@ -2672,21 +2667,18 @@ table 167 Job
         IsHandled := false;
         OnBeforeCheckBillToCustomerAssosEntriesExist(Job, xJob, IsHandled);
         if not IsHandled then
-            if (Job."Bill-to Customer No." = '') or (Job."Bill-to Customer No." <> xJob."Bill-to Customer No.") then begin
+            if (Job."Bill-to Customer No." = '') or (Job."Bill-to Customer No." <> xJob."Bill-to Customer No.") then
                 if Job.SalesJobLedgEntryExist() then
                     ThrowAssociatedEntriesExistError(Job, xJob, Job.FieldNo("Bill-to Customer No."), Job.FieldCaption("Bill-to Customer No."));
-                if Job.SalesLineExist() then
-                    ThrowAssociatedEntriesExistError(Job, xJob, Job.FieldNo("Bill-to Customer No."), Job.FieldCaption("Bill-to Customer No."));
-            end;
     end;
 
     local procedure ThrowAssociatedEntriesExistError(var Job: Record Job; xJob: Record Job; CallingFieldNo: Integer; FieldCaption: Text)
     var
-        IsHandled: Boolean;
+        IsHanled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeThrowAssociatedEntriesExistError(Job, xJob, CallingFieldNo, CurrFieldNo, IsHandled);
-        if IsHandled then
+        IsHanled := false;
+        OnBeforeThrowAssociatedEntriesExistError(Job, xJob, CallingFieldNo, CurrFieldNo, IsHanled);
+        if IsHanled then
             exit;
 
         Error(AssociatedEntriesExistErr, FieldCaption, TableCaption);
@@ -2809,13 +2801,7 @@ table 167 Job
         Contact: Record Contact;
         ContactBusinessRelation: Record "Contact Business Relation";
         ContactBusinessRelationFound: Boolean;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateSellToCust(Rec, ContactNo, IsHandled);
-        if IsHandled then
-            exit;
-
         if not Contact.Get(ContactNo) then begin
             "Sell-to Contact" := '';
             exit;
@@ -2974,20 +2960,37 @@ table 167 Job
         JobTask.ModifyAll("Invoice Currency Code", '');
     end;
 
-    local procedure ConfirmDeletion()
+    local procedure MoveFilterOnProjectTaskMapping()
     var
-        JobPlanningLine: Record "Job Planning Line";
-        Confirmed: Boolean;
+        IntegrationTableMapping: Record "Integration Table Mapping";
+        JobTask: Record "Job Task";
     begin
-        JobPlanningLine.SetRange("Job No.", "No.");
-        if JobPlanningLine.FindSet() then
-            repeat
-                if JobPlanningLine."Qty. Posted" < JobPlanningLine."Qty. Picked" then begin
-                    if not Confirm(ConfirmDeleteQst) then
-                        Error('');
-                    Confirmed := true;
-                end;
-            until (JobPlanningLine.Next() = 0) or Confirmed;
+        if Rec.Blocked <> Rec.Blocked::" " then
+            exit;
+
+        IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::Dataverse);
+        IntegrationTableMapping.SetRange("Delete After Synchronization", false);
+        IntegrationTableMapping.SetRange("Table ID", Database::"Job Task");
+        IntegrationTableMapping.SetRange("Integration Table ID", Database::"FS Project Task");
+        if not IntegrationTableMapping.FindFirst() then
+            exit;
+
+        JobTask.SetRange("Job No.", Rec."No.");
+        JobTask.SetCurrentKey(SystemCreatedAt);
+        JobTask.SetAscending(SystemCreatedAt, true);
+        if not JobTask.FindFirst() then
+            exit;
+
+        if JobTask.SystemCreatedAt = 0DT then begin
+            IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." := 0DT;
+            IntegrationTableMapping.Modify();
+            exit;
+        end;
+
+        if IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." > JobTask.SystemCreatedAt then begin
+            IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." := JobTask.SystemCreatedAt;
+            IntegrationTableMapping.Modify();
+        end;
     end;
 
     [IntegrationEvent(true, false)]
@@ -3280,26 +3283,6 @@ table 167 Job
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowSellToContactBusinessRelationNotFoundError(var Job: Record Job; Contact: Record Contact; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSyncShipToWithSellTo(var Job: Record Job)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterShipToAddressEqualsSellToAddress(var Job: Record Job; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateCostPricesOnRelatedJobPlanningLines(var Job: Record Job)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateSellToCust(var Job: Record Job; var ContactNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
 }
