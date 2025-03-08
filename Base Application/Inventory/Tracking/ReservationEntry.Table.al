@@ -271,7 +271,7 @@ table 337 "Reservation Entry"
         }
         key(Key2; "Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Reservation Status", "Shipment Date", "Expected Receipt Date")
         {
-            IncludedFields = "Quantity (Base)", "Qty. to Handle (Base)", "Serial No.", "Lot No.", "Package No.", "Item No.", Quantity, "Untracked Surplus";
+            IncludedFields = "Quantity (Base)", "Qty. to Handle (Base)", "Serial No.", "Lot No.", "Package No.", "Item No.", Quantity;
         }
         key(Key3; "Item No.", "Variant Code", "Location Code")
         {
@@ -279,7 +279,7 @@ table 337 "Reservation Entry"
         }
         key(Key4; "Item No.", "Variant Code", "Location Code", "Reservation Status", "Shipment Date", "Expected Receipt Date", "Serial No.", "Lot No.", "Package No.")
         {
-            IncludedFields = "Source Type", "Source Subtype", "Quantity (Base)", "Untracked Surplus";
+            IncludedFields = "Source Type", "Source Subtype", "Quantity (Base)";
         }
         key(Key9; "Source Type", "Source Subtype", "Source ID", "Source Batch Name", "Source Prod. Order Line", "Source Ref. No.")
         {
@@ -292,9 +292,6 @@ table 337 "Reservation Entry"
         key(Key11; "Serial No.", "Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line")
         {
             IncludedFields = "Reservation Status", "Quantity (Base)", "Lot No.", "Package No.", Binding;
-        }
-        key(Key12; Positive, "Reservation Status", "Source Type")
-        {
         }
     }
 
@@ -1041,7 +1038,7 @@ table 337 "Reservation Entry"
         OnAfterTransferReservations(OldReservEntry, NewReservEntry);
     end;
 
-    procedure FieldFilterNeeded(var FieldFilter: Text; SearchForSupply: Boolean; ItemTrackingType: Enum "Item Tracking Type") Result: Boolean
+    procedure FieldFilterNeeded(var FieldFilter: Text; SearchForSupply: Boolean; ItemTrackingType: Enum "Item Tracking Type"): Boolean
     var
         Item: Record Item;
         ItemTrackingCode: Record "Item Tracking Code";
@@ -1050,11 +1047,6 @@ table 337 "Reservation Entry"
         IsHandled: Boolean;
         IsSpecificTracking: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeFieldFilterNeeded(Rec, FieldFilter, SearchForSupply, ItemTrackingType, IsHandled, Result);
-        if IsHandled then
-            exit(Result);
-
         FieldFilter := '';
 
         FieldValue := '';
@@ -1416,11 +1408,6 @@ table 337 "Reservation Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferReservationsOnBeforeSetSourceForNewEntry(var OldReservationEntry: Record "Reservation Entry"; var NewReservationEntry: Record "Reservation Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeFieldFilterNeeded(var ReservationEntry: Record "Reservation Entry"; var FieldFilter: Text; SearchForSupply: Boolean; ItemTrackingType: Enum "Item Tracking Type"; var IsHandled: Boolean; var Result: Boolean)
     begin
     end;
 }
