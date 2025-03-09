@@ -266,6 +266,7 @@ using System.Tooling;
 using System.Visualization;
 using System.Utilities;
 using System.Xml;
+using Microsoft.Integration.FieldService;
 
 codeunit 1751 "Data Classification Eval. Data"
 {
@@ -1547,6 +1548,20 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(DATABASE::"Semi-Manual Execution Log");
         SetTableFieldsToNormal(DATABASE::"Work Shift");
         SetTableFieldsToNormal(DATABASE::"Company Size");
+        SetTableFieldsToNormal(DATABASE::"FS Connection Setup");
+        SetTableFieldsToNormal(DATABASE::"FS Bookable Resource");
+        SetTableFieldsToNormal(DATABASE::"FS Bookable Resource Booking");
+        SetTableFieldsToNormal(DATABASE::"FS BookableResourceBookingHdr");
+        SetTableFieldsToNormal(DATABASE::"FS Customer Asset");
+        SetTableFieldsToNormal(DATABASE::"FS Customer Asset Category");
+        SetTableFieldsToNormal(DATABASE::"FS Project Task");
+        SetTableFieldsToNormal(DATABASE::"FS Resource Pay Type");
+        SetTableFieldsToNormal(DATABASE::"FS Work Order");
+        SetTableFieldsToNormal(DATABASE::"FS Work Order Product");
+        SetTableFieldsToNormal(DATABASE::"FS Work Order Service");
+        SetTableFieldsToNormal(DATABASE::"FS Work Order Incident");
+        SetTableFieldsToNormal(DATABASE::"FS Work Order Substatus");
+        SetTableFieldsToNormal(DATABASE::"FS Work Order Type");
     end;
 
     local procedure ClassifyTablesToNormalPart10()
