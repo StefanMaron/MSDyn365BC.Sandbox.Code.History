@@ -270,6 +270,38 @@ codeunit 2752 "Universal Print Graph Helper"
         RequestId := ResponseHeaders.Get('Request-Id');
     end;
 
+    internal procedure GetPaperSizeFromUniversalPrintMediaSize(textValue: Text): Enum "Printer Paper Kind"
+    var
+        PrinterPaperKind: Enum "Printer Paper Kind";
+        OrdinalValue: Integer;
+        Index: Integer;
+    begin
+        // For universal print supported media sizes, refer https://learn.microsoft.com/en-us/graph/api/resources/printercapabilities?view=graph-rest-1.0#mediasizes-values
+        case textValue of
+            JPNHagakiSizeTxt:
+                PrinterPaperKind := Enum::"Printer Paper Kind"::JapanesePostcard;
+            NorthAmericaExecutiveSizeTxt:
+                PrinterPaperKind := PrinterPaperKind::Executive;
+            NorthAmericaLedgerSizeTxt:
+                PrinterPaperKind := PrinterPaperKind::Ledger;
+            NorthAmericaLegalSizeTxt:
+                PrinterPaperKind := PrinterPaperKind::Legal;
+            NorthAmericaLetterSizeTxt:
+                PrinterPaperKind := PrinterPaperKind::Letter;
+            NorthAmericaInvoiceSizeTxt:
+                PrinterPaperKind := PrinterPaperKind::Statement;
+            else begin
+                Index := PrinterPaperKind.Names.IndexOf(textValue);
+                if Index = 0 then
+                    exit(Enum::"Printer Paper Kind"::A4);
+
+                OrdinalValue := PrinterPaperKind.Ordinals.Get(Index);
+                PrinterPaperKind := Enum::"Printer Paper Kind".FromInteger(OrdinalValue);
+            end;
+        end;
+        exit(PrinterPaperKind);
+    end;
+
     local procedure GetMessageFromErrorJSON(ErrorResponseContent: Text): Text
     var
         ResponseJsonObject: JsonObject;
@@ -391,5 +423,11 @@ codeunit 2752 "Universal Print Graph Helper"
         InvokeWebRequestFailedTelemetryTxt: Label 'Invoking web request has failed. Status %1, Message %2, RequestId %3', Locked = true;
         NotFoundTelemetryTxt: Label 'Not Found.', Locked = true;
         UniversalPrintPortalUrlTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2153618', Locked = true;
+        JPNHagakiSizeTxt: Label 'JPN Hagaki', Locked = true;
+        NorthAmericaExecutiveSizeTxt: Label 'North America Executive', Locked = true;
+        NorthAmericaInvoiceSizeTxt: Label 'North America Invoice', Locked = true;
+        NorthAmericaLedgerSizeTxt: Label 'North America Ledger', Locked = true;
+        NorthAmericaLegalSizeTxt: Label 'North America Legal', Locked = true;
+        NorthAmericaLetterSizeTxt: Label 'North America Letter', Locked = true;
 }
 
