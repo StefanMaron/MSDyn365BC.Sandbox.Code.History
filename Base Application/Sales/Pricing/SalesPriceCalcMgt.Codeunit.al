@@ -827,22 +827,10 @@ codeunit 7000 "Sales Price Calc. Mgt."
                   TempSalesLineDisc.TableCaption());
 
             SalesLine.TestField("Allow Line Disc.");
-            ValidateLineDiscountOnSalesLine(SalesLine);
+            SalesLine.Validate("Line Discount %", TempSalesLineDisc."Line Discount %");
         end;
 
         OnAfterGetSalesLineLineDisc(SalesLine, TempSalesLineDisc);
-    end;
-
-    local procedure ValidateLineDiscountOnSalesLine(var SalesLine: Record "Sales Line")
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeValidateLineDiscountOnSalesLine(SalesLine, TempSalesLineDisc, IsHandled);
-        if IsHandled then
-            exit;
-
-        SalesLine.Validate("Line Discount %", TempSalesLineDisc."Line Discount %");
     end;
 
     procedure SalesLinePriceExists(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; ShowAll: Boolean) Result: Boolean
@@ -2084,11 +2072,6 @@ codeunit 7000 "Sales Price Calc. Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnFindSalesLinePriceOnCalcBestUnitPrice(SalesLine: Record "Sales Line"; var TempSalesPrice: Record "Sales Price" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateLineDiscountOnSalesLine(var SalesLine: Record "Sales Line"; var SalesLineDiscount: Record "Sales Line Discount" temporary; var IsHandled: Boolean)
     begin
     end;
 }
