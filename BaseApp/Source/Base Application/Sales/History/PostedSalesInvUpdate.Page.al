@@ -92,13 +92,6 @@ page 1355 "Posted Sales Inv. - Update"
                     Importance = Promoted;
                     Tooltip = 'Specifies if there is an ongoing dispute for this Invoice';
                 }
-                field("Your Reference"; Rec."Your Reference")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Editable = true;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the customer''s reference. The contents will be printed on sales documents.';
-                }
             }
             group(Payment)
             {
@@ -155,8 +148,7 @@ page 1355 "Posted Sales Inv. - Update"
           (Rec."Shipping Agent Code" <> xSalesInvoiceHeader."Shipping Agent Code") or
           (Rec."Shipping Agent Service Code" <> xSalesInvoiceHeader."Shipping Agent Service Code") or
           (Rec."Package Tracking No." <> xSalesInvoiceHeader."Package Tracking No.") or
-          (Rec."Due Date" <> xSalesInvoiceHeader."Due Date") or
-          (Rec."Your Reference" <> xSalesInvoiceHeader."Your Reference");
+          (Rec."Due Date" <> xSalesInvoiceHeader."Due Date");
 
         OnAfterRecordChanged(Rec, xSalesInvoiceHeader, IsChanged);
     end;

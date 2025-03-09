@@ -29,7 +29,6 @@ codeunit 134400 "ERM Incoming Documents"
         DialogTxt: Label 'Dialog';
         EmptyLinkToRelatedRecordErr: Label 'Link to related record is empty.';
         CannotReplaceMainAttachmentErr: Label 'Cannot replace the main attachment because the document has already been sent to OCR.';
-        TotalsMismatchErr: Label 'The invoice cannot be posted because the total is different from the total on the related incoming document.';
 
     [Test]
     [Scope('OnPrem')]
@@ -2427,74 +2426,6 @@ codeunit 134400 "ERM Incoming Documents"
         end;
     end;
 
-    [Test]
-    procedure IncDocEntryNoClearedInGenJnlLinePostedFromTemplateWithUnlinkInDocOption()
-    var
-        GenJnlTemplate: Record "Gen. Journal Template";
-        GenJnlBatch: Record "Gen. Journal Batch";
-        GenJournalLine: Record "Gen. Journal Line";
-        IncomingDocument: Record "Incoming Document";
-    begin
-        // [SCENARIO 556017] Incoming Document Entry No. is cleared in Gen. Journal Line posted from template with "Unlink Inc. Doc On Posting" option
-
-        // [GIVEN] Gen. Journal Template with "Unlink Inc. Doc On Posting" option
-        InsertGenJnlTemplateWithUnlinkIncDocOption(GenJnlTemplate);
-        LibraryERM.CreateGenJournalBatch(GenJnlBatch, GenJnlTemplate.Name);
-        // [GIVEN] General journal line with template
-        LibraryERM.CreateGeneralJnlLine2WithBalAcc(
-            GenJournalLine, GenJnlBatch."Journal Template Name", GenJnlBatch.Name,
-            GenJournalLine."Document Type"::" ", GenJournalLine."Account Type"::"G/L Account",
-            LibraryERM.CreateGLAccountNo(), GenJournalLine."Bal. Account Type"::"G/L Account",
-            LibraryERM.CreateGLAccountNo(), LibraryRandom.RandDec(100, 2));
-        CreateIncomingDocumentWithoutAttachments(IncomingDocument);
-        // [GIVEN] Incoming document is assigned to general journal line through the "Incoming Document Entry No." field
-        GenJournalLine.Validate("Incoming Document Entry No.", IncomingDocument."Entry No.");
-        GenJournalLine.Modify(true);
-
-        // [WHEN] Post general journal line
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // [THEN] Incoming Document Entry No. is blank in Gen. Journal Line
-        GenJournalLine.Find();
-        GenJournalLine.TestField("Incoming Document Entry No.", 0);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    [HandlerFunctions('PurchInvHandler')]
-    procedure VerifyIncomingDocumentOnPurchaseInvoiceWhenCommentLineUsed()
-    var
-        IncomingDocument: Record "Incoming Document";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseInvoice: TestPage "Purchase Invoice";
-    begin
-        // [SCENARIO 555670] Check purchase invoice and incoming document amount verification process by adding a comment line.
-        // [GIVEN] Delete existing purchase header records.
-        PurchaseHeader.SetFilter("Incoming Document Entry No.", '<>0');
-        PurchaseHeader.DeleteAll();
-
-        // [GIVEN] Create Incoming Document With VAT Amount.
-        CreateIncomingDocWithVATAmount(IncomingDocument);
-
-        // [WHEN] Create Purchase Invoice via Incoming Documents.
-        IncomingDocument.CreatePurchInvoice();
-        IncomingDocument.Modify(true);
-
-        // [THEN] Verify Incomig Document Type as Purchase Invoice.
-        IncomingDocument.TestField("Document Type", IncomingDocument."Document Type"::"Purchase Invoice");
-
-        // [WHEN] Create Purchase Header and Purchase Line with Type blank(Comment).
-        ModifyPurchaseHeaderAndCreatePurchaseLineWithCommentLine(PurchaseHeader, IncomingDocument);
-
-        // [GIVEN] Open Purchase Invoice Page.
-        PurchaseInvoice.OpenEdit();
-        PurchaseInvoice.GoToRecord(PurchaseHeader);
-
-        // [THEN] Verify a error occurs when Post action was Invoke.
-        asserterror PurchaseInvoice.Post.Invoke();
-        Assert.ExpectedError(TotalsMismatchErr);
-    end;
-
     local procedure InsertIncomingDocumentAttachment(IncomingDocument: Record "Incoming Document"): Integer
     var
         IncomingDocumentAttachment: Record "Incoming Document Attachment";
@@ -2511,57 +2442,6 @@ codeunit 134400 "ERM Incoming Documents"
         IncomingDocumentAttachment.Name := LibraryUtility.GenerateGUID();
         IncomingDocumentAttachment.Insert(true);
         exit(LineNo);
-    end;
-
-    local procedure InsertGenJnlTemplateWithUnlinkIncDocOption(var GenJnlTemplate: Record "Gen. Journal Template")
-    begin
-        LibraryERM.CreateGenJournalTemplate(GenJnlTemplate);
-        GenJnlTemplate.Validate("Unlink Inc. Doc On Posting", true);
-        GenJnlTemplate.Modify(true);
-    end;
-
-    local procedure CreateIncomingDocWithVATAmount(var IncomingDocument: Record "Incoming Document")
-    begin
-        CreateIncomingDocumentWithoutAttachments(IncomingDocument);
-
-        IncomingDocument.Description := CreateGuid();
-        IncomingDocument.Validate("Currency Code", LibraryERM.CreateCurrencyWithRandomExchRates());
-        IncomingDocument.Validate("Amount Incl. VAT", LibraryRandom.RandIntInRange(100, 200));
-        IncomingDocument.Validate("Amount Excl. VAT", IncomingDocument."Amount Incl. VAT" - LibraryRandom.RandInt(50));
-        IncomingDocument.Validate("VAT Amount", IncomingDocument."Amount Incl. VAT" - IncomingDocument."Amount Excl. VAT");
-        IncomingDocument.Modify(true);
-    end;
-
-    local procedure ModifyPurchaseHeaderAndCreatePurchaseLineWithCommentLine(var PurchaseHeader: Record "Purchase Header"; IncomingDocument: Record "Incoming Document")
-    var
-        Item: Record Item;
-        PurchaseLine: Record "Purchase Line";
-    begin
-        LibraryInventory.CreateItemWithUnitPriceAndUnitCost(
-            Item,
-            LibraryRandom.RandIntInRange(1000, 2000),
-            LibraryRandom.RandIntInRange(3000, 4000));
-
-        PurchaseHeader.FindFirst();
-        PurchaseHeader.TestField("Document Type", PurchaseHeader."Document Type"::Invoice);
-        PurchaseHeader.TestField("Incoming Document Entry No.", IncomingDocument."Entry No.");
-        PurchaseHeader.Validate("Buy-from Vendor No.", LibraryPurchase.CreateVendorNo());
-        PurchaseHeader.Validate("Vendor Invoice No.", PurchaseHeader."No.");
-        PurchaseHeader.Validate("Currency Code", IncomingDocument."Currency Code");
-        PurchaseHeader.Modify(true);
-
-        LibraryPurchase.CreatePurchaseLine(
-            PurchaseLine,
-            PurchaseHeader,
-            PurchaseLine.Type::" ",
-            '',
-            0);
-        LibraryPurchase.CreatePurchaseLine(
-            PurchaseLine,
-            PurchaseHeader,
-            PurchaseLine.Type::Item,
-            Item."No.",
-            LibraryRandom.RandInt(10));
     end;
 
     [ModalPageHandler]
