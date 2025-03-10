@@ -1250,6 +1250,7 @@ table 23 Vendor
                 ContBusRel: Record "Contact Business Relation";
                 TempVend: Record Vendor temporary;
             begin
+                Cont.FilterGroup(2);
                 ContBusRel.SetCurrentKey("Link to Table", "No.");
                 ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Vendor);
                 ContBusRel.SetRange("No.", "No.");
@@ -2322,7 +2323,9 @@ table 23 Vendor
     local procedure CreateNewVendor(VendorName: Text[100]; ShowVendorCard: Boolean) Result: Code[20]
     var
         Vendor: Record Vendor;
+        xRecVendor: Record Vendor;
         VendorTemplMgt: Codeunit "Vendor Templ. Mgt.";
+        WorkflowEventHandling: Codeunit "Workflow Event Handling";
         VendorCard: Page "Vendor Card";
         IsHandled: Boolean;
     begin
@@ -2336,6 +2339,9 @@ table 23 Vendor
 
         Vendor.Name := VendorName;
         Vendor.Modify(true);
+
+        WorkflowEventHandling.RunWorkflowOnVendorChanged(Vendor, xRecVendor, false);
+
         Commit();
         if not ShowVendorCard then
             exit(Vendor."No.");
