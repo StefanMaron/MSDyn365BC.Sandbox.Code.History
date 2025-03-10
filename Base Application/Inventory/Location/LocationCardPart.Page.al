@@ -13,6 +13,7 @@ page 5705 "Location Card Part"
         {
             group(General)
             {
+                Caption = 'General';
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
@@ -95,8 +96,8 @@ page 5705 "Location Card Part"
                     field("Job Consump. Whse. Handling"; Rec."Job Consump. Whse. Handling")
                     {
                         ApplicationArea = All;
-                        Caption = 'Job Consumption';
-                        ToolTip = 'Specifies the warehouse handling for consumption in job scenarios.';
+                        Caption = 'Project Consumption';
+                        ToolTip = 'Specifies the warehouse handling for consumption in project scenarios.';
                     }
                 }
             }
