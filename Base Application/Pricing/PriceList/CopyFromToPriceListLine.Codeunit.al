@@ -938,7 +938,6 @@ codeunit 7009 CopyFromToPriceListLine
     local procedure InsertPriceListLine(var PriceListLine: Record "Price List Line")
     begin
         InitLineNo(PriceListLine);
-        OnBeforeInsertPriceListLine(PriceListLine);
         PriceListLine.Insert(true);
     end;
 #endif
@@ -1056,11 +1055,6 @@ codeunit 7009 CopyFromToPriceListLine
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertPriceListLine(var PriceListLine: Record "Price List Line")
-    begin
-    end;
-
 #if not CLEAN23
     [IntegrationEvent(false, false)]
 #pragma warning disable AS0072
@@ -1149,5 +1143,5 @@ codeunit 7009 CopyFromToPriceListLine
 #pragma warning restore AS0072
     begin
     end;
-#endif    
+#endif
 }
