@@ -309,6 +309,8 @@ codeunit 10750 "SII XML Creator"
 
     local procedure CalculateNonExemptVATEntries(var TempVATEntryOut: Record "VAT Entry" temporary; TempVATEntry: Record "VAT Entry" temporary; SplitByEUService: Boolean; VATAmount: Decimal)
     begin
+        if TempVATEntry."Ignore In SII" then
+            exit;
         TempVATEntryOut.SetRange("VAT %", TempVATEntry."VAT %");
         TempVATEntryOut.SetRange("EC %", TempVATEntry."EC %");
         if SplitByEUService then
@@ -546,7 +548,8 @@ codeunit 10750 "SII XML Creator"
               ((InvoiceType in [GetF2InvoiceType(), 'F4']) and
                (TempServVATEntryCalcNonExempt.Count + TempGoodsVATEntryCalcNonExempt.Count = 1)) or
               (SIIDocUploadState."Sales Special Scheme Code" in [SIIDocUploadState."Sales Special Scheme Code"::"03 Special System",
-                                                                 SIIDocUploadState."Sales Special Scheme Code"::"05 Travel Agencies"]);
+                                                                 SIIDocUploadState."Sales Special Scheme Code"::"05 Travel Agencies",
+                                                                 SIIDocUploadState."Sales Special Scheme Code"::"09 Travel Agency Services"]);
             DataTypeManagement.GetRecordRef(CustLedgerEntry, CustLedgerEntryRecRef);
             CalculateTotalVatAndBaseAmounts(CustLedgerEntryRecRef, TotalBase, TotalNonExemptBase, TotalVATAmount);
             if AddNodeForTotals then begin
@@ -857,6 +860,7 @@ codeunit 10750 "SII XML Creator"
     begin
         TempVATEntry.Reset();
         TempVATEntry.SetCurrentKey("VAT %", "EC %");
+        TempVATEntry.SetRange("Ignore In SII", false);
         if TempVATEntry.FindSet() then
             repeat
                 FillDetalleIVANode(XMLNode, TempVATEntry, true, 1, true, 0, RegimeCodes, 'CuotaSoportada');
@@ -992,7 +996,7 @@ codeunit 10750 "SII XML Creator"
         if SIIManagement.NoTaxableEntriesExistPurchase(
              NoTaxableEntry,
              SIIManagement.GetVendFromLedgEntryByGLSetup(VendLedgEntry), VendLedgEntry."Document Type".AsInteger(),
-             VendLedgEntry."Document No.", VendLedgEntry."Posting Date")
+             VendLedgEntry."Document No.", VendLedgEntry."Posting Date", false)
         then begin
             NoTaxableEntry.CalcSums("Amount (LCY)");
             exit(NoTaxableEntry."Amount (LCY)");
@@ -1033,6 +1037,7 @@ codeunit 10750 "SII XML Creator"
         SIIManagement.FindVatEntriesFromLedger(RecRef, VATEntry);
         if not DomesticCustomer then
             VATEntry.SetRange("EU Service", IsService);
+        VATEntry.SetRange("Ignore In SII", false);
         if VATEntry.FindSet() then begin
             if SIIInitialDocUpload.DateWithinInitialUploadPeriod(CustLedgerEntry."Posting Date") then
                 NonExemptTransactionType := NonExemptTransactionType::S1
@@ -1193,6 +1198,8 @@ codeunit 10750 "SII XML Creator"
     var
         VATAmount: Decimal;
     begin
+        if VATEntry."Ignore In SII" then
+            exit;
         VATAmount := VATEntry.Amount + VATEntry."Unrealized Amount";
         CuotaDeducibleValue += VATAmount;
         VATAmount += VATEntry."Non-Deductible VAT Amount";
@@ -1510,12 +1517,14 @@ codeunit 10750 "SII XML Creator"
         FillMacrodatoNode(XMLNode, TotalAmount);
 
         // calculate Credit memo differences grouped by VAT %
+        FillNoTaxableVATEntriesPurch(TempVATEntryPerPercent, VendorLedgerEntry);
         CalcNonExemptVATEntriesWithCuotaDeducible(TempVATEntryPerPercent, CuotaDeducibleDecValue, VendorLedgerEntry, 1);
         CuotaDeducibleDecValue := Abs(CuotaDeducibleDecValue);
 
         XMLDOMManagement.AddElementWithPrefix(XMLNode, 'DesgloseFactura', '', 'sii', SiiTxt, XMLNode);
 
         // calculate old and new VAT totals grouped by VAT %
+        FillNoTaxableVATEntriesPurch(TempOldVATEntryPerPercent, OldVendorLedgerEntry);
         CalcNonExemptVATEntriesWithCuotaDeducible(TempOldVATEntryPerPercent, CuotaDeducibleDecValue, OldVendorLedgerEntry, -1);
         CuotaDeducibleDecValue := Abs(CuotaDeducibleDecValue);
 
@@ -1840,6 +1849,7 @@ codeunit 10750 "SII XML Creator"
 
     local procedure GetClaveRegimenNodeSales(var RegimeCodes: array[3] of Code[2]; SIIDocUploadState: Record "SII Doc. Upload State"; CustLedgerEntry: Record "Cust. Ledger Entry"; Customer: Record Customer)
     var
+        GeneralLedgerSetup: Record "General Ledger Setup";
         SIIInitialDocUpload: Codeunit "SII Initial Doc. Upload";
         CustLedgerEntryRecRef: RecordRef;
         IsHandled: Boolean;
@@ -1849,12 +1859,13 @@ codeunit 10750 "SII XML Creator"
         if IsHandled then
             exit;
 
+        GeneralLedgerSetup.Get();
         if SIIInitialDocUpload.DateWithinInitialUploadPeriod(CustLedgerEntry."Posting Date") then begin
             RegimeCodes[1] := '16';
             exit;
         end;
         DataTypeManagement.GetRecordRef(CustLedgerEntry, CustLedgerEntryRecRef);
-        if SIIManagement.IsLedgerCashFlowBased(CustLedgerEntryRecRef) then begin
+        if (SIIManagement.IsLedgerCashFlowBased(CustLedgerEntryRecRef)) and (GeneralLedgerSetup."VAT Cash Regime") then begin
             RegimeCodes[1] := '07';
             exit;
         end;
@@ -1871,6 +1882,7 @@ codeunit 10750 "SII XML Creator"
 
     local procedure GetClaveRegimenNodePurchases(var RegimeCodes: array[3] of Code[2]; SIIDocUploadState: Record "SII Doc. Upload State"; VendorLedgerEntry: Record "Vendor Ledger Entry"; Vendor: Record Vendor)
     var
+        GeneralLedgerSetup: Record "General Ledger Setup";
         SIIInitialDocUpload: Codeunit "SII Initial Doc. Upload";
         VendorLedgerEntryRecRef: RecordRef;
         IsHandled: Boolean;
@@ -1880,12 +1892,13 @@ codeunit 10750 "SII XML Creator"
         if IsHandled then
             exit;
 
+        GeneralLedgerSetup.Get();
         if SIIInitialDocUpload.DateWithinInitialUploadPeriod(VendorLedgerEntry."Posting Date") then begin
             RegimeCodes[1] := '14';
             exit;
         end;
         DataTypeManagement.GetRecordRef(VendorLedgerEntry, VendorLedgerEntryRecRef);
-        if SIIManagement.IsLedgerCashFlowBased(VendorLedgerEntryRecRef) then begin
+        if (SIIManagement.IsLedgerCashFlowBased(VendorLedgerEntryRecRef)) and (GeneralLedgerSetup."VAT Cash Regime") then begin
             RegimeCodes[1] := '07';
             exit;
         end;
@@ -2197,6 +2210,9 @@ codeunit 10750 "SII XML Creator"
         if VATPostingSetup."No Taxable Type" <> 0 then
             exit;
 
+        if VATPostingSetup."Ignore In SII" then
+            exit;
+
         if GetExemptionCode(VATEntry, ExemptionCode) then begin
             CalculateExemptVATEntries(ExemptionCausePresent, ExemptionBaseAmounts, VATEntry, ExemptionCode);
             if SIIInitialDocUpload.DateWithinInitialUploadPeriod(PostingDate) then
@@ -2366,7 +2382,7 @@ codeunit 10750 "SII XML Creator"
             HasEntries[i] :=
               SIIManagement.GetNoTaxableSalesAmount(
                 Amount[i], CustNo, CustLedgerEntry."Document Type".AsInteger(), CustLedgerEntry."Document No.",
-                CustLedgerEntry."Posting Date", IsService, true, IsLocalRule);
+                CustLedgerEntry."Posting Date", IsService, true, IsLocalRule, false);
         end;
         ExportNonTaxableVATEntries(
           TipoDesgloseXMLNode, DesgloseFacturaXMLNode, DomesticXMLNode,
@@ -2455,7 +2471,7 @@ codeunit 10750 "SII XML Creator"
         if SIIManagement.NoTaxableEntriesExistSales(
              NoTaxableEntry,
              SIIManagement.GetCustFromLedgEntryByGLSetup(CustLedgerEntry), CustLedgerEntry."Document Type".AsInteger(), CustLedgerEntry."Document No.",
-             CustLedgerEntry."Posting Date", IsService, false, false)
+             CustLedgerEntry."Posting Date", IsService, false, false, false)
         then begin
             if NoTaxableEntry.FindSet() then
                 repeat
