@@ -21,6 +21,7 @@ codeunit 8810 "Customer Layout - Statement"
         DuplicateJobQueueRecordErr: Label 'Customer statements are already scheduled to run in the job queue.';
         ConfirmRunRepInBackgroundQst: Label 'Do you want to set the job queue entry up to run immediately?';
 
+    [Scope('OnPrem')]
     procedure RunReport()
     var
         Customer: Record Customer;
@@ -34,6 +35,7 @@ codeunit 8810 "Customer Layout - Statement"
           ReportSelections.Usage::"C.Statement", RecRef, Customer.FieldName("No."), DATABASE::Customer, Customer.FieldName("No."), true);
     end;
 
+    [Scope('OnPrem')]
     procedure RunReportWithParameters(Parameters: Text)
     var
         Customer: Record Customer;
@@ -48,6 +50,7 @@ codeunit 8810 "Customer Layout - Statement"
           ReportSelections.Usage::"C.Statement", RecRef, Customer.FieldName("No."), DATABASE::Customer, Customer.FieldName("No."), true);
     end;
 
+    [Scope('OnPrem')]
     procedure RunReportWithoutRequestPage()
     var
         Customer: Record Customer;
@@ -62,6 +65,7 @@ codeunit 8810 "Customer Layout - Statement"
           ReportSelections.Usage::"C.Statement", RecRef, Customer.FieldName("No."), DATABASE::Customer, Customer.FieldName("No."), true);
     end;
 
+    [Scope('OnPrem')]
     procedure EnqueueReport()
     var
         JobQueueEntry: Record "Job Queue Entry";
@@ -95,6 +99,7 @@ codeunit 8810 "Customer Layout - Statement"
             JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
     end;
 
+    [Scope('OnPrem')]
     procedure CheckReportRunningInBackground()
     var
         JobQueueEntry: Record "Job Queue Entry";
