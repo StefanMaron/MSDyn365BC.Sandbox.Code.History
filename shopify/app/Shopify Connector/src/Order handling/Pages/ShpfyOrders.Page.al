@@ -122,7 +122,7 @@ page 30115 "Shpfy Orders"
                 field(FulfillmentStatus; Rec."Fulfillment Status")
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specifies the order''s status in terms of fulfilled line items. Valid values are: fulfilled, in progress, open, pending fulfillment, restocked, unfulfilled, partially fulfilled.';
+                    ToolTip = 'Specifies the order''s status in terms of fulfilled line items. Valid values are: fulfilled, in progress, open, pending fulfillment, restocked, unfulfilled, partially fulfilled, on hold.';
                 }
                 field(ReturnStatus; Rec."Return Status")
                 {
@@ -286,6 +286,22 @@ page 30115 "Shpfy Orders"
                 trigger OnAction();
                 begin
                     Report.Run(Report::"Shpfy Sync Shipm. to Shopify");
+                end;
+            }
+            action(MarkConflictAsResolved)
+            {
+                ApplicationArea = All;
+                Caption = 'Mark Conflict as Resolved';
+                Enabled = Rec."Has Order State Error";
+                Image = Approval;
+                ToolTip = 'Mark the conflict as resolved.';
+
+                trigger OnAction()
+                var
+                    ImportOrder: Codeunit "Shpfy Import Order";
+                begin
+                    ImportOrder.MarkOrderConflictAsResolved(Rec);
+                    Rec.Modify();
                 end;
             }
         }
