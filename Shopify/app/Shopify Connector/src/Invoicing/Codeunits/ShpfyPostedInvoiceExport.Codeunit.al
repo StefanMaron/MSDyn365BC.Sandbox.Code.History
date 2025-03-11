@@ -61,10 +61,6 @@ codeunit 30362 "Shpfy Posted Invoice Export"
         MapPostedSalesInvoiceData(SalesInvoiceHeader, TempOrderHeader, TempOrderLine, OrderTaxLines);
 
         DraftOrderId := DraftOrdersAPI.CreateDraftOrder(TempOrderHeader, TempOrderLine, OrderTaxLines);
-        if DraftOrderId = 0 then begin
-            SetSalesInvoiceShopifyOrderInformation(SalesInvoiceHeader, -1, '');
-            exit;
-        end;
         JResponse := DraftOrdersAPI.CompleteDraftOrder(DraftOrderId);
 
         if IsSuccess(JResponse) then begin
@@ -153,6 +149,7 @@ codeunit 30362 "Shpfy Posted Invoice Export"
         SalesInvoiceLine.Reset();
 
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
+        SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
         if SalesInvoiceLine.FindSet() then
             repeat
                 if (SalesInvoiceLine.Quantity <> 0) and (SalesInvoiceLine.Quantity <> Round(SalesInvoiceLine.Quantity, 1)) then
@@ -172,7 +169,7 @@ codeunit 30362 "Shpfy Posted Invoice Export"
         SalesInvoiceHeader.Modify(true);
     end;
 
-    internal procedure MapPostedSalesInvoiceData(
+    local procedure MapPostedSalesInvoiceData(
         SalesInvoiceHeader: Record "Sales Invoice Header";
         var TempOrderHeader: Record "Shpfy Order Header" temporary;
         var TempOrderLine: Record "Shpfy Order Line" temporary;
@@ -184,7 +181,6 @@ codeunit 30362 "Shpfy Posted Invoice Export"
         MapSalesInvoiceHeader(SalesInvoiceHeader, TempOrderHeader);
 
         InvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
-        InvoiceLine.SetFilter(Quantity, '>%1', 0);
         if InvoiceLine.FindSet() then
             repeat
                 MapSalesInvoiceLine(InvoiceLine, TempOrderHeader, TempOrderLine, OrderTaxLines);
