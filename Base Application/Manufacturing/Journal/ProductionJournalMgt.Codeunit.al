@@ -466,20 +466,24 @@ codeunit 5510 "Production Journal Mgt"
         PageTemplate: Option Item,Transfer,"Phys. Inventory",Revaluation,Consumption,Output,Capacity,"Prod. Order";
         User: Text;
         IsHandled: Boolean;
+        PageID: Integer;
     begin
+        PageID := Page::"Production Journal";
+        PageTemplate := PageTemplate::"Prod. Order";
+
         IsHandled := false;
-        OnBeforeSetTemplateAndBatchName(ToTemplateName, ToBatchName, IsHandled);
+        OnBeforeSetTemplateAndBatchName(ToTemplateName, ToBatchName, IsHandled, PageID, PageTemplate);
         if IsHandled then
             exit;
 
         ItemJnlTemplate.Reset();
-        ItemJnlTemplate.SetRange("Page ID", PAGE::"Production Journal");
+        ItemJnlTemplate.SetRange("Page ID", PageID);
         ItemJnlTemplate.SetRange(Recurring, false);
-        ItemJnlTemplate.SetRange(Type, PageTemplate::"Prod. Order");
+        ItemJnlTemplate.SetRange(Type, PageTemplate);
         if not ItemJnlTemplate.FindFirst() then begin
             ItemJnlTemplate.Init();
             ItemJnlTemplate.Recurring := false;
-            ItemJnlTemplate.Validate(Type, PageTemplate::"Prod. Order");
+            ItemJnlTemplate.Validate(Type, PageTemplate);
             ItemJnlTemplate.Validate("Page ID");
 
             ItemJnlTemplate.Name := Format(ItemJnlTemplate.Type, MaxStrLen(ItemJnlTemplate.Name));
@@ -537,6 +541,7 @@ codeunit 5510 "Production Journal Mgt"
         ItemJnlLine2.SetRange("Order No.", ProdOrderNo);
         if ProdOrderLineNo <> 0 then
             ItemJnlLine2.SetRange("Order Line No.", ProdOrderLineNo);
+        OnDeleteJnlLinesOnAfterSetFilters(ItemJnlLine2);
         if ItemJnlLine2.Find('-') then begin
             repeat
                 if ReservEntryExist(ItemJnlLine2, ReservEntry) then
@@ -720,7 +725,7 @@ codeunit 5510 "Production Journal Mgt"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetTemplateAndBatchName(var ToTemplateName: Code[10]; var ToBatchName: Code[10]; var IsHandled: Boolean)
+    local procedure OnBeforeSetTemplateAndBatchName(var ToTemplateName: Code[10]; var ToBatchName: Code[10]; var IsHandled: Boolean; var PageID: Integer; var PageTemplate: Option Item,Transfer,"Phys. Inventory",Revaluation,Consumption,Output,Capacity,"Prod. Order")
     begin
     end;
 
@@ -771,6 +776,11 @@ codeunit 5510 "Production Journal Mgt"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateJnlLinesOnAfterSetProdOrderLineFilters(var ProdOrderLine: Record "Prod. Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDeleteJnlLinesOnAfterSetFilters(var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 }
