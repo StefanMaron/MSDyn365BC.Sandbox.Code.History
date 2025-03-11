@@ -7,7 +7,6 @@ page 5648 "Insurance Types"
     PageType = List;
     SourceTable = "Insurance Type";
     UsageCategory = Administration;
-    AnalysisModeEnabled = false;
 
     layout
     {
