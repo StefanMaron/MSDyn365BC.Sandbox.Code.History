@@ -2,6 +2,7 @@
 
 using System.Environment;
 using System.IO;
+using System.Telemetry;
 using System.Utilities;
 
 page 1500 Workflows
@@ -368,7 +369,10 @@ page 1500 Workflows
     trigger OnOpenPage()
     var
         EnvironmentInfo: Codeunit "Environment Information";
+        FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
+        FeatureTelemetry.LogUptake('0000GDR', 'Workflows', Enum::"Feature Uptake Status"::Discovered);
+
         WorkflowSetup.InitWorkflow();
         if not WorkflowBufferInitialized then
             Rec.InitBufferForWorkflows(Rec);
