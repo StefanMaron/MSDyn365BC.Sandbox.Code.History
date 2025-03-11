@@ -379,8 +379,6 @@ report 780 "Certificate of Supply"
         TempServiceShipmentHeader."Ship-to Address 2" := SalesShipmentHeader."Ship-to Address 2";
         TempServiceShipmentHeader."Ship-to City" := SalesShipmentHeader."Ship-to City";
         TempServiceShipmentHeader."Ship-to Country/Region Code" := SalesShipmentHeader."Ship-to Country/Region Code";
-
-        OnAfterSetSourceSales(SalesShipmentHeader, TempServiceShipmentHeader);
     end;
 
     local procedure SetSourceService(ServiceShipmentHeader: Record "Service Shipment Header")
@@ -409,8 +407,6 @@ report 780 "Certificate of Supply"
         TempServiceShipmentHeader."Ship-to Address 2" := ReturnShipmentHeader."Ship-to Address 2";
         TempServiceShipmentHeader."Ship-to City" := ReturnShipmentHeader."Ship-to City";
         TempServiceShipmentHeader."Ship-to Country/Region Code" := ReturnShipmentHeader."Ship-to Country/Region Code";
-
-        OnAfterSetSourcePurchase(ReturnShipmentHeader, TempServiceShipmentHeader);
     end;
 
     local procedure IsReportInPreviewMode(): Boolean
@@ -592,16 +588,6 @@ report 780 "Certificate of Supply"
 
     [IntegrationEvent(true, false)]
     local procedure OnCertificateOfSupplyOnPreDataItemOnAfterFilterForReturnShipmentHeader(var CertificateOfSupply: Record "Certificate of Supply"; var ReturnShipmentHeader: Record "Return Shipment Header")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterSetSourcePurchase(var ReturnShipmentHeader: Record "Return Shipment Header"; var TempServiceShipmentHeader: Record "Service Shipment Header" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterSetSourceSales(var SalesShipmentHeader: Record "Sales Shipment Header"; var TempServiceShipmentHeader: Record "Service Shipment Header" temporary)
     begin
     end;
 }
