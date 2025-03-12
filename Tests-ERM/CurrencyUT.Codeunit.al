@@ -201,7 +201,7 @@ codeunit 134275 "Currency UT"
             LibraryRandom.RandIntInRange(300, 300));
 
         // [GIVEN] Validate Bal. Account Type, Bal. Account No. and Currency Code in Gen. Journal Line.
-        GenJournalLine.Validate("Posting Date", WorkDate());
+        GenJournalLine.Validate("Posting Date", Today());
         GenJournalLine.Validate("Bal. Account Type", GenJournalLine."Bal. Account Type"::"Bank Account");
         GenJournalLine.Validate("Bal. Account No.", BankAccountNo);
         GenJournalLine.Validate("Currency Code", CurrencyCode);
@@ -211,9 +211,8 @@ codeunit 134275 "Currency UT"
         LibraryERM.PostGeneralJnlLine(GenJournalLine);
 
         // [GIVEN] Generate and save Posting Date in a Variable.
-        PostingDate := CalcDate('<-2M>', WorkDate());
-
-        // [GIVEN] Create Random Currency Rate.
+        PostingDate := CalcDate('<-CM>', Today());
+        // WorkDate(PostingDate);
         CreateRandomExchangeRate(CurrencyCode, PostingDate);
 
         // [GIVEN] Create Gen. Journal Line.
@@ -265,7 +264,7 @@ codeunit 134275 "Currency UT"
         Currency.Validate("Realized G/L Losses Account", Currency."Realized G/L Gains Account");
         Currency.Modify(true);
 
-        CreateRandomExchangeRate(Currency.Code, WorkDate());
+        LibraryERM.CreateRandomExchangeRate(Currency.Code);
         exit(Currency.Code);
     end;
 
