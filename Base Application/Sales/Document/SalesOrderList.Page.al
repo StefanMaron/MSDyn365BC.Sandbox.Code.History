@@ -9,6 +9,7 @@ using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Inventory.Availability;
 using Microsoft.Sales.Comment;
@@ -171,7 +172,7 @@ page 9305 "Sales Order List"
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
-                    ToolTip = 'Specifies the location from where items are to be shipped. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
+                    ToolTip = 'Specifies the location from where inventory items to the customer on the sales document are to be shipped by default.';
                 }
                 field("Quote No."; Rec."Quote No.")
                 {
@@ -786,10 +787,11 @@ page 9305 "Sales Order List"
 
                     trigger OnAction()
                     var
-                        SalesHeader: Record "Sales Header";
+                        ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        CurrPage.SetSelectionFilter(SalesHeader);
-                        Rec.SendICSalesDoc(SalesHeader);
+                        if ApprovalsMgmt.PrePostApprovalCheckSales(Rec) then
+                            ICInOutboxMgt.SendSalesDoc(Rec, false);
                     end;
                 }
                 action("Delete Invoiced")
