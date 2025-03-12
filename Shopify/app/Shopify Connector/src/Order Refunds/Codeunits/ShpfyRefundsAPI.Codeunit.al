@@ -47,7 +47,7 @@ codeunit 30228 "Shpfy Refunds API"
             else
                 Parameters.Add('After', JsonHelper.GetValueAsText(JResponse, 'data.refund.refundLineItems.pageInfo.endCursor'));
             foreach JLine in JLines do
-                FillInRefundLine(RefundId, JLine.AsObject(), IsNonZeroOrReturnRefund(RefundHeader));
+                FillInRefundLine(RefundId, JLine.AsObject(), RefundHeader."Total Refunded Amount" > 0);
         until not JsonHelper.GetValueAsBoolean(JResponse, 'data.refund.refundLineItems.pageInfo.hasNextPage');
     end;
 
@@ -88,7 +88,7 @@ codeunit 30228 "Shpfy Refunds API"
         DataCapture.Add(Database::"Shpfy Refund Header", RefundHeader.SystemId, JResponse);
     end;
 
-    local procedure FillInRefundLine(RefundId: BigInteger; JLine: JsonObject; NonZeroOrReturnRefund: Boolean)
+    local procedure FillInRefundLine(RefundId: BigInteger; JLine: JsonObject; NonZeroRefund: Boolean)
     var
         DataCapture: Record "Shpfy Data Capture";
         RefundLine: Record "Shpfy Refund Line";
@@ -113,14 +113,9 @@ codeunit 30228 "Shpfy Refunds API"
         JsonHelper.GetValueIntoField(JLine, 'totalTaxSet.shopMoney.amount', RefundLineRecordRef, RefundLine.FieldNo("Total Tax Amount"));
         JsonHelper.GetValueIntoField(JLine, 'totalTaxSet.presentmentMoney.amount', RefundLineRecordRef, RefundLine.FieldNo("Presentment Total Tax Amount"));
         RefundLineRecordRef.SetTable(RefundLine);
-        RefundLine."Can Create Credit Memo" := NonZeroOrReturnRefund;
+        RefundLine."Can Create Credit Memo" := NonZeroRefund;
         RefundLine.Modify();
         RefundLineRecordRef.Close();
         DataCapture.Add(Database::"Shpfy Refund Line", RefundLine.SystemId, JLine);
-    end;
-
-    internal procedure IsNonZeroOrReturnRefund(RefundHeader: Record "Shpfy Refund Header"): Boolean
-    begin
-        exit((RefundHeader."Return Id" > 0) or (RefundHeader."Total Refunded Amount" > 0));
     end;
 }
