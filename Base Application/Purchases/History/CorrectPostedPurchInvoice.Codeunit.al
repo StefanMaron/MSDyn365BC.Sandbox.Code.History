@@ -29,19 +29,13 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     var
         PurchaseHeader: Record "Purchase Header";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
-        NoSeries: Codeunit "No. Series";
         RedoApplications: Boolean;
     begin
         RedoApplications := UnapplyCostApplication(ItemJnlPostLine, Rec."No.");
         OnRunOnBeforeCreateCopyDocument(Rec);
         CreateCopyDocument(Rec, PurchaseHeader, PurchaseHeader."Document Type"::"Credit Memo", false);
         PurchaseHeader."Vendor Cr. Memo No." := PurchaseHeader."No.";
-
-        SuppressCommit := not NoSeries.IsNoSeriesInDateOrder(PurchaseHeader."Posting No. Series");
-
-        OnAfterCreateCorrectivePurchCrMemo(Rec, PurchaseHeader, CancellingOnly, SuppressCommit);
-        if not SuppressCommit then
-            Commit();
+        OnAfterCreateCorrectivePurchCrMemo(Rec, PurchaseHeader, CancellingOnly);
 
         CODEUNIT.Run(CODEUNIT::"Purch.-Post", PurchaseHeader);
         SetTrackInfoForCancellation(Rec);
@@ -55,7 +49,6 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
         CancellingOnly: Boolean;
-        SuppressCommit: Boolean;
 
         AlreadyCorrectedErr: Label 'You cannot correct this posted purchase invoice because it has been canceled.';
         AlreadyCancelledErr: Label 'You cannot cancel this posted purchase invoice because it has already been canceled.';
@@ -223,7 +216,6 @@ codeunit 1313 "Correct Posted Purch. Invoice"
 
         if CreateCreditMemo(PurchInvHeader) then begin
             CreateCopyDocument(PurchInvHeader, PurchaseHeader, PurchaseHeader."Document Type"::Invoice, true);
-            OnCancelPostedInvoiceStartNewInvoiceOnAfterCreateCorrPurchaseInvoice(PurchaseHeader, PurchInvHeader);
             Commit();
         end;
     end;
@@ -231,6 +223,7 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     procedure TestCorrectInvoiceIsAllowed(var PurchInvHeader: Record "Purch. Inv. Header"; Cancelling: Boolean)
     begin
         CancellingOnly := Cancelling;
+        TestPurchaseInvoiceHeaderAmount(PurchInvHeader, Cancelling);
         TestIfPostingIsAllowed(PurchInvHeader);
         TestIfInvoiceIsCorrectedOnce(PurchInvHeader);
         TestIfInvoiceIsNotCorrectiveDoc(PurchInvHeader);
@@ -272,13 +265,7 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     var
         PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
         CancelledDocument: Record "Cancelled Document";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeSetTrackInfoForCancellation(PurchInvHeader, IsHandled);
-        if IsHandled then
-            exit;
-
         PurchCrMemoHdr.SetRange("Applies-to Doc. No.", PurchInvHeader."No.");
         if PurchCrMemoHdr.FindLast() then
             CancelledDocument.InsertPurchInvToCrMemoCancelledDocument(PurchInvHeader."No.", PurchCrMemoHdr."No.");
@@ -445,6 +432,19 @@ codeunit 1313 "Correct Posted Purch. Invoice"
             ErrorHelperHeader(Enum::"Correct Purch. Inv. Error Type"::IsCorrective, PurchInvHeader);
     end;
 
+    local procedure TestPurchaseInvoiceHeaderAmount(var PurchInvHeader: Record "Purch. Inv. Header"; Cancelling: Boolean)
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeTestPurchaseInvoiceHeaderAmount(PurchInvHeader, Cancelling, IsHandled);
+        if IsHandled then
+            exit;
+
+        PurchInvHeader.CalcFields(Amount);
+        PurchInvHeader.TestField(Amount);
+    end;
+
     local procedure TestIfPostingIsAllowed(PurchInvHeader: Record "Purch. Inv. Header")
     var
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
@@ -581,10 +581,9 @@ codeunit 1313 "Correct Posted Purch. Invoice"
         TestGLAccount(InventoryPostingSetup."Inventory Account", PurchInvLine);
     end;
 
-    local procedure IsCommentLine(PurchInvLine: Record "Purch. Inv. Line") Result: Boolean
+    local procedure IsCommentLine(PurchInvLine: Record "Purch. Inv. Line"): Boolean
     begin
-        Result := (PurchInvLine.Type = PurchInvLine.Type::" ") or (PurchInvLine."No." = '');
-        OnAfterIsCommentLine(PurchInvLine, Result);
+        exit((PurchInvLine.Type = PurchInvLine.Type::" ") or (PurchInvLine."No." = ''));
     end;
 
     local procedure WasNotCancelled(InvNo: Code[20]): Boolean
@@ -881,7 +880,7 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateCorrectivePurchCrMemo(PurchInvHeader: Record "Purch. Inv. Header"; var PurchaseHeader: Record "Purchase Header"; var CancellingOnly: Boolean; var SuppressCommit: Boolean)
+    local procedure OnAfterCreateCorrectivePurchCrMemo(PurchInvHeader: Record "Purch. Inv. Header"; var PurchaseHeader: Record "Purchase Header"; var CancellingOnly: Boolean)
     begin
     end;
 
@@ -970,24 +969,8 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     begin
     end;
 
-    [Obsolete('OnBeforeTestPurchaseInvoiceHeaderAmount is not supported anymore.', '25.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestPurchaseInvoiceHeaderAmount(var PurchInvHeader: Record "Purch. Inv. Header"; Cancelling: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCancelPostedInvoiceStartNewInvoiceOnAfterCreateCorrPurchaseInvoice(var PurchaseHeader: Record "Purchase Header"; var PurchInvHeader: Record "Purch. Inv. Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterIsCommentLine(PurchInvLine: Record "Purch. Inv. Line"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetTrackInfoForCancellation(var PurchInvHeader: Record "Purch. Inv. Header"; var IsHandled: Boolean)
     begin
     end;
 }
