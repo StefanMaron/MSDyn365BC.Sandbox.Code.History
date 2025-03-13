@@ -176,7 +176,6 @@ codeunit 8510 "Over-Receipt Mgt."
         if IsHandled then
             exit;
 
-        PurchaseLine.TestField(Type, PurchaseLine.Type::Item);
         Item.Get(PurchaseLine."No.");
         if Item."Over-Receipt Code" <> '' then begin
             DefaultOverReceiptCode := Item."Over-Receipt Code";
