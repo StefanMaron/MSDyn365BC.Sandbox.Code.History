@@ -3,7 +3,6 @@ namespace Microsoft.Integration.MDM;
 using Microsoft.Integration.SyncEngine;
 using System.Threading;
 using System.Upgrade;
-using System.Automation;
 
 /// <summary>
 /// Codeunit Master Data Mgt. Upgrade (ID 7238).
@@ -23,7 +22,6 @@ codeunit 7238 "Master Data Mgt. Upgrade"
     internal procedure UpgradeJobQueueEntryFrequencies()
     var
         IntegrationTableMapping: Record "Integration Table Mapping";
-        RestrictedRecord: Record "Restricted Record";
         JobQueueEntry: Record "Job Queue Entry";
         MasterDataMgtSetupDefault: Codeunit "Master Data Mgt. Setup Default";
         UpgradeTag: Codeunit "Upgrade Tag";
@@ -54,10 +52,8 @@ codeunit 7238 "Master Data Mgt. Upgrade"
                                     JobQueueEntry."No. of Minutes between Runs" := MasterDataMgtSetupDefault.DefaultNumberOfMinutesBetweenRuns();
                                 // we filtered for the default value of this one already
                                 JobQueueEntry."Inactivity Timeout Period" := MasterDataMgtSetupDefault.DefaultInactivityTimeoutPeriod();
-                                RestrictedRecord.SetRange("Record ID", JobQueueEntry.RecordId());
-                                if RestrictedRecord.IsEmpty() then
-                                    if not JobQueueEntry.Modify() then
-                                        NotAllJobQueueEntriesModified := true;
+                                if not JobQueueEntry.Modify() then
+                                    NotAllJobQueueEntriesModified := true;
                             end;
                 until JobQueueEntry.Next() = 0;
         end;
