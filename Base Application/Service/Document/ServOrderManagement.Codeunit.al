@@ -541,14 +541,7 @@ codeunit 5900 ServOrderManagement
     end;
 
     local procedure CopyComponentsFromBOM(var NewServItem: Record "Service Item")
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCopyComponentsFromBOM(NewServItem, IsHandled);
-        if IsHandled then
-            exit;
-
         CODEUNIT.Run(CODEUNIT::"ServComponent-Copy from BOM", NewServItem);
     end;
 
@@ -908,11 +901,6 @@ codeunit 5900 ServOrderManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnCopyCommentLinesWithSubTypeOnBeforeServCommentLineInsert(var ServiceCommentLine2: Record "Service Comment Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCopyComponentsFromBOM(var ServiceItem: Record "Service Item"; var IsHandled: Boolean)
     begin
     end;
 }
