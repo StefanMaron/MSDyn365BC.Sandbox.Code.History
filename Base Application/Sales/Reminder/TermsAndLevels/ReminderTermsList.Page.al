@@ -101,10 +101,10 @@ page 837 "Reminder Terms List"
 
                 trigger OnAction()
                 var
-                    IssuedReminderHeader: Record "Issued Reminder Header";
+                    ReminderHeader: Record "Reminder Header";
                 begin
-                    FilterIssuedRemindersBasedOnSelectedReminderTerms(IssuedReminderHeader);
-                    Page.Run(Page::"Issued Reminder List", IssuedReminderHeader);
+                    FilterIssuedRemindersBasedOnSelectedReminderTerms(ReminderHeader);
+                    Page.Run(Page::"Issued Reminder List", ReminderHeader);
                 end;
             }
             action(TransferOldTexts)
@@ -174,7 +174,7 @@ page 837 "Reminder Terms List"
             ReminderHeader.FindSet();
     end;
 
-    local procedure FilterIssuedRemindersBasedOnSelectedReminderTerms(var IssuedReminderHeader: Record "Issued Reminder Header")
+    local procedure FilterIssuedRemindersBasedOnSelectedReminderTerms(var ReminderHeader: Record "Reminder Header")
     var
         ReminderTerms: Record "Reminder Terms";
         RemindersTermCodeFilter: Text;
@@ -194,9 +194,9 @@ page 837 "Reminder Terms List"
             else
                 RemindersTermCodeFilter += '|' + ReminderTerms.Code;
         until ReminderTerms.Next() = 0;
-        IssuedReminderHeader.SetFilter("Reminder Terms Code", RemindersTermCodeFilter);
-        if not IssuedReminderHeader.IsEmpty() then
-            IssuedReminderHeader.FindSet();
+        ReminderHeader.SetFilter("Reminder Terms Code", RemindersTermCodeFilter);
+        if not ReminderHeader.IsEmpty() then
+            ReminderHeader.FindSet();
     end;
 }
 
