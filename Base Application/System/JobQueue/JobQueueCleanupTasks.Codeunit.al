@@ -8,10 +8,9 @@ codeunit 461 "Job Queue Cleanup Tasks"
 
     trigger OnRun()
     begin
-        CleanupJQTasks();
     end;
 
-    local procedure CleanupJQTasks()
+    internal procedure CleanupJQTasks()
     var
         JobQueueManagement: Codeunit "Job Queue Management";
     begin

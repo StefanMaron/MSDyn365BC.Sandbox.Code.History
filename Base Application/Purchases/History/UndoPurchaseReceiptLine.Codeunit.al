@@ -369,7 +369,6 @@ codeunit 5813 "Undo Purchase Receipt Line"
     local procedure InsertNewReceiptLine(OldPurchRcptLine: Record "Purch. Rcpt. Line"; ItemRcptEntryNo: Integer; DocLineNo: Integer)
     var
         NewPurchRcptLine: Record "Purch. Rcpt. Line";
-        SkipInsertItemEntryRelation: Boolean;
     begin
         NewPurchRcptLine.Init();
         NewPurchRcptLine.Copy(OldPurchRcptLine);
@@ -385,10 +384,9 @@ codeunit 5813 "Undo Purchase Receipt Line"
         NewPurchRcptLine."Dimension Set ID" := OldPurchRcptLine."Dimension Set ID";
         OnBeforeNewPurchRcptLineInsert(NewPurchRcptLine, OldPurchRcptLine);
         NewPurchRcptLine.Insert();
-        SkipInsertItemEntryRelation := false;
-        OnAfterNewPurchRcptLineInsert(NewPurchRcptLine, OldPurchRcptLine, TempGlobalItemEntryRelation, SkipInsertItemEntryRelation);
-        if not SkipInsertItemEntryRelation then
-            InsertItemEntryRelation(TempGlobalItemEntryRelation, NewPurchRcptLine);
+        OnAfterNewPurchRcptLineInsert(NewPurchRcptLine, OldPurchRcptLine);
+
+        InsertItemEntryRelation(TempGlobalItemEntryRelation, NewPurchRcptLine);
     end;
 
     procedure UpdateOrderLine(PurchRcptLine: Record "Purch. Rcpt. Line")
@@ -548,7 +546,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterNewPurchRcptLineInsert(var NewPurchRcptLine: Record "Purch. Rcpt. Line"; OldPurchRcptLine: Record "Purch. Rcpt. Line"; var TempGlobalItemEntryRelation: Record "Item Entry Relation" temporary; var SkipInsertItemEntryRelation: Boolean)
+    local procedure OnAfterNewPurchRcptLineInsert(var NewPurchRcptLine: Record "Purch. Rcpt. Line"; OldPurchRcptLine: Record "Purch. Rcpt. Line")
     begin
     end;
 
