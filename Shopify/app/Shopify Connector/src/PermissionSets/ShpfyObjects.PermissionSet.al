@@ -215,6 +215,7 @@ permissionset 30104 "Shpfy - Objects"
         codeunit "Shpfy GQL ReturnHeader" = X,
         codeunit "Shpfy GQL ReturnLines" = X,
         codeunit "Shpfy GQL ShipmentLines" = X,
+        codeunit "Shpfy GQL ShipToCountries" = X,
         codeunit "Shpfy GQL ShopLocales" = X,
         codeunit "Shpfy GQL TranslationsRegister" = X,
         codeunit "Shpfy GQL TranslResource" = X,
