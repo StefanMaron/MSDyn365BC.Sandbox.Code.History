@@ -7,6 +7,9 @@
       "path": "./EnforcedDigitalVouchers/Test Library/Enforced Digital Vouchers Test Library"
     },
     {
+      "path": "./EDocument Core/Test/E-Document Core Tests"
+    },
+    {
       "path": "./PlanConfiguration/Test/_Exclude_PlanConfiguration_ Tests"
     },
     {
@@ -176,9 +179,6 @@
     },
     {
       "path": "./ExternalEvents/test/_Exclude_Business_Events_Test"
-    },
-    {
-      "path": "./EDocument/Test/E-Document Core Tests"
     },
     {
       "path": "./Sustainability/Test/Sustainability Tests"
