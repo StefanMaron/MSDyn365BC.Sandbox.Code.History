@@ -42,8 +42,6 @@ codeunit 12134 "Declaration of Intent Export"
 
         CompanyInformation.Get();
 
-        OnExportBeforeWriteFile(VATExemption, CompanyInformation);
-
         FlatFileManagement.Initialize();
         FlatFileManagement.StartNewFile();
         CreateRecordA();
@@ -340,11 +338,6 @@ codeunit 12134 "Declaration of Intent Export"
         Vendor.Name := CompanyInformation.Name;
         Vendor."VAT Registration No." := CompanyInformation."VAT Registration No.";
         Vendor."Individual Person" := false;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnExportBeforeWriteFile(var VATExemption: Record "VAT Exemption"; var CompanyInformation: Record "Company Information")
-    begin
     end;
 }
 
