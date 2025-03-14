@@ -3714,7 +3714,7 @@ table 27 Item
         end;
     end;
 
-    procedure CalcVAT(): Decimal
+    local procedure CalcVAT(): Decimal
     begin
         if "Price Includes VAT" then begin
             VATPostingSetup.Get("VAT Bus. Posting Gr. (Price)", "VAT Prod. Posting Group");
@@ -4019,8 +4019,6 @@ table 27 Item
             exit;
 
         "Item Category Id" := ItemCategory.SystemId;
-
-        OnAfterUpdateItemCategoryId(Rec, ItemCategory);
     end;
 
     procedure UpdateTaxGroupId()
@@ -4551,11 +4549,6 @@ table 27 Item
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateItemTrackingCodeOnBeforeTestNoEntriesExist(var Item: Record Item; xItem: Record Item; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateItemCategoryId(var Item: Record Item; var ItemCategory: Record "Item Category")
     begin
     end;
 }
