@@ -387,8 +387,13 @@ codeunit 10860 "Payment Management"
                 else begin
                     if (InvPostingBuffer[1].Sign = InvPostingBuffer[1].Sign::Positive) and
                        (PaymentLine."Entry No. Debit" = 0) and (PaymentLine."Entry No. Credit" = 0)
-                    then
-                        PaymentLine.TestField("Document No.");
+                    then begin
+                        PaymentClass.Get(PaymentHeader."Payment Class");
+                        if PaymentClass."Line No. Series" = '' then
+                            PaymentLine.TestField("Document No.", NoSeriesBatch.GetNextNo(PaymentHeader."No. Series", PaymentLine."Posting Date"))
+                        else
+                            PaymentLine.TestField("Document No.", NoSeriesBatch.GetNextNo(PaymentClass."Line No. Series", PaymentLine."Posting Date"));
+                    end;
                     InvPostingBuffer[1]."Document No." := PaymentLine."Document No.";
                 end;
                 InvPostingBuffer[1]."Header Document No." := PaymentHeader."No.";
