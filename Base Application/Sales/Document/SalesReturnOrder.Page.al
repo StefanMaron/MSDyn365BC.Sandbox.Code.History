@@ -584,7 +584,7 @@ page 6630 "Sales Return Order"
                         ApplicationArea = SalesReturnOrder;
                         Caption = 'Location';
                         Importance = Promoted;
-                        ToolTip = 'Specifies the location where the items are to be placed when they are received. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
+                        ToolTip = 'Specifies the location from where inventory items to the customer on the sales document are to be shipped by default.';
                     }
                     field("Ship-to Name"; Rec."Ship-to Name")
                     {
@@ -1837,19 +1837,14 @@ page 6630 "Sales Return Order"
         SalesHeader: Record "Sales Header";
         InstructionMgt: Codeunit "Instruction Mgt.";
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
-        DocumentIsScheduledForPosting: Boolean;
         IsHandled: Boolean;
     begin
         LinesInstructionMgt.SalesCheckAllLinesHaveQuantityAssigned(Rec);
         Rec.SendToPosting(PostingCodeunitID);
 
-        SalesHeader.SetRange("Document Type", Rec."Document Type");
-        SalesHeader.SetRange("No.", Rec."No.");
-        DocumentIsPosted := SalesHeader.IsEmpty();
+        DocumentIsPosted := not SalesHeader.Get(Rec."Document Type", Rec."No.");
 
-        DocumentIsScheduledForPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
-        OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(Rec, DocumentIsScheduledForPosting, DocumentIsPosted);
-        if DocumentIsScheduledForPosting then
+        if Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting" then
             CurrPage.Close();
         CurrPage.Update(false);
 
@@ -1985,11 +1980,6 @@ page 6630 "Sales Return Order"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnQueryClosePage(var SalesHeader: Record "Sales Header"; CloseAction: Action; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(var SalesHeader: Record "Sales Header"; var DocumentIsScheduledForPosting: Boolean; var DocumentIsPosted: Boolean)
     begin
     end;
 }
