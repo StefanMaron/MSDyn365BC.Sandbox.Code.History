@@ -187,8 +187,6 @@ codeunit 452 "Report Distribution Management"
                             DocumentTypeText := ServiceOrderDocTypeTxt;
                     end;
                 end;
-            else
-                OnGetFullDocumentTypeTextElseCase(DocumentRecordRef, DocumentTypeText);
         end;
 
         TranslationHelper.RestoreGlobalLanguage();
@@ -592,11 +590,6 @@ codeunit 452 "Report Distribution Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnGetBillToCustomerOnUnhandledTableNo(DocumentRecordRef: RecordRef; var Customer: Record Customer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetFullDocumentTypeTextElseCase(DocumentRecordRef: RecordRef; var DocumentTypeText: Text[50])
     begin
     end;
 }
