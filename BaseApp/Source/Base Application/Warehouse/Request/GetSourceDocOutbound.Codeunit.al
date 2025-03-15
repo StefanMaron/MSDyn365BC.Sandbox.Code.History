@@ -90,7 +90,6 @@ codeunit 5752 "Get Source Doc. Outbound"
         WhseRqst.FilterGroup(2);
         WhseRqst.SetRange(Type, WhseRqst.Type::Outbound);
         WhseRqst.SetRange("Location Code", WhseShptHeader."Location Code");
-        WhseRqst.SetFilter("Source Document", '<>%1', WhseRqst."Source Document"::"Prod. Consumption");
         OnGetSingleOutboundDocOnSetFilterGroupFilters(WhseRqst, WhseShptHeader);
         WhseRqst.FilterGroup(0);
         WhseRqst.SetRange("Document Status", WhseRqst."Document Status"::Released);
@@ -150,12 +149,9 @@ codeunit 5752 "Get Source Doc. Outbound"
     end;
 
     procedure CreateFromPurchaseReturnOrder(PurchHeader: Record "Purchase Header")
-    var
-        IsHandled: Boolean;
     begin
-        OnBeforeCreateFromPurchaseReturnOrder(PurchHeader, IsHandled);
-        if not IsHandled then
-            ShowResult(CreateFromPurchReturnOrderHideDialog(PurchHeader));
+        OnBeforeCreateFromPurchaseReturnOrder(PurchHeader);
+        ShowResult(CreateFromPurchReturnOrderHideDialog(PurchHeader));
     end;
 
     procedure CreateFromPurchReturnOrderHideDialog(PurchHeader: Record "Purchase Header"): Boolean
@@ -167,12 +163,9 @@ codeunit 5752 "Get Source Doc. Outbound"
     end;
 
     procedure CreateFromOutbndTransferOrder(TransHeader: Record "Transfer Header")
-    var
-        IsHandled: Boolean;
     begin
-        OnBeforeCreateFromOutbndTransferOrder(TransHeader, IsHandled);
-        if not IsHandled then
-            ShowResult(CreateFromOutbndTransferOrderHideDialog(TransHeader));
+        OnBeforeCreateFromOutbndTransferOrder(TransHeader);
+        ShowResult(CreateFromOutbndTransferOrderHideDialog(TransHeader));
     end;
 
     procedure CreateFromOutbndTransferOrderHideDialog(TransHeader: Record "Transfer Header"): Boolean
@@ -453,7 +446,7 @@ codeunit 5752 "Get Source Doc. Outbound"
         if IsHandled then
             exit;
 
-        GetSourceDocuments.GetLastShptHeader(WarehouseShipmentHeader);
+        GetSourceDocuments.GetLastShptHeader(WarehouseShipmentHeader);        
         WMSManagement.CheckUserIsWhseEmployeeForLocation(WarehouseShipmentHeader."Location Code", true);
         PAGE.Run(PAGE::"Warehouse Shipment", WarehouseShipmentHeader);
     end;
@@ -666,12 +659,12 @@ codeunit 5752 "Get Source Doc. Outbound"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateFromPurchaseReturnOrder(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    local procedure OnBeforeCreateFromPurchaseReturnOrder(var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateFromOutbndTransferOrder(var TransferHeader: Record "Transfer Header"; var IsHandled: Boolean)
+    local procedure OnBeforeCreateFromOutbndTransferOrder(var TransferHeader: Record "Transfer Header")
     begin
     end;
 

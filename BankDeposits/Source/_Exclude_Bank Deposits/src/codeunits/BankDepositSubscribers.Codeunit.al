@@ -158,7 +158,7 @@ codeunit 1695 "Bank Deposit Subscribers"
     begin
         BankDepositHeader.SetRange("Journal Template Name", GenJnlTemplate.Name);
         BankDepositHeader.SetRange("Journal Batch Name", GenJnlBatch.Name);
-        if not BankDepositHeader.FindFirst() then begin
+        if BankDepositHeader.IsEmpty() then begin
             SetupBankDepositReports.InsertSetupData();
 
             BankDepositHeader.Init();
