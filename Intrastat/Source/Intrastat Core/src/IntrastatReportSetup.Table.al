@@ -13,7 +13,6 @@ using System.IO;
 table 4810 "Intrastat Report Setup"
 {
     Caption = 'Intrastat Report Setup';
-    DataClassification = CustomerContent;
 
     fields
     {
@@ -98,7 +97,7 @@ table 4810 "Intrastat Report Setup"
         field(18; "Data Exch. Def. Name"; Text[100])
         {
             Caption = 'Data Exch. Def. Name';
-            CalcFormula = lookup("Data Exch. Def".Name where(Code = field("Data Exch. Def. Code")));
+            CalcFormula = Lookup("Data Exch. Def".Name where(Code = field("Data Exch. Def. Code")));
             Editable = false;
             FieldClass = FlowField;
         }
@@ -110,7 +109,7 @@ table 4810 "Intrastat Report Setup"
         field(20; "Data Exch. Def. Name - Receipt"; Text[100])
         {
             Caption = 'Data Exch. Def. Name - Receipt';
-            CalcFormula = lookup("Data Exch. Def".Name where(Code = field("Data Exch. Def. Code - Receipt")));
+            CalcFormula = Lookup("Data Exch. Def".Name where(Code = field("Data Exch. Def. Code - Receipt")));
             Editable = false;
             FieldClass = FlowField;
         }
@@ -122,7 +121,7 @@ table 4810 "Intrastat Report Setup"
         field(22; "Data Exch. Def. Name - Shpt."; Text[100])
         {
             Caption = 'Data Exch. Def. Name - Shipment';
-            CalcFormula = lookup("Data Exch. Def".Name where(Code = field("Data Exch. Def. Code - Shpt.")));
+            CalcFormula = Lookup("Data Exch. Def".Name where(Code = field("Data Exch. Def. Code - Shpt.")));
             Editable = false;
             FieldClass = FlowField;
         }
@@ -165,10 +164,6 @@ table 4810 "Intrastat Report Setup"
         {
             Caption = 'Include Drop Shipment';
         }
-        field(32; "Def. Country Code for Item Tr."; Enum "Default Ctry. Code-Item Track.")
-        {
-            Caption = 'Default Country Code for Item Tracking';
-        }
     }
     keys
     {
@@ -179,7 +174,6 @@ table 4810 "Intrastat Report Setup"
     }
 
     var
-        SetupRead: Boolean;
         OnDelIntrastatContactErr: Label 'You cannot delete contact number %1 because it is set up as an Intrastat contact in the Intrastat Setup window.', Comment = '%1 - Contact No';
         OnDelVendorIntrastatContactErr: Label 'You cannot delete vendor number %1 because it is set up as an Intrastat contact in the Intrastat Setup window.', Comment = '%1 - Vendor No';
 
@@ -194,33 +188,5 @@ table 4810 "Intrastat Report Setup"
                     Error(OnDelIntrastatContactErr, ContactNo);
                 Error(OnDelVendorIntrastatContactErr, ContactNo);
             end;
-    end;
-
-    procedure GetPartnerNo(SellTo: Code[20]; BillTo: Code[20]; VATNoBasedToCheck: Enum "Intrastat Report VAT No. Base") PartnerNo: Code[20]
-    begin
-        GetSetup();
-        if VATNoBasedToCheck <> "VAT No. Based On" then
-            exit('');
-
-        exit(GetPartnerNo(SellTo, BillTo));
-    end;
-
-    procedure GetPartnerNo(SellTo: Code[20]; BillTo: Code[20]) PartnerNo: Code[20]
-    begin
-        GetSetup();
-        case "VAT No. Based On" of
-            "VAT No. Based On"::"Sell-to VAT":
-                PartnerNo := SellTo;
-            "VAT No. Based On"::"Bill-to VAT":
-                PartnerNo := BillTo;
-        end;
-    end;
-
-    procedure GetSetup()
-    begin
-        if not SetupRead then begin
-            Get();
-            SetupRead := true;
-        end;
     end;
 }
