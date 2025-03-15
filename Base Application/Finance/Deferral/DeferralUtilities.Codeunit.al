@@ -769,7 +769,6 @@ codeunit 1720 "Deferral Utilities"
         Changed: Boolean;
         IsHandled: Boolean;
     begin
-        OnBeforeOpenLineScheduleEdit(DeferralCode, DeferralDocType, GenJnlTemplateName, GenJnlBatchName, DocumentType, DocumentNo, LineNo, Amount, PostingDate, Description, CurrencyCode);
         if DeferralCode = '' then
             Message(SelectDeferralCodeMsg)
         else
@@ -956,15 +955,10 @@ codeunit 1720 "Deferral Utilities"
 
     procedure AdjustTotalAmountForDeferrals(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; var TotalVATBase: Decimal; var TotalVATBaseACY: Decimal)
     begin
-        AdjustTotalAmountForDeferrals(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, TotalVATBase, TotalVATBaseACY, 0, 0);
-    end;
-
-    procedure AdjustTotalAmountForDeferrals(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; var TotalVATBase: Decimal; var TotalVATBaseACY: Decimal; DiscountAmount: Decimal; DiscountAmountACY: Decimal)
-    begin
         TotalVATBase := TotalAmount;
         TotalVATBaseACY := TotalAmountACY;
         if DeferralCode <> '' then
-            if (AmtToDefer = TotalAmount - DiscountAmount) and (AmtToDeferACY = TotalAmountACY - DiscountAmountACY) then begin
+            if (AmtToDefer = TotalAmount) and (AmtToDeferACY = TotalAmountACY) then begin
                 AmtToDefer := 0;
                 AmtToDeferACY := 0;
             end else begin
@@ -972,18 +966,13 @@ codeunit 1720 "Deferral Utilities"
                 TotalAmountACY := TotalAmountACY - AmtToDeferACY;
             end;
 
-        OnAfterAdjustTotalAmountForDeferrals(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, DiscountAmount, DiscountAmountACY);
+        OnAfterAdjustTotalAmountForDeferrals(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY);
     end;
 
     procedure AdjustTotalAmountForDeferralsNoBase(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal)
     begin
-        AdjustTotalAmountForDeferralsNoBase(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, 0, 0);
-    end;
-
-    procedure AdjustTotalAmountForDeferralsNoBase(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; DiscountAmount: Decimal; DiscountAmountACY: Decimal)
-    begin
         if DeferralCode <> '' then
-            if (AmtToDefer = TotalAmount - DiscountAmount) and (AmtToDeferACY = TotalAmountACY - DiscountAmountACY) then begin
+            if (AmtToDefer = TotalAmount) and (AmtToDeferACY = TotalAmountACY) then begin
                 AmtToDefer := 0;
                 AmtToDeferACY := 0;
             end else begin
@@ -991,7 +980,7 @@ codeunit 1720 "Deferral Utilities"
                 TotalAmountACY := TotalAmountACY - AmtToDeferACY;
             end;
 
-        OnAfterAdjustTotalAmountForDeferrals(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, DiscountAmount, DiscountAmountACY);
+        OnAfterAdjustTotalAmountForDeferrals(DeferralCode, AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY);
     end;
 
     procedure CheckDeferralConditionForGenJournal(var GenJournalLine: Record "Gen. Journal Line")
@@ -1202,12 +1191,7 @@ codeunit 1720 "Deferral Utilities"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenLineScheduleEdit(DeferralCode: Code[10]; DeferralDocType: Integer; GenJnlTemplateName: Code[10]; GenJnlBatchName: Code[10]; DocumentType: Integer; DocumentNo: Code[20]; LineNo: Integer; Amount: Decimal; PostingDate: Date; Description: Text[100]; CurrencyCode: Code[10])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterAdjustTotalAmountForDeferrals(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; DiscountAmount: Decimal; DiscountAmountACY: Decimal);
+    local procedure OnAfterAdjustTotalAmountForDeferrals(DeferralCode: Code[10]; var AmtToDefer: Decimal; var AmtToDeferACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal);
     begin
     end;
 
