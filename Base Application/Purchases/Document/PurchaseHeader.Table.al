@@ -245,6 +245,7 @@ table 38 "Purchase Header"
                    (xRec."Pay-to Vendor No." <> '')
                 then
                     if ConfirmUpdateField(FieldNo("Pay-to Vendor No.")) then begin
+                        OnValidatePayToVendorNoOnAfterConfirmed(Rec);
                         PurchLine.SetRange("Document Type", "Document Type");
                         PurchLine.SetRange("Document No.", "No.");
 
@@ -2959,10 +2960,7 @@ table 38 "Purchase Header"
         DeleteRecordInApprovalRequest();
         PurchLine.LockTable();
 
-        WhseRequest.SetRange("Source Type", Database::"Purchase Line");
-        WhseRequest.SetRange("Source Subtype", "Document Type");
-        WhseRequest.SetRange("Source No.", "No.");
-        WhseRequest.DeleteAll(true);
+        DeleteWarehouseRequest();
 
         PurchLine.SetRange("Document Type", "Document Type");
         PurchLine.SetRange("Document No.", "No.");
@@ -5251,8 +5249,20 @@ table 38 "Purchase Header"
         ErrorMessageMgt.Activate(ErrorMessageHandler);
         ErrorMessageMgt.PushContext(ErrorContextElement, RecordId, 0, '');
         IsSuccess := CODEUNIT.Run(PostingCodeunitID, Rec);
-        if not IsSuccess then
+        if not IsSuccess then begin
+            if Rec.Status <> Rec.Status::Released then
+                DeleteWarehouseRequest();
             ErrorMessageHandler.ShowErrors();
+        end;
+    end;
+
+    local procedure DeleteWarehouseRequest()
+    begin
+        WhseRequest.SetRange("Source Type", Database::"Purchase Line");
+        WhseRequest.SetRange("Source Subtype", "Document Type");
+        WhseRequest.SetRange("Source No.", "No.");
+        if not WhseRequest.IsEmpty() then
+            WhseRequest.DeleteAll(true);
     end;
 
     procedure CancelBackgroundPosting()
@@ -8532,6 +8542,11 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterBuyFromAddressEqualsShipToAddress(PurchaseHeader: Record "Purchase Header"; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidatePayToVendorNoOnAfterConfirmed(var PurchaseHeader: Record "Purchase Header");
     begin
     end;
 
