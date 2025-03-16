@@ -685,14 +685,7 @@ table 7022 "Price Worksheet Line"
 
     procedure IsEditable() Result: Boolean;
     begin
-        case Status of
-            Status::Draft:
-                exit(true);
-            Status::Active:
-                exit(IsAllowedEditingActivePrice());
-            else
-                exit(false);
-        end;
+        Result := (Status = Status::Draft) or (Status = Status::Active) and IsAllowedEditingActivePrice();
     end;
 
     procedure IsHeaderActive() Result: Boolean;
