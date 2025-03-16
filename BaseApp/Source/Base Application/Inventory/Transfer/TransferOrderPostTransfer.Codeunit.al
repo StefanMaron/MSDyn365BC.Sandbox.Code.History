@@ -48,7 +48,6 @@ codeunit 5856 "TransferOrder-Post Transfer"
         ReleaseTransferDocument: Codeunit "Release Transfer Document";
         Window: Dialog;
         LineCount: Integer;
-        RequireReceiveValueToTest: Boolean;
     begin
         if TransferHeader2.Status = TransferHeader2.Status::Open then begin
             ReleaseTransferDocument.Release(TransferHeader2);
@@ -94,10 +93,7 @@ codeunit 5856 "TransferOrder-Post Transfer"
 
         // Require Receipt is not supported here, only Bin Mandatory
         GetLocation(TransHeader."Transfer-to Code");
-
-        RequireReceiveValueToTest := false;
-        OnRunWithCheckOnBeforeTestRequireReceive(Location, RequireReceiveValueToTest);
-        Location.TestField("Require Receive", RequireReceiveValueToTest);
+        Location.TestField("Require Receive", false);
         if Location."Bin Mandatory" then
             WhseReceive := true;
 
@@ -224,10 +220,7 @@ codeunit 5856 "TransferOrder-Post Transfer"
 
     local procedure PostItemJnlLine(var TransLine3: Record "Transfer Line"; DirectTransHeader2: Record "Direct Trans. Header"; DirectTransLine2: Record "Direct Trans. Line")
     var
-        TempTrackingSpecification: Record "Tracking Specification" temporary;
-        ItemTrackingMgt: Codeunit "Item Tracking Management";
         IsHandled: Boolean;
-        TrackingSpecExists: Boolean;
     begin
         IsHandled := false;
         OnBeforePostItemJnlLine(DirectTransHeader2, TransLine3, DirectTransLine2, WhseShptHeader, ItemJnlPostLine, WhseShip, IsHandled);
@@ -237,11 +230,6 @@ codeunit 5856 "TransferOrder-Post Transfer"
         CreateItemJnlLine(TransLine3, DirectTransHeader2, DirectTransLine2);
         ReserveTransLine.TransferTransferToItemJnlLine(TransLine3,
           ItemJnlLine, ItemJnlLine."Quantity (Base)", Enum::"Transfer Direction"::Outbound, true);
-
-        TrackingSpecExists := ItemTrackingMgt.RetrieveItemTracking(ItemJnlLine, TempTrackingSpecification);
-        if not TrackingSpecExists then
-            ReserveTransLine.TransferTransferToItemJnlLine(TransLine3,
-              ItemJnlLine, ItemJnlLine."Quantity (Base)", Enum::"Transfer Direction"::Inbound, true);
 
         OnPostItemJnlLineBeforeItemJnlPostLineRunWithCheck(ItemJnlLine, Transline3, DirectTransHeader2, DirectTransLine2, SuppressCommit);
 
@@ -706,11 +694,6 @@ codeunit 5856 "TransferOrder-Post Transfer"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnAfterTransLineSetFiltersForInsertShipmentLines(var TransferLine: Record "Transfer Line"; TransferHeader: Record "Transfer Header"; Location: Record Location; WhseShip: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRunWithCheckOnBeforeTestRequireReceive(var Location: Record Location; var RequireReceiveValueToTest: Boolean)
     begin
     end;
 }
