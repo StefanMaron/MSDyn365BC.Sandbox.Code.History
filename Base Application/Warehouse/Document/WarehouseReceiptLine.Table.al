@@ -162,7 +162,7 @@ table 7317 "Warehouse Receipt Line"
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateQtyToReceive(Rec, IsHandled, CurrFieldNo, xRec);
+                OnBeforeValidateQtyToReceive(Rec, IsHandled, CurrFieldNo);
                 if not OverReceiptProcessing() then
                     if not IsHandled then
                         if "Qty. to Receive" > "Qty. Outstanding" then
@@ -846,7 +846,7 @@ table 7317 "Warehouse Receipt Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateQtyToReceive(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; var IsHandled: Boolean; CurrentFieldNo: Integer; xWarehouseReceiptLine: Record "Warehouse Receipt Line")
+    local procedure OnBeforeValidateQtyToReceive(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; var IsHandled: Boolean; CurrentFieldNo: Integer)
     begin
     end;
 
