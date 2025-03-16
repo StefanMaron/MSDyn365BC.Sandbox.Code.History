@@ -1,6 +1,5 @@
 namespace Microsoft.Bank.PayPal;
 
-using System;
 using System.Integration;
 using System.Privacy;
 using Microsoft.Sales.Document;
@@ -39,10 +38,6 @@ table 1070 "MS - PayPal Standard Account"
                 CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
                 MSPayPalStandardMgt: Codeunit "MS - PayPal Standard Mgt.";
                 FeatureTelemetry: Codeunit "Feature Telemetry";
-                MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-                MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-                MyALAuditCategory: DotNet ALAuditCategory;
-                MSPayPalConsentProvidedLbl: Label 'MS Pay Pal - consent provided by UserSecurityId %1.', Locked = true;
             begin
                 if not xRec."Enabled" and Rec."Enabled" then
                     Rec."Enabled" := CustomerConsentMgt.ConfirmUserConsent();
@@ -50,7 +45,6 @@ table 1070 "MS - PayPal Standard Account"
                 if Rec.Enabled then begin
                     VerifyAccountID();
                     FeatureTelemetry.LogUptake('0000LHR', MSPayPalStandardMgt.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::"Set up");
-                    MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(MSPayPalConsentProvidedLbl, UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 4, 0);
                 end;
             end;
         }
