@@ -364,7 +364,7 @@ codeunit 1002 "Job Create-Invoice"
             TempJobPlanningLine.DeleteAll();
         end;
 
-        OnCreateSalesInvoiceJobTaskOnAfterLinesCreated(SalesHeader, Job, InvoicePerTask, LastJobTask);
+        OnCreateSalesInvoiceJobTaskOnAfterLinesCreated(SalesHeader, Job);
 
         if LastJobTask then begin
             if NoOfSalesLinesCreated = 0 then
@@ -523,7 +523,6 @@ codeunit 1002 "Job Create-Invoice"
             if JobTask2.FindFirst() then begin
                 JobPlanningLineInvoice.SetRange("Job No.", Job."No.");
                 JobPlanningLineInvoice.SetRange("Job Task No.", JobTask2."Job Task No.");
-                JobPlanningLineInvoice.SetRange("Document Type", JobPlanningLineInvoice."Document Type"::Invoice);
                 if JobPlanningLineInvoice.FindFirst() then begin
                     SalesHeader.Get(SalesHeader."Document Type"::Invoice, JobPlanningLineInvoice."Document No.");
                     exit(true);
@@ -532,14 +531,10 @@ codeunit 1002 "Job Create-Invoice"
         end;
     end;
 
-    local procedure GetCustomerNo(Job: Record Job; JobPlanningLine: Record "Job Planning Line"; SellToCustomerNo: Boolean) CustomerNo: Code[20]
+    local procedure GetCustomerNo(Job: Record Job; JobPlanningLine: Record "Job Planning Line"; SellToCustomerNo: Boolean): Code[20]
     var
         JobTask: Record "Job Task";
     begin
-        OnBeforeGetCustomerNo(Job, JobPlanningLine, SellToCustomerNo, CustomerNo);
-        if CustomerNo <> '' then
-            exit(CustomerNo);
-
         if Job."Task Billing Method" = Job."Task Billing Method"::"One customer" then
             if SellToCustomerNo then
                 exit(Job."Sell-to Customer No.")
@@ -624,15 +619,10 @@ codeunit 1002 "Job Create-Invoice"
             SalesLine."Inv. Disc. Amount to Invoice" := 0;
             SalesLine.UpdateAmounts();
         end;
-
-        IsHandled := false;
-        OnCreateSalesLineOnBeforeCheckPricesIncludingVATAndSetJobInformation(SalesLine, JobPlanningLine, IsHandled);
-        if not IsHandled then begin
-            if not SalesHeader."Prices Including VAT" then
-                SalesLine.Validate("Job Contract Entry No.", JobPlanningLine."Job Contract Entry No.");
-            SalesLine."Job No." := JobPlanningLine."Job No.";
-            SalesLine."Job Task No." := JobPlanningLine."Job Task No.";
-        end;
+        if not SalesHeader."Prices Including VAT" then
+            SalesLine.Validate("Job Contract Entry No.", JobPlanningLine."Job Contract Entry No.");
+        SalesLine."Job No." := JobPlanningLine."Job No.";
+        SalesLine."Job Task No." := JobPlanningLine."Job Task No.";
         SalesLine.Description := JobPlanningLine.Description;
         SalesLine."Description 2" := JobPlanningLine."Description 2";
         SalesLine."Line No." := GetNextLineNo(SalesLine);
@@ -769,7 +759,6 @@ codeunit 1002 "Job Create-Invoice"
         JobPlanningLineInvoice.SetRange("Line No.", SalesLine."Line No.");
         if JobPlanningLineInvoice.FindSet() then
             repeat
-                OnDeleteSalesLineOnBeforeGetJobPlanningLine(JobPlanningLineInvoice);
                 JobPlanningLine.Get(JobPlanningLineInvoice."Job No.", JobPlanningLineInvoice."Job Task No.", JobPlanningLineInvoice."Job Planning Line No.");
                 JobPlanningLineInvoice.Delete();
                 JobPlanningLine.UpdateQtyToTransfer();
@@ -1411,7 +1400,7 @@ codeunit 1002 "Job Create-Invoice"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateSalesInvoiceJobTaskOnAfterLinesCreated(var SalesHeader: Record "Sales Header"; var Job: Record Job; InvoicePerTask: Boolean; LastJobTask: Boolean)
+    local procedure OnCreateSalesInvoiceJobTaskOnAfterLinesCreated(var SalesHeader: Record "Sales Header"; var Job: Record Job)
     begin
     end;
 
@@ -1500,21 +1489,6 @@ codeunit 1002 "Job Create-Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateSalesInvoiceJobTaskOnAfterJobPlanningLineSetFilters(var JobPlanningLine: Record "Job Planning Line"; var JobTask2: Record "Job Task")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateSalesLineOnBeforeCheckPricesIncludingVATAndSetJobInformation(var SalesLine: Record "Sales Line"; JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnDeleteSalesLineOnBeforeGetJobPlanningLine(JobPlanningLineInvoice: Record "Job Planning Line Invoice")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetCustomerNo(var Job: Record Job; var JobPlanningLine: Record "Job Planning Line"; SellToCustomerNo: Boolean; var CustomerNo: Code[20])
     begin
     end;
 }
