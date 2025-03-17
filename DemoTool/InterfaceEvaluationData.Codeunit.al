@@ -20,7 +20,7 @@ codeunit 122001 "Interface Evaluation Data"
         XWEST: Label 'WEST';
         PmtRecNoSeriesStartNoTok: Label 'PREC000', Locked = true;
         XStatementLineDescription1: Label 'Transfer to savings account';
-        XStatementLineDescription2: Label 'Funds for Spring event';
+        XStatementLineDescription2: Label 'Funds for Spring event 2023';
         XStatementLineDescription3: Label 'Deposit to Account';
 
     procedure CreateSetupData()
