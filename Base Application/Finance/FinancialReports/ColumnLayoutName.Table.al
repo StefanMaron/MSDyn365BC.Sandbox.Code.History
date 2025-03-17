@@ -5,7 +5,7 @@ using System.IO;
 
 table 333 "Column Layout Name"
 {
-    Caption = 'Financial Report Column Definition';
+    Caption = 'Column Layout Name';
     DataCaptionFields = Name, Description;
     LookupPageID = "Column Layout Names";
     DataClassification = CustomerContent;
