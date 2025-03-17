@@ -100,8 +100,6 @@ codeunit 4810 IntrastatReportManagement
                         IntrastatReportSetup."Shipments Based On"::"Bill-to Country":
                             CountryCode := ReturnShptHeader."Pay-to Country/Region Code";
                     end;
-            else
-                OnGetIntrastatBaseCountryCodeFromItemLedgerElseCase(ItemLedgEntry, IntrastatReportSetup, CountryCode);
         end;
     end;
 
@@ -265,7 +263,7 @@ codeunit 4810 IntrastatReportManagement
                 if ServiceCrMemoHeader.Get(ItemLedgerEntry."Document No.") then
                     CurrencyCode := ServiceCrMemoHeader."Currency Code";
             else
-                OnGetOriginalCurrencyFromItemLedgerElseCase(ItemLedgerEntry, CurrencyCode);
+                CurrencyCode := '';
         end;
     end;
 
@@ -1202,16 +1200,6 @@ codeunit 4810 IntrastatReportManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnExportWithDataExchOnAfterGetIntrastatReportSetup(var IntrastatReportSetup: Record "Intrastat Report Setup"; var IntrastatReportHeader: Record "Intrastat Report Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetIntrastatBaseCountryCodeFromItemLedgerElseCase(ItemLedgerEntry: Record "Item Ledger Entry"; IntrastatReportSetup: Record "Intrastat Report Setup"; var CountryCode: Code[10])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetOriginalCurrencyFromItemLedgerElseCase(ItemLedgerEntry: Record "Item Ledger Entry"; var CurrencyCode: Code[10])
     begin
     end;
 }
