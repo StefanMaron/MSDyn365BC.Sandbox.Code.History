@@ -538,7 +538,7 @@ report 94 "Close Income Statement"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeValidateEndDate(EndDateReq, FiscalYearStartDate, FiscYearClosingDate, OK, Result, RealMode, IsHandled);
+        OnBeforeValidateEndDate(EndDateReq, FiscalYearStartDate, FiscYearClosingDate, OK, Result, IsHandled);
         if IsHandled then
             exit(Result);
 
@@ -764,6 +764,7 @@ report 94 "Close Income Statement"
             until BalLineBuffer.Next() = 0;
     end;
 
+    [Scope('OnPrem')]
     procedure InitializeRequest(EndDateReq2: Date; GenJnlTemplate2: Code[10]; GenJnlBatchName2: Code[10]; DocNo2: Code[10]; PostingDescription2: Text[50]; ClosePerBusUnit2: Boolean; ClosePerDept2: Boolean; ClosePerProj2: Boolean; RetainedAccNo: Code[20])
     begin
         EndDateReq := EndDateReq2;
@@ -828,7 +829,7 @@ report 94 "Close Income Statement"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateEndDate(EndDateReq: Date; var FiscalYearStartDate: Date; var FiscYearClosingDate: Date; var OK: Boolean; var Result: Boolean; RealMode: Boolean; var IsHandled: Boolean);
+    local procedure OnBeforeValidateEndDate(EndDateReq: Date; var FiscalYearStartDate: Date; var FiscYearClosingDate: Date; var OK: Boolean; var Result: Boolean; var IsHandled: Boolean);
     begin
     end;
 }
