@@ -6,7 +6,7 @@ page 8071 "Vendor Contracts"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor Contracts';
-    CardPageId = "Vendor Contract";
+    CardPageID = "Vendor Contract";
     DataCaptionFields = "Buy-from Vendor No.";
     Editable = false;
     PageType = List;
@@ -112,7 +112,7 @@ page 8071 "Vendor Contracts"
                     ApplicationArea = Dimensions;
                     Caption = 'Dimensions';
                     Image = Dimensions;
-                    ShortcutKey = 'Alt+D';
+                    ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
 
                     trigger OnAction()
@@ -126,7 +126,7 @@ page 8071 "Vendor Contracts"
                     ToolTip = 'Vendor Contract Deferrals.';
                     Image = LedgerEntries;
                     ShortcutKey = 'Ctrl+F7';
-                    RunObject = page "Vendor Contract Deferrals";
+                    RunObject = Page "Vendor Contract Deferrals";
                     RunPageView = sorting("Contract No.");
                     RunPageLink = "Contract No." = field("No.");
 
@@ -181,20 +181,6 @@ page 8071 "Vendor Contracts"
     begin
         Rec.CopyBuyFromVendorFilter();
         Rec.SetRange(Active, true);
-    end;
-
-    internal procedure GetVendorContractSelection() FilterText: Text
-    var
-        VendorContract: Record "Vendor Contract";
-        FilterTextBuilder: TextBuilder;
-    begin
-        CurrPage.SetSelectionFilter(VendorContract);
-        if VendorContract.FindSet() then
-            repeat
-                FilterTextBuilder.Append(VendorContract."No.");
-                FilterTextBuilder.Append('|');
-            until VendorContract.Next() = 0;
-        FilterText := FilterTextBuilder.ToText().TrimEnd('|');
     end;
 
     var
