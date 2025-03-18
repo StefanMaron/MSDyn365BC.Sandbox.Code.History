@@ -293,7 +293,6 @@ codeunit 1250 "Match General Journal Lines"
     begin
         CustLedgerEntry.CalcFields("Remaining Amount", "Remaining Amt. (LCY)");
         CustLedgerEntry."Applies-to ID" := GenJournalLine."Document No.";
-        OnPrepareCustLedgerEntryForApplicationOnBeforeSetAmountToApply(CustLedgerEntry);
         if Abs(CustLedgerEntry."Remaining Amt. (LCY)") < Abs(GenJournalLine."Amount (LCY)") then
             CustLedgerEntry."Amount to Apply" := CustLedgerEntry."Remaining Amount"
         else
@@ -306,7 +305,6 @@ codeunit 1250 "Match General Journal Lines"
     begin
         VendorLedgerEntry.CalcFields("Remaining Amount", "Remaining Amt. (LCY)");
         VendorLedgerEntry."Applies-to ID" := GenJournalLine."Document No.";
-        OnPrepareVendorLedgerEntryForApplicationOnBeforeSetAmountToApply(VendorLedgerEntry);
         if Abs(VendorLedgerEntry."Remaining Amt. (LCY)") < Abs(GenJournalLine."Amount (LCY)") then
             VendorLedgerEntry."Amount to Apply" := VendorLedgerEntry."Remaining Amount"
         else
@@ -486,16 +484,6 @@ codeunit 1250 "Match General Journal Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnSaveOneToOneMatchingOnBeforeTempBankStatementMatchingBufferFindSet(var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareCustLedgerEntryForApplicationOnBeforeSetAmountToApply(var CustLedgerEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareVendorLedgerEntryForApplicationOnBeforeSetAmountToApply(var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 }
