@@ -231,7 +231,6 @@ table 38 "Purchase Header"
                    (xRec."Pay-to Vendor No." <> '')
                 then
                     if ConfirmUpdateField(FieldNo("Pay-to Vendor No.")) then begin
-                        OnValidatePayToVendorNoOnAfterConfirmed(Rec);
                         PurchLine.SetRange("Document Type", "Document Type");
                         PurchLine.SetRange("Document No.", "No.");
 
@@ -2684,7 +2683,10 @@ table 38 "Purchase Header"
         DeleteRecordInApprovalRequest();
         PurchLine.LockTable();
 
-        DeleteWarehouseRequest();
+        WhseRequest.SetRange("Source Type", Database::"Purchase Line");
+        WhseRequest.SetRange("Source Subtype", "Document Type");
+        WhseRequest.SetRange("Source No.", "No.");
+        WhseRequest.DeleteAll(true);
 
         PurchLine.SetRange("Document Type", "Document Type");
         PurchLine.SetRange("Document No.", "No.");
@@ -4400,7 +4402,6 @@ table 38 "Purchase Header"
         NewDimSetID: Integer;
         ReceivedShippedItemLineDimChangeConfirmed: Boolean;
         IsHandled: Boolean;
-        DefaultAnswer: Boolean;
     begin
         IsHandled := false;
         OnBeforeUpdateAllLineDim(Rec, NewParentDimSetID, OldParentDimSetID, IsHandled, xRec);
@@ -4409,12 +4410,9 @@ table 38 "Purchase Header"
 
         if NewParentDimSetID = OldParentDimSetID then
             exit;
-        if not GetHideValidationDialog() then begin
-            DefaultAnswer := true;
-            OnUpdateAllLineDimOnBeforeConfirmUpdateAllLineDim(Rec, DefaultAnswer);
+        if not GetHideValidationDialog() then
             if not ConfirmManagement.GetResponseOrDefault(Text051, true) then
                 exit;
-        end;
 
         PurchLine.Reset();
         PurchLine.SetRange("Document Type", "Document Type");
@@ -4773,20 +4771,8 @@ table 38 "Purchase Header"
         ErrorMessageMgt.Activate(ErrorMessageHandler);
         ErrorMessageMgt.PushContext(ErrorContextElement, RecordId, 0, '');
         IsSuccess := CODEUNIT.Run(PostingCodeunitID, Rec);
-        if not IsSuccess then begin
-            if Rec.Status <> Rec.Status::Released then
-                DeleteWarehouseRequest();
+        if not IsSuccess then
             ErrorMessageHandler.ShowErrors();
-        end;
-    end;
-
-    local procedure DeleteWarehouseRequest()
-    begin
-        WhseRequest.SetRange("Source Type", Database::"Purchase Line");
-        WhseRequest.SetRange("Source Subtype", "Document Type");
-        WhseRequest.SetRange("Source No.", "No.");
-        if not WhseRequest.IsEmpty() then
-            WhseRequest.DeleteAll(true);
     end;
 
     procedure CancelBackgroundPosting()
@@ -8053,11 +8039,6 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidatePayToVendorNoOnAfterConfirmed(var PurchaseHeader: Record "Purchase Header");
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnBeforeHasMixedDropShipment(var PurchaseHeader: Record "Purchase Header"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
@@ -8069,11 +8050,6 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnInitRecordOnBeforeAssignResponsibilityCenter(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateAllLineDimOnBeforeConfirmUpdateAllLineDim(var PurchaseHeader: Record "Purchase Header"; var DefaultAnswer: Boolean)
     begin
     end;
 }
