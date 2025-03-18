@@ -16,6 +16,7 @@ pageextension 7278 "Sales Order Sub Form Ext" extends "Sales Order Subform"
                 Caption = 'Suggest sales lines';
                 Image = SparkleFilled;
                 ToolTip = 'Get sales lines suggestions from Copilot';
+                Visible = SLSActionVisibility;
 
                 trigger OnAction()
                 begin
@@ -31,6 +32,7 @@ pageextension 7278 "Sales Order Sub Form Ext" extends "Sales Order Subform"
                 Caption = 'Suggest sales lines';
                 Image = SparkleFilled;
                 ToolTip = 'Get sales lines suggestions from Copilot';
+                Visible = SLSActionVisibility;
 
                 trigger OnAction()
                 begin
@@ -40,6 +42,13 @@ pageextension 7278 "Sales Order Sub Form Ext" extends "Sales Order Subform"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        SLSActionVisibility := SalesLineAISuggestionImp.CheckSupportedLanguages()
+    end;
+
     var
         SalesLineAISuggestionImp: Codeunit "Sales Lines Suggestions Impl.";
+
+        SLSActionVisibility: Boolean;
 }
