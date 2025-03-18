@@ -4,55 +4,55 @@ enum 30158 "Shpfy Metafield Volume Type"
 {
     Access = Internal;
 
-    value(0; Milliliters)
+    value(0; ml)
     {
         Caption = 'ml';
     }
 
-    value(1; Centiliters)
+    value(1; cl)
     {
         Caption = 'cl';
     }
 
-    value(2; Liters)
+    value(2; l)
     {
         Caption = 'L';
     }
-    value(3; "Cubic Meters")
+    value(3; m3)
     {
         Caption = 'm3';
     }
 
-    value(4; "Fluid Ounces")
+    value(4; us_fl_oz)
     {
         Caption = 'fl oz';
     }
 
-    value(5; Pints)
+    value(5; us_pt)
     {
         Caption = 'pt';
     }
-    value(6; Quarts)
+    value(6; us_qt)
     {
         Caption = 'qt';
     }
-    value(7; Gallons)
+    value(7; us_gal)
     {
         Caption = 'gal';
     }
-    value(8; "Imperial Fluid Ounces")
+    value(8; imp_fl_oz)
     {
         Caption = 'imp fl oz';
     }
-    value(9; "Imperial Pints")
+    value(9; imp_pt)
     {
         Caption = 'imp pt';
     }
-    value(10; "Imperial Quarts")
+    value(10; imp_qt)
     {
         Caption = 'imp qt';
     }
-    value(11; "Imperial Gallons")
+    value(11; imp_gal)
     {
         Caption = 'imp gal';
     }
