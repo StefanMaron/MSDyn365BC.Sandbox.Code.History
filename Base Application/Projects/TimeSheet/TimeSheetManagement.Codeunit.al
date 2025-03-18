@@ -70,26 +70,17 @@ codeunit 950 "Time Sheet Management"
     end;
 
     procedure FilterTimeSheets(var TimeSheetHeader: Record "Time Sheet Header"; FieldNo: Integer)
-    begin
-        FilterTimeSheets(TimeSheetHeader, FieldNo, false);
-    end;
-
-    procedure FilterTimeSheets(var TimeSheetHeader: Record "Time Sheet Header"; FieldNo: Integer; ApplyToAdmin: Boolean)
     var
         UserSetup: Record "User Setup";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeFilterTimeSheets(TimeSheetHeader, FieldNo, ApplyToAdmin, IsHandled);
+        OnBeforeFilterTimeSheets(TimeSheetHeader, FieldNo, IsHandled);
         if IsHandled then
             exit;
 
-        if not ApplyToAdmin then begin
-            UserSetup.SetLoadFields("Time Sheet Admin.");
-            if UserSetup.Get(UserId) then;
-        end;
-
-        if ApplyToAdmin or (not UserSetup."Time Sheet Admin.") then begin
+        if UserSetup.Get(UserId) then;
+        if not UserSetup."Time Sheet Admin." then begin
             TimeSheetHeader.FilterGroup(2);
             case FieldNo of
                 TimeSheetHeader.FieldNo("Owner User ID"):
@@ -445,7 +436,6 @@ codeunit 950 "Time Sheet Management"
         TimeSheetLineArchive: Record "Time Sheet Line Archive";
         TimeSheetLines: Page "Time Sheet Lines";
         NextLineNo: Integer;
-        IsArchive: Boolean;
     begin
         TimeSheetLines.LookupMode := true;
         TimeSheetLines.Editable(false);
@@ -466,30 +456,20 @@ codeunit 950 "Time Sheet Management"
         if TempTimeSheetLine.Count() = 1 then begin
             TempTimeSheetLine.FindFirst();
             if TempTimeSheetLine.Posted then begin
-                TimeSheetLineArchive.SetLoadFields("Time Sheet No.", "Line No.");
-                IsArchive := TimeSheetLineArchive.Get(TempTimeSheetLine."Time Sheet No.", TempTimeSheetLine."Line No.");
-                if IsArchive then begin
-                    if not CheckUserWantAllLinesFromOneTimeSheetHeaderArchive(TempTimeSheetLine) then
-                        exit;
-                end else
-                    if not CheckUserWantAllLinesFromOneTimeSheetHeader(TempTimeSheetLine) then
-                        exit;
+                if not CheckUserWantAllLinesFromOneTimeSheetHeaderArchive(TempTimeSheetLine) then
+                    exit;
             end else
                 if not CheckUserWantAllLinesFromOneTimeSheetHeader(TempTimeSheetLine) then
                     exit;
         end;
-        TimeSheetLineArchive.SetLoadFields();
 
         if TempTimeSheetLine.FindSet() then
             repeat
                 if not TempTimeSheetLine.Posted then
                     CopyTimeSheetLine(ToTimeSheetHeader, TempTimeSheetLine, CopyComments, NextLineNo)
                 else begin
-                    IsArchive := TimeSheetLineArchive.Get(TempTimeSheetLine."Time Sheet No.", TempTimeSheetLine."Line No.");
-                    if IsArchive then
-                        CopyTimeSheetLineArchive(ToTimeSheetHeader, TimeSheetLineArchive, CopyComments, NextLineNo)
-                    else
-                        CopyTimeSheetLine(ToTimeSheetHeader, TempTimeSheetLine, CopyComments, NextLineNo)
+                    TimeSheetLineArchive.Get(TempTimeSheetLine."Time Sheet No.", TempTimeSheetLine."Line No.");
+                    CopyTimeSheetLineArchive(ToTimeSheetHeader, TimeSheetLineArchive, CopyComments, NextLineNo);
                 end;
             until TempTimeSheetLine.Next() = 0;
     end;
@@ -650,7 +630,6 @@ codeunit 950 "Time Sheet Management"
     var
         ToTimeSheetDetail: Record "Time Sheet Detail";
         FromTimeSheetDetail: Record "Time Sheet Detail";
-        IsHandled: Boolean;
     begin
         FromTimeSheetDetail.SetRange("Time Sheet No.", FromTimeSheetLine."Time Sheet No.");
         FromTimeSheetDetail.SetRange("Time Sheet Line No.", FromTimeSheetLine."Line No.");
@@ -664,10 +643,7 @@ codeunit 950 "Time Sheet Management"
                 ToTimeSheetDetail.Status := "Time Sheet Status"::Open;
                 ToTimeSheetDetail.Posted := false;
                 ToTimeSheetDetail."Posted Quantity" := 0;
-                IsHandled := false;
-                OnBeforeTimeSheetDetailInsert(ToTimeSheetDetail, FromTimeSheetDetail, IsHandled);
-                if not IsHandled then
-                    ToTimeSheetDetail.Insert();
+                ToTimeSheetDetail.Insert();
             until FromTimeSheetDetail.Next() = 0;
     end;
 
@@ -715,7 +691,6 @@ codeunit 950 "Time Sheet Management"
             ToTimeSheetLine.Description := FromTimeSheetLineArchive.Description;
             ToTimeSheetLine.Chargeable := FromTimeSheetLineArchive.Chargeable;
             ToTimeSheetLine."Work Type Code" := FromTimeSheetLineArchive."Work Type Code";
-            OnCopyTimeSheetLineArchiveOnBeforeToTimeSheetLineInsert(ToTimeSheetLine, FromTimeSheetLineArchive);
             ToTimeSheetLine.Insert();
 
             CopyTimeSheetLineArchiveDetails(ToTimeSheetLine, FromTimeSheetLineArchive);
@@ -1416,7 +1391,7 @@ codeunit 950 "Time Sheet Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFilterTimeSheets(var TimeSheetHeader: Record "Time Sheet Header"; FieldNo: Integer; ApplyToAdmin: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeFilterTimeSheets(var TimeSheetHeader: Record "Time Sheet Header"; FieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
@@ -1497,16 +1472,6 @@ codeunit 950 "Time Sheet Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnAddServLinesFromTSDetailOnBeforeInsertServiceLine(var ServiceLine: Record Microsoft.Service.Document."Service Line"; var LineNo: Integer; ServiceHeader: Record Microsoft.Service.Document."Service Header"; TimeSheetDetail: Record "Time Sheet Detail")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTimeSheetDetailInsert(var ToTimeSheetDetail: Record "Time Sheet Detail"; FromTimeSheetDetail: Record "Time Sheet Detail"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyTimeSheetLineArchiveOnBeforeToTimeSheetLineInsert(var ToTimeSheetLine: Record "Time Sheet Line"; FromTimeSheetLineArchive: Record "Time Sheet Line Archive")
     begin
     end;
 }
