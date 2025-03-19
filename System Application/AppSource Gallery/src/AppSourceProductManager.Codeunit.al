@@ -28,10 +28,8 @@ codeunit 2515 "AppSource Product Manager"
         CatalogProductsUriLbl: Label 'https://catalogapi.azure.com/products', Locked = true;
         CatalogApiVersionQueryParamNameLbl: Label 'api-version', Locked = true;
         CatalogApiVersionQueryParamValueLbl: Label '2023-05-01-preview', Locked = true;
-        CatalogApiVersionOldQueryParamValueLbl: Label '2018-08-01-beta', Locked = true;
         CatalogApiOrderByQueryParamNameLbl: Label '$orderby', Locked = true;
         CatalogMarketQueryParamNameLbl: Label 'market', Locked = true;
-        CatalogListMarketNameLbl: label 'all', Locked = true;
         CatalogLanguageQueryParamNameLbl: Label 'language', Locked = true;
         CatalogApiFilterQueryParamNameLbl: Label '$filter', Locked = true;
         CatalogApiSelectQueryParamNameLbl: Label '$select', Locked = true;
@@ -94,46 +92,54 @@ codeunit 2515 "AppSource Product Manager"
     /// <summary>
     /// Checks if the product can be installed or your are required to perform operations on AppSource before you can install the product.
     /// </summary>
-    internal procedure CanInstallProductWithPlans(UniqieProductIDValue: Text): Boolean
+    /// <param name="Plans">JSonArray representing the product plans</param>
+    /// <returns>True if the product can be installed, otherwise false</returns>
+    internal procedure CanInstallProductWithPlans(Plans: JsonArray): Boolean
     var
-        LegacyProductObject: JsonObject;
-        LegacyPlansToken: JsonToken;
-        LegacyPlans: JsonArray;
         PlanToken: JsonToken;
         PlanObject: JsonObject;
-        CallToActionToken: JsonToken;
+        PricingTypesToken: JsonToken;
+        PricingTypes: JsonArray;
+        PricingType: JsonToken;
     begin
-        Init();
-
-        // Query legacy api toget all the plan and test if there is a contact me call to action.
-        LegacyProductObject := GetProductDetails(UniqieProductIDValue, ConstructProductUri(UniqieProductIDValue, CatalogApiVersionOldQueryParamValueLbl));
-        LegacyProductObject.Get('plans', LegacyPlansToken);
-        LegacyPlans := LegacyPlansToken.AsArray();
-        foreach PlanToken in LegacyPlans do begin
+        foreach PlanToken in Plans do begin
             PlanObject := PlanToken.AsObject();
-            if PlanObject.Get('callToAction', CallToActionToken) then
-                if LowerCase(CallToActionToken.AsValue().AsText()) = 'contactme' then
-                    exit(false);
+
+            if PlanObject.Get('pricingTypes', PricingTypesToken) then
+                if (PricingTypesToken.IsArray()) then begin
+                    PricingTypes := PricingTypesToken.AsArray();
+                    if PricingTypes.Count() = 0 then
+                        exit(false); // No price structure, you need to contact the publisher
+
+                    foreach PricingType in PricingTypes do
+                        case LowerCase(PricingType.AsValue().AsText()) of
+                            'free', // Free
+                            'freetrial', // Free trial
+                            'payg', // Pay as you go
+                            'byol': // Bring your own license
+                                exit(true);
+                        end;
+                end;
         end;
 
-        exit(true);
+        exit(false);
     end;
     #endregion
 
     #region Market and language helper functions
-    local procedure GetCurrentLanguageCultureName(): Text
+    procedure GetCurrentLanguageCultureName(): Text
     var
         Language: Codeunit Language;
     begin
         exit(Language.GetCultureName(GetCurrentUserLanguageID()));
     end;
 
-    local procedure ResolveLanguageName() LanguageName: Text;
+    procedure ResolveMarketAndLanguage(var Market: Code[2]; var LanguageName: Text)
     var
         Language: Codeunit Language;
         LanguageID: Integer;
     begin
-        LanguageID := GetCurrentUserLanguageAndLocaleID();
+        GetCurrentUserLanguageAndLocaleID(LanguageID, Market);
 
         // Marketplace API only supports two letter languages.
         LanguageName := Language.GetTwoLetterISOLanguageName(LanguageID);
@@ -155,7 +161,7 @@ codeunit 2515 "AppSource Product Manager"
         exit(LanguageID);
     end;
 
-    local procedure GetCurrentUserLanguageAndLocaleID() LanguageID: Integer
+    local procedure GetCurrentUserLanguageAndLocaleID(var LanguageID: Integer; var LocaleID: Code[2])
     var
         TempUserSettings: Record "User Settings" temporary;
         Language: Codeunit Language;
@@ -166,6 +172,9 @@ codeunit 2515 "AppSource Product Manager"
             LanguageID := Language.GetLanguageIdFromCultureName(AppSourceProductManagerDependencies.GetPreferredLanguage());
         if (LanguageID = 0) then
             LanguageID := 1033; // Default to EN-US
+
+        if (AppSourceProductManagerDependencies.IsSaas()) then
+            LocaleID := AppSourceProductManagerDependencies.GetCountryLetterCode();
     end;
 
     /// <summary>
@@ -220,21 +229,14 @@ codeunit 2515 "AppSource Product Manager"
     /// </summary>
     local procedure GetProductDetails(UniqueProductIDValue: Text): JsonObject
     var
-        RequestUri: Text;
-    begin
-        Init();
-        RequestUri := ConstructProductUri(UniqueProductIDValue);
-        exit(GetProductDetails(UniqueProductIDValue, RequestUri));
-    end;
-
-    local procedure GetProductDetails(UniqueProductIDValue: Text; RequestUri: Text): JsonObject
-    var
         RestClient: Codeunit "Rest Client";
+        RequestUri: Text;
         ClientRequestID: Guid;
         TelemetryDictionary: Dictionary of [Text, Text];
     begin
         Init();
         ClientRequestID := CreateGuid();
+        RequestUri := ConstructProductUri(UniqueProductIDValue);
 
         PopulateTelemetryDictionary(ClientRequestID, UniqueProductIDValue, RequestUri, TelemetryDictionary);
         Session.LogMessage('AL:AppSource-GetProduct', 'Requesting product details.', Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, TelemetryDictionary);
@@ -295,12 +297,13 @@ codeunit 2515 "AppSource Product Manager"
         UriBuilder: Codeunit "Uri Builder";
         Uri: Codeunit Uri;
         Language: Text;
+        Market: Code[2];
     begin
-        Language := ResolveLanguageName();
+        ResolveMarketAndLanguage(Market, Language);
 
         UriBuilder.Init(CatalogProductsUriLbl);
         UriBuilder.AddQueryParameter(CatalogApiVersionQueryParamNameLbl, CatalogApiVersionQueryParamValueLbl);
-        UriBuilder.AddQueryParameter(CatalogMarketQueryParamNameLbl, CatalogListMarketNameLbl);
+        UriBuilder.AddQueryParameter(CatalogMarketQueryParamNameLbl, Market);
         UriBuilder.AddQueryParameter(CatalogLanguageQueryParamNameLbl, Language);
 
         UriBuilder.AddODataQueryParameter(CatalogApiFilterQueryParamNameLbl, 'productType eq ''DynamicsBC''');
@@ -312,23 +315,16 @@ codeunit 2515 "AppSource Product Manager"
     end;
 
     local procedure ConstructProductUri(UniqueIdentifier: Text): Text
-    begin
-        exit(ConstructProductUri(UniqueIdentifier, CatalogApiVersionQueryParamValueLbl));
-    end;
-
-    local procedure ConstructProductUri(UniqueIdentifier: Text; ApiVersion: Text): Text
     var
         UriBuilder: Codeunit "Uri Builder";
         Uri: Codeunit Uri;
         Language: Text;
-        Market: Text;
+        Market: Code[2];
     begin
-        // For market in the product details we use the Entra ID country code.
-        Market := AppSourceProductManagerDependencies.GetCountryLetterCode();
-        Language := ResolveLanguageName();
+        ResolveMarketAndLanguage(Market, Language);
         UriBuilder.Init(CatalogProductsUriLbl);
         UriBuilder.SetPath('products/' + UniqueIdentifier);
-        UriBuilder.AddQueryParameter(CatalogApiVersionQueryParamNameLbl, ApiVersion);
+        UriBuilder.AddQueryParameter(CatalogApiVersionQueryParamNameLbl, CatalogApiVersionQueryParamValueLbl);
         UriBuilder.AddQueryParameter(CatalogMarketQueryParamNameLbl, Market);
         UriBuilder.AddQueryParameter(CatalogLanguageQueryParamNameLbl, Language);
         UriBuilder.GetUri(Uri);
