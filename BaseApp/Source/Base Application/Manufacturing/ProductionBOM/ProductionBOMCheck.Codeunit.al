@@ -128,8 +128,6 @@ codeunit 99000769 "Production BOM-Check"
         ProdBOMComponent.SetRange("Version Code", VersionCode);
         ProdBOMComponent.SetFilter("No.", '<>%1', '');
 
-        OnCheckBOMStructureOnBeforeFindProdBOMComponent(ProdBOMComponent);
-
         if ProdBOMComponent.Find('-') then
             repeat
                 case ProdBOMComponent.Type of
@@ -271,11 +269,6 @@ codeunit 99000769 "Production BOM-Check"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckBOMStructureOnAfterGetProdBOMHeader(ProductionBOMHeader: Record "Production BOM Header"; var VersionCode: Code[20]; var Item: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCheckBOMStructureOnBeforeFindProdBOMComponent(var ProdBOMComponent: Record "Production BOM Line")
     begin
     end;
 }
