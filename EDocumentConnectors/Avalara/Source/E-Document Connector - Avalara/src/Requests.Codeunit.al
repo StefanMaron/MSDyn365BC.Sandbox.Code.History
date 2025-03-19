@@ -209,7 +209,7 @@ codeunit 6376 Requests
         this.DataBoundary := DelChr(this.DataBoundary, '<>=', '{}&[]*()!@#$%^+=;:"''<>,.?/|\\~`');
 
         this.ApiVersion := '1.0';
-        this.AvalaraClient := 'a0nUz00000MVekTIAT';
+        this.AvalaraClient := 'partner-einvoicing';
     end;
 
     /// <summary>
