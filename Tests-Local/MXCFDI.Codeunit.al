@@ -5243,7 +5243,6 @@
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
         InStream: InStream;
         OriginalStr: Text;
         FANo: Code[20];
@@ -5271,7 +5270,7 @@
 
         // [THEN] 'Concepto' node has attributes 'ClaveProdServ' = SAT Classification Code of the Fixed Asset, 'NoIdentificacion' = "FA", 'ClaveUnidad' = 'H87'
         // [THEN] String for digital stamp has 'ClaveProdServ' = SAT Classification Code of the Fixed Asset, 'NoIdentificacion' = "FA", 'ClaveUnidad' = 'H87'
-        VerifyCFDIConceptoFields(OriginalStr, FANo, SATUtilities.GetSATUnitOfMeasureFixedAsset(), SalesLine.Type::"Fixed Asset");
+        VerifyCFDIConceptoFields(OriginalStr, FANo, SATUtilities.GetSATUnitOfMeasureFixedAsset(), 4);
     end;
 
     [Test]
@@ -5281,7 +5280,6 @@
     var
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
         InStream: InStream;
         OriginalStr: Text;
         FANo: Code[20];
@@ -5310,7 +5308,7 @@
 
         // [THEN] 'Concepto' node has attributes 'ClaveProdServ' = '01010101', 'NoIdentificacion' = "FA", 'ClaveUnidad' = 'H87'
         // [THEN] String for digital stamp has 'ClaveProdServ' = '01010101', 'NoIdentificacion' = "FA", 'ClaveUnidad' = 'H87'
-        VerifyCFDIConceptoFields(OriginalStr, FANo, SATUtilities.GetSATUnitOfMeasureFixedAsset(), SalesLine.Type::"Fixed Asset");
+        VerifyCFDIConceptoFields(OriginalStr, FANo, SATUtilities.GetSATUnitOfMeasureFixedAsset(), 4);
     end;
 
     [Test]
@@ -5354,7 +5352,7 @@
 
         // [THEN] 'Concepto' node has attributes 'ClaveProdServ' = SAT Classification Code of the G/L Account, 'NoIdentificacion' = "GLAcc", 'ClaveUnidad' = 'E48'
         // [THEN] String for digital stamp has 'ClaveProdServ' = SAT Classification Code of theG/L Account, 'NoIdentificacion' = "GLAcc", 'ClaveUnidad' = 'E48'
-        VerifyCFDIConceptoFields(OriginalStr, GLAccount."No.", SATUtilities.GetSATUnitOfMeasureGLAccount(), SalesLine.Type::"G/L Account");
+        VerifyCFDIConceptoFields(OriginalStr, GLAccount."No.", SATUtilities.GetSATUnitOfMeasureGLAccount(), 1);
     end;
 
     [Test]
@@ -9091,16 +9089,16 @@
           OriginalStrCSV, RFCNo, CFDIPurpose, CFDIRelation, PaymentMethodCode, PaymentTermsCode, UnitOfMeasureCode, RelationIdx);
     end;
 
-    local procedure VerifyCFDIConceptoFields(OriginalStr: Text; NoIdentificacion: Code[20]; SATUnitOfMeasure: Code[10]; LineType: Enum "Sales Line Type")
+    local procedure VerifyCFDIConceptoFields(OriginalStr: Text; NoIdentificacion: Code[20]; SATUnitOfMeasure: Code[10]; LineType: Option)
     begin
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
 
-        LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'ClaveProdServ', SATUtilities.GetSATClassification(LineType, NoIdentificacion));
+        LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'ClaveProdServ', SATUtilities.GetSATItemClassification(LineType, NoIdentificacion));
         LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'NoIdentificacion', NoIdentificacion);
         LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'ClaveUnidad', SATUnitOfMeasure);
 
         Assert.AreEqual(
-          SATUtilities.GetSATClassification(LineType, NoIdentificacion), SelectStr(22, OriginalStr),
+          SATUtilities.GetSATItemClassification(LineType, NoIdentificacion), SelectStr(22, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'SAT Item Classification', OriginalStr));
         Assert.AreEqual(
           NoIdentificacion, SelectStr(23, OriginalStr),
