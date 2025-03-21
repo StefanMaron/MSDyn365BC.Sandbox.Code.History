@@ -29,21 +29,12 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     var
         PurchaseHeader: Record "Purchase Header";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
-        NoSeries: Codeunit "No. Series";
         RedoApplications: Boolean;
     begin
         RedoApplications := UnapplyCostApplication(ItemJnlPostLine, Rec."No.");
         OnRunOnBeforeCreateCopyDocument(Rec);
         CreateCopyDocument(Rec, PurchaseHeader, PurchaseHeader."Document Type"::"Credit Memo", false);
         PurchaseHeader."Vendor Cr. Memo No." := PurchaseHeader."No.";
-	
-        SuppressCommit := not NoSeries.IsNoSeriesInDateOrder(PurchaseHeader."Posting No. Series");
-
-        OnBeforeUpdateCheckTotal(Rec, PurchaseHeader, CancellingOnly, SuppressCommit);
-
-        if not SuppressCommit then
-            Commit();
-	    
         UpdateCheckTotal(PurchaseHeader);
         OnAfterCreateCorrectivePurchCrMemo(Rec, PurchaseHeader, CancellingOnly);
 
@@ -59,7 +50,6 @@ codeunit 1313 "Correct Posted Purch. Invoice"
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
         CancellingOnly: Boolean;
-        SuppressCommit: Boolean;
 
         PostedInvoiceIsPaidCorrectErr: Label 'You cannot correct this posted purchase invoice because it is fully or partially paid.\\To reverse a paid purchase invoice, you must manually create a purchase credit memo.';
         PostedInvoiceIsPaidCCancelErr: Label 'You cannot cancel this posted purchase invoice because it is fully or partially paid.\\To reverse a paid purchase invoice, you must manually create a purchase credit memo.';
@@ -585,10 +575,9 @@ codeunit 1313 "Correct Posted Purch. Invoice"
         TestGLAccount(InventoryPostingSetup."Inventory Account", PurchInvLine);
     end;
 
-    local procedure IsCommentLine(PurchInvLine: Record "Purch. Inv. Line") Result: Boolean
+    local procedure IsCommentLine(PurchInvLine: Record "Purch. Inv. Line"): Boolean
     begin
-        Result := (PurchInvLine.Type = PurchInvLine.Type::" ") or (PurchInvLine."No." = '');
-        OnAfterIsCommentLine(PurchInvLine, Result);
+        exit((PurchInvLine.Type = PurchInvLine.Type::" ") or (PurchInvLine."No." = ''));
     end;
 
     local procedure WasNotCancelled(InvNo: Code[20]): Boolean
@@ -901,11 +890,6 @@ codeunit 1313 "Correct Posted Purch. Invoice"
             end;
         PurchaseHeader.Modify();
     end;
-    
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateCheckTotal(PurchInvHeader: Record "Purch. Inv. Header"; var PurchaseHeader: Record "Purchase Header"; var CancellingOnly: Boolean; var SuppressCommit: Boolean)
-    begin
-    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateCorrectivePurchCrMemo(PurchInvHeader: Record "Purch. Inv. Header"; var PurchaseHeader: Record "Purchase Header"; var CancellingOnly: Boolean)
@@ -1005,11 +989,6 @@ codeunit 1313 "Correct Posted Purch. Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnCancelPostedInvoiceStartNewInvoiceOnAfterCreateCorrPurchaseInvoice(var PurchaseHeader: Record "Purchase Header"; var PurchInvHeader: Record "Purch. Inv. Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterIsCommentLine(PurchInvLine: Record "Purch. Inv. Line"; var Result: Boolean)
     begin
     end;
 
