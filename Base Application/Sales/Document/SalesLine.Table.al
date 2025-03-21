@@ -4055,13 +4055,7 @@ table 37 "Sales Line"
     procedure CalcShipmentDateForLocation()
     var
         CustomCalendarChange: array[2] of Record "Customized Calendar Change";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCalcShipmentDateForLocation(Rec, xRec, IsHandled);
-        if IsHandled then
-            exit;
-
         CustomCalendarChange[1].SetSource(CalChange."Source Type"::Location, "Location Code", '', '');
         "Shipment Date" := CalendarMgmt.CalcDateBOC('', SalesHeader."Shipment Date", CustomCalendarChange, false);
     end;
@@ -8504,10 +8498,8 @@ table 37 "Sales Line"
         Currency2: Record Currency;
     begin
         Currency2.InitRoundingPrecision();
-        if Rec."VAT Calculation Type" = Rec."VAT Calculation Type"::"Full VAT" then
-            Rec."Shipped Not Inv. (LCY) No VAT" := 0
-        else
-            Rec."Shipped Not Inv. (LCY) No VAT" := Round("Shipped Not Invoiced (LCY)" / (1 + "VAT %" / 100), Currency2."Amount Rounding Precision");
+        "Shipped Not Inv. (LCY) No VAT" :=
+          Round("Shipped Not Invoiced (LCY)" / (1 + "VAT %" / 100), Currency2."Amount Rounding Precision");
     end;
 
     procedure ClearSalesHeader()
@@ -11203,11 +11195,6 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateVATOnLinesOnAfterUpdateBaseAmounts(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempVATAmountLine: Record "VAT Amount Line" temporary; var VATAmountLine: Record "VAT Amount Line"; Currency: Record Currency)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcShipmentDateForLocation(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 }
