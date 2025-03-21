@@ -33,7 +33,6 @@ codeunit 1303 "Correct Posted Sales Invoice"
     trigger OnRun()
     var
         SalesHeader: Record "Sales Header";
-        NoSeries: Codeunit "No. Series";
         IsHandled: Boolean;
     begin
         UnapplyCostApplication(Rec."No.");
@@ -45,13 +44,9 @@ codeunit 1303 "Correct Posted Sales Invoice"
         if SalesInvoiceLinesContainJob(Rec."No.") then
             CreateAndProcessJobPlanningLines(SalesHeader);
 
-        SuppressCommit := not NoSeries.IsNoSeriesInDateOrder(SalesHeader."Posting No. Series");
-
         IsHandled := false;
-        OnRunOnBeforePostCorrectiveSalesCrMemo(Rec, SalesHeader, IsHandled, SuppressCommit);
+        OnRunOnBeforePostCorrectiveSalesCrMemo(Rec, SalesHeader, IsHandled);
         if not IsHandled then begin
-            if not SuppressCommit then
-                Commit();
             CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
             SetTrackInfoForCancellation(Rec);
             UpdateSalesOrderLinesFromCancelledInvoice(Rec."No.");
@@ -64,7 +59,6 @@ codeunit 1303 "Correct Posted Sales Invoice"
     var
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
         CancellingOnly: Boolean;
-        SuppressCommit: Boolean;
 
         PostedInvoiceIsPaidCorrectOrCancelErr: Label 'You cannot perform this action for closed or partially paid entries, nor for any entries that are created with the Cartera module.';
         AlreadyCorrectedErr: Label 'You cannot correct this posted sales invoice because it has been canceled.';
@@ -1286,7 +1280,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnBeforePostCorrectiveSalesCrMemo(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"; var IsHandled: Boolean; var SuppressCommit: Boolean)
+    local procedure OnRunOnBeforePostCorrectiveSalesCrMemo(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 
