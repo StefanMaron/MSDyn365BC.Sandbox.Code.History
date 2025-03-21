@@ -24,21 +24,16 @@ codeunit 353 "Item Availability Forms Mgt"
     procedure CalcItemPlanningFields(var Item: Record Item; CalculateTransferQuantities: Boolean)
     begin
         Item.Init();
-        if not CalculateTransferQuantities then
+        Item.CalcFields(
+          Inventory,
+          "Net Change",
+          "Purch. Req. Receipt (Qty.)",
+          "Planning Issues (Qty.)",
+          "Purch. Req. Release (Qty.)");
+
+        if CalculateTransferQuantities then
             Item.CalcFields(
-              Inventory,
-              "Net Change",
-              "Purch. Req. Receipt (Qty.)",
-              "Planning Issues (Qty.)",
-              "Purch. Req. Release (Qty.)")
-        else
-            Item.CalcFields(
-              Inventory,
-              "Net Change",
-              "Purch. Req. Receipt (Qty.)",
-              "Planning Issues (Qty.)",
-              "Purch. Req. Release (Qty.)",
-              "Trans. Ord. Shipment (Qty.)", "Qty. in Transit", "Trans. Ord. Receipt (Qty.)");
+                "Trans. Ord. Shipment (Qty.)", "Qty. in Transit", "Trans. Ord. Receipt (Qty.)");
 
         OnAfterCalcItemPlanningFields(Item);
     end;
@@ -48,36 +43,30 @@ codeunit 353 "Item Availability Forms Mgt"
         TransOrdShipmentQty: Decimal;
         QtyinTransit: Decimal;
         TransOrdReceiptQty: Decimal;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCalculateNeed(Item, GrossRequirement, PlannedOrderReceipt, ScheduledReceipt, PlannedOrderReleases, IsHandled);
-        if not IsHandled then begin
-            CalcItemPlanningFields(Item, true);
+        CalcItemPlanningFields(Item, true);
 
-            if Item.GetFilter("Location Filter") = '' then begin
-                TransOrdShipmentQty := 0;
-                QtyinTransit := 0;
-                TransOrdReceiptQty := 0;
-            end else begin
-                TransOrdShipmentQty := Item."Trans. Ord. Shipment (Qty.)";
-                QtyinTransit := Item."Qty. in Transit";
-                TransOrdReceiptQty := Item."Trans. Ord. Receipt (Qty.)";
-            end;
-            GrossRequirement :=
-                Item."Qty. on Sales Order" + Item."Qty. on Job Order" + Item."Qty. on Component Lines" +
-                TransOrdShipmentQty + Item."Planning Issues (Qty.)" + Item."Qty. on Asm. Component" + Item."Qty. on Purch. Return";
-            OnCalculateNeedOnAfterCalcGrossRequirement(Item, GrossRequirement);
-            PlannedOrderReceipt :=
-                Item."Planned Order Receipt (Qty.)" + Item."Purch. Req. Receipt (Qty.)";
-            ScheduledReceipt :=
-                Item."FP Order Receipt (Qty.)" + Item."Rel. Order Receipt (Qty.)" + Item."Qty. on Purch. Order" +
-                QtyinTransit + TransOrdReceiptQty + Item."Qty. on Assembly Order" + Item."Qty. on Sales Return";
-            OnCalculateNeedOnAfterCalcScheduledReceipt(Item, ScheduledReceipt, QtyinTransit, TransOrdReceiptQty);
-            PlannedOrderReleases :=
-                Item."Planned Order Release (Qty.)" + Item."Purch. Req. Release (Qty.)";
+        if Item.GetFilter("Location Filter") = '' then begin
+            TransOrdShipmentQty := 0;
+            QtyinTransit := 0;
+            TransOrdReceiptQty := 0;
+        end else begin
+            TransOrdShipmentQty := Item."Trans. Ord. Shipment (Qty.)";
+            QtyinTransit := Item."Qty. in Transit";
+            TransOrdReceiptQty := Item."Trans. Ord. Receipt (Qty.)";
         end;
-
+        GrossRequirement :=
+            Item."Qty. on Sales Order" + Item."Qty. on Job Order" + Item."Qty. on Component Lines" +
+            TransOrdShipmentQty + Item."Planning Issues (Qty.)" + Item."Qty. on Asm. Component" + Item."Qty. on Purch. Return";
+        OnCalculateNeedOnAfterCalcGrossRequirement(Item, GrossRequirement);
+        PlannedOrderReceipt :=
+            Item."Planned Order Receipt (Qty.)" + Item."Purch. Req. Receipt (Qty.)";
+        ScheduledReceipt :=
+            Item."FP Order Receipt (Qty.)" + Item."Rel. Order Receipt (Qty.)" + Item."Qty. on Purch. Order" +
+            QtyinTransit + TransOrdReceiptQty + Item."Qty. on Assembly Order" + Item."Qty. on Sales Return";
+        OnCalculateNeedOnAfterCalcScheduledReceipt(Item, ScheduledReceipt, QtyinTransit, TransOrdReceiptQty);
+        PlannedOrderReleases :=
+            Item."Planned Order Release (Qty.)" + Item."Purch. Req. Release (Qty.)";
         OnAfterCalculateNeed(Item, GrossRequirement, PlannedOrderReceipt, ScheduledReceipt, PlannedOrderReleases);
     end;
 
@@ -234,7 +223,6 @@ codeunit 353 "Item Availability Forms Mgt"
         if QtyByUnitOfMeasure <> 0 then
             ItemAvailLineList.SetQtyByUnitOfMeasure(QtyByUnitOfMeasure);
         ItemAvailLineList.Init(What, ItemCopy);
-        OnShowItemAvailLineListOnAfterItemAvailabilityLineListInit(ItemCopy, ItemAvailLineList);
         ItemAvailLineList.RunModal();
     end;
 
@@ -495,8 +483,6 @@ codeunit 353 "Item Availability Forms Mgt"
                     if ShowItemAvailabilityByBOMLevel(Item, CaptionText, InvtDocLine."Posting Date", NewDate) then
                         InvtDocLine.Validate("Posting Date", NewDate);
                 end;
-            else
-                OnShowItemAvailabilityFromInvtDocLineOnAvailabilityTypeCaseElse(AvailabilityType, Item, InvtDocLine);
         end;
     end;
 
@@ -550,7 +536,7 @@ codeunit 353 "Item Availability Forms Mgt"
 
     procedure ShowItemAvailabilityByLocation(var Item: Record Item; FieldCaption: Text; OldLocationCode: Code[10]; var NewLocationCode: Code[10]): Boolean
     var
-        ItemAvailabilityByLocation: Page "Item Availability by Location";
+        ItemAvailByLoc: Page "Item Availability by Location";
         IsHandled: Boolean;
         Result: Boolean;
     begin
@@ -566,11 +552,11 @@ codeunit 353 "Item Availability Forms Mgt"
 
         Item.SetRange("Location Filter");
         if FieldCaption <> '' then
-            ItemAvailabilityByLocation.LookupMode(true);
-        ItemAvailabilityByLocation.SetRecord(Item);
-        ItemAvailabilityByLocation.SetTableView(Item);
-        if ItemAvailabilityByLocation.RunModal() = Action::LookupOK then begin
-            NewLocationCode := ItemAvailabilityByLocation.GetLastLocation();
+            ItemAvailByLoc.LookupMode(true);
+        ItemAvailByLoc.SetRecord(Item);
+        ItemAvailByLoc.SetTableView(Item);
+        if ItemAvailByLoc.RunModal() = ACTION::LookupOK then begin
+            NewLocationCode := ItemAvailByLoc.GetLastLocation();
             if OldLocationCode <> NewLocationCode then
                 if Confirm(Text012, true, FieldCaption, OldLocationCode, NewLocationCode) then
                     exit(true);
@@ -720,8 +706,6 @@ codeunit 353 "Item Availability Forms Mgt"
 
     local procedure ShowBOMLevelAbleToMake(FieldCaption: Text; OldDate: Date; var NewDate: Date): Boolean
     begin
-        OnBeforeShowBOMLevelAbleToMake(FieldCaption, OldDate, NewDate);
-
         if FieldCaption <> '' then
             ItemAvailByBOMLevel.LookupMode(true);
         if ItemAvailByBOMLevel.RunModal() = ACTION::LookupOK then begin
@@ -818,7 +802,7 @@ codeunit 353 "Item Availability Forms Mgt"
     end;
 
 #if not CLEAN25
-    [Obsolete('Replaced by event OnBeforeShowItemAvailabilityByBOMLevel', '25.0')]
+    [Obsolete('Replaced by event OnBeforeShowItemAvailabilityByBOMLeve', '25.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowItemAvailByBOMLevel(var Item: Record Item; FieldCaption: Text[80]; OldDate: Date; var NewDate: Date; var Result: Boolean; var IsHandled: Boolean)
     begin
@@ -844,7 +828,7 @@ codeunit 353 "Item Availability Forms Mgt"
     end;
 
 #if not CLEAN25
-    [Obsolete('Replaced by event OnBeforeShowItemAvailabilityByEvent', '25.0')]
+    [Obsolete('Replaced by event OnBeforeShowItemAvailabilityByLocation', '25.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowItemAvailByEvent(var Item: Record Item; FieldCaption: Text[80]; OldDate: Date; var NewDate: Date; var IncludeForecast: Boolean; var Result: Boolean; var IsHandled: Boolean)
     begin
@@ -870,7 +854,7 @@ codeunit 353 "Item Availability Forms Mgt"
     end;
 
 #if not CLEAN25
-    [Obsolete('Replaced by event OnBeforeShowItemAvailabilityByUOM', '25.0')]
+    [Obsolete('Replaced by event OnBeforeShowItemAvailabilityByLocation', '25.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowItemAvailByUOM(var Item: Record Item; FieldCaption: Text[80]; OldUoMCode: Code[20]; var NewUoMCode: Code[20]; var Result: Boolean; var IsHandled: Boolean)
     begin
@@ -1083,26 +1067,6 @@ codeunit 353 "Item Availability Forms Mgt"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFilterItem(var Item: Record Item; LocationCode: Code[20]; VariantCode: Code[20]; Date: Date)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalculateNeed(var Item: Record Item; var GrossRequirement: Decimal; var PlannedOrderReceipt: Decimal; var ScheduledReceipt: Decimal; var PlannedOrderReleases: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnShowItemAvailLineListOnAfterItemAvailabilityLineListInit(var Item: Record Item; var ItemAvailabilityLineList: Page "Item Availability Line List")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnShowItemAvailabilityFromInvtDocLineOnAvailabilityTypeCaseElse(ItemAvailabilityType: Enum "Item Availability Type"; var Item: Record Item; var InvtDocumentLine: Record "Invt. Document Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowBOMLevelAbleToMake(FieldCaption: Text; OldDate: Date; var NewDate: Date)
     begin
     end;
 }
