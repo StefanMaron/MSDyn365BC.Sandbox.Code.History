@@ -216,7 +216,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
         if not FindReservEntry(OldProdOrderLine, OldReservationEntry) then
             exit;
 
-        if NeedUpdateReservationStatusForProdOrderLine(OldReservationEntry."Source Type", NewProdOrderLine.Status.AsInteger()) then
+        if NeedUpdateReservationStatusForProdOrderLine(OldReservationEntry."Source Type", NewProdOrderLine.Status.AsInteger(), OldReservationEntry."Reservation Status") then
             if OldReservationEntry."Source Subtype" = OldReservationEntry."Source Subtype"::"1" then begin
                 OldReservationEntry."Reservation Status" := OldReservationEntry."Reservation Status"::Surplus;
                 OldReservationEntry.Modify();
@@ -1052,9 +1052,9 @@ codeunit 99000837 "Prod. Order Line-Reserve"
             end;
     end;
     
-    local procedure NeedUpdateReservationStatusForProdOrderLine(SourceType: Integer; SourceSubtype: Option): Boolean
+    local procedure NeedUpdateReservationStatusForProdOrderLine(SourceType: Integer; SourceSubtype: Option; ReservationStatus: Enum "Reservation Status"): Boolean
     begin
-        if (SourceType <> Database::"Prod. Order Line") or (SourceSubtype <> 3) then
+        if (SourceType <> Database::"Prod. Order Line") or (SourceSubtype <> 3) or (ReservationStatus <> ReservationStatus::Prospect) then
             exit(false);
 
         exit(true);
