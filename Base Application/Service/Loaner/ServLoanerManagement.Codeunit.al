@@ -50,7 +50,6 @@ codeunit 5901 ServLoanerManagement
             LoanerEntry."Date Received" := 0D;
             LoanerEntry."Time Received" := 0T;
             LoanerEntry.Lent := true;
-            OnLendLoanerOnBeforeInsertLoanerEntry(LoanerEntry, ServItemLine);
             LoanerEntry.Insert();
             Clear(ServLogMgt);
             ServLogMgt.LoanerLent(LoanerEntry);
@@ -206,11 +205,6 @@ codeunit 5901 ServLoanerManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeReceiveLoaner(var ServiceItemLine: Record "Service Item Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnLendLoanerOnBeforeInsertLoanerEntry(var LoanerEntry: Record "Loaner Entry"; var ServiceItemLine: Record "Service Item Line")
     begin
     end;
 }
