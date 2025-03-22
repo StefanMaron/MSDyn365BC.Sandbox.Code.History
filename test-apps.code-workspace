@@ -16,9 +16,6 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
-    },
-    {
       "path": "./FieldServiceIntegration/Test/Field Service Integration Test"
     },
     {
@@ -265,12 +262,6 @@
       "path": "./ExcelReports/Test/Dynamics BC Excel Reports Tests"
     },
     {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
-    },
-    {
       "path": "./Email - SMTP API/Test/Email - SMTP API Tests"
     },
     {
@@ -278,9 +269,6 @@
     },
     {
       "path": "./Email - Outlook REST API/Test"
-    },
-    {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./LatePaymentPredictor/Test/Late Payment Prediction Tests"
@@ -305,11 +293,11 @@
     }
   ],
   "settings": {
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "allint.enabled": false
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
   }
 }
