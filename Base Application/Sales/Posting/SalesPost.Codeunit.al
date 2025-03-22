@@ -4954,6 +4954,8 @@ codeunit 80 "Sales-Post"
                 ItemEntryRelation.Insert();
                 OnInsertShptEntryRelationOnAfterItemEntryRelationInsert(SalesShptLine, ItemEntryRelation, xSalesLine);
             until TempHandlingSpecification.Next() = 0;
+
+            OnInsertShptEntryRelationOnBeforeDeleteTempHandlingSpecification(TempHandlingSpecification);
             TempHandlingSpecification.DeleteAll();
             exit(0);
         end;
@@ -12741,4 +12743,9 @@ codeunit 80 "Sales-Post"
     local procedure OnValidatePostingAndDocumentDateOnBeforeTestPostingDate(var SalesHeader: Record "Sales Header"; ReplacePostingDate: Boolean; var SkipTestPostingDate: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertShptEntryRelationOnBeforeDeleteTempHandlingSpecification(var TempHandlingTrackingSpecification: Record "Tracking Specification" temporary)
+    begin
+    end;    
 }
