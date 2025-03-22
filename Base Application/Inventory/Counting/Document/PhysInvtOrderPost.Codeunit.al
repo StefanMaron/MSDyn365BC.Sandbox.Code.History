@@ -507,7 +507,6 @@ codeunit 5884 "Phys. Invt. Order-Post"
             PhysInvtOrderLine.Reset();
             PhysInvtOrderLine.SetRange("Document No.", DocNo);
             PhysInvtOrderLine.DeleteAll();
-            PhysInvtOrderHeader.Delete();
         end else begin
 #endif
             ExpInvtOrderTracking.Reset();
