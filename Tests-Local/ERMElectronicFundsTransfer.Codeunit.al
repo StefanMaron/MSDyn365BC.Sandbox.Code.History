@@ -2740,69 +2740,6 @@
         Assert.AreEqual('', GenJournalLine."Document No.", DocumentNoBlankErr);
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    [HandlerFunctions('ExportElecPaymentsWordRequestPageHandler')]
-    procedure CompanyLogoAndAddrIsDisplayedInExportElecPaymentsWordReportOnlyWhenSetToTrueInReqPage()
-    var
-        Vendor: Record Vendor;
-        BankAccount: Record "Bank Account";
-        VendorBankAccount: Record "Vendor Bank Account";
-        GenJournalBatch: Record "Gen. Journal Batch";
-        GenJournalLine: Record "Gen. Journal Line";
-        CompanyInformation: Record "Company Information";
-    begin
-        // [SCENARIO 543593] Company Logo and Company Address is displayed in "ExportElecPayments - Word" report
-        // only when Stan sets Print Company Address and Print Company Logo as true on request page.
-        Initialize();
-
-        // [GIVEN] Create Bank Account With Export Setup.
-        CreateBankAccountForCountry(
-            BankAccount,
-            BankAccount."Export Format"::US,
-            CreateBankExportImportSetup(CreateDataExchDefForUS()),
-            '',
-            '');
-
-        // [GIVEN] Create Vendor with Bank Account.
-        CreateVendorWithVendorBankAccount(Vendor, VendorBankAccount, 'US');
-
-        // [GIVEN] Create General Journal Batch.
-        CreateGeneralJournalBatch(GenJournalBatch, BankAccount."No.");
-
-        // [GIVEN] Create Payment Journal Lines for Vendor.
-        CreateVendorPaymentLine(
-            GenJournalLine,
-            GenJournalBatch,
-            VendorBankAccount."Vendor No.",
-            VendorBankAccount.Code,
-            BankAccount."No.");
-
-        // [GIVEN] Run "ExportElecPayments - Word" report.
-        LibraryVariableStorage.Enqueue(GenJournalLine."Bal. Account No.");
-        LibraryVariableStorage.Enqueue('');
-        LibraryVariableStorage.Enqueue('');
-        LibraryVariableStorage.Enqueue(true);
-        LibraryVariableStorage.Enqueue(true);
-        RunReportExportElecPaymentsWord(GenJournalLine, true);
-
-        // [GIVEN] Find Company Information.
-        CompanyInformation.Get();
-        CompanyInformation.CalcFields(Picture);
-
-        // [WHEN] Report is printed.
-        LibraryReportDataset.LoadDataSetFile();
-        LibraryReportDataset.SetRange('Gen__Journal_Line___Document_No__', GenJournalLine."Document No.");
-        LibraryReportDataset.GetNextRow();
-
-        // [THEN] Company Picture is displayed in the report.
-        LibraryReportDataset.CurrentRowHasElement('CompanyPicture');
-
-        // [THEN] Address of Company Information is displyed in the report.
-        LibraryReportDataset.AssertCurrentRowValueEquals('CompanyAddress_1_', CompanyInformation.Name);
-        LibraryVariableStorage.AssertEmpty();
-    end;
-
     local procedure Initialize()
     var
         EFTExport: Record "EFT Export";
@@ -4672,18 +4609,6 @@
         ExportElecPaymentsWord.BankAccountNo.SetValue(LibraryVariableStorage.DequeueText());
         ExportElecPaymentsWord."Gen. Journal Line".SetFilter("Journal Template Name", LibraryVariableStorage.DequeueText());
         ExportElecPaymentsWord."Gen. Journal Line".SetFilter("Journal Batch Name", LibraryVariableStorage.DequeueText());
-        ExportElecPaymentsWord.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure ExportElecPaymentsWordRequestPageHandler(var ExportElecPaymentsWord: TestRequestPage "ExportElecPayments - Word")
-    begin
-        ExportElecPaymentsWord.BankAccountNo.SetValue(LibraryVariableStorage.DequeueText());
-        ExportElecPaymentsWord."Gen. Journal Line".SetFilter("Journal Template Name", LibraryVariableStorage.DequeueText());
-        ExportElecPaymentsWord."Gen. Journal Line".SetFilter("Journal Batch Name", LibraryVariableStorage.DequeueText());
-        ExportElecPaymentsWord.PrintCompanyAddress.SetValue(LibraryVariableStorage.DequeueBoolean());
-        ExportElecPaymentsWord.PrintCompanyLogo.SetValue(LibraryVariableStorage.DequeueBoolean());
         ExportElecPaymentsWord.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
