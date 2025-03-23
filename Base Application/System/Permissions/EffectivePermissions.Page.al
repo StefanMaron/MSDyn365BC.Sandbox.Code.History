@@ -1,7 +1,6 @@
 ﻿namespace System.Security.AccessControl;
 
 using Microsoft.Foundation.Company;
-using System;
 using System.Environment;
 using System.Security.User;
 
@@ -250,15 +249,9 @@ page 9852 "Effective Permissions"
     trigger OnOpenPage()
     var
         EffectivePermissionsMgt: Codeunit "Effective Permissions Mgt.";
-        MyCustomerAuditLoggerALHelper: DotNet CustomerAuditLoggerALHelper;
-        MyALSecurityOperationResult: DotNet ALSecurityOperationResult;
-        MyALAuditCategory: DotNet ALAuditCategory;
-        EffectivePermissionsPageOpenLbl: Label 'The Effective Permissions page has been opened by UserSecurityId %1.', Locked = true;
     begin
         EffectivePermissionsMgt.DisallowViewingEffectivePermissionsForNonAdminUsers(UserSecurityId());
         FillByObject();
-
-        MyCustomerAuditLoggerALHelper.LogAuditMessage(StrSubstNo(EffectivePermissionsPageOpenLbl, UserSecurityId()), MyALSecurityOperationResult::Success, MyALAuditCategory::ApplicationManagement, 2, 0);
     end;
 
     var
