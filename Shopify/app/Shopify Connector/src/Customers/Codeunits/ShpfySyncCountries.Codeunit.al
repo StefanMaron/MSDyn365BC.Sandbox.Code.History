@@ -12,7 +12,6 @@ codeunit 30107 "Shpfy Sync Countries"
     begin
         ShopifyShop := Rec;
         ShopifyCommunicationMgt.SetShop(Rec);
-        JCountries := GetCountries();
         SyncCountries();
         Commit();
     end;
@@ -21,14 +20,13 @@ codeunit 30107 "Shpfy Sync Countries"
         ShopifyShop: Record "Shpfy Shop";
         ShopifyCommunicationMgt: Codeunit "Shpfy Communication Mgt.";
         JsonHelper: Codeunit "Shpfy Json Helper";
-        JCountries: JsonArray;
 
     local procedure SyncCountries()
     var
         ShopCustomerTemplate: Record "Shpfy Customer Template";
         GraphQLType: Enum "Shpfy GraphQL Type";
-        JShipToCountries: JsonArray;
-        JShipToCountry: JsonToken;
+        JCountries: JsonArray;
+        JCountry: JsonToken;
         JResponse: JsonToken;
     begin
         ShopCustomerTemplate.SetRange("Shop Code", ShopifyShop.Code);
@@ -37,9 +35,9 @@ codeunit 30107 "Shpfy Sync Countries"
 
         GraphQLType := GraphQLType::GetShipToCountries;
         JResponse := ShopifyCommunicationMgt.ExecuteGraphQL(GraphQLType);
-        if JsonHelper.GetJsonArray(JResponse, JShipToCountries, 'data.shop.shipsToCountries') then
-            foreach JShipToCountry in JShipToCountries do
-                ImportCountry(JShipToCountry.AsValue());
+        if JsonHelper.GetJsonArray(JResponse, JCountries, 'data.shop.shipsToCountries') then
+            foreach JCountry in JCountries do
+                ImportCountry(JCountry.AsValue());
     end;
 
     local procedure ImportCountry(CountryCode: JsonValue);
@@ -58,10 +56,12 @@ codeunit 30107 "Shpfy Sync Countries"
     local procedure ImportProvince(CountryCode: JsonValue)
     var
         ShopifyTaxArea: Record "Shpfy Tax Area";
+        JCountries: JsonArray;
         JProvinces: JsonArray;
         JCountry: JsonToken;
         JProvince: JsonToken;
     begin
+        JCountries := GetCountries();
         foreach JCountry in JCountries do
             if JsonHelper.GetValueAsCode(JCountry.AsObject(), 'code') = CountryCode.AsCode() then begin
                 if JsonHelper.GetJsonArray(JCountry.AsObject(), JProvinces, 'provinces') then
@@ -78,17 +78,13 @@ codeunit 30107 "Shpfy Sync Countries"
 
     local procedure GetCountries(): JsonArray
     var
-        Line: Text;
-        CountryList: TextBuilder;
+        Body: Text;
         ResInStream: InStream;
-        JCountry: JsonObject;
+        JCountries: JsonObject;
     begin
         NavApp.GetResource('data/provinces.yml', ResInStream, TextEncoding::UTF8);
-        while not ResInStream.EOS do begin
-            ResInStream.ReadText(Line);
-            CountryList.AppendLine(Line);
-        end;
-        JCountry.ReadFromYaml(CountryList.ToText());
-        exit(JsonHelper.GetJsonArray(JCountry, 'countries'));
+        ResInStream.ReadText(Body);
+        JCountries.ReadFromYaml(Body);
+        exit(JsonHelper.GetJsonArray(JCountries, 'countries'));
     end;
 }
