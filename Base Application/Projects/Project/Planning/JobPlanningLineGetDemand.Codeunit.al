@@ -3,6 +3,7 @@ namespace Microsoft.Inventory.Tracking;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Sales.Customer;
+using Microsoft.Inventory.Item;
 
 codeunit 99000847 "Job Planning Line Get Demand"
 {
@@ -132,8 +133,8 @@ codeunit 99000847 "Job Planning Line Get Demand"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reservation Worksheet Mgt.", 'OnCalculateDemandOnAfterSync', '', false, false)]
-    local procedure SyncJobPlanningLines(BatchName: Code[10]; var GetDemandToReserve: Report "Get Demand To Reserve")
+    [EventSubscriber(ObjectType::Report, Report::"Get Demand To Reserve", 'OnGetDemand', '', false, false)]
+    local procedure OnGetDemand(var FilterItem: Record Item; DemandType: Enum "Reservation Demand Type"; VariantFilterFromBatch: Text; LocationFilterFromBatch: Text; ReservedFromStock: Enum "Reservation From Stock"; var ReservationWkshBatch: Record "Reservation Wksh. Batch"; DateFilter: Text; ItemFilterFromBatch: Text)
     var
         ReservationWkshLine: Record "Reservation Wksh. Line";
         TempJobPlanningLine: Record "Job Planning Line" temporary;
@@ -144,12 +145,14 @@ codeunit 99000847 "Job Planning Line Get Demand"
         AvailableQtyBase, InventoryQtyBase, ReservedQtyBase, WarehouseQtyBase : Decimal;
         LineNo: Integer;
     begin
-        GetDemandToReserve.GetJobPlanningLines(TempJobPlanningLine);
+        GetDemand(
+            TempJobPlanningLine, FilterItem, ReservationWkshBatch, DemandType,
+            DateFilter, VariantFilterFromBatch, LocationFilterFromBatch, ItemFilterFromBatch, ReservedFromStock);
         if TempJobPlanningLine.IsEmpty() then
             exit;
 
         ReservationWkshLine.SetCurrentKey("Journal Batch Name", "Source Type");
-        ReservationWkshLine.SetRange("Journal Batch Name", BatchName);
+        ReservationWkshLine.SetRange("Journal Batch Name", ReservationWkshBatch.Name);
         ReservationWkshLine.SetRange("Source Type", Database::"Job Planning Line");
         if ReservationWkshLine.FindSet(true) then
             repeat
@@ -157,14 +160,14 @@ codeunit 99000847 "Job Planning Line Get Demand"
                     ReservationWkshLine.Delete(true);
             until ReservationWkshLine.Next() = 0;
 
-        ReservationWkshLine."Journal Batch Name" := BatchName;
+        ReservationWkshLine."Journal Batch Name" := ReservationWkshBatch.Name;
         LineNo := ReservationWkshLine.GetLastLineNo();
 
         TempJobPlanningLine.FindSet();
         repeat
             LineNo += 10000;
             ReservationWkshLine.Init();
-            ReservationWkshLine."Journal Batch Name" := BatchName;
+            ReservationWkshLine."Journal Batch Name" := ReservationWkshBatch.Name;
             ReservationWkshLine."Line No." := LineNo;
             ReservationWkshLine."Source Type" := Database::"Job Planning Line";
             ReservationWkshLine."Source Subtype" := TempJobPlanningLine.Status.AsInteger();
@@ -206,6 +209,71 @@ codeunit 99000847 "Job Planning Line Get Demand"
             then
                 ReservationWkshLine.Insert(true);
         until TempJobPlanningLine.Next() = 0;
+    end;
+
+    local procedure GetDemand(var TempJobPlanningLine: Record "Job Planning Line" temporary; var FilterItem: Record Item; var ReservationWkshBatch: Record "Reservation Wksh. Batch"; DemandType: Enum "Reservation Demand Type"; DateFilter: Text; VariantFilterFromBatch: Text; LocationFilterFromBatch: Text; ItemFilterFromBatch: Text; ReservedFromStock: Enum "Reservation From Stock")
+    var
+        Item: Record Item;
+        JobPlanningLine: Record "Job Planning Line";
+#if not CLEAN25
+        GetDemandToReserve: Report "Get Demand To Reserve";
+#endif
+        SkipItem: Boolean;
+        IsHandled: Boolean;
+    begin
+        if not (DemandType in [Enum::"Reservation Demand Type"::All, Enum::"Reservation Demand Type"::"Job Usage"]) then
+            exit;
+
+        JobPlanningLine.Reset();
+        JobPlanningLine.SetCurrentKey("Job No.", "Job Task No.", "Line No.");
+        JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Item);
+        JobPlanningLine.SetFilter("Remaining Qty. (Base)", '<>%1', 0);
+
+        JobPlanningLine.SetFilter("No.", FilterItem.GetFilter("No."));
+        JobPlanningLine.SetFilter("Variant Code", FilterItem.GetFilter("Variant Filter"));
+        JobPlanningLine.SetFilter("Location Code", FilterItem.GetFilter("Location Filter"));
+        JobPlanningLine.SetFilter("Planning Date", FilterItem.GetFilter("Date Filter"));
+        JobPlanningLine.SetFilter(Reserve, '<>%1', JobPlanningLine.Reserve::Never);
+
+        JobPlanningLine.FilterGroup(2);
+        if DateFilter <> '' then
+            JobPlanningLine.SetFilter("Planning Date", DateFilter);
+        if VariantFilterFromBatch <> '' then
+            JobPlanningLine.SetFilter("Variant Code", VariantFilterFromBatch);
+        if LocationFilterFromBatch <> '' then
+            JobPlanningLine.SetFilter("Location Code", LocationFilterFromBatch);
+        JobPlanningLine.FilterGroup(0);
+
+        if JobPlanningLine.FindSet() then
+            repeat
+                if not JobPlanningLine.IsInventoriableItem() then
+                    SkipItem := true;
+
+                if (not SkipItem) then
+                    if not JobPlanningLine.CheckIfJobPlngLineMeetsReservedFromStockSetting(Abs(JobPlanningLine."Remaining Qty. (Base)"), ReservedFromStock) then
+                        SkipItem := true;
+
+                if (not SkipItem) and (ItemFilterFromBatch <> '') then begin
+                    Item.SetView(ReservationWkshBatch.GetItemFilterBlobAsViewFilters());
+                    Item.FilterGroup(2);
+                    Item.SetRange("No.", JobPlanningLine."No.");
+                    Item.FilterGroup(0);
+                    if Item.IsEmpty() then
+                        SkipItem := true;
+                end;
+
+                if not SkipItem then begin
+                    IsHandled := false;
+                    OnGetDemandOnBeforeSetTempJobPlanningLine(JobPlanningLine, IsHandled);
+#if not CLEAN25
+                    GetDemandToReserve.RunOnJobPlanningLineOnAfterGetRecordOnBeforeSetTempJobPlanningLine(JobPlanningLine, IsHandled);
+#endif
+                    if not IsHandled then begin
+                        TempJobPlanningLine := JobPlanningLine;
+                        TempJobPlanningLine.Insert();
+                    end;
+                end;
+            until JobPlanningLine.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]
