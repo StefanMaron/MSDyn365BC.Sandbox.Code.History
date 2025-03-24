@@ -276,7 +276,6 @@ page 654 "Requests to Approve"
 
     trigger OnAfterGetCurrRecord()
     var
-        [SecurityFiltering(SecurityFilter::Filtered)]
         RecRef: RecordRef;
     begin
         ShowChangeFactBox := CurrPage.Change.PAGE.SetFilterFromApprovalEntry(Rec);
