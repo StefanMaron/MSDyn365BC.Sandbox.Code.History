@@ -609,8 +609,33 @@ table 472 "Job Queue Entry"
     procedure RefreshLocked()
     begin
         SetLoadFields();
+        if not Rec.GetRecLockedExtendedTimeout() then begin
+            Rec.ReadIsolation(IsolationLevel::UpdLock);
+            Rec.Get(ID);  // one last try, and then throw the lock timeout error
+        end;
+    end;
+
+    /// <summary>
+    /// Allow up to three lock time-outs = 90 seconds, in order to reduce lock timeouts
+    ///</summary>    
+    procedure GetRecLockedExtendedTimeout(): Boolean
+    var
+        i: Integer;
+    begin
+        Rec.ReadIsolation(IsolationLevel::ReadUncommitted);
+        if not Rec.Find() then
+            exit(false);
         Rec.ReadIsolation(IsolationLevel::UpdLock);
-        Rec.Get(ID);
+        for i := 1 to 3 do
+            if TryGetRecordLocked(Rec) then
+                exit(true);
+        exit(false);
+    end;
+
+    [TryFunction]
+    local procedure TryGetRecordLocked(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        JobQueueEntry.Find();
     end;
 
     procedure IsExpired(AtDateTime: DateTime): Boolean
@@ -696,7 +721,6 @@ table 472 "Job Queue Entry"
     begin
         Status := Status::Error;
         "Error Message" := DeletedEntryErr;
-        Modify();
     end;
 
     procedure FinalizeRun()
@@ -990,8 +1014,12 @@ table 472 "Job Queue Entry"
         "Last Ready State" := CurrentDateTime();
         "User Language ID" := Language.GetLanguageIdOrDefault(Language.GetUserLanguageCode());
         if SetupUserId then
-            "User ID" := UserId();
+            "User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
         "No. of Attempts to Run" := 0;
+        if Status = Status::Ready then begin
+            "Error Message" := '';
+            clear("Error Message Register Id");
+        end;
         if "Job Timeout" = 0 then
             "Job Timeout" := DefaultJobTimeout();
 
