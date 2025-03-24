@@ -301,15 +301,9 @@ page 973 "Time Sheet Card"
     }
 
     trigger OnOpenPage()
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeOnOpenPage(Rec, IsHandled);
-        if not IsHandled then begin
-            CheckSetDefaultOwnerFilter();
-            RemoveFilterFromLinesExistField();
-        end;
+        CheckSetDefaultOwnerFilter();
+        RemoveFilterFromLinesExistField();
 
         OnAfterOnOpenPage(Rec);
     end;
@@ -525,11 +519,6 @@ page 973 "Time Sheet Card"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSubmitLines(var TimeSheetHeader: Record "Time Sheet Header"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnOpenPage(var TimeSheetHeader: Record "Time Sheet Header"; var IsHandled: Boolean);
     begin
     end;
 }
