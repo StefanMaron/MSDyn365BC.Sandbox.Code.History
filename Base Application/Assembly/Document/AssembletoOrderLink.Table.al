@@ -433,14 +433,11 @@ table 904 "Assemble-to-Order Link"
         Window: Dialog;
         QtyTracked: Decimal;
         QtyTrackedBase: Decimal;
-        ShowWindow: Boolean;
     begin
         GetAsmHeader();
-        ShowWindow := GuiAllowed();
-        OnSynchronizeAsmFromSalesLineOnAfterGetAsmHeader(NewSalesLine, AsmHeader, ShowWindow);
+        OnSynchronizeAsmFromSalesLineOnAfterGetAsmHeader(NewSalesLine, AsmHeader);
 
-        if ShowWindow then
-            Window.Open(GetWindowOpenTextSale(NewSalesLine));
+        Window.Open(GetWindowOpenTextSale(NewSalesLine));
 
         CaptureItemTracking(TempTrackingSpecification, QtyTracked, QtyTrackedBase);
 
@@ -480,8 +477,7 @@ table 904 "Assemble-to-Order Link"
         RestoreItemTracking(TempTrackingSpecification, NewSalesLine);
 
         NewSalesLine.CheckAsmToOrder(AsmHeader);
-        if ShowWindow then
-            Window.Close();
+        Window.Close();
 
         AsmHeader.SetWarningsOn();
         AsmHeader.ShowDueDateBeforeWorkDateMsg();
@@ -2005,7 +2001,7 @@ table 904 "Assemble-to-Order Link"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSynchronizeAsmFromSalesLineOnAfterGetAsmHeader(var NewSalesLine: Record "Sales Line"; var AssemblyHeader: Record "Assembly Header"; var ShowWindow: Boolean)
+    local procedure OnSynchronizeAsmFromSalesLineOnAfterGetAsmHeader(var NewSalesLine: Record "Sales Line"; var AssemblyHeader: Record "Assembly Header")
     begin
     end;
 
