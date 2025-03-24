@@ -116,10 +116,8 @@ codeunit 305 "No. Series - Setup Impl."
             NoSeriesLine.SetRange("Series Code", NoSeriesRec.Code);
         end;
 
-        if not NoSeriesLine.FindFirst() then begin
+        if not NoSeriesLine.FindFirst() then
             NoSeriesLine.Init();
-            NoSeriesLine."Series Code" := NoSeriesRec.Code;
-        end;
 
         if ResetForDrillDown then begin
             NoSeriesLine.SetRange("Starting Date");
