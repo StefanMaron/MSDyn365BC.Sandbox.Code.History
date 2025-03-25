@@ -39,7 +39,6 @@ codeunit 1381 "Customer Templ. Mgt."
 
         Customer.SetInsertFromTemplate(true);
         Customer.Init();
-        OnCreateCustomerFromTemplateOnBeforeInitCustomerNo(Customer);
         InitCustomerNo(Customer, CustomerTempl);
         Customer."Contact Type" := CustomerTempl."Contact Type";
         Customer.Insert(true);
@@ -574,16 +573,6 @@ codeunit 1381 "Customer Templ. Mgt."
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenBlankCardConfirmed(var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateCustomerFromTemplateOnBeforeInitCustomerNo(var Customer: Record Customer)
-    begin
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Config. Template Management", 'OnBeforeInsertRecordWithKeyFields', '', false, false)]
     local procedure OnBeforeInsertRecordWithKeyFieldsHandler(var RecRef: RecordRef; ConfigTemplateHeader: Record "Config. Template Header")
     begin
@@ -607,5 +596,10 @@ codeunit 1381 "Customer Templ. Mgt."
             FldRef := RecRef.Field(Customer.FieldNo("No. Series"));
             FldRef.Value := ConfigTemplateHeader."Instance No. Series";
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenBlankCardConfirmed(var Result: Boolean; var IsHandled: Boolean)
+    begin
     end;
 }
