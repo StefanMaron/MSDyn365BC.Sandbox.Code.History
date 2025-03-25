@@ -50,6 +50,7 @@ codeunit 6610 "FS Int. Table Subscriber"
         InsufficientPermissionsTxt: Label 'Insufficient permissions.', Locked = true;
         NoProjectUsageLinkTxt: Label 'Unable to find Project Usage Link.', Locked = true;
         NoProjectPlanningLineTxt: Label 'Unable to find Project Planning Line.', Locked = true;
+        MultiCompanySyncEnabledTxt: Label 'Multi-Company Synch Enabled', Locked = true;
         FSEntitySynchTxt: Label 'Synching a field service entity.', Locked = true;
 
 
@@ -495,15 +496,11 @@ codeunit 6610 "FS Int. Table Subscriber"
     begin
         case FSConnectionSetup."Line Post Rule" of
             "FS Work Order Line Post Rule"::LineUsed:
-                if FSWorkOrderProduct.LineStatus = FSWorkOrderProduct.LineStatus::Used then begin
+                if FSWorkOrderProduct.LineStatus = FSWorkOrderProduct.LineStatus::Used then
                     JobJnlPostLine.RunWithCheck(JobJournalLine);
-                    JobJournalLine.Delete(true);
-                end;
             "FS Work Order Line Post Rule"::WorkOrderCompleted:
-                if FSWorkOrderProduct.WorkOrderStatus in [FSWorkOrderProduct.WorkOrderStatus::Completed] then begin
+                if FSWorkOrderProduct.WorkOrderStatus in [FSWorkOrderProduct.WorkOrderStatus::Completed] then
                     JobJnlPostLine.RunWithCheck(JobJournalLine);
-                    JobJournalLine.Delete(true);
-                end;
             else
                 exit;
         end;
@@ -532,7 +529,6 @@ codeunit 6610 "FS Int. Table Subscriber"
     begin
         JobJournalLineId := JobJournalLine.SystemId;
         JobJnlPostLine.RunWithCheck(JobJournalLine);
-        JobJournalLine.Delete(true);
 
         // Work Order Services couple to two Project Journal Lines (one budget line for the resource and one billable line for the item of type service)
         // we must find the other coupled lines and post them as well.
@@ -540,11 +536,9 @@ codeunit 6610 "FS Int. Table Subscriber"
         CRMIntegrationRecord.SetRange("CRM ID", FSWorkOrderService.WorkOrderServiceId);
         if CRMIntegrationRecord.FindSet() then
             repeat
-                if CRMIntegrationRecord."Integration ID" <> JobJournalLineId then
-                    if CorrelatedJobJournalLine.GetBySystemId(CRMIntegrationRecord."Integration ID") then begin
+                if CRMIntegrationRecord."Integration ID" <> JobJournalLine.SystemId then
+                    if CorrelatedJobJournalLine.GetBySystemId(CRMIntegrationRecord."Integration ID") then
                         JobJnlPostLine.RunWithCheck(CorrelatedJobJournalLine);
-                        CorrelatedJobJournalLine.Delete(true);
-                    end;
             until CRMIntegrationRecord.Next() = 0;
     end;
 
@@ -560,10 +554,12 @@ codeunit 6610 "FS Int. Table Subscriber"
         FSConnectionSetup: Record "FS Connection Setup";
         JobJournalBatch: Record "Job Journal Batch";
         JobJournalTemplate: Record "Job Journal Template";
+        JobsSetup: Record "Jobs Setup";
         Resource: Record Resource;
         FSBookableResource: Record "FS Bookable Resource";
         LastJobJournalLine: Record "Job Journal Line";
         CRMProductName: Codeunit "CRM Product Name";
+        NoSeries: Codeunit "No. Series";
         RecID: RecordId;
         SourceDestCode: Text;
         BillingAccId: Guid;
@@ -645,6 +641,7 @@ codeunit 6610 "FS Int. Table Subscriber"
                     OnSetUpNewLineOnNewLine(JobJournalLine, JobJournalTemplate, JobJournalBatch, Handled);
                     if not Handled then begin
                         FSConnectionSetup.Get();
+                        JobsSetup.Get();
                         Job.Get(JobJournalLine."Job No.");
                         if not JobJournalTemplate.Get(FSConnectionSetup."Job Journal Template") then
                             Error(JobJournalIncorrectSetupErr, JobJournalTemplate.TableCaption(), FSConnectionSetup.TableCaption());
@@ -654,7 +651,25 @@ codeunit 6610 "FS Int. Table Subscriber"
                         JobJournalLine."Journal Batch Name" := JobJournalBatch.Name;
                         LastJobJournalLine.SetRange("Journal Template Name", JobJournalTemplate.Name);
                         LastJobJournalLine.SetRange("Journal Batch Name", JobJournalBatch.Name);
-                        CheckPostingRuleAndSetDocumentNo(JobJournalLine, LastJobJournalLine, JobJournalBatch, SourceRecordRef);
+                        if LastJobJournalLine.FindLast() then begin
+                            JobJournalLine."Posting Date" := LastJobJournalLine."Posting Date";
+                            JobJournalLine."Document Date" := LastJobJournalLine."Posting Date";
+                            if JobsSetup."Document No. Is Job No." and (LastJobJournalLine."Document No." = '') then
+                                JobJournalLine."Document No." := JobJournalLine."Job No."
+                            else
+                                JobJournalLine."Document No." := LastJobJournalLine."Document No.";
+                        end else begin
+                            JobJournalLine."Posting Date" := WorkDate();
+                            JobJournalLine."Document Date" := WorkDate();
+                            if JobsSetup."Document No. Is Job No." then begin
+                                if JobJournalLine."Document No." = '' then
+                                    JobJournalLine."Document No." := JobJournalLine."Job No.";
+                            end else
+                                if JobJournalBatch."No. Series" <> '' then begin
+                                    Clear(NoSeries);
+                                    JobJournalLine."Document No." := NoSeries.GetNextNo(JobJournalBatch."No. Series", JobJournalLine."Posting Date");
+                                end;
+                        end;
                         JobJournalLine."Line No." := LastJobJournalLine."Line No." + 10000;
                         JobJournalLine."Source Code" := JobJournalTemplate."Source Code";
                         JobJournalLine."Reason Code" := JobJournalBatch."Reason Code";
@@ -664,85 +679,6 @@ codeunit 6610 "FS Int. Table Subscriber"
                         SetJobJournalLineTypesAndNo(FSConnectionSetup, SourceRecordRef, JobJournalLine);
                     end;
                     DestinationRecordRef.GetTable(JobJournalLine);
-                end;
-        end;
-    end;
-
-    local procedure CheckPostingRuleAndSetDocumentNo(var JobJournalLine: Record "Job Journal Line"; var LastJobJournalLine: Record "Job Journal Line"; JobJournalBatch: Record "Job Journal Batch"; var SourceRecordRef: RecordRef)
-    var
-        FSConnectionSetup: Record "FS Connection Setup";
-        FSWorkOrderProduct: Record "FS Work Order Product";
-        FSWorkOrderService: Record "FS Work Order Service";
-    begin
-        if JobJournalBatch."Posting No. Series" <> '' then begin
-            FSConnectionSetup.Get();
-            case FSConnectionSetup."Line Post Rule" of
-                "FS Work Order Line Post Rule"::LineUsed,
-                "FS Work Order Line Post Rule"::WorkOrderCompleted:
-                    case SourceRecordRef.Number of
-                        Database::"FS Work Order Product":
-                            begin
-                                SourceRecordRef.SetTable(FSWorkOrderProduct);
-                                if (FSWorkOrderProduct.LineStatus = FSWorkOrderProduct.LineStatus::Used)
-                                    or (FSWorkOrderProduct.WorkOrderStatus in [FSWorkOrderProduct.WorkOrderStatus::Completed]) then
-                                    SetPostingDocumentNo(JobJournalLine, LastJobJournalLine, JobJournalBatch);
-                            end;
-                        Database::"FS Work Order Service":
-                            begin
-                                SourceRecordRef.SetTable(FSWorkOrderService);
-                                if (FSWorkOrderService.LineStatus = FSWorkOrderService.LineStatus::Used)
-                                    or (FSWorkOrderService.WorkOrderStatus in [FSWorkOrderService.WorkOrderStatus::Completed]) then
-                                    SetPostingDocumentNo(JobJournalLine, LastJobJournalLine, JobJournalBatch);
-                            end;
-                    end;
-                else
-                    SetDocumentNo(JobJournalLine, LastJobJournalLine, JobJournalBatch);
-            end;
-        end else
-            SetDocumentNo(JobJournalLine, LastJobJournalLine, JobJournalBatch);
-    end;
-
-    local procedure SetPostingDocumentNo(var JobJournalLine: Record "Job Journal Line"; var LastJobJournalLine: Record "Job Journal Line"; JobJournalBatch: Record "Job Journal Batch")
-    var
-        NoSeries: Codeunit "No. Series";
-    begin
-        if LastJobJournalLine.FindLast() then begin
-            JobJournalLine."Posting Date" := LastJobJournalLine."Posting Date";
-            JobJournalLine."Document Date" := LastJobJournalLine."Posting Date";
-            if LastJobJournalLine."Document No." = NoSeries.GetLastNoUsed(JobJournalBatch."Posting No. Series") then
-                JobJournalLine."Document No." := LastJobJournalLine."Document No."
-            else
-                JobJournalLine."Document No." := NoSeries.GetNextNo(JobJournalBatch."Posting No. Series", JobJournalLine."Posting Date");
-        end else begin
-            JobJournalLine."Posting Date" := WorkDate();
-            JobJournalLine."Document Date" := WorkDate();
-            JobJournalLine."Document No." := NoSeries.GetNextNo(JobJournalBatch."Posting No. Series", JobJournalLine."Posting Date");
-        end;
-    end;
-
-    local procedure SetDocumentNo(var JobJournalLine: Record "Job Journal Line"; var LastJobJournalLine: Record "Job Journal Line"; JobJournalBatch: Record "Job Journal Batch")
-    var
-        JobsSetup: Record "Jobs Setup";
-        NoSeries: Codeunit "No. Series";
-    begin
-        JobsSetup.Get();
-        if LastJobJournalLine.FindLast() then begin
-            JobJournalLine."Posting Date" := LastJobJournalLine."Posting Date";
-            JobJournalLine."Document Date" := LastJobJournalLine."Posting Date";
-            if JobsSetup."Document No. Is Job No." and (LastJobJournalLine."Document No." = '') then
-                JobJournalLine."Document No." := JobJournalLine."Job No."
-            else
-                JobJournalLine."Document No." := LastJobJournalLine."Document No.";
-        end else begin
-            JobJournalLine."Posting Date" := WorkDate();
-            JobJournalLine."Document Date" := WorkDate();
-            if JobsSetup."Document No. Is Job No." then begin
-                if JobJournalLine."Document No." = '' then
-                    JobJournalLine."Document No." := JobJournalLine."Job No.";
-            end else
-                if JobJournalBatch."No. Series" <> '' then begin
-                    Clear(NoSeries);
-                    JobJournalLine."Document No." := NoSeries.GetNextNo(JobJournalBatch."No. Series", JobJournalLine."Posting Date");
                 end;
         end;
     end;
@@ -900,8 +836,6 @@ codeunit 6610 "FS Int. Table Subscriber"
         if not FSConnectionSetup.IsEnabled() then
             exit;
 
-        Codeunit.Run(Codeunit::"CRM Integration Management");
-
         JobUsageLink.SetRange("Entry No.", JobLedgerEntry."Entry No.");
         if not JobUsageLink.FindFirst() then begin
             Session.LogMessage('0000MN8', NoProjectUsageLinkTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
@@ -934,6 +868,7 @@ codeunit 6610 "FS Int. Table Subscriber"
             exit;
         if not FSWorkOrderService.WritePermission() then
             exit;
+        Codeunit.Run(Codeunit::"CRM Integration Management");
         if FSWorkOrderProduct.Get(CRMIntegrationRecord."CRM ID") then begin
             FSWorkOrderProduct.QuantityConsumed += JobPlanningLine.Quantity;
             if not TryModifyWorkOrderProduct(FSWorkOrderProduct) then begin
@@ -952,7 +887,7 @@ codeunit 6610 "FS Int. Table Subscriber"
                         if JobPlanningLine."Line Type" <> JobPlanningLine."Line Type"::Budget then
                             exit;
 
-            FSWorkOrderService.DurationConsumed += Round((60 * JobPlanningLine.Quantity), 1, '=');
+            FSWorkOrderService.DurationConsumed += (60 * JobPlanningLine.Quantity);
             if not TryModifyWorkOrderService(FSWorkOrderService) then begin
                 Session.LogMessage('0000MN0', UnableToModifyWOSTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
                 ClearLastError();
@@ -1010,10 +945,12 @@ codeunit 6610 "FS Int. Table Subscriber"
                         Error(CoupledToDeletedErr, FSWorkOrderProduct.FieldCaption(Product), Format(FSWorkOrderProduct.Product), Item.TableCaption());
 
                     JobJournalLine.Validate("Entry Type", JobJournalLine."Entry Type"::Usage);
-                    JobJournalLine.Validate("Line Type", JobJournalLine."Line Type"::Billable);
+                    if Item.Type = Item.Type::"Non-Inventory" then
+                        JobJournalLine.Validate("Line Type", JobJournalLine."Line Type"::" ")
+                    else
+                        JobJournalLine.Validate("Line Type", JobJournalLine."Line Type"::Billable);
                     // set Item, but for work order products we must keep its Business Central Unit Cost
                     JobJournalLine.Validate("No.", Item."No.");
-                    JobJournalLine.Validate(Description, CopyStr(FSWorkOrderProduct.Name, 1, MaxStrLen(JobJournalLine.Description)));
                     JobJournalLine.Validate("Unit Cost", Item."Unit Cost");
                     JobJournalLine.Validate(Quantity, FSQuantity - QuantityCurrentlyConsumed);
                     JobJournalLine.Validate("Unit Price", Item."Unit Price");
@@ -1184,6 +1121,7 @@ codeunit 6610 "FS Int. Table Subscriber"
     local procedure LogTelemetryOnAfterInitSynchJob(ConnectionType: TableConnectionType; IntegrationTableID: Integer)
     var
         FSConnectionSetup: Record "FS Connection Setup";
+        IntegrationTableMapping: Record "Integration Table Mapping";
         FeatureTelemetry: Codeunit "Feature Telemetry";
         IntegrationRecordRef: RecordRef;
         TelemetryCategories: Dictionary of [Text, Text];
@@ -1192,8 +1130,25 @@ codeunit 6610 "FS Int. Table Subscriber"
         if ConnectionType <> TableConnectionType::CRM then
             exit;
 
-        if not FSConnectionSetup.IsEnabled() then
+        if FSConnectionSetup.IsEnabled() then
             exit;
+
+        IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::Dataverse);
+        IntegrationTableMapping.SetRange("Delete After Synchronization", false);
+        IntegrationTableMapping.SetRange("Multi Company Synch. Enabled", true);
+        IntegrationTableMapping.SetRange("Table ID", IntegrationTableID);
+        if not IntegrationTableMapping.IsEmpty() then begin
+            FeatureTelemetry.LogUptake('0000LCO', 'Dataverse Multi-Company Synch', Enum::"Feature Uptake Status"::Used);
+            FeatureTelemetry.LogUsage('0000LCQ', 'Dataverse Multi-Company Synch', 'Entity sync');
+            Session.LogMessage('0000LCS', MultiCompanySyncEnabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
+        end;
+        IntegrationTableMapping.SetRange("Table ID");
+        IntegrationTableMapping.SetRange("Integration Table ID", IntegrationTableID);
+        if not IntegrationTableMapping.IsEmpty() then begin
+            FeatureTelemetry.LogUptake('0000LCP', 'Dataverse Multi-Company Synch', Enum::"Feature Uptake Status"::Used);
+            FeatureTelemetry.LogUsage('0000LCR', 'Dataverse Multi-Company Synch', 'Entity sync');
+            Session.LogMessage('0000LCT', MultiCompanySyncEnabledTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
+        end;
 
         TelemetryCategories.Add('Category', CategoryTok);
         TelemetryCategories.Add('IntegrationTableID', Format(IntegrationTableID));

@@ -8,6 +8,7 @@ using System;
 using System.AI;
 using System.Telemetry;
 using System.Environment;
+using System.Globalization;
 
 codeunit 7275 "Sales Lines Suggestions Impl."
 {
@@ -161,6 +162,20 @@ codeunit 7275 "Sales Lines Suggestions Impl."
         end;
 
         exit(CompletionAnswer);
+    end;
+
+    procedure CheckSupportedLanguages(): Boolean
+    var
+        LanguageSelection: Record "Language Selection";
+        UserSessionSettings: SessionSettings;
+    begin
+        UserSessionSettings.Init();
+        LanguageSelection.SetLoadFields("Language Tag");
+        LanguageSelection.SetRange("Language ID", UserSessionSettings.LanguageId());
+        if LanguageSelection.FindFirst() then
+            if LanguageSelection."Language Tag".StartsWith('pt-') then
+                exit(false);
+        exit(true);
     end;
 
     procedure RegisterCapability()
