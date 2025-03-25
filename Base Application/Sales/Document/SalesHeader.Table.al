@@ -315,9 +315,6 @@ table 36 "Sales Header"
 
                 if xRec."Bill-to Customer No." <> "Bill-to Customer No." then
                     SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
-
-                if Rec."Sell-to Customer No." <> Rec."Bill-to Customer No." then
-                    UpdateShipToSalespersonCode();
             end;
         }
         field(5; "Bill-to Name"; Text[100])
@@ -3053,7 +3050,11 @@ table 36 "Sales Header"
         SalesLine.Reset();
         SalesLine.LockTable();
 
-        DeleteWarehouseRequest();
+        WhseRequest.SetRange("Source Type", DATABASE::"Sales Line");
+        WhseRequest.SetRange("Source Subtype", "Document Type");
+        WhseRequest.SetRange("Source No.", "No.");
+        if not WhseRequest.IsEmpty() then
+            WhseRequest.DeleteAll(true);
 
         DeleteAllSalesLines();
 
@@ -4774,13 +4775,10 @@ table 36 "Sales Header"
             "Sell-to County" := Cont.County;
             "Sell-to Country/Region Code" := Cont."Country/Region Code";
         end;
-        Clear(IsHandled);
-        OnUpdateSellToCustOnBeforeValidateBillToContactNo(Rec, IsHandled);
-        if not IsHandled then
-            if ("Sell-to Customer No." = "Bill-to Customer No.") or
-               ("Bill-to Customer No." = '')
-            then
-                Validate("Bill-to Contact No.", "Sell-to Contact No.");
+        if ("Sell-to Customer No." = "Bill-to Customer No.") or
+           ("Bill-to Customer No." = '')
+        then
+            Validate("Bill-to Contact No.", "Sell-to Contact No.");
 
         OnAfterUpdateSellToCust(Rec, Cont);
     end;
@@ -5603,20 +5601,8 @@ table 36 "Sales Header"
         IsSuccess := CODEUNIT.Run(PostingCodeunitID, Rec);
 
         OnSendToPostingOnAfterPost(Rec);
-        if not IsSuccess then begin
-            if Rec.Status <> Rec.Status::Released then
-                DeleteWarehouseRequest();
+        if not IsSuccess then
             ErrorMessageHandler.ShowErrors();
-        end;
-    end;
-
-    local procedure DeleteWarehouseRequest()
-    begin
-        WhseRequest.SetRange("Source Type", DATABASE::"Sales Line");
-        WhseRequest.SetRange("Source Subtype", "Document Type");
-        WhseRequest.SetRange("Source No.", "No.");
-        if not WhseRequest.IsEmpty() then
-            WhseRequest.DeleteAll(true);
     end;
 
     procedure CancelBackgroundPosting()
@@ -7473,7 +7459,6 @@ table 36 "Sales Header"
     procedure UpdateShipToSalespersonCode()
     var
         ShipToAddress: Record "Ship-to Address";
-        SalespersonCode: Code[20];
         IsHandled: Boolean;
         IsSalesPersonCodeAssigned: Boolean;
     begin
@@ -7486,8 +7471,7 @@ table 36 "Sales Header"
             ShipToAddress.SetLoadFields("Salesperson Code");
             ShipToAddress.Get("Sell-to Customer No.", "Ship-to Code");
             if ShipToAddress."Salesperson Code" <> '' then begin
-                SetSalespersonCode(ShipToAddress."Salesperson Code", SalespersonCode);
-                Validate("Salesperson Code", SalespersonCode);
+                SetSalespersonCode(ShipToAddress."Salesperson Code", "Salesperson Code");
                 IsSalesPersonCodeAssigned := true;
             end;
         end;
@@ -7498,10 +7482,7 @@ table 36 "Sales Header"
             if not IsHandled then
                 if ("Bill-to Customer No." <> '') then begin
                     GetCust("Bill-to Customer No.");
-                    SetSalespersonCode(Customer."Salesperson Code", SalespersonCode);
-                    Validate("Salesperson Code", SalespersonCode);
-                    if Rec."Sell-to Customer No." <> '' then
-                        GetCust(Rec."Sell-to Customer No.");
+                    SetSalespersonCode(Customer."Salesperson Code", "Salesperson Code");
                 end else
                     SetDefaultSalesperson();
         end;
@@ -8145,17 +8126,20 @@ table 36 "Sales Header"
         QtyReservedFromStock: Decimal;
     begin
         QtyReservedFromStock := SalesLineReserve.GetReservedQtyFromInventory(Rec);
-        if QtyReservedFromStock = 0 then
-            exit(Result::None);
 
         SalesLineLocal.SetRange("Document Type", "Document Type");
         SalesLineLocal.SetRange("Document No.", "No.");
         SalesLineLocal.SetRange(Type, SalesLineLocal.Type::Item);
         SalesLineLocal.CalcSums("Outstanding Qty. (Base)");
 
-        if QtyReservedFromStock = SalesLineLocal."Outstanding Qty. (Base)" then
-            exit(Result::Full);
-        exit(Result::Partial);
+        case QtyReservedFromStock of
+            0:
+                exit(Result::None);
+            SalesLineLocal."Outstanding Qty. (Base)":
+                exit(Result::Full);
+            else
+                exit(Result::Partial);
+        end;
     end;
 
     local procedure UpdateVATReportingDate(CalledByFieldNo: Integer)
@@ -9924,7 +9908,7 @@ table 36 "Sales Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateSalesLineOnBeforeAssignType(var SalesLine: Record "Sales Line"; TempSalesLine: Record "Sales Line" temporary; var SalesHeader: Record "Sales Header")
+    local procedure OnCreateSalesLineOnBeforeAssignType(var SalesLine: Record "Sales Line"; TempSalesLine: Record "Sales Line" temporary; SalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -10020,11 +10004,6 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSendToPosting(var SalesHeader: Record "Sales Header"; var IsSuccess: Boolean; var IsHandled: Boolean; PostingCodeunitID: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateSellToCustOnBeforeValidateBillToContactNo(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 }
