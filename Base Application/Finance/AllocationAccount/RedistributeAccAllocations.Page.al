@@ -214,12 +214,12 @@ page 2678 "Redistribute Acc. Allocations"
         exit(true);
     end;
 
-    procedure SetParentSystemId(NewParentSystemId: Guid)
+    internal procedure SetParentSystemId(NewParentSystemId: Guid)
     begin
         ParentSystemId := NewParentSystemId;
     end;
 
-    procedure SetParentTableId(NewParentTableId: Integer)
+    internal procedure SetParentTableId(NewParentTableId: Integer)
     begin
         ParentTableId := NewParentTableId;
     end;
