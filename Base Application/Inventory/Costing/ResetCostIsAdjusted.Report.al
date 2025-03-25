@@ -1,6 +1,6 @@
 namespace Microsoft.Inventory.Costing;
 
-using Microsoft.Assembly.History;
+using Microsoft.Assembly.Document;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Manufacturing.Document;
@@ -94,7 +94,7 @@ report 5803 "Reset Cost Is Adjusted"
                 end;
                 if ResetAssemblyOrderCosting then begin
                     InventoryAdjmtEntryOrder.SetRange("Order Type", InventoryAdjmtEntryOrder."Order Type"::Assembly);
-                    InventoryAdjmtEntryOrder.SetFilter("Order No.", PostedAssemblyOrderNo);
+                    InventoryAdjmtEntryOrder.SetFilter("Order No.", AssemblyOrderNo);
                     InventoryAdjmtEntryOrder.ModifyAll("Cost is Adjusted", false);
                 end;
             end;
@@ -128,16 +128,14 @@ report 5803 "Reset Cost Is Adjusted"
 
                     field("Reset Prod. Order Costing"; ResetProdOrderCosting)
                     {
-                        ApplicationArea = Manufacturing;
                         Caption = 'Adjust Production Orders';
                         ToolTip = 'Specifies if you want to mark production orders for the next cost adjustment run.';
                     }
                     field("Prod. Order No."; ProdOrderNo)
                     {
-                        ApplicationArea = Manufacturing;
                         Caption = 'No.';
                         ToolTip = 'Specifies a filter to run the Adjust Cost - Item Entries batch job for only certain production orders. You can leave this field blank to run the batch job for all production orders.';
-                        TableRelation = "Production Order"."No.";
+                        TableRelation = "Production Order";
                     }
                 }
                 group(AssemblyOrder)
@@ -146,16 +144,14 @@ report 5803 "Reset Cost Is Adjusted"
 
                     field("Reset Assembly Order Costing"; ResetAssemblyOrderCosting)
                     {
-                        ApplicationArea = Assembly;
                         Caption = 'Adjust Assembly Orders';
                         ToolTip = 'Specifies if you want to mark assembly orders for the next cost adjustment run.';
                     }
-                    field("Assembly Order No."; PostedAssemblyOrderNo)
+                    field("Assembly Order No."; AssemblyOrderNo)
                     {
-                        ApplicationArea = Assembly;
                         Caption = 'No.';
-                        ToolTip = 'Specifies a filter to run the Adjust Cost - Item Entries batch job for only certain posted assembly orders. You can leave this field blank to run the batch job for all posted assembly orders.';
-                        TableRelation = "Posted Assembly Header"."No.";
+                        ToolTip = 'Specifies a filter to run the Adjust Cost - Item Entries batch job for only certain assembly orders. You can leave this field blank to run the batch job for all assembly orders.';
+                        TableRelation = "Assembly Header" where("Document Type" = const(Order));
                     }
                 }
             }
@@ -179,7 +175,7 @@ report 5803 "Reset Cost Is Adjusted"
             if not Confirm(NoProdOrderFilterQst) then
                 CurrReport.Quit();
 
-        if ResetAssemblyOrderCosting and (PostedAssemblyOrderNo = '') then
+        if ResetAssemblyOrderCosting and (AssemblyOrderNo = '') then
             if not Confirm(NoAssemblyHeaderFilterQst) then
                 CurrReport.Quit();
 
@@ -207,7 +203,7 @@ report 5803 "Reset Cost Is Adjusted"
         FeatureTelemetry: Codeunit "Feature Telemetry";
         Window: Dialog;
         ProdOrderNo: Code[50];
-        PostedAssemblyOrderNo: Code[50];
+        AssemblyOrderNo: Code[50];
         FromDate: Date;
         ResetItemCosting: Boolean;
         ResetProdOrderCosting: Boolean;
