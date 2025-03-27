@@ -866,7 +866,8 @@ page 5964 "Service Quote"
                 trigger OnAction()
                 begin
                     CurrPage.Update();
-                    Codeunit.Run(Codeunit::"Serv-Quote to Order (Yes/No)", Rec);
+                    CODEUNIT.Run(CODEUNIT::"Serv-Quote to Order (Yes/No)", Rec);
+                    CurrPage.Update();
                 end;
             }
             action("&Print")
@@ -965,11 +966,6 @@ page 5964 "Service Quote"
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    begin
-        ActivateFields();
-    end;
-
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SaveRecord();
@@ -995,6 +991,8 @@ page 5964 "Service Quote"
     trigger OnOpenPage()
     begin
         Rec.SetSecurityFilterOnRespCenter();
+
+        ActivateFields();
         SetDocNoVisible();
     end;
 
