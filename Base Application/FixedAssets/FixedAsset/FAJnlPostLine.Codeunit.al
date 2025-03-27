@@ -4,6 +4,7 @@ using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
@@ -34,6 +35,7 @@ codeunit 5632 "FA Jnl.-Post Line"
         CalculateAcqCostDepr: Codeunit "Calculate Acq. Cost Depr.";
         MakeFALedgEntry: Codeunit "Make FA Ledger Entry";
         MakeMaintenanceLedgEntry: Codeunit "Make Maintenance Ledger Entry";
+        NonDeductibleVAT: Codeunit "Non-Deductible VAT";
         FANo: Code[20];
         BudgetNo: Code[20];
         DeprBookCode: Code[10];
@@ -352,6 +354,8 @@ codeunit 5632 "FA Jnl.-Post Line"
         OnBeforePostDeprUntilDate(FALedgEntry, FAPostingDate, Type, IsHandled);
         if IsHandled then
             exit;
+        if NonDeductibleVAT.IsNonDedFALedgEntryInFirstAcquisition(FALedgEntry) then
+            exit;
         FALedgEntry."Automatic Entry" := true;
         FALedgEntry."FA No./Budgeted FA No." := '';
         FALedgEntry."FA Posting Category" := FALedgEntry."FA Posting Category"::" ";
@@ -557,6 +561,7 @@ codeunit 5632 "FA Jnl.-Post Line"
         FADeprBook."FA No." := FALedgEntry."FA No.";
         FADeprBook."Depreciation Book Code" := FALedgEntry."Depreciation Book Code";
         FADeprBook.CalcFields("Gain/Loss");
+        OnSetResultOnDisposalOnAfterCalcGainLoss(FADeprBook);
         if FADeprBook."Gain/Loss" <= 0 then
             FALedgEntry."Result on Disposal" := FALedgEntry."Result on Disposal"::Gain
         else
@@ -571,6 +576,7 @@ codeunit 5632 "FA Jnl.-Post Line"
         FADeprBook."FA No." := FANo;
         FADeprBook."Depreciation Book Code" := DeprBookCode;
         FADeprBook.CalcFields("Gain/Loss");
+        OnCalcResultOnDisposalOnAfterCalcGainLoss(FADeprBook);
         if FADeprBook."Gain/Loss" <= 0 then
             exit(FALedgEntry."Result on Disposal"::Gain);
 
@@ -740,6 +746,16 @@ codeunit 5632 "FA Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostDisposalEntryOnAfterPostDisposalType(var FAInsertLedgerEntry: Codeunit "FA Insert Ledger Entry"; var FALedgerEntry: Record "FA Ledger Entry"; DisposalType: Option; EntryAmounts: array[14] of Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetResultOnDisposalOnAfterCalcGainLoss(var FADepreciationBook: Record "FA Depreciation Book")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcResultOnDisposalOnAfterCalcGainLoss(var FADepreciationBook: Record "FA Depreciation Book")
     begin
     end;
 }

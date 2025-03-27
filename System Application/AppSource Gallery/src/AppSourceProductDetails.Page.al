@@ -14,7 +14,7 @@ page 2516 "AppSource Product Details"
     PageType = Card;
     ApplicationArea = All;
     Editable = false;
-    Caption = 'App Overview';
+    Caption = 'App overview';
     DataCaptionExpression = AppSourceJsonUtilities.GetStringValue(ProductObject, 'displayName');
 
     InherentEntitlements = X;
@@ -65,6 +65,7 @@ page 2516 "AppSource Product Details"
                 {
                     Caption = 'Last Modified Date Time';
                     ToolTip = 'Specifies the date the offer was last updated.';
+                    Visible = false;
                 }
             }
             group(DescriptionGroup)
@@ -155,10 +156,10 @@ page 2516 "AppSource Product Details"
         {
             action(OpenInAppSource)
             {
-                Caption = 'View in AppSource';
+                Caption = 'View on AppSource';
                 Scope = Page;
-                Image = Open;
-                ToolTip = 'Opens the app offer in the AppSource marketplace.';
+                Image = Info;
+                ToolTip = 'Opens the app on AppSource.';
 
                 trigger OnAction()
                 begin
@@ -179,18 +180,19 @@ page 2516 "AppSource Product Details"
                 var
                     ExtensionManagement: Codeunit "Extension Management";
                 begin
-                    if (PlansAreVisible) then
+                    if PlansAreVisible then
                         if not Confirm(PurchaseLicensesElsewhereLbl) then
                             exit;
+
                     ExtensionManagement.InstallMarketplaceExtension(AppID);
                 end;
             }
 
             action(InstallFromAppSource)
             {
-                Caption = 'Install From AppSource';
+                Caption = 'Install from AppSource';
                 Scope = Page;
-                Image = Insert;
+                Image = Download;
                 ToolTip = 'Installs the app from Microsoft AppSource.';
                 Enabled = (not CurrentRecordCanBeUninstalled) and (not CurrentRecordCanBeInstalled);
                 Visible = (not CurrentRecordCanBeUninstalled) and (not CurrentRecordCanBeInstalled);
@@ -304,7 +306,7 @@ page 2516 "AppSource Product Details"
             PlansOverview := '';
         end;
 
-        CurrentRecordCanBeInstalled := (AppID <> '') and (not CurrentRecordCanBeUninstalled) and AppSourceProductManager.CanInstallProductWithPlans(AllPlans);
+        CurrentRecordCanBeInstalled := (AppID <> '') and (not CurrentRecordCanBeUninstalled) and AppSourceProductManager.CanInstallProductWithPlans(UniqueProductID);
     end;
 
     local procedure BuildPlanPriceText(Availabilities: JsonArray; var MonthlyPriceText: Text; var YearlyPriceText: Text): Boolean
