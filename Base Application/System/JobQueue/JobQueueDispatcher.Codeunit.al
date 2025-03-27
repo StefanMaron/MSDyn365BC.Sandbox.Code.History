@@ -16,10 +16,10 @@ codeunit 448 "Job Queue Dispatcher"
         if Skip then
             exit;
 
+        Rec.ReadIsolation(IsolationLevel::UpdLock);
+        Rec.Get(Rec.ID);
         if not Rec.IsReadyToStart() then
             exit;
-
-        Rec.RefreshLocked();
 
         if Rec.IsExpired(CurrentDateTime) then
             Rec.DeleteTask()
@@ -356,11 +356,10 @@ codeunit 448 "Job Queue Dispatcher"
         RunCrossMidnight := (JobQueueEntry."Ending Time" <> 0T) and (JobQueueEntry."Starting Time" > JobQueueEntry."Ending Time");
         if RunCrossMidnight and (NewRunTime < JobQueueEntry."Starting Time") and (NewRunTime > JobQueueEntry."Ending Time") or
            not RunCrossMidnight and (JobQueueEntry."Ending Time" <> 0T) and (NewRunTime > JobQueueEntry."Ending Time")  // e.g. when 08:00 - 16:00
-        then
+        then begin
             NewRunDateTime := JobQueueEntry.GetStartingDateTime(NewRunDateTime);
-
-        if not RunCrossMidnight and (JobQueueEntry."Ending Time" <> 0T) and (NewRunTime > JobQueueEntry."Ending Time") then
             NoOfDays := NoOfDays + 1;
+        end;
 
         StartingWeekDay := Date2DWY(DT2Date(StartingDateTime), 1);
         Found := RunOnDate[(StartingWeekDay - 1 + NoOfDays) mod 7 + 1];
@@ -372,9 +371,7 @@ codeunit 448 "Job Queue Dispatcher"
             Found := RunOnDate[(StartingWeekDay - 1 + NoOfDays) mod 7 + 1];
         end;
 
-        if not RunCrossMidnight and (JobQueueEntry."Starting Time" <> 0T) and (NewRunDateTime < JobQueueEntry.GetStartingDateTime(NewRunDateTime)) or
-            RunCrossMidnight and (NewRunDateTime > JobQueueEntry.GetEndingDateTime(NewRunDateTime))
-        then
+        if (JobQueueEntry."Starting Time" <> 0T) and (NewRunDateTime < JobQueueEntry.GetStartingDateTime(NewRunDateTime)) then
             NewRunDateTime := JobQueueEntry.GetStartingDateTime(NewRunDateTime);
 
         if (NoOfDays > 0) and (NewRunDateTime > JobQueueEntry.GetStartingDateTime(NewRunDateTime)) then
@@ -383,7 +380,7 @@ codeunit 448 "Job Queue Dispatcher"
         if (JobQueueEntry."Starting Time" = 0T) and (NoOfExtraDays > 0) and (JobQueueEntry."No. of Minutes between Runs" <> 0) then
             NewRunDateTime := CreateDateTime(DT2Date(NewRunDateTime), 0T);
 
-        if Found and (NoOfDays > 0) then
+        if Found then
             NewRunDateTime := CreateDateTime(DT2Date(NewRunDateTime) + NoOfDays, DT2Time(NewRunDateTime));
 
         OnAfterCalcRunTimeForRecurringJob(JobQueueEntry, Found, StartingDateTime, NewRunDateTime);
