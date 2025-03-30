@@ -319,19 +319,13 @@ codeunit 5348 "CRM Quote to Sales Quote"
         SalesLine.InsertFreightLine(CRMQuote.FreightAmount);
     end;
 
-    procedure GetCoupledCustomer(CRMQuote: Record "CRM Quote"; var Customer: Record Customer) Result: Boolean
+    procedure GetCoupledCustomer(CRMQuote: Record "CRM Quote"; var Customer: Record Customer): Boolean
     var
         CRMAccount: Record "CRM Account";
         CRMIntegrationRecord: Record "CRM Integration Record";
         NAVCustomerRecordId: RecordID;
         CRMAccountId: Guid;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeGetCoupledCustomer(CRMQuote, Customer, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         if IsNullGuid(CRMQuote.CustomerId) then
             Error(NoCustomerErr, CannotCreateSalesQuoteInNAVTxt, CRMQuote.Description, CRMProductName.CDSServiceName());
 
@@ -710,11 +704,6 @@ codeunit 5348 "CRM Quote to Sales Quote"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFindOrderSalesHeader(var OrderSalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetCoupledCustomer(CRMQuote: Record "CRM Quote"; var Customer: Record Customer; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
