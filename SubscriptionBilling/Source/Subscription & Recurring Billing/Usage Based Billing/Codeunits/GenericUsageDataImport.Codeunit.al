@@ -1,6 +1,7 @@
 namespace Microsoft.SubscriptionBilling;
 
 using System.IO;
+using Microsoft.Inventory.Item.Catalog;
 
 codeunit 8025 "Generic Usage Data Import"
 {
@@ -98,6 +99,7 @@ codeunit 8025 "Generic Usage Data Import"
                     ErrorCount += 1
                 else
                     UsageDataGenericImport."Processing Status" := Enum::"Processing Status"::Ok;
+                UpdateServiceObjectConnectionStatus(UsageDataImport, UsageDataGenericImport);
                 UsageDataGenericImport.Modify(false);
             until UsageDataGenericImport.Next() = 0
         else begin
@@ -130,10 +132,16 @@ codeunit 8025 "Generic Usage Data Import"
     local procedure CreateUsageDataSubscription(UsageDataGenericImport: Record "Usage Data Generic Import"; UsageDataSupplierReference: Record "Usage Data Supplier Reference"; SupplierNo: Code[20])
     var
         UsageDataSubscription: Record "Usage Data Subscription";
+        UsageDataCustomer: Record "Usage Data Customer";
     begin
-        UsageDataSubscription.SetRange("Supplier No.", SupplierNo);
-        UsageDataSubscription.SetRange("Supplier Reference", UsageDataGenericImport."Subscription ID");
-        if UsageDataSubscription.IsEmpty() then begin
+        if UsageDataSubscription.FindForSupplierReference(SupplierNo, UsageDataGenericImport."Subscription ID") then begin
+            UsageDataCustomer.SetRange("Supplier No.", SupplierNo);
+            UsageDataCustomer.SetRange("Supplier Reference", UsageDataGenericImport."Customer ID");
+            if UsageDataCustomer.FindFirst() then begin
+                UsageDataSubscription.Validate("Customer No.", UsageDataCustomer."Customer No.");
+                UsageDataSubscription.Modify(true);
+            end;
+        end else begin
             UsageDataSubscription.Init();
             UsageDataSubscription."Entry No." := 0;
             UsageDataSubscription.Validate("Supplier No.", SupplierNo);
@@ -204,6 +212,35 @@ codeunit 8025 "Generic Usage Data Import"
             end else
                 UsageDataGenericImport."Service Object No." := ServiceCommitment."Service Object No.";
         end;
+    end;
+
+    local procedure UpdateServiceObjectConnectionStatus(var UsageDataImport: Record "Usage Data Import"; var UsageDataGenericImport: Record "Usage Data Generic Import")
+    var
+        UsageDataSubscription: Record "Usage Data Subscription";
+        UsageDataSupplier: Record "Usage Data Supplier";
+        UsageDataSupplierReference: Record "Usage Data Supplier Reference";
+        ItemReference: Record "Item Reference";
+    begin
+        UsageDataGenericImport."Service Object Availability" := UsageDataGenericImport."Service Object Availability"::"Not Available";
+
+        if UsageDataGenericImport."Service Object No." <> '' then begin
+            UsageDataGenericImport."Service Object Availability" := UsageDataGenericImport."Service Object Availability"::Connected;
+            exit;
+        end;
+
+        if not UsageDataSupplier.Get(UsageDataImport."Supplier No.") then
+            exit;
+
+        if not UsageDataSubscription.FindForSupplierReference(UsageDataImport."Supplier No.", UsageDataGenericImport."Subscription ID") then
+            exit;
+
+        if not UsageDataSupplierReference.FindSupplierReference(UsageDataImport."Supplier No.", UsageDataSubscription."Product ID", Enum::"Usage Data Reference Type"::Product) then
+            exit;
+
+        if not ItemReference.FindForVendorAndSupplierReference(UsageDataSupplier."Vendor No.", UsageDataSupplierReference."Entry No.") then
+            exit;
+
+        UsageDataGenericImport."Service Object Availability" := UsageDataGenericImport."Service Object Availability"::Available;
     end;
 
     local procedure SetErrorIfServiceCommitmentDoesNotExist(var UsageDataGenericImport: Record "Usage Data Generic Import"; ServiceCommitment: Record "Service Commitment")
