@@ -42,7 +42,6 @@ codeunit 1690 "Bank Deposit-Post"
         PostingDate: Date;
         DocumentType: Enum "Gen. Journal Document Type";
         TotalAmountLCY: Decimal;
-        ShowDialog: Boolean;
     begin
         FeatureTelemetry.LogUptake('0000IG4', 'Bank Deposit', Enum::"Feature Uptake Status"::Used);
         FeatureTelemetry.LogUsage('0000IG5', 'Bank Deposit', 'Bank deposit posted');
@@ -138,11 +137,9 @@ codeunit 1690 "Bank Deposit-Post"
 
         UpdateAnalysisView.UpdateAll(0, true);
 
-        ShowDialog := true;
-        OnAfterBankDepositPost(Rec, PostedBankDepositHeader, ShowDialog);
+        OnAfterBankDepositPost(Rec, PostedBankDepositHeader);
 
-        if ShowDialog then
-            Page.Run(Page::"Posted Bank Deposit", PostedBankDepositHeader);
+        Page.Run(Page::"Posted Bank Deposit", PostedBankDepositHeader);
     end;
 
     local procedure InsertLumpSumGenJournalLine(BankDepositHeader: Record "Bank Deposit Header"; DocumentType: Enum "Gen. Journal Document Type"; DocumentDate: Date; TotalAmountLCY: Decimal)
@@ -405,13 +402,7 @@ codeunit 1690 "Bank Deposit-Post"
         BankAccCommentLine: Record "Bank Acc. Comment Line";
         PostedBankDepositHeaderLocal: Record "Posted Bank Deposit Header";
         PostedBankDepositLine: Record "Posted Bank Deposit Line";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCleanPostedBankDepositHeaderAndLines(BankDepositNo, IsHandled);
-        if IsHandled then
-            exit;
-
         PostedBankDepositLine.SetRange("Bank Deposit No.", BankDepositNo);
         PostedBankDepositLine.DeleteAll();
         if not PostedBankDepositHeaderLocal.Get(BankDepositNo) then
@@ -506,7 +497,7 @@ codeunit 1690 "Bank Deposit-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterBankDepositPost(BankDepositHeader: Record "Bank Deposit Header"; var PostedBankDepositHeader: Record "Posted Bank Deposit Header"; var ShowDialog: Boolean)
+    local procedure OnAfterBankDepositPost(BankDepositHeader: Record "Bank Deposit Header"; var PostedBankDepositHeader: Record "Posted Bank Deposit Header")
     begin
     end;
 
@@ -555,11 +546,6 @@ codeunit 1690 "Bank Deposit-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnBeforeGenJournalLineDeleteAll(var BankDepositHeader: Record "Bank Deposit Header"; var PostedBankDepositLine: Record "Posted Bank Deposit Line"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCleanPostedBankDepositHeaderAndLines(var BankDepositNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
 }

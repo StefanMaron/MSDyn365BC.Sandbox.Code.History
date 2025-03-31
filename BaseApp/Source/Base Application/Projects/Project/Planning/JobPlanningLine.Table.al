@@ -7,7 +7,6 @@ using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
-using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.UOM;
@@ -2002,7 +2001,7 @@ table 1003 "Job Planning Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateAllAmounts(Rec, xRec, IsHandled, CurrFieldNo);
+        OnBeforeUpdateAllAmounts(Rec, xRec, IsHandled);
         if IsHandled then
             exit;
 
@@ -2038,8 +2037,7 @@ table 1003 "Job Planning Line"
                         "Unit Cost (LCY)" := Round(SKU."Unit Cost" * "Qty. per Unit of Measure", UnitAmountRoundingPrecision)
                     else
                         "Unit Cost (LCY)" := Round(Item."Unit Cost" * "Qty. per Unit of Measure", UnitAmountRoundingPrecision);
-                    if not (CurrFieldNo = FieldNo("Unit Price")) then
-                        "Unit Cost" := ConvertAmountToFCY("Unit Cost (LCY)", UnitAmountRoundingPrecisionFCY);
+                    "Unit Cost" := ConvertAmountToFCY("Unit Cost (LCY)", UnitAmountRoundingPrecisionFCY);
                 end else
                     RecalculateAmounts(Job."Exch. Calculation (Cost)", xRec."Unit Cost", "Unit Cost", "Unit Cost (LCY)")
             else
@@ -2054,18 +2052,11 @@ table 1003 "Job Planning Line"
     end;
 
     local procedure CalculateRetrievedCost(var RetrievedCost: Decimal)
-    var
-        FullyInvoiced: Boolean;
     begin
-        CalcFields("Qty. Invoiced", "Invoiced Cost Amount (LCY)");
-        FullyInvoiced := (Quantity = "Qty. Invoiced") and ("Qty. Invoiced" <> 0);
-        if FullyInvoiced then
-            RetrievedCost := "Invoiced Cost Amount (LCY)" / "Qty. Invoiced"
+        if GetSKU() then
+            RetrievedCost := SKU."Unit Cost" * Rec."Qty. per Unit of Measure"
         else
-            if GetSKU() then
-                RetrievedCost := SKU."Unit Cost" * Rec."Qty. per Unit of Measure"
-            else
-                RetrievedCost := Item."Unit Cost" * Rec."Qty. per Unit of Measure";
+            RetrievedCost := Item."Unit Cost" * Rec."Qty. per Unit of Measure";
         OnAfterCalculateRetrievedCost(Rec, xRec, SKU, Item, RetrievedCost);
     end;
 
@@ -3238,16 +3229,11 @@ table 1003 "Job Planning Line"
     end;
 
     local procedure AddItem(var NewJobPlanningLine: Record "Job Planning Line"; ItemNo: Code[20])
-    var
-        TransferExtendedText: Codeunit "Transfer Extended Text";
     begin
         NewJobPlanningLine."Line No." += 10000;
         NewJobPlanningLine.Validate(Type, NewJobPlanningLine.Type::Item);
         NewJobPlanningLine.Validate("No.", ItemNo);
         NewJobPlanningLine.Insert(true);
-
-        if TransferExtendedText.JobCheckIfAnyExtText(NewJobPlanningLine, false) then
-            TransferExtendedText.InsertJobExtText(NewJobPlanningLine);
     end;
 
     local procedure InitNewLine(var NewJobPlanningLine: Record "Job Planning Line")
@@ -3606,7 +3592,7 @@ table 1003 "Job Planning Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateAllAmounts(var JobPlanningLine: Record "Job Planning Line"; var xJobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean; CurrFieldNo: Integer)
+    local procedure OnBeforeUpdateAllAmounts(var JobPlanningLine: Record "Job Planning Line"; var xJobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean)
     begin
     end;
 

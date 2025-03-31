@@ -5,8 +5,7 @@
 
 namespace System.Email;
 
-
-codeunit 4503 "Microsoft 365 Connector" implements "Default Email Rate Limit", "Email Connector v3"
+codeunit 4503 "Microsoft 365 Connector" implements "Default Email Rate Limit", "Email Connector v2"
 {
     Access = Internal;
     Permissions = tabledata "Email - Outlook Account" = r;
@@ -22,9 +21,9 @@ codeunit 4503 "Microsoft 365 Connector" implements "Default Email Rate Limit", "
         EmailOutlookAPIHelper.Send(EmailMessage, AccountId);
     end;
 
-    procedure RetrieveEmails(AccountId: Guid; var EmailInbox: Record "Email Inbox"; var Filters: Record "Email Retrieval Filters" temporary)
+    procedure RetrieveEmails(AccountId: Guid; var EmailInbox: Record "Email Inbox")
     begin
-        EmailOutlookAPIHelper.RetrieveEmails(AccountId, EmailInbox, Filters);
+        EmailOutlookAPIHelper.RetrieveEmails(AccountId, true, EmailInbox);
     end;
 
     procedure Reply(var EmailMessage: Codeunit "Email Message"; AccountId: Guid)

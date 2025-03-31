@@ -22,7 +22,7 @@ page 37020 "Purch. Actual vs. Budget Qty."
 
                 trigger ControlAddInReady()
                 begin
-                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
+                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageTok);
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
@@ -57,7 +57,7 @@ page 37020 "Purch. Actual vs. Budget Qty."
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageLbl: Label 'ReportSection0cb7f30495bc871b8948', Locked = true;
+        ReportPageTok: Label 'ReportSection0cb7f30495bc871b8948', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()
