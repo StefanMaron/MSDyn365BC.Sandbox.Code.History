@@ -62,18 +62,18 @@ codeunit 119300 "Create Time Series Data"
         ItemSalesFile.Open(Filename);
         ItemSalesFile.CreateInStream(InStr);
         TempXMLBufferSales.Load(InStr);
-        Evaluate(MaxNumberOfInvoices, TempXMLBufferSales.GetAttributeValue('MaxNumberOfInvoicesPerPeriod'));
-        Evaluate(Periods, TempXMLBufferSales.GetAttributeValue('Periods'));
+        Evaluate(MaxNumberOfInvoices, TempXMLBufferSales.GetAttributeValueAsText('MaxNumberOfInvoicesPerPeriod'));
+        Evaluate(Periods, TempXMLBufferSales.GetAttributeValueAsText('Periods'));
         TempXMLBufferSales.FindChildElements(TempXMLBufferSales);
         if TempXMLBufferSales.FindSet() then
             repeat
                 TempXMLBufferSales.FindChildElements(TempXMLBufferPeriods);
-                ItemNo := CopyStr(TempXMLBufferSales.GetAttributeValue('item'), 1, MaxStrLen(ItemNo));
-                Evaluate(ScaleToAverageQuantity, TempXMLBufferSales.GetAttributeValue('ScaleToAverageQuantity'));
+                ItemNo := CopyStr(TempXMLBufferSales.GetAttributeValueAsText('item'), 1, MaxStrLen(ItemNo));
+                Evaluate(ScaleToAverageQuantity, TempXMLBufferSales.GetAttributeValueAsText('ScaleToAverageQuantity'));
                 Period := 1;
                 if TempXMLBufferPeriods.FindSet() then
                     repeat
-                        Evaluate(Quantity, TempXMLBufferPeriods.GetAttributeValue('OriginalQuantity'));
+                        Evaluate(Quantity, TempXMLBufferPeriods.GetAttributeValueAsText('OriginalQuantity'));
                         ItemSalesData.Validate("Item No.", ItemNo);
                         ItemSalesData.Validate(Quantity, Quantity);
                         ItemSalesData.Validate(Period, Period);
