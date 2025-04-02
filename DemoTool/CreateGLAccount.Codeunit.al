@@ -1348,7 +1348,7 @@ codeunit 101015 "Create G/L Account"
             GLAccount.Validate("Direct Posting", DirectPosting);
             GLAccount."Tax Group Code" := XNONTAXABLE;
         end;
-        GLAccount.Validate("Income/Balance", IncomeBalance);
+        GLAccount.Validate("Income/Balance", "G/L Account Report Type".FromInteger(IncomeBalance));
         case AccountNo of
             '992910', '992920', '992930', '992940', '995310',
           '10100', '10200', '10300', '10400', '20100', PettyCash():

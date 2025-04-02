@@ -20,6 +20,7 @@ codeunit 139094 "Local Performance Tests"
         LibrarySales: Codeunit "Library - Sales";
         LibraryService: Codeunit "Library - Service";
         LibraryInventory: Codeunit "Library - Inventory";
+        LibraryVariableStorage: Codeunit "Library - Variable Storage";
         TestsBuffer: Integer;
         TestsBufferPercentage: Integer;
         TraceDumpFilePath: Text;
@@ -86,7 +87,7 @@ codeunit 139094 "Local Performance Tests"
     end;
 
     [Test]
-    [HandlerFunctions('InvokeMakeOrder,ConfirmHandlerYes,MessageHandler')]
+    [HandlerFunctions('InvokeMakeOrder,ConfirmHandler')]
     [Scope('OnPrem')]
     procedure TestMakeOrderFromServiceQuotes()
     var
@@ -97,8 +98,11 @@ codeunit 139094 "Local Performance Tests"
 
         CreateService(ServiceHeader, ServiceHeader."Document Type"::Quote);
 
+        LibraryVariableStorage.Enqueue(true);
+        LibraryVariableStorage.Enqueue(false);
         LibraryPerformanceProfiler.StartProfiler(true);
         Page.RunModal(Page::"Service Quote", ServiceHeader);
+        LibraryVariableStorage.Clear();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestMakeOrderFromServiceQuotes',
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Service Quote", true);
@@ -378,6 +382,13 @@ codeunit 139094 "Local Performance Tests"
     procedure ConfirmHandlerYes(Question: Text; var Reply: Boolean)
     begin
         Reply := true
+    end;
+
+    [ConfirmHandler]
+    [Scope('OnPrem')]
+    procedure ConfirmHandler(Question: Text; var Reply: Boolean)
+    begin
+        Reply := LibraryVariableStorage.DequeueBoolean()
     end;
 
     [ModalPageHandler]
