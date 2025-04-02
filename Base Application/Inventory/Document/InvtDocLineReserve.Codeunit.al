@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Inventory.Document;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Document;
 
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.UOM;
@@ -257,7 +261,8 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
         if not FindReservEntry(InvtDocumentLine, OldReservationEntry) then
             exit;
 
-        OldReservationEntry.Lock();
+        OldReservationEntry.LockTable();
+        OldReservationEntry.FindLast();
 
         ItemJournalLine.TestField("Location Code", InvtDocumentLine."Location Code");
         ItemJournalLine.TestField("Item No.", InvtDocumentLine."Item No.");
@@ -808,11 +813,11 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDeleteLine(var InvtDocumentLine: Record "Invt. Document Line"; DeleteItemTracking: Boolean; Blocked: Boolean; var IsHandled: Boolean)
     begin
-    end;    
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeVerifyChange(var NewInvtDocumentLine: Record "Invt. Document Line"; var OldInvtDocumentLine: Record "Invt. Document Line"; var IsHandled: Boolean)
     begin
-    end;
+    end;    
 }
 

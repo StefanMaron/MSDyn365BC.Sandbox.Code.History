@@ -48,7 +48,7 @@ codeunit 119032 "Create WIP Accounts"
         GLAccount.Validate("Account Type", "Account Type");
         if GLAccount."Account Type" = GLAccount."Account Type"::Posting then
             GLAccount.Validate("Direct Posting", "Direct Posting");
-        GLAccount.Validate("Income/Balance", "Income/Balance");
+                GLAccount.Validate("Income/Balance", "G/L Account Report Type".FromInteger("Income/Balance"));
         GLAccount.Validate("No. of Blank Lines", "No. of Blank Lines");
         if Totaling <> '' then
             GLAccount.Validate(Totaling, Totaling);

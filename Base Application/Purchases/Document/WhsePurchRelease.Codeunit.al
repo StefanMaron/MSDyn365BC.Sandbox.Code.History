@@ -42,7 +42,8 @@ codeunit 5772 "Whse.-Purch. Release"
         PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
         PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
         PurchaseLine.SetRange("Drop Shipment", false);
-        PurchaseLine.SetRange("Job No.", '');
+        if PurchaseHeader."Document Type" = PurchaseHeader."Document Type"::"Return Order" then
+            PurchaseLine.SetRange("Job No.", '');
         PurchaseLine.SetRange("Work Center No.", '');
         OnAfterReleaseSetFilters(PurchaseLine, PurchaseHeader);
         if PurchaseLine.FindSet() then begin
