@@ -735,7 +735,7 @@ codeunit 101015 "Create G/L Account"
         GLAccount.Validate("Account Type", AccountType);
         if GLAccount."Account Type" = GLAccount."Account Type"::Posting then
             GLAccount.Validate("Direct Posting", true);
-        GLAccount.Validate("Income/Balance", IncomeBalance);
+        GLAccount.Validate("Income/Balance", "G/L Account Report Type".FromInteger(IncomeBalance));
         case AccountNo of
             '550000', '550005', '550010', '560000', '570000':
                 begin
