@@ -900,8 +900,8 @@ codeunit 161300 "Create Italian Data"
         SourceCode: Record "Source Code";
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
-        NoSeriesLineSales: Record "No. Series Line Sales";
-        NoSeriesLinePurchase: Record "No. Series Line Purchase";
+        NoSeriesLineSales: Record "No. Series Line";
+        NoSeriesLinePurchase: Record "No. Series Line";
         GLAccount: Record "G/L Account";
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
@@ -1005,7 +1005,7 @@ codeunit 161300 "Create Italian Data"
         PurchaseLine.Insert();
     end;
 
-    local procedure InsertGLAccount(var GLAccount: Record "G/L Account"; No: Code[20]; Name: Text[50]; IncomeBalance: Option; Type: Enum "G/L Account Type"; GLAccountCategory: Record "G/L Account Category")
+    local procedure InsertGLAccount(var GLAccount: Record "G/L Account"; No: Code[20]; Name: Text[50]; IncomeBalance: Enum "G/L Account Report Type"; Type: Enum "G/L Account Type"; GLAccountCategory: Record "G/L Account Category")
     begin
         GLAccount.Init();
         GLAccount."No." := No;

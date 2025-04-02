@@ -47,7 +47,7 @@ codeunit 161345 "Create Sales No. Series Lines"
 
     procedure InsertData(SeriesCode: Code[10]; LineNo: Integer; StartingNo: Code[20]; IncrementByNo: Integer; Open: Boolean; StartDate: Date)
     var
-        NoSeriesLineSales: Record "No. Series Line Sales";
+        NoSeriesLineSales: Record "No. Series Line";
     begin
         NoSeriesLineSales.Init();
         NoSeriesLineSales.Validate("Series Code", SeriesCode);

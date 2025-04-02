@@ -48,7 +48,7 @@ codeunit 161346 "Create Purch. No. Series Lines"
 
     procedure InsertData(SeriesCode: Code[10]; LineNo: Integer; StartingNo: Code[20]; IncrementByNo: Integer; Open: Boolean; StartDate: Date)
     var
-        NoSeriesLinePurchase: Record "No. Series Line Purchase";
+        NoSeriesLinePurchase: Record "No. Series Line";
     begin
         NoSeriesLinePurchase.Init();
         NoSeriesLinePurchase.Validate("Series Code", SeriesCode);
