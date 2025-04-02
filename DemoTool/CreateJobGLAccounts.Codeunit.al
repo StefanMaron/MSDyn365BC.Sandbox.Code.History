@@ -43,7 +43,7 @@ codeunit 101168 "Create Job G/L Accounts"
         GLAccount.Validate("Account Type", AccountType);
         if GLAccount."Account Type" = GLAccount."Account Type"::Posting then
             GLAccount.Validate("Direct Posting", DirectPosting);
-        GLAccount.Validate("Income/Balance", IncomeBalance);
+        GLAccount.Validate("Income/Balance", "G/L Account Report Type".FromInteger(IncomeBalance));
         GLAccount.Validate("Debit/Credit", DebitCredit);
         GLAccount.Validate("No. of Blank Lines", NoOfBlankLines);
         if Totaling <> '' then

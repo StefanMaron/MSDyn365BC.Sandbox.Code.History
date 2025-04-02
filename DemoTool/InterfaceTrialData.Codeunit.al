@@ -153,9 +153,6 @@ codeunit 122000 "Interface Trial Data"
         RunCodeunit(CODEUNIT::"Create Named Forward Links");
         CreateICPartner.CreateICSetup();
         RunCodeunit(Codeunit::"Create IC G/L Account");
-#if not CLEAN23
-        RunCodeunit(CODEUNIT::"Create Payment Period Setup");
-#endif
         RunCodeunit(CODEUNIT::"Create Reminder Communication");
         FinalizeSetup();
 

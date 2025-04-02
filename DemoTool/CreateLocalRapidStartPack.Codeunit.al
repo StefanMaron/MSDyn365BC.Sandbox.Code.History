@@ -14,9 +14,6 @@ codeunit 101931 "Create Local RapidStart Pack"
     procedure CreateTables()
     begin
         CreateTable(DATABASE::"Fin. Charge Interest Rate");
-#if not CLEAN23
-        CreateTable(DATABASE::"Payment Period Setup");
-#endif
     end;
 
     procedure CreateTable(TableID: Integer)
