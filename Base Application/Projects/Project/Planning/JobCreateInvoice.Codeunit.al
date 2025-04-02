@@ -148,13 +148,7 @@ codeunit 1002 "Job Create-Invoice"
         else
             Message(Text000);
     end;
-#if not CLEAN23
-    [Obsolete('Replaced by CreateSalesInvoiceLines(JobNo: Code[20]; var JobPlanningLineSource: Record "Job Planning Line"; InvoiceNo: Code[20]; NewInvoice: Boolean; PostingDate: Date; DocumentDate: Date; CreditMemo: Boolean)', '23.0')]
-    procedure CreateSalesInvoiceLines(JobNo: Code[20]; var JobPlanningLineSource: Record "Job Planning Line"; InvoiceNo: Code[20]; NewInvoice: Boolean; PostingDate: Date; CreditMemo: Boolean)
-    begin
-        CreateSalesInvoiceLines(JobNo, JobPlanningLineSource, InvoiceNo, NewInvoice, PostingDate, 0D, CreditMemo);
-    end;
-#endif
+
     procedure CreateSalesInvoiceLines(JobNo: Code[20]; var JobPlanningLineSource: Record "Job Planning Line"; InvoiceNo: Code[20]; NewInvoice: Boolean; PostingDate: Date; DocumentDate: Date; CreditMemo: Boolean)
     var
         Job: Record Job;
@@ -276,12 +270,7 @@ codeunit 1002 "Job Create-Invoice"
             JobTask.TestField("Bill-to Customer No.");
             BillToCustomerNo := JobTask."Bill-to Customer No.";
         end;
-#if not CLEAN23
-        IsHandled := false;
-        OnCreateSalesInvoiceLinesOnBeforeGetCustomer(JobPlanningLineSource, Cust, IsHandled);
-        if not IsHandled then
-#endif
-            Cust.Get(BillToCustomerNo);
+        Cust.Get(BillToCustomerNo);
     end;
 
     procedure DeleteSalesInvoiceBuffer()
@@ -289,13 +278,7 @@ codeunit 1002 "Job Create-Invoice"
         ClearAll();
         TempJobPlanningLine.DeleteAll();
     end;
-#if not CLEAN23
-    [Obsolete('Replaced by CreateSalesInvoiceJobTask(var JobTask2: Record "Job Task"; PostingDate: Date; DocumentDate: Date; InvoicePerTask: Boolean; var NoOfInvoices: Integer; var OldJobNo: Code[20]; var OldJobTaskNo: Code[20]; LastJobTask: Boolean)', '23.0')]
-    procedure CreateSalesInvoiceJobTask(var JobTask2: Record "Job Task"; PostingDate: Date; InvoicePerTask: Boolean; var NoOfInvoices: Integer; var OldJobNo: Code[20]; var OldJobTaskNo: Code[20]; LastJobTask: Boolean)
-    begin
-        CreateSalesInvoiceJobTask(JobTask2, PostingDate, 0D, InvoicePerTask, NoOfInvoices, OldJobNo, OldJobTaskNo, LastJobTask);
-    end;
-#endif
+
     procedure CreateSalesInvoiceJobTask(var JobTask2: Record "Job Task"; PostingDate: Date; DocumentDate: Date; InvoicePerTask: Boolean; var NoOfInvoices: Integer; var OldJobNo: Code[20]; var OldJobTaskNo: Code[20]; LastJobTask: Boolean)
     var
         Cust: Record Customer;
@@ -1440,13 +1423,7 @@ codeunit 1002 "Job Create-Invoice"
     local procedure OnCreateSalesInvoiceLinesOnBeforeCreateSalesLine(var JobPlanningLine: Record "Job Planning Line"; SalesHeader: Record "Sales Header"; SalesHeader2: Record "Sales Header"; NewInvoice: Boolean; var NoOfSalesLinesCreated: Integer)
     begin
     end;
-#if not CLEAN23
-    [Obsolete('Replaced with OnBeforeCheckJobBillToCustomer', '21.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateSalesInvoiceLinesOnBeforeGetCustomer(JobPlanningLine: Record "Job Planning Line"; var Customer: Record Customer; var IsHandled: Boolean)
-    begin
-    end;
-#endif
+
     [IntegrationEvent(false, false)]
     local procedure OnCreateSalesInvoiceLinesOnBeforeTestJob(var Job: Record Job)
     begin
@@ -1561,12 +1538,12 @@ codeunit 1002 "Job Create-Invoice"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnTestExchangeRateOnBeforeValidateCurrencyDate(var JobPlanningLine: Record "Job Planning Line"; PostingDate: Date; var CurrencyExchangeRate: Record "Currency Exchange Rate"; var ShouldValidateCurrencyCode: Boolean)
+    local procedure OnBeforeFindJobPlanningLineInvoice(JobTask: Record "Job Task"; var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; var SalesHeader: Record "Sales Header"; var ExitValue: Boolean; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindJobPlanningLineInvoice(JobTask: Record "Job Task"; var JobPlanningLineInvoice: Record "Job Planning Line Invoice"; var SalesHeader: Record "Sales Header"; var ExitValue: Boolean; var IsHandled: Boolean)
+    local procedure OnTestExchangeRateOnBeforeValidateCurrencyDate(var JobPlanningLine: Record "Job Planning Line"; PostingDate: Date; var CurrencyExchangeRate: Record "Currency Exchange Rate"; var ShouldValidateCurrencyCode: Boolean)
     begin
     end;
 }
