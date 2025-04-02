@@ -1,9 +1,9 @@
 {
   "settings": {
+    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeAnalysis": false,
     "al.enableCodeActions": false,
     "allint.enabled": false
   },
@@ -117,7 +117,13 @@
       "path": "./Tests-SCM"
     },
     {
-      "path": "./Tests-Service"
+      "path": "./Tests-SCM-Assembly"
+    },
+    {
+      "path": "./Tests-SCM-Manufacturing"
+    },
+    {
+      "path": "./Tests-SCM-Service"
     },
     {
       "path": "./Tests-SINGLESERVER"
