@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./AI Test Toolkit"
@@ -109,7 +117,13 @@
       "path": "./Tests-SCM"
     },
     {
-      "path": "./Tests-Service"
+      "path": "./Tests-SCM-Assembly"
+    },
+    {
+      "path": "./Tests-SCM-Manufacturing"
+    },
+    {
+      "path": "./Tests-SCM-Service"
     },
     {
       "path": "./Tests-SINGLESERVER"
@@ -150,13 +164,5 @@
     {
       "path": "./AI Test Toolkit/src/TestSuite"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    }
-  }
+  ]
 }

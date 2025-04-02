@@ -1,4 +1,4 @@
-codeunit 101015 "Create G/L Account"
+﻿codeunit 101015 "Create G/L Account"
 {
 
     trigger OnRun()
@@ -867,7 +867,7 @@ codeunit 101015 "Create G/L Account"
         GLAccount.Validate("Account Type", AccountType);
         if GLAccount."Account Type" = GLAccount."Account Type"::Posting then
             GLAccount.Validate("Direct Posting", DirectPosting);
-        GLAccount.Validate("Income/Balance", IncomeBalance);
+        GLAccount.Validate("Income/Balance", "G/L Account Report Type".FromInteger(IncomeBalance));
         case AccountNo of
             '992910', '992920', '992930', '992940', '995310':
                 GLAccount."Reconciliation Account" := true;
@@ -887,9 +887,6 @@ codeunit 101015 "Create G/L Account"
             GLAccount.Validate("VAT Bus. Posting Group", VATGenPostingGroup);
         if VATProdPostingGroup <> '' then
             GLAccount.Validate("VAT Prod. Posting Group", VATProdPostingGroup);
-#if not CLEAN23
-        GLAccount."SRU-code" := CreateSRUCode(GLAccount."No.");
-#endif
         if GLAccount.Insert() then;
     end;
 
@@ -1127,67 +1124,5 @@ codeunit 101015 "Create G/L Account"
         GLAccountCategory.Find();
         // Reserved for local chart of accounts
     end;
-
-#if not CLEAN23
-    local procedure CreateSRUCode(AccNo: Text[20]) SRUCode: Code[10]
-    begin
-        case AccNo of
-            '1100', '1115', '1116', '1119':
-                SRUCode := '237';
-            '1200', '1215', '1216', '1219', '1220':
-                SRUCode := '236';
-            '1401', '1411':
-                SRUCode := '219';
-            '1920', '1940', '1941':
-                SRUCode := '200';
-            '2440', '2441', '2442', '2443', '2445':
-                SRUCode := '300';
-            '2610', '2615', '2620', '2640', '2641', '2642', '2645':
-                SRUCode := '307';
-            '6210', '6220', '6230':
-                SRUCode := '530';
-            '7210':
-                SRUCode := '512';
-            '7830', '7834':
-                SRUCode := '559';
-            '8710':
-                SRUCode := '7523';
-            '8750':
-                SRUCode := '7418';
-            '8910':
-                SRUCode := '598';
-            '8999':
-                SRUCode := '7550';
-            '1110':
-                SRUCode := '7214';
-            '1210':
-                SRUCode := '7215';
-            '1410':
-                SRUCode := '7241';
-            '1510':
-                SRUCode := '7251';
-            '1910':
-                SRUCode := '7281';
-            '2211':
-                SRUCode := '7368';
-            '2330':
-                SRUCode := '7351';
-            '2510':
-                SRUCode := '7368';
-            '2890':
-                SRUCode := '7354';
-            '3999':
-                SRUCode := '7410';
-            '7599':
-                SRUCode := '7514';
-            '7899':
-                SRUCode := '7515';
-            '7990':
-                SRUCode := '7517';
-            '2617', '2647':
-                SRUCode := '307';
-        end;
-    end;
-#endif
 }
 

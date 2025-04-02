@@ -334,19 +334,11 @@ codeunit 160700 "Create SE"
         CompInfo: Record "Company Information";
     begin
         CompInfo.Get();
-#if not CLEAN23
-        CompInfo."Plus Giro No." := '111111-1';
-#else
         CompInfo."Plus Giro Number" := '111111-1';
-#endif
         CompInfo."Phone No." := '031-00000';
         CompInfo."VAT Registration No." := 'SE556233480401';
         CompInfo."Registration No." := '5562334804';
-#if not CLEAN23
-        CompInfo."Registered Office" := XGoteborgTxt;
-#else
         CompInfo."Registered Office Info" := XGoteborgTxt;
-#endif
         CompInfo.Modify();
     end;
 
