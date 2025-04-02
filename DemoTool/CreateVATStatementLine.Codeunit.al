@@ -279,10 +279,6 @@ codeunit 101256 "Create VAT Statement Line"
         VATStatementLine.Validate("Show CZL", Show);
         VATStatementLine."Attribute Code CZL" := AttributeCode;
         VATStatementLine."VAT Ctrl. Report Section CZL" := VATControlRepSectionCode;
-#if not CLEAN23
-        if RowNo in ['30Z', '31Z'] then
-            VATStatementLine."EU-3 Party Trade CZL" := VATStatementLine."EU-3 Party Trade CZL"::Yes;
-#endif
         if RowNo in ['30Z', '31Z'] then
             VATStatementLine."EU 3 Party Trade" := VATStatementLine."EU 3 Party Trade"::EU3;
         VATStatementLine.Validate("Box No.", BoxNo);

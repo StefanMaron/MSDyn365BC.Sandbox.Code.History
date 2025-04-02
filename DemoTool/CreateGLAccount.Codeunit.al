@@ -1,4 +1,4 @@
-codeunit 101015 "Create G/L Account"
+﻿codeunit 101015 "Create G/L Account"
 {
 
     trigger OnRun()
@@ -838,7 +838,7 @@ codeunit 101015 "Create G/L Account"
         GLAccount.Validate("Account Type", AccountType);
         if GLAccount."Account Type" = GLAccount."Account Type"::Posting then
             GLAccount.Validate("Direct Posting", DirectPosting);
-        GLAccount."Income/Balance" := IncomeBalance;
+        GLAccount."Income/Balance" := "G/L Account Report Type".FromInteger(IncomeBalance);
         case AccountNo of
             '211100', '221100', '221200', '221300', '231100':
                 GLAccount."Reconciliation Account" := true;

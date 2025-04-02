@@ -13,7 +13,7 @@ codeunit 101410 "Create IC G/L Account"
             until GLAccount.Next() = 0;
     end;
 
-    procedure InsertData("No.": Code[30]; Name: Text[100]; "Account Type": Enum "G/L Account Type"; "Income/Balance": Option "Income Statement","Balance Sheet"; Blocked: Boolean; "Map-to G/L Acc. No": Code[30])
+    procedure InsertData("No.": Code[20]; Name: Text[100]; "Account Type": Enum "G/L Account Type"; "Income/Balance": Enum "G/L Account Report Type"; Blocked: Boolean; "Map-to G/L Acc. No": Code[30])
     var
         ICGLAccount: Record "IC G/L Account";
     begin

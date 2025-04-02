@@ -78,10 +78,10 @@ codeunit 119032 "Create WIP Accounts"
         if GLAccount."Account Type" = GLAccount."Account Type"::Posting then
             GLAccount.Validate("Direct Posting", "Direct Posting");
         if CopyStr(GLAccount."No.", 1, 1) in ['0' .. '4'] then // NAVCZ
-            "Income/Balance" := GLAccount."Income/Balance"::"Balance Sheet"
+            "Income/Balance" := GLAccount."Income/Balance"::"Balance Sheet".AsInteger()
         else
-            "Income/Balance" := GLAccount."Income/Balance"::"Income Statement";
-        GLAccount."Income/Balance" := "Income/Balance";
+            "Income/Balance" := GLAccount."Income/Balance"::"Income Statement".AsInteger();
+        GLAccount."Income/Balance" := "G/L Account Report Type".FromInteger("Income/Balance");
         GLAccount.Validate("No. of Blank Lines", "No. of Blank Lines");
         if Totaling <> '' then
             GLAccount.Validate(Totaling, Totaling);

@@ -10,8 +10,7 @@ codeunit 118870 "Create Assembly Setup"
         AssemblySetup.Validate("Copy Component Dimensions from", AssemblySetup."Copy Component Dimensions from"::"Item/Resource Card");
         AssemblySetup.Validate("Copy Comments when Posting", true);
         AssemblySetup.Validate("Create Movements Automatically", true);
-        AssemblySetup.Validate("Default Gen.Bus.Post. Grp. CZA", DemoDataSetup.IAssemblyCode());
-        // NAVCZ
+
         CreateNoSeries.InitBaseSeries(AssemblySetup."Assembly Order Nos.", XAORD, XAORDName, '1', XEndingNumber, '', XWarningNumber, 1, Enum::"No. Series Implementation"::Sequence);
         CreateNoSeries.InitBaseSeries(AssemblySetup."Assembly Quote Nos.", XAQUO, XAQuoteName, '1', XEndingNumber, '', XWarningNumber, 1, Enum::"No. Series Implementation"::Sequence);
         CreateNoSeries.InitBaseSeries(AssemblySetup."Blanket Assembly Order Nos.", XABLK, XABLKName, '1', XEndingNumber,
@@ -28,7 +27,6 @@ codeunit 118870 "Create Assembly Setup"
 
     var
         AssemblySetup: Record "Assembly Setup";
-        DemoDataSetup: Record "Demo Data Setup";
         CreateNoSeries: Codeunit "Create No. Series";
         XAORD: Label 'A-ORD', Comment = 'A-ORD stands for Assembly-Order';
         XAORDName: Label 'Assembly Orders';
