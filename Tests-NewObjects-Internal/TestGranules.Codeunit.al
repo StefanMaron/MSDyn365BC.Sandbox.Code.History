@@ -655,6 +655,8 @@ codeunit 132532 "Test Granules"
         TablesWithInherentEntitlements.Add(2718, true); // Page Summary Settings
         TablesWithInherentEntitlements.Add(4325, true); // SOA Setup
         TablesWithInherentEntitlements.Add(4585, true); // SOA Email
+        TablesWithInherentEntitlements.Add(4586, true); // SOA Billing Log
+        TablesWithInherentEntitlements.Add(4587, true); // SOA Billing Task Setup
         TablesWithInherentEntitlements.Add(4592, true); // SOA KPI Entry
         TablesWithInherentEntitlements.Add(4593, true); // SOA KPI
         TablesWithInherentEntitlements.Add(4594, true); // SOA Task

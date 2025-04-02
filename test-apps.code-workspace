@@ -109,7 +109,13 @@
       "path": "./Tests-SCM"
     },
     {
-      "path": "./Tests-Service"
+      "path": "./Tests-SCM-Assembly"
+    },
+    {
+      "path": "./Tests-SCM-Manufacturing"
+    },
+    {
+      "path": "./Tests-SCM-Service"
     },
     {
       "path": "./Tests-SINGLESERVER"
@@ -154,9 +160,9 @@
   "settings": {
     "allint.enabled": false,
     "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
-    }
+    },
+    "al.enableCodeActions": false
   }
 }
