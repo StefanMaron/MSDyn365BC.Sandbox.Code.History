@@ -318,6 +318,7 @@ codeunit 122001 "Interface Evaluation Data"
         CreateBankReconciliationLine(BankAccReconciliationLine, XStatementLineDescription3 + ' ' + Format(TransactionDate), TransactionDate, DepositAmount);
 
         BankAccReconciliation."Statement Ending Balance" := Bank1Amount + Bank2Amount + DepositAmount;
+        BankAccReconciliation."Statement Date" := CalcDate('<CM>', TransactionDate);
         BankAccReconciliation.Modify();
     end;
 

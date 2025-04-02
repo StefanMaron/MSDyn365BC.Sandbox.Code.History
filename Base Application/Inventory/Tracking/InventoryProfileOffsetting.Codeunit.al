@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Tracking;
 
 using Microsoft.Assembly.Document;
@@ -58,7 +62,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         ExcludeForecastBefore: Date;
         ScheduleDirection: Option Forward,Backward;
         PlanningLineStage: Option " ","Line Created","Routing Created",Exploded,Obsolete;
-        SurplusType: Option "None",Forecast,BlanketOrder,SafetyStock,ReorderPoint,MaxInventory,FixedOrderQty,MaxOrder,MinOrder,OrderMultiple,DampenerQty,PlanningFlexibility,Undefined,EmergencyOrder;
+        SurplusType: Enum "Planning Surplus Type";
         CurrWorksheetType: Option Requisition,Planning;
         PriceCalculationMethod: Enum "Price Calculation Method";
         DampenerQty: Decimal;
@@ -468,7 +472,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         end;
 
         ItemLedgEntry.Reset();
-        ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Location Code");
+        ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Location Code", "Entry No.");
         DemandInvtProfile.SetCurrentKey(
           "Item No.", "Variant Code", "Location Code", "Due Date");
 
@@ -1466,9 +1470,9 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 if IsReorderPointPlanning and (SupplyInvtProfile."Due Date" >= LatestBucketStartDate) then
                     PostInvChgReminder(TempReminderInvtProfile, SupplyInvtProfile, true);
                 CheckSupplyAndTrack(DemandInvtProfile, SupplyInvtProfile);
-                SurplusType := PlanningTransparency.FindReason(DemandInvtProfile);
+                SurplusType := PlanningTransparency.GetSurplusType(DemandInvtProfile);
                 if SurplusType <> SurplusType::None then
-                    PlanningTransparency.LogSurplus(
+                    PlanningTransparency.LogPlanningSurplus(
                       SupplyInvtProfile."Line No.", DemandInvtProfile."Line No.",
                       DemandInvtProfile."Source Type", DemandInvtProfile."Source ID",
                       DemandInvtProfile."Untracked Quantity", SurplusType);
@@ -1546,16 +1550,18 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
             // Planning Transparency
             if DemandExists then begin
-                SurplusType := PlanningTransparency.FindReason(DemandInvtProfile);
+                SurplusType := PlanningTransparency.GetSurplusType(DemandInvtProfile);
                 if SurplusType <> SurplusType::None then
-                    PlanningTransparency.LogSurplus(SupplyInvtProfile."Line No.", DemandInvtProfile."Line No.",
-                      DemandInvtProfile."Source Type", DemandInvtProfile."Source ID",
-                      SupplyInvtProfile."Untracked Quantity", SurplusType);
+                    PlanningTransparency.LogPlanningSurplus(
+                        SupplyInvtProfile."Line No.", DemandInvtProfile."Line No.",
+                        DemandInvtProfile."Source Type", DemandInvtProfile."Source ID",
+                        SupplyInvtProfile."Untracked Quantity", SurplusType);
             end;
             if SupplyInvtProfile."Planning Line No." <> 0 then begin
                 if SupplyInvtProfile."Safety Stock Quantity" > 0 then
-                    PlanningTransparency.LogSurplus(SupplyInvtProfile."Line No.", SupplyInvtProfile."Line No.", 0, '',
-                      SupplyInvtProfile."Safety Stock Quantity", SurplusType::SafetyStock);
+                    PlanningTransparency.LogPlanningSurplus(
+                        SupplyInvtProfile."Line No.", SupplyInvtProfile."Line No.", 0, '',
+                        SupplyInvtProfile."Safety Stock Quantity", SurplusType::SafetyStock);
                 if SupplyInvtProfile."Planning Line No." <> ReqLine."Line No." then
                     ReqLine.Get(CurrTemplateName, CurrWorksheetName, SupplyInvtProfile."Planning Line No.");
                 PlanningTransparency.PublishSurplus(SupplyInvtProfile, TempSKU, ReqLine, TempTrkgReservEntry);
@@ -1934,7 +1940,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
         LastProjectedInventory += SupplyInvtProfile."Remaining Quantity (Base)";
         LastAvailableInventory += SupplyInvtProfile."Untracked Quantity";
-        PlanningTransparency.LogSurplus(
+        PlanningTransparency.LogPlanningSurplus(
             SupplyInvtProfile."Line No.", SupplyInvtProfile."Line No.", 0, '',
             SupplyInvtProfile."Untracked Quantity", SurplusType::EmergencyOrder);
         SupplyInvtProfile."Untracked Quantity" := 0;
@@ -1963,7 +1969,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
         if not CanDecreaseSupply(SupplyInvtProfile, ReduceQty) then begin
             if (ReduceQty <= DampenerQty) and (SupplyInvtProfile."Planning Level Code" = 0) then
-                PlanningTransparency.LogSurplus(
+                PlanningTransparency.LogPlanningSurplus(
                   SupplyInvtProfile."Line No.", 0,
                   Database::"Manufacturing Setup", SupplyInvtProfile."Source ID",
                   DampenerQty, SurplusType::DampenerQty);
@@ -2700,14 +2706,14 @@ codeunit 99000854 "Inventory Profile Offsetting"
            (SKU."Maximum Order Quantity" > MinQty)
         then begin
             DeltaQty := SKU."Maximum Order Quantity" - OrderQty;
-            PlanningTransparency.LogSurplus(
+            PlanningTransparency.LogPlanningSurplus(
               SupplyLineNo, 0, Database::Item, TempSKU."Item No.",
               DeltaQty, SurplusType::MaxOrder);
         end else
             DeltaQty := 0;
         if SKU."Minimum Order Quantity" > (OrderQty + DeltaQty) then begin
             DeltaQty := SKU."Minimum Order Quantity" - OrderQty;
-            PlanningTransparency.LogSurplus(
+            PlanningTransparency.LogPlanningSurplus(
               SupplyLineNo, 0, Database::Item, TempSKU."Item No.",
               SKU."Minimum Order Quantity", SurplusType::MinOrder);
         end;
@@ -2715,7 +2721,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
             Rounding := Round(OrderQty + DeltaQty, SKU."Order Multiple", '>') - (OrderQty + DeltaQty);
             DeltaQty += Rounding;
             if DeltaQty <> 0 then
-                PlanningTransparency.LogSurplus(
+                PlanningTransparency.LogPlanningSurplus(
                   SupplyLineNo, 0, Database::Item, TempSKU."Item No.",
                   Rounding, SurplusType::OrderMultiple);
         end;
@@ -2758,7 +2764,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                         CalcMaximumReorderQty();
 
                     QtyToOrder := TempSKU."Maximum Inventory" - ProjectedInventory;
-                    PlanningTransparency.LogSurplus(
+                    PlanningTransparency.LogPlanningSurplus(
                       SupplyLineNo, 0, Database::Item, TempSKU."Item No.",
                       QtyToOrder, SurplusType::MaxInventory);
                 end;
@@ -2786,7 +2792,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                             end;
 
                     QtyToOrder := TempSKU."Reorder Quantity";
-                    PlanningTransparency.LogSurplus(
+                    PlanningTransparency.LogPlanningSurplus(
                       SupplyLineNo, 0, Database::Item, TempSKU."Item No.",
                       QtyToOrder, SurplusType::FixedOrderQty);
                 end;
@@ -3623,7 +3629,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 QtyToOrder -= SupplyWithinLeadtime;
                 if QtyToOrder < TempSKU."Reorder Quantity" then
                     QtyToOrder := TempSKU."Reorder Quantity";
-                PlanningTransparency.ModifyLogEntry(
+                PlanningTransparency.ModifyPlanningLog(
                   TempSupplyInvtProfile."Line No.", 0, Database::Item, TempSKU."Item No.", -SupplyWithinLeadtime,
                   SurplusType::ReorderPoint);
             end;
@@ -3632,7 +3638,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         if TempSKU."Reordering Policy" = TempSKU."Reordering Policy"::"Maximum Qty." then
             if SupplyWithinLeadtime <> 0 then begin
                 QtyToOrder -= SupplyWithinLeadtime;
-                PlanningTransparency.ModifyLogEntry(
+                PlanningTransparency.ModifyPlanningLog(
                   TempSupplyInvtProfile."Line No.", 0, Database::Item, TempSKU."Item No.", -SupplyWithinLeadtime,
                   SurplusType::MaxInventory);
             end;
@@ -3649,7 +3655,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                     TempSKU."Reordering Policy"::"Fixed Reorder Qty.":
                         SurplusType := SurplusType::FixedOrderQty;
                 end;
-                PlanningTransparency.LogSurplus(TempSupplyInvtProfile."Line No.", 0, 0, '', QtyToOrder, SurplusType);
+                PlanningTransparency.LogPlanningSurplus(TempSupplyInvtProfile."Line No.", 0, 0, '', QtyToOrder, SurplusType);
                 QtyToOrderThisLine := QtyToOrder + AdjustReorderQty(QtyToOrder, TempSKU, TempSupplyInvtProfile."Line No.", 0);
                 UpdateQty(TempSupplyInvtProfile, QtyToOrderThisLine);
                 TempSupplyInvtProfile.Insert();
@@ -3675,7 +3681,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
             SupplyInvtProfile.Insert();
 
             // Planning Transparency
-            PlanningTransparency.LogSurplus(
+            PlanningTransparency.LogPlanningSurplus(
               SupplyInvtProfile."Line No.", 0, 0, '', SupplyInvtProfile."Untracked Quantity", SurplusType::ReorderPoint);
 
             if SupplyInvtProfile."Due Date" < CurrDueDate then begin
