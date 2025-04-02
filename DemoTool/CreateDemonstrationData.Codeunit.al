@@ -214,12 +214,27 @@ codeunit 101900 "Create Demonstration Data"
     begin
         // Virtual table does not support ModifyAll
         FeatureKey.SetRange("Is One Way", false); // only enable features that can be disabled
-        FeatureKey.SetFilter(ID, '<>PowerAutomateCopilot&<>LegacyLocking');
         if FeatureKey.FindSet(true) then
             repeat
-                FeatureKey.Enabled := FeatureKey.Enabled::"All Users";
-                FeatureKey.Modify();
+                if not ExcludeNewFeature(FeatureKey) then begin
+                    FeatureKey.Enabled := FeatureKey.Enabled::"All Users";
+                    FeatureKey.Modify();
+                end;
             until FeatureKey.Next() = 0;
+    end;
+
+    local procedure ExcludeNewFeature(FeatureKey: Record "Feature Key"): Boolean
+    begin
+        if FeatureKey.ID in ['PowerAutomateCopilot',
+                             'CalcOnlyVisibleFlowFields',
+                             'ConcurrentInventoryPosting',
+                             'ConcurrentJobPosting',
+                             'ConcurrentResourcePosting',
+                             'SemanticMetadataSearch']
+        then
+            exit(true);
+
+        exit(false)
     end;
 
     local procedure IsTableIDIncludedIntoFullPack(TableID: Integer): Boolean
