@@ -25,6 +25,7 @@ using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 using Microsoft.Utilities;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -1910,16 +1911,6 @@ codeunit 5342 "CRM Synch. Helper"
         end;
     end;
 
-#if not CLEAN23
-    [Obsolete('Use another implementation of ConvertTableToOption', '20.0')]
-    procedure ConvertTableToOption(SourceFieldRef: FieldRef; var OptionValue: Integer) TableIsMapped: Boolean
-    var
-        FieldRef: FieldRef;
-    begin
-        exit(ConvertTableToOption(SourceFieldRef, FieldRef, OptionValue));
-    end;
-#endif
-
     procedure ConvertTableToOption(SourceFieldRef: FieldRef; DestinationFieldRef: FieldRef; var OptionValue: Integer) TableIsMapped: Boolean
     var
         CRMOptionMapping: Record "CRM Option Mapping";
@@ -2092,6 +2083,19 @@ codeunit 5342 "CRM Synch. Helper"
         SourceFieldRef.Value := Value;
     end;
 
+    internal procedure FulfillSalesOrder(SalesOrderId: Guid)
+    var
+        CDSIntegrationImpl: Codeunit "CDS Integration Impl.";
+        CrmHelper: Dotnet CrmHelper;
+    begin
+        OnBeforeFulfillSalesOrder(SalesOrderId);
+        if IsNullGuid(SalesOrderId) then
+            exit;
+
+        if CDSIntegrationImpl.InitializeConnection(CrmHelper) then
+            CrmHelper.FulfillSalesOrder(SalesOrderId);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetFieldRelation(RecRef: RecordRef; FldRef: FieldRef; var TableID: Integer)
     begin
@@ -2171,6 +2175,11 @@ codeunit 5342 "CRM Synch. Helper"
 
     [IntegrationEvent(false, false)]
     local procedure OnCancelCRMInvoiceOnBeforeCheckFieldsChanged(var CRMInvoice: Record "CRM Invoice"; var NewCRMInvoice: Record "CRM Invoice"; var ChangeNeeded: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFulfillSalesOrder(var SalesOrderId: Guid)
     begin
     end;
 }
