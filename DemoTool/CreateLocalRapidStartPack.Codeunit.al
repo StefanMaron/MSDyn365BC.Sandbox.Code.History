@@ -19,9 +19,6 @@ codeunit 101931 "Create Local RapidStart Pack"
         CreateTable(DATABASE::"Payment Status");
         CreateTable(DATABASE::"Payment Step");
         CreateTable(DATABASE::"Payment Address");
-#if not CLEAN23
-        CreateTable(DATABASE::"Payment Period Setup");
-#endif
         CreateTable(DATABASE::"Gen. Journal Line");
     end;
 

@@ -6,17 +6,11 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"FR Acc. Schedule Line");
         ListOfTablesToMigrate.Add(Database::"FR Acc. Schedule Name");
         ListOfTablesToMigrate.Add(Database::"Payment Address");
-#if not CLEAN23
-        ListOfTablesToMigrate.Add(Database::"Payment Application Buffer");
-#endif
         ListOfTablesToMigrate.Add(Database::"Payment Class");
         ListOfTablesToMigrate.Add(Database::"Payment Header Archive");
         ListOfTablesToMigrate.Add(Database::"Payment Header");
         ListOfTablesToMigrate.Add(Database::"Payment Line Archive");
         ListOfTablesToMigrate.Add(Database::"Payment Line");
-#if not CLEAN23
-        ListOfTablesToMigrate.Add(Database::"Payment Period Setup");
-#endif
         ListOfTablesToMigrate.Add(Database::"Payment Post. Buffer");
         ListOfTablesToMigrate.Add(Database::"Payment Status");
         ListOfTablesToMigrate.Add(Database::"Payment Step Ledger");

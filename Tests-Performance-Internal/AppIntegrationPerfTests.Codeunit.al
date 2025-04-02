@@ -696,13 +696,13 @@ codeunit 139092 "App Integration Perf Tests"
 
     local procedure CreateDataExchangeColumnDef(var DataExchColumnDef: Record "Data Exch. Column Def"; DataExchLineDef: Record "Data Exch. Line Def"; ColumnNo: Integer; Path: Text[250])
     var
-        TypeHelper: Codeunit "Type Helper";
+        Language: Codeunit Language;
     begin
         DataExchColumnDef.Init();
         DataExchColumnDef.Validate("Data Exch. Def Code", DataExchLineDef."Data Exch. Def Code");
         DataExchColumnDef.Validate("Data Exch. Line Def Code", DataExchLineDef.Code);
         DataExchColumnDef.Validate("Column No.", ColumnNo);
-        DataExchColumnDef.Validate("Data Formatting Culture", TypeHelper.LanguageIDToCultureName(WindowsLanguage));
+        DataExchColumnDef.Validate("Data Formatting Culture", Language.GetCultureName(WindowsLanguage));
         DataExchColumnDef.Validate(Path, Path);
         DataExchColumnDef.Insert(true);
     end;
