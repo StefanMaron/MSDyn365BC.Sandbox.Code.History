@@ -72,7 +72,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Salesperson/Purchaser");
         RunCodeunit(CODEUNIT::"Create Location");
         RunCodeunit(CODEUNIT::"Create Cust. Invoice Disc.");
-#if not CLEAN23
+#if not CLEAN25
         RunCodeunit(CODEUNIT::"Create Sales Discount");
 #endif
         RunCodeunit(CODEUNIT::"Create Vendor Invoice Disc.");
@@ -156,7 +156,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Item Unit of Measure");
         RunCodeunit(CODEUNIT::"Create Unit of Measure Trans.");
         RunCodeunit(CODEUNIT::"Create Extended text");
-#if not CLEAN23
+#if not CLEAN25
         RunCodeunit(CODEUNIT::"Create Sales Price");
 #endif
         RunCodeunit(CODEUNIT::"Create Resource");
@@ -166,7 +166,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Default Dimension");
 
         RunCodeunit(CODEUNIT::"Create Job");
-#if not CLEAN23
+#if not CLEAN25
         RunCodeunit(CODEUNIT::"Create Job G/L Prices");
         RunCodeunit(CODEUNIT::"Create Job Item Prices");
         RunCodeunit(CODEUNIT::"Create Job Resource Prices");
@@ -186,7 +186,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Inventory Posting Setup");
         RunCodeunit(CODEUNIT::"Create WIP Accounts");
         RunCodeunit(CODEUNIT::"Create Item Vendor");
-#if not CLEAN23
+#if not CLEAN25
         RunCodeunit(CODEUNIT::"Create Purchase Price");
         RunCodeunit(CODEUNIT::"Create Purch. Line Discount");
 #endif

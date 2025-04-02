@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Inventory.Transfer;
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Inventory.Transfer;
 
 using Microsoft.Finance.Analysis;
 using Microsoft.Finance.Dimension;
@@ -32,6 +36,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
                 tabledata "Transfer Receipt Header" = ri,
                 tabledata "Transfer Receipt Line" = rim;
     TableNo = "Transfer Header";
+    EventSubscriberInstance = Manual;
 
     trigger OnRun()
     var
@@ -102,7 +107,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
         TransHeader.CheckInvtPostingSetup();
         OnAfterCheckInvtPostingSetup(TransHeader, TempWhseRcptHeader, SourceCode);
 
-        LockTables(InvtSetup."Automatic Cost Posting");
+        LockTables(InvtSetup.UseLegacyPosting() and InvtSetup."Automatic Cost Posting");
         // Insert receipt header
         if WhseReceive then
             PostedWhseRcptHeader.LockTable();
@@ -130,7 +135,12 @@ codeunit 5705 "TransferOrder-Post Receipt"
         TransLine.SetRange(Quantity);
         TransLine.SetRange("Qty. to Receive");
         OnRunOnAfterTransLineSetFiltersForRcptLines(TransLine, TransHeader, Location, WhseReceive);
-        if TransLine.Find('-') then
+
+        Clear(PostponedValueEntries);
+        BindSubscription(this); // Start collecting value entries for GLPosting
+        if not InvtSetup.UseLegacyPosting() then
+            TransLine.SetCurrentKey("Document No.", "Item No.", "Transfer-from Code", "Transfer-from Bin Code", "Line No.");
+        if TransLine.FindSet() then
             repeat
                 LineCount := LineCount + 1;
                 if GuiAllowed then
@@ -154,6 +164,9 @@ codeunit 5705 "TransferOrder-Post Receipt"
                 InsertTransRcptLine(TransRcptHeader, TransRcptLine, TransLine);
                 OnAfterInsertTransRcptLineOnBeforePostDeferredValue(TransLine, TransHeader, TransRcptHeader, TransRcptLine, ItemJnlPostLine);
             until TransLine.Next() = 0;
+        TransLine.SetCurrentKey("Document No.", "Line No.");
+        UnBindSubscription(this); // Stop collecting value entries for GLPosting
+        ItemJnlPostLine.PostDeferredValueEntriesToGL(PostponedValueEntries);
 
         OnRunOnAfterInsertTransRcptLines(TransRcptHeader, TransLine, TransHeader, Location, WhseReceive);
 
@@ -259,6 +272,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
         WhsePostRcpt: Codeunit "Whse.-Post Receipt";
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
         WhseJnlRegisterLine: Codeunit "Whse. Jnl.-Register Line";
+        PostponedValueEntries: List of [Integer];
         SourceCode: Code[10];
         WhsePosting: Boolean;
         WhseReference: Integer;
@@ -801,6 +815,15 @@ codeunit 5705 "TransferOrder-Post Receipt"
     procedure SetPreviewMode(NewPreviewMode: Boolean)
     begin
         PreviewMode := NewPreviewMode;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforePostValueEntryToGL', '', false, false)]
+    local procedure OnBeforePostValueEntryToGL(var ValueEntry: Record "Value Entry"; var IsHandled: Boolean)
+    begin
+        if InvtSetup.UseLegacyPosting() then
+            exit;
+        PostponedValueEntries.Add(ValueEntry."Entry No.");
+        IsHandled := true;
     end;
 
     [IntegrationEvent(false, false)]
