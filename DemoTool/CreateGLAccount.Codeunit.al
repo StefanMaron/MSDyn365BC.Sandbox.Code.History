@@ -953,7 +953,7 @@ codeunit 101015 "Create G/L Account"
             else
                 GLAccount."Tax Group Code" := XTAXABLE;
         end;
-        GLAccount.Validate("Income/Balance", IncomeBalance);
+        GLAccount.Validate("Income/Balance", "G/L Account Report Type".FromInteger(IncomeBalance));
         case GLAccount."No." of
             Adjust.Convert('11110'), Adjust.Convert('992910'), Adjust.Convert('992920'), Adjust.Convert('992930'), Adjust.Convert('992940'), Adjust.Convert('995310'):
                 GLAccount."Reconciliation Account" := true;
