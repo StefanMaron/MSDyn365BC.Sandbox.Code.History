@@ -1,4 +1,4 @@
-#if not CLEAN23
+#if not CLEAN25
 codeunit 101702 "Create Purchase Price"
 {
     ObsoleteState = Pending;

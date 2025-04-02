@@ -22,9 +22,6 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"Return File Setup");
         ListOfTablesToMigrate.Add(Database::"Return File");
         ListOfTablesToMigrate.Add(Database::"Settled VAT Period");
-#if not CLEAN23
-        ListOfTablesToMigrate.Add(Database::"VAT Code");
-#endif
         ListOfTablesToMigrate.Add(Database::"VAT Reporting Code");
         ListOfTablesToMigrate.Add(Database::"VAT Note");
         ListOfTablesToMigrate.Add(Database::"VAT Period");

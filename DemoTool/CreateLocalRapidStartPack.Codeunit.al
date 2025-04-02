@@ -12,9 +12,6 @@ codeunit 101931 "Create Local RapidStart Pack"
 
     procedure CreateTables()
     begin
-#if not CLEAN23
-        CreateTable(DATABASE::"VAT Code");
-#endif
         CreateTable(Database::"VAT Reporting Code");
         CreateTable(DATABASE::"VAT Period");
         CreateTable(DATABASE::"E-Invoice Export Header");

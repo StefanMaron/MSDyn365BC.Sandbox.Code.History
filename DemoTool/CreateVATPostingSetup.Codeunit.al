@@ -7,11 +7,7 @@ codeunit 101325 "Create VAT Posting Setup"
         case DemoDataSetup."Company Type" of
             DemoDataSetup."Company Type"::VAT:
                 begin
-#if CLEAN23
-                        InsertVATReportingCodes();
-#else
-                    InsertVATCodes();
-#endif
+                    InsertVATReportingCodes();
                     InsertData(XCUSTNOVAT, XWITHOUT, XWITHOUT, 0, 0, 'E', '0', '84', '');
                     InsertData(XCUSTNOVAT, XHIGH, XWITHOUT, 0, 0, 'E', '', '81', '81');
                     InsertData(XCUSTNOVAT, XOUTSIDE, XOUTSIDE, 0, 0, 'E', '', '83', '83');
@@ -134,11 +130,6 @@ codeunit 101325 "Create VAT Posting Setup"
                     SetAccounts(VATPostingSetup, '995610', '995630', '995630', '995615', '995635', '995625');
             end;
 
-#if not CLEAN23
-        VATPostingSetup.Validate("VAT Code", VATCode);
-        VATPostingSetup.Validate("Sales VAT Reporting Code", SalesVATReportingCode);
-        VATPostingSetup.Validate("Purchase VAT Reporting Code", PurchaseVATReportingCode);
-#endif
         VATPostingSetup.Validate("VAT Number", VATCode);
         VATPostingSetup.Validate("Sale VAT Reporting Code", SalesVATReportingCode);
         VATPostingSetup.Validate("Purch. VAT Reporting Code", PurchaseVATReportingCode);
@@ -216,60 +207,4 @@ codeunit 101325 "Create VAT Posting Setup"
         VATReportingCode.Validate("Reverse Charge Report Box No.", ReverseChargeBoxNo);
         if VATReportingCode.Insert() then;
     end;
-#if not CLEAN23
-    local procedure InsertVATCodes()
-    var
-        VATCode: Record "VAT Code";
-    begin
-        InsertVATCode('0', false, XVATCode_0, VATCode."Trade Settlement 2017 Box No."::" ", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('1', false, XVATCode_1, VATCode."Trade Settlement 2017 Box No."::"14", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('11', false, XVATCode_11, VATCode."Trade Settlement 2017 Box No."::"15", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('12', false, XVATCode_12, VATCode."Trade Settlement 2017 Box No."::"15", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('13', false, XVATCode_13, VATCode."Trade Settlement 2017 Box No."::"16", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('14', false, XVATCode_14, VATCode."Trade Settlement 2017 Box No."::"17", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('15', false, XVATCode_15, VATCode."Trade Settlement 2017 Box No."::"18", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('2', false, XVATCode_2, VATCode."Trade Settlement 2017 Box No."::" ", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('21', false, XVATCode_21, VATCode."Trade Settlement 2017 Box No."::" ", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('22', false, XVATCode_22, VATCode."Trade Settlement 2017 Box No."::" ", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('23', false, XVATCode_23, VATCode."Trade Settlement 2017 Box No."::" ", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('3', true, XVATCode_3, VATCode."Trade Settlement 2017 Box No."::"3", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('31', true, XVATCode_31, VATCode."Trade Settlement 2017 Box No."::"4", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('32', true, XVATCode_32, VATCode."Trade Settlement 2017 Box No."::"4", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('33', true, XVATCode_33, VATCode."Trade Settlement 2017 Box No."::"5", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('4', false, XVATCode_4, VATCode."Trade Settlement 2017 Box No."::" ", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('5', true, XVATCode_5, VATCode."Trade Settlement 2017 Box No."::"6", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('51', true, XVATCode_51, VATCode."Trade Settlement 2017 Box No."::"7", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('52', true, XVATCode_52, VATCode."Trade Settlement 2017 Box No."::"8", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('6', true, XVATCode_6, VATCode."Trade Settlement 2017 Box No."::" ", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('7', true, XVATCode_7, VATCode."Trade Settlement 2017 Box No."::" ", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('81', false, XVATCode_81, VATCode."Trade Settlement 2017 Box No."::"9", VATCode."Reverse Charge Report Box No."::"17");
-        InsertVATCode('82', false, XVATCode_82, VATCode."Trade Settlement 2017 Box No."::"9", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('83', false, XVATCode_83, VATCode."Trade Settlement 2017 Box No."::"10", VATCode."Reverse Charge Report Box No."::"18");
-        InsertVATCode('84', false, XVATCode_84, VATCode."Trade Settlement 2017 Box No."::"10", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('85', false, XVATCode_85, VATCode."Trade Settlement 2017 Box No."::" ", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('86', false, XVATCode_86, VATCode."Trade Settlement 2017 Box No."::"12", VATCode."Reverse Charge Report Box No."::"17");
-        InsertVATCode('87', false, XVATCode_87, VATCode."Trade Settlement 2017 Box No."::"12", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('88', false, XVATCode_88, VATCode."Trade Settlement 2017 Box No."::"12", VATCode."Reverse Charge Report Box No."::"17");
-        InsertVATCode('89', false, XVATCode_89, VATCode."Trade Settlement 2017 Box No."::"12", VATCode."Reverse Charge Report Box No."::" ");
-        InsertVATCode('91', false, XVATCode_91, VATCode."Trade Settlement 2017 Box No."::"13", VATCode."Reverse Charge Report Box No."::"14");
-        InsertVATCode('92', false, XVATCode_92, VATCode."Trade Settlement 2017 Box No."::"14", VATCode."Reverse Charge Report Box No."::" ");
-    end;
-
-    local procedure InsertVATCode(NewCode: Code[10]; IsSales: Boolean; NewDescription: Text; BoxNo: Option; ReverseChargeBoxNo: Option)
-    var
-        VATCode: Record "VAT Code";
-    begin
-        VATCode.Init();
-        VATCode.Validate(Code, NewCode);
-        VATCode.Validate("Test Gen. Posting Type", VATCode."Test Gen. Posting Type"::" ");
-        if IsSales then
-            VATCode.Validate("Gen. Posting Type", VATCode."Gen. Posting Type"::Sale)
-        else
-            VATCode.Validate("Gen. Posting Type", VATCode."Gen. Posting Type"::Purchase);
-        VATCode.Validate(Description, CopyStr(NewDescription, 1, MaxStrLen(VATCode.Description)));
-        VATCode.Validate("Trade Settlement 2017 Box No.", BoxNo);
-        VATCode.Validate("Reverse Charge Report Box No.", ReverseChargeBoxNo);
-        if VATCode.Insert() then;
-    end;
-#endif
 }
