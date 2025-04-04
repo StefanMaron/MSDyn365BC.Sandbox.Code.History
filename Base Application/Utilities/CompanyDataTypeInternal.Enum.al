@@ -1,3 +1,5 @@
+#if not CLEAN26
+#pragma warning disable AS0049, AS0072
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -8,6 +10,10 @@ enum 9120 "Company Data Type (Internal)"
 {
     Extensible = true;
     AssignmentCompatibility = true;
+    Access = Internal;
+    ObsoleteTag = '25.2';
+    ObsoleteReason = 'Changing the way demo data is generated, for more infromation see https://go.microsoft.com/fwlink/?linkid=2288084';
+    ObsoleteState = Pending;
 
     value(0; "Evaluation Data")
     {
@@ -30,3 +36,5 @@ enum 9120 "Company Data Type (Internal)"
         Caption = 'Full No Data';
     }
 }
+#pragma warning restore AS0049, AS0072
+#endif
