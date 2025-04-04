@@ -683,7 +683,13 @@ table 290 "VAT Amount Line"
         PrevVATAmountLine: Record "VAT Amount Line";
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
         VATBaseDiscountPerc: Decimal;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateLines(Rec, TotalVATAmount, Currency, CurrencyFactor, PricesIncludingVAT, VATBaseDiscountPercHeader, TaxAreaCode, TaxLiable, PostingDate, IsHandled);
+        if IsHandled then
+            exit;
+
         if FindSet() then
             repeat
                 if (PrevVATAmountLine."VAT Identifier" <> "VAT Identifier") or
@@ -692,7 +698,7 @@ table 290 "VAT Amount Line"
                    (PrevVATAmountLine."Use Tax" <> "Use Tax")
                 then
                     PrevVATAmountLine.Init();
-                OnUpdateLinesOnAfterInitPrevVATAmountLine(PrevVATAmountLine);
+                OnUpdateLinesOnAfterInitPrevVATAmountLine(PrevVATAmountLine, Currency, PricesIncludingVAT, VATBaseDiscountPerc, Rec);
 
                 VATBaseDiscountPerc := GetVATBaseDiscountPerc(VATBaseDiscountPercHeader);
                 if PricesIncludingVAT then
@@ -1121,7 +1127,12 @@ table 290 "VAT Amount Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateLinesOnAfterInitPrevVATAmountLine(var PrevVATAmountLine: Record "VAT Amount Line")
+    local procedure OnUpdateLinesOnAfterInitPrevVATAmountLine(var PrevVATAmountLine: Record "VAT Amount Line"; Currency: Record Currency; PricesIncludingVAT: Boolean; var VATBaseDiscountPerc: Decimal; var VATAmountLine: Record "VAT Amount Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeUpdateLines(var VATAmountLine: Record "VAT Amount Line"; var TotalVATAmount: Decimal; Currency: Record Currency; CurrencyFactor: Decimal; PricesIncludingVAT: Boolean; VATBaseDiscountPercHeader: Decimal; TaxAreaCode: Code[20]; TaxLiable: Boolean; PostingDate: Date; var IsHandled: Boolean)
     begin
     end;
 }
