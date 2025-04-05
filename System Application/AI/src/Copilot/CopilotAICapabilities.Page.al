@@ -30,171 +30,94 @@ page 7775 "Copilot AI Capabilities"
     {
         area(Content)
         {
-            group(AOAIServicesInRegionArea)
+            group(AllowedDataMovementOffInfo)
             {
                 ShowCaption = false;
-                Visible = WithinAOAIServicesInRegionArea;
-                InstructionalText = 'Copilot and agents use the Azure OpenAI Service. Your environment connects to this service in your own region.';
+                Visible = ((not WithinGeo) or WithinEuropeGeo) and (not AllowDataMovement);
+                InstructionalText = 'Copilot uses the Azure OpenAI Service, which isn’t available in your region. To activate Copilot capabilities, you must allow data movement.';
+            }
 
-                field(DataSecurityAndPrivacy; FAQForDataSecurityAndPrivacyLbl)
-                {
-                    ShowCaption = false;
+            group(AllowedDataMovementOnInfo)
+            {
+                ShowCaption = false;
+                Visible = ((not WithinGeo) or WithinEuropeGeo) and AllowDataMovement;
+                InstructionalText = 'Copilot uses the Azure OpenAI Service, which isn’t available in your region. To keep using Copilot capabilities, you must allow data movement.';
+            }
 
-                    trigger OnDrillDown()
-                    begin
-                        Hyperlink(FAQForDataSecurityAndPrivacyDocLinkLbl);
-                    end;
-                }
+            group(AlwaysConnected)
+            {
+                ShowCaption = false;
+                InstructionalText = 'Copilot and other generative AI capabilities use Azure OpenAI Service. Your environment connects to Azure OpenAI Service in your region.';
+                Visible = WithinGeo and (not WithinEuropeGeo);
+
                 field(GovernData; CopilotGovernDataLbl)
                 {
                     ShowCaption = false;
 
                     trigger OnDrillDown()
                     begin
-                        Hyperlink(CopilotGovernDataDocLinkLbl);
-                    end;
-                }
-                field(DataProcessByAOAI; DataProcessByAOAILbl)
-                {
-                    ShowCaption = false;
-
-                    trigger OnDrillDown()
-                    begin
-                        Hyperlink(DataProcessByAOAIDocLinkLbl);
+                        Hyperlink('https://go.microsoft.com/fwlink/?linkid=2249575');
                     end;
                 }
             }
 
-            group(EUDBArea)
+            group(NotAlwaysConnected)
             {
                 ShowCaption = false;
-                Visible = WithinEUDBArea;
+                InstructionalText = 'By allowing data movement, you agree to data being stored and processed by the Azure OpenAI Service outside of your environment''s geographic region or compliance boundary.';
+                Visible = ((not WithinGeo) or WithinEuropeGeo) and AllowDataMovement;
 
-                group(AllowedDataMovementOffInfo)
+                field(DataMovement; AllowDataMovement)
                 {
-                    ShowCaption = false;
-                    Visible = WithinEUDBArea and (not AllowDataMovement);
-                    InstructionalText = 'Copilot and agents use the Azure OpenAI Service available within the EU Data Boundary. To activate these capabilities, you must allow data movement within this boundary.';
+                    ApplicationArea = All;
+                    Caption = 'Allow data movement';
+                    ToolTip = 'Specifies whether data movement across regions is allowed. This is required to enable Copilot in your environment.';
+                    Editable = AllowDataMovementEditable;
+
+                    trigger OnValidate()
+                    begin
+                        UpdateAllowDataMovement();
+                    end;
                 }
-                group(AllowedDataMovementOnInfo)
-                {
-                    ShowCaption = false;
-                    Visible = WithinEUDBArea and AllowDataMovement;
-                    InstructionalText = 'Copilot and agents use the Azure OpenAI Service available within the EU Data Boundary. To keep using these capabilities, you must allow data movement within this boundary.';
-                }
-                field(EUDBAreaDataSecurityAndPrivacy; FAQForDataSecurityAndPrivacyLbl)
+
+                field(AOAIServiceLocated; AOAIServiceLocatedLbl)
                 {
                     ShowCaption = false;
 
                     trigger OnDrillDown()
                     begin
-                        Hyperlink(FAQForDataSecurityAndPrivacyDocLinkLbl);
+                        Hyperlink('https://go.microsoft.com/fwlink/?linkid=2250267');
                     end;
-                }
-                group(EUDBAreaDataMovementGroup)
-                {
-                    ShowCaption = false;
-                    label(EUDBAreaCaption)
-                    {
-                        ApplicationArea = All;
-                        Caption = 'By allowing data movement, you agree to data being processed by the Azure OpenAI Service within the EU Data Boundary.';
-                    }
-                    field(EUDBAreaDataMovement; AllowDataMovement)
-                    {
-                        ApplicationArea = All;
-                        Caption = 'Allow data movement';
-                        ToolTip = 'Specifies whether data movement across regions is allowed. This is required to enable Copilot in your environment.';
-                        Editable = WithinEUDBArea and AllowDataMovementEditable;
-
-                        trigger OnValidate()
-                        begin
-                            UpdateAllowDataMovement();
-                        end;
-                    }
-                    field(EUDBAreaAOAIServiceLocated; AOAIServiceLocatedLbl)
-                    {
-                        ShowCaption = false;
-
-                        trigger OnDrillDown()
-                        begin
-                            Hyperlink(AOAIServiceLocatedDocLinkLbl);
-                        end;
-                    }
-                    field(EUDBAreaDataProcess; DataProcessByAOAILbl)
-                    {
-                        ShowCaption = false;
-
-                        trigger OnDrillDown()
-                        begin
-                            Hyperlink(DataProcessByAOAIDocLinkLbl);
-                        end;
-                    }
                 }
             }
 
-            group(AOAIOutOfRegionArea)
+            group(NotAlwaysConnected2)
             {
                 ShowCaption = false;
-                Visible = WithinAOAIOutOfRegionArea;
-                group(AllowedDataMovementOffInfo2)
+                InstructionalText = 'Generative AI capabilities are deactivated because Azure OpenAI Service is not available in your region. By allowing data movement, you agree to data being stored and processed by the Azure OpenAI Service outside of your environment''s geographic region or compliance boundary.';
+                Visible = ((not WithinGeo) or WithinEuropeGeo) and (not AllowDataMovement);
+
+                field(DataMovement2; AllowDataMovement)
                 {
-                    ShowCaption = false;
-                    Visible = WithinAOAIOutOfRegionArea and (not AllowDataMovement);
-                    InstructionalText = 'Copilot and agents use the Azure OpenAI Service, which isn''t available in your region. To activate these capabilities, you must allow data movement.';
+                    ApplicationArea = All;
+                    Caption = 'Allow data movement';
+                    ToolTip = 'Specifies whether data movement across regions is allowed. This is required to enable Copilot in your environment.';
+                    Editable = AllowDataMovementEditable;
+
+                    trigger OnValidate()
+                    begin
+                        UpdateAllowDataMovement();
+                    end;
                 }
-                group(AllowedDataMovementOnInfo2)
-                {
-                    ShowCaption = false;
-                    Visible = WithinAOAIOutOfRegionArea and AllowDataMovement;
-                    InstructionalText = 'Copilot and agents use the Azure OpenAI Service, which isn''t available in your region. To keep using these capabilities, you must allow data movement.';
-                }
-                field(AOAIOutOfRegionAreaDataSecurityAndPrivacy; FAQForDataSecurityAndPrivacyLbl)
+
+                field(AOAIServiceLocated2; AOAIServiceLocatedLbl)
                 {
                     ShowCaption = false;
 
                     trigger OnDrillDown()
                     begin
-                        Hyperlink(FAQForDataSecurityAndPrivacyDocLinkLbl);
+                        Hyperlink('https://go.microsoft.com/fwlink/?linkid=2250267');
                     end;
-                }
-                group(AOAIOutOfRegionAreaDataMovementGroup)
-                {
-                    ShowCaption = false;
-                    label(AOAIOutOfRegionAreaCaption)
-                    {
-                        ApplicationArea = All;
-                        Caption = 'By allowing data movement, you agree to data being processed by the Azure OpenAI Service outside of your environment''s geographic region or compliance boundary.';
-                    }
-                    field(AOAIOutOfRegionAreaDataMovement; AllowDataMovement)
-                    {
-                        ApplicationArea = All;
-                        Caption = 'Allow data movement';
-                        ToolTip = 'Specifies whether data movement across regions is allowed. This is required to enable Copilot in your environment.';
-                        Editable = WithinAOAIOutOfRegionArea and AllowDataMovementEditable;
-
-                        trigger OnValidate()
-                        begin
-                            UpdateAllowDataMovement();
-                        end;
-                    }
-                    field(AOAIOutOfRegionAreaAOAIServiceLocated; AOAIServiceLocatedLbl)
-                    {
-                        ShowCaption = false;
-
-                        trigger OnDrillDown()
-                        begin
-                            Hyperlink(AOAIServiceLocatedDocLinkLbl);
-                        end;
-                    }
-                    field(AOAIOutOfRegionAreaDataProcess; DataProcessByAOAILbl)
-                    {
-                        ShowCaption = false;
-
-                        trigger OnDrillDown()
-                        begin
-                            Hyperlink(DataProcessByAOAIDocLinkLbl);
-                        end;
-                    }
                 }
             }
 
@@ -226,7 +149,7 @@ page 7775 "Copilot AI Capabilities"
 
                 trigger OnAction()
                 begin
-                    Hyperlink(CheckServiceHealthDocLinkLbl);
+                    Hyperlink('https://aka.ms/azurestatus');
                 end;
             }
         }
@@ -242,13 +165,19 @@ page 7775 "Copilot AI Capabilities"
     trigger OnOpenPage()
     var
         EnvironmentInformation: Codeunit "Environment Information";
-        WithinGeo: Boolean;
-        WithinEUDB: Boolean;
     begin
         OnRegisterCopilotCapability();
 
-        CopilotCapabilityImpl.CheckGeoAndEUDB(WithinGeo, WithinEUDB);
-        CopilotCapabilityImpl.GetDataMovementAllowed(AllowDataMovement);
+        CopilotCapabilityImpl.CheckGeo(WithinGeo, WithinEuropeGeo);
+
+        case PrivacyNotice.GetPrivacyNoticeApprovalState(CopilotCapabilityImpl.GetAzureOpenAICategory(), false) of
+            Enum::"Privacy Notice Approval State"::Agreed:
+                AllowDataMovement := true;
+            Enum::"Privacy Notice Approval State"::Disagreed:
+                AllowDataMovement := false;
+            else
+                AllowDataMovement := true;
+        end;
 
         AllowDataMovementEditable := CopilotCapabilityImpl.IsAdmin();
 
@@ -258,19 +187,13 @@ page 7775 "Copilot AI Capabilities"
         if not EnvironmentInformation.IsSaaSInfrastructure() then
             CopilotCapabilityImpl.ShowCapabilitiesNotAvailableOnPremNotification();
 
-        if (WithinGeo and not WithinEUDB) and (not AllowDataMovement) then
+        if (WithinGeo and not WithinEuropeGeo) and (not AllowDataMovement) then
             CopilotCapabilityImpl.ShowPrivacyNoticeDisagreedNotification();
 
         CopilotCapabilityImpl.UpdateGuidedExperience(AllowDataMovement);
-
-        WithinEUDBArea := WithinEUDB;
-        WithinAOAIServicesInRegionArea := WithinGeo and (not WithinEUDB);
-        WithinAOAIOutOfRegionArea := (not WithinGeo) and (not WithinEUDB);
     end;
 
     local procedure UpdateAllowDataMovement()
-    var
-        CopilotTelemetry: Codeunit "Copilot Telemetry";
     begin
         if AllowDataMovement then
             PrivacyNotice.SetApprovalState(CopilotCapabilityImpl.GetAzureOpenAICategory(), Enum::"Privacy Notice Approval State"::Agreed)
@@ -280,7 +203,6 @@ page 7775 "Copilot AI Capabilities"
         CurrPage.GenerallyAvailableCapabilities.Page.SetDataMovement(AllowDataMovement);
         CurrPage.PreviewCapabilities.Page.SetDataMovement(AllowDataMovement);
         CopilotCapabilityImpl.UpdateGuidedExperience(AllowDataMovement);
-        CopilotTelemetry.SendCopilotDataMovementUpdatedTelemetry(AllowDataMovement);
     end;
 
     [IntegrationEvent(false, false)]
@@ -292,18 +214,10 @@ page 7775 "Copilot AI Capabilities"
     var
         CopilotCapabilityImpl: Codeunit "Copilot Capability Impl";
         PrivacyNotice: Codeunit "Privacy Notice";
-        WithinEUDBArea: Boolean;
-        WithinAOAIServicesInRegionArea: Boolean;
-        WithinAOAIOutOfRegionArea: Boolean;
+        WithinGeo: Boolean;
+        WithinEuropeGeo: Boolean;
         AllowDataMovement: Boolean;
         AllowDataMovementEditable: Boolean;
         CopilotGovernDataLbl: Label 'How do I govern my Copilot data?';
-        FAQForDataSecurityAndPrivacyLbl: Label 'FAQ for data security and privacy';
-        DataProcessByAOAILbl: Label 'What data is processed by Azure OpenAI Service?';
-        AOAIServiceLocatedLbl: Label 'In which region will my data be processed?';
-        CopilotGovernDataDocLinkLbl: Label 'https://go.microsoft.com/fwlink/?linkid=2249575', Locked = true;
-        FAQForDataSecurityAndPrivacyDocLinkLbl: Label 'https://go.microsoft.com/fwlink/?linkid=2298505', Locked = true;
-        DataProcessByAOAIDocLinkLbl: Label 'https://go.microsoft.com/fwlink/?linkid=2298232', Locked = true;
-        AOAIServiceLocatedDocLinkLbl: Label 'https://go.microsoft.com/fwlink/?linkid=2250267', Locked = true;
-        CheckServiceHealthDocLinkLbl: Label 'https://aka.ms/azurestatus', Locked = true;
+        AOAIServiceLocatedLbl: Label 'In which region will my data be stored and processed?';
 }

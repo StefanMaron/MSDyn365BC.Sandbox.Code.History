@@ -90,7 +90,6 @@ codeunit 5752 "Get Source Doc. Outbound"
         WhseRqst.FilterGroup(2);
         WhseRqst.SetRange(Type, WhseRqst.Type::Outbound);
         WhseRqst.SetRange("Location Code", WhseShptHeader."Location Code");
-        WhseRqst.SetFilter("Source Document", '<>%1', WhseRqst."Source Document"::"Prod. Consumption");
         OnGetSingleOutboundDocOnSetFilterGroupFilters(WhseRqst, WhseShptHeader);
         WhseRqst.FilterGroup(0);
         WhseRqst.SetRange("Document Status", WhseRqst."Document Status"::Released);

@@ -65,9 +65,9 @@ tableextension 308 NoSeriesObsolete extends "No. Series"
     [Obsolete('The method has been moved to codeunit "No. Series Setup Impl."', '24.0')]
     procedure DrillDown()
     var
-        NoSeries: Codeunit "No. Series";
+        NoSeriesSetupImpl: Codeunit "No. Series - Setup Impl.";
     begin
-        NoSeries.DrillDown(Rec);
+        NoSeriesSetupImpl.DrillDown(Rec);
     end;
 
     [Obsolete('The method has been moved to codeunit "No. Series Setup Impl."', '24.0')]
