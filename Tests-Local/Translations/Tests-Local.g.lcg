@@ -185,15 +185,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Auto Payment - NamedType AmtCapLbl)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3748939737 - NamedType 3522299158" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Last Entry No. must be %1 in %2.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1= Field Value ,%2= Table Name.]D;]A;(LookupHint=Codeunit ERM Auto Payment - NamedType AnalysisViewErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3748939737 - NamedType 4263247697" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[No. Series should be assigned from selected Series from Assist Edit.]]></Val>
@@ -1182,15 +1173,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[%1 = Field Caption,%2 =  Field Value, %3 = Table Caption.]D;]A;(LookupHint=Codeunit ERM Payment Lines - NamedType AmountErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2799076071 - NamedType 3288670887" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Remaining Amount must be %1.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[Field Value.]D;]A;(LookupHint=Codeunit ERM Payment Lines - NamedType RemainingAmountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2799076071 - NamedType 668728601" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
