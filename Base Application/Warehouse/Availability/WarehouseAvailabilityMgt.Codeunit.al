@@ -610,13 +610,6 @@ codeunit 7314 "Warehouse Availability Mgt."
 
     procedure CalcQtyOnBlockedItemTracking(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]): Decimal
     var
-        ItemTrackingSetup: Record "Item Tracking Setup";
-    begin
-        exit(CalcQtyOnBlockedItemTracking(LocationCode, ItemNo, VariantCode, ItemTrackingSetup));
-    end;
-
-    procedure CalcQtyOnBlockedItemTracking(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; ItemTrackingSetup: Record "Item Tracking Setup"): Decimal
-    var
         CalcQtyOnBlockedITOnSNQuery: Query "CalcQtyOnBlockedITOnSNQuery";
         CalcQtyOnBlockedITOnLNQuery: Query "CalcQtyOnBlockedITOnLNQuery";
         CalcQtyOnBlockedITOnPNQuery: Query "CalcQtyOnBlockedITOnPNQuery";
@@ -639,7 +632,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         CalcQtyOnBlockedITOnPNQuery.SetRange(Item_No_, ItemNo);
         CalcQtyOnBlockedITOnPNQuery.SetRange(Variant_Code, VariantCode);
         CalcQtyOnBlockedITOnPNQuery.SetRange(Blocked, true);
-        CalcQtyOnBlockedITOnPNQuery.SetItemTrackingFilter(ItemTrackingSetup);
 
         CalcQtyOnBlockedITOnPNQuery.SetRange(ILE_Item_No_, ItemNo);
         CalcQtyOnBlockedITOnPNQuery.SetRange(ILE_Variant_Code, VariantCode);
@@ -657,7 +649,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         CalcQtyOnBlockedITOnLNQuery.SetRange(Item_No_, ItemNo);
         CalcQtyOnBlockedITOnLNQuery.SetRange(Variant_Code, VariantCode);
         CalcQtyOnBlockedITOnLNQuery.SetRange(Blocked, true);
-        CalcQtyOnBlockedITOnLNQuery.SetItemTrackingFilter(ItemTrackingSetup);
 
         CalcQtyOnBlockedITOnLNQuery.SetRange(ILE_Item_No_, ItemNo);
         CalcQtyOnBlockedITOnLNQuery.SetRange(ILE_Variant_Code, VariantCode);
@@ -678,7 +669,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         CalcQtyOnBlockedITOnSNQuery.SetRange(Item_No_, ItemNo);
         CalcQtyOnBlockedITOnSNQuery.SetRange(Variant_Code, VariantCode);
         CalcQtyOnBlockedITOnSNQuery.SetRange(Blocked, true);
-        CalcQtyOnBlockedITOnSNQuery.SetItemTrackingFilter(ItemTrackingSetup);
 
         CalcQtyOnBlockedITOnSNQuery.SetRange(ILE_Item_No_, ItemNo);
         CalcQtyOnBlockedITOnSNQuery.SetRange(ILE_Variant_Code, VariantCode);
