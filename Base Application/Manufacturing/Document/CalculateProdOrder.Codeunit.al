@@ -562,7 +562,6 @@ codeunit 99000773 "Calculate Prod. Order"
         ErrorOccured: Boolean;
         IsHandled: Boolean;
         ShouldCheckIfEntriesExist: Boolean;
-        SkipCalcComponents: Boolean;
     begin
         ProdOrderLine := ProdOrderLine2;
 
@@ -645,9 +644,7 @@ codeunit 99000773 "Calculate Prod. Order"
                         until ProdOrderRoutingLine3.Next() = 0;
                 end;
 
-        SkipCalcComponents := false;
-        OnCalculateOnBeforeCalcComponents(ProdOrderLine, CalcComponents, SkipCalcComponents);
-        if CalcComponents and not SkipCalcComponents then
+        if CalcComponents then
             if ProdOrderLine."Production BOM No." <> '' then begin
                 Item.Get(ProdOrderLine."Item No.");
                 GetPlanningParameters.AtSKU(
@@ -1224,11 +1221,6 @@ codeunit 99000773 "Calculate Prod. Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckProdOrderLineQuantity(ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalculateOnBeforeCalcComponents(ProdOrderLine: Record "Prod. Order Line"; CalcComponents: Boolean; var SkipCalcComponents: Boolean)
     begin
     end;
 }
