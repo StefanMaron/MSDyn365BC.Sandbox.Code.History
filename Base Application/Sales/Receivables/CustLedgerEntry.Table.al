@@ -1139,6 +1139,8 @@ table 21 "Cust. Ledger Entry"
         CarteraDoc: Record "Cartera Doc.";
         PostedCarteraDoc: Record "Posted Cartera Doc.";
     begin
+        OnBeforeCheckBillSituation(Rec);
+
         case true of
             CarteraDoc.Get(CarteraDoc.Type::Receivable, "Entry No."):
                 if CarteraDoc."Bill Gr./Pmt. Order No." <> '' then
@@ -1484,6 +1486,11 @@ table 21 "Cust. Ledger Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateMaxPaymentToleranceOnBeforeFieldError(var CustLedgerEntry: Record "Cust. Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckBillSituation(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
 }
