@@ -24,7 +24,7 @@ page 609 "IC Partner Card"
                 {
                     ApplicationArea = Intercompany;
                     Caption = 'Transfer Type';
-                    ToolTip = 'Specifies the type of inbox the intercompany partner has. File Location: Send the partner a file with intercompany transactions. Database: The partner is set up as another company in the same tenant. Email: Send the partner transactions by email. No IC transfer: Collect data, but don''t send it to the partner.';
+                    ToolTip = 'Specifies what type of inbox the intercompany partner has. File Location. You send the partner a file containing intercompany transactions. Database: The partner is set up as another company in the same database. Email: You send the partner transactions by email.';
 
                     trigger OnValidate()
                     begin
@@ -38,7 +38,7 @@ page 609 "IC Partner Card"
                     CaptionClass = TransferTypeLbl;
                     Editable = EnableInboxDetails;
                     Enabled = EnableInboxDetails;
-                    ToolTip = 'Specifies the company name of the intercompany partner.';
+                    ToolTip = 'Specifies the details of the intercompany partner''s inbox.';
                 }
                 field("Code"; Rec.Code)
                 {
