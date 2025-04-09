@@ -6,7 +6,7 @@ query 36995 Jobs
 {
     Access = Internal;
     QueryType = API;
-    Caption = 'Power BI Project';
+    Caption = 'Power BI Job';
     APIPublisher = 'microsoft';
     APIGroup = 'analytics';
     APIVersion = 'v0.5';
