@@ -252,14 +252,7 @@ codeunit 10752 "SII Doc. Upload Management"
     local procedure PostExecutePendingRequests(var SIIDocUploadState: Record "SII Doc. Upload State"; var TempSIIHistoryBuffer: Record "SII History" temporary; SIISession: Record "SII Session"; XMLDoc: DotNet XmlDocument; IsInvokeSoapRequest: Boolean; SkipPrePost: Boolean)
     var
         ResponseText: Text;
-        IsHandled: Boolean;
     begin
-        if IsNull(XMLDoc) then
-            exit;
-        OnBeforePostExecutePendingRequests(SIIDocUploadState, TempSIIHistoryBuffer, SIISession, XMLDoc.OuterXML, IsInvokeSoapRequest, SkipPrePost, IsHandled);
-        if IsHandled then
-            exit;
-
         if SkipPrePost then
             exit;
 
@@ -798,11 +791,6 @@ codeunit 10752 "SII Doc. Upload Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnInvokeBatchSoapRequestOnBeforeStoreRequestXML(var RequestText: Text; RequestType: Option InvoiceIssuedRegistration,InvoiceReceivedRegistration,PaymentSentRegistration,PaymentReceivedRegistration,CollectionInCashRegistration; var WebServiceUrl: Text);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostExecutePendingRequests(var SIIDocUploadState: Record "SII Doc. Upload State"; var TempSIIHistoryBuffer: Record "SII History" temporary; SIISession: Record "SII Session"; RequestText: Text; IsInvokeSoapRequest: Boolean; SkipPrePost: Boolean; var IsHandled: Boolean);
     begin
     end;
 
