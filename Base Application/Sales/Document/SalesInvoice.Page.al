@@ -1,4 +1,4 @@
-namespace Microsoft.Sales.Document;
+﻿namespace Microsoft.Sales.Document;
 
 using Microsoft.Bank.Setup;
 using Microsoft.CRM.Contact;
@@ -438,12 +438,6 @@ page 43 "Sales Invoice"
                     Importance = Additional;
                     ToolTip = 'Specifies the customer''s VAT registration number for customers.';
                 }
-                field("Enterprise No."; Rec."Enterprise No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the enterprise number for customers';
-                }
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
                     ApplicationArea = Basic, Suite;
@@ -562,7 +556,7 @@ page 43 "Sales Invoice"
                 {
                     ApplicationArea = Location;
                     Importance = Additional;
-                    ToolTip = 'Specifies the location from where items are to be shipped. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
+                    ToolTip = 'Specifies the location from where inventory items to the customer on the sales document are to be shipped by default.';
                 }
             }
             group("Shipping and Billing")
