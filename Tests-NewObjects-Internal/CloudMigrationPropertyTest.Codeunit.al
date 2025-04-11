@@ -809,6 +809,7 @@
         ListOfTablesToMigrate.Add(3903); // Database::"Retention Policy Allowed Table"
         ListOfTablesToMigrate.Add(3905); // Database::"Retention Policy Log Entry"
         ListOfTablesToMigrate.Add(4325); // Database::"SOA Setup"
+        ListOfTablesToMigrate.Add(4585); // Database::"SOT Email"
         ListOfTablesToMigrate.Add(3712); // Database::"Translation"
         ListOfTablesToMigrate.Add(9999); // Database::"Upgrade Tags"
         ListOfTablesToMigrate.Add(9989); // Database::"Word Template Field"
