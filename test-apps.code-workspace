@@ -270,6 +270,9 @@
       "path": "./ExcelReports/Test/Dynamics BC Excel Reports Tests"
     },
     {
+      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
+    },
+    {
       "path": "./Email - SMTP API/Test/Email - SMTP API Tests"
     },
     {
@@ -277,6 +280,9 @@
     },
     {
       "path": "./Email - Outlook REST API/Test"
+    },
+    {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./LatePaymentPredictor/Test/Late Payment Prediction Tests"
