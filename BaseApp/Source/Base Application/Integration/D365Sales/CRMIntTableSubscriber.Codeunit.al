@@ -492,10 +492,8 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 if UpdateCRMSalesorderdetailUom(SourceRecordRef, DestinationRecordRef) then
                     AdditionalFieldsWereModified := true;
             'CRM Salesorderdetail-Sales Line':
-                if UpdateSalesLineUnitOfMeasure(SourceRecordRef, DestinationRecordRef) then begin
-                    UpdateSalesLinePriceOverride(SourceRecordRef, DestinationRecordRef);
+                if UpdateSalesLineUnitOfMeasure(SourceRecordRef, DestinationRecordRef) then
                     AdditionalFieldsWereModified := true;
-                end;
         end;
     end;
 
@@ -593,7 +591,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
                     ResetSalesOrderLineFromCRMSalesorderdetail(SourceRecordRef, DestinationRecordRef);
                     ApplySalesOrderDiscounts(SourceRecordRef, DestinationRecordRef);
-                    CreateFreightLines(SourceRecordRef, DestinationRecordRef);
                     ChangeValidateSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
                     SetOrderNumberAndDocOccurenceNumber(SourceRecordRef, DestinationRecordRef);
                     CreateSalesOrderNotes(SourceRecordRef, DestinationRecordRef);
@@ -818,7 +815,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
                     ResetSalesOrderLineFromCRMSalesorderdetail(SourceRecordRef, DestinationRecordRef);
                     ApplySalesOrderDiscounts(SourceRecordRef, DestinationRecordRef);
-                    CreateFreightLines(SourceRecordRef, DestinationRecordRef);
                     ChangeValidateSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
                     CreateSalesOrderNotes(SourceRecordRef, DestinationRecordRef);
                 end;
@@ -848,7 +844,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
                     ChangeSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Open);
                     ResetSalesOrderLineFromCRMSalesorderdetail(SourceRecordRef, DestinationRecordRef);
-                    CreateFreightLines(SourceRecordRef, DestinationRecordRef);
                     ChangeSalesOrderStatus(DestinationRecordRef, SalesHeader.Status::Released);
                     CreateSalesOrderNotes(SourceRecordRef, DestinationRecordRef);
                 end;
@@ -1831,20 +1826,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         SalesCalcDiscountByType.ApplyInvDiscBasedOnAmt(CRMDiscountAmount, ChangedSalesHeader);
 
         DestinationRecordRef.GetTable(ChangedSalesHeader);
-    end;
-
-    local procedure CreateFreightLines(SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef)
-    var
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        CRMSalesorder: Record "CRM Salesorder";
-    begin
-        SourceRecordRef.SetTable(CRMSalesorder);
-        DestinationRecordRef.SetTable(SalesHeader);
-
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.FindFirst() then
-            SalesLine.InsertFreightLine(CRMSalesorder.FreightAmount);
     end;
 
 #if not CLEAN25
@@ -2909,20 +2890,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         end;
         DestinationRecordRef.GetTable(SalesLine);
         exit(true);
-    end;
-
-    local procedure UpdateSalesLinePriceOverride(SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef): Boolean
-    var
-        CRMSalesorderdetail: Record "CRM Salesorderdetail";
-        SalesLine: Record "Sales Line";
-    begin
-        SourceRecordRef.SetTable(CRMSalesorderdetail);
-        DestinationRecordRef.SetTable(SalesLine);
-
-        if SalesLine."Unit Price" <> CRMSalesorderdetail.PricePerUnit then
-            SalesLine.Validate("Unit Price", CRMSalesorderdetail.PricePerUnit);
-
-        DestinationRecordRef.GetTable(SalesLine);
     end;
 
     local procedure UpdateCRMSalesorderdetailUom(SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef): Boolean
