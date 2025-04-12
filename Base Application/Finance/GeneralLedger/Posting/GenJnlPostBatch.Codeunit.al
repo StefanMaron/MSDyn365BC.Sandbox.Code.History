@@ -1047,7 +1047,6 @@ codeunit 13 "Gen. Jnl.-Post Batch"
         if not CurrGenJnlTemplate."Unlink Inc. Doc On Posting" then
             exit;
         GenJnlLine."Incoming Document Entry No." := 0;
-        GenJnlLine.Modify();
     end;
 
     [Scope('OnPrem')]
