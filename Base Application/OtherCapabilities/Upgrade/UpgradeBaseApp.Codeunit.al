@@ -2834,7 +2834,29 @@ codeunit 104000 "Upgrade - BaseApp"
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetJobShipToSellToFunctionalityUpgradeTag()) then
             exit;
 
-        if Job.FindSet(true) then
+        Job.SetLoadFields(
+            "Bill-to Customer No.",
+            "Bill-to Name",
+            "Bill-to Name 2",
+            "Bill-to Contact",
+            "Bill-to Contact No.",
+            "Bill-to Address",
+            "Bill-to Address 2",
+            "Bill-to Post Code",
+            "Bill-to Country/Region Code",
+            "Bill-to City",
+            "Bill-to County",
+            "Sell-to Customer Name",
+            "Sell-to Customer Name 2",
+            "Sell-to Address",
+            "Sell-to Address 2",
+            "Sell-to City",
+            "Sell-to County",
+            "Sell-to Post Code",
+            "Sell-to Country/Region Code",
+            "Sell-to Contact"
+        );
+        if Job.FindSet() then
             repeat
                 Job."Sell-to Customer No." := Job."Bill-to Customer No.";
                 Job."Sell-to Customer Name" := Job."Bill-to Name";
@@ -2847,12 +2869,9 @@ codeunit 104000 "Upgrade - BaseApp"
                 Job."Sell-to Country/Region Code" := Job."Bill-to Country/Region Code";
                 Job."Sell-to City" := Job."Bill-to City";
                 Job."Sell-to County" := Job."Bill-to County";
-                if Job."Bill-to Customer No." <> '' then begin
-                    Customer.SetLoadFields("Payment Method Code", "Payment Terms Code");
-                    if Customer.Get(Job."Bill-to Customer No.") then begin
-                        Job."Payment Method Code" := Customer."Payment Method Code";
-                        Job."Payment Terms Code" := Customer."Payment Terms Code";
-                    end;
+                if Customer.Get(Job."Bill-to Customer No.") then begin
+                    Job."Payment Method Code" := Customer."Payment Method Code";
+                    Job."Payment Terms Code" := Customer."Payment Terms Code";
                 end;
 
                 Job.SyncShipToWithSellTo();
@@ -3256,9 +3275,9 @@ codeunit 104000 "Upgrade - BaseApp"
                 (ServiceMgtSetup."Jnl. Templ. Serv. Contr. Inv." <> '') or (ServiceMgtSetup."Jnl. Templ. Serv. Contr. CM" <> '')
             then begin
                 ServiceMgtSetup."Serv. Inv. Template Name" := ServiceMgtSetup."Jnl. Templ. Serv. Inv.";
-                ServiceMgtSetup."Serv. Cr. Memo Templ. Name" := ServiceMgtSetup."Jnl. Templ. Serv. CM";
-                ServiceMgtSetup."Serv. Contr. Inv. Templ. Name" := ServiceMgtSetup."Jnl. Templ. Serv. Contr. Inv.";
-                ServiceMgtSetup."Serv. Contr. Cr.M. Templ. Name" := ServiceMgtSetup."Jnl. Templ. Serv. Contr. CM";
+                ServiceMgtSetup."Serv. Cr. Memo Templ. Name" := ServiceMgtSetup."Jnl. Templ. Serv. Contr. Inv.";
+                ServiceMgtSetup."Serv. Contr. Inv. Templ. Name" := ServiceMgtSetup."Jnl. Templ. Serv. Contr. CM";
+                ServiceMgtSetup."Serv. Contr. Cr.M. Templ. Name" := ServiceMgtSetup."Jnl. Templ. Serv. CM";
                 ServiceMgtSetup.Modify();
             end;
 
@@ -4376,7 +4395,6 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetIntegrationTableMappingTemplatesUpgradeTag());
     end;
 
-    [Obsolete('This function is obsolete as the "Customer Template" table has been removed in version 23.', '25.0')]
     [IntegrationEvent(false, false)]
     local procedure OnUpdateNewCustomerTemplateFromConversionTemplateOnBeforeModify(var CustomerTempl: Record "Customer Templ."; CustomerTemplate: Record "Customer Template")
     begin
