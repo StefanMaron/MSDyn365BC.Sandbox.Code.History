@@ -33,14 +33,9 @@ table 5777 "Item Reference"
             Caption = 'Reference Type';
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateReferenceType(Rec, xRec, IsHandled);
-                if not IsHandled then
-                    if ("Reference Type" <> xRec."Reference Type") and (xRec."Reference Type" <> xRec."Reference Type"::" ") then
-                        "Reference Type No." := '';
+                if ("Reference Type" <> xRec."Reference Type") and (xRec."Reference Type" <> xRec."Reference Type"::" ") then
+                    "Reference Type No." := '';
             end;
         }
         field(5; "Reference Type No."; Code[20])
@@ -149,23 +144,18 @@ table 5777 "Item Reference"
     end;
 
     trigger OnRename()
-    var
-        IsHandled: Boolean;
     begin
         if ("Reference Type No." <> '') and ("Reference Type" = "Reference Type"::" ") then
             Error(BlankReferenceTypeErr);
 
-        IsHandled := false;
-        OnRenameOnBeforeUpdateItemVendor(Rec, xRec, IsHandled);
-        if not IsHandled then
-            if ("Reference Type" = "Reference Type"::Vendor) and not ItemVendorResetRequired(xRec, Rec) then
-                UpdateItemVendorNo(xRec, "Reference No.")
-            else begin
-                if xRec."Reference Type" = "Reference Type"::Vendor then
-                    DeleteItemVendor(xRec);
-                if "Reference Type" = "Reference Type"::Vendor then
-                    CreateItemVendor();
-            end;
+        if ("Reference Type" = "Reference Type"::Vendor) and not ItemVendorResetRequired(xRec, Rec) then
+            UpdateItemVendorNo(xRec, "Reference No.")
+        else begin
+            if xRec."Reference Type" = "Reference Type"::Vendor then
+                DeleteItemVendor(xRec);
+            if "Reference Type" = "Reference Type"::Vendor then
+                CreateItemVendor();
+        end;
     end;
 
     var
@@ -364,16 +354,6 @@ table 5777 "Item Reference"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDeleteItemVendor(var ItemReference: Record "Item Reference"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRenameOnBeforeUpdateItemVendor(var ItemReference: Record "Item Reference"; xItemReference: Record "Item Reference"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateReferenceType(var ItemReference: Record "Item Reference"; xItemReference: Record "Item Reference"; var IsHandled: Boolean)
     begin
     end;
 }
