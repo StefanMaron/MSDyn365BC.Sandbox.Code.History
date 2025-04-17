@@ -13,11 +13,10 @@ codeunit 4790 "Create Common Location"
     var
         UKCampusBldg5Lbl: Label 'UK Campus Bldg 5', MaxLength = 100;
         MainWarehouseLbl: Label 'Main Warehouse', MaxLength = 100;
+        MainTok: Label 'MAIN', MaxLength = 10;
 
     procedure MainLocation(): Code[10]
-    var
-        CreateLocation: Codeunit "Create Location";
     begin
-        exit(CreateLocation.MainLocation());
+        exit(MainTok);
     end;
 }
