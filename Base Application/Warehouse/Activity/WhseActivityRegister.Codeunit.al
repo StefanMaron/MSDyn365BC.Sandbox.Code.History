@@ -1221,7 +1221,7 @@ codeunit 7307 "Whse.-Activity-Register"
                         end;
                 end;
 
-                OnRegisterWhseItemTrkgLineOnAfterSetDueDate(WhseActivLine2, DueDate);
+                OnRegisterWhseItemTrkgLineOnAfterSetDueDate(WhseActivLine2, DueDate, QtyToRegisterBase);
 
                 if WhseActivLine2."Activity Type" = WhseActivLine2."Activity Type"::"Invt. Movement" then
                     case WhseActivLine2."Source Type" of
@@ -1619,6 +1619,10 @@ codeunit 7307 "Whse.-Activity-Register"
             SubTotalBase :=
               QtyInWhseBase -
               QtyOnPickBinsBase - QtyOnOutboundBinsBase - QtyOnDedicatedBinsBase;
+
+            if (WhseActivLine."Action Type" = WhseActivLine."Action Type"::Take) and (WhseActivLine."Bin Code" = Location."Shipment Bin Code") then
+                SubTotalBase += QtyOnOutboundBinsBase;
+
             if WhseActivLine."Activity Type" <> WhseActivLine."Activity Type"::"Invt. Movement" then
                 SubTotalBase -= Abs(Item."Reserved Qty. on Inventory");
 
@@ -2672,7 +2676,7 @@ codeunit 7307 "Whse.-Activity-Register"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRegisterWhseItemTrkgLineOnAfterSetDueDate(WarehouseActivityLine: Record "Warehouse Activity Line"; var DueDate: Date)
+    local procedure OnRegisterWhseItemTrkgLineOnAfterSetDueDate(WarehouseActivityLine: Record "Warehouse Activity Line"; var DueDate: Date; var QtyToRegisterBase: Decimal)
     begin
     end;
 
