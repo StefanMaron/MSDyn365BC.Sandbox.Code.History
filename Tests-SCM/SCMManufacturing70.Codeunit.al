@@ -3118,6 +3118,124 @@ codeunit 137063 "SCM Manufacturing 7.0"
             VerifyProdOrderComponentQuantities(ParentItem."No.", ChildItemCode[i], QuantityPer[i]);
     end;
 
+    [Test]
+    procedure RefreshProdOrderReportForFamilyCreatesProdOrderLinesAsPerUOMOfItems()
+    var
+        Family: Record Family;
+        FamilyLine: Record "Family Line";
+        Item: array[2] of Record Item;
+        ItemUnitOfMeasure: array[4] of Record "Item Unit of Measure";
+        UnitOfMeasure: array[4] of Record "Unit of Measure";
+        ProductionOrder: Record "Production Order";
+        ProdOrderLine: Record "Prod. Order Line";
+    begin
+        // [SCENARIO 556431] When Stan runs Refresh Production Order action from a 
+        // Released Production Order having Source Type as Family then Prod. Order Lines 
+        // are created as per Unit of Measure Codes of Items.
+        Initialize();
+
+        // [GIVEN] Create Item [1].
+        LibraryInventory.CreateItem(Item[1]);
+
+        // [GIVEN] Create Item [2].
+        LibraryInventory.CreateItem(Item[2]);
+
+        // [GIVEN] Create Unit of Measure Code [1] and Item Unit of Measure [1].
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure[1]);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure[1], Item[1]."No.",
+            UnitOfMeasure[1].Code, LibraryRandom.RandIntInRange(50, 50));
+
+        // [GIVEN] Create Unit of Measure Code [2] and Item Unit of Measure [2].
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure[2]);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure[2], Item[1]."No.",
+            UnitOfMeasure[2].Code, LibraryRandom.RandInt(0));
+
+        // [GIVEN] Create Unit of Measure Code [3] and Item Unit of Measure [3].
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure[3]);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure[3], Item[1]."No.",
+            UnitOfMeasure[3].Code, LibraryRandom.RandDecInDecimalRange(0.2, 0.2, 1));
+
+        // [GIVEN] Create Unit of Measure Code [4] and Item Unit of Measure [4].
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure[4]);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure[4], Item[2]."No.",
+            UnitOfMeasure[4].Code, LibraryRandom.RandIntInRange(3, 3));
+
+        // [GIVEN] Create a Family.
+        LibraryManufacturing.CreateFamily(Family);
+
+        // [GIVEN] Create Family Lines.
+        CreateFamilyLines(
+            Family,
+            Item[1],
+            Item[2],
+            UnitOfMeasure[1],
+            UnitOfMeasure[2],
+            UnitOfMeasure[3],
+            UnitOfMeasure[4]);
+
+        // [GIVEN] Create and Refresh Production Order.
+        LibraryManufacturing.CreateAndRefreshProductionOrder(
+            ProductionOrder,
+            ProductionOrder.Status::Released,
+            ProductionOrder."Source Type"::Family,
+            Family."No.",
+            LibraryRandom.RandIntInRange(10, 10));
+
+        // [GIVEN] Find Family Line.
+        FamilyLine.SetRange("Family No.", Family."No.");
+        FamilyLine.SetRange("Item No.", Item[1]."No.");
+        FamilyLine.SetRange("Unit of Measure Code", UnitOfMeasure[2].Code);
+        FamilyLine.FindFirst();
+
+        // [WHEN] Find Prod. Order Line.
+        ProdOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+        ProdOrderLine.SetRange("Item No.", Item[1]."No.");
+        ProdOrderLine.SetRange("Unit of Measure Code", UnitOfMeasure[2].Code);
+        ProdOrderLine.FindFirst();
+
+        // [THEN] Quantity of Prod. Order Line is equal to Quanity of Production Order * Quantity of Family Line.
+        Assert.AreEqual(
+            ProductionOrder.Quantity * FamilyLine.Quantity,
+            ProdOrderLine.Quantity,
+            StrSubstNo(
+                QuanityPerErrorLbl,
+                FamilyLine.FieldCaption(Quantity),
+                ProductionOrder.Quantity * FamilyLine.Quantity,
+                FamilyLine.TableCaption()));
+    end;
+
+    [Test]
+    procedure ProdutionBOMVersionIsCertifedIfAnotherVersionIsClosedContainBOMLoop()
+    var
+        ChildItem: Record Item;
+        GrandParentItem: Record Item;
+        GrandProductionBOMHeader: Record "Production BOM Header";
+        ParentItem: Record Item;
+        ProductionBOMHeader: Record "Production BOM Header";
+        ProductionBOMLine: Record "Production BOM Line";
+        ProductionBOMVersion: array[2] of Record "Production BOM Version";
+    begin
+        // [SCENARIO 537287] New version of production BOM gets certified if there is another closed version containing BOM loop.
+        Initialize();
+
+        // [GIVEN] Create two level of Item Hierarchy.
+        CreateItemHierarchy(ProductionBOMHeader, ParentItem, ChildItem, LibraryRandom.RandInt(5));
+        CreateItemHierarchy(GrandProductionBOMHeader, GrandParentItem, ParentItem, LibraryRandom.RandInt(5));
+
+        // [GIVEN] Create version one of production bom, add parent item and marked status as closed.
+        CreateBOMVersionAndClosed(ParentItem, ProductionBOMVersion[1], ProductionBOMHeader);
+
+        // [GIVEN] Create version two of production bom.
+        CreateBOMVersionUsingCopyBOM(ParentItem."Base Unit of Measure", ProductionBOMVersion[2], ProductionBOMHeader, Format(LibraryRandom.RandIntInRange(2, 2)));
+
+        // [WHEN] When update quantity in version two of bom.
+        FindProductionBOMLine(ProductionBOMHeader, ProductionBOMVersion[2], ChildItem."No.", ProductionBOMLine);
+        UpdateProductionBOMLineByField(ProductionBOMLine, ProductionBOMLine.FieldNo(Quantity), LibraryRandom.RandIntInRange(3, 5));
+
+        // [THEN] Version two of production bom gets certified.
+        UpdateStatusOnProductionBOMVersion(ProductionBOMVersion[2], ProductionBOMVersion[2].Status::Certified);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -5486,6 +5604,97 @@ codeunit 137063 "SCM Manufacturing 7.0"
                 ProdOrderComponent.FieldCaption("Quantity per"),
                 ExpectedQuantity,
                 ProdOrderComponent.TableCaption()));
+    end;
+
+    local procedure CreateFamilyLines(
+        Family: Record Family;
+        Item: Record Item;
+        Item2: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        UnitOfMeasure2: Record "Unit of Measure";
+        UnitOfMeasure3: Record "Unit of Measure";
+        UnitOfMeasure4: Record "Unit of Measure")
+    var
+        FamilyLine: array[5] of Record "Family Line";
+    begin
+        LibraryManufacturing.CreateFamilyLine(FamilyLine[1], Family."No.", Item."No.", LibraryRandom.RandIntInRange(6, 6));
+        FamilyLine[1].Validate("Unit of Measure Code", UnitOfMeasure2.Code);
+        FamilyLine[1].Modify(true);
+
+        LibraryManufacturing.CreateFamilyLine(FamilyLine[2], Family."No.", Item2."No.", LibraryRandom.RandIntInRange(3, 3));
+        FamilyLine[2].Validate("Unit of Measure Code", UnitOfMeasure4.Code);
+        FamilyLine[2].Modify(true);
+
+        LibraryManufacturing.CreateFamilyLine(FamilyLine[3], Family."No.", Item."No.", LibraryRandom.RandIntInRange(4, 4));
+        FamilyLine[3].Validate("Unit of Measure Code", UnitOfMeasure.Code);
+        FamilyLine[3].Modify(true);
+
+        LibraryManufacturing.CreateFamilyLine(FamilyLine[4], Family."No.", Item."No.", LibraryRandom.RandIntInRange(6, 6));
+        FamilyLine[4].Validate("Unit of Measure Code", UnitOfMeasure3.Code);
+        FamilyLine[4].Modify(true);
+    end;
+
+    local procedure CreateBOMVersionAndClosed(
+        ParentItem: Record Item;
+        ProductionBOMVersion: Record "Production BOM Version";
+        ProductionBOMHeader: Record "Production BOM Header")
+    begin
+        CreateBOMVersionUsingCopyBOM(ParentItem."Base Unit of Measure", ProductionBOMVersion, ProductionBOMHeader, Format(LibraryRandom.RandInt(0)));
+        AddProductionBOMLine(ProductionBOMHeader, ProductionBOMVersion, ParentItem."No.");
+        UpdateStatusOnProductionBOMVersion(ProductionBOMVersion, ProductionBOMVersion.Status::Closed);
+    end;
+
+    local procedure CreateBOMVersionUsingCopyBOM(
+        BaseUnitOfMeasure: Code[10];
+        var ProductionBOMVersion: Record "Production BOM Version";
+        ProductionBOMHeader: Record "Production BOM Header"; VersionCode: Code[20])
+    var
+        ProductionBOMCopy: Codeunit "Production BOM-Copy";
+    begin
+        LibraryManufacturing.CreateProductionBOMVersion(
+            ProductionBOMVersion, ProductionBOMHeader."No.",
+            VersionCode, BaseUnitOfMeasure);
+        ProductionBOMCopy.CopyBOM(
+            ProductionBOMVersion."Production BOM No.", '',
+            ProductionBOMHeader, ProductionBOMVersion."Version Code");
+    end;
+
+    local procedure AddProductionBOMLine(ProductionBOMHeader: Record "Production BOM Header"; ProductionBOMVersion: Record "Production BOM Version"; ItemNo: Code[20])
+    var
+        ProductionBOMLine: Record "Production BOM Line";
+    begin
+        LibraryManufacturing.CreateProductionBOMLine(
+            ProductionBOMHeader, ProductionBOMLine, ProductionBOMVersion."Version Code",
+            ProductionBOMLine.Type::Item, ItemNo, LibraryRandom.RandInt(0));
+    end;
+
+    local procedure UpdateStatusOnProductionBOMVersion(var ProductionBOMVersion: Record "Production BOM Version"; Status: Enum "BOM Status")
+    begin
+        ProductionBOMVersion.Validate(Status, Status);
+        ProductionBOMVersion.Modify(true);
+    end;
+
+    local procedure FindProductionBOMLine(
+        ProductionBOMHeader: Record "Production BOM Header"; ProductionBOMVersion: Record "Production BOM Version";
+        ItemNo: Code[20]; var ProductionBOMLine: Record "Production BOM Line");
+    begin
+        ProductionBOMLine.SetRange("Production BOM No.", ProductionBOMHeader."No.");
+        ProductionBOMLine.SetRange("Version Code", ProductionBOMVersion."Version Code");
+        ProductionBOMLine.SetRange(Type, ProductionBOMLine.Type::Item);
+        ProductionBOMLine.SetRange("No.", ItemNo);
+        ProductionBOMLine.FindLast();
+    end;
+
+    local procedure UpdateProductionBOMLineByField(var ProductionBOMLine: Record "Production BOM Line"; FieldNo: Integer; Value: Variant)
+    var
+        RecRef: RecordRef;
+        FieldRef: FieldRef;
+    begin
+        RecRef.GetTable(ProductionBOMLine);
+        FieldRef := RecRef.Field(FieldNo);
+        FieldRef.Validate(Value);
+        RecRef.SetTable(ProductionBOMLine);
+        ProductionBOMLine.Modify(true);
     end;
 }
 
