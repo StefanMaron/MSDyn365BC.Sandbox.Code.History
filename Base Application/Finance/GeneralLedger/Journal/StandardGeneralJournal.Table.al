@@ -138,7 +138,6 @@ table 750 "Standard General Journal"
             GenJnlLine."Document No." := DocumentNo;
         if PostingDate <> 0D then
             GenJnlLine.Validate("Posting Date", PostingDate);
-        GenJnlLine.Validate("Currency Code", StdGenJnlLine."Currency Code");
         OnAfterCopyGenJnlFromStdJnl(GenJnlLine, StdGenJnlLine);
         GenJnlLine.Insert(true);
 
