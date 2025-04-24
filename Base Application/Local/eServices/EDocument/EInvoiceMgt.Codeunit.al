@@ -4374,6 +4374,7 @@ codeunit 10145 "E-Invoice Mgt."
         PostCode: Record "Post Code";
         TransferShipmentHeader: Record "Transfer Shipment Header";
         Location: Record Location;
+        CustomerLedgerEntry: Record "Cust. Ledger Entry";
         DataTypeManagement: Codeunit "Data Type Management";
         RecRef: RecordRef;
     begin
@@ -4383,6 +4384,10 @@ codeunit 10145 "E-Invoice Mgt."
             if PostCode.Get(TransferShipmentHeader."Transfer-from Post Code", TransferShipmentHeader."Transfer-from City") then
                 exit(PostCode."Time Zone");
             exit(GetTimeZoneFromCompany());
+        end;
+        if RecRef.Number = DATABASE::"Cust. Ledger Entry" then begin
+            RecRef.SetTable(CustomerLedgerEntry);
+            exit(GetTimeZoneFromCustomer(CustomerLedgerEntry."Customer No."));
         end;
 
         DocumentHeader.TransferFields(DocumentHeaderVariant);
