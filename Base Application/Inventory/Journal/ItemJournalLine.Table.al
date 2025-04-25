@@ -1993,7 +1993,7 @@ table 83 "Item Journal Line"
     begin
         OnBeforeSelectItemEntry(Rec, xRec, CurrentFieldNo);
 
-        IsHandled := true;
+        IsHandled := false;
         OnSelectItemEntryOnSetFilters(Rec, ItemLedgEntry, CurrentFieldNo, IsHandled);
         if not IsHandled then begin
             ItemLedgEntry.SetCurrentKey("Item No.", Positive);
