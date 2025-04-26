@@ -8,7 +8,7 @@ tableextension 30109 "Shpfy Sales Cr.Memo Line" extends "Sales Cr.Memo Line"
     {
         field(30103; "Shpfy Refund Id"; BigInteger)
         {
-            Caption = 'Shopify Refund Id';
+            Caption = 'Shpfy Refund Id';
             DataClassification = SystemMetadata;
             Editable = false;
             TableRelation = "Shpfy Refund Header"."Refund Id";

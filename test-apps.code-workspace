@@ -1,11 +1,11 @@
 {
   "settings": {
-    "al.enableCodeActions": false,
     "allint.enabled": false,
-    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
-    }
+    },
+    "al.enableCodeAnalysis": false
   },
   "folders": [
     {
@@ -105,9 +105,6 @@
       "path": "./APIV1/Test/_Exclude_APIV1_ Tests"
     },
     {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
-    },
-    {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
@@ -118,9 +115,6 @@
     },
     {
       "path": "./BankDeposits/Test/_Exclude_Bank Deposits Tests"
-    },
-    {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AI Tests"
@@ -265,12 +259,6 @@
     },
     {
       "path": "./ExternalEvents/test/_Exclude_Business_Events_Test"
-    },
-    {
-      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
     },
     {
       "path": "./Email - Outlook REST API/Test"
