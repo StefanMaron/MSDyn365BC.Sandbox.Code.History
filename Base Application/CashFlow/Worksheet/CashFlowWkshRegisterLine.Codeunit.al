@@ -32,8 +32,6 @@ codeunit 846 "Cash Flow Wksh. -Register Line"
     end;
 
     local procedure "Code"()
-    var
-        CheckIfCFAccountBlocked: Boolean;
     begin
         if CFWkshLine.EmptyLine() then
             exit;
@@ -46,9 +44,7 @@ codeunit 846 "Cash Flow Wksh. -Register Line"
         end;
 
         CashFlowForecast.Get(CFWkshLine."Cash Flow Forecast No.");
-        CheckIfCFAccountBlocked := CFWkshLine."Cash Flow Account No." <> '';
-        OnCodeOnAfterCalcCheckIfCFAccountBlocked(CFWkshLine, CheckIfCFAccountBlocked);
-        if CheckIfCFAccountBlocked then begin
+        if CFWkshLine."Cash Flow Account No." <> '' then begin
             CFAccount.Get(CFWkshLine."Cash Flow Account No.");
             CFAccount.TestField(Blocked, false);
         end;
@@ -85,11 +81,6 @@ codeunit 846 "Cash Flow Wksh. -Register Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateForecastEntry(var CashFlowForecastEntry: Record "Cash Flow Forecast Entry"; CashFlowWorksheetLine: Record "Cash Flow Worksheet Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCodeOnAfterCalcCheckIfCFAccountBlocked(var CashFlowWorksheetLine: Record "Cash Flow Worksheet Line"; var CheckIfCFAccountBlocked: Boolean)
     begin
     end;
 }
