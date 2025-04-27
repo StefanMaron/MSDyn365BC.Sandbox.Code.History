@@ -440,6 +440,7 @@ codeunit 7000006 "Document-Post"
                         ClosedCarteraDoc."Remaining Amt. (LCY)" := 0;
                         ClosedCarteraDoc."Amount for Collection" := 0;
                         ClosedCarteraDoc."Amt. for Collection (LCY)" := 0;
+                        OnUpdatePayableDocBeforeClosedCarteraDocInsert(ClosedCarteraDoc, GenJnlLine);
                         ClosedCarteraDoc.Insert();
                         CarteraDoc.Delete();
                         VendLedgEntry."Document Situation" := VendLedgEntry."Document Situation"::"Closed Documents";
@@ -966,15 +967,18 @@ codeunit 7000006 "Document-Post"
         PurchInvHeader: Record "Purch. Inv. Header";
         PostedPaymentOrder: Record "Posted Payment Order";
         CurrExchRate: Record "Currency Exchange Rate";
+        PaymentMethod: Record "Payment Method";
         CurrFact: Decimal;
     begin
         if PurchInvHeader.Get(PostedCarteraDoc."Document No.") then
             if PurchInvHeader."Currency Factor" <> 0 then begin
                 if PostedPaymentOrder.Get(PostedCarteraDoc."Bill Gr./Pmt. Order No.") then;
+                if PaymentMethod.Get(PostedCarteraDoc."Payment Method Code") then;
                 CurrFact := CurrExchRate.ExchangeRate(PostedPaymentOrder."Posting Date", PostedCarteraDoc."Currency Code");
                 if CurrFact <> PurchInvHeader."Currency Factor" then
-                    DocAmountLCY :=
-                      GetCorrectAmounts(CollDocAmountLCY, AppliedAmountLCY, CurrFact, PurchInvHeader."Currency Factor", PostedCarteraDoc);
+                    if not PaymentMethod."Invoices to Cartera" then
+                        DocAmountLCY :=
+                          GetCorrectAmounts(CollDocAmountLCY, AppliedAmountLCY, CurrFact, PurchInvHeader."Currency Factor", PostedCarteraDoc);
             end;
     end;
 
@@ -1270,6 +1274,11 @@ codeunit 7000006 "Document-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateReceivableDoc(var CustLedgEntry: Record "Cust. Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdatePayableDocBeforeClosedCarteraDocInsert(var ClosedCarteraDoc: Record "Closed Cartera Doc."; GenJnlLine: Record "Gen. Journal Line")
     begin
     end;
 }
