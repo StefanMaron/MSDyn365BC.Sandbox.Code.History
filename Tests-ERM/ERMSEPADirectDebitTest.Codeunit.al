@@ -722,6 +722,63 @@ codeunit 134406 "ERM SEPA Direct Debit Test"
         Assert.ExpectedError(NoEntriesErr);
     end;
 
+    [Test]
+    [HandlerFunctions('MessageHandler,ConfirmHandlerYes')]
+    [Scope('OnPrem')]
+    procedure CheckNoSeriesDataInGLEntryWhenDirectDebitCollectionCreateJournalOnlyTurnedOff()
+    var
+        CustLedgEntry: Record "Cust. Ledger Entry";
+        DirectDebitCollection: Record "Direct Debit Collection";
+        DirectDebitCollectionEntry: Record "Direct Debit Collection Entry";
+        GenJnlTemplate: Record "Gen. Journal Template";
+        GenJnlBatch: Record "Gen. Journal Batch";
+        SEPADirectDebitMandate: Record "SEPA Direct Debit Mandate";
+    begin
+        // [SCENARIO 560180] "Verify that the No. Series data in the GL entry is not blank when 'Create Journal Only' for Direct Debit Collection is turned off."
+        Initialize();
+
+        // [GIVEN] Create Direct Debit Collection Entry and Customer Ledger Entry.
+        CreateDirectDebitCollectionEntry(DirectDebitCollection, DirectDebitCollectionEntry, CustLedgEntry, SEPADirectDebitMandate);
+
+        // [GIVEN] Export the SEPA file.
+        DirectDebitCollection.Export();
+
+        // [GIVEN] Create Template and Batch.
+        CreateGenJnlTemplateAndBatch(GenJnlTemplate, GenJnlBatch, CreateNoSeries());
+
+        // [WHEN] Set CreateJnlOnly value false & Run Post Direct Collection Report.
+        RunPostDirectDebitCollection(DirectDebitCollection, GenJnlTemplate.Name, GenJnlBatch.Name);
+
+        // [THEN] Verify that the GL Entry No. Series field data is not blank.
+        VerifyGLEntry(GenJnlTemplate.Name, GenJnlBatch.Name);
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure VerifyIBANNoWhenBranchNoAndBankAccountNotEmpty()
+    var
+        BankAccount: Record "Bank Account";
+        CustomerBankAccount: Record "Customer Bank Account";
+        DirectDebitCollectionEntry: Record "Direct Debit Collection Entry";
+    begin
+        // [SCENARIO 562711] Verify the IBAN number when the Bank Branch number, Bank Account number, and IBAN are not empty.
+        Initialize();
+
+        // [GIVEN] Create Customer and Customer Bank Account.
+        CreateCustomerWithustomerBankAccount(CustomerBankAccount);
+
+        // [GIVEN] Create Direct Debit Collection Entry and Customer Ledger Entry.
+        CreateDirectDebitCollectionEntryWithBank(CustomerBankAccount, DirectDebitCollectionEntry, BankAccount);
+
+        // [WHEN] Export the SEPA file.
+        ExportToServerTempFile(DirectDebitCollectionEntry);
+
+        // [THEN] Verify IBAN No.
+        LibraryXMLRead.Initialize(ServerFileName);
+        LibraryXMLRead.VerifyNodeValueInSubtree('CdtrAcct', 'IBAN', BankAccount.IBAN);
+        LibraryXMLRead.VerifyNodeValueInSubtree('DbtrAcct', 'IBAN', CustomerBankAccount.IBAN);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -1080,9 +1137,9 @@ codeunit 134406 "ERM SEPA Direct Debit Test"
         MandateFromDate: Date;
         MandateToDate: Date;
         PartnerType: Enum "Partner Type";
-        CurrencyCode: Code[10];
-        DimSetID: Integer;
-        DimValCode: Code[20]): Code[20]
+                         CurrencyCode: Code[10];
+                         DimSetID: Integer;
+                         DimValCode: Code[20]): Code[20]
     var
         CustomerBankAccount: Record "Customer Bank Account";
         PaymentMethod: Record "Payment Method";
@@ -1127,6 +1184,148 @@ codeunit 134406 "ERM SEPA Direct Debit Test"
         LibraryVariableStorage.Enqueue(DimValCode);
         Commit();
         Report.Run(Report::"Create Direct Debit Collection");
+    end;
+
+    local procedure CreateDirectDebitCollectionEntry(var DirectDebitCollection: Record "Direct Debit Collection"; var DirectDebitCollectionEntry: Record "Direct Debit Collection Entry"; var CustLedgEntry: Record "Cust. Ledger Entry"; var SEPADirectDebitMandate: Record "SEPA Direct Debit Mandate")
+    begin
+        CreateDirectDebitCollectionEntryWithCurrency(
+            DirectDebitCollection,
+            DirectDebitCollectionEntry,
+            CustLedgEntry,
+            SEPADirectDebitMandate,
+            LibraryERM.GetCurrencyCode('EUR'));
+    end;
+
+    local procedure CreateDirectDebitCollectionEntryWithCurrency(var DirectDebitCollection: Record "Direct Debit Collection"; var DirectDebitCollectionEntry: Record "Direct Debit Collection Entry"; var CustLedgEntry: Record "Cust. Ledger Entry"; var SEPADirectDebitMandate: Record "SEPA Direct Debit Mandate"; CurrencyCode: Code[10])
+    var
+        BankAccount: Record "Bank Account";
+        Customer: Record Customer;
+        CustomerBankAccount: Record "Customer Bank Account";
+    begin
+        LibrarySales.CreateCustomer(Customer);
+
+        LibrarySales.CreateCustomerBankAccount(CustomerBankAccount, Customer."No.");
+        CustomerBankAccount.Validate(IBAN, Format(LibraryRandom.RandIntInRange(11111111, 99999999)));
+        CustomerBankAccount.Validate("SWIFT Code", Format(LibraryRandom.RandIntInRange(1111, 9999)));
+        CustomerBankAccount.Modify(true);
+
+        Customer.Validate("Preferred Bank Account Code", CustomerBankAccount.Code);
+        Customer.Validate("Partner Type", Customer."Partner Type"::Company);
+        Customer.Modify(true);
+        LibrarySales.CreateCustomerMandate(SEPADirectDebitMandate, Customer."No.", CustomerBankAccount.Code, Today(), WorkDate());
+
+        PostSalesInvoice(Customer, SEPADirectDebitMandate.ID, CurrencyCode);
+
+        CreateSEPABankAccount(BankAccount);
+        BankAccount.Validate("Direct Debit Msg. Nos.", CreateNoSeries());
+        BankAccount.Modify(true);
+        if DirectDebitCollection."No." = 0 then
+            DirectDebitCollection.CreateRecord(BankAccount.GetDirectDebitMessageNo(), BankAccount."No.", Customer."Partner Type");
+        DirectDebitCollectionEntry.SetRange("Direct Debit Collection No.", DirectDebitCollection."No.");
+
+        CustLedgEntry.FindLast();
+        DirectDebitCollectionEntry.CreateNew(DirectDebitCollection."No.", CustLedgEntry);
+        DirectDebitCollectionEntry.Modify(true);
+    end;
+
+    local procedure PostSalesInvoice(var Customer: Record Customer; DirectDebitMandateID: Code[35]; CurrencyCode: Code[10])
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        LibrarySales.CreateSalesInvoiceForCustomerNo(SalesHeader, Customer."No.");
+        SalesHeader.Validate("Currency Code", CurrencyCode);
+        SalesHeader.Validate("Direct Debit Mandate ID", DirectDebitMandateID);
+        SalesHeader.Modify(true);
+
+        LibrarySales.PostSalesDocument(SalesHeader, false, true);
+    end;
+
+    local procedure CreateNoSeries(): Code[20]
+    var
+        NoSeries: Record "No. Series";
+        NoSeriesLine: Record "No. Series Line";
+    begin
+        LibraryUtility.CreateNoSeries(NoSeries, true, false, false);
+        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, '', '');
+
+        exit(NoSeries.Code);
+    end;
+
+    local procedure CreateGenJnlTemplateAndBatch(var GenJnlTemplate: Record "Gen. Journal Template"; var GenJnlBatch: Record "Gen. Journal Batch"; NoSeriesCode: Code[20])
+    begin
+        LibraryERM.CreateGenJournalTemplate(GenJnlTemplate);
+        LibraryERM.CreateGenJournalBatch(GenJnlBatch, GenJnlTemplate.Name);
+        GenJnlBatch.Validate("No. Series", NoSeriesCode);
+        GenJnlBatch.Modify(true);
+    end;
+
+    local procedure RunPostDirectDebitCollection(DirectDebitCollection: Record "Direct Debit Collection"; JnlTemplateName: Code[10]; JnlBatchName: Code[10])
+    var
+        PostDirectDebitCollection: Report "Post Direct Debit Collection";
+    begin
+        PostDirectDebitCollection.SetCollectionEntry(DirectDebitCollection."No.");
+        PostDirectDebitCollection.SetJnlBatch(JnlTemplateName, JnlBatchName);
+        PostDirectDebitCollection.SetCreateJnlOnly(false);
+
+        Commit();
+        PostDirectDebitCollection.Run();
+    end;
+
+    local procedure VerifyGLEntry(JnlTemplateName: Code[10]; JnlBatchName: Code[10])
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        GLEntry.SetRange("Journal Templ. Name", JnlTemplateName);
+        GLEntry.SetRange("Journal Batch Name", JnlBatchName);
+        GLEntry.FindSet();
+        repeat
+            GLEntry.TestField("No. Series");
+        until GLEntry.Next() = 0;
+    end;
+
+    local procedure CreateCustomerWithustomerBankAccount(var CustomerBankAccount: Record "Customer Bank Account")
+    var
+        Customer: Record Customer;
+    begin
+        LibrarySales.CreateCustomerWithAddress(Customer);
+        LibrarySales.CreateCustomerBankAccount(CustomerBankAccount, Customer."No.");
+        CustomerBankAccount.Validate("Bank Account No.", Format(LibraryRandom.RandIntInRange(111111111, 999999999)));
+        CustomerBankAccount."Bank Branch No." := Format(LibraryRandom.RandIntInRange(100, 200));
+        CustomerBankAccount.Validate(IBAN, Format(LibraryRandom.RandIntInRange(11111111, 99999999)));
+        CustomerBankAccount.Validate("SWIFT Code", Format(LibraryRandom.RandIntInRange(1111, 9999)));
+        CustomerBankAccount.Modify(true);
+
+        Customer.Validate("Preferred Bank Account Code", CustomerBankAccount.Code);
+        Customer.Validate("Partner Type", Customer."Partner Type"::Company);
+        Customer.Modify(true);
+    end;
+
+    local procedure CreateDirectDebitCollectionEntryWithBank(CustomerBankAccount: Record "Customer Bank Account"; var DirectDebitCollectionEntry: Record "Direct Debit Collection Entry"; var BankAccount: Record "Bank Account")
+    var
+        BankExportImportSetup: Record "Bank Export/Import Setup";
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        Customer: Record Customer;
+        DirectDebitCollection: Record "Direct Debit Collection";
+        SEPADirectDebitMandate: Record "SEPA Direct Debit Mandate";
+    begin
+        Customer.Get(CustomerBankAccount."Customer No.");
+        LibrarySales.CreateCustomerMandate(SEPADirectDebitMandate, CustomerBankAccount."Customer No.", CustomerBankAccount.Code, Today(), WorkDate());
+        PostSalesInvoice(Customer, SEPADirectDebitMandate.ID, LibraryERM.GetCurrencyCode('EUR'));
+
+        CreateSEPABankAccount(BankAccount);
+        BankAccount.Validate("Bank Branch No.", Format(LibraryRandom.RandIntInRange(5000, 9000)));
+        BankAccount.Validate("Direct Debit Msg. Nos.", CreateNoSeries());
+        BankExportImportSetup.SetRange("Processing XMLport ID", Xmlport::"SEPA DD pain.008.001.02");
+        BankExportImportSetup.FindFirst();
+        BankAccount.Validate("Payment Export Format", BankExportImportSetup.Code);
+        BankAccount.Modify(true);
+
+        if DirectDebitCollection."No." = 0 then
+            DirectDebitCollection.CreateRecord(BankAccount.GetDirectDebitMessageNo(), BankAccount."No.", Customer."Partner Type");
+        DirectDebitCollectionEntry.SetRange("Direct Debit Collection No.", DirectDebitCollection."No.");
+        CustLedgerEntry.FindLast();
+        DirectDebitCollectionEntry.CreateNew(DirectDebitCollection."No.", CustLedgerEntry);
+        DirectDebitCollectionEntry.Modify(true);
     end;
 
     [MessageHandler]
