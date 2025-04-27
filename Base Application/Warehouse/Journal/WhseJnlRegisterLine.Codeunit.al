@@ -284,7 +284,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
         end;
         WhseJnlLine2."Qty. (Absolute)" := 0;
         WhseJnlLine2."Qty. (Absolute, Base)" := Abs(WhseJnlLine2."Qty. (Base)");
-        OnRegisterRoundResidualOnBeforeWhseJnlRegLineSetWhseRegister(WhseEntry, WhseEntry2, WhseJnlLine, WhseJnlLine2);
+        OnRegisterRoundResidualOnBeforeWhseJnlRegLineSetWhseRegister(WhseEntry, WhseEntry2, WhseJnlLine, WhseJnlLine2, Bin);
         WhseJnlRegLine.SetWhseRegister(WhseReg);
         WhseJnlRegLine.Run(WhseJnlLine2);
         WhseJnlRegLine.GetWhseRegister(WhseReg);
@@ -379,6 +379,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
             WarehouseEntry.CalcSums("Qty. (Base)");
             ModifyBinEmpty(WarehouseEntry."Qty. (Base)" = 0);
         end;
+        OnAfterUpdateBinEmpty(NewWarehouseEntry, Bin);
     end;
 
     local procedure ModifyBinEmpty(NewEmpty: Boolean)
@@ -511,6 +512,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
             WhseReg."Journal Batch Name" := WhseJnlLine."Journal Batch Name";
             WhseReg."Source Code" := WhseJnlLine."Source Code";
             WhseReg."User ID" := CopyStr(UserId(), 1, MaxStrLen(WhseJnlLine."User ID"));
+            OnInsertWhseRegOnBeforeInsertRecord(WhseReg, WhseJnlLine, WhseEntryNo);
             WhseReg.InsertRecord(WarehouseSetup.UseLegacyPosting());
         end else begin
             if ((WhseEntryNo < WhseReg."From Entry No.") and (WhseEntryNo <> 0)) or
@@ -519,6 +521,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
                 WhseReg."From Entry No." := WhseEntryNo;
             if WhseEntryNo > WhseReg."To Entry No." then
                 WhseReg."To Entry No." := WhseEntryNo;
+            OnInsertWhseRegOnBeforeModifyWarehouseRegister(WhseReg, WhseJnlLine, WhseEntryNo);
             WhseReg.Modify();
         end;
     end;
@@ -558,6 +561,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
     procedure SetWhseRegister(WhseRegDef: Record "Warehouse Register")
     begin
         WhseReg := WhseRegDef;
+        OnAfterSetWhseRegister(WhseReg);
     end;
 
     procedure GetWhseRegister(var WhseRegDef: Record "Warehouse Register")
@@ -734,10 +738,12 @@ codeunit 7301 "Whse. Jnl.-Register Line"
     begin
     end;
 
+#pragma warning disable AS0077    
     [IntegrationEvent(false, false)]
-    local procedure OnRegisterRoundResidualOnBeforeWhseJnlRegLineSetWhseRegister(var WhseEntry: Record "Warehouse Entry"; WhseEntry2: Record "Warehouse Entry"; WhseJnlLine: Record "Warehouse Journal Line"; WhseJnlLine2: Record "Warehouse Journal Line")
+    local procedure OnRegisterRoundResidualOnBeforeWhseJnlRegLineSetWhseRegister(var WhseEntry: Record "Warehouse Entry"; var WhseEntry2: Record "Warehouse Entry"; var WhseJnlLine: Record "Warehouse Journal Line"; var WhseJnlLine2: Record "Warehouse Journal Line"; var Bin: Record Bin)
     begin
     end;
+#pragma warning restore AS0077    
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteFromBinContentOnAfterClearTrackingFilters(var WarehouseEntry2: Record "Warehouse Entry"; var FromBinContent: Record "Bin Content"; WarehouseEntry: Record "Warehouse Entry")
@@ -751,6 +757,26 @@ codeunit 7301 "Whse. Jnl.-Register Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertWhseEntryOnBeforeTestFieldExpirationDate(WhseEntry: Record "Warehouse Entry"; ExistingExpDate: Date; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterUpdateBinEmpty(WarehouseEntry: Record "Warehouse Entry"; Bin: Record Bin)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnInsertWhseRegOnBeforeInsertRecord(var WarehouseReg: Record "Warehouse Register"; var WarehouseJournalLine: Record "Warehouse Journal Line"; WhseEntryNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnInsertWhseRegOnBeforeModifyWarehouseRegister(var WarehouseReg: Record "Warehouse Register"; var WarehouseJournalLine: Record "Warehouse Journal Line"; WhseEntryNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetWhseRegister(var WarehouseRegister: Record "Warehouse Register")
     begin
     end;
 }
