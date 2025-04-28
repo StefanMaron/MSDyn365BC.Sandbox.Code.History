@@ -1,9 +1,9 @@
 {
   "folders": [],
   "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
     "al.enableCodeActions": false,
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
     }
