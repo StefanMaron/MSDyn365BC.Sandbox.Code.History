@@ -97,6 +97,9 @@
       "path": "./APIV1/Test/_Exclude_APIV1_ Tests"
     },
     {
+      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
+    },
+    {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
