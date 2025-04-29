@@ -588,7 +588,6 @@ codeunit 99000773 "Calculate Prod. Order"
         ErrorOccured: Boolean;
         IsHandled: Boolean;
         ShouldCheckIfEntriesExist: Boolean;
-        SkipCalcComponents: Boolean;
     begin
         ProdOrderLine := ProdOrderLine2;
 
@@ -620,7 +619,7 @@ codeunit 99000773 "Calculate Prod. Order"
                   CapLedgEntry.TableCaption());
         end;
 
-        CheckProdOrderLineQuantity(ProdOrderLine);
+        ProdOrderLine.TestField(Quantity);
         if Direction = Direction::Backward then
             ProdOrderLine.TestField("Ending Date")
         else
@@ -671,9 +670,7 @@ codeunit 99000773 "Calculate Prod. Order"
                         until ProdOrderRoutingLine3.Next() = 0;
                 end;
 
-        SkipCalcComponents := false;
-        OnCalculateOnBeforeCalcComponents(ProdOrderLine, CalcComponents, SkipCalcComponents);
-        if CalcComponents and not SkipCalcComponents then
+        if CalcComponents then
             if ProdOrderLine."Production BOM No." <> '' then begin
                 Item.Get(ProdOrderLine."Item No.");
                 GetPlanningParameters.AtSKU(
@@ -988,16 +985,6 @@ codeunit 99000773 "Calculate Prod. Order"
         ProdOrderLine2 := ProdOrderLine;
     end;
 
-    local procedure CheckProdOrderLineQuantity(var ProdOrderLineToCheck: Record "Prod. Order Line")
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCheckProdOrderLineQuantity(ProdOrderLineToCheck, IsHandled);
-        if not IsHandled then
-            ProdOrderLineToCheck.TestField(Quantity);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertProdRoutingLine(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; ProdOrderLine: Record "Prod. Order Line")
     begin
@@ -1044,7 +1031,7 @@ codeunit 99000773 "Calculate Prod. Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalculate(var ItemLedgerEntry: Record "Item Ledger Entry"; var CapacityLedgerEntry: Record "Capacity Ledger Entry"; Direction: Option Forward,Backward; CalcRouting: Boolean; CalcComponents: Boolean; var DeleteRelations: Boolean; LetDueDateDecrease: Boolean; var IsHandled: Boolean; var ProdOrderLine: Record "Prod. Order Line"; var ErrorOccured: Boolean)
+    local procedure OnBeforeCalculate(var ItemLedgerEntry: Record "Item Ledger Entry"; var CapacityLedgerEntry: Record "Capacity Ledger Entry"; Direction: Option Forward,Backward; CalcRouting: Boolean; CalcComponents: Boolean; DeleteRelations: Boolean; LetDueDateDecrease: Boolean; var IsHandled: Boolean; var ProdOrderLine: Record "Prod. Order Line"; var ErrorOccured: Boolean)
     begin
     end;
 
@@ -1245,16 +1232,6 @@ codeunit 99000773 "Calculate Prod. Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalculateRoutingOnBeforeUpdateProdOrderRoutingLineDates(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckProdOrderLineQuantity(ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalculateOnBeforeCalcComponents(ProdOrderLine: Record "Prod. Order Line"; CalcComponents: Boolean; var SkipCalcComponents: Boolean)
     begin
     end;
 }
