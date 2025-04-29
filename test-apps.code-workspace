@@ -109,6 +109,9 @@
       "path": "./BankDeposits/Test/_Exclude_Bank Deposits Tests"
     },
     {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
+    },
+    {
       "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AI Tests"
     },
     {
@@ -251,6 +254,9 @@
     },
     {
       "path": "./ExternalEvents/test/_Exclude_Business_Events_Test"
+    },
+    {
+      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
       "path": "./Email - Outlook REST API/Test"
