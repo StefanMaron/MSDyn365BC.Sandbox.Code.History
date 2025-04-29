@@ -2,6 +2,7 @@ namespace Microsoft.Inventory.Tracking;
 
 using Microsoft.Inventory.Transfer;
 using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Item;
 
 codeunit 99000846 "Trans. Get Demand To Reserve"
 {
@@ -133,8 +134,9 @@ codeunit 99000846 "Trans. Get Demand To Reserve"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reservation Worksheet Mgt.", 'OnCalculateDemandOnAfterSync', '', false, false)]
-    local procedure SyncTransferOrderLines(BatchName: Code[10]; var GetDemandToReserve: Report "Get Demand To Reserve")
+
+    [EventSubscriber(ObjectType::Report, Report::"Get Demand To Reserve", 'OnGetDemand', '', false, false)]
+    local procedure OnGetDemand(var FilterItem: Record Item; DemandType: Enum "Reservation Demand Type"; VariantFilterFromBatch: Text; LocationFilterFromBatch: Text; ReservedFromStock: Enum "Reservation From Stock"; var ReservationWkshBatch: Record "Reservation Wksh. Batch"; DateFilter: Text; ItemFilterFromBatch: Text)
     var
         ReservationWkshLine: Record "Reservation Wksh. Line";
         TempTransferLine: Record "Transfer Line" temporary;
@@ -143,12 +145,14 @@ codeunit 99000846 "Trans. Get Demand To Reserve"
         AvailableQtyBase, InventoryQtyBase, ReservedQtyBase, WarehouseQtyBase : Decimal;
         LineNo: Integer;
     begin
-        GetDemandToReserve.GetTransferOrderLines(TempTransferLine);
+        GetDemand(
+            TempTransferLine, FilterItem, ReservationWkshBatch, DemandType,
+            DateFilter, VariantFilterFromBatch, LocationFilterFromBatch, ItemFilterFromBatch, ReservedFromStock);
         if TempTransferLine.IsEmpty() then
             exit;
 
         ReservationWkshLine.SetCurrentKey("Journal Batch Name", "Source Type");
-        ReservationWkshLine.SetRange("Journal Batch Name", BatchName);
+        ReservationWkshLine.SetRange("Journal Batch Name", ReservationWkshBatch.Name);
         ReservationWkshLine.SetRange("Source Type", Database::"Transfer Line");
         if ReservationWkshLine.FindSet(true) then
             repeat
@@ -156,14 +160,14 @@ codeunit 99000846 "Trans. Get Demand To Reserve"
                     ReservationWkshLine.Delete(true);
             until ReservationWkshLine.Next() = 0;
 
-        ReservationWkshLine."Journal Batch Name" := BatchName;
+        ReservationWkshLine."Journal Batch Name" := ReservationWkshBatch.Name;
         LineNo := ReservationWkshLine.GetLastLineNo();
 
         TempTransferLine.FindSet();
         repeat
             LineNo += 10000;
             ReservationWkshLine.Init();
-            ReservationWkshLine."Journal Batch Name" := BatchName;
+            ReservationWkshLine."Journal Batch Name" := ReservationWkshBatch.Name;
             ReservationWkshLine."Line No." := LineNo;
             ReservationWkshLine."Source Type" := Database::"Transfer Line";
             ReservationWkshLine."Source Subtype" := Enum::"Transfer Direction"::Outbound.AsInteger();
@@ -197,6 +201,67 @@ codeunit 99000846 "Trans. Get Demand To Reserve"
             then
                 ReservationWkshLine.Insert(true);
         until TempTransferLine.Next() = 0;
+    end;
+
+    local procedure GetDemand(var TempTransferLine: Record "Transfer Line" temporary; var FilterItem: Record Item; var ReservationWkshBatch: Record "Reservation Wksh. Batch"; DemandType: Enum "Reservation Demand Type"; DateFilter: Text; VariantFilterFromBatch: Text; LocationFilterFromBatch: Text; ItemFilterFromBatch: Text; ReservedFromStock: Enum "Reservation From Stock")
+    var
+        Item: Record Item;
+        TransferLine: Record "Transfer Line";
+#if not CLEAN25
+        GetDemandToReserve: Report "Get Demand To Reserve";
+#endif
+        SkipItem: Boolean;
+        IsHandled: Boolean;
+    begin
+        if not (DemandType in [Enum::"Reservation Demand Type"::All, Enum::"Reservation Demand Type"::"Service Orders"]) then
+            exit;
+
+        TransferLine.Reset();
+        TransferLine.SetCurrentKey("Document No.", "Line No.");
+        TransferLine.SetRange("Derived From Line No.", 0);
+        TransferLine.SetFilter("Outstanding Qty. (Base)", '<>%1', 0);
+
+        TransferLine.SetFilter("Item No.", FilterItem.GetFilter("No."));
+        TransferLine.SetFilter("Variant Code", FilterItem.GetFilter("Variant Filter"));
+        TransferLine.SetFilter("Transfer-from Code", FilterItem.GetFilter("Location Filter"));
+        TransferLine.SetFilter("Shipment Date", FilterItem.GetFilter("Date Filter"));
+
+        TransferLine.FilterGroup(2);
+        if DateFilter <> '' then
+            TransferLine.SetFilter("Shipment Date", DateFilter);
+        if VariantFilterFromBatch <> '' then
+            TransferLine.SetFilter("Variant Code", VariantFilterFromBatch);
+        if LocationFilterFromBatch <> '' then
+            TransferLine.SetFilter("Transfer-from Code", LocationFilterFromBatch);
+        TransferLine.FilterGroup(0);
+
+        if TransferLine.FindSet() then
+            repeat
+                if (not SkipItem) then
+                    if not TransferLine.CheckIfTransferLineMeetsReservedFromStockSetting(TransferLine."Outstanding Qty. (Base)", ReservedFromStock) then
+                        SkipItem := true;
+
+                if (not SkipItem) and (ItemFilterFromBatch <> '') then begin
+                    Item.SetView(ReservationWkshBatch.GetItemFilterBlobAsViewFilters());
+                    Item.FilterGroup(2);
+                    Item.SetRange("No.", TransferLine."Item No.");
+                    Item.FilterGroup(0);
+                    if Item.IsEmpty() then
+                        SkipItem := true;
+                end;
+
+                if not SkipItem then begin
+                    IsHandled := false;
+                    OnGetDemandOnBeforeSetTempTransferLine(TransferLine, IsHandled);
+#if not CLEAN25
+                    GetDemandToReserve.RunOnTransferOrderLineOnAfterGetRecordOnBeforeSetTempTransferLine(TransferLine, IsHandled);
+#endif
+                    if not IsHandled then begin
+                        TempTransferLine := TransferLine;
+                        TempTransferLine.Insert();
+                    end;
+                end;
+            until TransferLine.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]
