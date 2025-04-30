@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./Email - Current User Connector/Test/Email - Current User Connector Tests"
@@ -318,13 +326,5 @@
     {
       "path": "./Shopify/test/Shopify Connector Test"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "allint.enabled": false,
-    "al.enableCodeAnalysis": false
-  }
+  ]
 }
