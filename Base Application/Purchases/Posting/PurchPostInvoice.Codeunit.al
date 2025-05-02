@@ -273,10 +273,8 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         InvoicePostingBuffer.UpdateVATBase(TotalVATBase, TotalVATBaseACY);
         NonDeductibleVAT.SetNonDeductibleVAT(InvoicePostingBuffer, TotalNonDedVATBase, TotalNonDedVATAmount, TotalNonDedVATBaseACY, TotalNonDedVATAmountACY, TotalNonDedVATDiff);
         InvoicePostingBuffer."Deferral Code" := PurchLine."Deferral Code";
-        IsHandled := false;
-        PurchPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, PurchLine, TempInvoicePostingBuffer, FALineNo, InvDefLineNo, DeferralLineNo, IsHandled);
-        if not IsHandled then
-            UpdateInvoicePostingBuffer(InvoicePostingBuffer);
+        PurchPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, PurchLine);
+        UpdateInvoicePostingBuffer(InvoicePostingBuffer);
 
         PurchPostInvoiceEvents.RunOnPrepareLineOnAfterUpdateInvoicePostingBuffer(
             PurchHeader, PurchLine, InvoicePostingBuffer, TempInvoicePostingBuffer);
