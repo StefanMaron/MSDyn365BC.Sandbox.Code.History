@@ -224,8 +224,6 @@ codeunit 5579 "Digital Voucher Impl."
         SourceCodeSetup.Get();
         if IsPaymentReconciliationJournal(DigitalVoucherEntrySetup."Entry Type", RecRef) then
             exit(true);
-        if IsGenJnlLineWithIncDocAttachedToAdjLine(DigitalVoucherEntrySetup."Entry Type", RecRef) then
-            exit(true);
         exit(false);
     end;
 
@@ -260,7 +258,6 @@ codeunit 5579 "Digital Voucher Impl."
     var
         IncomingDocumentAttachment: Record "Incoming Document Attachment";
     begin
-        IncomingDocumentAttachment.ReadIsolation := IsolationLevel::ReadUncommitted;
         if not FilterIncomingDocumentRecordFromRecordRef(IncomingDocumentAttachment, IncomingDocument, MainRecordRef) then
             exit(false);
         exit(not IncomingDocumentAttachment.IsEmpty());
@@ -295,7 +292,6 @@ codeunit 5579 "Digital Voucher Impl."
 
     local procedure FindGenJournalLineFromGLEntry(var ConnectedGenJnlLine: Record "Gen. Journal Line"; CurrGenJnlLine: Record "Gen. Journal Line"; GLEntry: Record "G/L Entry")
     begin
-        ConnectedGenJnlLine.SetLoadFields("Journal Template Name", "Journal Batch Name", "Posting Date", "Document Type", "Document No.");
         ConnectedGenJnlLine.SetRange("Journal Template Name", CurrGenJnlLine."Journal Template Name");
         ConnectedGenJnlLine.SetRange("Journal Batch Name", CurrGenJnlLine."Journal Batch Name");
         ConnectedGenJnlLine.SetRange("Posting Date", GLEntry."Posting Date");
@@ -347,28 +343,6 @@ codeunit 5579 "Digital Voucher Impl."
         if not Evaluate(SourceCodeValue, FieldRef.Value()) then
             exit(false);
         exit(SourceCodeValue = SourceCodeSetup."Payment Reconciliation Journal");
-    end;
-
-    local procedure IsGenJnlLineWithIncDocAttachedToAdjLine(DigitalVoucherEntryType: Enum "Digital Voucher Entry Type"; RecRef: RecordRef): Boolean
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-        AdjacentGenJournalLine: Record "Gen. Journal Line";
-        IncomingDocument: Record "Incoming Document";
-    begin
-        if DigitalVoucherEntryType <> DigitalVoucherEntryType::"General Journal" then
-            exit(false);
-        RecRef.SetTable(GenJournalLine);
-        AdjacentGenJournalLine.ReadIsolation(IsolationLevel::ReadCommitted);
-        AdjacentGenJournalLine.SetLoadFields(AdjacentGenJournalLine."Incoming Document Entry No.");
-        AdjacentGenJournalLine.SetRange("Journal Template Name", GenJournalLine."Journal Template Name");
-        AdjacentGenJournalLine.SetRange("Journal Batch Name", GenJournalLine."Journal Batch Name");
-        AdjacentGenJournalLine.SetRange("Posting Date", GenJournalLine."Posting Date");
-        AdjacentGenJournalLine.SetRange("Document No.", GenJournalLine."Document No.");
-        AdjacentGenJournalLine.SetFilter("Line No.", '<>%1', GenJournalLine."Line No.");
-        AdjacentGenJournalLine.SetFilter("Incoming Document Entry No.", '<>0');
-        if not AdjacentGenJournalLine.FindFirst() then
-            exit(false);
-        exit(IncomingDocument.Get(AdjacentGenJournalLine."Incoming Document Entry No."));
     end;
 
     local procedure AttachDigitalVoucherFromReportPDF(ReportUsage: Enum "Report Selection Usage"; RecRef: RecordRef; IsInvoice: Boolean; PostingDate: Date; DocNo: Code[20]; AccountTableNo: Integer; AccountNo: Code[20]; StandardReportID: Integer)
@@ -598,8 +572,7 @@ codeunit 5579 "Digital Voucher Impl."
         if not DigitalVoucherFeature.IsFeatureEnabled() then
             exit;
         GLRegister.Get(GLRegNo);
-        GLEntry.ReadIsolation := IsolationLevel::ReadCommitted;
-        GLEntry.SetLoadFields("Entry No.", "Posting Date", "Document No.", "Source Type", "Source Code", "System-Created Entry");
+        GLEntry.SetCurrentKey("Document No.", "Posting Date");
         GLEntry.SetRange("Entry No.", GLRegister."From Entry No.", GLRegister."To Entry No.");
         if not GLEntry.FindSet() then
             exit;
