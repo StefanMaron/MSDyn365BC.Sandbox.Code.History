@@ -96,7 +96,6 @@ report 5756 "Create Warehouse Location"
         Location."Bin Mandatory" := true;
         Location.Validate("Directed Put-away and Pick", true);
         Location.Validate("Adjustment Bin Code", AdjBinCode);
-        OnPostReportOnBeforeLocationModify(Location);
         Location.Modify();
 
         if TempWhseJnlLine.Find('-') then
@@ -356,10 +355,5 @@ report 5756 "Create Warehouse Location"
     begin
     end;
 #endif
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostReportOnBeforeLocationModify(var Location: Record Location)
-    begin
-    end;
 }
 
