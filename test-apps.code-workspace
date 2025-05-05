@@ -4,8 +4,8 @@
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false
   },
   "folders": [
     {
@@ -103,9 +103,6 @@
     },
     {
       "path": "./APIV1/Test/_Exclude_APIV1_ Tests"
-    },
-    {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
     },
     {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
@@ -268,9 +265,6 @@
     },
     {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
     },
     {
       "path": "./Email - Outlook REST API/Test"

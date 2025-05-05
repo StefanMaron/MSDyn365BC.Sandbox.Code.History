@@ -22,7 +22,7 @@ page 37036 "Project Realization"
 
                 trigger ControlAddInReady()
                 begin
-                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
+                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageTok);
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
@@ -57,7 +57,7 @@ page 37036 "Project Realization"
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageLbl: Label 'ReportSection1356fdbebe72ad7283d3', Locked = true;
+        ReportPageTok: Label 'ReportSection1356fdbebe72ad7283d3', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()
