@@ -421,7 +421,6 @@ codeunit 980 "Payment Registration Mgt."
         CustLedgerEntry."Applies-to ID" :=
           NoSeries.PeekNextNo(GenJnlBatch."No. Series", TempPaymentRegistrationBuffer."Date Received");
         CustLedgerEntry.CalcFields("Remaining Amount");
-        OnUpdateApplicationFieldsOnCustLedgerEntryOnAfterCalcRemainingAmount(CustLedgerEntry);
         if (TempPaymentRegistrationBuffer."Amount Received" > CustLedgerEntry."Remaining Amount") then
             CustLedgerEntry."Amount to Apply" := CustLedgerEntry."Remaining Amount"
         else
@@ -648,11 +647,6 @@ codeunit 980 "Payment Registration Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnShowRecords(var TempDocumentSearchResult: Record "Document Search Result" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateApplicationFieldsOnCustLedgerEntryOnAfterCalcRemainingAmount(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
 }
