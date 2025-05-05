@@ -4,8 +4,8 @@
       "**.xlf": true
     },
     "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false
   },
   "folders": []
 }
