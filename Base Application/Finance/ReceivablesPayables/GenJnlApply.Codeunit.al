@@ -358,12 +358,7 @@ codeunit 225 "Gen. Jnl.-Apply"
         CustLedgEntry.SetRange("Customer No.", AccNo);
         CustLedgEntry.SetRange(Open, true);
         CustLedgEntry.SetRange("Applies-to ID", GenJnlLine."Applies-to ID");
-
-        IsHandled := false;
-        OnAfterCustLedgEntrySetFilters(CustLedgEntry, GenJnlLine, AccNo, CustomAppliesToId, IsHandled);
-        if IsHandled then
-            exit;
-
+        OnAfterCustLedgEntrySetFilters(CustLedgEntry, GenJnlLine, AccNo);
         if CustLedgEntry.Find('-') then begin
             CurrencyCode2 := CustLedgEntry."Currency Code";
             if GenJnlLine.Amount = 0 then begin
@@ -394,7 +389,6 @@ codeunit 225 "Gen. Jnl.-Apply"
                 if (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::Customer) or (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::Vendor) then
                     GenJnlLine.Amount := -GenJnlLine.Amount;
                 GenJnlLine.Validate(Amount);
-                OnApplyCustomerLedgerEntryOnAfterValidateAmount(GenJnlLine, CustLedgEntry);
             end else
                 repeat
                     OnApplyCustomerLedgerEntryOnBeforeCheckAgainstApplnCurrencyCustomerAmountNotZero(GenJnlLine, CustLedgEntry);
@@ -587,7 +581,7 @@ codeunit 225 "Gen. Jnl.-Apply"
                 TempVendorLedgerEntry.DeleteAll();
                 if (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::Customer) or (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::Vendor) then
                     GenJnlLine.Amount := -GenJnlLine.Amount;
-                OnApplyVendorLedgerEntryOnBeforeValidateAmount(GenJnlLine, VendLedgEntry);
+                OnApplyVendorLedgerEntryOnBeforeValidateAmount(GenJnlLine);
                 GenJnlLine.Validate(Amount);
             end else
                 repeat
@@ -750,7 +744,6 @@ codeunit 225 "Gen. Jnl.-Apply"
     local procedure CalcAppliedAmountOnCustLedgerEntry(CustLedgEntry: Record "Cust. Ledger Entry"; var AppliedAmount: Decimal)
     begin
         CustLedgEntry.CalcFields("Remaining Amount");
-        OnCalcAppliedAmountOnCustLedgerEntryOnAfterCalcRemainingAmount(CustLedgEntry);
         if PaymentToleranceMgt.CheckCalcPmtDiscGenJnlCust(GenJnlLine, CustLedgEntry, 0, false) and
             (Abs(CustLedgEntry."Amount to Apply") >=
             Abs(CustLedgEntry."Remaining Amount" - CustLedgEntry."Remaining Pmt. Disc. Possible"))
@@ -772,7 +765,7 @@ codeunit 225 "Gen. Jnl.-Apply"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCustLedgEntrySetFilters(var CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line"; AccNo: Code[20]; var CustomAppliesToId: Code[50]; var IsHandled: Boolean)
+    local procedure OnAfterCustLedgEntrySetFilters(var CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line"; AccNo: Code[20])
     begin
     end;
 
@@ -896,11 +889,6 @@ codeunit 225 "Gen. Jnl.-Apply"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
-    local procedure OnApplyCustomerLedgerEntryOnAfterValidateAmount(var GenJnlLine: Record "Gen. Journal Line"; var CustLedgEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnSetVendApplIdAPIOnBeforeCheckAgainstApplnCurrency(GenJournalLine: Record "Gen. Journal Line"; VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
@@ -967,17 +955,12 @@ codeunit 225 "Gen. Jnl.-Apply"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyVendorLedgerEntryOnBeforeValidateAmount(var GenJournalLine: Record "Gen. Journal Line"; var VendorLedgEntry: Record "Vendor Ledger Entry")
+    local procedure OnApplyVendorLedgerEntryOnBeforeValidateAmount(var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnSetVendApplIdAPIOnBeforeCheckPostingDate(var TempApplyingVendorLedgerEntry: Record "Vendor Ledger Entry"; var GenJournalLine: Record "Gen. Journal Line"; var VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcAppliedAmountOnCustLedgerEntryOnAfterCalcRemainingAmount(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
 }
