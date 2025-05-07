@@ -1494,7 +1494,7 @@ table 901 "Assembly Line"
             if OldAssemblyLine."Due Date" > "Due Date" then
                 AvailableToPromise.SetChangedAsmLine(OldAssemblyLine)
             else
-                GrossRequirement -= OldAssemblyLine."Remaining Quantity (Base)";
+                GrossRequirement -= OldAssemblyLine."Remaining Quantity";
 
         CompanyInfo.Get();
         LookaheadDateFormula := CompanyInfo."Check-Avail. Period Calc.";
@@ -2047,21 +2047,6 @@ table 901 "Assembly Line"
                 "Qty. per Unit of Measure" := UnitOfMeasureManagement.GetResQtyPerUnitOfMeasure(Resource, "Unit of Measure Code");
             else
                 "Qty. per Unit of Measure" := 1;
-        end;
-    end;
-
-    internal procedure ShowAssemblyDocument()
-    var
-        AssemblyHeader: Record "Assembly Header";
-    begin
-        AssemblyHeader.Get(Rec."Document Type", Rec."Document No.");
-        case AssemblyHeader."Document Type" of
-            AssemblyHeader."Document Type"::Quote:
-                Page.Run(Page::"Assembly Quote", AssemblyHeader);
-            AssemblyHeader."Document Type"::Order:
-                Page.Run(Page::"Assembly Order", AssemblyHeader);
-            AssemblyHeader."Document Type"::"Blanket Order":
-                Page.Run(Page::"Blanket Assembly Order", AssemblyHeader);
         end;
     end;
 

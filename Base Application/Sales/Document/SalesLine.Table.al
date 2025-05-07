@@ -456,7 +456,7 @@ table 37 "Sales Line"
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateShipmentDate(IsHandled, Rec, xRec, CurrFieldNo);
+                OnBeforeValidateShipmentDate(IsHandled, Rec, xRec);
                 if IsHandled then
                     exit;
 
@@ -1579,15 +1579,14 @@ table 37 "Sales Line"
                                 TestField("No.", VATPostingSetup.GetSalesAccount(false));
                             end;
                     end;
-                GetSalesSetup();
-                if ("VAT Bus. Posting Group" = SalesSetup."Reverse Charge VAT Posting Gr.") and not "Reverse Charge Item" then
-                    FieldError("VAT Bus. Posting Group", StrSubstNo(Text1041001, "VAT Bus. Posting Group", Type, "No."));
-
                 if "Document Type" = "Document Type"::"Credit Memo" then begin
+                    GetSalesSetup();
                     "Reverse Charge" := 0;
+                    if ("VAT Bus. Posting Group" = SalesSetup."Reverse Charge VAT Posting Gr.") and not "Reverse Charge Item" then
+                        FieldError("VAT Bus. Posting Group", StrSubstNo(Text1041001, "VAT Bus. Posting Group", Type, "No."));
                     if ("VAT Bus. Posting Group" = SalesSetup."Reverse Charge VAT Posting Gr.") and
-                     (SalesHeader."VAT Bus. Posting Group" = SalesSetup."Domestic Customers")
-                  then
+                       (SalesHeader."VAT Bus. Posting Group" = SalesSetup."Domestic Customers")
+                    then
                         "Reverse Charge" :=
                           Round(Amount * (1 - SalesHeader."VAT Base Discount %" / 100) * xRec."VAT %" / 100,
                             Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
@@ -5569,10 +5568,7 @@ table 37 "Sales Line"
         case CurrFieldNo of
             FieldNo("Shipment Date"):
                 begin
-                    if CheckCustomerBaseCalendarCodeExist() then
-                        CustomCalendarChange[2].SetSource(CalChange."Source Type"::Customer, "Sell-to Customer No.", '', '')
-                    else
-                        CustomCalendarChange[2].SetSource(CalChange."Source Type"::Location, "Location Code", '', '');
+                    CustomCalendarChange[2].SetSource(CalChange."Source Type"::Customer, "Sell-to Customer No.", '', '');
                     exit(CalendarMgmt.CalcDateBOC(Format("Shipping Time"), "Planned Shipment Date", CustomCalendarChange, true));
                 end;
             FieldNo("Planned Delivery Date"):
@@ -5581,18 +5577,6 @@ table 37 "Sales Line"
                     exit(CalendarMgmt.CalcDateBOC2(Format("Shipping Time"), "Planned Delivery Date", CustomCalendarChange, true));
                 end;
         end;
-    end;
-
-    local procedure CheckCustomerBaseCalendarCodeExist(): Boolean
-    var
-        Customer: Record customer;
-    begin
-        if "Sell-to Customer No." = '' then
-            exit(false);
-            
-        Customer.SetLoadFields("Base Calendar Code");
-        if Customer.Get("Sell-to Customer No.") then
-            exit(Customer."Base Calendar Code" <> '');
     end;
 
     /// <summary>
@@ -6710,7 +6694,7 @@ table 37 "Sales Line"
             repeat
                 if not SalesLine.ZeroAmountLine(QtyType) then begin
                     OnCalcVATAmountLinesOnBeforeProcessSalesLine(SalesLine);
-                    if ReverseChargeApplies and SalesLine."Reverse Charge Item" then begin
+		    if ReverseChargeApplies and SalesLine."Reverse Charge Item" then begin
                         SalesLine."Reverse Charge" := SalesLine."Amount Including VAT" - SalesLine.Amount;
                         SalesLine.SuspendStatusCheck(true);
                         GetSalesSetup();
@@ -8420,7 +8404,7 @@ table 37 "Sales Line"
         OnAfterCheckShipmentRelation(Rec, SalesShptLine);
     end;
 
-    procedure CheckShipmentDateBeforeWorkDate()
+    local procedure CheckShipmentDateBeforeWorkDate()
     var
         IsHandled: Boolean;
     begin
@@ -8748,8 +8732,6 @@ table 37 "Sales Line"
             exit;
         if SalesHeader."Invoice Discount Value" = 0 then
             exit;
-        if SalesHeader."Invoice Discount Calculation" = SalesHeader."Invoice Discount Calculation"::"%" then
-            exit;
         SalesHeader."Invoice Discount Value" -= InvDiscountAmount;
         SalesHeader.Modify(true);
     end;
@@ -8993,16 +8975,15 @@ table 37 "Sales Line"
     var
         Item: Record Item;
         IsHandled: Boolean;
-        ShouldUpdateDeferralCode: Boolean;
     begin
         IsHandled := false;
         OnBeforeInitDeferralCode(Rec, IsHandled);
         if IsHandled then
             exit;
 
-        ShouldUpdateDeferralCode := "Document Type" in ["Document Type"::Order, "Document Type"::Invoice, "Document Type"::"Credit Memo", "Document Type"::"Return Order"];
-        OnInitDeferralCodeOnBeforeUpdateDeferralCode(Rec, ShouldUpdateDeferralCode);
-        if ShouldUpdateDeferralCode then
+        if "Document Type" in
+           ["Document Type"::Order, "Document Type"::Invoice, "Document Type"::"Credit Memo", "Document Type"::"Return Order"]
+        then
             case Type of
                 Type::"G/L Account":
                     Validate("Deferral Code", GLAcc."Default Deferral Template Code");
@@ -9446,7 +9427,7 @@ table 37 "Sales Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeValidateUnitCostLCYOnGetUnitCost(IsHandled, Rec, Item);
+        OnBeforeValidateUnitCostLCYOnGetUnitCost(IsHandled, Rec);
         if IsHandled then
             exit;
 
@@ -11562,7 +11543,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeValidateUnitCostLCYOnGetUnitCost(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; Item: Record Item)
+    local procedure OnBeforeValidateUnitCostLCYOnGetUnitCost(var IsHandled: Boolean; var SalesLine: Record "Sales Line")
     begin
     end;
 
@@ -11582,7 +11563,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeValidateShipmentDate(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line"; CurrentFieldNo: Integer)
+    local procedure OnBeforeValidateShipmentDate(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line")
     begin
     end;
 
@@ -12140,11 +12121,6 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalcUnitPriceUsingUOMCoef(var SalesLine: Record "Sales Line"; SalesInvoiceLine: Record "Sales Invoice Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInitDeferralCodeOnBeforeUpdateDeferralCode(var SalesLine: Record "Sales Line"; var ShouldUpdateDeferralCode: Boolean)
     begin
     end;
 }
