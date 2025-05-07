@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false
-  },
   "folders": [
     {
       "path": "./Email - Current User Connector/Test/Email - Current User Connector Tests"
@@ -270,9 +262,6 @@
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
-    },
-    {
       "path": "./Email - Outlook REST API/Test"
     },
     {
@@ -311,5 +300,13 @@
     {
       "path": "./Shopify/test/Shopify Connector Test"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeActions": false,
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false
+  }
 }
