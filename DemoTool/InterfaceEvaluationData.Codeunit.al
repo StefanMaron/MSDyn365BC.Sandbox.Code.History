@@ -22,7 +22,7 @@ codeunit 122001 "Interface Evaluation Data"
         XLATE: Label 'LATE', Comment = 'Late';
         PmtRecNoSeriesStartNoTok: Label 'PREC000', Locked = true;
         XStatementLineDescription1: Label 'Transfer to savings account';
-        XStatementLineDescription2: Label 'Funds for Spring event 2023';
+        XStatementLineDescription2: Label 'Funds for Spring event';
         XStatementLineDescription3: Label 'Deposit to Account';
 
     procedure CreateSetupData()
