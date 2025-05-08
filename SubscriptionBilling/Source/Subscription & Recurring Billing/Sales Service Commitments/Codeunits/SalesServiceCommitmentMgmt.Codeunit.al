@@ -1,6 +1,5 @@
 namespace Microsoft.SubscriptionBilling;
 
-using System.Environment.Configuration;
 using Microsoft.Utilities;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Archive;
@@ -26,13 +25,7 @@ codeunit 8069 "Sales Service Commitment Mgmt."
     var
         ItemServCommitmentPackage: Record "Item Serv. Commitment Package";
         SalesHeader: Record "Sales Header";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeAddSalesServiceCommitmentsForSalesLine(SalesLine, SkipAddAdditionalSalesServComm, IsHandled);
-        if IsHandled then
-            exit;
-
         if not IsSalesLineWithSalesServiceCommitments(SalesLine, false) then
             exit;
 
@@ -67,13 +60,13 @@ codeunit 8069 "Sales Service Commitment Mgmt."
         SalesHeader: Record "Sales Header";
         AssignServiceCommitments: Page "Assign Service Commitments";
         PackageFilter: Text;
-        NoAddServicesForContractRenewalAllowedErr: Label 'Process must not be Contract Renewal. Additional services cannot be added to a Contract Renewal';
-        ShowAssignServiceCommitments: Boolean;
+        NoAddServicesForContractRenewalAllowedErr: Label 'Pricess must not be Contract Renewal. Additional services cannot be added to a Contract Renewal';
     begin
         if SalesLine."Line No." = 0 then
             exit;
         if SalesLine.IsContractRenewal() then
             Error(NoAddServicesForContractRenewalAllowedErr);
+
         SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
         ServiceCommitmentPackage.SetRange("Price Group", SalesHeader."Customer Price Group");
         if ServiceCommitmentPackage.IsEmpty then
@@ -83,10 +76,7 @@ codeunit 8069 "Sales Service Commitment Mgmt."
         ServiceCommitmentPackage.FilterCodeOnPackageFilter(PackageFilter);
         OnAddAdditionalSalesServiceCommitmentsForSalesLineAfterApplyFilters(ServiceCommitmentPackage, SalesLine);
 
-        ShowAssignServiceCommitments := not ServiceCommitmentPackage.IsEmpty();
-        OnAfterShowAssignServiceCommitmentsDetermined(SalesLine, ServiceCommitmentPackage, ShowAssignServiceCommitments);
-
-        if ShowAssignServiceCommitments and GuiAllowed() then begin
+        if not ServiceCommitmentPackage.IsEmpty() then begin
             AssignServiceCommitments.SetTableView(ServiceCommitmentPackage);
             AssignServiceCommitments.SetSalesLine(SalesLine);
             AssignServiceCommitments.LookupMode(true);
@@ -456,53 +446,6 @@ codeunit 8069 "Sales Service Commitment Mgmt."
             SalesShipmentLine."Quantity Invoiced" := 0;
             SalesShipmentLine."Qty. Invoiced (Base)" := 0;
         end;
-    end;
-
-    internal procedure NotifyIfDiscountIsNotTransferredFromSalesLine(var SalesLine: Record "Sales Line")
-    var
-        SalesServiceCommitment: Record "Sales Service Commitment";
-        CustomerContract: Record "Customer Contract";
-        MyNotification: Record "My Notifications";
-        NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
-        Notify: Notification;
-        DiscountNotTransferredTxt: Label 'The %1 of %2 %3 has not been transferred to the Sales Service Commitment(s). The %1 is only transferred to Sales Service Commitment, if %4 is set to %5.';
-        DontShowAgainActionLbl: Label 'Don''t show again';
-    begin
-        if not MyNotification.IsEnabled(CustomerContract.GetNotificationIdDiscountIsNotTransferredFromSalesLine()) then
-            exit;
-        SalesServiceCommitment.FilterOnSalesLine(SalesLine);
-        SalesServiceCommitment.SetRange(Partner, SalesServiceCommitment.Partner::Customer);
-        SalesServiceCommitment.SetFilter("Calculation Base Type", '<>%1', SalesServiceCommitment."Calculation Base Type"::"Document Price And Discount");
-        if not SalesServiceCommitment.IsEmpty() then begin
-            NotificationLifecycleMgt.RecallNotificationsForRecord(SalesLine.RecordId(), false);
-            Notify.Message :=
-                StrSubstNo(
-                    DiscountNotTransferredTxt,
-                    SalesServiceCommitment.FieldCaption("Discount %"),
-                    SalesLine.Type,
-                    SalesLine."No.",
-                    SalesServiceCommitment.FieldCaption("Calculation Base Type"),
-                    SalesServiceCommitment."Calculation Base Type"::"Document Price And Discount");
-            Notify.AddAction(DontShowAgainActionLbl, Codeunit::"Sales Service Commitment Mgmt.", 'SalesServComDiscPercentHideNotificationForCurrentUser');
-            NotificationLifecycleMgt.SendNotification(Notify, SalesLine.RecordId());
-        end;
-    end;
-
-    internal procedure SalesServComDiscPercentHideNotificationForCurrentUser(Notification: Notification)
-    var
-        CustomerContract: Record "Customer Contract";
-    begin
-        CustomerContract.DontNotifyCurrentUserAgain(CustomerContract.GetNotificationIdDiscountIsNotTransferredFromSalesLine());
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeAddSalesServiceCommitmentsForSalesLine(SalesLine: Record "Sales Line"; SkipAddAdditionalSalesServComm: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterShowAssignServiceCommitmentsDetermined(SalesLine: Record "Sales Line"; var ServiceCommitmentPackage: Record "Service Commitment Package"; var ShowAssignServiceCommitments: Boolean)
-    begin
     end;
 
     var
