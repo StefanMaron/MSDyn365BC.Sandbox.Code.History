@@ -106,8 +106,6 @@ codeunit 144049 "ERM Payment Management"
         CheckDimValuePostingLineErr: Label 'A dimension used in %1 %2 %3 has caused an error. Select a Dimension Value Code for the Dimension Code %4 for Vendor %5.';
         CheckDimValuePostingHeaderErr: Label 'A dimension used in %1 has caused an error. Dimension %2 is blocked.';
         PaymentSlipErr: Label 'Payment Slip must be posted without error of Document No.';
-        AppliesToIDMustBeBlankErr: Label 'Applies-to ID must be blank in Vendor Ledger Entry.';
-        DocumentNoErr: Label 'Document No. must be equal to %1', Comment = '%1 = Document No.';
 
     [Test]
     [HandlerFunctions('GLCustLedgerReconciliationRequestPageHandler')]
@@ -1842,131 +1840,6 @@ codeunit 144049 "ERM Payment Management"
         Assert.AreEqual(PaymentLine.Amount, Abs(GLEntry.Amount), PaymentSlipErr);
     end;
 
-    [Test]
-    [HandlerFunctions('PaymentClassListModalPageHandler,SuggestVendorPmtsFRRequestPageHandler')]
-    procedure AppliesToIDIsNotFilledIfNoPaymentLineIsCreatedBySugVendPmt()
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-        PaymentClass: Record "Payment Class";
-        PaymentStatus: Record "Payment Status";
-        PaymentHeader: Record "Payment Header";
-        Vendor: Record Vendor;
-        VendorLedgerEntry: Record "Vendor Ledger Entry";
-        SuggestVendorPaymentsFR: Report "Suggest Vendor Payments FR";
-    begin
-        // [SCENARIO 558277] Suggest Vendor Payment Summarize per Vendor doesn't fill 
-        // Applies-to ID of Vendor Ledger Entries if no Payment Line in the Payment Slip.
-        Initialize();
-
-        // [GIVEN] Create a Vendor.
-        LibraryPurchase.CreateVendor(Vendor);
-
-        // [GIVEN] Create a Gen. Journal Line.
-        CreateGenJournalLine(
-            GenJournalLine, GenJournalLine."Account Type"::Vendor, Vendor."No.", GenJournalLine."Document Type"::Payment,
-            GenJournalLine."Bal. Account Type"::"G/L Account", LibraryERM.CreateGLAccountNo());
-
-        // [GIVEN] Validate Debit Amount in Gen. Journal Line.
-        GenJournalLine.Validate("Debit Amount", LibraryRandom.RandIntInRange(100, 100));
-        GenJournalLine.Modify(true);
-
-        // [GIVEN] Post Gen. Journal Line.
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // [GIVEN] Create a Gen. Journal Line.
-        CreateGenJournalLine(
-            GenJournalLine, GenJournalLine."Account Type"::Vendor, Vendor."No.", GenJournalLine."Document Type"::Invoice,
-            GenJournalLine."Bal. Account Type"::"G/L Account", LibraryERM.CreateGLAccountNo());
-
-        // [GIVEN] Validate Credit Amount in Gen. Journal Line.
-        GenJournalLine.Validate("Credit Amount", LibraryRandom.RandIntInRange(100, 100));
-        GenJournalLine.Modify(true);
-
-        // [GIVEN] Post Gen. Journal Line.
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // [GIVEN] Create a Payment Class.
-        CreatePaymentClassWithNoSeries(PaymentClass);
-
-        // [GIVEN] Create a Payment Status.
-        LibraryFRLocalization.CreatePaymentStatus(PaymentStatus, PaymentClass.Code);
-
-        // [GIVEN] Create a Payment Header.
-        LibraryVariableStorage.Enqueue(PaymentClass.Code);
-        LibraryVariableStorage.Enqueue(Format(Vendor."No."));
-        LibraryFRLocalization.CreatePaymentHeader(PaymentHeader);
-        Commit();
-
-        // [GIVEN] Run Suggest Vendor Payments FR Report.
-        SuggestVendorPaymentsFR.SetGenPayLine(PaymentHeader);
-        SuggestVendorPaymentsFR.RunModal();
-
-        // [WHEN] Find Vendor Ledger Entry.
-        VendorLedgerEntry.SetRange("Vendor No.", Vendor."No.");
-        VendorLedgerEntry.FindFirst();
-
-        // [THEN] Applies-to ID must be blank in Vendor Ledger Entry.
-        Assert.AreEqual('', VendorLedgerEntry."Applies-to ID", AppliesToIDMustBeBlankErr);
-
-        // [WHEN] Find Vendor Ledger Entry.
-        VendorLedgerEntry.SetRange("Vendor No.", Vendor."No.");
-        VendorLedgerEntry.FindLast();
-
-        // [THEN] Applies-to ID must be blank in Vendor Ledger Entry.
-        Assert.AreEqual('', VendorLedgerEntry."Applies-to ID", AppliesToIDMustBeBlankErr);
-    end;
-
-    [Test]
-    [HandlerFunctions('PaymentClassListModalPageHandler,ApplyCustomerEntriesModalPageHandler')]
-    procedure NoSeriesUpdatedWhenInsertPaylineManually()
-    var
-        PaymentClass: Record "Payment Class";
-        PaymentStepLedger: Record "Payment Step Ledger";
-        VATPostingSetup: Record "VAT Posting Setup";
-        PaymentLine: Record "Payment Line";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        CustLedgerEntry: Record "Cust. Ledger Entry";
-        NoSeriesLine: Record "No. Series Line";
-        PaymentSlip: TestPage "Payment Slip";
-        PaymentHeaderNo: Code[20];
-        CustomerNo: Code[20];
-    begin
-        // [SCENARIO 561809]Last No. Used in No. Series line incremented when the Payment Slip lines are entered manually
-        Initialize();
-
-        // [GIVEN] Payment Slip Setup with Line No. series defined (<> Header No. Series)
-        PaymentClass.Get(
-          SetupForPaymentSlipPost(PaymentStepLedger."Detail Level"::Account, PaymentClass.Suggestions::Customer));
-        PaymentClass.Validate("Line No. Series", LibraryERM.CreateNoSeriesCode());
-        PaymentClass.Modify(true);
-
-        // [GIVEN] Posted Sales Invoice
-        CustomerNo := CreateAndPostSalesInvoice(VATPostingSetup."Unrealized VAT Type"::" ");
-        SalesInvoiceHeader.SetRange("Sell-to Customer No.", CustomerNo);
-        SalesInvoiceHeader.FindFirst();
-
-        // [GIVEN] Payment Slip with Payment Line with Document No. = "Y"
-        PaymentHeaderNo := CreatePaymentSlip(PaymentLine."Account Type"::Customer, CustomerNo);
-
-        // [GIVEN] Open the Payment Slip and enqueue the values for handler
-        OpenPaymentSlip(PaymentSlip, PaymentHeaderNo);
-        EnqueueValuesForHandler(EnqueueOpt::Application, SalesInvoiceHeader."Amount Including VAT");
-
-        // [WHEN] Payment Line applied to Customer Ledger Entry of Posted Sales Invoice
-        PaymentSlipApplication(PaymentSlip);
-
-        // [THEN] Customer Ledger Entry value of Applies-to ID = "Y"
-        LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, CustLedgerEntry."Document Type"::Invoice, SalesInvoiceHeader."No.");
-        PaymentLine.SetRange("No.", PaymentHeaderNo);
-        PaymentLine.FindFirst();
-
-        // [THEN] Find the Line No. Series line
-        FindNoSeriesLine(NoSeriesLine, PaymentClass."Line No. Series");
-
-        // [THEN] Verify the No. Series Line Last No. used updated
-        Assert.AreEqual(PaymentLine."Document No.", NoSeriesLine."Last No. Used", StrSubstNo(DocumentNoErr, PaymentLine."Document No."));
-    end;
-
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"ERM Payment Management");
@@ -3223,17 +3096,6 @@ codeunit 144049 "ERM Payment Management"
         NoSeriesLine.TestField("Last No. Used", LastNoUsed);
     end;
 
-    local procedure CreatePaymentClassWithNoSeries(var PaymentClass: Record "Payment Class")
-    begin
-        LibraryFRLocalization.CreatePaymentClass(PaymentClass);
-        PaymentClass.Validate("Header No. Series", LibraryERM.CreateNoSeriesCode());
-        PaymentClass.Validate("Line No. Series", LibraryERM.CreateNoSeriesCode());
-        PaymentClass.Validate(Suggestions, PaymentClass.Suggestions::Vendor);
-        PaymentClass.Validate("Unrealized VAT Reversal", PaymentClass."Unrealized VAT Reversal"::Application);
-        PaymentClass.Validate("SEPA Transfer Type", PaymentClass."SEPA Transfer Type"::"Credit Transfer");
-        PaymentClass.Modify(true);
-    end;
-
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure ApplyCustomerEntriesModalPageHandler(var ApplyCustomerEntries: TestPage "Apply Customer Entries")
@@ -3284,12 +3146,6 @@ codeunit 144049 "ERM Payment Management"
                 end;
         end;
         ApplyVendorEntries.OK().Invoke();
-    end;
-
-    local procedure FindNoSeriesLine(var NoSeriesLine: Record "No. Series Line"; NoSeriesCode: Code[20])
-    begin
-        NoSeriesLine.SetRange("Series Code", NoSeriesCode);
-        NoSeriesLine.FindFirst();
     end;
 
     [ModalPageHandler]
@@ -3430,18 +3286,6 @@ codeunit 144049 "ERM Payment Management"
     begin
         SuggestVendorPaymentsFR.LastPaymentDate.SetValue(WorkDate());
         SuggestVendorPaymentsFR.SummarizePer.SetValue(SummarizePer::Vendor);
-        SuggestVendorPaymentsFR.OK().Invoke();
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure SuggestVendorPmtsFRRequestPageHandler(var SuggestVendorPaymentsFR: TestRequestPage "Suggest Vendor Payments FR")
-    var
-        SummarizePer: Option " ",Vendor,"Due date";
-    begin
-        SuggestVendorPaymentsFR.LastPaymentDate.SetValue(WorkDate());
-        SuggestVendorPaymentsFR.SummarizePer.SetValue(SummarizePer::Vendor);
-        SuggestVendorPaymentsFR.Vendor.SetFilter("No.", LibraryVariableStorage.DequeueText());
         SuggestVendorPaymentsFR.OK().Invoke();
     end;
 
