@@ -1519,6 +1519,10 @@ codeunit 134226 "ERM TestMultipleGenJnlLines"
     [HandlerFunctions('ConfirmHandlerTrue')]
     procedure LastNoUsedInNoSeriesMustBeUpdatedWhenPostGenJnlLineWithForceDocBalFalse()
     var
+        Vendor1: Record Vendor;
+        Vendor2: Record Vendor;
+        Vendor3: Record Vendor;
+        Vendor4: Record Vendor;
         GenJournalBatch: Record "Gen. Journal Batch";
         GenJournalLine: Record "Gen. Journal Line";
         GenJournalLine1: Record "Gen. Journal Line";
@@ -1556,6 +1560,12 @@ codeunit 134226 "ERM TestMultipleGenJnlLines"
         GenJournalBatch.Validate("No. Series", NoSeries.Code);
         GenJournalBatch.Modify(true);
 
+        // [GIVEN] Create four different Vendors.
+        LibraryPurchase.CreateVendor(Vendor1);
+        LibraryPurchase.CreateVendor(Vendor2);
+        LibraryPurchase.CreateVendor(Vendor3);
+        LibraryPurchase.CreateVendor(Vendor4);
+
         // [GIVEN] Create a GL Account & save GL Account No in a Variable.
         LibraryERM.CreateGLAccount(GLAccount);
         GLAccountNo := GLAccount."No.";
@@ -1574,7 +1584,7 @@ codeunit 134226 "ERM TestMultipleGenJnlLines"
         CreateGeneralJournalLineWithBalAccountNo(
             GenJournalLine,
             GenJournalBatch,
-            LibraryERM.CreateGLAccountNo(),
+            Vendor1."No.",
             DocumentNo,
             GenJournalLine."Bal. Account Type"::"G/L Account",
             GLAccountNo);
@@ -1583,7 +1593,7 @@ codeunit 134226 "ERM TestMultipleGenJnlLines"
         CreateGeneralJournalLineWithBalAccountNo(
             GenJournalLine,
             GenJournalBatch,
-            LibraryERM.CreateGLAccountNo(),
+            Vendor2."No.",
             DocumentNo,
             GenJournalLine."Bal. Account Type"::"Bank Account",
             BankAccountNo);
@@ -1592,7 +1602,7 @@ codeunit 134226 "ERM TestMultipleGenJnlLines"
         CreateGeneralJournalLineWithBalAccountNo(
             GenJournalLine,
             GenJournalBatch,
-            LibraryERM.CreateGLAccountNo(),
+            Vendor3."No.",
             DocumentNo,
             GenJournalLine."Bal. Account Type"::"G/L Account",
             GLAccountNo);
@@ -1601,7 +1611,7 @@ codeunit 134226 "ERM TestMultipleGenJnlLines"
         CreateGeneralJournalLineWithBalAccountNo(
             GenJournalLine,
             GenJournalBatch,
-            LibraryERM.CreateGLAccountNo(),
+            Vendor4."No.",
             DocumentNo,
             GenJournalLine."Bal. Account Type"::"Bank Account",
             BankAccountNo);
@@ -2329,15 +2339,15 @@ codeunit 134226 "ERM TestMultipleGenJnlLines"
         GenJournalLine.Insert(true);
     end;
 
-    local procedure CreateGeneralJournalLineWithBalAccountNo(var GenJournalLine: Record "Gen. Journal Line"; var GenJournalBatch: Record "Gen. Journal Batch"; GLAccNo: Code[20]; DocNo: Code[20]; BalAccountType: Enum "Gen. Journal Account Type"; BalAccountNo: Code[20])
+    local procedure CreateGeneralJournalLineWithBalAccountNo(var GenJournalLine: Record "Gen. Journal Line"; var GenJournalBatch: Record "Gen. Journal Batch"; VendorNo: Code[20]; DocNo: Code[20]; BalAccountType: Enum "Gen. Journal Account Type"; BalAccountNo: Code[20])
     begin
         LibraryERM.CreateGeneralJnlLine(
             GenJournalLine,
             GenJournalBatch."Journal Template Name",
             GenJournalBatch.Name,
             GenJournalLine."Document Type"::Payment,
-            GenJournalLine."Account Type"::"G/L Account",
-            GLAccNo,
+            GenJournalLine."Account Type"::Vendor,
+            VendorNo,
             LibraryRandom.RandInt(20));
 
         GenJournalLine.Validate("Posting Date", WorkDate());
