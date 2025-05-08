@@ -105,7 +105,7 @@ codeunit 7000 "Sales Price Calc. Mgt."
                     SetResPrice(SalesLine."No.", SalesLine."Work Type Code", SalesLine."Currency Code");
                     OnFindSalesLinePriceOnAfterSetResPrice(SalesLine, ResPrice);
                     CODEUNIT.Run(CODEUNIT::"Resource-Find Price", ResPrice);
-                    OnAfterFindSalesLineResPrice(SalesLine, ResPrice, CalledByFieldNo);
+                    OnAfterFindSalesLineResPrice(SalesLine, ResPrice);
                     if not (CalledByFieldNo = SalesLine.FieldNo(Quantity)) then begin
                         ConvertPriceToVAT(false, '', '', ResPrice."Unit Price");
                         ConvertPriceLCYToFCY(ResPrice."Currency Code", ResPrice."Unit Price");
@@ -318,7 +318,7 @@ codeunit 7000 "Sales Price Calc. Mgt."
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeFindAnalysisReportPrice(ItemNo, Date, UnitPrice, IsHandled, FoundSalesPrice);
+        OnBeforeFindAnalysisReportPrice(ItemNo, Date, UnitPrice, IsHandled);
         if IsHandled then
             exit(UnitPrice);
 
@@ -348,7 +348,7 @@ codeunit 7000 "Sales Price Calc. Mgt."
         if FoundSalesPrice then
             repeat
                 IsHandled := false;
-                OnCalcBestUnitPriceOnBeforeCalcBestUnitPriceConvertPrice(SalesPrice, Qty, IsHandled, Item);
+                OnCalcBestUnitPriceOnBeforeCalcBestUnitPriceConvertPrice(SalesPrice, Qty, IsHandled);
                 if not IsHandled then
                     if IsInMinQty(SalesPrice."Unit of Measure Code", SalesPrice."Minimum Quantity") then begin
                         CalcBestUnitPriceConvertPrice(SalesPrice);
@@ -1739,7 +1739,7 @@ codeunit 7000 "Sales Price Calc. Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterFindSalesLineResPrice(var SalesLine: Record "Sales Line"; var ResPrice: Record "Resource Price"; CalledByFieldNo: Integer)
+    local procedure OnAfterFindSalesLineResPrice(var SalesLine: Record "Sales Line"; var ResPrice: Record "Resource Price")
     begin
     end;
 
@@ -1860,7 +1860,7 @@ codeunit 7000 "Sales Price Calc. Mgt."
 
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindAnalysisReportPrice(ItemNo: Code[20]; Date: Date; var UnitPrice: Decimal; var IsHandled: Boolean; var FoundSalesPrice: Boolean)
+    local procedure OnBeforeFindAnalysisReportPrice(ItemNo: Code[20]; Date: Date; var UnitPrice: Decimal; var IsHandled: Boolean)
     begin
     end;
 
@@ -2075,7 +2075,7 @@ codeunit 7000 "Sales Price Calc. Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCalcBestUnitPriceOnBeforeCalcBestUnitPriceConvertPrice(var SalesPrice: Record "Sales Price"; Qty: Decimal; var IsHandled: Boolean; var Item: Record Item)
+    local procedure OnCalcBestUnitPriceOnBeforeCalcBestUnitPriceConvertPrice(var SalesPrice: Record "Sales Price"; Qty: Decimal; var IsHandled: Boolean)
     begin
     end;
 
