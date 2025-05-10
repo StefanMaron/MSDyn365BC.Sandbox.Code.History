@@ -66,11 +66,13 @@ codeunit 30178 "Shpfy Product Export"
         NullGuid: Guid;
         BulkOperationInput: TextBuilder;
         GraphQueryList: List of [TextBuilder];
-        VariantPriceCalcSkippedLbl: Label 'Variant price is not synchronized because the item is blocked or sales blocked.';
+        VariantPriceCalcSkippedLbl: Label 'Variant price is not synchronized because the %1 is blocked or sales blocked.', Comment = '%1 - item or item variant.';
         ItemIsBlockedLbl: Label 'Item is blocked.';
         ItemIsDraftLbl: Label 'Shopify product is in draft status.';
         ItemIsArchivedLbl: Label 'Shopify product is archived.';
         ItemVariantIsBlockedLbl: Label 'Item variant is blocked or sales blocked.';
+        ItemLbl: Label 'item';
+        ItemVariantLbl: Label 'item variant';
 
     /// <summary> 
     /// Creates html body for a product from extended text, marketing text and attributes.
@@ -333,7 +335,7 @@ codeunit 30178 "Shpfy Product Export"
             if (not Item.Blocked) and (not Item."Sales Blocked") then
                 ProductPriceCalc.CalcPrice(Item, '', ItemUnitofMeasure.Code, ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price")
             else
-                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, VariantPriceCalcSkippedLbl, Shop);
+                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, StrSubstNo(VariantPriceCalcSkippedLbl, ItemLbl), Shop);
         if not OnlyUpdatePrice then begin
             ShopifyVariant."Available For Sales" := (not Item.Blocked) and (not Item."Sales Blocked");
             ShopifyVariant.Barcode := CopyStr(GetBarcode(Item."No.", '', ItemUnitofMeasure.Code), 1, MaxStrLen(ShopifyVariant.Barcode));
@@ -364,16 +366,19 @@ codeunit 30178 "Shpfy Product Export"
     /// <param name="ShopifyVariant">Parameter of type Record "Shopify Variant".</param>
     /// <param name="Item">Parameter of type Record Item.</param>
     /// <param name="ItemVariant">Parameter of type Record "Item Variant".</param>
-    internal procedure FillInProductVariantData(var ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant")
+   internal procedure FillInProductVariantData(var ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant")
     var
         Product: Record "Shpfy Product";
         ItemAsVariant: Boolean;
     begin
         if Shop."Sync Prices" or OnlyUpdatePrice then
-            if (not Item.Blocked) and (not Item."Sales Blocked") then
-                ProductPriceCalc.CalcPrice(Item, ItemVariant.Code, Item."Sales Unit of Measure", ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price")
+            if Item.Blocked or Item."Sales Blocked" then
+                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, StrSubstNo(VariantPriceCalcSkippedLbl, ItemLbl), Shop)
             else
-                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, VariantPriceCalcSkippedLbl, Shop);
+                if ItemVariant.Blocked or ItemVariant."Sales Blocked" then
+                    SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, ItemVariant.RecordId, StrSubstNo(VariantPriceCalcSkippedLbl, ItemVariantLbl), Shop)
+                else
+                    ProductPriceCalc.CalcPrice(Item, ItemVariant.Code, Item."Sales Unit of Measure", ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price");
         if not OnlyUpdatePrice then begin
             if Product.Get(ShopifyVariant."Product Id") then
                 if Product."Has Variants" then
@@ -427,10 +432,13 @@ codeunit 30178 "Shpfy Product Export"
     internal procedure FillInProductVariantData(var ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant"; ItemUnitofMeasure: Record "Item Unit of Measure")
     begin
         if Shop."Sync Prices" or OnlyUpdatePrice then
-            if (not Item.Blocked) and (not Item."Sales Blocked") then
-                ProductPriceCalc.CalcPrice(Item, ItemVariant.Code, ItemUnitofMeasure.Code, ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price")
+            if Item.Blocked or Item."Sales Blocked" then
+                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, StrSubstNo(VariantPriceCalcSkippedLbl, ItemLbl), Shop)
             else
-                SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, Item.RecordId, VariantPriceCalcSkippedLbl, Shop);
+                if ItemVariant.Blocked or ItemVariant."Sales Blocked" then
+                    SkippedRecord.LogSkippedRecord(ShopifyVariant.Id, ItemVariant.RecordId, StrSubstNo(VariantPriceCalcSkippedLbl, ItemVariantLbl), Shop)
+                else
+                    ProductPriceCalc.CalcPrice(Item, ItemVariant.Code, ItemUnitofMeasure.Code, ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price");
         if not OnlyUpdatePrice then begin
             ShopifyVariant."Available For Sales" := (not Item.Blocked) and (not Item."Sales Blocked");
             ShopifyVariant.Barcode := CopyStr(GetBarcode(Item."No.", ItemVariant.Code, ItemUnitofMeasure.Code), 1, MaxStrLen(ShopifyVariant.Barcode));
