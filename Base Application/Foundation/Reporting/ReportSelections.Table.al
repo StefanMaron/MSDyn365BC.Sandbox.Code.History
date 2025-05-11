@@ -366,7 +366,7 @@ table 77 "Report Selections"
         end;
     end;
 
-    procedure DrillDownToSelectLayout(var SelectedLayoutName: Text[250]; var SelectedLayoutAppID: Guid)
+    internal procedure DrillDownToSelectLayout(var SelectedLayoutName: Text[250]; var SelectedLayoutAppID: Guid)
     var
         ReportLayoutListSelection: Record "Report Layout List";
         ReportManagementCodeunit: Codeunit ReportManagement;
@@ -890,11 +890,10 @@ table 77 "Report Selections"
             EmailBodyUsageFound := false;
             OnGetEmailBodyVendorTextOnAfterNotFindEmailBodyUsage(
               ReportUsage.AsInteger(), RecordVariant, VendorNo, TempBodyReportSelections, IsHandled, EmailBodyUsageFound);
-            if not EmailBodyUsageFound then begin
+            if not EmailBodyUsageFound then
                 if IsHandled then
                     exit(true);
-                exit(false);
-            end;
+            exit(false);
         end;
 
         if TempBodyReportSelections."Email Body Layout Code" <> '' then
