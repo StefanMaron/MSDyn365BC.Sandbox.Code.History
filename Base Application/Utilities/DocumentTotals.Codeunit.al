@@ -46,7 +46,6 @@ codeunit 57 "Document Totals"
         TotalSalesLine2: Record "Sales Line";
     begin
         TotalSalesLine2 := TotalSalesLine;
-        TotalSalesLine2.ReadIsolation(IsolationLevel::ReadUncommitted);
         TotalSalesLine2.SetRange("Document Type", SalesLine."Document Type");
         TotalSalesLine2.SetRange("Document No.", SalesLine."Document No.");
         OnAfterSalesLineSetFilters(TotalSalesLine2, SalesLine);
@@ -66,6 +65,8 @@ codeunit 57 "Document Totals"
         SalesHeader: Record "Sales Header";
         SalesLine2: Record "Sales Line";
         TotalSalesLine2: Record "Sales Line";
+        TempTotalSalesLine: Record "Sales Line" temporary;
+        VATAmount2: Decimal;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -122,6 +123,14 @@ codeunit 57 "Document Totals"
                     end;
             end;
 
+        TempTotalSalesLine := TotalSalesLine2;
+        if TotalSalesHeader."Prices Including VAT" and TotalSalesHeader.SalesLinesExist() then begin
+            CalculateTotalSalesLineAndVATAmount(TotalSalesHeader, VATAmount2, TempTotalSalesLine);
+            if (VATAmount <> VATAmount2) then begin
+                TotalSalesLine2.Amount += VATAmount - VATAmount2;
+                VATAmount := VATAmount2;
+            end;
+        end;
 
         OnAfterCalculateSalesSubPageTotals(
           TotalSalesHeader, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct, TotalSalesLine2);
@@ -402,7 +411,10 @@ codeunit 57 "Document Totals"
 
     procedure SalesDeltaUpdateTotals(var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line"; var TotalSalesLine: Record "Sales Line"; var VATAmount: Decimal; var InvoiceDiscountAmount: Decimal; var InvoiceDiscountPct: Decimal)
     var
+        SalesHeader: Record "Sales Header";
+        TempTotalSalesLine: Record "Sales Line" temporary;
         InvDiscountBaseAmount: Decimal;
+        VATAmount2: Decimal;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -426,6 +438,15 @@ codeunit 57 "Document Totals"
                 InvoiceDiscountPct := Round(100 * InvoiceDiscountAmount / InvDiscountBaseAmount, 0.00001);
         end;
 
+        if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") then
+            if SalesHeader."Prices Including VAT" and SalesHeader.SalesLinesExist() then begin
+                CalculateTotalSalesLineAndVATAmountForCurrentSalesLine(SalesHeader, VATAmount2, SalesLine, TempTotalSalesLine);
+                if (VATAmount <> VATAmount2) then begin
+                    SalesLine.Amount += VATAmount - VATAmount2;
+                    TotalSalesLine.Amount += VATAmount - VATAmount2;
+                    VATAmount := VATAmount2
+                end;
+            end;
 
         OnAfterSalesDeltaUpdateTotals(SalesLine, xSalesLine, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
     end;
@@ -617,7 +638,6 @@ codeunit 57 "Document Totals"
         TotalPurchaseLine2: Record "Purchase Line";
     begin
         TotalPurchaseLine2 := TotalPurchaseLine;
-        TotalPurchaseLine2.ReadIsolation(IsolationLevel::ReadUncommitted);
         TotalPurchaseLine2.SetRange("Document Type", PurchaseLine."Document Type");
         TotalPurchaseLine2.SetRange("Document No.", PurchaseLine."Document No.");
         OnAfterPurchaseLineSetFilters(TotalPurchaseLine2, PurchaseLine);
@@ -937,6 +957,29 @@ codeunit 57 "Document Totals"
           TempTotalPurchaseLine."Inv. Discount Amount" + TotalVATAmount;
     end;
 
+    local procedure CalculateTotalSalesLineAndVATAmountForCurrentSalesLine(SalesHeader: Record "Sales Header"; var VATAmount: Decimal; CurrentSalesLine: Record "Sales Line"; var TempTotalSalesLine: Record "Sales Line" temporary)
+    var
+        TempSalesLine: Record "Sales Line" temporary;
+        TempTotalSalesLineLCY: Record "Sales Line" temporary;
+        SalesPost: Codeunit "Sales-Post";
+        VATAmountText: Text[30];
+        ProfitLCY: Decimal;
+        ProfitPct: Decimal;
+        TotalAdjCostLCY: Decimal;
+    begin
+        SalesPost.GetSalesLines(SalesHeader, TempSalesLine, 0);
+        if TempSalesLine.Get(CurrentSalesLine."Document Type", CurrentSalesLine."Document No.", CurrentSalesLine."Line No.") then begin
+            TempSalesLine.Delete();
+            TempSalesLine.Init();
+            TempSalesLine := CurrentSalesLine;
+            TempSalesLine.Insert();
+        end;
+
+        Clear(SalesPost);
+        SalesPost.SumSalesLinesTemp(
+          SalesHeader, TempSalesLine, 0, TempTotalSalesLine, TempTotalSalesLineLCY,
+          VATAmount, VATAmountText, ProfitLCY, ProfitPct, TotalAdjCostLCY);
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalculatePostedSalesInvoiceTotals(var SalesInvoiceHeader: Record "Sales Invoice Header"; SalesInvoiceLine: Record "Sales Invoice Line"; var VATAmount: Decimal)
