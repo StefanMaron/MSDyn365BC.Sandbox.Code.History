@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AI Tests"
@@ -283,9 +291,6 @@
       "path": "./Sustainability/Test/Sustainability Tests"
     },
     {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
-    },
-    {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
@@ -303,13 +308,5 @@
     {
       "path": "./BusinessFoundation/Test/Business Foundation Tests"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false
-  }
+  ]
 }
