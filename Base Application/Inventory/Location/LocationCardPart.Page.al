@@ -46,6 +46,7 @@ page 5705 "Location Card Part"
                 {
                     ApplicationArea = All;
                     Caption = 'Allow Breakbulk';
+                    ToolTip = 'Specifies that an order can be fulfilled with items stored in alternate units of measure, if an item stored in the requested unit of measure is not found.';
                 }
                 group(Bin)
                 {
