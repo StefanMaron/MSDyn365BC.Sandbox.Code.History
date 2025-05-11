@@ -1,4 +1,3 @@
-#pragma warning disable AS0049
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -9,11 +8,9 @@ using Microsoft.eServices.EDocument;
 
 table 6100 "E-Document Purchase Header"
 {
+    InherentEntitlements = X;
+    InherentPermissions = X;
     Access = Internal;
-#pragma warning disable AS0034
-    InherentEntitlements = RIMDX;
-    InherentPermissions = RIMDX;
-#pragma warning restore AS0034
 
     fields
     {
@@ -230,4 +227,3 @@ table 6100 "E-Document Purchase Header"
     end;
 
 }
-#pragma warning restore AS0049
