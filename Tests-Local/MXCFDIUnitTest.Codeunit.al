@@ -643,7 +643,7 @@
         SalesInvoiceHeader."No." := LibraryUtility.GenerateGUID();
         SalesInvoiceHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         SalesInvoiceHeader."Electronic Document Status" := SalesInvoiceHeader."Electronic Document Status"::"Stamp Received";
-        SalesInvoiceHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
+        SalesInvoiceHeader."CFDI Cancellation Reason Code" := '01';
         asserterror SalesInvoiceHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -661,7 +661,7 @@
         SalesCrMemoHeader."No." := LibraryUtility.GenerateGUID();
         SalesCrMemoHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         SalesCrMemoHeader."Electronic Document Status" := SalesCrMemoHeader."Electronic Document Status"::"Stamp Received";
-        SalesCrMemoHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
+        SalesCrMemoHeader."CFDI Cancellation Reason Code" := '01';
         asserterror SalesCrMemoHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -679,7 +679,7 @@
         ServiceInvoiceHeader."No." := LibraryUtility.GenerateGUID();
         ServiceInvoiceHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         ServiceInvoiceHeader."Electronic Document Status" := ServiceInvoiceHeader."Electronic Document Status"::"Stamp Received";
-        ServiceInvoiceHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
+        ServiceInvoiceHeader."CFDI Cancellation Reason Code" := '01';
         asserterror ServiceInvoiceHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -697,7 +697,7 @@
         ServiceCrMemoHeader."No." := LibraryUtility.GenerateGUID();
         ServiceCrMemoHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         ServiceCrMemoHeader."Electronic Document Status" := ServiceCrMemoHeader."Electronic Document Status"::"Stamp Received";
-        ServiceCrMemoHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
+        ServiceCrMemoHeader."CFDI Cancellation Reason Code" := '01';
         asserterror ServiceCrMemoHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -715,7 +715,7 @@
         SalesShipmentHeader."No." := LibraryUtility.GenerateGUID();
         SalesShipmentHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         SalesShipmentHeader."Electronic Document Status" := SalesShipmentHeader."Electronic Document Status"::"Stamp Received";
-        SalesShipmentHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
+        SalesShipmentHeader."CFDI Cancellation Reason Code" := '01';
         asserterror SalesShipmentHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -733,7 +733,7 @@
         TransferShipmentHeader."No." := LibraryUtility.GenerateGUID();
         TransferShipmentHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         TransferShipmentHeader."Electronic Document Status" := TransferShipmentHeader."Electronic Document Status"::"Stamp Received";
-        TransferShipmentHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
+        TransferShipmentHeader."CFDI Cancellation Reason Code" := '01';
         asserterror TransferShipmentHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -751,7 +751,7 @@
         CustLedgerEntry."Entry No." := LibraryUtility.GetNewRecNo(CustLedgerEntry, CustLedgerEntry.FieldNo("Entry No."));
         CustLedgerEntry."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         CustLedgerEntry."Electronic Document Status" := CustLedgerEntry."Electronic Document Status"::"Stamp Received";
-        CustLedgerEntry."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
+        CustLedgerEntry."CFDI Cancellation Reason Code" := '01';
         asserterror CustLedgerEntry.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -2264,16 +2264,15 @@
     procedure FixedAssetGetSATClassification()
     var
         FixedAsset: Record "Fixed Asset";
-        SalesLine: Record "Sales Line";
         SATUtilities: Codeunit "SAT Utilities";
     begin
-        // [SCENARIO 433795] SATUtilities.GetSATClassification returns a value from Fixed Asset Card
+        // [SCENARIO 433795] SATUtilities.GetSATItemClassification returns a value from Fixed Asset Card
         FixedAsset.Init();
         FixedAsset."No." := LibraryUtility.GenerateGUID();
         FixedAsset."SAT Classification Code" := LibraryUtility.GenerateGUID();
         FixedAsset.Insert();
         Assert.AreEqual(
-          FixedAsset."SAT Classification Code", SATUtilities.GetSATClassification(SalesLine.Type::"Fixed Asset", FixedAsset."No."), ExpectedError);
+          FixedAsset."SAT Classification Code", SATUtilities.GetSATItemClassification(4, FixedAsset."No."), ExpectedError);
     end;
 
     [Test]
@@ -2311,16 +2310,15 @@
     procedure GLAccountGetSATClassification()
     var
         GLAccount: Record "G/L Account";
-        SalesLine: Record "Sales Line";
         SATUtilities: Codeunit "SAT Utilities";
     begin
-        // [SCENARIO 491617] SATUtilities.GetSATClassification returns a value for G/L Account
+        // [SCENARIO 491617] SATUtilities.GetSATItemClassification returns a value for G/L Account
         GLAccount.Init();
         GLAccount."No." := LibraryUtility.GenerateGUID();
         GLAccount."SAT Classification Code" := LibraryUtility.GenerateGUID();
         GLAccount.Insert();
         Assert.AreEqual(
-          GLAccount."SAT Classification Code", SATUtilities.GetSATClassification(SalesLine.Type::"G/L Account", GLAccount."No."), ExpectedError);
+          GLAccount."SAT Classification Code", SATUtilities.GetSATItemClassification(1, GLAccount."No."), ExpectedError);
     end;
 
     [Test]
@@ -2683,16 +2681,6 @@
         DummyCFDIRelationDocument: Record "CFDI Relation Document";
     begin
         exit(DummyCFDIRelationDocument."Related Doc. Type"::"Credit Memo");
-    end;
-
-    local procedure CreateCancellationReasonCode(SubstitutionRequired: Boolean): Code[10]
-    var
-        CFDICancellationReason: Record "CFDI Cancellation Reason";
-    begin
-        CFDICancellationReason.Code := LibraryUtility.GenerateGUID();
-        CFDICancellationReason."Substitution Number Required" := SubstitutionRequired;
-        CFDICancellationReason.Insert();
-        exit(CFDICancellationReason.Code);
     end;
 
     local procedure FindCancellationReasonCode(): Code[10]
