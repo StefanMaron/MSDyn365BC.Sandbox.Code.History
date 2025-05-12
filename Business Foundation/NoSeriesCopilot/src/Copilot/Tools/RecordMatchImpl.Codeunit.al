@@ -5,23 +5,11 @@
 
 namespace Microsoft.Foundation.NoSeries;
 
-codeunit 337 "No. Series Text Match Impl."
+codeunit 337 "Record Match Impl."
 {
     Access = Internal;
     InherentPermissions = X;
     InherentEntitlements = X;
-
-    procedure IsRelevant(FirstString: Text; SecondString: Text): Boolean
-    var
-        Score: Decimal;
-    begin
-        FirstString := RemoveShortWords(FirstString);
-        SecondString := RemoveShortWords(SecondString);
-
-        Score := CalculateStringNearness(FirstString, SecondString, GetMatchLengthTreshold(), 100) / 100;
-
-        exit(Score >= RequiredNearness());
-    end;
 
     /// <summary>
     /// Computes a nearness score between strings. Nearness is based on repeatedly finding longest common substrings.
@@ -33,7 +21,7 @@ codeunit 337 "No. Series Text Match Impl."
     /// <param name="Threshold">Substring matches below Threshold are not considered</param>
     /// <param name="NormalizingFactor">Max value returned by this procedure</param>
     /// <returns>A number between 0 and NormalizingFactor, representing how much of the strings was matched</returns>
-    local procedure CalculateStringNearness(FirstString: Text; SecondString: Text; Threshold: Integer; NormalizingFactor: Integer): Integer
+    procedure CalculateStringNearness(FirstString: Text; SecondString: Text; Threshold: Integer; NormalizingFactor: Integer): Integer
     var
         Result: Text;
         TotalMatchedChars: Integer;
@@ -110,11 +98,11 @@ codeunit 337 "No. Series Text Match Impl."
         exit(MinThreshold <= Length);
     end;
 
-    local procedure RemoveShortWords(OriginalText: Text): Text;
+    procedure RemoveShortWords(OriginalText: Text[250]): Text[250];
     var
         Words: List of [Text];
-        Word: Text;
-        Result: Text;
+        Word: Text[250];
+        Result: Text[250];
     begin
         Words := OriginalText.Split(' '); // split the text by spaces into a list of words
         foreach Word in Words do // loop through each word in the list
@@ -123,15 +111,5 @@ codeunit 337 "No. Series Text Match Impl."
         Result := CopyStr(Result.TrimEnd(), 1, MaxStrLen(Result)); // remove the trailing space from the result
         OriginalText := Result; // assign the result back to the text parameter
         exit(OriginalText);
-    end;
-
-    local procedure GetMatchLengthTreshold(): Decimal
-    begin
-        exit(2);
-    end;
-
-    local procedure RequiredNearness(): Decimal
-    begin
-        exit(0.9)
     end;
 }
