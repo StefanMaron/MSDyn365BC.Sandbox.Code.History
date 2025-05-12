@@ -8,7 +8,6 @@ using Microsoft.CRM.Contact;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Purchases.Vendor;
-using System.Environment;
 using Microsoft.Sales.Customer;
 using Microsoft.Utilities;
 using System;
@@ -25,7 +24,7 @@ codeunit 249 "VAT Registration Log Mgt."
 
     var
         DataTypeManagement: Codeunit "Data Type Management";
-        ClientTypeManagement: Codeunit "Client Type Management";
+
         ValidPathTxt: Label 'descendant::vat:valid', Locked = true;
         NamePathTxt: Label 'descendant::vat:traderName', Locked = true;
         AddressPathTxt: Label 'descendant::vat:traderAddress', Locked = true;
@@ -353,13 +352,6 @@ codeunit 249 "VAT Registration Log Mgt."
         if IsHandled then
             exit;
         RecordRef.GetTable(RecordVariant);
-
-        if IsAPIClientType() then
-            exit;
-
-        if not GuiAllowed() then
-            exit;
-
         if not CountryRegion.IsEUCountry(CountryCode) then
             exit; // VAT Reg. check Srv. is only available for EU countries.
 
@@ -482,11 +474,6 @@ codeunit 249 "VAT Registration Log Mgt."
             ServiceConnection.Status := ServiceConnection.Status::Disabled;
         ServiceConnection.InsertServiceConnection(
               ServiceConnection, RecRef.RecordId, DescriptionLbl, VATRegNoSrvConfig."Service Endpoint", PAGE::"VAT Registration Config");
-    end;
-
-    local procedure IsAPIClientType(): Boolean
-    begin
-        exit(ClientTypeManagement.GetCurrentClientType() in [ClientType::Api, ClientType::SOAP, ClientType::OData, ClientType::ODataV4])
     end;
 
     [IntegrationEvent(false, false)]
