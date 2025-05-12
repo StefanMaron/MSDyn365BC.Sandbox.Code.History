@@ -1,11 +1,11 @@
 {
   "settings": {
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeAnalysis": false
+    "allint.enabled": false,
+    "al.enableCodeActions": false
   },
   "folders": [
     {
@@ -94,9 +94,6 @@
     },
     {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
-    },
-    {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
     },
     {
       "path": "./BaseApp/Test/Tests-Bank"
@@ -291,16 +288,7 @@
       "path": "./Sustainability/Test/Sustainability Tests"
     },
     {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
-    },
-    {
       "path": "./EU3PartyTradePurchase/test/EU 3-Party Trade Purchase Tests"
-    },
-    {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests"

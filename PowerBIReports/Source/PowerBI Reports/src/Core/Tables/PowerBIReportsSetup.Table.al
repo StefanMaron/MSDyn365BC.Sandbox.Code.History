@@ -4,6 +4,7 @@ using System.DateTime;
 
 table 36951 "PowerBI Reports Setup"
 {
+    Access = Internal;
     Caption = 'Setup for Power BI Connector';
 
     fields
@@ -31,7 +32,7 @@ table 36951 "PowerBI Reports Setup"
         }
         field(4; "ISO Country Holidays"; Option)
         {
-            Caption = 'ISO Country Holidays';
+            Caption = 'Iso Country Holidays';
             OptionMembers = AT,AU,BE,CA,DE,ES,FR,GB,IT,NL,NO,PT,SE,US;
             OptionCaption = 'AT,AU,BE,CA,DE,ES,FR,GB,IT,NL,NO,PT,SE,US';
             DataClassification = CustomerContent;
@@ -76,7 +77,7 @@ table 36951 "PowerBI Reports Setup"
             Caption = 'Calendar Range';
             OptionMembers = Calendar,FiscalGregorian,FiscalWeekly;
             OptionCaption = 'Standard,Fiscal Calendar,Weekly';
-            InitValue = FiscalGregorian;
+            InitValue = "Calendar";
             DataClassification = CustomerContent;
             // Defines to which type of calendar the year boundaries are applied during table’s generation. 
             // Using FiscalWeekly the first and last day of the year might not correspond to a first and last day of a month, respectively.
