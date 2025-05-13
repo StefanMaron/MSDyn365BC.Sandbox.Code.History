@@ -283,8 +283,6 @@ table 7005 "Price Source"
                 PriceListLine.SetRange("Parent Source No.", "Parent Source No.");
         end else
             PriceListLine.SetRange("Source No.");
-
-        OnAfterFilterPriceLines(Rec, PriceListLine);
     end;
 
     procedure VerifyAmountTypeForSourceType(AmountType: Enum "Price Amount Type")
@@ -364,11 +362,6 @@ table 7005 "Price Source"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePriceSourceInterfaceVerifyDate(PriceSource: Record "Price Source"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFilterPriceLines(PriceSource: Record "Price Source"; var PriceListLine: Record "Price List Line")
     begin
     end;
 }
