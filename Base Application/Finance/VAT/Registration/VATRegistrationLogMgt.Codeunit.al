@@ -39,6 +39,7 @@ codeunit 249 "VAT Registration Log Mgt."
         VATSrvDisclaimerUrlTok: Label 'https://go.microsoft.com/fwlink/?linkid=841741', Locked = true;
         DescriptionLbl: Label 'EU VAT Reg. No. Validation Service Setup';
         UnexpectedResponseErr: Label 'The VAT registration number could not be verified because the VIES VAT Registration No. service may be currently unavailable for the selected EU state, %1.', Comment = '%1 - Country / Region Code';
+        UnexpectedResponseQst: Label 'The VAT registration number could not be verified because the VIES VAT Registration No. service may be currently unavailable for the selected EU state, %1. Do you want to continue without validation?', Comment = '%1 - Country / Region Code';
         EUVATRegNoValidationServiceTok: Label 'EUVATRegNoValidationServiceTelemetryCategoryTok', Locked = true;
         ValidationFailureMsg: Label 'VIES service may be currently unavailable', Locked = true;
         NameMatchPathTxt: Label 'descendant::vat:traderNameMatch', Locked = true;
@@ -104,7 +105,14 @@ codeunit 249 "VAT Registration Log Mgt."
     begin
         if not XMLDOMMgt.FindNodeWithNamespace(XMLDoc.DocumentElement, ValidPathTxt, 'vat', Namespace, FoundXmlNode) then begin
             Session.LogMessage('0000C4T', ValidationFailureMsg, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EUVATRegNoValidationServiceTok);
-            Error(UnexpectedResponseErr, VATRegistrationLog."Country/Region Code");
+
+            if not GuiAllowed() then
+                Error(UnexpectedResponseErr);
+
+            if Confirm(StrSubstNo(UnexpectedResponseQst, VATRegistrationLog."Country/Region Code")) then
+                exit
+            else
+                Error('');
         end;
 
         case LowerCase(FoundXmlNode.InnerText) of
