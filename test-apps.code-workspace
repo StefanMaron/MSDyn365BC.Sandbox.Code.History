@@ -283,6 +283,9 @@
       "path": "./Sustainability/Test/Sustainability Tests"
     },
     {
+      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
+    },
+    {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
