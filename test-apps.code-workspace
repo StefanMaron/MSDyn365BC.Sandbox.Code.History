@@ -280,7 +280,13 @@
       "path": "./Sustainability/Test/Sustainability Tests"
     },
     {
+      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
+    },
+    {
       "path": "./EU3PartyTradePurchase/test/EU 3-Party Trade Purchase Tests"
+    },
+    {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests"
