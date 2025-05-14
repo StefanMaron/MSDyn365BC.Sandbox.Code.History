@@ -322,8 +322,7 @@ codeunit 6611 "FS Setup Defaults"
 
         FSBookableResource.Reset();
         FSBookableResource.SetRange(StateCode, FSBookableResource.StateCode::Active);
-        FSBookableResource.SetFilter(ResourceType, Format(FSBookableResource.ResourceType::Generic) + '|' + Format(FSBookableResource.ResourceType::Account)
-           + '|' + Format(FSBookableResource.ResourceType::Equipment) + '|' + Format(FSBookableResource.ResourceType::User));
+        FSBookableResource.SetFilter(ResourceType, Format(FSBookableResource.ResourceType::Generic) + '|' + Format(FSBookableResource.ResourceType::Account) + '|' + Format(FSBookableResource.ResourceType::Equipment));
         if CDSIntegrationMgt.GetCDSCompany(CDSCompany) then
             FSBookableResource.SetFilter(CompanyId, CDSCompany.CompanyId + '|' + Format(EmptyGuid));
         InsertIntegrationTableMapping(

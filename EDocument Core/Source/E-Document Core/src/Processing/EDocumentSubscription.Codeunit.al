@@ -21,7 +21,6 @@ using Microsoft.Sales.Reminder;
 using Microsoft.Service.Document;
 using Microsoft.Service.History;
 using Microsoft.Service.Posting;
-using System.Automation;
 
 codeunit 6103 "E-Document Subscription"
 {
@@ -84,21 +83,16 @@ codeunit 6103 "E-Document Subscription"
     var
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        DocumentSendingProfile: Record "Document Sending Profile";
-        EDocumentProcessing: Codeunit "E-Document Processing";
     begin
         if (SalesInvHdrNo = '') and (SalesCrMemoHdrNo = '') then
             exit;
 
-        if not EDocumentProcessing.GetDocSendingProfileForCust(SalesHeader."Bill-to Customer No.", DocumentSendingProfile) then
-            exit;
-
         if SalesInvHdrNo <> '' then begin
             if SalesInvHeader.Get(SalesInvHdrNo) then
-                CreateEDocumentFromPostedDocument(SalesInvHeader, DocumentSendingProfile, Enum::"E-Document Type"::"Sales Invoice");
+                CreateEDocumentFromPosedDocument(SalesInvHeader);
         end else
             if SalesCrMemoHeader.Get(SalesCrMemoHdrNo) then
-                CreateEDocumentFromPostedDocument(SalesCrMemoHeader, DocumentSendingProfile, Enum::"E-Document Type"::"Sales Credit Memo");
+                CreateEDocumentFromPosedDocument(SalesCrMemoHeader);
     end;
 
 
@@ -134,53 +128,38 @@ codeunit 6103 "E-Document Subscription"
     var
         ServiceInvoiceHeader: Record "Service Invoice Header";
         ServiceCrMemoHdr: Record "Service Cr.Memo Header";
-        DocumentSendingProfile: Record "Document Sending Profile";
-        EDocumentProcessing: Codeunit "E-Document Processing";
     begin
         if (ServInvoiceNo = '') and (ServCrMemoNo = '') then
             exit;
 
-        if not EDocumentProcessing.GetDocSendingProfileForCust(ServiceHeader."Bill-to Customer No.", DocumentSendingProfile) then
-            exit;
-
         if ServInvoiceNo <> '' then begin
             if ServiceInvoiceHeader.Get(ServInvoiceNo) then
-                CreateEDocumentFromPostedDocument(ServiceInvoiceHeader, DocumentSendingProfile, Enum::"E-Document Type"::"Service Invoice");
+                CreateEDocumentFromPosedDocument(ServiceInvoiceHeader);
         end else
             if ServiceCrMemoHdr.Get(ServCrMemoNo) then
-                CreateEDocumentFromPostedDocument(ServiceCrMemoHdr, DocumentSendingProfile, Enum::"E-Document Type"::"Service Credit Memo");
+                CreateEDocumentFromPosedDocument(ServiceCrMemoHdr);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"FinChrgMemo-Issue", 'OnAfterIssueFinChargeMemo', '', false, false)]
     local procedure OnAfterIssueFinChargeMemo(var FinChargeMemoHeader: Record "Finance Charge Memo Header"; IssuedFinChargeMemoNo: Code[20])
     var
         IssuedFinChrgMemoHeader: Record "Issued Fin. Charge Memo Header";
-        DocumentSendingProfile: Record "Document Sending Profile";
-        EDocumentProcessing: Codeunit "E-Document Processing";
     begin
-        if not EDocumentProcessing.GetDocSendingProfileForCust(FinChargeMemoHeader."Customer No.", DocumentSendingProfile) then
-            exit;
-
         if IssuedFinChargeMemoNo = '' then
             exit;
         if IssuedFinChrgMemoHeader.Get(IssuedFinChargeMemoNo) then
-            CreateEDocumentFromPostedDocument(IssuedFinChrgMemoHeader, DocumentSendingProfile, Enum::"E-Document Type"::"Issued Finance Charge Memo");
+            CreateEDocumentFromPosedDocument(IssuedFinChrgMemoHeader);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reminder-Issue", 'OnAfterIssueReminder', '', false, false)]
     local procedure OnAfterIssueReminder(var ReminderHeader: Record "Reminder Header"; IssuedReminderNo: Code[20]; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
     var
         IssuedReminderHeader: Record "Issued Reminder Header";
-        DocumentSendingProfile: Record "Document Sending Profile";
-        EDocumentProcessing: Codeunit "E-Document Processing";
     begin
-        if not EDocumentProcessing.GetDocSendingProfileForCust(ReminderHeader."Customer No.", DocumentSendingProfile) then
-            exit;
-
         if IssuedReminderNo = '' then
             exit;
         if IssuedReminderHeader.Get(IssuedReminderNo) then
-            CreateEDocumentFromPostedDocument(IssuedReminderHeader, DocumentSendingProfile, Enum::"E-Document Type"::"Issued Reminder");
+            CreateEDocumentFromPosedDocument(IssuedReminderHeader);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Document Sending Profile", 'OnCheckElectronicSendingEnabled', '', false, false)]
@@ -304,21 +283,13 @@ codeunit 6103 "E-Document Subscription"
         EDocLogHelper.InsertLog(EDocument, EDocService, Enum::"E-Document Service Status"::"Imported Document Created");
     end;
 
-    local procedure CreateEDocumentFromPostedDocument(PostedRecord: Variant; DocumentSendingProfile: Record "Document Sending Profile"; DocumentType: Enum "E-Document Type")
+    local procedure CreateEDocumentFromPosedDocument(PostedRecord: Variant)
     var
-        WorkFlow: Record Workflow;
         PostedSourceDocumentHeader: RecordRef;
     begin
         PostedSourceDocumentHeader.GetTable(PostedRecord);
-        if (DocumentSendingProfile."Electronic Document" <> DocumentSendingProfile."Electronic Document"::"Extended E-Document Service Flow") then
-            exit;
-
-        if not WorkFlow.Get(DocumentSendingProfile."Electronic Service Flow") then
-            Error(DocumentSendingProfileWithWorkflowErr, DocumentSendingProfile."Electronic Service Flow", Format(DocumentSendingProfile."Electronic Document"::"Extended E-Document Service Flow"), DocumentSendingProfile.Code);
-
-        WorkFlow.TestField(Enabled);
-        if DocumentSendingProfile."Electronic Document" = DocumentSendingProfile."Electronic Document"::"Extended E-Document Service Flow" then
-            EDocExport.CreateEDocument(PostedSourceDocumentHeader, WorkFlow, DocumentType);
+        if EDocumentHelper.IsElectronicDocument(PostedSourceDocumentHeader) then
+            EDocExport.CreateEDocument(PostedSourceDocumentHeader);
     end;
 
     local procedure PointEDocumentToPostedDocument(OpenRecord: Variant; PostedRecord: Variant; PostedDocumentNo: Code[20]; DocumentType: Enum "E-Document Type")
@@ -338,5 +309,4 @@ codeunit 6103 "E-Document Subscription"
         EDocumentProcessingPhase: Enum "E-Document Processing Phase";
         WrongAmountErr: Label 'Purchase Document cannot be released as Amount Incl. VAT: %1, is different from E-Document Amount Incl. VAT: %2', Comment = '%1 - Purchase document amount, %2 - E-document amount';
         DeleteNotAllowedErr: Label 'Deletion of Purchase Header linked to E-Document is not allowed.';
-        DocumentSendingProfileWithWorkflowErr: Label 'Workflow %1 defined for %2 in Document Sending Profile %3 is not found.', Comment = '%1 - The workflow code, %2 - Enum value set in Electronic Document, %3 - Document Sending Profile Code';
 }

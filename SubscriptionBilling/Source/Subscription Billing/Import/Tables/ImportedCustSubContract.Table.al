@@ -15,6 +15,7 @@ table 8010 "Imported Cust. Sub. Contract"
 {
     DataClassification = CustomerContent;
     Caption = 'Imported Customer Subscription Contract';
+    Access = Internal;
 
     fields
     {

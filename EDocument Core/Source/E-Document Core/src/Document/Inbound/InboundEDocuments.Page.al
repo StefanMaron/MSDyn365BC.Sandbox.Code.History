@@ -2,13 +2,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-#pragma warning disable AS0031, AS0032, AS0050
 namespace Microsoft.eServices.EDocument;
 
 using Microsoft.Foundation.Attachment;
 using Microsoft.eServices.EDocument.Processing.Import;
-using Microsoft.eServices.EDocument.Processing.Import.Purchase;
-using Microsoft.Purchases.Vendor;
 
 page 6105 "Inbound E-Documents"
 {
@@ -29,31 +26,24 @@ page 6105 "Inbound E-Documents"
             repeater(DocumentList)
             {
                 ShowCaption = false;
-                field("Document Name"; DocumentNameTxt)
+                field(SystemCreatedAt; Rec.SystemCreatedAt)
                 {
-                    Caption = 'Document';
-                    ToolTip = 'Specifies the unique name for the document.';
+                    Caption = 'Received At';
+                    ToolTip = 'Specifies the date and time when the electronic document was created.';
                     trigger OnDrillDown()
                     begin
                         EDocumentHelper.OpenDraftPage(Rec);
                     end;
                 }
-                field(SystemCreatedAt; Rec.SystemCreatedAt)
-                {
-                    Caption = 'Received At';
-                    ToolTip = 'Specifies the date and time when the electronic document was created.';
-                }
                 field("Entry No"; Rec."Entry No")
                 {
                     Caption = 'No.';
                     ToolTip = 'Specifies the entry number.';
-                    Visible = false;
                 }
                 field("File Name"; Rec."File Name")
                 {
                     Caption = 'Source File';
                     ToolTip = 'Specifies the name of the source file.';
-                    Visible = false;
 
                     trigger OnDrillDown()
                     begin
@@ -62,36 +52,18 @@ page 6105 "Inbound E-Documents"
                 }
                 field("File Type"; Rec."File Type")
                 {
-                    Caption = 'Source File Type';
                     ToolTip = 'Specifies the type of the source file.';
                     Visible = false;
                 }
-                field(Service; Rec.Service)
+                field("Vendor Name"; Rec."Bill-to/Pay-to Name")
                 {
-                    Visible = false;
-                    Caption = 'Service';
-                    ToolTip = 'Specifies the service code of the electronic document.';
-                }
-                field("Service Integration"; Rec."Service Integration")
-                {
-                    Caption = 'Source';
-                    ToolTip = 'Specifies the source of the electronic document.';
-                }
-                field("Source Details"; Rec."Source Details")
-                {
-                    Caption = 'Source Details';
-                    ToolTip = 'Specifies the details about the source of the electronic document.';
-                }
-                field("Vendor Name"; VendorNameTxt)
-                {
-                    Caption = 'Sender';
+                    Caption = 'Vendor Name';
                     ToolTip = 'Specifies the vendor name of the electronic document.';
                 }
                 field("Status"; Rec.Status)
                 {
                     Caption = 'Status';
                     ToolTip = 'Specifies the status of the electronic document.';
-                    Visible = false;
                 }
                 field("Import Processing Status"; ImportProcessingStatus)
                 {
@@ -100,17 +72,20 @@ page 6105 "Inbound E-Documents"
                 }
                 field("Document Type"; Rec."Document Type")
                 {
-                    Caption = 'Finalized Document Type';
                     ToolTip = 'Specifies the document type of the electronic document.';
                 }
                 field("Document Record ID"; RecordLinkTxt)
                 {
-                    Caption = 'Finalized Document No.';
+                    Caption = 'Document';
                     ToolTip = 'Specifies the document created from the electronic document.';
                     trigger OnDrillDown()
                     begin
                         Rec.ShowRecord();
                     end;
+                }
+                field(Service; Rec.Service)
+                {
+                    ToolTip = 'Specifies the service code of the electronic document.';
                 }
             }
         }
@@ -247,8 +222,9 @@ page 6105 "Inbound E-Documents"
                 {
                 }
             }
-            actionref(Promoted_ViewFile; ViewFile) { }
+            actionref(Promoted_Process; OpenDraftDocument) { }
             actionref(Promoted_EDocumentServices; EDocumentServices) { }
+            actionref(Promoted_ViewFile; ViewFile) { }
         }
     }
 
@@ -256,7 +232,7 @@ page 6105 "Inbound E-Documents"
         EDocumentHelper: Codeunit "E-Document Helper";
         ImportProcessingStatus: Enum "Import E-Doc. Proc. Status";
         ProcessDialogMsg: Label 'Processing pdf...';
-        RecordLinkTxt, VendorNameTxt, DocumentNameTxt : Text;
+        RecordLinkTxt: Text;
 
     trigger OnAfterGetRecord()
     var
@@ -264,38 +240,6 @@ page 6105 "Inbound E-Documents"
     begin
         ImportProcessingStatus := Rec.GetEDocumentImportProcessingStatus();
         RecordLinkTxt := EDocumentProcessing.GetRecordLinkText(Rec);
-        PopulateDocumentNameTxt();
-        PopulateVendorNameTxt();
-    end;
-
-    local procedure PopulateDocumentNameTxt()
-    var
-        CaptionBuilder: TextBuilder;
-    begin
-        if Rec."File Name" <> '' then
-            CaptionBuilder.Append(Rec."File Name" + ' - ')
-        else
-            CaptionBuilder.Append('Draft document - ');
-
-        CaptionBuilder.Append(Format(Rec."Entry No"));
-        DocumentNameTxt := CaptionBuilder.ToText();
-    end;
-
-    local procedure PopulateVendorNameTxt()
-    var
-        EDocumentHeaderMapping: Record "E-Document Header Mapping";
-        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
-        Vendor: Record Vendor;
-    begin
-        VendorNameTxt := Rec."Bill-to/Pay-to Name";
-        EDocumentHeaderMapping := Rec.GetEDocumentHeaderMapping();
-        if Vendor.Get(EDocumentHeaderMapping."Vendor No.") then
-            VendorNameTxt := Vendor.Name
-        else begin
-            EDocumentPurchaseHeader := EDocumentHeaderMapping.GetEDocumentPurchaseHeader();
-            if EDocumentPurchaseHeader."Vendor Company Name" <> '' then
-                VendorNameTxt := EDocumentPurchaseHeader."Vendor Company Name";
-        end;
     end;
 
     trigger OnOpenPage()
@@ -324,7 +268,7 @@ page 6105 "Inbound E-Documents"
         FileName: Text;
         InStr: InStream;
     begin
-        if not UploadIntoStream('', '', 'PDF Files|*.pdf', FileName, InStr) then
+        if not UploadIntoStream('', '', '', FileName, InStr) then
             exit;
 
         EDocumentService.GetPDFReaderService();
@@ -368,5 +312,3 @@ page 6105 "Inbound E-Documents"
     end;
 
 }
-
-#pragma warning restore AS0031, AS0032, AS0050
