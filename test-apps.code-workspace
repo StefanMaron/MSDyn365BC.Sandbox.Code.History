@@ -145,24 +145,24 @@
       "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
-      "path": "./Test Runner/src/DataDrivenTest"
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
     }
   ],
   "settings": {
+    "al.enableCodeActions": false,
     "allint.enabled": false,
     "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
-    },
-    "al.enableCodeActions": false
+    }
   }
 }
