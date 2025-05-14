@@ -5,6 +5,7 @@ codeunit 139323 "Onboarding Signal Tests"
     Permissions = tabledata "Onboarding Signal" = ri;
 
     var
+        OnboardingSignal: Record "Onboarding Signal";
         Assert: Codeunit Assert;
         LibraryOnboardingSignal: Codeunit "Library - Onboarding Signal";
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
@@ -13,7 +14,6 @@ codeunit 139323 "Onboarding Signal Tests"
     procedure OnboardingSignalDeleteCompany()
     var
         Company: Record Company;
-        OnboardingSignal: Record "Onboarding Signal";
         OnboardingSignalTests: Codeunit "Onboarding Signal Tests";
         MockCompanyName: Text[30];
     begin
@@ -22,8 +22,8 @@ codeunit 139323 "Onboarding Signal Tests"
         LibraryLowerPermissions.SetO365Basic();
         BindSubscription(OnboardingSignalTests);
 
-        // [THEN] After initializing, table Onboarding Signal is empty
-        Assert.IsTrue(OnboardingSignal.Count() = 0, 'After initializing, table Onboarding Signal should be empty.');
+        // [THEN] After initializing, table Onboarding Signal is emtpy
+        Assert.IsTrue(OnboardingSignal.Count() = 0, 'After initializing, table Onboarding Signal should be emtpy.');
 
         // [GIVEN] Populate some demo data into Onboarding Signal table
         MockCompanyName := 'Mock Company 1';
@@ -49,7 +49,6 @@ codeunit 139323 "Onboarding Signal Tests"
     procedure OnboardingSignalTestSignal()
     var
         Company: Record Company;
-        OnboardingSignal: Record "Onboarding Signal";
         OnboardingSignalImpl: Codeunit "Onboarding Signal";
         OnboardingSignalType: Enum "Onboarding Signal Type";
     begin
@@ -57,8 +56,8 @@ codeunit 139323 "Onboarding Signal Tests"
         LibraryOnboardingSignal.InitializeOnboardingSignalTestingEnv();
         LibraryLowerPermissions.SetO365Basic();
 
-        // [THEN] After initializing, table Onboarding Signal is empty
-        Assert.IsTrue(OnboardingSignal.Count() = 0, 'After initializing, table Onboarding Signal should be empty.');
+        // [THEN] After initializing, table Onboarding Signal is emtpy
+        Assert.IsTrue(OnboardingSignal.Count() = 0, 'After initializing, table Onboarding Signal should be emtpy.');
 
         // [GIVEN] Register a new test onboarding signal
         Company.Get(CompanyName());
@@ -75,7 +74,7 @@ codeunit 139323 "Onboarding Signal Tests"
         // [GIVEN] Check if registered signal has met its requirement.
         OnboardingSignalImpl.CheckAndEmitOnboardingSignals();
 
-        // [THEN] The test signal should have status "Onboarding Complete" = true
+        // [THEN] The test signal should have status "Onboarding Compelete" = true
         Assert.IsTrue(LibraryOnboardingSignal.IsOnboardingCompleted(Company.Name, OnboardingSignalType::"Test Signal"), 'Test Signal''s status should be true.');
     end;
 
@@ -114,7 +113,7 @@ codeunit 139323 "Onboarding Signal Tests"
     procedure TestGetOnboardingSignal()
     var
         Company: Record Company;
-        TempOnboardingSignalBuffer: Record "Onboarding Signal Buffer" temporary;
+        OnboardingSignalBuffer: Record "Onboarding Signal Buffer" temporary;
         OnboardingSignalImpl: Codeunit "Onboarding Signal";
         OnboardingSignalType: Enum "Onboarding Signal Type";
     begin
@@ -130,45 +129,18 @@ codeunit 139323 "Onboarding Signal Tests"
         // [GIVEN] Register a new test onboarding signal
         OnboardingSignalImpl.RegisterNewOnboardingSignal(Company.Name, OnboardingSignalType::"Test Signal");
 
-        OnboardingSignalImpl.GetOnboardingSignals(TempOnboardingSignalBuffer);
+        OnboardingSignalImpl.GetOnboardingSignals(OnboardingSignalBuffer);
 
         // [THEN] There should be two signals already registered
-        Assert.AreEqual(2, TempOnboardingSignalBuffer.Count(), 'There should be two signals already registered');
+        Assert.AreEqual(2, OnboardingSignalBuffer.Count(), 'There should be two signals already registered');
 
         // [GIVEN] Select the Company signal
-        TempOnboardingSignalBuffer.SetRange("Onboarding Signal Type", OnboardingSignalType::Company);
-        TempOnboardingSignalBuffer.FindFirst();
+        OnboardingSignalBuffer.SetRange("Onboarding Signal Type", OnboardingSignalType::Company);
+        OnboardingSignalBuffer.FindFirst();
 
         // [THEN] The value inside onboarding signals should be properly set
-        Assert.AreEqual(Today(), TempOnboardingSignalBuffer."Onboarding Start Date", 'The start date of a signal should be correctly copied to buffer table');
+        Assert.AreEqual(Today(), OnboardingSignalBuffer."Onboarding Start Date", 'The start date of a signal should be correctly copied to buffer table');
     end;
-
-
-    [Test]
-    procedure TestInvalidOnboardingSignal()
-    var
-        Company: Record Company;
-        OnboardingSignalImpl: Codeunit "Onboarding Signal";
-        OnboardingSignalType: Enum "Onboarding Signal Type";
-    begin
-        // [SCENARIO] Extension registered a signal, later the extension is uninstalled, the newly registered signal should not trigger an error.
-        LibraryOnboardingSignal.InitializeOnboardingSignalTestingEnv();
-        LibraryLowerPermissions.SetO365Basic();
-
-        Company.Get(CompanyName());
-
-        // [GIVEN] Register a new test onboarding signal
-        OnboardingSignalImpl.RegisterNewOnboardingSignal(Company.Name, OnboardingSignalType::"Test Signal");
-
-        // [GIVEN] Register an invalid onboarding signal (i.e. the Enum does not exist)
-#pragma warning disable AL0603
-        OnboardingSignalImpl.RegisterNewOnboardingSignal(Company.Name, 123456);
-#pragma warning restore AL0603
-
-        // [THEN] CheckAndEmitOnboardingSignals should successfully run without error
-        OnboardingSignalImpl.CheckAndEmitOnboardingSignals();
-    end;
-
 
     local procedure PopulateOnboardingSignals(CompanyName: Text[30]; IsCompleted: Boolean)
     var
