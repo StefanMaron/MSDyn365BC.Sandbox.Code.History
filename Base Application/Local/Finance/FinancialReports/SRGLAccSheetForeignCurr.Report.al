@@ -213,8 +213,6 @@ report 11564 "SR G/L Acc Sheet Foreign Curr"
                         BalAccType := '';
 
 #if not CLEAN24
-                    "Amount (FCY)" := "Source Currency Amount";
-                    "G/L Account"."Currency Code" := "Source Currency Code";
                     FcyAcyAmt := "Amount (FCY)";
                     FcyAcyBalance := FcyAcyBalance + "Amount (FCY)";
                     Exrate := CalcExrate("Amount (FCY)", Amount, "G/L Account"."Currency Code");
