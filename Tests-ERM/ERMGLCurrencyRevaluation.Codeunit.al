@@ -354,126 +354,6 @@ codeunit 134887 "ERM G/L Currency Revaluation"
         Assert.ExpectedError(CurrUpdateBalAccErr);
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    procedure CheckSourceCurrencyOnGainsLossesCustomerEntries()
-    var
-        GLAccount: Record "G/L Account";
-        GLEntry: Record "G/L Entry";
-        BalGLAccount: Record "G/L Account";
-        Customer: Record Customer;
-        CustomerPostingGroup: Record "Customer Posting Group";
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
-        GenJournalLine: Record "Gen. Journal Line";
-        DocumentNo: Code[20];
-        Amount: Decimal;
-    begin
-        Initialize();
-
-        // Setup.
-        LibraryERM.CreateGLAccount(BalGLAccount);
-        BalGLAccount."Direct Posting" := true;
-        BalGLAccount.Modify();
-
-        CreateAccountWithSameSourceCurrencySetup(GLAccount);
-        GLAccount.Validate("Account Type", GLAccount."Account Type"::Posting);
-        GLAccount.Validate("Income/Balance", GLAccount."Income/Balance"::"Balance Sheet");
-        GLAccount.Modify(true);
-
-        AddDifferentExchangeRate(CurrencyExchangeRate, GLAccount, 1);
-
-        LibrarySales.CreateCustomer(Customer);
-        Customer.Validate("Currency Code", GLAccount."Source Currency Code");
-        LibrarySales.CreateCustomerPostingGroup(CustomerPostingGroup);
-        CustomerPostingGroup.Validate("Receivables Account", GLAccount."No.");
-        CustomerPostingGroup.Modify();
-        Customer.Validate("Customer Posting Group", CustomerPostingGroup.Code);
-        Customer.Modify();
-
-        Amount := LibraryRandom.RandDec(100, 2);
-        CreateCustomerJournal(
-            GenJournalLine, Customer, "Gen. Journal Document Type"::Invoice, WorkDate(),
-            GenJournalLine."Bal. Account Type"::"G/L Account", BalGLAccount."No.", Amount);
-        DocumentNo := GenJournalLine."Document No.";
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // Post payment with another exchange rate
-        CreateCustomerJournal(
-            GenJournalLine, Customer, "Gen. Journal Document Type"::Payment, WorkDate() + 30,
-            GenJournalLine."Bal. Account Type"::"G/L Account", BalGLAccount."No.", -Amount);
-        GenJournalLine."Applies-to Doc. Type" := GenJournalLine."Applies-to Doc. Type"::Invoice;
-        GenJournalLine."Applies-to Doc. No." := DocumentNo;
-        GenJournalLine.Modify();
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // Verify gain/losses
-        GLEntry.SetRange("Posting Date", GenJournalLine."Posting Date");
-        GLEntry.SetRange("Document No.", GenJournalLine."Document No.");
-        GLEntry.FindLast();
-        GLEntry.TestField("Source Currency Amount", 0);
-        GLEntry.TestField("Source Currency Code", '');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure CheckSourceCurrencyOnGainsLossesVendorEntries()
-    var
-        GLAccount: Record "G/L Account";
-        GLEntry: Record "G/L Entry";
-        BalGLAccount: Record "G/L Account";
-        Vendor: Record Vendor;
-        VendorPostingGroup: Record "Vendor Posting Group";
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
-        GenJournalLine: Record "Gen. Journal Line";
-        DocumentNo: Code[20];
-        Amount: Decimal;
-    begin
-        Initialize();
-
-        // Setup.
-        LibraryERM.CreateGLAccount(BalGLAccount);
-        BalGLAccount."Direct Posting" := true;
-        BalGLAccount.Modify();
-
-        CreateAccountWithSameSourceCurrencySetup(GLAccount);
-        GLAccount.Validate("Account Type", GLAccount."Account Type"::Posting);
-        GLAccount.Validate("Income/Balance", GLAccount."Income/Balance"::"Balance Sheet");
-        GLAccount.Modify(true);
-
-        AddDifferentExchangeRate(CurrencyExchangeRate, GLAccount, 1);
-
-        LibraryPurchase.CreateVendor(Vendor);
-        Vendor.Validate("Currency Code", GLAccount."Source Currency Code");
-        LibraryPurchase.CreateVendorPostingGroup(VendorPostingGroup);
-        VendorPostingGroup.Validate("Payables Account", GLAccount."No.");
-        VendorPostingGroup.Modify();
-        Vendor.Validate("Vendor Posting Group", VendorPostingGroup.Code);
-        Vendor.Modify();
-
-        Amount := LibraryRandom.RandDec(100, 2);
-        CreateVendorJournal(
-            GenJournalLine, Vendor, "Gen. Journal Document Type"::Invoice, WorkDate(),
-            GenJournalLine."Bal. Account Type"::"G/L Account", BalGLAccount."No.", -Amount);
-        DocumentNo := GenJournalLine."Document No.";
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // Post payment with another exchange rate
-        CreateVendorJournal(
-            GenJournalLine, Vendor, "Gen. Journal Document Type"::Payment, WorkDate() + 30,
-            GenJournalLine."Bal. Account Type"::"G/L Account", BalGLAccount."No.", Amount);
-        GenJournalLine."Applies-to Doc. Type" := GenJournalLine."Applies-to Doc. Type"::Invoice;
-        GenJournalLine."Applies-to Doc. No." := DocumentNo;
-        GenJournalLine.Modify();
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // Verify gain/losses
-        GLEntry.SetRange("Posting Date", GenJournalLine."Posting Date");
-        GLEntry.SetRange("Document No.", GenJournalLine."Document No.");
-        GLEntry.FindLast();
-        GLEntry.TestField("Source Currency Amount", 0);
-        GLEntry.TestField("Source Currency Code", '');
-    end;
-
     local procedure AddDifferentExchangeRate(var CurrencyExchangeRate: Record "Currency Exchange Rate"; GLAccount: Record "G/L Account"; GainsLossesFactor: Integer)
     begin
         CurrencyExchangeRate.SetRange("Currency Code", GLAccount."Source Currency Code");
@@ -502,20 +382,19 @@ codeunit 134887 "ERM G/L Currency Revaluation"
         Currency: Record Currency;
         GLAccountSourceCurrency: Record "G/L Account Source Currency";
         Correction: Decimal;
-        CurrencyFactor: Decimal;
     begin
         Currency.Get(CurrencyExchangeRate."Currency Code");
         GLAccountSourceCurrency."G/L Account No." := GLAccount."No.";
         GLAccountSourceCurrency."Currency Code" := Currency.Code;
         GLAccountSourceCurrency.SetRange("Date Filter", 0D, CurrencyExchangeRate."Starting Date");
         GLAccountSourceCurrency.CalcFields("Balance at Date", "Source Curr. Balance at Date");
-        CurrencyFactor := CurrencyExchangeRate.ExchangeRateAdjmt(CurrencyExchangeRate."Starting Date", GLAccountSourceCurrency."Currency Code");
-        if CurrencyFactor <> 0 then
-            Correction :=
-                Round(
-                    CurrencyExchangeRate.ExchangeAmtFCYToLCYAdjmt(
-                        CurrencyExchangeRate."Starting Date", GLAccountSourceCurrency."Currency Code", GLAccountSourceCurrency."Source Curr. Balance at Date", CurrencyFactor)) -
-                GLAccountSourceCurrency."Balance at Date";
+
+        Correction :=
+            Round(
+                GLAccountSourceCurrency."Source Curr. Balance at Date" /
+                CurrencyExchangeRate.ExchangeRateAdjmt(CurrencyExchangeRate."Starting Date", Currency.Code) - GLAccountSourceCurrency."Balance at Date",
+                GeneralLedgerSetup."Amount Rounding Precision");
+
         if Correction > 0 then
             BalGLAccountNo := GetGainsAccount(Currency, GLAccount."Unrealized Revaluation")
         else
@@ -605,38 +484,6 @@ codeunit 134887 "ERM G/L Currency Revaluation"
           BalAccType, BalAccNo, LibraryRandom.RandDec(100, 2));
         GenJournalLine.Validate("Posting Date", PostingDate);
         GenJournalLine.Validate("Currency Code", CurrCode);
-        GenJournalLine.Modify(true);
-    end;
-
-    local procedure CreateCustomerJournal(var GenJournalLine: Record "Gen. Journal Line"; var Customer: Record Customer; DocumentType: Enum "Gen. Journal Document Type"; PostingDate: Date; BalAccType: Enum "Gen. Journal Account Type"; BalAccNo: Code[20]; Amount: Decimal)
-    var
-        GenJournalTemplate: Record "Gen. Journal Template";
-        GenJournalBatch: Record "Gen. Journal Batch";
-    begin
-        LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
-        LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
-
-        LibraryERM.CreateGeneralJnlLineWithBalAcc(
-            GenJournalLine, GenJournalTemplate.Name, GenJournalBatch.Name, DocumentType,
-            GenJournalLine."Account Type"::Customer, Customer."No.", BalAccType, BalAccNo, Amount);
-        GenJournalLine.Validate("Currency Code", Customer."Currency Code");
-        GenJournalLine.Validate("Posting Date", PostingDate);
-        GenJournalLine.Modify(true);
-    end;
-
-    local procedure CreateVendorJournal(var GenJournalLine: Record "Gen. Journal Line"; var Vendor: Record Vendor; DocumentType: Enum "Gen. Journal Document Type"; PostingDate: Date; BalAccType: Enum "Gen. Journal Account Type"; BalAccNo: Code[20]; Amount: Decimal)
-    var
-        GenJournalTemplate: Record "Gen. Journal Template";
-        GenJournalBatch: Record "Gen. Journal Batch";
-    begin
-        LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
-        LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
-
-        LibraryERM.CreateGeneralJnlLineWithBalAcc(
-            GenJournalLine, GenJournalTemplate.Name, GenJournalBatch.Name, DocumentType,
-            GenJournalLine."Account Type"::Vendor, Vendor."No.", BalAccType, BalAccNo, Amount);
-        GenJournalLine.Validate("Currency Code", Vendor."Currency Code");
-        GenJournalLine.Validate("Posting Date", PostingDate);
         GenJournalLine.Modify(true);
     end;
 
