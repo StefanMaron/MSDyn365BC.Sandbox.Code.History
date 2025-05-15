@@ -179,8 +179,7 @@ table 83 "Item Journal Line"
                 OnValidateItemNoOnBeforeValidateUnitOfMeasureCode(Rec, Item, CurrFieldNo, xRec);
                 Validate("Unit of Measure Code");
                 if "Variant Code" <> '' then
-                    if not IsEntryTypeProduction() then
-                        Validate("Variant Code");
+                    Validate("Variant Code");
 
                 OnAfterOnValidateItemNoAssignByEntryType(Rec, Item);
 
