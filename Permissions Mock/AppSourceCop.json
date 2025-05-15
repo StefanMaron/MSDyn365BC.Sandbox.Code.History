@@ -1,5 +1,5 @@
 {
-  "obsoleteTagAllowedVersions": "26.0,27.0",
-  "obsoleteTagVersion": "25.0",
-  "version": "24.4.22295.32220"
+  "version": "25.0.23364.33837",
+  "obsoleteTagVersion": "25.1",
+  "obsoleteTagAllowedVersions": "26.0,27.0"
 }
