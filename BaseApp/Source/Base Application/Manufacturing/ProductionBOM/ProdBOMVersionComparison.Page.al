@@ -78,6 +78,7 @@ page 9288 "Prod. BOM Version Comparison"
                     BlankZero = true;
                     CaptionClass = '3,' + BOMMatrix_CaptionSet;
                     DecimalPlaces = 0 : 5;
+                    Visible = Field1Visible;
                 }
                 field(Field1; Matrix_CellData[1])
                 {
@@ -445,7 +446,6 @@ page 9288 "Prod. BOM Version Comparison"
     var
         Matrix_CurrentColumnOrdinal: Integer;
     begin
-        BOMMatrix_CellData := BOMMatrixManagement.GetComponentNeed(Rec."Item No.", Rec."Variant Code", '');
         Matrix_CurrentColumnOrdinal := 0;
         while Matrix_CurrentColumnOrdinal < Matrix_CurrSetLength do begin
             Matrix_CurrentColumnOrdinal := Matrix_CurrentColumnOrdinal + 1;
@@ -559,6 +559,9 @@ page 9288 "Prod. BOM Version Comparison"
 
     local procedure Matrix_OnAfterGetRecord(Matrix_ColumnOrdinal: Integer)
     begin
+        ComponentNeed := BOMMatrixManagement.GetComponentNeed(Rec."Item No.", Rec."Variant Code", '');
+        BOMMatrix_CellData := ComponentNeed;
+
         ComponentNeed := BOMMatrixManagement.GetComponentNeed(Rec."Item No.", Rec."Variant Code", MatrixRecords[Matrix_ColumnOrdinal]."Version Code");
         Matrix_CellData[Matrix_ColumnOrdinal] := ComponentNeed;
     end;
