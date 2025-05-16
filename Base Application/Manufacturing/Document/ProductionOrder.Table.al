@@ -1368,7 +1368,7 @@ table 5405 "Production Order"
                             CalcProdOrder.Recalculate(ProdOrderLine, 1, true);
                 end;
                 IsHandled := false;
-                OnBeforeUpdateProdOrderLineDueDate(ProdOrderLine, IsHandled, CalcProdOrder);
+                OnBeforeUpdateProdOrderLineDueDate(ProdOrderLine, IsHandled);
                 if not IsHandled then
                     if ProdOrderLine."Planning Level Code" > 0 then
                         ProdOrderLine."Due Date" := ProdOrderLine."Ending Date"
@@ -1735,7 +1735,7 @@ table 5405 "Production Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateProdOrderLineDueDate(var ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean; var CalculateProdOrder: Codeunit "Calculate Prod. Order")
+    local procedure OnBeforeUpdateProdOrderLineDueDate(var ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
     begin
     end;
 
