@@ -238,8 +238,6 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
         AllocationAccountGenJournalLine.FindSet();
 
         repeat
-            GenJnlLineCount := 0;
-            SumAmountLCY := 0;
             CreateLinesFromAllocationAccountLine(AllocationAccountGenJournalLine);
         until AllocationAccountGenJournalLine.Next() = 0;
     end;
@@ -334,10 +332,7 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
     local procedure CreateGLLine(var AllocationAccountGenJournalLine: Record "Gen. Journal Line"; var AllocationLine: Record "Allocation Line"; var LastJournalLineNo: Integer; Increment: Integer; DescriptionChanged: Boolean)
     var
         GenJournalLine: Record "Gen. Journal Line";
-        AllocationLineCount: Integer;
     begin
-        AllocationLineCount := AllocationLine.Count;
-        GenJnlLineCount += 1;
         GenJournalLine.TransferFields(AllocationAccountGenJournalLine, true);
         GenJournalLine."Journal Batch Name" := AllocationAccountGenJournalLine."Journal Batch Name";
         GenJournalLine."Journal Template Name" := AllocationAccountGenJournalLine."Journal Template Name";
@@ -348,11 +343,6 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
         TransferDimensionSetID(GenJournalLine, AllocationLine, AllocationAccountGenJournalLine."Alloc. Acc. Modified by User");
         if DescriptionChanged and (AllocationAccountGenJournalLine.Description <> '') then
             GenJournalLine.Description := AllocationAccountGenJournalLine.Description;
-
-        SumAmountLCY += GenJournalLine."Amount (LCY)";
-        if GenJnlLineCount = AllocationLineCount then
-            if SumAmountLCY <> AllocationAccountGenJournalLine."Amount (LCY)" then
-                GenJournalLine.Validate("Amount (LCY)", GenJournalLine."Amount (LCY)" + (AllocationAccountGenJournalLine."Amount (LCY)" - SumAmountLCY));
 
         OnBeforeCreateGeneralJournalLine(GenJournalLine, AllocationLine, AllocationAccountGenJournalLine);
         GenJournalLine.Insert(true);
@@ -576,7 +566,7 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
             VerifySelectedAllocationAccountNo(GenJournalLine);
     end;
 
-    procedure VerifySelectedAllocationAccountNo(var GenJournalLine: Record "Gen. Journal Line")
+    internal procedure VerifySelectedAllocationAccountNo(var GenJournalLine: Record "Gen. Journal Line")
     begin
         if GenJournalLine."Selected Alloc. Account No." = '' then
             exit;
@@ -606,6 +596,4 @@ codeunit 2677 "Gen. Journal Alloc. Acc. Mgt."
         InvalidAccountTypeForInheritFromParentErr: Label 'Selected account type - %1 cannot be used for allocation accounts that have inherit from parent defined.', Comment = '%1 - Account type, e.g. G/L Account, Customer, Vendor, Bank Account, Fixed Asset, Item, Resource, Charge, Project, or Blank.';
         MustProvideAccountNoForInheritFromParentErr: Label 'You must provide an account number for allocation account with inherit from parent defined.';
         AllocationAccountsCannotBeUsedOnThisPageErr: Label 'Allocation accounts cannot be used on this page.';
-        GenJnlLineCount: Integer;
-        SumAmountLCY: Decimal;
 }
