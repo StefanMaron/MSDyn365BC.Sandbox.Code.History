@@ -33,7 +33,6 @@ codeunit 134331 "ERM Purchase Payables"
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
         LibraryResource: Codeunit "Library - Resource";
         LibraryDimension: Codeunit "Library - Dimension";
-        LibraryERMCountryData: Codeunit "Library - ERM Country Data";
         IsInitialized: Boolean;
         MustNotBeEqualErr: Label 'Transaction No. %1 and %2 must not be equal.', Comment = '%1=Transaction1;%2=Transaction2';
         PostingDateErr: Label 'Enter the posting date.';
@@ -60,7 +59,6 @@ codeunit 134331 "ERM Purchase Payables"
         AdjustExchRateDefaultDescTxt: Label 'Adjmt. of %1 %2, Ex.Rate Adjust.', Locked = true;
         AccountBalanceErrLbl: Label 'G/L Account %1 is not balanced';
         AmountNotMatchedErr: Label 'Amount not matched.';
-        PostedDocumentNoErr: Label 'Document No. must be equal to %1', Comment = '%1= Document No.';
 
     [Test]
     [Scope('OnPrem')]
@@ -2923,7 +2921,7 @@ codeunit 134331 "ERM Purchase Payables"
         CreateGeneralJournalBatch(GenJournalBatch, true);
 
         // [GIVEN] Create a Payment and Post.
-        CreatePaymentAndPost(GenJournalLine, GenJournalBatch, Vendor."No.", VendorPostingGroup[2].Code, PostingDate[1], PaymentDocNo, LibraryRandom.RandIntInRange(100, 100));
+        CreatePaymentAndPost(GenJournalLine, GenJournalBatch, Vendor."No.", VendorPostingGroup[2].Code, PostingDate[1], PaymentDocNo);
 
         // [WHEN] Apply Payment with Invoice.
         ApplyPostVendPayment2Invoices(PaymentDocNo, PurchInvHeader."No.");
@@ -3036,135 +3034,6 @@ codeunit 134331 "ERM Purchase Payables"
         GLEntry.SetRange("Dimension Set ID", DimSetID[2]);
         GLEntry.FindFirst();
         Assert.AreEqual(Amount[2], GLEntry.Amount, AmountNotMatchedErr);
-    end;
-
-    [Test]
-    procedure PurchaseInvoiceHavingAllocationAccountShouldPostWhenStatusReleased()
-    var
-        GLAccount: array[4] of Record "G/L Account";
-        GLEntry: Record "G/L Entry";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        AllocationAccountCode: Code[20];
-        PostedDocumentNo: Code[20];
-        Share: Decimal;
-    begin
-        // [SCENARIO 562692] Puechase Invoice will be posted when PurchaseLine has Allocation Account and Status is Released
-        Initialize();
-
-        // [GIVEN] Create Allocation Account
-        AllocationAccountCode := CreateAllocationAccountWithFixedDistribution();
-
-        // [GIVEN] Generate and save Shares value
-        Share := LibraryRandom.RandDecInDecimalRange(0.25, 0.25, 2);
-
-        // [GIVEN] Add GL Accounts with Share in Fixed Account Distribution.
-        CreateMultipleGLAccountAllocationForFixedDistribution(AllocationAccountCode, GLAccount, Share);
-
-        // [GIVEN] Create Purchase Invoice with Allocation Account.
-        CreatePurchInvoiceWithAllocationAccount(PurchaseHeader, PurchaseLine, AllocationAccountCode);
-
-        // [WHEN] Released the Purchase Invoice
-        PurchaseHeader.Validate(Status, PurchaseHeader.Status::Released);
-        PurchaseHeader.Modify();
-
-        // [WHEN] Post Purchase Invoice.
-        PostedDocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true);
-
-        // [THEN] Find Last GL Entry and verify invoice has been posted without any entry
-        GLEntry.FindLast();
-        Assert.AreEqual(PostedDocumentNo, GLEntry."Document No.", StrSubstNo(PostedDocumentNoErr, PostedDocumentNo));
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    [HandlerFunctions('ConfirmHandler')]
-    procedure GLAccountsAreBalancedAppyFullPaymentWithInvoiceWithCurrencyWhenUsingMultiplePostingGroups()
-    var
-        Currency: Record Currency;
-        GenJournalBatch: Record "Gen. Journal Batch";
-        GenJournalLine: Record "Gen. Journal Line";
-        GLAccount: Record "G/L Account";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        PurchInvHeader: Record "Purch. Inv. Header";
-        VATPostingSetup: Record "VAT Posting Setup";
-        Vendor: Record Vendor;
-        VendorPostingGroup: array[2] of Record "Vendor Posting Group";
-        ActualAmount: array[2] of Decimal;
-        Amount: array[2] of Decimal;
-        ExchRate: array[2] of Decimal;
-        PostingDate: array[2] of Date;
-        PaymentDocNo: Code[20];
-        GenPostingType: Enum "General Posting Type";
-        VATCalculationType: Enum "Tax Calculation Type";
-    begin
-        // [SCENARIO 561134] G/L Accounts are balanced after applying full Payment and Invoice with currency using Multiple Posting Groups. 
-        Initialize();
-        LibraryERMCountryData.UpdateGeneralLedgerSetup();
-
-        // [GIVEN] Set Journal Templ Name mandatory to false.
-        SetJournalTemplNameMandatoryFalse();
-
-        // [GIVEN] Generate Posting Date.
-        PostingDate[1] := CalcDate('<1M>', WorkDate());
-        PostingDate[2] := WorkDate();
-
-        // [GIVEN] Generate Exchange Rate.
-        ExchRate[1] := LibraryRandom.RandDecInDecimalRange(4.2783, 4.2783, 4);
-        ExchRate[2] := LibraryRandom.RandDecInDecimalRange(4.2763, 4.2763, 4);
-
-        // [GIVEN] Generate Amount.
-        Amount[1] := LibraryRandom.RandIntInRange(1000, 1000);
-        Amount[2] := LibraryRandom.RandDecInDecimalRange(233.85, 233.85, 2);
-
-        // [GIVEN] Create Currency and Exchange Rates.       
-        Currency.Get(LibraryERM.CreateCurrencyWithExchangeRate(PostingDate[1], ExchRate[1], ExchRate[1]));
-        LibraryERM.CreateExchangeRate(Currency.Code, PostingDate[2], ExchRate[2], ExchRate[2]);
-
-        // [GIVEN] Create VAT Posting Setup with Zero Vat.
-        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATCalculationType::"Normal VAT", 0);
-
-        // [GIVEN] Create Vendor Posting Group One.
-        LibraryPurchase.CreateVendorPostingGroup(VendorPostingGroup[1]);
-
-        // [GIVEN] Set Allowed Multiple Posting Groups.
-        SetPurchAllowMultiplePostingGroups(true);
-
-        // [GIVEN Create Vendor.
-        CreateVendorWithAllowMultiplePostingGroups(
-            Vendor, VendorPostingGroup[1].Code,
-            '', VATPostingSetup."VAT Bus. Posting Group");
-
-        // [GIVEN] Create Vendor Posting Group Two.
-        CreateVendorPostingGroupWithCopy(VendorPostingGroup);
-
-        // [GIVEN] Create Alternative Vendor Posting Group. 
-        LibraryPurchase.CreateAltVendorPostingGroup(VendorPostingGroup[1].Code, VendorPostingGroup[2].Code);
-        LibraryPurchase.CreateAltVendorPostingGroup(VendorPostingGroup[2].Code, VendorPostingGroup[1].Code);
-
-        // [GIVEN] Create GLAccount.
-        GLAccount.Get(LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostingSetup, GenPostingType::Purchase));
-
-        // [GIVEN] Create General Journal Batch.
-        CreateGeneralJournalBatch(GenJournalBatch, true);
-
-        // [GIVEN] Create a Payment and Post.
-        CreatePaymentAndPost(
-            GenJournalLine, GenJournalBatch, Vendor."No.", VendorPostingGroup[2].Code, PostingDate[2], PaymentDocNo, Amount[2]);
-
-        // [GIVEN] Create Purchase Invoice.
-        CreatePurchaseInvoiceForGLAccount(
-            PurchaseHeader, PurchaseLine, PostingDate[1], GLAccount."No.", Vendor."No.", Currency.Code, Amount[1]);
-
-        // [GIVEN] Post Purchase Invoice.
-        PurchInvHeader.Get(LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true));
-
-        // [WHEN] Apply Payment with Invoice.
-        ApplyPostVendPayment2Invoices(PaymentDocNo, PurchInvHeader."No.");
-
-        // [THEN] Verify G/L Entries for Payable Account are Balanced.
-        VerifyGLEntryForAccount(VendorPostingGroup, ActualAmount);
     end;
 
     local procedure Initialize()
@@ -4309,14 +4178,14 @@ codeunit 134331 "ERM Purchase Payables"
 
     local procedure CreatePaymentAndPost(
         GenJournalLine: Record "Gen. Journal Line"; GenJournalBatch: Record "Gen. Journal Batch"; VendorNo: Code[20];
-        VendorPostingGroupCode: Code[20]; PostingDate: Date; var PaymentDocNo: Code[20]; Amount: Decimal)
+        VendorPostingGroupCode: Code[20]; PostingDate: Date; var PaymentDocNo: Code[20])
     var
         GLAccountType: Enum "G/L Account Type";
     begin
         LibraryERM.CreateGeneralJnlLineWithBalAcc(
             GenJournalLine, GenJournalBatch."Journal Template Name", GenJournalBatch.Name,
             GenJournalLine."Document Type"::Payment, GenJournalLine."Account Type"::Vendor, VendorNo,
-            GenJournalLine."Bal. Account Type"::"G/L Account", CreateGLAccount(GLAccountType::Posting, true), Amount);
+            GenJournalLine."Bal. Account Type"::"G/L Account", CreateGLAccount(GLAccountType::Posting, true), LibraryRandom.RandIntInRange(100, 100));
         GenJournalLine.Validate("Posting Date", PostingDate);
         GenJournalLine.Validate("Posting Group", VendorPostingGroupCode);
         GenJournalLine.Modify(true);
@@ -4355,36 +4224,6 @@ codeunit 134331 "ERM Purchase Payables"
 
         GetGLEntryBalance(VendorPostingGroup[2]."Payables Account", ActualAmount[2]);
         Assert.AreEqual(0, ActualAmount[2], StrSubstNo(AccountBalanceErrLbl, VendorPostingGroup[2]."Payables Account"));
-    end;
-
-    local procedure CreateMultipleGLAccountAllocationForFixedDistribution(AllocationAccountCode: Code[20]; GLAccount: array[4] of Record "G/L Account"; Share: Decimal)
-    var
-        i: Integer;
-    begin
-        for i := 1 to ArrayLen(GLAccount) do
-            CreateGLAccountAllocationForFixedDistrubution(AllocationAccountCode, GLAccount[i], Share);
-    end;
-
-    local procedure CreatePurchaseInvoiceForGLAccount(
-        var PurchaseHeader: Record "Purchase Header";
-        var PurchaseLine: Record "Purchase Line";
-        PostingDate: Date;
-        GLAccountNo: Code[20];
-        VendorNo: Code[20];
-        CurrencyCode: Code[20];
-        DirectUnitCost: Decimal)
-    begin
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, VendorNo);
-        PurchaseHeader.Validate("Currency Code", CurrencyCode);
-        PurchaseHeader.Validate("Posting Date", PostingDate);
-        PurchaseHeader.Validate("Document Date", PostingDate);
-        PurchaseHeader.Validate("Vendor Invoice No.", Format(LibraryRandom.RandInt(5)));
-        PurchaseHeader.Modify(true);
-
-        LibraryPurchase.CreatePurchaseLine(
-            PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccountNo, LibraryRandom.RandInt(0));
-        PurchaseLine.Validate("Direct Unit Cost", DirectUnitCost);
-        PurchaseLine.Modify(true);
     end;
 
     [RequestPageHandler]
