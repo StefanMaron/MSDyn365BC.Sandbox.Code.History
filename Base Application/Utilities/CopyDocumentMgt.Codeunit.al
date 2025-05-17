@@ -697,7 +697,7 @@ codeunit 6620 "Copy Document Mgt."
                 SavedDimSetId := ToSalesHeader."Dimension Set ID";
             ToSalesHeader.CreateDimFromDefaultDim(0);
             if IncludeHeader then
-                ToSalesHeader.Validate("Dimension Set ID", SavedDimSetId);
+                ToSalesHeader."Dimension Set ID" := SavedDimSetId;
         end;
 
         ToSalesHeader."No. Printed" := 0;
@@ -1246,7 +1246,7 @@ codeunit 6620 "Copy Document Mgt."
                 SavedDimSetId := ToPurchHeader."Dimension Set ID";
             ToPurchHeader.CreateDimFromDefaultDim(0);
             if IncludeHeader then
-                ToPurchHeader.Validate("Dimension Set ID", SavedDimSetId);
+                ToPurchHeader."Dimension Set ID" := SavedDimSetId;
         end;
         ToPurchHeader."No. Printed" := 0;
         ToPurchHeader."Applies-to Doc. Type" := ToPurchHeader."Applies-to Doc. Type"::" ";
@@ -7349,7 +7349,7 @@ codeunit 6620 "Copy Document Mgt."
             end;
         end;
 
-        OnAfterUpdateVendLedgEntry(ToPurchHeader, FromDocNo, FromDocType, VendLedgEntry);
+        OnAfterUpdateVendLedgEntry(ToPurchHeader, FromDocNo);
     end;
 
     local procedure UpdatePurchCreditMemoHeader(var PurchaseHeader: Record "Purchase Header")
@@ -8968,7 +8968,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateVendLedgEntry(var PurchaseHeader: Record "Purchase Header"; FromDocumentNo: Code[20]; FromDocType: Enum "Gen. Journal Document Type"; var VendorLedgerEntry: Record "Vendor Ledger Entry")
+    local procedure OnAfterUpdateVendLedgEntry(var PurchaseHeader: Record "Purchase Header"; FromDocumentNo: Code[20])
     begin
     end;
 
@@ -9810,7 +9810,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopySalesShptLinesToDocOnBeforeCopySalesLine(var ToSalesHeader: Record "Sales Header"; var FromSalesLine: Record "Sales Line"; FromSalesShptLine: Record "Sales Shipment Line"; var CopyItemTrkg: Boolean)
+    local procedure OnCopySalesShptLinesToDocOnBeforeCopySalesLine(var ToSalesHeader: Record "Sales Header"; var FromSalesLine: Record "Sales Line"; FromSalesShptLine: record "Sales Shipment Line"; var CopyItemTrkg: Boolean)
     begin
     end;
 
@@ -9835,7 +9835,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopySalesInvLinesToDocOnBeforeCopySalesLine(var ToSalesHeader: Record "Sales Header"; var FromSalesLine: Record "Sales Line"; var TempSalesLineBuf: Record "Sales Line" temporary; var ToSalesLine: Record "Sales Line"; FromSalesInvLine: Record "Sales Invoice Line"; IncludeHeader: Boolean; RecalculateLines: Boolean; var TempDocSalesLine: Record "Sales Line" temporary; var FromSalesLine1: Record "Sales Line"; ExactCostRevMandatory: Boolean)
+    local procedure OnCopySalesInvLinesToDocOnBeforeCopySalesLine(ToSalesHeader: Record "Sales Header"; var FromSalesLine: Record "Sales Line"; var TempSalesLineBuf: Record "Sales Line" temporary; var ToSalesLine: Record "Sales Line"; FromSalesInvLine: Record "Sales Invoice Line"; IncludeHeader: Boolean; RecalculateLines: Boolean; var TempDocSalesLine: Record "Sales Line" temporary; var FromSalesLine1: Record "Sales Line"; ExactCostRevMandatory: Boolean)
     begin
     end;
 
