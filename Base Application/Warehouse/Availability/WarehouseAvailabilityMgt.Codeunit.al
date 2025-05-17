@@ -379,7 +379,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         WarehouseEntry: Record "Warehouse Entry";
         QtyOnDedicatedBin: Decimal;
     begin
-        WarehouseEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
+        WarehouseEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         WarehouseEntry.SetRange("Item No.", ItemNo);
         WarehouseEntry.SetRange("Location Code", LocationCode);
         WarehouseEntry.SetRange("Variant Code", VariantCode);
@@ -476,7 +476,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         if not Location."Directed Put-away and Pick" then
             exit(0);
 
-        WhseEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
+        WhseEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         WhseEntry.SetCalculationFilters(ItemNo, LocationCode, VariantCode, WhseItemTrackingSetup, ExcludeDedicatedBinContent);
         WhseEntry.SetFilter("Bin Type Code", CreatePick.GetBinTypeFilter(1)); // Shipping area
         WhseEntry.CalcSums("Qty. (Base)");
@@ -593,7 +593,7 @@ codeunit 7314 "Warehouse Availability Mgt."
     var
         WhseEntry2: Record "Warehouse Entry";
     begin
-        WhseEntry2.ReadIsolation(IsolationLevel::ReadUnCommitted);
+        WhseEntry2.ReadIsolation(IsolationLevel::ReadCommitted);
         if WhseEntry.FindSet() then
             repeat
                 WhseEntry.SetRange("Bin Code", WhseEntry."Bin Code");
@@ -609,13 +609,6 @@ codeunit 7314 "Warehouse Availability Mgt."
     end;
 
     procedure CalcQtyOnBlockedItemTracking(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]): Decimal
-    var
-        ItemTrackingSetup: Record "Item Tracking Setup";
-    begin
-        exit(CalcQtyOnBlockedItemTracking(LocationCode, ItemNo, VariantCode, ItemTrackingSetup));
-    end;
-
-    procedure CalcQtyOnBlockedItemTracking(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; ItemTrackingSetup: Record "Item Tracking Setup"): Decimal
     var
         CalcQtyOnBlockedITOnSNQuery: Query "CalcQtyOnBlockedITOnSNQuery";
         CalcQtyOnBlockedITOnLNQuery: Query "CalcQtyOnBlockedITOnLNQuery";
@@ -639,7 +632,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         CalcQtyOnBlockedITOnPNQuery.SetRange(Item_No_, ItemNo);
         CalcQtyOnBlockedITOnPNQuery.SetRange(Variant_Code, VariantCode);
         CalcQtyOnBlockedITOnPNQuery.SetRange(Blocked, true);
-        CalcQtyOnBlockedITOnPNQuery.SetItemTrackingFilter(ItemTrackingSetup);
 
         CalcQtyOnBlockedITOnPNQuery.SetRange(ILE_Item_No_, ItemNo);
         CalcQtyOnBlockedITOnPNQuery.SetRange(ILE_Variant_Code, VariantCode);
@@ -657,7 +649,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         CalcQtyOnBlockedITOnLNQuery.SetRange(Item_No_, ItemNo);
         CalcQtyOnBlockedITOnLNQuery.SetRange(Variant_Code, VariantCode);
         CalcQtyOnBlockedITOnLNQuery.SetRange(Blocked, true);
-        CalcQtyOnBlockedITOnLNQuery.SetItemTrackingFilter(ItemTrackingSetup);
 
         CalcQtyOnBlockedITOnLNQuery.SetRange(ILE_Item_No_, ItemNo);
         CalcQtyOnBlockedITOnLNQuery.SetRange(ILE_Variant_Code, VariantCode);
@@ -678,7 +669,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         CalcQtyOnBlockedITOnSNQuery.SetRange(Item_No_, ItemNo);
         CalcQtyOnBlockedITOnSNQuery.SetRange(Variant_Code, VariantCode);
         CalcQtyOnBlockedITOnSNQuery.SetRange(Blocked, true);
-        CalcQtyOnBlockedITOnSNQuery.SetItemTrackingFilter(ItemTrackingSetup);
 
         CalcQtyOnBlockedITOnSNQuery.SetRange(ILE_Item_No_, ItemNo);
         CalcQtyOnBlockedITOnSNQuery.SetRange(ILE_Variant_Code, VariantCode);
@@ -764,7 +754,7 @@ codeunit 7314 "Warehouse Availability Mgt."
             exit(QtyPickedBase);
 
         WarehouseEntry.Reset();
-        WarehouseEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
+        WarehouseEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         WarehouseEntry.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceRefNo, true);
         WarehouseEntry.SetRange("Entry Type", WarehouseEntry."Entry Type"::Movement);
         WarehouseEntry.SetRange("Reference Document", WarehouseEntry."Reference Document"::Pick);
@@ -773,7 +763,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         QtyPickedBase := WarehouseEntry."Qty. (Base)";
 
         WarehouseEntry.Reset();
-        WarehouseEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
+        WarehouseEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         WarehouseEntry.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceRefNo, true);
         WarehouseEntry.SetRange("Entry Type", WarehouseEntry."Entry Type"::"Negative Adjmt.");
         WarehouseEntry.SetRange("Whse. Document Type", WarehouseEntry."Whse. Document Type"::Shipment);
