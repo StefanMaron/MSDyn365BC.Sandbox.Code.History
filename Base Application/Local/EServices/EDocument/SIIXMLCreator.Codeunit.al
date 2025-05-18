@@ -671,7 +671,7 @@ codeunit 10750 "SII XML Creator"
                 XMLDOMManagement.AddElementWithPrefix(
                   XMLNode, 'ImporteTotal', FormatNumber(TotalAmount), 'sii', SiiTxt, TempXMLNode);
             end;
-            FillBaseImponibleACosteNode(XMLNode, RegimeCodes, TotalNonExemptBase + TotalNDBase);
+            FillBaseImponibleACosteNode(XMLNode, RegimeCodes, TotalNonExemptBase);
 
             FillOperationDescription(
               XMLNode, GetOperationDescriptionFromDocument(false, VendorLedgerEntry."Document No."),
@@ -1904,6 +1904,7 @@ codeunit 10750 "SII XML Creator"
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         SIIInitialDocUpload: Codeunit "SII Initial Doc. Upload";
+        VendorLedgerEntryRecRef: RecordRef;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1914,6 +1915,11 @@ codeunit 10750 "SII XML Creator"
         GeneralLedgerSetup.Get();
         if SIIInitialDocUpload.DateWithinInitialUploadPeriod(VendorLedgerEntry."Posting Date") then begin
             RegimeCodes[1] := '14';
+            exit;
+        end;
+        DataTypeManagement.GetRecordRef(VendorLedgerEntry, VendorLedgerEntryRecRef);
+        if (SIIManagement.IsLedgerCashFlowBased(VendorLedgerEntryRecRef)) and (GeneralLedgerSetup."VAT Cash Regime") then begin
+            RegimeCodes[1] := '07';
             exit;
         end;
         if SIIDocUploadState."Purch. Special Scheme Code" <> "SII Purch. Upload Scheme Code"::" " then begin
