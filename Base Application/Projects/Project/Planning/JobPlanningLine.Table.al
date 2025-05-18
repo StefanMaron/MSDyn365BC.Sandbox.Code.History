@@ -2002,7 +2002,7 @@ table 1003 "Job Planning Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateAllAmounts(Rec, xRec, IsHandled, CurrFieldNo);
+        OnBeforeUpdateAllAmounts(Rec, xRec, IsHandled);
         if IsHandled then
             exit;
 
@@ -2038,8 +2038,7 @@ table 1003 "Job Planning Line"
                         "Unit Cost (LCY)" := Round(SKU."Unit Cost" * "Qty. per Unit of Measure", UnitAmountRoundingPrecision)
                     else
                         "Unit Cost (LCY)" := Round(Item."Unit Cost" * "Qty. per Unit of Measure", UnitAmountRoundingPrecision);
-                    if not (CurrFieldNo = FieldNo("Unit Price")) then
-                        "Unit Cost" := ConvertAmountToFCY("Unit Cost (LCY)", UnitAmountRoundingPrecisionFCY);
+                    "Unit Cost" := ConvertAmountToFCY("Unit Cost (LCY)", UnitAmountRoundingPrecisionFCY);
                 end else
                     RecalculateAmounts(Job."Exch. Calculation (Cost)", xRec."Unit Cost", "Unit Cost", "Unit Cost (LCY)")
             else
@@ -2054,18 +2053,11 @@ table 1003 "Job Planning Line"
     end;
 
     local procedure CalculateRetrievedCost(var RetrievedCost: Decimal)
-    var
-        FullyInvoiced: Boolean;
     begin
-        CalcFields("Qty. Invoiced", "Invoiced Cost Amount (LCY)");
-        FullyInvoiced := (Quantity = "Qty. Invoiced") and ("Qty. Invoiced" <> 0);
-        if FullyInvoiced then
-            RetrievedCost := "Invoiced Cost Amount (LCY)" / "Qty. Invoiced"
+        if GetSKU() then
+            RetrievedCost := SKU."Unit Cost" * Rec."Qty. per Unit of Measure"
         else
-            if GetSKU() then
-                RetrievedCost := SKU."Unit Cost" * Rec."Qty. per Unit of Measure"
-            else
-                RetrievedCost := Item."Unit Cost" * Rec."Qty. per Unit of Measure";
+            RetrievedCost := Item."Unit Cost" * Rec."Qty. per Unit of Measure";
         OnAfterCalculateRetrievedCost(Rec, xRec, SKU, Item, RetrievedCost);
     end;
 
@@ -3606,7 +3598,7 @@ table 1003 "Job Planning Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateAllAmounts(var JobPlanningLine: Record "Job Planning Line"; var xJobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean; CurrFieldNo: Integer)
+    local procedure OnBeforeUpdateAllAmounts(var JobPlanningLine: Record "Job Planning Line"; var xJobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean)
     begin
     end;
 
