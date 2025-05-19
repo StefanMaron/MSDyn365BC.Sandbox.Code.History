@@ -86,8 +86,7 @@ codeunit 6041 "Service Document Archive Mgmt."
              StrSubstNo(ServiceDocumentArchiveConfirmationQst, ServiceHeader."Document Type", ServiceHeader."No."), true)
         then begin
             StoreServiceDocument(ServiceHeader, false);
-            if GuiAllowed() then
-                Message(ServiceDocumentArchivedMsg, ServiceHeader."No.");
+            Message(ServiceDocumentArchivedMsg, ServiceHeader."No.");
         end;
     end;
 
@@ -182,7 +181,7 @@ codeunit 6041 "Service Document Archive Mgmt."
         ReleaseServiceDocument: Codeunit "Release Service Document";
         RestoreDocument: Boolean;
         IsHandled: Boolean;
-        DoCheck, SkipDeletingLinks, ShowMessage : Boolean;
+        DoCheck, SkipDeletingLinks : Boolean;
     begin
         OnBeforeRestoreServiceDocument(ServiceHeaderArchive, IsHandled);
         if IsHandled then
@@ -194,8 +193,7 @@ codeunit 6041 "Service Document Archive Mgmt."
         ServiceHeader.TestField("Release Status", ServiceHeader."Release Status"::Open);
 
         DoCheck := true;
-        RestoreDocument := false;
-        OnBeforeCheckIfDocumentIsPartiallyPosted(ServiceHeaderArchive, DoCheck, RestoreDocument);
+        OnBeforeCheckIfDocumentIsPartiallyPosted(ServiceHeaderArchive, DoCheck);
 
         if (ServiceHeader."Document Type" = ServiceHeader."Document Type"::Order) and DoCheck then begin
             ServiceShipmentHeader.SetCurrentKey("Order No.");
@@ -209,14 +207,14 @@ codeunit 6041 "Service Document Archive Mgmt."
                 Error(ServiceDocumentRestoreNotPossibleErr, ServiceHeader."Document Type", ServiceHeader."No.");
         end;
 
-        if not RestoreDocument then
-            if ConfirmManagement.GetResponseOrDefault(
-                 StrSubstNo(
-                   RestoreDocumentConfirmationQst, ServiceHeaderArchive."Document Type",
-                   ServiceHeaderArchive."No.", ServiceHeaderArchive."Version No."), true)
-            then
-                RestoreDocument := true;
+        RestoreDocument := false;
 
+        if ConfirmManagement.GetResponseOrDefault(
+             StrSubstNo(
+               RestoreDocumentConfirmationQst, ServiceHeaderArchive."Document Type",
+               ServiceHeaderArchive."No.", ServiceHeaderArchive."Version No."), true)
+        then
+            RestoreDocument := true;
         if RestoreDocument then begin
             ServiceHeader.TestField("Doc. No. Occurrence", ServiceHeaderArchive."Doc. No. Occurrence");
             SkipDeletingLinks := false;
@@ -256,11 +254,9 @@ codeunit 6041 "Service Document Archive Mgmt."
             RestoreServiceLines(ServiceHeaderArchive, ServiceHeader);
             ServiceHeader.Status := ServiceHeader.Status::Finished;
             ReleaseServiceDocument.Reopen(ServiceHeader);
-            ShowMessage := GuiAllowed();
-            OnAfterRestoreServiceDocument(ServiceHeader, ServiceHeaderArchive, ShowMessage);
+            OnAfterRestoreServiceDocument(ServiceHeader, ServiceHeaderArchive);
 
-            if ShowMessage then
-                Message(ServiceDocumentRestoredMsg, ServiceHeader."Document Type", ServiceHeader."No.");
+            Message(ServiceDocumentRestoredMsg, ServiceHeader."Document Type", ServiceHeader."No.");
         end;
     end;
 
@@ -546,7 +542,7 @@ codeunit 6041 "Service Document Archive Mgmt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckIfDocumentIsPartiallyPosted(var ServiceHeaderArchive: Record "Service Header Archive"; var DoCheck: Boolean; var RestoreDocumentWithoutConfirmation: Boolean)
+    local procedure OnBeforeCheckIfDocumentIsPartiallyPosted(var ServiceHeaderArchive: Record "Service Header Archive"; var DoCheck: Boolean)
     begin
     end;
 
@@ -581,7 +577,7 @@ codeunit 6041 "Service Document Archive Mgmt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterRestoreServiceDocument(var ServiceHeader: Record "Service Header"; var ServiceHeaderArchive: Record "Service Header Archive"; var ShowMessage: Boolean)
+    local procedure OnAfterRestoreServiceDocument(var ServiceHeader: Record "Service Header"; var ServiceHeaderArchive: Record "Service Header Archive")
     begin
     end;
 
