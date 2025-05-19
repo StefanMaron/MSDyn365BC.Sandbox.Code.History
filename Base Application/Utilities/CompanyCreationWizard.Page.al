@@ -4,19 +4,19 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Utilities;
 
+using System.Globalization;
 using System.Environment;
+using System.Environment.Configuration;
 using System.Security.AccessControl;
 using System.Security.User;
 using System.Utilities;
-#pragma warning disable AS0018
-#pragma warning disable AS0032
+
 page 9192 "Company Creation Wizard"
 {
     Caption = 'Create New Company';
     PageType = NavigatePage;
     SourceTable = User;
     SourceTableTemporary = true;
-    RefreshOnActivate = true;
 
     layout
     {
@@ -108,24 +108,37 @@ page 9192 "Company Creation Wizard"
                         group(Control26)
                         {
                             ShowCaption = false;
-                            field(CompanyData; NewCompanyData)
+                            Visible = not IsSandbox;
+                            field(CompanyData; NewCompanyDataProduction)
                             {
                                 ApplicationArea = Basic, Suite;
                                 ShowCaption = false;
+                                Visible = not IsSandbox;
 
                                 trigger OnValidate()
-                                var
-                                    CompanyCreationDemoData: Codeunit "Company Creation Demo Data";
                                 begin
-                                    if NewCompanyData in [NewCompanyData::"Evaluation - Contoso Sample Data", NewCompanyData::"Production - Setup Data Only"] then
-                                        CompanyCreationDemoData.CheckDemoDataAppsAvailability();
-
+                                    NewCompanyData := NewCompanyDataProduction;
                                     UpdateDataDescription();
                                 end;
                             }
                         }
-#pragma warning restore AS0032
-#pragma warning restore AS0072
+                        group(Control27)
+                        {
+                            ShowCaption = false;
+                            Visible = IsSandbox;
+                            field(CompanyFullData; NewCompanyDataSandbox)
+                            {
+                                ApplicationArea = Basic, Suite;
+                                ShowCaption = false;
+                                Visible = IsSandbox;
+
+                                trigger OnValidate()
+                                begin
+                                    NewCompanyData := NewCompanyDataSandbox;
+                                    UpdateDataDescription();
+                                end;
+                            }
+                        }
                         field(NewCompanyDataDescription; NewCompanyDataDescription)
                         {
                             ApplicationArea = Basic, Suite;
@@ -134,15 +147,18 @@ page 9192 "Company Creation Wizard"
                             ShowCaption = false;
                         }
                     }
-                }
-            }
-            group(DemoData)
-            {
-                ShowCaption = false;
-                Visible = DemoDataStepVisible;
-                group("Available Modules")
-                {
-                    Caption = 'Available Modules';
+                    group("Additional Demo Data")
+                    {
+                        Visible = (AdditionalDemoDataVisible)
+                            and ((NewCompanyData = NewCompanyData::"Evaluation Data") or (NewCompanyData = NewCompanyData::"Standard Data"));
+
+                        field("Install Contoso Coffee Demo Data"; InstallAdditionalDemoData)
+                        {
+                            ApplicationArea = All;
+                            ToolTip = 'Install the Contoso Demo Data app on top of the default sample data.';
+                            Caption = 'Install the Contoso Demo Data app on top of the default sample data.';
+                        }
+                    }
                 }
             }
             group(Control32)
@@ -300,10 +316,14 @@ page 9192 "Company Creation Wizard"
     trigger OnOpenPage()
     begin
         Step := Step::Start;
-        NewCompanyData := NewCompanyData::"Create New - No Data";
+        NewCompanyData := NewCompanyData::"Standard Data";
+        NewCompanyDataProduction := NewCompanyDataProduction::"Production - Setup Data Only";
+        NewCompanyDataSandbox := NewCompanyDataSandbox::"Production - Setup Data Only";
         UpdateDataDescription();
         EnableControls();
         CurrPage.Update(false);
+
+        OnOpenPageCheckAdditionalDemoData(AdditionalDemoDataVisible);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -319,30 +339,37 @@ page 9192 "Company Creation Wizard"
         MediaRepositoryDone: Record "Media Repository";
         MediaResourcesStandard: Record "Media Resources";
         MediaResourcesDone: Record "Media Resources";
+        AssistedCompanySetup: Codeunit "Assisted Company Setup";
         ClientTypeManagement: Codeunit "Client Type Management";
-        Step: Option Start,Creation,"Demo Data","Add Users",Finish;
+        Step: Option Start,Creation,"Add Users",Finish;
         TopBannerVisible: Boolean;
         FirstStepVisible: Boolean;
         CreationStepVisible: Boolean;
-        DemoDataStepVisible: Boolean;
         FinalStepVisible: Boolean;
         FinishActionEnabled: Boolean;
         BackActionEnabled: Boolean;
         NextActionEnabled: Boolean;
         SetupNotCompletedQst: Label 'The company has not yet been created.\\Are you sure that you want to exit?';
         ConfigurationPackageExists: Boolean;
+        AdditionalDemoDataVisible: Boolean;
+        InstallAdditionalDemoData: Boolean;
         NewCompanyName: Text[30];
-        NewCompanyData: Enum "Company Demo Data Type";
+        NewCompanyData: Enum "Company Data Type (Internal)";
+        NewCompanyDataProduction: Enum "Company Data Type (Production)";
+        NewCompanyDataSandbox: Enum "Company Data Type (Sandbox)";
         CompanyAlreadyExistsErr: Label 'A company with that name already exists. Try a different name.';
         NewCompanyDataDescription: Text;
         CompanyCreated: Boolean;
         SpecifyCompanyNameErr: Label 'To continue, you must specify a name for the company.';
+        NoConfigurationPackageFileDefinedMsg: Label 'No configuration package file is defined for this company type. An empty company will be created.';
         EvaluationDataTxt: Label '\Essential Experience / Cronus Company Sample Data / Setup Data\\Create a company with the Essential functionality scope containing everything you need to evaluate the product for companies with standard processes. For example, sample invoices and ledger entries allow you to view charts and reports.';
         StandardDataTxt: Label '\Essential Experience / Setup Data Only\\Create a company with the Essential functionality scope containing data and setup, such as a chart of accounts and payment methods ready for use by companies with standard processes. Set up your own items and customers, and start posting right away.';
         NoDataTxt: Label '\Any Experience / No Sample Data / No Setup Data\\Create a company with the desired experience for companies with any process complexity, and set it up manually.';
+        ExtendedDataTxt: Label '\Advanced Experience / Cronus Company Sample Data / Setup Data\\Create a company with the Advanced functionality scope containing everything you need to evaluate the product for companies with advanced processes. For example, sample items and customers allow you to start posting right away.';
         TrialPeriodTxt: Label '\\You will be able to use this company for a 30-day trial period.';
         EvalPeriodTxt: Label '\\You will be able to use the company to try out the product for as long as you want. ';
         IsSandbox: Boolean;
+        LangDifferentFromConfigurationPackageFileMsg: Label 'The language of the configuration package file is different than your current language. The new company will be created in %1.', Comment = '%1 is the language code of the pack';
         CompanySetUpInProgressMsg: Label 'Company %1 is created, but we are still setting it up.\This might take some time, so take a break before you begin to use it. When it is ready, its status is Completed. Refresh the page to update the status.', Comment = '%1 - a company name';
         AddUsersVisible: Boolean;
         ManageUsersLbl: Label 'Manage Users';
@@ -350,21 +377,6 @@ page 9192 "Company Creation Wizard"
         ContainUsers: Boolean;
         OnlySuperCanManageUsersLbl: Label 'Only administrators and super users can sign in to this company and manage users.';
         OnlySuperCanCreateNewCompanyErr: Label 'Only users with the SUPER permission set can create a new company.';
-
-    procedure GetNewCompanyName(): Text[30];
-    begin
-        exit(NewCompanyName);
-    end;
-
-    procedure GetStep(): Option Start,Creation,"Demo Data","Add Users",Finish;
-    begin
-        exit(Step);
-    end;
-
-    procedure GetNewCompanyData(): Enum "Company Demo Data Type"
-    begin
-        exit(NewCompanyData);
-    end;
 
     local procedure EnableControls()
     begin
@@ -375,8 +387,6 @@ page 9192 "Company Creation Wizard"
                 ShowStartStep();
             Step::Creation:
                 ShowCreationStep();
-            Step::"Demo Data":
-                ShowDemoDataStep();
             Step::"Add Users":
                 ShowAddUsersStep();
             Step::Finish:
@@ -390,9 +400,9 @@ page 9192 "Company Creation Wizard"
         PermissionManager: Codeunit "Permission Manager";
     begin
         AssistedCompanySetup.CreateNewCompany(NewCompanyName);
-        OnAfterCreateNewCompany(NewCompanyData, NewCompanyName);
+        OnAfterCreateNewCompany(NewCompanyData.AsInteger(), NewCompanyName);
 
-        AssistedCompanySetup.SetupCompanyWithoutDemodata(NewCompanyName, NewCompanyData);
+        AssistedCompanySetup.SetUpNewCompany(NewCompanyName, NewCompanyData.AsInteger(), InstallAdditionalDemoData);
 
         if Rec.FindSet() then
             repeat
@@ -400,31 +410,19 @@ page 9192 "Company Creation Wizard"
             until Rec.Next() = 0;
 
         CompanyCreated := true;
-        OnFinishActionOnBeforeCurrPageClose(NewCompanyData, NewCompanyName);
+        OnFinishActionOnBeforeCurrPageClose(NewCompanyData.AsInteger(), NewCompanyName);
         CurrPage.Close();
-
-        if not (NewCompanyData in [NewCompanyData::"Create New - No Data"]) then
+        if not (NewCompanyData in [NewCompanyData::None, NewCompanyData::"Full No Data"]) then
             Message(CompanySetUpInProgressMsg, NewCompanyName);
     end;
 
     local procedure NextStep(Backwards: Boolean)
-    var
-        CompanyCreationDemoData: Codeunit "Company Creation Demo Data";
     begin
         if (Step = Step::Creation) and not Backwards then
             if NewCompanyName = '' then
                 Error(SpecifyCompanyNameErr);
         if (Step = Step::Creation) and not Backwards then
-            // Skip demo data page if user chooses to create company without data
-            if NewCompanyData = NewCompanyData::"Create New - No Data" then
-                Step := Step + 1
-            else begin
-                CompanyCreationDemoData.CheckDemoDataAppsAvailability();
-                CurrPage.Update();
-            end;
-        if (Step = step::"Add Users") and Backwards then
-            if NewCompanyData = NewCompanyData::"Create New - No Data" then
-                Step := Step - 1;
+            ValidateCompanyType();
 
         if Backwards then
             Step := Step - 1
@@ -445,13 +443,6 @@ page 9192 "Company Creation Wizard"
     local procedure ShowCreationStep()
     begin
         CreationStepVisible := true;
-
-        FinishActionEnabled := false;
-    end;
-
-    local procedure ShowDemoDataStep()
-    begin
-        DemoDataStepVisible := true;
 
         FinishActionEnabled := false;
     end;
@@ -477,7 +468,6 @@ page 9192 "Company Creation Wizard"
 
         FirstStepVisible := false;
         CreationStepVisible := false;
-        DemoDataStepVisible := false;
         AddUsersVisible := false;
         FinalStepVisible := false;
     end;
@@ -493,19 +483,49 @@ page 9192 "Company Creation Wizard"
                 TopBannerVisible := MediaResourcesDone."Media Reference".HasValue;
     end;
 
+    local procedure ValidateCompanyType()
+    var
+        ConfigurationPackageFile: Record "Configuration Package File";
+        UserPersonalization: Record "User Personalization";
+        Language: Codeunit Language;
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeValidateCompanyType(NewCompanyData, ConfigurationPackageExists, IsHandled);
+        if IsHandled then
+            exit;
+
+        ConfigurationPackageExists := false;
+        if NewCompanyData in [NewCompanyData::None, NewCompanyData::"Full No Data"] then
+            exit;
+        ConfigurationPackageExists :=
+            AssistedCompanySetup.FindConfigurationPackageFile(ConfigurationPackageFile, NewCompanyData.AsInteger());
+
+        if not ConfigurationPackageExists then
+            Message(NoConfigurationPackageFileDefinedMsg)
+        else begin
+            UserPersonalization.Get(UserSecurityId());
+            if ConfigurationPackageFile."Language ID" <> UserPersonalization."Language ID" then
+                Message(LangDifferentFromConfigurationPackageFileMsg,
+                  Language.GetWindowsLanguageName(ConfigurationPackageFile."Language ID"));
+        end;
+    end;
+
     local procedure UpdateDataDescription()
     var
         TenantLicenseState: Codeunit "Tenant License State";
     begin
         case NewCompanyData of
-            NewCompanyData::"Evaluation - Contoso Sample Data":
+            NewCompanyData::"Evaluation Data":
                 NewCompanyDataDescription := EvaluationDataTxt;
-            NewCompanyData::"Production - Setup Data Only":
+            NewCompanyData::"Standard Data":
                 NewCompanyDataDescription := StandardDataTxt;
-            NewCompanyData::"Create New - No Data":
+            NewCompanyData::"Extended Data":
+                NewCompanyDataDescription := ExtendedDataTxt;
+            NewCompanyData::None, NewCompanyData::"Full No Data":
                 NewCompanyDataDescription := NoDataTxt;
             else
-                OnUpdateDataDescriptionCaseElse(NewCompanyData, NewCompanyDataDescription);
+                OnUpdateDataDescriptionCaseElse(NewCompanyData.AsInteger(), NewCompanyDataDescription);
         end;
 
         if IsSandbox then
@@ -515,37 +535,42 @@ page 9192 "Company Creation Wizard"
             exit;
 
         case NewCompanyData of
-            NewCompanyData::"Evaluation - Contoso Sample Data":
+            NewCompanyData::"Evaluation Data":
                 NewCompanyDataDescription += EvalPeriodTxt;
-            NewCompanyData::"Production - Setup Data Only",
-            NewCompanyData::"Create New - No Data":
+            NewCompanyData::"Standard Data",
+            NewCompanyData::None:
                 NewCompanyDataDescription += TrialPeriodTxt;
         end;
     end;
 
-#pragma warning disable AS0072
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateNewCompany(NewCompanyData: Enum "Company Demo Data Type"; NewCompanyName: Text[30])
+    local procedure OnOpenPageCheckAdditionalDemoData(var AdditionalDemoDataVisible: Boolean)
     begin
     end;
-#pragma warning restore AS0072
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateNewCompany(NewCompanyData: Option; NewCompanyName: Text[30])
+    begin
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateCompanyName(var NewCompanyName: Text[30])
     begin
     end;
 
-#pragma warning disable AS0072
     [IntegrationEvent(false, false)]
-    local procedure OnFinishActionOnBeforeCurrPageClose(NewCompanyData: Enum "Company Demo Data Type"; NewCompanyName: Text[30])
+    local procedure OnBeforeValidateCompanyType(NewCompanyData: Enum "Company Data Type (Internal)"; var ConfigurationPackageExists: Boolean; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateDataDescriptionCaseElse(NewCompanyData: Enum "Company Demo Data Type"; var NewCompanyDataDescription: Text)
+    local procedure OnFinishActionOnBeforeCurrPageClose(NewCompanyData: Option "Evaluation Data","Standard Data","None","Extended Data","Full No Data"; NewCompanyName: Text[30])
     begin
     end;
-#pragma warning restore AS0072
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateDataDescriptionCaseElse(NewCompanyData: Option; var NewCompanyDataDescription: Text)
+    begin
+    end;
 }
-#pragma warning restore AS0032
-#pragma warning restore AS0018
+
