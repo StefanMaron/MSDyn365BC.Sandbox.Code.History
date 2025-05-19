@@ -15,6 +15,7 @@ using Microsoft.Finance.GeneralLedger.Journal;
 codeunit 8067 "Customer Deferrals Mngmt."
 {
     SingleInstance = true;
+    Access = Internal;
     Permissions =
         tabledata "Sales Invoice Line" = r;
 
@@ -438,17 +439,17 @@ codeunit 8067 "Customer Deferrals Mngmt."
         GlobalGLEntry."Subscription Contract No." := GenJournalLine."Subscription Contract No.";
     end;
 
-    internal procedure SetDeferralNo(NewDeferralNo: Integer)
+    procedure SetDeferralNo(NewDeferralNo: Integer)
     begin
         DeferralEntryNo := NewDeferralNo;
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeInsertCustomerContractDeferralWhenStartingOnFirstDayInMonth(var CustSubContractDeferral: Record "Cust. Sub. Contract Deferral"; SalesLine: Record "Sales Line"; PeriodNo: Integer; NumberOfPeriods: Integer)
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeInsertCustomerContractDeferralWhenNotStartingOnFirstDayInMonth(var CustSubContractDeferral: Record "Cust. Sub. Contract Deferral"; SalesLine: Record "Sales Line"; PeriodNo: Integer; NumberOfPeriods: Integer)
     begin
     end;
