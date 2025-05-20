@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false
-  },
   "folders": [
     {
       "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
@@ -275,5 +267,13 @@
     {
       "path": "./MasterDataManagement/Test Library/_Exclude_Master_Data_Management_Test_Library"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false
+  }
 }
