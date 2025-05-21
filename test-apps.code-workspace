@@ -30,6 +30,9 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
+      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
+    },
+    {
       "path": "./DataArchive/test/Data Archive Tests"
     },
     {
