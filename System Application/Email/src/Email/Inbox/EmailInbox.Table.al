@@ -76,16 +76,6 @@ table 8886 "Email Inbox"
         {
             DataClassification = CustomerContent;
         }
-
-        field(13; "Is Read"; Boolean)
-        {
-            DataClassification = CustomerContent;
-        }
-
-        field(14; "Is Draft"; Boolean)
-        {
-            DataClassification = CustomerContent;
-        }
     }
 
     keys
