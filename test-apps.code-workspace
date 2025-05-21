@@ -1,13 +1,18 @@
 {
+  "settings": {
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false
+  },
   "folders": [
     {
       "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
     },
     {
       "path": "./SalesAndInventoryForecast/Test/Sales and Inventory Forecast Tests"
-    },
-    {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests"
@@ -22,19 +27,10 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
-    },
-    {
       "path": "./DataArchive/test/Data Archive Tests"
     },
     {
       "path": "./Email - Outlook REST API/Test"
-    },
-    {
-      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
     },
     {
       "path": "./APIV2/Test/_Exclude_APIV2_ Tests"
@@ -303,13 +299,5 @@
     {
       "path": "./MasterDataManagement/Test Library/_Exclude_Master_Data_Management_Test_Library"
     }
-  ],
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false
-  }
+  ]
 }
