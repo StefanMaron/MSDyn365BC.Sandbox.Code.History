@@ -102,7 +102,6 @@ table 27 Item
         field(2; "No. 2"; Code[20])
         {
             Caption = 'No. 2';
-            OptimizeForTextSearch = true;
         }
         field(3; Description; Text[100])
         {
@@ -130,7 +129,6 @@ table 27 Item
         field(4; "Search Description"; Code[100])
         {
             Caption = 'Search Description';
-            OptimizeForTextSearch = true;
         }
         field(5; "Description 2"; Text[50])
         {
@@ -249,7 +247,6 @@ table 27 Item
         field(12; "Shelf No."; Code[10])
         {
             Caption = 'Shelf No.';
-            OptimizeForTextSearch = true;
         }
         field(14; "Item Disc. Group"; Code[20])
         {
@@ -447,7 +444,8 @@ table 27 Item
         {
             Caption = 'Vendor No.';
             TableRelation = Vendor;
-            OptimizeForTextSearch = true;
+            //This property is currently not supported
+            //TestTableRelation = true;
             ValidateTableRelation = true;
 
             trigger OnValidate()
@@ -495,7 +493,6 @@ table 27 Item
         field(37; "Alternative Item No."; Code[20])
         {
             Caption = 'Alternative Item No.';
-            OptimizeForTextSearch = true;
             TableRelation = Item;
         }
         field(38; "Unit List Price"; Decimal)
@@ -514,7 +511,6 @@ table 27 Item
         field(40; "Duty Code"; Code[10])
         {
             Caption = 'Duty Code';
-            OptimizeForTextSearch = true;
         }
         field(41; "Gross Weight"; Decimal)
         {
@@ -552,7 +548,6 @@ table 27 Item
         {
             Caption = 'Tariff No.';
             TableRelation = "Tariff Number";
-            OptimizeForTextSearch = true;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -1274,7 +1269,6 @@ table 27 Item
         field(1217; GTIN; Code[14])
         {
             Caption = 'GTIN';
-            OptimizeForTextSearch = true;
             Numeric = true;
             ExtendedDatatype = Barcode;
         }
@@ -1596,13 +1590,11 @@ table 27 Item
         {
             Caption = 'Manufacturer Code';
             TableRelation = Manufacturer;
-            OptimizeForTextSearch = true;
         }
         field(5702; "Item Category Code"; Code[20])
         {
             Caption = 'Item Category Code';
             TableRelation = "Item Category";
-            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -1678,7 +1670,6 @@ table 27 Item
         {
             Caption = 'Purchasing Code';
             TableRelation = Purchasing;
-            OptimizeForTextSearch = true;
         }
         field(5776; "Qty. Assigned to ship"; Decimal)
         {
@@ -1711,7 +1702,6 @@ table 27 Item
         {
             Caption = 'Item Tracking Code';
             TableRelation = "Item Tracking Code";
-            OptimizeForTextSearch = true;
 
             trigger OnValidate()
             var
@@ -2223,7 +2213,6 @@ table 27 Item
         field(99008500; "Common Item No."; Code[20])
         {
             Caption = 'Common Item No.';
-            OptimizeForTextSearch = true;
         }
     }
 
@@ -3175,8 +3164,10 @@ table 27 Item
         FoundRecordCount :=
             FindRecordMgt.FindRecordByDescriptionAndView(ReturnValue, SalesLine.Type::Item.AsInteger(), ItemText, View);
 
-        if FoundRecordCount = 1 then
+        if FoundRecordCount = 1 then begin
+            ReturnValue := DelChr(ReturnValue, '<>', '''');
             exit(true);
+        end;
 
         if FoundRecordCount = 0 then begin
             ReturnValue := CopyStr(ItemText, 1, MaxStrLen(ReturnValue));
@@ -3277,20 +3268,14 @@ table 27 Item
     procedure PickItem(var Item: Record Item): Code[20]
     var
         ItemList: Page "Item List";
-        FindRecordMgt: Codeunit "Find Record Management";
-        RaiseNotification: Boolean;
     begin
         if Item.FilterGroup = -1 then
             ItemList.SetTempFilteredItemRec(Item);
-
-        RaiseNotification := Item.Count > FindRecordMgt.GetMaxRecordCountToReturn();
 
         if Item.FindFirst() then;
         ItemList.SetTableView(Item);
         ItemList.SetRecord(Item);
         ItemList.LookupMode := true;
-        if RaiseNotification then
-            ItemList.DoShowNotification();
         if ItemList.RunModal() = ACTION::LookupOK then
             ItemList.GetRecord(Item)
         else
