@@ -103,7 +103,7 @@ page 509 "Blanket Purchase Order"
                     field("Buy-from County"; Rec."Buy-from County")
                     {
                         ApplicationArea = Suite;
-                        CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
+                        Caption = 'State';
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the state where the vendor sending the invoice is located.';
@@ -467,7 +467,7 @@ page 509 "Blanket Purchase Order"
                     field("Ship-to County"; Rec."Ship-to County")
                     {
                         ApplicationArea = Suite;
-                        CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                        Caption = 'State';
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the state where the vendor sending the invoice is located.';
@@ -548,7 +548,7 @@ page 509 "Blanket Purchase Order"
                     field("Pay-to County"; Rec."Pay-to County")
                     {
                         ApplicationArea = Suite;
-                        CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
+                        Caption = 'State';
                         Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Importance = Additional;
