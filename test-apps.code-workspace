@@ -7,6 +7,9 @@
       "path": "./SalesAndInventoryForecast/Test/Sales and Inventory Forecast Tests"
     },
     {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
+    },
+    {
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests"
     },
     {
@@ -23,6 +26,9 @@
     },
     {
       "path": "./Email - Outlook REST API/Test"
+    },
+    {
+      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
       "path": "./APIV2/Test/_Exclude_APIV2_ Tests"
