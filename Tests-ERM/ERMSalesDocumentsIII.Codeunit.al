@@ -74,6 +74,7 @@ codeunit 134387 "ERM Sales Documents III"
         PostingPreviewNoTok: Label '***', Locked = true;
         ReturnQtyToReceiveMustBeZeroErr: Label ' Return Qty. to Receive must be zero.';
         QtyToAssignErr: Label '%1 must be %2 in %3', Comment = '%1 = Qty. to Assign, %2 = Quantity, %3 = Sales Return Order Subform';
+        UniCostLCYErr: Label 'Unit Cost (LCY) must be zero.';
 
     [Test]
     [Scope('OnPrem')]
@@ -5978,9 +5979,304 @@ codeunit 134387 "ERM Sales Documents III"
         Assert.AreEqual(PostCodeB.City, CityTxt[2], 'The City should not be changed');
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    procedure VerifyUnitCostLCYZeroWhenItemVariantCodeValidated()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        Location: Record Location;
+        ReturnReason: Record "Return Reason";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        ItemNo: Code[20];
+    begin
+        // [SCENARIO 547101] Verify Inventory Value Zero is behaving on a Return if a Variant is added or changed and the cost is 0
+        Initialize();
+
+        // [GIVEN] Create Location with posting setup
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+
+        // [GIVEN] Create Customer with Location Code
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Location Code", Location.Code);
+        Customer.Modify();
+
+        // [GIVEN] Create Item
+        ItemNo := LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Return Reason Code with Inventory Value zero
+        LibraryERM.CreateReturnReasonCode(ReturnReason);
+        ReturnReason.Validate("Inventory Value Zero", true);
+        ReturnReason.Modify();
+
+        // [GIVEN] Add unit cost
+        Item.Validate("Unit Cost", LibraryRandom.RandDec(1, 2));
+        Item.Modify();
+
+        // [GIVEN] Create Item Variant
+        LibraryInventory.CreateItemVariant(ItemVariant, ItemNo);
+
+        // [WHEN] Validate the Return Reason code, Location Code, Quanitity and Variant Code
+        CreateSalesDocument(SalesHeader, SalesLine, SalesHeader."Document Type"::"Return Order", Customer."No.", SalesLine.Type::Item, Item."No.", LibraryRandom.RandIntInRange(10, 20));
+        SalesLine.Validate("Return Reason Code", ReturnReason.Code);
+        SalesLine.Validate("Location Code", Location.Code);
+        SalesLine.Validate(Quantity, LibraryRandom.RandIntInRange(10, 20));
+        SalesLine.Validate("Variant Code", ItemVariant.Code);
+        Salesline.Modify();
+
+        // [THEN] Verify the Unit Cost (LCY) is zero when Return Reason Code is validated
+        Assert.AreEqual(0, SalesLine."Unit Cost (LCY)", UniCostLCYErr);
+    end;
+
+    [Test]
+    procedure Salesperson_SellToBlank_UserSetup()
+    var
+        SellToCustomer: Record Customer;
+        UserSetup: Record "User Setup";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has blank salesperson, User Setup has salesperson, Salesperson Code on sales order is set to User Setup salesperson.
+        Initialize();
+
+        LibrarySales.CreateCustomer(SellToCustomer);
+        CreateUserSetupWithSalesperson(UserSetup);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", UserSetup."Salespers./Purch. Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_UserSetup()
+    var
+        SellToCustomer: Record Customer;
+        UserSetup: Record "User Setup";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, User Setup has salesperson, Salesperson Code on sales order is set to Sell-to Customer salesperson.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateUserSetupWithSalesperson(UserSetup);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", SellToCustomer."Salesperson Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellToBlank_BillToBlank_UserSetup()
+    var
+        SellToCustomer, BillToCustomer : Record Customer;
+        SalesHeader: Record "Sales Header";
+        UserSetup: Record "User Setup";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has blank salesperson, Bill-to Customer has blank salesperson, User Setup has salesperson, Salesperson Code on sales order is set to User Setup salesperson.
+        Initialize();
+
+        LibrarySales.CreateCustomer(SellToCustomer);
+        LibrarySales.CreateCustomer(BillToCustomer);
+        SellToCustomer.Validate("Bill-to Customer No.", BillToCustomer."No.");
+        SellToCustomer.Modify(true);
+        CreateUserSetupWithSalesperson(UserSetup);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", UserSetup."Salespers./Purch. Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_BillToBlank()
+    var
+        SellToCustomer, BillToCustomer : Record Customer;
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Bill-to Customer has blank salesperson, Salesperson Code on sales order is set to blank.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        LibrarySales.CreateCustomer(BillToCustomer);
+        SellToCustomer.Validate("Bill-to Customer No.", BillToCustomer."No.");
+        SellToCustomer.Modify(true);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", '');
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_BillTo_UserSetup()
+    var
+        SellToCustomer, BillToCustomer : Record Customer;
+        SalesHeader: Record "Sales Header";
+        UserSetup: Record "User Setup";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Bill-to Customer has salesperson, User Setup has salesperson, Salesperson Code on sales order is set to Bill-to Customer salesperson.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateCustomerWithSalesperson(BillToCustomer);
+        SellToCustomer.Validate("Bill-to Customer No.", BillToCustomer."No.");
+        SellToCustomer.Modify(true);
+        CreateUserSetupWithSalesperson(UserSetup);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", BillToCustomer."Salesperson Code");
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure Salesperson_SellTo_BillTo_ResetBillTo()
+    var
+        SellToCustomer, BillToCustomer : Record Customer;
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Bill-to Customer has salesperson, Salesperson Code on sales order is set to Sell-to Customer salesperson after Bill-to Customer No. is reset.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateCustomerWithSalesperson(BillToCustomer);
+        SellToCustomer.Validate("Bill-to Customer No.", BillToCustomer."No.");
+        SellToCustomer.Modify(true);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+        SalesHeader.TestField("Salesperson Code", BillToCustomer."Salesperson Code");
+
+        SalesHeader.Validate("Bill-to Customer No.", SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", SellToCustomer."Salesperson Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_ShipTo()
+    var
+        SellToCustomer: Record Customer;
+        ShipToAddress: Record "Ship-to Address";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Ship-to Address has salesperson, Salesperson Code on sales order is set to Ship-to Address salesperson.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateShipToAddressWithSalesperson(ShipToAddress, SellToCustomer."No.");
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+        SalesHeader.Validate("Ship-to Code", ShipToAddress."Code");
+
+        SalesHeader.TestField("Salesperson Code", ShipToAddress."Salesperson Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_ShipTo_ShipToBlank_ChangeShipTo()
+    var
+        SellToCustomer: Record Customer;
+        ShipToAddress1, ShipToAddress2 : Record "Ship-to Address";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Ship-to Address1 has salesperson, Ship-to Address2 has blank salesperson, Salesperson Code on sales order stays with Ship-to Address1 salesperson after Ship-to Address2 is selected.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateShipToAddressWithSalesperson(ShipToAddress1, SellToCustomer."No.");
+        SellToCustomer.Validate("Ship-to Code", ShipToAddress1."Code");
+        SellToCustomer.Modify(true);
+        LibrarySales.CreateShipToAddress(ShipToAddress2, SellToCustomer."No.");
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+        SalesHeader.TestField("Salesperson Code", ShipToAddress1."Salesperson Code");
+
+        SalesHeader.Validate("Ship-to Code", ShipToAddress2."Code");
+
+        SalesHeader.TestField("Salesperson Code", ShipToAddress1."Salesperson Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_ShipTo_ShipTo2()
+    var
+        SellToCustomer: Record Customer;
+        ShipToAddress1, ShipToAddress2 : Record "Ship-to Address";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Ship-to Address1 has salesperson, Ship-to Address2 has salesperson, Salesperson Code on sales order is set to Ship-to Address2 salesperson.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateShipToAddressWithSalesperson(ShipToAddress1, SellToCustomer."No.");
+        CreateShipToAddressWithSalesperson(ShipToAddress2, SellToCustomer."No.");
+        SellToCustomer.Validate("Ship-to Code", ShipToAddress1."Code");
+        SellToCustomer.Modify(true);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+        SalesHeader.TestField("Salesperson Code", ShipToAddress1."Salesperson Code");
+
+        SalesHeader.Validate("Ship-to Code", ShipToAddress2."Code");
+
+        SalesHeader.TestField("Salesperson Code", ShipToAddress2."Salesperson Code");
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure Salesperson_SellTo_BillTo_ShipTo_ChangeBillTo()
+    var
+        SellToCustomer, BillToCustomer1, BillToCustomer2 : Record Customer;
+        ShipToAddress: Record "Ship-to Address";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Bill-to Customers have salesperson, Ship-to Address has salesperson, Salesperson Code on sales order stays with Ship-to Address salesperson after Bill-to Customer No. is changed.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateCustomerWithSalesperson(BillToCustomer1);
+        CreateCustomerWithSalesperson(BillToCustomer2);
+        CreateShipToAddressWithSalesperson(ShipToAddress, SellToCustomer."No.");
+        SellToCustomer.Validate("Bill-to Customer No.", BillToCustomer1."No.");
+        SellToCustomer.Validate("Ship-to Code", ShipToAddress."Code");
+        SellToCustomer.Modify(true);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+        SalesHeader.TestField("Salesperson Code", ShipToAddress."Salesperson Code");
+
+        SalesHeader.Validate("Bill-to Customer No.", BillToCustomer2."No.");
+
+        SalesHeader.TestField("Salesperson Code", ShipToAddress."Salesperson Code");
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure Salesperson_SellTo_BillTo_ShipToBlank_ManualEdit_ChangeBillTo()
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+        SellToCustomer, BillToCustomer : Record Customer;
+        ShipToAddress: Record "Ship-to Address";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Bill-to Customer has salesperson, Ship-to Address has blank salesperson, Salesperson Code on sales order is set to Bill-to Customer salesperson after Salesperson Code on sales order is manually edited.
+        Initialize();
+
+        LibrarySales.CreateSalesperson(Salesperson);
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateCustomerWithSalesperson(BillToCustomer);
+        LibrarySales.CreateShipToAddress(ShipToAddress, SellToCustomer."No.");
+        SellToCustomer.Validate("Ship-to Code", ShipToAddress."Code");
+        SellToCustomer.Modify(true);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.Validate("Salesperson Code", Salesperson."Code");
+        SalesHeader.Modify(true);
+
+        SalesHeader.Validate("Bill-to Customer No.", BillToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", BillToCustomer."Salesperson Code");
+    end;
+
     local procedure Initialize()
     var
         ReportSelections: Record "Report Selections";
+        UserSetup: Record "User Setup";
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"ERM Sales Documents III");
@@ -5988,8 +6284,11 @@ codeunit 134387 "ERM Sales Documents III"
         LibraryVariableStorage.Clear();
         LibrarySetupStorage.Restore();
         LibraryPriceCalculation.DisableExtendedPriceCalculation();
+        UserSetup.DeleteAll();
+
         if isInitialized then
             exit;
+
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(CODEUNIT::"ERM Sales Documents III");
 
         LibraryERMCountryData.CreateVATData();
@@ -6297,6 +6596,36 @@ codeunit 134387 "ERM Sales Documents III"
         Evaluate(ShippingTime, StrSubstNo('<%1D>', LibraryRandom.RandInt(10)));
         Customer.Validate("Shipping Time", ShippingTime);
         Customer.Modify(true);
+    end;
+
+    local procedure CreateCustomerWithSalesperson(var Customer: Record Customer)
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+    begin
+        LibrarySales.CreateCustomer(Customer);
+        LibrarySales.CreateSalesperson(Salesperson);
+        Customer.Validate("Salesperson Code", Salesperson.Code);
+        Customer.Modify(true);
+    end;
+
+    local procedure CreateUserSetupWithSalesperson(var UserSetup: Record "User Setup")
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+    begin
+        LibraryTimeSheet.CreateUserSetup(UserSetup, true);
+        LibrarySales.CreateSalesperson(Salesperson);
+        UserSetup.Validate("Salespers./Purch. Code", Salesperson.Code);
+        UserSetup.Modify(true);
+    end;
+
+    local procedure CreateShipToAddressWithSalesperson(var ShipToAddress: Record "Ship-to Address"; CustomerNo: Code[20])
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+    begin
+        LibrarySales.CreateShipToAddress(ShipToAddress, CustomerNo);
+        LibrarySales.CreateSalesperson(Salesperson);
+        ShipToAddress.Validate("Salesperson Code", Salesperson.Code);
+        ShipToAddress.Modify(true);
     end;
 
     local procedure CreatePostCode(var PostCode: Record "Post Code"; "Code": Code[20])
@@ -7521,6 +7850,13 @@ codeunit 134387 "ERM Sales Documents III"
     begin
         Assert.ExpectedMessage(LibraryVariableStorage.DequeueText(), Message);
         Response := LibraryVariableStorage.DequeueBoolean();
+    end;
+
+    [ConfirmHandler]
+    [Scope('OnPrem')]
+    procedure ConfirmHandlerYes(Question: Text[1024]; var Reply: Boolean)
+    begin
+        Reply := true;
     end;
 
     [ModalPageHandler]
