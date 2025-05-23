@@ -148,7 +148,6 @@ codeunit 99000839 "Sales Get Demand To Reserve"
         RemainingQty, RemainingQtyBase : Decimal;
         AvailableQtyBase, InventoryQtyBase, ReservedQtyBase, WarehouseQtyBase : Decimal;
         LineNo: Integer;
-        DoInsertReservationWkshLine: Boolean;
     begin
         GetDemandToReserve.GetSalesOrderLines(TempSalesLine);
         if TempSalesLine.IsEmpty() then
@@ -207,20 +206,15 @@ codeunit 99000839 "Sales Get Demand To Reserve"
             ReservationWkshLine.Validate("Qty. Reserv. in Stock (Base)", ReservedQtyBase);
             ReservationWkshLine.Validate("Qty. in Whse. Handling (Base)", WarehouseQtyBase);
 
-            DoInsertReservationWkshLine := (ReservationWkshLine."Remaining Qty. to Reserve" > 0) and (ReservationWkshLine."Available Qty. to Reserve" > 0);
-            OnSyncSalesOrderLinesOnBeforeInsertReservationWkshLine(ReservationWkshLine, TempSalesLine, DoInsertReservationWkshLine);
-            if DoInsertReservationWkshLine then
+            if (ReservationWkshLine."Remaining Qty. to Reserve" > 0) and
+               (ReservationWkshLine."Available Qty. to Reserve" > 0)
+            then
                 ReservationWkshLine.Insert(true);
         until TempSalesLine.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnGetDemandOnBeforeSetTempSalesLine(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSyncSalesOrderLinesOnBeforeInsertReservationWkshLine(var ReservationWkshLine: Record "Reservation Wksh. Line"; var TempSalesLine: Record "Sales Line" temporary; var DoInsertReservationWkshLine: Boolean)
     begin
     end;
 }
