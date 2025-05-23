@@ -160,8 +160,7 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
         InvoicePostingBuffer.SetAccount(SalesAccountNo, TotalVAT, TotalVATACY, TotalAmount, TotalAmountACY);
         InvoicePostingBuffer.UpdateVATBase(TotalVATBase, TotalVATBaseACY);
 
-        ServicePostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(
-            InvoicePostingBuffer, ServiceLine, ServiceLineACY, SuppressCommit, TempInvoicePostingBuffer);
+        ServicePostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, ServiceLine, ServiceLineACY, SuppressCommit);
 
         UpdateInvoicePostingBuffer(InvoicePostingBuffer, ServiceLine);
     end;
@@ -316,8 +315,6 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
         LineCount: Integer;
     begin
         ServiceHeader := DocumentHeaderVar;
-
-        ServicePostInvoiceEvents.RunOnBeforePostLines(ServiceHeader, TempInvoicePostingBuffer);
 
         LineCount := 0;
         if TempInvoicePostingBuffer.Find('+') then
