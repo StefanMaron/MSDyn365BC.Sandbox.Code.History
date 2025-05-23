@@ -1420,8 +1420,6 @@ codeunit 6500 "Item Tracking Management"
 
     procedure CalcWhseItemTrkgLine(var WhseItemTrkgLine: Record "Whse. Item Tracking Line")
     var
-        ItemTrackingCode: Record "Item Tracking Code";
-        SourceReservEntry: Record "Reservation Entry";
         WhseActivQtyBase: Decimal;
     begin
         case WhseItemTrkgLine."Source Type" of
@@ -1464,20 +1462,6 @@ codeunit 6500 "Item Tracking Management"
         else
             WhseItemTrkgLine.Validate("Quantity Handled (Base)",
               WhseItemTrkgLine."Qty. Registered (Base)");
-
-        GetItemTrackingCode(WhseItemTrkgLine."Item No.", ItemTrackingCode);
-
-        if (ItemTrackingCode."Lot Specific Tracking") or (ItemTrackingCode."Package Specific Tracking") then begin
-            SourceReservEntry.SetSourceFilter(WhseItemTrkgLine."Source Type", WhseItemTrkgLine."Source Subtype", WhseItemTrkgLine."Source ID", WhseItemTrkgLine."Source Ref. No.", true);
-            SourceReservEntry.SetSourceFilter('', WhseItemTrkgLine."Source Prod. Order Line");
-            if ItemTrackingCode."Lot Specific Tracking" then
-                SourceReservEntry.SetRange("Lot No.", WhseItemTrkgLine."Lot No.");
-            if ItemTrackingCode."Package Specific Tracking" then
-                SourceReservEntry.SetRange("Package No.", WhseItemTrkgLine."Package No.");
-            if SourceReservEntry.FindFirst() then
-                if Abs(SourceReservEntry."Quantity (Base)") > WhseItemTrkgLine."Quantity Handled (Base)" then
-                    WhseItemTrkgLine.Validate("Quantity (Base)", Abs(SourceReservEntry."Quantity (Base)"));
-        end;
 
         if WhseItemTrkgLine."Quantity (Base)" >= WhseItemTrkgLine."Quantity Handled (Base)" then
             WhseItemTrkgLine.Validate("Qty. to Handle (Base)",
@@ -2664,7 +2648,6 @@ codeunit 6500 "Item Tracking Management"
         ReservEntryBindingCheck: Record "Reservation Entry";
         ATOSalesLine: Record "Sales Line";
         AsmHeader: Record "Assembly Header";
-        UntrackedReservEntry: Record "Reservation Entry";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         SignFactor: Integer;
         ToRowID: Text[250];
@@ -2779,13 +2762,6 @@ codeunit 6500 "Item Tracking Management"
 
                     if (TempTrackingSpec."Qty. to Handle (Base)" = 0) and (TempTrackingSpec."Qty. to Invoice (Base)" = 0) then
                         TempTrackingSpec.Delete();
-                end
-                else begin
-                    UntrackedReservEntry.SetSourceFilter(
-                        TempTrackingSpec."Source Type", TempTrackingSpec."Source Subtype",
-                        TempTrackingSpec."Source ID", TempTrackingSpec."Source Ref. No.", true);
-                    UntrackedReservEntry.SetSourceFilter('', TempTrackingSpec."Source Prod. Order Line");
-                    RemoveUntrackedSurplus(UntrackedReservEntry);
                 end;
             until TempTrackingSpec.Next() = 0;
 
