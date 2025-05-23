@@ -5,6 +5,7 @@ using Microsoft.Foundation.NoSeries;
 
 codeunit 8005 "Create Subscription Header"
 {
+    Access = Internal;
     TableNo = "Imported Subscription Header";
 
     trigger OnRun()
@@ -92,17 +93,17 @@ codeunit 8005 "Create Subscription Header"
     end;
 
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterSubscriptionHeaderInsert(var SubscriptionHeader: Record "Subscription Header"; var ImportedSubscriptionHeader: Record "Imported Subscription Header")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterSubscriptionHeaderModify(var SubscriptionHeader: Record "Subscription Header"; var ImportedSubscriptionHeader: Record "Imported Subscription Header")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterTestImportedSubscriptionHeader(ImportedSubscriptionHeader: Record "Imported Subscription Header")
     begin
     end;
