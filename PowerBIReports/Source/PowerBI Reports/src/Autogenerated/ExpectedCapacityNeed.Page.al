@@ -22,7 +22,7 @@ page 37044 "Expected Capacity Need"
 
                 trigger ControlAddInReady()
                 begin
-                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
+                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageTok);
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
@@ -57,7 +57,7 @@ page 37044 "Expected Capacity Need"
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageLbl: Label 'ReportSectiona2c7d37ca03217072470', Locked = true;
+        ReportPageTok: Label 'ReportSectiona2c7d37ca03217072470', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()
