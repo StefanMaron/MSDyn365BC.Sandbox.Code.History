@@ -160,7 +160,7 @@ codeunit 9002 "Permission Manager"
         Plan.Read();
 
         if Plan.Role_Center_ID = Page::"Business Manager Role Center" then
-            FilterProfileToBusinessManager(AllProfile, IsAllProfileFiltered)
+            FilterProfileToBusinessManagerEvaluationForCronus(AllProfile, IsAllProfileFiltered)
         else
             AllProfile.SetRange("Role Center ID", Plan.Role_Center_ID);
 
@@ -267,22 +267,16 @@ codeunit 9002 "Permission Manager"
         exit(CopyStr(CryptographyManagement.GenerateHash(InputText, 2), 1, 250)); // 2 corresponds to SHA256
     end;
 
-    local procedure FilterProfileToBusinessManager(var AllProfile: Record "All Profile"; var IsFiltered: Boolean)
+    local procedure FilterProfileToBusinessManagerEvaluationForCronus(var AllProfile: Record "All Profile"; var IsFiltered: Boolean)
     var
         Company: Record Company;
     begin
-        if not Company.Get(CompanyName()) then
-            exit;
-
-        if Company."Evaluation Company" then begin
-            if Company.Name.ToLower().StartsWith('cronus') then begin
-                AllProfile.SetRange("Profile ID", 'Business Manager Evaluation');
-                IsFiltered := true;
-            end;
-        end else begin
-            AllProfile.SetRange("Profile ID", 'Business Manager');
-            IsFiltered := true;
-        end;
+        if Company.Get(CompanyName()) then
+            if Company."Evaluation Company" then
+                if Company.Name.ToLower().StartsWith('cronus') then begin
+                    AllProfile.SetRange("Profile ID", 'Business Manager Evaluation');
+                    IsFiltered := true;
+                end;
     end;
 
     local procedure GetCharRepresentationOfPermission(PermissionOption: Integer): Text[1]
