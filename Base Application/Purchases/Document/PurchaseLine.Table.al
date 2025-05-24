@@ -347,15 +347,11 @@ table 39 "Purchase Line"
             trigger OnValidate()
             var
                 ConfirmManagement: Codeunit "Confirm Management";
-                IsHandled, ShouldExit : Boolean;
+                IsHandled: Boolean;
             begin
                 TestStatusOpen();
                 IsHandled := false;
-                ShouldExit := false;
-                OnValidateLocationCodeOnAfterTestStatusOpen(Rec, xRec, IsHandled, ShouldExit);
-                if ShouldExit then
-                    exit;
-
+                OnValidateLocationCodeOnAfterTestStatusOpen(Rec, xRec, IsHandled);
                 if xRec."Location Code" <> "Location Code" then begin
                     if ("Prepmt. Amt. Inv." <> 0) and (not IsHandled) then
                         if not ConfirmManagement.GetResponseOrDefault(
@@ -1146,16 +1142,13 @@ table 39 "Purchase Line"
             trigger OnValidate()
             var
                 Item: Record Item;
-                ShouldCheckCostingMethod: Boolean;
             begin
                 TestField("No.");
                 TestStatusOpen();
 
                 CheckLineTypeOnIndirectCostPercentUpdate();
 
-                ShouldCheckCostingMethod := (Type = Type::Item) and ("Prod. Order No." = '');
-                OnValidateIndirectCostOnAfterCalcShouldCheckCostingMethod(Rec, ShouldCheckCostingMethod);
-                if ShouldCheckCostingMethod then begin
+                if (Type = Type::Item) and ("Prod. Order No." = '') then begin
                     GetItem(Item);
                     Item.TestField(Type, Item.Type::Inventory);
                     if Item."Costing Method" = Item."Costing Method"::Standard then
@@ -2693,7 +2686,7 @@ table 39 "Purchase Line"
                 Item: Record Item;
                 Resource: Record Resource;
                 IsHandled: Boolean;
-                ShouldUpdateItemReference, ShouldUpdateNonSubcontractingDocument : Boolean;
+                ShouldUpdateItemReference: Boolean;
             begin
                 TestStatusOpen();
                 TestField("Quantity Received", 0);
@@ -2718,11 +2711,10 @@ table 39 "Purchase Line"
                 end;
                 SetUnitOfMeasure();
                 ShouldUpdateItemReference := Type = Type::Item;
-                ShouldUpdateNonSubcontractingDocument := "Prod. Order No." = '';
-                OnValidateUnitOfMeasureCodeOnAfterCalcShouldUpdateItemReference(Rec, ShouldUpdateItemReference, ShouldUpdateNonSubcontractingDocument);
+                OnValidateUnitOfMeasureCodeOnAfterCalcShouldUpdateItemReference(Rec, ShouldUpdateItemReference);
                 if ShouldUpdateItemReference then
                     UpdateItemReference();
-                if ShouldUpdateNonSubcontractingDocument then
+                if "Prod. Order No." = '' then
                     case Type of
                         Type::Item:
                             begin
@@ -5200,7 +5192,6 @@ table 39 "Purchase Line"
     var
         Item: Record Item;
         DiscountAmountPerQty: Decimal;
-        ShouldCalcStandardUnitCostLCY: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -5241,9 +5232,7 @@ table 39 "Purchase Line"
         end else
             "Unit Cost (LCY)" := "Unit Cost";
 
-        ShouldCalcStandardUnitCostLCY := (Type = Type::Item) and ("Prod. Order No." = '');
-        OnUpdateUnitCostOnBeforeCalcStandardUnitCostLCY(Rec, ShouldCalcStandardUnitCostLCY);
-        if ShouldCalcStandardUnitCostLCY then begin
+        if (Type = Type::Item) and ("Prod. Order No." = '') then begin
             GetItem(Item);
             if Item."Costing Method" = Item."Costing Method"::Standard then begin
                 if GetSKU() then
@@ -5669,16 +5658,12 @@ table 39 "Purchase Line"
                     LocalGLAcc.Get(FAPostingGr.GetMaintenanceExpenseAccount());
             end;
 
-        IsHandled := false;
-        OnGetFAPostingGroupOnBeforeCheckGLAcc(Rec, LocalGLAcc, FADeprBook, IsHandled);
-        if not IsHandled then begin
-            LocalGLAcc.CheckGLAcc();
-            if not ApplicationAreaMgmt.IsSalesTaxEnabled() then
-                LocalGLAcc.TestField("Gen. Prod. Posting Group");
-            "Posting Group" := FADeprBook."FA Posting Group";
-            "Gen. Prod. Posting Group" := LocalGLAcc."Gen. Prod. Posting Group";
-            "Tax Group Code" := LocalGLAcc."Tax Group Code";
-        end;
+        LocalGLAcc.CheckGLAcc();
+        if not ApplicationAreaMgmt.IsSalesTaxEnabled() then
+            LocalGLAcc.TestField("Gen. Prod. Posting Group");
+        "Posting Group" := FADeprBook."FA Posting Group";
+        "Gen. Prod. Posting Group" := LocalGLAcc."Gen. Prod. Posting Group";
+        "Tax Group Code" := LocalGLAcc."Tax Group Code";
         ValidateVATProdPostingGroupFromGLAcc(LocalGLAcc);
 
         OnAfterGetFAPostingGroup(Rec, LocalGLAcc);
@@ -10837,12 +10822,12 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateLocationCodeOnBeforeDropShipmentError(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; xPurchaseLine: Record "Purchase Line")
+    local procedure OnValidateLocationCodeOnBeforeDropShipmentError(PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; xPurchaseLine: Record "Purchase Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateLocationCodeOnBeforeSpecialOrderError(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; CurrFieldNo: Integer; xPurchaseLine: Record "Purchase Line")
+    local procedure OnValidateLocationCodeOnBeforeSpecialOrderError(PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; CurrFieldNo: Integer; xPurchaseLine: Record "Purchase Line")
     begin
     end;
 
@@ -10952,7 +10937,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateUnitOfMeasureCodeOnAfterCalcShouldUpdateItemReference(var PurchaseLine: Record "Purchase Line"; var ShouldUpdateItemReference: Boolean; var ShouldUpdateNonSubcontractingDocument: Boolean)
+    local procedure OnValidateUnitOfMeasureCodeOnAfterCalcShouldUpdateItemReference(var PurchaseLine: Record "Purchase Line"; var ShouldUpdateItemReference: Boolean)
     begin
     end;
 
@@ -11230,7 +11215,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateLocationCodeOnAfterTestStatusOpen(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; var ShouldExit: Boolean)
+    local procedure OnValidateLocationCodeOnAfterTestStatusOpen(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -11684,21 +11669,6 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(true, false)]
     local procedure OnValidateOrderDateOnBeforeCheckDateConflict(var PurchaseLine: Record "Purchase Line"; CurrFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetFAPostingGroupOnBeforeCheckGLAcc(var PurchaseLine: Record "Purchase Line"; var GLAccount: Record "G/L Account"; FADeprBook: Record "FA Depreciation Book"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateUnitCostOnBeforeCalcStandardUnitCostLCY(var PurchaseLine: Record "Purchase Line"; var ShouldCalcStandardUnitCostLCY: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateIndirectCostOnAfterCalcShouldCheckCostingMethod(var PurchaseLine: Record "Purchase Line"; var ShouldCheckCostingMethod: Boolean)
     begin
     end;
 }
