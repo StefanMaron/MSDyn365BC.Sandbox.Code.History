@@ -173,15 +173,14 @@ codeunit 5705 "TransferOrder-Post Receipt"
 
         MakeInventoryAdjustment();
 
-        if InvtSetup.UseLegacyPosting() then begin
-            ValueEntry.LockTable();
-            ItemLedgEntry.LockTable();
-            ItemApplnEntry.LockTable();
-            ItemReg.LockTable();
-            if WhsePosting then
-                WhseEntry.LockTable();
-        end;
+        ValueEntry.LockTable();
+        ItemLedgEntry.LockTable();
+        ItemApplnEntry.LockTable();
+        ItemReg.LockTable();
         TransLine.LockTable();
+        if WhsePosting then
+            WhseEntry.LockTable();
+
         TransLine.SetFilter(Quantity, '<>0');
         TransLine.SetFilter("Qty. to Receive", '<>0');
         if TransLine.Find('-') then
@@ -348,7 +347,6 @@ codeunit 5705 "TransferOrder-Post Receipt"
         ItemJnlLine."Prod. Order Comp. Line No." := TransRcptLine2."Prod. Order Comp. Line No.";
         ItemJnlLine."Subcontr. Purch. Order No." := TransRcptLine."Subcontr. Purch. Order No.";
         ItemJnlLine."Subcontr. Purch. Order Line" := TransRcptLine."Subcontr. Purch. Order Line";
-        OnPostItemJnlLineOnBeforeWriteDownDerivedLines(ItemJnlLine, TransLine3, TransRcptHeader2, TransRcptLine2);
         WriteDownDerivedLines(TransLine3);
         ItemJnlPostLine.SetPostponeReservationHandling(true);
 
@@ -493,7 +491,6 @@ codeunit 5705 "TransferOrder-Post Receipt"
                         TransLine4."Qty. to Receive" := 0;
                     end;
                 end;
-                OnWriteDownDerivedLinesOnAfterAssignTracking(TransLine4, TempDerivedSpecification, TrackingSpecificationExists);
                 if TransLine4."Qty. to Receive (Base)" <= BaseQtyToReceive then begin
                     ReserveTransLine.TransferTransferToItemJnlLine(
                       TransLine4, ItemJnlLine, TransLine4."Qty. to Receive (Base)", Enum::"Transfer Direction"::Inbound);
@@ -1069,17 +1066,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunWithCheckOnBeforeModifyTransferHeader(var TransferHeader: Record "Transfer Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostItemJnlLineOnBeforeWriteDownDerivedLines(var ItemJournalLine: Record "Item Journal Line"; var TransferLine: Record "Transfer Line"; var TransferReceiptHeader: Record "Transfer Receipt Header"; var TransferReceiptLine: Record "Transfer Receipt Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnWriteDownDerivedLinesOnAfterAssignTracking(var TransferLine: Record "Transfer Line"; var TrackingSpecification: Record "Tracking Specification"; TrackingSpecificationExists: boolean)
+    local procedure OnRunWithCheckOnBeforeModifyTransferHeader(var TransferHeader: Record "Transfer Header");
     begin
     end;
 
