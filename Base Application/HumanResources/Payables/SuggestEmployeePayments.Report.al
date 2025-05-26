@@ -31,7 +31,7 @@ report 394 "Suggest Employee Payments"
                 if StopPayments then
                     CurrReport.Break();
                 Window.Update(1, "No.");
-                if IncludeEmployee(Employee, EmployeeBalance) then begin
+                if EmployeeBalance > 0 then begin
                     GetEmplLedgEntries(true);
                     GetEmplLedgEntries(false);
                     CheckAmounts();
@@ -841,14 +841,6 @@ report 394 "Suggest Employee Payments"
         GenJnlLine2."Bal. Account No." := GenJnlBatch."Bal. Account No.";
     end;
 
-    local procedure IncludeEmployee(Employee: Record Employee; EmployeeBalance: Decimal) Result: Boolean
-    begin
-        Result := EmployeeBalance > 0;
-
-        OnAfterIncludeEmployee(Employee, EmployeeBalance, Result);
-    end;
-
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateDimensions(var GenJournalLine: Record "Gen. Journal Line"; SummarizePerEmpl: Boolean)
     begin
@@ -866,11 +858,6 @@ report 394 "Suggest Employee Payments"
 
     [IntegrationEvent(false, false)]
     local procedure OnGetEmplLedgEntriesOnAfterSetFilters(var EmployeeLedgerEntry: Record "Employee Ledger Entry"; Positive: Boolean; SkipExportedPayments: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterIncludeEmployee(Employee: Record Employee; EmployeeBalance: Decimal; var Result: Boolean)
     begin
     end;
 }
