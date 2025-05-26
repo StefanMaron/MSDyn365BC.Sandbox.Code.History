@@ -12,7 +12,6 @@ using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
-using System.Utilities;
 
 codeunit 2000042 "Post Coded Bank Statement"
 {
@@ -73,7 +72,6 @@ codeunit 2000042 "Post Coded Bank Statement"
     procedure "Code"()
     var
         CodedBankStmtLine: Record "CODA Statement Line";
-        ConfirmManagement: Codeunit "Confirm Management";
     begin
         CodedBankStmtLine.SetCurrentKey("Bank Account No.", "Statement No.", "Statement Line No.");
         CodedBankStmtLine.CopyFilters(CodBankStmtLine);
@@ -82,7 +80,7 @@ codeunit 2000042 "Post Coded Bank Statement"
         if not CodedBankStmtLine.IsEmpty() then
             Error(Text000);
 
-        if not ConfirmManagement.GetResponseOrDefault(Text001, true) then
+        if not Confirm(Text001, false) then
             exit;
 
         CodedBankStmtLine.Reset();
