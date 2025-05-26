@@ -1499,6 +1499,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM CETAF Inventory Valuation - NamedType OpenOutboudEntryErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3520103777 - NamedType 435233247" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Incorrect caption]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Copy Document Mgt. - NamedType CaptionNotMatchErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3520103777 - NamedType 2496471266" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[have a Corrected Invoice No. Do you want to continue?]]></Val>
@@ -3425,6 +3434,15 @@
       <Cmt Name="Dev"><![CDATA[%1= Dimension Value]D;]A;(LookupHint=Codeunit SCM Inventory Documents - NamedType DimensionValueErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 917041221 - NamedType 248647599" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[is before work date]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Documents - NamedType DueDateBeforeWorkDateMsg)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 917041221 - NamedType 4144387699" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Item No. are not equal]]></Val>
@@ -3792,6 +3810,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Item Tracking II - NamedType QtyToInvoiceDoesNotMatchItemTrackingErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2769833927 - NamedType 731024551" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reservation is not created for Sales Order: %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Sales Order No.]D;]A;(LookupHint=Codeunit SCM Inventory Item Tracking II - NamedType ReservationIsNotCreatedForSOErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2769833927 - NamedType 4109136451" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -4449,6 +4476,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Miscellaneous II - NamedType FirmPlannedProdMessage)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2137039471 - NamedType 1965496285" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Inventory Movement is not registered.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Miscellaneous II - NamedType InventoryMovementIsNotRegisteredErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2137039471 - NamedType 2129549005" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -5432,6 +5468,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Categories - NamedType RenamingErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 167793459 - NamedType 1434876051" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Block Movement must not be All in Bin Content Location Code='%1',Bin Code='%2',Item No.='%3',Variant Code='%4',Unit of Measure Code='%5'.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1= Location Code, %2= Bin Code, %3= Item No., %4= Varient Code, %5= Unit of Measure Code]D;]A;(LookupHint=Codeunit SCM Item Journal - NamedType BlockedBinContentErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 167793459 - NamedType 643940626" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Block Movement must not be All in Bin]]></Val>
@@ -5538,6 +5583,33 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Journal - NamedType UnitCostCannotBeChangedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 167793459 - NamedType 306311142" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 value must be equal to %2 in %3]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Field Name, %2= Expected Value, %3 = Table Name]D;]A;(LookupHint=Codeunit SCM Item Journal - NamedType ValueMustBeEqualErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 167793459 - NamedType 3537898559" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 Value must be negative]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1=FieldName]D;]A;(LookupHint=Codeunit SCM Item Journal - NamedType ValueMustBeNegativeErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 167793459 - NamedType 837997799" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 Value must be positive]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1=FieldName]D;]A;(LookupHint=Codeunit SCM Item Journal - NamedType ValueMustBePositiveErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3790605068 - NamedType 4264773054" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
