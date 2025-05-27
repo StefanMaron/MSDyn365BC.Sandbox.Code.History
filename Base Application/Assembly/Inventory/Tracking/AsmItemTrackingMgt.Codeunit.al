@@ -213,8 +213,6 @@ codeunit 935 "Asm. Item Tracking Mgt."
                 TempTrackingSpecification."Qty. per Unit of Measure" := ItemLedgerEntry."Qty. per Unit of Measure";
                 TempTrackingSpecification.InitQtyToShip();
 
-                if TempTrackingSpecification."Quantity (Base)" * CurrentSignFactor > Abs(MaxQtyBase - CurrentQtyBase) then
-                    TempTrackingSpecification."Quantity (Base)" := MaxQtyBase - CurrentQtyBase;
                 CurrentQtyBase += TempTrackingSpecification."Quantity (Base)";
 
                 sender.RunOnBeforeCollectTempTrackingSpecificationInsert(TempTrackingSpecification, ItemLedgerEntry, TrackingSpecification);
