@@ -1569,16 +1569,11 @@ page 47 "Sales Invoice Subform"
     end;
 
     procedure DeltaUpdateTotals()
-    var
-        IsHandled: Boolean;
     begin
         if SuppressTotals then
             exit;
 
-        IsHandled := false;
-        OnBeforeDeltaUpdateTotals(Rec, xRec, SuppressTotals, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeDeltaUpdateTotals(Rec, xRec, SuppressTotals);
 
         DocumentTotals.SalesDeltaUpdateTotals(Rec, xRec, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
         if Rec."Line Amount" <> xRec."Line Amount" then
@@ -1723,7 +1718,7 @@ page 47 "Sales Invoice Subform"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; SuppressTotals: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; SuppressTotals: Boolean)
     begin
     end;
 
