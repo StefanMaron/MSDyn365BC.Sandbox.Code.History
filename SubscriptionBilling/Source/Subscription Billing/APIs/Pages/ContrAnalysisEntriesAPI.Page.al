@@ -1,4 +1,3 @@
-#pragma warning disable AA0247
 page 8087 "Contr. Analysis Entries API"
 {
     APIGroup = 'subsBilling';

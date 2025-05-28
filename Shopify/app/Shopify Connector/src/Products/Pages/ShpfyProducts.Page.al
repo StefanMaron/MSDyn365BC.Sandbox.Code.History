@@ -351,10 +351,7 @@ page 30126 "Shpfy Products"
                     var
                         BackgroundSyncs: Codeunit "Shpfy Background Syncs";
                     begin
-                        if Rec."Shop Code" <> '' then
-                            BackgroundSyncs.ProductsSync(Rec."Shop Code")
-                        else
-                            BackgroundSyncs.ProductsSync(CopyStr(Rec.GetFilter("Shop Code"), 1, MaxStrLen(Rec."Shop Code")));
+                        BackgroundSyncs.ProductsSync(Rec."Shop Code");
                     end;
                 }
                 action(SyncProductPrices)
@@ -372,10 +369,7 @@ page 30126 "Shpfy Products"
                     var
                         BackgroundSyncs: Codeunit "Shpfy Background Syncs";
                     begin
-                        if Rec."Shop Code" <> '' then
-                            BackgroundSyncs.ProductPricesSync(Rec."Shop Code")
-                        else
-                            BackgroundSyncs.ProductPricesSync(CopyStr(Rec.GetFilter("Shop Code"), 1, MaxStrLen(Rec."Shop Code")));
+                        BackgroundSyncs.ProductPricesSync(Rec."Shop Code");
                     end;
                 }
                 action(SyncImages)
@@ -392,10 +386,7 @@ page 30126 "Shpfy Products"
                     var
                         BackgroundSyncs: Codeunit "Shpfy Background Syncs";
                     begin
-                        if Rec."Shop Code" <> '' then
-                            BackgroundSyncs.ProductImagesSync(Rec."Shop Code", '')
-                        else
-                            BackgroundSyncs.ProductImagesSync(CopyStr(Rec.GetFilter("Shop Code"), 1, MaxStrLen(Rec."Shop Code")), '');
+                        BackgroundSyncs.ProductImagesSync(Rec."Shop Code", '');
                     end;
                 }
                 action(SyncInventory)
@@ -412,10 +403,7 @@ page 30126 "Shpfy Products"
                     var
                         BackgroundSyncs: Codeunit "Shpfy Background Syncs";
                     begin
-                        if Rec."Shop Code" <> '' then
-                            BackgroundSyncs.InventorySync(Rec."Shop Code")
-                        else
-                            BackgroundSyncs.InventorySync(CopyStr(Rec.GetFilter("Shop Code"), 1, MaxStrLen(Rec."Shop Code")));
+                        BackgroundSyncs.InventorySync(Rec."Shop Code");
                     end;
                 }
             }
