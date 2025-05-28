@@ -1,4 +1,4 @@
-codeunit 134887 "ERM G/L Currency Revaluation"
+﻿codeunit 134887 "ERM G/L Currency Revaluation"
 {
     // // [FEATURE] [G/L Currency Revaluation]
 
@@ -397,6 +397,13 @@ codeunit 134887 "ERM G/L Currency Revaluation"
         DocumentNo := GenJournalLine."Document No.";
         LibraryERM.PostGeneralJnlLine(GenJournalLine);
 
+        // Verify payables posting amount in Source Currency
+        GLEntry.SetRange("Posting Date", GenJournalLine."Posting Date");
+        GLEntry.SetRange("Document No.", GenJournalLine."Document No.");
+        GLEntry.FindLast();
+        GLEntry.TestField("Source Currency Code", Customer."Currency Code");
+        GLEntry.TestField("Source Currency Amount", GenJournalLine.Amount);
+
         // Post payment with another exchange rate
         CreateCustomerJournal(
             GenJournalLine, Customer, "Gen. Journal Document Type"::Payment, WorkDate() + 30,
@@ -456,6 +463,13 @@ codeunit 134887 "ERM G/L Currency Revaluation"
             GenJournalLine."Bal. Account Type"::"G/L Account", BalGLAccount."No.", -Amount);
         DocumentNo := GenJournalLine."Document No.";
         LibraryERM.PostGeneralJnlLine(GenJournalLine);
+
+        // Verify payables posting amount in Source Currency
+        GLEntry.SetRange("Posting Date", GenJournalLine."Posting Date");
+        GLEntry.SetRange("Document No.", GenJournalLine."Document No.");
+        GLEntry.FindLast();
+        GLEntry.TestField("Source Currency Code", Vendor."Currency Code");
+        GLEntry.TestField("Source Currency Amount", GenJournalLine.Amount);
 
         // Post payment with another exchange rate
         CreateVendorJournal(
