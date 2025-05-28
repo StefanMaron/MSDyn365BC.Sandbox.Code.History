@@ -311,12 +311,7 @@ table 9053 "Sales Cue"
         SalesLine: Record "Sales Line";
         ReservationEntry: Record "Reservation Entry";
         SalesReservFromItemLedger: Query "Sales Reserv. From Item Ledger";
-        IsHandled: Boolean;
     begin
-        OnBeforeCalcNoOfReservedFromStockSalesOrders(SalesHeader, Number, IsHandled);
-        if IsHandled then
-            exit(Number);
-
         Number := 0;
 
         if not ReservationEntry.ReadPermission() then
@@ -350,7 +345,6 @@ table 9053 "Sales Cue"
         [SecurityFiltering(SecurityFilter::Filtered)]
         SalesHeader: Record "Sales Header";
     begin
-        OnBeforeDrillDownNoOfReservedFromStockSalesOrders(SalesHeader);
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
         SalesHeader.SetLoadFields("Document Type", "No.");
         if SalesHeader.FindSet() then
@@ -384,16 +378,6 @@ table 9053 "Sales Cue"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSummarizeDelayedData(var SalesHeader: Record "Sales Header"; var SumDelayDays: Integer; var CountDelayedInvoices: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeDrillDownNoOfReservedFromStockSalesOrders(var SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcNoOfReservedFromStockSalesOrders(var SalesHeader: Record "Sales Header"; var Number: Integer; var IsHandled: Boolean)
     begin
     end;
 }
