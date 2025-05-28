@@ -213,6 +213,8 @@ codeunit 935 "Asm. Item Tracking Mgt."
                 TempTrackingSpecification."Qty. per Unit of Measure" := ItemLedgerEntry."Qty. per Unit of Measure";
                 TempTrackingSpecification.InitQtyToShip();
 
+                if TempTrackingSpecification."Quantity (Base)" * CurrentSignFactor > Abs(MaxQtyBase - CurrentQtyBase) then
+                    TempTrackingSpecification."Quantity (Base)" := MaxQtyBase - CurrentQtyBase;
                 CurrentQtyBase += TempTrackingSpecification."Quantity (Base)";
 
                 sender.RunOnBeforeCollectTempTrackingSpecificationInsert(TempTrackingSpecification, ItemLedgerEntry, TrackingSpecification);
@@ -231,23 +233,4 @@ codeunit 935 "Asm. Item Tracking Mgt."
             IsHandled := true;
         end;
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Inventory Profile Offsetting", OnCheckIsSNSpecificTracking, '', false, false)]
-    local procedure OnCheckIsSNSpecificTracking(ItemTrackingCode: Record "Item Tracking Code"; var SNSepecificTracking: Boolean)
-    begin
-        if SNSepecificTracking then
-            exit;
-
-        SNSepecificTracking := ItemTrackingCode."SN Assembly Inbound Tracking" or ItemTrackingCode."SN Assembly Outbound Tracking";
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Inventory Profile Offsetting", OnCheckIsLotSpecificTracking, '', false, false)]
-    local procedure OnCheckIsLotSpecificTracking(ItemTrackingCode: Record "Item Tracking Code"; var LotSepecificTracking: Boolean)
-    begin
-        if LotSepecificTracking then
-            exit;
-
-        LotSepecificTracking := ItemTrackingCode."Lot Assembly Inbound Tracking" or ItemTrackingCode."Lot Assembly Outbound Tracking";
-    end;
-
 }
