@@ -8,7 +8,6 @@ using Microsoft.CRM.Contact;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Purchases.Vendor;
-using System.Environment;
 using Microsoft.Sales.Customer;
 using Microsoft.Utilities;
 using System;
@@ -25,7 +24,7 @@ codeunit 249 "VAT Registration Log Mgt."
 
     var
         DataTypeManagement: Codeunit "Data Type Management";
-        ClientTypeManagement: Codeunit "Client Type Management";
+
         ValidPathTxt: Label 'descendant::vat:valid', Locked = true;
         NamePathTxt: Label 'descendant::vat:traderName', Locked = true;
         AddressPathTxt: Label 'descendant::vat:traderAddress', Locked = true;
@@ -39,7 +38,6 @@ codeunit 249 "VAT Registration Log Mgt."
         VATSrvDisclaimerUrlTok: Label 'https://go.microsoft.com/fwlink/?linkid=841741', Locked = true;
         DescriptionLbl: Label 'EU VAT Reg. No. Validation Service Setup';
         UnexpectedResponseErr: Label 'The VAT registration number could not be verified because the VIES VAT Registration No. service may be currently unavailable for the selected EU state, %1.', Comment = '%1 - Country / Region Code';
-        UnexpectedResponseQst: Label 'The VAT registration number could not be verified because the VIES VAT Registration No. service may be currently unavailable for the selected EU state, %1. Do you want to continue without validation?', Comment = '%1 - Country / Region Code';
         EUVATRegNoValidationServiceTok: Label 'EUVATRegNoValidationServiceTelemetryCategoryTok', Locked = true;
         ValidationFailureMsg: Label 'VIES service may be currently unavailable', Locked = true;
         NameMatchPathTxt: Label 'descendant::vat:traderNameMatch', Locked = true;
@@ -105,14 +103,7 @@ codeunit 249 "VAT Registration Log Mgt."
     begin
         if not XMLDOMMgt.FindNodeWithNamespace(XMLDoc.DocumentElement, ValidPathTxt, 'vat', Namespace, FoundXmlNode) then begin
             Session.LogMessage('0000C4T', ValidationFailureMsg, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EUVATRegNoValidationServiceTok);
-
-            if not GuiAllowed() then
-                Error(UnexpectedResponseErr);
-
-            if Confirm(StrSubstNo(UnexpectedResponseQst, VATRegistrationLog."Country/Region Code")) then
-                exit
-            else
-                Error('');
+            Error(UnexpectedResponseErr, VATRegistrationLog."Country/Region Code");
         end;
 
         case LowerCase(FoundXmlNode.InnerText) of
@@ -361,13 +352,6 @@ codeunit 249 "VAT Registration Log Mgt."
         if IsHandled then
             exit;
         RecordRef.GetTable(RecordVariant);
-
-        if IsAPIClientType() then
-            exit;
-
-        if not GuiAllowed() then
-            exit;
-
         if not CountryRegion.IsEUCountry(CountryCode) then
             exit; // VAT Reg. check Srv. is only available for EU countries.
 
@@ -490,11 +474,6 @@ codeunit 249 "VAT Registration Log Mgt."
             ServiceConnection.Status := ServiceConnection.Status::Disabled;
         ServiceConnection.InsertServiceConnection(
               ServiceConnection, RecRef.RecordId, DescriptionLbl, VATRegNoSrvConfig."Service Endpoint", PAGE::"VAT Registration Config");
-    end;
-
-    local procedure IsAPIClientType(): Boolean
-    begin
-        exit(ClientTypeManagement.GetCurrentClientType() in [ClientType::Api, ClientType::SOAP, ClientType::OData, ClientType::ODataV4])
     end;
 
     [IntegrationEvent(false, false)]
