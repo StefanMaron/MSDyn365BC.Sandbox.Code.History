@@ -95,7 +95,6 @@ codeunit 2000042 "Post Coded Bank Statement"
         GenJnlLine.SetRange("Journal Template Name", GenJnlTemplate.Name);
         GenJnlManagement.OpenJnl(BatchName, GenJnlLine);
         OnCodeOnBeforeTransferCodBankStmtLines(CodedBankStmtLine, CodBankStmtLine);
-        CheckAccountType(CodBankStmtLine."Bank Account No.", CodBankStmtLine."Statement No.");
         TransferCodBankStmtLines();
     end;
 
@@ -509,18 +508,16 @@ codeunit 2000042 "Post Coded Bank Statement"
             CustLedgEntry2.SetRange("Customer No.", Cust."No.");
             CustLedgEntry2.SetRange(Open, true);
             CustLedgEntry2.SetRange(Positive, CodBankStmtLine."Statement Amount" > 0);
-            OnSearchCustLedgEntryOnAfterCustLedgEntry2SetFilters(CustLedgEntry2, CodBankStmtLine);
             if CustLedgEntry2.FindSet() then
                 repeat
                     CustLedgEntry2.CalcFields("Remaining Amount");
                     if CustLedgEntry2."Remaining Amount" = CodBankStmtLine."Statement Amount" then begin
                         Found := Found + 1;
-                        if CheckCustLedgEntry(CustLedgEntry2, Found) then
-                            CustLedgEntry := CustLedgEntry2;
+                        CustLedgEntry := CustLedgEntry2;
                     end;
                 until CustLedgEntry2.Next() = 0;
             // Multiple Entries with Same Amount: Do Not Assign
-            if (Found = 0) or ((Found > 1) and (CustLedgEntry."Payment Reference" = '')) then
+            if Found <> 1 then
                 Clear(CustLedgEntry);
             CustLedgEntry."Customer No." := Cust."No.";
 
@@ -769,75 +766,6 @@ codeunit 2000042 "Post Coded Bank Statement"
         OnAfterInitCodBankStmtLine(CodBankStmtLine, CodedTrans, AccountType, UpdateApplicationAmounts);
     end;
 
-    local procedure CheckAccountType(BankAccountNo: Code[20]; StatementNo: Code[20])
-    var
-        CODAStatementLine: Record "CODA Statement Line";
-    begin
-        CODAStatementLine.SetRange("Bank Account No.", BankAccountNo);
-        CODAStatementLine.SetRange("Statement No.", StatementNo);
-        CODAStatementLine.SetFilter("Application Status", '%1|%2', CODAStatementLine."Application Status"::Applied, CODAStatementLine."Application Status"::"Partly applied");
-        CodBankStmtLine.SetFilter("Statement Amount", '<>%1', 0);
-        if CODAStatementLine.FindSet() then
-            repeat
-                case CODAStatementLine."Account Type" of
-                    CODAStatementLine."Account Type"::"G/L Account":
-                        GetGLAccount(CODAStatementLine."Account No.");
-                    CODAStatementLine."Account Type"::Customer:
-                        GetCustomerAccount(CODAStatementLine."Account No.");
-                    CODAStatementLine."Account Type"::Vendor:
-                        GetVendorAccount(CODAStatementLine."Account No.");
-                end;
-            until CODAStatementLine.Next() = 0;
-    end;
-
-    local procedure GetGLAccount(AccountNo: Code[20])
-    var
-        GLAccount: Record "G/L Account";
-    begin
-        GLAccount.Get(AccountNo);
-        GLAccount.CheckGLAcc();
-    end;
-
-    local procedure GetCustomerAccount(AccountNo: Code[20])
-    var
-        Customer: Record Customer;
-    begin
-        Customer.Get(AccountNo);
-        if Customer.Blocked = Customer.Blocked::" " then
-            exit;
-
-        Customer.CustBlockedErrorMessage(Customer, true)
-    end;
-
-    local procedure GetVendorAccount(AccountNo: Code[20])
-    var
-        Vendor: Record Vendor;
-    begin
-        Vendor.Get(AccountNo);
-        if Vendor.Blocked = Vendor.Blocked::" " then
-            exit;
-
-        Vendor.VendBlockedErrorMessage(Vendor, true)
-    end;
-
-    local procedure CheckCustLedgEntry(CustLedgEntry2: Record "Cust. Ledger Entry"; Found: Integer): Boolean
-    var
-        StatementMessage: Text;
-    begin
-        if Found = 1 then
-            exit(true);
-
-        if CustLedgEntry2."Payment Reference" = '' then
-            exit(false);
-
-        StatementMessage := CopyStr(CodBankStmtLine."Statement Message", 1, StrLen(CustLedgEntry2."Payment Reference"));
-        if StatementMessage = '' then
-            exit(false);
-
-        if CustLedgEntry2."Payment Reference" = StatementMessage then
-            exit(true);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitCodBankStmtLine(var CodBankStmtLine: Record "CODA Statement Line"; TransactionCoding: Record "Transaction Coding"; AccountType: Integer; UpdateApplicationAmounts: Boolean)
     begin
@@ -865,11 +793,6 @@ codeunit 2000042 "Post Coded Bank Statement"
 
     [IntegrationEvent(false, false)]
     local procedure OnDecodeVendLedgEntryOnAfterVendLedgEntrySetFilters(var VendLedgEntry: Record "Vendor Ledger Entry"; var CODAStatementLine: Record "CODA Statement Line"; var Message: Text[50])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSearchCustLedgEntryOnAfterCustLedgEntry2SetFilters(var CustLedgerEntry: Record "Cust. Ledger Entry"; var CODAStatementLine: Record "CODA Statement Line")
     begin
     end;
 
