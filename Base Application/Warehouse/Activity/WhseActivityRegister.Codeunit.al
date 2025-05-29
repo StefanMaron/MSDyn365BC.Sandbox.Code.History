@@ -148,7 +148,7 @@ codeunit 7307 "Whse.-Activity-Register"
         RegisterWhseActivityLines(GlobalWhseActivLine, TempWhseActivLineToReserve, TempWhseActivityLineGrouped);
         GlobalWhseActivLine.SetRange("Breakbulk No.");
 
-        OnCodeOnBeforeTempWhseActivityLineGroupedLoop(GlobalWhseActivHeader, GlobalWhseActivLine, RegisteredWhseActivHeader, TempWhseActivityLineGrouped);
+        OnCodeOnBeforeTempWhseActivityLineGroupedLoop(GlobalWhseActivHeader, GlobalWhseActivLine, RegisteredWhseActivHeader);
         TempWhseActivityLineGrouped.Reset();
         if TempWhseActivityLineGrouped.FindSet() then
             repeat
@@ -2804,7 +2804,7 @@ codeunit 7307 "Whse.-Activity-Register"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforeTempWhseActivityLineGroupedLoop(var WhseActivHeader: Record "Warehouse Activity Header"; var WhseActivLine: Record "Warehouse Activity Line"; var RegisteredWhseActivHeader: Record "Registered Whse. Activity Hdr."; var TempWarehouseActivityLineGrouped: Record "Warehouse Activity Line" temporary)
+    local procedure OnCodeOnBeforeTempWhseActivityLineGroupedLoop(var WhseActivHeader: Record "Warehouse Activity Header"; var WhseActivLine: Record "Warehouse Activity Line"; var RegisteredWhseActivHeader: Record "Registered Whse. Activity Hdr.")
     begin
     end;
 
