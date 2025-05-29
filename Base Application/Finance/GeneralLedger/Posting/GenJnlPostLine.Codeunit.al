@@ -435,12 +435,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
         GLEntry: Record "G/L Entry";
         LastEntryNo: Integer;
         LastTransactionNo: Integer;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeInitNextEntryNo(GLEntry, NextEntryNo, NextTransactionNo, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeInitNextEntryNo(GLEntry);
 
         GLEntry.LockTable();
         GLEntry.GetLastEntry(LastEntryNo, LastTransactionNo);
@@ -2053,7 +2049,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         LastSourceCurrencyTaxAmountCredit := 0;
         if TempGLEntryBuf.FindSet() then begin
             repeat
-                if (TempGLEntryBuf."Source Currency Code" <> '') and (GenJournalLine."Deferral Code" = '') then
+                if TempGLEntryBuf."Source Currency Code" <> '' then
                     UpdateSourceCurrencyAmounts(TempGLEntryBuf, LastSourceCurrencyVATAmount, LastSourceCurrencyTaxAmountCredit);
                 TempGLEntryPreview := TempGLEntryBuf;
                 TempGLEntryPreview.Insert();
@@ -2152,9 +2148,9 @@ codeunit 12 "Gen. Jnl.-Post Line"
             else begin
                 GLEntry."Source Currency VAT Amount" := GenJnlLine."Source Curr. VAT Amount";
                 if GLEntry."Source Currency VAT Amount" = 0 then
-                    GLEntry."Source Currency Amount" := GetSourceCurrencyAmount(GenJnlLine, GLEntry.Amount > 0, true)
+                    GLEntry."Source Currency Amount" := GenJnlLine."Source Currency Amount"
                 else
-                    GLEntry."Source Currency Amount" := GetSourceCurrencyAmount(GenJnlLine, GLEntry.Amount > 0, false);
+                    GLEntry."Source Currency Amount" := GenJnlLine."Source Curr. VAT Base Amount";
             end;
         end;
     end;
@@ -2266,8 +2262,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
             UpdateGLEntrySourceCurrencyFields(GLEntry, GenJnlLine);
             GenJnlLine."Entry No." := NextEntryNo;
             UseVendExchRate := false;
-            if (GLEntry."Source Currency Code" <> '') and (GenJnlLine."Deferral Code" <> '') then
-                GLEntry."Source Currency Amount" := AmountAddCurr;
         end;
 
         OnAfterInitGLEntry(GLEntry, GenJnlLine, Amount, AmountAddCurr, UseAmountAddCurr, CurrencyFactor, GLReg);
@@ -6697,10 +6691,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
             UpdateEmplLedgEntry(DetailedEmployeeLedgerEntry2);
         until DetailedEmployeeLedgerEntry2.Next() = 0;
 
-        IsHandled := false;
-        OnBeforeCreateGLEntriesForTotalAmountsUnapplyEmployee(DetailedEmployeeLedgerEntry, EmployeePostingGroup, GenJournalLineToPost, TempDimensionPostingBuffer, IsHandled);
-        if not IsHandled then
-            CreateGLEntriesForTotalAmountsUnapply(GenJournalLineToPost, TempDimensionPostingBuffer, EmployeePostingGroup.GetPayablesAccount());
+        CreateGLEntriesForTotalAmountsUnapply(GenJournalLineToPost, TempDimensionPostingBuffer, EmployeePostingGroup.GetPayablesAccount());
 
         if IsTempGLEntryBufEmpty() then
             DetailedEmployeeLedgerEntry.SetZeroTransNo(NextTransactionNo);
@@ -7156,7 +7147,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
             VendLedgEntry."Closed by Currency Amount" := 0;
             VendLedgEntry."Pmt. Disc. Rcd.(LCY)" := 0;
             VendLedgEntry."Pmt. Tolerance (LCY)" := 0;
-            VendLedgEntry."Applies-to Ext. Doc. No." := '';
         end;
         VendLedgEntry."EFT Amount Transferred" := 0;
 
@@ -7779,22 +7769,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
         exit(false);
     end;
 
-    local procedure GetSourceCurrencyAmount(GenJnlLine: Record "Gen. Journal Line"; IsPositive: Boolean; IsSourceCurrVATZero: Boolean): Decimal
-    begin
-        if IsSourceCurrVATZero then
-            exit(UpdateAmountSign(GenJnlLine."Source Currency Amount", IsPositive));
-
-        exit(UpdateAmountSign(GenJnlLine."Source Curr. VAT Base Amount", IsPositive));
-    end;
-
-    local procedure UpdateAmountSign(Amount: Decimal; IsPositive: Boolean): Decimal
-    begin
-        if IsPositive then
-            exit(Abs(Amount))
-        else
-            exit(-Abs(Amount));
-    end;
-
     /// <summary>
     /// Returns offset of adjustment amount.
     /// If amount positive and amount in additional currency is greater than 0 (zero) return value will be 1. If not - return value will be 3.
@@ -7843,13 +7817,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
     /// Variable NextVATEntryNo is used as entry no. when creating vat entries
     /// </remarks>
     procedure IncrNextVATEntryNo()
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeIncrNextVATEntryNo(NextVATEntryNo, IsHandled);
-        if IsHandled then
-            exit;
         NextVATEntryNo := NextVATEntryNo + 1;
     end;
 
@@ -7860,13 +7828,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
     /// Variable NextEntryNo is used as entry no. when creating ledger entries
     /// </remarks>
     procedure IncrNextEntryNo()
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeIncrNextEntryNo(NextEntryNo, IsHandled);
-        if IsHandled then
-            exit;
         NextEntryNo := NextEntryNo + 1;
     end;
 
@@ -12928,7 +12890,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitNextEntryNo(var GLEntry: Record "G/L Entry"; var NextEntryNo: Integer; var NextTransactionNo: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeInitNextEntryNo(var GLEntry: Record "G/L Entry")
     begin
     end;
 
@@ -12974,21 +12936,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
 
     [IntegrationEvent(true, false)]
     local procedure OnCodeOnAfterCheckGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; CheckLine: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeCreateGLEntriesForTotalAmountsUnapplyEmployee(DetailedEmployeeLedgerEntry: Record "Detailed Employee Ledger Entry"; var EmployeePostingGroup: Record "Employee Posting Group"; GenJournalLine: Record "Gen. Journal Line"; var TempDimPostingBuffer: Record "Dimension Posting Buffer" temporary; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIncrNextVATEntryNo(var NextVATEntryNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIncrNextEntryNo(var NextEntryNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
