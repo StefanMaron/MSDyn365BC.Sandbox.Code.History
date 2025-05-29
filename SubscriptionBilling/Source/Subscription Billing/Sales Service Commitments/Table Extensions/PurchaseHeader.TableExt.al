@@ -13,7 +13,7 @@ tableextension 8061 "Purchase Header" extends "Purchase Header"
         }
     }
 
-    local procedure GetLastLineNo(): Integer
+    internal procedure GetLastLineNo(): Integer
     var
         PurchaseLine: Record "Purchase Line";
     begin
