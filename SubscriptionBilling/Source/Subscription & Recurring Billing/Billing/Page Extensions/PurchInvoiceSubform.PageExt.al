@@ -4,20 +4,10 @@ using Microsoft.Purchases.Document;
 
 pageextension 8071 "Purch Invoice Subform" extends "Purch. Invoice Subform"
 {
-    layout
-    {
-        addafter(Description)
-        {
-            field("Attached to Contract Line"; Rec."Attached to Contract line")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies that the invoice line is linked to a contract line.';
-            }
-        }
-    }
     actions
     {
-        addlast("Related Information")
+
+        addlast(processing)
         {
             action(ShowBillingLines)
             {
@@ -51,29 +41,15 @@ pageextension 8071 "Purch Invoice Subform" extends "Purch. Invoice Subform"
                     Page.RunModal(Page::"Usage Data Billings", UsageDataBilling);
                 end;
             }
-            action("Assign Contract Line")
-            {
-                ApplicationArea = All;
-                Caption = 'Assign Contract Line';
-                Image = GetOrder;
-                ToolTip = 'Select a corresponding Vendor Contract line.';
-                Enabled = ContractLineCanBeAssigned;
 
-                trigger OnAction()
-                begin
-                    Rec.AssignVendorContractLine();
-                end;
-            }
         }
     }
     trigger OnAfterGetCurrRecord()
     begin
         IsConnectedToBillingLine := Rec.IsLineAttachedToBillingLine();
-        ContractLineCanBeAssigned := Rec.IsContractLineAssignable();
     end;
 
     var
         ContractsGeneralMgt: Codeunit "Contracts General Mgt.";
         IsConnectedToBillingLine: Boolean;
-        ContractLineCanBeAssigned: Boolean;
 }
