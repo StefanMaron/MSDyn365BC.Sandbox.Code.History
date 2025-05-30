@@ -1,8 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-// ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Document;
+﻿namespace Microsoft.Sales.Document;
 
 using Microsoft.Assembly.Document;
 using Microsoft.Bank.BankAccount;
@@ -261,8 +257,6 @@ table 36 "Sales Header"
 
                 IsHandled := false;
                 OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
 
                 if BilltoCustomerNoChanged and not IsHandled then
                     if xRec."Bill-to Customer No." = '' then
@@ -4605,8 +4599,7 @@ table 36 "Sales Header"
                                 SalesLine.Validate("Shipment Date", "Shipment Date");
                         FieldNo("Currency Factor"):
                             if SalesLine.Type <> SalesLine.Type::" " then begin
-                                if SalesLine."Line Discount %" <> 0 then
-                                    SalesLine.Validate("Unit Price");
+                                SalesLine.Validate("Unit Price");
                                 SalesLine.Validate("Unit Cost (LCY)");
                                 if SalesLine."Job No." <> '' then
                                     JobTransferLine.FromSalesHeaderToPlanningLine(SalesLine, "Currency Factor");
@@ -7865,7 +7858,6 @@ table 36 "Sales Header"
 
     local procedure UpdateShipToContact()
     var
-        ShipToAddress: Record "Ship-to Address";
         IsHandled: Boolean;
     begin
         if not (CurrFieldNo in [FieldNo("Sell-to Contact"), FieldNo("Sell-to Contact No.")]) then
@@ -7873,11 +7865,6 @@ table 36 "Sales Header"
 
         if IsCreditDocType() then
             exit;
-
-        if "Ship-to Code" <> '' then
-            if ShipToAddress.Get("Sell-to Customer No.", "Ship-to Code") then
-                if ShipToAddress.Contact <> '' then
-                    exit;
 
         IsHandled := false;
         OnUpdateShipToContactOnBeforeValidateShipToContact(Rec, xRec, CurrFieldNo, IsHandled);
@@ -8269,36 +8256,18 @@ table 36 "Sales Header"
     local procedure ModifyBillToCustomerAddress()
     var
         Customer: Record Customer;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeModifyBillToCustomerAddress(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         GetSalesSetup();
         if SalesSetup."Ignore Updated Addresses" then
             exit;
-
         if IsCreditDocType() then
             exit;
-
-        if ("Bill-to Customer No." = "Sell-to Customer No.") then
-            exit;
-
-        if not HasBillToAddress() then
-            exit;
-
-        if not Customer.Get("Bill-to Customer No.") then
-            exit;
-
-        if not HasDifferentBillToAddress(Customer) then
-            exit;
-
-        ShowModifyAddressNotification(GetModifyBillToCustomerAddressNotificationId(),
-          ModifyCustomerAddressNotificationLbl, ModifyCustomerAddressNotificationMsg,
-          'CopyBillToCustomerAddressFieldsFromSalesDocument', "Bill-to Customer No.",
-          "Bill-to Name", FieldName("Bill-to Customer No."));
+        if ("Bill-to Customer No." <> "Sell-to Customer No.") and Customer.Get("Bill-to Customer No.") then
+            if HasBillToAddress() and HasDifferentBillToAddress(Customer) then
+                ShowModifyAddressNotification(GetModifyBillToCustomerAddressNotificationId(),
+                  ModifyCustomerAddressNotificationLbl, ModifyCustomerAddressNotificationMsg,
+                  'CopyBillToCustomerAddressFieldsFromSalesDocument', "Bill-to Customer No.",
+                  "Bill-to Name", FieldName("Bill-to Customer No."));
     end;
 
     local procedure ModifyCustomerAddress()
@@ -9338,7 +9307,6 @@ table 36 "Sales Header"
         if IsHandled then
             exit(Result);
 
-        Contact.FilterGroup(2);
         if "Sell-to Customer No." <> '' then
             if Contact.Get("Sell-to Contact No.") then
                 Contact.SetRange("Company No.", Contact."Company No.")
@@ -9356,7 +9324,6 @@ table 36 "Sales Header"
             Validate("Sell-to Contact No.", Contact."No.");
             exit(true);
         end;
-        Contact.FilterGroup(0);
         exit(false);
     end;
 
@@ -9560,28 +9527,21 @@ table 36 "Sales Header"
 
     internal procedure GetQtyReservedFromStockState() Result: Enum "Reservation From Stock"
     var
+        SalesLineLocal: Record "Sales Line";
         QtyReservedFromStock: Decimal;
     begin
         QtyReservedFromStock := SalesLineReserve.GetReservedQtyFromInventory(Rec);
         if QtyReservedFromStock = 0 then
             exit(Result::None);
 
-        if QtyReservedFromStock = CalcOutstandingQuantityBase() then
+        SalesLineLocal.SetRange("Document Type", "Document Type");
+        SalesLineLocal.SetRange("Document No.", "No.");
+        SalesLineLocal.SetRange(Type, SalesLineLocal.Type::Item);
+        SalesLineLocal.CalcSums("Outstanding Qty. (Base)");
+
+        if QtyReservedFromStock = SalesLineLocal."Outstanding Qty. (Base)" then
             exit(Result::Full);
-
         exit(Result::Partial);
-    end;
-
-    local procedure CalcOutstandingQuantityBase(): Decimal
-    var
-        SalesLine2: Record "Sales Line";
-    begin
-        SalesLine2.SetRange("Document Type", "Document Type");
-        SalesLine2.SetRange("Document No.", "No.");
-        SalesLine2.SetRange(Type, SalesLine2.Type::Item);
-        OnCalcOutstandingQuantityBaseOnAfterSalesLineSetFilters(SalesLine2);
-        SalesLine2.CalcSums("Outstanding Qty. (Base)");
-        exit(SalesLine2."Outstanding Qty. (Base)");
     end;
 
     local procedure UpdateVATReportingDate(CalledByFieldNo: Integer)
@@ -11537,16 +11497,6 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidatePrepmtCrMemoNoSeries(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcOutstandingQuantityBaseOnAfterSalesLineSetFilters(var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeModifyBillToCustomerAddress(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 }
