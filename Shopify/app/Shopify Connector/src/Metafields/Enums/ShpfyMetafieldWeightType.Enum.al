@@ -4,22 +4,22 @@ enum 30157 "Shpfy Metafield Weight Type"
 {
     Access = Internal;
 
-    value(0; Kilograms)
+    value(0; kg)
     {
         Caption = 'kg';
     }
 
-    value(1; Grams)
+    value(1; g)
     {
         Caption = 'g';
     }
 
-    value(2; Pounds)
+    value(2; lb)
     {
         Caption = 'lb';
     }
 
-    value(3; Ounces)
+    value(3; oz)
     {
         Caption = 'oz';
     }
