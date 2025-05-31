@@ -37,32 +37,23 @@ codeunit 10700 "Due Date-Adjust"
         NonPaymentPeriod: Record "Non-Payment Period";
         Vendor: Record Vendor;
         CompanyInfo: Record "Company Information";
-		IsHandled: Boolean;
     begin
         if VendorNo = '' then
             exit;
         if not Vendor.Get(VendorNo) then
             exit;
 
-        IsHandled := false;
-        OnPurchAdjustDueDateOnBeforeSetNonPaymentPeriodFilterAndFields(NonPaymentPeriod, Vendor, IsHandled);
-        if not IsHandled then
-			if Vendor."Non-Paymt. Periods Code" <> '' then
-				SetNonPaymentPeriodFilterAndFields(NonPaymentPeriod, NonPaymentPeriod."Table Name"::Vendor, Vendor."Non-Paymt. Periods Code")
-			else begin
-				CompanyInfo.Get();
-				SetNonPaymentPeriodFilterAndFields(
-				  NonPaymentPeriod, NonPaymentPeriod."Table Name"::"Company Information", CompanyInfo."Non-Paymt. Periods Code")
+        if Vendor."Non-Paymt. Periods Code" <> '' then
+            SetNonPaymentPeriodFilterAndFields(NonPaymentPeriod, NonPaymentPeriod."Table Name"::Vendor, Vendor."Non-Paymt. Periods Code")
+        else begin
+            CompanyInfo.Get();
+            SetNonPaymentPeriodFilterAndFields(
+              NonPaymentPeriod, NonPaymentPeriod."Table Name"::"Company Information", CompanyInfo."Non-Paymt. Periods Code")
         end;
-
-        IsHandled := false;
-        OnPurchAdjustDueDateOnBeforeSetPaymentDayFilterAndFields(PaymentDay, Vendor, IsHandled);
-        if not IsHandled then		
-			if Vendor."Payment Days Code" <> '' then
-				SetPaymentDayFilterAndFields(PaymentDay, PaymentDay."Table Name"::Vendor, Vendor."Payment Days Code")
-			else
-				SetPaymentDayFilterAndFieldsFromCompany(PaymentDay);
-
+        if Vendor."Payment Days Code" <> '' then
+            SetPaymentDayFilterAndFields(PaymentDay, PaymentDay."Table Name"::Vendor, Vendor."Payment Days Code")
+        else
+            SetPaymentDayFilterAndFieldsFromCompany(PaymentDay);
         AdjustDate(NonPaymentPeriod, PaymentDay, DueDate, MinDate, MaxDate);
 
         OnAfterPurchAdjustDueDate(DueDate, MinDate, MaxDate, VendorNo, PaymentDay);
@@ -185,16 +176,6 @@ codeunit 10700 "Due Date-Adjust"
 
     [IntegrationEvent(false, false)]
     local procedure OnAdjustToNonPaymentPeriodOnAfterCalcDueDate()
-    begin
-    end;
-	
-	[IntegrationEvent(false, false)]
-    local procedure OnPurchAdjustDueDateOnBeforeSetNonPaymentPeriodFilterAndFields(var NonPaymentPeriod: Record "Non-Payment Period"; Vendor: Record Vendor; IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPurchAdjustDueDateOnBeforeSetPaymentDayFilterAndFields(var PaymentDay: Record "Payment Day"; Vendor: Record Vendor; IsHandled: Boolean)
     begin
     end;
 }
