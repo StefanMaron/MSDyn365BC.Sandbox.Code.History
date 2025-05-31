@@ -1,8 +1,6 @@
 namespace System.Threading;
 
 using System.Azure.Identity;
-using System.Environment;
-using System.Privacy;
 using System.Security.AccessControl;
 
 page 672 "Job Queue Entries"
@@ -293,20 +291,6 @@ page 672 "Job Queue Entries"
                     end;
                 }
             }
-            group(Flow)
-            {
-                Caption = 'Power Automate';
-                Image = Flow;
-                customaction(CreateFlowFromTemplate)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Automate Job Queue Notifications';
-                    ToolTip = 'Create a new flow of job queue notifications in Power Automate from a list of relevant flow templates.';
-                    Visible = IsSaaS and IsPowerAutomatePrivacyNoticeApproved;
-                    CustomActionType = FlowTemplateGallery;
-                    FlowTemplateCategoryName = 'd365bc_jobqueue';
-                }
-            }
         }
         area(navigation)
         {
@@ -396,9 +380,6 @@ page 672 "Job Queue Entries"
                 actionref(ShowError_Promoted; ShowError)
                 {
                 }
-                actionref(CreateFlowFromTemplate_Promoted; CreateFlowFromTemplate)
-                {
-                }
             }
         }
     }
@@ -406,14 +387,9 @@ page 672 "Job Queue Entries"
     trigger OnOpenPage()
     var
         AzureADGraphUser: Codeunit "Azure AD Graph User";
-        EnvironmentInfo: Codeunit "Environment Information";
-        PrivacyNotice: Codeunit "Privacy Notice";
-        PrivacyNoticeRegistrations: Codeunit "Privacy Notice Registrations";
     begin
         JobQueueManagement.TooManyScheduledTasksNotification();
         IsUserDelegated := AzureADGraphUser.IsUserDelegatedAdmin() or AzureADGraphUser.IsUserDelegatedHelpdesk();
-        IsSaaS := EnvironmentInfo.IsSaaS();
-        IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
     end;
 
     trigger OnAfterGetRecord()
@@ -433,8 +409,6 @@ page 672 "Job Queue Entries"
         JobQueueManagement: Codeunit "Job Queue Management";
         IsUserDelegated: Boolean;
         UserDoesNotExist: Boolean;
-        IsSaaS: Boolean;
-        IsPowerAutomatePrivacyNoticeApproved: Boolean;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOnActionRunNow(JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
