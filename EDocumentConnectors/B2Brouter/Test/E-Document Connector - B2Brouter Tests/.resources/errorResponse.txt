@@ -1,7 +1,0 @@
-{"errors": 
-[
-	"Document started processing",
-	"Wrong data in send xml",
-	"An error has been identified in the submitted document."
-], 
-"invoice": {"state": ""}}
