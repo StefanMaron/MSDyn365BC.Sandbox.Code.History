@@ -5029,7 +5029,16 @@ table 81 "Gen. Journal Line"
         TempJobJnlLine.Validate("No.", "Account No.");
         TempJobJnlLine.Validate(Quantity, "Job Quantity");
 
-        TmpJobJnlOverallCurrencyFactor := GetGenJnlLineToJobCurrencyFactor();
+        if "Currency Factor" = 0 then begin
+            if "Job Currency Factor" = 0 then
+                TmpJobJnlOverallCurrencyFactor := 1
+            else
+                TmpJobJnlOverallCurrencyFactor := "Job Currency Factor";
+        end else
+            if "Job Currency Factor" = 0 then
+                TmpJobJnlOverallCurrencyFactor := 1 / "Currency Factor"
+            else
+                TmpJobJnlOverallCurrencyFactor := "Job Currency Factor" / "Currency Factor";
 
         UpdateAmountsOnTempJobJnlLine(TmpJobJnlOverallCurrencyFactor);
 
@@ -6445,6 +6454,9 @@ table 81 "Gen. Journal Line"
             "Pmt. Discount Date" := PurchHeader."Prepmt. Pmt. Discount Date";
             "Payment Discount %" := PurchHeader."Prepmt. Payment Discount %";
         end;
+        "Message Type" := PurchHeader."Message Type";
+        "Invoice Message" := PurchHeader."Invoice Message";
+        "Invoice Message 2" := PurchHeader."Invoice Message 2";
 
         OnAfterCopyGenJnlLineFromPurchHeaderPrepmtPost(PurchHeader, Rec, UsePmtDisc);
     end;
@@ -7656,7 +7668,11 @@ table 81 "Gen. Journal Line"
     local procedure CheckOpenApprovalEntryExistForCurrentUser()
     var
         GenJournalBatch: Record "Gen. Journal Batch";
+        IsHandled: Boolean;
     begin
+        OnBeforeCheckOpenApprovalEntryExistForCurrentUser(Rec, CurrFieldNo, IsHandled);
+        if IsHandled then
+            exit;
         ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(Rec);
         if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
             ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(GenJournalBatch);
@@ -7718,22 +7734,6 @@ table 81 "Gen. Journal Line"
         if GenJournalBatch.Get(GenJournalLine."Journal Template Name", GenJournalLine."Journal Batch Name") then
             if ApprovalsMgmt.IsGeneralJournalBatchApprovalsWorkflowEnabled(GenJournalBatch) then
                 RecordRestrictionMgt.RestrictRecordUsage(GenJournalLine, RestrictBatchUsageDetailsTxt);
-    end;
-
-    /// <summary>
-    /// Calculates the currency factor for the general journal line based on the job currency factor and the journal line currency factor.
-    /// </summary>
-    /// <returns>Resulted currency factor</returns>
-    procedure GetGenJnlLineToJobCurrencyFactor(): Decimal
-    begin
-        if "Currency Factor" = 0 then begin
-            if "Job Currency Factor" = 0 then
-                exit(1);
-            exit("Job Currency Factor");
-        end;
-        if "Job Currency Factor" = 0 then
-            exit(1 / "Currency Factor");
-        exit("Job Currency Factor" / "Currency Factor");
     end;
 
     /// <summary>
@@ -11940,6 +11940,11 @@ table 81 "Gen. Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateAppliesToDocNo(var GenJnlLine: Record "Gen. Journal Line"; xGenJnlLine: Record "Gen. Journal Line"; CurrentFieldNo: Integer; var SuppressCommit: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckOpenApprovalEntryExistForCurrentUser(GenJnlLine: Record "Gen. Journal Line"; CurrFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
