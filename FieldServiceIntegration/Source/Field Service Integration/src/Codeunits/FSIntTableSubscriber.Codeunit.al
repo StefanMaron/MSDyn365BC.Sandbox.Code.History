@@ -2629,8 +2629,11 @@ codeunit 6610 "FS Int. Table Subscriber"
                 Database::"FS Project Task",
                 Database::"FS Work Order Product",
                 Database::"FS Work Order Service",
+                Database::"FS Work Order Incident",
                 Database::"FS Customer Asset",
                 Database::"FS Bookable Resource",
+                Database::"FS Bookable Resource Booking",
+                Database::"FS Incident Type",
                 Database::"FS Resource Pay Type",
                 Database::"FS Warehouse"] then begin
             Session.LogMessage('0000M9F', FSEntitySynchTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, TelemetryCategories);
