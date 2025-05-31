@@ -185,7 +185,6 @@ page 510 "Blanket Purchase Order Subform"
 
                     trigger OnValidate()
                     begin
-                        CurrPage.SaveRecord();
                         DeltaUpdateTotals();
                         if PurchasesPayablesSetup."Calc. Inv. Discount" and (Rec.Quantity = 0) then
                             CurrPage.Update(false);
