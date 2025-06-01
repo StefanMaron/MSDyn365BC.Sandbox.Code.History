@@ -50,7 +50,7 @@ codeunit 5837 "Additional-Currency Management"
             IsUnitAmount));
     end;
 
-    procedure RoundACYAmt(UnroundedACYAmt: Decimal; IsUnitAmount: Boolean): Decimal
+    local procedure RoundACYAmt(UnroundedACYAmt: Decimal; IsUnitAmount: Boolean): Decimal
     var
         RndgPrec: Decimal;
     begin
