@@ -14,7 +14,6 @@ using Microsoft.eServices.EDocument.OrderMatch;
 using Microsoft.eServices.EDocument.OrderMatch.Copilot;
 using Microsoft.eServices.EDocument.Service;
 using Microsoft.Foundation.Attachment;
-using Microsoft.eServices.EDocument.Processing.Import.Purchase;
 
 page 6121 "E-Document"
 {
@@ -154,11 +153,6 @@ page 6121 "E-Document"
                     Importance = Additional;
                     ToolTip = 'Specifies the receiving company address.';
                 }
-            }
-            part("Lines"; "E-Doc. Read. Purch. Lines")
-            {
-                SubPageLink = "E-Document Entry No." = field("Entry No");
-                Visible = IsIncomingDoc;
             }
             part(EdocoumentServiceStatus; "E-Document Service Status")
             {
@@ -348,7 +342,6 @@ page 6121 "E-Document"
                     begin
                         EDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
                         EDocImportParameters."Purch. Journal V1 Behavior" := EDocImportParameters."Purch. Journal V1 Behavior"::"Create purchase document";
-                        EDocImportParameters."Create Document V1 Behavior" := true;
                         EDocImport.ProcessIncomingEDocument(Rec, EDocImportParameters);
                         if EDocumentErrorHelper.HasErrors(Rec) then
                             Message(DocNotCreatedMsg, Rec."Document Type");
@@ -367,7 +360,6 @@ page 6121 "E-Document"
                     begin
                         EDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
                         EDocImportParameters."Purch. Journal V1 Behavior" := EDocImportParameters."Purch. Journal V1 Behavior"::"Create journal line";
-                        EDocImportParameters."Create Document V1 Behavior" := true;
                         EDocImport.ProcessIncomingEDocument(Rec, EDocImportParameters);
                         if EDocumentErrorHelper.HasErrors(Rec) then
                             Message(DocNotCreatedMsg, Rec."Document Type");
@@ -454,22 +446,6 @@ page 6121 "E-Document"
                 RunObject = Page "E-Document Logs";
                 RunPageLink = "E-Doc. Entry No" = field("Entry No");
                 RunPageMode = View;
-            }
-            action(ViewExtractedDocumentData)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'View extracted data';
-                ToolTip = 'View the extracted data from the source file.';
-                Image = ViewRegisteredOrder;
-                Visible = IsIncomingDoc;
-
-                trigger OnAction()
-                var
-                    EDocumentPurchaseHeader: Record "E-Document Purchase Header";
-                begin
-                    EDocumentPurchaseHeader.GetFromEDocument(Rec);
-                    Page.Run(Page::"E-Doc. Readable Purchase Doc.", EDocumentPurchaseHeader);
-                end;
             }
         }
         area(Promoted)
