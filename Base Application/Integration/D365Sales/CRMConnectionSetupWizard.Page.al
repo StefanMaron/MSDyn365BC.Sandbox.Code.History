@@ -534,6 +534,8 @@ page 1817 "CRM Connection Setup Wizard"
     end;
 
     local procedure ShowFieldServiceStep()
+    var
+        CRMIntegrationManagement: Codeunit "CRM Integration Management";
     begin
         BackActionEnabled := true;
         NextActionEnabled := false;
@@ -541,20 +543,19 @@ page 1817 "CRM Connection Setup Wizard"
         AdvancedActionEnabled := false;
         SimpleActionEnabled := false;
         FieldServiceStepVisible := true;
+        FieldServiceIntegrationAppInstalled := CRMIntegrationManagement.IsFieldServiceIntegrationAppInstalled();
     end;
 
     local procedure ShowCredentialsStep()
     var
         CRMConnectionSetup: Record "CRM Connection Setup";
-        CRMIntegrationManagement: Codeunit "CRM Integration Management";
     begin
-        FieldServiceIntegrationAppInstalled := CRMIntegrationManagement.IsFieldServiceIntegrationAppInstalled();
         BackActionEnabled := true;
-        NextActionEnabled := SoftwareAsAService and (not FieldServiceIntegrationAppInstalled);
+        NextActionEnabled := SoftwareAsAService;
         AdvancedActionEnabled := not ShowAdvancedSettings;
         SimpleActionEnabled := not AdvancedActionEnabled;
         CredentialsStepVisible := true;
-        FinishActionEnabled := (not SoftwareAsAService) or FieldServiceIntegrationAppInstalled;
+        FinishActionEnabled := not SoftwareAsAService;
 
         EnableBidirectionalSalesOrderIntegrationEnabled := ImportCRMSolutionEnabled;
         EnableSalesOrderIntegrationEnabled := ImportCRMSolutionEnabled;
