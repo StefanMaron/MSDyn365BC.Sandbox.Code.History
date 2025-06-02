@@ -48,7 +48,6 @@ codeunit 5856 "TransferOrder-Post Transfer"
         ReleaseTransferDocument: Codeunit "Release Transfer Document";
         Window: Dialog;
         LineCount: Integer;
-        RequireReceiveValueToTest: Boolean;
     begin
         if TransferHeader2.Status = TransferHeader2.Status::Open then begin
             ReleaseTransferDocument.Release(TransferHeader2);
@@ -94,10 +93,7 @@ codeunit 5856 "TransferOrder-Post Transfer"
 
         // Require Receipt is not supported here, only Bin Mandatory
         GetLocation(TransHeader."Transfer-to Code");
-
-        RequireReceiveValueToTest := false;
-        OnRunWithCheckOnBeforeTestRequireReceive(Location, RequireReceiveValueToTest);
-        Location.TestField("Require Receive", RequireReceiveValueToTest);
+        Location.TestField("Require Receive", false);
         if Location."Bin Mandatory" then
             WhseReceive := true;
 
@@ -706,11 +702,6 @@ codeunit 5856 "TransferOrder-Post Transfer"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnAfterTransLineSetFiltersForInsertShipmentLines(var TransferLine: Record "Transfer Line"; TransferHeader: Record "Transfer Header"; Location: Record Location; WhseShip: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRunWithCheckOnBeforeTestRequireReceive(var Location: Record Location; var RequireReceiveValueToTest: Boolean)
     begin
     end;
 }
