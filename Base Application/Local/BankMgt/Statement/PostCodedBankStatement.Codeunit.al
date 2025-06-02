@@ -509,18 +509,16 @@ codeunit 2000042 "Post Coded Bank Statement"
             CustLedgEntry2.SetRange("Customer No.", Cust."No.");
             CustLedgEntry2.SetRange(Open, true);
             CustLedgEntry2.SetRange(Positive, CodBankStmtLine."Statement Amount" > 0);
-            OnSearchCustLedgEntryOnAfterCustLedgEntry2SetFilters(CustLedgEntry2, CodBankStmtLine);
             if CustLedgEntry2.FindSet() then
                 repeat
                     CustLedgEntry2.CalcFields("Remaining Amount");
                     if CustLedgEntry2."Remaining Amount" = CodBankStmtLine."Statement Amount" then begin
                         Found := Found + 1;
-                        if CheckCustLedgEntry(CustLedgEntry2, Found) then
-                            CustLedgEntry := CustLedgEntry2;
+                        CustLedgEntry := CustLedgEntry2;
                     end;
                 until CustLedgEntry2.Next() = 0;
             // Multiple Entries with Same Amount: Do Not Assign
-            if (Found = 0) or ((Found > 1) and (CustLedgEntry."Payment Reference" = '')) then
+            if Found <> 1 then
                 Clear(CustLedgEntry);
             CustLedgEntry."Customer No." := Cust."No.";
 
@@ -820,24 +818,6 @@ codeunit 2000042 "Post Coded Bank Statement"
         Vendor.VendBlockedErrorMessage(Vendor, true)
     end;
 
-    local procedure CheckCustLedgEntry(CustLedgEntry2: Record "Cust. Ledger Entry"; Found: Integer): Boolean
-    var
-        StatementMessage: Text;
-    begin
-        if Found = 1 then
-            exit(true);
-
-        if CustLedgEntry2."Payment Reference" = '' then
-            exit(false);
-
-        StatementMessage := CopyStr(CodBankStmtLine."Statement Message", 1, StrLen(CustLedgEntry2."Payment Reference"));
-        if StatementMessage = '' then
-            exit(false);
-
-        if CustLedgEntry2."Payment Reference" = StatementMessage then
-            exit(true);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitCodBankStmtLine(var CodBankStmtLine: Record "CODA Statement Line"; TransactionCoding: Record "Transaction Coding"; AccountType: Integer; UpdateApplicationAmounts: Boolean)
     begin
@@ -865,11 +845,6 @@ codeunit 2000042 "Post Coded Bank Statement"
 
     [IntegrationEvent(false, false)]
     local procedure OnDecodeVendLedgEntryOnAfterVendLedgEntrySetFilters(var VendLedgEntry: Record "Vendor Ledger Entry"; var CODAStatementLine: Record "CODA Statement Line"; var Message: Text[50])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSearchCustLedgEntryOnAfterCustLedgEntry2SetFilters(var CustLedgerEntry: Record "Cust. Ledger Entry"; var CODAStatementLine: Record "CODA Statement Line")
     begin
     end;
 
