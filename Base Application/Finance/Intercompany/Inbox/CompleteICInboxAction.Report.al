@@ -165,8 +165,6 @@ report 511 "Complete IC Inbox Action"
                 ICCommentLine: Record "IC Comment Line";
                 ICPartner: Record "IC Partner";
                 IsHandled: Boolean;
-                IsRecordInserted: Boolean;
-                SkipRecord: Boolean;
             begin
                 if "Line Action" = "Line Action"::"No Action" then
                     CurrReport.Skip();
@@ -193,15 +191,7 @@ report 511 "Complete IC Inbox Action"
                 end;
                 IsHandled := false;
                 OnBeforeHandledInboxTransactionInsert(HandledInboxTransaction2, InboxTransaction2, IsHandled);
-
-                IsRecordInserted := HandledInboxTransaction2.Insert();
-                SkipRecord := false;
-                OnAfterHandledInboxTransactionInsert(HandledInboxTransaction2, InboxTransaction2, IsRecordInserted, SkipRecord);
-
-                if SkipRecord then
-                    CurrReport.Skip();
-
-                if not IsRecordInserted and (not IsHandled) then
+                if not HandledInboxTransaction2.Insert() and (not IsHandled) then
                     Error(
                       Text001, InboxTransaction2.FieldCaption("Transaction No."),
                       InboxTransaction2."Transaction No.", InboxTransaction2."IC Partner Code",
@@ -503,11 +493,6 @@ report 511 "Complete IC Inbox Action"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestGenJnlTemplateType(var TempGenJnlLine: Record "Gen. Journal Line" temporary; GenJnlTemplate: Record "Gen. Journal Template"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterHandledInboxTransactionInsert(var HandledICInboxTrans: Record "Handled IC Inbox Trans."; var InboxTransaction: Record "IC Inbox Transaction"; IsRecordInserted: Boolean; var SkipRecord: Boolean)
     begin
     end;
 }
