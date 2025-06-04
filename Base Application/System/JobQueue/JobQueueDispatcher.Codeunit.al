@@ -16,10 +16,8 @@ codeunit 448 "Job Queue Dispatcher"
         Skip: Boolean;
     begin
         OnBeforeRun(Rec, Skip);
-        if Skip then begin
-            TelemetrySubscribers.SendJobQueueSkippedTelemetry(Rec);
+        if Skip then
             exit;
-        end;
 
         if Rec.Status = Rec.Status::"In Process" then
             RunCleanupForCurrentJob(Rec);
