@@ -625,7 +625,7 @@ page 50 "Purchase Order"
                                     ApplicationArea = Location;
                                     Importance = Promoted;
                                     Editable = ShipToOptions = ShipToOptions::Location;
-                                    ToolTip = 'Specifies the location where the items are to be placed when they are received. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
+                                    ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
                                 }
                             }
                             field("Ship-to Name"; Rec."Ship-to Name")
@@ -2524,24 +2524,17 @@ page 50 "Purchase Order"
         PurchaseHeader: Record "Purchase Header";
         InstructionMgt: Codeunit "Instruction Mgt.";
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
-        DocumentIsScheduledForPosting: Boolean;
+        IsScheduledPosting: Boolean;
         IsHandled: Boolean;
     begin
         LinesInstructionMgt.PurchaseCheckAllLinesHaveQuantityAssigned(Rec);
 
         Rec.SendToPosting(PostingCodeunitID);
 
-        DocumentIsScheduledForPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
-        if DocumentIsScheduledForPosting then
-            DocumentIsPosted := true
-        else begin
-            PurchaseHeader.SetRange("Document Type", Rec."Document Type");
-            PurchaseHeader.SetRange("No.", Rec."No.");
-            DocumentIsPosted := PurchaseHeader.IsEmpty();
-        end;
+        IsScheduledPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
+        DocumentIsPosted := (not PurchaseHeader.Get(Rec."Document Type", Rec."No.")) or IsScheduledPosting;
 
-        OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(Rec, DocumentIsScheduledForPosting, DocumentIsPosted);
-        if DocumentIsScheduledForPosting then
+        if IsScheduledPosting then
             CurrPage.Close();
         CurrPage.Update(false);
 
@@ -2559,7 +2552,7 @@ page 50 "Purchase Order"
                     if InstructionMgt.IsEnabled(InstructionMgt.ShowPostedConfirmationMessageCode()) then
                         ShowPostedConfirmationMessage();
 
-                    if DocumentIsScheduledForPosting or DocumentIsPosted then
+                    if IsScheduledPosting or DocumentIsPosted then
                         CurrPage.Close();
                 end;
             Enum::"Navigate After Posting"::"New Document":
@@ -2837,7 +2830,7 @@ page 50 "Purchase Order"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnPostDocumentBeforeNavigateAfterPosting(var PurchaseHeader: Record "Purchase Header"; var PostingCodeunitID: Integer; var Navigate: Enum "Navigate After Posting"; var DocumentIsPosted: Boolean; var IsHandled: Boolean)
+    local procedure OnPostDocumentBeforeNavigateAfterPosting(var PurchaseHeader: Record "Purchase Header"; var PostingCodeunitID: Integer; var Navigate: Enum "Navigate After Posting"; DocumentIsPosted: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -2868,11 +2861,6 @@ page 50 "Purchase Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCurrencyCodeOnAssistEdit(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(var PurchaseHeader: Record "Purchase Header"; var DocumentIsScheduledForPosting: Boolean; var DocumentIsPosted: Boolean)
     begin
     end;
 }
