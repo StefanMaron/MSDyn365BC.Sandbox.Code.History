@@ -7,6 +7,7 @@ using Microsoft.Purchases.History;
 
 codeunit 8004 "Post Sub. Contract Renewal"
 {
+    Access = Internal;
     TableNo = "Sales Header";
 
     trigger OnRun()
@@ -47,7 +48,7 @@ codeunit 8004 "Post Sub. Contract Renewal"
             until SalesLine.Next() = 0;
     end;
 
-    local procedure Post(var SalesHeader: Record "Sales Header")
+    internal procedure Post(var SalesHeader: Record "Sales Header")
     var
         SalesLine: Record "Sales Line";
         ContractRenewalMgt: Codeunit "Sub. Contract Renewal Mgt.";
@@ -75,7 +76,7 @@ codeunit 8004 "Post Sub. Contract Renewal"
             until SalesServiceCommitment.Next() = 0;
     end;
 
-    local procedure InsertPlannedServiceCommitmentFromSalesServiceCommitment(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; SalesServiceCommitment: Record "Sales Subscription Line")
+    procedure InsertPlannedServiceCommitmentFromSalesServiceCommitment(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; SalesServiceCommitment: Record "Sales Subscription Line")
     var
         PlannedServiceCommitment: Record "Planned Subscription Line";
         ServiceCommitment: Record "Subscription Line";
@@ -273,7 +274,7 @@ codeunit 8004 "Post Sub. Contract Renewal"
             until TempPlannedServiceCommitment.Next() = 0;
     end;
 
-    local procedure ProcessPlannedServiceCommitment(PlannedServiceCommitment: Record "Planned Subscription Line")
+    procedure ProcessPlannedServiceCommitment(PlannedServiceCommitment: Record "Planned Subscription Line")
     var
         ServiceCommitment: Record "Subscription Line";
         IsHandled: Boolean;
@@ -346,27 +347,27 @@ codeunit 8004 "Post Sub. Contract Renewal"
         SalesLine.Modify(false);
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeUpdateSubscriptionLineFromPlannedSubscriptionLine(var SubscriptionLine: Record "Subscription Line"; var PlannedSubscriptionLine: Record "Planned Subscription Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnCheckPerformSubscriptionLineUpdate(SubscriptionLine: Record "Subscription Line"; PlannedSubscriptionLine: Record "Planned Subscription Line"; var PerformUpdate: Boolean)
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeInsertPlannedSubscriptionLineFromSalesSubscriptionLine(SalesLine: Record "Sales Line"; SalesSubscriptionLine: Record "Sales Subscription Line"; var IsHandled: Boolean)
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertPlannedSubscriptionLineFromSalesSubscriptionLine(SalesLine: Record "Sales Line"; var TempSubscriptionLine: Record "Subscription Line"; var PlannedSubscriptionLine: Record "Planned Subscription Line")
+    [InternalEvent(false, false)]
+    local procedure OnAfterInsertPlannedSubscriptionLineFromSalesSubscriptionLine(SalesLine: Record "Sales Line"; var TempSubscriptionLine: Record "Subscription Line"; PlannedSubscriptionLine: Record "Planned Subscription Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeProcessPlannedSubscriptionLine(var PlannedSubscriptionLine: Record "Planned Subscription Line"; var IsHandled: Boolean)
     begin
     end;

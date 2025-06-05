@@ -13,9 +13,12 @@ codeunit 139612 "Shpfy Webhooks Test"
         LibraryAssert: Codeunit "Library Assert";
         LibraryRandom: Codeunit "Library - Random";
         Any: Codeunit Any;
+
         WebhooksSubcriber: Codeunit "Shpfy Webhooks Subscriber";
         BulkOpSubscriber: Codeunit "Shpfy Bulk Op. Subscriber";
         SubscriptionId: Text;
+        BulkOperationTopicLbl: Label 'BULK_OPERATIONS_FINISH', Locked = true;
+        OrdersCreateTopicLbl: Label 'ORDERS_CREATE', Locked = true;
         IsInitialized: Boolean;
 
     local procedure Initialize()
@@ -60,7 +63,7 @@ codeunit 139612 "Shpfy Webhooks Test"
 
         // [THEN] Subscription is created and id field is filled
         LibraryAssert.AreEqual(Shop."Order Created Webhook Id", SubscriptionId, 'Subscription id should be filled.');
-        WebhookSubscription.SetRange(Endpoint, Format("Shpfy Webhook Topic"::ORDERS_CREATE));
+        WebhookSubscription.SetRange(Endpoint, OrdersCreateTopicLbl);
         LibraryAssert.RecordCount(WebhookSubscription, 1);
         Clear();
     end;
@@ -89,7 +92,7 @@ codeunit 139612 "Shpfy Webhooks Test"
 
         // [THEN] Subscription is deleted and id field is cleared
         LibraryAssert.AreEqual(Shop."Order Created Webhook Id", '', 'Subscription id should be cleared.');
-        WebhookSubscription.SetRange(Endpoint, Format("Shpfy Webhook Topic"::ORDERS_CREATE));
+        WebhookSubscription.SetRange(Endpoint, OrdersCreateTopicLbl);
         LibraryAssert.RecordIsEmpty(WebhookSubscription);
         Clear();
     end;
@@ -114,7 +117,7 @@ codeunit 139612 "Shpfy Webhooks Test"
         end;
 
         // [WHEN] A notification is inserted
-        InsertNotification(Shop."Shopify URL", Format("Shpfy Webhook Topic"::ORDERS_CREATE), '');
+        InsertNotification(Shop."Shopify URL", OrdersCreateTopicLbl, '');
 
         // [THEN] Job queue entry is created
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Report);
@@ -146,7 +149,7 @@ codeunit 139612 "Shpfy Webhooks Test"
         JobQueueEntryId := CreateJobQueueEntry(Shop, Report::"Shpfy Sync Orders from Shopify");
 
         // [WHEN] A notification is inserted
-        InsertNotification(Shop."Shopify URL", Format("Shpfy Webhook Topic"::ORDERS_CREATE), '');
+        InsertNotification(Shop."Shopify URL", OrdersCreateTopicLbl, '');
 
         // [THEN] Job queue entry is not created
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Report);
@@ -178,7 +181,7 @@ codeunit 139612 "Shpfy Webhooks Test"
 
         // [THEN] Subscription is created and id field is filled
         LibraryAssert.AreEqual(Shop."Bulk Operation Webhook Id", SubscriptionId, 'Subscription id should be filled.');
-        WebhookSubscription.SetRange(Endpoint, Format("Shpfy Webhook Topic"::BULK_OPERATIONS_FINISH));
+        WebhookSubscription.SetRange(Endpoint, BulkOperationTopicLbl);
         LibraryAssert.RecordCount(WebhookSubscription, 1);
         Clear();
     end;
@@ -202,7 +205,7 @@ codeunit 139612 "Shpfy Webhooks Test"
 
         // [THEN] Subscription is deleted and id field is cleared
         LibraryAssert.AreEqual(Shop."Bulk Operation Webhook Id", '', 'Subscription id should be cleared.');
-        WebhookSubscription.SetRange(Endpoint, Format("Shpfy Webhook Topic"::BULK_OPERATIONS_FINISH));
+        WebhookSubscription.SetRange(Endpoint, BulkOperationTopicLbl);
         LibraryAssert.RecordIsEmpty(WebhookSubscription);
         Clear();
     end;
@@ -230,7 +233,7 @@ codeunit 139612 "Shpfy Webhooks Test"
 
         // [WHEN] A notification is inserted
         BulkOperationMgt.EnableBulkOperations(Shop);
-        InsertNotification(Shop."Shopify URL", Format("Shpfy Webhook Topic"::BULK_OPERATIONS_FINISH), CreateBulkOperationNotificationJson(BulkOperationId));
+        InsertNotification(Shop."Shopify URL", BulkOperationTopicLbl, CreateBulkOperationNotificationJson(BulkOperationId));
 
         // [THEN] Bulk operation status and completed at is updated
         BulkOperation.GetBySystemId(BulkOperationSystemId);
