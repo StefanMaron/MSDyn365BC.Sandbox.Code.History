@@ -243,8 +243,7 @@ report 99001043 "Exchange Production BOM Item"
                         {
                             ApplicationArea = Manufacturing;
                             Caption = 'No.';
-                            ToolTip = 'Specifies the item number or the production BOM number that will be exchanged.';
-                            ShowMandatory = true;
+                            ToolTip = 'Specifies the number of the item.';
 
                             trigger OnLookup(var Text: Text): Boolean
                             var
@@ -287,7 +286,7 @@ report 99001043 "Exchange Production BOM Item"
                         {
                             ApplicationArea = Manufacturing;
                             Caption = 'Type';
-                            ToolTip = 'Specifies the replacement for the selected exchange type - either Item or Production BOM.';
+                            ToolTip = 'Specifies your new selection that will replace what you selected in the Exchange Type field - Item or Production BOM.';
 
                             trigger OnValidate()
                             begin
@@ -298,7 +297,7 @@ report 99001043 "Exchange Production BOM Item"
                         {
                             ApplicationArea = Manufacturing;
                             Caption = 'No.';
-                            ToolTip = 'Specifies the item or production BOM that should serve as a replacement. This field may be left blank if neither the item nor the production BOM is required anymore and should not be included in the new version or removed from the production BOM.';
+                            ToolTip = 'Specifies the number of the item.';
 
                             trigger OnLookup(var Text: Text): Boolean
                             begin
@@ -337,7 +336,7 @@ report 99001043 "Exchange Production BOM Item"
                         ApplicationArea = Manufacturing;
                         Caption = 'Create New Version';
                         Editable = CreateNewVersionEditable;
-                        ToolTip = 'Specifies whether the exchange should create a new version. If enabled, a new version will be created. If disabled, the current production BOM will be updated along with certified Production BOM versions. Note that Production BOM Versions with statuses other than Certified will be ignored.';
+                        ToolTip = 'Specifies if you want to make the exchange in a new version.';
 
                         trigger OnValidate()
                         begin
@@ -355,13 +354,13 @@ report 99001043 "Exchange Production BOM Item"
                     {
                         ApplicationArea = Manufacturing;
                         Caption = 'Starting Date';
-                        ToolTip = 'Specifies the effective date for these changes. For a new version of the production BOM, this date will be copied to the header. For lines added to the existing production BOM, the date will be specified in the lines.';
+                        ToolTip = 'Specifies the date from which these changes are to become valid.';
                     }
                     field(Recertify; Recertify)
                     {
                         ApplicationArea = Manufacturing;
                         Caption = 'Recertify';
-                        ToolTip = 'Specifies whether the production BOM should be certified after the changes. Otherwise, after modification the production BOM or production BOM versions will remain in the Under Development status.';
+                        ToolTip = 'Specifies if you want the production BOM to be certified after the change.';
                     }
                     field(CopyRoutingLink; CopyRoutingLink)
                     {
@@ -374,7 +373,7 @@ report 99001043 "Exchange Production BOM Item"
                         ApplicationArea = Manufacturing;
                         Caption = 'Delete Exchanged Component';
                         Editable = DeleteExchangedComponentEditab;
-                        ToolTip = 'Specifies whether the exchanged component should be deleted. This setting is applicable only if the Create New Version option is turned off and a replacement item or production BOM has been selected.';
+                        ToolTip = 'Specifies whether you want the exchanged component deleted.';
 
                         trigger OnValidate()
                         begin
@@ -396,8 +395,6 @@ report 99001043 "Exchange Production BOM Item"
             CreateNewVersion := true;
             QtyMultiply := 1;
             StartingDate := WorkDate();
-            FromProductionBOMLineType := FromProductionBOMLineType::Item;
-            ToProductionBOMLineType := ToProductionBOMLineType::Item;
 
             OnAfterOnInitReport(CreateNewVersion, StartingDate, DeleteExcComp);
         end;
