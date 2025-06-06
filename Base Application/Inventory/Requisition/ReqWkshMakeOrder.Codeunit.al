@@ -96,7 +96,6 @@ codeunit 333 "Req. Wksh.-Make Order"
         Day: Integer;
         Week: Integer;
         Month: Integer;
-        Year: Integer;
         CounterFailed: Integer;
         PrevPurchCode: Code[10];
         PrevShipToCode: Code[10];
@@ -1051,14 +1050,13 @@ codeunit 333 "Req. Wksh.-Make Order"
             Week := Date2DWY(ReqLine2."Order Date", 2);
             Month := Date2DMY(ReqLine2."Order Date", 2);
             MonthText := Format(ReqLine2."Order Date", 0, Text007);
-            Year := Date2DMY(ReqLine2."Order Date", 3);
             AccountingPeriod.SetRange("Starting Date", 0D, ReqLine2."Order Date");
             if not AccountingPeriod.FindLast() then
                 AccountingPeriod.Name := '';
             ReqLine2.Description :=
               DelChr(
                 PadStr(
-                  StrSubstNo(ReqLine2.Description, Day, Week, Month, MonthText, AccountingPeriod.Name, Year),
+                  StrSubstNo(ReqLine2.Description, Day, Week, Month, MonthText, AccountingPeriod.Name),
                   MaxStrLen(ReqLine2.Description)),
                 '>');
             ReqLine2.Modify();
