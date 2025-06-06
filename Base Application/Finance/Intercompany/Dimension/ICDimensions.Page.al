@@ -114,7 +114,7 @@ page 600 "IC Dimensions"
                     ApplicationArea = Intercompany;
                     Caption = 'Synchronization Setup';
                     Image = Setup;
-                    ShortcutKey = 'Ctrl+Alt+S';
+                    ShortcutKey = 'S';
                     ToolTip = 'Open the setup for the synchronization of the dimensions of intercompany.';
                     Enabled = EnableSynchronization;
 
