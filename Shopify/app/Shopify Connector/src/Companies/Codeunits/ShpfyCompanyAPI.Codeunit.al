@@ -27,18 +27,17 @@ codeunit 30286 "Shpfy Company API"
         GraphQuery := CreateCompanyGraphQLQuery(ShopifyCompany, CompanyLocation);
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQuery);
         if JResponse.SelectToken('$.data.companyCreate.company', JItem) then
-            if JItem.IsObject then begin
+            if JItem.IsObject then
                 ShopifyCompany.Id := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JItem, 'id'));
-                if JsonHelper.GetJsonArray(JResponse, JLocations, 'data.companyCreate.company.locations.edges') then
-                    if JLocations.Count = 1 then
-                        if JLocations.Get(0, JItem) then begin
-                            ShopifyCompany."Location Id" := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JItem, 'node.id'));
-                            CompanyLocation.Id := ShopifyCompany."Location Id";
-                        end;
-                if JsonHelper.GetJsonArray(JResponse, JLocations, 'data.companyCreate.company.contactRoles.edges') then
-                    foreach JItem in JLocations do
-                        CompanyContactRoles.Add(JsonHelper.GetValueAsText(JItem, 'node.name'), CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JItem, 'node.id')));
-            end;
+        if JsonHelper.GetJsonArray(JResponse, JLocations, 'data.companyCreate.company.locations.edges') then
+            if JLocations.Count = 1 then
+                if JLocations.Get(0, JItem) then begin
+                    ShopifyCompany."Location Id" := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JItem, 'node.id'));
+                    CompanyLocation.Id := ShopifyCompany."Location Id";
+                end;
+        if JsonHelper.GetJsonArray(JResponse, JLocations, 'data.companyCreate.company.contactRoles.edges') then
+            foreach JItem in JLocations do
+                CompanyContactRoles.Add(JsonHelper.GetValueAsText(JItem, 'node.name'), CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JItem, 'node.id')));
         if ShopifyCompany.Id > 0 then begin
             CompanyContactId := AssignCompanyMainContact(ShopifyCompany.Id, ShopifyCustomer.Id, ShopifyCompany."Location Id", CompanyContactRoles);
             ShopifyCompany."Main Contact Id" := CompanyContactId;
@@ -110,7 +109,8 @@ codeunit 30286 "Shpfy Company API"
         if CompanyLocation."Phone No." <> '' then
             AddFieldToGraphQuery(GraphQuery, 'phone', CompanyLocation."Phone No.");
         GraphQuery.Append('shippingAddress: {');
-        AddFieldToGraphQuery(GraphQuery, 'address1', CompanyLocation.Address);
+        if CompanyLocation.Address <> '' then
+            AddFieldToGraphQuery(GraphQuery, 'address1', CompanyLocation.Address);
         if CompanyLocation."Address 2" <> '' then
             AddFieldToGraphQuery(GraphQuery, 'address2', CompanyLocation."Address 2");
         if CompanyLocation.Zip <> '' then

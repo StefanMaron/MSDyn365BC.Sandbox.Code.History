@@ -92,7 +92,11 @@ codeunit 8066 "Purchase Documents"
 
     local procedure FilterBillingLinePerPurchaseLine(var BillingLine: Record "Billing Line"; PurchaseLine: Record "Purchase Line")
     begin
-        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromPurchaseDocumentType(PurchaseLine."Document Type"), PurchaseLine."Document No.", PurchaseLine."Line No.");
+        BillingLine.SetRange("Document Type", BillingLine.GetBillingDocumentTypeFromPurchaseDocumentType(PurchaseLine."Document Type"));
+        BillingLine.SetRange("Document No.", PurchaseLine."Document No.");
+        BillingLine.SetRange("Document Line No.", PurchaseLine."Line No.");
+        BillingLine.SetFilter("Billing from", '>=%1', PurchaseLine."Recurring Billing from");
+        BillingLine.SetFilter("Billing to", '<=%1', PurchaseLine."Recurring Billing to");
     end;
 
     local procedure ResetPurchaseDocumentFieldsForBillingLines(var BillingLine: Record "Billing Line")
@@ -223,9 +227,10 @@ codeunit 8066 "Purchase Documents"
     var
         BillingLine: Record "Billing Line";
     begin
-        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromPurchaseDocumentType(PurchLine."Document Type"), PurchLine."Document No.", PurchLine."Line No.");
-        if not BillingLine.FindFirst() then
+        if not PurchLine.IsLineAttachedToBillingLine() then
             exit;
+        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromPurchaseDocumentType(PurchLine."Document Type"), PurchLine."Document No.", PurchLine."Line No.");
+        BillingLine.FindFirst();
         PurchInvLine."Contract No." := BillingLine."Contract No.";
         PurchInvLine."Contract Line No." := BillingLine."Contract Line No.";
     end;
@@ -235,9 +240,10 @@ codeunit 8066 "Purchase Documents"
     var
         BillingLine: Record "Billing Line";
     begin
-        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromPurchaseDocumentType(PurchLine."Document Type"), PurchLine."Document No.", PurchLine."Line No.");
-        if not BillingLine.FindFirst() then
+        if not PurchLine.IsLineAttachedToBillingLine() then
             exit;
+        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromPurchaseDocumentType(PurchLine."Document Type"), PurchLine."Document No.", PurchLine."Line No.");
+        BillingLine.FindFirst();
         PurchCrMemoLine."Contract No." := BillingLine."Contract No.";
         PurchCrMemoLine."Contract Line No." := BillingLine."Contract Line No.";
     end;
