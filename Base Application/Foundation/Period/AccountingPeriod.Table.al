@@ -183,7 +183,6 @@ table 50 "Accounting Period"
         Day: Integer;
         Week: Integer;
         Month: Integer;
-        Year: Integer;
         MonthText: Text[30];
         IsHandled: Boolean;
     begin
@@ -196,7 +195,6 @@ table 50 "Accounting Period"
         Week := Date2DWY(PostingDate, 2);
         Month := Date2DMY(PostingDate, 2);
         MonthText := Format(PostingDate, 0, MonthTxt);
-        Year := Date2DMY(PostingDate, 3);
         AccountingPeriod.SetRange("Starting Date", 0D, PostingDate);
         if not AccountingPeriod.FindLast() then
             AccountingPeriod.Name := '';
@@ -204,13 +202,13 @@ table 50 "Accounting Period"
             CopyStr(
                 DelChr(
                     PadStr(
-                        StrSubstNo(DocumentNo, Day, Week, Month, MonthText, AccountingPeriod.Name, Year), MaxStrLen(DocumentNo)), '>'),
+                        StrSubstNo(DocumentNo, Day, Week, Month, MonthText, AccountingPeriod.Name), MaxStrLen(DocumentNo)), '>'),
                     1, MaxStrLen(DocumentNo));
         Description :=
             CopyStr(
                 DelChr(
                     PadStr(
-                        StrSubstNo(Description, Day, Week, Month, MonthText, AccountingPeriod.Name, Year), MaxStrLen(Description)), '>'),
+                        StrSubstNo(Description, Day, Week, Month, MonthText, AccountingPeriod.Name), MaxStrLen(Description)), '>'),
                     1, MaxStrLen(Description));
     end;
 

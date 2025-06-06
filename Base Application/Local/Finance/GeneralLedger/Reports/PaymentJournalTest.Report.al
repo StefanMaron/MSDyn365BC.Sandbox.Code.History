@@ -971,7 +971,6 @@ report 10089 "Payment Journal - Test"
         Day: Integer;
         Week: Integer;
         Month: Integer;
-        Year: Integer;
         MonthText: Text[30];
         AmountError: Boolean;
         ErrorCounter: Integer;
@@ -1102,20 +1101,19 @@ report 10089 "Payment Journal - Test"
             Week := Date2DWY(GenJnlLine2."Posting Date", 2);
             Month := Date2DMY(GenJnlLine2."Posting Date", 2);
             MonthText := Format(GenJnlLine2."Posting Date", 0, Text023);
-            Year := Date2DMY(GenJnlLine2."Posting Date", 3);
             AccountingPeriod.SetRange("Starting Date", 0D, GenJnlLine2."Posting Date");
             if not AccountingPeriod.FindLast() then
                 AccountingPeriod.Name := '';
             GenJnlLine2."Document No." :=
               DelChr(
                 PadStr(
-                  StrSubstNo(GenJnlLine2."Document No.", Day, Week, Month, MonthText, AccountingPeriod.Name, Year),
+                  StrSubstNo(GenJnlLine2."Document No.", Day, Week, Month, MonthText, AccountingPeriod.Name),
                   MaxStrLen(GenJnlLine2."Document No.")),
                 '>');
             GenJnlLine2.Description :=
               DelChr(
                 PadStr(
-                  StrSubstNo(GenJnlLine2.Description, Day, Week, Month, MonthText, AccountingPeriod.Name, Year),
+                  StrSubstNo(GenJnlLine2.Description, Day, Week, Month, MonthText, AccountingPeriod.Name),
                   MaxStrLen(GenJnlLine2.Description)),
                 '>');
         end;
