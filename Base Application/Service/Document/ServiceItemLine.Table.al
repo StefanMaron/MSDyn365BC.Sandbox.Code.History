@@ -2342,11 +2342,6 @@ table 5901 "Service Item Line"
 
     procedure ShowComments(Type: Option General,Fault,Resolution,Accessory,Internal,"Service Item Loaner")
     begin
-        ShowComments("Service Comment Line Type".FromInteger(Type));
-    end;
-
-    procedure ShowComments(ServiceCommentLineType: Enum "Service Comment Line Type")
-    begin
         ServHeader.Get(Rec."Document Type", Rec."Document No.");
         ServHeader.TestField("Customer No.");
         TestField("Line No.");
@@ -2355,23 +2350,21 @@ table 5901 "Service Item Line"
         ServCommentLine.SetRange("Table Name", ServCommentLine."Table Name"::"Service Header");
         ServCommentLine.SetRange("Table Subtype", "Document Type");
         ServCommentLine.SetRange("No.", "Document No.");
-        case ServiceCommentLineType of
-            ServiceCommentLineType::Fault:
+        case Type of
+            Type::Fault:
                 ServCommentLine.SetRange(Type, ServCommentLine.Type::Fault);
-            ServiceCommentLineType::Resolution:
+            Type::Resolution:
                 ServCommentLine.SetRange(Type, ServCommentLine.Type::Resolution);
-            ServiceCommentLineType::Accessory:
+            Type::Accessory:
                 ServCommentLine.SetRange(Type, ServCommentLine.Type::Accessory);
-            ServiceCommentLineType::Internal:
+            Type::Internal:
                 ServCommentLine.SetRange(Type, ServCommentLine.Type::Internal);
-            ServiceCommentLineType::"Service Item Loaner":
+            Type::"Service Item Loaner":
                 ServCommentLine.SetRange(Type, ServCommentLine.Type::"Service Item Loaner");
-            else
-                OnShowCommentsOnCaseElse(ServCommentLine, ServiceCommentLineType);
         end;
         ServCommentLine.SetRange("Table Line No.", "Line No.");
         OnShowCommentsOnBeforeRunPageServiceCommentSheet(Rec, ServCommentLine);
-        Page.RunModal(Page::"Service Comment Sheet", ServCommentLine);
+        PAGE.RunModal(PAGE::"Service Comment Sheet", ServCommentLine);
     end;
 
     local procedure CheckRecreateServLines()
@@ -3239,11 +3232,6 @@ table 5901 "Service Item Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckWarranty(var ServiceItemLine: Record "Service Item Line"; var xServiceItemLine: Record "Service Item Line"; Date: Date)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnShowCommentsOnCaseElse(var ServiceCommentLine: Record "Service Comment Line"; ServiceCommentLineType: Enum "Service Comment Line Type")
     begin
     end;
 }
