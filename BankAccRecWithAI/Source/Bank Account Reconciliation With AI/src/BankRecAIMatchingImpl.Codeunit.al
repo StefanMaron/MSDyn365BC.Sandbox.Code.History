@@ -109,6 +109,19 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         exit(CompletionPrompt);
     end;
 
+    procedure BuildBankRecCompletionPromptUserMessage(StatementLines: Text; LedgerLines: Text): SecretText
+    var
+        UserMessageTxt: SecretText;
+        EmptyText: SecretText;
+        ConcatSubstrTok: Label '%1%2', Locked = true;
+    begin
+        LedgerLines += '"""\n**Matches**:'; // close the ledger lines section
+        StatementLines += '"""\n'; // close the statement lines section
+        UserMessageTxt := SecretStrSubstNo(ConcatSubstrTok, EmptyText, StatementLines);
+        UserMessageTxt := SecretStrSubstNo(ConcatSubstrTok, UserMessageTxt, LedgerLines);
+        exit(UserMessageTxt);
+    end;
+
     procedure BuildBankRecLedgerEntries(var LedgerLines: Text; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var CandidateLedgerEntryNos: List of [Integer]): Text
     begin
         if (LedgerLines = '') then
@@ -324,7 +337,15 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
     end;
 
     [NonDebuggable]
-    procedure CreateCompletionAndMatch(CompletionPromptTxt: SecretText; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; DaysTolerance: Integer): Integer
+    procedure CreateCompletionAndMatch(CompletionTaskTxt: SecretText; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; DaysTolerance: Integer): Integer
+    var
+        EmptyText: SecretText;
+    begin
+        exit(CreateCompletionAndMatch(CompletionTaskTxt, EmptyText, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance));
+    end;
+
+    [NonDebuggable]
+    procedure CreateCompletionAndMatch(CompletionTaskTxt: SecretText; UserMessageTxt: SecretText; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempBankAccLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary; DaysTolerance: Integer): Integer
     var
         AzureOpenAI: Codeunit "Azure OpenAi";
         AOAIDeployments: Codeunit "AOAI Deployments";
@@ -346,7 +367,9 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"Bank Account Reconciliation");
         AOAIChatCompletionParams.SetMaxTokens(MaxTokens());
         AOAIChatCompletionParams.SetTemperature(0);
-        AOAIChatMessages.AddSystemMessage(CompletionPromptTxt.Unwrap().Replace('\n', NewLineChar));
+        AOAIChatMessages.AddSystemMessage(CompletionTaskTxt.Unwrap().Replace('\n', NewLineChar));
+        if not UserMessageTxt.IsEmpty() then
+            AOAIChatMessages.AddUserMessage(UserMessageTxt.Unwrap().Replace('\n', NewLineChar));
         AzureOpenAI.GenerateChatCompletion(AOAIChatMessages, AOAIChatCompletionParams, AOAIOperationResponse);
         if AOAIOperationResponse.IsSuccess() then
             CompletionAnswerTxt := AOAIOperationResponse.GetResult()
@@ -426,8 +449,7 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         TopLedgerEntries: array[5] of Record "Ledger Entry Matching Buffer";
         LocalBankAccountLedgerEntry: Record "Bank Account Ledger Entry";
         FeatureTelemetry: Codeunit "Feature Telemetry";
-        CompletionTaskTxt: SecretText;
-        CompletionPromptTxt: SecretText;
+        CompletionTaskTxt, UserMessageTxt : SecretText;
         BankRecLedgerEntriesTxt: Text;
         BankRecStatementLinesTxt: Text;
         TopBankLedgerEntriesFilterTxt: Text;
@@ -538,8 +560,8 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
                 CompletePromptTokenCount := TaskPromptTokenCount + AOAIToken.GetGPT4TokenCount(BankRecStatementLinesTxt) + AOAIToken.GetGPT4TokenCount(BankRecLedgerEntriesTxt);
                 if (CompletePromptTokenCount >= PromptSizeThreshold()) then begin
                     Session.LogMessage('0000LFK', TelemetryApproximateTokenCountExceedsLimitTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
-                    CompletionPromptTxt := BuildBankRecCompletionPrompt(CompletionTaskTxt, BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
-                    CreateCompletionAndMatch(CompletionPromptTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
+                    UserMessageTxt := BuildBankRecCompletionPromptUserMessage(BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
+                    CreateCompletionAndMatch(CompletionTaskTxt, UserMessageTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
                     BankRecStatementLinesTxt := '';
                     BankRecLedgerEntriesTxt := '';
                     Clear(CandidateLedgerEntryNos);
@@ -548,8 +570,8 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
 
             // If BankRecStatementLinesTxt and BankRecLedgerEntriesTxt are not empty, then we need to generate a prompt for the remaining records
             if (BankRecStatementLinesTxt <> '') and (BankRecLedgerEntriesTxt <> '') then begin
-                CompletionPromptTxt := BuildBankRecCompletionPrompt(CompletionTaskTxt, BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
-                CreateCompletionAndMatch(CompletionPromptTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
+                UserMessageTxt := BuildBankRecCompletionPromptUserMessage(BankRecStatementLinesTxt, BankRecLedgerEntriesTxt);
+                CreateCompletionAndMatch(CompletionTaskTxt, UserMessageTxt, BankAccReconciliationLine, TempBankAccLedgerEntryMatchingBuffer, TempBankStatementMatchingBuffer, DaysTolerance);
             end;
 
             TempBankStatementMatchingBuffer.Reset();
@@ -574,17 +596,30 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
     end;
 
     procedure HasReservedWords(Input: Text): Boolean
+    var
+        LowerCaseNoSpacesInput: Text;
     begin
-        if StrPos(LowerCase(Input), '<|im_start|>') > 0 then
+        LowerCaseNoSpacesInput := LowerCase(Input).Replace(' ', '');
+
+        if StrPos(LowerCaseNoSpacesInput, '<|im_start|>') > 0 then
             exit(true);
 
-        if StrPos(LowerCase(Input), '<|im_end|>') > 0 then
+        if StrPos(LowerCaseNoSpacesInput, '<|im_end|>') > 0 then
             exit(true);
 
-        if StrPos(LowerCase(Input), '<|start|>') > 0 then
+        if StrPos(LowerCaseNoSpacesInput, '<|start|>') > 0 then
             exit(true);
 
-        if StrPos(LowerCase(Input), '<|end|>') > 0 then
+        if StrPos(LowerCaseNoSpacesInput, '<|end|>') > 0 then
+            exit(true);
+
+        if StrPos(LowerCaseNoSpacesInput, '**task**') > 0 then
+            exit(true);
+
+        if StrPos(LowerCaseNoSpacesInput, '[system]') > 0 then
+            exit(true);
+
+        if StrPos(LowerCaseNoSpacesInput, 'system:') > 0 then
             exit(true);
 
         exit(false)
@@ -638,25 +673,27 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         if not EnvironmentInformation.IsSaaSInfrastructure() then
             exit;
 
+        if not CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Bank Account Reconciliation") then begin
+            Session.LogMessage('0000OZO', TelemetryAttemptingToRegisterCapabilityTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
+            CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"Bank Account Reconciliation", Enum::"Copilot Availability"::"Generally Available", LearnMoreUrlTxt);
+            if not UpgradeTag.HasUpgradeTag(GetRegisterBankAccRecCopilotGACapabilityUpgradeTag()) then
+                UpgradeTag.SetUpgradeTag(GetRegisterBankAccRecCopilotGACapabilityUpgradeTag());
+            Commit();
+            Session.LogMessage('0000OZP', TelemetrySucceededRegisterCapabilityTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', FeatureName());
+            exit;
+        end;
+
         if UpgradeTag.HasUpgradeTag(GetRegisterBankAccRecCopilotGACapabilityUpgradeTag()) then
             exit;
-
-        if not CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Bank Account Reconciliation") then
-            CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"Bank Account Reconciliation", Enum::"Copilot Availability"::"Generally Available", LearnMoreUrlTxt)
-        else
-            CopilotCapability.ModifyCapability(Enum::"Copilot Capability"::"Bank Account Reconciliation", Enum::"Copilot Availability"::"Generally Available", LearnMoreUrlTxt);
-
+        CopilotCapability.ModifyCapability(Enum::"Copilot Capability"::"Bank Account Reconciliation", Enum::"Copilot Availability"::"Generally Available", LearnMoreUrlTxt);
         UpgradeTag.SetUpgradeTag(GetRegisterBankAccRecCopilotGACapabilityUpgradeTag());
     end;
 
     local procedure MatchIsAcceptable(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; MatchedLineNoTxt: Text; MatchedEntryNoTxt: Text): Boolean
     var
         LocalBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
-        RecordMatchMng: Codeunit "Record Match Mgt.";
         MatchedEntryNo: Integer;
         MatchedLineNo: Integer;
-        BankRecLineDescription: Text;
-        SimilarityScore: Decimal;
     begin
         if not Evaluate(MatchedEntryNo, MatchedEntryNoTxt) then
             exit(false);
@@ -673,20 +710,6 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
             exit(false);
 
         if not SameSign(LocalBankAccReconciliationLine.Difference, TempLedgerEntryMatchingBuffer."Remaining Amount") then
-            exit(false);
-
-        // if amount matches exactly, the match is acceptable
-        if LocalBankAccReconciliationLine.Difference = TempLedgerEntryMatchingBuffer."Remaining Amount" then
-            exit(true);
-
-        // if description doesn't match at least on a substring of 3, the match is not acceptable
-        BankRecLineDescription := LocalBankAccReconciliationLine.Description;
-        if LocalBankAccReconciliationLine."Additional Transaction Info" <> '' then
-            BankRecLineDescription += (' ' + LocalBankAccReconciliationLine."Additional Transaction Info");
-        BankRecLineDescription := RemoveShortWords(CopyStr(BankRecLineDescription, 1, 250));
-
-        SimilarityScore := RecordMatchMng.CalculateStringNearness(RemoveShortWords(TempLedgerEntryMatchingBuffer."Description" + ' ' + TempLedgerEntryMatchingBuffer."Document No." + ' ' + TempLedgerEntryMatchingBuffer."External Document No." + ' ' + TempLedgerEntryMatchingBuffer."Payment Reference"), CopyStr(BankRecLineDescription, 1, 250), 3, 100) / 100.0;
-        if SimilarityScore = 0 then
             exit(false);
 
         exit(true)
@@ -723,6 +746,8 @@ codeunit 7250 "Bank Rec. AI Matching Impl."
         ConstructingPromptFailedErr: label 'There was an error with sending the call to Copilot. Log a Business Central support request about this.', Comment = 'Copilot is a Microsoft service name and must not be translated';
         TelemetryConstructingPromptFailedErr: label 'There was an error with constructing the chat completion prompt from the Key Vault.', Locked = true;
         TelemetryApproximateTokenCountExceedsLimitTxt: label 'The approximate token count for the Copilot request exceeded the limit. Sending request in chunks.', Locked = true;
+        TelemetryAttemptingToRegisterCapabilityTxt: label 'Attempting to register capability Bank Account Reconciliation with Copilot.', Locked = true;
+        TelemetrySucceededRegisterCapabilityTxt: label 'Successfully registered capability Bank Account Reconciliation with Copilot.', Locked = true;
         TelemetryChatCompletionErr: label 'Chat completion request was unsuccessful. Response code: %1', Locked = true;
         LearnMoreUrlTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2248547', Locked = true;
         ContentAreaCaptionTxt: label 'Reconciling %1 statement %2 for %3', Comment = '%1 - bank account code, %2 - statement number, %3 - statement date';
