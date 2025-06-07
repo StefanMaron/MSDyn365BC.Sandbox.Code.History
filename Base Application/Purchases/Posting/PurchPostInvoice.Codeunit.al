@@ -304,7 +304,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
             TempInvoicePostingBufferReverseCharge.Modify();
     end;
 
-    procedure PrepareInvoicePostingBuffer(var PurchLine: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
+    internal procedure PrepareInvoicePostingBuffer(var PurchLine: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
     begin
         PurchPostInvoiceEvents.RunOnBeforePrepareInvoicePostingBuffer(PurchLine, InvoicePostingBuffer);
 
