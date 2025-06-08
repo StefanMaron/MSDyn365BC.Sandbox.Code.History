@@ -99,7 +99,6 @@ codeunit 10250 "Bulk Vendor Remit Reporting"
         // Run reports
         CustomLayoutReporting.SetRunReportOncePerFilter(true);
         CustomLayoutReporting.SetOutputFileBaseName('Remittance Advice');
-        OnRunWithRecordOnBeforeCustomLayoutProcessReport(CustomLayoutReporting);
         CustomLayoutReporting.ProcessReport();
 
         // Export to file if we don't have anything in preview mode
@@ -451,11 +450,6 @@ codeunit 10250 "Bulk Vendor Remit Reporting"
 
     [IntegrationEvent(false, false)]
     local procedure OnClearDocNoPreviewOnAfterGenJournalLineModify(var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRunWithRecordOnBeforeCustomLayoutProcessReport(var CustomLayoutReporting: Codeunit "Custom Layout Reporting")
     begin
     end;
 }
