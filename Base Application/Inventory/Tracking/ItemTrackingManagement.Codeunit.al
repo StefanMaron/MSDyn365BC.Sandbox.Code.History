@@ -24,7 +24,6 @@ using Microsoft.Warehouse.InternalDocument;
 using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Ledger;
 using Microsoft.Warehouse.Request;
-using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Tracking;
 using Microsoft.Warehouse.Worksheet;
 using System.Utilities;
@@ -886,8 +885,6 @@ codeunit 6500 "Item Tracking Management"
         if SerialNo <> '' then
             ItemLedgerEntry.SetRange("Serial No.", SerialNo);
 
-        OnFindInInventoryOnAfterItemLedgerEntrySetFilters(ItemLedgerEntry);
-
         exit(not ItemLedgerEntry.IsEmpty());
     end;
 
@@ -977,7 +974,7 @@ codeunit 6500 "Item Tracking Management"
                     TempWhseJnlLine2."Qty. (Base)" := -TempWhseJnlLine2."Qty. (Absolute, Base)";
                     TempWhseJnlLine2.Quantity := -TempWhseJnlLine2."Qty. (Absolute)";
                 end;
-                SplitFactor := Abs(TempWhseSplitTrackingSpec."Quantity (Base)") / NonDistrQtyBase;
+                SplitFactor := TempWhseSplitTrackingSpec."Quantity (Base)" / NonDistrQtyBase;
                 if SplitFactor < 1 then begin
                     TempWhseJnlLine2.Cubage := Round(NonDistrCubage * SplitFactor, UOMMgt.QtyRndPrecision());
                     TempWhseJnlLine2.Weight := Round(NonDistrWeight * SplitFactor, UOMMgt.QtyRndPrecision());
@@ -1443,18 +1440,10 @@ codeunit 6500 "Item Tracking Management"
         WhseItemTrkgLine.CalcFields("Put-away Qty. (Base)", "Pick Qty. (Base)");
         OnCalcWhseItemTrkgLineOnAfterCalcBaseQuantities(WhseItemTrkgLine);
 
-        if WhseItemTrkgLine."Source Type" <> Database::"Prod. Order Component" then begin
-            if WhseItemTrkgLine."Put-away Qty. (Base)" > 0 then
-                WhseActivQtyBase := WhseItemTrkgLine."Put-away Qty. (Base)";
-            if WhseItemTrkgLine."Pick Qty. (Base)" > 0 then
-                WhseActivQtyBase := WhseItemTrkgLine."Pick Qty. (Base)";
-        end else begin
-            WhseActivQtyBase := GetPutAwayQtyOrPickQtyBaseForProdOrder(WhseItemTrkgLine, "Warehouse Action Type"::Place);
-            if WhseActivQtyBase <= 0 then
-                WhseActivQtyBase := GetPutAwayQtyOrPickQtyBaseForProdOrder(WhseItemTrkgLine, "Warehouse Action Type"::Take);
-            if WhseActivQtyBase < 0 then
-                WhseActivQtyBase := 0;
-        end;
+        if WhseItemTrkgLine."Put-away Qty. (Base)" > 0 then
+            WhseActivQtyBase := WhseItemTrkgLine."Put-away Qty. (Base)";
+        if WhseItemTrkgLine."Pick Qty. (Base)" > 0 then
+            WhseActivQtyBase := WhseItemTrkgLine."Pick Qty. (Base)";
 
         if not Registering then
             WhseItemTrkgLine.Validate("Quantity Handled (Base)",
@@ -3257,7 +3246,6 @@ codeunit 6500 "Item Tracking Management"
         ReservEntry."Reservation Status" := ReservEntry."Reservation Status"::Surplus;
         ReservEntry.Description := TransferLine.Description;
         ReservEntry.UpdateItemTracking();
-        OnInsertReservEntryToOutboundTransferLineOnBeforeReservationEntryInsert(ReservEntry, ItemLedgEntryBuf, TransferLine, QtyBase, EntriesExist);
         ReservEntry.Insert();
     end;
 
@@ -3440,26 +3428,6 @@ codeunit 6500 "Item Tracking Management"
         end;
 
         ItemTrackingCode := CachedItemTrackingCode;
-    end;
-
-    local procedure GetPutAwayQtyOrPickQtyBaseForProdOrder(
-        WhseItemTrkgLine: Record "Whse. Item Tracking Line";
-        ActionType: Enum "Warehouse Action Type"): Decimal
-    var
-        WarehouseActivityLine: Record "Warehouse Activity Line";
-    begin
-        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityLine."Activity Type"::Movement, WarehouseActivityLine."Activity Type"::"Put-away");
-        WarehouseActivityLine.SetRange("Whse. Document Type", WhseItemTrkgLine."Source Type Filter");
-        WarehouseActivityLine.SetRange("Whse. Document No.", WhseItemTrkgLine."Source ID");
-        WarehouseActivityLine.Setrange("Whse. Document Line No.", WhseItemTrkgLine."Source Prod. Order Line");
-        WarehouseActivityLine.SetRange("Source Subline No.", WhseItemTrkgLine."Source Ref. No.");
-        WarehouseActivityLine.SetRange("Serial No.", WhseItemTrkgLine."Serial No.");
-        WarehouseActivityLine.SetRange("Lot No.", WhseItemTrkgLine."Lot No.");
-        WarehouseActivityLine.SetRange("Package No.", WhseItemTrkgLine."Package No.");
-        WarehouseActivityLine.SetRange("Item No.", WhseItemTrkgLine."Item No.");
-        WarehouseActivityLine.SetRange("Action Type", ActionType);
-        WarehouseActivityLine.CalcSums("Qty. Outstanding (Base)");
-        exit(WarehouseActivityLine."Qty. Outstanding (Base)");
     end;
 
     [Scope('OnPrem')]
@@ -4193,16 +4161,6 @@ codeunit 6500 "Item Tracking Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnSynchronizeItemTracking2OnBeforeRegisterItemTrackingLines(var ItemTrackingLines: Page "Item Tracking Lines"; var TempSourceSpec: Record "Tracking Specification" temporary; var TempTrkgSpec3: Record "Tracking Specification" temporary; var FromReservEntry: Record "Reservation Entry"; ReservEntry2: Record "Reservation Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFindInInventoryOnAfterItemLedgerEntrySetFilters(var ItemLedgerEntry: Record "Item Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertReservEntryToOutboundTransferLineOnBeforeReservationEntryInsert(var ReservationEntry: Record "Reservation Entry"; var ItemLedgerEntryBuf: Record "Item Ledger Entry"; var TransferLine: Record "Transfer Line"; QtyBase: Decimal; var EntriesExist: Boolean)
     begin
     end;
 }
