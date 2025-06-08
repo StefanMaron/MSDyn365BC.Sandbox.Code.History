@@ -1253,13 +1253,7 @@ table 5902 "Service Line"
             var
                 ServAmountsMgt: Codeunit "Serv-Amounts Mgt.";
                 LineDiscountAmountExpected: Decimal;
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateLineAmount(Rec, xRec, Currency, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
-
                 TestField(Type);
                 TestQtyFromLineAmount();
                 TestField("Unit Price");
@@ -7194,11 +7188,6 @@ table 5902 "Service Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetVatBaseDiscountPct(var ServiceLine: Record "Service Line"; var ServiceHeader: Record "Service Header"; var Result: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateLineAmount(var ServiceLine: Record "Service Line"; xServiceLine: Record "Service Line"; Currency: Record Currency; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
