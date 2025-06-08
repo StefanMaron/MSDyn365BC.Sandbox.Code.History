@@ -24,7 +24,6 @@ codeunit 139884 "Item Serv. Comm. Test"
     begin
         SetupServiceCommPackageAndServiceCommitmentItem(false);
         ContractTestLibrary.UpdateServiceCommitmentPackageWithPriceGroup(ServiceCommitmentPackage, '');
-        ContractTestLibrary.UpdateServiceCommitmentPackageLineWithInvoicingItem(ServiceCommPackageLine, '');
         Commit(); // retain data after asserterror
         for i := 0 to 3 do begin
             ContractTestLibrary.CreateItemWithServiceCommitmentOption(Item, Enum::"Item Service Commitment Type".FromInteger(i));
@@ -50,7 +49,6 @@ codeunit 139884 "Item Serv. Comm. Test"
     begin
         SetupServiceCommPackageAndServiceCommitmentItem(false);
         ContractTestLibrary.UpdateServiceCommitmentPackageWithPriceGroup(ServiceCommitmentPackage, '');
-        ContractTestLibrary.UpdateServiceCommitmentPackageLineWithInvoicingItem(ServiceCommPackageLine, '');
         Commit(); // retain data after asserterror
         for i := 0 to 3 do begin
             ContractTestLibrary.CreateItemWithServiceCommitmentOption(Item, Enum::"Item Service Commitment Type".FromInteger(i));
