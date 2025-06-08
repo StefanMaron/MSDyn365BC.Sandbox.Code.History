@@ -1051,7 +1051,13 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     local procedure InsertCapLedgEntry(var CapLedgEntry: Record "Capacity Ledger Entry"; Qty: Decimal; InvdQty: Decimal)
+    var
+        IsHandled: Boolean;
     begin
+        OnBeforeProcedureInsertCapLedgEntry(ItemJnlLine, CapLedgEntry, IsHandled);
+        if IsHandled then
+            exit;
+
         if CapLedgEntryNo = 0 then begin
             CapLedgEntry.LockTable();
             CapLedgEntryNo := CapLedgEntry.GetLastEntryNo();
@@ -1996,7 +2002,14 @@ codeunit 22 "Item Jnl.-Post Line"
                         ReservEntry.SetRange("Item No.", ItemJnlLine."Item No.");
                     end;
 
-                UseReservationApplication := ReservEntry.FindFirst();
+                if TempTrackingSpecification.IsEmpty() then
+                    if ItemJnlLine."Document Type" = ItemJnlLine."Document Type"::"Direct Transfer" then
+                        if ItemLedgEntry.Quantity < 0 then
+                            ReservEntry.SetRange("Source Subtype", 0)
+                        else
+                            ReservEntry.SetRange("Source Subtype", 1);
+
+                UseReservationApplication := FindReservationEntryWithAdditionalCheckForAssemblyItem(ReservEntry);
 
                 Handled := false;
                 OnApplyItemLedgEntryOnBeforeCloseSurplusTrackingEntry(ItemJnlLine, StartApplication, UseReservationApplication, Handled);
@@ -2161,6 +2174,28 @@ codeunit 22 "Item Jnl.-Post Line"
             end;
             OnApplyItemLedgEntryOnApplicationLoop(ItemLedgEntry);
         until false;
+    end;
+
+    local procedure FindReservationEntryWithAdditionalCheckForAssemblyItem(var ReservEntry: Record "Reservation Entry"): Boolean
+    begin
+        if not ReservEntry.FindFirst() then
+            exit(false);
+
+        if AssemblyReservationEntryMismatchWithItemJnlLine(ReservEntry) then
+            exit(false);
+
+        exit(true);
+    end;
+
+    local procedure AssemblyReservationEntryMismatchWithItemJnlLine(var ReservEntry: Record "Reservation Entry"): Boolean
+    var
+        ReservEntry2: Record "Reservation Entry";
+    begin
+        ReservEntry2.SetLoadFields("Source Type", "Source Subtype");
+        ReservEntry2.Get(ReservEntry."Entry No.", not ReservEntry.Positive);
+        if (ReservEntry2."Source Type" = Database::"Assembly Header") and (ReservEntry2."Source Subtype" = 1)
+             and (not ItemJnlLine."Assemble to Order") then
+            exit(true);
     end;
 
     local procedure UpdateReservationEntryForNonInventoriableItem()
@@ -8287,6 +8322,11 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUndoValuePostingWithJob(OldItemLedgEntryNo: Integer; NewItemLedgEntryNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeProcedureInsertCapLedgEntry(var ItemJournalLine: Record "Item Journal Line"; var CapacityLedgerEntry: Record "Capacity Ledger Entry"; var IsHandled: Boolean)
     begin
     end;
 }
