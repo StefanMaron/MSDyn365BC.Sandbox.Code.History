@@ -431,14 +431,8 @@ table 8068 "Sales Service Commitment"
     end;
 
     procedure CalculateCalculationBaseAmount()
-    var
-        IsHandled: Boolean;
     begin
         SalesLine.Get("Document Type", "Document No.", "Document Line No.");
-        OnBeforeCalculateCalculationBaseAmount(SalesLine, Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         if SalesLine.Type <> Enum::"Sales Line Type"::Item then
             exit;
         case Partner of
@@ -447,7 +441,6 @@ table 8068 "Sales Service Commitment"
             Partner::Vendor:
                 CalculateCalculationBaseAmountVendor();
         end;
-        OnAfterCalculateCalculationBaseAmount(SalesLine, Rec);
     end;
 
     local procedure CalculateCalculationBaseAmountCustomer()
@@ -691,7 +684,7 @@ table 8068 "Sales Service Commitment"
             TempSalesServiceCommitmentBuff.SetRange("VAT Calculation Type", SalesLineVAT."VAT Calculation Type");
             TempSalesServiceCommitmentBuff.SetRange("VAT %", VatPercent);
             TempSalesServiceCommitmentBuff.SetRange("Tax Group Code", SalesLineVAT."Tax Group Code");
-            if not TempSalesServiceCommitmentBuff.FindLast() then begin
+            if TempSalesServiceCommitmentBuff.IsEmpty() then begin
                 TempSalesServiceCommitmentBuff."Entry No." := TempSalesServiceCommitmentBuff.GetNextEntryNo();
                 TempSalesServiceCommitmentBuff.Init();
                 TempSalesServiceCommitmentBuff."Rhythm Identifier" := RhythmIdentifier;
@@ -745,16 +738,6 @@ table 8068 "Sales Service Commitment"
 
     [InternalEvent(false, false)]
     local procedure OnBeforeCreateVATAmountLineForSalesServiceCommitment(SalesServiceCommitment: Record "Sales Service Commitment"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalculateCalculationBaseAmount(var SalesLine: Record "Sales Line"; var SalesServiceCommitment: Record "Sales Service Commitment"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCalculateCalculationBaseAmount(var SalesLine: Record "Sales Line"; var SalesServiceCommitment: Record "Sales Service Commitment")
     begin
     end;
 
