@@ -324,6 +324,7 @@ table 6103 "E-Document Service"
         EDocBackgroundJobs.RemoveJob(Rec."Import Recurrent Job Id");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"E-Document Service", 'I')]
     internal procedure GetPDFReaderService()
     begin
         if Rec.Get(AzureDocumentIntelligenceTok) then

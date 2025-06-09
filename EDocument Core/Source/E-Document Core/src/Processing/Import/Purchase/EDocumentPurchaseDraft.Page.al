@@ -402,7 +402,6 @@ page 6181 "E-Document Purchase Draft"
     var
         EDocImportParameters: Record "E-Doc. Import Parameters";
         EDocImport: Codeunit "E-Doc. Import";
-        EDocumentHelper: Codeunit "E-Document Helper";
     begin
         Session.LogMessage('0000PCO', FinalizeDraftInvokedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', EDocPOCopilotMatching.FeatureName());
 
@@ -428,7 +427,6 @@ page 6181 "E-Document Purchase Draft"
     var
         EDocImportParameters: Record "E-Doc. Import Parameters";
         EDocImport: Codeunit "E-Doc. Import";
-        EDocumentHelper: Codeunit "E-Document Helper";
         ConfirmDialogMgt: Codeunit "Confirm Management";
         Progress: Dialog;
     begin
@@ -453,16 +451,13 @@ page 6181 "E-Document Purchase Draft"
     local procedure AnalyzeEDocument()
     var
         EDocImportParameters: Record "E-Doc. Import Parameters";
-        EDocumentService: Record "E-Document Service";
         EDocImport: Codeunit "E-Doc. Import";
         Progress: Dialog;
     begin
-        EDocumentService.GetPDFReaderService();
-        Rec.TestField("Service", EDocumentService.Code);
-
+        if not EDocumentHelper.EnsureInboundEDocumentHasService(Rec) then
+            exit;
         if GuiAllowed() then
             Progress.Open(ProcessingDocumentMsg);
-
 
         // Regardless of document state, we re-run the structure received data, then prepare draft step.
         EDocImportParameters."Step to Run" := Enum::"Import E-Document Steps"::"Structure received data";
@@ -482,6 +477,7 @@ page 6181 "E-Document Purchase Draft"
         EDocumentProcessing: Codeunit "E-Document Processing";
         EDocPOCopilotMatching: Codeunit "E-Doc. PO Copilot Matching";
         FeatureTelemetry: Codeunit "Feature Telemetry";
+        EDocumentHelper: Codeunit "E-Document Helper";
         ErrorsAndWarningsNotification: Notification;
         AIGeneratedContentNotification: Notification;
         RecordLinkTxt, StyleStatusTxt, ServiceStatusStyleTxt, VendorName, DataCaption : Text;
