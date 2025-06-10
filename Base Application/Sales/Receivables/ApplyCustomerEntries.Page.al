@@ -116,14 +116,10 @@ page 232 "Apply Customer Entries"
 
                     trigger OnValidate()
                     begin
-                        if Rec."Applies-to ID" = xRec."Applies-to ID" then
-                            exit;
-
                         if (CalcType = CalcType::"Gen. Jnl. Line") and (ApplnType = ApplnType::"Applies-to Doc. No.") then
                             Error(CannotSetAppliesToIDErr);
 
                         SetCustApplId(true);
-                        Rec.Get(Rec."Entry No.");
                         if Rec."Applies-to ID" <> '' then
                             UpdateCustomAppliesToIDForGenJournal(Rec."Applies-to ID");
 
@@ -1553,8 +1549,6 @@ page 232 "Apply Customer Entries"
                 else
                     Applied := CustEntryApplyPostedEntries.Apply(Rec, NewApplyUnapplyParameters);
 
-                OnPostDirectApplicationOnAfterApply(Rec, NewApplyUnapplyParameters, PreviewMode, Applied);
-
                 if (not PreviewMode) and Applied then begin
                     Message(ApplicationPostedMsg);
                     PostingDone := true;
@@ -1859,11 +1853,6 @@ page 232 "Apply Customer Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrencyWhenEntryNoIsNotNull(CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDirectApplicationOnAfterApply(var CustLedgerEntry: Record "Cust. Ledger Entry"; var NewApplyUnapplyParameters: Record "Apply Unapply Parameters"; PreviewMode: Boolean; Applied: Boolean)
     begin
     end;
 }
