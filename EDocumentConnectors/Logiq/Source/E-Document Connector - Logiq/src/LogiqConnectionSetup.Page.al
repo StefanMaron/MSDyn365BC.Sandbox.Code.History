@@ -37,9 +37,6 @@ page 6430 "Logiq Connection Setup"
                         IsolatedStorage.Set(this.LogiqAuth.GetConnectionSetupClientSecretKey(), this.ClientSecret, DataScope::Company);
                     end;
                 }
-                field(Environment; Rec.Environment)
-                {
-                }
                 field("Authentication URL"; Rec."Authentication URL")
                 {
                 }
