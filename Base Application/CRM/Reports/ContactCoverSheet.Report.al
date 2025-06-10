@@ -349,7 +349,12 @@ report 5055 "Contact - Cover Sheet"
 
         trigger OnInit()
         begin
-            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Cover Sheet") <> '';
+            LogInteractionEnable := true;
+        end;
+
+        trigger OnOpenPage()
+        begin
+            LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Cover Sheet") <> '';
             LogInteractionEnable := LogInteraction;
         end;
     }
