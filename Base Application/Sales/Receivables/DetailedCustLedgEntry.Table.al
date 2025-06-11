@@ -339,7 +339,6 @@ table 379 "Detailed Cust. Ledg. Entry"
         SetOriginalDocumentInfo();
     end;
 
-    [InherentPermissions(PermissionObjectType::TableData, Database::"Detailed Cust. Ledg. Entry", 'r')]
     procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";

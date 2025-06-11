@@ -192,9 +192,6 @@ table 12144 "GL Book Entry"
         key(Key7; "G/L Account No.", "Posting Date")
         {
         }
-        key(Key8; "Progressive No.", "Official Date")
-        {
-        }
     }
 
     fieldgroups
