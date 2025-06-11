@@ -188,7 +188,6 @@ codeunit 30176 "Shpfy Product API"
         exit(Product."Image Id");
     end;
 
-    [TryFunction]
     internal procedure UpdateProductImage(Parameters: Dictionary of [Text, Text])
     begin
         CommunicationMgt.ExecuteGraphQL("Shpfy GraphQL Type"::UpdateProductImage, Parameters);
