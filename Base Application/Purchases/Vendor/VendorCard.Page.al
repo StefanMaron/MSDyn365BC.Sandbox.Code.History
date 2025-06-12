@@ -1807,20 +1807,18 @@ page 26 "Vendor Card"
     }
 
     trigger OnAfterGetCurrRecord()
-    var
-        ClientTypeManagement: Codeunit "Client Type Management";
     begin
         if GuiAllowed() then
             OnAfterGetCurrRecordFunc()
         else
-            if not (ClientTypeManagement.GetCurrentClientType() in [ClientType::ODataV4, ClientType::Api]) then
-                StartBackgroundCalculations();
+            StartBackgroundCalculations();
     end;
 
     local procedure OnAfterGetCurrRecordFunc()
     var
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
     begin
+        OnBeforeOnAfterGetCurrRecordFunc(Rec);
         if NewMode then
             CreateVendorFromTemplate()
         else
@@ -2107,6 +2105,11 @@ page 26 "Vendor Card"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateVendorFromTemplateOnBeforeCurrPageUpdate(var Vendor: Record Vendor)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnAfterGetCurrRecordFunc(var Vendor: Record Vendor)
     begin
     end;
 }
