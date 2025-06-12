@@ -13,6 +13,7 @@ codeunit 36955 "Manuf. Filter Helper"
         RelativeFilterLbl: Label '%1..', Locked = true;
         FilterTxt: Text;
     begin
+        Clear(FilterTxt);
         if PBISetup.Get() then
             case PBISetup."Manufacturing Load Date Type" of
                 PBISetup."Manufacturing Load Date Type"::"Start/End Date":
@@ -42,6 +43,7 @@ codeunit 36955 "Manuf. Filter Helper"
         RelativeFilterLbl: Label '%1..', Locked = true;
         FilterTxt: Text;
     begin
+        Clear(FilterTxt);
         if PBISetup.Get() then
             case PBISetup."Manufacturing Load Date Type" of
                 PBISetup."Manufacturing Load Date Type"::"Start/End Date":
