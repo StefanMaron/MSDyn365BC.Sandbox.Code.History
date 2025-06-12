@@ -10,7 +10,6 @@ page 191 "Incoming Documents Setup"
     ApplicationArea = Suite;
     Caption = 'Incoming Documents Setup';
     DeleteAllowed = false;
-    InsertAllowed = false;
     PageType = Card;
     SourceTable = "Incoming Documents Setup";
     UsageCategory = Administration;
