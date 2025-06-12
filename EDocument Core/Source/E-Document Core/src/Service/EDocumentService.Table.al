@@ -8,6 +8,7 @@ using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.eServices.EDocument.Integration.Interfaces;
 using Microsoft.eServices.EDocument.Integration;
 using Microsoft.eServices.EDocument.Processing.Import;
+using Microsoft.eServices.EDocument.Format;
 
 table 6103 "E-Document Service"
 {
@@ -257,24 +258,12 @@ table 6103 "E-Document Service"
                 end;
             end;
         }
-#pragma warning disable AS0004
-#pragma warning disable AS0115
-#pragma warning disable AS0072
-#if not CLEANSCHEMA26
-        field(29; "E-Document Structured Format"; Integer)
+        field(29; "E-Document Structured Format"; Enum "E-Document Structured Format")
         {
             Caption = 'Structured Data Format';
             ToolTip = 'Specifies the format of the structured data.';
             DataClassification = SystemMetadata;
-            ObsoleteReason = 'Use the "Read into Draft Impl." field instead.';
-            ObsoleteState = Removed;
-            ObsoleteTag = '26.0';
         }
-#endif
-#pragma warning restore AS0115
-#pragma warning restore AS0004
-#pragma warning restore AS0072
-
         field(31; "Import Process"; Enum "E-Document Import Process")
         {
             Caption = 'Import Process';
@@ -285,12 +274,6 @@ table 6103 "E-Document Service"
         {
             Caption = 'Automatic processing';
             ToolTip = 'Specifies if the processing of a document should start automatically after it is imported.';
-            DataClassification = SystemMetadata;
-        }
-        field(33; "Read into Draft Impl."; Enum "E-Doc. Read into Draft")
-        {
-            Caption = 'Read into Draft';
-            ToolTip = 'Specifies how the inbound structured e-document should be read into a draft document.';
             DataClassification = SystemMetadata;
         }
         field(40; "Embed PDF in export"; Boolean)
@@ -324,7 +307,6 @@ table 6103 "E-Document Service"
         EDocBackgroundJobs.RemoveJob(Rec."Import Recurrent Job Id");
     end;
 
-    [InherentPermissions(PermissionObjectType::TableData, Database::"E-Document Service", 'I')]
     internal procedure GetPDFReaderService()
     begin
         if Rec.Get(AzureDocumentIntelligenceTok) then
@@ -335,6 +317,7 @@ table 6103 "E-Document Service"
         Rec."Import Process" := "Import Process"::"Version 2.0";
         Rec.Description := AzureDocumentIntelligenceServiceTxt;
         Rec."Automatic Import Processing" := "E-Doc. Automatic Processing"::No;
+        Rec."E-Document Structured Format" := "E-Document Structured Format"::"Azure Document Intelligence";
         Rec.Insert(true);
     end;
 
@@ -362,11 +345,7 @@ table 6103 "E-Document Service"
 
     internal procedure GetDefaultImportParameters() EDocImportParameters: Record "E-Doc. Import Parameters"
     begin
-        if Rec."Import Process" = "Import Process"::"Version 1.0" then begin
-            EDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
-            EDocImportParameters."Create Document V1 Behavior" := IsAutomaticProcessingEnabled();
-        end else
-            EDocImportParameters."Step to Run" := IsAutomaticProcessingEnabled() ? "Import E-Document Steps"::"Finish draft" : "Import E-Document Steps"::"Prepare draft";
+        EDocImportParameters."Step to Run" := IsAutomaticProcessingEnabled() ? "Import E-Document Steps"::"Finish draft" : "Import E-Document Steps"::"Prepare draft";
     end;
 
     internal procedure ToString(): Text
