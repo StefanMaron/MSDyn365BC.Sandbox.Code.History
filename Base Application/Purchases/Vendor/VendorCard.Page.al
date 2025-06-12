@@ -1843,14 +1843,11 @@ page 26 "Vendor Card"
     }
 
     trigger OnAfterGetCurrRecord()
-    var
-        ClientTypeManagement: Codeunit "Client Type Management";
     begin
         if GuiAllowed() then
             OnAfterGetCurrRecordFunc()
         else
-            if not (ClientTypeManagement.GetCurrentClientType() in [ClientType::ODataV4, ClientType::Api]) then
-                StartBackgroundCalculations();
+            StartBackgroundCalculations();
     end;
 
     local procedure OnAfterGetCurrRecordFunc()
