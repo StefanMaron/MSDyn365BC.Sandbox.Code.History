@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./SimplifiedBankStatementImport/Test/Simplified Bank Statement Import Test"
@@ -8,6 +16,9 @@
     },
     {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
+    },
+    {
+      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
     },
     {
       "path": "./BusinessFoundation/Test/Business Foundation Test Libraries"
@@ -300,13 +311,5 @@
     {
       "path": "./Shopify/test/Shopify Connector Test"
     }
-  ],
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    }
-  }
+  ]
 }
