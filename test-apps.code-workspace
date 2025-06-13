@@ -163,6 +163,9 @@
       "path": "./ReportLayouts/Test/Report Layouts Tests"
     },
     {
+      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
+    },
+    {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
