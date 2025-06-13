@@ -7,6 +7,9 @@
       "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
     },
     {
+      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
+    },
+    {
       "path": "./BusinessFoundation/Test/Business Foundation Test Libraries"
     },
     {
@@ -74,6 +77,9 @@
     },
     {
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests"
+    },
+    {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AI Tests"
