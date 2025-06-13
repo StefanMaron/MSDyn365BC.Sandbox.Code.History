@@ -31,22 +31,22 @@ table 5093 "Opportunity Entry"
 
             trigger OnValidate()
             var
-                OpportunityEntry2: Record "Opportunity Entry";
+                OppEntry: Record "Opportunity Entry";
             begin
-                OpportunityEntry2.SetCurrentKey(Active, "Opportunity No.");
-                OpportunityEntry2.SetRange(Active, true);
-                OpportunityEntry2.SetRange("Opportunity No.", "Opportunity No.");
-                if OpportunityEntry2.FindFirst() then begin
-                    "Estimated Value (LCY)" := OpportunityEntry2."Estimated Value (LCY)";
-                    "Chances of Success %" := OpportunityEntry2."Chances of Success %";
-                    "Date of Change" := OpportunityEntry2."Date of Change";
-                    if OpportunityEntry2."Date of Change" > WorkDate() then
-                        "Date of Change" := OpportunityEntry2."Date of Change"
+                OppEntry.SetCurrentKey(Active, "Opportunity No.");
+                OppEntry.SetRange(Active, true);
+                OppEntry.SetRange("Opportunity No.", "Opportunity No.");
+                if OppEntry.FindFirst() then begin
+                    "Estimated Value (LCY)" := OppEntry."Estimated Value (LCY)";
+                    "Chances of Success %" := OppEntry."Chances of Success %";
+                    "Date of Change" := OppEntry."Date of Change";
+                    if OppEntry."Date of Change" > WorkDate() then
+                        "Date of Change" := OppEntry."Date of Change"
                     else
                         "Date of Change" := WorkDate();
-                    "Estimated Close Date" := OpportunityEntry2."Estimated Close Date";
-                    "Previous Sales Cycle Stage" := OpportunityEntry2."Sales Cycle Stage";
-                    "Action Taken" := OpportunityEntry2."Action Taken";
+                    "Estimated Close Date" := OppEntry."Estimated Close Date";
+                    "Previous Sales Cycle Stage" := OppEntry."Sales Cycle Stage";
+                    "Action Taken" := OppEntry."Action Taken";
                 end else
                     "Date of Change" := WorkDate();
             end;
@@ -229,11 +229,10 @@ table 5093 "Opportunity Entry"
 
     trigger OnInsert()
     var
-        Opportunity: Record Opportunity;
-        SalesCycleStage2: Record "Sales Cycle Stage";
-        ShouldModifyOpportunity: Boolean;
+        Opp: Record Opportunity;
+        SalesCycleStage: Record "Sales Cycle Stage";
     begin
-        Opportunity.Get("Opportunity No.");
+        Opp.Get("Opportunity No.");
         case "Action Taken" of
             "Action Taken"::" ",
             "Action Taken"::Next,
@@ -241,52 +240,47 @@ table 5093 "Opportunity Entry"
             "Action Taken"::Updated,
             "Action Taken"::Jumped:
                 begin
-                    SalesCycleStage2.SetLoadFields(Description);
-                    if SalesCycleStage2.Get("Sales Cycle Code", "Sales Cycle Stage") then
-                        "Sales Cycle Stage Description" := SalesCycleStage2.Description;
-                    if Opportunity.Status <> Opportunity.Status::"In Progress" then begin
-                        Opportunity.Status := Opportunity.Status::"In Progress";
-                        ShouldModifyOpportunity := true;
+                    if SalesCycleStage.Get("Sales Cycle Code", "Sales Cycle Stage") then
+                        "Sales Cycle Stage Description" := SalesCycleStage.Description;
+                    if Opp.Status <> Opp.Status::"In Progress" then begin
+                        Opp.Status := Opp.Status::"In Progress";
+                        Opp.Modify();
                     end;
                 end;
             "Action Taken"::Won:
                 begin
                     TestCust();
-                    if Opportunity.Status <> Opportunity.Status::Won then begin
-                        Opportunity.Status := Opportunity.Status::Won;
-                        Opportunity.Closed := true;
-                        Opportunity."Date Closed" := "Date of Change";
+                    if Opp.Status <> Opp.Status::Won then begin
+                        Opp.Status := Opp.Status::Won;
+                        Opp.Closed := true;
+                        Opp."Date Closed" := "Date of Change";
                         "Date Closed" := "Date of Change";
                         "Estimated Close Date" := "Date of Change";
-                        ShouldModifyOpportunity := true;
+                        Opp.Modify();
                     end;
                 end;
             "Action Taken"::Lost:
-                if Opportunity.Status <> Opportunity.Status::Lost then begin
-                    Opportunity.Status := Opportunity.Status::Lost;
-                    Opportunity.Closed := true;
-                    Opportunity."Date Closed" := "Date of Change";
+                if Opp.Status <> Opp.Status::Lost then begin
+                    Opp.Status := Opp.Status::Lost;
+                    Opp.Closed := true;
+                    Opp."Date Closed" := "Date of Change";
                     "Date Closed" := "Date of Change";
                     "Estimated Close Date" := "Date of Change";
-                    ShouldModifyOpportunity := true;
+                    Opp.Modify();
                 end;
         end;
-
-        OnOnInsertOnBeforeModifyOpportunity(Rec, Opportunity, ShouldModifyOpportunity);
-        if ShouldModifyOpportunity then
-            Opportunity.Modify();
     end;
 
     var
-        OpportunityEntry: Record "Opportunity Entry";
-        SalesCycleStage: Record "Sales Cycle Stage";
-        PreviousDateOfChange: Date;
-        EntryExists: Boolean;
 #pragma warning disable AA0074
 #pragma warning disable AA0470
         Text000: Label 'You can not create a Customer from contact %1 before you assign a Contact Company No. to the contact.';
 #pragma warning restore AA0470
 #pragma warning restore AA0074
+        OppEntry: Record "Opportunity Entry";
+        SalesCycleStage: Record "Sales Cycle Stage";
+        PreviousDateOfChange: Date;
+        EntryExists: Boolean;
 #pragma warning disable AA0074
         Text005: Label 'You cannot go to this stage before you have assigned a sales quote.';
 #pragma warning disable AA0470
@@ -319,39 +313,39 @@ table 5093 "Opportunity Entry"
         exit(FindRecordManagement.GetLastEntryIntFieldValue(Rec, FieldNo("Entry No.")))
     end;
 
-    procedure InsertEntry(var OpportunityEntryToInsert: Record "Opportunity Entry"; CancelOldTask: Boolean; CreateNewTask: Boolean)
+    procedure InsertEntry(var OppEntry: Record "Opportunity Entry"; CancelOldTask: Boolean; CreateNewTask: Boolean)
     var
-        OpportunityEntryInserted: Record "Opportunity Entry";
+        OppEntry2: Record "Opportunity Entry";
         EntryNo: Integer;
     begin
-        if OpportunityEntryInserted.FindLast() then
-            EntryNo := OpportunityEntryInserted."Entry No."
+        OppEntry2.Reset();
+        if OppEntry2.FindLast() then
+            EntryNo := OppEntry2."Entry No."
         else
             EntryNo := 0;
-        OpportunityEntryInserted.SetCurrentKey(Active, "Opportunity No.");
-        OpportunityEntryInserted.SetRange(Active, true);
-        OpportunityEntryInserted.SetRange("Opportunity No.", OpportunityEntryToInsert."Opportunity No.");
-        if OpportunityEntryInserted.FindFirst() then begin
-            OpportunityEntryInserted.Active := false;
-            OpportunityEntryInserted."Days Open" := OpportunityEntryToInsert."Date of Change" - OpportunityEntryInserted."Date of Change";
-            OpportunityEntryInserted.Modify();
+        OppEntry2.SetCurrentKey(Active, "Opportunity No.");
+        OppEntry2.SetRange(Active, true);
+        OppEntry2.SetRange("Opportunity No.", OppEntry."Opportunity No.");
+        if OppEntry2.FindFirst() then begin
+            OppEntry2.Active := false;
+            OppEntry2."Days Open" := OppEntry."Date of Change" - OppEntry2."Date of Change";
+            OppEntry2.Modify();
         end;
 
-        OpportunityEntryInserted := OpportunityEntryToInsert;
-        OpportunityEntryInserted."Entry No." := EntryNo + 1;
-        OpportunityEntryInserted.Active := true;
-        OpportunityEntryInserted.CreateTask(CancelOldTask, CreateNewTask);
-        OnInsertEntryOnBeforeInsert(OpportunityEntryToInsert, OpportunityEntryInserted);
-        OpportunityEntryInserted.Insert(true);
-        OpportunityEntryToInsert := OpportunityEntryInserted;
-        OnAfterInsertEntry(OpportunityEntryToInsert);
+        OppEntry2 := OppEntry;
+        OppEntry2."Entry No." := EntryNo + 1;
+        OppEntry2.Active := true;
+        OppEntry2.CreateTask(CancelOldTask, CreateNewTask);
+        OppEntry2.Insert(true);
+        OppEntry := OppEntry2;
+        OnAfterInsertEntry(OppEntry);
     end;
 
     procedure UpdateEstimates()
     var
         SalesCycle: Record "Sales Cycle";
-        SalesCycleStage2: Record "Sales Cycle Stage";
-        Opportunity: Record Opportunity;
+        SalesCycleStage: Record "Sales Cycle Stage";
+        Opp: Record Opportunity;
         SalesHeader: Record "Sales Header";
         IsHandled: Boolean;
     begin
@@ -360,12 +354,11 @@ table 5093 "Opportunity Entry"
         if IsHandled then
             exit;
 
-        SalesCycleStage2.SetLoadFields("Chances of Success %", "Completed %", "Date Formula");
-        if SalesCycleStage2.Get("Sales Cycle Code", "Sales Cycle Stage") then begin
+        if SalesCycleStage.Get("Sales Cycle Code", "Sales Cycle Stage") then begin
             SalesCycle.Get("Sales Cycle Code");
-            if ("Chances of Success %" = 0) and (SalesCycleStage2."Chances of Success %" <> 0) then
-                "Chances of Success %" := SalesCycleStage2."Chances of Success %";
-            "Completed %" := SalesCycleStage2."Completed %";
+            if ("Chances of Success %" = 0) and (SalesCycleStage."Chances of Success %" <> 0) then
+                "Chances of Success %" := SalesCycleStage."Chances of Success %";
+            "Completed %" := SalesCycleStage."Completed %";
             case SalesCycle."Probability Calculation" of
                 SalesCycle."Probability Calculation"::Multiply:
                     "Probability %" := "Chances of Success %" * "Completed %" / 100;
@@ -378,14 +371,14 @@ table 5093 "Opportunity Entry"
             end;
             "Calcd. Current Value (LCY)" := "Estimated Value (LCY)" * "Probability %" / 100;
             if ("Estimated Close Date" = "Date of Change") or ("Estimated Close Date" = 0D) then
-                "Estimated Close Date" := CalcDate(SalesCycleStage2."Date Formula", "Date of Change");
+                "Estimated Close Date" := CalcDate(SalesCycleStage."Date Formula", "Date of Change");
         end;
 
         case "Action Taken" of
             "Action Taken"::Won:
                 begin
-                    Opportunity.Get("Opportunity No.");
-                    if SalesHeader.Get(SalesHeader."Document Type"::Quote, Opportunity."Sales Document No.") then
+                    Opp.Get("Opportunity No.");
+                    if SalesHeader.Get(SalesHeader."Document Type"::Quote, Opp."Sales Document No.") then
                         "Calcd. Current Value (LCY)" := GetSalesDocValue(SalesHeader);
 
                     "Completed %" := 100;
@@ -407,35 +400,35 @@ table 5093 "Opportunity Entry"
 
     procedure CreateTask(CancelOldTask: Boolean; CreateNewTask: Boolean)
     var
-        SalesCycleStage2: Record "Sales Cycle Stage";
-        ToDoTask: Record "To-do";
-        Opportunity: Record Opportunity;
+        SalesCycleStage: Record "Sales Cycle Stage";
+        Task: Record "To-do";
+        Opp: Record Opportunity;
         TempRMCommentLine: Record "Rlshp. Mgt. Comment Line" temporary;
         TempAttendee: Record Attendee temporary;
         TempTaskInteractionLanguage: Record "To-do Interaction Language" temporary;
         TempAttachment: Record Attachment temporary;
     begin
         if CancelOldTask then
-            ToDoTask.CancelOpenTasks("Opportunity No.");
+            Task.CancelOpenTasks("Opportunity No.");
 
         if CreateNewTask then
-            if SalesCycleStage2.Get("Sales Cycle Code", "Sales Cycle Stage") then
-                if SalesCycleStage2."Activity Code" <> '' then begin
-                    Opportunity.Get("Opportunity No.");
-                    ToDoTask."No." := '';
-                    ToDoTask."Campaign No." := "Campaign No.";
-                    ToDoTask."Segment No." := Opportunity."Segment No.";
-                    ToDoTask."Salesperson Code" := "Salesperson Code";
-                    ToDoTask.Validate("Contact No.", "Contact No.");
-                    ToDoTask."Opportunity No." := "Opportunity No.";
-                    ToDoTask."Opportunity Entry No." := "Entry No.";
-                    ToDoTask.Date := "Date of Change";
-                    ToDoTask.Duration := 1440 * 1000 * 60;
-                    OnCreateTaskOnBeforeInsertTask(Rec, ToDoTask);
-                    ToDoTask.InsertTask(
-                      ToDoTask, TempRMCommentLine, TempAttendee,
+            if SalesCycleStage.Get("Sales Cycle Code", "Sales Cycle Stage") then
+                if SalesCycleStage."Activity Code" <> '' then begin
+                    Opp.Get("Opportunity No.");
+                    Task."No." := '';
+                    Task."Campaign No." := "Campaign No.";
+                    Task."Segment No." := Opp."Segment No.";
+                    Task."Salesperson Code" := "Salesperson Code";
+                    Task.Validate("Contact No.", "Contact No.");
+                    Task."Opportunity No." := "Opportunity No.";
+                    Task."Opportunity Entry No." := "Entry No.";
+                    Task.Date := "Date of Change";
+                    Task.Duration := 1440 * 1000 * 60;
+                    OnCreateTaskOnBeforeInsertTask(Rec, Task);
+                    Task.InsertTask(
+                      Task, TempRMCommentLine, TempAttendee,
                       TempTaskInteractionLanguage, TempAttachment,
-                      SalesCycleStage2."Activity Code", false);
+                      SalesCycleStage."Activity Code", false);
                 end;
     end;
 
@@ -464,8 +457,8 @@ table 5093 "Opportunity Entry"
 
     local procedure TestCust()
     var
-        Contact: Record Contact;
-        ContactBusinessRelation: Record "Contact Business Relation";
+        Cont: Record Contact;
+        ContBusRel: Record "Contact Business Relation";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -473,54 +466,52 @@ table 5093 "Opportunity Entry"
         if IsHandled then
             exit;
 
-        Contact.Get("Contact No.");
+        Cont.Get("Contact No.");
 
-        if (Contact.Type = Contact.Type::Person) and (Contact."Company No." <> '') then
-            if not Contact.Get(Contact."Company No.") then
-                Error(Text000, Contact."No.");
+        if (Cont.Type = Cont.Type::Person) and (Cont."Company No." <> '') then
+            if not Cont.Get(Cont."Company No.") then
+                Error(Text000, Cont."No.");
 
-        ContactBusinessRelation.SetRange("Contact No.", Contact."No.");
-        ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
+        ContBusRel.SetRange("Contact No.", Cont."No.");
+        ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
 
-        if ContactBusinessRelation.IsEmpty() then
-            Contact.CreateCustomerFromTemplate('');
+        if not ContBusRel.FindFirst() then
+            Cont.CreateCustomerFromTemplate('');
     end;
 
-    procedure InitOpportunityEntry(Opportunity: Record Opportunity)
+    procedure InitOpportunityEntry(Opp: Record Opportunity)
     begin
-        Validate("Opportunity No.", Opportunity."No.");
-        "Sales Cycle Code" := Opportunity."Sales Cycle Code";
-        "Contact No." := Opportunity."Contact No.";
-        "Contact Company No." := Opportunity."Contact Company No.";
-        "Salesperson Code" := Opportunity."Salesperson Code";
-        "Campaign No." := Opportunity."Campaign No.";
+        Validate("Opportunity No.", Opp."No.");
+        "Sales Cycle Code" := Opp."Sales Cycle Code";
+        "Contact No." := Opp."Contact No.";
+        "Contact Company No." := Opp."Contact Company No.";
+        "Salesperson Code" := Opp."Salesperson Code";
+        "Campaign No." := Opp."Campaign No.";
 
-        OnAfterInitOpportunityEntry(Opportunity, Rec);
+        OnAfterInitOpportunityEntry(Opp, Rec);
     end;
 
-    procedure CloseOppFromOpp(var Opportunity: Record Opportunity)
+    procedure CloseOppFromOpp(var Opp: Record Opportunity)
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCloseOppFromOpp(Opportunity, Rec, IsHandled);
+        OnBeforeCloseOppFromOpp(Opp, Rec, IsHandled);
         if IsHandled then
             exit;
 
-        Opportunity.TestField(Closed, false);
+        Opp.TestField(Closed, false);
         DeleteAll();
         Init();
-        Validate("Opportunity No.", Opportunity."No.");
-        "Sales Cycle Code" := Opportunity."Sales Cycle Code";
-        "Contact No." := Opportunity."Contact No.";
-        "Contact Company No." := Opportunity."Contact Company No.";
-        "Salesperson Code" := Opportunity."Salesperson Code";
-        "Campaign No." := Opportunity."Campaign No.";
+        Validate("Opportunity No.", Opp."No.");
+        "Sales Cycle Code" := Opp."Sales Cycle Code";
+        "Contact No." := Opp."Contact No.";
+        "Contact Company No." := Opp."Contact Company No.";
+        "Salesperson Code" := Opp."Salesperson Code";
+        "Campaign No." := Opp."Campaign No.";
 
-        IsHandled := false;
-        OnCloseOppFromOppOnBeforeStartWizard(Opportunity, Rec, IsHandled);
-        if not IsHandled then
-            StartWizard(Page::"Close Opportunity");
+        OnCloseOppFromOppOnBeforeStartWizard(Opp, Rec);
+        StartWizard(PAGE::"Close Opportunity");
     end;
 
     local procedure StartWizard(PageID: Integer)
@@ -533,7 +524,7 @@ table 5093 "Opportunity Entry"
             exit;
 
         Insert();
-        if Page.RunModal(PageID, Rec) = Action::OK then;
+        if PAGE.RunModal(PageID, Rec) = ACTION::OK then;
     end;
 
     procedure CheckStatus()
@@ -559,41 +550,40 @@ table 5093 "Opportunity Entry"
     [Scope('OnPrem')]
     procedure FinishWizard()
     var
-        OpportunityEntryToInsert: Record "Opportunity Entry";
+        OppEntry: Record "Opportunity Entry";
     begin
         UpdateEstimates();
-        OpportunityEntryToInsert := Rec;
-        OnFinishWizardOnAfterUpdateEstimates(OpportunityEntryToInsert);
-        InsertEntry(OpportunityEntryToInsert, "Cancel Old To Do", false);
-        OnFinishWizardOnAfterInsertEntry(OpportunityEntryToInsert);
+        OppEntry := Rec;
+        InsertEntry(OppEntry, "Cancel Old To Do", false);
+        OnFinishWizardOnAfterInsertEntry(OppEntry);
         Delete();
     end;
 
-    local procedure ErrorMessage(FieldName: Text)
+    local procedure ErrorMessage(FieldName: Text[1024])
     begin
         Error(Text013, FieldName);
     end;
 
-    procedure UpdateOppFromOpp(var Opportunity: Record Opportunity)
+    procedure UpdateOppFromOpp(var Opp: Record Opportunity)
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateOppFromOpp(Opportunity, Rec, IsHandled);
+        OnBeforeUpdateOppFromOpp(Opp, Rec, IsHandled);
         if IsHandled then
             exit;
 
-        Opportunity.TestField(Closed, false);
+        Opp.TestField(Closed, false);
         DeleteAll();
         Init();
-        Validate("Opportunity No.", Opportunity."No.");
-        "Sales Cycle Code" := Opportunity."Sales Cycle Code";
-        "Contact No." := Opportunity."Contact No.";
-        "Contact Company No." := Opportunity."Contact Company No.";
-        "Salesperson Code" := Opportunity."Salesperson Code";
-        "Campaign No." := Opportunity."Campaign No.";
+        Validate("Opportunity No.", Opp."No.");
+        "Sales Cycle Code" := Opp."Sales Cycle Code";
+        "Contact No." := Opp."Contact No.";
+        "Contact Company No." := Opp."Contact Company No.";
+        "Salesperson Code" := Opp."Salesperson Code";
+        "Campaign No." := Opp."Campaign No.";
 
-        OnUpdateOppFromOppOnBeforeStartWizard2(Opportunity, Rec);
+        OnUpdateOppFromOppOnBeforeStartWizard2(Opp, Rec);
         StartWizard2();
     end;
 
@@ -608,7 +598,7 @@ table 5093 "Opportunity Entry"
         IsHandled := false;
         OnStartWizard2OnBeforeRunModalPage(Rec, xRec, IsHandled);
         if not IsHandled then
-            if Page.RunModal(Page::"Update Opportunity", Rec) = Action::OK then;
+            if PAGE.RunModal(PAGE::"Update Opportunity", Rec) = ACTION::OK then;
     end;
 
     procedure CheckStatus2()
@@ -638,7 +628,6 @@ table 5093 "Opportunity Entry"
     var
         CreateNewTask: Boolean;
         CancelOldTask: Boolean;
-        IsHandled: Boolean;
     begin
         CancelOldTask := "Cancel Old To Do";
         CreateNewTask := "Action Taken" <> "Action Taken"::Updated;
@@ -646,19 +635,16 @@ table 5093 "Opportunity Entry"
         "Cancel Old To Do" := false;
         UpdateEstimates();
         "Action Type" := "Action Type"::" ";
-        IsHandled := false;
-        OnFinishWizard2OnBeforeValidateSalesCycleStageDescription(OpportunityEntry, IsHandled);
-        if not IsHandled then
-            "Sales Cycle Stage Description" := '';
-        OpportunityEntry := Rec;
-        InsertEntry(OpportunityEntry, CancelOldTask, CreateNewTask);
-        OnFinishWizard2OnAfterInsertEntry(OpportunityEntry);
+        "Sales Cycle Stage Description" := '';
+        OppEntry := Rec;
+        InsertEntry(OppEntry, CancelOldTask, CreateNewTask);
+        OnFinishWizard2OnAfterInsertEntry(OppEntry);
         Delete();
     end;
 
     procedure WizardActionTypeValidate2()
     var
-        ToDoTask: Record "To-do";
+        Task: Record "To-do";
     begin
         case "Action Type" of
             "Action Type"::First:
@@ -706,10 +692,10 @@ table 5093 "Opportunity Entry"
                     "Action Taken" := "Action Taken"::Jumped;
                 end;
         end;
-
-        ToDoTask.SetCurrentKey("Opportunity No.");
-        ToDoTask.SetRange("Opportunity No.", "Opportunity No.");
-        if not ToDoTask.IsEmpty() then
+        Task.Reset();
+        Task.SetCurrentKey("Opportunity No.");
+        Task.SetRange("Opportunity No.", "Opportunity No.");
+        if Task.FindFirst() then
             "Cancel Old To Do" := false;
         Modify();
     end;
@@ -739,7 +725,7 @@ table 5093 "Opportunity Entry"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateStageList(OpportunityEntry, Rec, IsHandled);
+        OnBeforeCreateStageList(OppEntry, Rec, IsHandled);
         if IsHandled then
             exit;
 
@@ -750,15 +736,15 @@ table 5093 "Opportunity Entry"
         TempSalesCycleStageUpdate.DeleteAll();
         TempSalesCycleStageJump.DeleteAll();
 
-        OpportunityEntry.Reset();
-        OpportunityEntry.SetCurrentKey(Active, "Opportunity No.");
-        OpportunityEntry.SetRange(Active, true);
-        OpportunityEntry.SetRange("Opportunity No.", "Opportunity No.");
+        OppEntry.Reset();
+        OppEntry.SetCurrentKey(Active, "Opportunity No.");
+        OppEntry.SetRange(Active, true);
+        OppEntry.SetRange("Opportunity No.", "Opportunity No.");
         SalesCycleStage.Reset();
         SalesCycleStage.SetRange("Sales Cycle Code", "Sales Cycle Code");
 
-        if OpportunityEntry.Find('-') then begin
-            PreviousDateOfChange := OpportunityEntry."Date of Change";
+        if OppEntry.Find('-') then begin
+            PreviousDateOfChange := OppEntry."Date of Change";
             EntryExists := true;
         end else begin
             PreviousDateOfChange := WorkDate();
@@ -766,16 +752,16 @@ table 5093 "Opportunity Entry"
         end;
 
         // Option 1 Activate first Stage
-        if not OpportunityEntry.Find('-') then
+        if not OppEntry.Find('-') then
             if SalesCycleStage.Find('-') then begin
                 TempSalesCycleStageFirst := SalesCycleStage;
                 TempSalesCycleStageFirst.Insert();
             end;
 
         // Option 2 Goto next Stage
-        if OpportunityEntry.Find('-') then
+        if OppEntry.Find('-') then
             if SalesCycleStage.Find('-') then begin
-                SalesCycleStage.Get(OpportunityEntry."Sales Cycle Code", OpportunityEntry."Sales Cycle Stage");
+                SalesCycleStage.Get(OppEntry."Sales Cycle Code", OppEntry."Sales Cycle Stage");
                 if SalesCycleStage.Find('>') then begin
                     TempSalesCycleStageNext := SalesCycleStage;
                     TempSalesCycleStageNext.Insert();
@@ -785,9 +771,9 @@ table 5093 "Opportunity Entry"
             end;
 
         // Option 3 Goto Previous Stage
-        if OpportunityEntry.Find('-') then
+        if OppEntry.Find('-') then
             if SalesCycleStage.Find('-') then begin
-                SalesCycleStage.Get(OpportunityEntry."Sales Cycle Code", OpportunityEntry."Sales Cycle Stage");
+                SalesCycleStage.Get(OppEntry."Sales Cycle Code", OppEntry."Sales Cycle Stage");
                 if SalesCycleStage.Find('<') then begin
                     TempSalesCycleStagePrevious := SalesCycleStage;
                     TempSalesCycleStagePrevious.Insert();
@@ -795,9 +781,9 @@ table 5093 "Opportunity Entry"
             end;
 
         // Option 4 Skip Stages
-        if OpportunityEntry.Find('-') then
+        if OppEntry.Find('-') then
             if SalesCycleStage.Find('-') then begin
-                SalesCycleStage.Get(OpportunityEntry."Sales Cycle Code", OpportunityEntry."Sales Cycle Stage");
+                SalesCycleStage.Get(OppEntry."Sales Cycle Code", OppEntry."Sales Cycle Stage");
                 if SalesCycleStage.Find('>') then
                     if SalesCycleStage."Allow Skip" then begin
                         Stop := false;
@@ -819,20 +805,20 @@ table 5093 "Opportunity Entry"
                     end;
 
         // Option 5 Update Current
-        if OpportunityEntry.Find('-') then
+        if OppEntry.Find('-') then
             if SalesCycleStage.Find('-') then begin
-                SalesCycleStage.Get(OpportunityEntry."Sales Cycle Code", OpportunityEntry."Sales Cycle Stage");
+                SalesCycleStage.Get(OppEntry."Sales Cycle Code", OppEntry."Sales Cycle Stage");
                 TempSalesCycleStageUpdate := SalesCycleStage;
                 TempSalesCycleStageUpdate.Insert();
             end;
 
         // Option 6 jump to Previous Stage
-        if OpportunityEntry.Find('-') then
+        if OppEntry.Find('-') then
             if SalesCycleStage.Find('-') then begin
                 Stop := false;
                 repeat
                     TempSalesCycleStageJump := SalesCycleStage;
-                    if TempSalesCycleStageJump.Stage <> OpportunityEntry."Sales Cycle Stage" then
+                    if TempSalesCycleStageJump.Stage <> OppEntry."Sales Cycle Stage" then
                         TempSalesCycleStageJump.Insert()
                     else
                         Stop := true;
@@ -857,7 +843,7 @@ table 5093 "Opportunity Entry"
 
     local procedure TestQuote()
     var
-        Opportunity: Record Opportunity;
+        Opp: Record Opportunity;
         SalesHeader: Record "Sales Header";
         IsHandled: Boolean;
     begin
@@ -866,8 +852,8 @@ table 5093 "Opportunity Entry"
         if IsHandled then
             exit;
 
-        Opportunity.Get("Opportunity No.");
-        if not SalesHeader.Get(SalesHeader."Document Type"::Quote, Opportunity."Sales Document No.") then
+        Opp.Get("Opportunity No.");
+        if not SalesHeader.Get(SalesHeader."Document Type"::Quote, Opp."Sales Document No.") then
             Error(Text005);
     end;
 
@@ -964,22 +950,22 @@ table 5093 "Opportunity Entry"
     begin
         case "Action Type" of
             "Action Type"::First:
-                if Action::LookupOK = Page.RunModal(0, TempSalesCycleStageFirst) then
+                if ACTION::LookupOK = PAGE.RunModal(0, TempSalesCycleStageFirst) then
                     "Sales Cycle Stage" := TempSalesCycleStageFirst.Stage;
             "Action Type"::Next:
-                if Action::LookupOK = Page.RunModal(0, TempSalesCycleStageNext) then
+                if ACTION::LookupOK = PAGE.RunModal(0, TempSalesCycleStageNext) then
                     "Sales Cycle Stage" := TempSalesCycleStageNext.Stage;
             "Action Type"::Previous:
-                if Action::LookupOK = Page.RunModal(0, TempSalesCycleStagePrevious) then
+                if ACTION::LookupOK = PAGE.RunModal(0, TempSalesCycleStagePrevious) then
                     "Sales Cycle Stage" := TempSalesCycleStagePrevious.Stage;
             "Action Type"::Skip:
-                if Action::LookupOK = Page.RunModal(0, TempSalesCycleStageSkip) then
+                if ACTION::LookupOK = PAGE.RunModal(0, TempSalesCycleStageSkip) then
                     "Sales Cycle Stage" := TempSalesCycleStageSkip.Stage;
             "Action Type"::Update:
-                if Action::LookupOK = Page.RunModal(0, TempSalesCycleStageUpdate) then
+                if ACTION::LookupOK = PAGE.RunModal(0, TempSalesCycleStageUpdate) then
                     "Sales Cycle Stage" := TempSalesCycleStageUpdate.Stage;
             "Action Type"::Jump:
-                if Action::LookupOK = Page.RunModal(0, TempSalesCycleStageJump) then
+                if ACTION::LookupOK = PAGE.RunModal(0, TempSalesCycleStageJump) then
                     "Sales Cycle Stage" := TempSalesCycleStageJump.Stage;
         end;
         Validate("Sales Cycle Stage");
@@ -1070,7 +1056,7 @@ table 5093 "Opportunity Entry"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCloseOppFromOppOnBeforeStartWizard(Opportunity: Record Opportunity; var OpportunityEntry: Record "Opportunity Entry"; var IsHandled: Boolean)
+    local procedure OnCloseOppFromOppOnBeforeStartWizard(Opportunity: Record Opportunity; var OpportunityEntry: Record "Opportunity Entry")
     begin
     end;
 
@@ -1111,26 +1097,6 @@ table 5093 "Opportunity Entry"
 
     [IntegrationEvent(true, false)]
     local procedure OnStartWizard2OnBeforeRunModalPage(var OpportunityEntry: Record "Opportunity Entry"; xOpportunityEntry: Record "Opportunity Entry"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFinishWizard2OnBeforeValidateSalesCycleStageDescription(var OpportunityEntry: Record "Opportunity Entry"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFinishWizardOnAfterUpdateEstimates(var OpportunityEntry: Record "Opportunity Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnOnInsertOnBeforeModifyOpportunity(var OpportunityEntry: Record "Opportunity Entry"; var Opportunity: Record Opportunity; var ShouldModifyOpportunity: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertEntryOnBeforeInsert(var OpportunityEntryToInsert: Record "Opportunity Entry"; var OpportunityEntryInserted: Record "Opportunity Entry")
     begin
     end;
 }
