@@ -9,7 +9,6 @@ using System.Environment.Configuration;
 using System.Automation;
 using System.Utilities;
 using Microsoft.eServices.EDocument.Processing.Interfaces;
-using Microsoft.eServices.EDocument.Processing.Import;
 
 codeunit 6148 "E-Document Helper"
 {
@@ -123,11 +122,7 @@ codeunit 6148 "E-Document Helper"
     var
         IProcessStructuredData: Interface IProcessStructuredData;
     begin
-        if EDocument.GetEDocumentService().GetImportProcessVersion() = "E-Document Import Process"::"Version 1.0" then begin
-            Page.Run(Page::"E-Document", EDocument);
-            exit;
-        end;
-        IProcessStructuredData := EDocument."Process Draft Impl.";
+        IProcessStructuredData := EDocument."Structured Data Process";
         IProcessStructuredData.OpenDraftPage(EDocument);
     end;
 

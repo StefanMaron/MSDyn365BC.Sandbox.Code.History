@@ -126,10 +126,6 @@ page 8082 "Sales Service Commitments"
                     Editable = false;
                     ToolTip = 'Specifies whether the Subscription Line is used as a basis for periodic invoicing or discounts.';
                 }
-                field("Create Contract Deferrals"; Rec."Create Contract Deferrals")
-                {
-                    ToolTip = 'Specifies whether deferrals are created for new Subscription lines.';
-                }
                 field("Document Type"; Rec."Document Type")
                 {
                     Visible = false;

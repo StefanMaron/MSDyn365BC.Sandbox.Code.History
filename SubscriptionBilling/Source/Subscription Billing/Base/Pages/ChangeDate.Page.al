@@ -35,12 +35,12 @@ page 8028 "Change Date"
         ChangedDate: Date;
         NoDateErr: Label 'You must enter the Date.';
 
-    procedure GetDate(): Date
+    internal procedure GetDate(): Date
     begin
         exit(ChangedDate);
     end;
 
-    procedure SetDate(NewDate: Date)
+    internal procedure SetDate(NewDate: Date)
     begin
         ChangedDate := NewDate;
     end;
