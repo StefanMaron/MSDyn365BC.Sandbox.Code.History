@@ -460,8 +460,6 @@ page 5801 "Cost Adjustment Overview"
             }
             group(Diagnostics)
             {
-                Caption = 'Diagnostics';
-
                 action("Action Messages")
                 {
                     Caption = 'Action Messages';
