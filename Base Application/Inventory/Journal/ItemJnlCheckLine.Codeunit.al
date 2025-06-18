@@ -71,7 +71,7 @@ codeunit 21 "Item Jnl.-Check Line"
 
         Item.ReadIsolation(IsolationLevel::ReadUncommitted);
         IsHandled := false;
-        OnBeforeGetItem(Item, IsHandled, ItemJournalLine);
+        OnBeforeGetItem(Item, IsHandled);
         if not IsHandled then
             if Item.Get(ItemJournalLine."Item No.") then
                 Item.TestField("Base Unit of Measure", ErrorInfo.Create());
@@ -707,7 +707,7 @@ codeunit 21 "Item Jnl.-Check Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetItem(var Item: Record Item; var IsHandled: Boolean; ItemJournalLine: Record "Item Journal Line")
+    local procedure OnBeforeGetItem(var Item: Record Item; var IsHandled: Boolean)
     begin
     end;
 
