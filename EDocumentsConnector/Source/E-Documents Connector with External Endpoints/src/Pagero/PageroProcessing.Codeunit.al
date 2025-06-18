@@ -286,7 +286,6 @@ codeunit 6369 "Pagero Processing"
         PurchaseHeader: Record "Purchase Header";
         RelatedRecordID: RecordID;
         RelatedRecordRef: RecordRef;
-        NullGuid: Guid;
     begin
         RelatedRecordID := EDocument."Document Record ID";
         RelatedRecordRef := RelatedRecordID.GetRecord();
@@ -296,10 +295,6 @@ codeunit 6369 "Pagero Processing"
             database::"Purchase Header":
                 begin
                     RelatedRecordRef.SetTable(PurchaseHeader);
-                    if EDocument.SystemId <> PurchaseHeader."E-Document Link" then
-                        Error(CannotRejectErr, PurchaseHeader.SystemId, PurchaseHeader."E-Document Link");
-
-                    PurchaseHeader.Validate("E-Document Link", NullGuid);
                     PurchaseHeader.Delete(true);
                 end;
         end;
@@ -545,9 +540,9 @@ codeunit 6369 "Pagero Processing"
 
             if Value = 'Received' then begin
                 TempNameValueBuffer.Init();
-                TempNameValueBuffer.Name := CopyStr(DocumentId, 1, 250);
-                TempNameValueBuffer.Value := CopyStr(DocumentNo, 1, 250);
-                TempNameValueBuffer."Value Long" := CopyStr(Status, 1, 2048);
+                TempNameValueBuffer.Name := DocumentId;
+                TempNameValueBuffer.Value := DocumentNo;
+                TempNameValueBuffer."Value Long" := Status;
                 TempNameValueBuffer.Insert();
             end;
         end;
@@ -598,9 +593,6 @@ codeunit 6369 "Pagero Processing"
         HttpContentResponse: HttpContent;
         Status, StatusDescription : Text;
     begin
-        if EDocumentService."Service Integration" <> EDocumentService."Service Integration"::Pagero then
-            exit;
-
         HttpContentResponse := HttpResponse.Content;
         if not ParseGetADocumentApprovalResponse(HttpContentResponse, Status, StatusDescription) then
             IsHandled := true;
@@ -614,9 +606,6 @@ codeunit 6369 "Pagero Processing"
         DocumentOutStream: OutStream;
         ContentData, DocumentId, FileId : Text;
     begin
-        if EDocumentService."Service Integration" <> EDocumentService."Service Integration"::Pagero then
-            exit;
-
         HttpResponse.Content.ReadAs(ContentData);
         if not ParseReceivedDocument(ContentData, EDocument."Index In Batch", DocumentId, FileId) then begin
             EDocumentErrorHelper.LogSimpleErrorMessage(EDocument, DocumentIdNotFoundErr);
@@ -654,7 +643,6 @@ codeunit 6369 "Pagero Processing"
         CouldNotRetrieveDocumentErr: Label 'Could not retrieve document with id: %1 from the service', Comment = '%1 - Document ID';
         DocumentIdNotFoundErr: Label 'Document ID not found in response';
         ParseErr: Label 'Failed to parse document from Pagero API';
-        CannotRejectErr: Label 'Failed to delete purchase document %1 as it is currently linked to another E-Document %2', Comment = '%1 - Purchase header system id, %2 - E-Document system id';
         WrongParseStatusErr: Label 'Got unexected status from Pagero API: %1', Comment = '%1 - Status that we received from API', Locked = true;
         PageroAwaitingInteractionStatusLbl: Label 'AwaitingInteraction', Locked = true;
         PageroErrorStatusLbl: Label 'Error', Locked = true;
