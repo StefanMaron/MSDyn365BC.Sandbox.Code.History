@@ -220,7 +220,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
             if WhseShip then
                 WhseShptLine.LockTable();
             TransHeader.LockTable();
-            if WhseShip and (not PreviewMode) then begin
+            if WhseShip then begin
                 WhsePostShpt.PostUpdateWhseDocuments(WhseShptHeader);
                 TempWhseShptHeader.Delete();
             end;
