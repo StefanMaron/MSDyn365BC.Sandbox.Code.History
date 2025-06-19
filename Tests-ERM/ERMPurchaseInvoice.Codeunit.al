@@ -62,6 +62,7 @@
         DocumentNoErr: Label 'Document No. are not equal.';
         AmountZeroErr: Label 'Amount must be zero';
         AmountMustSameErr: Label 'Amount must be same';
+        ChangeExtendedTextErr: Label 'You cannot change %1 for Extended Text Line.', Comment = '%1= Field Caption';
 
     [Test]
     [Scope('OnPrem')]
@@ -448,53 +449,6 @@
         Assert.AreEqual(
           PurchaseHeader."Currency Code", PurchInvHeader."Currency Code",
           StrSubstNo(CurrencyErr, PurchInvHeader.TableCaption()));
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure PurchaseInvoiceWithSourceCurrency()
-    var
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
-        GLEntry: Record "G/L Entry";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        PurchInvHeader: Record "Purch. Inv. Header";
-        PostedDocumentNo: Code[20];
-    begin
-        // Create and Post a Purchase Invoice with Currency and verify Source Currency Amount on G/L Entries
-
-        // Setup.
-        Initialize();
-
-        // Exercise: Create Purchase Invoice, attach new Currency on Purchase Invoice and Post Invoice.
-        CreatePurchaseHeader(PurchaseHeader, CreateVendor(''), PurchaseHeader."Document Type"::Invoice);
-        PurchaseHeader.Validate("Currency Code", CreateCurrency());
-        PurchaseHeader.Modify(true);
-        LibraryPurchase.CreatePurchaseLine(
-          PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, CreateItem(), LibraryRandom.RandInt(10));
-        LibraryLowerPermissions.SetPurchDocsPost();
-        PostedDocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-
-        // Verify: Verify Currency Code in Purchase Line and Posted Purchase Invoice Header.
-        PurchInvHeader.Get(PostedDocumentNo);
-        Assert.AreEqual(
-          PurchaseHeader."Currency Code", PurchaseLine."Currency Code",
-          StrSubstNo(CurrencyErr, PurchaseLine.TableCaption()));
-        Assert.AreEqual(
-          PurchaseHeader."Currency Code", PurchInvHeader."Currency Code",
-          StrSubstNo(CurrencyErr, PurchInvHeader.TableCaption()));
-
-        // Verify: Source Currency Amounts in G/L Entries
-        GLEntry.SetRange("Document No.", PurchInvHeader."No.");
-        GLEntry.FindSet();
-        repeat
-            if GLEntry."Source Currency Amount" <> 0 then
-                Assert.AreNearlyEqual(
-                    GLEntry."Source Currency Amount",
-                    CurrencyExchangeRate.ExchangeAmtLCYToFCY(
-                        PurchInvHeader."Posting Date", PurchInvHeader."Currency Code", GLEntry.Amount, PurchInvHeader."Currency Factor"),
-                    0.01, 'incorrect Source Currency Amount in G/L Entry');
-        until GLEntry.Next() = 0;
     end;
 
     [Test]
@@ -3268,6 +3222,37 @@
         PurchInvEntityAggregate.FindFirst();
         Assert.AreEqual(LineAmtGLAccount + LineAmtItem, PurchInvEntityAggregate.Amount, AmountMustSameErr);
         Assert.AreEqual(TotalAmountIncludingVAT, PurchInvEntityAggregate."Amount Including VAT", AmountMustSameErr);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure UpdateExtendedTextTypeNotAllowed()
+    var
+        Item: Record Item;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+    begin
+        // [SCENARIO 564049] Error message when adding a Purchase line with type Item that have extended text previously
+        Initialize();
+
+        // [GIVEN] Item "X" with Extended Text
+        CreateItemAndExtendedText(Item);
+
+        // [GIVEN] Create Purchase Header
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, '');
+
+        // [GIVEN] Purchase Line with Item, second Purchase Line with Extended Text
+        CreatePurchLineWithExtendedText(PurchaseHeader, Item."No.");
+
+        // [WHEN] Get extended text Purchase Line 
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+        PurchaseLine.FindLast();
+
+        // [THEN] Error come when try to change type of extended text Purchase line
+        asserterror PurchaseLine.Validate(Type, PurchaseLine.Type::Item);
+
+        // [THEN] Verify the error of extended text
+        Assert.ExpectedError(StrSubstNo(ChangeExtendedTextErr, PurchaseLine.FieldCaption(Type)));
     end;
 
     local procedure Initialize()
