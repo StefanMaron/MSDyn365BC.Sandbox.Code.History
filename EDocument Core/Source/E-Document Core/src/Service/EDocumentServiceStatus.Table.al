@@ -8,8 +8,6 @@ using Microsoft.eServices.EDocument.Processing.Import;
 
 table 6138 "E-Document Service Status"
 {
-    ReplicateData = false;
-
     fields
     {
         field(1; "E-Document Entry No"; Integer)
@@ -35,7 +33,10 @@ table 6138 "E-Document Service Status"
             Caption = 'Processing Status';
             trigger OnValidate()
             begin
-                Rec.Validate(Status, Rec."Import Processing Status" = "Import E-Doc. Proc. Status"::Processed ? "E-Document Service Status"::"Imported Document Created" : "E-Document Service Status"::Imported);
+                if Rec."Import Processing Status" = "Import E-Doc. Proc. Status"::Unprocessed then
+                    Rec.Validate(Status, "E-Document Service Status"::Imported);
+                if Rec."Import Processing Status" = "Import E-Doc. Proc. Status"::Processed then
+                    Rec.Validate(Status, "E-Document Service Status"::"Imported Document Created");
             end;
         }
     }
