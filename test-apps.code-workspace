@@ -15,10 +15,16 @@
       "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
     },
     {
+      "path": "./EDocumentConnectors/Pagero/Test/E-Document Connector - Pagero Tests"
+    },
+    {
       "path": "./EDocumentConnectors/SignUp/Test/E-Document Connector - SignUp Tests"
     },
     {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
+    },
+    {
+      "path": "./EDocumentConnectors/B2Brouter/Test/E-Document Connector - B2Brouter Tests"
     },
     {
       "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
@@ -97,9 +103,6 @@
     },
     {
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests/src/UnitTests"
-    },
-    {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AI Tests"
