@@ -5,7 +5,6 @@
 namespace Microsoft.Inventory.Posting;
 
 using Microsoft.Inventory.Journal;
-using System.Utilities;
 
 codeunit 243 "Item Jnl.-B.Post"
 {
@@ -30,12 +29,10 @@ codeunit 243 "Item Jnl.-B.Post"
         Text000: Label 'Do you want to post the journals?';
         Text001: Label 'The journals were successfully posted.';
         Text002: Label 'It was not possible to post all of the journals. ';
-        Text003: Label 'The journals that were not successfully posted are now shown.';
+        Text003: Label 'The journals that were not successfully posted are now marked.';
 #pragma warning restore AA0074
 
     local procedure "Code"()
-    var
-        ConfirmManagement: Codeunit "Confirm Management";
     begin
         ItemJnlTemplate.Get(ItemJnlBatch."Journal Template Name");
         ItemJnlTemplate.TestField("Force Posting Report", false);
@@ -43,10 +40,10 @@ codeunit 243 "Item Jnl.-B.Post"
         IsHandled := false;
         OnCodeOnBeforeConfirm(IsHandled);
         if not IsHandled then
-            if not ConfirmManagement.GetResponseOrDefault(Text000, false) then
+            if not Confirm(Text000, false) then
                 exit;
 
-        ItemJnlBatch.FindSet();
+        ItemJnlBatch.Find('-');
         repeat
             ItemJnlLine."Journal Template Name" := ItemJnlBatch."Journal Template Name";
             ItemJnlLine."Journal Batch Name" := ItemJnlBatch.Name;
@@ -77,11 +74,6 @@ codeunit 243 "Item Jnl.-B.Post"
         end;
 
         OnAfterCode(JnlWithErrors);
-    end;
-
-    procedure JournalWithPostingErrors(): Boolean
-    begin
-        exit(JnlWithErrors);
     end;
 
     [IntegrationEvent(false, false)]
