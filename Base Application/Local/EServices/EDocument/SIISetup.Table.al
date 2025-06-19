@@ -28,7 +28,7 @@ table 10751 "SII Setup"
             var
                 CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
                 IsHandled: Boolean;
-                SIISetupConsentProvidedLbl: Label 'SII Setup - consent provided by UserSecurityId %1.', Locked = true;
+                SIISetupConsentProvidedLbl: Label 'SII Setup - consent provided.', Locked = true;
             begin
                 IsHandled := false;
                 OnBeforeValidateEnabled(Rec, IsHandled);
@@ -40,7 +40,7 @@ table 10751 "SII Setup"
                 if Enabled then
                     Enabled := CustomerConsentMgt.ConfirmUserConsent();
                 if Enabled then
-                    Session.LogAuditMessage(StrSubstNo(SIISetupConsentProvidedLbl, UserSecurityId()), SecurityOperationResult::Success, AuditCategory::ApplicationManagement, 4, 0);
+                    Session.LogAuditMessage(SIISetupConsentProvidedLbl, SecurityOperationResult::Success, AuditCategory::ApplicationManagement, 4, 0);
             end;
         }
         field(3; Certificate; BLOB)
@@ -184,11 +184,6 @@ table 10751 "SII Setup"
             begin
                 FeatureTelemetry.LogUsage('0000M84', SIIFeatureNameTok, StrSubstNo(NewAutomaticSendingExperienceEnabledTxt, Rec."New Automatic Sending Exp."));
             end;
-        }
-        field(45; "Tax Period"; Enum "SII Tax Period")
-        {
-            Caption = 'Tax Period';
-            Tooltip = 'Specifies the type of the tax period for the SII. It will affect the value in the Periodo xml node.';
         }
     }
 
