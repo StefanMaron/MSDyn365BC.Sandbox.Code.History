@@ -1619,6 +1619,9 @@ codeunit 134403 "ERM Test SEPA Credit Transfers"
 
         // [THEN] Journal and vendor ledger entry have "Exported to Payment File" = False
         VerifyExportedToPaymentFileFlagVendor(GenJournalLine, VendorLedgerEntry, false);
+
+        // [THEN] "Vendor Ledger Entry"."Applies-to ID" = ''
+        VendorLedgerEntry.TestField("Applies-to ID", '');
         LibraryVariableStorage.AssertEmpty();
     end;
 

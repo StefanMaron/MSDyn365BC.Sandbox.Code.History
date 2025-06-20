@@ -773,11 +773,14 @@ page 1015 "Job Planning Lines Part"
     }
 
     trigger OnAfterGetCurrRecord()
+    begin
+        SetEditable(IsTypeFieldEditable());
+    end;
+
+    trigger OnAfterGetRecord()
     var
         Item: Record Item;
     begin
-        SetEditable(IsTypeFieldEditable());
-
         if Rec."Variant Code" = '' then
             VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
     end;
