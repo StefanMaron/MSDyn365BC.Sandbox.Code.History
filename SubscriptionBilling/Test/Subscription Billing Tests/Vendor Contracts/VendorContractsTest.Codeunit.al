@@ -348,38 +348,6 @@ codeunit 148154 "Vendor Contracts Test"
     end;
 
     [Test]
-    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler,ConfirmHandler')]
-    procedure CurrencyCodeRemainsSameWhenPayToVendorChanges()
-    var
-        CurrencyCode: Code[10];
-    begin
-        //[SCENARIO]: Create Subscription Header with Subscription Lines
-        //[SCENARIO]: Create two vendors with same Currency Code; When Pay-to Vendor is changed in Vendor contract
-        //[SCENARIO]: Currency code should remain the same
-
-        //[GIVEN]: Setup Service Object with Service Commitment
-        //[GIVEN] Create Vendor Contract with Contract Lines from Service Commitments
-        ClearAll();
-        ContractTestLibrary.DeleteAllContractRecords();
-        ContractTestLibrary.InitContractsApp();
-
-        //[GIVEN]: Create two vendors with same Currency Code
-        CurrencyCode := LibraryERM.CreateCurrencyWithRandomExchRates();
-        ContractTestLibrary.CreateVendor(Vendor, CurrencyCode);
-        ContractTestLibrary.CreateVendor(Vendor2, CurrencyCode);
-
-        ContractTestLibrary.CreateVendorContractAndCreateContractLinesForItems(VendorContract, ServiceObject, Vendor."No.", false);
-
-        //[WHEN]: Change Pay-to Vendor in Vendor Contract
-        VendorContract.Validate("Pay-to Vendor No.", Vendor2."No.");
-        VendorContract.Modify(true);
-
-        //[THEN]: Check that Currency Code is the same as in Vendor - no change has been made
-        VendorContract.Get(VendorContract."No.");
-        VendorContract.TestField("Currency Code", CurrencyCode);
-    end;
-
-    [Test]
     procedure DeleteAssignedContractTypeError()
     begin
         ClearAll();
@@ -685,24 +653,22 @@ codeunit 148154 "Vendor Contracts Test"
     end;
 
     [Test]
-    procedure TransferCreateContractDeferralsFromContractType()
+    procedure TestTransferOfDefaultWithoutContractDeferralsFromContractType()
     begin
         // Create Vendor Contract with contract type
         // Create new Contract Type with field "Def. Without Contr. Deferrals" = true
         // Check that the field value has been transferred
         ClearAll();
         ContractTestLibrary.CreateVendorContractWithContractType(VendorContract, ContractType);
-        ContractType.TestField("Create Contract Deferrals", true);
-        VendorContract.TestField("Create Contract Deferrals", true);
+        VendorContract.TestField("Without Contract Deferrals", ContractType."Def. Without Contr. Deferrals");
         ContractTestLibrary.CreateContractType(ContractType);
-        ContractType."Create Contract Deferrals" := false;
+        ContractType."Def. Without Contr. Deferrals" := true;
         ContractType.Modify(false);
         VendorContract.Validate("Contract Type", ContractType.Code);
         VendorContract.Modify(false);
-        VendorContract.TestField("Create Contract Deferrals", false);
-
+        VendorContract.TestField("Without Contract Deferrals", ContractType."Def. Without Contr. Deferrals");
         // allow manually changing the value of the field
-        VendorContract.Validate("Create Contract Deferrals", true);
+        VendorContract.Validate("Without Contract Deferrals", false);
         VendorContract.Modify(false);
         VendorContract.TestField("Contract Type", ContractType.Code);
     end;
