@@ -6445,9 +6445,6 @@ table 81 "Gen. Journal Line"
             "Pmt. Discount Date" := PurchHeader."Prepmt. Pmt. Discount Date";
             "Payment Discount %" := PurchHeader."Prepmt. Payment Discount %";
         end;
-        "Message Type" := PurchHeader."Message Type";
-        "Invoice Message" := PurchHeader."Invoice Message";
-        "Invoice Message 2" := PurchHeader."Invoice Message 2";
 
         OnAfterCopyGenJnlLineFromPurchHeaderPrepmtPost(PurchHeader, Rec, UsePmtDisc);
     end;
@@ -7659,11 +7656,7 @@ table 81 "Gen. Journal Line"
     local procedure CheckOpenApprovalEntryExistForCurrentUser()
     var
         GenJournalBatch: Record "Gen. Journal Batch";
-        IsHandled: Boolean;
     begin
-        OnBeforeCheckOpenApprovalEntryExistForCurrentUser(Rec, CurrFieldNo, IsHandled);
-        if IsHandled then
-            exit;
         ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(Rec);
         if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
             ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(GenJournalBatch);
@@ -11947,11 +11940,6 @@ table 81 "Gen. Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateAppliesToDocNo(var GenJnlLine: Record "Gen. Journal Line"; xGenJnlLine: Record "Gen. Journal Line"; CurrentFieldNo: Integer; var SuppressCommit: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckOpenApprovalEntryExistForCurrentUser(GenJnlLine: Record "Gen. Journal Line"; CurrFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
