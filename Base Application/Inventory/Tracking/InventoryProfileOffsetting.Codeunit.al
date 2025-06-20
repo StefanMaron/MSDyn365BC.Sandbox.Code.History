@@ -421,7 +421,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         exit(TempTransLine.IsEmpty);
     end;
 
-    procedure ForecastConsumption(var DemandInvtProfile: Record "Inventory Profile"; var Item: Record Item; OrderDate: Date; ToDate: Date) UpdatedOrderDate: Date
+    local procedure ForecastConsumption(var DemandInvtProfile: Record "Inventory Profile"; var Item: Record Item; OrderDate: Date; ToDate: Date) UpdatedOrderDate: Date
     var
         ForecastEntry: Record "Production Forecast Entry";
         ForecastEntry2: Record "Production Forecast Entry";
@@ -3081,7 +3081,6 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
         Location.Get(TransferReqLine."Location Code");
         InboundWhseTime := Location."Inbound Whse. Handling Time";
-        OnAdjustTransferDatesOnAfterInboundWhseTimeSet(TransferReqLine, Location, InboundWhseTime);
 
         OK := TransferRoute.Get(TransferReqLine."Transfer-from Code", TransferReqLine."Location Code");
         if PlanningResiliency and not OK then
@@ -4758,10 +4757,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         OnCreateTempSKUForComponentsLocationOnBeforeSetLocationCodeFilter(Item, SKU, IsHandled);
         if not IsHandled then
             SKU.SetRange("Location Code", ManufacturingSetup."Components at Location");
-        IsHandled := false;
-        OnCreateTempSKUForComponentsLocationOnBeforeItemCopyFilter(SKU, Item, IsHandled);
-        if not IsHandled then
-            Item.CopyFilter("Variant Filter", SKU."Variant Code");
+        Item.CopyFilter("Variant Filter", SKU."Variant Code");
         if SKU.IsEmpty() then
             CreateTempSKUForLocation(Item."No.", ManufacturingSetup."Components at Location");
     end;
@@ -6176,14 +6172,5 @@ codeunit 99000854 "Inventory Profile Offsetting"
     local procedure OnCheckIsSNSpecificTracking(ItemTrackingCode: Record "Item Tracking Code"; var SNSepecificTracking: Boolean)
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateTempSKUForComponentsLocationOnBeforeItemCopyFilter(var StockkeepingUnit: Record "Stockkeeping Unit"; var Item: Record Item; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAdjustTransferDatesOnAfterInboundWhseTimeSet(var TransferRequisitionLine: Record "Requisition Line"; var Location: Record Location; var InboundWhseTime: DateFormula)
-    begin
-    end;
 }
+
