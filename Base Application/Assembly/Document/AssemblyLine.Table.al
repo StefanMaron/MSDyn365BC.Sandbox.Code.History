@@ -1502,7 +1502,7 @@ table 901 "Assembly Line"
             if OldAssemblyLine."Due Date" > "Due Date" then
                 AvailableToPromise.SetChangedAsmLine(OldAssemblyLine)
             else
-                GrossRequirement -= OldAssemblyLine."Remaining Quantity (Base)";
+                GrossRequirement -= OldAssemblyLine."Remaining Quantity";
 
         CompanyInfo.Get();
         LookaheadDateFormula := CompanyInfo."Check-Avail. Period Calc.";
