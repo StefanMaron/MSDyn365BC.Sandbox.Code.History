@@ -43,12 +43,12 @@ codeunit 133574 "Bank Rec. With AI Match Entr."
         DataSetDate, PostingDate : Date;
         BankAccountNo: Code[20];
         DataSetExtDocNo: Code[35];
-        DataSetDocumentNo, DataSetLineDocumentNo, StatementNo : Code[20];
+        DataSetDocumentNo, StatementNo : Code[20];
         DocumentNo: Code[20];
         Description: Text[50];
         DataSetAmount, Amount : Decimal;
         Lines, Attributes, LineSpecs : List of [Text];
-        Line, Input, DataSetDescription, PaymentReference, K, V, LineSpec, TestOutputTxt, ExpectedTestOutputTxt, BankRecLedgerEntriesTxt, BankRecStatementLinesTxt : Text;
+        Line, Input, DataSetDescription, K, V, LineSpec, TestOutputTxt, ExpectedTestOutputTxt, BankRecLedgerEntriesTxt, BankRecStatementLinesTxt : Text;
         JsonContent: JSonObject;
         JSonToken: JSonToken;
         DataSetEntryNo, DataSetLineNo, LineNo, EntryNo : Integer;
@@ -86,13 +86,9 @@ codeunit 133574 "Bank Rec. With AI Match Entr."
                                     Evaluate(DataSetAmount, V.Trim(), 9);
                                 'Date':
                                     Evaluate(DataSetDate, V.Trim(), 9);
-                                'DocumentNo':
-                                    DataSetLineDocumentNo := CopyStr(V.Trim(), 1, MaxStrLen(DataSetLineDocumentNo));
-                                'PaymentReference':
-                                    PaymentReference := V.Trim();
                             end;
                         end;
-                        LineNo := CreateBankAccRecLine(BankAccReconciliation, DataSetDate, CopyStr(DataSetDescription, 1, MaxStrLen(Description)), '', DataSetAmount, PaymentReference, DataSetLineDocumentNo);
+                        LineNo := CreateBankAccRecLine(BankAccReconciliation, DataSetDate, CopyStr(DataSetDescription, 1, MaxStrLen(Description)), '', DataSetAmount);
                         LineNoMapping.Add(DataSetLineNo, LineNo);
                     end;
                 'E':
@@ -237,7 +233,7 @@ codeunit 133574 "Bank Rec. With AI Match Entr."
         BankAccReconciliation.Insert();
     end;
 
-    local procedure CreateBankAccRecLine(var BankAccReconciliation: Record "Bank Acc. Reconciliation"; TransactionDate: Date; Description: Text[50]; PayerInfo: Text[50]; Amount: Decimal; PaymentReference: Text; DataSetLineDocumentNo: Code[20]): Integer
+    local procedure CreateBankAccRecLine(var BankAccReconciliation: Record "Bank Acc. Reconciliation"; TransactionDate: Date; Description: Text[50]; PayerInfo: Text[50]; Amount: Decimal): Integer
     var
         BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
     begin
@@ -256,8 +252,6 @@ codeunit 133574 "Bank Rec. With AI Match Entr."
         BankAccReconciliationLine."Related-Party Name" := PayerInfo;
         BankAccReconciliationLine."Statement Amount" := Amount;
         BankAccReconciliationLine.Difference := Amount;
-        BankAccReconciliationLine."Payment Reference No." := CopyStr(PaymentReference, 1, MaxStrLen(BankAccReconciliationLine."Payment Reference No."));
-        BankAccReconciliationLine."Document No." := DataSetLineDocumentNo;
         BankAccReconciliationLine.Insert();
 
         exit(BankAccReconciliationLine."Statement Line No.");

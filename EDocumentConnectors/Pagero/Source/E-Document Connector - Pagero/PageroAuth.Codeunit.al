@@ -17,7 +17,7 @@ codeunit 6364 "Pagero Auth."
     procedure InitConnectionSetup()
     var
         EDocExtConnectionSetup: Record "E-Doc. Ext. Connection Setup";
-        OAuth2: Codeunit OAuth2;
+        OAuth20: Codeunit OAuth2;
         RedirectUrl: Text;
     begin
         if not EDocExtConnectionSetup.Get() then begin
@@ -26,26 +26,9 @@ codeunit 6364 "Pagero Auth."
             EDocExtConnectionSetup."FileAPI URL" := FileAPITxt;
             EDocExtConnectionSetup."DocumentAPI Url" := DocumentAPITxt;
             EDocExtConnectionSetup."Fileparts URL" := FilepartAPITxt;
-            OAuth2.GetDefaultRedirectURL(RedirectUrl);
+            OAuth20.GetDefaultRedirectURL(RedirectUrl);
             EDocExtConnectionSetup.Validate("Redirect URL", CopyStr(RedirectUrl, 1, MaxStrLen(EDocExtConnectionSetup."Redirect URL")));
             EDocExtConnectionSetup.Insert();
-        end;
-    end;
-
-    procedure ResetConnectionSetup()
-    var
-        EDocExtConnectionSetup: Record "E-Doc. Ext. Connection Setup";
-        OAuth2: Codeunit OAuth2;
-        RedirectUrl: Text;
-    begin
-        if EDocExtConnectionSetup.Get() then begin
-            EDocExtConnectionSetup."Authentication URL" := AuthURLTxt;
-            EDocExtConnectionSetup."FileAPI URL" := FileAPITxt;
-            EDocExtConnectionSetup."DocumentAPI Url" := DocumentAPITxt;
-            EDocExtConnectionSetup."Fileparts URL" := FilepartAPITxt;
-            OAuth2.GetDefaultRedirectURL(RedirectUrl);
-            EDocExtConnectionSetup.Validate("Redirect URL", CopyStr(RedirectUrl, 1, MaxStrLen(EDocExtConnectionSetup."Redirect URL")));
-            EDocExtConnectionSetup.Modify();
         end;
     end;
 
