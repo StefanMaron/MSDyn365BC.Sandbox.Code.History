@@ -147,12 +147,12 @@ reportextension 8011 "Contract Standard Sales Quote" extends "Standard Sales - Q
         SalesReportPrintoutMgmt.FillServiceCommitmentsGroups(Header, ServiceCommitmentsGroupPerPeriod, ServiceCommitmentsGroup);
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeFillSubscriptionLinesForLine(Header: Record "Sales Header"; var SubscriptionLineForLine: Record "Sales Line"; var SubscriptionLineForLineCaption: Record "Name/Value Buffer")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeFillSubscriptionLinesGroupPerPeriod(Header: Record "Sales Header"; var SubscriptionLinesGroupPerPeriod: Record "Name/Value Buffer")
     begin
     end;

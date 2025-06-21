@@ -7,7 +7,7 @@ codeunit 8054 "Cust. Sub. Contr. Dim. Mgt."
     var
         NoDimCodeForCustContractErr: Label 'Before Customer is selected you must set Dimension Code for Customer Contract in Subscription Contract Setup.';
 
-    internal procedure AutomaticInsertCustomerContractDimensionValue(var CustomerContract: Record "Customer Subscription Contract")
+    procedure AutomaticInsertCustomerContractDimensionValue(var CustomerContract: Record "Customer Subscription Contract")
     var
         ServiceContractSetup: Record "Subscription Contract Setup";
         DimensionMgt: Codeunit "Dimension Mgt.";
