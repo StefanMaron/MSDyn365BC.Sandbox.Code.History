@@ -318,6 +318,8 @@ codeunit 367 CheckManagement
                             GenJnlLine2."Source Currency Code" := VendorLedgEntry."Currency Code";
                             GenJnlLine2."Journal Template Name" := BankAccLedgEntry2."Journal Templ. Name";
                             GenJnlLine2."Journal Batch Name" := BankAccLedgEntry2."Journal Batch Name";
+                            if GenJnlLine2."Posting Group" <> VendorLedgEntry."Vendor Posting Group" then
+                                GenJnlLine2."Posting Group" := VendorLedgEntry."Vendor Posting Group";
                             OnFinancialVoidCheckOnBeforePostBalAccLine(GenJnlLine2, CheckLedgEntry);
                             GenJnlPostLine.RunWithCheck(GenJnlLine2);
                             OnFinancialVoidCheckOnAfterPostBalAccLine(GenJnlLine2, CheckLedgEntry, GenJnlPostLine);
@@ -902,13 +904,7 @@ codeunit 367 CheckManagement
     var
         GenJnlLine2: Record "Gen. Journal Line";
         Currency: Record Currency;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforePostRoundingAmount(BankAcc, CheckLedgEntry, BankAccLedgEntry2, PostingDate, RoundingAmount, IsHandled);
-        if IsHandled then
-            exit;
-
         Currency.Get(BankAcc."Currency Code");
         GenJnlLine2.Init();
         GenJnlLine2."System-Created Entry" := true;
@@ -1171,11 +1167,6 @@ codeunit 367 CheckManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnFinancialVoidCheckOnBeforeConfirmFinancialVoid(var CheckLedgEntry: Record "Check Ledger Entry"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostRoundingAmount(var BankAcc: Record "Bank Account"; var CheckLedgEntry: Record "Check Ledger Entry"; BankAccLedgEntry2: Record "Bank Account Ledger Entry"; var PostingDate: Date; var RoundingAmount: Decimal; var IsHandled: Boolean)
     begin
     end;
 }
