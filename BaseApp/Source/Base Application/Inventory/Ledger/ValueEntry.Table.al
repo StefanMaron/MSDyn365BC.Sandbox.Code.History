@@ -565,7 +565,6 @@ table 5802 "Value Entry"
         exit(SequenceNoMgt.GetNextSeqNo(DATABASE::"Value Entry"));
     end;
 
-    [InherentPermissions(PermissionObjectType::TableData, Database::"Value Entry", 'r')]
     procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";

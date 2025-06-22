@@ -35,18 +35,24 @@ codeunit 8068 "Vendor Deferrals Mngmt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch. Post Invoice Events", 'OnPrepareLineOnBeforeSetAccount', '', false, false)]
     local procedure OnPrepareLineOnBeforeSetAccount(PurchLine: Record "Purchase Line"; var SalesAccount: Code[20])
     var
+        VendContractHeader: Record "Vendor Subscription Contract";
         GeneralPostingSetup: Record "General Posting Setup";
+        BillingLine: Record "Billing Line";
     begin
-        if not PurchLine.IsLineAttachedToBillingLine() then
+        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromPurchaseDocumentType(PurchLine."Document Type"), PurchLine."Document No.", PurchLine."Line No.");
+        BillingLine.SetFilter("Billing from", '>=%1', PurchLine."Recurring Billing from");
+        BillingLine.SetFilter("Billing to", '<=%1', PurchLine."Recurring Billing to");
+        if not BillingLine.FindFirst() then
             exit;
 
+        VendContractHeader.Get(BillingLine."Subscription Contract No.");
         GeneralPostingSetup.Get(PurchLine."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
-        if PurchLine.CreateContractDeferrals() then begin
-            GeneralPostingSetup.TestField("Vend. Sub. Contr. Def. Account");
-            SalesAccount := GeneralPostingSetup."Vend. Sub. Contr. Def. Account";
-        end else begin
+        if VendContractHeader."Without Contract Deferrals" then begin
             GeneralPostingSetup.TestField("Vend. Sub. Contract Account");
             SalesAccount := GeneralPostingSetup."Vend. Sub. Contract Account";
+        end else begin
+            GeneralPostingSetup.TestField("Vend. Sub. Contr. Def. Account");
+            SalesAccount := GeneralPostingSetup."Vend. Sub. Contr. Def. Account";
         end;
     end;
 
@@ -55,7 +61,7 @@ codeunit 8068 "Vendor Deferrals Mngmt."
     begin
         VendorContractDeferralLinePosting := false;
         Clear(TempPurchaseLine);
-        if PurchLine.CreateContractDeferrals() then begin
+        if IsVendorContractWithDeferrals(PurchLine) then begin
             VendorContractDeferralLinePosting := true;
             TempPurchaseLine := PurchLine;
         end;
@@ -107,12 +113,14 @@ codeunit 8068 "Vendor Deferrals Mngmt."
             exit;
         if not (PurchaseLine."Document Type" in [Enum::"Purchase Document Type"::Invoice, Enum::"Purchase Document Type"::"Credit Memo"]) then
             exit;
-        if not PurchaseLine.CreateContractDeferrals() then
-            exit;
 
         BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromPurchaseDocumentType(PurchaseLine."Document Type"), PurchaseLine."Document No.", PurchaseLine."Line No.");
-        BillingLine.FindFirst();
+        if not BillingLine.FindFirst() then
+            exit;
         VendContractHeader.Get(BillingLine."Subscription Contract No.");
+        if VendContractHeader."Without Contract Deferrals" then
+            exit;
+
         GLSetup.Get();
 
         VendorContractDeferral.Init();
@@ -329,6 +337,18 @@ codeunit 8068 "Vendor Deferrals Mngmt."
                 TempVendorContractDeferral.Insert(false); //Used for Preview Posting
             until InvoiceVendorContractDeferral.Next() = 0;
         end;
+    end;
+
+    local procedure IsVendorContractWithDeferrals(PurchaseLine: Record "Purchase Line"): Boolean
+    var
+        VendorContractHeader: Record "Vendor Subscription Contract";
+        BillingLine: Record "Billing Line";
+    begin
+        BillingLine.FilterBillingLineOnDocumentLine(BillingLine.GetBillingDocumentTypeFromPurchaseDocumentType(PurchaseLine."Document Type"), PurchaseLine."Document No.", PurchaseLine."Line No.");
+        if not BillingLine.FindFirst() then
+            exit;
+        VendorContractHeader.Get(BillingLine."Subscription Contract No.");
+        exit(not VendorContractHeader."Without Contract Deferrals");
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Posting Preview Event Handler", OnAfterFillDocumentEntry, '', false, false)]

@@ -127,16 +127,12 @@ codeunit 8063 "Sales Documents"
                     Item.Get(ServiceObject."Source No.");
                     if Item."VAT Prod. Posting Group" <> '' then
                         SalesLine.Validate("VAT Prod. Posting Group", Item."VAT Prod. Posting Group");
-                    if Item."Tax Group Code" <> '' then
-                        SalesLine.Validate("Tax Group Code", Item."Tax Group Code");
                 end;
             ServiceObject.Type::"G/L Account":
                 begin
                     GLAccount.Get(ServiceObject."Source No.");
                     if GLAccount."VAT Prod. Posting Group" <> '' then
                         SalesLine.Validate("VAT Prod. Posting Group", GLAccount."VAT Prod. Posting Group");
-                    if GLAccount."Tax Group Code" <> '' then
-                        SalesLine.Validate("Tax Group Code", GLAccount."Tax Group Code");
                 end;
         end;
     end;
@@ -219,7 +215,7 @@ codeunit 8063 "Sales Documents"
         CommitIsSuppressed: Boolean;
         IsHandled: Boolean;
     begin
-        OnBeforeMoveBillingLineToBillingLineArchiveForPostingPreview(SalesInvoiceHeader, IsHandled);
+        OnBeforeMoveBillingLineToBillingLineArchiveForPostingPreview(IsHandled);
         if IsHandled then
             exit;
         if SalesHeader.Get(SalesHeader."Document Type"::Invoice, SalesInvoiceHeader."Pre-Assigned No.") then
@@ -354,7 +350,7 @@ codeunit 8063 "Sales Documents"
         CreateServiceObjectFromSales(SalesHeader, SalesOrderLine, SalesShptLine);
     end;
 
-    procedure CreateServiceObjectFromSales(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var SalesShptLine: Record "Sales Shipment Line")
+    local procedure CreateServiceObjectFromSales(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var SalesShptLine: Record "Sales Shipment Line")
     var
         TempTrackingSpecBuffer: Record "Tracking Specification" temporary;
         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
@@ -517,7 +513,7 @@ codeunit 8063 "Sales Documents"
         OnCreateSubscriptionHeaderFromSalesLineAfterInsertSubscriptionHeader(ServiceObject, SalesHeader, SalesLine);
     end;
 
-    procedure CreateSubscriptionLineFromSalesLine(ServiceObject: Record "Subscription Header"; SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line")
+    local procedure CreateSubscriptionLineFromSalesLine(ServiceObject: Record "Subscription Header"; SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line")
     var
         SalesSubscriptionLine: Record "Sales Subscription Line";
         SubscriptionLine: Record "Subscription Line";
@@ -815,7 +811,7 @@ codeunit 8063 "Sales Documents"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeMoveBillingLineToBillingLineArchiveForPostingPreview(SalesInvoiceHeader: Record "Sales Invoice Header"; var IsHandled: Boolean)
+    local procedure OnBeforeMoveBillingLineToBillingLineArchiveForPostingPreview(var IsHandled: Boolean)
     begin
     end;
 

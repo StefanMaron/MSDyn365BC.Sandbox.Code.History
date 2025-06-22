@@ -120,14 +120,6 @@ table 8009 "Imported Subscription Line"
         field(21; "Invoicing via"; Enum "Invoicing Via")
         {
             Caption = 'Invoicing via';
-            trigger OnValidate()
-            begin
-                if "Invoicing via" = "Invoicing via"::Sales then begin
-                    "Invoicing Item No." := '';
-                    "Create Contract Deferrals" := "Create Contract Deferrals"::No;
-                end else
-                    "Create Contract Deferrals" := "Create Contract Deferrals"::"Contract-dependent";
-            end;
         }
         field(22; "Invoicing Item No."; Code[20])
         {
@@ -206,10 +198,6 @@ table 8009 "Imported Subscription Line"
         {
             Caption = 'Exclude from Price Update';
         }
-        field(41; "Create Contract Deferrals"; Enum "Create Contract Deferrals")
-        {
-            Caption = 'Create Contract Deferrals';
-        }
         field(100; "Subscription Line created"; Boolean)
         {
             Caption = 'Subscription Line created';
@@ -273,7 +261,7 @@ table 8009 "Imported Subscription Line"
         }
     }
 
-    procedure IsContractCommentLine(): Boolean
+    internal procedure IsContractCommentLine(): Boolean
     begin
         exit(Rec."Sub. Contract Line Type" = Rec."Sub. Contract Line Type"::Comment)
     end;

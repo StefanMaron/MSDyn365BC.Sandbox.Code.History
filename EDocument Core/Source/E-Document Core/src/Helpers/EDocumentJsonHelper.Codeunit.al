@@ -71,21 +71,21 @@ codeunit 6121 "EDocument Json Helper"
 
     internal procedure SetCurrencyValueInField(FieldName: Text; var FieldsJsonObject: JsonObject; var Amount: Decimal; var CurrencyCode: Code[10])
     var
-        CurrencyValueAsJson: JsonValue;
+        JsonValue: JsonValue;
         FoundCurrency: Text;
     begin
-        // 1. Read the number value from the JSON object
         SetNumberValueInField(FieldName, FieldsJsonObject, Amount);
 
-        // 2. Try to read the currency code from the JSON object
-        if not TryGetJsonFieldValue(FieldName, FieldsJsonObject, 'currency_code', CurrencyValueAsJson) then
+        if not TryGetJsonFieldValue(FieldName, FieldsJsonObject, 'currency_code', JsonValue) then
             exit;
-        if TryAssignToText(CurrencyValueAsJson, MaxStrLen(CurrencyCode), FoundCurrency) then;
+        if TryAssignToText(JsonValue, MaxStrLen(CurrencyCode), FoundCurrency) then;
 
         if FoundCurrency = '' then
             exit;
         if CurrencyCode = '' then begin
-            CurrencyCode := CopyStr(FoundCurrency, 1, MaxStrLen(CurrencyCode));
+#pragma warning disable AA0139 // false positive: overflow handled by TryAssignToText
+            CurrencyCode := FoundCurrency;
+#pragma warning restore AA0139
             exit;
         end;
     end;

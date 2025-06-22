@@ -81,7 +81,7 @@ codeunit 8055 "Sub. Contracts Item Management"
 
     local procedure PreventServiceCommitmentItem(ItemNo: Code[20])
     begin
-        if AllowInsertOfInvoicingItem then
+        if SessionStore.GetBooleanKey('CreateBillingDocumentsAllowInsertOfInvoicingItemNo') then
             exit;
         if IsServiceCommitmentItem(ItemNo) then
             Error(ServiceCommitmentItemErr);
@@ -93,7 +93,7 @@ codeunit 8055 "Sub. Contracts Item Management"
     begin
         if not GetItem(ItemNo, Item) then
             exit;
-        if AllowInsertOfInvoicingItem then
+        if SessionStore.GetBooleanKey('CreateBillingDocumentsAllowInsertOfInvoicingItemNo') then
             exit;
         if Item."Subscription Option" = Enum::"Item Service Commitment Type"::"Invoicing Item" then
             Error(InvoicingItemErr);
@@ -314,13 +314,8 @@ codeunit 8055 "Sub. Contracts Item Management"
         exit(Item.Description);
     end;
 
-    procedure SetAllowInsertOfInvoicingItem(NewAllowInsertOfInvoicingItem: Boolean)
-    begin
-        AllowInsertOfInvoicingItem := NewAllowInsertOfInvoicingItem;
-    end;
-
     var
-        AllowInsertOfInvoicingItem: Boolean;
+        SessionStore: Codeunit "Session Store";
         NonInventoryTypeErr: Label 'The value "%1" can only be set if either "%2" or "%3" is selected in the field "%4".';
         InvoicingItemErr: Label 'Items that are marked as Invoicing Item may not be used here. Please choose another item.';
         ServiceCommitmentItemErr: Label 'Items that are marked as Subscription Item may not be used here. Please choose another item.';

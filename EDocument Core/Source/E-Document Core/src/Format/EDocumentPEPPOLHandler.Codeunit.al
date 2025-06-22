@@ -14,10 +14,8 @@ using Microsoft.Finance.GeneralLedger.Setup;
 codeunit 6173 "E-Document PEPPOL Handler" implements IStructuredFormatReader
 {
     Access = Internal;
-    InherentEntitlements = X;
-    InherentPermissions = X;
 
-    procedure ReadIntoDraft(EDocument: Record "E-Document"; TempBlob: Codeunit "Temp Blob"): Enum "E-Doc. Process Draft"
+    procedure Read(EDocument: Record "E-Document"; TempBlob: Codeunit "Temp Blob"): Enum "E-Doc. Structured Data Process"
     var
         EDocumentPurchaseHeader: Record "E-Document Purchase Header";
         DocStream: InStream;
@@ -55,7 +53,7 @@ codeunit 6173 "E-Document PEPPOL Handler" implements IStructuredFormatReader
         end;
         EDocumentPurchaseHeader.Modify();
         EDocument.Direction := EDocument.Direction::Incoming;
-        exit(Enum::"E-Doc. Process Draft"::"Purchase Document");
+        exit(Enum::"E-Doc. Structured Data Process"::"Purchase Document");
     end;
 
     local procedure InsertPurchaseInvoiceLines(PeppolXML: XmlDocument; XmlNamespaces: XmlNamespaceManager; EDocumentEntryNo: Integer)
@@ -73,7 +71,7 @@ codeunit 6173 "E-Document PEPPOL Handler" implements IStructuredFormatReader
         for i := 1 to LineXMLList.Count do begin
             Clear(EDocumentPurchaseLine);
             EDocumentPurchaseLine.Validate("E-Document Entry No.", EDocumentEntryNo);
-            EDocumentPurchaseLine."Line No." := EDocumentPurchaseLine.GetNextLineNo(EDocumentEntryNo);
+            EDocumentPurchaseLine."Line No." := (i * 10000);
             LineXMLList.Get(i, LineXMLNode);
             NewLineXML.ReplaceNodes(LineXMLNode);
             PopulateEDocumentPurchaseLine(NewLineXML, XmlNamespaces, EDocumentPurchaseLine);
@@ -93,14 +91,12 @@ codeunit 6173 "E-Document PEPPOL Handler" implements IStructuredFormatReader
         SetStringValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cac:PayeeParty/cac:PartyName/cbc:Name', MaxStrLen(EDocumentPurchaseHeader."Vendor Company Name"), EDocumentPurchaseHeader."Vendor Company Name");
         SetNumberValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount', EDocumentPurchaseHeader."Total Discount");
         SetNumberValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cac:LegalMonetaryTotal/cbc:PayableAmount', EDocumentPurchaseHeader."Amount Due");
-        SetNumberValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cac:LegalMonetaryTotal/cbc:PayableAmount', EDocumentPurchaseHeader.Total);
         SetStringValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:Name', MaxStrLen(EDocumentPurchaseHeader."Vendor Contact Name"), EDocumentPurchaseHeader."Vendor Contact Name");
         SetStringValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:StreetName', MaxStrLen(EDocumentPurchaseHeader."Vendor Address"), EDocumentPurchaseHeader."Vendor Address");
         SetStringValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID', MaxStrLen(EDocumentPurchaseHeader."Customer VAT Id"), EDocumentPurchaseHeader."Customer VAT Id");
         // Line below, using PayeeParty, shall be used when the Payee is different from the Seller. Otherwise, it will not be shown in the XML.
         SetStringValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cac:PayeeParty/cac:PartyLegalEntity/cbc:CompanyID', MaxStrLen(EDocumentPurchaseHeader."Vendor VAT Id"), EDocumentPurchaseHeader."Vendor VAT Id");
         SetNumberValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount', EDocumentPurchaseHeader."Sub Total");
-        EDocumentPurchaseHeader."Total VAT" := EDocumentPurchaseHeader."Total" - EDocumentPurchaseHeader."Sub Total" - EDocumentPurchaseHeader."Total Discount";
         SetDateValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cbc:DueDate', EDocumentPurchaseHeader."Due Date");
         SetDateValueInField(PeppolXML, XMLNamespaces, '/inv:Invoice/cbc:IssueDate', EDocumentPurchaseHeader."Document Date");
         SetStringValueInField(PeppolXML, XmlNamespaces, '/inv:Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID', MaxStrLen(EDocumentPurchaseHeader."Vendor VAT Id"), EDocumentPurchaseHeader."Vendor VAT Id");
@@ -126,6 +122,7 @@ codeunit 6173 "E-Document PEPPOL Handler" implements IStructuredFormatReader
         SetStringValueInField(LineXML, XMLNamespaces, 'cac:InvoiceLine/cbc:Note', MaxStrLen(EDocumentPurchaseLine.Description), EDocumentPurchaseLine.Description);
         SetStringValueInField(LineXML, XMLNamespaces, 'cac:InvoiceLine/cac:Item/cbc:Name', MaxStrLen(EDocumentPurchaseLine.Description), EDocumentPurchaseLine.Description);
         SetStringValueInField(LineXML, XMLNamespaces, 'cac:InvoiceLine/cac:Item/cbc:Description', MaxStrLen(EDocumentPurchaseLine.Description), EDocumentPurchaseLine.Description);
+        SetStringValueInField(LineXML, XMLNamespaces, 'cac:InvoiceLine/cbc:ID', MaxStrLen(EDocumentPurchaseLine."Product Code"), EDocumentPurchaseLine."Product Code");
         SetStringValueInField(LineXML, XMLNamespaces, 'cac:InvoiceLine/cac:Item/cac:SellersItemIdentification/cbc:ID', MaxStrLen(EDocumentPurchaseLine."Product Code"), EDocumentPurchaseLine."Product Code");
         SetStringValueInField(LineXML, XMLNamespaces, 'cac:InvoiceLine/cac:Item/cac:StandardItemIdentification/cbc:ID', MaxStrLen(EDocumentPurchaseLine."Product Code"), EDocumentPurchaseLine."Product Code");
         SetNumberValueInField(LineXML, XMLNamespaces, 'cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory/cbc:Percent', EDocumentPurchaseLine."VAT Rate");
@@ -197,10 +194,5 @@ codeunit 6173 "E-Document PEPPOL Handler" implements IStructuredFormatReader
 
         if XMLNode.AsXmlElement().InnerText() <> '' then
             Evaluate(DateValue, XMLNode.AsXmlElement().InnerText(), 9);
-    end;
-
-    procedure View(EDocument: Record "E-Document"; TempBlob: Codeunit "Temp Blob")
-    begin
-        Error('A view is not implemented for this handler.');
     end;
 }
