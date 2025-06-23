@@ -218,7 +218,10 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
     local procedure CreateLinesFromDocument(var PurchaseHeader: Record "Purchase Header")
     var
         AllocationPurchaseLine: Record "Purchase Line";
+        IsReopen: Boolean;
     begin
+        CheckPurchaseReleaseStatus(PurchaseHeader, IsReopen);
+
         AllocationPurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
         AllocationPurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
         AllocationPurchaseLine.SetRange("Type", AllocationPurchaseLine."Type"::"Allocation Account");
@@ -231,6 +234,8 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
         AllocationPurchaseLine.SetFilter("Selected Alloc. Account No.", '<>%1', '');
         CreateLines(AllocationPurchaseLine);
         AllocationPurchaseLine.DeleteAll();
+
+        CheckPurchaseReleaseStatus(PurchaseHeader, IsReopen);
     end;
 
     local procedure CreateLines(var AllocationPurchaseLine: Record "Purchase Line")
@@ -524,20 +529,31 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
     end;
 
     local procedure MoveAmounts(var PurchaseLine: Record "Purchase Line"; var AllocationPurchaseLine: Record "Purchase Line"; var AllocationLine: Record "Allocation Line"; var AllocationAccount: Record "Allocation Account")
-    var
-        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
-        AmountRoundingPrecision: Decimal;
     begin
         PurchaseLine."Unit Cost" := AllocationPurchaseLine."Unit Cost";
 
         if AllocationAccount."Document Lines Split" = AllocationAccount."Document Lines Split"::"Split Amount" then begin
-            AmountRoundingPrecision := AllocationAccountMgt.GetCurrencyRoundingPrecision(PurchaseLine."Currency Code");
-            PurchaseLine.Validate("Direct Unit Cost", Round(AllocationLine.Amount / PurchaseLine.Quantity, AmountRoundingPrecision));
-            PurchaseLine.Validate("Line Amount", AllocationLine.Amount);
+            PurchaseLine.Validate("Direct Unit Cost", GetUnitPrice(PurchaseLine, AllocationLine.Amount));
+            PurchaseLine."Line Amount" := AllocationLine.Amount;
         end else begin
             PurchaseLine.Validate("Direct Unit Cost", AllocationPurchaseLine."Direct Unit Cost");
             PurchaseLine."Line Amount" := AllocationPurchaseLine."Line Amount";
         end;
+    end;
+
+    local procedure GetUnitPrice(var PurchaseLine: Record "Purchase Line"; AllocationLineAmount: Decimal): Decimal
+    var
+        PurchaseHeader: Record "Purchase Header";
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
+        AmountRoundingPrecision: Decimal;
+    begin
+        PurchaseHeader.ReadIsolation := IsolationLevel::ReadUncommitted;
+        PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
+        if PurchaseHeader."Prices Including VAT" then
+            AllocationLineAmount += AllocationLineAmount * PurchaseLine."VAT %" / 100;
+
+        AmountRoundingPrecision := AllocationAccountMgt.GetCurrencyRoundingPrecision(PurchaseLine."Currency Code");
+        exit(Round(AllocationLineAmount / PurchaseLine.Quantity, AmountRoundingPrecision));
     end;
 
     local procedure GetNextLine(var AllocationPurchaseLine: Record "Purchase Line"): Integer
@@ -708,6 +724,25 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
             VerifyAllocationAccount(AllocationAccount);
             AllocationAccountMgt.VerifyNoInheritFromParentUsed(AllocationAccount."No.");
         end;
+    end;
+
+    local procedure CheckPurchaseReleaseStatus(var PurchaseHeader: Record "Purchase Header"; var IsReopen: Boolean)
+    var
+        PurchaseRelease: Codeunit "Release Purchase Document";
+    begin
+        if IsReopen then begin
+            PurchaseRelease.Run(PurchaseHeader);
+            PurchaseHeader.Modify();
+            exit;
+        end;
+
+        if PurchaseHeader.Status <> PurchaseHeader.Status::Released then
+            exit;
+
+        PurchaseRelease.Reopen(PurchaseHeader);
+        IsReopen := true;
+        PurchaseRelease.SetSkipCheckReleaseRestrictions();
+        PurchaseHeader.SetHideValidationDialog(true);
     end;
 
     [IntegrationEvent(false, false)]
