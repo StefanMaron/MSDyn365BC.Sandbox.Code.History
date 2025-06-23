@@ -333,8 +333,6 @@ codeunit 224 "EmplEntry-Apply Posted Entries"
         GenJnlPostLine.UnapplyEmplLedgEntry(GenJnlLine, DtldEmplLedgEntry2);
         RunEmployeeExchRateAdjustment(GenJnlLine, TempEmployeeLedgerEntry);
 
-        OnPostUnApplyEmployeeOnAfterRunEmployeeExchRateAdjustment(GenJnlLine, EmplLedgEntry, DtldEmplLedgEntry2, GenJnlPostLine, TempEmployeeLedgerEntry);
-
         if PreviewMode then
             GenJnlPostPreview.ThrowError();
 
@@ -551,11 +549,6 @@ codeunit 224 "EmplEntry-Apply Posted Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRunEmplExchRateAdjustment(var GenJnlLine: Record "Gen. Journal Line"; var TempEmployeeLedgerEntry: Record "Employee Ledger Entry" temporary; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostUnApplyEmployeeOnAfterRunEmployeeExchRateAdjustment(GenJournalLine: Record "Gen. Journal Line"; EmplLedgerEntry: Record "employee Ledger Entry"; DetailedEmplLedgEntry: Record "Detailed Employee Ledger Entry"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var TempEmplLedgerEntry: Record "Employee Ledger Entry" temporary)
     begin
     end;
 }
