@@ -9,7 +9,6 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Calculation;
-using System.Reflection;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
@@ -249,7 +248,8 @@ codeunit 6109 "E-Document Import Helper"
         LineAmount := LineAmountFieldRef.Value();
 
         LineDiscountAmount := (LineQuantity * LineDirectUnitCost) - LineAmount;
-        LineDiscountAmountFieldRef.Value(LineDiscountAmount);
+
+        LineDiscountAmountFieldRef.Value(Format(LineDiscountAmount, 0, 9));
     end;
 
     /// <summary>
@@ -270,8 +270,9 @@ codeunit 6109 "E-Document Import Helper"
         if (CompanyInformation.GLN = '') and (CompanyInformation."VAT Registration No." = '') then
             EDocErrorHelper.LogErrorMessage(EDocument, CompanyInformation, CompanyInformation.FieldNo(GLN), MissingCompanyInfoSetupErr);
 
-        if not (CompanyInformation.GLN in ['', EDocument."Receiving Company GLN"]) then
-            EDocErrorHelper.LogErrorMessage(EDocument, CompanyInformation, CompanyInformation.FieldNo(GLN), StrSubstNo(InvalidCompanyInfoGLNErr, EDocument."Receiving Company GLN"));
+        if EDocument."Receiving Company GLN" <> '' then
+            if not (CompanyInformation.GLN in ['', EDocument."Receiving Company GLN"]) then
+                EDocErrorHelper.LogErrorMessage(EDocument, CompanyInformation, CompanyInformation.FieldNo(GLN), StrSubstNo(InvalidCompanyInfoGLNErr, EDocument."Receiving Company GLN"));
 
         if not (ExtractVatRegNo(CompanyInformation."VAT Registration No.", '') in ['', ExtractVatRegNo(EDocument."Receiving Company VAT Reg. No.", '')]) then
             EDocErrorHelper.LogErrorMessage(EDocument, CompanyInformation, CompanyInformation.FieldNo("VAT Registration No."), StrSubstNo(InvalidCompanyInfoVATRegNoErr, EDocument."Receiving Company VAT Reg. No."));
@@ -591,26 +592,6 @@ codeunit 6109 "E-Document Import Helper"
         EDocumentImport.SetHideDialogs(Hide);
     end;
 
-    /// <summary>
-    /// Use it to find attachment file extension when importing E-Document.
-    /// </summary>
-    procedure DetermineFileType(MimeType: Text): Text
-    begin
-        case MimeType of
-            'image/jpeg':
-                exit('jpeg');
-            'image/png':
-                exit('png');
-            'application/pdf':
-                exit('pdf');
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'application/vnd.oasis.opendocument.spreadsheet':
-                exit('xlsx');
-            else
-                exit('');
-        end;
-    end;
-
     local procedure TryFindLeastBlockedVendorNoByVendorBankAcc(var VendorBankAccount: record "Vendor Bank Account"): Code[20]
     var
         Vendor: Record Vendor;
@@ -644,14 +625,6 @@ codeunit 6109 "E-Document Import Helper"
         exit('');
     end;
 
-    internal procedure ProcessField(EDocument: Record "E-Document"; RecRef: RecordRef; Field: Record Field; DocumentFieldRef: FieldRef)
-    begin
-        if Field.Type = Field.Type::Decimal then
-            ProcessDecimalField(EDocument, RecRef, Field."No.", DocumentFieldRef.Value())
-        else
-            ProcessField(EDocument, RecRef, Field."No.", DocumentFieldRef.Value());
-    end;
-
     internal procedure ProcessFieldNoValidate(RecRef: RecordRef; FieldNo: Integer; Value: Text[250])
     var
         FieldRef: FieldRef;
@@ -666,14 +639,6 @@ codeunit 6109 "E-Document Import Helper"
     begin
         FieldRef := RecRef.Field(FieldNo);
         SetFieldValue(EDocument, FieldRef, Value);
-    end;
-
-    internal procedure ProcessDecimalField(EDocument: Record "E-Document"; RecRef: RecordRef; FieldNo: Integer; Value: Decimal)
-    var
-        FieldRef: FieldRef;
-    begin
-        FieldRef := RecRef.Field(FieldNo);
-        SetDecimalFieldValue(EDocument, FieldRef, Value);
     end;
 
     internal procedure GetCurrencyRoundingPrecision(CurrencyCode: Code[10]): Decimal
@@ -890,17 +855,6 @@ codeunit 6109 "E-Document Import Helper"
         if StrPos(VatRegNo, UpperCase(CountryRegionCode)) = 1 then
             VatRegNo := DelStr(VatRegNo, 1, StrLen(CountryRegionCode));
         exit(VatRegNo);
-    end;
-
-    local procedure SetDecimalFieldValue(EDocument: Record "E-Document"; var FieldRef: FieldRef; Value: Decimal)
-    var
-        ConfigValidateManagement: Codeunit "Config. Validate Management";
-        ErrorText: Text;
-    begin
-        // ConfigValidateManagement works with XML formats, but we need to adapt it to the regional settings
-        ErrorText := ConfigValidateManagement.EvaluateValueWithValidate(FieldRef, Format(Value, 0, 9), false);
-        if ErrorText <> '' then
-            EDocErrorHelper.LogSimpleErrorMessage(EDocument, ErrorText);
     end;
 
     local procedure SetFieldValue(EDocument: Record "E-Document"; var FieldRef: FieldRef; Value: Text[250])
