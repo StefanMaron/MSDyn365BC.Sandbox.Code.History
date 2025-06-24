@@ -456,6 +456,12 @@ table 17 "G/L Entry"
             Caption = 'Non-Deductible VAT Amount ACY';
             AutoFormatType = 1;
         }
+        field(6202; "Src. Curr. Non-Ded. VAT Amount"; Decimal)
+        {
+            Caption = 'Source Currency Non-Deductible VAT Amount';
+            AutoFormatExpression = Rec."Source Currency Code";
+            AutoFormatType = 1;
+        }
         field(8001; "Account Id"; Guid)
         {
             CalcFormula = lookup("G/L Account".SystemId where("No." = field("G/L Account No.")));
@@ -492,12 +498,12 @@ table 17 "G/L Entry"
         }
         key(Key2; "G/L Account No.", "Posting Date")
         {
-            SumIndexFields = Amount, "Debit Amount", "Credit Amount", "Additional-Currency Amount", "Add.-Currency Debit Amount", "Add.-Currency Credit Amount", "VAT Amount", Quantity, "Source Currency Amount";
+            SumIndexFields = Amount, "Debit Amount", "Credit Amount", "Additional-Currency Amount", "Add.-Currency Debit Amount", "Add.-Currency Credit Amount", "VAT Amount", Quantity, "Source Currency Amount", "Source Currency VAT Amount";
             IncludedFields = Amount, "Additional-Currency Amount";
         }
         key(Key3; "G/L Account No.", "Global Dimension 1 Code", "Global Dimension 2 Code", "Posting Date", "VAT Reporting Date", "Source Currency Code")
         {
-            SumIndexFields = Amount, "Debit Amount", "Credit Amount", "Additional-Currency Amount", "Add.-Currency Debit Amount", "Add.-Currency Credit Amount", "VAT Amount", "Source Currency Amount";
+            SumIndexFields = Amount, "Debit Amount", "Credit Amount", "Additional-Currency Amount", "Add.-Currency Debit Amount", "Add.-Currency Credit Amount", "VAT Amount", "Source Currency Amount", "Source Currency VAT Amount";
         }
         key(Key4; "G/L Account No.", "Business Unit Code", "Posting Date")
         {
