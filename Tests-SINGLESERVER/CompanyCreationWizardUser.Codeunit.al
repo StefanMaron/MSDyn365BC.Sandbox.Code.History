@@ -20,8 +20,8 @@ codeunit 139318 "Company Creation Wizard - User"
     var
         Company: Record Company;
         User: Record User;
-        AccessControl: Record "Access Control";
         CompanyCreationWizard: TestPage "Company Creation Wizard";
+        NewCompanyData: Option "ENU=Evaluation - Sample Data","Production - Setup Data Only","No Data","Advanced Evaluation - Complete Sample Data","Create New - No Data";
         NewCompanyName: Text[30];
     begin
         // [SCENARIO] Not choosing any user in the Company Creation Wizard creates company without any user
@@ -38,18 +38,14 @@ codeunit 139318 "Company Creation Wizard - User"
         CompanyCreationWizard.ActionBack.Invoke(); // Welcome page
         CompanyCreationWizard.ActionNext.Invoke(); // Basic Information page
         CompanyCreationWizard.CompanyName.SetValue(NewCompanyName);
-        CompanyCreationWizard.CompanyData.SetValue(Enum::"Company Demo Data Type"::"Create New - No Data"); // Set to None to avoid lengthy data import
+        CompanyCreationWizard.CompanyData.SetValue(NewCompanyData::"No Data"); // Set to None to avoid lengthy data import
         CompanyCreationWizard.ActionNext.Invoke(); // Manage Users page
         CompanyCreationWizard.ActionNext.Invoke(); // That's it page
 
         // [WHEN] Company Creation Wizard is finished without adding any users
         CompanyCreationWizard.ActionFinish.Invoke();
 
-        // [THEN] Company is created without any users, excluding super user
-        AccessControl.SetRange("Role ID", 'SUPER');
-        if AccessControl.FindFirst() then
-            User.SetFilter("User Security ID",'<>%1',AccessControl."User Security ID");
-
+        // [THEN] Company is created without any users
         Assert.RecordIsEmpty(User);
     end;
 
@@ -65,6 +61,7 @@ codeunit 139318 "Company Creation Wizard - User"
         AzureADPlan: Codeunit "Azure AD Plan";
         AzureADPlanTestLibrary: Codeunit "Azure AD Plan Test Library";
         CompanyCreationWizard: TestPage "Company Creation Wizard";
+        NewCompanyData: Option "ENU=Evaluation - Sample Data","Production - Setup Data Only","No Data","Advanced Evaluation - Complete Sample Data","Create New - No Data";
         NewCompanyName: Text[30];
         PlanAID: Guid;
         PlanBID: Guid;
@@ -112,7 +109,7 @@ codeunit 139318 "Company Creation Wizard - User"
         CompanyCreationWizard.ActionBack.Invoke(); // Welcome page
         CompanyCreationWizard.ActionNext.Invoke(); // Basic Information page
         CompanyCreationWizard.CompanyName.SetValue(NewCompanyName);
-        CompanyCreationWizard.CompanyData.SetValue(Enum::"Company Demo Data Type"::"Create New - No Data"); // Set to None to avoid lengthy data import
+        CompanyCreationWizard.CompanyData.SetValue(NewCompanyData::"No Data"); // Set to None to avoid lengthy data import
         CompanyCreationWizard.ActionNext.Invoke(); // Manage Users page
         Commit();
 
