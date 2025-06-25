@@ -6514,7 +6514,7 @@ table 39 "Purchase Line"
            ("Line Discount Amount" = 0) and
            (not PurchHeader."Prices Including VAT")
         then
-            ItemChargeAssgntLineAmt := "Line Amount" + NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(Rec)
+            ItemChargeAssgntLineAmt := "Line Amount"
         else
             if PurchHeader."Prices Including VAT" then
                 ItemChargeAssgntLineAmt :=
