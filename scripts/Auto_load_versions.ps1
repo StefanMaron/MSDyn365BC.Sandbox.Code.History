@@ -93,7 +93,7 @@ $Versions | Sort-Object -Property Country, Version | % {
         git config user.name "Stefan Maron"
         git add -A | out-null
         git commit -a -m "$($country)-$($version.ToString())" | out-null
-        git gc | out-null\
+        git gc | out-null
         git pull origin
         git push --set-upstream origin "$($country)-$($Version.Major)"
         
