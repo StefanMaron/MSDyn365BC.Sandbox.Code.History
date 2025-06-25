@@ -167,24 +167,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Edit Posted Documents - NamedType CashFlowWorkSheetLineMustNotBeFoundErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 682729763 - NamedType 563687943" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Dispute Status must be editable]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Edit Posted Documents - NamedType DisputeStatusEditableErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 682729763 - NamedType 833206911" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Dispute Status must be visible]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Edit Posted Documents - NamedType DisputeStatusVisibleErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 682729763 - NamedType 2871896518" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Unexpected Gross Weight shown.]]></Val>
@@ -885,15 +867,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Apply Sales/Receivables - NamedType WrongValErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2732538615 - NamedType 43668131" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Planned Delivery Date must be %1 in %2.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1= Value ,%2=Table Name.]D;]A;(LookupHint=Codeunit ERM Base Calendar - NamedType PlannedDeliveryDateErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3401192251 - NamedType 1947391627" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -2750,15 +2723,6 @@
       <Cmt Name="Dev"><![CDATA[%1 and %2 = Invoice No.]D;]A;(LookupHint=Codeunit ERM Intercompany II - NamedType PostedInvoiceFromSameTransactionQst)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2300497691 - NamedType 2932411483" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 of %2 must be equal to blank]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = date field, %2 = table name]D;]A;(LookupHint=Codeunit ERM Intercompany II - NamedType PostingDateErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 2300497691 - NamedType 1630371593" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Reservation Entry doen's exist.]]></Val>
@@ -3126,15 +3090,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Multiple Posting Groups - NamedType PostingGroupNonEditableErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2480070618 - NamedType 964133575" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[G/L Entry Bill Account Not Matching with Purchase Invoice Vendor Posting Group Bill Account]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Multiple Posting Groups - NamedType VendorPostingGroupMatchErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2516795050 - NamedType 90657030" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -5070,15 +5025,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Sales Documents II - NamedType WorkStartingDateRecIsNotFoundErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2641639841 - NamedType 1874506076" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[G/L Account %1 is not balanced]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = G/L Account No]D;]A;(LookupHint=Codeunit ERM Sales Documents III - NamedType AccountBalanceErrLbl)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2641639841 - NamedType 234256417" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -9084,15 +9030,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder - Add. Line fee - NamedType ReminderLineMustNotExistErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2624800184 - NamedType 3559511364" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Filters are not saved]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder Automation Tests - NamedType FiltersAreNotSavedErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1475444133 - NamedType 1063273132" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
