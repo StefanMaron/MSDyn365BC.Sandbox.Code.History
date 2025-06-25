@@ -12,6 +12,7 @@ codeunit 8062 "Billing Proposal"
         SalesHeader: Record "Sales Header";
         PurchaseHeader: Record "Purchase Header";
         CreateBillingDocuments: Codeunit "Create Billing Documents";
+        SessionStore: Codeunit "Session Store";
         CreateBillingDocumentPage: Page "Create Billing Document";
         LastContractNo: Code[20];
         LastPartnerNo: Code[20];
@@ -731,8 +732,10 @@ codeunit 8062 "Billing Proposal"
     begin
         if DocumentNo = '' then
             exit;
+        SessionStore.SetBooleanKey('SkipContractPurchaseHeaderModifyCheck', true);
         PurchaseHeader.Get(DocumentType, DocumentNo);
         PurchaseHeader.SetRecurringBilling();
+        SessionStore.RemoveBooleanKey('SkipContractPurchaseHeaderModifyCheck');
     end;
 
     local procedure BillingProposalCanBeCreatedForContract(ContractNo: Code[20]; ServicePartner: Enum "Service Partner"): Boolean
