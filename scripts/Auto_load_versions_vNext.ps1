@@ -109,12 +109,12 @@ $Versions | Sort-Object -Property Country, Version | % {
 
         "$($country)-$($version.ToString())" > version.txt
 
+        git pull --ff-only origin
         git config user.email "stefanmaron@outlook.de"
         git config user.name "Stefan Maron"
         git add -A | out-null
         git commit -a -m "$($country)-$($version.ToString())-vNext" | out-null
         git gc | out-null
-        git pull origin
         git push --set-upstream origin "$($country)-$($Version.Major)-vNext"
         
         Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
