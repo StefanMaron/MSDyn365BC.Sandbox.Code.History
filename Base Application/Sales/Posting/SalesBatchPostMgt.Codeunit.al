@@ -4,10 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Posting;
 
-using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Intercompany.Outbox;
-using Microsoft.Inventory.Analysis;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
 using System.Automation;
@@ -25,20 +23,15 @@ codeunit 1371 "Sales Batch Post Mgt."
     var
         SalesHeader: Record "Sales Header";
         SalesBatchPostMgt: Codeunit "Sales Batch Post Mgt.";
-        UpdateAnalysisView: Codeunit "Update Analysis View";
-        UpdateItemAnalysisView: Codeunit "Update Item Analysis View";
     begin
         SalesHeader.Copy(Rec);
 
-        BindSubscription(SalesBatchPostMgt);  // also disables automatic update of Analysis Views
+        BindSubscription(SalesBatchPostMgt);
         SalesBatchPostMgt.SetPostingCodeunitId(PostingCodeunitId);
         SalesBatchPostMgt.SetBatchProcessor(BatchProcessingMgt);
         SalesBatchPostMgt.Code(SalesHeader);
-        Rec := SalesHeader;
-        UnBindSubscription(SalesBatchPostMgt);  // reenable automatic update of Analysis Views
 
-        UpdateAnalysisView.UpdateAll(0, true);
-        UpdateItemAnalysisView.UpdateAll(0, true);
+        Rec := SalesHeader;
     end;
 
     var
@@ -146,7 +139,7 @@ codeunit 1371 "Sales Batch Post Mgt."
     local procedure PrepareSalesHeader(var SalesHeader: Record "Sales Header"; var BatchConfirm: Option)
     var
         CalcInvoiceDiscont: Boolean;
-        ReplacePostingDate, ReplaceVATDate, ReplaceDocumentDate : Boolean;
+        ReplacePostingDate, ReplaceVATDate : Boolean;
         PostingDate, VATDate : Date;
     begin
         BatchProcessingMgt.GetBooleanParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Calculate Invoice Discount", CalcInvoiceDiscont);
@@ -154,13 +147,12 @@ codeunit 1371 "Sales Batch Post Mgt."
         BatchProcessingMgt.GetDateParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Posting Date", PostingDate);
         BatchProcessingMgt.GetBooleanParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Replace VAT Date", ReplaceVATDate);
         BatchProcessingMgt.GetDateParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"VAT Date", VATDate);
-        BatchProcessingMgt.GetBooleanParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Replace Document Date", ReplaceDocumentDate);
+
 
         if CalcInvoiceDiscont then
             CalculateInvoiceDiscount(SalesHeader);
 
         SalesHeader.BatchConfirmUpdateDeferralDate(BatchConfirm, ReplacePostingDate, PostingDate, ReplaceVATDate, VATDate);
-        SalesHeader.BatchConfirmUpdatePostingDate(ReplacePostingDate, PostingDate, ReplaceVATDate, VATDate, ReplaceDocumentDate);
         OnPrepareSalesHeaderOnAfterBatchConfirmUpdateDeferralDate(SalesHeader, BatchProcessingMgt);
 
         BatchProcessingMgt.GetBooleanParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::Ship, SalesHeader.Ship);
@@ -433,18 +425,6 @@ codeunit 1371 "Sales Batch Post Mgt."
         ICOutboxExport: Codeunit "IC Outbox Export";
     begin
         ICOutboxExport.DownloadBatchFiles(GetICBatchFileName());
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Update Analysis View", 'OnBeforeUpdateAll', '', false, false)]
-    local procedure OnBeforeUpdateAnalysisView(Which: Option "Ledger Entries","Budget Entries",Both; DirectlyFromPosting: Boolean; var AnalysisView: Record "Analysis View"; var InBatchPosting: Boolean)
-    begin
-        InBatchPosting := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Update Item Analysis View", 'OnBeforeUpdateAll', '', false, false)]
-    local procedure OnBeforeUpdateItemAnalysisView(var IsHandled: Boolean)
-    begin
-        IsHandled := true;
     end;
 }
 
