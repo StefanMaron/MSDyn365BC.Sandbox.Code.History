@@ -152,7 +152,6 @@ codeunit 5705 "TransferOrder-Post Receipt"
                 OnCheckTransLine(TransLine, TransHeader, Location, WhseReceive);
 
                 InsertTransRcptLine(TransRcptHeader, TransRcptLine, TransLine);
-                OnAfterInsertTransRcptLineOnBeforePostDeferredValue(TransLine, TransHeader, TransRcptHeader, TransRcptLine, ItemJnlPostLine);
             until TransLine.Next() = 0;
 
         OnRunOnAfterInsertTransRcptLines(TransRcptHeader, TransLine, TransHeader, Location, WhseReceive);
@@ -997,9 +996,5 @@ codeunit 5705 "TransferOrder-Post Receipt"
     local procedure OnRunWithCheckOnBeforeModifyTransferHeader(var TransferHeader: Record "Transfer Header");
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertTransRcptLineOnBeforePostDeferredValue(var TransLine: Record "Transfer Line"; TransHeader: Record "Transfer Header"; TransRcptHeader: Record "Transfer Receipt Header"; TransRcptLine: Record "Transfer Receipt Line"; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line")
-    begin
-    end;
 }
+
