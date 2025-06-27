@@ -7,6 +7,7 @@ table 8007 "Overdue Subscription Line"
     DataClassification = CustomerContent;
     Caption = 'Overdue Subscription Line';
     TableType = Temporary;
+    Access = Internal;
 
     fields
     {
@@ -114,7 +115,7 @@ table 8007 "Overdue Subscription Line"
         }
     }
 
-    internal procedure CountOverdueServiceCommitments(): Integer
+    procedure CountOverdueServiceCommitments(): Integer
     var
         ServiceCommitment: Record "Subscription Line";
         OverdueDate: Date;
@@ -140,7 +141,7 @@ table 8007 "Overdue Subscription Line"
         exit(CalcDate(ServiceContractSetup."Overdue Date Formula", WorkDate()));
     end;
 
-    internal procedure FillOverdueServiceCommitments()
+    procedure FillOverdueServiceCommitments()
     var
         OverdueDate: Date;
     begin

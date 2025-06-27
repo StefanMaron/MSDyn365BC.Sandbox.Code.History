@@ -9,6 +9,7 @@ table 8000 "Field Translation"
     DataClassification = CustomerContent;
     DrillDownPageId = "Field Translations";
     LookupPageId = "Field Translations";
+    Access = Internal;
 
     fields
     {
@@ -75,7 +76,7 @@ table 8000 "Field Translation"
         Rec.TestField("Source SystemId");
     end;
 
-    internal procedure GetSourceText() SourceText: Text
+    procedure GetSourceText() SourceText: Text
     var
         RecRef: RecordRef;
         FRef: FieldRef;
@@ -91,21 +92,21 @@ table 8000 "Field Translation"
         end;
     end;
 
-    internal procedure GetNumberOfTranslations(SourceRecord: Variant; TargetFieldID: Integer): Integer
+    procedure GetNumberOfTranslations(SourceRecord: Variant; TargetFieldID: Integer): Integer
     begin
         if not FilterTranslationsForField(SourceRecord, TargetFieldID) then
             exit(0);
         exit(Rec.Count());
     end;
 
-    internal procedure OpenTranslationsForField(SourceRecord: Variant; TargetFieldID: Integer)
+    procedure OpenTranslationsForField(SourceRecord: Variant; TargetFieldID: Integer)
     begin
         if not FilterTranslationsForField(SourceRecord, TargetFieldID) then
             exit;
         Page.RunModal(0, Rec);
     end;
 
-    internal procedure DeleteRelatedTranslations(SourceRecord: Variant; TargetFieldID: Integer)
+    procedure DeleteRelatedTranslations(SourceRecord: Variant; TargetFieldID: Integer)
     begin
         if not FilterTranslationsForField(SourceRecord, TargetFieldID) then
             exit;
@@ -131,7 +132,7 @@ table 8000 "Field Translation"
         exit(true);
     end;
 
-    internal procedure FindTranslation(SourceRecord: Variant; TargetFieldID: Integer; LanguageCode: Code[10]): Text
+    procedure FindTranslation(SourceRecord: Variant; TargetFieldID: Integer; LanguageCode: Code[10]): Text
     var
         WindowsLanguage: Record "Windows Language";
         DataTypeMgt: Codeunit "Data Type Management";
