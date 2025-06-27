@@ -6,14 +6,12 @@ namespace Microsoft.Bank.CODA;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
-using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
-using System.Utilities;
 
 codeunit 2000042 "Post Coded Bank Statement"
 {
@@ -61,7 +59,6 @@ codeunit 2000042 "Post Coded Bank Statement"
         Vend: Record Vendor;
         VendLedgEntry: Record "Vendor Ledger Entry";
         GLAcc: Record "G/L Account";
-        CurrExchRate: Record "Currency Exchange Rate";
         PaymJnlManagement: Codeunit PmtJrnlManagement;
         GenJnlManagement: Codeunit GenJnlManagement;
         CodeFound: Boolean;
@@ -75,7 +72,6 @@ codeunit 2000042 "Post Coded Bank Statement"
     procedure "Code"()
     var
         CodedBankStmtLine: Record "CODA Statement Line";
-        ConfirmManagement: Codeunit "Confirm Management";
     begin
         CodedBankStmtLine.SetCurrentKey("Bank Account No.", "Statement No.", "Statement Line No.");
         CodedBankStmtLine.CopyFilters(CodBankStmtLine);
@@ -84,7 +80,7 @@ codeunit 2000042 "Post Coded Bank Statement"
         if not CodedBankStmtLine.IsEmpty() then
             Error(Text000);
 
-        if not ConfirmManagement.GetResponseOrDefault(Text001, true) then
+        if not Confirm(Text001, false) then
             exit;
 
         CodedBankStmtLine.Reset();
@@ -156,12 +152,7 @@ codeunit 2000042 "Post Coded Bank Statement"
                 end;
                 GenJnlLine.Validate("Account No.", CodBankStmtLine."Account No.");
                 GenJnlLine."Applies-to ID" := CodBankStmtLine."Applies-to ID";
-                if ((BankAcc."Currency Code" = '') and (GenJnlLine."Currency Code" <> '')) then begin
-                    GenJnlLine."Amount (LCY)" := -CodBankStmtLine."Statement Amount";
-                    GenJnlLine.Amount := Round(
-                        CurrExchRate.ExchangeAmtLCYToFCY(GenJnlLine."Posting Date", GenJnlLine."Currency Code", GenJnlLine."Amount (LCY)", GenJnlLine."Currency Factor"));
-                end else
-                    GenJnlLine.Validate(Amount, -CodBankStmtLine."Statement Amount");
+                GenJnlLine.Validate(Amount, -CodBankStmtLine."Statement Amount");
                 GenJnlLine."System-Created Entry" := true;
                 OnTransferCodBankStmtLinesOnBeforeGenJnlLineInsert(GenJnlLine, CodBankStmtLine);
                 GenJnlLine.Insert();
