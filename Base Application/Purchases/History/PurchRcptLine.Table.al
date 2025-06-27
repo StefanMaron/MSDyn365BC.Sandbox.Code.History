@@ -811,13 +811,7 @@ table 121 "Purch. Rcpt. Line"
     procedure ShowItemTrackingLines()
     var
         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeShowItemTrackingLines(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         ItemTrackingDocMgt.ShowItemTrackingForShptRcptLine(DATABASE::"Purch. Rcpt. Line", 0, "Document No.", '', 0, "Line No.");
     end;
 
@@ -960,6 +954,7 @@ table 121 "Purch. Rcpt. Line"
                 PurchLine.Validate("Line Discount Amount", PurchOrderLine."Line Discount Amount");
                 PurchLine."Line Discount %" := PurchOrderLine."Line Discount %";
                 OnInsertInvLineFromRcptLineOnBeforePurchLineUpdatePrePaymentAmounts(PurchLine, PurchOrderLine);
+                PurchLine.UpdatePrePaymentAmounts();
                 if PurchOrderLine.Quantity = 0 then
                     PurchLine.Validate("Inv. Discount Amount", 0)
                 else begin
@@ -975,7 +970,6 @@ table 121 "Purch. Rcpt. Line"
                     else
                         PurchLine.Validate("Inv. Discount Amount", 0);
                 end;
-                PurchLine.UpdatePrePaymentAmounts();
             end;
 
             PurchLine."Attached to Line No." :=
@@ -1398,11 +1392,6 @@ table 121 "Purch. Rcpt. Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetSecurityFilterOnRespCenter(var PurchRcptLine: Record "Purch. Rcpt. Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowItemTrackingLines(var PurchRcptLine: Record "Purch. Rcpt. Line"; var IsHandled: Boolean)
     begin
     end;
 }
