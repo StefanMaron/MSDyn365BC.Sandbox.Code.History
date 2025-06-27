@@ -82,11 +82,8 @@ codeunit 21 "Item Jnl.-Check Line"
             if not ItemJournalLine.OnlyStopTime() then
                 ItemJournalLine.TestField("Item No.", ErrorInfo.Create());
 
-        IsHandled := false;
-        OnBeforeGetItem(Item, IsHandled);
-        if not IsHandled then
-            if Item.Get(ItemJournalLine."Item No.") then
-                Item.TestField("Base Unit of Measure", ErrorInfo.Create());
+        if Item.Get(ItemJournalLine."Item No.") then
+            Item.TestField("Base Unit of Measure", ErrorInfo.Create());
 
         IsHandled := false;
         OnAfterGetItem(Item, ItemJournalLine, IsHandled);
@@ -591,13 +588,11 @@ codeunit 21 "Item Jnl.-Check Line"
                 No[4] := ItemJnlLine."New Location Code";
                 CheckDimensionsAfterAssignDimTableIDs(ItemJnlLine, TableID, No, ItemJnlLine."New Dimension Set ID");
             end else begin
-                // This condition will ensure locations default dimension is not checked as for Item charge lines, location in item journal is populated from document line
-                if ItemJnlLine."Item Charge No." = '' then begin
-                    TableID[4] := Database::Location;
-                    No[4] := ItemJnlLine."Location Code";
-                    TableID[5] := Database::Location;
-                    No[5] := ItemJnlLine."New Location Code";
-                end;
+                TableID[4] := Database::Location;
+                No[4] := ItemJnlLine."Location Code";
+                TableID[5] := Database::Location;
+                No[5] := ItemJnlLine."New Location Code";
+
                 if (ItemJnlLine."Entry Type" = ItemJnlLine."Entry Type"::Transfer) then begin
                     CheckDimensionsAfterAssignDimTableIDs(ItemJnlLine, TableID, No, ItemJnlLine."Dimension Set ID");
                     if (DimMgt.CheckDefaultDimensionHasCodeMandatory(TableID, No)) and
@@ -857,11 +852,6 @@ codeunit 21 "Item Jnl.-Check Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunCheckOnBeforeTestFieldAppliesToEntry(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetItem(var Item: Record Item; var IsHandled: Boolean)
     begin
     end;
 }
