@@ -1005,6 +1005,11 @@ report 1303 "Standard Sales - Draft Invoice"
 
         trigger OnInit()
         begin
+            LogInteractionEnable := true;
+        end;
+
+        trigger OnOpenPage()
+        begin
             InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
@@ -1075,6 +1080,9 @@ report 1303 "Standard Sales - Draft Invoice"
     begin
         if Header.GetFilters = '' then
             Error(NoFilterSetErr);
+
+        if not CurrReport.UseRequestPage() then
+            InitLogInteraction();
 
         CompanyLogoPosition := SalesSetup."Logo Position on Documents";
     end;
