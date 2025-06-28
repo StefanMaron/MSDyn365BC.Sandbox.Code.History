@@ -14,6 +14,7 @@ using Microsoft.Sales.Setup;
 
 codeunit 57 "Document Totals"
 {
+
     trigger OnRun()
     begin
     end;
@@ -336,7 +337,6 @@ codeunit 57 "Document Totals"
             end;
             PreviousTotalSalesHeader.CalcFields(Amount, "Amount Including VAT");
             PreviousTotalSalesVATDifference := CalcTotalSalesVATDifference(PreviousTotalSalesHeader);
-            OnAfterSalesCalculateTotalsWithInvoiceRounding(PreviousTotalSalesHeader);
         end;
     end;
 
@@ -436,7 +436,7 @@ codeunit 57 "Document Totals"
         end;
 
         if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") then
-            if SalesHeader."Prices Including VAT" and SalesHeader.SalesLinesExist() then begin
+            if SalesHeader."Prices Including VAT" then begin
                 CalculateTotalSalesLineAndVATAmountForCurrentSalesLine(SalesHeader, VATAmount2, SalesLine, TempTotalSalesLine);
                 if (VATAmount <> VATAmount2) then begin
                     SalesLine.Amount += VATAmount - VATAmount2;
@@ -490,15 +490,8 @@ codeunit 57 "Document Totals"
             ClearPurchaseAmounts(TotalsPurchaseLine, VATAmount);
     end;
 
-    local procedure PurchaseUpdateTotals(var PurchaseHeader: Record "Purchase Header"; CurrentPurchaseLine: Record "Purchase Line"; var TotalsPurchaseLine: Record "Purchase Line"; var VATAmount: Decimal; Force: Boolean) Result: Boolean
-    var
-        IsHandled: Boolean;
+    local procedure PurchaseUpdateTotals(var PurchaseHeader: Record "Purchase Header"; CurrentPurchaseLine: Record "Purchase Line"; var TotalsPurchaseLine: Record "Purchase Line"; var VATAmount: Decimal; Force: Boolean): Boolean
     begin
-        IsHandled := false;
-        OnBeforePurchaseUpdateTotals(PurchaseHeader, PreviousTotalPurchaseHeader, CurrentPurchaseLine, TotalsPurchaseLine, VATAmount, Force, IsHandled, Result);
-        if IsHandled then
-            exit(Result);
-
         PurchaseHeader.CalcFields(Amount, "Amount Including VAT", "Invoice Discount Amount");
 
         if (PreviousTotalPurchaseHeader.Amount = PurchaseHeader.Amount) and
@@ -1235,16 +1228,5 @@ codeunit 57 "Document Totals"
     local procedure OnCalculatePurchasePageTotalsOnAfterCalculateVATAmount(var TotalPurchaseLine: Record "Purchase Line"; var VATAmount: Decimal; var PurchaseLine: Record "Purchase Line"; var TotalPurchaseLine2: Record "Purchase Line")
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePurchaseUpdateTotals(var PurchaseHeader: Record "Purchase Header"; var PreviousTotalPurchaseHeader: Record "Purchase Header"; CurrentPurchaseLine: Record "Purchase Line"; var TotalsPurchaseLine: Record "Purchase Line"; var VATAmount: Decimal; Force: Boolean; var IsHandled: Boolean; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSalesCalculateTotalsWithInvoiceRounding(var SalesHeader: Record "Sales Header")
-    begin
-    end;
-
 }
 
