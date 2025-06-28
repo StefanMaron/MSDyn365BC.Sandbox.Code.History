@@ -819,6 +819,11 @@ report 1308 "Standard Sales - Shipment"
 
         trigger OnInit()
         begin
+            LogInteractionEnable := true;
+        end;
+
+        trigger OnOpenPage()
+        begin
             InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
@@ -893,11 +898,15 @@ report 1308 "Standard Sales - Shipment"
         if Header.GetFilters = '' then
             Error(NoFilterSetErr);
 
+        if not CurrReport.UseRequestPage then
+            InitLogInteraction();
+
         CompanyLogoPosition := SalesSetup."Logo Position on Documents";
     end;
 
     var
         GLSetup: Record "General Ledger Setup";
+        CompanyBankAccount: Record "Bank Account";
         DummyCompanyInfo: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         Cust: Record Customer;
@@ -981,7 +990,6 @@ report 1308 "Standard Sales - Shipment"
         ShipmentMethod: Record "Shipment Method";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         TempTrackingSpecBuffer: Record "Tracking Specification" temporary;
-        CompanyBankAccount: Record "Bank Account";
         FirstLineHasBeenOutput: Boolean;
         CustAddr: array[8] of Text[100];
         ShipToAddr: array[8] of Text[100];
