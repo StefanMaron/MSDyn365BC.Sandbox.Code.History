@@ -14,7 +14,6 @@ codeunit 139554 "Library - Intrastat"
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryFixedAsset: Codeunit "Library - Fixed Asset";
         LibrarySales: Codeunit "Library - Sales";
-        LibraryService: Codeunit "Library - Service";
         LibraryRandom: Codeunit "Library - Random";
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryItemTracking: Codeunit "Library - Item Tracking";
@@ -235,28 +234,6 @@ codeunit 139554 "Library - Intrastat"
         LibrarySales.CreateSalesHeader(SalesHeader, DocumentType, CustomerNo);
         SalesHeader.Validate("Posting Date", PostingDate);
         SalesHeader.Modify(true);
-    end;
-
-    procedure CreateServiceDocument(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; CustomerNo: Code[20]; PostingDate: Date; DocumentType: Enum "Service Document Type"; Type: Enum "Service Line Type"; No: Code[20];
-                                                                                                                                                                              NoOfLines: Integer)
-    var
-        i: Integer;
-    begin
-        // Create Service Order with Random Quantity and Unit Price.
-        CreateServiceHeader(ServiceHeader, CustomerNo, PostingDate, DocumentType);
-        for i := 1 to NoOfLines do begin
-            LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, Type, No);
-            ServiceLine.Validate(Quantity, LibraryRandom.RandDec(100, 2));
-            ServiceLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
-            ServiceLine.Modify(true);
-        end;
-    end;
-
-    procedure CreateServiceHeader(var ServiceHeader: Record "Service Header"; CustomerNo: Code[20]; PostingDate: Date; DocumentType: Enum "Service Document Type")
-    begin
-        LibraryService.CreateServiceHeader(ServiceHeader, DocumentType, CustomerNo);
-        ServiceHeader.Validate("Posting Date", PostingDate);
-        ServiceHeader.Modify(true);
     end;
 
     procedure CreateAndPostSalesInvoiceWithItemAndItemCharge(PostingDate: Date): Code[20]
@@ -892,39 +869,12 @@ codeunit 139554 "Library - Intrastat"
         SalesReceivablesSetup.Modify(true);
     end;
 
-    procedure UpdateRetReceiptOnCrMemoSalesSetup(RetReceiptOnCrMemo: Boolean)
-    var
-        SalesReceivablesSetup: Record "Sales & Receivables Setup";
-    begin
-        SalesReceivablesSetup.Get();
-        SalesReceivablesSetup.Validate("Return Receipt on Credit Memo", RetReceiptOnCrMemo);
-        SalesReceivablesSetup.Modify(true);
-    end;
-
-    procedure UpdateShipmentOnInvoiceServiceSetup(ShipmentOnInvoice: Boolean)
-    var
-        ServiceMgtSetup: Record "Service Mgt. Setup";
-    begin
-        ServiceMgtSetup.Get();
-        ServiceMgtSetup.Validate("Shipment on Invoice", ShipmentOnInvoice);
-        ServiceMgtSetup.Modify(true);
-    end;
-
     procedure UpdateRetShpmtOnCrMemoPurchSetup(RetShpmtOnCrMemo: Boolean)
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
     begin
         PurchasesPayablesSetup.Get();
         PurchasesPayablesSetup.Validate("Return Shipment on Credit Memo", RetShpmtOnCrMemo);
-        PurchasesPayablesSetup.Modify(true);
-    end;
-
-    procedure UpdateReceiptOnInvoicePurchSetup(ReceiptOnInvoice: Boolean)
-    var
-        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
-    begin
-        PurchasesPayablesSetup.Get();
-        PurchasesPayablesSetup.Validate("Receipt on Invoice", ReceiptOnInvoice);
         PurchasesPayablesSetup.Modify(true);
     end;
 
@@ -1031,17 +981,5 @@ codeunit 139554 "Library - Intrastat"
         Purchasing.Modify(true);
         SalesLine.Validate("Purchasing Code", Purchasing.Code);
         SalesLine.Modify(true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::IntrastatReportManagement, 'OnBeforeExportToZip', '', true, true)]
-    local procedure OnBeforeExportToZip(DataExch1: Record "Data Exch."; DataExch2: Record "Data Exch."; StatisticsPeriod: Text; var FileName: Text; var ReceptFileName: Text; var ShipmentFileName: Text; var ZipFileName: Text; var IsHandled: Boolean);
-    begin
-        IsHandled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::IntrastatReportManagement, 'OnBeforeExportToFile', '', true, true)]
-    local procedure OnBeforeExportToFile(DataExch: Record "Data Exch."; var FileName: Text; var Handled: Boolean)
-    begin
-        Handled := true;
     end;
 }
