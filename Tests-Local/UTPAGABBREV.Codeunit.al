@@ -151,7 +151,7 @@ codeunit 144071 "UT PAG ABBREV"
     [Scope('OnPrem')]
     procedure ToDosWithPeriodTypeMonth()
     var
-        ToDos: TestPage Microsoft.CRM.Analysis.Tasks;
+        ToDos: TestPage Tasks;
         PeriodType: Option Day,Week,Month,Quarter,Year,"Accounting Period";
         No: Code[20];
     begin
