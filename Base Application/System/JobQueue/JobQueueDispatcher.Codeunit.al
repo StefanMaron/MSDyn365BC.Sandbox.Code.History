@@ -1,7 +1,6 @@
 namespace System.Threading;
 
 using System.IO;
-using System.Telemetry;
 
 codeunit 448 "Job Queue Dispatcher"
 {
@@ -19,13 +18,8 @@ codeunit 448 "Job Queue Dispatcher"
         if Skip then
             exit;
 
-        if Rec.Status = Rec.Status::"In Process" then
-            RunCleanupForCurrentJob(Rec);
-
-        if not Rec.IsReadyToStart() then begin
-            TelemetrySubscribers.SendJobQueueNotReadyToStartTelemetry(Rec);
+        if not Rec.IsReadyToStart() then
             exit;
-        end;
 
         Rec.RefreshLocked();
 
@@ -50,21 +44,10 @@ codeunit 448 "Job Queue Dispatcher"
     end;
 
     var
-        TelemetrySubscribers: Codeunit "Telemetry Subscribers";
         TestMode: Boolean;
         JobQueueEntryFailedtoGetBeforeFinalizingTxt: Label 'Failed to get Job Queue Entry before finalizing record.', Locked = true;
         JobQueueEntryFailedtoGetBeforeUpdatingStatusTxt: Label 'Failed to get Job Queue Entry before updating status.', Locked = true;
         JobQueueEntriesCategoryTxt: Label 'AL JobQueueEntries', Locked = true;
-
-    /// <summary>
-    /// This is used to run the cleanup tasks for the current job queue entry when the job queue fails but is retriable.
-    /// The prior Job Queue Log Entry would still be in the "In Process" state.
-    /// </summary>
-    /// <param name="JobQueueEntry">The Job Queue Entry that is running.</param>
-    local procedure RunCleanupForCurrentJob(var JobQueueEntry: Record "Job Queue Entry")
-    begin
-        TaskScheduler.CreateTask(Codeunit::"Job Queue Cleanup Tasks", 0, true, CompanyName(), CurrentDateTime(), JobQueueEntry.RecordId);
-    end;
 
     local procedure HandleRequest(var JobQueueEntry: Record "Job Queue Entry")
     var
@@ -230,28 +213,12 @@ codeunit 448 "Job Queue Dispatcher"
             JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
             JobQueueEntry."Object ID to Run" := Codeunit::"Job Queue Cleanup Tasks";
             JobQueueEntry.Description := CopyStr(JobDescrLbl, MaxStrLen(JobQueueEntry.Description));
-            JobQueueEntry.Validate("Run on Mondays", true);
-            JobQueueEntry.Validate("Run on Tuesdays", true);
-            JobQueueEntry.Validate("Run on Wednesdays", true);
-            JobQueueEntry.Validate("Run on Thursdays", true);
-            JobQueueEntry.Validate("Run on Fridays", true);
-            JobQueueEntry.Validate("Run on Saturdays", true);
             JobQueueEntry.Validate("Run on Sundays", true);
-            JobQueueEntry.Validate("Starting Time", DT2Time(CurrentDateTime())); // to spread the load for all tenants
             JobQueueEntry."Earliest Start Date/Time" := CalcInitialRunTime(JobQueueEntry, CurrentDateTime());
             Codeunit.Run(Codeunit::"Job Queue - Enqueue", JobQueueEntry);
         end else
             if not JobQueueEntry.Scheduled or (JobQueueEntry.Status = JobQueueEntry.Status::Error) then
-                JobQueueEntry.Restart()
-            else
-                if (JobQueueEntry."Starting Time" = 0T) and (DT2Time(JobQueueEntry."Earliest Start Date/Time") = 000000T) then begin
-                    JobQueueEntry.GetRecLockedExtendedTimeout();
-                    JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
-                    JobQueueEntry.Validate("Starting Time", DT2Time(CurrentDateTime())); // to spread the load for all tenants
-                    JobQueueEntry."Earliest Start Date/Time" := CalcInitialRunTime(JobQueueEntry, CurrentDateTime());
-                    JobQueueEntry.Modify();
-                    JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
-                end;
+                JobQueueEntry.Restart();
     end;
 
     [Scope('OnPrem')]
@@ -322,7 +289,7 @@ codeunit 448 "Job Queue Dispatcher"
         end;
 
         IsHandled := false;
-        OnCalcNextRunTimeForRecurringJobOnAfterCalcNewRunDateTime(JobQueueEntry, NewRunDateTime, IsHandled, StartingDateTime);
+        OnCalcNextRunTimeForRecurringJobOnAfterCalcNewRunDateTime(JobQueueEntry, NewRunDateTime, IsHandled);
         if IsHandled then
             exit(NewRunDateTime);
 
@@ -526,7 +493,7 @@ codeunit 448 "Job Queue Dispatcher"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCalcNextRunTimeForRecurringJobOnAfterCalcNewRunDateTime(var JobQueueEntry: Record "Job Queue Entry"; var NewRunDateTime: DateTime; var IsHandled: Boolean; StartingDateTime: DateTime)
+    local procedure OnCalcNextRunTimeForRecurringJobOnAfterCalcNewRunDateTime(var JobQueueEntry: Record "Job Queue Entry"; var NewRunDateTime: DateTime; var IsHandled: Boolean)
     begin
     end;
 
