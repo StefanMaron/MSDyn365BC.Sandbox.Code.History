@@ -588,11 +588,17 @@ table 5093 "Opportunity Entry"
     end;
 
     local procedure StartWizard2()
+    var
+        IsHandled: Boolean;
     begin
         "Wizard Step" := "Wizard Step"::"1";
         CreateStageList();
         Insert();
-        if PAGE.RunModal(PAGE::"Update Opportunity", Rec) = ACTION::OK then;
+
+        IsHandled := false;
+        OnStartWizard2OnBeforeRunModalPage(Rec, xRec, IsHandled);
+        if not IsHandled then
+            if PAGE.RunModal(PAGE::"Update Opportunity", Rec) = ACTION::OK then;
     end;
 
     procedure CheckStatus2()
@@ -614,15 +620,7 @@ table 5093 "Opportunity Entry"
             ErrorMessage(FieldCaption("Date of Change"));
 
         ValidateStage();
-
-        if "Estimated Value (LCY)" <= 0 then
-            Error(Text008, FieldCaption("Estimated Value (LCY)"));
-        if "Chances of Success %" <= 0 then
-            Error(Text008, FieldCaption("Chances of Success %"));
-        if "Estimated Close Date" = 0D then
-            ErrorMessage(FieldCaption("Estimated Close Date"));
-        if "Estimated Close Date" < "Date of Change" then
-            Error(Text009);
+        CheckEstimatedValues();
     end;
 
     [Scope('OnPrem')]
@@ -630,6 +628,7 @@ table 5093 "Opportunity Entry"
     var
         CreateNewTask: Boolean;
         CancelOldTask: Boolean;
+        IsHandled: Boolean;
     begin
         CancelOldTask := "Cancel Old To Do";
         CreateNewTask := "Action Taken" <> "Action Taken"::Updated;
@@ -637,7 +636,10 @@ table 5093 "Opportunity Entry"
         "Cancel Old To Do" := false;
         UpdateEstimates();
         "Action Type" := "Action Type"::" ";
-        "Sales Cycle Stage Description" := '';
+        IsHandled := false;
+        OnFinishWizard2OnBeforeValidateSalesCycleStageDescription(OppEntry, IsHandled);
+        if not IsHandled then
+            "Sales Cycle Stage Description" := '';
         OppEntry := Rec;
         InsertEntry(OppEntry, CancelOldTask, CreateNewTask);
         OnFinishWizard2OnAfterInsertEntry(OppEntry);
@@ -973,6 +975,25 @@ table 5093 "Opportunity Entry"
         Validate("Sales Cycle Stage");
     end;
 
+    local procedure CheckEstimatedValues()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCheckEstimatedValues(Rec, xRec, IsHandled);
+        if IsHandled then
+            exit;
+
+        if "Estimated Value (LCY)" <= 0 then
+            Error(Text008, FieldCaption("Estimated Value (LCY)"));
+        if "Chances of Success %" <= 0 then
+            Error(Text008, FieldCaption("Chances of Success %"));
+        if "Estimated Close Date" = 0D then
+            ErrorMessage(FieldCaption("Estimated Close Date"));
+        if "Estimated Close Date" < "Date of Change" then
+            Error(Text009);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitOpportunityEntry(Opportunity: Record Opportunity; var OpportunityEntry: Record "Opportunity Entry")
     begin
@@ -1070,6 +1091,21 @@ table 5093 "Opportunity Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestQuote(OpportunityEntry: Record "Opportunity Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeCheckEstimatedValues(var OpportunityEntry: Record "Opportunity Entry"; xOpportunityEntry: Record "Opportunity Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnStartWizard2OnBeforeRunModalPage(var OpportunityEntry: Record "Opportunity Entry"; xOpportunityEntry: Record "Opportunity Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFinishWizard2OnBeforeValidateSalesCycleStageDescription(var OpportunityEntry: Record "Opportunity Entry"; var IsHandled: Boolean)
     begin
     end;
 }
