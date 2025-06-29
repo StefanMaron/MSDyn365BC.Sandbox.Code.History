@@ -503,15 +503,6 @@ codeunit 10 "Type Helper"
         exit(Value);
     end;
 
-    [NonDebuggable]
-    procedure UrlEncodeSecret(var Value: Text): Text
-    var
-        HttpUtility: DotNet HttpUtility;
-    begin
-        Value := HttpUtility.UrlEncode(Value);
-        exit(Value);
-    end;
-
     procedure UrlDecode(var Value: Text): Text
     var
         HttpUtility: DotNet HttpUtility;
@@ -534,6 +525,20 @@ codeunit 10 "Type Helper"
     begin
         Value := HttpUtility.HtmlDecode(Value);
         exit(Value);
+    end;
+
+    procedure JavaScriptStringEncode(Value: Text): Text
+    var
+        HttpUtility: DotNet HttpUtility;
+    begin
+        exit(HttpUtility.JavaScriptStringEncode(Value));
+    end;
+
+    procedure JavaScriptStringEncode(Value: Text; AddDoubleQuotes: Boolean): Text
+    var
+        HttpUtility: DotNet HttpUtility;
+    begin
+        exit(HttpUtility.JavaScriptStringEncode(Value, AddDoubleQuotes));
     end;
 
     procedure UriEscapeDataString(Value: Text): Text
