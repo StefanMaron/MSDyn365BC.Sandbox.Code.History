@@ -213,7 +213,6 @@ report 2000019 "Suggest Vendor Payments EB"
             VendLedgEntry.SetFilter("Currency Code", Vend.GetFilter("Currency Filter"));
         VendLedgEntry.SetFilter("Global Dimension 1 Code", Vend.GetFilter("Global Dimension 1 Filter"));
         VendLedgEntry.SetFilter("Global Dimension 2 Code", Vend.GetFilter("Global Dimension 2 Filter"));
-        OnSuggestPaymentsOnAfterApplyVendLedgEntryFilters(VendLedgEntry);
         // first take credit memo's into account
         if IncCreditMemos then begin
             // no filtering on "due date" here
@@ -347,11 +346,6 @@ report 2000019 "Suggest Vendor Payments EB"
 
     [IntegrationEvent(false, false)]
     local procedure OnSetPaymJnlLineOnBeforePaymJnlLineInsert(var PaymJnlLine: Record "Payment Journal Line"; VendorLedgEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSuggestPaymentsOnAfterApplyVendLedgEntryFilters(var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 }
