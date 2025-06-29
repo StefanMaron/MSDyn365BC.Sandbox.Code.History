@@ -440,8 +440,6 @@ report 20 "Calc. and Post VAT Settlement"
             }
 
             trigger OnPostDataItem()
-            var
-                NoSeries: Codeunit "No. Series";
             begin
                 // Post to settlement account
                 if VATAmount <> 0 then begin
@@ -468,16 +466,8 @@ report 20 "Calc. and Post VAT Settlement"
                     GenJnlLine."Source Currency Amount" := VATAmountAddCurr;
                     GenJnlLine."Source Code" := SourceCodeSetup."VAT Settlement";
                     GenJnlLine."VAT Posting" := GenJnlLine."VAT Posting"::"Manual VAT Entry";
-                    if PostSettlement then begin
+                    if PostSettlement then
                         PostGenJnlLine(GenJnlLine);
-
-                        if GenJnlBatch."Posting No. Series" <> '' then begin
-                            if DocNo = NoSeries.PeekNextNo(GenJnlBatch."Posting No. Series", PostingDate) then
-                                NoSeries.GetNextNo(GenJnlBatch."Posting No. Series", PostingDate)
-                        end else
-                            if DocNo = NoSeries.PeekNextNo(GenJnlBatch."No. Series", PostingDate) then
-                                NoSeries.GetNextNo(GenJnlBatch."No. Series", PostingDate)
-                    end;
                 end;
             end;
 
@@ -507,10 +497,10 @@ report 20 "Calc. and Post VAT Settlement"
                     Clear(DocNo);
                     GenJnlBatch.Get(GenJnlLine."Journal Template Name", GenJnlLine."Journal Batch Name");
                     if GenJnlBatch."Posting No. Series" <> '' then
-                        DocNo := NoSeries.PeekNextNo(GenJnlBatch."Posting No. Series", PostingDate)
+                        DocNo := NoSeries.GetNextNo(GenJnlBatch."Posting No. Series", PostingDate)
                     else begin
                         GenJnlBatch.TestField("No. Series");
-                        DocNo := NoSeries.PeekNextNo(GenJnlBatch."No. Series", PostingDate);
+                        DocNo := NoSeries.GetNextNo(GenJnlBatch."No. Series", PostingDate);
                     end;
                 end;
             end;

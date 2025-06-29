@@ -235,10 +235,8 @@ codeunit 925 "Assembly Header-Reserve"
         ReservationManagement.SetReservSource(NewAssemblyHeader);
         if NewAssemblyHeader."Qty. per Unit of Measure" <> OldAssemblyHeader."Qty. per Unit of Measure" then
             ReservationManagement.ModifyUnitOfMeasure();
-        OnVerifyQuantityOnBeforeDeleteReservationEntries(NewAssemblyHeader, OldAssemblyHeader);
         ReservationManagement.DeleteReservEntries(false, NewAssemblyHeader."Remaining Quantity (Base)");
         ReservationManagement.ClearSurplus();
-        OnVerifyQuantityOnBeforeAutoTrack(NewAssemblyHeader);
         ReservationManagement.AutoTrack(NewAssemblyHeader."Remaining Quantity (Base)");
         AssignForPlanning(NewAssemblyHeader);
     end;
@@ -324,8 +322,6 @@ codeunit 925 "Assembly Header-Reserve"
                         OldReservationEntry."Qty. to Invoice (Base)" := Abs(OldReservationEntry2."Qty. to Invoice (Base)");
                     end;
                 end;
-
-                OnTransferAsmHeaderToItemJnlLineOnBeforeTransferReservationEntry(AssemblyHeader, ItemJournalLine, OldReservationEntry);
 
                 TransferQty := CreateReservEntry.TransferReservEntry(
                     Database::"Item Journal Line",
@@ -803,21 +799,6 @@ codeunit 925 "Assembly Header-Reserve"
 
     [IntegrationEvent(false, false)]
     local procedure OnSetAssemblyHeaderOnBeforeUpdateReservation(var ReservEntry: Record "Reservation Entry"; AssemblyHeader: Record "Assembly Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnVerifyQuantityOnBeforeDeleteReservationEntries(var NewAssemblyHeader: Record "Assembly Header"; OldAssemblyHeader: Record "Assembly Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnVerifyQuantityOnBeforeAutoTrack(var NewAssemblyHeader: Record "Assembly Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnTransferAsmHeaderToItemJnlLineOnBeforeTransferReservationEntry(var AssemblyHeader: Record "Assembly Header"; var ItemJournalLine: Record "Item Journal Line"; var OldReservationEntry: Record "Reservation Entry")
     begin
     end;
 }
