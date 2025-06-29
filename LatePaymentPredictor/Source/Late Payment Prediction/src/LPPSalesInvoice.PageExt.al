@@ -26,7 +26,7 @@ pageextension 1957 "LPP Sales Invoice" extends "Sales Invoice"
                 var
                     LPPredictionMgt: Codeunit "LP Prediction Mgt.";
                 begin
-                    Rec.CheckAmountMoreThanZero();
+                    CheckAmountMoreThanZero();
                     LPPredictionMgt.PredictLateShowResult(Rec);
                 end;
             }
