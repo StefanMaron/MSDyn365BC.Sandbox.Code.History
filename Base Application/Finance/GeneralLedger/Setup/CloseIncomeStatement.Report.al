@@ -88,10 +88,18 @@ report 94 "Close Income Statement"
                         if TempEntryNoAmountBuffer.Find() then begin
                             TempEntryNoAmountBuffer.Amount := TempEntryNoAmountBuffer.Amount + Amount;
                             TempEntryNoAmountBuffer.Amount2 := TempEntryNoAmountBuffer.Amount2 + "Additional-Currency Amount";
+                            if "Source Currency Code" <> '' then begin
+                                TempEntryNoAmountBuffer."Source Currency Code" := "Source Currency Code";
+                                TempEntryNoAmountBuffer."Source Currency Amount" := TempEntryNoAmountBuffer."Source Currency Amount" + "Source Currency Amount";
+                                TempEntryNoAmountBuffer."Source Currency VAT Amount" := TempEntryNoAmountBuffer."Source Currency VAT Amount" + "Source Currency VAT Amount";
+                            end;
                             TempEntryNoAmountBuffer.Modify();
                         end else begin
                             TempEntryNoAmountBuffer.Amount := Amount;
                             TempEntryNoAmountBuffer.Amount2 := "Additional-Currency Amount";
+                            TempEntryNoAmountBuffer."Source Currency Code" := "Source Currency Code";
+                            TempEntryNoAmountBuffer."Source Currency Amount" := "Source Currency Amount";
+                            TempEntryNoAmountBuffer."Source Currency VAT Amount" := "Source Currency VAT Amount";
                             TempEntryNoAmountBuffer.Insert();
                         end;
                         OnGLEntryOnAfterGetRecordOnAfterEntryNoAmountBuf(TempEntryNoAmountBuffer, "G/L Entry");
@@ -104,6 +112,7 @@ report 94 "Close Income Statement"
                 trigger OnPostDataItem()
                 var
                     TempDimBuf2: Record "Dimension Buffer" temporary;
+                    GLAccount: Record "G/L Account";
                     GlobalDimVal1: Code[20];
                     GlobalDimVal2: Code[20];
                     NewDimensionID: Integer;
@@ -134,7 +143,8 @@ report 94 "Close Income Statement"
                                 GenJnlLine."Reason Code" := GenJnlBatch."Reason Code";
                                 GenJnlLine.Validate(Amount, -TempEntryNoAmountBuffer.Amount);
                                 GenJnlLine."System-Created Entry" := true;
-                                GenJnlLine."Source Currency Amount" := -TempEntryNoAmountBuffer.Amount2;
+                                if not AddSourceCurrencyFields() then
+                                    GenJnlLine."Source Currency Amount" := -TempEntryNoAmountBuffer.Amount2;
                                 GenJnlLine."Business Unit Code" := TempEntryNoAmountBuffer."Business Unit Code";
 
                                 TempDimBuf2.DeleteAll();
@@ -147,6 +157,14 @@ report 94 "Close Income Statement"
                                 if ClosePerGlobalDim2 then
                                     GenJnlLine."Shortcut Dimension 2 Code" := GlobalDimVal2;
                                 OnPostDataItemOnAfterGenJnlLineDimUpdated(GenJnlLine, ClosePerGlobalDim1, ClosePerGlobalDim2);
+
+                                if (RetainedEarningsGLAcc."No." <> '') then
+                                    if GLAccount.Get(GenJnlLine."Account No.") then
+                                        if GLAccount."Income Stmt. Bal. Acc." = RetainedEarningsGLAcc."No." then begin
+                                            GenJnlLine."Bal. Account Type" := GenJnlLine."Bal. Account Type"::"G/L Account";
+                                            GenJnlLine."Bal. Account No." := RetainedEarningsGLAcc."No.";
+                                            GenJnlLine.UpdateLineBalance();
+                                        end;
 
                                 HandleGenJnlLine();
                                 UpdateBalAcc();
@@ -785,6 +803,17 @@ report 94 "Close Income Statement"
     local procedure GroupSum(): Boolean
     begin
         exit(ClosePerGlobalDimOnly and (ClosePerBusUnit or ClosePerGlobalDim1));
+    end;
+
+    local procedure AddSourceCurrencyFields(): Boolean
+    begin
+        if (TempEntryNoAmountBuffer.Amount2 <> 0) or (TempEntryNoAmountBuffer."Source Currency Amount" = 0) then
+            exit(false);
+
+        GenJnlLine."Source Currency Code" := TempEntryNoAmountBuffer."Source Currency Code";
+        GenJnlLine."Source Currency Amount" := -(TempEntryNoAmountBuffer."Source Currency Amount");
+        GenJnlLine."Source Curr. VAT Amount" := -(TempEntryNoAmountBuffer."Source Currency VAT Amount");
+        exit(true);
     end;
 
     [IntegrationEvent(false, false)]
