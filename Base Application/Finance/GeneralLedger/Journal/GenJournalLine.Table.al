@@ -4022,6 +4022,7 @@ table 81 "Gen. Journal Line"
         FirstDocNo: Code[20];
         TempFirstDocNo: Code[20];
         PrevCustVendNo: Code[20];
+        CurrCustVendNo: Code[20];
         First: Boolean;
         IsHandled: Boolean;
         PrevPostingDate: Date;
@@ -4051,17 +4052,16 @@ table 81 "Gen. Journal Line"
                 end;
                 if GenJnlLine2."Document No." = FirstDocNo then
                     exit;
-                if not First and
-                    ((GenJnlLine2."Document No." <> PrevDocNo) or
-                      (GenJnlLine2."Posting Date" <> PrevPostingDate) or
-                      (not (GetCustVendNo(GenJnlLine2) in [PrevCustVendNo, ''])) or
-                    ((GenJnlLine2."Bal. Account No." <> '') and (GenJnlLine2."Document No." = ''))) and
-                    not LastGenJnlLine.EmptyLine()
-                then
+                GetCustVendNo(CurrCustVendNo, GenJnlLine2);
+#pragma warning disable AA0205
+                if ShouldChangeDocNo(GenJnlLine2, LastGenJnlLine, First, PrevDocNo, PrevPostingDate, PrevCustVendNo, CurrCustVendNo) then begin
+#pragma warning restore AA0205
                     DocNo := IncStr(DocNo);
+                    PrevCustVendNo := '';
+                end;
                 PrevDocNo := GenJnlLine2."Document No.";
                 PrevPostingDate := GenJnlLine2."Posting Date";
-                PrevCustVendNo := GetCustVendNo(GenJnlLine2);
+                GetCustVendNo(PrevCustVendNo, GenJnlLine2);
                 if GenJnlLine2."Document No." <> '' then begin
                     if GenJnlLine2."Applies-to ID" = GenJnlLine2."Document No." then
                         GenJnlLine2.RenumberAppliesToID(GenJnlLine2, GenJnlLine2."Document No.", DocNo);
@@ -4081,6 +4081,19 @@ table 81 "Gen. Journal Line"
             until GenJnlLine2.Next() = 0;
 
         OnAfterRenumberDocNoOnLines(DocNo, GenJnlLine2);
+    end;
+
+    local procedure ShouldChangeDocNo(GenJnlLineForChange: Record "Gen. Journal Line"; LastGenJnlLine: Record "Gen. Journal Line"; First: Boolean; PrevDocNo: Code[20]; PrevPostingDate: Date; PrevCustVendNo: Code[20]; CurrCustVendNo: Code[20]): Boolean
+    begin
+        if First or LastGenJnlLine.EmptyLine() then
+            exit(false);
+        if (GenJnlLineForChange."Bal. Account No." <> '') and (GenJnlLineForChange."Document No." = '') then
+            exit(true);
+        if (GenJnlLineForChange."Document No." <> PrevDocNo) or (GenJnlLineForChange."Posting Date" <> PrevPostingDate) then
+            exit(true);
+        if GenJnlLineForChange."Document Type" in [GenJnlLineForChange."Document Type"::" ", GenJnlLineForChange."Document Type"::Payment, GenJnlLineForChange."Document Type"::Refund] then
+            exit(false);
+        exit((PrevCustVendNo <> '') and (CurrCustVendNo <> '') and (CurrCustVendNo <> PrevCustVendNo));
     end;
 
     local procedure GetTempRenumberDocumentNo(): Code[20]
@@ -6261,6 +6274,7 @@ table 81 "Gen. Journal Line"
         if "Applies-to Doc. No." <> '' then begin
             CustLedgEntry.SetRange("Document Type", "Applies-to Doc. Type");
             CustLedgEntry.SetRange("Document No.", "Applies-to Doc. No.");
+            CustLedgEntry.SetRange("Document Occurrence", "Applies-to Occurrence No.");
             if CustLedgEntry.FindFirst() then;
         end else
             if "Applies-to ID" <> '' then begin
@@ -6277,6 +6291,7 @@ table 81 "Gen. Journal Line"
         if "Applies-to Doc. No." <> '' then begin
             VendLedgEntry.SetRange("Document Type", "Applies-to Doc. Type");
             VendLedgEntry.SetRange("Document No.", "Applies-to Doc. No.");
+            VendLedgEntry.SetRange("Document Occurrence", "Applies-to Occurrence No.");
             if VendLedgEntry.FindFirst() then;
         end else
             if "Applies-to ID" <> '' then begin
@@ -7764,12 +7779,12 @@ table 81 "Gen. Journal Line"
         OnAfterAccountNoOnValidateGetVendorAccount(Rec, Vend, CurrFieldNo);
     end;
 
-    local procedure GetCustVendNo(GenJnlLineToCheck: Record "Gen. Journal Line"): Code[20]
+    local procedure GetCustVendNo(var CustVendNo: Code[20]; GenJnlLineToCheck: Record "Gen. Journal Line")
     begin
         if GenJnlLineToCheck."Account Type" in [GenJnlLineToCheck."Account Type"::Customer, GenJnlLineToCheck."Account Type"::Vendor] then
-            exit(GenJnlLineToCheck."Account No.");
+            CustVendNo := GenJnlLineToCheck."Account No.";
         if GenJnlLineToCheck."Bal. Account Type" in [GenJnlLineToCheck."Bal. Account Type"::Customer, GenJnlLineToCheck."Bal. Account Type"::Vendor] then
-            exit(GenJnlLineToCheck."Bal. Account No.");
+            CustVendNo := GenJnlLineToCheck."Bal. Account No.";
     end;
 
     local procedure CheckConfirmDifferentVendorAndPayToVendor(Vend: Record Vendor; AccountNo: Code[20])
