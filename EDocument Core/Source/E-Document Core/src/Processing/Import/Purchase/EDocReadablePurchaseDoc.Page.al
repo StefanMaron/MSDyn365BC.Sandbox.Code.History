@@ -1,3 +1,4 @@
+#pragma warning disable AS0050
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -11,6 +12,7 @@ page 6182 "E-Doc. Readable Purchase Doc."
     ApplicationArea = Basic, Suite;
     Caption = 'Received purchase document data';
     SourceTable = "E-Document Purchase Header";
+    SourceTableTemporary = true;
     Editable = false;
     Extensible = false;
     DataCaptionExpression = DataCaption;
@@ -228,6 +230,7 @@ page 6182 "E-Doc. Readable Purchase Doc."
             part("Lines"; "E-Doc. Read. Purch. Lines")
             {
                 SubPageLink = "E-Document Entry No." = field("E-Document Entry No.");
+                Caption = 'Lines';
             }
         }
     }
@@ -241,14 +244,22 @@ page 6182 "E-Doc. Readable Purchase Doc."
     var
         ImportEDocumentProcess: Codeunit "Import E-Document Process";
     begin
-        if Rec."E-Document Entry No." <> 0 then begin
-            AIGeneratedContentNotification.Message(ImportEDocumentProcess.AIGeneratedContentText());
-            AIGeneratedContentNotification.AddAction(ImportEDocumentProcess.TermsAndConditionsText(), Codeunit::"Import E-Document Process", 'OpenTermsAndConditions');
-            AIGeneratedContentNotification.Send();
-        end;
+        Rec.TestField("E-Document Entry No.");
+        AIGeneratedContentNotification.Message(ImportEDocumentProcess.AIGeneratedContentText());
+        AIGeneratedContentNotification.AddAction(ImportEDocumentProcess.TermsAndConditionsText(), Codeunit::"Import E-Document Process", 'OpenTermsAndConditions');
+        AIGeneratedContentNotification.Send();
+    end;
+
+    internal procedure SetBuffer(var EDocumentPurchaseHeader: Record "E-Document Purchase Header" temporary; var EDocumentPurchaseLine: Record "E-Document Purchase Line" temporary)
+    begin
+        Clear(Rec);
+        Rec := EDocumentPurchaseHeader;
+        Rec.Insert();
+        CurrPage.Lines.Page.SetBuffer(EDocumentPurchaseLine);
     end;
 
     var
         AIGeneratedContentNotification: Notification;
         DataCaption: Text;
 }
+#pragma warning restore AS0050
