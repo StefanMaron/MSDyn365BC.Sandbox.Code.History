@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false
-  },
   "folders": [
     {
       "path": "./RecommendedApps/Test/Recommended Apps Tests"
@@ -275,5 +267,13 @@
     {
       "path": "./ServiceDeclaration/Test/Service Declaration Tests"
     }
-  ]
+  ],
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false
+  }
 }
