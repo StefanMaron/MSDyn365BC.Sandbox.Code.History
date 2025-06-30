@@ -76,9 +76,7 @@ codeunit 1222 "SEPA CT-Prepare Source"
                 TempGenJnlLine."External Document No." := CarteraDoc."Original Document No.";
                 TempGenJnlLine."Currency Code" := CarteraDoc."Currency Code";
                 TempGenJnlLine.Amount := CarteraDoc."Remaining Amount";
-                OnCreateTempJnlLinesOnBeforeTempGenJnlLineInsert(TempGenJnlLine, CarteraDoc);
                 TempGenJnlLine.Insert();
-                OnCreateTempJnlLinesOnAfterTempGenJnlLineInsert(TempGenJnlLine, CarteraDoc);
             until CarteraDoc.Next() = 0;
 
         OnAfterCreateTempJnlLines(FromGenJnlLine, TempGenJnlLine);
@@ -96,16 +94,6 @@ codeunit 1222 "SEPA CT-Prepare Source"
 
     [IntegrationEvent(false, false)]
     local procedure OnCopyJnlLinesOnBeforeTempGenJnlLineInsert(var FromGenJournalLine: Record "Gen. Journal Line"; var TempGenJournalLine: Record "Gen. Journal Line" temporary; GenJournalBatch: Record "Gen. Journal Batch")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateTempJnlLinesOnBeforeTempGenJnlLineInsert(var TempGenJnlLine: Record "Gen. Journal Line"; CarteraDoc: Record "Cartera Doc.")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateTempJnlLinesOnAfterTempGenJnlLineInsert(var TempGenJnlLine: Record "Gen. Journal Line"; CarteraDoc: Record "Cartera Doc.")
     begin
     end;
 }
