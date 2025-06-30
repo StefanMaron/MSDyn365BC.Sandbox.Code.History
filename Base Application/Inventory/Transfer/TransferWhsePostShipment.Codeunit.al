@@ -411,7 +411,7 @@ codeunit 5748 "Transfer Whse. Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostSourceDocumentOnBeforeCaseTransferLine(TransferHeader: Record Microsoft.Inventory.Transfer."Transfer Header"; WarehouseShipmentLine: Record "Warehouse Shipment Line")
+    local procedure OnPostSourceDocumentOnBeforeCaseTransferLine(var TransferHeader: Record Microsoft.Inventory.Transfer."Transfer Header"; WarehouseShipmentLine: Record "Warehouse Shipment Line")
     begin
     end;
 
@@ -436,12 +436,12 @@ codeunit 5748 "Transfer Whse. Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInitSourceDocumentHeaderOnBeforeTransferHeaderUpdatePostingDate(var TransferHeader: Record "Transfer Header"; var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; ModifyHeader: Boolean; IsHandled: Boolean)
+    local procedure OnInitSourceDocumentHeaderOnBeforeTransferHeaderUpdatePostingDate(var TransferHeader: Record "Transfer Header"; var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var ModifyHeader: Boolean; IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInitSourceDocumentHeaderOnBeforeTransHeaderModify(var TransferHeader: Record "Transfer Header"; var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; ModifyHeader: Boolean)
+    local procedure OnInitSourceDocumentHeaderOnBeforeTransHeaderModify(var TransferHeader: Record "Transfer Header"; var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; var ModifyHeader: Boolean)
     begin
     end;
 
