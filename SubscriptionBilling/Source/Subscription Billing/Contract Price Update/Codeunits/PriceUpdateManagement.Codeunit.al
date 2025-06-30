@@ -2,6 +2,8 @@ namespace Microsoft.SubscriptionBilling;
 
 codeunit 8009 "Price Update Management"
 {
+    Access = Internal;
+
     var
         LastGroupByValue: Code[20];
         LastGroupEntryNo: Integer;
@@ -291,7 +293,7 @@ codeunit 8009 "Price Update Management"
             until ContractPriceUpdateLine.Next() = 0;
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterFilterSubscriptionLineOnAfterGetAndApplyFiltersOnSubscriptionLine(var SubscriptionLine: Record "Subscription Line")
     begin
     end;
