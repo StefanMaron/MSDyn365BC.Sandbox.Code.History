@@ -13,11 +13,11 @@ permissionset 36951 "PowerBi Report Basic"
     Caption = 'Power BI Core Basic', MaxLength = 30;
     Assignable = true;
     Permissions =
-        tabledata "Dimension Set Entry" = R,
+        tabledata "PowerBI Flat Dim. Set Entry" = R,
         tabledata "PowerBI Reports Setup" = R,
         tabledata "Working Day" = R,
         tabledata "Account Category" = R,
-        table "Dimension Set Entry" = X,
+        table "PowerBI Flat Dim. Set Entry" = X,
         table "PowerBI Reports Setup" = X,
         table "Working Day" = X,
         table "Account Category" = X,
@@ -36,7 +36,11 @@ permissionset 36951 "PowerBi Report Basic"
         page "General Ledger Setup - PBI API" = X,
         page Locations = X,
         page "Power BI Selection Lookup" = X,
+#if not CLEAN25
+#pragma warning disable AL0432
         page "Purchasing Scorecard" = X,
+#pragma warning restore AL0432
+#endif
         page "Salesperson/Purchasers" = X,
         page "PowerBI Reports Setup" = X,
         page "Vendors - PBI API" = X,
