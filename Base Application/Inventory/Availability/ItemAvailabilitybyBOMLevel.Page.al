@@ -462,7 +462,6 @@ page 5871 "Item Availability by BOM Level"
         ShowTotalAvailability := true;
         if DemandDate = 0D then
             DemandDate := WorkDate();
-        OnOpenPageOnBeforeRefreshPage(Rec);
         RefreshPage();
     end;
 
@@ -630,11 +629,6 @@ page 5871 "Item Availability by BOM Level"
 
     [IntegrationEvent(false, false)]
     local procedure OnRefreshPageOnBeforeCheckItemHasBOM(var Item: Record Item; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnOpenPageOnBeforeRefreshPage(var BOMBuffer: Record "BOM Buffer")
     begin
     end;
 }
