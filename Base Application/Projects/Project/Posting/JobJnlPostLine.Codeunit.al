@@ -139,8 +139,6 @@ codeunit 1012 "Job Jnl.-Post Line"
         else
             JobLedgEntryNo := CreateJobLedgEntry(JobJnlLine2);
 
-        FinalizePostATO(JobJnlLine2);
-
         OnAfterRunCode(JobJnlLine2, JobLedgEntryNo, JobReg, NextEntryNo);
 
         exit(JobLedgEntryNo);
@@ -730,38 +728,6 @@ codeunit 1012 "Job Jnl.-Post Line"
             CreatePosterATOLink(AsmHeader, JobPlanningLine);
             AsmPost.PostATO(AsmHeader, ItemJnlPostLine, ResJnlPostLine, WhseJnlPostLine);
             Window.Close();
-        end;
-    end;
-
-    local procedure FinalizePostATO(JobJournalLine: Record "Job Journal Line")
-    var
-        AsmHeader: Record "Assembly Header";
-        ATOLink: Record "Assemble-to-Order Link";
-        JobPlanningLine: Record "Job Planning Line";
-        Window: Dialog;
-    begin
-        if not JobJournalLine."Assemble to Order" then
-            exit;
-
-        if not JobPlanningLine.Get(JobJournalLine."Job No.", JobJournalLine."Job Task No.", JobJournalLine."Job Planning Line No.") then
-            exit;
-
-        if JobPlanningLine.AsmToOrderExists(AsmHeader) then begin
-            if GuiAllowed() then begin
-                Window.Open(AssemblyPostProgressMsg);
-                Window.Update(1,
-                    StrSubstNo(Format4Lbl,
-                    JobPlanningLine."Job No.", JobPlanningLine."Job Task No.", JobPlanningLine.FieldCaption("Line No."), JobPlanningLine."Line No."));
-                Window.Update(2, StrSubstNo(Format2Lbl, AsmHeader."Document Type", AsmHeader."No."));
-            end;
-
-            if AsmHeader."Remaining Quantity (Base)" = 0 then begin
-                AsmPost.FinalizePostATO(AsmHeader);
-                ATOLink.Get(AsmHeader."Document Type", AsmHeader."No.");
-                ATOLink.Delete();
-            end;
-            if GuiAllowed() then
-                Window.Close();
         end;
     end;
 
