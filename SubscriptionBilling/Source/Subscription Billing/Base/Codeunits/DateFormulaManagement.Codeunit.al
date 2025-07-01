@@ -2,6 +2,8 @@ namespace Microsoft.SubscriptionBilling;
 
 codeunit 8057 "Date Formula Management"
 {
+    Access = Internal;
+
     var
         DateFormulaNegativeErr: Label 'The date formula cannot be negative.';
         DateFormulaEmptyErr: Label 'The %1 must be filled out. Please enter a date formula.';
@@ -11,19 +13,19 @@ codeunit 8057 "Date Formula Management"
         ComplexFormulaErr: Label 'The Date Formula cannot be complex.';
         NaturalNumberRatioErr: Label 'The ratio of ''%1'' and ''%2'' or vice versa must give a natural number.';
 
-    internal procedure ErrorIfDateFormulaEmpty(DateFormula: DateFormula; FieldCaption: Text)
+    procedure ErrorIfDateFormulaEmpty(DateFormula: DateFormula; FieldCaption: Text)
     begin
         if Format(DateFormula) = '' then
             Error(DateFormulaEmptyErr, FieldCaption);
     end;
 
-    internal procedure ErrorIfDateFormulaNegative(DateFormula: DateFormula)
+    procedure ErrorIfDateFormulaNegative(DateFormula: DateFormula)
     begin
         if StrPos(Format(DateFormula), '-') <> 0 then
             Error(DateFormulaNegativeErr);
     end;
 
-    internal procedure ErrorIfDateEmpty(Date: Date; FieldCaption: Text)
+    procedure ErrorIfDateEmpty(Date: Date; FieldCaption: Text)
     begin
         if Date = 0D then
             Error(DateEmptyErr, FieldCaption);
@@ -118,7 +120,7 @@ codeunit 8057 "Date Formula Management"
         Evaluate(Letter, CopyStr(InputDateText, LetterPosition, 1));
     end;
 
-    local procedure FindDateFormulaType(InputDateFormula: DateFormula; var PeriodCount: Integer) DateFormulaType: Enum "Date Formula Type"
+    procedure FindDateFormulaType(InputDateFormula: DateFormula; var PeriodCount: Integer) DateFormulaType: Enum "Date Formula Type"
     var
         Letter: Char;
     begin
@@ -137,7 +139,7 @@ codeunit 8057 "Date Formula Management"
         end;
     end;
 
-    procedure CalculateRenewalTermRatioByBillingRhythm(StartDate: Date; RenewalTermDateFormula: DateFormula; BillingRhythmFormula: DateFormula) RenewalRatio: Decimal
+    internal procedure CalculateRenewalTermRatioByBillingRhythm(StartDate: Date; RenewalTermDateFormula: DateFormula; BillingRhythmFormula: DateFormula) RenewalRatio: Decimal
     var
         RenewalTermEndDate: Date;
         NextBillingDate: Date;
