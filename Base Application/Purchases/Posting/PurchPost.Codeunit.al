@@ -540,8 +540,6 @@ codeunit 90 "Purch.-Post"
     /// </remarks>
     local procedure CommitAndUpdateAnalysisVeiw()
     var
-        UpdateAnalysisView: Codeunit "Update Analysis View";
-        UpdateItemAnalysisView: Codeunit "Update Item Analysis View";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -551,9 +549,10 @@ codeunit 90 "Purch.-Post"
 
         if not (InvtPickPutaway or SuppressCommit or PreviewMode) then begin
             Commit();
-            UpdateAnalysisView.UpdateAll(0, true);
-            UpdateItemAnalysisView.UpdateAll(0, true);
-        end;
+            UpdateAnalysisViewAfterPosting();
+        end else
+            if DateOrderSeriesUsed then
+                UpdateAnalysisViewAfterPosting();
     end;
 
     /// <summary>
@@ -740,7 +739,7 @@ codeunit 90 "Purch.-Post"
         ModifyHeader := UpdatePostingNos(PurchHeader, ReverseChargeVAT);
         if DateOrderSeriesUsed then
             SuppressCommit := true;
-	  
+
         if PurchHeader.Invoice and (PurchHeader."Operation Occurred Date" < GLSetup."Last Gen. Jour. Printing Date") then
             PurchHeader.FieldError("Operation Occurred Date", StrSubstNo(Text1130008, GLSetup."Last Gen. Jour. Printing Date"));
 
@@ -1337,10 +1336,14 @@ codeunit 90 "Purch.-Post"
         if UseLegacyInvoicePosting() then
             PostVendorEntry(
                 PurchHeader, TotalPurchLine, TotalPurchLineLCY, GenJnlLineDocType, GenJnlLineDocNo, GenJnlLineExtDocNo, SrcCode)
-        else
+        else begin
 #endif
+            InvoicePostingInterface.SetParameters(InvoicePostingParameters);
+            InvoicePostingInterface.SetTotalLines(TotalPurchLine, TotalPurchLineLCY);
             InvoicePostingInterface.PostLedgerEntry(PurchHeader, GenJnlPostLine);
-
+#if not CLEAN23
+        end;
+#endif
         UpdatePurchaseHeader(VendLedgEntry, PurchHeader);
 
         // Balancing account
@@ -1646,7 +1649,7 @@ codeunit 90 "Purch.-Post"
             CalcItemJnlLineToBeReceivedAmounts(ItemJnlLine, PurchHeader, PurchLine, QtyToBeReceived);
 
         OnPostItemJnlLineOnAfterPrepareItemJnlLine(
-            ItemJnlLine, PurchLine, PurchHeader, PreviewMode, GenJnlLineDocNo, TrackingSpecification, QtyToBeReceived);
+            ItemJnlLine, PurchLine, PurchHeader, PreviewMode, GenJnlLineDocNo, TrackingSpecification, QtyToBeReceived, QtyToBeInvoiced);
 
         if PurchLine."Prod. Order No." <> '' then
             PostItemJnlLineCopyProdOrder(PurchLine, ItemJnlLine, QtyToBeReceived, QtyToBeInvoiced);
@@ -2515,44 +2518,49 @@ codeunit 90 "Purch.-Post"
         IsHandled: Boolean;
         ItemShptEntryNo: Integer;
     begin
-        SalesOrderHeader.Get(
-          SalesOrderHeader."Document Type"::Order, PurchLine."Sales Order No.");
-        SalesOrderLine.Get(
-          SalesOrderLine."Document Type"::Order, PurchLine."Sales Order No.", PurchLine."Sales Order Line No.");
-        ErrorMessageMgt.PushContext(ErrorContextElementSalesLine, SalesOrderLine.RecordId, 0, '');
-
         IsHandled := false;
-        OnPostAssocItemJnlLineOnBeforeInitAssocItemJnlLine(SalesOrderLine, ItemShptEntryNo, IsHandled);
-        if IsHandled then
-            exit(ItemShptEntryNo);
+        OnBeforeProcedurePostAssocItemJnlLine(SalesOrderLine, TempTrackingSpecification, TempHandlingSpecification, QtyToBeShipped, QtyToBeShippedBase, ItemShptEntryNo, IsHandled);
+        if not IsHandled then begin
+            SalesOrderHeader.Get(
+              SalesOrderHeader."Document Type"::Order, PurchLine."Sales Order No.");
+            SalesOrderLine.Get(
+              SalesOrderLine."Document Type"::Order, PurchLine."Sales Order No.", PurchLine."Sales Order Line No.");
+            ErrorMessageMgt.PushContext(ErrorContextElementSalesLine, SalesOrderLine.RecordId, 0, '');
 
-        InitAssocItemJnlLine(ItemJnlLine, SalesOrderHeader, SalesOrderLine, PurchHeader, QtyToBeShipped, QtyToBeShippedBase);
+            IsHandled := false;
+            OnPostAssocItemJnlLineOnBeforeInitAssocItemJnlLine(SalesOrderLine, ItemShptEntryNo, IsHandled);
+            if IsHandled then
+                exit(ItemShptEntryNo);
 
-        IsHandled := false;
-        OnPostAssocItemJnlLineOnBeforePost(ItemJnlLine, SalesOrderLine, IsHandled);
-        if (SalesOrderLine."Job Contract Entry No." = 0) or IsHandled then begin
-            TransferReservToItemJnlLine(SalesOrderLine, ItemJnlLine, PurchLine, QtyToBeShippedBase, true);
-            OnBeforePostAssocItemJnlLine(ItemJnlLine, SalesOrderLine, SuppressCommit, PurchLine);
-            RunItemJnlPostLine(ItemJnlLine);
-            OnAfterPostAssocItemJnlLine(ItemJnlLine, ItemJnlPostLine);
-            // Handle Item Tracking
-            if ItemJnlPostLine.CollectTrackingSpecification(TempHandlingSpecification2) then begin
-                if TempHandlingSpecification2.FindSet() then
-                    repeat
-                        TempTrackingSpecification := TempHandlingSpecification2;
-                        TempTrackingSpecification.SetSourceFromSalesLine(SalesOrderLine);
-                        if TempTrackingSpecification.Insert() then;
-                        ItemEntryRelation.InitFromTrackingSpec(TempHandlingSpecification2);
-                        ItemEntryRelation.SetSource(DATABASE::"Sales Shipment Line", 0, SalesOrderHeader."Shipping No.", SalesOrderLine."Line No.");
-                        ItemEntryRelation.SetOrderInfo(SalesOrderLine."Document No.", SalesOrderLine."Line No.");
-                        ItemEntryRelation.Insert();
-                    until TempHandlingSpecification2.Next() = 0;
-                exit(0);
+            InitAssocItemJnlLine(ItemJnlLine, SalesOrderHeader, SalesOrderLine, PurchHeader, QtyToBeShipped, QtyToBeShippedBase);
+
+            IsHandled := false;
+            OnPostAssocItemJnlLineOnBeforePost(ItemJnlLine, SalesOrderLine, IsHandled);
+            if (SalesOrderLine."Job Contract Entry No." = 0) or IsHandled then begin
+                TransferReservToItemJnlLine(SalesOrderLine, ItemJnlLine, PurchLine, QtyToBeShippedBase, true);
+                OnBeforePostAssocItemJnlLine(ItemJnlLine, SalesOrderLine, SuppressCommit, PurchLine);
+                RunItemJnlPostLine(ItemJnlLine);
+                OnAfterPostAssocItemJnlLine(ItemJnlLine, ItemJnlPostLine);
+                // Handle Item Tracking
+                if ItemJnlPostLine.CollectTrackingSpecification(TempHandlingSpecification2) then begin
+                    if TempHandlingSpecification2.FindSet() then
+                        repeat
+                            TempTrackingSpecification := TempHandlingSpecification2;
+                            TempTrackingSpecification.SetSourceFromSalesLine(SalesOrderLine);
+                            if TempTrackingSpecification.Insert() then;
+                            ItemEntryRelation.InitFromTrackingSpec(TempHandlingSpecification2);
+                            ItemEntryRelation.SetSource(DATABASE::"Sales Shipment Line", 0, SalesOrderHeader."Shipping No.", SalesOrderLine."Line No.");
+                            ItemEntryRelation.SetOrderInfo(SalesOrderLine."Document No.", SalesOrderLine."Line No.");
+                            ItemEntryRelation.Insert();
+                        until TempHandlingSpecification2.Next() = 0;
+                    exit(0);
+                end;
             end;
+
+            IsHandled := false;
+            ItemShptEntryNo := ItemJnlLine."Item Shpt. Entry No.";
         end;
 
-        IsHandled := false;
-        ItemShptEntryNo := ItemJnlLine."Item Shpt. Entry No.";
         OnPostAssocItemJnlLineOnBeforeExit(SalesOrderHeader, ItemShptEntryNo, IsHandled);
         exit(ItemShptEntryNo);
     end;
@@ -9979,6 +9987,15 @@ codeunit 90 "Purch.-Post"
         ItemChargeAssgntPurch.DeleteAll();
     end;
 
+    local procedure UpdateAnalysisViewAfterPosting()
+    var
+        UpdateAnalysisView: Codeunit "Update Analysis View";
+        UpdateItemAnalysisView: Codeunit "Update Item Analysis View";
+    begin
+        UpdateAnalysisView.UpdateAll(0, true);
+        UpdateItemAnalysisView.UpdateAll(0, true);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnArchiveSalesOrdersOnBeforeSalesOrderLineModify(var SalesOrderLine: Record "Sales Line"; var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary)
     begin
@@ -11609,7 +11626,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostItemJnlLineOnAfterPrepareItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; var GenJnlLineDocNo: code[20]; TrackingSpecification: Record "Tracking Specification"; QtyToBeReceived: Decimal)
+    local procedure OnPostItemJnlLineOnAfterPrepareItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; PreviewMode: Boolean; var GenJnlLineDocNo: code[20]; TrackingSpecification: Record "Tracking Specification"; QtyToBeReceived: Decimal; QtyToBeInvoiced: Decimal)
     begin
     end;
 
@@ -12735,6 +12752,11 @@ codeunit 90 "Purch.-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckItemCharge(var ItemChargeAssignmentPurch: Record "Item Charge Assignment (Purch)"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeProcedurePostAssocItemJnlLine(var SalesOrderLine: Record "Sales Line"; var TempTrackingSpecification: Record "Tracking Specification" temporary; var TempHandlingSpecification: Record "Tracking Specification" temporary; QtyToBeShipped: Decimal; QtyToBeShippedBase: Decimal; var ItemShptEntryNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
