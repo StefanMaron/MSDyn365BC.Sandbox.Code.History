@@ -132,10 +132,6 @@ table 8051 "Subscription Contract Setup"
                 TestField("Def. Rel. Jnl. Template Name");
             end;
         }
-        field(182; "Create Contract Deferrals"; Enum "Create Contract Deferrals")
-        {
-            Caption = 'Create Contract Deferrals';
-        }
     }
     keys
     {

@@ -249,7 +249,7 @@ table 8061 "Billing Line"
         BillingLine2.FindFirst();
     end;
 
-    procedure ResetServiceCommitmentNextBillingDate()
+    internal procedure ResetServiceCommitmentNextBillingDate()
     var
         ServiceCommitment: Record "Subscription Line";
     begin
@@ -412,13 +412,13 @@ table 8061 "Billing Line"
         end;
     end;
 
-    procedure FilterBillingLineOnContract(ServicePartner: Enum "Service Partner"; ContractNo: Code[20])
+    internal procedure FilterBillingLineOnContract(ServicePartner: Enum "Service Partner"; ContractNo: Code[20])
     begin
         Rec.SetRange(Partner, ServicePartner);
         Rec.SetRange("Subscription Contract No.", ContractNo);
     end;
 
-    procedure FilterBillingLineOnContractLine(ServicePartner: Enum "Service Partner"; ContractNo: Code[20]; ContractLineNo: Integer)
+    internal procedure FilterBillingLineOnContractLine(ServicePartner: Enum "Service Partner"; ContractNo: Code[20]; ContractLineNo: Integer)
     begin
         Rec.FilterBillingLineOnContract(ServicePartner, ContractNo);
         Rec.SetRange("Subscription Contract Line No.", ContractLineNo);
@@ -434,7 +434,7 @@ table 8061 "Billing Line"
         CustomerContract.RecalculateHarmonizedBillingFieldsBasedOnNextBillingDate(0);
     end;
 
-    procedure IsPartnerVendor(): Boolean
+    internal procedure IsPartnerVendor(): Boolean
     begin
         exit(Rec.Partner = Rec.Partner::Vendor);
     end;
