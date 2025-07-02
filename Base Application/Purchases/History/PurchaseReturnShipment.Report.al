@@ -526,6 +526,11 @@ report 6636 "Purchase - Return Shipment"
 
         trigger OnInit()
         begin
+            LogInteractionEnable := true;
+        end;
+
+        trigger OnOpenPage()
+        begin
             InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
@@ -552,6 +557,12 @@ report 6636 "Purchase - Return Shipment"
                       "Return Shipment Header"."Buy-from Vendor No.", "Return Shipment Header"."Purchaser Code", '',
                       "Return Shipment Header"."Posting Description", '');
                 until "Return Shipment Header".Next() = 0;
+    end;
+
+    trigger OnPreReport()
+    begin
+        if not CurrReport.UseRequestPage then
+            InitLogInteraction();
     end;
 
     var
