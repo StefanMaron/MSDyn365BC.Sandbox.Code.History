@@ -458,7 +458,7 @@ table 37 "Sales Line"
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateShipmentDate(IsHandled, Rec, xRec, CurrFieldNo);
+                OnBeforeValidateShipmentDate(IsHandled, Rec, xRec);
                 if IsHandled then
                     exit;
 
@@ -8500,7 +8500,7 @@ table 37 "Sales Line"
         OnAfterCheckShipmentRelation(Rec, SalesShptLine);
     end;
 
-    procedure CheckShipmentDateBeforeWorkDate()
+    local procedure CheckShipmentDateBeforeWorkDate()
     var
         IsHandled: Boolean;
     begin
@@ -8871,8 +8871,6 @@ table 37 "Sales Line"
             exit;
         if SalesHeader."Invoice Discount Value" = 0 then
             exit;
-        if SalesHeader."Invoice Discount Calculation" = SalesHeader."Invoice Discount Calculation"::"%" then
-            exit;
         SalesHeader."Invoice Discount Value" -= InvDiscountAmount;
         SalesHeader.Modify(true);
     end;
@@ -9105,16 +9103,15 @@ table 37 "Sales Line"
     var
         Item: Record Item;
         IsHandled: Boolean;
-        ShouldUpdateDeferralCode: Boolean;
     begin
         IsHandled := false;
         OnBeforeInitDeferralCode(Rec, IsHandled);
         if IsHandled then
             exit;
 
-        ShouldUpdateDeferralCode := "Document Type" in ["Document Type"::Order, "Document Type"::Invoice, "Document Type"::"Credit Memo", "Document Type"::"Return Order"];
-        OnInitDeferralCodeOnBeforeUpdateDeferralCode(Rec, ShouldUpdateDeferralCode);
-        if ShouldUpdateDeferralCode then
+        if "Document Type" in
+           ["Document Type"::Order, "Document Type"::Invoice, "Document Type"::"Credit Memo", "Document Type"::"Return Order"]
+        then
             case Type of
                 Type::"G/L Account":
                     Validate("Deferral Code", GLAcc."Default Deferral Template Code");
@@ -9558,7 +9555,7 @@ table 37 "Sales Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeValidateUnitCostLCYOnGetUnitCost(IsHandled, Rec, Item);
+        OnBeforeValidateUnitCostLCYOnGetUnitCost(IsHandled, Rec);
         if IsHandled then
             exit;
 
@@ -11674,7 +11671,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeValidateUnitCostLCYOnGetUnitCost(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; Item: Record Item)
+    local procedure OnBeforeValidateUnitCostLCYOnGetUnitCost(var IsHandled: Boolean; var SalesLine: Record "Sales Line")
     begin
     end;
 
@@ -11694,7 +11691,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeValidateShipmentDate(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line"; CurrentFieldNo: Integer)
+    local procedure OnBeforeValidateShipmentDate(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line")
     begin
     end;
 
@@ -12252,11 +12249,6 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalcUnitPriceUsingUOMCoef(var SalesLine: Record "Sales Line"; SalesInvoiceLine: Record "Sales Invoice Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInitDeferralCodeOnBeforeUpdateDeferralCode(var SalesLine: Record "Sales Line"; var ShouldUpdateDeferralCode: Boolean)
     begin
     end;
 }
