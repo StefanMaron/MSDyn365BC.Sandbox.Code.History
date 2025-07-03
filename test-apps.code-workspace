@@ -271,9 +271,6 @@
       "path": "./ReportLayouts/Test/Report Layouts Tests"
     },
     {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
-    },
-    {
       "path": "./SimplifiedBankStatementImport/Test/Simplified Bank Statement Import Test"
     },
     {
@@ -286,7 +283,13 @@
       "path": "./Email - Microsoft 365 Connector/Test/Email - Microsoft 365 Connector Tests"
     },
     {
+      "path": "./EDocumentConnectors/B2Brouter/Test/E-Document Connector - B2Brouter Tests"
+    },
+    {
       "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
+    },
+    {
+      "path": "./EDocumentConnectors/Pagero/Test/E-Document Connector - Pagero Tests"
     },
     {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
