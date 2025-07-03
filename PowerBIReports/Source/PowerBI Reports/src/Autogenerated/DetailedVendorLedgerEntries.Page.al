@@ -22,7 +22,7 @@ page 36996 "Detailed Vendor Ledger Entries"
 
                 trigger ControlAddInReady()
                 begin
-                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
+                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageTok);
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
@@ -57,7 +57,7 @@ page 36996 "Detailed Vendor Ledger Entries"
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageLbl: Label 'ReportSectione72966404f743d39d212', Locked = true;
+        ReportPageTok: Label 'ReportSectione72966404f743d39d212', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()
