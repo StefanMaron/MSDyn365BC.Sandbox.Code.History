@@ -1,4 +1,3 @@
-#pragma warning disable AA0247
 page 8050 "Sales Person API"
 {
     APIGroup = 'subsBilling';

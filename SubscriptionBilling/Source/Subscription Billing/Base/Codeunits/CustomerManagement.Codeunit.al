@@ -5,7 +5,7 @@ using Microsoft.Sales.Customer;
 codeunit 8019 "Customer Management"
 {
     Access = Internal;
-    internal procedure OpenCustomerCard(CustomerNo: Code[20])
+    procedure OpenCustomerCard(CustomerNo: Code[20])
     var
         Customer: Record Customer;
     begin
