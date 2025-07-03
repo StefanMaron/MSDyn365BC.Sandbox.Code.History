@@ -903,12 +903,12 @@ codeunit 99000854 "Inventory Profile Offsetting"
         ReservEntry.SetFilter(ReservEntry."Reservation Status", '<>%1', ReservEntry."Reservation Status"::Prospect);
         if ReservEntry.Find('-') then
             repeat
-                Item.SetLoadFields("Manufacturing Policy", "Replenishment System", "Reordering Policy", "Order Tracking Policy");
+                Item.SetLoadFields("Manufacturing Policy", "Replenishment System");
                 Item.Get(ReservEntry."Item No.");
                 if not IsTrkgForSpecialOrderOrDropShpt(ReservEntry) then begin
                     if ShouldDeleteReservEntry(ReservEntry, ToDate) then begin
                         ResEntryWasDeleted := true;
-                        if ((ReservEntry."Source Type" = Database::"Item Ledger Entry") or CheckReorderingPolicyAndOrderTrackingPolicy(Item)) and
+                        if (ReservEntry."Source Type" = Database::"Item Ledger Entry") and
                            (ReservEntry."Reservation Status" = ReservEntry."Reservation Status"::Tracking)
                         then
                             if ReservEntry1.Get(ReservEntry."Entry No.", not ReservEntry.Positive) then
@@ -2082,7 +2082,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
                               TempSKU."Reorder Quantity";
                 end;
 
-            if IsReorderQtyToAdjust(TempSKU) then
+            if ((TempSKU."Replenishment System" = TempSKU."Replenishment System"::"Prod. Order") and (TempSKU."Manufacturing Policy" = TempSKU."Manufacturing Policy"::"Make-to-Stock"))
+                or (TempSKU."Replenishment System" = TempSKU."Replenishment System"::Purchase) or (TempSKU."Replenishment System" = TempSKU."Replenishment System"::Assembly) then
                 ReorderQty += AdjustReorderQty(ReorderQty, TempSKU, SupplyInvtProfile."Line No.", SupplyInvtProfile."Min. Quantity");
             SupplyInvtProfile."Max. Quantity" := TempSKU."Maximum Order Quantity";
         end;
@@ -4914,24 +4915,6 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 if CheckItemInventoryExists(SupplyInvtProfile) then
                     exit(true);
         end;
-    end;
-
-    local procedure IsReorderQtyToAdjust(StockkeepingUnit: Record "Stockkeeping Unit"): Boolean
-    begin
-        exit(not ((StockkeepingUnit."Reordering Policy" = StockkeepingUnit."Reordering Policy"::"Lot-for-Lot") and (StockkeepingUnit."Manufacturing Policy" = StockkeepingUnit."Manufacturing Policy"::"Make-to-Order")) or
-            ((StockkeepingUnit."Replenishment System" = StockkeepingUnit."Replenishment System"::"Prod. Order") and (StockkeepingUnit."Manufacturing Policy" = StockkeepingUnit."Manufacturing Policy"::"Make-to-Stock")) or
-            (StockkeepingUnit."Replenishment System" in [StockkeepingUnit."Replenishment System"::Purchase, StockkeepingUnit."Replenishment System"::Assembly]))
-    end;
-
-    local procedure CheckReorderingPolicyAndOrderTrackingPolicy(Item: Record Item): Boolean
-    begin
-        if not (Item."Reordering Policy" in ["Reordering Policy"::"Fixed Reorder Qty.", "Reordering Policy"::"Lot-for-Lot"]) then
-            exit(false);
-
-        if Item."Order Tracking Policy" <> Item."Order Tracking Policy"::"Tracking Only" then
-            exit(false);
-
-        exit(true);
     end;
 
     [IntegrationEvent(false, false)]
