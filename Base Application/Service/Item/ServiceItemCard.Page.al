@@ -353,7 +353,7 @@ page 5980 "Service Item Card"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = Service;
-                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                            Caption = 'County';
                             QuickEntry = false;
                         }
                     }
