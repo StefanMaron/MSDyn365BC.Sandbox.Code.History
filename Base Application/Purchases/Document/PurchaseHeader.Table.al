@@ -210,8 +210,7 @@ table 38 "Purchase Header"
                     Rec.RecallModifyAddressNotification(GetModifyVendorAddressNotificationId());
                     if Rec."Remit-to Code" <> '' then
                         Rec.Validate("Remit-to Code", '');
-                end else
-                    SelectDefaultRemitAddress(Rec);
+                end;
 
                 if xRec."Buy-from Vendor No." = "Buy-from Vendor No." then
                     UpdatePurchLinesByFieldNo(FieldNo("Buy-from Vendor No."), CurrFieldNo <> 0);
@@ -2621,7 +2620,7 @@ table 38 "Purchase Header"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Doc. Amount Incl. VAT';
-            ToolTip = 'Specifies the total amount (including VAT) of the purchase invoice or credit memo as specified in the external document. When this value comes from an e-document service, it''s value can''t be changed.';
+            ToolTip = 'Specifies the total amount (including VAT) of the purchase invoice or credit memo.';
 
             trigger OnValidate()
             var
@@ -2648,7 +2647,7 @@ table 38 "Purchase Header"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Doc. Amount VAT';
-            ToolTip = 'Specifies the VAT amount of the purchase invoice or credit memo as specified in the external document. When this values comes from an e-document service, it''s value can''t be changed.';
+            ToolTip = 'Specifies the VAT amount of the purchase invoice or credit memo.';
 
             trigger OnValidate()
             var
@@ -3079,7 +3078,7 @@ table 38 "Purchase Header"
         ShowPostedDocsToPrint :=
             (PurchRcptHeader."No." <> '') or (PurchInvHeader."No." <> '') or (PurchCrMemoHeader."No." <> '') or
            (ReturnShptHeader."No." <> '') or (PurchInvHeaderPrepmt."No." <> '') or (PurchCrMemoHeaderPrepmt."No." <> '');
-        OnBeforeShowPostedDocsToPrintCreatedMsg(ShowPostedDocsToPrint, HideValidationDialog, Rec);
+        OnBeforeShowPostedDocsToPrintCreatedMsg(ShowPostedDocsToPrint, HideValidationDialog);
         if ShowPostedDocsToPrint then
             Message(PostedDocsToPrintCreatedMsg);
     end;
@@ -8949,7 +8948,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowPostedDocsToPrintCreatedMsg(var ShowPostedDocsToPrint: Boolean; HideValidationDialog: Boolean; var PurchaseHeader: Record "Purchase Header")
+    local procedure OnBeforeShowPostedDocsToPrintCreatedMsg(var ShowPostedDocsToPrint: Boolean; HideValidationDialog: Boolean)
     begin
     end;
 
