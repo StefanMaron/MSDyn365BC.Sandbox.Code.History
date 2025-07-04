@@ -797,8 +797,6 @@ report 117 Reminder
 
         trigger OnInit()
         begin
-            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Rmdr.") <> '';
-            LogInteractionEnable := LogInteraction;
             if ReportParametersInitialized then
                 LogInteractionEnable := true;
         end;
@@ -807,6 +805,8 @@ report 117 Reminder
         begin
             if ReportParametersInitialized then
                 exit;
+            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Rmdr.") <> '';
+            LogInteractionEnable := LogInteraction;
         end;
     }
 
