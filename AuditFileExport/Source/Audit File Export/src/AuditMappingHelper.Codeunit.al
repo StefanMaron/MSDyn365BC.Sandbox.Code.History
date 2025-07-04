@@ -207,7 +207,6 @@ codeunit 5260 "Audit Mapping Helper"
         GLAccountMappingHeader.TestField("Ending Date");
         if GuiAllowed() then
             ProgressDialog.Open(PreparingSourceForMappingLbl);
-        OnSetupGLAccountsForMappingOnBeforeGetGLAccountForMapping(GLAccount);
         GetGLAccountForMapping(GLAccount);
         repeat
             GLAccountMappingLine.Init();
@@ -292,10 +291,5 @@ codeunit 5260 "Audit Mapping Helper"
         if not GuiAllowed() then
             Error(ErrorMessage);
         ErrorMessageManagement.LogError(SourceVariant, ErrorMessage, '');
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetupGLAccountsForMappingOnBeforeGetGLAccountForMapping(var GLAccount: Record "G/L Account")
-    begin
     end;
 }

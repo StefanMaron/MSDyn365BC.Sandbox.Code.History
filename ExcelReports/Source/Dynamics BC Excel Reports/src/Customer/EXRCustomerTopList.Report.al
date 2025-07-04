@@ -6,7 +6,6 @@
 namespace Microsoft.Sales.ExcelReports;
 
 using Microsoft.Sales.Customer;
-using Microsoft.ExcelReports;
 
 report 4409 "EXR Customer Top List"
 {
@@ -101,9 +100,6 @@ report 4409 "EXR Customer Top List"
         TopCustomerListLabel = 'Top Customer List';
     }
 
-    var
-        ExcelReportsTelemetry: Codeunit "Excel Reports Telemetry";
-
     protected var
         GlobalExtTopCustomerReportBuffer: Record "EXR Top Customer Report Buffer";
         EXTTopCustomerCaptionHandler: Codeunit "EXT Top Cust. Caption Handler";
@@ -111,7 +107,6 @@ report 4409 "EXR Customer Top List"
 
     trigger OnPreReport()
     begin
-        ExcelReportsTelemetry.LogReportUsage(Report::"EXR Customer Top List");
         BindSubscription(EXTTopCustomerCaptionHandler);
         BuildDataSet();
     end;
