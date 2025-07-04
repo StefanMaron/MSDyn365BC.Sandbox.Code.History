@@ -226,7 +226,7 @@ table 8062 "Cust. Sub. Contract Line"
         ServiceObject.OpenServiceObjectCard("Subscription Header No.");
     end;
 
-    procedure GetNextLineNo(CustomerContractNo: Code[20]) LineNo: Integer
+    internal procedure GetNextLineNo(CustomerContractNo: Code[20]) LineNo: Integer
     var
         CustomerContractLine: Record "Cust. Sub. Contract Line";
     begin
@@ -286,7 +286,7 @@ table 8062 "Cust. Sub. Contract Line"
         OnAfterLoadAmountsForContractLine(Rec, ServiceCommitment);
     end;
 
-    procedure GetServiceCommitment(var ServiceCommitment: Record "Subscription Line"): Boolean
+    internal procedure GetServiceCommitment(var ServiceCommitment: Record "Subscription Line"): Boolean
     var
     begin
         ServiceCommitment.Init();

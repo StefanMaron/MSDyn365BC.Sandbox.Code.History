@@ -1,4 +1,3 @@
-#if not CLEAN26
 namespace Microsoft.PowerBIReports;
 
 using System.Integration.PowerBI;
@@ -12,10 +11,8 @@ page 37040 "Current Utilization"
 #pragma warning restore AS0035
     Caption = 'Current Utilization';
     AboutTitle = 'About Current Utilization';
-    AboutText = 'View the current Weeks Utilization % by comparing Capacity Used to Available Capacity in Hours. View all or some Work Centers to measure throughput and efficiency.';
-    ObsoleteState = Pending;
-    ObsoleteReason = 'The Power BI report has been changed/removed and this is no longer required.';
-    ObsoleteTag = '26.0';
+    AboutText = 'View the current Weeks Utilisation % by comparing Capacity Used to Available Capacity in Hours. View all or some Work Centres to measure throughput and efficiency.';
+
     layout
     {
         area(Content)
@@ -58,5 +55,4 @@ page 37040 "Current Utilization"
         ReportId := SetupHelper.GetReportIdAndEnsureSetup(CurrPage.Caption(), PowerBIReportsSetup.FieldNo("Manufacturing Report Id"));
     end;
 }
-#endif
 
