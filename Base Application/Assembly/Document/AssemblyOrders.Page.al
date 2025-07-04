@@ -13,7 +13,7 @@ using Microsoft.Warehouse.Ledger;
 
 page 902 "Assembly Orders"
 {
-    AdditionalSearchTerms = 'kitting order,kit sale,asm order';
+    AdditionalSearchTerms = 'kitting order,kit sale';
     ApplicationArea = Assembly;
     Caption = 'Assembly Orders';
     CardPageID = "Assembly Order";
