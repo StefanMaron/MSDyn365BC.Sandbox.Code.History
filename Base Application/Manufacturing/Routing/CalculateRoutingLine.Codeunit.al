@@ -1133,10 +1133,7 @@ codeunit 99000774 "Calculate Routing Line"
                 SetMaxDateTime(
                   ProdStartingDate, ProdStartingTime, ProdOrderRoutingLine2."Ending Date", ProdOrderRoutingLine2."Ending Time");
 
-            if SendAheadLotSize > ProdOrderQty then
-                LotSize := ProdOrderQty
-            else
-                LotSize := SendAheadLotSize;
+            LotSize := SendAheadLotSize;
             RemainNeedQty := LotSize * ProdOrderRoutingLine.RunTimePer();
             OnCalculateRoutingLineForwardOnAfterCalcRemainNeedQtyForLotSize(ProdOrderRoutingLine, RemainNeedQty);
             RemainNeedQty :=
@@ -2347,7 +2344,7 @@ codeunit 99000774 "Calculate Routing Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitProdOrderCapNeed(ProductionOrder: Record "Production Order"; var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var ProdOrderCapacityNeed: Record "Prod. Order Capacity Need"; RoutingTimeType: Enum "Routing Time Type"; NeedDate: Date; StartingTime: Time; EndingTime: Time; var NeedQty: Decimal; LotSize: Decimal)
+    local procedure OnBeforeInitProdOrderCapNeed(ProductionOrder: Record "Production Order"; var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var ProdOrderCapacityNeed: Record "Prod. Order Capacity Need"; RoutingTimeType: Enum "Routing Time Type"; NeedDate: Date; StartingTime: Time; EndingTime: Time; NeedQty: Decimal; LotSize: Decimal)
     begin
     end;
 }
