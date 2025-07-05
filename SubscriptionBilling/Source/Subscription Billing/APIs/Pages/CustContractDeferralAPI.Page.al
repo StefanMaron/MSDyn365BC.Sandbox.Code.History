@@ -1,4 +1,3 @@
-#pragma warning disable AA0247
 page 8046 "Cust. Contract Deferral API"
 {
     APIGroup = 'subsBilling';

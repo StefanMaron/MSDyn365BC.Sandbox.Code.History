@@ -38,4 +38,8 @@ page 8093 "Assign Service Comm. Packages"
             }
         }
     }
+    internal procedure GetSelectionFilter(var ServiceCommitmentPackage: Record "Subscription Package")
+    begin
+        CurrPage.SetSelectionFilter(ServiceCommitmentPackage);
+    end;
 }
