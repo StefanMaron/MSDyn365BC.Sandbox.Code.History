@@ -268,8 +268,7 @@ codeunit 5988 "Serv-Documents Mgt."
                       Database::"Service Line", ServLine."Document Type".AsInteger(), ServLine."Document No.", ServLine."Line No.",
                       ServLine."Qty. to Ship (Base)", ServLine."Qty. to Invoice (Base)", Ship, Invoice);
                 LineCount += 1;
-                if GuiAllowed() then
-                    Window.Update(2, LineCount);
+                Window.Update(2, LineCount);
 
                 IsHandled := false;
                 OnPostDocumentLinesOnBeforeCheckServLine(ServHeader, ServLine, Ship, Invoice, ServItemLine, IsHandled);
@@ -502,8 +501,7 @@ codeunit 5988 "Serv-Documents Mgt."
                 if TempInvoicePostBuffer.Find('+') then
                     repeat
                         LineCount += 1;
-                        if GuiAllowed() then
-                            Window.Update(3, LineCount);
+                        Window.Update(3, LineCount);
                         ServPostingJnlsMgt.SetPostingDate(ServHeader."Posting Date");
                         ServPostingJnlsMgt.PostInvoicePostBufferLine(
                             TempInvoicePostBuffer, GenJnlLineDocType.AsInteger(), GenJnlLineDocNo, GenJnlLineExtDocNo);
@@ -518,8 +516,7 @@ codeunit 5988 "Serv-Documents Mgt."
             end;
 #endif
             // Post customer entry
-            if GuiAllowed() then
-                Window.Update(4, 1);
+            Window.Update(4, 1);
 #if not CLEAN23
             if UseLegacyInvoicePosting() then begin
                 ServPostingJnlsMgt.SetPostingDate(ServHeader."Posting Date");
@@ -539,8 +536,7 @@ codeunit 5988 "Serv-Documents Mgt."
             OnPostDocumentLinesOnBeforePostBalancingEntry(ServHeader, ServLine, TotalServiceLine, ServPostingJnlsMgt, GenJnlLineDocType, GenJnlLineDocNo, GenJnlLineExtDocNo, InvoicePostingInterface, Window, IsHandled);
             if not IsHandled then
                 if ServHeader."Bal. Account No." <> '' then begin
-                    if GuiAllowed() then
-                        Window.Update(5, 1);
+                    Window.Update(5, 1);
 #if not CLEAN23
                     if UseLegacyInvoicePosting() then begin
                         ServPostingJnlsMgt.SetPostingDate(ServHeader."Posting Date");
@@ -933,16 +929,14 @@ codeunit 5988 "Serv-Documents Mgt."
             ServInvHeader."Pre-Assigned No. Series" := '';
             ServInvHeader."Order No. Series" := ServHeader."No. Series";
             ServInvHeader."Order No." := ServHeader."No.";
-            if GuiAllowed() then
-                Window.Update(1, StrSubstNo(Text007, ServHeader."Document Type", ServHeader."No.", ServInvHeader."No."));
+            Window.Update(1, StrSubstNo(Text007, ServHeader."Document Type", ServHeader."No.", ServInvHeader."No."));
         end else begin
             ServInvHeader."Pre-Assigned No. Series" := ServHeader."No. Series";
             ServInvHeader."Pre-Assigned No." := ServHeader."No.";
             OnPrepareInvoiceHeaderOnBeforeCheckPostingNo(ServHeader, ServInvHeader);
             if ServHeader."Posting No." <> '' then begin
                 ServInvHeader."No." := ServHeader."Posting No.";
-                if GuiAllowed() then
-                    Window.Update(1, StrSubstNo(Text007, ServHeader."Document Type", ServHeader."No.", ServInvHeader."No."));
+                Window.Update(1, StrSubstNo(Text007, ServHeader."Document Type", ServHeader."No.", ServInvHeader."No."));
             end;
         end;
 
@@ -1013,8 +1007,7 @@ codeunit 5988 "Serv-Documents Mgt."
         ServCrMemoHeader."Pre-Assigned No." := ServHeader."No.";
         if ServHeader."Posting No." <> '' then begin
             ServCrMemoHeader."No." := ServHeader."Posting No.";
-            if GuiAllowed() then
-                Window.Update(1, StrSubstNo(Text008, ServHeader."Document Type", ServHeader."No.", ServCrMemoHeader."No."));
+            Window.Update(1, StrSubstNo(Text008, ServHeader."Document Type", ServHeader."No.", ServCrMemoHeader."No."));
         end;
 
         if ServMgtSetup."Ext. Doc. No. Mandatory" then
