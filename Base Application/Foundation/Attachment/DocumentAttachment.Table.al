@@ -232,6 +232,7 @@ table 1173 "Document Attachment"
         EmptyFileNameErr: Label 'Please choose a file to attach.';
         NoContentErr: Label 'The selected file ''%1'' has no content. Please choose another file.', Comment = '%1=FileName';
         DuplicateErr: Label 'This file is already attached to the document. Please choose another file.';
+        RecordRefNotFoundErr: Label 'The record reference is empty. Please save the record before attaching files.';
 
     procedure ImportAttachment(DocumentInStream: InStream; FileName: Text)
     begin
@@ -378,6 +379,9 @@ table 1173 "Document Attachment"
     var
         IsHandled: Boolean;
     begin
+        if not RecRef.Find() then
+            Error(RecordRefNotFoundErr);
+
         InitFieldsFromRecRef(RecRef);
 
         // If duplicate filename is allowed, use increment versions (specifically needed for phone Take/Use Photo functionality)
