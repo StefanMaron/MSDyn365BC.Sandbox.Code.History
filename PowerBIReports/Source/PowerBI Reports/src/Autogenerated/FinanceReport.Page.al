@@ -6,7 +6,9 @@ page 37059 "Finance Report"
 {
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
+#pragma warning disable AS0035 // Changed from Card to UserControlHost
     PageType = UserControlHost;
+#pragma warning restore AS0035
     Caption = 'Finance Report';
     AboutTitle = 'About Finance Report';
     AboutText = 'The Finance Report offers a consolidated view of all financial report pages, conveniently embedded into a single page for easy access.';
@@ -23,7 +25,7 @@ page 37059 "Finance Report"
                 begin
                     SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
                 end;
-
+                
                 trigger ReportLoaded(ReportFilters: Text; ActivePageName: Text; ActivePageFilters: Text; CorrelationId: Text)
                 begin
                     SetupHelper.LogReportLoaded(CorrelationId);

@@ -6,14 +6,11 @@ namespace Microsoft.eServices.EDocument.Processing.Import;
 using System.Reflection;
 using Microsoft.Purchases.History;
 using System.Apps;
-using Microsoft.eServices.EDocument;
 
 page 6101 "E-Doc. Purch. Line Fields"
 {
     PageType = ListPart;
-#pragma warning disable AS0035 // extensible = false, released in 26.2, changed for 26.3, this is breaking if someone uses Page.run(6101, Rec)
-    SourceTable = "ED Purchase Line Field Setup";
-#pragma warning restore AS0035
+    SourceTable = "EDoc. Purch. Line Field Setup";
     SourceTableTemporary = true;
     InsertAllowed = false;
     DeleteAllowed = false;
@@ -63,43 +60,31 @@ page 6101 "E-Doc. Purch. Line Fields"
     }
 
     var
-        EDocumentService: Record "E-Document Service";
         Name, OwnerApp : Text;
         AddAdditionalField: Boolean;
-        NoEDocumentServiceErr: Label 'No E-Document Service was provided to page.';
 
-    trigger OnOpenPage()
+    trigger OnInit()
     var
     begin
-        if EDocumentService.Code = '' then
-            Error(NoEDocumentServiceErr);
-        Rec.AllPurchaseLineFields(EDocumentService, Rec);
+        Rec.AllPurchaseLineFields(Rec);
         Rec.FindFirst();
     end;
 
-
     trigger OnAfterGetRecord()
     var
-        EDocHistPurchLineFields: Record "ED Purchase Line Field Setup";
+        EDocHistPurchLineFields: Record "EDoc. Purch. Line Field Setup";
         Field: Record Field;
         NAVInstalledApp: Record "NAV App Installed App";
         AppPublishedByPlaceholderLbl: Label '%1 by %2', Comment = '%1 is the name of the app, %2 is the publisher of the app';
     begin
         AddAdditionalField := false;
-        if EDocHistPurchLineFields.Get(Rec."Field No.", Rec."E-Document Service") then
+        if EDocHistPurchLineFields.Get(Rec."Field No.") then
             AddAdditionalField := true;
         if Field.Get(Database::"Purch. Inv. Line", Rec."Field No.") then
             Name := Field.FieldName;
         NAVInstalledApp.SetRange("Package ID", Field."App Package ID");
         if NAVInstalledApp.FindFirst() then
             OwnerApp := StrSubstNo(AppPublishedByPlaceholderLbl, NAVInstalledApp.Name, NAVInstalledApp.Publisher);
-    end;
-
-#pragma warning disable AA0244
-    internal procedure SetEDocumentService(EDocumentService: Record "E-Document Service")
-#pragma warning restore AA0244
-    begin
-        this.EDocumentService := EDocumentService;
     end;
 
 }

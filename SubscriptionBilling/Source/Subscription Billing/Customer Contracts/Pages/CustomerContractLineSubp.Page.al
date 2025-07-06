@@ -118,20 +118,14 @@ page 8068 "Customer Contract Line Subp."
                 {
                     ToolTip = 'Specifies the description of the Subscription Line.';
                 }
-                field("Service Object Quantity"; ContractLineQty)
+                field("Service Object Quantity"; ServiceCommitment.Quantity)
                 {
                     Caption = 'Quantity';
                     ToolTip = 'Specifies the number of units of Subscription.';
 
                     trigger OnValidate()
                     begin
-                        ServiceCommitment.Quantity := ContractLineQty;
                         UpdateServiceCommitmentOnPage(ServiceCommitment.FieldNo(Quantity));
-                    end;
-
-                    trigger OnAssistEdit()
-                    begin
-                        Rec.OpenServiceObjectCard();
                     end;
                 }
                 field("Calculation Base Amount"; ServiceCommitment."Calculation Base Amount")
@@ -547,7 +541,6 @@ page 8068 "Customer Contract Line Subp."
         InitializePageVariables();
         SetNextBillingDateStyle();
         Rec.LoadServiceCommitmentForContractLine(ServiceCommitment);
-        LoadQuantityForContractLine();
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -567,7 +560,6 @@ page 8068 "Customer Contract Line Subp."
     var
         ContractsGeneralMgt: Codeunit "Sub. Contracts General Mgt.";
         NextBillingDateStyleExpr: Text;
-        ContractLineQty: Decimal;
         IsDiscountLine: Boolean;
         IsCommentLineEditable: Boolean;
         UsageDataEnabled: Boolean;
@@ -602,19 +594,8 @@ page 8068 "Customer Contract Line Subp."
         IsDiscountLine := ServiceCommitment.Discount;
     end;
 
-    local procedure LoadQuantityForContractLine()
-    begin
-        ContractLineQty := ServiceObject.Quantity;
-        OnAfterLoadQuantityForContractLine(Rec, ServiceObject, ContractLineQty);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetNextBillingDateStyle(CustSubContractLine: Record "Cust. Sub. Contract Line"; SubscriptionLine: Record "Subscription Line"; var NextBillingDateStyleExpr: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterLoadQuantityForContractLine(CustSubContractLine: Record "Cust. Sub. Contract Line"; SubscriptionHeader: Record "Subscription Header"; var ContractLineQty: Decimal)
     begin
     end;
 }
