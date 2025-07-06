@@ -4964,7 +4964,7 @@ table 36 "Sales Header"
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec, FieldNumber);
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if SalesLinesExist() then
@@ -9972,11 +9972,13 @@ table 36 "Sales Header"
         IsHandled: Boolean;
     begin
         SalesInvoiceHeader.SetLoadFields("No.");
-        if (not SalesInvoiceHeader.Get(Rec."Applies-to Doc. No.")) and (Rec."Applies-to ID" = '') then
+        if not SalesInvoiceHeader.Get(Rec."Applies-to Doc. No.") then
             exit;
         SalesCreditMemoHeader.SetLoadFields("Pre-Assigned No.", "Cust. Ledger Entry No.");
         SalesCreditMemoHeader.SetRange("Pre-Assigned No.", Rec."No.");
         if not SalesCreditMemoHeader.FindFirst() then
+            exit;
+        if IsNotFullyCancelled(SalesCreditMemoHeader) then
             exit;
 
         IsHandled := false;
@@ -10300,7 +10302,7 @@ table 36 "Sales Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; FieldNumber: Integer)
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header")
     begin
     end;
 
