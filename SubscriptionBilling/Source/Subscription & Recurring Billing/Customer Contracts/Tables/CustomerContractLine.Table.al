@@ -112,7 +112,6 @@ table 8062 "Customer Contract Line"
         ContractsGeneralMgt: Codeunit "Contracts General Mgt.";
         ConfirmManagement: Codeunit "Confirm Management";
         CalledFromDeleteServiceCommitment: Boolean;
-        HideValidationDialog: Boolean;
         DeletionNotAllowedErr: Label 'Deletion is not allowed because the line is linked to a contract billing line. Please delete the billing proposal first.';
         ClosedContractLinesDeletionQst: Label 'Deleting the contract line breaks the link to the service in the service object. Do you want to continue?';
         OneContractLineSelectedErr: Label 'Please select the lines you want to combine.';
@@ -296,7 +295,7 @@ table 8062 "Customer Contract Line"
     begin
         if not Rec.Closed then
             exit;
-        if not GetConfirmResponse(ClosedContractLinesDeletionQst, true) then
+        if not ConfirmManagement.GetResponse(ClosedContractLinesDeletionQst, true) then
             Error(TextManagement.GetProcessingAbortedErr());
     end;
 
@@ -420,7 +419,7 @@ table 8062 "Customer Contract Line"
         ServiceCommitment: Record "Service Commitment";
     begin
         CreateServiceObject(ServiceObject, RefCustomerContractLine."Service Object No.", CustomerContractLine);
-        CreateMergedServiceCommitment(ServiceCommitment, ServiceObject, RefCustomerContractLine);
+        CreateMergedServiceCommitment(ServiceCommitment, ServiceObject."No.", RefCustomerContractLine, CustomerContractLine);
         CloseCustomerContractLines(CustomerContractLine);
         if not AssignNewServiceCommitmentToCustomerContract(CustomerContractLine."Contract No.", ServiceCommitment) then
             exit(false);
@@ -446,12 +445,12 @@ table 8062 "Customer Contract Line"
         ServiceObject.Insert(true);
     end;
 
-    local procedure CreateMergedServiceCommitment(var ServiceCommitment: Record "Service Commitment"; ServiceObject: Record "Service Object"; RefCustomerContractLine: Record "Customer Contract Line")
+    local procedure CreateMergedServiceCommitment(var ServiceCommitment: Record "Service Commitment"; NewServiceObjectNo: Code[20]; RefCustomerContractLine: Record "Customer Contract Line"; var CustomerContractLine: Record "Customer Contract Line")
     begin
         RefCustomerContractLine.GetServiceCommitment(ServiceCommitment);
         ServiceCommitment."Entry No." := 0;
-        ServiceCommitment."Service Object No." := ServiceObject."No.";
-        ServiceCommitment.Validate("Service Amount", ServiceCommitment.Price * ServiceObject."Quantity Decimal");
+        ServiceCommitment."Service Object No." := NewServiceObjectNo;
+        ServiceCommitment.Validate("Service Amount", ServiceCommitment.GetTotalServiceAmountFromCustContractLines(CustomerContractLine));
         ServiceCommitment.Validate("Service Start Date", ServiceCommitment."Next Billing Date");
         ServiceCommitment.Insert(true);
     end;
@@ -487,9 +486,7 @@ table 8062 "Customer Contract Line"
         ServiceCommitment."Service End Date" := ServiceCommitment."Next Billing Date";
         ServiceCommitment."Next Billing Date" := 0D;
         ServiceCommitment.Validate("Service End Date");
-        ServiceCommitment.Closed := true;
         ServiceCommitment.Modify(false);
-
         CustomerContractLine.Closed := true;
         CustomerContractLine.Modify(false);
     end;
@@ -515,23 +512,6 @@ table 8062 "Customer Contract Line"
         ServiceAmount := 0;
         CalculationBasePercent := 0;
         CalculationBaseAmount := 0;
-    end;
-
-    procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
-    begin
-        HideValidationDialog := NewHideValidationDialog;
-    end;
-
-    procedure GetHideValidationDialog(): Boolean
-    begin
-        exit(HideValidationDialog);
-    end;
-
-    local procedure GetConfirmResponse(ConfirmQuestion: Text; DefaultButton: Boolean): Boolean
-    begin
-        if HideValidationDialog then
-            exit(true);
-        exit(ConfirmManagement.GetResponse(ConfirmQuestion, DefaultButton));
     end;
 
     internal procedure SetCalledFromDeleteServiceCommitment(NewCalledFromDeleteServiceCommitment: Boolean)
