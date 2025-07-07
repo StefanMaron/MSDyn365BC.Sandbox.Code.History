@@ -1837,19 +1837,14 @@ page 6630 "Sales Return Order"
         SalesHeader: Record "Sales Header";
         InstructionMgt: Codeunit "Instruction Mgt.";
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
-        DocumentIsScheduledForPosting: Boolean;
         IsHandled: Boolean;
     begin
         LinesInstructionMgt.SalesCheckAllLinesHaveQuantityAssigned(Rec);
         Rec.SendToPosting(PostingCodeunitID);
 
-        SalesHeader.SetRange("Document Type", Rec."Document Type");
-        SalesHeader.SetRange("No.", Rec."No.");
-        DocumentIsPosted := SalesHeader.IsEmpty();
+        DocumentIsPosted := not SalesHeader.Get(Rec."Document Type", Rec."No.");
 
-        DocumentIsScheduledForPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
-        OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(Rec, DocumentIsScheduledForPosting, DocumentIsPosted);
-        if DocumentIsScheduledForPosting then
+        if Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting" then
             CurrPage.Close();
         CurrPage.Update(false);
 
@@ -1985,11 +1980,6 @@ page 6630 "Sales Return Order"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnQueryClosePage(var SalesHeader: Record "Sales Header"; CloseAction: Action; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(var SalesHeader: Record "Sales Header"; var DocumentIsScheduledForPosting: Boolean; var DocumentIsPosted: Boolean)
     begin
     end;
 }
