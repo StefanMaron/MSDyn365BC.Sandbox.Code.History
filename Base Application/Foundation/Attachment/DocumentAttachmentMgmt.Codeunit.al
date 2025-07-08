@@ -95,7 +95,7 @@ codeunit 1173 "Document Attachment Mgmt"
         Rec.FilterGroup := CurrentFilterGroup;
     end;
 
-    procedure GetRefTable(var RecRef: RecordRef; DocumentAttachment: Record "Document Attachment"): Boolean
+    internal procedure GetRefTable(var RecRef: RecordRef; DocumentAttachment: Record "Document Attachment"): Boolean
     var
         Customer: Record Customer;
         Vendor: Record Vendor;
