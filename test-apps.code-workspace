@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./RecommendedApps/Test/Recommended Apps Tests"
@@ -26,9 +34,6 @@
     },
     {
       "path": "./DataSearch/test/Data Search Tests"
-    },
-    {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
     },
     {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
@@ -259,9 +264,6 @@
       "path": "./ReportLayouts/Test/Report Layouts Tests"
     },
     {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
-    },
-    {
       "path": "./SimplifiedBankStatementImport/Test/Simplified Bank Statement Import Test"
     },
     {
@@ -272,12 +274,6 @@
     },
     {
       "path": "./Email - Microsoft 365 Connector/Test/Email - Microsoft 365 Connector Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
       "path": "./EDocument Core/Test/E-Document Core Tests"
@@ -303,13 +299,5 @@
     {
       "path": "./ServiceDeclaration/Test/Service Declaration Tests"
     }
-  ],
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "allint.enabled": false,
-    "al.enableCodeActions": false
-  }
+  ]
 }

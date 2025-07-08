@@ -1,22 +1,23 @@
 codeunit 139624 "E-Doc E2E Test"
 {
     Subtype = Test;
+    TestPermissions = Disabled;
     EventSubscriberInstance = Manual;
 
     var
-        Customer: Record Customer;
-        EDocumentService: Record "E-Document Service";
+
         Assert: Codeunit Assert;
+        LibrarySales: Codeunit "Library - Sales";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryEDoc: Codeunit "Library - E-Document";
         LibraryWorkflow: codeunit "Library - Workflow";
         LibraryJobQueue: Codeunit "Library - Job Queue";
         LibraryPurchase: Codeunit "Library - Purchase";
         EDocImplState: Codeunit "E-Doc. Impl. State";
-        LibraryLowerPermission: Codeunit "Library - Lower Permissions";
         IsInitialized: Boolean;
         IncorrectValueErr: Label 'Incorrect value found';
         DocumentSendingProfileWithWorkflowErr: Label 'Workflow %1 defined for %2 in Document Sending Profile %3 is not found.', Comment = '%1 - The workflow code, %2 - Enum value set in Electronic Document, %3 - Document Sending Profile Code';
+        EDocEmptyErr: Label 'The E-Document table is empty.';
         FailedToGetBlobErr: Label 'Failed to get exported blob from EDocument %1', Comment = '%1 - E-Document No.';
         SendingErrStateErr: Label 'E-document is Pending response and can not be sent in this state.';
         DeleteNotAllowedErr: Label 'Deletion of Purchase Header linked to E-Document is not allowed.';
@@ -25,8 +26,11 @@ codeunit 139624 "E-Doc E2E Test"
     procedure CreateEDocumentBeforeAfterEventsSuccessful()
     var
         SalesInvHeader: Record "Sales Invoice Header";
+        SalesHeader: Record "Sales Header";
         EDocument: Record "E-Document";
         DocumentSendingProfile: Record "Document Sending Profile";
+
+        RecordRef: RecordRef;
         Variant: Variant;
     begin
         // [FEATURE] [E-Document] [Processing] 
@@ -38,16 +42,17 @@ codeunit 139624 "E-Doc E2E Test"
         LibraryVariableStorage.AssertEmpty();
         EDocImplState.SetVariableStorage(LibraryVariableStorage);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        SalesInvHeader := LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] E document is created
+        LibrarySales.CreateSalesInvoice(SalesHeader);
+        SalesInvHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
+        RecordRef.GetTable(SalesInvHeader);
 
         // [THEN] OnBeforeCreatedEDocument is fired and edocument is empty
         EDocImplState.GetVariableStorage(LibraryVariableStorage);
         Assert.AreEqual(2, LibraryVariableStorage.Length(), IncorrectValueErr);
         LibraryVariableStorage.Dequeue(Variant);
         EDocument := Variant;
-        Assert.AreEqual('', EDocument."Document No.", 'OnBeforeCreatedEDocument should give empty edocument');
+        Assert.AreEqual('', EDocument."Document No.", IncorrectValueErr);
 
         // [THEN] OnAfterCreatedEDocument event is fired and edocument is populated
         LibraryVariableStorage.Dequeue(Variant);
@@ -58,7 +63,7 @@ codeunit 139624 "E-Doc E2E Test"
         Assert.AreEqual(SalesInvHeader."Document Date", EDocument."Document Date", IncorrectValueErr);
         Assert.AreEqual(EDocument."Source Type"::Customer, EDocument."Source Type", IncorrectValueErr);
         Assert.AreEqual(EDocument.Status::"In Progress", EDocument.Status, IncorrectValueErr);
-        DocumentSendingProfile.GetDefaultForCustomer(Customer."No.", DocumentSendingProfile);
+        DocumentSendingProfile.GetDefaultForCustomer(SalesInvHeader."Bill-to Customer No.", DocumentSendingProfile);
         Assert.AreEqual(EDocument."Document Sending Profile", DocumentSendingProfile.Code, IncorrectValueErr);
 
         UnbindSubscription(EDocImplState);
@@ -68,7 +73,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure CheckEDocumentUnitSucccess()
     var
         SalesHeader, SalesHeader2 : Record "Sales Header";
-        EDocService: Record "E-Document Service";
+        EDocService, EDocService2 : Record "E-Document Service";
         EDocExport: Codeunit "E-Doc. Export";
         RecordRef: RecordRef;
         EDocProcessingPhase: Enum "E-Document Processing Phase";
@@ -82,13 +87,11 @@ codeunit 139624 "E-Doc E2E Test"
         Initialize();
         EDocImplState.EnableOnCheckEvent();
         BindSubscription(EDocImplState);
+        LibrarySales.CreateSalesInvoice(SalesHeader);
+        RecordRef.GetTable(SalesHeader);
+
         LibraryVariableStorage.AssertEmpty();
         EDocImplState.SetVariableStorage(LibraryVariableStorage);
-
-        // [WHEN] Team member create invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.CreateSalesHeaderWithItem(Customer, SalesHeader, Enum::"Sales Document Type"::Invoice);
-        RecordRef.GetTable(SalesHeader);
 
         // [WEHN] Check E-Document is called
         EDocExport.CheckEDocument(RecordRef, Enum::"E-Document Processing Phase"::Create);
@@ -105,8 +108,8 @@ codeunit 139624 "E-Doc E2E Test"
         EDocProcessingPhase := EDocProcessingPhaseInt;
 
         // [THEN] EDocService that was created by test for flow, is the one that is provided by event
-
-        Assert.AreEqual(EDocService.Code, EDocumentService.Code, IncorrectValueErr);
+        EDocService2.FindLast();
+        Assert.AreEqual(EDocService.Code, EDocService2.Code, IncorrectValueErr);
 
         // [THEN] Sales Header that we created is the one that is provided by event            
         Assert.AreEqual(SalesHeader."No.", SalesHeader2."No.", IncorrectValueErr);
@@ -125,7 +128,7 @@ codeunit 139624 "E-Doc E2E Test"
         EDocExport: Codeunit "E-Doc. Export";
         RecordRef: RecordRef;
         Variant: Variant;
-        EDocServiceA, EDocServiceB, WorkflowCode : Code[20];
+        EDocServiceA, EDocServiceB : Code[20];
     begin
         // [FEATURE] [E-Document] [Processing] 
         // [SCENARIO] Check that CheckEDocument is successfull for multiple services
@@ -135,23 +138,17 @@ codeunit 139624 "E-Doc E2E Test"
         LibraryWorkflow.DisableAllWorkflows();
         EDocServiceA := LibraryEDoc.CreateService();
         EDocServiceB := LibraryEDoc.CreateService();
-        LibraryEDoc.CreateDocSendingProfile(DocumentSendingProfile);
-        WorkflowCode := LibraryEDoc.CreateFlowWithServices(DocumentSendingProfile.Code, EDocServiceA, EDocServiceB);
-        DocumentSendingProfile."Electronic Document" := DocumentSendingProfile."Electronic Document"::"Extended E-Document Service Flow";
-        DocumentSendingProfile."Electronic Service Flow" := WorkflowCode;
+        DocumentSendingProfile.GetDefault(DocumentSendingProfile);
+        DocumentSendingProfile."Electronic Service Flow" := LibraryEDoc.CreateFlowWithServices(DocumentSendingProfile.Code, EDocServiceA, EDocServiceB);
         DocumentSendingProfile.Modify();
-        Customer."Document Sending Profile" := DocumentSendingProfile.Code;
-        Customer.Modify();
 
         EDocImplState.EnableOnCheckEvent();
         BindSubscription(EDocImplState);
+        LibrarySales.CreateSalesInvoice(SalesHeader);
+        RecordRef.GetTable(SalesHeader);
+
         LibraryVariableStorage.AssertEmpty();
         EDocImplState.SetVariableStorage(LibraryVariableStorage);
-
-        // [WHEN] Team member create invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.CreateSalesHeaderWithItem(Customer, SalesHeader, Enum::"Sales Document Type"::Invoice);
-        RecordRef.GetTable(SalesHeader);
 
         // [WEHN] Check E-Document is called
         EDocExport.CheckEDocument(RecordRef, Enum::"E-Document Processing Phase"::Create);
@@ -168,18 +165,12 @@ codeunit 139624 "E-Doc E2E Test"
         EDocService := Variant;
         Assert.AreEqual(EDocService.Code, EDocServiceB, IncorrectValueErr);
         UnbindSubscription(EDocImplState);
-
-        LibraryLowerPermission.SetOutsideO365Scope();
-        LibraryWorkflow.DisableAllWorkflows();
-        LibraryWorkflow.DeleteAllExistingWorkflows();
-        EDocService.SetFilter(Code, '%1|%2', EDocServiceA, EDocServiceB);
-        EDocService.DeleteAll();
-        IsInitialized := false;
     end;
 
     [Test]
     procedure CreateEDocumentFailureNoWorkflow()
     var
+        EDocument: Record "E-Document";
         DocumentSendingProfile: Record "Document Sending Profile";
     begin
         // [FEATURE] [E-Document] [Processing] 
@@ -187,19 +178,13 @@ codeunit 139624 "E-Doc E2E Test"
 
         // [GIVEN] E document is created when posting document with incorrectly setup document sending profile
         Initialize();
-        LibraryEDoc.CreateDocSendingProfile(DocumentSendingProfile);
-        DocumentSendingProfile."Electronic Document" := DocumentSendingProfile."Electronic Document"::"Extended E-Document Service Flow";
+        DocumentSendingProfile.GetDefault(DocumentSendingProfile);
         DocumentSendingProfile."Electronic Service Flow" := 'NON-WORKFLOW';
         DocumentSendingProfile.Modify();
-        Customer."Document Sending Profile" := DocumentSendingProfile.Code;
-        Customer.Modify();
 
-        LibraryLowerPermission.SetTeamMember();
-        asserterror LibraryEDoc.PostInvoice(Customer);
         // [THEN] Error is thrown when posting   
-        //asserterror LibraryEDoc.CreateEDocumentFromSales(EDocument, Customer."No.");
+        asserterror LibraryEDoc.CreateEDocumentFromSales(EDocument);
         Assert.AreEqual(StrSubstNo(DocumentSendingProfileWithWorkflowErr, 'NON-WORKFLOW', Format(DocumentSendingProfile."Electronic Document"::"Extended E-Document Service Flow"), DocumentSendingProfile.Code), GetLastErrorText(), IncorrectValueErr);
-        IsInitialized := false;
     end;
 
     [Test]
@@ -213,10 +198,9 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.EnableOnCheckEvent();
         EDocImplState.SetThrowLoggedError();
         BindSubscription(EDocImplState);
-        LibraryLowerPermission.SetTeamMember();
 
         // [THEN] Error is thrown and posting will be stopped.
-        asserterror LibraryEDoc.PostInvoice(Customer);
+        asserterror LibraryEDoc.PostSalesDocument();
         Assert.ExpectedError('TEST');
 
         UnbindSubscription(EDocImplState);
@@ -233,10 +217,9 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.EnableOnCheckEvent();
         EDocImplState.SetThrowRuntimeError();
         BindSubscription(EDocImplState);
-        LibraryLowerPermission.SetTeamMember();
 
         // [THEN] Error is thrown and posting will be stopped.
-        asserterror LibraryEDoc.PostInvoice(Customer);
+        asserterror LibraryEDoc.PostSalesDocument();
         UnbindSubscription(EDocImplState);
     end;
 
@@ -244,7 +227,9 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceCreateErrorE2ESuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentPage: TestPage "E-Document";
+        DocNo: Code[20];
     begin
         // [FEATURE] [E-Document] [Processing] 
         // [SCENARIO] If an error is logged with Error Message in Create implementation, this will NOT block posting
@@ -254,20 +239,21 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.SetThrowLoggedError();
         BindSubscription(EDocImplState);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        // [WHEN] Posting document is going to succeed
+        DocNo := LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
 
-        // [WHEN] Posting document is not going to succeed
         EDocumentPage.OpenView();
         EDocumentPage.Last();
+        EDocumentService.FindLast();
 
         // [THEN] E-Document has correct error status
         Assert.AreEqual(Format(EDocument.Status::Error), EDocumentPage."Electronic Document Status".Value(), IncorrectValueErr);
         Assert.AreEqual(Format(EDocument.Direction::Outgoing), EDocumentPage.Direction.Value(), IncorrectValueErr);
-        Assert.AreEqual(EDocument."Document No.", EDocumentPage."Document No.".Value(), IncorrectValueErr);
+        Assert.AreEqual(DocNo, EDocumentPage."Document No.".Value(), IncorrectValueErr);
 
         // [THEN] E-Document Service Status has correct error status
         Assert.AreEqual(EDocumentService.Code, EDocumentPage.EdocoumentServiceStatus."E-Document Service Code".Value(), IncorrectValueErr);
@@ -279,7 +265,6 @@ codeunit 139624 "E-Doc E2E Test"
         Assert.AreEqual('TEST', EDocumentPage.ErrorMessagesPart.Description.Value(), IncorrectValueErr);
 
         EDocument.Reset();
-        EDocument.SetFilter("Entry No", '>=%1', EDocument."Entry No");
         Assert.AreEqual(1, EDocument.Count(), IncorrectValueErr);
 
         UnbindSubscription(EDocImplState);
@@ -289,7 +274,9 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceCreateRuntimeErrorE2ESuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentPage: TestPage "E-Document";
+        DocNo: Code[20];
     begin
         // [FEATURE] [E-Document] [Processing] 
         // [SCENARIO] If an error is thrown in Create implementation, this will NOT block posting
@@ -299,19 +286,21 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.SetThrowRuntimeError();
         BindSubscription(EDocImplState);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        // [WHEN] Posting document is going to succeed
+        DocNo := LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
 
         EDocumentPage.OpenView();
         EDocumentPage.Last();
+        EDocumentService.FindLast();
 
         // [THEN] E-Document has correct error status
         Assert.AreEqual(Format(EDocument.Status::Error), EDocumentPage."Electronic Document Status".Value(), IncorrectValueErr);
         Assert.AreEqual(Format(EDocument.Direction::Outgoing), EDocumentPage.Direction.Value(), IncorrectValueErr);
-        Assert.AreEqual(EDocument."Document No.", EDocumentPage."Document No.".Value(), IncorrectValueErr);
+        Assert.AreEqual(DocNo, EDocumentPage."Document No.".Value(), IncorrectValueErr);
 
         // [THEN] E-Document Service Status has correct error status
         Assert.AreEqual(EDocumentService.Code, EDocumentPage.EdocoumentServiceStatus."E-Document Service Code".Value(), IncorrectValueErr);
@@ -323,7 +312,6 @@ codeunit 139624 "E-Doc E2E Test"
         Assert.AreEqual('TEST', EDocumentPage.ErrorMessagesPart.Description.Value(), IncorrectValueErr);
 
         EDocument.Reset();
-        EDocument.SetFilter("Entry No", '>=%1', EDocument."Entry No");
         Assert.AreEqual(1, EDocument.Count(), IncorrectValueErr);
 
         UnbindSubscription(EDocImplState);
@@ -333,8 +321,10 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceCreateWithEmptyBlobE2ESuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocLog: Record "E-Document Log";
         EDocumentPage: TestPage "E-Document";
+        DocNo: Code[20];
     begin
         // [FEATURE] [E-Document] [Processing] 
         // [SCENARIO] 
@@ -344,22 +334,21 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.SetDisableOnCreateOutput();
         BindSubscription(EDocImplState);
 
-        EDocument.FindLast();
-        EDocument.SetFilter("Entry No", '>%1', EDocument."Entry No");
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        DocNo := LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
 
         EDocumentPage.OpenView();
         EDocumentPage.Last();
+        EDocumentService.FindLast();
 
         // [THEN] E-Document has correct error status
         Assert.AreEqual(Format(EDocument.Status::Error), EDocumentPage."Electronic Document Status".Value(), IncorrectValueErr);
         Assert.AreEqual(Format(EDocument.Direction::Outgoing), EDocumentPage.Direction.Value(), IncorrectValueErr);
-        Assert.AreEqual(EDocument."Document No.", EDocumentPage."Document No.".Value(), IncorrectValueErr);
+        Assert.AreEqual(DocNo, EDocumentPage."Document No.".Value(), IncorrectValueErr);
 
         // [THEN] E-Document Service Status has correct error status
         Assert.AreEqual(EDocumentService.Code, EDocumentPage.EdocoumentServiceStatus."E-Document Service Code".Value(), IncorrectValueErr);
@@ -378,6 +367,7 @@ codeunit 139624 "E-Doc E2E Test"
         Assert.AreEqual('Error', EDocumentPage.ErrorMessagesPart."Message Type".Value(), IncorrectValueErr);
         Assert.AreEqual(StrSubstNo(FailedToGetBlobErr, EDocument."Entry No"), EDocumentPage.ErrorMessagesPart.Description.Value(), IncorrectValueErr);
 
+        EDocument.Reset();
         Assert.AreEqual(1, EDocument.Count(), IncorrectValueErr);
 
         UnbindSubscription(EDocImplState);
@@ -387,7 +377,9 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceCreateBatchErrorE2ESuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentPage: TestPage "E-Document";
+        DocNo: Code[20];
     begin
         // [FEATURE] [E-Document] [Processing] 
         // [SCENARIO] If an error is logged with Error Message in CreateBatch implementation, this will NOT block posting
@@ -397,17 +389,16 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.SetThrowLoggedError();
         BindSubscription(EDocImplState);
 
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        EDocumentService.FindLast();
         EDocumentService."Use Batch Processing" := true;
         EDocumentService."Batch Mode" := EDocumentService."Batch Mode"::Threshold;
         EDocumentService."Batch Threshold" := 1;
         EDocumentService.Modify();
 
-        EDocument.FindLast();
-        EDocument.SetFilter("Entry No", '>%1', EDocument."Entry No");
-
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        DocNo := LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
 
@@ -417,7 +408,7 @@ codeunit 139624 "E-Doc E2E Test"
         // [THEN] E-Document has correct error status
         Assert.AreEqual(Format(EDocument.Status::Error), EDocumentPage."Electronic Document Status".Value(), IncorrectValueErr);
         Assert.AreEqual(Format(EDocument.Direction::Outgoing), EDocumentPage.Direction.Value(), IncorrectValueErr);
-        Assert.AreEqual(EDocument."Document No.", EDocumentPage."Document No.".Value(), IncorrectValueErr);
+        Assert.AreEqual(DocNo, EDocumentPage."Document No.".Value(), IncorrectValueErr);
 
         // [THEN] E-Document Service Status has correct error status
         Assert.AreEqual(EDocumentService.Code, EDocumentPage.EdocoumentServiceStatus."E-Document Service Code".Value(), IncorrectValueErr);
@@ -428,6 +419,7 @@ codeunit 139624 "E-Doc E2E Test"
         Assert.AreEqual('Error', EDocumentPage.ErrorMessagesPart."Message Type".Value(), IncorrectValueErr);
         Assert.AreEqual('TEST', EDocumentPage.ErrorMessagesPart.Description.Value(), IncorrectValueErr);
 
+        EDocument.Reset();
         Assert.AreEqual(1, EDocument.Count(), IncorrectValueErr);
 
         UnbindSubscription(EDocImplState);
@@ -437,7 +429,9 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceCreateBatchRuntimeErrorE2ESuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentPage: TestPage "E-Document";
+        DocNo: Code[20];
     begin
         // [FEATURE] [E-Document] [Processing] 
         // [SCENARIO] If an error is logged with Error Message in CreateBatch implementation, this will NOT block posting
@@ -447,17 +441,16 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.SetThrowRuntimeError();
         BindSubscription(EDocImplState);
 
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        EDocumentService.FindLast();
         EDocumentService."Use Batch Processing" := true;
         EDocumentService."Batch Mode" := EDocumentService."Batch Mode"::Threshold;
         EDocumentService."Batch Threshold" := 1;
         EDocumentService.Modify();
 
-        EDocument.FindLast();
-        EDocument.SetFilter("Entry No", '>%1', EDocument."Entry No");
-
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        DocNo := LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
 
@@ -467,7 +460,7 @@ codeunit 139624 "E-Doc E2E Test"
         // [THEN] E-Document has correct error status
         Assert.AreEqual(Format(EDocument.Status::Error), EDocumentPage."Electronic Document Status".Value(), IncorrectValueErr);
         Assert.AreEqual(Format(EDocument.Direction::Outgoing), EDocumentPage.Direction.Value(), IncorrectValueErr);
-        Assert.AreEqual(EDocument."Document No.", EDocumentPage."Document No.".Value(), IncorrectValueErr);
+        Assert.AreEqual(DocNo, EDocumentPage."Document No.".Value(), IncorrectValueErr);
 
         // [THEN] E-Document Service Status has correct error status
         Assert.AreEqual(EDocumentService.Code, EDocumentPage.EdocoumentServiceStatus."E-Document Service Code".Value(), IncorrectValueErr);
@@ -478,6 +471,7 @@ codeunit 139624 "E-Doc E2E Test"
         Assert.AreEqual('Error', EDocumentPage.ErrorMessagesPart."Message Type".Value(), IncorrectValueErr);
         Assert.AreEqual('TEST', EDocumentPage.ErrorMessagesPart.Description.Value(), IncorrectValueErr);
 
+        EDocument.Reset();
         Assert.AreEqual(1, EDocument.Count(), IncorrectValueErr);
 
         UnbindSubscription(EDocImplState);
@@ -487,35 +481,37 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceCreateBatchE2ESuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentPage: TestPage "E-Document";
-        DocNoA: Code[20];
+        DocNoA, DocNoB : Code[20];
     begin
         // [FEATURE] [E-Document] [Processing] 
         // [SCENARIO] Post two documents for activating batch. Validate first edocument, before second is posted, then validate both.
 
         // [GIVEN] Edocument service using 'Threshold' batch mode
-        IsInitialized := false;
         Initialize();
         BindSubscription(EDocImplState);
 
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        EDocumentService.FindLast();
         EDocumentService."Use Batch Processing" := true;
         EDocumentService."Batch Mode" := EDocumentService."Batch Mode"::Threshold;
         EDocumentService."Batch Threshold" := 2;
         EDocumentService.Modify();
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        DocNoA := LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
 
         EDocumentPage.OpenView();
-        EDocumentPage.GoToRecord(EDocument);
+        EDocumentPage.Last();
 
         // [THEN] E-Document has correct status
         Assert.AreEqual(Format(EDocument.Status::"In Progress"), EDocumentPage."Electronic Document Status".Value(), IncorrectValueErr);
         Assert.AreEqual(Format(EDocument.Direction::Outgoing), EDocumentPage.Direction.Value(), IncorrectValueErr);
-        Assert.AreEqual(EDocument."Document No.", EDocumentPage."Document No.".Value(), IncorrectValueErr);
+        Assert.AreEqual(DocNoA, EDocumentPage."Document No.".Value(), IncorrectValueErr);
 
         // [THEN] E-Document Service Status has correct error status
         Assert.AreEqual(EDocumentService.Code, EDocumentPage.EdocoumentServiceStatus."E-Document Service Code".Value(), IncorrectValueErr);
@@ -526,13 +522,12 @@ codeunit 139624 "E-Doc E2E Test"
         Assert.AreEqual('', EDocumentPage.ErrorMessagesPart."Message Type".Value(), IncorrectValueErr);
         Assert.AreEqual('', EDocumentPage.ErrorMessagesPart.Description.Value(), IncorrectValueErr);
 
-        DocNoA := EDocument."Document No.";
-        EDocument.SetFilter("Entry No", '>=%1', EDocument."Entry No");
+        EDocument.Reset();
         Assert.AreEqual(1, EDocument.Count(), IncorrectValueErr);
         EDocumentPage.Close();
 
         // [WHEN] Second document is posted
-        LibraryEDoc.PostInvoice(Customer);
+        DocNoB := LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
 
@@ -542,7 +537,7 @@ codeunit 139624 "E-Doc E2E Test"
         // [THEN] E-Document has correct status
         Assert.AreEqual(Format(EDocument.Status::Processed), EDocumentPage."Electronic Document Status".Value(), IncorrectValueErr);
         Assert.AreEqual(Format(EDocument.Direction::Outgoing), EDocumentPage.Direction.Value(), IncorrectValueErr);
-        Assert.AreEqual(EDocument."Document No.", EDocumentPage."Document No.".Value(), IncorrectValueErr);
+        Assert.AreEqual(DocNoB, EDocumentPage."Document No.".Value(), IncorrectValueErr);
 
         // [THEN] E-Document Service Status has correct error status
         Assert.AreEqual(EDocumentService.Code, EDocumentPage.EdocoumentServiceStatus."E-Document Service Code".Value(), IncorrectValueErr);
@@ -554,7 +549,6 @@ codeunit 139624 "E-Doc E2E Test"
         Assert.AreEqual('', EDocumentPage.ErrorMessagesPart.Description.Value(), IncorrectValueErr);
 
         // [THEN] First edocument was also updated 
-        EDocumentPage.Filter.SetFilter("Document No.", DocNoA);
         EDocumentPage.First();
         Assert.AreEqual(Format(EDocument.Status::Processed), EDocumentPage."Electronic Document Status".Value(), IncorrectValueErr);
         Assert.AreEqual(Format(EDocument.Direction::Outgoing), EDocumentPage.Direction.Value(), IncorrectValueErr);
@@ -576,8 +570,10 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceCreateBatchRecurrentE2ESuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         EDocumentServicePage: TestPage "E-Document Service";
+        DocNoA: Code[20];
     begin
         // [FEATURE] [E-Document] [Processing] 
         // [SCENARIO] Post two documents for activating batch. Validate first edocument, before second is posted, then validate both.
@@ -586,6 +582,9 @@ codeunit 139624 "E-Doc E2E Test"
         Initialize();
         BindSubscription(EDocImplState);
 
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        EDocumentService.FindLast();
         EDocumentService."Use Batch Processing" := true;
         EDocumentService."Batch Mode" := EDocumentService."Batch Mode"::Recurrent;
         EDocumentService.Modify();
@@ -594,9 +593,8 @@ codeunit 139624 "E-Doc E2E Test"
         EDocumentServicePage.Filter.SetFilter(Code, EDocumentService.Code);
         EDocumentServicePage.Close();
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        DocNoA := LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
         EDocumentServiceStatus.FindLast();
@@ -608,9 +606,8 @@ codeunit 139624 "E-Doc E2E Test"
 
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocumentService.RecordId);
 
-        EDocument.FindLast();
-        EDocumentServiceStatus.SetRange("E-Document Entry No", EDocument."Entry No");
         EDocumentServiceStatus.FindLast();
+        EDocument.FindLast();
 
         Assert.AreEqual(EDocument."Entry No", EDocumentServiceStatus."E-Document Entry No", IncorrectValueErr);
         Assert.AreEqual(EDocumentService.Code, EDocumentServiceStatus."E-Document Service Code", IncorrectValueErr);
@@ -625,6 +622,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceCreateBatchRecurrentE2EFailure()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         EDocumentServicePage: TestPage "E-Document Service";
     begin
@@ -636,8 +634,9 @@ codeunit 139624 "E-Doc E2E Test"
         BindSubscription(EDocImplState);
         EDocImplState.SetDisableOnCreateBatchOutput();
 
-        EDocumentService.SetRecFilter();
-        EDocumentService.FindFirst();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        EDocumentService.FindLast();
         EDocumentService."Use Batch Processing" := true;
         EDocumentService."Batch Mode" := EDocumentService."Batch Mode"::Recurrent;
         EDocumentService.Modify();
@@ -646,9 +645,8 @@ codeunit 139624 "E-Doc E2E Test"
         EDocumentServicePage.Filter.SetFilter(Code, EDocumentService.Code);
         EDocumentServicePage.Close();
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
         EDocumentServiceStatus.FindLast();
@@ -660,9 +658,8 @@ codeunit 139624 "E-Doc E2E Test"
 
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocumentService.RecordId);
 
-        EDocument.FindLast();
-        EDocumentServiceStatus.SetRange("E-Document Entry No", EDocument."Entry No");
         EDocumentServiceStatus.FindLast();
+        EDocument.FindLast();
 
         Assert.AreEqual(EDocument."Entry No", EDocumentServiceStatus."E-Document Entry No", IncorrectValueErr);
         Assert.AreEqual(EDocumentService.Code, EDocumentServiceStatus."E-Document Service Code", IncorrectValueErr);
@@ -670,17 +667,13 @@ codeunit 139624 "E-Doc E2E Test"
         Assert.AreEqual(EDocument.Status::Error, EDocument.Status, IncorrectValueErr);
 
         UnbindSubscription(EDocImplState);
-
-        LibraryLowerPermission.SetOutsideO365Scope();
-        EDocumentService.FindFirst();
-        EDocumentService."Use Batch Processing" := false;
-        EDocumentService.Modify();
     end;
 
     [Test]
     procedure InterfaceAsyncSendingSuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         JobQueueEntry: Record "Job Queue Entry";
     begin
@@ -694,27 +687,27 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.SetIsAsync();
         EDocImplState.SetOnGetResponseSuccess();
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
-        EDocumentServiceStatus.SetRange("E-Document Entry No", EDocument."Entry No");
         EDocumentServiceStatus.FindLast();
+        EDocumentService.FindLast();
 
         Assert.AreEqual(EDocument."Entry No", EDocumentServiceStatus."E-Document Entry No", IncorrectValueErr);
         Assert.AreEqual(EDocumentService.Code, EDocumentServiceStatus."E-Document Service Code", IncorrectValueErr);
         Assert.AreEqual(EDocumentServiceStatus.Status::"Pending Response", EDocumentServiceStatus.Status, IncorrectValueErr);
         Assert.AreEqual(EDocument.Status::"In Progress", EDocument.Status, IncorrectValueErr);
 
-        // [WHEN] Executing Get Response succesfully
+        // [WHEN] Executing Get Response succesfully 
         JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"E-Document Get Response");
         LibraryJobQueue.RunJobQueueDispatcher(JobQueueEntry);
 
         // [THEN] Status is Sent on service, and document is processed
-        EDocument.FindLast();
-        EDocumentServiceStatus.SetRange("E-Document Entry No", EDocument."Entry No");
         EDocumentServiceStatus.FindLast();
+        EDocument.FindLast();
         Assert.AreEqual(EDocument."Entry No", EDocumentServiceStatus."E-Document Entry No", IncorrectValueErr);
         Assert.AreEqual(EDocumentService.Code, EDocumentServiceStatus."E-Document Service Code", IncorrectValueErr);
         Assert.AreEqual(EDocumentServiceStatus.Status::Sent, EDocumentServiceStatus.Status, IncorrectValueErr);
@@ -729,6 +722,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceSyncSendingSuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
     begin
         // [FEATURE] [E-Document] [Processing] 
@@ -737,14 +731,15 @@ codeunit 139624 "E-Doc E2E Test"
         // [GIVEN] Edocument service using 'Recurrent' batch mode
         Initialize();
         BindSubscription(EDocImplState);
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
-        EDocumentServiceStatus.SetRange("E-Document Entry No", EDocument."Entry No");
         EDocumentServiceStatus.FindLast();
+        EDocumentService.FindLast();
         EDocument.Get(EDocument."Entry No"); // Get after job queue run
 
         // [THEN] Verify that document was sent
@@ -760,6 +755,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnSendSyncRuntimeFailure()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
     begin
         // [FEATURE] [E-Document] [Processing] 
@@ -770,13 +766,14 @@ codeunit 139624 "E-Doc E2E Test"
         BindSubscription(EDocImplState);
         EDocImplState.SetThrowIntegrationLoggedError();
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
-        EDocumentServiceStatus.SetRange("E-Document Entry No", EDocument."Entry No");
         EDocumentServiceStatus.FindLast();
+        EDocumentService.FindLast();
         EDocument.Get(EDocument."Entry No"); // Get after job queue run
 
         // [THEN] Verify that document is in error state
@@ -792,6 +789,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnSendSyncLoggedErrorFailure()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
     begin
         // [FEATURE] [E-Document] [Processing] 
@@ -802,16 +800,17 @@ codeunit 139624 "E-Doc E2E Test"
         BindSubscription(EDocImplState);
         EDocImplState.SetThrowIntegrationLoggedError();
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
 
         // [THEN] Status is Error on service, and document is error state
-        EDocument.FindLast();
-        EDocumentServiceStatus.SetRange("E-Document Entry No", EDocument."Entry No");
         EDocumentServiceStatus.FindLast();
+        EDocumentService.FindLast();
+        EDocument.FindLast();
         Assert.AreEqual(EDocument."Entry No", EDocumentServiceStatus."E-Document Entry No", IncorrectValueErr);
         Assert.AreEqual(EDocumentService.Code, EDocumentServiceStatus."E-Document Service Code", IncorrectValueErr);
         Assert.AreEqual(EDocumentServiceStatus.Status::"Sending Error", EDocumentServiceStatus.Status, IncorrectValueErr);
@@ -824,6 +823,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnSendAsyncRuntimeFailure()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         JobQueueEntry: Record "Job Queue Entry";
     begin
@@ -835,15 +835,15 @@ codeunit 139624 "E-Doc E2E Test"
         BindSubscription(EDocImplState);
         EDocImplState.SetIsAsync();
         EDocImplState.SetThrowIntegrationRuntimeError();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
-        EDocument.FindLast(); // Get after job queue run
-        EDocumentServiceStatus.SetRange("E-Document Entry No", EDocument."Entry No");
         EDocumentServiceStatus.FindLast();
+        EDocumentService.FindLast();
+        EDocument.Get(EDocument."Entry No"); // Get after job queue run
 
         // [THEN] Verify that document is in error state
         Assert.AreEqual(EDocument."Entry No", EDocumentServiceStatus."E-Document Entry No", IncorrectValueErr);
@@ -861,6 +861,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnSendAsyncLoggedErrorFailure()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         JobQueueEntry: Record "Job Queue Entry";
     begin
@@ -872,10 +873,10 @@ codeunit 139624 "E-Doc E2E Test"
         BindSubscription(EDocImplState);
         EDocImplState.SetIsAsync();
         EDocImplState.SetThrowIntegrationLoggedError();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
 
@@ -892,6 +893,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnGetResponseLoggedErrorFailure()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         EDocumentLog: Record "E-Document Log";
         JobQueueEntry: Record "Job Queue Entry";
@@ -903,10 +905,10 @@ codeunit 139624 "E-Doc E2E Test"
         Initialize();
         BindSubscription(EDocImplState);
         EDocImplState.SetIsAsync();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] document is posted and sent
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
         EDocumentServiceStatus.FindLast();
@@ -949,6 +951,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnGetResponseThrowErrorFailure()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         EDocumentLog: Record "E-Document Log";
         JobQueueEntry: Record "Job Queue Entry";
@@ -960,10 +963,10 @@ codeunit 139624 "E-Doc E2E Test"
         Initialize();
         BindSubscription(EDocImplState);
         EDocImplState.SetIsAsync();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] document is posted and sent
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
         EDocumentServiceStatus.FindLast();
@@ -1004,6 +1007,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnGetResponseReturnFalseThenTrueSuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         JobQueueEntry: Record "Job Queue Entry";
     begin
@@ -1016,10 +1020,10 @@ codeunit 139624 "E-Doc E2E Test"
         Initialize();
         BindSubscription(EDocImplState);
         EDocImplState.SetIsAsync();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
         VerifyStatusOnDocumentAndService(EDocument, Enum::"E-Document Status"::"In Progress", EDocumentService, EDocumentServiceStatus, Enum::"E-Document Service Status"::"Pending Response");
@@ -1054,6 +1058,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnGetResponseReturnTrueSuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         JobQueueEntry: Record "Job Queue Entry";
     begin
@@ -1066,10 +1071,10 @@ codeunit 139624 "E-Doc E2E Test"
         BindSubscription(EDocImplState);
         EDocImplState.SetIsAsync();
         EDocImplState.SetOnGetResponseSuccess();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
         VerifyStatusOnDocumentAndService(EDocument, Enum::"E-Document Status"::"In Progress", EDocumentService, EDocumentServiceStatus, Enum::"E-Document Service Status"::"Pending Response");
@@ -1091,6 +1096,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnGetApprovalReturnFalseSuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         JobQueueEntry: Record "Job Queue Entry";
         EDocumentPage: TestPage "E-Document";
@@ -1103,10 +1109,10 @@ codeunit 139624 "E-Doc E2E Test"
         BindSubscription(EDocImplState);
         EDocImplState.SetIsAsync();
         EDocImplState.SetOnGetResponseSuccess();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
         VerifyStatusOnDocumentAndService(EDocument, Enum::"E-Document Status"::"In Progress", EDocumentService, EDocumentServiceStatus, Enum::"E-Document Service Status"::"Pending Response");
@@ -1139,6 +1145,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnGetApprovalReturnTrueSuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         JobQueueEntry: Record "Job Queue Entry";
         EDocumentPage: TestPage "E-Document";
@@ -1153,10 +1160,10 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.SetIsAsync();
         EDocImplState.SetOnGetResponseSuccess();
         EDocImplState.SetOnGetApprovalSuccess();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
         VerifyStatusOnDocumentAndService(EDocument, Enum::"E-Document Status"::"In Progress", EDocumentService, EDocumentServiceStatus, Enum::"E-Document Service Status"::"Pending Response");
@@ -1188,6 +1195,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnGetApprovalThrowErrorFailure()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         JobQueueEntry: Record "Job Queue Entry";
         EDocumentPage: TestPage "E-Document";
@@ -1203,10 +1211,10 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.SetIsAsync();
         EDocImplState.SetOnGetResponseSuccess();
         EDocImplState.SetOnGetApprovalSuccess();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
         VerifyStatusOnDocumentAndService(EDocument, Enum::"E-Document Status"::"In Progress", EDocumentService, EDocumentServiceStatus, Enum::"E-Document Service Status"::"Pending Response");
@@ -1239,6 +1247,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure InterfaceOnGetApprovalLoggedErrorFailure()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         JobQueueEntry: Record "Job Queue Entry";
         EDocumentPage: TestPage "E-Document";
@@ -1254,10 +1263,10 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.SetIsAsync();
         EDocImplState.SetOnGetResponseSuccess();
         EDocImplState.SetOnGetApprovalSuccess();
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
         VerifyStatusOnDocumentAndService(EDocument, Enum::"E-Document Status"::"In Progress", EDocumentService, EDocumentServiceStatus, Enum::"E-Document Service Status"::"Pending Response");
@@ -1293,6 +1302,7 @@ codeunit 139624 "E-Doc E2E Test"
     procedure UIClickSendInWhenPendingResponseSuccess()
     var
         EDocument: Record "E-Document";
+        EDocumentService: Record "E-Document Service";
         EDocumentServiceStatus: Record "E-Document Service Status";
         EDocumentPage: TestPage "E-Document";
     begin
@@ -1305,9 +1315,10 @@ codeunit 139624 "E-Doc E2E Test"
         EDocImplState.SetIsAsync();
         EDocImplState.SetOnGetResponseSuccess();
 
-        // [WHEN] Team member post invoice
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
+        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
+
+        // [WHEN] Posting document is going to succeed
+        LibraryEDoc.PostSalesDocument();
         EDocument.FindLast();
         LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(EDocument.RecordId);
 
@@ -1326,26 +1337,19 @@ codeunit 139624 "E-Doc E2E Test"
     [Test]
     procedure PostDocumentNoDefaultOrElectronicProfile()
     var
-        DocumentSendingProfile: Record "Document Sending Profile";
         EDocument: Record "E-Document";
+        DocumentSendingProfile: Record "Document Sending Profile";
     begin
         // [FEATURE] [E-Document] [Processing] 
         // [SCENARIO] Post document without having default or Electronic sending profile
         Initialize();
-
-        if EDocument.FindLast() then
-            EDocument.SetFilter("Entry No", '>%1', EDocument."Entry No");
-
         // [GIVEN] No default document sending profile
         DocumentSendingProfile.Reset();
         DocumentSendingProfile.DeleteAll();
 
-        LibraryLowerPermission.SetTeamMember();
-        LibraryEDoc.PostInvoice(Customer);
-
         // [THEN] No e-Document is created
-        asserterror EDocument.FindLast();
-        Assert.AssertNothingInsideFilter();
+        asserterror LibraryEDoc.CreateEDocumentFromSales(EDocument);
+        Assert.AreEqual(EDocEmptyErr, GetLastErrorText(), IncorrectValueErr);
 
         // [GIVEN] Default document sending profile is not electronic
         DocumentSendingProfile.GetDefault(DocumentSendingProfile);
@@ -1353,9 +1357,8 @@ codeunit 139624 "E-Doc E2E Test"
         DocumentSendingProfile.Modify();
 
         // [THEN] No e-Document is created
-        LibraryEDoc.PostInvoice(Customer);
-        asserterror EDocument.FindLast();
-        Assert.AssertNothingInsideFilter();
+        asserterror LibraryEDoc.CreateEDocumentFromSales(EDocument);
+        Assert.AreEqual(EDocEmptyErr, GetLastErrorText(), IncorrectValueErr);
     end;
 
     [Test]
@@ -1389,35 +1392,28 @@ codeunit 139624 "E-Doc E2E Test"
     [ModalPageHandler]
     internal procedure EDocServicesPageHandler(var EDocServicesPage: TestPage "E-Document Services")
     var
-        EDocumentService2: Record "E-Document Service";
+        EDocumentService: Record "E-Document Service";
         Variant: Variant;
     begin
         LibraryVariableStorage.Dequeue(Variant);
-        EDocumentService2 := Variant;
-        EDocServicesPage.GoToRecord(EDocumentService2);
+        EDocumentService := Variant;
+        EDocServicesPage.GoToRecord(EDocumentService);
         EDocServicesPage.OK().Invoke();
     end;
 
     local procedure Initialize()
     var
         TransformationRule: Record "Transformation Rule";
-        EDocument: Record "E-Document";
+        DocumentSendingProfile: Record "Document Sending Profile";
     begin
-        LibraryLowerPermission.SetOutsideO365Scope();
+        IsInitialized := true;
         LibraryVariableStorage.Clear();
         Clear(EDocImplState);
-
-        if IsInitialized then
-            exit;
-
-        LibraryEDoc.SetupStandardVAT();
-        LibraryEDoc.SetupStandardSalesScenario(Customer, EDocumentService, Enum::"E-Document Format"::Mock, Enum::"E-Document Integration"::Mock);
-
+        LibraryEDoc.Initialize();
+        DocumentSendingProfile.DeleteAll();
         TransformationRule.DeleteAll();
         TransformationRule.CreateDefaultTransformations();
-        EDocument.DeleteAll();
-
-        IsInitialized := true;
+        LibraryEDoc.CreateSimpleFlow(LibraryEDoc.CreateService());
     end;
 
     local procedure VerifyStatusOnDocumentAndService(EDocument: Record "E-Document"; EDocStatus: Enum "E-Document Status"; EDocumentService: Record "E-Document Service"; EDocumentServiceStatus: Record "E-Document Service Status"; EDocServiceStatus: Enum "E-Document Service Status")
