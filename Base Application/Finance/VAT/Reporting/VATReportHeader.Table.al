@@ -623,21 +623,10 @@ table 740 "VAT Report Header"
     procedure CheckIfCanBeReleased(VATReportHeader: Record "VAT Report Header")
     begin
         VATReportHeader.TestField(Status, VATReportHeader.Status::Open);
-        VATReportHeader.TestOriginalReportNo();
-    end;
 
-    internal procedure TestOriginalReportNo()
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeTestOriginalReportNo(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
-        if "VAT Report Type" in ["VAT Report Type"::Corrective] then
-            if "Original Report No." = '' then
-                Error(Text008, Format("VAT Report Type"));
+        if VATReportHeader."VAT Report Type" in ["VAT Report Type"::Corrective] then
+            if VATReportHeader."Original Report No." = '' then
+                Error(Text008, Format(VATReportHeader."VAT Report Type"));
     end;
 
     local procedure CheckPeriodNo()
@@ -796,11 +785,6 @@ table 740 "VAT Report Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetNoSeriesCode(var VATReportHeader: Record "VAT Report Header"; var Result: Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTestOriginalReportNo(VATReportHeader: Record "VAT Report Header"; var IsHandled: Boolean)
     begin
     end;
 }
