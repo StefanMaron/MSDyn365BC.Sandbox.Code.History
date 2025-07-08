@@ -557,7 +557,7 @@ page 51 "Purchase Invoice"
                                 field("Location Code"; Rec."Location Code")
                                 {
                                     ApplicationArea = Location;
-                                    ToolTip = 'Specifies the location where the items are to be placed when they are received. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
+                                    ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
                                 }
                             }
                             field("Ship-to Name"; Rec."Ship-to Name")
@@ -1962,7 +1962,7 @@ page 51 "Purchase Invoice"
         InstructionMgt: Codeunit "Instruction Mgt.";
         PreAssignedNo: Code[20];
         xLastPostingNo: Code[20];
-        DocumentIsScheduledForPosting: Boolean;
+        IsScheduledPosting: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1976,17 +1976,10 @@ page 51 "Purchase Invoice"
 
         Rec.SendToPosting(PostingCodeunitID);
 
-        DocumentIsScheduledForPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
-        if DocumentIsScheduledForPosting then
-            DocumentIsPosted := true
-        else begin
-            PurchaseHeader.SetRange("Document Type", Rec."Document Type");
-            PurchaseHeader.SetRange("No.", Rec."No.");
-            DocumentIsPosted := PurchaseHeader.IsEmpty();
-        end;
+        IsScheduledPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
+        DocumentIsPosted := (not PurchaseHeader.Get(Rec."Document Type", Rec."No.")) or IsScheduledPosting;
 
-        OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(Rec, DocumentIsScheduledForPosting, DocumentIsPosted);
-        if DocumentIsScheduledForPosting then
+        if IsScheduledPosting then
             CurrPage.Close();
         CurrPage.Update(false);
 
@@ -2243,11 +2236,6 @@ page 51 "Purchase Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCurrencyCodeOnAssistEdit(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDocumentOnAfterCalcDocumentIsScheduledForPosting(var PurchaseHeader: Record "Purchase Header"; var DocumentIsScheduledForPosting: Boolean; var DocumentIsPosted: Boolean)
     begin
     end;
 }
