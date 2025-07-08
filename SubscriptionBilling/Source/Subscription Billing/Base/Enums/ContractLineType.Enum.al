@@ -2,7 +2,7 @@ namespace Microsoft.SubscriptionBilling;
 
 enum 8055 "Contract Line Type"
 {
-    Extensible = true;
+    Extensible = false;
     value(0; "Comment")
     {
         Caption = 'Comment';

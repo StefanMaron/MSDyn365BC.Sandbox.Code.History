@@ -1344,7 +1344,6 @@ codeunit 139628 "E-Doc. Receive Test"
     end;
 
     [Test]
-    [HandlerFunctions('MessageHandler')]
     procedure ReceiveEDocumentDuplicate()
     var
         EDocService: Record "E-Document Service";
@@ -1418,11 +1417,6 @@ codeunit 139628 "E-Doc. Receive Test"
 
     [StrMenuHandler]
     procedure MenuHandler(Options: Text[1024]; var Choice: Integer; Instruction: Text[1024])
-    begin
-    end;
-
-    [MessageHandler]
-    procedure MessageHandler(Message: Text[1024])
     begin
     end;
 
