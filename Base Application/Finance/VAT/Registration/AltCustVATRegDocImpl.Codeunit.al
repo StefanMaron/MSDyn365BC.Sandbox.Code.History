@@ -73,7 +73,7 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
         end;
         if SalesHeader."Alt. VAT Registration No." then begin
             SalesHeader.Validate("Alt. VAT Registration No.", false);
-            CopyVATRegNoOrEnterpriseNoFromCustToSalesHeader(SalesHeader, Customer);
+            SalesHeader.Validate("VAT Registration No.", Customer."VAT Registration No.");
             AddStringToCommaSeparatedList(ChangedFieldsList, SalesHeader.FieldCaption("VAT Registration No."));
         end;
         if SalesHeader."Alt. Gen. Bus Posting Group" then begin
@@ -88,22 +88,11 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
         end;
         if SalesHeader."Alt. Enterprise No." then begin
             SalesHeader.Validate("Alt. Enterprise No.", false);
-            CopyVATRegNoOrEnterpriseNoFromCustToSalesHeader(SalesHeader, Customer);
+            SalesHeader.Validate("Enterprise No.", Customer."Enterprise No.");
             AddStringToCommaSeparatedList(ChangedFieldsList, SalesHeader.FieldCaption("Enterprise No."));
         end;
         if GuiAllowed() then
             Message(VATDataTakenFromCustomerMsg, ChangedFieldsList);
-    end;
-
-    local procedure CopyVATRegNoOrEnterpriseNoFromCustToSalesHeader(var SalesHeader: Record "Sales Header"; Customer: Record Customer)
-    begin
-        if Customer."Enterprise No." = '' then begin
-            SalesHeader.Validate("Enterprise No.", '');
-            SalesHeader.Validate("VAT Registration No.", Customer."VAT Registration No.")
-        end else begin
-            SalesHeader.Validate("VAT Registration No.", '');
-            SalesHeader.Validate("Enterprise No.", Customer."Enterprise No.");
-        end;
     end;
 
     procedure UpdateSetupOnShipToCountryChangeInSalesHeader(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header")
@@ -143,9 +132,6 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
         GLSetup: Record "General Ledger Setup";
         AltCustVATReg: Record "Alt. Cust. VAT Reg.";
     begin
-        if not SalesHeader."Alt. Enterprise No." then
-            SalesHeader."Enterprise No." := BillToCustomer."Enterprise No.";
-
         GLSetup.Get();
         if GLSetup."Bill-to/Sell-to VAT Calc." <> GLSetup."Bill-to/Sell-to VAT Calc."::"Bill-to/Pay-to No." then
             exit;
@@ -166,8 +152,10 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
             SalesHeader."VAT Bus. Posting Group" := BillToCustomer."VAT Bus. Posting Group";
         SalesHeader."VAT Country/Region Code" := BillToCustomer."Country/Region Code";
         SalesHeader."VAT Registration No." := BillToCustomer."VAT Registration No.";
+        SalesHeader."Enterprise No." := BillToCustomer."Enterprise No.";
         SalesHeader."Registration Number" := BillToCustomer."Registration Number";
         SalesHeader."Gen. Bus. Posting Group" := BillToCustomer."Gen. Bus. Posting Group";
+        SalesHeader."Enterprise No." := BillToCustomer."Enterprise No.";
         OnAfterUpdateSetupOnBillToCustomerChangeInSalesHeader(SalesHeader, BillToCustomer);
     end;
 
@@ -236,8 +224,6 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
         if AltCustVATReg."VAT Registration No." <> '' then begin
             SalesHeader.Validate("Alt. VAT Registration No.", true);
             SalesHeader.Validate("VAT Registration No.", AltCustVATReg."VAT Registration No.");
-            SalesHeader.Validate("Alt. Enterprise No.", false);
-            SalesHeader.Validate("Enterprise No.", '');
         end;
         if AltCustVATReg."Gen. Bus. Posting Group" <> '' then begin
             SalesHeader.Validate("Alt. Gen. Bus Posting Group", true);
@@ -250,10 +236,7 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
         if AltCustVATReg."Enterprise No." <> '' then begin
             SalesHeader.Validate("Alt. Enterprise No.", true);
             SalesHeader.Validate("Enterprise No.", AltCustVATReg."Enterprise No.");
-            SalesHeader.Validate("Alt. VAT Registration No.", false);
-            SalesHeader.Validate("VAT Registration No.", '');
         end;
-        OnAfterUpdateAltCustVATRegInSalesHeader(SalesHeader, AltCustVATReg);
         UnbindSubscription(this);
         FeatureTelemetry.LogUptake('0000NHG', FeatureNameTxt, Enum::"Feature Uptake Status"::Used);
     end;
@@ -414,11 +397,6 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterBuildFieldChangeBuffer(var TempChangeLogEntry: Record "Change Log Entry" temporary; SalesHeader: Record "Sales Header");
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateAltCustVATRegInSalesHeader(var SalesHeader: Record "Sales Header"; var AltCustVATReg: Record "Alt. Cust. VAT Reg.")
     begin
     end;
 }
