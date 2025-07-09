@@ -170,6 +170,8 @@ codeunit 54 "Language Impl."
         if LanguageFilter <> '' then
             WindowsLanguage.SetFilter("Language ID", LanguageFilter);
 
+        WindowsLanguage.SetRange("Localization Exist", true);
+        WindowsLanguage.SetRange("Globally Enabled", true);
         if WindowsLanguage.FindSet() then
             repeat
                 TempWindowsLanguage := WindowsLanguage;
