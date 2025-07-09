@@ -16,8 +16,6 @@ using Microsoft.Warehouse.Structure;
 
 codeunit 99000795 "Mfg. Item Integration"
 {
-    Permissions = tabledata "Manufacturing Setup" = r;
-
     var
         ChangeConfirmationQst: Label 'If you change %1 it may affect existing production orders.\Do you want to change %1?', Comment = '%1 - field caption';
         CannotDeleteDocumentErr: Label 'You cannot delete item variant %1 because there is at least one %2 that includes this Variant Code.', Comment = '%1 - item variant, %2 - document number';
@@ -28,26 +26,31 @@ codeunit 99000795 "Mfg. Item Integration"
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure ItemOnAfterValidateEventNo(var Rec: Record Item; var xRec: Record Item)
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
     begin
-        if (Rec."No." = xRec."No.") or (xRec."No." <> '') then
-            exit;
-
-        SetDefaultFlushingMethod(Rec);
+        if (Rec."No." <> xRec."No.") and (xRec."No." = '') then
+            if ManufacturingSetup.Get() then
+                Rec."Flushing Method" := ManufacturingSetup."Default Flushing Method";
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnInsertOnAfterAssignNo', '', true, true)]
     local procedure OnInsertOnAfterAssignNo(var Item: Record Item)
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
     begin
-        SetDefaultFlushingMethod(Item);
+        if ManufacturingSetup.Get() then
+            Item."Flushing Method" := ManufacturingSetup."Default Flushing Method";
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAssistEditOnAfterAssignNo', '', true, true)]
     local procedure OnAssistEditOnAfterAssignNo(var Item: Record Item; xItem: Record Item)
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
     begin
-        if xItem."No." <> '' then
-            exit;
-
-        SetDefaultFlushingMethod(Item);
+        if xItem."No." = '' then
+            if ManufacturingSetup.Get() then
+                Item."Flushing Method" := ManufacturingSetup."Default Flushing Method";
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterHasBOM', '', true, true)]
@@ -97,11 +100,12 @@ codeunit 99000795 "Mfg. Item Integration"
 
     [EventSubscriber(ObjectType::Page, Page::"Item Card", 'OnCreateItemFromTemplateOnBeforeIsFoundationEnabled', '', true, true)]
     local procedure OnCreateItemFromTemplateOnBeforeIsFoundationEnabled(var Item: Record Item)
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
     begin
-        if Item."No." <> '' then
-            exit;
-
-        SetDefaultFlushingMethod(Item);
+        if Item."No." = '' then
+            if ManufacturingSetup.Get() then
+                Item."Flushing Method" := ManufacturingSetup."Default Flushing Method";
     end;
 
     // Inventory Posting Setup
@@ -153,7 +157,7 @@ codeunit 99000795 "Mfg. Item Integration"
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnBeforeRenameEvent', '', true, true)]
-    local procedure OnBeforeRenameItemVariant(var Rec: Record "Item Variant"; var xRec: Record "Item Variant"; RunTrigger: Boolean)
+    local procedure OnBeforeRenameItemVariant(var Rec: Record "Item Variant"; var xRec: Record "Item Variant")
     var
         BOMComponent: Record "BOM Component";
         AssemblyHeader: Record "Assembly Header";
@@ -168,9 +172,6 @@ codeunit 99000795 "Mfg. Item Integration"
         ItemLedgerEntry: Record "Item Ledger Entry";
         ProdOrderLine: Record "Prod. Order Line";
     begin
-        if not RunTrigger then
-            exit;
-
         if xRec."Item No." <> Rec."Item No." then begin
             ProdOrderLine.SetRange("Item No.", xRec."Item No.");
             ProdOrderLine.SetRange("Variant Code", xRec.Code);
@@ -389,44 +390,49 @@ codeunit 99000795 "Mfg. Item Integration"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Catalog Item Management", 'OnCreateNewItemOnBeforeItemInsert', '', true, true)]
     local procedure OnCreateNewItemOnBeforeItemInsert(var Item: Record Item; NonstockItem: Record "Nonstock Item")
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
     begin
-        SetDefaultFlushingMethod(Item);
+        if ManufacturingSetup.Get() then
+            Item."Flushing Method" := ManufacturingSetup."Default Flushing Method";
     end;
 
     // Item Templ. Mgt.
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Templ. Mgt.", 'OnCreateItemFromTemplateOnBeforeItemInsert', '', true, true)]
     local procedure OnCreateItemFromTemplateOnBeforeItemInsert(var Item: Record Item)
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
     begin
-        SetDefaultFlushingMethod(Item);
+        if ManufacturingSetup.Get() then
+            Item."Flushing Method" := ManufacturingSetup."Default Flushing Method";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Templ. Mgt.", 'OnInitFromTemplateOnAfterPrepareTempItem', '', true, true)]
+    local procedure OnInitFromTemplateOnAfterPrepareTempItem(var TempItem: Record Item temporary)
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
+    begin
+        if ManufacturingSetup.Get() then
+            TempItem."Flushing Method" := ManufacturingSetup."Default Flushing Method";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Templ. Mgt.", 'OnInitFromTemplateOnAfterPrepareEmptyItemTemplRecordRef', '', true, true)]
+    local procedure OnInitFromTemplateOnAfterPrepareEmptyItemTemplRecordRef(var EmptyItemTemplRecordRef: RecordRef; ItemTempl: Record "Item Templ.")
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
+    begin
+        if ManufacturingSetup.Get() then
+            EmptyItemTemplRecordRef.Field(ItemTempl.FieldNo("Flushing Method")).Value := ManufacturingSetup."Default Flushing Method";
     end;
 
     // Item Templ. Card
 
     [EventSubscriber(ObjectType::Page, Page::"Item Templ. Card", 'OnAfterOnNewRecord', '', true, true)]
     local procedure OnAfterOnNewRecord(var ItemTempl: Record "Item Templ.")
-    begin
-        SetDefaultFlushingMethod(ItemTempl);
-    end;
-
-    local procedure SetDefaultFlushingMethod(var Item: Record Item)
     var
         ManufacturingSetup: Record "Manufacturing Setup";
     begin
-        if not ManufacturingSetup.ReadPermission() then
-            exit;
-
-        if ManufacturingSetup.Get() then
-            Item."Flushing Method" := ManufacturingSetup."Default Flushing Method";
-    end;
-
-    local procedure SetDefaultFlushingMethod(var ItemTempl: Record "Item Templ.")
-    var
-        ManufacturingSetup: Record "Manufacturing Setup";
-    begin
-        if not ManufacturingSetup.ReadPermission() then
-            exit;
-
         if ManufacturingSetup.Get() then
             ItemTempl."Flushing Method" := ManufacturingSetup."Default Flushing Method";
     end;
