@@ -192,7 +192,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
             if WhseShip then
                 WhseShptLine.LockTable();
             TransHeader.LockTable();
-            if WhseShip and (not PreviewMode) then begin
+            if WhseShip then begin
                 WhsePostShpt.PostUpdateWhseDocuments(WhseShptHeader);
                 TempWhseShptHeader.Delete();
             end;
@@ -253,7 +253,6 @@ codeunit 5704 "TransferOrder-Post Shipment"
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
         WhseJnlRegisterLine: Codeunit "Whse. Jnl.-Register Line";
         PostponedValueEntries: List of [Integer];
-        ItemsToAdjust: List of [Code[20]];
         SourceCode: Code[10];
         WhseShip: Boolean;
         WhsePosting: Boolean;
@@ -758,7 +757,6 @@ codeunit 5704 "TransferOrder-Post Shipment"
         TransLine.SetRange("Derived From Line No.", 0);
         TransLine.SetFilter(Quantity, '<>0');
         TransLine.SetFilter("Qty. to Ship", '<>0');
-        OnCheckLinesOnAfterTransLineSetFilters(TransLine);
         if TransLine.IsEmpty() then
             Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
     end;
@@ -838,8 +836,11 @@ codeunit 5704 "TransferOrder-Post Shipment"
     var
         InvtAdjmtHandler: Codeunit "Inventory Adjustment Handler";
     begin
-        InvtAdjmtHandler.MakeAutomaticInventoryAdjustment(ItemsToAdjust);
-        OnAfterInvtAdjmt(TransHeader, TransShptHeader);
+        InvtSetup.Get();
+        if InvtSetup.AutomaticCostAdjmtRequired() then begin
+            InvtAdjmtHandler.MakeInventoryAdjustment(true, InvtSetup."Automatic Cost Posting");
+            OnAfterInvtAdjmt(TransHeader, TransShptHeader);
+        end;
     end;
 
     procedure SetSuppressCommit(NewSuppressCommit: Boolean)
@@ -859,16 +860,6 @@ codeunit 5704 "TransferOrder-Post Shipment"
             exit;
         PostponedValueEntries.Add(ValueEntry."Entry No.");
         IsHandled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem', '', false, false)]
-    local procedure OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem(var Item2: Record Item)
-    begin
-        if InvtSetup.UseLegacyPosting() then
-            exit;
-
-        if not ItemsToAdjust.Contains(Item2."No.") then
-            ItemsToAdjust.Add(Item2."No.");
     end;
 
     [IntegrationEvent(false, false)]
@@ -1114,11 +1105,6 @@ codeunit 5704 "TransferOrder-Post Shipment"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferTrackingOnAfterTransferToTransfer(var TempHandlingTrackingSpecification: Record "Tracking Specification"; var FromTransferLine: Record "Transfer Line"; var ToTransferLine: Record "Transfer Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCheckLinesOnAfterTransLineSetFilters(var TransferLine: Record "Transfer Line")
     begin
     end;
 }
