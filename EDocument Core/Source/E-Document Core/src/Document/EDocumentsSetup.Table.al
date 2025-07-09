@@ -3,18 +3,14 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.eServices.EDocument;
-
 using System.Environment;
 using System.Azure.Identity;
 
 table 6107 "E-Documents Setup"
 {
     Access = Internal;
-#pragma warning disable AS0034
-    InherentEntitlements = RIX;
-    InherentPermissions = RX;
-#pragma warning restore AS0034
-    ReplicateData = false;
+    InherentEntitlements = X;
+    InherentPermissions = R;
 
     fields
     {
@@ -45,7 +41,6 @@ table 6107 "E-Documents Setup"
         if Rec.FindFirst() then
             if Rec."New E-Document Experience" then
                 exit(true);
-
         if AzureADTenant.GetAadTenantId() in [
             '7bfacc13-5977-43eb-ae75-63e4cbf78029',
             '5d02776e-8cf2-4fae-8cac-a52cfdfbe90f',
@@ -56,11 +51,9 @@ table 6107 "E-Documents Setup"
             'e5afa896-1f57-4c74-b9cd-65638c0f77da'
         ] then
             exit(true);
-
-        if EnvironmentInformation.GetEnvironmentSetting('EnableNewEDocumentExperience') <> '' then
-            exit(true);
-
-        exit(EnvironmentInformation.GetApplicationFamily() in ['US', 'AU', 'NZ', 'GB'])
+        if not EnvironmentInformation.IsSandbox() then
+            exit(false);
+        exit(EnvironmentInformation.GetEnvironmentSetting('EnableNewEDocumentExperience') <> '');
     end;
 
     [InherentPermissions(PermissionObjectType::TableData, Database::"E-Documents Setup", 'I')]

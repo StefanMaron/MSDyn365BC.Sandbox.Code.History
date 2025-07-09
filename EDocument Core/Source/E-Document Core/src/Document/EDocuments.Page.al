@@ -8,6 +8,7 @@ page 6122 "E-Documents"
 {
     ApplicationArea = Basic, Suite;
     SourceTable = "E-Document";
+    CardPageId = "E-Document";
     PageType = List;
     UsageCategory = Lists;
     AdditionalSearchTerms = 'Edoc,Electronic Document,EDocuments,E Documents,E invoices,Einvoices,Electronic';
@@ -27,13 +28,6 @@ page 6122 "E-Documents"
                 field("Entry No"; Rec."Entry No")
                 {
                     ToolTip = 'Specifies the entry number.';
-
-                    trigger OnDrillDown()
-                    var
-                        EDocumentHelper: Codeunit "E-Document Helper";
-                    begin
-                        EDocumentHelper.OpenDraftPage(Rec);
-                    end;
                 }
                 field("Bill-to/Pay-to No."; Rec."Bill-to/Pay-to No.")
                 {
@@ -68,7 +62,7 @@ page 6122 "E-Documents"
         {
             action(ImportManually)
             {
-                Caption = 'New from file';
+                Caption = 'New From File';
                 ToolTip = 'Create an electronic document by manually uploading a file.';
                 Image = Import;
 
@@ -109,16 +103,15 @@ page 6122 "E-Documents"
         {
             action(InboundEDocuments)
             {
-                Caption = 'Inbound';
+                Caption = 'Inbound E-Documents';
                 ToolTip = 'View inbound electronic documents.';
                 Visible = NewEDocumentExperienceActive;
                 RunObject = Page "Inbound E-Documents";
-                RunPageMode = View;
                 Image = InwardEntry;
             }
             action(OutboundEDocuments)
             {
-                Caption = 'Outbound';
+                Caption = 'Outbound E-Documents';
                 ToolTip = 'View outbound electronic documents.';
                 Visible = NewEDocumentExperienceActive;
                 RunObject = Page "Outbound E-Documents";
@@ -128,10 +121,10 @@ page 6122 "E-Documents"
         area(Promoted)
         {
             actionref(Promoted_ImportManually; ImportManually) { }
+            actionref(Promoted_EDocumentServices; EDocumentServices) { }
             actionref(Promoted_ViewFile; ViewFile) { }
             actionref(Promoted_InboundEDocuments; InboundEDocuments) { }
             actionref(Promoted_OutboundEDocuments; OutboundEDocuments) { }
-            actionref(Promoted_EDocumentServices; EDocumentServices) { }
         }
     }
 
