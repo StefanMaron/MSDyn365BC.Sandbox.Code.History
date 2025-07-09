@@ -1419,11 +1419,10 @@ page 47 "Sales Invoice Subform"
 
     local procedure SetOpenPage()
     var
-        [SecurityFiltering(SecurityFilter::Filtered)]
-        Location: Record Location;
         ServerSetting: Codeunit "Server Setting";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
+        Location: Record Location;
     begin
         OnBeforeSetOpenPage();
 
@@ -1450,7 +1449,6 @@ page 47 "Sales Invoice Subform"
             exit;
 
         SalesHeader.Get(Rec."Document Type", Rec."Document No.");
-        SalesHeader.TestField(Status, SalesHeader.Status::Open);
         SalesCalcDiscByType.ApplyInvDiscBasedOnAmt(InvoiceDiscountAmount, SalesHeader);
         DocumentTotals.SalesDocTotalsNotUpToDate();
         CurrPage.Update(false);
@@ -1589,16 +1587,11 @@ page 47 "Sales Invoice Subform"
     end;
 
     procedure DeltaUpdateTotals()
-    var
-        IsHandled: Boolean;
     begin
         if SuppressTotals then
             exit;
 
-        IsHandled := false;
-        OnBeforeDeltaUpdateTotals(Rec, xRec, SuppressTotals, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeDeltaUpdateTotals(Rec, xRec, SuppressTotals);
 
         DocumentTotals.SalesDeltaUpdateTotals(Rec, xRec, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
         if Rec."Line Amount" <> xRec."Line Amount" then
@@ -1743,7 +1736,7 @@ page 47 "Sales Invoice Subform"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; SuppressTotals: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; SuppressTotals: Boolean)
     begin
     end;
 

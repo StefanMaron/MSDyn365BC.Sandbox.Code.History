@@ -623,7 +623,6 @@ codeunit 5477 "Sales Invoice Aggregator"
         if CheckUpdatesDisabled(DummyGuid) then
             exit;
 
-        SalesInvoiceEntityAggregate.SetLoadFields("Cust. Ledger Entry No.", Posted, "No.", Status);
         SalesInvoiceEntityAggregate.SetRange("Cust. Ledger Entry No.", CustLedgerEntry."Entry No.");
         SalesInvoiceEntityAggregate.SetRange(Posted, true);
 
@@ -837,7 +836,7 @@ codeunit 5477 "Sales Invoice Aggregator"
         SalesInvoiceEntityAggregate: Record "Sales Invoice Entity Aggregate";
         SalesHeader: Record "Sales Header";
     begin
-        if (not RecalculateInvoiceDisc) and (SalesLine.Type = SalesLine.Type::Item) then
+        if not RecalculateInvoiceDisc then
             exit;
 
         if not SalesInvoiceEntityAggregate.Get(SalesLine."Document No.", false) then
