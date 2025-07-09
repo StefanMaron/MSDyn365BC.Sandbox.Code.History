@@ -335,7 +335,7 @@ page 9308 "Purchase Invoices"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStatsaction. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
 
@@ -358,7 +358,7 @@ page 9308 "Purchase Invoices"
                     Visible = not SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif
+#endif                    
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Statistics";
                     RunPageOnRec = true;
@@ -374,7 +374,7 @@ page 9308 "Purchase Invoices"
                     Visible = SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif
+#endif                    
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Stats.";
                     RunPageOnRec = true;
@@ -680,14 +680,11 @@ page 9308 "Purchase Invoices"
 #if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStats action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
                 }
 #else
-                actionref(PurchaseStatistics_Promoted; PurchaseStatistics)
-                {
-                }
                 actionref(PurchaseStats_Promoted; PurchaseStats)
                 {
                 }
@@ -746,7 +743,7 @@ page 9308 "Purchase Invoices"
         JobQueueActive := PurchasesPayablesSetup.JobQueueActive();
 
         Rec.CopyBuyFromVendorFilter();
-        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
+        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Purchase Order Stats.";
     end;
 
     var
@@ -822,13 +819,11 @@ page 9308 "Purchase Invoices"
             Error(TotalsMismatchErr);
     end;
 
-#if not CLEAN26
-    [Obsolete('The Statistics action will be replaced with the PurchaseOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateSalesTaxStatistics(var PurchaseHeader: Record "Purchase Header"; ShowDialog: Boolean)
     begin
     end;
-#endif
+
     [IntegrationEvent(true, false)]
     local procedure OnPostBeforeNavigateAfterPosting(var PurchaseHeader: Record "Purchase Header"; var PostingCodeunitID: Integer; var IsHandled: Boolean)
     begin
