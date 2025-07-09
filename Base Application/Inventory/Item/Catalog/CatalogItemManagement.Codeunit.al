@@ -415,8 +415,6 @@ codeunit 5703 "Catalog Item Management"
             exit;
 
         OnDelNonStockItemOnAfterCheckRelations(Item, ShouldExit);
-        if ShouldExit then
-            exit;
 
         NewItem.Get(Item."No.");
         DeleteCreatedFromNonstockItem();
