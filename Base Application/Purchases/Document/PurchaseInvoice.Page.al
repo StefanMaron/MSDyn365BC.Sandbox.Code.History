@@ -1949,8 +1949,6 @@ page 51 "Purchase Invoice"
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
-        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
-        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetDocNoVisible();
         IsOfficeAddin := OfficeMgt.IsAvailable();
         CreateIncomingDocFromEmailAttachment := OfficeMgt.OCRAvailable();
