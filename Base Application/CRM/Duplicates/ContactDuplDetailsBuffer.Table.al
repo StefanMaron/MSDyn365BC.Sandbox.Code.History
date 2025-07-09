@@ -10,7 +10,6 @@ table 5113 "Contact Dupl. Details Buffer"
 {
     Caption = 'Contact Dupl. Details Buffer';
     DataClassification = CustomerContent;
-    Permissions = tabledata "Duplicate Search String Setup" = ri;
     ReplicateData = false;
 
     fields
