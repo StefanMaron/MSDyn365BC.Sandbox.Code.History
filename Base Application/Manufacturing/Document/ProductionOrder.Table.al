@@ -968,8 +968,6 @@ table 5405 "Production Order"
             WhseRequest.DeleteAll(true);
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
           Database::"Prod. Order Component", Status.AsInteger(), "No.", '', 0, 0, '', false);
-
-        OnAfterDeleteProdOrderRelations(Rec, ProdOrderComment, WhseRequest, ReservMgt, ItemTrackingMgt);
     end;
 
     local procedure DeleteProdOrderLines()
@@ -1370,7 +1368,7 @@ table 5405 "Production Order"
                             CalcProdOrder.Recalculate(ProdOrderLine, 1, true);
                 end;
                 IsHandled := false;
-                OnBeforeUpdateProdOrderLineDueDate(ProdOrderLine, IsHandled, CalcProdOrder);
+                OnBeforeUpdateProdOrderLineDueDate(ProdOrderLine, IsHandled);
                 if not IsHandled then
                     if ProdOrderLine."Planning Level Code" > 0 then
                         ProdOrderLine."Due Date" := ProdOrderLine."Ending Date"
@@ -1737,7 +1735,7 @@ table 5405 "Production Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateProdOrderLineDueDate(var ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean; var CalculateProdOrder: Codeunit "Calculate Prod. Order")
+    local procedure OnBeforeUpdateProdOrderLineDueDate(var ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1845,11 +1843,5 @@ table 5405 "Production Order"
     local procedure OnUpdateAllLineDimOnAfterUpdateProdOrderCompDim(var ProductionOrder: Record "Production Order"; var ProdOrderLine: Record "Prod. Order Line"; NewParentDimSetID: Integer; OldParentDimSetID: Integer);
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterDeleteProdOrderRelations(var ProductionOrder: Record "Production Order"; var ProdOrderCommentLine: Record "Prod. Order Comment Line"; var WhsePickRequest: Record "Whse. Pick Request"; var ReservationManagement: Codeunit "Reservation Management"; var ItemTrackingManagement: Codeunit "Item Tracking Management")
-    begin
-    end;
-
 }
 
