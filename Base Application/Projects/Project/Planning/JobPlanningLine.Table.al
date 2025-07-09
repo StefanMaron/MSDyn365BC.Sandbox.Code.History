@@ -387,8 +387,6 @@ table 1003 "Job Planning Line"
             TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
-            var
-                SkipValidateQuantity: Boolean;
             begin
                 ValidateModification(xRec."Location Code" <> "Location Code", Rec.FieldNo("Location Code"));
 
@@ -397,9 +395,7 @@ table 1003 "Job Planning Line"
                     GetLocation("Location Code");
                     CheckItemAvailable(FieldNo("Location Code"));
                     UpdateReservation(FieldNo("Location Code"));
-                    OnBeforeValidateQuantity(Rec, xRec, SkipValidateQuantity);
-                    if not SkipValidateQuantity then
-                        Validate(Quantity);
+                    Validate(Quantity);
                     SetDefaultBin();
                     JobWarehouseMgt.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Location Code"));
                     InitQtyToAsm();
@@ -1620,21 +1616,6 @@ table 1003 "Job Planning Line"
         OnAfterCopyFieldsFromJob(Rec, xRec, Job);
     end;
 
-    /// <summary>
-    /// Renames all Job Planning Line "No." values for the specified LineType and OldNo to NewNo.
-    /// </summary>
-    /// <param name="LineType">The type of the job planning line.</param>
-    /// <param name="OldNo">The old number to be replaced.</param>
-    /// <param name="NewNo">The new number to set.</param>
-    procedure RenameNo(LineType: Enum "Job Planning Line Type"; OldNo: Code[20]; NewNo: Code[20])
-    begin
-        Reset();
-        SetRange(Type, LineType);
-        SetRange("No.", OldNo);
-        if not Rec.IsEmpty() then
-            ModifyAll("No.", NewNo, true);
-    end;
-
     local procedure CheckQuantityPosted()
     var
         IsHandled: Boolean;
@@ -2052,22 +2033,20 @@ table 1003 "Job Planning Line"
         GetJob();
         if (Type = Type::Item) and Item.Get("No.") then
             if Item."Costing Method" = Item."Costing Method"::Standard then
-                if RetrieveCostPrice(CurrFieldNo) then begin
+                if RetrieveCostPrice(CurrFieldNo) or (CurrFieldNo = FieldNo("Unit Price")) then begin
                     if GetSKU() then
                         "Unit Cost (LCY)" := Round(SKU."Unit Cost" * "Qty. per Unit of Measure", UnitAmountRoundingPrecision)
                     else
                         "Unit Cost (LCY)" := Round(Item."Unit Cost" * "Qty. per Unit of Measure", UnitAmountRoundingPrecision);
-
-                    "Unit Cost" := ConvertAmountToFCY("Unit Cost (LCY)", UnitAmountRoundingPrecisionFCY);
+                    if not (CurrFieldNo = FieldNo("Unit Price")) then
+                        "Unit Cost" := ConvertAmountToFCY("Unit Cost (LCY)", UnitAmountRoundingPrecisionFCY);
                 end else
                     RecalculateAmounts(Job."Exch. Calculation (Cost)", xRec."Unit Cost", "Unit Cost", "Unit Cost (LCY)")
             else
                 if RetrieveCostPrice(CurrFieldNo) or (CurrFieldNo = FieldNo("Unit Price")) then begin
                     CalculateRetrievedCost(RetrievedCost);
-                    if not (CurrFieldNo = FieldNo("Unit Price")) then begin
-                        "Unit Cost" := ConvertAmountToFCY(RetrievedCost, UnitAmountRoundingPrecisionFCY);
-                        "Unit Cost (LCY)" := Round(RetrievedCost, UnitAmountRoundingPrecision);
-                    end;
+                    "Unit Cost" := ConvertAmountToFCY(RetrievedCost, UnitAmountRoundingPrecisionFCY);
+                    "Unit Cost (LCY)" := Round(RetrievedCost, UnitAmountRoundingPrecision);
                 end else
                     RecalculateAmounts(Job."Exch. Calculation (Cost)", xRec."Unit Cost", "Unit Cost", "Unit Cost (LCY)")
         else
@@ -2274,12 +2253,9 @@ table 1003 "Job Planning Line"
 
         if (xRec."Currency Factor" <> "Currency Factor") and
            (Amount = xAmount) and (JobExchCalculation = JobExchCalculation::"Fixed LCY")
-        then begin
-            Amount := ConvertAmountToFCY(AmountLCY, UnitAmountRoundingPrecisionFCY);
-            exit;
-        end;
-
-        if (Amount <> xAmount) then
+        then
+            Amount := ConvertAmountToFCY(AmountLCY, UnitAmountRoundingPrecisionFCY)
+        else
             AmountLCY := ConvertAmountToLCY(Amount, UnitAmountRoundingPrecision);
     end;
 
@@ -2445,6 +2421,7 @@ table 1003 "Job Planning Line"
 
     local procedure UpdateRemainingQuantity()
     var
+        Delta: Decimal;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -2452,8 +2429,11 @@ table 1003 "Job Planning Line"
         if IsHandled then
             exit;
 
-        if "Usage Link" then
-            ControlUsageLink();
+        if "Usage Link" and (xRec."No." = "No.") then begin
+            Delta := Quantity - xRec.Quantity;
+            Validate("Remaining Qty.", "Remaining Qty." + Delta);
+            Validate("Qty. to Transfer to Journal", "Qty. to Transfer to Journal" + Delta);
+        end;
     end;
 
     procedure UpdateQtyToTransfer()
@@ -3771,11 +3751,6 @@ table 1003 "Job Planning Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateQtyToTransfer(var JobPlanningLine: Record "Job Planning Line"; CurrFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateQuantity(JobPlanningLine: Record "Job Planning Line"; xJobPlanningLine: Record "Job Planning Line"; var SkipValidateQuantity: Boolean)
     begin
     end;
 }
