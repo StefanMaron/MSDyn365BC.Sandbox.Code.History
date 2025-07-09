@@ -289,6 +289,9 @@
       "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
     },
     {
+      "path": "./EDocumentConnectors/Continia/Test/E-Document Connector - Continia Tests"
+    },
+    {
       "path": "./EDocumentConnectors/Pagero/Test/E-Document Connector - Pagero Tests"
     },
     {
