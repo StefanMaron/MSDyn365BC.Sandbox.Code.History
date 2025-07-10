@@ -45,6 +45,13 @@ page 6181 "E-Document Purchase Draft"
                         CurrPage.Update();
                     end;
                 }
+                field(DraftType; Rec."Read into Draft Impl.")
+                {
+                    Caption = 'Draft Type';
+                    ToolTip = 'Specifies the type of draft document.';
+                    Visible = false;
+                    Editable = false;
+                }
                 group("Buy-from")
                 {
                     ShowCaption = false;
