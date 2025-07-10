@@ -28,9 +28,6 @@
       "path": "./DataSearch/test/Data Search Tests"
     },
     {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
-    },
-    {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
@@ -274,9 +271,6 @@
       "path": "./Email - Microsoft 365 Connector/Test/Email - Microsoft 365 Connector Tests"
     },
     {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
-    },
-    {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
@@ -306,10 +300,10 @@
   ],
   "settings": {
     "al.enableCodeActions": false,
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
-    },
-    "allint.enabled": false,
-    "al.enableCodeAnalysis": false
+    }
   }
 }
