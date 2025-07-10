@@ -18,7 +18,6 @@ codeunit 30179 "Shpfy Product Image Export"
         NewImageId: BigInteger;
         Hash: Integer;
         ImageExists: Boolean;
-        JRequest: JsonObject;
     begin
         if Shop."Sync Item Images" <> Shop."Sync Item Images"::"To Shopify" then
             exit;
@@ -44,9 +43,6 @@ codeunit 30179 "Shpfy Product Image Export"
             Rec.Modify();
         end else begin
             ProductApi.UpdateShopifyProductImage(Rec, Item, BulkOperationInput, ParametersList, CurrRecordCount);
-            JRequest.Add('id', Rec.Id);
-            JRequest.Add('imageHash', Rec."Image Hash");
-            JRequestData.Add(JRequest);
             Rec."Image Hash" := Hash;
             Rec.Modify();
         end;
@@ -59,7 +55,6 @@ codeunit 30179 "Shpfy Product Image Export"
         NullGuid: Guid;
         ParametersList: List of [Dictionary of [Text, Text]];
         BulkOperationInput: TextBuilder;
-        JRequestData: JsonArray;
 
     /// <summary> 
     /// Set Shop.
@@ -97,10 +92,5 @@ codeunit 30179 "Shpfy Product Image Export"
     internal procedure GetParametersList(): List of [Dictionary of [Text, Text]]
     begin
         exit(ParametersList);
-    end;
-
-    internal procedure GetRequestData(): JsonArray
-    begin
-        exit(JRequestData);
     end;
 }
