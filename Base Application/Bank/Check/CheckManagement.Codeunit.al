@@ -797,9 +797,7 @@ codeunit 367 CheckManagement
             GenJournalLine."Account Type"::Customer:
                 ClearApplnCustLedgerEntries(GenJournalLine);
             GenJournalLine."Account Type"::Vendor:
-                if ShouldClearApplnVendorLedgerEntries(GenJournalLine) then
-                    ClearApplnVendorLedgerEntries(GenJournalLine);
-
+                ClearApplnVendorLedgerEntries(GenJournalLine);
             GenJournalLine."Account Type"::Employee:
                 ClearApplnEmployeeLedgerEntries(GenJournalLine);
         end
@@ -935,11 +933,6 @@ codeunit 367 CheckManagement
         BankAccountLedgerEntry."Remaining Amount" := 0;
         BankAccountLedgerEntry."Statement Status" := BankAccLedgEntry2."Statement Status"::Closed;
         BankAccountLedgerEntry.Modify();
-    end;
-
-    local procedure ShouldClearApplnVendorLedgerEntries(GenJournalLine: Record "Gen. Journal Line"): Boolean
-    begin
-        exit((GenJournalLine."Applies-to ID" = '') or (GenJournalLine."Applies-to Doc. Type" <> GenJournalLine."Applies-to Doc. Type"::Invoice));
     end;
 
     [IntegrationEvent(false, false)]
