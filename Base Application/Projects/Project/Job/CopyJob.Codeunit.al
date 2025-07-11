@@ -188,7 +188,6 @@ codeunit 1006 "Copy Job"
                     TargetJobPlanningLine."Completely Picked" := false;
                     TargetJobPlanningLine."Ledger Entry No." := 0;
                     TargetJobPlanningLine."Ledger Entry Type" := TargetJobPlanningLine."Ledger Entry Type"::" ";
-                    TargetJobPlanningLine."System-Created Entry" := false;
                     OnCopyJobPlanningLinesOnBeforeTargetJobPlanningLineInsert(TargetJobPlanningLine, SourceJobPlanningLine);
                     TargetJobPlanningLine.Insert(true);
                     OnCopyJobPlanningLinesOnAfterTargetJobPlanningLineInsert(TargetJobPlanningLine, SourceJobPlanningLine);
