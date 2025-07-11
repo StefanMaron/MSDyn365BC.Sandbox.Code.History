@@ -117,8 +117,7 @@ codeunit 57 "Document Totals"
                         SalesLine2.CopyFilters(TotalSalesLine2);
                         SalesLine2.SetRange("Allow Invoice Disc.", true);
                         SalesLine2.CalcSums("Line Amount");
-                        if SalesLine2."Line Amount" <> 0 then
-                            InvoiceDiscountPct := Round(InvoiceDiscountAmount / SalesLine2."Line Amount" * 100, 0.00001);
+                        InvoiceDiscountPct := Round(InvoiceDiscountAmount / SalesLine2."Line Amount" * 100, 0.00001);
                         TotalSalesHeader."Invoice Discount Value" := InvoiceDiscountAmount;
                     end;
             end;
@@ -704,8 +703,7 @@ codeunit 57 "Document Totals"
                         PurchaseLine2.CopyFilters(TotalPurchaseLine2);
                         PurchaseLine2.SetRange("Allow Invoice Disc.", true);
                         PurchaseLine2.CalcSums("Line Amount");
-                        if PurchaseLine2."Line Amount" <> 0 then
-                            InvoiceDiscountPct := Round(InvoiceDiscountAmount / PurchaseLine2."Line Amount" * 100, 0.00001);
+                        InvoiceDiscountPct := Round(InvoiceDiscountAmount / PurchaseLine2."Line Amount" * 100, 0.00001);
                         TotalPurchaseHeader."Invoice Discount Value" := InvoiceDiscountAmount;
                     end;
             end;
