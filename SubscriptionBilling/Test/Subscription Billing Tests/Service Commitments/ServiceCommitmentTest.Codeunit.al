@@ -22,7 +22,6 @@ codeunit 148156 "Service Commitment Test"
         ContractTestLibrary: Codeunit "Contract Test Library";
         LibraryRandom: Codeunit "Library - Random";
         LibrarySales: Codeunit "Library - Sales";
-        LibraryTestInitialize: Codeunit "Library - Test Initialize";
         PackageLineMissingInvoicingItemNoErr: Label 'The %1 %2 can not be used with Item %3, because at least one of the Service Commitment Package lines is missing an %4.', Locked = true;
 
     #region Tests
@@ -219,7 +218,6 @@ codeunit 148156 "Service Commitment Test"
         FromDocNo: Code[20];
     begin
         // [SCENARIO] When sales order is created from sales quote expect that qty to invoice is set to 0 in case of Subscription Items
-        Initialize();
         ContractTestLibrary.InitContractsApp();
 
         // [GIVEN]  Create Subscription Item
@@ -429,7 +427,6 @@ codeunit 148156 "Service Commitment Test"
 
     local procedure Initialize()
     begin
-        LibraryTestInitialize.OnTestInitialize(Codeunit::"Service Commitment Test");
         ClearAll();
 
         ContractTestLibrary.CreateServiceCommitmentTemplate(ServiceCommitmentTemplate);

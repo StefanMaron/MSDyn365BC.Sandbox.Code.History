@@ -19,7 +19,6 @@ table 6141 "E-Doc. Record Link"
     InherentEntitlements = RIMDX;
     InherentPermissions = RIMDX;
     Access = Internal;
-    ReplicateData = false;
 
     fields
     {
