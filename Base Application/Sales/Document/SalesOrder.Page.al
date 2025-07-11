@@ -417,11 +417,6 @@ page 42 "Sales Order"
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the period to use when reporting for general public customers';
                 }
-                field("CFDI Certificate of Origin No."; Rec."CFDI Certificate of Origin No.")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the identifier which was used to pay for the issuance of the certificate of origin.';
-                }
                 group("Work Description")
                 {
                     Caption = 'Work Description';
@@ -2928,7 +2923,7 @@ page 42 "Sales Order"
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
         BasicEUEnabled := ApplicationAreaMgmtFacade.IsBasicCountryEnabled('EU');
 
-        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
+        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Sales Order Stats.";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean

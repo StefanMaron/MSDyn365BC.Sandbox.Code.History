@@ -44,11 +44,6 @@ pageextension 10014 "Posted Service Invoice NA" extends "Posted Service Invoice"
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies a code to indicate if the document is used for exports to other countries.';
                 }
-                field("CFDI Certificate of Origin No."; Rec."CFDI Certificate of Origin No.")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the identifier which was used to pay for the issuance of the certificate of origin.';
-                }
                 field(Control1310005; Rec."Foreign Trade")
                 {
                     ApplicationArea = BasicMX;
@@ -222,32 +217,6 @@ pageextension 10014 "Posted Service Invoice NA" extends "Posted Service Invoice"
             end;
         }
 #endif
-        addafter(ServiceStatistics)
-        {
-            action(ServiceStats)
-            {
-                ApplicationArea = Service;
-                Caption = 'Statistics';
-                Image = Statistics;
-                ShortCutKey = 'F7';
-                ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-#if CLEAN27
-                    Visible = SalesTaxStatisticsVisible;
-#else
-                Visible = false;
-#endif
-                RunObject = Page "Service Invoice Stats.";
-                RunPageOnRec = true;
-            }
-        }
-#if CLEAN27
-        addafter(ServiceStatistics_Promoted)
-        {
-            actionref(ServiceStats_Promoted; ServiceStats)
-            {
-            }
-        }
-#endif
     }
 
     trigger OnOpenPage()
@@ -257,7 +226,6 @@ pageextension 10014 "Posted Service Invoice NA" extends "Posted Service Invoice"
         GLSetup.SetLoadFields("Multiple SAT Certificates");
         GLSetup.Get();
         SATCertInLocationEnabled := EInvoiceMgt.IsPACEnvironmentEnabled() and GLSetup."Multiple SAT Certificates";
-        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     trigger OnAfterGetRecord()
@@ -272,9 +240,6 @@ pageextension 10014 "Posted Service Invoice NA" extends "Posted Service Invoice"
         SATCertificateCode: Text;
         SATCertificateName: Text;
         SATCertificateSource: Text;
-
-    protected var
-        SalesTaxStatisticsVisible: Boolean;
 
     local procedure UpdateSATCertificateFields()
     var
