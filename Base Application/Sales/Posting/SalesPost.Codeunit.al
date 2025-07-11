@@ -216,7 +216,6 @@ codeunit 80 "Sales-Post"
         DropShipOrder: Boolean;
         DocumentIsReadyToBeChecked: Boolean;
         PostponedValueEntries: List of [Integer];
-        ItemsToAdjust: List of [Code[20]];
         CannotAssignInvoicedErr: Label 'You cannot assign item charges to the %1 %2 = %3,%4 = %5, %6 = %7, because it has been invoiced.', Comment = '%1 = Sales Line, %2/%3 = Document Type, %4/%5 - Document No.,%6/%7 = Line No.';
         InvoiceMoreThanReceivedErr: Label 'You cannot invoice more than you have received for return order %1.', Comment = '%1 = Order No.';
         ReturnReceiptLinesDeletedErr: Label 'The return receipt lines have been deleted.';
@@ -535,7 +534,7 @@ codeunit 80 "Sales-Post"
             TotalSalesLineLCY."Unit Cost (LCY)" := -TotalSalesLineLCY."Unit Cost (LCY)";
         end;
 
-        OnProcessPostingLinesOnBeforePostDropOrderShipment(SalesHeader, TotalSalesLine, TotalSalesLineLCY);
+        OnProcessPostingLinesOnBeforePostDropOrderShipment(SalesHeader, TotalSalesLine);
         PostDropOrderShipment(SalesHeader, TempDropShptPostBuffer);
         if SalesHeader.Invoice then
             PostInvoice(SalesHeader, CustLedgEntry, LineCount);
@@ -3584,11 +3583,9 @@ codeunit 80 "Sales-Post"
     var
         NoVAT: Boolean;
         IsHandled: Boolean;
-        BefIncrTotalSalesLineAmtInclVAT: Decimal;
     begin
         OnBeforeRoundAmount(SalesHeader, SalesLine, SalesLineQty, CurrExchRate);
 
-        BefIncrTotalSalesLineAmtInclVAT := TotalSalesLine."Amount Including VAT";
         IncrAmount(SalesHeader, SalesLine, TotalSalesLine);
         Increment(TotalSalesLine."Net Weight", Round(SalesLineQty * SalesLine."Net Weight", UOMMgt.WeightRndPrecision()));
         Increment(TotalSalesLine."Gross Weight", Round(SalesLineQty * SalesLine."Gross Weight", UOMMgt.WeightRndPrecision()));
@@ -3606,22 +3603,12 @@ codeunit 80 "Sales-Post"
         if not IsHandled then
             if SalesHeader."Currency Code" <> '' then begin
                 NoVAT := SalesLine.Amount = SalesLine."Amount Including VAT";
-                if SalesLine."VAT Calculation Type" = SalesLine."VAT Calculation Type"::"Sales Tax" then
-                    SalesLine."Amount Including VAT" :=
-                        Round(
-                            CurrExchRate.ExchangeAmtFCYToLCY(
-                                SalesHeader.GetUseDate(), SalesHeader."Currency Code",
-                                TotalSalesLine."Amount Including VAT", SalesHeader."Currency Factor") -
-                            CurrExchRate.ExchangeAmtFCYToLCY(
-                                SalesHeader.GetUseDate(), SalesHeader."Currency Code",
-                                BefIncrTotalSalesLineAmtInclVAT, SalesHeader."Currency Factor"))
-                else
-                    SalesLine."Amount Including VAT" :=
-                      Round(
-                        CurrExchRate.ExchangeAmtFCYToLCY(
-                          SalesHeader.GetUseDate(), SalesHeader."Currency Code",
-                          TotalSalesLine."Amount Including VAT", SalesHeader."Currency Factor")) -
-                        TotalSalesLineLCY."Amount Including VAT";
+                SalesLine."Amount Including VAT" :=
+                  Round(
+                    CurrExchRate.ExchangeAmtFCYToLCY(
+                      SalesHeader.GetUseDate(), SalesHeader."Currency Code",
+                      TotalSalesLine."Amount Including VAT", SalesHeader."Currency Factor")) -
+                  TotalSalesLineLCY."Amount Including VAT";
                 if NoVAT then
                     SalesLine.Amount := SalesLine."Amount Including VAT"
                 else
@@ -8068,7 +8055,7 @@ codeunit 80 "Sales-Post"
             IsHandled := false;
             OnBeforeMakeInventoryAdjustment(InvtSetup, InvtAdjmtHandler, IsHandled);
             if not IsHandled then
-                InvtAdjmtHandler.MakeAutomaticInventoryAdjustment(ItemsToAdjust);
+                InvtAdjmtHandler.MakeInventoryAdjustment(true, InvtSetup."Automatic Cost Posting");
         end;
     end;
 
@@ -10876,18 +10863,6 @@ codeunit 80 "Sales-Post"
         IsHandled := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem', '', false, false)]
-    local procedure OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem(var Item2: Record Item)
-    var
-        InventorySetup: Record "Inventory Setup";
-    begin
-        if InventorySetup.UseLegacyPosting() then
-            exit;
-
-        if not ItemsToAdjust.Contains(Item2."No.") then
-            ItemsToAdjust.Add(Item2."No.");
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnArchivePurchaseOrdersOnBeforePurchOrderLineModify(var PurchOrderLine: Record "Purchase Line"; var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary)
     begin
@@ -12476,7 +12451,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnProcessPostingLinesOnBeforePostDropOrderShipment(SalesHeader: Record "Sales Header"; TotalSalesLine: Record "Sales Line"; TotalSalesLineLCY: Record "Sales Line")
+    local procedure OnProcessPostingLinesOnBeforePostDropOrderShipment(SalesHeader: Record "Sales Header"; TotalSalesLine: Record "Sales Line")
     begin
     end;
 
