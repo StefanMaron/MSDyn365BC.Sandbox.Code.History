@@ -182,7 +182,10 @@ codeunit 5813 "Undo Purchase Receipt Line"
             if HasInvoicedNotReturnedQuantity(PurchRcptLine) then
                 Error(Text004);
         if PurchRcptLine.Type = PurchRcptLine.Type::Item then begin
-            CheckPurchRcptLineFields(PurchRcptLine);
+            PurchRcptLine.TestField("Prod. Order No.", '');
+            PurchRcptLine.TestField("Sales Order No.", '');
+            PurchRcptLine.TestField("Sales Order Line No.", 0);
+
             UndoPostingMgt.TestPurchRcptLine(PurchRcptLine);
             IsHandled := false;
             OnCheckPurchRcptLineOnBeforeCollectItemLedgEntries(PurchRcptLine, TempItemLedgEntry, IsHandled);
@@ -542,20 +545,6 @@ codeunit 5813 "Undo Purchase Receipt Line"
         end;
     end;
 
-    local procedure CheckPurchRcptLineFields(var PurchRcptLine: Record "Purch. Rcpt. Line")
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCheckPurchRcptLineFields(PurchRcptLine, IsHandled);
-        if IsHandled then
-            exit;
-
-        PurchRcptLine.TestField("Prod. Order No.", '');
-        PurchRcptLine.TestField("Sales Order No.", '');
-        PurchRcptLine.TestField("Sales Order Line No.", 0);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterCode(var PurchRcptLine: Record "Purch. Rcpt. Line"; var UndoPostingManagement: Codeunit "Undo Posting Management")
     begin
@@ -688,11 +677,6 @@ codeunit 5813 "Undo Purchase Receipt Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCodeOnBeforeLoopPurchRcptLine(var PurchRcptLine: Record "Purch. Rcpt. Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckPurchRcptLineFields(var PurchRcptLine: Record "Purch. Rcpt. Line"; var IsHandled: Boolean)
     begin
     end;
 }
