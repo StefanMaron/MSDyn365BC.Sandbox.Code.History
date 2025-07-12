@@ -291,7 +291,7 @@ table 1173 "Document Attachment"
         exit(false);
     end;
 
-    procedure SupportedByFileViewer(): Boolean
+    internal procedure SupportedByFileViewer(): Boolean
     begin
         case Rec."File Type" of
             Rec."File Type"::PDF:
@@ -607,7 +607,7 @@ table 1173 "Document Attachment"
         exit(TenantMedia."Mime Type");
     end;
 
-    procedure ViewFile()
+    internal procedure ViewFile()
     var
         TempBlob: Codeunit "Temp Blob";
         FileInStream: InStream;
