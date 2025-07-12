@@ -309,10 +309,14 @@ codeunit 7764 "AOAI Chat Messages Impl"
         Preprompt: Text;
         Postprompt: Text;
     begin
-        if not AzureKeyVault.GetAzureKeyVaultSecret('AOAI-Preprompt-Chat', Preprompt) then
+        if not AzureKeyVault.GetAzureKeyVaultSecret('AOAI-Preprompt-Chat', Preprompt) then begin
             Telemetry.LogMessage('0000LX4', TelemetryPrepromptRetrievalErr, Verbosity::Error, DataClassification::SystemMetadata);
-        if not AzureKeyVault.GetAzureKeyVaultSecret('AOAI-Postprompt-Chat', Postprompt) then
+            Error(MetapromptLoadingErr);
+        end;
+        if not AzureKeyVault.GetAzureKeyVaultSecret('AOAI-Postprompt-Chat', Postprompt) then begin
             Telemetry.LogMessage('0000LX5', TelemetryPostpromptRetrievalErr, Verbosity::Error, DataClassification::SystemMetadata);
+            Error(MetapromptLoadingErr);
+        end;
 
         exit(Preprompt + Message + Postprompt);
     end;
@@ -322,7 +326,6 @@ codeunit 7764 "AOAI Chat Messages Impl"
     var
         AzureKeyVault: Codeunit "Azure Key Vault";
         EnvironmentInformation: Codeunit "Environment Information";
-        ModuleInfo: ModuleInfo;
         KVSecret: Text;
     begin
         if not EnvironmentInformation.IsSaaSInfrastructure() then
@@ -332,9 +335,7 @@ codeunit 7764 "AOAI Chat Messages Impl"
             UsingMicrosoftMetaprompt := true
         else begin
             Telemetry.LogMessage('0000LX6', TelemetryMetapromptRetrievalErr, Verbosity::Error, DataClassification::SystemMetadata);
-            NavApp.GetCurrentModuleInfo(ModuleInfo);
-            if ModuleInfo.Publisher = 'Microsoft' then
-                Error(MetapromptLoadingErr);
+            Error(MetapromptLoadingErr);
         end;
         Metaprompt := KVSecret;
     end;
