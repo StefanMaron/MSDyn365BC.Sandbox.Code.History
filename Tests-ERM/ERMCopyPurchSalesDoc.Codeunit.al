@@ -3019,7 +3019,6 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
     end;
 
     [Test]
-    [HandlerFunctions('ConfirmHandlerYes')]
     procedure CorrectiveSalesCreditMemoLineOrder()
     var
         Item: Array[2] of Record Item;
@@ -3188,7 +3187,6 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
     end;
 
     [Test]
-    [HandlerFunctions('ConfirmHandlerYes')]
     procedure CorrectivePurchCreditMemoLineOrder()
     var
         Item: Array[2] of Record Item;
