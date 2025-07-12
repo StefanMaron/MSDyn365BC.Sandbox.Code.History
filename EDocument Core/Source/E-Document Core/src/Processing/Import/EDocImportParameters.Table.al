@@ -21,8 +21,5 @@ table 6106 "E-Doc. Import Parameters"
         {
             OptionMembers = "Inherit from service","Create purchase document","Create journal line";
         }
-        field(4; "Create Document V1 Behavior"; Boolean)
-        {
-        }
     }
 }

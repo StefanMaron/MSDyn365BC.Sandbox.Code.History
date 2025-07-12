@@ -801,7 +801,7 @@ report 790 "Calculate Inventory"
         IsCalculated: Boolean;
     begin
         IsHandled := false;
-        OnBeforeItemBinLocationIsCalculated("Item Ledger Entry", IsHandled, IsCalculated, WhseEntry);
+        OnBeforeItemBinLocationIsCalculated("Item Ledger Entry", IsHandled, IsCalculated);
         if IsHandled then
             exit(IsCalculated);
 
@@ -1142,7 +1142,7 @@ report 790 "Calculate Inventory"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeItemBinLocationIsCalculated(ItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean; var IsCalculated: Boolean; var WarehouseEntry: Record "Warehouse Entry")
+    local procedure OnBeforeItemBinLocationIsCalculated(ItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean; var IsCalculated: Boolean)
     begin
     end;
 

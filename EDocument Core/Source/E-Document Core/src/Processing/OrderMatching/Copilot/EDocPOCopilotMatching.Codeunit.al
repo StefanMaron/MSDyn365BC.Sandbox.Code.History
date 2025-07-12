@@ -8,6 +8,7 @@ using Microsoft.eServices.EDocument.OrderMatch;
 using System.Environment;
 using Microsoft.eServices.EDocument;
 using System.Telemetry;
+using System.Upgrade;
 
 codeunit 6163 "E-Doc. PO Copilot Matching"
 {
@@ -144,6 +145,15 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
         end;
     end;
 
+    procedure IsCopilotVisible(): Boolean
+    var
+        CopilotCapability: Codeunit "Copilot Capability";
+        AIMatchingImpl: Codeunit "E-Doc. PO Copilot Matching";
+    begin
+        AIMatchingImpl.RegisterAICapability();
+        exit(CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"E-Document Matching Assistance"));
+    end;
+
     procedure SumUnitCostForAIMatches(var TempAIProposalBuffer: Record "E-Doc. PO Match Prop. Buffer" temporary) Sum: Decimal
     var
         EDocument: Record "E-Document";
@@ -164,14 +174,19 @@ codeunit 6163 "E-Doc. PO Copilot Matching"
     var
         CopilotCapability: Codeunit "Copilot Capability";
         EnvironmentInformation: Codeunit "Environment Information";
+        UpgradeTag: Codeunit "Upgrade Tag";
     begin
         if not EnvironmentInformation.IsSaaSInfrastructure() then
             exit;
 
-        if not CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"E-Document Matching Assistance") then begin
+        if UpgradeTag.HasUpgradeTag(RegisterEDocumentPurchaseOrderMatchingCopilotCapability()) then
+            exit;
+
+        if not CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"E-Document Matching Assistance") then
             CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"E-Document Matching Assistance", LearnMoreUrlTxt);
-            FeatureTelemetry.LogUptake('0000MMI', FeatureName(), Enum::"Feature Uptake Status"::"Set up");
-        end;
+
+        UpgradeTag.SetUpgradeTag(RegisterEDocumentPurchaseOrderMatchingCopilotCapability());
+        FeatureTelemetry.LogUptake('0000MMI', FeatureName(), Enum::"Feature Uptake Status"::"Set up");
     end;
 
     local procedure PreparePrompt(Prompt: Text): Text

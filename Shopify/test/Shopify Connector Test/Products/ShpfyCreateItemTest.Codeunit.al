@@ -8,7 +8,6 @@ codeunit 139567 "Shpfy Create Item Test"
 
     var
         LibraryAssert: codeunit "Library Assert";
-        LibraryRandom: codeunit "Library - Random";
 
     [Test]
     procedure UnitTestCreateItemSKUIsItemNo()
@@ -53,9 +52,6 @@ codeunit 139567 "Shpfy Create Item Test"
     procedure UnitTestCreateItemSKUIsItemNoFromProductWithMultiVariants()
     var
         Item: Record Item;
-        UnitOfMeasure: Record "Unit of Measure";
-        ItemUnitOfMeasure: Record "Item Unit of Measure";
-        ItemTempl: Record "Item Templ.";
         Shop: Record "Shpfy Shop";
         ShopifyProduct: Record "Shpfy Product";
         ShopifyVariant: Record "Shpfy Variant";
@@ -68,13 +64,6 @@ codeunit 139567 "Shpfy Create Item Test"
         Shop := InitializeTest.CreateShop();
         Shop."SKU Mapping" := "Shpfy SKU Mapping"::"Item No.";
         Shop.Modify();
-
-        // [GIVEN] Item template with unit of measure
-        ItemTempl.Get(Shop."Item Templ. Code");
-        UnitOfMeasure.Code := LibraryRandom.RandText(MaxStrLen(UnitOfMeasure.Code));
-        UnitOfMeasure.Insert();
-        ItemTempl."Base Unit of Measure" := UnitOfMeasure.Code;
-        ItemTempl.Modify();
 
         // [GIVEN] A Shopify variant record of a standard shopify product. (The variant record always exists, even if the products don't have any variants.)
         ShopifyVariant := ProductInitTest.CreateProductWithMultiVariants(Shop);
@@ -98,16 +87,11 @@ codeunit 139567 "Shpfy Create Item Test"
                 LibraryAssert.AreEqual(CopyStr(ShopifyProduct.Title, 1, MaxStrLen(Item.Description)), Item.Description, 'Description');
                 LibraryAssert.AreEqual(ShopifyVariant."Unit Cost", Item."Unit Cost", 'Unit Cost');
                 LibraryAssert.AreEqual(ShopifyVariant.Price, Item."Unit Price", 'Unit Price');
-
-                // [THEN] Check Item unit of measure
-                LibraryAssert.AreEqual(ItemTempl."Base Unit of Measure", Item."Base Unit of Measure", 'Item."Base Unit of Measure" = ItemTempl."Base Unit of Measure"');
-                ItemUnitOfMeasure.SetRange("Item No.", Item."No.");
-                LibraryAssert.RecordIsNotEmpty(ItemUnitOfMeasure);
             until ShopifyVariant.Next() = 0;
     end;
 
     [Test]
-    procedure UnitTestCreateItemSKUIsItemNoAndVariantCode()
+    procedure UnitTestCreateItemSKUIsItemNoAndVaraintCode()
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";

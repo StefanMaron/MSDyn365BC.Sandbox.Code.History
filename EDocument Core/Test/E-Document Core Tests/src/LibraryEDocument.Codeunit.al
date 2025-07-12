@@ -56,7 +56,6 @@ codeunit 139629 "Library - E-Document"
         WorkflowSetup: Codeunit "Workflow Setup";
         WorkflowCode: Code[20];
     begin
-        LibraryWorkflow.DeleteAllExistingWorkflows();
         WorkflowSetup.InitWorkflow();
         SetupCompanyInfo();
 
@@ -206,74 +205,6 @@ codeunit 139629 "Library - E-Document"
         EDocumentServiceStatus.Insert();
     end;
 
-    procedure MockPurchaseDraftPrepared(EDocument: Record "E-Document")
-    var
-        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
-        EDocumentProcessing: Codeunit "E-Document Processing";
-    begin
-        EDocumentPurchaseHeader.InsertForEDocument(EDocument);
-        EDocumentPurchaseHeader."Sub Total" := 1000;
-        EDocumentPurchaseHeader."Total VAT" := 100;
-        EDocumentPurchaseHeader.Total := 1100;
-        EDocumentPurchaseHeader.Modify();
-        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Draft Ready");
-        EDocument."Document Type" := "E-Document Type"::"Purchase Invoice";
-        EDocument.Modify();
-    end;
-
-    procedure CreateInboundPEPPOLDocumentToState(var EDocument: Record "E-Document"; EDocumentService: Record "E-Document Service"; FileName: Text; EDocImportParams: Record "E-Doc. Import Parameters"): Boolean
-    var
-        EDocImport: Codeunit "E-Doc. Import";
-        InStream: InStream;
-    begin
-        NavApp.GetResource(FileName, InStream, TextEncoding::UTF8);
-        EDocImport.CreateFromType(EDocument, EDocumentService, Enum::"E-Doc. File Format"::XML, 'TestFile', InStream);
-        exit(EDocImport.ProcessIncomingEDocument(EDocument, EDocImportParams));
-    end;
-
-    /// <summary>
-    /// Given a purchase header with purchase lines created from an e-document, it modifies the required fields to make it ready for posting.
-    /// </summary>
-    procedure EditPurchaseDocumentFromEDocumentForPosting(var PurchaseHeader: Record "Purchase Header"; var EDocument: Record "E-Document")
-    var
-        PurchaseLine: Record "Purchase Line";
-        GLAccount: Record "G/L Account";
-        GeneralPostingSetup: Record "General Posting Setup";
-        GenBusinessPostingGroup: Record "Gen. Business Posting Group";
-        GenProductPostingGroup: Record "Gen. Product Posting Group";
-        VATBusinessPostingGroup: Record "VAT Business Posting Group";
-        VATProductPostingGroup: Record "VAT Product Posting Group";
-        LocalVATPostingSetup: Record "VAT Posting Setup";
-    begin
-        Assert.AreEqual(EDocument.SystemId, PurchaseHeader."E-Document Link", 'The purchase header has no link to the e-document.');
-        LibraryERM.CreateGenBusPostingGroup(GenBusinessPostingGroup);
-        LibraryERM.CreateGenProdPostingGroup(GenProductPostingGroup);
-        LibraryERM.CreateGeneralPostingSetup(GeneralPostingSetup, GenBusinessPostingGroup.Code, GenProductPostingGroup.Code);
-        LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
-        LibraryERM.CreateVATProductPostingGroup(VATProductPostingGroup);
-        LibraryERM.CreateVATPostingSetup(LocalVATPostingSetup, VATBusinessPostingGroup.Code, VATProductPostingGroup.Code);
-        LibraryERM.CreateGLAccount(GLAccount);
-        LocalVATPostingSetup."Purchase VAT Account" := GLAccount."No.";
-        LocalVATPostingSetup.Modify();
-        LibraryERM.CreateGLAccount(GLAccount);
-        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
-        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
-        PurchaseLine.FindSet();
-        repeat
-            PurchaseLine.Type := PurchaseLine.Type::"G/L Account";
-            PurchaseLine."No." := GLAccount."No.";
-            PurchaseLine."Gen. Bus. Posting Group" := GenBusinessPostingGroup.Code;
-            PurchaseLine."Gen. Prod. Posting Group" := GenProductPostingGroup.Code;
-            PurchaseLine."VAT Bus. Posting Group" := VATBusinessPostingGroup.Code;
-            PurchaseLine."VAT Prod. Posting Group" := VATProductPostingGroup.Code;
-            PurchaseLine.UpdateAmounts();
-            PurchaseLine.Modify();
-        until PurchaseLine.Next() = 0;
-        PurchaseHeader.CalcFields("Amount Including VAT");
-        EDocument."Amount Incl. VAT" := PurchaseHeader."Amount Including VAT";
-        EDocument.Modify();
-    end;
-
     procedure CreateDocSendingProfile(var DocumentSendingProfile: Record "Document Sending Profile")
     begin
         DocumentSendingProfile.Init();
@@ -287,23 +218,16 @@ codeunit 139629 "Library - E-Document"
         Workflow: Record Workflow;
         WorkflowStepResponse: Record "Workflow Step";
         WorkflowStepArgument: Record "Workflow Step Argument";
-        WorkflowStep: Record "Workflow Step";
         EDocWorkflowSetup: Codeunit "E-Document Workflow Setup";
+        EventConditions: Text;
         EDocCreatedEventID, SendEDocResponseEventID : Integer;
     begin
         // Create a simple workflow
         // Send to Service 'ServiceCode' when using Document Sending Profile 'DocSendingProfile' 
-        WorkflowStep.SetRange("Function Name", EDocWorkflowSetup.EDocCreated());
-        WorkflowStep.SetRange("Entry Point", true);
-        if WorkflowStep.FindSet() then
-            repeat
-                Workflow.Get(WorkflowStep."Workflow Code");
-                if not Workflow.Template then
-                    exit;
-            until WorkflowStep.Next() = 0;
-
         LibraryWorkflow.CreateWorkflow(Workflow);
+        EventConditions := CreateWorkflowEventConditionDocSendingProfileFilter(DocSendingProfileCode);
         EDocCreatedEventID := LibraryWorkflow.InsertEntryPointEventStep(Workflow, EDocWorkflowSetup.EDocCreated());
+        LibraryWorkflow.InsertEventArgument(EDocCreatedEventID, EventConditions);
         SendEDocResponseEventID := LibraryWorkflow.InsertResponseStep(Workflow, EDocWorkflowSetup.EDocSendEDocResponseCode(), EDocCreatedEventID);
 
         WorkflowStepResponse.Get(Workflow.Code, SendEDocResponseEventID);
