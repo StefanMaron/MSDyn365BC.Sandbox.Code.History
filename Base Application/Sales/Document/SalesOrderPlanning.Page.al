@@ -484,13 +484,17 @@ page 99000883 "Sales Order Planning"
         Item: Record Item;
         SalesLine: Record "Sales Line";
         SKU: Record "Stockkeeping Unit";
-        CreateProdOrder: Boolean;
+        DoCreateProdOrder: Boolean;
         EndLoop: Boolean;
         IsHandled: Boolean;
+        ProcessOrder: Boolean;
     begin
         xSalesPlanLine := Rec;
 
-        OnCreateOrdersOnBeforeFindSet(Rec);
+        OrdersCreated := false;
+        OnCreateOrdersOnBeforeFindSet(Rec, IsHandled, OrdersCreated);
+        if IsHandled then
+            exit;
 
         if not Rec.FindSet() then
             exit;
@@ -501,20 +505,22 @@ page 99000883 "Sales Order Planning"
             SalesLine.CalcFields("Reserved Qty. (Base)");
 
             IsHandled := false;
-            OnCreateOrdersOnBeforeCreateProdOrder(Rec, SalesLine, IsHandled);
+            ProcessOrder := true;
+            OnCreateOrdersOnBeforeCreateProdOrder(Rec, SalesLine, IsHandled, ProcessOrder, OrdersCreated, EndLoop);
             if IsHandled then
                 exit;
 
-            if SalesLine."Outstanding Qty. (Base)" > SalesLine."Reserved Qty. (Base)" then begin
-                if SKU.Get(SalesLine."Location Code", SalesLine."No.", SalesLine."Variant Code") then
-                    CreateProdOrder := SKU."Replenishment System" = SKU."Replenishment System"::"Prod. Order"
-                else begin
-                    Item.Get(SalesLine."No.");
-                    CreateProdOrder := Item."Replenishment System" = Item."Replenishment System"::"Prod. Order";
-                end;
+            if ProcessOrder then
+                if SalesLine."Outstanding Qty. (Base)" > SalesLine."Reserved Qty. (Base)" then begin
+                    if SKU.Get(SalesLine."Location Code", SalesLine."No.", SalesLine."Variant Code") then
+                        DoCreateProdOrder := SKU."Replenishment System" = SKU."Replenishment System"::"Prod. Order"
+                    else begin
+                        Item.Get(SalesLine."No.");
+                        DoCreateProdOrder := Item."Replenishment System" = Item."Replenishment System"::"Prod. Order";
+                    end;
 
-                CreateOrder(CreateProdOrder, SalesLine, EndLoop, OrdersCreated);
-            end;
+                    CreateOrder(DoCreateProdOrder, SalesLine, EndLoop, OrdersCreated);
+                end;
         until (Rec.Next() = 0) or EndLoop;
 
         Rec := xSalesPlanLine;
@@ -561,14 +567,17 @@ page 99000883 "Sales Order Planning"
         CurrPage.Update(false);
     end;
 
-    local procedure CreateOrder(CreateProdOrder: Boolean; var SalesLine: Record "Sales Line"; var EndLoop: Boolean; var OrdersCreated: Boolean)
+    local procedure CreateOrder(DoCreateProdOrder: Boolean; var SalesLine: Record "Sales Line"; var EndLoop: Boolean; var OrdersCreated: Boolean)
     var
         CreateProdOrderFromSale: Codeunit "Create Prod. Order from Sale";
+        HideValidationDialog: Boolean;
     begin
-        OnBeforeCreateOrder(Rec, SalesLine, CreateProdOrder);
+        HideValidationDialog := false;
+        OnBeforeCreateOrder(Rec, SalesLine, DoCreateProdOrder, HideValidationDialog);
 
-        if CreateProdOrder then begin
+        if DoCreateProdOrder then begin
             OrdersCreated := true;
+            CreateProdOrderFromSale.SetHideValidationDialog(HideValidationDialog);
             CreateProdOrderFromSale.CreateProductionOrder(SalesLine, NewStatus, NewOrderType);
             if NewOrderType = NewOrderType::ProjectOrder then
                 EndLoop := true;
@@ -596,7 +605,7 @@ page 99000883 "Sales Order Planning"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnCreateOrdersOnBeforeFindSet(var SalesPlanningLine: Record "Sales Planning Line")
+    local procedure OnCreateOrdersOnBeforeFindSet(var SalesPlanningLine: Record "Sales Planning Line"; var IsHandled: Boolean; var OrdersCreated: Boolean)
     begin
     end;
 
@@ -611,12 +620,12 @@ page 99000883 "Sales Order Planning"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateOrdersOnBeforeCreateProdOrder(var SalesPlanningLine: Record "Sales Planning Line"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnCreateOrdersOnBeforeCreateProdOrder(var SalesPlanningLine: Record "Sales Planning Line"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean; var ProcessOrder: Boolean; var OrdersCreated: Boolean; var EndLoop: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateOrder(var SalesPlanningLine: Record "Sales Planning Line"; var SalesLine: Record "Sales Line"; var CreateProdOrder: Boolean);
+    local procedure OnBeforeCreateOrder(var SalesPlanningLine: Record "Sales Planning Line"; var SalesLine: Record "Sales Line"; var CreateProdOrder: Boolean; var HideValidationDialog: Boolean);
     begin
     end;
 }
