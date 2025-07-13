@@ -484,7 +484,7 @@ page 99000883 "Sales Order Planning"
         Item: Record Item;
         SalesLine: Record "Sales Line";
         SKU: Record "Stockkeeping Unit";
-        DoCreateProdOrder: Boolean;
+        CreateProdOrder: Boolean;
         EndLoop: Boolean;
         IsHandled: Boolean;
     begin
@@ -507,13 +507,13 @@ page 99000883 "Sales Order Planning"
 
             if SalesLine."Outstanding Qty. (Base)" > SalesLine."Reserved Qty. (Base)" then begin
                 if SKU.Get(SalesLine."Location Code", SalesLine."No.", SalesLine."Variant Code") then
-                    DoCreateProdOrder := SKU."Replenishment System" = SKU."Replenishment System"::"Prod. Order"
+                    CreateProdOrder := SKU."Replenishment System" = SKU."Replenishment System"::"Prod. Order"
                 else begin
                     Item.Get(SalesLine."No.");
-                    DoCreateProdOrder := Item."Replenishment System" = Item."Replenishment System"::"Prod. Order";
+                    CreateProdOrder := Item."Replenishment System" = Item."Replenishment System"::"Prod. Order";
                 end;
 
-                CreateOrder(DoCreateProdOrder, SalesLine, EndLoop, OrdersCreated);
+                CreateOrder(CreateProdOrder, SalesLine, EndLoop, OrdersCreated);
             end;
         until (Rec.Next() = 0) or EndLoop;
 
@@ -561,17 +561,14 @@ page 99000883 "Sales Order Planning"
         CurrPage.Update(false);
     end;
 
-    local procedure CreateOrder(DoCreateProdOrder: Boolean; var SalesLine: Record "Sales Line"; var EndLoop: Boolean; var OrdersCreated: Boolean)
+    local procedure CreateOrder(CreateProdOrder: Boolean; var SalesLine: Record "Sales Line"; var EndLoop: Boolean; var OrdersCreated: Boolean)
     var
         CreateProdOrderFromSale: Codeunit "Create Prod. Order from Sale";
-        HideValidationDialog: Boolean;
     begin
-        HideValidationDialog := false;
-        OnBeforeCreateOrder(Rec, SalesLine, DoCreateProdOrder, HideValidationDialog);
+        OnBeforeCreateOrder(Rec, SalesLine, CreateProdOrder);
 
-        if DoCreateProdOrder then begin
+        if CreateProdOrder then begin
             OrdersCreated := true;
-            CreateProdOrderFromSale.SetHideValidationDialog(HideValidationDialog);
             CreateProdOrderFromSale.CreateProductionOrder(SalesLine, NewStatus, NewOrderType);
             if NewOrderType = NewOrderType::ProjectOrder then
                 EndLoop := true;
@@ -619,7 +616,7 @@ page 99000883 "Sales Order Planning"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateOrder(var SalesPlanningLine: Record "Sales Planning Line"; var SalesLine: Record "Sales Line"; var CreateProdOrder: Boolean; var HideValidationDialog: Boolean);
+    local procedure OnBeforeCreateOrder(var SalesPlanningLine: Record "Sales Planning Line"; var SalesLine: Record "Sales Line"; var CreateProdOrder: Boolean);
     begin
     end;
 }
