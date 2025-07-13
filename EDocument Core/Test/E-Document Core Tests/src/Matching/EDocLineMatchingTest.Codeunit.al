@@ -2,29 +2,23 @@ codeunit 139659 "E-Doc. Line Matching Test"
 {
 
     Subtype = Test;
+    TestPermissions = Disabled;
     EventSubscriberInstance = Manual;
 
 
     var
 
-        Vendor: Record Vendor;
-        EDocumentService: Record "E-Document Service";
         Assert: Codeunit Assert;
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryEdoc: Codeunit "Library - E-Document";
-        LibraryPermission: Codeunit "Library - Lower Permissions";
-        IsInitialized: Boolean;
 
     procedure Initialize()
+    var
+        PurchaseLine: Record "Purchase Line";
+        EDocImportedLine: Record "E-Doc. Imported Line";
     begin
-        LibraryPermission.SetOutsideO365Scope();
-        if IsInitialized then
-            exit;
-
-        LibraryEdoc.SetupStandardVAT();
-        LibraryEdoc.SetupStandardPurchaseScenario(Vendor, EDocumentService, Enum::"E-Document Format"::Mock, Enum::"E-Document Integration"::Mock);
-
-        IsInitialized := true;
+        EDocImportedLine.DeleteAll();
+        PurchaseLine.DeleteAll();
     end;
 
     [Test]
@@ -34,9 +28,9 @@ codeunit 139659 "E-Doc. Line Matching Test"
         EDocImportedLine: Record "E-Doc. Imported Line";
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
+        EDocService: Record "E-Document Service";
         EDocLineMatching: Codeunit "E-Doc. Line Matching";
-        EDocLog: Codeunit "E-Document Log";
-        EDocProcessing: Codeunit "E-Document Processing";
+        EDocLog: Codeunit "E-Document Log Helper";
         EDocOrderLineMatchingPage: TestPage "E-Doc. Order Line Matching";
     begin
         // [FEATURE] [E-Document] [Matching] 
@@ -46,15 +40,16 @@ codeunit 139659 "E-Doc. Line Matching Test"
         Initialize();
 
         // [GIVEN] We create e-document and PO line with Qty 5
-        CreatePurchaseOrderWithLine(PurchaseHeader, PurchaseLine, 5);
-        CreateEDocumentWithPOReference(EDocument, PurchaseHeader);
+        PurchaseHeader := CreatePurchaseLine(5);
+        CreateEDocumentWithPOReference(PurchaseHeader);
+        EDocService.Get(LibraryEdoc.CreateService());
+
 
         // Receive
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, false);
         LibraryPurchase.ReopenPurchaseDocument(PurchaseHeader);
         EDocument.FindLast();
-        EDocLog.InsertLog(EDocument, EDocumentService, Enum::"E-Document Service Status"::"Order Linked");
-        EDocProcessing.InsertServiceStatus(EDocument, EDocumentService, Enum::"E-Document Service Status"::"Order Linked");
+        EDocLog.InsertLog(EDocument, EDocService, Enum::"E-Document Service Status"::"Order Linked");
 
         // [GIVEN] We imported a item with quantity 5
         CreateImportedLine(EDocument, 10000, 5, Enum::"Purchase Line Type"::Item);
@@ -63,7 +58,6 @@ codeunit 139659 "E-Doc. Line Matching Test"
 
         // [WHEN] Open Matching page and select first entry
         Commit();
-        LibraryPermission.SetTeamMember();
 
         EDocOrderLineMatchingPage.Trap();
         EDocLineMatching.RunMatching(EDocument);
@@ -107,8 +101,8 @@ codeunit 139659 "E-Doc. Line Matching Test"
         Initialize();
 
         // [GIVEN] We create e-document and PO line with Qty 5
-        CreatePurchaseOrderWithLine(PurchaseHeader, PurchaseLine, 5);
-        CreateEDocumentWithPOReference(EDocument, PurchaseHeader);
+        PurchaseHeader := CreatePurchaseLine(5);
+        CreateEDocumentWithPOReference(PurchaseHeader);
 
         // Receive
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, false);
@@ -130,7 +124,6 @@ codeunit 139659 "E-Doc. Line Matching Test"
         TempPurchaseLine.Insert();
 
         // [THEN] Match manually 
-        LibraryPermission.SetTeamMember();
         EDocumentLineMatching.MatchManually(TempEDocImportedLine, TempPurchaseLine, TempEDocMatchesThatWasMatched);
 
         TempEDocImportedLine.FindSet();
@@ -157,8 +150,8 @@ codeunit 139659 "E-Doc. Line Matching Test"
         Initialize();
 
         // [GIVEN] We create e-document and PO line with Qty 5
-        CreatePurchaseOrderWithLine(PurchaseHeader, PurchaseLine, 5);
-        CreateEDocumentWithPOReference(EDocument, PurchaseHeader);
+        PurchaseHeader := CreatePurchaseLine(5);
+        CreateEDocumentWithPOReference(PurchaseHeader);
 
         // Receive
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, false);
@@ -181,7 +174,6 @@ codeunit 139659 "E-Doc. Line Matching Test"
         TempEDocImportedLine.Next();
 
         // [THEN] Match manually will assign what can be assigned
-        LibraryPermission.SetTeamMember();
         EDocumentLineMatching.MatchManually(TempEDocImportedLine, TempPurchaseLine, TempEDocMatchesThatWasMatched);
 
         // [THEN] Quantity was partially assigned
@@ -196,25 +188,30 @@ codeunit 139659 "E-Doc. Line Matching Test"
         Assert.ExpectedError('Matching of Imported Line 20000 is incomplete. It is not fully matched to purchase order lines.');
     end;
 
-    local procedure CreateEDocumentWithPOReference(var EDocument: Record "E-Document"; PurchaseHeader: Record "Purchase Header")
+    local procedure CreateEDocumentWithPOReference(PurchaseHeader: Record "Purchase Header")
+    var
+        EDocument: Record "E-Document";
     begin
         EDocument.Init();
         EDocument."Order No." := PurchaseHeader."No.";
         EDocument."Document Record ID" := PurchaseHeader.RecordId();
         EDocument."Document Type" := EDocument."Document Type"::"Purchase Order";
-        EDocument.Direction := Enum::"E-Document Direction"::Incoming;
         EDocument.Insert();
-        EDocument.SetRecFilter();
     end;
 
-    local procedure CreatePurchaseOrderWithLine(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; Quantity: Integer)
+    local procedure CreatePurchaseLine(Quantity: Integer): Record "Purchase Header";
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
     begin
-        LibraryEdoc.CreatePurchaseOrderWithLine(Vendor, PurchaseHeader, PurchaseLine, Quantity);
+        LibraryPurchase.CreatePurchaseOrder(PurchaseHeader);
         PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
         PurchaseLine.FindLast();
         PurchaseLine.Validate(Quantity, Quantity);
         PurchaseLine.Validate("Qty. to Invoice", 0);
         PurchaseLine.Modify();
+
+        exit(PurchaseHeader);
     end;
 
     local procedure AddPurchaseLine(Quantity: Integer; Type: Enum "Purchase Line Type")
