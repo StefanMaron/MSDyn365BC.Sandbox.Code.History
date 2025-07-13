@@ -84,7 +84,7 @@ page 140 "Posted Purchase Credit Memo"
                         field("Buy-from County"; Rec."Buy-from County")
                         {
                             ApplicationArea = Basic, Suite;
-                            CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
+                            Caption = 'County';
                             Editable = false;
                             Importance = Additional;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -385,7 +385,7 @@ page 140 "Posted Purchase Credit Memo"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                            Caption = 'County';
                             Editable = false;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
                         }
@@ -467,7 +467,7 @@ page 140 "Posted Purchase Credit Memo"
                         field("Pay-to County"; Rec."Pay-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
+                            Caption = 'County';
                             Editable = false;
                             Importance = Additional;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -595,7 +595,6 @@ page 140 "Posted Purchase Credit Memo"
             {
                 Caption = '&Cr. Memo';
                 Image = CreditMemo;
-#if not CLEAN27
                 action(Statistics)
                 {
                     ApplicationArea = Basic, Suite;
@@ -603,9 +602,6 @@ page 140 "Posted Purchase Credit Memo"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseCrMemoStatistics and PurchaseCrMemoStats actions. The new actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '27.0';
 
                     trigger OnAction()
                     begin
@@ -614,37 +610,6 @@ page 140 "Posted Purchase Credit Memo"
                         else
                             PAGE.RunModal(PAGE::"Purch. Credit Memo Stats.", Rec, Rec."No.");
                     end;
-                }
-#endif
-                action(PurchaseCrMemoStatistics)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    ShortCutKey = 'F7';
-                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-#if CLEAN27
-                    Visible = not PurchaseCrMemoStatsVisible;
-#else
-                    Visible = false;
-#endif
-                    RunObject = Page "Purch. Credit Memo Statistics";
-                    RunPageOnRec = true;
-                }
-                action(PurchaseCrMemoStats)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    ShortCutKey = 'F7';
-                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-#if CLEAN27
-                    Visible = PurchaseCrMemoStatsVisible;
-#else
-                    Visible = false;
-#endif
-                    RunObject = Page "Purch. Credit Memo Stats.";
-                    RunPageOnRec = true;
                 }
                 action("Co&mments")
                 {
@@ -901,21 +866,9 @@ page 140 "Posted Purchase Credit Memo"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
-#if not CLEAN27
                 actionref(Statistics_Promoted; Statistics)
                 {
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseCrMemoStatistics and PurchaseCrMemoStats actions. The new actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '27.0';
                 }
-#else
-                actionref(PurchaseCrMemoStatistics_Promoted; PurchaseCrMemoStatistics)
-                {
-                }
-                actionref(PurchaseCrMemoStats_Promoted; PurchaseCrMemoStats)
-                {
-                }
-#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -979,7 +932,6 @@ page 140 "Posted Purchase Credit Memo"
 
         ActivateFields();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
-        PurchaseCrMemoStatsVisible := Rec."Tax Area Code" <> '';
     end;
 
     var
@@ -995,9 +947,6 @@ page 140 "Posted Purchase Credit Memo"
         IsShipToCountyVisible: Boolean;
         VATDateEnabled: Boolean;
 
-    protected var
-        PurchaseCrMemoStatsVisible: Boolean;
-
     local procedure ActivateFields()
     begin
         IsBuyFromCountyVisible := FormatAddress.UseCounty(Rec."Buy-from Country/Region Code");
@@ -1005,3 +954,4 @@ page 140 "Posted Purchase Credit Memo"
         IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
     end;
 }
+
