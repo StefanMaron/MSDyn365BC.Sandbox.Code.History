@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false
+  },
   "folders": [
     {
       "path": "./Shopify/test/Shopify Connector Test"
@@ -142,9 +150,6 @@
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
-    },
-    {
       "path": "./FieldServiceIntegration/Test/Field Service Integration Test"
     },
     {
@@ -268,9 +273,6 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
-    },
-    {
       "path": "./ContosoCoffeeDemoDataset/Test/Contoso Coffee Demo Dataset Tests"
     },
     {
@@ -303,13 +305,5 @@
     {
       "path": "./System Application/Source/System Application/Email/src/Test Email"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "allint.enabled": false
-  }
+  ]
 }

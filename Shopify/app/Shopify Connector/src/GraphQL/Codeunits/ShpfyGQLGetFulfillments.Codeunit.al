@@ -1,5 +1,3 @@
-namespace Microsoft.Integration.Shopify;
-
 /// <summary>
 /// Codeunit Shpfy GQL Get Fulfillments (ID 30317) implements Interface Shpfy IGraphQL.
 /// </summary>
