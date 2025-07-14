@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.GeneralLedger.Ledger;
 
 using Microsoft.Bank.BankAccount;
@@ -327,6 +331,11 @@ table 17 "G/L Entry"
         {
             Caption = 'Journal Template Name';
         }
+        field(79; "VAT Reporting Date"; Date)
+        {
+            Caption = 'VAT Date';
+            Editable = false;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -337,11 +346,6 @@ table 17 "G/L Entry"
             begin
                 Rec.ShowDimensions();
             end;
-        }
-        field(79; "VAT Reporting Date"; Date)
-        {
-            Caption = 'VAT Date';
-            Editable = false;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])
         {
@@ -561,6 +565,7 @@ table 17 "G/L Entry"
         GLSetup: Record "General Ledger Setup";
         GLSetupRead: Boolean;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"G/L Entry", 'r')]
     procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";
@@ -568,6 +573,7 @@ table 17 "G/L Entry"
         exit(FindRecordManagement.GetLastEntryIntFieldValue(Rec, FieldNo("Entry No.")))
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"G/L Entry", 'r')]
     procedure GetLastEntry(var LastEntryNo: Integer; var LastTransactionNo: Integer)
     var
         FindRecordManagement: Codeunit "Find Record Management";
