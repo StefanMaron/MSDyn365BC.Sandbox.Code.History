@@ -356,7 +356,7 @@ codeunit 99000835 "Item Jnl. Line-Reserve"
 
     procedure DeleteLine(var ItemJournalLine: Record "Item Journal Line")
     begin
-        OnBeforeDeleteLine(ItemJournalLine, DeleteItemTracking);
+        OnBeforeDeleteLine(ItemJournalLine);
         if Blocked then
             exit;
 
@@ -576,7 +576,6 @@ codeunit 99000835 "Item Jnl. Line-Reserve"
             ReturnOption::"Gross Qty. (Base)":
                 exit(ItemJournalLine."Quantity (Base)");
         end;
-        OnAfterGetSourceValue(ReservationEntry, SourceRecRef, ReturnOption);
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Reservation Entries", 'OnLookupReserved', '', false, false)]
@@ -625,7 +624,7 @@ codeunit 99000835 "Item Jnl. Line-Reserve"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeDeleteLine(var ItemJournalLine: Record "Item Journal Line"; var DeleteItemTracking: Boolean)
+    local procedure OnBeforeDeleteLine(var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
@@ -793,11 +792,6 @@ codeunit 99000835 "Item Jnl. Line-Reserve"
             ItemJnlLine.Validate("Unit Cost");
             ItemJnlLine.Modify();
         end;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetSourceValue(var ReservationEntry: Record "Reservation Entry"; var SourceRecRef: RecordRef; ReturnOption: Option "Net Qty. (Base)","Gross Qty. (Base)")
-    begin
     end;
 
 }
