@@ -10,6 +10,7 @@ using Microsoft.Foundation.Attachment;
 
 codeunit 8059 "Sub. Contracts General Mgt."
 {
+    Access = Internal;
     SingleInstance = true;
 
     procedure OpenContractCard(Partner: Enum "Service Partner"; ContractNo: Code[20])
@@ -98,7 +99,7 @@ codeunit 8059 "Sub. Contracts General Mgt."
         exit((ContractNo <> '') and (ContractLineNo <> 0));
     end;
 
-    internal procedure ShowBillingLines(ContractNo: Code[20]; ContractLineNo: Integer; ServicePartner: Enum "Service Partner")
+    procedure ShowBillingLines(ContractNo: Code[20]; ContractLineNo: Integer; ServicePartner: Enum "Service Partner")
     var
         BillingLine: Record "Billing Line";
     begin
@@ -114,7 +115,7 @@ codeunit 8059 "Sub. Contracts General Mgt."
         Page.Run(0, BillingLine);
     end;
 
-    internal procedure ShowArchivedBillingLinesForServiceCommitment(ServiceCommitmentEntryNo: Integer)
+    procedure ShowArchivedBillingLinesForServiceCommitment(ServiceCommitmentEntryNo: Integer)
     var
         BillingLineArchive: Record "Billing Line Archive";
     begin
@@ -122,7 +123,7 @@ codeunit 8059 "Sub. Contracts General Mgt."
         Page.Run(0, BillingLineArchive);
     end;
 
-    internal procedure ShowArchivedBillingLines(ContractNo: Code[20]; ContractLineNo: Integer; ServicePartner: Enum "Service Partner"; RecurringBillingDocumentType: Enum "Rec. Billing Document Type"; DocumentNo: Code[20])
+    procedure ShowArchivedBillingLines(ContractNo: Code[20]; ContractLineNo: Integer; ServicePartner: Enum "Service Partner"; RecurringBillingDocumentType: Enum "Rec. Billing Document Type"; DocumentNo: Code[20])
     var
         BillingLineArchive: Record "Billing Line Archive";
     begin
@@ -207,7 +208,7 @@ codeunit 8059 "Sub. Contracts General Mgt."
             until BillingLineArchive.Next() = 0;
     end;
 
-    internal procedure ShowUnpostedSalesDocument(SalesDocumentType: Enum "Sales Document Type"; CustomerContract: Record "Customer Subscription Contract")
+    procedure ShowUnpostedSalesDocument(SalesDocumentType: Enum "Sales Document Type"; CustomerContract: Record "Customer Subscription Contract")
     var
         SalesHeader: Record "Sales Header";
     begin
@@ -240,7 +241,7 @@ codeunit 8059 "Sub. Contracts General Mgt."
         SalesHeader.MarkedOnly(true);
     end;
 
-    internal procedure ShowPostedSalesInvoices(CustomerContract: Record "Customer Subscription Contract")
+    procedure ShowPostedSalesInvoices(CustomerContract: Record "Customer Subscription Contract")
     var
         SalesInvoiceLine: Record "Sales Invoice Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
@@ -261,7 +262,7 @@ codeunit 8059 "Sub. Contracts General Mgt."
         Page.Run(Page::"Posted Sales Invoices", SalesInvoiceHeader);
     end;
 
-    internal procedure ShowPostedSalesCreditMemos(CustomerContract: Record "Customer Subscription Contract")
+    procedure ShowPostedSalesCreditMemos(CustomerContract: Record "Customer Subscription Contract")
     var
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
@@ -283,7 +284,7 @@ codeunit 8059 "Sub. Contracts General Mgt."
     end;
 
 
-    internal procedure ShowPostedPurchaseInvoices(VendorContract: Record "Vendor Subscription Contract")
+    procedure ShowPostedPurchaseInvoices(VendorContract: Record "Vendor Subscription Contract")
     var
         PurchaseInvoiceLine: Record "Purch. Inv. Line";
         PurchaseInvoiceHeader: Record "Purch. Inv. Header";
@@ -304,7 +305,7 @@ codeunit 8059 "Sub. Contracts General Mgt."
         Page.Run(Page::"Posted Purchase Invoices", PurchaseInvoiceHeader);
     end;
 
-    internal procedure ShowPostedPurchaseCreditMemos(VendorContract: Record "Vendor Subscription Contract")
+    procedure ShowPostedPurchaseCreditMemos(VendorContract: Record "Vendor Subscription Contract")
     var
         PurchCrMemoLine: Record "Purch. Cr. Memo Line";
         PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
@@ -325,7 +326,7 @@ codeunit 8059 "Sub. Contracts General Mgt."
         Page.Run(Page::"Posted Purchase Credit Memos", TempPurchCrMemoHeader);
     end;
 
-    internal procedure ShowUnpostedPurchDocument(PurchDocumentType: Enum "Purchase Document Type"; VendorContract: Record "Vendor Subscription Contract")
+    procedure ShowUnpostedPurchDocument(PurchDocumentType: Enum "Purchase Document Type"; VendorContract: Record "Vendor Subscription Contract")
     var
         PurchaseHeader: Record "Purchase Header";
     begin
@@ -366,7 +367,7 @@ codeunit 8059 "Sub. Contracts General Mgt."
         exit(not BillingLine.IsEmpty);
     end;
 
-    local procedure FilterBillingLineOnContractLine(var BillingLine: Record "Billing Line"; ServicePartner: Enum "Service Partner"; ContractNo: Code[20]; ContractLineNo: Integer): Boolean
+    internal procedure FilterBillingLineOnContractLine(var BillingLine: Record "Billing Line"; ServicePartner: Enum "Service Partner"; ContractNo: Code[20]; ContractLineNo: Integer): Boolean
     begin
         BillingLine.SetRange(Partner, ServicePartner);
         BillingLine.SetRange("Subscription Contract No.", ContractNo);
