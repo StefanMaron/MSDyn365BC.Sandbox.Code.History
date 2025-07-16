@@ -7,7 +7,6 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.UOM;
-using Microsoft.Sales.Document;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Counting.Journal;
 using Microsoft.Inventory.Item;
@@ -39,9 +38,7 @@ codeunit 22 "Item Jnl.-Post Line"
                   TableData "Avg. Cost Adjmt. Entry Point" = rim,
                   TableData "Post Value Entry to G/L" = ri,
                   TableData "Capacity Ledger Entry" = rimd,
-                  TableData "Inventory Adjmt. Entry (Order)" = rim,
-                  TableData "Job Planning Line" = r;
-
+                  TableData "Inventory Adjmt. Entry (Order)" = rim;
     TableNo = "Item Journal Line";
 
     trigger OnRun()
@@ -240,7 +237,6 @@ codeunit 22 "Item Jnl.-Post Line"
 
         OnCodeOnBeforeRunCheck(ItemJnlCheckLine, ItemJnlLine);
         ItemJnlCheckLine.RunCheck(ItemJnlLine);
-        OnCodeOnAfterRunCheck(ItemJnlLine);
 
         if ItemJnlLine."Document Date" = 0D then
             ItemJnlLine."Document Date" := ItemJnlLine."Posting Date";
@@ -799,11 +795,10 @@ codeunit 22 "Item Jnl.-Post Line"
         IsHandled := false;
         OnPostItemOnAfterGetSKU(ItemJnlLine, SKUExists, IsHandled);
         if not IsHandled then
-            if ItemJnlLine."Item Shpt. Entry No." <> 0 then
-                if not CheckIfReservationEntryForJobExist() then begin
-                    ItemJnlLine."Location Code" := '';
-                    ItemJnlLine."Variant Code" := '';
-                end;
+            if ItemJnlLine."Item Shpt. Entry No." <> 0 then begin
+                ItemJnlLine."Location Code" := '';
+                ItemJnlLine."Variant Code" := '';
+            end;
 
         if GetItem(ItemJnlLine."Item No.", false) then
             CheckIfItemIsBlocked();
@@ -1256,12 +1251,7 @@ codeunit 22 "Item Jnl.-Post Line"
     var
         IsReserved: Boolean;
         InsertItemLedgEntryNeeded: Boolean;
-        IsHandled: Boolean;
     begin
-        OnBeforeItemQtyPosting(ItemJnlLine, CalledFromAdjustment, IsHandled);
-        if IsHandled then
-            exit;
-
         if ItemJnlLine.Quantity <> ItemJnlLine."Invoiced Quantity" then
             ItemJnlLine.TestField("Invoiced Quantity", 0);
         ItemJnlLine.TestField("Item Shpt. Entry No.", 0);
@@ -6132,11 +6122,7 @@ codeunit 22 "Item Jnl.-Post Line"
     var
         FloatingFactor: Decimal;
         PostItemJnlLine: Boolean;
-        IsHandled: Boolean;
     begin
-        OnBeforeSetupTempSplitItemJnlLine(ItemJnlLine2, SignFactor, NonDistrQuantity, NonDistrAmount, NonDistrAmountACY, NonDistrDiscountAmount, Invoice, IsHandled);
-        if IsHandled then
-            exit;
         TempSplitItemJnlLine."Quantity (Base)" := SignFactor * TempTrackingSpecification."Qty. to Handle (Base)";
         TempSplitItemJnlLine.Quantity := SignFactor * TempTrackingSpecification."Qty. to Handle";
         if Invoice then begin
@@ -6317,49 +6303,12 @@ codeunit 22 "Item Jnl.-Post Line"
         if (ItemLedgerEntry."Remaining Quantity" + OldItemLedgerEntry."Remaining Quantity") > 0 then
             exit(0);
 
-        exit(GetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry));
+        exit(-Abs(OldItemLedgerEntry."Reserved Quantity"));
     end;
 
     procedure RunOnPublishPostingInventoryToGL()
     begin
         OnPublishPostingInventoryToGL(ItemJnlLine, InventoryPostingToGL);
-    end;
-
-    local procedure CheckIfReservationEntryForJobExist(): Boolean
-    var
-        JobPlanningLine: Record "Job Planning Line";
-        ReservationEntry: Record "Reservation Entry";
-    begin
-        JobPlanningLine.SetCurrentKey("Job Contract Entry No.");
-        JobPlanningLine.SetRange("Job Contract Entry No.", ItemJnlLine."Job Contract Entry No.");
-        if not JobPlanningLine.FindFirst() then
-            exit(false);
-
-        exit(JobPlanningLineReserve.FindReservEntry(JobPlanningLine, ReservationEntry));
-    end;
-
-    local procedure GetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry: Record "Item Ledger Entry"): Decimal
-    var
-        ReservationEntry: Record "Reservation Entry";
-        ReservationEntry2: Record "Reservation Entry";
-        SourceType: Integer;
-    begin
-        if OldItemLedgerEntry."Reserved Quantity" = 0 then
-            exit(0);
-
-        ReservationEntry.SetLoadFields("Entry No.", Positive, "Source Type", "Source Ref. No.");
-        ReservationEntry.SetRange("Source Type", Database::"Item Ledger Entry");
-        ReservationEntry.SetRange("Source Ref. No.", OldItemLedgerEntry."Entry No.");
-        if ReservationEntry.FindFirst() then
-            if ReservationEntry2.Get(ReservationEntry."Entry No.", not ReservationEntry.Positive) then
-                SourceType := ReservationEntry2."Source Type";
-
-        case SourceType of
-            Database::"Sales Line":
-                exit(-Abs(OldItemLedgerEntry."Remaining Quantity" - OldItemLedgerEntry."Reserved Quantity"));
-            else
-                exit(-Abs(OldItemLedgerEntry."Reserved Quantity"));
-        end;
     end;
 
     [IntegrationEvent(false, false)]
@@ -6978,7 +6927,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyItemLedgEntryOnAfterSetAppliedQtyZero(OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemLedgerEntry: Record "Item Ledger Entry"; var AppliedQty: Decimal; var ItemJournalLine: Record "Item Journal Line")
+    local procedure OnApplyItemLedgEntryOnAfterSetAppliedQtyZero(OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var AppliedQty: Decimal; var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
@@ -8378,21 +8327,6 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeProcedureInsertCapLedgEntry(var ItemJournalLine: Record "Item Journal Line"; var CapacityLedgerEntry: Record "Capacity Ledger Entry"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCodeOnAfterRunCheck(var ItemJournalLine: Record "Item Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeItemQtyPosting(var ItemJnlLine: Record "Item Journal Line"; var CalledFromAdjustment: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetupTempSplitItemJnlLine(var ItemJnlLine2: Record "Item Journal Line"; var SignFactor: Integer; var NonDistrQuantity: Decimal; var NonDistrAmount: Decimal; var NonDistrAmountACY: Decimal; var NonDistrDiscountAmount: Decimal; var Invoice: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
