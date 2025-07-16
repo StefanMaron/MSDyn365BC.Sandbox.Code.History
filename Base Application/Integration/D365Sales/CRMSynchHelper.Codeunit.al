@@ -1344,13 +1344,8 @@ codeunit 5342 "CRM Synch. Helper"
 
     local procedure AddToCacheCRMPriceLevel(CRMPricelevel: Record "CRM Pricelevel")
     begin
-        if TempCRMPricelevel.Get(CRMPricelevel.PriceLevelId) then begin
-            TempCRMPricelevel := CRMPricelevel;
-            TempCRMPricelevel.Modify();
-        end else begin
-            TempCRMPricelevel := CRMPricelevel;
-            TempCRMPricelevel.Insert();
-        end;
+        TempCRMPricelevel := CRMPricelevel;
+        TempCRMPricelevel.Insert();
     end;
 
     local procedure CacheCRMPriceLevel(): Boolean
