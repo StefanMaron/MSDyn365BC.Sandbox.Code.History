@@ -435,7 +435,7 @@ report 3010801 "Quote Analysis"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCalcHeaderAmount(SalesHead, _TableType, Result, IsHandled, ArchSalesHead);
+        OnBeforeCalcHeaderAmount(SalesHead, _TableType, Result, IsHandled);
         if IsHandled then
             exit(Result);
 
@@ -512,7 +512,7 @@ report 3010801 "Quote Analysis"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcHeaderAmount(SalesHeader: Record "Sales Header"; _TableType: Integer; var Result: Decimal; var IsHandled: Boolean; var SalesHeaderArchive: Record "Sales Header Archive")
+    local procedure OnBeforeCalcHeaderAmount(SalesHeader: Record "Sales Header"; _TableType: Integer; var Result: Decimal; var IsHandled: Boolean)
     begin
     end;
 }
