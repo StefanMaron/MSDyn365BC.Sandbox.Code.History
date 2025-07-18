@@ -712,7 +712,6 @@ codeunit 483 "Change Global Dimensions"
         TestDirectModifyPermission(RecRef);
         ChangeGlobalDimLogEntry.FillData(RecRef);
         RecRef.Close();
-        OnAfterFillTableData(ChangeGlobalDimLogEntry);
     end;
 
     local procedure FindTablesWithDims(var TempAllObjWithCaption: Record AllObjWithCaption temporary): Boolean
@@ -843,9 +842,5 @@ codeunit 483 "Change Global Dimensions"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFillTableData(var ChangeGlobalDimLogEntry: Record "Change Global Dim. Log Entry")
-    begin
-    end;
 }
 
