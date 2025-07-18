@@ -671,7 +671,7 @@ codeunit 10750 "SII XML Creator"
                 XMLDOMManagement.AddElementWithPrefix(
                   XMLNode, 'ImporteTotal', FormatNumber(TotalAmount), 'sii', SiiTxt, TempXMLNode);
             end;
-            FillBaseImponibleACosteNode(XMLNode, RegimeCodes, TotalNonExemptBase + TotalNDBase);
+            FillBaseImponibleACosteNode(XMLNode, RegimeCodes, TotalNonExemptBase);
 
             FillOperationDescription(
               XMLNode, GetOperationDescriptionFromDocument(false, VendorLedgerEntry."Document No."),
