@@ -234,11 +234,6 @@ page 923 "Posted Asm. Order Statistics"
     {
     }
 
-    trigger OnOpenPage()
-    begin
-        Rec.TestField("Item No.");
-    end;
-
     trigger OnAfterGetRecord()
     var
         CalculateAssemblyCost: Codeunit "Calculate Assembly Cost";
@@ -252,3 +247,4 @@ page 923 "Posted Asm. Order Statistics"
         ColIdx: Option ,StdCost,ExpCost,ActCost,Dev,"Var";
         RowIdx: Option ,MatCost,ResCost,ResOvhd,AsmOvhd,Total;
 }
+
