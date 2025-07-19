@@ -14,7 +14,6 @@ using Microsoft.eServices.EDocument.OrderMatch;
 using Microsoft.eServices.EDocument.OrderMatch.Copilot;
 using Microsoft.eServices.EDocument.Service;
 using Microsoft.Foundation.Attachment;
-using Microsoft.eServices.EDocument.Processing.Import.Purchase;
 
 page 6121 "E-Document"
 {
@@ -154,11 +153,6 @@ page 6121 "E-Document"
                     Importance = Additional;
                     ToolTip = 'Specifies the receiving company address.';
                 }
-            }
-            part("Lines"; "E-Doc. Read. Purch. Lines")
-            {
-                SubPageLink = "E-Document Entry No." = field("Entry No");
-                Visible = IsIncomingDoc;
             }
             part(EdocoumentServiceStatus; "E-Document Service Status")
             {
@@ -348,7 +342,6 @@ page 6121 "E-Document"
                     begin
                         EDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
                         EDocImportParameters."Purch. Journal V1 Behavior" := EDocImportParameters."Purch. Journal V1 Behavior"::"Create purchase document";
-                        EDocImportParameters."Create Document V1 Behavior" := true;
                         EDocImport.ProcessIncomingEDocument(Rec, EDocImportParameters);
                         if EDocumentErrorHelper.HasErrors(Rec) then
                             Message(DocNotCreatedMsg, Rec."Document Type");
@@ -367,7 +360,6 @@ page 6121 "E-Document"
                     begin
                         EDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
                         EDocImportParameters."Purch. Journal V1 Behavior" := EDocImportParameters."Purch. Journal V1 Behavior"::"Create journal line";
-                        EDocImportParameters."Create Document V1 Behavior" := true;
                         EDocImport.ProcessIncomingEDocument(Rec, EDocImportParameters);
                         if EDocumentErrorHelper.HasErrors(Rec) then
                             Message(DocNotCreatedMsg, Rec."Document Type");
@@ -455,26 +447,6 @@ page 6121 "E-Document"
                 RunPageLink = "E-Doc. Entry No" = field("Entry No");
                 RunPageMode = View;
             }
-            action(ViewExtractedDocumentData)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'View extracted data';
-                ToolTip = 'View the extracted data from the source file.';
-                Image = ViewRegisteredOrder;
-                Visible = IsIncomingDoc;
-
-                trigger OnAction()
-                var
-                    EDocumentPurchaseHeader: Record "E-Document Purchase Header";
-                    EDocumentPurchaseLine: Record "E-Document Purchase Line";
-                    EDocReadablePurchaseDoc: Page "E-Doc. Readable Purchase Doc.";
-                begin
-                    EDocumentPurchaseHeader.GetFromEDocument(Rec);
-                    EDocumentPurchaseLine.SetRange("E-Document Entry No.", Rec."Entry No");
-                    EDocReadablePurchaseDoc.SetBuffer(EDocumentPurchaseHeader, EDocumentPurchaseLine);
-                    EDocReadablePurchaseDoc.Run();
-                end;
-            }
         }
         area(Promoted)
         {
@@ -547,7 +519,7 @@ page 6121 "E-Document"
                 Caption = 'Match Purchase Order';
                 ToolTip = 'Match E-document lines to Purchase Order.';
                 Image = SparkleFilled;
-                Visible = ShowMapToOrder;
+                Visible = ShowMapToOrder and CopilotVisible;
 
                 trigger OnAction()
                 var
@@ -562,11 +534,13 @@ page 6121 "E-Document"
     trigger OnOpenPage()
     var
         EDocumentsSetup: Record "E-Documents Setup";
+        EDocPOMatching: Codeunit "E-Doc. PO Copilot Matching";
     begin
         ShowMapToOrder := false;
         HasErrorsOrWarnings := false;
         HasErrors := false;
         IsProcessed := false;
+        CopilotVisible := EDocPOMatching.IsCopilotVisible();
         NewEDocumentExperienceActive := EDocumentsSetup.IsNewEDocumentExperienceActive();
     end;
 
@@ -586,7 +560,6 @@ page 6121 "E-Document"
         SetStyle();
         ResetActionVisiability();
         SetIncomingDocActions();
-        FillLineBuffer();
 
         EDocImport.V1_ProcessEDocPendingOrderMatch(Rec);
     end;
@@ -671,14 +644,6 @@ page 6121 "E-Document"
         ShowRelink := false;
     end;
 
-    local procedure FillLineBuffer()
-    var
-        EDocumentPurchaseLine: Record "E-Document Purchase Line";
-    begin
-        EDocumentPurchaseLine.SetRange("E-Document Entry No.", Rec."Entry No");
-        CurrPage.Lines.Page.SetBuffer(EDocumentPurchaseLine);
-    end;
-
     var
         EDocumentBackgroundjobs: Codeunit "E-Document Background Jobs";
         EDocIntegrationManagement: Codeunit "E-Doc. Integration Management";
@@ -688,7 +653,7 @@ page 6121 "E-Document"
         ErrorsAndWarningsNotification: Notification;
         NewEDocumentExperienceActive: Boolean;
         RecordLinkTxt, StyleStatusTxt : Text;
-        ShowRelink, ShowMapToOrder, HasErrorsOrWarnings, HasErrors, IsIncomingDoc, IsProcessed : Boolean;
+        ShowRelink, ShowMapToOrder, HasErrorsOrWarnings, HasErrors, IsIncomingDoc, IsProcessed, CopilotVisible : Boolean;
         EDocHasErrorOrWarningMsg: Label 'Errors or warnings found for E-Document. Please review below in "Error Messages" section.';
         DocNotCreatedMsg: Label 'Failed to create new %1 from E-Document. Please review errors below.', Comment = '%1 - E-Document Document Type';
 
