@@ -10,7 +10,6 @@ table 6123 "E-Doc. Mapping Log"
 {
     DataClassification = CustomerContent;
     Caption = 'E-Document Mapping Log';
-    ReplicateData = false;
 
     fields
     {
