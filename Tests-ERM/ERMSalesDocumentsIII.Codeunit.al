@@ -74,6 +74,8 @@ codeunit 134387 "ERM Sales Documents III"
         ReturnQtyToReceiveMustBeZeroErr: Label ' Return Qty. to Receive must be zero.';
         QtyToAssignErr: Label '%1 must be %2 in %3', Comment = '%1 = Qty. to Assign, %2 = Quantity, %3 = Sales Return Order Subform';
         UniCostLCYErr: Label 'Unit Cost (LCY) must be zero.';
+        AdjustExchRateDefaultDescTxt: Label 'Adjmt. of %1 %2, Ex.Rate Adjust.', Locked = true;
+        AccountBalanceErrLbl: Label 'G/L Account %1 is not balanced', Comment = '%1 = G/L Account No';
 
     [Test]
     [Scope('OnPrem')]
@@ -5936,9 +5938,329 @@ codeunit 134387 "ERM Sales Documents III"
         Assert.AreEqual(0, SalesLine."Unit Cost (LCY)", UniCostLCYErr);
     end;
 
+    [Test]
+    procedure Salesperson_SellToBlank_UserSetup()
+    var
+        SellToCustomer: Record Customer;
+        UserSetup: Record "User Setup";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has blank salesperson, User Setup has salesperson, Salesperson Code on sales order is set to User Setup salesperson.
+        Initialize();
+
+        LibrarySales.CreateCustomer(SellToCustomer);
+        CreateUserSetupWithSalesperson(UserSetup);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", UserSetup."Salespers./Purch. Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_UserSetup()
+    var
+        SellToCustomer: Record Customer;
+        UserSetup: Record "User Setup";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, User Setup has salesperson, Salesperson Code on sales order is set to Sell-to Customer salesperson.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateUserSetupWithSalesperson(UserSetup);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", SellToCustomer."Salesperson Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellToBlank_BillToBlank_UserSetup()
+    var
+        SellToCustomer, BillToCustomer : Record Customer;
+        SalesHeader: Record "Sales Header";
+        UserSetup: Record "User Setup";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has blank salesperson, Bill-to Customer has blank salesperson, User Setup has salesperson, Salesperson Code on sales order is set to User Setup salesperson.
+        Initialize();
+
+        LibrarySales.CreateCustomer(SellToCustomer);
+        LibrarySales.CreateCustomer(BillToCustomer);
+        SellToCustomer.Validate("Bill-to Customer No.", BillToCustomer."No.");
+        SellToCustomer.Modify(true);
+        CreateUserSetupWithSalesperson(UserSetup);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", UserSetup."Salespers./Purch. Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_BillToBlank()
+    var
+        SellToCustomer, BillToCustomer : Record Customer;
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Bill-to Customer has blank salesperson, Salesperson Code on sales order is set to blank.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        LibrarySales.CreateCustomer(BillToCustomer);
+        SellToCustomer.Validate("Bill-to Customer No.", BillToCustomer."No.");
+        SellToCustomer.Modify(true);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", '');
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_BillTo_UserSetup()
+    var
+        SellToCustomer, BillToCustomer : Record Customer;
+        SalesHeader: Record "Sales Header";
+        UserSetup: Record "User Setup";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Bill-to Customer has salesperson, User Setup has salesperson, Salesperson Code on sales order is set to Bill-to Customer salesperson.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateCustomerWithSalesperson(BillToCustomer);
+        SellToCustomer.Validate("Bill-to Customer No.", BillToCustomer."No.");
+        SellToCustomer.Modify(true);
+        CreateUserSetupWithSalesperson(UserSetup);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", BillToCustomer."Salesperson Code");
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure Salesperson_SellTo_BillTo_ResetBillTo()
+    var
+        SellToCustomer, BillToCustomer : Record Customer;
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Bill-to Customer has salesperson, Salesperson Code on sales order is set to Sell-to Customer salesperson after Bill-to Customer No. is reset.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateCustomerWithSalesperson(BillToCustomer);
+        SellToCustomer.Validate("Bill-to Customer No.", BillToCustomer."No.");
+        SellToCustomer.Modify(true);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+        SalesHeader.TestField("Salesperson Code", BillToCustomer."Salesperson Code");
+
+        SalesHeader.Validate("Bill-to Customer No.", SellToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", SellToCustomer."Salesperson Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_ShipTo()
+    var
+        SellToCustomer: Record Customer;
+        ShipToAddress: Record "Ship-to Address";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Ship-to Address has salesperson, Salesperson Code on sales order is set to Ship-to Address salesperson.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateShipToAddressWithSalesperson(ShipToAddress, SellToCustomer."No.");
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+        SalesHeader.Validate("Ship-to Code", ShipToAddress."Code");
+
+        SalesHeader.TestField("Salesperson Code", ShipToAddress."Salesperson Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_ShipTo_ShipToBlank_ChangeShipTo()
+    var
+        SellToCustomer: Record Customer;
+        ShipToAddress1, ShipToAddress2 : Record "Ship-to Address";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Ship-to Address1 has salesperson, Ship-to Address2 has blank salesperson, Salesperson Code on sales order stays with Ship-to Address1 salesperson after Ship-to Address2 is selected.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateShipToAddressWithSalesperson(ShipToAddress1, SellToCustomer."No.");
+        SellToCustomer.Validate("Ship-to Code", ShipToAddress1."Code");
+        SellToCustomer.Modify(true);
+        LibrarySales.CreateShipToAddress(ShipToAddress2, SellToCustomer."No.");
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+        SalesHeader.TestField("Salesperson Code", ShipToAddress1."Salesperson Code");
+
+        SalesHeader.Validate("Ship-to Code", ShipToAddress2."Code");
+
+        SalesHeader.TestField("Salesperson Code", ShipToAddress1."Salesperson Code");
+    end;
+
+    [Test]
+    procedure Salesperson_SellTo_ShipTo_ShipTo2()
+    var
+        SellToCustomer: Record Customer;
+        ShipToAddress1, ShipToAddress2 : Record "Ship-to Address";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Ship-to Address1 has salesperson, Ship-to Address2 has salesperson, Salesperson Code on sales order is set to Ship-to Address2 salesperson.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateShipToAddressWithSalesperson(ShipToAddress1, SellToCustomer."No.");
+        CreateShipToAddressWithSalesperson(ShipToAddress2, SellToCustomer."No.");
+        SellToCustomer.Validate("Ship-to Code", ShipToAddress1."Code");
+        SellToCustomer.Modify(true);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+        SalesHeader.TestField("Salesperson Code", ShipToAddress1."Salesperson Code");
+
+        SalesHeader.Validate("Ship-to Code", ShipToAddress2."Code");
+
+        SalesHeader.TestField("Salesperson Code", ShipToAddress2."Salesperson Code");
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure Salesperson_SellTo_BillTo_ShipTo_ChangeBillTo()
+    var
+        SellToCustomer, BillToCustomer1, BillToCustomer2 : Record Customer;
+        ShipToAddress: Record "Ship-to Address";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Bill-to Customers have salesperson, Ship-to Address has salesperson, Salesperson Code on sales order stays with Ship-to Address salesperson after Bill-to Customer No. is changed.
+        Initialize();
+
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateCustomerWithSalesperson(BillToCustomer1);
+        CreateCustomerWithSalesperson(BillToCustomer2);
+        CreateShipToAddressWithSalesperson(ShipToAddress, SellToCustomer."No.");
+        SellToCustomer.Validate("Bill-to Customer No.", BillToCustomer1."No.");
+        SellToCustomer.Validate("Ship-to Code", ShipToAddress."Code");
+        SellToCustomer.Modify(true);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+        SalesHeader.TestField("Salesperson Code", ShipToAddress."Salesperson Code");
+
+        SalesHeader.Validate("Bill-to Customer No.", BillToCustomer2."No.");
+
+        SalesHeader.TestField("Salesperson Code", ShipToAddress."Salesperson Code");
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure Salesperson_SellTo_BillTo_ShipToBlank_ManualEdit_ChangeBillTo()
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+        SellToCustomer, BillToCustomer : Record Customer;
+        ShipToAddress: Record "Ship-to Address";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO 539321] Sell-to Customer has salesperson, Bill-to Customer has salesperson, Ship-to Address has blank salesperson, Salesperson Code on sales order is set to Bill-to Customer salesperson after Salesperson Code on sales order is manually edited.
+        Initialize();
+
+        LibrarySales.CreateSalesperson(Salesperson);
+        CreateCustomerWithSalesperson(SellToCustomer);
+        CreateCustomerWithSalesperson(BillToCustomer);
+        LibrarySales.CreateShipToAddress(ShipToAddress, SellToCustomer."No.");
+        SellToCustomer.Validate("Ship-to Code", ShipToAddress."Code");
+        SellToCustomer.Modify(true);
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, SellToCustomer."No.");
+
+        SalesHeader.Validate("Salesperson Code", Salesperson."Code");
+        SalesHeader.Modify(true);
+
+        SalesHeader.Validate("Bill-to Customer No.", BillToCustomer."No.");
+
+        SalesHeader.TestField("Salesperson Code", BillToCustomer."Salesperson Code");
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerTrue')]
+    [Scope('OnPrem')]
+    procedure UnreliazedGainLossEntrieAreClearWhenUsingMultiplePostingGroups()
+    var
+        Currency: Record Currency;
+        CurrencyExchangeRate: array[3] of Record "Currency Exchange Rate";
+        GenJournalBatch: Record "Gen. Journal Batch";
+        GenJournalLine: Record "Gen. Journal Line";
+        Item: Record Item;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        SalesInvHeader: Record "Sales Invoice Header";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Customer: Record Customer;
+        CustomerPostingGroup: array[2] of Record "Customer Posting Group";
+        ActualAmount: array[2] of Decimal;
+        PostingDate: array[3] of Date;
+        PaymentDocNo: Code[20];
+        VATCalculationType: Enum "Tax Calculation Type";
+    begin
+        // [SCENARIO 563207] Unrealized Gain / Loss is cleared during applicaiton when using multiple customer posting groups. 
+        Initialize();
+
+        // [GIVEN] Set Journal Templ Name mandatory to false.
+        SetJournalTemplNameMandatoryFalse();
+
+        // [GIVEN] Generate Posting Date.
+        GeneratePostingDate(PostingDate);
+
+        // [GIVEN] Create Currency and Exchange Rates.
+        CreateCurrencyWithExchangeRates(Currency, CurrencyExchangeRate, PostingDate);
+
+        // [GIVEN] Create VAT Posting Setup with Zero Vat.
+        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATCalculationType::"Normal VAT", 0);
+
+        // [GIVEN] Create Customer Posting Group One.
+        LibrarySales.CreateCustomerPostingGroup(CustomerPostingGroup[1]);
+
+        // [GIVEN] Set Allowed Multiple Posting Groups.
+        SetSalesAllowMultiplePostingGroups(true);
+
+        // [GIVEN Create Customer.
+        CreateCustomerWithAllowMultiplePostingGroups(
+            Customer, CustomerPostingGroup[1].Code,
+            Currency.Code, VATPostingSetup."VAT Bus. Posting Group");
+
+        // [GIVEN] Create Alternative Customer Posting Group. 
+        LibrarySales.CreateCustomerPostingGroup(CustomerPostingGroup[2]);
+        LibrarySales.CreateAltCustomerPostingGroup(CustomerPostingGroup[1].Code, CustomerPostingGroup[2].Code);
+
+        // [GIVEN] Create Item.
+        Item.Get(LibraryInventory.CreateItemNoWithVATProdPostingGroup(VATPostingSetup."VAT Prod. Posting Group"));
+
+        // [GIVEN] Create Sales Invoice.
+        CreateSalesInvoice(SalesHeader, SalesLine, PostingDate[3], Item."No.", Customer."No.");
+
+        // [GIVEN] Post Sales Invoice.
+        SalesInvHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
+
+        // [GIVEN] Run Exchange Rate Adjustment.
+        LibraryERM.RunExchRateAdjustment(Currency.Code, PostingDate[3], PostingDate[1], AdjustExchRateDefaultDescTxt, PostingDate[2], LibraryRandom.RandText(10), false);
+
+        // [GIVEN] Create General Journal Batch.
+        CreateGeneralJournalBatch(GenJournalBatch, true);
+
+        // [GIVEN] Create a Payment and Post.
+        CreatePaymentAndPost(GenJournalLine, GenJournalBatch, Customer."No.", CustomerPostingGroup[2].Code, PostingDate[1], PaymentDocNo);
+
+        // [WHEN] Apply Payment with Invoice.
+        ApplyPostCustPayment2Invoices(PaymentDocNo, SalesInvHeader."No.");
+
+        // [THEN] Verify G/L Entries for Payable Account are Balanced.
+        VerifyGLEntryForAccount(CustomerPostingGroup, ActualAmount);
+    end;
+
     local procedure Initialize()
     var
         ReportSelections: Record "Report Selections";
+        UserSetup: Record "User Setup";
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"ERM Sales Documents III");
@@ -5946,8 +6268,11 @@ codeunit 134387 "ERM Sales Documents III"
         LibraryVariableStorage.Clear();
         LibrarySetupStorage.Restore();
         LibraryPriceCalculation.DisableExtendedPriceCalculation();
+        UserSetup.DeleteAll();
+
         if isInitialized then
             exit;
+
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(CODEUNIT::"ERM Sales Documents III");
 
         LibraryERMCountryData.CreateVATData();
@@ -6265,6 +6590,36 @@ codeunit 134387 "ERM Sales Documents III"
         Evaluate(ShippingTime, StrSubstNo('<%1D>', LibraryRandom.RandInt(10)));
         Customer.Validate("Shipping Time", ShippingTime);
         Customer.Modify(true);
+    end;
+
+    local procedure CreateCustomerWithSalesperson(var Customer: Record Customer)
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+    begin
+        LibrarySales.CreateCustomer(Customer);
+        LibrarySales.CreateSalesperson(Salesperson);
+        Customer.Validate("Salesperson Code", Salesperson.Code);
+        Customer.Modify(true);
+    end;
+
+    local procedure CreateUserSetupWithSalesperson(var UserSetup: Record "User Setup")
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+    begin
+        LibraryTimeSheet.CreateUserSetup(UserSetup, true);
+        LibrarySales.CreateSalesperson(Salesperson);
+        UserSetup.Validate("Salespers./Purch. Code", Salesperson.Code);
+        UserSetup.Modify(true);
+    end;
+
+    local procedure CreateShipToAddressWithSalesperson(var ShipToAddress: Record "Ship-to Address"; CustomerNo: Code[20])
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+    begin
+        LibrarySales.CreateShipToAddress(ShipToAddress, CustomerNo);
+        LibrarySales.CreateSalesperson(Salesperson);
+        ShipToAddress.Validate("Salesperson Code", Salesperson.Code);
+        ShipToAddress.Modify(true);
     end;
 
     local procedure CreatePostCode(var PostCode: Record "Post Code"; "Code": Code[20])
@@ -7222,6 +7577,145 @@ codeunit 134387 "ERM Sales Documents III"
         PostCode.Insert(true);
     end;
 
+    local procedure SetJournalTemplNameMandatoryFalse()
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Journal Templ. Name Mandatory" := false;
+        GeneralLedgerSetup.Modify();
+    end;
+
+    local procedure GeneratePostingDate(var PostingDate: array[3] of Date)
+    begin
+        PostingDate[1] := WorkDate();
+        PostingDate[2] := CalcDate('<-15D>', PostingDate[1]);
+        PostingDate[3] := CalcDate('<-15D>', PostingDate[2]);
+    end;
+
+    local procedure CreateCurrencyWithExchangeRates(
+        var Currency: Record Currency;
+        var CurrencyExchangeRate: array[3] of Record "Currency Exchange Rate";
+        PostingDate: array[3] of Date)
+    var
+        RelExchRateAmount: array[3] of Integer;
+        AdjustExchRateAmount: Integer;
+    begin
+        RelExchRateAmount[1] := LibraryRandom.RandIntInRange(75, 75);
+        RelExchRateAmount[2] := LibraryRandom.RandIntInRange(80, 80);
+        RelExchRateAmount[3] := LibraryRandom.RandIntInRange(90, 90);
+        AdjustExchRateAmount := LibraryRandom.RandIntInRange(100, 100);
+
+        Currency.Get(LibraryERM.CreateCurrencyWithGLAccountSetup());
+
+        LibraryERM.CreateExchRate(CurrencyExchangeRate[1], Currency.Code, PostingDate[3]);
+        CurrencyExchangeRate[1].Validate("Exchange Rate Amount", AdjustExchRateAmount);
+        CurrencyExchangeRate[1].Validate("Adjustment Exch. Rate Amount", AdjustExchRateAmount);
+        CurrencyExchangeRate[1].Validate("Relational Exch. Rate Amount", RelExchRateAmount[1]);
+        CurrencyExchangeRate[1].Validate("Relational Adjmt Exch Rate Amt", RelExchRateAmount[1]);
+        CurrencyExchangeRate[1].Modify(true);
+
+        LibraryERM.CreateExchRate(CurrencyExchangeRate[2], Currency.Code, PostingDate[2]);
+        CurrencyExchangeRate[2].Validate("Exchange Rate Amount", AdjustExchRateAmount);
+        CurrencyExchangeRate[2].Validate("Adjustment Exch. Rate Amount", AdjustExchRateAmount);
+        CurrencyExchangeRate[2].Validate("Relational Exch. Rate Amount", RelExchRateAmount[2]);
+        CurrencyExchangeRate[2].Validate("Relational Adjmt Exch Rate Amt", RelExchRateAmount[2]);
+        CurrencyExchangeRate[2].Modify(true);
+
+        LibraryERM.CreateExchRate(CurrencyExchangeRate[3], Currency.Code, PostingDate[1]);
+        CurrencyExchangeRate[3].Validate("Exchange Rate Amount", AdjustExchRateAmount);
+        CurrencyExchangeRate[3].Validate("Adjustment Exch. Rate Amount", AdjustExchRateAmount);
+        CurrencyExchangeRate[3].Validate("Relational Exch. Rate Amount", RelExchRateAmount[3]);
+        CurrencyExchangeRate[3].Validate("Relational Adjmt Exch Rate Amt", RelExchRateAmount[3]);
+        CurrencyExchangeRate[3].Modify(true);
+    end;
+
+    local procedure CreateCustomerWithAllowMultiplePostingGroups(
+        var Customer: Record Customer;
+        CustomerPostingGroupCode: Code[20];
+        CurrencyCode: Code[20];
+        VATBusPostGroupCode: Code[20])
+    begin
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Allow Multiple Posting Groups", true);
+        Customer.Validate("VAT Bus. Posting Group", VATBusPostGroupCode);
+        Customer.Validate("Customer Posting Group", CustomerPostingGroupCode);
+        Customer.Validate("Currency Code", CurrencyCode);
+        Customer.Modify(true);
+    end;
+
+    local procedure CreateSalesInvoice(
+        var SalesHeader: Record "Sales Header";
+        var SalesLine: Record "Sales Line";
+        PostingDate: Date;
+        ItemCode: Code[20];
+        CustomerNo: Code[20])
+    begin
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Invoice, CustomerNo);
+        SalesHeader.Validate("Posting Date", PostingDate);
+        SalesHeader.Validate("Document Date", PostingDate);
+        SalesHeader.Modify(true);
+
+        LibrarySales.CreateSalesLineWithUnitPrice(
+            SalesLine, SalesHeader, ItemCode,
+            LibraryRandom.RandIntInRange(100, 100), LibraryRandom.RandInt(0));
+    end;
+
+    local procedure CreateGeneralJournalBatch(var GenJournalBatch: Record "Gen. Journal Batch"; ForceDocBalance: Boolean)
+    var
+        GenJournalTemplate: Record "Gen. Journal Template";
+    begin
+        LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
+        GenJournalTemplate.Validate("Force Doc. Balance", ForceDocBalance);
+        GenJournalTemplate.Modify(true);
+        LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
+    end;
+
+    local procedure CreatePaymentAndPost(
+        GenJournalLine: Record "Gen. Journal Line"; GenJournalBatch: Record "Gen. Journal Batch"; CustomerNo: Code[20];
+        CustomerPostingGroupCode: Code[20]; PostingDate: Date; var PaymentDocNo: Code[20])
+    begin
+        LibraryERM.CreateGeneralJnlLineWithBalAcc(
+            GenJournalLine, GenJournalBatch."Journal Template Name", GenJournalBatch.Name,
+            GenJournalLine."Document Type"::Payment, GenJournalLine."Account Type"::Customer, CustomerNo,
+            GenJournalLine."Bal. Account Type"::"G/L Account", LibraryERM.CreateGLAccountNoWithDirectPosting(), -LibraryRandom.RandIntInRange(100, 100));
+        GenJournalLine.Validate("Posting Date", PostingDate);
+        GenJournalLine.Validate("Posting Group", CustomerPostingGroupCode);
+        GenJournalLine.Modify(true);
+        PaymentDocNo := GenJournalLine."Document No.";
+        LibraryERM.PostGeneralJnlLine(GenJournalLine);
+    end;
+
+    local procedure ApplyPostCustPayment2Invoices(PayDocNo: Code[20]; InvDocNo: Code[20])
+    var
+        CustLedgerEntryFrom: Record "Cust. Ledger Entry";
+        CustLedgerEntryTo: Record "Cust. Ledger Entry";
+    begin
+        LibraryERM.FindCustomerLedgerEntry(CustLedgerEntryFrom, CustLedgerEntryFrom."Document Type"::Payment, PayDocNo);
+        CustLedgerEntryFrom.CalcFields("Remaining Amount");
+        LibraryERM.SetApplyCustomerEntry(CustLedgerEntryFrom, CustLedgerEntryFrom."Remaining Amount");
+        LibraryERM.FindCustomerLedgerEntry(CustLedgerEntryTo, CustLedgerEntryTo."Document Type"::Invoice, InvDocNo);
+        LibraryERM.SetAppliestoIdCustomer(CustLedgerEntryTo);
+        LibraryERM.PostCustLedgerApplication(CustLedgerEntryFrom);
+    end;
+
+    local procedure VerifyGLEntryForAccount(CustomerPostingGroup: array[2] of Record "Customer Posting Group"; ActualAmount: array[2] of Decimal)
+    begin
+        GetGLEntryBalance(CustomerPostingGroup[1]."Receivables Account", ActualAmount[1]);
+        Assert.AreEqual(0, ActualAmount[1], StrSubstNo(AccountBalanceErrLbl, CustomerPostingGroup[1]."Receivables Account"));
+        GetGLEntryBalance(CustomerPostingGroup[2]."Receivables Account", ActualAmount[2]);
+        Assert.AreEqual(0, ActualAmount[2], StrSubstNo(AccountBalanceErrLbl, CustomerPostingGroup[2]."Receivables Account"));
+    end;
+
+    local procedure GetGLEntryBalance(AccountNo: Code[20]; var Balance: Decimal)
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        GLEntry.SetRange("G/L Account No.", AccountNo);
+        GLEntry.CalcSums(Amount);
+        Balance := GLEntry.Amount;
+    end;
+
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure CreateEmptyPostedInvConfirmHandler(Question: Text[1024]; var Reply: Boolean)
@@ -7456,6 +7950,13 @@ codeunit 134387 "ERM Sales Documents III"
     begin
         Assert.ExpectedMessage(LibraryVariableStorage.DequeueText(), Message);
         Response := LibraryVariableStorage.DequeueBoolean();
+    end;
+
+    [ConfirmHandler]
+    [Scope('OnPrem')]
+    procedure ConfirmHandlerYes(Question: Text[1024]; var Reply: Boolean)
+    begin
+        Reply := true;
     end;
 
     [ModalPageHandler]
