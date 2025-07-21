@@ -24,20 +24,16 @@ codeunit 36953 "Finance Installation Handler"
         InitializePowerBIAccountCategories();
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"Account Category", 'r')]
     local procedure InitializePowerBIAccountCategories()
     var
         PowerBIAccountCategory: Record "Account Category";
     begin
-        if PowerBIAccountCategory.IsEmpty() then
-            RestorePowerBIAccountCategories();
-    end;
-
-    [InherentPermissions(PermissionObjectType::TableData, Database::"Account Category", 'r')]
-    procedure RestorePowerBIAccountCategories()
-    begin
-        InsertL1AccountCategories();
-        InsertL2AccountCategories();
-        InsertL3AccountCategories();
+        if PowerBIAccountCategory.IsEmpty() then begin
+            InsertL1AccountCategories();
+            InsertL2AccountCategories();
+            InsertL3AccountCategories();
+        end;
     end;
 
     local procedure InsertL1AccountCategories()
@@ -89,11 +85,9 @@ codeunit 36953 "Finance Installation Handler"
         NewPowerBIAccountCategory: Record "Account Category";
         GLAccCatParentEntryNo: Integer;
     begin
-        if not NewPowerBIAccountCategory.Get(AccountCategoryType) then begin
-            NewPowerBIAccountCategory.Init();
-            NewPowerBIAccountCategory."Account Category Type" := AccountCategoryType;
-            NewPowerBIAccountCategory.Insert();
-        end;
+        NewPowerBIAccountCategory.Init();
+        NewPowerBIAccountCategory."Account Category Type" := AccountCategoryType;
+        NewPowerBIAccountCategory.Insert();
 
         if ValidateGLAccountCategory(GLAccCatEntryNo, GLAccCatIndentation, GLAccCatParentEntryNo) then begin
             NewPowerBIAccountCategory."G/L Acc. Category Entry No." := GLAccCatEntryNo;

@@ -142,9 +142,6 @@
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
-    },
-    {
       "path": "./FieldServiceIntegration/Test/Field Service Integration Test"
     },
     {
@@ -268,9 +265,6 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
-    },
-    {
       "path": "./ContosoCoffeeDemoDataset/Test/Contoso Coffee Demo Dataset Tests"
     },
     {
@@ -306,10 +300,10 @@
   ],
   "settings": {
     "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
     },
+    "al.enableCodeActions": false,
     "allint.enabled": false
   }
 }
