@@ -4,7 +4,6 @@ using System.IO;
 using System.Security.AccessControl;
 using System.Telemetry;
 
-#pragma warning disable AS0018
 codeunit 423 "Change Log Management"
 {
     InherentEntitlements = X;
@@ -37,8 +36,13 @@ codeunit 423 "Change Log Management"
         ChangeLogCategoryLbl: Label 'Change Log', Locked = true;
 
     procedure GetDatabaseTableTriggerSetup(TableID: Integer; var LogInsert: Boolean; var LogModify: Boolean; var LogDelete: Boolean; var LogRename: Boolean)
+    var
+        IsHandled: Boolean;
     begin
-        // Do not add events that allow control of LogInsert, LogModify, LogDelete, LogRename or IsHandled.
+        IsHandled := false;
+        OnBeforeGetDatabaseTableTriggerSetup(TableID, LogInsert, LogModify, LogDelete, LogRename, IsHandled);
+        if IsHandled then
+            exit;
 
         if LogDelete and LogInsert and LogModify and LogRename then
             exit;
@@ -86,11 +90,19 @@ codeunit 423 "Change Log Management"
         LogModify := LogModify or (TempChangeLogSetupTable."Log Modification" <> TempChangeLogSetupTable."Log Modification"::" ");
         LogRename := LogRename or (TempChangeLogSetupTable."Log Modification" <> TempChangeLogSetupTable."Log Modification"::" ");
         LogDelete := LogDelete or (TempChangeLogSetupTable."Log Deletion" <> TempChangeLogSetupTable."Log Deletion"::" ");
+
+        OnAfterGetDatabaseTableTriggerSetup(TempChangeLogSetupTable, LogInsert, LogModify, LogDelete, LogRename);
     end;
 
     procedure IsLogActive(TableNumber: Integer; FieldNumber: Integer; TypeOfChange: Option Insertion,Modification,Deletion): Boolean
+    var
+        IsActive: Boolean;
+        IsHandled: Boolean;
     begin
-        // Do not add events that allow control of return value
+        IsHandled := false;
+        OnBeforeIsLogActive(TableNumber, FieldNumber, TypeOfChange, IsActive, IsHandled);
+        if IsHandled then
+            exit(IsActive);
 
         if IsAlwaysLoggedTable(TableNumber) then
             exit(true);
@@ -142,7 +154,7 @@ codeunit 423 "Change Log Management"
         end;
     end;
 
-    local procedure IsFieldLogActive(TableNumber: Integer; FieldNumber: Integer; TypeOfChange: Option Insertion,Modification,Deletion): Boolean
+    local procedure IsFieldLogActive(TableNumber: Integer; FieldNumber: Integer; TypeOfChange: Option Insertion,Modification,Deletion) IsActive: Boolean
     begin
         if FieldNumber = 0 then
             exit(true);
@@ -169,6 +181,8 @@ codeunit 423 "Change Log Management"
             TypeOfChange::Deletion:
                 exit(TempChangeLogSetupField."Log Deletion");
         end;
+
+        OnAfterIsFieldLogActive(TableNumber, FieldNumber, TypeOfChange, TempChangeLogSetupField, IsActive);
     end;
 
     procedure IsAlwaysLoggedTable(TableID: Integer) AlwaysLogTable: Boolean
@@ -200,6 +214,8 @@ codeunit 423 "Change Log Management"
         KeyFldRef: FieldRef;
         KeyRef1: KeyRef;
         i: Integer;
+        AlwaysLog: Boolean;
+        Handled: Boolean;
     begin
         if RecRef.CurrentCompany <> ChangeLogEntry.CurrentCompany then
             ChangeLogEntry.ChangeCompany(RecRef.CurrentCompany);
@@ -261,7 +277,15 @@ codeunit 423 "Change Log Management"
         ChangeLogEntry.Validate("Changed Record SystemId", RecRef.Field(RecRef.SystemIdNo).Value);
         MonitorSensitiveFieldData.HandleMonitorSensitiveFields(ChangeLogEntry, TempChangeLogSetupField, RecRef, FldRef, IsAlwaysLoggedTable(RecRef.Number), FieldMonitoringSetup."Monitor Status");
 
-        ChangeLogEntry.Insert(true);
+        AlwaysLog := IsAlwaysLoggedTable(ChangeLogEntry."Table No.");
+        ChangeLogEntry.Consistent := false; // to protect against commits in the subscriber(s)
+        if AlwaysLog then
+            OnBeforeInsertChangeLogEntryByValue(ChangeLogEntry, AlwaysLog, Handled)
+        else
+            OnBeforeInsertChangeLogEntry(ChangeLogEntry, AlwaysLog, Handled);
+        ChangeLogEntry.Consistent := true;
+        if AlwaysLog or not Handled then
+            ChangeLogEntry.Insert(true);
     end;
 
     procedure LogInsertion(var RecRef: RecordRef)
@@ -633,6 +657,21 @@ codeunit 423 "Change Log Management"
     begin
     end;
 
+    local procedure OnBeforeInsertChangeLogEntryByValue(ChangeLogEntry: Record "Change Log Entry"; AlwaysLog: Boolean; var Handled: Boolean)
+    begin
+        OnBeforeInsertChangeLogEntry(ChangeLogEntry, AlwaysLog, Handled);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetDatabaseTableTriggerSetup(TableID: Integer; var LogInsert: Boolean; var LogModify: Boolean; var LogDelete: Boolean; var LogRename: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterIsFieldLogActive(TableNumber: Integer; FieldNumber: Integer; TypeOfChange: Option Insertion,Modification,Deletion,,Mandatory,Secured,Reporting,"Data Approval"; TempChangeLogSetupField: Record "Change Log Setup (Field)" temporary; var IsActive: Boolean)
+    begin
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnInsertLogEntryOnBeforeChangeLogEntryValidateChangedRecordSystemId(var ChangeLogEntry: Record "Change Log Entry"; RecRef: RecordRef; FldRef: FieldRef)
     begin
@@ -659,7 +698,22 @@ codeunit 423 "Change Log Management"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertChangeLogEntry(var ChangeLogEntry: Record "Change Log Entry"; AlwaysLog: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterIsAlwaysLoggedTable(TableID: Integer; var AlwaysLogTable: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetDatabaseTableTriggerSetup(TempChangeLogSetupTable: Record "Change Log Setup (Table)" temporary; var LogInsert: Boolean; var LogModify: Boolean; var LogDelete: Boolean; var LogRename: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsLogActive(TableNumber: Integer; FieldNumber: Integer; TypeOfChange: Option Insertion,Modification,Deletion; var IsActive: Boolean; var IsHandled: Boolean);
     begin
     end;
 
@@ -683,5 +737,4 @@ codeunit 423 "Change Log Management"
     begin
     end;
 }
-#pragma warning restore AS0018
 
