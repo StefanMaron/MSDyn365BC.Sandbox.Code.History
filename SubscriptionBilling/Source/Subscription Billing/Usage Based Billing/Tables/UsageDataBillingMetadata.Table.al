@@ -1,4 +1,3 @@
-#pragma warning disable AA0247
 table 8021 "Usage Data Billing Metadata"
 {
     Access = Internal;
