@@ -1605,7 +1605,6 @@ table 38 "Purchase Header"
                     UpdateDocumentDate := true;
                 Validate("Payment Terms Code");
                 Validate("Prepmt. Payment Terms Code");
-                UpdateDocumentDate := false;
             end;
         }
         field(101; "Area"; Code[10])
@@ -1955,14 +1954,7 @@ table 38 "Purchase Header"
             TableRelation = "No. Series";
 
             trigger OnLookup()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeLookupPrepmtCrMemoNoSeries(Rec, xRec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 PurchHeader := Rec;
                 GetPurchSetup();
                 PurchSetup.TestField("Posted Prepmt. Cr. Memo Nos.");
@@ -1972,14 +1964,7 @@ table 38 "Purchase Header"
             end;
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidatePrepmtCrMemoNoSeries(Rec, xRec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if "Prepmt. Cr. Memo No. Series" <> '' then begin
                     GetPurchSetup();
                     PurchSetup.TestField("Posted Prepmt. Cr. Memo Nos.");
@@ -4146,8 +4131,6 @@ table 38 "Purchase Header"
                     DimMgt.UpdateGlobalDimFromDimSetID(Rec."Dimension Set ID", Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code");
                 end;
 
-        OnCreateDimOnAfterConfirmKeepExisting(Rec, xRec, CurrFieldNo, OldDimSetID, DefaultDimSource);
-
         if (OldDimSetID <> "Dimension Set ID") and PurchLinesExist() then begin
             Modify();
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
@@ -4217,7 +4200,7 @@ table 38 "Purchase Header"
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec, FieldNumber);
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if PurchLinesExist() then
@@ -4662,7 +4645,6 @@ table 38 "Purchase Header"
     /// <param name="OldParentDimSetID">Previous dimension set ID.</param>
     procedure UpdateAllLineDim(NewParentDimSetID: Integer; OldParentDimSetID: Integer)
     var
-        xPurchaseLine: Record "Purchase Line";
         ConfirmManagement: Codeunit "Confirm Management";
         NewDimSetID: Integer;
         ReceivedShippedItemLineDimChangeConfirmed: Boolean;
@@ -4694,7 +4676,6 @@ table 38 "Purchase Header"
                 NewDimSetID := DimMgt.GetDeltaDimSetID(PurchLine."Dimension Set ID", NewParentDimSetID, OldParentDimSetID);
                 OnUpdateAllLineDimOnAfterGetPurchLineNewDimsetID(Rec, xRec, PurchLine, NewDimSetID, NewParentDimSetID, OldParentDimSetID);
                 if PurchLine."Dimension Set ID" <> NewDimSetID then begin
-                    xPurchaseLine := PurchLine;
                     PurchLine."Dimension Set ID" := NewDimSetID;
 
                     if not GetHideValidationDialog() and GuiAllowed then
@@ -4703,7 +4684,7 @@ table 38 "Purchase Header"
                     DimMgt.UpdateGlobalDimFromDimSetID(
                       PurchLine."Dimension Set ID", PurchLine."Shortcut Dimension 1 Code", PurchLine."Shortcut Dimension 2 Code");
 
-                    OnUpdateAllLineDimOnBeforePurchLineModify(PurchLine, xPurchaseLine);
+                    OnUpdateAllLineDimOnBeforePurchLineModify(PurchLine);
                     PurchLine.Modify();
                 end;
             until PurchLine.Next() = 0;
@@ -4813,13 +4794,7 @@ table 38 "Purchase Header"
     procedure GetPstdDocLinesToReverse()
     var
         PurchPostedDocLines: Page "Posted Purchase Document Lines";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeGetPstdDocLinesToReverse(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         GetVend("Buy-from Vendor No.");
         PurchPostedDocLines.SetToPurchHeader(Rec);
         PurchPostedDocLines.SetRecord(Vend);
@@ -4828,8 +4803,6 @@ table 38 "Purchase Header"
             PurchPostedDocLines.CopyLineToDoc();
 
         Clear(PurchPostedDocLines);
-
-        OnAfterGetPstdDocLinesToReverse(Rec);
     end;
 
     /// <summary>
@@ -4931,32 +4904,27 @@ table 38 "Purchase Header"
 
     local procedure CopyAddressInfoFromOrderAddress()
     var
-        OrderAddress: Record "Order Address";
-        IsHandled: Boolean;
+        OrderAddr: Record "Order Address";
     begin
-        OrderAddress.Get("Buy-from Vendor No.", "Order Address Code");
-        IsHandled := false;
-        OnCopyAddressInfoFromOrderAddressOnBeforeCopyBuyFromVendorAddressFieldsFromOrderAddress(Rec, xRec, OrderAddress, IsHandled);
-        if not IsHandled then begin
-            "Buy-from Vendor Name" := OrderAddress.Name;
-            "Buy-from Vendor Name 2" := OrderAddress."Name 2";
-            "Buy-from Address" := OrderAddress.Address;
-            "Buy-from Address 2" := OrderAddress."Address 2";
-            "Buy-from City" := OrderAddress.City;
-            "Buy-from Contact" := OrderAddress.Contact;
-            "Buy-from Post Code" := OrderAddress."Post Code";
-            "Buy-from County" := OrderAddress.County;
-            "Buy-from Country/Region Code" := OrderAddress."Country/Region Code";
-        end;
+        OrderAddr.Get("Buy-from Vendor No.", "Order Address Code");
+        "Buy-from Vendor Name" := OrderAddr.Name;
+        "Buy-from Vendor Name 2" := OrderAddr."Name 2";
+        "Buy-from Address" := OrderAddr.Address;
+        "Buy-from Address 2" := OrderAddr."Address 2";
+        "Buy-from City" := OrderAddr.City;
+        "Buy-from Contact" := OrderAddr.Contact;
+        "Buy-from Post Code" := OrderAddr."Post Code";
+        "Buy-from County" := OrderAddr.County;
+        "Buy-from Country/Region Code" := OrderAddr."Country/Region Code";
 
         if IsCreditDocType() then begin
             SetShipToAddress(
-                OrderAddress.Name, OrderAddress."Name 2", OrderAddress.Address, OrderAddress."Address 2",
-                OrderAddress.City, OrderAddress."Post Code", OrderAddress.County, OrderAddress."Country/Region Code");
-            "Ship-to Phone No." := OrderAddress."Phone No.";
-            "Ship-to Contact" := OrderAddress.Contact;
+                OrderAddr.Name, OrderAddr."Name 2", OrderAddr.Address, OrderAddr."Address 2",
+                OrderAddr.City, OrderAddr."Post Code", OrderAddr.County, OrderAddr."Country/Region Code");
+            "Ship-to Phone No." := OrderAddr."Phone No.";
+            "Ship-to Contact" := OrderAddr.Contact;
         end;
-        OnAfterCopyAddressInfoFromOrderAddress(OrderAddress, Rec);
+        OnAfterCopyAddressInfoFromOrderAddress(OrderAddr, Rec);
     end;
 
     /// <summary>
@@ -5099,7 +5067,6 @@ table 38 "Purchase Header"
 
         PurchaseLine.SetRange("Document Type", "Document Type");
         PurchaseLine.SetRange("Document No.", "No.");
-        PurchaseLine.SetFilter(Type, '<>%1', PurchaseLine.Type::" ");
         if not PurchaseLine.FindFirst() then
             exit(true);
 
@@ -5964,8 +5931,6 @@ table 38 "Purchase Header"
             InitNoSeries();
             exit(true);
         end;
-
-        OnAfterInitFromVendor(Rec, xRec, VendorNo, VendorCaption);
     end;
 
     local procedure InitFromContact(ContactNo: Code[20]; VendorNo: Code[20]; ContactCaption: Text): Boolean
@@ -7779,7 +7744,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var PurcasehHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; FieldNumber: Integer)
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var PurcasehHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header")
     begin
     end;
 
@@ -8364,7 +8329,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateAllLineDimOnBeforePurchLineModify(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line")
+    local procedure OnUpdateAllLineDimOnBeforePurchLineModify(var PurchaseLine: Record "Purchase Line")
     begin
     end;
 
@@ -8847,41 +8812,6 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterPayToAddressEqualsOldBuyFromAddress(PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyAddressInfoFromOrderAddressOnBeforeCopyBuyFromVendorAddressFieldsFromOrderAddress(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; OrderAddress: Record "Order Address"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInitFromVendor(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; VendorNo: Code[20]; VendorCaption: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateDimOnAfterConfirmKeepExisting(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CurrentFieldNo: Integer; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeLookupPrepmtCrMemoNoSeries(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidatePrepmtCrMemoNoSeries(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetPstdDocLinesToReverse(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetPstdDocLinesToReverse(var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 }
