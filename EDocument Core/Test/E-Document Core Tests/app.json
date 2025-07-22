@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "E-Document Core Tests",
   "description": "E-Document Core Tests",
-  "version": "26.3.36158.37009",
+  "version": "26.3.36158.37016",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
   "help": "https://go.microsoft.com/fwlink/?linkid=2204541",
@@ -45,12 +45,6 @@
     {
       "id": "e7320ebb-08b3-4406-b1ec-b4927d3e280b",
       "name": "Any",
-      "publisher": "Microsoft",
-      "version": "26.3.0.0"
-    },
-    {
-      "id": "3e75ec63-8d7b-4bf8-9c79-9182a7caad84",
-      "name": "Adversarial Simulation Test Library",
       "publisher": "Microsoft",
       "version": "26.3.0.0"
     }
