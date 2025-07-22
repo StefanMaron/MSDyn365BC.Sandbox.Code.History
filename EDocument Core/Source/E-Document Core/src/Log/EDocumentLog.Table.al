@@ -11,7 +11,6 @@ using Microsoft.eServices.EDocument.Processing.Import;
 table 6124 "E-Document Log"
 {
     DataClassification = CustomerContent;
-    ReplicateData = false;
 
     fields
     {
