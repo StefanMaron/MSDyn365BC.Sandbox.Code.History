@@ -25,7 +25,6 @@ page 7775 "Copilot AI Capabilities"
     Extensible = false;
     InherentEntitlements = X;
     InherentPermissions = X;
-    Permissions = tabledata "Copilot Settings" = r;
 
     layout
     {
