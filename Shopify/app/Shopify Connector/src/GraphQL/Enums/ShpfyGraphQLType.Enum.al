@@ -485,6 +485,11 @@ enum 30111 "Shpfy GraphQL Type" implements "Shpfy IGraphQL"
         Caption = 'Variant Metafield Ids';
         Implementation = "Shpfy IGraphQL" = "Shpfy GQL VariantMetafieldIds";
     }
+    value(97; GetProductImage)
+    {
+        Caption = 'Get Product Image';
+        Implementation = "Shpfy IGraphQL" = "Shpfy GQL GetProductImage";
+    }
     value(111; InventoryActivate)
     {
         Caption = 'Inventory Activate';
