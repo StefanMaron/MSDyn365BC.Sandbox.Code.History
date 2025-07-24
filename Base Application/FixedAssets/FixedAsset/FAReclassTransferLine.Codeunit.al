@@ -353,7 +353,6 @@ codeunit 5642 "FA Reclass. Transfer Line"
         FixedAmount: Decimal;
         FixedAmount2: Decimal;
         DaysInFiscalYear: Integer;
-        IsHandled: Boolean;
     begin
         if not FAReclassJnlLine."Calc. DB1 Depr. Amount" then
             exit;
@@ -387,22 +386,18 @@ codeunit 5642 "FA Reclass. Transfer Line"
         FADeprBook.TestField("Temp. Ending Date", 0D);
         FADeprBook2.TestField("Temp. Ending Date", 0D);
 
-        IsHandled := false;
-        OnCalcDB1DeprAmountOnBeforeGetAccountingPeriod(FAReclassJnlLine, DeprUntilDate, IsHandled);
-
-        if not IsHandled then
-            if AccountingPeriod.IsEmpty() then
-                DeprUntilDate := CalcDate('<-CY>', FAReclassJnlLine."FA Posting Date") - 1
-            else begin
-                AccountingPeriod.SetRange("New Fiscal Year", true);
-                AccountingPeriod.SetRange("Starting Date", FAReclassJnlLine."FA Posting Date", DMY2Date(31, 12, 9999));
-                if AccountingPeriod.FindFirst() then begin
-                    if AccountingPeriod."Starting Date" <= 00000101D then
-                        Error(Text005, AccountingPeriod.FieldCaption("Starting Date"), AccountingPeriod.TableCaption);
-                    DeprUntilDate := AccountingPeriod."Starting Date" - 1
-                end else
+        if AccountingPeriod.IsEmpty() then
+            DeprUntilDate := CalcDate('<-CY>', FAReclassJnlLine."FA Posting Date") - 1
+        else begin
+            AccountingPeriod.SetRange("New Fiscal Year", true);
+            AccountingPeriod.SetRange("Starting Date", FAReclassJnlLine."FA Posting Date", DMY2Date(31, 12, 9999));
+            if AccountingPeriod.FindFirst() then begin
+                if AccountingPeriod."Starting Date" <= 00000101D then
                     Error(Text005, AccountingPeriod.FieldCaption("Starting Date"), AccountingPeriod.TableCaption);
-            end;
+                DeprUntilDate := AccountingPeriod."Starting Date" - 1
+            end else
+                Error(Text005, AccountingPeriod.FieldCaption("Starting Date"), AccountingPeriod.TableCaption);
+        end;
 
         CalculateDepr.Calculate(
           DeprAmount, Custom1Amount, NumberOfDays, Custom1NumberOfDays,
@@ -467,11 +462,6 @@ codeunit 5642 "FA Reclass. Transfer Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcAmountsOnAfterSetAmounts(FADepreciationBook: Record "FA Depreciation Book"; var Amounts: array[9] of Decimal; TransferType: array[9] of Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcDB1DeprAmountOnBeforeGetAccountingPeriod(FAReclassJnlLine: Record "FA Reclass. Journal Line"; var DeprUntilDate: Date; var IsHandled: Boolean)
     begin
     end;
 }
