@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "allint.enabled": false,
-    "al.enableCodeAnalysis": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false
-  },
   "folders": [
     {
       "path": "./Shopify/test/Shopify Connector Test"
@@ -123,9 +115,6 @@
       "path": "./SubscriptionBilling/Test/Subscription & Recurring Billing Tests"
     },
     {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
-    },
-    {
       "path": "./Email - Outlook REST API/Test"
     },
     {
@@ -145,12 +134,6 @@
     },
     {
       "path": "./VATGroupManagement/Test/VAT Group Management Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
     },
     {
       "path": "./FieldServiceIntegration/Test/Field Service Integration Test"
@@ -276,9 +259,6 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
-    },
-    {
       "path": "./ContosoCoffeeDemoDataset/Test/Contoso Coffee Demo Dataset Tests"
     },
     {
@@ -311,5 +291,13 @@
     {
       "path": "./System Application/Source/System Application/Email/src/Test Email"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false
+  }
 }
