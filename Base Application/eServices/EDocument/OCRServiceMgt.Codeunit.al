@@ -554,6 +554,7 @@ codeunit 1294 "OCR Service Mgt."
         exit(UploadLearningDocument(TempBlob, DocumentId, IncomingDocument.RecordId));
     end;
 
+    [Scope('OnPrem')]
     procedure CorrectOCRFile(IncomingDocument: Record "Incoming Document"; var TempBlob: Codeunit "Temp Blob")
     var
         OCRFileXMLRootNode: DotNet XmlNode;
@@ -577,7 +578,6 @@ codeunit 1294 "OCR Service Mgt."
         CorrectOCRFileNode(OCRFileXMLRootNode, IncomingDocument, IncomingDocument.FieldNo("Vendor Bank Branch No."));
         CorrectOCRFileNode(OCRFileXMLRootNode, IncomingDocument, IncomingDocument.FieldNo("Vendor Bank Account No."));
         CorrectOCRFileNode(OCRFileXMLRootNode, IncomingDocument, IncomingDocument.FieldNo("Vendor Phone No."));
-        OnCorrectOCRFileOnAfterCorrectOCRFileNodes(OCRFileXMLRootNode, IncomingDocument);
         Clear(TempBlob);
         TempBlob.CreateOutStream(OutStream);
         OCRFileXMLRootNode.OwnerDocument.Save(OutStream);
@@ -787,9 +787,7 @@ codeunit 1294 "OCR Service Mgt."
         IncomingDocumentAttachment.FindFirst();
 
         IncomingDocument.Get(IncomingDocumentAttachment."Incoming Document Entry No.");
-        if (IncomingDocument."OCR Status" <> IncomingDocument."OCR Status"::Sent) and
-           (IncomingDocument."OCR Status" <> IncomingDocument."OCR Status"::"Awaiting Verification")
-        then
+        if IncomingDocument."OCR Status" <> IncomingDocument."OCR Status"::Sent then
             exit;
 
         TempIncomingDocumentAttachment := IncomingDocumentAttachment;
@@ -1178,7 +1176,7 @@ codeunit 1294 "OCR Service Mgt."
             35: // 'BATCHEXPORTFAILED'
                 exit(IncomingDocument."OCR Status"::Error);
             40: // 'BATCHSUCCESSFULLYPROCESSED'
-                exit(IncomingDocument."OCR Status"::Success);
+                exit(IncomingDocument."OCR Status"::Sent);
             50: // 'BATCHREJECTED'
                 exit(IncomingDocument."OCR Status"::Error);
             100: // 'BATCHDELETED'
@@ -1327,11 +1325,6 @@ codeunit 1294 "OCR Service Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDownloadDocument(ExternalBatchId: Text[50]; DocId: Text[50]; var Result: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCorrectOCRFileOnAfterCorrectOCRFileNodes(var OCRFileXMLRootNode: DotNet XmlNode; var IncomingDocument: Record "Incoming Document")
     begin
     end;
 }
