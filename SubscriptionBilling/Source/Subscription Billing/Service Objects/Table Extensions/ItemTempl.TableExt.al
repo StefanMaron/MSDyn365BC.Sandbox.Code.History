@@ -18,13 +18,6 @@ tableextension 8095 "Item Templ." extends "Item Templ."
                     DeleteItemTemplateServiceCommitmentPackages();
             end;
         }
-        modify("Allow Invoice Disc.")
-        {
-            trigger OnAfterValidate()
-            begin
-                Rec.ValidateItemField(FieldNo("Allow Invoice Disc."));
-            end;
-        }
     }
 
     local procedure DeleteItemTemplateServiceCommitmentPackages()

@@ -25,7 +25,7 @@ codeunit 30286 "Shpfy Company API"
         CompanyContactId: BigInteger;
         CompanyContactRoles: Dictionary of [Text, BigInteger];
     begin
-        GraphQuery := CreateCompanyGraphQLQuery(ShopifyCompany, CompanyLocation);
+        GraphQuery := CreateCompanyGraphQLQuery(ShopifyCompany, CompanyLocation, ShopifyCustomer);
         JResponse := CommunicationMgt.ExecuteGraphQL(GraphQuery);
         if JResponse.SelectToken('$.data.companyCreate.company', JItem) then
             if JItem.IsObject then begin
@@ -102,7 +102,7 @@ codeunit 30286 "Shpfy Company API"
         exit(true);
     end;
 
-    internal procedure CreateCompanyGraphQLQuery(var ShopifyCompany: Record "Shpfy Company"; CompanyLocation: Record "Shpfy Company Location"): Text
+    internal procedure CreateCompanyGraphQLQuery(var ShopifyCompany: Record "Shpfy Company"; CompanyLocation: Record "Shpfy Company Location"; ShopifyCustomer: Record "Shpfy Customer"): Text
     var
         GraphQuery: TextBuilder;
         PaymentTermsTemplateIdTxt: Label 'gid://shopify/PaymentTermsTemplate/%1', Comment = '%1 = Payment Terms Template Id', Locked = true;
@@ -110,8 +110,9 @@ codeunit 30286 "Shpfy Company API"
         GraphQuery.Append('{"query":"mutation {companyCreate(input: {company: {');
         if ShopifyCompany.Name <> '' then
             AddFieldToGraphQuery(GraphQuery, 'name', ShopifyCompany.Name);
-        if ShopifyCompany."External Id" <> '' then
-            AddFieldToGraphQuery(GraphQuery, 'externalId', ShopifyCompany."External Id");
+        ShopifyCustomer.CalcFields("Customer No.");
+        if ShopifyCustomer."Customer No." <> '' then
+            AddFieldToGraphQuery(GraphQuery, 'externalId', ShopifyCustomer."Customer No.");
         GraphQuery.Remove(GraphQuery.Length - 1, 2);
         GraphQuery.Append('}, companyLocation: {billingSameAsShipping: true,');
         AddFieldToGraphQuery(GraphQuery, 'name', CompanyLocation.Name);
@@ -192,8 +193,6 @@ codeunit 30286 "Shpfy Company API"
         GraphQuery.Append('{"query":"mutation {companyUpdate(companyId: \"' + StrSubstNo(CompanyIdTxt, ShopifyCompany.Id) + '\", input: {');
         if ShopifyCompany.Name <> xShopifyCompany.Name then
             HasChange := AddFieldToGraphQuery(GraphQuery, 'name', ShopifyCompany.Name);
-        if ShopifyCompany."External Id" <> xShopifyCompany."External Id" then
-            HasChange := AddFieldToGraphQuery(GraphQuery, 'externalId', ShopifyCompany."External Id");
         if ShopifyCompany.GetNote() <> xShopifyCompany.GetNote() then
             HasChange := AddFieldToGraphQuery(GraphQuery, 'note', CommunicationMgt.EscapeGraphQLData(ShopifyCompany.GetNote()));
 
@@ -357,7 +356,6 @@ codeunit 30286 "Shpfy Company API"
         ShopifyCompany."Main Contact Id" := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JCompany, 'mainContact.id'));
         ShopifyCompany."Main Contact Customer Id" := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JCompany, 'mainContact.customer.id'));
         ShopifyCompany.Name := CopyStr(JsonHelper.GetValueAsText(JCompany, 'name', MaxStrLen(ShopifyCompany.Name)), 1, MaxStrLen(ShopifyCompany.Name));
-        ShopifyCompany."External Id" := CopyStr(JsonHelper.GetValueAsText(JCompany, 'externalId', MaxStrLen(ShopifyCompany."External Id")), 1, MaxStrLen(ShopifyCompany."External Id"));
         if JsonHelper.GetValueAsText(JCompany, 'note') <> '' then begin
             Clear(ShopifyCompany.Note);
             ShopifyCompany.Note.CreateOutStream(OutStream, TextEncoding::UTF8);
