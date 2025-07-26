@@ -290,7 +290,7 @@ codeunit 6620 "Copy Document Mgt."
         LinesNotCopied: Integer;
         MissingExCostRevLink: Boolean;
         ReleaseDocument: Boolean;
-        IsHandled: Boolean;
+        IsHandled, ShouldExit : Boolean;
     begin
         if not CreateToHeader then begin
             ToSalesHeader.TestField(Status, ToSalesHeader.Status::Open);
@@ -375,7 +375,10 @@ codeunit 6620 "Copy Document Mgt."
                 "Sales Document Type From"::"Posted Invoice":
                     begin
                         FromSalesHeader.TransferFields(FromSalesInvHeader);
-                        OnCopySalesDocOnBeforeCopySalesDocInvLine(FromSalesInvHeader, ToSalesHeader);
+                        ShouldExit := false;
+                        OnCopySalesDocOnBeforeCopySalesDocInvLine(FromSalesInvHeader, ToSalesHeader, ShouldExit);
+                        if ShouldExit then
+                            exit;
                         CopySalesDocInvLine(FromSalesInvHeader, ToSalesHeader, LinesNotCopied, MissingExCostRevLink);
                     end;
                 "Sales Document Type From"::"Posted Return Receipt":
@@ -436,6 +439,9 @@ codeunit 6620 "Copy Document Mgt."
             ErrorMessageHandler.NotifyAboutErrors();
             ErrorMessageMgt.PopContext(ErrorContextElement);
         end;
+
+        ToSalesLine.GetCaptionClass(ToSalesHeader.FieldNo("Prices Including VAT"));
+
         OnAfterCopySalesDocument(
           FromDocType.AsInteger(), FromDocNo, ToSalesHeader, FromDocOccurrenceNo, FromDocVersionNo, IncludeHeader, RecalculateLines, MoveNegLines);
     end;
@@ -683,7 +689,7 @@ codeunit 6620 "Copy Document Mgt."
                 SavedDimSetId := ToSalesHeader."Dimension Set ID";
             ToSalesHeader.CreateDimFromDefaultDim(0);
             if IncludeHeader then
-                ToSalesHeader."Dimension Set ID" := SavedDimSetId;
+                ToSalesHeader.Validate("Dimension Set ID", SavedDimSetId);
         end;
 
         ToSalesHeader."No. Printed" := 0;
@@ -1048,6 +1054,8 @@ codeunit 6620 "Copy Document Mgt."
             ErrorMessageMgt.PopContext(ErrorContextElement);
         end;
 
+        ToPurchLine.GetCaptionClass(ToPurchHeader.FieldNo("Prices Including VAT"));
+
         OnAfterCopyPurchaseDocument(
           FromDocType.AsInteger(), FromDocNo, ToPurchHeader, FromDocOccurrenceNo, FromDocVersionNo, IncludeHeader, RecalculateLines, MoveNegLines);
     end;
@@ -1223,7 +1231,7 @@ codeunit 6620 "Copy Document Mgt."
                 SavedDimSetId := ToPurchHeader."Dimension Set ID";
             ToPurchHeader.CreateDimFromDefaultDim(0);
             if IncludeHeader then
-                ToPurchHeader."Dimension Set ID" := SavedDimSetId;
+                ToPurchHeader.Validate("Dimension Set ID", SavedDimSetId);
         end;
         ToPurchHeader."No. Printed" := 0;
         ToPurchHeader."Applies-to Doc. Type" := ToPurchHeader."Applies-to Doc. Type"::" ";
@@ -7387,7 +7395,7 @@ codeunit 6620 "Copy Document Mgt."
                     TestPurchEfecs(FromDocType, ToPurchHeader, FromPurchInvHeader, VendLedgEntry);
         end;
 
-        OnAfterUpdateVendLedgEntry(ToPurchHeader, FromDocNo);
+        OnAfterUpdateVendLedgEntry(ToPurchHeader, FromDocNo, FromDocType, VendLedgEntry);
     end;
 
     local procedure UpdatePurchCreditMemoHeader(var PurchaseHeader: Record "Purchase Header")
@@ -9006,7 +9014,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateVendLedgEntry(var PurchaseHeader: Record "Purchase Header"; FromDocumentNo: Code[20])
+    local procedure OnAfterUpdateVendLedgEntry(var PurchaseHeader: Record "Purchase Header"; FromDocumentNo: Code[20]; FromDocType: Enum "Gen. Journal Document Type"; var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 
@@ -9628,7 +9636,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopySalesDocOnBeforeCopySalesDocInvLine(var FromSalesInvoiceHeader: Record "Sales Invoice Header"; var ToSalesHeader: Record "Sales Header")
+    local procedure OnCopySalesDocOnBeforeCopySalesDocInvLine(var FromSalesInvoiceHeader: Record "Sales Invoice Header"; var ToSalesHeader: Record "Sales Header"; var ShouldExit: Boolean)
     begin
     end;
 
@@ -9848,7 +9856,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopySalesShptLinesToDocOnBeforeCopySalesLine(var ToSalesHeader: Record "Sales Header"; var FromSalesLine: Record "Sales Line"; FromSalesShptLine: record "Sales Shipment Line"; var CopyItemTrkg: Boolean)
+    local procedure OnCopySalesShptLinesToDocOnBeforeCopySalesLine(var ToSalesHeader: Record "Sales Header"; var FromSalesLine: Record "Sales Line"; FromSalesShptLine: Record "Sales Shipment Line"; var CopyItemTrkg: Boolean)
     begin
     end;
 
@@ -9873,7 +9881,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopySalesInvLinesToDocOnBeforeCopySalesLine(ToSalesHeader: Record "Sales Header"; var FromSalesLine: Record "Sales Line"; var TempSalesLineBuf: Record "Sales Line" temporary; var ToSalesLine: Record "Sales Line"; FromSalesInvLine: Record "Sales Invoice Line"; IncludeHeader: Boolean; RecalculateLines: Boolean; var TempDocSalesLine: Record "Sales Line" temporary; var FromSalesLine1: Record "Sales Line"; ExactCostRevMandatory: Boolean)
+    local procedure OnCopySalesInvLinesToDocOnBeforeCopySalesLine(var ToSalesHeader: Record "Sales Header"; var FromSalesLine: Record "Sales Line"; var TempSalesLineBuf: Record "Sales Line" temporary; var ToSalesLine: Record "Sales Line"; FromSalesInvLine: Record "Sales Invoice Line"; IncludeHeader: Boolean; RecalculateLines: Boolean; var TempDocSalesLine: Record "Sales Line" temporary; var FromSalesLine1: Record "Sales Line"; ExactCostRevMandatory: Boolean)
     begin
     end;
 
