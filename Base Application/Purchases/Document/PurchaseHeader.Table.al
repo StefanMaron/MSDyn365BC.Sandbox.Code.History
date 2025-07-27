@@ -27,7 +27,6 @@ using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Shipping;
-using Microsoft.Intercompany;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
 using Microsoft.Inventory;
@@ -516,7 +515,7 @@ table 38 "Purchase Header"
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateOrderDate(Rec, xRec, IsHandled, CurrFieldNo);
+                OnBeforeValidateOrderDate(Rec, xRec, IsHandled);
                 if IsHandled then
                     exit;
 
@@ -7087,15 +7086,14 @@ table 38 "Purchase Header"
     begin
         IsHandled := false;
         OnBeforeValidateEmptySellToCustomerAndLocation(Rec, Vend, IsHandled, xRec);
-        if not IsHandled then begin
-            Validate("Sell-to Customer No.", '');
+        if IsHandled then
+            exit;
 
-            if "Buy-from Vendor No." <> '' then
-                GetVend("Buy-from Vendor No.");
-            UpdateLocationCode(Vend."Location Code");
-        end;
+        Validate("Sell-to Customer No.", '');
 
-        OnAfterValidateEmptySellToCustomerAndLocation(Rec, Vend);
+        if "Buy-from Vendor No." <> '' then
+            GetVend("Buy-from Vendor No.");
+        UpdateLocationCode(Vend."Location Code");
     end;
 
     /// <summary>
@@ -7616,17 +7614,6 @@ table 38 "Purchase Header"
     begin
         if PrepaymentMgt.TestPurchasePrepayment(Rec) then
             Error(PrepaymentInvoicesNotPaidErr, Rec."Document Type", Rec."No.");
-    end;
-
-    procedure SendICPurchaseDoc(var PurchaseHeader: Record "Purchase Header")
-    var
-        ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
-    begin
-        if PurchaseHeader.FindSet() then
-            repeat
-                if ApprovalsMgmt.PrePostApprovalCheckPurch(PurchaseHeader) then
-                    ICInOutboxMgt.SendPurchDoc(PurchaseHeader, false);
-            until PurchaseHeader.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]
@@ -8785,7 +8772,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateOrderDate(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; CurrFieldNo: Integer)
+    local procedure OnBeforeValidateOrderDate(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 
@@ -9003,11 +8990,6 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetPstdDocLinesToReverse(var PurchaseHeader: Record "Purchase Header")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterValidateEmptySellToCustomerAndLocation(var PurchaseHeader: Record "Purchase Header"; var Vendor: Record Vendor)
     begin
     end;
 }
