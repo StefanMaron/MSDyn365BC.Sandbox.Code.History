@@ -623,7 +623,6 @@ codeunit 5477 "Sales Invoice Aggregator"
         if CheckUpdatesDisabled(DummyGuid) then
             exit;
 
-        SalesInvoiceEntityAggregate.SetLoadFields("Cust. Ledger Entry No.", Posted, "No.", Status);
         SalesInvoiceEntityAggregate.SetRange("Cust. Ledger Entry No.", CustLedgerEntry."Entry No.");
         SalesInvoiceEntityAggregate.SetRange(Posted, true);
 
