@@ -438,7 +438,7 @@ codeunit 1336 "Item Templ. Mgt."
         Page.Run(Page::"Item Templ. List");
     end;
 
-    procedure InitItemNo(var Item: Record Item; ItemTempl: Record "Item Templ.")
+    local procedure InitItemNo(var Item: Record Item; ItemTempl: Record "Item Templ.")
     var
         NoSeries: Codeunit "No. Series";
         IsHandled: Boolean;
