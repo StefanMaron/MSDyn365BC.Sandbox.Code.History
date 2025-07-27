@@ -98,10 +98,6 @@ table 189 "VAT Setup"
         {
             Caption = 'Ship-To Alt. Cust. VAT Reg.';
         }
-        field(24; "Per Activity Code Settl. Entry"; Boolean)
-        {
-            Caption = 'Per Activity Code Settlement Entry';
-        }
     }
 
     keys
