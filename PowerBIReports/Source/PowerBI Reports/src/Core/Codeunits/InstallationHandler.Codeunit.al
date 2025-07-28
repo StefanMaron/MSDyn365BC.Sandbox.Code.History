@@ -40,7 +40,7 @@ codeunit 36950 "Installation Handler"
         RunAfterInstalled();
     end;
 
-    internal procedure RunAfterInstalled()
+    local procedure RunAfterInstalled()
     var
         PBIMgt: Codeunit Initialization;
         JobQueueDescLbl: Label 'Update Power BI Dimension Set Entries', MaxLength = 250;
