@@ -23,24 +23,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Inv. Pick On Job Planning - NamedType FieldMustNotBeChangedErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 736944143 - NamedType 2331269627" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 Item must be in Reclassification Journal.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1=Item No.]D;]A;(LookupHint=Codeunit Inv. Pick On Job Planning - NamedType ItemReclassificationErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 736944143 - NamedType 1603180165" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Lot No. must not be empty.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Inv. Pick On Job Planning - NamedType LotNoErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 736944143 - NamedType 4046733397" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[nothing to create]]></Val>
@@ -707,15 +689,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Job Invoicing - NamedType WrongJobLedgerEntryQtyErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 1338490621 - NamedType 4034838440" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Wrong number of lines created.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Job Invoicing - NamedType WrongNoOfLinesLbl)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 1338490621 - NamedType 2081253264" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Dimensions must be equal.]]></Val>
@@ -858,15 +831,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Job Journal - NamedType TestForBlankValuesPassed)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 948787226 - NamedType 1473162410" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Quantity must be %1 in %2.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1= Value, %2=Table Name.]D;]A;(LookupHint=Codeunit Job Order Tracking - NamedType QuantityErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 948787226 - NamedType 1801570682" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1229,15 +1193,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Jobs - Assemble-to Order - NamedType CreateAsmForJobErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 1292684493 - NamedType 1591768236" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 is not correct]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[Field Name]D;]A;(LookupHint=Codeunit Jobs - Assemble-to Order - NamedType FieldValueIsNotCorrect)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 1292684493 - NamedType 1632888944" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Remaining Quantity (Base) cannot be more than %1 in Assembly Header Document Type='%2',No.='%3']]></Val>
@@ -1281,15 +1236,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Jobs - Multiple Customers - NamedType LinesTransferedToInvoiceMsg)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3185217834 - NamedType 1899778124" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 invoices are created.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1= Invoice count]D;]A;(LookupHint=Codeunit Jobs - Multiple Customers - NamedType MultipleInvoiceCreatedMsg)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3185217834 - NamedType 2091268835" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1769,15 +1715,6 @@
       <Cmt Name="Dev"><![CDATA[%1 = Ship-to City field caption, %2 = Expected city value]D;]A;(LookupHint=Codeunit UT T Job - NamedType ShipToCityNotMatchedErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3438364934 - NamedType 3152294443" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 must be %2 in %3]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = Status, %2 = Completed, %3 = Job]D;]A;(LookupHint=Codeunit UT T Job - NamedType StatusErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3438364934 - NamedType 893890369" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You have changed %1 on the project, but it has not been changed on the existing project tasks.]]></Val>
@@ -1947,15 +1884,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT T Job Planning Line - NamedType TestFieldErrorCodeTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3251676635 - NamedType 3041014380" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 must be %2 in %3]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = Unit Cost, %2 = UnitCost variable value, %3 = Job Planning Line]D;]A;(LookupHint=Codeunit UT T Job Planning Line - NamedType UnitCostErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3251676635 - NamedType 2786395298" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
