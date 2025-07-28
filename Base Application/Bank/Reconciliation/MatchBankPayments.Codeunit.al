@@ -270,13 +270,7 @@ codeunit 1255 "Match Bank Payments"
         EmployeeLedgerEntry: Record "Employee Ledger Entry";
         Prefix: Code[50];
         MaxEntriesToCheck: Integer;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeNotifyIfEntriesMatchedElsewhere(BankAccReconciliationLine, IsHandled);
-        if IsHandled then
-            exit;
-
         if not GuiAllowed() then
             exit;
         MaxEntriesToCheck := 600;
@@ -654,8 +648,6 @@ codeunit 1255 "Match Bank Payments"
         LineSplitMsg: Text;
         ParentLineNo: Integer;
         TransactionID: Text[50];
-        DifferenceTransferred: Boolean;
-        SuppressMessage: Boolean;
     begin
         if BankAccReconciliationLine.IsEmpty() or (BankAccReconciliationLine.Difference = 0) then
             exit;
@@ -665,8 +657,7 @@ codeunit 1255 "Match Bank Payments"
         if not TempGenJournalLine.Insert() then
             TempGenJournalLine.Modify();
 
-        RunTransferDifferencetoAccount(BankAccReconciliationLine, TempGenJournalLine, DifferenceTransferred);
-        if DifferenceTransferred then begin
+        if PAGE.RunModal(PAGE::"Transfer Difference to Account", TempGenJournalLine) = ACTION::LookupOK then begin
             if TempGenJournalLine."Account No." = '' then
                 Error(MustChooseAccountErr);
 
@@ -711,25 +702,9 @@ codeunit 1255 "Match Bank Payments"
             BankAccReconciliationLine.SetRange("Statement No.", BankAccReconciliationLine."Statement No.");
             BankAccReconciliationLine.SetRange("Statement Line No.", BankAccReconciliationLine."Statement Line No.");
             UpdatePaymentMatchDetails(BankAccReconciliationLine);
-            if LineSplitMsg <> '' then begin
-                OnBeforeShowLineSplitMessage(BankAccReconciliationLine, SuppressMessage);
-                if not SuppressMessage then
-                    Message(LineSplitMsg);
-            end;
+            if LineSplitMsg <> '' then
+                Message(LineSplitMsg);
         end;
-    end;
-
-    local procedure RunTransferDifferencetoAccount(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempGenJnlLine: Record "Gen. Journal Line" temporary; var DifferenceTransferred: Boolean)
-    begin
-        DifferenceTransferred := false;
-        OnTransferDifference(BankAccReconciliationLine, TempGenJnlLine, DifferenceTransferred);
-        if DifferenceTransferred then
-            exit;
-
-        if not GuiAllowed() then
-            exit;
-
-        DifferenceTransferred := Page.RunModal(Page::"Transfer Difference to Account", TempGenJnlLine) = Action::LookupOK;
     end;
 
     procedure MatchSingleLineCustomer(var BankPmtApplRule: Record "Bank Pmt. Appl. Rule"; BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; AppliesToEntryNo: Integer; var NoOfLedgerEntriesWithinTolerance: Integer; var NoOfLedgerEntriesOutsideTolerance: Integer)
@@ -854,7 +829,7 @@ codeunit 1255 "Match Bank Payments"
     begin
         InitializeBankPmtApplSettings();
         TempLedgerEntryMatchingBuffer.Reset();
-        OnFindMatchingEntriesOnBeforeFindFirst(TempBankAccReconciliationLine, TempLedgerEntryMatchingBuffer, AccountType, SkipOtherEntries, ApplyEntries);
+        OnFindMatchingEntriesOnBeforeFindFirst(TempBankAccReconciliationLine, TempLedgerEntryMatchingBuffer, AccountType, ApplyEntries);
         if TempLedgerEntryMatchingBuffer.FindFirst() then
             repeat
                 FindMatchingEntry(TempLedgerEntryMatchingBuffer, TempBankAccReconciliationLine, AccountType, BankPmtApplRule);
@@ -2357,7 +2332,6 @@ codeunit 1255 "Match Bank Payments"
         CustLedgEntry.CalcFields("Remaining Amount");
         CustLedgEntry."Applies-to ID" := AppliesToID;
         CustLedgEntry."Amount to Apply" := CustLedgEntry."Remaining Amount";
-        OnSetCustAppicationDataOnBeforeCustEntryEdit(CustLedgEntry);
         CODEUNIT.Run(CODEUNIT::"Cust. Entry-Edit", CustLedgEntry);
     end;
 
@@ -2369,7 +2343,6 @@ codeunit 1255 "Match Bank Payments"
         VendLedgEntry.CalcFields("Remaining Amount");
         VendLedgEntry."Applies-to ID" := AppliesToID;
         VendLedgEntry."Amount to Apply" := VendLedgEntry."Remaining Amount";
-        OnSetVendAppicationDataOnBeforeVendEntryEdit(VendLedgEntry);
         CODEUNIT.Run(CODEUNIT::"Vend. Entry-Edit", VendLedgEntry);
     end;
 
@@ -2465,11 +2438,6 @@ codeunit 1255 "Match Bank Payments"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeNotifyIfEntriesMatchedElsewhere(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var IsHandled: Boolean)
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsVendorBankAccountMatching(ValueFromBankStatement: Text; VendorNo: Code[20]; BankAccountNo: Code[20]; var Result: Boolean; var IsHandled: Boolean)
     begin
@@ -2486,7 +2454,7 @@ codeunit 1255 "Match Bank Payments"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFindMatchingEntriesOnBeforeFindFirst(var TempBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line" temporary; var TempLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; AccountType: Enum "Gen. Journal Account Type"; var SkipOtherEntries: Boolean; var ApplyEntries: Boolean)
+    local procedure OnFindMatchingEntriesOnBeforeFindFirst(var TempBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line" temporary; var TempLedgerEntryMatchingBuffer: Record "Ledger Entry Matching Buffer" temporary; AccountType: Enum "Gen. Journal Account Type"; var SkipOtherEntries: Boolean)
     begin
     end;
 
@@ -2627,26 +2595,6 @@ codeunit 1255 "Match Bank Payments"
 
     [IntegrationEvent(false, false)]
     local procedure OnFindTextMappingsOnAfterTextMapperMatched(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TextToAccountMapping: Record "Text-to-Account Mapping"; var TempBankStatementMatchingBuffer: Record "Bank Statement Matching Buffer" temporary);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetCustAppicationDataOnBeforeCustEntryEdit(var CustLedgerEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnTransferDifference(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var TempGenJnlLine: Record "Gen. Journal Line" temporary; var DifferenceTransferred: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetVendAppicationDataOnBeforeVendEntryEdit(var VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowLineSplitMessage(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var SuppressMessage: Boolean)
     begin
     end;
 }
