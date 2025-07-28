@@ -2313,11 +2313,9 @@ table 167 Job
         Job.SetRecFilter();
         Confirmed := ConfirmManagement.GetResponseOrDefault(RunWIPFunctionsQst, true);
         Commit();
-        if Confirmed then begin
-            JobCalculateWIP.UseRequestPage(false);
-            JobCalculateWIP.SetTableView(Job);
-            JobCalculateWIP.Run();
-        end;
+        JobCalculateWIP.UseRequestPage(not Confirmed);
+        JobCalculateWIP.SetTableView(Job);
+        JobCalculateWIP.Run();
     end;
 
     local procedure GetReportCaption(ReportID: Integer): Text
