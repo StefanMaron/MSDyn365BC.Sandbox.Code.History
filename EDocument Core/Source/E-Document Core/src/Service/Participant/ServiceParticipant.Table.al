@@ -17,7 +17,6 @@ table 6104 "Service Participant"
     Access = Public;
     Extensible = true;
     DataClassification = SystemMetadata;
-    ReplicateData = false;
 
     fields
     {
