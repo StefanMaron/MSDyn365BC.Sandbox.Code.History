@@ -186,14 +186,9 @@ codeunit 367 CheckManagement
         FinancialVoidCheckPreValidation(CheckLedgEntry);
 
         Clear(ConfirmFinancialVoid);
-
-        IsHandled := false;
-        OnFinancialVoidCheckOnBeforeConfirmFinancialVoid(CheckLedgEntry, IsHandled);
-        if not IsHandled then begin
-            ConfirmFinancialVoid.SetCheckLedgerEntry(CheckLedgEntry);
-            if ConfirmFinancialVoid.RunModal() <> ACTION::Yes then
-                exit;
-        end;
+        ConfirmFinancialVoid.SetCheckLedgerEntry(CheckLedgEntry);
+        if ConfirmFinancialVoid.RunModal() <> ACTION::Yes then
+            exit;
 
         AmountToVoid := CalcAmountToVoid(CheckLedgEntry);
 
@@ -433,15 +428,7 @@ codeunit 367 CheckManagement
         PayDetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry";
         GenJournalLine3: Record "Gen. Journal Line";
         AppliesID: Code[50];
-        IsHandled: Boolean;
-        Result: Boolean;
     begin
-
-        IsHandled := false;
-        OnBeforeUnApplyVendInvoices(CheckLedgEntry, VoidDate, IsHandled, Result);
-        if IsHandled then
-            exit(Result);
-
         // first, find first original payment line, if any
         BankAccountLedgerEntry.Get(CheckLedgEntry."Bank Account Ledger Entry No.");
         if CheckLedgEntry."Bal. Account Type" = CheckLedgEntry."Bal. Account Type"::Vendor then begin
@@ -462,12 +449,8 @@ codeunit 367 CheckManagement
         PayDetailedVendorLedgEntry.SetRange(Unapplied, false);
         PayDetailedVendorLedgEntry.SetFilter("Applied Vend. Ledger Entry No.", '<>%1', 0);
         PayDetailedVendorLedgEntry.SetRange("Entry Type", PayDetailedVendorLedgEntry."Entry Type"::Application);
-        if not PayDetailedVendorLedgEntry.FindSet() then begin
-            IsHandled := false;
-            OnUnApplyVendInvoicesOnBeforeErrorNoAppliedEntry(BankAccountLedgerEntry, GenJnlLine2, IsHandled);
-            if not IsHandled then
-                Error(NoAppliedEntryErr);
-        end;
+        if not PayDetailedVendorLedgEntry.FindSet() then
+            Error(NoAppliedEntryErr);
         repeat
             GenJournalLine3.CopyFromPaymentVendLedgEntry(OrigPaymentVendorLedgerEntry);
             GenJournalLine3."Posting Date" := VoidDate;
@@ -484,7 +467,6 @@ codeunit 367 CheckManagement
             MakeAppliesID(AppliesID, CheckLedgEntry."Document No.");
             OrigPaymentVendorLedgerEntry."Applies-to ID" := AppliesID;
             OrigPaymentVendorLedgerEntry.CalcFields("Remaining Amount");
-            OnUnApplyVendInvoicesOnAfterCalcRemainingAmount(OrigPaymentVendorLedgerEntry);
             OrigPaymentVendorLedgerEntry."Amount to Apply" := OrigPaymentVendorLedgerEntry."Remaining Amount";
             OrigPaymentVendorLedgerEntry."Accepted Pmt. Disc. Tolerance" := false;
             OrigPaymentVendorLedgerEntry."Accepted Payment Tolerance" := 0;
@@ -539,7 +521,6 @@ codeunit 367 CheckManagement
             MakeAppliesID(AppliesID, CheckLedgEntry."Document No.");
             OrigPaymentCustLedgerEntry."Applies-to ID" := AppliesID;
             OrigPaymentCustLedgerEntry.CalcFields("Remaining Amount");
-            OnUnApplyCustInvoicesOnAfterCalcRemainingAmount(OrigPaymentCustLedgerEntry);
             OrigPaymentCustLedgerEntry."Amount to Apply" := OrigPaymentCustLedgerEntry."Remaining Amount";
             OrigPaymentCustLedgerEntry."Accepted Pmt. Disc. Tolerance" := false;
             OrigPaymentCustLedgerEntry."Accepted Payment Tolerance" := 0;
@@ -685,14 +666,7 @@ codeunit 367 CheckManagement
     end;
 
     local procedure SetGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; OriginalAmount: Decimal; CurrencyCode: Code[10]; DocumentNo: Code[20]; Dim1Code: Code[20]; Dim2Code: Code[20]; DimSetID: Integer)
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeSetGenJnlLine(GenJnlLine, IsHandled);
-        if IsHandled then
-            exit;
-
         GenJnlLine.Validate(Amount, OriginalAmount);
         GenJnlLine.Validate("Currency Code", CurrencyCode);
         MakeAppliesID(GenJnlLine."Applies-to ID", DocumentNo);
@@ -700,8 +674,6 @@ codeunit 367 CheckManagement
         GenJnlLine."Shortcut Dimension 2 Code" := Dim2Code;
         GenJnlLine."Dimension Set ID" := DimSetID;
         GenJnlLine."Source Currency Code" := CurrencyCode;
-
-        OnAfterSetGenJnlLine(GenJnlLine);
     end;
 
     local procedure IsElectronicBankPaymentType(BankPaymentType: Enum "Bank Payment Type") IsElectronicPaymentType: Boolean
@@ -1063,39 +1035,5 @@ codeunit 367 CheckManagement
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnUnApplyCustInvoicesOnAfterCalcRemainingAmount(var CustLedgerEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUnApplyVendInvoicesOnAfterCalcRemainingAmount(var VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUnApplyVendInvoicesOnBeforeErrorNoAppliedEntry(var BankAccLedgEntry: Record "Bank Account Ledger Entry"; var GenJnlLine: Record "Gen. Journal Line"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetGenJnlLine(var GenJnlLine: Record "Gen. Journal Line");
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUnApplyVendInvoices(var CheckLedgEntry: Record "Check Ledger Entry"; var VoidDate: Date; var IsHandled: Boolean; var Result: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFinancialVoidCheckOnBeforeConfirmFinancialVoid(var CheckLedgEntry: Record "Check Ledger Entry"; var IsHandled: Boolean);
-    begin
-    end;
 }
 
