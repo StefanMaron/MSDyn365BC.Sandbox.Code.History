@@ -440,7 +440,6 @@ codeunit 1501 "Workflow Management"
         WorkflowEvent: Record "Workflow Event";
     begin
         Workflow.SetRange(Enabled, true);
-        WorkflowStepInstance.ReadIsolation(WorkflowStepInstance.ReadIsolation::ReadUncommitted);
         if WorkflowStepInstance.IsEmpty() and Workflow.IsEmpty() then
             exit(false);
 
