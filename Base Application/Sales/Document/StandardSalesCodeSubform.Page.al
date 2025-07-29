@@ -84,15 +84,8 @@ page 171 "Standard Sales Code Subform"
                     ToolTip = 'Specifies a description of the entry, which is based on the contents of the Type and No. fields.';
 
                     trigger OnValidate()
-                    var
-                        IsHandled: Boolean;
                     begin
                         if Rec.Description = xRec.Description then
-                            exit;
-
-                        IsHandled := false;
-                        OnValidateDescriptionOnBeforeChangeSalesLineType(Rec, IsHandled);
-                        if IsHandled then
                             exit;
 
                         if Rec."No." = '' then
@@ -332,11 +325,6 @@ page 171 "Standard Sales Code Subform"
           DimVisible1, DimVisible2, DimVisible3, DimVisible4, DimVisible5, DimVisible6, DimVisible7, DimVisible8);
 
         Clear(DimMgt);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateDescriptionOnBeforeChangeSalesLineType(var StandardSalesLine: Record "Standard Sales Line"; var IsHandled: Boolean)
-    begin
     end;
 }
 
