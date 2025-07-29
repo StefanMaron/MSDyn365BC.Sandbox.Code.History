@@ -117,7 +117,7 @@ codeunit 415 "Release Purchase Document"
         OnCodeOnBeforeCalcAndUpdateVATOnLines(PurchaseHeader);
         LinesWereModified := LinesWereModified or CalcAndUpdateVATOnLines(PurchaseHeader, PurchLine);
 
-        OnCodeOnBeforeModifyHeader(PurchaseHeader, PurchLine, PreviewMode, LinesWereModified, NotOnlyDropShipment);
+        OnCodeOnBeforeModifyHeader(PurchaseHeader, PurchLine, PreviewMode, LinesWereModified);
 
         PurchaseHeader.Modify(true);
 
@@ -382,7 +382,7 @@ codeunit 415 "Release Purchase Document"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforeModifyHeader(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; PreviewMode: Boolean; var LinesWereModified: Boolean; var NotOnlyDropShipment: Boolean)
+    local procedure OnCodeOnBeforeModifyHeader(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; PreviewMode: Boolean; var LinesWereModified: Boolean)
     begin
     end;
 
