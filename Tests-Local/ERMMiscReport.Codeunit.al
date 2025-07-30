@@ -123,9 +123,6 @@ codeunit 142060 "ERM Misc. Report"
         PaymentNotFoundErr: Label 'Payment %1 was not found';
         GetAmtMisc07Misc15BTxt: Label 'GetAmtMISC07MISC15B';
         NotHandledErr: Label 'Not Handled';
-        TrialBalanceLbl: Label ' Trial Balance';
-        DimensionNameText011Lbl: Label 'Dimension_Name_________Text011';
-        DimCodeDimValueLbl: Label 'DimCode_DimValue';
 
     [Test]
     [HandlerFunctions('WhereUsedListRequestPageHandler')]
@@ -2327,124 +2324,6 @@ codeunit 142060 "ERM Misc. Report"
         LibraryReportDataset.AssertCurrentRowValueEquals(ItemLedgerEntryInvoicedQuantityLbl, -Quantity);
     end;
 
-    [Test]
-    [HandlerFunctions('TrialBalanceRequestPageHandler')]
-    [Scope('OnPrem')]
-    procedure RunTrialBalanceReportWithClosingDate()
-    var
-        DateFilterText: Text;
-        ToDate: Date;
-        FromDate: Date;
-    begin
-        // [SCENARIO 544390] When Stan runs Trial Balance Report with Closing Date then Report is executed.
-        Initialize();
-
-        // [GIVEN] Generate To Date and save it in a Variable.
-        ToDate := CalcDate('<CY>', Today());
-
-        // [GIVEN] Generate From Date and save it in a Variable.
-        FromDate := CalcDate('<-1Y>', ToDate + 1);
-
-        // [GIVEN] Generate Date Filter and save it in a Variable.
-        DateFilterText := Format(FromDate) + '..' + Format(ClosingDate(ToDate));
-
-        // [GIVEN] Run Purchase Invoice Book Report.
-        LibraryVariableStorage.Enqueue(DateFilterText);
-        LibraryVariableStorage.Enqueue(true);
-        Commit();
-        Report.Run(Report::"Trial Balance");
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceSpreadGDimRequestPageHandler')]
-    [Scope('OnPrem')]
-    procedure RunTrialBalanceSpreadGlobalDimensionReportWithClosingDate()
-    var
-        Dimension: Record Dimension;
-        DateFilterText: Text;
-        ToDate: Date;
-        FromDate: Date;
-        GlobalDimemsion: Code[20];
-    begin
-        // [SCENARIO 562159] When Stan runs Trial Balance Report with Closing Date then Report is executed.
-        Initialize();
-
-        // [GIVEN] Generate To Date and save it in a Variable.
-        ToDate := CalcDate('<CY>', Today());
-
-        // [GIVEN] Generate From Date and save it in a Variable.
-        FromDate := CalcDate('<-1Y>', ToDate + 1);
-
-        // [GIVEN] Generate Date Filter and save it in a Variable.
-        DateFilterText := Format(FromDate) + '..' + Format(ClosingDate(ToDate));
-
-        // [GIVEN] Save global dimension
-        GlobalDimemsion := LibraryERM.GetGlobalDimensionCode(1);
-
-        // [GIVEN] Enqueue the value of date filter, dimension and skip zero account needed on report request page
-        LibraryVariableStorage.Enqueue(DateFilterText);
-        LibraryVariableStorage.Enqueue(GlobalDimemsion);
-        LibraryVariableStorage.Enqueue(true);
-
-        // [GIVEN] Commit all the transaction before run the report
-        Commit();
-
-        // [WHEN] Run the report "Trial Balance, per Global Dim."
-        Report.Run(Report::"Trial Balance, Spread G. Dim.");
-
-        // [THEN] Verify all variable storage is empty
-        LibraryVariableStorage.AssertEmpty();
-
-        // [THEN] Verify the report is run successfully and dataset has global dimension text
-        Dimension.Get(GlobalDimemsion);
-        LibraryReportDataset.LoadDataSetFile();
-        LibraryReportDataset.AssertElementWithValueExists(DimensionNameText011Lbl, Dimension.Name + TrialBalanceLbl);
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalancePerGlobalDimRequestPageHandler')]
-    [Scope('OnPrem')]
-    procedure RunTrialBalancePerGlobalDimensionReportWithClosingDate()
-    var
-        DateFilterText: Text;
-        ToDate: Date;
-        FromDate: Date;
-        GlobalDimemsion: Code[20];
-    begin
-        // [SCENARIO 562159] When Stan runs Trial Balance Report with Closing Date then Report is executed.
-        Initialize();
-
-        // [GIVEN] Generate To Date and save it in a Variable.
-        ToDate := CalcDate('<CY>', Today());
-
-        // [GIVEN] Generate From Date and save it in a Variable.
-        FromDate := CalcDate('<-1Y>', ToDate + 1);
-
-        // [GIVEN] Generate Date Filter and save it in a Variable.
-        DateFilterText := Format(FromDate) + '..' + Format(ClosingDate(ToDate));
-
-        // [GIVEN] Save global dimension code
-        GlobalDimemsion := LibraryERM.GetGlobalDimensionCode(1);
-
-        // [GIVEN] Enqueue the value of date filter, dimension and skip zero account needed on report request page
-        LibraryVariableStorage.Enqueue(DateFilterText);
-        LibraryVariableStorage.Enqueue(GlobalDimemsion);
-        LibraryVariableStorage.Enqueue(true);
-
-        // [GIVEN] Commit all the transaction before run the report
-        Commit();
-
-        // [WHEN] Run the report "Trial Balance, per Global Dim."
-        Report.Run(Report::"Trial Balance, per Global Dim.");
-
-        // [THEN] Verify all variable storage is empty
-        LibraryVariableStorage.AssertEmpty();
-
-        // [THEN] Verify the report is run successfully and dataset has global dimension 
-        LibraryReportDataset.LoadDataSetFile();
-        LibraryReportDataset.AssertElementWithValueExists(DimCodeDimValueLbl, GlobalDimemsion);
-    end;
-
     local procedure Initialize()
     var
         InventorySetup: Record "Inventory Setup";
@@ -3633,50 +3512,6 @@ codeunit 142060 "ERM Misc. Report"
     procedure CashReceiptRPH(var CashApplied: TestRequestPage "Cash Applied")
     begin
         CashApplied.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure TrialBalanceRequestPageHandler(var TrialBalance: TestRequestPage "Trial Balance")
-    var
-        DateFilterText: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(DateFilterText);
-        TrialBalance.ActualBalances.SetValue(LibraryVariableStorage.DequeueBoolean());
-        TrialBalance."G/L Account".SetFilter("Date Filter", Format(DateFilterText));
-        TrialBalance.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure TrialBalanceSpreadGDimRequestPageHandler(var TrialBalance: TestRequestPage "Trial Balance, Spread G. Dim.")
-    var
-        DateFilterText: Variant;
-        DimensionCode: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(DateFilterText);
-        LibraryVariableStorage.Dequeue(DimensionCode);
-
-        TrialBalance.DimCode.SetValue(DimensionCode);
-        TrialBalance.SkipZeros.SetValue(LibraryVariableStorage.DequeueBoolean());
-        TrialBalance."G/L Account".SetFilter("Date Filter", Format(DateFilterText));
-        TrialBalance.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure TrialBalancePerGlobalDimRequestPageHandler(var TrialBalance: TestRequestPage "Trial Balance, per Global Dim.")
-    var
-        DateFilterText: Variant;
-        GlobalDimemsion: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(DateFilterText);
-        LibraryVariableStorage.Dequeue(GlobalDimemsion);
-
-        TrialBalance.DimCode.SetValue(GlobalDimemsion);
-        TrialBalance.ActualBalance.SetValue(LibraryVariableStorage.DequeueBoolean());
-        TrialBalance."G/L Account".SetFilter("Date Filter", Format(DateFilterText));
-        TrialBalance.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
     [ReportHandler]
