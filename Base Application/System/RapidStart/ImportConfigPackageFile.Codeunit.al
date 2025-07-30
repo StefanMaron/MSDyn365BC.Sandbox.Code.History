@@ -1,4 +1,3 @@
-#pragma warning disable AS0072
 namespace System.IO;
 
 using System.Environment.Configuration;
@@ -8,9 +7,6 @@ using Microsoft.Utilities;
 codeunit 1799 "Import Config. Package File"
 {
     TableNo = "Configuration Package File";
-    ObsoleteTag = '25.2';
-    ObsoleteReason = 'Changing the way demo data is generated, for more infromation see https://go.microsoft.com/fwlink/?linkid=2288084';
-    ObsoleteState = Pending;
 
     trigger OnRun()
     var
@@ -42,4 +38,4 @@ codeunit 1799 "Import Config. Package File"
     var
         DescriptionTxt: Label 'Could not complete the company setup.';
 }
-#pragma warning restore AS0072
+
