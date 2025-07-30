@@ -4958,7 +4958,6 @@
         GenJournalLine: Record "Gen. Journal Line";
         SalesVATEntry: Record "VAT Entry";
         PurchaseVATEntry: Record "VAT Entry";
-        CustLedgerEntry: Record "Cust. Ledger Entry";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
         DocumentNo: Code[20];
         UpdatedVATDate: Date;
@@ -5010,9 +5009,6 @@
         // [THEN] Only GL Entries related to sales transactions are updated
         VerifyVATDateInGLEntries(SalesVATEntry, UpdatedVATDate);
         VerifyVATDateInGLEntries(PurchaseVATEntry, InitalVATDate);
-
-        // Cleanup
-        CustLedgerEntry.DeleteAll();
     end;
 
     [Test]
@@ -5669,11 +5665,9 @@
     var
         VATReturnPeriod: Record "VAT Return Period";
         VATReportHeader: Record "VAT Report Header";
-        SettledVATPeriod: Record "Settled VAT Period";
     begin
         VATReturnPeriod.DeleteAll();
         VATReportHeader.DeleteAll();
-        SettledVATPeriod.DeleteAll();
     end;
 
     local procedure CreateVATReturnPeriod(VATReturnPeriodStatus: Option; VATReportHeaderStatus: Option; StartDate: Date; EndDate: Date)
