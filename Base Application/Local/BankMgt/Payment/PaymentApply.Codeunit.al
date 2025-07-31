@@ -28,7 +28,6 @@ codeunit 10861 "Payment-Apply"
     var
         PaymentHeader: Record "Payment Header";
         PaymentToleranceMgt: Codeunit "Payment Tolerance Management";
-        IsHandled: Boolean;
     begin
         PaymentHeader.Get(PaymentLine."No.");
 
@@ -49,28 +48,22 @@ codeunit 10861 "Payment-Apply"
         case AccType of
             AccType::Customer:
                 begin
-                    if ApplyCustomer(PaymentLine) then
-                        exit;
+                    ApplyCustomer(PaymentLine);
                     if PaymentLine.Amount <> 0 then
                         if not PaymentToleranceMgt.PmtTolGenJnl(GenJnlLine) then
                             exit;
                 end;
             AccType::Vendor:
                 begin
-                    if ApplyVendor(PaymentLine) then
-                        exit;
+                    ApplyVendor(PaymentLine);
                     if PaymentLine.Amount <> 0 then
                         if not PaymentToleranceMgt.PmtTolGenJnl(GenJnlLine) then
                             exit;
                 end;
-            else begin
-                IsHandled := false;
-                OnApplyOnElseCase(PaymentLine, GenJnlLine, IsHandled);
-                if not IsHandled then
-                    Error(
-                        Text005,
-                        GenJnlLine.FieldCaption("Account Type"), GenJnlLine.FieldCaption("Bal. Account Type"));
-            end;
+            else
+                Error(
+                    Text005,
+                    GenJnlLine.FieldCaption("Account Type"), GenJnlLine.FieldCaption("Bal. Account Type"));
         end;
 
         PaymentLine."Applies-to Doc. Type" := GenJnlLine."Applies-to Doc. Type";
@@ -108,7 +101,7 @@ codeunit 10861 "Payment-Apply"
         AccType: Enum "Gen. Journal Account Type";
 
 
-    local procedure ApplyCustomer(PaymentLine: Record "Payment Line"): Boolean
+    local procedure ApplyCustomer(PaymentLine: Record "Payment Line")
     begin
         CustLedgEntry.SetCurrentKey("Customer No.", Open, Positive);
         CustLedgEntry.SetRange("Customer No.", AccNo);
@@ -121,7 +114,7 @@ codeunit 10861 "Payment-Apply"
         OK := ApplyCustEntries.RunModal() = ACTION::LookupOK;
         Clear(ApplyCustEntries);
         if not OK then
-            exit(true);
+            exit;
         CustLedgEntry.Reset();
         CustLedgEntry.SetCurrentKey("Customer No.", Open, Positive);
         CustLedgEntry.SetRange("Customer No.", AccNo);
@@ -183,7 +176,7 @@ codeunit 10861 "Payment-Apply"
         OnAfterApplyCustomer(CustLedgEntry, GenJnlLine);
     end;
 
-    local procedure ApplyVendor(PaymentLine: Record "Payment Line"): Boolean
+    local procedure ApplyVendor(PaymentLine: Record "Payment Line")
     begin
         VendLedgEntry.SetCurrentKey("Vendor No.", Open, Positive);
         VendLedgEntry.SetRange("Vendor No.", AccNo);
@@ -196,7 +189,7 @@ codeunit 10861 "Payment-Apply"
         OK := ApplyVendEntries.RunModal() = ACTION::LookupOK;
         Clear(ApplyVendEntries);
         if not OK then
-            exit(true);
+            exit;
         VendLedgEntry.Reset();
         VendLedgEntry.SetCurrentKey("Vendor No.", Open, Positive);
         VendLedgEntry.SetRange("Vendor No.", AccNo);
@@ -431,11 +424,6 @@ codeunit 10861 "Payment-Apply"
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteApplyOnBeforeVendLedgEntryModifyAll(PaymentLine: Record "Payment Line"; var VendLedgEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnApplyOnElseCase(var PaymentLine: Record "Payment Line"; var GenJnlLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
 }
