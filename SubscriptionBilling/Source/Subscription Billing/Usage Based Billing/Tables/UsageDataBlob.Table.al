@@ -1,5 +1,6 @@
 namespace Microsoft.SubscriptionBilling;
 
+using System.Utilities;
 using System.Security.Encryption;
 
 table 8011 "Usage Data Blob"
@@ -8,7 +9,7 @@ table 8011 "Usage Data Blob"
     DataClassification = CustomerContent;
     LookupPageId = "Usage Data Blobs";
     DrillDownPageId = "Usage Data Blobs";
-
+    Access = Internal;
     fields
     {
         field(1; "Entry No."; Integer)
@@ -104,6 +105,15 @@ table 8011 "Usage Data Blob"
         Rec."Import Date" := Today();
         Rec."Import Status" := "Processing Status"::Ok;
         Rec.Modify(false);
+    end;
+
+    internal procedure SetDataFieldFromBlob(TempBlob: Codeunit "Temp Blob")
+    var
+        RecordRef: RecordRef;
+    begin
+        RecordRef.GetTable(Rec);
+        TempBlob.ToRecordRef(RecordRef, FieldNo(Rec.Data));
+        RecordRef.SetTable(Rec);
     end;
 
     internal procedure ShowReason()
