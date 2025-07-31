@@ -923,6 +923,7 @@ codeunit 5817 "Undo Posting Management"
 
         // Move tracking information from the derived line to the original line
         TransferTracking(DerivedTransferLine, TransferLine, TransferShptLine);
+        OnUpdateDerivedTransferLineOnAfterTransferTracking(TransferLine, TransferShptLine, DerivedTransferLine);
 
         // Update any Transfer Shipment Lines that are pointing to this Derived Transfer Order Line
         TransferShipmentLine.SetRange("Transfer Order No.", DerivedTransferLine."Document No.");
@@ -944,9 +945,9 @@ codeunit 5817 "Undo Posting Management"
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         FromReservationEntryRowID: Text[250];
         ToReservationEntryRowID: Text[250];
-        TransferQty: Decimal;
+        TransferQtyBase: Decimal;
     begin
-        TransferQty := FromTransLine.Quantity;
+        TransferQtyBase := FromTransLine."Quantity (Base)";
         ReserveTransLine.FindReservEntrySet(FromTransLine, ReservationEntry, "Transfer Direction"::Inbound);
         if ReservationEntry.IsEmpty() then
             exit;
@@ -966,8 +967,8 @@ codeunit 5817 "Undo Posting Management"
         if not ReservationEntry.IsEmpty() then
             repeat
                 ReservationEntry.TestItemFields(FromTransLine."Item No.", FromTransLine."Variant Code", FromTransLine."Transfer-to Code");
-                UpdateTransferQuantity(TransferQty, ToTransLine, ReservationEntry);
-            until (ReservationEntry.Next() = 0) or (TransferQty = 0);
+                UpdateTransferQuantity(TransferQtyBase, ToTransLine, ReservationEntry);
+            until (ReservationEntry.Next() = 0) or (TransferQtyBase = 0);
     end;
 
     local procedure CheckReservationEntryStatus(var ReservationEntry: Record "Reservation Entry"; var TransferShipmentLine: Record "Transfer Shipment Line")
@@ -979,14 +980,14 @@ codeunit 5817 "Undo Posting Management"
         ReservationEntry.FindSet();
     end;
 
-    local procedure UpdateTransferQuantity(var TransferQty: Decimal; var NewTransLine: Record "Transfer Line"; var OldReservEntry: Record "Reservation Entry")
+    local procedure UpdateTransferQuantity(var TransferQtyBase: Decimal; var NewTransLine: Record "Transfer Line"; var OldReservEntry: Record "Reservation Entry")
     var
         CreateReservEntry: Codeunit "Create Reserv. Entry";
     begin
-        TransferQty :=
+        TransferQtyBase :=
             CreateReservEntry.TransferReservEntry(DATABASE::"Transfer Line",
             "Transfer Direction"::Inbound.AsInteger(), NewTransLine."Document No.", '', NewTransLine."Derived From Line No.",
-            NewTransLine."Line No.", NewTransLine."Qty. per Unit of Measure", OldReservEntry, TransferQty);
+            NewTransLine."Line No.", NewTransLine."Qty. per Unit of Measure", OldReservEntry, TransferQtyBase);
     end;
 
     procedure UpdateTransLine(TransferLine: Record "Transfer Line"; UndoQty: Decimal; UndoQtyBase: Decimal; var TempUndoneItemLedgEntry: Record "Item Ledger Entry" temporary)
@@ -1612,6 +1613,11 @@ codeunit 5817 "Undo Posting Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnRevertPostedItemTrackingOnBeforeGetTrackingSpecification(var TempItemLedgerEntry: Record "Item Ledger Entry" temporary; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateDerivedTransferLineOnAfterTransferTracking(var TransferLine: Record "Transfer Line"; var TransferShipmentLine: Record "Transfer Shipment Line"; var DerivedTransferLine: Record "Transfer Line")
     begin
     end;
 }
