@@ -27,6 +27,7 @@ codeunit 144200 "FatturaPA Test"
         NoSeriesBatch: Codeunit "No. Series - Batch";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibraryITLocalization: Codeunit "Library - IT Localization";
+        FatturaDocHelper: Codeunit "Fattura Doc. Helper";
         IsInitialized: Boolean;
         FatturaPA_ElectronicFormatTxt: Label 'FatturaPA';
         DocumentType: Enum "Gen. Journal Document Type";
@@ -2732,7 +2733,6 @@ codeunit 144200 "FatturaPA Test"
         LineDiscountAmount: Decimal;
         LineAmount: Decimal;
         LineDiscountPct: Decimal;
-        UnitPrice: Decimal;
         NoFieldNo: Integer;
     begin
         TempXMLBuffer.FindNodesByXPath(TempXMLBuffer, '/p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee');
@@ -2764,13 +2764,14 @@ codeunit 144200 "FatturaPA Test"
         AssertElementValue(TempXMLBuffer, 'PrezzoUnitario', FormatAmountFromFieldRef(LineRecRef.Field(UnitPriceFieldNo)));
 
         LineDiscountPct := LineRecRef.Field(LineDiscountPercFieldNo).Value();
-        LineDiscountAmount := LineRecRef.Field(LineDiscountAmountFieldNo).Value();
-        UnitPrice := LineRecRef.Field(UnitPriceFieldNo).Value();
+        LineDiscountAmount :=
+          FatturaDocHelper.CalcInvDiscAmountDividedByQty(LineRecRef, QuantityFieldNo, LineInvDiscAmountFieldNo);
         if (LineDiscountAmount <> 0) or (LineDiscountPct <> 0) then begin
             AssertElementValue(TempXMLBuffer, 'ScontoMaggiorazione', '');
             AssertElementValue(TempXMLBuffer, 'Tipo', 'SC');
             AssertElementValue(TempXMLBuffer, 'Percentuale', FormatAmountFromFieldRef(LineRecRef.Field(LineDiscountPercFieldNo)));
-            AssertElementValue(TempXMLBuffer, 'Importo', FormatAmountEightDecimalPlaces((UnitPrice * LineDiscountPct) / 100));
+            if LineDiscountPct = 0 then
+                AssertElementValue(TempXMLBuffer, 'Importo', FormatAmount(LineDiscountAmount));
         end;
 
         AssertElementValue(TempXMLBuffer, 'PrezzoTotale', FormatAmountFromFieldRef(LineRecRef.Field(AmountFieldNo)));
@@ -3292,11 +3293,6 @@ codeunit 144200 "FatturaPA Test"
         AssertCurrentElementValue(
           TempXMLBuffer, '/p:FatturaElettronica/FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/ImponibileImporto',
           FormatAmount((LineTotal[1] + LineTotal[2])));
-    end;
-
-    local procedure FormatAmountEightDecimalPlaces(Amount: Decimal): Text[250]
-    begin
-        exit(Format(Amount, 0, '<Sign><Integer><Decimals,8><Comma,.>'))
     end;
 }
 
