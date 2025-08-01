@@ -2709,14 +2709,11 @@ page 30 "Item Card"
         ShowWorkflowStatus: Boolean;
 
     procedure EnableControls()
-    var
-        AdjustItemInventory: Codeunit "Adjust Item Inventory";
     begin
         IsService := Rec.IsServiceType();
         IsNonInventoriable := Rec.IsNonInventoriableType();
         IsInventoriable := Rec.IsInventoriableType();
         ReplenishmentSystemEditable := CurrPage.Editable();
-        IsInventoryAdjmtAllowed := AdjustItemInventory.GetInventoryAdjustmentAllowed();
 
         if IsNonInventoriable then
             Rec."Stockout Warning" := Rec."Stockout Warning"::No;
@@ -3022,3 +3019,4 @@ page 30 "Item Card"
     begin
     end;
 }
+
