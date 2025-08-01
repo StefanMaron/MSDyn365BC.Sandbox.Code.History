@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false
-  },
   "folders": [
     {
       "path": "./Shopify/test/Shopify Connector Test"
@@ -148,9 +140,6 @@
     },
     {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
     },
     {
       "path": "./FieldServiceIntegration/Test/Field Service Integration Test"
@@ -311,5 +300,13 @@
     {
       "path": "./System Application/Source/System Application/Email/src/Test Email"
     }
-  ]
+  ],
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false,
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false
+  }
 }

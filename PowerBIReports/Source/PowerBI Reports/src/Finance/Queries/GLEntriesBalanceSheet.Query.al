@@ -61,14 +61,4 @@ query 36955 "G\L Entries - Balance Sheet"
             }
         }
     }
-
-    trigger OnBeforeOpen()
-    var
-        PBIMgt: Codeunit "Finance Filter Helper";
-        DateFilterText: Text;
-    begin
-        DateFilterText := PBIMgt.GenerateFinanceReportDateFilter();
-        if DateFilterText <> '' then
-            CurrQuery.SetFilter(postingDate, DateFilterText);
-    end;
 }
