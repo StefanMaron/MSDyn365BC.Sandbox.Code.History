@@ -896,14 +896,19 @@ codeunit 10756 "SII Management"
 
     procedure UpdateSIIInfoInPurchDoc(var PurchaseHeader: Record "Purchase Header")
     var
+        GeneralLedgerSetup: Record "General Ledger Setup";
         Vendor: Record Vendor;
     begin
-        if PurchaseHeader."Pay-to Vendor No." <> '' then
-            if Vendor.Get(PurchaseHeader."Pay-to Vendor No.") then
-                if VendorIsIntraCommunity(Vendor."No.") then
-                    PurchaseHeader."Special Scheme Code" := PurchaseHeader."Special Scheme Code"::"09 Intra-Community Acquisition"
-                else
-                    PurchaseHeader."Special Scheme Code" := PurchaseHeader."Special Scheme Code"::"01 General";
+        GeneralLedgerSetup.Get();
+        if GeneralLedgerSetup."VAT Cash Regime" then
+            PurchaseHeader."Special Scheme Code" := PurchaseHeader."Special Scheme Code"::"07 Special Cash"
+        else
+            if PurchaseHeader."Pay-to Vendor No." <> '' then
+                if Vendor.Get(PurchaseHeader."Pay-to Vendor No.") then
+                    if VendorIsIntraCommunity(Vendor."No.") then
+                        PurchaseHeader."Special Scheme Code" := PurchaseHeader."Special Scheme Code"::"09 Intra-Community Acquisition"
+                    else
+                        PurchaseHeader."Special Scheme Code" := PurchaseHeader."Special Scheme Code"::"01 General";
     end;
 
     local procedure DoNotReportNegativeLines(): Boolean
@@ -970,28 +975,8 @@ codeunit 10756 "SII Management"
                 exit(CountryRegion."ISO Code" = '');
     end;
 
-    procedure GetTaxPeriod(PostingDate: Date) TaxPeriod: Text
-    var
-        SIISetup: Record "SII Setup";
-    begin
-        SIISetup.Get();
-        case SIISetup."Tax Period" of
-            SIISetup."Tax Period"::Monthly:
-                exit(Format(PostingDate, 0, '<Month,2>'));
-            SIISetup."Tax Period"::Quarterly:
-                exit(Format((Date2DMY(PostingDate, 2) - 1) div 3 + 1) + 'T');
-            else
-                OnGetTaxPeriodOnElse(TaxPeriod, PostingDate);
-        end;
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetNoTaxableSalesAmount(var NoTaxableEntry: Record "No Taxable Entry"; SourceNo: Code[20]; DocumentType: Option; DocumentNo: Code[20]; PostingDate: Date; IsService: Boolean; UseNoTaxableType: Boolean; IsLocalRule: Boolean; var NoTaxableAmount: Decimal; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetTaxPeriodOnElse(var TaxPeriod: Text; PostingDate: Date)
     begin
     end;
 }
