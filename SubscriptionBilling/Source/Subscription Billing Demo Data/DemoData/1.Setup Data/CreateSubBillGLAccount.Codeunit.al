@@ -1,5 +1,4 @@
 namespace Microsoft.SubscriptionBilling;
-using Microsoft.Finance.GeneralLedger.Account;
 
 codeunit 8108 "Create Sub. Bill. GL Account"
 {
@@ -18,26 +17,14 @@ codeunit 8108 "Create Sub. Bill. GL Account"
 
     var
         CreateGLAccount: Codeunit "Create G/L Account";
-        CreateJobGLAccount: Codeunit "Create Job GL Account";
         CustomerContractsRevenueLbl: Label 'Customer Subscription Contracts Revenue', MaxLength = 100;
         CustomerContractsDeferralsLbl: Label 'Customer Subscription Contract Deferrals', MaxLength = 100;
         VendorContractsCostLbl: Label 'Vendor Subscription Contracts Cost', MaxLength = 100;
         VendorContractsDeferralsLbl: Label 'Vendor Subscription Contract Deferrals', MaxLength = 100;
 
-    procedure FindGLAccountByName(AccountName: Text[100]): Code[20]
-    var
-        GLAccount: Record "G/L Account";
-    begin
-        GLAccount.SetRange("Name", AccountName);
-        if GLAccount.FindFirst() then
-            exit(GLAccount."No.")
-        else
-            exit('');
-    end;
-
     procedure CustomerContractsRevenue(): Code[20]
     begin
-        exit(FindGLAccountByName(CreateGLAccount.JobSalesName()));
+        exit(CreateGLAccount.JobSales());
     end;
 
     procedure CustomerContractsRevenueName(): Text[100]
@@ -47,7 +34,7 @@ codeunit 8108 "Create Sub. Bill. GL Account"
 
     procedure CustomerContractsDeferrals(): Code[20]
     begin
-        exit(FindGLAccountByName(CreateGLAccount.WIPJobSalesName()));
+        exit(CreateGLAccount.WIPJobSales());
     end;
 
     procedure CustomerContractsDeferralsName(): Text[100]
@@ -57,7 +44,7 @@ codeunit 8108 "Create Sub. Bill. GL Account"
 
     procedure VendorContractsCost(): Code[20]
     begin
-        exit(FindGLAccountByName(CreateJobGLAccount.RecognizedCostsName()));
+        exit(CreateGLAccount.CostofResourcesUsed());
     end;
 
     procedure VendorContractsCostName(): Text[100]
@@ -67,7 +54,7 @@ codeunit 8108 "Create Sub. Bill. GL Account"
 
     procedure VendorContractsDeferrals(): Code[20]
     begin
-        exit(FindGLAccountByName(CreateGLAccount.WIPJobCostsName()));
+        exit(CreateGLAccount.WIPJobCosts());
     end;
 
     procedure VendorContractsDeferralsName(): Text[100]
