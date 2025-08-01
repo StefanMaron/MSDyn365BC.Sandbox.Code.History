@@ -103,7 +103,7 @@ page 509 "Blanket Purchase Order"
                     field("Buy-from County"; Rec."Buy-from County")
                     {
                         ApplicationArea = Suite;
-                        CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
+                        Caption = 'State';
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the state where the vendor sending the invoice is located.';
@@ -467,7 +467,7 @@ page 509 "Blanket Purchase Order"
                     field("Ship-to County"; Rec."Ship-to County")
                     {
                         ApplicationArea = Suite;
-                        CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                        Caption = 'State';
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the state where the vendor sending the invoice is located.';
@@ -548,7 +548,7 @@ page 509 "Blanket Purchase Order"
                     field("Pay-to County"; Rec."Pay-to County")
                     {
                         ApplicationArea = Suite;
-                        CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
+                        Caption = 'State';
                         Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Importance = Additional;
@@ -764,7 +764,7 @@ page 509 "Blanket Purchase Order"
                     Visible = not SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif
+#endif                    
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Order Statistics";
                     RunPageOnRec = true;
@@ -780,7 +780,7 @@ page 509 "Blanket Purchase Order"
                     Visible = SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif
+#endif                    
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Order Stats.";
                     RunPageOnRec = true;
@@ -1222,7 +1222,7 @@ page 509 "Blanket Purchase Order"
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
                 }
-#else
+#else                
                 actionref(PurchaseOrderStatistics_Promoted; PurchaseOrderStatistics)
                 {
                 }
@@ -1282,7 +1282,7 @@ page 509 "Blanket Purchase Order"
         SetDocNoVisible();
 
         ActivateFields();
-        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
+        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Purchase Order Stats.";
     end;
 
     var
