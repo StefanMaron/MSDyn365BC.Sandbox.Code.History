@@ -32,11 +32,6 @@ page 4303 "Agent Task Log Entry List"
                     Caption = 'ID';
                     ToolTip = 'Specifies the unique identifier of the log entry.';
                 }
-                field(Timestamp; Rec.SystemCreatedAt)
-                {
-                    Caption = 'Timestamp';
-                    ToolTip = 'Specifies the date and time when the log entry was created.';
-                }
                 field(TaskID; Rec."Task ID")
                 {
                     Visible = false;
@@ -45,7 +40,6 @@ page 4303 "Agent Task Log Entry List"
                 field(Type; Rec.Type)
                 {
                     Caption = 'Type';
-                    StyleExpr = TypeStyle;
                 }
                 field(PageCaption; Rec."Page Caption")
                 {
@@ -89,18 +83,9 @@ page 4303 "Agent Task Log Entry List"
         AgentTaskImpl: Codeunit "Agent Task Impl.";
     begin
         DetailsTxt := AgentTaskImpl.GetDetailsForAgentTaskLogEntry(Rec);
-        case Rec.Level of
-            Rec.Level::Error:
-                TypeStyle := 'Unfavorable';
-            Rec.Level::Warning:
-                TypeStyle := 'Ambiguous';
-            else
-                TypeStyle := 'Standard';
-        end;
     end;
 
     var
         DetailsTxt: Text;
-        TypeStyle: Text;
 }
 #pragma warning restore AS0125
