@@ -1,8 +1,3 @@
-// ------------------------------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-// ------------------------------------------------------------------------------------------------
-
 namespace System.Security.AccessControl;
 
 page 9848 "User Security Groups Part"
@@ -53,22 +48,19 @@ page 9848 "User Security Groups Part"
             SecurityGroup.GetMembers(Rec);
     end;
 
-    [Scope('OnPrem')]
-    procedure Refresh(var SecurityGroupMemberBuffer: Record "Security Group Member Buffer")
+    internal procedure Refresh(var SecurityGroupMemberBuffer: Record "Security Group Member Buffer")
     begin
         Rec.Copy(SecurityGroupMemberBuffer, true);
         CurrPage.Update(false);
     end;
 
-    [Scope('OnPrem')]
-    procedure GetSourceRecord(var SecurityGroupMemberBuffer: Record "Security Group Member Buffer")
+    internal procedure GetSourceRecord(var SecurityGroupMemberBuffer: Record "Security Group Member Buffer")
     begin
         IsInitializedByCaller := true;
         SecurityGroupMemberBuffer.Copy(Rec, true);
     end;
 
-    [Scope('OnPrem')]
-    procedure SetInitializedByCaller()
+    internal procedure SetInitializedByCaller()
     begin
         IsInitializedByCaller := true;
     end;
