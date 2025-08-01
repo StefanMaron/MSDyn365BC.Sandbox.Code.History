@@ -115,9 +115,6 @@
       "path": "./SubscriptionBilling/Test/Subscription Billing Tests"
     },
     {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
-    },
-    {
       "path": "./Email - Outlook REST API/Test"
     },
     {
@@ -149,6 +146,12 @@
     },
     {
       "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
+    },
+    {
+      "path": "./EDocumentConnectors/B2Brouter/Test/E-Document Connector - B2Brouter Tests"
+    },
+    {
+      "path": "./EDocumentConnectors/Pagero/Test/E-Document Connector - Pagero Tests"
     },
     {
       "path": "./EDocumentConnectors/SignUp/Test/E-Document Connector - SignUp Tests"
