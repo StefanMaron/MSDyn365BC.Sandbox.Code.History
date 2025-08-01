@@ -318,6 +318,8 @@ codeunit 80 "Sales-Post"
         CustLedgEntry: Record "Cust. Ledger Entry";
         TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary;
         DisableAggregateTableUpdate: Codeunit "Disable Aggregate Table Update";
+        UpdateAnalysisView: Codeunit "Update Analysis View";
+        UpdateItemAnalysisView: Codeunit "Update Item Analysis View";
         EverythingInvoiced: Boolean;
         SavedPreviewMode: Boolean;
         SavedSuppressCommit: Boolean;
@@ -386,10 +388,9 @@ codeunit 80 "Sales-Post"
 
         if not (InvtPickPutaway or SuppressCommit or PreviewMode) then begin
             Commit();
-            UpdateAnalysisViewAfterPosting();
-        end else
-            if DateOrderSeriesUsed then
-                UpdateAnalysisViewAfterPosting();
+            UpdateAnalysisView.UpdateAll(0, true);
+            UpdateItemAnalysisView.UpdateAll(0, true);
+        end;
 
         OnAfterPostSalesDoc(
           SalesHeader2, GenJnlPostLine, SalesShptHeader."No.", ReturnRcptHeader."No.",
@@ -538,7 +539,7 @@ codeunit 80 "Sales-Post"
         if SalesHeader.Invoice then
             PostInvoice(SalesHeader, CustLedgEntry);
 
-        OnRunOnBeforePostICGenJnl(SalesHeader, SalesInvHeader, SalesCrMemoHeader, GenJnlPostLine, SrcCode, GenJnlLineDocType, GenJnlLineDocNo, ReturnRcptHeader, PreviewMode);
+        OnRunOnBeforePostICGenJnl(SalesHeader, SalesInvHeader, SalesCrMemoHeader, GenJnlPostLine, SrcCode, GenJnlLineDocType, GenJnlLineDocNo);
 
         if ICGenJnlLineNo > 0 then
             PostICGenJnl(SalesHeader."Activity Code");
@@ -1933,7 +1934,6 @@ codeunit 80 "Sales-Post"
     var
         TempWhseJnlLine2: Record "Warehouse Journal Line" temporary;
     begin
-        OnBeforePostItemJournalLineWarehouseLine(TempWhseJnlLine, TempWhseTrackingSpecification);
         ItemTrackingMgt.SplitWhseJnlLine(TempWhseJnlLine, TempWhseJnlLine2, TempWhseTrackingSpecification, false);
         if TempWhseJnlLine2.FindSet() then
             repeat
@@ -1941,7 +1941,6 @@ codeunit 80 "Sales-Post"
                 WhseJnlPostLine.Run(TempWhseJnlLine2);
             until TempWhseJnlLine2.Next() = 0;
         TempWhseTrackingSpecification.DeleteAll();
-        OnAfterPostItemJournalLineWarehouseLine(TempWhseJnlLine, TempWhseTrackingSpecification);
     end;
 
     /// <summary>
@@ -2310,16 +2309,10 @@ codeunit 80 "Sales-Post"
         Factor: Decimal;
         QtyToAssign: Decimal;
         AmountToAssign: Decimal;
-        IsHandled: Boolean;
     begin
-        OnBeforePostDistributeItemCharge(SalesHeader, SalesLine, TempItemLedgEntry, NonDistrQuantity, NonDistrQtyToAssign, NonDistrAmountToAssign, IsHandled);
-        if IsHandled then
-            exit;
-
         if TempItemLedgEntry.FindSet() then
             repeat
                 Factor := Abs(TempItemLedgEntry.Quantity / NonDistrQuantity);
-                OnPostDistributeItemChargeOnAfterSetFactor(TempItemLedgEntry, Factor);
                 QtyToAssign := NonDistrQtyToAssign * Factor;
                 AmountToAssign := Round(NonDistrAmountToAssign * Factor, GLSetup."Amount Rounding Precision");
                 if Factor < 1 then begin
@@ -3026,7 +3019,6 @@ codeunit 80 "Sales-Post"
                             PurchOrderHeader.TestField("Receiving No. Series");
                             PurchOrderHeader."Receiving No." :=
                               NoSeries.GetNextNo(PurchOrderHeader."Receiving No. Series", SalesHeader."Posting Date");
-                            OnUpdateAssosOrderPostingNosOnBeforeModifyPurchOrderHeader(PurchOrderHeader, SalesHeader);
                             PurchOrderHeader.Modify();
                         end;
                         OnUpdateAssosOrderPostingNosOnAfterReleasePurchaseDocument(PurchOrderHeader, SalesHeader);
@@ -4984,8 +4976,6 @@ codeunit 80 "Sales-Post"
                 ItemEntryRelation.Insert();
                 OnInsertShptEntryRelationOnAfterItemEntryRelationInsert(SalesShptLine, ItemEntryRelation, xSalesLine);
             until TempHandlingSpecification.Next() = 0;
-
-            OnInsertShptEntryRelationOnBeforeDeleteTempHandlingSpecification(TempHandlingSpecification);
             TempHandlingSpecification.DeleteAll();
             exit(0);
         end;
@@ -5748,7 +5738,6 @@ codeunit 80 "Sales-Post"
 
     local procedure CalcPrepmtAmtToDeduct(SalesLine: Record "Sales Line"; Ship: Boolean): Decimal
     begin
-        OnBeforeCalcPrepmtAmtToDeduct(SalesLine, Ship);
         SalesLine."Qty. to Invoice" := GetQtyToInvoice(SalesLine, Ship);
         SalesLine.CalcPrepaymentToDeduct();
         exit(SalesLine."Prepmt Amt to Deduct");
@@ -5965,35 +5954,35 @@ codeunit 80 "Sales-Post"
         IsHandled := false;
         OnBeforePostJobContractLine(
             SalesHeader, SalesLine, IsHandled, JobContractLine, InvoicePostingInterface, SalesLineACY, SalesInvHeader, SalesCrMemoHeader);
+        if IsHandled then
+            exit;
+
+        if SalesLine."Job Contract Entry No." = 0 then
+            exit;
+
+        IsHandled := false;
+        OnPostJobContractLineBeforeTestFields(SalesHeader, SalesLine, IsHandled);
         if not IsHandled then begin
-            if SalesLine."Job Contract Entry No." = 0 then
-                exit;
+            if (SalesHeader."Document Type" <> SalesHeader."Document Type"::Invoice) and
+               (SalesHeader."Document Type" <> SalesHeader."Document Type"::"Credit Memo")
+            then
+                SalesLine.TestField("Job Contract Entry No.", 0);
 
-            IsHandled := false;
-            OnPostJobContractLineBeforeTestFields(SalesHeader, SalesLine, IsHandled);
-            if not IsHandled then begin
-                if (SalesHeader."Document Type" <> SalesHeader."Document Type"::Invoice) and
-                   (SalesHeader."Document Type" <> SalesHeader."Document Type"::"Credit Memo")
-                then
-                    SalesLine.TestField("Job Contract Entry No.", 0);
-
-                SalesLine.TestField("Job No.");
-                SalesLine.TestField("Job Task No.");
-            end;
-
-            if SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice then
-                SalesLine."Document No." := SalesInvHeader."No.";
-            if SalesHeader."Document Type" = SalesHeader."Document Type"::"Credit Memo" then
-                SalesLine."Document No." := SalesCrMemoHeader."No.";
-            JobContractLine := true;
-#if not CLEAN23
-            if UseLegacyInvoicePosting() then
-                JobPostLine.PostInvoiceContractLine(SalesHeader, SalesLine)
-            else
-#endif
-            InvoicePostingInterface.PrepareJobLine(SalesHeader, SalesLine, SalesLineACY);
+            SalesLine.TestField("Job No.");
+            SalesLine.TestField("Job Task No.");
         end;
-        OnAfterPostJobContractLine(SalesHeader, SalesLine, GenJnlLineDocType, GenJnlLineDocNo, GenJnlLineExtDocNo, SrcCode);
+
+        if SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice then
+            SalesLine."Document No." := SalesInvHeader."No.";
+        if SalesHeader."Document Type" = SalesHeader."Document Type"::"Credit Memo" then
+            SalesLine."Document No." := SalesCrMemoHeader."No.";
+        JobContractLine := true;
+#if not CLEAN23
+        if UseLegacyInvoicePosting() then
+            JobPostLine.PostInvoiceContractLine(SalesHeader, SalesLine)
+        else
+#endif
+        InvoicePostingInterface.PrepareJobLine(SalesHeader, SalesLine, SalesLineACY);
     end;
 
     local procedure InsertICGenJnlLine(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var ICGenJnlLineNo: Integer)
@@ -6557,13 +6546,13 @@ codeunit 80 "Sales-Post"
         end else begin
             GenJnlLine.Amount := TotalSalesLine2."Amount Including VAT" + TotalRemainPmtDiscPossible;
             GenJnlLine."Payment Terms Code" := SalesHeader."Payment Terms Code";
-            CustLedgEntry.CalcFields(Amount);
-            if CustLedgEntry.Amount = 0 then
-                GenJnlLine."Amount (LCY)" := TotalSalesLineLCY2."Amount Including VAT"
-            else
-                GenJnlLine."Amount (LCY)" :=
-                  TotalSalesLineLCY2."Amount Including VAT" +
-                  Round(CustLedgEntry."Remaining Pmt. Disc. Possible" / CustLedgEntry."Adjusted Currency Factor");
+        CustLedgEntry.CalcFields(Amount);
+        if CustLedgEntry.Amount = 0 then
+            GenJnlLine."Amount (LCY)" := TotalSalesLineLCY2."Amount Including VAT"
+        else
+            GenJnlLine."Amount (LCY)" :=
+              TotalSalesLineLCY2."Amount Including VAT" +
+              Round(CustLedgEntry."Remaining Pmt. Disc. Possible" / CustLedgEntry."Adjusted Currency Factor");
         end;
 
         GenJnlLine."Source Currency Amount" := GenJnlLine.Amount;
@@ -9572,15 +9561,6 @@ codeunit 80 "Sales-Post"
             JobArchiveManagement.AutoArchiveJob(Job);
     end;
 
-    local procedure UpdateAnalysisViewAfterPosting()
-    var
-        UpdateAnalysisView: Codeunit "Update Analysis View";
-        UpdateItemAnalysisView: Codeunit "Update Item Analysis View";
-    begin
-        UpdateAnalysisView.UpdateAll(0, true);
-        UpdateItemAnalysisView.UpdateAll(0, true);
-    end;
-
 #if not CLEAN23
     local procedure UseLegacyInvoicePosting(): Boolean
     var
@@ -10138,7 +10118,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnBeforePostICGenJnl(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var SrcCode: Code[10]; var GenJnlLineDocType: Enum "Gen. Journal Document Type"; GenJnlLineDocNo: Code[20]; var ReturnReceiptHeader: Record "Return Receipt Header"; var PreviewMode: Boolean)
+    local procedure OnRunOnBeforePostICGenJnl(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var SrcCode: Code[10]; var GenJnlLineDocType: Enum "Gen. Journal Document Type"; GenJnlLineDocNo: Code[20])
     begin
     end;
 
@@ -10550,7 +10530,7 @@ codeunit 80 "Sales-Post"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeRoundAmount(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var SalesLineQty: Decimal; var CurrExchRate: Record "Currency Exchange Rate")
+    local procedure OnBeforeRoundAmount(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; SalesLineQty: Decimal; var CurrExchRate: Record "Currency Exchange Rate")
     begin
     end;
 
@@ -10854,11 +10834,10 @@ codeunit 80 "Sales-Post"
           BatchProcessingMgt.GetBooleanParameter(
             SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Replace Document Date", ReplaceDocumentDate) and
           BatchProcessingMgt.GetDateParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Posting Date", PostingDate);
+        OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(PostingDateExists, ReplacePostingDate, ReplaceDocumentDate, PostingDate, SalesHeader, ModifyHeader);
 
         VATDateExists := BatchProcessingMgt.GetBooleanParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Replace VAT Date", ReplaceVATDate);
         BatchProcessingMgt.GetDateParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"VAT Date", VATDate);
-
-        OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(PostingDateExists, ReplacePostingDate, ReplaceDocumentDate, PostingDate, SalesHeader, ModifyHeader, VATDateExists, ReplaceVATDate, VATDate);
 
         if PostingDateExists and (ReplacePostingDate or (SalesHeader."Posting Date" = 0D)) then begin
             SalesHeader.SetHideValidationDialog(true);
@@ -12426,7 +12405,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(var PostingDateExists: Boolean; var ReplacePostingDate: Boolean; var ReplaceDocumentDate: Boolean; var PostingDate: Date; var SalesHeader: Record "Sales Header"; var ModifyHeader: Boolean; var VATDateExists: Boolean; var ReplaceVATDate: Boolean; var VATDate: Date)
+    local procedure OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(var PostingDateExists: Boolean; var ReplacePostingDate: Boolean; var ReplaceDocumentDate: Boolean; var PostingDate: Date; var SalesHeader: Record "Sales Header"; var ModifyHeader: Boolean)
     begin
     end;
 
@@ -12937,46 +12916,6 @@ codeunit 80 "Sales-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnSumSalesLinesTempOnAfterVatAmountSet(var VATAmount: Decimal; var TotalSalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertShptEntryRelationOnBeforeDeleteTempHandlingSpecification(var TempHandlingTrackingSpecification: Record "Tracking Specification" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateAssosOrderPostingNosOnBeforeModifyPurchOrderHeader(var PurchaseOrderHeader: Record "Purchase Header"; var SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPostJobContractLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var GenJnlLineDocType: Enum "Gen. Journal Document Type"; var GenJnlLineDocNo: Code[20]; var GenJnlLineExtDocNo: Code[35]; var SrcCode: Code[10])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostDistributeItemCharge(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempItemLedgerEntry: Record "Item Ledger Entry"; NonDistrQuantity: Decimal; NonDistrQtyToAssign: Decimal; NonDistrAmountToAssign: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDistributeItemChargeOnAfterSetFactor(TempItemLedgerEntry: Record "Item Ledger Entry"; var Factor: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcPrepmtAmtToDeduct(var SalesLine: Record "Sales Line"; Ship: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostItemJournalLineWarehouseLine(var TempWarehouseJournalLine: Record "Warehouse Journal Line" temporary; var TempWhseTrackingSpecification: Record "Tracking Specification" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPostItemJournalLineWarehouseLine(var TempWarehouseJournalLine: Record "Warehouse Journal Line" temporary; var TempWhseTrackingSpecification: Record "Tracking Specification" temporary)
     begin
     end;
 }
