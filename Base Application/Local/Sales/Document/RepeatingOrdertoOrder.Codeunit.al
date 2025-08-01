@@ -20,8 +20,6 @@ codeunit 15000300 "Repeating Order to Order"
     var
         GLSetup: Record "General Ledger Setup";
     begin
-        OnBeforeOnRun(Rec);
-
         Rec.TestField("Document Type", Rec."Document Type"::"Blanket Order");
 
         if Rec."Order Date" > ProcessingDate then
@@ -306,11 +304,6 @@ codeunit 15000300 "Repeating Order to Order"
         RecurringPost.Validate("Document No.", SalesOrder."No.");
         RecurringPost.Validate("User ID", UserId);
         RecurringPost.Insert(true);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnRun(var SalesHeader: Record "Sales Header")
-    begin
     end;
 }
 
