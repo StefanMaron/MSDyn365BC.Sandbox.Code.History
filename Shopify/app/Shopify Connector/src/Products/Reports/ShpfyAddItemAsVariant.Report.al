@@ -25,6 +25,7 @@ report 30117 "Shpfy Add Item As Variant"
                 Clear(CreateItemAsVariant);
                 CreateItemAsVariant.SetParentProduct(ParentProductNo);
                 CreateItemAsVariant.CheckProductAndShopSettings();
+                CreateItemAsVariant.FindDefaultVariantId();
 
                 if GuiAllowed then begin
                     CurrItemNo := Item."No.";
@@ -45,6 +46,8 @@ report 30117 "Shpfy Add Item As Variant"
 
             trigger OnPostDataItem()
             begin
+                CreateItemAsVariant.RemoveDefaultVariant();
+
                 if GuiAllowed then
                     ProcessDialog.Close();
             end;
