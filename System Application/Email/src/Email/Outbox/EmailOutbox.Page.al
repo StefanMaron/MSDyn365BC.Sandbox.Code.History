@@ -98,11 +98,6 @@ page 8882 "Email Outbox"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the date when this email is scheduled for sending.';
                 }
-                field("Retry No."; Rec."Retry No.")
-                {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the number of times this email has been retried for sending.';
-                }
             }
         }
     }
@@ -120,7 +115,7 @@ page 8882 "Email Outbox"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                Enabled = FailedStatus or HasRetryDetail;
+                Enabled = FailedStatus;
 
                 trigger OnAction()
                 begin
@@ -137,7 +132,7 @@ page 8882 "Email Outbox"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                Enabled = FailedStatus or HasRetryDetail;
+                Enabled = FailedStatus;
 
                 trigger OnAction()
                 begin
@@ -160,46 +155,6 @@ page 8882 "Email Outbox"
                     EmailImpl.ShowSourceRecord(Rec."Message Id");
                 end;
             }
-            action(CancelRetry)
-            {
-                ApplicationArea = All;
-                Image = Cancel;
-                Caption = 'Cancel Sending';
-                ToolTip = 'Cancel the sending of the email.';
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                Enabled = true;
-
-                trigger OnAction()
-                var
-                    EmailRetryImpl: Codeunit "Email Retry Impl.";
-                begin
-                    if not EmailRetryImpl.CancelRetryByMessageId(Rec."Message Id") then
-                        Error(CannotCancelRetryMsg);
-                    Message(CancelSendSuccessMsg);
-                    CurrPage.Update(false);
-                end;
-            }
-            action(ShowRetryDetail)
-            {
-                ApplicationArea = All;
-                Image = ShowList;
-                Caption = 'Retry Detail';
-                ToolTip = 'View the retry detail of the email.';
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                Enabled = HasRetryDetail;
-
-                trigger OnAction()
-                var
-                    EmailRetryDetailRec: Record "Email Retry";
-                begin
-                    EmailRetryDetailRec.SetRange("Message Id", Rec."Message Id");
-                    PAGE.RunModal(PAGE::"Email Retry Detail", EmailRetryDetailRec);
-                end;
-            }
         }
 
         area(Processing)
@@ -213,25 +168,20 @@ page 8882 "Email Outbox"
                 Promoted = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-                Enabled = not NoEmailsInOutbox and CanSendEmail;
+                Enabled = not NoEmailsInOutbox;
 
                 trigger OnAction()
                 var
                     SelectedEmailOutbox: Record "Email Outbox";
                     EmailMessage: Codeunit "Email Message";
-                    EmailRetryImpl: Codeunit "Email Retry Impl.";
                 begin
                     CurrPage.SetSelectionFilter(SelectedEmailOutbox);
                     if not SelectedEmailOutbox.FindSet() then
                         exit;
 
                     repeat
-                        if ((Rec.Status = Rec.Status::Failed) or (Rec.Status = Rec.Status::Draft)) and not TaskScheduler.TaskExists(Rec."Task Scheduler Id") then begin
-                            EmailMessage.Get(SelectedEmailOutbox."Message Id");
-                            EmailRetryImpl.CleanEmailRetryByMessageId(SelectedEmailOutbox."Message Id");
-                            EmailImpl.Enqueue(EmailMessage, SelectedEmailOutbox."Account Id", SelectedEmailOutbox.Connector, CurrentDateTime());
-                        end else
-                            Error(EmailRetryNotCompletedMsg);
+                        EmailMessage.Get(SelectedEmailOutbox."Message Id");
+                        EmailImpl.Enqueue(EmailMessage, SelectedEmailOutbox."Account Id", SelectedEmailOutbox.Connector, CurrentDateTime());
                     until SelectedEmailOutbox.Next() = 0;
 
                     LoadEmailOutboxForUser();
@@ -272,8 +222,6 @@ page 8882 "Email Outbox"
         end;
 
         FailedStatus := Rec.Status = Rec.Status::Failed;
-        HasRetryDetail := EmailImpl.HasRetryDetail(Rec."Message Id");
-        CanSendEmail := ((Rec.Status = Rec.Status::Failed) or (Rec.Status = Rec.Status::Draft)) and not TaskScheduler.TaskExists(Rec."Task Scheduler Id");
         NoEmailsInOutbox := false;
     end;
 
@@ -370,15 +318,10 @@ page 8882 "Email Outbox"
         EmailStatus: Enum "Email Status";
         EmailAccountId: Guid;
         RefreshOutbox: Boolean;
-        CanSendEmail: Boolean;
-        HasRetryDetail: Boolean;
         NoEmailsInOutbox: Boolean;
         FailedStatus: Boolean;
         HasSourceRecord: Boolean;
         EmailConnectorHasBeenUninstalledMsg: Label 'The email extension that was used to send this email has been uninstalled. To view information about the email account, you must reinstall the extension.';
-        EmailRetryNotCompletedMsg: Label 'The selected email cannot be sent because it is still being retried. Please wait until the retry is complete.';
         EmailThrottledMsg: Label 'Your emails are being throttled due to the rate limit set on an account.';
         EmailThrottledMsgIdTok: Label '025cd7b4-9a12-44de-af35-d84f5e360438', Locked = true;
-        CannotCancelRetryMsg: Label 'We cannot cancel the retry of this email because the background task has completed.';
-        CancelSendSuccessMsg: Label 'The sending of the email has been cancelled.';
 }
