@@ -520,9 +520,7 @@ report 20 "Calc. and Post VAT Settlement"
                             "VAT Posting Setup"."VAT Calculation Type"::"Reverse Charge VAT",
                             "VAT Posting Setup"."VAT Calculation Type"::"Full VAT":
                                 begin
-                                    VATEntry.SetCurrentKey(
-                                        Type, Closed, "VAT Bus. Posting Group", "VAT Prod. Posting Group",
-                                        "Tax Jurisdiction Code", "Use Tax", "Tax Liable", "VAT Period", "Operation Occurred Date");
+                                    VATEntry.SetCurrentKey(Type, Closed, "Tax Liable", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Operation Occurred Date", "VAT Period");
                                     if FindFirstEntry then begin
                                         if not VATEntry.Find('-') then
                                             repeat
