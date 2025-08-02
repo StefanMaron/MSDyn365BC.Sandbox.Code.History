@@ -42,11 +42,8 @@ codeunit 7301 "Whse. Jnl.-Register Line"
     var
         GlobalWhseEntry: Record "Warehouse Entry";
         Item: Record Item;
-        IsHandled: Boolean;
     begin
-        OnBeforeCode(WhseJnlLine, GlobalWhseEntryNo, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeCode(WhseJnlLine, GlobalWhseEntryNo);
 
         if (WhseJnlLine."Qty. (Absolute)" = 0) and (WhseJnlLine."Qty. (Base)" = 0) and (not WhseJnlLine."Phys. Inventory") then
             exit;
@@ -634,7 +631,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCode(var WarehouseJournalLine: Record "Warehouse Journal Line"; var WhseEntryNo: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeCode(var WarehouseJournalLine: Record "Warehouse Journal Line"; var WhseEntryNo: Integer)
     begin
     end;
 
