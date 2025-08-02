@@ -31,7 +31,7 @@ codeunit 5763 "Whse.-Post Shipment"
         Code();
         Rec := WhseShptLine;
 
-        OnAfterRun(Rec, WhsePostParameters."Preview Posting");
+        OnAfterRun(Rec);
     end;
 
     var
@@ -302,7 +302,7 @@ codeunit 5763 "Whse.-Post Shipment"
         WhseShptLine2: Record "Warehouse Shipment Line";
         DeleteWhseShptLine: Boolean;
     begin
-        OnBeforePostUpdateWhseDocuments(WhseShptHeaderParam, TempWarehouseShipmentLine);
+        OnBeforePostUpdateWhseDocuments(WhseShptHeaderParam);
         if TempWarehouseShipmentLine.Find('-') then begin
             repeat
                 WhseShptLine2.Get(TempWarehouseShipmentLine."No.", TempWarehouseShipmentLine."Line No.");
@@ -691,7 +691,7 @@ codeunit 5763 "Whse.-Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterRun(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; PreviewMode: Boolean)
+    local procedure OnAfterRun(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
     begin
     end;
 
@@ -1136,7 +1136,7 @@ codeunit 5763 "Whse.-Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostUpdateWhseDocuments(var WhseShptHeader: Record "Warehouse Shipment Header"; var TempWarehouseShipmentLine: Record "Warehouse Shipment Line" temporary)
+    local procedure OnBeforePostUpdateWhseDocuments(var WhseShptHeader: Record "Warehouse Shipment Header")
     begin
     end;
 
@@ -1624,7 +1624,7 @@ codeunit 5763 "Whse.-Post Shipment"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostSourceDocumentAfterGetWhseShptHeader(var WhseShptLine: Record "Warehouse Shipment Line"; var WhseShptHeader: Record "Warehouse Shipment Header")
+    local procedure OnPostSourceDocumentAfterGetWhseShptHeader(WhseShptLine: Record "Warehouse Shipment Line"; var WhseShptHeader: Record "Warehouse Shipment Header")
     begin
     end;
 
