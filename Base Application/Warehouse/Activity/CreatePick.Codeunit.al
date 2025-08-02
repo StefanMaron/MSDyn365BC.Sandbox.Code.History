@@ -141,8 +141,8 @@ codeunit 7312 "Create Pick"
         if PickAccordingToFEFO(LocationCode, WhseItemTrackingSetup) or PickStrictExpirationPosting(ItemNo, WhseItemTrackingSetup) then begin
             QtyToTrackBase := RemTrackedQtyToPickBase;
             if UndefinedItemTrkg(QtyToTrackBase) then begin
-                CreateTempItemTrkgLines(ItemNo, VariantCode, UnitofMeasureCode, QtyToTrackBase, true);
-                CreateTempItemTrkgLines(ItemNo, VariantCode, UnitofMeasureCode, TransferRemQtyToPickBase, false);
+                CreateTempItemTrkgLines(ItemNo, VariantCode, QtyToTrackBase, true);
+                CreateTempItemTrkgLines(ItemNo, VariantCode, TransferRemQtyToPickBase, false);
             end;
         end;
 
@@ -1569,36 +1569,30 @@ codeunit 7312 "Create Pick"
     end;
 
     local procedure CreateWhseActivHeader(LocationCode: Code[10]; var FirstWhseDocNo: Code[20]; var LastWhseDocNo: Code[20]; var NoOfSourceDoc: Integer; var NoOfLines: Integer; var WhseDocCreated: Boolean)
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCreateWhseActivHeader(CurrWarehouseActivityHeader, LocationCode, FirstWhseDocNo, LastWhseDocNo, NoOfSourceDoc, NoOfLines, WhseDocCreated, IsHandled);
-        if not IsHandled then begin
-            CurrWarehouseActivityHeader.Init();
-            CurrWarehouseActivityHeader."No." := '';
-            if CreatePickParameters."Whse. Document Type" = CreatePickParameters."Whse. Document Type"::Movement then
-                CurrWarehouseActivityHeader.Type := CurrWarehouseActivityHeader.Type::Movement
-            else
-                CurrWarehouseActivityHeader.Type := CurrWarehouseActivityHeader.Type::Pick;
-            CurrWarehouseActivityHeader."Location Code" := LocationCode;
-            if CreatePickParameters."Assigned ID" <> '' then
-                CurrWarehouseActivityHeader.Validate("Assigned User ID", CreatePickParameters."Assigned ID");
-            CurrWarehouseActivityHeader."Sorting Method" := CreatePickParameters."Sorting Method";
-            CurrWarehouseActivityHeader."Breakbulk Filter" := CreatePickParameters."Breakbulk Filter";
-            OnBeforeWhseActivHeaderInsert(CurrWarehouseActivityHeader, TempWarehouseActivityLine, CreatePickParameters, CurrWarehouseShipmentLine);
-            CurrWarehouseActivityHeader.Insert(true);
-            OnCreateWhseActivHeaderOnAfterWhseActivHeaderInsert(CurrWarehouseActivityHeader, TempWarehouseActivityLine, CreatePickParameters);
+        CurrWarehouseActivityHeader.Init();
+        CurrWarehouseActivityHeader."No." := '';
+        if CreatePickParameters."Whse. Document Type" = CreatePickParameters."Whse. Document Type"::Movement then
+            CurrWarehouseActivityHeader.Type := CurrWarehouseActivityHeader.Type::Movement
+        else
+            CurrWarehouseActivityHeader.Type := CurrWarehouseActivityHeader.Type::Pick;
+        CurrWarehouseActivityHeader."Location Code" := LocationCode;
+        if CreatePickParameters."Assigned ID" <> '' then
+            CurrWarehouseActivityHeader.Validate("Assigned User ID", CreatePickParameters."Assigned ID");
+        CurrWarehouseActivityHeader."Sorting Method" := CreatePickParameters."Sorting Method";
+        CurrWarehouseActivityHeader."Breakbulk Filter" := CreatePickParameters."Breakbulk Filter";
+        OnBeforeWhseActivHeaderInsert(CurrWarehouseActivityHeader, TempWarehouseActivityLine, CreatePickParameters, CurrWarehouseShipmentLine);
+        CurrWarehouseActivityHeader.Insert(true);
+        OnCreateWhseActivHeaderOnAfterWhseActivHeaderInsert(CurrWarehouseActivityHeader, TempWarehouseActivityLine, CreatePickParameters);
 
-            NoOfLines := 1;
-            NoOfSourceDoc := 1;
+        NoOfLines := 1;
+        NoOfSourceDoc := 1;
 
-            if not WhseDocCreated then begin
-                FirstWhseDocNo := CurrWarehouseActivityHeader."No.";
-                WhseDocCreated := true;
-            end;
-            LastWhseDocNo := CurrWarehouseActivityHeader."No.";
+        if not WhseDocCreated then begin
+            FirstWhseDocNo := CurrWarehouseActivityHeader."No.";
+            WhseDocCreated := true;
         end;
+        LastWhseDocNo := CurrWarehouseActivityHeader."No.";
     end;
 
     local procedure CreateWhseDocLine()
@@ -1848,17 +1842,13 @@ codeunit 7312 "Create Pick"
     end;
 
     local procedure ProcessDoNotFillQtytoHandle(var WarehouseActivityLine: Record "Warehouse Activity Line")
-    var
-        IsHandled: Boolean;
     begin
-        OnBeforeProcessDoNotFillQtytoHandle(WarehouseActivityLine, TempWarehouseActivityLine, CreatePickParameters, IsHandled);
-        if not IsHandled then
-            if CreatePickParameters."Do Not Fill Qty. to Handle" then begin
-                WarehouseActivityLine."Qty. to Handle" := 0;
-                WarehouseActivityLine."Qty. to Handle (Base)" := 0;
-                WarehouseActivityLine.Cubage := 0;
-                WarehouseActivityLine.Weight := 0;
-            end;
+        if CreatePickParameters."Do Not Fill Qty. to Handle" then begin
+            WarehouseActivityLine."Qty. to Handle" := 0;
+            WarehouseActivityLine."Qty. to Handle (Base)" := 0;
+            WarehouseActivityLine.Cubage := 0;
+            WarehouseActivityLine.Weight := 0;
+        end;
 
         OnAfterProcessDoNotFillQtytoHandle(WarehouseActivityLine, TempWarehouseActivityLine);
     end;
@@ -2286,7 +2276,7 @@ codeunit 7312 "Create Pick"
             until TempTotalWhseItemTrackingLine.Next() = 0;
     end;
 
-    local procedure CreateTempItemTrkgLines(ItemNo: Code[20]; VariantCode: Code[10]; UnitofMeasureCode: Code[10]; TotalQtyToPickBase: Decimal; HasExpiryDate: Boolean)
+    local procedure CreateTempItemTrkgLines(ItemNo: Code[20]; VariantCode: Code[10]; TotalQtyToPickBase: Decimal; HasExpiryDate: Boolean)
     var
         EntrySummary: Record "Entry Summary";
         DummyEntrySummary2: Record "Entry Summary";
@@ -2312,10 +2302,7 @@ codeunit 7312 "Create Pick"
 
         WhseItemTrackingFEFO.SetSource(CurrSourceType, CurrSourceSubType, CurrSourceNo, CurrSourceLineNo, CurrSourceSubLineNo);
         WhseItemTrackingFEFO.SetCalledFromMovementWksh(CalledFromMoveWksh);
-        if IsPickByExactRequestedUnitOfMeasure() then
-            WhseItemTrackingFEFO.CreateEntrySummaryFEFO(CurrLocation, ItemNo, VariantCode, UnitofMeasureCode, HasExpiryDate)
-        else
-            WhseItemTrackingFEFO.CreateEntrySummaryFEFO(CurrLocation, ItemNo, VariantCode, HasExpiryDate);
+        WhseItemTrackingFEFO.CreateEntrySummaryFEFO(CurrLocation, ItemNo, VariantCode, HasExpiryDate);
 
         RemQtyToPickBase := TotalQtyToPickBase;
         if HasExpiryDate then
@@ -2383,11 +2370,6 @@ codeunit 7312 "Create Pick"
             HasExpiredItems := WhseItemTrackingFEFO.GetHasExpiredItems();
             EnqueueCannotBeHandledReason(WhseItemTrackingFEFO.GetResultMessageForExpiredItem());
         end;
-    end;
-
-    local procedure IsPickByExactRequestedUnitOfMeasure(): Boolean
-    begin
-        exit(CurrLocation."Directed Put-away and Pick" and (not CurrLocation."Allow Breakbulk"));
     end;
 
     procedure ItemTrackedQuantity(WhseItemTrackingSetup: Record "Item Tracking Setup"): Decimal
@@ -4753,16 +4735,6 @@ codeunit 7312 "Create Pick"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcTotalAvailQtyToPickForDirectedPutAwayPickOnBeforeCalcAvailabilityAfterReservationImpact(var TotalAvailQtyBase: Decimal; MaxPickableQtyExcludingShipBin: Decimal; MaxPickableQtyInWhse: Decimal; ReservedQtyOnInventory: Decimal; QtyReservedOnPickShip: Decimal; LineReservedQty: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeProcessDoNotFillQtytoHandle(var WarehouseActivityLine: Record "Warehouse Activity Line"; var TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary; var CreatePickParameters: Record "Create Pick Parameters" temporary; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateWhseActivHeader(var CurrWarehouseActivityHeader: Record "Warehouse Activity Header"; LocationCode: Code[10]; var FirstWhseDocNo: Code[20]; var LastWhseDocNo: Code[20]; var NoOfSourceDoc: Integer; var NoOfLines: Integer; var WhseDocCreated: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
