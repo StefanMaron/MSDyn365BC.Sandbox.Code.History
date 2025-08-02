@@ -238,7 +238,6 @@ report 32000003 "Suggest Bank Payments"
         end else
             VendLedgEntry.SetRange("Due Date", 0D, LastDueDateToPayReq);
         VendLedgEntry.SetRange("On Hold", '');
-        VendLedgEntry.SetFilter("Currency Code", Vendor.GetFilter("Currency Filter"));
         if VendLedgEntry.FindSet() then
             repeat
                 SaveAmount();
