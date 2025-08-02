@@ -482,14 +482,12 @@
         HideWizardForDevices: Boolean;
         IsAddInReady: Boolean;
         IsPageReady: Boolean;
-        RecordForUpdateCachedCueValuesIsLocked: Boolean;
         TaskIdCalculateCue: Integer;
+        PBTTelemetryCategoryLbl: Label 'PBT', Locked = true;
+        PBTTelemetryMsgTxt: Label 'PBT errored with code %1 and text %2. The call stack is as follows %3.', Locked = true;
         IntegrationErrorsCue: Text;
         CoupledErrorsCue: Text;
         PBTList: Dictionary of [Integer, Text];
-        CachedCueValuesCalculationStartDateTime: DateTime;
-        PBTTelemetryCategoryLbl: Label 'PBT', Locked = true;
-        PBTTelemetryMsgTxt: Label 'PBT errored with code %1 and text %2. The call stack is as follows %3.', Locked = true;
 
     procedure CalculateCueFieldValues()
     var
@@ -500,10 +498,6 @@
                 CurrPage.CancelBackgroundTask(TaskId);
                 PBTList.Remove(TaskId);
             end;
-
-        CachedCueValuesCalculationStartDateTime := CurrentDateTime();
-        if not ActivitiesMgt.IsCachedCueDataExpired(Rec, CachedCueValuesCalculationStartDateTime) then
-            exit;
 
         SchedulePBT(Rec.FieldName("Overdue Sales Invoice Amount"), Rec.FieldCaption("Overdue Sales Invoice Amount"));
         SchedulePBT(Rec.FieldName("Overdue Purch. Invoice Amount"), Rec.FieldCaption("Overdue Purch. Invoice Amount"));
@@ -541,37 +535,18 @@
     begin
         // As PBT runs synchronously when running in test, the task is called even before PBTList is updated.
         // So, we use (TaskIdCalculateCue = TaskId) to check if the task is the one we are interested in.
-        if PBTList.ContainsKey(TaskId) then begin
-            if not RecordForUpdateCachedCueValuesIsLocked then begin
-                Rec.LockTable(true);
-                Rec.Get();
-                RecordForUpdateCachedCueValuesIsLocked := true;
-            end;
-            O365ActivitiesDictionary.FillActivitiesCue(Results, Rec);
-            if PBTList.ContainsKey(TaskId) then begin
-                PBTList.Remove(TaskId);
-                if PBTList.Count() = 0 then begin
-                    RecordForUpdateCachedCueValuesIsLocked := false;
-                    Rec."Last Date/Time Modified" := CachedCueValuesCalculationStartDateTime;
-                    Rec.Modify(true);
-                    Commit();
-                end;
-            end;
-            exit;
-        end;
-
-        // If task is finished before PBTList is updated.
-        if TaskIdCalculateCue = TaskId then begin
+        if PBTList.ContainsKey(TaskId) or (TaskIdCalculateCue = TaskId) then begin
             Rec.LockTable(true);
             Rec.Get();
             O365ActivitiesDictionary.FillActivitiesCue(Results, Rec);
-            // Set new date/time if this is the last PBT task.
-            if Results.ContainsKey(Rec.FieldName("S. Ord. - Reserved From Stock")) then
-                Rec."Last Date/Time Modified" := CachedCueValuesCalculationStartDateTime;
+            if PBTList.ContainsKey(TaskId) then begin
+                PBTList.Remove(TaskId);
+                if PBTList.Count() = 0 then
+                    Rec."Last Date/Time Modified" := CurrentDateTime;
+            end;
             Rec.Modify(true);
             Commit();
-            TaskIdCalculateCue := 0;
-        end;
+        end
     end;
 
     local procedure SchedulePBT(FieldName: Text; FieldCaption: Text)
@@ -584,8 +559,7 @@
         Clear(Input);
         Input.Add(FieldName, '');
         CurrPage.EnqueueBackgroundTask(TaskIdCalculateCue, Codeunit::"O365 Activities Dictionary", Input, TimeoutInMs);
-        if TaskIdCalculateCue <> 0 then
-            PBTList.Add(TaskIdCalculateCue, FieldCaption);
+        PBTList.Add(TaskIdCalculateCue, FieldCaption);
     end;
 
     local procedure SetActivityGroupVisibility()
