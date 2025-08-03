@@ -10,6 +10,7 @@ table 8062 "Cust. Sub. Contract Line"
     DataClassification = CustomerContent;
     DrillDownPageId = "Customer Contract Lines";
     LookupPageId = "Customer Contract Lines";
+    Access = Internal;
 
     fields
     {
@@ -226,7 +227,7 @@ table 8062 "Cust. Sub. Contract Line"
         ServiceObject.OpenServiceObjectCard("Subscription Header No.");
     end;
 
-    procedure GetNextLineNo(CustomerContractNo: Code[20]) LineNo: Integer
+    internal procedure GetNextLineNo(CustomerContractNo: Code[20]) LineNo: Integer
     var
         CustomerContractLine: Record "Cust. Sub. Contract Line";
     begin
@@ -268,7 +269,7 @@ table 8062 "Cust. Sub. Contract Line"
         OnAfterUpdateSubscriptionLineDescription(Rec);
     end;
 
-    procedure LoadServiceCommitmentForContractLine(var ServiceCommitment: Record "Subscription Line")
+    internal procedure LoadServiceCommitmentForContractLine(var ServiceCommitment: Record "Subscription Line")
     var
         LocalServiceCommitment: Record "Subscription Line"; //in case the parameter is passed as temporary table
     begin
@@ -283,7 +284,7 @@ table 8062 "Cust. Sub. Contract Line"
                     ServiceCommitment.TransferFields(LocalServiceCommitment);
                 end;
         end;
-        OnAfterLoadAmountsForContractLine(Rec, ServiceCommitment);
+        OnAfterLoadAmountsForContractLine(Rec);
     end;
 
     procedure GetServiceCommitment(var ServiceCommitment: Record "Subscription Line"): Boolean
@@ -293,7 +294,7 @@ table 8062 "Cust. Sub. Contract Line"
         exit(ServiceCommitment.Get(Rec."Subscription Line Entry No."));
     end;
 
-    internal procedure GetServiceObject(var ServiceObject: Record "Subscription Header"): Boolean
+    procedure GetServiceObject(var ServiceObject: Record "Subscription Header"): Boolean
     begin
         ServiceObject.Init();
         exit(ServiceObject.Get(Rec."Subscription Header No."));
@@ -424,7 +425,7 @@ table 8062 "Cust. Sub. Contract Line"
         SetRange("Contract Line Type", "Contract Line Type"::Item, "Contract Line Type"::"G/L Account");
     end;
 
-    procedure MergeContractLines(var CustomerContractLine: Record "Cust. Sub. Contract Line")
+    internal procedure MergeContractLines(var CustomerContractLine: Record "Cust. Sub. Contract Line")
     var
         RefCustomerContractLine: Record "Cust. Sub. Contract Line";
         SelectCustContractLines: Page "Select Cust. Contract Lines";
@@ -535,7 +536,17 @@ table 8062 "Cust. Sub. Contract Line"
         CustomerContractLine.Modify(false);
     end;
 
-    procedure GetConfirmResponse(ConfirmQuestion: Text; DefaultButton: Boolean): Boolean
+    procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
+    begin
+        HideValidationDialog := NewHideValidationDialog;
+    end;
+
+    procedure GetHideValidationDialog(): Boolean
+    begin
+        exit(HideValidationDialog);
+    end;
+
+    local procedure GetConfirmResponse(ConfirmQuestion: Text; DefaultButton: Boolean): Boolean
     begin
         if HideValidationDialog then
             exit(true);
@@ -547,32 +558,32 @@ table 8062 "Cust. Sub. Contract Line"
         exit("Contract Line Type" = "Contract Line Type"::Comment);
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterCheckSelectedContractLinesOnMergeContractLines(var SelectedCustSubContractLine: Record "Cust. Sub. Contract Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterCheckAndDisconnectContractLine(var CustSubContractLine: Record "Cust. Sub. Contract Line"; xCustSubContractLine: Record "Cust. Sub. Contract Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterUpdateSubscriptionDescription(var CustSubContractLine: Record "Cust. Sub. Contract Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterUpdateSubscriptionLineDescription(var CustSubContractLine: Record "Cust. Sub. Contract Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterLoadAmountsForContractLine(var CustSubContractLine: Record "Cust. Sub. Contract Line"; var SubscriptionLine: Record "Subscription Line")
+    [InternalEvent(false, false)]
+    local procedure OnAfterLoadAmountsForContractLine(var CustSubContractLine: Record "Cust. Sub. Contract Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterInitFromSubscriptionLine(var CustSubContractLine: Record "Cust. Sub. Contract Line"; SubscriptionLine: Record "Subscription Line"; SubscriptionHeader: Record "Subscription Header")
     begin
     end;
