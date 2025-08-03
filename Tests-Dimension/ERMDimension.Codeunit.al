@@ -61,8 +61,7 @@ codeunit 134380 "ERM Dimension"
         TestDimensionValueList.Filter.SetFilter("Dimension Code", Dimension.Code);
         Assert.IsTrue(TestDimensionValueList.First(), 'not found 1st line');
         TestDimensionValueList.Code.AssertEquals(DimensionValue[1].Code);
-        Assert.IsTrue(TestDimensionValueList.Next(), 'not found 2nd line');
-        TestDimensionValueList.Code.AssertEquals(DimensionValue[2].Code);
+        Assert.IsFalse(TestDimensionValueList.Next(), 'found 2nd line');
     end;
 
     [Test]
