@@ -459,6 +459,7 @@ codeunit 12179 "Export FatturaPA Document"
         // 2.2.1 DettaglioLinee
         TempXMLBuffer.AddGroupElement('DettaglioLinee');
         TempXMLBuffer.AddNonEmptyElement('NumeroLinea', Format(TempFatturaLine."Line No."));
+
         if TempFatturaLine.GetItem(Item) then begin
             TempXMLBuffer.AddGroupElement('CodiceArticolo');
             TempXMLBuffer.AddNonEmptyElement('CodiceTipo', 'GTIN');
@@ -472,8 +473,8 @@ codeunit 12179 "Export FatturaPA Document"
             TempXMLBuffer.AddGroupElement('ScontoMaggiorazione');
             TempXMLBuffer.AddNonEmptyElement('Tipo', 'SC');
             TempXMLBuffer.AddNonEmptyElement('Percentuale', FormatAmount(TempFatturaLine."Discount Percent"));
-            TempFatturaLine."Discount Amount" := (TempFatturaLine."Unit Price" * TempFatturaLine."Discount Percent") / 100;
-            TempXMLBuffer.AddNonEmptyElement('Importo', FormatAmountEightDecimalPlaces(TempFatturaLine."Discount Amount"));
+            if TempFatturaLine."Discount Percent" = 0 then
+                TempXMLBuffer.AddNonEmptyElement('Importo', FormatAmountEightDecimalPlaces(TempFatturaLine."Discount Amount"));
             TempXMLBuffer.GetParent();
         end;
 
