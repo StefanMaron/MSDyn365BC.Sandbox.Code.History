@@ -4,7 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.eServices.EDocument;
 
-using System.Security.AccessControl;
+using System.Text;
+using System.Utilities;
 
 page 6108 "Inbound E-Doc. Factbox"
 {
@@ -23,24 +24,24 @@ page 6108 "Inbound E-Doc. Factbox"
             field("E-Document Service"; Rec."E-Document Service Code")
             {
                 Caption = 'Service';
-                ToolTip = 'Specifies the E-Document Service that retrieved this document ';
+                ToolTip = 'Specifies the service code of an E-Document';
             }
             field("Status"; Rec.Status)
             {
                 Caption = 'Service Status';
-                ToolTip = 'Specifies the stage in which the importing of this document is in';
+                ToolTip = 'Specifies the status of an E-Document';
             }
             field("Processing Status"; Format(Rec."Import Processing Status"))
             {
                 Caption = 'Processing Status';
-                ToolTip = 'Specifies the stage in which the processing of this document is in';
+                ToolTip = 'Specifies the processing status of an E-Document';
                 Editable = false;
                 Visible = ImportProcessingStatusVisible;
             }
             field(Logs; Rec.Logs())
             {
                 Caption = 'Document Logs';
-                ToolTip = 'Specifies the count of logs for an document. Drill down to access the logs.';
+                ToolTip = 'Specifies the count of logs for an E-Document';
 
                 trigger OnDrillDown()
                 begin
@@ -50,31 +51,26 @@ page 6108 "Inbound E-Doc. Factbox"
             field(HttpLogs; Rec.IntegrationLogs())
             {
                 Caption = 'Integration Logs';
-                ToolTip = 'Specifies the count of communication logs for the document. Drill down to access the logs.';
+                ToolTip = 'Specifies the count of communication logs for an E-Document';
 
                 trigger OnDrillDown()
                 begin
                     Rec.ShowIntegrationLogs();
                 end;
             }
-            field("Created date"; EDocSystemCreatedAt)
-            {
-                Caption = 'Created Date';
-                ToolTip = 'Specifies the date when the document was created';
-            }
-            field("Created by"; EDocSystemCreatedBy)
-            {
-                Caption = 'Created By';
-                ToolTip = 'Specifies the user who created the document';
-            }
             group(PDF)
             {
-                Visible = false;
+                Visible = IsPdf;
                 ShowCaption = false;
                 usercontrol(PDFViewer; "PDF Viewer")
                 {
                     ApplicationArea = All;
-                    Visible = false;
+
+                    trigger ControlAddinReady()
+                    begin
+                        ControlAddInReady := true;
+                        SetPDFDocument();
+                    end;
                 }
             }
         }
@@ -87,11 +83,8 @@ page 6108 "Inbound E-Doc. Factbox"
             action(NextPdfPage)
             {
                 Caption = 'Next pdf page';
-                ToolTip = 'Next pdf page';
                 ApplicationArea = All;
-                Visible = false;
-                Enabled = false;
-                Image = NextRecord;
+                Visible = IsPdf;
 
                 trigger OnAction()
                 begin
@@ -101,11 +94,8 @@ page 6108 "Inbound E-Doc. Factbox"
             action(PreviousPdfPage)
             {
                 Caption = 'Previous pdf page';
-                ToolTip = 'Previous pdf page';
                 ApplicationArea = All;
-                Visible = false;
-                Enabled = false;
-                Image = PreviousRecord;
+                Visible = IsPdf;
 
                 trigger OnAction()
                 begin
@@ -116,9 +106,9 @@ page 6108 "Inbound E-Doc. Factbox"
     }
 
     var
-        ImportProcessingStatusVisible, Visible : Boolean;
-        EDocSystemCreatedAt: DateTime;
-        EDocSystemCreatedBy: Text;
+        EDocument: Record "E-Document";
+        IsPdf, ControlAddInReady : Boolean;
+        ImportProcessingStatusVisible, Visible, Loaded : Boolean;
 
     trigger OnOpenPage()
     var
@@ -127,33 +117,39 @@ page 6108 "Inbound E-Doc. Factbox"
         ImportProcessingStatusVisible := EDocumentsSetup.IsNewEDocumentExperienceActive();
     end;
 
-    trigger OnAfterGetCurrRecord()
-    var
-        EDocument: Record "E-Document";
-    begin
-        if EDocument.Get(Rec."E-Document Entry No") then
-            UpdateStatus(EDocument);
-    end;
-
     trigger OnAfterGetRecord()
-    var
-        EDocument: Record "E-Document";
     begin
         if EDocument.Get(Rec."E-Document Entry No") then;
+        IsPdf := EDocument."File Type" = EDocument."File Type"::PDF;
+
+        // If new record is selected, then reload the PDF document
+        if Rec."E-Document Entry No" <> xRec."E-Document Entry No" then
+            SetPDFDocument();
     end;
 
-    local procedure UpdateStatus(EDocument: Record "E-Document")
+    local procedure SetPDFDocument()
     var
-        User: Record User;
+        EDocumentDataStorage: Record "E-Doc. Data Storage";
+        Base64Convert: Codeunit "Base64 Convert";
+        TempBlob: Codeunit "Temp Blob";
+        InStreamVar: InStream;
+        PDFAsTxt: Text;
     begin
-        if EDocument."Entry No" = 0 then
+        if not ControlAddInReady then
             exit;
 
-        EDocSystemCreatedAt := EDocument.SystemCreatedAt;
-        if User.Get(EDocument.SystemCreatedBy) then
-            EDocSystemCreatedBy := User."Full Name"
-        else
-            EDocSystemCreatedBy := 'System';
+        if (EDocument."Unstructured Data Entry No." <> 0) and (not Loaded) then begin
+            Visible := true;
+            EDocumentDataStorage.Get(EDocument."Unstructured Data Entry No.");
+            EDocumentDataStorage.CalcFields("Data Storage");
+            TempBlob.FromRecord(EDocumentDataStorage, EDocumentDataStorage.FieldNo("Data Storage"));
+
+            TempBlob.CreateInStream(InStreamVar);
+            PDFAsTxt := Base64Convert.ToBase64(InStreamVar);
+            CurrPage.PDFViewer.LoadPDF(PDFAsTxt);
+            Loaded := true;
+        end;
+        CurrPage.PDFViewer.SetVisible(Visible);
     end;
 
 }
