@@ -29,6 +29,7 @@ page 7504 "Item Attribute Value List"
                     trigger OnValidate()
                     var
                         ItemAttributeValue: Record "Item Attribute Value";
+                        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
                         ItemAttribute: Record "Item Attribute";
                     begin
                         OnBeforeCheckAttributeName(Rec, RelatedRecordCode);
@@ -37,10 +38,19 @@ page 7504 "Item Attribute Value List"
                             DeleteItemAttributeValueMapping(ItemAttribute.ID);
                         end;
 
-                        if (Rec.Value <> '') and not Rec.FindAttributeValue(ItemAttributeValue) then
+                        if not Rec.FindAttributeValue(ItemAttributeValue) then
                             Rec.InsertItemAttributeValue(ItemAttributeValue, Rec);
 
-                        InsertItemAttributeValueMapping(ItemAttributeValue);
+                        if ItemAttributeValue.Get(ItemAttributeValue."Attribute ID", ItemAttributeValue.ID) then begin
+                            ItemAttributeValueMapping.Reset();
+                            ItemAttributeValueMapping.Init();
+                            ItemAttributeValueMapping."Table ID" := Database::Item;
+                            ItemAttributeValueMapping."No." := RelatedRecordCode;
+                            ItemAttributeValueMapping."Item Attribute ID" := ItemAttributeValue."Attribute ID";
+                            ItemAttributeValueMapping."Item Attribute Value ID" := ItemAttributeValue.ID;
+                            OnBeforeItemAttributeValueMappingInsert(ItemAttributeValueMapping, ItemAttributeValue, Rec);
+                            ItemAttributeValueMapping.Insert();
+                        end;
                     end;
                 }
                 field(Value; Rec.Value)
@@ -60,7 +70,6 @@ page 7504 "Item Attribute Value List"
                         if not Rec.FindAttributeValue(ItemAttributeValue) then
                             Rec.InsertItemAttributeValue(ItemAttributeValue, Rec);
 
-                        InsertItemAttributeValueMapping(ItemAttributeValue);
                         ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
                         ItemAttributeValueMapping.SetRange("No.", RelatedRecordCode);
                         ItemAttributeValueMapping.SetRange("Item Attribute ID", ItemAttributeValue."Attribute ID");
@@ -139,24 +148,6 @@ page 7504 "Item Attribute Value List"
 
         ItemAttribute.Get(AttributeToDeleteID);
         ItemAttribute.RemoveUnusedArbitraryValues();
-    end;
-
-    local procedure InsertItemAttributeValueMapping(ItemAttributeValue: Record "Item Attribute Value")
-    var
-        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
-    begin
-        if not ItemAttributeValue.Get(ItemAttributeValue."Attribute ID", ItemAttributeValue.ID) or
-           ItemAttributeValueMapping.Get(Database::Item, RelatedRecordCode, ItemAttributeValue."Attribute ID") then
-            exit;
-
-        ItemAttributeValueMapping.Reset();
-        ItemAttributeValueMapping.Init();
-        ItemAttributeValueMapping."Table ID" := Database::Item;
-        ItemAttributeValueMapping."No." := RelatedRecordCode;
-        ItemAttributeValueMapping."Item Attribute ID" := ItemAttributeValue."Attribute ID";
-        ItemAttributeValueMapping."Item Attribute Value ID" := ItemAttributeValue.ID;
-        OnBeforeItemAttributeValueMappingInsert(ItemAttributeValueMapping, ItemAttributeValue, Rec);
-        ItemAttributeValueMapping.Insert();
     end;
 
     [IntegrationEvent(false, false)]
