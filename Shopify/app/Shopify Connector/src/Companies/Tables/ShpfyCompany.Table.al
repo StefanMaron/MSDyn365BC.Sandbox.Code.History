@@ -90,12 +90,6 @@ table 30150 "Shpfy Company"
             DataClassification = CustomerContent;
             Editable = false;
         }
-        field(14; "External Id"; Text[500])
-        {
-            Caption = 'External Id';
-            DataClassification = CustomerContent;
-            Editable = false;
-        }
     }
 
     keys
