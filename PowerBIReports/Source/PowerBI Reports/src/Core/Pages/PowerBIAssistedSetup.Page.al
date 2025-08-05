@@ -6,15 +6,13 @@ using System.DateTime;
 using System.Security.User;
 using System.Utilities;
 
-#pragma warning disable AS0125
-#pragma warning disable AS0030
 page 36950 "PowerBI Assisted Setup"
-#pragma warning restore AS0030
-#pragma warning restore AS0125
 {
     PageType = NavigatePage;
     Caption = 'Power BI Assisted Setup';
     SourceTable = "PowerBI Reports Setup";
+    ApplicationArea = All;
+    UsageCategory = Tasks;
     Extensible = false;
 
     layout
@@ -213,49 +211,15 @@ page 36950 "PowerBI Assisted Setup"
             group(Step5)
             {
                 Visible = CurrentStep = Steps::Setting;
-#if not CLEAN25
                 group(Settings)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'This group is no longer used.';
-                    ObsoleteTag = '25.0';
-                }
-#endif
-                group(FinanceReportSetup)
-                {
-                    Caption = 'Finance';
-                    InstructionalText = 'Configure the Power BI Finance App.';
-                    field("Finance Report Name"; Rec."Finance Report Name")
-                    {
-                        Caption = 'Power BI Finance Report';
-                        ToolTip = 'Specifies the Power BI Finance Report.';
-                        ApplicationArea = All;
-                        Editable = false;
+                    Caption = 'Connector Settings';
+                    InstructionalText = 'Configure connector specific settings.';
 
-                        trigger OnAssistEdit()
-                        begin
-                            SetupHelper.EnsureUserAcceptedPowerBITerms();
-                            SetupHelper.LookupPowerBIReport(Rec."Finance Report ID", Rec."Finance Report Name");
-                        end;
-                    }
-                    group(FinanceShowMoreGroup)
+                    group(FinanceReportSetup)
                     {
-                        ShowCaption = false;
-                        Visible = not FinanceTabVisible;
-                        field(FinanceShowMore; ShowMoreTxt)
-                        {
-                            ApplicationArea = All;
-                            ShowCaption = false;
-                            trigger OnDrillDown()
-                            begin
-                                FinanceTabVisible := not FinanceTabVisible;
-                            end;
-                        }
-                    }
-                    group(FinanceFastTab)
-                    {
-                        ShowCaption = false;
-                        Visible = FinanceTabVisible;
+                        Caption = 'Finance Connector for Power BI';
+                        InstructionalText = 'Filter tables used in the Finance Dataset';
 
                         group(IncomeStatementFilters)
                         {
@@ -308,57 +272,16 @@ page 36950 "PowerBI Assisted Setup"
                                 ToolTip = 'Specifies the end date for the Vendor Ledger Entries filter.';
                             }
                         }
-                        field(FinanceShowLess; ShowLessTxt)
-                        {
-                            ApplicationArea = All;
-                            ShowCaption = false;
-                            trigger OnDrillDown()
-                            begin
-                                FinanceTabVisible := not FinanceTabVisible;
-                            end;
-                        }
                     }
 
-                }
-
-                group(ItemSalesReportSetup)
-                {
-                    Caption = 'Sales';
-                    InstructionalText = 'Configure the Power BI Sales App.';
-                    field("Sales Report Name"; Rec."Sales Report Name")
+                    group(ItemSalesReportSetup)
                     {
-                        Caption = 'Power BI Sales Report';
-                        ToolTip = 'Specifies the Power BI Sales Report.';
-                        ApplicationArea = All;
-                        Editable = false;
-                        trigger OnAssistEdit()
-                        begin
-                            SetupHelper.EnsureUserAcceptedPowerBITerms();
-                            SetupHelper.LookupPowerBIReport(Rec."Sales Report ID", Rec."Sales Report Name");
-                        end;
-                    }
-                    group(SalesShowMoreGroup)
-                    {
-                        ShowCaption = false;
-                        Visible = not SalesTabVisible;
-                        field(SalesShowMore; ShowMoreTxt)
-                        {
-                            ApplicationArea = All;
-                            ShowCaption = false;
-                            trigger OnDrillDown()
-                            begin
-                                SalesTabVisible := not SalesTabVisible;
-                            end;
-                        }
-                    }
-                    group(SalesFastTab)
-                    {
-                        ShowCaption = false;
-                        Visible = SalesTabVisible;
+                        Caption = 'Sales Connector for Power BI';
                         group(SalesDataFiltering)
                         {
                             ShowCaption = false;
                             InstructionalText = 'Configure the volume of data that is sent to your Power BI semantic models (optional).';
+
                             field(ItmSlsRepLoadDateType; Rec."Item Sales Load Date Type")
                             {
                                 ApplicationArea = All;
@@ -380,56 +303,16 @@ page 36950 "PowerBI Assisted Setup"
                                 ToolTip = 'Specifies the date formula for Item Sales report filter.';
                             }
                         }
-                        field(SalesShowLess; ShowLessTxt)
-                        {
-                            ApplicationArea = All;
-                            ShowCaption = false;
-                            trigger OnDrillDown()
-                            begin
-                                SalesTabVisible := not SalesTabVisible;
-                            end;
-                        }
                     }
-                }
 
-                group(ItemPurchReportSetup)
-                {
-                    Caption = 'Purchases';
-                    InstructionalText = 'Configure the Power BI Purchases App.';
-                    field("Purchases Report Name"; Rec."Purchases Report Name")
+                    group(ItemPurchReportSetup)
                     {
-                        Caption = 'Power BI Purchases Report';
-                        ToolTip = 'Specifies the Power BI Purchases Report.';
-                        ApplicationArea = All;
-                        Editable = false;
-                        trigger OnAssistEdit()
-                        begin
-                            SetupHelper.EnsureUserAcceptedPowerBITerms();
-                            SetupHelper.LookupPowerBIReport(Rec."Purchases Report ID", Rec."Purchases Report Name");
-                        end;
-                    }
-                    group(PurchShowMoreGroup)
-                    {
-                        ShowCaption = false;
-                        Visible = not PurchasesTabVisible;
-                        field(PurchShowMore; ShowMoreTxt)
-                        {
-                            ApplicationArea = All;
-                            ShowCaption = false;
-                            trigger OnDrillDown()
-                            begin
-                                PurchasesTabVisible := not PurchasesTabVisible;
-                            end;
-                        }
-                    }
-                    group(PurchFastTab)
-                    {
-                        ShowCaption = false;
-                        Visible = PurchasesTabVisible;
+                        Caption = 'Purchasing Connector for Power BI';
                         group(PurchDataFiltering)
                         {
                             ShowCaption = false;
                             InstructionalText = 'Configure the volume of data that is sent to your Power BI semantic models (optional).';
+
                             field(ItmPchRepLoadDateType; Rec."Item Purch. Load Date Type")
                             {
                                 ApplicationArea = All;
@@ -451,178 +334,56 @@ page 36950 "PowerBI Assisted Setup"
                                 ToolTip = 'Specifies the date formula for Item Purchases report filter.';
                             }
                         }
-                        field(PurchShowLess; ShowLessTxt)
-                        {
-                            ApplicationArea = All;
-                            ShowCaption = false;
-                            trigger OnDrillDown()
-                            begin
-                                PurchasesTabVisible := not PurchasesTabVisible;
-                            end;
-                        }
                     }
-                }
 
-                group(InventoryReportSetup)
-                {
-                    Caption = 'Inventory';
-                    InstructionalText = 'Configure the Power BI Inventory App.';
-                    field("Inventory Report Name"; Rec."Inventory Report Name")
+                    group(JobsReportSetup)
                     {
-                        Caption = 'Power BI Inventory Report';
-                        ToolTip = 'Specifies the Power BI Inventory Report.';
-                        ApplicationArea = All;
-                        Editable = false;
-                        trigger OnAssistEdit()
-                        begin
-                            SetupHelper.EnsureUserAcceptedPowerBITerms();
-                            SetupHelper.LookupPowerBIReport(Rec."Inventory Report ID", Rec."Inventory Report Name");
-                        end;
-                    }
-                    field("Inventory Val. Report Name"; Rec."Inventory Val. Report Name")
-                    {
-                        Caption = 'Power BI Inventory Valuation Name';
-                        ToolTip = 'Specifies the Power BI Inventory Valuation Report.';
-                        ApplicationArea = All;
-                        Editable = false;
-                        trigger OnAssistEdit()
-                        begin
-                            SetupHelper.EnsureUserAcceptedPowerBITerms();
-                            SetupHelper.LookupPowerBIReport(Rec."Inventory Val. Report ID", Rec."Inventory Val. Report Name");
-                        end;
-                    }
-                }
+                        Caption = 'Jobs Connector for Power BI';
+                        InstructionalText = 'Configure the volume of data that is sent to your Power BI semantic models';
 
-                group(JobsReportSetup)
-                {
-                    Caption = 'Projects';
-                    InstructionalText = 'Configure the Power BI Projects App.';
-                    field("Projects Report Name"; Rec."Projects Report Name")
-                    {
-                        Caption = 'Power BI Projects Report';
-                        ToolTip = 'Specifies the Power BI Projects Report.';
-                        ApplicationArea = All;
-                        Editable = false;
-                        trigger OnAssistEdit()
-                        begin
-                            SetupHelper.EnsureUserAcceptedPowerBITerms();
-                            SetupHelper.LookupPowerBIReport(Rec."Projects Report Id", Rec."Projects Report Name");
-                        end;
-                    }
-                    group(ProjectsShowMoreGroup)
-                    {
-                        ShowCaption = false;
-                        Visible = not ProjectTabVisible;
-                        field(ProjectsShowMore; ShowMoreTxt)
-                        {
-                            ApplicationArea = All;
-                            ShowCaption = false;
-                            trigger OnDrillDown()
-                            begin
-                                ProjectTabVisible := not ProjectTabVisible;
-                            end;
-                        }
-                    }
-                    group(ProjectsFastTab)
-                    {
-                        ShowCaption = false;
-                        Visible = ProjectTabVisible;
                         group(JobLedgerFilters)
                         {
-                            Caption = 'Project Ledger Entry Filters';
-                            InstructionalText = 'Filters Project Ledger Entries';
+                            Caption = 'Job Ledger Entry Filters';
+                            InstructionalText = 'Filters Job Ledger Entries';
                             field(JobLedgerStartDate; Rec."Job Ledger Entry Start Date")
                             {
                                 Caption = 'Start Date';
                                 ApplicationArea = All;
-                                ToolTip = 'Specifies the start date for Project Ledger Entries filter.';
+                                ToolTip = 'Specifies the start date for Job Ledger Entries filter.';
                             }
                             field(JobLedgerEndDate; Rec."Job Ledger Entry End Date")
                             {
                                 Caption = 'End Date';
                                 ApplicationArea = All;
-                                ToolTip = 'Specifies the end date for Project Ledger Entries Entries filter.';
+                                ToolTip = 'Specifies the end date for Job Ledger Entries Entries filter.';
                             }
                         }
-                        field(ProjectsShowLess; ShowLessTxt)
-                        {
-                            ApplicationArea = All;
-                            ShowCaption = false;
-                            trigger OnDrillDown()
-                            begin
-                                ProjectTabVisible := not ProjectTabVisible;
-                            end;
-                        }
                     }
-                }
 
-                group(ManufacturingReportSetup)
-                {
-                    Caption = 'Manufacturing';
-                    InstructionalText = 'Configure the Power BI Manufacturing App.';
-                    field("Manufacturing Report Name"; Rec."Manufacturing Report Name")
+                    group(ManufacturingReportSetup)
                     {
-                        Caption = 'Power BI Manufacturing Report';
-                        ToolTip = 'Specifies the Power BI Manufacturing Report.';
-                        ApplicationArea = All;
-                        Editable = false;
-                        trigger OnAssistEdit()
-                        begin
-                            SetupHelper.EnsureUserAcceptedPowerBITerms();
-                            SetupHelper.LookupPowerBIReport(Rec."Manufacturing Report ID", Rec."Manufacturing Report Name");
-                        end;
-                    }
-                    group(ManuShowMoreGroup)
-                    {
-                        ShowCaption = false;
-                        Visible = not ManufacturingTabVisible;
-                        field(ManuShowMore; ShowMoreTxt)
+                        Caption = 'Manufacturing Connector for Power BI';
+                        InstructionalText = 'Configure the volume of data that is sent to your Power BI semantic models';
+
+                        field(ManuRepLoadDateType; Rec."Manufacturing Load Date Type")
                         {
                             ApplicationArea = All;
-                            ShowCaption = false;
-                            trigger OnDrillDown()
-                            begin
-                                ManufacturingTabVisible := not ManufacturingTabVisible;
-                            end;
+                            ToolTip = 'Specifies the date type for Manufacturing report filter.';
                         }
-                    }
-                    group(ManuFastTab)
-                    {
-                        ShowCaption = false;
-                        Visible = ManufacturingTabVisible;
-                        group(ManufacturingRecordFilters)
-                        {
-                            Caption = 'Manufacturing Document and Entry Filters';
-                            InstructionalText = 'Filters Manufacturing Data';
-                            field(ManuRepLoadDateType; Rec."Manufacturing Load Date Type")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the date type for Manufacturing report filter.';
-                            }
-                            field(ManuRepStartDate; Rec."Manufacturing Start Date")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the start date for Manufacturing report filter.';
-                            }
-                            field(ManuRepEndDate; Rec."Manufacturing End Date")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the end date for Manufacturing report filter.';
-                            }
-                            field(ManuRepDateFormula; Rec."Manufacturing Date Formula")
-                            {
-                                ApplicationArea = All;
-                                ToolTip = 'Specifies the date formula for Manufacturing report filter.';
-                            }
-                        }
-                        field(ManuShowLess; ShowLessTxt)
+                        field(ManuRepStartDate; Rec."Manufacturing Start Date")
                         {
                             ApplicationArea = All;
-                            ShowCaption = false;
-                            trigger OnDrillDown()
-                            begin
-                                ManufacturingTabVisible := not ManufacturingTabVisible;
-                            end;
+                            ToolTip = 'Specifies the start date for Manufacturing report filter.';
+                        }
+                        field(ManuRepEndDate; Rec."Manufacturing End Date")
+                        {
+                            ApplicationArea = All;
+                            ToolTip = 'Specifies the end date for Manufacturing report filter.';
+                        }
+                        field(ManuRepDateFormula; Rec."Manufacturing Date Formula")
+                        {
+                            ApplicationArea = All;
+                            ToolTip = 'Specifies the date formula for Manufacturing report filter.';
                         }
                     }
                 }
@@ -634,7 +395,7 @@ page 36950 "PowerBI Assisted Setup"
                 group(Complete)
                 {
                     Caption = 'All Done!';
-                    InstructionalText = 'You have finished the Assisted Setup for Power BI Connector. Copy your Power BI Connection Details below for use when setting up your Power BI Reports. Choose Finish to complete the setup.';
+                    InstructionalText = 'You have finished the Assisted Setup for Power BI Connector. Copy your Power BI Connection string below for use in connecting your Power BI Reports. Choose Finish to complete the setup.';
                 }
                 group(ConnectionDetails)
                 {
@@ -731,7 +492,7 @@ page 36950 "PowerBI Assisted Setup"
         GuidedExperience: Codeunit "Guided Experience";
         TimeZoneSelection: Codeunit "Time Zone Selection";
         EnvironmentInformation: Codeunit "Environment Information";
-        SetupHelper: Codeunit "Setup Helper";
+
         Steps: Option Intro,DateTableConfig,UTCOffset,WorkingDays,Setting,Finish;
         PrevStep: Option;
         CurrentStep: Option;
@@ -745,17 +506,10 @@ page 36950 "PowerBI Assisted Setup"
         AssistedSetupComplete: Boolean;
         ViewDeveloperDocLbl: Label 'Power BI Documentation';
         DevDocUrlTxt: Label 'https://learn.microsoft.com/en-au/dynamics365/business-central/admin-powerbi#get-ready-to-use-power-bi', Locked = true;
-        CalendarType: Option ,Fiscal,Standard,Weekly;
+        CalendarType: Option ,Standard,Fiscal,Weekly;
         StandardCalendarVisible: Boolean;
         FiscalCalendarVisible: Boolean;
         WeeklyCalendarVisible: Boolean;
-        FinanceTabVisible: Boolean;
-        SalesTabVisible: Boolean;
-        PurchasesTabVisible: Boolean;
-        ProjectTabVisible: Boolean;
-        ManufacturingTabVisible: Boolean;
-        ShowMoreTxt: Label 'Show More';
-        ShowLessTxt: Label 'Show Less';
 
     trigger OnOpenPage()
     var
@@ -771,15 +525,6 @@ page 36950 "PowerBI Assisted Setup"
         if UserSetup.Get(UserId()) then
             TestEmailAddress := UserSetup."E-Mail";
 
-        case Rec."Calendar Range" of
-            Rec."Calendar Range"::Calendar:
-                CalendarType := CalendarType::Standard;
-            Rec."Calendar Range"::FiscalGregorian:
-                CalendarType := CalendarType::Fiscal;
-            Rec."Calendar Range"::FiscalWeekly:
-                CalendarType := CalendarType::Weekly;
-        end;
-
         LoadTopBanners();
         TakeStep(0);
     end;
@@ -788,6 +533,7 @@ page 36950 "PowerBI Assisted Setup"
     begin
         case CurrentStep of
             Steps::UTCOffset:
+
                 Rec.TestField("Time Zone");
         end;
 
@@ -804,6 +550,7 @@ page 36950 "PowerBI Assisted Setup"
                     NextEnabled := true;
                 end;
             Steps::DateTableConfig:
+
                 if CalendarType > 0 then
                     NextEnabled := true;
             Steps::UTCOffset:
@@ -839,9 +586,10 @@ page 36950 "PowerBI Assisted Setup"
     end;
 
     local procedure OnUpdateCalendarSelection()
+    var
     begin
         case CalendarType of
-            CalendarType::Standard:
+            1:
                 begin
                     StandardCalendarVisible := true;
                     FiscalCalendarVisible := false;
@@ -849,7 +597,7 @@ page 36950 "PowerBI Assisted Setup"
                     Rec."Calendar Range" := Rec."Calendar Range"::Calendar;
                     TakeStep(0);
                 end;
-            CalendarType::Fiscal:
+            2:
                 begin
                     FiscalCalendarVisible := true;
                     StandardCalendarVisible := false;
@@ -857,7 +605,7 @@ page 36950 "PowerBI Assisted Setup"
                     Rec."Calendar Range" := Rec."Calendar Range"::FiscalGregorian;
                     TakeStep(0);
                 end;
-            CalendarType::Weekly:
+            3:
                 begin
                     WeeklyCalendarVisible := true;
                     FiscalCalendarVisible := false;
