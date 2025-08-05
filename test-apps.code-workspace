@@ -1,5 +1,4 @@
 {
-  "folders": [],
   "settings": {
     "allint.enabled": false,
     "al.enableCodeAnalysis": false,
@@ -7,5 +6,6 @@
       "**.xlf": true
     },
     "al.enableCodeActions": false
-  }
+  },
+  "folders": []
 }
