@@ -981,7 +981,7 @@ page 47 "Sales Invoice Subform"
                         Caption = 'Get &Project Planning Lines';
                         Ellipsis = true;
                         Image = JobLines;
-                        ToolTip = 'Select multiple planning lines to the same customer because you want to combine them on one invoice.';
+                        ToolTip = 'Select multiple planning lines associated with the same billing and selling customer to consolidate them into a single invoice. Lines must be associated with invoice currency code that matches that of the invoice.';
 
                         trigger OnAction()
                         begin
@@ -1406,10 +1406,11 @@ page 47 "Sales Invoice Subform"
 
     local procedure SetOpenPage()
     var
+        [SecurityFiltering(SecurityFilter::Filtered)]
+        Location: Record Location;
         ServerSetting: Codeunit "Server Setting";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
-        Location: Record Location;
     begin
         OnBeforeSetOpenPage();
 

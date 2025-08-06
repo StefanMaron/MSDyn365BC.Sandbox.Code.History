@@ -11,6 +11,7 @@ using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Requisition;
+using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.Activity;
@@ -978,6 +979,11 @@ table 337 "Reservation Entry"
         OnAfterNewTrackingExists(Rec, IsTrackingExists);
     end;
 
+    procedure IsReclass() Reclass: Boolean
+    begin
+        Reclass := ("Source Type" = Database::"Item Journal Line") and ("Source Subtype" = 4);
+    end;
+
     procedure TransferReservations(var OldReservEntry: Record "Reservation Entry"; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; TransferAll: Boolean; TransferQty: Decimal; QtyPerUOM: Decimal; SourceType: Integer; SourceSubtype: Option; SourceID: Code[20]; SourceBatchName: Code[10]; SourceProdOrderLine: Integer; SourceRefNo: Integer)
     var
         NewReservEntry: Record "Reservation Entry";
@@ -1016,6 +1022,10 @@ table 337 "Reservation Entry"
                               CreateReservEntry.TransferReservEntry(
                                 SourceType, SourceSubtype, SourceID, SourceBatchName, SourceProdOrderLine, SourceRefNo,
                                 QtyPerUOM, OldReservEntry, TransferQty);
+
+                            if (OldReservEntry."Reservation Status" = OldReservEntry."Reservation Status"::Prospect) and (SourceType = Database::"Purchase Line") and (SourceSubtype in [1, 2]) then
+                                ChangeReservationStatusToSurplus(SourceType, SourceSubtype, SourceID, SourceRefNo);
+
                             OnTransferReservationsOnAfterSecondOldReservEntryLoop(OldReservEntry, NewReservEntry, SourceType, SourceSubtype, SourceID);
                         until (OldReservEntry.Next() = 0) or (TransferQty = 0);
                 end;
@@ -1118,6 +1128,18 @@ table 337 "Reservation Entry"
     procedure UpdateSourceCost(UnitCost: Decimal)
     begin
         OnUpdateSourceCost(Rec, UnitCost);
+    end;
+
+    local procedure ChangeReservationStatusToSurplus(SourceType: Integer; SourceSubtype: Option; SourceID: Code[20]; SourceRefNo: Integer)
+    var
+        NewReservationEntry: Record "Reservation Entry";
+    begin
+        NewReservationEntry.SetSourceFilter(SourceType, SourceSubtype, SourceID, SourceRefNo, true);
+        NewReservationEntry.SetRange("Reservation Status", NewReservationEntry."Reservation Status"::Prospect);
+        if NewReservationEntry.FindFirst() then begin
+            NewReservationEntry."Reservation Status" := NewReservationEntry."Reservation Status"::Surplus;
+            NewReservationEntry.Modify(true);
+        end;
     end;
 
     [IntegrationEvent(false, false)]
