@@ -1036,7 +1036,6 @@ table 295 "Reminder Header"
                 ReminderLine."Reminder No." := LocalReminderHeader."No.";
                 ReminderLine."Line No." := NextLineNo;
                 ReminderLine.Description := ReminderCommunication.SubstituteBeginningOrEndingDescription(ReminderAttachmentTextLine.Text, ReminderTotal, MaxStrLen(ReminderLine.Description), LocalReminderHeader, FinChrgTerms);
-                OnInsertTextLinesOnBeforeRemLineInsert(LocalReminderHeader, ReminderLine, ReminderAttachmentText);
                 ReminderLine.Insert();
             until ReminderAttachmentTextLine.Next() = 0;
 
@@ -1542,11 +1541,6 @@ table 295 "Reminder Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertLines(var ReminderHeader: Record "Reminder Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertTextLinesOnBeforeRemLineInsert(var ReminderHeader: Record "Reminder Header"; var ReminderLine: Record "Reminder Line"; var ReminderAttachmentText: Record "Reminder Attachment Text")
     begin
     end;
 }
