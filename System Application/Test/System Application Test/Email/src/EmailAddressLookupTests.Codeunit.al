@@ -22,6 +22,7 @@ codeunit 134699 "Email Address Lookup Tests"
         Assert: Codeunit "Library Assert";
         PermissionsMock: Codeunit "Permissions Mock";
 
+
     [Test]
     [HandlerFunctions('EmailRecipientLookupHandler')]
     procedure EmailAddresssLookupTest()

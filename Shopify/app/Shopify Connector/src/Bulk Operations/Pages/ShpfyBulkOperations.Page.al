@@ -79,7 +79,7 @@ page 30152 "Shpfy Bulk Operations"
                     BulkOperationMgt: Codeunit "Shpfy Bulk Operation Mgt.";
                 begin
                     Shop.Get(Rec."Shop Code");
-                    Message(BulkOperationMgt.GetBulkOperationResult(Shop, Rec));
+                    BulkOperationMgt.GetBulkOperationResult(Shop, Rec."Bulk Operation Id");
                 end;
             }
             action(Refresh)

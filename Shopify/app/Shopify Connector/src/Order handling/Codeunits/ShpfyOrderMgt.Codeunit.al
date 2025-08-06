@@ -1,7 +1,6 @@
 namespace Microsoft.Integration.Shopify;
 
 using System.Reflection;
-using Microsoft.Sales.Document;
 
 /// <summary>
 /// Codeunit Shpfy Order Mgt. (ID 30164).
@@ -124,7 +123,6 @@ codeunit 30164 "Shpfy Order Mgt."
     /// <param name="RecAsVariant">Parameter of type Variant.</param>
     internal procedure ShowShopifyOrder(var RecAsVariant: Variant)
     var
-        SalesHeader: Record "Sales Header";
         OrderHeader: Record "Shpfy Order Header";
         RecordRef: RecordRef;
         FieldRef: FieldRef;
@@ -139,7 +137,7 @@ codeunit 30164 "Shpfy Order Mgt."
             else
                 exit;
 
-        FieldNumber := FieldNo(RecordRef, SalesHeader.FieldName(SalesHeader."Shpfy Order No."));
+        FieldNumber := FieldNo(RecordRef, 'Shopify Order No.');
         if FieldNumber <> 0 then begin
             FieldRef := RecordRef.Field(FieldNumber);
             OrderNo := FieldRef.Value();
