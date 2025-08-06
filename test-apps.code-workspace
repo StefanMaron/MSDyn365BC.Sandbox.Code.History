@@ -1,11 +1,11 @@
 {
   "settings": {
+    "allint.enabled": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeActions": false,
     "al.enableCodeAnalysis": false,
-    "allint.enabled": false
+    "al.enableCodeActions": false
   },
   "folders": [
     {
@@ -150,9 +150,6 @@
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
-    },
-    {
       "path": "./FieldServiceIntegration/Test/Field Service Integration Test"
     },
     {
@@ -274,9 +271,6 @@
     },
     {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
-    },
-    {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
     },
     {
       "path": "./ContosoCoffeeDemoDataset/Test/Contoso Coffee Demo Dataset Tests"
