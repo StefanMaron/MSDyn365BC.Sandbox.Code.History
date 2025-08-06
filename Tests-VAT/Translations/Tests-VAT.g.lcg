@@ -545,6 +545,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM VAT Reg. No Validity Check - NamedType NoVATNoToValidateErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 319318622 - NamedType 3699042893" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The VAT registration number could not be verified because the VIES VAT Registration No. service may be currently unavailable for the selected EU state, %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM VAT Reg. No Validity Check - NamedType UnexpectedResponseErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 319318622 - NamedType 1026294714" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[valid]]></Val>
@@ -986,15 +995,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Non Ded. VAT Misc. - NamedType IncorrectGLEntryAmtErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2188954535 - NamedType 2465520783" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Incorrect amount in Project Ledger Entry]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Non Ded. VAT Misc. - NamedType InCorrectProjLedgEntryAmtErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 2320631175 - NamedType 648351519" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Amount must be equal.]]></Val>
@@ -1002,15 +1002,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Non-Deductible Purch. Posting - NamedType AmountMustBeEqualErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2320631175 - NamedType 3029586008" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 must be %2 in %3]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = Cost Amount (Actual), %2 = value of Cost Amount (Actual), %3 = Value Entry]D;]A;(LookupHint=Codeunit Non-Deductible Purch. Posting - NamedType CostAmountActualErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2320631175 - NamedType 495267396" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1047,15 +1038,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Non-Deductible VAT Journal - NamedType EntriesReversedLbl)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1718597743 - NamedType 3255458007" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Non-Deductable VAT Amount must be %1 in VAT Entries]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = Expected Non-Deductible VAT Amount]D;]A;(LookupHint=Codeunit Non-Deductible VAT Journal - NamedType NonDeductiableVATAmountMustBeEqualErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1718597743 - NamedType 3158364080" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1101,15 +1083,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Non-Deductible VAT Reports - NamedType ConfirmAdjustQst)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 116159835 - NamedType 479760294" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[G/L Entry is inconsistent]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Non-Deductible VAT Statistics - NamedType GLEntryConsistentErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 729097190 - NamedType 3551190662" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
