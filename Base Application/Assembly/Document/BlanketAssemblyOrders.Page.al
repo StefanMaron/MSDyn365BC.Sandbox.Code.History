@@ -129,10 +129,14 @@ page 942 "Blanket Assembly Orders"
                 ApplicationArea = Assembly;
                 Caption = 'Statistics';
                 Image = Statistics;
+                RunPageOnRec = true;
                 ShortCutKey = 'F7';
                 ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                RunObject = Page "Assembly Order Statistics";
-                RunPageOnRec = true;
+
+                trigger OnAction()
+                begin
+                    Rec.ShowStatistics();
+                end;
             }
             action(Dimensions)
             {
@@ -233,3 +237,4 @@ page 942 "Blanket Assembly Orders"
     var
         IsUnitCostEditable: Boolean;
 }
+
