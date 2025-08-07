@@ -117,8 +117,11 @@ page 922 "Posted Assembly Orders"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    RunObject = Page "Posted Asm. Order Statistics";
-                    RunPageOnRec = true;
+
+                    trigger OnAction()
+                    begin
+                        Rec.ShowStatistics();
+                    end;
                 }
                 action(Dimensions)
                 {
@@ -211,3 +214,4 @@ page 922 "Posted Assembly Orders"
         }
     }
 }
+
