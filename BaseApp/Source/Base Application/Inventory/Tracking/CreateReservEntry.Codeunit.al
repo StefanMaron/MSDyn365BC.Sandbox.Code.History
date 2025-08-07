@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -112,7 +112,6 @@ codeunit 99000830 "Create Reserv. Entry"
             ReservEntry2."Source Prod. Order Line" := InsertReservEntry2."Source Prod. Order Line";
             ReservEntry2."Source Ref. No." := InsertReservEntry2."Source Ref. No.";
             ReservEntry2.CopyTrackingFromreservEntry(InsertReservEntry2);
-            ReservEntry2."Expiration Date" := InsertReservEntry2."Expiration Date";
             ReservEntry2."Qty. per Unit of Measure" := InsertReservEntry2."Qty. per Unit of Measure";
             ReservEntry2."Untracked Surplus" := InsertReservEntry2."Untracked Surplus" and not ReservEntry2.Positive;
 
@@ -633,13 +632,12 @@ codeunit 99000830 "Create Reserv. Entry"
 
     local procedure CheckSourceTypeSubtype(var ReservEntry: Record "Reservation Entry") IsError: Boolean
     begin
-        // This event used internally for base app source tables
         OnCheckSourceTypeSubtype(ReservEntry, IsError);
-        
-        // This event used for compatibility with previous versions
+        if IsError then
+            exit(true);
+
         OnAfterCheckValidity(ReservEntry, IsError);
 
-        // This event used for external extensions
         OnAfterCheckSourceTypeSubtype(ReservEntry, IsError);
     end;
 
@@ -1046,7 +1044,7 @@ codeunit 99000830 "Create Reserv. Entry"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyFromInsertReservEntry(var InsertReservEntry: Record "Reservation Entry"; var ReservEntry: Record "Reservation Entry"; FromReservEntry: Record "Reservation Entry"; Status: Enum "Reservation Status"; var QtyToHandleAndInvoiceIsSet: Boolean)
+    local procedure OnAfterCopyFromInsertReservEntry(var InsertReservEntry: Record "Reservation Entry"; var ReservEntry: Record "Reservation Entry"; FromReservEntry: Record "Reservation Entry"; Status: Enum "Reservation Status"; QtyToHandleAndInvoiceIsSet: Boolean)
     begin
     end;
 
