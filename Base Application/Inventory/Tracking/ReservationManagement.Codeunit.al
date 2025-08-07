@@ -1299,7 +1299,6 @@ codeunit 99000845 "Reservation Management"
             FromTrackingSpecification.SetSourceFromReservEntry(ToReservEntry);
             FromTrackingSpecification."Qty. per Unit of Measure" := ToReservEntry."Qty. per Unit of Measure";
             FromTrackingSpecification.CopyTrackingFromReservEntry(ToReservEntry);
-            FromTrackingSpecification."Expiration Date" := ToReservEntry."Expiration Date";
             CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
             CreateReservEntry.SetApplyFromEntryNo(FromReservEntry."Appl.-from Item Entry");
             CreateReservEntry.SetApplyToEntryNo(FromReservEntry."Appl.-to Item Entry");
