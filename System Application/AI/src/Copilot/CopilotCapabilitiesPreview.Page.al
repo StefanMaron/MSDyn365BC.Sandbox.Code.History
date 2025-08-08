@@ -108,8 +108,16 @@ page 7773 "Copilot Capabilities Preview"
                 Scope = Repeater;
 
                 trigger OnAction()
+                var
+                    CopilotDeactivate: Page "Copilot Deactivate Capability";
                 begin
-                    CopilotCapabilityImpl.DeactivateCapability(Rec);
+                    CopilotDeactivate.SetCaption(Format(Rec.Capability));
+                    if CopilotDeactivate.RunModal() = Action::OK then begin
+                        Rec.Status := Rec.Status::Inactive;
+                        Rec.Modify(true);
+
+                        CopilotCapabilityImpl.SendDeactivateTelemetry(Rec.Capability, Rec."App Id", CopilotDeactivate.GetReason());
+                    end;
                 end;
             }
             action(SupplementalTerms)
