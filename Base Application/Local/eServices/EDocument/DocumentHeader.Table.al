@@ -275,10 +275,6 @@ table 10002 "Document Header"
         {
             Caption = 'Document Table ID';
         }
-        field(27012; "CFDI Certificate of Origin No."; Text[50])
-        {
-            Caption = 'CFDI Certificate of Origin No.';
-        }
     }
 
     keys
