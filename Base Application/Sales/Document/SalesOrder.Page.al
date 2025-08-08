@@ -1,4 +1,4 @@
-namespace Microsoft.Sales.Document;
+﻿namespace Microsoft.Sales.Document;
 
 using Microsoft.Assembly.Document;
 using Microsoft.Bank.Setup;
@@ -458,12 +458,6 @@ page 42 "Sales Order"
                     ApplicationArea = VAT;
                     Importance = Additional;
                     ToolTip = 'Specifies the VAT registration number for customers.';
-                }
-                field("Enterprise No."; Rec."Enterprise No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the enterprise number for customers';
                 }
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
@@ -928,7 +922,7 @@ page 42 "Sales Order"
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
-                    ToolTip = 'Specifies the location from where items are to be shipped. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
+                    ToolTip = 'Specifies the location from where inventory items to the customer on the sales document are to be shipped by default.';
                 }
                 field("Shipment Date"; Rec."Shipment Date")
                 {

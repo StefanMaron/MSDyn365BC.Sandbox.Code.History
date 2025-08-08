@@ -811,7 +811,7 @@ table 5993 "Service Invoice Line"
 
         if UserSetupMgt.GetServiceFilter() <> '' then begin
             FilterGroup(2);
-            SetRange("Responsibility Center", UserSetupMgt.GetServiceFilter());
+            SetRange("Responsibility Center", UserSetupMgt.GetPurchasesFilter());
             FilterGroup(0);
         end;
     end;
