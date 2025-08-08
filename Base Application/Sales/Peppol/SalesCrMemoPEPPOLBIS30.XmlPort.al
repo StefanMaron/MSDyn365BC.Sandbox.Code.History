@@ -1,8 +1,4 @@
-// ------------------------------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-// ------------------------------------------------------------------------------------------------
-
+﻿
 namespace Microsoft.Sales.Peppol;
 
 using Microsoft.Finance.GeneralLedger.Setup;
@@ -104,7 +100,7 @@ xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
 
                 trigger OnBeforePassVariable()
                 begin
-                    BuyerReference := PEPPOLMgt.GetBuyerReference(SalesHeader);
+                    BuyerReference := SalesHeader."Your Reference";
                     if BuyerReference = '' then
                         currXMLport.Skip();
                 end;
@@ -684,7 +680,7 @@ xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
                                 currXMLport.Skip();
                         end;
                     }
-                    textelement(customerpartyname)
+                    textelement(custoemerpartyname)
                     {
                         NamespacePrefix = 'cac';
                         XmlName = 'PartyName';
@@ -1296,90 +1292,6 @@ xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
                         currXMLport.Skip();
                 end;
             }
-            tableelement(allowancechargepaymentdiscountloop; Integer)
-            {
-                NamespacePrefix = 'cac';
-                XmlName = 'AllowanceCharge';
-                SourceTableView = sorting(Number) where(Number = filter(1 ..));
-                textelement(ChargeIndicatorPaymentDiscount)
-                {
-                    XmlName = 'ChargeIndicator';
-                    NamespacePrefix = 'cbc';
-                }
-                textelement(AllowanceChargeReasonCodePaymentDiscount)
-                {
-                    XmlName = 'AllowanceChargeReasonCode';
-                    NamespacePrefix = 'cbc';
-                }
-                textelement(AllowanceChargeReasonPaymentDiscount)
-                {
-                    XmlName = 'AllowanceChargeReason';
-                    NamespacePrefix = 'cbc';
-                }
-                textelement(AmountPaymentDiscount)
-                {
-                    XmlName = 'Amount';
-                    NamespacePrefix = 'cbc';
-                    textattribute(allowancechargecurrencyidPaymentDiscount)
-                    {
-                        XmlName = 'currencyID';
-                    }
-                }
-                textelement(TaxCategoryPaymentDiscount)
-                {
-                    XmlName = 'TaxCategory';
-                    NamespacePrefix = 'cac';
-                    textelement(taxcategoryidPaymentDiscount)
-                    {
-                        NamespacePrefix = 'cbc';
-                        XmlName = 'ID';
-                    }
-                    textelement(PercentPaymentDiscount)
-                    {
-                        XmlName = 'Percent';
-                        NamespacePrefix = 'cbc';
-
-                        trigger OnBeforePassVariable()
-                        begin
-                            if PercentPaymentDiscount = '' then
-                                currXMLport.Skip();
-                        end;
-                    }
-                    textelement(TaxSchemePaymentDiscount)
-                    {
-                        XmlName = 'TaxScheme';
-                        NamespacePrefix = 'cac';
-                        textelement(allowancechargetaxschemeidPaymentDiscount)
-                        {
-                            NamespacePrefix = 'cbc';
-                            XmlName = 'ID';
-                        }
-                    }
-                }
-
-                trigger OnAfterGetRecord()
-                begin
-                    if not FindNextVATAmtRec(TempVATAmtLine, AllowanceChargePaymentDiscountLoop.Number) then
-                        currXMLport.Break();
-
-                    PEPPOLMgt.GetAllowanceChargeInfoPaymentDiscount(
-                      TempVATAmtLine,
-                      SalesHeader,
-                      ChargeIndicatorPaymentDiscount,
-                      AllowanceChargeReasonCodePaymentDiscount,
-                      DummyVar,
-                      AllowanceChargeReasonPaymentDiscount,
-                      AmountPaymentDiscount,
-                      AllowanceChargeCurrencyIDPaymentDiscount,
-                      TaxCategoryIDPaymentDiscount,
-                      DummyVar,
-                      PercentPaymentDiscount,
-                      AllowanceChargeTaxSchemeIDPaymentDiscount);
-
-                    if ChargeIndicatorPaymentDiscount = '' then
-                        currXMLport.Skip();
-                end;
-            }
             textelement(TaxTotal)
             {
                 NamespacePrefix = 'cac';
@@ -1726,7 +1638,7 @@ xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
                             XmlName = 'ID';
                         }
                     }
-                    textelement(crmemolnbillingreferenceline)
+                    textelement("crmemolnbillingreferenceline>")
                     {
                         NamespacePrefix = 'cac';
                         XmlName = 'BillingReferenceLine';
@@ -2170,7 +2082,6 @@ xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
                     if not FindNextCreditMemoLineRec(CreditMemoLineLoop.Number) then
                         currXMLport.Break();
 
-                    OnCreditMemoLineLoopOnAfterGetRecordOnBeforeGetLineGeneralInfo(SalesCrMemoLine, SalesLine);
                     PEPPOLMgt.GetLineGeneralInfo(
                       SalesLine,
                       SalesHeader,
@@ -2268,7 +2179,6 @@ xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
                     if SalesCrMemoLine.FindSet() then
                         repeat
                             SalesLine.TransferFields(SalesCrMemoLine);
-                            OnGetTotalsOnBeforeGetSalesLineTotals(SalesCrMemoLine, SalesLine);
                             PEPPOLMgt.GetTotals(SalesLine, TempVATAmtLine);
                             PEPPOLMgt.GetTaxCategories(SalesLine, TempVATProductPostingGroup);
                         until SalesCrMemoLine.Next() = 0;
@@ -2324,7 +2234,6 @@ xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
                     if SalesCrMemoLine.FindSet() then
                         repeat
                             SalesLine.TransferFields(SalesCrMemoLine);
-                            OnInitializeOnBeforeGetInvoiceRoundingLine(SalesCrMemoLine, SalesLine);
                             PEPPOLMgt.GetInvoiceRoundingLine(TempSalesLineRounding, SalesLine);
                         until SalesCrMemoLine.Next() = 0;
                     if TempSalesLineRounding."Line No." <> 0 then
@@ -2385,21 +2294,6 @@ xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFindSalesCrMemoLine(var SalesCrMemoLine: Record "Sales Cr.Memo Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetTotalsOnBeforeGetSalesLineTotals(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInitializeOnBeforeGetInvoiceRoundingLine(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreditMemoLineLoopOnAfterGetRecordOnBeforeGetLineGeneralInfo(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var SalesLine: Record "Sales Line")
     begin
     end;
 }
