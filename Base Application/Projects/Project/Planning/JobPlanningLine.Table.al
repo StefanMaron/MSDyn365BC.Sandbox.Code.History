@@ -7,7 +7,6 @@ using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
-using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.UOM;
@@ -2002,7 +2001,7 @@ table 1003 "Job Planning Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateAllAmounts(Rec, xRec, IsHandled, CurrFieldNo);
+        OnBeforeUpdateAllAmounts(Rec, xRec, IsHandled);
         if IsHandled then
             exit;
 
@@ -3230,16 +3229,11 @@ table 1003 "Job Planning Line"
     end;
 
     local procedure AddItem(var NewJobPlanningLine: Record "Job Planning Line"; ItemNo: Code[20])
-    var
-        TransferExtendedText: Codeunit "Transfer Extended Text";
     begin
         NewJobPlanningLine."Line No." += 10000;
         NewJobPlanningLine.Validate(Type, NewJobPlanningLine.Type::Item);
         NewJobPlanningLine.Validate("No.", ItemNo);
         NewJobPlanningLine.Insert(true);
-
-        if TransferExtendedText.JobCheckIfAnyExtText(NewJobPlanningLine, false) then
-            TransferExtendedText.InsertJobExtText(NewJobPlanningLine);
     end;
 
     local procedure InitNewLine(var NewJobPlanningLine: Record "Job Planning Line")
@@ -3598,7 +3592,7 @@ table 1003 "Job Planning Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateAllAmounts(var JobPlanningLine: Record "Job Planning Line"; var xJobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean; CurrFieldNo: Integer)
+    local procedure OnBeforeUpdateAllAmounts(var JobPlanningLine: Record "Job Planning Line"; var xJobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean)
     begin
     end;
 
