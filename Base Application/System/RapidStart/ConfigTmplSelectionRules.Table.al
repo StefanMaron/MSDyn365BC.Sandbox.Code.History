@@ -139,6 +139,7 @@ table 8620 "Config. Tmpl. Selection Rules"
         FiltersOutStream.WriteText(NewFilters);
     end;
 
+    [Scope('OnPrem')]
     procedure FindTemplateBasedOnRecordFields(RecordVariant: Variant; var ConfigTemplateHeader: Record "Config. Template Header"): Boolean
     var
         ConfigTmplSelectionRules: Record "Config. Tmpl. Selection Rules";
