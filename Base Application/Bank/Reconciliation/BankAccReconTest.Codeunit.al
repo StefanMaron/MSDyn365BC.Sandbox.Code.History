@@ -107,12 +107,8 @@ codeunit 380 "Bank Acc. Recon. Test"
 
     internal procedure CheckBankAccountLedgerEntryFilters(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"; StatementNo: Code[20]; StatementDate: Date): Boolean
     begin
-        if not BankAccountLedgerEntry.Open then
+        if (not BankAccountLedgerEntry.Open) and (BankAccountLedgerEntry."Closed at Date" = 0D) then
             exit(false);
-
-        if (BankAccountLedgerEntry."Closed at Date" <> 0D) and (BankAccountLedgerEntry."Closed at Date" <= StatementDate) then
-            exit(false);
-
         if BankAccountLedgerEntry."Statement No." = '' then begin
             if CheckBankLedgerEntryIsOpen(BankAccountLedgerEntry, StatementDate) then
                 exit(true);
@@ -126,10 +122,6 @@ codeunit 380 "Bank Acc. Recon. Test"
     var
         BankAccountReconciliation: Record "Bank Acc. Reconciliation";
     begin
-        // Check if the Bank Account Ledger Entry is closed on a later statement
-        if BankAccountLedgerEntry."Closed at Date" > StatementDate then
-            exit(true);
-
         if not BankAccountLedgerEntry.Open then
             exit(false);
 
@@ -144,9 +136,6 @@ codeunit 380 "Bank Acc. Recon. Test"
 
     local procedure CheckBankLedgerEntryIsOpen(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"; StatementDate: Date): Boolean
     begin
-        //there are closed entries with "statement status" = closed but with blank statement no.
-        if BankAccountLedgerEntry."Statement Status" = BankAccountLedgerEntry."Statement Status"::Closed then
-            exit(false);
         if BankAccountLedgerEntry.Open then
             exit(true);
         if (BankAccountLedgerEntry."Closed at Date" = 0D) then
