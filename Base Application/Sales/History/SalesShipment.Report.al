@@ -680,6 +680,11 @@ report 208 "Sales - Shipment"
 
         trigger OnInit()
         begin
+            LogInteractionEnable := true;
+        end;
+
+        trigger OnOpenPage()
+        begin
             InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
@@ -723,6 +728,8 @@ report 208 "Sales - Shipment"
 
     trigger OnPreReport()
     begin
+        if not CurrReport.UseRequestPage then
+            InitLogInteraction();
         AsmHeaderExists := false;
 
         OnAfterOnPreReport("Sales Shipment Header");
