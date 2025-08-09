@@ -130,7 +130,6 @@ codeunit 1305 "Sales-Quote to Invoice"
             SalesInvoiceHeader."Posting Date" := WorkDate();
         SalesInvoiceHeader.InitFromSalesHeader(SalesQuoteHeader);
         SalesInvoiceHeader."VAT Reporting Date" := GLSetup.GetVATDate(SalesInvoiceHeader."Posting Date", SalesInvoiceHeader."Document Date");
-        SalesInvoiceHeader.Validate("Posting Date");
 
         OnBeforeInsertSalesInvoiceHeader(SalesInvoiceHeader, SalesQuoteHeader);
         SalesInvoiceHeader.Modify();
@@ -244,7 +243,7 @@ codeunit 1305 "Sales-Quote to Invoice"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateSalesInvoiceLineLoop(var SalesQuoteLine: Record "Sales Line"; var SalesQuoteHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Header"; var IsHandled: Boolean)
+    local procedure OnBeforeCreateSalesInvoiceLineLoop(var SalesQuoteLine: Record "Sales Line"; var SalesQuoteHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Header"; var IsHandled: Boolean);
     begin
     end;
 
