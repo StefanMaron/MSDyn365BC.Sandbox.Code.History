@@ -256,6 +256,9 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
+      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
+    },
+    {
       "path": "./Email - Outlook REST API/Test"
     },
     {
