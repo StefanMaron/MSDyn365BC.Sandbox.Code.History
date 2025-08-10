@@ -74,7 +74,6 @@ codeunit 265 "Feature Key Management"
         if not ConcurrentInventoryPostingRead then
             ConcurrentInventoryPosting := FeatureManagementFacade.IsEnabled(ConcurrentInventoryPostingLbl);
         ConcurrentInventoryPostingRead := true;
-        OnAfterIsConcurrentInventoryPostingEnabled(ConcurrentInventoryPosting);
         exit(ConcurrentInventoryPosting);
     end;
 
@@ -193,9 +192,4 @@ codeunit 265 "Feature Key Management"
         end;
     end;
 #endif
-
-    [InternalEvent(false)]
-    local procedure OnAfterIsConcurrentInventoryPostingEnabled(var ConcurrentInventoryPosting: Boolean)
-    begin
-    end;
 }
