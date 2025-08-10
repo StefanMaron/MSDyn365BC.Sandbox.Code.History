@@ -136,7 +136,7 @@ page 51 "Purchase Invoice"
                         field("Buy-from County"; Rec."Buy-from County")
                         {
                             ApplicationArea = Basic, Suite;
-                            CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
+                            Caption = 'County';
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the state, province or county of the address.';
@@ -332,7 +332,6 @@ page 51 "Purchase Invoice"
                     BlankZero = true;
                     Enabled = DocAmountEnable;
                     Visible = DocAmountEnable;
-                    Editable = DocAmountsEditable;
                     ShowMandatory = true;
                 }
                 field(DocAmountVAT; Rec."Doc. Amount VAT")
@@ -340,7 +339,6 @@ page 51 "Purchase Invoice"
                     ApplicationArea = Basic, Suite;
                     Enabled = DocAmountEnable;
                     Visible = DocAmountEnable;
-                    Editable = DocAmountsEditable;
                 }
                 field("Job Queue Status"; Rec."Job Queue Status")
                 {
@@ -633,7 +631,7 @@ page 51 "Purchase Invoice"
                                 field("Ship-to County"; Rec."Ship-to County")
                                 {
                                     ApplicationArea = Basic, Suite;
-                                    CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                                    Caption = 'County';
                                     Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                     Importance = Additional;
                                     QuickEntry = false;
@@ -760,7 +758,7 @@ page 51 "Purchase Invoice"
                             field("Pay-to County"; Rec."Pay-to County")
                             {
                                 ApplicationArea = Basic, Suite;
-                                CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
+                                Caption = 'County';
                                 Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                                 Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                                 Importance = Additional;
@@ -1847,6 +1845,7 @@ page 51 "Purchase Invoice"
         SetExtDocNoMandatoryCondition();
         ShowShippingOptionsWithLocation := ApplicationAreaMgmtFacade.IsLocationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled();
         IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
+        DocAmountEnable := PurchSetup."Check Doc. Total Amounts";
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1873,8 +1872,6 @@ page 51 "Purchase Invoice"
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
-        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
-        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetDocNoVisible();
         IsOfficeAddin := OfficeMgt.IsAvailable();
         CreateIncomingDocFromEmailAttachment := OfficeMgt.OCRAvailable();
@@ -1970,7 +1967,7 @@ page 51 "Purchase Invoice"
         IsPurchaseLinesEditable: Boolean;
         RejectICPurchaseInvoiceEnabled: Boolean;
         VATDateEnabled: Boolean;
-        DocAmountEnable, DocAmountsEditable : Boolean;
+        DocAmountEnable: Boolean;
 
     protected var
         ShipToOptions: Option "Default (Company Address)",Location,"Custom Address";
@@ -2135,8 +2132,6 @@ page 51 "Purchase Invoice"
         WorkflowWebhookMgt: Codeunit "Workflow Webhook Management";
     begin
         HasIncomingDocument := Rec."Incoming Document Entry No." <> 0;
-        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
-        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetExtDocNoMandatoryCondition();
         SetPostingGroupEditable();
 
