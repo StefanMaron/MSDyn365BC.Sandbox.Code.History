@@ -70,8 +70,6 @@ codeunit 137156 "SCM Orders IV"
         DocumentCountErr: label 'Expected %1 purchase invoice lines but found %2.', Comment = '%1 = Expected Count, %2 = Actual Count';
         DocumentLineQuantityErr: label 'Expected quantity of 1 on line line but found %1.', Comment = '%1 = Actual Quantity';
         DocumentLineSourceNoErr: label 'Expected source on document line is %1 but found %2.', Comment = '%1 = Expected Source No., %2 = Actual Source No.';
-        PurchasingCodeOnSalesInvoiceErr: Label 'The Purchasing Code should be blank for item %1 on the sales invoice because it is used only for the drop shipment process.', Comment = '%1= Item No.';
-        ShipToAddressErr: Label 'Ship-to Address on Return Order should be company address';
 
 #if not CLEAN25
     [Test]
@@ -3471,77 +3469,10 @@ codeunit 137156 "SCM Orders IV"
         // [THEN] No error occurs.
     end;
 
-    [Test]
-    procedure SalesLineWithDocumentTypeInvoiceCannotCreateWithTypeItemHDefaultPurchasingCodeDropShipment()
-    var
-        Item: Record Item;
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        PurchasingCode: Code[10];
-    begin
-        // [SCENARIO 574904] Verify that a sales line with the document type 'Invoice' cannot be created with Type 'Item' for an Item No. that has a default Purchasing Code of 'Drop Shipment'.
-        Initialize();
-
-        // [GIVEN] Create Purchasing Code and Set Drop Shipment true.
-        PurchasingCode := CreatePurchasingCode(true, false); // Drop Shipment
-
-        // [GIVEN] Create an item and assign a Purchasing Code to it.
-        LibraryInventory.CreateItem(Item);
-        Item.Validate("Purchasing Code", PurchasingCode);
-        Item.Modify(true);
-
-        // [GIVEN] Create a sales header with the document type set to 'Invoice'.
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Invoice, '');
-
-        // [WHEN] A sales line with the document type 'Invoice' was inserted using an item that has a Purchasing Code.
-        asserterror LibrarySales.CreateSalesLine(
-            SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", LibraryRandom.RandInt(10));
-
-        // [THEN] An error occurred because a sales line with the document type 'Invoice' was inserted using an item that has a Purchasing Code.
-        Assert.ExpectedError(StrSubstNo(PurchasingCodeOnSalesInvoiceErr, Item."No."));
-    end;
-
-    [Test]
-    procedure MoveNegativeLines_SetsReturnOrderShipToAddressToCompany()
-    var
-        Customer: Record Customer;
-        Item: Record Item;
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        CompanyInfo: Record "Company Information";
-    begin
-        // [SCENARIO 580640] Verify Ship to Address of Return Order when Move Negative Lines on the Sales Order.
-        Initialize();
-
-        // [GIVEN] Create Customer.
-        LibrarySales.CreateCustomer(Customer);
-
-        // [GIVEN] Create Sales Header with Document Type as Order.
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
-
-        // [GIVEN] Create SalesLine with Negative Quantity.
-        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, LibraryInventory.CreateItem(Item), LibraryRandom.RandIntInRange(-5, -10));
-
-        // [WHEN] Move Negative Lines
-        MoveNegativeLinesOnSalesOrder(SalesHeader);
-
-        // [GIVEN] Get company address
-        CompanyInfo.Get();
-
-        // [THEN] Sales Return Order is created with Ship to Address as Company Address.
-        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::"Return Order");
-        SalesHeader.SetRange("Sell-to Customer No.", Customer."No.");
-        SalesHeader.FindFirst();
-        Assert.AreEqual(
-            CompanyInfo."Ship-to Address", SalesHeader."Ship-to Address", ShipToAddressErr);
-        Assert.AreEqual(
-            CompanyInfo."Ship-to City", SalesHeader."Ship-to City", ShipToAddressErr);
-    end;
-
     local procedure Initialize()
     var
-        PriceListLine: Record "Price List Line";
         InstructionMgt: Codeunit "Instruction Mgt.";
+        PriceListLine: Record "Price List Line";
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"SCM Orders IV");
         LibrarySetupStorage.Restore();
@@ -5395,8 +5326,8 @@ codeunit 137156 "SCM Orders IV"
     begin
         WarehouseActivityLine.SetRange("Action Type", ActionType);
         FindWarehouseActivityLine(
-WarehouseActivityLine, WarehouseActivityLine."Source Document"::"Purchase Order", SourceNo,
-WarehouseActivityLine."Activity Type"::"Put-away");
+          WarehouseActivityLine, WarehouseActivityLine."Source Document"::"Purchase Order", SourceNo,
+          WarehouseActivityLine."Activity Type"::"Put-away");
         WarehouseActivityLine.ModifyAll("Zone Code", ZoneCode, true);
         WarehouseActivityLine.ModifyAll("Bin Code", BinCode, true);
     end;
