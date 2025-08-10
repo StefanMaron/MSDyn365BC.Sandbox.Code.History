@@ -77,12 +77,6 @@ table 10750 "SII History"
         {
             Caption = 'Retry Accepted';
         }
-        field(41; "CSV Response"; Text[250])
-        {
-            Caption = 'CSV Response';
-            DataClassification = SystemMetadata;
-            Editable = false;
-        }
     }
 
     keys
@@ -241,8 +235,6 @@ table 10750 "SII History"
             then
                 SIIDocUploadState.Status := SIIDocUploadState.Status::"Accepted With Errors";
         end;
-
-        SIIDocUploadState."CSV Response" := Rec."CSV Response";
     end;
 
     [IntegrationEvent(false, false)]
