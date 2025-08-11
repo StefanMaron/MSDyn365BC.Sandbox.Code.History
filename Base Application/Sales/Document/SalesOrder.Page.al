@@ -162,7 +162,7 @@ page 42 "Sales Order"
                         field("Sell-to County"; Rec."Sell-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            CaptionClass = '5,1,' + Rec."Sell-to Country/Region Code";
+                            Caption = 'County';
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the state, province or county of the address.';
@@ -244,23 +244,6 @@ page 42 "Sales Order"
                     Caption = 'Contact';
                     Editable = Rec."Sell-to Customer No." <> '';
                     ToolTip = 'Specifies the name of the person to contact at the customer.';
-
-                    trigger OnLookup(var Text: Text): Boolean
-                    var
-                        Contact: Record Contact;
-                    begin
-                        Contact.FilterGroup(2);
-                        Rec.LookupContact(Rec."Sell-to Customer No.", Rec."Sell-to Contact No.", Contact);
-                        if Page.RunModal(0, Contact) = ACTION::LookupOK then
-                            Rec.Validate("Sell-to Contact No.", Contact."No.");
-
-                        if ShipToOptions = ShipToOptions::"Default (Sell-to Address)" then
-                            Rec.Validate("Ship-to Contact", Rec."Sell-to Contact");
-                        Contact.FilterGroup(0);
-
-                        Text := Rec."Sell-to Contact";
-                        CurrPage.Update();
-                    end;
                 }
                 field("No. of Archived Versions"; Rec."No. of Archived Versions")
                 {
@@ -416,11 +399,6 @@ page 42 "Sales Order"
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the period to use when reporting for general public customers';
-                }
-                field("CFDI Certificate of Origin No."; Rec."CFDI Certificate of Origin No.")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the identifier which was used to pay for the issuance of the certificate of origin.';
                 }
                 group("Work Description")
                 {
@@ -766,7 +744,7 @@ page 42 "Sales Order"
                                 field("Ship-to County"; Rec."Ship-to County")
                                 {
                                     ApplicationArea = Basic, Suite;
-                                    CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                                    Caption = 'County';
                                     Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                     QuickEntry = false;
                                     ToolTip = 'Specifies the state, province or county of the address.';
@@ -888,25 +866,6 @@ page 42 "Sales Order"
                                     CurrPage.Update();
                                 end;
                             end;
-
-                            trigger OnLookup(var Text: Text): Boolean
-                            var
-                                Customer: Record Customer;
-                            begin
-                                if Customer.SelectCustomer(Customer) then begin
-                                    xRec := Rec;
-                                    Rec."Bill-to Name" := Customer.Name;
-                                    Rec.Validate("Bill-to Customer No.", Customer."No.");
-                                end;
-
-                                if not ((BillToOptions = BillToOptions::"Custom Address") and not ShouldSearchForCustByName) then begin
-                                    if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
-                                        if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
-                                            Rec.SetRange("Bill-to Customer No.");
-
-                                    CurrPage.Update();
-                                end;
-                            end;
                         }
                         field("Bill-to Address"; Rec."Bill-to Address")
                         {
@@ -945,7 +904,7 @@ page 42 "Sales Order"
                             field("Bill-to County"; Rec."Bill-to County")
                             {
                                 ApplicationArea = Basic, Suite;
-                                CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
+                                Caption = 'County';
                                 Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                                 Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                                 Importance = Additional;
@@ -2928,7 +2887,7 @@ page 42 "Sales Order"
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
         BasicEUEnabled := ApplicationAreaMgmtFacade.IsBasicCountryEnabled('EU');
 
-        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
+        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Sales Order Stats.";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
