@@ -84,7 +84,7 @@ table 9056 "Manufacturing Cue"
         }
         field(11; "Invt. Put-aways from Prod."; Integer)
         {
-            CalcFormula = count("Warehouse Activity Header" where(Type = const("Invt. Put-away"),
+            CalcFormula = count("Warehouse Activity Header" where(Type = const(Pick),
                                                                    "Source Document" = const("Prod. Output")));
             Caption = 'Invt. Put-aways from Prod.';
             FieldClass = FlowField;
