@@ -329,7 +329,6 @@ codeunit 99000772 "Prod. Order Route Management"
         ProdOrderRtngLine2.ModifyAll("Sequence No. (Actual)", 0);
 
         MaxSeq := ProdOrderRtngLine2.Count();
-        ProdOrderRtngLine.Get(ProdOrderRtngLine.Status, ProdOrderRtngLine."Prod. Order No.", ProdOrderRtngLine."Routing Reference No.", ProdOrderRtngLine."Routing No.", ProdOrderRtngLine."Operation No.");
 
         case Direction of
             Direction::Forward:
