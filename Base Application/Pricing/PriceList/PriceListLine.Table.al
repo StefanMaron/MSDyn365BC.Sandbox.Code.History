@@ -662,7 +662,6 @@ table 7001 "Price List Line"
             exit;
 
         "Line No." := 10000;
-        PriceListLine.SetLoadFields("Line No.");
         PriceListLine.SetRange("Price List Code", "Price List Code");
         if PriceListLine.FindLast() then
             "Line No." += PriceListLine."Line No.";
@@ -680,14 +679,7 @@ table 7001 "Price List Line"
 
     procedure IsEditable() Result: Boolean;
     begin
-        case Status of
-            Status::Draft:
-                exit(true);
-            Status::Active:
-                exit(IsAllowedEditingActivePrice());
-            else
-                exit(false);
-        end;
+        Result := (Status = Status::Draft) or (Status = Status::Active) and IsAllowedEditingActivePrice();
     end;
 
     procedure IsHeaderActive() Result: Boolean;
@@ -1061,7 +1053,7 @@ table 7001 "Price List Line"
 
         VerifySource();
         TestField("Asset Type");
-        if ("Asset Type" = "Asset Type"::Item) and ("Amount Type" <> "Amount Type"::Discount) then
+        if "Asset Type" = "Asset Type"::Item then
             TestField("Asset No.");
 
         OnAfterVerify(Rec);
