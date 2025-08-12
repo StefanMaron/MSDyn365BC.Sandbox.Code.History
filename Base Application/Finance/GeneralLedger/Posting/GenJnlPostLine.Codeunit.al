@@ -42,6 +42,9 @@ using System.Telemetry;
 using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Finance.WithholdingTax;
 using Microsoft.Bank.Payment;
+#if not CLEAN27
+using System.Environment.Configuration;
+#endif
 
 codeunit 12 "Gen. Jnl.-Post Line"
 {
@@ -1603,7 +1606,11 @@ codeunit 12 "Gen. Jnl.-Post Line"
             Iterations := Iterations + 1;
             OnPostVendOnBeforeInitVendLedgEntry(GenJournalLine, VendLedgEntry, CVLedgEntryBuf, TempDtldCVLedgEntryBuf, VendPostingGr);
             InitVendLedgEntry(GenJournalLine, VendLedgEntry);
-            VendLedgEntry."Document Occurrence" := Iterations;
+            if (GenJournalLine."Applies-to Occurrence No." <> 0) and (GenJournalLine."Applies-to Doc. No." = '') then begin
+                VendLedgEntry."Document Occurrence" := GenJournalLine."Applies-to Occurrence No.";
+                GenJournalLine."Applies-to Occurrence No." := 0;
+            end else
+                VendLedgEntry."Document Occurrence" := Iterations;
             VendLedgEntry."Applies-to Occurrence No." := GenJournalLine."Applies-to Occurrence No.";
             VendLedgEntry."Due Date" := PaymentTermsLine."Due Date";
             VendLedgEntry."Pmt. Discount Date" := PaymentTermsLine."Pmt. Discount Date";
@@ -8046,14 +8053,35 @@ codeunit 12 "Gen. Jnl.-Post Line"
     [Scope('OnPrem')]
     procedure CheckIfVATPeriodClosed(PostingDate: Date)
     var
+#if not CLEAN27
         SettlementVATEntry: Record "Periodic Settlement VAT Entry";
+        VATSettlementEntry: Record "Periodic VAT Settlement Entry";
+        FeatureManagementIT: Codeunit "Feature Management IT";
+#else
+        VATSettlementEntry: Record "Periodic VAT Settlement Entry";
+#endif
         VATPeriod: Code[10];
     begin
         VATPeriod :=
           Format(Date2DMY(PostingDate, 3)) + '/' +
           ConvertStr(Format(Date2DMY(PostingDate, 2), 2), ' ', '0');
-        if SettlementVATEntry.Get(VATPeriod) then
-            SettlementVATEntry.TestField("VAT Period Closed", false);
+#if not CLEAN27
+        if FeatureManagementIT.IsVATSettlementPerActivityCodeFeatureEnabled() then begin
+            VATSettlementEntry.SetRange("VAT Period", VATPeriod);
+            if VATSettlementEntry.FindSet() then
+                repeat
+                    VATSettlementEntry.TestField("VAT Period Closed", false);
+                until VATSettlementEntry.Next() = 0;
+        end else
+            if SettlementVATEntry.Get(VATPeriod) then
+                SettlementVATEntry.TestField("VAT Period Closed", false);
+#else
+        VATSettlementEntry.SetRange("VAT Period", VATPeriod);
+        if VATSettlementEntry.FindSet() then
+            repeat
+                VATSettlementEntry.TestField("VAT Period Closed", false);
+            until VATSettlementEntry.Next() = 0;
+#endif
     end;
 
     [Scope('OnPrem')]
