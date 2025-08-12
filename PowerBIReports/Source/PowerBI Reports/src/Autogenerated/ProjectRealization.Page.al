@@ -6,7 +6,9 @@ page 37036 "Project Realization"
 {
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
+#pragma warning disable AS0035 // Changed from Card to UserControlHost
     PageType = UserControlHost;
+#pragma warning restore AS0035
     Caption = 'Project Realization';
     AboutTitle = 'About Project Realization';
     AboutText = 'The Project Realization report features key metrics like Billable Invoice Price and Actual Total Price to support Realization percent per project. Enabling organizations to measure actual performance and achievements against planned or budgeted expectations.';
@@ -24,14 +26,8 @@ page 37036 "Project Realization"
                     SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
                 end;
 
-                trigger ReportLoaded(ReportFilters: Text; ActivePageName: Text; ActivePageFilters: Text; CorrelationId: Text)
-                begin
-                    SetupHelper.LogReportLoaded(CorrelationId);
-                end;
-
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
                 begin
-                    SetupHelper.LogError(Operation, ErrorText);
                     SetupHelper.ShowPowerBIErrorNotification(Operation, ErrorText);
                 end;
             }
