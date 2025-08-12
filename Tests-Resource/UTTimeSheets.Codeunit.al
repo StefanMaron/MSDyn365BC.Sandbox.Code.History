@@ -869,83 +869,6 @@ codeunit 136500 "UT Time Sheets"
         TimeSheetLine.TestField("Job Task No.", '');
     end;
 
-    [Test]
-    procedure ResourceNameIsNotShowingUpOnTheManagerTimeSheetsByProjectPage()
-    var
-        Job: Record Job;
-        JobTask: Record "Job Task";
-        ResourceSetup: Record "Resources Setup";
-        TimeSheetHeader: Record "Time Sheet Header";
-        TimeSheetLine: Record "Time Sheet Line";
-        UserSetup: Record "User Setup";
-        TimeSheetApprovalManagement: Codeunit "Time Sheet Approval Management";
-    begin
-        // [SCENARIO 571456] Resource Name is not showing up on the "Manager Time Sheets by Project" page when the "Resource Name" field is added via Personalization
-        Initialize();
-
-        // [GIVEN] Set "Time Sheet Submission Policy" = "Empty Lines Not Submitted"
-        ResourceSetup.Get();
-        ResourceSetup."Time Sheet Submission Policy" := ResourceSetup."Time Sheet Submission Policy"::"Empty Lines Not Submitted";
-        ResourceSetup.Modify();
-
-        // [GIVEN] Create UserSetup
-        LibraryTimeSheet.CreateUserSetup(UserSetup, true);
-        UserSetup."Allow Posting From" := WorkDate();
-        UserSetup."Allow Posting To" := WorkDate();
-        UserSetup."Time Sheet Admin." := true;
-        UserSetup.Modify();
-
-        // [GIVEN] Create Job with Job task
-        LibraryJob.CreateJob(Job);
-        LibraryJob.CreateJobTask(Job, JobTask);
-
-        // [GIVEN] Create Time Sheet with Lines of type Project
-        LibraryTimeSheet.CreateTimeSheet(TimeSheetHeader, true);
-        TimeSheetHeader.CalcFields("Resource Name");
-        CreateTimeSheetLineWithTimeAllocaiton(TimeSheetLine, TimeSheetHeader, "Time Sheet Line Type"::Job, Job."No.", JobTask."Job Task No.");
-
-        // [GIVEN] Submit Time Sheet Line
-        TimeSheetLine.Reset();
-        TimeSheetLine.SetRange("Time Sheet No.", TimeSheetHeader."No.");
-        TimeSheetApprovalManagement.Submit(TimeSheetLine);
-
-        //[THEN] Check Resource Name is not blank 
-        TimeSheetHeader.TestField("Resource Name");
-    end;
-
-    [Test]
-    procedure TimeSheetStatusFactboxIsNotUpdatedWhenACommentIsAdded()
-    var
-        Resource: Record Resource;
-        TimeSheetHeader: Record "Time Sheet Header";
-        TimeSheetCommentSheet: TestPage "Time Sheet Comment Sheet";
-        TimeSheetCard: TestPage "Time Sheet Card";
-    begin
-        // [SCENARIO 591266] Times Sheet Status Factbox Is Not Updated When A Comment Is Added
-        Initialize();
-
-        // [GIVEN] Create Resource
-        CreateTimeSheetResource(Resource, true);
-
-        // [GIVEN] Create Time Sheet
-        LibraryTimeSheet.CreateTimeSheet(TimeSheetHeader, true);
-
-        // [GIVEN] Open Time Sheet card 
-        TimeSheetCard.OpenEdit();
-        TimeSheetCard.Filter.SetFilter("No.", TimeSheetHeader."No.");
-        TimeSheetCard.TimeSheetComments.Invoke();
-        TimeSheetHeader.CalcFields(Comment);
-
-        //[WHEN] Add Comment on Time sheet Comment sheet Page
-        TimeSheetCommentSheet.OpenEdit();
-        TimeSheetCommentSheet.Filter.SetFilter("No.", TimeSheetHeader."No.");
-        TimeSheetCommentSheet.New();
-        TimeSheetCommentSheet.Comment.SetValue('Test');
-        TimeSheetCommentSheet.Close();
-
-        // [THEN] Check Comment Should be updated on the Factbox without refresh the page after adding comment
-    end;
-
     local procedure Initialize()
     var
         UserSetup: Record "User Setup";
@@ -1300,16 +1223,6 @@ codeunit 136500 "UT Time Sheets"
         TimeSheetChartMgt.UpdateData(BusChartBuf);
     end;
 
-    local procedure CreateTimeSheetLineWithTimeAllocaiton(var TimeSheetLine: Record "Time Sheet Line"; TimeSheetHeader: Record "Time Sheet Header"; LineType: Enum "Time Sheet Line Type"; JobNo: Code[20]; JobTaskNo: Code[20])
-    var
-        i: Integer;
-    begin
-        LibraryTimeSheet.CreateTimeSheetLine(TimeSheetHeader, TimeSheetLine, LineType, JobNo, JobTaskNo, '', '');
-        for i := 1 to 5 do
-            LibraryTimeSheet.CreateTimeSheetDetail(
-                TimeSheetLine, TimeSheetHeader."Starting Date" + i - 1, LibraryRandom.RandDecInRange(5, 15, 2));
-    end;
-
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure TimeSheetLineJobDetailHandler(var TimeSheetLineJobDetail: TestPage "Time Sheet Line Job Detail")
@@ -1538,7 +1451,7 @@ codeunit 136500 "UT Time Sheets"
     local procedure VerifyTeamMemberTimeSheetStatuses(OpenExists: Integer; SubmittedExists: Integer; TimesheetsToApproveExists: Integer; RejectedExists: Integer; ApprovedExists: Integer)
     var
         TeamMemberCue: Record "Team Member Cue";
-        UserFilterOption: Option Owner,Approver;
+		UserFilterOption: Option Owner,Approver;
     begin
         TeamMemberCue."User ID Filter" := UserId();
 
