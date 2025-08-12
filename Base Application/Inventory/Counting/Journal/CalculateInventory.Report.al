@@ -36,7 +36,7 @@ report 790 "Calculate Inventory"
                     InsertTempSKU: Boolean;
                     IsHandled: Boolean;
                 begin
-                    if not this.GetLocation("Location Code") then
+                    if not GetLocation("Location Code") then
                         CurrReport.Skip();
 
                     if ("Location Code" <> '') and Location."Use As In-Transit" then
@@ -151,7 +151,7 @@ report 790 "Calculate Inventory"
                     TempQuantityOnHandBuffer."Location Code" := "Location Code";
                     TempQuantityOnHandBuffer."Variant Code" := "Variant Code";
 
-                    this.GetLocation("Location Code");
+                    GetLocation("Location Code");
                     if Location."Bin Mandatory" and not Location."Directed Put-away and Pick" then
                         TempQuantityOnHandBuffer."Bin Code" := "Bin Code";
 
@@ -523,7 +523,6 @@ report 790 "Calculate Inventory"
             TempQuantityOnHandBuffer."Variant Code" := VariantCode;
             TempQuantityOnHandBuffer."Bin Code" := '';
             TempQuantityOnHandBuffer."Dimension Entry No." := 0;
-            OnInsertQuantityOnHandBufferOnBeforeInsert(TempQuantityOnHandBuffer);
             TempQuantityOnHandBuffer.Insert(true);
         end;
     end;
@@ -1139,11 +1138,6 @@ report 790 "Calculate Inventory"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeItemBinLocationIsCalculated(ItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean; var IsCalculated: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnInsertQuantityOnHandBufferOnBeforeInsert(var InventoryBuffer: Record "Inventory Buffer")
     begin
     end;
 }
