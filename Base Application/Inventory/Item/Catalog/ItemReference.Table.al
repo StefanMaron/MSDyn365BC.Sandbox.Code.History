@@ -134,18 +134,13 @@ table 5777 "Item Reference"
     end;
 
     trigger OnInsert()
-    var
-        IsHandled: Boolean;
     begin
         if ("Reference Type No." <> '') and ("Reference Type" = "Reference Type"::" ") then
             Error(BlankReferenceTypeErr);
 
         Item.Get("Item No.");
-        IsHandled := false;
-        OnInsertTriggerOnBeforeValidateUoM(Rec, xRec, Item, IsHandled);
-        if not IsHandled then
-            if "Unit of Measure" = '' then
-                Validate("Unit of Measure", Item."Base Unit of Measure");
+        if "Unit of Measure" = '' then
+            Validate("Unit of Measure", Item."Base Unit of Measure");
 
         OnInsertTriggerOnBeforeCreateItemVendor(Rec, xRec, Item);
 
@@ -380,11 +375,6 @@ table 5777 "Item Reference"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateReferenceType(var ItemReference: Record "Item Reference"; xItemReference: Record "Item Reference"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertTriggerOnBeforeValidateUoM(var ItemReference: Record "Item Reference"; xItemReference: Record "Item Reference"; Item: Record "Item"; var IsHandled: Boolean)
     begin
     end;
 }
