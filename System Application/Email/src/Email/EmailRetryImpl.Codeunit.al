@@ -8,8 +8,6 @@ namespace System.Email;
 codeunit 8909 "Email Retry Impl."
 {
     Access = Internal;
-    InherentPermissions = X;
-    InherentEntitlements = X;
     TableNo = "Email Retry";
     Permissions = tabledata "Sent Email" = ri,
                   tabledata "Email Outbox" = rimd,
@@ -62,13 +60,12 @@ codeunit 8909 "Email Retry Impl."
         exit(true);
     end;
 
-    [InherentPermissions(PermissionObjectType::TableData, Database::"Email Retry", 'rd')]
     internal procedure CleanEmailRetry(MessageId: Guid)
     var
         EmailRetry: Record "Email Retry";
     begin
         EmailRetry.SetRange("Message Id", MessageId);
-        if EmailRetry.IsEmpty() then
+        if not EmailRetry.IsEmpty() then
             exit;
 
         EmailRetry.DeleteAll();
