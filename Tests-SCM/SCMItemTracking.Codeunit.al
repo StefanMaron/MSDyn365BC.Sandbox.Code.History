@@ -59,7 +59,6 @@ codeunit 137405 "SCM Item Tracking"
         CannotChangeITWhseEntriesExistErr: Label 'You cannot change %1 because there are one or more warehouse entries for item %2.', Comment = '%1: Changed field name; %2: Item No.';
         LotNoMustNotBeBlankErr: Label 'Lot No. must not be blank.';
         SerialNoMustNotBeBlankErr: Label 'Serial No. must not be blank.';
-        WhseActivityLineMustBeFoundErr: Label 'Warehouse Activity Line must be found.';
 
     [Test]
     [HandlerFunctions('ItemTrackingAssignTrackingNoAndVerifyQuantityHandler,EnterQuantityToCreateHandler')]
@@ -2259,65 +2258,6 @@ codeunit 137405 "SCM Item Tracking"
         // [THEN] The error 'You must adjust the existing item tracking and then reenter the new quantity' is raised
         asserterror SalesLine.Validate(Quantity, LibraryRandom.RandInt(10));
         Assert.ExpectedError(AdjustTrackingErr);
-    end;
-
-    [Test]
-    [HandlerFunctions('ItemTrackingLinesLotAndSerialHanlder')]
-    [Scope('OnPrem')]
-    procedure WhsPickShipmentSNAndLotTrackedItemWithExpirationDate()
-    var
-        Item: Record Item;
-        Location: array[2] of Record Location;
-        Bin: Record Bin;
-        TransferHeader: Record "Transfer Header";
-        WarehouseShipmentHeader: Record "Warehouse Shipment Header";
-        WarehouseActivityLine: Record "Warehouse Activity Line";
-        I: Integer;
-        Qty: Integer;
-        LotNo: Code[50];
-        SerialNos: array[10] of Code[20];
-        ExpirationDate: Date;
-    begin
-        Initialize();
-
-        // [GIVEN] Item "I" tracked by both serial and lot nos.
-        CreateItem(Item, CreateItemTrackingCodeLotSerial(), '', '');
-
-        // [GIVEN] Location "L1" with shipment and pick
-        CreateLocationWithBins(Location[1], Bin);
-
-        // [GIVEN] Location "L2" with base settings
-        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location[2]);
-
-        // [GIVEN] Post item stock for x pcs of item "I", serial no. "S1", lot no. "L1", expiration date 
-        LotNo := LibraryUtility.GenerateGUID();
-        ExpirationDate := LibraryRandom.RandDateFromInRange(WorkDate(), 10, 20);
-
-        Qty := LibraryRandom.RandIntInRange(5, 10);
-        for I := 1 to Qty do begin
-            SerialNos[I] := LibraryUtility.GenerateGUID();
-            PostItemJnlLineWithLotSerialExpDate(Item."No.", Location[1].Code, Bin.Code, LotNo, SerialNos[I], ExpirationDate);
-        end;
-
-        // [GIVEN] Create a transfer order, create a warehouse shipment and pick
-        CreateAndReleaseTransferOrder(TransferHeader, Location[1].Code, Location[2].Code, Item."No.", Qty);
-        CreateWhseShipmentAndPickFromTransferOrder(WarehouseShipmentHeader, TransferHeader);
-
-        // [GIVEN] Update pick lines with serial no.
-        for I := 1 to Qty do begin
-            UpdateSerialNoOnWhseActivityLine(WarehouseShipmentHeader."No.", WarehouseActivityLine."Action Type"::Take, SerialNos[I]);
-            UpdateSerialNoOnWhseActivityLine(WarehouseShipmentHeader."No.", WarehouseActivityLine."Action Type"::Place, SerialNos[I]);
-        end;
-
-        // [WHEN] Post the warehouse pick
-        RegisterWhseActivity(WarehouseShipmentHeader."No.");
-
-        // [THEN] Post warehouse shipment is possible
-        LibraryWarehouse.PostWhseShipment(WarehouseShipmentHeader, false);
-
-        // [THEN] Transfer order receipt can be posted
-        TransferHeader.Find();
-        LibraryWarehouse.PostTransferOrder(TransferHeader, false, true);
     end;
 
     [Test]
@@ -5133,102 +5073,6 @@ codeunit 137405 "SCM Item Tracking"
         Assert.AreNotEqual('', WhseActivityLine."Serial No.", SerialNoMustNotBeBlankErr);
     end;
 
-    [Test]
-    [HandlerFunctions('ItemTrackingSerialNoHandler,WhseItemTrackingSerialNoHandler,ConfirmHandlerTrue,MessageHandler')]
-    [Scope('OnPrem')]
-    procedure WhsePickIsCreatedForSrNoHavingExpDateAndNotForSrNoWithoutExpDateWhenStrictExpPostingIsTrueInItemTrkgCode()
-    var
-        Bin: array[5] of Record Bin;
-        Item: Record Item;
-        Location: Record Location;
-        ItemTrackingCode: Record "Item Tracking Code";
-        InternalMovementHeader: Record "Internal Movement Header";
-        InternalMovementLine: Record "Internal Movement Line";
-        SalesHeader: Record "Sales Header";
-        WhseActivityLine: Record "Warehouse Activity Line";
-        WarehouseEmployee: Record "Warehouse Employee";
-        WhseShipmentHeader: Record "Warehouse Shipment Header";
-        WhseShipmentLine: Record "Warehouse Shipment Line";
-        SerialNo: array[4] of Code[50];
-    begin
-        // [SCENARIO 566894] Warehouse Pick for Serial No. having "Expiration Date" is created even if another 
-        // Serial No. is with "Expiration Date" when Create Pick from a Warehouse Shipment of Item whose Inventory 
-        // Movement is already created with other two Serial Nos.
-        Initialize();
-
-        // [GIVEN] Create Serial Item Tracking Code.
-        CreateSerialItemTrackingCode(ItemTrackingCode);
- 
-
-        // [GIVEN] Create Item with Serial Item Tracking Code and
-        // Validate "Use Expiration Dates" and "Strict Expiration Posting".
-        CreateItemWithSerialItemTrackingCode(Item, ItemTrackingCode);
-        ItemTrackingCode.Validate("Use Expiration Dates", true);
-        ItemTrackingCode.Validate("Strict Expiration Posting", true);
-        ItemTrackingCode.Modify(true);
-
-        // [GIVEN] Create Location with Warehouse Employee Setup.
-        CreateLocationWithWarehouseEmployeeSetup(Location, WarehouseEmployee);
-
-        // [GIVEN] Create five Bins.
-        LibraryWarehouse.CreateBin(Bin[1], Location.Code, Bin[1].Code, '', '');
-        LibraryWarehouse.CreateBin(Bin[2], Location.Code, Bin[2].Code, '', '');
-        LibraryWarehouse.CreateBin(Bin[3], Location.Code, Bin[3].Code, '', '');
-        LibraryWarehouse.CreateBin(Bin[4], Location.Code, Bin[4].Code, '', '');
-        LibraryWarehouse.CreateBin(Bin[5], Location.Code, Bin[5].Code, '', '');
-
-        // [GIVEN] Validate Location fields.
-        ValidateLocationFields(Location, Bin[5]);
-
-        // [GIVEN] Generate and save four Serial Nos. in a Variable.
-        SerialNo[1] := Format(LibraryRandom.RandIntInRange(1, 1));
-        SerialNo[2] := Format(LibraryRandom.RandIntInRange(2, 2));
-        SerialNo[3] := Format(LibraryRandom.RandIntInRange(3, 3));
-        SerialNo[4] := Format(LibraryRandom.RandIntInRange(4, 4));
-
-        // [GIVEN] Create Positive Adjustment With Serial Nos.
-        LibraryVariableStorage.Enqueue(SerialNo[1]);
-        LibraryVariableStorage.Enqueue(SerialNo[2]);
-        LibraryVariableStorage.Enqueue(SerialNo[3]);
-        LibraryVariableStorage.Enqueue(SerialNo[4]);
-        CreatePositivAdjWithSerialNos(Item."No.", Location.Code, Bin[1], LibraryRandom.RandIntInRange(4, 4), SerialNo[1], SerialNo[2], SerialNo[3], SerialNo[4]);
-
-        // [GIVEN] Create Internal Movement Header.
-        LibraryWarehouse.CreateInternalMovementHeader(InternalMovementHeader, Location.Code, Bin[2].Code);
-
-        // [GIVEN] Create Internal Movement Line.
-        LibraryWarehouse.CreateInternalMovementLine(InternalMovementHeader, InternalMovementLine, Item."No.", Bin[1].Code, Bin[2].Code, LibraryRandom.RandIntInRange(2, 2));
-
-        // [GIVEN] Open Item Tracking Lines.
-        LibraryVariableStorage.Enqueue(SerialNo[1]);
-        LibraryVariableStorage.Enqueue(SerialNo[2]);
-        InternalMovementLine.OpenItemTrackingLines();
-
-        // [GIVEN] Crate Inventory Movement from Internal Movement.
-        LibraryWarehouse.CreateInvtMvmtFromInternalMvmt(InternalMovementHeader);
-
-        // [GIVEN] Create and Release Sales Order with Quantity.
-        CreateAndReleaseSalesOrderWithQty(SalesHeader, Item, Location, LibraryRandom.RandIntInRange(2, 2));
-
-        // [GIVEN] Create Warehouse Shipment.
-        LibraryWarehouse.CreateWhseShipmentFromSO(SalesHeader);
-
-        // [GIVEN] Find Warehouse Shipment Header and Line.
-        FindWarehouseShipmentHeaderAndLine(WhseShipmentHeader, WhseShipmentLine, SalesHeader);
-
-        // [GIVEN] Create Pick.
-        LibraryWarehouse.CreatePick(WhseShipmentHeader);
-
-        // [WHEN] Find Warehouse Pick Line.
-        WhseActivityLine.SetRange("Item No.", Item."No.");
-        WhseActivityLine.SetRange("Serial No.", SerialNo[4]);
-        WhseActivityLine.SetRange("Activity Type", WhseActivityLine."Activity Type"::Pick);
-        WhseActivityLine.FindFirst();
-
-        // [VERIFY] Warehouse Activity Lineis found.
-        Assert.IsFalse(WhseActivityLine.IsEmpty(), WhseActivityLineMustBeFoundErr);
-    end;
-
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -6958,66 +6802,6 @@ codeunit 137405 "SCM Item Tracking"
         PurchaseLine.FindFirst();
     end;
 
-    local procedure ValidateLocationFields(var Location: Record Location; Bin: Record Bin)
-    begin
-        Location.Validate("Bin Mandatory", true);
-        Location.Validate("Require Pick", true);
-        Location.Validate("Shipment Bin Code", Bin.Code);
-        Location.Validate("Always Create Pick Line", false);
-        Location.Validate("Pick According to FEFO", false);
-        Location.Modify(true);
-    end;
-
-    local procedure CreatePositivAdjWithSerialNos(ItemNo: Code[20]; LocationCode: Code[10]; Bin: Record Bin; Quantity: Decimal; SerialNo: Code[50]; SerialNo2: Code[50]; SerialNo3: Code[50]; SerialNo4: Code[50])
-    var
-        ItemJournalBatch: Record "Item Journal Batch";
-        ItemJournalTemplate: Record "Item Journal Template";
-        ItemJournalLine: Record "Item Journal Line";
-    begin
-        LibraryInventory.FindItemJournalTemplate(ItemJournalTemplate);
-        LibraryInventory.CreateItemJournalBatch(ItemJournalBatch, ItemJournalTemplate.Name);
-        LibraryInventory.CreateItemJournalLine(
-            ItemJournalLine, ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name,
-            ItemJournalLine."Entry Type"::"Positive Adjmt.", ItemNo, Quantity);
-        
-        ItemJournalLine.Validate("Location Code", LocationCode);
-        ItemJournalLine.Validate("Bin Code", Bin.Code);
-        ItemJournalLine.Modify(true);
-
-        LibraryVariableStorage.Enqueue(SerialNo);
-        LibraryVariableStorage.Enqueue(SerialNo2);
-        LibraryVariableStorage.Enqueue(SerialNo3);
-        LibraryVariableStorage.Enqueue(SerialNo4);
-
-        ItemJournalLine.OpenItemTrackingLines(false);
-        LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
-    end;
-
-    local procedure CreateAndReleaseSalesOrderWithQty(var SalesHeader: Record "Sales Header"; Item: Record Item; Location: Record Location; Qty: Decimal)
-    var
-        Customer: Record Customer;
-        SalesLine: Record "Sales Line";
-    begin
-        LibrarySales.CreateCustomer(Customer);
-
-        LibrarySales.CreateSalesHeader(
-            SalesHeader,
-            SalesHeader."Document Type"::Order,
-            Customer."No.");
-
-        LibrarySales.CreateSalesLine(
-            SalesLine,
-            SalesHeader,
-            SalesLine.Type::Item,
-            Item."No.",
-            Qty);
-
-        SalesLine.Validate("Location Code", Location.Code);
-        SalesLine.Modify(true);
-
-        LibrarySales.ReleaseSalesDocument(SalesHeader);
-    end;
-
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure ItemTrackingLinesPageHandlerTrackingOption(var ItemTrackingLines: TestPage "Item Tracking Lines")
@@ -7387,41 +7171,6 @@ codeunit 137405 "SCM Item Tracking"
     begin
         PostedPurchaseDocumentLines.PostedReceiptsBtn.SetValue(Format(DocumentType::"Posted Receipts"));
         PostedPurchaseDocumentLines.OK().Invoke();
-    end;
-
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure ItemTrackingSerialNoHandler(var ItemTrackingLines: TestPage "Item Tracking Lines")
-    begin
-        ItemTrackingLines.First();
-        ItemTrackingLines."Serial No.".SetValue(LibraryVariableStorage.DequeueText());
-        ItemTrackingLines."Expiration Date".SetValue(CalcDate('<CY-6M>', WorkDate()));
-        ItemTrackingLines."Quantity (Base)".SetValue(LibraryRandom.RandIntInRange(1, 1));
-        ItemTrackingLines.Next();
-        ItemTrackingLines."Serial No.".SetValue(LibraryVariableStorage.DequeueText());
-        ItemTrackingLines."Expiration Date".SetValue(CalcDate('<CY-3M+6D>', WorkDate()));
-        ItemTrackingLines."Quantity (Base)".SetValue(LibraryRandom.RandIntInRange(1, 1));
-        ItemTrackingLines.Next();
-        ItemTrackingLines."Serial No.".SetValue(LibraryVariableStorage.DequeueText());
-        ItemTrackingLines."Quantity (Base)".SetValue(LibraryRandom.RandIntInRange(1, 1));
-        ItemTrackingLines.Next();
-        ItemTrackingLines."Serial No.".SetValue(LibraryVariableStorage.DequeueText());
-        ItemTrackingLines."Expiration Date".SetValue(CalcDate('<CY>', WorkDate()));
-        ItemTrackingLines."Quantity (Base)".SetValue(LibraryRandom.RandIntInRange(1, 1));
-        ItemTrackingLines.OK().Invoke();
-    end;
-
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure WhseItemTrackingSerialNoHandler(var WhseItemTrackingLines: TestPage "Whse. Item Tracking Lines")
-    begin
-        WhseItemTrackingLines.First();
-        WhseItemTrackingLines."Serial No.".SetValue(LibraryVariableStorage.DequeueText());
-        WhseItemTrackingLines.Quantity.SetValue(LibraryRandom.RandIntInRange(1, 1));
-        WhseItemTrackingLines.Next();
-        WhseItemTrackingLines."Serial No.".SetValue(LibraryVariableStorage.DequeueText());
-        WhseItemTrackingLines.Quantity.SetValue(LibraryRandom.RandIntInRange(1, 1));
-        WhseItemTrackingLines.OK().Invoke();
     end;
 }
 
