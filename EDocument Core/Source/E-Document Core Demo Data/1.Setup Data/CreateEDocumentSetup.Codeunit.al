@@ -5,7 +5,6 @@ codeunit 5374 "Create E-Document Setup"
 
     trigger OnRun()
     begin
-        CreateEDocumentsSetupWithNewExperience();
         CreateEDocService();
         CreateWorkflow();
         CreateDocSendingProfile();
@@ -43,17 +42,6 @@ codeunit 5374 "Create E-Document Setup"
         Workflow.Category := CategoryCode;
         Workflow.Enabled := false;
         if Workflow.Insert() then;
-    end;
-
-    local procedure CreateEDocumentsSetupWithNewExperience()
-    var
-        EDocumentsSetup: Record "E-Documents Setup";
-        EnvironmentInformation: Codeunit "Environment Information";
-    begin
-        if EDocumentsSetup.IsNewEDocumentExperienceActive() then
-            exit;
-        if EnvironmentInformation.IsOnPrem() then
-            EDocumentsSetup.InsertNewExperienceSetup();
     end;
 
     local procedure CreateEDocService()
