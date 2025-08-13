@@ -12,6 +12,7 @@ codeunit 137045 "SCM Bugfixes"
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
+        LibraryERM: Codeunit "Library - ERM";
         LibraryRandom: Codeunit "Library - Random";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryItemTracking: Codeunit "Library - Item Tracking";
@@ -27,6 +28,7 @@ codeunit 137045 "SCM Bugfixes"
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryManufacturing: Codeunit "Library - Manufacturing";
         LibraryAssembly: Codeunit "Library - Assembly";
+        ItemTrackingHandlerAction: Option AssignRandomSN,AssignSpecificLot;
         isInitialized: Boolean;
         LocationCodesArr: array[3] of Code[10];
         ConfirmMessageQst: Label 'Do you want to change ';
@@ -38,6 +40,7 @@ codeunit 137045 "SCM Bugfixes"
         UseInTransitLocationErr: Label 'You can use In-Transit location %1 for transfer orders only.', Comment = '%1: Location code';
         PurchaseOrderErr: Label 'Unexpected new purchase order created';
         AssemblyCommentLineErr: Label 'Comment/Description not Transfered to Assembly Order while Running Carry Out Action Message';
+        TrackingMsg: Label 'The change will not affect existing entries';
 
     [Test]
     [Scope('OnPrem')]
@@ -1038,6 +1041,140 @@ codeunit 137045 "SCM Bugfixes"
         Assert.AreEqual(4, ActualCount, AssemblyCommentLineErr);
     end;
 
+    [Test]
+    [HandlerFunctions('ItemTrackingLinesModalPageHandler')]
+    procedure NoDuplicateSurplusReservationEntriesOnRecalculateRequisitionWorksheet()
+    var
+        Item: Record Item;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        Vendor: Record Vendor;
+        RequisitionLine: Record "Requisition Line";
+        RequisitionWkshName: Record "Requisition Wksh. Name";
+        PurchaseHeader: Record "Purchase Header";
+        NewPurchOrderChoice: Option " ","Make Purch. Orders","Make Purch. Orders & Print","Copy to Req. Wksh";
+        Qty: Decimal;
+    begin
+        // [SCENARIO 575040] When recalculating an item in a requisition or planning worksheet with no planning results lead to wrong surplus entries in the reservation table whic are added to the item tracking page.
+        Initialize();
+
+        // [GIVEN] Created Lot Tracked Item with Reordering Policy:Lot-for-Lot.
+        CreateTrackedItem(Item);
+
+        // [GIVEN] Created Sales Order with 1 Item and 100 quantity.
+        Qty := 100;
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, '');
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", Qty);
+        LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        // [GIVEN] Calculate requisition plan
+        CalculateRequisitionPlan(RequisitionWkshName, Item);
+
+        // [GIVEN] Find Requisition Line
+        FindRequisitionLine(RequisitionLine, RequisitionWkshName, RequisitionLine."Action Message"::New);
+
+        // [GIVEN] Update Vendor No., Planning Flexibility with None and change the quantity to 150
+        RequisitionLine.Validate("Vendor No.", LibraryPurchase.CreateVendor(Vendor));
+        RequisitionLine.Validate("Planning Flexibility", RequisitionLine."Planning Flexibility"::None);
+        RequisitionLine.Validate(Quantity, 150);
+        RequisitionLine.Modify(true);
+
+        // [GIVEN] Assign the Lot On Item tracking Line
+        RequisitionLine.OpenItemTrackingLines();
+
+        // [GIVEN] Set "Accept Action Message" on all Requisition lines.
+        LibraryPlanning.CarryOutPlanWksh(RequisitionLine, 0, NewPurchOrderChoice::"Make Purch. Orders", 0, 0, '', '', '', '');
+
+        // [GIVEN] Check at reservation entries for Purchase Order created, only 2 reservation entries should exist for the PO
+        PurchaseHeader.SetRange("Buy-from Vendor No.", Vendor."No.");
+        PurchaseHeader.FindLast();
+        AssertReservationEntryCount(PurchaseHeader, 2);
+
+        // [WHEN] Calculate Plan again for same item from requisition worksheet
+        CalculateRequisitionPlan(RequisitionWkshName, Item);
+
+        // [THEN] After recalculation, a new reservation entry should NOT be created for the PO
+        AssertReservationEntryCount(PurchaseHeader, 2);
+    end;
+
+    [Test]
+    procedure ChangeVATandVerifyVATAmountOnPurchInvoiceSubform()
+    var
+        PurchHeader: Record "Purchase Header";
+        PurchLine, PurchLine1 : Record "Purchase Line";
+        VATPostingSetup, VATPostingSetup1 : Record "VAT Posting Setup";
+        VATProductPostingGroup: Record "VAT Product Posting Group";
+        PurchaseInvoice: TestPage "Purchase Invoice";
+        VendorNo: Code[20];
+        ItemNo: Code[20];
+        TotalVATAmount: Decimal;
+    begin
+        // [SCENARIO 571395] When using the functionality 'Get Recurring Purchase Lines' on the Purchase Invoice VAT rounding is not correct
+        Initialize();
+
+        // [GIVEN] Create two VAT Posting Setup with 21 % and 0%        
+        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, Enum::"Tax Calculation Type"::"Normal VAT", 21);
+        LibraryERM.CreateVATProductPostingGroup(VATProductPostingGroup);
+        LibraryERM.CreateVATPostingSetup(VATPostingSetup1, VATPostingSetup."VAT Bus. Posting Group", VATProductPostingGroup.Code);
+
+        // [GIVEN] Create a domestic vendor and Item with 21% VAT Prod. Posting Group
+        VendorNo := LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group");
+        ItemNo := LibraryInventory.CreateItemWithVATProdPostingGroup(VATPostingSetup."VAT Prod. Posting Group");
+
+        // [GIVEN] Create Purchase Invoice Document with the same Item as Direct Unit Cost 10.93 and 12.5
+        LibraryPurchase.CreatePurchHeader(PurchHeader, Enum::"Purchase Document Type"::Invoice, VendorNo);
+        LibraryPurchase.CreatePurchaseLineWithUnitCost(PurchLine, PurchHeader, ItemNo, 1, 10.93);
+        LibraryPurchase.CreatePurchaseLineWithUnitCost(PurchLine1, PurchHeader, ItemNo, 1, 12.5);
+
+        // [WHEN] Change the First Purchase Invoice Line VAT Prod. Posting Group to NO VAT
+        PurchLine.Validate("VAT Prod. Posting Group", VATPostingSetup1."VAT Prod. Posting Group");
+        PurchLine.Modify(true);
+        PurchaseInvoice.OpenEdit();
+        PurchaseInvoice.Filter.SetFilter("No.", PurchHeader."No.");
+        PurchaseInvoice.PurchLines.First();
+        PurchLine.RecalculateAmounts(PurchLine."Document Type", PurchLine."Document No.", PurchLine."Line No.");
+
+        // [THEN] Total VAT Amount in the Purchase Invoice Subform should be 2.63 instead of 2.62
+        PurchaseInvoice.PurchLines.Next();
+        Evaluate(TotalVATAmount, PurchaseInvoice.PurchLines."Total VAT Amount".Value());
+        Assert.AreEqual(2.63, TotalVATAmount, 'Mismatch in Total VAT Amount Value');
+    end;
+
+    [Test]
+    [HandlerFunctions('MessageHandlerOrderTracking,ItemTrackingLinesPageHandler')]
+    procedure CheckDefaultUntrackedSurplusReservationEntriesUpdatedWhenSerialNoAllocated()
+    var
+        Item: Record Item;
+        Location: Record Location;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        Qty: Decimal;
+    begin
+        // [SCENARIO 575956] Check Default Untracked Surplus Reservation Entries Updated When Serial No Allocated from Item Tracking Lines and 
+        // not Created duplicate lines.
+        Initialize();
+
+        // [GIVEN] Created Lot Tracked Item.
+        CreateTrackedItemWithOrderTrackingPolicy(Item);
+
+        // [GIVEN] Created Sales Order with 1 Item and 3 quantity.
+        Qty := 3;
+        LibraryWarehouse.CreateLocation(Location);
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, '');
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", Qty);
+        SalesLine.Validate("Location Code", Location.Code);
+        SalesLine.Modify(true);
+
+        // [GIVEN] From Item tracking lines (Sales Order), add a SN to the item.
+        // [WHEN] Assign random serial numbers.
+        LibraryVariableStorage.Enqueue(ItemTrackingHandlerAction::AssignRandomSN);
+        LibraryVariableStorage.Enqueue(SalesLine.Quantity);
+        SalesLine.OpenItemTrackingLines(); // ItemTrackingLinesPageHandler required.
+
+        // [THEN] After recalculation, a new reservation entry should NOT be created for the SO.
+        AssertReservationEntryCountForSales(SalesHeader, 3);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -1749,6 +1886,36 @@ codeunit 137045 "SCM Bugfixes"
         CalculatePlanPlanWksh.RunModal();
     end;
 
+    local procedure AssertReservationEntryCount(PurchaseHeader: Record "Purchase Header"; ExpectedCount: Integer)
+    var
+        ReservationEntry: Record "Reservation Entry";
+    begin
+        ReservationEntry.SetRange("Source Type", Database::"Purchase Line");
+        ReservationEntry.SetRange("Source ID", PurchaseHeader."No.");
+        Assert.RecordCount(ReservationEntry, ExpectedCount);
+    end;
+
+    local procedure CreateTrackedItemWithOrderTrackingPolicy(var Item: Record Item)
+    var
+        ItemTrackingCode: Record "Item Tracking Code";
+    begin
+        CreateItemTrackingCodeWithLotSpecTracking(ItemTrackingCode);
+        LibraryInventory.CreateTrackedItem(Item, LibraryUtility.GetGlobalNoSeriesCode(), '', ItemTrackingCode.Code);
+        LibraryVariableStorage.Enqueue(TrackingMsg);  // Enqueue value for message handler.
+        Item.Validate("Replenishment System", Item."Replenishment System"::Purchase);
+        Item.Validate("Order Tracking Policy", Item."Order Tracking Policy"::"Tracking & Action Msg.");
+        Item.Modify(true);
+    end;
+
+    local procedure AssertReservationEntryCountForSales(SalesHeader: Record "Sales Header"; ExpectedCount: Integer)
+    var
+        ReservationEntry: Record "Reservation Entry";
+    begin
+        ReservationEntry.SetRange("Source Type", Database::"Sales Line");
+        ReservationEntry.SetRange("Source ID", SalesHeader."No.");
+        Assert.RecordCount(ReservationEntry, ExpectedCount);
+    end;
+
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure ContactListModalPageHandler(var ContactLookup: Page "Contact List"; var Response: Action)
@@ -1809,10 +1976,52 @@ codeunit 137045 "SCM Bugfixes"
         OrderPromisingLines.CapableToPromise.Invoke()
     end;
 
+    [ModalPageHandler]
+    procedure ItemTrackingLinesPageHandler(var ItemTrackingLines: TestPage "Item Tracking Lines")
+    var
+        ActionOption: Integer;
+        LotNo: Text;
+        HowMany: Integer;
+        Counter: Integer;
+    begin
+        ActionOption := LibraryVariableStorage.DequeueInteger();
+        case ActionOption of
+            ItemTrackingHandlerAction::AssignRandomSN:
+                begin
+                    HowMany := LibraryVariableStorage.DequeueInteger();
+                    if HowMany > 0 then begin
+                        ItemTrackingLines.First();
+                        for Counter := 1 to HowMany do begin
+                            ItemTrackingLines."Serial No.".SetValue(LibraryRandom.RandText(5));
+                            ItemTrackingLines."Quantity (Base)".SetValue(1);
+                            ItemTrackingLines.Next();
+                        end;
+                    end;
+                end;
+            ItemTrackingHandlerAction::AssignSpecificLot:
+                begin
+                    LotNo := LibraryVariableStorage.DequeueText();
+                    ItemTrackingLines.First();
+                    ItemTrackingLines."Lot No.".SetValue(LotNo);
+                    ItemTrackingLines."Quantity (Base)".SetValue(LibraryVariableStorage.DequeueDecimal());
+                end;
+        end;
+        ItemTrackingLines.OK().Invoke();
+    end;
+
     [MessageHandler]
     [Scope('OnPrem')]
     procedure MessageHandler(Message: Text[1024])
     begin
+    end;
+
+    [MessageHandler]
+    procedure MessageHandlerOrderTracking(Message: Text[1024])
+    var
+        QueuedMessage: Variant;
+    begin
+        LibraryVariableStorage.Dequeue(QueuedMessage);  // Dequeue variable.
+        Assert.IsTrue(StrPos(Message, QueuedMessage) > 0, Message);
     end;
 }
 
