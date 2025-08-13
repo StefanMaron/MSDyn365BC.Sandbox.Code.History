@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -190,8 +190,6 @@ codeunit 6500 "Item Tracking Management"
                         ItemTrackingSetup."Serial No. Required" := ItemTrackingCode."SN Neg. Adjmt. Outb. Tracking";
                 EntryType::Transfer:
                     ItemTrackingSetup."Serial No. Required" := ItemTrackingCode."SN Transfer Tracking";
-                else
-                    OnGetItemTrackingSetupOnSetSerialNoRequired(ItemTrackingSetup, ItemTrackingCode, EntryType, Inbound);
             end;
 
         if ItemTrackingCode."Lot Specific Tracking" then
@@ -220,8 +218,6 @@ codeunit 6500 "Item Tracking Management"
                         ItemTrackingSetup."Lot No. Required" := ItemTrackingCode."Lot Neg. Adjmt. Outb. Tracking";
                 EntryType::Transfer:
                     ItemTrackingSetup."Lot No. Required" := ItemTrackingCode."Lot Transfer Tracking";
-                else
-                    OnGetItemTrackingSetupOnSetLotNoRequired(ItemTrackingSetup, ItemTrackingCode, EntryType, Inbound);
             end;
 
         if ItemTrackingCode."Package Specific Tracking" then
@@ -250,8 +246,6 @@ codeunit 6500 "Item Tracking Management"
                         ItemTrackingSetup."Package No. Required" := ItemTrackingCode."Package Neg. Outb. Tracking";
                 EntryType::Transfer:
                     ItemTrackingSetup."Package No. Required" := ItemTrackingCode."Package Transfer Tracking";
-                else
-                    OnGetItemTrackingSetupOnSetPackageNoRequired(ItemTrackingSetup, ItemTrackingCode, EntryType, Inbound);
             end;
 
         if EntryType = EntryType::Transfer then
@@ -406,7 +400,7 @@ codeunit 6500 "Item Tracking Management"
         if ReservEntry.FindSet() then begin
             GetItemTrackingCode(ReservEntry."Item No.", ItemTrackingCode);
             repeat
-                if ReservEntry.TrackingExists() or (ReservEntry.IsReclass() and ReservEntry.NewTrackingExists()) then begin
+                if ReservEntry.TrackingExists() then begin
                     if SumPerLine then
                         TempHandlingSpecification.SetRange("Source Ref. No.", ReservEntry."Source Ref. No."); // Sum up line per line
                     if SumPerTracking then begin
@@ -2147,10 +2141,7 @@ codeunit 6500 "Item Tracking Management"
                             else
                                 if RegisteredWhseActLine."Whse. Document Type" = RegisteredWhseActLine."Whse. Document Type"::Shipment then begin
                                     ZeroQtyToHandle := true;
-                                    Qty :=
-                                        -(TempTrackingSpecification."Qty. to Handle (Base)" +
-                                            CalcQtyBaseRegistered(RegisteredWhseActLine) -
-                                            CalcQtyBaseShipped(RegisteredWhseActLine));
+                                    Qty := -(TempTrackingSpecification."Qty. to Handle (Base)" + CalcQtyBaseRegistered(RegisteredWhseActLine));
                                 end;
                         end;
 
@@ -2333,7 +2324,7 @@ codeunit 6500 "Item Tracking Management"
 
         if ItemLedgEntry.GetFilters() <> '' then
             ItemLedgEntry.Reset();
-        ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Lot No.", "Serial No.", "Package No.");
+        ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Lot No.", "Package No.", "Serial No.");
         ItemLedgEntry.SetRange("Item No.", ItemNo);
         ItemLedgEntry.SetRange("Variant Code", VariantCode);
         ItemLedgEntry.SetRange(Positive, true);
@@ -2634,7 +2625,7 @@ codeunit 6500 "Item Tracking Management"
         RegisteredWhseActivityLineForCalcBaseQty: Record "Registered Whse. Activity Line";
     begin
         RegisteredWhseActivityLineForCalcBaseQty.CopyFilters(RegisteredWhseActivityLine);
-        RegisteredWhseActivityLineForCalcBaseQty.SetFilter("Action Type", '%1|%2', RegisteredWhseActivityLineForCalcBaseQty."Action Type"::" ", RegisteredWhseActivityLineForCalcBaseQty."Action Type"::Place);
+        RegisteredWhseActivityLineForCalcBaseQty.SetRange("Action Type", RegisteredWhseActivityLineForCalcBaseQty."Action Type"::Place);
         RegisteredWhseActivityLineForCalcBaseQty.CalcSums("Qty. (Base)");
         exit(RegisteredWhseActivityLineForCalcBaseQty."Qty. (Base)");
     end;
@@ -3016,7 +3007,6 @@ codeunit 6500 "Item Tracking Management"
         QtyToHandleInItemTracking: Decimal;
         QtyToHandleOnSourceDocLine: Decimal;
         QtyToHandleToNewRegister: Decimal;
-        AllowWhseOverpick: Boolean;
         IsHandled: Boolean;
     begin
         OnBeforeRegisterNewItemTrackingLines(TempTrackingSpec);
@@ -3046,20 +3036,18 @@ codeunit 6500 "Item Tracking Management"
                 QtyToHandleOnSourceDocLine := ReservMgt.GetSourceRecordValue(ReservEntry, false, 0);
 
                 IsHandled := false;
-                AllowWhseOverpick := false;
 #if not CLEAN24
                 // Please use next event OnRegisterNewItemTrackingLinesOnBeforeCannotMatchItemTrackingError instead
                 OnRegisterNewItemTrackingLinesOnBeforeCannotMatchItemTrackingErr(
                     TempTrackingSpec, QtyToHandleToNewRegister, QtyToHandleInItemTracking, QtyToHandleOnSourceDocLine, IsHandled);
 #endif
                 OnRegisterNewItemTrackingLinesOnBeforeCannotMatchItemTrackingError(
-                    TempTrackingSpec, QtyToHandleToNewRegister, QtyToHandleInItemTracking, QtyToHandleOnSourceDocLine, IsHandled, AllowWhseOverpick);
+                    TempTrackingSpec, QtyToHandleToNewRegister, QtyToHandleInItemTracking, QtyToHandleOnSourceDocLine, IsHandled);
                 if not IsHandled then
-                    if not AllowWhseOverpick then
-                        if QtyToHandleToNewRegister + QtyToHandleInItemTracking > Abs(QtyToHandleOnSourceDocLine) then
-                            Error(CannotMatchItemTrackingErr,
-                                TempTrackingSpec."Source ID", TempTrackingSpec."Source Ref. No.",
-                                TempTrackingSpec."Item No.", TempTrackingSpec.Description);
+                    if QtyToHandleToNewRegister + QtyToHandleInItemTracking > Abs(QtyToHandleOnSourceDocLine) then
+                        Error(CannotMatchItemTrackingErr,
+                            TempTrackingSpec."Source ID", TempTrackingSpec."Source Ref. No.",
+                            TempTrackingSpec."Item No.", TempTrackingSpec.Description);
 
                 TrackingSpec."Quantity (Base)" :=
                   TempTrackingSpec."Qty. to Handle (Base)" + Abs(ItemTrkgQtyPostedOnSource(TrackingSpec));
@@ -3151,7 +3139,6 @@ codeunit 6500 "Item Tracking Management"
             FromReservEntry."Source Batch Name", FromReservEntry."Source Prod. Order Line", FromReservEntry."Source Ref. No.");
         ToReservEntry.SetPointer(ToRowID);
         ToReservEntry.SetPointerFilter();
-        ToReservEntry.SetTrackingFilterFromReservEntry(FromReservEntry);
         SynchronizeItemTrkgTransfer(ToReservEntry);
     end;
 
@@ -3812,20 +3799,6 @@ codeunit 6500 "Item Tracking Management"
         exit(5407);
     end;
 
-    local procedure CalcQtyBaseShipped(RegisteredWhseActivityLine: Record "Registered Whse. Activity Line"): Decimal
-    var
-        WarehouseShipmentline: Record "Warehouse Shipment Line";
-    begin
-        if (RegisteredWhseActivityLine."Whse. Document No." = '') or (RegisteredWhseActivityLine."Whse. Document Line No." = 0) then
-            exit(0);
-
-        WarehouseShipmentLine.SetLoadFields("Qty. Shipped (Base)");
-        if WarehouseShipmentLine.Get(RegisteredWhseActivityLine."Whse. Document No.", RegisteredWhseActivityLine."Whse. Document Line No.") then
-            exit(WarehouseShipmentLine."Qty. Shipped (Base)");
-
-        exit(0);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyHandledItemTrkgToInvLine(FromSalesLine: Record "Sales Line"; var ToSalesLine: Record "Sales Line")
     begin
@@ -4457,7 +4430,7 @@ codeunit 6500 "Item Tracking Management"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnRegisterNewItemTrackingLinesOnBeforeCannotMatchItemTrackingError(var TempTrackingSpecification: Record "Tracking Specification" temporary; var QtyToHandleToNewRegister: Decimal; var QtyToHandleInItemTracking: Decimal; var QtyToHandleOnSourceDocLine: Decimal; var IsHandled: Boolean; var AllowWhseOverpick: Boolean)
+    local procedure OnRegisterNewItemTrackingLinesOnBeforeCannotMatchItemTrackingError(var TempTrackingSpecification: Record "Tracking Specification" temporary; var QtyToHandleToNewRegister: Decimal; var QtyToHandleInItemTracking: Decimal; var QtyToHandleOnSourceDocLine: Decimal; var IsHandled: Boolean)
     begin
     end;
 
@@ -4493,20 +4466,6 @@ codeunit 6500 "Item Tracking Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnSynchronizeWhseActivItemTrkgAssembly(var WhseActivLine: Record "Warehouse Activity Line"; var ToRowID: Text[250])
-    begin
-    end;
-    [InternalEvent(false)]
-    local procedure OnGetItemTrackingSetupOnSetSerialNoRequired(var ItemTrackingSetup: Record "Item Tracking Setup"; ItemTrackingCode: Record "Item Tracking Code"; EntryType: Enum "Item Ledger Entry Type"; Inbound: Boolean)
-    begin
-    end;
-
-    [InternalEvent(false)]
-    local procedure OnGetItemTrackingSetupOnSetLotNoRequired(var ItemTrackingSetup: Record "Item Tracking Setup"; ItemTrackingCode: Record "Item Tracking Code"; EntryType: Enum "Item Ledger Entry Type"; Inbound: Boolean)
-    begin
-    end;
-
-    [InternalEvent(false)]
-    local procedure OnGetItemTrackingSetupOnSetPackageNoRequired(var ItemTrackingSetup: Record "Item Tracking Setup"; ItemTrackingCode: Record "Item Tracking Code"; EntryType: Enum "Item Ledger Entry Type"; Inbound: Boolean)
     begin
     end;
 }
