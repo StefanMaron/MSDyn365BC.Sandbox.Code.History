@@ -84,6 +84,7 @@ report 790 "Calculate Inventory"
                                 WhseEntry.SetRange("Item No.", "Item No.");
                                 WhseEntry.SetRange("Location Code", "Location Code");
                                 WhseEntry.SetRange("Variant Code", "Variant Code");
+                                OnAfterGetRecordItemLedgEntryOnBeforeWhseEntryFind(WhseEntry, "Item Ledger Entry");
                                 if WhseEntry.Find('-') then
                                     if WhseEntry."Entry No." <> OldWhseEntry."Entry No." then begin
                                         OldWhseEntry := WhseEntry;
@@ -94,7 +95,10 @@ report 790 "Calculate Inventory"
                                                 OnItemLedgerEntryOnAfterGetRecordOnBeforeUpdateBuffer(WhseEntry);
                                                 UpdateBuffer(WhseEntry."Bin Code", WhseEntry."Qty. (Base)", false);
                                             end;
-                                            WhseEntry.Find('+');
+                                            IsHandled := false;
+                                            OnWhseEntryLoopOnBeforeFindlast(WhseEntry, IsHandled);
+                                            if not IsHandled then
+                                                WhseEntry.Find('+');
                                             Item.CopyFilter("Bin Filter", WhseEntry."Bin Code");
                                         until WhseEntry.Next() = 0;
                                     end;
@@ -136,15 +140,22 @@ report 790 "Calculate Inventory"
             dataitem("Warehouse Entry"; "Warehouse Entry")
             {
                 DataItemLink = "Item No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter");
+                DataItemTableView = sorting("Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code", "Lot No.", "Serial No.", "Entry Type", Dedicated, "Package No.", "Bin Type Code", "SIFT Bucket No.");
+
+                trigger OnPreDataItem()
+                begin
+                    if not "Item Ledger Entry".IsEmpty() then
+                        CurrReport.Break(); // Skip if item has any record in Item Ledger Entry.                    
+                end;
 
                 trigger OnAfterGetRecord()
                 var
                     ItemVariant: Record "Item Variant";
                 begin
                     if not "Item Ledger Entry".IsEmpty() then
-                        CurrReport.Skip();   // Skip if item has any record in Item Ledger Entry.
+                        CurrReport.Break();   // Skip if item has any record in Item Ledger Entry.
 
-                    if "Warehouse Entry"."Variant Code" = '' then begin
+                    if "Warehouse Entry"."Variant Code" <> '' then begin
                         ItemVariant.SetLoadFields(Blocked);
                         if ItemVariant.Get("Item No.", "Variant Code") and ItemVariant.Blocked then
                             CurrReport.Skip();
@@ -810,6 +821,7 @@ report 790 "Calculate Inventory"
         TempQuantityOnHandBuffer.SetRange("Variant Code", "Item Ledger Entry"."Variant Code");
         TempQuantityOnHandBuffer.SetRange("Location Code", "Item Ledger Entry"."Location Code");
         TempQuantityOnHandBuffer.SetRange("Bin Code", BinCode);
+        OnItemBinLocationIsCalculatedOnBeforeFind(TempQuantityOnHandBuffer, "Item Ledger Entry");
         exit(TempQuantityOnHandBuffer.Find('-'));
     end;
 
@@ -1148,6 +1160,21 @@ report 790 "Calculate Inventory"
 
     [IntegrationEvent(true, false)]
     local procedure OnInsertQuantityOnHandBufferOnBeforeInsert(var InventoryBuffer: Record "Inventory Buffer")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnWhseEntryLoopOnBeforeFindlast(var WarehouseEntry: Record "Warehouse Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetRecordItemLedgEntryOnBeforeWhseEntryFind(var WarehouseEntry: Record "Warehouse Entry"; ItemLedgerEntry: Record "Item Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnItemBinLocationIsCalculatedOnBeforeFind(var InventoryBuffer: Record "Inventory Buffer"; ItemLedgerEntry: Record "Item Ledger Entry")
     begin
     end;
 }
