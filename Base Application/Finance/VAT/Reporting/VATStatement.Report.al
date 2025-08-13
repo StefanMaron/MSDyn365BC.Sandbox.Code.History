@@ -8,7 +8,6 @@ using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Ledger;
-using Microsoft.Foundation.Address;
 
 report 12 "VAT Statement"
 {
@@ -213,27 +212,6 @@ report 12 "VAT Statement"
                         MultiLine = true;
                         ToolTip = 'Specifies if you want the amounts to be printed in the additional reporting currency. If you leave this check box empty, the amounts will be printed in LCY.';
                     }
-                    field("Country/Region Filter"; CountryRegionFilter)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Country/Region Filter';
-                        ToolTip = 'Specifies the country/region to filter the VAT entries.';
-                        Importance = Additional;
-
-                        trigger OnLookup(var Text: Text): Boolean
-                        var
-                            CountryRegion: Record "Country/Region";
-                            CountriesRegions: Page "Countries/Regions";
-                        begin
-                            CountriesRegions.LookupMode(true);
-                            if CountriesRegions.RunModal() = Action::LookupOK then begin
-                                CountriesRegions.GetRecord(CountryRegion);
-                                CountryRegionFilter := CountryRegion.Code;
-                                exit(true);
-                            end;
-                            exit(false);
-                        end;
-                    }
                 }
             }
         }
@@ -312,7 +290,7 @@ report 12 "VAT Statement"
         Selection: Enum "VAT Statement Report Selection";
         TotalAmount: Decimal;
         UseAmtsInAddCurr: Boolean;
-        CountryRegionFilter: Text;
+        CountryRegionFilter: Text[250];
 
     procedure CalcLineTotal(VATStmtLine2: Record "VAT Statement Line"; var TotalAmount: Decimal; var CorrectionAmount: Decimal; var NetAmountLCY: Decimal; JournalTempl: Code[10]; Level: Integer): Boolean
     var
@@ -349,7 +327,7 @@ report 12 "VAT Statement"
                         GLEntry.SetFilter("Document Type", '<>%1', VATStmtLine2."Document Type"::"Credit Memo")
                     else
                         GLEntry.SetRange("Document Type", VATStmtLine2."Document Type");
-                    OnCalcLineTotalWithBaseOnAfterGLAccSetFilters(GLAcc, VATStmtLine2, GLEntry);
+                    OnCalcLineTotalWithBaseOnAfterGLAccSetFilters(GLAcc, VATStmtLine2);
                     Amount := 0;
                     Amount2 := 0;
                     if GLAcc.Find('-') and (VATStmtLine2."Account Totaling" <> '') then
@@ -529,7 +507,7 @@ report 12 "VAT Statement"
         InitializeRequest(NewVATStmtName, NewVATStatementLine, NewSelection, NewPeriodSelection, NewPrintInIntegers, NewUseAmtsInAddCurr, '');
     end;
 
-    procedure InitializeRequest(var NewVATStmtName: Record "VAT Statement Name"; var NewVATStatementLine: Record "VAT Statement Line"; NewSelection: Enum "VAT Statement Report Selection"; NewPeriodSelection: Enum "VAT Statement Report Period Selection"; NewPrintInIntegers: Boolean; NewUseAmtsInAddCurr: Boolean; NewCountryRegionFilter: Text)
+    procedure InitializeRequest(var NewVATStmtName: Record "VAT Statement Name"; var NewVATStatementLine: Record "VAT Statement Line"; NewSelection: Enum "VAT Statement Report Selection"; NewPeriodSelection: Enum "VAT Statement Report Period Selection"; NewPrintInIntegers: Boolean; NewUseAmtsInAddCurr: Boolean; NewCountryRegionFilter: Text[250])
     begin
         ClearAll();
         "VAT Statement Name".Copy(NewVATStmtName);
@@ -635,7 +613,7 @@ report 12 "VAT Statement"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCalcLineTotalWithBaseOnAfterGLAccSetFilters(var GLAccount: Record "G/L Account"; VATStatementLine2: Record "VAT Statement Line"; var GLEntry: Record "G/L Entry")
+    local procedure OnCalcLineTotalWithBaseOnAfterGLAccSetFilters(var GLAccount: Record "G/L Account"; VATStatementLine2: Record "VAT Statement Line")
     begin
     end;
 
