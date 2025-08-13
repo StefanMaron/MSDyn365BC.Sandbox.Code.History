@@ -245,7 +245,6 @@ table 454 "Approval Entry"
         WorkflowEventQueue.DeleteAll();
     end;
 
-    [InherentPermissions(PermissionObjectType::TableData, Database::"Approval Entry", 'r')]
     procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";
