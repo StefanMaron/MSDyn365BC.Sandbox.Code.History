@@ -22,7 +22,7 @@ page 37011 "Daily Purchases"
 
                 trigger ControlAddInReady()
                 begin
-                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
+                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageTok);
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
@@ -57,7 +57,7 @@ page 37011 "Daily Purchases"
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageLbl: Label 'ReportSection02de1de9adad5ee196e0', Locked = true;
+        ReportPageTok: Label 'ReportSection02de1de9adad5ee196e0', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()
