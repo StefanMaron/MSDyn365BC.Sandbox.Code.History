@@ -28,8 +28,6 @@ using Microsoft.Foundation.AuditCodes;
 
 codeunit 139685 "Contract Test Library"
 {
-    Access = Internal;
-
     var
         LibraryDimension: Codeunit "Library - Dimension";
         LibraryERM: Codeunit "Library - ERM";
@@ -495,6 +493,7 @@ codeunit 139685 "Contract Test Library"
         ServiceCommitmentTemplate."Calculation Base Type" := CalculationBaseType;
         if Discount then
             ServiceCommitmentTemplate.Discount := true;
+        ServiceCommitmentTemplate."Create Contract Deferrals" := ServiceCommitmentTemplate."Create Contract Deferrals"::Yes;
 
         OnCreateSubPackageLineTemplateOnBeforeInsert(ServiceCommitmentTemplate);
         ServiceCommitmentTemplate.Insert(true)
@@ -526,6 +525,13 @@ codeunit 139685 "Contract Test Library"
         ServiceCommitmentPackage.Code := ServiceCommitmentPackageCode;
         ServiceCommitmentPackage.Description := ServiceCommitmentPackageCode;
         ServiceCommitmentPackage.Insert(true)
+    end;
+
+    procedure CreateServiceCommitmentPackageWithLine(ServiceCommitmentTemplateCode: Code[20]; var ServiceCommitmentPackage: Record "Subscription Package")
+    var
+        ServiceCommPackageLine: Record "Subscription Package Line";
+    begin
+        CreateServiceCommitmentPackageWithLine(ServiceCommitmentTemplateCode, ServiceCommitmentPackage, ServiceCommPackageLine);
     end;
 
     procedure CreateServiceCommitmentPackageWithLine(ServiceCommitmentTemplateCode: Code[20]; var ServiceCommitmentPackage: Record "Subscription Package"; var ServiceCommPackageLine: Record "Subscription Package Line")
@@ -569,6 +575,7 @@ codeunit 139685 "Contract Test Library"
         Evaluate(ServiceCommPackageLine."Billing Rhythm", BillingRhythmText);
         ServiceCommPackageLine.Validate(Partner, ServicePartner);
         Evaluate(ServiceCommPackageLine."Price Binding Period", PriceBindingPeriod);
+        ServiceCommPackageLine.Validate("Create Contract Deferrals", Enum::"Create Contract Deferrals"::Yes);
 
         OnCreateSubscriptionPackageLineOnBeforeInsert(ServiceCommPackageLine);
         ServiceCommPackageLine.Insert(false);
