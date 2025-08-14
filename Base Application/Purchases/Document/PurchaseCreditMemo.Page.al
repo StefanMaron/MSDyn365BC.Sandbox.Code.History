@@ -346,12 +346,14 @@ page 52 "Purchase Credit Memo"
                     BlankZero = true;
                     Enabled = DocAmountEnable;
                     Visible = DocAmountEnable;
+                    Editable = DocAmountsEditable;
                     ShowMandatory = true;
                 }
                 field(DocAmountVAT; Rec."Doc. Amount VAT")
                 {
                     ApplicationArea = Basic, Suite;
                     Enabled = DocAmountEnable;
+                    Editable = DocAmountsEditable;
                     Visible = DocAmountEnable;
                 }
             }
@@ -982,7 +984,7 @@ page 52 "Purchase Credit Memo"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStats action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
 
@@ -1673,12 +1675,15 @@ page 52 "Purchase Credit Memo"
 #if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStats action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
                 }
 #else
                 actionref(PurchaseStatistics_Promoted; PurchaseStatistics)
+                {
+                }
+                actionref(PurchaseStats_Promoted; PurchaseStats)
                 {
                 }
 #endif
@@ -1744,7 +1749,6 @@ page 52 "Purchase Credit Memo"
         JobQueueUsed := PurchSetup.JobQueueActive();
         SetExtDocNoMandatoryCondition();
         IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
-        DocAmountEnable := PurchSetup."Check Doc. Total Amounts";
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1766,6 +1770,8 @@ page 52 "Purchase Credit Memo"
         EnvironmentInfo: Codeunit "Environment Information";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
+        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
+        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetDocNoVisible();
         IsOfficeAddin := OfficeMgt.IsAvailable();
         IsSaaS := EnvironmentInfo.IsSaaS();
@@ -1781,7 +1787,7 @@ page 52 "Purchase Credit Memo"
 
         CheckShowBackgrValidationNotification();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
-        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Purchase Order Stats.";
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -1834,7 +1840,7 @@ page 52 "Purchase Credit Memo"
         IsPostingGroupEditable: Boolean;
         IsPurchaseLinesEditable: Boolean;
         VATDateEnabled: Boolean;
-        DocAmountEnable: Boolean;
+        DocAmountEnable, DocAmountsEditable : Boolean;
 
     protected var
         ShipToOptions: Option "Default (Vendor Address)","Alternate Vendor Address","Custom Address";
@@ -1975,6 +1981,8 @@ page 52 "Purchase Credit Memo"
     begin
         JobQueueVisible := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
         HasIncomingDocument := Rec."Incoming Document Entry No." <> 0;
+        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
+        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetExtDocNoMandatoryCondition();
         SetPostingGroupEditable();
 
