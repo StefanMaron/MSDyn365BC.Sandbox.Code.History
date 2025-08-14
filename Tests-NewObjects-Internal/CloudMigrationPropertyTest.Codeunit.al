@@ -815,10 +815,6 @@
         ListOfTablesToMigrate.Add(9990); // Database::"Word Templates Related Table"
         ListOfTablesToMigrate.Add(9987); // Database::"Word Templates Table"
 
-        // E-Document
-        ListOfTablesToMigrate.Add(6121); // Database::"E-Document"
-        ListOfTablesToMigrate.Add(6103); // Database::"E-Document Service"
-
         // Other tables
         ListOfTablesToMigrate.Add(Database::"Acc. Sched. Cell Value");
         ListOfTablesToMigrate.Add(Database::"Acc. Sched. Chart Setup Line");
@@ -1098,7 +1094,6 @@
         ListOfTablesToMigrate.Add(Database::"Email Inbox");
         ListOfTablesToMigrate.Add(Database::"Email Outbox");
         ListOfTablesToMigrate.Add(Database::"Email Parameter");
-        ListOfTablesToMigrate.Add(8890); // Database:: Email Retry
         ListOfTablesToMigrate.Add(Database::"Email Scenario Attachments");
         ListOfTablesToMigrate.Add(Database::"Employee Absence");
         ListOfTablesToMigrate.Add(Database::"Employee Ledger Entry");
