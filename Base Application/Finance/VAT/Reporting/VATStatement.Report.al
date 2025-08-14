@@ -5,15 +5,11 @@
 namespace Microsoft.Finance.VAT.Reporting;
 
 using Microsoft.Finance.GeneralLedger.Account;
-using Microsoft.Utilities;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Ledger;
 // using Microsoft.Foundation.Enums;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
-#if not CLEAN27
-using System.Environment.Configuration;
-#endif
 
 report 12 "VAT Statement"
 {
@@ -183,7 +179,6 @@ report 12 "VAT Statement"
                                 VATPeriod := '';
                         end;
                     }
-#if not CLEAN27
                     field(VatPeriod; VATPeriod)
                     {
                         ApplicationArea = Basic, Suite;
@@ -192,10 +187,6 @@ report 12 "VAT Statement"
                         LookupPageID = "Periodic VAT Settlement List";
                         TableRelation = "Periodic Settlement VAT Entry";
                         ToolTip = 'Specifies the period of time that defines the VAT period.';
-                        Visible = not VATSettlementByActivityCodeIsEnabled;
-                        ObsoleteState = Pending;
-                        ObsoleteReason = 'Replaced by VAT settlement per activity code.';
-                        ObsoleteTag = '27.0';
 
                         trigger OnValidate()
                         begin
@@ -206,55 +197,6 @@ report 12 "VAT Statement"
                                 EndDateReq := 0D;
                             end;
                         end;
-                    }
-                    field(VatPeriodByActivityCode; VATPeriod)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Vat Period';
-                        Importance = Additional;
-                        LookupPageID = "Periodic VAT Settl. List";
-                        TableRelation = "Periodic VAT Settlement Entry";
-                        ToolTip = 'Specifies the period of time that defines the VAT period.';
-                        Visible = VATSettlementByActivityCodeIsEnabled;
-
-                        trigger OnValidate()
-                        begin
-                            if VATPeriod <> '' then begin
-                                Selection := Selection::Closed;
-                                PeriodSelection := PeriodSelection::"Within Period";
-                                StartDate := 0D;
-                                EndDateReq := 0D;
-                            end;
-                        end;
-                    }
-#else
-                    field(VatPeriodByActivityCode; VATPeriod)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Vat Period';
-                        Importance = Additional;
-                        LookupPageID = "Periodic VAT Settl. List";
-                        TableRelation = "Periodic VAT Settlement Entry";
-                        ToolTip = 'Specifies the period of time that defines the VAT period.';
-
-                        trigger OnValidate()
-                        begin
-                            if VATPeriod <> '' then begin
-                                Selection := Selection::Closed;
-                                PeriodSelection := PeriodSelection::"Within Period";
-                                StartDate := 0D;
-                                EndDateReq := 0D;
-                            end;
-                        end;
-                    }
-#endif
-                    field(ActivityCode; ActivityCode)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Activity Code';
-                        Importance = Additional;
-                        TableRelation = "Activity Code";
-                        ToolTip = 'Specifies the activity code that is assigned to the VAT settlement transaction.';
                     }
                     field("Country/Region Filter"; CountryRegionFilter)
                     {
@@ -295,15 +237,6 @@ report 12 "VAT Statement"
     {
     }
 
-#if not CLEAN27
-    trigger OnInitReport()
-    var
-        FeatureManagementIT: Codeunit "Feature Management IT";
-    begin
-        VATSettlementByActivityCodeIsEnabled := FeatureManagementIT.IsVATSettlementPerActivityCodeFeatureEnabled();
-    end;
-#endif
-
     trigger OnPreReport()
     begin
         if EndDateReq = 0D then
@@ -335,15 +268,7 @@ report 12 "VAT Statement"
         PageGroupNo: Integer;
         NextPageGroupNo: Integer;
         Heading2: Text[50];
-#if not CLEAN27
         PeriodicSettlVATEntry: Record "Periodic Settlement VAT Entry";
-        PeriodVATSettlEntry: Record "Periodic VAT Settlement Entry";
-#else
-        PeriodVATSettlEntry: Record "Periodic VAT Settlement Entry";
-#endif
-#if not CLEAN27
-        VATSettlementByActivityCodeIsEnabled: Boolean;
-#endif
         VATPeriod: Code[10];
 #pragma warning disable AA0074
 #pragma warning disable AA0470
@@ -366,21 +291,12 @@ report 12 "VAT Statement"
         Selection: Enum "VAT Statement Report Selection";
         TotalAmount: Decimal;
         UseAmtsInAddCurr: Boolean;
-        ActivityCode: Code[6];
         CountryRegionFilter: Text;
 
     procedure CalcLineTotal(VATStmtLine2: Record "VAT Statement Line"; var TotalAmount: Decimal; Level: Integer): Boolean
     var
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
-        Result: Boolean;
-        IsHandled: Boolean;
-        DummyBase: Decimal;
     begin
-        IsHandled := false;
-        OnBeforeCalcLineTotalWithBase(VATStmtLine2, TotalAmount, DummyBase, Level, RowNo, ErrorText, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         if Level = 0 then
             TotalAmount := 0;
         Amount := 0;
@@ -540,359 +456,123 @@ report 12 "VAT Statement"
                 begin
                     case Selection of
                         Selection::Open:
-
-#if not CLEAN27
-                            if VATSettlementByActivityCodeIsEnabled then begin
-                                PeriodVATSettlEntry.Reset();
-                                PeriodVATSettlEntry.SetCurrentKey("VAT Period Closed");
-                                PeriodVATSettlEntry.SetRange("VAT Period Closed", false);
-                                PeriodVATSettlEntry.SetRange("Activity Code", ActivityCode);
-                            end else begin
+                            begin
                                 PeriodicSettlVATEntry.Reset();
                                 PeriodicSettlVATEntry.SetCurrentKey("VAT Period Closed");
                                 PeriodicSettlVATEntry.SetRange("VAT Period Closed", false);
                             end;
-#else
-                            begin
-                                PeriodVATSettlEntry.Reset();
-                                PeriodVATSettlEntry.SetCurrentKey("VAT Period Closed");
-                                PeriodVATSettlEntry.SetRange("VAT Period Closed", false);
-                                PeriodVATSettlEntry.SetRange("Activity Code", ActivityCode);
-                            end;
-#endif
-
                         Selection::Closed:
-#if not CLEAN27
-                            if VATSettlementByActivityCodeIsEnabled then begin
-                                PeriodVATSettlEntry.Reset();
-                                PeriodVATSettlEntry.SetRange("VAT Period", VATPeriod);
-                                PeriodVATSettlEntry.SetRange("Activity Code", ActivityCode);
-                            end else begin
+                            begin
                                 PeriodicSettlVATEntry.Reset();
                                 PeriodicSettlVATEntry.SetRange("VAT Period", VATPeriod);
                             end;
-#else
-                            begin
-                                PeriodVATSettlEntry.Reset();
-                                PeriodVATSettlEntry.SetRange("VAT Period", VATPeriod);
-                                PeriodVATSettlEntry.SetRange("Activity Code", ActivityCode);
-                            end;
-#endif
                     end;
 
                     case VATStmtLine2."Gen. Posting Type" of
                         VATStmtLine2."Gen. Posting Type"::"Prior Period Input VAT":
-#if not CLEAN27
-                            if VATSettlementByActivityCodeIsEnabled then begin
-                                PeriodVATSettlEntry.CalcSums("Prior Period Input VAT", "Add Curr. Prior Per. Inp. VAT");
-                                Amount :=
-                                ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Prior Period Input VAT", PeriodVATSettlEntry."Add Curr. Prior Per. Inp. VAT");
-                                CalcTotalAmount(VATStmtLine2, TotalAmount);
-                            end else begin
+                            begin
                                 PeriodicSettlVATEntry.CalcSums("Prior Period Input VAT", "Add Curr. Prior Per. Inp. VAT");
                                 Amount :=
-                                ConditionalAdd(
+                                  ConditionalAdd(
                                     0, PeriodicSettlVATEntry."Prior Period Input VAT", PeriodicSettlVATEntry."Add Curr. Prior Per. Inp. VAT");
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#else
-                            begin
-                                PeriodVATSettlEntry.CalcSums("Prior Period Input VAT", "Add Curr. Prior Per. Inp. VAT");
-                                Amount :=
-                                  ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Prior Period Input VAT", PeriodVATSettlEntry."Add Curr. Prior Per. Inp. VAT");
-                                CalcTotalAmount(VATStmtLine2, TotalAmount);
-                            end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::"Prior Period Output VAT":
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Prior Period Output VAT", "Add Curr. Prior Per. Out VAT");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Prior Period Output VAT", PeriodVATSettlEntry."Add Curr. Prior Per. Out VAT");
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Prior Period Output VAT", "Add Curr. Prior Per. Out VAT");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Prior Period Output VAT", PeriodicSettlVATEntry."Add Curr. Prior Per. Out VAT");
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Prior Period Output VAT", "Add Curr. Prior Per. Out VAT");
+                                PeriodicSettlVATEntry.CalcSums("Prior Period Output VAT", "Add Curr. Prior Per. Out VAT");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Prior Period Output VAT", PeriodVATSettlEntry."Add Curr. Prior Per. Out VAT");
+                                    0, PeriodicSettlVATEntry."Prior Period Output VAT", PeriodicSettlVATEntry."Add Curr. Prior Per. Out VAT");
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::Paid:
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Paid Amount", "Add-Curr. Paid. Amount");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Paid Amount", PeriodVATSettlEntry."Add-Curr. Paid. Amount");
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Paid Amount", "Add-Curr. Paid. Amount");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Paid Amount", PeriodicSettlVATEntry."Add-Curr. Paid. Amount");
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Paid Amount", "Add-Curr. Paid. Amount");
+                                PeriodicSettlVATEntry.CalcSums("Paid Amount", "Add-Curr. Paid. Amount");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Paid Amount", PeriodVATSettlEntry."Add-Curr. Paid. Amount");
+                                    0, PeriodicSettlVATEntry."Paid Amount", PeriodicSettlVATEntry."Add-Curr. Paid. Amount");
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::Advanced:
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Advanced Amount", "Add-Curr. Advanced Amount");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Advanced Amount", PeriodVATSettlEntry."Add-Curr. Advanced Amount");
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Advanced Amount", "Add-Curr. Advanced Amount");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Advanced Amount", PeriodicSettlVATEntry."Add-Curr. Advanced Amount");
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Advanced Amount", "Add-Curr. Advanced Amount");
+                                PeriodicSettlVATEntry.CalcSums("Advanced Amount", "Add-Curr. Advanced Amount");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Advanced Amount", PeriodVATSettlEntry."Add-Curr. Advanced Amount");
+                                    0, PeriodicSettlVATEntry."Advanced Amount", PeriodicSettlVATEntry."Add-Curr. Advanced Amount");
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::"Credit VAT Compens.":
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodicSettlVATEntry.CalcSums("Credit VAT Compensation");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Credit VAT Compensation", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Credit VAT Compensation");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Credit VAT Compensation", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Credit VAT Compensation");
+                                PeriodicSettlVATEntry.CalcSums("Credit VAT Compensation");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Credit VAT Compensation", 0);
+                                    0, PeriodicSettlVATEntry."Credit VAT Compensation", 0);
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::"Payab. VAT Variation":
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Payable VAT Variation");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Payable VAT Variation", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Payable VAT Variation");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Payable VAT Variation", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Payable VAT Variation");
+                                PeriodicSettlVATEntry.CalcSums("Payable VAT Variation");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Payable VAT Variation", 0);
+                                    0, PeriodicSettlVATEntry."Payable VAT Variation", 0);
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::"Deduc. VAT Variation.":
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Deductible VAT Variation");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Deductible VAT Variation", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Deductible VAT Variation");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Deductible VAT Variation", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Deductible VAT Variation");
+                                PeriodicSettlVATEntry.CalcSums("Deductible VAT Variation");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Deductible VAT Variation", 0);
+                                    0, PeriodicSettlVATEntry."Deductible VAT Variation", 0);
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::"Tax Debit Variat.":
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Tax Debit Variation");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Tax Debit Variation", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Tax Debit Variation");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Tax Debit Variation", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Tax Debit Variation");
+                                PeriodicSettlVATEntry.CalcSums("Tax Debit Variation");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Tax Debit Variation", 0);
+                                    0, PeriodicSettlVATEntry."Tax Debit Variation", 0);
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::"Tax Credit Variation":
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Tax Credit Variation");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Tax Credit Variation", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Tax Credit Variation");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Tax Credit Variation", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Tax Credit Variation");
+                                PeriodicSettlVATEntry.CalcSums("Tax Credit Variation");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Tax Credit Variation", 0);
+                                    0, PeriodicSettlVATEntry."Tax Credit Variation", 0);
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::"Tax Deb. Variat. Int.":
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Tax Debit Variation Interest");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Tax Debit Variation Interest", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Tax Debit Variation Interest");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Tax Debit Variation Interest", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Tax Debit Variation Interest");
+                                PeriodicSettlVATEntry.CalcSums("Tax Debit Variation Interest");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Tax Debit Variation Interest", 0);
+                                    0, PeriodicSettlVATEntry."Tax Debit Variation Interest", 0);
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::"Unpaid VAT Prev. Periods":
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Unpaid VAT Previous Periods");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Unpaid VAT Previous Periods", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Unpaid VAT Previous Periods");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Unpaid VAT Previous Periods", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Unpaid VAT Previous Periods");
+                                PeriodicSettlVATEntry.CalcSums("Unpaid VAT Previous Periods");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Unpaid VAT Previous Periods", 0);
+                                    0, PeriodicSettlVATEntry."Unpaid VAT Previous Periods", 0);
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::"Omit Payable Int.":
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Omit VAT Payable Interest");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Omit VAT Payable Interest", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                    PeriodicSettlVATEntry.CalcSums("Omit VAT Payable Interest");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Omit VAT Payable Interest", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Omit VAT Payable Interest");
+                                PeriodicSettlVATEntry.CalcSums("Omit VAT Payable Interest");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Omit VAT Payable Interest", 0);
+                                    0, PeriodicSettlVATEntry."Omit VAT Payable Interest", 0);
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         VATStmtLine2."Gen. Posting Type"::"Special Credit":
-#if not CLEAN27
-                                if VATSettlementByActivityCodeIsEnabled then begin
-                                    PeriodVATSettlEntry.CalcSums("Special Credit");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodVATSettlEntry."Special Credit", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end else begin
-                                            PeriodicSettlVATEntry.CalcSums("Special Credit");
-                                    Amount :=
-                                    ConditionalAdd(
-                                        0, PeriodicSettlVATEntry."Special Credit", 0);
-                                    CalcTotalAmount(VATStmtLine2, TotalAmount);
-                                end;
-#else
                             begin
-                                PeriodVATSettlEntry.CalcSums("Special Credit");
+                                PeriodicSettlVATEntry.CalcSums("Special Credit");
                                 Amount :=
                                   ConditionalAdd(
-                                    0, PeriodVATSettlEntry."Special Credit", 0);
+                                    0, PeriodicSettlVATEntry."Special Credit", 0);
                                 CalcTotalAmount(VATStmtLine2, TotalAmount);
                             end;
-#endif
                         else
                             Amount := 0;
 
@@ -978,11 +658,6 @@ report 12 "VAT Statement"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcLineTotalWithBaseOnAfterGLAccSetFilters(var GLAccount: Record "G/L Account"; VATStatementLine2: Record "VAT Statement Line")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeCalcLineTotalWithBase(VATStmtLine2: Record "VAT Statement Line"; var TotalAmount: Decimal; var TotalBase: Decimal; Level: Integer; var RowNo: array[6] of Code[10]; var ErrorText: Text[80]; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
