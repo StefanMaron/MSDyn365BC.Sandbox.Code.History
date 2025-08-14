@@ -4603,7 +4603,7 @@ table 36 "Sales Header"
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec, FieldNumber);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if SalesLinesExist() then
@@ -6669,8 +6669,12 @@ table 36 "Sales Header"
             TestSalesLineFieldsBeforeRecreate();
             ShouldValidateLocationCode := (SalesLine."Location Code" <> "Location Code") and not SalesLine.IsNonInventoriableItem();
             OnRecreateReservEntryReqLineOnAfterCalcShouldValidateLocationCode(Rec, xRec, SalesLine, ShouldValidateLocationCode);
-            if ShouldValidateLocationCode then
+            if ShouldValidateLocationCode then begin
                 SalesLine.Validate("Location Code", "Location Code");
+                if Rec."Document Type" in [Rec."Document Type"::Invoice, Rec."Document Type"::"Credit Memo"] then
+                    if SalesLine."Location Code" <> '' then
+                        SalesLine.CheckLocationOnWMS();
+            end;
             TempSalesLine := SalesLine;
             if SalesLine.Nonstock then begin
                 SalesLine.Nonstock := false;
@@ -9260,13 +9264,11 @@ table 36 "Sales Header"
         IsHandled: Boolean;
     begin
         SalesInvoiceHeader.SetLoadFields("No.");
-        if not SalesInvoiceHeader.Get(Rec."Applies-to Doc. No.") then
+        if (not SalesInvoiceHeader.Get(Rec."Applies-to Doc. No.")) and (Rec."Applies-to ID" = '') then
             exit;
         SalesCreditMemoHeader.SetLoadFields("Pre-Assigned No.", "Cust. Ledger Entry No.");
         SalesCreditMemoHeader.SetRange("Pre-Assigned No.", Rec."No.");
         if not SalesCreditMemoHeader.FindFirst() then
-            exit;
-        if IsNotFullyCancelled(SalesCreditMemoHeader) then
             exit;
 
         IsHandled := false;
@@ -9602,7 +9604,7 @@ table 36 "Sales Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header")
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; FieldNumber: Integer)
     begin
     end;
 
