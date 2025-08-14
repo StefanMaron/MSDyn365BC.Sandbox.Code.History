@@ -6,7 +6,6 @@ using Microsoft.Inventory.Item;
 codeunit 8018 TableAndFieldManagement
 {
     Access = Internal;
-
     internal procedure FieldExists(SearchTableNo: Integer; SearchFieldNo: Integer): Boolean
     var
         AllFields: Record Field;
@@ -45,7 +44,7 @@ codeunit 8018 TableAndFieldManagement
         ItemTemplate.Modify(false);
     end;
 
-    local procedure TransferFieldValues(var SrcRecRef: RecordRef; var DestRecRef: RecordRef; Reverse: Boolean; StartFieldIndex: Integer; FieldCount: Integer)
+    internal procedure TransferFieldValues(var SrcRecRef: RecordRef; var DestRecRef: RecordRef; Reverse: Boolean; StartFieldIndex: Integer; FieldCount: Integer)
     var
         SrcFieldRef: FieldRef;
         DestFieldRef: FieldRef;
