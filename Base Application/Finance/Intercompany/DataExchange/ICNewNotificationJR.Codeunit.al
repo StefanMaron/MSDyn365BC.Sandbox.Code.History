@@ -52,8 +52,7 @@ codeunit 533 "IC New Notification JR"
             ICOutgoingNotification.Status := ICOutgoingNotification.Status::Failed;
             ICOutgoingNotification.SetErrorMessage(GetLastErrorText());
             ICOutgoingNotification.Modify();
-            Commit();
-            Error(GetLastErrorText());
+            ClearLastError();
         end;
     end;
 
