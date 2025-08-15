@@ -11,7 +11,6 @@ codeunit 137085 "Cost Adjustment Features"
     end;
 
     var
-        LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryCosting: Codeunit "Library - Costing";
@@ -22,21 +21,17 @@ codeunit 137085 "Cost Adjustment Features"
 
     local procedure Initialize()
     begin
-        LibraryTestInitialize.OnTestInitialize(Codeunit::"Cost Adjustment Features");
         LibrarySetupStorage.Restore();
         LibraryVariableStorage.Clear();
 
         if Initialized then
             exit;
-        LibraryTestInitialize.OnBeforeTestSuiteInitialize(Codeunit::"Cost Adjustment Features");
 
         SetManualCostAdjustmentParameters();
 
         LibrarySetupStorage.Save(Database::"Inventory Setup");
 
         Initialized := true;
-        Commit();
-        LibraryTestInitialize.OnAfterTestSuiteInitialize(Codeunit::"Cost Adjustment Features");
     end;
 
     // TEST CASES:
