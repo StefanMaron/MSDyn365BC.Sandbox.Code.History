@@ -34,7 +34,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         JobPostLine: Codeunit "Job Post-Line";
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
         SalesPostInvoiceEvents: Codeunit "Sales Post Invoice Events";
-        SalesPostInvoiceEventsBE: Codeunit "Sales Post Invoice Events BE";
         DeferralLineNo: Integer;
         InvDefLineNo: Integer;
         FALineNo: Integer;
@@ -438,8 +437,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
                 then begin
                     SetJobLineFilters(JobSalesLine, TempInvoicePostingBuffer);
                     JobPostLine.PostJobSalesLines(JobSalesLine.GetView(), GLEntryNo);
-                    SalesPostInvoiceEvents.RunOnPostLinesOnAfterPostJobSalesLines(
-                      SalesHeader, TempInvoicePostingBuffer, TotalSalesLine, TotalSalesLineLCY, GLEntryNo, InvoicePostingParameters);
                 end;
             until TempInvoicePostingBuffer.Next(-1) = 0;
 
@@ -454,7 +451,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
     local procedure PrepareGenJnlLine(var SalesHeader: Record "Sales Header"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var GenJnlLine: Record "Gen. Journal Line")
     var
         BillToCust: Record Customer;
-        IsHandled: Boolean;
     begin
         InitGenJnlLine(GenJnlLine, SalesHeader, InvoicePostingBuffer);
 
@@ -463,13 +459,8 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
             InvoicePostingParameters."External Document No.", InvoicePostingParameters."Source Code", '');
 
         GenJnlLine.CopyFromSalesHeader(SalesHeader);
-
-        IsHandled := false;
-        SalesPostInvoiceEventsBE.RunOnPrepareGenJnlLineOnBeforeUpdateCountryRegionCode(SalesHeader, GenJnlLine, InvoicePostingBuffer, IsHandled);
-        if not IsHandled then begin
-            BillToCust.Get(GenJnlLine."Bill-to/Pay-to No.");
-            GenJnlLine."Country/Region Code" := BillToCust."Country/Region Code";
-        end;
+        BillToCust.Get(GenJnlLine."Bill-to/Pay-to No.");
+        GenJnlLine."Country/Region Code" := BillToCust."Country/Region Code";
 
         InvoicePostingBuffer.CopyToGenJnlLine(GenJnlLine);
         if GLSetup."Journal Templ. Name Mandatory" then
