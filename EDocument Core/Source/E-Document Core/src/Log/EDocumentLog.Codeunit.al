@@ -24,7 +24,6 @@ codeunit 6132 "E-Document Log"
         EDocumentServiceStatusToInsert: Enum "E-Document Service Status";
         EDocumentProcStatusToInsert: Enum "Import E-Doc. Proc. Status";
         ConfiguredLogToInsert: Boolean;
-        UndoStepToInsert: Boolean;
         EDocDataStorageAlreadySetErr: Label 'E-Doc. Data Storage can not be overwritten with new entry';
         EDocTelemetryGetLogFailureLbl: Label 'E-Document Blog Log Failure', Locked = true;
 
@@ -91,12 +90,11 @@ codeunit 6132 "E-Document Log"
         CopyStream(OutStream, InStream);
     end;
 
-    internal procedure ConfigureLogToInsert(EDocumentServiceStatus: Enum "E-Document Service Status"; EDocumentProcStatus: Enum "Import E-Doc. Proc. Status"; UndoStep: Boolean)
+    internal procedure ConfigureLogToInsert(EDocumentServiceStatus: Enum "E-Document Service Status"; EDocumentProcStatus: Enum "Import E-Doc. Proc. Status")
     begin
         ConfiguredLogToInsert := true;
         this.EDocumentServiceStatusToInsert := EDocumentServiceStatus;
         this.EDocumentProcStatusToInsert := EDocumentProcStatus;
-        this.UndoStepToInsert := UndoStep;
     end;
 
     internal procedure InsertLog(): Record "E-Document Log";
@@ -105,20 +103,15 @@ codeunit 6132 "E-Document Log"
     begin
         if not ConfiguredLogToInsert then
             Error(DeveloperErr);
-        exit(this.InsertLog(this.EDocumentServiceStatusToInsert, this.EDocumentProcStatusToInsert, this.UndoStepToInsert));
+        exit(this.InsertLog(this.EDocumentServiceStatusToInsert, this.EDocumentProcStatusToInsert));
     end;
 
     internal procedure InsertLog(EDocumentServiceStatus: Enum "E-Document Service Status"): Record "E-Document Log";
     begin
-        exit(this.InsertLog(EDocumentServiceStatus, Enum::"Import E-Doc. Proc. Status"::Unprocessed, false));
+        exit(this.InsertLog(EDocumentServiceStatus, Enum::"Import E-Doc. Proc. Status"::Unprocessed));
     end;
 
     internal procedure InsertLog(EDocumentServiceStatus: Enum "E-Document Service Status"; EDocumentProcStatus: Enum "Import E-Doc. Proc. Status"): Record "E-Document Log";
-    begin
-        exit(this.InsertLog(EDocumentServiceStatus, EDocumentProcStatus, false));
-    end;
-
-    internal procedure InsertLog(EDocumentServiceStatus: Enum "E-Document Service Status"; EDocumentProcStatus: Enum "Import E-Doc. Proc. Status"; UndoStep: Boolean): Record "E-Document Log";
     begin
         // Reset these fields
         this.EDocLog."E-Doc. Data Storage Entry No." := 0;
@@ -129,7 +122,6 @@ codeunit 6132 "E-Document Log"
 
         this.EDocLog.Validate(Status, EDocumentServiceStatus);
         this.EDocLog.Validate("Processing Status", EDocumentProcStatus);
-        this.EDocLog.Validate("Step Undone", UndoStep);
         this.EDocLog.Insert();
         ConfiguredLogToInsert := false;
         exit(this.EDocLog);

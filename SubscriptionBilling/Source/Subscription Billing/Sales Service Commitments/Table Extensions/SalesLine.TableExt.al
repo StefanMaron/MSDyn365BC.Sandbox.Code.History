@@ -102,17 +102,6 @@ tableextension 8054 "Sales Line" extends "Sales Line"
                     SalesServiceCommitmentMgmt.NotifyIfDiscountIsNotTransferredFromSalesLine(Rec);
             end;
         }
-        modify("Line Discount Amount")
-        {
-            trigger OnAfterValidate()
-            var
-                SalesServiceCommitmentMgmt: Codeunit "Sales Subscription Line Mgmt.";
-            begin
-                UpdateSalesServiceCommitmentCalculationBaseAmount(Rec, xRec);
-                if Rec."Line Discount Amount" <> xRec."Line Discount Amount" then
-                    SalesServiceCommitmentMgmt.NotifyIfDiscountIsNotTransferredFromSalesLine(Rec);
-            end;
-        }
         modify("Customer Price Group")
         {
             trigger OnAfterValidate()
@@ -219,7 +208,6 @@ tableextension 8054 "Sales Line" extends "Sales Line"
         if (xSalesLine.Quantity = SalesLine.Quantity) and
             (xSalesLine."Unit Price" = SalesLine."Unit Price") and
             (xSalesLine."Line Discount %" = SalesLine."Line Discount %") and
-            (xSalesLine."Line Discount Amount" = SalesLine."Line Discount Amount") and
             (xSalesLine."Unit Cost" = SalesLine."Unit Cost") and
             (xSalesLine."Unit Cost (LCY)" = SalesLine."Unit Cost (LCY)")
         then
@@ -369,13 +357,6 @@ tableextension 8054 "Sales Line" extends "Sales Line"
         SalesServiceCommitment.FilterOnSalesLine(Rec);
         SalesServiceCommitment.SetRange(Process, Enum::Process::"Contract Renewal");
         exit(not SalesServiceCommitment.IsEmpty());
-    end;
-
-    internal procedure GetSalesDocumentSign(): Integer
-    begin
-        if Rec."Document Type" = "Sales Document Type"::"Credit Memo" then
-            exit(-1);
-        exit(1);
     end;
 
     [IntegrationEvent(false, false)]

@@ -45,13 +45,6 @@ page 6181 "E-Document Purchase Draft"
                         CurrPage.Update();
                     end;
                 }
-                field(DraftType; Rec."Read into Draft Impl.")
-                {
-                    Caption = 'Draft Type';
-                    ToolTip = 'Specifies the type of draft document.';
-                    Visible = false;
-                    Editable = false;
-                }
                 group("Buy-from")
                 {
                     ShowCaption = false;
@@ -61,22 +54,14 @@ page 6181 "E-Document Purchase Draft"
                         Caption = 'Vendor No.';
                         Importance = Promoted;
                         ShowMandatory = true;
-                        ToolTip = 'Specifies the internal vendor identifier code.';
+                        ToolTip = 'Specifies the number of the vendor who delivers the products.';
                         Editable = PageEditable;
                         Lookup = true;
 
-                        trigger OnValidate()
-                        begin
-                            EDocumentPurchaseHeader.Validate("[BC] Vendor No.", EDocumentPurchaseHeader."[BC] Vendor No.");
-                            EDocumentPurchaseHeader.Modify();
-                            PrepareDraft();
-                        end;
-
                         trigger OnLookup(var Text: Text): Boolean
                         begin
-                            exit(LookupVendor(Text));
+                            LookupVendor();
                         end;
-
                     }
                     field("Vendor Name"; EDocumentPurchaseHeader."Vendor Company Name")
                     {
@@ -111,25 +96,13 @@ page 6181 "E-Document Purchase Draft"
                         Caption = 'Document No.';
                         ToolTip = 'Specifies the extracted ID for this specific document.';
                         Editable = true;
-
-                        trigger OnValidate()
-                        begin
-                            EDocumentPurchaseHeader.Modify();
-                            CurrPage.Update();
-                        end;
                     }
-                    field("Document Date"; EDocumentPurchaseHeader."Document Date")
+                    field("Document Date"; EDocumentPurchaseHeader."Invoice Date")
                     {
                         Caption = 'Document Date';
                         ToolTip = 'Specifies the extracted document date.';
                         Importance = Promoted;
                         Editable = true;
-
-                        trigger OnValidate()
-                        begin
-                            EDocumentPurchaseHeader.Modify();
-                            CurrPage.Update();
-                        end;
                     }
                     field("Due Date"; EDocumentPurchaseHeader."Due Date")
                     {
@@ -137,12 +110,6 @@ page 6181 "E-Document Purchase Draft"
                         Caption = 'Due Date';
                         ToolTip = 'Specifies the extracted due date.';
                         Editable = true;
-
-                        trigger OnValidate()
-                        begin
-                            EDocumentPurchaseHeader.Modify();
-                            CurrPage.Update();
-                        end;
                     }
                 }
                 field("Status"; Rec.Status)
@@ -205,16 +172,8 @@ page 6181 "E-Document Purchase Draft"
                 ApplicationArea = All;
                 Caption = 'Documents';
                 UpdatePropagation = Both;
-                SubPageLink = "Table ID" = const(Database::"E-Document"),
-                            "E-Document Entry No." = field("Entry No"),
-                            "E-Document Attachment" = const(true);
-            }
-            part(InboundEDocPicture; "Inbound E-Doc. Picture")
-            {
-                Caption = 'E-Document Pdf Preview';
-                SubPageLink = "Entry No." = field("Unstructured Data Entry No."),
-                            "File Format" = const("E-Doc. File Format"::PDF);
-                ShowFilter = false;
+                SubPageLink = "E-Document Entry No." = field("Entry No"),
+                              "E-Document Attachment" = const(true);
             }
             part(InboundEDocFactbox; "Inbound E-Doc. Factbox")
             {
@@ -293,49 +252,6 @@ page 6181 "E-Document Purchase Draft"
                     EDocImport.ViewExtractedData(Rec);
                 end;
             }
-            action(ClearErrors)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Clear errors';
-                ToolTip = 'Clears all error messages for the E-Document.';
-                Image = ClearLog;
-                Visible = HasErrorsOrWarnings;
-
-                trigger OnAction()
-                begin
-                    EDocumentErrorHelper.ClearErrorMessages(Rec);
-                    ClearErrorsAndWarnings();
-                end;
-            }
-        }
-        area(Navigation)
-        {
-            group(Vendors)
-            {
-                Visible = false;
-                action(CreateVendorAction)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Create Vendor';
-                    ToolTip = 'Creates a vendor based on the invoice details.';
-                    Image = Vendor;
-
-                    trigger OnAction()
-                    var
-                        Vendor: Record Vendor;
-                        VendorTemplMgt: Codeunit "Vendor Templ. Mgt.";
-                        VendorCard: Page "Vendor Card";
-                        IsHandled: Boolean;
-                    begin
-                        if VendorTemplMgt.CreateVendorFromTemplate(Vendor, IsHandled) then begin
-                            Vendor.Validate(Blocked, Enum::"Vendor Blocked"::All);
-                            Vendor.Modify();
-                            VendorCard.SetRecord(Vendor);
-                            VendorCard.Run();
-                        end;
-                    end;
-                }
-            }
         }
         area(Promoted)
         {
@@ -350,9 +266,6 @@ page 6181 "E-Document Purchase Draft"
                 actionref(Promoted_ViewFile; ViewFile)
                 {
                 }
-                actionref(Promoted_ClearErrors; ClearErrors)
-                {
-                }
             }
         }
     }
@@ -361,7 +274,6 @@ page 6181 "E-Document Purchase Draft"
     var
         EDocumentsSetup: Record "E-Documents Setup";
         ImportEDocumentProcess: Codeunit "Import E-Document Process";
-        EDocumentNotification: Codeunit "E-Document Notification";
     begin
         if not EDocumentsSetup.IsNewEDocumentExperienceActive() then
             Error('');
@@ -376,13 +288,26 @@ page 6181 "E-Document Purchase Draft"
         EDocumentServiceStatus := Rec.GetEDocumentServiceStatus();
         HasErrorsOrWarnings := false;
         HasErrors := false;
-        PageEditable := IsEditable();
-        EDocumentNotification.SendPurchaseDocumentDraftNotifications(Rec."Entry No");
+        PageEditable := ConditionallyEditable();
     end;
 
-    local procedure IsEditable(): Boolean
+    local procedure ConditionallyEditable(): Boolean
+    var
+        RecRef: RecordRef;
     begin
-        exit(Rec.Status <> Rec.Status::Processed);
+        if Rec."Document Record ID".TableNo() = 0 then
+            exit(true);
+
+        if not TryOpen(RecRef, Rec."Document Record ID".TableNo()) then
+            exit(true);
+
+        exit(not RecRef.Get(Rec."Document Record ID"));
+    end;
+
+    [TryFunction]
+    local procedure TryOpen(var RecRef: RecordRef; TableNo: Integer)
+    begin
+        RecRef.Open(TableNo);
     end;
 
     trigger OnAfterGetRecord()
@@ -403,8 +328,6 @@ page 6181 "E-Document Purchase Draft"
         ShowAnalyzeDocumentAction :=
             (Rec."Import Processing Status" = Enum::"Import E-Document Steps"::"Structure received data") and
             (Rec.Status = Enum::"E-Document Status"::Error);
-
-        PageEditable := IsEditable();
     end;
 
     local procedure SetPageCaption()
@@ -448,14 +371,11 @@ page 6181 "E-Document Purchase Draft"
         CurrPage.ErrorMessagesPart.Page.SetRecords(TempErrorMessage);
         CurrPage.ErrorMessagesPart.Page.Update(false);
 
-        ErrorsAndWarningsNotification.Id := GetErrorNotificationGuid();
-        ErrorsAndWarningsNotification.Scope := NotificationScope::LocalScope;
-        if ErrorsAndWarningsNotification.Recall() then;
         ErrorsAndWarningsNotification.Message(EDocHasErrorOrWarningMsg);
         ErrorsAndWarningsNotification.Send();
     end;
 
-    local procedure LookupVendor(var VendorNo: Text): Boolean
+    local procedure LookupVendor()
     var
         Vendor: Record Vendor;
         VendorList: Page "Vendor List";
@@ -463,8 +383,8 @@ page 6181 "E-Document Purchase Draft"
         VendorList.LookupMode := true;
         if VendorList.RunModal() = Action::LookupOK then begin
             VendorList.GetRecord(Vendor);
-            VendorNo := Vendor."No.";
-            exit(true);
+            EDocumentPurchaseHeader."[BC] Vendor No." := Vendor."No.";
+            EDocumentPurchaseHeader.Modify();
         end;
     end;
 
@@ -475,7 +395,6 @@ page 6181 "E-Document Purchase Draft"
         CurrPage.ErrorMessagesPart.Page.SetRecords(TempErrorMessage);
         CurrPage.ErrorMessagesPart.Page.Update(false);
 
-        ErrorsAndWarningsNotification.Id := GetErrorNotificationGuid();
         if ErrorsAndWarningsNotification.Recall() then;
     end;
 
@@ -496,7 +415,7 @@ page 6181 "E-Document Purchase Draft"
         if EDocumentErrorHelper.HasErrors(Rec) then
             exit;
 
-        PageEditable := IsEditable();
+        PageEditable := ConditionallyEditable();
         CurrPage.Lines.Page.Update();
         CurrPage.Update();
         Session.LogMessage('0000PCP', FinalizeDraftPerformedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', EDocPOCopilotMatching.FeatureName());
@@ -529,26 +448,6 @@ page 6181 "E-Document Purchase Draft"
             Progress.Close();
     end;
 
-    local procedure PrepareDraft()
-    var
-        EDocImportParameters: Record "E-Doc. Import Parameters";
-        EDocImport: Codeunit "E-Doc. Import";
-        EDocumentHelper: Codeunit "E-Document Helper";
-        Progress: Dialog;
-    begin
-        if not EDocumentHelper.EnsureInboundEDocumentHasService(Rec) then
-            exit;
-        if GuiAllowed() then
-            Progress.Open(ProcessingDocumentMsg);
-
-        EDocImportParameters."Step to Run" := Enum::"Import E-Document Steps"::"Prepare draft";
-        EDocImport.ProcessIncomingEDocument(Rec, EDocImportParameters);
-
-        Rec.Get(Rec."Entry No");
-        if GuiAllowed() then
-            Progress.Close();
-    end;
-
     local procedure AnalyzeEDocument()
     var
         EDocImportParameters: Record "E-Doc. Import Parameters";
@@ -571,11 +470,6 @@ page 6181 "E-Document Purchase Draft"
             Progress.Close();
     end;
 
-    local procedure GetErrorNotificationGuid(): Guid
-    begin
-        exit('5d928119-f61d-42f7-ba98-43bfcf8bfaeb');
-    end;
-
     var
         EDocumentPurchaseHeader: Record "E-Document Purchase Header";
         EDocumentServiceStatus: Record "E-Document Service Status";
@@ -590,7 +484,7 @@ page 6181 "E-Document Purchase Draft"
         HasErrorsOrWarnings, HasErrors : Boolean;
         ShowFinalizeDraftAction: Boolean;
         ShowAnalyzeDocumentAction: Boolean;
-        EDocHasErrorOrWarningMsg: Label 'Errors occurred when processing this draft. See errors in the "Error messages" section at the bottom of the page.';
+        EDocHasErrorOrWarningMsg: Label 'Errors or warnings found for E-Document. Please review below in "Error Messages" section.';
         FinalizeDraftInvokedTxt: Label 'User invoked Finalize Draft action.';
         FinalizeDraftPerformedTxt: Label 'User completed Finalize Draft action.';
         ProcessingDocumentMsg: Label 'Processing document...';

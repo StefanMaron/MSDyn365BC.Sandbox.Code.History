@@ -1,7 +1,7 @@
 namespace Microsoft.SubscriptionBilling;
 
 using System.Upgrade;
-#if not CLEANSCHEMA29
+#if not CLEAN27
 using Microsoft.Finance.GeneralLedger.Setup;
 #endif
 
@@ -16,10 +16,14 @@ codeunit 8032 "Upgrade Subscription Billing"
 
     trigger OnUpgradePerCompany()
     begin
-#if not CLEANSCHEMA29
+#if not CLEAN27
         UpdateClosedFlagForServiceCommitments();
         UpdateSourceNoForServiceObjects();
+#endif
+#if not CLEAN26
         UpdateTypeNoForContractLines();
+#endif
+#if not CLEAN27
         UpdateSourceNoForContractAnalysisEntries();
         UpdateDefaultPeriodsInServiceContractSetup();
         MoveCustContrDimensionToServiceContractSetup();
@@ -27,7 +31,7 @@ codeunit 8032 "Upgrade Subscription Billing"
         UpdateCreateContractDeferralsFlag();
     end;
 
-#if not CLEANSCHEMA29
+#if not CLEAN26
     local procedure UpdateTypeNoForContractLines()
     var
         CustomerContractLine: Record "Cust. Sub. Contract Line";
@@ -65,7 +69,9 @@ codeunit 8032 "Upgrade Subscription Billing"
     begin
         exit('MS-565334-TypeNoForContractLinessUpgradeTag-20250205');
     end;
+#endif
 
+#if not CLEAN27
     local procedure UpdateClosedFlagForServiceCommitments()
     var
         CustomerContractLine: Record "Cust. Sub. Contract Line";
@@ -261,8 +267,10 @@ codeunit 8032 "Upgrade Subscription Billing"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerCompanyUpgradeTags', '', false, false)]
     local procedure RegisterPerCompanyTags(var PerCompanyUpgradeTags: List of [Code[250]])
     begin
-#if not CLEANSCHEMA29
+#if not CLEAN26
         PerCompanyUpgradeTags.Add(GetTypeNoForContractLinesUpgradeTag());
+#endif
+#if not CLEAN27
         PerCompanyUpgradeTags.Add(GetClosedFlagUpgradeTag());
         PerCompanyUpgradeTags.Add(GetSourceNoForServiceObjectsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetSourceNoForContractAnalysisEntriesUpgradeTag());

@@ -268,7 +268,7 @@ table 8062 "Cust. Sub. Contract Line"
         OnAfterUpdateSubscriptionLineDescription(Rec);
     end;
 
-    procedure LoadServiceCommitmentForContractLine(var ServiceCommitment: Record "Subscription Line")
+    internal procedure LoadServiceCommitmentForContractLine(var ServiceCommitment: Record "Subscription Line")
     var
         LocalServiceCommitment: Record "Subscription Line"; //in case the parameter is passed as temporary table
     begin
@@ -424,7 +424,7 @@ table 8062 "Cust. Sub. Contract Line"
         SetRange("Contract Line Type", "Contract Line Type"::Item, "Contract Line Type"::"G/L Account");
     end;
 
-    procedure MergeContractLines(var CustomerContractLine: Record "Cust. Sub. Contract Line")
+    internal procedure MergeContractLines(var CustomerContractLine: Record "Cust. Sub. Contract Line")
     var
         RefCustomerContractLine: Record "Cust. Sub. Contract Line";
         SelectCustContractLines: Page "Select Cust. Contract Lines";
