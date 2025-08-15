@@ -104,7 +104,7 @@ xmlport 1610 "Sales Invoice - PEPPOL BIS 3.0"
 
                 trigger OnBeforePassVariable()
                 begin
-                    BuyerReference := PEPPOLMgt.GetBuyerReference(SalesHeader);
+                    BuyerReference := SalesHeader."Your Reference";
                     if BuyerReference = '' then
                         currXMLport.Skip();
                 end;
@@ -1367,7 +1367,7 @@ xmlport 1610 "Sales Invoice - PEPPOL BIS 3.0"
                         TransactionCurrencyTaxAmount: Text;
                         TransCurrTaxAmtCurrencyID: Text;
                     begin
-                        if (not FindNextVATAmtRec(TempVATAmtLine, TaxSubtotalLoop.Number)) and (TaxSubtotalLoop.Number > 1) then
+                        if not FindNextVATAmtRec(TempVATAmtLine, TaxSubtotalLoop.Number) then
                             currXMLport.Break();
 
                         PEPPOLMgt.GetTaxSubtotalInfo(
