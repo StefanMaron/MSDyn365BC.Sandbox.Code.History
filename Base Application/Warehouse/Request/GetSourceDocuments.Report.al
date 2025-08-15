@@ -657,7 +657,7 @@ report 5753 "Get Source Documents"
         ActivitiesCreated := ActivitiesCreated + 1;
         WhseHeaderCreated := true;
 
-        OnAfterCreateShptHeader(WhseShptHeader, "Warehouse Request", "Sales Line", "Purchase Line");
+        OnAfterCreateShptHeader(WhseShptHeader, "Warehouse Request", "Sales Line");
     end;
 
     procedure CreateReceiptHeader()
@@ -913,7 +913,7 @@ report 5753 "Get Source Documents"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateShptHeader(var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; WarehouseRequest: Record "Warehouse Request"; SalesLine: Record "Sales Line"; PurchaseLine: Record "Purchase Line")
+    local procedure OnAfterCreateShptHeader(var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; WarehouseRequest: Record "Warehouse Request"; SalesLine: Record "Sales Line")
     begin
     end;
 
