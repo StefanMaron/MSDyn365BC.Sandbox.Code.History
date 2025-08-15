@@ -126,12 +126,7 @@ codeunit 99000815 "Reservation-Check Date Confl."
             UpdateDate(ReservationEntry, RequisitionLine."Due Date");
 
         ReservMgt.SetReservSource(RequisitionLine);
-
-        IsHandled := false;
-        OnReqLineCheckOnBeforeClearSurplus(ReservMgt, IsHandled);
-        if not IsHandled then
-            ReservMgt.ClearSurplus();
-
+        ReservMgt.ClearSurplus();
         ReservMgt.AutoTrack(RequisitionLine."Quantity (Base)");
     end;
 
@@ -633,14 +628,5 @@ codeunit 99000815 "Reservation-Check Date Confl."
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnSameProdOrderAutoReserve(var FilterReservationEntry: Record "Reservation Entry"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnReqLineCheckOnBeforeClearSurplus(var ReservMgt: Codeunit "Reservation Management"; var IsHandled: Boolean)
-    begin
-    end;
 }
 
