@@ -482,8 +482,6 @@ codeunit 99000778 OrderTrackingManagement
                 end;
                 DrillOrdersUp(FilterReservEntry, Level);
             end;
-
-        OnAfterDrillOrdersUp(TempOrderTrackingEntry, ReservEntry, Level, EntryNo, SearchUp, SearchUpIsSet);
     end;
 
     local procedure ProcessReservEntry(var ReservEntry: Record "Reservation Entry"; var FilterReservEntry: Record "Reservation Entry"; var ContinueDrillUp: Boolean; var IncludePlanningFilter: Boolean; Level: Integer)
@@ -899,8 +897,7 @@ codeunit 99000778 OrderTrackingManagement
                         else
                             OnDerivePlanningFilterOnSetRequisitionLineFilters(ToReservEntry, FilterReqLine, OK);
                     end;
-            end else
-                OnDerivePlanningFilterOnCheckReservationSourceTypeElse(FromReservEntry, ToReservEntry, OK);
+            end;
         end;
     end;
 
@@ -969,16 +966,6 @@ codeunit 99000778 OrderTrackingManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnOrderTrackingEntryExistsOnBeforeFindTrackingEntry(var TempOrderTrackingEntry: Record "Order Tracking Entry" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnDerivePlanningFilterOnCheckReservationSourceTypeElse(var FromReservationEntry: Record "Reservation Entry"; var ToReservationEntry: Record "Reservation Entry"; var IsOK: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterDrillOrdersUp(var TempOrderTrackingEntry: Record "Order Tracking Entry" temporary; var ReservationEntry: Record "Reservation Entry"; Level: Integer; var EntryNo: Integer; var SearchUp: Boolean; var SearchUpIsSet: Boolean)
     begin
     end;
 }
