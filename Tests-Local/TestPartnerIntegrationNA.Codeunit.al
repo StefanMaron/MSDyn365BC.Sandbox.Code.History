@@ -223,8 +223,7 @@
         VerifyDataTypeBuffer(SalesStatsTxt);
     end;
 #endif
-#if not CLEAN27
-    [Obsolete('The statistics action will be replaced with the SalesStatistics action. The new action uses RunObject and does not run the action trigger', '27.0')]
+
     [Test]
     [HandlerFunctions('SalesOrderStatsPageHandler,SalesDocumentTestRequestPageHandler')]
     [Scope('OnPrem')]
@@ -262,7 +261,7 @@
         // [THEN] Integration Events have fired.
         VerifyDataTypeBuffer(OnBeforeCalculateSalesTaxStatisticsTxt);
     end;
-#endif
+
 #if not CLEAN26
     [Obsolete('The statistics action will be replaced with the SalesStatistics action. The new action uses RunObject and does not run the action trigger', '26.0')]
     [Test]
@@ -389,8 +388,6 @@
         VerifyDataTypeBuffer(SalesStatsTxt);
     end;
 #endif
-#if not CLEAN27
-    [Obsolete('The statistics action will be replaced with the SalesStatistics action. The new action uses RunObject and does not run the action trigger', '27.0')]
     [Test]
     [HandlerFunctions('SalesInvoiceStatsPageHandler')]
     [Scope('OnPrem')]
@@ -418,7 +415,7 @@
         VerifyDataTypeBuffer(OnBeforeCalculateSalesTaxStatisticsTxt);
         VerifyDataTypeBuffer(SalesStatsTxt);
     end;
-#endif
+
     [Test]
     [Scope('OnPrem')]
     procedure TestPostSalesOrderOnBeforePostUpdateOrderLine()
@@ -528,8 +525,6 @@
         VerifyDataTypeBuffer(SalesStatsTxt);
     end;
 #endif
-#if not CLEAN27
-    [Obsolete('The statistics action will be replaced with the SalesStatistics action. The new action uses RunObject and does not run the action trigger', '27.0')]
     [Test]
     [HandlerFunctions('SalesCreditMemoStatsPageHandler')]
     [Scope('OnPrem')]
@@ -558,7 +553,6 @@
         VerifyDataTypeBuffer(OnAfterCalculateSalesTaxStatisticsTxt);
     end;
 
-    [Obsolete('The statistics action will be replaced with the SalesStatistics action. The new action uses RunObject and does not run the action trigger', '27.0')]
     [Test]
     [HandlerFunctions('SalesCreditMemoStatsPageHandler')]
     [Scope('OnPrem')]
@@ -586,7 +580,7 @@
         VerifyDataTypeBuffer(OnBeforeCalculateSalesTaxStatisticsTxt);
         VerifyDataTypeBuffer(OnAfterCalculateSalesTaxStatisticsTxt);
     end;
-#endif
+
     [Test]
     [Scope('OnPrem')]
     procedure TestSalesPostPrepaymentsOnBeforeUpdateSalesTaxOnLines()
@@ -1497,7 +1491,6 @@
         InsertDataTypeBuffer(OnAfterCalculateSalesTaxStatisticsTxt);
     end;
 
-#if not CLEAN26
     [EventSubscriber(ObjectType::Page, Page::"Purchase Order", 'OnBeforeCalculateSalesTaxStatistics', '', false, false)]
     local procedure OnBeforeCalculateSalesTaxStatisticsPurchaseOrder(var PurchaseHeader: Record "Purchase Header"; ShowDialog: Boolean)
     begin
@@ -1510,6 +1503,7 @@
         InsertDataTypeBuffer(OnBeforeCalculateSalesTaxStatisticsTxt);
     end;
 
+#if not CLEAN26
     [EventSubscriber(ObjectType::Page, Page::"Purchase Invoice", 'OnBeforeCalculateSalesTaxStatistics', '', false, false)]
     local procedure OnBeforeCalculateSalesTaxStatisticsPurchaseInvoice(var PurchaseHeader: Record "Purchase Header"; ShowDialog: Boolean)
     begin
@@ -1719,7 +1713,7 @@
         SalesLine."Tax Group Code" := 'X';
         SalesLine.Modify();
     end;
-#if not CLEAN27
+
     local procedure CreateSalesInvoice(var SalesHeader: Record "Sales Header")
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
@@ -1734,7 +1728,7 @@
 
         CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
     end;
-#endif
+
     local procedure PostSalesOrder(var SalesHeader: Record "Sales Header")
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
@@ -1757,7 +1751,7 @@
 
         CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
     end;
-#if not CLEAN27
+
     local procedure CreateSalesCreditMemo(var SalesHeader: Record "Sales Header")
     var
         SalesLine: Record "Sales Line";
@@ -1777,7 +1771,7 @@
 
         CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
     end;
-#endif
+
 #if not CLEAN26
     [Obsolete('The statistics action will be replaced with the PurchaseOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
     local procedure CreatePurchaseHeader(var PurchaseHeader: Record "Purchase Header"; DocumentType: Enum "Purchase Document Type")
