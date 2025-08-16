@@ -8,6 +8,7 @@ table 8065 "Vend. Sub. Contract Line"
 {
     Caption = 'Vendor Subscription Contract Line';
     DataClassification = CustomerContent;
+    Access = Internal;
 
     fields
     {
@@ -272,14 +273,14 @@ table 8065 "Vend. Sub. Contract Line"
         end
     end;
 
-    internal procedure GetServiceCommitment(var ServiceCommitment: Record "Subscription Line"): Boolean
+    procedure GetServiceCommitment(var ServiceCommitment: Record "Subscription Line"): Boolean
     var
     begin
         ServiceCommitment.Init();
         exit(ServiceCommitment.Get(Rec."Subscription Line Entry No."));
     end;
 
-    internal procedure GetServiceObject(var ServiceObject: Record "Subscription Header"): Boolean
+    procedure GetServiceObject(var ServiceObject: Record "Subscription Header"): Boolean
     begin
         ServiceObject.Init();
         exit(ServiceObject.Get(Rec."Subscription Header No."));
