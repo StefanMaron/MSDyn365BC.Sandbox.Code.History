@@ -101,7 +101,7 @@ codeunit 32000000 "Ref. Payment Management"
                     GenJnlLine.Validate(Amount, RefPaymentImported.Amount * -1);
                     GenJnlLine.Comment := RefPaymentImported."Filing Code";
                     GenJnlLine.Validate("Bal. Account No.", GetBalAccountNo(GenJnlLine, AccCode, CustLedgEntry));
-                    OnSetLinesOnBeforeGenJnlLineInsert(CustLedgEntry, GenJnlLine, RefPaymentImported);
+                    OnSetLinesOnBeforeGenJnlLineInsert(CustLedgEntry, GenJnlLine);
                     GenJnlLine.Insert(true);
                     LineNro += LineNoIncrement;
                     LastDocNro := IncStr(LastDocNro);
@@ -436,7 +436,7 @@ codeunit 32000000 "Ref. Payment Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSetLinesOnBeforeGenJnlLineInsert(CustLedgEntry: Record "Cust. Ledger Entry"; var GenJnlLine: Record "Gen. Journal Line"; RefPaymentImported: Record "Ref. Payment - Imported")
+    local procedure OnSetLinesOnBeforeGenJnlLineInsert(CustLedgEntry: Record "Cust. Ledger Entry"; var GenJnlLine: Record "Gen. Journal Line")
     begin
     end;
 
