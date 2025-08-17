@@ -2,7 +2,8 @@ namespace Microsoft.SubscriptionBilling;
 
 enum 8061 "Date Formula Type"
 {
-    Extensible = true;
+    Extensible = false;
+    Access = Internal;
 
     value(0; Day)
     {
