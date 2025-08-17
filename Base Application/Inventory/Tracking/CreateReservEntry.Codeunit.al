@@ -112,7 +112,7 @@ codeunit 99000830 "Create Reserv. Entry"
             ReservEntry2."Source Prod. Order Line" := InsertReservEntry2."Source Prod. Order Line";
             ReservEntry2."Source Ref. No." := InsertReservEntry2."Source Ref. No.";
             ReservEntry2.CopyTrackingFromreservEntry(InsertReservEntry2);
-            ReservEntry2."Expiration Date" := ReservEntry."Expiration Date";
+            ReservEntry2."Expiration Date" := InsertReservEntry2."Expiration Date";
             ReservEntry2."Qty. per Unit of Measure" := InsertReservEntry2."Qty. per Unit of Measure";
             ReservEntry2."Untracked Surplus" := InsertReservEntry2."Untracked Surplus" and not ReservEntry2.Positive;
 
@@ -636,7 +636,7 @@ codeunit 99000830 "Create Reserv. Entry"
     begin
         // This event used internally for base app source tables
         OnCheckSourceTypeSubtype(ReservEntry, IsError);
-
+        
         // This event used for compatibility with previous versions
         OnAfterCheckValidity(ReservEntry, IsError);
 
@@ -955,6 +955,7 @@ codeunit 99000830 "Create Reserv. Entry"
         UseQtyToInvoice := UseQtyToInvoice2;
     end;
 
+    [Scope('OnPrem')]
     procedure SetUntrackedSurplus(OrderTracking: Boolean)
     begin
         InsertReservEntry."Untracked Surplus" := OrderTracking;
