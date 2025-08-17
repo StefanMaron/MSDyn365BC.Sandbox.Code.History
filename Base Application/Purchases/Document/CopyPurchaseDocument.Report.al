@@ -187,7 +187,7 @@ report 492 "Copy Purchase Document"
 
         OnPreReportOnBeforeCopyPurchaseDoc(CopyDocMgt, CurrReport.UseRequestPage(), IncludeHeader, RecalculateLines);
 
-        CopyDocMgt.CopyPurchDoc(FromDocType, FromDocNo, PurchHeader, true);
+        CopyDocMgt.CopyPurchDoc(FromDocType, FromDocNo, PurchHeader);
 
         OnAfterOnPreReport(FromDocType, FromDocNo, PurchHeader);
     end;
