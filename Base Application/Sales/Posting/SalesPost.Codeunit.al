@@ -542,7 +542,7 @@ codeunit 80 "Sales-Post"
                 QuoteManagement.RecalcPostedCreditMemo(SalesCrMemoHeader);
         end;
 
-        OnRunOnBeforePostICGenJnl(SalesHeader, SalesInvHeader, SalesCrMemoHeader, GenJnlPostLine, SrcCode, GenJnlLineDocType, GenJnlLineDocNo, ReturnRcptHeader, PreviewMode);
+        OnRunOnBeforePostICGenJnl(SalesHeader, SalesInvHeader, SalesCrMemoHeader, GenJnlPostLine, SrcCode, GenJnlLineDocType, GenJnlLineDocNo);
 
         if ICGenJnlLineNo > 0 then
             PostICGenJnl();
@@ -3007,7 +3007,6 @@ codeunit 80 "Sales-Post"
                             PurchOrderHeader.TestField("Receiving No. Series");
                             PurchOrderHeader."Receiving No." :=
                               NoSeries.GetNextNo(PurchOrderHeader."Receiving No. Series", SalesHeader."Posting Date");
-                            OnUpdateAssosOrderPostingNosOnBeforeModifyPurchOrderHeader(PurchOrderHeader, SalesHeader);
                             PurchOrderHeader.Modify();
                         end;
                         OnUpdateAssosOrderPostingNosOnAfterReleasePurchaseDocument(PurchOrderHeader, SalesHeader);
@@ -5942,35 +5941,35 @@ codeunit 80 "Sales-Post"
         IsHandled := false;
         OnBeforePostJobContractLine(
             SalesHeader, SalesLine, IsHandled, JobContractLine, InvoicePostingInterface, SalesLineACY, SalesInvHeader, SalesCrMemoHeader);
+        if IsHandled then
+            exit;
+
+        if SalesLine."Job Contract Entry No." = 0 then
+            exit;
+
+        IsHandled := false;
+        OnPostJobContractLineBeforeTestFields(SalesHeader, SalesLine, IsHandled);
         if not IsHandled then begin
-            if SalesLine."Job Contract Entry No." = 0 then
-                exit;
+            if (SalesHeader."Document Type" <> SalesHeader."Document Type"::Invoice) and
+               (SalesHeader."Document Type" <> SalesHeader."Document Type"::"Credit Memo")
+            then
+                SalesLine.TestField("Job Contract Entry No.", 0);
 
-            IsHandled := false;
-            OnPostJobContractLineBeforeTestFields(SalesHeader, SalesLine, IsHandled);
-            if not IsHandled then begin
-                if (SalesHeader."Document Type" <> SalesHeader."Document Type"::Invoice) and
-                   (SalesHeader."Document Type" <> SalesHeader."Document Type"::"Credit Memo")
-                then
-                    SalesLine.TestField("Job Contract Entry No.", 0);
-
-                SalesLine.TestField("Job No.");
-                SalesLine.TestField("Job Task No.");
-            end;
-
-            if SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice then
-                SalesLine."Document No." := SalesInvHeader."No.";
-            if SalesHeader."Document Type" = SalesHeader."Document Type"::"Credit Memo" then
-                SalesLine."Document No." := SalesCrMemoHeader."No.";
-            JobContractLine := true;
-#if not CLEAN23
-            if UseLegacyInvoicePosting() then
-                JobPostLine.PostInvoiceContractLine(SalesHeader, SalesLine)
-            else
-#endif
-            InvoicePostingInterface.PrepareJobLine(SalesHeader, SalesLine, SalesLineACY);
+            SalesLine.TestField("Job No.");
+            SalesLine.TestField("Job Task No.");
         end;
-        OnAfterPostJobContractLine(SalesHeader, SalesLine, GenJnlLineDocType, GenJnlLineDocNo, GenJnlLineExtDocNo, SrcCode);
+
+        if SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice then
+            SalesLine."Document No." := SalesInvHeader."No.";
+        if SalesHeader."Document Type" = SalesHeader."Document Type"::"Credit Memo" then
+            SalesLine."Document No." := SalesCrMemoHeader."No.";
+        JobContractLine := true;
+#if not CLEAN23
+        if UseLegacyInvoicePosting() then
+            JobPostLine.PostInvoiceContractLine(SalesHeader, SalesLine)
+        else
+#endif
+        InvoicePostingInterface.PrepareJobLine(SalesHeader, SalesLine, SalesLineACY);
     end;
 
     local procedure InsertICGenJnlLine(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var ICGenJnlLineNo: Integer)
@@ -9988,7 +9987,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnBeforePostICGenJnl(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var SrcCode: Code[10]; var GenJnlLineDocType: Enum "Gen. Journal Document Type"; GenJnlLineDocNo: Code[20]; var ReturnReceiptHeader: Record "Return Receipt Header"; var PreviewMode: Boolean)
+    local procedure OnRunOnBeforePostICGenJnl(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var SrcCode: Code[10]; var GenJnlLineDocType: Enum "Gen. Journal Document Type"; GenJnlLineDocNo: Code[20])
     begin
     end;
 
@@ -10694,11 +10693,10 @@ codeunit 80 "Sales-Post"
           BatchProcessingMgt.GetBooleanParameter(
             SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Replace Document Date", ReplaceDocumentDate) and
           BatchProcessingMgt.GetDateParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Posting Date", PostingDate);
+        OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(PostingDateExists, ReplacePostingDate, ReplaceDocumentDate, PostingDate, SalesHeader, ModifyHeader);
 
         VATDateExists := BatchProcessingMgt.GetBooleanParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Replace VAT Date", ReplaceVATDate);
         BatchProcessingMgt.GetDateParameter(SalesHeader.RecordId, Enum::"Batch Posting Parameter Type"::"VAT Date", VATDate);
-
-        OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(PostingDateExists, ReplacePostingDate, ReplaceDocumentDate, PostingDate, SalesHeader, ModifyHeader, VATDateExists, ReplaceVATDate, VATDate);
 
         if PostingDateExists and (ReplacePostingDate or (SalesHeader."Posting Date" = 0D)) then begin
             SalesHeader."Posting Date" := PostingDate;
@@ -12254,7 +12252,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(var PostingDateExists: Boolean; var ReplacePostingDate: Boolean; var ReplaceDocumentDate: Boolean; var PostingDate: Date; var SalesHeader: Record "Sales Header"; var ModifyHeader: Boolean; var VATDateExists: Boolean; var ReplaceVATDate: Boolean; var VATDate: Date)
+    local procedure OnValidatePostingAndDocumentDateOnAfterCalcPostingDateExists(var PostingDateExists: Boolean; var ReplacePostingDate: Boolean; var ReplaceDocumentDate: Boolean; var PostingDate: Date; var SalesHeader: Record "Sales Header"; var ModifyHeader: Boolean)
     begin
     end;
 
@@ -12770,16 +12768,6 @@ codeunit 80 "Sales-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertShptEntryRelationOnBeforeDeleteTempHandlingSpecification(var TempHandlingTrackingSpecification: Record "Tracking Specification" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateAssosOrderPostingNosOnBeforeModifyPurchOrderHeader(var PurchaseOrderHeader: Record "Purchase Header"; var SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPostJobContractLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var GenJnlLineDocType: Enum "Gen. Journal Document Type"; var GenJnlLineDocNo: Code[20]; var GenJnlLineExtDocNo: Code[35]; var SrcCode: Code[10])
     begin
     end;
 }
