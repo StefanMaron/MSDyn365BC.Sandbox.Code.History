@@ -273,7 +273,7 @@ codeunit 1006 "Copy Job"
                 NewDefaultDimension."Dimension Code" := DefaultDimension."Dimension Code";
                 NewDefaultDimension.TransferFields(DefaultDimension, false);
                 NewDefaultDimension.Insert();
-                DimMgt.DefaultDimOnInsert(NewDefaultDimension);
+                DimMgt.DefaultDimOnInsert(DefaultDimension);
             until DefaultDimension.Next() = 0;
 
         DimMgt.UpdateDefaultDim(

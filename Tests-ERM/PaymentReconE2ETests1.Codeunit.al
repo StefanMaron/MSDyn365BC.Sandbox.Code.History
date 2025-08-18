@@ -40,11 +40,14 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
     procedure TestTransactionsAlreadyImported()
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
-        BankAccReconciliation: array[2] of Record "Bank Acc. Reconciliation";
+        BankAccRecon: Record "Bank Acc. Reconciliation";
         BankAcc: Record "Bank Account";
         TempBlobUTF8: Codeunit "Temp Blob";
         PmtReconJnl: TestPage "Payment Reconciliation Journal";
+        DummyPmtReconJnl1: TestPage "Payment Reconciliation Journal";
+        DummyPmtReconJnl2: TestPage "Payment Reconciliation Journal";
         OutStream: OutStream;
+        i: Integer;
         BankStmtFormat: Code[20];
     begin
         CreateOneSaleOnePmtOutstream(CustLedgEntry, OutStream, TempBlobUTF8);
@@ -52,22 +55,35 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         BankStmtFormat := 'SEPA CAMT';
         CreateBankAcc(BankStmtFormat, BankAcc, '');
 
+        LibraryLowerPermissions.SetAccountReceivables();
         // Exercise
-        LibraryLowerPermissions.AddAccountReceivables();
-        OneSaleOnePmt1(BankAccReconciliation[1], BankAcc, TempBlobUTF8);
-        OneSaleOnePmt1(BankAccReconciliation[2], BankAcc, TempBlobUTF8);
+        for i := 1 to 2 do begin
+            if i = 1 then
+                PmtReconJnl := DummyPmtReconJnl1
+            else
+                PmtReconJnl := DummyPmtReconJnl2;
 
-        OpenPmtReconJnl(BankAccReconciliation[1], PmtReconJnl);
-        PmtReconJnl.Post.Invoke();
-        VerifyNoLinesImported(BankAccReconciliation[2]);
+            Clear(BankAccRecon);
+            LibraryERM.CreateBankAccReconciliation(BankAccRecon, BankAcc."No.", BankAccRecon."Statement Type"::"Payment Application");
+            SetupSourceMock(BankStmtFormat, TempBlobUTF8);
+            BankAccRecon.ImportBankStatement();
+            GetLinesAndUpdateBankAccRecStmEndingBalance(BankAccRecon);
 
-        OpenPmtReconJnl(BankAccReconciliation[2], PmtReconJnl);
-        asserterror PmtReconJnl.Post.Invoke(); // It should not be possible to post
-        PmtReconJnl.Close();
-        BankAccReconciliation[2].Find();
-        BankAccReconciliation[2].Delete(true); // It should be possible to delete the payment reconcilation journal
+            // CreateBankAccReconAndImportStmt(BankAccRecon,TempBlobUTF8);
+            OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
+            ApplyAutomatically(PmtReconJnl);
+            VerifyPrePost(BankAccRecon, PmtReconJnl);
+        end;
+        DummyPmtReconJnl1.First();
+        DummyPmtReconJnl1.Post.Invoke();
 
-        // Verify that all customers | gls | banks go to zero
+        VerifyNoLinesImported(BankAccRecon);
+        asserterror DummyPmtReconJnl2.Post.Invoke(); // It should not be possible to post
+        DummyPmtReconJnl2.Close();
+        BankAccRecon.Find();
+        BankAccRecon.Delete(true); // It should be possible to delete the payment reconcilation journal
+
+        // Verify that all Vendors | gls | banks go to zero
         VerifyCustLedgEntry(CustLedgEntry."Customer No.");
     end;
 
@@ -2348,21 +2364,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
 
         WriteCAMTStmtLine(
               OutStream, CustLedgEntry."Posting Date", CustLedgEntry."Document No.", CustLedgEntry."Remaining Amount" - CustLedgEntry."Remaining Pmt. Disc. Possible", CustLedgEntry."Currency Code");
-    end;
-
-    local procedure OneSaleOnePmt1(var BankAccRecon: Record "Bank Acc. Reconciliation"; BankAcc: Record "Bank Account"; TempBlobUTF8: Codeunit "Temp Blob")
-    var
-        PmtReconJnl: TestPage "Payment Reconciliation Journal";
-    begin
-        LibraryERM.CreateBankAccReconciliation(BankAccRecon, BankAcc."No.", BankAccRecon."Statement Type"::"Payment Application");
-        SetupSourceMock(BankAcc."Bank Statement Import Format", TempBlobUTF8);
-        BankAccRecon.ImportBankStatement();
-        GetLinesAndUpdateBankAccRecStmEndingBalance(BankAccRecon);
-
-        OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
-        ApplyAutomatically(PmtReconJnl);
-
-        VerifyPrePost(BankAccRecon, PmtReconJnl);
     end;
 
     local procedure OneSaleOnePmtExcessiveAmount(var CustLedgEntry: Record "Cust. Ledger Entry"; var OutStream: OutStream; ExcessiveAmount: Decimal)
