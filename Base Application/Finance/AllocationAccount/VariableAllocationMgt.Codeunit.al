@@ -36,14 +36,9 @@ codeunit 2670 "Variable Allocation Mgt."
         if TotalDistributedAmount = AmountToDistribute then
             exit;
 
-        foreach AccountSystemID in AmountDistributions.Keys() do begin
-            AmountDistributions.Get(AccountSystemID, AccountBalance);
-            if AccountBalance <> 0 then begin
-                AccountBalance += AmountToDistribute - TotalDistributedAmount;
-                AmountDistributions.Set(AccountSystemID, AccountBalance);
-                exit;
-            end;
-        end;
+        AmountDistributions.Get(AccountSystemID, AccountBalance);
+        AccountBalance += AmountToDistribute - TotalDistributedAmount;
+        AmountDistributions.Set(AccountSystemID, AccountBalance);
     end;
 
     internal procedure FixBalances(var ShareDistributions: Dictionary of [Guid, Decimal]; var FixedDistributions: Dictionary of [Guid, Decimal]; var TotalBalance: Decimal)
