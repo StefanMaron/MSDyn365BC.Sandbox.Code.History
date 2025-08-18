@@ -190,7 +190,6 @@ codeunit 134465 "ERM Increment Batch Name Tests"
         ResJournalLine.Validate("Posting Date", WorkDate());
         ResJournalLine.Validate("Entry Type", ResJournalLine."Entry Type"::Sale);
         ResJournalLine.Validate("Resource No.", LibraryResource.CreateResourceNo());
-        ResJournalLine.Validate("Document No.", ResJournalLine."Resource No.");
         ResJournalLine.Validate("Unit Price", 100);
         ResJournalLine.Modify(true);
 
@@ -229,7 +228,6 @@ codeunit 134465 "ERM Increment Batch Name Tests"
         ResJournalLine.Validate("Posting Date", WorkDate());
         ResJournalLine.Validate("Entry Type", ResJournalLine."Entry Type"::Sale);
         ResJournalLine.Validate("Resource No.", LibraryResource.CreateResourceNo());
-        ResJournalLine.Validate("Document No.", ResJournalLine."Resource No.");
         ResJournalLine.Validate("Unit Price", 100);
         ResJournalLine.Modify(true);
 
