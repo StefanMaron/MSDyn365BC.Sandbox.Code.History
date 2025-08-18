@@ -50,8 +50,8 @@ codeunit 136306 "Job Invoicing"
 #endif
         WrongDescriptionInPostedSalesInvoiceErr: Label 'Wrong Description in Sales Invoice Line.';
         TrackingOption: Option "Assign Lot No.","Assign Serial No.";
-        CancelPostedInvoiceQst: Label 'The posted sales invoice will be canceled, and a sales credit memo will be created and posted, which reverses the posted sales invoice.\ \Do you want to continue?';
-        CorrectPostedInvoiceQst: Label 'The posted sales invoice will be canceled, and a new version of the sales invoice will be created so that you can make the correction.\ \Do you want to continue?';
+        CancelPostedInvoiceQst: Label 'This invoice was posted from a sales order. To cancel it, a sales credit memo will be created and posted. The quantities from the original sales order will be restored, provided the sales order still exists.\ \Do you want to continue?';
+        CorrectPostedInvoiceQst: Label 'The posted sales invoice will be canceled, and a new version of the sales invoice will automatically be created by the system so that you can make the correction.\ \Do you want to continue?';
         JobMustNotBeBlockedErr: Label 'Project %1 must not be blocked', Comment = '%1 - Project No.';
         ExtDocNoErr: Label 'The actual %1 External Document No. and the expected %2 External Document No. are not equal', Comment = '%1 = Project, %2 = Sales Header';
         YourReferenceErr: Label 'The actual %1 Your Reference and the expected %2 Your Reference are not equal', Comment = '%1 = Project, %2 = Sales Header';
@@ -4080,6 +4080,50 @@ codeunit 136306 "Job Invoicing"
         JobPlanningLine.SetRange("Job No.", TargetJobNo);
         JobPlanningLine.FindFirst();
         Assert.IsFalse(JobPlanningLine."System-Created Entry", StrSubstNo(SystemCreatedEntryErr, JobPlanningLine."System-Created Entry"));
+    end;
+
+    [Test]
+    procedure PostPurchaseCreditMemoWithNonInventoryItemLinkedToProject()
+    var
+        Item: Record Item;
+        Job: Record Job;
+        JobTask: Record "Job Task";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
+        Vendor: Record Vendor;
+        DocumentNo: Code[20];
+    begin
+        // [SCENARIO 580434] Error when posting a Purchase Credit Memo for 'Non-Inventory' item with Project No. selected
+        Initialize();
+
+        // [GIVEN] Create Non-Inventory Item
+        LibraryInventory.CreateNonInventoryTypeItem(Item);
+
+        // [GIVEN] Create Job with Customer
+        CreateJobWithCustomer(Job);
+
+        // [GIVEN] Create Job Task
+        LibraryJob.CreateJobTask(Job, JobTask);
+
+        // [GIVEN] Create Vendor
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Create Purchase Credit Memo
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::"Credit Memo", Vendor."No.");
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, Item."No.", 1);
+
+        // [GIVEN] Set Job No., Job Task No. and Job Line Type as Billable
+        PurchaseLine.Validate("Job No.", Job."No.");
+        PurchaseLine.Validate("Job Task No.", JobTask."Job Task No.");
+        PurchaseLine.Validate("Job Line Type", PurchaseLine."Job Line Type"::Billable);
+        PurchaseLine.Modify(true);
+
+        // [WHEN] Post Purchase Credit Memo
+        DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+
+        // [THEN] No error should come, as posting for Non-Inventory Item.
+        PurchCrMemoHdr.Get(DocumentNo);
     end;
 
     local procedure Initialize()
