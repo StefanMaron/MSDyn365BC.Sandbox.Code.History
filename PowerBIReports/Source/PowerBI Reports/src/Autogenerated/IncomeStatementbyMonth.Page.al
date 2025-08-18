@@ -22,7 +22,7 @@ page 36985 "Income Statement by Month"
 
                 trigger ControlAddInReady()
                 begin
-                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
+                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageTok);
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
@@ -57,7 +57,7 @@ page 36985 "Income Statement by Month"
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageLbl: Label 'ReportSectionf72eb4d7e5e35db3b283', Locked = true;
+        ReportPageTok: Label 'ReportSectionf72eb4d7e5e35db3b283', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()

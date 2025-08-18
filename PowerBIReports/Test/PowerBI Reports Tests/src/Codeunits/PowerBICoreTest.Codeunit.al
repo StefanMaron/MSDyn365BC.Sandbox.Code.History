@@ -1,7 +1,10 @@
 namespace Microsoft.Finance.PowerBIReports.Test;
 
 using Microsoft.PowerBIReports;
-using Microsoft.PowerBIReports.Test;
+using Microsoft.Sales.PowerBIReports;
+using Microsoft.Purchases.PowerBIReports;
+using Microsoft.Manufacturing.PowerBIReports;
+using Microsoft.Finance.PowerBIReports;
 using System.TestLibraries.Security.AccessControl;
 
 codeunit 139875 "PowerBI Core Test"
@@ -12,13 +15,12 @@ codeunit 139875 "PowerBI Core Test"
     var
         Assert: Codeunit Assert;
         PermissionsMock: Codeunit "Permissions Mock";
-        PowerBIAPIRequests: Codeunit "PowerBI API Requests";
-        FilterScenario: Enum "PowerBI Filter Scenarios";
 
     [Test]
     procedure TestGenerateItemSalesReportDateFilter_StartEndDate()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Sales Filter Helper";
         ExpectedFilterTxt: Text;
         ActualFilterTxt: Text;
     begin
@@ -37,7 +39,7 @@ codeunit 139875 "PowerBI Core Test"
         ExpectedFilterTxt := Format(Today()) + '..' + Format(Today() + 10);
 
         // [WHEN] GenerateItemSalesReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Sales Date");
+        ActualFilterTxt := PBIMgt.GenerateItemSalesReportDateFilter();
 
         // [THEN] A filter text of format "%1..%2" should be created 
         Assert.AreEqual(ExpectedFilterTxt, ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -47,6 +49,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure TestGenerateItemSalesReportDateFilter_RelativeDate()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Sales Filter Helper";
         ExpectedFilterTxt: Text;
         ActualFilterTxt: Text;
     begin
@@ -64,7 +67,7 @@ codeunit 139875 "PowerBI Core Test"
         ExpectedFilterTxt := Format(CalcDate(PBISetup."Item Sales Date Formula")) + '..';
 
         // [WHEN] GenerateItemSalesReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Sales Date");
+        ActualFilterTxt := PBIMgt.GenerateItemSalesReportDateFilter();
 
         // [THEN] A filter text of format "%1.." should be created 
         Assert.AreEqual(ExpectedFilterTxt, ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -74,6 +77,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure TestGenerateItemSalesReportDateFilter_Blank()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Sales Filter Helper";
         ActualFilterTxt: Text;
     begin
         // [SCENARIO] Test GenerateItemSalesReportDateFilter
@@ -85,7 +89,7 @@ codeunit 139875 "PowerBI Core Test"
         PermissionsMock.ClearAssignments();
 
         // [WHEN] GenerateItemSalesReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Sales Date");
+        ActualFilterTxt := PBIMgt.GenerateItemSalesReportDateFilter();
 
         // [THEN] A blank filter text should be created 
         Assert.AreEqual('', ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -95,6 +99,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure GenerateItemPurchasesReportDateFilter_StartEndDate()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Purchases Filter Helper";
         ExpectedFilterTxt: Text;
         ActualFilterTxt: Text;
     begin
@@ -113,7 +118,7 @@ codeunit 139875 "PowerBI Core Test"
         ExpectedFilterTxt := Format(Today()) + '..' + Format(Today() + 10);
 
         // [WHEN] GenerateItemPurchasesReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Purchases Date");
+        ActualFilterTxt := PBIMgt.GenerateItemPurchasesReportDateFilter();
 
         // [THEN] A filter text of format "%1..%2" should be created 
         Assert.AreEqual(ExpectedFilterTxt, ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -123,6 +128,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure GenerateItemPurchasesReportDateFilter_RelativeDate()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Purchases Filter Helper";
         ExpectedFilterTxt: Text;
         ActualFilterTxt: Text;
     begin
@@ -140,7 +146,7 @@ codeunit 139875 "PowerBI Core Test"
         ExpectedFilterTxt := Format(CalcDate(PBISetup."Item Purch. Date Formula")) + '..';
 
         // [WHEN] GenerateItemPurchasesReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Purchases Date");
+        ActualFilterTxt := PBIMgt.GenerateItemPurchasesReportDateFilter();
 
         // [THEN] A filter text of format "%1.." should be created 
         Assert.AreEqual(ExpectedFilterTxt, ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -150,6 +156,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure GenerateItemPurchasesReportDateFilter_Blank()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Purchases Filter Helper";
         ActualFilterTxt: Text;
     begin
         // [SCENARIO] Test GenerateItemPurchasesReportDateFilter
@@ -161,7 +168,7 @@ codeunit 139875 "PowerBI Core Test"
         PermissionsMock.ClearAssignments();
 
         // [WHEN] GenerateItemPurchasesReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Purchases Date");
+        ActualFilterTxt := PBIMgt.GenerateItemPurchasesReportDateFilter();
 
         // [THEN] A blank filter text should be created 
         Assert.AreEqual('', ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -171,6 +178,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure GenerateManufacturingReportDateFilter_StartEndDate()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Manuf. Filter Helper";
         ExpectedFilterTxt: Text;
         ActualFilterTxt: Text;
     begin
@@ -189,7 +197,7 @@ codeunit 139875 "PowerBI Core Test"
         ExpectedFilterTxt := Format(Today()) + '..' + Format(Today() + 10);
 
         // [WHEN] GenerateManufacturingReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Manufacturing Date");
+        ActualFilterTxt := PBIMgt.GenerateManufacturingReportDateFilter();
 
         // [THEN] A filter text of format "%1..%2" should be created 
         Assert.AreEqual(ExpectedFilterTxt, ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -199,6 +207,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure GenerateManufacturingReportDateFilter_RelativeDate()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Manuf. Filter Helper";
         ExpectedFilterTxt: Text;
         ActualFilterTxt: Text;
     begin
@@ -216,7 +225,7 @@ codeunit 139875 "PowerBI Core Test"
         ExpectedFilterTxt := Format(CalcDate(PBISetup."Manufacturing Date Formula")) + '..';
 
         // [WHEN] GenerateManufacturingReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Manufacturing Date");
+        ActualFilterTxt := PBIMgt.GenerateManufacturingReportDateFilter();
 
         // [THEN] A filter text of format "%1.." should be created 
         Assert.AreEqual(ExpectedFilterTxt, ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -226,6 +235,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure GenerateManufacturingReportDateFilter_Blank()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Manuf. Filter Helper";
         ActualFilterTxt: Text;
     begin
         // [SCENARIO] Test GenerateManufacturingReportDateFilter
@@ -237,7 +247,7 @@ codeunit 139875 "PowerBI Core Test"
         PermissionsMock.ClearAssignments();
 
         // [WHEN] GenerateManufacturingReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Manufacturing Date");
+        ActualFilterTxt := PBIMgt.GenerateManufacturingReportDateFilter();
 
         // [THEN] A blank filter text should be created 
         Assert.AreEqual('', ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -247,6 +257,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure GenerateManufacturingReportDateTimeFilter_StartEndDate()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Manuf. Filter Helper";
         ExpectedFilterTxt: Text;
         ActualFilterTxt: Text;
     begin
@@ -265,7 +276,7 @@ codeunit 139875 "PowerBI Core Test"
         ExpectedFilterTxt := Format(CreateDateTime(Today(), 0T)) + '..' + Format(CreateDateTime(Today() + 10, 0T));
 
         // [WHEN] GenerateManufacturingReportDateTimeFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Manufacturing Date Time");
+        ActualFilterTxt := PBIMgt.GenerateManufacturingReportDateTimeFilter();
 
         // [THEN] A filter text of format "%1..%2" should be created 
         Assert.AreEqual(ExpectedFilterTxt, ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -275,6 +286,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure GenerateManufacturingReportDateTimeFilter_RelativeDate()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Manuf. Filter Helper";
         ExpectedFilterTxt: Text;
         ActualFilterTxt: Text;
     begin
@@ -292,7 +304,7 @@ codeunit 139875 "PowerBI Core Test"
         ExpectedFilterTxt := Format(CreateDateTime(CalcDate(PBISetup."Manufacturing Date Formula"), 0T)) + '..';
 
         // [WHEN] GenerateManufacturingReportDateTimeFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Manufacturing Date Time");
+        ActualFilterTxt := PBIMgt.GenerateManufacturingReportDateTimeFilter();
 
         // [THEN] A filter text of format "%1.." should be created 
         Assert.AreEqual(ExpectedFilterTxt, ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -302,6 +314,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure GenerateManufacturingReportDateTimeFilter_Blank()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Manuf. Filter Helper";
         ActualFilterTxt: Text;
     begin
         // [SCENARIO] Test GenerateManufacturingReportDateTimeFilter
@@ -313,7 +326,7 @@ codeunit 139875 "PowerBI Core Test"
         PermissionsMock.ClearAssignments();
 
         // [WHEN] GenerateManufacturingReportDateTimeFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Manufacturing Date Time");
+        ActualFilterTxt := PBIMgt.GenerateManufacturingReportDateTimeFilter();
 
         // [THEN] A blank filter text should be created 
         Assert.AreEqual('', ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -323,6 +336,7 @@ codeunit 139875 "PowerBI Core Test"
     procedure GenerateFinanceReportDateFilter_StartEndDate()
     var
         PBISetup: Record "PowerBI Reports Setup";
+        PBIMgt: Codeunit "Finance Filter Helper";
         ExpectedFilterTxt: Text;
         ActualFilterTxt: Text;
     begin
@@ -340,7 +354,7 @@ codeunit 139875 "PowerBI Core Test"
         ExpectedFilterTxt := Format(Today()) + '..' + Format(Today() + 10);
 
         // [WHEN] GenerateFinanceReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Finance Date");
+        ActualFilterTxt := PBIMgt.GenerateFinanceReportDateFilter();
 
         // [THEN] A filter text of format "%1..%2" should be created 
         Assert.AreEqual(ExpectedFilterTxt, ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -349,6 +363,7 @@ codeunit 139875 "PowerBI Core Test"
     [Test]
     procedure GenerateFinanceReportDateFilter_Blank()
     var
+        PBIMgt: Codeunit "Finance Filter Helper";
         ActualFilterTxt: Text;
     begin
         // [SCENARIO] Test GenerateFinanceReportDateFilter
@@ -358,7 +373,7 @@ codeunit 139875 "PowerBI Core Test"
         PermissionsMock.ClearAssignments();
 
         // [WHEN] GenerateFinanceReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Finance Date");
+        ActualFilterTxt := PBIMgt.GenerateFinanceReportDateFilter();
 
         // [THEN] A filter text of format "%1..%2" should be created 
         Assert.AreEqual('', ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -377,6 +392,5 @@ codeunit 139875 "PowerBI Core Test"
     procedure AssignAdminPermissionSet()
     begin
         PermissionsMock.Assign('PowerBI Report Admin');
-        PermissionsMock.Assign('D365 BUS FULL ACCESS');
     end;
 }
