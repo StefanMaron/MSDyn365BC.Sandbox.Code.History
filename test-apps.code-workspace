@@ -132,6 +132,9 @@
       "path": "./EDocumentConnectors/SignUp/Test/E-Document Connector - SignUp Tests"
     },
     {
+      "path": "./EDocumentConnectors/Continia/Test/E-Document Connector - Continia Tests"
+    },
+    {
       "path": "./Sustainability/Test/Sustainability Tests"
     },
     {
