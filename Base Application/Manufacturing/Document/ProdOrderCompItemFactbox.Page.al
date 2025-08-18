@@ -299,7 +299,6 @@ page 874 "Prod. Order Comp. Item FactBox"
     begin
         if GetItem() then begin
 
-            SetItemFilter();
             Evaluate(LookaheadDateformula, '<0D>');
 
             exit(
@@ -313,14 +312,6 @@ page 874 "Prod. Order Comp. Item FactBox"
         end;
     end;
 
-    local procedure SetItemFilter()
-    begin
-        Item.Reset();
-        Item.SetRange("Date Filter", 0D, CalcAvailabilityDate(Rec));
-        Item.SetRange("Variant Filter", Rec."Variant Code");
-        Item.SetRange("Location Filter", Rec."Location Code");
-    end;
-
     local procedure CalcAvailabilityDate(ProdOrderComponent: Record "Prod. Order Component"): Date
     begin
         if ProdOrderComponent."Due Date" <> 0D then
@@ -331,42 +322,32 @@ page 874 "Prod. Order Comp. Item FactBox"
 
     local procedure CalcAvailableInventory(): Decimal
     begin
-        if Rec."Item No." <> '' then begin
-            SetItemFilter();
+        if Rec."Item No." <> '' then
             exit(AvailableToPromise.CalcAvailableInventory(Item));
-        end;
     end;
 
     local procedure CalcScheduledReceipt(): Decimal
     begin
-        if Rec."Item No." <> '' then begin
-            SetItemFilter();
+        if Rec."Item No." <> '' then
             exit(AvailableToPromise.CalcScheduledReceipt(Item));
-        end;
     end;
 
     local procedure CalcGrossRequirement(): Decimal
     begin
-        if Rec."Item No." <> '' then begin
-            SetItemFilter();
+        if Rec."Item No." <> '' then
             exit(AvailableToPromise.CalcGrossRequirement(Item));
-        end;
     end;
 
     local procedure CalcReservedReceipt(): Decimal
     begin
-        if Rec."Item No." <> '' then begin
-            SetItemFilter();
+        if Rec."Item No." <> '' then
             exit(AvailableToPromise.CalcReservedReceipt(Item));
-        end;
     end;
 
     local procedure CalcReservedRequirement(): Decimal
     begin
-        if Rec."Item No." <> '' then begin
-            SetItemFilter();
+        if Rec."Item No." <> '' then
             exit(AvailableToPromise.CalcReservedRequirement(Item));
-        end;
     end;
 
     local procedure GetQtyReservedFromStockState() Result: Enum "Reservation From Stock"
