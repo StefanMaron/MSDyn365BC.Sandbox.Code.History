@@ -116,7 +116,7 @@ page 6630 "Sales Return Order"
                         field("Sell-to County"; Rec."Sell-to County")
                         {
                             ApplicationArea = SalesReturnOrder;
-                            CaptionClass = '5,1,' + Rec."Sell-to Country/Region Code";
+                            Caption = 'County';
                             Importance = Additional;
                             ToolTip = 'Specifies the county of the address.';
                         }
@@ -572,7 +572,7 @@ page 6630 "Sales Return Order"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = SalesReturnOrder;
-                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                            Caption = 'County';
                             ToolTip = 'Specifies the county of the address.';
                         }
                     }
@@ -630,23 +630,6 @@ page 6630 "Sales Return Order"
 
                             CurrPage.Update();
                         end;
-
-                        trigger OnLookup(var Text: Text): Boolean
-                        var
-                            Customer: Record Customer;
-                        begin
-                            if Customer.SelectCustomer(Customer) then begin
-                                xRec := Rec;
-                                Rec."Bill-to Name" := Customer.Name;
-                                Rec.Validate("Bill-to Customer No.", Customer."No.");
-                            end;
-
-                            if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
-                                if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
-                                    Rec.SetRange("Bill-to Customer No.");
-
-                            CurrPage.Update();
-                        end;
                     }
                     field("Bill-to Address"; Rec."Bill-to Address")
                     {
@@ -673,7 +656,7 @@ page 6630 "Sales Return Order"
                         field("Bill-to County"; Rec."Bill-to County")
                         {
                             ApplicationArea = SalesReturnOrder;
-                            CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
+                            Caption = 'County';
                             Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                             Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                             Importance = Additional;
@@ -962,7 +945,7 @@ page 6630 "Sales Return Order"
                     Visible = SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif
+#endif                    
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Sales Order Stats.";
                     RunPageOnRec = true;
@@ -1789,7 +1772,7 @@ page 6630 "Sales Return Order"
         CheckShowBackgrValidationNotification();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
 
-        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
+        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Sales Order Stats.";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
