@@ -575,9 +575,6 @@ report 10705 "Purchases Invoice Book"
 
                     trigger OnAfterGetRecord()
                     begin
-                        if (VATEntry."Non-Deductible VAT %" <> "Non-Deductible VAT %") and (VATEntry."Entry No." <> "Entry No.") then
-                            exit;
-
                         if ShowAutoInvCred and ("VAT Calculation Type" = "VAT Calculation Type"::"Reverse Charge VAT") then begin
                             VATBuffer."VAT %" := 0;
                             VATBuffer."EC %" := 0;
@@ -798,6 +795,8 @@ report 10705 "Purchases Invoice Book"
                 begin
                     VATBuffer.DeleteAll();
                     TempVATEntry := VATEntry;
+                    if TempVATEntry.Find() then
+                        CurrReport.Skip();
                     AmountVatReverse3 := AmountVatReverse;
 
                     DocType := Format("Document Type");
