@@ -10,10 +10,7 @@ using System.Environment.Configuration;
 
 codeunit 5060 DuplicateManagement
 {
-    Permissions = tabledata "Marketing Setup" = r,
-                  tabledata "Contact Duplicate" = rid,
-                  tabledata "Cont. Duplicate Search String" = rid,
-                  tabledata "Duplicate Search String Setup" = r;
+    Permissions = tabledata "Marketing Setup" = r;
 
     trigger OnRun()
     begin
