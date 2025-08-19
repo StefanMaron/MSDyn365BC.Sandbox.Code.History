@@ -23,6 +23,7 @@ using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.Setup;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Sales.History;
@@ -2066,9 +2067,9 @@ codeunit 22 "Item Jnl.-Post Line"
                 if TempTrackingSpecification.IsEmpty() then
                     if ItemJnlLine."Document Type" = ItemJnlLine."Document Type"::"Direct Transfer" then
                         if ItemLedgEntry.Quantity < 0 then
-                            ReservEntry.SetRange("Source Subtype", 0)
+                            ReservEntry.SetRange(Positive, false)
                         else
-                            ReservEntry.SetRange("Source Subtype", 1);
+                            ReservEntry.SetRange(Positive, true);
 
                 if not SkipReservationCheck then
                     UseReservationApplication := FindReservationEntryWithAdditionalCheckForAssemblyItem(ReservEntry);
@@ -3388,11 +3389,16 @@ codeunit 22 "Item Jnl.-Post Line"
             if GLSetup."Additional Reporting Currency" <> '' then
                 CostAmtACY := ACYMgt.CalcACYAmt(CostAmt, ValueEntry."Posting Date", false);
         end else begin
-            CostAmt :=
-              ValueEntry."Cost per Unit" * ValueEntry."Valued Quantity";
-            CostAmtACY :=
-              ValueEntry."Cost per Unit (ACY)" * ValueEntry."Valued Quantity";
-
+            if IsNondeductibleAndUseItemCost() then begin
+                CostAmt := ItemJnlLine.Amount;
+                CostAmtACY := ACYMgt.CalcACYAmt(CostAmt, ValueEntry."Posting Date", false);
+            end
+            else begin
+                CostAmt :=
+                  ValueEntry."Cost per Unit" * ValueEntry."Valued Quantity";
+                CostAmtACY :=
+                  ValueEntry."Cost per Unit (ACY)" * ValueEntry."Valued Quantity";
+            end;
             if MustConsiderUnitCostRoundingOnRevaluation(ItemJnlLine) then begin
                 CostAmt += RoundingResidualAmount;
                 CostAmtACY += RoundingResidualAmountACY;
@@ -4874,6 +4880,7 @@ codeunit 22 "Item Jnl.-Post Line"
         IsReserved: Boolean;
         IsHandled: Boolean;
         ShouldInsertCorrValueEntries: Boolean;
+        ShouldCheckItem: Boolean;
     begin
         IsHandled := false;
         OnBeforeUndoQuantityPosting(ItemJnlLine, IsHandled);
@@ -4897,11 +4904,15 @@ codeunit 22 "Item Jnl.-Post Line"
             OldItemLedgEntry.Get(ItemJnlLine."Applies-from Entry");
 
         if GetItem(OldItemLedgEntry."Item No.", false) then begin
-            Item.TestField(Blocked, false);
-            Item.CheckBlockedByApplWorksheet();
+            ShouldCheckItem := true;
+            OnUndoQuantityPostingOnBeforeCheckItem(Item, OldItemLedgEntry, ShouldCheckItem);
+            if ShouldCheckItem then begin
+                Item.TestField(Blocked, false);
+                Item.CheckBlockedByApplWorksheet();
 
-            if GetItemVariant(OldItemLedgEntry."Item No.", OldItemLedgEntry."Variant Code", false) then
-                ItemVariant.TestField(Blocked, false);
+                if GetItemVariant(OldItemLedgEntry."Item No.", OldItemLedgEntry."Variant Code", false) then
+                    ItemVariant.TestField(Blocked, false);
+            end;
         end;
 
         ItemJnlLine."Item No." := OldItemLedgEntry."Item No.";
@@ -5025,6 +5036,12 @@ codeunit 22 "Item Jnl.-Post Line"
     var
         EntriesExist: Boolean;
     begin
+        if OldItemLedgEntry."Entry Type" = OldItemLedgEntry."Entry Type"::Sale then
+            if (OldItemLedgEntry."Serial No." <> '') and (OldItemLedgEntry."Serial No." = ItemJnlLine."Serial No.") and
+                ((-OldItemLedgEntry.Quantity) > 0)
+            then
+                CheckItemSerialNoForCorrILE(ItemJnlLine);
+
         ItemLedgEntryNo := GetNextItemLedgerEntryNo(ItemLedgEntryNo);
         NewItemLedgEntry := OldItemLedgEntry;
         ItemTrackingMgt.RetrieveAppliedExpirationDate(NewItemLedgEntry);
@@ -6550,6 +6567,22 @@ codeunit 22 "Item Jnl.-Post Line"
             Window.Close();
     end;
 
+    local procedure IsNondeductibleAndUseItemCost(): Boolean
+    var
+        VATSetup: Record "VAT Setup";
+    begin
+        if (VATSetup.Get()) and (VATSetup."Enable Non-Deductible VAT") and
+           (VATSetup."Use For Item Cost") and
+           (Item."Costing Method" <> Item."Costing Method"::Standard) and
+           (ItemJnlLine."Value Entry Type" = ItemJnlLine."Value Entry Type"::"Direct Cost") and
+           (ItemJnlLine."Item Charge No." = '') and
+           (ItemJnlLine."Applies-from Entry" = 0) and
+           not ItemJnlLine.Adjustment and (ItemJnlLine."Document Type" <> ItemJnlLine."Document Type"::"Inventory Receipt") then
+            exit(true);
+
+        exit(false);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAllowProdApplication(OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var AllowApplication: Boolean)
     begin
@@ -7939,6 +7972,22 @@ codeunit 22 "Item Jnl.-Post Line"
             until ItemApplicationEntry.Next() = 0;
     end;
 
+    local procedure CheckItemSerialNoForCorrILE(ItemJnlLine: Record "Item Journal Line")
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        if SkipSerialNoQtyValidation then
+            exit;
+
+        ItemLedgerEntry.SetLoadFields(Quantity);
+        ItemLedgerEntry.SetRange("Item No.", ItemJnlLine."Item No.");
+        ItemLedgerEntry.SetRange("Variant Code", ItemJnlLine."Variant Code");
+        ItemLedgerEntry.SetTrackingFilterFromItemJournalLine(ItemJnlLine);
+        ItemLedgerEntry.CalcSums(Quantity);
+        if ItemLedgerEntry.Quantity > 0 then
+            Error(Text014, ItemJnlLine."Serial No.");
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sequence No. Mgt.", 'OnPreviewableLedgerEntry', '', false, false)]
     local procedure OnPreviewableLedgerEntry(TableNo: Integer; var IsPreviewable: Boolean)
     begin
@@ -8621,6 +8670,11 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetupTempSplitItemJnlLine(var ItemJnlLine2: Record "Item Journal Line"; var SignFactor: Integer; var NonDistrQuantity: Decimal; var NonDistrAmount: Decimal; var NonDistrAmountACY: Decimal; var NonDistrDiscountAmount: Decimal; var Invoice: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUndoQuantityPostingOnBeforeCheckItem(Item: Record Item; ItemLedgerEntry: Record "Item Ledger Entry"; var ShouldCheckItem: Boolean)
     begin
     end;
 }
