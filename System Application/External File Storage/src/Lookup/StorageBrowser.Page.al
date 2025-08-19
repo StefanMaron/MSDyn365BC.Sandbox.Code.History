@@ -161,13 +161,12 @@ page 9455 "Storage Browser"
         BrowseFolder(Path);
     end;
 
-    internal procedure EnableSaveFileLookupMode(Path: Text; FileNameSuggestion: Text; FileExtension: Text)
+    internal procedure EnableSaveFileLookupMode(Path: Text; FileExtension: Text)
     var
         FileFilterTok: Label '*.%1', Locked = true;
     begin
         ShowFileName := true;
         FileFilter := StrSubstNo(FileFilterTok, FileExtension);
-        SaveFileName := FileNameSuggestion;
         EnableLookupMode();
         BrowseFolder(Path);
     end;
