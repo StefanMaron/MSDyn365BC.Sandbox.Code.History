@@ -5,7 +5,6 @@
 namespace Microsoft.eServices.EDocument;
 
 using Microsoft.eServices.EDocument.IO;
-using Microsoft.eServices.EDocument.Processing.Import;
 using System.DataAdministration;
 using System.Apps.AppSource;
 using System.Telemetry;
@@ -18,7 +17,6 @@ page 6103 "E-Document Services"
     CardPageID = "E-Document Service";
     PageType = List;
     SourceTable = "E-Document Service";
-    SourceTableView = where(Code = filter(<> 'MSEOCADI' & <> 'AGENT' & <> 'E-DOC DEMO DATA'));
     AdditionalSearchTerms = 'EServices,Service,edoc,edocument';
     DataCaptionFields = Code;
     Editable = false;
@@ -139,22 +137,6 @@ page 6103 "E-Document Services"
                         EDocumentInstall.ImportSalesCreditMemoXML();
                         EDocumentInstall.ImportServiceInvoiceXML();
                         EDocumentInstall.ImportServiceCreditMemoXML();
-                    end;
-                }
-
-                action(ConfigureAdditionalFields)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Configure additional fields';
-                    Tooltip = 'Configure the additional fields to consider when importing an E-Document.';
-                    Image = AddContacts;
-
-                    trigger OnAction()
-                    var
-                        EDocAdditionalFieldsSetup: Page "EDoc Additional Fields Setup";
-                    begin
-                        EDocAdditionalFieldsSetup.SetEDocumentService(Rec);
-                        EDocAdditionalFieldsSetup.RunModal();
                     end;
                 }
             }

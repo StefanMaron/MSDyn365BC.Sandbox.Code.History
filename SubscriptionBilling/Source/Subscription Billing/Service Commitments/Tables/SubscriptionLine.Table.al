@@ -181,14 +181,6 @@ table 8059 "Subscription Line"
         field(16; "Invoicing via"; Enum "Invoicing Via")
         {
             Caption = 'Invoicing via';
-            trigger OnValidate()
-            begin
-                if "Invoicing via" = "Invoicing via"::Sales then
-                    "Create Contract Deferrals" := "Create Contract Deferrals"::No
-                else
-                    "Create Contract Deferrals" := "Create Contract Deferrals"::"Contract-dependent";
-
-            end;
         }
         field(17; "Invoicing Item No."; Code[20])
         {
@@ -211,13 +203,7 @@ table 8059 "Subscription Line"
 
             trigger OnValidate()
             begin
-                if IsNoticePeriodEmpty() then
-                    exit;
-
                 DateFormulaManagement.ErrorIfDateFormulaNegative("Notice Period");
-
-                if "Term until" <> 0D then
-                    UpdateCancellationPossibleUntil();
             end;
         }
         field(21; "Initial Term"; DateFormula)
@@ -373,16 +359,6 @@ table 8059 "Subscription Line"
             FieldClass = FlowField;
             CalcFormula = lookup("Subscription Header".Quantity where("No." = field("Subscription Header No.")));
         }
-        field(40; "Create Contract Deferrals"; Enum "Create Contract Deferrals")
-        {
-            Caption = 'Create Contract Deferrals';
-
-            trigger OnValidate()
-            begin
-                if OpenDeferralsExist() then
-                    Error(DeferralsExistErr);
-            end;
-        }
         field(42; "Customer Price Group"; Code[10])
         {
             Caption = 'Customer Price Group';
@@ -531,7 +507,6 @@ table 8059 "Subscription Line"
             FieldClass = FlowField;
             CalcFormula = lookup("Subscription Header"."Source No." where("No." = field("Subscription Header No.")));
         }
-#if not CLEANSCHEMA29
         field(8009; "Item No."; Code[20])
         {
             Caption = 'Item No.';
@@ -547,7 +522,6 @@ table 8059 "Subscription Line"
             ObsoleteTag = '29.0';
 #endif
         }
-#endif
         field(8010; "Subscription Description"; Text[100])
         {
             Caption = 'Subscription Description';
@@ -613,22 +587,14 @@ table 8059 "Subscription Line"
         BillingLineForServiceCommitmentExistErr: Label 'The contract line is in the current billing. Delete the billing line to be able to adjust the Subscription Line start date.';
         BillingLineArchiveForServiceCommitmentExistErr: Label 'The contract line has already been billed. The Subscription Line start date can no longer be changed.';
         NoManualEntryOfUnitCostLCYForVendorServCommErr: Label 'Please use the fields "Calculation Base Amount" and "Calculation Base %" in order to update the unit cost.';
-        DeferralsExistErr: Label 'The creation of contract deferrals cannot be changed as there are still unreleased deferrals for this contract line.';
 
-    internal procedure CheckServiceDates()
+    local procedure CheckServiceDates()
     begin
         CheckServiceDates(Rec."Subscription Line Start Date", Rec."Subscription Line End Date", Rec."Next Billing Date");
     end;
 
     internal procedure CheckServiceDates(ServiceStartDate: Date; ServiceEndDate: Date; NextBillingDate: Date)
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCheckServiceDates(ServiceStartDate, ServiceEndDate, NextBillingDate, IsHandled);
-        if IsHandled then
-            exit;
-
         if (ServiceStartDate <> 0D) and (ServiceEndDate <> 0D) then
             if ServiceStartDate > ServiceEndDate then
                 Error(DateBeforeDateErr, Rec.FieldCaption("Subscription Line End Date"), Rec.FieldCaption("Subscription Line Start Date"));
@@ -640,7 +606,7 @@ table 8059 "Subscription Line"
         end;
     end;
 
-    local procedure DisplayErrorIfContractLinesExist(ErrorTxt: Text; CheckContractLineClosed: Boolean)
+    internal procedure DisplayErrorIfContractLinesExist(ErrorTxt: Text; CheckContractLineClosed: Boolean)
     var
         CustomerContractLine: Record "Cust. Sub. Contract Line";
         VendorContractLine: Record "Vend. Sub. Contract Line";
@@ -768,7 +734,7 @@ table 8059 "Subscription Line"
 
     internal procedure UpdateCancellationPossibleUntil(): Boolean
     begin
-        if IsNoticePeriodEmpty() or ("Term until" = 0D) then
+        if IsNoticePeriodEmpty() then
             exit(false);
         CalendarManagement.ReverseDateFormula(NegativeDateFormula, "Notice Period");
         "Cancellation Possible Until" := CalcDate(NegativeDateFormula, "Term Until");
@@ -985,14 +951,10 @@ table 8059 "Subscription Line"
                         Validate("Next Price Update", "Next Price Update");
                     FieldNo("Period Calculation"):
                         Validate("Period Calculation", "Period Calculation");
-                    FieldNo("Notice Period"):
-                        Validate("Notice Period", "Notice Period");
                     FieldNo("Price Binding Period"):
                         Validate("Period Calculation", "Period Calculation");
                     FieldNo("Unit Cost (LCY)"):
                         Validate("Unit Cost (LCY)", "Unit Cost (LCY)");
-                    FieldNo("Create Contract Deferrals"):
-                        Validate("Create Contract Deferrals", "Create Contract Deferrals");
                 end;
                 Modify(true);
             end;
@@ -1205,7 +1167,6 @@ table 8059 "Subscription Line"
         Rec."Usage Based Billing" := SalesServiceCommitment."Usage Based Billing";
         Rec."Usage Based Pricing" := SalesServiceCommitment."Usage Based Pricing";
         Rec."Pricing Unit Cost Surcharge %" := SalesServiceCommitment."Pricing Unit Cost Surcharge %";
-        Rec."Create Contract Deferrals" := SalesServiceCommitment."Create Contract Deferrals";
         OnAfterCopyFromSalesSubscriptionLine(Rec, SalesServiceCommitment);
     end;
 
@@ -1261,7 +1222,6 @@ table 8059 "Subscription Line"
     begin
         if not GuiAllowed then
             exit(false);
-        Commit(); // Save changes before opening the page
         ExchangeRateSelectionPage.SetData(WorkDate(), CurrencyCode, NewMessageTxt);
         ExchangeRateSelectionPage.SetIsCalledFromServiceObject(CalledFromServiceObject);
         if ExchangeRateSelectionPage.RunModal() = Action::Ok then begin
@@ -1313,7 +1273,7 @@ table 8059 "Subscription Line"
         Rec.SetRange("Subscription Contract No.", ContractNo);
     end;
 
-    local procedure InitCurrencyData()
+    internal procedure InitCurrencyData()
     var
         Currency: Record Currency;
     begin
@@ -1433,7 +1393,7 @@ table 8059 "Subscription Line"
     local procedure FindServiceCommitmentArchiveCreatedInLessThanMinute(var ServiceCommitmentArchive: Record "Subscription Line Archive"): Boolean
     begin
         ServiceCommitmentArchive.FilterOnServiceCommitment(Rec."Entry No.");
-        ServiceCommitmentArchive.SetRange(SystemModifiedAt, CurrentDateTime() - 60000, CurrentDateTime());
+        ServiceCommitmentArchive.SetRange(SystemModifiedAt, CurrentDateTime - 60000, CurrentDateTime);
         exit(ServiceCommitmentArchive.FindLast());
     end;
 
@@ -1579,7 +1539,7 @@ table 8059 "Subscription Line"
         end;
     end;
 
-    local procedure DeleteContractPriceUpdateLines()
+    internal procedure DeleteContractPriceUpdateLines()
     var
         ContractPriceUpdateLine: Record "Sub. Contr. Price Update Line";
     begin
@@ -1709,7 +1669,7 @@ table 8059 "Subscription Line"
         exit(Rec."Usage Based Billing" and (Rec."Subscription Header No." <> ''));
     end;
 
-    local procedure GetOriginalInvoicedToDateIfRebillingMetadataExist() OriginalInvoicedToDate: Date
+    internal procedure GetOriginalInvoicedToDateIfRebillingMetadataExist() OriginalInvoicedToDate: Date
     var
         UsageDataBillingMetadata: Record "Usage Data Billing Metadata";
     begin
@@ -1879,76 +1839,48 @@ table 8059 "Subscription Line"
             Error(NoManualEntryOfUnitCostLCYForVendorServCommErr);
     end;
 
-    internal procedure OpenDeferralsExist(): Boolean
-    var
-        CustSubContractDeferral: Record "Cust. Sub. Contract Deferral";
-        VendSubContractDeferral: Record "Vend. Sub. Contract Deferral";
-    begin
-        if "Subscription Contract No." = '' then
-            exit(false);
-        case Partner of
-            Enum::"Service Partner"::Customer:
-                begin
-                    CustSubContractDeferral.SetRange(Released, false);
-                    CustSubContractDeferral.SetRange("Subscription Contract No.", "Subscription Contract No.");
-                    exit(not CustSubContractDeferral.IsEmpty());
-                end;
-            Enum::"Service Partner"::Vendor:
-                begin
-                    VendSubContractDeferral.SetRange(Released, false);
-                    VendSubContractDeferral.SetRange("Subscription Contract No.", "Subscription Contract No.");
-                    exit(not VendSubContractDeferral.IsEmpty());
-                end;
-        end;
-    end;
-
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterUpdateNextBillingDate(var SubscriptionLine: Record "Subscription Line"; LastBillingToDate: Date)
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterCalculateServiceAmount(var SubscriptionLine: Record "Subscription Line"; CalledByFieldNo: Integer)
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterUpdateSubscriptionLine(var SubscriptionLine: Record "Subscription Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterGetCombinedDimensionSetID(var SubscriptionLine: Record "Subscription Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeValidateShortcutDimCode(var SubscriptionLine: Record "Subscription Line"; xSubscriptionLine: Record "Subscription Line"; FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterValidateShortcutDimCode(var SubscriptionLine: Record "Subscription Line"; xSubscriptionLine: Record "Subscription Line"; FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeValidateDimensionSetID(var SubscriptionLine: Record "Subscription Line"; xSubscriptionLine: Record "Subscription Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterValidateDimensionSetID(var SubscriptionLine: Record "Subscription Line"; xSubscriptionLine: Record "Subscription Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterCopyFromSalesSubscriptionLine(var SubscriptionLine: Record "Subscription Line"; SalesSubscriptionLine: Record "Sales Subscription Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckServiceDates(ServiceStartDate: Date; ServiceEndDate: Date; NextBillingDate: Date; var IsHandled: Boolean)
     begin
     end;
 }

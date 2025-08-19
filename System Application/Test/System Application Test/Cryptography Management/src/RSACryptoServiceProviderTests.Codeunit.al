@@ -200,7 +200,6 @@ codeunit 132613 RSACryptoServiceProviderTests
         DecryptingTempBlob.CreateOutStream(DecryptedOutStream);
         asserterror RSACryptoServiceProvider.Decrypt(PrivateKeyXmlStringSecret, EncryptedInStream, false, DecryptedOutStream);
 
-
         // [THEN] Error occurs
         LibraryAssert.ExpectedError('A call to System.Security.Cryptography.RSACryptoServiceProvider.Decrypt failed with this message:');
     end;
