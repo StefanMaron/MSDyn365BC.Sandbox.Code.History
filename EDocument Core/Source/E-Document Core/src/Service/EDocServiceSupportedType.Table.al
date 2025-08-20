@@ -7,7 +7,6 @@ namespace Microsoft.eServices.EDocument;
 table 6122 "E-Doc. Service Supported Type"
 {
     DataClassification = CustomerContent;
-    ReplicateData = false;
 
     fields
     {

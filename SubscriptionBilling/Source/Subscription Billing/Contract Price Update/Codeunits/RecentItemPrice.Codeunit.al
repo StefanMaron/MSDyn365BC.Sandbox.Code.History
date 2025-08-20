@@ -12,20 +12,20 @@ codeunit 8011 "Recent Item Price" implements "Contract Price Update"
         IncludeServiceCommitmentUpToDate: Date;
         PerformUpdateOnDate: Date;
 
-    internal procedure SetPriceUpdateParameters(NewPriceUpdateTemplate: Record "Price Update Template"; NewIncludeServiceCommitmentUpToDate: Date; NewPerformUpdateOnDate: Date)
+    procedure SetPriceUpdateParameters(NewPriceUpdateTemplate: Record "Price Update Template"; NewIncludeServiceCommitmentUpToDate: Date; NewPerformUpdateOnDate: Date)
     begin
         PriceUpdateTemplate := NewPriceUpdateTemplate;
         IncludeServiceCommitmentUpToDate := NewIncludeServiceCommitmentUpToDate;
         PerformUpdateOnDate := NewPerformUpdateOnDate;
     end;
 
-    internal procedure ApplyFilterOnServiceCommitments()
+    procedure ApplyFilterOnServiceCommitments()
     begin
         PriceUpdateManagement.TestIncludeServiceCommitmentUpToDate(IncludeServiceCommitmentUpToDate);
         PriceUpdateManagement.GetAndApplyFiltersOnServiceCommitment(ServiceCommitment, PriceUpdateTemplate, IncludeServiceCommitmentUpToDate);
     end;
 
-    internal procedure CreatePriceUpdateProposal()
+    procedure CreatePriceUpdateProposal()
     begin
         if ServiceCommitment.FindSet() then
             repeat
