@@ -17,22 +17,19 @@ codeunit 11600 "ABN Management"
 
     var
         Text1450000: Label 'You can enter only numbers in this field.';
-        Text1450001: Label 'You should enter an 11 or 13-digit number in this field.';
+        Text1450001: Label 'You should enter an 11-digit number in this field.';
         Text1450002: Label 'The number is invalid.';
         Text1450003: Label 'The number already exists for %1 %2. Do you wish to continue?';
 
-    procedure CheckABN(ABN: Text[13]; Which: Option Customer,Vendor,Internal,Contact)
+    procedure CheckABN(ABN: Text[11]; Which: Option Customer,Vendor,Internal,Contact)
     var
         CheckDigit: Integer;
-        AbnDigit: array[13] of Integer;
-        WeightFactor: array[13] of Integer;
+        AbnDigit: array[11] of Integer;
+        WeightFactor: array[11] of Integer;
         AbnWeightSum: Integer;
         i: Integer;
         j: Integer;
-        WeightLength: Integer;
-        Reminder: Integer;
         IsHandled: Boolean;
-        LengthCheck: Boolean;
     begin
         IsHandled := false;
         OnBeforeCheckABN(ABN, Which, IsHandled);
@@ -44,50 +41,30 @@ codeunit 11600 "ABN Management"
 
         if StrPos(ABN, ' ') <> 0 then
             Error(Text1450000);
-
-        LengthCheck := (StrLen(ABN) <> 13);
-
-        if LengthCheck then
-            LengthCheck := (StrLen(ABN) <> 11);
-
-        if LengthCheck then
+        if StrLen(ABN) <> 11 then
             Error(Text1450001);
 
-        if (StrLen(ABN) = 13) and (which = Which::Internal) then begin
-            WeightLength := 15;
-            for i := 1 to StrLen(ABN) do begin
-                Evaluate(j, ABN[i]);
-                AbnWeightSum += j * (WeightLength - 1);
-            end;
-            Reminder := AbnWeightSum mod 11;
-            CheckDigit := 11 - Reminder;
-            if CheckDigit <> 0 then
-                Error(Text1450002);
-            if CheckDigit <> ABN[StrLen(ABN)] then
-                Error(Text1450002);
-        end else begin
-            j := -1;
-            CheckDigit := 89;
-            Clear(AbnDigit);
-            Clear(WeightFactor);
-            Clear(AbnWeightSum);
+        j := -1;
+        CheckDigit := 89;
+        Clear(AbnDigit);
+        Clear(WeightFactor);
+        Clear(AbnWeightSum);
 
-            for i := 1 to 11 do begin
-                if not Evaluate(AbnDigit[i], CopyStr(ABN, i, 1)) then
-                    Error(Text1450000);
-                if i = 1 then begin
-                    AbnDigit[i] := AbnDigit[i] - 1;
-                    WeightFactor[i] := 10;
-                end else begin
-                    j += 2;
-                    WeightFactor[i] := j;
-                end;
-                AbnWeightSum += (WeightFactor[i] * AbnDigit[i]);
+        for i := 1 to 11 do begin
+            if not Evaluate(AbnDigit[i], CopyStr(ABN, i, 1)) then
+                Error(Text1450000);
+            if i = 1 then begin
+                AbnDigit[i] := AbnDigit[i] - 1;
+                WeightFactor[i] := 10;
+            end else begin
+                j += 2;
+                WeightFactor[i] := j;
             end;
-
-            if AbnWeightSum mod CheckDigit <> 0 then
-                Error(Text1450002);
+            AbnWeightSum += (WeightFactor[i] * AbnDigit[i]);
         end;
+
+        if AbnWeightSum mod CheckDigit <> 0 then
+            Error(Text1450002);
 
         CheckForDuplicates(ABN, Which);
     end;
