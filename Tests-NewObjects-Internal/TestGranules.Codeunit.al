@@ -182,10 +182,7 @@ codeunit 132532 "Test Granules"
         TempTableDataAllObj: Record AllObj temporary;
         TempExpandedPermission: Record "Expanded Permission" temporary;
         TableMetadata: Record "Table Metadata";
-        TablesWithInherentEntitlements: Dictionary of [Integer, Boolean];
     begin
-        // Get tables that use inherent entitlements
-        TablesWithInherentEntitlements := GetTablesWithInherentEntitlements();
 
         // CopyAllAppTableObjectsToTempBuffer and CopyAllTablePermissionsToTempBuffer to contain correct ranges
         CopyAllAppTableObjectsToTempBuffer(TempTableDataAllObj);
@@ -200,7 +197,7 @@ codeunit 132532 "Test Granules"
             if ((TempExpandedPermission."Object Type" <> TempExpandedPermission."Object Type"::"Table Data") or
                     not TableMetadata.Get(TempExpandedPermission."Object ID") or
                     (TableMetadata.TableType <> 6)) and
-                    not TablesWithInherentEntitlements.ContainsKey(TempExpandedPermission."Object ID") then
+                    (TableMetadata.InherentEntitlements = '') and (TableMetadata.InherentPermissions = '') then // Do not validate tables with inherent permissions
                 Assert.IsFalse(TempTableDataAllObj.IsEmpty, StrSubstNo(PermissionDoesNotExistsTxt, TempExpandedPermission."Object ID", TempExpandedPermission."Role ID"));
         until TempExpandedPermission.Next() = 0;
     end;
@@ -462,11 +459,7 @@ codeunit 132532 "Test Granules"
     var
         AllObj: Record AllObj;
         TableMetadata: Record "Table Metadata";
-        TablesWithInherentEntitlements: Dictionary of [Integer, Boolean];
     begin
-        // Get tables that use inherent entitlements
-        TablesWithInherentEntitlements := GetTablesWithInherentEntitlements();
-
         // Add all tabledata into the TempTableDataAllObj
         AllObj.SetRange("Object Type", AllObj."Object Type"::TableData);
         AllObj.SetFilter("Object ID", '<>%1', 5105); // Skip table 5105 Customer Template
@@ -475,7 +468,7 @@ codeunit 132532 "Test Granules"
             TableMetadata.Get(AllObj."Object ID");
 
             if (TableMetadata.ObsoleteState <> TableMetadata.ObsoleteState::Removed) // Do not validate removed tables
-                    and (not TablesWithInherentEntitlements.ContainsKey(AllObj."Object ID")) // Do not validate tables with inherent permissions
+                    and (TableMetadata.InherentEntitlements = '') and (TableMetadata.InherentPermissions = '') // Do not validate tables with inherent permissions
                     and (TableMetadata.TableType <> 6) then begin // Do not Validate temporary tables
                 TempTableDataAllObj := AllObj;
                 TempTableDataAllObj.Insert();
@@ -641,33 +634,6 @@ codeunit 132532 "Test Granules"
 
         O365PermissionSetsList.Add(XSECURITYTxt);
         O365PermissionSetsList.Add(XLOCALTxt);
-    end;
-
-    local procedure GetTablesWithInherentEntitlements() TablesWithInherentEntitlements: Dictionary of [Integer, Boolean]
-    begin
-        // Only add a table here if all entitlements for the table is given through inherent entitlements and the table does not need to exist in any permission set.
-        // This is a workaround pending bug 464349.
-
-        TablesWithInherentEntitlements.Add(150, true); // Signup Context Values
-        TablesWithInherentEntitlements.Add(1470, true); // Product Video Buffer
-        TablesWithInherentEntitlements.Add(1480, true); // Edit in Excel Settings
-        TablesWithInherentEntitlements.Add(2718, true); // Page Summary Settings
-        TablesWithInherentEntitlements.Add(4325, true); // SOA Setup
-        TablesWithInherentEntitlements.Add(4585, true); // SOA Email
-        TablesWithInherentEntitlements.Add(4586, true); // SOA Billing Log
-        TablesWithInherentEntitlements.Add(4587, true); // SOA Billing Task Setup
-        TablesWithInherentEntitlements.Add(4592, true); // SOA KPI Entry
-        TablesWithInherentEntitlements.Add(4593, true); // SOA KPI
-        TablesWithInherentEntitlements.Add(4594, true); // SOA Task
-        TablesWithInherentEntitlements.Add(4690, true); // Recurrence Schedule
-        TablesWithInherentEntitlements.Add(5490, true); // Onboarding Signal 
-        TablesWithInherentEntitlements.Add(7775, true); // Copilot Settings
-        TablesWithInherentEntitlements.Add(8703, true); // Feature Uptake
-        TablesWithInherentEntitlements.Add(9008, true); // User Login
-        TablesWithInherentEntitlements.Add(9011, true); // User Environment Login
-        TablesWithInherentEntitlements.Add(9222, true); // Application User Settings
-        TablesWithInherentEntitlements.Add(9996, true); // Upgrade Tag Backup
-        TablesWithInherentEntitlements.Add(9999, true); // Upgrade Tags
     end;
 
     local procedure IsComposedPermissionSet(RoleID: Code[20]): Boolean
