@@ -2127,14 +2127,7 @@ table 5900 "Service Header"
             Caption = 'Starting Date';
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateStartingDate(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if "Starting Date" <> 0D then begin
                     if "Starting Date" < "Order Date" then
                         Error(Text026, FieldCaption("Starting Date"), FieldCaption("Order Date"));
@@ -2173,14 +2166,7 @@ table 5900 "Service Header"
             Caption = 'Starting Time';
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateStartingTime(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
-
                 TestField("Starting Date");
 
                 if ("Starting Date" = "Finishing Date") and
@@ -2218,14 +2204,7 @@ table 5900 "Service Header"
             Caption = 'Finishing Date';
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateFinishingDate(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if "Finishing Date" <> 0D then begin
                     if "Finishing Date" < "Starting Date" then
                         Error(Text026, FieldCaption("Finishing Date"), FieldCaption("Starting Date"));
@@ -2278,11 +2257,6 @@ table 5900 "Service Header"
             var
                 IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateFinishingTime(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
-
                 TestField("Finishing Date");
                 if "Finishing Time" <> 0T then begin
                     if ("Starting Date" = "Finishing Date") and
@@ -3076,7 +3050,7 @@ table 5900 "Service Header"
         OldDimSetID := "Dimension Set ID";
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
 
-        OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(Rec, xRec, FieldNumber);
+        OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(Rec, xRec);
         if ServItemLineExists() or ServLineExists() then
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
 
@@ -4164,13 +4138,7 @@ table 5900 "Service Header"
         ErrorMessageMgt: Codeunit "Error Message Management";
         ErrorMessageHandler: Codeunit "Error Message Handler";
         ServPostYesNo: Codeunit "Service-Post (Yes/No)";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeSendToPostWithLines(Rec, TempServLine, CodeunitId, IsHandled, IsSuccess);
-        if IsHandled then
-            exit(IsSuccess);
-
         Commit();
         ErrorMessageMgt.Activate(ErrorMessageHandler);
         ErrorMessageMgt.PushContext(ErrorContextElement, RecordId, 0, '');
@@ -4795,7 +4763,6 @@ table 5900 "Service Header"
         "Post Code" := Cust."Post Code";
         County := Cust.County;
         "Country/Region Code" := Cust."Country/Region Code";
-        "VAT Country/Region Code" := "Country/Region Code";
         if not SkipContact then begin
             "Contact Name" := Cust.Contact;
             "Phone No." := Cust."Phone No.";
@@ -5261,15 +5228,10 @@ table 5900 "Service Header"
         ServiceContractHeader."Next Invoice Date" := ServDocReg."Next Invoice Date";
         ServiceContractHeader."Next Invoice Period Start" := ServDocReg."Next Invoice Period Start";
         ServiceContractHeader."Next Invoice Period End" := ServDocReg."Next Invoice Period End";
-        if ServiceContractHeader.Prepaid then
-            ServiceContractHeader."Last Invoice Period End" := ServiceContractHeader."Next Invoice Date" - 1;
 
         ServiceContractHeader.CalcFields("No. of Posted Invoices", "No. of Unposted Invoices");
         if (ServiceContractHeader."No. of Posted Invoices" = 0) and (ServiceContractHeader."No. of Unposted Invoices" = 1) then
             ServiceContractHeader."Last Invoice Date" := 0D;
-
-        if ServiceContractHeader."Last Invoice Date" = 0D then
-            ServiceContractHeader."Last Invoice Period End" := 0D;
 
         exit(true);
     end;
@@ -5947,7 +5909,7 @@ table 5900 "Service Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; FieldNumber: Integer);
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header");
     begin
     end;
 
@@ -6048,31 +6010,6 @@ table 5900 "Service Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteOnBeforeArchiveServiceDocument(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSendToPostWithLines(var ServiceHeader: Record "Service Header"; var TempServiceLine: Record "Service Line" temporary; PostingCodeunitID: Integer; var IsHandled: Boolean; var IsSuccess: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateStartingDate(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateStartingTime(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateFinishingDate(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateFinishingTime(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
