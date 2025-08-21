@@ -19,7 +19,6 @@ codeunit 5814 "Undo Return Shipment Line"
                   TableData "Item Entry Relation" = ri,
                   TableData "Return Shipment Line" = rimd;
     TableNo = "Return Shipment Line";
-    EventSubscriberInstance = Manual;
 
     trigger OnRun()
     var
@@ -49,7 +48,6 @@ codeunit 5814 "Undo Return Shipment Line"
         UndoPostingMgt: Codeunit "Undo Posting Management";
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
         WhseUndoQty: Codeunit "Whse. Undo Quantity";
-        ItemsToAdjust: List of [Code[20]];
         HideDialog: Boolean;
         JobItem: Boolean;
         NextLineNo: Integer;
@@ -90,7 +88,6 @@ codeunit 5814 "Undo Return Shipment Line"
             CheckReturnShptLine(ReturnShptLine);
         until ReturnShptLine.Next() = 0;
 
-        BindSubscription(this);
         ReturnShptLine.Find('-');
         repeat
             TempGlobalItemLedgEntry.Reset();
@@ -135,7 +132,6 @@ codeunit 5814 "Undo Return Shipment Line"
             if not JobItem then
                 JobItem := (ReturnShptLine.Type = ReturnShptLine.Type::Item) and (ReturnShptLine."Job No." <> '');
         until ReturnShptLine.Next() = 0;
-        UnbindSubscription(this);
 
         MakeInventoryAdjustment();
 
@@ -326,22 +322,14 @@ codeunit 5814 "Undo Return Shipment Line"
 
     local procedure MakeInventoryAdjustment()
     var
+        Invtsetup: Record "Inventory Setup";
         InvtAdjmtHandler: Codeunit "Inventory Adjustment Handler";
     begin
-        InvtAdjmtHandler.SetJobUpdateProperties(not JobItem);
-        InvtAdjmtHandler.MakeAutomaticInventoryAdjustment(ItemsToAdjust);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem', '', false, false)]
-    local procedure OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem(var Item2: Record Item)
-    var
-        InventorySetup: Record "Inventory Setup";
-    begin
-        if InventorySetup.UseLegacyPosting() then
-            exit;
-
-        if not ItemsToAdjust.Contains(Item2."No.") then
-            ItemsToAdjust.Add(Item2."No.");
+        InvtSetup.Get();
+        if InvtSetup.AutomaticCostAdjmtRequired() then begin
+            InvtAdjmtHandler.SetJobUpdateProperties(not JobItem);
+            InvtAdjmtHandler.MakeInventoryAdjustment(true, InvtSetup."Automatic Cost Posting");
+        end;
     end;
 
     [IntegrationEvent(false, false)]
