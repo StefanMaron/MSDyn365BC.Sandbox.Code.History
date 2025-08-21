@@ -22,7 +22,7 @@ pageextension 1956 "LPP  Sales Order" extends "Sales Order"
                 var
                     LPPredictionMgt: Codeunit "LP Prediction Mgt.";
                 begin
-                    Rec.CheckAmountMoreThanZero();
+                    CheckAmountMoreThanZero();
                     LPPredictionMgt.PredictLateShowResult(Rec);
                 end;
             }
