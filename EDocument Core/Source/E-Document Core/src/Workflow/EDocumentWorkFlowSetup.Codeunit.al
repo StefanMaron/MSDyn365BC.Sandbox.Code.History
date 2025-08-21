@@ -8,9 +8,9 @@ using System.Automation;
 
 codeunit 6139 "E-Document Workflow Setup"
 {
-    Access = Public;
+    Access = Internal;
 
-    internal procedure InsertSendToSingleServiceTemplate()
+    procedure InsertSendToSingleServiceTemplate()
     var
         Workflow: Record Workflow;
         WorkflowSetup: Codeunit "Workflow Setup";
@@ -23,7 +23,7 @@ codeunit 6139 "E-Document Workflow Setup"
         Workflow.Modify();
     end;
 
-    internal procedure InsertSendToMultiServiceTemplate()
+    procedure InsertSendToMultiServiceTemplate()
     var
         Workflow: Record Workflow;
         WorkflowSetup: Codeunit "Workflow Setup";
@@ -36,12 +36,12 @@ codeunit 6139 "E-Document Workflow Setup"
         Workflow.Modify();
     end;
 
-    internal procedure EDocReceived(): Code[128]
+    procedure EDocReceived(): Code[128]
     begin
         exit('EDOCRECEIVED');
     end;
 
-    internal procedure EDocImport(): Code[128]
+    procedure EDocImport(): Code[128]
     begin
         exit('EDOCIMPORT');
     end;
@@ -56,7 +56,7 @@ codeunit 6139 "E-Document Workflow Setup"
         exit('EDOCCREATEDEVENT')
     end;
 
-    internal procedure EDocStatusChanged(): code[128];
+    procedure EDocStatusChanged(): code[128];
     begin
         exit('EDOCSENT')
     end;
@@ -105,7 +105,7 @@ codeunit 6139 "E-Document Workflow Setup"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Workflow Response Handling", OnExecuteWorkflowResponse, '', true, true)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Workflow Response Handling", 'OnExecuteWorkflowResponse', '', true, true)]
     local procedure ExecuteEdocWorkflowResponses(ResponseWorkflowStepInstance: Record "Workflow Step Instance"; var ResponseExecuted: Boolean; var Variant: Variant; xVariant: Variant)
     var
         WorkflowResponse: Record "Workflow Response";
