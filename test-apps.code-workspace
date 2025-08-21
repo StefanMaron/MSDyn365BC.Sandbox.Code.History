@@ -111,6 +111,9 @@
       "path": "./EU3PartyTradePurchase/test/EU 3-Party Trade Purchase Tests"
     },
     {
+      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
+    },
+    {
       "path": "./Sustainability/Test/Sustainability Tests"
     },
     {
@@ -261,6 +264,9 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
+      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
+    },
+    {
       "path": "./Email - Outlook REST API/Test"
     },
     {
@@ -283,6 +289,9 @@
     },
     {
       "path": "./ContosoCoffeeDemoDataset/Test/Contoso Coffee Demo Dataset Tests/src/TestImplementations"
+    },
+    {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./ReportLayouts/Test/Report Layouts Tests"
