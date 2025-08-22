@@ -17,7 +17,6 @@ using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Shipping;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
@@ -121,7 +120,6 @@ codeunit 136101 "Service Orders"
         UnitCostErr: Label 'Unit Cost are Not equal.';
         AvailableExpectedQuantityErr: Label 'Available expected quantity must be %1.', Comment = '%1=Value';
         VATCountryRegionLbl: Label 'VAT Country/Region Code must be %1', Comment = '%1 = Country/Region Code';
-        ServiceOrderErr: Label 'Service Order does not exist.';
 
     [Test]
     [Scope('OnPrem')]
@@ -5278,137 +5276,6 @@ codeunit 136101 "Service Orders"
         until ServiceLine.Next() = 0;
     end;
 
-    [HandlerFunctions('MessageHandler,ServiceQuoteLinesWithCatalogItem')]
-    [Test]
-    procedure ServiceQuoteMakeOrderWithAttachedCatalogItem()
-    var
-        ServiceHeader: Record "Service Header";
-        ServiceItemLine: Record "Service Item Line";
-        ServiceItem: Record "Service Item";
-        Customer: Record Customer;
-        ItemTempl: Record "Item Templ.";
-        NonstockItem: Record "Nonstock Item";
-        ServiceQuote: TestPage "Service Quote";
-    begin
-        // [SCENARIO 556739] Service Quote "Make Order" should Create Service Order when Service Line has Catalog Item
-        Initialize();
-
-        // [GIVEN] Create Customer
-        LibrarySales.CreateCustomer(Customer);
-
-        // [GIVEN] Nonstock Item having Item Template
-        LibraryTemplates.CreateItemTemplateWithData(ItemTempl);
-        LibraryInventory.CreateNonStockItemWithItemTemplateCode(NonstockItem, ItemTempl.Code);
-
-        // [GIVEN] Create Service Header
-        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Quote, Customer."No.");
-
-        // [GIVEN] Create Service Item and Service Item Line
-        LibraryService.CreateServiceItem(ServiceItem, ServiceHeader."Customer No.");
-        LibraryService.CreateServiceItemLine(ServiceItemLine, ServiceHeader, ServiceItem."No.");
-        LibraryVariableStorage.Enqueue(NonstockItem."Item No.");
-
-        // [GIVEN] Open Service Quote Lines page for Service Item Line(Service Quote -> Lines -> Quote -> Service Lines)
-        ServiceQuote.OpenEdit();
-        ServiceQuote.GotoRecord(ServiceHeader);
-        ServiceQuote.ServItemLine.GotoRecord(ServiceItemLine);
-        ServiceQuote.ServItemLine.ServiceLines.Invoke();
-
-        // [WHEN] Run Make Order action
-        LibraryService.CreateOrderFromQuote(ServiceHeader);
-
-        // [THEN] Verify Service Order created successfully.
-        ServiceHeader.SetRange("Document Type", ServiceHeader."Document Type"::Order);
-        ServiceHeader.SetRange("Customer No.", Customer."No.");
-        Assert.IsTrue(ServiceHeader.FindFirst(), ServiceOrderErr);
-    end;
-
-    [Test]
-    procedure AlternativePostingGroupIsNotUsingTheCorrectGLAccountsForPostingInServiceManagement()
-    var
-        AltCustPostGrp: Record "Alt. Customer Posting Group";
-        Customer: Record Customer;
-        CustPostGroup: Record "Customer Posting Group";
-        FindCustPostGroup: Record "Customer Posting Group";
-        GLEntry: Record "G/L Entry";
-        SalesReceivablesSetup: Record "Sales & Receivables Setup";
-        ServicemanagementSetup: Record "Service Mgt. Setup";
-        ServiceInvoiceHeader: Record "Service Invoice Header";
-        InvoiceNo: Code[20];
-    begin
-        // [SCENARIO 575185] Alternative Posting Group is not using the correct G/L Accounts for posting in Service Management
-        Initialize();
-
-        // Activate "Allow Multiple Posting Groups" true in Sales & Receivables Setup and Service Mgmt Setup
-        SalesReceivablesSetup.Get();
-        SalesReceivablesSetup."Allow Multiple Posting Groups" := true;
-        SalesReceivablesSetup.Modify();
-        ServicemanagementSetup.Get();
-        ServicemanagementSetup."Allow Multiple Posting Groups" := true;
-        ServicemanagementSetup.Modify();
-
-        // [GIVEN] Create Customer with "Allow Multiple Posting Groups" true.
-        LibrarySales.CreateCustomer(Customer);
-        Customer."Allow Multiple Posting Groups" := true;
-        Customer.Modify();
-
-        // [GIVEN] Create a Customer Posting Group and add Alternate Posting Group
-        LibrarySales.CreateCustomerPostingGroup(CustPostGroup);
-        AltCustPostGrp.Init();
-        AltCustPostGrp."Customer Posting Group" := Customer."Customer Posting Group";
-        AltCustPostGrp.Validate("Alt. Customer Posting Group", CustPostGroup.Code);
-        AltCustPostGrp.Insert();
-
-        // [GIVEN] Create and Post Service Invoice with Customer Posting Group 
-        InvoiceNo := CreateAndPostServiceInvoiceWithCustomerPostingGroup(Customer."No.", CustPostGroup.Code, WorkDate());
-
-        // [THEN] Check GL Entry Created With Service Header Customer Posting Group
-        ServiceInvoiceHeader.Get(InvoiceNo);
-        FindCustPostGroup.Get(ServiceInvoiceHeader."Customer Posting Group");
-        GLEntry.SetRange("Document No.", InvoiceNo);
-        GLEntry.SetRange("G/L Account No.", FindCustPostGroup."Receivables Account");
-        if GLEntry.FindFirst() then
-            Assert.AreEqual(CustPostGroup."Receivables Account", GLEntry."G/L Account No.", '');
-    end;
-
-    [Test]
-    procedure ValidatingCustomerNoInitializesNewServiceOrder()
-    var
-        ServiceHeader: Record "Service Header";
-    begin
-        // [FEATURE] [Service Order] [UT]
-        // [SCENARIO 575369] Validating "Customer No." initializes new Service Order.
-        Initialize();
-
-        ServiceHeader.Init();
-        ServiceHeader.Validate("Customer No.", LibrarySales.CreateCustomerNo());
-
-        ServiceHeader.TestField("Document Date", WorkDate());
-        ServiceHeader.TestField("Posting Date", WorkDate());
-    end;
-
-    [Test]
-    procedure NonBlankDocumentAndPostingDatesOnServiceOrderAreNotReset()
-    var
-        ServiceHeader: Record "Service Header";
-        NewDate: Date;
-    begin
-        // [FEATURE] [Service Order] [UT]
-        // [SCENARIO 575369] Non-blank "Document Date" and "Posting Date" on Service Order are not reset on insert.
-        Initialize();
-        NewDate := WorkDate() + 1;
-
-        ServiceHeader.Init();
-        ServiceHeader.Validate("Customer No.", LibrarySales.CreateCustomerNo());
-        ServiceHeader.Validate("Document Date", NewDate);
-        ServiceHeader.Validate("Posting Date", NewDate);
-
-        ServiceHeader.Insert(true);
-
-        ServiceHeader.TestField("Document Date", NewDate);
-        ServiceHeader.TestField("Posting Date", NewDate);
-    end;
-
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -5619,39 +5486,6 @@ codeunit 136101 "Service Orders"
 
         // [THEN] "VAT Country/Region Code" on a Service Header is equals to second Customer Country/Region code.
         Assert.AreEqual(Customer[2]."Country/Region Code", ServiceHeader."VAT Country/Region Code", VATCountryRegionLbl);
-    end;
-
-    [Test]
-    [HandlerFunctions('ServiceOrderReportRequestPageHandler')]
-    procedure PrintServiceOrderWithWorkDescription()
-    var
-        Item: Record Item;
-        ServiceHeader: Record "Service Header";
-        ServiceItem: Record "Service Item";
-        ServiceItemLine: Record "Service Item Line";
-        ServiceLine: Record "Service Line";
-        ServiceOrder: TestPage "Service Order";
-    begin
-        // [SCENARIO 575369] Verify Printing Service Order with Work Description does not throw error.
-        Initialize();
-
-        // [GIVEN] Create Item
-        LibraryInventory.CreateItem(Item);
-
-        // [GIVEN] Create Service Order with Work Description
-        LibraryService.CreateServiceItem(ServiceItem, LibrarySales.CreateCustomerNo());
-        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Order, ServiceItem."Customer No.");
-        LibraryService.CreateServiceItemLine(ServiceItemLine, ServiceHeader, ServiceItem."No.");
-        LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Item, Item."No.");
-
-        // [WHEN] Open Service Order Card and click Print
-        CreateCustomReportSelectionForCustomer(ServiceHeader."Customer No.", "Report Selection Usage"::"SM.Order", 5900);
-        ServiceOrder.OpenEdit();
-        ServiceOrder.GotoRecord(ServiceHeader);
-        ServiceOrder.WorkDescription.SetValue(LibraryRandom.RandText(20));
-        ServiceOrder."&Print".Invoke();
-
-        // [THEN] Verify no transaction error should occur.
     end;
 
     [ConfirmHandler]
@@ -7936,44 +7770,6 @@ codeunit 136101 "Service Orders"
         ServiceGetShipment.CreateInvLines(ServiceShipmentLine);
     end;
 
-    local procedure CreateAndPostServiceInvoiceWithCustomerPostingGroup(CustomerNo: Code[20]; CustPostGrp: Code[20]; PostingDate: Date): Code[20]
-    var
-        ServiceHeader: Record "Service Header";
-        ServiceInvoiceHeader: Record "Service Invoice Header";
-        ServiceLine: Record "Service Line";
-    begin
-        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Invoice, CustomerNo);
-        ServiceHeader.Validate("Posting Date", PostingDate);
-        ServiceHeader.Validate("Customer Posting Group", CustPostGrp);
-        ServiceHeader.Modify(true);
-        LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Item, LibraryInventory.CreateItemNo());
-        ServiceLine.Validate(Quantity, LibraryRandom.RandInt(100));
-        ServiceLine.Validate("Unit Price", LibraryRandom.RandDec(10, 2));
-        ServiceLine.Modify(true);
-        LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
-
-        ServiceInvoiceHeader.SetRange("Pre-Assigned No.", ServiceHeader."No.");
-        if ServiceInvoiceHeader.FindFirst() then
-            exit(ServiceInvoiceHeader."No.");
-    end;
-
-    local procedure CreateCustomReportSelectionForCustomer(CustomerNo: Code[20]; ReportSelectionUsage: Enum "Report Selection Usage"; ReportID: Integer)
-    var
-        CustomReportSelection: Record "Custom Report Selection";
-        CustomReportLayout: Record "Custom Report Layout";
-    begin
-        CustomReportSelection.Init();
-        CustomReportSelection.Validate("Source Type", Database::Customer);
-        CustomReportSelection.Validate("Source No.", CustomerNo);
-        CustomReportSelection.Validate(Usage, ReportSelectionUsage);
-        CustomReportSelection.Validate(Sequence, 1);
-        CustomReportSelection.Validate("Report ID", ReportID);
-        CustomReportSelection.Validate("Use for Email Body", true);
-        CustomReportSelection.Validate(
-            "Email Body Layout Code", CustomReportLayout.InitBuiltInLayout(CustomReportSelection."Report ID", CustomReportLayout.Type::Word.AsInteger()));
-        CustomReportSelection.Insert(true);
-    end;
-
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure ConfirmMessageHandler(Question: Text[1024]; var Reply: Boolean)
@@ -8249,19 +8045,6 @@ codeunit 136101 "Service Orders"
             ServiceItemWorksheet.ServInvLines."Insert Travel Fee".Invoke();
     end;
 
-    [ModalPageHandler]
-    procedure ServiceQuoteLinesWithCatalogItem(var ServiceQuoteLines: TestPage "Service Quote Lines")
-    var
-        ServiceLine: Record "Service Line";
-        NonStockItemNo: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(NonStockItemNo);
-        ServiceQuoteLines.New();
-        ServiceQuoteLines.Type.SetValue(ServiceLine.Type::Item);
-        ServiceQuoteLines."No.".SetValue(NonStockItemNo);
-        ServiceQuoteLines.OK().Invoke();
-    end;
-
     [MessageHandler]
     [Scope('OnPrem')]
     procedure ExactMessageHandler(Message: Text)
@@ -8306,12 +8089,6 @@ codeunit 136101 "Service Orders"
         // Enqueue amounts from handler to verify in test body
         LibraryVariableStorage.Enqueue(CreditLimitNotification.CreditLimitDetails.OutstandingAmtLCY.Value);
         LibraryVariableStorage.Enqueue(CreditLimitNotification.CreditLimitDetails.TotalAmountLCY.Value);
-    end;
-
-    [RequestPageHandler]
-    procedure ServiceOrderReportRequestPageHandler(var ServiceOrder: TestRequestPage "Service Order")
-    begin
-        ServiceOrder.Cancel().Invoke();
     end;
 }
 

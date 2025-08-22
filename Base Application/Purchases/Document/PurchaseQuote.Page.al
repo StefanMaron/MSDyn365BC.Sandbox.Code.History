@@ -108,7 +108,7 @@ page 49 "Purchase Quote"
                         field("Buy-from County"; Rec."Buy-from County")
                         {
                             ApplicationArea = Suite;
-                            CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
+                            Caption = 'County';
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the county in the vendor''s address.';
@@ -533,7 +533,7 @@ page 49 "Purchase Quote"
                                 field("Ship-to County"; Rec."Ship-to County")
                                 {
                                     ApplicationArea = Basic, Suite;
-                                    CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                                    Caption = 'County';
                                     Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                     Importance = Additional;
                                     QuickEntry = false;
@@ -656,7 +656,7 @@ page 49 "Purchase Quote"
                             field("Pay-to County"; Rec."Pay-to County")
                             {
                                 ApplicationArea = Basic, Suite;
-                                CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
+                                Caption = 'County';
                                 Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                                 Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                                 Importance = Additional;
@@ -886,7 +886,7 @@ page 49 "Purchase Quote"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStats action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
 
@@ -1534,15 +1534,12 @@ page 49 "Purchase Quote"
 #if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStats action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
                 }
 #else
                 actionref(PurchaseStatistics_Promoted; PurchaseStatistics)
-                {
-                }
-                actionref(PurchaseStats_Promoted; PurchaseStats)
                 {
                 }
 #endif
@@ -1638,7 +1635,7 @@ page 49 "Purchase Quote"
         ActivateFields();
 
         SetDocNoVisible();
-        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
+        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Purchase Order Stats.";
     end;
 
     var
