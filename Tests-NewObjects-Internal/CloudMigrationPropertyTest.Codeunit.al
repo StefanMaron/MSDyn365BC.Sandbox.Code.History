@@ -1098,6 +1098,7 @@
         ListOfTablesToMigrate.Add(Database::"Email Inbox");
         ListOfTablesToMigrate.Add(Database::"Email Outbox");
         ListOfTablesToMigrate.Add(Database::"Email Parameter");
+        ListOfTablesToMigrate.Add(8890); // Database:: Email Retry
         ListOfTablesToMigrate.Add(Database::"Email Scenario Attachments");
         ListOfTablesToMigrate.Add(Database::"Employee Absence");
         ListOfTablesToMigrate.Add(Database::"Employee Ledger Entry");
