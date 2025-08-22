@@ -47,10 +47,7 @@ codeunit 91 "Purch.-Post (Yes/No)"
             if not ConfirmPost(PurchaseHeader, DefaultOption) then
                 exit;
 
-        IsHandled := false;
-        OnAfterConfirmPost(PurchaseHeader, IsHandled);
-        if IsHandled then
-            exit;
+        OnAfterConfirmPost(PurchaseHeader);
 
         PurchSetup.Get();
         if PurchSetup."Post with Job Queue" then
@@ -142,7 +139,7 @@ codeunit 91 "Purch.-Post (Yes/No)"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterConfirmPost(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    local procedure OnAfterConfirmPost(var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 
