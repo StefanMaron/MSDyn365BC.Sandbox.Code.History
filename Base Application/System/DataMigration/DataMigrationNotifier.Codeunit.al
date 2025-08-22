@@ -2,6 +2,7 @@ namespace System.Integration;
 
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
+using Microsoft.CRM.RoleCenters;
 using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
@@ -259,6 +260,13 @@ codeunit 1802 "Data Migration Notifier"
                         exit;
                     end;
                 until Vendor.Next() = 0;
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales & Relationship Mgr. Act.", 'OnOpenPageEvent', '', false, false)]
+    local procedure OnOpenSalesRelationshipMgrActPage(var Rec: Record "Relationship Mgmt. Cue")
+    begin
+        ShowContactNotificationIfCustWithoutContExist();
+        ShowContactNotificationIfVendWithoutContExist();
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Customer List", 'OnAfterGetCurrRecordEvent', '', false, false)]
