@@ -13,7 +13,7 @@ using System.Security.AccessControl;
 /// </summary>
 page 9843 "User Lookup"
 {
-    Extensible = true;
+    Extensible = false;
     DataCaptionExpression = '';
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -66,17 +66,13 @@ page 9843 "User Lookup"
     var
         EnvironmentInformation: Codeunit "Environment Information";
     begin
-        if HideOnlyExternalUsers then
-            UserSelectionImpl.HideOnlyExternalUsers(Rec)
-        else
-            UserSelectionImpl.HideExternalAndSystemUsers(Rec);
+        UserSelectionImpl.HideExternalUsers(Rec);
         IsSaaS := EnvironmentInformation.IsSaaS();
     end;
 
     var
         UserSelectionImpl: Codeunit "User Selection Impl.";
         IsSaaS: Boolean;
-        HideOnlyExternalUsers: Boolean;
 
     /// <summary>
     /// Gets the currently selected users.
@@ -100,11 +96,6 @@ page 9843 "User Lookup"
             CurrPage.SetSelectionFilter(SelectedUser);
             SelectedUser.FindSet();
         end;
-    end;
-
-    internal procedure SetHideOnlyExternalUsers(HideOnlyExternal: Boolean)
-    begin
-        HideOnlyExternalUsers := HideOnlyExternal;
     end;
 }
 
