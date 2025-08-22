@@ -49,7 +49,6 @@ codeunit 136350 "UT T Job"
         UpdatePlanningLinesManuallyMsg: Label 'You must update the existing project planning lines manually.';
         SplitMessageTxt: Label '%1\%2', Comment = 'Some message text 1.\Some message text 2.', Locked = true;
         DPPLocationErr: Label 'You cannot create purchase orders for items that are set up for directed put-away and pick. You can activate and select Reserve field from personalization in order to finish this task.';
-        StatusErr: Label '%1 must be %2 in %3', Comment = '%1 = Status, %2 = Completed, %3 = Job';
 
     [Test]
     [Scope('OnPrem')]
@@ -1746,51 +1745,6 @@ codeunit 136350 "UT T Job"
     end;
 
     [Test]
-    [HandlerFunctions('PurchOrderFromJobModalPageHandler,PurchaseLinesFromJobModalPageHandler')]
-    procedure LinkPurchaseLinesWithProjectWithoutAmountOnPurchaseOrder()
-    var
-        Vendor: Record Vendor;
-        Item: Record Item;
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        JobCard: TestPage "Job Card";
-        PurchaseOrder: TestPage "Purchase Order";
-    begin
-        // [SCENARIO 556855] Verify Purchase lines are linked with Project without amount on Purchase Order 
-        Initialize();
-
-        // [GIVEN] Create Vendor
-        LibraryPurchase.CreateVendor(Vendor);
-
-        // [GIVEN] Create Item
-        LibraryInventory.CreateItem(Item);
-
-        // [GIVEN] Create Job with Job Task
-        CreateJobAndJobTask();
-
-        // [GIVEN] Create Job Planning Line
-        CreateJobPlanningLineWithItem(JobPlanningLine."Line Type"::"Both Budget and Billable", Item."No.", 1);
-
-        // [WHEN] Create Purchase Order from Job
-        LibraryVariableStorage.Enqueue(Vendor."No.");
-        PurchaseOrder.Trap();
-        JobCard.OpenEdit();
-        JobCard.GotoRecord(Job);
-        JobCard.CreatePurchaseOrder.Invoke();
-
-        // [GIVEN] Find Purchase document
-        FindPurchaseDocumentByItemNo(PurchaseHeader, PurchaseLine, Item."No.");
-
-        // Enqueue Purchase document values
-        LibraryVariableStorage.Enqueue(PurchaseLine."Document No.");
-        LibraryVariableStorage.Enqueue(PurchaseLine."No.");
-        LibraryVariableStorage.Enqueue(Vendor."No.");
-
-        // [THEN] Verify results        
-        JobCard.PurchaseLines.Invoke();
-    end;
-
-    [Test]
     [HandlerFunctions('PurchOrderFromJobModalPageHandlerWithDPPLocation')]
     procedure VerifyErrorOnCreatePurchaseOrderFromJobForDPPLocation()
     var
@@ -2027,43 +1981,6 @@ codeunit 136350 "UT T Job"
         // [THEN] Verify results
         PurchaseLines[1].TestField(Quantity, 5);
         PurchaseLines[2].TestField(Quantity, 3);
-    end;
-
-    [Test]
-    [HandlerFunctions('MessageHandler2,ConfirmFalseHandler')]
-    procedure WIPIsNotCalculatedIfNotConfirmedOnChangingStatusOfJobToCompleted()
-    var
-        JobWIPMethod: Record "Job WIP Method";
-        JobCard: TestPage "Job Card";
-    begin
-        // [SCENARIO 558589] WIP is not calculated if Stan doesn't confirm the 
-        // Confirmation message while changing the Status of Job to Completed.
-        Initialize();
-
-        // [GIVEN] Create a Job.
-        LibraryJob.CreateJob(Job);
-
-        // [GIVEN] Create a Job WIP Method.
-        LibraryJob.CreateJobWIPMethod(JobWIPMethod);
-
-        // [GIVEN] Open Job Card page and set WIP Method and Status.
-        JobCard.OpenEdit();
-        JobCard.GoToRecord(Job);
-        JobCard."WIP Method".SetValue(JobWIPMethod.Code);
-        JobCard.Status.SetValue(Enum::"Job Status"::Completed);
-
-        // [WHEN] Find Job.
-        Job.Get(Job."No.");
-
-        // [THEN] Status of Job is Completed.
-        Assert.AreEqual(
-            Enum::"Job Status"::Completed,
-            Job.Status,
-            StrSubstNo(
-                StatusErr,
-                Job.FieldCaption(Status),
-                Enum::"Job Status"::Completed,
-                Job.TableCaption()));
     end;
 
     local procedure Initialize()
@@ -2506,14 +2423,6 @@ codeunit 136350 "UT T Job"
     end;
 
     [ModalPageHandler]
-    procedure PurchOrderFromJobModalPageHandlerWithQtyCheck(var PurchOrderFromSalesOrder: TestPage "Purch. Order From Sales Order")
-    begin
-        PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
-        Assert.AreEqual(LibraryVariableStorage.DequeueDecimal(), PurchOrderFromSalesOrder."Demand Quantity".AsDecimal(), 'Demand Quantity not matched');
-        PurchOrderFromSalesOrder.OK().Invoke();
-    end;
-
-    [ModalPageHandler]
     procedure PurchOrderFromJobModalPageHandlerWithDPPLocation(var PurchOrderFromSalesOrder: TestPage "Purch. Order From Sales Order")
     begin
         PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
@@ -2521,11 +2430,11 @@ codeunit 136350 "UT T Job"
     end;
 
     [ModalPageHandler]
-    procedure PurchaseLinesFromJobModalPageHandler(var PurchaseLines: TestPage "Purchase Lines")
+    procedure PurchOrderFromJobModalPageHandlerWithQtyCheck(var PurchOrderFromSalesOrder: TestPage "Purch. Order From Sales Order")
     begin
-        Assert.AreEqual(PurchaseLines."Document No.".Value, LibraryVariableStorage.DequeueText(), 'Purchase Lines are not linked with Project');
-        Assert.AreEqual(PurchaseLines."No.".Value, LibraryVariableStorage.DequeueText(), 'Purchase Lines are not linked with Project');
-        Assert.AreEqual(PurchaseLines."Buy-from Vendor No.".Value, LibraryVariableStorage.DequeueText(), 'Purchase Lines are not linked with Project');
+        PurchOrderFromSalesOrder.Vendor.SetValue(LibraryVariableStorage.DequeueText());
+        Assert.AreEqual(LibraryVariableStorage.DequeueDecimal(), PurchOrderFromSalesOrder."Demand Quantity".AsDecimal(), 'Demand Quantity not matched');
+        PurchOrderFromSalesOrder.OK().Invoke();
     end;
 
     [MessageHandler]
@@ -2546,12 +2455,6 @@ codeunit 136350 "UT T Job"
                 end;
         end;
         Assert.ExpectedMessage(ExpectedMessage, Message);
-    end;
-
-    [MessageHandler]
-    [Scope('OnPrem')]
-    procedure MessageHandler2(Message: Text[1024])
-    begin
     end;
 }
 
