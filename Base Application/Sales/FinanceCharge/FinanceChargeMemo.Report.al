@@ -692,6 +692,11 @@ report 118 "Finance Charge Memo"
 
         trigger OnInit()
         begin
+            LogInteractionEnable := true;
+        end;
+
+        trigger OnOpenPage()
+        begin
             InitLogInteraction();
             LogInteractionEnable := LogInteraction;
         end;
@@ -736,6 +741,12 @@ report 118 "Finance Charge Memo"
                       "Issued Fin. Charge Memo Header"."Customer No.", '', '', "Issued Fin. Charge Memo Header"."Posting Description", '');
 
                 until "Issued Fin. Charge Memo Header".Next() = 0;
+    end;
+
+    trigger OnPreReport()
+    begin
+        if not CurrReport.UseRequestPage then
+            InitLogInteraction();
     end;
 
     var
