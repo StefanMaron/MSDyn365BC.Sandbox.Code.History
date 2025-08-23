@@ -1256,7 +1256,12 @@ codeunit 22 "Item Jnl.-Post Line"
     var
         IsReserved: Boolean;
         InsertItemLedgEntryNeeded: Boolean;
+        IsHandled: Boolean;
     begin
+        OnBeforeItemQtyPosting(ItemJnlLine, CalledFromAdjustment, IsHandled);
+        if IsHandled then
+            exit;
+
         if ItemJnlLine.Quantity <> ItemJnlLine."Invoiced Quantity" then
             ItemJnlLine.TestField("Invoiced Quantity", 0);
         ItemJnlLine.TestField("Item Shpt. Entry No.", 0);
@@ -6137,7 +6142,11 @@ codeunit 22 "Item Jnl.-Post Line"
     var
         FloatingFactor: Decimal;
         PostItemJnlLine: Boolean;
+        IsHandled: Boolean;
     begin
+        OnBeforeSetupTempSplitItemJnlLine(ItemJnlLine2, SignFactor, NonDistrQuantity, NonDistrAmount, NonDistrAmountACY, NonDistrDiscountAmount, Invoice, IsHandled);
+        if IsHandled then
+            exit;
         TempSplitItemJnlLine."Quantity (Base)" := SignFactor * TempTrackingSpecification."Qty. to Handle (Base)";
         TempSplitItemJnlLine.Quantity := SignFactor * TempTrackingSpecification."Qty. to Handle";
         if Invoice then begin
@@ -6979,7 +6988,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyItemLedgEntryOnAfterSetAppliedQtyZero(OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var AppliedQty: Decimal; var ItemJournalLine: Record "Item Journal Line")
+    local procedure OnApplyItemLedgEntryOnAfterSetAppliedQtyZero(OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemLedgerEntry: Record "Item Ledger Entry"; var AppliedQty: Decimal; var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
@@ -8384,6 +8393,16 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCodeOnAfterRunCheck(var ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeItemQtyPosting(var ItemJnlLine: Record "Item Journal Line"; var CalledFromAdjustment: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetupTempSplitItemJnlLine(var ItemJnlLine2: Record "Item Journal Line"; var SignFactor: Integer; var NonDistrQuantity: Decimal; var NonDistrAmount: Decimal; var NonDistrAmountACY: Decimal; var NonDistrDiscountAmount: Decimal; var Invoice: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
