@@ -92,7 +92,6 @@ report 703 "Item Register - Quantity"
                 trigger OnPreDataItem()
                 begin
                     SetRange("Entry No.", "Item Register"."From Entry No.", "Item Register"."To Entry No.");
-                    SetFilter("Item Register No.", '0|%1', "Item Register"."No.");
                 end;
             }
         }
@@ -129,3 +128,4 @@ report 703 "Item Register - Quantity"
         ItemDescriptionCaptionLbl: Label 'Description';
         No_ItemRegisterCaptionLbl: Label 'Register No.';
 }
+
