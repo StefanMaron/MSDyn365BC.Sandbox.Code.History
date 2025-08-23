@@ -399,7 +399,6 @@ table 520 "Availability Info. Buffer"
     )
     var
         ReservationEntry: Record "Reservation Entry";
-        IsHandled: Boolean;
     begin
         ReservationEntry.SetRange("Item No.", "Item No.");
         ReservationEntry.SetRange("Source Type", SourceType);
@@ -408,12 +407,8 @@ table 520 "Availability Info. Buffer"
         ReservationEntry.SetRange("Lot No.", "Lot No.");
         if Rec.GetFilter("Location Code Filter") <> '' then
             ReservationEntry.SetRange("Location Code", Rec.GetFilter("Location Code Filter"));
-
-        IsHandled := false;
-        OnAddEntriesForLookUpOnBeforeVariantCodeGetFilter(Rec, IsHandled);
-        if not IsHandled then
-            if Rec.GetFilter("Variant Code Filter") <> '' then
-                ReservationEntry.SetRange("Variant Code", Rec.GetFilter("Variant Code Filter"));
+        if Rec.GetFilter("Variant Code Filter") <> '' then
+            ReservationEntry.SetRange("Variant Code", Rec.GetFilter("Variant Code Filter"));
 
         if DateFilterOption = "Reservation Date Filter"::"Shipment Date" then
             ReservationEntry.SetFilter("Shipment Date", Rec.GetFilter("Date Filter"))
@@ -459,11 +454,6 @@ table 520 "Availability Info. Buffer"
 
     [IntegrationEvent(true, false)]
     local procedure OnLookupPlannedOrderReceipt(var TempReservationEntry: Record "Reservation Entry" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAddEntriesForLookUpOnBeforeVariantCodeGetFilter(var AvailabilityInfoBuffer: Record "Availability Info. Buffer"; var IsHandled: Boolean)
     begin
     end;
 }
