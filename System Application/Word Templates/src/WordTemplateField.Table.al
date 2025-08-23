@@ -9,7 +9,7 @@ using System.Reflection;
 
 table 9989 "Word Template Field"
 {
-    Access = Public;
+    Access = Internal;
     InherentEntitlements = X;
     InherentPermissions = X;
 
