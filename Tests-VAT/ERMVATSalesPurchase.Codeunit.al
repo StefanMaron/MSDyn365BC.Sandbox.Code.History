@@ -4376,3 +4376,4 @@
         Assert.IsFalse(BatchPostPurchCreditMemos.ReplaceVATDate.Visible(), '');
     end;
 }
+
