@@ -192,8 +192,7 @@ codeunit 5139 "Job Archive Management"
         if RestoreArchivedJob then begin
             CommentLine.SetRange("Table Name", CommentLine."Table Name"::Job);
             CommentLine.SetRange("No.", Job."No.");
-            if not CommentLine.IsEmpty() then
-                CommentLine.DeleteAll();
+            CommentLine.DeleteAll();
 
             Job.Delete();
             OnRestoreJobOnAfterDeleteJob(Job);
@@ -216,22 +215,19 @@ codeunit 5139 "Job Archive Management"
     local procedure RestoreJobTasks(var JobArchive: Record "Job Archive"; Job: Record Job)
     var
         JobTask: Record "Job Task";
-        JobTaskDimension: Record "Job Task Dimension";
+        JobTaskDim: Record "Job Task Dimension";
         JobTaskArchive: Record "Job Task Archive";
         JobPlanningLine: Record "Job Planning Line";
     begin
-        OnBeforeDeleteJobTasks(JobTask, JobTaskDimension, JobPlanningLine, JobArchive, Job);
         JobTask.SetRange("Job No.", Job."No.");
-        if not JobTask.IsEmpty() then
-            JobTask.DeleteAll();
+        JobTask.DeleteAll();
 
-        JobTaskDimension.SetRange("Job No.", Job."No.");
-        if not JobTaskDimension.IsEmpty() then
-            JobTaskDimension.DeleteAll();
+        JobTaskDim.SetRange("Job No.", Job."No.");
+        if not JobTaskDim.IsEmpty() then
+            JobTaskDim.DeleteAll();
 
         JobPlanningLine.SetRange("Job No.", Job."No.");
-        if not JobPlanningLine.IsEmpty() then
-            JobPlanningLine.DeleteAll();
+        JobPlanningLine.DeleteAll();
 
         JobTaskArchive.SetRange("Job No.", JobArchive."No.");
         JobTaskArchive.SetRange("Version No.", JobArchive."Version No.");
@@ -249,8 +245,7 @@ codeunit 5139 "Job Archive Management"
     begin
         JobTaskDimension.SetRange("Job No.", Job."No.");
         JobTaskDimension.SetRange("Job Task No.", JobTaskArchive."Job Task No.");
-        if not JobTaskDimension.IsEmpty() then
-            JobTaskDimension.DeleteAll();
+        JobTaskDimension.DeleteAll();
 
         JobTask.Init();
         JobTask.TransferFields(JobTaskArchive);
@@ -392,11 +387,6 @@ codeunit 5139 "Job Archive Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnStoreJobOnBeforeStoreJobTaskAndJobPlanningLine(var JobTask: Record "Job Task"; var JobPlanningLine: Record "Job Planning Line"; var Job: Record Job)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeDeleteJobTasks(var JobTask: Record "Job Task"; var JobTaskDimension: Record "Job Task Dimension"; var JobPlanningLine: Record "Job Planning Line"; var JobArchive: Record "Job Archive"; Job: Record Job)
     begin
     end;
 }
