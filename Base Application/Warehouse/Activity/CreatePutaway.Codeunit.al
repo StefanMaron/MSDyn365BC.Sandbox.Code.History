@@ -434,7 +434,6 @@ codeunit 7313 "Create Put-away"
     procedure AssignPlaceBinZone(var WhseActivLine: Record "Warehouse Activity Line"; PostedWhseRcptLine: Record "Posted Whse. Receipt Line"; Location: Record Location; Bin: Record Bin)
     var
         Bin2: Record Bin;
-        BinCodeFilterText: Text[250];
     begin
         WhseActivLine."Bin Code" := Bin.Code;
         WhseActivLine."Zone Code" := Bin."Zone Code";
@@ -443,15 +442,8 @@ codeunit 7313 "Create Put-away"
            ((Bin.Code = PostedWhseRcptLine."Bin Code") or Location.IsBinBWReceiveOrShip(Bin.Code))
         then begin
             Bin2.SetRange("Location Code", Location.Code);
-            if Location."Receipt Bin Code" <> '' then
-                AddToFilterText(BinCodeFilterText, '&', '<>', Location."Receipt Bin Code");
-            if Location."Shipment Bin Code" <> '' then
-                AddToFilterText(BinCodeFilterText, '&', '<>', Location."Shipment Bin Code");
-            if PostedWhseRcptLine."Bin Code" <> '' then
-                AddToFilterText(BinCodeFilterText, '&', '<>', PostedWhseRcptLine."Bin Code");
-            OnAssignPlaceBinZoneOnBeforeApplyBinCodeFilter(BinCodeFilterText, Location, PostedWhseRcptLine);
-            if BinCodeFilterText <> '' then
-                Bin2.SetFilter(Code, BinCodeFilterText);
+            Bin2.SetFilter(Code, '<>%1&<>%2&<>%3', Location."Receipt Bin Code", Location."Shipment Bin Code",
+              PostedWhseRcptLine."Bin Code");
             OnAssignPlaceBinZoneOnAfterBin2SetFilters(PostedWhseRcptLine, WhseActivLine, Location, Bin2);
             Bin2.SetLoadFields(Code, "Zone Code");
             if Bin2.FindFirst() then begin
@@ -464,14 +456,6 @@ codeunit 7313 "Create Put-away"
         end;
 
         OnAfterAssignPlaceBinZone(WhseActivLine);
-    end;
-
-    local procedure AddToFilterText(var TextVar: Text[250]; Separator: Code[1]; Comparator: Code[2]; Addendum: Code[20])
-    begin
-        if TextVar = '' then
-            TextVar := Comparator + '''' + Addendum + ''''
-        else
-            TextVar += Separator + Comparator + '''' + Addendum + '''';
     end;
 
     local procedure InsertWhseActivHeader(var PostedWhseRcptLine: Record "Posted Whse. Receipt Line")
@@ -726,7 +710,6 @@ codeunit 7313 "Create Put-away"
     local procedure GetWarehouseClassCode()
     begin
         WarehouseClassCode := CurrItem."Warehouse Class Code";
-        OnAfterGetWarehouseClassCode(WarehouseClassCode, CurrItem, CurrStockkeepingUnit);
     end;
 
     local procedure GetPutAwayUOM()
@@ -1093,7 +1076,6 @@ codeunit 7313 "Create Put-away"
 
     internal procedure CreateWhsePutAwayForProdOutput()
     begin
-        OnBeforeCreateWhsePutAwayForProdOutput(TempProductionOrderForWhsePutAwayForProdOutput);
         if TempProductionOrderForWhsePutAwayForProdOutput.FindSet() then
             repeat
                 ProcessWhsePutAwayForProdOrderFromItemJnlLine(TempProductionOrderForWhsePutAwayForProdOutput);
@@ -1218,7 +1200,6 @@ codeunit 7313 "Create Put-away"
 
     internal procedure CreateWhsePutAwayForProdOrder(var ProductionOrder: Record "Production Order")
     begin
-        OnBeforeCreateWhsePutAwayForProdOrder(ProductionOrder);
         if not MfgPutAwayHelper.CanCreateProdWhsePutAway(ProductionOrder) then
             exit;
 
@@ -1359,7 +1340,6 @@ codeunit 7313 "Create Put-away"
 
     local procedure FindBinForProdOrderLine(ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; var BinContentQtyBase: Decimal)
     begin
-        OnBeforeFindBinForProdOrderLine(ProdOrderLine, TempProdOrdLineTrackingBuff, BinContentQtyBase);
         if not FindBin(ProdOrderLine."Location Code", WarehouseClassCode) then
             exit;
 
@@ -1371,7 +1351,6 @@ codeunit 7313 "Create Put-away"
 
     local procedure FindBinFromBinContentForProdOrderLine(ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; var BinContentQtyBase: Decimal)
     begin
-        OnBeforeFindBinFromBinContentForProdOrderLine(ProdOrderLine, TempProdOrdLineTrackingBuff, BinContentQtyBase);
         if not FindBinContent(ProdOrderLine."Location Code", ProdOrderLine."Item No.", ProdOrderLine."Variant Code", WarehouseClassCode) then
             exit;
 
@@ -1688,8 +1667,6 @@ codeunit 7313 "Create Put-away"
             WarehouseActivityLine."Qty. Rounding Precision (Base)" := BasePutAwayItemUnitOfMeasure."Qty. Rounding Precision";
         end;
 
-        OnCreateNewWhseActivityForProdOrderLineOnBeforeValidateQuantity(WarehouseActivityLine, ProdOrderLine, TempProdOrdLineTrackingBuff);
-
         WarehouseActivityLine.Validate(
               Quantity, UnitOfMeasureManagement.RoundQty(QtyToHandleBase / WarehouseActivityLine."Qty. per Unit of Measure", WarehouseActivityLine."Qty. Rounding Precision"));
         if QtyToHandleBase <> 0 then begin
@@ -1703,9 +1680,6 @@ codeunit 7313 "Create Put-away"
             WarehouseActivityLine.Cubage := 0;
             WarehouseActivityLine.Weight := 0;
         end;
-
-        OnCreateNewWhseActivityForProdOrderLineOnAfterSetQtyToHandle(WarehouseActivityLine, ProdOrderLine, TempProdOrdLineTrackingBuff, DoNotFillQtytoHandle);
-
         WarehouseActivityLine.CopyTrackingFromProdOrderLineTrackingBuffer(TempProdOrdLineTrackingBuff);
         WarehouseActivityLine."Warranty Date" := TempProdOrdLineTrackingBuff."Warranty Date";
         WarehouseActivityLine."Expiration Date" := TempProdOrdLineTrackingBuff."Expiration Date";
@@ -1998,46 +1972,6 @@ codeunit 7313 "Create Put-away"
 
     [IntegrationEvent(false, false)]
     local procedure OnCodeOnAfterFilterPutAwayTemplateLine(var PutAwayTemplateLine: Record "Put-away Template Line"; PostedWhseReceiptLine: Record "Posted Whse. Receipt Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateWhsePutAwayForProdOutput(var TempProductionOrderForWhsePutAwayForProdOutput: Record "Production Order" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindBinFromBinContentForProdOrderLine(ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; var BinContentQtyBase: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindBinForProdOrderLine(ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; var BinContentQtyBase: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateWhsePutAwayForProdOrder(var ProductionOrder: Record "Production Order")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAssignPlaceBinZoneOnBeforeApplyBinCodeFilter(var BinCodeFilterText: Text[250]; var Location: Record Location; var PostedWhseReceiptLine: Record "Posted Whse. Receipt Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetWarehouseClassCode(var WarehouseClassCode: Code[10]; Item: Record Item; StockkeepingUnit: Record "Stockkeeping Unit")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateNewWhseActivityForProdOrderLineOnBeforeValidateQuantity(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateNewWhseActivityForProdOrderLineOnAfterSetQtyToHandle(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; DoNotFillQtytoHandle: Boolean)
     begin
     end;
 }
