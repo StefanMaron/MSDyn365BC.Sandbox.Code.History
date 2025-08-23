@@ -97,7 +97,7 @@ codeunit 487 "Job Queue Start Report"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeProcessPrint(ReportID, JobQueueEntry, IsHandled, RecRef);
+        OnBeforeProcessPrint(ReportID, JobQueueEntry, IsHandled);
         if IsHandled then
             exit;
 
@@ -153,7 +153,7 @@ codeunit 487 "Job Queue Start Report"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeProcessPrint(ReportID: Integer; var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean; var RecordRef: RecordRef)
+    local procedure OnBeforeProcessPrint(ReportID: Integer; var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
     begin
     end;
 
