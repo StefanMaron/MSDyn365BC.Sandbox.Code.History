@@ -270,14 +270,16 @@ report 1002 "Post Inventory Cost to G/L"
                             MarkedOnly(true);
                             DeleteAll();
                         end;
-                        Window.Close();
+                        if GuiAllowed then
+                            Window.Close();
                     end;
 
                     trigger OnPreDataItem()
                     var
                         GLEntry: Record "G/L Entry";
                     begin
-                        Window.Open(ProcessingItemsTxt);
+                        if GuiAllowed then
+                            Window.Open(ProcessingItemsTxt);
                         if Post then begin
                             GLEntry.LockTable();
                             GLEntry.GetLastEntryNo();
@@ -666,8 +668,10 @@ report 1002 "Post Inventory Cost to G/L"
             GLSetup.GetRecordOnce();
             if GLSetup."Journal Templ. Name Mandatory" then begin
                 IsJournalTemplNameMandatory := true;
-                GenJnlLineReq."Journal Template Name" := GLSetup."Apply Jnl. Template Name";
-                GenJnlLineReq."Journal Batch Name" := GLSetup."Apply Jnl. Batch Name";
+                if GenJnlLineReq."Journal Template Name" = '' then
+                    GenJnlLineReq."Journal Template Name" := GLSetup."Apply Jnl. Template Name";
+                if GenJnlLineReq."Journal Batch Name" = '' then
+                    GenJnlLineReq."Journal Batch Name" := GLSetup."Apply Jnl. Batch Name";
             end;
         end;
     }
