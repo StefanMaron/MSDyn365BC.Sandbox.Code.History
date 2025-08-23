@@ -7,7 +7,6 @@ namespace Microsoft.Integration.DynamicsFieldService;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Foundation.NoSeries;
-using Microsoft.Foundation.UOM;
 using Microsoft.Projects.Project.Setup;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Inventory.Setup;
@@ -406,8 +405,6 @@ codeunit 6610 "FS Int. Table Subscriber"
     var
         FSConnectionSetup: Record "FS Connection Setup";
         IntegrationTableMapping: Record "Integration Table Mapping";
-        IntegrationFieldMapping: Record "Integration Field Mapping";
-        ProjectJournalLine: Record "Job Journal Line";
         FSSetupDefaults: Codeunit "FS Setup Defaults";
     begin
         if not Rec."Location Mandatory" then
@@ -416,15 +413,10 @@ codeunit 6610 "FS Int. Table Subscriber"
         if not FSConnectionSetup.IsEnabled() then
             exit;
 
-        if not IntegrationTableMapping.Get('LOCATION') then
-            FSSetupDefaults.ResetLocationMapping(FSConnectionSetup, 'LOCATION', true, true);
+        if IntegrationTableMapping.Get('LOCATION') then
+            exit;
 
-        IntegrationFieldMapping.SetFilter("Integration Table Mapping Name", 'PJLINE-WORDERPRODUCT');
-        IntegrationFieldMapping.SetRange("Field No.", ProjectJournalLine.FieldNo("Location Code"));
-        if IntegrationFieldMapping.IsEmpty() then begin
-            FSSetupDefaults.SetLocationFieldMapping(true);
-            FSSetupDefaults.ResetProjectJournalLineWOProductMapping(FSConnectionSetup, 'PJLINE-WORDERPRODUCT', true);
-        end;
+        FSSetupDefaults.ResetLocationMapping(FSConnectionSetup, 'LOCATION', true, true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"CRM Setup Defaults", 'OnResetItemProductMappingOnAfterInsertFieldsMapping', '', false, false)]
@@ -608,10 +600,12 @@ codeunit 6610 "FS Int. Table Subscriber"
         FSConnectionSetup: Record "FS Connection Setup";
         JobJournalBatch: Record "Job Journal Batch";
         JobJournalTemplate: Record "Job Journal Template";
+        JobsSetup: Record "Jobs Setup";
         Resource: Record Resource;
         FSBookableResource: Record "FS Bookable Resource";
         LastJobJournalLine: Record "Job Journal Line";
         CRMProductName: Codeunit "CRM Product Name";
+        NoSeries: Codeunit "No. Series";
         RecID: RecordId;
         SourceDestCode: Text;
         BillingAccId: Guid;
@@ -693,6 +687,7 @@ codeunit 6610 "FS Int. Table Subscriber"
                     OnSetUpNewLineOnNewLine(JobJournalLine, JobJournalTemplate, JobJournalBatch, Handled);
                     if not Handled then begin
                         FSConnectionSetup.Get();
+                        JobsSetup.Get();
                         Job.Get(JobJournalLine."Job No.");
                         if not JobJournalTemplate.Get(FSConnectionSetup."Job Journal Template") then
                             Error(JobJournalIncorrectSetupErr, JobJournalTemplate.TableCaption(), FSConnectionSetup.TableCaption());
@@ -702,7 +697,25 @@ codeunit 6610 "FS Int. Table Subscriber"
                         JobJournalLine."Journal Batch Name" := JobJournalBatch.Name;
                         LastJobJournalLine.SetRange("Journal Template Name", JobJournalTemplate.Name);
                         LastJobJournalLine.SetRange("Journal Batch Name", JobJournalBatch.Name);
-                        CheckPostingRuleAndSetDocumentNo(JobJournalLine, LastJobJournalLine, JobJournalBatch, SourceRecordRef);
+                        if LastJobJournalLine.FindLast() then begin
+                            JobJournalLine."Posting Date" := LastJobJournalLine."Posting Date";
+                            JobJournalLine."Document Date" := LastJobJournalLine."Posting Date";
+                            if JobsSetup."Document No. Is Job No." and (LastJobJournalLine."Document No." = '') then
+                                JobJournalLine."Document No." := JobJournalLine."Job No."
+                            else
+                                JobJournalLine."Document No." := LastJobJournalLine."Document No.";
+                        end else begin
+                            JobJournalLine."Posting Date" := WorkDate();
+                            JobJournalLine."Document Date" := WorkDate();
+                            if JobsSetup."Document No. Is Job No." then begin
+                                if JobJournalLine."Document No." = '' then
+                                    JobJournalLine."Document No." := JobJournalLine."Job No.";
+                            end else
+                                if JobJournalBatch."No. Series" <> '' then begin
+                                    Clear(NoSeries);
+                                    JobJournalLine."Document No." := NoSeries.GetNextNo(JobJournalBatch."No. Series", JobJournalLine."Posting Date");
+                                end;
+                        end;
                         JobJournalLine."Line No." := LastJobJournalLine."Line No." + 10000;
                         JobJournalLine."Source Code" := JobJournalTemplate."Source Code";
                         JobJournalLine."Reason Code" := JobJournalBatch."Reason Code";
@@ -712,85 +725,6 @@ codeunit 6610 "FS Int. Table Subscriber"
                         SetJobJournalLineTypesAndNo(FSConnectionSetup, SourceRecordRef, JobJournalLine);
                     end;
                     DestinationRecordRef.GetTable(JobJournalLine);
-                end;
-        end;
-    end;
-
-    local procedure CheckPostingRuleAndSetDocumentNo(var JobJournalLine: Record "Job Journal Line"; var LastJobJournalLine: Record "Job Journal Line"; JobJournalBatch: Record "Job Journal Batch"; var SourceRecordRef: RecordRef)
-    var
-        FSConnectionSetup: Record "FS Connection Setup";
-        FSWorkOrderProduct: Record "FS Work Order Product";
-        FSWorkOrderService: Record "FS Work Order Service";
-    begin
-        if JobJournalBatch."Posting No. Series" <> '' then begin
-            FSConnectionSetup.Get();
-            case FSConnectionSetup."Line Post Rule" of
-                "FS Work Order Line Post Rule"::LineUsed,
-                "FS Work Order Line Post Rule"::WorkOrderCompleted:
-                    case SourceRecordRef.Number of
-                        Database::"FS Work Order Product":
-                            begin
-                                SourceRecordRef.SetTable(FSWorkOrderProduct);
-                                if (FSWorkOrderProduct.LineStatus = FSWorkOrderProduct.LineStatus::Used)
-                                    or (FSWorkOrderProduct.WorkOrderStatus in [FSWorkOrderProduct.WorkOrderStatus::Completed]) then
-                                    SetPostingDocumentNo(JobJournalLine, LastJobJournalLine, JobJournalBatch);
-                            end;
-                        Database::"FS Work Order Service":
-                            begin
-                                SourceRecordRef.SetTable(FSWorkOrderService);
-                                if (FSWorkOrderService.LineStatus = FSWorkOrderService.LineStatus::Used)
-                                    or (FSWorkOrderService.WorkOrderStatus in [FSWorkOrderService.WorkOrderStatus::Completed]) then
-                                    SetPostingDocumentNo(JobJournalLine, LastJobJournalLine, JobJournalBatch);
-                            end;
-                    end;
-                else
-                    SetDocumentNo(JobJournalLine, LastJobJournalLine, JobJournalBatch);
-            end;
-        end else
-            SetDocumentNo(JobJournalLine, LastJobJournalLine, JobJournalBatch);
-    end;
-
-    local procedure SetPostingDocumentNo(var JobJournalLine: Record "Job Journal Line"; var LastJobJournalLine: Record "Job Journal Line"; JobJournalBatch: Record "Job Journal Batch")
-    var
-        NoSeries: Codeunit "No. Series";
-    begin
-        if LastJobJournalLine.FindLast() then begin
-            JobJournalLine."Posting Date" := LastJobJournalLine."Posting Date";
-            JobJournalLine."Document Date" := LastJobJournalLine."Posting Date";
-            if LastJobJournalLine."Document No." = NoSeries.GetLastNoUsed(JobJournalBatch."Posting No. Series") then
-                JobJournalLine."Document No." := LastJobJournalLine."Document No."
-            else
-                JobJournalLine."Document No." := NoSeries.GetNextNo(JobJournalBatch."Posting No. Series", JobJournalLine."Posting Date");
-        end else begin
-            JobJournalLine."Posting Date" := WorkDate();
-            JobJournalLine."Document Date" := WorkDate();
-            JobJournalLine."Document No." := NoSeries.GetNextNo(JobJournalBatch."Posting No. Series", JobJournalLine."Posting Date");
-        end;
-    end;
-
-    local procedure SetDocumentNo(var JobJournalLine: Record "Job Journal Line"; var LastJobJournalLine: Record "Job Journal Line"; JobJournalBatch: Record "Job Journal Batch")
-    var
-        JobsSetup: Record "Jobs Setup";
-        NoSeries: Codeunit "No. Series";
-    begin
-        JobsSetup.Get();
-        if LastJobJournalLine.FindLast() then begin
-            JobJournalLine."Posting Date" := LastJobJournalLine."Posting Date";
-            JobJournalLine."Document Date" := LastJobJournalLine."Posting Date";
-            if JobsSetup."Document No. Is Job No." and (LastJobJournalLine."Document No." = '') then
-                JobJournalLine."Document No." := JobJournalLine."Job No."
-            else
-                JobJournalLine."Document No." := LastJobJournalLine."Document No.";
-        end else begin
-            JobJournalLine."Posting Date" := WorkDate();
-            JobJournalLine."Document Date" := WorkDate();
-            if JobsSetup."Document No. Is Job No." then begin
-                if JobJournalLine."Document No." = '' then
-                    JobJournalLine."Document No." := JobJournalLine."Job No.";
-            end else
-                if JobJournalBatch."No. Series" <> '' then begin
-                    Clear(NoSeries);
-                    JobJournalLine."Document No." := NoSeries.GetNextNo(JobJournalBatch."No. Series", JobJournalLine."Posting Date");
                 end;
         end;
     end;
@@ -1032,14 +966,12 @@ codeunit 6610 "FS Int. Table Subscriber"
         CRMProduct: Record "CRM Product";
         BudgetJobJournalLine: Record "Job Journal Line";
         CRMProductName: Codeunit "CRM Product Name";
-        UOMMgt: Codeunit "Unit of Measure Management";
         BookableResourceCoupled: Boolean;
         BookableResourceCoupledToDeleted: Boolean;
         FSQuantity: Decimal;
         FSQuantityToBill: Decimal;
         QuantityCurrentlyConsumed: Decimal;
         QuantityCurrentlyInvoiced: Decimal;
-        RoundedQtyToInvoice: Decimal;
     begin
         SetCurrentProjectPlanningQuantities(SourceRecordRef, QuantityCurrentlyConsumed, QuantityCurrentlyInvoiced);
         case SourceRecordRef.Number of
@@ -1143,8 +1075,7 @@ codeunit 6610 "FS Int. Table Subscriber"
                     JobJournalLine.Validate("Unit Cost", Item."Unit Cost");
                     JobJournalLine.Validate(Quantity, FSQuantity - QuantityCurrentlyConsumed);
                     JobJournalLine.Validate("Unit Price", Item."Unit Price");
-                    RoundedQtyToInvoice := UOMMgt.RoundAndValidateQty(FSQuantityToBill - QuantityCurrentlyInvoiced, JobJournalLine."Qty. Rounding Precision", JobJournalLine.FieldCaption("Qty. to Transfer to Invoice"));
-                    JobJournalLine.Validate("Qty. to Transfer to Invoice", RoundedQtyToInvoice);
+                    JobJournalLine.Validate("Qty. to Transfer to Invoice", FSQuantityToBill - QuantityCurrentlyInvoiced);
                 end;
         end;
     end;
