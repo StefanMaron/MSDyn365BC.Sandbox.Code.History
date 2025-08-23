@@ -193,7 +193,7 @@ table 5092 Opportunity
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateContactNo(Rec, CurrFieldNo, IsHandled, xRec);
+                OnBeforeValidateContactNo(Rec, CurrFieldNo, IsHandled);
                 if IsHandled then
                     exit;
 
@@ -1154,7 +1154,6 @@ table 5092 Opportunity
             TestField("Sales Cycle Code");
             TestField(Status, Status::"Not Started");
             SalesCycleStage.SetRange("Sales Cycle Code", "Sales Cycle Code");
-            OnStartActivateFirstStageOnBeforeSalesCycleStageFind(Rec, SalesCycleStage);
             if SalesCycleStage.FindFirst() then begin
                 OpportunityEntry.Init();
                 OpportunityEntry."Sales Cycle Stage" := SalesCycleStage.Stage;
@@ -1394,17 +1393,12 @@ table 5092 Opportunity
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateContactNo(var Opportunity: Record Opportunity; CurrentFieldNo: Integer; var IsHandled: Boolean; xOpportunity: Record Opportunity)
+    local procedure OnBeforeValidateContactNo(var Opportunity: Record Opportunity; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnStartWizardBeforeInsert(var Opportunity: Record Opportunity)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnStartActivateFirstStageOnBeforeSalesCycleStageFind(var Opportunity: Record Opportunity; var SalesCycleStage: Record "Sales Cycle Stage")
     begin
     end;
 }
