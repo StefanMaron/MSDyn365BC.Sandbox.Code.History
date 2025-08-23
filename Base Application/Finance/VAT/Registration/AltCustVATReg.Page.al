@@ -35,10 +35,6 @@ page 212 "Alt. Cust. VAT Reg."
                     ApplicationArea = Basic, Suite;
                     ShowMandatory = true;
                 }
-                field("Enterprise No."; Rec."Enterprise No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                }
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
                     ApplicationArea = Basic, Suite;
@@ -52,7 +48,7 @@ page 212 "Alt. Cust. VAT Reg."
     }
 
     var
-        FeatureNameTxt: Label 'Alternative Customer VAT Registration', Locked = true;
+        FeatureNameTxt: Label 'Alternative Customer VAT Registration';
 
     trigger OnOpenPage();
     var
