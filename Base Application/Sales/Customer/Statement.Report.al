@@ -774,12 +774,6 @@ report 116 Statement
         {
         }
 
-        trigger OnInit()
-        begin
-            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Stmnt.") <> '';
-            LogInteractionEnable := LogInteraction;
-        end;
-
         trigger OnOpenPage()
         begin
             InitRequestPageDataInternal();
@@ -1046,6 +1040,9 @@ report 116 Statement
 
         if (not PrintAllHavingEntry) and (not PrintAllHavingBal) then
             PrintAllHavingBal := true;
+
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Stmnt.") <> '';
+        LogInteractionEnable := LogInteraction;
 
         if Format(PeriodLength) = '' then
             Evaluate(PeriodLength, '<1M+CM>');
