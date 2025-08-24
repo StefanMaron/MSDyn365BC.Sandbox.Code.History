@@ -6,7 +6,6 @@ namespace Microsoft.EServices.EDocumentConnector;
 
 using System.Telemetry;
 using System.Environment;
-using System.Utilities;
 
 page 6361 "EDoc Ext Connection Setup Card"
 {
@@ -115,22 +114,6 @@ page 6361 "EDoc Ext Connection Setup Card"
                     FeatureTelemetry.LogUptake('0000MSD', ExternalServiceTok, Enum::"Feature Uptake Status"::"Set up");
                 end;
             }
-            action(ResetSetup)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Reset Setup';
-                Image = Restore;
-                ToolTip = 'Resets the Pagero setup.';
-
-                trigger OnAction()
-                var
-                    PageroAuth: Codeunit "Pagero Auth.";
-                    ConfirmMgt: Codeunit "Confirm Management";
-                begin
-                    if ConfirmMgt.GetResponse(ResetQst) then
-                        PageroAuth.ResetConnectionSetup();
-                end;
-            }
         }
     }
 
@@ -161,5 +144,4 @@ page 6361 "EDoc Ext Connection Setup Card"
         ClientID, ClientSecret : Text;
         IsSaaS: Boolean;
         ExternalServiceTok: Label 'ExternalServiceConnector', Locked = true;
-        ResetQst: Label 'Are you sure you want to reset the Pagero setup?';
 }

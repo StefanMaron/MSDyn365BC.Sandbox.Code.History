@@ -470,9 +470,6 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
         if IsHandled then
             exit;
 
-        if NewProdOrderComponent."Line No." = 0 then
-            exit;
-
         if not WhseValidateSourceLine.WhseLinesExist(
              Database::"Prod. Order Component", OldProdOrderComponent.Status.AsInteger(), OldProdOrderComponent."Prod. Order No.",
              OldProdOrderComponent."Prod. Order Line No.", OldProdOrderComponent."Line No.", OldProdOrderComponent.Quantity)
