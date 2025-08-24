@@ -560,14 +560,7 @@ codeunit 905 "Assembly Line Management"
     end;
 
     procedure ShowDueDateBeforeWorkDateMsg(ActualLineDueDate: Date)
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeShowDueDateBeforeWorkDateMsg(ActualLineDueDate, IsHandled);
-        if IsHandled then
-            exit;
-
         if GuiAllowed then
             if GetWarningMode() then
                 Message(Text005, ActualLineDueDate, WorkDate());
@@ -1073,11 +1066,6 @@ codeunit 905 "Assembly Line Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateAndSendNotification(var AssemblyHeader: Record "Assembly Header"; var AssemblyLine: Record "Assembly Line"; var IsHandled: Boolean; var Rollback: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowDueDateBeforeWorkDateMsg(ActualLineDueDate: Date; var IsHandled: Boolean)
     begin
     end;
 }
