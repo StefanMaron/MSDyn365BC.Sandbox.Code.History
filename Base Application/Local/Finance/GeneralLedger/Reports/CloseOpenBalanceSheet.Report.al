@@ -631,8 +631,7 @@ report 12113 "Close/Open Balance Sheet"
         if ClosePerGlobalDimOnly then
             exit;
 
-        GLEntry.SetCurrentKey("G/L Account No.", "Posting Date", "Close Income Statement Dim. ID", "Entry No.");
-        GLEntry.SetLoadFields("Entry No.", "Dimension Set ID", "Close Income Statement Dim. ID");
+        GLEntry.SetCurrentKey("G/L Account No.", "Posting Date");
         GLEntry.SetRange("G/L Account No.", AccNo);
         GLEntry.SetRange("Posting Date", FiscalYearStartDate, FiscYearClosingDate);
         GLEntry.SetRange("Close Income Statement Dim. ID", 0);
