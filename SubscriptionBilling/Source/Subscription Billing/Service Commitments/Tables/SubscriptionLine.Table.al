@@ -531,6 +531,7 @@ table 8059 "Subscription Line"
             FieldClass = FlowField;
             CalcFormula = lookup("Subscription Header"."Source No." where("No." = field("Subscription Header No.")));
         }
+#if not CLEANSCHEMA29
         field(8009; "Item No."; Code[20])
         {
             Caption = 'Item No.';
@@ -546,6 +547,7 @@ table 8059 "Subscription Line"
             ObsoleteTag = '29.0';
 #endif
         }
+#endif
         field(8010; "Subscription Description"; Text[100])
         {
             Caption = 'Subscription Description';
@@ -619,7 +621,14 @@ table 8059 "Subscription Line"
     end;
 
     internal procedure CheckServiceDates(ServiceStartDate: Date; ServiceEndDate: Date; NextBillingDate: Date)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCheckServiceDates(ServiceStartDate, ServiceEndDate, NextBillingDate, IsHandled);
+        if IsHandled then
+            exit;
+
         if (ServiceStartDate <> 0D) and (ServiceEndDate <> 0D) then
             if ServiceStartDate > ServiceEndDate then
                 Error(DateBeforeDateErr, Rec.FieldCaption("Subscription Line End Date"), Rec.FieldCaption("Subscription Line Start Date"));
@@ -759,10 +768,8 @@ table 8059 "Subscription Line"
 
     internal procedure UpdateCancellationPossibleUntil(): Boolean
     begin
-        if IsNoticePeriodEmpty() then
+        if IsNoticePeriodEmpty() or ("Term until" = 0D) then
             exit(false);
-        if "Term Until" = 0D then
-            exit;
         CalendarManagement.ReverseDateFormula(NegativeDateFormula, "Notice Period");
         "Cancellation Possible Until" := CalcDate(NegativeDateFormula, "Term Until");
         if DateTimeManagement.IsLastDayOfMonth("Term until") then
@@ -1937,6 +1944,11 @@ table 8059 "Subscription Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyFromSalesSubscriptionLine(var SubscriptionLine: Record "Subscription Line"; SalesSubscriptionLine: Record "Sales Subscription Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckServiceDates(ServiceStartDate: Date; ServiceEndDate: Date; NextBillingDate: Date; var IsHandled: Boolean)
     begin
     end;
 }
