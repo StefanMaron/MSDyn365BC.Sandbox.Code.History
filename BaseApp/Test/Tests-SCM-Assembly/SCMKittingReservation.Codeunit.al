@@ -2289,7 +2289,7 @@ codeunit 137099 "SCM Kitting Reservation"
 
         LibraryVariableStorage.Enqueue(UndoPostedAssemblyOrderQst); // Enqueue for ConfirmHandler.
         LibraryVariableStorage.Enqueue(true); // First time the answer is "Yes" for conform dialog.
-        Codeunit.Run(Codeunit::"Pstd. Assembly - Undo (Yes/No)", PostedAssemblyHeader);
+        CODEUNIT.Run(CODEUNIT::"Pstd. Assembly - Undo (Yes/No)", PostedAssemblyHeader);
     end;
 
     local procedure VerifyAssemblyOrderItemTracking(AssemblyOrderNo: Code[20])
