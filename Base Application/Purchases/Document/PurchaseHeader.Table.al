@@ -27,7 +27,6 @@ using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Shipping;
-using Microsoft.Intercompany;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
 using Microsoft.Inventory;
@@ -520,7 +519,7 @@ table 38 "Purchase Header"
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateOrderDate(Rec, xRec, IsHandled, CurrFieldNo);
+                OnBeforeValidateOrderDate(Rec, xRec, IsHandled);
                 if IsHandled then
                     exit;
 
@@ -1646,7 +1645,6 @@ table 38 "Purchase Header"
                     UpdateDocumentDate := true;
                 Validate("Payment Terms Code");
                 Validate("Prepmt. Payment Terms Code");
-                UpdateDocumentDate := false;
             end;
         }
         field(101; "Area"; Code[10])
@@ -4299,7 +4297,7 @@ table 38 "Purchase Header"
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec, FieldNumber);
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if PurchLinesExist() then
@@ -7061,15 +7059,14 @@ table 38 "Purchase Header"
     begin
         IsHandled := false;
         OnBeforeValidateEmptySellToCustomerAndLocation(Rec, Vend, IsHandled, xRec);
-        if not IsHandled then begin
-            Validate("Sell-to Customer No.", '');
+        if IsHandled then
+            exit;
 
-            if "Buy-from Vendor No." <> '' then
-                GetVend("Buy-from Vendor No.");
-            UpdateLocationCode(Vend."Location Code");
-        end;
+        Validate("Sell-to Customer No.", '');
 
-        OnAfterValidateEmptySellToCustomerAndLocation(Rec, Vend);
+        if "Buy-from Vendor No." <> '' then
+            GetVend("Buy-from Vendor No.");
+        UpdateLocationCode(Vend."Location Code");
     end;
 
     /// <summary>
@@ -7592,17 +7589,6 @@ table 38 "Purchase Header"
             Error(PrepaymentInvoicesNotPaidErr, Rec."Document Type", Rec."No.");
     end;
 
-    procedure SendICPurchaseDoc(var PurchaseHeader: Record "Purchase Header")
-    var
-        ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
-    begin
-        if PurchaseHeader.FindSet() then
-            repeat
-                if ApprovalsMgmt.PrePostApprovalCheckPurch(PurchaseHeader) then
-                    ICInOutboxMgt.SendPurchDoc(PurchaseHeader, false);
-            until PurchaseHeader.Next() = 0;
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var PurchaseHeader: Record "Purchase Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
@@ -7874,7 +7860,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var PurcasehHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; FieldNumber: Integer)
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var PurcasehHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header")
     begin
     end;
 
@@ -8759,7 +8745,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateOrderDate(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; CurrFieldNo: Integer)
+    local procedure OnBeforeValidateOrderDate(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 
@@ -8977,11 +8963,6 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetPstdDocLinesToReverse(var PurchaseHeader: Record "Purchase Header")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterValidateEmptySellToCustomerAndLocation(var PurchaseHeader: Record "Purchase Header"; var Vendor: Record Vendor)
     begin
     end;
 }
