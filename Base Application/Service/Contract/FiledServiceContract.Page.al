@@ -193,7 +193,7 @@ page 6072 "Filed Service Contract"
                         field("Bill-to County"; Rec."Bill-to County")
                         {
                             ApplicationArea = Service;
-                            CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
+                            Caption = 'County';
                         }
                     }
                     field("Bill-to Post Code"; Rec."Bill-to Post Code")
@@ -299,7 +299,7 @@ page 6072 "Filed Service Contract"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = Service;
-                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                            Caption = 'County';
                         }
                     }
                     field("Ship-to Post Code"; Rec."Ship-to Post Code")
