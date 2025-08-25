@@ -2499,13 +2499,10 @@ codeunit 138008 "Cust/Vend/Item/Empl Templates"
         ItemTempl.Validate("Costing Method", ItemTempl."Costing Method"::Average);
         ItemTempl.Modify(true);
 
-        // [GIVEN] Create item "I"
+        // [WHEN] Create item "I"
         Item.Init();
         Item.Insert(true);
-        Item.TestField("Costing Method", Item."Costing Method"::Standard);
-
-        // [WHEN] Apply item template.
-        ItemTemplMgt.ApplyItemTemplate(Item, ItemTempl, true);
+        ItemTemplMgt.ApplyItemTemplate(Item, ItemTempl);
 
         // [THEN] "I" has "Costing Method" = "CM2"
         Item.TestField("Costing Method", Item."Costing Method"::Average);
@@ -2532,13 +2529,10 @@ codeunit 138008 "Cust/Vend/Item/Empl Templates"
         ItemTempl.Validate("Costing Method", ItemTempl."Costing Method"::FIFO);
         ItemTempl.Modify(true);
 
-        // [GIVEN] Create item "I"
+        // [WHEN] Create item "I"
         Item.Init();
         Item.Insert(true);
-        Item.TestField("Costing Method", Item."Costing Method"::Average);
-
-        // [WHEN] Apply item template.
-        ItemTemplMgt.ApplyItemTemplate(Item, ItemTempl, true);
+        ItemTemplMgt.ApplyItemTemplate(Item, ItemTempl);
 
         // [THEN] "I" has "Costing Method" = "FIFO"
         Item.TestField("Costing Method", Item."Costing Method"::FIFO);
@@ -2739,24 +2733,23 @@ codeunit 138008 "Cust/Vend/Item/Empl Templates"
         ItemTempl: Record "Item Templ.";
         ItemTemplMgt: Codeunit "Item Templ. Mgt.";
     begin
-        // [SCENARIO 431385] Create item from template with "Type" = 'Service' and "Reserve" = 'Never'
+        // [SCENARIO 431385] Create item from template with "Type" = 'Service' and "Reserve" = 'Optional'
         Initialize();
 
-        // [GIVEN] Item template "IT" with "Type" = Service and "Reserve" = Never
+        // [GIVEN] Item template "IT" with "Type" = Service and "Reserve" = Optional
         CreateItemTemplateWithDataAndDimensions(ItemTempl);
         ItemTempl."Inventory Posting Group" := '';
         ItemTempl.Type := ItemTempl.Type::Service;
-        ItemTempl.Reserve := ItemTempl.Reserve::Never;
+        ItemTempl.Reserve := ItemTempl.Reserve::Optional;
         ItemTempl.Modify();
 
         // [WHEN] Create item "I"
         Item.Init();
         Item.Insert(true);
-        Item.TestField(Reserve, Item.Reserve::Optional);
         ItemTemplMgt.ApplyItemTemplate(Item, ItemTempl);
 
-        // [THEN] "I"."Reserve" = 'Optional' as the value is not updated from template.
-        Item.TestField(Reserve, Item.Reserve::Optional);
+        // [THEN] "I"."Reserve" = 'Never'
+        Item.TestField(Reserve, Item.Reserve::Never);
 
         // [THEN] "IT"."Reserve" = 'Never'
         ItemTempl.Get(ItemTempl.Code);
