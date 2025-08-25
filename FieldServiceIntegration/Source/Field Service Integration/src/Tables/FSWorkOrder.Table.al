@@ -17,7 +17,7 @@ table 6617 "FS Work Order"
     {
         field(1; WorkOrderId; GUID)
         {
-            ExternalName = 'msdyn_workorderid';
+            ExternalName = 'msdyn_workorderId';
             ExternalType = 'Uniqueidentifier';
             ExternalAccess = Insert;
             Description = 'Shows the entity instances.';

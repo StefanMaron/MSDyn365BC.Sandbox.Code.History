@@ -1,11 +1,11 @@
 {
   "settings": {
-    "allint.enabled": false,
-    "al.enableCodeAnalysis": false,
     "al.enableCodeActions": false,
+    "allint.enabled": false,
     "search.exclude": {
       "**.xlf": true
-    }
+    },
+    "al.enableCodeAnalysis": false
   },
   "folders": [
     {
@@ -112,9 +112,6 @@
     },
     {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
     },
     {
       "path": "./Sustainability/Test/Sustainability Tests"
@@ -265,9 +262,6 @@
     },
     {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
-    },
-    {
-      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
     },
     {
       "path": "./Email - Outlook REST API/Test"

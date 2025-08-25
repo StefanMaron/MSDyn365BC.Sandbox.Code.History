@@ -1,13 +1,9 @@
-#if not CLEAN26
 namespace Microsoft.SubscriptionBilling;
 
 query 8000 "Overdue Customer Serv. Comm."
 {
     Caption = 'Overdue Service Commitments';
     QueryType = Normal;
-    ObsoleteState = Pending;
-    ObsoleteTag = '26.0';
-    ObsoleteReason = 'Removed as there is no need to use queries in order to fetch Service Commitments for temporary display using buffer table "Overdue Service Commitments"';
 
     elements
     {
@@ -44,4 +40,3 @@ query 8000 "Overdue Customer Serv. Comm."
         }
     }
 }
-#endif
