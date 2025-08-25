@@ -440,8 +440,6 @@ table 5902 "Service Line"
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
                 CheckQtyToShipPositive();
 
@@ -472,15 +470,12 @@ table 5902 "Service Line"
                         Validate("Qty. to Consume", 0);
                 end;
 
-                IsHandled := false;
-                OnValidateQtyToShipOnBeforeQtyToShipCheck(Rec, xRec, CurrFieldNo, IsHandled);
-                if not IsHandled then begin
-                    if not CanShipQty() then
-                        Error(Text016, "Outstanding Quantity");
+                OnValidateQtyToShipOnBeforeQtyToShipCheck(Rec);
+                if not CanShipQty() then
+                    Error(Text016, "Outstanding Quantity");
 
-                    if not CanShipBaseQty() then
-                        Error(Text017, "Outstanding Qty. (Base)");
-                end;
+                if not CanShipBaseQty() then
+                    Error(Text017, "Outstanding Qty. (Base)");
             end;
         }
         field(22; "Unit Price"; Decimal)
@@ -2171,8 +2166,6 @@ table 5902 "Service Line"
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
                 if CurrFieldNo = FieldNo("Qty. to Consume") then
                     CheckWarehouse();
@@ -2196,21 +2189,18 @@ table 5902 "Service Line"
                     "Qty. to Invoice (Base)" := 0;
                 end;
 
-                OnValidateQtyToConsumeOnBeforeQtyToConsumeCheck(Rec, xRec, CurrFieldNo, IsHandled);
-                if not IsHandled then begin
-                    if ("Qty. to Consume" * Quantity < 0) or
-                       (Abs("Qty. to Consume") > Abs(MaxQtyToConsume()))
-                    then
-                        Error(
-                          Text028,
-                          MaxQtyToConsume());
-                    if ("Qty. to Consume (Base)" * "Quantity (Base)" < 0) or
-                       (Abs("Qty. to Consume (Base)") > Abs(MaxQtyToConsumeBase()))
-                    then
-                        Error(
-                          Text032,
-                          MaxQtyToConsumeBase());
-                end;
+                if ("Qty. to Consume" * Quantity < 0) or
+                   (Abs("Qty. to Consume") > Abs(MaxQtyToConsume()))
+                then
+                    Error(
+                      Text028,
+                      MaxQtyToConsume());
+                if ("Qty. to Consume (Base)" * "Quantity (Base)" < 0) or
+                   (Abs("Qty. to Consume (Base)") > Abs(MaxQtyToConsumeBase()))
+                then
+                    Error(
+                      Text032,
+                      MaxQtyToConsumeBase());
 
                 if (xRec."Qty. to Consume" <> "Qty. to Consume") or
                    (xRec."Qty. to Consume (Base)" <> "Qty. to Consume (Base)")
@@ -4465,9 +4455,6 @@ table 5902 "Service Line"
             "Qty. Shipped Not Invoiced" := "Quantity Shipped" - "Quantity Invoiced" - "Quantity Consumed";
             "Qty. Shipped Not Invd. (Base)" := "Qty. Shipped (Base)" - "Qty. Invoiced (Base)" - "Qty. Consumed (Base)";
         end;
-
-        OnInitOutstandingOnAfterInitOutstandingQuantity(Rec);
-
         CalcFields("Reserved Quantity");
         Planned := "Reserved Quantity" = "Outstanding Quantity";
         "Completely Shipped" := (Quantity <> 0) and ("Outstanding Quantity" = 0);
@@ -7271,7 +7258,7 @@ table 5902 "Service Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateQtyToShipOnBeforeQtyToShipCheck(var ServiceLine: Record "Service Line"; var xServiceLine: Record "Service Line"; CallingFieldNo: Integer; var IsHandled: Boolean)
+    local procedure OnValidateQtyToShipOnBeforeQtyToShipCheck(var ServiceLine: Record "Service Line")
     begin
     end;
 
@@ -7467,16 +7454,6 @@ table 5902 "Service Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcVATAmountLinesOnBeforeUpdateVATAmountLine(var ServiceLine: Record "Service Line"; var VATAmountLine: Record "VAT Amount Line"; var TotalVATAmount: Decimal; Currency: Record Currency; var RoundingLineInserted: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateQtyToConsumeOnBeforeQtyToConsumeCheck(var ServiceLine: Record "Service Line"; var xServiceLine: Record "Service Line"; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInitOutstandingOnAfterInitOutstandingQuantity(var ServiceLine: Record "Service Line")
     begin
     end;
 }
