@@ -12,7 +12,25 @@
       "path": "./LatePaymentPredictor/Test/Late Payment Prediction Tests"
     },
     {
+      "path": "./businessfoundation/Test/Business Foundation Test Libraries"
+    },
+    {
+      "path": "./businessfoundation/Test/Business Foundation Tests/DisabledTests"
+    },
+    {
       "path": "./ServiceDeclaration/Test/Service Declaration Tests"
+    },
+    {
+      "path": "./system application/Test/System Application Test Library"
+    },
+    {
+      "path": "./system application/Test/System Application Test/DisabledTests"
+    },
+    {
+      "path": "./system application/Test/System Application Test/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./system application/source/System Application/Email/src/Test Email"
     },
     {
       "path": "./MasterDataManagement/Test/_Exclude_Master_Data_Management_Tests"
@@ -39,28 +57,10 @@
       "path": "./SubscriptionBilling/Test/Subscription Billing Tests"
     },
     {
-      "path": "./System Application/Test/System Application Test Library"
-    },
-    {
-      "path": "./System Application/Test/System Application Test/DisabledTests"
-    },
-    {
-      "path": "./System Application/Test/System Application Test/Extension Management/testArtifacts"
-    },
-    {
-      "path": "./System Application/Source/System Application/Email/src/Test Email"
-    },
-    {
       "path": "./Intrastat/Test/Intrastat Core Tests"
     },
     {
       "path": "./Shopify/test/Shopify Connector Test"
-    },
-    {
-      "path": "./BusinessFoundation/Test/Business Foundation Test Libraries"
-    },
-    {
-      "path": "./BusinessFoundation/Test/Business Foundation Tests/DisabledTests"
     },
     {
       "path": "./testframework/testlibraries"
@@ -130,6 +130,9 @@
     },
     {
       "path": "./EDocumentConnectors/SignUp/Test/E-Document Connector - SignUp Tests"
+    },
+    {
+      "path": "./EDocumentConnectors/Continia/Test/E-Document Connector - Continia Tests"
     },
     {
       "path": "./Sustainability/Test/Sustainability Tests"
