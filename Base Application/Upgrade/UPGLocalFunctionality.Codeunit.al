@@ -224,22 +224,18 @@ codeunit 104100 "Upg Local Functionality"
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefCountry.GetReportSelectionForGLVATReconciliationTag()) then
             exit;
 
-        DACHReportSelections.SetRange(Usage, DACHReportSelections.Usage::"Sales VAT Acc. Proof");
+        DACHReportSelections.SETRANGE(Usage, DACHReportSelections.Usage::"Sales VAT Acc. Proof");
         if DACHReportSelections.FindFirst() then
             ReportID := DACHReportSelections."Report ID"
         else
             ReportID := 11;
 
-        if ReportSelections.Get(ReportSelections.Usage::"Sales VAT Acc. Proof", '1') then begin
-            ReportSelections."Report ID" := ReportID;
+        ReportSelections.Init();
+        ReportSelections.Usage := ReportSelections.Usage::"Sales VAT Acc. Proof";
+        ReportSelections.Sequence := '1';
+        ReportSelections."Report ID" := ReportID;
+        if not ReportSelections.Insert() then
             ReportSelections.Modify();
-        end else begin
-            ReportSelections.Init();
-            ReportSelections.Usage := ReportSelections.Usage::"Sales VAT Acc. Proof";
-            ReportSelections.Sequence := '1';
-            ReportSelections."Report ID" := ReportID;
-            ReportSelections.Insert();
-        end;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefCountry.GetReportSelectionForGLVATReconciliationTag());
     end;
@@ -264,16 +260,12 @@ codeunit 104100 "Upg Local Functionality"
         else
             ReportID := Report::"VAT Statement Schedule";
 
-        if ReportSelections.Get(ReportSelections.Usage::"VAT Statement Schedule", '1') then begin
-            ReportSelections."Report ID" := ReportID;
+        ReportSelections.Init();
+        ReportSelections.Usage := ReportSelections.Usage::"VAT Statement Schedule";
+        ReportSelections.Sequence := '1';
+        ReportSelections."Report ID" := ReportID;
+        if not ReportSelections.Insert() then
             ReportSelections.Modify();
-        end else begin
-            ReportSelections.Init();
-            ReportSelections.Usage := ReportSelections.Usage::"VAT Statement Schedule";
-            ReportSelections.Sequence := '1';
-            ReportSelections."Report ID" := ReportID;
-            ReportSelections.Insert();
-        end;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefCountry.GetReportSelectionForVATStatementScheduleTag());
     end;
@@ -298,16 +290,12 @@ codeunit 104100 "Upg Local Functionality"
         else
             ReportID := Report::"Issued Delivery Reminder";
 
-        if ReportSelections.Get(ReportSelections.Usage::"Issued Delivery Reminder", '1') then begin
-            ReportSelections."Report ID" := ReportID;
+        ReportSelections.Init();
+        ReportSelections.Usage := ReportSelections.Usage::"Issued Delivery Reminder";
+        ReportSelections.Sequence := '1';
+        ReportSelections."Report ID" := ReportID;
+        if not ReportSelections.Insert() then
             ReportSelections.Modify();
-        end else begin
-            ReportSelections.Init();
-            ReportSelections.Usage := ReportSelections.Usage::"Issued Delivery Reminder";
-            ReportSelections.Sequence := '1';
-            ReportSelections."Report ID" := ReportID;
-            ReportSelections.Insert();
-        end;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefCountry.GetReportSelectionForIssuedDeliveryReminderTag());
     end;
@@ -332,16 +320,12 @@ codeunit 104100 "Upg Local Functionality"
         else
             ReportID := Report::"Delivery Reminder - Test";
 
-        if ReportSelections.Get(ReportSelections.Usage::"Delivery Reminder Test", '1') then begin
-            ReportSelections."Report ID" := ReportID;
+        ReportSelections.Init();
+        ReportSelections.Usage := ReportSelections.Usage::"Delivery Reminder Test";
+        ReportSelections.Sequence := '1';
+        ReportSelections."Report ID" := ReportID;
+        if not ReportSelections.Insert() then
             ReportSelections.Modify();
-        end else begin
-            ReportSelections.Init();
-            ReportSelections.Usage := ReportSelections.Usage::"Delivery Reminder Test";
-            ReportSelections.Sequence := '1';
-            ReportSelections."Report ID" := ReportID;
-            ReportSelections.Insert();
-        end;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefCountry.GetReportSelectionForDeliveryReminderTestTag());
     end;
