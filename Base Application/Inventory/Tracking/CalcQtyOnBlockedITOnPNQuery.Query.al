@@ -35,10 +35,4 @@ query 7317 CalcQtyOnBlockedITOnPNQuery
             }
         }
     }
-
-    procedure SetItemTrackingFilter(ItemTrackingSetup: Record "Item Tracking Setup")
-    begin
-        if ItemTrackingSetup."Package No." <> '' then
-            SetRange(Package_No_, ItemTrackingSetup."Package No.");
-    end;
 }
