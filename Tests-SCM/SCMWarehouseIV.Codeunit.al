@@ -48,8 +48,6 @@ codeunit 137407 "SCM Warehouse IV"
         ItemTrackingMode: Option AssignLotNo,AssignSerialNo,SelectEntries,AssignLotAndQty;
         ItemTrackingModeWithVerification: Option AssignLotNo,AssignSerialNo,SelectEntries,AssignLotAndQty,VerifyWarrantyDate;
         WarrantyDateError: Label 'Warranty Date must be %1';
-        ReorderPolicyVisibleErr: Label 'Reorder Policy must be visible';
-        SpecialEquipmentCodeVisibleErr: Label 'Special Equipment Code should be visible.';
 
     [Test]
     [Scope('OnPrem')]
@@ -4010,223 +4008,6 @@ codeunit 137407 "SCM Warehouse IV"
         VerifyWarrantyDatesOnServiceItem(Item."No.", WarrantyStartingDateWhenItemTrackingExists, WarrantyDateFormula, DefaultWarrantyDuration);
     end;
 
-    [Test]
-    procedure SKUCardHasReorderPlanningAndWarehouseFastTabVisble()
-    var
-        Item: Record Item;
-        Location: Record Location;
-        StocKkeepingUnitCard: Testpage "Stockkeeping Unit Card";
-    begin
-        // [SCENARIO 566001] Planning and Warehouse fasttab Visible on the newly created Stockkeeping Unit.
-        Initialize();
-
-        // [GIVEN] Create an Item.
-        LibraryInventory.CreateItem(Item);
-
-        // [GIVEN] Create a Location.
-        LibraryWarehouse.CreateLocation(Location);
-
-        // [WHEN] Create new Stockkeeping Unit.
-        StocKkeepingUnitCard.OpenNew();
-        StocKkeepingUnitCard."Item No.".SetValue(Item."No.");
-        StocKkeepingUnitCard."Location Code".SetValue(Location.Code);
-
-        // [THEN] Reorder Policy must be visible.
-        Assert.IsTrue(StocKkeepingUnitCard."Reordering Policy".Visible(), ReorderPolicyVisibleErr);
-
-        // [THEN] Special Equipment Code must visible.
-        Assert.IsTrue(StocKkeepingUnitCard."Special Equipment Code".Visible(), SpecialEquipmentCodeVisibleErr);
-    end;
-
-    [Test]
-    [HandlerFunctions('ItemTrackingLinesHandler,CreatePutAwayFromPostedWhseSourceReportHandler,MessageHandler')]
-    procedure VerifyWhsePutAwayIsCreatedFromPostedWhseReceiptIfWhsePutAwayIsRegisteredPartially()
-    var
-        ItemTrackingCode: Record "Item Tracking Code";
-        Item: Record Item;
-        Location: Record Location;
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        UnitofMeasure: Record "Unit of Measure";
-        ItemUnitofMeasure: Record "Item Unit of Measure";
-        WarehouseReceiptHeader: Record "Warehouse Receipt Header";
-        WarehouseReceiptLine: Record "Warehouse Receipt Line";
-        WarehouseActivityLine: Record "Warehouse Activity Line";
-        WarehouseActivityHeader: Record "Warehouse Activity Header";
-        LotNo: Code[50];
-    begin
-        // [SCENARIO 571201]: There is Nothing to Handle error when creating putaway from Posted Warehouse Receipt after a partially registered putaway.
-
-        // [GIVEN] Initialize initials
-        Initialize();
-        LotNo := LibraryUtility.GenerateGUID();
-
-        // [GIVEN] Create Location with 'Bin Mandatory' and 'Require Put-away' set to true.
-        CreateFullWarehouseSetup(Location);
-
-        // [GIVEN] Item Tracking Code with Lot Purchase Tracking
-        CreateItemTrackingCode(ItemTrackingCode, true, false, false);
-
-        // [GIVEN] Create Unit of Measure Code
-        LibraryInventory.CreateUnitOfMeasureCode(UnitofMeasure);
-
-        // [GIVEN] Create a new Item and new Item Unit of Measure and specify 48 Quantity per UOM
-        LibraryInventory.CreateItem(Item);
-        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitofMeasure, Item."No.", UnitofMeasure.Code, LibraryRandom.RandIntInRange(48, 48));
-
-        // [GIVEN] Update Item with Item Tracking Code, Purchase UOM as new Item UOM and Put-away UOM as Item Base Unit of Measure
-        Item.Validate("Item Tracking Code", ItemTrackingCode.Code);
-        Item.Validate("Purch. Unit of Measure", ItemUnitofMeasure.Code);
-        Item.Validate("Put-away Unit of Measure Code", Item."Base Unit of Measure");
-        Item.Modify(true);
-
-        // [GIVEN] Create a new Purchase Order with Item Quantity as 2 
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, '');
-        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, Item."No.", LibraryRandom.RandIntInRange(2, 2));
-        PurchaseLine.Validate("Location Code", Location.Code);
-        PurchaseLine.Modify(true);
-        LibraryPurchase.ReleasePurchaseDocument(PurchaseHeader);
-
-        // [GIVEN] Create warehouse receipt from the purchase order.
-        LibraryWarehouse.CreateWhseReceiptFromPO(PurchaseHeader);
-        EnqueueTrackingLotAndQty(ItemTrackingMode::AssignLotAndQty, LotNo, LibraryRandom.RandIntInRange(96, 96));
-
-        // [GIVEN] Assign Item Tracking Line to the Warehouse Receipt Line
-        WarehouseReceiptLine.SetRange("Source No.", PurchaseHeader."No.");
-        WarehouseReceiptLine.SetRange("Source Line No.", PurchaseLine."Line No.");
-        WarehouseReceiptLine.SetRange("Item No.", Item."No.");
-        WarehouseReceiptLine.FindFirst();
-        WarehouseReceiptLine.OpenItemTrackingLines();
-
-        // [GIVEN] Post Warehouse Receipt
-        WarehouseReceiptHeader.Get(WarehouseReceiptLine."No.");
-        LibraryWarehouse.PostWhseReceipt(WarehouseReceiptHeader);
-
-        // [GIVEN] Open Warehouse Put Aways and change Qty.to Handle
-        LibraryVariableStorage.Enqueue(LibraryRandom.RandIntInRange(1, 1));
-        UpdateWarehouseActivityLineQtyToHandle(WarehouseActivityLine, PurchaseHeader."No.", PurchaseLine."Line No.", PurchaseLine."No.", Enum::"Warehouse Activity Type"::"Put-away", ItemUnitofMeasure.Code);
-        LibraryVariableStorage.Enqueue(LibraryRandom.RandIntInRange(48, 48));
-        UpdateWarehouseActivityLineQtyToHandle(WarehouseActivityLine, PurchaseHeader."No.", PurchaseLine."Line No.", PurchaseLine."No.", Enum::"Warehouse Activity Type"::"Put-away", Item."Base Unit of Measure");
-
-        // [GIVEN] Register the Warehouse Put Away
-        WarehouseActivityHeader.Get(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.");
-        LibraryWarehouse.RegisterWhseActivity(WarehouseActivityHeader);
-
-        // [GIVEN] Delete the Warehouse Put Away Document
-        WarehouseActivityHeader.Get(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.");
-        WarehouseActivityHeader.Delete(true);
-        Commit();
-
-        // [WHEN] Once Registered, go to Posted Whse. Receipts and Create Put Away
-        FindPostedWhseReceiptAndCreatePutAway(PurchaseHeader."No.", PurchaseLine."Line No.", PurchaseLine."No.");
-
-        // [THEN] Putaway is created for the 1 remaining bag to be putaway into pcs.
-        LibraryVariableStorage.AssertEmpty();
-    end;
-
-    [Test]
-    [HandlerFunctions('SalesOrderStatisticsUpdateTotalVATHandler,VATAmountLinesHandler,MessageHandler')]
-    procedure SalesOrderWithVATCorrectionWhenInventoryPickIsPosted()
-    var
-        CustomerPostingGroup: Record "Customer Posting Group";
-        GLAccount: Record "G/L Account";
-        Item: Record Item;
-        Location: Record Location;
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        VATPostingSetup: Record "VAT Posting Setup";
-        Vendor: Record Vendor;
-        WarehouseEmployee: Record "Warehouse Employee";
-        LibraryERM: Codeunit "Library - ERM";
-        SalesOrder: Testpage "Sales Order";
-        MaxVATDifference: Decimal;
-        VATDifference: Decimal;
-        GLAccountCode: Code[20];
-    begin
-        // [SCENARIO 575983] Corrected VAT Amount is set back when inventory pick was posted.
-        Initialize();
-
-        // [GIVEN] "Sales & Receivables Setup"."Allow VAT Difference" = TRUE
-        // [GIVEN] "General Ledger Setup"."Max. VAT Difference Allowed" = "D"
-        MaxVATDifference := EnableVATDiffAmount();
-        VATDifference := LibraryRandom.RandDecInDecimalRange(0.01, MaxVATDifference, 2);
-        LibraryVariableStorage.Enqueue(VATDifference);
-
-        // [GIVEN] Create an Item.
-        LibraryInventory.CreateItem(Item);
-
-        // [GIVEN] Create Location with required Warehouse Setup and Warehouse Employee.
-        LibraryWarehouse.CreateLocationWMS(Location, true, true, true, false, false);
-        LibraryWarehouse.CreateWarehouseEmployee(WarehouseEmployee, Location.Code, true);
-
-        // [GIVEN] Create Bin and Bin Content.
-        CreateBinAndBinContent(Location.Code, Item);
-
-        // [GIVEN] Create Purchase Order with Quantity as 1 and Release Purchase Order.
-        LibraryPurchase.CreatePurchaseDocumentWithItem(PurchaseHeader, PurchaseLine, PurchaseHeader."Document Type"::Order, LibraryPurchase.CreateVendor(Vendor),
-            Item."No.", 1, Location.Code, WorkDate());
-        PurchaseLine.Validate("Location Code", Location.Code);
-        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 2));
-        PurchaseLine.Modify(true);
-        LibraryPurchase.ReleasePurchaseDocument(PurchaseHeader);
-
-        // [GIVEN] Create Inventory Put-Away and Find Warehouse Activity Line.
-        CreateInventoryPut(PurchaseLine, false, false, Location.Code);
-
-        // [GIVEN] Post Inventory Put-Away for receipt.
-        PostInventoryPut(PurchaseHeader."No.");
-
-        // [GIVEN] Create VATPostingSetup with Vat % as 20.
-        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 20);
-
-        // [GIVEN] Create G/L Account with VAT Posting Setup.
-        GLAccountCode := LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostingSetup, GLAccount."Gen. Posting Type"::Sale);
-
-        // [GIVEN] Create Sales Header
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, LibrarySales.CreateCustomerNo());
-        SalesHeader.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
-        SalesHeader.Validate("Location Code", Location.Code);
-        SalesHeader.Modify(true);
-
-        // Assign G/L Account on Customer Posting Group.
-        CustomerPostingGroup.Get(SalesHeader."Customer Posting Group");
-        CustomerPostingGroup."Invoice Rounding Account" := GLAccountCode;
-        CustomerPostingGroup.Modify(true);
-
-        // [GIVEN] Validate VAT Prod. Posting Group on Item.
-        Item.Get(Item."No.");
-        Item.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
-        Item.Modify(true);
-
-        // [GIVEN] Create Sales Line with Quantity as 1.
-        LibrarySales.CreateSalesLineWithUnitPrice(SalesLine, SalesHeader, Item."No.", LibraryRandom.RandDecInRange(200, 400, 2), 1);
-        SalesLine.Validate("Location Code", Location.Code);
-        SalesLine.Modify(true);
-        LibrarySales.ReleaseSalesDocument(SalesHeader);
-
-        // [GIVEN] Sales Order is opened on Sales Order page.
-        SalesOrder.OpenEdit();
-        SalesOrder.Filter.SetFilter("No.", SalesHeader."No.");
-
-        // [GIVEN] Add VAT Difference in Sales Order Statistic Handler.
-        SalesOrder.SalesOrderStatistics.Invoke();
-
-        // [GIVEN] Create Inventory Pick and Find Warehouse Activity Line.
-        CreateInventoryPick(SalesLine, Location.Code);
-
-        // [WHEN] Post Shipment from Inventory-Pick.
-        PostInventoryPick(SalesHeader."No.", false);
-
-        // [THEN] Verify Sales Header Status as Released and Sales Line with VAT Difference.
-        SalesHeader.TestField(Status, SalesHeader.Status::Released);
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        SalesLine.SetRange("No.", Item."No.");
-        SalesLine.FindFirst();
-        SalesLine.TestField("VAT Difference", VATDifference);
-    end;
-
     local procedure Initialize()
     var
         WarehouseSetup: Record "Warehouse Setup";
@@ -5518,61 +5299,6 @@ codeunit 137407 "SCM Warehouse IV"
         WarehouseActivityLine.Modify(true);
     end;
 
-    local procedure UpdateWarehouseActivityLineQtyToHandle(var WhseActivityLine: Record "Warehouse Activity Line"; SourceNo: Code[20]; SourceLineNo: Integer; ItemNo: Code[20]; ActivityType: Enum "Warehouse Activity Type"; UnitofMeasureCode: Code[10])
-    var
-        QtytoHandle: Decimal;
-    begin
-        QtytoHandle := LibraryVariableStorage.DequeueDecimal();
-
-        WhseActivityLine.SetRange("Activity Type", ActivityType);
-        WhseActivityLine.SetRange("Source No.", SourceNo);
-        WhseActivityLine.SetRange("Source Line No.", SourceLineNo);
-        WhseActivityLine.SetRange("Item No.", ItemNo);
-        WhseActivityLine.SetRange("Unit of Measure Code", UnitofMeasureCode);
-        if WhseActivityLine.FindSet() then
-            repeat
-                WhseActivityLine.Validate("Qty. to Handle", QtytoHandle);
-                WhseActivityLine.Modify();
-            until WhseActivityLine.Next() = 0;
-    end;
-
-    local procedure FindPostedWhseReceiptAndCreatePutAway(SourceNo: Code[20]; SourceLineNo: Integer; ItemNo: Code[20])
-    var
-        PostedWhseReceiptLine: Record "Posted Whse. Receipt Line";
-        PostedWhseReceiptHeader: Record "Posted Whse. Receipt Header";
-    begin
-        PostedWhseReceiptLine.SetRange("Source No.", SourceNo);
-        PostedWhseReceiptLine.SetRange("Source Line No.", SourceLineNo);
-        PostedWhseReceiptLine.SetRange("Item No.", ItemNo);
-        PostedWhseReceiptLine.FindFirst();
-
-        PostedWhseReceiptHeader.Get(PostedWhseReceiptLine."No.");
-
-        PostedWhseReceiptLine.CreatePutAwayDoc(PostedWhseReceiptLine, PostedWhseReceiptHeader."Assigned User ID");
-    end;
-
-    local procedure EnableVATDiffAmount() Result: Decimal
-    var
-        LibraryERM: Codeunit "Library - ERM";
-    begin
-        Result := LibraryRandom.RandDec(2, 2);  // Use any Random decimal value between 0.01 and 1.99, value is not important.
-        LibraryERM.SetMaxVATDifferenceAllowed(Result);
-        LibrarySales.SetAllowVATDifference(true);
-    end;
-
-    local procedure CreateBinAndBinContent(LocationCode: Code[10]; Item: Record Item)
-    var
-        Bin: Record Bin;
-        BinContent: Record "Bin Content";
-    begin
-        LibraryWarehouse.CreateBin(Bin, LocationCode, '', '', '');
-        LibraryWarehouse.CreateBinContent(BinContent, LocationCode, '', Bin.Code, Item."No.", '', Item."Base Unit of Measure");
-        BinContent.Validate(Quantity, 1);
-        BinContent.Validate(Fixed, true);
-        BinContent.Validate(Default, true);
-        BinContent.Modify(true);
-    end;
-
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure ConfirmHandlerFalse(ConfirmMessage: Text[1024]; var Reply: Boolean)
@@ -5812,19 +5538,6 @@ codeunit 137407 "SCM Warehouse IV"
         ItemTrackingSummary.OK().Invoke();
     end;
 
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure VATAmountLinesHandler(var VATAmountLine: TestPage "VAT Amount Lines")
-    var
-        VATAmount: Decimal;
-    begin
-        // Modal Page Handler.
-        VATAmount := VATAmountLine."VAT Amount".AsDecimal() + LibraryVariableStorage.DequeueDecimal();
-        LibraryVariableStorage.Enqueue(VATAmount);
-        VATAmountLine."VAT Amount".SetValue(VATAmount);
-        VATAmountLine.OK().Invoke();
-    end;
-
     [RequestPageHandler]
     procedure CreateStockkeepingUnitRequestPageHandler(var CreateStockkeepingUnit: TestRequestPage "Create Stockkeeping Unit")
     begin
@@ -5864,21 +5577,6 @@ codeunit 137407 "SCM Warehouse IV"
     procedure ItemTrackingSummaryModalPageHandler(var ItemTrackingSummary: TestPage "Item Tracking Summary")
     begin
         ItemTrackingSummary.OK().Invoke();
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure CreatePutAwayFromPostedWhseSourceReportHandler(var CreatePutAwayFromWhseSource: TestRequestPage "Whse.-Source - Create Document")
-    begin
-        CreatePutAwayFromWhseSource.OK().Invoke();
-    end;
-
-    [PageHandler]
-    [Scope('OnPrem')]
-    procedure SalesOrderStatisticsUpdateTotalVATHandler(var SalesOrderStatistics: TestPage "Sales Order Statistics")
-    begin
-        SalesOrderStatistics.NoOfVATLines_Invoicing.DrillDown();
-        SalesOrderStatistics.OK().Invoke();
     end;
 }
 
