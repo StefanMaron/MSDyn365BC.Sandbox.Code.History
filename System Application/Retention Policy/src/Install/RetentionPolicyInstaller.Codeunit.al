@@ -5,6 +5,7 @@
 
 namespace System.DataAdministration;
 
+using System.Environment.Configuration;
 using System.Upgrade;
 using System.Environment;
 
@@ -108,12 +109,9 @@ codeunit 3907 "Retention Policy Installer"
         AddAllowedTables(true);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", OnGetPerCompanyUpgradeTags, '', false, false)]
-    local procedure RegisterPerCompanyTags(var PerCompanyUpgradeTags: List of [Code[250]])
-    var
-        UpgradeTag: Codeunit "Upgrade Tag";
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", OnAfterLogin, '', false, false)]
+    local procedure AddAllowedTablesOnAfterLogin()
     begin
-        if not UpgradeTag.HasUpgradeTag(GetRetenPolLogEntryAddedUpgradeTag()) then
-            PerCompanyUpgradeTags.Add(GetRetenPolLogEntryAddedUpgradeTag());
+        AddAllowedTables();
     end;
 }
