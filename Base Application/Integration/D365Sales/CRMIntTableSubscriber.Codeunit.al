@@ -492,10 +492,8 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 if UpdateCRMSalesorderdetailUom(SourceRecordRef, DestinationRecordRef) then
                     AdditionalFieldsWereModified := true;
             'CRM Salesorderdetail-Sales Line':
-                if UpdateSalesLineUnitOfMeasure(SourceRecordRef, DestinationRecordRef) then begin
-                    UpdateSalesLinePriceOverride(SourceRecordRef, DestinationRecordRef);
+                if UpdateSalesLineUnitOfMeasure(SourceRecordRef, DestinationRecordRef) then
                     AdditionalFieldsWereModified := true;
-                end;
         end;
     end;
 
@@ -2909,20 +2907,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         end;
         DestinationRecordRef.GetTable(SalesLine);
         exit(true);
-    end;
-
-    local procedure UpdateSalesLinePriceOverride(SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef): Boolean
-    var
-        CRMSalesorderdetail: Record "CRM Salesorderdetail";
-        SalesLine: Record "Sales Line";
-    begin
-        SourceRecordRef.SetTable(CRMSalesorderdetail);
-        DestinationRecordRef.SetTable(SalesLine);
-
-        if SalesLine."Unit Price" <> CRMSalesorderdetail.PricePerUnit then
-            SalesLine.Validate("Unit Price", CRMSalesorderdetail.PricePerUnit);
-
-        DestinationRecordRef.GetTable(SalesLine);
     end;
 
     local procedure UpdateCRMSalesorderdetailUom(SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef): Boolean
