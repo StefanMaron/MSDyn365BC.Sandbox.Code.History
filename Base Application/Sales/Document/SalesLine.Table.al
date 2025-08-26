@@ -452,17 +452,19 @@ table 37 "Sales Line"
             trigger OnValidate()
             var
                 CheckDateConflict: Codeunit "Reservation-Check Date Confl.";
-                IsHandled: boolean;
+                DoCheckReceiptOrderStatus: Boolean;
+                IsHandled: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateShipmentDate(IsHandled, Rec, xRec);
+                OnBeforeValidateShipmentDate(IsHandled, Rec, xRec, CurrFieldNo);
                 if IsHandled then
                     exit;
 
                 TestStatusOpen();
                 SalesWarehouseMgt.SalesLineVerifyChange(Rec, xRec);
-                OnValidateShipmentDateOnAfterSalesLineVerifyChange(Rec, CurrFieldNo);
-                if CurrFieldNo <> 0 then
+                DoCheckReceiptOrderStatus := CurrFieldNo <> 0;
+                OnValidateShipmentDateOnAfterSalesLineVerifyChange(Rec, CurrFieldNo, DoCheckReceiptOrderStatus);
+                if DoCheckReceiptOrderStatus then
                     AddOnIntegrMgt.CheckReceiptOrderStatus(Rec);
 
                 if "Shipment Date" <> 0D then begin
@@ -938,8 +940,13 @@ table 37 "Sales Line"
             MinValue = 0;
 
             trigger OnValidate()
+            var
+                DropInvoiceDiscountAmount: Boolean;
             begin
-                ValidateLineDiscountPercent(true);
+                DropInvoiceDiscountAmount := true;
+                OnValidateLineDiscountPercentOnBeforeValidateLineDiscountPercent(Rec, xRec, DropInvoiceDiscountAmount);
+                ValidateLineDiscountPercent(DropInvoiceDiscountAmount);
+
                 NotifyOnMissingSetup(FieldNo("Line Discount Amount"));
             end;
         }
@@ -1572,14 +1579,15 @@ table 37 "Sales Line"
                                 TestField("No.", VATPostingSetup.GetSalesAccount(false));
                             end;
                     end;
+                GetSalesSetup();
+                if ("VAT Bus. Posting Group" = SalesSetup."Reverse Charge VAT Posting Gr.") and not "Reverse Charge Item" then
+                    FieldError("VAT Bus. Posting Group", StrSubstNo(Text1041001, "VAT Bus. Posting Group", Type, "No."));
+
                 if "Document Type" = "Document Type"::"Credit Memo" then begin
-                    GetSalesSetup();
                     "Reverse Charge" := 0;
-                    if ("VAT Bus. Posting Group" = SalesSetup."Reverse Charge VAT Posting Gr.") and not "Reverse Charge Item" then
-                        FieldError("VAT Bus. Posting Group", StrSubstNo(Text1041001, "VAT Bus. Posting Group", Type, "No."));
                     if ("VAT Bus. Posting Group" = SalesSetup."Reverse Charge VAT Posting Gr.") and
-                       (SalesHeader."VAT Bus. Posting Group" = SalesSetup."Domestic Customers")
-                    then
+                     (SalesHeader."VAT Bus. Posting Group" = SalesSetup."Domestic Customers")
+                  then
                         "Reverse Charge" :=
                           Round(Amount * (1 - SalesHeader."VAT Base Discount %" / 100) * xRec."VAT %" / 100,
                             Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
@@ -2407,6 +2415,8 @@ table 37 "Sales Line"
 
                 if Type = Type::Item then begin
                     GetUnitCost();
+                    if "Document Type" = "Document Type"::"Return Order" then
+                        ValidateReturnReasonCode(FieldNo("Variant Code"));
                     if "Variant Code" <> xRec."Variant Code" then
                         PlanPriceCalcByField(FieldNo("Variant Code"));
                 end;
@@ -6685,7 +6695,7 @@ table 37 "Sales Line"
             repeat
                 if not SalesLine.ZeroAmountLine(QtyType) then begin
                     OnCalcVATAmountLinesOnBeforeProcessSalesLine(SalesLine);
-		    if ReverseChargeApplies and SalesLine."Reverse Charge Item" then begin
+                    if ReverseChargeApplies and SalesLine."Reverse Charge Item" then begin
                         SalesLine."Reverse Charge" := SalesLine."Amount Including VAT" - SalesLine.Amount;
                         SalesLine.SuspendStatusCheck(true);
                         GetSalesSetup();
@@ -8395,7 +8405,7 @@ table 37 "Sales Line"
         OnAfterCheckShipmentRelation(Rec, SalesShptLine);
     end;
 
-    local procedure CheckShipmentDateBeforeWorkDate()
+    procedure CheckShipmentDateBeforeWorkDate()
     var
         IsHandled: Boolean;
     begin
@@ -8722,6 +8732,8 @@ table 37 "Sales Line"
         if IsNullGuid(SalesHeader.SystemId) then
             exit;
         if SalesHeader."Invoice Discount Value" = 0 then
+            exit;
+        if SalesHeader."Invoice Discount Calculation" = SalesHeader."Invoice Discount Calculation"::"%" then
             exit;
         SalesHeader."Invoice Discount Value" -= InvDiscountAmount;
         SalesHeader.Modify(true);
@@ -9418,7 +9430,7 @@ table 37 "Sales Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeValidateUnitCostLCYOnGetUnitCost(IsHandled, Rec);
+        OnBeforeValidateUnitCostLCYOnGetUnitCost(IsHandled, Rec, Item);
         if IsHandled then
             exit;
 
@@ -10082,6 +10094,8 @@ table 37 "Sales Line"
             exit;
 
         "Unit Price" := ("Qty. per Unit of Measure" * SalesInvoiceLine."Unit Price") / SalesInvoiceLine."Qty. per Unit of Measure";
+
+        OnAfterCalcUnitPriceUsingUOMCoef(Rec, SalesInvoiceLine);
     end;
 
     local procedure GetSalesInvoiceLine(var SalesInvoiceLine: Record "Sales Invoice Line")
@@ -11144,7 +11158,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShipmentDateOnAfterSalesLineVerifyChange(var SalesLine: Record "Sales Line"; CurrentFieldNo: Integer)
+    local procedure OnValidateShipmentDateOnAfterSalesLineVerifyChange(var SalesLine: Record "Sales Line"; CurrentFieldNo: Integer; var DoCheckReceiptOrderStatus: Boolean)
     begin
     end;
 
@@ -11532,7 +11546,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeValidateUnitCostLCYOnGetUnitCost(var IsHandled: Boolean; var SalesLine: Record "Sales Line")
+    local procedure OnBeforeValidateUnitCostLCYOnGetUnitCost(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; Item: Record Item)
     begin
     end;
 
@@ -11552,7 +11566,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeValidateShipmentDate(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line")
+    local procedure OnBeforeValidateShipmentDate(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line"; CurrentFieldNo: Integer)
     begin
     end;
 
@@ -12100,6 +12114,16 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestQuantityFieldsOnValidateUnitOfMeasure(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateLineDiscountPercentOnBeforeValidateLineDiscountPercent(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var DropInvoiceDiscountAmount: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcUnitPriceUsingUOMCoef(var SalesLine: Record "Sales Line"; SalesInvoiceLine: Record "Sales Invoice Line")
     begin
     end;
 }
