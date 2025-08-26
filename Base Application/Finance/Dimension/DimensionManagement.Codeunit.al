@@ -2209,7 +2209,6 @@ codeunit 408 DimensionManagement
         HighPriorityDefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
         AddDimSource(DefaultDimSource, Database::Job, JobJournalLine."Job No.");
-        AddDimSource(DefaultDimSource, Database::Location, JobJournalLine."Location Code");
         AddDimSource(DefaultDimSource, TypeToTableID2(JobJournalLine.Type.AsInteger()), JobJournalLine."No.");
         AddDimSource(DefaultDimSource, Database::"Resource Group", JobJournalLine."Resource Group No.");
 
@@ -2758,7 +2757,7 @@ codeunit 408 DimensionManagement
         DefaultDimension.FindSet(true);
         repeat
             DefaultDimension.CreateDimValuePerAccountFromDimValue(DimensionValue, Confirmed);
-            if Confirmed then
+            if not Confirmed then
                 DefaultDimension.UpdateDefaultDimensionAllowedValuesFilter();
         until DefaultDimension.Next() = 0;
     end;
