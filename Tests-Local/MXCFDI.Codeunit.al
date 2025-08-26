@@ -757,37 +757,6 @@
     end;
 
     [Test]
-    [HandlerFunctions('CancelRequestMenuHandler,ConfirmHandler')]
-    procedure CancelPaymentManually()
-    var
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-        CustLedgerEntry: Record "Cust. Ledger Entry";
-        PaymentNo: Code[20];
-    begin
-        // [SCENARIO 573377] Cancel customer payment manually
-        Initialize();
-        // [GIVEN] Sales Invoice
-        SalesInvoiceHeader.Get(CreateAndPostDoc(DATABASE::"Sales Invoice Header", CreatePaymentMethodForSAT()));
-        SalesInvoiceHeader.CalcFields("Amount Including VAT");
-
-        // [GIVEN] A payment for this sales invoice
-        PaymentNo := CreatePostPayment(SalesInvoiceHeader."Sell-to Customer No.", SalesInvoiceHeader."No.", -SalesInvoiceHeader."Amount Including VAT", '');
-        UpdateDocumentFieldValue(
-          DATABASE::"Cust. Ledger Entry", CustLedgerEntry.FieldNo("Document No."), PaymentNo,
-          CustLedgerEntry.FieldNo("Electronic Document Status"), CustLedgerEntry."Electronic Document Status"::"Cancel In Progress");
-
-        // [WHEN] Runing Cancel document with Cancel Request option
-        LibraryVariableStorage.Enqueue(CancelOption::MarkAsCanceled);
-        LibraryVariableStorage.Enqueue(true);
-        Cancel(DATABASE::"Cust. Ledger Entry", PaymentNo, ResponseOption::Success);
-
-        // [THEN] 'Electronic Document Status' set to "Canceled"
-        CustLedgerEntry.SetRange("Document No.", PaymentNo);
-        CustLedgerEntry.FindFirst();
-        Assert.AreEqual(CustLedgerEntry."Electronic Document Status", CustLedgerEntry."Electronic Document Status"::Canceled, 'Status should be Canceled');
-    end;
-
-    [Test]
     [Scope('OnPrem')]
     procedure CancelRequestStatusBatch()
     var
@@ -3167,7 +3136,7 @@
         VerifyVATTotalLine(
           OriginalStr, 2448.71, 16, '002', 0, 4, 1);
         VerifyTotalImpuestos(
-          OriginalStr, 'TotalImpuestosTrasladados', 2448.71, 88);
+          OriginalStr, 'TotalImpuestosTrasladados', 2448.71, 87);
 
         LibraryVariableStorage.AssertEmpty();
     end;
@@ -3224,7 +3193,7 @@
         VerifyVATTotalLine(
           OriginalStr, 71.12, 16, '002', 0, 1, 1);
         VerifyTotalImpuestos(
-          OriginalStr, 'TotalImpuestosTrasladados', 71.12, 43);
+          OriginalStr, 'TotalImpuestosTrasladados', 71.12, 42);
 
         LibraryVariableStorage.AssertEmpty();
     end;
@@ -3428,7 +3397,7 @@
               StrSubstNo(IncorrectOriginalStrValueErr, CFDIRelationDocument[i]."Fiscal Invoice Number PAC", OriginalStr));
         // [THEN] String for digital stamp contains Descrition with encoded special characters (TFS327477)
         Assert.AreEqual(
-          EncodedDescr, SelectStr(32, OriginalStr),
+          EncodedDescr, SelectStr(31, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, SalesInvoiceLine.FieldCaption(Description), OriginalStr));
         // [THEN] "Date/Time First Req. Sent" is created in current time zone (TFS 323341) (TFS 522707)
         // VerifyIsNearlyEqualDateTime(
@@ -3873,16 +3842,16 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 540218] Request Stamp for Sales Invoice in Location Time Zone
+        // [SCENARIO 323341] Request Stamp for Sales Invoice in 'Ship-to' Time Zone
         Initialize();
         TableNo := DATABASE::"Sales Invoice Header";
 
-        // [GIVEN] Sales Invoice has Location with City and Post Code with Time Zone offset = 2h
+        // [GIVEN] Sales Invoice has 'Ship-To City' and 'Ship-to Post Code' with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
-          SalesInvoiceHeader.FieldNo("Location Code"), TimeZoneID);
+          SalesInvoiceHeader.FieldNo("Ship-to City"), SalesInvoiceHeader.FieldNo("Ship-to Post Code"), TimeZoneID);
 
         // [WHEN] Request stamp for the Sales Invoice
         RequestStamp(TableNo, DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -3906,16 +3875,16 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 540218] Request Stamp for Sales Credit Memo in Location Time Zone
+        // [SCENARIO 323341] Request Stamp for Sales Credit Memo in 'Sell-to' Time Zone
         Initialize();
         TableNo := DATABASE::"Sales Cr.Memo Header";
 
-        // [GIVEN] Sales Credit memo has Location with City and Post Code with Time Zone offset = 2h
+        // [GIVEN] Sales Credit memo has 'Sell-To City' and 'Sell-to Post Code' with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, SalesCrMemoHeader.FieldNo("No."), DocumentNo,
-          SalesCrMemoHeader.FieldNo("Location Code"), TimeZoneID);
+          SalesCrMemoHeader.FieldNo("Ship-to City"), SalesCrMemoHeader.FieldNo("Ship-to Post Code"), TimeZoneID);
 
         // [WHEN] Request stamp for the Sales Credit Memo
         RequestStamp(TableNo, DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -3939,16 +3908,16 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 540218] Request Stamp for Service Invoice in Location Time Zone
+        // [SCENARIO 323341] Request Stamp for Service Invoice in 'Bill-to' Time Zone
         Initialize();
         TableNo := DATABASE::"Service Invoice Header";
 
-        // [GIVEN] Service Invoice has Location with City and Post Code with Time Zone offset = 2h
+        // [GIVEN] Service Invoice has 'Bill-To City' and 'Bill-to Post Code' with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, ServiceInvoiceHeader.FieldNo("No."), DocumentNo,
-          ServiceInvoiceHeader.FieldNo("Location Code"), TimeZoneID);
+          ServiceInvoiceHeader.FieldNo("Ship-to City"), ServiceInvoiceHeader.FieldNo("Ship-to Post Code"), TimeZoneID);
 
         // [WHEN] Request stamp for the Service Invoice
         RequestStamp(TableNo, DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -3972,16 +3941,17 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 540218] Request Stamp for Service Credit Memo for Location with defined Time Zone
+        // [SCENARIO 323341] Request Stamp for Service Credit Memo for customer with defined Time Zone
         Initialize();
         TableNo := DATABASE::"Service Cr.Memo Header";
 
-        // [GIVEN] Service Credit Memo  has Location with City and Post Code with Time Zone offset = 2h
+        // [GIVEN] Service Credit Memo  has Customer with Post Code of Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, ServiceCrMemoHeader.FieldNo("No."), DocumentNo,
-          ServiceCrMemoHeader.FieldNo("Location Code"), TimeZoneID);
+          ServiceCrMemoHeader.FieldNo("Ship-to City"), ServiceCrMemoHeader.FieldNo("Ship-to Post Code"),
+          TimeZoneID);
 
         // [WHEN] Request stamp for the Service Credit Memo
         RequestStamp(TableNo, DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -4043,11 +4013,11 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 540218] Send document for Sales Invoice in Location Time Zone
+        // [SCENARIO 323341] Send document for Sales Invoice in 'Ship-to' Time Zone
         Initialize();
         TableNo := DATABASE::"Sales Invoice Header";
 
-        // [GIVEN] Stamped Sales Invoice has Location with City and Post Code with Time Zone offset = 2h
+        // [GIVEN] Stamped Sales Invoice has 'Ship-To City' and 'Ship-to Post Code' with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         UpdateDocumentFieldValue(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
@@ -4055,7 +4025,7 @@
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
-          SalesInvoiceHeader.FieldNo("Location Code"), TimeZoneID);
+          SalesInvoiceHeader.FieldNo("Ship-to City"), SalesInvoiceHeader.FieldNo("Ship-to Post Code"), TimeZoneID);
 
         // [WHEN] Send Electronic Document for the Sales Invoice
         RequestStamp(TableNo, DocumentNo, ResponseOption::Success, ActionOption::Send);
@@ -4119,11 +4089,11 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 540218] Cancel Sales Invoice in Location Time Zone
+        // [SCENARIO 323341] Cancel Sales Invoice in 'Ship-to' Time Zone
         Initialize();
         TableNo := DATABASE::"Sales Invoice Header";
 
-        // [GIVEN] Stamped Sales Invoice has Location with City and Post Code with Time Zone offset = 2h
+        // [GIVEN] Stamped Sales Invoice has 'Ship-To City' and 'Ship-to Post Code' with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         UpdateDocumentFieldValue(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
@@ -4131,7 +4101,7 @@
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
-          SalesInvoiceHeader.FieldNo("Location Code"), TimeZoneID);
+          SalesInvoiceHeader.FieldNo("Ship-to City"), SalesInvoiceHeader.FieldNo("Ship-to Post Code"), TimeZoneID);
 
         // [WHEN] Cancel Sales Invoice
         Cancel(TableNo, DocumentNo, ResponseOption::Success);
@@ -4659,9 +4629,9 @@
         // [GIVEN] Posted Sales Invoice with line1: Amount = 1000, VAT % = 16, line2: Amount = 800, VAT % = 8.
         Customer.Get(CreateCustomer());
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
-        // [GIVEN] "Bill-to Post Code" is filled in with 12345
-        SalesHeader."Bill-to Post Code" := Format(LibraryRandom.RandIntInRange(10000, 20000));
-        SalesHeader.Modify();
+        // [GIVEN] Customer."Post Code" is filled in with 12345
+        Customer."Post Code" := Format(LibraryRandom.RandIntInRange(10000, 20000));
+        Customer.Modify();
         VATProdPostingGroup := CreateVATPostingSetup(SalesHeader."VAT Bus. Posting Group", 16, false, false);
         CreateSalesLineItemWithVATSetup(SalesLine1, SalesHeader, CreateItem(), VATProdPostingGroup, 1, LibraryRandom.RandIntInRange(1000, 2000), 0);
         VATProdPostingGroup := CreateVATPostingSetup(SalesHeader."VAT Bus. Posting Group", 8, false, false);
@@ -4679,26 +4649,26 @@
         InStream.ReadText(OriginalStr);
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
 
-        // [THEN] 'DomicilioFiscalReceptor' is exported from SalesInvoice."Post Code" = 12345 (TFS 547550)
+        // [THEN] 'DomicilioFiscalReceptor' is exported from Customer."Post Code" = 12345 (TFS 477864)
         VerifyPartyInformation(
           OriginalStr, Customer."RFC No.", Customer."CFDI Customer Name",
-          SalesInvoiceHeader."Bill-to Post Code", Customer."SAT Tax Regime Classification", 18, 21);
+          Customer."Post Code", Customer."SAT Tax Regime Classification", 18, 21);
         // [THEN] XML Document has node 'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' with VAT data for lines
         // [THEN] Line1 has attributes 'Importe' = 160, 'TipoFactor' = 'Tasa', 'Impuesto' = '002', 'Base' = 1000.
         // [THEN] Line2 has attributes 'Importe' = 64, 'TipoFactor' = 'Tasa', 'Impuesto' = '002', 'Base' = 800.
         VerifyVATAmountLines(
-          OriginalStr, SalesLine1.Amount, SalesLine1."Amount Including VAT" - SalesLine1.Amount, SalesLine1."VAT %", '002', 0, 0);
+          OriginalStr, SalesLine1.Amount, SalesLine1."Amount Including VAT" - SalesLine1.Amount, SalesLine1."VAT %", '002', 1, 0);
         VerifyVATAmountLines(
-          OriginalStr, SalesLine2.Amount, SalesLine2."Amount Including VAT" - SalesLine2.Amount, SalesLine2."VAT %", '002', 0, 1);
+          OriginalStr, SalesLine2.Amount, SalesLine2."Amount Including VAT" - SalesLine2.Amount, SalesLine2."VAT %", '002', 1, 1);
         // [THEN] XML Document has node 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' with 2 total VAT lines
         // [THEN] Line1: attributes 'Importe' = 160, 'TipoFactor' = 'Tasa', 'Impuesto' = '002'.
         // [THEN] Line2: attributes 'Importe' = 64, 'TipoFactor' = 'Tasa', 'Impuesto' = '002'.
         VerifyVATTotalLine(
           OriginalStr,
-          SalesLine1."Amount Including VAT" - SalesLine1.Amount, SalesLine1."VAT %", '002', 0, 1, 15);
+          SalesLine1."Amount Including VAT" - SalesLine1.Amount, SalesLine1."VAT %", '002', 0, 1, 16);
         VerifyVATTotalLine(
           OriginalStr,
-          SalesLine2."Amount Including VAT" - SalesLine2.Amount, SalesLine2."VAT %", '002', 1, 1, 15);
+          SalesLine2."Amount Including VAT" - SalesLine2.Amount, SalesLine2."VAT %", '002', 1, 1, 16);
         VerifyTotalImpuestos(
           OriginalStr, 'TotalImpuestosTrasladados', SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount, 63);
     end;
@@ -4787,7 +4757,7 @@
           OriginalStr, SalesInvoiceHeader.Amount, '002');
 
         // [THEN] Total Impuestos:  'cfdi:Impuestos/TotalImpuestosTrasladados' = 0
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 39);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 38);
     end;
 
     [Test]
@@ -4888,7 +4858,7 @@
           SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine.Amount, SalesInvoiceLine."VAT %",
           GetTaxCodeTraslado(SalesInvoiceLine."VAT %"), 1, 2, 0);
         VerifyTotalImpuestos(
-          OriginalStr, 'TotalImpuestosTrasladados', SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount, 63);
+          OriginalStr, 'TotalImpuestosTrasladados', SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount, 62);
     end;
 
     [Test]
@@ -5041,7 +5011,7 @@
           ServiceLineDisc."Amount Including VAT" - ServiceLineDisc.Amount,
           ServiceLineDisc.Amount, 0);
         // [THEN] 'Concepto' node for normal line has 'Descuento' = 0, Importe = 3000, 'ValorUnitario' = 1000
-        // [THEN] 'Traslado' node for normal line has 'Importe' = 450 (3450 - 3000), 'Base' = 3000 
+        // [THEN] 'Traslado' node for normal line has 'Importe' = 450 (3450 - 3000), 'Base' = 3000        VerifyLineAmountsByIndex(
         VerifyLineAmountsByIndex(
           0, UnitPrice * ServiceLine.Quantity, UnitPrice,
           ServiceLine."Amount Including VAT" - ServiceLine.Amount,
@@ -5271,7 +5241,6 @@
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
         InStream: InStream;
         OriginalStr: Text;
         FANo: Code[20];
@@ -5299,7 +5268,7 @@
 
         // [THEN] 'Concepto' node has attributes 'ClaveProdServ' = SAT Classification Code of the Fixed Asset, 'NoIdentificacion' = "FA", 'ClaveUnidad' = 'H87'
         // [THEN] String for digital stamp has 'ClaveProdServ' = SAT Classification Code of the Fixed Asset, 'NoIdentificacion' = "FA", 'ClaveUnidad' = 'H87'
-        VerifyCFDIConceptoFields(OriginalStr, FANo, SATUtilities.GetSATUnitOfMeasureFixedAsset(), SalesLine.Type::"Fixed Asset");
+        VerifyCFDIConceptoFields(OriginalStr, FANo, SATUtilities.GetSATUnitOfMeasureFixedAsset(), 4);
     end;
 
     [Test]
@@ -5309,7 +5278,6 @@
     var
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
         InStream: InStream;
         OriginalStr: Text;
         FANo: Code[20];
@@ -5338,7 +5306,7 @@
 
         // [THEN] 'Concepto' node has attributes 'ClaveProdServ' = '01010101', 'NoIdentificacion' = "FA", 'ClaveUnidad' = 'H87'
         // [THEN] String for digital stamp has 'ClaveProdServ' = '01010101', 'NoIdentificacion' = "FA", 'ClaveUnidad' = 'H87'
-        VerifyCFDIConceptoFields(OriginalStr, FANo, SATUtilities.GetSATUnitOfMeasureFixedAsset(), SalesLine.Type::"Fixed Asset");
+        VerifyCFDIConceptoFields(OriginalStr, FANo, SATUtilities.GetSATUnitOfMeasureFixedAsset(), 4);
     end;
 
     [Test]
@@ -5382,7 +5350,7 @@
 
         // [THEN] 'Concepto' node has attributes 'ClaveProdServ' = SAT Classification Code of the G/L Account, 'NoIdentificacion' = "GLAcc", 'ClaveUnidad' = 'E48'
         // [THEN] String for digital stamp has 'ClaveProdServ' = SAT Classification Code of theG/L Account, 'NoIdentificacion' = "GLAcc", 'ClaveUnidad' = 'E48'
-        VerifyCFDIConceptoFields(OriginalStr, GLAccount."No.", SATUtilities.GetSATUnitOfMeasureGLAccount(), SalesLine.Type::"G/L Account");
+        VerifyCFDIConceptoFields(OriginalStr, GLAccount."No.", SATUtilities.GetSATUnitOfMeasureGLAccount(), 1);
     end;
 
     [Test]
@@ -5427,7 +5395,7 @@
         InStream.ReadText(OriginalStr);
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
         Assert.AreEqual(
-          NameValueBuffer.Name, SelectStr(38, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumeroPedimento', OriginalStr));
+          NameValueBuffer.Name, SelectStr(37, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumeroPedimento', OriginalStr));
 
         NameValueBuffer.Delete();
     end;
@@ -5477,7 +5445,7 @@
         InStream.ReadText(OriginalStr);
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
         Assert.AreEqual(
-          NumeroPedimentoStr, SelectStr(38, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumeroPedimento', OriginalStr));
+          NumeroPedimentoStr, SelectStr(37, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumeroPedimento', OriginalStr));
     end;
 
     [Test]
@@ -5631,17 +5599,17 @@
         VerifyRetentionAmountLine(
           OriginalStr,
           SalesLine."Amount Including VAT", SalesLineRetention."Amount Including VAT",
-          SalesLineRetention."Retention VAT %", GetTaxCodeRetention(SalesLineRetention."Retention VAT %"), 42, 0);
+          SalesLineRetention."Retention VAT %", GetTaxCodeRetention(SalesLineRetention."Retention VAT %"), 41, 0);
 
         // [THEN] 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' has attributes 'Importe' = 0, 'TipoFactor' = 'Tasa', 'Impuesto' = '002'.
         // [THEN] 'cfdi:Impuestos/cfdi:Retenciones/cfdi:Retencion' has attributes 'Importe' = 100, 'Impuesto' = '002'.
         VerifyVATTotalLine(OriginalStr, 0, 0, '002', 0, 1, 8);
         VerifyRetentionTotalLine(
-          OriginalStr, -SalesLineRetention."Amount Including VAT", GetTaxCodeRetention(SalesLineRetention."Retention VAT %"), 43, 0);
+          OriginalStr, -SalesLineRetention."Amount Including VAT", GetTaxCodeRetention(SalesLineRetention."Retention VAT %"), 42, 0);
 
         // [THEN] Total Impuestos:  'cfdi:Impuestos/TotalImpuestosTrasladados' = 0, 'cfdi:Impuestos/TotalImpuestosRetenidos' = 100
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 50);
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', -SalesLineRetention."Amount Including VAT", 45);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 49);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', -SalesLineRetention."Amount Including VAT", 44);
     end;
 
     [Test]
@@ -5696,17 +5664,17 @@
         VerifyRetentionAmountLine(
           OriginalStr,
           SalesLine."Amount Including VAT", SalesLineRetention."Amount Including VAT",
-          SalesLineRetention."Retention VAT %", GetTaxCodeRetention(SalesLineRetention."VAT %"), 42, 0);
+          SalesLineRetention."Retention VAT %", GetTaxCodeRetention(SalesLineRetention."VAT %"), 41, 0);
 
         // [THEN] 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' has attributes 'Importe' = 0, 'TipoFactor' = 'Tasa', 'Impuesto' = '002'.
         // [THEN] 'cfdi:Impuestos/cfdi:Retenciones/cfdi:Retencion' has attributes 'Importe' = 100, 'Impuesto' = '002'.
         VerifyVATTotalLine(OriginalStr, 0, 0, '002', 0, 1, 8);
         VerifyRetentionTotalLine(
-          OriginalStr, -SalesLineRetention."Amount Including VAT", GetTaxCodeRetention(SalesLineRetention."VAT %"), 43, 0);
+          OriginalStr, -SalesLineRetention."Amount Including VAT", GetTaxCodeRetention(SalesLineRetention."VAT %"), 42, 0);
 
         // [THEN] Total Impuestos:  'cfdi:Impuestos/TotalImpuestosTrasladados' = 0, 'cfdi:Impuestos/TotalImpuestosRetenidos' = 100
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 50);
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', -SalesLineRetention."Amount Including VAT", 45);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 49);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', -SalesLineRetention."Amount Including VAT", 44);
     end;
 
     [Test]
@@ -5769,12 +5737,12 @@
         VerifyRetentionAmountLine(
           OriginalStr,
           SalesLine.Amount, SalesLineRetention1.Amount, SalesLineRetention1."Retention VAT %",
-          GetTaxCodeRetention(SalesLineRetention1."Retention VAT %"), 42, 0);
+          GetTaxCodeRetention(SalesLineRetention1."Retention VAT %"), 41, 0);
         VerifyRetentionAmountLine(
           OriginalStr,
           SalesLine.Amount,
           SalesLineRetention2."Unit Price" * SalesLineRetention2.Quantity, SalesLineRetention2."Retention VAT %",
-          GetTaxCodeRetention(SalesLineRetention2."Retention VAT %"), 47, 1);
+          GetTaxCodeRetention(SalesLineRetention2."Retention VAT %"), 46, 1);
 
         // [THEN] 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' has attributes 'Importe' = 12480, 'TipoFactor' = 'Tasa', 'Impuesto' = '002'.
         // [THEN] Line 1 of 'cfdi:Impuestos/cfdi:Retenciones/cfdi:Retencion' has attributes 'Importe' = 7800, 'Impuesto' = '001'.
@@ -5783,13 +5751,13 @@
           OriginalStr, SalesLine."Amount Including VAT" - SalesLine.Amount, SalesLine."VAT %",
           GetTaxCodeTraslado(SalesLine."VAT %"), 0, 1, 15);
         VerifyRetentionTotalLine(OriginalStr, -SalesLineRetention1."Amount Including VAT",
-          GetTaxCodeRetention(SalesLineRetention1."Retention VAT %"), 48, 0);
+          GetTaxCodeRetention(SalesLineRetention1."Retention VAT %"), 47, 0);
         VerifyRetentionTotalLine(OriginalStr, -SalesLineRetention2."Amount Including VAT",
-          GetTaxCodeRetention(SalesLineRetention2."Retention VAT %"), 50, 1);
+          GetTaxCodeRetention(SalesLineRetention2."Retention VAT %"), 49, 1);
 
         // [THEN] Total Impuestos:  'cfdi:Impuestos/TotalImpuestosTrasladados' = 12480, 'cfdi:Impuestos/TotalImpuestosRetenidos' = 16119.95
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', SalesLine."Amount Including VAT" - SalesLine.Amount, 57);
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', SalesLineRetention1.Amount + SalesLineRetention2.Amount, 52);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', SalesLine."Amount Including VAT" - SalesLine.Amount, 56);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', SalesLineRetention1.Amount + SalesLineRetention2.Amount, 51);
     end;
 
     [Test]
@@ -5951,9 +5919,9 @@
         InStream.ReadText(OriginalStr);
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
 
-        // [THEN] 'DomicilioFiscalReceptor' is exported from Bill-to Post Code (TFS 547550)
+        // [THEN] 'DomicilioFiscalReceptor' is exported from SAT Address Id (TFS 477864)
         VerifyPartyInformation(
-          OriginalStr, Customer."RFC No.", Customer."CFDI Customer Name", SalesInvoiceHeader."Bill-to Post Code", Customer."SAT Tax Regime Classification", 18, 22);
+          OriginalStr, Customer."RFC No.", Customer."CFDI Customer Name", GetSATPostalCode(SalesInvoiceHeader."SAT Address ID"), Customer."SAT Tax Regime Classification", 18, 22);
         // [THEN] Comercio Exterior node has TipoCambioUSD = 20, TotalUSD = 100 (2000 / 20)
         VerifyComercioExteriorHeader(
           OriginalStr, SalesInvoiceHeader."SAT International Trade Term",
@@ -6256,7 +6224,7 @@
         // [THEN] 'cfdi:Conceptos/cfdi:Concepto' has attributes ClaveProdServ="84111506" Cantidad="1" ClaveUnidad="ACT" ValorUnitario="2000" Importe="2000"
         BaseAmount := SalesLine.Amount * SalesHeader."Prepayment %" / 100;
         VerifyConceptoNode(
-          OriginalStr, '84111506', '1', 'ACT', 'Anticipo bien o servicio', FormatDecimal(BaseAmount, 2), FormatDecimal(BaseAmount, 2), 22);
+          OriginalStr, '84111506', '1', 'ACT', 'Anticipo bien o servicio', FormatDecimal(BaseAmount, 2), FormatDecimal(BaseAmount, 2), 21);
 
         // [THEN] Total VAT line in 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' has 'Base' = 2000, 'Importe' = 320  
         // [THEN] Total VAT Amount in 'cfdi:Impuestos/TotalImpuestosTrasladados' =  320
@@ -6293,7 +6261,7 @@
         SalesHeader.Validate(SalesHeader."Prepayment %", LibraryRandom.RandIntInRange(10, 50));
         SalesHeader.Modify(true);
         CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), LibraryRandom.RandIntInRange(2, 5), 0, 16, false, false);
-
+        
         // [GIVEN] Posted prepayment invoice, Amount Including VAT = 2320, VAT = 16%
         SalesInvoiceHeader.Get(LibrarySales.PostSalesPrepaymentInvoice(SalesHeader));
 
@@ -6317,7 +6285,7 @@
         // [THEN] 'cfdi:Conceptos/cfdi:Concepto' has attributes ClaveProdServ="84111506" Cantidad="1" ClaveUnidad="ACT" ValorUnitario="2000" Importe="2000"
         BaseAmount := SalesLine.Amount * SalesHeader."Prepayment %" / 100;
         VerifyConceptoNode(
-          OriginalStr, '84111506', '1', 'ACT', 'Anticipo bien o servicio', FormatDecimal(BaseAmount, 2), FormatDecimal(BaseAmount, 2), 23);
+          OriginalStr, '84111506', '1', 'ACT', 'Anticipo bien o servicio', FormatDecimal(BaseAmount, 2), FormatDecimal(BaseAmount, 2), 22);
 
         // [THEN] Total VAT line in 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' has 'Base' = 2000, 'Importe' = 320  
         // [THEN] Total VAT Amount in 'cfdi:Impuestos/TotalImpuestosTrasladados' =  320
@@ -8876,14 +8844,16 @@
         PostedHeaderRecRef.Modify();
     end;
 
-    local procedure UpdateDocumentLocation(TableNo: Integer; FieldNoDocumentNo: Integer; DocumentNo: Code[20]; FieldNoLocation: Integer; LocationCode: Variant)
+    local procedure UpdateDocumentPostCode(TableNo: Integer; FieldNoDocumentNo: Integer; DocumentNo: Code[20]; FieldNoCity: Integer; FieldNoPostCode: Integer; City: Variant; PostCode: Variant)
     var
         PostedHeaderRecRef: RecordRef;
         ChangeFieldRef: FieldRef;
     begin
         FindPostedHeader(PostedHeaderRecRef, TableNo, FieldNoDocumentNo, DocumentNo);
-        ChangeFieldRef := PostedHeaderRecRef.Field(FieldNoLocation);
-        ChangeFieldRef.Value := LocationCode;
+        ChangeFieldRef := PostedHeaderRecRef.Field(FieldNoCity);
+        ChangeFieldRef.Value := City;
+        ChangeFieldRef := PostedHeaderRecRef.Field(FieldNoPostCode);
+        ChangeFieldRef.Value := PostCode;
         PostedHeaderRecRef.Modify();
     end;
 
@@ -8907,17 +8877,13 @@
         Customer.Modify();
     end;
 
-    local procedure UpdateDocumentWithTimeZone(TableID: Integer; FieldNoDocumentNo: Integer; DocumentNo: Code[20]; FieldNoLocation: Integer; TimeZoneID: Text[180])
+    local procedure UpdateDocumentWithTimeZone(TableID: Integer; FieldNoDocumentNo: Integer; DocumentNo: Code[20]; FieldNoCity: Integer; FieldNoPostCode: Integer; TimeZoneID: Text[180])
     var
         PostCode: Record "Post Code";
-        Location: Record Location;
     begin
         CreatePostCode(PostCode, TimeZoneID);
-        LibraryWarehouse.CreateLocation(Location);
-        Location."Post Code" := PostCode.Code;
-        Location.City := PostCode.City;
-        Location.Modify();
-        UpdateDocumentLocation(TableID, FieldNoDocumentNo, DocumentNo, FieldNoLocation, Location.Code);
+        UpdateDocumentPostCode(
+          TableID, FieldNoDocumentNo, DocumentNo, FieldNoCity, FieldNoPostCode, PostCode.City, PostCode.Code);
     end;
 
     local procedure UpdateSalesInvoiceCancellation(var SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -9051,7 +9017,7 @@
           StrSubstNo(IncorrectOriginalStrValueErr, RFCNoFieldTxt, OriginalString));
         Assert.AreEqual(
           CFDIPurpose,
-          SelectStr(20 + RelationIdx, OriginalString),
+          SelectStr(19 + RelationIdx, OriginalString),
           StrSubstNo(IncorrectOriginalStrValueErr, CFDIPurposeFieldTxt, OriginalString));
         VerifyCFDIRelation(OriginalString, CFDIRelation, RelationIdx);
 
@@ -9065,7 +9031,7 @@
           StrSubstNo(IncorrectOriginalStrValueErr, MetodoDePagoFieldTxt, OriginalString));
         Assert.AreEqual(
           UpperCase(UnitOfMeasureCode),
-          SelectStr(24 + RelationIdx, OriginalString),
+          SelectStr(23 + RelationIdx, OriginalString),
           StrSubstNo(IncorrectOriginalStrValueErr, ConceptoUnidadFieldTxt, OriginalString));
     end;
 
@@ -9121,24 +9087,22 @@
           OriginalStrCSV, RFCNo, CFDIPurpose, CFDIRelation, PaymentMethodCode, PaymentTermsCode, UnitOfMeasureCode, RelationIdx);
     end;
 
-    local procedure VerifyCFDIConceptoFields(OriginalStr: Text; NoIdentificacion: Code[20]; SATUnitOfMeasure: Code[10]; LineType: Enum "Sales Line Type")
-    var
-        StartPosition: Integer;
+    local procedure VerifyCFDIConceptoFields(OriginalStr: Text; NoIdentificacion: Code[20]; SATUnitOfMeasure: Code[10]; LineType: Option)
     begin
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
-        StartPosition := 23;
-        LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'ClaveProdServ', SATUtilities.GetSATClassification(LineType, NoIdentificacion));
+
+        LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'ClaveProdServ', SATUtilities.GetSATItemClassification(LineType, NoIdentificacion));
         LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'NoIdentificacion', NoIdentificacion);
         LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'ClaveUnidad', SATUnitOfMeasure);
 
         Assert.AreEqual(
-          SATUtilities.GetSATClassification(LineType, NoIdentificacion), SelectStr(StartPosition, OriginalStr),
+          SATUtilities.GetSATItemClassification(LineType, NoIdentificacion), SelectStr(22, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'SAT Item Classification', OriginalStr));
         Assert.AreEqual(
-          NoIdentificacion, SelectStr(StartPosition + 1, OriginalStr),
+          NoIdentificacion, SelectStr(23, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'NoIdentificacion', OriginalStr));
         Assert.AreEqual(
-          SATUnitOfMeasure, SelectStr(StartPosition + 3, OriginalStr),
+          SATUnitOfMeasure, SelectStr(25, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'SAT Unit of Measure', OriginalStr));
     end;
 
@@ -9384,68 +9348,62 @@
     end;
 
     local procedure VerifyVATAmountLines(OriginalStr: Text; Amount: Decimal; VATAmount: Decimal; VATPct: Decimal; Impuesto: Text; Offset: Integer; index: Integer)
-    var
-        StartPosition: Integer;
     begin
-        StartPosition := 33;
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'Importe', FormatDecimal(VATAmount, 6), index);
         Assert.AreEqual(
-          FormatDecimal(VATAmount, 6), SelectStr(StartPosition + 4 + index * 15 + Offset, OriginalStr),
+          FormatDecimal(VATAmount, 6), SelectStr(36 + index * 15 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Importe', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'TasaOCuota', FormatDecimal(VATPct / 100, 6), index);
         Assert.AreEqual(
-          FormatDecimal(VATPct / 100, 6), SelectStr(StartPosition + 3 + index * 15 + Offset, OriginalStr),
+          FormatDecimal(VATPct / 100, 6), SelectStr(35 + index * 15 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'TasaOCuota', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'TipoFactor', 'Tasa', index);
         Assert.AreEqual(
-          'Tasa', SelectStr(StartPosition + 2 + index * 15 + Offset, OriginalStr),
+          'Tasa', SelectStr(34 + index * 15 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Tasa', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'Impuesto', Impuesto, index);
         Assert.AreEqual(
-          Impuesto, SelectStr(StartPosition + 1 + index * 15 + Offset, OriginalStr),
+          Impuesto, SelectStr(33 + index * 15 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Impuesto', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'Base', FormatDecimal(Amount, 6), index);
         Assert.AreEqual(
-          FormatDecimal(Amount, 6), SelectStr(StartPosition + index * 15 + Offset, OriginalStr),
+          FormatDecimal(Amount, 6), SelectStr(32 + index * 15 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Base', OriginalStr));
     end;
 
     local procedure VerifyVATAmountLinesExempt(OriginalStr: Text; Amount: Decimal; Impuesto: Text)
-    var
-        StartPosition: Integer;
     begin
-        StartPosition := 33;
         LibraryXPathXMLReader.VerifyAttributeValue(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'TipoFactor', 'Exento');
         Assert.AreEqual(
-          'Exento', SelectStr(StartPosition + 2, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Exento', OriginalStr));
+          'Exento', SelectStr(34, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Exento', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValue(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'Impuesto', Impuesto);
         Assert.AreEqual(
-          Impuesto, SelectStr(StartPosition + 1, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Impuesto', OriginalStr));
+          Impuesto, SelectStr(33, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Impuesto', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValue(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'Base', FormatDecimal(Amount, 6));
         Assert.AreEqual(
-          FormatDecimal(Amount, 6), SelectStr(StartPosition, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Base', OriginalStr));
+          FormatDecimal(Amount, 6), SelectStr(32, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Base', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeAbsence(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
@@ -9496,34 +9454,32 @@
 
     local procedure VerifyVATTotalLine(OriginalStr: Text; VATAmount: Decimal; VATPct: Decimal; Impuesto: Text; index: Integer; LineQty: Integer; Offset: Integer)
     var
-        StartPosition: Integer;
         TotalOffset: Integer;
     begin
-        StartPosition := 39;
         TotalOffset := (LineQty - 1) * 15;
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', 'Importe', FormatDecimal(VATAmount, 2), index);
         Assert.AreEqual(
-          FormatDecimal(VATAmount, 2), SelectStr(StartPosition + 3 + TotalOffset + index * 5 + Offset, OriginalStr),
+          FormatDecimal(VATAmount, 2), SelectStr(41 + TotalOffset + index * 5 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Importe', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', 'TasaOCuota', FormatDecimal(VATPct / 100, 6), index);
         Assert.AreEqual(
-          FormatDecimal(VATPct / 100, 6), SelectStr(StartPosition + 2 + TotalOffset + index * 5 + Offset, OriginalStr),
+          FormatDecimal(VATPct / 100, 6), SelectStr(40 + TotalOffset + index * 5 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'TasaOCuota', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', 'TipoFactor', 'Tasa', index);
         Assert.AreEqual(
-          'Tasa', SelectStr(StartPosition + 1 + TotalOffset + index * 5 + Offset, OriginalStr),
+          'Tasa', SelectStr(39 + TotalOffset + index * 5 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'TipoFactor', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', 'Impuesto', Impuesto, index);
         Assert.AreEqual(
-          Impuesto, SelectStr(StartPosition + TotalOffset + index * 5 + Offset, OriginalStr),
+          Impuesto, SelectStr(38 + TotalOffset + index * 5 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Impuesto', OriginalStr));
     end;
 
