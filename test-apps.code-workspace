@@ -106,6 +106,9 @@
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
+      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
+    },
+    {
       "path": "./Sustainability/Test/Sustainability Tests"
     },
     {
