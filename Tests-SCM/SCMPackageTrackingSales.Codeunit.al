@@ -1419,7 +1419,6 @@ codeunit 137264 "SCM Package Tracking Sales"
 
         PurchaseHeader.Find();
         PurchaseHeader.Validate(Correction, true);
-        PurchaseHeader.Validate("Vendor Cr. Memo No.", LibraryUtility.GenerateGUID());
         PurchaseHeader.Modify();
 
         PurchaseLine.SetRange("No.", Item."No.");
@@ -1489,7 +1488,6 @@ codeunit 137264 "SCM Package Tracking Sales"
 
         PurchaseHeader.Find();
         PurchaseHeader.Validate(Correction, true);
-        PurchaseHeader.Validate("Vendor Cr. Memo No.", LibraryUtility.GenerateGUID());
         PurchaseHeader.Modify();
         PurchaseLine.SetRange("No.", Item."No.");
         PurchaseLine.FindFirst();
@@ -1557,7 +1555,6 @@ codeunit 137264 "SCM Package Tracking Sales"
 
         PurchaseHeader.Find();
         PurchaseHeader.Validate(Correction, true);
-        PurchaseHeader.Validate("Vendor Cr. Memo No.", LibraryUtility.GenerateGUID());
         PurchaseHeader.Modify();
 
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
