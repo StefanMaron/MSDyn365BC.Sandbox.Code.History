@@ -20,7 +20,10 @@ codeunit 740 "VAT Report Mediator"
     procedure GetLines(VATReportHeader: Record "VAT Report Header")
     begin
         VATReportHeader.TestField(Status, VATReportHeader.Status::Open);
-        VATReportHeader.TestOriginalReportNo();
+        if (VATReportHeader."VAT Report Type" = VATReportHeader."VAT Report Type"::Corrective) or
+           (VATReportHeader."VAT Report Type" = VATReportHeader."VAT Report Type"::"Cancellation ")
+        then
+            VATReportHeader.TestField("Original Report No.");
 
         VATReportHeader.TestField("VAT Report Config. Code");
 
