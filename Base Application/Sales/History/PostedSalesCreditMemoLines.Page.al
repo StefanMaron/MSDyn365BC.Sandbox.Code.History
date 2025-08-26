@@ -28,11 +28,6 @@ page 527 "Posted Sales Credit Memo Lines"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the customer.';
                 }
-                field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the name of the customer.';
-                }
                 field(Type; Rec.Type)
                 {
                     ApplicationArea = Basic, Suite;
@@ -140,12 +135,6 @@ page 527 "Posted Sales Credit Memo Lines"
                     ToolTip = 'Specifies the number of the item ledger entry that the document or journal line is applied to.';
                     Visible = false;
                 }
-                field("Order No."; Rec."Order No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the order number this line is associated with.';
-                    Visible = false;
-                }
                 field("Job No."; Rec."Job No.")
                 {
                     ApplicationArea = Jobs;
@@ -246,6 +235,5 @@ page 527 "Posted Sales Credit Memo Lines"
     begin
         Rec.SetSecurityFilterOnRespCenter();
     end;
-
 }
 

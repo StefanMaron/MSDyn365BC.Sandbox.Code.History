@@ -376,7 +376,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         WarehouseEntry: Record "Warehouse Entry";
         QtyOnDedicatedBin: Decimal;
     begin
-        WarehouseEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
+        WarehouseEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         WarehouseEntry.SetRange("Item No.", ItemNo);
         WarehouseEntry.SetRange("Location Code", LocationCode);
         WarehouseEntry.SetRange("Variant Code", VariantCode);
@@ -452,7 +452,6 @@ codeunit 7314 "Warehouse Availability Mgt."
             if Location."Bin Mandatory" and WhseItemTrackingSetup.TrackingExists() then begin
                 GetOutboundBinsOnBasicWarehouseLocation(
                   TempBinContentBuffer, LocationCode, ItemNo, VariantCode, WhseItemTrackingSetup);
-                ExcludeDedicatedBinContentFromTempBinContentBuffer(TempBinContentBuffer, ExcludeDedicatedBinContent);
                 TempBinContentBuffer.CalcSums("Qty. Outstanding (Base)");
                 QtyOnOutboundBins := TempBinContentBuffer."Qty. Outstanding (Base)";
             end else begin
@@ -474,7 +473,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         if not Location."Directed Put-away and Pick" then
             exit(0);
 
-        WhseEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
+        WhseEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         WhseEntry.SetCalculationFilters(ItemNo, LocationCode, VariantCode, WhseItemTrackingSetup, ExcludeDedicatedBinContent);
         WhseEntry.SetFilter("Bin Type Code", CreatePick.GetBinTypeFilter(1)); // Shipping area
         WhseEntry.CalcSums("Qty. (Base)");
@@ -493,7 +492,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         WarehouseEntry: Record "Warehouse Entry";
         QtyInBin: Decimal;
     begin
-        TempBinContentBuffer.Reset();
         TempBinContentBuffer.DeleteAll();
 
         Location.Get(LocationCode);
@@ -516,7 +514,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         WarehouseEntry.SetRange("Reference Document", WarehouseEntry."Reference Document"::Pick);
         WarehouseEntry.SetFilter("Qty. (Base)", '>%1', 0);
         OnGetOutboundBinsOnBasicWarehouseLocationOnAfterSetWarehouseEntryFilters(WarehouseEntry);
-        WarehouseEntry.SetLoadFields("Bin Code", Dedicated);
+        WarehouseEntry.SetLoadFields("Bin Code");
         if WarehouseEntry.FindSet() then
             repeat
                 WarehouseEntry.SetRange("Bin Code", WarehouseEntry."Bin Code");
@@ -525,7 +523,6 @@ codeunit 7314 "Warehouse Availability Mgt."
                     TempBinContentBuffer.Init();
                     TempBinContentBuffer."Location Code" := LocationCode;
                     TempBinContentBuffer."Bin Code" := WarehouseEntry."Bin Code";
-                    TempBinContentBuffer.Dedicated := WarehouseEntry.Dedicated;
                     TempBinContentBuffer."Item No." := ItemNo;
                     TempBinContentBuffer."Variant Code" := VariantCode;
                     TempBinContentBuffer."Qty. Outstanding (Base)" := QtyInBin;
@@ -593,7 +590,7 @@ codeunit 7314 "Warehouse Availability Mgt."
     var
         WhseEntry2: Record "Warehouse Entry";
     begin
-        WhseEntry2.ReadIsolation(IsolationLevel::ReadUnCommitted);
+        WhseEntry2.ReadIsolation(IsolationLevel::ReadCommitted);
         if WhseEntry.FindSet() then
             repeat
                 WhseEntry.SetRange("Bin Code", WhseEntry."Bin Code");
@@ -749,7 +746,7 @@ codeunit 7314 "Warehouse Availability Mgt."
             exit(QtyPickedBase);
 
         WarehouseEntry.Reset();
-        WarehouseEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
+        WarehouseEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         WarehouseEntry.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceRefNo, true);
         WarehouseEntry.SetRange("Entry Type", WarehouseEntry."Entry Type"::Movement);
         WarehouseEntry.SetRange("Reference Document", WarehouseEntry."Reference Document"::Pick);
@@ -758,7 +755,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         QtyPickedBase := WarehouseEntry."Qty. (Base)";
 
         WarehouseEntry.Reset();
-        WarehouseEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
+        WarehouseEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         WarehouseEntry.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceRefNo, true);
         WarehouseEntry.SetRange("Entry Type", WarehouseEntry."Entry Type"::"Negative Adjmt.");
         WarehouseEntry.SetRange("Whse. Document Type", WarehouseEntry."Whse. Document Type"::Shipment);
@@ -869,9 +866,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         end else
             AvailQtyBase := CalcInvtAvailQty(Item, Location, WhseWorksheetLine."Variant Code", TempWhseActivLine);
 
-        if Location."Require Pick" or
-           (Location."Prod. Consump. Whse. Handling" = Location."Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)")
-        then
+        if Location."Require Pick" then
             QtyReservedOnPickShip := CalcReservQtyOnPicksShips(WhseWorksheetLine."Location Code", WhseWorksheetLine."Item No.", WhseWorksheetLine."Variant Code", TempWhseActivLine);
 
         QtyReservedForCurrLine :=
@@ -1042,14 +1037,6 @@ codeunit 7314 "Warehouse Availability Mgt."
             AvailabilityType::UOM:
                 ItemAvailabilityFormsMgt.ShowItemAvailabilityByUOM(Item, WhseActivLine.FieldCaption(WhseActivLine."Unit of Measure Code"), WhseActivLine."Unit of Measure Code", NewUnitOfMeasureCode);
         end;
-    end;
-
-    local procedure ExcludeDedicatedBinContentFromTempBinContentBuffer(var TempBinContentBuffer: Record "Bin Content Buffer" temporary; ExcludeDedicatedBinContent: Boolean)
-    begin
-        if not ExcludeDedicatedBinContent then
-            exit;
-
-        TempBinContentBuffer.SetRange(Dedicated, false);
     end;
 
     [IntegrationEvent(false, false)]
