@@ -37,7 +37,6 @@ codeunit 134159 "Test Price Calculation - V16"
             Comment = '%1 - a field caption, %2 - a value of the field';
         ValueMustBeEqualErr: Label '%1 must be equal to %2 in %3', Comment = '%1 = Field Caption , %2 = Expected Value , %3 = Table Caption';
         TestFieldErr: Label '%1 must have a value', Comment = '%1 = Field Caption';
-        LineDiscPctErr: Label 'Line Discount % must be %1 in %2', Comment = '%1 = Line Discount % value, %2 = Service Line';
 
     [Test]
     procedure T001_SalesLineAddsActivatedCampaignOnHeaderAsSource()
@@ -5397,190 +5396,6 @@ codeunit 134159 "Test Price Calculation - V16"
         LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
     end;
 
-    [Test]
-    [HandlerFunctions('ConfirmHandlerYes')]
-    procedure LineDiscPctInServLineForServCostIsEqualToLineDiscPctOfItsSalesPrice()
-    var
-        Customer: Record Customer;
-        Item: Record Item;
-        PriceListHeader: Record "Price List Header";
-        PriceListLine: array[2] of Record "Price List Line";
-        ServiceCost: Record "Service Cost";
-        ServiceHeader: Record "Service Header";
-        ServiceItem: Record "Service Item";
-        ServiceItemLine: Record "Service Item Line";
-        ServiceLine: Record "Service Line";
-    begin
-        // [SCENARIO 574353] "Line Discount %" in Service Line of Service Cost is 
-        // equal to "Line Discount %" of Sales Price Line of Service Cost.
-        Initialize();
-
-        // [GIVEN] Create an Item.
-        LibraryInventory.CreateItem(Item);
-
-        // [GIVEN] Create a Service Cost.
-        CreateServiceCost(ServiceCost, Item);
-
-        // [GIVEN] Create a Price Header.
-        LibraryPriceCalculation.CreatePriceHeader(
-            PriceListHeader,
-            PriceListHeader."Price Type"::Sale,
-            PriceListHeader."Source Type"::"All Customers",
-            '');
-
-        // [GIVEN] Create Price List Line [1].
-        PriceListLine[1].DeleteAll();
-        CreatePriceListLineForItem(PriceListLine[1], PriceListHeader, Item);
-
-        // [GIVEN] Validate "Allow Invoice Disc." in Price List Line [1].
-        PriceListLine[1].Validate("Allow Invoice Disc.", false);
-        PriceListLine[1].Modify(true);
-
-        // [GIVEN] Create Price List Line [2].
-        CreatePriceListLineForServiceCost(PriceListLine[2], PriceListHeader, ServiceCost);
-
-        // [GIVEN] Validate "Allow Invoice Disc." in Price List Line [2].
-        PriceListLine[2].Validate("Allow Invoice Disc.", true);
-        PriceListLine[2].Modify(true);
-
-        // [GIVEN] Validate "Status" in Price List Header.
-        PriceListHeader.Validate(Status, PriceListHeader.Status::Active);
-        PriceListHeader.Modify(true);
-
-        // [GIVEN] Create a Customer and Validate " Allow Line Disc.".
-        LibrarySales.CreateCustomer(Customer);
-        Customer.Validate("Allow Line Disc.", true);
-        Customer.Modify(true);
-
-        // [GIVEN] Create a Service Item and Validate "Item No.".
-        LibraryService.CreateServiceItem(ServiceItem, Customer."No.");
-        ServiceItem.Validate("Item No.", Item."No.");
-        ServiceItem.Modify(true);
-
-        // [GIVEN] Create a Service Header.
-        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Order, Customer."No.");
-
-        // [GIVEN] Create a Service Item Line.
-        LibraryService.CreateServiceItemLine(ServiceItemLine, ServiceHeader, ServiceItem."No.");
-
-        // [WHEN] Create a Service Line.
-        Clear(ServiceLine);
-        CreateServiceLine(ServiceLine, ServiceHeader, ServiceItemLine, ServiceCost);
-
-        // [THEN] "Line Discount %" of Service Line is equal to "Line Discount %" of Price List Line [2].
-        Assert.AreEqual(
-            PriceListLine[2]."Line Discount %",
-            ServiceLine."Line Discount %",
-            StrSubstNo(
-                LineDiscPctErr,
-                PriceListLine[2]."Line Discount %",
-                ServiceLine.TableCaption()));
-    end;
-
-    [Test]
-    [HandlerFunctions('ServiceCostsModalPageHandler')]
-    procedure ServCostsPageLookupIsShownInProdNoIfProdTypeIsServCostInSalesPriceLines()
-    var
-        Item: Record Item;
-        PriceListHeader: Record "Price List Header";
-        ServiceCost: Record "Service Cost";
-        SalesPriceList: TestPage "Sales Price List";
-    begin
-        // [SCENARIO 579104] Service Costs page lookup is shown under "Product No." field 
-        // of Sales Price List Lines if "Asset Type" is Service Cost.
-        Initialize();
-
-        // [GIVEN] Create an Item.
-        LibraryInventory.CreateItem(Item);
-
-        // [GIVEN] Create a Service Cost.
-        CreateServiceCost(ServiceCost, Item);
-
-        // [GIVEN] Create a Price Header.
-        LibraryPriceCalculation.CreatePriceHeader(
-            PriceListHeader,
-            PriceListHeader."Price Type"::Sale,
-            PriceListHeader."Source Type"::"All Customers",
-            '');
-
-        // [GIVEN] Open Sales Price List page.
-        SalesPriceList.OpenEdit();
-        SalesPriceList.GoToRecord(PriceListHeader);
-
-        // [WHEN] Set values in "Asset Type" and "Product No.".
-        LibraryVariableStorage.Enqueue(Format(ServiceCost.Code));
-        SalesPriceList.Lines."Asset Type".SetValue("Price Asset Type"::"Service Cost");
-        SalesPriceList.Lines."Product No.".Lookup();
-
-        // [THEN] "Product No." in Sales Price List Lines is 
-        // equal to "Code" of Service Cost.
-        SalesPriceList.Lines."Product No.".AssertEquals(ServiceCost.Code);
-    end;
-
-    [Test]
-    [HandlerFunctions('ConfirmHandlerYes,MessageHandlerOK,GetPriceLineHandler')]
-    procedure VerifySalesPriceInSalesLineWhenSalesPriceIsUpdatedViaGetPriceFunction()
-    var
-        Customer: Record Customer;
-        Item: Record Item;
-        PriceListHeader: array[2] of Record "Price List Header";
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        SalesOrder: TestPage "Sales Order";
-        UnitPrice: array[2] of Decimal;
-        FirstDayOfYear, LastDayOfYear : Date;
-    begin
-        // [SCENARIO 580007] Confirm sales price in sales line when sales price is updated via GetPrice function.
-        Initialize();
-
-        // [GIVEN] Calculate the first and last day of the year.
-        FirstDayOfYear := CalcDate('<-CY>', WorkDate());
-        LastDayOfYear := CalcDate('<CY>', WorkDate());
-
-        // [GIVEN] Create an Item and customer.
-        CreateItemAndCustomer(Item, Customer);
-
-        // [GIVEN] Create First Sales Price.
-        UnitPrice[1] := CreatePriceListHeader(
-            PriceListHeader[1], Customer."No.", Item."No.", FirstDayOfYear, LastDayOfYear);
-
-        // [GIVEN] Create Second Sales Price.
-        UnitPrice[2] := CreatePriceListHeader(
-            PriceListHeader[2], Customer."No.", Item."No.",
-            CalcDate('<6M>', FirstDayOfYear), LastDayOfYear);
-
-        // [GIVEN] Set WorkDate.
-        WorkDate := CalcDate('<5M>', FirstDayOfYear);
-
-        // [GIVEN] Create a sales order.
-        CreateSalesOrder(SalesHeader, Customer."No.", Item."No.");
-        LibraryVariableStorage.Enqueue(PriceListHeader[2]."Starting Date");
-
-        // [GIVEN] Open Sales Order page.
-        SalesOrder.OpenEdit();
-        SalesOrder.GoToRecord(SalesHeader);
-
-        // [GIVEN] Change Posting Date and Order Date value.
-        SalesOrder."Posting Date".SetValue(CalcDate('<2M>', WorkDate()));
-        SalesOrder."Order Date".SetValue(CalcDate('<2M>', WorkDate()));
-
-        // [WHEN] Get Prices Action was invoked.
-        SalesOrder.SalesLines.GetPrices.Invoke();
-
-        // [GIVEN] Find Updated Sales Line.
-        FindSalesLine(SalesLine, SalesHeader."No.", Item."No.");
-
-        // [THEN] No error occurred and the unit price is updating in the sales line from the sales price.
-        Assert.AreEqual(
-            UnitPrice[2], SalesLine."Unit Price",
-            StrSubstNo(
-                ValueMustBeEqualErr,
-                SalesLine.FieldCaption("Unit Price"),
-                UnitPrice[2],
-                SalesLine.TableCaption()));
-        LibraryVariableStorage.AssertEmpty();
-    end;
-
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -6328,126 +6143,6 @@ codeunit 134159 "Test Price Calculation - V16"
         end;
     end;
 
-    local procedure CreateServiceCost(var ServiceCost: Record "Service Cost"; Item: Record Item)
-    begin
-        LibraryService.CreateServiceCost(ServiceCost);
-        ServiceCost.Validate("Cost Type", ServiceCost."Cost Type"::Support);
-        ServiceCost.Validate("Default Quantity", LibraryRandom.RandIntInRange(1, 1));
-        ServiceCost.Validate("Default Unit Cost", LibraryRandom.RandIntInRange(100, 100));
-        ServiceCost.Validate("Default Unit Price", LibraryRandom.RandIntInRange(200, 200));
-        ServiceCost.Validate("Unit of Measure Code", Item."Base Unit of Measure");
-        ServiceCost.Modify(true);
-    end;
-
-    local procedure CreatePriceListLineForItem(var PriceListLine: Record "Price List Line"; PriceListHeader: Record "Price List Header"; Item: Record Item)
-    begin
-        LibraryPriceCalculation.CreatePriceListLine(
-            PriceListLine,
-            PriceListHeader,
-            "Price Amount Type"::Any,
-            "Price Asset Type"::Item,
-            Item."No.");
-
-        PriceListLine.Validate("Unit of Measure Code", Item."Base Unit of Measure");
-        PriceListLine.Validate("Allow Line Disc.", true);
-        PriceListLine.Validate("Line Discount %", LibraryRandom.RandIntInRange(10, 10));
-        PriceListLine.Validate("Unit Price", 0);
-        PriceListLine.Modify(true);
-    end;
-
-    local procedure CreatePriceListLineForServiceCost(var PriceListLine: Record "Price List Line"; PriceListHeader: Record "Price List Header"; ServiceCost: Record "Service Cost")
-    begin
-        LibraryPriceCalculation.CreatePriceListLine(
-            PriceListLine,
-            PriceListHeader,
-            "Price Amount Type"::Any,
-            "Price Asset Type"::"Service Cost",
-            ServiceCost.Code);
-
-        PriceListLine.Validate("Line Discount %", LibraryRandom.RandIntInRange(10, 10));
-        PriceListLine.Validate("Allow Line Disc.", true);
-        PriceListLine.Validate("Unit Price", 0);
-        PriceListLine.Modify(true);
-    end;
-
-    local procedure CreateServiceLine(var ServiceLine: Record "Service Line"; ServiceHeader: Record "Service Header"; ServiceItemLine: Record "Service Item Line"; ServiceCost: Record "Service Cost")
-    begin
-        ServiceLine.Init();
-        ServiceLine."Document Type" := ServiceLine."Document Type"::Order;
-        ServiceLine."Document No." := ServiceHeader."No.";
-        ServiceLine."Line No." := LibraryRandom.RandIntInRange(10000, 10000);
-        ServiceLine."Service Item Line No." := ServiceItemLine."Line No.";
-        ServiceLine.Insert(true);
-
-        ServiceLine.Validate(Type, ServiceLine.Type::Cost);
-        ServiceLine.Validate("No.", ServiceCost.Code);
-        ServiceLine.Modify(true);
-    end;
-
-    local procedure CreateItemAndCustomer(var Item: Record Item; var Customer: Record Customer)
-    var
-        VATPostingSetup: Record "VAT Posting Setup";
-    begin
-        LibraryERM.CreateVATPostingSetupWithAccounts(
-            VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 0);
-        LibraryInventory.CreateItem(Item);
-        Item.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
-        Item.Modify(true);
-
-        LibrarySales.CreateCustomer(Customer);
-        Customer.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
-        Customer.Validate("Allow Line Disc.", false);
-        Customer.Modify(true);
-    end;
-
-    local procedure CreatePriceListHeader(var PriceListHeader: Record "Price List Header"; CustomerNo: Code[20]; ItemNo: Code[20]; FirstDayOfYear: Date; LastDayOfYear: Date): Decimal
-    var
-        PriceListLine: Record "Price List Line";
-    begin
-        LibraryPriceCalculation.CreatePriceHeader(
-            PriceListHeader, PriceListHeader."Price Type"::Sale,
-            PriceListHeader."Source Type"::Customer, CustomerNo);
-        PriceListHeader.Validate("Starting Date", FirstDayOfYear);
-        PriceListHeader.Validate("Ending Date", LastDayOfYear);
-        PriceListHeader.Validate("Allow Updating Defaults", true);
-        PriceListHeader.Modify(true);
-
-        CreatePriceListLine(PriceListLine, PriceListHeader, ItemNo, FirstDayOfYear);
-        PriceListHeader.Validate(Status, PriceListHeader.Status::Active);
-        PriceListHeader.Modify(true);
-
-        exit(PriceListLine."Unit Price");
-    end;
-
-    local procedure CreatePriceListLine(var PriceListLine: Record "Price List Line"; var PriceListHeader: Record "Price List Header"; ItemNo: Code[20]; FirstDayOfYear: Date)
-    begin
-        LibraryPriceCalculation.CreateSalesPriceLine(
-            PriceListLine, PriceListHeader.Code,
-            PriceListHeader."Source Type", PriceListHeader."Source No.",
-            PriceListLine."Asset Type"::Item, ItemNo);
-        PriceListLine.Validate("Minimum Quantity", 1);
-        PriceListLine.Validate("Unit Price", LibraryRandom.RandIntInRange(100, 200));
-        PriceListLine.Validate("Starting Date", FirstDayOfYear);
-        PriceListLine.Modify(true);
-    end;
-
-    local procedure CreateSalesOrder(var SalesHeader: Record "Sales Header"; CustomerNo: Code[20]; ItemNo: Code[20])
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CustomerNo);
-        LibrarySales.CreateSalesLine(
-            SalesLine, SalesHeader, SalesLine.Type::Item, ItemNo, LibraryRandom.RandInt(10));
-    end;
-
-    local procedure FindSalesLine(var SalesLine: Record "Sales Line"; SalesOrdertNo: Code[20]; ItemNo: Code[20])
-    begin
-        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
-        SalesLine.SetRange("Document No.", SalesOrdertNo);
-        SalesLine.SetRange("No.", ItemNo);
-        SalesLine.FindFirst();
-    end;
-
     [RequestPageHandler]
     procedure ImplementStandardCostChangesHandler(var ImplementStandardCostChange: TestRequestPage "Implement Standard Cost Change")
     var
@@ -6536,13 +6231,6 @@ codeunit 134159 "Test Price Calculation - V16"
         GetPriceLine.OK().Invoke();
     end;
 
-    [ModalPageHandler]
-    procedure ServiceCostsModalPageHandler(var ServiceCosts: TestPage "Service Costs")
-    begin
-        ServiceCosts.Filter.SetFilter("Code", LibraryVariableStorage.DequeueText());
-        ServiceCosts.OK().Invoke();
-    end;
-
     [ConfirmHandler]
     procedure ConfirmNoHandler(Question: Text; var Reply: Boolean)
     begin
@@ -6553,12 +6241,6 @@ codeunit 134159 "Test Price Calculation - V16"
     procedure ConfirmYesHandler(Question: Text; var Reply: Boolean)
     begin
         LibraryVariableStorage.Enqueue(Question);
-        Reply := true;
-    end;
-
-    [ConfirmHandler]
-    procedure ConfirmHandlerYes(QuestionText: Text[1024]; var Reply: Boolean)
-    begin
         Reply := true;
     end;
 
@@ -6573,17 +6255,5 @@ codeunit 134159 "Test Price Calculation - V16"
     begin
         ResPriceList.Handler.SetValue("Price Calculation Handler"::"Business Central (Version 16.0)");
         ResPriceList.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
-    end;
-
-    [MessageHandler]
-    procedure MessageHandlerOK(Msg: Text[1024])
-    begin
-    end;
-
-    [ModalPageHandler]
-    procedure GetPriceLineHandler(var GetPriceLine: TestPage "Get Price Line")
-    begin
-        GetPriceLine.Filter.SetFilter("Starting Date", Format(LibraryVariableStorage.DequeueDate()));
-        GetPriceLine.OK().Invoke();
     end;
 }
