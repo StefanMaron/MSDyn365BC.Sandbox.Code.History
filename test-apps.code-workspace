@@ -57,6 +57,9 @@
       "path": "./ReportLayouts/Test/Report Layouts Tests"
     },
     {
+      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
+    },
+    {
       "path": "./ExternalEvents/test/_Exclude_Business_Events_Test"
     },
     {
@@ -289,6 +292,9 @@
     },
     {
       "path": "./BusinessFoundation/Test/Business Foundation Tests"
+    },
+    {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./Email - Outlook REST API/Test"
