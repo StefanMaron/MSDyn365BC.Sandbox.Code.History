@@ -27,7 +27,6 @@ using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Shipping;
-using Microsoft.Intercompany;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
 using Microsoft.Inventory;
@@ -542,7 +541,7 @@ table 38 "Purchase Header"
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateOrderDate(Rec, xRec, IsHandled, CurrFieldNo);
+                OnBeforeValidateOrderDate(Rec, xRec, IsHandled);
                 if IsHandled then
                     exit;
 
@@ -1639,9 +1638,8 @@ table 38 "Purchase Header"
             trigger OnValidate()
             begin
                 if not ("Document Type" in ["Document Type"::"Blanket Order", "Document Type"::Quote]) then
-                    if "Posting Date" <> 0D then
-                        if "Document Date" > "Posting Date" then
-                            Error(Text1130017, FieldCaption("Document Date"), FieldCaption("Posting Date"));
+                    if "Document Date" > "Posting Date" then
+                        Error(Text1130017, FieldCaption("Document Date"), FieldCaption("Posting Date"));
                 if not CheckVATExemption() then
                     "Document Date" := xRec."Document Date";
                 GLSetup.Get();
@@ -1657,10 +1655,9 @@ table 38 "Purchase Header"
                     UpdateDocumentDate := true;
                 Validate("Payment Terms Code");
                 Validate("Prepmt. Payment Terms Code");
-              
+
                 PurchWithhSoc.UpdateDateRelatedWithPurchHeaderDocDate(Rec);
-                UpdateDocumentDate := false;
-end;
+            end;
         }
         field(101; "Area"; Code[10])
         {
@@ -1846,19 +1843,14 @@ end;
                 if "VAT Base Discount %" > GLSetup."VAT Tolerance %" then begin
                     if GetHideValidationDialog() or not GuiAllowed then
                         Confirmed := true
-                    else begin
-                        IsHandled := false;
-                        OnValidateVATBaseDiscountOnBeforeConfirm(Rec, IsHandled, Confirmed);
-                        if not IsHandled then
-                            Confirmed :=
-                              Confirm(
-                                Text007 +
-                                Text008, false,
-                                FieldCaption("VAT Base Discount %"),
-                                GLSetup.FieldCaption("VAT Tolerance %"),
-                                GLSetup.TableCaption());
-                    end;
-
+                    else
+                        Confirmed :=
+                          Confirm(
+                            Text007 +
+                            Text008, false,
+                            FieldCaption("VAT Base Discount %"),
+                            GLSetup.FieldCaption("VAT Tolerance %"),
+                            GLSetup.TableCaption());
                     if not Confirmed then
                         "VAT Base Discount %" := xRec."VAT Base Discount %";
                 end;
@@ -2013,14 +2005,7 @@ end;
             TableRelation = "No. Series";
 
             trigger OnLookup()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeLookupPrepmtCrMemoNoSeries(Rec, xRec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 PurchHeader := Rec;
                 GetPurchSetup();
                 PurchSetup.TestField("Posted Prepmt. Cr. Memo Nos.");
@@ -2030,14 +2015,7 @@ end;
             end;
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidatePrepmtCrMemoNoSeries(Rec, xRec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if "Prepmt. Cr. Memo No. Series" <> '' then begin
                     GetPurchSetup();
                     PurchSetup.TestField("Posted Prepmt. Cr. Memo Nos.");
@@ -3703,14 +3681,11 @@ end;
     procedure PerformManualRelease()
     var
         ReleasePurchDoc: Codeunit "Release Purchase Document";
-        IsHandled: Boolean;
     begin
-        OnBeforePerformManualRelease(Rec, IsHandled);
-        if not IsHandled then
-            if Rec.Status <> Rec.Status::Released then begin
-                ReleasePurchDoc.PerformManualRelease(Rec);
-                Commit();
-            end;
+        if Rec.Status <> Rec.Status::Released then begin
+            ReleasePurchDoc.PerformManualRelease(Rec);
+            Commit();
+        end;
     end;
 
     procedure PerformManualReopen(var PurchaseHeader: Record "Purchase Header")
@@ -4172,17 +4147,12 @@ end;
     procedure ConfirmCurrencyFactorUpdate(): Boolean
     var
         ForceConfirm: Boolean;
-        IsHandled: Boolean;
     begin
         OnBeforeConfirmUpdateCurrencyFactor(Rec, HideValidationDialog, ForceConfirm);
         if GetHideValidationDialog() or not GuiAllowed or ForceConfirm then
             Confirmed := true
-        else begin
-            IsHandled := false;
-            OnConfirmCurrencyFactorUpdateOnBeforeConfirm(Rec, IsHandled, Confirmed);
-            if not IsHandled then
-                Confirmed := Confirm(Text022, false);
-        end;
+        else
+            Confirmed := Confirm(Text022, false);
         if Confirmed then
             Validate("Currency Factor")
         else
@@ -4458,8 +4428,6 @@ end;
                     DimMgt.UpdateGlobalDimFromDimSetID(Rec."Dimension Set ID", Rec."Shortcut Dimension 1 Code", Rec."Shortcut Dimension 2 Code");
                 end;
 
-        OnCreateDimOnAfterConfirmKeepExisting(Rec, xRec, CurrFieldNo, OldDimSetID, DefaultDimSource);
-
         if (OldDimSetID <> "Dimension Set ID") and PurchLinesExist() then begin
             Modify();
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
@@ -4529,7 +4497,7 @@ end;
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec, FieldNumber);
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if PurchLinesExist() then
@@ -5007,7 +4975,6 @@ end;
     /// <param name="OldParentDimSetID">Previous dimension set ID.</param>
     procedure UpdateAllLineDim(NewParentDimSetID: Integer; OldParentDimSetID: Integer)
     var
-        xPurchaseLine: Record "Purchase Line";
         ConfirmManagement: Codeunit "Confirm Management";
         NewDimSetID: Integer;
         ReceivedShippedItemLineDimChangeConfirmed: Boolean;
@@ -5024,7 +4991,7 @@ end;
         if not GetHideValidationDialog() then begin
             DefaultAnswer := true;
             OnUpdateAllLineDimOnBeforeConfirmUpdateAllLineDim(Rec, DefaultAnswer);
-            if not ConfirmManagement.GetResponseOrDefault(Text051, DefaultAnswer) then
+            if not ConfirmManagement.GetResponseOrDefault(Text051, true) then
                 exit;
         end;
 
@@ -5039,7 +5006,6 @@ end;
                 NewDimSetID := DimMgt.GetDeltaDimSetID(PurchLine."Dimension Set ID", NewParentDimSetID, OldParentDimSetID);
                 OnUpdateAllLineDimOnAfterGetPurchLineNewDimsetID(Rec, xRec, PurchLine, NewDimSetID, NewParentDimSetID, OldParentDimSetID);
                 if PurchLine."Dimension Set ID" <> NewDimSetID then begin
-                    xPurchaseLine := PurchLine;
                     PurchLine."Dimension Set ID" := NewDimSetID;
 
                     if not GetHideValidationDialog() and GuiAllowed then
@@ -5048,7 +5014,7 @@ end;
                     DimMgt.UpdateGlobalDimFromDimSetID(
                       PurchLine."Dimension Set ID", PurchLine."Shortcut Dimension 1 Code", PurchLine."Shortcut Dimension 2 Code");
 
-                    OnUpdateAllLineDimOnBeforePurchLineModify(PurchLine, xPurchaseLine);
+                    OnUpdateAllLineDimOnBeforePurchLineModify(PurchLine);
                     PurchLine.Modify();
                 end;
             until PurchLine.Next() = 0;
@@ -5083,7 +5049,6 @@ end;
         if VendLedgEntry.FindFirst() then begin
             if VendLedgEntry."Amount to Apply" = 0 then begin
                 VendLedgEntry.CalcFields("Remaining Amount");
-                OnSetAmountToApplyAfterOnCalcRemainingAmount(VendLedgEntry);
                 VendLedgEntry."Amount to Apply" := VendLedgEntry."Remaining Amount";
             end else
                 VendLedgEntry."Amount to Apply" := 0;
@@ -5158,13 +5123,7 @@ end;
     procedure GetPstdDocLinesToReverse()
     var
         PurchPostedDocLines: Page "Posted Purchase Document Lines";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeGetPstdDocLinesToReverse(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         GetVend("Buy-from Vendor No.");
         PurchPostedDocLines.SetToPurchHeader(Rec);
         PurchPostedDocLines.SetRecord(Vend);
@@ -5173,8 +5132,6 @@ end;
             PurchPostedDocLines.CopyLineToDoc();
 
         Clear(PurchPostedDocLines);
-
-        OnAfterGetPstdDocLinesToReverse(Rec);
     end;
 
     /// <summary>
@@ -5276,32 +5233,27 @@ end;
 
     local procedure CopyAddressInfoFromOrderAddress()
     var
-        OrderAddress: Record "Order Address";
-        IsHandled: Boolean;
+        OrderAddr: Record "Order Address";
     begin
-        OrderAddress.Get("Buy-from Vendor No.", "Order Address Code");
-        IsHandled := false;
-        OnCopyAddressInfoFromOrderAddressOnBeforeCopyBuyFromVendorAddressFieldsFromOrderAddress(Rec, xRec, OrderAddress, IsHandled);
-        if not IsHandled then begin
-            "Buy-from Vendor Name" := OrderAddress.Name;
-            "Buy-from Vendor Name 2" := OrderAddress."Name 2";
-            "Buy-from Address" := OrderAddress.Address;
-            "Buy-from Address 2" := OrderAddress."Address 2";
-            "Buy-from City" := OrderAddress.City;
-            "Buy-from Contact" := OrderAddress.Contact;
-            "Buy-from Post Code" := OrderAddress."Post Code";
-            "Buy-from County" := OrderAddress.County;
-            "Buy-from Country/Region Code" := OrderAddress."Country/Region Code";
-        end;
+        OrderAddr.Get("Buy-from Vendor No.", "Order Address Code");
+        "Buy-from Vendor Name" := OrderAddr.Name;
+        "Buy-from Vendor Name 2" := OrderAddr."Name 2";
+        "Buy-from Address" := OrderAddr.Address;
+        "Buy-from Address 2" := OrderAddr."Address 2";
+        "Buy-from City" := OrderAddr.City;
+        "Buy-from Contact" := OrderAddr.Contact;
+        "Buy-from Post Code" := OrderAddr."Post Code";
+        "Buy-from County" := OrderAddr.County;
+        "Buy-from Country/Region Code" := OrderAddr."Country/Region Code";
 
         if IsCreditDocType() then begin
             SetShipToAddress(
-                OrderAddress.Name, OrderAddress."Name 2", OrderAddress.Address, OrderAddress."Address 2",
-                OrderAddress.City, OrderAddress."Post Code", OrderAddress.County, OrderAddress."Country/Region Code");
-            "Ship-to Phone No." := OrderAddress."Phone No.";
-            "Ship-to Contact" := OrderAddress.Contact;
+                OrderAddr.Name, OrderAddr."Name 2", OrderAddr.Address, OrderAddr."Address 2",
+                OrderAddr.City, OrderAddr."Post Code", OrderAddr.County, OrderAddr."Country/Region Code");
+            "Ship-to Phone No." := OrderAddr."Phone No.";
+            "Ship-to Contact" := OrderAddr.Contact;
         end;
-        OnAfterCopyAddressInfoFromOrderAddress(OrderAddress, Rec);
+        OnAfterCopyAddressInfoFromOrderAddress(OrderAddr, Rec);
     end;
 
     /// <summary>
@@ -5375,18 +5327,13 @@ end;
     procedure IsApprovedForPosting() Approved: Boolean
     var
         PrepaymentMgt: Codeunit "Prepayment Mgt.";
-        IsHandled: Boolean;
     begin
         if ApprovalsMgmt.PrePostApprovalCheckPurch(Rec) then begin
             TestPurchasePrepayment();
             Approved := true;
             if "Document Type" = "Document Type"::Order then
-                if PrepaymentMgt.TestPurchasePayment(Rec) then begin
-                    IsHandled := false;
-                    OnIsApprovedForPostingOnBeforeError(Rec, IsHandled, Approved);
-                    if not IsHandled then
-                        Error(Text054, "Document Type", "No.");
-                end;
+                if PrepaymentMgt.TestPurchasePayment(Rec) then
+                    Error(Text054, "Document Type", "No.");
             OnAfterIsApprovedForPosting(Rec, Approved);
         end;
     end;
@@ -5580,7 +5527,6 @@ end;
 
         PurchaseLine.SetRange("Document Type", "Document Type");
         PurchaseLine.SetRange("Document No.", "No.");
-        PurchaseLine.SetFilter(Type, '<>%1', PurchaseLine.Type::" ");
         if not PurchaseLine.FindFirst() then
             exit(true);
 
@@ -6377,15 +6323,16 @@ end;
         OnAfterUpdatePayToAddressFromBuyFromAddress(Rec, xRec, FieldNumber);
     end;
 
-    local procedure PayToAddressEqualsOldBuyFromAddress() Result: Boolean
+    local procedure PayToAddressEqualsOldBuyFromAddress(): Boolean
     begin
-        Result := (xRec."Buy-from Address" = "Pay-to Address") and
+        if (xRec."Buy-from Address" = "Pay-to Address") and
            (xRec."Buy-from Address 2" = "Pay-to Address 2") and
            (xRec."Buy-from City" = "Pay-to City") and
            (xRec."Buy-from County" = "Pay-to County") and
            (xRec."Buy-from Post Code" = "Pay-to Post Code") and
-           (xRec."Buy-from Country/Region Code" = "Pay-to Country/Region Code");
-        OnAfterPayToAddressEqualsOldBuyFromAddress(Rec, xRec, Result);
+           (xRec."Buy-from Country/Region Code" = "Pay-to Country/Region Code")
+        then
+            exit(true);
     end;
 
     /// <summary>
@@ -6445,8 +6392,6 @@ end;
             InitNoSeries();
             exit(true);
         end;
-
-        OnAfterInitFromVendor(Rec, xRec, VendorNo, VendorCaption);
     end;
 
     local procedure InitFromContact(ContactNo: Code[20]; VendorNo: Code[20]; ContactCaption: Text): Boolean
@@ -7459,15 +7404,14 @@ end;
     begin
         IsHandled := false;
         OnBeforeValidateEmptySellToCustomerAndLocation(Rec, Vend, IsHandled, xRec);
-        if not IsHandled then begin
-            Validate("Sell-to Customer No.", '');
+        if IsHandled then
+            exit;
 
-            if "Buy-from Vendor No." <> '' then
-                GetVend("Buy-from Vendor No.");
-            UpdateLocationCode(Vend."Location Code");
-        end;
+        Validate("Sell-to Customer No.", '');
 
-        OnAfterValidateEmptySellToCustomerAndLocation(Rec, Vend);
+        if "Buy-from Vendor No." <> '' then
+            GetVend("Buy-from Vendor No.");
+        UpdateLocationCode(Vend."Location Code");
     end;
 
     /// <summary>
@@ -7992,17 +7936,6 @@ end;
             Error(PrepaymentInvoicesNotPaidErr, Rec."Document Type", Rec."No.");
     end;
 
-    procedure SendICPurchaseDoc(var PurchaseHeader: Record "Purchase Header")
-    var
-        ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
-    begin
-        if PurchaseHeader.FindSet() then
-            repeat
-                if ApprovalsMgmt.PrePostApprovalCheckPurch(PurchaseHeader) then
-                    ICInOutboxMgt.SendPurchDoc(PurchaseHeader, false);
-            until PurchaseHeader.Next() = 0;
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var PurchaseHeader: Record "Purchase Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
@@ -8279,7 +8212,7 @@ end;
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var PurcasehHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; FieldNumber: Integer)
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var PurcasehHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header")
     begin
     end;
 
@@ -8874,7 +8807,7 @@ end;
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateAllLineDimOnBeforePurchLineModify(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line")
+    local procedure OnUpdateAllLineDimOnBeforePurchLineModify(var PurchaseLine: Record "Purchase Line")
     begin
     end;
 
@@ -9174,7 +9107,7 @@ end;
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateOrderDate(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; CurrFieldNo: Integer)
+    local procedure OnBeforeValidateOrderDate(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 
@@ -9327,76 +9260,6 @@ end;
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateAllLineDimOnBeforeConfirmUpdateAllLineDim(var PurchaseHeader: Record "Purchase Header"; var DefaultAnswer: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetAmountToApplyAfterOnCalcRemainingAmount(var VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePerformManualRelease(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateVATBaseDiscountOnBeforeConfirm(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var Confirmed: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnConfirmCurrencyFactorUpdateOnBeforeConfirm(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var Confirmed: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnIsApprovedForPostingOnBeforeError(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var Approved: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPayToAddressEqualsOldBuyFromAddress(PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyAddressInfoFromOrderAddressOnBeforeCopyBuyFromVendorAddressFieldsFromOrderAddress(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; OrderAddress: Record "Order Address"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInitFromVendor(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; VendorNo: Code[20]; VendorCaption: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateDimOnAfterConfirmKeepExisting(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CurrentFieldNo: Integer; OldDimSetID: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeLookupPrepmtCrMemoNoSeries(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidatePrepmtCrMemoNoSeries(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetPstdDocLinesToReverse(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetPstdDocLinesToReverse(var PurchaseHeader: Record "Purchase Header")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterValidateEmptySellToCustomerAndLocation(var PurchaseHeader: Record "Purchase Header"; var Vendor: Record Vendor)
     begin
     end;
 }
