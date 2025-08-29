@@ -348,15 +348,11 @@ table 39 "Purchase Line"
             var
                 Vend: Record Vendor;
                 ConfirmManagement: Codeunit "Confirm Management";
-                IsHandled, ShouldExit : Boolean;
+                IsHandled: Boolean;
             begin
                 TestStatusOpen();
                 IsHandled := false;
-                ShouldExit := false;
-                OnValidateLocationCodeOnAfterTestStatusOpen(Rec, xRec, IsHandled, ShouldExit);
-                if ShouldExit then
-                    exit;
-
+                OnValidateLocationCodeOnAfterTestStatusOpen(Rec, xRec, IsHandled);
                 if xRec."Location Code" <> "Location Code" then begin
                     if ("Prepmt. Amt. Inv." <> 0) and (not IsHandled) then
                         if not ConfirmManagement.GetResponseOrDefault(
@@ -408,46 +404,43 @@ table 39 "Purchase Line"
                 else
                     if not VendorLocation.Get("Buy-from Vendor No.", "Location Code") then
                         VendorLocation."Business Presence" := true;
-		        IsHandled := false;
-                OnValidateLocationCodeOnBeforeSetInboundWhseHandlingTime(CurrFieldNo, Rec, xRec, IsHandled);
-                if not IsHandled then
-	                if "Location Code" = '' then begin
-	                    if InvtSetup.Get() then
-	                        "Inbound Whse. Handling Time" := InvtSetup."Inbound Whse. Handling Time";
-	                    GetPurchHeader();
-	                    if PurchSetup."Use Vendor's Tax Area Code" and ("Tax Area Code" <> '') then begin
-	                        Validate("Tax Area Code");
-	                        VendorLocation."Business Presence" := true;
-	                    end else
-	                        if VendorLocation."Business Presence" then
-	                            Validate("Tax Area Code", PurchHeader."Tax Area Code")
-	                        else
-	                            Validate("Tax Area Code", VendorLocation."Alt. Tax Area Code");
-	                    if (TaxArea."Country/Region" = TaxArea."Country/Region"::CA) and not VendorLocation."Business Presence" then
-	                        "Provincial Tax Area Code" := PurchHeader."Provincial Tax Area Code"
-	                    else
-	                        "Provincial Tax Area Code" := '';
-	                end else
-	                    if Location.Get("Location Code") then begin
-	                        "Inbound Whse. Handling Time" := Location."Inbound Whse. Handling Time";
-	                        if Location."Do Not Use For Tax Calculation" then begin
-	                            GetPurchHeader();
-	                            Location."Tax Area Code" := PurchHeader."Tax Area Code";
-	                            Location."Provincial Tax Area Code" := PurchHeader."Provincial Tax Area Code";
-	                        end;
-	                        if PurchSetup."Use Vendor's Tax Area Code" and ("Tax Area Code" <> '') then begin
-	                            Validate("Tax Area Code");
-	                            VendorLocation."Business Presence" := true;
-	                        end else
-	                            if VendorLocation."Business Presence" then
-	                                Validate("Tax Area Code", Location."Tax Area Code")
-	                            else
-	                                Validate("Tax Area Code", VendorLocation."Alt. Tax Area Code");
-	                        if (TaxArea."Country/Region" = TaxArea."Country/Region"::CA) and not VendorLocation."Business Presence" then
-	                            "Provincial Tax Area Code" := Location."Provincial Tax Area Code"
-	                        else
-	                            "Provincial Tax Area Code" := '';
-	                    end;
+                if "Location Code" = '' then begin
+                    if InvtSetup.Get() then
+                        "Inbound Whse. Handling Time" := InvtSetup."Inbound Whse. Handling Time";
+                    GetPurchHeader();
+                    if PurchSetup."Use Vendor's Tax Area Code" and ("Tax Area Code" <> '') then begin
+                        Validate("Tax Area Code");
+                        VendorLocation."Business Presence" := true;
+                    end else
+                        if VendorLocation."Business Presence" then
+                            Validate("Tax Area Code", PurchHeader."Tax Area Code")
+                        else
+                            Validate("Tax Area Code", VendorLocation."Alt. Tax Area Code");
+                    if (TaxArea."Country/Region" = TaxArea."Country/Region"::CA) and not VendorLocation."Business Presence" then
+                        "Provincial Tax Area Code" := PurchHeader."Provincial Tax Area Code"
+                    else
+                        "Provincial Tax Area Code" := '';
+                end else
+                    if Location.Get("Location Code") then begin
+                        "Inbound Whse. Handling Time" := Location."Inbound Whse. Handling Time";
+                        if Location."Do Not Use For Tax Calculation" then begin
+                            GetPurchHeader();
+                            Location."Tax Area Code" := PurchHeader."Tax Area Code";
+                            Location."Provincial Tax Area Code" := PurchHeader."Provincial Tax Area Code";
+                        end;
+                        if PurchSetup."Use Vendor's Tax Area Code" and ("Tax Area Code" <> '') then begin
+                            Validate("Tax Area Code");
+                            VendorLocation."Business Presence" := true;
+                        end else
+                            if VendorLocation."Business Presence" then
+                                Validate("Tax Area Code", Location."Tax Area Code")
+                            else
+                                Validate("Tax Area Code", VendorLocation."Alt. Tax Area Code");
+                        if (TaxArea."Country/Region" = TaxArea."Country/Region"::CA) and not VendorLocation."Business Presence" then
+                            "Provincial Tax Area Code" := Location."Provincial Tax Area Code"
+                        else
+                            "Provincial Tax Area Code" := '';
+                    end;
 
                 UpdateLeadTimeFields();
                 UpdateDates();
@@ -1179,9 +1172,6 @@ table 39 "Purchase Line"
                 CreateDimFromDefaultDim(Rec.FieldNo("Job No."));
 
                 UpdateDirectUnitCostByField(FieldNo("Job No."));
-
-                if (xRec."Line Discount %" <> "Line Discount %") and ("Line Discount Amount" <> 0) then
-                    UpdateLineDiscPct();
             end;
         }
         field(54; "Indirect Cost %"; Decimal)
@@ -1193,16 +1183,13 @@ table 39 "Purchase Line"
             trigger OnValidate()
             var
                 Item: Record Item;
-                ShouldCheckCostingMethod: Boolean;
             begin
                 TestField("No.");
                 TestStatusOpen();
 
                 CheckLineTypeOnIndirectCostPercentUpdate();
 
-                ShouldCheckCostingMethod := (Type = Type::Item) and ("Prod. Order No." = '');
-                OnValidateIndirectCostOnAfterCalcShouldCheckCostingMethod(Rec, ShouldCheckCostingMethod);
-                if ShouldCheckCostingMethod then begin
+                if (Type = Type::Item) and ("Prod. Order No." = '') then begin
                     GetItem(Item);
                     Item.TestField(Type, Item.Type::Inventory);
                     if Item."Costing Method" = Item."Costing Method"::Standard then
@@ -2787,7 +2774,7 @@ table 39 "Purchase Line"
                 Item: Record Item;
                 Resource: Record Resource;
                 IsHandled: Boolean;
-                ShouldUpdateItemReference, ShouldUpdateNonSubcontractingDocument : Boolean;
+                ShouldUpdateItemReference: Boolean;
             begin
                 TestStatusOpen();
                 TestField("Quantity Received", 0);
@@ -2812,11 +2799,10 @@ table 39 "Purchase Line"
                 end;
                 SetUnitOfMeasure();
                 ShouldUpdateItemReference := Type = Type::Item;
-                ShouldUpdateNonSubcontractingDocument := "Prod. Order No." = '';
-                OnValidateUnitOfMeasureCodeOnAfterCalcShouldUpdateItemReference(Rec, ShouldUpdateItemReference, ShouldUpdateNonSubcontractingDocument);
+                OnValidateUnitOfMeasureCodeOnAfterCalcShouldUpdateItemReference(Rec, ShouldUpdateItemReference);
                 if ShouldUpdateItemReference then
                     UpdateItemReference();
-                if ShouldUpdateNonSubcontractingDocument then
+                if "Prod. Order No." = '' then
                     case Type of
                         Type::Item:
                             begin
@@ -3386,12 +3372,8 @@ table 39 "Purchase Line"
                 end else
                     "Expected Receipt Date" := "Planned Receipt Date";
 
-                if not TrackingBlocked then begin
-                    IsHandled := false;
-                    OnValidateOrderDateOnBeforeCheckDateConflict(Rec, CurrFieldNo, IsHandled);
-                    if not IsHandled then
-                        CheckDateConflict.PurchLineCheck(Rec, CurrFieldNo <> 0);
-                end;
+                if not TrackingBlocked then
+                    CheckDateConflict.PurchLineCheck(Rec, CurrFieldNo <> 0);
 
                 OnAfterValidateOrderDate(Rec, xRec, CurrFieldNo);
             end;
@@ -5374,7 +5356,6 @@ table 39 "Purchase Line"
     var
         Item: Record Item;
         DiscountAmountPerQty: Decimal;
-        ShouldCalcStandardUnitCostLCY: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -5415,9 +5396,7 @@ table 39 "Purchase Line"
         end else
             "Unit Cost (LCY)" := "Unit Cost";
 
-        ShouldCalcStandardUnitCostLCY := (Type = Type::Item) and ("Prod. Order No." = '');
-        OnUpdateUnitCostOnBeforeCalcStandardUnitCostLCY(Rec, ShouldCalcStandardUnitCostLCY);
-        if ShouldCalcStandardUnitCostLCY then begin
+        if (Type = Type::Item) and ("Prod. Order No." = '') then begin
             GetItem(Item);
             if Item."Costing Method" = Item."Costing Method"::Standard then begin
                 if GetSKU() then
@@ -5785,7 +5764,6 @@ table 39 "Purchase Line"
                     NonDeductibleVAT.CheckPrepmtVATPostingSetup(VATPostingSetup);
                 end else
                     Clear(VATPostingSetup);
-                OnAfterGetPostingSetup(Rec, VATPostingSetup);
             end;
             if ("Prepayment VAT %" <> 0) and ("Prepayment VAT %" <> VATPostingSetup."VAT %") and ("Prepmt. Amt. Inv." <> 0) then
                 Error(CannotChangePrepmtAmtDiffVAtPctErr);
@@ -5845,7 +5823,8 @@ table 39 "Purchase Line"
         SalesOrderLine."Unit Cost (LCY)" := "Unit Cost (LCY)" * SalesOrderLine."Qty. per Unit of Measure" / "Qty. per Unit of Measure";
         SalesOrderLine."Unit Cost" := "Unit Cost" * SalesOrderLine."Qty. per Unit of Measure" / "Qty. per Unit of Measure";
         SalesOrderLine.Validate("Unit Cost (LCY)");
-        SalesOrderLine.Modify();
+        if CurrFieldNo <> 0 then
+            SalesOrderLine.Modify();
 
         OnAfterUpdateSalesCost(Rec, SalesOrderLine);
     end;
@@ -5885,17 +5864,13 @@ table 39 "Purchase Line"
                     LocalGLAcc.Get(FAPostingGr.GetMaintenanceExpenseAccount());
             end;
 
-        IsHandled := false;
-        OnGetFAPostingGroupOnBeforeCheckGLAcc(Rec, LocalGLAcc, FADeprBook, IsHandled);
-        if not IsHandled then begin
-            LocalGLAcc.CheckGLAcc();
-            GLSetup.Get();
-            if GLSetup."VAT in Use" then
-                LocalGLAcc.TestField("Gen. Prod. Posting Group");
-            "Posting Group" := FADeprBook."FA Posting Group";
-            "Gen. Prod. Posting Group" := LocalGLAcc."Gen. Prod. Posting Group";
-            "Tax Group Code" := LocalGLAcc."Tax Group Code";
-        end;
+        LocalGLAcc.CheckGLAcc();
+        GLSetup.Get();
+        if GLSetup."VAT in Use" then
+            LocalGLAcc.TestField("Gen. Prod. Posting Group");
+        "Posting Group" := FADeprBook."FA Posting Group";
+        "Gen. Prod. Posting Group" := LocalGLAcc."Gen. Prod. Posting Group";
+        "Tax Group Code" := LocalGLAcc."Tax Group Code";
         ValidateVATProdPostingGroupFromGLAcc(LocalGLAcc);
 
         OnAfterGetFAPostingGroup(Rec, LocalGLAcc);
@@ -6542,7 +6517,7 @@ table 39 "Purchase Line"
            ("Line Discount Amount" = 0) and
            (not PurchHeader."Prices Including VAT")
         then
-            ItemChargeAssgntLineAmt := "Line Amount" + NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(Rec)
+            ItemChargeAssgntLineAmt := "Line Amount"
         else
             if PurchHeader."Prices Including VAT" then
                 ItemChargeAssgntLineAmt :=
@@ -8249,7 +8224,7 @@ table 39 "Purchase Line"
         end else
             if PurchOrderLine.Get(PurchOrderLine."Document Type"::Order, ReceiptLine."Order No.", ReceiptLine."Order Line No.") then begin
                 if ("Prepayment %" = 100) and (Quantity <> PurchOrderLine.Quantity - PurchOrderLine."Quantity Invoiced") then
-                    "Prepmt Amt to Deduct" := GetLineAmountToHandle(Quantity) - "Inv. Disc. Amount to Invoice"
+                    "Prepmt Amt to Deduct" := "Line Amount"
                 else
                     "Prepmt Amt to Deduct" :=
                       Round((PurchOrderLine."Prepmt. Amt. Inv." - PurchOrderLine."Prepmt Amt Deducted") *
@@ -9615,7 +9590,6 @@ table 39 "Purchase Line"
             NonDeductibleVAT.InitNonDeductibleVATDiff(Rec);
             LineAmountChanged := true;
         end;
-        OnAfterUpdateLineAmount(Rec, xRec, Currency, LineAmountChanged);
     end;
 
     local procedure CheckLocationRequireReceive();
@@ -11190,12 +11164,12 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateLocationCodeOnBeforeDropShipmentError(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; xPurchaseLine: Record "Purchase Line")
+    local procedure OnValidateLocationCodeOnBeforeDropShipmentError(PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; xPurchaseLine: Record "Purchase Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateLocationCodeOnBeforeSpecialOrderError(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; CurrFieldNo: Integer; xPurchaseLine: Record "Purchase Line")
+    local procedure OnValidateLocationCodeOnBeforeSpecialOrderError(PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; CurrFieldNo: Integer; xPurchaseLine: Record "Purchase Line")
     begin
     end;
 
@@ -11305,7 +11279,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateUnitOfMeasureCodeOnAfterCalcShouldUpdateItemReference(var PurchaseLine: Record "Purchase Line"; var ShouldUpdateItemReference: Boolean; var ShouldUpdateNonSubcontractingDocument: Boolean)
+    local procedure OnValidateUnitOfMeasureCodeOnAfterCalcShouldUpdateItemReference(var PurchaseLine: Record "Purchase Line"; var ShouldUpdateItemReference: Boolean)
     begin
     end;
 
@@ -11583,7 +11557,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateLocationCodeOnAfterTestStatusOpen(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; var ShouldExit: Boolean)
+    local procedure OnValidateLocationCodeOnAfterTestStatusOpen(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -12019,39 +11993,5 @@ table 39 "Purchase Line"
     local procedure OnAfterReversedInternalLeadTimeDays(PurchaseLine: Record "Purchase Line"; PurchDate: Date; ReversedWhseHandlingTime: DateFormula; var TotalDays: DateFormula)
     begin
     end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetPostingSetup(var PurchaseLine: Record "Purchase Line"; var VATPostingSetup: Record "VAT Posting Setup")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterUpdateLineAmount(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; Currency: Record Currency; var LineAmountChanged: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateLocationCodeOnBeforeSetInboundWhseHandlingTime(CurrFieldNo: Integer; PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnValidateOrderDateOnBeforeCheckDateConflict(var PurchaseLine: Record "Purchase Line"; CurrFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetFAPostingGroupOnBeforeCheckGLAcc(var PurchaseLine: Record "Purchase Line"; var GLAccount: Record "G/L Account"; FADeprBook: Record "FA Depreciation Book"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateUnitCostOnBeforeCalcStandardUnitCostLCY(var PurchaseLine: Record "Purchase Line"; var ShouldCalcStandardUnitCostLCY: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateIndirectCostOnAfterCalcShouldCheckCostingMethod(var PurchaseLine: Record "Purchase Line"; var ShouldCheckCostingMethod: Boolean)
-    begin
-    end;
 }
+
