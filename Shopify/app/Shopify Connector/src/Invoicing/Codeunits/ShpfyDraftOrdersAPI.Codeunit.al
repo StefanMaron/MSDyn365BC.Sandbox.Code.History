@@ -80,7 +80,6 @@ codeunit 30159 "Shpfy Draft Orders API"
             AddFieldToGraphQuery(GraphQuery, 'phone', TempOrderHeader."Phone No.", true);
         if TempOrderHeader."Currency Code" <> '' then
             AddFieldToGraphQuery(GraphQuery, 'presentmentCurrencyCode', GetISOCode(TempOrderHeader."Currency Code"), false);
-        GraphQuery.Remove(GraphQuery.Length - 1, 2);
         if TempOrderHeader."Discount Amount" <> 0 then
             AddDiscountAmountToGraphQuery(GraphQuery, TempOrderHeader."Discount Amount", 'Invoice Discount Amount');
 
@@ -198,7 +197,7 @@ codeunit 30159 "Shpfy Draft Orders API"
 
     local procedure AddDiscountAmountToGraphQuery(var GraphQuery: TextBuilder; DiscountAmount: Decimal; DiscountTitle: Text)
     begin
-        GraphQuery.Append(', appliedDiscount: {');
+        GraphQuery.Append('appliedDiscount: {');
         GraphQuery.Append('description: \"');
         GraphQuery.Append(CommunicationMgt.EscapeGraphQLData(DiscountTitle));
         GraphQuery.Append('\"');
@@ -293,10 +292,9 @@ codeunit 30159 "Shpfy Draft Orders API"
         Currency: Record Currency;
     begin
         if Currency.Get(CurrencyCode) then
-            if Currency."ISO Code" <> '' then
-                exit(Currency."ISO Code");
-
-        exit(CopyStr(CurrencyCode, 1, 3)); // If it is not found in the currency table then it is LCY
+            exit(Currency."ISO Code")
+        else
+            exit(CopyStr(CurrencyCode, 1, 3)); // If it is not found in the currency table then it is LCY
     end;
 
     local procedure AddFieldToGraphQuery(var GraphQuery: TextBuilder; FieldName: Text; ValueAsVariant: Variant; ValueAsString: Boolean): Boolean
