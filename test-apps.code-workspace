@@ -52,6 +52,9 @@
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
+      "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
+    },
+    {
       "path": "./ExternalEvents/test/_Exclude_Business_Events_Test"
     },
     {
