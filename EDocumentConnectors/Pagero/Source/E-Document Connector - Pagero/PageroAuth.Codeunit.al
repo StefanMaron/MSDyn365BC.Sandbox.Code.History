@@ -12,7 +12,7 @@ using System.Environment;
 codeunit 6364 "Pagero Auth."
 {
     Access = Internal;
-    Permissions = tabledata "OAuth 2.0 Setup" = rim;
+    Permissions = tabledata "OAuth 2.0 Setup" = im;
 
     procedure InitConnectionSetup()
     var
