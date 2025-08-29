@@ -302,7 +302,6 @@ page 658 "Approval Entries"
 
     trigger OnAfterGetCurrRecord()
     var
-        [SecurityFiltering(SecurityFilter::Filtered)]
         RecRef: RecordRef;
     begin
         ShowChangeFactBox := CurrPage.Change.PAGE.SetFilterFromApprovalEntry(Rec);
