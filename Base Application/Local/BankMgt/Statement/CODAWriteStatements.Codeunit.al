@@ -70,18 +70,15 @@ codeunit 2000041 "CODA Write Statements"
                     CodedBankStnt."Statement No." := CodBankStmtSrcLine."Statement No.";
                     CodedBankStnt."Statement Date" := CodBankStmtSrcLine."Transaction Date";
                     if not CodedBankStnt.Insert(true) then
-                        if GuiAllowed then begin
-                            if Confirm(
-                                StrSubstNo(Text000,
-                                CodedBankStnt.TableCaption(), CodBankStmtSrcLine."Bank Account No.", CodBankStmtSrcLine."Statement No."))
-                            then begin
-                                CodBankStmtLine.Reset();
-                                CodBankStmtLine.SetRange("Bank Account No.", CodBankStmtSrcLine."Bank Account No.");
-                                CodBankStmtLine.SetRange("Statement No.", CodBankStmtSrcLine."Statement No.");
-                                CodBankStmtLine.DeleteAll(true);
-                                CodedBankStnt.Modify(true);
-                            end else
-                                exit(false);
+                        if Confirm(
+                            StrSubstNo(Text000,
+                            CodedBankStnt.TableCaption(), CodBankStmtSrcLine."Bank Account No.", CodBankStmtSrcLine."Statement No."))
+                        then begin
+                            CodBankStmtLine.Reset();
+                            CodBankStmtLine.SetRange("Bank Account No.", CodBankStmtSrcLine."Bank Account No.");
+                            CodBankStmtLine.SetRange("Statement No.", CodBankStmtSrcLine."Statement No.");
+                            CodBankStmtLine.DeleteAll(true);
+                            CodedBankStnt.Modify(true);
                         end else
                             exit(false);
                     Clear(LastCodBankStmtSrcLine);
