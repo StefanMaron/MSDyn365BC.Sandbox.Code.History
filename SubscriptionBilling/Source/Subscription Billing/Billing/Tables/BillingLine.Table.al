@@ -249,7 +249,7 @@ table 8061 "Billing Line"
         BillingLine2.FindFirst();
     end;
 
-    procedure ResetServiceCommitmentNextBillingDate()
+    internal procedure ResetServiceCommitmentNextBillingDate()
     var
         ServiceCommitment: Record "Subscription Line";
     begin
@@ -338,7 +338,7 @@ table 8061 "Billing Line"
             PurchaseDocumentType := PurchaseDocumentType::"Credit Memo";
     end;
 
-    procedure GetSalesDocumentTypeFromBillingDocumentType() SalesDocumentType: Enum "Sales Document Type"
+    internal procedure GetSalesDocumentTypeFromBillingDocumentType() SalesDocumentType: Enum "Sales Document Type"
     begin
         case "Document Type" of
             "Document Type"::Invoice:
@@ -348,7 +348,7 @@ table 8061 "Billing Line"
         end;
     end;
 
-    procedure GetPurchaseDocumentTypeFromBillingDocumentType() PurchaseDocumentType: Enum "Purchase Document Type"
+    internal procedure GetPurchaseDocumentTypeFromBillingDocumentType() PurchaseDocumentType: Enum "Purchase Document Type"
     begin
         case "Document Type" of
             "Document Type"::Invoice:
@@ -358,7 +358,7 @@ table 8061 "Billing Line"
         end;
     end;
 
-    procedure GetBillingDocumentTypeFromSalesDocumentType(SalesDocumentType: Enum "Sales Document Type") RecurringBillingDocumentType: Enum "Rec. Billing Document Type"
+    internal procedure GetBillingDocumentTypeFromSalesDocumentType(SalesDocumentType: Enum "Sales Document Type") RecurringBillingDocumentType: Enum "Rec. Billing Document Type"
     begin
         case SalesDocumentType of
             SalesDocumentType::Invoice:
@@ -368,12 +368,22 @@ table 8061 "Billing Line"
         end;
     end;
 
-    procedure GetBillingDocumentTypeFromPurchaseDocumentType(PurchaseDocumentType: Enum "Purchase Document Type") RecurringBillingDocumentType: Enum "Rec. Billing Document Type"
+    internal procedure GetBillingDocumentTypeFromPurchaseDocumentType(PurchaseDocumentType: Enum "Purchase Document Type") RecurringBillingDocumentType: Enum "Rec. Billing Document Type"
     begin
         case PurchaseDocumentType of
             PurchaseDocumentType::Invoice:
                 RecurringBillingDocumentType := RecurringBillingDocumentType::Invoice;
             PurchaseDocumentType::"Credit Memo":
+                RecurringBillingDocumentType := RecurringBillingDocumentType::"Credit Memo";
+        end;
+    end;
+
+    internal procedure GetBillingDocumentTypeFromTextDocumentType(DocumentType: Text) RecurringBillingDocumentType: Enum "Rec. Billing Document Type"
+    begin
+        case DocumentType of
+            Format(RecurringBillingDocumentType::Invoice):
+                RecurringBillingDocumentType := RecurringBillingDocumentType::Invoice;
+            Format(RecurringBillingDocumentType::"Credit Memo"):
                 RecurringBillingDocumentType := RecurringBillingDocumentType::"Credit Memo";
         end;
     end;
@@ -385,21 +395,15 @@ table 8061 "Billing Line"
         "Entry No." := 0;
     end;
 
-    local procedure OpenSalesDocumentCard()
+    internal procedure OpenSalesDocumentCard()
     var
         SalesHeader: Record "Sales Header";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeOpenSalesDocumentCard(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         if SalesHeader.Get(GetSalesDocumentTypeFromBillingDocumentType(), "Document No.") then
             PageManagement.PageRunModal(SalesHeader);
     end;
 
-    local procedure OpenPurchaseDocumentCard()
+    internal procedure OpenPurchaseDocumentCard()
     var
         PurchaseHeader: Record "Purchase Header";
     begin
@@ -418,13 +422,13 @@ table 8061 "Billing Line"
         end;
     end;
 
-    procedure FilterBillingLineOnContract(ServicePartner: Enum "Service Partner"; ContractNo: Code[20])
+    internal procedure FilterBillingLineOnContract(ServicePartner: Enum "Service Partner"; ContractNo: Code[20])
     begin
         Rec.SetRange(Partner, ServicePartner);
         Rec.SetRange("Subscription Contract No.", ContractNo);
     end;
 
-    procedure FilterBillingLineOnContractLine(ServicePartner: Enum "Service Partner"; ContractNo: Code[20]; ContractLineNo: Integer)
+    internal procedure FilterBillingLineOnContractLine(ServicePartner: Enum "Service Partner"; ContractNo: Code[20]; ContractLineNo: Integer)
     begin
         Rec.FilterBillingLineOnContract(ServicePartner, ContractNo);
         Rec.SetRange("Subscription Contract Line No.", ContractLineNo);
@@ -440,7 +444,7 @@ table 8061 "Billing Line"
         CustomerContract.RecalculateHarmonizedBillingFieldsBasedOnNextBillingDate(0);
     end;
 
-    procedure IsPartnerVendor(): Boolean
+    internal procedure IsPartnerVendor(): Boolean
     begin
         exit(Rec.Partner = Rec.Partner::Vendor);
     end;
@@ -463,14 +467,14 @@ table 8061 "Billing Line"
         exit('');
     end;
 
-    procedure FilterBillingLineOnDocumentLine(DocumentType: Enum "Rec. Billing Document Type"; DocumentNo: Code[20]; DocumentLineNo: Integer)
+    internal procedure FilterBillingLineOnDocumentLine(DocumentType: Enum "Rec. Billing Document Type"; DocumentNo: Code[20]; DocumentLineNo: Integer)
     begin
         Rec.SetRange("Document Type", DocumentType);
         Rec.SetRange("Document No.", DocumentNo);
         Rec.SetRange("Document Line No.", DocumentLineNo);
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeUpdateNextBillingDateInResetSubscriptionLineNextBillingDate(var SubscriptionLine: Record "Subscription Line")
     begin
     end;
@@ -508,10 +512,5 @@ table 8061 "Billing Line"
         UsageDataBilling.SetRange("Document Type", "Usage Based Billing Doc. Type"::None);
         UsageDataBilling.SetRange(Rebilling, true);
         exit(not UsageDataBilling.IsEmpty());
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenSalesDocumentCard(BillingLine: Record "Billing Line"; var IsHandled: Boolean)
-    begin
     end;
 }
