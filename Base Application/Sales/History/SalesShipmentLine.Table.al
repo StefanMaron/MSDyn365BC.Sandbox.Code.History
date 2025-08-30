@@ -1,7 +1,3 @@
-// ------------------------------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.History;
 
 using Microsoft.Assembly.History;
@@ -60,7 +56,6 @@ table 111 "Sales Shipment Line"
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            OptimizeForTextSearch = true;
             TableRelation = "Sales Shipment Header";
 
             trigger OnValidate()
@@ -110,17 +105,14 @@ table 111 "Sales Shipment Line"
         field(11; Description; Text[100])
         {
             Caption = 'Description';
-            OptimizeForTextSearch = true;
         }
         field(12; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
-            OptimizeForTextSearch = true;
         }
         field(13; "Unit of Measure"; Text[50])
         {
             Caption = 'Unit of Measure';
-            OptimizeForTextSearch = true;
         }
         field(15; Quantity; Decimal)
         {
@@ -566,17 +558,6 @@ table 111 "Sales Shipment Line"
                 UpdateDocumentNo();
             end;
         }
-        field(10701; "EC %"; Decimal)
-        {
-            Caption = 'EC %';
-        }
-        field(10702; "EC Difference"; Decimal)
-        {
-            AutoFormatExpression = Rec."Currency Code";
-            AutoFormatType = 1;
-            Caption = 'EC Difference';
-            Editable = false;
-        }
     }
 
     keys
@@ -841,7 +822,6 @@ table 111 "Sales Shipment Line"
                 SalesOrderLine."Line No.",
                 NextLineNo,
                 "Attached to Line No.");
-            SalesLine."Bin Code" := "Bin Code";
             SalesLine."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
             SalesLine."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
             SalesLine."Dimension Set ID" := "Dimension Set ID";
