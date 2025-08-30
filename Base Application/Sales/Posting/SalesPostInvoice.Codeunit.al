@@ -34,7 +34,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         JobPostLine: Codeunit "Job Post-Line";
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
         SalesPostInvoiceEvents: Codeunit "Sales Post Invoice Events";
-        SalesPostInvoiceEventsBE: Codeunit "Sales Post Invoice Events BE";
         DeferralLineNo: Integer;
         InvDefLineNo: Integer;
         FALineNo: Integer;
@@ -44,7 +43,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         NoDeferralScheduleErr: Label 'You must create a deferral schedule because you have specified the deferral code %2 in line %1.', Comment = '%1=The item number of the sales transaction line, %2=The Deferral Template Code';
         ZeroDeferralAmtErr: Label 'Deferral amounts cannot be 0. Line: %1, Deferral Template: %2.', Comment = '%1=The item number of the sales transaction line, %2=The Deferral Template Code';
         IncorrectInterfaceErr: Label 'This implementation designed to post Sales Header table only.';
-        TotalToDeferErr: Label 'The sum of the deferred amounts must be equal to the amount in the Amount to Defer field.';
 
     procedure Check(TableID: Integer)
     begin
@@ -321,7 +319,7 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         SalesPostInvoiceEvents.RunOnAfterInitTotalAmounts(SalesLine, SalesLineACY, TotalVAT, TotalVATACY, TotalAmount, TotalAmountACY, TotalVATBase, TotalVATBaseACY);
     end;
 
-    procedure PrepareInvoicePostingBuffer(var SalesLine: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
+    internal procedure PrepareInvoicePostingBuffer(var SalesLine: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
     begin
         SalesPostInvoiceEvents.RunOnBeforePrepareInvoicePostingBuffer(SalesLine, InvoicePostingBuffer);
 #if not CLEAN25
@@ -438,8 +436,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
                 then begin
                     SetJobLineFilters(JobSalesLine, TempInvoicePostingBuffer);
                     JobPostLine.PostJobSalesLines(JobSalesLine.GetView(), GLEntryNo);
-                    SalesPostInvoiceEvents.RunOnPostLinesOnAfterPostJobSalesLines(
-                      SalesHeader, TempInvoicePostingBuffer, TotalSalesLine, TotalSalesLineLCY, GLEntryNo, InvoicePostingParameters);
                 end;
             until TempInvoicePostingBuffer.Next(-1) = 0;
 
@@ -454,7 +450,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
     local procedure PrepareGenJnlLine(var SalesHeader: Record "Sales Header"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var GenJnlLine: Record "Gen. Journal Line")
     var
         BillToCust: Record Customer;
-        IsHandled: Boolean;
     begin
         InitGenJnlLine(GenJnlLine, SalesHeader, InvoicePostingBuffer);
 
@@ -463,13 +458,8 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
             InvoicePostingParameters."External Document No.", InvoicePostingParameters."Source Code", '');
 
         GenJnlLine.CopyFromSalesHeader(SalesHeader);
-
-        IsHandled := false;
-        SalesPostInvoiceEventsBE.RunOnPrepareGenJnlLineOnBeforeUpdateCountryRegionCode(SalesHeader, GenJnlLine, InvoicePostingBuffer, IsHandled);
-        if not IsHandled then begin
-            BillToCust.Get(GenJnlLine."Bill-to/Pay-to No.");
-            GenJnlLine."Country/Region Code" := BillToCust."Country/Region Code";
-        end;
+        BillToCust.Get(GenJnlLine."Bill-to/Pay-to No.");
+        GenJnlLine."Country/Region Code" := BillToCust."Country/Region Code";
 
         InvoicePostingBuffer.CopyToGenJnlLine(GenJnlLine);
         if GLSetup."Journal Templ. Name Mandatory" then
@@ -741,7 +731,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
     var
         DeferralTemplate: Record "Deferral Template";
         DeferralPostingBuffer: Record "Deferral Posting Buffer";
-        IsDeferralAmountCheck: Boolean;
     begin
         DeferralTemplate.Get(SalesLine."Deferral Code");
 
@@ -773,11 +762,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
                 if TempDeferralLine.FindSet() then
                     repeat
                         if (TempDeferralLine."Amount (LCY)" <> 0) or (TempDeferralLine.Amount <> 0) then begin
-                            if not IsDeferralAmountCheck then begin
-                                CheckDeferralAmount(TempDeferralLine);
-                                IsDeferralAmountCheck := true;
-                            end;
-
                             DeferralPostingBuffer.PrepareSales(SalesLine, InvoicePostingParameters."Document No.");
                             DeferralPostingBuffer.InitFromDeferralLine(TempDeferralLine);
                             if not SalesLine.IsCreditDocType() then
@@ -800,26 +784,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         end else
             Error(NoDeferralScheduleErr, SalesLine."No.", SalesLine."Deferral Code");
         SalesPostInvoiceEvents.RunOnAfterPrepareDeferralLine(DeferralPostingBuffer, SalesHeader, SalesLine, InvoicePostingParameters."Document No.", DeferralAccount, SalesAccount, InvDefLineNo, DeferralLineNo, RemainAmtToDefer);
-    end;
-
-    local procedure CheckDeferralAmount(DeferralLine: Record "Deferral Line")
-    var
-        DeferralHeader: Record "Deferral Header";
-    begin
-        DeferralHeader.SetLoadFields("Amount to Defer", "Schedule Line Total");
-        if not DeferralHeader.Get(
-            DeferralLine."Deferral Doc. Type",
-            DeferralLine."Gen. Jnl. Template Name",
-            DeferralLine."Gen. Jnl. Batch Name",
-            DeferralLine."Document Type",
-            DeferralLine."Document No.",
-            DeferralLine."Line No.")
-        then
-            exit;
-
-        DeferralHeader.CalcFields("Schedule Line Total");
-        if DeferralHeader."Schedule Line Total" <> DeferralHeader."Amount to Defer" then
-            Error(TotalToDeferErr);
     end;
 
     procedure CalcDeferralAmounts(SalesHeaderVar: Variant; SalesLineVar: Variant; OriginalDeferralAmount: Decimal)
