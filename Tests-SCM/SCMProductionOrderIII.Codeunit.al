@@ -72,6 +72,7 @@
         RtngLineBinCodeErr: Label 'Wrong %1 in %2.', Comment = '%1: Field(To-Production Bin Code), %2: TableCaption(Prod. Order Routing Line)';
         QuantityImbalanceErr: Label 'out of balance';
         InvalidPrecisionErr: Label 'field to be incorrect';
+        ReservationEntryMustExistErr: Label '%1 must exist.', Comment = '%1 is Table Caption';
 
     [Test]
     [Scope('OnPrem')]
@@ -1519,6 +1520,16 @@
         // Create output journal with negative quantity
         CreateOutputJournalWithApplyEntryAndOperationNo(
           Item."No.", -ProductionOrder.Quantity, RoutingLine."Operation No.", SetAppliesToEntry);
+    end;
+
+    local procedure ModifyLocation(Location: Record Location)
+    begin
+        Location.Validate("Require Receive", true);
+        Location.Validate("Require Shipment", true);
+        Location.Validate("Prod. Consump. Whse. Handling", Location."Prod. Consump. Whse. Handling"::"Warehouse Pick (optional)");
+        Location.Validate("Asm. Consump. Whse. Handling", Location."Asm. Consump. Whse. Handling"::"No Warehouse Handling");
+        Location.Validate("Job Consump. Whse. Handling", Location."Job Consump. Whse. Handling"::"No Warehouse Handling");
+        Location.Modify(true);
     end;
 
     [Test]
@@ -5245,6 +5256,153 @@
         VerifyProdOrderCapacity(ProductionOrder, WorkCenters[3], 1);
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    [HandlerFunctions('ItemTrackingHandler,MessageHandlerWithoutValidation')]
+    procedure CheckReservationEntryStatusWhenPlannedProdOrderConvertToReleasedProdOrder()
+    var
+        Item: Record Item;
+        ManufacturingSetup: Record "Manufacturing Setup";
+        ProductionOrder: Record "Production Order";
+        ReservationEntry: Record "Reservation Entry";
+        SalesHeader: Record "Sales Header";
+        PlannedProdOrder: TestPage "Planned Production Order";
+        TotalQuantity: Decimal;
+    begin
+        // [SCENARIO 523992] Change the reservation entry status from prospect to surplus when planned prod. order convert to the released prod. order.
+        Initialize();
+
+        // [GIVEN] Set location code in Manufacturing Setup.
+        ManufacturingSetup.Get();
+        ManufacturingSetup.Validate("Components at Location", LocationBlue.Code);
+        ManufacturingSetup.Modify(true);
+
+        // [GIVEN] Create Item with Lot Tracking.
+        CreateItemWithLotTracking(Item);
+
+        // [GIVEN] Create a Sales Order.
+        TotalQuantity := CreateSalesOrderOnManufacturingLocation(SalesHeader, Item."No.", LibraryRandom.RandInt(5), LocationBlue.Code);
+
+        // [GIVEN] Create Production Order.
+        CreateProdOrderOnManufacturingLocation(ProductionOrder, Item."No.", TotalQuantity, LocationBlue.Code);
+
+        // [WHEN] Refreshing released production order.
+        LibraryManufacturing.RefreshProdOrder(ProductionOrder, false, true, true, true, false);
+
+        // [GIVEN] Open Planned Prod. Order page.
+        PlannedProdOrder.OpenEdit();
+        PlannedProdOrder.GoToRecord(ProductionOrder);
+
+        // [GIVEN] Enqueue the Lot No. and Quantity value.
+        OpenItemTrackingLinesSetValueInProdOrderLine(LibraryUtility.GenerateGUID(), '', TotalQuantity);
+
+        // [WHEN] Invoke the Item Tracking Page and assign the values.
+        PlannedProdOrder.ProdOrderLines."Item &Tracking Lines".Invoke();
+
+        // [WHEN] Change the Production Order Status.
+        LibraryManufacturing.ChangeProuctionOrderStatus(ProductionOrder."No.", ProductionOrder.Status::Planned, ProductionOrder.Status::Released);
+
+        // [THEN] Check Reservation Entry Status.
+        VerifyReservationEntry(Item."No.", ProductionOrder.Quantity, ReservationEntry."Reservation Status"::Surplus, LocationBlue.Code);
+    end;
+
+    [Test]
+    [HandlerFunctions('SourceDocumentsPageHandler')]
+    procedure WarehouseShipmentGetSourceDocumentsNotShowProdConsumptionLine()
+    var
+        Item: array[2] of Record Item;
+        ProductionOrder: Record "Production Order";
+        WarehouseShipmentHeader: Record "Warehouse Shipment Header";
+        WarehouseShipment: TestPage "Warehouse Shipment";
+    begin
+        // [SCENARIO 563482] The production order component line should not be displayed when retrieving source documents from a warehouse shipment.
+        Initialize();
+
+        // [GIVEN] Create Production BOM.
+        CreateItemsSetup(Item[1], Item[2], LibraryRandom.RandInt(2));
+
+        // [GIVEN] Modify Green Location.
+        ModifyLocation(LocationBlue);
+
+        // [GIVEN] Post Postive Adjustment.
+        CreateAndPostItemJournalLine(Item[2]."No.", LibraryRandom.RandIntInRange(5, 10), LocationBlue.Code, '');
+
+        // [GIVEN] Create Released Production Order.
+        CreateAndRefreshProductionOrder(ProductionOrder, ProductionOrder.Status::Released, Item[1]."No.", 1, LocationBlue.Code, '');
+
+        // [GIVEN] Create Warehouse Shipment Header.
+        LibraryWarehouse.CreateWarehouseShipmentHeader(WarehouseShipmentHeader);
+        WarehouseShipmentHeader.Validate("Location Code", LocationBlue.Code);
+        WarehouseShipmentHeader.Modify(true);
+
+        // [WHEN] Open Warehouse Shipment Page.
+        WarehouseShipment.OpenEdit();
+        WarehouseShipment.GoToRecord(WarehouseShipmentHeader);
+
+        // [THEN] verify production order component line should not be displayed When 'Get Source Documents' was invoke.
+        WarehouseShipment."Get Source Documents".Invoke();
+    end;
+
+    [Test]
+    [HandlerFunctions('ProductionJournalPageHandler2,ItemTrackingHandler,ConfirmHandler,MessageHandlerWithoutValidation')]
+    procedure VerifySalesOrderShippedSucessfullyWhenItemWasLotTrackedAndPlannedProdOrderCreatedFromSalesOrder()
+    var
+        Item: Record Item;
+        PlannedProductionOrder: Record "Production Order";
+        ReleasedProductionOrder: Record "Production Order";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        ReservationEntry: Record "Reservation Entry";
+        CreateProdOrderFromSale: Codeunit "Create Prod. Order from Sale";
+        NewOrderType: Enum "Create Production Order Type";
+    begin
+        // [SCENARIO 565684] Verify if the sales order was successfully shipped if the item was lot-tracked and a planned production order was created from the sales order."
+        Initialize();
+
+        // [GIVEN] Create Item with Lot Tracking.
+        CreateItemWithLotTracking(Item);
+        Item.Validate("Reordering Policy", Item."Reordering Policy"::" ");
+        Item.Validate("Manufacturing Policy", Item."Manufacturing Policy"::"Make-to-Order");
+        Item.Modify(true);
+
+        // [GIVEN] Create Sales Order and Released.
+        CreateSalesOrderAndReleased(SalesHeader, SalesLine, Item."No.");
+
+        // [GIVEN] Create Planned Production Order From Sales Order.
+        CreateProdOrderFromSale.SetHideValidationDialog(false);
+        CreateProdOrderFromSale.CreateProductionOrder(
+            SalesLine, PlannedProductionOrder.Status::Planned, NewOrderType::ItemOrder);
+
+        // [GIVEN] Verify Planned Production Order Was Created.
+        PlannedProductionOrder.SetRange("Source No.", Item."No.");
+        PlannedProductionOrder.SetRange(Status, PlannedProductionOrder.Status::Planned);
+        PlannedProductionOrder.FindFirst();
+
+        // [GIVEN] Convert Planned Production Order into Released Production Order.
+        LibraryManufacturing.ChangeProuctionOrderStatus(
+            PlannedProductionOrder."No.",
+            PlannedProductionOrder.Status::Planned, PlannedProductionOrder.Status::Released);
+
+        // [WHEN] Verify Released Production Order Was Created.
+        ReleasedProductionOrder.SetRange(Status, ReleasedProductionOrder.Status::Released);
+        ReleasedProductionOrder.SetRange("Planned Order No.", PlannedProductionOrder."No.");
+        ReleasedProductionOrder.FindFirst();
+
+        // [THEN] Verify that the reservation entry status has not been changed.
+        VerifyReservationEntry(Item, Database::"Prod. Order Line", ReservationEntry."Reservation Status"::Reservation);
+        VerifyReservationEntry(Item, Database::"Sales Line", ReservationEntry."Reservation Status"::Reservation);
+
+        // [GIVEN] Enqueue Multiple Item Tracking Values. 
+        OpenItemTrackingLinesSetValueInProdOrderLine(LibraryUtility.GenerateGUID(), '', SalesLine.Quantity);
+
+        // [WHEN] Post Producton Journal.
+        CreateAndPostProductionJnlWithLotNo(ReleasedProductionOrder, SalesLine."Line No.");
+
+        // [THEN] Verify that the sales document was shipped successfully.
+        LibrarySales.PostSalesDocument(SalesHeader, true, false);
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"SCM Production Order III");
@@ -5301,6 +5459,7 @@
 
         LibraryWarehouse.CreateLocationWMS(LocationSilver, true, true, true, false, false);  // Location Silver.
         LibraryWarehouse.CreateWarehouseEmployee(WarehouseEmployee, LocationSilver.Code, false);
+        LibraryWarehouse.CreateWarehouseEmployee(WarehouseEmployee, LocationBlue.Code, false);
         LibraryWarehouse.CreateNumberOfBins(LocationSilver.Code, '', '', LibraryRandom.RandInt(3) + 2, false);  // Value required for Number of Bins.
     end;
 
@@ -7484,6 +7643,64 @@
         Assert.RecordCount(ProdOrderCapacityNeed, NoOfRecords);
     end;
 
+    local procedure CreateItemWithLotTracking(Var Item: Record Item)
+    var
+        ItemTrackingCode: Record "Item Tracking Code";
+    begin
+        LibraryInventory.CreateItem(Item);
+
+        Item.Validate("Replenishment System", Item."Replenishment System"::"Prod. Order");
+        Item.Validate("Reordering Policy", Item."Reordering Policy"::"Lot-for-Lot");
+        LibraryItemTracking.CreateItemTrackingCode(ItemTrackingCode, false, true);
+        Item.Validate("Item Tracking Code", ItemTrackingCode.Code);
+        Item.Modify(true);
+    end;
+
+    local procedure CreateSalesOrderOnManufacturingLocation(var SalesHeader: Record "Sales Header"; ItemNo: Code[20]; Quantity: Decimal; LocationCode: Code[10]): Decimal;
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        LibrarySales.CreateSalesHeader(
+            SalesHeader,
+            SalesHeader."Document Type"::Order,
+            LibrarySales.CreateCustomerNo());
+
+        SalesHeader.Validate("Shipment Date", Today);
+        SalesHeader.Modify(true);
+
+        LibrarySales.CreateSalesLine(
+            SalesLine,
+            SalesHeader,
+            SalesLine.Type::Item,
+            ItemNo,
+            Quantity);
+        UpdateLocationOnSalesLine(SalesLine."Document No.", LocationCode);
+
+        exit(SalesLine.Quantity);
+    end;
+
+    local procedure CreateProdOrderOnManufacturingLocation(var ProductionOrder: Record "Production Order"; ItemNo: Code[20]; Quantity: Decimal; LocationCode: Code[10])
+    begin
+        LibraryManufacturing.CreateProductionOrder(
+            ProductionOrder,
+            ProductionOrder.Status::Planned,
+            ProductionOrder."Source Type"::Item,
+            ItemNo,
+            Quantity);
+
+        ProductionOrder.Validate("Location Code", LocationCode);
+        ProductionOrder.Validate("Due Date", Today);
+        ProductionOrder.Modify(true);
+    end;
+
+    local procedure OpenItemTrackingLinesSetValueInProdOrderLine(LotNo: Code[50]; SerialNo: Code[50]; Quantity: Decimal)
+    begin
+        LibraryVariableStorage.Enqueue(ItemTrackingMode::SetValue);
+        LibraryVariableStorage.Enqueue(LotNo);
+        LibraryVariableStorage.Enqueue(SerialNo);
+        LibraryVariableStorage.Enqueue(Quantity);
+    end;
+
     [MessageHandler]
     [Scope('OnPrem')]
     procedure MessageHandler(Message: Text[1024])
@@ -7639,6 +7856,33 @@
         ProductionJournal.Post.Invoke();
     end;
 
+    local procedure CreateSalesOrderAndReleased(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; ItemNo: Code[20])
+    begin
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, LibrarySales.CreateCustomerNo());
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, ItemNo, LibraryRandom.RandInt(10));
+        LibrarySales.ReleaseSalesDocument(SalesHeader);
+    end;
+
+    local procedure CreateAndPostProductionJnlWithLotNo(ProductionOrder: Record "Production Order"; ProdOrderLineNo: Integer)
+    var
+        ReleaseProdOrder: TestPage "Released Production Order";
+    begin
+        ReleaseProdOrder.OpenView();
+        ReleaseProdOrder.GoToRecord(ProductionOrder);
+        ReleaseProdOrder.ProdOrderLines.Filter.SetFilter("Line No.", Format(ProdOrderLineNo));
+        ReleaseProdOrder.ProdOrderLines.ProductionJournal.Invoke();
+    end;
+
+    local procedure VerifyReservationEntry(Item: Record Item; SourceType: Integer; ReservationStatus: Enum "Reservation Status")
+    var
+        ReservationEntry: Record "Reservation Entry";
+    begin
+        ReservationEntry.SetRange("Item No.", Item."No.");
+        ReservationEntry.SetRange("Source Type", SourceType);
+        ReservationEntry.SetRange("Reservation Status", ReservationStatus);
+        Assert.IsFalse(ReservationEntry.IsEmpty(), StrSubstNo(ReservationEntryMustExistErr, ReservationEntry.TableCaption));
+    end;
+
     [PageHandler]
     [Scope('OnPrem')]
     procedure ItemAvailabilityByBOMPageHandler(var ItemAvailByBOMLevel: TestPage "Item Availability by BOM Level")
@@ -7692,6 +7936,20 @@
         ProdOrderRouting.Type.SetValue(ProdOrderRoutingLine.Type::"Work Center");
         ProdOrderRouting."No.".SetValue(LibraryVariableStorage.DequeueText());
         ProdOrderRouting.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure SourceDocumentsPageHandler(var SourceDocuments: TestPage "Source Documents")
+    begin
+        SourceDocuments.First();
+        SourceDocuments."Source No.".AssertEquals('');
+    end;
+
+    [ModalPageHandler]
+    procedure ProductionJournalPageHandler2(var ProductionJournal: TestPage "Production Journal")
+    begin
+        ProductionJournal.ItemTrackingLines.Invoke();
+        ProductionJournal.Post.Invoke();
     end;
 }
 
