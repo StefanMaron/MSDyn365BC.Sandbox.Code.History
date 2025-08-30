@@ -64,7 +64,6 @@ page 99000902 "Item Availability Line List"
     begin
         AvailType := NewType;
         Item.Copy(NewItem);
-        OnAfterInit(NewItem, AvailType);
     end;
 
     local procedure MakeEntries()
@@ -216,11 +215,6 @@ page 99000902 "Item Availability Line List"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeLookupEntries(ItemAvailabilityLine: Record "Item Availability Line"; var Item: Record Item; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInit(var Item: Record Item; var AvailType: Option "Gross Requirement","Planned Order Receipt","Scheduled Order Receipt","Planned Order Release",All)
     begin
     end;
 
