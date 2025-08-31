@@ -519,14 +519,6 @@ page 36951 "PowerBI Reports Setup"
         }
     }
 
-    trigger OnOpenPage()
-    var
-        PowerBIInstallationHandler: Codeunit "Installation Handler";
-    begin
-        if not Rec.FindFirst() then
-            PowerBIInstallationHandler.RunAfterInstalled();
-    end;
-
     trigger OnAfterGetCurrRecord()
     begin
         OnUpdateCalendarSelection();
