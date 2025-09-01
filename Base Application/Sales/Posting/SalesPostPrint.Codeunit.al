@@ -54,10 +54,7 @@ codeunit 82 "Sales-Post + Print"
             if not ConfirmPost(SalesHeader, DefaultOption) then
                 exit;
 
-        IsHandled := false;
-        OnAfterConfirmPost(SalesHeader, IsHandled);
-        if IsHandled then
-            exit;
+        OnAfterConfirmPost(SalesHeader);
 
         SalesSetup.Get();
         CheckTaxNoSeries(SalesHeader, SalesSetup);
@@ -250,7 +247,7 @@ codeunit 82 "Sales-Post + Print"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterConfirmPost(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    local procedure OnAfterConfirmPost(var SalesHeader: Record "Sales Header")
     begin
     end;
 
