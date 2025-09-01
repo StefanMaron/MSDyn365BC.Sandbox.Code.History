@@ -1,4 +1,3 @@
-#pragma warning disable AA0247
 page 8090 "Contract Analysis Entries"
 {
     ApplicationArea = All;
