@@ -870,11 +870,8 @@ codeunit 99000836 "Transfer Line-Reserve"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reservation Management", 'OnUpdateStatistics', '', false, false)]
-    local procedure OnUpdateStatistics(CalcReservEntry: Record "Reservation Entry"; var ReservSummEntry: Record "Entry Summary"; AvailabilityDate: Date; Positive: Boolean; var TotalQuantity: Decimal; ReservationSummaryType: Integer)
+    local procedure OnUpdateStatistics(CalcReservEntry: Record "Reservation Entry"; var ReservSummEntry: Record "Entry Summary"; AvailabilityDate: Date; Positive: Boolean; var TotalQuantity: Decimal)
     begin
-        if ReservationSummaryType = Enum::"Reservation Summary Type"::"Item Tracking Line".AsInteger() then
-            exit;
-
         if ReservSummEntry."Entry No." in [101, 102] then
             UpdateStatistics(
                 CalcReservEntry, ReservSummEntry, AvailabilityDate, ReservSummEntry."Entry No." - 101, Positive, TotalQuantity);
@@ -970,7 +967,6 @@ codeunit 99000836 "Transfer Line-Reserve"
                             end;
                             sender.SetQtyToReserveDownToTrackedQuantity(
                                 CalcReservEntry, TransLine.RowID1(TransferDirection::Inbound), QtyThisLine, QtyThisLineBase);
-                            sender.SetReservedQtyDownToTrackedQuantity(CalcReservEntry, TransLine.RowID1(TransferDirection::Inbound), ReservQty);
                         end;
                 end;
 
