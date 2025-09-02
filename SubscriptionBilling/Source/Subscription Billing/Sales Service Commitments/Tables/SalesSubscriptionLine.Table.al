@@ -262,6 +262,10 @@ table 8068 "Sales Subscription Line"
             Caption = 'Discount';
             Editable = false;
         }
+        field(40; "Create Contract Deferrals"; Enum "Create Contract Deferrals")
+        {
+            Caption = 'Create Contract Deferrals';
+        }
         field(50; "Subscription Header No."; Code[20])
         {
             Caption = 'Subscription No.';
@@ -402,7 +406,7 @@ table 8068 "Sales Subscription Line"
             Error(ReleasedSalesOrderExistsErr);
     end;
 
-    internal procedure FilterOnSalesLine(SourceSalesLine: Record "Sales Line")
+    procedure FilterOnSalesLine(SourceSalesLine: Record "Sales Line")
     begin
         Rec.FilterOnDocument(SourceSalesLine."Document Type", SourceSalesLine."Document No.");
         Rec.SetRange("Document Line No.", SourceSalesLine."Line No.");
@@ -457,7 +461,7 @@ table 8068 "Sales Subscription Line"
         end;
     end;
 
-    internal procedure CalculateCalculationBaseAmount()
+    procedure CalculateCalculationBaseAmount()
     var
         IsHandled: Boolean;
     begin
