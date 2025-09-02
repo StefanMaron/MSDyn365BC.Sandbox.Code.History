@@ -1305,7 +1305,7 @@ codeunit 6620 "Copy Document Mgt."
 
         ToPurchHeader.Validate("Buy-from Vendor No.", FromPurchInvHeader."Buy-from Vendor No.");
 
-        if PurchasesPayablesSetup."Check Doc. Total Amounts" then begin
+        if PurchasesPayablesSetup.ShouldDocumentTotalAmountsBeChecked(ToPurchHeader) then begin
             FromPurchInvHeader.CalcFields("Amount Including VAT", Amount);
             ToPurchHeader.Validate("Doc. Amount Incl. VAT", FromPurchInvHeader."Amount Including VAT");
             ToPurchHeader.Validate("Doc. Amount VAT", FromPurchInvHeader."Amount Including VAT" - FromPurchInvHeader.Amount);
@@ -11858,7 +11858,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopySalesCrMemoLinesToDocOnAfterFillSalesLineBuffer(ToSalesHeader: Record "Sales Header"; var FromSalesLineBuf: Record "Sales Line" temporary)
+    local procedure OnCopySalesCrMemoLinesToDocOnAfterFillSalesLineBuffer(var ToSalesHeader: Record "Sales Header"; var FromSalesLineBuf: Record "Sales Line" temporary)
     begin
     end;
 

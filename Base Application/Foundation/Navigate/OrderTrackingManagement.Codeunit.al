@@ -482,6 +482,8 @@ codeunit 99000778 OrderTrackingManagement
                 end;
                 DrillOrdersUp(FilterReservEntry, Level);
             end;
+
+        OnAfterDrillOrdersUp(TempOrderTrackingEntry, ReservEntry, Level, EntryNo, SearchUp, SearchUpIsSet);
     end;
 
     local procedure ProcessReservEntry(var ReservEntry: Record "Reservation Entry"; var FilterReservEntry: Record "Reservation Entry"; var ContinueDrillUp: Boolean; var IncludePlanningFilter: Boolean; Level: Integer)
@@ -842,6 +844,8 @@ codeunit 99000778 OrderTrackingManagement
         TempOrderTrackingEntry.SetRange("From Prod. Order Line", TempOrderTrackingEntry."From Prod. Order Line");
         TempOrderTrackingEntry.SetRange("From Ref. No.", TempOrderTrackingEntry."From Ref. No.");
 
+        OnOrderTrackingEntryExistsOnBeforeFindTrackingEntry(TempOrderTrackingEntry);
+
         if TempOrderTrackingEntry.Find('-') then begin
             TempOrderTrackingEntry.Reset();
             exit(true);
@@ -895,7 +899,8 @@ codeunit 99000778 OrderTrackingManagement
                         else
                             OnDerivePlanningFilterOnSetRequisitionLineFilters(ToReservEntry, FilterReqLine, OK);
                     end;
-            end;
+            end else
+                OnDerivePlanningFilterOnCheckReservationSourceTypeElse(FromReservEntry, ToReservEntry, OK);
         end;
     end;
 
@@ -959,6 +964,21 @@ codeunit 99000778 OrderTrackingManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnDerivePlanningFilterOnSetRequisitionLineFilters(var ToReservEntry: Record "Reservation Entry"; FilterReqLine: Record "Requisition Line"; var OK: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnOrderTrackingEntryExistsOnBeforeFindTrackingEntry(var TempOrderTrackingEntry: Record "Order Tracking Entry" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDerivePlanningFilterOnCheckReservationSourceTypeElse(var FromReservationEntry: Record "Reservation Entry"; var ToReservationEntry: Record "Reservation Entry"; var IsOK: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterDrillOrdersUp(var TempOrderTrackingEntry: Record "Order Tracking Entry" temporary; var ReservationEntry: Record "Reservation Entry"; Level: Integer; var EntryNo: Integer; var SearchUp: Boolean; var SearchUpIsSet: Boolean)
     begin
     end;
 }
