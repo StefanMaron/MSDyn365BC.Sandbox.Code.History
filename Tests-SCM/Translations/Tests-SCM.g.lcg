@@ -2030,6 +2030,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory - Orders - NamedType DocumentDateError)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3222706049 - NamedType 3279289237" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You cannot use the cancel or correct functionality because the invoice line is associated with purchase order %1 via a Drop Shipment.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Purchase Order No.]D;]A;(LookupHint=Codeunit SCM Inventory - Orders - NamedType DropShipmentDocumentExistsErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3222706049 - NamedType 2077905568" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The Credit Memo doesn't have a Corrected Invoice No. Do you want to continue?]]></Val>
@@ -2505,6 +2514,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Costing - NamedType InvAmountDoNotMatchErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1058953448 - NamedType 2333488488" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Item Card must be enabled.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Costing - NamedType ItemCardErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1058953448 - NamedType 2370716705" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -3128,6 +3146,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Documents - NamedType ReorderingPolicyShouldBeVisibleErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 917041221 - NamedType 63584038" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reserve must not be Never]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Documents - NamedType ReserveMustNotBeNeverErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 917041221 - NamedType 518004169" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[is of lower precision than expected]]></Val>
@@ -3621,6 +3648,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Journals - NamedType LocationErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 901483511 - NamedType 3061709746" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Do you want to overwrite the existing information?]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Journals - NamedType LotNoConfirmatonQst)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 901483511 - NamedType 3922887190" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -4262,6 +4298,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Miscellaneous II - NamedType InventoryMovementIsNotRegisteredErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2137039471 - NamedType 2324413943" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Warehouse Activity Header not found for Production Order Components.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Miscellaneous II - NamedType InventoryPickNotFoundErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2137039471 - NamedType 2129549005" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Number of Invt. Pick activities created: 1 out of a total of 1.]]></Val>
@@ -4467,6 +4512,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Orders-II - NamedType PostedChargeCostAmountMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 474352393 - NamedType 1261885820" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Drop shipment purchase order must be created.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Orders-II - NamedType PurchaseOrderMustBeCreatedErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 474352393 - NamedType 4096521443" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -5900,6 +5954,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Tracking - NamedType UnknownError)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 4274535345 - NamedType 1675390523" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Warehouse Activity Line must be found.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Tracking - NamedType WhseActivityLineMustBeFoundErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 4274535345 - NamedType 923456017" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Wrong expiration date in %1 No. %2]]></Val>
@@ -6546,6 +6609,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Orders IV - NamedType PeriodTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1204784329 - NamedType 727166178" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The Purchasing Code should be blank for item %1 on the sales invoice because it is used only for the drop shipment process.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1= Item No.]D;]A;(LookupHint=Codeunit SCM Orders IV - NamedType PurchasingCodeOnSalesInvoiceErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1204784329 - NamedType 2920429530" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -8283,6 +8355,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM PS Bugs-I - NamedType OutputIsMissingQst)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3862164203 - NamedType 1473162410" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Quantity update should be possible in %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1= Table Name.]D;]A;(LookupHint=Codeunit SCM PS Bugs-I - NamedType QuantityErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3862164203 - NamedType 2995628168" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -12002,6 +12083,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse - Shipping - NamedType UnexpectedErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2728740681 - NamedType 1513062657" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Warehouse Shipment is required for Line No.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse - Shipping - NamedType WhseShipmentIsRequiredErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2728740681 - NamedType 2188395909" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Warehouse Receipt Header."Vendor Shipment No." is wrong.]]></Val>
@@ -12605,6 +12695,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse II - NamedType PutAwayActivityMessage)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3188199532 - NamedType 1473162410" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Quantity must not be changed when a Warehouse Receipt Line for this Purchase Line exists:  in Purchase Line Document Type='%1',Document No.='%2',Line No.='%3'.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1= Document Type Value, %2= Document No. Value, %3= Line No. Value.]D;]A;(LookupHint=Codeunit SCM Warehouse II - NamedType QuantityErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3188199532 - NamedType 237791493" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Quantity must be %1 in %2.]]></Val>
@@ -12983,6 +13082,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse Management II - NamedType GetSourceDocErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3297871101 - NamedType 1394228177" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Input Quantity Must be %1 in %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[1% = Remaining Quanity value, %2 = Prod. Order Routing Line]D;]A;(LookupHint=Codeunit SCM Warehouse Management II - NamedType InputQtyErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3297871101 - NamedType 1693810221" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You must assign a lot number for item %1]]></Val>
@@ -13044,6 +13152,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse Management II - NamedType ShipmentLinesNotCreatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3297871101 - NamedType 115472904" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Starting Date-Time must not be %1 in %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = StartingDateTime value, %2 = Prod. Order Routing Line.]D;]A;(LookupHint=Codeunit SCM Warehouse Management II - NamedType StartingDateTimeErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3297871101 - NamedType 3968509188" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -13305,6 +13422,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse Orders - NamedType ReservationEntryForItemLedgerEntryErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 324823623 - NamedType 1387711905" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing Status must not be %1 in Prod. Order Routing Line Status='%2',Prod. Order No.='%3',Routing Reference No.='%4',Routing No.='%5',Operation No.='%6']]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse Orders - NamedType RoutingStatusFieldErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 324823623 - NamedType 4116089012" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -13665,6 +13791,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse UOM - NamedType BinContentMustBeDeleted)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3383261961 - NamedType 1340610095" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The quantity in the bin content was not updated.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse UOM - NamedType BinContentQtyErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3383261961 - NamedType 3219713110" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
