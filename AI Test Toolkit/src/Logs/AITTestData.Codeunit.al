@@ -11,9 +11,6 @@ codeunit 149035 "AIT Test Data"
 {
     Access = Internal;
 
-    var
-        TurnsLbl: Label '<b>%1:</b> %2 <br>', Comment = '%1 = The turn number as an integer, %2 = The data from that turn', Locked = true;
-
     procedure UpdateTestInput(TestInput: Text; TestInputView: Enum "AIT Test Input - View"): Text
     var
         TestData: Codeunit "Test Input Json";
@@ -24,15 +21,15 @@ codeunit 149035 "AIT Test Data"
             TestInputView::"Full Input":
                 exit(TestInput);
             TestInputView::Question:
-                exit(FilterToElement('question', TestData));
+                exit(GetTestDataElement('question', TestData));
             TestInputView::Context:
-                exit(FilterToElement('context', TestData));
+                exit(GetTestDataElement('context', TestData));
             TestInputView::"Test Setup":
-                exit(FilterToElement('test_setup', TestData));
+                exit(GetTestDataElement('test_setup', TestData));
             TestInputView::"Ground Truth":
-                exit(FilterToElement('ground_truth', TestData));
+                exit(GetTestDataElement('ground_truth', TestData));
             TestInputView::"Expected Data":
-                exit(FilterToElement('expected_data', TestData));
+                exit(GetTestDataElement('expected_data', TestData));
             else
                 exit('');
         end;
@@ -48,13 +45,13 @@ codeunit 149035 "AIT Test Data"
             TestOutputView::"Full Output":
                 exit(TestOutput);
             TestOutputView::Answer:
-                exit(FilterToElement('answer', TestData));
+                exit(GetTestDataElement('answer', TestData));
             TestOutputView::Question:
-                exit(FilterToElement('question', TestData));
+                exit(GetTestDataElement('question', TestData));
             TestOutputView::Context:
-                exit(FilterToElement('context', TestData));
+                exit(GetTestDataElement('context', TestData));
             TestOutputView::"Ground Truth":
-                exit(FilterToElement('ground_truth', TestData));
+                exit(GetTestDataElement('ground_truth', TestData));
             else
                 exit('');
         end;
@@ -68,38 +65,20 @@ codeunit 149035 "AIT Test Data"
             TestData.Initialize(TestDataText);
     end;
 
-    local procedure FilterToElement(ElementName: Text; TestData: Codeunit "Test Input Json"): Text
+    local procedure GetTestDataElement(ElementName: Text; TestData: Codeunit "Test Input Json"): Text
     var
-        TurnsDataJson: Codeunit "Test Input Json";
-        ElementJson: Codeunit "Test Input Json";
-        TextBuilder: TextBuilder;
-        IsMultiTurn: Boolean;
-        NumberOfTurns: Integer;
-        I: Integer;
-    begin
-        TurnsDataJson := TestData.ElementExists('turns', IsMultiTurn);
-
-        if not IsMultiTurn then
-            exit(GetTestDataElement(ElementName, TestData));
-
-        NumberOfTurns := TurnsDataJson.GetElementCount();
-        for I := 0 to NumberOfTurns - 1 do begin
-            ElementJson := TurnsDataJson.ElementAt(I);
-            TextBuilder.AppendLine(StrSubstNo(TurnsLbl, I, GetTestDataElement(ElementName, ElementJson)));
-        end;
-
-        exit(TextBuilder.ToText());
-    end;
-
-    local procedure GetTestDataElement(ElementName: Text; var TestData: Codeunit "Test Input Json"): Text
-    var
-        ElementJson: Codeunit "Test Input Json";
+        ElementTestDataJson: Codeunit "Test Input Json";
         ElementExists: Boolean;
     begin
-        ElementJson := TestData.ElementExists(ElementName, ElementExists);
+        ElementTestDataJson := TestData.ElementExists('turns', ElementExists);
 
-        if ElementExists and (ElementJson.ToText() <> '{}') then
-            exit(ElementJson.ToText())
+        if ElementExists then
+            TestData := ElementTestDataJson;
+
+        ElementTestDataJson := TestData.ElementExists(ElementName, ElementExists);
+
+        if ElementExists and (ElementTestDataJson.ToText() <> '{}') then
+            exit(ElementTestDataJson.ToText())
         else
             exit('');
     end;
