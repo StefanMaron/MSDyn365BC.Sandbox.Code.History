@@ -356,6 +356,11 @@ page 44 "Sales Credit Memo"
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies a code to indicate if the document is used for exports to other countries.';
                 }
+                field("CFDI Certificate of Origin No."; Rec."CFDI Certificate of Origin No.")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the identifier which was used to pay for the issuance of the certificate of origin.';
+                }
                 field(Control1310005; Rec."Foreign Trade")
                 {
                     ApplicationArea = BasicMX;
@@ -947,7 +952,7 @@ page 44 "Sales Credit Memo"
                     Visible = SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif                    
+#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Sales Order Stats.";
                     RunPageOnRec = true;
@@ -1683,7 +1688,7 @@ page 44 "Sales Credit Memo"
         CheckShowBackgrValidationNotification();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
 
-        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Sales Order Stats.";
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
