@@ -726,7 +726,6 @@ codeunit 7313 "Create Put-away"
     local procedure GetWarehouseClassCode()
     begin
         WarehouseClassCode := CurrItem."Warehouse Class Code";
-        OnAfterGetWarehouseClassCode(WarehouseClassCode, CurrItem, CurrStockkeepingUnit);
     end;
 
     local procedure GetPutAwayUOM()
@@ -1688,8 +1687,6 @@ codeunit 7313 "Create Put-away"
             WarehouseActivityLine."Qty. Rounding Precision (Base)" := BasePutAwayItemUnitOfMeasure."Qty. Rounding Precision";
         end;
 
-        OnCreateNewWhseActivityForProdOrderLineOnBeforeValidateQuantity(WarehouseActivityLine, ProdOrderLine, TempProdOrdLineTrackingBuff);
-
         WarehouseActivityLine.Validate(
               Quantity, UnitOfMeasureManagement.RoundQty(QtyToHandleBase / WarehouseActivityLine."Qty. per Unit of Measure", WarehouseActivityLine."Qty. Rounding Precision"));
         if QtyToHandleBase <> 0 then begin
@@ -1703,9 +1700,6 @@ codeunit 7313 "Create Put-away"
             WarehouseActivityLine.Cubage := 0;
             WarehouseActivityLine.Weight := 0;
         end;
-
-        OnCreateNewWhseActivityForProdOrderLineOnAfterSetQtyToHandle(WarehouseActivityLine, ProdOrderLine, TempProdOrdLineTrackingBuff, DoNotFillQtytoHandle);
-
         WarehouseActivityLine.CopyTrackingFromProdOrderLineTrackingBuffer(TempProdOrdLineTrackingBuff);
         WarehouseActivityLine."Warranty Date" := TempProdOrdLineTrackingBuff."Warranty Date";
         WarehouseActivityLine."Expiration Date" := TempProdOrdLineTrackingBuff."Expiration Date";
@@ -2023,21 +2017,6 @@ codeunit 7313 "Create Put-away"
 
     [IntegrationEvent(false, false)]
     local procedure OnAssignPlaceBinZoneOnBeforeApplyBinCodeFilter(var BinCodeFilterText: Text[250]; var Location: Record Location; var PostedWhseReceiptLine: Record "Posted Whse. Receipt Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetWarehouseClassCode(var WarehouseClassCode: Code[10]; Item: Record Item; StockkeepingUnit: Record "Stockkeeping Unit")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateNewWhseActivityForProdOrderLineOnBeforeValidateQuantity(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateNewWhseActivityForProdOrderLineOnAfterSetQtyToHandle(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; DoNotFillQtytoHandle: Boolean)
     begin
     end;
 }
