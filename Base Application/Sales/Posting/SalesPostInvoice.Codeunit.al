@@ -212,10 +212,7 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         if InvoicePostingParameters."Tax Type" = InvoicePostingParameters."Tax Type"::"Sales Tax" then
             InvoicePostingBuffer.ClearVATFields();
         SalesPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, SalesLine);
-        IsHandled := false;
-        SalesPostInvoiceEvents.RunOnBeforeUpdateInvoicePostingBuffer(TempInvoicePostingBuffer, InvoicePostingBuffer, false, InvDefLineNo, DeferralLineNo, FALineNo, SalesLine, IsHandled);
-        if not IsHandled then
-            UpdateInvoicePostingBuffer(InvoicePostingBuffer, false);
+        UpdateInvoicePostingBuffer(InvoicePostingBuffer, false);
 
         SalesPostInvoiceEvents.RunOnPrepareLineOnAfterUpdateInvoicePostingBuffer(
             SalesHeader, SalesLine, InvoicePostingBuffer, TempInvoicePostingBuffer);
