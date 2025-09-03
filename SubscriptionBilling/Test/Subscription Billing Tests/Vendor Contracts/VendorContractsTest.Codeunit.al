@@ -41,7 +41,6 @@ codeunit 148154 "Vendor Contracts Test"
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryRandom: Codeunit "Library - Random";
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryTestInitialize: Codeunit "Library - Test Initialize";
         BillingRhythmValue: DateFormula;
         ExpectedDate: Date;
         ExpectedDecimalValue: Decimal;
@@ -56,7 +55,6 @@ codeunit 148154 "Vendor Contracts Test"
     var
         VendorContractLine2: Record "Vend. Sub. Contract Line";
     begin
-        Initialize();
         SetupServiceObjectForNewItemWithServiceCommitment(false);
         ContractTestLibrary.CreateVendorContractAndCreateContractLinesForItems(VendorContract, ServiceObject, Vendor."No."); // ExchangeRateSelectionModalPageHandler, MessageHandler
         ContractTestLibrary.InsertVendorContractCommentLine(VendorContract, VendorContractLine2);
@@ -79,7 +77,7 @@ codeunit 148154 "Vendor Contracts Test"
     [Test]
     procedure CheckContractInitValues()
     begin
-        Initialize();
+        ClearAll();
 
         ContractTestLibrary.CreateVendorContract(VendorContract, '');
 
@@ -90,7 +88,7 @@ codeunit 148154 "Vendor Contracts Test"
     [Test]
     procedure CheckNewContractFromVendor()
     begin
-        Initialize();
+        ClearAll();
 
         ContractTestLibrary.CreateVendor(Vendor);
         VendorContract.Init();
@@ -105,7 +103,6 @@ codeunit 148154 "Vendor Contracts Test"
         InvoicingViaNotManagedErr: Label 'Invoicing via %1 not managed', Locked = true;
     begin
         // [SCENARIO] Check that proper Subscription Lines are assigned to Vendor Subscription Contract Lines.
-        Initialize();
         SetupServiceObjectForNewItemWithServiceCommitment(false);
         ContractTestLibrary.CreateVendorContract(VendorContract, Vendor."No.");
 
@@ -147,7 +144,6 @@ codeunit 148154 "Vendor Contracts Test"
         // [SCENARIO] Create a Subscription for G/L Account and make sure that its Subscription Lines can be assigned to a contract
 
         // [GIVEN] A Subscription for G/L Account has been created with Subscription Lines included
-        Initialize();
         SetupServiceObjectForNewGLAccountWithServiceCommitment();
 
         // [WHEN] A Contract has been created and Subscription Lines are assigned on a contract
@@ -175,7 +171,6 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ServCommWOVendContractPageHandler,ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure CheckServiceCommitmentAssignmentToVendorContractInFCY()
     begin
-        Initialize();
         SetupServiceObjectForNewItemWithServiceCommitment(false);
         ContractTestLibrary.CreateVendorContract(VendorContract, Vendor."No.");
 
@@ -190,7 +185,7 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure CheckServiceObjectDescriptionInVendorContractLines()
     begin
-        Initialize();
+        ClearAll();
         ContractTestLibrary.DeleteAllContractRecords();
         ContractTestLibrary.CreateVendorContractAndCreateContractLinesForItems(VendorContract, ServiceObject, Vendor."No.", true);
         TestVendorContractLinesServiceObjectDescription(VendorContract."No.", ServiceObject.Description);
@@ -204,7 +199,7 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ConfirmHandler')]
     procedure CheckTransferDefaultsFromVendorToVendorContract()
     begin
-        Initialize();
+        ClearAll();
 
         ContractTestLibrary.CreateVendor(Vendor);
         ContractTestLibrary.CreateVendor(Vendor2);
@@ -233,7 +228,6 @@ codeunit 148154 "Vendor Contracts Test"
         ServiceObjectQuantity: Decimal;
     begin
         // [SCENARIO] Assign Subscription Lines to Vendor Subscription Contract Lines. Change values on Vendor Subscription Contract Lines and check that Subscription Line has changed values.
-        Initialize();
         Currency.InitRoundingPrecision();
         CreateVendorContractSetup();
 
@@ -338,7 +332,7 @@ codeunit 148154 "Vendor Contracts Test"
         EntryNo: Integer;
     begin
         // Test: Subscription Line should be disconnected from the contract when the line type changes
-        Initialize();
+        ClearAll();
         SetupNewContract(false);
 
         VendorContractLine.Reset();
@@ -365,7 +359,7 @@ codeunit 148154 "Vendor Contracts Test"
 
         //[GIVEN]: Setup Service Object with Service Commitment
         //[GIVEN] Create Vendor Contract with Contract Lines from Service Commitments
-        Initialize();
+        ClearAll();
         ContractTestLibrary.DeleteAllContractRecords();
         ContractTestLibrary.InitContractsApp();
 
@@ -388,7 +382,7 @@ codeunit 148154 "Vendor Contracts Test"
     [Test]
     procedure DeleteAssignedContractTypeError()
     begin
-        Initialize();
+        ClearAll();
 
         ContractTestLibrary.CreateVendorContractWithContractType(VendorContract, ContractType);
         asserterror ContractType.Delete(true);
@@ -398,7 +392,6 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ServCommWOVendContractPageHandler,ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure ExpectErrorOnAssignServiceCommitmentsWithMultipleCurrencies()
     begin
-        Initialize();
         SetupServiceObjectForNewItemWithServiceCommitment(false);
         ContractTestLibrary.CreateVendorContract(VendorContract, Vendor."No.");
 
@@ -419,7 +412,6 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure ExpectErrorOnMergeOneVendorContractLine()
     begin
-        Initialize();
         SetupNewContract(false);
         asserterror VendorContractLine.MergeContractLines(VendorContractLine);
     end;
@@ -428,7 +420,6 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure ExpectErrorOnMergeTextLine()
     begin
-        Initialize();
         SetupNewContract(false);
         ContractTestLibrary.InsertVendorContractCommentLine(VendorContract, VendorContractLine);
         VendorContractLine.Reset();
@@ -439,7 +430,6 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure ExpectErrorOnMergeVendorContractLineWithBillingProposal()
     begin
-        Initialize();
         SetupNewContract(false);
         ContractTestLibrary.CreateBillingProposal(BillingTemplate, Enum::"Service Partner"::Vendor, Today());
         asserterror VendorContractLine.MergeContractLines(VendorContractLine);
@@ -449,7 +439,7 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler,CreateVendorBillingDocsContractPageHandler')]
     procedure ExpectErrorOnModifyServiceStartDateWhenBillingLineArchiveExist()
     begin
-        Initialize();
+        ClearAll();
         LibraryERMCountryData.UpdatePurchasesPayablesSetup();
         ContractTestLibrary.DeleteAllContractRecords();
         ContractTestLibrary.CreateVendorContractAndCreateContractLinesForItems(VendorContract, ServiceObject, Vendor."No.", true);
@@ -462,7 +452,7 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure ExpectErrorOnModifyServiceStartDateWhenBillingLineExist()
     begin
-        Initialize();
+        ClearAll();
         ContractTestLibrary.DeleteAllContractRecords();
         ContractTestLibrary.CreateVendorContractAndCreateContractLinesForItems(VendorContract, ServiceObject, Vendor."No.", true);
         ContractTestLibrary.CreateBillingProposal(BillingTemplate, Enum::"Service Partner"::Vendor);
@@ -476,7 +466,6 @@ codeunit 148154 "Vendor Contracts Test"
     var
         VendorContractLine2: Record "Vend. Sub. Contract Line";
     begin
-        Initialize();
         SetupServiceObjectForNewItemWithServiceCommitment(false);
         ContractTestLibrary.CreateVendorContractAndCreateContractLinesForItems(VendorContract, ServiceObject, Vendor."No.");
         ContractTestLibrary.InsertVendorContractCommentLine(VendorContract, VendorContractLine2);
@@ -501,7 +490,7 @@ codeunit 148154 "Vendor Contracts Test"
         // [SCENARIO] Manually create contract lines for Item and expect Subscription to be created
 
         // [GIVEN] A Vendor Subscription Contract has been created
-        Initialize();
+        ClearAll();
         ContractTestLibrary.DeleteAllContractRecords();
         ContractTestLibrary.CreateVendor(Vendor);
         ContractTestLibrary.CreateVendorContract(VendorContract, Vendor."No.");
@@ -529,7 +518,7 @@ codeunit 148154 "Vendor Contracts Test"
         // [SCENARIO] Manually create contract lines for G/L Account and expect Subscription to be created
 
         // [GIVEN] A Vendor Subscription Contract has been created
-        Initialize();
+        ClearAll();
         ContractTestLibrary.InitContractsApp();
         ContractTestLibrary.CreateVendor(Vendor);
         ContractTestLibrary.CreateVendorContract(VendorContract, Vendor."No.");
@@ -554,7 +543,7 @@ codeunit 148154 "Vendor Contracts Test"
     [Test]
     procedure RemoveAndDeleteAssignedContractType()
     begin
-        Initialize();
+        ClearAll();
 
         ContractTestLibrary.CreateVendorContractWithContractType(VendorContract, ContractType);
 
@@ -569,7 +558,7 @@ codeunit 148154 "Vendor Contracts Test"
     procedure TestDeleteServiceCommitmentLinkedToContractLineIsClosed()
     begin
         // Test: A closed Contract Line is deleted when deleting the Subscription Line
-        Initialize();
+        ClearAll();
         ContractTestLibrary.DeleteAllContractRecords();
         SetupServiceObjectForNewItemWithServiceCommitment(false);
         ContractTestLibrary.CreateVendorContractAndCreateContractLinesForItems(VendorContract, ServiceObject, Customer."No."); // ExchangeRateSelectionModalPageHandler, MessageHandler
@@ -593,7 +582,7 @@ codeunit 148154 "Vendor Contracts Test"
     procedure TestDeleteServiceCommitmentLinkedToContractLineNotClosed()
     begin
         // Test: Subscription Line cannot be deleted if an open contract line exists
-        Initialize();
+        ClearAll();
         ContractTestLibrary.DeleteAllContractRecords();
         SetupServiceObjectForNewItemWithServiceCommitment(false);
         ContractTestLibrary.CreateVendorContractAndCreateContractLinesForItems(VendorContract, ServiceObject, Customer."No."); // ExchangeRateSelectionModalPageHandler, MessageHandler
@@ -612,7 +601,7 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure TestEqualServiceStartDateAndNextBillingDate()
     begin
-        Initialize();
+        ClearAll();
         ContractTestLibrary.DeleteAllContractRecords();
         ContractTestLibrary.CreateVendorContractAndCreateContractLinesForItems(VendorContract, ServiceObject, Vendor."No.", true);
 
@@ -629,7 +618,6 @@ codeunit 148154 "Vendor Contracts Test"
         TempServiceCommitment: Record "Subscription Line" temporary;
         ExpectedServiceAmount: Decimal;
     begin
-        Initialize();
         SetupNewContract(false);
         CreateTwoEqualServiceObjectsWithServiceCommitments();
         ExpectedServiceAmount := GetTotalServiceAmountFromServiceCommitments();
@@ -664,7 +652,6 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ServCommWOVendContractPageHandler,ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure TestRecalculateServiceCommitmentsOnChangeCurrencyCode()
     begin
-        Initialize();
         SetupServiceObjectForNewItemWithServiceCommitment(false);
         ContractTestLibrary.CreateVendorContract(VendorContract, Vendor."No.");
 
@@ -683,7 +670,6 @@ codeunit 148154 "Vendor Contracts Test"
     [HandlerFunctions('ServCommWOVendContractPageHandler,ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure TestResetServiceCommitmentsOnCurrencyCodeDelete()
     begin
-        Initialize();
         SetupServiceObjectForNewItemWithServiceCommitment(false);
         ContractTestLibrary.CreateVendorContract(VendorContract, Vendor."No.");
 
@@ -699,24 +685,22 @@ codeunit 148154 "Vendor Contracts Test"
     end;
 
     [Test]
-    procedure TransferCreateContractDeferralsFromContractType()
+    procedure TestTransferOfDefaultWithoutContractDeferralsFromContractType()
     begin
         // Create Vendor Contract with contract type
         // Create new Contract Type with field "Def. Without Contr. Deferrals" = true
         // Check that the field value has been transferred
-        Initialize();
+        ClearAll();
         ContractTestLibrary.CreateVendorContractWithContractType(VendorContract, ContractType);
-        ContractType.TestField("Create Contract Deferrals", true);
-        VendorContract.TestField("Create Contract Deferrals", true);
+        VendorContract.TestField("Without Contract Deferrals", ContractType."Def. Without Contr. Deferrals");
         ContractTestLibrary.CreateContractType(ContractType);
-        ContractType."Create Contract Deferrals" := false;
+        ContractType."Def. Without Contr. Deferrals" := true;
         ContractType.Modify(false);
         VendorContract.Validate("Contract Type", ContractType.Code);
         VendorContract.Modify(false);
-        VendorContract.TestField("Create Contract Deferrals", false);
-
+        VendorContract.TestField("Without Contract Deferrals", ContractType."Def. Without Contr. Deferrals");
         // allow manually changing the value of the field
-        VendorContract.Validate("Create Contract Deferrals", true);
+        VendorContract.Validate("Without Contract Deferrals", false);
         VendorContract.Modify(false);
         VendorContract.TestField("Contract Type", ContractType.Code);
     end;
@@ -724,12 +708,6 @@ codeunit 148154 "Vendor Contracts Test"
     #endregion Tests
 
     #region Procedures
-
-    local procedure Initialize()
-    begin
-        LibraryTestInitialize.OnTestInitialize(Codeunit::"Vendor Contracts Test");
-        ClearAll();
-    end;
 
     local procedure CreateAndPostBillingProposal()
     begin

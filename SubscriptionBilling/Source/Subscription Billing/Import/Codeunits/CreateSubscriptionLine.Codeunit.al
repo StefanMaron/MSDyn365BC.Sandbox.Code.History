@@ -125,7 +125,6 @@ codeunit 8006 "Create Subscription Line"
 
         ServiceCommitment.SetDefaultDimensions(true);
         ServiceCommitment."Renewal Term" := ServiceCommitment."Initial Term";
-        ServiceCommitment."Create Contract Deferrals" := ImportedServiceCommitment."Create Contract Deferrals";
         OnBeforeSubscriptionLineModify(ServiceCommitment, ImportedServiceCommitment);
         ServiceCommitment.SetSkipArchiving(true);
         ServiceCommitment.Modify(true);

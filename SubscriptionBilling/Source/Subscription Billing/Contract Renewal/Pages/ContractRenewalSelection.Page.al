@@ -315,7 +315,7 @@ page 8006 "Contract Renewal Selection"
         end;
     end;
 
-    procedure SelectLinesWithRenewalTerm(var CustomerContractLine: Record "Cust. Sub. Contract Line")
+    local procedure SelectLinesWithRenewalTerm(var CustomerContractLine: Record "Cust. Sub. Contract Line")
     begin
         CustomerContractLine.Reset();
         CustomerContractLine.Copy(Rec);
