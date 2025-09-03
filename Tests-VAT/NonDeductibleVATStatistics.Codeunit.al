@@ -756,14 +756,22 @@ codeunit 134287 "Non-Deductible VAT Statistics"
         GLAccountNo: Code[20])
     var
         PurchaseLine: Record "Purchase Line";
+        GeneralPostingSetup: Record "General Posting Setup";
+        GLAccount: Record "G/L Account";
     begin
+        LibraryERM.FindGeneralPostingSetup(GeneralPostingSetup);
+
         LibraryPurchase.CreatePurchHeader(
             PurchaseHeader,
             PurchaseHeader."Document Type"::Invoice,
-            LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATBusPostingGroup));
+            LibraryPurchase.CreateVendorWithBusPostingGroups(GeneralPostingSetup."Gen. Bus. Posting Group", VATBusPostingGroup));
         PurchaseHeader.Validate("Vendor Invoice No.", LibraryUtility.GenerateGUID());
         PurchaseHeader.Validate("Currency Code", CurrencyCode);
         PurchaseHeader.Modify(true);
+
+        GLAccount.Get(GLAccountNo);
+        GLAccount.Validate("Gen. Prod. Posting Group", GeneralPostingSetup."Gen. Prod. Posting Group");
+        GLAccount.Modify(true);
 
         LibraryPurchase.CreatePurchaseLine(
             PurchaseLine,
