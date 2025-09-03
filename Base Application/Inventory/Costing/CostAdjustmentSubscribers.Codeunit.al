@@ -286,6 +286,8 @@ codeunit 5821 "Cost Adjustment Subscribers"
             TempCostAdjustmentDetailedLog.Modify();
         end else begin
             TempCostAdjustmentDetailedLog."Starting Date-Time" := CurrentDateTime();
+            TempCostAdjustmentDetailedLog."Ending Date-Time" := 0DT;
+            TempCostAdjustmentDetailedLog.Duration := 0;
             TempCostAdjustmentDetailedLog."Interim Date-Time" := TempCostAdjustmentDetailedLog."Starting Date-Time";
             TempCostAdjustmentDetailedLog.Insert();
         end;
