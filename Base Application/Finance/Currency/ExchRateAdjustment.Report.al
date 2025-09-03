@@ -488,7 +488,7 @@ report 596 "Exch. Rate Adjustment"
         end;
     end;
 
-    [IntegrationEvent(true, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnAfterCopyParameters(var ExchRateAdjmtParameters2: Record "Exch. Rate Adjmt. Parameters" temporary)
     begin
     end;
