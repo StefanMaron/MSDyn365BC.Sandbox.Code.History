@@ -55,7 +55,7 @@ table 189 "VAT Setup"
         }
         field(5; "Use For Job Cost"; Boolean)
         {
-            Caption = 'Use For Project Cost';
+            Caption = 'Use For Job Cost';
         }
         field(10; "Show Non-Ded. VAT In Lines"; Boolean)
         {
@@ -97,10 +97,6 @@ table 189 "VAT Setup"
         field(23; "Ship-To Alt. Cust. VAT Reg."; Enum "Ship-To Alt. Cust. VAT Reg.")
         {
             Caption = 'Ship-To Alt. Cust. VAT Reg.';
-        }
-        field(24; "Per Activity Code Settl. Entry"; Boolean)
-        {
-            Caption = 'Per Activity Code Settlement Entry';
         }
     }
 
