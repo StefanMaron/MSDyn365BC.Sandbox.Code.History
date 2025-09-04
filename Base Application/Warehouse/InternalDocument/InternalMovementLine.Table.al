@@ -156,7 +156,6 @@ table 7347 "Internal Movement Line"
         field(29; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnLookup()
             begin
