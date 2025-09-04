@@ -208,10 +208,7 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         InvoicePostingBuffer.UpdateVATBase(TotalVATBase, TotalVATBaseACY);
         InvoicePostingBuffer."Deferral Code" := SalesLine."Deferral Code";
         SalesPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, SalesLine);
-        IsHandled := false;
-        SalesPostInvoiceEvents.RunOnBeforeUpdateInvoicePostingBuffer(TempInvoicePostingBuffer, InvoicePostingBuffer, false, InvDefLineNo, DeferralLineNo, FALineNo, SalesLine, IsHandled);
-        if not IsHandled then
-            UpdateInvoicePostingBuffer(InvoicePostingBuffer, false);
+        UpdateInvoicePostingBuffer(InvoicePostingBuffer, false);
 
         SalesPostInvoiceEvents.RunOnPrepareLineOnAfterUpdateInvoicePostingBuffer(
             SalesHeader, SalesLine, InvoicePostingBuffer, TempInvoicePostingBuffer);
@@ -765,7 +762,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
                             DeferralPostingBuffer."Deferral Account" := DeferralAccount;
                             DeferralPostingBuffer."Period Description" := DeferralTemplate."Period Description";
                             DeferralPostingBuffer."Deferral Line No." := InvDefLineNo;
-                            SalesPostInvoiceEvents.RunOnPrepareDeferralLineOnBeforeDeferralPostingBufferUpdate(DeferralPostingBuffer, TempDeferralLine, RemainAmtToDefer);
                             DeferralPostingBuffer.Update(DeferralPostingBuffer);
                         end else
                             Error(ZeroDeferralAmtErr, SalesLine."No.", SalesLine."Deferral Code");
@@ -778,7 +774,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
                 Error(NoDeferralScheduleErr, SalesLine."No.", SalesLine."Deferral Code")
         end else
             Error(NoDeferralScheduleErr, SalesLine."No.", SalesLine."Deferral Code");
-        SalesPostInvoiceEvents.RunOnAfterPrepareDeferralLine(DeferralPostingBuffer, SalesHeader, SalesLine, InvoicePostingParameters."Document No.", DeferralAccount, SalesAccount, InvDefLineNo, DeferralLineNo, RemainAmtToDefer);
     end;
 
     procedure CalcDeferralAmounts(SalesHeaderVar: Variant; SalesLineVar: Variant; OriginalDeferralAmount: Decimal)
