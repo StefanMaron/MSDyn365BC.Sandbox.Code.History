@@ -6,7 +6,9 @@ page 36986 "Balance Sheet by Month"
 {
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
+#pragma warning disable AS0035 // Changed from Card to UserControlHost
     PageType = UserControlHost;
+#pragma warning restore AS0035
     Caption = 'Balance Sheet by Month';
     AboutTitle = 'About Balance Sheet by Month';
     AboutText = 'The Balance Sheet by Month report provides a month-to-month comparative view of the balance at date for balance sheet accounts. ';
@@ -24,14 +26,8 @@ page 36986 "Balance Sheet by Month"
                     SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
                 end;
 
-                trigger ReportLoaded(ReportFilters: Text; ActivePageName: Text; ActivePageFilters: Text; CorrelationId: Text)
-                begin
-                    SetupHelper.LogReportLoaded(CorrelationId);
-                end;
-
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
                 begin
-                    SetupHelper.LogError(Operation, ErrorText);
                     SetupHelper.ShowPowerBIErrorNotification(Operation, ErrorText);
                 end;
             }

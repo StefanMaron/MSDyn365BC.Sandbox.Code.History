@@ -1,4 +1,3 @@
-#pragma warning disable AA0247
 page 8047 "Vendor Contract Lines API"
 {
     APIGroup = 'subsBilling';
