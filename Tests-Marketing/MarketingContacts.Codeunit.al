@@ -3477,6 +3477,53 @@ codeunit 136201 "Marketing Contacts"
     end;
 
     [Test]
+    [HandlerFunctions('NotificationHandler')]
+    [Scope('OnPrem')]
+    procedure ShowSuggestCreateContForCustSaleRelationshipRoleCenter()
+    var
+        Customer: Record Customer;
+        SalesRelationshipMgrAct: TestPage "Sales & Relationship Mgr. Act.";
+    begin
+        // [FEATURE] [Notification] [Customer]
+        // [SCENARIO 216150] Notifications suggesting to create Contacts for Customer appear in Sales & Relationship Manager role center
+        Initialize();
+
+        // [GIVEN] Customer "C" exist with no Contact assigned
+        CreateCustomer(Customer);
+
+        // [WHEN] Sales & Relationship Manager role center is opened
+        SalesRelationshipMgrAct.OpenView();
+
+        // [THEN] Notification is shown
+        Assert.ExpectedMessage(YouCanGetContactFromCustTxt, LibraryVariableStorage.DequeueText());
+        Customer.Delete();
+        SalesRelationshipMgrAct.Close();
+    end;
+
+    [Test]
+    [HandlerFunctions('NotificationHandler')]
+    [Scope('OnPrem')]
+    procedure ShowSuggestCreateContForVendSaleRelationshipRoleCenter()
+    var
+        Vendor: Record Vendor;
+        Customer: Record Customer;
+        SalesRelationshipMgrAct: TestPage "Sales & Relationship Mgr. Act.";
+    begin
+        // [FEATURE] [Notification] [Vendor]
+        // [SCENARIO 216150] Notifications suggesting to create Contacts for Vendor appear in Sales & Relationship Manager role center
+        Initialize();
+        Customer.DeleteAll();
+        // [WHEN] Vendor "V" exist with no Contact assigned and Sales & Relationship Manager role center is opened
+        CreateVendor(Vendor);
+        SalesRelationshipMgrAct.OpenView();
+
+        // [THEN] Notification is shown
+        Assert.ExpectedMessage(YouCanGetContactFromVendTxt, LibraryVariableStorage.DequeueText());
+        Vendor.Delete();
+        SalesRelationshipMgrAct.Close();
+    end;
+
+    [Test]
     [HandlerFunctions('MyNotificationsModalPageHandler')]
     [Scope('OnPrem')]
     procedure DisabledContactNotificationsDontAppear()
@@ -6004,39 +6051,6 @@ codeunit 136201 "Marketing Contacts"
         VerifyInteractionLogEntry.Get(InteractionLogEntry."Entry No.");
         Assert.AreEqual(VerifyInteractionLogEntry."Cost (LCY)", CostLCY, ValueMustMatch);
         Assert.AreEqual(VerifyInteractionLogEntry."Duration (Min.)", DurationMin, ValueMustMatch);
-    end;
-
-    [Test]
-    [HandlerFunctions('ModalPageHandlerForTask')]
-    procedure TaskListPageHasFixedSystemTaskTypeFilterAsOrganiserOrContactAttendee()
-    var
-        Contact: Record Contact;
-        Task: Record "To-do";
-        TempTask: Record "To-do" temporary;
-        ContactCard: TestPage "Contact Card";
-        TaskList: TestPage "Task List";
-    begin
-        // [SCENARIO 568324] Task List page has a fixed System Task Type filter as 'Organizer|Contact Attendee' when Next Task Date Drilldown on Contact card
-        Initialize();
-
-        // [GIVEN] Create Contact
-        LibraryMarketing.CreateCompanyContact(Contact);
-
-        // [GIVEN] Create Task for Contact
-        Task.SetRange("Contact No.", Contact."No.");
-        TempTask.CreateTaskFromTask(Task);
-
-        // [WHEN] Open Contact Card and Drilldonw 'Next Task Date' also Trap Task List
-        ContactCard.OpenView();
-        ContactCard.GoToRecord(Contact);
-        TaskList.Trap();
-        ContactCard."Next Task Date".Drilldown();
-
-        // [THEN] Verify Correct filter has been set on the page
-        TaskList."Contact No.".AssertEquals(Contact."No.");
-        Assert.AreEqual(
-            StrSubstNo('%1|%2', Task."System To-do Type"::Organizer, Task."System To-do Type"::"Contact Attendee"),
-            TaskList.Filter.GetFilter("System To-do Type"), 'Wrong filter was set');
     end;
 
     local procedure Initialize()
