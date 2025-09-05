@@ -950,14 +950,11 @@ codeunit 90 "Purch.-Post"
         if IsHandled then
             exit;
 
-        if (PurchHeader."Document Type" <> PurchHeader."Document Type"::Invoice) and
-           (PurchHeader."Document Type" <> PurchHeader."Document Type"::"Credit Memo") then
+        if PreviewMode then
             exit;
 
         GetPurchSetup();
-        if not PurchSetup."Check Doc. Total Amounts" then
-            exit;
-        if PreviewMode then
+        if not PurchSetup.ShouldDocumentTotalAmountsBeChecked(PurchHeader) then
             exit;
 
         PurchHeader.CalcFields(Amount, "Amount Including VAT");
@@ -1726,7 +1723,7 @@ codeunit 90 "Purch.-Post"
             else
                 ItemJnlLine.CopyDocumentFields(
                   ItemJnlLine."Document Type"::"Purchase Receipt",
-                  PurchRcptHeader."No.", PurchRcptHeader."Vendor Shipment No.", SrcCode, PurchRcptHeader."No. Series");
+                  PurchRcptHeader."No.", SetExternalDocumentNo(), SrcCode, PurchRcptHeader."No. Series");
             if QtyToBeInvoiced <> 0 then
                 if ItemJnlLine."Document No." = '' then
                     if PurchLine."Document Type" = PurchLine."Document Type"::"Credit Memo" then
@@ -5207,6 +5204,7 @@ codeunit 90 "Purch.-Post"
     local procedure CreatePrepmtLines(PurchHeader: Record "Purchase Header"; CompleteFunctionality: Boolean)
     var
         GLAcc: Record "G/L Account";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
         TempPurchLine: Record "Purchase Line" temporary;
         TempExtTextLine: Record "Extended Text Line" temporary;
         GenPostingSetup: Record "General Posting Setup";
@@ -5314,6 +5312,10 @@ codeunit 90 "Purch.-Post"
                         TempPrepmtPurchLine."Job No." := TempPurchLine."Job No.";
                         TempPrepmtPurchLine."Job Task No." := TempPurchLine."Job Task No.";
                         TempPrepmtPurchLine."Job Line Type" := TempPurchLine."Job Line Type";
+                        if PurchRcptLine.Get(TempPurchLine."Receipt No.", TempPurchLine."Receipt Line No.") then begin
+                            TempPrepmtPurchLine."Order No." := PurchRcptLine."Order No.";
+                            TempPrepmtPurchLine."Order Line No." := PurchRcptLine."Order Line No.";
+                        end;
                         TempPrepmtPurchLine."Line No." := NextLineNo;
                         NextLineNo := NextLineNo + 10000;
                         OnBeforeTempPrepmtPurchLineInsert(TempPrepmtPurchLine, TempPurchLine, PurchHeader, CompleteFunctionality);
@@ -8636,7 +8638,7 @@ codeunit 90 "Purch.-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforePurchRcptLineInsert(PurchRcptLine, PurchRcptHeader, PurchLine, SuppressCommit, PostedWhseRcptLine, IsHandled);
+        OnBeforePurchRcptLineInsert(PurchRcptLine, PurchRcptHeader, PurchLine, SuppressCommit, PostedWhseRcptLine, IsHandled, ItemLedgShptEntryNo);
         if IsHandled then
             exit;
 
@@ -8916,6 +8918,14 @@ codeunit 90 "Purch.-Post"
             exit;
         PostponedValueEntries.Add(ValueEntry."Entry No.");
         IsHandled := true;
+    end;
+
+    local procedure SetExternalDocumentNo(): Code[35]
+    begin
+        if PurchRcptHeader."Vendor Shipment No." <> '' then
+            exit(PurchRcptHeader."Vendor Shipment No.");
+
+        exit(GenJnlLineExtDocNo);
     end;
 
     [IntegrationEvent(false, false)]
@@ -9775,7 +9785,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePurchRcptLineInsert(var PurchRcptLine: Record "Purch. Rcpt. Line"; var PurchRcptHeader: Record "Purch. Rcpt. Header"; var PurchLine: Record "Purchase Line"; CommitIsSupressed: Boolean; PostedWhseRcptLine: Record "Posted Whse. Receipt Line"; var IsHandled: Boolean)
+    local procedure OnBeforePurchRcptLineInsert(var PurchRcptLine: Record "Purch. Rcpt. Line"; var PurchRcptHeader: Record "Purch. Rcpt. Header"; var PurchLine: Record "Purchase Line"; CommitIsSupressed: Boolean; PostedWhseRcptLine: Record "Posted Whse. Receipt Line"; var IsHandled: Boolean; ItemLedgShptEntryNo: Integer)
     begin
     end;
 
