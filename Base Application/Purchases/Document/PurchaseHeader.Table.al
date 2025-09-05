@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Document;
 
 using Microsoft.Bank.BankAccount;
@@ -191,7 +195,8 @@ table 38 "Purchase Header"
                     Rec.RecallModifyAddressNotification(GetModifyVendorAddressNotificationId());
                     if Rec."Remit-to Code" <> '' then
                         Rec.Validate("Remit-to Code", '');
-                end;
+                end else
+                    SelectDefaultRemitAddress(Rec);
             end;
         }
         field(3; "No."; Code[20])
@@ -2559,7 +2564,7 @@ table 38 "Purchase Header"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Doc. Amount Incl. VAT';
-            ToolTip = 'Specifies the total amount (including VAT) of the purchase invoice or credit memo.';
+            ToolTip = 'Specifies the total amount (including VAT) of the purchase invoice or credit memo as specified in the external document. When this value comes from an e-document service, it''s value can''t be changed.';
 
             trigger OnValidate()
             var
@@ -2586,7 +2591,7 @@ table 38 "Purchase Header"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Doc. Amount VAT';
-            ToolTip = 'Specifies the VAT amount of the purchase invoice or credit memo.';
+            ToolTip = 'Specifies the VAT amount of the purchase invoice or credit memo as specified in the external document. When this values comes from an e-document service, it''s value can''t be changed.';
 
             trigger OnValidate()
             var
@@ -2710,7 +2715,7 @@ table 38 "Purchase Header"
         ShowPostedDocsToPrint :=
             (PurchRcptHeader."No." <> '') or (PurchInvHeader."No." <> '') or (PurchCrMemoHeader."No." <> '') or
            (ReturnShptHeader."No." <> '') or (PurchInvHeaderPrepmt."No." <> '') or (PurchCrMemoHeaderPrepmt."No." <> '');
-        OnBeforeShowPostedDocsToPrintCreatedMsg(ShowPostedDocsToPrint, HideValidationDialog);
+        OnBeforeShowPostedDocsToPrintCreatedMsg(ShowPostedDocsToPrint, HideValidationDialog, Rec);
         if ShowPostedDocsToPrint then
             Message(PostedDocsToPrintCreatedMsg);
     end;
@@ -5071,7 +5076,7 @@ table 38 "Purchase Header"
         GeneralLedgerSetup: Record "General Ledger Setup";
         DocumentTotals: Codeunit "Document Totals";
         VATAmount: Decimal;
-        IsHandled: Boolean;
+        IsHandled, Result : Boolean;
     begin
         OnBeforeIsTotalValid(Rec, IsHandled);
         if IsHandled then
@@ -5094,6 +5099,11 @@ table 38 "Purchase Header"
            (IncomingDocument."Currency Code" <> GeneralLedgerSetup."LCY Code")
         then
             exit(true);
+
+        IsHandled := false;
+        OnBeforeCheckIsTotalValid(IncomingDocument, Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
 
         TempTotalPurchaseLine.Init();
         DocumentTotals.PurchaseCalculateTotalsWithInvoiceRounding(PurchaseLine, VATAmount, TempTotalPurchaseLine);
@@ -8352,7 +8362,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowPostedDocsToPrintCreatedMsg(var ShowPostedDocsToPrint: Boolean; HideValidationDialog: Boolean)
+    local procedure OnBeforeShowPostedDocsToPrintCreatedMsg(var ShowPostedDocsToPrint: Boolean; HideValidationDialog: Boolean; var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 
@@ -8996,6 +9006,11 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateVendorCrMemoNo(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckIsTotalValid(IncomingDocument: Record "Incoming Document"; PurchaseHeader: Record "Purchase Header"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
