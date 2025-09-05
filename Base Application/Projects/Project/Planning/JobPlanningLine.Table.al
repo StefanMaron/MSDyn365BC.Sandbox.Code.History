@@ -387,6 +387,8 @@ table 1003 "Job Planning Line"
             TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
+            var
+                SkipValidateQuantity: Boolean;
             begin
                 ValidateModification(xRec."Location Code" <> "Location Code", Rec.FieldNo("Location Code"));
 
@@ -395,7 +397,9 @@ table 1003 "Job Planning Line"
                     GetLocation("Location Code");
                     CheckItemAvailable(FieldNo("Location Code"));
                     UpdateReservation(FieldNo("Location Code"));
-                    Validate(Quantity);
+                    OnBeforeValidateQuantity(Rec, xRec, SkipValidateQuantity);
+                    if not SkipValidateQuantity then
+                        Validate(Quantity);
                     SetDefaultBin();
                     JobWarehouseMgt.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Location Code"));
                     InitQtyToAsm();
@@ -2045,8 +2049,10 @@ table 1003 "Job Planning Line"
             else
                 if RetrieveCostPrice(CurrFieldNo) or (CurrFieldNo = FieldNo("Unit Price")) then begin
                     CalculateRetrievedCost(RetrievedCost);
-                    "Unit Cost" := ConvertAmountToFCY(RetrievedCost, UnitAmountRoundingPrecisionFCY);
-                    "Unit Cost (LCY)" := Round(RetrievedCost, UnitAmountRoundingPrecision);
+                    if not (CurrFieldNo = FieldNo("Unit Price")) then begin
+                        "Unit Cost" := ConvertAmountToFCY(RetrievedCost, UnitAmountRoundingPrecisionFCY);
+                        "Unit Cost (LCY)" := Round(RetrievedCost, UnitAmountRoundingPrecision);
+                    end;
                 end else
                     RecalculateAmounts(Job."Exch. Calculation (Cost)", xRec."Unit Cost", "Unit Cost", "Unit Cost (LCY)")
         else
@@ -2421,7 +2427,6 @@ table 1003 "Job Planning Line"
 
     local procedure UpdateRemainingQuantity()
     var
-        Delta: Decimal;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -2429,11 +2434,8 @@ table 1003 "Job Planning Line"
         if IsHandled then
             exit;
 
-        if "Usage Link" and (xRec."No." = "No.") then begin
-            Delta := Quantity - xRec.Quantity;
-            Validate("Remaining Qty.", "Remaining Qty." + Delta);
-            Validate("Qty. to Transfer to Journal", "Qty. to Transfer to Journal" + Delta);
-        end;
+        if "Usage Link" then
+            ControlUsageLink();
     end;
 
     procedure UpdateQtyToTransfer()
@@ -3751,6 +3753,11 @@ table 1003 "Job Planning Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateQtyToTransfer(var JobPlanningLine: Record "Job Planning Line"; CurrFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateQuantity(JobPlanningLine: Record "Job Planning Line"; xJobPlanningLine: Record "Job Planning Line"; var SkipValidateQuantity: Boolean)
     begin
     end;
 }
