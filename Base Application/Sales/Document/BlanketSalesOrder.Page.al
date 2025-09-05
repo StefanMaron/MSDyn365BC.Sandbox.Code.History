@@ -120,7 +120,7 @@ page 507 "Blanket Sales Order"
                         field("Sell-to County"; Rec."Sell-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            CaptionClass = '5,1,' + Rec."Sell-to Country/Region Code";
+                            Caption = 'County';
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the state, province or county of the address.';
@@ -545,7 +545,7 @@ page 507 "Blanket Sales Order"
                                 field("Ship-to County"; Rec."Ship-to County")
                                 {
                                     ApplicationArea = Basic, Suite;
-                                    CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                                    Caption = 'County';
                                     Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                     QuickEntry = false;
                                     ToolTip = 'Specifies the state, province or county of the address.';
@@ -650,23 +650,6 @@ page 507 "Blanket Sales Order"
                                         Rec.SetRange("Bill-to Customer No.");
                                 CurrPage.Update();
                             end;
-
-                            trigger OnLookup(var Text: Text): Boolean
-                            var
-                                Customer: Record Customer;
-                            begin
-                                if Customer.SelectCustomer(Customer) then begin
-                                    xRec := Rec;
-                                    Rec."Bill-to Name" := Customer.Name;
-                                    Rec.Validate("Bill-to Customer No.", Customer."No.");
-                                end;
-
-                                if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
-                                    if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
-                                        Rec.SetRange("Bill-to Customer No.");
-
-                                CurrPage.Update();
-                            end;
                         }
                         field("Bill-to Address"; Rec."Bill-to Address")
                         {
@@ -715,7 +698,7 @@ page 507 "Blanket Sales Order"
                             field("Bill-to County"; Rec."Bill-to County")
                             {
                                 ApplicationArea = Basic, Suite;
-                                CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
+                                Caption = 'County';
                                 Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                                 Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                                 Importance = Additional;
