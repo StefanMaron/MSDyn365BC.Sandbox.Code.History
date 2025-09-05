@@ -817,7 +817,9 @@ table 37 "Sales Line"
                 then
                     Error(Text006, MaxQtyToInvoiceBase());
 
-                ClearVATDifference();
+                GetSalesSetup();
+                if not SalesSetup."Allow VAT Difference" then
+                    ClearVATDifference();
 
                 OnValidateQtyToInvoiceOnBeforeCalcInvDiscToInvoice(Rec, CurrFieldNo);
                 CalcInvDiscToInvoice();
@@ -1936,7 +1938,7 @@ table 37 "Sales Line"
                     FieldError("Prepmt. Line Amount", StrSubstNo(Text045, "Line Amount"));
                 if "System-Created Entry" and not IsServiceChargeLine() then
                     FieldError("Prepmt. Line Amount", StrSubstNo(Text045, 0));
-                Validate("Prepayment %", "Prepmt. Line Amount" * 100 / CalculateOutstandingAmountExclTax());
+                Validate("Prepayment %", "Prepmt. Line Amount" * 100 / "Line Amount");
             end;
         }
         field(111; "Prepmt. Amt. Inv."; Decimal)
@@ -3954,7 +3956,10 @@ table 37 "Sales Line"
     begin
         "Qty. to Invoice" := MaxQtyToInvoice();
         "Qty. to Invoice (Base)" := MaxQtyToInvoiceBase();
-        ClearVATDifference();
+
+        GetSalesSetup();
+        if not SalesSetup."Allow VAT Difference" then
+            ClearVATDifference();
 
         OnBeforeCalcInvDiscToInvoice(Rec, CurrFieldNo);
         CalcInvDiscToInvoice();
@@ -4892,6 +4897,7 @@ table 37 "Sales Line"
     var
         PriceCalculation: Interface "Price Calculation";
     begin
+        GetSalesHeader();
         GetPriceCalculationHandler(PriceType::Sale, SalesHeader, PriceCalculation);
         PriceCalculation.PickPrice();
         GetLineWithCalculatedPrice(PriceCalculation);
@@ -7858,7 +7864,10 @@ table 37 "Sales Line"
 
         "Qty. to Invoice" := MaxQtyToInvoice();
         "Qty. to Invoice (Base)" := MaxQtyToInvoiceBase();
-        "VAT Difference" := 0;
+
+        GetSalesSetup();
+        if not SalesSetup."Allow VAT Difference" then
+            "VAT Difference" := 0;
 
         OnInitQtyToShip2OnBeforeCalcInvDiscToInvoice(Rec, xRec);
 
