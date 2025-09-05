@@ -10,7 +10,6 @@ using System.Security.User;
 page 973 "Time Sheet Card"
 {
     PageType = Document;
-    RefreshOnActivate = true;
     SourceTable = "Time Sheet Header";
     Caption = 'Time Sheet';
     InsertAllowed = false;
@@ -424,7 +423,7 @@ page 973 "Time Sheet Card"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeApproveLines(Rec, IsHandled);
+        OnBeforeSubmitLines(Rec, IsHandled);
         if IsHandled then
             exit;
 
@@ -438,7 +437,7 @@ page 973 "Time Sheet Card"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeRejectLines(Rec, IsHandled);
+        OnBeforeSubmitLines(Rec, IsHandled);
         if IsHandled then
             exit;
 
@@ -526,16 +525,6 @@ page 973 "Time Sheet Card"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSubmitLines(var TimeSheetHeader: Record "Time Sheet Header"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeApproveLines(var TimeSheetHeader: Record "Time Sheet Header"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRejectLines(var TimeSheetHeader: Record "Time Sheet Header"; var IsHandled: Boolean);
     begin
     end;
 
