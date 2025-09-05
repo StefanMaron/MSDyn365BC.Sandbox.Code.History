@@ -8,6 +8,7 @@ table 8016 "Usage Data Supp. Subscription"
     DataClassification = CustomerContent;
     LookupPageId = "Usage Data Subscriptions";
     DrillDownPageId = "Usage Data Subscriptions";
+    Access = Internal;
 
     fields
     {
@@ -164,7 +165,7 @@ table 8016 "Usage Data Supp. Subscription"
         }
         field(23; "Connect to Sub. Header at Date"; Date)
         {
-            Caption = 'Connect to Subscription to Date';
+            Caption = 'Connect to Subscription at Date';
 
             trigger OnValidate()
             begin

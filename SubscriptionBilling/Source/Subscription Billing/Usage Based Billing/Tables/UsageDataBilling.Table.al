@@ -11,6 +11,7 @@ table 8006 "Usage Data Billing"
     DataClassification = CustomerContent;
     DrillDownPageId = "Usage Data Billings";
     LookupPageId = "Usage Data Billings";
+    Access = Internal;
 
     fields
     {
@@ -104,7 +105,6 @@ table 8006 "Usage Data Billing"
         {
             Caption = 'Charge Start Date';
         }
-#if not CLEANSCHEMA29
         field(17; "Charge Start Time"; Time)
         {
             Caption = 'Charge Start Time';
@@ -117,12 +117,10 @@ table 8006 "Usage Data Billing"
 #endif
             ObsoleteReason = 'No longer needed as the time component is not relevant for processing of usage data.';
         }
-#endif
         field(18; "Charge End Date"; Date)
         {
             Caption = 'Charge End Date';
         }
-#if not CLEANSCHEMA29
         field(19; "Charge End Time"; Time)
         {
             Caption = 'Charge End Time';
@@ -135,12 +133,10 @@ table 8006 "Usage Data Billing"
 #endif
             ObsoleteReason = 'No longer needed as the time component is not relevant for processing of usage data.';
         }
-#endif
         field(20; "Charged Period (Days)"; Decimal)
         {
             Caption = 'Charged Period (Days)';
         }
-#if not CLEANSCHEMA29
         field(21; "Charged Period (Hours)"; Decimal)
         {
             Caption = 'Charged Period (Hours)';
@@ -153,7 +149,6 @@ table 8006 "Usage Data Billing"
 #endif
             ObsoleteReason = 'No longer needed as the time component is not relevant for processing of usage data.';
         }
-#endif
         field(22; Quantity; Decimal)
         {
             Caption = 'Quantity';
@@ -301,7 +296,7 @@ table 8006 "Usage Data Billing"
         end;
     end;
 
-    local procedure DeleteUsageDataBillingMetadata()
+    internal procedure DeleteUsageDataBillingMetadata()
     var
         UsageDataBillingMetadata: Record "Usage Data Billing Metadata";
     begin
@@ -309,7 +304,7 @@ table 8006 "Usage Data Billing"
         UsageDataBillingMetadata.DeleteAll();
     end;
 
-    local procedure RevertServiceCommitmentNextBillingDateIfRebillingMetadataExist()
+    internal procedure RevertServiceCommitmentNextBillingDateIfRebillingMetadataExist()
     var
         ServiceCommitment: Record "Subscription Line";
         UsageDataBillingMetadata: Record "Usage Data Billing Metadata";
@@ -487,7 +482,7 @@ table 8006 "Usage Data Billing"
         PurchaseHeader.MarkedOnly(true);
     end;
 
-    local procedure MarkPurchInvHeaderFromUsageDataBilling(var UsageDataBilling: Record "Usage Data Billing"; var PurchInvHeader: Record "Purch. Inv. Header")
+    internal procedure MarkPurchInvHeaderFromUsageDataBilling(var UsageDataBilling: Record "Usage Data Billing"; var PurchInvHeader: Record "Purch. Inv. Header")
     begin
         UsageDataBilling.SetRange("Document Type", "Usage Based Billing Doc. Type"::"Posted Invoice");
         UsageDataBilling.SetFilter("Document No.", '<>%1', '');
@@ -499,7 +494,7 @@ table 8006 "Usage Data Billing"
         PurchInvHeader.MarkedOnly(true);
     end;
 
-    local procedure MarkSalesInvHeaderFromUsageDataBilling(var UsageDataBilling: Record "Usage Data Billing"; var SalesInvoiceHeader: Record "Sales Invoice Header")
+    internal procedure MarkSalesInvHeaderFromUsageDataBilling(var UsageDataBilling: Record "Usage Data Billing"; var SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
         UsageDataBilling.SetRange("Document Type", "Usage Based Billing Doc. Type"::"Posted Invoice");
         UsageDataBilling.SetFilter("Document No.", '<>%1', '');
@@ -511,7 +506,7 @@ table 8006 "Usage Data Billing"
         SalesInvoiceHeader.MarkedOnly(true);
     end;
 
-    local procedure MarkSalesHeaderFromUsageDataBilling(var UsageDataBilling: Record "Usage Data Billing"; var SalesHeader: Record "Sales Header")
+    internal procedure MarkSalesHeaderFromUsageDataBilling(var UsageDataBilling: Record "Usage Data Billing"; var SalesHeader: Record "Sales Header")
     begin
         UsageDataBilling.SetRange("Document Type", "Usage Based Billing Doc. Type"::Invoice);
         UsageDataBilling.SetFilter("Document No.", '<>%1', '');
@@ -525,7 +520,6 @@ table 8006 "Usage Data Billing"
 
     internal procedure FilterOnDocumentTypeAndDocumentNo(ServicePartner: Enum "Service Partner"; UsageBasedBillingDocType: Enum "Usage Based Billing Doc. Type"; DocumentNo: Code[20])
     begin
-        Rec.SetRange(Partner, ServicePartner);
         Rec.SetRange("Document Type", UsageBasedBillingDocType);
         Rec.SetRange("Document No.", DocumentNo);
     end;
@@ -537,7 +531,6 @@ table 8006 "Usage Data Billing"
         Rec."Document Line No." := DocumentEntryNo;
         Rec."Billing Line Entry No." := BillingLineEntryNo;
         Rec.Modify(false);
-        OnAfterSaveDocumentValues(Rec);
     end;
 
     internal procedure IsPartnerVendor(): Boolean
@@ -686,9 +679,15 @@ table 8006 "Usage Data Billing"
         exit((Rec."Document Type" <> "Usage Based Billing Doc. Type"::None) and (Rec."Document No." <> ''));
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSaveDocumentValues(UsageDateBilling: Record "Usage Data Billing")
+    internal procedure SetBillingProposalFilters(ServiceCommitment: Record "Subscription Line"; BillingFromDate: Date; BillingToDate: Date)
     begin
+        Rec.SetRange("Subscription Header No.", ServiceCommitment."Subscription Header No.");
+        Rec.SetRange("Subscription Line Entry No.", ServiceCommitment."Entry No.");
+        Rec.SetRange(Partner, ServiceCommitment.Partner);
+        Rec.SetRange("Usage Base Pricing", "Usage Based Pricing"::"Usage Quantity", "Usage Based Pricing"::"Unit Cost Surcharge");
+        Rec.SetRange("Document Type", "Usage Based Billing Doc. Type"::None);
+        Rec.SetFilter("Charge Start Date", '>=%1', BillingFromDate);
+        Rec.SetFilter("Charge End Date", '<=%1', CalcDate('<1D>', BillingToDate));
     end;
 
     var
