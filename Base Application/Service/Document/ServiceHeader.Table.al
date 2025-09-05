@@ -3296,7 +3296,7 @@ table 5900 "Service Header"
         OldDimSetID := "Dimension Set ID";
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
 
-        OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(Rec, xRec, FieldNumber);
+        OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(Rec, xRec);
         if ServItemLineExists() or ServLineExists() then
             UpdateAllLineDim("Dimension Set ID", OldDimSetID);
 
@@ -5046,7 +5046,6 @@ table 5900 "Service Header"
         "Post Code" := Cust."Post Code";
         County := Cust.County;
         "Country/Region Code" := Cust."Country/Region Code";
-        "VAT Country/Region Code" := "Country/Region Code";
         if not SkipContact then begin
             "Contact Name" := Cust.Contact;
             "Phone No." := Cust."Phone No.";
@@ -5512,15 +5511,10 @@ table 5900 "Service Header"
         ServiceContractHeader."Next Invoice Date" := ServDocReg."Next Invoice Date";
         ServiceContractHeader."Next Invoice Period Start" := ServDocReg."Next Invoice Period Start";
         ServiceContractHeader."Next Invoice Period End" := ServDocReg."Next Invoice Period End";
-        if ServiceContractHeader.Prepaid then
-            ServiceContractHeader."Last Invoice Period End" := ServiceContractHeader."Next Invoice Date" - 1;
 
         ServiceContractHeader.CalcFields("No. of Posted Invoices", "No. of Unposted Invoices");
         if (ServiceContractHeader."No. of Posted Invoices" = 0) and (ServiceContractHeader."No. of Unposted Invoices" = 1) then
             ServiceContractHeader."Last Invoice Date" := 0D;
-
-        if ServiceContractHeader."Last Invoice Date" = 0D then
-            ServiceContractHeader."Last Invoice Period End" := 0D;
 
         exit(true);
     end;
@@ -6214,7 +6208,7 @@ table 5900 "Service Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; FieldNumber: Integer);
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateUpdateAllLineDim(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header");
     begin
     end;
 
