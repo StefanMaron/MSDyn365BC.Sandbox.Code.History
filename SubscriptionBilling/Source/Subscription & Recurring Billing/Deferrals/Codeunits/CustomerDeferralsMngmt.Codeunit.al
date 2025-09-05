@@ -329,7 +329,6 @@ codeunit 8067 "Customer Deferrals Mngmt."
         InvoiceCustContractDeferral.SetRange("Contract Line No.", SalesCrMemoLine."Contract Line No.");
         if InvoiceCustContractDeferral.FindSet() then begin
             ContractDeferralRelease.GetAndTestSourceCode();
-            ContractDeferralRelease.GetGeneralLedgerSetupAndCheckJournalTemplateAndBatch();
             ContractDeferralRelease.SetAllowGUI(false);
             repeat
                 CreditMemoCustContractDeferral := InvoiceCustContractDeferral;
@@ -396,7 +395,7 @@ codeunit 8067 "Customer Deferrals Mngmt."
         CustomerContractDeferral: Record "Customer Contract Deferral";
         Navigate: Page Navigate;
     begin
-        CustomerContractDeferral.SetFilter("Document No.", DocNoFilter);
+        CustomerContractDeferral.SetRange("Document No.", DocNoFilter);
         Navigate.InsertIntoDocEntry(DocumentEntry, Database::"Customer Contract Deferral", CustomerContractDeferral."Document Type", CustomerContractDeferral.TableCaption, CustomerContractDeferral.Count);
     end;
 #endif
@@ -408,7 +407,7 @@ codeunit 8067 "Customer Deferrals Mngmt."
     begin
         if TempDocumentEntry."Table ID" <> Database::"Customer Contract Deferral" then
             exit;
-        CustomerContractDeferral.SetFilter("Document No.", DocNoFilter);
+        CustomerContractDeferral.SetRange("Document No.", DocNoFilter);
         Page.Run(Page::"Customer Contract Deferrals", CustomerContractDeferral);
     end;
 #endif
