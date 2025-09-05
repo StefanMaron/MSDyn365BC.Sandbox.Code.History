@@ -747,7 +747,6 @@ codeunit 6620 "Copy Document Mgt."
     begin
         FromSalesHeader.CalcFields("Work Description");
         ToSalesHeader.TransferFields(FromSalesHeader, false);
-        UpdateShipToAddress(ToSalesHeader);
         UpdateSalesHeaderWhenCopyFromSalesHeader(ToSalesHeader, OldSalesHeader, FromDocType);
         SetReceivedFromCountryCode(FromDocType, ToSalesHeader);
         OnAfterCopySalesHeader(ToSalesHeader, OldSalesHeader, FromSalesHeader, FromDocType);
@@ -891,11 +890,6 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     procedure CopyPurchDoc(FromDocType: Enum "Purchase Document Type From"; FromDocNo: Code[20]; var ToPurchHeader: Record "Purchase Header")
-    begin
-        CopyPurchDoc(FromDocType, FromDocNo, ToPurchHeader, false);
-    end;
-
-    procedure CopyPurchDoc(FromDocType: Enum "Purchase Document Type From"; FromDocNo: Code[20]; var ToPurchHeader: Record "Purchase Header"; ClearVendorFieldsOnTarget: Boolean)
     var
         ToPurchLine: Record "Purchase Line";
         FromPurchHeader: Record "Purchase Header";
@@ -971,7 +965,7 @@ codeunit 6620 "Copy Document Mgt."
         if IncludeHeader then
             CopyPurchDocUpdateHeader(
                 FromDocType, FromDocNo, ToPurchHeader, FromPurchHeader,
-                FromPurchRcptHeader, FromPurchInvHeader, FromReturnShptHeader, FromPurchCrMemoHeader, FromPurchHeaderArchive, ReleaseDocument, ClearVendorFieldsOnTarget)
+                FromPurchRcptHeader, FromPurchInvHeader, FromReturnShptHeader, FromPurchCrMemoHeader, FromPurchHeaderArchive, ReleaseDocument)
         else
             OnCopyPurchDocWithoutHeader(ToPurchHeader, FromDocType.AsInteger(), FromDocNo, FromDocOccurrenceNo, FromDocVersionNo, FromPurchInvHeader, FromPurchCrMemoHeader);
 
@@ -1170,7 +1164,7 @@ codeunit 6620 "Copy Document Mgt."
             until FromPurchLineArchive.Next() = 0;
     end;
 
-    local procedure CopyPurchDocUpdateHeader(FromDocType: Enum "Purchase Document Type From"; FromDocNo: Code[20]; var ToPurchHeader: Record "Purchase Header"; FromPurchHeader: Record "Purchase Header"; FromPurchRcptHeader: Record "Purch. Rcpt. Header"; FromPurchInvHeader: Record "Purch. Inv. Header"; FromReturnShptHeader: Record "Return Shipment Header"; FromPurchCrMemoHeader: Record "Purch. Cr. Memo Hdr."; FromPurchHeaderArchive: Record "Purchase Header Archive"; var ReleaseDocument: Boolean; ClearVendorFieldsOnTarget: Boolean)
+    local procedure CopyPurchDocUpdateHeader(FromDocType: Enum "Purchase Document Type From"; FromDocNo: Code[20]; var ToPurchHeader: Record "Purchase Header"; FromPurchHeader: Record "Purchase Header"; FromPurchRcptHeader: Record "Purch. Rcpt. Header"; FromPurchInvHeader: Record "Purch. Inv. Header"; FromReturnShptHeader: Record "Return Shipment Header"; FromPurchCrMemoHeader: Record "Purch. Cr. Memo Hdr."; FromPurchHeaderArchive: Record "Purchase Header Archive"; var ReleaseDocument: Boolean)
     var
         Vend: Record Vendor;
         OldPurchHeader: Record "Purchase Header";
@@ -1237,9 +1231,6 @@ codeunit 6620 "Copy Document Mgt."
         ToPurchHeader."Applies-to Doc. No." := '';
         ToPurchHeader."Applies-to ID" := '';
         ToPurchHeader."Quote No." := '';
-        if ClearVendorFieldsOnTarget then
-            ClearPurchaseHeaderVendorFields(ToPurchHeader);
-
         OnCopyPurchDocUpdateHeaderOnBeforeUpdateVendLedgerEntry(ToPurchHeader, FromDocType.AsInteger(), FromDocNo);
 
         if ((FromDocType = "Purchase Document Type From"::"Posted Invoice") and
@@ -1310,7 +1301,7 @@ codeunit 6620 "Copy Document Mgt."
 
         ToPurchHeader.Validate("Buy-from Vendor No.", FromPurchInvHeader."Buy-from Vendor No.");
 
-        if PurchasesPayablesSetup.ShouldDocumentTotalAmountsBeChecked(ToPurchHeader) then begin
+        if PurchasesPayablesSetup."Check Doc. Total Amounts" then begin
             FromPurchInvHeader.CalcFields("Amount Including VAT", Amount);
             ToPurchHeader.Validate("Doc. Amount Incl. VAT", FromPurchInvHeader."Amount Including VAT");
             ToPurchHeader.Validate("Doc. Amount VAT", FromPurchInvHeader."Amount Including VAT" - FromPurchInvHeader.Amount);
@@ -4576,7 +4567,7 @@ codeunit 6620 "Copy Document Mgt."
         JobPlanningLine.SetRange("Job Contract Entry No.", JobContractEntryNo);
         if JobPlanningLine.FindFirst() then begin
             NewJobPlanningLine.InitFromJobPlanningLine(JobPlanningLine, SalesLine.Quantity);
-            OnCreateJobPlanningLineOnAfterInitFromJobPlanningLine(NewJobPlanningLine, JobPlanningLine, SalesLine);
+
             JobPlanningLineInvoice.InitFromJobPlanningLine(NewJobPlanningLine);
             JobPlanningLineInvoice.InitFromSales(SalesHeader, SalesHeader."Posting Date", SalesLine."Line No.");
             JobPlanningLineInvoice.Insert();
@@ -8212,7 +8203,7 @@ codeunit 6620 "Copy Document Mgt."
     /// <param name="NextLineNo">The next line number for the target document.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCopyPurchLine(var ToPurchHeader: Record "Purchase Header"; FromPurchHeader: Record "Purchase Header"; FromPurchLine: Record "Purchase Line"; RecalculateAmount: Boolean; var CopyThisLine: Boolean; ToPurchLine: Record "Purchase Line"; MoveNegLines: Boolean; var RoundingLineInserted: Boolean; var Result: Boolean; var IsHandled: Boolean; FromPurchDocType: Enum "Purchase Document Type From"; DocLineNo: Integer;
-                                                                                                                                                                                                                                                                                                                                                                                                  RecalculateLines: Boolean; var LinesNotCopied: Integer; var CopyPostedDeferral: Boolean; var NextLineNo: Integer)
+                                                                                                                                                                                                                                                                                                                                                                                                 RecalculateLines: Boolean; var LinesNotCopied: Integer; var CopyPostedDeferral: Boolean; var NextLineNo: Integer)
     begin
     end;
 
@@ -8375,14 +8366,6 @@ codeunit 6620 "Copy Document Mgt."
     begin
         if SkipOldInvoiceDesc and RcptOrShipLineExist then
             SkipCopyFromDescription := true;
-    end;
-
-    local procedure ClearPurchaseHeaderVendorFields(var ToPurchHeader: Record "Purchase Header")
-    begin
-        ToPurchHeader."Vendor Order No." := '';
-        ToPurchHeader."Vendor Invoice No." := '';
-        ToPurchHeader."Vendor Cr. Memo No." := '';
-        ToPurchHeader."Vendor Shipment No." := '';
     end;
 
     [IntegrationEvent(false, false)]
@@ -11861,7 +11844,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopySalesCrMemoLinesToDocOnAfterFillSalesLineBuffer(var ToSalesHeader: Record "Sales Header"; var FromSalesLineBuf: Record "Sales Line" temporary)
+    local procedure OnCopySalesCrMemoLinesToDocOnAfterFillSalesLineBuffer(ToSalesHeader: Record "Sales Header"; var FromSalesLineBuf: Record "Sales Line" temporary)
     begin
     end;
 
@@ -12524,11 +12507,6 @@ codeunit 6620 "Copy Document Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnCopyArchSalesLineOnBeforeIncrementLinesNotCopied(FromSalesLineArchive: Record "Sales Line Archive"; var ShouldIncrementLinesNotCopied: Boolean; var LinesNotCopied: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateJobPlanningLineOnAfterInitFromJobPlanningLine(var NewJobPlanningLine: Record "Job Planning Line"; JobPlanningLine: Record "Job Planning Line"; SalesLine: Record "Sales Line")
     begin
     end;
 }
