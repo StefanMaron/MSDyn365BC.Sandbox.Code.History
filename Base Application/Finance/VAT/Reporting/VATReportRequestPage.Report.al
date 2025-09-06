@@ -89,7 +89,7 @@ report 742 "VAT Report Request Page"
     {
     }
 
-    protected var
+    var
         Selection: Enum "VAT Statement Report Selection";
         PeriodSelection: Enum "VAT Statement Report Period Selection";
 }
