@@ -403,19 +403,14 @@ codeunit 130456 "Test Suite Mgt."
                     Dialog.Update(2, format(Counter) + '/' + format(TotalCount) + ' (' + format(round(Counter / TotalCount * 100, 1)) + '%)');
                 end;
 
-                if TestMethodLine."Data Input Group Code" <> '' then begin
-                    TempTestMethodLine.TransferFields(TestMethodLine);
-                    TempTestMethodLine.Insert();
-                    ExpandDataDrivenTests.SetDataDrivenTests(TempTestMethodLine);
-                    BindSubscription(ExpandDataDrivenTests);
-                end;
-
+                TempTestMethodLine.TransferFields(TestMethodLine);
+                TempTestMethodLine.Insert();
+                ExpandDataDrivenTests.SetDataDrivenTests(TempTestMethodLine);
+                BindSubscription(ExpandDataDrivenTests);
                 TestRunnerGetMethods.SetUpdateTests(true);
                 TestRunnerGetMethods.Run(TestMethodLine);
-                if TempTestMethodLine."Data Input Group Code" <> '' then begin
-                    UnbindSubscription(ExpandDataDrivenTests);
-                    TempTestMethodLine.DeleteAll();
-                end;
+                UnbindSubscription(ExpandDataDrivenTests);
+                TempTestMethodLine.DeleteAll();
             until TestMethodLine.Next() = 0;
 
         if GuiAllowed() then
@@ -486,8 +481,7 @@ codeunit 130456 "Test Suite Mgt."
         CodeunitTestMethodLine.SetRange("Test Codeunit", TestMethodLine."Test Codeunit");
         CodeunitTestMethodLine.SetRange("Line Type", TestMethodLine."Line Type"::Codeunit);
         CodeunitTestMethodLine.SetAscending("Line No.", true);
-        if not CodeunitTestMethodLine.FindLast() then
-            CodeunitTestMethodLine."Line No." := TestMethodLine."Line No.";
+        CodeunitTestMethodLine.FindLast();
 
         NextCodeunitTestMethodLine.SetFilter("Line No.", '>%1', TestMethodLine."Line No.");
         NextCodeunitTestMethodLine.SetRange("Test Suite", TestMethodLine."Test Suite");
