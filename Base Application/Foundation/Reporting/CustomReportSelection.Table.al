@@ -304,8 +304,6 @@ table 9657 "Custom Report Selection"
                         Validate("Email Body Layout Code", ReportSelections."Email Body Layout Code");
                     Validate("Email Body Layout Name", ReportSelections."Email Body Layout Name");
                     Validate("Email Body Layout AppID", ReportSelections."Email Body Layout AppID");
-                    Validate("Email Attachment Layout Name", ReportSelections."Report Layout Name");
-                    Validate("Email Attachment Layout AppID", ReportSelections."Report Layout AppID");
                     OnCopyFromReportSelectionsOnBeforeInsert(Rec, ReportSelections);
                     Insert();
                     SequenceNo += 1;
