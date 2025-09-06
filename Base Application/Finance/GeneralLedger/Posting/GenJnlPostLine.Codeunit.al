@@ -178,6 +178,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         OriginalEntryExist: Boolean;
         TotalAmountForTax: Decimal;
         ForceDocBalance: Boolean;
+        BillSettlementGainLoss: Boolean;
         Text1100013: Label 'You do not have permissions to apply or unapply documents in the Cartera Module.';
 
         NeedsRoundingErr: Label '%1 needs to be rounded', Comment = '%1 - amount';
@@ -5383,7 +5384,9 @@ codeunit 12 "Gen. Jnl.-Post Line"
             ExistDtldCVLedgEntryBuf := not DetailedCVLedgEntryBuffer.IsEmpty();
             DtldLedgEntryInserted := not DetailedCVLedgEntryBuffer.IsEmpty();
 
+            CheckIfRealisedGainLossSettlement(AdjAmount);
             AccNo := GetVendCarteraAccountNo(GenJournalLine, VendPostingGr);
+            BillSettlementGainLoss := false;
 
             CalcPostingBufferTotals(TempDimensionPostingBuffer);
             PayableAccAmtLCY := TempDimensionPostingBuffer.Amount - (DocAmountLCY + CollDocAmountLCY);
@@ -5436,9 +5439,9 @@ codeunit 12 "Gen. Jnl.-Post Line"
             AccNo := VendPostingGr."Bills Account";
         end else begin
             VendPostingGr.TestField("Payables Account");
-            AccNo := VendPostingGr."Payables Account";
+            AccNo := VendPostingGr.GetPayablesAccount();
         end;
-        if CollDocAmountLCY <> 0 then
+        if (CollDocAmountLCY <> 0) and (not BillSettlementGainLoss) then
             case GenJnlLine."Applies-to Doc. Type" of
                 GenJnlLine."Applies-to Doc. Type"::Bill:
                     AccNo := VendPostingGr.GetBillsInPmtOrderAccount();
@@ -9785,6 +9788,19 @@ codeunit 12 "Gen. Jnl.-Post Line"
             exit(GetVendorPayablesAccount(GenJournalLine, VendPostingGr));
         end else
             exit(GetVendorPayablesAccount(GenJournalLine, VendPostingGr));
+    end;
+
+    local procedure CheckIfRealisedGainLossSettlement(AdjAmount: array[4] of Decimal)
+    var
+        i: Integer;
+    begin
+        if not FromBillSettlement then
+            exit;
+        BillSettlementGainLoss := false;
+
+        for i := 1 to ArrayLen(AdjAmount) do
+            if AdjAmount[i] <> 0 then
+                BillSettlementGainLoss := true;
     end;
 
     [IntegrationEvent(true, false)]
