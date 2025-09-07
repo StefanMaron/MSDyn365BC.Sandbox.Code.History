@@ -639,6 +639,13 @@ table 125 "Purch. Cr. Memo Line"
         {
             Caption = 'Price Calculation Method';
         }
+        field(8512; "Buy-from Vendor Name"; Text[100])
+        {
+            CalcFormula = lookup(Vendor.Name where("No." = field("Buy-from Vendor No.")));
+            Caption = 'Buy-from Vendor Name';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(10017; "Provincial Tax Area Code"; Code[20])
         {
             Caption = 'Provincial Tax Area Code';
@@ -947,6 +954,53 @@ table 125 "Purch. Cr. Memo Line"
     begin
         VATPct := "VAT %";
         OnAfterGetVATPct(Rec, VATPct);
+    end;
+
+    internal procedure GetPurchaseInvoiceLine(var PurchInvLine: Record "Purch. Inv. Line")
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        ValueEntry: Record "Value Entry";
+    begin
+        CheckApplFromItemLedgEntry(ItemLedgerEntry);
+
+        if ItemLedgerEntry."Entry No." = 0 then
+            FindItemLedgerEntryFromItemApplicationEntry(ItemLedgerEntry);
+
+        ValueEntry.SetLoadFields("Item Ledger Entry No.", "Item Ledger Entry Type", "Document Type", "Document No.", "Document Line No.");
+        ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+        ValueEntry.SetRange("Item Ledger Entry Type", ItemLedgerEntry."Entry Type");
+        ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Purchase Invoice");
+        if ValueEntry.FindFirst() then
+            PurchInvLine.Get(ValueEntry."Document No.", ValueEntry."Document Line No.");
+    end;
+
+    local procedure CheckApplFromItemLedgEntry(var ItemLedgerEntry: Record "Item Ledger Entry")
+    begin
+        if "Appl.-to Item Entry" = 0 then
+            exit;
+
+        TestField(Type, Type::Item);
+        TestField(Quantity);
+        ItemLedgerEntry.Get("Appl.-to Item Entry");
+        ItemLedgerEntry.TestField(Positive, true);
+        ItemLedgerEntry.TestField("Item No.", "No.");
+        ItemLedgerEntry.TestField("Variant Code", "Variant Code");
+        ItemLedgerEntry.CheckTrackingDoesNotExist(RecordId, FieldCaption("Appl.-to Item Entry"));
+    end;
+
+    local procedure FindItemLedgerEntryFromItemApplicationEntry(var ItemLedgerEntry: Record "Item Ledger Entry")
+    var
+        ItemApplicationEntry: Record "Item Application Entry";
+        TempItemLedEntry: Record "Item Ledger Entry" temporary;
+        ItemTrackingDocMgmt: Codeunit "Item Tracking Doc. Management";
+    begin
+        ItemTrackingDocMgmt.RetrieveEntriesFromPostedInvoice(TempItemLedEntry, RowID1());
+        if TempItemLedEntry.IsEmpty then
+            exit;
+
+        TempItemLedEntry.FindFirst();
+        if ItemApplicationEntry.AppliedFromEntryExists(TempItemLedEntry."Entry No.") then
+            ItemLedgerEntry.Get(ItemApplicationEntry."Outbound Item Entry No.");
     end;
 
     [IntegrationEvent(false, false)]
