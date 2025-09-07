@@ -298,7 +298,6 @@ codeunit 7000000 CarteraManagement
         CarteraDoc.SetRange("On Hold", false);
         if CarteraDoc.FindSet() then
             repeat
-                Vendor.SetLoadFields(Blocked);
                 if Vendor.Get(CarteraDoc."Account No.") then
                     if Vendor.Blocked = Vendor.Blocked::" " then
                         if not (PmtOrd."Export Electronic Payment") then

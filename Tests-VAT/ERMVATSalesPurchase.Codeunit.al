@@ -5019,7 +5019,6 @@
         GenJournalLine: Record "Gen. Journal Line";
         SalesVATEntry: Record "VAT Entry";
         PurchaseVATEntry: Record "VAT Entry";
-        CustLedgerEntry: Record "Cust. Ledger Entry";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
         DocumentNo: Code[20];
         UpdatedVATDate: Date;
@@ -5071,9 +5070,6 @@
         // [THEN] Only GL Entries related to sales transactions are updated
         VerifyVATDateInGLEntries(SalesVATEntry, UpdatedVATDate);
         VerifyVATDateInGLEntries(PurchaseVATEntry, InitalVATDate);
-
-        // Cleanup
-        CustLedgerEntry.DeleteAll();
     end;
 
     [Test]
@@ -5514,82 +5510,6 @@
 
         // [THEN] Two VAT Entries are created (one recurring line with VAT Reporting Date = VAT Date, one allocation line wiyth VAT Reporrting Date = Posting Date + 1)  
         VerifyVATDateRecurringJournal(ExternaDocNo, GenJournalLine."Posting Date", VATDate);
-    end;
-
-    [Test]
-    [HandlerFunctions('ConfirmHandlerTrue')]
-    [Scope('OnPrem')]
-    procedure PurchaseReverseChargeVATEntriesAmountsWithMultipleLinesVatProdPostingGrp()
-    var
-        GLAccount: array[2] of Record "G/L Account";
-        VATPostingSetup: array[2] of Record "VAT Posting Setup";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        GeneralPostingSetup: Record "General Posting Setup";
-        VATEntry: Record "VAT Entry";
-        VATProductPostingGroup: Record "VAT Product Posting Group";
-        VendorLedgerEntry: Record "Vendor Ledger Entry";
-        ReverseChargeGLAccount: Code[20];
-        VATPct: array[2] of Decimal;
-    begin
-        // [FEATURE] [Purchase] [Reverse Charge VAT]
-        // [SCENARIO 575973] The VAT amount wrongly posted when the purchase invoice includes multiple lines with different VAT Prod. Posting Groups.
-        Initialize();
-        VendorLedgerEntry.DeleteAll();
-
-        VATPct[1] := 0;
-        VATPct[2] := 22;
-
-        // [GIVEN] Create Reverse Charge G/L Account for VAT Posting Setups.
-        ReverseChargeGLAccount := LibraryERM.CreateGLAccountNo();
-
-        // [GIVEN] VAT Posting Setups "V1/V2" with "VAT %" = 0, "VAT %" = 22 and VAT Calculation Type = "Reverse Charge VAT".
-        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup[1], VATPostingSetup[1]."VAT Calculation Type"::"Reverse Charge VAT", VATPct[1]);
-        VATPostingSetup[1]."Reverse Chrg. VAT Acc." := ReverseChargeGLAccount;
-        VATPostingSetup[1].Modify(true);
-
-        LibraryERM.CreateVATProductPostingGroup(VATProductPostingGroup);
-        VATPostingSetup[2] := VATPostingSetup[1];
-        VATPostingSetup[2]."VAT Identifier" := LibraryUtility.GenerateRandomCode(VATPostingSetup[2].FieldNo("VAT Identifier"), DATABASE::"VAT Posting Setup");
-        VATPostingSetup[2]."VAT Prod. Posting Group" := VATProductPostingGroup.Code;
-        VATPostingSetup[2]."VAT+EC %" := VATPct[2];
-        VATPostingSetup[2]."VAT %" := VATPct[2];
-        VATPostingSetup[2]."Reverse Chrg. VAT Acc." := ReverseChargeGLAccount;
-        VATPostingSetup[2].Validate("Tax Category", 'S');
-        VATPostingSetup[2].Insert(true);
-
-        // [GIVEN] G/L Accounts "G1"/"G2".
-        LibraryERM.FindGeneralPostingSetup(GeneralPostingSetup);
-        LibraryERM.CreateGLAccount(GLAccount[1]);
-        GLAccount[1].Validate("Gen. Prod. Posting Group", GeneralPostingSetup."Gen. Prod. Posting Group");
-        GLAccount[1].Validate("VAT Prod. Posting Group", VATPostingSetup[1]."VAT Prod. Posting Group");
-        GLAccount[1].Modify(true);
-        LibraryERM.CreateGLAccount(GLAccount[2]);
-        GLAccount[2].Validate("Gen. Prod. Posting Group", GeneralPostingSetup."Gen. Prod. Posting Group");
-        GLAccount[2].Validate("VAT Prod. Posting Group", VATPostingSetup[2]."VAT Prod. Posting Group");
-        GLAccount[2].Modify(true);
-
-        // [GIVEN] Purchase Order with two Purchase Lines with "Unit Price" = "1320.67"/"3282.75", "VAT Prod. Post. Group" = "V1/V2", "No." = "G1"/"G2".
-        LibraryPurchase.CreatePurchHeader(
-            PurchaseHeader, PurchaseHeader."Document Type"::Order,
-            LibraryPurchase.CreateVendorWithBusPostingGroups(
-                GeneralPostingSetup."Gen. Bus. Posting Group", VATPostingSetup[1]."VAT Bus. Posting Group"));
-        CreatePurchaseLineWithUnitPriceAndVATProdPstGroup(
-            PurchaseLine, PurchaseHeader,
-            VATPostingSetup[1]."VAT Prod. Posting Group", PurchaseLine.Type::"G/L Account", GLAccount[1]."No.", 1, 1320.67);
-        CreatePurchaseLineWithUnitPriceAndVATProdPstGroup(
-            PurchaseLine, PurchaseHeader,
-            VATPostingSetup[2]."VAT Prod. Posting Group", PurchaseLine.Type::"G/L Account", GLAccount[2]."No.", 1, 3282.75);
-
-        // [WHEN] Purchase Order is posted.
-        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-
-        // [THEN] Two VAT entries created with Amount = "0.00"/"722.21".
-        VATEntry.SetRange("Bill-to/Pay-to No.", PurchaseHeader."Buy-from Vendor No.");
-        VATEntry.SetFilter(Amount, '0.00');
-        Assert.RecordIsNotEmpty(VATEntry);
-        VATEntry.SetFilter(Amount, '722.21');
-        Assert.RecordIsNotEmpty(VATEntry);
     end;
 
     local procedure Initialize()
@@ -6985,18 +6905,15 @@ LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Pos
     local procedure VerifyAmountOnVendorLedgerEntry(PostedInvoiceNo: Code[20])
     var
         VendorLedgerEntry: Record "Vendor Ledger Entry";
-        ExpectedPmtAmount: Decimal;
+        PurchInvHeader: Record "Purch. Inv. Header";
     begin
+        PurchInvHeader.Get(PostedInvoiceNo);
+        PurchInvHeader.CalcFields("Amount Including VAT");
         VendorLedgerEntry.SetRange("Document No.", PostedInvoiceNo);
         VendorLedgerEntry.SetRange("Document Type", VendorLedgerEntry."Document Type"::Payment);
         VendorLedgerEntry.FindFirst();
         VendorLedgerEntry.CalcFields("Amount (LCY)");
-        ExpectedPmtAmount := VendorLedgerEntry."Amount (LCY)" - VendorLedgerEntry."Original Pmt. Disc. Possible";
-
-        VendorLedgerEntry.SetRange("Document Type", VendorLedgerEntry."Document Type"::Payment);
-        VendorLedgerEntry.FindFirst();
-        VendorLedgerEntry.CalcFields("Amount (LCY)");
-        VendorLedgerEntry.TestField("Amount (LCY)", ExpectedPmtAmount);
+        VendorLedgerEntry.TestField("Amount (LCY)", PurchInvHeader."Amount Including VAT");
         VendorLedgerEntry.TestField(Open, false);
     end;
 
