@@ -108,7 +108,6 @@ codeunit 7768 "AOAI Deployments"
         exit(AOAIDeploymentsImpl.GetGPT4Preview(CallerModuleInfo));
     end;
 #endif
-
 #if not CLEAN27
     /// <summary>
     /// Returns the name of the latest AOAI deployment model of GPT4o.
@@ -161,7 +160,7 @@ codeunit 7768 "AOAI Deployments"
         NavApp.GetCallerModuleInfo(CallerModuleInfo);
         exit(AOAIDeploymentsImpl.GetGPT4oMiniPreview(CallerModuleInfo));
     end;
-#endif    
+#endif
 
     /// <summary>
     /// Returns the name of the latest AOAI deployment model of GPT-4.1.
