@@ -1,9 +1,8 @@
+#if not CLEAN26
 namespace Microsoft.SubscriptionBilling;
 
 using System.Upgrade;
-#if not CLEANSCHEMA29
 using Microsoft.Finance.GeneralLedger.Setup;
-#endif
 
 codeunit 8032 "Upgrade Subscription Billing"
 {
@@ -16,54 +15,12 @@ codeunit 8032 "Upgrade Subscription Billing"
 
     trigger OnUpgradePerCompany()
     begin
-#if not CLEANSCHEMA29
         UpdateClosedFlagForServiceCommitments();
         UpdateSourceNoForServiceObjects();
         UpdateTypeNoForContractLines();
         UpdateSourceNoForContractAnalysisEntries();
         UpdateDefaultPeriodsInServiceContractSetup();
         MoveCustContrDimensionToServiceContractSetup();
-#endif
-        UpdateCreateContractDeferralsFlag();
-    end;
-
-#if not CLEANSCHEMA29
-    local procedure UpdateTypeNoForContractLines()
-    var
-        CustomerContractLine: Record "Cust. Sub. Contract Line";
-        VendorContractLine: Record "Vend. Sub. Contract Line";
-        ServiceObject: Record "Subscription Header";
-        UpgradeTag: Codeunit "Upgrade Tag";
-    begin
-        if UpgradeTag.HasUpgradeTag(GetTypeNoForContractLinesUpgradeTag()) then
-            exit;
-
-        CustomerContractLine.SetRange("Contract Line Type", CustomerContractLine."Contract Line Type"::"Service Commitment");
-        if CustomerContractLine.FindSet() then
-            repeat
-                if ServiceObject.Get(CustomerContractLine."Subscription Header No.") then begin
-                    CustomerContractLine."Contract Line Type" := CustomerContractLine."Contract Line Type"::Item;
-                    CustomerContractLine."No." := ServiceObject."Source No.";
-                    CustomerContractLine.Modify();
-                end;
-            until CustomerContractLine.Next() = 0;
-
-        VendorContractLine.SetRange("Contract Line Type", VendorContractLine."Contract Line Type"::"Service Commitment");
-        if VendorContractLine.FindSet() then
-            repeat
-                if ServiceObject.Get(VendorContractLine."Subscription Header No.") then begin
-                    VendorContractLine."Contract Line Type" := VendorContractLine."Contract Line Type"::Item;
-                    VendorContractLine."No." := ServiceObject."Source No.";
-                    VendorContractLine.Modify();
-                end;
-            until VendorContractLine.Next() = 0;
-
-        UpgradeTag.SetUpgradeTag(GetTypeNoForContractLinesUpgradeTag());
-    end;
-
-    local procedure GetTypeNoForContractLinesUpgradeTag(): Code[250]
-    begin
-        exit('MS-565334-TypeNoForContractLinessUpgradeTag-20250205');
     end;
 
     local procedure UpdateClosedFlagForServiceCommitments()
@@ -99,7 +56,7 @@ codeunit 8032 "Upgrade Subscription Billing"
         UpgradeTag.SetUpgradeTag(GetClosedFlagUpgradeTag());
     end;
 
-    local procedure GetClosedFlagUpgradeTag(): Code[250]
+    internal procedure GetClosedFlagUpgradeTag(): Code[250]
     begin
         exit('MS-XXXXXX-ClosedFlagUpgradeTag-20241110');
     end;
@@ -122,9 +79,47 @@ codeunit 8032 "Upgrade Subscription Billing"
         UpgradeTag.SetUpgradeTag(GetSourceNoForServiceObjectsUpgradeTag());
     end;
 
-    local procedure GetSourceNoForServiceObjectsUpgradeTag(): Code[250]
+    internal procedure GetSourceNoForServiceObjectsUpgradeTag(): Code[250]
     begin
         exit('MS-565334-SourceNoForServiceObjectsUpgradeTag-20250205');
+    end;
+
+    local procedure UpdateTypeNoForContractLines()
+    var
+        CustomerContractLine: Record "Cust. Sub. Contract Line";
+        VendorContractLine: Record "Vend. Sub. Contract Line";
+        ServiceObject: Record "Subscription Header";
+        UpgradeTag: Codeunit "Upgrade Tag";
+    begin
+        if UpgradeTag.HasUpgradeTag(GetTypeNoForContractLinesUpgradeTag()) then
+            exit;
+
+        CustomerContractLine.SetRange("Contract Line Type", CustomerContractLine."Contract Line Type"::"Service Commitment");
+        if CustomerContractLine.FindSet() then
+            repeat
+                if ServiceObject.Get(CustomerContractLine."Subscription Header No.") then begin
+                    CustomerContractLine."Contract Line Type" := CustomerContractLine."Contract Line Type"::Item;
+                    CustomerContractLine."No." := ServiceObject."Source No.";
+                    CustomerContractLine.Modify();
+                end;
+            until CustomerContractLine.Next() = 0;
+
+        VendorContractLine.SetRange("Contract Line Type", VendorContractLine."Contract Line Type"::"Service Commitment");
+        if VendorContractLine.FindSet() then
+            repeat
+                if ServiceObject.Get(VendorContractLine."Subscription Header No.") then begin
+                    VendorContractLine."Contract Line Type" := VendorContractLine."Contract Line Type"::Item;
+                    VendorContractLine."No." := ServiceObject."Source No.";
+                    VendorContractLine.Modify();
+                end;
+            until VendorContractLine.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(GetTypeNoForContractLinesUpgradeTag());
+    end;
+
+    internal procedure GetTypeNoForContractLinesUpgradeTag(): Code[250]
+    begin
+        exit('MS-565334-TypeNoForContractLinessUpgradeTag-20250205');
     end;
 
     local procedure UpdateSourceNoForContractAnalysisEntries()
@@ -145,7 +140,7 @@ codeunit 8032 "Upgrade Subscription Billing"
         UpgradeTag.SetUpgradeTag(GetSourceNoForContractAnalysisEntriesUpgradeTag());
     end;
 
-    local procedure GetSourceNoForContractAnalysisEntriesUpgradeTag(): Code[250]
+    internal procedure GetSourceNoForContractAnalysisEntriesUpgradeTag(): Code[250]
     begin
         exit('MS-565334-SourceNoForContractAnalysisEntriesTag-20250205');
     end;
@@ -167,7 +162,7 @@ codeunit 8032 "Upgrade Subscription Billing"
         UpgradeTag.SetUpgradeTag(GetUpdateDefaultPeriodsInServiceContractSetupUpgradeTag());
     end;
 
-    local procedure GetUpdateDefaultPeriodsInServiceContractSetupUpgradeTag(): Code[250]
+    internal procedure GetUpdateDefaultPeriodsInServiceContractSetupUpgradeTag(): Code[250]
     begin
         exit('MS-565334-DefaultPeriodsInServiceContractSetupsTag-20250205');
     end;
@@ -192,83 +187,20 @@ codeunit 8032 "Upgrade Subscription Billing"
         UpgradeTag.SetUpgradeTag(GetMoveCustContrDimensionUpgradeTag());
     end;
 
-    local procedure GetMoveCustContrDimensionUpgradeTag(): Code[250]
+    internal procedure GetMoveCustContrDimensionUpgradeTag(): Code[250]
     begin
         exit('MS-565334-MoveCustContrDimension-20250205');
     end;
-#endif
-
-    local procedure UpdateCreateContractDeferralsFlag()
-    var
-        SubPackageLineTemplate: Record "Sub. Package Line Template";
-        SubscriptionPackageLine: Record "Subscription Package Line";
-        SalesSubscriptionLine: Record "Sales Subscription Line";
-        SubscriptionLine: Record "Subscription Line";
-        SubscriptionContractType: Record "Subscription Contract Type";
-        CustomerSubscriptionContract: Record "Customer Subscription Contract";
-        VendorSubscriptionContract: Record "Vendor Subscription Contract";
-        ImportedCustSubContract: Record "Imported Cust. Sub. Contract";
-        ImportedSubscriptionLine: Record "Imported Subscription Line";
-        UpgradeTag: Codeunit "Upgrade Tag";
-    begin
-        if UpgradeTag.HasUpgradeTag(GetUpdateCreateContractDeferralsFlag()) then
-            exit;
-
-        SubPackageLineTemplate.SetRange("Invoicing via", Enum::"Invoicing Via"::Sales);
-        SubPackageLineTemplate.ModifyAll("Create Contract Deferrals", Enum::"Create Contract Deferrals"::No);
-
-        SubscriptionPackageLine.SetRange("Invoicing via", Enum::"Invoicing Via"::Sales);
-        SubscriptionPackageLine.ModifyAll("Create Contract Deferrals", Enum::"Create Contract Deferrals"::No);
-
-        SalesSubscriptionLine.SetRange("Invoicing via", Enum::"Invoicing Via"::Sales);
-        SalesSubscriptionLine.ModifyAll("Create Contract Deferrals", Enum::"Create Contract Deferrals"::No);
-
-        SubscriptionLine.SetRange("Invoicing via", Enum::"Invoicing Via"::Sales);
-        SubscriptionLine.ModifyAll("Create Contract Deferrals", Enum::"Create Contract Deferrals"::No);
-
-        SubscriptionContractType.SetRange("Def. Without Contr. Deferrals", true);
-        SubscriptionContractType.ModifyAll("Create Contract Deferrals", false);
-        SubscriptionContractType.SetRange("Def. Without Contr. Deferrals", false);
-        SubscriptionContractType.ModifyAll("Create Contract Deferrals", true);
-
-        CustomerSubscriptionContract.SetRange("Without Contract Deferrals", true);
-        CustomerSubscriptionContract.ModifyAll("Create Contract Deferrals", false);
-        CustomerSubscriptionContract.SetRange("Without Contract Deferrals", false);
-        CustomerSubscriptionContract.ModifyAll("Create Contract Deferrals", true);
-
-        VendorSubscriptionContract.SetRange("Without Contract Deferrals", true);
-        VendorSubscriptionContract.ModifyAll("Create Contract Deferrals", false);
-        VendorSubscriptionContract.SetRange("Without Contract Deferrals", false);
-        VendorSubscriptionContract.ModifyAll("Create Contract Deferrals", true);
-
-        ImportedCustSubContract.SetRange("Without Contract Deferrals", true);
-        ImportedCustSubContract.ModifyAll("Create Contract Deferrals", false);
-        ImportedCustSubContract.SetRange("Without Contract Deferrals", false);
-        ImportedCustSubContract.ModifyAll("Create Contract Deferrals", true);
-
-        ImportedSubscriptionLine.SetRange("Invoicing via", Enum::"Invoicing Via"::Sales);
-        ImportedSubscriptionLine.ModifyAll("Create Contract Deferrals", Enum::"Create Contract Deferrals"::No);
-
-        UpgradeTag.SetUpgradeTag(GetUpdateCreateContractDeferralsFlag());
-    end;
-
-    internal procedure GetUpdateCreateContractDeferralsFlag(): Code[250]
-    begin
-        exit('MS-XXXXXX-UpdateCreateContractDeferralsFlag-20250321');
-    end;
-
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerCompanyUpgradeTags', '', false, false)]
     local procedure RegisterPerCompanyTags(var PerCompanyUpgradeTags: List of [Code[250]])
     begin
-#if not CLEANSCHEMA29
-        PerCompanyUpgradeTags.Add(GetTypeNoForContractLinesUpgradeTag());
         PerCompanyUpgradeTags.Add(GetClosedFlagUpgradeTag());
         PerCompanyUpgradeTags.Add(GetSourceNoForServiceObjectsUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetTypeNoForContractLinesUpgradeTag());
         PerCompanyUpgradeTags.Add(GetSourceNoForContractAnalysisEntriesUpgradeTag());
         PerCompanyUpgradeTags.Add(GetUpdateDefaultPeriodsInServiceContractSetupUpgradeTag());
         PerCompanyUpgradeTags.Add(GetMoveCustContrDimensionUpgradeTag());
-#endif
-        PerCompanyUpgradeTags.Add(GetUpdateCreateContractDeferralsFlag());
     end;
 }
+#endif

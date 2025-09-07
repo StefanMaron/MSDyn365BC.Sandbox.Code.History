@@ -58,10 +58,7 @@ report 4412 "EXR Fixed Asset Analysis Excel"
                     BeforeStartingDate := GetFixedAssetPostedAmount(BeforeAmount, EndingAmount);
                     BeforeStartingDate := FAGeneralReport.CalcFAPostedAmount(FixedAssetData."No.", FAPostingType."FA Posting Type No.", Period, StartingDate, EndingDate, DepreciationBookCode, BeforeAmount, EndingAmount, false, false);
                     Period := Period::"At Ending Date";
-                    if SetAmountToZero(FAPostingType."FA Posting Type No.") then
-                        AtEndingDate := 0
-                    else
-                        AtEndingDate := FAGeneralReport.CalcFAPostedAmount(FixedAssetData."No.", FAPostingType."FA Posting Type No.", Period, StartingDate, EndingDate, DepreciationBookCode, BeforeAmount, EndingAmount, false, false);
+                    AtEndingDate := FAGeneralReport.CalcFAPostedAmount(FixedAssetData."No.", FAPostingType."FA Posting Type No.", Period, StartingDate, EndingDate, DepreciationBookCode, BeforeAmount, EndingAmount, false, false);
                     Period := Period::"Net Change";
                     NetChange := FAGeneralReport.CalcFAPostedAmount(FixedAssetData."No.", FAPostingType."FA Posting Type No.", Period, StartingDate, EndingDate, DepreciationBookCode, BeforeAmount, EndingAmount, false, false);
                 end;
@@ -255,25 +252,4 @@ report 4412 "EXR Fixed Asset Analysis Excel"
         exit(DisposalDate <= EndingDate);
     end;
 
-    local procedure SetAmountToZero(PostingTypeNo: Integer): Boolean
-    var
-        FADeprBook: Record "FA Depreciation Book";
-    begin
-        case PostingTypeNo of
-            FADeprBook.FieldNo("Proceeds on Disposal"),
-          FADeprBook.FieldNo("Gain/Loss"):
-                exit(false);
-        end;
-        if not SalesReport and (SetSalesMark()) then
-            exit(true);
-        exit(false);
-    end;
-
-    local procedure SetSalesMark(): Boolean
-    begin
-        if DisposalDate > 0D then
-            if (EndingDate = 0D) or (DisposalDate <= EndingDate) then
-                exit(true);
-        exit(false)
-    end;
 }
