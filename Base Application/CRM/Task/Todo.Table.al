@@ -332,15 +332,7 @@ table 5080 "To-do"
             Caption = 'Closed';
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
-                SkipConfirmDialog: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateClosed(Rec, xRec, SkipConfirmDialog, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if Closed then begin
                     "Date Closed" := Today;
                     Status := Status::Completed;
@@ -350,9 +342,8 @@ table 5080 "To-do"
                         then
                             Error(Text029, FieldCaption("Completed By"));
                         if CurrFieldNo <> 0 then
-                            if not SkipConfirmDialog then
-                                if Confirm(Text004, true) then
-                                    CreateInteraction()
+                            if Confirm(Text004, true) then
+                                CreateInteraction()
                     end;
                     if Recurring then
                         CreateRecurringTask();
@@ -2710,8 +2701,6 @@ table 5080 "To-do"
         then
             UpdateInteractionTemplate(
               Rec, TempTaskInteractionLanguage, TempAttachment, InteractionTemplate.Code, true);
-
-        OnAfterAssignDefaultAttendeeInfo(Rec, AttendeeLineNo, TempAttendee);
     end;
 
     [Scope('OnPrem')]
@@ -3305,16 +3294,6 @@ table 5080 "To-do"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertActivityTask(var Task: Record "To-Do"; ActivityCode: Code[10]; var Attendee: Record Attendee; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateClosed(var Todo: Record "To-do"; xTodo: Record "To-do"; var SkipConfirmDialog: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterAssignDefaultAttendeeInfo(var Todo: Record "To-do"; var AttendeeLineNo: Integer; var TempAttendee: Record Attendee temporary)
     begin
     end;
 }
