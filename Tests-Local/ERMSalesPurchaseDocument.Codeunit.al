@@ -92,7 +92,7 @@ codeunit 142053 "ERM Sales/Purchase Document"
           SalesHeader."Document Type"::"Return Order", SalesCommentLine."Document Type"::"Posted Credit Memo", true);  // Post as Invoice.
     end;
 
-    local procedure SalesCommentLineWithSalesDocument(DocumentType: Enum "Sales Document Type"; SalesCommentLineDocType: Enum "Sales Comment Document Type"; Invoice: Boolean)
+    local procedure SalesCommentLineWithSalesDocument(DocumentType: Enum "Sales Document Type"; SalesCommentLineDocType: Enum "Sales Document Type"; Invoice: Boolean)
     var
         SalesCommentLine: Record "Sales Comment Line";
         DocumentNo: Code[20];
@@ -978,7 +978,6 @@ codeunit 142053 "ERM Sales/Purchase Document"
         CreateICOutboxJnlLineWithTax(TaxDetail."Tax Type"::"Sales and Use Tax", true);
     end;
 
-#if not CLEAN27
     [Test]
     [HandlerFunctions('PurchaseInvoiceStatsModalPageHandler')]
     [Scope('OnPrem')]
@@ -1016,47 +1015,6 @@ codeunit 142053 "ERM Sales/Purchase Document"
 
         // Exercise: Post Purchase Credit Memo
         OpenPostedPurchCreditMemoStatistics(PostedDocumentNo);
-
-        // Verification has been done in handler PurchaseCreditMemoStatsModalPageHandler
-    end;
-#endif
-    [Test]
-    [HandlerFunctions('PurchaseInvoiceStatsModalPageHandlerNM')]
-    [Scope('OnPrem')]
-    procedure VerifyTotalInclTaxOnPurchInvStatisticsNM()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PostedDocumentNo: Code[20];
-    begin
-        // [FEATURE] [Purchase] [Invoice] [Statistics]
-        // Setup: Create Tax detail with Jurisdiction and Post Purchase Invoice.
-        Initialize();
-        CreatePurchaseDocumentWithTaxAreaCode(PurchaseHeader, PurchaseHeader."Document Type"::Invoice);
-        PostedDocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-
-        // Exercise: Post Purchase Invoice
-        OpenPostedInvoiceStatsNM(PostedDocumentNo);
-
-        // Verification has been done in handler PurchaseInvoiceStatsModalPageHandler
-    end;
-
-    [Test]
-    [HandlerFunctions('PurchaseCreditMemoStatsModalPageHandlerNM')]
-    [Scope('OnPrem')]
-    procedure VerifyTotalIncTaxOnCreditMemoStatisticsNM()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PostedDocumentNo: Code[20];
-    begin
-        // [FEATURE] [Purchase] [Credit Memo] [Statistics]
-        // Setup: Create Tax detail with Jurisdiction and Post Purchase Credit Memo.
-        Initialize();
-        CreatePurchaseDocumentWithTaxAreaCode(PurchaseHeader, PurchaseHeader."Document Type"::"Credit Memo");
-        PurchaseHeader.Validate("Vendor Cr. Memo No.", LibraryUtility.GenerateGUID());
-        PostedDocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-
-        // Exercise: Post Purchase Credit Memo
-        OpenPostedPurchCreditMemoStatsNM(PostedDocumentNo);
 
         // Verification has been done in handler PurchaseCreditMemoStatsModalPageHandler
     end;
@@ -2342,7 +2300,6 @@ codeunit 142053 "ERM Sales/Purchase Document"
         PurchInvHeader.TestField("Buy-from Vendor No.", VendorNo);
     end;
 
-#if not CLEAN27
     [Test]
     [HandlerFunctions('PurchaseInvoiceStatsPurchaseAmountLCYModalPageHandler')]
     [Scope('OnPrem')]
@@ -2363,85 +2320,6 @@ codeunit 142053 "ERM Sales/Purchase Document"
 
         // [VERIFY] Verification has been done in handler PurchaseInvoiceStatsModalPageHandler
     end;
-#endif
-    [Test]
-    [HandlerFunctions('PurchaseInvoiceStatsPurchaseAmountLCYPageHandler')]
-    [Scope('OnPrem')]
-    procedure VerifyAmountLCYOnPurchInvStatisticsNM()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PostedDocumentNo: Code[20];
-    begin
-        // [SCENARIO 451479] Verify the Purchase (LCY) value in on Posted Purchase Invoice Statistics
-        Initialize();
-
-        // [GIVEN] Create Purchase Invoice and Post
-        CreatePurchaseDocumentWithoutTaxAreaCode(PurchaseHeader, PurchaseHeader."Document Type"::Invoice);
-        PostedDocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-
-        // [THEN] Opening the Posted Purchase Invoice Statistics
-        OpenPostedInvoiceStatisticsNM(PostedDocumentNo);
-
-        // [VERIFY] Verification has been done in handler PurchaseInvoiceStatsModalPageHandler
-    end;
-
-    [Test]
-    procedure TestGLEntryConsistencyErrorIfCommentLineBetweenItem()
-    var
-        Currency: Record Currency;
-        Customer: Record Customer;
-        SalesHeader: Record "Sales Header";
-        SalesLine, SalesLine1, SalesLine2, SalesLine3 : Record "Sales Line";
-        SalesInvocieHeader: Record "Sales Invoice Header";
-        TaxArea: Record "Tax Area";
-        TaxGroup: Record "Tax Group";
-        TaxDetail: Record "Tax Detail";
-        ItemNo: Code[20];
-        PostedDocumentNo: Code[20];
-        UnitPrice: Decimal;
-    begin
-        //[SCENARIO 597331] G/L Entry inconsistency when posting Sales Invoice with specific amounts and comment
-        Initialize();
-
-        // [GIVEN] Create Currency and set the new exchange rate from working date, Exch Rate Amt as 1, Relational Exch Rate Amt as 1.3691
-        LibraryERM.CreateCurrency(Currency);
-        CreateCurrencyExchangeRate(Currency.Code, WorkDate(), 1, 1.3691);
-
-        // [GIVEN] Create Sales Tax and set Tax Below Max = 3.0 
-        LibraryERM.CreateTaxArea(TaxArea);
-        LibraryERM.CreateTaxGroup(TaxGroup);
-        CreateTaxAreaSetupWithValues(TaxDetail, TaxArea.Code, TaxGroup.Code, 3);
-
-        // [GIVEN] Create Customer with Currency and Tax Area Code
-        CreateCustomerWithCurrencyAndTaxArea(Customer, Currency.Code, TaxArea.Code);
-
-        // [GIVEN] Create Item with Tax Group Code
-        ItemNo := CreateItem(TaxGroup.Code);
-
-        // [GIVEN] Create Sales Invoice Document
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.");
-
-        // [GIVEN] Create first line with Item - Quantity as 1 and Unit Price as 730.991
-        UnitPrice := 730.991;
-        LibrarySales.CreateSalesLineWithUnitPrice(SalesLine, SalesHeader, ItemNo, UnitPrice, 1);
-
-        // [GIVEN] Create second line with Item - Quantity as 1 and Unit Price as 730.991
-        LibrarySales.CreateSalesLineWithUnitPrice(SalesLine1, SalesHeader, ItemNo, UnitPrice, 1);
-
-        // [GIVEN] Create third line with Type as blank and Random Description
-        LibrarySales.CreateSalesLine(SalesLine2, SalesHeader, SalesLine.Type::" ", '', 0);
-        SalesLine2.Validate(Description, LibraryRandom.RandText(100));
-        SalesLine2.Modify(true);
-
-        // [GIVEN] Create fourth line with Item - Quantity as 1 and Unit Price as 730.991
-        LibrarySales.CreateSalesLineWithUnitPrice(SalesLine3, SalesHeader, ItemNo, UnitPrice, 1);
-
-        // [WHEN] Post the sales document
-        PostedDocumentNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
-
-        // [THEN] No error of G/L Consistency should come
-        SalesInvocieHeader.Get(PostedDocumentNo);
-    end;
 
     local procedure Initialize()
     var
@@ -2459,7 +2337,6 @@ codeunit 142053 "ERM Sales/Purchase Document"
         end;
         ICSetup."Auto. Send Transactions" := false;
         ICSetup.Modify();
-
         LibraryERMCountryData.CreateVATData();
         LibraryApplicationArea.EnableFoundationSetup();
         LibrarySales.SetStockoutWarning(false);
@@ -2952,7 +2829,8 @@ codeunit 142053 "ERM Sales/Purchase Document"
     begin
         TaxAreaCode := CreateTaxAreaLine(TaxDetail, TaxDetail."Tax Type"::"Sales Tax Only");
         LibraryPurchase.CreatePurchHeader(PurchaseHeader, DocumentType, CreateVendor(TaxAreaCode, ''));
-        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, CreateItem(TaxDetail."Tax Group Code"), LibraryRandom.RandDec(10, 2));
+        LibraryPurchase.CreatePurchaseLine(
+  PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, CreateItem(TaxDetail."Tax Group Code"), LibraryRandom.RandDec(10, 2));
         PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandIntInRange(50, 100));
         PurchaseLine.Validate("Tax Group Code", TaxDetail."Tax Group Code");
         PurchaseLine.Modify(true);
@@ -3113,7 +2991,6 @@ codeunit 142053 "ERM Sales/Purchase Document"
         PostedSalesShipments."&Print".Invoke();
     end;
 
-#if not CLEAN27
     local procedure OpenPostedInvoiceStatistics(PostesInvoiceNo: Code[20])
     var
         PurchInvHeader: Record "Purch. Inv. Header";
@@ -3138,45 +3015,6 @@ codeunit 142053 "ERM Sales/Purchase Document"
         PostedPurchaswCreditMemo.OpenEdit();
         PostedPurchaswCreditMemo.FILTER.SetFilter("No.", PostesInvoiceNo);
         PostedPurchaswCreditMemo.Statistics.Invoke();
-    end;
-#endif
-    local procedure OpenPostedInvoiceStatsNM(PostesInvoiceNo: Code[20])
-    var
-        PurchInvHeader: Record "Purch. Inv. Header";
-        PostedPurchaseInvoice: TestPage "Posted Purchase Invoice";
-    begin
-        PurchInvHeader.Get(PostesInvoiceNo);
-        PurchInvHeader.CalcFields("Amount Including VAT");
-        LibraryVariableStorage.Enqueue(PurchInvHeader."Amount Including VAT");
-        PostedPurchaseInvoice.OpenEdit();
-        PostedPurchaseInvoice.FILTER.SetFilter("No.", PostesInvoiceNo);
-        PostedPurchaseInvoice.PurchaseInvoiceStats.Invoke();
-    end;
-
-    local procedure OpenPostedInvoiceStatisticsNM(PostesInvoiceNo: Code[20])
-    var
-        PurchInvHeader: Record "Purch. Inv. Header";
-        PostedPurchaseInvoice: TestPage "Posted Purchase Invoice";
-    begin
-        PurchInvHeader.Get(PostesInvoiceNo);
-        PurchInvHeader.CalcFields("Amount Including VAT");
-        LibraryVariableStorage.Enqueue(PurchInvHeader."Amount Including VAT");
-        PostedPurchaseInvoice.OpenEdit();
-        PostedPurchaseInvoice.FILTER.SetFilter("No.", PostesInvoiceNo);
-        PostedPurchaseInvoice.PurchaseInvoiceStatistics.Invoke();
-    end;
-
-    local procedure OpenPostedPurchCreditMemoStatsNM(PostesInvoiceNo: Code[20])
-    var
-        PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
-        PostedPurchaseCreditMemo: TestPage "Posted Purchase Credit Memo";
-    begin
-        PurchCrMemoHdr.Get(PostesInvoiceNo);
-        PurchCrMemoHdr.CalcFields("Amount Including VAT");
-        LibraryVariableStorage.Enqueue(PurchCrMemoHdr."Amount Including VAT");
-        PostedPurchaseCreditMemo.OpenEdit();
-        PostedPurchaseCreditMemo.FILTER.SetFilter("No.", PostesInvoiceNo);
-        PostedPurchaseCreditMemo.PurchaseCrMemoStats.Invoke();
     end;
 
     local procedure PostPurchaseCreditMemo(DocumentNo: Code[20]) DocumentNo2: Code[20]
@@ -3278,44 +3116,6 @@ codeunit 142053 "ERM Sales/Purchase Document"
         GLAccount.Modify(true);
     end;
 
-    local procedure CreateCurrencyExchangeRate(CurrencyCode: Code[10]; StartingDate: Date; ExchangeRateAmount: Decimal; RelationalExchRateAmount: Decimal)
-    var
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
-    begin
-
-        LibraryERM.CreateExchRate(CurrencyExchangeRate, CurrencyCode, StartingDate);
-        CurrencyExchangeRate.Validate("Exchange Rate Amount", ExchangeRateAmount);  // Magic exchange rate
-        CurrencyExchangeRate.Validate("Relational Exch. Rate Amount", RelationalExchRateAmount);
-        CurrencyExchangeRate.Validate("Adjustment Exch. Rate Amount", CurrencyExchangeRate."Exchange Rate Amount");
-        CurrencyExchangeRate.Validate("Relational Adjmt Exch Rate Amt", CurrencyExchangeRate."Relational Exch. Rate Amount");
-        CurrencyExchangeRate.Modify(true);
-    end;
-
-    local procedure CreateTaxAreaSetupWithValues(var TaxDetail: Record "Tax Detail"; TaxAreaCode: Code[20]; TaxGroupCode: Code[20]; TaxBelowMax: Decimal)
-    var
-        TaxJurisdiction: Record "Tax Jurisdiction";
-        TaxAreaLine: Record "Tax Area Line";
-    begin
-        LibraryERM.CreateTaxJurisdiction(TaxJurisdiction);
-        TaxJurisdiction.Validate("Tax Account (Purchases)", LibraryERM.CreateGLAccountNo());
-        TaxJurisdiction.Modify(true);
-        LibraryERM.CreateTaxDetail(TaxDetail, TaxJurisdiction.Code, TaxGroupCode, TaxDetail."Tax Type"::"Sales and Use Tax", WorkDate());
-        TaxDetail.Validate("Tax Below Maximum", TaxBelowMax);
-        TaxDetail.Modify(true);
-        LibraryERM.CreateTaxAreaLine(TaxAreaLine, TaxAreaCode, TaxJurisdiction.Code);
-    end;
-
-    local procedure CreateCustomerWithCurrencyAndTaxArea(var Customer: Record Customer; CurrencyCode: Code[10]; TaxAreaCode: Code[20])
-    var
-    begin
-        LibrarySales.CreateCustomer(Customer);
-        Customer.Validate("Currency Code", CurrencyCode);
-        Customer.Validate("Tax Area Code", TaxAreaCode);
-        Customer.Validate("Tax Liable", true);
-        Customer.Validate("VAT Bus. Posting Group", '');
-        Customer.Modify(true);
-    end;
-
     local procedure VerifyErrorOnSalesCommentLine(DocumentType: Enum "Sales Comment Document Type"; DocumentNo: Code[20]; LineNo: Integer)
     var
         SalesCommentLine: Record "Sales Comment Line";
@@ -3413,7 +3213,7 @@ codeunit 142053 "ERM Sales/Purchase Document"
         ICOutboxJnlLine.TestField(Amount, TaxAmount);
     end;
 
-    local procedure VerifySalesCommentLine(DocumentType: Enum "Sales Comment Document Type"; DocumentNo: Code[20]; LineNo: Integer; Comment: Text[80])
+    local procedure VerifySalesCommentLine(DocumentType: Enum "Sales Document Type"; DocumentNo: Code[20]; LineNo: Integer; Comment: Text[80])
     var
         SalesCommentLine: Record "Sales Comment Line";
     begin
@@ -3511,7 +3311,6 @@ codeunit 142053 "ERM Sales/Purchase Document"
         SalesShipment.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
-#if not CLEAN27
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure PurchaseInvoiceStatsModalPageHandler(var PurchaseInvoiceStats: TestPage "Purchase Invoice Stats.")
@@ -3531,42 +3330,10 @@ codeunit 142053 "ERM Sales/Purchase Document"
         LibraryVariableStorage.Dequeue(AmountInclVAT);
         PurchCreditMemoStats.AmountInclVAT.AssertEquals(AmountInclVAT);
     end;
-#endif
-    [PageHandler]
-    [Scope('OnPrem')]
-    procedure PurchaseInvoiceStatsModalPageHandlerNM(var PurchaseInvoiceStats: TestPage "Purchase Invoice Stats.")
-    var
-        AmountInclVAT: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(AmountInclVAT);
-        PurchaseInvoiceStats.AmountInclVAT.AssertEquals(AmountInclVAT);
-    end;
 
-    [PageHandler]
-    [Scope('OnPrem')]
-    procedure PurchaseCreditMemoStatsModalPageHandlerNM(var PurchCreditMemoStats: TestPage "Purch. Credit Memo Stats.")
-    var
-        AmountInclVAT: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(AmountInclVAT);
-        PurchCreditMemoStats.AmountInclVAT.AssertEquals(AmountInclVAT);
-    end;
-#if not CLEAN27
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure PurchaseInvoiceStatsPurchaseAmountLCYModalPageHandler(var PurchaseInvoiceStatistics: TestPage "Purchase Invoice Statistics")
-    var
-        PurchaseAmountLCY: Variant;
-        AmountLCY: Decimal;
-    begin
-        LibraryVariableStorage.Dequeue(PurchaseAmountLCY);
-        Evaluate(AmountLCY, PurchaseInvoiceStatistics.AmountLCY.Value);
-        PurchaseInvoiceStatistics.AmountLCY.AssertEquals(Abs(AmountLCY));
-    end;
-#endif
-    [PageHandler]
-    [Scope('OnPrem')]
-    procedure PurchaseInvoiceStatsPurchaseAmountLCYPageHandler(var PurchaseInvoiceStatistics: TestPage "Purchase Invoice Statistics")
     var
         PurchaseAmountLCY: Variant;
         AmountLCY: Decimal;
