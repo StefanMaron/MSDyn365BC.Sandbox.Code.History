@@ -5,6 +5,7 @@
 namespace Microsoft.Service.History;
 
 using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Setup;
 
 pageextension 10012 "Posted Service Credit Memo NA" extends "Posted Service Credit Memo"
 {
@@ -43,6 +44,11 @@ pageextension 10012 "Posted Service Credit Memo NA" extends "Posted Service Cred
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies a code to indicate if the document is used for exports to other countries.';
                 }
+                field("CFDI Certificate of Origin No."; Rec."CFDI Certificate of Origin No.")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the identifier which was used to pay for the issuance of the certificate of origin.';
+                }
                 field(Control1310005; Rec."Foreign Trade")
                 {
                     ApplicationArea = BasicMX;
@@ -52,6 +58,27 @@ pageextension 10012 "Posted Service Credit Memo NA" extends "Posted Service Cred
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies an international commercial terms code that are used in international sale contracts according to the SAT internatoinal trade terms definition.';
+                }
+                field("SAT Certificate Name"; SATCertificateName)
+                {
+                    ApplicationArea = BasicMX;
+                    Caption = 'SAT Certificate Name';
+                    ToolTip = 'Specifies the name of the certificate that is used to sign the e-document.';
+                    Visible = SATCertInLocationEnabled;
+                    Editable = false;
+
+                    trigger OnDrillDown()
+                    begin
+                        EInvoiceMgt.DrillDownSATCertificate(SATCertificateCode);
+                    end;
+                }
+                field("SAT Certificate Source"; SATCertificateSource)
+                {
+                    ApplicationArea = BasicMX;
+                    Caption = 'SAT Certificate Source';
+                    ToolTip = 'Specifies the record with which the certificate is associated, such as General Ledger Setup or a specific Location (e.g., Location BLUE).';
+                    Visible = SATCertInLocationEnabled;
+                    Editable = false;
                 }
                 field("Exchange Rate USD"; Rec."Exchange Rate USD")
                 {
@@ -195,8 +222,67 @@ pageextension 10012 "Posted Service Credit Memo NA" extends "Posted Service Cred
             end;
         }
 #endif
+        addafter(ServiceStatistics)
+        {
+            action(ServiceStats)
+            {
+                ApplicationArea = Service;
+                Caption = 'Statistics';
+                Image = Statistics;
+                ShortCutKey = 'F7';
+                ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+#if CLEAN27
+                    Visible = SalesTaxStatisticsVisible;
+#else
+                Visible = false;
+#endif
+                RunObject = Page "Service Credit Memo Stats.";
+                RunPageOnRec = true;
+            }
+        }
+#if CLEAN27
+        addafter(ServiceStatistics_Promoted)
+        {
+            actionref(ServiceStats_Promoted; ServiceStats)
+            {
+            }
+        }
+#endif
     }
 
+    trigger OnOpenPage()
+    var
+        GLSetup: Record "General Ledger Setup";
+    begin
+        GLSetup.SetLoadFields("Multiple SAT Certificates");
+        GLSetup.Get();
+        SATCertInLocationEnabled := EInvoiceMgt.IsPACEnvironmentEnabled() and GLSetup."Multiple SAT Certificates";
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        if SATCertInLocationEnabled then
+            UpdateSATCertificateFields();
+    end;
+
+    var
+        EInvoiceMgt: Codeunit "E-Invoice Mgt.";
+        SATCertInLocationEnabled: Boolean;
+        SATCertificateCode: Text;
+        SATCertificateName: Text;
+        SATCertificateSource: Text;
+
+    protected var
+        SalesTaxStatisticsVisible: Boolean;
+
+    local procedure UpdateSATCertificateFields()
+    var
+        DocumentRecRef: RecordRef;
+    begin
+        DocumentRecRef.GetTable(Rec);
+        EInvoiceMgt.GetSATCertificateInfoForDocument(DocumentRecRef, SATCertificateCode, SATCertificateName, SATCertificateSource);
+    end;
 #if not CLEAN25
     [Obsolete('Moved to procedure OpenStatistics in table ServiceCrMemoHeader', '25.0')]
     [IntegrationEvent(false, false)]

@@ -848,6 +848,7 @@ report 20 "Calc. and Post VAT Settlement"
             GenJnlLine, 0, DefaultDimSource, GenJnlLine."Source Code",
             GenJnlLine."Shortcut Dimension 1 Code", GenJnlLine."Shortcut Dimension 2 Code", 0, 0);
         OnPostGenJnlLineOnBeforeGenJnlPostLineRun(GenJnlLine);
+        GenJnlPostLine.SetIgnoreJournalTemplNameMandatoryCheck();
         GenJnlPostLine.Run(GenJnlLine);
     end;
 
@@ -916,6 +917,7 @@ report 20 "Calc. and Post VAT Settlement"
 
     local procedure CloseVATEntriesOnPostSettlement(var VATEntry: Record "VAT Entry"; NextVATEntryNo: Integer)
     var
+        VATEntry2: Record "VAT Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -923,8 +925,16 @@ report 20 "Calc. and Post VAT Settlement"
         if IsHandled then
             exit;
 
-        VATEntry.ModifyAll("Closed by Entry No.", NextVATEntryNo);
-        VATEntry.ModifyAll(Closed, true);
+        VATEntry2.ReadIsolation := IsolationLevel::UpdLock;
+        if VATEntry.FindSet() then
+            repeat
+                if ((VATEntry.Closed <> true) or (VATEntry."Closed by Entry No." <> NextVATEntryNo)) then begin
+                    VATEntry2.Copy(VATEntry);
+                    VATEntry2."Closed by Entry No." := NextVATEntryNo;
+                    VATEntry2.Closed := true;
+                    VATEntry2.Modify();
+                end;
+            until VATEntry.Next() = 0;
     end;
 
     local procedure IsNotSettlement(GenPostingType: Enum "General Posting Type"): Boolean
