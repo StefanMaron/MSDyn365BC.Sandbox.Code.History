@@ -503,12 +503,14 @@ codeunit 10750 "SII XML Creator"
         DomesticCustomer: Boolean;
         RegimeCodes: array[3] of Code[2];
         IsHandled: Boolean;
+        ValueRefExternal: Text;
     begin
         GetCustomerByGLSetup(Customer, CustLedgerEntry);
         DomesticCustomer := SIIManagement.IsDomesticCustomer(Customer);
 
         SIIDocUploadState.GetSIIDocUploadStateByCustLedgEntry(CustLedgerEntry);
         if IsSalesInvoice(InvoiceType, SIIDocUploadState) then begin
+            OnPopulateXMLWithSalesInvoiceOnBeforeInitializeSalesXmlBody(CustLedgerEntry);
             InitializeSalesXmlBody(XMLNode, CustLedgerEntry."VAT Reporting Date");
             if SIIDocUploadState."First Summary Doc. No." = '' then
                 XMLDOMManagement.AddElementWithPrefix(
@@ -554,6 +556,9 @@ codeunit 10750 "SII XML Creator"
                                                                  SIIDocUploadState."Sales Special Scheme Code"::"09 Travel Agency Services"]);
             DataTypeManagement.GetRecordRef(CustLedgerEntry, CustLedgerEntryRecRef);
             CalculateTotalVatAndBaseAmounts(CustLedgerEntryRecRef, TotalBase, TotalNonExemptBase, TotalVATAmount, TotalNDBase, TotalNDAmount);
+
+            OnPopulateXMLWithSalesInvoiceOnBeforeAddNodeForTotals(AddNodeForTotals, CustLedgerEntry, TotalBase, TotalNonExemptBase, TotalVATAmount);
+
             if AddNodeForTotals then begin
                 TotalAmount := -TotalBase - TotalVATAmount;
                 XMLDOMManagement.AddElementWithPrefix(
@@ -564,7 +569,9 @@ codeunit 10750 "SII XML Creator"
             FillOperationDescription(
               XMLNode, GetOperationDescriptionFromDocument(true, CustLedgerEntry."Document No."),
               CustLedgerEntry."Posting Date", CustLedgerEntry.Description);
-            FillRefExternaNode(XMLNode, Format(SIIDocUploadState."Entry No"));
+            ValueRefExternal := Format(SIIDocUploadState."Entry No");
+            OnPopulateXMLWithSalesInvoiceOnBeforeFillRefExternaNode(SIIDocUploadState, ValueRefExternal);
+            FillRefExternaNode(XMLNode, ValueRefExternal);
             FillSucceededCompanyInfo(XMLNode, SIIDocUploadState);
             if AddNodeForTotals then
                 FillMacrodatoNode(XMLNode, TotalAmount);
@@ -666,6 +673,9 @@ codeunit 10750 "SII XML Creator"
               (SIIDocUploadState."Purch. Special Scheme Code" in [SIIDocUploadState."Purch. Special Scheme Code"::"03 Special System",
                                                                   SIIDocUploadState."Purch. Special Scheme Code"::"05 Travel Agencies"]);
             CalculateTotalVatAndBaseAmounts(VendorLedgerEntryRecRef, TotalBase, TotalNonExemptBase, TotalVATAmount, TotalNDBase, TotalNDAmount);
+
+            OnPopulateXMLWithPurchInvoiceOnBeforeAddNodeForTotals(AddNodeForTotals, VendorLedgerEntry, TotalBase, TotalNonExemptBase, TotalVATAmount);
+
             if AddNodeForTotals then begin
                 TotalAmount := TotalBase + TotalNDBase + TotalVATAmount + TotalNDAmount;
                 XMLDOMManagement.AddElementWithPrefix(
@@ -3109,6 +3119,26 @@ codeunit 10750 "SII XML Creator"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateTotalVatAndBaseAmounts(LedgerEntryRecRef: RecordRef; var TotalBaseAmount: Decimal; var TotalNonExemptVATBaseAmount: Decimal; var TotalVATAmount: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnPopulateXMLWithPurchInvoiceOnBeforeAddNodeForTotals(var AddNodeForTotals: Boolean; var VendorLedgerEntry: Record "Vendor Ledger Entry"; var TotalBase: Decimal; var TotalNonExemptBase: Decimal; var TotalVATAmount: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnPopulateXMLWithSalesInvoiceOnBeforeAddNodeForTotals(var AddNodeForTotals: Boolean; var CustLedgerEntry: Record "Cust. Ledger Entry"; var TotalBase: Decimal; var TotalNonExemptBase: Decimal; var TotalVATAmount: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPopulateXMLWithSalesInvoiceOnBeforeFillRefExternaNode(var SIIDocUploadState: Record "SII Doc. Upload State"; var ValueRefExternal: Text);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPopulateXMLWithSalesInvoiceOnBeforeInitializeSalesXmlBody(var CustLedgerEntry: Record "Cust. Ledger Entry");
     begin
     end;
 }
