@@ -7,7 +7,6 @@ table 8007 "Overdue Subscription Line"
     DataClassification = CustomerContent;
     Caption = 'Overdue Subscription Line';
     TableType = Temporary;
-    Access = Internal;
 
     fields
     {
@@ -50,6 +49,7 @@ table 8007 "Overdue Subscription Line"
         {
             Caption = 'Amount';
         }
+#if not CLEANSCHEMA29
         field(11; "Item No."; Code[20])
         {
             Caption = 'Item No.';
@@ -63,6 +63,7 @@ table 8007 "Overdue Subscription Line"
 #endif
             TableRelation = Item;
         }
+#endif
         field(12; "Subscription Contract Type"; Code[10])
         {
             Caption = 'Subscription Contract Type';
@@ -115,7 +116,7 @@ table 8007 "Overdue Subscription Line"
         }
     }
 
-    procedure CountOverdueServiceCommitments(): Integer
+    internal procedure CountOverdueServiceCommitments(): Integer
     var
         ServiceCommitment: Record "Subscription Line";
         OverdueDate: Date;
@@ -141,7 +142,7 @@ table 8007 "Overdue Subscription Line"
         exit(CalcDate(ServiceContractSetup."Overdue Date Formula", WorkDate()));
     end;
 
-    procedure FillOverdueServiceCommitments()
+    internal procedure FillOverdueServiceCommitments()
     var
         OverdueDate: Date;
     begin

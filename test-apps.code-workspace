@@ -22,6 +22,18 @@
       "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
+      "path": "./system application/source/System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./system application/Test/System Application Test Library"
+    },
+    {
+      "path": "./system application/Test/System Application Test/DisabledTests"
+    },
+    {
+      "path": "./system application/Test/System Application Test/Extension Management/testArtifacts"
+    },
+    {
       "path": "./ContosoCoffeeDemoDataset/Test/Contoso Coffee Demo Dataset Tests"
     },
     {
@@ -55,6 +67,12 @@
       "path": "./ReportLayouts/Test/Report Layouts Tests"
     },
     {
+      "path": "./EDocumentConnectors/B2Brouter/Test/E-Document Connector - B2Brouter Tests"
+    },
+    {
+      "path": "./EDocumentConnectors/Pagero/Test/E-Document Connector - Pagero Tests"
+    },
+    {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
@@ -64,22 +82,13 @@
       "path": "./EDocumentConnectors/SignUp/Test/E-Document Connector - SignUp Tests"
     },
     {
+      "path": "./EDocumentConnectors/Continia/Test/E-Document Connector - Continia Tests"
+    },
+    {
       "path": "./ExternalEvents/test/_Exclude_Business_Events_Test"
     },
     {
       "path": "./DataArchive/test/Data Archive Tests"
-    },
-    {
-      "path": "./System Application/Test/System Application Test Library"
-    },
-    {
-      "path": "./System Application/Test/System Application Test/DisabledTests"
-    },
-    {
-      "path": "./System Application/Test/System Application Test/Extension Management/testArtifacts"
-    },
-    {
-      "path": "./System Application/Source/System Application/Email/src/Test Email"
     },
     {
       "path": "./EnforcedDigitalVouchers/Test Library/Enforced Digital Vouchers Test Library"
@@ -211,6 +220,12 @@
       "path": "./ReviewGLEntries/Test/_Exclude_Review_General_Ledger_Entries_Tests"
     },
     {
+      "path": "./businessfoundation/Test/Business Foundation Test Libraries"
+    },
+    {
+      "path": "./businessfoundation/Test/Business Foundation Tests/DisabledTests"
+    },
+    {
       "path": "./Intrastat/Test/Intrastat Core Tests"
     },
     {
@@ -299,15 +314,6 @@
     },
     {
       "path": "./EDocument Core/Test/E-Document Core Tests"
-    },
-    {
-      "path": "./BusinessFoundation/Test/Business Foundation Test Libraries"
-    },
-    {
-      "path": "./BusinessFoundation/Test/Business Foundation Tests/DisabledTests"
-    },
-    {
-      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./Email - Outlook REST API/Test"

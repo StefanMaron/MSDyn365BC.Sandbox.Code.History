@@ -22,6 +22,7 @@ codeunit 139692 "Contract Renewal Test"
         ContractRenewalMgt: Codeunit "Sub. Contract Renewal Mgt.";
         ContractTestLibrary: Codeunit "Contract Test Library";
         LibraryRandom: Codeunit "Library - Random";
+        LibraryTestInitialize: Codeunit "Library - Test Initialize";
         AddVendorServices: Boolean;
         ConfirmOption: Boolean;
         BaseCalculationPercentage: Decimal;
@@ -74,6 +75,7 @@ codeunit 139692 "Contract Renewal Test"
         SalesHeader.Get(SalesHeader."Document Type"::Quote, SalesQuoteNo);
         SalesHeader.TestField("Sell-to Customer No.", CustomerContract."Sell-to Customer No.");
         SalesHeader.TestField("Bill-to Customer No.", CustomerContract."Bill-to Customer No.");
+        SalesHeader.TestField("Posting Date", 0D);
 
         FilterSalesLineOnDocumentAndServiceObject(SalesLine, SalesHeader."Document Type", SalesHeader."No.");
         SalesLine.SetAutoCalcFields("Subscription Lines");
@@ -675,6 +677,7 @@ codeunit 139692 "Contract Renewal Test"
 
     local procedure Initialize()
     begin
+        LibraryTestInitialize.OnTestInitialize(Codeunit::"Contract Renewal Test");
         ClearAll();
         ContractTestLibrary.InitContractsApp();
     end;
@@ -685,8 +688,7 @@ codeunit 139692 "Contract Renewal Test"
         DiscountAsInt: Integer;
     begin
         SalesServiceCommitment.Reset();
-        SalesServiceCommitment.SetRange("Document Type", SalesHeader."Document Type");
-        SalesServiceCommitment.SetRange("Document No.", SalesHeader."No.");
+        SalesServiceCommitment.FilterOnDocument(SalesHeader."Document Type", SalesHeader."No.");
         SalesServiceCommitment.FindSet(true);
         repeat
             repeat
