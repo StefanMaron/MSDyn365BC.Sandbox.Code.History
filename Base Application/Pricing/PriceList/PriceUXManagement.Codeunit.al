@@ -575,6 +575,7 @@ codeunit 7018 "Price UX Management"
 
     procedure SetPriceListLineFilters(PriceAssetList: Codeunit "Price Asset List"; PriceType: Enum "Price Type"; AmountType: Enum "Price Amount Type"): Boolean;
     var
+        [SecurityFiltering(SecurityFilter::Filtered)]
         PriceListLine: Record "Price List Line";
         PriceSource: Record "Price Source";
         PriceListManagement: Codeunit "Price List Management";
@@ -639,7 +640,7 @@ codeunit 7018 "Price UX Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowPriceListLines(PriceSource: Record "Price Source"; PriceAsset: Record "Price Asset"; PriceType: Enum "Price Type"; AmountType: Enum "Price Amount Type"; var IsHandled: Boolean)
+    local procedure OnBeforeShowPriceListLines(PriceSource: Record "Price Source"; var PriceAsset: Record "Price Asset"; PriceType: Enum "Price Type"; AmountType: Enum "Price Amount Type"; var IsHandled: Boolean)
     begin
     end;
 

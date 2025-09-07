@@ -618,7 +618,7 @@ codeunit 5940 ServContractManagement
         LatestInvToDate := InvToDate;
         if ServiceLedgerEntry.Get(ServiceApplyEntry) then begin
             ServiceLedgerEntry.SetRange("Entry No.", ServiceApplyEntry, ServiceLedgerEntry."Apply Until Entry No.");
-            if ServiceLedgerEntry.FindSet() then
+            if ServiceLedgerEntry.FindSet() then begin
                 repeat
                     if ServiceLedgerEntry.Prepaid then begin
                         InvFromDate := ServiceLedgerEntry."Posting Date";
@@ -626,6 +626,7 @@ codeunit 5940 ServContractManagement
                         if InvToDate > LatestInvToDate then
                             InvToDate := LatestInvToDate;
                     end;
+                    OnCreateServiceLineOnBeforeServLedgEntryToServiceLine(ServHeader, ServContractHeader, ServiceLedgerEntry, InvFromDate, InvToDate);
                     ServLedgEntryToServiceLine(
                       TotalServLine,
                       TotalServLineLCY,
@@ -634,9 +635,12 @@ codeunit 5940 ServContractManagement
                       ContractNo,
                       InvFromDate,
                       InvToDate);
-                until ServiceLedgerEntry.Next() = 0
+                until ServiceLedgerEntry.Next() = 0;
+                OnCreateServiceLineOnAfterServLedgEntryToServiceLine(ServHeader, InvFromDate, InvToDate);
+            end;
         end else begin
             Clear(ServiceLedgerEntry);
+            OnCreateServiceLineOnBeforeServLedgEntryToServiceLine(ServHeader, ServContractHeader, ServiceLedgerEntry, InvFromDate, InvToDate);
             ServLedgEntryToServiceLine(
               TotalServLine,
               TotalServLineLCY,
@@ -1175,7 +1179,7 @@ codeunit 5940 ServContractManagement
                     AppliedCreditLineUnitCost,
                     AppliedCreditLineDiscAmount,
                     ServLedgEntryNo);
-                if not ApplyServiceLedgerEntryAmounts then begin
+                if (not ApplyServiceLedgerEntryAmounts) or (not ServContract.Prepaid) then begin
                     AppliedCreditLineAmount :=
                       Round(CalcContractLineAmount(ContractLineAmount, WDate, OldWDate), Currency."Amount Rounding Precision");
                     AppliedCreditLineCost :=
@@ -3198,5 +3202,14 @@ codeunit 5940 ServContractManagement
     local procedure OnInsertMultipleServLedgEntriesOnAfterSetDueDate(Index: Integer; var DueDate: Date; ServiceLedgerEntry: Record "Service Ledger Entry"; CountOfEntryLoop: Integer; InvRoundedAmount: array[4] of Decimal; var NonDistrAmount: array[4] of Decimal; var ServiceHeader: Record "Service Header"; AmountRoundingPrecision: Decimal)
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateServiceLineOnBeforeServLedgEntryToServiceLine(var ServiceHeader: Record "Service Header"; var ServiceContractHeader: Record "Service Contract Header"; var ServiceLedgerEntry: Record "Service Ledger Entry"; var InvFromDate: Date; var InvToDate: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateServiceLineOnAfterServLedgEntryToServiceLine(ServiceHeader: Record "Service Header"; InvoiceFromDate: Date; InvoiceToDate: Date)
+    begin
+    end;
+}
