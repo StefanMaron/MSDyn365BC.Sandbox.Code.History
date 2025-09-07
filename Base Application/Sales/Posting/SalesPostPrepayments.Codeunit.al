@@ -168,6 +168,8 @@ codeunit 442 "Sales-Post Prepayments"
         if (SalesSetup."Calc. Inv. Discount" and (SalesHeader.Status = SalesHeader.Status::Open)) then
             DocumentTotals.SalesRedistributeInvoiceDiscountAmountsOnDocument(SalesHeader);
 
+        OnCodeOnBeforeCheckPrepmtDoc(SalesHeader, DocumentType);
+
         CheckPrepmtDoc(SalesHeader, DocumentType);
 
         UpdateDocNos(SalesHeader, DocumentType, GenJnlLineDocNo, PostingNoSeriesCode, ModifyHeader);
@@ -770,14 +772,16 @@ codeunit 442 "Sales-Post Prepayments"
         PrepmtInvLineBuf := SavedPrepmtInvLineBuf;
     end;
 
-    local procedure GetPrepmtAccNo(VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]): Code[20]
+    local procedure GetPrepmtAccNo(VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]) PrepmtAccNo: Code[20]
     begin
         if (VATBusPostingGroup <> VATPostingSetup."VAT Bus. Posting Group") or
            (VATProdPostingGroup <> VATPostingSetup."VAT Prod. Posting Group")
         then
             VATPostingSetup.Get(VATBusPostingGroup, VATProdPostingGroup);
         VATPostingSetup.TestField("Sales Prepayments Account");
-        exit(VATPostingSetup."Sales Prepayments Account");
+        PrepmtAccNo := VATPostingSetup."Sales Prepayments Account";
+        OnAfterGetPrepmtAccNo(VATPostingSetup, PrepmtAccNo);
+        exit(PrepmtAccNo);
     end;
 
     procedure GetCorrBalAccNo(SalesHeader: Record "Sales Header"; PositiveAmount: Boolean): Code[20]
@@ -1700,6 +1704,10 @@ codeunit 442 "Sales-Post Prepayments"
             if SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", PrepmtInvLineBuffer."Line No.") then
                 SalesInvLine."Description 2" := SalesLine."Description 2";
 
+        if SalesHeader."Compress Prepayment" then
+            if SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", LineNo) then
+                SalesInvLine."Unit of Measure Code" := SalesLine."Unit of Measure Code";
+
         SalesInvLine.Quantity := 1;
         if SalesInvHeader."Prices Including VAT" then begin
             SalesInvLine."Unit Price" := PrepmtInvLineBuffer."Amount Incl. VAT";
@@ -2245,6 +2253,16 @@ codeunit 442 "Sales-Post Prepayments"
 
     [IntegrationEvent(false, false)]
     local procedure OnFindVATAmountLineOnAfterSetFilters(var SalesLine: Record "Sales Line"; var VATAmountLine: Record "VAT Amount Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnBeforeCheckPrepmtDoc(var SalesHeader: Record "Sales Header"; var DocumentType: Option Invoice,"Credit Memo")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetPrepmtAccNo(VATPostingSetup: Record "VAT Posting Setup"; var PrepmtAccNo: Code[20])
     begin
     end;
 }
