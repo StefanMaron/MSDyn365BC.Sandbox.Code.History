@@ -1169,7 +1169,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
 
         if IsBlankInvtMovement then begin
             // inventory movement without source document, created from Internal Movement
-            if ShouldSetBinCodeForBlankInvtMovement(NewWarehouseActivityLine) then
+            if not CurrLocation."Pick According to FEFO" then
                 FromBinContent.SetRange("Bin Code", FromBinCode);
             FromBinContent.SetRange(Default);
         end;
@@ -1333,14 +1333,9 @@ codeunit 7322 "Create Inventory Pick/Movement"
             CurrBin.Get(LocationCode, BinCode)
     end;
 
-    local procedure GetShelfNo(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]): Code[10]
-    var
-        StockkeepingUnit: Record "Stockkeeping Unit";
+    local procedure GetShelfNo(ItemNo: Code[20]): Code[10]
     begin
         GetItem(ItemNo);
-        StockkeepingUnit.SetLoadFields("Shelf No.");
-        if StockkeepingUnit.Get(LocationCode, ItemNo, VariantCode) then
-            exit(StockkeepingUnit."Shelf No.");
         exit(CurrItem."Shelf No.");
     end;
 
@@ -2164,7 +2159,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
             end;
             NewWarehouseActivityLine."Special Equipment Code" := GetSpecEquipmentCode(NewWarehouseActivityLine."Item No.", NewWarehouseActivityLine."Variant Code", NewWarehouseActivityLine."Location Code", TakeBinCode);
         end else
-            NewWarehouseActivityLine."Shelf No." := GetShelfNo(NewWarehouseActivityLine."Item No.", NewWarehouseActivityLine."Variant Code", NewWarehouseActivityLine."Location Code");
+            NewWarehouseActivityLine."Shelf No." := GetShelfNo(NewWarehouseActivityLine."Item No.");
         NewWarehouseActivityLine."Qty. to Handle" := 0;
         NewWarehouseActivityLine."Qty. to Handle (Base)" := 0;
         NewWarehouseActivityLine."Qty. Rounding Precision" := 0;
@@ -2455,27 +2450,6 @@ codeunit 7322 "Create Inventory Pick/Movement"
     procedure SetHideDialogForTracking(NewHideDialogForTracking: Boolean)
     begin
         HideDialogForTracking := NewHideDialogForTracking;
-    end;
-
-    local procedure ShouldSetBinCodeForBlankInvtMovement(NewWarehouseActivityLine: Record "Warehouse Activity Line"): Boolean
-    begin
-        if CheckItemTrackingCodeUseExpirationDates(NewWarehouseActivityLine."Item No.") then
-            exit(false);
-
-        exit(true);
-    end;
-
-    local procedure CheckItemTrackingCodeUseExpirationDates(ItemNo: Code[20]): Boolean
-    var
-        Item2: Record Item;
-    begin
-        if ItemNo = '' then
-            exit;
-
-        Item2.SetLoadFields("Item Tracking Code");
-        Item2.Get(ItemNo);
-        if Item2.ItemTrackingCodeUseExpirationDates() then
-            exit(true);
     end;
 
     [IntegrationEvent(false, false)]
