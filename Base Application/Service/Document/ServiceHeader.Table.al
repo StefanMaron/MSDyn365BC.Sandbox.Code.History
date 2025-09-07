@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -37,9 +37,7 @@ using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Receivables;
-#if not CLEAN27
 using Microsoft.Sales.Setup;
-#endif
 using Microsoft.Service.Archive;
 using Microsoft.Service.Comment;
 using Microsoft.Service.Contract;
@@ -171,9 +169,6 @@ table 5900 "Service Header"
                         end;
                     end;
 
-                if "No." = '' then
-                    InitRecord();
-
                 GetCust("Customer No.");
                 if "Customer No." <> '' then begin
                     IsHandled := false;
@@ -224,7 +219,7 @@ table 5900 "Service Header"
         field(3; "No."; Code[20])
         {
             Caption = 'No.';
-
+            
             trigger OnValidate()
             begin
                 if "No." <> xRec."No." then begin
@@ -331,23 +326,23 @@ table 5900 "Service Header"
         field(5; "Bill-to Name"; Text[100])
         {
             Caption = 'Bill-to Name';
-        }
+                    }
         field(6; "Bill-to Name 2"; Text[50])
         {
             Caption = 'Bill-to Name 2';
-        }
+                    }
         field(7; "Bill-to Address"; Text[100])
         {
             Caption = 'Bill-to Address';
-        }
+                    }
         field(8; "Bill-to Address 2"; Text[50])
         {
             Caption = 'Bill-to Address 2';
-        }
+                    }
         field(9; "Bill-to City"; Text[30])
         {
             Caption = 'Bill-to City';
-            TableRelation = if ("Bill-to Country/Region Code" = const('')) "Post Code".City
+                        TableRelation = if ("Bill-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Bill-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Bill-to Country/Region Code"));
             ValidateTableRelation = false;
@@ -371,11 +366,11 @@ table 5900 "Service Header"
         field(10; "Bill-to Contact"; Text[100])
         {
             Caption = 'Bill-to Contact';
-        }
+                    }
         field(11; "Your Reference"; Text[35])
         {
             Caption = 'Your Reference';
-        }
+                    }
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
@@ -473,23 +468,23 @@ table 5900 "Service Header"
         field(13; "Ship-to Name"; Text[100])
         {
             Caption = 'Ship-to Name';
-        }
+                    }
         field(14; "Ship-to Name 2"; Text[50])
         {
             Caption = 'Ship-to Name 2';
-        }
+                    }
         field(15; "Ship-to Address"; Text[100])
         {
             Caption = 'Ship-to Address';
-        }
+                    }
         field(16; "Ship-to Address 2"; Text[50])
         {
             Caption = 'Ship-to Address 2';
-        }
+                    }
         field(17; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
-            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
+                        TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
@@ -513,21 +508,14 @@ table 5900 "Service Header"
         field(18; "Ship-to Contact"; Text[100])
         {
             Caption = 'Ship-to Contact';
-        }
+                    }
         field(19; "Order Date"; Date)
         {
             Caption = 'Order Date';
             NotBlank = true;
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateOrderDate(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if "Order Date" <> xRec."Order Date" then begin
                     if ("Order Date" > "Starting Date") and
                        ("Starting Date" <> 0D)
@@ -624,7 +612,7 @@ table 5900 "Service Header"
         field(22; "Posting Description"; Text[100])
         {
             Caption = 'Posting Description';
-        }
+                    }
         field(23; "Payment Terms Code"; Code[10])
         {
             Caption = 'Payment Terms Code';
@@ -887,7 +875,7 @@ table 5900 "Service Header"
         field(42; "Format Region"; Text[80])
         {
             Caption = 'Format Region';
-            TableRelation = "Language Selection"."Language Tag";
+                        TableRelation = "Language Selection"."Language Tag";
         }
         field(43; "Salesperson Code"; Code[20])
         {
@@ -1032,7 +1020,7 @@ table 5900 "Service Header"
         field(70; "VAT Registration No."; Text[20])
         {
             Caption = 'VAT Registration No.';
-        }
+                    }
         field(71; "Combine Shipments"; Boolean)
         {
             Caption = 'Combine Shipments';
@@ -1090,15 +1078,15 @@ table 5900 "Service Header"
         field(79; Name; Text[100])
         {
             Caption = 'Name';
-        }
+                    }
         field(80; "Name 2"; Text[50])
         {
             Caption = 'Name 2';
-        }
+                    }
         field(81; Address; Text[100])
         {
             Caption = 'Address';
-
+            
             trigger OnValidate()
             begin
                 UpdateShipToAddressFromGeneralAddress(FieldNo("Ship-to Address"));
@@ -1107,7 +1095,7 @@ table 5900 "Service Header"
         field(82; "Address 2"; Text[50])
         {
             Caption = 'Address 2';
-
+            
             trigger OnValidate()
             begin
                 UpdateShipToAddressFromGeneralAddress(FieldNo("Ship-to Address 2"));
@@ -1116,7 +1104,7 @@ table 5900 "Service Header"
         field(83; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+                        TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
             else
             if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
@@ -1140,7 +1128,7 @@ table 5900 "Service Header"
         field(84; "Contact Name"; Text[100])
         {
             Caption = 'Contact Name';
-        }
+                    }
         field(85; "Bill-to Post Code"; Code[20])
         {
             Caption = 'Bill-to Post Code';
@@ -1169,7 +1157,7 @@ table 5900 "Service Header"
         {
             CaptionClass = '5,3,' + "Bill-to Country/Region Code";
             Caption = 'Bill-to County';
-        }
+                    }
         field(87; "Bill-to Country/Region Code"; Code[10])
         {
             Caption = 'Bill-to Country/Region Code';
@@ -1211,7 +1199,7 @@ table 5900 "Service Header"
         {
             CaptionClass = '5,1,' + "Country/Region Code";
             Caption = 'County';
-
+            
             trigger OnValidate()
             begin
                 UpdateShipToAddressFromGeneralAddress(FieldNo("Ship-to County"));
@@ -1261,7 +1249,7 @@ table 5900 "Service Header"
         {
             CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
-        }
+                    }
         field(93; "Ship-to Country/Region Code"; Code[10])
         {
             Caption = 'Ship-to Country/Region Code';
@@ -1301,7 +1289,7 @@ table 5900 "Service Header"
         field(100; "External Document No."; Code[35])
         {
             Caption = 'External Document No.';
-
+            
             trigger OnValidate()
             var
                 WhseServiceRelease: Codeunit "Whse.-Service Release";
@@ -1544,13 +1532,7 @@ table 5900 "Service Header"
             var
                 JobQueueEntry: Record "Job Queue Entry";
                 RepairStatus: Record "Repair Status";
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateStatus(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
-
                 ServItemLine.Reset();
                 ServItemLine.SetRange("Document Type", "Document Type");
                 ServItemLine.SetRange("Document No.", "No.");
@@ -1989,7 +1971,7 @@ table 5900 "Service Header"
         field(5902; Description; Text[100])
         {
             Caption = 'Description';
-        }
+                    }
         field(5904; "Service Order Type"; Code[10])
         {
             Caption = 'Service Order Type';
@@ -2047,7 +2029,7 @@ table 5900 "Service Header"
         field(5915; "Phone No."; Text[30])
         {
             Caption = 'Phone No.';
-            ExtendedDatatype = PhoneNo;
+                        ExtendedDatatype = PhoneNo;
 
             trigger OnValidate()
             begin
@@ -2057,7 +2039,7 @@ table 5900 "Service Header"
         field(5916; "E-Mail"; Text[80])
         {
             Caption = 'Email';
-            ExtendedDatatype = EMail;
+                        ExtendedDatatype = EMail;
 
             trigger OnValidate()
             var
@@ -2070,7 +2052,7 @@ table 5900 "Service Header"
         field(5917; "Phone No. 2"; Text[30])
         {
             Caption = 'Phone No. 2';
-            ExtendedDatatype = PhoneNo;
+                        ExtendedDatatype = PhoneNo;
 
             trigger OnValidate()
             begin
@@ -2080,7 +2062,7 @@ table 5900 "Service Header"
         field(5918; "Fax No."; Text[30])
         {
             Caption = 'Fax No.';
-        }
+                    }
         field(5921; "No. of Unallocated Items"; Integer)
         {
             CalcFormula = count("Service Item Line" where("Document Type" = field("Document Type"),
@@ -2523,11 +2505,11 @@ table 5900 "Service Header"
         field(5955; "Ship-to Fax No."; Text[30])
         {
             Caption = 'Ship-to Fax No.';
-        }
+                    }
         field(5956; "Ship-to E-Mail"; Text[80])
         {
             Caption = 'Ship-to Email';
-            ExtendedDatatype = EMail;
+                        ExtendedDatatype = EMail;
 
             trigger OnValidate()
             var
@@ -2545,12 +2527,12 @@ table 5900 "Service Header"
         field(5958; "Ship-to Phone"; Text[30])
         {
             Caption = 'Ship-to Phone';
-            ExtendedDatatype = PhoneNo;
+                        ExtendedDatatype = PhoneNo;
         }
         field(5959; "Ship-to Phone 2"; Text[30])
         {
             Caption = 'Ship-to Phone 2';
-            ExtendedDatatype = PhoneNo;
+                        ExtendedDatatype = PhoneNo;
         }
         field(5966; "Service Zone Filter"; Code[10])
         {
@@ -2877,9 +2859,7 @@ table 5900 "Service Header"
         PostCode: Record "Post Code";
         CurrExchRate: Record "Currency Exchange Rate";
         GeneralLedgerSetup: Record "General Ledger Setup";
-#if not CLEAN27
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
-#endif
         ServShptHeader: Record "Service Shipment Header";
         ServInvHeader: Record "Service Invoice Header";
         ServCrMemoHeader: Record "Service Cr.Memo Header";
@@ -2964,9 +2944,6 @@ table 5900 "Service Header"
         CannotDeleteWhenNextInvExistsErr: Label 'The service invoice cannot be deleted because there are service invoices with a later posting date.';
         CannotRestoreInvoiceDatesErr: Label 'The service invoice cannot be deleted because the previous invoice dates cannot be restored in the service contract.';
         InvoicePeriodChangedErr: Label 'The invoice period in the service contract has been changed and cannot be updated.';
-#if not CLEAN27
-        SkipStatsPrep: Boolean;
-#endif
 
     protected var
         GlobalNoSeries: Record "No. Series";
@@ -3046,7 +3023,6 @@ table 5900 "Service Header"
 
     procedure UpdateAllLineDim(NewParentDimSetID: Integer; OldParentDimSetID: Integer)
     var
-        xServiceLine: Record "Service Line";
         ConfirmManagement: Codeunit "Confirm Management";
         NewDimSetID: Integer;
         IsHandled: Boolean;
@@ -3075,14 +3051,10 @@ table 5900 "Service Header"
                 OnUpdateAllLineDimOnBeforeGetServLineNewDimSetID(ServLine, NewParentDimSetID, OldParentDimSetID);
                 NewDimSetID := DimMgt.GetDeltaDimSetID(ServLine."Dimension Set ID", NewParentDimSetID, OldParentDimSetID);
                 if ServLine."Dimension Set ID" <> NewDimSetID then begin
-                    xServiceLine := ServLine;
                     ServLine."Dimension Set ID" := NewDimSetID;
                     DimMgt.UpdateGlobalDimFromDimSetID(
                       ServLine."Dimension Set ID", ServLine."Shortcut Dimension 1 Code", ServLine."Shortcut Dimension 2 Code");
-
-                    OnUpdateAllLineDimOnBeforeServiceLineModify(ServLine, xServiceLine);
                     ServLine.Modify();
-                    OnUpdateAllLineDimOnAfterServiceLineModify(ServLine);
                 end;
             until ServLine.Next() = 0;
 
@@ -3161,7 +3133,7 @@ table 5900 "Service Header"
     /// <summary>
     /// Updates value of the field 'Currency Factor' for the current service header.
     /// </summary>
-    /// <remarks>If no exchange rate for selected currency code exists, the system will offer to a user option to manually add missing exchange rate.
+    /// <remarks>If no exchange rate for selected currency code exists, the system will offer to a user option to manually add missing exchange rate. 
     /// Changes will be propagated to all existing service lines related to current service header. </remarks>
     procedure UpdateCurrencyFactor()
     var
@@ -3198,10 +3170,10 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Recalculates existing service lines related to current service header based on new values from hader.
+    /// Recalculates existing service lines related to current service header based on new values from hader. 
     /// </summary>
     /// <param name="ChangedFieldName">Indicates the name of a field which invoked the method. </param>
-    /// <remarks>Changing 'Location Code' value won't be possible if reservation entry, item tracking code or order tracking exist.
+    /// <remarks>Changing 'Location Code' value won't be possible if reservation entry, item tracking code or order tracking exist. 
     /// Additional service lines must not be shipped or invoiced. </remarks>
     procedure RecreateServLines(ChangedFieldName: Text[100])
     var
@@ -3337,7 +3309,7 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Propagates changes for specific fields provided by 'ChangedFieldNo' to service lines related to current service header.
+    /// Propagates changes for specific fields provided by 'ChangedFieldNo' to service lines related to current service header. 
     /// </summary>
     /// <param name="ChangedFieldNo">Indicates the number of fields which invoked the validation. </param>
     /// <param name="AskQuestion">Indicates if confirmation dialog should appear. </param>
@@ -3554,17 +3526,10 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Updates values of 'Response Date' and 'Response Time' based on related service item line.
+    /// Updates values of 'Response Date' and 'Response Time' based on related service item line. 
     /// </summary>
     procedure UpdateResponseDateTime()
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateResponseDateTime(Rec, CurrFieldNo, IsHandled);
-        if IsHandled then
-            exit;
-
         ServItemLine.Reset();
         ServItemLine.SetCurrentKey("Document Type", "Document No.", "Response Date");
         ServItemLine.SetRange("Document Type", "Document Type");
@@ -3633,7 +3598,7 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Checks if service item line exists for current service header record.
+    /// Checks if service item line exists for current service header record. 
     /// </summary>
     /// <returns>Returns 'true' if service item line exists, otherwise 'false'. </returns>
     procedure ServItemLineExists(): Boolean
@@ -3647,7 +3612,7 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Checks if service line exists for current service header record.
+    /// Checks if service line exists for current service header record. 
     /// </summary>
     /// <returns>Returns 'true' if service line exists, otherwise 'false'. </returns>
     procedure ServLineExists(): Boolean
@@ -3699,8 +3664,8 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Indicates if of values 'Sarting Date', 'Starting Time', 'Finishing Date' and 'Finishing Time' will be taken from related service item line for current service header.
-    /// Also it controls if field 'Fault Reason Code' should be populated on related service item lines.
+    /// Indicates if of values 'Sarting Date', 'Starting Time', 'Finishing Date' and 'Finishing Time' will be taken from related service item line for current service header. 
+    /// Also it controls if field 'Fault Reason Code' should be populated on related service item lines. 
     /// </summary>
     /// <param name="NewValidatingFromLines">New value for 'ValidatingFromLines'. </param>
     ///<remarks>If 'true' transfer won't be done. </remarks>
@@ -3711,7 +3676,7 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Test if a setup for services number series is defined in the service management setup record, also if a corresponding general journal template setup exist.
+    /// Test if a setup for services number series is defined in the service management setup record, also if a corresponding general journal template setup exist. 
     /// </summary>
     procedure TestNoSeries()
     var
@@ -4143,11 +4108,8 @@ table 5900 "Service Header"
 
     local procedure InitPostingDate()
     begin
-        if "Posting Date" = 0D then
-            "Posting Date" := WorkDate();
-
-        if "Document Date" = 0D then
-            "Document Date" := WorkDate();
+        "Posting Date" := WorkDate();
+        "Document Date" := WorkDate();
 
         OnAfterInitPostingDate(Rec);
     end;
@@ -4217,7 +4179,7 @@ table 5900 "Service Header"
 #endif
                     if ServiceMgtSetup."Shipment on Invoice" then
 #if CLEAN24
-                        if NoSeries.IsAutomatic(ServiceMgtSetup."Posted Service Shipment Nos.") then
+                    if NoSeries.IsAutomatic(ServiceMgtSetup."Posted Service Shipment Nos.") then
                             "Shipping No. Series" := ServiceMgtSetup."Posted Service Shipment Nos.";
 #else
 #pragma warning disable AL0432
@@ -4344,7 +4306,7 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Sets shipment information from provided parameters for the current service header record.
+    /// Sets shipment information from provided parameters for the current service header record. 
     /// </summary>
     /// <param name="ShipToName">Provided name information. </param>
     /// <param name="ShipToName2">Provided name 2 information. </param>
@@ -4367,7 +4329,7 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Runs confirmation dialog to confirm deletion of related service document record.
+    /// Runs confirmation dialog to confirm deletion of related service document record. 
     /// </summary>
     /// <returns>Returns 'true' if delete is confirmed, otherwise 'false'. </returns>
     procedure ConfirmDeletion(): Boolean
@@ -4497,15 +4459,13 @@ table 5900 "Service Header"
             until ValueEntry.Next() = 0;
     end;
 
-#if not CLEAN27
-    [Obsolete('Call CalculateIncDiscForHeader on codeunit "Service-Calc. Discount" directly instead', '27.0')]
     procedure CalcInvDiscForHeader()
     var
         ServiceInvDisc: Codeunit "Service-Calc. Discount";
     begin
         ServiceInvDisc.CalculateIncDiscForHeader(Rec);
     end;
-#endif
+
     procedure SetSecurityFilterOnRespCenter()
     var
         IsHandled: Boolean;
@@ -4522,12 +4482,10 @@ table 5900 "Service Header"
         end;
     end;
 
-#if not CLEAN27
     /// <summary>
     /// Runs page service statistic for current service header record.
     /// </summary>
     /// <remarks>Commit will be triggered. </remarks>
-    [Obsolete('The new statistics actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
     procedure OpenStatistics()
     var
         StatPageID: Integer;
@@ -4542,12 +4500,9 @@ table 5900 "Service Header"
         Commit();
         StatPageID := Page::"Service Statistics";
         OnOpenStatisticsOnAfterSetStatPageID(Rec, StatPageID);
-        SkipStatsPrep := true;
         Page.RunModal(StatPageID, Rec);
-        ResetSkipStatisticsPreparationFlag();
     end;
 
-    [Obsolete('The new statistics actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
     procedure OpenOrderStatistics()
     var
         ServiceLine: Record "Service Line";
@@ -4574,23 +4529,9 @@ table 5900 "Service Header"
 
         StatPageID := Page::"Service Order Statistics";
         OnOpenOrderStatisticsOnAfterSetStatPageID(Rec, StatPageID);
-        SkipStatsPrep := true;
         Page.RunModal(StatPageID, Rec);
-        ResetSkipStatisticsPreparationFlag();
     end;
 
-    [Obsolete('The statistics action will be replaced with the SOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
-    procedure SkipStatisticsPreparation(): Boolean
-    begin
-        exit(SkipStatsPrep)
-    end;
-
-    [Obsolete('The statistics action will be replaced with the ServiceOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
-    procedure ResetSkipStatisticsPreparationFlag()
-    begin
-        SkipStatsPrep := false;
-    end;
-#endif
     local procedure CheckMandSalesPersonOrderData(ServiceMgtSetup: Record "Service Mgt. Setup")
     begin
         if ServiceMgtSetup."Salesperson Mandatory" then
@@ -5433,7 +5374,7 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Transfers relevant field values from current service header to the provided general journal line.
+    /// Transfers relevant field values from current service header to the provided general journal line. 
     /// </summary>
     /// <param name="GenJournalLine">Destination general journal line. </param>
     procedure CopyToGenJournalLine(var GenJournalLine: Record "Gen. Journal Line")
@@ -5451,8 +5392,6 @@ table 5900 "Service Header"
         GenJournalLine."Ship-to/Order Address Code" := "Ship-to Code";
         GenJournalLine."EU 3-Party Trade" := "EU 3-Party Trade";
         GenJournalLine."Salespers./Purch. Code" := "Salesperson Code";
-        if GenJournalLine."Account Type" = GenJournalLine."Account Type"::Customer then
-            GenJournalLine."Posting Group" := "Customer Posting Group";
         GeneralLedgerSetup.GetRecordOnce();
         if GeneralLedgerSetup."Journal Templ. Name Mandatory" then
             GenJournalLine."Journal Template Name" := "Journal Templ. Name";
@@ -5464,7 +5403,7 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Transfers apply-to document information from current service header to the provided general journal line.
+    /// Transfers apply-to document information from current service header to the provided general journal line. 
     /// </summary>
     /// <param name="GenJournalLine">Destination general journal line. </param>
     procedure CopyToGenJournalLineApplyTo(var GenJournalLine: Record "Gen. Journal Line")
@@ -5481,7 +5420,7 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Transfers payment information from current service header to the provided general journal line.
+    /// Transfers payment information from current service header to the provided general journal line. 
     /// </summary>
     /// <param name="GenJournalLine">Destination general journal line. </param>
     procedure CopyToGenJournalLinePayment(var GenJournalLine: Record "Gen. Journal Line")
@@ -5500,7 +5439,7 @@ table 5900 "Service Header"
     end;
 
     /// <summary>
-    /// Transfers relevant field values from current service header to the provided item journal line.
+    /// Transfers relevant field values from current service header to the provided item journal line. 
     /// </summary>
     /// <param name="ItemJournalLine">Destination general journal line. </param>
     procedure CopyToItemJnlLine(var ItemJournalLine: Record "Item Journal Line")
@@ -5765,19 +5704,17 @@ table 5900 "Service Header"
     local procedure OnAfterOnInsert(var ServiceHeader: Record "Service Header")
     begin
     end;
-#if not CLEAN27
-    [Obsolete('The new statistics actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOpenOrderStatistics(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
     begin
     end;
 
-    [Obsolete('The new statistics actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOpenStatistics(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
     begin
     end;
-#endif
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestMandatoryFields(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line")
     begin
@@ -6223,19 +6160,16 @@ table 5900 "Service Header"
     begin
     end;
 
-#if not CLEAN27
-    [Obsolete('The new statistics actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnOpenStatisticsOnAfterSetStatPageID(var ServiceHeader: Record "Service Header"; var StatPageID: Integer)
     begin
     end;
 
-    [Obsolete('The new statistics actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnOpenOrderStatisticsOnAfterSetStatPageID(var ServiceHeader: Record "Service Header"; var StatPageID: Integer)
     begin
     end;
-#endif
+
     [IntegrationEvent(false, false)]
     local procedure OnDeleteOnBeforeArchiveServiceDocument(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header")
     begin
@@ -6323,31 +6257,6 @@ table 5900 "Service Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateFinishingTime(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateOrderDate(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateStatus(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateResponseDateTime(var ServiceHeader: Record "Service Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateAllLineDimOnBeforeServiceLineModify(var ServiceLine: Record "Service Line"; var xServiceLine: Record "Service Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateAllLineDimOnAfterServiceLineModify(var ServiceLine: Record "Service Line")
     begin
     end;
 }
