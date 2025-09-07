@@ -487,13 +487,28 @@ report 393 "Suggest Vendor Payments"
         ShowPostingDateWarning := false;
     end;
 
+    protected var
+        GenJnlLine2: Record "Gen. Journal Line";
+        LastDueDateToPayReq: Date;
+        UsePaymentDisc: Boolean;
+        UsePriority: Boolean;
+        AmountAvailable: Decimal;
+        SkipExportedPayments: Boolean;
+        CheckOtherJournalBatches: Boolean;
+        SummarizePerVend: Boolean;
+        SummarizePerDimText: Text[250];
+        PostingDate: Date;
+        UseDueDateAsPostingDate: Boolean;
+        DueDateOffset: DateFormula;
+        NextDocNo: Code[20];
+        DocNoPerLine: Boolean;
+
     var
         Vend2: Record Vendor;
         GenJnlTemplate: Record "Gen. Journal Template";
         GenJnlBatch: Record "Gen. Journal Batch";
         GenJnlLine: Record "Gen. Journal Line";
         DimSetEntry: Record "Dimension Set Entry";
-        GenJnlLine2: Record "Gen. Journal Line";
         VendLedgEntry: Record "Vendor Ledger Entry";
         GLAcc: Record "G/L Account";
         BankAcc: Record "Bank Account";
@@ -506,24 +521,13 @@ report 393 "Suggest Vendor Payments"
         TempErrorMessage: Record "Error Message" temporary;
         DimMgt: Codeunit DimensionManagement;
         DimBufMgt: Codeunit "Dimension Buffer Management";
-        DueDateOffset: DateFormula;
         Window: Dialog;
         Window2: Dialog;
-        UsePaymentDisc: Boolean;
-        PostingDate: Date;
-        LastDueDateToPayReq: Date;
-        NextDocNo: Code[20];
-        AmountAvailable: Decimal;
         OriginalAmtAvailable: Decimal;
-        UsePriority: Boolean;
-        SummarizePerVend: Boolean;
         SummarizePerDim: Boolean;
-        SummarizePerDimText: Text[250];
         LastLineNo: Integer;
         NextEntryNo: Integer;
-        UseDueDateAsPostingDate: Boolean;
         StopPayments: Boolean;
-        DocNoPerLine: Boolean;
         BankPmtType: Enum "Bank Payment Type";
         BalAccType: Enum "Gen. Journal Account Type";
         BalAccNo: Code[20];
@@ -568,10 +572,8 @@ report 393 "Suggest Vendor Payments"
 #pragma warning restore AA0470
         ReplacePostingDateMsg: Label 'For one or more entries, the requested posting date is before the work date.\\These posting dates will use the work date.';
         PmtDiscUnavailableErr: Label 'You cannot use Summarize per Vendor together with Calculate Posting Date from Applies-to-Doc. Due Date, because the resulting posting date might not match the due date.';
-        SkipExportedPayments: Boolean;
         MessageToRecipientMsg: Label 'Payment of %1 %2 ', Comment = '%1 document type, %2 Document No.';
         StartingDocumentNoErr: Label 'The value in the Starting Document No. field must have a number so that we can assign the next number in the series.';
-        CheckOtherJournalBatches: Boolean;
         ReviewNotSuggestedLinesQst: Label 'There are payments in other journal batches that are not suggested here. This helps avoid duplicate payments. To add them to this batch, remove the payment from the other batch, and then suggest payments again.\\Do you want to review the payments from the other journal batches now?';
 #pragma warning disable AA0470
         NotSuggestedPaymentInfoTxt: Label 'There are payments in %1 %2, %3 %4, %5 %6', Comment = 'There are payments in Journal Template Name PAYMENT, Journal Batch Name GENERAL, Applies-to Doc. No. 101321';
@@ -1335,7 +1337,7 @@ report 393 "Suggest Vendor Payments"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnBeforeUpdateGnlJnlLineDimensionsFromVendorPaymentBuffer(var GenJournalLine: Record "Gen. Journal Line"; TempVendorPaymentBuffer: Record "Vendor Payment Buffer" temporary; SummarizePerVend: Boolean; DocNoPerLine: Boolean; var NextDocNo: Code[20])
     begin
     end;
@@ -1350,7 +1352,7 @@ report 393 "Suggest Vendor Payments"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [IntegrationEvent(true, false)]
     local procedure OnInsertGenJournalLineOnBeforeAssignDocumentNo(var GenJournalLine: record "Gen. Journal Line"; GenJournalLine2: record "Gen. Journal Line"; GenJournalBatch: record "Gen. Journal Batch"; TempVendorPaymentBuffer: record "Vendor Payment Buffer" temporary; var NextDocNo: Code[20]; BankPmtType: Enum "Bank Payment Type"; DocNoPerLine: Boolean; var TempOldVendorPaymentBuffer: Record "Vendor Payment Buffer" temporary; SummarizePerVend: Boolean; var IsHandled: Boolean)
     begin
     end;

@@ -163,8 +163,6 @@ codeunit 87 "Blanket Sales Order to Order"
                 ResetQuantityFields(SalesLineOrder);
                 SalesLineOrder."Document Type" := SalesHeaderOrder."Document Type";
                 SalesLineOrder."Document No." := SalesHeaderOrder."No.";
-                NextLineNo += 10000;
-                SalesLineOrder."Line No." := NextLineNo;
                 SalesLineOrder."Blanket Order No." := SalesHeaderBlanketOrder."No.";
                 SalesLineOrder."Blanket Order Line No." := SalesLineBlanketOrder."Line No.";
                 if (SalesLineOrder."No." <> '') and (SalesLineOrder.Type <> SalesLineOrder.Type::" ") then begin
@@ -450,6 +448,7 @@ codeunit 87 "Blanket Sales Order to Order"
     begin
         if not SalesOrderLine.IsExtendedText() then
             exit(true);
+
         exit(
           AttachedToSalesLine.Get(
             SalesOrderLine."Document Type", SalesOrderLine."Document No.", SalesOrderLine."Attached to Line No."));

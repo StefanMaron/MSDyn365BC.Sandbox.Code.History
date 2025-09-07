@@ -219,7 +219,7 @@ report 5753 "Get Source Documents"
                     begin
                         SetPurchLineFilters("Purchase Line", "Warehouse Request");
 
-                        OnAfterPurchaseLineOnPreDataItem("Purchase Line", OneHeaderCreated, WhseShptHeader, WhseReceiptHeader);
+                        OnAfterPurchaseLineOnPreDataItem("Purchase Line", OneHeaderCreated, WhseShptHeader, WhseReceiptHeader, RequestType);
                     end;
                 }
 
@@ -657,7 +657,7 @@ report 5753 "Get Source Documents"
         ActivitiesCreated := ActivitiesCreated + 1;
         WhseHeaderCreated := true;
 
-        OnAfterCreateShptHeader(WhseShptHeader, "Warehouse Request", "Sales Line");
+        OnAfterCreateShptHeader(WhseShptHeader, "Warehouse Request", "Sales Line", "Purchase Line");
     end;
 
     procedure CreateReceiptHeader()
@@ -913,7 +913,7 @@ report 5753 "Get Source Documents"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateShptHeader(var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; WarehouseRequest: Record "Warehouse Request"; SalesLine: Record "Sales Line")
+    local procedure OnAfterCreateShptHeader(var WarehouseShipmentHeader: Record "Warehouse Shipment Header"; WarehouseRequest: Record "Warehouse Request"; SalesLine: Record "Sales Line"; PurchaseLine: Record "Purchase Line")
     begin
     end;
 
@@ -968,7 +968,7 @@ report 5753 "Get Source Documents"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterPurchaseLineOnPreDataItem(var PurchaseLine: Record "Purchase Line"; OneHeaderCreated: Boolean; WhseShptHeader: Record "Warehouse Shipment Header"; WhseReceiptHeader: Record "Warehouse Receipt Header")
+    local procedure OnAfterPurchaseLineOnPreDataItem(var PurchaseLine: Record "Purchase Line"; OneHeaderCreated: Boolean; WhseShptHeader: Record "Warehouse Shipment Header"; WhseReceiptHeader: Record "Warehouse Receipt Header"; RequestType: Option)
     begin
     end;
 
