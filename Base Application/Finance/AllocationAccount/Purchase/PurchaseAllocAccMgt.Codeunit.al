@@ -358,7 +358,6 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
 
         BindSubscription(AllocAccHandleDocPost);
         PurchaseLine.Validate("No.", AllocationLine."Destination Account Number");
-        PurchaseLine.Validate("Tax Group Code", AllocationPurchaseLine."Tax Group Code");
         UnbindSubscription(AllocAccHandleDocPost);
 
         if DescriptionChanged then begin
@@ -371,7 +370,6 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
         MoveAmounts(PurchaseLine, AllocationPurchaseLine, AllocationLine, AllocationAccount);
         MoveQuantities(PurchaseLine, AllocationPurchaseLine);
 
-        PurchaseLine."VAT Difference" := AllocationLine.Percentage * AllocationPurchaseLine."VAT Difference" / 100;
         PurchaseLine."Deferral Code" := AllocationPurchaseLine."Deferral Code";
         CopyDeferralSchedule(PurchaseLine, AllocationPurchaseLine);
         TransferDimensionSetID(PurchaseLine, AllocationLine, AllocationPurchaseLine."Alloc. Acc. Modified by User");
@@ -551,13 +549,11 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
     begin
         PurchaseHeader.ReadIsolation := IsolationLevel::ReadUncommitted;
         PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
-        if PurchaseHeader."Prices Including VAT" then begin
+        if PurchaseHeader."Prices Including VAT" then
             AllocationLineAmount += AllocationLineAmount * PurchaseLine."VAT %" / 100;
-            AmountRoundingPrecision := AllocationAccountMgt.GetCurrencyRoundingPrecision(PurchaseLine."Currency Code");
-            exit(Round(AllocationLineAmount / PurchaseLine.Quantity, AmountRoundingPrecision));
-        end;
 
-        exit(AllocationLineAmount / PurchaseLine.Quantity);
+        AmountRoundingPrecision := AllocationAccountMgt.GetCurrencyRoundingPrecision(PurchaseLine."Currency Code");
+        exit(Round(AllocationLineAmount / PurchaseLine.Quantity, AmountRoundingPrecision));
     end;
 
     local procedure GetNextLine(var AllocationPurchaseLine: Record "Purchase Line"): Integer
