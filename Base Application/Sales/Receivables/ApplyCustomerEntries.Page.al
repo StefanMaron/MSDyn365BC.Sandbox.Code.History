@@ -116,14 +116,10 @@ page 232 "Apply Customer Entries"
 
                     trigger OnValidate()
                     begin
-                        if Rec."Applies-to ID" = xRec."Applies-to ID" then
-                            exit;
-
                         if (CalcType = CalcType::"Gen. Jnl. Line") and (ApplnType = ApplnType::"Applies-to Doc. No.") then
                             Error(CannotSetAppliesToIDErr);
 
                         SetCustApplId(true);
-                        Rec.Get(Rec."Entry No.");
                         if Rec."Applies-to ID" <> '' then
                             UpdateCustomAppliesToIDForGenJournal(Rec."Applies-to ID");
 
@@ -1056,7 +1052,7 @@ page 232 "Apply Customer Entries"
         CurrPage.SetSelectionFilter(CustLedgEntry);
         CheckCustLedgEntry(CustLedgEntry);
 
-        OnSetCustApplIdOnAfterCheckAgainstApplnCurrency(Rec, CustLedgEntry, CalcType.AsInteger(), GenJnlLine, SalesHeader, TempApplyingCustLedgEntry);
+        OnSetCustApplIdOnAfterCheckAgainstApplnCurrency(Rec, CalcType.AsInteger(), GenJnlLine, SalesHeader, TempApplyingCustLedgEntry);
 #if not CLEAN25
         OnSetCustApplIdAfterCheckAgainstApplnCurrency(Rec, CalcType.AsInteger(), GenJnlLine, SalesHeader, ServHeader, TempApplyingCustLedgEntry);
 #endif
@@ -1559,8 +1555,6 @@ page 232 "Apply Customer Entries"
                 else
                     Applied := CustEntryApplyPostedEntries.Apply(Rec, NewApplyUnapplyParameters);
 
-                OnPostDirectApplicationOnAfterApply(Rec, NewApplyUnapplyParameters, PreviewMode, Applied);
-
                 if (not PreviewMode) and Applied then begin
                     Message(ApplicationPostedMsg);
                     PostingDone := true;
@@ -1806,7 +1800,7 @@ page 232 "Apply Customer Entries"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnSetCustApplIdOnAfterCheckAgainstApplnCurrency(var CustLedgerEntry: Record "Cust. Ledger Entry"; var CustLedgerEntry2: Record "Cust. Ledger Entry"; CalcType: Option; var GenJnlLine: Record "Gen. Journal Line"; SalesHeader: Record "Sales Header"; ApplyingCustLedgEntry: Record "Cust. Ledger Entry")
+    local procedure OnSetCustApplIdOnAfterCheckAgainstApplnCurrency(var CustLedgerEntry: Record "Cust. Ledger Entry"; CalcType: Option; var GenJnlLine: Record "Gen. Journal Line"; SalesHeader: Record "Sales Header"; ApplyingCustLedgEntry: Record "Cust. Ledger Entry")
     begin
     end;
 
@@ -1865,11 +1859,6 @@ page 232 "Apply Customer Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckCustLedgEntryOnBeforeCheckAgainstApplnCurrencyWhenEntryNoIsNotNull(CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDirectApplicationOnAfterApply(var CustLedgerEntry: Record "Cust. Ledger Entry"; var NewApplyUnapplyParameters: Record "Apply Unapply Parameters"; PreviewMode: Boolean; Applied: Boolean)
     begin
     end;
 }
