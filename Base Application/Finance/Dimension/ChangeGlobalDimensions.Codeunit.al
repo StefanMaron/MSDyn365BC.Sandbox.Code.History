@@ -656,7 +656,6 @@ codeunit 483 "Change Global Dimensions"
         ChangeGlobalDimLogEntry.LockTable();
         ChangeGlobalDimLogEntry.DeleteAll(true);
         if FindTablesWithDims(TempAllObjWithCaption) then begin
-            OnInitTableListOnAfterFindTablesWithDims(ChangeGlobalDimHeader);
             repeat
                 ChangeGlobalDimLogEntry.Init();
                 ChangeGlobalDimLogEntry."Table ID" := TempAllObjWithCaption."Object ID";
@@ -668,7 +667,6 @@ codeunit 483 "Change Global Dimensions"
                 TempParentTableInteger.Number := ChangeGlobalDimLogEntry."Parent Table ID";
                 if TempParentTableInteger.Number <> 0 then
                     if TempParentTableInteger.Insert() then;
-                OnInitTableListOnBeforeInsertChangeGlobalDimLogEntry(ChangeGlobalDimHeader, ChangeGlobalDimLogEntry);
                 ChangeGlobalDimLogEntry.Insert();
             until TempAllObjWithCaption.Next() = 0;
 
@@ -714,7 +712,6 @@ codeunit 483 "Change Global Dimensions"
         TestDirectModifyPermission(RecRef);
         ChangeGlobalDimLogEntry.FillData(RecRef);
         RecRef.Close();
-        OnAfterFillTableData(ChangeGlobalDimLogEntry);
     end;
 
     local procedure FindTablesWithDims(var TempAllObjWithCaption: Record AllObjWithCaption temporary): Boolean
@@ -845,19 +842,5 @@ codeunit 483 "Change Global Dimensions"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFillTableData(var ChangeGlobalDimLogEntry: Record "Change Global Dim. Log Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInitTableListOnAfterFindTablesWithDims(var ChangeGlobalDimHeader: Record "Change Global Dim. Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInitTableListOnBeforeInsertChangeGlobalDimLogEntry(var ChangeGlobalDimHeader: Record "Change Global Dim. Header"; var ChangeGlobalDimLogEntry: Record "Change Global Dim. Log Entry")
-    begin
-    end;
 }
 
