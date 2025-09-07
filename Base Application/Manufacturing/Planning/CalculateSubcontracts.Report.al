@@ -335,9 +335,7 @@ report 99001015 "Calculate Subcontracts"
 
     local procedure CalculateSubContractRequirements()
     begin
-        OnProdOrderRoutingLineOnBeforeCalculateSubContractRequirements(TempProdOrderRoutingLine);
-
-        if TempProdOrderRoutingLine.IsEmpty() then
+        if TempProdOrderRoutingLine.IsEmpty then
             exit;
 
         TempProdOrderRoutingLine.SetCurrentKey("Prod. Order No.", "Routing Reference No.", Status, "Routing No.", "Operation No.");
@@ -423,11 +421,6 @@ report 99001015 "Calculate Subcontracts"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetVendorItemNo(var RequisitionLine: Record "Requisition Line"; ItemVendor: Record "Item Vendor"; Item: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnProdOrderRoutingLineOnBeforeCalculateSubContractRequirements(var TempProdOrderRoutingLine: Record "Prod. Order Routing Line" temporary)
     begin
     end;
 }
