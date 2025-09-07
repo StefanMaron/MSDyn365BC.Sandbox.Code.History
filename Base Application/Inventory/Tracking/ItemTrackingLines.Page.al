@@ -1701,7 +1701,8 @@ page 6510 "Item Tracking Lines"
           TrackingSpecification."Source ID", TrackingSpecification."Source Ref. No.", true);
         ReservEntry.SetSourceFilter(
           TrackingSpecification."Source Batch Name", TrackingSpecification."Source Prod. Order Line");
-        ReservEntry.SetRange("Untracked Surplus", false);
+        if CheckTrackingSpecificationSource(TrackingSpecification) then
+            ReservEntry.SetRange("Untracked Surplus", false);
 
         // Transfer Receipt gets special treatment:
         SetSourceSpecForTransferReceipt(TrackingSpecification, ReservEntry, TempTrackingSpecification2);
@@ -1839,7 +1840,7 @@ page 6510 "Item Tracking Lines"
                     TempReservEntry := ReservEntry;
                     TempReservEntry.Insert();
                 end;
-                if ReservEntry.TrackingExists() then begin
+                if ReservEntry.TrackingExists() or (ReservEntry.IsReclass() and ReservEntry.NewTrackingExists()) then begin
                     AddTracking := true;
                     if SecondSourceID = Database::"Warehouse Shipment Line" then
                         if FromReservEntry.Get(ReservEntry."Entry No.", not ReservEntry.Positive) then
@@ -2377,7 +2378,7 @@ page 6510 "Item Tracking Lines"
                     if IsHandled then
                         exit(true);
 
-                    if (OldTrackingSpecification."Quantity (Base)" = 0) or not OldTrackingSpecification.TrackingExists() then
+                    if (OldTrackingSpecification."Quantity (Base)" = 0) or (not OldTrackingSpecification.TrackingExists() and not NewTrackingSpecification.NewTrackingExists()) then
                         exit(true);
                     TempReservEntry.SetTrackingFilterBlank();
                     OldTrackingSpecification."Quantity (Base)" :=
@@ -2536,6 +2537,8 @@ page 6510 "Item Tracking Lines"
                 end;
         end;
         SetQtyToHandleAndInvoice(NewTrackingSpecification);
+
+        OnAfterRegisterChange(Rec, OldTrackingSpecification, NewTrackingSpecification, CurrentSignFactor, CurrentRunMode.AsInteger(), CurrentPageIsOpen, ChangeType, ModifySharedFields, OK);
     end;
 
     local procedure ProcessLateBinding(var NewTrackingSpecification: Record "Tracking Specification")
@@ -3828,6 +3831,18 @@ page 6510 "Item Tracking Lines"
         OnAfterQtyToHandleOrInvoiceDifferFromQuantity(ItemTrackingLine, HasChanged);
     end;
 
+    local procedure CheckTrackingSpecificationSource(TrackingSpecification: Record "Tracking Specification"): Boolean
+    begin
+        if not ((TrackingSpecification."Source Type" = Database::"Sales Line") and (TrackingSpecification."Source Subtype" = TrackingSpecification."Source Subtype"::"1")) then
+            exit(true);
+
+        if ((TrackingSpecification."Source Type" = Database::"Sales Line") and (TrackingSpecification."Source Subtype" = TrackingSpecification."Source Subtype"::"1") and
+           (TrackingSpecification."Lot No." <> '')) then
+            exit(true)
+        else
+            exit(false);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterQtyToHandleOrInvoiceDifferFromQuantity(ItemTrackingLine: Record "Tracking Specification"; var HasChanged: Boolean)
     begin
@@ -4378,6 +4393,13 @@ page 6510 "Item Tracking Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckItemTrackingLineIsBoundForBarcodeScanning(var TrackingSpecification: Record "Tracking Specification"; var Result: Boolean; IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRegisterChange(var TrackingSpecification: Record "Tracking Specification"; var OldTrackingSpecification: Record "Tracking Specification";
+        var NewTrackingSpecification: Record "Tracking Specification"; CurrentSignFactor: Integer; FormRunMode: Option ,Reclass,"Combined Ship/Rcpt","Drop Shipment",Transfer;
+        CurrentPageIsOpen: Boolean; ChangeType: Option Insert,Modify,FullDelete,PartDelete,ModifyAll; ModifySharedFields: Boolean; var ResultOK: Boolean)
     begin
     end;
 }
