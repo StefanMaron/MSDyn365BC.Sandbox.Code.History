@@ -104,7 +104,6 @@ codeunit 139822 "APIV2 - Employees E2E"
 
         // [GIVEN] An Employee exists.
         CreateEmployee(Employee);
-        Employee.Validate("Bank Account No.");
         TempEmployee.TransferFields(Employee);
         TempEmployee."E-Mail" := LibraryUtility.GenerateRandomEmail();
         RequestBody := GetEmployeeJSON(TempEmployee);

@@ -73,16 +73,13 @@ codeunit 8069 "Sales Subscription Line Mgmt."
             exit;
         if SalesLine.IsContractRenewal() then
             Error(NoAddServicesForContractRenewalAllowedErr);
+        SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
+        ServiceCommitmentPackage.SetRange("Price Group", SalesHeader."Customer Price Group");
+        if ServiceCommitmentPackage.IsEmpty then
+            ServiceCommitmentPackage.SetRange("Price Group");
 
         PackageFilter := ItemServCommitmentPackage.GetPackageFilterForItem(SalesLine, RemoveExistingPackageFromFilter);
         ServiceCommitmentPackage.FilterCodeOnPackageFilter(PackageFilter);
-
-        SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
-        if SalesHeader."Customer Price Group" <> '' then
-            ServiceCommitmentPackage.SetFilter("Price Group", '%1|%2', SalesHeader."Customer Price Group", '');
-        if ServiceCommitmentPackage.IsEmpty() then
-            ServiceCommitmentPackage.SetRange("Price Group");
-
         OnAddAdditionalSalesSubscriptionLinesForSalesLineAfterApplyFilters(ServiceCommitmentPackage, SalesLine);
 
         ShowAssignServiceCommitments := not ServiceCommitmentPackage.IsEmpty();
@@ -103,7 +100,7 @@ codeunit 8069 "Sales Subscription Line Mgmt."
         end;
     end;
 
-    procedure IsSalesLineWithSalesServiceCommitments(var SalesLine: Record "Sales Line"; SkipTemporaryCheck: Boolean; ServiceCommitmentItemOnly: Boolean): Boolean
+    local procedure IsSalesLineWithSalesServiceCommitments(var SalesLine: Record "Sales Line"; SkipTemporaryCheck: Boolean; ServiceCommitmentItemOnly: Boolean): Boolean
     var
         SalesLine2: Record "Sales Line";
     begin
@@ -127,12 +124,12 @@ codeunit 8069 "Sales Subscription Line Mgmt."
         exit(true);
     end;
 
-    procedure IsSalesLineWithSalesServiceCommitments(var SalesLine: Record "Sales Line"; SkipTemporaryCheck: Boolean): Boolean
+    local procedure IsSalesLineWithSalesServiceCommitments(var SalesLine: Record "Sales Line"; SkipTemporaryCheck: Boolean): Boolean
     begin
         exit(IsSalesLineWithSalesServiceCommitments(SalesLine, SkipTemporaryCheck, false));
     end;
 
-    procedure IsSalesLineWithServiceCommitmentItem(var SalesLine: Record "Sales Line"; SkipTemporaryCheck: Boolean): Boolean
+    internal procedure IsSalesLineWithServiceCommitmentItem(var SalesLine: Record "Sales Line"; SkipTemporaryCheck: Boolean): Boolean
     begin
         exit(IsSalesLineWithSalesServiceCommitments(SalesLine, SkipTemporaryCheck, true));
     end;
@@ -183,14 +180,14 @@ codeunit 8069 "Sales Subscription Line Mgmt."
         end;
     end;
 
-    procedure CreateSalesServCommLineFromServCommPackageLine(var SalesLine: Record "Sales Line"; ServiceCommitmentPackageLine: Record "Subscription Package Line")
+    local procedure CreateSalesServCommLineFromServCommPackageLine(var SalesLine: Record "Sales Line"; ServiceCommitmentPackageLine: Record "Subscription Package Line")
     var
         SalesServiceCommitment: Record "Sales Subscription Line";
     begin
         CreateSalesServCommLineFromServCommPackageLine(SalesLine, ServiceCommitmentPackageLine, SalesServiceCommitment);
     end;
 
-    procedure CreateSalesServCommLineFromServCommPackageLine(var SalesLine: Record "Sales Line"; ServiceCommitmentPackageLine: Record "Subscription Package Line"; var SalesServiceCommitment: Record "Sales Subscription Line")
+    local procedure CreateSalesServCommLineFromServCommPackageLine(var SalesLine: Record "Sales Line"; ServiceCommitmentPackageLine: Record "Subscription Package Line"; var SalesServiceCommitment: Record "Sales Subscription Line")
     var
         IsHandled: Boolean;
     begin
@@ -221,7 +218,6 @@ codeunit 8069 "Sales Subscription Line Mgmt."
             SalesServiceCommitment.Validate(Discount, ServiceCommitmentPackageLine.Discount);
             SalesServiceCommitment."Price Binding Period" := ServiceCommitmentPackageLine."Price Binding Period";
             SalesServiceCommitment."Period Calculation" := ServiceCommitmentPackageLine."Period Calculation";
-            SalesServiceCommitment."Create Contract Deferrals" := ServiceCommitmentPackageLine."Create Contract Deferrals";
             SalesServiceCommitment.CalculateCalculationBaseAmount();
             if SalesServiceCommitment.Partner = SalesServiceCommitment.Partner::Customer then
                 SalesServiceCommitment.CalculateUnitCost();

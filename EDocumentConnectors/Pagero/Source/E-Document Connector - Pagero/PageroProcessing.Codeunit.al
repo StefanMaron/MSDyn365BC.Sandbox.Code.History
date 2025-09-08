@@ -16,8 +16,7 @@ codeunit 6369 "Pagero Processing"
 {
     Access = Internal;
     Permissions = tabledata "E-Document" = m,
-                    tabledata "E-Document Service" = rm,
-                    tabledata "E-Document Service Status" = rm;
+                  tabledata "E-Document Service Status" = m;
 
     procedure SendEDocument(var EDocument: Record "E-Document"; var EDocumentService: Record "E-Document Service"; var TempBlob: Codeunit "Temp Blob"; HttpRequest: HttpRequestMessage; HttpResponse: HttpResponseMessage)
     var
