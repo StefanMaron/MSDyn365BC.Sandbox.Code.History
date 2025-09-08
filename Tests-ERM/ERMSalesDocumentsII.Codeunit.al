@@ -4680,7 +4680,7 @@ codeunit 134386 "ERM Sales Documents II"
         GLSetup.Get();
         GLSetup."Show Amounts" := GLSetup."Show Amounts"::"All Amounts";
         GLSetup.Modify();
-        LibrarySetupStorage.Save(DATABASE::"General Ledger Setup");
+        LibrarySetupStorage.SaveGeneralLedgerSetup();
 
         isInitialized := true;
         Commit();

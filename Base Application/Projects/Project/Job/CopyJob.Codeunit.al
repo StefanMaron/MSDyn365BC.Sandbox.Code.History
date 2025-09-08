@@ -152,7 +152,7 @@ codeunit 1006 "Copy Job"
             exit;
         NextPlanningLineNo := 0;
         SourceJobPlanningLine.SetRange("Line No.", 0, SourceJobPlanningLine."Line No.");
-        OnCopyJobPlanningLinesOnAfterSourceJobPlanningLineSetFilters(SourceJobPlanningLine, CopyPrices);
+        OnCopyJobPlanningLinesOnAfterSourceJobPlanningLineSetFilters(SourceJobPlanningLine);
         if SourceJobPlanningLine.FindSet() then
             repeat
                 IsHandled := false;
@@ -188,7 +188,6 @@ codeunit 1006 "Copy Job"
                     TargetJobPlanningLine."Completely Picked" := false;
                     TargetJobPlanningLine."Ledger Entry No." := 0;
                     TargetJobPlanningLine."Ledger Entry Type" := TargetJobPlanningLine."Ledger Entry Type"::" ";
-                    TargetJobPlanningLine."System-Created Entry" := false;
                     OnCopyJobPlanningLinesOnBeforeTargetJobPlanningLineInsert(TargetJobPlanningLine, SourceJobPlanningLine);
                     TargetJobPlanningLine.Insert(true);
                     OnCopyJobPlanningLinesOnAfterTargetJobPlanningLineInsert(TargetJobPlanningLine, SourceJobPlanningLine);
@@ -398,12 +397,6 @@ codeunit 1006 "Copy Job"
         JobTaskDateRangeTo := JobTaskDateRangeTo2;
     end;
 
-    procedure GetJobTaskDateRange(var JobTaskDateRangeFrom2: Date; var JobTaskDateRangeTo2: Date)
-    begin
-        JobTaskDateRangeFrom2 := JobTaskDateRangeFrom;
-        JobTaskDateRangeTo2 := JobTaskDateRangeTo;
-    end;
-
     local procedure FindLastJobPlanningLine(JobPlanningLine: Record "Job Planning Line"): Integer
     begin
         JobPlanningLine.SetRange("Job No.", JobPlanningLine."Job No.");
@@ -464,7 +457,7 @@ codeunit 1006 "Copy Job"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyJobPlanningLinesOnAfterSourceJobPlanningLineSetFilters(var SourceJobPlanningLine: Record "Job Planning Line"; CopyPrices: Boolean)
+    local procedure OnCopyJobPlanningLinesOnAfterSourceJobPlanningLineSetFilters(var SourceJobPlanningLine: Record "Job Planning Line")
     begin
     end;
 
