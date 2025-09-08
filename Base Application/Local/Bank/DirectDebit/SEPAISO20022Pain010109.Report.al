@@ -43,7 +43,6 @@ report 11000014 "SEPA ISO20022 Pain 01.01.09"
             begin
                 if "Payment History".FindSet(true) then;
                 CompanyInfo.Get();
-                OnPaymentHistoryOnPreDataItemOnAfterGetCompanyInfo(CompanyInfo);
                 GLSetup.Get();
             end;
         }
@@ -520,11 +519,6 @@ report 11000014 "SEPA ISO20022 Pain 01.01.09"
 
     [IntegrationEvent(false, false)]
     local procedure OnExportSEPAFileOnBeforeFileMgtDownloadHandler(ServerTempFileName: Text; ExportFileName: Text[250]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPaymentHistoryOnPreDataItemOnAfterGetCompanyInfo(var CompanyInfo: Record "Company Information")
     begin
     end;
 }
