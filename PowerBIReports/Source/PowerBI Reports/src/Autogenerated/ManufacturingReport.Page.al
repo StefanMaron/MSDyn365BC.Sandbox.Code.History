@@ -22,7 +22,7 @@ page 37063 "Manufacturing Report"
 
                 trigger ControlAddInReady()
                 begin
-                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
+                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageTok);
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
@@ -56,7 +56,9 @@ page 37063 "Manufacturing Report"
     var
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
-        ReportPageLbl: Label '', Locked = true;
+#pragma warning disable AA0240
+        ReportPageTok: Label '', Locked = true;
+#pragma warning restore AA0240
 
     trigger OnOpenPage()
     var
