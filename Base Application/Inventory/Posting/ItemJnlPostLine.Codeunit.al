@@ -2103,7 +2103,7 @@ codeunit 22 "Item Jnl.-Post Line"
                     OldItemLedgEntry.TestField("Item No.", ItemJnlLine."Item No.");
                     OldItemLedgEntry.TestField("Variant Code", ItemJnlLine."Variant Code");
                     OldItemLedgEntry.TestField("Location Code", ItemJnlLine."Location Code");
-                    OnApplyItemLedgEntryOnBeforeCloseReservEntry(OldItemLedgEntry, ItemJnlLine, ItemLedgEntry, ReservEntry);
+                    OnApplyItemLedgEntryOnBeforeCloseReservEntry(OldItemLedgEntry, ItemJnlLine, ItemLedgEntry);
                     ReservEngineMgt.CloseReservEntry(ReservEntry, false, false);
                     OnApplyItemLedgEntryOnAfterCloseReservEntry(OldItemLedgEntry, ItemJnlLine, ItemLedgEntry, ReservEntry);
                     OldItemLedgEntry.CalcReservedQuantity();
@@ -3037,10 +3037,7 @@ codeunit 22 "Item Jnl.-Post Line"
                         ItemApplnEntry."Cost Application" := true;
                     ItemJnlLine.Correction:
                         begin
-                            if (ItemJnlLine."Entry Type" = ItemJnlLine."Entry Type"::Output) and (ItemJnlLine."Order Type" = ItemJnlLine."Order Type"::Production) and ItemJnlLine.Subcontracting then
-                                ApplItemLedgEntry := GlobalItemLedgEntry
-                            else
-                                ApplItemLedgEntry.Get(ItemApplnEntry."Item Ledger Entry No.");
+                            ApplItemLedgEntry.Get(ItemApplnEntry."Item Ledger Entry No.");
                             ItemApplnEntry."Cost Application" :=
                               (ApplItemLedgEntry.Quantity > 0) or (ApplItemLedgEntry."Applies-to Entry" <> 0);
                         end;
@@ -7081,7 +7078,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeTestFirstApplyItemLedgEntry(var OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemLedgerEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
+    local procedure OnBeforeTestFirstApplyItemLedgEntry(var OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -7136,7 +7133,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnApplyItemLedgEntryOnBeforeCloseReservEntry(var OldItemLedgEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line"; var ItemLedgerEntry: Record "Item Ledger Entry"; var ReservEntry: Record "Reservation Entry")
+    local procedure OnApplyItemLedgEntryOnBeforeCloseReservEntry(var OldItemLedgEntry: Record "Item Ledger Entry"; ItemJournalLine: Record "Item Journal Line"; var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
     end;
 
