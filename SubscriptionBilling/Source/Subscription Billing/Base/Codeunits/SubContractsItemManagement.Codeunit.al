@@ -46,9 +46,12 @@ codeunit 8055 "Sub. Contracts Item Management"
     [EventSubscriber(ObjectType::Table, Database::"Purchase Line", OnBeforeValidateEvent, "No.", false, false)]
     local procedure PurchaseLineOnBeforeValidateEvent(var Rec: Record "Purchase Line")
     begin
-        if Rec.Type = Rec.Type::Item then
+        if Rec.Type = Rec.Type::Item then begin
             if not Rec.IsLineAttachedToBillingLine() then
                 PreventBillingItem(Rec."No.");
+            if not Rec.IsPurchaseInvoice() and not Rec.IsPurchaseOrderLineAttachedToBillingLine() then
+                PreventServiceCommitmentItem(Rec."No.");
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch.-Post", OnBeforePostPurchLine, '', false, false)]
