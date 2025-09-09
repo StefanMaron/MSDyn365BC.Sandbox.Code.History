@@ -618,7 +618,7 @@ codeunit 5940 ServContractManagement
         LatestInvToDate := InvToDate;
         if ServiceLedgerEntry.Get(ServiceApplyEntry) then begin
             ServiceLedgerEntry.SetRange("Entry No.", ServiceApplyEntry, ServiceLedgerEntry."Apply Until Entry No.");
-            if ServiceLedgerEntry.FindSet() then begin
+            if ServiceLedgerEntry.FindSet() then
                 repeat
                     if ServiceLedgerEntry.Prepaid then begin
                         InvFromDate := ServiceLedgerEntry."Posting Date";
@@ -635,9 +635,7 @@ codeunit 5940 ServContractManagement
                       ContractNo,
                       InvFromDate,
                       InvToDate);
-                until ServiceLedgerEntry.Next() = 0;
-                OnCreateServiceLineOnAfterServLedgEntryToServiceLine(ServHeader, InvFromDate, InvToDate);
-            end;
+                until ServiceLedgerEntry.Next() = 0
         end else begin
             Clear(ServiceLedgerEntry);
             OnCreateServiceLineOnBeforeServLedgEntryToServiceLine(ServHeader, ServContractHeader, ServiceLedgerEntry, InvFromDate, InvToDate);
@@ -3205,11 +3203,6 @@ codeunit 5940 ServContractManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateServiceLineOnBeforeServLedgEntryToServiceLine(var ServiceHeader: Record "Service Header"; var ServiceContractHeader: Record "Service Contract Header"; var ServiceLedgerEntry: Record "Service Ledger Entry"; var InvFromDate: Date; var InvToDate: Date)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateServiceLineOnAfterServLedgEntryToServiceLine(ServiceHeader: Record "Service Header"; InvoiceFromDate: Date; InvoiceToDate: Date)
     begin
     end;
 }
