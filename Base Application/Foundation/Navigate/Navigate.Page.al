@@ -404,6 +404,8 @@ page 344 Navigate
                         end else begin
                             DocumentEntries.TransferDocEntries(Rec);
                             DocumentEntries.TransferFilters(DocNoFilter, PostingDateFilter);
+                            if NavigateDeposit then
+                                DocumentEntries.SetExternal();
                             DocumentEntries.Run();
                         end;
                     end;
