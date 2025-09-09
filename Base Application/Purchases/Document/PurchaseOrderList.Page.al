@@ -1043,8 +1043,7 @@ page 9307 "Purchase Order List"
         Rec.CopyBuyFromVendorFilter();
         if OnlyShowHeadersWithVat then
             SetFilterOnPositiveVatPostingGroups();
-        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
-        ;
+        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Purchase Order Stats.";
     end;
 
     var
