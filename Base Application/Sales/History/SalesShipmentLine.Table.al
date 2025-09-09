@@ -684,13 +684,7 @@ table 111 "Sales Shipment Line"
     procedure ShowItemTrackingLines()
     var
         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeShowItemTrackingLines(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         ItemTrackingDocMgt.ShowItemTrackingForShptRcptLine(DATABASE::"Sales Shipment Line", 0, "Document No.", '', 0, "Line No.");
     end;
 
@@ -912,14 +906,12 @@ table 111 "Sales Shipment Line"
                 ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgEntry."Entry No.");
                 if ValueEntry.FindSet() then
                     repeat
-                        if ValueEntry."Document Type" = ValueEntry."Document Type"::"Sales Invoice" then begin
-                            OnGetSalesInvLinesOnBeforeGetSalesInvoiceLine(SalesInvLine);
+                        if ValueEntry."Document Type" = ValueEntry."Document Type"::"Sales Invoice" then
                             if SalesInvLine.Get(ValueEntry."Document No.", ValueEntry."Document Line No.") then begin
                                 TempSalesInvLine.Init();
                                 TempSalesInvLine := SalesInvLine;
                                 if TempSalesInvLine.Insert() then;
                             end;
-                        end;
                     until ValueEntry.Next() = 0;
             until ItemLedgEntry.Next() = 0;
         end;
@@ -1182,7 +1174,7 @@ table 111 "Sales Shipment Line"
 
         if UserSetupMgt.GetSalesFilter() <> '' then begin
             FilterGroup(2);
-            SetRange("Responsibility Center", UserSetupMgt.GetSalesFilter());
+            SetRange("Responsibility Center", UserSetupMgt.GetPurchasesFilter());
             FilterGroup(0);
         end;
     end;
@@ -1279,16 +1271,6 @@ table 111 "Sales Shipment Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertInvLineFromShptLineOnBeforeSalesHeaderGet(var SalesHeader: Record "Sales Header"; SalesShipmentLine: Record "Sales Shipment Line"; var TempSalesLine: Record "Sales Line" temporary; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetSalesInvLinesOnBeforeGetSalesInvoiceLine(var SalesInvoiceLine: Record "Sales Invoice Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowItemTrackingLines(var SalesShipmentLine: Record "Sales Shipment Line"; var IsHandled: Boolean)
     begin
     end;
 }
