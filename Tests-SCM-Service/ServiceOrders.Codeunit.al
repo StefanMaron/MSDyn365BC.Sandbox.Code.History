@@ -5322,6 +5322,92 @@ codeunit 136101 "Service Orders"
         Assert.IsTrue(ServiceHeader.FindFirst(), ServiceOrderErr);
     end;
 
+    [Test]
+    procedure AlternativePostingGroupIsNotUsingTheCorrectGLAccountsForPostingInServiceManagement()
+    var
+        AltCustPostGrp: Record "Alt. Customer Posting Group";
+        Customer: Record Customer;
+        CustPostGroup: Record "Customer Posting Group";
+        FindCustPostGroup: Record "Customer Posting Group";
+        GLEntry: Record "G/L Entry";
+        SalesReceivablesSetup: Record "Sales & Receivables Setup";
+        ServicemanagementSetup: Record "Service Mgt. Setup";
+        ServiceInvoiceHeader: Record "Service Invoice Header";
+        InvoiceNo: Code[20];
+    begin
+        // [SCENARIO 575185] Alternative Posting Group is not using the correct G/L Accounts for posting in Service Management
+        Initialize();
+
+        // Activate "Allow Multiple Posting Groups" true in Sales & Receivables Setup and Service Mgmt Setup
+        SalesReceivablesSetup.Get();
+        SalesReceivablesSetup."Allow Multiple Posting Groups" := true;
+        SalesReceivablesSetup.Modify();
+        ServicemanagementSetup.Get();
+        ServicemanagementSetup."Allow Multiple Posting Groups" := true;
+        ServicemanagementSetup.Modify();
+
+        // [GIVEN] Create Customer with "Allow Multiple Posting Groups" true.
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Allow Multiple Posting Groups" := true;
+        Customer.Modify();
+
+        // [GIVEN] Create a Customer Posting Group and add Alternate Posting Group
+        LibrarySales.CreateCustomerPostingGroup(CustPostGroup);
+        AltCustPostGrp.Init();
+        AltCustPostGrp."Customer Posting Group" := Customer."Customer Posting Group";
+        AltCustPostGrp.Validate("Alt. Customer Posting Group", CustPostGroup.Code);
+        AltCustPostGrp.Insert();
+
+        // [GIVEN] Create and Post Service Invoice with Customer Posting Group 
+        InvoiceNo := CreateAndPostServiceInvoiceWithCustomerPostingGroup(Customer."No.", CustPostGroup.Code, WorkDate());
+
+        // [THEN] Check GL Entry Created With Service Header Customer Posting Group
+        ServiceInvoiceHeader.Get(InvoiceNo);
+        FindCustPostGroup.Get(ServiceInvoiceHeader."Customer Posting Group");
+        GLEntry.SetRange("Document No.", InvoiceNo);
+        GLEntry.SetRange("G/L Account No.", FindCustPostGroup."Receivables Account");
+        if GLEntry.FindFirst() then
+            Assert.AreEqual(CustPostGroup."Receivables Account", GLEntry."G/L Account No.", '');
+    end;
+
+    [Test]
+    procedure ValidatingCustomerNoInitializesNewServiceOrder()
+    var
+        ServiceHeader: Record "Service Header";
+    begin
+        // [FEATURE] [Service Order] [UT]
+        // [SCENARIO 575369] Validating "Customer No." initializes new Service Order.
+        Initialize();
+
+        ServiceHeader.Init();
+        ServiceHeader.Validate("Customer No.", LibrarySales.CreateCustomerNo());
+
+        ServiceHeader.TestField("Document Date", WorkDate());
+        ServiceHeader.TestField("Posting Date", WorkDate());
+    end;
+
+    [Test]
+    procedure NonBlankDocumentAndPostingDatesOnServiceOrderAreNotReset()
+    var
+        ServiceHeader: Record "Service Header";
+        NewDate: Date;
+    begin
+        // [FEATURE] [Service Order] [UT]
+        // [SCENARIO 575369] Non-blank "Document Date" and "Posting Date" on Service Order are not reset on insert.
+        Initialize();
+        NewDate := WorkDate() + 1;
+
+        ServiceHeader.Init();
+        ServiceHeader.Validate("Customer No.", LibrarySales.CreateCustomerNo());
+        ServiceHeader.Validate("Document Date", NewDate);
+        ServiceHeader.Validate("Posting Date", NewDate);
+
+        ServiceHeader.Insert(true);
+
+        ServiceHeader.TestField("Document Date", NewDate);
+        ServiceHeader.TestField("Posting Date", NewDate);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -7814,6 +7900,27 @@ codeunit 136101 "Service Orders"
         ServiceShipmentLine.SetRange("Order No.", OrderNo);
         ServiceGetShipment.SetServiceHeader(ServiceHeader);
         ServiceGetShipment.CreateInvLines(ServiceShipmentLine);
+    end;
+
+    local procedure CreateAndPostServiceInvoiceWithCustomerPostingGroup(CustomerNo: Code[20]; CustPostGrp: Code[20]; PostingDate: Date): Code[20]
+    var
+        ServiceHeader: Record "Service Header";
+        ServiceInvoiceHeader: Record "Service Invoice Header";
+        ServiceLine: Record "Service Line";
+    begin
+        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Invoice, CustomerNo);
+        ServiceHeader.Validate("Posting Date", PostingDate);
+        ServiceHeader.Validate("Customer Posting Group", CustPostGrp);
+        ServiceHeader.Modify(true);
+        LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Item, LibraryInventory.CreateItemNo());
+        ServiceLine.Validate(Quantity, LibraryRandom.RandInt(100));
+        ServiceLine.Validate("Unit Price", LibraryRandom.RandDec(10, 2));
+        ServiceLine.Modify(true);
+        LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
+
+        ServiceInvoiceHeader.SetRange("Pre-Assigned No.", ServiceHeader."No.");
+        if ServiceInvoiceHeader.FindFirst() then
+            exit(ServiceInvoiceHeader."No.");
     end;
 
     [ConfirmHandler]
