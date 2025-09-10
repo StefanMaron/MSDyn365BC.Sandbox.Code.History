@@ -451,7 +451,8 @@ table 37 "Sales Line"
             trigger OnValidate()
             var
                 CheckDateConflict: Codeunit "Reservation-Check Date Confl.";
-                IsHandled: boolean;
+                DoCheckReceiptOrderStatus: Boolean;
+                IsHandled: Boolean;
             begin
                 IsHandled := false;
                 OnBeforeValidateShipmentDate(IsHandled, Rec, xRec);
@@ -460,8 +461,9 @@ table 37 "Sales Line"
 
                 TestStatusOpen();
                 SalesWarehouseMgt.SalesLineVerifyChange(Rec, xRec);
-                OnValidateShipmentDateOnAfterSalesLineVerifyChange(Rec, CurrFieldNo);
-                if CurrFieldNo <> 0 then
+                DoCheckReceiptOrderStatus := CurrFieldNo <> 0;
+                OnValidateShipmentDateOnAfterSalesLineVerifyChange(Rec, CurrFieldNo, DoCheckReceiptOrderStatus);
+                if DoCheckReceiptOrderStatus then
                     AddOnIntegrMgt.CheckReceiptOrderStatus(Rec);
 
                 if "Shipment Date" <> 0D then begin
@@ -937,8 +939,13 @@ table 37 "Sales Line"
             MinValue = 0;
 
             trigger OnValidate()
+            var
+                DropInvoiceDiscountAmount: Boolean;
             begin
-                ValidateLineDiscountPercent(true);
+                DropInvoiceDiscountAmount := true;
+                OnValidateLineDiscountPercentOnBeforeValidateLineDiscountPercent(Rec, xRec, DropInvoiceDiscountAmount);
+                ValidateLineDiscountPercent(DropInvoiceDiscountAmount);
+
                 NotifyOnMissingSetup(FieldNo("Line Discount Amount"));
             end;
         }
@@ -2404,6 +2411,8 @@ table 37 "Sales Line"
 
                 if Type = Type::Item then begin
                     GetUnitCost();
+                    if "Document Type" = "Document Type"::"Return Order" then
+                        ValidateReturnReasonCode(FieldNo("Variant Code"));
                     if "Variant Code" <> xRec."Variant Code" then
                         PlanPriceCalcByField(FieldNo("Variant Code"));
                 end;
@@ -2532,10 +2541,7 @@ table 37 "Sales Line"
             begin
                 TestJobPlanningLine();
                 TestStatusOpen();
-                TestField("Quantity Shipped", 0);
-                TestField("Qty. Shipped (Base)", 0);
-                TestField("Return Qty. Received", 0);
-                TestField("Return Qty. Received (Base)", 0);
+                TestQuantityFieldsOnValidateUnitOfMeasure();
                 if "Unit of Measure Code" <> xRec."Unit of Measure Code" then begin
                     TestField("Shipment No.", '');
                     TestField("Return Receipt No.", '');
@@ -5576,7 +5582,7 @@ table 37 "Sales Line"
         if CurrFieldNo = FieldNo("Requested Delivery Date") then
             exit("Requested Delivery Date");
 
-        if "Shipment Date" = 0D then
+        if ("Shipment Date" = 0D) and (CurrFieldNo <> FieldNo("Planned Delivery Date")) then
             exit("Planned Delivery Date");
 
         CustomCalendarChange[1].SetSource(CalChange."Source Type"::"Shipping Agent", "Shipping Agent Code", "Shipping Agent Service Code", '');
@@ -5978,10 +5984,11 @@ table 37 "Sales Line"
 
         Clear(SalesHeader);
         TestStatusOpen();
-        if ItemSubstitutionMgt.ItemSubstGet(Rec) then
+        if ItemSubstitutionMgt.ItemSubstGet(Rec) then begin
+            Rec.Validate("Location Code");
             if TransferExtendedText.SalesCheckIfAnyExtText(Rec, false) then
                 TransferExtendedText.InsertSalesExtText(Rec);
-
+        end;
         OnAfterShowItemSub(Rec);
     end;
 
@@ -8538,7 +8545,7 @@ table 37 "Sales Line"
 
     local procedure CheckWMS()
     begin
-        if CurrFieldNo <> 0 then
+        if (CurrFieldNo <> 0) or (SalesHeader."VAT Bus. Posting Group" <> Rec."VAT Bus. Posting Group") then
             CheckLocationOnWMS();
     end;
 
@@ -10074,6 +10081,8 @@ table 37 "Sales Line"
             exit;
 
         "Unit Price" := ("Qty. per Unit of Measure" * SalesInvoiceLine."Unit Price") / SalesInvoiceLine."Qty. per Unit of Measure";
+
+        OnAfterCalcUnitPriceUsingUOMCoef(Rec, SalesInvoiceLine);
     end;
 
     local procedure GetSalesInvoiceLine(var SalesInvoiceLine: Record "Sales Invoice Line")
@@ -10116,6 +10125,20 @@ table 37 "Sales Line"
             Codeunit::"Sales Line-Reserve",
             'SetSaleShipQty',
             StrSubstNo(QtyShipActionDescriptionLbl, Rec.FieldCaption("Qty. to Ship"), Rec.Quantity)));
+    end;
+
+    local procedure TestQuantityFieldsOnValidateUnitOfMeasure()
+    var
+        IsHandled: Boolean;
+    begin
+        OnBeforeTestQuantityFieldsOnValidateUnitOfMeasure(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        TestField("Quantity Shipped", 0);
+        TestField("Qty. Shipped (Base)", 0);
+        TestField("Return Qty. Received", 0);
+        TestField("Return Qty. Received (Base)", 0);
     end;
 
     [IntegrationEvent(false, false)]
@@ -11122,7 +11145,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShipmentDateOnAfterSalesLineVerifyChange(var SalesLine: Record "Sales Line"; CurrentFieldNo: Integer)
+    local procedure OnValidateShipmentDateOnAfterSalesLineVerifyChange(var SalesLine: Record "Sales Line"; CurrentFieldNo: Integer; var DoCheckReceiptOrderStatus: Boolean)
     begin
     end;
 
@@ -12073,6 +12096,21 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcShipmentDateForLocation(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestQuantityFieldsOnValidateUnitOfMeasure(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateLineDiscountPercentOnBeforeValidateLineDiscountPercent(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var DropInvoiceDiscountAmount: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcUnitPriceUsingUOMCoef(var SalesLine: Record "Sales Line"; SalesInvoiceLine: Record "Sales Invoice Line")
     begin
     end;
 }
