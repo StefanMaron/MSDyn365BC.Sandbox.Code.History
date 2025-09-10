@@ -40,9 +40,7 @@ codeunit 9874 "User Security Groups PBT"
         GraphUserInfo: DotNet UserInfo;
         GroupInfo: DotNet GroupInfo;
     begin
-        if not AzureADGraphUser.GetGraphUser(UserSecId, true, GraphUserInfo) then
-            // User cannot be found in Microsoft Entra
-            exit(UserSecurityGroups);
+        AzureADGraphUser.GetGraphUser(UserSecId, true, GraphUserInfo);
 
         if IsNull(GraphUserInfo.Groups()) then
             exit(UserSecurityGroups);
