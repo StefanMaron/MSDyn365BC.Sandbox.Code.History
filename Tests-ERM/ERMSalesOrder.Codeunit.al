@@ -71,6 +71,8 @@
         UnitPriceMustMatchErr: Label 'Unit Price must match.';
         PlannedShipmentDateErr: Label 'Planned Shipment Date must be %1 in %2.', Comment = '%1= Value ,%2=Table Name.';
         ServiceChargeLineExist: Label 'Service Charge Line exist';
+        CorrectPostedSalesInvoiceErr: Label 'Cancelled must be %1 for %2', Comment = '%1= Value ,%2=Table Name';
+        SalesLineQtyErr: Label 'Sales Line %1 must be equal to %2', Comment = '%1= Field ,%2= Value';
 
     [Test]
     [Scope('OnPrem')]
@@ -5666,6 +5668,242 @@
         Assert.IsFalse(FindSalesServiceChargeLineexist(SalesLine, SalesHeader), ServiceChargeLineExist);
     end;
 
+    [Test]
+    procedure CorrectPostedSalesInvoiceWithItemHasDimensionMandatory()
+    var
+        DefaultDimension: Record "Default Dimension";
+        Dimension: Record Dimension;
+        DimensionValue: Record "Dimension Value";
+        ItemJournalLine: Record "Item Journal Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: array[2] of Record "Sales Line";
+        SalesInvHeader: Record "Sales Invoice Header";
+        Item: Record Item;
+        CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
+        Quantity: Decimal;
+        DocumentNo: Code[20];
+    begin
+        // [SCENARIO 575341] Verify correct a Posted Invoice with an Item that has Dimension Code Mandatory 
+        Initialize();
+        Quantity := LibraryRandom.RandDecInRange(5, 5, 2);
+
+        // [GIVEN] Create Dimension and Dimension Value.
+        LibraryDimension.CreateDimension(Dimension);
+        LibraryDimension.CreateDimensionValue(DimensionValue, Dimension.Code);
+
+        // [GIVEN] Create an Item with Dimension and Value Posting as Code Mandatory.
+        LibraryInventory.CreateItem(Item);
+        LibraryDimension.CreateDefaultDimensionItem(DefaultDimension, Item."No.", Dimension.Code, '');
+        DefaultDimension.Validate("Value Posting", DefaultDimension."Value Posting"::"Code Mandatory");
+        DefaultDimension.Modify(true);
+
+        // [GIVEN] Create Item Journal Line with Dimension Set ID.
+        LibraryInventory.CreateItemJournalLineInItemTemplate(ItemJournalLine, item."No.", '', '', LibraryRandom.RandDec(20, 2));
+        ItemJournalLine.Validate(
+          "Dimension Set ID",
+          LibraryDimension.CreateDimSet(ItemJournalLine."Dimension Set ID", DimensionValue."Dimension Code", DimensionValue.Code));
+        ItemJournalLine.Modify(true);
+
+        // [GIVEN] Post Item Joutnal Line.
+        LibraryInventory.PostItemJournalLine(ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
+
+        // [GIVEN] Create Sales Header
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomer());
+
+        // [GIVEN] Create first Sales Line with Dimension Set ID.
+        LibrarySales.CreateSalesLine(SalesLine[1], SalesHeader, SalesLine[1].Type::Item, Item."No.", Quantity);
+        SalesLine[1].Validate("Unit Price", LibraryRandom.RandDec(100, 2));
+        SalesLine[1].Validate(
+        "Dimension Set ID",
+        LibraryDimension.CreateDimSet(SalesLine[1]."Dimension Set ID", DimensionValue."Dimension Code", DimensionValue.Code));
+        SalesLine[1].Modify(true);
+
+        // [GIVEN] Create Second Sales Line with Qty. to Ship, Qty. to Invoice as 0.
+        LibrarySales.CreateSalesLine(SalesLine[2], SalesHeader, SalesLine[2].Type::Item, Item."No.", Quantity);
+        SalesLine[2].Validate("Unit Price", LibraryRandom.RandDec(100, 2));
+        SalesLine[2].Validate("Qty. to Ship", 0);
+        SalesLine[2].Validate("Qty. to Invoice", 0);
+        SalesLine[2].Modify(true);
+
+        // [GIVEN] Post Sales Order
+        DocumentNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [WHEN] Correct Posted Sales Invoice        
+        SalesInvHeader.Get(DocumentNo);
+        CorrectPostedSalesInvoice.CancelPostedInvoice(SalesInvHeader);
+
+        // [THEN] Verify Correction of Posted Sales Invoice done successfully. 
+        SalesInvHeader.CalcFields(Cancelled);
+        Assert.IsTrue(SalesInvHeader.Cancelled,
+             StrSubstNo(
+                CorrectPostedSalesInvoiceErr,
+                'TRUE',
+                SalesInvHeader.TableCaption()));
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure VerifySalesOrderUpdatedAfterPartialCorrectPostedSalesInvoice()
+    var
+        Item: Record Item;
+        SalesLine: Record "Sales Line";
+        SalesHeader: Record "Sales Header";
+        SalesHeader2: Record "Sales Header";
+        SalesLine2: Record "Sales Line";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
+        SalesCreditMemo: TestPage "Sales Credit Memo";
+    begin
+        // [SCENARIO 578443] Verify quantity on posted Sales Order updated correctly after partial posting of Corrective Credit memo.
+        Initialize();
+
+        // [GIVEN] Create an Item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Sales Header.
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomer());
+
+        // [GIVEN] Create Sales Line with Quanity as 10.
+        CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", LibraryRandom.RandIntInRange(10, 10), LibraryRandom.RandDec(100, 2));
+
+        // [GIVEN] Update Qty To Ship in Sales Line.
+        SalesLine.Validate("Qty. to Ship", LibraryRandom.RandIntInRange(5, 5));
+        SalesLine.Modify(true);
+
+        // [GIVEN] Post the partial Sales order.
+        SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
+
+        // [GIVEN] Create Corrective Credit Memo.
+        CorrectPostedSalesInvoice.CreateCreditMemoCopyDocument(SalesInvoiceHeader, SalesHeader2);
+
+        // [GIVEN] Find Sales Line of created Sales Credit Memo.
+        SalesLine2.SetRange("Document Type", SalesHeader2."Document Type");
+        SalesLine2.SetRange("Document No.", SalesHeader2."No.");
+        SalesLine2.SetRange("No.", Item."No.");
+        SalesLine2.FindFirst();
+        SalesLine2.Validate(Quantity, LibraryRandom.RandIntInRange(2, 2));
+        SalesLine2.Modify(true);
+
+        // [WHEN] Post the Corrective Credit Memo
+        SalesCreditMemo.OpenView();
+        SalesCreditMemo.GotoRecord(Salesheader2);
+        SalesCreditMemo.Post.Invoke();
+
+        // [THEN] Verify Sales Order Qty. to Ship and Qty. to Invoice are updated as 7 in the sales line.
+        VerifySalesOrderAfterPartialPostCorrectiveCreditMemo(SalesHeader."No.", 7);
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure VerifySalesOrderUpdatedAfterCorrectPostedSalesInvoiceDifferentQuantity()
+    var
+        Item: Record Item;
+        SalesLine: Record "Sales Line";
+        SalesLine2: Record "Sales Line";
+        SalesHeader: Record "Sales Header";
+        SalesHeader2: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
+        SalesCreditMemo: TestPage "Sales Credit Memo";
+    begin
+        // [SCENARIO 578443] Verify quantity on posted Sales Order updated correctly after partial posting of Corrective Credit memo.
+        Initialize();
+
+        // [GIVEN] Create an Item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Sales Header.
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomer());
+
+        // [GIVEN] Create Sales Line with Quanity as 10.
+        CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", LibraryRandom.RandIntInRange(10, 10), LibraryRandom.RandDec(100, 2));
+
+        // [GIVEN] Update Qty To Ship in Sales Line.
+        SalesLine.Validate("Qty. to Ship", LibraryRandom.RandIntInRange(3, 3));
+        SalesLine.Modify(true);
+
+        // [GIVEN] Ship the partial Sales order with Qty. to Ship as 3.
+        LibrarySales.PostSalesDocument(SalesHeader, true, false);
+
+        // [GIVEN] Update Qty To Ship in Sales Line as 2.
+        SalesLine2.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.");
+        SalesLine2.Validate("Qty. to Ship", LibraryRandom.RandIntInRange(2, 2));
+        SalesLine2.Modify(true);
+
+        // [GIVEN] Ship the partial Sales order with Qty. to Ship as 2.
+        LibrarySales.PostSalesDocument(SalesHeader, true, false);
+
+        // [GIVEN] Update Qty. to Ship as 0 and Qty. to Invoice as 5 in Sales Line.
+        SalesLine2.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.");
+        SalesLine2.Validate("Qty. to Ship", 0);
+        SalesLine2.Validate("Qty. to Invoice", 5);
+        SalesLine2.Modify(true);
+        SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, false, true));
+
+        // [GIVEN] Create Corrective Credit Memo.
+        CorrectPostedSalesInvoice.CreateCreditMemoCopyDocument(SalesInvoiceHeader, SalesHeader2);
+
+        // [WHEN] Post the Corrective Credit Memo
+        SalesCreditMemo.OpenView();
+        SalesCreditMemo.GotoRecord(Salesheader2);
+        SalesCreditMemo.Post.Invoke();
+
+        // [THEN] Verify Sales Order Qty. to Ship and Qty. to Invoice are updated as 10 in the sales line.
+        VerifySalesOrderAfterPartialPostCorrectiveCreditMemo(SalesHeader."No.", 10);
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
+    procedure VerifySalesOrderUpdatedAfterCorrectPostedSalesInvoiceApplyEntries()
+    var
+        Item: Record Item;
+        SalesLine: Record "Sales Line";
+        SalesHeader: Record "Sales Header";
+        SalesHeader2: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        CustLedgEntry: Record "Cust. Ledger Entry";
+        CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
+        SalesCreditMemo: TestPage "Sales Credit Memo";
+    begin
+        // [SCENARIO 578443] Verify quantity on posted Sales Order updated correctly after posting of Corrective Credit memo with Application.
+        Initialize();
+
+        // [GIVEN] Create an Item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Sales Header.
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomer());
+
+        // [GIVEN] Create Sales Line with Quanity as 10.
+        CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", LibraryRandom.RandIntInRange(10, 10), LibraryRandom.RandDec(100, 2));
+
+        // [GIVEN] Update Qty To Ship in Sales Line as 5.
+        SalesLine.Validate("Qty. to Ship", LibraryRandom.RandIntInRange(5, 5));
+        SalesLine.Modify(true);
+
+        // [GIVEN] Post the partial Sales order.
+        SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, true));
+
+        // [GIVEN] Create Corrective Credit Memo.
+        CorrectPostedSalesInvoice.CreateCreditMemoCopyDocument(SalesInvoiceHeader, SalesHeader2);
+
+        // [GIVEN] Set Applied-to ID on Customer Ledger Entry.
+        CustLedgEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
+        CustLedgEntry.SetRange(Open, true);
+        CustLedgEntry.FindFirst();
+        CustLedgEntry."Applies-to ID" := SalesHeader2."No.";
+        CustLedgEntry.CalcFields("Remaining Amount");
+        CustLedgEntry."Amount to Apply" := CustLedgEntry."Remaining Amount";
+
+        // [WHEN] Post the Corrective Credit Memo
+        SalesCreditMemo.OpenView();
+        SalesCreditMemo.GotoRecord(Salesheader2);
+        SalesCreditMemo.Post.Invoke();
+
+        // [THEN] Verify Sales Order Qty. to Ship and Qty. to Invoice are updated as 10 in the sales line.
+        VerifySalesOrderAfterPartialPostCorrectiveCreditMemo(SalesHeader."No.", 10);
+    end;
+
     local procedure Initialize()
     var
         SalesHeader: Record "Sales Header";
@@ -7847,6 +8085,21 @@
         SalesLine.SetRange(Type, SalesLine.Type::"G/L Account");
         if not SalesLine.IsEmpty then
             exit(true);
+    end;
+
+    local procedure VerifySalesOrderAfterPartialPostCorrectiveCreditMemo(SalesHeaderNo: Code[20]; ExpectedQuantity: Decimal)
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.SetRange("Document No.", SalesHeaderNo);
+        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
+        SalesLine.FindSet();
+        repeat
+            Assert.AreEqual(ExpectedQuantity, SalesLine."Qty. to Ship", StrSubstNo(
+                SalesLineQtyErr, SalesLine.FieldName("Qty. to Ship"), ExpectedQuantity));
+            Assert.AreEqual(ExpectedQuantity, SalesLine."Qty. to Invoice", StrSubstNo(
+                SalesLineQtyErr, SalesLine.FieldName("Qty. to Invoice"), ExpectedQuantity));
+        until SalesLine.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostUpdateOrderLineModifyTempLine', '', false, false)]
