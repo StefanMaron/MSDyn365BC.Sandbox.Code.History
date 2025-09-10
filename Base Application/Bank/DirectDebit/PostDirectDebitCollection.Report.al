@@ -252,18 +252,12 @@ report 1201 "Post Direct Debit Collection"
         CreateJnlOnly := NewCreateJnlOnly;
     end;
 
-    local procedure CreateJnlLine(var DirectDebitCollectionEntry: Record "Direct Debit Collection Entry") Result: Boolean
+    local procedure CreateJnlLine(var DirectDebitCollectionEntry: Record "Direct Debit Collection Entry"): Boolean
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
         GenJournalTemplate: Record "Gen. Journal Template";
         NoSeries: Codeunit "No. Series";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCreateJnlLine(GenJnlLine, DirectDebitCollectionEntry, IsHandled, Result);
-        if IsHandled then
-            exit(Result);
-
         CustLedgEntry.Get(DirectDebitCollectionEntry."Applies-to Entry No.");
         CustLedgEntry.CalcFields("Remaining Amount");
         if not CustLedgEntry.Open or (CustLedgEntry."Remaining Amount" < DirectDebitCollectionEntry."Transfer Amount") then
@@ -334,11 +328,6 @@ report 1201 "Post Direct Debit Collection"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetGenJnlLineDim(var GenJournalLine: Record "Gen. Journal Line"; CustLedgEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateJnlLine(var GenJournalLine: Record "Gen. Journal Line"; DirectDebitCollectionEntry: Record "Direct Debit Collection Entry"; var IsHandled: Boolean; var Result: Boolean)
     begin
     end;
 }
