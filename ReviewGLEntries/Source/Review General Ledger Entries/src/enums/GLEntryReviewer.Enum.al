@@ -9,6 +9,5 @@ enum 22202 "G/L Entry Reviewer" implements "G/L Entry Reviewer"
     value(0; "Review G/L Entry")
     {
         Implementation = "G/L Entry Reviewer" = "Review G/L Entry";
-        Caption = 'Review G/L Entry';
     }
 }

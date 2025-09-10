@@ -4,6 +4,7 @@ using Microsoft.Finance.Currency;
 
 codeunit 8026 "Process Usage Data Billing"
 {
+    Access = Internal;
     TableNo = "Usage Data Import";
 
     var
@@ -202,7 +203,7 @@ codeunit 8026 "Process Usage Data Billing"
         OnAfterProcessSubscriptionLine(ServiceCommitment);
     end;
 
-    local procedure CalculateSumCostAmountFromUsageDataBilling(LastUsageDataBilling: Record "Usage Data Billing"; UsageDataImportEntryNo: Integer; ServiceCommitment: Record "Subscription Line"): Decimal
+    procedure CalculateSumCostAmountFromUsageDataBilling(LastUsageDataBilling: Record "Usage Data Billing"; UsageDataImportEntryNo: Integer; ServiceCommitment: Record "Subscription Line"): Decimal
     var
         UsageDataBilling: Record "Usage Data Billing";
     begin
@@ -346,7 +347,7 @@ codeunit 8026 "Process Usage Data Billing"
         exit(UsageDataBilling.Quantity);
     end;
 
-    local procedure CalculateSumAmountFromUsageDataBilling(LastUsageDataBilling: Record "Usage Data Billing"; UsageDataImportEntryNo: Integer; ServiceCommitment: Record "Subscription Line"): Decimal
+    procedure CalculateSumAmountFromUsageDataBilling(LastUsageDataBilling: Record "Usage Data Billing"; UsageDataImportEntryNo: Integer; ServiceCommitment: Record "Subscription Line"): Decimal
     var
         UsageDataBilling: Record "Usage Data Billing";
     begin
@@ -357,7 +358,7 @@ codeunit 8026 "Process Usage Data Billing"
         exit(UsageDataBilling.Amount);
     end;
 
-    internal procedure SetRoundingPrecision(var RoundingPrecision: Decimal; UnitPrice: Decimal; Currency: Record Currency)
+    procedure SetRoundingPrecision(var RoundingPrecision: Decimal; UnitPrice: Decimal; Currency: Record Currency)
     begin
         RoundingPrecision := DateTimeManagement.GetRoundingPrecision(DateTimeManagement.GetNumberOfDecimals(UnitPrice));
         if RoundingPrecision = 1 then begin
@@ -366,33 +367,33 @@ codeunit 8026 "Process Usage Data Billing"
         end;
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeProcessUsageDataBilling(UsageDataImport: Record "Usage Data Import")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterProcessUsageDataBilling(UsageDataImport: Record "Usage Data Import")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnUsageBasedPricingElseCaseOnProcessSubscriptionLine(var UnitCost: Decimal; var NewServiceObjectQuantity: Decimal; var SubscriptionLine: Record "Subscription Line"; LastUsageDataBilling: Record "Usage Data Billing"; var IsHandled: Boolean)
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnUsageBasedPricingElseCaseOnCalculateCustomerUsageDataBillingPrice(var UnitPrice: Decimal; var Amount: Decimal; var UsageDataBilling: Record "Usage Data Billing"; CustomerSubscriptionContract: Record "Customer Subscription Contract"; var IsHandled: Boolean)
     begin
     end;
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnBeforeProcessSubscriptionLine(var SubscriptionLine: Record "Subscription Line")
     begin
     end;
 
 
-    [IntegrationEvent(false, false)]
+    [InternalEvent(false, false)]
     local procedure OnAfterProcessSubscriptionLine(var SubscriptionLine: Record "Subscription Line")
     begin
     end;
