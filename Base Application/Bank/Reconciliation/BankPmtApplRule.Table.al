@@ -167,29 +167,9 @@ table 1252 "Bank Pmt. Appl. Rule"
     var
         MediumConfidenceHighestScore: Integer;
     begin
-        // Text mapper should override only Medium confidence and lower. It's base, lowest score is 3000, whereas the max for medium is 2999
+        // Text mapper should override only Medium confidence and lower
         MediumConfidenceHighestScore := CalculateScore("Match Confidence"::Medium, 0);
         exit(MediumConfidenceHighestScore);
-    end;
-
-    procedure GetMaxTextMapperScore(): Integer
-    begin
-        // 3499
-        exit(GetTextMapperScore() + (GetConfidenceScoreRange() div 2) - 1)
-    end;
-
-    internal procedure GetTextMapperScore(SubstringLength: Integer; ExactMatch: Boolean): Integer
-    var
-        TextMapperScore: Integer;
-    begin
-        // add the length of longest common substring to differentiate between multiple string nearness matches
-        TextMapperScore := GetTextMapperScore() + SubstringLength;
-
-        // give precedence to exact match and increase its score by 1
-        if ExactMatch then
-            TextMapperScore += 1;
-
-        exit(TextMapperScore)
     end;
 
     local procedure UpdateScore(var BankPmtApplRule: Record "Bank Pmt. Appl. Rule")
@@ -222,8 +202,7 @@ table 1252 "Bank Pmt. Appl. Rule"
         BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
         OptionNo: Integer;
     begin
-        // we make sure that the range for Text Mapper scores is 3000-3499
-        if (MatchQuality >= GetTextMapperScore()) and (MatchQuality <= GetMaxTextMapperScore()) then
+        if MatchQuality = GetTextMapperScore() then
             exit(BankAccReconciliationLine."Match Confidence"::"High - Text-to-Account Mapping".AsInteger());
 
         OptionNo := MatchQuality div GetConfidenceScoreRange();
@@ -241,9 +220,6 @@ table 1252 "Bank Pmt. Appl. Rule"
 
     procedure GetLowestScoreInRange(AssignedScore: Integer): Integer
     begin
-        // we make sure that the range for High confidence matches is 3500-3999
-        if AssignedScore div GetConfidenceScoreRange() = Enum::"Bank Rec. Match Confidence"::High.AsInteger() then
-            exit(GetMaxTextMapperScore() + 1);
         exit((AssignedScore div GetConfidenceScoreRange()) * GetConfidenceScoreRange());
     end;
 
