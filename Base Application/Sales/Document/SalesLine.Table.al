@@ -454,11 +454,10 @@ table 37 "Sales Line"
             trigger OnValidate()
             var
                 CheckDateConflict: Codeunit "Reservation-Check Date Confl.";
-                DoCheckReceiptOrderStatus: Boolean;
-                IsHandled: Boolean;
+                IsHandled: boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateShipmentDate(IsHandled, Rec, xRec, CurrFieldNo);
+                OnBeforeValidateShipmentDate(IsHandled, Rec, xRec);
                 if IsHandled then
                     exit;
 
@@ -469,9 +468,8 @@ table 37 "Sales Line"
                     if Type in [Type::"G/L Account", Type::Item, Type::Resource, Type::"Fixed Asset", Type::"Charge (Item)"] then
                         Validate("VAT Prod. Posting Group");
 
-                DoCheckReceiptOrderStatus := CurrFieldNo <> 0;
-                OnValidateShipmentDateOnAfterSalesLineVerifyChange(Rec, CurrFieldNo, DoCheckReceiptOrderStatus);
-                if DoCheckReceiptOrderStatus then
+                OnValidateShipmentDateOnAfterSalesLineVerifyChange(Rec, CurrFieldNo);
+                if CurrFieldNo <> 0 then
                     AddOnIntegrMgt.CheckReceiptOrderStatus(Rec);
 
                 if "Shipment Date" <> 0D then begin
@@ -950,13 +948,8 @@ table 37 "Sales Line"
             MinValue = 0;
 
             trigger OnValidate()
-            var
-                DropInvoiceDiscountAmount: Boolean;
             begin
-                DropInvoiceDiscountAmount := true;
-                OnValidateLineDiscountPercentOnBeforeValidateLineDiscountPercent(Rec, xRec, DropInvoiceDiscountAmount);
-                ValidateLineDiscountPercent(DropInvoiceDiscountAmount);
-
+                ValidateLineDiscountPercent(true);
                 NotifyOnMissingSetup(FieldNo("Line Discount Amount"));
             end;
         }
@@ -2412,8 +2405,6 @@ table 37 "Sales Line"
 
                 if Type = Type::Item then begin
                     GetUnitCost();
-                    if "Document Type" = "Document Type"::"Return Order" then
-                        ValidateReturnReasonCode(FieldNo("Variant Code"));
                     if "Variant Code" <> xRec."Variant Code" then
                         PlanPriceCalcByField(FieldNo("Variant Code"));
                 end;
@@ -2542,7 +2533,10 @@ table 37 "Sales Line"
             begin
                 TestJobPlanningLine();
                 TestStatusOpen();
-                TestQuantityFieldsOnValidateUnitOfMeasure();
+                TestField("Quantity Shipped", 0);
+                TestField("Qty. Shipped (Base)", 0);
+                TestField("Return Qty. Received", 0);
+                TestField("Return Qty. Received (Base)", 0);
                 if "Unit of Measure Code" <> xRec."Unit of Measure Code" then begin
                     TestField("Shipment No.", '');
                     TestField("Return Receipt No.", '');
@@ -5637,17 +5631,14 @@ table 37 "Sales Line"
         if CurrFieldNo = FieldNo("Requested Delivery Date") then
             exit("Requested Delivery Date");
 
-        if ("Shipment Date" = 0D) and (CurrFieldNo <> FieldNo("Planned Delivery Date")) then
+        if "Shipment Date" = 0D then
             exit("Planned Delivery Date");
 
         CustomCalendarChange[1].SetSource(CalChange."Source Type"::"Shipping Agent", "Shipping Agent Code", "Shipping Agent Service Code", '');
         case CurrFieldNo of
             FieldNo("Shipment Date"):
                 begin
-                    if CheckCustomerBaseCalendarCodeExist() then
-                        CustomCalendarChange[2].SetSource(CalChange."Source Type"::Customer, "Sell-to Customer No.", '', '')
-                    else
-                        CustomCalendarChange[2].SetSource(CalChange."Source Type"::Location, "Location Code", '', '');
+                    CustomCalendarChange[2].SetSource(CalChange."Source Type"::Customer, "Sell-to Customer No.", '', '');
                     exit(CalendarMgmt.CalcDateBOC(Format("Shipping Time"), "Planned Shipment Date", CustomCalendarChange, true));
                 end;
             FieldNo("Planned Delivery Date"):
@@ -5656,18 +5647,6 @@ table 37 "Sales Line"
                     exit(CalendarMgmt.CalcDateBOC2(Format("Shipping Time"), "Planned Delivery Date", CustomCalendarChange, true));
                 end;
         end;
-    end;
-
-    local procedure CheckCustomerBaseCalendarCodeExist(): Boolean
-    var
-        Customer: Record customer;
-    begin
-        if "Sell-to Customer No." = '' then
-            exit(false);
-            
-        Customer.SetLoadFields("Base Calendar Code");
-        if Customer.Get("Sell-to Customer No.") then
-            exit(Customer."Base Calendar Code" <> '');
     end;
 
     /// <summary>
@@ -6054,11 +6033,10 @@ table 37 "Sales Line"
 
         Clear(SalesHeader);
         TestStatusOpen();
-        if ItemSubstitutionMgt.ItemSubstGet(Rec) then begin
-            Rec.Validate("Location Code");
+        if ItemSubstitutionMgt.ItemSubstGet(Rec) then
             if TransferExtendedText.SalesCheckIfAnyExtText(Rec, false) then
                 TransferExtendedText.InsertSalesExtText(Rec);
-        end;
+
         OnAfterShowItemSub(Rec);
     end;
 
@@ -8515,7 +8493,7 @@ table 37 "Sales Line"
         OnAfterCheckShipmentRelation(Rec, SalesShptLine);
     end;
 
-    procedure CheckShipmentDateBeforeWorkDate()
+    local procedure CheckShipmentDateBeforeWorkDate()
     var
         IsHandled: Boolean;
     begin
@@ -8651,7 +8629,7 @@ table 37 "Sales Line"
 
     local procedure CheckWMS()
     begin
-        if (CurrFieldNo <> 0) or (SalesHeader."VAT Bus. Posting Group" <> Rec."VAT Bus. Posting Group") then
+        if CurrFieldNo <> 0 then
             CheckLocationOnWMS();
     end;
 
@@ -8886,8 +8864,6 @@ table 37 "Sales Line"
             exit;
         if SalesHeader."Invoice Discount Value" = 0 then
             exit;
-        if SalesHeader."Invoice Discount Calculation" = SalesHeader."Invoice Discount Calculation"::"%" then
-            exit;
         SalesHeader."Invoice Discount Value" -= InvDiscountAmount;
         SalesHeader.Modify(true);
     end;
@@ -9120,16 +9096,15 @@ table 37 "Sales Line"
     var
         Item: Record Item;
         IsHandled: Boolean;
-        ShouldUpdateDeferralCode: Boolean;
     begin
         IsHandled := false;
         OnBeforeInitDeferralCode(Rec, IsHandled);
         if IsHandled then
             exit;
 
-        ShouldUpdateDeferralCode := "Document Type" in ["Document Type"::Order, "Document Type"::Invoice, "Document Type"::"Credit Memo", "Document Type"::"Return Order"];
-        OnInitDeferralCodeOnBeforeUpdateDeferralCode(Rec, ShouldUpdateDeferralCode);
-        if ShouldUpdateDeferralCode then
+        if "Document Type" in
+           ["Document Type"::Order, "Document Type"::Invoice, "Document Type"::"Credit Memo", "Document Type"::"Return Order"]
+        then
             case Type of
                 Type::"G/L Account":
                     Validate("Deferral Code", GLAcc."Default Deferral Template Code");
@@ -9573,7 +9548,7 @@ table 37 "Sales Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeValidateUnitCostLCYOnGetUnitCost(IsHandled, Rec, Item);
+        OnBeforeValidateUnitCostLCYOnGetUnitCost(IsHandled, Rec);
         if IsHandled then
             exit;
 
@@ -10237,8 +10212,6 @@ table 37 "Sales Line"
             exit;
 
         "Unit Price" := ("Qty. per Unit of Measure" * SalesInvoiceLine."Unit Price") / SalesInvoiceLine."Qty. per Unit of Measure";
-
-        OnAfterCalcUnitPriceUsingUOMCoef(Rec, SalesInvoiceLine);
     end;
 
     local procedure GetSalesInvoiceLine(var SalesInvoiceLine: Record "Sales Invoice Line")
@@ -10281,20 +10254,6 @@ table 37 "Sales Line"
             Codeunit::"Sales Line-Reserve",
             'SetSaleShipQty',
             StrSubstNo(QtyShipActionDescriptionLbl, Rec.FieldCaption("Qty. to Ship"), Rec.Quantity)));
-    end;
-
-    local procedure TestQuantityFieldsOnValidateUnitOfMeasure()
-    var
-        IsHandled: Boolean;
-    begin
-        OnBeforeTestQuantityFieldsOnValidateUnitOfMeasure(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
-        TestField("Quantity Shipped", 0);
-        TestField("Qty. Shipped (Base)", 0);
-        TestField("Return Qty. Received", 0);
-        TestField("Return Qty. Received (Base)", 0);
     end;
 
     [IntegrationEvent(false, false)]
@@ -11301,7 +11260,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShipmentDateOnAfterSalesLineVerifyChange(var SalesLine: Record "Sales Line"; CurrentFieldNo: Integer; var DoCheckReceiptOrderStatus: Boolean)
+    local procedure OnValidateShipmentDateOnAfterSalesLineVerifyChange(var SalesLine: Record "Sales Line"; CurrentFieldNo: Integer)
     begin
     end;
 
@@ -11689,7 +11648,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeValidateUnitCostLCYOnGetUnitCost(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; Item: Record Item)
+    local procedure OnBeforeValidateUnitCostLCYOnGetUnitCost(var IsHandled: Boolean; var SalesLine: Record "Sales Line")
     begin
     end;
 
@@ -11709,7 +11668,7 @@ table 37 "Sales Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeValidateShipmentDate(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line"; CurrentFieldNo: Integer)
+    local procedure OnBeforeValidateShipmentDate(var IsHandled: Boolean; var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line")
     begin
     end;
 
@@ -12252,26 +12211,6 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcShipmentDateForLocation(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTestQuantityFieldsOnValidateUnitOfMeasure(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateLineDiscountPercentOnBeforeValidateLineDiscountPercent(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var DropInvoiceDiscountAmount: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCalcUnitPriceUsingUOMCoef(var SalesLine: Record "Sales Line"; SalesInvoiceLine: Record "Sales Invoice Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInitDeferralCodeOnBeforeUpdateDeferralCode(var SalesLine: Record "Sales Line"; var ShouldUpdateDeferralCode: Boolean)
     begin
     end;
 }
