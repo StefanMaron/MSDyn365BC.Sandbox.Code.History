@@ -10,6 +10,7 @@ codeunit 134101 "ERM Prepayment II"
     end;
 
     var
+        NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryERM: Codeunit "Library - ERM";
@@ -35,6 +36,7 @@ codeunit 134101 "ERM Prepayment II"
         ShipmentLinesDocNoErr: Label 'Wrong Document No. in shipment line in "Get Shipment Lines" page.';
         ReceiptLinesDocNoErr: Label 'Wrong Document No. in receipt line in "Get Receipt Lines" page.';
         VATCalculationType: Enum "Tax Calculation Type";
+        BaseAmountNotMatchedErr: Label 'VAT Base must be equal to %1.', Comment = '%1= VAT Base';
 
     [Test]
     [Scope('OnPrem')]
@@ -1868,6 +1870,187 @@ codeunit 134101 "ERM Prepayment II"
         // [THEN] Status is changed to Released in purchase orders "PO2"
         VerifyStatusOnPurchaseHeader(PurchaseHeader1, PurchaseHeader1.Status::"Pending Prepayment");
         VerifyStatusOnPurchaseHeader(PurchaseHeader2, PurchaseHeader2.Status::Released);
+        NotificationLifecycleMgt.RecallAllNotifications();
+    end;
+
+    [Test]
+    procedure PrepmtOnSalesLineWithFirstInvoiceDiscount()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        GLAccount: Record "G/L Account";
+        SalesCalcDiscountByType: Codeunit "Sales - Calc Discount By Type";
+        PrepaymentAmount: Decimal;
+    begin
+        // [FEATURE] [Sales] [Prepayment Amount]
+        // [SCENARIO 598768] Check "Prepayment Line Amount" is not changed on Sales Line after posting Prepayment Invoice and release sales order
+        // [SCENARIO 598769] Prepayment Line Amount is inserted after invoice discount is applied
+
+        // [GIVEN] Create Sales Order X with invoice discount 10 and one item line
+        // [GIVEN] Insert "Prepayment Line Amount" 100 and post prepayment invoice
+
+        Initialize();
+
+        LibrarySales.CreatePrepaymentVATSetup(GLAccount, VATCalculationType);
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomerWithPostingSetup(GLAccount));
+
+        CreateSalesLine(SalesLine, SalesHeader, Enum::"Sales Line Type"::Item, CreateItemWithPostingSetup(GLAccount));
+        SalesLine.Validate("Prepayment %", 0);
+        SalesLine.Modify(true);
+        SalesCalcDiscountByType.ApplyInvDiscBasedOnAmt(LibraryRandom.RandDec(100, 2), SalesHeader);
+        SalesHeader.Modify(true);
+
+        PrepaymentAmount := LibraryRandom.RandDec(10, 2);
+        SalesLine.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.");
+        SalesLine.Validate("Prepmt. Line Amount", PrepaymentAmount);
+        SalesLine.Modify(true);
+        LibrarySales.PostSalesPrepaymentInvoice(SalesHeader);
+
+        // [WHEN] Release Sales Document
+        LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        // [THEN] Verify Prepayment Line Amount on Sales Line is not changed after release
+        SalesLine.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.");
+        SalesLine.TestField("Prepmt. Line Amount", PrepaymentAmount);
+        NotificationLifecycleMgt.RecallAllNotifications();
+    end;
+
+    [Test]
+    procedure PrepmtOnSalesLineWithSecondInvoiceDiscount()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        GLAccount: Record "G/L Account";
+        SalesCalcDiscountByType: Codeunit "Sales - Calc Discount By Type";
+        PrepaymentAmount: Decimal;
+    begin
+        // [FEATURE] [Sales] [Prepayment Amount]
+        // [SCENARIO 598768] Check "Prepayment Line Amount" is not changed on Sales Line after posting Prepayment Invoice and release sales order
+        // [SCENARIO 598769] Prepayment Line Amount is inserted before invoice discount is applied
+
+        // [GIVEN] Create Sales Order X with one item line
+        // [GIVEN] Insert "Prepayment Line Amount" 100
+        // [GIVEN] Insert invoice discount 10
+        // [GIVEN] Post prepayment invoice
+        Initialize();
+
+        LibrarySales.CreatePrepaymentVATSetup(GLAccount, VATCalculationType);
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomerWithPostingSetup(GLAccount));
+
+        CreateSalesLine(SalesLine, SalesHeader, Enum::"Sales Line Type"::Item, CreateItemWithPostingSetup(GLAccount));
+
+        SalesLine.Validate("Prepayment %", 0);
+        SalesLine.Validate("Prepmt. Line Amount", LibraryRandom.RandDec(10, 2));
+        SalesLine.Modify(true);
+        SalesCalcDiscountByType.ApplyInvDiscBasedOnAmt(LibraryRandom.RandDec(10, 2), SalesHeader);
+        SalesHeader.Modify(true);
+        SalesLine.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.");
+        PrepaymentAmount := SalesLine."Prepmt. Line Amount";
+        LibrarySales.PostSalesPrepaymentInvoice(SalesHeader);
+
+        // [WHEN] Release Sales Document
+        LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        // [THEN] Verify Prepayment Line Amount on Sales Line is not changed after release
+        SalesLine.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.");
+        SalesLine.TestField("Prepmt. Line Amount", PrepaymentAmount);
+        NotificationLifecycleMgt.RecallAllNotifications();
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure VerifyBaseAmountOnGSTEntrieswithPrepayment()
+    var
+        GeneralPostingSetup: Record "General Posting Setup";
+        GLAccount: Record "G/L Account";
+        Item: array[3] of Record Item;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: array[3] of Record "Purchase Line";
+        PurchaseLine2: Record "Purchase Line";
+        VATEntry: Record "VAT Entry";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Vendor: Record Vendor;
+        CurrencyCode: Code[10];
+        PurchaseInvoiceNo: Code[20];
+        ExpectedVATBaseAmount: Decimal;
+    begin
+        //[SCENARIO 567355] Verify Base Amount on the GST Entries with Posted Prepayment Invoice.
+        Initialize();
+
+        // [GIVEN] Create General Posting Setup and VAT Posting Setup with VAT% as 0.
+        LibraryERM.CreateGeneralPostingSetupInvt(GeneralPostingSetup);
+        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 0);
+
+        // [GIVEN] Create G/L Account and assign Gen. Prod. Posting Group and VAT Prod. Posting Group. 
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount.Validate("Gen. Prod. Posting Group", GeneralPostingSetup."Gen. Prod. Posting Group");
+        GLAccount.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
+        GLAccount.Modify(true);
+        GeneralPostingSetup.Validate("Direct Cost Applied Account", GLAccount."No.");
+        GeneralPostingSetup.Validate("Purch. Prepayments Account", GLAccount."No.");
+        GeneralPostingSetup.Modify(true);
+
+        // [GIVEN] Create Currency with Exchange Rates.
+        CurrencyCode := LibraryERM.CreateCurrencyWithRandomExchRates();
+
+        // [GIVEN] Create Vendor with Gen. Bus. Posting Group, VAT Bus. Posting Group and Currency.
+        LibraryPurchase.CreateVendor(Vendor);
+        Vendor.Validate("Gen. Bus. Posting Group", GeneralPostingSetup."Gen. Bus. Posting Group");
+        Vendor.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
+        Vendor.Validate("Currency Code", CurrencyCode);
+        Vendor.Modify(true);
+
+        // [GIVEN] create 3 Items with Dimensions, Gen. Prod. Posting Group and VAT Prod. Posting Group.
+        CreateItemWithDimensions(Item, GeneralPostingSetup."Gen. Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
+
+        // [GIVEN] Create Purchase Header
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, Vendor."No.");
+
+        // [GIVEN] Create first Purchase Line with Direct Unit Cost as 56.40.
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine[1], PurchaseHeader, PurchaseLine[1].Type::Item, Item[1]."No.", 8);
+        PurchaseLine[1].Validate("Direct Unit Cost", 56.40);
+        PurchaseLine[1].Modify(true);
+
+        // [GIVEN] Create second Purchase Line with Direct Unit Cost as 38.
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine[2], PurchaseHeader, PurchaseLine[2].Type::Item, Item[2]."No.", 10);
+        PurchaseLine[2].Validate("Direct Unit Cost", 38);
+        PurchaseLine[2].Modify(true);
+
+        // [GIVEN] Create third Purchase Line with Direct Unit Cost as 19.60.
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine[3], PurchaseHeader, PurchaseLine[3].Type::Item, Item[3]."No.", 20);
+        PurchaseLine[3].Validate("Direct Unit Cost", 19.60);
+        PurchaseLine[3].Modify(true);
+
+        // [GIVEN] Post Purchase Order Receive only.
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, false);
+
+        // [GIVEN] Reopen the Purchase Document.
+        LibraryPurchase.ReopenPurchaseDocument(PurchaseHeader);
+
+        // [GIVEN] Update Prepayment % as 100 for all three Purchase Lines.
+        PurchaseLine2.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine2.SetRange("Document No.", PurchaseHeader."No.");
+        if PurchaseLine2.FindSet() then
+            repeat
+                ExpectedVATBaseAmount += PurchaseLine2."VAT Base (ACY)";
+                PurchaseLine2.Validate("Prepayment %", 100);
+                PurchaseLine2.Modify(true);
+            until PurchaseLine2.Next() = 0;
+
+        // [GIVEN] Post Prepayment Invoice
+        LibraryPurchase.PostPurchasePrepaymentInvoice(PurchaseHeader);
+        PurchaseHeader.Validate("Vendor Invoice No.", IncStr(PurchaseHeader."Vendor Invoice No."));
+        PurchaseHeader.Modify(true);
+
+        // [WHEN] Post Purchase Order Invoice.
+        PurchaseInvoiceNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true);
+
+        // [THEN] Verify GST Base Amount on GST Entries.
+        VATEntry.SetRange("Document No.", PurchaseInvoiceNo);
+        VATEntry.SetFilter(Base, '<%1', 0);
+        VATEntry.CalcSums(Base);
+        Assert.AreEqual(ExpectedVATBaseAmount, Abs(VATEntry.Base),
+            StrSubstNo(BaseAmountNotMatchedErr, ExpectedVATBaseAmount));
     end;
 
     local procedure Initialize()
@@ -2798,6 +2981,25 @@ codeunit 134101 "ERM Prepayment II"
         InventorySetup.Modify(true);
     end;
 
+    local procedure CreateItemWithDimensions(var Item: array[3] of Record Item; GenProdPostingGroup: Code[20]; VATProdPostingGroup: Code[20])
+    var
+        DimensionValue: Record "Dimension Value";
+        LibraryDimension: Codeunit "Library - Dimension";
+        i: Integer;
+    begin
+        for i := 1 to 3 do begin
+            LibraryInventory.CreateItem(Item[i]);
+            LibraryDimension.GetGlobalDimCodeValue(1, DimensionValue);
+            Item[i].Validate("Global Dimension 1 Code", DimensionValue.Code);
+            LibraryDimension.GetGlobalDimCodeValue(2, DimensionValue);
+            LibraryDimension.CreateDimensionValue(DimensionValue, DimensionValue."Dimension Code");
+            Item[i].Validate("Global Dimension 2 Code", DimensionValue.Code);
+            Item[i].Validate("Gen. Prod. Posting Group", GenProdPostingGroup);
+            Item[i].Validate("VAT Prod. Posting Group", VATProdPostingGroup);
+            Item[i].Modify(true);
+        end;
+    end;
+
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure VerifyNoOfGetShipmentLinesPageHandler(var GetShipmentLines: TestPage "Get Shipment Lines")
@@ -2850,4 +3052,3 @@ codeunit 134101 "ERM Prepayment II"
         PurchaseHeader.TestField(Status, ExpectedStatus);
     end;
 }
-
