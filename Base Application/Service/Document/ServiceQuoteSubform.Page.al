@@ -5,7 +5,6 @@
 namespace Microsoft.Service.Document;
 
 using Microsoft.Finance.Dimension;
-using Microsoft.Service.Comment;
 using Microsoft.Service.Item;
 using Microsoft.Service.Loaner;
 using Microsoft.Service.Maintenance;
@@ -350,7 +349,7 @@ page 5965 "Service Quote Subform"
 
                         trigger OnAction()
                         begin
-                            Rec.ShowComments("Service Comment Line Type"::Fault);
+                            Rec.ShowComments(1);
                         end;
                     }
                     action(Resolutions)
@@ -362,7 +361,7 @@ page 5965 "Service Quote Subform"
 
                         trigger OnAction()
                         begin
-                            Rec.ShowComments("Service Comment Line Type"::Resolution);
+                            Rec.ShowComments(2);
                         end;
                     }
                     action(Internal)
@@ -374,7 +373,7 @@ page 5965 "Service Quote Subform"
 
                         trigger OnAction()
                         begin
-                            Rec.ShowComments("Service Comment Line Type"::Internal);
+                            Rec.ShowComments(4);
                         end;
                     }
                     action(Accessories)
@@ -386,7 +385,7 @@ page 5965 "Service Quote Subform"
 
                         trigger OnAction()
                         begin
-                            Rec.ShowComments("Service Comment Line Type"::Accessory);
+                            Rec.ShowComments(3);
                         end;
                     }
                     action("Lent Loaners")
@@ -397,7 +396,7 @@ page 5965 "Service Quote Subform"
 
                         trigger OnAction()
                         begin
-                            Rec.ShowComments("Service Comment Line Type"::"Service Item Loaner");
+                            Rec.ShowComments(5);
                         end;
                     }
                 }
