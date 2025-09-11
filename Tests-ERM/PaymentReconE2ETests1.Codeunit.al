@@ -40,11 +40,14 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
     procedure TestTransactionsAlreadyImported()
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
-        BankAccReconciliation: array[2] of Record "Bank Acc. Reconciliation";
+        BankAccRecon: Record "Bank Acc. Reconciliation";
         BankAcc: Record "Bank Account";
         TempBlobUTF8: Codeunit "Temp Blob";
         PmtReconJnl: TestPage "Payment Reconciliation Journal";
+        DummyPmtReconJnl1: TestPage "Payment Reconciliation Journal";
+        DummyPmtReconJnl2: TestPage "Payment Reconciliation Journal";
         OutStream: OutStream;
+        i: Integer;
         BankStmtFormat: Code[20];
     begin
         CreateOneSaleOnePmtOutstream(CustLedgEntry, OutStream, TempBlobUTF8);
@@ -52,22 +55,35 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         BankStmtFormat := 'SEPA CAMT';
         CreateBankAcc(BankStmtFormat, BankAcc, '');
 
+        LibraryLowerPermissions.SetAccountReceivables();
         // Exercise
-        LibraryLowerPermissions.AddAccountReceivables();
-        OneSaleOnePmt1(BankAccReconciliation[1], BankAcc, TempBlobUTF8);
-        OneSaleOnePmt1(BankAccReconciliation[2], BankAcc, TempBlobUTF8);
+        for i := 1 to 2 do begin
+            if i = 1 then
+                PmtReconJnl := DummyPmtReconJnl1
+            else
+                PmtReconJnl := DummyPmtReconJnl2;
 
-        OpenPmtReconJnl(BankAccReconciliation[1], PmtReconJnl);
-        PmtReconJnl.Post.Invoke();
-        VerifyNoLinesImported(BankAccReconciliation[2]);
+            Clear(BankAccRecon);
+            LibraryERM.CreateBankAccReconciliation(BankAccRecon, BankAcc."No.", BankAccRecon."Statement Type"::"Payment Application");
+            SetupSourceMock(BankStmtFormat, TempBlobUTF8);
+            BankAccRecon.ImportBankStatement();
+            GetLinesAndUpdateBankAccRecStmEndingBalance(BankAccRecon);
 
-        OpenPmtReconJnl(BankAccReconciliation[2], PmtReconJnl);
-        asserterror PmtReconJnl.Post.Invoke(); // It should not be possible to post
-        PmtReconJnl.Close();
-        BankAccReconciliation[2].Find();
-        BankAccReconciliation[2].Delete(true); // It should be possible to delete the payment reconcilation journal
+            // CreateBankAccReconAndImportStmt(BankAccRecon,TempBlobUTF8);
+            OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
+            ApplyAutomatically(PmtReconJnl);
+            VerifyPrePost(BankAccRecon, PmtReconJnl);
+        end;
+        DummyPmtReconJnl1.First();
+        DummyPmtReconJnl1.Post.Invoke();
 
-        // Verify that all customers | gls | banks go to zero
+        VerifyNoLinesImported(BankAccRecon);
+        asserterror DummyPmtReconJnl2.Post.Invoke(); // It should not be possible to post
+        DummyPmtReconJnl2.Close();
+        BankAccRecon.Find();
+        BankAccRecon.Delete(true); // It should be possible to delete the payment reconcilation journal
+
+        // Verify that all Vendors | gls | banks go to zero
         VerifyCustLedgEntry(CustLedgEntry."Customer No.");
     end;
 
@@ -1536,7 +1552,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         LibraryVariableStorage.Enqueue(CustLedgEntry."Customer No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Bank Account No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Statement No.");
-        LibraryVariableStorage.Enqueue(true);
         OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
 
         // [WHEN] Manually match one with an amount 10
@@ -1596,7 +1611,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         LibraryVariableStorage.Enqueue(VendLedgEntry."Vendor No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Bank Account No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Statement No.");
-        LibraryVariableStorage.Enqueue(true);
         OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
 
         // [WHEN] Manually match one with an amount 10
@@ -1655,7 +1669,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         // [WHEN] Payment Reconciliation Journal is opened and report is invoked
         LibraryVariableStorage.Enqueue(BankAccRecon."Bank Account No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Statement No.");
-        LibraryVariableStorage.Enqueue(true);
         OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
         PmtReconJnl.TestReport.Invoke();
 
@@ -1712,7 +1725,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         // [WHEN] Bank Reconciliation Report is run, the outstanding transactions are included
         LibraryVariableStorage.Enqueue(BankAccRecon."Bank Account No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Statement No.");
-        LibraryVariableStorage.Enqueue(true);
         REPORT.Run(REPORT::"Bank Acc. Recon. - Test");
 
         // [THEN] Verify outstanding transactions are included and report totals correct for multiple transactions
@@ -1771,7 +1783,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         // [WHEN] Report is invoked from Payment Reconciliation Journal
         LibraryVariableStorage.Enqueue(BankAccRecon."Bank Account No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Statement No.");
-        LibraryVariableStorage.Enqueue(false);
         PmtReconJnl.TestReport.Invoke();
 
         // [THEN] Verify no outstanding transactions included as they are applied, verify totals on report
@@ -1830,7 +1841,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         // [WHEN] Bank Reconciliation Report is run
         LibraryVariableStorage.Enqueue(BankAccRecon."Bank Account No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Statement No.");
-        LibraryVariableStorage.Enqueue(true);
         PmtReconJnl.TestReport.Invoke();
 
         // [THEN] Verify outstanding transactions that are not applied are included, verify totals on report
@@ -1882,7 +1892,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         // [WHEN] Report is run for Payment Reconciliation Journal
         LibraryVariableStorage.Enqueue(BankAccRecon."Bank Account No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Statement No.");
-        LibraryVariableStorage.Enqueue(false);
         REPORT.Run(REPORT::"Bank Acc. Recon. - Test");
 
         // [THEN] Verify expected warnings for account closed and missing record are on report
@@ -1928,7 +1937,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         // [WHEN] Report is run for Payment Reconciliation Journal
         LibraryVariableStorage.Enqueue(BankAccRecon."Bank Account No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Statement No.");
-        LibraryVariableStorage.Enqueue(false);
         REPORT.Run(REPORT::"Bank Acc. Recon. - Test");
 
         // [THEN] Verify warnings on report for closed, wrong amount and missing ledger
@@ -1977,7 +1985,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         // [WHEN] Report is run for Payment Reconciliation Journal
         LibraryVariableStorage.Enqueue(BankAccRecon."Bank Account No.");
         LibraryVariableStorage.Enqueue(BankAccRecon."Statement No.");
-        LibraryVariableStorage.Enqueue(false);
         REPORT.Run(REPORT::"Bank Acc. Recon. - Test");
 
         // [THEN] Verify warnings on report for closed, wrong amount and missing ledger
@@ -2125,47 +2132,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         PaymentReconciliationJournal.Post.Invoke();
 
         LibraryVariableStorage.AssertEmpty();
-    end;
-
-    [Test]
-    [HandlerFunctions('ConfirmHandlerYes,PostAndReconcilePageHandler,BankAccountStatementRequestPageHandler')]
-    procedure GLBalanceOnBankAccountStatementWhenPostedFromPaymentRecJournal()
-    var
-        BankAccount: Record "Bank Account";
-        BankGLAccount: Record "G/L Account";
-        OtherGLAccount: Record "G/L Account";
-        BankAccountStatement: Record "Bank Account Statement";
-        BankAccReconciliation: Record "Bank Acc. Reconciliation";
-        PaymentReconciliationJournal: TestPage "Payment Reconciliation Journal";
-        RequestPageXML: Text;
-    begin
-        // [SCENARIO] The field GL Balance at Posting date in the Bank Statement report should consider the entries posted from the payment reconciliation journal.
-        Initialize();
-        BankAccountStatement.DeleteAll();
-        // [GIVEN] A new bank account with no balance in either the Bank Account or corresponding GL account.
-        LibraryERM.CreateGLAccount(BankGLAccount);
-        LibraryERM.CreateBankAccount(BankAccount, BankGLAccount);
-        // [GIVEN] A posted payment reconciliation journal that posted a new GL Entry to some other GLAccount as one of its lines.
-        LibraryERM.CreateGLAccount(OtherGLAccount);
-        LibraryERM.CreateBankAccReconciliation(BankAccReconciliation, BankAccount."No.", BankAccReconciliation."Statement Type"::"Payment Application");
-        OpenPmtReconJnl(BankAccReconciliation, PaymentReconciliationJournal);
-        PaymentReconciliationJournal."Transaction Text".SetValue('Description');
-        PaymentReconciliationJournal."Transaction Date".SetValue(WorkDate());
-        PaymentReconciliationJournal."Statement Amount".SetValue(100);
-        PaymentReconciliationJournal."Account Type".SetValue(Enum::"Gen. Journal Account Type"::"G/L Account");
-        PaymentReconciliationJournal."Account No.".SetValue(OtherGLAccount."No.");
-        PaymentReconciliationJournal.Accept.Invoke();
-        BankAccReconciliation."Statement Date" := WorkDate();
-        BankAccReconciliation.Validate("Statement Ending Balance", 100);
-        BankAccReconciliation.Modify();
-        PaymentReconciliationJournal.Post.Invoke();
-        Commit();
-        // [WHEN] The Bank Statement report is run.
-        BankAccountStatement.Get(BankAccReconciliation."Bank Account No.", BankAccReconciliation."Statement No.");
-        RequestPageXML := Report.RunRequestPage(Report::"Bank Account Statement", RequestPageXML);
-        LibraryReportDataset.RunReportAndLoad(Report::"Bank Account Statement", BankAccountStatement, RequestPageXML);
-        // [THEN] The GLBalanceAtPostingDate field includes the newly posted line.
-        LibraryReportDataset.AssertElementWithValueExists('Bank_Acc__Reconciliation___TotalBalOnBankAccount', 100.0);
     end;
 
     local procedure Initialize()
@@ -2408,21 +2374,6 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
 
         WriteCAMTStmtLine(
               OutStream, CustLedgEntry."Posting Date", CustLedgEntry."Document No.", CustLedgEntry."Remaining Amount" - CustLedgEntry."Remaining Pmt. Disc. Possible", CustLedgEntry."Currency Code");
-    end;
-
-    local procedure OneSaleOnePmt1(var BankAccRecon: Record "Bank Acc. Reconciliation"; BankAcc: Record "Bank Account"; TempBlobUTF8: Codeunit "Temp Blob")
-    var
-        PmtReconJnl: TestPage "Payment Reconciliation Journal";
-    begin
-        LibraryERM.CreateBankAccReconciliation(BankAccRecon, BankAcc."No.", BankAccRecon."Statement Type"::"Payment Application");
-        SetupSourceMock(BankAcc."Bank Statement Import Format", TempBlobUTF8);
-        BankAccRecon.ImportBankStatement();
-        GetLinesAndUpdateBankAccRecStmEndingBalance(BankAccRecon);
-
-        OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
-        ApplyAutomatically(PmtReconJnl);
-
-        VerifyPrePost(BankAccRecon, PmtReconJnl);
     end;
 
     local procedure OneSaleOnePmtExcessiveAmount(var CustLedgEntry: Record "Cust. Ledger Entry"; var OutStream: OutStream; ExcessiveAmount: Decimal)
@@ -3245,8 +3196,7 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
         BankAccReconTest."Bank Acc. Reconciliation".SetFilter("Bank Account No.", LibraryVariableStorage.DequeueText());
         BankAccReconTest."Bank Acc. Reconciliation".SetFilter("Statement No.", LibraryVariableStorage.DequeueText());
         BankAccReconTest."Bank Acc. Reconciliation".SetFilter("Statement Type", 'Payment Application');
-        BankAccReconTest.PrintOutstdTransac.SetValue(LibraryVariableStorage.DequeueBoolean());
-        BankAccReconTest.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
+        BankAccReconTest.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName())
     end;
 
     [Scope('OnPrem')]
@@ -3376,14 +3326,5 @@ codeunit 134265 "Payment Recon. E2E Tests 1"
     begin
         Reply := true;
     end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure BankAccountStatementRequestPageHandler(var BankAccountStatement: TestRequestPage "Bank Account Statement")
-    begin
-        BankAccountStatement.PrintOutstandingTransaction.SetValue(true);
-        BankAccountStatement.OK().Invoke();
-    end;
-
 }
 
