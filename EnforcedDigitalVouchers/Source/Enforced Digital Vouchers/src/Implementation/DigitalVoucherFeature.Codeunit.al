@@ -85,7 +85,7 @@ codeunit 5585 "Digital Voucher Feature"
     end;
 
     [InternalEvent(false, false)]
-    procedure OnBeforeEnforceDigitalVoucherFunctionality(var IsEnabled: Boolean; var IsHandled: Boolean)
+    internal procedure OnBeforeEnforceDigitalVoucherFunctionality(var IsEnabled: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

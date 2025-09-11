@@ -5,8 +5,7 @@ using System.Environment.Configuration;
 codeunit 8020 "Personalization Data Mgmt."
 {
     Access = Internal;
-
-    internal procedure SetDataPagePersonalization(ObjectType: Option ,,,Report,,,XMLport,,Page; ObjectID: Text; ValueName: Code[40]; Value: Text)
+    procedure SetDataPagePersonalization(ObjectType: Option ,,,Report,,,XMLport,,Page; ObjectID: Text; ValueName: Code[40]; Value: Text)
     var
         PageDataPersonalization: Record "Page Data Personalization";
         BigText: BigText;
@@ -27,7 +26,7 @@ codeunit 8020 "Personalization Data Mgmt."
             PageDataPersonalization.Modify(false);
     end;
 
-    internal procedure GetDataPagePersonalization(ObjectType: Option ,,,Report,,,XMLport,,Page; ObjectID: Text; ValueName: Code[40]; var Value: Text): Boolean
+    procedure GetDataPagePersonalization(ObjectType: Option ,,,Report,,,XMLport,,Page; ObjectID: Text; ValueName: Code[40]; var Value: Text): Boolean
     var
         PageDataPersonalization: Record "Page Data Personalization";
         BigText: BigText;
@@ -42,6 +41,15 @@ codeunit 8020 "Personalization Data Mgmt."
             exit(true);
         end else
             exit(false);
+    end;
+
+    procedure DeleteDataPagePersonalization(ObjectType: Option ,,,Report,,,XMLport,,Page; ObjectID: Text; ValueName: Code[40])
+    var
+        PageDataPersonalization: Record "Page Data Personalization";
+    begin
+        FilterPageDataPersonalization(PageDataPersonalization, ObjectType, ObjectID, ValueName);
+        if not PageDataPersonalization.IsEmpty() then
+            PageDataPersonalization.DeleteAll(false);
     end;
 
     local procedure FilterPageDataPersonalization(var PageDataPersonalization2: Record "Page Data Personalization"; ObjectType: Option ,,,Report,,,XMLport,,Page; ObjectID: Text; ValueName: Code[40])
