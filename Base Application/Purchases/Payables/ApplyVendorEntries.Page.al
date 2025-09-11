@@ -108,14 +108,10 @@ page 233 "Apply Vendor Entries"
 
                     trigger OnValidate()
                     begin
-                        if Rec."Applies-to ID" = xRec."Applies-to ID" then
-                            exit;
-
                         if (CalcType = CalcType::"Gen. Jnl. Line") and (ApplnType = ApplnType::"Applies-to Doc. No.") then
                             Error(CannotSetAppliesToIDErr);
 
                         SetVendApplId(true);
-                        Rec.Get(Rec."Entry No.");
                         if Rec."Applies-to ID" <> '' then
                             UpdateCustomAppliesToIDForGenJournal(Rec."Applies-to ID");
 
@@ -1448,7 +1444,7 @@ page 233 "Apply Vendor Entries"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforePostDirectApplication(Rec, PreviewMode, IsHandled, TempApplyingVendLedgEntry);
+        OnBeforePostDirectApplication(Rec, PreviewMode, IsHandled);
         if IsHandled then
             exit;
 
@@ -1487,8 +1483,6 @@ page 233 "Apply Vendor Entries"
                     VendEntryApplyPostedEntries.PreviewApply(Rec, NewApplyUnapplyParameters)
                 else
                     Applied := VendEntryApplyPostedEntries.Apply(Rec, NewApplyUnapplyParameters);
-
-                OnPostDirectApplicationOnAfterApply(Rec, NewApplyUnapplyParameters, PreviewMode, Applied);
 
                 if (not PreviewMode) and Applied then begin
                     Message(ApplicationPostedMsg);
@@ -1529,7 +1523,6 @@ page 233 "Apply Vendor Entries"
     protected procedure ExchangeLedgerEntryAmounts(Type: Enum "Vendor Apply Calculation Type"; CurrencyCode: Code[10]; var CalcVendLedgEntry: Record "Vendor Ledger Entry"; PostingDate: Date)
     var
         CalculateCurrency: Boolean;
-        IsHandled: Boolean;
     begin
         CalcVendLedgEntry.CalcFields("Remaining Amount");
 
@@ -1537,10 +1530,6 @@ page 233 "Apply Vendor Entries"
             CalculateCurrency := TempApplyingVendLedgEntry."Entry No." <> 0
         else
             CalculateCurrency := true;
-
-        OnExchangeLedgerEntryAmountsOnBeforeCalculateAmounts(CalcVendLedgEntry, VendLedgEntry, CurrencyCode, CalculateCurrency, IsHandled);
-        if IsHandled then
-            exit;
 
         if (CurrencyCode <> CalcVendLedgEntry."Currency Code") and CalculateCurrency then begin
             CalcVendLedgEntry."Remaining Amount" :=
@@ -1690,7 +1679,7 @@ page 233 "Apply Vendor Entries"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostDirectApplication(var VendorLedgerEntry: Record "Vendor Ledger Entry"; PreviewMode: Boolean; var IsHandled: Boolean; var TempApplyingVendLedgEntry: Record "Vendor Ledger Entry" temporary)
+    local procedure OnBeforePostDirectApplication(var VendorLedgerEntry: Record "Vendor Ledger Entry"; PreviewMode: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -1781,16 +1770,6 @@ page 233 "Apply Vendor Entries"
 
     [IntegrationEvent(true, false)]
     local procedure OnPostDirectApplicationOnBeforeCheckApplicationDate(VendorLedgerEntry: Record "Vendor Ledger Entry"; NewApplyUnapplyParameters: Record "Apply Unapply Parameters"; ApplicationDate: Date; PreviewMode: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnExchangeLedgerEntryAmountsOnBeforeCalculateAmounts(var CalcVendLedgEntry: Record "Vendor Ledger Entry"; VendLedgEntry: Record "Vendor Ledger Entry"; CurrencyCode: Code[10]; CalculateCurrency: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDirectApplicationOnAfterApply(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var NewApplyUnapplyParameters: Record "Apply Unapply Parameters"; PreviewMode: Boolean; Applied: Boolean)
     begin
     end;
 }
