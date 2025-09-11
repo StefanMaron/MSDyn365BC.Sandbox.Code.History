@@ -1440,7 +1440,7 @@ page 233 "Apply Vendor Entries"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforePostDirectApplication(Rec, PreviewMode, IsHandled);
+        OnBeforePostDirectApplication(Rec, PreviewMode, IsHandled, TempApplyingVendLedgEntry);
         if IsHandled then
             exit;
 
@@ -1686,8 +1686,8 @@ page 233 "Apply Vendor Entries"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostDirectApplication(var VendorLedgerEntry: Record "Vendor Ledger Entry"; PreviewMode: Boolean; var IsHandled: Boolean)
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforePostDirectApplication(var VendorLedgerEntry: Record "Vendor Ledger Entry"; PreviewMode: Boolean; var IsHandled: Boolean; var TempApplyingVendLedgEntry: Record "Vendor Ledger Entry" temporary)
     begin
     end;
 
