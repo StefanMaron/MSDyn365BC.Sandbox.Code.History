@@ -132,7 +132,7 @@ codeunit 929 "Asm. Get Demand To Reserve"
                 begin
                     AssemblyHeader.SetLoadFields("Document Type", "No.");
                     AssemblyHeader.Get(ReservationWkshLine."Source Subtype", ReservationWkshLine."Source ID");
-                    PAGE.Run(PAGE::"Assembly Order Statistics", AssemblyHeader);
+                    AssemblyHeader.ShowStatistics();
                 end;
         end;
     end;
