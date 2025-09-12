@@ -249,7 +249,6 @@ report 10715 "Telematic VAT Declaration"
     procedure CalcTotLine(VATStatementLine2: Record "VAT Statement Line"; var TotalAmount: Decimal; Level: Integer): Boolean
     var
         VATPostingSetup: Record "VAT Posting Setup";
-        VATReportSetup: Record "VAT Report Setup";
         NoTaxableEntry: Record "No Taxable Entry";
         IsNoTaxableEntry: Boolean;
     begin
@@ -300,9 +299,9 @@ report 10715 "Telematic VAT Declaration"
                         VATEntry.SetRange(Type, VATStatementLine2."Gen. Posting Type");
                         if "VAT Declaration Line".GetFilter("Date Filter") <> '' then
                             if PeriodSelected = PeriodSelected::"Before and Within Period" then
-                                VATEntry.SetRange("VAT Reporting Date", 0D, "VAT Declaration Line".GetRangeMax("Date Filter"))
+                                VATEntry.SetRange("Posting Date", 0D, "VAT Declaration Line".GetRangeMax("Date Filter"))
                             else
-                                "VAT Declaration Line".CopyFilter("Date Filter", VATEntry."VAT Reporting Date");
+                                "VAT Declaration Line".CopyFilter("Date Filter", VATEntry."Posting Date");
                         SetSelectionFilterOnVATEntry(VATEntry, Selection);
                         if VATEntry.FindFirst() then;
                     end;
@@ -364,19 +363,6 @@ report 10715 "Telematic VAT Declaration"
                                 else
                                     Base := ConditionalAdd(0, VATEntry.Base, VATEntry."Additional-Currency Base");
                                 Amount := Amount + Base;
-                            end;
-                        VATStatementLine2."Amount Type"::"Non-Deductible Amount":
-                            begin
-                                VATEntry.CalcSums("Non-Deductible VAT Base", "Non-Deductible VAT Base ACY", "Non-Deductible VAT Amount", "Non-Deductible VAT Amount ACY");
-                                Amount := ConditionalAdd(0, VATEntry."Non-Deductible VAT Amount", VATEntry."Non-Deductible VAT Amount ACY");
-                                if VATReportSetup.Get() then;
-                                if VATReportSetup."Report VAT Base" then
-                                    Base := ConditionalAdd(0, VATEntry."Non-Deductible VAT Base", VATEntry."Non-Deductible VAT Base ACY");
-                            end;
-                        VATStatementLine2."Amount Type"::"Non-Deductible Base":
-                            begin
-                                VATEntry.CalcSums("Non-Deductible VAT Base", "Non-Deductible VAT Base ACY");
-                                Amount := ConditionalAdd(0, VATEntry."Non-Deductible VAT Base", VATEntry."Non-Deductible VAT Base ACY");
                             end;
                     end;
                     CalcTotAmount(VATStatementLine2, TotalAmount);
