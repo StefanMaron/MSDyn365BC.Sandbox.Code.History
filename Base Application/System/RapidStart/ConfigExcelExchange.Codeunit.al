@@ -817,7 +817,8 @@ codeunit 8618 "Config. Excel Exchange"
     begin
         // maximum Worksheet Name length in Excel
         WorksheetNameMaxLen := 31;
-        Caption := CopyStr(TableID + ' ' + Caption, 1, WorksheetNameMaxLen);
+        if (StrLen(Caption) > WorksheetNameMaxLen) or (TableID = '5105') then
+            Caption := CopyStr(TableID + ' ' + Caption, 1, WorksheetNameMaxLen);
         exit(Caption);
     end;
 
