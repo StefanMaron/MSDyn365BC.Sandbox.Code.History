@@ -113,7 +113,6 @@ codeunit 7769 "AOAI Deployments Impl"
         exit(GetDeploymentName(GPT4oMiniLatestLbl));
     end;
 #endif
-
     procedure GetGPT41Preview(CallerModuleInfo: ModuleInfo): Text
     begin
         exit(GetDeploymentName(GPT41PreviewLbl));
