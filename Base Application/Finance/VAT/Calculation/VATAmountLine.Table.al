@@ -675,7 +675,7 @@ table 290 "VAT Amount Line"
                         "VAT Calculation Type"::"Reverse Charge VAT":
                             begin
                                 "VAT Base" :=
-                                  CalcLineAmount() / (1 + "VAT %" / 100) - "VAT Difference";
+                                  Round(CalcLineAmount() / (1 + "VAT %" / 100), Currency."Amount Rounding Precision") - "VAT Difference";
                                 OnUpdateLinesOnAfterCalcVATBase(Rec, Currency, PricesIncludingVAT);
                                 "VAT Amount" :=
                                   "VAT Difference" +
@@ -684,10 +684,6 @@ table 290 "VAT Amount Line"
                                     (CalcLineAmount() - "VAT Base" - "VAT Difference") *
                                     (1 - VATBaseDiscountPerc / 100),
                                     Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
-                                if VATBaseDiscountPerc <> 0 then
-                                    "VAT Base" := Round("VAT Base", Currency."Amount Rounding Precision")
-                                else
-                                    "VAT Base" := CalcLineAmount() - "VAT Amount";
                                 OnUpdateLinesOnAfterCalcVATAmount(Rec, PrevVATAmountLine, Currency, VATBaseDiscountPerc, PricesIncludingVAT);
                                 "Amount Including VAT" := "VAT Base" + "VAT Amount";
                                 OnUpdateLinesOnAfterCalcAmountIncludingVATNormalVAT(Rec, PrevVATAmountLine, Currency, VATBaseDiscountPerc, PricesIncludingVAT);
@@ -822,7 +818,6 @@ table 290 "VAT Amount Line"
         if PurchInvLine."Allow Invoice Disc." then
             "Inv. Disc. Base Amount" := PurchInvLine."Line Amount";
         "Invoice Discount Amount" := PurchInvLine."Inv. Discount Amount";
-        "Pmt. Discount Amount" := PurchInvLine."Pmt. Discount Amount";
         Quantity := PurchInvLine."Quantity (Base)";
         "Calculated VAT Amount" :=
           PurchInvLine."Amount Including VAT" - PurchInvLine.Amount - PurchInvLine."VAT Difference";
@@ -847,7 +842,6 @@ table 290 "VAT Amount Line"
         if PurchCrMemoLine."Allow Invoice Disc." then
             "Inv. Disc. Base Amount" := PurchCrMemoLine."Line Amount";
         "Invoice Discount Amount" := PurchCrMemoLine."Inv. Discount Amount";
-        "Pmt. Discount Amount" := PurchCrMemoLine."Pmt. Discount Amount";
         Quantity := PurchCrMemoLine."Quantity (Base)";
         "Calculated VAT Amount" :=
           PurchCrMemoLine."Amount Including VAT" - PurchCrMemoLine.Amount - PurchCrMemoLine."VAT Difference";
@@ -870,7 +864,6 @@ table 290 "VAT Amount Line"
         if SalesInvoiceLine."Allow Invoice Disc." then
             "Inv. Disc. Base Amount" := SalesInvoiceLine."Line Amount";
         "Invoice Discount Amount" := SalesInvoiceLine."Inv. Discount Amount";
-        "Pmt. Discount Amount" := SalesInvoiceLine."Pmt. Discount Amount";
         Quantity := SalesInvoiceLine."Quantity (Base)";
         "Calculated VAT Amount" :=
           SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine.Amount - SalesInvoiceLine."VAT Difference";
@@ -892,7 +885,6 @@ table 290 "VAT Amount Line"
         if SalesCrMemoLine."Allow Invoice Disc." then
             "Inv. Disc. Base Amount" := SalesCrMemoLine."Line Amount";
         "Invoice Discount Amount" := SalesCrMemoLine."Inv. Discount Amount";
-        "Pmt. Discount Amount" := SalesCrMemoLine."Pmt. Discount Amount";
         Quantity := SalesCrMemoLine."Quantity (Base)";
         "Calculated VAT Amount" := SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine.Amount - SalesCrMemoLine."VAT Difference";
         "VAT Difference" := SalesCrMemoLine."VAT Difference";
@@ -915,7 +907,6 @@ table 290 "VAT Amount Line"
         if ServiceInvoiceLine."Allow Invoice Disc." then
             "Inv. Disc. Base Amount" := ServiceInvoiceLine."Line Amount";
         "Invoice Discount Amount" := ServiceInvoiceLine."Inv. Discount Amount";
-        "Pmt. Discount Amount" := ServiceInvoiceLine."Pmt. Discount Amount";
         Quantity := ServiceInvoiceLine."Quantity (Base)";
         "Calculated VAT Amount" :=
           ServiceInvoiceLine."Amount Including VAT" - ServiceInvoiceLine.Amount - ServiceInvoiceLine."VAT Difference";
@@ -940,7 +931,6 @@ table 290 "VAT Amount Line"
         if ServiceCrMemoLine."Allow Invoice Disc." then
             "Inv. Disc. Base Amount" := ServiceCrMemoLine."Line Amount";
         "Invoice Discount Amount" := ServiceCrMemoLine."Inv. Discount Amount";
-        "Pmt. Discount Amount" := ServiceCrMemoLine."Pmt. Discount Amount";
         Quantity := ServiceCrMemoLine."Quantity (Base)";
         "Calculated VAT Amount" :=
           ServiceCrMemoLine."Amount Including VAT" - ServiceCrMemoLine.Amount - ServiceCrMemoLine."VAT Difference";
