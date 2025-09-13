@@ -5,7 +5,6 @@
 namespace Microsoft.Inventory.Location;
 
 using Microsoft.Finance.Dimension;
-using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Calendar;
 using Microsoft.Inventory.Item;
@@ -178,12 +177,6 @@ page 5703 "Location Card"
                         Importance = Additional;
                         ToolTip = 'Specifies the SAT address that the goods or merchandise are moved to.';
                     }
-                    field("SAT Certificate"; Rec."SAT Certificate")
-                    {
-                        ApplicationArea = BasicMX;
-                        ToolTip = 'Specifies the certificate issued by the tax authority to the company branch at this location for verifying its identity when sending electronic invoices. To enable this, set "Multiple SAT Certificates" option in the General Ledger Setup.';
-                        Enabled = SATCertInLocationEnabled;
-                    }
                 }
             }
             group(Warehouse)
@@ -310,7 +303,7 @@ page 5703 "Location Card"
                     {
                         ApplicationArea = Warehouse;
                         Enabled = UsePutAwayWorksheetEnable;
-                        ToolTip = 'Specifies if put-aways for posted warehouse receipts must be created with the put-away worksheet. If the check box is not selected, put-aways are created directly when you post a warehouse receipt or production output.';
+                        ToolTip = 'Specifies if put-aways for posted warehouse receipts must be created with the put-away worksheet. If the check box is not selected, put-aways are created directly when you post a warehouse receipt.';
                     }
                     field("Use ADCS"; Rec."Use ADCS")
                     {
@@ -503,6 +496,7 @@ page 5703 "Location Card"
                 {
                     ApplicationArea = Warehouse;
                     Enabled = AllowBreakbulkEnable;
+                    ToolTip = 'Specifies that an order can be fulfilled with items stored in alternate units of measure, if an item stored in the requested unit of measure is not found.';
                 }
                 group("Put-away")
                 {
@@ -718,9 +712,6 @@ page 5703 "Location Card"
         InboundWhseHandlingTimeEnable := true;
         OutboundWhseHandlingTimeEnable := true;
         EditInTransit := true;
-
-        GLSetup.Get();
-        SATCertInLocationEnabled := GLSetup."Multiple SAT Certificates";
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -729,7 +720,6 @@ page 5703 "Location Card"
     end;
 
     var
-        GLSetup: Record "General Ledger Setup";
         CalendarManagement: Codeunit "Calendar Management";
         FormatAddress: Codeunit "Format Address";
         EditInTransit: Boolean;
@@ -776,7 +766,6 @@ page 5703 "Location Card"
         ShipmentBinCodeEnable: Boolean;
         UseADCSEnable: Boolean;
         UseCrossDockingEnable: Boolean;
-        SATCertInLocationEnabled: Boolean;
 
     procedure UpdateEnabled()
     begin
