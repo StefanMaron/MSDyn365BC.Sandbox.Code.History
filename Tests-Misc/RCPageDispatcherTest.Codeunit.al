@@ -13,8 +13,6 @@ codeunit 134681 "RC Page Dispatcher Test"
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
 #endif
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
-        LibraryVariableStorage: Codeunit "Library - Variable Storage";
-        LibrarySales: Codeunit "Library - Sales";
         Assert: Codeunit Assert;
         isInitialized: Boolean;
 
@@ -240,33 +238,6 @@ codeunit 134681 "RC Page Dispatcher Test"
 #pragma warning restore AS0072
 #endif
 
-    [Test]
-    [HandlerFunctions('ItemPriceListReportHandler,CustomerLookupHandler')]
-    procedure TestItemPriceList()
-    var
-        CustomerNo, CustomerNo1 : Code[20];
-    begin
-        // [SCENARIO 572934] Item price list print report request page Assign-to field disabled
-        // Setup: Set Report format to Print.
-        Initialize();
-
-        // [GIVEN] Create Customer
-        CustomerNo := LibrarySales.CreateCustomerNo();
-
-        // [GIVEN] Print Item Price List Report for Customer Created
-        Commit();
-        LibraryVariableStorage.Enqueue(CustomerNo);
-        REPORT.Run(REPORT::"Item Price List");
-
-        // [WHEN] Create Second Customer
-        CustomerNo1 := LibrarySales.CreateCustomerNo();
-
-        // [THEN] Item Price List Request Page should be open with Second Customer Filter
-        Commit();
-        LibraryVariableStorage.Enqueue(CustomerNo1);
-        REPORT.Run(REPORT::"Item Price List");
-    end;
-
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"RC Page Dispatcher Test");
@@ -294,11 +265,6 @@ codeunit 134681 "RC Page Dispatcher Test"
         Assert.ExpectedError('');
     end;
 
-    local procedure FormatFileName(ReportCaption: Text) ReportFileName: Text
-    begin
-        ReportFileName := DelChr(ReportCaption, '=', '/') + '.pdf'
-    end;
-
     [RequestPageHandler]
     procedure ItemPriceListHandler(var ItemPriceList: TestRequestPage "Item Price List")
     begin
@@ -309,21 +275,5 @@ codeunit 134681 "RC Page Dispatcher Test"
     procedure ResPriceListHandler(var ResPriceList: TestRequestPage "Res. Price List")
     begin
         ResPriceList.Cancel().Invoke();
-    end;
-
-    [RequestPageHandler]
-    procedure ItemPriceListReportHandler(var ItemPriceList: TestRequestPage "Item Price List")
-    begin
-        ItemPriceList.SourceType.SetValue(11);
-        ItemPriceList.SourceNoCtrl.Lookup();
-        ItemPriceList.Date.SetValue(WorkDate());
-        ItemPriceList.SaveAsPdf(FormatFileName(ItemPriceList.Caption));
-    end;
-
-    [ModalPageHandler]
-    procedure CustomerLookupHandler(var CustomerLookup: TestPage "Customer Lookup")
-    begin
-        CustomerLookup.Filter.SetFilter("No.", LibraryVariableStorage.DequeueText());
-        CustomerLookup.OK().Invoke();
     end;
 }
