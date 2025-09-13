@@ -173,6 +173,7 @@ codeunit 5005270 "Issue Delivery Reminder"
         DeliveryReminderHeader.TestField("Document Date");
     end;
 
+    [Scope('OnPrem')]
     procedure Set(var NewDelivReminHeader: Record "Delivery Reminder Header"; NewReplacementPostingDate: Boolean; NewPostingDate: Date)
     begin
         DeliveryReminderHeader := NewDelivReminHeader;
@@ -180,11 +181,13 @@ codeunit 5005270 "Issue Delivery Reminder"
         PostingDate := NewPostingDate;
     end;
 
+    [Scope('OnPrem')]
     procedure GetIssDelivReminHeader(var IssDelivReminHeaderNew: Record "Issued Deliv. Reminder Header")
     begin
         IssDelivReminHeaderNew := IssuedDeliveryReminderHeader;
     end;
 
+    [Scope('OnPrem')]
     procedure IncrNoPrinted(var IssDelivReminHeader: Record "Issued Deliv. Reminder Header")
     begin
         IssDelivReminHeader.Find();
@@ -193,6 +196,7 @@ codeunit 5005270 "Issue Delivery Reminder"
         Commit();
     end;
 
+    [Scope('OnPrem')]
     procedure DeleteIssuedDelivReminderLines(IssuedDelivReminderHeader: Record "Issued Deliv. Reminder Header")
     var
         IssuedDelivReminderLine: Record "Issued Deliv. Reminder Line";
