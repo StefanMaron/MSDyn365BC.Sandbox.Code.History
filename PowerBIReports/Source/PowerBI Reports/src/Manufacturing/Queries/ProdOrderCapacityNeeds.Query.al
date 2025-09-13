@@ -5,7 +5,7 @@ using Microsoft.Manufacturing.Document;
 query 36987 "Prod. Order Capacity Needs"
 {
     Access = Internal;
-    Caption = 'Power BI Production Order Capacity Need';
+    Caption = 'Power BI Prod. Order Cap. Need';
     QueryType = API;
     APIPublisher = 'microsoft';
     APIGroup = 'analytics';

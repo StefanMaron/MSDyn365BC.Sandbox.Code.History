@@ -6,7 +6,9 @@ page 37064 "Inventory Report"
 {
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
+#pragma warning disable AS0035 // Changed from Card to UserControlHost
     PageType = UserControlHost;
+#pragma warning restore AS0035
     Caption = 'Inventory Report';
     AboutTitle = 'About Inventory Report';
     AboutText = 'The Inventory Report offers a consolidated view of all inventory report pages, conveniently embedded into a single page for easy access.';
@@ -24,14 +26,8 @@ page 37064 "Inventory Report"
                     SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
                 end;
 
-                trigger ReportLoaded(ReportFilters: Text; ActivePageName: Text; ActivePageFilters: Text; CorrelationId: Text)
-                begin
-                    SetupHelper.LogReportLoaded(CorrelationId);
-                end;
-
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
                 begin
-                    SetupHelper.LogError(Operation, ErrorText);
                     SetupHelper.ShowPowerBIErrorNotification(Operation, ErrorText);
                 end;
             }
