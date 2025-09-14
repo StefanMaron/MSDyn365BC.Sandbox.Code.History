@@ -1255,7 +1255,7 @@ page 50 "Purchase Order"
                     Visible = not SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif                    
+#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Order Statistics";
                     RunPageOnRec = true;
@@ -1271,7 +1271,7 @@ page 50 "Purchase Order"
                     Visible = SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif                    
+#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Order Stats.";
                     RunPageOnRec = true;
@@ -2368,7 +2368,7 @@ page 50 "Purchase Order"
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
                 }
-#else                
+#else
                 actionref(PurchaseOrderStatistics_Promoted; PurchaseOrderStatistics)
                 {
                 }
@@ -2508,7 +2508,7 @@ page 50 "Purchase Order"
                 ICInboxOutboxMgt.ShowDuplicateICDocumentWarning(PurchaseHeader, ICIncomingInvoiceFromOriginalOrderMsg);
         end;
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
-        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Purchase Order Stats.";
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -2803,11 +2803,13 @@ page 50 "Purchase Order"
         end;
     end;
 
+#if not CLEAN26
+    [Obsolete('The Statistics action will be replaced with the PurchaseOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateSalesTaxStatistics(var PurchaseHeader: Record "Purchase Header"; ShowDialog: Boolean)
     begin
     end;
-
+#endif
     local procedure ValidateShippingOption()
     var
         IsHandled: Boolean;
