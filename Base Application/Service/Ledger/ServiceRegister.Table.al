@@ -73,7 +73,6 @@ table 5934 "Service Register"
     {
     }
 
-    [InherentPermissions(PermissionObjectType::TableData, Database::"Service Register", 'r')]
     procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";
