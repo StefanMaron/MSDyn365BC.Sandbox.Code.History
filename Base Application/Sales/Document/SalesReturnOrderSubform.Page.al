@@ -1263,7 +1263,6 @@ page 6631 "Sales Return Order Subform"
 
     trigger OnOpenPage()
     var
-        [SecurityFiltering(SecurityFilter::Filtered)]
         Location: Record Location;
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
     begin
