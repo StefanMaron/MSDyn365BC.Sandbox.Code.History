@@ -281,7 +281,8 @@ table 246 "Requisition Line"
                         OnValidateVendorNoOnBeforeSetVendorItemNoFromItemVend(Rec, IsHandled);
                         if not IsHandled then
                             "Vendor Item No." := ItemVend."Vendor Item No.";
-                        UpdateOrderReceiptDate(ItemVend."Lead Time Calculation");
+                        if not DoNotUpdateOrderReceiptDate then
+                            UpdateOrderReceiptDate(ItemVend."Lead Time Calculation");
                     end else begin
                         GetPlanningParameters.AtSKU(TempSKU, "No.", "Variant Code", "Location Code");
                         if "Vendor No." = TempSKU."Vendor No." then
@@ -1821,6 +1822,7 @@ table 246 "Requisition Line"
         WMSManagement: Codeunit "WMS Management";
         ConfirmManagement: Codeunit System.Utilities."Confirm Management";
         BlockReservation: Boolean;
+        DoNotUpdateOrderReceiptDate: Boolean;
 
 #pragma warning disable AA0074
 #pragma warning disable AA0470
@@ -2152,7 +2154,13 @@ table 246 "Requisition Line"
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCreateDim(Rec, DefaultDimSource, CurrFieldNo, IsHandled);
+        if IsHandled then
+            exit;
+
         SourceCodeSetup.Get();
 
         "Shortcut Dimension 1 Code" := '';
@@ -3491,11 +3499,12 @@ table 246 "Requisition Line"
             exit;
         if (Rec."Sales Order No." <> '') and Rec."Drop Shipment" then
             exit;
-        if ("Location Code" <> '') and ("No." <> '') then begin
-            GetLocation("Location Code");
-            if ("Bin Code" = '') and Location."Bin Mandatory" and not Location."Directed Put-away and Pick" then
-                WMSManagement.GetDefaultBin("No.", "Variant Code", "Location Code", "Bin Code");
-        end;
+        if ("Location Code" <> '') and ("No." <> '') then
+            if not IsDropShipment() then begin
+                GetLocation("Location Code");
+                if ("Bin Code" = '') and Location."Bin Mandatory" and not Location."Directed Put-away and Pick" then
+                    WMSManagement.GetDefaultBin("No.", "Variant Code", "Location Code", "Bin Code");
+            end;
     end;
 
     /// <summary>
@@ -3994,6 +4003,11 @@ table 246 "Requisition Line"
     local procedure TestProdOrderNo()
     begin
         OnTestProdOrderNo(Rec);
+    end;
+
+    procedure SetDoNotUpdateOrderReceiptDate(NewUpdateOrderReceiptDate: Boolean)
+    begin
+        DoNotUpdateOrderReceiptDate := NewUpdateOrderReceiptDate;
     end;
 
     [IntegrationEvent(false, false)]
@@ -4583,6 +4597,11 @@ table 246 "Requisition Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnLookupRefOrderNoElseCase(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateDim(var RequisitionLine: Record "Requisition Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }

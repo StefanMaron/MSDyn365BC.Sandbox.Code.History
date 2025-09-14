@@ -188,6 +188,7 @@ codeunit 1006 "Copy Job"
                     TargetJobPlanningLine."Completely Picked" := false;
                     TargetJobPlanningLine."Ledger Entry No." := 0;
                     TargetJobPlanningLine."Ledger Entry Type" := TargetJobPlanningLine."Ledger Entry Type"::" ";
+                    TargetJobPlanningLine."System-Created Entry" := false;
                     OnCopyJobPlanningLinesOnBeforeTargetJobPlanningLineInsert(TargetJobPlanningLine, SourceJobPlanningLine);
                     TargetJobPlanningLine.Insert(true);
                     OnCopyJobPlanningLinesOnAfterTargetJobPlanningLineInsert(TargetJobPlanningLine, SourceJobPlanningLine);
@@ -395,6 +396,12 @@ codeunit 1006 "Copy Job"
     begin
         JobTaskDateRangeFrom := JobTaskDateRangeFrom2;
         JobTaskDateRangeTo := JobTaskDateRangeTo2;
+    end;
+
+    procedure GetJobTaskDateRange(var JobTaskDateRangeFrom2: Date; var JobTaskDateRangeTo2: Date)
+    begin
+        JobTaskDateRangeFrom2 := JobTaskDateRangeFrom;
+        JobTaskDateRangeTo2 := JobTaskDateRangeTo;
     end;
 
     local procedure FindLastJobPlanningLine(JobPlanningLine: Record "Job Planning Line"): Integer
