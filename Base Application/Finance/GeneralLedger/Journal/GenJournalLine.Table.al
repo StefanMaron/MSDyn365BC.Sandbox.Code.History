@@ -3364,14 +3364,20 @@ table 81 "Gen. Journal Line"
     /// Also, updates the allocations for the line and validates the deferral code field if necessary.
     /// </remarks>
     procedure UpdateLineBalance()
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnUpdateLineBalanceOnBeforeUpdateAmounts(Rec, IsHandled);
-        if not IsHandled then
-            UpdateAmounts();
+        "Debit Amount" := 0;
+        "Credit Amount" := 0;
 
+        if ((Amount > 0) and (not Correction)) or
+           ((Amount < 0) and Correction)
+        then
+            "Debit Amount" := Amount
+        else
+            if Amount <> 0 then
+                "Credit Amount" := -Amount;
+
+        if "Currency Code" = '' then
+            "Amount (LCY)" := Amount;
         case true of
             ("Account No." <> '') and ("Bal. Account No." <> ''):
                 "Balance (LCY)" := 0;
@@ -3391,26 +3397,6 @@ table 81 "Gen. Journal Line"
 
         if ("Deferral Code" <> '') and (Amount <> xRec.Amount) and ((Amount <> 0) and (xRec.Amount <> 0)) then
             Validate("Deferral Code");
-    end;
-
-    /// <summary>
-    /// Updates the debit and credit amounts based on the current line's amount and correction status.
-    /// </summary>
-    procedure UpdateAmounts()
-    begin
-        "Debit Amount" := 0;
-        "Credit Amount" := 0;
-
-        if ((Amount > 0) and (not Correction)) or
-           ((Amount < 0) and Correction)
-        then
-            "Debit Amount" := Amount
-        else
-            if Amount <> 0 then
-                "Credit Amount" := -Amount;
-
-        if "Currency Code" = '' then
-            "Amount (LCY)" := Amount;
     end;
 
     /// <summary>
@@ -3969,13 +3955,8 @@ table 81 "Gen. Journal Line"
     end;
 
     protected procedure CheckGLAcc(GLAcc: Record "G/L Account")
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCheckGLAcc(GLAcc, Rec, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeCheckGLAcc(GLAcc, Rec);
 
         GLAcc.CheckGLAcc();
         if GLAcc."Direct Posting" or ("Journal Template Name" = '') or "System-Created Entry" then
@@ -4022,7 +4003,6 @@ table 81 "Gen. Journal Line"
         FADeprBook: Record "FA Depreciation Book";
         FANo: Code[20];
         UseFAAddCurrExchRate: Boolean;
-        IsHandled: Boolean;
     begin
         "FA Add.-Currency Factor" := 0;
         if ("FA Posting Type" <> "FA Posting Type"::" ") and
@@ -4056,12 +4036,6 @@ table 81 "Gen. Journal Line"
                 end;
                 if UseFAAddCurrExchRate then begin
                     FADeprBook.Get(FANo, "Depreciation Book Code");
-
-                    IsHandled := false;
-                    OnGetFAAddCurrExchRateOnBeforeFADeprBookTestField(FADeprBook, IsHandled);
-                    if IsHandled then
-                        exit;
-
                     FADeprBook.TestField("FA Add.-Currency Factor");
                     "FA Add.-Currency Factor" := FADeprBook."FA Add.-Currency Factor";
                 end;
@@ -4529,8 +4503,6 @@ table 81 "Gen. Journal Line"
                 CalculateVATAmount(VATAmount, VATAmountLCY);
                 if VATAmountLCY <> 0 then
                     "Sales/Purch. (LCY)" := ("Amount (LCY)" + VATAmountLCY);
-                if ("Sales/Purch. (LCY)" * "Amount (LCY)") < 0 then
-                    "Sales/Purch. (LCY)" := "Amount (LCY)";
             end;
         end;
 
@@ -7620,11 +7592,7 @@ table 81 "Gen. Journal Line"
     local procedure CheckOpenApprovalEntryExistForCurrentUser()
     var
         GenJournalBatch: Record "Gen. Journal Batch";
-        IsHandled: Boolean;
     begin
-        OnBeforeCheckOpenApprovalEntryExistForCurrentUser(Rec, CurrFieldNo, IsHandled);
-        if IsHandled then
-            exit;
         ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(Rec);
         if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
             ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(GenJournalBatch);
@@ -11839,7 +11807,7 @@ table 81 "Gen. Journal Line"
     /// <param name="GLAccount">The G/L Account record being validated.</param>
     /// <param name="GenJournalLine">The current General Journal Line being processed.</param>
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckGLAcc(var GLAccount: Record "G/L Account"; var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    local procedure OnBeforeCheckGLAcc(var GLAccount: Record "G/L Account"; var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 
@@ -11908,21 +11876,6 @@ table 81 "Gen. Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateAppliesToDocNo(var GenJnlLine: Record "Gen. Journal Line"; xGenJnlLine: Record "Gen. Journal Line"; CurrentFieldNo: Integer; var SuppressCommit: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckOpenApprovalEntryExistForCurrentUser(GenJnlLine: Record "Gen. Journal Line"; CurrFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetFAAddCurrExchRateOnBeforeFADeprBookTestField(var FADeprBook: Record "FA Depreciation Book"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateLineBalanceOnBeforeUpdateAmounts(var GenJnlLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
 }
