@@ -99,6 +99,10 @@ codeunit 2357 "Http Response Message Impl."
         CurrHttpResponseMessageInstance: HttpResponseMessage;
 
     procedure SetResponseMessage(var ResponseMessage: HttpResponseMessage)
+    var
+        Cookie: Cookie;
+        Cookies: Dictionary of [Text, Cookie];
+        CookieName: Text;
     begin
         ClearAll();
         CurrHttpResponseMessageInstance := ResponseMessage;
@@ -108,6 +112,11 @@ codeunit 2357 "Http Response Message Impl."
         SetIsSuccessStatusCode(ResponseMessage.IsSuccessStatusCode);
         SetHeaders(ResponseMessage.Headers);
         SetContent(HttpContent.Create(ResponseMessage.Content));
+        foreach CookieName in ResponseMessage.GetCookieNames() do begin
+            ResponseMessage.GetCookie(CookieName, Cookie);
+            Cookies.Add(CookieName, Cookie);
+        end;
+        SetCookies(Cookies);
     end;
 
     procedure GetResponseMessage() ReturnValue: HttpResponseMessage
@@ -133,53 +142,31 @@ codeunit 2357 "Http Response Message Impl."
 
     #region Cookies
     var
-        GlobalCookiesInitialized: Boolean;
         GlobalCookies: Dictionary of [Text, Cookie];
 
     procedure SetCookies(Cookies: Dictionary of [Text, Cookie])
     begin
         GlobalCookies := Cookies;
-        GlobalCookiesInitialized := true;
     end;
 
     procedure GetCookies() Cookies: Dictionary of [Text, Cookie]
     begin
-        InitializeCookies();
         Cookies := GlobalCookies;
     end;
 
     procedure GetCookieNames() CookieNames: List of [Text]
     begin
-        InitializeCookies();
-        CookieNames := GlobalCookies.Keys();
+        CookieNames := GlobalCookies.Keys;
     end;
 
     procedure GetCookie(Name: Text) TheCookie: Cookie
     begin
-        InitializeCookies();
         if GlobalCookies.Get(Name, TheCookie) then;
     end;
 
     procedure GetCookie(Name: Text; var TheCookie: Cookie) Success: Boolean
     begin
-        InitializeCookies();
         Success := GlobalCookies.Get(Name, TheCookie);
-    end;
-
-    local procedure InitializeCookies()
-    var
-        CookieName: Text;
-        Cookie: Cookie;
-    begin
-        if GlobalCookiesInitialized then
-            exit;
-
-        foreach CookieName in CurrHttpResponseMessageInstance.GetCookieNames() do begin
-            CurrHttpResponseMessageInstance.GetCookie(CookieName, Cookie);
-            GlobalCookies.Add(CookieName, Cookie);
-        end;
-
-        GlobalCookiesInitialized := true;
     end;
     #endregion
 

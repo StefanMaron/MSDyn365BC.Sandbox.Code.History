@@ -1009,8 +1009,6 @@ page 99000852 "Planning Worksheet"
             PAGE::"Planning Worksheet", false, "Req. Worksheet Template Type"::Planning, Rec, JnlSelected);
         if not JnlSelected then
             Error('');
-        if NewOpenFromItemAvailabilityByEvent then
-            CurrentWkshBatchName := Rec."Journal Batch Name";
         ReqJnlManagement.OpenJnl(CurrentWkshBatchName, Rec);
     end;
 
@@ -1024,7 +1022,6 @@ page 99000852 "Planning Worksheet"
         OpenedFromBatch: Boolean;
         VariantCodeMandatory: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
-        NewOpenFromItemAvailabilityByEvent: Boolean;
         Warning: Option " ",Emergency,Exception,Attention;
 
     protected var
@@ -1111,11 +1108,6 @@ page 99000852 "Planning Worksheet"
 
         CarryOutActionMsgPlan.SetReqWkshLine(Rec);
         CarryOutActionMsgPlan.RunModal();
-    end;
-
-    procedure CallFromItemAvailabilityByEvent(OpenFromItemAvailabilityByEvent: Boolean)
-    begin
-        NewOpenFromItemAvailabilityByEvent := OpenFromItemAvailabilityByEvent;
     end;
 
     [IntegrationEvent(false, false)]
