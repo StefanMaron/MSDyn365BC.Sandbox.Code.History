@@ -13,14 +13,14 @@ using Microsoft.eServices.EDocument.Processing.Import;
 #if not CLEAN26
 using Microsoft.eServices.EDocument.Integration;
 #endif
+using System.IO;
 using System.Utilities;
 using Microsoft.eServices.EDocument.Processing.Interfaces;
-using Microsoft.eServices.EDocument.Processing.Import.Purchase;
 
 codeunit 6140 "E-Doc. Import"
 {
     Permissions =
-        tabledata "E-Document" = imd,
+        tabledata "E-Document" = im,
         tabledata "E-Doc. Imported Line" = imd;
 
     procedure ReceiveAndProcessAutomatically(EDocumentService: Record "E-Document Service"): Boolean
@@ -43,7 +43,7 @@ codeunit 6140 "E-Doc. Import"
         AllEDocumentsProcessed := true;
         EDocumentServiceStatus.SetRange("E-Document Service Code", EDocumentService.Code);
         EDocumentServiceStatus.SetRange(Status, "E-Document Service Status"::Imported);
-        EDocumentServiceStatus.SetRange("Import Processing Status", "Import E-Doc. Proc. Status"::Unprocessed);
+        EDocumentServiceStatus.SetFilter("Import Processing Status", '<> %1', "Import E-Doc. Proc. Status"::Processed);
         if EDocumentServiceStatus.FindSet() then
             repeat
                 EDocument.Get(EDocumentServiceStatus."E-Document Entry No");
@@ -68,24 +68,7 @@ codeunit 6140 "E-Doc. Import"
     internal procedure ProcessIncomingEDocument(EDocument: Record "E-Document"; EDocumentService: Record "E-Document Service"; EDocImportParameters: Record "E-Doc. Import Parameters"): Boolean
     var
         ImportEDocumentProcess: Codeunit "Import E-Document Process";
-        StatusBefore, StatusAfter : Enum "Import E-Doc. Proc. Status";
-    begin
-        if EDocImportParameters."Step to Run / Desired Status" = EDocImportParameters."Step to Run / Desired Status"::"Desired E-Document Status" then
-            exit(GetEDocumentToDesiredStatus(EDocument, EDocumentService, EDocImportParameters."Desired E-Document Status", EDocImportParameters))
-        else begin
-            StatusBefore := ImportEDocumentProcess.GetStatusForStep(EDocImportParameters."Step to Run", true);
-            StatusAfter := ImportEDocumentProcess.GetStatusForStep(EDocImportParameters."Step to Run", false);
-            if not GetEDocumentToDesiredStatus(EDocument, EDocumentService, StatusBefore, EDocImportParameters) then
-                exit(false);
-            exit(GetEDocumentToDesiredStatus(EDocument, EDocumentService, StatusAfter, EDocImportParameters));
-        end;
-    end;
-
-    local procedure GetEDocumentToDesiredStatus(EDocument: Record "E-Document"; EDocumentService: Record "E-Document Service"; DesiredStatus: Enum "Import E-Doc. Proc. Status"; EDocImportParameters: Record "E-Doc. Import Parameters"): Boolean
-    var
-        ImportEDocumentProcess: Codeunit "Import E-Document Process";
-        EDocImpSessionTelemetry: Codeunit "E-Doc. Imp. Session Telemetry";
-        Status, CurrentStatus : Enum "Import E-Doc. Proc. Status";
+        PreviousStatus, CurrentStatus, DesiredStatus : Enum "Import E-Doc. Proc. Status";
         StepToDo, StepToUndo : Enum "Import E-Document Steps";
         StatusIndex: Integer;
     begin
@@ -93,79 +76,69 @@ codeunit 6140 "E-Doc. Import"
         Clear(EDocumentLog);
         EDocumentLog.SetFields(EDocument, EDocumentService);
 
-        EDocument.CalcFields("Import Processing Status");
-        CurrentStatus := EDocument."Import Processing Status";
+        CurrentStatus := EDocument.GetEDocumentImportProcessingStatus();
+        DesiredStatus := ImportEDocumentProcess.GetStatusForStep(EDocImportParameters."Step to Run", false);
 
-        EDocImpSessionTelemetry.SetSession(CurrentStatus, DesiredStatus);
-        EDocImpSessionTelemetry.SetBool('Success', true);
+        // We undo all the steps that have been done, if CurrentStatus = DesiredStatus we undo the last step to redo it
+        for StatusIndex := ImportEDocumentProcess.StatusStepIndex(CurrentStatus) downto ImportEDocumentProcess.StatusStepIndex(DesiredStatus) do
+            if StatusIndex > 0 then begin
+                PreviousStatus := ImportEDocumentProcess.IndexToStatus(StatusIndex - 1);
+                StepToUndo := ImportEDocumentProcess.GetNextStep(PreviousStatus);
+                ImportEDocumentProcess.ConfigureImportRun(EDocument, StepToUndo, EDocImportParameters, true);
+                if not RunConfiguredImportStep(ImportEDocumentProcess, EDocument) then
+                    exit(false);
+            end;
 
-        // We undo all the steps that have been done, if CurrentStatus = DesiredStatus we don't need to undo anything
-        for StatusIndex := ImportEDocumentProcess.StatusStepIndex(CurrentStatus) downto ImportEDocumentProcess.StatusStepIndex(DesiredStatus) + 1 do
-            if ImportEDocumentProcess.IndexToStatus(StatusIndex, Status) then
-                if ImportEDocumentProcess.GetPreviousStep(Status, StepToUndo) then begin
-                    ImportEDocumentProcess.ConfigureImportRun(EDocument, StepToUndo, EDocImportParameters, true);
-                    if not RunConfiguredImportStep(ImportEDocumentProcess, EDocument) then
-                        exit(false);
-                end;
-
-        EDocument.CalcFields("Import Processing Status");
-        CurrentStatus := EDocument."Import Processing Status";
-
+        CurrentStatus := EDocument.GetEDocumentImportProcessingStatus();
         // We run all the steps that need to be done to reach the desired state
         for StatusIndex := ImportEDocumentProcess.StatusStepIndex(CurrentStatus) to ImportEDocumentProcess.StatusStepIndex(DesiredStatus) - 1 do
-            if ImportEDocumentProcess.IndexToStatus(StatusIndex, Status) then
-                if ImportEDocumentProcess.GetNextStep(Status, StepToDo) then begin
-                    ImportEDocumentProcess.ConfigureImportRun(EDocument, StepToDo, EDocImportParameters, false);
-                    if not RunConfiguredImportStep(ImportEDocumentProcess, EDocument) then
-                        exit(false);
-                end;
-
-        if CurrentStatus <> DesiredStatus then
-            EDocImpSessionTelemetry.Emit(EDocument);
-        OnAfterProcessIncomingEDocument(EDocument, EDocImportParameters, CurrentStatus, DesiredStatus);
+            if StatusIndex < ImportEDocumentProcess.StatusStepIndex("Import E-Doc. Proc. Status"::Processed) then begin
+                StepToDo := ImportEDocumentProcess.GetNextStep(ImportEDocumentProcess.IndexToStatus(StatusIndex));
+                ImportEDocumentProcess.ConfigureImportRun(EDocument, StepToDo, EDocImportParameters, false);
+                if not RunConfiguredImportStep(ImportEDocumentProcess, EDocument) then
+                    exit(false)
+            end;
         exit(true);
     end;
 
     local procedure RunConfiguredImportStep(var ImportEDocumentProcess: Codeunit "Import E-Document Process"; EDocument: Record "E-Document"): Boolean
     var
-        EDocDraftSessionTelemetry: Codeunit "E-Doc. Imp. Session Telemetry";
         EDocumentErrorHelper: Codeunit "E-Document Error Helper";
     begin
         EDocumentErrorHelper.ClearErrorMessages(EDocument);
         Commit();
         if not ImportEDocumentProcess.Run() then begin
+
             EDocument.SetRecFilter();
             EDocument.FindFirst();
 
             EDocErrorHelper.LogSimpleErrorMessage(EDocument, GetLastErrorText());
-            EDocument.CalcFields("Import Processing Status");
-            EDocumentLog.InsertLog(Enum::"E-Document Service Status"::"Imported Document Processing Error", EDocument."Import Processing Status");
+            EDocumentLog.InsertLog(Enum::"E-Document Service Status"::"Imported Document Processing Error", EDocument.GetEDocumentImportProcessingStatus());
             EDocumentProcessing.ModifyServiceStatus(EDocument, EDocument.GetEDocumentService(), Enum::"E-Document Service Status"::"Imported Document Processing Error");
             EDocumentProcessing.ModifyEDocumentStatus(EDocument);
-            EDocDraftSessionTelemetry.SetText('Step', Format(ImportEDocumentProcess.GetStep()));
-            EDocDraftSessionTelemetry.SetBool('Success', false);
             exit(false);
         end;
         exit(true);
     end;
 
-    internal procedure CreateFromType(var EDocument: Record "E-Document"; EDocumentService: Record "E-Document Service"; EDocFileFormat: Enum "E-Doc. File Format"; Filename: Text; InStr: InStream)
+    internal procedure CreateFromType(var EDocument: Record "E-Document"; EDocumentService: Record "E-Document Service"; Type: Enum "E-Doc. Data Storage Blob Type"; Filename: Text; InStr: InStream)
     var
         EDocLog: Record "E-Document Log";
+        IBlobType: Interface IBlobType;
     begin
-        EDocument.Create(
-            EDocument.Direction::Incoming,
-            EDocument."Document Type"::None,
-            EDocumentService
-        );
+        IBlobType := Type;
+        EDocument.Direction := EDocument.Direction::Incoming;
+        EDocument."Document Type" := Enum::"E-Document Type"::None;
+        EDocument.Service := EDocumentService.Code;
 
         EDocument."File Name" := CopyStr(FileName, 1, 256);
-        EDocument.Modify(true);
+        EDocument."File Type" := Type;
+        EDocument.Insert(true);
 
         EDocumentLog.SetFields(EDocument, EDocumentService);
-        EDocumentLog.SetBlob(CopyStr(FileName, 1, 256), EDocFileFormat, InStr);
+        EDocumentLog.SetBlob(CopyStr(FileName, 1, 256), Type, InStr);
 
-        EDocLog := EDocumentLog.InsertLog(Enum::"E-Document Service Status"::Imported, Enum::"Import E-Doc. Proc. Status"::Unprocessed, false);
+        EDocLog := EDocumentLog.InsertLog(Enum::"E-Document Service Status"::Imported, Enum::"Import E-Doc. Proc. Status"::Unprocessed);
         EDocumentProcessing.InsertServiceStatus(EDocument, EDocumentService, Enum::"E-Document Service Status"::Imported);
 
         EDocument."Unstructured Data Entry No." := EDocLog."E-Doc. Data Storage Entry No.";
@@ -181,12 +154,17 @@ codeunit 6140 "E-Doc. Import"
         InStr: InStream;
         FileName: Text;
         EDocumentServiceStatus: Enum "E-Document Service Status";
+        BlobType: Enum "E-Doc. Data Storage Blob Type";
     begin
         if Page.RunModal(Page::"E-Document Services", EDocumentService) <> Action::LookupOK then
             exit;
 
         if not UploadIntoStream('', '', '', FileName, InStr) then
             exit;
+
+        BlobType := GetFileType(FileName);
+        if BlobType = Enum::"E-Doc. Data Storage Blob Type"::Unspecified then
+            Error(FileTypeNotSupportedErr);
 
         EDocument.Direction := EDocument.Direction::Incoming;
         EDocument."Document Type" := Enum::"E-Document Type"::None;
@@ -197,6 +175,7 @@ codeunit 6140 "E-Doc. Import"
         CopyStream(OutStr, InStr);
 
         EDocument."File Name" := CopyStr(FileName, 1, 256);
+        EDocument."File Type" := BlobType;
 
         if EDocument."Entry No" = 0 then begin
             EDocument.Insert(true);
@@ -235,7 +214,7 @@ codeunit 6140 "E-Doc. Import"
             EDocAttachmentProcessor.DeleteAll(EDocument, RecordRef);
     end;
 
-    internal procedure V1_ProcessEDocument(var EDocument: Record "E-Document"; CreateJnlLine: Boolean; AutoProcessDocument: Boolean)
+    internal procedure V1_ProcessEDocument(var EDocument: Record "E-Document"; CreateJnlLine: Boolean)
     var
         EDocService: Record "E-Document Service";
         TempBlob: Codeunit "Temp Blob";
@@ -249,7 +228,7 @@ codeunit 6140 "E-Doc. Import"
         EDocService := EDocument.GetEDocumentService();
         EDocumentLog.GetDocumentBlobFromLog(EDocument, EDocService, TempBlob, Enum::"E-Document Service Status"::Imported);
 
-        V1_ProcessImportedDocument(EDocument, EDocService, TempBlob, CreateJnlLine, AutoProcessDocument);
+        V1_ProcessImportedDocument(EDocument, EDocService, TempBlob, CreateJnlLine);
     end;
 
     local procedure GetDocumentBasicInfo(var EDocument: Record "E-Document"; EDocService: Record "E-Document Service"; var TempBlob: Codeunit "Temp Blob")
@@ -306,17 +285,7 @@ codeunit 6140 "E-Doc. Import"
         EDocument."Document Type" := EDocument."Document Type"::None;
         EDocument.Modify();
 
-        V1_ProcessEDocument(EDocument, false, true);
-    end;
-
-    procedure ViewExtractedData(EDocument: Record "E-Document")
-    var
-        EDocumentDataStorage: Record "E-Doc. Data Storage";
-        IStructuredFormatReader: Interface IStructuredFormatReader;
-    begin
-        IStructuredFormatReader := EDocument."Read into Draft Impl.";
-        EDocumentDataStorage.Get(EDocument."Structured Data Entry No.");
-        IStructuredFormatReader.View(EDocument, EDocumentDataStorage.GetTempBlob());
+        V1_ProcessEDocument(EDocument, false);
     end;
 
     local procedure ProcessExistingOrder(var EDocument: Record "E-Document"; EDocService: Record "E-Document Service"; var SourceDocumentLine: RecordRef; var DocumentHeader: RecordRef; var EDocServiceStatus: Enum "E-Document Service Status")
@@ -447,8 +416,6 @@ codeunit 6140 "E-Doc. Import"
         DocumentHeader.SetTable(PurchHeader);
 
         PurchHeader.Validate("E-Document Link", EDocument.SystemId);
-        PurchHeader."Doc. Amount Incl. VAT" := EDocument."Amount Incl. VAT";
-        PurchHeader."Doc. Amount VAT" := EDocument."Amount Incl. VAT" - EDocument."Amount Excl. VAT";
         PurchHeader.Modify();
 
         UpdateEDocumentRecordId(EDocument, DocumentHeader.Field(PurchHeader.FieldNo("No.")).Value(), DocumentHeader.RecordId);
@@ -487,7 +454,7 @@ codeunit 6140 "E-Doc. Import"
         EDocument.Modify();
     end;
 
-    internal procedure V1_ProcessImportedDocument(var EDocument: Record "E-Document"; var EDocService: Record "E-Document Service"; var TempBlob: Codeunit "Temp Blob"; CreateJnlLine: Boolean; AutoProcessDocument: Boolean)
+    internal procedure V1_ProcessImportedDocument(var EDocument: Record "E-Document"; var EDocService: Record "E-Document Service"; var TempBlob: Codeunit "Temp Blob"; CreateJnlLine: Boolean)
     var
         EDocLog: Record "E-Document Log";
         TempEDocMapping: Record "E-Doc. Mapping" temporary;
@@ -513,7 +480,7 @@ codeunit 6140 "E-Doc. Import"
             exit;
         end;
 
-        if EDocument.IsDuplicate(true) then begin
+        if EDocument.IsDuplicate() then begin
             EDocument.Delete(true);
             exit;
         end;
@@ -526,13 +493,9 @@ codeunit 6140 "E-Doc. Import"
             EDocumentProcessing.ModifyEDocumentStatus(EDocument);
             exit;
         end;
+
         if ExistingOrderNo <> '' then
             EDocument."Order No." := ExistingOrderNo;
-
-        if not AutoProcessDocument then begin
-            EDocument.Modify(true);
-            exit;
-        end;
 
         if Vendor.Get(EDocument."Bill-to/Pay-to No.") then
             if ValidateEDocumentIsForPurchaseOrder(EDocument, Vendor) then
@@ -604,7 +567,7 @@ codeunit 6140 "E-Doc. Import"
         if not IsPendingEDocReadyToProcess(EDocument) then
             exit;
 
-        V1_ProcessEDocument(EDocument, EDocService."Create Journal Lines", true);
+        V1_ProcessEDocument(EDocument, EDocService."Create Journal Lines");
     end;
 
     local procedure IsPendingEDocReadyToProcess(EDocument: Record "E-Document"): Boolean
@@ -702,8 +665,6 @@ codeunit 6140 "E-Doc. Import"
         SourceDocumentHeader.Copy(SourceDocumentHeaderMapped, true);
         SourceDocumentLine.Copy(SourceDocumentLineMapped, true);
 
-        V1_PopulateEDocumentPreview(EDocument, SourceDocumentHeader, SourceDocumentLine);
-
         OnAfterPrepareReceivedDoc(EDocument, TempBlob, SourceDocumentHeader, SourceDocumentLine, TempEDocMapping);
     end;
 
@@ -757,75 +718,6 @@ codeunit 6140 "E-Doc. Import"
         OnAfterCreateJournalLine(EDocument, JnlLine);
     end;
 
-    local procedure V1_PopulateEDocumentPreview(EDocument: Record "E-Document"; SourceDocumentHeader: RecordRef; SourceDocumentLine: RecordRef)
-    var
-        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
-        EDocumentPurchaseLine: Record "E-Document Purchase Line";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        LineNo: Integer;
-    begin
-        EDocumentPurchaseHeader.InsertForEDocument(EDocument);
-
-        if (EDocument."Document Type" <> EDocument."Document Type"::"Purchase Invoice") and (EDocument."Document Type" <> EDocument."Document Type"::"Purchase Credit Memo") then
-            exit;
-
-        SourceDocumentHeader.SetTable(PurchaseHeader);
-        V1_CopyFromPurchaseHeader(EDocument, PurchaseHeader, EDocumentPurchaseHeader);
-
-        EDocumentPurchaseLine.SetRange("E-Document Entry No.", EDocument."Entry No");
-        EDocumentPurchaseLine.DeleteAll();
-        LineNo := 10000;
-        if SourceDocumentLine.FindSet() then
-            repeat
-                Clear(EDocumentPurchaseLine);
-                EDocumentPurchaseLine."E-Document Entry No." := EDocument."Entry No";
-                EDocumentPurchaseLine."Line No." := LineNo;
-                EDocumentPurchaseLine.Insert();
-
-                SourceDocumentLine.SetTable(PurchaseLine);
-                V1_CopyFromPurchaseLine(PurchaseLine, EDocumentPurchaseLine);
-                LineNo := LineNo + 10000;
-            until SourceDocumentLine.Next() = 0;
-
-    end;
-
-    local procedure V1_CopyFromPurchaseHeader(EDocument: Record "E-Document"; PurchaseHeader: Record "Purchase Header"; var EDocumentPurchaseHeader: Record "E-Document Purchase Header")
-    var
-        Vendor: Record Vendor;
-    begin
-        if Vendor.Get(PurchaseHeader."Buy-from Vendor No.") then;
-        EDocumentPurchaseHeader."Vendor Company Name" := PurchaseHeader."Pay-to Name";
-        EDocumentPurchaseHeader."Vendor Contact Name" := Vendor.Contact;
-        EDocumentPurchaseHeader."Vendor Address" := Vendor.Address;
-        EDocumentPurchaseHeader."Vendor VAT Id" := Vendor."VAT Registration No.";
-        EDocumentPurchaseHeader."Purchase Order No." := PurchaseHeader."Vendor Order No.";
-        EDocumentPurchaseHeader."Sales Invoice No." := PurchaseHeader."Vendor Invoice No.";
-        EDocumentPurchaseHeader."Invoice Date" := PurchaseHeader."Posting Date";
-        EDocumentPurchaseHeader."Due Date" := PurchaseHeader."Due Date";
-        EDocumentPurchaseHeader."Currency Code" := PurchaseHeader."Currency Code";
-        EDocumentPurchaseHeader."Document Date" := PurchaseHeader."Document Date";
-        EDocumentPurchaseHeader."Vendor Address" := PurchaseHeader."Pay-to Address";
-        EDocumentPurchaseHeader."Total Discount" := PurchaseHeader."Invoice Discount Amount";
-        EDocumentPurchaseHeader."Total" := EDocument."Amount Incl. VAT";
-        EDocumentPurchaseHeader."Total VAT" := EDocument."Amount Incl. VAT" - EDocument."Amount Excl. VAT";
-        EDocumentPurchaseHeader.Modify();
-    end;
-
-    local procedure V1_CopyFromPurchaseLine(PurchaseLine: Record "Purchase Line"; var EDocumentPurchaseLine: Record "E-Document Purchase Line")
-    begin
-        EDocumentPurchaseLine."Product Code" := PurchaseLine."No.";
-        EDocumentPurchaseLine."Description" := PurchaseLine.Description;
-        EDocumentPurchaseLine.Quantity := PurchaseLine.Quantity;
-        EDocumentPurchaseLine."Unit Price" := PurchaseLine."Direct Unit Cost";
-        EDocumentPurchaseLine."Unit of Measure" := PurchaseLine."Unit of Measure Code";
-        EDocumentPurchaseLine."Sub Total" := PurchaseLine."Direct Unit Cost" * PurchaseLine.Quantity;
-        EDocumentPurchaseLine."Total Discount" := PurchaseLine."Line Discount Amount";
-        EDocumentPurchaseLine."VAT Rate" := PurchaseLine."VAT %";
-        EDocumentPurchaseLine."Currency Code" := PurchaseLine."Currency Code";
-        EDocumentPurchaseLine.Modify();
-    end;
-
     local procedure OrderExists(EDocument: Record "E-Document"; Vendor: Record Vendor; var DocumentHeader: RecordRef): Boolean
     var
         PurchaseHeader: Record "Purchase Header";
@@ -862,6 +754,22 @@ codeunit 6140 "E-Doc. Import"
         HideDialogs := Hide;
     end;
 
+    local procedure GetFileType(FileName: Text): Enum "E-Doc. Data Storage Blob Type"
+    var
+        FileMgt: Codeunit "File Management";
+    begin
+        case UpperCase(FileMgt.GetExtension(FileName)) of
+            'XML':
+                exit(Enum::"E-Doc. Data Storage Blob Type"::XML);
+            'PDF':
+                exit(Enum::"E-Doc. Data Storage Blob Type"::PDF);
+            'JSON':
+                exit(Enum::"E-Doc. Data Storage Blob Type"::JSON);
+            else
+                exit(Enum::"E-Doc. Data Storage Blob Type"::Unspecified);
+        end;
+    end;
+
 
 #if not CLEAN26
     internal procedure V1_AfterInsertImportedEdocument(var EDocument: Record "E-Document"; var EDocumentService: Record "E-Document Service"; var TempBlob: Codeunit "Temp Blob"; EDocCount: Integer; var HttpRequest: HttpRequestMessage; var HttpResponse: HttpResponseMessage)
@@ -881,6 +789,7 @@ codeunit 6140 "E-Doc. Import"
         EDocErrorHelper: Codeunit "E-Document Error Helper";
         EDocumentProcessing: Codeunit "E-Document Processing";
         HideDialogs: Boolean;
+        FileTypeNotSupportedErr: Label 'File type not supported';
         JnlLineCreateMsg: Label 'Creating Journal Line';
         DocCreateMsg: Label 'Creating Purchase %1', Comment = '%1 - Document type';
         DocLinkMsg: Label 'Linking to existing order';
@@ -889,11 +798,6 @@ codeunit 6140 "E-Doc. Import"
         DocTypeIsNotSupportedErr: Label 'Document type %1 is not supported.', Comment = '%1 - Document Type';
         FailedToFindVendorErr: Label 'No vendor is set for Edocument';
         CannotProcessEDocumentMsg: Label 'Cannot process E-Document %1 with Purchase Order %2 before Purchase Order has been matched and posted for E-Document %3.', Comment = '%1 - E-Document entry no, %2 - Purchase Order number, %3 - EDocument entry no.';
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterProcessIncomingEDocument(EDocument: Record "E-Document"; EDocImportParameters: Record "E-Doc. Import Parameters"; StartState: Enum "Import E-Doc. Proc. Status"; DesiredEndState: Enum "Import E-Doc. Proc. Status")
-    begin
-    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterProcessImportedDocument(var EDocument: Record "E-Document"; var DocumentHeader: RecordRef)

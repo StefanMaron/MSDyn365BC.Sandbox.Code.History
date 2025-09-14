@@ -2,7 +2,7 @@ namespace Microsoft.SubscriptionBilling;
 
 enum 8052 "Calculation Base Type"
 {
-    Extensible = true;
+    Extensible = false;
 
     value(0; "Item Price")
     {
