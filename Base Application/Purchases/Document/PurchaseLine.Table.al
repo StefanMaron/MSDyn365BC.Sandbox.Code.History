@@ -1677,7 +1677,7 @@ table 39 "Purchase Line"
                 CheckLineAmount(MaxLineAmount);
 
                 IsHandled := false;
-                OnValidateLineAmountBeforeValidateLineDiscountAmount(Rec, Currency, IsHandled);
+                OnValidateLineAmountBeforeValidateLineDiscountAmount(Rec, Currency, IsHandled, CurrFieldNo);
                 if not IsHandled then
                     Validate("Line Discount Amount", MaxLineAmount - "Line Amount");
             end;
@@ -2093,6 +2093,12 @@ table 39 "Purchase Line"
                     UpdateJobPrices();
                 end;
                 UpdateDimensionsFromJobTask();
+
+                if (xRec."Line Discount %" <> "Line Discount %") and
+                   (xRec."Job Task No." <> "Job Task No.") and
+                   ("Line Discount Amount" <> 0)
+                then
+                    UpdateLineDiscPct();
             end;
         }
         field(1002; "Job Line Type"; Enum "Job Line Type")
@@ -6217,7 +6223,7 @@ table 39 "Purchase Line"
         else
             if PurchHeader."Prices Including VAT" then
                 ItemChargeAssgntLineAmt :=
-                  Round(CalcLineAmount() / (1 + GetVATPct() / 100), Currency."Amount Rounding Precision")
+                  Round(CalcLineAmount() / (1 + GetVATPct() / 100), Currency."Amount Rounding Precision") + NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(Rec)
             else
                 ItemChargeAssgntLineAmt := CalcLineAmount();
 
@@ -10987,6 +10993,21 @@ table 39 "Purchase Line"
         ShowDeferrals(PurchaseHeader."Posting Date", PurchaseHeader."Currency Code");
     end;
 
+    procedure RecalculateAmounts(DocumentType: Enum "Purchase Document Type"; DocumentNo: Code[20]; ExcludeLineNo: Integer)
+    var
+        PurchaseLine: Record "Purchase Line";
+    begin
+        PurchaseLine.SetRange("Document Type", DocumentType);
+        PurchaseLine.SetRange("Document No.", DocumentNo);
+        PurchaseLine.SetFilter("Line No.", '<>%1', ExcludeLineNo);
+        PurchaseLine.SetFilter("Direct Unit Cost", '<>%1', 0);
+        if PurchaseLine.FindSet(true) then
+            repeat
+                PurchaseLine.UpdateAmounts();
+                PurchaseLine.Modify(true);
+            until PurchaseLine.Next() = 0;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterAssignResourceValues(var PurchaseLine: Record "Purchase Line"; Resource: Record Resource)
     begin
@@ -11253,7 +11274,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateLineAmountBeforeValidateLineDiscountAmount(var PurchLine: Record "Purchase Line"; Currency: Record Currency; var IsHandled: Boolean)
+    local procedure OnValidateLineAmountBeforeValidateLineDiscountAmount(var PurchLine: Record "Purchase Line"; Currency: Record Currency; var IsHandled: Boolean; CurrFieldNo: Integer)
     begin
     end;
 
