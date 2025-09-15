@@ -3272,14 +3272,8 @@ codeunit 7312 "Create Pick"
         ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
         WhseSource2: Option;
         ShouldCalcMaxQty: Boolean;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCreateTempActivityLine(
-            BinCode, QtyToPick, QtyToPickBase, ActionType, LocationCode, UOMCode, QtyPerUOM, CurrWarehouseShipmentLine, CreatePickParameters,
-            TempWarehouseActivityLine, CurrBin, WhseItemTrkgExists, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeCreateTempActivityLine(BinCode, QtyToPick, QtyToPickBase, ActionType, LocationCode, UOMCode, QtyPerUOM, CurrWarehouseShipmentLine, CreatePickParameters, TempWarehouseActivityLine, CurrBin, WhseItemTrkgExists);
 
         GetCurrBin(LocationCode, BinCode);
 
@@ -4346,7 +4340,7 @@ codeunit 7312 "Create Pick"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateTempActivityLine(BinCode: Code[20]; QtyToPick: Decimal; QtyToPickBase: Decimal; ActionType: Integer; LocationCode: Code[10]; UOMCode: Code[10]; QtyPerUOM: Decimal; WarehouseShipmentLine: Record "Warehouse Shipment Line"; var CreatePickParameters: Record "Create Pick Parameters"; var TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary; var Bin: Record Bin; WhseItemTrkgExists: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeCreateTempActivityLine(BinCode: Code[20]; QtyToPick: Decimal; QtyToPickBase: Decimal; ActionType: Integer; LocationCode: Code[10]; UOMCode: Code[10]; QtyPerUOM: Decimal; WarehouseShipmentLine: Record "Warehouse Shipment Line"; CreatePickParameters: Record "Create Pick Parameters"; var TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary; var Bin: Record Bin; WhseItemTrkgExists: Boolean)
     begin
     end;
 
