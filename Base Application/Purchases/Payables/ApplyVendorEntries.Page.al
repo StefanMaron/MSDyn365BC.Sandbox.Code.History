@@ -1440,7 +1440,7 @@ page 233 "Apply Vendor Entries"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforePostDirectApplication(Rec, PreviewMode, IsHandled, TempApplyingVendLedgEntry);
+        OnBeforePostDirectApplication(Rec, PreviewMode, IsHandled);
         if IsHandled then
             exit;
 
@@ -1484,8 +1484,6 @@ page 233 "Apply Vendor Entries"
                     VendEntryApplyPostedEntries.PreviewApply(Rec, NewApplyUnapplyParameters)
                 else
                     Applied := VendEntryApplyPostedEntries.Apply(Rec, NewApplyUnapplyParameters);
-
-                OnPostDirectApplicationOnAfterApply(Rec, NewApplyUnapplyParameters, PreviewMode, Applied);
 
                 if (not PreviewMode) and Applied then begin
                     Message(ApplicationPostedMsg);
@@ -1686,8 +1684,8 @@ page 233 "Apply Vendor Entries"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforePostDirectApplication(var VendorLedgerEntry: Record "Vendor Ledger Entry"; PreviewMode: Boolean; var IsHandled: Boolean; var TempApplyingVendLedgEntry: Record "Vendor Ledger Entry" temporary)
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePostDirectApplication(var VendorLedgerEntry: Record "Vendor Ledger Entry"; PreviewMode: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -1783,11 +1781,6 @@ page 233 "Apply Vendor Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnExchangeLedgerEntryAmountsOnBeforeCalculateAmounts(var CalcVendLedgEntry: Record "Vendor Ledger Entry"; VendLedgEntry: Record "Vendor Ledger Entry"; CurrencyCode: Code[10]; CalculateCurrency: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDirectApplicationOnAfterApply(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var NewApplyUnapplyParameters: Record "Apply Unapply Parameters"; PreviewMode: Boolean; Applied: Boolean)
     begin
     end;
 }
