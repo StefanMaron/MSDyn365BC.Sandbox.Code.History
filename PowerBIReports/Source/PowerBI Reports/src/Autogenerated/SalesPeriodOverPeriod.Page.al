@@ -22,7 +22,7 @@ page 37002 "Sales Period-Over-Period"
 
                 trigger ControlAddInReady()
                 begin
-                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageLbl);
+                    SetupHelper.InitializeEmbeddedAddin(CurrPage.PowerBIAddin, ReportId, ReportPageTok);
                 end;
 
                 trigger ErrorOccurred(Operation: Text; ErrorText: Text)
@@ -57,7 +57,7 @@ page 37002 "Sales Period-Over-Period"
         SetupHelper: Codeunit "Setup Helper";
         ReportId: Guid;
 #pragma warning disable AA0240
-        ReportPageLbl: Label 'ReportSection2480499c371d97221c09', Locked = true;
+        ReportPageTok: Label 'ReportSection2480499c371d97221c09', Locked = true;
 #pragma warning restore AA0240
 
     trigger OnOpenPage()
