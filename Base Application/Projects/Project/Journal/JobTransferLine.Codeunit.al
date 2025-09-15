@@ -171,7 +171,6 @@ codeunit 1004 "Job Transfer Line"
     var
         SourceCodeSetup: Record "Source Code Setup";
         JobTask: Record "Job Task";
-        IsHandled: Boolean;
     begin
         OnBeforeFromPlanningSalesLineToJnlLine(JobPlanningLine, SalesHeader, SalesLine, JobJnlLine, EntryType);
 
@@ -226,19 +225,17 @@ codeunit 1004 "Job Transfer Line"
                 JobJnlLine.Validate(Quantity, -SalesLine.Quantity);
         end;
 
-        IsHandled := false;
-        OnFromPlanningSalesLineToJnlLineOnBeforeInitAmounts(JobJnlLine, SalesLine, SalesHeader, JobPlanningLine, IsHandled);
-        if not IsHandled then begin
-            JobJnlLine."Direct Unit Cost (LCY)" := JobPlanningLine."Direct Unit Cost (LCY)";
-            if (JobPlanningLine."Currency Code" = '') and (SalesHeader."Currency Factor" <> 0) then begin
-                GetCurrencyRounding(SalesHeader."Currency Code");
-                ValidateUnitCostAndPrice(
-                  JobJnlLine, SalesLine, SalesLine."Unit Cost (LCY)",
-                  JobPlanningLine."Unit Price");
-            end else
-                ValidateUnitCostAndPrice(JobJnlLine, SalesLine, SalesLine."Unit Cost", JobPlanningLine."Unit Price");
-            JobJnlLine.Validate("Line Discount %", SalesLine."Line Discount %");
-        end;
+        OnFromPlanningSalesLineToJnlLineOnBeforeInitAmounts(JobJnlLine, SalesLine, SalesHeader);
+
+        JobJnlLine."Direct Unit Cost (LCY)" := JobPlanningLine."Direct Unit Cost (LCY)";
+        if (JobPlanningLine."Currency Code" = '') and (SalesHeader."Currency Factor" <> 0) then begin
+            GetCurrencyRounding(SalesHeader."Currency Code");
+            ValidateUnitCostAndPrice(
+              JobJnlLine, SalesLine, SalesLine."Unit Cost (LCY)",
+              JobPlanningLine."Unit Price");
+        end else
+            ValidateUnitCostAndPrice(JobJnlLine, SalesLine, SalesLine."Unit Cost", JobPlanningLine."Unit Price");
+        JobJnlLine.Validate("Line Discount %", SalesLine."Line Discount %");
 
         OnAfterFromPlanningSalesLineToJnlLine(JobJnlLine, JobPlanningLine, SalesHeader, SalesLine, EntryType);
     end;
@@ -425,9 +422,9 @@ codeunit 1004 "Job Transfer Line"
         JobJnlLine."Serial No." := WarehouseActivityLine."Serial No.";
         JobJnlLine."Lot No." := WarehouseActivityLine."Lot No.";
         JobJnlLine."Package No." := WarehouseActivityLine."Package No.";
+        JobJnlLine."Assemble to Order" := JobPlanningLine."Assemble to Order";
 
         JobJnlLine.Validate(Quantity, WarehouseActivityLine."Qty. to Handle");
-        JobJnlLine."Assemble to Order" := WarehouseActivityLine."Assemble to Order";
         JobJnlLine.Validate("Qty. per Unit of Measure", WarehouseActivityLine."Qty. per Unit of Measure");
         JobJnlLine."Direct Unit Cost (LCY)" := JobPlanningLine."Direct Unit Cost (LCY)";
         JobJnlLine.Validate("Unit Cost", JobPlanningLine."Unit Cost");
@@ -494,18 +491,12 @@ codeunit 1004 "Job Transfer Line"
         JobJnlLine."Total Cost (LCY)" := GenJnlLine."Job Total Cost (LCY)";
         JobJnlLine."Total Cost" := GenJnlLine."Job Total Cost";
 
-        if NonDeductibleVAT.UseNonDeductibleVATAmountForJobCost() then
-            if JobJnlLine."Unit Cost" > 0 then begin
-                JobJnlLine."Unit Cost (LCY)" += Abs(Round(GenJnlLine."Non-Deductible VAT Amount LCY" / JobJnlLine.Quantity));
-                JobJnlLine."Unit Cost" += Abs(Round(GenJnlLine."Non-Deductible VAT Amount" / JobJnlLine.Quantity));
-                JobJnlLine."Total Cost (LCY)" += Abs(GenJnlLine."Non-Deductible VAT Amount LCY");
-                JobJnlLine."Total Cost" += Abs(GenJnlLine."Non-Deductible VAT Amount");
-            end else begin
-                JobJnlLine."Unit Cost (LCY)" += Round(GenJnlLine."Non-Deductible VAT Amount LCY" / JobJnlLine.Quantity);
-                JobJnlLine."Unit Cost" += Round(GenJnlLine."Non-Deductible VAT Amount" / JobJnlLine.Quantity);
-                JobJnlLine."Total Cost (LCY)" += GenJnlLine."Non-Deductible VAT Amount LCY";
-                JobJnlLine."Total Cost" += GenJnlLine."Non-Deductible VAT Amount";
-            end;
+        if NonDeductibleVAT.UseNonDeductibleVATAmountForJobCost() then begin
+            JobJnlLine."Unit Cost (LCY)" += Abs(Round(GenJnlLine."Non-Deductible VAT Amount LCY" / JobJnlLine.Quantity));
+            JobJnlLine."Unit Cost" += Abs(Round(GenJnlLine."Non-Deductible VAT Amount" / JobJnlLine.Quantity));
+            JobJnlLine."Total Cost (LCY)" += Abs(GenJnlLine."Non-Deductible VAT Amount LCY");
+            JobJnlLine."Total Cost" += Abs(GenJnlLine."Non-Deductible VAT Amount");
+        end;
 
         JobJnlLine."Unit Price (LCY)" := GenJnlLine."Job Unit Price (LCY)";
         JobJnlLine."Unit Price" := GenJnlLine."Job Unit Price";
@@ -673,9 +664,8 @@ codeunit 1004 "Job Transfer Line"
         JobJnlLine."Unit Cost" := PurchLine."Unit Cost" / PurchLine."Qty. per Unit of Measure" + Abs(NondeductibleVATAmtPrUnit);
 
         if NonDeductibleVAT.UseNonDeductibleVATAmountForJobCost() then begin
-            GetNonDeductibleVATAmtPerUnitCost(JobJnlLine, NonDeductibleVATAmtPerUnitLCY, NonDeductibleVATAmtPerUnit);
-            JobJnlLine."Unit Cost (LCY)" += NonDeductibleVATAmtPerUnitLCY;
-            JobJnlLine."Unit Cost" += NonDeductibleVATAmtPerUnit;
+            JobJnlLine."Unit Cost (LCY)" += Abs(NonDeductibleVATAmtPerUnitLCY);
+            JobJnlLine."Unit Cost" += Abs(NonDeductibleVATAmtPerUnit);
         end;
 
         OnFromPurchaseLineToJnlLineOnAfterCalcUnitCostLCY(JobJnlLine, PurchLine);
@@ -883,14 +873,6 @@ codeunit 1004 "Job Transfer Line"
         exit(false);
     end;
 
-    local procedure GetNonDeductibleVATAmtPerUnitCost(JobJnlLine: Record "Job Journal Line"; var NonDeductibleVATAmtPerUnitLCY: Decimal; var NonDeductibleVATAmtPerUnit: Decimal)
-    begin
-        if JobJnlLine."Unit Cost" > 0 then begin
-            NonDeductibleVATAmtPerUnit := Abs(NonDeductibleVATAmtPerUnit);
-            NonDeductibleVATAmtPerUnitLCY := Abs(NonDeductibleVATAmtPerUnitLCY);
-        end;
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterIsCreatedFromJob(var SalesLine: Record "Sales Line"; var Result: Boolean)
     begin
@@ -976,8 +958,8 @@ codeunit 1004 "Job Transfer Line"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
-    local procedure OnFromPlanningSalesLineToJnlLineOnBeforeInitAmounts(var JobJournalLine: Record "Job Journal Line"; var SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header"; var JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean)
+    [IntegrationEvent(false, false)]
+    local procedure OnFromPlanningSalesLineToJnlLineOnBeforeInitAmounts(var JobJournalLine: Record "Job Journal Line"; var SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header")
     begin
     end;
 
