@@ -67,7 +67,6 @@ report 11000000 "Get Proposal Entries"
 
                 trigger OnPreDataItem()
                 begin
-                    OnCustLedgerEntryOnBeforePreDataItem("Cust. Ledger Entry");
                     if TransactionmodeTable."Account Type" <> TransactionmodeTable."Account Type"::Customer then
                         CurrReport.Break();
                 end;
@@ -120,7 +119,6 @@ report 11000000 "Get Proposal Entries"
 
                 trigger OnPreDataItem()
                 begin
-                    OnVendorLedgerEntryOnBeforePreDataItem("Vendor Ledger Entry");
                     if TransactionmodeTable."Account Type" <> TransactionmodeTable."Account Type"::Vendor then
                         CurrReport.Break();
                 end;
@@ -160,7 +158,6 @@ report 11000000 "Get Proposal Entries"
 
                 trigger OnPreDataItem()
                 begin
-                    OnEmployeeLedgerEntryOnBeforePreDataItem("Employee Ledger Entry");
                     if TransactionmodeTable."Account Type" <> TransactionmodeTable."Account Type"::Employee then
                         CurrReport.Break();
                 end;
@@ -615,21 +612,6 @@ report 11000000 "Get Proposal Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetRecordDetailLineOnBeforeCreateProposalLine(var ProposalLine: Record "Proposal Line"; DetailLine: Record "Detail Line"; var Found: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCustLedgerEntryOnBeforePreDataItem(var CustLedgerEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnVendorLedgerEntryOnBeforePreDataItem(var VendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnEmployeeLedgerEntryOnBeforePreDataItem(var EmployeeLedgerEntry: Record "Employee Ledger Entry")
     begin
     end;
 }
