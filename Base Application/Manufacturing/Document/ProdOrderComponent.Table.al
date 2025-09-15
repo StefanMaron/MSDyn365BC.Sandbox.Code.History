@@ -327,7 +327,7 @@ table 5407 "Prod. Order Component"
                 if ("Remaining Quantity" * "Expected Quantity") <= 0 then
                     "Remaining Quantity" := 0;
                 "Remaining Qty. (Base)" := CalcBaseQty("Remaining Quantity", FieldCaption("Remaining Quantity"), FieldCaption("Remaining Qty. (Base)"));
-                UpdateCompletelyPicked();
+                "Completely Picked" := "Qty. Picked" >= "Expected Quantity";
 
                 ProdOrderCompReserve.VerifyQuantity(Rec, xRec);
 
@@ -595,10 +595,7 @@ table 5407 "Prod. Order Component"
                     exit;
 
                 CalculateQuantity(Quantity);
-                if "Qty. Rounding Precision" < 1 then
-                    Quantity := UOMMgt.RoundAndValidateQty(Quantity, "Qty. Rounding Precision", FieldCaption(Quantity))
-                else
-                    Quantity := UOMMgt.RoundToItemRndPrecision(Quantity, "Qty. Rounding Precision");
+                Quantity := UOMMgt.RoundAndValidateQty(Quantity, "Qty. Rounding Precision", FieldCaption(Quantity));
 
                 OnValidateCalculationFormulaOnAfterSetQuantity(Rec);
                 "Quantity (Base)" := CalcBaseQty(Quantity, FieldCaption(Quantity), FieldCaption("Quantity (Base)"));
@@ -836,7 +833,8 @@ table 5407 "Prod. Order Component"
             begin
                 "Qty. Picked (Base)" :=
                     UOMMgt.CalcBaseQty("Item No.", "Variant Code", "Unit of Measure Code", "Qty. Picked", "Qty. per Unit of Measure");
-                UpdateCompletelyPicked();
+
+                "Completely Picked" := "Qty. Picked" >= "Expected Quantity";
             end;
         }
         field(7301; "Qty. Picked (Base)"; Decimal)
@@ -849,7 +847,8 @@ table 5407 "Prod. Order Component"
             begin
                 "Qty. Picked" :=
                   UOMMgt.CalcQtyFromBase("Item No.", "Variant Code", "Unit of Measure Code", "Qty. Picked (Base)", "Qty. per Unit of Measure");
-                UpdateCompletelyPicked();
+
+                "Completely Picked" := "Qty. Picked" >= "Expected Quantity";
             end;
         }
         field(7302; "Completely Picked"; Boolean)
@@ -1164,11 +1163,6 @@ table 5407 "Prod. Order Component"
             "Prod. Order No.", ProdOrder.Description, ProdOrderLine."Item No."));
     end;
 
-    local procedure UpdateCompletelyPicked()
-    begin
-        "Completely Picked" := ("Qty. Picked" >= "Expected Quantity") and ("Expected Quantity" >= 0);
-    end;
-
     procedure ProdOrderNeeds(): Decimal
     var
         ProdOrderLine: Record "Prod. Order Line";
@@ -1407,13 +1401,7 @@ table 5407 "Prod. Order Component"
     var
         SourceCodeSetup: Record "Source Code Setup";
         ProdOrderLine: Record "Prod. Order Line";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCreateDim(Rec, DefaultDimSource, CurrFieldNo, IsHandled);
-        if IsHandled then
-            exit;
-
         SourceCodeSetup.Get();
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -2508,11 +2496,6 @@ table 5407 "Prod. Order Component"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateRoutingLinkCodeOnBeforeUpdateDueDateAndTime(var ProdOrderComponent: Record "Prod. Order Component"; var ProdOrderLine: Record "Prod. Order Line"; var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateDim(var ProdOrderComponent: Record "Prod. Order Component"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }

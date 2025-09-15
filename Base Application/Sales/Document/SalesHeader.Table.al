@@ -258,14 +258,13 @@ table 36 "Sales Header"
             var
                 FatturaDocHelper: Codeunit "Fattura Doc. Helper";
                 IsHandled: Boolean;
-                IsHandledDoExist: Boolean;
             begin
                 TestStatusOpen();
                 BilltoCustomerNoChanged := xRec."Bill-to Customer No." <> "Bill-to Customer No.";
 
                 IsHandled := false;
-                OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(Rec, xRec, CurrFieldNo, IsHandled, IsHandledDoExist);
-                if IsHandledDoExist then
+                OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(Rec, xRec, CurrFieldNo, IsHandled);
+                if IsHandled then
                     exit;
 
                 if BilltoCustomerNoChanged and not IsHandled then
@@ -721,7 +720,7 @@ table 36 "Sales Header"
                     exit;
 
                 PaymentLines.CreatePaymentLinesSales(Rec);
-                CalcFields("Payment %"); 
+                CalcFields("Payment %");
             end;
         }
         field(24; "Due Date"; Date)
@@ -2118,13 +2117,7 @@ table 36 "Sales Header"
             trigger OnLookup()
             var
                 NoSeries: Codeunit "No. Series";
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeLookupPrepmtNoSeries(Rec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 SalesHeader := Rec;
                 GetSalesSetup();
                 SalesSetup.TestField("Posted Prepmt. Inv. Nos.");
@@ -2136,13 +2129,7 @@ table 36 "Sales Header"
             trigger OnValidate()
             var
                 NoSeries: Codeunit "No. Series";
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidatePrepmtNoSeries(Rec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if "Prepayment No. Series" <> '' then begin
                     GetSalesSetup();
                     SalesSetup.TestField("Posted Prepmt. Inv. Nos.");
@@ -4977,7 +4964,7 @@ table 36 "Sales Header"
             Modify();
 
         if OldDimSetID <> "Dimension Set ID" then begin
-            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec, FieldNumber);
+            OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(Rec, xRec);
             if not IsNullGuid(Rec.SystemId) then
                 Modify();
             if SalesLinesExist() then
@@ -7378,12 +7365,8 @@ table 36 "Sales Header"
             TestSalesLineFieldsBeforeRecreate();
             ShouldValidateLocationCode := (SalesLine."Location Code" <> "Location Code") and not SalesLine.IsNonInventoriableItem();
             OnRecreateReservEntryReqLineOnAfterCalcShouldValidateLocationCode(Rec, xRec, SalesLine, ShouldValidateLocationCode);
-            if ShouldValidateLocationCode then begin
+            if ShouldValidateLocationCode then
                 SalesLine.Validate("Location Code", "Location Code");
-                if Rec."Document Type" in [Rec."Document Type"::Invoice, Rec."Document Type"::"Credit Memo"] then
-                    if SalesLine."Location Code" <> '' then
-                        SalesLine.CheckLocationOnWMS();
-            end;
             TempSalesLine := SalesLine;
             if SalesLine.Nonstock then begin
                 SalesLine.Nonstock := false;
@@ -7630,8 +7613,6 @@ table 36 "Sales Header"
     var
         SellToCustomerNo: Code[20];
     begin
-        OnBeforeSetSellToCustomerFromFilter(Rec);
-
         SellToCustomerNo := GetSellToCustomerFromFilter();
 
         if SellToCustomerNo <> '' then
@@ -7667,7 +7648,6 @@ table 36 "Sales Header"
         SellToCustomerFilter: Text;
     begin
         SellToCustomerFilter := GetFilter("Sell-to Customer No.");
-        OnCopySellToCustomerFilterOnAfterGetSellToCustomerFilter(Rec, SellToCustomerFilter);
         if SellToCustomerFilter <> '' then begin
             FilterGroup(2);
             SetFilter("Sell-to Customer No.", SellToCustomerFilter);
@@ -9517,8 +9497,6 @@ table 36 "Sales Header"
         if "Sell-to Customer No." <> '' then
             Customer.Get("Sell-to Customer No.");
 
-        OnLookupSellToCustomerNameOnBeforeSelectCustomer(Rec, Customer, CustomerName);
-
         if Customer.SelectCustomer(Customer) then begin
             if Rec."Sell-to Customer Name" = Customer.Name then
                 CustomerName := SearchCustomerName
@@ -9984,13 +9962,19 @@ table 36 "Sales Header"
 
     procedure UpdateSalesOrderLineIfExist()
     var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCreditMemoHeader: Record "Sales Cr.Memo Header";
         CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
         IsHandled: Boolean;
     begin
+        SalesInvoiceHeader.SetLoadFields("No.");
+        if not SalesInvoiceHeader.Get(Rec."Applies-to Doc. No.") then
+            exit;
         SalesCreditMemoHeader.SetLoadFields("Pre-Assigned No.", "Cust. Ledger Entry No.");
         SalesCreditMemoHeader.SetRange("Pre-Assigned No.", Rec."No.");
         if not SalesCreditMemoHeader.FindFirst() then
+            exit;
+        if IsNotFullyCancelled(SalesCreditMemoHeader) then
             exit;
 
         IsHandled := false;
@@ -10314,7 +10298,7 @@ table 36 "Sales Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; FieldNumber: Integer)
+    local procedure OnValidateShortcutDimCodeOnBeforeUpdateAllLineDim(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -11860,7 +11844,7 @@ table 36 "Sales Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; CurrFieldNo: Integer; var IsHandled: Boolean; var IsHandledDoExist: Boolean)
+    local procedure OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; CurrFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
@@ -12041,31 +12025,6 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeModifyBillToCustomerAddress(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeLookupPrepmtNoSeries(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidatePrepmtNoSeries(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopySellToCustomerFilterOnAfterGetSellToCustomerFilter(var SalesHeader: Record "Sales Header"; var SellToCustomerFilter: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetSellToCustomerFromFilter(var SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnLookupSellToCustomerNameOnBeforeSelectCustomer(SalesHeader: Record "Sales Header"; var Customer: Record Customer; var CustomerName: Text)
     begin
     end;
 }

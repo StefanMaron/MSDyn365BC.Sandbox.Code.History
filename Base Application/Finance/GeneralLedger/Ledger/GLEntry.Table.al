@@ -1,7 +1,3 @@
-// ------------------------------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.GeneralLedger.Ledger;
 
 using Microsoft.Bank.BankAccount;
@@ -569,9 +565,6 @@ table 17 "G/L Entry"
         {
             SumIndexFields = Amount, "Debit Amount", "Credit Amount", "Additional-Currency Amount";
         }
-        key(Key12100; "G/L Account No.", "Posting Date", "Close Income Statement Dim. ID", "Entry No.") // For report 12113 UpdateCloseIncomeStmtDimID
-        {
-        }
     }
 
     fieldgroups
@@ -600,7 +593,6 @@ table 17 "G/L Entry"
         GLSetup: Record "General Ledger Setup";
         GLSetupRead: Boolean;
 
-    [InherentPermissions(PermissionObjectType::TableData, Database::"G/L Entry", 'r')]
     procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";
@@ -608,7 +600,6 @@ table 17 "G/L Entry"
         exit(FindRecordManagement.GetLastEntryIntFieldValue(Rec, FieldNo("Entry No.")))
     end;
 
-    [InherentPermissions(PermissionObjectType::TableData, Database::"G/L Entry", 'r')]
     procedure GetLastEntry(var LastEntryNo: Integer; var LastTransactionNo: Integer)
     var
         FindRecordManagement: Codeunit "Find Record Management";
