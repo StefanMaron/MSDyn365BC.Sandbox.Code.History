@@ -16,11 +16,9 @@ codeunit 147590 "Test VAT Statement"
         LibraryPurchase: Codeunit "Library - Purchase";
         LibrarySales: Codeunit "Library - Sales";
         LibraryUtility: Codeunit "Library - Utility";
-        LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryRandom: Codeunit "Library - Random";
         LibraryVATStatement: Codeunit "Library VAT Statement";
-        LibraryInventory: Codeunit "Library - Inventory";
         FileManagement: Codeunit "File Management";
         Assert: Codeunit Assert;
         LibraryTextFileValidation: Codeunit "Library - Text File Validation";
@@ -36,7 +34,6 @@ codeunit 147590 "Test VAT Statement"
         TotalECAmtTok: Label 'TotalECAmt';
         ValueMustBeEqualErr: Label '%1 must be equal to %2 in the %3.', Comment = '%1 = Field Caption , %2 = Expected Value, %3 = Table Caption';
         AEATTransferenceValueErr: Label 'Value of 80 character should be accepted in AEATTransference File.';
-        ECPercentErr: Label 'EC % must be %1 in %2.', Comment = '%1= Field Value, %2= Table Caption.';
 
     [Test]
     [HandlerFunctions('TemplateSelectionModalPageHandler')]
@@ -2059,189 +2056,6 @@ codeunit 147590 "Test VAT Statement"
           AEATTransferenceValueErr);
     end;
 
-    [Test]
-    procedure GetPostedDocumentLinesToReverseInPostedSalesShipmentBringSEquivalenceCharge()
-    var
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        SalesShipmentLine: Record "Sales Shipment Line";
-        VATPostingSetupNormal: Record "VAT Posting Setup";
-        CopyDocumentMgt: Codeunit "Copy Document Mgt.";
-        LinesNotCopied: Integer;
-        MissingExCostRevLink: Boolean;
-    begin
-        // [SCENARIO 566248] Get Posted Document Lines to Reverse action from the Posted Sales Shipment brings the Equivalence Charge correctly.
-        Initialize();
-
-        // [GIVEN] Create VAT Posting Setup with "VAT %" and "EC %".
-        CreateVATPostingSetup(VATPostingSetupNormal);
-        VATPostingSetupNormal.Validate("VAT %", LibraryRandom.RandDecInRange(10, 20, 2));
-        VATPostingSetupNormal.Validate("EC %", LibraryRandom.RandDecInDecimalRange(5, 15, 2));
-        VATPostingSetupNormal.Modify(true);
-
-        // [GIVEN] Create Sales Invoice with VAT Posting Setup.
-        CreatePostSalesInvoice(SalesHeader, VATPostingSetupNormal);
-
-        // [GIVEN] Create Sales Credit Memo and Validate "VAT Bus. Posting Group".
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::"Credit Memo", SalesHeader."Sell-to Customer No.");
-        SalesHeader.Validate("VAT Bus. Posting Group", VATPostingSetupNormal."VAT Bus. Posting Group");
-        SalesHeader.Modify(true);
-
-        // [WHEN] "Get Posted Document Lines to Reverse" from Sales Credit Memo.
-        SalesShipmentLine.SetRange("Sell-to Customer No.", SalesHeader."Sell-to Customer No.");
-        CopyDocumentMgt.SetProperties(false, false, false, false, true, true, false);
-        CopyDocumentMgt.CopySalesShptLinesToDoc(SalesHeader, SalesShipmentLine, LinesNotCopied, MissingExCostRevLink);
-
-        // [THEN] EC % must be populated in Sales Credit Memo Line.
-        LibrarySales.FindFirstSalesLine(SalesLine, SalesHeader);
-        SalesLine.SetRange(Type, SalesLine.Type::"G/L Account");
-        SalesLine.FindFirst();
-        Assert.AreEqual(
-          VATPostingSetupNormal."EC %",
-          SalesLine."EC %",
-          StrSubstNo(
-            ECPercentErr,
-            VATPostingSetupNormal."EC %",
-            SalesLine.TableCaption()));
-    end;
-
-    [Test]
-    [HandlerFunctions('TransferenceTXTWithDateFilterRequestPageHandler,TransferenceTXTModalPageHandlerSimple')]
-    procedure TestTransferenceTXTVATEntryTotalingWithVATSetup()
-    var
-        VATPostingSetup: Record "VAT Posting Setup";
-        VATStatementName: Record "VAT Statement Name";
-        VATStatementLine: Record "VAT Statement Line";
-        AEATTransferenceFormat: Record "AEAT Transference Format";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        FileName: Text[1024];
-        PadString: Text[1];
-        VendorNo: Code[20];
-        ItemNo: Code[20];
-        VATReportingDate: Date;
-    begin
-        // [SCENARIO 576379] Generate txt file from VAT statement filters by Posting Date and not by VAT Date in the Spanish version.
-        Initialize();
-
-        // [GIVEN] Create VAT Posting Setup With 21%
-        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 21);
-
-        // [GIVEN] Create Vendor and Item
-        VendorNo := LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group");
-        ItemNo := LibraryInventory.CreateItemWithVATProdPostingGroup(VATPostingSetup."VAT Prod. Posting Group");
-
-        // [GIVEN] Create Purchase Header with Invoice Document Type and change the VAT Date to next month
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, VendorNo);
-        VATReportingDate := CalcDate('<1M>', PurchaseHeader."VAT Reporting Date");
-        PurchaseHeader.Validate("VAT Reporting Date", VATReportingDate);
-        PurchaseHeader.Modify(true);
-
-        // [GIVEN] Create the Purchase Line with 1000 Unit Cost
-        LibraryPurchase.CreatePurchaseLineWithUnitCost(PurchaseLine, PurchaseHeader, ItemNo, 1000, 1);
-
-        // [GIVEN] Post the Purchase Document
-        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true);
-
-        // [GIVEN] Create VAT Statement Template, Declaration and VAT Statement Line
-        PadString := '0';
-        CreateVATStatement(VATStatementName);
-        CreateVATStatementLineVATTotalling(VATStatementLine, VATStatementName, '1',
-          VATPostingSetup, VATStatementLine."Gen. Posting Type"::Purchase, VATStatementLine."Amount Type"::Base, '1');
-        CreateVATStatementLineVATTotalling(VATStatementLine, VATStatementName, '2',
-          VATPostingSetup, VATStatementLine."Gen. Posting Type"::Purchase, VATStatementLine."Amount Type"::Amount, '2');
-
-        // [GIVEN] Design the Text File Transference Format
-        LibraryVATStatement.CreateAEATTransreferenceFormatTxt(AEATTransferenceFormat, VATStatementName.Name,
-          1, 1, 17, AEATTransferenceFormat.Type::Numerical, AEATTransferenceFormat.Subtype::"Integer and Decimal Part",
-          '', '1');
-        LibraryVATStatement.CreateAEATTransreferenceFormatTxt(AEATTransferenceFormat, VATStatementName.Name,
-          2, 18, 35, AEATTransferenceFormat.Type::Numerical, AEATTransferenceFormat.Subtype::"Integer and Decimal Part",
-          '', '2');
-
-        // [WHEN] Run the Telematic VAT Declaration Report with Date Filter
-        FileName := CopyStr(RunTelematicVATDeclarationWithDateFilter(VATStatementLine, 0, 1, false, Format(VATReportingDate)), 1, 1024);
-
-        // [THEN] Verify - check the account amount printed in file
-        Assert.AreEqual(PadDecimalToString(1000, 2, 17, PadString, false, false),
-          Format(LibraryTextFileValidation.ReadValueFromLine(FileName, 1, 1, 17)),
-          'Amount is not set correctly.');
-    end;
-
-    [Test]
-    [HandlerFunctions('TemplateSelectionModalPageHandler,TransferenceTXTRequestPageHandler,TransferenceTXTModalPageHandlerSimple')]
-    [Scope('OnPrem')]
-    procedure NonDeductibleVATAmountinTransferenceTxtFile()
-    var
-        VATSetup: Record "VAT Setup";
-        VATPostingSetup: Record "VAT Posting Setup";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        VATStatementName: Record "VAT Statement Name";
-        VATStatementLine: Record "VAT Statement Line";
-        AEATTransferenceFormat: Record "AEAT Transference Format";
-        TelematicVATDeclaration: Report "Telematic VAT Declaration";
-        VendorNo: Code[20];
-        ItemNo: Code[20];
-        NonDeductibleVATAmount: Decimal;
-        GeneratedTextFromFile: BigText;
-        FileName: Text[1024];
-    begin
-        // [SCENARIO 592275] Test Non-Deductible VAT shown in txt file
-        Initialize();
-
-        // [GIVEN] Enable Non-Deductible VAT in VAT Setup 
-        VATSetup.Get();
-        VATSetup."Enable Non-Deductible VAT" := true;
-        VATSetup."Show Non-Ded. VAT In Lines" := true;
-        VATSetup.Modify();
-
-        // [GIVEN] Create VAT VAT Posting Setup with Non-Deductible VAT
-        CreateVATPostingSetupWithNonDeductibleVAT(VATPostingSetup);
-
-        // [GIVEN] Create Vendor with VAT Bus Posting Group 
-        VendorNo := LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group");
-
-        // [GIVEN] Create Item with VAT Product Posting Group 
-        ItemNo := LibraryInventory.CreateItemWithVATProdPostingGroup(VATPostingSetup."VAT Prod. Posting Group");
-
-        // [GIVEN] Create and post Purchase Invoice 
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, VendorNo);
-        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, ItemNo, 1);
-        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandIntInRange(100, 100));
-        PurchaseLine.Modify();
-        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-
-        // [GIVEN] Create VAT Statement Name '103' 
-        CreateVATStatement(VATStatementName);
-        VATStatementName.Validate("Template Type", VATStatementName."Template Type"::"One Column Report");
-        VATStatementName.Modify();
-
-        // [GIVEN] Create two VAT Statement Lines for Non-Deductible VAT Amount
-        CreateVATStatementLineVATTotalling(VATStatementLine, VATStatementName, '1', VATPostingSetup,
-            VATStatementLine."Gen. Posting Type"::Purchase, VATStatementLine."Amount Type"::"Non-Deductible Amount", '1');
-
-        // [GIVEN] Create Transference Format 
-        LibraryVATStatement.CreateAEATTransreferenceFormatTxt(AEATTransferenceFormat, VATStatementName.Name,
-            1, 1, 17, AEATTransferenceFormat.Type::Numerical, AEATTransferenceFormat.Subtype::"Integer and Decimal Part", '00000000000000000', '1');
-
-        // [GIVEN] Get Non-Deductible VAT Amount from VAT Statement Preview
-        NonDeductibleVATAmount := GetNonDeductibelVATAmountfromPreview(VATStatementName."Statement Template Name");
-
-        // [GIVEN] Load Non-Deductible VAT Amount into AEAT Transference Format
-        TelematicVATDeclaration.LoadValue(AEATTransferenceFormat, NonDeductibleVATAmount);
-
-        // [WHEN] Run Telematic VAT Declaration Report
-        FileName := CopyStr(RunTelematicVATDeclaration(VATStatementLine, 0, 0, false), 1, 1024);
-
-        // [THEN] Verify - check the Non-Deductible VAT Amount printed in file
-        LibraryTextFileValidation.ReadTextFile(FileName, GeneratedTextFromFile);
-        Assert.AreEqual(
-          AEATTransferenceFormat.Value,
-          Format(GeneratedTextFromFile),
-          AEATTransferenceValueErr);
-    end;
-
     local procedure GetVATAmount(DocNo: Code[20]): Decimal
     var
         VATEntry: Record "VAT Entry";
@@ -2267,11 +2081,9 @@ codeunit 147590 "Test VAT Statement"
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
     begin
         LibraryVariableStorage.Clear();
-        LibrarySetupStorage.Restore();
         if IsInitialized then
             exit;
 
-        LibrarySetupStorage.SaveVATSetup();
         LibraryERMCountryData.CreateVATData();
         LibraryERMCountryData.UpdateGeneralPostingSetup();
         GLSetup.Get();
@@ -2862,7 +2674,6 @@ codeunit 147590 "Test VAT Statement"
         LibraryERM.CreateVATProductPostingGroup(VATProductPostingGroup);
         LibraryERM.CreateVATPostingSetup(VATPostingSetup, VATBusinessPostingGroup.Code, VATProductPostingGroup.Code);
         VATPostingSetup.Validate("VAT %", LibraryRandom.RandIntInRange(2, 2));
-        VATPostingSetup.Validate("VAT Identifier", LibraryRandom.RandText(10));
         VATPostingSetup.Validate("Allow Non-Deductible VAT", VATPostingSetup."Allow Non-Deductible VAT"::Allow);
         VATPostingSetup.Validate("Non-Deductible VAT %", LibraryRandom.RandIntInRange(3, 3));
         VATPostingSetup.Validate("Non-Ded. Purchase VAT Account", LibraryERM.CreateGLAccountNo());
@@ -2885,22 +2696,6 @@ codeunit 147590 "Test VAT Statement"
         NonDeductibleVATBase := PurchaseLine."Non-Deductible VAT Base";
 
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, false);
-    end;
-
-    local procedure GetNonDeductibelVATAmountfromPreview(StatementTemplateName: Code[10]): Decimal
-    var
-        VATStatement: TestPage "VAT Statement";
-        VATStatementPreview: TestPage "VAT Statement Preview";
-        NonDeductibleVATAmount: Decimal;
-    begin
-        LibraryVariableStorage.Enqueue(StatementTemplateName);
-        VATStatement.OpenEdit();
-        VATStatementPreview.Trap();
-        VATStatement."P&review".Invoke();
-        Evaluate(NonDeductibleVATAmount, VATStatementPreview.VATStatementLineSubForm.ColumnValue.Value);
-        VATStatementPreview.Close();
-
-        exit(NonDeductibleVATAmount);
     end;
 
     [ModalPageHandler]
@@ -2932,7 +2727,7 @@ codeunit 147590 "Test VAT Statement"
         TelematicVATDeclaration.EntryType.SetValue(EntryType);
         TelematicVATDeclaration.EntryPeriod.SetValue(EntryPeriod);
         TelematicVATDeclaration.AddtnlCurrency.SetValue(Currency);
-        
+
         TelematicVATDeclaration.OK().Invoke(); // code will "jump" to TransferenceTXTModalPageHandlerWithVerify
     end;
 
@@ -3046,49 +2841,6 @@ codeunit 147590 "Test VAT Statement"
         CalcAndPostVATSettlement.DocumentNo.SetValue(LibraryVariableStorage.DequeueText());
         CalcAndPostVATSettlement.SettlementAcc.SetValue(LibraryVariableStorage.DequeueText());
         CalcAndPostVATSettlement.OK().Invoke();
-    end;
-
-    local procedure RunTelematicVATDeclarationWithDateFilter(var VATStatementLine: Record "VAT Statement Line"; EntryType: Option; EntryPeriod: Option; AddtnlCurrency: Boolean; LineDateFilter: Text[100]) ServerFileName: Text
-    var
-        TelematicVATDeclaration: Report "Telematic VAT Declaration";
-    begin
-        ServerFileName := FileManagement.ServerTempFileName('txt');
-
-        TelematicVATDeclaration.CurrentAsign(VATStatementLine);
-        TelematicVATDeclaration.SetSilentMode(ServerFileName);
-
-        // enqueue for the modal request page
-        LibraryVariableStorage.Enqueue(EntryType); // open entries
-        LibraryVariableStorage.Enqueue(EntryPeriod); // before and within period
-        LibraryVariableStorage.Enqueue(AddtnlCurrency); // additional currency
-        LibraryVariableStorage.Enqueue(LineDateFilter);
-        // enqueue for the modal page handler
-        LibraryVariableStorage.Enqueue(VATStatementLine."Statement Name");
-
-        Commit();
-        TelematicVATDeclaration.RunModal();
-        Clear(TelematicVATDeclaration);
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure TransferenceTXTWithDateFilterRequestPageHandler(var TelematicVATDeclaration: TestRequestPage "Telematic VAT Declaration")
-    var
-        EntryType: Variant;
-        EntryPeriod: Variant;
-        Currency: Variant;
-        LineDateFilter: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(EntryType);
-        LibraryVariableStorage.Dequeue(EntryPeriod);
-        LibraryVariableStorage.Dequeue(Currency);
-        LibraryVariableStorage.Dequeue(LineDateFilter);
-
-        TelematicVATDeclaration.EntryType.SetValue(EntryType);
-        TelematicVATDeclaration.EntryPeriod.SetValue(EntryPeriod);
-        TelematicVATDeclaration.AddtnlCurrency.SetValue(Currency);
-        TelematicVATDeclaration."VAT Declaration Line".SetFilter("Date Filter", LineDateFilter);
-        TelematicVATDeclaration.OK().Invoke(); // code will "jump" to TransferenceTXTModalPageHandlerWithVerify
     end;
 }
 

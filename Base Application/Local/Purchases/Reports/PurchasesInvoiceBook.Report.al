@@ -570,7 +570,7 @@ report 10705 "Purchases Invoice Book"
                 }
                 dataitem(VATEntry2; "VAT Entry")
                 {
-                    DataItemLink = Type = field(Type), "VAT Reporting Date" = field("VAT Reporting Date"), "Document Type" = field("Document Type"), "Document No." = field("Document No."), "VAT Prod. Posting Group" = field("VAT Prod. Posting Group"), "Gen. Prod. Posting Group" = field("Gen. Prod. Posting Group");
+                    DataItemLink = Type = field(Type), "VAT Reporting Date" = field("VAT Reporting Date"), "Document Type" = field("Document Type"), "Document No." = field("Document No.");
                     DataItemTableView = sorting("No. Series", "VAT Reporting Date");
 
                     trigger OnAfterGetRecord()

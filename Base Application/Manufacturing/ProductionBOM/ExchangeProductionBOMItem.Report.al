@@ -157,7 +157,7 @@ report 99001043 "Exchange Production BOM Item"
                                         CopyPositionFields(ProductionBOMLine2, ProductionBOMLine3);
                                         ShouldModifyProductionBOMLine := true;
                                         OnIntegerOnPostDataItemOnBeforeModifyProductionBOMLine(ProductionBOMLine, ShouldModifyProductionBOMLine);
-                                        if ShouldModifyProductionBOMLine then begin
+                                        if not ShouldModifyProductionBOMLine then begin
                                             ProductionBOMLine."Ending Date" := StartingDate - 1;
                                             ProductionBOMLine.Modify();
                                         end;
