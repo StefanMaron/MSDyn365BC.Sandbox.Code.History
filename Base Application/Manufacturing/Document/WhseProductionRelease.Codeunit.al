@@ -232,16 +232,16 @@ codeunit 5774 "Whse.-Production Release"
                     (ProdOrderComponent2."Prod. Order Line No." <> ProdOrderComponent."Prod. Order Line No.") or
                     (ProdOrderComponent2."Line No." <> ProdOrderComponent."Line No.")) and
                    ((not ProdOrderComponent2."Completely Picked") or
-                    (Location."Prod. Consump. Whse. Handling" = Location."Prod. Consump. Whse. Handling"::"No Warehouse Handling"))
+                    (not (Location."Require Pick" and Location."Require Shipment")))
                 then
                     KeepWarehouseRequest := true;
             until (ProdOrderComponent2.Next() = 0) or KeepWarehouseRequest;
 
         if not KeepWarehouseRequest then
-            if Location."Prod. Consump. Whse. Handling" = Location."Prod. Consump. Whse. Handling"::"Inventory Pick/Movement" then
-                DeleteWarehouseRequest(ProdOrderComponent, false)
+            if Location."Require Shipment" then
+                DeleteWhsePickRequest(ProdOrderComponent, false)
             else
-                DeleteWhsePickRequest(ProdOrderComponent, false);
+                DeleteWarehouseRequest(ProdOrderComponent, false);
 
         OnAfterDeleteLine(ProdOrderComponent);
     end;
