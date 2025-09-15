@@ -274,7 +274,6 @@ codeunit 5705 "TransferOrder-Post Receipt"
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
         WhseJnlRegisterLine: Codeunit "Whse. Jnl.-Register Line";
         PostponedValueEntries: List of [Integer];
-        ItemsToAdjust: List of [Code[20]];
         SourceCode: Code[10];
         WhsePosting: Boolean;
         WhseReference: Integer;
@@ -802,7 +801,8 @@ codeunit 5705 "TransferOrder-Post Receipt"
     var
         InvtAdjmtHandler: Codeunit "Inventory Adjustment Handler";
     begin
-        InvtAdjmtHandler.MakeAutomaticInventoryAdjustment(ItemsToAdjust);
+        if InvtSetup.AutomaticCostAdjmtRequired() then
+            InvtAdjmtHandler.MakeInventoryAdjustment(true, InvtSetup."Automatic Cost Posting");
     end;
 
     procedure SetSuppressCommit(NewSuppressCommit: Boolean)
@@ -827,16 +827,6 @@ codeunit 5705 "TransferOrder-Post Receipt"
             exit;
         PostponedValueEntries.Add(ValueEntry."Entry No.");
         IsHandled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem', '', false, false)]
-    local procedure OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem(var Item2: Record Item)
-    begin
-        if InvtSetup.UseLegacyPosting() then
-            exit;
-
-        if not ItemsToAdjust.Contains(Item2."No.") then
-            ItemsToAdjust.Add(Item2."No.");
     end;
 
     [IntegrationEvent(false, false)]
