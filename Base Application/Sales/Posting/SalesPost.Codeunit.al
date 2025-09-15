@@ -217,7 +217,6 @@ codeunit 80 "Sales-Post"
         DropShipOrder: Boolean;
         DocumentIsReadyToBeChecked: Boolean;
         PostponedValueEntries: List of [Integer];
-        ItemsToAdjust: List of [Code[20]];
         CannotAssignInvoicedErr: Label 'You cannot assign item charges to the %1 %2 = %3,%4 = %5, %6 = %7, because it has been invoiced.', Comment = '%1 = Sales Line, %2/%3 = Document Type, %4/%5 - Document No.,%6/%7 = Line No.';
         InvoiceMoreThanReceivedErr: Label 'You cannot invoice more than you have received for return order %1.', Comment = '%1 = Order No.';
         ReturnReceiptLinesDeletedErr: Label 'The return receipt lines have been deleted.';
@@ -258,7 +257,6 @@ codeunit 80 "Sales-Post"
         SendShipmentAlsoQst: Label 'You can take the same actions for the related Sales - Shipment document.\\Do you want to do that now?';
         SuppressCommit: Boolean;
         PostingPreviewNoTok: Label '***', Locked = true;
-        PostingPreviewNoFormatTxt: Label '<Filler Character,0><Integer,6>', Comment = 'Previewed document numbers are displayed in the format ***000000', Locked = true;
         InvPickExistsErr: Label 'One or more related inventory picks must be registered before you can post the shipment.';
         InvPutAwayExistsErr: Label 'One or more related inventory put-aways must be registered before you can post the receipt.';
         CheckSalesHeaderMsg: Label 'Check sales document fields.';
@@ -514,7 +512,7 @@ codeunit 80 "Sales-Post"
             TotalSalesLineLCY."Unit Cost (LCY)" := -TotalSalesLineLCY."Unit Cost (LCY)";
         end;
 
-        OnProcessPostingLinesOnBeforePostDropOrderShipment(SalesHeader, TotalSalesLine, TotalSalesLineLCY);
+        OnProcessPostingLinesOnBeforePostDropOrderShipment(SalesHeader, TotalSalesLine);
         PostDropOrderShipment(SalesHeader, TempDropShptPostBuffer);
         if SalesHeader.Invoice then
             PostInvoice(SalesHeader, CustLedgEntry);
@@ -1369,7 +1367,7 @@ codeunit 80 "Sales-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeProcessAssocItemJnlLine(SalesLine, IsHandled, SalesHeader, TempDropShptPostBuffer);
+        OnBeforeProcessAssocItemJnlLine(SalesLine, IsHandled);
         if IsHandled then
             exit;
 
@@ -2725,8 +2723,10 @@ codeunit 80 "Sales-Post"
                     // Check for posting conflicts.
                     if SalesShptHeader.Get(SalesHeader."Shipping No.") then
                         Error(SalesShptHeaderConflictErr, SalesHeader."Shipping No.");
-                end else
+                end else begin
+                    SalesHeader."Shipping No." := PostingPreviewNoTok;
                     OnSetPostingPreviewDocumentNo(SalesHeader."Shipping No.", SalesHeader);
+                end;
 
         OnAfterUpdateShippingNo(SalesHeader, PreviewMode, ModifyHeader);
     end;
@@ -2739,33 +2739,34 @@ codeunit 80 "Sales-Post"
         PreviewToken: Text;
     begin
         OnGetPostingPreviewDocumentNos(PreviewDocNos);
+        if PreviewDocNos.Count() = 0 then
+            PreviewDocNos.Add(PostingPreviewNoTok);
 
-        if not Format(SalesHeader."Shipping No.").StartsWith(PostingPreviewNoTok) and
-           not Format(SalesHeader."Return Receipt No.").StartsWith(PostingPreviewNoTok) and
-           not Format(SalesHeader."Posting No.").StartsWith(PostingPreviewNoTok)
-        then
-            exit;
+        if PreviewDocNos.Contains(SalesHeader."Shipping No.") or
+            PreviewDocNos.Contains(SalesHeader."Return Receipt No.") or
+            PreviewDocNos.Contains(SalesHeader."Posting No.")
+        then begin
+            TelemetryCustomDimensions.Add(SalesHeader.FieldCaption(SystemId), SalesHeader.SystemId);
+            TelemetryCustomDimensions.Add(SalesHeader.FieldCaption("Document Type"), Format(SalesHeader."Document Type"));
 
-        TelemetryCustomDimensions.Add(SalesHeader.FieldCaption(SystemId), SalesHeader.SystemId);
-        TelemetryCustomDimensions.Add(SalesHeader.FieldCaption("Document Type"), Format(SalesHeader."Document Type"));
+            if PreviewDocNos.Contains(SalesHeader."Shipping No.") then begin
+                PreviewToken := SalesHeader."Shipping No.";
+                TelemetryCustomDimensions.Add(SalesHeader.FieldCaption("Shipping No."), SalesHeader."Shipping No.");
+                SalesHeader."Shipping No." := '';
+            end;
+            if PreviewDocNos.Contains(SalesHeader."Return Receipt No.") then begin
+                PreviewToken := SalesHeader."Return Receipt No.";
+                TelemetryCustomDimensions.Add(SalesHeader.FieldCaption("Return Receipt No."), SalesHeader."Return Receipt No.");
+                SalesHeader."Return Receipt No." := '';
+            end;
+            if PreviewDocNos.Contains(SalesHeader."Posting No.") then begin
+                PreviewToken := SalesHeader."Posting No.";
+                TelemetryCustomDimensions.Add(SalesHeader.FieldCaption("Posting No."), SalesHeader."Posting No.");
+                SalesHeader."Posting No." := '';
+            end;
 
-        if Format(SalesHeader."Shipping No.").StartsWith(PostingPreviewNoTok) then begin
-            PreviewToken := SalesHeader."Shipping No.";
-            TelemetryCustomDimensions.Add(SalesHeader.FieldCaption("Shipping No."), SalesHeader."Shipping No.");
-            SalesHeader."Shipping No." := '';
+            Session.LogMessage('0000CUV', StrSubstNo(PreviewTokenFoundLbl, PreviewToken), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, TelemetryCustomDimensions);
         end;
-        if Format(SalesHeader."Return Receipt No.").StartsWith(PostingPreviewNoTok) then begin
-            PreviewToken := SalesHeader."Return Receipt No.";
-            TelemetryCustomDimensions.Add(SalesHeader.FieldCaption("Return Receipt No."), SalesHeader."Return Receipt No.");
-            SalesHeader."Return Receipt No." := '';
-        end;
-        if Format(SalesHeader."Posting No.").StartsWith(PostingPreviewNoTok) then begin
-            PreviewToken := SalesHeader."Posting No.";
-            TelemetryCustomDimensions.Add(SalesHeader.FieldCaption("Posting No."), SalesHeader."Posting No.");
-            SalesHeader."Posting No." := '';
-        end;
-
-        Session.LogMessage('0000CUV', StrSubstNo(PreviewTokenFoundLbl, PreviewToken), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, TelemetryCustomDimensions);
     end;
 
     local procedure UpdatePostingNo(var SalesHeader: Record "Sales Header"; var ModifyHeader: Boolean)
@@ -2774,7 +2775,7 @@ codeunit 80 "Sales-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdatePostingNo(SalesHeader, PreviewMode, ModifyHeader, IsHandled, DateOrderSeriesUsed);
+        OnBeforeUpdatePostingNo(SalesHeader, PreviewMode, ModifyHeader, IsHandled);
         if IsHandled then
             exit;
 
@@ -2801,8 +2802,10 @@ codeunit 80 "Sales-Post"
                         DateOrderSeriesUsed := true;
                     ModifyHeader := true;
                 end;
-            if PreviewMode then
+            if PreviewMode then begin
+                SalesHeader."Posting No." := PostingPreviewNoTok;
                 OnSetPostingPreviewDocumentNo(SalesHeader."Posting No.", SalesHeader);
+            end;
 
             // Check for posting conflicts.
             if not PreviewMode then
@@ -2839,8 +2842,10 @@ codeunit 80 "Sales-Post"
                     // Check for posting conflicts.
                     if ReturnRcptHeader.Get(SalesHeader."Return Receipt No.") then
                         Error(SalesReturnRcptHeaderConflictErr, SalesHeader."Return Receipt No.")
-                end else
+                end else begin
+                    SalesHeader."Return Receipt No." := PostingPreviewNoTok;
                     OnSetPostingPreviewDocumentNo(SalesHeader."Return Receipt No.", SalesHeader);
+                end;
 
         OnAfterUpdateReturnReceiptNo(SalesHeader);
     end;
@@ -3486,7 +3491,7 @@ codeunit 80 "Sales-Post"
         IsHandled := false;
         OnRoundAmountOnAfterAssignSalesLines(xSalesLine, SalesLineACY, SalesHeader, IsHandled, TotalSalesLine, TotalSalesLineLCY, SalesLine);
         if not IsHandled then
-            if (SalesHeader."Currency Code" <> '') and (SalesLine.Type <> SalesLine.Type::" ") then begin
+            if SalesHeader."Currency Code" <> '' then begin
                 NoVAT := SalesLine.Amount = SalesLine."Amount Including VAT";
                 SalesLine."Amount Including VAT" :=
                   Round(
@@ -6995,7 +7000,7 @@ codeunit 80 "Sales-Post"
         SalesShptHeader.TransferFields(SalesHeader);
         OnInsertShipmentHeaderOnAfterTransferfieldsToSalesShptHeader(SalesHeader, SalesShptHeader);
 
-        AssignPostedDocumentNo(SalesShptHeader."No.", SalesHeader."Shipping No.");
+        SalesShptHeader."No." := SalesHeader."Shipping No.";
         if SalesHeader."Document Type" = SalesHeader."Document Type"::Order then begin
             SalesShptHeader."Order No. Series" := SalesHeader."No. Series";
             SalesShptHeader."Order No." := SalesHeader."No.";
@@ -7055,7 +7060,7 @@ codeunit 80 "Sales-Post"
             ReturnRcptHeader.Init();
             OnInsertReturnReceiptHeaderOnBeforeReturnReceiptHeaderTransferFields(SalesHeader);
             ReturnRcptHeader.TransferFields(SalesHeader);
-            AssignPostedDocumentNo(ReturnRcptHeader."No.", SalesHeader."Return Receipt No.");
+            ReturnRcptHeader."No." := SalesHeader."Return Receipt No.";
             if SalesHeader."Document Type" = SalesHeader."Document Type"::"Return Order" then begin
                 ReturnRcptHeader."Return Order No. Series" := SalesHeader."No. Series";
                 ReturnRcptHeader."Return Order No." := SalesHeader."No.";
@@ -7111,7 +7116,7 @@ codeunit 80 "Sales-Post"
         SalesInvHeader.TransferFields(SalesHeader);
         OnInsertInvoiceHeaderOnAfterSalesInvHeaderTransferFields(SalesHeader, SalesInvHeader);
 
-        AssignPostedDocumentNo(SalesInvHeader."No.", SalesHeader."Posting No.");
+        SalesInvHeader."No." := SalesHeader."Posting No.";
 
         IsHandled := false;
         OnInsertInvoiceHeaderOnBeforeCheckDocumentType(SalesHeader, SalesInvHeader, SalesSetup, IsHandled);
@@ -7124,7 +7129,7 @@ codeunit 80 "Sales-Post"
                 SalesInvHeader."Order No." := SalesHeader."No.";
             end else begin
                 if SalesHeader."Posting No." = '' then
-                    AssignPostedDocumentNo(SalesInvHeader."No.", SalesHeader."No.");
+                    SalesInvHeader."No." := SalesHeader."No.";
                 SalesInvHeader."Pre-Assigned No. Series" := SalesHeader."No. Series";
                 SalesInvHeader."Pre-Assigned No." := SalesHeader."No.";
             end;
@@ -7164,13 +7169,12 @@ codeunit 80 "Sales-Post"
         SalesHeader.CalcFields("Work Description");
         OnInsertCrMemoHeaderOnBeforeSalesCrMemoHeaderTransferFields(SalesHeader);
         SalesCrMemoHeader.TransferFields(SalesHeader);
-        AssignPostedDocumentNo(SalesCrMemoHeader."No.", SalesHeader."No.");
         OnInsertCrMemoHeaderOnAfterSalesCrMemoHeaderTransferFields(SalesHeader, SalesCrMemoHeader);
 
         ShouldProcessAsReturnOrder := SalesHeader."Document Type" = SalesHeader."Document Type"::"Return Order";
         OnInsertCrMemoHeaderOnAfterCalcShouldProcessAsReturnOrder(SalesHeader, ShouldProcessAsReturnOrder);
         if ShouldProcessAsReturnOrder then begin
-            AssignPostedDocumentNo(SalesCrMemoHeader."No.", SalesHeader."Posting No.");
+            SalesCrMemoHeader."No." := SalesHeader."Posting No.";
             if SalesSetup."Ext. Doc. No. Mandatory" then
                 SalesHeader.TestField("External Document No.");
             SalesCrMemoHeader."Pre-Assigned No. Series" := '';
@@ -7182,7 +7186,7 @@ codeunit 80 "Sales-Post"
             SalesCrMemoHeader."Pre-Assigned No. Series" := SalesHeader."No. Series";
             SalesCrMemoHeader."Pre-Assigned No." := SalesHeader."No.";
             if SalesHeader."Posting No." <> '' then begin
-                AssignPostedDocumentNo(SalesCrMemoHeader."No.", SalesHeader."Posting No.");
+                SalesCrMemoHeader."No." := SalesHeader."Posting No.";
                 if GuiAllowed() and not HideProgressWindow then
                     Window.Update(1, StrSubstNo(CreditMemoNoMsg, SalesHeader."Document Type", SalesHeader."No.", SalesCrMemoHeader."No."));
             end;
@@ -7210,7 +7214,7 @@ codeunit 80 "Sales-Post"
     begin
         PurchRcptHeader.Init();
         PurchRcptHeader.TransferFields(PurchaseHeader);
-        AssignPostedDocumentNo(PurchRcptHeader."No.", PurchaseHeader."Receiving No.");
+        PurchRcptHeader."No." := PurchaseHeader."Receiving No.";
         PurchRcptHeader."Order No." := PurchaseHeader."No.";
         PurchRcptHeader."Posting Date" := SalesHeader."Posting Date";
         PurchRcptHeader."Document Date" := SalesHeader."Document Date";
@@ -7625,7 +7629,7 @@ codeunit 80 "Sales-Post"
             IsHandled := false;
             OnBeforeMakeInventoryAdjustment(InvtSetup, InvtAdjmtHandler, IsHandled);
             if not IsHandled then
-                InvtAdjmtHandler.MakeAutomaticInventoryAdjustment(ItemsToAdjust);
+                InvtAdjmtHandler.MakeInventoryAdjustment(true, InvtSetup."Automatic Cost Posting");
         end;
     end;
 
@@ -8230,7 +8234,7 @@ codeunit 80 "Sales-Post"
         exit(Condition);
     end;
 
-    procedure PostUpdateOrderLine(SalesHeader: Record "Sales Header")
+    local procedure PostUpdateOrderLine(SalesHeader: Record "Sales Header")
     var
         TempSalesLine: Record "Sales Line" temporary;
         SetDefaultQtyBlank: Boolean;
@@ -9355,7 +9359,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeProcessAssocItemJnlLine(var SalesLine: Record "Sales Line"; var IsHandled: Boolean; var SalesHeader: Record "Sales Header"; var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary)
+    local procedure OnBeforeProcessAssocItemJnlLine(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -9943,7 +9947,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdatePostingNo(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean; var ModifyHeader: Boolean; var IsHandled: Boolean; var DateOrderSeriesUsed: Boolean)
+    local procedure OnBeforeUpdatePostingNo(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean; var ModifyHeader: Boolean; var IsHandled: Boolean)
     begin
     end;
 
@@ -10393,14 +10397,6 @@ codeunit 80 "Sales-Post"
             exit(true);
     end;
 
-    local procedure AssignPostedDocumentNo(var PostedDocumentNo: Code[20]; DocumentNo: Code[20])
-    begin
-        if PreviewMode then
-            PostedDocumentNo := PostingPreviewNoTok + Format(Random(999999), 0, PostingPreviewNoFormatTxt)
-        else
-            PostedDocumentNo := DocumentNo;
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforePostValueEntryToGL', '', false, false)]
     local procedure OnBeforePostValueEntryToGL(var ValueEntry: Record "Value Entry"; var IsHandled: Boolean)
     var
@@ -10410,18 +10406,6 @@ codeunit 80 "Sales-Post"
             exit;
         PostponedValueEntries.Add(ValueEntry."Entry No.");
         IsHandled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem', '', false, false)]
-    local procedure OnSetItemAdjmtPropertiesOnBeforeCheckModifyItem(var Item2: Record Item)
-    var
-        InventorySetup: Record "Inventory Setup";
-    begin
-        if InventorySetup.UseLegacyPosting() then
-            exit;
-
-        if not ItemsToAdjust.Contains(Item2."No.") then
-            ItemsToAdjust.Add(Item2."No.");
     end;
 
     [IntegrationEvent(false, false)]
@@ -11992,7 +11976,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnProcessPostingLinesOnBeforePostDropOrderShipment(SalesHeader: Record "Sales Header"; TotalSalesLine: Record "Sales Line"; TotalSalesLineLCY: Record "Sales Line")
+    local procedure OnProcessPostingLinesOnBeforePostDropOrderShipment(SalesHeader: Record "Sales Header"; TotalSalesLine: Record "Sales Line")
     begin
     end;
 
