@@ -332,6 +332,7 @@ page 51 "Purchase Invoice"
                     BlankZero = true;
                     Enabled = DocAmountEnable;
                     Visible = DocAmountEnable;
+                    Editable = DocAmountsEditable;
                     ShowMandatory = true;
                 }
                 field(DocAmountVAT; Rec."Doc. Amount VAT")
@@ -339,6 +340,7 @@ page 51 "Purchase Invoice"
                     ApplicationArea = Basic, Suite;
                     Enabled = DocAmountEnable;
                     Visible = DocAmountEnable;
+                    Editable = DocAmountsEditable;
                 }
                 field("Job Queue Status"; Rec."Job Queue Status")
                 {
@@ -1128,7 +1130,7 @@ page 51 "Purchase Invoice"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStats action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
 
@@ -1835,12 +1837,15 @@ page 51 "Purchase Invoice"
 #if not CLEAN26
                 actionref(Statistics_Promoted; Statistics)
                 {
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
+                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics or PurchaseStatsaction. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
                 }
 #else
                 actionref(PurchaseStatistics_Promoted; PurchaseStatistics)
+                {
+                }
+                actionref(PurchaseStats_Promoted; PurchaseStats)
                 {
                 }
 #endif
@@ -1915,7 +1920,6 @@ page 51 "Purchase Invoice"
         SetExtDocNoMandatoryCondition();
         ShowShippingOptionsWithLocation := ApplicationAreaMgmtFacade.IsLocationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled();
         IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
-        DocAmountEnable := PurchSetup."Check Doc. Total Amounts";
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1942,6 +1946,8 @@ page 51 "Purchase Invoice"
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
+        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
+        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetDocNoVisible();
         IsOfficeAddin := OfficeMgt.IsAvailable();
         CreateIncomingDocFromEmailAttachment := OfficeMgt.OCRAvailable();
@@ -1975,7 +1981,7 @@ page 51 "Purchase Invoice"
                     ICInboxOutboxMgt.ShowDuplicateICDocumentWarning(PurchaseHeader, ICIncomingInvoiceFromOriginalOrderMsg);
         end;
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
-        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Purchase Order Stats.";
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -2038,7 +2044,7 @@ page 51 "Purchase Invoice"
         IsPurchaseLinesEditable: Boolean;
         RejectICPurchaseInvoiceEnabled: Boolean;
         VATDateEnabled: Boolean;
-        DocAmountEnable: Boolean;
+        DocAmountEnable, DocAmountsEditable : Boolean;
 
     protected var
         ShipToOptions: Option "Default (Company Address)",Location,"Custom Address";
@@ -2204,6 +2210,8 @@ page 51 "Purchase Invoice"
         WorkflowWebhookMgt: Codeunit "Workflow Webhook Management";
     begin
         HasIncomingDocument := Rec."Incoming Document Entry No." <> 0;
+        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
+        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetExtDocNoMandatoryCondition();
         SetPostingGroupEditable();
 
