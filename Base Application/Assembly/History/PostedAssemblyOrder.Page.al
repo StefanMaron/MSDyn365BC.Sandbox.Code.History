@@ -163,8 +163,11 @@ page 920 "Posted Assembly Order"
                 Image = Statistics;
                 ShortCutKey = 'F7';
                 ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                RunObject = Page "Posted Asm. Order Statistics";
-                RunPageOnRec = true;
+
+                trigger OnAction()
+                begin
+                    Rec.ShowStatistics();
+                end;
             }
             action(Dimensions)
             {
@@ -301,3 +304,4 @@ page 920 "Posted Assembly Order"
     var
         UndoPostEnabledExpr: Boolean;
 }
+

@@ -1410,7 +1410,7 @@ codeunit 134027 "ERM Invoice Discount And VAT"
         SalesOrder: TestPage "Sales Order";
     begin
         // [FEATURE] [Sales] [Discount] [UT]
-        // [SCENARIO 421486] "G/L accounts for discounts are missing" notification is not shown for sales document if there is at least one general posting setup with empty G/L account
+        // [SCENARIO 421486] "G/L accounts for discounts are missing" notification is not shown for sales document if there is at least one general posting setup with empty G/L account 
         Initialize();
 
         // [GIVEN] Enable Invoice Discount for sales
@@ -1445,7 +1445,7 @@ codeunit 134027 "ERM Invoice Discount And VAT"
         PurchaseOrder: TestPage "Purchase Order";
     begin
         // [FEATURE] [Purchase] [Discount] [UT]
-        // [SCENARIO 421486] "G/L accounts for discounts are missing" notification is not shown for purchase document if there is at least one general posting setup with empty G/L account
+        // [SCENARIO 421486] "G/L accounts for discounts are missing" notification is not shown for purchase document if there is at least one general posting setup with empty G/L account 
         Initialize();
 
         // [GIVEN] Enable Invoice Discount for Purchase
@@ -1467,7 +1467,7 @@ codeunit 134027 "ERM Invoice Discount And VAT"
 
         // [THEN] No notification "G/L accounts for discounts are missing" (checked in VerifyNoNotificationsAreSend)
     end;
-#if not CLEAN27
+
     [Test]
     [HandlerFunctions('ServiceOrderStatisticsHandler,VerifyNoNotificationsAreSend')]
     [Scope('OnPrem')]
@@ -1480,7 +1480,7 @@ codeunit 134027 "ERM Invoice Discount And VAT"
         ServiceOrder: TestPage "Service Order";
     begin
         // [FEATURE] [Service] [Discount] [UT]
-        // [SCENARIO 421486] "G/L accounts for discounts are missing" notification is not shown for service document if there is at least one general posting setup with empty G/L account
+        // [SCENARIO 421486] "G/L accounts for discounts are missing" notification is not shown for service document if there is at least one general posting setup with empty G/L account 
         Initialize();
 
         // [GIVEN] New general posting setup "BUS" "PROD" with empty G/L accounts
@@ -1498,40 +1498,6 @@ codeunit 134027 "ERM Invoice Discount And VAT"
         ServiceOrder.OpenEdit();
         ServiceOrder.Filter.SetFilter("No.", ServHeader."No.");
         ServiceOrder.Statistics.Invoke();
-
-        // [THEN] No notification "G/L accounts for discounts are missing" (checked in VerifyNoNotificationsAreSend)
-    end;
-#endif
-    [Test]
-    [HandlerFunctions('ServiceOrderStatisticsHandlerNM,VerifyNoNotificationsAreSend')]
-    [Scope('OnPrem')]
-    procedure NoMissedGLAccountNotificationServiceNM()
-    var
-        ServHeader: Record "Service Header";
-        ServLine: Record "Service Line";
-        GeneralPostingSetup: Record "General Posting Setup";
-        VATPostingSetup: Record "VAT Posting Setup";
-        ServiceOrder: TestPage "Service Order";
-    begin
-        // [FEATURE] [Service] [Discount] [UT]
-        // [SCENARIO 421486] "G/L accounts for discounts are missing" notification is not shown for service document if there is at least one general posting setup with empty G/L account
-        Initialize();
-
-        // [GIVEN] New general posting setup "BUS" "PROD" with empty G/L accounts
-        CreateGeneralPostingSetup(GeneralPostingSetup);
-
-        // [GIVEN] Service order "SO" for customer "C" with some invoice discount and Gen. Bus. Posting Group = "BUS"
-        CreateVATPostingSetup(VATPostingSetup, LibraryRandom.RandInt(20));
-        LibraryService.CreateServiceHeader(
-          ServHeader, ServHeader."Document Type"::Order,
-          CreateCustomerWithInvoiceDiscountGenPostGroup(VATPostingSetup."VAT Bus. Posting Group", GeneralPostingSetup."Gen. Bus. Posting Group"));
-        LibraryService.CreateServiceLine(
-          ServLine, ServHeader, ServLine.Type::Item, CreateItem(true, VATPostingSetup."VAT Prod. Posting Group"));
-
-        // [WHEN] Open service order page for "SO" and run statistics to cause discount calculation
-        ServiceOrder.OpenEdit();
-        ServiceOrder.Filter.SetFilter("No.", ServHeader."No.");
-        ServiceOrder.ServiceOrderStatistics.Invoke();
 
         // [THEN] No notification "G/L accounts for discounts are missing" (checked in VerifyNoNotificationsAreSend)
     end;
@@ -1570,7 +1536,7 @@ codeunit 134027 "ERM Invoice Discount And VAT"
         LibraryVariableStorage.Enqueue(ItemTrackingMode::"Assign Lot No.");
         PurchaseLine.OpenItemTrackingLines();
 
-        // [WHEN] Release and Post the Purchase Invoice
+        // [WHEN] Release and Post the Purchase Invoice 
         LibraryPurchase.ReleasePurchaseDocument(PurchaseHeader);
         UpdateGeneralPostingSetup(GeneralPostingSetup, PurchaseLine);
         PstdInvoiceNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
@@ -1591,142 +1557,6 @@ codeunit 134027 "ERM Invoice Discount And VAT"
                 PurchaseLineCorrection.FieldCaption("Inv. Discount Amount"),
                 PurchaseLine."Inv. Discount Amount",
                 PurchaseLineCorrection.TableCaption()));
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure NoErrorWhenSalesLineAmountIsZeroWithMultiLinesInvoiceDiscount()
-    var
-        SalesHeader: Record "Sales Header";
-        SalesLine: array[5] of Record "Sales Line";
-        VATPostingSetup: array[2] of Record "VAT Posting Setup";
-        VATProdPostingGroup: Record "VAT Product Posting Group";
-        ItemNo: array[2] of Code[20];
-        InvoiceDiscountPerc: Integer;
-        SalesInvoicePage: TestPage "Sales Invoice";
-        UnitPrice: Decimal;
-    begin
-        // [SCENARIO 573759] No error of "Attempted to Divide by zero" error when Allow Invoice Discount set to false on a Sales Invoice where calculated Invoice Discounts are
-        // redistributed to certain lines. Sales Invoice can be reopened.
-        Initialize();
-
-        // [GIVEN] Set Cal. Inv. Discount to false
-        LibrarySales.SetCalcInvDiscount(false);
-
-        // [GIVEN] Find VAT Posting Setup
-        LibraryERM.FindVATPostingSetup(VATPostingSetup[1], VATPostingSetup[1]."VAT Calculation Type"::"Normal VAT");
-
-        // [GIVEN] Create Sales Header for Sales Invoice
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Invoice, CreateCustomer(VATPostingSetup[1]."VAT Bus. Posting Group"));
-
-        // [GIVEN] Create new VAT Product Posting Group
-        LibraryERM.CreateVATProductPostingGroup(VATProdPostingGroup);
-
-        // [GIVEN] Create VAT Posting Setup
-        LibraryERM.CreateVATPostingSetup(VATPostingSetup[2], VATPostingSetup[1]."VAT Bus. Posting Group", VATProdPostingGroup.Code);
-
-        // [GIVEN] Create 2 items
-        ItemNo[1] := CreateItem(true, VATPostingSetup[1]."VAT Prod. Posting Group");
-        ItemNo[2] := CreateItem(true, VATPostingSetup[2]."VAT Prod. Posting Group");
-
-        // [GIVEN] Save value to Unit Price and Invoice Discount Percent
-        UnitPrice := LibraryRandom.RandDec(1000, 2);
-        InvoiceDiscountPerc := LibraryRandom.RandInt(100);
-
-        // [GIVEN] Create multiple Sales Line
-        CreateSalesLine(SalesHeader, SalesLine[1], ItemNo[1], UnitPrice, 1);
-        CreateSalesLine(SalesHeader, SalesLine[2], ItemNo[2], UnitPrice, 1);
-        CreateSalesLine(SalesHeader, SalesLine[3], ItemNo[1], UnitPrice, -1);
-        CreateSalesLine(SalesHeader, SalesLine[4], ItemNo[2], UnitPrice, 1);
-        CreateSalesLine(SalesHeader, SalesLine[5], ItemNo[2], UnitPrice, -1);
-
-        // [GIVEN] Open Sales Invoice page
-        SalesInvoicePage.OpenEdit();
-        SalesInvoicePage.Filter.SetFilter("No.", SalesHeader."No.");
-
-        // [WHEN] Set Invoice Discount Percent
-        SalesInvoicePage.SalesLines."Invoice Disc. Pct.".SetValue(InvoiceDiscountPerc);
-
-        // [THEN] Verify Invoice Discount Amount calculated correctly
-        SalesInvoicePage.SalesLines.GoToRecord(SalesLine[4]);
-        SalesInvoicePage.SalesLines."Invoice Discount Amount".AssertEquals(UnitPrice * InvoiceDiscountPerc / 100);
-
-        // [WHEN] Set Allow Invoice Disc to false, no error will come
-        SalesLine[4]."Allow Invoice Disc." := false;
-        SalesLine[4].Modify();
-
-        // [THEN] Verify Invoice Discount Amount will 0
-        SalesInvoicePage.SalesLines.GoToRecord(SalesLine[4]);
-        SalesInvoicePage.SalesLines."Invoice Discount Amount".AssertEquals(0);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure NoErrorWhenPurchaseLineAmountIsZeroWithMultiLinesInvoiceDiscount()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: array[5] of Record "Purchase Line";
-        VATPostingSetup: array[2] of Record "VAT Posting Setup";
-        VATProdPostingGroup: Record "VAT Product Posting Group";
-        ItemNo: array[2] of Code[20];
-        InvoiceDiscountPerc: Integer;
-        PurchaseInvoicePage: TestPage "Purchase Invoice";
-        UniCost: Decimal;
-        AmountBeforeDiscount: Decimal;
-    begin
-        // [SCENARIO 573759] No error of "Attempted to Divide by zero" error when Allow Invoice Discount set to false on a Purchase Invoice where calculated Invoice Discounts are
-        // redistributed to certain lines. Purchase Invoice can be reopened.
-        Initialize();
-
-        // [GIVEN] Set Cal. Inv. Discount to false
-        LibraryPurchase.SetCalcInvDiscount(false);
-
-        // [GIVEN] Find VAT Posting Setup
-        LibraryERM.FindVATPostingSetup(VATPostingSetup[1], VATPostingSetup[1]."VAT Calculation Type"::"Normal VAT");
-
-        // [GIVEN] Create Purchase Header for Purchase Invoice
-        LibraryPurchase.CreatePurchaseInvoiceForVendorNo(PurchaseHeader, CreateVendorWithVATBusPostingGroup(VATPostingSetup[1]."VAT Bus. Posting Group"));
-
-        // [GIVEN] Create new VAT Product Posting Group
-        LibraryERM.CreateVATProductPostingGroup(VATProdPostingGroup);
-
-        // [GIVEN] Create VAT Posting Setup
-        LibraryERM.CreateVATPostingSetup(VATPostingSetup[2], VATPostingSetup[1]."VAT Bus. Posting Group", VATProdPostingGroup.Code);
-
-        // [GIVEN] Create 2 items
-        ItemNo[1] := CreateItem(true, VATPostingSetup[1]."VAT Prod. Posting Group");
-        ItemNo[2] := CreateItem(true, VATPostingSetup[2]."VAT Prod. Posting Group");
-
-        // [GIVEN] Save value to Unit Cost and Invoice Discount Percent
-        UniCost := LibraryRandom.RandDec(1000, 2);
-        InvoiceDiscountPerc := LibraryRandom.RandInt(100);
-
-        // [GIVEN] Create multiple Purchase Line
-        CreatePurchaseLine(PurchaseHeader, PurchaseLine[1], ItemNo[1], UniCost, 1);
-        CreatePurchaseLine(PurchaseHeader, PurchaseLine[2], ItemNo[2], UniCost, 1);
-        CreatePurchaseLine(PurchaseHeader, PurchaseLine[3], ItemNo[1], UniCost, -1);
-        CreatePurchaseLine(PurchaseHeader, PurchaseLine[4], ItemNo[2], UniCost, 1);
-        CreatePurchaseLine(PurchaseHeader, PurchaseLine[5], ItemNo[2], UniCost, -1);
-
-        // [GIVEN] Open Purchase Invoice page
-        PurchaseInvoicePage.OpenEdit();
-        PurchaseInvoicePage.Filter.SetFilter("No.", PurchaseHeader."No.");
-
-        // [WHEN] Set Invoice Discount Percent
-        PurchaseInvoicePage.PurchLines."Invoice Disc. Pct.".SetValue(InvoiceDiscountPerc);
-
-        // [THEN] Verify Invoice Discount Amount calculated correctly
-        PurchaseInvoicePage.PurchLines.GoToRecord(PurchaseLine[4]);
-        Evaluate(AmountBeforeDiscount, PurchaseInvoicePage.PurchLines.AmountBeforeDiscount.Value);
-        PurchaseInvoicePage.PurchLines.InvoiceDiscountAmount.AssertEquals(AmountBeforeDiscount * InvoiceDiscountPerc / 100);
-
-        // [WHEN] Set Allow Invoice Disc to false, no error will come
-        PurchaseLine[4]."Allow Invoice Disc." := false;
-        PurchaseLine[4].Modify();
-
-        // [THEN] Verify Invoice Discount Percent will be same as before
-        PurchaseInvoicePage.PurchLines.GoToRecord(PurchaseLine[4]);
-        PurchaseInvoicePage.PurchLines."Invoice Disc. Pct.".AssertEquals(InvoiceDiscountPerc);
     end;
 
     local procedure Initialize()
@@ -2380,7 +2210,7 @@ codeunit 134027 "ERM Invoice Discount And VAT"
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.FindFirst();
-        SalesLine.Validate("Qty. to Ship", Round(SalesLine.Quantity / LibraryRandom.RandIntInRange(2, 5), 1));
+        SalesLine.Validate("Qty. to Ship", Round(SalesLine.Quantity / LibraryRandom.RandIntInRange(2,5), 1));
         SalesLine.Modify(true);
         LibrarySales.PostSalesDocument(SalesHeader, true, true);
     end;
@@ -3273,16 +3103,9 @@ codeunit 134027 "ERM Invoice Discount And VAT"
             Assert.Fail('No notification should be thrown.');
     end;
 
-#if not CLEAN27
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure ServiceOrderStatisticsHandler(var ServiceOrderStatistics: TestPage "Service Order Statistics")
-    begin
-    end;
-#endif
-    [PageHandler]
-    [Scope('OnPrem')]
-    procedure ServiceOrderStatisticsHandlerNM(var ServiceOrderStatistics: TestPage "Service Order Statistics")
     begin
     end;
 
@@ -3299,3 +3122,4 @@ codeunit 134027 "ERM Invoice Discount And VAT"
         ItemTrackingLines.OK().Invoke();
     end;
 }
+
