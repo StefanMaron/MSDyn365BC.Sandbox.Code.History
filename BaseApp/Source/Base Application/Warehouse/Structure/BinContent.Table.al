@@ -783,7 +783,6 @@ table 7302 "Bin Content"
     local procedure CheckBinMaxCubageAndWeight()
     var
         BinContent: Record "Bin Content";
-        ItemUnitOfMeasure: Record "Item Unit of Measure";
         WMSMgt: Codeunit "WMS Management";
         TotalCubage: Decimal;
         TotalWeight: Decimal;
@@ -818,24 +817,20 @@ table 7302 "Bin Content"
                     TotalWeight := TotalWeight + Weight;
                 until BinContent.Next() = 0;
 
-            ItemUnitOfMeasure.SetLoadFields(Cubage, Weight);
-            ItemUnitOfMeasure.Get("Item No.", "Unit of Measure Code");
-            if ItemUnitOfMeasure.Cubage > 0 then
-                if (Bin."Maximum Cubage" > 0) and (Bin."Maximum Cubage" - TotalCubage < 0) then
-                    if not Confirm(
-                         Text002,
-                         false, TotalCubage, FieldCaption("Max. Qty."),
-                         Bin.FieldCaption("Maximum Cubage"), Bin."Maximum Cubage", Bin.TableCaption())
-                    then
-                        Error(Text004);
-            if ItemUnitOfMeasure.Weight > 0 then
-                if (Bin."Maximum Weight" > 0) and (Bin."Maximum Weight" - TotalWeight < 0) then
-                    if not Confirm(
-                         Text003,
-                         false, TotalWeight, FieldCaption("Max. Qty."),
-                         Bin.FieldCaption("Maximum Weight"), Bin."Maximum Weight", Bin.TableCaption())
-                    then
-                        Error(Text004);
+            if (Bin."Maximum Cubage" > 0) and (Bin."Maximum Cubage" - TotalCubage < 0) then
+                if not Confirm(
+                     Text002,
+                     false, TotalCubage, FieldCaption("Max. Qty."),
+                     Bin.FieldCaption("Maximum Cubage"), Bin."Maximum Cubage", Bin.TableCaption())
+                then
+                    Error(Text004);
+            if (Bin."Maximum Weight" > 0) and (Bin."Maximum Weight" - TotalWeight < 0) then
+                if not Confirm(
+                     Text003,
+                     false, TotalWeight, FieldCaption("Max. Qty."),
+                     Bin.FieldCaption("Maximum Weight"), Bin."Maximum Weight", Bin.TableCaption())
+                then
+                    Error(Text004);
         end;
     end;
 
@@ -928,14 +923,9 @@ table 7302 "Bin Content"
                 GetBin("Location Code", "Bin Code");
                 if "Max. Qty." <> 0 then begin
                     QtyAvailToPutAwayBase := CalcQtyAvailToPutAway(DeductQtyBase);
-                    if Location."Bin Capacity Policy" = Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap." then
-                        WMSMgt.CheckPutAwayAvailability(
-                            "Bin Code", WhseActivLine.FieldCaption("Qty. (Base)"), TableCaption(), QtyBase, Math.Min(QtyAvailToPutAwayBase, "Max. Qty."),
-                            (Location."Bin Capacity Policy" = Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap.") and CalledbyPosting)
-                    else
-                        WMSMgt.CheckPutAwayAvailability(
-                            "Bin Code", WhseActivLine.FieldCaption("Qty. (Base)"), TableCaption(), QtyBase, Math.Min(QtyAvailToPutAwayBase, ("Max. Qty." * "Qty. per Unit of Measure")),
-                            (Location."Bin Capacity Policy" = Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap.") and CalledbyPosting);
+                    WMSMgt.CheckPutAwayAvailability(
+                        "Bin Code", WhseActivLine.FieldCaption("Qty. (Base)"), TableCaption(), QtyBase, Math.Min(QtyAvailToPutAwayBase, "Max. Qty."),
+                        (Location."Bin Capacity Policy" = Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap.") and CalledbyPosting);
                 end;
                 if (Bin."Maximum Cubage" <> 0) or (Bin."Maximum Weight" <> 0) then begin
                     Bin.CalcCubageAndWeight(AvailableCubage, AvailableWeight, CalledbyPosting);

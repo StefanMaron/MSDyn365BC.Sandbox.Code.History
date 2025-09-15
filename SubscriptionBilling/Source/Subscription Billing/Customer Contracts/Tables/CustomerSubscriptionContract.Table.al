@@ -831,25 +831,36 @@ table 8052 "Customer Subscription Contract"
                 UpdateBillToCust("Bill-to Contact No.");
             end;
         }
-        field(8050; "Create Contract Deferrals"; Boolean)
+        field(9000; "Assigned User ID"; Code[50])
         {
-            Caption = 'Create Contract Deferrals';
+            Caption = 'Assigned User ID';
+            DataClassification = EndUserIdentifiableInformation;
+            TableRelation = "User Setup"."User ID";
+        }
+        field(9500; Active; Boolean)
+        {
+            Caption = 'Active';
             InitValue = true;
         }
-#if not CLEANSCHEMA30
+        field(9501; "Contract Type"; Code[10])
+        {
+            TableRelation = "Subscription Contract Type";
+            Caption = 'Contract Type';
+
+            trigger OnValidate()
+            begin
+                ClearHarmonizedBillingFields(Rec."Contract Type", xRec."Contract Type");
+                SetDefaultWithoutContractDeferralsFromContractType();
+            end;
+        }
+        field(9502; "Description Preview"; Text[100])
+        {
+            Caption = 'Description Preview';
+        }
         field(8051; "Without Contract Deferrals"; Boolean)
         {
-            ObsoleteReason = 'Removed in favor of Create Contract Deferrals.';
-#if not CLEAN27
-            ObsoleteState = Pending;
-            ObsoleteTag = '27.0';
-#else
-            ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
-#endif
             Caption = 'Without Contract Deferrals';
         }
-#endif
         field(8052; "Detail Overview"; Enum "Contract Detail Overview")
         {
             Caption = 'Detail Overview';
@@ -918,32 +929,6 @@ table 8052 "Customer Subscription Contract"
         {
             Caption = 'Recipient Name in collective Invoice';
         }
-        field(9000; "Assigned User ID"; Code[50])
-        {
-            Caption = 'Assigned User ID';
-            DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "User Setup"."User ID";
-        }
-        field(9500; Active; Boolean)
-        {
-            Caption = 'Active';
-            InitValue = true;
-        }
-        field(9501; "Contract Type"; Code[10])
-        {
-            TableRelation = "Subscription Contract Type";
-            Caption = 'Contract Type';
-
-            trigger OnValidate()
-            begin
-                ClearHarmonizedBillingFields(Rec."Contract Type", xRec."Contract Type");
-                SetCreateContractDeferralsFromContractType();
-            end;
-        }
-        field(9502; "Description Preview"; Text[100])
-        {
-            Caption = 'Description Preview';
-        }
     }
     keys
     {
@@ -972,9 +957,6 @@ table 8052 "Customer Subscription Contract"
 
         CustContractDimensionMgt.AutomaticInsertCustomerContractDimensionValue(Rec);
         SetNameDefaultsForCollectiveInvoices();
-
-        GetServiceContractSetup();
-        Rec."Create Contract Deferrals" := ServiceContractSetup."Create Contract Deferrals" in [Enum::"Create Contract Deferrals"::"Contract-dependent", Enum::"Create Contract Deferrals"::Yes];
 
         // Remove view filters so that the cards does not show filtered view notification
         SetView('');
@@ -1023,6 +1005,7 @@ table 8052 "Customer Subscription Contract"
         ConfirmManagement: Codeunit "Confirm Management";
         ShipToAddressBuffer: Dictionary of [Code[20], Boolean];
         CurrencyFactor: Decimal;
+        CurencyFactorDate: Date;
         CurrencyFactorDate: Date;
         Confirmed: Boolean;
         RenameErr: Label 'You cannot rename a %1.', Comment = '%1 = a Table caption.';
@@ -2030,7 +2013,7 @@ table 8052 "Customer Subscription Contract"
         NotifyIfShipToAddressDiffers();
     end;
 
-    procedure CreateCustomerContractLineFromServiceCommitment(TempServiceCommitment: Record "Subscription Line" temporary; ContractNo: Code[20])
+    internal procedure CreateCustomerContractLineFromServiceCommitment(TempServiceCommitment: Record "Subscription Line" temporary; ContractNo: Code[20])
     var
         CustomerContractLine: Record "Cust. Sub. Contract Line";
         ServiceCommitment2: Record "Subscription Line";
@@ -2044,7 +2027,7 @@ table 8052 "Customer Subscription Contract"
         CreateCustomerContractLineFromServiceCommitment(ServiceCommitment2, ContractNo, CustomerContractLine);
     end;
 
-    procedure CreateCustomerContractLineFromServiceCommitment(var ServiceCommitment: Record "Subscription Line"; ContractNo: Code[20]; var CustomerContractLine: Record "Cust. Sub. Contract Line")
+    internal procedure CreateCustomerContractLineFromServiceCommitment(var ServiceCommitment: Record "Subscription Line"; ContractNo: Code[20]; var CustomerContractLine: Record "Cust. Sub. Contract Line")
     var
         ServiceObject: Record "Subscription Header";
         CustomerContract: Record "Customer Subscription Contract";
@@ -2162,8 +2145,8 @@ table 8052 "Customer Subscription Contract"
     begin
         if not CustomerContractLinesExists() then
             exit;
-        ServiceCommitment.OpenExchangeSelectionPage(CurrencyFactorDate, CurrencyFactor, Rec."Currency Code", '', false);
-        ServiceCommitment.UpdateAndRecalculateServCommCurrencyFromContract(Enum::"Service Partner"::Customer, Rec."No.", CurrencyFactor, CurrencyFactorDate, Rec."Currency Code");
+        ServiceCommitment.OpenExchangeSelectionPage(CurencyFactorDate, CurrencyFactor, Rec."Currency Code", '', false);
+        ServiceCommitment.UpdateAndRecalculateServCommCurrencyFromContract(Enum::"Service Partner"::Customer, Rec."No.", CurrencyFactor, CurencyFactorDate, Rec."Currency Code");
     end;
 
     internal procedure ResetCustomerServiceCommitmentCurrencyFromLCY()
@@ -2227,13 +2210,13 @@ table 8052 "Customer Subscription Contract"
         ServiceCommitmentFound := ServiceCommitment.FindFirst();
     end;
 
-    local procedure SetCreateContractDeferralsFromContractType()
+    local procedure SetDefaultWithoutContractDeferralsFromContractType()
     var
         ContractType: Record "Subscription Contract Type";
     begin
         if not ContractType.Get(Rec."Contract Type") then
             exit;
-        Rec."Create Contract Deferrals" := ContractType."Create Contract Deferrals";
+        Rec."Without Contract Deferrals" := ContractType."Def. Without Contr. Deferrals";
     end;
 
     local procedure ClearDeviatingShipToAddressNotification()
@@ -2551,7 +2534,7 @@ table 8052 "Customer Subscription Contract"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateServicesDates(CustomerSubscriptionContract: Record "Customer Subscription Contract"; var CustSubContractLine: Record "Cust. Sub. Contract Line")
+    local procedure OnBeforeUpdateServicesDates(CustomerSubscriptionContract: Record "Customer Subscription Contract"; CustSubContractLine: Record "Cust. Sub. Contract Line")
     begin
     end;
 }

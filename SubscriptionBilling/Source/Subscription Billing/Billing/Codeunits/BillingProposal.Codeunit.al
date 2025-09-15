@@ -12,6 +12,7 @@ codeunit 8062 "Billing Proposal"
         SalesHeader: Record "Sales Header";
         PurchaseHeader: Record "Purchase Header";
         CreateBillingDocuments: Codeunit "Create Billing Documents";
+        SessionStore: Codeunit "Session Store";
         CreateBillingDocumentPage: Page "Create Billing Document";
         LastContractNo: Code[20];
         LastPartnerNo: Code[20];
@@ -144,7 +145,7 @@ codeunit 8062 "Billing Proposal"
         end;
     end;
 
-    procedure CreateBillingProposal(BillingTemplateCode: Code[20]; BillingDate: Date; BillingToDate: Date)
+    internal procedure CreateBillingProposal(BillingTemplateCode: Code[20]; BillingDate: Date; BillingToDate: Date)
     var
         BillingTemplate: Record "Billing Template";
         CustomerContract: Record "Customer Subscription Contract";
@@ -359,7 +360,6 @@ codeunit 8062 "Billing Proposal"
         UsageDataBilling: Record "Usage Data Billing";
         CurrExchRate: Record "Currency Exchange Rate";
         Currency: Record Currency;
-        BaseAmount: Decimal;
     begin
         if not ServiceCommitment.IsUsageBasedBillingValid() then
             exit(false);
@@ -370,19 +370,14 @@ codeunit 8062 "Billing Proposal"
         UsageDataBilling.CalcSums(Amount, "Cost Amount");
         case BillingLine.Partner of
             Enum::"Service Partner"::Vendor:
-                BaseAmount := UsageDataBilling."Cost Amount";
+                BillingLine.Amount := UsageDataBilling."Cost Amount";
             Enum::"Service Partner"::Customer:
-                BaseAmount := UsageDataBilling.Amount;
+                BillingLine.Amount := UsageDataBilling.Amount;
         end;
-        BillingLine.Amount := BaseAmount;
-
         UsageDataBilling.FindLast();
         if UsageDataBilling.Rebilling or (UsageDataBilling."Usage Base Pricing" = Enum::"Usage Based Pricing"::"Usage Quantity") then
             BillingLine."Service Object Quantity" := UsageDataBilling.Quantity;
         BillingLine."Unit Price" := BillingLine.Amount / BillingLine."Service Object Quantity";
-        BillingLine."Discount %" := ServiceCommitment."Discount %";
-        // Apply discount from Subscription Line
-        BillingLine.Amount := BaseAmount * (1 - ServiceCommitment."Discount %" / 100);
         BillingLine."Unit Cost" := UsageDataBilling."Cost Amount" / UsageDataBilling.Quantity;
         Currency.Initialize(ServiceCommitment."Currency Code");
         Currency.TestField("Unit-Amount Rounding Precision");
@@ -737,8 +732,10 @@ codeunit 8062 "Billing Proposal"
     begin
         if DocumentNo = '' then
             exit;
+        SessionStore.SetBooleanKey('SkipContractPurchaseHeaderModifyCheck', true);
         PurchaseHeader.Get(DocumentType, DocumentNo);
         PurchaseHeader.SetRecurringBilling();
+        SessionStore.RemoveBooleanKey('SkipContractPurchaseHeaderModifyCheck');
     end;
 
     local procedure BillingProposalCanBeCreatedForContract(ContractNo: Code[20]; ServicePartner: Enum "Service Partner"): Boolean

@@ -13,7 +13,6 @@ using Microsoft.Purchases.Document;
 table 6102 "E-Document Header Mapping"
 {
     Access = Internal;
-    ReplicateData = false;
 #pragma warning disable AS0034
     InherentEntitlements = RIMDX;
     InherentPermissions = RIMDX;
