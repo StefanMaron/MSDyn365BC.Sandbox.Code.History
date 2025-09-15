@@ -7,7 +7,6 @@ namespace Microsoft.Finance.VAT.Reporting;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Ledger;
-using Microsoft.Foundation.Address;
 #if not CLEAN23
 using System.Environment.Configuration;
 #endif
@@ -372,27 +371,6 @@ report 12 "VAT Statement"
                         MultiLine = true;
                         ToolTip = 'Specifies if you want report amounts to be shown in the additional reporting currency.';
                     }
-                    field("Country/Region Filter"; CountryRegionFilter)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Country/Region Filter';
-                        ToolTip = 'Specifies the country/region to filter the VAT entries.';
-                        Importance = Additional;
-
-                        trigger OnLookup(var Text: Text): Boolean
-                        var
-                            CountryRegion: Record "Country/Region";
-                            CountriesRegions: Page "Countries/Regions";
-                        begin
-                            CountriesRegions.LookupMode(true);
-                            if CountriesRegions.RunModal() = Action::LookupOK then begin
-                                CountriesRegions.GetRecord(CountryRegion);
-                                CountryRegionFilter := CountryRegion.Code;
-                                exit(true);
-                            end;
-                            exit(false);
-                        end;
-                    }
                 }
             }
         }
@@ -479,7 +457,7 @@ report 12 "VAT Statement"
         Selection: Enum "VAT Statement Report Selection";
         TotalAmount: Decimal;
         UseAmtsInAddCurr: Boolean;
-        CountryRegionFilter: Text;
+        CountryRegionFilter: Text[250];
 
     procedure CalcLineTotal(VATStmtLine2: Record "VAT Statement Line"; var TotalAmount: Decimal; Level: Integer): Boolean
     var
@@ -675,7 +653,7 @@ report 12 "VAT Statement"
         InitializeRequest(NewVATStmtName, NewVATStatementLine, NewSelection, NewPeriodSelection, NewPrintInIntegers, NewUseAmtsInAddCurr, '');
     end;
 
-    procedure InitializeRequest(var NewVATStmtName: Record "VAT Statement Name"; var NewVATStatementLine: Record "VAT Statement Line"; NewSelection: Enum "VAT Statement Report Selection"; NewPeriodSelection: Enum "VAT Statement Report Period Selection"; NewPrintInIntegers: Boolean; NewUseAmtsInAddCurr: Boolean; NewCountryRegionFilter: Text)
+    procedure InitializeRequest(var NewVATStmtName: Record "VAT Statement Name"; var NewVATStatementLine: Record "VAT Statement Line"; NewSelection: Enum "VAT Statement Report Selection"; NewPeriodSelection: Enum "VAT Statement Report Period Selection"; NewPrintInIntegers: Boolean; NewUseAmtsInAddCurr: Boolean; NewCountryRegionFilter: Text[250])
     begin
         "VAT Statement Name".Copy(NewVATStmtName);
         "VAT Statement Line".Copy(NewVATStatementLine);
