@@ -130,27 +130,13 @@ codeunit 7774 "Copilot Capability Impl"
     procedure IsCapabilityActive(CopilotCapability: Enum "Copilot Capability"; AppId: Guid): Boolean
     var
         CopilotSettings: Record "Copilot Settings";
-        CopilotCapabilityCU: Codeunit "Copilot Capability";
-        PrivacyNotice: Codeunit "Privacy Notice";
-        RequiredPrivacyNotices: List of [Code[50]];
-        RequiredPrivacyNotice: Code[50];
     begin
         CopilotSettings.ReadIsolation(IsolationLevel::ReadCommitted);
         CopilotSettings.SetLoadFields(Status);
         if not CopilotSettings.Get(CopilotCapability, AppId) then
             exit(false);
 
-        CopilotCapabilityCU.OnGetRequiredPrivacyNotices(CopilotCapability, AppId, RequiredPrivacyNotices);
-
-        if (CopilotSettings.Status <> Enum::"Copilot Status"::Active) or (RequiredPrivacyNotices.Count() <= 0) then
-            exit(CopilotSettings.Status = Enum::"Copilot Status"::Active);
-
-        // check privacy notices
-        foreach RequiredPrivacyNotice in RequiredPrivacyNotices do
-            if (PrivacyNotice.GetPrivacyNoticeApprovalState(RequiredPrivacyNotice, true) <> Enum::"Privacy Notice Approval State"::Agreed) then
-                exit(false);
-
-        exit(true);
+        exit(CopilotSettings.Status = Enum::"Copilot Status"::Active);
     end;
 
     procedure SendActivateTelemetry(CopilotCapability: Enum "Copilot Capability"; AppId: Guid)
@@ -255,26 +241,12 @@ codeunit 7774 "Copilot Capability Impl"
     end;
 
     [TryFunction]
-    procedure CheckGeoAndEUDB(var WithinGeo: Boolean; var WithinEUDB: Boolean)
+    procedure CheckGeo(var WithinGeo: Boolean; var WithinEuropeGeo: Boolean)
     var
         ALCopilotFunctions: DotNet ALCopilotFunctions;
     begin
         WithinGeo := ALCopilotFunctions.IsWithinGeo();
-        WithinEUDB := ALCopilotFunctions.IsWithinEUDB();
-    end;
-
-    procedure GetDataMovementAllowed(var AllowDataMovement: Boolean)
-    var
-        PrivacyNotice: Codeunit "Privacy Notice";
-    begin
-        case PrivacyNotice.GetPrivacyNoticeApprovalState(GetAzureOpenAICategory(), false) of
-            Enum::"Privacy Notice Approval State"::Agreed:
-                AllowDataMovement := true;
-            Enum::"Privacy Notice Approval State"::Disagreed:
-                AllowDataMovement := false;
-            else
-                AllowDataMovement := true;
-        end;
+        WithinEuropeGeo := ALCopilotFunctions.IsEuropeGeo();
     end;
 
     procedure UpdateGuidedExperience(AllowDataMovement: Boolean)
@@ -297,12 +269,17 @@ codeunit 7774 "Copilot Capability Impl"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Action Triggers", 'GetCopilotCapabilityStatus', '', false, false)]
-    local procedure GetCopilotCapabilityStatus(Capability: Integer; var IsEnabled: Boolean; AppId: Guid; Silent: Boolean)
+    local procedure GetCopilotCapabilityStatus(Capability: Integer; var IsEnabled: Boolean)
     var
         AzureOpenAI: Codeunit "Azure OpenAI";
         CopilotCapability: Enum "Copilot Capability";
+        Silent: Boolean;
     begin
         CopilotCapability := Enum::"Copilot Capability".FromInteger(Capability);
-        IsEnabled := AzureOpenAI.IsEnabled(CopilotCapability, Silent, AppId);
+
+        if CopilotCapability = Enum::"Copilot Capability"::Chat then
+            Silent := true;
+
+        IsEnabled := AzureOpenAI.IsEnabled(CopilotCapability, Silent);
     end;
 }
