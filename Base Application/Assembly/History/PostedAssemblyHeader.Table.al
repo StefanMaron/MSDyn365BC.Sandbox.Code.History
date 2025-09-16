@@ -68,6 +68,11 @@ table 910 "Posted Assembly Header"
             Caption = 'Gen. Prod. Posting Group';
             TableRelation = "Gen. Product Posting Group";
         }
+        field(17; "Gen. Bus. Posting Group"; Code[20])
+        {
+            Caption = 'Gen. Bus. Posting Group';
+            TableRelation = "Gen. Business Posting Group";
+        }
         field(19; Comment; Boolean)
         {
             CalcFormula = exist("Assembly Comment Line" where("Document Type" = const("Posted Assembly"),
@@ -255,12 +260,14 @@ table 910 "Posted Assembly Header"
         DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2', TableCaption(), "No."));
     end;
 
+#if not CLEAN27
+    [Obsolete('The statistics action is refactored to use the RunObject property instead.', '27.0')]
     procedure ShowStatistics()
     begin
         TestField("Item No.");
         PAGE.Run(PAGE::"Posted Asm. Order Statistics", Rec);
     end;
-
+#endif
     procedure PrintRecords(ShowRequestForm: Boolean)
     var
         ReportSelections: Record "Report Selections";
@@ -359,4 +366,3 @@ table 910 "Posted Assembly Header"
     begin
     end;
 }
-
