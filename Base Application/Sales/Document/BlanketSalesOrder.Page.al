@@ -105,7 +105,7 @@ page 507 "Blanket Sales Order"
                     }
                     field("Sell-to County"; Rec."Sell-to County")
                     {
-                        Caption = 'State';
+                        CaptionClass = '5,1,' + Rec."Sell-to Country/Region Code";
                         ToolTip = 'Specifies the state that is used to calculate and post sales tax.';
                     }
                     field("Sell-to Post Code"; Rec."Sell-to Post Code")
@@ -510,7 +510,7 @@ page 507 "Blanket Sales Order"
                             field("Ship-to County"; Rec."Ship-to County")
                             {
                                 ApplicationArea = Suite;
-                                Caption = 'State';
+                                CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                                 Editable = ShipToOptions = ShipToOptions::"Custom Address";
                                 QuickEntry = false;
                                 ToolTip = 'Specifies the state that is used to calculate and post sales tax.';
@@ -621,6 +621,23 @@ page 507 "Blanket Sales Order"
                                         Rec.SetRange("Bill-to Customer No.");
                                 CurrPage.Update();
                             end;
+
+                            trigger OnLookup(var Text: Text): Boolean
+                            var
+                                Customer: Record Customer;
+                            begin
+                                if Customer.SelectCustomer(Customer) then begin
+                                    xRec := Rec;
+                                    Rec."Bill-to Name" := Customer.Name;
+                                    Rec.Validate("Bill-to Customer No.", Customer."No.");
+                                end;
+
+                                if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
+                                    if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
+                                        Rec.SetRange("Bill-to Customer No.");
+
+                                CurrPage.Update();
+                            end;
                         }
                         field("Bill-to Address"; Rec."Bill-to Address")
                         {
@@ -654,7 +671,7 @@ page 507 "Blanket Sales Order"
                         }
                         field("Bill-to County"; Rec."Bill-to County")
                         {
-                            Caption = 'State';
+                            CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
                             Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                             Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                             QuickEntry = false;
@@ -907,7 +924,7 @@ page 507 "Blanket Sales Order"
                     Visible = SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif                    
+#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Sales Order Stats.";
                     RunPageOnRec = true;
@@ -1389,7 +1406,7 @@ page 507 "Blanket Sales Order"
         IsPaymentMethodCodeVisible := not GLSetup."Hide Payment Method Code";
         IsSalesLinesEditable := Rec.SalesLinesEditable();
 
-        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Sales Order Stats.";
+        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
         IsCustomerOrContactNotEmpty := (Rec."Sell-to Customer No." <> '') or (Rec."Sell-to Contact No." <> '');
     end;
 
