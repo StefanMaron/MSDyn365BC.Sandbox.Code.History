@@ -67,29 +67,6 @@ xmlport 149031 "AIT Test Suite Import/Export"
                 {
                     Occurrence = Optional;
                 }
-                tableelement(AITEvaluator; "AIT Evaluator")
-                {
-                    LinkFields = "Test Suite Code" = field("Code");
-                    LinkTable = "AITSuite";
-                    MinOccurs = Zero;
-                    XmlName = 'Evaluator';
-                    SourceTableView = where("Test Method Line" = const(0));
-
-                    fieldattribute(Evaluator; AITEvaluator.Evaluator)
-                    {
-                        Occurrence = Required;
-                    }
-                    fieldattribute(Type; AITEvaluator."Evaluator Type")
-                    {
-                        Occurrence = Required;
-                    }
-
-                    trigger OnAfterInitRecord()
-                    begin
-                        if SkipTestSuites.Contains(AITSuite.Code) then
-                            currXMLport.Skip();
-                    end;
-                }
                 tableelement(AITestMethodLine; "AIT Test Method Line")
                 {
                     LinkFields = "Test Suite Code" = field("Code");
@@ -109,32 +86,10 @@ xmlport 149031 "AIT Test Suite Import/Export"
                     {
                         Occurrence = Optional;
                     }
-                    tableelement(AITLineEvaluator; "AIT Evaluator")
+                    textattribute(EvaluatorText)
                     {
-                        LinkFields = "Test Suite Code" = field("Test Suite Code"), "Test Method Line" = field("Line No.");
-                        LinkTable = AITestMethodLine;
-                        MinOccurs = Zero;
+                        Occurrence = Optional;
                         XmlName = 'Evaluator';
-
-                        fieldattribute(Evaluator; AITLineEvaluator.Evaluator)
-                        {
-                            Occurrence = Required;
-                        }
-                        fieldattribute(Type; AITLineEvaluator."Evaluator Type")
-                        {
-                            Occurrence = Required;
-                        }
-
-                        trigger OnAfterInitRecord()
-                        begin
-                            if SkipTestSuites.Contains(AITSuite.Code) then
-                                currXMLport.Skip();
-                        end;
-
-                        trigger OnBeforeInsertRecord()
-                        begin
-                            AITLineEvaluator."Test Method Line" := AITestMethodLine."Line No.";
-                        end;
                     }
 
                     trigger OnAfterInitRecord()

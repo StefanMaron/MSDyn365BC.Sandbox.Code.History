@@ -84,7 +84,8 @@ codeunit 137083 "SCM Production Orders IV"
         DateConflictErr: Label 'The change leads to a date conflict with existing reservations.\Reserved quantity (Base): %1, Date %2\Cancel or change reservations and try again', Comment = '%1 - reserved quantity, %2 - date';
         FieldMustBeVisibleErr: Label '%1 must be visible in Page %2', Comment = '%1 = Field Caption , %2 = Page Caption';
         FieldMustBeEnabledErr: Label '%1 must be enabled in Page %2', Comment = '%1 = Field Caption , %2 = Page Caption';
-        ItemMustBeEqualErr: Label '%1 must be equal to %2 for Item No. %3 in the %4.', Comment = '%1 = Field Caption , %2 = Expected Value, %3 = Item No., %4 = Table Caption';
+        NonInventoryItemInStandardCostCalcForSKUErr: Label 'You cannot modify %1 on SKU %2 = %3, %4 = %5, %6 = %7 as Production BOM %8 has a non-inventory Item %9.',
+                                                     Comment = '%1 = Field Caption, %2 = Field Caption, %3 = Location Code , %4 = Field Caption , %5 = Item No. , %6 = Field Caption , %7 = Variant Code , %8 =  Production BOM No. , %9 = Item No.';
 
     [Test]
     [HandlerFunctions('ConfirmHandlerTrue,MessageHandler')]
@@ -3470,7 +3471,7 @@ codeunit 137083 "SCM Production Orders IV"
 
     [Test]
     [HandlerFunctions('StrMenuHandler')]
-    procedure VerifyStandardCostMustBeUpdatedInSKUIfNonInventoryExistInProductionBOM()
+    procedure VerifyStandardCostMustNotBeUpdatedInSKUIfNonInventoryExistInProductionBOM()
     var
         OutputItem: Record Item;
         NonInvItem: Record Item;
@@ -3484,7 +3485,7 @@ codeunit 137083 "SCM Production Orders IV"
         ExpectedOvhdCost: Decimal;
         IndirectCostPer: Decimal;
     begin
-        // [SCENARIO 565590] Verify "Standard Cost" must be updated in SKU if Non-Inventory item must be exist in "Production BOM".
+        // [SCENARIO 565590] Verify "Standard Cost" must not be updated in SKU if Non-Inventory item must be exist in "Production BOM".
         Initialize();
 
         // [GIVEN] Update "Inc. Non. Inv. Cost To Prod" in Manufacturing Setup.
@@ -3539,10 +3540,21 @@ codeunit 137083 "SCM Production Orders IV"
         StockkeepingUnit.FindFirst();
 
         // [WHEN] Update "Standard Cost" in SKU.
-        StockkeepingUnit.Validate("Standard Cost", ExpectedStandardCost + NonInvUnitCost);
+        asserterror StockkeepingUnit.Validate("Standard Cost", ExpectedStandardCost + NonInvUnitCost);
 
-        // [THEN] Verify "Standard Cost" must be updated in SKU.
-        VerifyCostFieldsInSKU(StockkeepingUnit, ExpectedStandardCost + NonInvUnitCost, ExpectedStandardCost + NonInvUnitCost, ExpectedStandardCost + NonInvUnitCost, 0, 0, 0, 0);
+        // [THEN] Verify "Standard Cost" must not be updated in SKU.
+        Assert.ExpectedError(
+            StrSubstNo(
+                NonInventoryItemInStandardCostCalcForSKUErr,
+                StockkeepingUnit.FieldCaption("Standard Cost"),
+                StockkeepingUnit.FieldCaption("Location Code"),
+                StockkeepingUnit."Location Code",
+                StockkeepingUnit.FieldCaption("Item No."),
+                StockkeepingUnit."Item No.",
+                StockkeepingUnit.FieldCaption("Variant Code"),
+                StockkeepingUnit."Variant Code",
+                OutputItem."Production BOM No.",
+                NonInvItem."No."));
     end;
 
     [Test]
@@ -3958,279 +3970,6 @@ codeunit 137083 "SCM Production Orders IV"
         // [THEN] Verify Value Entry should be created with "Variance Type" - "Material - Non Inventory" for SKU.
         VerifyCostAmountExpectedAndActualForValueEntry(ProductionOrder, "Item Ledger Entry Type"::Output, "Cost Entry Type"::Variance, OutputItem, Location.Code, 0, 0, (NonInvUnitCost * Quantity));
         VerifyCostAmountExpectedAndActualForItemLedgerEntry(ProductionOrder, "Item Ledger Entry Type"::Output, OutputItem, Location.Code, 0, ExpectedStandardCost * Quantity);
-    end;
-
-    [Test]
-    [HandlerFunctions('StrMenuHandler')]
-    procedure VerifyCostFieldsMustBeUpdatedInSKUIfNonInventoryItemExistInProdBOMWhenRevaluationJournalIsPosted()
-    var
-        OutputItem: Record Item;
-        NonInvItem: Record Item;
-        Location: Record Location;
-        StockkeepingUnit: Record "Stockkeeping Unit";
-        ProductionBOMHeader: Record "Production BOM Header";
-        RevaluationItemJournalBatch: Record "Item Journal Batch";
-        CalculateStdCost: Codeunit "Calculate Standard Cost";
-        Quantity: Decimal;
-        NonInvUnitCost: Decimal;
-        ExpectedStandardCost: Decimal;
-        ExpectedOvhdCost: Decimal;
-        IndirectCostPer: Decimal;
-        RevaluedUnitCost: Decimal;
-    begin
-        // [SCENARIO 567056] Verify Cost Fields must be updated in SKU If Non-Inventory item exist in Production BOM.
-        // When Revaluation Journal is posted.
-        Initialize();
-
-        // [GIVEN] Update "Inc. Non. Inv. Cost To Prod" in Manufacturing Setup.
-        LibraryManufacturing.UpdateNonInventoryCostToProductionInManufacturingSetup(true);
-
-        // [GIVEN] Update "Journal Templ. Name Mandatory" in General Ledger Setup.
-        LibraryERMCountryData.UpdateJournalTemplMandatory(false);
-
-        // [GIVEN] Create a Location with Inventory Posting Setup.
-        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
-
-        // [GIVEN] Create Production Item, Non-Inventory Item with Production BOM.
-        CreateProductionItemWithNonInvItemAndProductionBOM(OutputItem, NonInvItem, ProductionBOMHeader);
-
-        // [GIVEN] Save Quantity, Indirect%, Component Unit Cost.
-        Quantity := LibraryRandom.RandIntInRange(10, 10);
-        NonInvUnitCost := LibraryRandom.RandIntInRange(20, 20);
-        IndirectCostPer := LibraryRandom.RandIntInRange(10, 10);
-        ExpectedOvhdCost := (NonInvUnitCost * IndirectCostPer) / 100;
-        ExpectedStandardCost := NonInvUnitCost + ExpectedOvhdCost;
-        RevaluedUnitCost := ExpectedStandardCost + NonInvUnitCost;
-
-        // [GIVEN] Create and Post Purchase Document for Non-Inventory item with Unit Cost.
-        CreateAndPostPurchaseDocumentWithNonInvItem(NonInvItem, Quantity, NonInvUnitCost);
-
-        // [GIVEN] Update "Costing Method", "Indirect Cost %" in Production item.
-        OutputItem.Validate("Costing Method", OutputItem."Costing Method"::Standard);
-        OutputItem.Validate("Indirect Cost %", IndirectCostPer);
-        OutputItem.Modify();
-
-        // [WHEN] Calculate Cost of Production Item.
-        CalculateStdCost.CalcItem(OutputItem."No.", false);
-
-        // [THEN] Verify Cost fields in Output item.
-        OutputItem.Get(OutputItem."No.");
-        VerifyCostFieldsInItem(OutputItem, ExpectedStandardCost, 0, 0, NonInvUnitCost, NonInvUnitCost, ExpectedOvhdCost, ExpectedOvhdCost);
-
-        // [GIVEN] Create Semi-Stockkeeping Unit.
-        LibraryInventory.CreateStockKeepingUnit(OutputItem, Enum::"SKU Creation Method"::"Location & Variant", false, false);
-
-        // [WHEN] Find Semi-Stockkeeping Unit.
-        StockkeepingUnit.SetRange("Item No.", OutputItem."No.");
-        StockkeepingUnit.SetRange("Location Code", Location.Code);
-        StockkeepingUnit.FindFirst();
-
-        // [THEN] Verify Cost fields in SKU.
-        VerifyCostFieldsInSKU(StockkeepingUnit, ExpectedStandardCost, 0, 0, NonInvUnitCost, NonInvUnitCost, ExpectedOvhdCost, ExpectedOvhdCost);
-
-        // [GIVEN] Create and Post Item Journal with Location Code.
-        CreateAndPostItemJournalLine(OutputItem."No.", Quantity, '', '');
-        CreateAndPostItemJournalLine(OutputItem."No.", Quantity, '', Location.Code);
-
-        // [GIVEN] Revaluation Journal Setup.
-        RevaluationJournalSetup(RevaluationItemJournalBatch);
-
-        // [GIVEN] Calculate Inventory Value.
-        CalculateInventoryValue(RevaluationItemJournalBatch, OutputItem);
-
-        // [GIVEN] Update Revaluation Item Journal.
-        UpdateRevaluationJournalLine(OutputItem."No.", '', RevaluedUnitCost);
-        UpdateRevaluationJournalLine(OutputItem."No.", Location.Code, RevaluedUnitCost);
-
-        // [WHEN] Post Revaluation Item Journal.
-        LibraryInventory.PostItemJournalLine(RevaluationItemJournalBatch."Journal Template Name", RevaluationItemJournalBatch.Name);
-
-        // [THEN] Verify Cost fields in Output item.
-        OutputItem.Get(OutputItem."No.");
-        VerifyCostFieldsInItem(OutputItem, RevaluedUnitCost, RevaluedUnitCost, RevaluedUnitCost, 0, 0, 0, 0);
-
-        // [THEN] Verify Cost Fields must be updated in SKU When Revaluation Journal is posted.
-        StockkeepingUnit.Get(StockkeepingUnit."Location Code", StockkeepingUnit."Item No.", StockkeepingUnit."Variant Code");
-        VerifyCostFieldsInSKU(StockkeepingUnit, RevaluedUnitCost, RevaluedUnitCost, RevaluedUnitCost, 0, 0, 0, 0);
-    end;
-
-    [Test]
-    [HandlerFunctions('ConfirmHandlerTrue,ReleasedProdOrderPageHandler')]
-    procedure VerifyConsumptionMustNotBePostedIfComponentHaveBackwardFlushingWhenReopenProductionOrder()
-    var
-        Item: Record Item;
-        ChildItem: Record Item;
-        ProductionOrder: Record "Production Order";
-        ProdOrderLine: Record "Prod. Order Line";
-        ItemJournalBatch: Record "Item Journal Batch";
-        ItemJournalLine: Record "Item Journal Line";
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        ManufacturingSetup: Record "Manufacturing Setup";
-        FinishedProductionOrder: TestPage "Finished Production Order";
-        QuantityPer: Decimal;
-        Quantity: Decimal;
-        PartialQuantity: Decimal;
-    begin
-        // [SCENARIO 574905] Verify consumption must not be posted if the component has a backward flushing method When Status is changed from Released to Finished after Reopen the production Order.
-        Initialize();
-
-        // [GIVEN] Set location code in Manufacturing Setup.
-        ManufacturingSetup.Get();
-        ManufacturingSetup.Validate("Components at Location", '');
-        ManufacturingSetup.Modify(true);
-
-        // [GIVEN] Generate "Quantity Per", Quantity and Partial Quantity.
-        QuantityPer := LibraryRandom.RandIntInRange(2, 5);
-        Quantity := LibraryRandom.RandIntInRange(10, 20);
-        PartialQuantity := LibraryRandom.RandIntInRange(1, 5);
-
-        // [GIVEN] Create an Item with BOM and Routing.
-        CreateItemWithBOMAndRouting(Item, ChildItem, QuantityPer);
-
-        // [GIVEN] Update Routing Link Code in Prod BOM Line and Routing Line.
-        UpdateRoutingLinkCodeInProdBOMAndRouting(Item, ChildItem, '');
-
-        // [GIVEN] Create and Post Item Journal Line for Component item with Unit Cost.
-        CreateItemJournalLineWithUnitCost(ItemJournalBatch, ItemJournalLine, ChildItem."No.", LibraryRandom.RandIntInRange(100, 200), '', '', LibraryRandom.RandInt(10));
-        LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
-
-        // [GIVEN] Create and Refresh Released Production Order.
-        CreateAndRefreshReleasedProductionOrder(ProductionOrder, Item."No.", Quantity, '', '');
-
-        // [GIVEN] Find Released Production Order Line.
-        FindProdOrderLine(ProdOrderLine, ProdOrderLine.Status::Released, ProductionOrder."No.");
-
-        // [GIVEN] Create and Post Output Journal.
-        CreateAndPostOutputJournalWithRunTimeAndUnitCost(ProductionOrder."No.", PartialQuantity, 0, 0);
-
-        // [WHEN] Change Status From Released to Finished.
-        LibraryManufacturing.ChangeStatusReleasedToFinished(ProductionOrder."No.");
-
-        // [THEN] Verify Consumption Entry must be created with Output Quantity as Component has backward flushing Method.
-        ItemLedgerEntry.SetRange("Order Type", ItemLedgerEntry."Order Type"::Production);
-        ItemLedgerEntry.SetRange("Order No.", ProductionOrder."No.");
-        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Consumption);
-        ItemLedgerEntry.SetRange("Item No.", ChildItem."No.");
-        ItemLedgerEntry.CalcSums(Quantity);
-        Assert.RecordCount(ItemLedgerEntry, 1);
-        Assert.AreEqual(
-            -PartialQuantity * QuantityPer,
-            ItemLedgerEntry.Quantity,
-            StrSubstNo(ValueMustBeEqualErr, ItemLedgerEntry.FieldCaption(Quantity), -PartialQuantity * QuantityPer, ItemLedgerEntry.TableCaption()));
-
-        // [GIVEN] Get Finished Production Order.
-        ProductionOrder.Get(ProductionOrder.Status::Finished, ProductionOrder."No.");
-
-        // [GIVEN] Execute "ReopenFinishProdOrder" action.
-        FinishedProductionOrder.OpenEdit();
-        FinishedProductionOrder.GoToRecord(ProductionOrder);
-        FinishedProductionOrder.ReopenFinishedProdOrder.Invoke();
-
-        // [WHEN] Change Status From Released to Finished.
-        LibraryManufacturing.ChangeStatusReleasedToFinished(ProductionOrder."No.");
-
-        // [THEN] Verify Consumption Entry must not be created with Output Quantity again as consumption is already posted.
-        ItemLedgerEntry.SetRange("Order Type", ItemLedgerEntry."Order Type"::Production);
-        ItemLedgerEntry.SetRange("Order No.", ProductionOrder."No.");
-        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Consumption);
-        ItemLedgerEntry.SetRange("Item No.", ChildItem."No.");
-        ItemLedgerEntry.CalcSums(Quantity);
-        Assert.RecordCount(ItemLedgerEntry, 1);
-        Assert.AreEqual(
-            -PartialQuantity * QuantityPer,
-            ItemLedgerEntry.Quantity,
-            StrSubstNo(ValueMustBeEqualErr, ItemLedgerEntry.FieldCaption(Quantity), -PartialQuantity * QuantityPer, ItemLedgerEntry.TableCaption()));
-    end;
-
-    [Test]
-    [HandlerFunctions('ConfirmHandlerTrue,ReleasedProdOrderPageHandler')]
-    procedure VerifyConsumptionMustBePostedIfComponentHaveBackwardFlushingWhenReopenProductionOrder()
-    var
-        Item: Record Item;
-        ChildItem: Record Item;
-        ProductionOrder: Record "Production Order";
-        ProdOrderLine: Record "Prod. Order Line";
-        ItemJournalBatch: Record "Item Journal Batch";
-        ItemJournalLine: Record "Item Journal Line";
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        ManufacturingSetup: Record "Manufacturing Setup";
-        FinishedProductionOrder: TestPage "Finished Production Order";
-        QuantityPer: Decimal;
-        Quantity: Decimal;
-        PartialQuantity: Decimal;
-    begin
-        // [SCENARIO 574905] Verify consumption must be posted if the component has a backward flushing method for remaining Finished Quantity When Status is changed from Released to Finished after Reopen the production Order.
-        Initialize();
-
-        // [GIVEN] Set location code in Manufacturing Setup.
-        ManufacturingSetup.Get();
-        ManufacturingSetup.Validate("Components at Location", '');
-        ManufacturingSetup.Modify(true);
-
-        // [GIVEN] Generate "Quantity Per", Quantity and Partial Quantity.
-        QuantityPer := LibraryRandom.RandIntInRange(2, 5);
-        Quantity := LibraryRandom.RandIntInRange(10, 20);
-        PartialQuantity := LibraryRandom.RandIntInRange(1, 5);
-
-        // [GIVEN] Create an Item with BOM and Routing.
-        CreateItemWithBOMAndRouting(Item, ChildItem, QuantityPer);
-
-        // [GIVEN] Update Routing Link Code in Prod BOM Line and Routing Line.
-        UpdateRoutingLinkCodeInProdBOMAndRouting(Item, ChildItem, '');
-
-        // [GIVEN] Create and Post Item Journal Line for Component item with Unit Cost.
-        CreateItemJournalLineWithUnitCost(ItemJournalBatch, ItemJournalLine, ChildItem."No.", LibraryRandom.RandIntInRange(100, 200), '', '', LibraryRandom.RandInt(10));
-        LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
-
-        // [GIVEN] Create and Refresh Released Production Order.
-        CreateAndRefreshReleasedProductionOrder(ProductionOrder, Item."No.", Quantity, '', '');
-
-        // [GIVEN] Find Released Production Order Line.
-        FindProdOrderLine(ProdOrderLine, ProdOrderLine.Status::Released, ProductionOrder."No.");
-
-        // [GIVEN] Create and Post Output Journal.
-        CreateAndPostOutputJournalWithRunTimeAndUnitCost(ProductionOrder."No.", PartialQuantity, 0, 0);
-
-        // [WHEN] Change Status From Released to Finished.
-        LibraryManufacturing.ChangeStatusReleasedToFinished(ProductionOrder."No.");
-
-        // [THEN] Verify Consumption Entry must be created with Output Quantity as Component has backward flushing Method.
-        ItemLedgerEntry.SetRange("Order Type", ItemLedgerEntry."Order Type"::Production);
-        ItemLedgerEntry.SetRange("Order No.", ProductionOrder."No.");
-        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Consumption);
-        ItemLedgerEntry.SetRange("Item No.", ChildItem."No.");
-        ItemLedgerEntry.CalcSums(Quantity);
-        Assert.RecordCount(ItemLedgerEntry, 1);
-        Assert.AreEqual(
-            -PartialQuantity * QuantityPer,
-            ItemLedgerEntry.Quantity,
-            StrSubstNo(ValueMustBeEqualErr, ItemLedgerEntry.FieldCaption(Quantity), -PartialQuantity * QuantityPer, ItemLedgerEntry.TableCaption()));
-
-        // [GIVEN] Get Finished Production Order.
-        ProductionOrder.Get(ProductionOrder.Status::Finished, ProductionOrder."No.");
-
-        // [GIVEN] Execute "ReopenFinishProdOrder" action.
-        FinishedProductionOrder.OpenEdit();
-        FinishedProductionOrder.GoToRecord(ProductionOrder);
-        FinishedProductionOrder.ReopenFinishedProdOrder.Invoke();
-
-        // [GIVEN] Create and Post Output Journal.
-        CreateAndPostOutputJournalWithRunTimeAndUnitCost(ProductionOrder."No.", Quantity - PartialQuantity, 0, 0);
-
-        // [WHEN] Change Status From Released to Finished.
-        LibraryManufacturing.ChangeStatusReleasedToFinished(ProductionOrder."No.");
-
-        // [THEN] Verify Consumption Entry must be created with remaining Output Quantity.
-        ItemLedgerEntry.SetRange("Order Type", ItemLedgerEntry."Order Type"::Production);
-        ItemLedgerEntry.SetRange("Order No.", ProductionOrder."No.");
-        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Consumption);
-        ItemLedgerEntry.SetRange("Item No.", ChildItem."No.");
-        ItemLedgerEntry.CalcSums(Quantity);
-        Assert.RecordCount(ItemLedgerEntry, 2);
-        Assert.AreEqual(
-            -Quantity * QuantityPer,
-            ItemLedgerEntry.Quantity,
-            StrSubstNo(ValueMustBeEqualErr, ItemLedgerEntry.FieldCaption(Quantity), -Quantity * QuantityPer, ItemLedgerEntry.TableCaption()));
     end;
 
     local procedure Initialize()
@@ -4680,31 +4419,31 @@ codeunit 137083 "SCM Production Orders IV"
         Assert.AreEqual(
             StandardCost,
             Item."Standard Cost",
-            StrSubstNo(ItemMustBeEqualErr, Item.FieldCaption("Standard Cost"), StandardCost, Item."No.", Item.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, Item.FieldCaption("Standard Cost"), StandardCost, Item."No.", Item.TableCaption()));
         Assert.AreEqual(
             SLNonInvMatCost,
             Item."Single-Lvl Mat. Non-Invt. Cost",
-            StrSubstNo(ItemMustBeEqualErr, Item.FieldCaption("Single-Lvl Mat. Non-Invt. Cost"), SLNonInvMatCost, Item."No.", Item.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, Item.FieldCaption("Single-Lvl Mat. Non-Invt. Cost"), SLNonInvMatCost, Item."No.", Item.TableCaption()));
         Assert.AreEqual(
             RUNonInvMatCost,
             Item."Rolled-up Mat. Non-Invt. Cost",
-            StrSubstNo(ItemMustBeEqualErr, Item.FieldCaption("Rolled-up Mat. Non-Invt. Cost"), RUNonInvMatCost, Item."No.", Item.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, Item.FieldCaption("Rolled-up Mat. Non-Invt. Cost"), RUNonInvMatCost, Item."No.", Item.TableCaption()));
         Assert.AreEqual(
             SLMatCost,
             Item."Single-Level Material Cost",
-            StrSubstNo(ItemMustBeEqualErr, Item.FieldCaption("Single-Level Material Cost"), SLMatCost, Item."No.", Item.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, Item.FieldCaption("Single-Level Material Cost"), SLMatCost, Item."No.", Item.TableCaption()));
         Assert.AreEqual(
             RUMatCost,
             Item."Rolled-up Material Cost",
-            StrSubstNo(ItemMustBeEqualErr, Item.FieldCaption("Rolled-up Material Cost"), RUMatCost, Item."No.", Item.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, Item.FieldCaption("Rolled-up Material Cost"), RUMatCost, Item."No.", Item.TableCaption()));
         Assert.AreEqual(
             SLMfgOvhdCost,
             Item."Single-Level Mfg. Ovhd Cost",
-            StrSubstNo(ItemMustBeEqualErr, Item.FieldCaption("Single-Level Mfg. Ovhd Cost"), SLMfgOvhdCost, Item."No.", Item.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, Item.FieldCaption("Single-Level Mfg. Ovhd Cost"), SLMfgOvhdCost, Item."No.", Item.TableCaption()));
         Assert.AreEqual(
             RUMfgOvhdCost,
             Item."Rolled-up Mfg. Ovhd Cost",
-            StrSubstNo(ItemMustBeEqualErr, Item.FieldCaption("Rolled-up Mfg. Ovhd Cost"), RUMfgOvhdCost, Item."No.", Item.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, Item.FieldCaption("Rolled-up Mfg. Ovhd Cost"), RUMfgOvhdCost, Item."No.", Item.TableCaption()));
     end;
 
     local procedure VerifyCostFieldsInSKU(SKU: Record "Stockkeeping Unit"; StandardCost: Decimal; SLMatCost: Decimal; RUMatCost: Decimal; SLNonInvMatCost: Decimal; RUNonInvMatCost: Decimal; SLMfgOvhdCost: Decimal; RUMfgOvhdCost: Decimal)
@@ -4712,31 +4451,31 @@ codeunit 137083 "SCM Production Orders IV"
         Assert.AreEqual(
             StandardCost,
             SKU."Standard Cost",
-            StrSubstNo(ItemMustBeEqualErr, SKU.FieldCaption("Standard Cost"), StandardCost, SKU."Item No.", SKU.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, SKU.FieldCaption("Standard Cost"), StandardCost, SKU."Item No.", SKU.TableCaption()));
         Assert.AreEqual(
             SLNonInvMatCost,
             SKU."Single-Lvl Mat. Non-Invt. Cost",
-            StrSubstNo(ItemMustBeEqualErr, SKU.FieldCaption("Single-Lvl Mat. Non-Invt. Cost"), SLNonInvMatCost, SKU."Item No.", SKU.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, SKU.FieldCaption("Single-Lvl Mat. Non-Invt. Cost"), SLNonInvMatCost, SKU."Item No.", SKU.TableCaption()));
         Assert.AreEqual(
             RUNonInvMatCost,
             SKU."Rolled-up Mat. Non-Invt. Cost",
-            StrSubstNo(ItemMustBeEqualErr, SKU.FieldCaption("Rolled-up Mat. Non-Invt. Cost"), RUNonInvMatCost, SKU."Item No.", SKU.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, SKU.FieldCaption("Rolled-up Mat. Non-Invt. Cost"), RUNonInvMatCost, SKU."Item No.", SKU.TableCaption()));
         Assert.AreEqual(
             SLMatCost,
             SKU."Single-Level Material Cost",
-            StrSubstNo(ItemMustBeEqualErr, SKU.FieldCaption("Single-Level Material Cost"), SLMatCost, SKU."Item No.", SKU.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, SKU.FieldCaption("Single-Level Material Cost"), SLMatCost, SKU."Item No.", SKU.TableCaption()));
         Assert.AreEqual(
             RUMatCost,
             SKU."Rolled-up Material Cost",
-            StrSubstNo(ItemMustBeEqualErr, SKU.FieldCaption("Rolled-up Material Cost"), RUMatCost, SKU."Item No.", SKU.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, SKU.FieldCaption("Rolled-up Material Cost"), RUMatCost, SKU."Item No.", SKU.TableCaption()));
         Assert.AreEqual(
             SLMfgOvhdCost,
             SKU."Single-Level Mfg. Ovhd Cost",
-            StrSubstNo(ItemMustBeEqualErr, SKU.FieldCaption("Single-Level Mfg. Ovhd Cost"), SLMfgOvhdCost, SKU."Item No.", SKU.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, SKU.FieldCaption("Single-Level Mfg. Ovhd Cost"), SLMfgOvhdCost, SKU."Item No.", SKU.TableCaption()));
         Assert.AreEqual(
             RUMfgOvhdCost,
             SKU."Rolled-up Mfg. Ovhd Cost",
-            StrSubstNo(ItemMustBeEqualErr, SKU.FieldCaption("Rolled-up Mfg. Ovhd Cost"), RUMfgOvhdCost, SKU."Item No.", SKU.TableCaption()));
+            StrSubstNo(EntryMustBeEqualErr, SKU.FieldCaption("Rolled-up Mfg. Ovhd Cost"), RUMfgOvhdCost, SKU."Item No.", SKU.TableCaption()));
     end;
 
     local procedure RunBOMCostSharesReport(Item: Record Item; ShowLevel: Option; ShowDetails: Boolean; ShowCostShare: Option)
@@ -4976,27 +4715,6 @@ codeunit 137083 "SCM Production Orders IV"
         ItemLedgerEntry.SetRange("Item No.", ItemNo);
         ItemLedgerEntry.SetRange("Location Code", LocationCode);
         ItemLedgerEntry.FindFirst();
-    end;
-
-    local procedure UpdateRoutingLinkCodeInProdBOMAndRouting(Item: Record Item; ChildItem: Record Item; RoutingLinkCode: Code[10])
-    var
-        RoutingLine: Record "Routing Line";
-        ProdBOMLine: Record "Production BOM Line";
-    begin
-        FindProdBOMLine(ProdBOMLine, Item."Production BOM No.", ChildItem."No.");
-        FindRoutingLine(RoutingLine, Item."Routing No.", ProdBOMLine."Routing Link Code");
-        RoutingLine."Routing Link Code" := RoutingLinkCode;
-        RoutingLine.Modify();
-
-        ProdBOMLine."Routing Link Code" := RoutingLinkCode;
-        ProdBOMLine.Modify();
-    end;
-
-    local procedure FindRoutingLine(var RoutingLine: Record "Routing Line"; RoutingNo: Code[20]; RoutingLinkCode: Code[10]);
-    begin
-        RoutingLine.SetRange("Routing No.", RoutingNo);
-        RoutingLine.SetRange("Routing Link Code", RoutingLinkCode);
-        RoutingLine.FindFirst();
     end;
 
     [ConfirmHandler]
