@@ -295,8 +295,6 @@ codeunit 367 CheckManagement
                             end;
                             GenJnlLine2."Journal Template Name" := BankAccLedgEntry2."Journal Templ. Name";
                             GenJnlLine2."Journal Batch Name" := BankAccLedgEntry2."Journal Batch Name";
-                            if GenJnlLine2."Posting Group" <> VendorLedgEntry."Vendor Posting Group" then
-                                GenJnlLine2."Posting Group" := VendorLedgEntry."Vendor Posting Group";
                             OnFinancialVoidCheckOnBeforePostBalAccLine(GenJnlLine2, CheckLedgEntry);
                             GenJnlPostLine.RunWithCheck(GenJnlLine2);
                             OnFinancialVoidCheckOnAfterPostBalAccLine(GenJnlLine2, CheckLedgEntry, GenJnlPostLine);
@@ -951,7 +949,7 @@ codeunit 367 CheckManagement
 
     local procedure ShouldClearApplnVendorLedgerEntries(GenJournalLine: Record "Gen. Journal Line"): Boolean
     begin
-        exit(GenJournalLine."Applies-to ID" = '');
+        exit((GenJournalLine."Applies-to ID" = '') or (GenJournalLine."Applies-to Doc. Type" <> GenJournalLine."Applies-to Doc. Type"::Invoice));
     end;
 
     [IntegrationEvent(false, false)]
