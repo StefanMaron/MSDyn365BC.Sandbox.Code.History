@@ -1896,10 +1896,11 @@ page 46 "Sales Order Subform"
 
     local procedure SetOpenPage()
     var
+        [SecurityFiltering(SecurityFilter::Filtered)]
+        Location: Record Location;
         ServerSetting: Codeunit "Server Setting";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
-        Location: Record Location;
     begin
         OnBeforeSetOpenPage();
 
@@ -2215,7 +2216,7 @@ page 46 "Sales Order Subform"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCalculateTotals(Rec, IsHandled, DocumentTotals);
+        OnBeforeCalculateTotals(Rec, IsHandled, DocumentTotals, SuppressTotals);
         if IsHandled then
             exit;
 
@@ -2436,7 +2437,7 @@ page 46 "Sales Order Subform"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalculateTotals(var SalesLine: Record "Sales Line"; var IsHandled: Boolean; var DocumentTotals: Codeunit "Document Totals")
+    local procedure OnBeforeCalculateTotals(var SalesLine: Record "Sales Line"; var IsHandled: Boolean; var DocumentTotals: Codeunit "Document Totals"; var SuppressTotals: Boolean)
     begin
     end;
 

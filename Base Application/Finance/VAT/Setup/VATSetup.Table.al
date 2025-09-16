@@ -55,7 +55,7 @@ table 189 "VAT Setup"
         }
         field(5; "Use For Job Cost"; Boolean)
         {
-            Caption = 'Use For Job Cost';
+            Caption = 'Use For Project Cost';
         }
         field(10; "Show Non-Ded. VAT In Lines"; Boolean)
         {
@@ -63,7 +63,7 @@ table 189 "VAT Setup"
         }
         field(11; "Non-Deductible VAT Is Enabled"; Boolean)
         {
-            Caption = 'Show Non-Ded. VAT In Lines';
+            Caption = 'Non-Deductible VAT Is Enabled';
             Editable = false;
         }
         field(12; "Allow VAT Date From"; Date)
@@ -97,6 +97,10 @@ table 189 "VAT Setup"
         field(23; "Ship-To Alt. Cust. VAT Reg."; Enum "Ship-To Alt. Cust. VAT Reg.")
         {
             Caption = 'Ship-To Alt. Cust. VAT Reg.';
+        }
+        field(24; "Per Activity Code Settl. Entry"; Boolean)
+        {
+            Caption = 'Per Activity Code Settlement Entry';
         }
     }
 
