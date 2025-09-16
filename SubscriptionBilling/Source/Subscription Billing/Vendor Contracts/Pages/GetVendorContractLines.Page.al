@@ -101,7 +101,7 @@ page 8095 "Get Vendor Contract Lines"
                     trigger OnValidate()
                     begin
                         Rec.Selected := true;
-                        Evaluate(Rec."Billing Base Period", Format(BillingToDate - Rec."Next Billing Date" + 1) + 'D');
+                        Evaluate(Rec."Billing Base Period", '<' + Format(BillingToDate - Rec."Next Billing Date" + 1) + 'D>');
                         Rec."Billing Rhythm" := Rec."Billing Base Period";
                     end;
                 }
@@ -341,7 +341,7 @@ page 8095 "Get Vendor Contract Lines"
         Rec.Validate(Amount, VendorInvoiceAmount);
     end;
 
-    internal procedure TestPurchaseDocument(PurchaseHeader: Record "Purchase Header")
+    local procedure TestPurchaseDocument(PurchaseHeader: Record "Purchase Header")
     begin
         PurchaseHeader.TestField("Document Type", PurchaseHeader."Document Type"::Invoice);
         PurchaseHeader.TestField(Status, PurchaseHeader.Status::Open);
