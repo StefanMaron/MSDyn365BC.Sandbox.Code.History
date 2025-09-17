@@ -1585,7 +1585,6 @@ report 20 "Calc. and Post VAT Settlement"
 
     local procedure CloseVATEntriesOnPostSettlement(var VATEntry: Record "VAT Entry"; NextVATEntryNo: Integer)
     var
-        VATEntry2: Record "VAT Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1593,17 +1592,12 @@ report 20 "Calc. and Post VAT Settlement"
         if IsHandled then
             exit;
 
-        VATEntry2.ReadIsolation := IsolationLevel::UpdLock;
-        if VATEntry.FindSet() then
-            repeat
-                if ((VATEntry.Closed <> true) or (VATEntry."Closed by Entry No." <> NextVATEntryNo) or (VATEntry."VAT Period" <> VATPeriod)) then begin
-                    VATEntry2.Copy(VATEntry);
-                    VATEntry2."Closed by Entry No." := NextVATEntryNo;
-                    VATEntry2.Closed := true;
-                    VATEntry2."VAT Period" := VATPeriod;
-                    VATEntry2.Modify();
-                end;
-            until VATEntry.Next() = 0;
+        VATEntry.ModifyAll("Closed by Entry No.", NextVATEntryNo);
+        VATEntry.ModifyAll(Closed, true);
+
+        VATEntry.SetRange(Closed, true);
+        VATEntry.ModifyAll("VAT Period", VATPeriod);
+        VATEntry.SetRange(Closed, false);
     end;
 
     local procedure IsNotSettlement(GenPostingType: Enum "General Posting Type"): Boolean
