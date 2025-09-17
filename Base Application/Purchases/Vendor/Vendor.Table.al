@@ -2394,19 +2394,15 @@ table 23 Vendor
     procedure SelectVendor(var Vendor: Record Vendor): Boolean
     var
         VendorLookup: Page "Vendor Lookup";
-        PreviousVendorCode: Code[20];
         Result: Boolean;
     begin
         VendorLookup.SetTableView(Vendor);
         VendorLookup.SetRecord(Vendor);
         VendorLookup.LookupMode := true;
-        PreviousVendorCode := Vendor."No.";
-
-        VendorLookup.RunModal();
-        VendorLookup.GetRecord(Vendor);
-        Result := Vendor."No." <> PreviousVendorCode;
-
-        if not Result then
+        Result := VendorLookup.RunModal() = ACTION::LookupOK;
+        if Result then
+            VendorLookup.GetRecord(Vendor)
+        else
             Clear(Vendor);
 
         exit(Result);
