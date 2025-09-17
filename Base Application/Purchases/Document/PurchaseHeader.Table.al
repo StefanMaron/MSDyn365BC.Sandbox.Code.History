@@ -194,14 +194,13 @@ table 38 "Purchase Header"
                     Rec.RecallModifyAddressNotification(GetModifyVendorAddressNotificationId());
                     if Rec."Remit-to Code" <> '' then
                         Rec.Validate("Remit-to Code", '');
-                end else
-                    SelectDefaultRemitAddress(Rec);
+                end;
             end;
         }
         field(3; "No."; Code[20])
         {
             Caption = 'No.';
-
+            
             trigger OnValidate()
             begin
                 if "No." <> xRec."No." then begin
@@ -313,7 +312,7 @@ table 38 "Purchase Header"
         field(5; "Pay-to Name"; Text[100])
         {
             Caption = 'Pay-to Name';
-            TableRelation = Vendor.Name;
+                        TableRelation = Vendor.Name;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -341,11 +340,11 @@ table 38 "Purchase Header"
         field(6; "Pay-to Name 2"; Text[50])
         {
             Caption = 'Pay-to Name 2';
-        }
+                    }
         field(7; "Pay-to Address"; Text[100])
         {
             Caption = 'Pay-to Address';
-
+            
             trigger OnValidate()
             begin
                 ModifyPayToVendorAddress();
@@ -354,7 +353,7 @@ table 38 "Purchase Header"
         field(8; "Pay-to Address 2"; Text[50])
         {
             Caption = 'Pay-to Address 2';
-
+            
             trigger OnValidate()
             begin
                 ModifyPayToVendorAddress();
@@ -363,7 +362,7 @@ table 38 "Purchase Header"
         field(9; "Pay-to City"; Text[30])
         {
             Caption = 'Pay-to City';
-            TableRelation = if ("Pay-to Country/Region Code" = const('')) "Post Code".City
+                        TableRelation = if ("Pay-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Pay-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Pay-to Country/Region Code"));
             ValidateTableRelation = false;
@@ -388,7 +387,7 @@ table 38 "Purchase Header"
         field(10; "Pay-to Contact"; Text[100])
         {
             Caption = 'Pay-to Contact';
-
+            
             trigger OnLookup()
             var
                 Contact: Record Contact;
@@ -408,7 +407,7 @@ table 38 "Purchase Header"
         field(11; "Your Reference"; Text[35])
         {
             Caption = 'Your Reference';
-        }
+                    }
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
@@ -462,23 +461,23 @@ table 38 "Purchase Header"
         field(13; "Ship-to Name"; Text[100])
         {
             Caption = 'Ship-to Name';
-        }
+                    }
         field(14; "Ship-to Name 2"; Text[50])
         {
             Caption = 'Ship-to Name 2';
-        }
+                    }
         field(15; "Ship-to Address"; Text[100])
         {
             Caption = 'Ship-to Address';
-        }
+                    }
         field(16; "Ship-to Address 2"; Text[50])
         {
             Caption = 'Ship-to Address 2';
-        }
+                    }
         field(17; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
-            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
+                        TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
             else
             if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
@@ -502,7 +501,7 @@ table 38 "Purchase Header"
         field(18; "Ship-to Contact"; Text[100])
         {
             Caption = 'Ship-to Contact';
-        }
+                    }
         field(19; "Order Date"; Date)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
@@ -605,7 +604,7 @@ table 38 "Purchase Header"
         field(22; "Posting Description"; Text[100])
         {
             Caption = 'Posting Description';
-        }
+                    }
         field(23; "Payment Terms Code"; Code[10])
         {
             Caption = 'Payment Terms Code';
@@ -922,7 +921,7 @@ table 38 "Purchase Header"
         field(42; "Format Region"; Text[80])
         {
             Caption = 'Format Region';
-            TableRelation = "Language Selection"."Language Tag";
+                        TableRelation = "Language Selection"."Language Tag";
         }
         field(43; "Purchaser Code"; Code[20])
         {
@@ -1199,7 +1198,7 @@ table 38 "Purchase Header"
         field(70; "VAT Registration No."; Text[20])
         {
             Caption = 'VAT Registration No.';
-        }
+                    }
         field(72; "Sell-to Customer No."; Code[20])
         {
             Caption = 'Sell-to Customer No.';
@@ -1287,7 +1286,7 @@ table 38 "Purchase Header"
         field(79; "Buy-from Vendor Name"; Text[100])
         {
             Caption = 'Buy-from Vendor Name';
-            TableRelation = Vendor.Name;
+                        TableRelation = Vendor.Name;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -1333,11 +1332,11 @@ table 38 "Purchase Header"
         field(80; "Buy-from Vendor Name 2"; Text[50])
         {
             Caption = 'Buy-from Vendor Name 2';
-        }
+                    }
         field(81; "Buy-from Address"; Text[100])
         {
             Caption = 'Buy-from Address';
-
+            
             trigger OnValidate()
             begin
                 UpdatePayToAddressFromBuyFromAddress(FieldNo("Pay-to Address"));
@@ -1347,7 +1346,7 @@ table 38 "Purchase Header"
         field(82; "Buy-from Address 2"; Text[50])
         {
             Caption = 'Buy-from Address 2';
-
+            
             trigger OnValidate()
             begin
                 UpdatePayToAddressFromBuyFromAddress(FieldNo("Pay-to Address 2"));
@@ -1357,7 +1356,7 @@ table 38 "Purchase Header"
         field(83; "Buy-from City"; Text[30])
         {
             Caption = 'Buy-from City';
-            TableRelation = if ("Buy-from Country/Region Code" = const('')) "Post Code".City
+                        TableRelation = if ("Buy-from Country/Region Code" = const('')) "Post Code".City
             else
             if ("Buy-from Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Buy-from Country/Region Code"));
             ValidateTableRelation = false;
@@ -1389,7 +1388,7 @@ table 38 "Purchase Header"
         field(84; "Buy-from Contact"; Text[100])
         {
             Caption = 'Buy-from Contact';
-
+            
             trigger OnLookup()
             begin
                 LookupBuyFromContact();
@@ -1429,7 +1428,7 @@ table 38 "Purchase Header"
         {
             CaptionClass = '5,6,' + "Pay-to Country/Region Code";
             Caption = 'Pay-to County';
-
+            
             trigger OnValidate()
             begin
                 ModifyPayToVendorAddress();
@@ -1482,7 +1481,7 @@ table 38 "Purchase Header"
         {
             CaptionClass = '5,5,' + "Buy-from Country/Region Code";
             Caption = 'Buy-from County';
-
+            
             trigger OnValidate()
             begin
                 UpdatePayToAddressFromBuyFromAddress(FieldNo("Pay-to County"));
@@ -1539,7 +1538,7 @@ table 38 "Purchase Header"
         {
             CaptionClass = '5,4,' + "Ship-to Country/Region Code";
             Caption = 'Ship-to County';
-        }
+                    }
         field(93; "Ship-to Country/Region Code"; Code[10])
         {
             Caption = 'Ship-to Country/Region Code';
@@ -1880,7 +1879,7 @@ table 38 "Purchase Header"
         field(127; "IC Reference Document No."; Code[20])
         {
             Caption = 'IC Reference Document No.';
-            Editable = false;
+                        Editable = false;
         }
         field(129; "IC Direction"; Enum "IC Direction Type")
         {
@@ -1931,14 +1930,7 @@ table 38 "Purchase Header"
             TableRelation = "No. Series";
 
             trigger OnLookup()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeLookupPrepmtNoSeries(Rec, xRec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 PurchHeader := Rec;
                 GetPurchSetup();
                 PurchSetup.TestField("Posted Prepmt. Inv. Nos.");
@@ -1948,14 +1940,7 @@ table 38 "Purchase Header"
             end;
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidatePrepmtNoSeries(Rec, xRec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if "Prepayment No. Series" <> '' then begin
                     GetPurchSetup();
                     PurchSetup.TestField("Posted Prepmt. Inv. Nos.");
@@ -2015,7 +2000,7 @@ table 38 "Purchase Header"
         field(139; "Prepmt. Posting Description"; Text[100])
         {
             Caption = 'Prepmt. Posting Description';
-        }
+                    }
         field(142; "Prepmt. Pmt. Discount Date"; Date)
         {
             Caption = 'Prepmt. Pmt. Discount Date';
@@ -2168,7 +2153,7 @@ table 38 "Purchase Header"
         field(210; "Ship-to Phone No."; Text[30])
         {
             Caption = 'Ship-to Phone No.';
-            ExtendedDatatype = PhoneNo;
+                        ExtendedDatatype = PhoneNo;
         }
         field(300; "A. Rcd. Not Inv. Ex. VAT (LCY)"; Decimal)
         {
@@ -2566,7 +2551,7 @@ table 38 "Purchase Header"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Doc. Amount Incl. VAT';
-            ToolTip = 'Specifies the total amount (including VAT) of the purchase invoice or credit memo as specified in the external document. When this value comes from an e-document service, it''s value can''t be changed.';
+            ToolTip = 'Specifies the total amount (including VAT) of the purchase invoice or credit memo.';
 
             trigger OnValidate()
             var
@@ -2593,7 +2578,7 @@ table 38 "Purchase Header"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Doc. Amount VAT';
-            ToolTip = 'Specifies the VAT amount of the purchase invoice or credit memo as specified in the external document. When this values comes from an e-document service, it''s value can''t be changed.';
+            ToolTip = 'Specifies the VAT amount of the purchase invoice or credit memo.';
 
             trigger OnValidate()
             var
@@ -2713,7 +2698,7 @@ table 38 "Purchase Header"
         ShowPostedDocsToPrint :=
             (PurchRcptHeader."No." <> '') or (PurchInvHeader."No." <> '') or (PurchCrMemoHeader."No." <> '') or
            (ReturnShptHeader."No." <> '') or (PurchInvHeaderPrepmt."No." <> '') or (PurchCrMemoHeaderPrepmt."No." <> '');
-        OnBeforeShowPostedDocsToPrintCreatedMsg(ShowPostedDocsToPrint, HideValidationDialog, Rec);
+        OnBeforeShowPostedDocsToPrintCreatedMsg(ShowPostedDocsToPrint, HideValidationDialog);
         if ShowPostedDocsToPrint then
             Message(PostedDocsToPrintCreatedMsg);
     end;
@@ -4197,12 +4182,8 @@ table 38 "Purchase Header"
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         OldDimSetID: Integer;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode, IsHandled);
-        if IsHandled then
-            exit;
+        OnBeforeValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode);
 
         OldDimSetID := "Dimension Set ID";
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
@@ -5469,7 +5450,6 @@ table 38 "Purchase Header"
         exit(false);
     end;
 
-#if not CLEAN26
     local procedure GetStatisticsPageID(): Integer
     begin
         if IsOrderDocument() then
@@ -5477,7 +5457,7 @@ table 38 "Purchase Header"
 
         exit(PAGE::"Purchase Statistics");
     end;
-#endif
+
     [IntegrationEvent(true, false)]
     procedure OnCheckPurchasePostRestrictions()
     begin
@@ -7603,30 +7583,6 @@ table 38 "Purchase Header"
             until PurchaseHeader.Next() = 0;
     end;
 
-    procedure UpdatePurchaseOrderLineIfExist()
-    var
-        PurchaseInvHeader: Record "Purch. Inv. Header";
-        PurchaseCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
-        CorrectPostedPurchInvoice: Codeunit "Correct Posted Purch. Invoice";
-        IsHandled: Boolean;
-    begin
-        PurchaseInvHeader.SetLoadFields("No.");
-        if (not PurchaseInvHeader.Get(Rec."Applies-to Doc. No.")) and (Rec."Applies-to ID" = '') then
-            exit;
-
-        PurchaseCrMemoHeader.SetLoadFields("Pre-Assigned No.");
-        PurchaseCrMemoHeader.SetRange("Pre-Assigned No.", Rec."No.");
-        if not PurchaseCrMemoHeader.FindFirst() then
-            exit;
-
-        IsHandled := false;
-        OnBeforeUpdatePurchaseOrderLineIfExist(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
-        CorrectPostedPurchInvoice.UpdatePurchaseOrderLineIfExist(PurchaseCrMemoHeader."No.");
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var PurchaseHeader: Record "Purchase Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
@@ -8281,7 +8237,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateShortcutDimCode(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header"; FieldNumber: Integer; var ShortcutDimCode: Code[20]; var IsHandled: Boolean)
+    local procedure OnBeforeValidateShortcutDimCode(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header"; FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
     end;
 
@@ -8386,7 +8342,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowPostedDocsToPrintCreatedMsg(var ShowPostedDocsToPrint: Boolean; HideValidationDialog: Boolean; var PurchaseHeader: Record "Purchase Header")
+    local procedure OnBeforeShowPostedDocsToPrintCreatedMsg(var ShowPostedDocsToPrint: Boolean; HideValidationDialog: Boolean)
     begin
     end;
 
@@ -9035,21 +8991,6 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckIsTotalValid(IncomingDocument: Record "Incoming Document"; PurchaseHeader: Record "Purchase Header"; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeLookupPrepmtNoSeries(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidatePrepmtNoSeries(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdatePurchaseOrderLineIfExist(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 }
