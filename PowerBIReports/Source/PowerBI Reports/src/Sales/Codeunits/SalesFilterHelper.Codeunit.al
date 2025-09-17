@@ -13,6 +13,7 @@ codeunit 36960 "Sales Filter Helper"
         RelativeFilterLbl: Label '%1..', Locked = true;
         FilterTxt: Text;
     begin
+        Clear(FilterTxt);
         if PBISetup.Get() then
             case PBISetup."Item Sales Load Date Type" of
                 PBISetup."Item Sales Load Date Type"::"Start/End Date":
