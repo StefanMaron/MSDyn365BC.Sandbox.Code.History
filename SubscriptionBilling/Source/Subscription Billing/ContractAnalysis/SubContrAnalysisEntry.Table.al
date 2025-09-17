@@ -260,7 +260,6 @@ table 8019 "Sub. Contr. Analysis Entry"
         {
             Caption = 'Subscription Source No.';
         }
-#if not CLEANSCHEMA29
         field(8009; "Service Object Item No."; Code[20])
         {
             Caption = 'Subscription Item No.';
@@ -273,7 +272,6 @@ table 8019 "Sub. Contr. Analysis Entry"
             ObsoleteTag = '29.0';
 #endif
         }
-#endif
         field(8010; "Subscription Description"; Text[100])
         {
             Caption = 'Subscription Description';

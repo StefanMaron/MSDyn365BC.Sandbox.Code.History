@@ -10,9 +10,8 @@ using Microsoft.eServices.EDocument.Processing.Import.Purchase;
 page 6184 "E-Doc. Read. Purch. Lines"
 {
     ApplicationArea = Basic, Suite;
-    Caption = 'Received purchase document line data';
+    Caption = 'Lines';
     SourceTable = "E-Document Purchase Line";
-    SourceTableTemporary = true;
     Editable = false;
     Extensible = false;
     PageType = ListPart;
@@ -76,16 +75,5 @@ page 6184 "E-Doc. Read. Purch. Lines"
             }
         }
     }
-
-    internal procedure SetBuffer(var EDocumentPurchaseLine: Record "E-Document Purchase Line" temporary)
-    begin
-        Rec.DeleteAll();
-        if EDocumentPurchaseLine.FindSet() then
-            repeat
-                Rec := EDocumentPurchaseLine;
-                Rec.Insert();
-            until EDocumentPurchaseLine.Next() = 0;
-        if Rec.FindFirst() then;
-    end;
 }
 #pragma warning restore AS0050

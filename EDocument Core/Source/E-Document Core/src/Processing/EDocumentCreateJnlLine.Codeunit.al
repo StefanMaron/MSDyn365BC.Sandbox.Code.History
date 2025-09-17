@@ -13,9 +13,6 @@ using Microsoft.Purchases.Setup;
 
 codeunit 6137 "E-Document Create Jnl. Line"
 {
-
-    Permissions = tabledata "Gen. Journal Line" = imd;
-
     trigger OnRun()
     begin
         CreateGeneralJournalLine(SourceEDocument, CreatedJnlLine);
