@@ -2478,7 +2478,22 @@ table 18 Customer
     begin
         Clear(PrimaryContact);
         if Customer.Get(CustomerNo) then
-            if PrimaryContact.Get(Customer."Primary Contact No.") then;
+            if not PrimaryContact.Get(Customer."Primary Contact No.") then
+                GetContact(CustomerNo, PrimaryContact);
+    end;
+
+    local procedure GetContact(CustomerNo: Code[20]; var PrimaryContact: Record Contact)
+    var
+        ContactBusinessRelation: Record "Contact Business Relation";
+    begin
+        ContactBusinessRelation.SetCurrentKey("Link to Table", "No.");
+        ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
+        ContactBusinessRelation.SetRange("No.", CustomerNo);
+        if ContactBusinessRelation.FindSet() then
+            repeat
+                if PrimaryContact.Get(ContactBusinessRelation."Contact No.") then
+                    exit;
+            until ContactBusinessRelation.Next() = 0;
     end;
 
     local procedure GetCustomerPriceGroupPriceCalcMethod(): Enum "Price Calculation Method";
@@ -2524,32 +2539,30 @@ table 18 Customer
     var
         [SecurityFiltering(SecurityFilter::Filtered)]
         SalesLine: Record "Sales Line";
-        SalesInvoiceOutstandingAmountLCYForInvoicingShippedOrders: Decimal;
+        SalesOutstandingAmountFromShipment: Decimal;
         InvoicedPrepmtAmountLCY: Decimal;
         RetRcdNotInvAmountLCY: Decimal;
         AdditionalAmountLCY: Decimal;
         IsHandled: Boolean;
         TotalAmountLCY: Decimal;
+        ShippedFromOrderLCY: Decimal;
+        ShippedOutstandingInvoicesLCY: Decimal;
     begin
         IsHandled := false;
         OnBeforeGetTotalAmountLCYCommon(Rec, AdditionalAmountLCY, IsHandled);
         if IsHandled then
             exit(AdditionalAmountLCY);
 
-        // Sum up "Outstanding Amount (LCY)" of sales invoices for invoicing shipped orders. This amount is already included in "Shipped Not Invoiced (LCY)", and should be subtracted from outstanding invoices.
-        SalesInvoiceOutstandingAmountLCYForInvoicingShippedOrders := SalesLine.OutstandingInvoiceAmountFromShipment("No.");
-
+        SalesOutstandingAmountFromShipment := SalesLine.OutstandingInvoiceAmountFromShipment("No.");
         InvoicedPrepmtAmountLCY := GetInvoicedPrepmtAmountLCY();
         RetRcdNotInvAmountLCY := GetReturnRcdNotInvAmountLCY();
+        ShippedFromOrderLCY := GetShippedFromOrderLCYAmountLCY();
+        ShippedOutstandingInvoicesLCY := GetShippedOutstandingInvoicesAmountLCY();
 
         TotalAmountLCY :=
-            "Balance (LCY)"
-            + "Outstanding Orders (LCY)"
-            + "Shipped Not Invoiced (LCY)"
-            + "Outstanding Invoices (LCY)" - SalesInvoiceOutstandingAmountLCYForInvoicingShippedOrders
-            - InvoicedPrepmtAmountLCY
-            - RetRcdNotInvAmountLCY
-            + AdditionalAmountLCY;
+            "Balance (LCY)" + "Outstanding Orders (LCY)" + ("Shipped Not Invoiced (LCY)" - ShippedFromOrderLCY) +
+            ("Outstanding Invoices (LCY)" - ShippedOutstandingInvoicesLCY) + SalesOutstandingAmountFromShipment -
+            InvoicedPrepmtAmountLCY - RetRcdNotInvAmountLCY + AdditionalAmountLCY;
 
         OnAfterGetTotalAmountLCYCommon(Rec, TotalAmountLCY);
         exit(TotalAmountLCY);
