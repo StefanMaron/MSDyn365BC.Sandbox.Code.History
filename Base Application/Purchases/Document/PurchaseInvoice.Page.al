@@ -333,7 +333,6 @@ page 51 "Purchase Invoice"
                     BlankZero = true;
                     Enabled = DocAmountEnable;
                     Visible = DocAmountEnable;
-                    Editable = DocAmountsEditable;
                     ShowMandatory = true;
                 }
                 field(DocAmountVAT; Rec."Doc. Amount VAT")
@@ -341,7 +340,6 @@ page 51 "Purchase Invoice"
                     ApplicationArea = Basic, Suite;
                     Enabled = DocAmountEnable;
                     Visible = DocAmountEnable;
-                    Editable = DocAmountsEditable;
                 }
                 field("Job Queue Status"; Rec."Job Queue Status")
                 {
@@ -1854,6 +1852,7 @@ page 51 "Purchase Invoice"
         ShowShippingOptionsWithLocation := ApplicationAreaMgmtFacade.IsLocationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled();
 
         IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
+        DocAmountEnable := PurchSetup."Check Doc. Total Amounts";
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1880,8 +1879,6 @@ page 51 "Purchase Invoice"
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
-        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
-        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetDocNoVisible();
         IsOfficeAddin := OfficeMgt.IsAvailable();
         CreateIncomingDocFromEmailAttachment := OfficeMgt.OCRAvailable();
@@ -1977,7 +1974,7 @@ page 51 "Purchase Invoice"
         IsPurchaseLinesEditable: Boolean;
         RejectICPurchaseInvoiceEnabled: Boolean;
         VATDateEnabled: Boolean;
-        DocAmountEnable, DocAmountsEditable : Boolean;
+        DocAmountEnable: Boolean;
 
     protected var
         ShipToOptions: Option "Default (Company Address)",Location,"Custom Address";
@@ -2142,8 +2139,6 @@ page 51 "Purchase Invoice"
         WorkflowWebhookMgt: Codeunit "Workflow Webhook Management";
     begin
         HasIncomingDocument := Rec."Incoming Document Entry No." <> 0;
-        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
-        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetExtDocNoMandatoryCondition();
         SetPostingGroupEditable();
 
