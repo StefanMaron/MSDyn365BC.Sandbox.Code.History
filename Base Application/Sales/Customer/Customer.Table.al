@@ -2380,30 +2380,32 @@ table 18 Customer
     var
         [SecurityFiltering(SecurityFilter::Filtered)]
         SalesLine: Record "Sales Line";
-        SalesOutstandingAmountFromShipment: Decimal;
+        SalesInvoiceOutstandingAmountLCYForInvoicingShippedOrders: Decimal;
         InvoicedPrepmtAmountLCY: Decimal;
         RetRcdNotInvAmountLCY: Decimal;
         AdditionalAmountLCY: Decimal;
         IsHandled: Boolean;
         TotalAmountLCY: Decimal;
-        ShippedFromOrderLCY: Decimal;
-        ShippedOutstandingInvoicesLCY: Decimal;
     begin
         IsHandled := false;
         OnBeforeGetTotalAmountLCYCommon(Rec, AdditionalAmountLCY, IsHandled);
         if IsHandled then
             exit(AdditionalAmountLCY);
 
-        SalesOutstandingAmountFromShipment := SalesLine.OutstandingInvoiceAmountFromShipment("No.");
+        // Sum up "Outstanding Amount (LCY)" of sales invoices for invoicing shipped orders. This amount is already included in "Shipped Not Invoiced (LCY)", and should be subtracted from outstanding invoices.
+        SalesInvoiceOutstandingAmountLCYForInvoicingShippedOrders := SalesLine.OutstandingInvoiceAmountFromShipment("No.");
+
         InvoicedPrepmtAmountLCY := GetInvoicedPrepmtAmountLCY();
         RetRcdNotInvAmountLCY := GetReturnRcdNotInvAmountLCY();
-        ShippedFromOrderLCY := GetShippedFromOrderLCYAmountLCY();
-        ShippedOutstandingInvoicesLCY := GetShippedOutstandingInvoicesAmountLCY();
 
         TotalAmountLCY :=
-            "Balance (LCY)" + "Outstanding Orders (LCY)" + ("Shipped Not Invoiced (LCY)" - ShippedFromOrderLCY) +
-            ("Outstanding Invoices (LCY)" - ShippedOutstandingInvoicesLCY) + SalesOutstandingAmountFromShipment -
-            InvoicedPrepmtAmountLCY - RetRcdNotInvAmountLCY + AdditionalAmountLCY;
+            "Balance (LCY)"
+            + "Outstanding Orders (LCY)"
+            + "Shipped Not Invoiced (LCY)"
+            + "Outstanding Invoices (LCY)" - SalesInvoiceOutstandingAmountLCYForInvoicingShippedOrders
+            - InvoicedPrepmtAmountLCY
+            - RetRcdNotInvAmountLCY
+            + AdditionalAmountLCY;
 
         OnAfterGetTotalAmountLCYCommon(Rec, TotalAmountLCY);
         exit(TotalAmountLCY);
