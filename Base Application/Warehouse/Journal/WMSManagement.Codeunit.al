@@ -215,10 +215,8 @@ codeunit 7302 "WMS Management"
                                 GetBin(WarehouseJournalLine."Location Code", WarehouseJournalLine."To Bin Code");
                                 Bin.CheckIncreaseBin(Bin.Code, WarehouseJournalLine."Item No.", WarehouseJournalLine."Qty. (Absolute)", WarehouseJournalLine.Cubage, WarehouseJournalLine.Weight, WarehouseJournalLine.Cubage, WarehouseJournalLine.Weight, true, false);
                             end;
-                        end else begin
+                        end else
                             CheckWarehouseClass(WarehouseJournalLine."Location Code", WarehouseJournalLine."To Bin Code", WarehouseJournalLine."Item No.", WarehouseJournalLine."Variant Code", WarehouseJournalLine."Unit of Measure Code");
-                            CheckBinAndBinContentMovement(WarehouseJournalLine);
-                        end;
                 SourceJnl::OutputJnl, SourceJnl::ConsumpJnl:
                     if WarehouseJournalLine."To Bin Code" <> '' then
                         if Location."Bin Capacity Policy" <> Location."Bin Capacity Policy"::"Never Check Capacity" then
@@ -451,15 +449,10 @@ codeunit 7302 "WMS Management"
         if not ShowError then
             ShowError := CheckBinCodeChange(ItemJnlLine."New Location Code", ItemJnlLine."New Bin Code", xItemJnlLine."New Bin Code");
 
-        OnCheckItemJnlLineFieldChangeOnAfterCheckBinCodeChange(ItemJnlLine, xItemJnlLine, CurrFieldCaption, ShowError, BinIsEligible);
-        if ShowError then begin
-            IsHandled := false;
-            OnCheckItemJnlLineFieldChangeOnBeforeShowError(ItemJnlLine, xItemJnlLine, IsHandled);
-            if not IsHandled then
-                Error(Text015,
-                  CurrFieldCaption,
-                  LowerCase(Location.TableCaption()), Location.Code, Location.FieldCaption("Directed Put-away and Pick"));
-        end;
+        if ShowError then
+            Error(Text015,
+              CurrFieldCaption,
+              LowerCase(Location.TableCaption()), Location.Code, Location.FieldCaption("Directed Put-away and Pick"));
 
         if ItemJnlLine."Entry Type" in
            [ItemJnlLine."Entry Type"::"Negative Adjmt.", ItemJnlLine."Entry Type"::"Positive Adjmt.", ItemJnlLine."Entry Type"::Sale, ItemJnlLine."Entry Type"::Purchase]
@@ -482,22 +475,17 @@ codeunit 7302 "WMS Management"
                 ShowError := Location."Directed Put-away and Pick";
             end;
 
-            OnCheckItemJnlLineFieldChangeOnAfterAssignShowError(ItemJnlLine, xItemJnlLine, CurrFieldCaption, ShowError);
             if ShowError then begin
-                IsHandled := false;
-                OnCheckItemJnlLineFieldChangeOnBeforeShowError(ItemJnlLine, xItemJnlLine, IsHandled);
-                if not IsHandled then begin
-                    if ItemJnlLine."Phys. Inventory" then
-                        Error(Text010,
-                          CurrFieldCaption,
-                          Location.TableCaption(), Location.Code, Location.FieldCaption("Directed Put-away and Pick"),
-                          WhsePhysInvtJournal.Caption);
-
+                if ItemJnlLine."Phys. Inventory" then
                     Error(Text010,
                       CurrFieldCaption,
                       Location.TableCaption(), Location.Code, Location.FieldCaption("Directed Put-away and Pick"),
-                      WhseItemJournal.Caption);
-                end;
+                      WhsePhysInvtJournal.Caption);
+
+                Error(Text010,
+                  CurrFieldCaption,
+                  Location.TableCaption(), Location.Code, Location.FieldCaption("Directed Put-away and Pick"),
+                  WhseItemJournal.Caption);
             end;
             GetLocation(ItemJnlLine."Location Code");
             if not Location."Bin Mandatory" then
@@ -1411,7 +1399,7 @@ codeunit 7302 "WMS Management"
             else
                 WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::"Positive Adjmt.";
             IsDirectedPutAwayAndPick := Location."Directed Put-away and Pick";
-            OnSetZoneAndBinsOnAfterCalcIsDirectedPutAwayAndPick(ItemJournalLine, Location, IsDirectedPutAwayAndPick, true);
+            OnSetZoneAndBinsOnAfterCalcIsDirectedPutAwayAndPick(ItemJournalLine, Location, IsDirectedPutAwayAndPick);
             if IsDirectedPutAwayAndPick then
                 if CheckItemJournalLineBinCodeForDirectedPutAwayAndPickLocation(ItemJournalLine) then
                     WarehouseJournalLine."To Bin Code" := ItemJournalLine."Bin Code"
@@ -1438,7 +1426,7 @@ codeunit 7302 "WMS Management"
                 else
                     WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::"Negative Adjmt.";
                 IsDirectedPutAwayAndPick := Location."Directed Put-away and Pick";
-                OnSetZoneAndBinsOnAfterCalcIsDirectedPutAwayAndPick(ItemJournalLine, Location, IsDirectedPutAwayAndPick, false);
+                OnSetZoneAndBinsOnAfterCalcIsDirectedPutAwayAndPick(ItemJournalLine, Location, IsDirectedPutAwayAndPick);
                 if IsDirectedPutAwayAndPick then
                     if CheckItemJournalLineBinCodeForDirectedPutAwayAndPickLocation(ItemJournalLine) then
                         WarehouseJournalLine."From Bin Code" := ItemJournalLine."Bin Code"
@@ -1469,13 +1457,11 @@ codeunit 7302 "WMS Management"
         OnAfterSetZoneAndBins(WarehouseJournalLine, ItemJournalLine, Location, Bin);
     end;
 
-    local procedure CheckItemJournalLineBinCodeForDirectedPutAwayAndPickLocation(ItemJournalLine: Record "Item Journal Line") Result: Boolean
+    local procedure CheckItemJournalLineBinCodeForDirectedPutAwayAndPickLocation(ItemJournalLine: Record "Item Journal Line"): Boolean
     begin
-        Result :=
-            ((ItemJournalLine."Entry Type" = ItemJournalLine."Entry Type"::"Negative Adjmt.") and (ItemJournalLine."Job No." <> '')) or
-            (ItemJournalLine."Entry Type" in [ItemJournalLine."Entry Type"::"Assembly Output", ItemJournalLine."Entry Type"::"Assembly Consumption"]);
-
-        OnAfterCheckItemJournalLineBinCodeForDirectedPutAwayAndPickLocation(ItemJournalLine, Result);
+        exit(
+            (ItemJournalLine."Entry Type" in [ItemJournalLine."Entry Type"::"Assembly Output", ItemJournalLine."Entry Type"::"Assembly Consumption"]) or
+            ((ItemJournalLine."Entry Type" in [ItemJournalLine."Entry Type"::"Negative Adjmt."]) and (ItemJournalLine."Job No." <> '')));
     end;
 
     procedure SerialNoOnInventory(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; SerialNo: Code[50]): Boolean
@@ -1855,7 +1841,7 @@ codeunit 7302 "WMS Management"
         OnBeforeCheckBlockedBin(LocationCode, BinCode, ItemNo, VariantCode, UnitOfMeasureCode, CheckInbound, IsHandled);
         if not IsHandled then begin
             GetLocation(LocationCode);
-            if (Location."Directed Put-away and Pick") or ((BinCode <> '') and (Location."Bin Capacity Policy" = Location."Bin Capacity Policy"::"Never Check Capacity")) then
+            if Location."Directed Put-away and Pick" then
                 if BinContent.Get(LocationCode, BinCode, ItemNo, VariantCode, UnitOfMeasureCode) then begin
                     if (CheckInbound and
                         (BinContent."Block Movement" in [BinContent."Block Movement"::Inbound, BinContent."Block Movement"::All])) or
@@ -1898,19 +1884,6 @@ codeunit 7302 "WMS Management"
     begin
         if Bin2.Get(LocationCode, BinCode) then
             exit(Bin2."Bin Type Code");
-    end;
-
-    local procedure CheckBinAndBinContentMovement(WarehouseJournalLine: Record "Warehouse Journal Line")
-    begin
-        if WarehouseJournalLine.Quantity = 0 then
-            exit;
-
-        case WarehouseJournalLine."Entry Type" of
-            WarehouseJournalLine."Entry Type"::"Positive Adjmt.":
-                CheckBlockedBin(WarehouseJournalLine."Location Code", WarehouseJournalLine."To Bin Code", WarehouseJournalLine."Item No.", WarehouseJournalLine."Variant Code", WarehouseJournalLine."Unit of Measure Code", WarehouseJournalLine.Quantity > 0);
-            WarehouseJournalLine."Entry Type"::"Negative Adjmt.":
-                CheckBlockedBin(WarehouseJournalLine."Location Code", WarehouseJournalLine."To Bin Code", WarehouseJournalLine."Item No.", WarehouseJournalLine."Variant Code", WarehouseJournalLine."Unit of Measure Code", WarehouseJournalLine.Quantity < 0);
-        end;
     end;
 
 #if not CLEAN23
@@ -2382,7 +2355,7 @@ codeunit 7302 "WMS Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSetZoneAndBinsOnAfterCalcIsDirectedPutAwayAndPick(ItemJnlLine: Record "Item Journal Line"; Location: Record Location; var IsDirectedPutAwayAndPick: Boolean; IsQtyIncrease: Boolean)
+    local procedure OnSetZoneAndBinsOnAfterCalcIsDirectedPutAwayAndPick(ItemJnlLine: Record "Item Journal Line"; Location: Record Location; var IsDirectedPutAwayAndPick: Boolean)
     begin
     end;
 
@@ -2418,26 +2391,6 @@ codeunit 7302 "WMS Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnSerialNoOnInventoryOnBeforeCalcQtyBase(var WarehouseEntry: Record "Warehouse Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCheckItemJnlLineFieldChangeOnBeforeShowError(var ItemJournalLine: Record "Item Journal Line"; xItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnCheckItemJnlLineFieldChangeOnAfterCheckBinCodeChange(var ItemJournalLine: Record "Item Journal Line"; var xItemJournalLine: Record "Item Journal Line"; CurrFieldCaption: Text[30]; var ShowError: Boolean; var BinIsEligible: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnCheckItemJnlLineFieldChangeOnAfterAssignShowError(var ItemJournalLine: Record "Item Journal Line"; var xItemJournalLine: Record "Item Journal Line"; CurrFieldCaption: Text[30]; var ShowError: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCheckItemJournalLineBinCodeForDirectedPutAwayAndPickLocation(ItemJournalLine: Record "Item Journal Line"; var CheckResult: Boolean)
     begin
     end;
 }
