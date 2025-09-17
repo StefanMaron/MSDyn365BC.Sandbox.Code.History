@@ -1,4 +1,4 @@
-﻿codeunit 134887 "ERM G/L Currency Revaluation"
+codeunit 134887 "ERM G/L Currency Revaluation"
 {
     // // [FEATURE] [G/L Currency Revaluation]
 
