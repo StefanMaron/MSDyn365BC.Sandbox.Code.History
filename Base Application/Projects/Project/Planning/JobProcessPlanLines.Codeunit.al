@@ -4,8 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Projects.Project.Planning;
 
+using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Setup;
 using Microsoft.Sales.Document;
+using System.Text;
 
 codeunit 1033 "Job-Process Plan. Lines"
 {
@@ -30,55 +32,74 @@ codeunit 1033 "Job-Process Plan. Lines"
     var
         SalesHeader: Record "Sales Header";
         TempJobPlanningLine: Record "Job Planning Line" temporary;
+        SelectionFilterManagement: Codeunit SelectionFilterManagement;
         JobCreateInvoice: Codeunit "Job Create-Invoice";
         GetPlanningLines: Page "Get Job Planning Lines";
 
     local procedure FindMatchingPlanningLines()
     var
-        GetJobPlanningLines: Query "GetJobPlanningLines";
-        TaskBillingMethod: Enum "Task Billing Method";
-    begin
-        SetFiltersOnGetJobPlanningLine(GetJobPlanningLines, TaskBillingMethod::"One customer");
-        UpdateTempJobPlanningLineBasedOnGetJobPlanningLine(GetJobPlanningLines);
-
-        SetFiltersOnGetJobPlanningLine(GetJobPlanningLines, TaskBillingMethod::"Multiple customers");
-        UpdateTempJobPlanningLineBasedOnGetJobPlanningLine(GetJobPlanningLines);
-    end;
-
-    local procedure SetFiltersOnGetJobPlanningLine(var GetJobPlanningLines: Query "GetJobPlanningLines"; TaskBillingMethod: Enum "Task Billing Method")
-    var
-        JobPlanningLine: Record "Job Planning Line";
-    begin
-        Clear(GetJobPlanningLines);
-
-        GetJobPlanningLines.SetRange(Task_Billing_Method_Filter, TaskBillingMethod);
-
-        if TaskBillingMethod = TaskBillingMethod::"One customer" then begin
-            GetJobPlanningLines.SetRange(Job_Bill_to_Customer_No_Filter, SalesHeader."Bill-to Customer No.");
-            GetJobPlanningLines.SetRange(Job_Sell_to_Customer_No_Filter, SalesHeader."Sell-to Customer No.");
-            GetJobPlanningLines.SetRange(Job_Invoice_Currency_Code_Filter, SalesHeader."Currency Code");
-        end
-        else begin
-            GetJobPlanningLines.SetRange(Task_Bill_to_Customer_No_Filter, SalesHeader."Bill-to Customer No.");
-            GetJobPlanningLines.SetRange(Task_Sell_to_Customer_No_Filter, SalesHeader."Sell-to Customer No.");
-            GetJobPlanningLines.SetRange(Task_Invoice_Currency_Code_Filter, SalesHeader."Currency Code");
-        end;
-        GetJobPlanningLines.SetFilter(Line_Type_Filter, '%1|%2', JobPlanningLine."Line Type"::Billable, JobPlanningLine."Line Type"::"Both Budget and Billable");
-        GetJobPlanningLines.SetFilter(Qty_to_Transfer_to_Invoice_Filter, '<>%1', 0);
-    end;
-
-    local procedure UpdateTempJobPlanningLineBasedOnGetJobPlanningLine(var GetJobPlanningLines: Query "GetJobPlanningLines")
-    var
+        JobTask: Record "Job Task";
         JobPlanningLine2: Record "Job Planning Line";
+        TaskBillingMethod: Enum "Task Billing Method";
+        JobFilter, JobTaskFilter : Text;
     begin
-        GetJobPlanningLines.Open();
         JobPlanningLine2.ReadIsolation(IsolationLevel::ReadUncommitted);
+        JobPlanningLine2.SetFilter("Line Type", '%1|%2', JobPlanningLine2."Line Type"::Billable, JobPlanningLine2."Line Type"::"Both Budget and Billable");
+        JobPlanningLine2.SetFilter("Qty. to Transfer to Invoice", '<>%1', 0);
 
-        while GetJobPlanningLines.Read() do
-            if JobPlanningLine2.Get(GetJobPlanningLines.Job_No, GetJobPlanningLines.Job_Task_No, GetJobPlanningLines.Line_No) then begin
-                TempJobPlanningLine := JobPlanningLine2;
-                TempJobPlanningLine.Insert();
-            end;
+        JobFilter := CreateJobFilter(TaskBillingMethod::"One customer");
+        if JobFilter <> '' then begin
+            JobPlanningLine2.SetFilter("Job No.", JobFilter);
+            if JobPlanningLine2.FindSet() then
+                repeat
+                    TempJobPlanningLine := JobPlanningLine2;
+                    TempJobPlanningLine.Insert();
+                until JobPlanningLine2.Next() = 0;
+        end;
+
+        JobTaskFilter := CreateJobTaskFilter();
+        if JobTaskFilter <> '' then begin
+            JobPlanningLine2.SetFilter("Job No.", CreateJobFilter(TaskBillingMethod::"Multiple customers"));
+            JobPlanningLine2.SetFilter("Job Task No.", JobTaskFilter);
+            if JobPlanningLine2.FindSet() then
+                repeat
+                    if JobTask.Get(JobPlanningLine2."Job No.", JobPlanningLine2."Job Task No.")
+                        and (JobTask."Sell-to Customer No." = SalesHeader."Sell-to Customer No.")
+                            and (JobTask."Sell-to Customer No." = SalesHeader."Sell-to Customer No.") then begin
+                        TempJobPlanningLine := JobPlanningLine2;
+                        TempJobPlanningLine.Insert();
+                    end;
+                until JobPlanningLine2.Next() = 0;
+        end;
+    end;
+
+    local procedure CreateJobFilter(TaskBillingMethod: Enum "Task Billing Method"): Text
+    var
+        Job: Record "Job";
+    begin
+        if TaskBillingMethod = TaskBillingMethod::"One customer" then begin
+            Job.SetRange("Bill-to Customer No.", SalesHeader."Bill-to Customer No.");
+            Job.SetRange("Sell-to Customer No.", SalesHeader."Sell-to Customer No.");
+        end;
+        Job.SetRange("Task Billing Method", TaskBillingMethod);
+        Job.SetRange("Invoice Currency Code", SalesHeader."Currency Code");
+        exit(SelectionFilterManagement.GetSelectionFilterForJob(Job));
+    end;
+
+    local procedure CreateJobTaskFilter(): Text
+    var
+        Job: Record "Job";
+        JobTask: Record "Job Task";
+        JobFilter: Text;
+    begin
+        Job.SetRange("Task Billing Method", Job."Task Billing Method"::"Multiple customers");
+        JobFilter := SelectionFilterManagement.GetSelectionFilterForJob(Job);
+
+        JobTask.SetFilter("Job No.", JobFilter);
+        JobTask.SetRange("Bill-to Customer No.", SalesHeader."Bill-to Customer No.");
+        JobTask.SetRange("Sell-to Customer No.", SalesHeader."Sell-to Customer No.");
+        JobTask.SetRange("Invoice Currency Code", SalesHeader."Currency Code");
+        exit(SelectionFilterManagement.GetSelectionFilterForJobTask(JobTask));
     end;
 
     procedure SetSalesHeader(var SalesHeader2: Record "Sales Header")
