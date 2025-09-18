@@ -350,12 +350,12 @@ codeunit 7205 "CDS Int. Table. Subscriber"
                 // except if the original contact is coupled. in this case, we know that the Primary Contact No. was updated, so this change (blanking it) is valid
                 ContactNo := OriginalDestinationFieldValue;
                 if Contact.Get(ContactNo) then
-                    if CRMIntegrationRecord.FindByRecordID(Contact.RecordId) then
+                    if not CRMIntegrationRecord.FindByRecordID(Contact.RecordId) then begin
+                        NewValue := OriginalDestinationFieldValue;
+                        IsValueFound := true;
+                        NeedsConversion := false;
                         exit;
-                NewValue := OriginalDestinationFieldValue;
-                IsValueFound := true;
-                NeedsConversion := false;
-                exit;
+                    end;
             end;
         end;
 
@@ -939,8 +939,6 @@ codeunit 7205 "CDS Int. Table. Subscriber"
         CDSConnectionSetup: Record "CDS Connection Setup";
         CRMConnectionSetup: Record "CRM Connection Setup";
         CDSIntegrationRecord: Record "CRM Integration Record";
-        CDSIntegrationSyncJob: Record "Integration Synch. Job";
-        CDSIntegrationsSyncJobErrors: Record "Integration Synch. Job Errors";
     begin
         CDSConnectionSetup.ChangeCompany(NewCompanyName);
         CDSConnectionSetup.DeleteAll();
@@ -948,10 +946,6 @@ codeunit 7205 "CDS Int. Table. Subscriber"
         CRMConnectionSetup.DeleteAll();
         CDSIntegrationRecord.ChangeCompany(NewCompanyName);
         CDSIntegrationRecord.DeleteAll();
-        CDSIntegrationSyncJob.ChangeCompany(NewCompanyName);
-        CDSIntegrationSyncJob.DeleteAll();
-        CDSIntegrationsSyncJobErrors.ChangeCompany(NewCompanyName);
-        CDSIntegrationsSyncJobErrors.DeleteAll();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Company, 'OnBeforeDeleteEvent', '', false, false)]
