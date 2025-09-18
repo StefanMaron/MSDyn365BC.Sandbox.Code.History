@@ -182,7 +182,7 @@ page 1173 "Document Attachment Details"
             fileuploadaction(AttachmentsUpload)
             {
                 ApplicationArea = All;
-                Caption = 'Attach files';
+                Caption = 'Upload files';
                 Image = Document;
                 Enabled = true;
                 Scope = Page;
@@ -200,11 +200,11 @@ page 1173 "Document Attachment Details"
             action(UploadFile)
             {
                 ApplicationArea = All;
-                Caption = 'Attach a file';
+                Caption = 'Upload file';
                 Image = Document;
                 Enabled = true;
                 Scope = Page;
-                ToolTip = 'Upload one file';
+                ToolTip = 'Upload file';
                 Visible = IsOfficeAddin;
 
                 trigger OnAction()
@@ -215,32 +215,34 @@ page 1173 "Document Attachment Details"
         }
         area(Promoted)
         {
-            actionref(Preview_Promoted; Preview)
+            group(Category_Process)
             {
-            }
-            group(OneDrive_Process)
-            {
-                ShowAs = SplitButton;
-                Caption = 'OneDrive';
+                Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
-                actionref(OpenInOneDrive_Promoted; OpenInOneDrive)
+                actionref(Preview_Promoted; Preview)
                 {
                 }
-                actionref(EditInOneDrive_Promoted; EditInOneDrive)
+                group(OneDrive_Process)
+                {
+                    ShowAs = SplitButton;
+                    Image = Cloud;
+
+                    actionref(OpenInOneDrive_Promoted; OpenInOneDrive)
+                    {
+                    }
+                    actionref(EditInOneDrive_Promoted; EditInOneDrive)
+                    {
+                    }
+                    actionref(ShareWithOneDrive_Promoted; ShareWithOneDrive)
+                    {
+                    }
+                }
+                actionref(AttachFromEmail_Promoted; AttachFromEmail)
                 {
                 }
-                actionref(ShareWithOneDrive_Promoted; ShareWithOneDrive)
+                actionref(UploadFile_Promoted; UploadFile)
                 {
                 }
-            }
-            actionref(AttachFromEmail_Promoted; AttachFromEmail)
-            {
-            }
-            actionref(UploadFile_Promoted; UploadFile)
-            {
-            }
-            actionref(AttachMultipleFiles_Promoted; AttachmentsUpload)
-            {
             }
         }
     }
@@ -285,7 +287,7 @@ page 1173 "Document Attachment Details"
         FileDialogTxt: Label 'Attachments (%1)|%1', Comment = '%1=file types, such as *.txt or *.docx';
         FilterTxt: Label '*.jpg;*.jpeg;*.bmp;*.png;*.gif;*.tiff;*.tif;*.pdf;*.docx;*.doc;*.xlsx;*.xls;*.pptx;*.ppt;*.msg;*.xml;*.*', Locked = true;
         ImportTxt: Label 'Attach a document.';
-        SelectFileTxt: Label 'Attach a file';
+        SelectFileTxt: Label 'Attach File(s)...';
         PurchaseDocumentFlow: Boolean;
         ShareOptionsVisible: Boolean;
         ShareEditOptionVisible: Boolean;
