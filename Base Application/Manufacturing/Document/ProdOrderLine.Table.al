@@ -109,7 +109,7 @@ table 5406 "Prod. Order Line"
                                 Validate("Routing No.", Item."Routing No.");
                     OnAfterCopyFromItem(Rec, Item, xRec, CurrFieldNo);
                     if ProdOrder."Source Type" = ProdOrder."Source Type"::Family then
-                        "Routing Reference No." := "Line No."
+                        "Routing Reference No." := 0
                     else
                         if "Line No." = 0 then
                             "Routing Reference No." := -10000
@@ -250,11 +250,6 @@ table 5406 "Prod. Order Line"
                     CheckBin();
                 end;
             end;
-        }
-        field(35; "Standard Task Code"; Code[10])
-        {
-            Caption = 'Standard Task Code';
-            TableRelation = "Standard Task";
         }
         field(40; Quantity; Decimal)
         {
@@ -804,7 +799,7 @@ table 5406 "Prod. Order Line"
         }
         field(66; "Put-away Status"; Option)
         {
-            Caption = 'Put-away Status';
+            Caption = 'Status';
             Editable = false;
             OptionCaption = ' ,Partially Put Away,Completely Put Away';
             OptionMembers = " ","Partially Put Away","Completely Put Away";
@@ -1072,7 +1067,7 @@ table 5406 "Prod. Order Line"
         ProdOrderLine.SetRange("Routing No.", "Routing No.");
         ProdOrderLine.SetFilter("Line No.", '<>%1', "Line No.");
         ProdOrderLine.SetRange("Routing Reference No.", "Routing Reference No.");
-        if ProdOrderLine.IsEmpty() then begin
+        if not ProdOrderLine.FindFirst() then begin
             ProdOrderRoutingLine.SetRange(Status, Status);
             ProdOrderRoutingLine.SetRange("Prod. Order No.", "Prod. Order No.");
             ProdOrderRoutingLine.SetRange("Routing Reference No.", "Routing Reference No.");
@@ -1113,8 +1108,6 @@ table 5406 "Prod. Order Line"
         end;
 
         WhseOutputProdRelease.DeleteLine(Rec);
-
-        OnAfterDeleteRelations(Rec);
     end;
 
     procedure ShowOrderTracking()
@@ -1657,10 +1650,7 @@ table 5406 "Prod. Order Line"
         then
             exit;
 
-        IsHandled := false;
-        OnShowRoutingOnBeforeFindAndSetProdOrderLineBinCodeFromProdRoutingLines(Rec, IsHandled);
-        if not IsHandled then
-            CalcProdOrder.FindAndSetProdOrderLineBinCodeFromProdRoutingLines(Status, "Prod. Order No.", "Line No.");
+        CalcProdOrder.FindAndSetProdOrderLineBinCodeFromProdRoutingLines(Status, "Prod. Order No.", "Line No.");
     end;
 
     procedure SetFilterByReleasedOrderNo(OrderNo: Code[20])
@@ -1996,16 +1986,6 @@ table 5406 "Prod. Order Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateVariantCodeOnAfterVerifyChange(var ProdOrderLine: Record "Prod. Order Line"; xProdOrderLine: Record "Prod. Order Line"; CurrFieldNo: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterDeleteRelations(var ProdOrderLine: Record "Prod. Order Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnShowRoutingOnBeforeFindAndSetProdOrderLineBinCodeFromProdRoutingLines(var ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
     begin
     end;
 }
