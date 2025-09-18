@@ -432,19 +432,8 @@ report 2000021 "File Domiciliations"
     end;
 
     trigger OnPostReport()
-    var
-        TempBlob: Codeunit "Temp Blob";
-        FileMgt: Codeunit "File Management";
-        InStream: InStream;
-        IsHandled: Boolean;
     begin
-        FileMgt.BLOBImportFromServerFile(TempBlob, FromFile);
-        IsHandled := false;
-        OnPostReportOnBeforeDownloadXmlFile(TempBlob, IsHandled);
-        if not IsHandled then begin
-            TempBlob.CreateInStream(InStream);
-            FileMgt.DownloadFromStreamHandler(InStream, '', '', AllFilesDescriptionTxt, FullFileName);
-        end;
+        Download(FromFile, '', '', AllFilesDescriptionTxt, FullFileName);
     end;
 
     trigger OnPreReport()
@@ -528,10 +517,10 @@ report 2000021 "File Domiciliations"
         DomJnlBatchName: Code[10];
         DocumentNo: Code[20];
         CurrencyCode: Code[10];
-        Reference: Text[16];
+        Reference: Text[12];
         EnterpriseNo: Text[11];
         DomiciliationNo: Text[30];
-        DomiciliationNoText: Text[16];
+        DomiciliationNoText: Text[12];
         FileName: Text[250];
         VersionCode: Text[1];
         CompanyAddress: array[8] of Text[100];
@@ -609,8 +598,8 @@ report 2000021 "File Domiciliations"
             // number of payment records
             LineCounter := LineCounter + 1;
 
-            DomiciliationNoText := PaymJnlManagement.ConvertToDigit(DomiciliationNo, 16);
-            Reference := PaymJnlManagement.ConvertToDigit("Domiciliation Journal Line".Reference, 16);
+            DomiciliationNoText := PaymJnlManagement.ConvertToDigit(DomiciliationNo, 12);
+            Reference := PaymJnlManagement.ConvertToDigit("Domiciliation Journal Line".Reference, 12);
             xFile.Write(
                   '1' +
                   PaymJnlManagement.DecimalNumeralZeroFormat(LineCounter, 4) +
@@ -620,7 +609,7 @@ report 2000021 "File Domiciliations"
                   Format(CompanyInfo.Name, 26) +
                   Format("Domiciliation Journal Line"."Message 1", 15) +
                   Format("Domiciliation Journal Line"."Message 2", 15) +
-                  PaymJnlManagement.TextZeroFormat(Reference, 16) +
+                  PaymJnlManagement.TextZeroFormat(Reference, 12) +
                   Format('', 30));
 
             i := TypeCode + 1;
@@ -717,11 +706,6 @@ report 2000021 "File Domiciliations"
         LastGenJnlLine := NewLastGenJnlLine;
         GenJnlBatch := NewGenJnlBatch;
         DocumentNo := NewDocumentNo;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostReportOnBeforeDownloadXmlFile(var TempBlob: Codeunit "Temp Blob"; var IsHandled: Boolean);
-    begin
     end;
 }
 
