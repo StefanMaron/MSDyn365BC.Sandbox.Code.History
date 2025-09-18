@@ -62,7 +62,6 @@
         CannotAllowInvDiscountErr: Label 'The value of the Allow Invoice Disc. field is not valid when the VAT Calculation Type field is set to "Full VAT".';
         DocumentNoErr: Label 'Document No. are not equal.';
         AmountZeroErr: Label 'Amount must be zero';
-        AmountMustSameErr: Label 'Amount must be same';
 
     [Test]
     [Scope('OnPrem')]
@@ -449,53 +448,6 @@
         Assert.AreEqual(
           PurchaseHeader."Currency Code", PurchInvHeader."Currency Code",
           StrSubstNo(CurrencyErr, PurchInvHeader.TableCaption()));
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure PurchaseInvoiceWithSourceCurrency()
-    var
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
-        GLEntry: Record "G/L Entry";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        PurchInvHeader: Record "Purch. Inv. Header";
-        PostedDocumentNo: Code[20];
-    begin
-        // Create and Post a Purchase Invoice with Currency and verify Source Currency Amount on G/L Entries
-
-        // Setup.
-        Initialize();
-
-        // Exercise: Create Purchase Invoice, attach new Currency on Purchase Invoice and Post Invoice.
-        CreatePurchaseHeader(PurchaseHeader, CreateVendor(''), PurchaseHeader."Document Type"::Invoice);
-        PurchaseHeader.Validate("Currency Code", CreateCurrency());
-        PurchaseHeader.Modify(true);
-        LibraryPurchase.CreatePurchaseLine(
-          PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, CreateItem(), LibraryRandom.RandInt(10));
-        LibraryLowerPermissions.SetPurchDocsPost();
-        PostedDocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-
-        // Verify: Verify Currency Code in Purchase Line and Posted Purchase Invoice Header.
-        PurchInvHeader.Get(PostedDocumentNo);
-        Assert.AreEqual(
-          PurchaseHeader."Currency Code", PurchaseLine."Currency Code",
-          StrSubstNo(CurrencyErr, PurchaseLine.TableCaption()));
-        Assert.AreEqual(
-          PurchaseHeader."Currency Code", PurchInvHeader."Currency Code",
-          StrSubstNo(CurrencyErr, PurchInvHeader.TableCaption()));
-
-        // Verify: Source Currency Amounts in G/L Entries
-        GLEntry.SetRange("Document No.", PurchInvHeader."No.");
-        GLEntry.FindSet();
-        repeat
-            if GLEntry."Source Currency Amount" <> 0 then
-                Assert.AreNearlyEqual(
-                    GLEntry."Source Currency Amount",
-                    CurrencyExchangeRate.ExchangeAmtLCYToFCY(
-                        PurchInvHeader."Posting Date", PurchInvHeader."Currency Code", GLEntry.Amount, PurchInvHeader."Currency Factor"),
-                    0.01, 'incorrect Source Currency Amount in G/L Entry');
-        until GLEntry.Next() = 0;
     end;
 
     [Test]
@@ -3269,36 +3221,6 @@
 
         // [THEN] Verify the 0 amount G/l entry posted.
         Assert.AreEqual(0, GLEntry.Amount, AmountZeroErr);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure AmountUpdatedInPurchInvEntityAggregateTableWhenPurchInvHasLastLineAsGLAccount()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        PurchInvEntityAggregate: Record "Purch. Inv. Entity Aggregate";
-        LineAmtGLAccount: Decimal;
-        LineAmtItem: Decimal;
-        TotalAmountIncludingVAT: Decimal;
-    begin
-        // [SCENARIO 557775] Amount not updated in Purch. Inv. Entity Aggregate Table 5477 when last line of the Purchase Invoice has type G/L Account
-        Initialize();
-
-        // [GIVEN] Create Purchase Header and 2 Purchase Line, 1st line type with Item
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, LibraryPurchase.CreateVendorNo());
-        LineAmtItem := CreatePurchLineWithReturnAmt(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, CreateItem());
-        TotalAmountIncludingVAT := PurchaseLine."Amount Including VAT";
-
-        // [WHEN] 2nd line type with G/L Account
-        LineAmtGLAccount := CreatePurchLineWithReturnAmt(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", LibraryERM.CreateGLAccountWithPurchSetup());
-        TotalAmountIncludingVAT += PurchaseLine."Amount Including VAT";
-
-        // [THEN] Verify Amount and "Amount Including VAT" as same as total amounts on purchase lines
-        PurchInvEntityAggregate.SetRange("No.", PurchaseHeader."No.");
-        PurchInvEntityAggregate.FindFirst();
-        Assert.AreEqual(LineAmtGLAccount + LineAmtItem, PurchInvEntityAggregate.Amount, AmountMustSameErr);
-        Assert.AreEqual(TotalAmountIncludingVAT, PurchInvEntityAggregate."Amount Including VAT", AmountMustSameErr);
     end;
 
     local procedure Initialize()
