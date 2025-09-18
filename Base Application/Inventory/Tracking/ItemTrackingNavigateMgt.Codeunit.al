@@ -580,7 +580,6 @@ codeunit 6529 "Item Tracking Navigate Mgt."
         PostedInvtPickLine.SetFilter("Package No.", ItemFilters.GetFilter("Package No. Filter"));
         PostedInvtPickLine.SetFilter("Item No.", ItemFilters.GetFilter("No."));
         PostedInvtPickLine.SetFilter("Variant Code", ItemFilters.GetFilter("Variant Filter"));
-        OnFindPostedInvtPickLineOnAfterSetFilters(PostedInvtPickLine, ItemFilters);
         if PostedInvtPickLine.FindSet() then
             repeat
                 RecRef.GetTable(PostedInvtPickLine);
@@ -607,7 +606,6 @@ codeunit 6529 "Item Tracking Navigate Mgt."
         PostedInvtPutAwayLine.SetFilter("Package No.", ItemFilters.GetFilter("Package No. Filter"));
         PostedInvtPutAwayLine.SetFilter("Item No.", ItemFilters.GetFilter("No."));
         PostedInvtPutAwayLine.SetFilter("Variant Code", ItemFilters.GetFilter("Variant Filter"));
-        OnFindPostedInvtPutAwayLineOnAfterSetFilters(PostedInvtPutAwayLine, ItemFilters);
         if PostedInvtPutAwayLine.FindSet() then
             repeat
                 RecRef.GetTable(PostedInvtPutAwayLine);
@@ -651,7 +649,6 @@ codeunit 6529 "Item Tracking Navigate Mgt."
         RgstrdWhseActivLine.SetFilter("Package No.", ItemFilters.GetFilter("Package No. Filter"));
         RgstrdWhseActivLine.SetFilter("Item No.", ItemFilters.GetFilter("No."));
         RgstrdWhseActivLine.SetFilter("Variant Code", ItemFilters.GetFilter("Variant Filter"));
-        OnFindRegWhseActivLineOnAfterSetFilters(RgstrdWhseActivLine, ItemFilters);
         if RgstrdWhseActivLine.FindSet() then
             repeat
                 RecRef.GetTable(RgstrdWhseActivLine);
@@ -680,7 +677,6 @@ codeunit 6529 "Item Tracking Navigate Mgt."
         ItemLedgEntry.SetFilter("Package No.", ItemFilters.GetFilter("Package No. Filter"));
         ItemLedgEntry.SetFilter("Item No.", ItemFilters.GetFilter("No."));
         ItemLedgEntry.SetFilter("Variant Code", ItemFilters.GetFilter("Variant Filter"));
-        OnFindItemLedgerEntryOnAfterSetFilters(ItemLedgEntry, ItemFilters);
         if ItemLedgEntry.FindSet() then
             repeat
                 RecRef.GetTable(ItemLedgEntry);
@@ -842,7 +838,6 @@ codeunit 6529 "Item Tracking Navigate Mgt."
         ReservEntry.SetFilter("Package No.", ItemFilters.GetFilter("Package No. Filter"));
         ReservEntry.SetFilter("Item No.", ItemFilters.GetFilter("No."));
         ReservEntry.SetFilter("Variant Code", ItemFilters.GetFilter("Variant Filter"));
-        OnFindReservEntryOnAfterSetFilters(ReservEntry, ItemFilters);
         if ReservEntry.FindSet() then
             repeat
                 RecRef.GetTable(ReservEntry);
@@ -894,7 +889,6 @@ codeunit 6529 "Item Tracking Navigate Mgt."
         WhseActivLine.SetFilter("Package No.", ItemFilters.GetFilter("Package No. Filter"));
         WhseActivLine.SetFilter("Item No.", ItemFilters.GetFilter("No."));
         WhseActivLine.SetFilter("Variant Code", ItemFilters.GetFilter("Variant Filter"));
-        OnFindWhseActivLineOnAfterSetFilters(WhseActivLine, ItemFilters);
         if WhseActivLine.FindSet() then
             repeat
                 RecRef.GetTable(WhseActivLine);
@@ -921,7 +915,6 @@ codeunit 6529 "Item Tracking Navigate Mgt."
         WhseEntry.SetFilter("Package No.", ItemFilters.GetFilter("Package No. Filter"));
         WhseEntry.SetFilter("Item No.", ItemFilters.GetFilter("No."));
         WhseEntry.SetFilter("Variant Code", ItemFilters.GetFilter("Variant Filter"));
-        OnFindWhseEntryOnAfterSetFilters(WhseEntry, ItemFilters);
         if WhseEntry.FindSet() then
             repeat
                 RecRef.GetTable(WhseEntry);
@@ -1238,41 +1231,6 @@ codeunit 6529 "Item Tracking Navigate Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnShowTable(TableNo: Integer; var TempRecordBuffer: Record "Record Buffer" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFindItemLedgerEntryOnAfterSetFilters(var ItemLedgerEntry: Record "Item Ledger Entry"; var ItemFilters: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFindReservEntryOnAfterSetFilters(var ReservationEntry: Record "Reservation Entry"; var ItemFilters: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFindWhseActivLineOnAfterSetFilters(var WarehouseActivityLine: Record "Warehouse Activity Line"; var ItemFilters: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFindRegWhseActivLineOnAfterSetFilters(var RegisteredWhseActivityLine: Record "Registered Whse. Activity Line"; var ItemFilters: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFindWhseEntryOnAfterSetFilters(var WarehouseEntry: Record "Warehouse Entry"; var ItemFilters: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFindPostedInvtPutAwayLineOnAfterSetFilters(var PostedInvtPutawayLine: Record "Posted Invt. Put-away Line"; var ItemFilters: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnFindPostedInvtPickLineOnAfterSetFilters(var PostedInvtPickLine: Record "Posted Invt. Pick Line"; var ItemFilters: Record Item)
     begin
     end;
 }
