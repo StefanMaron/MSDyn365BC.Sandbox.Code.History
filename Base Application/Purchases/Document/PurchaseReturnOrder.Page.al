@@ -112,7 +112,7 @@ page 6640 "Purchase Return Order"
                         field("Buy-from County"; Rec."Buy-from County")
                         {
                             ApplicationArea = PurchReturnOrder;
-                            CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
+                            Caption = 'County';
                             Importance = Additional;
                             ToolTip = 'Specifies the county of the address.';
                         }
@@ -535,7 +535,7 @@ page 6640 "Purchase Return Order"
                         field("Ship-to County"; Rec."Ship-to County")
                         {
                             ApplicationArea = PurchReturnOrder;
-                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                            Caption = 'County';
                             Editable = ShipToOptions = ShipToOptions::"Custom Address";
                             Importance = Additional;
                             ToolTip = 'Specifies the county of the address.';
@@ -631,7 +631,7 @@ page 6640 "Purchase Return Order"
                         field("Pay-to County"; Rec."Pay-to County")
                         {
                             ApplicationArea = PurchReturnOrder;
-                            CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
+                            Caption = 'County';
                             Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                             Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                             Importance = Additional;
@@ -891,7 +891,7 @@ page 6640 "Purchase Return Order"
                     Visible = not SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif
+#endif                    
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Order Statistics";
                     RunPageOnRec = true;
@@ -907,7 +907,7 @@ page 6640 "Purchase Return Order"
                     Visible = SalesTaxStatisticsVisible;
 #else
                     Visible = false;
-#endif
+#endif                    
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Order Stats.";
                     RunPageOnRec = true;
@@ -1739,7 +1739,7 @@ page 6640 "Purchase Return Order"
                     ObsoleteState = Pending;
                     ObsoleteTag = '26.0';
                 }
-#else
+#else                
                 actionref(PurchaseOrderStatistics_Promoted; PurchaseOrderStatistics)
                 {
                 }
@@ -1832,8 +1832,7 @@ page 6640 "Purchase Return Order"
 
         CheckShowBackgrValidationNotification();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
-        SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
-        ;
+        SalesTaxStatisticsVisible := Rec.GetStatisticsPageID() = Page::"Purchase Order Stats.";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
