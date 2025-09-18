@@ -127,7 +127,6 @@ report 106 "Customer Detailed Aging"
                             OverDueMonths := CalcFullMonthsBetweenDates("Due Date", EndDate);
                         if ("Remaining Amount" = 0) and OnlyOpen then
                             CurrReport.Skip();
-                        OnAfterGetCustLedgerEntryOnBeforeUpdateTotal("Cust. Ledger Entry");
                         TempCurrencyTotalBuffer.UpdateTotal(
                           "Currency Code", "Remaining Amount", "Remaining Amt. (LCY)", Counter);
                     end;
@@ -329,11 +328,6 @@ report 106 "Customer Detailed Aging"
             FullMonths += 1;
 
         exit(FullMonths);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetCustLedgerEntryOnBeforeUpdateTotal(var CustLedgerEntry: Record "Cust. Ledger Entry")
-    begin
     end;
 }
 
