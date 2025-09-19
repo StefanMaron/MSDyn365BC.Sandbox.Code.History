@@ -3151,6 +3151,7 @@ codeunit 6500 "Item Tracking Management"
             FromReservEntry."Source Batch Name", FromReservEntry."Source Prod. Order Line", FromReservEntry."Source Ref. No.");
         ToReservEntry.SetPointer(ToRowID);
         ToReservEntry.SetPointerFilter();
+        ToReservEntry.SetTrackingFilterFromReservEntry(FromReservEntry);
         SynchronizeItemTrkgTransfer(ToReservEntry);
     end;
 
