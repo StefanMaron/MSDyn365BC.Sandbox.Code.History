@@ -282,7 +282,7 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
                     ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
                     ItemJournalLine."Journal Batch Name", 0, ItemJournalLine."Line No.",
                     ItemJournalLine."Qty. per Unit of Measure", OldReservationEntry,
-                    ReceiptQty); // qty base
+                    ReceiptQty * ItemJournalLine."Qty. per Unit of Measure"); // qty base
 
             until (ReservationEngineMgt.NEXTRecord(OldReservationEntry) = 0) or (ReceiptQty = 0);
     end;
@@ -811,13 +811,13 @@ codeunit 5854 "Invt. Doc. Line-Reserve"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeVerifyChange(var NewInvtDocumentLine: Record "Invt. Document Line"; var OldInvtDocumentLine: Record "Invt. Document Line"; var IsHandled: Boolean)
+    local procedure OnBeforeDeleteLine(var InvtDocumentLine: Record "Invt. Document Line"; DeleteItemTracking: Boolean; Blocked: Boolean; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeDeleteLine(var InvtDocumentLine: Record "Invt. Document Line"; DeleteItemTracking: Boolean; Blocked: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeVerifyChange(var NewInvtDocumentLine: Record "Invt. Document Line"; var OldInvtDocumentLine: Record "Invt. Document Line"; var IsHandled: Boolean)
     begin
-    end;
+    end;    
 }
 
