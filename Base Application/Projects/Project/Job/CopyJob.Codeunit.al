@@ -208,7 +208,6 @@ codeunit 1006 "Copy Job"
         SourceJob: Record Job;
         JobTransferLine: Codeunit "Job Transfer Line";
         NextPlanningLineNo: Integer;
-        IsHandled: Boolean;
     begin
         SourceJob.Get(SourceJobTask."Job No.");
         TargetJobPlanningLine.SetRange("Job No.", TargetJobTask."Job No.");
@@ -244,11 +243,8 @@ codeunit 1006 "Copy Job"
                     TargetJobPlanningLine.Validate("Line Discount %", JobLedgEntry."Line Discount %");
                 end;
                 ExchangeJobPlanningLineAmounts(TargetJobPlanningLine, SourceJob."Currency Code");
-                IsHandled := false;
-                OnCopyJLEsToJobPlanningLinesOnBeforeValidateQuantity(TargetJobPlanningLine, CopyQuantity, IsHandled);
-                if not IsHandled then
-                    if not CopyQuantity then
-                        TargetJobPlanningLine.Validate(Quantity, 0);
+                if not CopyQuantity then
+                    TargetJobPlanningLine.Validate(Quantity, 0);
                 NextPlanningLineNo += 10000;
                 TargetJobPlanningLine.Modify();
             until JobLedgEntry.Next() = 0;
@@ -277,7 +273,7 @@ codeunit 1006 "Copy Job"
                 NewDefaultDimension."Dimension Code" := DefaultDimension."Dimension Code";
                 NewDefaultDimension.TransferFields(DefaultDimension, false);
                 NewDefaultDimension.Insert();
-                DimMgt.DefaultDimOnInsert(NewDefaultDimension);
+                DimMgt.DefaultDimOnInsert(DefaultDimension);
             until DefaultDimension.Next() = 0;
 
         DimMgt.UpdateDefaultDim(
@@ -479,11 +475,6 @@ codeunit 1006 "Copy Job"
 
     [IntegrationEvent(true, false)]
     local procedure OnCopyJobPlanningLinesOnBeforeTargetJobPlanningLineInit(var TargetJobPlanningLine: Record "Job Planning Line"; SourceJobPlanningLine: Record "Job Planning Line"; TargetJobTask: Record "Job Task"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnCopyJLEsToJobPlanningLinesOnBeforeValidateQuantity(var TargetJobPlanningLine: Record "Job Planning Line"; var CopyQuantity: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
