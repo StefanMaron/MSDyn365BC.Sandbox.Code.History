@@ -43,6 +43,7 @@ report 7390 "Whse. Calculate Inventory"
             trigger OnPreDataItem()
             var
                 WhseJnlTemplate: Record "Warehouse Journal Template";
+                WhseJnlBatch: Record "Warehouse Journal Batch";
             begin
                 if RegisteringDate = 0D then
                     Error(Text001, WhseJnlLine.FieldCaption("Registering Date"));
@@ -83,7 +84,7 @@ report 7390 "Whse. Calculate Inventory"
                 SkipRecord: Boolean;
             begin
                 this.GetLocation("Location Code");
-                SkipRecord := ShouldSkipRecord();
+                SkipRecord := ("Bin Code" = Location."Adjustment Bin Code") or SkipCycleSKU("Location Code", "Item No.", "Variant Code");
                 OnWarehouseEntryOnAfterGetRecordOnAfterCalcSkipRecord("Warehouse Entry", SkipRecord);
                 if SkipRecord then
                     CurrReport.Skip();
@@ -383,23 +384,6 @@ report 7390 "Whse. Calculate Inventory"
             if SKU.ReadPermission then
                 if SKU.Get(LocationCode, ItemNo, VariantCode) then
                     exit(true);
-        exit(false);
-    end;
-
-    local procedure ShouldSkipRecord(): Boolean
-    var
-        Item: Record Item;
-    begin
-        if ("Warehouse Entry"."Bin Code" = Location."Adjustment Bin Code") then
-            exit(true);
-
-        Item.SetRange("No.", "Warehouse Entry"."Item No.");
-        if Item.IsEmpty() then
-            exit(true);
-
-        if SkipCycleSKU("Warehouse Entry"."Location Code", "Warehouse Entry"."Item No.", "Warehouse Entry"."Variant Code") then
-            exit(true);
-
         exit(false);
     end;
 
