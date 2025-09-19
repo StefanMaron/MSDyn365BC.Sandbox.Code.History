@@ -2685,7 +2685,6 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -3204,7 +3203,6 @@
                                   <Value>=Code.BlankZero(Fields!VATEntry7_NonDeductibleVAT.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!VATEntry7_NonDeductibleVATFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -3268,7 +3266,6 @@
                                   <Value>=Code.BlankZero(Fields!VATEntry7_NonDeductibleVATBase.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!VATEntry7_NonDeductibleVATBaseFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -3332,7 +3329,6 @@
                                   <Value>=Code.BlankZero(Fields!VATEntry7_NonDeductibleVATAmt.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!VATEntry7_NonDeductibleVATAmtFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -3709,7 +3705,6 @@
                                   <Value>=Code.BlankZero(Fields!VATEntry2_NonDeductibleVAT.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!VATEntry2_NonDeductibleVATFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -3773,7 +3768,6 @@
                                   <Value>=Code.BlankZero(Fields!VATEntry2_NonDeductibleVATBase.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!VATEntry2_NonDeductibleVATBaseFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -3837,7 +3831,6 @@
                                   <Value>=Code.BlankZero(Fields!VATEntry2_NonDeductibleVATAmt.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!VATEntry2_NonDeductibleVATAmtFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -3900,7 +3893,7 @@
                                   <Value>=Fields!VATBuffer2_Base_VATBuffer2_Amount.Value+Fields!VATEntry2_NonDeductibleVATBase.Value+Fields!VATEntry2_NonDeductibleVATAmt.Value</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>0.00;(0.00)</Format>
+                                    <Format>=Fields!VATBuffer2_Base_VATBuffer2_Amount.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -4209,7 +4202,6 @@
                                   <Value>=Code.BlankZero(Fields!VATEntry4_NonDeductibleVAT.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!VATEntry4_NonDeductibleVATFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -4272,7 +4264,6 @@
                                   <Value>=Code.BlankZero(Fields!VATEntry4_NonDeductibleVATBase.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!VATEntry4_NonDeductibleVATBaseFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -4335,7 +4326,6 @@
                                   <Value>=Code.BlankZero(Fields!VATEntry4_NonDeductibleVATAmt.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Fields!VATEntry4_NonDeductibleVATAmtFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -4612,7 +4602,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!Base_NoTaxableEntryFormat.Value)</Format>
+                                    <Format>=Fields!Base_NoTaxableEntryFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -4765,7 +4755,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!Base_NoTaxableEntryFormat.Value)</Format>
+                                    <Format>=Fields!Base_NoTaxableEntryFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -4981,7 +4971,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATBuffer2_BaseFormat.Value)</Format>
+                                    <Format>=Fields!VATBuffer2_BaseFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -5054,68 +5044,11 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <ColSpan>3</ColSpan>
                       </CellContents>
                     </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox150">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=SUM(Fields!VATEntry2_NonDeductibleVATBase.Value)</Value>
-                                  <Style>
-                                    <FontSize>7pt</FontSize>
-                                    <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATEntry2_NonDeductibleVATBaseFormat.Value)</Format>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox150</rd:DefaultName>
-                          <Style>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>0.075cm</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox151">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value />
-                                  <Style>
-                                    <FontSize>7pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox151</rd:DefaultName>
-                          <Style>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>0.075cm</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
+                    <TablixCell />
+                    <TablixCell />
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox145">
@@ -5125,11 +5058,10 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=SUM(Fields!VATEntry2_NonDeductibleVATAmt.Value)</Value>
+                                  <Value />
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATEntry2_NonDeductibleVATAmtFormat.Value)</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -5159,7 +5091,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATBuffer2_AmountFormat.Value)</Format>
+                                    <Format>=Fields!VATBuffer2_AmountFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -5189,7 +5121,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATBuffer2_Base_VATBuffer2_AmountFormat.Value)</Format>
+                                    <Format>=Fields!VATBuffer2_Base_VATBuffer2_AmountFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -5398,7 +5330,7 @@
                                   <Value>=SUM(Fields!VATBuffer2_Base_Control88.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Last(Fields!VATBuffer2_Base_Control88Format.Value)</Format>
+                                    <Format>=Fields!VATBuffer2_Base_Control88Format.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -5471,66 +5403,11 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <ColSpan>3</ColSpan>
                       </CellContents>
                     </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox152">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=SUM(Fields!VATEntry4_NonDeductibleVATBase.Value)</Value>
-                                  <Style>
-                                    <FontSize>7pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox152</rd:DefaultName>
-                          <Style>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>0.075cm</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox153">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value />
-                                  <Style>
-                                    <FontSize>7pt</FontSize>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox153</rd:DefaultName>
-                          <Style>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>0.075cm</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
+                    <TablixCell />
+                    <TablixCell />
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox146">
@@ -5540,7 +5417,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=SUM(Fields!VATEntry4_NonDeductibleVATAmt.Value)</Value>
+                                  <Value />
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                   </Style>
@@ -5571,7 +5448,7 @@
                                   <Value>=Code.BlankZero(SUM(Fields!VATBuffer2_Amount_Control82.Value))</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Last(Fields!VATBuffer2_Amount_Control82Format.Value)</Format>
+                                    <Format>=Fields!VATBuffer2_Amount_Control82Format.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -5600,7 +5477,7 @@
                                   <Value>=SUM(Fields!VATBuffer2_Base_VATBuffer2_Amount_Control81.Value)+SUM(Fields!VATEntry2_NonDeductibleVATBase.Value)+SUM(Fields!VATEntry2_NonDeductibleVATAmt.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
-                                    <Format>=Last(Fields!VATBuffer2_Base_VATBuffer2_Amount_Control81Format.Value)</Format>
+                                    <Format>=Fields!VATBuffer2_Base_VATBuffer2_Amount_Control81Format.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -5779,7 +5656,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATBuffer2_BaseFormat.Value)</Format>
+                                    <Format>=Fields!VATBuffer2_BaseFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -5846,41 +5723,14 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <ColSpan>3</ColSpan>
                       </CellContents>
                     </TablixCell>
+                    <TablixCell />
+                    <TablixCell />
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox156">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Sum(Fields!VATEntry2_NonDeductibleVATBase.Value)</Value>
-                                  <Style>
-                                    <FontSize>7pt</FontSize>
-                                    <FontWeight>Bold</FontWeight>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox150</rd:DefaultName>
-                          <Style>
-                            <VerticalAlign>Middle</VerticalAlign>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>0.075cm</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox155">
+                        <Textbox Name="Textbox147">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -5888,32 +5738,6 @@
                               <TextRuns>
                                 <TextRun>
                                   <Value />
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox155</rd:DefaultName>
-                          <Style>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox154">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=Sum(Fields!VATEntry2_NonDeductibleVATAmt.Value)</Value>
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -5923,7 +5747,7 @@
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox145</rd:DefaultName>
+                          <rd:DefaultName>Textbox147</rd:DefaultName>
                           <Style>
                             <VerticalAlign>Middle</VerticalAlign>
                             <PaddingLeft>2pt</PaddingLeft>
@@ -5946,7 +5770,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATBuffer2_AmountFormat.Value)</Format>
+                                    <Format>=Fields!VATBuffer2_AmountFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -5976,7 +5800,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATBuffer2_Base_VATBuffer2_AmountFormat.Value)</Format>
+                                    <Format>=Fields!VATBuffer2_Base_VATBuffer2_AmountFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -6155,7 +5979,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATBuffer4_BaseFormat.Value)</Format>
+                                    <Format>=Fields!VATBuffer4_BaseFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -6222,63 +6046,11 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <ColSpan>3</ColSpan>
                       </CellContents>
                     </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox158">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value>=SUM(Fields!VATEntry7_NonDeductibleVATBase.Value)+SUM(Fields!VATEntry2_NonDeductibleVATBase.Value)</Value>
-                                  <Style>
-                                    <FontSize>7pt</FontSize>
-                                    <FontWeight>Bold</FontWeight>
-                                  </Style>
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox158</rd:DefaultName>
-                          <Style>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
-                    <TablixCell>
-                      <CellContents>
-                        <Textbox Name="Textbox159">
-                          <CanGrow>true</CanGrow>
-                          <KeepTogether>true</KeepTogether>
-                          <Paragraphs>
-                            <Paragraph>
-                              <TextRuns>
-                                <TextRun>
-                                  <Value />
-                                  <Style />
-                                </TextRun>
-                              </TextRuns>
-                              <Style />
-                            </Paragraph>
-                          </Paragraphs>
-                          <rd:DefaultName>Textbox159</rd:DefaultName>
-                          <Style>
-                            <PaddingLeft>2pt</PaddingLeft>
-                            <PaddingRight>2pt</PaddingRight>
-                            <PaddingTop>2pt</PaddingTop>
-                            <PaddingBottom>2pt</PaddingBottom>
-                          </Style>
-                        </Textbox>
-                      </CellContents>
-                    </TablixCell>
+                    <TablixCell />
+                    <TablixCell />
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox148">
@@ -6288,7 +6060,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=SUM(Fields!VATEntry7_NonDeductibleVATAmt.Value)+SUM(Fields!VATEntry2_NonDeductibleVATAmt.Value)</Value>
+                                  <Value />
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -6321,7 +6093,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATBuffer4_AmountFormat.Value)</Format>
+                                    <Format>=Fields!VATBuffer4_AmountFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -6350,7 +6122,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!VATBuffer4_Base_VATBuffer4_AmountFormat.Value)</Format>
+                                    <Format>=Fields!VATBuffer4_Base_VATBuffer4_AmountFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -6530,7 +6302,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!Base_NoTaxableEntryFormat.Value)</Format>
+                                    <Format>=Fields!Base_NoTaxableEntryFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -6676,7 +6448,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>=Last(Fields!Base_NoTaxableEntryFormat.Value)</Format>
+                                    <Format>=Fields!Base_NoTaxableEntryFormat.Value</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
