@@ -1424,7 +1424,7 @@ page 490 "Acc. Schedule Overview"
         ValidateCostObjectFilter();
     end;
 
-    procedure SetDimFilters(DimNo: Integer; DimValueFilter: Text)
+    local procedure SetDimFilters(DimNo: Integer; DimValueFilter: Text)
     var
         CurrentCostCenterFilter: Text;
         CurrentCostObjectFilter: Text;
