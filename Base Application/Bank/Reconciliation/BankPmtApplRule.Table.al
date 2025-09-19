@@ -24,7 +24,14 @@ table 1252 "Bank Pmt. Appl. Rule"
             Caption = 'Priority';
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidatePriority(Rec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if (Priority > GetMaximumPriorityNo()) or (Priority < 1) then
                     Error(WrongPriorityNoErr, FieldCaption(Priority), 1, GetMaximumPriorityNo());
             end;
@@ -490,6 +497,11 @@ table 1252 "Bank Pmt. Appl. Rule"
 
         BankPmtApplRule.Insert(true);
         RulePriority += 1;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidatePriority(var BankPmtApplRule: Record "Bank Pmt. Appl. Rule"; var IsHandled: Boolean)
+    begin
     end;
 }
 
