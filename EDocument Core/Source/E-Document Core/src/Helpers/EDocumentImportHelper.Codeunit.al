@@ -16,7 +16,6 @@ using System.Reflection;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
-using Microsoft.eServices.EDocument.Service.Participant;
 using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
@@ -470,13 +469,17 @@ codeunit 6109 "E-Document Import Helper"
     procedure FindVendorByVATRegistrationNo(VATRegistrationNo: Text[20]): Code[20]
     var
         Vendor: Record Vendor;
-        VendorNo: Code[20];
     begin
         if VATRegistrationNo = '' then
             exit('');
 
-        VendorNo := Vendor.FindVendorByVATRegistrationNo(VATRegistrationNo);
-        exit(VendorNo);
+        Vendor.SetLoadFields("VAT Registration No.", "Country/Region Code");
+        Vendor.SetFilter("VAT Registration No.", StrSubstNo(VATRegistrationNoFilterTxt, CopyStr(VATRegistrationNo, 1, MaxStrLen(VATRegistrationNo))));
+        if Vendor.FindSet() then
+            repeat
+                if ExtractVatRegNo(Vendor."VAT Registration No.", Vendor."Country/Region Code") = ExtractVatRegNo(VATRegistrationNo, Vendor."Country/Region Code") then
+                    exit(Vendor."No.");
+            until Vendor.Next() = 0;
     end;
 
     /// <summary>
@@ -512,25 +515,11 @@ codeunit 6109 "E-Document Import Helper"
     /// <param name="VendorAddress">Vendor's address.</param>
     /// <returns>Vendor number if exists or empty string.</returns>
     procedure FindVendorByNameAndAddress(VendorName: Text; VendorAddress: Text): Code[20]
-    begin
-        exit(FindVendorByNameAndAddressWithNotification(VendorName, VendorAddress, 0));
-    end;
-
-    /// <summary>
-    /// Use it to find a vendor by name and address and raise a notification if vendor is found by name but not by address.
-    /// </summary>
-    /// <param name="VendorName">Name of a vendor</param>
-    /// <param name="VendorAddress">Address of a vendor</param>
-    /// <param name="EDocumentEntryNo">Id of e-document</param>
-    /// <returns>Vendor number if exists or empty string.</returns>
-    procedure FindVendorByNameAndAddressWithNotification(VendorName: Text; VendorAddress: Text; EDocEntryNoForNotification: Integer): Code[20]
     var
         Vendor: Record Vendor;
         RecordMatchMgt: Codeunit "Record Match Mgt.";
-        EDocumentNotification: Codeunit "E-Document Notification";
         NameNearness: Integer;
         AddressNearness: Integer;
-        MatchedByAddress: Boolean;
     begin
         Vendor.SetCurrentKey(Blocked);
         Vendor.SetLoadFields(Name, Address);
@@ -541,13 +530,8 @@ codeunit 6109 "E-Document Import Helper"
                     AddressNearness := RequiredNearness()
                 else
                     AddressNearness := RecordMatchMgt.CalculateStringNearness(VendorAddress, Vendor.Address, MatchThreshold(), NormalizingFactor());
-                if NameNearness >= RequiredNearness() then begin
-                    MatchedByAddress := AddressNearness >= RequiredNearness();
-                    if MatchedByAddress then
-                        exit(Vendor."No.");
-                    if EDocEntryNoForNotification <> 0 then
-                        EDocumentNotification.AddVendorMatchedByNameNotAddressNotification(EDocEntryNoForNotification);
-                end;
+                if (NameNearness >= RequiredNearness()) and (AddressNearness >= RequiredNearness()) then
+                    exit(Vendor."No.");
             until Vendor.Next() = 0;
     end;
 
@@ -588,27 +572,6 @@ codeunit 6109 "E-Document Import Helper"
     begin
         if not Vendor.Get(VendorNo) then
             EDocErrorHelper.LogSimpleErrorMessage(EDocument, StrSubstNo(VendorNotFoundErr, EDocument."Bill-to/Pay-to Name"));
-    end;
-
-    /// <summary>
-    /// Use it to find a vendor by service participant
-    /// </summary>
-    /// <param name="VendorID">Vendor's ID</param>
-    /// <param name="EDocumentServiceCode">E-Document Service code</param>
-    /// <returns>Vendor number if exists or empty string.</returns>
-    procedure FindVendorByServiceParticipant(VendorID: Text[200]; EDocumentServiceCode: Code[20]): Code[20]
-    var
-        ServiceParticipant: Record "Service Participant";
-    begin
-        ServiceParticipant.SetRange("Participant Type", ServiceParticipant."Participant Type"::Vendor);
-        ServiceParticipant.SetRange("Participant Identifier", VendorID);
-        ServiceParticipant.SetRange(Service, EDocumentServiceCode);
-        if ServiceParticipant.FindFirst() then
-            exit(ServiceParticipant.Participant);
-
-        ServiceParticipant.SetRange(Service);
-        if ServiceParticipant.FindFirst() then
-            exit(ServiceParticipant.Participant);
     end;
 
 #if not CLEAN26
@@ -1000,4 +963,5 @@ codeunit 6109 "E-Document Import Helper"
         TotalsMismatchErr: Label 'The total amount %1 on the created document is different than the total amount %2 in the electronic document.', Comment = '%1 total amount, %2 expected total amount';
         VendorNotFoundErr: Label 'Cannot find vendor ''%1'' based on the vendor''s name, address or VAT registration number on the electronic document. Make sure that a card for the vendor exists with the corresponding name, address or VAT Registration No.', Comment = '%1 Vendor name (e.g. London Postmaster)';
         NotSpecifiedUnitOfMeasureTxt: Label '<NONE>';
+        VATRegistrationNoFilterTxt: Label '*%1', Comment = '%1 - Filter value', Locked = true;
 }
