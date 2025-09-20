@@ -226,13 +226,11 @@ codeunit 7000006 "Document-Post"
             if GenJnlLine."Recipient Bank Account" <> '' then begin
                 CustBankAcc.Get(GenJnlLine."Account No.", GenJnlLine."Recipient Bank Account");
                 CarteraDoc.Place := CompanyInfo."Post Code" = CustBankAcc."Post Code";
-                OnGJLInfoToDocOnBeforeExit(CarteraDoc, GenJnlLine);
                 exit;
             end;
             Cust.Get(GenJnlLine."Account No.");
             CarteraDoc.Place := CompanyInfo."Post Code" = Cust."Post Code";
         end;
-        OnAfterGJLInfoToDoc(CarteraDoc, GenJnlLine);
     end;
 
     procedure UpdateReceivableDoc(var CustLedgEntry: Record "Cust. Ledger Entry"; var GenJnlLine: Record "Gen. Journal Line"; AppliedAmountLCY: Decimal; var DocAmountLCY: Decimal; var RejDocAmountLCY: Decimal; var DiscDocAmountLCY: Decimal; var CollDocAmountLCY: Decimal; var DiscRiskFactAmountLCY: Decimal; var DiscUnriskFactAmountLCY: Decimal; var CollFactAmountLCY: Decimal)
@@ -1281,16 +1279,6 @@ codeunit 7000006 "Document-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdatePayableDocBeforeClosedCarteraDocInsert(var ClosedCarteraDoc: Record "Closed Cartera Doc."; GenJnlLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGJLInfoToDocOnBeforeExit(var CarteraDoc: Record "Cartera Doc."; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGJLInfoToDoc(var CarteraDoc: Record "Cartera Doc."; GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 }

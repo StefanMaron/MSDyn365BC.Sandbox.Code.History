@@ -410,15 +410,6 @@
       <Cmt Name="Dev"><![CDATA[%1=TableCaption;%2=FieldCaption]D;]A;(LookupHint=Codeunit Cartera Payables Installments - NamedType CountMismatchErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2132286949 - NamedType 2710320230" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Remaining Amount (LCY) stats. must be %1 in %2.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1= Field Value, %2=Table Name.]D;]A;(LookupHint=Codeunit Cartera Payables Installments - NamedType RemainingAmountLCYstatsErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 199787064 - NamedType 897546474" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Data could not be found in the report dataset.]]></Val>
@@ -1067,15 +1058,6 @@
       <Cmt Name="Dev"><![CDATA[%1=TableCaption;%2=FieldCaption]D;]A;(LookupHint=Codeunit Cartera Recv. Installments - NamedType CountMismatchErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 592251050 - NamedType 2710320230" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Remaining Amount (LCY) stats. must be %1 in %2.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1= Field Value, %2=Table Name.]D;]A;(LookupHint=Codeunit Cartera Recv. Installments - NamedType RemainingAmountLCYstatsErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 829520536 - NamedType 2088389632" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Bank Bill Group %1 was successfully posted for discount.]]></Val>
@@ -1488,15 +1470,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Apply Unapply - NamedType UnapplyBlankedDocTypeErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 4164090883 - NamedType 2176669094" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Vendor Ledger Entry should not be exported to Payment File.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Cartera Journal Posting - NamedType ExportedToPaymentFileError)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 4164090883 - NamedType 3148959106" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -4962,15 +4935,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test VAT Statement - NamedType AEATTransferenceValueErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2971784732 - NamedType 624661084" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[EC % must be %1 in %2.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1= Field Value, %2= Table Caption.]D;]A;(LookupHint=Codeunit Test VAT Statement - NamedType ECPercentErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2971784732 - NamedType 863404764" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

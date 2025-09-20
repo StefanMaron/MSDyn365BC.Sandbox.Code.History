@@ -741,15 +741,12 @@ table 5092 Opportunity
         SegmentHeader: Record "Segment Header";
         SegmentLine: Record "Segment Line";
         IsHandled: Boolean;
-        DoSetDefaultSalesCycle: Boolean;
     begin
         DeleteAll();
         Init();
-        DoSetDefaultSalesCycle := true;
-        OnCreateOppFromOppOnAfterInit(Opportunity, DoSetDefaultSalesCycle);
+        OnCreateOppFromOppOnAfterInit(Opportunity);
         "Creation Date" := WorkDate();
-        if DoSetDefaultSalesCycle then
-            SetDefaultSalesCycle();
+        SetDefaultSalesCycle();
         if Contact.Get(Opportunity.GetFilter("Contact Company No.")) then begin
             Validate("Contact No.", Contact."No.");
             "Salesperson Code" := Contact."Salesperson Code";
@@ -761,7 +758,7 @@ table 5092 Opportunity
             SetRange("Contact No.", "Contact No.");
         end;
         IsHandled := false;
-        OnCreateOppFromOppOnBeforeSetFilterSalesPersonCode(Rec, IsHandled, Opportunity);
+        OnCreateOppFromOppOnBeforeSetFilterSalesPersonCode(Rec, IsHandled);
         if not IsHandled then
             if SalespersonPurchaser.Get(Opportunity.GetFilter("Salesperson Code")) then begin
                 "Salesperson Code" := SalespersonPurchaser.Code;
@@ -843,7 +840,6 @@ table 5092 Opportunity
     var
         TempOppEntry: Record "Opportunity Entry" temporary;
     begin
-        OnBeforeUpdateOpportunity(Rec);
         if "No." <> '' then
             TempOppEntry.UpdateOppFromOpp(Rec);
     end;
@@ -1336,7 +1332,7 @@ table 5092 Opportunity
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnCreateOppFromOppOnAfterInit(var Opportunity: Record Opportunity; var DoSetDefaultSalesCycle: Boolean)
+    local procedure OnCreateOppFromOppOnAfterInit(var Opportunity: Record Opportunity)
     begin
     end;
 
@@ -1381,7 +1377,7 @@ table 5092 Opportunity
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateOppFromOppOnBeforeSetFilterSalesPersonCode(var Opportunity: Record Opportunity; var IsHandled: Boolean; var FromOpportunity: Record Opportunity)
+    local procedure OnCreateOppFromOppOnBeforeSetFilterSalesPersonCode(var Opportunity: Record Opportunity; var IsHandled: Boolean)
     begin
     end;
 
@@ -1402,11 +1398,6 @@ table 5092 Opportunity
 
     [IntegrationEvent(false, false)]
     local procedure OnStartActivateFirstStageOnBeforeSalesCycleStageFind(var Opportunity: Record Opportunity; var SalesCycleStage: Record "Sales Cycle Stage")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateOpportunity(var Opportunity: Record Opportunity)
     begin
     end;
 }
