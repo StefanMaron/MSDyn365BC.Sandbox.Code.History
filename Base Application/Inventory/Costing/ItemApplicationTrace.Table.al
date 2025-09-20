@@ -68,7 +68,7 @@ table 5812 "Item Application Trace"
         }
     }
 
-    procedure CreateChain(FromItemLedgerEntry: Record "Item Ledger Entry"; var AppliedItemLedgerEntry: Record "Item Ledger Entry")
+    internal procedure CreateChain(FromItemLedgerEntry: Record "Item Ledger Entry"; var AppliedItemLedgerEntry: Record "Item Ledger Entry")
     begin
         // parent entry
         Rec.Init();
@@ -102,7 +102,7 @@ table 5812 "Item Application Trace"
             until AppliedItemLedgerEntry.Next() = 0;
     end;
 
-    procedure AddChain(FromItemLedgerEntryNo: Integer; var ItemApplicationTrace: Record "Item Application Trace")
+    internal procedure AddChain(FromItemLedgerEntryNo: Integer; var ItemApplicationTrace: Record "Item Application Trace")
     begin
         if ItemApplicationTrace.FindSet() then
             repeat
