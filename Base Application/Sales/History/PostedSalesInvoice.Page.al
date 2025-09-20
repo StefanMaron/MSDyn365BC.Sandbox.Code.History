@@ -16,7 +16,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using System.Telemetry;
 using System.Automation;
-using Microsoft.Finance.GeneralLedger.Setup;
 
 page 132 "Posted Sales Invoice"
 {
@@ -101,7 +100,7 @@ page 132 "Posted Sales Invoice"
                         field("Sell-to County"; Rec."Sell-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            CaptionClass = '5,1,' + Rec."Sell-to Country/Region Code";
+                            Caption = 'County';
                             Editable = false;
                             Importance = Additional;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -467,132 +466,6 @@ page 132 "Posted Sales Invoice"
                     ToolTip = 'Specifies the code for the location from which the items were shipped.';
                 }
             }
-            group("Electronic Invoice")
-            {
-                Caption = 'Electronic Invoice';
-                field("Electronic Document Status"; Rec."Electronic Document Status")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the status of the document.';
-                }
-                field("Date/Time Stamped"; Rec."Date/Time Stamped")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the date and time that the document received a digital stamp from the authorized service provider.';
-                }
-                field("Date/Time Sent"; Rec."Date/Time Sent")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the date and time that the document was sent to the customer.';
-                }
-                field("Date/Time Canceled"; Rec."Date/Time Canceled")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the date and time that the document was canceled.';
-                }
-                field("Error Code"; Rec."Error Code")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the error code that the authorized service provider, PAC, has returned to Business Central.';
-                }
-                field("Error Description"; Rec."Error Description")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the error message that the authorized service provider, PAC, has returned to Business Central.';
-                }
-                field("PAC Web Service Name"; Rec."PAC Web Service Name")
-                {
-                    ApplicationArea = BasicMX;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the name of the authorized service provider, PAC, which has processed the electronic document.';
-                }
-                field("Fiscal Invoice Number PAC"; Rec."Fiscal Invoice Number PAC")
-                {
-                    ApplicationArea = BasicMX;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the official invoice number for the electronic document.';
-                    Editable = false;
-                }
-                field("No. of E-Documents Sent"; Rec."No. of E-Documents Sent")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the number of times that this document has been sent electronically.';
-                }
-                field("CFDI Purpose"; Rec."CFDI Purpose")
-                {
-                    ApplicationArea = BasicMX;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the CFDI purpose required for reporting to the Mexican tax authorities (SAT).';
-                }
-                field("CFDI Relation"; Rec."CFDI Relation")
-                {
-                    ApplicationArea = BasicMX;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the relation of the CFDI document. ';
-                }
-                field("CFDI Export Code"; Rec."CFDI Export Code")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies a code to indicate if the document is used for exports to other countries.';
-                }
-                field("CFDI Certificate of Origin No."; Rec."CFDI Certificate of Origin No.")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the identifier which was used to pay for the issuance of the certificate of origin.';
-                }
-                field(Control1310005; Rec."Foreign Trade")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies whether the goods or merchandise that are transported enter or leave the national territory.';
-                }
-                field("SAT Address ID"; Rec."SAT Address ID")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the SAT address that the goods or merchandise are moved to.';
-                    BlankZero = true;
-                }
-                field("SAT International Trade Term"; Rec."SAT International Trade Term")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies an international commercial terms code that are used in international sale contracts according to the SAT internatoinal trade terms definition.';
-                }
-                field("SAT Certificate Name"; SATCertificateName)
-                {
-                    ApplicationArea = BasicMX;
-                    Caption = 'SAT Certificate Name';
-                    ToolTip = 'Specifies the name of the certificate that is used to sign the e-document.';
-                    Visible = SATCertInLocationEnabled;
-                    Editable = false;
-
-                    trigger OnDrillDown()
-                    begin
-                        EInvoiceMgt.DrillDownSATCertificate(SATCertificateCode);
-                    end;
-                }
-                field("SAT Certificate Source"; SATCertificateSource)
-                {
-                    ApplicationArea = BasicMX;
-                    Caption = 'SAT Certificate Source';
-                    ToolTip = 'Specifies the record with which the certificate is associated, such as General Ledger Setup or a specific Location (e.g., Location BLUE).';
-                    Visible = SATCertInLocationEnabled;
-                    Editable = false;
-                }
-                field("Exchange Rate USD"; Rec."Exchange Rate USD")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the USD to MXN exchange rate that is used to report foreign trade documents to Mexican SAT authorities. This rate must match the rate used by the Mexican National Bank.';
-                }
-                field("CFDI Cancellation Reason Code"; Rec."CFDI Cancellation Reason Code")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the reason for the cancellation as a code.';
-                }
-                field("Substitution Document No."; Rec."Substitution Document No.")
-                {
-                    ApplicationArea = BasicMX;
-                    ToolTip = 'Specifies the document number that replaces the canceled one. It is required when the cancellation reason is 01.';
-                }
-            }
             group("Shipping and Billing")
             {
                 Caption = 'Shipping and Billing';
@@ -629,6 +502,106 @@ page 132 "Posted Sales Invoice"
                         Editable = false;
                         Importance = Additional;
                         ToolTip = 'Specifies the shipping agent''s package number.';
+                    }
+                }
+                group("Electronic Invoice")
+                {
+                    Caption = 'Electronic Invoice';
+                    field("Electronic Document Status"; Rec."Electronic Document Status")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the status of the document.';
+                    }
+                    field("Date/Time Stamped"; Rec."Date/Time Stamped")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the date and time that the document received a digital stamp from the authorized service provider.';
+                    }
+                    field("Date/Time Sent"; Rec."Date/Time Sent")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the date and time that the document was sent to the customer.';
+                    }
+                    field("Date/Time Canceled"; Rec."Date/Time Canceled")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the date and time that the document was canceled.';
+                    }
+                    field("Error Code"; Rec."Error Code")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the error code that the authorized service provider, PAC, has returned to Business Central.';
+                    }
+                    field("Error Description"; Rec."Error Description")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the error message that the authorized service provider, PAC, has returned to Business Central.';
+                    }
+                    field("PAC Web Service Name"; Rec."PAC Web Service Name")
+                    {
+                        ApplicationArea = BasicMX;
+                        Importance = Additional;
+                        ToolTip = 'Specifies the name of the authorized service provider, PAC, which has processed the electronic document.';
+                    }
+                    field("Fiscal Invoice Number PAC"; Rec."Fiscal Invoice Number PAC")
+                    {
+                        ApplicationArea = BasicMX;
+                        Importance = Additional;
+                        ToolTip = 'Specifies the official invoice number for the electronic document.';
+                        Editable = false;
+                    }
+                    field("No. of E-Documents Sent"; Rec."No. of E-Documents Sent")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the number of times that this document has been sent electronically.';
+                    }
+                    field("CFDI Purpose"; Rec."CFDI Purpose")
+                    {
+                        ApplicationArea = BasicMX;
+                        Importance = Additional;
+                        ToolTip = 'Specifies the CFDI purpose required for reporting to the Mexican tax authorities (SAT).';
+                    }
+                    field("CFDI Relation"; Rec."CFDI Relation")
+                    {
+                        ApplicationArea = BasicMX;
+                        Importance = Additional;
+                        ToolTip = 'Specifies the relation of the CFDI document. ';
+                    }
+                    field("CFDI Export Code"; Rec."CFDI Export Code")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies a code to indicate if the document is used for exports to other countries.';
+                    }
+                    field(Control1310005; Rec."Foreign Trade")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies whether the goods or merchandise that are transported enter or leave the national territory.';
+                    }
+                    field("SAT Address ID"; Rec."SAT Address ID")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the SAT address that the goods or merchandise are moved to.';
+                        BlankZero = true;
+                    }
+                    field("SAT International Trade Term"; Rec."SAT International Trade Term")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies an international commercial terms code that are used in international sale contracts according to the SAT internatoinal trade terms definition.';
+                    }
+                    field("Exchange Rate USD"; Rec."Exchange Rate USD")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the USD to MXN exchange rate that is used to report foreign trade documents to Mexican SAT authorities. This rate must match the rate used by the Mexican National Bank.';
+                    }
+                    field("CFDI Cancellation Reason Code"; Rec."CFDI Cancellation Reason Code")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the reason for the cancellation as a code.';
+                    }
+                    field("Substitution Document No."; Rec."Substitution Document No.")
+                    {
+                        ApplicationArea = BasicMX;
+                        ToolTip = 'Specifies the document number that replaces the canceled one. It is required when the cancellation reason is 01.';
                     }
                 }
                 group("Ship-to")
@@ -687,7 +660,7 @@ page 132 "Posted Sales Invoice"
                     field("Ship-to County"; Rec."Ship-to County")
                     {
                         ApplicationArea = Basic, Suite;
-                        CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                        Caption = 'County';
                         Editable = false;
                         ToolTip = 'Specifies the state, province or county as a part of the address.';
                     }
@@ -768,7 +741,7 @@ page 132 "Posted Sales Invoice"
                         field("Bill-to County"; Rec."Bill-to County")
                         {
                             ApplicationArea = Basic, Suite;
-                            CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
+                            Caption = 'County';
                             Editable = false;
                             Importance = Additional;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -918,7 +891,6 @@ page 132 "Posted Sales Invoice"
             {
                 Caption = '&Invoice';
                 Image = Invoice;
-#if not CLEAN27
                 action(Statistics)
                 {
                     ApplicationArea = Suite;
@@ -926,9 +898,6 @@ page 132 "Posted Sales Invoice"
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    ObsoleteReason = 'The statistics action will be replaced with the SalesInvoiceStatistics and SalesInvoiceStats actions. The new actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '27.0';
 
                     trigger OnAction()
                     begin
@@ -938,37 +907,6 @@ page 132 "Posted Sales Invoice"
                         else
                             PAGE.RunModal(PAGE::"Sales Invoice Stats.", Rec, Rec."No.");
                     end;
-                }
-#endif
-                action(SalesInvoiceStatistics)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    ShortCutKey = 'F7';
-                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-#if CLEAN27
-                    Visible = not SalesInvoiceStatsVisible;
-#else
-                    Visible = false;
-#endif
-                    RunObject = Page "Sales Invoice Statistics";
-                    RunPageOnRec = true;
-                }
-                action(SalesInvoiceStats)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    ShortCutKey = 'F7';
-                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-#if CLEAN27
-                    Visible = not SalesInvoiceStatsVisible;
-#else
-                    Visible = false;
-#endif
-                    RunObject = Page "Sales Invoice Stats.";
-                    RunPageOnRec = true;
                 }
                 action("Co&mments")
                 {
@@ -1514,21 +1452,9 @@ page 132 "Posted Sales Invoice"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
-#if not CLEAN27
                 actionref(Statistics_Promoted; Statistics)
                 {
-                    ObsoleteReason = 'The statistics action will be replaced with the SalesInvoiceStatistics and SalesInvoiceStats actions. The new actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '27.0';
                 }
-#else
-                actionref(SalesInvoiceStatistics_Promoted; SalesInvoiceStatistics)
-                {
-                }
-                actionref(SalesInvoiceStats_Promoted; SalesInvoiceStats)
-                {
-                }
-#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -1633,8 +1559,6 @@ page 132 "Posted Sales Invoice"
             end;
         end;
         UpdatePaymentService();
-        if SATCertInLocationEnabled then
-            UpdateSATCertificateFields();
         DocExcStatusVisible := Rec.DocExchangeStatusIsSent();
     end;
 
@@ -1652,7 +1576,6 @@ page 132 "Posted Sales Invoice"
 
     trigger OnOpenPage()
     var
-        GLSetup: Record "General Ledger Setup";
         PaymentServiceSetup: Record "Payment Service Setup";
         OfficeMgt: Codeunit "Office Management";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
@@ -1665,11 +1588,6 @@ page 132 "Posted Sales Invoice"
         ActivateFields();
         PaymentServiceVisible := PaymentServiceSetup.IsPaymentServiceVisible();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
-
-        GLSetup.SetLoadFields("Multiple SAT Certificates");
-        GLSetup.Get();
-        SATCertInLocationEnabled := EInvoiceMgt.IsPACEnvironmentEnabled() and GLSetup."Multiple SAT Certificates";
-        SalesInvoiceStatsVisible := Rec."Tax Area Code" <> '';
     end;
 
     var
@@ -1678,7 +1596,6 @@ page 132 "Posted Sales Invoice"
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
         FeatureTelemetry: Codeunit "Feature Telemetry";
         FormatAddress: Codeunit "Format Address";
-        EInvoiceMgt: Codeunit "E-Invoice Mgt.";
         ChangeExchangeRate: Page "Change Exchange Rate";
         HasIncomingDocument: Boolean;
         DocExchStatusStyle: Text;
@@ -1692,15 +1609,10 @@ page 132 "Posted Sales Invoice"
         IsSellToCountyVisible: Boolean;
         IsShipToCountyVisible: Boolean;
         VATDateEnabled: Boolean;
-        SATCertInLocationEnabled: Boolean;
-        SATCertificateCode: Text;
-        SATCertificateName: Text;
-        SATCertificateSource: Text;
 
     protected var
         SalesInvHeader: Record "Sales Invoice Header";
         IsOfficeAddin: Boolean;
-        SalesInvoiceStatsVisible: Boolean;
 
     local procedure ActivateFields()
     begin
@@ -1716,26 +1628,16 @@ page 132 "Posted Sales Invoice"
         PaymentServiceEnabled := PaymentServiceSetup.CanChangePaymentService(Rec);
     end;
 
-    local procedure UpdateSATCertificateFields()
-    var
-        DocumentRecRef: RecordRef;
-    begin
-        DocumentRecRef.GetTable(Rec);
-        EInvoiceMgt.GetSATCertificateInfoForDocument(DocumentRecRef, SATCertificateCode, SATCertificateName, SATCertificateSource);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSalesInvHeaderPrintRecords(var SalesInvHeader: Record "Sales Invoice Header"; var IsHandled: Boolean)
     begin
     end;
 
-#if not CLEAN27
-    [Obsolete('The statistics action will be replaced with the SalesInvoiceStatistics and SalesInvoiceStats actions. The new actions use RunObject and do not run the action trigger. Use a page extension to modify the behaviour.', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateSalesTaxStatistics(var SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
     end;
-#endif
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateCreditMemoOnAction(var SalesInvoiceHeader: Record "Sales Invoice Header"; var IsHandled: Boolean)
     begin
@@ -1746,3 +1648,4 @@ page 132 "Posted Sales Invoice"
     begin
     end;
 }
+
