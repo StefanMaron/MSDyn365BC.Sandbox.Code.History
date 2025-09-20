@@ -13,6 +13,7 @@ codeunit 139300 "Assis. Comp. Setup Plat. Tests"
 
     var
         Assert: Codeunit Assert;
+        StandardTxt: Label 'Standard', Comment = 'Must be similar to "Data Type" option in table 101900 Demonstration Data Setup';
 
     [Scope('OnPrem')]
     procedure TestInitialWizard()
@@ -33,6 +34,7 @@ codeunit 139300 "Assis. Comp. Setup Plat. Tests"
         Assert.RecordIsEmpty(GLAccount);
 
         // [WHEN] The wizard is executed
+        ImportConfigurationPackageFiles();
         AccountingPeriodStartDate := CalcDate('<-CY>', Today);
         InsertWizardData(TempConfigSetup);
         AssistedCompanySetup.ApplyUserInput(TempConfigSetup, BankAccount, AccountingPeriodStartDate, false);
@@ -117,8 +119,13 @@ codeunit 139300 "Assis. Comp. Setup Plat. Tests"
 
     local procedure CompleteWizardStep()
     var
+        AssistedCompanySetupStatus: Record "Assisted Company Setup Status";
         GuidedExperience: Codeunit "Guided Experience";
     begin
+        AssistedCompanySetupStatus.Get(CompanyName);
+        AssistedCompanySetupStatus."Package Imported" := true;
+        AssistedCompanySetupStatus.Modify();
+
         // The compltion status of the wizard is usually set by the wizard, hence the following code
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, PAGE::"Assisted Company Setup Wizard");
     end;
@@ -157,6 +164,14 @@ codeunit 139300 "Assis. Comp. Setup Plat. Tests"
     begin
         CODEUNIT.Run(CODEUNIT::"Company-Initialize");
         AssistedCompanySetupStatus.SetEnabled(CompanyName, true, true);
+    end;
+
+    local procedure ImportConfigurationPackageFiles()
+    var
+        ConfigurationPackageFile: Record "Configuration Package File";
+    begin
+        ConfigurationPackageFile.SetFilter(Code, '*' + StandardTxt + '*');
+        CODEUNIT.Run(CODEUNIT::"Import Config. Package Files", ConfigurationPackageFile);
     end;
 }
 
