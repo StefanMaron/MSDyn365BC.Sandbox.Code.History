@@ -225,6 +225,9 @@
       "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
     },
     {
+      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
+    },
+    {
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
