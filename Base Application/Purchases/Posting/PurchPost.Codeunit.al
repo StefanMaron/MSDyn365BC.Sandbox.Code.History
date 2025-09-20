@@ -453,6 +453,7 @@ codeunit 90 "Purch.-Post"
         MixedDerpFAUntilPostingDateErr: Label 'The value in the Depr. Until FA Posting Date field must be the same on lines for the same fixed asset %1.', Comment = '%1 - Fixed Asset No.';
         CannotPostSameMultipleFAWhenDeprBookValueZeroErr: Label 'You cannot select the Depr. Until FA Posting Date check box because there is no previous acquisition entry for fixed asset %1.\\If you want to depreciate new acquisitions, you can select the Depr. Acquisition Cost check box instead.', Comment = '%1 - Fixed Asset No.';
         PostingPreviewNoTok: Label '***', Locked = true;
+        PostingPreviewNoFormatTxt: Label '<Filler Character,0><Integer,6>', Comment = 'Previewed document numbers are displayed in the format ***000000', Locked = true;
         InvPickExistsErr: Label 'One or more related inventory picks must be registered before you can post the shipment.';
         InvPutAwayExistsErr: Label 'One or more related inventory put-aways must be registered before you can post the receipt.';
         SuppressCommit: Boolean;
@@ -1359,7 +1360,7 @@ codeunit 90 "Purch.-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeProcessAssocItemJnlLine(PurchLine, IsHandled, TempDropShptPostBuffer, TempTrackingSpecification, ItemLedgShptEntryNo);
+        OnBeforeProcessAssocItemJnlLine(PurchLine, IsHandled, TempDropShptPostBuffer, TempTrackingSpecification, ItemLedgShptEntryNo, ItemJnlPostLine);
         if IsHandled then
             exit;
 
@@ -1611,7 +1612,7 @@ codeunit 90 "Purch.-Post"
                       PurchHeader, PurchLine, OriginalItemJnlLine, TempReservationEntry, QtyToBeInvoiced, QtyToBeReceived,
                       TempHandlingSpecification, ItemJnlLine."Item Shpt. Entry No.");
 
-            OnPostItemJnlLineOnAfterPostItemJnlLineJobConsumption(ItemJnlLine, PurchHeader, PurchLine, OriginalItemJnlLine, TempReservationEntry, TempHandlingSpecification, QtyToBeInvoiced, QtyToBeReceived, PostJobConsumptionBeforePurch);
+            OnPostItemJnlLineOnAfterPostItemJnlLineJobConsumption(ItemJnlLine, PurchHeader, PurchLine, OriginalItemJnlLine, TempReservationEntry, TempHandlingSpecification, QtyToBeInvoiced, QtyToBeReceived, PostJobConsumptionBeforePurch, ItemJnlPostLine);
 
             if PostWhseJnlLine then begin
                 OnPostItemJnlLineOnBeforePostWhseJnlLine(TempHandlingSpecification, TempWhseJnlLine, ItemJnlLine);
@@ -1623,7 +1624,7 @@ codeunit 90 "Purch.-Post"
                   PurchHeader, PurchLine, OriginalItemJnlLine, ItemJnlLine."Item Shpt. Entry No.", TempTrackingSpecificationChargeAssmt);
         end;
 
-        OnAfterPostItemJnlLine(ItemJnlLine, PurchLine, PurchHeader, ItemJnlPostLine, WhseJnlPostLine);
+        OnAfterPostItemJnlLine(ItemJnlLine, PurchLine, PurchHeader, ItemJnlPostLine, WhseJnlPostLine, WhseReceive, WhseShip, WhseRcptHeader, WhseShptHeader);
 
         ItemJnlPostLine.RunOnPublishPostingInventoryToGL();
 
@@ -3006,7 +3007,7 @@ codeunit 90 "Purch.-Post"
 #if not CLEAN24
         OnBeforeUpdatePostingNos(PurchHeader, NoSeriesMgt, ModifyHeader, SuppressCommit, IsHandled);
 #else
-        OnBeforeUpdatePostingNos(PurchHeader, ModifyHeader, SuppressCommit, IsHandled);
+        OnBeforeUpdatePostingNos(PurchHeader, ModifyHeader, SuppressCommit, IsHandled, DateOrderSeriesUsed);
 #endif
         if IsHandled then
             exit;
@@ -3029,10 +3030,8 @@ codeunit 90 "Purch.-Post"
                     if PurchRcptHeader.Get(PurchHeader."Receiving No.") then
                         Error(PurchRcptHeaderConflictErr, PurchHeader."Receiving No.");
 
-                end else begin
-                    PurchHeader."Receiving No." := PostingPreviewNoTok;
+                end else
                     OnSetPostingPreviewDocumentNo(PurchHeader."Receiving No.");
-                end;
 
         if PurchHeader.Ship and (PurchHeader."Return Shipment No." = '') then
             if (PurchHeader."Document Type" = PurchHeader."Document Type"::"Return Order") or
@@ -3050,10 +3049,8 @@ codeunit 90 "Purch.-Post"
                     if ReturnShptHeader.Get(PurchHeader."Return Shipment No.") then
                         Error(ReturnShptHeaderConflictErr, PurchHeader."Return Shipment No.");
 
-                end else begin
-                    PurchHeader."Return Shipment No." := PostingPreviewNoTok;
+                end else
                     OnSetPostingPreviewDocumentNo(PurchHeader."Return Shipment No.");
-                end;
 
         IsHandled := false;
         OnUpdatePostingNosOnBeforeUpdatePostingNo(PurchHeader, PreviewMode, ModifyHeader, IsHandled);
@@ -3084,10 +3081,9 @@ codeunit 90 "Purch.-Post"
                             DateOrderSeriesUsed := true;
                         ModifyHeader := true;
                     end;
-                if PreviewMode then begin
-                    PurchHeader."Posting No." := PostingPreviewNoTok;
+                if PreviewMode then
                     OnSetPostingPreviewDocumentNo(PurchHeader."Posting No.");
-                end;
+
                 // Check for posting conflicts.
                 if not PreviewMode then
                     if PurchHeader."Document Type" in [PurchHeader."Document Type"::Order, PurchHeader."Document Type"::Invoice] then begin
@@ -3596,12 +3592,15 @@ codeunit 90 "Purch.-Post"
                     PurchaseHeader.GetUseDate(), PurchaseHeader."Currency Code",
                     TotalPurchLine."VAT Difference", PurchaseHeader."Currency Factor")) -
             TotalPurchLineLCY."VAT Difference";
-        PurchaseLine."VAT Base Amount" :=
-            Round(
-                CurrExchRate.ExchangeAmtFCYToLCY(
-                    PurchaseHeader.GetUseDate(), PurchaseHeader."Currency Code",
-                    TotalPurchLine."VAT Base Amount", PurchaseHeader."Currency Factor")) -
-            TotalPurchLineLCY."VAT Base Amount";
+        if NoVAT then
+            PurchaseLine."VAT Base Amount" := PurchaseLine."Amount Including VAT"
+        else
+            PurchaseLine."VAT Base Amount" :=
+                Round(
+                    CurrExchRate.ExchangeAmtFCYToLCY(
+                        PurchaseHeader.GetUseDate(), PurchaseHeader."Currency Code",
+                        TotalPurchLine."VAT Base Amount", PurchaseHeader."Currency Factor")) -
+                TotalPurchLineLCY."VAT Base Amount";
         PurchaseLine."Pmt. Discount Amount" :=
             Round(
                 CurrExchRate.ExchangeAmtFCYToLCY(
@@ -6516,7 +6515,7 @@ codeunit 90 "Purch.-Post"
         end;
     end;
 
-    local procedure GetCountryCode(SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"): Code[10]
+    procedure GetCountryCode(SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"): Code[10]
     var
         SalesShipmentHeader: Record "Sales Shipment Header";
         CountryRegionCode: Code[10];
@@ -6746,7 +6745,7 @@ codeunit 90 "Purch.-Post"
         if not IsHandled then begin
             PurchRcptHeader.Init();
             PurchRcptHeader.TransferFields(PurchHeader);
-            PurchRcptHeader."No." := PurchHeader."Receiving No.";
+            AssignPostedDocumentNo(PurchRcptHeader."No.", PurchHeader."Receiving No.");
             if PurchHeader."Document Type" = PurchHeader."Document Type"::Order then begin
                 PurchRcptHeader."Order No. Series" := PurchHeader."No. Series";
                 PurchRcptHeader."Order No." := PurchHeader."No.";
@@ -6871,7 +6870,7 @@ codeunit 90 "Purch.-Post"
         if not IsHandled then begin
             ReturnShptHeader.Init();
             ReturnShptHeader.TransferFields(PurchHeader);
-            ReturnShptHeader."No." := PurchHeader."Return Shipment No.";
+            AssignPostedDocumentNo(ReturnShptHeader."No.", PurchHeader."Return Shipment No.");
             if PurchHeader."Document Type" = PurchHeader."Document Type"::"Return Order" then begin
                 ReturnShptHeader."Return Order No. Series" := PurchHeader."No. Series";
                 ReturnShptHeader."Return Order No." := PurchHeader."No.";
@@ -7013,14 +7012,14 @@ codeunit 90 "Purch.-Post"
         PurchInvHeader.Init();
         PurchInvHeader.TransferFields(PurchHeader);
 
-        PurchInvHeader."No." := PurchHeader."Posting No.";
+        AssignPostedDocumentNo(PurchInvHeader."No.", PurchHeader."Posting No.");
         if PurchHeader."Document Type" = PurchHeader."Document Type"::Order then begin
             PurchInvHeader."Pre-Assigned No. Series" := '';
             PurchInvHeader."Order No. Series" := PurchHeader."No. Series";
             PurchInvHeader."Order No." := PurchHeader."No.";
         end else begin
             if PurchHeader."Posting No." = '' then
-                PurchInvHeader."No." := PurchHeader."No.";
+                AssignPostedDocumentNo(PurchInvHeader."No.", PurchHeader."No.");
             PurchInvHeader."Pre-Assigned No. Series" := PurchHeader."No. Series";
             PurchInvHeader."Pre-Assigned No." := PurchHeader."No.";
         end;
@@ -7087,8 +7086,9 @@ codeunit 90 "Purch.-Post"
 
         PurchCrMemoHdr.Init();
         PurchCrMemoHdr.TransferFields(PurchHeader);
+        AssignPostedDocumentNo(PurchCrMemoHdr."No.", PurchHeader."No.");
         if PurchHeader."Document Type" = PurchHeader."Document Type"::"Return Order" then begin
-            PurchCrMemoHdr."No." := PurchHeader."Posting No.";
+            AssignPostedDocumentNo(PurchCrMemoHdr."No.", PurchHeader."Posting No.");
             PurchCrMemoHdr."Pre-Assigned No. Series" := '';
             PurchCrMemoHdr."Return Order No. Series" := PurchHeader."No. Series";
             PurchCrMemoHdr."Return Order No." := PurchHeader."No.";
@@ -7098,7 +7098,7 @@ codeunit 90 "Purch.-Post"
             PurchCrMemoHdr."Pre-Assigned No. Series" := PurchHeader."No. Series";
             PurchCrMemoHdr."Pre-Assigned No." := PurchHeader."No.";
             if PurchHeader."Posting No." <> '' then begin
-                PurchCrMemoHdr."No." := PurchHeader."Posting No.";
+                AssignPostedDocumentNo(PurchCrMemoHdr."No.", PurchHeader."Posting No.");
                 if GuiAllowed() and not HideProgressWindow then
                     Window.Update(1, StrSubstNo(CreditMemoNoMsg, PurchHeader."Document Type", PurchHeader."No.", PurchCrMemoHdr."No."));
             end;
@@ -7143,7 +7143,7 @@ codeunit 90 "Purch.-Post"
         SalesShptHeader.Init();
         SalesOrderHeader.CalcFields("Work Description");
         SalesShptHeader.TransferFields(SalesOrderHeader);
-        SalesShptHeader."No." := SalesOrderHeader."Shipping No.";
+        AssignPostedDocumentNo(SalesShptHeader."No.", SalesOrderHeader."Shipping No.");
         SalesShptHeader."Order No." := SalesOrderHeader."No.";
         SalesShptHeader."Posting Date" := PurchHeader."Posting Date";
         SalesShptHeader."Document Date" := PurchHeader."Document Date";
@@ -8863,34 +8863,33 @@ codeunit 90 "Purch.-Post"
         PreviewToken: Text;
     begin
         OnGetPostingPreviewDocumentNos(PreviewDocNos);
-        if PreviewDocNos.Count() = 0 then
-            PreviewDocNos.Add(PostingPreviewNoTok);
 
-        if PreviewDocNos.Contains(PurchaseHeader."Receiving No.") or
-           PreviewDocNos.Contains(PurchaseHeader."Return Shipment No.") or
-           PreviewDocNos.Contains(PurchaseHeader."Posting No.")
-        then begin
-            TelemetryCustomDimensions.Add(PurchaseHeader.FieldCaption(SystemId), PurchaseHeader.SystemId);
-            TelemetryCustomDimensions.Add(PurchaseHeader.FieldCaption("Document Type"), Format(PurchaseHeader."Document Type"));
+        if not Format(PurchaseHeader."Receiving No.").StartsWith(PostingPreviewNoTok) and
+           not Format(PurchaseHeader."Return Shipment No.").StartsWith(PostingPreviewNoTok) and
+           not Format(PurchaseHeader."Posting No.").StartsWith(PostingPreviewNoTok)
+        then
+            exit;
 
-            if PreviewDocNos.Contains(PurchaseHeader."Receiving No.") then begin
-                PreviewToken := PurchaseHeader."Receiving No.";
-                TelemetryCustomDimensions.Add(PurchaseHeader.FieldCaption("Receiving No."), PurchaseHeader."Receiving No.");
-                PurchaseHeader."Receiving No." := '';
-            end;
-            if PreviewDocNos.Contains(PurchaseHeader."Return Shipment No.") then begin
-                PreviewToken := PurchaseHeader."Return Shipment No.";
-                TelemetryCustomDimensions.Add(PurchaseHeader.FieldCaption("Return Shipment No."), PurchaseHeader."Return Shipment No.");
-                PurchaseHeader."Return Shipment No." := '';
-            end;
-            if PreviewDocNos.Contains(PurchaseHeader."Posting No.") then begin
-                PreviewToken := PurchaseHeader."Posting No.";
-                TelemetryCustomDimensions.Add(PurchaseHeader.FieldCaption("Posting No."), PurchaseHeader."Posting No.");
-                PurchaseHeader."Posting No." := '';
-            end;
+        TelemetryCustomDimensions.Add(PurchaseHeader.FieldCaption(SystemId), PurchaseHeader.SystemId);
+        TelemetryCustomDimensions.Add(PurchaseHeader.FieldCaption("Document Type"), Format(PurchaseHeader."Document Type"));
 
-            Session.LogMessage('0000CUW', StrSubstNo(PreviewTokenFoundLbl, PreviewToken), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, TelemetryCustomDimensions);
+        if Format(PurchaseHeader."Receiving No.").StartsWith(PostingPreviewNoTok) then begin
+            PreviewToken := PurchaseHeader."Receiving No.";
+            TelemetryCustomDimensions.Add(PurchaseHeader.FieldCaption("Receiving No."), PurchaseHeader."Receiving No.");
+            PurchaseHeader."Receiving No." := '';
         end;
+        if Format(PurchaseHeader."Return Shipment No.").StartsWith(PostingPreviewNoTok) then begin
+            PreviewToken := PurchaseHeader."Return Shipment No.";
+            TelemetryCustomDimensions.Add(PurchaseHeader.FieldCaption("Return Shipment No."), PurchaseHeader."Return Shipment No.");
+            PurchaseHeader."Return Shipment No." := '';
+        end;
+        if Format(PurchaseHeader."Posting No.").StartsWith(PostingPreviewNoTok) then begin
+            PreviewToken := PurchaseHeader."Posting No.";
+            TelemetryCustomDimensions.Add(PurchaseHeader.FieldCaption("Posting No."), PurchaseHeader."Posting No.");
+            PurchaseHeader."Posting No." := '';
+        end;
+
+        Session.LogMessage('0000CUW', StrSubstNo(PreviewTokenFoundLbl, PreviewToken), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, TelemetryCustomDimensions);
     end;
 
     local procedure CheckDefaultNoSeries(NoSeriesCode: Code[20])
@@ -8905,6 +8904,14 @@ codeunit 90 "Purch.-Post"
     begin
         ItemChargeAssgntPurch.SetFilter("Applies-to Doc. Line No.", '<>%1', ItemChargeAssgntPurch."Applies-to Doc. Line No.");
         ItemChargeAssgntPurch.DeleteAll();
+    end;
+
+    local procedure AssignPostedDocumentNo(var PostedDocumentNo: Code[20]; DocumentNo: Code[20])
+    begin
+        if PreviewMode then
+            PostedDocumentNo := PostingPreviewNoTok + Format(Random(999999), 0, PostingPreviewNoFormatTxt)
+        else
+            PostedDocumentNo := DocumentNo;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforePostValueEntryToGL', '', false, false)]
@@ -9271,7 +9278,7 @@ codeunit 90 "Purch.-Post"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterPostItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; var PurchaseLine: Record "Purchase Line"; var PurchaseHeader: Record "Purchase Header"; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line"; var WhseJnlRegisterLine: Codeunit "Whse. Jnl.-Register Line")
+    local procedure OnAfterPostItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; var PurchaseLine: Record "Purchase Line"; var PurchaseHeader: Record "Purchase Header"; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line"; var WhseJnlRegisterLine: Codeunit "Whse. Jnl.-Register Line"; var WhseReceive: Boolean; var WhseShip: Boolean; var WhseRcptHeader: Record "Warehouse Receipt Header"; var WhseShptHeader: Record "Warehouse Shipment Header")
     begin
     end;
 
@@ -9775,7 +9782,7 @@ codeunit 90 "Purch.-Post"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeProcessAssocItemJnlLine(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary; var TempTrackingSpecification: Record "Tracking Specification" temporary; ItemLedgShptEntryNo: Integer)
+    local procedure OnBeforeProcessAssocItemJnlLine(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary; var TempTrackingSpecification: Record "Tracking Specification" temporary; ItemLedgShptEntryNo: Integer; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line")
     begin
     end;
 
@@ -10041,7 +10048,7 @@ codeunit 90 "Purch.-Post"
     end;
 #else
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdatePostingNos(var PurchHeader: Record "Purchase Header"; var ModifyHeader: Boolean; SuppressCommit: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeUpdatePostingNos(var PurchHeader: Record "Purchase Header"; var ModifyHeader: Boolean; SuppressCommit: Boolean; var IsHandled: Boolean; var DateOrderSeriesUsed: Boolean)
     begin
     end;
 #endif
@@ -10533,7 +10540,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostItemJnlLineOnAfterPostItemJnlLineJobConsumption(var ItemJournalLine: Record "Item Journal Line"; PurchaseHeader: Record "Purchase Header"; PurchaseLine: Record "Purchase Line"; OriginalItemJnlLine: Record "Item Journal Line"; var TempReservationEntry: Record "Reservation Entry" temporary; var TrackingSpecification: Record "Tracking Specification" temporary; QtyToBeInvoiced: Decimal; QtyToBeReceived: Decimal; var PostJobConsumptionBeforePurch: Boolean)
+    local procedure OnPostItemJnlLineOnAfterPostItemJnlLineJobConsumption(var ItemJournalLine: Record "Item Journal Line"; PurchaseHeader: Record "Purchase Header"; PurchaseLine: Record "Purchase Line"; OriginalItemJnlLine: Record "Item Journal Line"; var TempReservationEntry: Record "Reservation Entry" temporary; var TrackingSpecification: Record "Tracking Specification" temporary; QtyToBeInvoiced: Decimal; QtyToBeReceived: Decimal; var PostJobConsumptionBeforePurch: Boolean; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line")
     begin
     end;
 
