@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -16,40 +16,33 @@ codeunit 935 "Asm. Item Tracking Mgt."
     var
         ItemTrackingMgt: Codeunit "Item Tracking Management";
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Tracking Management", 'OnGetItemTrackingSetupOnSetSerialNoRequired', '', false, false)]
-    local procedure OnGetItemTrackingSetupOnSetSerialNoRequired(var ItemTrackingSetup: Record "Item Tracking Setup"; ItemTrackingCode: Record "Item Tracking Code"; EntryType: Enum "Item Ledger Entry Type"; Inbound: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Tracking Management", 'OnAfterGetItemTrackingSetup', '', false, false)]
+    local procedure OnAfterGetItemTrackingSetup(var ItemTrackingCode: Record "Item Tracking Code"; var ItemTrackingSetup: Record "Item Tracking Setup"; EntryType: Enum "Item Ledger Entry Type"; Inbound: Boolean)
     begin
-        case EntryType of
-            EntryType::"Assembly Consumption", EntryType::"Assembly Output":
-                if Inbound then
-                    ItemTrackingSetup."Serial No. Required" := ItemTrackingCode."SN Assembly Inbound Tracking"
-                else
-                    ItemTrackingSetup."Serial No. Required" := ItemTrackingCode."SN Assembly Outbound Tracking";
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Tracking Management", 'OnGetItemTrackingSetupOnSetLotNoRequired', '', false, false)]
-    local procedure OnGetItemTrackingSetupOnSetLotNoRequired(var ItemTrackingSetup: Record "Item Tracking Setup"; ItemTrackingCode: Record "Item Tracking Code"; EntryType: Enum "Item Ledger Entry Type"; Inbound: Boolean)
-    begin
-        case EntryType of
-            EntryType::"Assembly Consumption", EntryType::"Assembly Output":
-                if Inbound then
-                    ItemTrackingSetup."Lot No. Required" := ItemTrackingCode."Lot Assembly Inbound Tracking"
-                else
-                    ItemTrackingSetup."Lot No. Required" := ItemTrackingCode."Lot Assembly Outbound Tracking";
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Tracking Management", 'OnGetItemTrackingSetupOnSetPackageNoRequired', '', false, false)]
-    local procedure OnGetItemTrackingSetupOnSetPackageNoRequired(var ItemTrackingSetup: Record "Item Tracking Setup"; ItemTrackingCode: Record "Item Tracking Code"; EntryType: Enum "Item Ledger Entry Type"; Inbound: Boolean)
-    begin
-        case EntryType of
-            EntryType::"Assembly Consumption", EntryType::"Assembly Output":
-                if Inbound then
-                    ItemTrackingSetup."Package No. Required" := ItemTrackingCode."Package Assembly Inb. Tracking"
-                else
-                    ItemTrackingSetup."Package No. Required" := ItemTrackingCode."Package Assembly Out. Tracking";
-        end;
+        if ItemTrackingCode."SN Specific Tracking" then
+            case EntryType of
+                EntryType::"Assembly Consumption", EntryType::"Assembly Output":
+                    if Inbound then
+                        ItemTrackingSetup."Serial No. Required" := ItemTrackingCode."SN Assembly Inbound Tracking"
+                    else
+                        ItemTrackingSetup."Serial No. Required" := ItemTrackingCode."SN Assembly Outbound Tracking";
+            end;
+        if ItemTrackingCode."Lot Specific Tracking" then
+            case EntryType of
+                EntryType::"Assembly Consumption", EntryType::"Assembly Output":
+                    if Inbound then
+                        ItemTrackingSetup."Lot No. Required" := ItemTrackingCode."Lot Assembly Inbound Tracking"
+                    else
+                        ItemTrackingSetup."Lot No. Required" := ItemTrackingCode."Lot Assembly Outbound Tracking";
+            end;
+        if ItemTrackingCode."Package Specific Tracking" then
+            case EntryType of
+                EntryType::"Assembly Consumption", EntryType::"Assembly Output":
+                    if Inbound then
+                        ItemTrackingSetup."Package No. Required" := ItemTrackingCode."Package Assembly Inb. Tracking"
+                    else
+                        ItemTrackingSetup."Package No. Required" := ItemTrackingCode."Package Assembly Out. Tracking";
+            end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Tracking Management", 'OnAfterIsResEntryReservedAgainstInventory', '', false, false)]
@@ -238,23 +231,4 @@ codeunit 935 "Asm. Item Tracking Mgt."
             IsHandled := true;
         end;
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Inventory Profile Offsetting", OnCheckIsSNSpecificTracking, '', false, false)]
-    local procedure OnCheckIsSNSpecificTracking(ItemTrackingCode: Record "Item Tracking Code"; var SNSepecificTracking: Boolean)
-    begin
-        if SNSepecificTracking then
-            exit;
-
-        SNSepecificTracking := ItemTrackingCode."SN Assembly Inbound Tracking" or ItemTrackingCode."SN Assembly Outbound Tracking";
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Inventory Profile Offsetting", OnCheckIsLotSpecificTracking, '', false, false)]
-    local procedure OnCheckIsLotSpecificTracking(ItemTrackingCode: Record "Item Tracking Code"; var LotSepecificTracking: Boolean)
-    begin
-        if LotSepecificTracking then
-            exit;
-
-        LotSepecificTracking := ItemTrackingCode."Lot Assembly Inbound Tracking" or ItemTrackingCode."Lot Assembly Outbound Tracking";
-    end;
-
 }
