@@ -1,4 +1,4 @@
-namespace Microsoft.Sales.Document;
+﻿namespace Microsoft.Sales.Document;
 
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
@@ -439,12 +439,6 @@ page 44 "Sales Credit Memo"
                     Importance = Additional;
                     ToolTip = 'Specifies the customer''s VAT registration number for customers.';
                 }
-                field("Enterprise No."; Rec."Enterprise No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the enterprise number for customers';
-                }
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
                     ApplicationArea = Basic, Suite;
@@ -524,7 +518,7 @@ page 44 "Sales Credit Memo"
                 {
                     ApplicationArea = Location;
                     Importance = Additional;
-                    ToolTip = 'Specifies the location where the items are to be placed when they are received. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
+                    ToolTip = 'Specifies the location from where inventory items to the customer on the sales document are to be shipped by default.';
                 }
                 field("EU 3-Party Trade"; Rec."EU 3-Party Trade")
                 {
