@@ -199,6 +199,8 @@ codeunit 5407 "Prod. Order Status Management"
         TransReopenProdOrderCmtLine(ProdOrder);
         TransReopenProdOrderRtngCmtLn(ProdOrder);
         TransReopenProdOrderBOMCmtLine(ProdOrder);
+
+        OnAfterTransferRelatedTablesToReleasedProdOrder(ProdOrder);
     end;
 
     local procedure ShowReleasedProdOrderDocument(var ProdOrder: Record "Production Order")
@@ -230,6 +232,7 @@ codeunit 5407 "Prod. Order Status Management"
         TransferReopenProdOrderLine(ProdOrderLine);
         TransReopenProdOrderComp(ProdOrderLine);
         UpdateSourceSubtypeForPutAwayDocumentWhenStatusIsChanged(ProdOrderLine, ProdOrderLine.Status::Released);
+        OnProcessProdOrderLineForReopenOnBeforeDeleteUpdateProdOrderLine(ProdOrderLine);
         UpdateProdOrderLine.Get(ProdOrderLine.Status, ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.");
         UpdateProdOrderLine.Delete();
     end;
@@ -243,6 +246,8 @@ codeunit 5407 "Prod. Order Status Management"
         ProductionOrder.Status := ProductionOrder.Status::Released;
         ProductionOrder."Reopened" := true;
         ProductionOrder.Insert();
+        
+        OnAfterTransferReopenProdOrder(ProductionOrder, FromProdOrder);
     end;
 
     local procedure TransferReopenProdOrderLine(FromProdOrderLine: Record "Prod. Order Line")
@@ -265,6 +270,8 @@ codeunit 5407 "Prod. Order Status Management"
         Item.Get(ProductionOrderLine."Item No.");
         Item."Cost is Adjusted" := false;
         Item.Modify();
+
+        OnAfterTransferReopenProdOrderLine(ProductionOrderLine, FromProdOrderLine);
     end;
 
     local procedure TransReopenProdOrderComp(FromProdOrderLine: Record "Prod. Order Line")
@@ -458,7 +465,10 @@ codeunit 5407 "Prod. Order Status Management"
 
     local procedure MakeMultiLevelAdjmt(ProdOrder: Record "Production Order")
     var
+        InventoryAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)";
+        ItemLedgerEntry: Record "Item Ledger Entry";
         InvtAdjmtHandler: Codeunit "Inventory Adjustment Handler";
+        ItemsToAdjust: List of [Code[20]];
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -466,9 +476,20 @@ codeunit 5407 "Prod. Order Status Management"
         if IsHandled then
             exit;
 
-        InventorySetup.Get();
-        if InventorySetup.AutomaticCostAdjmtRequired() then
-            InvtAdjmtHandler.MakeInventoryAdjustment(true, InventorySetup."Automatic Cost Posting");
+        ItemLedgerEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+        ItemLedgerEntry.SetCurrentKey("Order Type", "Order No.");
+        ItemLedgerEntry.SetRange("Order Type", ItemLedgerEntry."Order Type"::Production);
+        ItemLedgerEntry.SetRange("Order No.", ProdOrder."No.");
+        ItemLedgerEntry.SetLoadFields("Item No.");
+        if ItemLedgerEntry.FindSet() then
+            repeat
+                if not ItemsToAdjust.Contains(ItemLedgerEntry."Item No.") then
+                    ItemsToAdjust.Add(ItemLedgerEntry."Item No.");
+            until ItemLedgerEntry.Next() = 0;
+
+        InventoryAdjmtEntryOrder.SetRange("Order Type", InventoryAdjmtEntryOrder."Order Type"::Production);
+        InventoryAdjmtEntryOrder.SetRange("Order No.", ProdOrder."No.");
+        InvtAdjmtHandler.MakeAutomaticInventoryAdjustment(ItemsToAdjust, InventoryAdjmtEntryOrder);
     end;
 
     procedure TransProdOrder(var FromProdOrder: Record "Production Order")
@@ -1005,7 +1026,11 @@ codeunit 5407 "Prod. Order Status Management"
                 if NewStatus = NewStatus::Released then
                     QtyToPost := ProdOrderComp.GetNeededQty(1, false)
                 else begin
-                    QtyToPost := ProdOrderComp.GetNeededQty(0, false);
+                    if ProdOrder.Reopened then
+                        QtyToPost := ProdOrderComp.GetNeededQty(0, true)
+                    else
+                        QtyToPost := ProdOrderComp.GetNeededQty(0, false);
+
                     if SuppliedByProdOrderLine.Get(ProdOrderComp.Status, ProdOrderComp."Prod. Order No.", ProdOrderComp."Supplied-by Line No.") and
                        (SuppliedByProdOrderLine."Remaining Quantity" = 0) and
                        (SuppliedByProdOrderLine.Quantity = SuppliedByProdOrderLine."Finished Quantity")
@@ -1274,7 +1299,9 @@ codeunit 5407 "Prod. Order Status Management"
                 if ((ProdOrderComp."Flushing Method" <> ProdOrderComp."Flushing Method"::Backward) and
                     (ProdOrderComp."Flushing Method" <> ProdOrderComp."Flushing Method"::"Pick + Backward") and
                     (ProdOrderComp."Routing Link Code" = '')) or
-                   ((ProdOrderComp."Routing Link Code" <> '') and not RtngWillFlushComp(ProdOrderComp))
+                   ((ProdOrderComp."Routing Link Code" <> '') and not RtngWillFlushComp(ProdOrderComp)) or
+                   ((ProdOrderComp."Flushing Method" in [ProdOrderComp."Flushing Method"::Manual, ProdOrderComp."Flushing Method"::"Pick + Manual"]) and
+                   (ProdOrderComp."Routing Link Code" <> ''))
                 then
                     ShowWarning := true;
             until ProdOrderComp.Next() = 0;
@@ -1326,6 +1353,7 @@ codeunit 5407 "Prod. Order Status Management"
     begin
         ProdOrderLine.SetRange(Status, ProdOrder.Status);
         ProdOrderLine.SetRange("Prod. Order No.", ProdOrder."No.");
+        OnErrorIfUnableToClearWIPOnAfterProdOrderLineSetFilters(ProdOrder, ProdOrderLine);
         if ProdOrderLine.FindSet() then
             repeat
                 IsHandled := false;
@@ -1900,6 +1928,31 @@ codeunit 5407 "Prod. Order Status Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTransProdOrderComp(FromProdOrder: Record "Production Order"; var ToProdOrder: Record "Production Order"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnErrorIfUnableToClearWIPOnAfterProdOrderLineSetFilters(ProductionOrder: Record "Production Order"; var ProdOrderLine: Record "Prod. Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterTransferReopenProdOrderLine(ProdOrderLine: Record "Prod. Order Line"; FromProdOrderLine: Record "Prod. Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterTransferRelatedTablesToReleasedProdOrder(ProductionOrder: Record "Production Order")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnProcessProdOrderLineForReopenOnBeforeDeleteUpdateProdOrderLine(ProdOrderLine: Record "Prod. Order Line")
+    begin
+    end;
+    
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterTransferReopenProdOrder(ProductionOrder: Record "Production Order"; FromProductionOrder: Record "Production Order")
     begin
     end;
 }
