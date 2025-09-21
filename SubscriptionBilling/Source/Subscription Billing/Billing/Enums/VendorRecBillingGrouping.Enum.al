@@ -3,6 +3,7 @@ namespace Microsoft.SubscriptionBilling;
 enum 8058 "Vendor Rec. Billing Grouping"
 {
     Extensible = false;
+    Access = Internal;
 
     value(0; "Contract")
     {
