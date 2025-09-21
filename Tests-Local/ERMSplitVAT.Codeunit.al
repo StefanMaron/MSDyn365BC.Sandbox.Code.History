@@ -469,7 +469,6 @@ codeunit 144561 "ERM Split VAT"
     var
         ServiceHeader: Record "Service Header";
         VATPostingSetup: Record "VAT Posting Setup";
-        ServiceCalcDiscount: Codeunit "Service-Calc. Discount";
         CustomerNo: Code[20];
         InvoiceDiscountAmount: Decimal;
     begin
@@ -495,7 +494,7 @@ codeunit 144561 "ERM Split VAT"
         // [THEN] Inv. Discount Amount should not be changed
         // Verify using Service Statistics page handler
         LibraryVariableStorage.Enqueue(InvoiceDiscountAmount);
-        ServiceCalcDiscount.CalculateIncDiscForHeader(ServiceHeader);
+        ServiceHeader.CalcInvDiscForHeader();
         PAGE.RunModal(PAGE::"Service Statistics", ServiceHeader);
 
         // Cleanup
@@ -1792,11 +1791,10 @@ codeunit 144561 "ERM Split VAT"
     local procedure CreateServiceInvoiceForCustomer(var ServiceHeader: Record "Service Header"; CustomerNo: Code[20]; VATPostingSetup: Record "VAT Posting Setup"): Decimal
     var
         ServiceLine: Record "Service Line";
-        ServiceCalcDiscount: Codeunit "Service-Calc. Discount";
     begin
         LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Invoice, CustomerNo);
         LibrarySplitVAT.CreateServiceLine(ServiceLine, ServiceHeader, VATPostingSetup."VAT Prod. Posting Group");
-        ServiceCalcDiscount.CalculateIncDiscForHeader(ServiceHeader);
+        ServiceHeader.CalcInvDiscForHeader();
         ServiceLine.Find();
         exit(ServiceLine."Inv. Discount Amount");
     end;
@@ -2316,3 +2314,4 @@ codeunit 144561 "ERM Split VAT"
     begin
     end;
 }
+
