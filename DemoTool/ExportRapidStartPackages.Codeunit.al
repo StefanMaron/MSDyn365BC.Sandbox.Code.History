@@ -24,36 +24,6 @@ codeunit 101930 "Export RapidStart Packages"
             until ConfigPackage.Next() = 0;
     end;
 
-    procedure ExportSetupPackageFromContoso()
-    var
-        DemoDataSetup: Record "Demo Data Setup";
-        CreateDemoDatafromConfig: Codeunit "Create Demo Data from Config";
-    begin
-        CreateDemoDatafromConfig.SetupDemonstrationData(DemoDataSetup);
-        DemoDataSetup."Data Type" := DemoDataSetup."Data Type"::Standard;
-
-        ExportPackageFromContoso();
-    end;
-
-    procedure ExportEvalPackageFromContoso()
-    var
-        DemoDataSetup: Record "Demo Data Setup";
-        CreateDemoDatafromConfig: Codeunit "Create Demo Data from Config";
-    begin
-        CreateDemoDatafromConfig.SetupDemonstrationData(DemoDataSetup);
-        DemoDataSetup."Data Type" := DemoDataSetup."Data Type"::Evaluation;
-
-        ExportPackageFromContoso();
-    end;
-
-    local procedure ExportPackageFromContoso()
-    var
-        CreateRapidStartPackage: Codeunit "Create RapidStart Package";
-    begin
-        CreateRapidStartPackage.InsertMiniAppData();
-        CODEUNIT.Run(CODEUNIT::"Export RapidStart Packages");
-    end;
-
     var
         ConfigPckgCompressionMgt: Codeunit "Config. Pckg. Compression Mgt.";
         FileMgt: Codeunit "File Management";
