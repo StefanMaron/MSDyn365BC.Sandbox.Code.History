@@ -54,7 +54,7 @@ table 189 "VAT Setup"
         }
         field(5; "Use For Job Cost"; Boolean)
         {
-            Caption = 'Use For Project Cost';
+            Caption = 'Use For Job Cost';
         }
         field(10; "Show Non-Ded. VAT In Lines"; Boolean)
         {
@@ -62,7 +62,7 @@ table 189 "VAT Setup"
         }
         field(11; "Non-Deductible VAT Is Enabled"; Boolean)
         {
-            Caption = 'Non-Deductible VAT Is Enabled';
+            Caption = 'Show Non-Ded. VAT In Lines';
             Editable = false;
         }
         field(12; "Allow VAT Date From"; Date)
