@@ -43,20 +43,15 @@ codeunit 67 "Transfer-Explode BOM"
 
         FromBOMComponent.SetRange("Parent Item No.", Rec."Item No.");
         FromBOMComponent.SetRange(Type, FromBOMComponent.Type::Item);
-
         NoOfBOMComponents := FromBOMComponent.Count();
         if NoOfBOMComponents = 0 then
             Error(NotBOMErr, Rec."Item No.");
 
-        IsHandled := false;
-        OnBeforeConfirmBOMContainsNonItemLines(Rec, IsHandled);
-        if not IsHandled then begin
-            FromBOMComponent.SetFilter(Type, '<>%1', FromBOMComponent.Type::Item);
-            if not FromBOMComponent.IsEmpty() then
-                if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(BOMContainsNonItemLinesQst, Rec."Item No."), true) then
-                    Error('');
-            FromBOMComponent.SetRange(Type, FromBOMComponent.Type::Item);
-        end;
+        FromBOMComponent.SetFilter(Type, '<>%1', FromBOMComponent.Type::Item);
+        if not FromBOMComponent.IsEmpty() then
+            if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(BOMContainsNonItemLinesQst, Rec."Item No."), true) then
+                Error('');
+        FromBOMComponent.SetRange(Type, FromBOMComponent.Type::Item);
 
         Selection := GetSelection(Rec);
         if Selection = 0 then
@@ -205,11 +200,6 @@ codeunit 67 "Transfer-Explode BOM"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckTransferLine(TransferLine: Record "Transfer Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeConfirmBOMContainsNonItemLines(var TransferLine: Record "Transfer Line"; var IsHandled: Boolean)
     begin
     end;
 }
