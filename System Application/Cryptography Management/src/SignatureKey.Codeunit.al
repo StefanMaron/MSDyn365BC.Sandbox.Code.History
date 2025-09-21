@@ -67,7 +67,7 @@ codeunit 1474 "Signature Key"
     /// Gets an XML string containing the key of the saved key value.
     /// </summary>
     /// <returns>An XML string containing the key of the saved key value.</returns>
-    procedure ToXmlString(): SecretText
+    internal procedure ToXmlString(): SecretText
     begin
         exit(SignatureKeyImpl.ToXmlString());
     end;
