@@ -214,7 +214,7 @@ report 5199 "Update Contact Classification"
         NoOfRecs := Cust.Count();
         if Cust.Find('-') then
             repeat
-                OnFindCustomerValuesOnBeforeCustLoop(ProfileQuestionnaireLine, Cust, Date);
+                OnFindCustomerValuesOnBeforeCustLoop(ProfileQuestionnaireLine, Cust);
                 RecCount := RecCount + 1;
                 Window.Update(5, Cust."No.");
                 Window.Update(6, Round(10000 * RecCount / NoOfRecs, 1));
@@ -468,7 +468,7 @@ report 5199 "Update Contact Classification"
         NoOfRecs := Cont.Count();
         if Cont.Find('-') then
             repeat
-                OnFindContactValuesOnBeforeContLoop(ProfileQuestionnaireLine, Cont, Date);
+                OnFindContactValuesOnBeforeContLoop(ProfileQuestionnaireLine, Cont);
                 RecCount := RecCount + 1;
                 Window.Update(5, Cont."No.");
                 Window.Update(6, Round(10000 * RecCount / NoOfRecs, 1));
@@ -680,8 +680,6 @@ report 5199 "Update Contact Classification"
     end;
 
     local procedure InRange(Value: Decimal; FromValue: Decimal; ToValue: Decimal): Boolean
-    var
-        Result: Boolean;
     begin
         if (FromValue <> 0) and (ToValue <> 0) and (Value >= FromValue) and (Value <= ToValue) then
             exit(true);
@@ -689,10 +687,6 @@ report 5199 "Update Contact Classification"
             exit(true);
         if (FromValue = 0) and (ToValue <> 0) and (Value <= ToValue) then
             exit(true);
-
-        Result := false;
-        OnAfterInRange(Value, FromValue, ToValue, Result);
-        exit(Result);
     end;
 
     local procedure MarkContact(ProfileQuestnLineQuestion: Record "Profile Questionnaire Line"; ProfileQuestnLineAnswer: Record "Profile Questionnaire Line"; ContNo: Code[20]; UpdateDate: Date; QuestionsAnsweredPrc: Decimal)
@@ -928,12 +922,12 @@ report 5199 "Update Contact Classification"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnFindContactValuesOnBeforeContLoop(var ProfileQuestionnaireLine: Record "Profile Questionnaire Line"; var Contact: Record Contact; Date: Date)
+    local procedure OnFindContactValuesOnBeforeContLoop(ProfileQuestionnaireLine: Record "Profile Questionnaire Line"; var Contact: Record Contact)
     begin
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnFindCustomerValuesOnBeforeCustLoop(var ProfileQuestionnaireLine: Record "Profile Questionnaire Line"; var Customer: Record Customer; Date: Date)
+    local procedure OnFindCustomerValuesOnBeforeCustLoop(ProfileQuestionnaireLine: Record "Profile Questionnaire Line"; var Customer: Record Customer)
     begin
     end;
 
@@ -969,11 +963,6 @@ report 5199 "Update Contact Classification"
 
     [IntegrationEvent(false, false)]
     local procedure OnMarkContactOnBeforeCheckContactType(ProfileQuestnHeader: Record "Profile Questionnaire Header"; ProfileQuestnLineQuestion: Record "Profile Questionnaire Line"; ProfileQuestnLineAnswer: Record "Profile Questionnaire Line"; Cont: Record Contact; UpdateDate: Date; QuestionsAnsweredPrc: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInRange(Value: Decimal; FromValue: Decimal; ToValue: Decimal; var Result: Boolean)
     begin
     end;
 }
