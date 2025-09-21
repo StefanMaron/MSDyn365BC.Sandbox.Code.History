@@ -141,6 +141,9 @@ table 37 "Sales Line"
                                 SalesHeader.TestField(Status, SalesHeader.Status::Open);
                         Type::"Charge (Item)":
                             DeleteChargeChargeAssgnt("Document Type", "Document No.", "Line No.");
+                        Type::" ":
+                            if ("Attached to Line No." <> 0) and (Quantity = 0) then
+                                Error(ChangeExtendedTextErr, FieldCaption(Type));
                     end;
                     if xRec."Deferral Code" <> '' then
                         DeferralUtilities.RemoveOrSetDeferralSchedule('',
@@ -1904,7 +1907,7 @@ table 37 "Sales Line"
                     FieldError("Prepmt. Line Amount", StrSubstNo(Text045, "Line Amount"));
                 if "System-Created Entry" and not IsServiceChargeLine() then
                     FieldError("Prepmt. Line Amount", StrSubstNo(Text045, 0));
-                Validate("Prepayment %", "Prepmt. Line Amount" * 100 / "Line Amount");
+                Validate("Prepayment %", "Prepmt. Line Amount" * 100 / CalculateOutstandingAmountExclTax());
             end;
         }
         field(111; "Prepmt. Amt. Inv."; Decimal)
@@ -3375,6 +3378,13 @@ table 37 "Sales Line"
             FieldClass = FlowField;
             BlankZero = true;
         }
+        field(7012; "Sell-to Customer Name"; Text[100])
+        {
+            CalcFormula = lookup(Customer.Name where("No." = field("Sell-to Customer No.")));
+            Caption = 'Sell-to Customer Name';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(3010501; "Customer Line Reference"; Integer)
         {
             Caption = 'Customer Line Reference';
@@ -3800,6 +3810,8 @@ table 37 "Sales Line"
         CannotChangeVATGroupWithPrepmInvErr: Label 'You cannot change the VAT product posting group because prepayment invoices have been posted.\\You need to post the prepayment credit memo to be able to change the VAT product posting group.';
         CannotChangePrepmtAmtDiffVAtPctErr: Label 'You cannot change the prepayment amount because the prepayment invoice has been posted with a different VAT percentage. Please check the settings on the prepayment G/L account.';
         NonInvReserveTypeErr: Label 'Non-inventory and service items must have the reserve type Never. The current reserve type for item %1 is %2.', Comment = '%1 is Item No., %2 is Reserve';
+        ChangeExtendedTextErr: Label 'You cannot change %1 for Extended Text Line.', Comment = '%1= Field Caption';
+        PurchasingCodeOnSalesInvoiceErr: Label 'The Purchasing Code should be blank for item %1 on the sales invoice because it is used only for the drop shipment process.', Comment = '%1= Item No.';
 
     protected var
         HideValidationDialog: Boolean;
@@ -4176,6 +4188,7 @@ table 37 "Sales Line"
         else
             "Unit of Measure Code" := Item."Base Unit of Measure";
 
+        CheckPurchasingCodeForInvoice();
         if "Document Type" in ["Document Type"::Quote, "Document Type"::Order, "Document Type"::Invoice, "Document Type"::"Blanket Order"] then
             Validate("Purchasing Code", Item."Purchasing Code");
         OnAfterCopyFromItem(Rec, Item, CurrFieldNo, xRec);
@@ -5655,7 +5668,7 @@ table 37 "Sales Line"
     begin
         if "Sell-to Customer No." = '' then
             exit(false);
-            
+
         Customer.SetLoadFields("Base Calendar Code");
         if Customer.Get("Sell-to Customer No.") then
             exit(Customer."Base Calendar Code" <> '');
@@ -8749,7 +8762,12 @@ table 37 "Sales Line"
     var
         PosBefore: Integer;
         PosAfter: Integer;
+        IsHandled: Boolean;
     begin
+        OnBeforeCalcPosition(Rec, Position, IsHandled);
+        if IsHandled then
+            exit;
+
         if not (CheckQuoteMgtPermission() or (CopyStr(SerialNumber, 7, 3) = '000')) then
             exit;
 
@@ -8875,8 +8893,12 @@ table 37 "Sales Line"
     procedure ValidateLineDiscountPercent(DropInvoiceDiscountAmount: Boolean)
     var
         InvDiscountAmount: Decimal;
+        IsHandled: Boolean;
     begin
-        TestJobPlanningLine();
+        IsHandled := false;
+        OnValidateLineDiscountPercentOnBeforeTestJobPlanningLine(Rec, xRec, IsHandled);
+        if not IsHandled then
+            TestJobPlanningLine();
         TestStatusOpen();
         OnValidateLineDiscountPercentOnAfterTestStatusOpen(Rec, xRec, CurrFieldNo);
         "Line Discount Amount" :=
@@ -10371,6 +10393,23 @@ table 37 "Sales Line"
             ClearPrepaymentVATPct();
 
         OnAfterCopyPrepaymentFromVATPostingSetup(Rec, VATPostingSetupFrom);
+    end;
+
+    local procedure CheckPurchasingCodeForInvoice()
+    var
+        Item: Record Item;
+        Purchasing: Record Purchasing;
+    begin
+        if (Rec."Document Type" <> Rec."Document Type"::Invoice) or (Rec.Type <> Rec.Type::Item) then
+            exit;
+
+        Item := GetItem();
+        if Item."Purchasing Code" = '' then
+            exit;
+
+        Purchasing.Get(Item."Purchasing Code");
+        if Purchasing."Drop Shipment" then
+            Error(PurchasingCodeOnSalesInvoiceErr, Rec."No.");
     end;
 
     [IntegrationEvent(false, false)]
@@ -12393,6 +12432,16 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnInitDeferralCodeOnBeforeUpdateDeferralCode(var SalesLine: Record "Sales Line"; var ShouldUpdateDeferralCode: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnValidateLineDiscountPercentOnBeforeTestJobPlanningLine(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalcPosition(var SalesLine: Record "Sales Line"; var Position: Integer; var IsHandled: Boolean)
     begin
     end;
 }
