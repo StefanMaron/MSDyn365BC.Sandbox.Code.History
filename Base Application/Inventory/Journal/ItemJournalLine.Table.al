@@ -76,7 +76,6 @@ table 83 "Item Journal Line"
                 if "Item No." <> xRec."Item No." then begin
                     "Variant Code" := '';
                     "Bin Code" := '';
-                    "Unit of Measure Code" := '';
                     if CurrFieldNo <> 0 then begin
                         GetItem();
                         if Item.IsInventoriableType() then
@@ -180,8 +179,7 @@ table 83 "Item Journal Line"
                 OnValidateItemNoOnBeforeValidateUnitOfMeasureCode(Rec, Item, CurrFieldNo, xRec);
                 Validate("Unit of Measure Code");
                 if "Variant Code" <> '' then
-                    if not IsEntryTypeProduction() then
-                        Validate("Variant Code");
+                    Validate("Variant Code");
 
                 OnAfterOnValidateItemNoAssignByEntryType(Rec, Item);
 
@@ -235,8 +233,6 @@ table 83 "Item Journal Line"
                     else
                         OnValidateEntryTypeOnUpdateByEntryType(Rec);
                 end;
-
-                OnValidateEntryTypeBeforeValidateLocationCode(Rec);
 
                 if xRec."Location Code" = '' then
                     if Location.Get("Location Code") then
@@ -5186,11 +5182,6 @@ table 83 "Item Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnTimeIsEmpty(var ItemJournalLine: Record "Item Journal Line"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateEntryTypeBeforeValidateLocationCode(var ItemJnlLine: Record "Item Journal Line")
     begin
     end;
 }
