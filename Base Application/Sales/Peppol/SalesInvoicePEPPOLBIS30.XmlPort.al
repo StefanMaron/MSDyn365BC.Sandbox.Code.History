@@ -104,7 +104,7 @@ xmlport 1610 "Sales Invoice - PEPPOL BIS 3.0"
 
                 trigger OnBeforePassVariable()
                 begin
-                    BuyerReference := PEPPOLMgt.GetBuyerReference(SalesHeader);
+                    BuyerReference := SalesHeader."Your Reference";
                     if BuyerReference = '' then
                         currXMLport.Skip();
                 end;
@@ -1367,7 +1367,7 @@ xmlport 1610 "Sales Invoice - PEPPOL BIS 3.0"
                         TransactionCurrencyTaxAmount: Text;
                         TransCurrTaxAmtCurrencyID: Text;
                     begin
-                        if (not FindNextVATAmtRec(TempVATAmtLine, TaxSubtotalLoop.Number)) and (TaxSubtotalLoop.Number > 1) then
+                        if not FindNextVATAmtRec(TempVATAmtLine, TaxSubtotalLoop.Number) then
                             currXMLport.Break();
 
                         PEPPOLMgt.GetTaxSubtotalInfo(
@@ -2041,7 +2041,6 @@ xmlport 1610 "Sales Invoice - PEPPOL BIS 3.0"
                     if not FindNextInvoiceLineRec(InvoiceLineLoop.Number) then
                         currXMLport.Break();
 
-                    OnInvoiceLineLoopOnAfterGetRecordOnBeforeGetLineGeneralInfo(SalesInvoiceLine, SalesLine);
                     PEPPOLMgt.GetLineGeneralInfo(
                       SalesLine,
                       SalesHeader,
@@ -2133,7 +2132,6 @@ xmlport 1610 "Sales Invoice - PEPPOL BIS 3.0"
                     if SalesInvoiceLine.FindSet() then
                         repeat
                             SalesLine.TransferFields(SalesInvoiceLine);
-                            OnGetTotalsOnBeforeGetSalesLineTotals(SalesInvoiceLine, SalesLine);
                             PEPPOLMgt.GetTotals(SalesLine, TempVATAmtLine);
                             PEPPOLMgt.GetTaxCategories(SalesLine, TempVATProductPostingGroup);
                         until SalesInvoiceLine.Next() = 0;
@@ -2189,7 +2187,6 @@ xmlport 1610 "Sales Invoice - PEPPOL BIS 3.0"
                     if SalesInvoiceLine.FindSet() then
                         repeat
                             SalesLine.TransferFields(SalesInvoiceLine);
-                            OnInitializeOnBeforeGetInvoiceRoundingLine(SalesInvoiceLine, SalesLine);
                             PEPPOLMgt.GetInvoiceRoundingLine(TempSalesLineRounding, SalesLine);
                         until SalesInvoiceLine.Next() = 0;
                     if TempSalesLineRounding."Line No." <> 0 then
@@ -2253,18 +2250,4 @@ xmlport 1610 "Sales Invoice - PEPPOL BIS 3.0"
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnGetTotalsOnBeforeGetSalesLineTotals(var SalesInvoiceLine: Record "Sales Invoice Line"; var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInvoiceLineLoopOnAfterGetRecordOnBeforeGetLineGeneralInfo(var SalesInvoiceLine: Record "Sales Invoice Line"; var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInitializeOnBeforeGetInvoiceRoundingLine(var SalesInvoiceLine: Record "Sales Invoice Line"; var SalesLine: Record "Sales Line")
-    begin
-    end;
 }
