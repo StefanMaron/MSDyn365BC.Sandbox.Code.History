@@ -12,7 +12,6 @@ using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
-using Microsoft.Finance.Currency;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using System.Utilities;
@@ -375,10 +374,6 @@ report 11383 "ExportElecPayments - Word"
                         }
 
                         trigger OnAfterGetRecord()
-                        var
-                            Currency: Record Currency;
-                            CurrExchRate: Record "Currency Exchange Rate";
-                            ValidExchRate: Boolean;
                         begin
                             CalcFields("Remaining Amt. (LCY)");
                             if ("Pmt. Discount Date" >= "Gen. Journal Line"."Document Date") and
@@ -395,16 +390,7 @@ report 11383 "ExportElecPayments - Word"
                                     AmountPaid := -ExportAmount - TotalAmountPaid;
                             end;
 
-                            if "Gen. Journal Line"."Currency Code" = '' then begin
-                                Currency.Reset();
-                                Currency.SetRange(Code, "Currency Code");
-                                if Currency.FindFirst() then
-                                    TotalAmountPaid := TotalAmountPaid + Round(CurrExchRate.ApplnExchangeAmtFCYToFCY(
-                                             "Posting Date", "Currency Code", "Gen. Journal Line"."Currency Code", AmountPaid, ValidExchRate), Currency."Amount Rounding Precision")
-                                else
-                                    TotalAmountPaid := TotalAmountPaid + AmountPaid;
-                            end else
-                                TotalAmountPaid := TotalAmountPaid + AmountPaid;
+                            TotalAmountPaid := TotalAmountPaid + AmountPaid;
                             IsSummary := true;
                         end;
 
