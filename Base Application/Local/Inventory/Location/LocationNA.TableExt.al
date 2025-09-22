@@ -2,7 +2,6 @@ namespace Microsoft.Inventory.Location;
 
 using Microsoft.Finance.SalesTax;
 using Microsoft.eServices.EDocument;
-using System.Security.Encryption;
 
 tableextension 10015 "Location NA" extends Location
 {
@@ -70,12 +69,6 @@ tableextension 10015 "Location NA" extends Location
                 if SATAddress.LookupSATAddress(SATAddress, Rec."Country/Region Code", '') then
                     Rec."SAT Address ID" := SATAddress.Id;
             end;
-        }
-        field(27020; "SAT Certificate"; Code[20])
-        {
-            Caption = 'SAT Certificate';
-            DataClassification = CustomerContent;
-            TableRelation = "Isolated Certificate";
         }
 #if not CLEANSCHEMA26
         field(27026; "SAT State Code"; Code[10])
