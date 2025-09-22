@@ -14,7 +14,6 @@ codeunit 136502 "UT Time Sheets Posting"
         TimeSheetApprovalMgt: Codeunit "Time Sheet Approval Management";
         LibraryTimeSheet: Codeunit "Library - Time Sheet";
         LibraryJob: Codeunit "Library - Job";
-        LibraryERM: Codeunit "Library - ERM";
 #if not CLEAN25
         LibraryRandom: Codeunit "Library - Random";
 #endif
@@ -565,8 +564,6 @@ codeunit 136502 "UT Time Sheets Posting"
         ResJournalTemplate.SetRange(Recurring, false);
         LibraryResource.FindResJournalTemplate(ResJournalTemplate);
         LibraryResource.FindResJournalBatch(ResJournalBatch, ResJournalTemplate.Name);
-        ResJournalBatch.Validate("No. Series", LibraryERM.CreateNoSeriesCode());
-        ResJournalBatch.Modify(true);
     end;
 
     local procedure FilterJobJournalLineByBatchTemplate(var JobJournalLine: Record "Job Journal Line"; JobJournalTemplateName: Code[10]; JobJournalBatchName: Code[10])
