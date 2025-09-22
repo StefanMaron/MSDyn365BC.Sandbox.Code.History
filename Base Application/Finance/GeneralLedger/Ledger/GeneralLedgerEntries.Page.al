@@ -792,6 +792,7 @@ page 20 "General Ledger Entries"
         if IsHandled then
             exit(RetCaption);
 
+        GLAcc.SecurityFiltering := GLAcc.SecurityFiltering::Filtered;
         GLAcc.SetLoadFields("No.", Name);
         if GLAcc."No." <> Rec."G/L Account No." then
             if not GLAcc.Get(Rec."G/L Account No.") then
