@@ -775,6 +775,8 @@ codeunit 442 "Sales-Post Prepayments"
             BalAccNo := GetInvRoundingAccNo(SalesHeader."Customer Posting Group")
         else
             BalAccNo := GetGainLossGLAcc(SalesHeader."Currency Code", PositiveAmount);
+
+        OnAfterGetCorrBalAccNo(SalesHeader, PositiveAmount, BalAccNo);
         exit(BalAccNo);
     end;
 
@@ -1926,6 +1928,10 @@ codeunit 442 "Sales-Post Prepayments"
             if SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", PrepmtInvLineBuffer."Line No.") then
                 SalesInvLine."Description 2" := SalesLine."Description 2";
 
+        if SalesHeader."Compress Prepayment" then
+            if SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", LineNo) then
+                SalesInvLine."Unit of Measure Code" := SalesLine."Unit of Measure Code";
+
         SalesInvLine.Quantity := 1;
         if GLSetup.CheckFullGSTonPrepayment(PrepmtInvLineBuffer."VAT Bus. Posting Group", PrepmtInvLineBuffer."VAT Prod. Posting Group") then
             SalesInvLine."Prepayment Line" := true;
@@ -2659,9 +2665,14 @@ codeunit 442 "Sales-Post Prepayments"
     local procedure OnCodeOnBeforeCheckPrepmtDoc(var SalesHeader: Record "Sales Header"; var DocumentType: Option Invoice,"Credit Memo")
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetPrepmtAccNo(GenPostingSetup: Record "General Posting Setup"; var PrepmtAccNo: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetCorrBalAccNo(SalesHeader: Record "Sales Header"; PositiveAmount: Boolean; var BalAccNo: Code[20])
     begin
     end;
 }
