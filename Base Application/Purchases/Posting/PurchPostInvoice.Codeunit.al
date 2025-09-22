@@ -287,8 +287,10 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         InvoicePostingBuffer.UpdateVATBase(TotalVATBase, TotalVATBaseACY);
         NonDeductibleVAT.SetNonDeductibleVAT(InvoicePostingBuffer, TotalNonDedVATBase, TotalNonDedVATAmount, TotalNonDedVATBaseACY, TotalNonDedVATAmountACY, TotalNonDedVATDiff);
         InvoicePostingBuffer."Deferral Code" := PurchLine."Deferral Code";
-        PurchPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, PurchLine);
-        UpdateInvoicePostingBuffer(InvoicePostingBuffer);
+        IsHandled := false;
+        PurchPostInvoiceEvents.RunOnPrepareLineOnAfterFillInvoicePostingBuffer(InvoicePostingBuffer, PurchLine, TempInvoicePostingBuffer, FALineNo, InvDefLineNo, DeferralLineNo, IsHandled);
+        if not IsHandled then
+            UpdateInvoicePostingBuffer(InvoicePostingBuffer);
 
         PurchPostInvoiceEvents.RunOnPrepareLineOnAfterUpdateInvoicePostingBuffer(
             PurchHeader, PurchLine, InvoicePostingBuffer, TempInvoicePostingBuffer);
@@ -938,7 +940,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
                     InvoicePostingBuffer."VAT Calculation Type"::"Reverse Charge VAT":
                         begin
                             VATPostingSetup.Get(InvoicePostingBuffer."VAT Bus. Posting Group", InvoicePostingBuffer."VAT Prod. Posting Group");
-                            PurchPostInvoiceEvents.RunOnCalculateVATAmountsOnAfterGetReverseChargeVATPostingSetup(VATPostingSetup);
+                            PurchPostInvoiceEvents.RunOnCalculateVATAmountsOnAfterGetReverseChargeVATPostingSetup(VATPostingSetup, PurchHeader, TempInvoicePostingBuffer);
 
                             VATBaseAmount := InvoicePostingBuffer."VAT Base Amount" * (1 - PurchHeader."VAT Base Discount %" / 100);
                             VATBaseAmountACY := InvoicePostingBuffer."VAT Base Amount (ACY)" * (1 - PurchHeader."VAT Base Discount %" / 100);
@@ -1002,6 +1004,8 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
                                         InvoicePostingBuffer."VAT Amount", 0);
                             InvoicePostingBuffer.Modify();
                         end;
+                    else
+                        PurchPostInvoiceEvents.RunOnCalculateVATAmountsOnAfterVatCalculationType(TempInvoicePostingBuffer, PurchHeader, VATPostingSetup);
                 end;
             until InvoicePostingBuffer.Next() = 0;
     end;
@@ -1010,7 +1014,13 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
     var
         DeferralTemplate: Record "Deferral Template";
         DeferralPostingBuffer: Record "Deferral Posting Buffer";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        PurchPostInvoiceEvents.RunOnBeforePrepareDeferralLine(TempDeferralHeader, TempDeferralLine, PurchHeader, PurchLine, AmountLCY, AmountACY, RemainAmtToDefer, RemainAmtToDeferACY, DeferralAccount, PurchAccount, InvoicePostingParameters."Document No.", InvDefLineNo, IsHandled);
+        if IsHandled then
+            exit;
+
         DeferralTemplate.Get(PurchLine."Deferral Code");
 
         if TempDeferralHeader.Get(
