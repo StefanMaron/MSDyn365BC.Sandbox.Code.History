@@ -17,6 +17,7 @@ using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Shipping;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
@@ -120,6 +121,7 @@ codeunit 136101 "Service Orders"
         AvailableExpectedQuantityErr: Label 'Available expected quantity must be %1.', Comment = '%1=Value';
         VATCountryRegionLbl: Label 'VAT Country/Region Code must be %1', Comment = '%1 = Country/Region Code';
         ServiceOrderErr: Label 'Service Order does not exist.';
+        ServiceOrderStatusShouldChangedErr: Label 'Service Header Status should have changed when adding Service Item';
 
     [Test]
     [Scope('OnPrem')]
@@ -5572,6 +5574,133 @@ codeunit 136101 "Service Orders"
         Assert.AreEqual(Customer[2]."Country/Region Code", ServiceHeader."VAT Country/Region Code", VATCountryRegionLbl);
     end;
 
+    [Test]
+    [HandlerFunctions('ServiceOrderReportRequestPageHandler')]
+    procedure PrintServiceOrderWithWorkDescription()
+    var
+        Item: Record Item;
+        ServiceHeader: Record "Service Header";
+        ServiceItem: Record "Service Item";
+        ServiceItemLine: Record "Service Item Line";
+        ServiceLine: Record "Service Line";
+        ServiceOrder: TestPage "Service Order";
+    begin
+        // [SCENARIO 575369] Verify Printing Service Order with Work Description does not throw error.
+        Initialize();
+
+        // [GIVEN] Create Item
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Service Order with Work Description
+        LibraryService.CreateServiceItem(ServiceItem, LibrarySales.CreateCustomerNo());
+        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Order, ServiceItem."Customer No.");
+        LibraryService.CreateServiceItemLine(ServiceItemLine, ServiceHeader, ServiceItem."No.");
+        LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Item, Item."No.");
+
+        // [WHEN] Open Service Order Card and click Print
+        CreateCustomReportSelectionForCustomer(ServiceHeader."Customer No.", "Report Selection Usage"::"SM.Order", 5900);
+        ServiceOrder.OpenEdit();
+        ServiceOrder.GotoRecord(ServiceHeader);
+        ServiceOrder.WorkDescription.SetValue(LibraryRandom.RandText(20));
+        ServiceOrder."&Print".Invoke();
+
+        // [THEN] Verify no transaction error should occur.
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ServiceStatisticsShouldZeroWIth100PctLineDiscount()
+    var
+        Customer: Record Customer;
+        Resource: Record Resource;
+        ServiceHeader: Record "Service Header";
+        ServiceLine: Record "Service Line";
+        ServiceInvoice: TestPage "Service Invoice";
+        ServiceStatistics: TestPage "Service Statistics";
+    begin
+        // [SCENARIO 575012] Negative invoice amount when posting a service invoice with 100% line discount
+        Initialize();
+
+        // [GIVEN] Create new customer and resource
+        LibrarySales.CreateCustomer(Customer);
+        LibraryResource.CreateResourceNew(Resource);
+
+        // [GIVEN] Create Service Header with Document Type = Invoice
+        CreateServiceDocumentWithResourceWith100PctDisc(
+            ServiceHeader, ServiceLine, ServiceHeader."Document Type"::Invoice, Customer."No.",
+            Resource."No.", LibraryRandom.RandIntInRange(1, 1), LibraryRandom.RandDecInDecimalRange(0.01, 0.01, 2));
+
+        // [WHEN] Invoke Service Invoice Statistics page and Goto Record
+        ServiceInvoice.OpenEdit();
+        ServiceInvoice.GotoRecord(ServiceHeader);
+        ServiceStatistics.Trap();
+        ServiceInvoice.ServiceStatistics.Invoke();
+
+        // [THEN] Service Invoice Statistics Lines Sub form tab where "Line Amount" and "Amount Including VAT" = 0.00
+        ServiceStatistics.SubForm."Line Amount".AssertEquals(0);
+        ServiceStatistics.SubForm."Amount Including VAT".AssertEquals(0);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure AutoUpdateServiceHeaderStatusOnServiceItemLineAdd()
+    var
+        ServiceHeader: Record "Service Header";
+        ServiceItem: Record "Service Item";
+        Customer: Record Customer;
+        ServiceOrderPage: TestPage "Service Order";
+        InitialStatus: Enum "Service Document Status";
+        FinalStatus: Enum "Service Document Status";
+    begin
+        // [SCENARIO 582114] Test that Service Header Status changes automatically when adding Service Item to Finished Service Order
+
+        // [GIVEN] Initialize and create test data
+        Initialize();
+        LibrarySales.CreateCustomer(Customer);
+        LibraryService.CreateServiceItem(ServiceItem, Customer."No.");
+
+        // [GIVEN] Create a Service Order and set status to Finished
+        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Order, Customer."No.");
+        ServiceHeader.Validate(Status, ServiceHeader.Status::Finished);
+        ServiceHeader.Modify(true);
+        InitialStatus := ServiceHeader.Status;
+
+        // [WHEN] Open Service Order page and add Service Item Line (simulating user action)
+        ServiceOrderPage.OpenEdit();
+        ServiceOrderPage.Filter.SetFilter("No.", ServiceHeader."No.");
+
+        // [THEN] Verify initial status is Finished
+        ServiceOrderPage.Status.AssertEquals(ServiceHeader.Status::Finished);
+
+        // [GIVEN] Add Service Item to the Service Item Lines subform
+        ServiceOrderPage.ServItemLines.New();
+        ServiceOrderPage.ServItemLines.ServiceItemNo.SetValue(ServiceItem."No.");
+        ServiceOrderPage.ServItemLines.Next(); // Move focus to trigger validation
+
+        // [THEN] Verify that Service Header Status has changed automatically
+        ServiceOrderPage.Status.AssertEquals(ServiceHeader.Status::Pending); // Expected new status based on repair status priority
+
+        // [THEN] Verify the change was logged in Service Document Log
+        ServiceHeader.Get(ServiceHeader."Document Type", ServiceHeader."No.");
+        FinalStatus := ServiceHeader.Status;
+
+        // [THEN] Verify status actually changed
+        Assert.AreNotEqual(InitialStatus, FinalStatus, ServiceOrderStatusShouldChangedErr);
+        ServiceOrderPage.Close();
+    end;
+
+    local procedure CreateServiceDocumentWithResourceWith100PctDisc(
+       var ServiceHeader: Record "Service Header"; ServiceLine: Record "Service Line"; DocumentType: Enum "Service Document Type";
+       CustomerNo: Code[20]; ResourceNo: Code[20]; Quantity: Decimal; UnitPrice: Decimal)
+    begin
+        LibraryService.CreateServiceHeader(ServiceHeader, DocumentType, CustomerNo);
+        LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Resource, ResourceNo);
+        ServiceLine.Validate(Quantity, Quantity);
+        ServiceLine.Validate("Unit Price", UnitPrice);
+        ServiceLine.Validate("Line Discount %", 100);
+        ServiceLine.Modify(true);
+    end;
+
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure ConfirmHandlerTRUE(Question: Text[1024]; var Reply: Boolean)
@@ -7875,6 +8004,23 @@ codeunit 136101 "Service Orders"
             exit(ServiceInvoiceHeader."No.");
     end;
 
+    local procedure CreateCustomReportSelectionForCustomer(CustomerNo: Code[20]; ReportSelectionUsage: Enum "Report Selection Usage"; ReportID: Integer)
+    var
+        CustomReportSelection: Record "Custom Report Selection";
+        CustomReportLayout: Record "Custom Report Layout";
+    begin
+        CustomReportSelection.Init();
+        CustomReportSelection.Validate("Source Type", Database::Customer);
+        CustomReportSelection.Validate("Source No.", CustomerNo);
+        CustomReportSelection.Validate(Usage, ReportSelectionUsage);
+        CustomReportSelection.Validate(Sequence, 1);
+        CustomReportSelection.Validate("Report ID", ReportID);
+        CustomReportSelection.Validate("Use for Email Body", true);
+        CustomReportSelection.Validate(
+            "Email Body Layout Code", CustomReportLayout.InitBuiltInLayout(CustomReportSelection."Report ID", CustomReportLayout.Type::Word.AsInteger()));
+        CustomReportSelection.Insert(true);
+    end;
+
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure ConfirmMessageHandler(Question: Text[1024]; var Reply: Boolean)
@@ -8207,6 +8353,12 @@ codeunit 136101 "Service Orders"
         // Enqueue amounts from handler to verify in test body
         LibraryVariableStorage.Enqueue(CreditLimitNotification.CreditLimitDetails.OutstandingAmtLCY.Value);
         LibraryVariableStorage.Enqueue(CreditLimitNotification.CreditLimitDetails.TotalAmountLCY.Value);
+    end;
+
+    [RequestPageHandler]
+    procedure ServiceOrderReportRequestPageHandler(var ServiceOrder: TestRequestPage "Service Order")
+    begin
+        ServiceOrder.Cancel().Invoke();
     end;
 }
 
