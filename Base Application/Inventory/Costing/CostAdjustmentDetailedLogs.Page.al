@@ -96,7 +96,6 @@ page 5809 "Cost Adjustment Detailed Logs"
                         exit;
 
                     ValueEntry.SetRange("Entry No.", ItemRegister."From Value Entry No.", ItemRegister."To Value Entry No.");
-                    ValueEntry.SetFilter("Item Register No.", '0|%1', ItemRegisterNo);
                     ValueEntry.SetRange("Item No.", Rec."Item No.");
                     Page.RunModal(0, ValueEntry);
                 end;
@@ -133,7 +132,6 @@ page 5809 "Cost Adjustment Detailed Logs"
             ItemRegister.SetLoadFields("From Value Entry No.", "To Value Entry No.");
             ItemRegister.Get(ItemRegisterNo);
             ValueEntry.SetRange("Entry No.", ItemRegister."From Value Entry No.", ItemRegister."To Value Entry No.");
-            ValueEntry.SetFilter("Item Register No.", '0|%1', ItemRegisterNo);
             ValueEntry.SetRange("Item No.", Rec."Item No.");
             ValueEntry.CalcSums("Cost Amount (Actual)");
             AdjustedCostAmount := ValueEntry."Cost Amount (Actual)";
