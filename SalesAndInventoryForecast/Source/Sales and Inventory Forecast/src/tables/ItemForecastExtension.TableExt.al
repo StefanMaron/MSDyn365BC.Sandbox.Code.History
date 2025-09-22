@@ -12,7 +12,6 @@ tableextension 1854 ItemForecastExtension extends Item
     {
         field(21850; "Has Sales Forecast"; Boolean)
         {
-            DataClassification = CustomerContent;
             Editable = false;
             FieldClass = Normal;
         }
