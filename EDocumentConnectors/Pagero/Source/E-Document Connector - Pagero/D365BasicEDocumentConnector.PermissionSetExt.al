@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.EServices.EDocumentConnector;
 
-using Microsoft.eServices.EDocument;
+using System.Security.AccessControl;
 
-permissionsetextension 6361 "D365 Basic - EDocument Connector" extends "E-Doc. Core - Admin"
+permissionsetextension 6361 "D365 Basic - EDocument Connector" extends "D365 BASIC"
 {
     IncludedPermissionSets = "EDocConnector - Edit";
 }

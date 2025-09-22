@@ -55,12 +55,6 @@
       "path": "./ReportLayouts/Test/Report Layouts Tests"
     },
     {
-      "path": "./EDocumentConnectors/B2Brouter/Test/E-Document Connector - B2Brouter Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Pagero/Test/E-Document Connector - Pagero Tests"
-    },
-    {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
@@ -68,9 +62,6 @@
     },
     {
       "path": "./EDocumentConnectors/SignUp/Test/E-Document Connector - SignUp Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Continia/Test/E-Document Connector - Continia Tests"
     },
     {
       "path": "./ExternalEvents/test/_Exclude_Business_Events_Test"
@@ -316,6 +307,9 @@
       "path": "./BusinessFoundation/Test/Business Foundation Tests/DisabledTests"
     },
     {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
+    },
+    {
       "path": "./Email - Outlook REST API/Test"
     },
     {
@@ -326,11 +320,11 @@
     }
   ],
   "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeActions": false
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
   }
 }
