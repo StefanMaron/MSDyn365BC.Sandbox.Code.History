@@ -6,22 +6,17 @@ codeunit 461 "Job Queue Cleanup Tasks"
     InherentPermissions = X;
     TableNo = "Job Queue Entry";
 
-    var
-        JobQueueManagement: Codeunit "Job Queue Management";
-
     trigger OnRun()
     begin
-        if (Rec."Object Type to Run" = Rec."Object Type to Run"::Codeunit) and (Rec."Object ID to Run" = Codeunit::"Job Queue Cleanup Tasks") then
-            CleanupJQTasks()
-        else
-            JobQueueManagement.UpdateRetriableFailedJobQueueLogEntry(Rec);
+        CleanupJQTasks();
     end;
 
     local procedure CleanupJQTasks()
+    var
+        JobQueueManagement: Codeunit "Job Queue Management";
     begin
         JobQueueManagement.CheckAndRefreshCategoryRecoveryTasks();
         JobQueueManagement.FindStaleJobsAndSetError();
     end;
-
 
 }
