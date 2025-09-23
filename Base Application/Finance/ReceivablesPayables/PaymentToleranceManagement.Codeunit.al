@@ -329,11 +329,20 @@ codeunit 426 "Payment Tolerance Management"
         PmtDiscAmount: Decimal;
         MaxPmtTolAmount: Decimal;
         ApplnRoundingPrecision: Decimal;
+        IsHandled: Boolean;
+        Result: Boolean;
     begin
         GLSetup.Get();
         CalcCustApplnAmount(
           NewCustLedgEntry, GLSetup, AppliedAmount, ApplyingAmount, AmounttoApply, PmtDiscAmount,
           MaxPmtTolAmount, AppliesToID, ApplnRoundingPrecision);
+
+        IsHandled := false;
+        OnPmtTolCustLedgEntryOnBeforeWarning(
+         NewCustLedgEntry, GLSetup, AppliedAmount, ApplyingAmount, AmounttoApply, PmtDiscAmount,
+         MaxPmtTolAmount, AppliesToID, ApplnRoundingPrecision, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
 
         OriginalAppliedAmount := AppliedAmount;
 
@@ -379,11 +388,20 @@ codeunit 426 "Payment Tolerance Management"
         PmtDiscAmount: Decimal;
         MaxPmtTolAmount: Decimal;
         ApplnRoundingPrecision: Decimal;
+        IsHandled: Boolean;
+        Result: Boolean;
     begin
         GLSetup.Get();
         CalcVendApplnAmount(
           NewVendLedgEntry, GLSetup, AppliedAmount, ApplyingAmount, AmounttoApply, PmtDiscAmount,
           MaxPmtTolAmount, AppliesToID, ApplnRoundingPrecision);
+
+        IsHandled := false;
+        OnPmtTolVendLedgEntryOnBeforeWarning(
+          NewVendLedgEntry, GLSetup, AppliedAmount, ApplyingAmount, AmounttoApply, PmtDiscAmount,
+          MaxPmtTolAmount, AppliesToID, ApplnRoundingPrecision, IsHandled, Result);
+        if IsHandled then
+            exit(Result);
 
         OriginalAppliedAmount := AppliedAmount;
 
@@ -972,6 +990,7 @@ codeunit 426 "Payment Tolerance Management"
 
         AppliedCustLedgEntry.LockTable();
         AppliedCustLedgEntry.SetLoadFields();
+        AppliedCustLedgEntry.SetCurrentKey("Max. Payment Tolerance");
 
         AcceptedTolAmount := Amount + AppliedAmount;
         Number := AppliedCustLedgEntry.Count();
@@ -2385,6 +2404,16 @@ codeunit 426 "Payment Tolerance Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateVendAmountsForApplicationAfterCalcRemainingAmount(var VendorLedgerEntry: Record "Vendor Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPmtTolCustLedgEntryOnBeforeWarning(var CustledgEntry: Record "Cust. Ledger Entry"; GLSetup: Record "General Ledger Setup"; var AppliedAmount: Decimal; var ApplyingAmount: Decimal; var AmounttoApply: Decimal; var PmtDiscAmount: Decimal; var MaxPmtTolAmount: Decimal; CustEntryApplID: Code[50]; var ApplnRoundingPrecision: Decimal; var IsHandled: Boolean; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPmtTolVendLedgEntryOnBeforeWarning(var VendledgEntry: Record "Vendor Ledger Entry"; GLSetup: Record "General Ledger Setup"; var AppliedAmount: Decimal; var ApplyingAmount: Decimal; var AmounttoApply: Decimal; var PmtDiscAmount: Decimal; var MaxPmtTolAmount: Decimal; VendEntryApplID: Code[50]; var ApplnRoundingPrecision: Decimal; var IsHandled: Boolean; var Result: Boolean)
     begin
     end;
 }
