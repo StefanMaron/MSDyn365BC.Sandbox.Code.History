@@ -2,10 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-#if not CLEAN27
 namespace Microsoft.Finance.VAT.Reporting;
-
-using System.Environment.Configuration;
 
 page 12121 "Periodic VAT Settlement List"
 {
@@ -13,9 +10,6 @@ page 12121 "Periodic VAT Settlement List"
     Caption = 'Periodic VAT Settlement List';
     CardPageID = "Periodic VAT Settlement Card";
     Editable = true;
-    ObsoleteReason = 'Replaced by page 12116 "Periodic VAT Settl. List".';
-    ObsoleteState = Pending;
-    ObsoleteTag = '27.0';
     PageType = List;
     SourceTable = "Periodic Settlement VAT Entry";
     UsageCategory = Lists;
@@ -126,17 +120,5 @@ page 12121 "Periodic VAT Settlement List"
     actions
     {
     }
-
-
-    trigger OnOpenPage()
-    var
-        FeatureManagementIT: Codeunit "Feature Management IT";
-    begin
-        if FeatureManagementIT.IsVATSettlementPerActivityCodeFeatureEnabled() then begin
-            Page.Run(Page::"Periodic VAT Settl. List");
-            Error('');
-        end;
-    end;
-
 }
-#endif
+
