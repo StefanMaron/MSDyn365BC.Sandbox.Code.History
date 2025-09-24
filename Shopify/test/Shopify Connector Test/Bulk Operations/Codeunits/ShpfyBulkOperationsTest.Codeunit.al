@@ -30,15 +30,13 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         if BindSubscription(BulkOpSubscriber) then;
     end;
 
-    local procedure ClearSetup()
+    local procedure Clear()
     var
         BulkOperation: Record "Shpfy Bulk Operation";
-        ShopifyVariant: Record "Shpfy Variant";
     begin
         BulkOperation.DeleteAll();
         BulkOpSubscriber.SetBulkOperationRunning(false);
         BulkOpSubscriber.SetBulkUploadFail(false);
-        ShopifyVariant.DeleteAll();
     end;
 
 
@@ -53,7 +51,6 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         BulkOperationType: Enum "Shpfy Bulk Operation Type";
         IBulkOperation: Interface "Shpfy IBulk Operation";
         tb: TextBuilder;
-        RequestData: JsonArray;
     begin
         // [SCENARIO] Sending a bulk operation creates a bulk operation record
 
@@ -67,12 +64,12 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         tb.AppendLine(StrSubstNo(IBulkOperation.GetInput(), 'Sweet new snowboard 1', 'Snowboard', 'JadedPixel'));
         tb.AppendLine(StrSubstNo(IBulkOperation.GetInput(), 'Sweet new snowboard 2', 'Snowboard', 'JadedPixel'));
         tb.AppendLine(StrSubstNo(IBulkOperation.GetInput(), 'Sweet new snowboard 3', 'Snowboard', 'JadedPixel'));
-        LibraryAssert.IsTrue(BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText(), RequestData), 'Bulk operation should be sent.');
+        LibraryAssert.IsTrue(BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText()), 'Bulk operation should be sent.');
 
         // [THEN] A bulk operation record is created
         BulkOperation.Get(BulkOperationId1, Shop.Code, BulkOperation.Type::mutation);
         LibraryAssert.AreEqual(BulkOperation.Status, BulkOperation.Status::Created, 'Bulk operation should be created.');
-        ClearSetup();
+        Clear();
     end;
 
     [Test]
@@ -86,7 +83,6 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         BulkOperationType: Enum "Shpfy Bulk Operation Type";
         IBulkOperation: Interface "Shpfy IBulk Operation";
         tb: TextBuilder;
-        RequestData: JsonArray;
     begin
         // [SCENARIO] Sending a bulk operation after previous one completed creates a bulk operation record
 
@@ -100,7 +96,7 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         tb.AppendLine(StrSubstNo(IBulkOperation.GetInput(), 'Sweet new snowboard 1', 'Snowboard', 'JadedPixel'));
         tb.AppendLine(StrSubstNo(IBulkOperation.GetInput(), 'Sweet new snowboard 2', 'Snowboard', 'JadedPixel'));
         tb.AppendLine(StrSubstNo(IBulkOperation.GetInput(), 'Sweet new snowboard 3', 'Snowboard', 'JadedPixel'));
-        BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText(), RequestData);
+        BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText());
         BulkOperation.Get(BulkOperationId1, Shop.Code, BulkOperation.Type::mutation);
         BulkOperation.Status := BulkOperation.Status::Completed;
         BulkOperation.Modify();
@@ -110,12 +106,12 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         tb.AppendLine('{ "input": { "title": "Sweet new snowboard 4", "productType": "Snowboard", "vendor": "JadedPixel" } }');
         tb.AppendLine('{ "input": { "title": "Sweet new snowboard 5", "productType": "Snowboard", "vendor": "JadedPixel" } }');
         tb.AppendLine('{ "input": { "title": "Sweet new snowboard 6", "productType": "Snowboard", "vendor": "JadedPixel" } }');
-        LibraryAssert.IsTrue(BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText(), RequestData), 'Bulk operation should be sent.');
+        LibraryAssert.IsTrue(BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText()), 'Bulk operation should be sent.');
 
         // [THEN] A bulk operation record is created
         BulkOperation.Get(BulkOperationId2, Shop.Code, BulkOperation.Type::mutation);
         LibraryAssert.AreEqual(BulkOperation.Status, BulkOperation.Status::Created, 'Bulk operation should be created.');
-        ClearSetup();
+        Clear();
     end;
 
     [Test]
@@ -129,7 +125,6 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         BulkOperationType: Enum "Shpfy Bulk Operation Type";
         IBulkOperation: Interface "Shpfy IBulk Operation";
         tb: TextBuilder;
-        RequestData: JsonArray;
     begin
         // [SCENARIO] Sending a bulk operation after previous one has not complete does not create a bulk operation record
 
@@ -143,7 +138,7 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         tb.AppendLine(StrSubstNo(IBulkOperation.GetInput(), 'Sweet new snowboard 1', 'Snowboard', 'JadedPixel'));
         tb.AppendLine(StrSubstNo(IBulkOperation.GetInput(), 'Sweet new snowboard 2', 'Snowboard', 'JadedPixel'));
         tb.AppendLine(StrSubstNo(IBulkOperation.GetInput(), 'Sweet new snowboard 3', 'Snowboard', 'JadedPixel'));
-        BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText(), RequestData);
+        BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText());
         // [WHEN] A second bulk operation is sent
         BulkOpSubscriber.SetBulkOperationRunning(true);
         BulkOpSubscriber.SetBulkOperationId(BulkOperationId2);
@@ -151,11 +146,11 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         tb.AppendLine('{ "input": { "title": "Sweet new snowboard 4", "productType": "Snowboard", "vendor": "JadedPixel" } }');
         tb.AppendLine('{ "input": { "title": "Sweet new snowboard 5", "productType": "Snowboard", "vendor": "JadedPixel" } }');
         tb.AppendLine('{ "input": { "title": "Sweet new snowboard 6", "productType": "Snowboard", "vendor": "JadedPixel" } }');
-        LibraryAssert.IsFalse(BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText(), RequestData), 'Bulk operation should be sent.');
+        LibraryAssert.IsFalse(BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText()), 'Bulk operation should be sent.');
 
         // [THEN] A bulk operation record is not created
         LibraryAssert.RecordCount(BulkOperation, 1);
-        ClearSetup();
+        Clear();
     end;
 
     [Test]
@@ -167,7 +162,6 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         BulkOperationType: Enum "Shpfy Bulk Operation Type";
         IBulkOperation: Interface "Shpfy IBulk Operation";
         tb: TextBuilder;
-        RequestData: JsonArray;
     begin
         // [SCENARIO] Sending a faulty bulk operation fails silently
 
@@ -184,137 +178,8 @@ codeunit 139633 "Shpfy Bulk Operations Test"
         tb.AppendLine(StrSubstNo(IBulkOperation.GetInput(), 'Sweet new snowboard 3', 'Snowboard', 'JadedPixel'));
 
         // [THEN] A bulk operation fails silently
-        LibraryAssert.IsFalse(BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText(), RequestData), 'Bulk operation should be sent.');
-        ClearSetup();
-    end;
-
-    [Test]
-    procedure TestBulkOperationRevertFailed()
-    var
-        Shop: Record "Shpfy Shop";
-        ShopifyVariant: Record "Shpfy Variant";
-        BulkOperation: Record "Shpfy Bulk Operation";
-        CommunicationMgt: Codeunit "Shpfy Communication Mgt.";
-        BulkOperationType: Enum "Shpfy Bulk Operation Type";
-        ProductId: BigInteger;
-        VariantId: BigInteger;
-        VariantIds: List of [BigInteger];
-        Index: Integer;
-        BulkOperationUrl: Text;
-    begin
-        // [SCENARIO] A bulk operation completes but some operations failed and they are reverted
-
-        // [GIVEN] A bulk operation record and four variants
-        Initialize();
-        Shop := CommunicationMgt.GetShopRecord();
-        for Index := 1 to 4 do begin
-            ProductId := Any.IntegerInRange(100000, 555555);
-            VariantId := Any.IntegerInRange(100000, 555555);
-            VariantIds.Add(VariantId);
-            ShopifyVariant."Product Id" := ProductId;
-            ShopifyVariant.Id := VariantId;
-            ShopifyVariant.Price := 200;
-            ShopifyVariant.Insert();
-        end;
-        BulkOperationUrl := Any.AlphabeticText(50);
-        BulkOperation := CreateBulkOperation(BulkOperationId1, BulkOperationType::UpdateProductPrice, Shop.Code, BulkOperationUrl, GenerateRequestData(VariantIds, 100));
-
-        // [WHEN] Bulk operation is completed
-        BulkOpSubscriber.SetBulkOperationId(BulkOperationId1);
-        BulkOpSubscriber.SetBulkOperationUrl(BulkOperationUrl);
-        BulkOpSubscriber.SetVariantIds(VariantIds.Get(1), VariantIds.Get(4));
-        BulkOperation.Status := BulkOperation.Status::Completed;
-        BulkOperation.Modify(true);
-
-        // [THEN] The bulk operation is processed and one variant is reverted
-        BulkOperation.Get(BulkOperationId1, Shop.Code, BulkOperation.Type::mutation);
-        LibraryAssert.IsTrue(BulkOperation.Processed, 'Bulk operation should be processed.');
-        ShopifyVariant.Get(VariantIds.Get(1));
-        LibraryAssert.AreEqual(ShopifyVariant.Price, 200, 'Variant price should not be reverted.');
-        ShopifyVariant.Get(VariantIds.Get(2));
-        LibraryAssert.AreEqual(ShopifyVariant.Price, 100, 'Variant price should be reverted.');
-        ShopifyVariant.Get(VariantIds.Get(3));
-        LibraryAssert.AreEqual(ShopifyVariant.Price, 100, 'Variant price should be reverted.');
-        ShopifyVariant.Get(VariantIds.Get(4));
-        LibraryAssert.AreEqual(ShopifyVariant.Price, 200, 'Variant price should not be reverted.');
-        ClearSetup();
-    end;
-
-    [Test]
-    procedure TestBulkOperationRevertAll()
-    var
-        Shop: Record "Shpfy Shop";
-        ShopifyVariant: Record "Shpfy Variant";
-        BulkOperation: Record "Shpfy Bulk Operation";
-        CommunicationMgt: Codeunit "Shpfy Communication Mgt.";
-        BulkOperationType: Enum "Shpfy Bulk Operation Type";
-        ProductId: BigInteger;
-        VariantId: BigInteger;
-        VariantIds: List of [BigInteger];
-        Index: Integer;
-        BulkOperationUrl: Text;
-    begin
-        // [SCENARIO] A bulk operation fails and all operations are reverted
-
-        // [GIVEN] A bulk operation record and two variants
-        Initialize();
-        Shop := CommunicationMgt.GetShopRecord();
-        for Index := 1 to 2 do begin
-            ProductId := Any.IntegerInRange(100000, 555555);
-            VariantId := Any.IntegerInRange(100000, 555555);
-            VariantIds.Add(VariantId);
-            ShopifyVariant."Product Id" := ProductId;
-            ShopifyVariant.Id := VariantId;
-            ShopifyVariant.Price := 200;
-            ShopifyVariant.Insert();
-        end;
-        BulkOperationUrl := Any.AlphabeticText(50);
-        BulkOperation := CreateBulkOperation(BulkOperationId1, BulkOperationType::UpdateProductPrice, Shop.Code, BulkOperationUrl, GenerateRequestData(VariantIds, 100));
-
-        // [WHEN] Bulk operation is failed
-        BulkOperation.Status := BulkOperation.Status::Failed;
-        BulkOperation.Modify(true);
-
-        // [THEN] The bulk operation is processed and one variant is reverted
-        BulkOperation.Get(BulkOperationId1, Shop.Code, BulkOperation.Type::mutation);
-        LibraryAssert.IsTrue(BulkOperation.Processed, 'Bulk operation should be processed.');
-        ShopifyVariant.Get(VariantIds.Get(1));
-        LibraryAssert.AreEqual(ShopifyVariant.Price, 100, 'Variant price should be reverted.');
-        ShopifyVariant.Get(VariantIds.Get(2));
-        LibraryAssert.AreEqual(ShopifyVariant.Price, 100, 'Variant price should be reverted.');
-        ClearSetup();
-    end;
-
-    local procedure CreateBulkOperation(BulkOperationId: BigInteger; BulkOperationType: Enum "Shpfy Bulk Operation Type"; ShopCode: Code[20]; BulkOperationUrl: Text; RequestData: JsonArray): Record "Shpfy Bulk Operation"
-    var
-        BulkOperation: Record "Shpfy Bulk Operation";
-    begin
-        BulkOperation."Bulk Operation Id" := BulkOperationId;
-        BulkOperation.Type := BulkOperation.Type::mutation;
-        BulkOperation."Shop Code" := ShopCode;
-        BulkOperation."Bulk Operation Type" := BulkOperationType;
-        BulkOperation.Processed := false;
-        BulkOperation.Url := CopyStr(BulkOperationUrl, 1, MaxStrLen(BulkOperation.Url));
-        BulkOperation.Insert();
-        BulkOperation.SetRequestData(RequestData);
-        exit(BulkOperation);
-    end;
-
-    local procedure GenerateRequestData(VariantIds: List of [BigInteger]; Price: Decimal): JsonArray
-    var
-        RequestData: JsonArray;
-        VariantId: BigInteger;
-        Data: JsonObject;
-    begin
-        foreach VariantId in VariantIds do begin
-            Clear(Data);
-            Data.Add('id', VariantId);
-            Data.Add('price', Price);
-            Data.Add('compareAtPrice', 0);
-            Data.Add('updatedAt', '2025-02-25T13:40:15.6530000Z');
-            RequestData.Add(Data);
-        end;
-        exit(RequestData);
+        LibraryAssert.IsFalse(BulkOperationMgt.SendBulkMutation(Shop, BulkOperationType::AddProduct, tb.ToText()), 'Bulk operation should be sent.');
+        Clear();
     end;
 
     [MessageHandler]

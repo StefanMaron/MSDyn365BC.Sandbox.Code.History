@@ -19,8 +19,7 @@ codeunit 6169 "E-Doc. Attachment Processor"
     var
         RecordRefTo: RecordRef;
     begin
-        if (EDocument.Direction = Enum::"E-Document Direction"::Incoming) and
-            (EDocument."Document Type" <> Enum::"E-Document Type"::"General Journal") then begin
+        if EDocument.Direction = Enum::"E-Document Direction"::Incoming then begin
             RecordRefTo.Get(NewDocument);
             MoveToPurchaseDocument(EDocument, RecordRefTo);
             RecordRefTo.GetTable(EDocument);
@@ -39,7 +38,6 @@ codeunit 6169 "E-Doc. Attachment Processor"
     begin
         RecordRef.GetTable(EDocument);
         DocumentAttachment.SaveAttachmentFromStream(DocStream, RecordRef, FileName);
-        DocumentAttachment."Document Flow Purchase" := true;
         DocumentAttachment.Validate("E-Document Attachment", true);
         DocumentAttachment.Validate("E-Document Entry No.", EDocument."Entry No");
         DocumentAttachment.Modify();
@@ -113,27 +111,13 @@ codeunit 6169 "E-Doc. Attachment Processor"
         until DocumentAttachment.Next() = 0;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Document Attachment Mgmt", OnCopyAttachmentsOnAfterSetFromParameters, '', false, false)]
-    local procedure OnCopyAttachmentsOnAfterSetFromParameters(FromRecRef: RecordRef; var FromDocumentAttachment: Record "Document Attachment"; var FromAttachmentDocumentType: Enum "Attachment Document Type")
-    var
-        EDocument: Record "E-Document";
-    begin
-        if FromRecRef.Number() <> Database::"E-Document" then
-            exit;
-
-        FromRecRef.SetTable(EDocument);
-        FromDocumentAttachment.SetRange("No.", Format(EDocument."Entry No"));
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Document Attachment Mgmt", OnAfterTableHasNumberFieldPrimaryKey, '', false, false)]
     local procedure OnAfterTableHasNumberFieldPrimaryKeyForEDocs(TableNo: Integer; var Result: Boolean; var FieldNo: Integer)
-    var
-        EDocument: Record "E-Document";
     begin
         case TableNo of
             Database::"E-Document":
                 begin
-                    FieldNo := EDocument.FieldNo("Entry No");
+                    FieldNo := 1;
                     Result := true;
                 end;
         end;

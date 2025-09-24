@@ -218,13 +218,7 @@ table 1650 "Curr. Exch. Rate Update Setup"
     var
         JobQueueEntry: Record "Job Queue Entry";
         DummyRecId: RecordID;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeAutoUpdateExchangeRates(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         if Enabled then begin
             JobQueueEntry.ScheduleRecurrentJobQueueEntryWithFrequency(JobQueueEntry."Object Type to Run"::Codeunit,
               CODEUNIT::"Update Currency Exchange Rates", DummyRecId, 24 * 60, 3, 3600, 0T);
@@ -310,11 +304,6 @@ table 1650 "Curr. Exch. Rate Update Setup"
 
     [IntegrationEvent(false, false)]
     local procedure OnShowJobQueueEntryOnBeforeJobQueueEntryFindFirst(var CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup"; var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeAutoUpdateExchangeRates(var CurrExchRateUpdateSetup: Record "Curr. Exch. Rate Update Setup"; var IsHandled: boolean)
     begin
     end;
 
