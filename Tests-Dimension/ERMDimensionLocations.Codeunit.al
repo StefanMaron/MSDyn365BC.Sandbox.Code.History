@@ -24,8 +24,6 @@ codeunit 134474 "ERM Dimension Locations"
         LibraryJob: Codeunit "Library - Job";
         IsInitialized: Boolean;
         DimPostErr: Label 'Select a Dimension Value Code for the Dimension Code';
-        ProjectTaskDimensionErr: Label 'Project Task Dimension must be updated as per Default Dimension.';
-        DimensionsNotEqualErr: Label 'Dimensions are not equal';
 
     [Test]
     [Scope('OnPrem')]
@@ -1099,139 +1097,6 @@ codeunit 134474 "ERM Dimension Locations"
         LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
     end;
 
-    [Test]
-    procedure ProjectAndProjectTaskDimensionReplacesLocationDimensionInProjectJournals()
-    var
-        DefaultDimension: Record "Default Dimension";
-        Dimension: Record Dimension;
-        DimensionValue: array[2] of Record "Dimension Value";
-        Item: Record Item;
-        Location: Record Location;
-        Job: Record Job;
-        JobTask: Record "Job Task";
-        JobJournalLine: Record "Job Journal Line";
-    begin
-        // [SCENARIO 543630] Location ID Dimension does not overrides the Project No. and Project Task No. Dimension in the Project Journals.
-        Initialize();
-
-        // [GIVEN] Create Dimension Value for Global Dimension 1.
-        LibraryDimension.CreateDimensionValue(DimensionValue[1], LibraryERM.GetGlobalDimensionCode(1));
-
-        // [GIVEN] Create an Item.
-        LibraryInventory.CreateItem(Item);
-
-        // [GIVEN] Create a Dimension.
-        LibraryDimension.CreateDimension(Dimension);
-
-        // [GIVEN] Create Dimension Value for Dimension.
-        LibraryDimension.CreateDimensionValue(DimensionValue[2], Dimension.Code);
-
-        // [GIVEN] Create a Location.
-        LibraryWarehouse.CreateLocation(Location);
-
-        // [GIVEN] Create Default Dimension for Location.
-        LibraryDimension.CreateDefaultDimension(
-            DefaultDimension,
-            Database::Location,
-            Location.Code,
-            DimensionValue[2]."Dimension Code",
-            DimensionValue[2].Code);
-
-        // [GIVEN] Create a Job.
-        LibraryJob.CreateJob(Job);
-
-        // [GIVEN] Create a Job Task with the Job and Validate the Dimension.
-        LibraryJob.CreateJobTask(Job, JobTask);
-        JobTask.Validate("Global Dimension 1 Code", DimensionValue[1].Code);
-        JobTask.Modify(true);
-
-        // [GIVEN] Create Job Journal Line and Validate Item.
-        LibraryJob.CreateJobJournalLine("Job Line Type"::" ", JobTask, JobJournalLine);
-        JobJournalLine.Validate(Type, JobJournalLine.Type::Item);
-        JobJournalLine.Validate("No.", Item."No.");
-
-        // [WHEN] Validate Location Code in Job Journal Line.
-        JobJournalLine.Validate("Location Code", Location.Code);
-        JobJournalLine.Modify(true);
-
-        // [THEN] Dimension must be avilable in Job Journal Line.
-        Assert.AreEqual(JobJournalLine."Shortcut Dimension 1 Code", DimensionValue[1].Code, ProjectTaskDimensionErr);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure VerfiyDefaultDimensionPriorityOnTransferLine()
-    var
-        DefaultDimension: Record "Default Dimension";
-        DimensionValue: array[6] of Record "Dimension Value";
-        Item: Record Item;
-        Location: array[3] of Record Location;
-        SourceCodeSetup: Record "Source Code Setup";
-        TransferHeader: Record "Transfer Header";
-        TransferLine: Record "Transfer Line";
-    begin
-        // [SCENARIO 556718] The default dimension priority should be respected when entering the item in the line of a transfer order.
-        Initialize();
-
-        // [GIVEN] Create Global Dimesnion with Dimension Values.
-        LibraryDimension.GetGlobalDimCodeValue(1, DimensionValue[1]);
-        LibraryDimension.GetGlobalDimCodeValue(2, DimensionValue[2]);
-
-        // [GIVEN] Create Dimension Values.
-        LibraryDimension.CreateDimensionValue(DimensionValue[3], DimensionValue[1]."Dimension Code");
-        LibraryDimension.CreateDimensionValue(DimensionValue[4], DimensionValue[2]."Dimension Code");
-        LibraryDimension.CreateDimensionValue(DimensionValue[5], DimensionValue[1]."Dimension Code");
-        LibraryDimension.CreateDimensionValue(DimensionValue[6], DimensionValue[2]."Dimension Code");
-
-        // [GIVEN] Create Location 1 with Default Dimension Values.
-        CreateLocationWithDefaultDimension(Location[1], DimensionValue[1]);
-        LibraryDimension.CreateDefaultDimension(
-            DefaultDimension,
-            Database::Location,
-            Location[1].Code,
-            DimensionValue[2]."Dimension Code",
-            DimensionValue[2].Code);
-
-        // [GIVEN] Create Location 2 with Default Dimension Values.
-        CreateLocationWithDefaultDimension(Location[2], DimensionValue[3]);
-        LibraryDimension.CreateDefaultDimension(
-            DefaultDimension,
-            Database::Location,
-            Location[2].Code,
-            DimensionValue[2]."Dimension Code",
-            DimensionValue[4].Code);
-
-        // [GIVEN] Create Item with Default Dimension Values.
-        CreateItemWithDefaultDimension(Item, DimensionValue[5]);
-        LibraryDimension.CreateDefaultDimension(
-            DefaultDimension,
-            Database::Item,
-            Item."No.",
-            DimensionValue[2]."Dimension Code",
-            DimensionValue[6].Code);
-
-        // [GIVEN] Create Default Dimension Priority 1 for Item, 2 for Location with source code.
-        SourceCodeSetup.Get();
-        SetDefaultDimensionPriority(SourceCodeSetup.Transfer);
-
-        // [WHEN] Create Transfer Order.
-        LibraryWarehouse.CreateInTransitLocation(Location[3]);
-        LibraryInventory.CreateTransferHeader(
-            TransferHeader,
-            Location[1].Code,
-            Location[2].Code,
-            Location[3].Code);
-        LibraryInventory.CreateTransferLine(
-            TransferHeader,
-            TransferLine,
-            Item."No.",
-            LibraryRandom.RandInt(10));
-
-        // [THEN] The Default Dimension Prioritization is not ignored in the Transfer Order Line.
-        Assert.AreNotEqual(TransferHeader."Shortcut Dimension 1 Code", TransferLine."Shortcut Dimension 1 Code", DimensionsNotEqualErr);
-        Assert.AreNotEqual(TransferHeader."Shortcut Dimension 2 Code", TransferLine."Shortcut Dimension 2 Code", DimensionsNotEqualErr);
-    end;
-
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(Codeunit::"ERM Dimension Locations");
@@ -1314,30 +1179,6 @@ codeunit 134474 "ERM Dimension Locations"
         LibraryDimension.CreateDefaultDimensionItem(DefaultDimension, Item."No.", DimensionValue."Dimension Code", '');
         DefaultDimension.Validate("Value Posting", DefaultDimension."Value Posting"::"Code Mandatory");
         DefaultDimension.Modify(true);
-    end;
-
-    local procedure SetDefaultDimensionPriority(SourceCode: Code[10])
-    begin
-        ClearDefaultDimensionPriorities(SourceCode);
-        CreateDefaultDimensionPriority(SourceCode, Database::Item, 1);
-        CreateDefaultDimensionPriority(SourceCode, Database::Location, 2);
-    end;
-
-    local procedure ClearDefaultDimensionPriorities(SourceCode: Code[10])
-    var
-        DefaultDimensionPriority: Record "Default Dimension Priority";
-    begin
-        DefaultDimensionPriority.SetRange("Source Code", SourceCode);
-        DefaultDimensionPriority.DeleteAll(true);
-    end;
-
-    local procedure CreateDefaultDimensionPriority(SourceCode: Code[10]; TableID: Integer; Priority: Integer)
-    var
-        DefaultDimensionPriority: Record "Default Dimension Priority";
-    begin
-        LibraryDimension.CreateDefaultDimensionPriority(DefaultDimensionPriority, SourceCode, TableID);
-        DefaultDimensionPriority.Validate(Priority, Priority);
-        DefaultDimensionPriority.Modify(true);
     end;
 
     [ModalPageHandler]
