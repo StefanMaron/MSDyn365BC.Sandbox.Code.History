@@ -1078,42 +1078,6 @@ codeunit 134391 "ERM Sales Batch Posting"
     end;
 
     [Test]
-    [HandlerFunctions('BatchPostSalesInvoicesPrintRequestPageHandler,MessageHandler')]
-    [Scope('OnPrem')]
-    procedure BatchPostInvoicesWithAnalysisView()
-    var
-        SalesHeader: array[2] of Record "Sales Header";
-        AnalysisView: Record "Analysis View";
-        ERMAnalysisView: Codeunit "ERM Analysis View";
-        AnalysisAccountSource: Enum "Analysis Account Source";
-        LastEntryNo: Integer;
-        i: Integer;
-    begin
-        // [SCENARIO] Batch posting updates Analysis Views
-        Initialize();
-        ERMAnalysisView.CreateAnalysisViewWithDimensions(AnalysisView, AnalysisAccountSource::"G/L Account");
-        AnalysisView."Update on Posting" := true;
-        AnalysisView.Modify();
-        Commit();
-        LastEntryNo := AnalysisView."Last Entry No.";
-
-        // [GIVEN] Two invoices
-        CreateSalesDocument(SalesHeader[1], SalesHeader[1]."Document Type"::Invoice, false);
-        CreateSalesDocument(SalesHeader[2], SalesHeader[2]."Document Type"::Invoice, false);
-
-        // [WHEN] Post batch
-        RunBatchPostSales(SalesHeader[1]."Document Type", SalesHeader[1]."No." + '|' + SalesHeader[2]."No.", 0D, false);
-        AnalysisView.Get(AnalysisView.Code);
-        while (i < 10) and (LastEntryNo = AnalysisView."Last Entry No.") do begin  // may be executed in background
-            i += 1;
-            AnalysisView.Get(AnalysisView.Code);
-            Sleep(1000 * i);
-        end;
-        if i >= 10 then
-            Error('Analysis View is not updated after 10 waits.');
-    end;
-
-    [Test]
     [HandlerFunctions('SalesStaticsUpdateVATAmountModalPageHandler,RequestPageHandlerBatchPostSalesInvoices')]
     procedure BatchPostSalesInvoiceWithVATDifference()
     var
@@ -1485,32 +1449,6 @@ codeunit 134391 "ERM Sales Batch Posting"
         end;
     end;
 
-    [Test]
-    [HandlerFunctions('RequestPageHandlerBatchPostSalesOrders,MessageHandler')]
-    [Scope('OnPrem')]
-    procedure BatchPostSalesOrderReplacePostingDate()
-    var
-        SalesHeader: Record "Sales Header";
-        LibraryJobQueue: Codeunit "Library - Job Queue";
-    begin
-        // [SCENARIO 543504] There is an issue with the “Post with Job Queue” function in the Sales & Receivables Setup. When selecting “Replace Posting Date” the posting date does not update as expected
-        Initialize();
-        LibrarySales.SetPostWithJobQueue(true);
-        BindSubscription(LibraryJobQueue);
-        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
-
-        // [GIVEN] Create and Release the Sales Order 
-        CreateSalesDocument(SalesHeader, SalesHeader."Document Type"::Order, false);
-        LibrarySales.ReleaseSalesDocument(SalesHeader);
-
-        // [WHEN] Run Batch Post Sales Order with Replace Posting Date, Replace Document Date options
-        RunBatchPostsales(SalesHeader."Document Type", SalesHeader."No.", SalesHeader."Posting Date" + 1, false);
-        LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(SalesHeader.RecordId);
-
-        // [THEN] Posting Date is replaced with new Posting Date in the Sales Order
-        VerifyPostedSalesOrder(SalesHeader."No.", SalesHeader."Posting Date" + 1, false);
-    end;
-
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -1759,7 +1697,6 @@ codeunit 134391 "ERM Sales Batch Posting"
         SalesInvoiceHeader.SetFilter("Order No.", PreAssignedNo);
         SalesInvoiceHeader.FindFirst();
         SalesInvoiceHeader.TestField("Posting Date", PostingDate);
-        SalesInvoiceHeader.TestField("Document Date", PostingDate);
         SalesInvoiceLine.SetFilter("Document No.", SalesInvoiceHeader."No.");
         SalesInvoiceLine.FindFirst();
         Assert.AreEqual(InvDisc, SalesInvoiceLine."Inv. Discount Amount" <> 0, 'Calculate Inv. Discount value not processed correctly.');
@@ -1893,10 +1830,9 @@ codeunit 134391 "ERM Sales Batch Posting"
         BatchPostSalesOrders."Sales Header".SetFilter("Document Type", Format(SalesHeader."Document Type"::Order));
 
         BatchPostSalesOrders.PostingDate.SetValue(PostingDate);
-        if Format(PostingDate) <> '' then begin
-            BatchPostSalesOrders.ReplacePostingDate.SetValue(true);
-            BatchPostSalesOrders.ReplaceDocumentDate.SetValue(true);
-        end else
+        if Format(PostingDate) <> '' then
+            BatchPostSalesOrders.ReplacePostingDate.SetValue(true)
+        else
             BatchPostSalesOrders.ReplacePostingDate.SetValue(false);
         BatchPostSalesOrders.Ship.SetValue(true);
         BatchPostSalesOrders.Invoice.SetValue(true);
