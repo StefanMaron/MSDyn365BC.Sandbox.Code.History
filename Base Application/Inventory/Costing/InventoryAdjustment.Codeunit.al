@@ -481,7 +481,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         OutbndValueEntry.Reset();
         OutbndValueEntry.SetCurrentKey("Item Ledger Entry No.", "Document No.", "Document Line No.");
         OutbndValueEntry.SetRange("Item Ledger Entry No.", OutbndItemLedgEntryNo);
-        LoadFields(OutbndValueEntry);
+        OutbndValueEntry.SetBaseLoadFields();
         for ExpectedCost := true downto false do begin
             OutbndValueEntry.SetRange("Expected Cost", ExpectedCost);
             if OutbndValueEntry.FindSet() then
@@ -752,7 +752,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         TransValueEntry.SetRange("Item Ledger Entry No.", ItemLedgEntryNo);
         TransValueEntry.SetRange("Entry Type", TransValueEntry."Entry Type"::"Direct Cost");
         TransValueEntry.Ascending(false);
-        LoadFields(TransValueEntry);
+        TransValueEntry.SetBaseLoadFields();
         TransValueEntry.FindSet();
         repeat
             if TransValueEntry."Item Charge No." = '' then begin
@@ -797,7 +797,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         InbndValueEntry.SetCurrentKey("Item Ledger Entry No.", "Document No.");
         InbndValueEntry.SetRange("Item Ledger Entry No.", InbndItemApplnEntry."Item Ledger Entry No.");
         OnAdjustAppliedInbndEntriesOnAfterSetFilter(InbndValueEntry);
-        LoadFields(InbndValueEntry);
+        InbndValueEntry.SetBaseLoadFields();
         InbndValueEntry.FindSet();
         repeat
             if (InbndValueEntry."Entry Type" = InbndValueEntry."Entry Type"::"Direct Cost") and
@@ -1290,7 +1290,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         AvgCostAdjmtEntryPoint.GetValuationPeriod(CalendarPeriod);
         OnAfterGetValuationPeriod(CalendarPeriod, Item);
 
-        ValueEntry.SetCurrentKey("Item No.", "Valuation Date");
+        ValueEntry.SetCurrentKey("Item No.", "Valuation Date", "Location Code", "Variant Code", "Entry No.");
         ValueEntry.SetRange("Item No.", AvgCostAdjmtEntryPoint."Item No.");
         if AvgCostAdjmtEntryPoint.AvgCostCalcTypeIsChanged(CalendarPeriod."Period Start") then begin
             AvgCostAdjmtEntryPoint.GetAvgCostCalcTypeIsChgPeriod(NextFiscalYearAccPeriod, CalendarPeriod."Period Start");
@@ -1305,7 +1305,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         end;
         OnAvgValueEntriesToAdjustExistOnAfterSetAvgValueEntryFilters(ValueEntry);
 
-        ValueEntry.SetLoadFields("Item No.", "Valuation Date");
+        ValueEntry.SetBaseLoadFields();
         if ValueEntry.FindFirst() then begin
             FindNextRange := true;
 
@@ -1334,8 +1334,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
             end;
 
             DeleteAvgBuffers(OutbndValueEntry, ExcludedValueEntry);
-            ValueEntry.SetLoadFields();
-            LoadFields(ValueEntry);
             ValueEntry.FindSet();
             repeat
                 if ValueEntry."Entry Type" = ValueEntry."Entry Type"::Revaluation then begin
@@ -2666,7 +2664,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         OpenValueEntry.SetCurrentKey("Item Ledger Entry No.", "Valuation Date");
         OpenValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntryNo);
         OpenValueEntry.SetFilter("Valuation Date", '<%1', PeriodStart);
-        LoadFields(OpenValueEntry);
+        OpenValueEntry.SetBaseLoadFields();
         FoundEntries := OpenValueEntry.FindSet();
         if FoundEntries then
             repeat
@@ -2984,16 +2982,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         if Item2.FindLast() then
             exit(Item2."Low-Level Code");
         exit(0);
-    end;
-
-    local procedure LoadFields(var ValueEntry: Record "Value Entry")
-    begin
-        ValueEntry.SetLoadFields("Entry No.", "Item No.", "Item Ledger Entry Type", "Document No.", "Location Code",
-                                 "Item Ledger Entry No.", "Valued Quantity", "Item Ledger Entry Quantity", "Invoiced Quantity",
-                                 "Cost per Unit", "Applies-to Entry", "Cost Amount (Actual)", "Cost Amount (Actual) (ACY)", "Cost per Unit (ACY)",
-                                 "Document Line No.", "Order Type", "Order No.", "Order Line No.", "Expected Cost",
-                                 "Item Charge No.", "Valued By Average Cost", "Partial Revaluation", Inventoriable, "Valuation Date",
-                                 "Entry Type", "Cost Amount (Expected)", "Cost Amount (Expected) (ACY)", "Variant Code", Adjustment)
     end;
 
     local procedure Min(Date1: Date; Date2: Date): Date
