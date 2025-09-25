@@ -3277,7 +3277,7 @@ codeunit 22 "Item Jnl.-Post Line"
                                 CalcCostPerUnit(CostAmtACY, ValueEntry."Valued Quantity", true);
                     end;
                 end else
-                    if (not ItemJnlLine.Adjustment) and not (ItemJnlLine."Document Type" in [ItemJnlLine."Document Type"::"Purchase Credit Memo"]) then
+                    if not ItemJnlLine.Adjustment then
                         CalcOutboundCostAmt(ValueEntry, CostAmt, CostAmtACY)
                     else begin
                         CostAmt := ItemJnlLine.Amount;
