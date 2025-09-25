@@ -21,7 +21,7 @@ codeunit 5774 "Whse.-Production Release"
         WhsePickRequest: Record "Whse. Pick Request";
         ProdOrderComp: Record "Prod. Order Component";
 
-    procedure Release(ProductionOrder: Record "Production Order")
+    procedure Release(ProdOrder: Record "Production Order")
     var
 #if not CLEAN26
         ManufacturingSetup: Record "Manufacturing Setup";
@@ -30,16 +30,16 @@ codeunit 5774 "Whse.-Production Release"
         CurrentSignFactor: Integer;
         OldSignFactor: Integer;
     begin
-        if ProductionOrder.Status <> ProductionOrder.Status::Released then
+        if ProdOrder.Status <> ProdOrder.Status::Released then
             exit;
 
-        OnBeforeReleaseWhseProdOrder(ProductionOrder);
+        OnBeforeReleaseWhseProdOrder(ProdOrder);
 
         LocationCode2 := '';
         OldSignFactor := 0;
         ProdOrderComp.SetCurrentKey(Status, "Prod. Order No.", "Location Code");
-        ProdOrderComp.SetRange(Status, ProductionOrder.Status);
-        ProdOrderComp.SetRange("Prod. Order No.", ProductionOrder."No.");
+        ProdOrderComp.SetRange(Status, ProdOrder.Status);
+        ProdOrderComp.SetRange("Prod. Order No.", ProdOrder."No.");
 #if not CLEAN26
         if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
             ProdOrderComp.SetFilter(
@@ -59,20 +59,19 @@ codeunit 5774 "Whse.-Production Release"
               ProdOrderComp."Flushing Method"::"Pick + Backward");
         ProdOrderComp.SetRange("Planning Level Code", 0);
         ProdOrderComp.SetFilter("Remaining Quantity", '<>0');
-        OnReleaseOnBeforeLoopProdOrderComponent(ProductionOrder, ProdOrderComp);
         if ProdOrderComp.Find('-') then
-            CreateWarehouseRequest(ProdOrderComp, ProductionOrder);
+            CreateWarehouseRequest(ProdOrderComp, ProdOrder);
         repeat
             CurrentSignFactor := SignFactor(ProdOrderComp.Quantity);
             if (ProdOrderComp."Location Code" <> LocationCode2) or
                (CurrentSignFactor <> OldSignFactor)
             then
-                CreateWarehouseRequest(ProdOrderComp, ProductionOrder);
+                CreateWarehouseRequest(ProdOrderComp, ProdOrder);
             LocationCode2 := ProdOrderComp."Location Code";
             OldSignFactor := CurrentSignFactor;
         until ProdOrderComp.Next() = 0;
 
-        OnAfterRelease(ProductionOrder);
+        OnAfterRelease(ProdOrder);
     end;
 
     local procedure CreateWarehouseRequest(var ProdOrderComponent: Record "Prod. Order Component"; var ProdOrder: Record "Production Order")
@@ -195,7 +194,7 @@ codeunit 5774 "Whse.-Production Release"
 
     procedure DeleteLine(ProdOrderComponent: Record "Prod. Order Component")
     var
-        ProdOrderComponent2: Record "Prod. Order Component";
+        ProdOrderComp2: Record "Prod. Order Component";
 #if not CLEAN26
         ManufacturingSetup: Record "Manufacturing Setup";
 #endif
@@ -203,39 +202,38 @@ codeunit 5774 "Whse.-Production Release"
     begin
         KeepWarehouseRequest := false;
         GetLocation(ProdOrderComponent."Location Code");
-        ProdOrderComponent2.SetCurrentKey(Status, "Prod. Order No.", "Location Code");
-        ProdOrderComponent2.SetRange(Status, ProdOrderComponent.Status);
-        ProdOrderComponent2.SetRange("Prod. Order No.", ProdOrderComponent."Prod. Order No.");
-        ProdOrderComponent2.SetRange("Location Code", ProdOrderComponent."Location Code");
+        ProdOrderComp2.SetCurrentKey(Status, "Prod. Order No.", "Location Code");
+        ProdOrderComp2.SetRange(Status, ProdOrderComponent.Status);
+        ProdOrderComp2.SetRange("Prod. Order No.", ProdOrderComponent."Prod. Order No.");
+        ProdOrderComp2.SetRange("Location Code", ProdOrderComponent."Location Code");
 #if not CLEAN26
         if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
-            ProdOrderComponent2.SetFilter(
+            ProdOrderComp2.SetFilter(
               "Flushing Method", '%1|%2|%3|%4',
-              ProdOrderComponent2."Flushing Method"::Manual,
-              ProdOrderComponent2."Flushing Method"::"Pick + Manual",
-              ProdOrderComponent2."Flushing Method"::"Pick + Forward",
-              ProdOrderComponent2."Flushing Method"::"Pick + Backward")
+              ProdOrderComp2."Flushing Method"::Manual,
+              ProdOrderComp2."Flushing Method"::"Pick + Manual",
+              ProdOrderComp2."Flushing Method"::"Pick + Forward",
+              ProdOrderComp2."Flushing Method"::"Pick + Backward")
         else
 #endif
-            ProdOrderComponent2.SetFilter(
+            ProdOrderComp2.SetFilter(
               "Flushing Method", '%1|%2|%3',
-              ProdOrderComponent2."Flushing Method"::"Pick + Manual",
-              ProdOrderComponent2."Flushing Method"::"Pick + Forward",
-              ProdOrderComponent2."Flushing Method"::"Pick + Backward");
-        ProdOrderComponent2.SetRange("Planning Level Code", 0);
-        ProdOrderComponent2.SetFilter("Remaining Quantity", '<>0');
-        OnDeleteLineOnBeforeLoopProdOrderComponent(ProdOrderComponent, ProdOrderComponent2);
-        if ProdOrderComponent2.Find('-') then
+              ProdOrderComp2."Flushing Method"::"Pick + Manual",
+              ProdOrderComp2."Flushing Method"::"Pick + Forward",
+              ProdOrderComp2."Flushing Method"::"Pick + Backward");
+        ProdOrderComp2.SetRange("Planning Level Code", 0);
+        ProdOrderComp2.SetFilter("Remaining Quantity", '<>0');
+        if ProdOrderComp2.Find('-') then
             repeat
-                if ((ProdOrderComponent2.Status <> ProdOrderComponent.Status) or
-                    (ProdOrderComponent2."Prod. Order No." <> ProdOrderComponent."Prod. Order No.") or
-                    (ProdOrderComponent2."Prod. Order Line No." <> ProdOrderComponent."Prod. Order Line No.") or
-                    (ProdOrderComponent2."Line No." <> ProdOrderComponent."Line No.")) and
-                   ((not ProdOrderComponent2."Completely Picked") or
+                if ((ProdOrderComp2.Status <> ProdOrderComponent.Status) or
+                    (ProdOrderComp2."Prod. Order No." <> ProdOrderComponent."Prod. Order No.") or
+                    (ProdOrderComp2."Prod. Order Line No." <> ProdOrderComponent."Prod. Order Line No.") or
+                    (ProdOrderComp2."Line No." <> ProdOrderComponent."Line No.")) and
+                   ((not ProdOrderComp2."Completely Picked") or
                     (not (Location."Require Pick" and Location."Require Shipment")))
                 then
                     KeepWarehouseRequest := true;
-            until (ProdOrderComponent2.Next() = 0) or KeepWarehouseRequest;
+            until (ProdOrderComp2.Next() = 0) or KeepWarehouseRequest;
 
         if not KeepWarehouseRequest then
             if Location."Require Shipment" then
@@ -294,29 +292,27 @@ codeunit 5774 "Whse.-Production Release"
         end;
     end;
 
-    local procedure ProdOrderCompletelyPicked(LocationCode: Code[10]; ProdOrderNo: Code[20]; ProductionOrderStatus: Enum "Production Order Status"; CompLineNo: Integer): Boolean
+    local procedure ProdOrderCompletelyPicked(LocationCode: Code[10]; ProdOrderNo: Code[20]; ProdOrderStatus: Enum "Production Order Status"; CompLineNo: Integer): Boolean
     var
-        ProdOrderComponent2: Record "Prod. Order Component";
+        ProdOrderComp2: Record "Prod. Order Component";
 #if not CLEAN26
         ManufacturingSetup: Record "Manufacturing Setup";
 #endif
     begin
-        OnBeforeProdOrderCompletelyPicked(LocationCode, ProdOrderNo, ProductionOrderStatus, CompLineNo, ProdOrderComp);
-
-        ProdOrderComponent2.SetCurrentKey(Status, "Prod. Order No.", "Location Code");
-        ProdOrderComponent2.SetRange(Status, ProductionOrderStatus);
-        ProdOrderComponent2.SetRange("Prod. Order No.", ProdOrderNo);
-        ProdOrderComponent2.SetRange("Location Code", LocationCode);
-        ProdOrderComponent2.SetFilter("Line No.", '<>%1', CompLineNo);
+        ProdOrderComp2.SetCurrentKey(Status, "Prod. Order No.", "Location Code");
+        ProdOrderComp2.SetRange(Status, ProdOrderStatus);
+        ProdOrderComp2.SetRange("Prod. Order No.", ProdOrderNo);
+        ProdOrderComp2.SetRange("Location Code", LocationCode);
+        ProdOrderComp2.SetFilter("Line No.", '<>%1', CompLineNo);
 #if not CLEAN26
         if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
-            ProdOrderComponent2.SetFilter("Flushing Method", '%1|%2', ProdOrderComp."Flushing Method"::Manual, ProdOrderComp."Flushing Method"::"Pick + Manual")
+            ProdOrderComp2.SetFilter("Flushing Method", '%1|%2', ProdOrderComp."Flushing Method"::Manual, ProdOrderComp."Flushing Method"::"Pick + Manual")
         else
 #endif
-        ProdOrderComponent2.SetRange("Flushing Method", ProdOrderComp."Flushing Method"::"Pick + Manual");
-        ProdOrderComponent2.SetRange("Planning Level Code", 0);
-        ProdOrderComponent2.SetRange("Completely Picked", false);
-        exit(ProdOrderComponent2.IsEmpty());
+        ProdOrderComp2.SetRange("Flushing Method", ProdOrderComp."Flushing Method"::"Pick + Manual");
+        ProdOrderComp2.SetRange("Planning Level Code", 0);
+        ProdOrderComp2.SetRange("Completely Picked", false);
+        exit(ProdOrderComp2.IsEmpty());
     end;
 
     local procedure ProdOrderCompletelyHandled(ProductionOrder: Record "Production Order"; LocationCode: Code[10]): Boolean
@@ -406,21 +402,6 @@ codeunit 5774 "Whse.-Production Release"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeWarehouseRequestUpdate(var WarehouseRequest: Record "Warehouse Request"; ProdOrderComponent: Record "Prod. Order Component")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeProdOrderCompletelyPicked(var LocationCode: Code[10]; var ProdOrderNo: Code[20]; var ProductionOrderStatus: Enum "Production Order Status"; var CompLineNo: Integer; var ProdOrderComponent: Record "Prod. Order Component");
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnReleaseOnBeforeLoopProdOrderComponent(var ProductionOrder: Record "Production Order"; var ProdOrderComponent: Record "Prod. Order Component")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnDeleteLineOnBeforeLoopProdOrderComponent(var ProdOrderComponent: Record "Prod. Order Component"; var ProdOrderComponent2: Record "Prod. Order Component")
     begin
     end;
 }
