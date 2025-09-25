@@ -8,6 +8,7 @@ table 8009 "Imported Subscription Line"
 {
     DataClassification = CustomerContent;
     Caption = 'Imported Subscription Line';
+    Access = Internal;
 
     fields
     {

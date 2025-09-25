@@ -9,7 +9,7 @@ using System.TestTools.AITestToolkit;
 using System.TestLibraries.Environment;
 
 
-codeunit 133502 EDocCopilotPOAccuracy
+codeunit 133502 EDocCopilotPOAccuacy
 {
     Subtype = Test;
     TestPermissions = Disabled;
@@ -18,7 +18,7 @@ codeunit 133502 EDocCopilotPOAccuracy
         EDocPOCopilotMatching: Codeunit "E-Doc. PO Copilot Matching";
 
     [Test]
-    procedure TestPromptAccuracy()
+    procedure TestPromptAccuacy()
     var
         EDocument: Record "E-Document";
         TempEDocumentImportedLine: Record "E-Doc. Imported Line" temporary;
@@ -39,8 +39,8 @@ codeunit 133502 EDocCopilotPOAccuracy
         Input, Line, Item, K, V, Output : Text;
         LineNo: Integer;
     begin
-        // [FEATURE] [E-Document] [Copilot Accuracy] 
-        // [SCENARIO] Match exact LLM output to datai in accuracy.jsonl
+        // [FEATURE] [E-Document] [Copilot Accuacy] 
+        // [SCENARIO] Match exact LLM output to datai in accuacy.jsonl
 
         PurchaseLine.DeleteAll();
         EDocumentImportedLine.DeleteAll();

@@ -6,6 +6,7 @@ table 8056 "Subscription Package Line"
 {
     Caption = 'Subscription Package Line';
     DataClassification = CustomerContent;
+    Access = Internal;
 
     fields
     {
@@ -281,12 +282,6 @@ table 8056 "Subscription Package Line"
         if Rec.Discount then
             if Rec."Usage Based Billing" then
                 Error(RecurringDiscountCannotBeGrantedErr);
-    end;
-
-    internal procedure FilterOnPackageCode(PackageCode: Code[20])
-    begin
-        Rec.Reset();
-        Rec.SetRange("Subscription Package Code", PackageCode);
     end;
 
     internal procedure IsPartnerVendor(): Boolean

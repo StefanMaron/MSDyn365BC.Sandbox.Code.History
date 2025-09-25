@@ -54,72 +54,42 @@ codeunit 6102 "E-Doc. Export"
         OnAfterEDocumentCheck(EDocSourceRecRef, EDocumentProcessingPhase);
     end;
 
-    internal procedure CreateEDocument(DocumentHeader: RecordRef; WorkFlow: Record Workflow; EDocumentType: Enum "E-Document Type")
+    internal procedure CreateEDocument(var SourceDocumentHeader: RecordRef)
     var
+        DocumentSendingProfile: Record "Document Sending Profile";
         EDocument: Record "E-Document";
         EDocumentService: Record "E-Document Service";
-        EDocWorkFlowProcessing: Codeunit "E-Document WorkFlow Processing";
-    begin
-        if not EDocWorkFlowProcessing.GetEDocumentServicesInWorkflow(WorkFlow, EDocumentService) then
-            exit;
-
-        WorkFlow.TestField(Enabled);
-        EDocument."Workflow Code" := WorkFlow.Code;
-        CreateEDocument(EDocument, DocumentHeader, EDocumentService, EDocumentType);
-    end;
-
-    /// <summary>
-    /// CreateEDocument - Creates E-Document for the given document header and a given set of services.
-    /// 
-    /// If services do not support the document type they are filtered out
-    ///
-    /// </summary>
-    local procedure CreateEDocument(EDocument: Record "E-Document"; var DocumentHeader: RecordRef; var EDocumentService: Record "E-Document Service"; EDocumentType: Enum "E-Document Type")
-    var
         EDocumentLog: Codeunit "E-Document Log";
         EDocumentBackgroundJobs: Codeunit "E-Document Background Jobs";
-        SupportedServices: List of [Code[20]];
-        Code: Code[20];
+        EDocWorkFlowProcessing: Codeunit "E-Document WorkFlow Processing";
+        IsDocumentTypeSupported: Boolean;
     begin
-        EDocument.SetRange("Document Record ID", DocumentHeader.RecordId);
+        EDocument.SetRange("Document Record ID", SourceDocumentHeader.RecordId);
         if not EDocument.IsEmpty() then
             exit;
 
-        if EDocumentService.FindSet() then
-            repeat
-                if IsDocumentTypeSupported(EDocumentService, EDocumentType) then
-                    SupportedServices.Add(EDocumentService.Code);
-            until EDocumentService.Next() = 0;
+        IsDocumentTypeSupported := false;
+        DocumentSendingProfile := EDocumentProcessing.GetDocSendingProfileForDocRef(SourceDocumentHeader);
+        if EDocWorkFlowProcessing.DoesFlowHasEDocService(EDocumentService, DocumentSendingProfile."Electronic Service Flow") then
+            if EDocumentService.FindSet() then
+                repeat
+                    IsDocumentTypeSupported := IsDocumentTypeSupportedByService(EDocumentService, SourceDocumentHeader, false);
+                until (EDocumentService.Next() = 0) or IsDocumentTypeSupported;
 
-        if SupportedServices.Count() = 0 then
-            exit;
+        if IsDocumentTypeSupported then begin
+            OnBeforeCreateEDocument(EDocument, SourceDocumentHeader);
 
-        OnBeforeCreateEDocument(EDocument, DocumentHeader);
+            PopulateEDocument(EDocument, SourceDocumentHeader);
 
-        EDocument.Validate("Document Record ID", DocumentHeader.RecordId);
-        EDocument.Validate("Document Type", EDocumentType);
-        EDocument.Validate(Status, EDocument.Status::"In Progress");
-        EDocument.Validate(Direction, EDocument.Direction::Outgoing);
-        EDocument.Insert();
+            OnAfterCreateEDocument(EDocument, SourceDocumentHeader);
 
-        PopulateEDocument(EDocument, DocumentHeader);
-        EDocument.Modify();
-
-        OnAfterCreateEDocument(EDocument, DocumentHeader);
-
-        Clear(EDocumentService);
-        EDocumentLog.InsertLog(EDocument, Enum::"E-Document Service Status"::Created);
-
-        // Handle next step for each of services
-        foreach Code in SupportedServices do begin
-            EDocumentService.Get(Code);
+            EDocumentLog.InsertLog(EDocument, Enum::"E-Document Service Status"::Created);
             EDocumentProcessing.InsertServiceStatus(EDocument, EDocumentService, Enum::"E-Document Service Status"::Created);
             EDocumentProcessing.ModifyEDocumentStatus(EDocument);
+
+            EDocumentBackgroundJobs.StartEDocumentCreatedFlow(EDocument);
         end;
-
-        EDocumentBackgroundJobs.StartEDocumentCreatedFlow(EDocument);
     end;
-
 
     internal procedure ExportEDocument(var EDocument: Record "E-Document"; var EDocumentService: Record "E-Document Service") Success: Boolean
     var
@@ -346,6 +316,8 @@ codeunit 6102 "E-Doc. Export"
                     EDocument."Amount Incl. VAT" := SourceDocumentHeader.Field(PurchHeader.FieldNo("Amount Including VAT")).Value;
                 end;
         end;
+
+        EDocument.Insert();
     end;
 
     local procedure CreateEDocument(EDocumentService: Record "E-Document Service"; var EDocument: Record "E-Document"; var SourceDocumentHeader: RecordRef; var SourceDocumentLines: RecordRef; var TempBlob: Codeunit "Temp Blob")
@@ -494,13 +466,6 @@ codeunit 6102 "E-Doc. Export"
         end;
 
         exit(EDocServiceSupportedType.Get(EDocService.Code, EDocSourceType));
-    end;
-
-    local procedure IsDocumentTypeSupported(EDocService: Record "E-Document Service"; DocumentType: Enum "E-Document Type"): Boolean
-    var
-        EDocServiceSupportedType: Record "E-Doc. Service Supported Type";
-    begin
-        exit(EDocServiceSupportedType.Get(EDocService.Code, DocumentType));
     end;
 
     var

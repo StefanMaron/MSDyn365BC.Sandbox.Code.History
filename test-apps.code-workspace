@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "al.enableCodeActions": false
-  },
   "folders": [
     {
       "path": "./Shopify/test/Shopify Connector Test"
@@ -61,12 +53,6 @@
     },
     {
       "path": "./ReportLayouts/Test/Report Layouts Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/B2Brouter/Test/E-Document Connector - B2Brouter Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Pagero/Test/E-Document Connector - Pagero Tests"
     },
     {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
@@ -321,6 +307,9 @@
       "path": "./BusinessFoundation/Test/Business Foundation Tests/DisabledTests"
     },
     {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
+    },
+    {
       "path": "./Email - Outlook REST API/Test"
     },
     {
@@ -329,5 +318,13 @@
     {
       "path": "./APIV2/Test/_Exclude_APIV2_ Tests"
     }
-  ]
+  ],
+  "settings": {
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
+  }
 }

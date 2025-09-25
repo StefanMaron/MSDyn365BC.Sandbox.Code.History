@@ -427,12 +427,12 @@ codeunit 8068 "Vendor Deferrals Mngmt."
         end;
     end;
 
-    internal procedure SetDeferralNo(NewDeferralNo: Integer)
+    procedure SetDeferralNo(NewDeferralNo: Integer)
     begin
         DeferralEntryNo := NewDeferralNo;
     end;
 
-    local procedure GetAppliesToDocNo(PurchHeader: Record "Purchase Header"): Code[20]
+    procedure GetAppliesToDocNo(PurchHeader: Record "Purchase Header"): Code[20]
     var
         BillingLine: Record "Billing Line";
     begin
