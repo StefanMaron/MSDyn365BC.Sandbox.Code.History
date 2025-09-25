@@ -1068,7 +1068,7 @@ codeunit 5802 "Inventory Posting To G/L"
             OnPostInvtPostBufProcessGlobalInvtPostBufOnAfterSetAmt(GenJnlLine);
 
             if not CalledFromTestReport and not RunOnlyCheck then
-                CreateGLItemLedgerRelation(ValueEntry);
+                CreateGLItemLedgRelation(ValueEntry);
         until TempGlobalInvtPostingBuffer.Next() = 0;
     end;
 
@@ -1146,11 +1146,11 @@ codeunit 5802 "Inventory Posting To G/L"
         TempInvtPostToGLTestBuf.Insert();
     end;
 
-    local procedure CreateGLItemLedgerRelation(var ValueEntry: Record "Value Entry")
+    local procedure CreateGLItemLedgRelation(var ValueEntry: Record "Value Entry")
     var
-        GLRegister: Record "G/L Register";
+        GLReg: Record "G/L Register";
     begin
-        GenJnlPostLine.GetGLReg(GLRegister);
+        GenJnlPostLine.GetGLReg(GLReg);
         if GlobalPostPerPostGroup then begin
             TempGLItemLedgRelation.Reset();
             TempGLItemLedgRelation.SetRange("G/L Entry No.", TempGlobalInvtPostingBuffer."Entry No.");
@@ -1158,30 +1158,24 @@ codeunit 5802 "Inventory Posting To G/L"
             repeat
                 ValueEntry.Get(TempGLItemLedgRelation."Value Entry No.");
                 UpdateValueEntry(ValueEntry);
-                CreateGLItemLedgerRelationEntry(GLRegister);
+                CreateGLItemLedgRelationEntry(GLReg);
             until TempGLItemLedgRelation.Next() = 0;
         end else begin
             UpdateValueEntry(ValueEntry);
-            CreateGLItemLedgerRelationEntry(GLRegister);
+            CreateGLItemLedgRelationEntry(GLReg);
         end;
     end;
 
-    local procedure CreateGLItemLedgerRelationEntry(GLRegister: Record "G/L Register")
+    local procedure CreateGLItemLedgRelationEntry(GLReg: Record "G/L Register")
     var
-        GLItemLedgerRelation: Record "G/L - Item Ledger Relation";
-        IsHandled: Boolean;
+        GLItemLedgRelation: Record "G/L - Item Ledger Relation";
     begin
-        IsHandled := false;
-        OnBeforeCreateGLItemLedgerRelationEntry(GLRegister, IsHandled);
-        if IsHandled then
-            exit;
-
-        GLItemLedgerRelation.Init();
-        GLItemLedgerRelation."G/L Entry No." := GLRegister."To Entry No.";
-        GLItemLedgerRelation."Value Entry No." := TempGLItemLedgRelation."Value Entry No.";
-        GLItemLedgerRelation."G/L Register No." := GLRegister."No.";
-        OnBeforeGLItemLedgRelationInsert(GLItemLedgerRelation, TempGlobalInvtPostingBuffer, GLRegister, TempGLItemLedgRelation);
-        GLItemLedgerRelation.Insert();
+        GLItemLedgRelation.Init();
+        GLItemLedgRelation."G/L Entry No." := GLReg."To Entry No.";
+        GLItemLedgRelation."Value Entry No." := TempGLItemLedgRelation."Value Entry No.";
+        GLItemLedgRelation."G/L Register No." := GLReg."No.";
+        OnBeforeGLItemLedgRelationInsert(GLItemLedgRelation, TempGlobalInvtPostingBuffer, GLReg, TempGLItemLedgRelation);
+        GLItemLedgRelation.Insert();
         OnAfterGLItemLedgRelationInsert();
         TempGLItemLedgRelation."G/L Entry No." := TempGlobalInvtPostingBuffer."Entry No.";
         TempGLItemLedgRelation.Delete();
@@ -1560,11 +1554,6 @@ codeunit 5802 "Inventory Posting To G/L"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeBufferCapacityPosting(var ValueEntry: Record "Value Entry"; var TempGlobalInvtPostingBuffer: Record "Invt. Posting Buffer" temporary; CostToPost: Decimal; CostToPostACY: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateGLItemLedgerRelationEntry(var GLRegister: Record "G/L Register"; var IsHandled: Boolean)
     begin
     end;
 }
