@@ -13,7 +13,7 @@ using System.Environment.Configuration;
 page 2515 "AppSource Product List"
 {
     PageType = List;
-    Caption = 'Microsoft AppSource apps';
+    Caption = 'Microsoft AppSource Apps';
     ApplicationArea = All;
     UsageCategory = Administration;
     Editable = false;
@@ -96,9 +96,9 @@ page 2515 "AppSource Product List"
     {
         area(Promoted)
         {
+            actionref(AppSource_Promoted; OpenAppSource) { }
             actionref(Open_Promoted; OpenInAppSource) { }
             actionref(Refresh_Promoted; UpdateProducts) { }
-            actionref(AppSource_Promoted; OpenAppSource) { }
             actionref(ShowSettings_Promoted; ShowSettings) { }
         }
 
@@ -106,10 +106,10 @@ page 2515 "AppSource Product List"
         {
             action(OpenAppSource)
             {
-                Caption = 'Go to AppSource';
+                Caption = 'View AppSource';
                 Scope = Page;
-                Image = GoTo;
-                ToolTip = 'View all apps on AppSource';
+                Image = OpenWorksheet;
+                ToolTip = 'View all apps in AppSource';
 
                 trigger OnAction()
                 begin
@@ -119,10 +119,10 @@ page 2515 "AppSource Product List"
 
             action(OpenInAppSource)
             {
-                Caption = 'View on AppSource';
+                Caption = 'View in AppSource';
                 Scope = Repeater;
-                Image = Info;
-                ToolTip = 'View selected app on AppSource';
+                Image = Open;
+                ToolTip = 'View selected app in AppSource';
 
                 trigger OnAction()
                 begin
@@ -143,7 +143,7 @@ page 2515 "AppSource Product List"
         {
             action(UpdateProducts)
             {
-                Caption = 'Refresh apps';
+                Caption = 'Refresh list from Microsoft AppSource';
                 Scope = Page;
                 ToolTip = 'Refreshes the list by downloading the latest apps from Microsoft AppSource';
                 Image = Refresh;
