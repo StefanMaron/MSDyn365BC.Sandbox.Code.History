@@ -200,7 +200,7 @@ codeunit 87 "Blanket Sales Order to Order"
                     SalesLineOrder."Qty. to Asm. to Order (Base)" := SalesLineOrder."Quantity (Base)";
                 end;
                 SalesLineOrder.DefaultDeferralCode();
-                if IsSalesOrderLineToBeInserted(SalesLineOrder, SalesLineBlanketOrder) then begin
+                if IsSalesOrderLineToBeInserted(SalesLineOrder) then begin
                     OnBeforeInsertSalesOrderLine(SalesLineOrder, SalesHeaderOrder, SalesLineBlanketOrder, SalesHeaderBlanketOrder);
                     SalesLineOrder.Insert();
                     OnAfterInsertSalesOrderLine(SalesLineOrder, SalesHeaderOrder, SalesLineBlanketOrder, SalesHeaderBlanketOrder);
@@ -447,12 +447,15 @@ codeunit 87 "Blanket Sales Order to Order"
             ItemCheckAvail.RaiseUpdateInterruptedError();
     end;
 
-    local procedure IsSalesOrderLineToBeInserted(SalesOrderLine: Record "Sales Line"; BlanketSalesOrderLine: Record "Sales Line"): Boolean
+    local procedure IsSalesOrderLineToBeInserted(SalesOrderLine: Record "Sales Line"): Boolean
+    var
+        AttachedToSalesLine: Record "Sales Line";
     begin
         if not SalesOrderLine.IsExtendedText() then
             exit(true);
-
-        exit(BlanketSalesOrderLine."Attached to Line No." <> 0);
+        exit(
+          AttachedToSalesLine.Get(
+            SalesOrderLine."Document Type", SalesOrderLine."Document No.", SalesOrderLine."Attached to Line No."));
     end;
 
     [IntegrationEvent(false, false)]
