@@ -27,17 +27,14 @@ report 6655 "Batch Post Sales Return Orders"
             trigger OnPreDataItem()
             var
                 SalesBatchPostMgt: Codeunit "Sales Batch Post Mgt.";
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeSalesHeaderOnPreDataItem("Sales Header", ReceiveReq, InvReq, SalesBatchPostMgt, IsHandled);
-                if not IsHandled then begin
-                    SalesBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::Receive, ReceiveReq);
-                    SalesBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::Print, PrintDoc);
-                    SalesBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Replace VAT Date", ReplaceVATDateReq);
-                    SalesBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"VAT Date", VATDateReq);
-                    SalesBatchPostMgt.RunBatch("Sales Header", ReplacePostingDate, PostingDateReq, ReplaceDocumentDate, CalcInvDisc, false, InvReq);
-                end;
+                OnBeforeSalesHeaderOnPreDataItem("Sales Header", ReceiveReq, InvReq);
+
+                SalesBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::Receive, ReceiveReq);
+                SalesBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::Print, PrintDoc);
+                SalesBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Replace VAT Date", ReplaceVATDateReq);
+                SalesBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"VAT Date", VATDateReq);
+                SalesBatchPostMgt.RunBatch("Sales Header", ReplacePostingDate, PostingDateReq, ReplaceDocumentDate, CalcInvDisc, false, InvReq);
 
                 CurrReport.Break();
             end;
@@ -233,7 +230,7 @@ report 6655 "Batch Post Sales Return Orders"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSalesHeaderOnPreDataItem(var SalesHeader: Record "Sales Header"; var ReceiveReq: Boolean; var InvReq: Boolean; var SalesBatchPostMgt: Codeunit "Sales Batch Post Mgt."; var IsHandled: Boolean)
+    local procedure OnBeforeSalesHeaderOnPreDataItem(var SalesHeader: Record "Sales Header"; var ReceiveReq: Boolean; var InvReq: Boolean)
     begin
     end;
 }

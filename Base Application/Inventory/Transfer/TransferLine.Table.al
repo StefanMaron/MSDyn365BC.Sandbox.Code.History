@@ -53,13 +53,7 @@ table 5741 "Transfer Line"
             trigger OnValidate()
             var
                 TempTransferLine: Record "Transfer Line" temporary;
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateItemNo(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
-                    exit;
-
                 TestField("Quantity Shipped", 0);
                 TestField("WIP Qty. Shipped", 0);
                 if CurrFieldNo <> 0 then
@@ -1731,8 +1725,6 @@ table 5741 "Transfer Line"
             exit;
 
         TestField("Item No.");
-        Item.Get("Item No.");
-        Item.TestField(Reserve);
         Clear(Reservation);
         OptionNumber := StrMenu(Text011);
         if OptionNumber > 0 then begin
@@ -2688,11 +2680,6 @@ table 5741 "Transfer Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateQtyToReceive(var TransferLine: Record "Transfer Line"; xTransferLine: Record "Transfer Line"; CallingFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateItemNo(var TransferLine: Record "Transfer Line"; xTransferLine: Record "Transfer Line"; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
