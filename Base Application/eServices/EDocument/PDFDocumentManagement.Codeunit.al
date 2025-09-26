@@ -174,17 +174,8 @@ codeunit 5467 "PDF Document Management"
         CompanyInformation.Get();
 
         case DocumentType of
-            DocumentType::Journal, DocumentType::" ":
+            DocumentType::Journal, DocumentType::"Sales Order", DocumentType::" ":
                 DocumentFound := false;
-            DocumentType::"Sales Order":
-                if SalesHeader.GetBySystemId(DocumentId) then begin
-                    SalesHeader.SetRange("No.", SalesHeader."No.");
-                    SalesHeader.SetRange("Document Type", SalesHeader."Document Type");
-                    ReportUsage := "Report Selection Usage"::"S.Order";
-                    ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, SalesHeader, SalesHeader."Sell-to Customer No.");
-                    DocumentMailing.GetAttachmentFileName(Name, SalesHeader."No.", SalesHeader.GetDocTypeTxt(), ReportUsage.AsInteger());
-                    DocumentFound := true;
-                end;
             DocumentType::"Sales Quote":
                 if SalesHeader.GetBySystemId(DocumentId) then
                     if SalesHeader."Document Type" = SalesHeader."Document Type"::Quote then begin
