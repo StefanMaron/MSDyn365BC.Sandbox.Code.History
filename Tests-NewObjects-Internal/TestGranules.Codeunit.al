@@ -653,11 +653,6 @@ codeunit 132532 "Test Granules"
         TablesWithInherentEntitlements.Add(1470, true); // Product Video Buffer
         TablesWithInherentEntitlements.Add(1480, true); // Edit in Excel Settings
         TablesWithInherentEntitlements.Add(2718, true); // Page Summary Settings
-        TablesWithInherentEntitlements.Add(4325, true); // SOA Setup
-        TablesWithInherentEntitlements.Add(4585, true); // SOA Email
-        TablesWithInherentEntitlements.Add(4592, true); // SOA KPI Entry
-        TablesWithInherentEntitlements.Add(4593, true); // SOA KPI
-        TablesWithInherentEntitlements.Add(4594, true); // SOA Task
         TablesWithInherentEntitlements.Add(4690, true); // Recurrence Schedule
         TablesWithInherentEntitlements.Add(5490, true); // Onboarding Signal 
         TablesWithInherentEntitlements.Add(7775, true); // Copilot Settings
