@@ -611,6 +611,7 @@ codeunit 99000837 "Prod. Order Line-Reserve"
             ReturnOption::"Gross Qty. (Base)":
                 exit(ProdOrderLine."Quantity (Base)");
         end;
+        OnAfterGetSourceValue(ReservationEntry, SourceRecordRef, ReturnOption);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reservation Management", 'OnGetSourceRecordValue', '', false, false)]
@@ -1057,6 +1058,11 @@ codeunit 99000837 "Prod. Order Line-Reserve"
             exit(false);
 
         exit(true);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetSourceValue(ReservationEntry: Record "Reservation Entry"; var SourceRecordRef: RecordRef; ReturnOption: Option "Net Qty. (Base)","Gross Qty. (Base)")
+    begin
     end;
 }
 
