@@ -4,6 +4,7 @@ table 8005 "Item Templ. Sub. Package"
 {
     Caption = 'Item Template Subscription Package';
     DataClassification = CustomerContent;
+    Access = Internal;
 
     fields
     {
