@@ -4,10 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Posting;
 
-using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Intercompany.Outbox;
-using Microsoft.Inventory.Analysis;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
 using System.Automation;
@@ -25,20 +23,15 @@ codeunit 1372 "Purchase Batch Post Mgt."
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseBatchPostMgt: Codeunit "Purchase Batch Post Mgt.";
-        UpdateAnalysisView: Codeunit "Update Analysis View";
-        UpdateItemAnalysisView: Codeunit "Update Item Analysis View";
     begin
         PurchaseHeader.Copy(Rec);
 
-        BindSubscription(PurchaseBatchPostMgt);  // also disables automatic update of Analysis Views
+        BindSubscription(PurchaseBatchPostMgt);
         PurchaseBatchPostMgt.SetPostingCodeunitId(PostingCodeunitId);
         PurchaseBatchPostMgt.SetBatchProcessor(BatchProcessingMgt);
         PurchaseBatchPostMgt.Code(PurchaseHeader);
-        Rec := PurchaseHeader;
-        UnBindSubscription(PurchaseBatchPostMgt);  // reenable automatic update of Analysis Views
 
-        UpdateAnalysisView.UpdateAll(0, true);
-        UpdateItemAnalysisView.UpdateAll(0, true);
+        Rec := PurchaseHeader;
     end;
 
     var
@@ -408,18 +401,6 @@ codeunit 1372 "Purchase Batch Post Mgt."
         ICOutboxExport: Codeunit "IC Outbox Export";
     begin
         ICOutboxExport.DownloadBatchFiles(GetICBatchFileName());
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Update Analysis View", 'OnBeforeUpdateAll', '', false, false)]
-    local procedure OnBeforeUpdateAnalysisView(Which: Option "Ledger Entries","Budget Entries",Both; DirectlyFromPosting: Boolean; var AnalysisView: Record "Analysis View"; var InBatchPosting: Boolean)
-    begin
-        InBatchPosting := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Update Item Analysis View", 'OnBeforeUpdateAll', '', false, false)]
-    local procedure OnBeforeUpdateItemAnalysisView(var IsHandled: Boolean)
-    begin
-        IsHandled := true;
     end;
 }
 
