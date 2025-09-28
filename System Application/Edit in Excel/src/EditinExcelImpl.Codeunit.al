@@ -715,7 +715,6 @@ codeunit 1482 "Edit in Excel Impl."
         StartStr: Text;
         EndStr: Text;
         ByteValue: DotNet Byte;
-        ConvertedByteValue: Text;
         IsByteValueUnderscore: Dictionary of [Integer, Boolean];
     begin
         ConvertedName := Name;
@@ -749,9 +748,7 @@ codeunit 1482 "Edit in Excel Impl."
                     ByteValue := Convert.ToByte(ConvertedName[CurrentPosition]);
                     StartStr := CopyStr(ConvertedName, 1, CurrentPosition - 1);
                     EndStr := CopyStr(ConvertedName, CurrentPosition + 1);
-                    ConvertedByteValue := Convert.ToString(ByteValue, 16);
-                    ConvertedByteValue := ConvertedByteValue.ToUpper();
-                    ConvertedName := StrSubstNo(XmlByteEncoding2Tok, StartStr, ConvertedByteValue, EndStr);
+                    ConvertedName := StrSubstNo(XmlByteEncoding2Tok, StartStr, Convert.ToString(ByteValue, 16), EndStr);
                 end;
                 // length of _x00nn_ minus one that will be added later
                 CurrentPosition += 6;
