@@ -414,7 +414,6 @@ page 6613 "FS Connection Setup Wizard"
         end else begin
             InitializeDefaultAuthenticationType();
             InitializeDefaultProxyVersion();
-            InitializeDefaultTemplateAndBatch();
         end;
         Rec.Insert();
         Step := Step::Start;
@@ -634,11 +633,6 @@ page 6613 "FS Connection Setup Wizard"
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
     begin
         Rec.Validate("Proxy Version", CRMIntegrationManagement.GetLastProxyVersionItem());
-    end;
-
-    local procedure InitializeDefaultTemplateAndBatch()
-    begin
-        Rec.InitializeDefaultTemplateAndBatch();
     end;
 
     local procedure GetVirtualTablesAppSourceLink(): Text
