@@ -38,10 +38,7 @@ codeunit 92 "Purch.-Post + Print"
             if not ConfirmPost(PurchHeader, DefaultOption) then
                 exit;
 
-        IsHandled := false;
-        OnAfterConfirmPost(PurchHeader, IsHandled);
-        if IsHandled then
-            exit;
+        OnAfterConfirmPost(PurchHeader);
 
         PurchSetup.Get();
         if PurchSetup."Post & Print with Job Queue" then
@@ -222,7 +219,7 @@ codeunit 92 "Purch.-Post + Print"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterConfirmPost(PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    local procedure OnAfterConfirmPost(PurchaseHeader: Record "Purchase Header")
     begin
     end;
 
