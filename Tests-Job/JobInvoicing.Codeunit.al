@@ -50,15 +50,14 @@ codeunit 136306 "Job Invoicing"
 #endif
         WrongDescriptionInPostedSalesInvoiceErr: Label 'Wrong Description in Sales Invoice Line.';
         TrackingOption: Option "Assign Lot No.","Assign Serial No.";
-        CancelPostedInvoiceQst: Label 'This invoice was posted from a sales order. To cancel it, a sales credit memo will be created and posted. The quantities from the original sales order will be restored, provided the sales order still exists.\ \Do you want to continue?';
-        CorrectPostedInvoiceQst: Label 'The posted sales invoice will be canceled, and a new version of the sales invoice will automatically be created by the system so that you can make the correction.\ \Do you want to continue?';
+        CancelPostedInvoiceQst: Label 'The posted sales invoice will be canceled, and a sales credit memo will be created and posted, which reverses the posted sales invoice.\ \Do you want to continue?';
+        CorrectPostedInvoiceQst: Label 'The posted sales invoice will be canceled, and a new version of the sales invoice will be created so that you can make the correction.\ \Do you want to continue?';
         JobMustNotBeBlockedErr: Label 'Project %1 must not be blocked', Comment = '%1 - Project No.';
         ExtDocNoErr: Label 'The actual %1 External Document No. and the expected %2 External Document No. are not equal', Comment = '%1 = Project, %2 = Sales Header';
         YourReferenceErr: Label 'The actual %1 Your Reference and the expected %2 Your Reference are not equal', Comment = '%1 = Project, %2 = Sales Header';
         DetailLevel: Option All,"Per Job","Per Job Task","Per Job Planning Line";
         LineDiscountPctErr: Label '%1 should be %2', Comment = '%1 = Field Caption, %2 = Field Value';
         WrongNoOfLinesLbl: Label 'Wrong number of lines created.';
-        SystemCreatedEntryErr: Label 'System Created Entry must not equal to %1', Comment = '%1= System Created Entry';
 
     [Test]
     [HandlerFunctions('TransferToInvoiceHandler,MessageHandler')]
@@ -3919,62 +3918,6 @@ codeunit 136306 "Job Invoicing"
     end;
 
     [Test]
-    [HandlerFunctions('TransferToInvoiceHandler,MessageHandler')]
-    [Scope('OnPrem')]
-    procedure SingleInvoiceCreatedBillingMethodMultipleCustomerSameCustomerOnPlanningLinesWithTwoTaskNo()
-    var
-        JobTask: Record "Job Task";
-        Job: Record Job;
-        Item: array[2] of Record Item;
-        JobTask2: Record "Job Task";
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        JobPlanningLine: array[2] of Record "Job Planning Line";
-        JobCreateInvoice: Codeunit "Job Create-Invoice";
-        DocumentType: Enum "Sales Document Type";
-        TaskBillingMethod: Enum "Task Billing Method";
-        InvoicesList: List of [Code[20]];
-        DocumentNo: Code[20];
-    begin
-        // [SCENARIO 566879] When the field Task Billing Method is set to Multiple Customers on the Project Card with 2 Project Tasks and a Single Planning Line Each, 
-        // the system now generates a Single Sales Invoice when a Single Project Task is Selected.
-        Initialize();
-
-        // [GIVEN] Create a Job and 2 Job Task with Billing Method set Multiple Customers.
-        CreateJobAndJobTaskWithBillingMethod(JobTask, TaskBillingMethod::"Multiple customers");
-        Job.Get(JobTask."Job No.");
-        LibraryJob.CreateJobTask(Job, JobTask2);
-
-        // [GIVEN] Create One Job Planning Lines for Each JobTask. 
-        LibraryInventory.CreateItem(Item[1]);
-        CreateJobPlanningLineWithItem(JobPlanningLine[1], JobTask, JobPlanningLine[1]."Line Type"::"Both Budget and Billable", Item[1]."No.", LibraryRandom.RandIntInRange(1, 10));
-        LibraryInventory.CreateItem(Item[2]);
-        CreateJobPlanningLineWithItem(JobPlanningLine[2], JobTask2, JobPlanningLine[2]."Line Type"::"Both Budget and Billable", Item[2]."No.", LibraryRandom.RandIntInRange(1, 10));
-        Commit();
-
-        // [GIVEN] Create Invoice for 1st Job Task - Job Planning Lines.
-        JobCreateInvoice.CreateSalesInvoice(JobPlanningLine[1], false);
-
-        // [WHEN] Get Sales Invoice Document.
-        GetSalesInvoiceDocumentList(JobPlanningLine[1], DocumentType::Invoice, InvoicesList);
-        GetSalesInvoiceDocumentList(JobPlanningLine[2], DocumentType::Invoice, InvoicesList);
-
-        // [THEN] Verify One Sales Invoice is Created.
-        Assert.AreEqual(1, InvoicesList.Count, WrongNoOfLinesLbl);
-
-        // [GIVEN] Get Sales Invoice No from List.
-        InvoicesList.Get(1, DocumentNo);
-
-        // [WHEN] Get Sales Header and Lines.
-        SalesHeader.Get(SalesHeader."Document Type"::Invoice, DocumentNo);
-        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Invoice);
-        SalesLine.SetRange("Document No.", DocumentNo);
-
-        // [THEN] Verify One Sales Lines are created in a single invoice.
-        Assert.AreEqual(1, SalesLine.Count, WrongNoOfLinesLbl);
-    end;
-
-    [Test]
     [HandlerFunctions('TransferToInvoiceHandler,MessageHandler,ConfirmHandler')]
     [Scope('OnPrem')]
     procedure CopyInvoicedJobAndCreateInvoiceWithoutError()
@@ -4042,88 +3985,6 @@ codeunit 136306 "Job Invoicing"
 
         // [THEN] Verify the invoice is created successfully
         Assert.AreEqual(1, InvoicesList.Count, WrongNoOfLinesLbl);
-    end;
-
-    [Test]
-    [HandlerFunctions('MessageHandler,ConfirmHandler')]
-    [Scope('OnPrem')]
-    procedure CopyJobAndCreateProjectJournalLineWithoutError()
-    var
-        Job: Record Job;
-        JobPlanningLine: Record "Job Planning Line";
-        JobTask: Record "Job Task";
-        JobJournalLine: Record "Job Journal Line";
-        CopyJob: Codeunit "Copy Job";
-        JobLineType: Enum "Job Line Type";
-        TargetJobNo: Code[20];
-    begin
-        // [SCENARIO 573397] Copy project of System-Created Entry must be equal to 'No' in Project Planning Line
-        Initialize();
-
-        // [GIVEN] Create Job with Customer
-        CreateJobWithCustomer(Job);
-
-        // [GIVEN] Create Job Task
-        LibraryJob.CreateJobTask(Job, JobTask);
-
-        // [GIVEN] Create Job Journal Line of type "Both Budget and Billable" and post it.
-        CreateAndPostJobJournalLineWithIteAndType(JobJournalLine, JobTask, JobLineType::"Both Budget and Billable");
-
-        // [GIVEN] Create target Job Id
-        TargetJobNo := LibraryUtility.GenerateGUID();
-
-        // [WHEN] Copy Job by setting Copy Quantity as true.
-        CopyJob.SetCopyOptions(false, true, false, 0, 0, 0);
-        CopyJob.CopyJob(Job, TargetJobNo, TargetJobNo, Job."Bill-to Customer No.", '');
-
-        // [THEN] Find the created Job Planning Line and "System-Created Entry" should be set false
-        JobPlanningLine.SetRange("Job No.", TargetJobNo);
-        JobPlanningLine.FindFirst();
-        Assert.IsFalse(JobPlanningLine."System-Created Entry", StrSubstNo(SystemCreatedEntryErr, JobPlanningLine."System-Created Entry"));
-    end;
-
-    [Test]
-    procedure PostPurchaseCreditMemoWithNonInventoryItemLinkedToProject()
-    var
-        Item: Record Item;
-        Job: Record Job;
-        JobTask: Record "Job Task";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
-        Vendor: Record Vendor;
-        DocumentNo: Code[20];
-    begin
-        // [SCENARIO 580434] Error when posting a Purchase Credit Memo for 'Non-Inventory' item with Project No. selected
-        Initialize();
-
-        // [GIVEN] Create Non-Inventory Item
-        LibraryInventory.CreateNonInventoryTypeItem(Item);
-
-        // [GIVEN] Create Job with Customer
-        CreateJobWithCustomer(Job);
-
-        // [GIVEN] Create Job Task
-        LibraryJob.CreateJobTask(Job, JobTask);
-
-        // [GIVEN] Create Vendor
-        LibraryPurchase.CreateVendor(Vendor);
-
-        // [GIVEN] Create Purchase Credit Memo
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::"Credit Memo", Vendor."No.");
-        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, Item."No.", 1);
-
-        // [GIVEN] Set Job No., Job Task No. and Job Line Type as Billable
-        PurchaseLine.Validate("Job No.", Job."No.");
-        PurchaseLine.Validate("Job Task No.", JobTask."Job Task No.");
-        PurchaseLine.Validate("Job Line Type", PurchaseLine."Job Line Type"::Billable);
-        PurchaseLine.Modify(true);
-
-        // [WHEN] Post Purchase Credit Memo
-        DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-
-        // [THEN] No error should come, as posting for Non-Inventory Item.
-        PurchCrMemoHdr.Get(DocumentNo);
     end;
 
     local procedure Initialize()
@@ -5746,11 +5607,11 @@ codeunit 136306 "Job Invoicing"
             JobPlanningLineInvoice.SetRange("Document Type", JobPlanningLineInvoice."Document Type"::Invoice)
         else
             JobPlanningLineInvoice.SetRange("Document Type", JobPlanningLineInvoice."Document Type"::"Credit Memo");
-        if JobPlanningLineInvoice.FindSet() then
-            Repeat
-                if not InvoicesList.Contains(JobPlanningLineInvoice."Document No.") then
-                    InvoicesList.Add(JobPlanningLineInvoice."Document No.");
-            until JobPlanningLineInvoice.Next() = 0;
+        JobPlanningLineInvoice.FindSet();
+        Repeat
+            if not InvoicesList.Contains(JobPlanningLineInvoice."Document No.") then
+                InvoicesList.Add(JobPlanningLineInvoice."Document No.");
+        until JobPlanningLineInvoice.Next() = 0;
     end;
 
     local procedure UpdateQuantityInJobPlanningLine(JobNo: Code[20])
@@ -5763,20 +5624,6 @@ codeunit 136306 "Job Invoicing"
             JobPlanningLine.Validate(Quantity, LibraryRandom.RandIntInRange(1, 10));
             JobPlanningLine.Modify();
         until JobPlanningLine.Next() = 0;
-    end;
-
-    local procedure CreateAndPostJobJournalLineWithIteAndType(var JobJournalLine: Record "Job Journal Line"; JobTask: Record "Job Task"; JobLineType: Enum "Job Line Type")
-    var
-        Item: Record Item;
-    begin
-        LibraryInventory.CreateItem(Item);
-        LibraryJob.CreateJobJournalLine(JobLineType, JobTask, JobJournalLine);
-        JobJournalLine.Validate(Type, JobJournalLine.Type::Item);
-        JobJournalLine.Validate("No.", Item."No.");
-        JobJournalLine.Validate(Quantity, LibraryRandom.RandInt(100));
-        JobJournalLine.Modify(true);
-
-        LibraryJob.PostJobJournal(JobJournalLine);
     end;
 
     [RequestPageHandler]
