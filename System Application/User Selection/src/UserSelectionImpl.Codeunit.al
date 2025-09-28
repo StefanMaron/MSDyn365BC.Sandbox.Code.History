@@ -18,7 +18,7 @@ codeunit 9844 "User Selection Impl."
     var
         UserNameDoesNotExistErr: Label 'The user name %1 does not exist.', Comment = '%1 username';
 
-    procedure HideExternalAndSystemUsers(var User: Record User)
+    procedure HideExternalUsers(var User: Record User)
     var
         EnvironmentInformation: Codeunit "Environment Information";
     begin
@@ -30,21 +30,10 @@ codeunit 9844 "User Selection Impl."
         User.FilterGroup(0);
     end;
 
-    procedure HideOnlyExternalUsers(var User: Record User)
-    var
-        EnvironmentInformation: Codeunit "Environment Information";
-    begin
-        User.FilterGroup(2);
-        if EnvironmentInformation.IsSaaS() then
-            User.SetFilter("License Type", '<>%1', User."License Type"::"External User");
-        User.FilterGroup(0);
-    end;
-
-    procedure Open(var SelectedUser: Record User; HideOnlyExternal: Boolean): Boolean
+    procedure Open(var SelectedUser: Record User): Boolean
     var
         UserLookup: Page "User Lookup";
     begin
-        UserLookup.SetHideOnlyExternalUsers(HideOnlyExternal);
         UserLookup.SetTableView(SelectedUser);
         UserLookup.LookupMode := true;
         if UserLookup.RunModal() = Action::LookupOK then begin
