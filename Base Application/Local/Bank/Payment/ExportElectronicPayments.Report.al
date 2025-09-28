@@ -11,9 +11,7 @@ using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Payables;
-using Microsoft.Purchases.Remittance;
 using Microsoft.Purchases.Vendor;
-using Microsoft.Finance.Currency;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using System.Telemetry;
@@ -311,12 +309,7 @@ report 10083 "Export Electronic Payments"
                         }
 
                         trigger OnAfterGetRecord()
-                        var
-                            Currency: Record Currency;
-                            CurrExchRate: Record "Currency Exchange Rate";
-                            ValidExchRate: Boolean;
                         begin
-                            ValidExchRate := true;
                             CalcFields("Remaining Amt. (LCY)");
                             if ("Pmt. Discount Date" >= "Gen. Journal Line"."Document Date") and
                                ("Remaining Pmt. Disc. Possible" <> 0) and
@@ -332,16 +325,7 @@ report 10083 "Export Electronic Payments"
                                     AmountPaid := -ExportAmount - TotalAmountPaid;
                             end;
 
-                            if "Gen. Journal Line"."Currency Code" = '' then begin
-                                Currency.Reset();
-                                Currency.SetRange(Code, "Currency Code");
-                                if Currency.FindFirst() then
-                                    TotalAmountPaid := TotalAmountPaid + Round(CurrExchRate.ApplnExchangeAmtFCYToFCY(
-                                             "Posting Date", "Currency Code", "Gen. Journal Line"."Currency Code", AmountPaid, ValidExchRate), Currency."Amount Rounding Precision")
-                                else
-                                    TotalAmountPaid := TotalAmountPaid + AmountPaid;
-                            end else
-                                TotalAmountPaid := TotalAmountPaid + AmountPaid;
+                            TotalAmountPaid := TotalAmountPaid + AmountPaid;
                         end;
 
                         trigger OnPreDataItem()
@@ -669,14 +653,9 @@ report 10083 "Export Electronic Payments"
 
     local procedure ProcessVendor(var GenJnlLine: Record "Gen. Journal Line")
     var
-        RemitAddress: Record "Remit Address";
         EFTRecipientBankAccountMgt: codeunit "EFT Recipient Bank Account Mgt";
     begin
-        if GenJnlLine."Remit-to Code" <> '' then begin
-            RemitAddress.Get(GenJnlLine."Remit-to Code", Vendor."No.");
-            FormatAddress.VendorRemitToAddress(RemitAddress, PayeeAddress);
-        end else
-            FormatAddress.Vendor(PayeeAddress, Vendor);
+        FormatAddress.Vendor(PayeeAddress, Vendor);
 
         EFTRecipientBankAccountMgt.GetRecipientVendorBankAccount(VendBankAccount, GenJnlLine, Vendor."No.");
 
