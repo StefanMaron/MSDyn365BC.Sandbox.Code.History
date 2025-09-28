@@ -5,10 +5,12 @@ using System.Reflection;
 
 codeunit 8021 "Text Management"
 {
+    Access = Internal;
+
     var
         ProcessingAbortedErr: Label 'Processing aborted.';
 
-    internal procedure GetProcessingAbortedErr(): Text
+    procedure GetProcessingAbortedErr(): Text
     begin
         exit(ProcessingAbortedErr);
     end;
@@ -55,7 +57,7 @@ codeunit 8021 "Text Management"
         TextEditor.RunModal();
     end;
 
-    local procedure ReadBlobText(RecRef: RecordRef; FieldNo: Integer): Text
+    procedure ReadBlobText(RecRef: RecordRef; FieldNo: Integer): Text
     var
         TempBlob: Codeunit "Temp Blob";
         TypeHelper: Codeunit "Type Helper";
@@ -68,7 +70,7 @@ codeunit 8021 "Text Management"
         exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator()));
     end;
 
-    internal procedure WriteBlobText(var RRef: RecordRef; FieldNo: Integer; BlobText: Text)
+    procedure WriteBlobText(var RRef: RecordRef; FieldNo: Integer; BlobText: Text)
     var
         TempBlob: Codeunit "Temp Blob";
         OutStream: OutStream;

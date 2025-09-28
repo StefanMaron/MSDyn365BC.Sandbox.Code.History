@@ -12,6 +12,7 @@ table 8069 "Sales Sub. Line Archive"
     PasteIsValid = false;
     DrillDownPageId = "Sales Serv. Comm. Archive List";
     LookupPageId = "Sales Serv. Comm. Archive List";
+    Access = Internal;
 
     fields
     {
