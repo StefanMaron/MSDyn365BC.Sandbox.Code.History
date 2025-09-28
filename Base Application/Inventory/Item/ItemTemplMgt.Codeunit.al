@@ -141,16 +141,8 @@ codeunit 1336 "Item Templ. Mgt."
                 Error(VATPostingSetupErr, SalesReceivablesSetup."VAT Bus. Posting Gr. (Price)", ItemTempl."VAT Prod. Posting Group");
             Item.Validate("Price Includes VAT", ItemTempl."Price Includes VAT");
         end;
-        if ShouldUpdateItemCategoryCode(Item, ItemTempl, UpdateExistingValues) then
-            Item.Validate("Item Category Code", ItemTempl."Item Category Code");
+        Item.Validate("Item Category Code", ItemTempl."Item Category Code");
         Item.Validate("Indirect Cost %", ItemTempl."Indirect Cost %");
-    end;
-
-    local procedure ShouldUpdateItemCategoryCode(Item: Record Item; ItemTempl: Record "Item Templ."; UpdateExistingValues: Boolean): Boolean
-    begin
-        if UpdateExistingValues then
-            exit(ItemTempl."Item Category Code" <> Item."Item Category Code");
-        exit((Item."Item Category Code" = '') and (ItemTempl."Item Category Code" <> ''));
     end;
 
     local procedure ApplyTemplate(var Item: Record Item; ItemTempl: Record "Item Templ."; UpdateExistingValues: Boolean)
@@ -538,16 +530,10 @@ codeunit 1336 "Item Templ. Mgt."
             ItemTempl.Modify();
     end;
 
-    procedure IsOpenBlankCardConfirmed() Result: Boolean
+    procedure IsOpenBlankCardConfirmed(): Boolean
     var
         ConfirmManagement: Codeunit "Confirm Management";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeOpenBlankCardConfirmed(Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         exit(ConfirmManagement.GetResponse(OpenBlankCardQst, false));
     end;
 
@@ -712,11 +698,6 @@ codeunit 1336 "Item Templ. Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSelectItemTemplate(ItemTempl: Record "Item Templ."; var IsHandled: Boolean; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenBlankCardConfirmed(var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

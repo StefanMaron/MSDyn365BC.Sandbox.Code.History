@@ -600,7 +600,6 @@ codeunit 12184 "Fattura Doc. Helper"
         VATEntry.SetRange("VAT Calculation Type", VATEntry."VAT Calculation Type"::"Reverse Charge VAT");
         VATEntry.SetFilter("Document Type", '%1|%2', VATEntry."Document Type"::Invoice, VATEntry."Document Type"::"Credit Memo");
         VATEntry.SetFilter("Posting Date", DateFilter);
-        OnBuildSelfBillingDocPageSourceOnAfterSetVATEntryFilters(TempVATEntry, VATEntry);
         BuildVATEntryBufferWithLinks(TempVATEntry, VATEntry);
     end;
 
@@ -1131,7 +1130,6 @@ codeunit 12184 "Fattura Doc. Helper"
         UnitPrice: Decimal;
         InvDiscAmountByQty: Decimal;
         LineDiscountPct: Decimal;
-        Amount: Decimal;
     begin
         if Format(LineRecRef.Field(LineTypeFieldNo).Value) = ' ' then
             exit;
@@ -1147,14 +1145,12 @@ codeunit 12184 "Fattura Doc. Helper"
         TempFatturaLine."VAT %" := LineRecRef.Field(VatPercFieldNo).Value();
         Quantity := LineRecRef.Field(QuantityFieldNo).Value();
         UnitPrice := LineRecRef.Field(UnitPriceFieldNo).Value();
-        Amount := Quantity * UnitPrice;
 
         Currency.Initialize(TempFatturaHeader."Currency Code");
         UnitPrice :=
             ExchangeToLCYAmount(TempFatturaHeader,
                 CalcForPricesIncludingVAT(
                 UnitPrice, PricesIncludingVAT, TempFatturaLine."VAT %", Currency."Unit-Amount Rounding Precision"));
-        Amount := ExchangeToLCYAmount(TempFatturaHeader, Amount);
         if Quantity < 0 then
             TempFatturaLine."Unit Price" := -UnitPrice
         else begin
@@ -1174,7 +1170,7 @@ codeunit 12184 "Fattura Doc. Helper"
 
         TempFatturaLine.Amount := LineRecRef.Field(LineAmountFieldNo).Value();
         if (TempFatturaLine.Amount <> 0) and (InvDiscAmountByQty = 0) and (LineDiscountPct = 0) and (TempFatturaLine."Discount Amount" = 0) then
-            TempFatturaLine.Amount := Round(Amount) - TempFatturaLine."Discount Amount"
+            TempFatturaLine.Amount := Round(Quantity * UnitPrice) - TempFatturaLine."Discount Amount"
         else
             TempFatturaLine.Amount :=
               ExchangeToLCYAmount(
@@ -1575,11 +1571,6 @@ codeunit 12184 "Fattura Doc. Helper"
 
     [IntegrationEvent(false, false)]
     local procedure OnCollectShipmentInfoFromLines(var TempFatturaHeader: Record "Fattura Header" temporary; var TempShptFatturaLine: Record "fattura Line" temporary; var TempLineNumberBuffer: Record "Line Number Buffer" temporary; var FatturaProjectCode: Code[15]; var FatturaTenderCode: Code[15]; var CustomerPurchOrderNo: Text[35]; Type: Text[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBuildSelfBillingDocPageSourceOnAfterSetVATEntryFilters(var TempVATEntry: Record "VAT Entry" temporary; var VATEntry: Record "VAT Entry")
     begin
     end;
 }

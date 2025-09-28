@@ -326,7 +326,10 @@ codeunit 5626 "FA General Report"
             Period::"at Ending Date":
                 FALedgEntry.SetRange("FA Posting Date", 0D, EndingDate);
         end;
-        FALedgEntry.SetRange("Reclassification Entry", false);
+        FALedgEntry.SetRange("Reclassification Entry", true);
+        if FALedgEntry.FindFirst() then
+            FALedgEntry.SetRange("Entry No.", 0, FALedgEntry."Entry No." - 1);
+        FALedgEntry.SetRange("Reclassification Entry");
         OnCalcFAPostedOriginalAcqCostAmountOnAfterSetFilters(FALedgEntry, Period, StartingDate, EndingDate);
         FALedgEntry.CalcSums(Amount);
         exit(FALedgEntry.Amount);
