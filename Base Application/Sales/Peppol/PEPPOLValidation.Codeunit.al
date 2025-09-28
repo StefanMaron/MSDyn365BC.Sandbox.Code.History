@@ -104,12 +104,7 @@ codeunit 1620 "PEPPOL Validation"
 
         if SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::Order] then
             SalesHeader.TestField("Shipment Date");
-
-        IsHandled := false;
-        OnCheckSalesDocumentOnBeforeCheckYourReference(SalesHeader, IsHandled);
-        if not IsHandled then
-            SalesHeader.TestField("Your Reference");
-
+        SalesHeader.TestField("Your Reference");
         CheckShipToAddress(SalesHeader);
         SalesHeader.TestField("Due Date");
 
@@ -405,11 +400,6 @@ codeunit 1620 "PEPPOL Validation"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckSalesDocumentOnBeforeCheckCustomerVATRegNo(SalesHeader: Record "Sales Header"; Customer: Record Customer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCheckSalesDocumentOnBeforeCheckYourReference(SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 }
