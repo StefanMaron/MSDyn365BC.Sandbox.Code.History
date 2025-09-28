@@ -1213,16 +1213,7 @@ page 113 Budget
         exit(BudgetName);
     end;
 
-#if not CLEAN26
-    [Obsolete('Replaced by SetGLAccountFilter(NewGLAccFilter: Text)', '26.0')]
     procedure SetGLAccountFilter(NewGLAccFilter: Code[250])
-    begin
-        GLAccFilter := NewGLAccFilter;
-        GLAccFilterOnAfterValidate();
-    end;
-#endif
-
-    procedure SetGLAccountFilter(NewGLAccFilter: Text)
     begin
         GLAccFilter := NewGLAccFilter;
         GLAccFilterOnAfterValidate();
