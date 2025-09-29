@@ -32,7 +32,8 @@ page 242 "Consolidate Wizard"
 
                     trigger OnValidate()
                     begin
-                        UpdateOtherDateAfterOneIsEdited(TempConsolidationProcess."Starting Date", TempConsolidationProcess."Ending Date");
+                        if TempConsolidationProcess."Starting Date" = ClosingDate(TempConsolidationProcess."Starting Date") then
+                            TempConsolidationProcess."Ending Date" := TempConsolidationProcess."Starting Date";
                         if (TempConsolidationProcess."Starting Date" <> 0D) and (TempConsolidationProcess."Ending Date" <> 0D) then
                             ConsolidateBusinessUnits.ValidateDatesForConsolidation(TempConsolidationProcess."Starting Date", TempConsolidationProcess."Ending Date", true);
                         UpdateBusinessUnitDefaultConsolidateState();
@@ -49,7 +50,8 @@ page 242 "Consolidate Wizard"
 
                     trigger OnValidate()
                     begin
-                        UpdateOtherDateAfterOneIsEdited(TempConsolidationProcess."Ending Date", TempConsolidationProcess."Starting Date");
+                        if TempConsolidationProcess."Ending Date" = ClosingDate(TempConsolidationProcess."Ending Date") then
+                            TempConsolidationProcess."Starting Date" := TempConsolidationProcess."Ending Date";
                         if (TempConsolidationProcess."Starting Date" <> 0D) and (TempConsolidationProcess."Ending Date" <> 0D) then
                             ConsolidateBusinessUnits.ValidateDatesForConsolidation(TempConsolidationProcess."Starting Date", TempConsolidationProcess."Ending Date", true);
                         UpdateBusinessUnitDefaultConsolidateState();
@@ -500,20 +502,6 @@ page 242 "Consolidate Wizard"
     trigger OnAfterGetRecord()
     begin
         UpdateCurrentRecState();
-    end;
-
-    local procedure UpdateOtherDateAfterOneIsEdited(DateEdited: Date; var OtherDate: Date)
-    begin
-        if DateEdited = 0D then
-            exit;
-        if DateEdited = ClosingDate(DateEdited) then begin
-            OtherDate := DateEdited;
-            exit;
-        end;
-        if OtherDate = 0D then
-            exit;
-        if OtherDate = ClosingDate(OtherDate) then
-            OtherDate := 0D;
     end;
 
     local procedure UpdateBusinessUnitDefaultConsolidateState()
