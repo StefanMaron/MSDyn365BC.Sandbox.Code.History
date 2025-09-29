@@ -50,7 +50,7 @@ codeunit 30190 "Shpfy Export Shipments"
             FulfillmentOrderRequest := CreateFulfillmentOrderRequest(SalesShipmentHeader, Shop, LocationId, DeliveryMethodType);
             if FulfillmentOrderRequest <> '' then begin
                 JResponse := ShopifyCommunicationMgt.ExecuteGraphQL(FulfillmentOrderRequest);
-                JFulfillment := JsonHelper.GetJsonToken(JResponse, 'data.fulfillmentCreate.fulfillment');
+                JFulfillment := JsonHelper.GetJsonToken(JResponse, 'data.fulfillmentCreateV2.fulfillment');
                 if (JFulfillment.IsObject) then
                     SalesShipmentHeader."Shpfy Fulfillment Id" := OrderFulfillments.ImportFulfillment(SalesShipmentHeader."Shpfy Order Id", JFulfillment)
                 else
@@ -103,7 +103,7 @@ codeunit 30190 "Shpfy Export Shipments"
 
             TempFulfillmentOrderLine.Reset();
             if TempFulfillmentOrderLine.FindSet() then begin
-                GraphQuery.Append('{"query": "mutation {fulfillmentCreate( fulfillment: {');
+                GraphQuery.Append('{"query": "mutation {fulfillmentCreateV2( fulfillment: {');
                 if GetNotifyCustomer(Shop, SalesShipmentHeader, LocationId) then
                     GraphQuery.Append('notifyCustomer: true, ')
                 else
@@ -112,7 +112,7 @@ codeunit 30190 "Shpfy Export Shipments"
                     GraphQuery.Append('trackingInfo: {');
                     if SalesShipmentHeader."Shipping Agent Code" <> '' then begin
                         GraphQuery.Append('company: \"');
-                        if ShippingAgent.Get(SalesShipmentHeader."Shipping Agent Code") then
+                        if ShippingAgent.Get(SalesShipmentHeader."Shipping Agent Code") then begin
                             if ShippingAgent."Shpfy Tracking Company" = ShippingAgent."Shpfy Tracking Company"::" " then begin
                                 if ShippingAgent.Name = '' then
                                     GraphQuery.Append(ShippingAgent.Code)
@@ -120,6 +120,8 @@ codeunit 30190 "Shpfy Export Shipments"
                                     GraphQuery.Append(ShippingAgent.Name)
                             end else
                                 GraphQuery.Append(TrackingCompany.Names.Get(TrackingCompany.Ordinals.IndexOf(ShippingAgent."Shpfy Tracking Company".AsInteger())));
+                        end else
+                            GraphQuery.Append('""');
                         GraphQuery.Append('\",');
                     end;
 
@@ -162,7 +164,7 @@ codeunit 30190 "Shpfy Export Shipments"
                     GraphQuery.Append('}');
                 until TempFulfillmentOrderLine.Next() = 0;
                 GraphQuery.Append(']}]})');
-                GraphQuery.Append('{fulfillment { legacyResourceId name createdAt updatedAt deliveredAt displayStatus estimatedDeliveryAt status totalQuantity location { legacyResourceId } trackingInfo { number url company } service { serviceName type } fulfillmentLineItems(first: 10) { pageInfo { endCursor hasNextPage } nodes { id quantity originalTotalSet { presentmentMoney { amount } shopMoney { amount }} lineItem { id isGiftCard }}}}, userErrors {field,message}}}"}');
+                GraphQuery.Append('{fulfillment { legacyResourceId name createdAt updatedAt deliveredAt displayStatus estimatedDeliveryAt status totalQuantity location { legacyResourceId } trackingInfo { number url company } service { serviceName type shippingMethods { code label }} fulfillmentLineItems(first: 10) { pageInfo { endCursor hasNextPage } nodes { id quantity originalTotalSet { presentmentMoney { amount } shopMoney { amount }} lineItem { id isGiftCard }}}}, userErrors {field,message}}}"}');
             end;
             exit(GraphQuery.ToText());
         end;

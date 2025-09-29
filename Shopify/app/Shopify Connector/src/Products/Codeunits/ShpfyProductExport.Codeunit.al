@@ -213,9 +213,10 @@ codeunit 30178 "Shpfy Product Export"
         if OnlyUpdatePrice then
             exit;
         Clear(TempShopifyVariant);
+        TempShopifyVariant."Product Id" := ProductId;
         FillInProductVariantData(TempShopifyVariant, Item, ItemUnitofMeasure);
         TempShopifyVariant.Insert(false);
-        VariantApi.AddProductVariant(TempShopifyVariant, ProductId, "Shpfy Variant Create Strategy"::DEFAULT);
+        VariantApi.AddProductVariant(TempShopifyVariant);
     end;
 
     /// <summary> 
@@ -230,9 +231,10 @@ codeunit 30178 "Shpfy Product Export"
         if OnlyUpdatePrice then
             exit;
         Clear(TempShopifyVariant);
+        TempShopifyVariant."Product Id" := ProductId;
         FillInProductVariantData(TempShopifyVariant, Item, ItemVariant);
         TempShopifyVariant.Insert(false);
-        VariantApi.AddProductVariant(TempShopifyVariant, ProductId, "Shpfy Variant Create Strategy"::DEFAULT);
+        VariantApi.AddProductVariant(TempShopifyVariant);
     end;
 
     /// <summary> 
@@ -246,9 +248,10 @@ codeunit 30178 "Shpfy Product Export"
         TempShopifyVariant: Record "Shpfy Variant" temporary;
     begin
         Clear(TempShopifyVariant);
+        TempShopifyVariant."Product Id" := ProductId;
         FillInProductVariantData(TempShopifyVariant, Item, ItemVariant, ItemUnitofMeasure);
         TempShopifyVariant.Insert(false);
-        VariantApi.AddProductVariant(TempShopifyVariant, ProductId, "Shpfy Variant Create Strategy"::DEFAULT);
+        VariantApi.AddProductVariant(TempShopifyVariant);
     end;
 
 
@@ -346,23 +349,14 @@ codeunit 30178 "Shpfy Product Export"
     /// <param name="Item">Parameter of type Record Item.</param>
     /// <param name="ItemVariant">Parameter of type Record "Item Variant".</param>
     local procedure FillInProductVariantData(var ShopifyVariant: Record "Shpfy Variant"; Item: Record Item; ItemVariant: Record "Item Variant")
-    var
-        Product: Record "Shpfy Product";
-        ItemAsVariant: Boolean;
     begin
         if Shop."Sync Prices" or OnlyUpdatePrice then
             if (not Item.Blocked) and (not Item."Sales Blocked") then
                 ProductPriceCalc.CalcPrice(Item, ItemVariant.Code, Item."Sales Unit of Measure", ShopifyVariant."Unit Cost", ShopifyVariant.Price, ShopifyVariant."Compare at Price");
         if not OnlyUpdatePrice then begin
-            if Product.Get(ShopifyVariant."Product Id") then
-                if Product."Has Variants" then
-                    ItemAsVariant := ShopifyVariant."Item SystemId" <> Product."Item SystemId";
             ShopifyVariant."Available For Sales" := (not Item.Blocked) and (not Item."Sales Blocked");
             ShopifyVariant.Barcode := CopyStr(GetBarcode(Item."No.", ItemVariant.Code, Item."Sales Unit of Measure"), 1, MaxStrLen(ShopifyVariant.Barcode));
-            if ItemAsVariant then
-                ShopifyVariant.Title := Item."No."
-            else
-                ShopifyVariant.Title := CopyStr(RemoveTabChars(ItemVariant.Description), 1, MaxStrLen(ShopifyVariant.Title));
+            ShopifyVariant.Title := CopyStr(RemoveTabChars(ItemVariant.Description), 1, MaxStrLen(ShopifyVariant.Title));
             ShopifyVariant."Inventory Policy" := Shop."Default Inventory Policy";
             case Shop."SKU Mapping" of
                 Shop."SKU Mapping"::"Bar Code":
@@ -383,12 +377,8 @@ codeunit 30178 "Shpfy Product Export"
             ShopifyVariant."Tax Code" := Item."Tax Group Code";
             ShopifyVariant.Taxable := true;
             ShopifyVariant.Weight := Item."Gross Weight";
-            if ShopifyVariant."Option 1 Name" = '' then
-                ShopifyVariant."Option 1 Name" := 'Variant';
-            if ItemAsVariant then
-                ShopifyVariant."Option 1 Value" := Item."No."
-            else
-                ShopifyVariant."Option 1 Value" := ItemVariant.Code;
+            ShopifyVariant."Option 1 Name" := 'Variant';
+            ShopifyVariant."Option 1 Value" := ItemVariant.Code;
             ShopifyVariant."Shop Code" := Shop.Code;
             ShopifyVariant."Item SystemId" := Item.SystemId;
             ShopifyVariant."Item Variant SystemId" := ItemVariant.SystemId;
