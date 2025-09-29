@@ -43,10 +43,9 @@ page 9090 "Item Replenishment FactBox"
                     var
                         Vendor: Record Vendor;
                     begin
-                        if Rec."Vendor No." <> '' then begin
+                        if Rec."Vendor No." <> '' then
                             Vendor.SetRange("No.", Rec."Vendor No.");
-                            Page.Run(Page::"Vendor Card", Vendor);
-                        end;
+                        Page.Run(Page::"Vendor Card", Vendor);
                     end;
                 }
                 field("Vendor Item No."; Rec."Vendor Item No.")
@@ -74,10 +73,9 @@ page 9090 "Item Replenishment FactBox"
                     var
                         RoutingHeader: Record "Routing Header";
                     begin
-                        if Rec."Routing No." <> '' then begin
-                            RoutingHeader.SetFilter("No.", Rec."Routing No.");
-                            Page.Run(Page::Routing, RoutingHeader);
-                        end;
+                        if RoutingHeader."No." <> '' then
+                            RoutingHeader.SetRange("No.", Rec."Routing No.");
+                        Page.Run(Page::Routing, RoutingHeader);
                     end;
                 }
                 field("Production BOM No."; Rec."Production BOM No.")
@@ -90,10 +88,9 @@ page 9090 "Item Replenishment FactBox"
                     var
                         ProductionBOMHeader: Record "Production BOM Header";
                     begin
-                        if Rec."Production BOM No." <> '' then begin
+                        if ProductionBOMHeader."No." <> '' then
                             ProductionBOMHeader.SetRange("No.", Rec."Production BOM No.");
-                            Page.Run(Page::"Production BOM", ProductionBOMHeader);
-                        end;
+                        Page.Run(Page::"Production BOM", ProductionBOMHeader);
                     end;
                 }
             }
