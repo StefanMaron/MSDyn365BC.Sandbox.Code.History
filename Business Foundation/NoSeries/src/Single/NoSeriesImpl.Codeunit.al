@@ -155,7 +155,6 @@ codeunit 304 "No. Series - Impl."
         NoSeriesRec: Record "No. Series";
         NoSeriesLine2: Record "No. Series Line";
         NoSeries: Codeunit "No. Series";
-        NoSeriesSetupImpl: Codeunit "No. Series - Setup Impl.";
         NoSeriesErrorsImpl: Codeunit "No. Series - Errors Impl.";
 #if not CLEAN24
 #pragma warning disable AL0432
@@ -175,7 +174,9 @@ codeunit 304 "No. Series - Impl."
 
         // Find the No. Series Line closest to the usage date
         NoSeriesLine2.Reset();
-        NoSeriesSetupImpl.SetNoSeriesLineFilters(NoSeriesLine2, NoSeriesCode, UsageDate);
+        NoSeriesLine2.SetCurrentKey("Series Code", "Starting Date");
+        NoSeriesLine2.SetRange("Series Code", NoSeriesCode);
+        NoSeriesLine2.SetRange("Starting Date", 0D, UsageDate);
 #if not CLEAN24
 #pragma warning disable AL0432
         NoSeriesManagement.RaiseObsoleteOnNoSeriesLineFilterOnBeforeFindLast(NoSeriesLine2);

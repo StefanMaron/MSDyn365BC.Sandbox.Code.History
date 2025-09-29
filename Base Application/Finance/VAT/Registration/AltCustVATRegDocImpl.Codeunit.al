@@ -28,7 +28,7 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
         CannotChangeVATDataWhenPrepmtErr: Label 'You cannot make this change because it leads to a different VAT Registration No., Gen. Bus. Posting Group or VAT Bus. Posting Group than in the sales document. Since you have posted a prepayment invoice, such a change will cause an inconsistency in the ledger entries.';
         CannotChangeVATDataWhenPartiallyPostedErr: Label 'You cannot make this change because it leads to a different VAT Registration No., Gen. Bus. Posting Group or VAT Bus. Posting Group than in the sales document. Since you have posted a partial shipment, such a change will cause an inconsistency in the ledger entries.';
         VATDataTakenFromCustomerMsg: Label 'The VAT Country/Region code has been changed to the value that does not have an alternative VAT registration.\\The following fields have been updated from the customer card: %1', Comment = '%1 = list of the fields';
-        FeatureNameTxt: Label 'Alternative Customer VAT Registration', Locked = true;
+        FeatureNameTxt: Label 'Alternative Customer VAT Registration';
         ConfirmAltCustVATRegNotificationNameTok: Label 'Confirm an alternative customer VAT registration.';
         ConfirmAltCustVATRegNotificationDescTok: Label 'Show the user the page to confirm an alternative customer VAT registration when choosing either ship-to address or the VAT country different from the customer''s';
         AddAlternativeCustVATRegQst: Label 'The VAT country is different than the customer''s. Do you want to add an alternative VAT registration for this VAT country?';
@@ -124,7 +124,6 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
     procedure UpdateSetupOnBillToCustomerChangeInSalesHeader(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; BillToCustomer: Record Customer)
     var
         GLSetup: Record "General Ledger Setup";
-        AltCustVATReg: Record "Alt. Cust. VAT Reg.";
     begin
         GLSetup.Get();
         if GLSetup."Bill-to/Sell-to VAT Calc." <> GLSetup."Bill-to/Sell-to VAT Calc."::"Bill-to/Pay-to No." then
@@ -136,10 +135,6 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
             CopyFromCustomer(SalesHeader, xSalesHeader, BillToCustomer);
             exit;
         end;
-        if AltCustVATRegFacade.GetAlternativeCustVATReg(AltCustVATReg, BillToCustomer."No.", SalesHeader."Ship-to Country/Region Code") then begin
-            SalesHeader.Validate("VAT Country/Region Code", AltCustVATReg."VAT Country/Region Code");
-            exit;
-        end;
         if (SalesHeader."VAT Bus. Posting Group" <> '') and (SalesHeader."VAT Bus. Posting Group" <> BillToCustomer."VAT Bus. Posting Group") then
             SalesHeader.Validate("VAT Bus. Posting Group", BillToCustomer."VAT Bus. Posting Group")
         else
@@ -148,7 +143,6 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
         SalesHeader.AssignVATRegistrationNo(BillToCustomer."No.");
         SalesHeader."Registration Number" := BillToCustomer."Registration Number";
         SalesHeader."Gen. Bus. Posting Group" := BillToCustomer."Gen. Bus. Posting Group";
-        OnAfterUpdateSetupOnBillToCustomerChangeInSalesHeader(SalesHeader, BillToCustomer);
     end;
 
     local procedure IsAltVATRegUsed(SalesHeader: Record "Sales Header"): Boolean
@@ -172,7 +166,7 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
         exit(AltCustVATRegFacade.GetAlternativeCustVATReg(AltCustVATReg, Customer."No.", SalesHeader."VAT Country/Region Code"));
     end;
 
-    local procedure ConfirmChanges(var SalesHeader: Record "Sales Header") Confirmed: Boolean
+    local procedure ConfirmChanges(SalesHeader: Record "Sales Header") Confirmed: Boolean
     var
         TempChangeLogEntry: Record "Change Log Entry" temporary;
         ConfirmAltCustVATRegPage: Page "Confirm Alt. Cust. VAT Reg.";
@@ -180,7 +174,7 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
         FeatureTelemetry.LogUsage('0000NHM', FeatureNameTxt, 'Confirm changes');
         if not BuildFieldChangeBuffer(TempChangeLogEntry, SalesHeader) then
             exit(true);
-        if (not GuiAllowed()) or SalesHeader.GetHideValidationDialog() then
+        if not GuiAllowed() then
             exit(true);
         if not ShowConfirmation() then
             exit(true);
@@ -240,7 +234,6 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
             AddFieldChangeBuffer(TempChangeLogEntry, SalesHeader.FieldNo("Gen. Bus. Posting Group"), SalesHeader."Gen. Bus. Posting Group", AltCustVATReg."Gen. Bus. Posting Group");
         if (AltCustVATReg."VAT Bus. Posting Group" <> '') and (SalesHeader."VAT Bus. Posting Group" <> AltCustVATReg."VAT Bus. Posting Group") then
             AddFieldChangeBuffer(TempChangeLogEntry, SalesHeader.FieldNo("VAT Bus. Posting Group"), SalesHeader."VAT Bus. Posting Group", AltCustVATReg."VAT Bus. Posting Group");
-        OnAfterBuildFieldChangeBuffer(TempChangeLogEntry, SalesHeader);
         exit(not TempChangeLogEntry.IsEmpty());
     end;
 
@@ -374,15 +367,5 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
     local procedure SetSalesLineRecreatedOnAfterRecreateSalesLines()
     begin
         SalesLinesRecreated := true;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateSetupOnBillToCustomerChangeInSalesHeader(var SalesHeader: Record "Sales Header"; Customer: Record Customer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterBuildFieldChangeBuffer(var TempChangeLogEntry: Record "Change Log Entry" temporary; SalesHeader: Record "Sales Header");
-    begin
     end;
 }
