@@ -1,4 +1,3 @@
-#pragma warning disable AS0072
 namespace System.IO;
 
 using Microsoft.Foundation.Company;
@@ -11,9 +10,6 @@ codeunit 1805 "Import Config. Package Files"
     // // This code unit is executed in a separate session. Messages and errors will be output to the event log.
 
     TableNo = "Configuration Package File";
-    ObsoleteTag = '25.2';
-    ObsoleteReason = 'Changing the way demo data is generated, for more infromation see https://go.microsoft.com/fwlink/?linkid=2288084';
-    ObsoleteState = Pending;
 
     trigger OnRun()
     var
@@ -220,4 +216,4 @@ codeunit 1805 "Import Config. Package Files"
     begin
     end;
 }
-#pragma warning restore AS0072
+
