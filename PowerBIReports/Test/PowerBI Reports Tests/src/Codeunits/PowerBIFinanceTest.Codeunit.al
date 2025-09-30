@@ -1,6 +1,7 @@
 namespace Microsoft.Finance.PowerBIReports.Test;
 
 using Microsoft.PowerBIReports;
+using Microsoft.Finance.PowerBIReports;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Ledger;
@@ -13,7 +14,6 @@ using Microsoft.Sales.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Document;
-using Microsoft.PowerBIReports.Test;
 using System.TestLibraries.Utilities;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Finance.GeneralLedger.Setup;
@@ -37,9 +37,7 @@ codeunit 139876 "PowerBI Finance Test"
         LibUtility: Codeunit "Library - Utility";
         UriBuilder: Codeunit "Uri Builder";
         PermissionsMock: Codeunit "Permissions Mock";
-        PowerBIAPIRequests: Codeunit "PowerBI API Requests";
         PowerBICoreTest: Codeunit "PowerBI Core Test";
-        PowerBIAPIEndpoints: Enum "PowerBI API Endpoints";
         ResponseEmptyErr: Label 'Response should not be empty.';
 
     [Test]
@@ -81,7 +79,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for vendor ledger entry is made
-        TargetURL := PowerBIAPIRequests.GetEndpointUrl(PowerBIAPIEndpoints::"Vendor Ledger Entries");
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Finance.PowerBIReports."Vendor Ledg. Entries - PBI API", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', 'vleEntryNo eq ' + Format(VendorLedgerEntry."Entry No.") + '');
         UriBuilder.GetUri(Uri);
@@ -169,7 +167,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for customer ledger entry is made
-        TargetURL := PowerBIAPIRequests.GetEndpointUrl(PowerBIAPIEndpoints::"Customer Ledger Entries");
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::"Customer Ledger Entries", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', 'cleEntryNo eq ' + Format(CustomerLedgerEntry."Entry No.") + '');
         UriBuilder.GetUri(Uri);
@@ -231,7 +229,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for G/L account is made
-        TargetURL := PowerBIAPIRequests.GetEndpointUrl(PowerBIAPIEndpoints::"G/L Accounts");
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::"G/L Accounts", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', 'accountNo eq ''' + Format(GLAccount."No.") + '''');
         UriBuilder.GetUri(Uri);
@@ -269,7 +267,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for G/L account category is made
-        TargetURL := PowerBIAPIRequests.GetEndpointUrl(PowerBIAPIEndpoints::"G/L Account Categories");
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::"G/L Account Categories", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', 'entryNo eq ' + Format(GLAccountCategory."Entry No.") + '');
         UriBuilder.GetUri(Uri);
@@ -305,7 +303,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for G/L budget is made
-        TargetURL := PowerBIAPIRequests.GetEndpointUrl(PowerBIAPIEndpoints::"G/L Budgets");
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::"G/L Budgets", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', 'budgetName eq ''' + Format(GLBudgetName.Name) + '''');
         UriBuilder.GetUri(Uri);
@@ -346,7 +344,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for G/L budget entry is made
-        TargetURL := PowerBIAPIRequests.GetEndpointUrl(PowerBIAPIEndpoints::"G/L Budget Entries");
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Finance.PowerBIReports."G/L Budget Entries - PBI API", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', 'budgetName eq ''' + Format(GLBudgetEntry."Budget Name") + '''');
         UriBuilder.GetUri(Uri);
@@ -408,7 +406,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for income statement G/L entry is made
-        TargetURL := PowerBIAPIRequests.GetEndpointUrl(PowerBIAPIEndpoints::"G/L Entries - Income Statement");
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::"G/L Entries - Income Statement", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', 'accountNo eq ''' + Format(GLAccount."No.") + '''');
         UriBuilder.GetUri(Uri);
@@ -446,7 +444,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for income statement G/L entry is made
-        TargetURL := PowerBIAPIRequests.GetEndpointUrl(PowerBIAPIEndpoints::"G/L Entries - Balance Sheet");
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::"G\L Entries - Balance Sheet", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', 'glAccountNo eq ''' + Format(GLAccount."No.") + '''');
         UriBuilder.GetUri(Uri);
@@ -486,7 +484,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for balance sheet G/L entry outside of the query filter is made
-        TargetURL := PowerBIAPIRequests.GetEndpointUrl(PowerBIAPIEndpoints::"G/L Entries - Balance Sheet");
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::"G\L Entries - Balance Sheet", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', 'glAccountNo eq ''' + Format(GLAccount."No.") + '''');
         UriBuilder.GetUri(Uri);
@@ -541,7 +539,7 @@ codeunit 139876 "PowerBI Finance Test"
         Commit();
 
         // [WHEN] Get request for income statement G/L entry is made
-        TargetURL := PowerBIAPIRequests.GetEndpointUrl(PowerBIAPIEndpoints::"G/L Entries - Closing");
+        TargetURL := LibGraphMgt.CreateQueryTargetURL(Query::Microsoft.Finance.PowerBIReports."G/L Entries - Closing", '');
         UriBuilder.Init(TargetURL);
         UriBuilder.AddQueryParameter('$filter', StrSubstNo('glAccountNo eq ''' + GLAccount."No." + ''' or glAccountNo eq ''' + BalGLAccount."No." + ''''));
         UriBuilder.GetUri(Uri);
@@ -661,7 +659,7 @@ codeunit 139876 "PowerBI Finance Test"
     procedure TestGenerateFinanceReportDateFilter_StartEndDate()
     var
         PBISetup: Record "PowerBI Reports Setup";
-        FilterScenario: Enum "PowerBI Filter Scenarios";
+        PBIMgt: Codeunit "Finance Filter Helper";
         ExpectedFilterTxt: Text;
         ActualFilterTxt: Text;
     begin
@@ -679,7 +677,7 @@ codeunit 139876 "PowerBI Finance Test"
         ExpectedFilterTxt := StrSubstNo(Format(Today()) + '..' + Format(Today() + 10));
 
         // [WHEN] GenerateFinanceReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Finance Date");
+        ActualFilterTxt := PBIMgt.GenerateFinanceReportDateFilter();
 
         // [THEN] A filter text of format "%1..%2" should be created 
         Assert.AreEqual(ExpectedFilterTxt, ActualFilterTxt, 'The expected & actual filter text did not match.');
@@ -688,7 +686,7 @@ codeunit 139876 "PowerBI Finance Test"
     [Test]
     procedure TestGenerateFinanceReportDateFilter_Blank()
     var
-        FilterScenario: Enum "PowerBI Filter Scenarios";
+        PBIMgt: Codeunit "Finance Filter Helper";
         ActualFilterTxt: Text;
     begin
         // [SCENARIO] Test GenerateFinanceReportDateFilter
@@ -698,7 +696,7 @@ codeunit 139876 "PowerBI Finance Test"
         PermissionsMock.ClearAssignments();
 
         // [WHEN] GenerateFinanceReportDateFilter executes 
-        ActualFilterTxt := PowerBIAPIRequests.GetFilterForQueryScenario(FilterScenario::"Finance Date");
+        ActualFilterTxt := PBIMgt.GenerateFinanceReportDateFilter();
 
         // [THEN] A filter text of format "%1..%2" should be created 
         Assert.AreEqual('', ActualFilterTxt, 'The expected & actual filter text did not match.');

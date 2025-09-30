@@ -20,8 +20,6 @@ codeunit 148152 "Extend Contract Test"
         Item."Last Direct Cost" := LibraryRandom.RandDec(100, 2);
         Item."Unit Cost" := LibraryRandom.RandDec(100, 2);
         Item.Modify(false);
-        ContractTestLibrary.CreateServiceCommitmentPackageWithLine(ServiceCommitmentTemplate.Code, ServiceCommitmentPackage, ServiceCommPackageLine);
-        ContractTestLibrary.AssignItemToServiceCommitmentPackage(Item, ServiceCommitmentPackage.Code);
         CreateCustomerAndVendorContracts();
         InvokeExtendContractFromCustContractCard();
         CustomerContractCard.Close();
