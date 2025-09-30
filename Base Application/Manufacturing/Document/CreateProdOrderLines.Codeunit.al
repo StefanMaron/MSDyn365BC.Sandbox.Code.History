@@ -660,7 +660,7 @@ codeunit 99000787 "Create Prod. Order Lines"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnAfterCreateProdOrderLine(ProdOrder: Record "Production Order"; VariantCode: Code[10]; var ErrorOccured: Boolean)
     begin
     end;
