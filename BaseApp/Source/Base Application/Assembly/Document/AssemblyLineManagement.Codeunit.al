@@ -275,28 +275,13 @@ codeunit 905 "Assembly Line Management"
     procedure UpdateWarningOnLines(AsmHeader: Record "Assembly Header")
     var
         AssemblyLine: Record "Assembly Line";
-        Window: Dialog;
-        LineNo: Integer;
-        PrevValue: Boolean;
-        PrevUpdateTime: DateTime;
-        WindowLbl: Label 'Checking availability. Line no. #1#########.', Comment = '#1 is an integer counter';
     begin
-        PrevUpdateTime := CurrentDateTime();
-        Window.Open(WindowLbl);
         SetLinkToLines(AsmHeader, AssemblyLine);
-        if AssemblyLine.FindSet(true) then
+        if AssemblyLine.FindSet() then
             repeat
-                LineNo += 1;
-                if CurrentDateTime > PrevUpdateTime + 1000 then begin
-                    Window.Update(1, LineNo);
-                    PrevUpdateTime := CurrentDateTime();
-                end;
-                PrevValue := AssemblyLine."Avail. Warning";
                 AssemblyLine.UpdateAvailWarning();
-                if PrevValue <> AssemblyLine."Avail. Warning" then
-                    AssemblyLine.Modify();
+                AssemblyLine.Modify();
             until AssemblyLine.Next() = 0;
-        Window.Close();
     end;
 
     procedure UpdateAssemblyLines(var AsmHeader: Record "Assembly Header"; OldAsmHeader: Record "Assembly Header"; FieldNum: Integer; ReplaceLinesFromBOM: Boolean; CurrFieldNo: Integer; CurrentFieldNum: Integer)
@@ -575,14 +560,7 @@ codeunit 905 "Assembly Line Management"
     end;
 
     procedure ShowDueDateBeforeWorkDateMsg(ActualLineDueDate: Date)
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeShowDueDateBeforeWorkDateMsg(ActualLineDueDate, IsHandled);
-        if IsHandled then
-            exit;
-
         if GuiAllowed then
             if GetWarningMode() then
                 Message(Text005, ActualLineDueDate, WorkDate());
@@ -1088,11 +1066,6 @@ codeunit 905 "Assembly Line Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateAndSendNotification(var AssemblyHeader: Record "Assembly Header"; var AssemblyLine: Record "Assembly Line"; var IsHandled: Boolean; var Rollback: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowDueDateBeforeWorkDateMsg(ActualLineDueDate: Date; var IsHandled: Boolean)
     begin
     end;
 }

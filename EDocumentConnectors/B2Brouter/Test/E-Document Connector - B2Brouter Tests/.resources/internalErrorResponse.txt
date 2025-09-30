@@ -1,4 +1,0 @@
-{"errors": 
-[
-	"An internal server error occurred.",
-]
