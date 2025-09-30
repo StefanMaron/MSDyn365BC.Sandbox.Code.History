@@ -110,11 +110,7 @@ codeunit 144078 "ERM Extra VAT"
         PrepmtVATAmountCap: Label 'PrepmtVATAmount';
         YourReferenceCap: Label 'YourReference_SalesHeader';
         VATPeriodTxt: Label '%1/%2', Comment = '%1=Field Value,%2=Field Value';
-#if not CLEAN27
         VATPeriodClosedErr: Label 'VAT Period Closed must be equal to ''No''  in Periodic Settlement VAT Entry: VAT Period=%1/%2. Current value is ''Yes''.', Comment = '%1=Field Value,%2=Field Value';
-#else
-        VATPeriodActivityCodeClosedErr: Label 'VAT Period Closed must be equal to ''No''  in Periodic VAT Settlement Entry: VAT Period=%1/%2, Activity Code=%3. Current value is ''Yes''.', Comment = '%1=Field Value,%2=Field Value,%3=Field Value';
-#endif
         VATFieldErr: Label 'Field %1 contains wrong value';
         LibraryJournals: Codeunit "Library - Journals";
         NoSeriesBatch: Codeunit "No. Series - Batch";
@@ -233,13 +229,9 @@ codeunit 144078 "ERM Extra VAT"
         asserterror LibrarySales.PostSalesDocument(SalesHeader, true, true);  // Post as Ship and Invoice.
 
         // Verify.
-#if not CLEAN27
         Assert.ExpectedError(
           StrSubstNo(VATPeriodClosedErr, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0')));  // Value Zero required for VAT Period.
-#else
-        Assert.ExpectedError(
-          StrSubstNo(VATPeriodActivityCodeClosedErr, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0'), ''));  // Value Zero required for VAT Period.
-#endif
+
         // Tear Down.
         DeletePeriodicSettlementVATEntry();
     end;
@@ -267,13 +259,9 @@ codeunit 144078 "ERM Extra VAT"
         asserterror LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);  // Post as Receive and Invoice.
 
         // Verify.
-#if not CLEAN27
         Assert.ExpectedError(
           StrSubstNo(VATPeriodClosedErr, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0')));  // Value Zero required for VAT Period.
-#else
-        Assert.ExpectedError(
-          StrSubstNo(VATPeriodActivityCodeClosedErr, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0'), ''));  // Value Zero required for VAT Period.
-#endif
+
         // Tear Down.
         DeletePeriodicSettlementVATEntry();
     end;
@@ -300,13 +288,8 @@ codeunit 144078 "ERM Extra VAT"
         asserterror LibraryERM.PostGeneralJnlLine(GenJournalLine);
 
         // Verify.
-#if not CLEAN27
         Assert.ExpectedError(
           StrSubstNo(VATPeriodClosedErr, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0')));  // Value Zero required for VAT Period.
-#else
-        Assert.ExpectedError(
-          StrSubstNo(VATPeriodActivityCodeClosedErr, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0'), ''));  // Value Zero required for VAT Period.
-#endif
     end;
 
     [Test]
@@ -335,13 +318,8 @@ codeunit 144078 "ERM Extra VAT"
         asserterror ReversalEntry.ReverseRegister(FindGLRegister(GenJournalLine."Journal Batch Name"));
 
         // Verify.
-#if not CLEAN27
         Assert.ExpectedError(
           StrSubstNo(VATPeriodClosedErr, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0')));  // Value Zero required for VAT Period.
-#else
-        Assert.ExpectedError(
-          StrSubstNo(VATPeriodActivityCodeClosedErr, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0'), ''));  // Value Zero required for VAT Period.
-#endif
     end;
 
     [Test]
@@ -351,11 +329,7 @@ codeunit 144078 "ERM Extra VAT"
         GenJournalLine: Record "Gen. Journal Line";
         SalesLine: Record "Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
-#if not CLEAN27
         PeriodicSettlementVATEntry: Record "Periodic Settlement VAT Entry";
-#else
-        PeriodicSettlementVATEntry: Record "Periodic VAT Settlement Entry";
-#endif
         AppliesToDocNo: Code[20];
     begin
         // Verify error while posting application transaction in closed VAT Period with Unrealized VAT.
@@ -410,13 +384,8 @@ codeunit 144078 "ERM Extra VAT"
         asserterror CustEntryApplyPostedEntries.UnApplyCustLedgEntry(CustLedgerEntry."Entry No.");
 
         // Verify.
-#if not CLEAN27
         Assert.ExpectedError(
           StrSubstNo(VATPeriodClosedErr, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0')));  // Value Zero required for VAT Period.
-#else
-        Assert.ExpectedError(
-          StrSubstNo(VATPeriodActivityCodeClosedErr, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0'), ''));  // Value Zero required for VAT Period.
-#endif
     end;
 
     [Test]
@@ -1368,58 +1337,6 @@ codeunit 144078 "ERM Extra VAT"
         VerifySeveralRealizedVATEntries(VATEntry, UnrealVATEntryNo, Amount, -1);
     end;
 
-    [Test]
-    [HandlerFunctions('PurchaseStatisticsChangeVATAmountPageHandler')]
-    procedure DeductibleVATDetailOnPurchaseStatistics()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        VATPostingSetup: Record "VAT Posting Setup";
-        VATAmountLine: Record "VAT Amount Line";
-        PurchaseInvoicePage: TestPage "Purchase Invoice";
-        NonDeductibleBase: Decimal;
-        NonDeductibleAmount: Decimal;
-    begin
-        // [SCENARIO 580117] “Deductible %”, “Nondeductible Base” and “Nondeductible Amount” are correctly filled in “Purchase Invoice Statistics” page.
-        Initialize();
-
-        // [GIVEN] Unrealized deductible VAT Posting Setup with "Deductible %" = 50
-        UpdateDeductibleVATPostingSetup(VATPostingSetup, 50);
-
-        // [GIVEN] Purchase invoice with one G/L Account line with "Amount Including VAT" = 1000, "VAT Base Amount" = 800
-        CreatePurchaseInvoice(
-         PurchaseLine, VATPostingSetup."VAT Bus. Posting Group", '', '', PurchaseLine.Type::"G/L Account",
-         CreateGLAccount(VATPostingSetup));
-
-        // [GIVEN] Save NonDeductibleBase and NonDeductibleAmount
-        NonDeductibleBase := PurchaseLine."VAT Base Amount" * (VATPostingSetup."Deductible %" / 100);
-        NonDeductibleAmount := (PurchaseLine."Amount Including VAT" - PurchaseLine.Amount) * (VATPostingSetup."Deductible %" / 100);
-
-        // [GIVEN] Get Purchase Header
-        PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
-
-        // [GIVEN] Save "Deductible %" to LibraryVariableStorage
-        LibraryVariableStorage.Enqueue(VATPostingSetup."Deductible %");
-
-        // [WHEN] Open purchase invoice page
-        PurchaseInvoicePage.OpenEdit();
-        PurchaseInvoicePage.Filter.SetFilter("No.", PurchaseHeader."No.");
-
-        // [WHEN] Open statistics of the invoice and verify the "Deductible %"
-        PurchaseInvoicePage.PurchaseStatistics.Invoke();
-
-        // [WHEN] Calculate VatAmountLines
-        PurchaseLine.CalcVATAmountLines(0, PurchaseHeader, PurchaseLine, VATAmountLine);
-
-        // [THEN] Check Deductible % and NonDeductible Base and Amount are correct in VATAmountLine
-        Assert.AreEqual(VATPostingSetup."Deductible %", VATAmountLine."Deductible %", StrSubstNo(VATFieldErr, VATAmountLine.FieldCaption("Deductible %")));
-        Assert.AreNearlyEqual(NonDeductibleBase, VATAmountLine."Nondeductible Base", 0.01, StrSubstNo(VATFieldErr, VATAmountLine.FieldCaption("Nondeductible Base")));
-        Assert.AreNearlyEqual(NonDeductibleAmount, VATAmountLine."Nondeductible Amount", 0.01, StrSubstNo(VATFieldErr, VATAmountLine.FieldCaption("Nondeductible Amount")));
-
-        // [THEN] Check that LibraryVariableStorage is empty
-        LibraryVariableStorage.AssertEmpty();
-    end;
-
     local procedure Initialize()
     begin
         LibraryVariableStorage.Clear();
@@ -1645,17 +1562,9 @@ codeunit 144078 "ERM Extra VAT"
 
     local procedure CreatePeriodicVATSettlementEntry()
     var
-#if not CLEAN27
         PeriodicSettlementVATEntry: Record "Periodic Settlement VAT Entry";
-#else
-        PeriodicSettlementVATEntry: Record "Periodic VAT Settlement Entry";
-#endif
     begin
-#if not CLEAN27
         LibraryITLocalization.CreatePeriodicVATSettlementEntry(PeriodicSettlementVATEntry, WorkDate());
-#else
-        LibraryITLocalization.CreatePeriodicSettlementVATEntry(PeriodicSettlementVATEntry, WorkDate());
-#endif
         PeriodicSettlementVATEntry.Validate("VAT Period Closed", true);
         PeriodicSettlementVATEntry.Modify(true);
     end;
@@ -1882,11 +1791,7 @@ codeunit 144078 "ERM Extra VAT"
 
     local procedure DeletePeriodicSettlementVATEntry()
     var
-#if not CLEAN27
         PeriodicSettlementVATEntry: Record "Periodic Settlement VAT Entry";
-#else
-        PeriodicSettlementVATEntry: Record "Periodic VAT Settlement Entry";
-#endif
     begin
         PeriodicSettlementVATEntry.SetRange(
           "VAT Period", StrSubstNo(VATPeriodTxt, Date2DMY(WorkDate(), 3), ConvertStr(Format(Date2DMY(WorkDate(), 2), 2), ' ', '0')));  // Value Zero required for VAT Period.
@@ -2077,15 +1982,6 @@ codeunit 144078 "ERM Extra VAT"
         SalesHeader.Modify(true);
         SalesLine.Validate("Prepayment %", LibraryRandom.RandDec(10, 2));
         SalesLine.Modify(true);
-    end;
-
-    local procedure UpdateDeductibleVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup"; DeductiblePct: Decimal)
-    begin
-        LibraryERM.CreateVATPostingSetupWithAccounts(
-          VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", LibraryRandom.RandIntInRange(10, 30));
-        VATPostingSetup.Get(VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
-        VATPostingSetup.Validate("Deductible %", DeductiblePct);
-        VATPostingSetup.Modify(true);
     end;
 
     local procedure UpdateSalesLine(var SalesLine: Record "Sales Line"; NewUnitPrice: Decimal; VATPostingSetup: Record "VAT Posting Setup")
@@ -2702,14 +2598,5 @@ codeunit 144078 "ERM Extra VAT"
         GLPostingPreview."No. of Records".AssertEquals(LibraryVariableStorage.DequeueInteger());
         GLPostingPreview.OK().Invoke();
     end;
-
-    [PageHandler]
-    procedure PurchaseStatisticsChangeVATAmountPageHandler(var PurchaseStatisticsPage: TestPage "Purchase Statistics")
-    var
-        DeductiblePer: Decimal;
-    begin
-        DeductiblePer := LibraryVariableStorage.DequeueDecimal();
-        PurchaseStatisticsPage.SubForm."Deductible %".AssertEquals(DeductiblePer);
-        PurchaseStatisticsPage.Close();
-    end;
 }
+
