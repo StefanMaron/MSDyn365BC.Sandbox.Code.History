@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false
+  },
   "folders": [
     {
       "path": "./Business Foundation Test Libraries"
@@ -138,13 +146,5 @@
     {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "allint.enabled": false,
-    "al.enableCodeAnalysis": false
-  }
+  ]
 }
