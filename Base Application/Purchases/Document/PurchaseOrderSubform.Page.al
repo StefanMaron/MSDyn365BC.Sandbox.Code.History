@@ -278,7 +278,6 @@ page 54 "Purchase Order Subform"
 
                     trigger OnValidate()
                     begin
-                        CurrPage.SaveRecord();
                         DeltaUpdateTotals();
                         SetItemChargeFieldsStyle();
                         if PurchasesPayablesSetup."Calc. Inv. Discount" and (Rec.Quantity = 0) then
