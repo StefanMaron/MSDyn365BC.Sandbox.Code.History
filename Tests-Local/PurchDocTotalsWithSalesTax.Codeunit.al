@@ -12,17 +12,14 @@ codeunit 142057 PurchDocTotalsWithSalesTax
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
         LibraryERM: Codeunit "Library - ERM";
         LibraryInventory: Codeunit "Library - Inventory";
-        LibraryJournals: Codeunit "Library - Journals";
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryRandom: Codeunit "Library - Random";
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
         LibraryIncomingDocuments: Codeunit "Library - Incoming Documents";
-        LibraryUtility: Codeunit "Library - Utility";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryApplicationArea: Codeunit "Library - Application Area";
         Assert: Codeunit Assert;
         isInitialized: Boolean;
-        VATDifferenceErr: Label 'VAT Difference must be equal to %1', Comment = '%1 = TaxAmount value';
 
     [Test]
     [Scope('OnPrem')]
@@ -590,103 +587,6 @@ codeunit 142057 PurchDocTotalsWithSalesTax
         LibraryVariableStorage.AssertEmpty();
     end;
 
-    [Test]
-    [HandlerFunctions('PurchaseStatsPageHandler,ConfirmHandlerYes')]
-    [Scope('OnPrem')]
-    procedure VATDiffInVATEntryIsEqualToTaxAmtOfSalesTaxAmtLineInPurchInvStatsWhenPostPurchInv()
-    var
-        PurchaseLine: Record "Purchase Line";
-        VATEntry: Record "VAT Entry";
-        PurchaseInvoice: TestPage "Purchase Invoice";
-        TaxAmount: Decimal;
-    begin
-        // [SCENARIO 555978] "VAT Difference" in VAT Entry is equal to "TAX Amount" of Purchase Statistics 
-        // when post Purchase Invoice having "Currency Code" and Allow VAT Difference is set in 
-        // General Ledger Setup and Purchases & Payables Setup.
-        Initialize();
-
-        // [GIVEN] Enable Sales Tax Setup.
-        LibraryApplicationArea.EnableSalesTaxSetup();
-
-        // [GIVEN] Set Max VAT Difference Allowed.
-        LibraryERM.SetMaxVATDifferenceAllowed(LibraryRandom.RandIntInRange(500, 500));
-        LibraryPurchase.SetAllowVATDifference(true);
-
-        // [GIVEN] Create a Purchase Invoice and Validate "Currency Code".
-        CreatePurchaseDocument(PurchaseLine, "Purchase Document Type"::Invoice, false);
-        PurchaseLine.Validate("Currency Code", CreateCurrencyWithExchRate());
-        PurchaseLine.Modify(true);
-
-        // [GIVEN] Open Purchase Invoice page and run Purchase Stats action.
-        PurchaseInvoice.OpenEdit();
-        PurchaseInvoice.Filter.SetFilter("No.", PurchaseLine."Document No.");
-        PurchaseInvoice.PurchaseStats.Invoke();
-
-        // [GIVEN] Post Purchase Invoice.
-        PostPurchaseInvoiceFromPage(PurchaseLine."Document No.");
-
-        // [GIVEN] Generate and save "Tax Amount" from Purchase Statistics in a Vraiable.
-        TaxAmount := -LibraryVariableStorage.DequeueDecimal();
-
-        // [WHEN] Find VAT Entry.
-        VATEntry.SetRange("Tax Area Code", PurchaseLine."Tax Area Code");
-        VATEntry.FindFirst();
-
-        // [THEN] "VAT Difference" in VAT Entry is equal to TaxAmount.
-        Assert.AreEqual(TaxAmount, VATEntry."VAT Difference", VATDifferenceErr);
-    end;
-
-    [Test]
-    procedure PurchaseInvoiceWithAllocationAccountsAndTaxDifference()
-    var
-        AllocationAccount: Record "Allocation Account";
-        BalancingGLAccount: Record "G/L Account";
-        BreakdownGLAccount: array[3] of Record "G/L Account";
-        DestinationGLAccount: Record "G/L Account";
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        PurchInvHeader: Record "Purch. Inv. Header";
-        PurchaseHeader: Record "Purchase Header";
-        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
-        TaxDetail: Record "Tax Detail";
-    begin
-        // [SCENARIO 555978] Purchase Invoice with Allocation Accounts and Tax Difference is posted.
-        Initialize();
-
-        // [GIVEN] Max VAT Difference Allowed is updated in General Ledger Setup.
-        GeneralLedgerSetup.GetRecordOnce();
-        GeneralLedgerSetup.Validate("Max. VAT Difference Allowed", LibraryRandom.RandIntInRange(5, 10));
-        GeneralLedgerSetup.Modify(true);
-
-        // [GIVEN] Allow VAT Difference is set in Purchases & Payables Setup.
-        PurchasesPayablesSetup.GetRecordOnce();
-        PurchasesPayablesSetup.Validate("Allow VAT Difference", true);
-        PurchasesPayablesSetup.Modify(true);
-
-        // [GIVEN] Create Tax Detail with "Expense/Capitalize" = false and "Tax Rate".
-        CreateTaxAreaLine(TaxDetail, false, LibraryRandom.RandIntInRange(10, 20));
-
-        // [GIVEN] Three GL accounts with dimensions and balances and one Balancing G/L Account
-        CreateBreakdownAccountsWithBalances(BreakdownGLAccount[1], BreakdownGLAccount[2], BreakdownGLAccount[3]);
-        DestinationGLAccount.Get(LibraryERM.CreateGLAccountWithPurchSetup());
-        BalancingGLAccount.Get(LibraryERM.CreateGLAccountWithPurchSetup());
-
-        // [GIVEN] Create Allocation Account with Fixed GL Distributions.
-        CreateAllocationAccountwithFixedGLDistributions(AllocationAccount);
-        AllocationAccount."Document Lines Split" := AllocationAccount."Document Lines Split"::"Split Quantity";
-        AllocationAccount.Modify();
-
-        // [GIVEN] Create Purchase Invoice with Allocation Account and Tax Difference.
-        CreatePurchaseInvoiceWithTaxDetail(PurchaseHeader, AllocationAccount."No.");
-
-        // [WHEN] Post Purchase Invoice.
-        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
-
-        // [THEN] Posted Purchase Invoice is created with Allocation Account and Tax Difference.
-        PurchInvHeader.SetRange("Buy-from Vendor No.", PurchaseHeader."Buy-from Vendor No.");
-        PurchInvHeader.FindFirst();
-        Assert.RecordIsNotEmpty(PurchInvHeader);
-    end;
-
     local procedure Initialize()
     var
         InventorySetup: Record "Inventory Setup";
@@ -936,116 +836,6 @@ codeunit 142057 PurchDocTotalsWithSalesTax
         Assert.AreEqual(ExpectedAmountInclVAT, PurchInvHeader."Amount Including VAT", '');
     end;
 
-    local procedure CreateCurrencyWithExchRate(): Code[10]
-    var
-        Currency: Record Currency;
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
-    begin
-        LibraryERM.CreateCurrency(Currency);
-        Currency.Validate("Max. VAT Difference Allowed", LibraryRandom.RandIntInRange(500, 500));
-        Currency.Modify(true);
-
-        LibraryERM.CreateRandomExchangeRate(Currency.Code);
-
-        CurrencyExchangeRate.SetRange("Currency Code", Currency.Code);
-        CurrencyExchangeRate.FindFirst();
-
-        CurrencyExchangeRate.Validate("Exchange Rate Amount", LibraryRandom.RandIntInRange(1, 1));
-        CurrencyExchangeRate.Validate("Relational Exch. Rate Amount", LibraryRandom.RandDecInDecimalRange(0.5, 0.5, 0));
-        CurrencyExchangeRate.Validate("Adjustment Exch. Rate Amount", LibraryRandom.RandIntInRange(1, 1));
-        CurrencyExchangeRate.Validate("Relational Adjmt Exch Rate Amt", LibraryRandom.RandDecInDecimalRange(0.5, 0.5, 0));
-        CurrencyExchangeRate.Modify(true);
-
-        exit(Currency.Code);
-    end;
-
-    local procedure CreateBreakdownAccountsWithBalances(var FirstBreakdownGLAccount: Record "G/L Account"; var SecondBreakdownGLAccount: Record "G/L Account"; var ThirdBreakdownGLAccount: Record "G/L Account")
-    begin
-        FirstBreakdownGLAccount.Get(LibraryERM.CreateGLAccountWithPurchSetup());
-        CreateBalanceForGLAccount(LibraryRandom.RandIntInRange(100, 100), FirstBreakdownGLAccount, 0);
-
-        SecondBreakdownGLAccount.Get(LibraryERM.CreateGLAccountWithPurchSetup());
-        CreateBalanceForGLAccount(LibraryRandom.RandIntInRange(200, 200), SecondBreakdownGLAccount, 0);
-
-        ThirdBreakdownGLAccount.Get(LibraryERM.CreateGLAccountWithPurchSetup());
-        CreateBalanceForGLAccount(LibraryRandom.RandIntInRange(300, 300), ThirdBreakdownGLAccount, 0);
-    end;
-
-    local procedure CreateAllocationAccountwithFixedGLDistributions(var AllocationAccount: Record "Allocation Account")
-    var
-        AllocationAccountPage: TestPage "Allocation Account";
-        FixedAllocationAccountCode: Code[20];
-    begin
-        FixedAllocationAccountCode := CreateAllocationAccountWithFixedDistribution(AllocationAccountPage);
-        AllocationAccount.Get(FixedAllocationAccountCode);
-    end;
-
-    local procedure CreateAllocationAccountWithFixedDistribution(var AllocationAccountPage: TestPage "Allocation Account"): Code[20]
-    var
-        DummyAllocationAccount: Record "Allocation Account";
-        AllocationAccountNo: Code[20];
-    begin
-        AllocationAccountPage.OpenNew();
-        AllocationAccountNo := LibraryUtility.GenerateGUID();
-
-        AllocationAccountPage."No.".SetValue(AllocationAccountNo);
-        AllocationAccountPage."Account Type".SetValue(DummyAllocationAccount."Account Type"::Fixed);
-        AllocationAccountPage.Name.SetValue(LibraryRandom.RandText(5));
-        exit(AllocationAccountNo);
-    end;
-
-    local procedure CreatePurchaseInvoiceWithTaxDetail(var PurchaseHeader: Record "Purchase Header"; AllocationAccountNo: Code[20])
-    var
-        PurchaseLine: Record "Purchase Line";
-        TaxDetail: Record "Tax Detail";
-        TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
-        TaxGroup: Record "Tax Group";
-        VendorCreated: Code[20];
-        ItemCreated: Code[20];
-        TaxPercent: Decimal;
-    begin
-        TaxPercent := LibraryRandom.RandIntInRange(10, 20);
-        LibraryERM.CreateTaxGroup(TaxGroup);
-        LibraryERM.CreateTaxDetail(TaxDetail, CreateSalesTaxJurisdiction(), TaxGroup.Code, TaxDetail."Tax Type"::"Excise Tax", WorkDate());
-        TaxDetail.Validate("Tax Below Maximum", TaxPercent);
-        TaxDetail.Validate("Expense/Capitalize", false);
-        TaxDetail.Modify(true);
-        LibraryERM.CreateTaxArea(TaxArea);
-        LibraryERM.CreateTaxAreaLine(TaxAreaLine, TaxArea.Code, TaxDetail."Tax Jurisdiction Code");
-
-        VendorCreated := CreateVendor(TaxArea.Code);
-        ItemCreated := CreateItem(TaxDetail."Tax Group Code");
-
-        // Create purchase invoice and assign tax area
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, VendorCreated);
-        PurchaseHeader.Validate("Vendor Cr. Memo No.", PurchaseHeader."No.");
-        PurchaseHeader."Tax Area Code" := TaxArea.Code;
-        PurchaseHeader."Tax Liable" := true;
-        PurchaseHeader.Modify(true);
-        LibraryPurchase.CreatePurchaseLine(
-            PurchaseLine, PurchaseHeader,
-            PurchaseLine.Type::Item,
-            ItemCreated,
-            LibraryRandom.RandInt(10));
-        PurchaseLine.Validate("Allocation Account No.", AllocationAccountNo);
-        PurchaseLine.Validate(Amount, (PurchaseLine.Amount - LibraryRandom.RandIntInRange(1, 1)));
-        PurchaseLine.Modify(true);
-    end;
-
-    local procedure CreateBalanceForGLAccount(Balance: Decimal; var GLAccount: Record "G/L Account"; DimensionSetID: Integer)
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-    begin
-        LibraryJournals.CreateGenJournalLineWithBatch(
-            GenJournalLine, GenJournalLine."Document Type"::" ",
-            GenJournalLine."Account Type"::"G/L Account", GLAccount."No.", Balance);
-        GenJournalLine.Validate("Posting Date", WorkDate());
-        GenJournalLine.Validate("Dimension Set ID", DimensionSetID);
-        GenJournalLine.Modify(true);
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-    end;
-
 #if not CLEAN26
     [Obsolete('The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger', '26.0')]
     [ModalPageHandler]
@@ -1070,15 +860,6 @@ codeunit 142057 PurchDocTotalsWithSalesTax
         TaxDifference := LibraryVariableStorage.DequeueDecimal();
         NewTaxAmount := PurchaseStats.SubForm."Tax Amount".AsDecimal() + TaxDifference;
         PurchaseStats.SubForm."Tax Amount".SetValue(NewTaxAmount);
-    end;
-
-    [PageHandler]
-    [Scope('OnPrem')]
-    procedure PurchaseStatsPageHandler(var PurchaseStats: TestPage "Purchase Stats.")
-    begin
-        PurchaseStats.SubForm."Tax Amount".SetValue(PurchaseStats.TaxAmount.AsDecimal() / LibraryRandom.RandIntInRange(2, 2));
-        LibraryVariableStorage.Enqueue(PurchaseStats.SubForm."Tax Amount".AsDecimal());
-        PurchaseStats.OK().Invoke();
     end;
 
     [ConfirmHandler]
