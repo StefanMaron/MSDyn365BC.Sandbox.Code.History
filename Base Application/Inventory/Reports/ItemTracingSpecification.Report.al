@@ -120,12 +120,12 @@ report 6520 "Item Tracing Specification"
                         FldRef := RecRef.Field(FldNo[i]);
                         x += 1;
                         if not HeaderTextCreated then
-                            HeaderText[x] := CopyStr(FldRef.Caption, 1, MaxStrLen(HeaderText[x]));
+                            HeaderText[x] := FldRef.Caption;
                         if (i < 9) or
                            ((TempTrackEntry."Source Type" = TempTrackEntry."Source Type"::Customer) and PrintCustomer) or
                            ((TempTrackEntry."Source Type" = TempTrackEntry."Source Type"::Vendor) and PrintVendor)
                         then
-                            BodyText[x] := CopyStr(Format(FldRef), 1, MaxStrLen(BodyText[x]));
+                            BodyText[x] := Format(FldRef);
                     end;
 
                 HeaderTextCreated := true;
@@ -430,7 +430,7 @@ report 6520 "Item Tracing Specification"
         if FieldSelection.Open(Field) then
             if FldNo[FieldNumber] <> Field."No." then begin
                 FldNo[FieldNumber] := Field."No.";
-                FieldCaption[FieldNumber] := CopyStr(Field."Field Caption", 1, MaxStrLen(FieldCaption[FieldNumber]));
+                FieldCaption[FieldNumber] := Field."Field Caption";
             end;
     end;
 
@@ -441,7 +441,7 @@ report 6520 "Item Tracing Specification"
         FieldCaption[ArrayNo] := '';
         if FieldNumber <> 0 then
             if TypeHelper.GetField(DATABASE::"Item Tracing Buffer", FieldNumber, Field) then
-                FieldCaption[ArrayNo] := CopyStr(Field."Field Caption", 1, MaxStrLen(FieldCaption[ArrayNo]));
+                FieldCaption[ArrayNo] := Field."Field Caption";
     end;
 }
 
