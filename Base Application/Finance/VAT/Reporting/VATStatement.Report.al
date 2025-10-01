@@ -9,7 +9,6 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Ledger;
 // using Microsoft.Foundation.Enums;
 using Microsoft.Finance.VAT.Calculation;
-using Microsoft.Foundation.Address;
 
 report 12 "VAT Statement"
 {
@@ -198,27 +197,6 @@ report 12 "VAT Statement"
                             end;
                         end;
                     }
-                    field("Country/Region Filter"; CountryRegionFilter)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Country/Region Filter';
-                        ToolTip = 'Specifies the country/region to filter the VAT entries.';
-                        Importance = Additional;
-
-                        trigger OnLookup(var Text: Text): Boolean
-                        var
-                            CountryRegion: Record "Country/Region";
-                            CountriesRegions: Page "Countries/Regions";
-                        begin
-                            CountriesRegions.LookupMode(true);
-                            if CountriesRegions.RunModal() = Action::LookupOK then begin
-                                CountriesRegions.GetRecord(CountryRegion);
-                                CountryRegionFilter := CountryRegion.Code;
-                                exit(true);
-                            end;
-                            exit(false);
-                        end;
-                    }
                 }
             }
         }
@@ -291,7 +269,7 @@ report 12 "VAT Statement"
         Selection: Enum "VAT Statement Report Selection";
         TotalAmount: Decimal;
         UseAmtsInAddCurr: Boolean;
-        CountryRegionFilter: Text;
+        CountryRegionFilter: Text[250];
 
     procedure CalcLineTotal(VATStmtLine2: Record "VAT Statement Line"; var TotalAmount: Decimal; Level: Integer): Boolean
     var

@@ -129,7 +129,6 @@ page 352 "Vendor Purchase Lines"
         VendLedgEntry.SetFilter("Posting Date", Vend.GetFilter("Date Filter"));
         VendLedgEntry.SetFilter("Global Dimension 1 Code", Vend.GetFilter("Global Dimension 1 Filter"));
         VendLedgEntry.SetFilter("Global Dimension 2 Code", Vend.GetFilter("Global Dimension 2 Filter"));
-        OnShowVendEntriesOnAfterSetFilters(VendLedgEntry, Vend);
         PAGE.Run(0, VendLedgEntry);
     end;
 
@@ -145,7 +144,6 @@ page 352 "Vendor Purchase Lines"
         DtldVendLedgEntry.SetFilter("Posting Date", '..%1', Vend.GetRangeMax("Date Filter"));
         DtldVendLedgEntry.SetFilter("Initial Entry Global Dim. 1", Vend.GetFilter("Global Dimension 1 Filter"));
         DtldVendLedgEntry.SetFilter("Initial Entry Global Dim. 2", Vend.GetFilter("Global Dimension 2 Filter"));
-        OnShowVendEntriesDueOnAfterSetFilters(DtldVendLedgEntry, Vend);
         PAGE.Run(0, DtldVendLedgEntry)
     end;
 
@@ -174,16 +172,6 @@ page 352 "Vendor Purchase Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetLines(var NewVendor: Record Vendor; NewPeriodType: Enum "Analysis Period Type"; NewAmountType: Enum "Analysis Amount Type")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnShowVendEntriesOnAfterSetFilters(var VendorLedgEntry: Record "Vendor Ledger Entry"; Vendor: Record Vendor)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnShowVendEntriesDueOnAfterSetFilters(var DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry"; Vendor: Record Vendor)
     begin
     end;
 }
