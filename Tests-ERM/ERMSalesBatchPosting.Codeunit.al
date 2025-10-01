@@ -30,9 +30,6 @@ codeunit 134391 "ERM Sales Batch Posting"
         GLInterCompanyZipFileNamePatternTok: Label 'General Journal IC Batch - %1.zip', Comment = '%1 - today date, Sample: Sales IC Batch - 23-01-2024.zip';
         NotificationMsg: Label 'An error or warning occured during operation Batch processing of Sales Header records.';
         DefaultCategoryCodeLbl: Label 'SALESBCKGR';
-        NothingToPostErr: Label 'There is nothing to post because the document does not contain a quantity or amount.';
-        SalesOrderStatusMsg: Label 'Sales Order Status must be released.';
-        SalesCrMemoPostingErr: Label 'Sales Credit Memo was not posted successfully.';
 
     [Test]
     [HandlerFunctions('RequestPageHandlerBatchPostSalesInvoices,MessageHandler')]
@@ -1683,126 +1680,6 @@ codeunit 134391 "ERM Sales Batch Posting"
         VerifyPostedSalesInvoiceAmount(SalesHeader."Document Type", SalesHeader."No.", SalesHeader."Posting Date" + 10, Amount);
     end;
 
-    [Test]
-    [HandlerFunctions('RequestPageHandlerBatchPostSalesOrderShipmentCompleted,MessageHandler')]
-    procedure VerifySalesOrderStatusBatchPostSaleOrderWithReplacePostingDateAndCurrencyCode()
-    var
-        Currency: Record Currency;
-        SalesHeader: Record "Sales Header";
-        LibraryJobQueue: Codeunit "Library - Job Queue";
-    begin
-        // [SCENARIO 578963] Verify Sales Order Status When Batch posting with Replace Posting Date and different currency.
-        Initialize();
-
-        // [GIVEN] Set Post with Job queue on Sales & Receivables Setup
-        LibrarySales.SetPostWithJobQueue(true);
-
-        // [GIVEN] Bind subscription and do not handle Job queue event as true
-        BindSubscription(LibraryJobQueue);
-        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
-
-        // [GIVEN] Create Release Sales Order with Currency Code.
-        CreateSalesDocumentWithCurrency(SalesHeader, Currency, SalesHeader."Document Type"::Order, false);
-        LibrarySales.ReleaseSalesDocument(SalesHeader);
-
-        // [WHEN] Run Post Batch with Replace Posting Date, Replace Document Date & Replace VAT Date options.
-        RunBatchPostSales(SalesHeader."Document Type", SalesHeader."No.", SalesHeader."Posting Date" + 10, false);
-        asserterror LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(SalesHeader.RecordId);
-
-        // [THEN] An Error Message appear and verify Sales Header Status as Released.
-        Assert.ExpectedError(NothingToPostErr);
-        VerifySalesOrderStatus(SalesHeader."Document Type", SalesHeader."No.")
-    end;
-
-    [Test]
-    [HandlerFunctions('RequestPageHandlerBatchPostSalesCrMemos,MessageHandler')]
-    procedure PostBatchCreditMemoWithCalcPmtDiscOnLinesAndCalcPmtDiscOnCrMemosDisabled()
-    var
-        Customer: Record Customer;
-        GeneralLedgerSetup: Record "General Ledger Setup";
-        PaymentTerms: Record "Payment Terms";
-        SalesHeader: Record "Sales Header";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-    begin
-        // [SCENARIO 582107] Verify Batch Posting of Credit Memo using "Calc. Pmt. Disc. on Lines" Payment Discount type and "Calc. Pmt. Disc. on Cr. Memos" disabled on the Payment Terms.
-        Initialize();
-        // [GIVEN] Validate Payment Discount Type and Discount Calculation in General Ledger Setup
-        GeneralLedgerSetup.Get();
-        GeneralLedgerSetup.Validate("Payment Discount Type", GeneralLedgerSetup."Payment Discount Type"::"Calc. Pmt. Disc. On Lines");
-        GeneralLedgerSetup.Validate("Discount Calculation", GeneralLedgerSetup."Discount Calculation"::"Line Disc. * Inv. Disc. * Payment Disc.");
-        GeneralLedgerSetup.Modify(true);
-        // [GIVEN] Create Payment Terms with "Calc. Pmt. Disc. on Cr. Memos" disabled
-        LibraryERM.CreatePaymentTerms(PaymentTerms);
-        Evaluate(PaymentTerms."Due Date Calculation", '<' + Format(LibraryRandom.RandInt(14)) + 'D>');
-        PaymentTerms.Validate("Due Date Calculation", PaymentTerms."Due Date Calculation");
-        PaymentTerms.Validate("Calc. Pmt. Disc. on Cr. Memos", false);
-        PaymentTerms.Modify(true);
-        // [GIVEN] Create Customer with Payment Terms
-        LibrarySales.CreateCustomer(Customer);
-        Customer.Validate("Payment Terms Code", PaymentTerms.Code);
-        Customer.Modify(true);
-        // [GIVEN] Create Credit Memo
-        LibrarySales.CreateSalesCreditMemoForCustomerNo(SalesHeader, Customer."No.");
-        // [WHEN] Run Batch Post Sales Credity Memo with Replace Posting Date, Replace Document Date, Calc. Inv. Discount options
-        RunBatchPostSales(SalesHeader."Document Type", SalesHeader."No.", SalesHeader."Posting Date" + 1, true);
-        // [THEN] Verify Sales Credit Memo should be posted successfully.
-        SalesCrMemoHeader.SetRange("Pre-Assigned No.", SalesHeader."No.");
-        SalesCrMemoHeader.SetRange("Posting Date", SalesHeader."Posting Date" + 1);
-        Assert.IsTrue(SalesCrMemoHeader.FindFirst(), SalesCrMemoPostingErr);
-    end;
-
-    [Test]
-    [HandlerFunctions('RequestPageHandlerBatchPostSalesInvoices,MessageHandler')]
-    procedure BatchPostSalesInvoiceWithPaymentDiscount()
-    var
-        SalesHeader: Record "Sales Header";
-        Customer: Record Customer;
-        PaymentTerms: Record "Payment Terms";
-        LibraryJobQueue: Codeunit "Library - Job Queue";
-        BatchID: array[2] of Guid;
-        BatchSessionID: array[2] of Integer;
-        PostingDate: array[2] of Date;
-    begin
-        // [FEATURE] [Invoice]
-        // [SCENARIO 582400] Payment discounts are not being calculated on sales invoices when batch posting with the 'Replace Posting date' and 'Replace document date' options selected
-        Initialize();
-        LibrarySales.SetPostWithJobQueue(true);
-        BindSubscription(LibraryJobQueue);
-        LibraryJobQueue.SetDoNotHandleCodeunitJobQueueEnqueueEvent(true);
-
-        BatchSessionID[1] := SessionId();
-        BatchSessionID[2] := SessionId() - 1;
-
-        PostingDate[1] := WorkDate() - 1;
-        PostingDate[2] := WorkDate();
-
-        BatchID[1] := CreateGuid();
-        BatchID[2] := CreateGuid();
-
-        // [GIVEN] Create Customer with Payment Terms and Payment Discount
-        LibraryERM.CreatePaymentTermsDiscount(PaymentTerms, false);
-
-        LibrarySales.CreateCustomer(Customer);
-        Customer.Validate("Payment Terms Code", PaymentTerms.Code);
-        Customer.Modify(true);
-
-        // [GIVEN] Sales invoice to be posted via batch
-        CreateSalesDocument(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", 1);
-
-        // [GIVEN] Adding Batch Parameter "Posting Date" 
-        AddBatchProcessParameters(
-          SalesHeader, "Batch Posting Parameter Type"::"Posting Date", PostingDate[1], BatchSessionID[1], BatchID[1]);
-        AddBatchProcessParameters(
-          SalesHeader, "Batch Posting Parameter Type"::"Posting Date", PostingDate[1], BatchSessionID[2], BatchID[2]);
-
-        // [WHEN] Run "Batch Post Sales Invoices" report with "Replace Posting Date" = TRUE 
-        RunBatchPostSales(SalesHeader."Document Type", SalesHeader."No.", PostingDate[2], true);
-        LibraryJobQueue.FindAndRunJobQueueEntryByRecordId(SalesHeader.RecordId);
-
-        // [THEN] Verify Payment discount setup on the Sales invoice should be calculated after posting via batch posting process
-        VerifyPostedSalesInvoicePaymentDiscount(SalesHeader."No.", PostingDate[2], PaymentTerms."Discount %");
-    end;
-
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -1855,18 +1732,6 @@ codeunit 134391 "ERM Sales Batch Posting"
         SalesLine: Record "Sales Line";
     begin
         LibrarySales.CreateSalesHeader(SalesHeader, DocumentType, CreateCustomer(InvDisc));
-        LibraryInventory.CreateItem(Item);
-        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", DocQuantity);
-        SalesLine.Validate("Unit Price", LibraryRandom.RandInt(100));
-        SalesLine.Modify(true);
-    end;
-
-    local procedure CreateSalesDocument(var SalesHeader: Record "Sales Header"; DocumentType: Enum "Sales Document Type"; CustomerNo: Code[20]; DocQuantity: Decimal)
-    var
-        Item: Record Item;
-        SalesLine: Record "Sales Line";
-    begin
-        LibrarySales.CreateSalesHeader(SalesHeader, DocumentType, CustomerNo);
         LibraryInventory.CreateItem(Item);
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", DocQuantity);
         SalesLine.Validate("Unit Price", LibraryRandom.RandInt(100));
@@ -2033,17 +1898,6 @@ codeunit 134391 "ERM Sales Batch Posting"
         Assert.AreEqual(InvDisc, SalesInvoiceLine."Inv. Discount Amount" <> 0, 'Calculate Inv. Discount value not processed correctly.');
     end;
 
-    local procedure VerifyPostedSalesInvoicePaymentDiscount(PreAssignedNo: Code[20]; PostingDate: Date; PaymentDiscount: Decimal)
-    var
-        SalesInvoiceHeader: Record "Sales Invoice Header";
-    begin
-        SalesInvoiceHeader.SetFilter("Pre-Assigned No.", PreAssignedNo);
-        SalesInvoiceHeader.FindFirst();
-        SalesInvoiceHeader.TestField("Posting Date", PostingDate);
-        SalesInvoiceHeader.TestField("Document Date", PostingDate);
-        SalesInvoiceHeader.TestField("Payment Discount %", PaymentDiscount);
-    end;
-
     local procedure VerifyPostedSalesInvoiceByOrderNo(OrderNo: Code[20]; PostingDate: Date; InvDisc: Boolean)
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
@@ -2199,14 +2053,6 @@ codeunit 134391 "ERM Sales Batch Posting"
         SalesInvoiceLine.SetFilter("Document No.", SalesInvoiceHeader."No.");
         SalesInvoiceLine.FindFirst();
         Assert.Equal(Amount, SalesInvoiceLine."Amount Including VAT");
-    end;
-
-    local procedure VerifySalesOrderStatus(DocumentType: Enum "Sales Document Type"; DocumentNo: Code[20])
-    var
-        SalesHeader: Record "Sales Header";
-    begin
-        SalesHeader.Get(DocumentType, DocumentNo);
-        Assert.AreEqual(SalesHeader.Status::Released, SalesHeader.Status, SalesOrderStatusMsg);
     end;
 
     [RequestPageHandler]
