@@ -7,7 +7,7 @@ pageextension 8063 "Sales Cr. Memo Subform" extends "Sales Cr. Memo Subform"
 
     actions
     {
-        addlast("&Line")
+        addlast(Processing)
         {
             action(ShowBillingLines)
             {

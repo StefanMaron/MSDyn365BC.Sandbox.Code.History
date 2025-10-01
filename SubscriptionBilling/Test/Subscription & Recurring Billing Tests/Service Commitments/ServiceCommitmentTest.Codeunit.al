@@ -2,7 +2,7 @@ namespace Microsoft.SubscriptionBilling;
 
 using Microsoft.Inventory.Item;
 
-codeunit 148156 "Service Commitment Test"
+codeunit 139883 "Service Commitment Test"
 {
     Subtype = Test;
     Access = Internal;
@@ -377,7 +377,7 @@ codeunit 148156 "Service Commitment Test"
                 InsertServiceCommitment(ServiceCommitment.Partner::Vendor, InsertCounter);
         end;
 
-        Assert.AreEqual(InsertCounter, OverdueServiceCommitments.CountOverdueServiceCommitments(), 'Only service commitments that are open and within the correct date range should be counted.');
+        Assert.AreEqual(InsertCounter, OverdueServiceCommitments.FillAndCountOverdueServiceCommitments(), 'Only service commitments that are open and within the correct date range should be counted.');
     end;
 
     local procedure InsertServiceCommitment(ServicePartner: Enum "Service Partner"; var InsertCounter: Integer)
