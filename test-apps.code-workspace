@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false,
-    "search.exclude": {
-      "**.xlf": true
-    }
-  },
   "folders": [
     {
       "path": "./AuditFileExport/Test/Audit File Export Tests"
@@ -25,6 +17,9 @@
     },
     {
       "path": "./BusinessFoundation/Test/Business Foundation Tests/DisabledTests"
+    },
+    {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
     },
     {
       "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
@@ -177,22 +172,13 @@
       "path": "./Email - SMTP Connector/Test/Email - SMTP Connector Tests"
     },
     {
-      "path": "./EDocumentConnectors/B2Brouter/Test/E-Document Connector - B2Brouter Tests"
-    },
-    {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
       "path": "./EDocumentConnectors/SignUp/Test/E-Document Connector - SignUp Tests"
     },
     {
-      "path": "./EDocumentConnectors/Pagero/Test/E-Document Connector - Pagero Tests"
-    },
-    {
       "path": "./EDocumentConnectors/Logiq/Test/E-Document Connector - Logiq Tests"
-    },
-    {
-      "path": "./EDocumentConnectors/Continia/Test/E-Document Connector - Continia Tests"
     },
     {
       "path": "./APIV2/Test/_Exclude_APIV2_ Tests"
@@ -332,5 +318,13 @@
     {
       "path": "./ReviewGLEntries/Test/_Exclude_Review_General_Ledger_Entries_Tests"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false,
+    "allint.enabled": false
+  }
 }

@@ -18,9 +18,7 @@ codeunit 134408 "Incom. Doc. Attach. FactBox"
         LibraryPlainTextFile: Codeunit "Library - Plain Text File";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryPurchase: Codeunit "Library - Purchase";
-        LibraryRandom: Codeunit "Library - Random";
         UnexpectedFileNameNoErr: Label 'Unexpected number of stored file names.';
-        MainAttachmentErr: Label 'Main Attachment must be enabled.';
 
     [Test]
     [Scope('OnPrem')]
@@ -381,99 +379,6 @@ codeunit 134408 "Incom. Doc. Attach. FactBox"
         PurchaseInvoice.Close();
     end;
 
-    [Test]
-    procedure MainAttachmentEnabledAfterPostingGeneralJournal()
-    var
-        GenJournalBatch: Record "Gen. Journal Batch";
-        GenJournalTemplate: Record "Gen. Journal Template";
-        GenJournalLine: Record "Gen. Journal Line";
-        GeneralJournalTestPage: TestPage "General Journal";
-    begin
-        // [SCENARIO 558845] Main Attachment is enabled after posting the General Journal.
-
-        // [GIVEN] Create General Journal Batch With General type.
-        LibraryJournals.CreateGenJournalBatchWithType(GenJournalBatch, GenJournalTemplate.Type::General);
-
-        // [GIVEN] Create General Journal Line.
-        LibraryERM.CreateGeneralJnlLine(
-            GenJournalLine,
-            GenJournalBatch."Journal Template Name",
-            GenJournalBatch."Name",
-            GenJournalLine."Document Type"::" ",
-            GenJournalLine."Account Type"::"G/L Account",
-            LibraryERM.CreateGLAccountNoWithDirectPosting(),
-            LibraryRandom.RandInt(5));
-
-        // [GIVEN] Validate "Bal. Account No.".
-        GenJournalLine.Validate("Bal. Account No.", LibraryERM.CreateGLAccountNoWithDirectPosting());
-        GenJournalLine.Modify(true);
-
-        // [GIVEN] Post General Journal.
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // [GIVEN] Open General Journal.
-        GeneralJournalTestPage.Trap();
-        PAGE.Run(PAGE::"General Journal", GenJournalLine);
-
-        // [GIVEN] Prepare Attachment Record For General Journal and Validate "Account No.".
-        PrepareAttachmentRecordForGenJournalLine(GenJournalLine);
-        GeneralJournalTestPage."Account Type".SetValue(GenJournalLine."Account Type"::"G/L Account");
-        GeneralJournalTestPage."Account No.".SetValue(LibraryERM.CreateGLAccountNoWithDirectPosting());
-
-        // [THEN] Upload Main Attachment action must be enabled.
-        Assert.AreEqual(GeneralJournalTestPage.IncomingDocAttachFactBox.UploadMainAttachment.Enabled(), true, MainAttachmentErr);
-    end;
-
-    [Test]
-    [HandlerFunctions('GLPostingPreviewHandler')]
-    procedure PaymentJournalPreviewPostingWithMainAttachmentInOneLineAndSupportingAttachmentOnOtherLine()
-    var
-        GenJournalTemplate: Record "Gen. Journal Template";
-        GenJournalLine: Record "Gen. Journal Line";
-        PaymentJournalPage: TestPage "Payment Journal";
-        DocumentNo: Text;
-    begin
-        // [SCENARIO 596981] Verify Payment Journal Preview Posting without any error when Main Attachment in One Line and Supporting Attachment on Other Line.
-
-        // [GIVEN] Create General Journal Batch.
-        CreateGeneralJournalBatch(GenJournalLine, GenJournalTemplate.Type::Payments);
-        DocumentNo := LibraryRandom.RandText(9) + Format(LibraryRandom.RandIntInRange(1, 1));
-        PaymentJournalPage.Trap();
-        Page.Run(Page::"Payment Journal", GenJournalLine);
-
-        // [GIVEN] Create First Line.
-        PaymentJournalPage."Document No.".SetValue(DocumentNo);
-        PaymentJournalPage."Account Type".SetValue(GenJournalLine."Account Type"::Vendor);
-        PaymentJournalPage."Account No.".SetValue(LibraryPurchase.CreateVendorNo());
-        PaymentJournalPage."Bal. Account Type".SetValue(GenJournalLine."Account Type"::"G/L Account");
-        PaymentJournalPage."Bal. Account No.".SetValue(LibraryERM.CreateGLAccountNoWithDirectPosting());
-        PaymentJournalPage.Amount.SetValue(LibraryRandom.RandInt(10000));
-
-        // [GIVEN] Run Import New action from Incoming Doc Attach FactBox.
-        PrepareAttachmentRecordForGenJournalLine(GenJournalLine);
-        PaymentJournalPage.IncomingDocAttachFactBox.UploadMainAttachment.Invoke();
-
-        // [GIVEN] Create Second Line.
-        PaymentJournalPage.New();
-        PaymentJournalPage."Document No.".SetValue(IncStr(DocumentNo));
-        PaymentJournalPage."Account Type".SetValue(GenJournalLine."Account Type"::Vendor);
-        PaymentJournalPage."Account No.".SetValue(LibraryPurchase.CreateVendorNo());
-        PaymentJournalPage."Bal. Account Type".SetValue(GenJournalLine."Account Type"::"G/L Account");
-        PaymentJournalPage."Bal. Account No.".SetValue(LibraryERM.CreateGLAccountNoWithDirectPosting());
-        PaymentJournalPage.Amount.SetValue(LibraryRandom.RandInt(10000));
-
-        // [WHEN] Run Import New action from Incoming Doc Attach FactBox.
-        PrepareAttachmentRecordForGenJournalLine(GenJournalLine);
-        PaymentJournalPage.IncomingDocAttachFactBox.UploadMainAttachment.Invoke();
-
-        // [THEN] Go to the next line.
-        // No Error occured.
-        PaymentJournalPage.Next();
-
-        // No errors occur when previewing a posting in the Payment Journal, with the main attachment on one line and the supporting attachment on another line.
-        PaymentJournalPage.Preview.Invoke();
-    end;
-
     local procedure CreateGeneralJournalBatch(var GenJournalLine: Record "Gen. Journal Line"; GenJournalTemplateType: Enum "Gen. Journal Template Type")
     var
         GenJournalBatch: Record "Gen. Journal Batch";
@@ -553,12 +458,6 @@ codeunit 134408 "Incom. Doc. Attach. FactBox"
     procedure YesConfirmHandler(Question: Text[1024]; var Reply: Boolean)
     begin
         Reply := true;
-    end;
-
-    [PageHandler]
-    procedure GLPostingPreviewHandler(var GLPostingPreview: TestPage "G/L Posting Preview")
-    begin
-        GLPostingPreview.OK().Invoke();
     end;
 }
 

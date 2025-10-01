@@ -322,8 +322,7 @@ codeunit 6611 "FS Setup Defaults"
 
         FSBookableResource.Reset();
         FSBookableResource.SetRange(StateCode, FSBookableResource.StateCode::Active);
-        FSBookableResource.SetFilter(ResourceType, Format(FSBookableResource.ResourceType::Generic) + '|' + Format(FSBookableResource.ResourceType::Account)
-           + '|' + Format(FSBookableResource.ResourceType::Equipment) + '|' + Format(FSBookableResource.ResourceType::User));
+        FSBookableResource.SetFilter(ResourceType, Format(FSBookableResource.ResourceType::Generic) + '|' + Format(FSBookableResource.ResourceType::Account) + '|' + Format(FSBookableResource.ResourceType::Equipment));
         if CDSIntegrationMgt.GetCDSCompany(CDSCompany) then
             FSBookableResource.SetFilter(CompanyId, CDSCompany.CompanyId + '|' + Format(EmptyGuid));
         InsertIntegrationTableMapping(
@@ -483,8 +482,6 @@ codeunit 6611 "FS Setup Defaults"
           IntegrationFieldMapping.Direction::ToIntegrationTable,
           '', true, false);
 
-        OnResetLocationMappingOnAfterInsertFieldMapping(IntegrationTableMappingName);
-
         RecreateJobQueueEntryFromIntTableMapping(IntegrationTableMapping, 1, ShouldRecreateJobQueueEntry, 5);
     end;
 
@@ -542,8 +539,6 @@ codeunit 6611 "FS Setup Defaults"
           FSWorkOrderType.FieldNo(IntegrateToService),
           IntegrationFieldMapping.Direction::Bidirectional,
           'true', true, false);
-
-        OnResetServiceOrderTypeMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName);
 
         RecreateJobQueueEntryFromIntTableMapping(IntegrationTableMapping, 1, ShouldRecreateJobQueueEntry, 30);
     end;
@@ -650,8 +645,6 @@ codeunit 6611 "FS Setup Defaults"
           IntegrationFieldMapping.Direction::Bidirectional,
           'true', true, false);
 
-        OnResetServiceOrderMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName);
-
         RecreateJobQueueEntryFromIntTableMapping(IntegrationTableMapping, 1, ShouldRecreateJobQueueEntry, 30);
         CRMSetupDefaults.RecreateJobQueueEntry(ShouldRecreateJobQueueEntry, Codeunit::"FS Archived Service Orders Job", 30, StrSubstNo(ArchivedServiceOrdersSynchJobDescTxt, CRMProductName.SHORT()), false)
     end;
@@ -715,8 +708,6 @@ codeunit 6611 "FS Setup Defaults"
           FSWorkOrderIncident.FieldNo(Description),
           IntegrationFieldMapping.Direction::Bidirectional,
           '', true, false);
-
-        OnResetServiceOrderItemLineMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName);
     end;
 
     local procedure ResetServiceOrderLineItemMapping(var FSConnectionSetup: Record "FS Connection Setup"; IntegrationTableMappingName: Code[20]; ShouldRecreateJobQueueEntry: Boolean)
@@ -846,8 +837,6 @@ codeunit 6611 "FS Setup Defaults"
           FSWorkOrderProduct.FieldNo(IntegrateToService),
           IntegrationFieldMapping.Direction::Bidirectional,
           'true', true, false);
-
-        OnResetServiceOrderLineItemMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName);
     end;
 
     local procedure ResetServiceOrderLineServiceItemMapping(var FSConnectionSetup: Record "FS Connection Setup"; IntegrationTableMappingName: Code[20]; ShouldRecreateJobQueueEntry: Boolean)
@@ -953,8 +942,6 @@ codeunit 6611 "FS Setup Defaults"
           FSWorkOrderService.FieldNo(IntegrateToService),
           IntegrationFieldMapping.Direction::Bidirectional,
           'true', true, false);
-
-        OnResetServiceOrderLineServiceItemMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName);
     end;
 
     local procedure ResetServiceOrderLineResourceMapping(var FSConnectionSetup: Record "FS Connection Setup"; IntegrationTableMappingName: Code[20]; ShouldRecreateJobQueueEntry: Boolean)
@@ -1027,8 +1014,6 @@ codeunit 6611 "FS Setup Defaults"
           FSBookableResourceBooking.FieldNo(IntegrateToService),
           IntegrationFieldMapping.Direction::Bidirectional,
           'true', true, false);
-
-        OnResetServiceOrderLineResourceMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName);
     end;
 
     local procedure ShouldResetServiceItemMapping(): Boolean
@@ -1413,41 +1398,6 @@ codeunit 6611 "FS Setup Defaults"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateJobQueueEntryOnBeforeJobQueueEnqueue(var JobQueueEntry: Record "Job Queue Entry"; var IntegrationTableMapping: Record "Integration Table Mapping"; JobCodeunitId: Integer; JobDescription: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnResetServiceOrderTypeMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnResetServiceOrderMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnResetServiceOrderItemLineMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnResetServiceOrderLineItemMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnResetServiceOrderLineServiceItemMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnResetServiceOrderLineResourceMappingOnAfterInsertFieldsMapping(IntegrationTableMappingName: Code[20])
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnResetLocationMappingOnAfterInsertFieldMapping(IntegrationTableMappingName: Code[20])
     begin
     end;
 }
