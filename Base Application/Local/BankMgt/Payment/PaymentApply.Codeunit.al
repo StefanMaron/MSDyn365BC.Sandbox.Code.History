@@ -49,7 +49,6 @@ codeunit 10861 "Payment-Apply"
         case AccType of
             AccType::Customer:
                 begin
-                    OnApplyOnBeforeApplyCustomer(PaymentLine, GenJnlLine);
                     if ApplyCustomer(PaymentLine) then
                         exit;
                     if PaymentLine.Amount <> 0 then
@@ -58,7 +57,6 @@ codeunit 10861 "Payment-Apply"
                 end;
             AccType::Vendor:
                 begin
-                    OnApplyOnBeforeApplyVendor(PaymentLine, GenJnlLine);
                     if ApplyVendor(PaymentLine) then
                         exit;
                     if PaymentLine.Amount <> 0 then
@@ -438,16 +436,6 @@ codeunit 10861 "Payment-Apply"
 
     [IntegrationEvent(false, false)]
     local procedure OnApplyOnElseCase(var PaymentLine: Record "Payment Line"; var GenJnlLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnApplyOnBeforeApplyCustomer(var PaymentLine: Record "Payment Line"; var GenJnlLine: Record "Gen. Journal Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnApplyOnBeforeApplyVendor(var PaymentLine: Record "Payment Line"; var GenJnlLine: Record "Gen. Journal Line")
     begin
     end;
 }
