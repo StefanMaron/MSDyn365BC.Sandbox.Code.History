@@ -1,7 +1,6 @@
 ﻿namespace Microsoft.Finance.AllocationAccount.Purchase;
 
 using Microsoft.Finance.AllocationAccount;
-using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
 using Microsoft.Inventory.Posting;
 using Microsoft.Purchases.Document;
@@ -218,10 +217,7 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
     local procedure CreateLinesFromDocument(var PurchaseHeader: Record "Purchase Header")
     var
         AllocationPurchaseLine: Record "Purchase Line";
-        IsReopen: Boolean;
     begin
-        CheckPurchaseReleaseStatus(PurchaseHeader, IsReopen);
-
         AllocationPurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
         AllocationPurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
         AllocationPurchaseLine.SetRange("Type", AllocationPurchaseLine."Type"::"Allocation Account");
@@ -234,8 +230,6 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
         AllocationPurchaseLine.SetFilter("Selected Alloc. Account No.", '<>%1', '');
         CreateLines(AllocationPurchaseLine);
         AllocationPurchaseLine.DeleteAll();
-
-        CheckPurchaseReleaseStatus(PurchaseHeader, IsReopen);
     end;
 
     local procedure CreateLines(var AllocationPurchaseLine: Record "Purchase Line")
@@ -371,38 +365,15 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
         MoveQuantities(PurchaseLine, AllocationPurchaseLine);
 
         PurchaseLine."Deferral Code" := AllocationPurchaseLine."Deferral Code";
-        CopyDeferralSchedule(PurchaseLine, AllocationPurchaseLine);
+
         TransferDimensionSetID(PurchaseLine, AllocationLine, AllocationPurchaseLine."Alloc. Acc. Modified by User");
         PurchaseLine."Allocation Account No." := AllocationLine."Allocation Account No.";
         PurchaseLine."Selected Alloc. Account No." := '';
         OnBeforeCreatePurchaseLine(PurchaseLine, AllocationLine, AllocationPurchaseLine);
-        BindSubscription(AllocAccHandleDocPost);
         PurchaseLine.Insert(true);
-        UnbindSubscription(AllocAccHandleDocPost);
         LastLineNo := PurchaseLine."Line No.";
         RedistributeQuantitiesIfNeededMoveQuantities(PurchaseLine, AllocationPurchaseLine, AllocationLine, AllocationAccount);
         exit(PurchaseLine.SystemId);
-    end;
-
-    local procedure CopyDeferralSchedule(PurchaseLine: Record "Purchase Line"; AllocationPurchaseLine: Record "Purchase Line")
-    var
-        DeferralHeader: Record "Deferral Header";
-        DeferralTemplate: Record "Deferral Template";
-        DeferralUtilities: Codeunit "Deferral Utilities";
-    begin
-        if PurchaseLine."Deferral Code" = '' then
-            exit;
-
-        if not DeferralTemplate.Get(PurchaseLine."Deferral Code") then
-            exit;
-
-        if DeferralTemplate."Calc. Method" <> DeferralTemplate."Calc. Method"::"User-Defined" then
-            exit;
-
-        if not DeferralHeader.Get("Deferral Document Type"::Purchase, '', '', PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", AllocationPurchaseLine."Line No.") then
-            exit;
-
-        DeferralUtilities.CreateCopyOfDeferralSchedule(DeferralHeader, PurchaseLine."Line No.");
     end;
 
     local procedure MoveQuantities(var PurchaseLine: Record "Purchase Line"; var AllocationPurchaseLine: Record "Purchase Line")
@@ -433,10 +404,7 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
             LinePercentage := Round(AllocationLine.Quantity / AllocationPurchaseLine.Quantity * 100, AllocationLine.GetQuantityPrecision());
 
         PurchaseLine.Quantity := 0;
-        if PurchaseLine.IsInvoiceDocType() then
-            PurchaseLine.Validate(Quantity, Round(AllocationPurchaseLine.Quantity * LinePercentage / 100, AllocationLine.GetQuantityPrecision()))
-        else
-            PurchaseLine.Validate(Quantity, AllocationLine.Quantity);
+        PurchaseLine.Validate(Quantity, AllocationLine.Quantity);
         PurchaseLine."Outstanding Quantity" := Round(AllocationPurchaseLine."Outstanding Quantity" * LinePercentage / 100, AllocationLine.GetQuantityPrecision());
         PurchaseLine."Quantity Received" := Round(AllocationPurchaseLine."Quantity Received" * LinePercentage / 100, AllocationLine.GetQuantityPrecision());
         PurchaseLine."Quantity Invoiced" := Round(AllocationPurchaseLine."Quantity Invoiced" * LinePercentage / 100, AllocationLine.GetQuantityPrecision());
@@ -529,31 +497,20 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
     end;
 
     local procedure MoveAmounts(var PurchaseLine: Record "Purchase Line"; var AllocationPurchaseLine: Record "Purchase Line"; var AllocationLine: Record "Allocation Line"; var AllocationAccount: Record "Allocation Account")
+    var
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
+        AmountRoundingPrecision: Decimal;
     begin
         PurchaseLine."Unit Cost" := AllocationPurchaseLine."Unit Cost";
 
         if AllocationAccount."Document Lines Split" = AllocationAccount."Document Lines Split"::"Split Amount" then begin
-            PurchaseLine.Validate("Direct Unit Cost", GetUnitPrice(PurchaseLine, AllocationLine.Amount));
-            PurchaseLine."Line Amount" := AllocationLine.Amount;
+            AmountRoundingPrecision := AllocationAccountMgt.GetCurrencyRoundingPrecision(PurchaseLine."Currency Code");
+            PurchaseLine.Validate("Direct Unit Cost", Round(AllocationLine.Amount / PurchaseLine.Quantity, AmountRoundingPrecision));
+            PurchaseLine.Validate("Line Amount", AllocationLine.Amount);
         end else begin
             PurchaseLine.Validate("Direct Unit Cost", AllocationPurchaseLine."Direct Unit Cost");
             PurchaseLine."Line Amount" := AllocationPurchaseLine."Line Amount";
         end;
-    end;
-
-    local procedure GetUnitPrice(var PurchaseLine: Record "Purchase Line"; AllocationLineAmount: Decimal): Decimal
-    var
-        PurchaseHeader: Record "Purchase Header";
-        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
-        AmountRoundingPrecision: Decimal;
-    begin
-        PurchaseHeader.ReadIsolation := IsolationLevel::ReadUncommitted;
-        PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
-        if PurchaseHeader."Prices Including VAT" then
-            AllocationLineAmount += AllocationLineAmount * PurchaseLine."VAT %" / 100;
-
-        AmountRoundingPrecision := AllocationAccountMgt.GetCurrencyRoundingPrecision(PurchaseLine."Currency Code");
-        exit(Round(AllocationLineAmount / PurchaseLine.Quantity, AmountRoundingPrecision));
     end;
 
     local procedure GetNextLine(var AllocationPurchaseLine: Record "Purchase Line"): Integer
@@ -724,25 +681,6 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
             VerifyAllocationAccount(AllocationAccount);
             AllocationAccountMgt.VerifyNoInheritFromParentUsed(AllocationAccount."No.");
         end;
-    end;
-
-    local procedure CheckPurchaseReleaseStatus(var PurchaseHeader: Record "Purchase Header"; var IsReopen: Boolean)
-    var
-        PurchaseRelease: Codeunit "Release Purchase Document";
-    begin
-        if IsReopen then begin
-            PurchaseRelease.Run(PurchaseHeader);
-            PurchaseHeader.Modify();
-            exit;
-        end;
-
-        if PurchaseHeader.Status <> PurchaseHeader.Status::Released then
-            exit;
-
-        PurchaseRelease.Reopen(PurchaseHeader);
-        IsReopen := true;
-        PurchaseRelease.SetSkipCheckReleaseRestrictions();
-        PurchaseHeader.SetHideValidationDialog(true);
     end;
 
     [IntegrationEvent(false, false)]
