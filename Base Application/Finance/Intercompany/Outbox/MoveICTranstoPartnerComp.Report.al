@@ -155,22 +155,14 @@ report 513 "Move IC Trans. to Partner Comp"
             }
 
             trigger OnAfterGetRecord()
-            var
-                ICPartnerCode: Code[20];
-                IsHandled: Boolean;
             begin
                 if CurrentPartner.Code <> "IC Partner Code" then
                     CurrentPartner.Get("IC Partner Code");
 
-                ICPartnerCode := ICSetup."IC Partner Code";
-                IsHandled := false;
-                OnICOutboxTransactionOnAfterGetRecordOnBeforeCase(ICPartnerCode, "IC Outbox Transaction", TempICInboxTransaction, ICSetup, IsHandled);
-                if IsHandled then
-                    exit;
-
                 case "Line Action" of
                     "Line Action"::"Send to IC Partner":
-                        ICInboxOutboxMgt.OutboxTransToInbox("IC Outbox Transaction", TempICInboxTransaction, ICPartnerCode);
+                        ICInboxOutboxMgt.OutboxTransToInbox(
+                          "IC Outbox Transaction", TempICInboxTransaction, ICSetup."IC Partner Code");
                     "Line Action"::"Return to Inbox":
                         RecreateInboxTrans("IC Outbox Transaction");
                 end;
@@ -208,11 +200,11 @@ report 513 "Move IC Trans. to Partner Comp"
     }
 
     var
+        ICSetup: Record "IC Setup";
         GLSetup: Record "General Ledger Setup";
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
 
     protected var
-        ICSetup: Record "IC Setup";
         CurrentPartner: Record "IC Partner";
         TempICInboxTransaction: Record "IC Inbox Transaction" temporary;
         TempICInboxJnlLine: Record "IC Inbox Jnl. Line" temporary;
@@ -229,8 +221,6 @@ report 513 "Move IC Trans. to Partner Comp"
         TempRegisteredPartner: Record "IC Partner" temporary;
         ICDataExchange: Interface "IC Data Exchange";
     begin
-        OnBeforeTransfertoPartner(CurrentPartner, ICSetup);
-
         ICDataExchange := CurrentPartner."Data Exchange Type";
         ICDataExchange.GetICPartnerFromICPartner(CurrentPartner, TempRegisteredPartner);
 
@@ -427,16 +417,6 @@ report 513 "Move IC Trans. to Partner Comp"
     [IntegrationEvent(true, false)]
     [Scope('OnPrem')]
     procedure OnICInboxTransactionCreated(var ICInboxTransaction: Record "IC Inbox Transaction"; PartnerCompanyName: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnICOutboxTransactionOnAfterGetRecordOnBeforeCase(var ICPartnerCode: Code[20]; ICOutboxTransaction: Record "IC Outbox Transaction"; TempICInboxTransaction: Record "IC Inbox Transaction" temporary; ICSetup: Record "IC Setup"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTransfertoPartner(var CurrentPartner: Record "IC Partner"; ICSetup: Record "IC Setup");
     begin
     end;
 }
