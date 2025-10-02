@@ -27,6 +27,9 @@
       "path": "./BusinessFoundation/Test/Business Foundation Tests"
     },
     {
+      "path": "./EDocumentsConnector/Test/E-Documents Connector Tests"
+    },
+    {
       "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
     },
     {
@@ -166,6 +169,9 @@
     },
     {
       "path": "./Email - SMTP Connector/Test/Email - SMTP Connector Tests"
+    },
+    {
+      "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
       "path": "./APIV2/Test/_Exclude_APIV2_ Tests"
