@@ -31,6 +31,6 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "25.0.0.0",
+  "application": "25.1.0.0",
   "target": "Cloud"
 }
