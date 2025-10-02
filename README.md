@@ -93,6 +93,43 @@ git clone -b w1-24 --depth 1 https://github.com/StefanMaron/MSDyn365BC.Sandbox.C
 
 Later, you can deepen your clone by 3 commits (or any other number of commits) with `git fetch --deepen 3` or convert it to a complete clone using `git fetch --unshallow`.
 
+## Branch History Rewrites
+
+> [!IMPORTANT]
+> Branch history may be rewritten when late hotfixes are released by Microsoft.
+
+**What are late hotfixes?**
+Occasionally, Microsoft releases hotfix versions with version numbers lower than already-published versions (e.g., releasing `27.0.40357` after `27.1.40348` is already committed). To maintain semantic version order in git history, the automation uses `git rebase` to insert these hotfixes at the correct chronological position.
+
+**Impact on existing clones:**
+- If you have an existing clone and a branch gets rebased, your local copy will become outdated
+- `git pull` will fail with "divergent branches" errors
+
+**Solution - Update your local branches:**
+
+Windows (PowerShell):
+```powershell
+.\scripts\Update-Branches.ps1 -branches w1-24,w1-25,de-24
+```
+
+Linux/macOS (Bash):
+```bash
+./scripts/update-branches.sh w1-24 w1-25 de-24
+```
+
+Or manually for a single branch:
+```bash
+git fetch origin
+git checkout <branch-name>
+git reset --hard origin/<branch-name>
+```
+
+**Why rewrite history?**
+- Maintains correct semantic version order in commit history
+- Reduces repository size by avoiding large diffs from out-of-order commits
+- Makes version comparison and git blame more intuitive
+- This is acceptable for a read-only tracking repository
+
 ## Disclaimer
 
 All code is owned by Microsoft. You can not do any pull request on this repository.
