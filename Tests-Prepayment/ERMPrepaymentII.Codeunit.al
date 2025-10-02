@@ -1869,7 +1869,6 @@ codeunit 134101 "ERM Prepayment II"
         // [THEN] Status is changed to Released in purchase orders "PO2"
         VerifyStatusOnPurchaseHeader(PurchaseHeader1, PurchaseHeader1.Status::"Pending Prepayment");
         VerifyStatusOnPurchaseHeader(PurchaseHeader2, PurchaseHeader2.Status::Released);
-        NotificationLifecycleMgt.RecallAllNotifications();
     end;
 
     [Test]
