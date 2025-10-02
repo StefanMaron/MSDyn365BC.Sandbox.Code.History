@@ -128,6 +128,8 @@ codeunit 90 "Purch.-Post"
         if IsHandled then
             exit;
 
+        GetPurchaseHeader(PurchaseHeader2);
+
         if not GuiAllowed then
             LockTimeout(false);
 
@@ -3492,7 +3494,9 @@ codeunit 90 "Purch.-Post"
                 end else begin
                     PurchLine.Amount := PurchLine.CalcLineAmount();
                     if FullGST and PurchLine."Prepayment Line" then
-                        PurchLine."VAT Base Amount" := Round(TempVATAmountLine."VAT Base", Currency."Amount Rounding Precision")
+                        PurchLine."VAT Base Amount" :=
+                            Round(
+                                TempVATAmountLine."VAT Base" * PurchLine.CalcLineAmount() / TempVATAmountLine.CalcLineAmount(), Currency."Amount Rounding Precision")
                     else
                         PurchLine."VAT Base Amount" :=
                           Round(
@@ -3856,6 +3860,16 @@ codeunit 90 "Purch.-Post"
     local procedure Increment(var Number: Decimal; Number2: Decimal)
     begin
         Number := Number + Number2;
+    end;
+
+    local procedure GetPurchaseHeader(var PurchaseHeader: Record "Purchase Header")
+    var
+        PurchaseHeaderCopy: Record "Purchase Header";
+    begin
+        PurchaseHeaderCopy := PurchaseHeader;
+        PurchaseHeader.ReadIsolation := IsolationLevel::ReadCommitted;
+        PurchaseHeader.Get(PurchaseHeader."Document Type", PurchaseHeader."No.");
+        PurchaseHeader := PurchaseHeaderCopy;
     end;
 
     procedure GetPurchLines(var PurchHeader: Record "Purchase Header"; var PurchLine: Record "Purchase Line"; QtyType: Option General,Invoicing,Shipping)
@@ -4509,6 +4523,8 @@ codeunit 90 "Purch.-Post"
             ItemChargeAssgntPurch."Amount to Handle" :=
               Round(ItemChargeAssgntPurch."Qty. to Handle" * ItemChargeAssgntPurch."Unit Cost", Currency."Amount Rounding Precision");
             ItemChargeAssgntPurch.Modify();
+            if ItemChargeAssgntPurch."Qty. Assigned" = PurchOrderLine.Quantity then
+                DeleteItemChargeLines(ItemChargeAssgntPurch);
         end else begin
             ItemChargeAssgntPurch.SetRange("Applies-to Doc. Type");
             ItemChargeAssgntPurch.SetRange("Applies-to Doc. No.");
@@ -8729,11 +8745,6 @@ codeunit 90 "Purch.-Post"
                 TempTrackingSpecification.Init();
         end;
 
-        PreciseTotalChargeAmt := 0;
-        PreciseTotalChargeAmtACY := 0;
-        RoundedPrevTotalChargeAmt := 0;
-        RoundedPrevTotalChargeAmtACY := 0;
-
         ShouldProcessShipment := PurchHeader.IsCreditDocType();
         OnPostItemTrackingOnAfterCalcShouldProcessShipment(PurchHeader, PurchLine, ShouldProcessShipment);
         if ShouldProcessShipment then begin
@@ -9882,6 +9893,12 @@ codeunit 90 "Purch.-Post"
     begin
         if NoSeries.Get(NoSeriesCode) then
             NoSeries.TestField("Default Nos.", true);
+    end;
+
+    local procedure DeleteItemChargeLines(var ItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)")
+    begin
+        ItemChargeAssgntPurch.SetFilter("Applies-to Doc. Line No.", '<>%1', ItemChargeAssgntPurch."Applies-to Doc. Line No.");
+        ItemChargeAssgntPurch.DeleteAll();
     end;
 
     [IntegrationEvent(false, false)]

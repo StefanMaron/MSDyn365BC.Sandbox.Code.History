@@ -2398,6 +2398,8 @@ table 37 "Sales Line"
 
                 if Type = Type::Item then begin
                     GetUnitCost();
+                    if "Document Type" = "Document Type"::"Return Order" then
+                        ValidateReturnReasonCode(FieldNo("Variant Code"));
                     if "Variant Code" <> xRec."Variant Code" then
                         PlanPriceCalcByField(FieldNo("Variant Code"));
                 end;
@@ -5461,14 +5463,17 @@ table 37 "Sales Line"
         if CurrFieldNo = FieldNo("Requested Delivery Date") then
             exit("Requested Delivery Date");
 
-        if "Shipment Date" = 0D then
+        if ("Shipment Date" = 0D) and (CurrFieldNo <> FieldNo("Planned Delivery Date")) then
             exit("Planned Delivery Date");
 
         CustomCalendarChange[1].SetSource(CalChange."Source Type"::"Shipping Agent", "Shipping Agent Code", "Shipping Agent Service Code", '');
         case CurrFieldNo of
             FieldNo("Shipment Date"):
                 begin
-                    CustomCalendarChange[2].SetSource(CalChange."Source Type"::Customer, "Sell-to Customer No.", '', '');
+                    if CheckCustomerBaseCalendarCodeExist() then
+                        CustomCalendarChange[2].SetSource(CalChange."Source Type"::Customer, "Sell-to Customer No.", '', '')
+                    else
+                        CustomCalendarChange[2].SetSource(CalChange."Source Type"::Location, "Location Code", '', '');
                     exit(CalendarMgmt.CalcDateBOC(Format("Shipping Time"), "Planned Shipment Date", CustomCalendarChange, true));
                 end;
             FieldNo("Planned Delivery Date"):
@@ -5477,6 +5482,18 @@ table 37 "Sales Line"
                     exit(CalendarMgmt.CalcDateBOC2(Format("Shipping Time"), "Planned Delivery Date", CustomCalendarChange, true));
                 end;
         end;
+    end;
+
+    local procedure CheckCustomerBaseCalendarCodeExist(): Boolean
+    var
+        Customer: Record customer;
+    begin
+        if "Sell-to Customer No." = '' then
+            exit(false);
+            
+        Customer.SetLoadFields("Base Calendar Code");
+        if Customer.Get("Sell-to Customer No.") then
+            exit(Customer."Base Calendar Code" <> '');
     end;
 
     procedure CalcPlannedShptDate(CurrFieldNo: Integer) PlannedShipmentDate: Date
@@ -5779,10 +5796,11 @@ table 37 "Sales Line"
 
         Clear(SalesHeader);
         TestStatusOpen();
-        if ItemSubstitutionMgt.ItemSubstGet(Rec) then
+        if ItemSubstitutionMgt.ItemSubstGet(Rec) then begin
+            Rec.Validate("Location Code");
             if TransferExtendedText.SalesCheckIfAnyExtText(Rec, false) then
                 TransferExtendedText.InsertSalesExtText(Rec);
-
+        end;
         OnAfterShowItemSub(Rec);
     end;
 
@@ -6626,10 +6644,7 @@ table 37 "Sales Line"
                                         Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
                                     VATAmountLine."Amount Including VAT" := VATAmountLine."Line Amount";
                                 end else begin
-                                    VATAmountLine."VAT Base" :=
-                                      Round(
-                                        (VATAmountLine."Line Amount" - VATAmountLine."Invoice Discount Amount") / (1 + VATAmountLine."VAT %" / 100),
-                                        Currency."Amount Rounding Precision", Currency.VATRoundingDirection()) - VATAmountLine."VAT Difference";
+                                    VATAmountLine."VAT Base" := (VATAmountLine."Line Amount" - VATAmountLine."Invoice Discount Amount") / (1 + VATAmountLine."VAT %" / 100) - VATAmountLine."VAT Difference";
                                     VATAmountLine."VAT Amount" :=
                                       VATAmountLine."VAT Difference" +
                                       Round(
@@ -6637,6 +6652,10 @@ table 37 "Sales Line"
                                         (VATAmountLine."Line Amount" - VATAmountLine."Invoice Discount Amount" - VATAmountLine."VAT Base" - VATAmountLine."VAT Difference") *
                                         (1 - SalesHeader."VAT Base Discount %" / 100),
                                         Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
+                                    if SalesHeader."VAT Base Discount %" <> 0 then
+                                        VATAmountLine."VAT Base" := Round(VATAmountLine."VAT Base", Currency."Amount Rounding Precision", Currency.VATRoundingDirection())
+                                    else
+                                        VATAmountLine."VAT Base" := VATAmountLine."Line Amount" - VATAmountLine."Invoice Discount Amount" - VATAmountLine."VAT Amount";
                                     VATAmountLine."Amount Including VAT" := VATAmountLine."VAT Base" + VATAmountLine."VAT Amount";
                                     VATAmountLine."VAT Base (ACY)" :=
                                               Round(
@@ -8476,7 +8495,7 @@ table 37 "Sales Line"
 
     local procedure CheckWMS()
     begin
-        if CurrFieldNo <> 0 then
+        if (CurrFieldNo <> 0) or (SalesHeader."VAT Bus. Posting Group" <> Rec."VAT Bus. Posting Group") then
             CheckLocationOnWMS();
     end;
 
@@ -9447,6 +9466,7 @@ table 37 "Sales Line"
             CurrExchRate.ExchangeRate(
             GetDate(), GLSetup."Additional Reporting Currency"));
     end;
+
     local procedure GetCurrencyFactorACY(var AddCurrency: Record Currency; CurrSalesHeader: Record "Sales Header"): Decimal
     begin
         GetGLSetup();
