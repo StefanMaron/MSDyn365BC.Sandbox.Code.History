@@ -4,27 +4,20 @@ codeunit 119070 "Modify Manufacturing Setup"
     trigger OnRun()
     begin
         DemoDataSetup.Get();
-        MfgSetup.Get();
-        CreateNoSeries.InitFinalSeries(
-          MfgSetup."Planned Order Nos.", XMPLANM, XProductionOrderPlanned, 9);
-        MfgSetup."Planned Order Nos." := XMPLANM;
-
-        CreateNoSeries.InitFinalSeries(
-          MfgSetup."Firm Planned Order Nos.", XMFIRMPM, XProductionOrderFirmPlanned, 10);
-        MfgSetup."Firm Planned Order Nos." := XMFIRMPM;
-
-        CreateNoSeries.InitFinalSeries(
-          MfgSetup."Released Order Nos.", XMRELM, XProductionOrderReleased, 11);
-        MfgSetup."Released Order Nos." := XMRELM;
-
-        MfgSetup."Current Production Forecast" := Format(DemoDataSetup."Starting Year" + 1);
-        MfgSetup."Show Capacity In" := XMINUTES;
-        MfgSetup.Modify();
+        ManufacturingSetup.Get();
+        CreateNoSeries.InitFinalSeries(ManufacturingSetup."Planned Order Nos.", XMPLANM, XProductionOrderPlanned, 9);
+        ManufacturingSetup."Planned Order Nos." := XMPLANM;
+        CreateNoSeries.InitFinalSeries(ManufacturingSetup."Firm Planned Order Nos.", XMFIRMPM, XProductionOrderFirmPlanned, 10);
+        ManufacturingSetup."Firm Planned Order Nos." := XMFIRMPM;
+        CreateNoSeries.InitFinalSeries(ManufacturingSetup."Released Order Nos.", XMRELM, XProductionOrderReleased, 11);
+        ManufacturingSetup."Released Order Nos." := XMRELM;
+        ManufacturingSetup."Show Capacity In" := XMINUTES;
+        ManufacturingSetup.Modify();
     end;
 
     var
         DemoDataSetup: Record "Demo Data Setup";
-        MfgSetup: Record "Manufacturing Setup";
+        ManufacturingSetup: Record "Manufacturing Setup";
         CreateNoSeries: Codeunit "Create No. Series";
         XMPLANM: Label 'M-PLAN-M';
         XMRELM: Label 'M-REL-M';
@@ -39,13 +32,11 @@ codeunit 119070 "Modify Manufacturing Setup"
 
     procedure Finalize()
     begin
-        MfgSetup.Get();
-
-        MfgSetup."Planned Order Nos." := XMPLAN;
-        MfgSetup."Firm Planned Order Nos." := XMFIRMP;
-        MfgSetup."Released Order Nos." := XMREL;
-
-        MfgSetup.Modify();
+        ManufacturingSetup.Get();
+        ManufacturingSetup."Planned Order Nos." := XMPLAN;
+        ManufacturingSetup."Firm Planned Order Nos." := XMFIRMP;
+        ManufacturingSetup."Released Order Nos." := XMREL;
+        ManufacturingSetup.Modify();
     end;
 }
 
