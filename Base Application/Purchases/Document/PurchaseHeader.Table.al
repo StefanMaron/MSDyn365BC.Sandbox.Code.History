@@ -192,7 +192,8 @@ table 38 "Purchase Header"
                     Rec.RecallModifyAddressNotification(GetModifyVendorAddressNotificationId());
                     if Rec."Remit-to Code" <> '' then
                         Rec.Validate("Remit-to Code", '');
-                end;
+                end else
+                    SelectDefaultRemitAddress(Rec);
             end;
         }
         field(3; "No."; Code[20])
@@ -1203,7 +1204,13 @@ table 38 "Purchase Header"
             trigger OnValidate()
             var
                 VendorLedgerEntry: Record "Vendor Ledger Entry";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateVendorInvoiceNo(Rec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if "Vendor Invoice No." <> '' then
                     if FindPostedDocumentWithSameExternalDocNo(VendorLedgerEntry, "Vendor Invoice No.") then
                         ShowExternalDocAlreadyExistNotification(VendorLedgerEntry)
@@ -1218,7 +1225,13 @@ table 38 "Purchase Header"
             trigger OnValidate()
             var
                 VendorLedgerEntry: Record "Vendor Ledger Entry";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateVendorCrMemoNo(Rec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if "Vendor Cr. Memo No." <> '' then
                     if FindPostedDocumentWithSameExternalDocNo(VendorLedgerEntry, "Vendor Cr. Memo No.") then
                         ShowExternalDocAlreadyExistNotification(VendorLedgerEntry)
@@ -7603,6 +7616,30 @@ table 38 "Purchase Header"
             until PurchaseHeader.Next() = 0;
     end;
 
+  procedure UpdatePurchaseOrderLineIfExist()
+    var
+        PurchaseInvHeader: Record "Purch. Inv. Header";
+        PurchaseCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
+        CorrectPostedPurchInvoice: Codeunit "Correct Posted Purch. Invoice";
+        IsHandled: Boolean;
+    begin
+        PurchaseInvHeader.SetLoadFields("No.");
+        if (not PurchaseInvHeader.Get(Rec."Applies-to Doc. No.")) and (Rec."Applies-to ID" = '') then
+            exit;
+
+        PurchaseCrMemoHeader.SetLoadFields("Pre-Assigned No.");
+        PurchaseCrMemoHeader.SetRange("Pre-Assigned No.", Rec."No.");
+        if not PurchaseCrMemoHeader.FindFirst() then
+            exit;
+
+        IsHandled := false;
+        OnBeforeUpdatePurchaseOrderLineIfExist(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        CorrectPostedPurchInvoice.UpdatePurchaseOrderLineIfExist(PurchaseCrMemoHeader."No.");
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var PurchaseHeader: Record "Purchase Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
@@ -8982,6 +9019,21 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterValidateEmptySellToCustomerAndLocation(var PurchaseHeader: Record "Purchase Header"; var Vendor: Record Vendor)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateVendorInvoiceNo(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateVendorCrMemoNo(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdatePurchaseOrderLineIfExist(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 }
