@@ -114,7 +114,7 @@ curl -sSL https://raw.githubusercontent.com/StefanMaron/MSDyn365BC.Sandbox.Code.
 
 Windows (PowerShell):
 ```powershell
-iex (irm https://raw.githubusercontent.com/StefanMaron/MSDyn365BC.Sandbox.Code.History/main/scripts/Update-Branches.ps1)
+irm https://raw.githubusercontent.com/StefanMaron/MSDyn365BC.Sandbox.Code.History/main/scripts/Update-Branches.ps1 | iex
 ```
 
 The scripts automatically detect and update all your locally tracked branches. To update specific branches only, add branch names as arguments when running locally.
