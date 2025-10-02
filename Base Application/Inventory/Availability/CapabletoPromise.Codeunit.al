@@ -183,8 +183,8 @@ codeunit 99000886 "Capable to Promise"
         ReqLine.Validate("Ending Date",
           LeadTimeMgt.PlannedEndingDate(ItemNo, LocationCode, VariantCode, DueDate, ReqLine."Vendor No.", ReqLine."Ref. Order Type"));
         ReqLine."Ending Time" := 235959T;
-        ReqLine.Validate(Quantity, Quantity);
         ReqLine.Validate("Unit of Measure Code", Unit);
+        ReqLine.Validate(Quantity, Quantity);
         if ReqLine."Starting Date" = 0D then
             ReqLine."Starting Date" := WorkDate();
         OnBeforeReqLineInsert(ReqLine);
@@ -229,6 +229,7 @@ codeunit 99000886 "Capable to Promise"
         PlanningComponent.SetRange("Worksheet Template Name", ReqLine."Worksheet Template Name");
         PlanningComponent.SetRange("Worksheet Batch Name", ReqLine."Journal Batch Name");
         PlanningComponent.SetRange("Worksheet Line No.", ReqLine."Line No.");
+        PlanningComponent.SetFilter(Quantity, '<>%1', 0);
         if PlanningComponent.FindSet() then
             repeat
                 if (PlanningComponent."Supplied-by Line No." = 0) and PlanningComponent.Critical then begin

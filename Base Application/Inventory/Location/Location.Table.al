@@ -23,6 +23,7 @@ using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Structure;
 using System.Email;
+using System.Security.Encryption;
 using Microsoft.eServices.EDocument;
 
 table 14 Location
@@ -498,6 +499,7 @@ table 14 Location
         {
             AccessByPermission = TableData "Warehouse Source Filter" = R;
             Caption = 'Allow Breakbulk';
+            ToolTip = 'Specifies that an order can be fulfilled with items stored in alternate units of measure, if an item stored in the requested unit of measure is not found. This feature is applicable only with directed put-away and pick locations.';
         }
         field(7309; "Bin Capacity Policy"; Option)
         {
@@ -792,6 +794,12 @@ table 14 Location
                 if SATAddress.LookupSATAddress(SATAddress, Rec."Country/Region Code", '') then
                     Rec."SAT Address ID" := SATAddress.Id;
             end;
+        }
+        field(27020; "SAT Certificate"; Code[20])
+        {
+            Caption = 'SAT Certificate';
+            DataClassification = CustomerContent;
+            TableRelation = "Isolated Certificate";
         }
         field(27026; "SAT State Code"; Code[10])
         {
