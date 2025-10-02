@@ -356,18 +356,14 @@ codeunit 249 "VAT Registration Log Mgt."
         VATRegNo: Text[20];
         IsHandled: Boolean;
     begin
+        if IsAPIClientType() then
+            exit;
+
         IsHandled := false;
         OnBeforeCheckVIESForVATNoField(RecordRef, VATRegistrationLog, RecordVariant, EntryNo, CountryCode, AccountType, VATNoFieldName, IsHandled);
         if IsHandled then
             exit;
         RecordRef.GetTable(RecordVariant);
-
-        if IsAPIClientType() then
-            exit;
-
-        if not GuiAllowed() then
-            exit;
-
         if not CountryRegion.IsEUCountry(CountryCode) then
             exit; // VAT Reg. check Srv. is only available for EU countries.
 
