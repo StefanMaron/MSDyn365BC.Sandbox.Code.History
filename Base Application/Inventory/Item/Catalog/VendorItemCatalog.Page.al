@@ -74,7 +74,6 @@ page 297 "Vendor Item Catalog"
             {
                 Caption = 'Ve&ndor Item';
                 Image = Item;
-#if not CLEAN25
                 action("Purch. Prices")
                 {
                     ApplicationArea = Planning;
@@ -86,9 +85,6 @@ page 297 "Vendor Item Catalog"
                                   "Vendor No." = field("Vendor No.");
                     RunPageView = sorting("Item No.", "Vendor No.");
                     ToolTip = 'Define purchase price agreements with vendors for specific items.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '18.0';
                 }
                 action("P&urch. Line Discounts")
                 {
@@ -100,11 +96,7 @@ page 297 "Vendor Item Catalog"
                     RunPageLink = "Item No." = field("Item No."),
                                   "Vendor No." = field("Vendor No.");
                     ToolTip = 'Define purchase line discounts with vendors. For example, you may get for a line discount if you buy items from a vendor in large quantities.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '18.0';
                 }
-#endif
                 action(Prices)
                 {
                     AccessByPermission = TableData "Purchase Price Access" = R;
@@ -145,20 +137,12 @@ page 297 "Vendor Item Catalog"
             {
                 Caption = 'Prices & Discounts', Comment = 'Generated from the PromotedActionCategories property index 3.';
 
-#if not CLEAN25
                 actionref("Purch. Prices_Promoted"; "Purch. Prices")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '18.0';
                 }
                 actionref("P&urch. Line Discounts_Promoted"; "P&urch. Line Discounts")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '18.0';
                 }
-#endif
                 actionref(Prices_Promoted; Prices)
                 {
                 }

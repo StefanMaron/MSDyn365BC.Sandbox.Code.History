@@ -648,7 +648,7 @@ codeunit 134561 "ERM Account Schedule Charts"
           'Unexpected account schedule line selected in the overview page.');
         Assert.AreEqual(
           BusinessChartBuffer."Period Length",
-          AccScheduleOverview.PeriodType.AsInteger(),
+          AccScheduleOverview.PeriodTypeDefault.AsInteger(),
           'Unexpected account schedule period selected in the overview page.');
 
         AccScheduleOverview.Close();

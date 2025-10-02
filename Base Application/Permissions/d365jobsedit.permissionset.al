@@ -9,9 +9,7 @@ using Microsoft.Pricing.Worksheet;
 using Microsoft.Projects.Project.Archive;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Journal;
-#if not CLEAN25
 using Microsoft.Projects.Project.Pricing;
-#endif
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Projects.Project.WIP;
@@ -33,10 +31,8 @@ permissionset 9886 "D365 JOBS, EDIT"
                   tabledata "Job Archive" = IMD,
                   tabledata "Job Cue" = IMD,
                   tabledata "Job Entry No." = IMD,
-#if not CLEAN25
                   tabledata "Job G/L Account Price" = IMD,
                   tabledata "Job Item Price" = IMD,
-#endif
                   tabledata "Job Journal Batch" = IMD,
                   tabledata "Job Journal Line" = IMD,
                   tabledata "Job Journal Quantity" = IMD,
@@ -46,9 +42,7 @@ permissionset 9886 "D365 JOBS, EDIT"
                   tabledata "Job Planning Line Archive" = IMD,
                   tabledata "Job Planning Line Invoice" = IMD,
                   tabledata "Job Register" = imd,
-#if not CLEAN25
                   tabledata "Job Resource Price" = IMD,
-#endif
                   tabledata "Job Task" = IMD,
                   tabledata "Job Task Archive" = IMD,
                   tabledata "Job Task Dimension" = IMD,

@@ -862,6 +862,36 @@ page 47 "Sales Invoice Subform"
                 {
                     Caption = 'F&unctions';
                     Image = "Action";
+                    action("Get &Price")
+                    {
+                        AccessByPermission = TableData "Sales Price" = R;
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Get &Price';
+                        Ellipsis = true;
+                        Image = Price;
+                        ToolTip = 'Insert the lowest possible price in the Unit Price field according to any special price that you have set up.';
+                        Visible = not ExtendedPriceEnabled;
+
+                        trigger OnAction()
+                        begin
+                            ShowPrices()
+                        end;
+                    }
+                    action("Get Li&ne Discount")
+                    {
+                        AccessByPermission = TableData "Sales Line Discount" = R;
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Get Li&ne Discount';
+                        Ellipsis = true;
+                        Image = LineDiscount;
+                        ToolTip = 'Insert the best possible discount in the Line Discount field according to any special discounts that you have set up.';
+                        Visible = not ExtendedPriceEnabled;
+
+                        trigger OnAction()
+                        begin
+                            ShowLineDisc()
+                        end;
+                    }
                     action(GetPrice)
                     {
                         AccessByPermission = TableData "Sales Price Access" = R;

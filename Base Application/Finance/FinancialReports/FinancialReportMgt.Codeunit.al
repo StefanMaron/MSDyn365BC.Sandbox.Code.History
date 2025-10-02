@@ -453,6 +453,41 @@ codeunit 18 "Financial Report Mgt."
         exit(UpdateFinancialReportNotificationIdTok);
     end;
 
+    procedure SetAccScheduleFilter(FinancialReport: Record "Financial Report"; var AccountSchedule: Report "Account Schedule")
+    var
+        AccScheduleLine: Record "Acc. Schedule Line";
+    begin
+        CalcAccScheduleLineDateFilter(FinancialReport, AccScheduleLine);
+        AccountSchedule.SetFinancialReportName(FinancialReport.Name);
+        AccountSchedule.SetFilters(
+            AccScheduleLine.GetFilter("Date Filter"),
+            FinancialReport.GLBudgetFilter,
+            FinancialReport.CostBudgetFilter,
+            '',
+            FinancialReport.Dim1Filter,
+            FinancialReport.Dim2Filter,
+            FinancialReport.Dim3Filter,
+            FinancialReport.Dim4Filter,
+            FinancialReport.CashFlowFilter,
+            FinancialReport.GetEffectiveNegativeAmountFormat());
+    end;
+
+    procedure SetAccScheduleLineFilter(FinancialReport: Record "Financial Report"; var AccScheduleLine: Record "Acc. Schedule Line")
+    begin
+        AccScheduleLine.SetRange("Schedule Name", FinancialReport."Financial Report Row Group");
+        AccScheduleLine.SetFilter("Date Filter", FinancialReport.DateFilter);
+        AccScheduleLine.SetFilter("G/L Budget Filter", FinancialReport.GLBudgetFilter);
+        AccScheduleLine.SetFilter("Cost Budget Filter", FinancialReport.CostBudgetFilter);
+        AccScheduleLine.SetFilter("Business Unit Filter", '');
+        AccScheduleLine.SetFilter("Dimension 1 Filter", FinancialReport.Dim1Filter);
+        AccScheduleLine.SetFilter("Dimension 2 Filter", FinancialReport.Dim2Filter);
+        AccScheduleLine.SetFilter("Dimension 3 Filter", FinancialReport.Dim3Filter);
+        AccScheduleLine.SetFilter("Dimension 4 Filter", FinancialReport.Dim4Filter);
+        AccScheduleLine.SetFilter("Cash Flow Forecast Filter", FinancialReport.CashFlowFilter);
+        if FinancialReport.CostCenterFilter <> '' then
+            AccScheduleLine.SetFilter("Cost Center Filter", FinancialReport.CostCenterFilter);
+    end;
+
     procedure CalcAccScheduleLineDateFilter(FinancialReport: Record "Financial Report"; var AccScheduleLine: Record "Acc. Schedule Line")
     var
         AccSchedManagement: Codeunit AccSchedManagement;
@@ -484,7 +519,7 @@ codeunit 18 "Financial Report Mgt."
             if TrySetAccScheduleLineDateFilter(FinancialReport.DateFilter, AccScheduleLine) then
                 exit;
 
-        AccSchedManagement.FindPeriod(AccScheduleLine, '', FinancialReport.PeriodType);
+        AccSchedManagement.FindPeriod(AccScheduleLine, '', FinancialReport.GetEffectivePeriodType());
     end;
 
     [TryFunction]

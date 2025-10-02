@@ -13,10 +13,8 @@ using Microsoft.Inventory.Item.Attribute;
 using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Inventory.Setup;
 using Microsoft.Pricing.PriceList;
-#if not CLEAN25
 using Microsoft.Purchases.Pricing;
 using Microsoft.Sales.Pricing;
-#endif
 using System.Environment.Configuration;
 
 codeunit 730 "Copy Item"
@@ -141,12 +139,10 @@ codeunit 730 "Copy Item"
         CopyBOMComponents(SourceItem."No.", TargetItem."No.");
         CopyItemVendors(SourceItem."No.", TargetItem."No.");
         CopyItemPriceListLines(SourceItem."No.", TargetItem."No.");
-#if not CLEAN25
         CopyItemSalesPrices(SourceItem."No.", TargetItem."No.");
         CopySalesLineDiscounts(SourceItem."No.", TargetItem."No.");
         CopyPurchasePrices(SourceItem."No.", TargetItem."No.");
         CopyPurchaseLineDiscounts(SourceItem."No.", TargetItem."No.");
-#endif
         CopyItemAttributes(SourceItem."No.", TargetItem."No.");
         CopyItemReferences(SourceItem."No.", TargetItem."No.");
 
@@ -396,8 +392,6 @@ codeunit 730 "Copy Item"
             until PriceListLine.Next() = 0;
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by the method CopyItemPriceListLines()', '17.0')]
     local procedure CopyItemSalesPrices(FromItemNo: Code[20]; ToItemNo: Code[20])
     var
         SalesPrice: Record "Sales Price";
@@ -408,7 +402,6 @@ codeunit 730 "Copy Item"
         CopyItemRelatedTable(Database::"Sales Price", SalesPrice.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
 
-    [Obsolete('Replaced by the method CopyItemPriceListLines()', '17.0')]
     local procedure CopySalesLineDiscounts(FromItemNo: Code[20]; ToItemNo: Code[20])
     var
         SalesLineDiscount: Record "Sales Line Discount";
@@ -423,7 +416,6 @@ codeunit 730 "Copy Item"
         CopyItemRelatedTableFromRecRef(RecRef, SalesLineDiscount.FieldNo(Code), FromItemNo, ToItemNo);
     end;
 
-    [Obsolete('Replaced by the method CopyItemPriceListLines()', '17.0')]
     local procedure CopyPurchasePrices(FromItemNo: Code[20]; ToItemNo: Code[20])
     var
         PurchasePrice: Record "Purchase Price";
@@ -434,7 +426,6 @@ codeunit 730 "Copy Item"
         CopyItemRelatedTable(Database::"Purchase Price", PurchasePrice.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
 
-    [Obsolete('Replaced by the method CopyItemPriceListLines()', '17.0')]
     local procedure CopyPurchaseLineDiscounts(FromItemNo: Code[20]; ToItemNo: Code[20])
     var
         PurchLineDiscount: Record "Purchase Line Discount";
@@ -444,7 +435,6 @@ codeunit 730 "Copy Item"
 
         CopyItemRelatedTable(Database::"Purchase Line Discount", PurchLineDiscount.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
-#endif
 
     local procedure CopyItemAttributes(FromItemNo: Code[20]; ToItemNo: Code[20])
     var
