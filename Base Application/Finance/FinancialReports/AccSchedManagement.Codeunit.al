@@ -1829,11 +1829,9 @@ codeunit 8 AccSchedManagement
             else
                 OnConvDimTotalingFilterOnDimNoElseCase(DimNo, DimCode, AnalysisView, CostAccSetup);
         end;
-        OnAfterGetConvDimCode(AnalysisView, DimCode);
         if DimCode = '' then
             exit(DimTotaling);
 
-        DimVal.SecurityFiltering := DimVal.SecurityFiltering::Filtered;
         DimVal.SetRange("Dimension Code", DimCode);
         DimVal.SetFilter(Code, DimTotaling);
         if DimVal.Find('-') then
@@ -2487,10 +2485,6 @@ codeunit 8 AccSchedManagement
                   GetDimTotalingFilter(3, TempColumnLayout."Dimension 3 Totaling"),
                   GetDimTotalingFilter(4, TempColumnLayout."Dimension 4 Totaling"));
                 GLAccAnalysisView.SetFilter("Business Unit Filter", TempColumnLayout."Business Unit Totaling");
-                if SubcategoryEntryFilter <> '' then begin
-                    GlAcc.SetRange("Account Type", GlAcc."Account Type"::Posting);
-                    GLAcc.SetFilter("Account Subcategory Entry No.", SubcategoryEntryFilter);
-                end;
                 GLAccAnalysisView.FilterGroup(0);
                 Clear(ChartOfAccsAnalysisView);
                 ChartOfAccsAnalysisView.InsertTempGLAccAnalysisViews(GLAcc);
@@ -2976,11 +2970,6 @@ codeunit 8 AccSchedManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcCFAccountOnAfterSetEntryFilters(var CFAccount: Record "Cash Flow Account"; var AccSchedLine: Record "Acc. Schedule Line"; var ColumnLayout: Record "Column Layout"; var ColValue: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetConvDimCode(AnalysisView: Record "Analysis View"; var DimCode: Code[20])
     begin
     end;
 }
