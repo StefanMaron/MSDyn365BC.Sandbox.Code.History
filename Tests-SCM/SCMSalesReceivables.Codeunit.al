@@ -24,15 +24,11 @@ codeunit 137062 "SCM Sales & Receivables"
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
-#if not CLEAN25
         LibraryCosting: Codeunit "Library - Costing";
-#endif
         LibraryRandom: Codeunit "Library - Random";
         LibraryFiscalYear: Codeunit "Library - Fiscal Year";
         LibraryTimeSheet: Codeunit "Library - Time Sheet";
-#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
-#endif
         NumberofLineErr: Label 'Number of Line must be same.';
         QuantityErr: Label 'Quantity must be same.';
         QtyToReceiveErr: Label 'Qty. to Receive must be equal.';
@@ -131,7 +127,6 @@ codeunit 137062 "SCM Sales & Receivables"
         Assert.AreEqual(Quantity, SalesLine.Quantity, QuantityErr);
     end;
 
-#if not CLEAN25
     [Test]
     [HandlerFunctions('RetrieveDimStrMenuHandler')]
     [Scope('OnPrem')]
@@ -353,7 +348,6 @@ codeunit 137062 "SCM Sales & Receivables"
         VerifyPurchUnitPrice(
           Item."No.", QtyOfUOMPerUOM, UnitCostOnItemCard, UnitPurchasePrice, UnitOfMeasure2.Code, UnitOfMeasure.Code);
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -1444,7 +1438,6 @@ codeunit 137062 "SCM Sales & Receivables"
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, ItemNo, Quantity);
     end;
 
-#if not CLEAN25
     local procedure CreateSalesOrder(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; SalesItemNo: Code[20]; CustomerNo: Code[20])
     var
         Location: Record Location;
@@ -1455,14 +1448,13 @@ codeunit 137062 "SCM Sales & Receivables"
           SalesHeader, SalesLine, SalesHeader."Document Type"::Order, CustomerNo, SalesItemNo, LibraryRandom.RandDec(10, 2));
         UpdateLocationOnSalesLine(SalesLine, Location.Code);
     end;
-#endif
+
     local procedure CreatePurchaseDocument(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; DocumentType: Enum "Purchase Document Type"; VendorNo: Code[20]; ItemNo: Code[20]; Quantity: Decimal)
     begin
         LibraryPurchase.CreatePurchHeader(PurchaseHeader, DocumentType, VendorNo);
         LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, ItemNo, Quantity);
     end;
 
-#if not CLEAN25
     local procedure CreatePurchOrder(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; ItemNo: Code[20]; VendorNo: Code[20])
     var
         Location: Record Location;
@@ -1474,7 +1466,7 @@ codeunit 137062 "SCM Sales & Receivables"
         PurchaseLine.Validate("Location Code", Location.Code);
         PurchaseLine.Modify(true);
     end;
-#endif
+
     local procedure CreateItemBudgetEntry(Item: Record Item; Date: Date; DepartmentCode: Code[20]; ProjectCode: Code[20]; CustomerGroupCode: Code[20])
     var
         ItemBudgetEntry: Record "Item Budget Entry";
@@ -1523,7 +1515,6 @@ codeunit 137062 "SCM Sales & Receivables"
         PurchaseHeader.Modify(true);
     end;
 
-#if not CLEAN25
     local procedure CreateItemUnitOfMeasure(var ItemUnitOfMeasure: Record "Item Unit of Measure"; ItemNo: Code[20]; UnitOfMeasureCode: Code[10]; QtyPerUnitOfMeasure: Decimal)
     begin
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, ItemNo, UnitOfMeasureCode, QtyPerUnitOfMeasure);
@@ -1539,7 +1530,7 @@ codeunit 137062 "SCM Sales & Receivables"
         BOMComponent.Validate("Variant Code", VariantCode);
         BOMComponent.Modify(true);
     end;
-#endif
+
     local procedure ClearEntries()
     var
         ItemBudgetEntry: Record "Item Budget Entry";
@@ -1565,7 +1556,6 @@ codeunit 137062 "SCM Sales & Receivables"
         Result := DelChr(String, '>'); // delete trailing space chars
     end;
 
-#if not CLEAN25
     local procedure UpdateChildItem(var Item: Record Item; UnitOfMeasureCode: Code[10]; UnitPrice: Decimal; LastDirectCost: Decimal)
     begin
         Item.Validate("Base Unit of Measure", UnitOfMeasureCode);
@@ -1585,7 +1575,7 @@ codeunit 137062 "SCM Sales & Receivables"
         CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);  // Value is important for Test.
         CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure2.Code, QtyPerUnitOfMeasure);
     end;
-#endif
+
     local procedure CreateItemWithAutoText(var Item: Record Item; var ItemExtText: Text[100])
     begin
         LibraryInventory.CreateItem(Item);
@@ -1730,7 +1720,6 @@ codeunit 137062 "SCM Sales & Receivables"
         until ItemBudgetEntry.Next() = 0;
     end;
 
-#if not CLEAN25
     local procedure VerifyPurchUnitPrice(ItemNo: Text[30]; QtyOfUOMPerUOM2: Decimal; UnitCostOnItemCard: Decimal; UnitPurchPrice: Decimal; UnitOfMeasureCode: Code[10]; UnitOfMeasureCode2: Code[10])
     var
         PurchaseLine: Record "Purchase Line";
@@ -1751,7 +1740,6 @@ codeunit 137062 "SCM Sales & Receivables"
             ExpectedUnitPrice := QtyOfUOMPerUOM2 * UnitPurchPrice;
         PurchaseLine.TestField("Direct Unit Cost", ExpectedUnitPrice);
     end;
-#endif
 
     local procedure VerifyDateComprRegister(var DateComprRegister: Record "Date Compr. Register"; TotalNoOfRecords: Integer; NumsNewRecords: Text[250]; NumsDelRecords: Text[250])
     var
@@ -1770,7 +1758,6 @@ codeunit 137062 "SCM Sales & Receivables"
         until DateComprRegister.Next() = 0;
     end;
 
-#if not CLEAN25
     local procedure VerifySalesUnitPrice(ItemNo: Text[30]; QtyOfUOMPerUOM2: Decimal; UnitPriceOnItemCard: Decimal; UnitSalesPrice: Decimal; UnitOfMeasureCode: Code[10]; UnitOfMeasureCode2: Code[10])
     var
         SalesLine: Record "Sales Line";
@@ -1791,7 +1778,6 @@ codeunit 137062 "SCM Sales & Receivables"
             ExpectedUnitPrice := QtyOfUOMPerUOM2 * UnitSalesPrice;
         SalesLine.TestField("Unit Price", ExpectedUnitPrice);
     end;
-#endif
 
     local procedure VerifyPurchaseLine(DocumentType: Enum "Purchase Document Type"; DocumentNo: Code[20]; ExpectedCount: Integer; LineDate: Date)
     var

@@ -322,7 +322,7 @@ codeunit 138029 "O365 Trial Balance"
         AccScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
 
-        AccScheduleOverview.PeriodType.SetValue(PeriodType::"Accounting Period");
+        AccScheduleOverview.PeriodTypeDefault.SetValue(PeriodType::"Accounting Period");
     end;
 
     local procedure CompareResults(AccScheduleOverview: TestPage "Acc. Schedule Overview"; Values: array[9, 2] of Decimal)

@@ -7,9 +7,7 @@ namespace Microsoft.Service.Analysis;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Projects.Project.Planning;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Service.Document;
 using System.Utilities;
@@ -474,7 +472,6 @@ page 9217 "ResGrp. All. per Serv.  Matrix"
             {
                 Caption = '&Prices';
                 Image = Price;
-#if not CLEAN25
                 action(Costs)
                 {
                     ApplicationArea = Service;
@@ -485,9 +482,6 @@ page 9217 "ResGrp. All. per Serv.  Matrix"
                     RunPageLink = Type = const("Group(Resource)"),
                                   Code = field("Resource Group Filter");
                     ToolTip = 'View or change detailed information about costs for the resource.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '19.0';
                 }
                 action(Prices)
                 {
@@ -499,11 +493,7 @@ page 9217 "ResGrp. All. per Serv.  Matrix"
                     RunPageLink = Type = const("Group(Resource)"),
                                   Code = field("Resource Group Filter");
                     ToolTip = 'View or edit prices for the resource.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '19.0';
                 }
-#endif
                 action(PurchPriceLists)
                 {
                     ApplicationArea = Jobs;
