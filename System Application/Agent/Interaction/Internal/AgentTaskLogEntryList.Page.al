@@ -32,6 +32,11 @@ page 4303 "Agent Task Log Entry List"
                     Caption = 'ID';
                     ToolTip = 'Specifies the unique identifier of the log entry.';
                 }
+                field(Timestamp; Rec.SystemCreatedAt)
+                {
+                    Caption = 'Timestamp';
+                    ToolTip = 'Specifies the date and time when the log entry was created.';
+                }
                 field(TaskID; Rec."Task ID")
                 {
                     Visible = false;
@@ -40,6 +45,7 @@ page 4303 "Agent Task Log Entry List"
                 field(Type; Rec.Type)
                 {
                     Caption = 'Type';
+                    StyleExpr = TypeStyle;
                 }
                 field(PageCaption; Rec."Page Caption")
                 {
