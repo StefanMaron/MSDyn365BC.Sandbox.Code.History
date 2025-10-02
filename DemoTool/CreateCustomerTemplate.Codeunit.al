@@ -64,11 +64,6 @@ codeunit 101998 "Create Customer Template"
         CreateTemplateHelper.CreateTemplateLine(ConfigTemplateHeader, Customer.FieldNo("Contact Type"), Format(CustomerContactType));
     end;
 
-    local procedure InsertForeignTradeInfo(var ConfigTemplateHeader: Record "Config. Template Header"; CurrencyCode: Code[10])
-    begin
-        CreateTemplateHelper.CreateTemplateLine(ConfigTemplateHeader, Customer.FieldNo("Currency Code"), Format(CurrencyCode));
-    end;
-
     local procedure InsertPaymentsInfo(var ConfigTemplateHeader: Record "Config. Template Header"; ApplMethod: Text[20]; PaymentTerms: Code[20]; PaymentMethod: Code[20]; ReminderTerms: Code[20]; FinChargeTerms: Code[20]; PrintStatm: Boolean)
     begin
         CreateTemplateHelper.CreateTemplateLine(ConfigTemplateHeader, Customer.FieldNo("Application Method"), ApplMethod);
@@ -84,4 +79,3 @@ codeunit 101998 "Create Customer Template"
         exit(CopyStr(xCashDescriptionTxt, 1, 50));
     end;
 }
-
