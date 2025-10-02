@@ -431,7 +431,12 @@ codeunit 5705 "TransferOrder-Post Receipt"
         QtyToReceive: Decimal;
         BaseQtyToReceive: Decimal;
         TrackingSpecificationExists: Boolean;
+        IsHandled: Boolean;
     begin
+        OnBeforeWriteDownDerivedLines(TransLine3, SuppressCommit, TransLine4, T337, TempDerivedSpecification, IsHandled);
+        if IsHandled then
+            exit;
+
         TransLine4.SetRange("Document No.", TransLine3."Document No.");
         TransLine4.SetRange("Derived From Line No.", TransLine3."Line No.");
         if TransLine4.Find('-') then begin
@@ -995,6 +1000,11 @@ codeunit 5705 "TransferOrder-Post Receipt"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunWithCheckOnBeforeModifyTransferHeader(var TransferHeader: Record "Transfer Header");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeWriteDownDerivedLines(var TransferLine: Record "Transfer Line"; SuppressCommit: Boolean; var TransferLine2: Record "Transfer Line"; var ReservationLine: Record "Reservation Entry"; var TempDerivedSpecification: Record "Tracking Specification" temporary; var IsHandled: Boolean)
     begin
     end;
 
