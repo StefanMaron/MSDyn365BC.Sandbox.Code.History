@@ -1910,7 +1910,7 @@ table 37 "Sales Line"
                     FieldError("Prepmt. Line Amount", StrSubstNo(Text045, "Line Amount"));
                 if "System-Created Entry" and not IsServiceChargeLine() then
                     FieldError("Prepmt. Line Amount", StrSubstNo(Text045, 0));
-                Validate("Prepayment %", "Prepmt. Line Amount" * 100 / "Line Amount");
+                Validate("Prepayment %", "Prepmt. Line Amount" * 100 / CalculateOutstandingAmountExclTax());
             end;
         }
         field(111; "Prepmt. Amt. Inv."; Decimal)
