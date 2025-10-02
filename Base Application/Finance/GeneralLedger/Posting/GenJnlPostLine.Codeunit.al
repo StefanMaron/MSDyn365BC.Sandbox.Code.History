@@ -360,6 +360,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
     local procedure InitAmounts(var GenJnlLine: Record "Gen. Journal Line"): Decimal
     var
         Currency: Record Currency;
+        VATPostingSetup: Record "VAT Posting Setup";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -378,8 +379,17 @@ codeunit 12 "Gen. Jnl.-Post Line"
             if (not GenJnlLine."System-Created Entry") or (GenJnlLine."Financial Void") then begin
                 GenJnlLine."Source Currency Code" := GenJnlLine."Currency Code";
                 GenJnlLine."Source Currency Amount" := GenJnlLine.Amount;
-                GenJnlLine."Source Curr. VAT Base Amount" := GenJnlLine."VAT Base Amount";
-                GenJnlLine."Source Curr. VAT Amount" := GenJnlLine."VAT Amount";
+                if GenJnlLine."VAT Calculation Type" = GenJnlLine."VAT Calculation Type"::"Reverse Charge VAT" then begin
+                    VATPostingSetup.Get(GenJnlLine."VAT Bus. Posting Group", GenJnlLine."VAT Prod. Posting Group");
+                    GenJnlLine."Source Curr. VAT Base Amount" := GenJnlLine.Amount;
+                    GenJnlLine."Source Curr. VAT Amount" :=
+                        Round(
+                            GenJnlLine.Amount * VATPostingSetup."VAT %" / 100,
+                            Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
+                end else begin
+                    GenJnlLine."Source Curr. VAT Base Amount" := GenJnlLine."VAT Base Amount";
+                    GenJnlLine."Source Curr. VAT Amount" := GenJnlLine."VAT Amount";
+                end;
             end;
         end;
         if GenJnlLine."Additional-Currency Posting" = GenJnlLine."Additional-Currency Posting"::None then begin
@@ -1900,7 +1910,10 @@ codeunit 12 "Gen. Jnl.-Post Line"
         CostAccountingSetup: Record "Cost Accounting Setup";
         TransferGlEntriesToCA: Codeunit "Transfer GL Entries to CA";
         IsTransactionConsistentExternal: Boolean;
-        LastSourceCurrencyVATAmount: Decimal;
+        LastSourceCurrencyTaxAmount: Decimal;
+        LastSourceCurrencyTaxAmountCredit: Decimal;
+        LastSourceCurrencyNonDedTaxAmount: Decimal;
+        LastSourceCurrencyNonDedTaxAmountCredit: Decimal;
     begin
         OnBeforeFinishPosting(GenJournalLine, TempGLEntryBuf);
 
@@ -1914,11 +1927,18 @@ codeunit 12 "Gen. Jnl.-Post Line"
 
         IsTransactionConsistent := IsTransactionConsistent and IsTransactionConsistentExternal;
 
-        LastSourceCurrencyVATAmount := 0;
+        LastSourceCurrencyTaxAmount := 0;
+        LastSourceCurrencyTaxAmountCredit := 0;
+        LastSourceCurrencyNonDedTaxAmount := 0;
+        LastSourceCurrencyNonDedTaxAmountCredit := 0;
         if TempGLEntryBuf.FindSet() then begin
             repeat
-                if TempGLEntryBuf."Source Currency Code" <> '' then
-                    UpdateSourceCurrencyAmounts(TempGLEntryBuf, LastSourceCurrencyVATAmount);
+                if (TempGLEntryBuf."Source Currency Code" <> '') and (GenJournalLine."Deferral Code" = '') then
+                    UpdateSourceCurrencyAmounts(
+                        TempGLEntryBuf, LastSourceCurrencyTaxAmount, LastSourceCurrencyTaxAmountCredit,
+                        LastSourceCurrencyNonDedTaxAmount, LastSourceCurrencyNonDedTaxAmountCredit,
+                        (GenJournalLine."VAT Calculation Type" = "Tax Calculation Type"::"Reverse Charge VAT") or
+                        (GenJournalLine."Bal. VAT Calculation Type" = "Tax Calculation Type"::"Reverse Charge VAT"));
                 TempGLEntryPreview := TempGLEntryBuf;
                 TempGLEntryPreview.Insert();
                 GlobalGLEntry := TempGLEntryBuf;
@@ -2002,7 +2022,17 @@ codeunit 12 "Gen. Jnl.-Post Line"
         end;
     end;
 
+    local procedure ClearGLEntrySourceCurrencyFields(var GLEntry: Record "G/L Entry")
+    begin
+        GLEntry."Source Currency Code" := '';
+        GLEntry."Source Currency Amount" := 0;
+        GLEntry."Source Currency VAT Amount" := 0;
+        GLEntry.Modify();
+    end;
+
     local procedure UpdateGLEntrySourceCurrencyFields(var GLEntry: Record "G/L Entry"; var GenJnlLine: Record "Gen. Journal Line")
+    var
+        GLAccount: Record "G/L Account";
     begin
         if GenJnlLine."Source Currency Code" = '' then
             exit;
@@ -2026,6 +2056,11 @@ codeunit 12 "Gen. Jnl.-Post Line"
         then
             exit;
 
+        if GLEntry."G/L Account No." <> '' then begin
+            GLAccount.Get(GLEntry."G/L Account No.");
+            GenJnlCheckLine.CheckGLAccountSourceCurrency(GLAccount, GenJnlLine."Source Currency Code");
+        end;
+
         GLEntry."Source Currency Code" := GenJnlLine."Source Currency Code";
         case GenJnlLine."VAT Calculation Type" of
             GenJnlLine."VAT Calculation Type"::"Sales Tax":
@@ -2036,26 +2071,59 @@ codeunit 12 "Gen. Jnl.-Post Line"
             else begin
                 GLEntry."Source Currency VAT Amount" := GenJnlLine."Source Curr. VAT Amount";
                 if GLEntry."Source Currency VAT Amount" = 0 then
-                    GLEntry."Source Currency Amount" := GenJnlLine."Source Currency Amount"
+                    GLEntry."Source Currency Amount" := GetSourceCurrencyAmount(GenJnlLine, GLEntry.Amount > 0, true)
                 else
-                    GLEntry."Source Currency Amount" := GenJnlLine."Source Curr. VAT Base Amount";
+                    GLEntry."Source Currency Amount" := GetSourceCurrencyAmount(GenJnlLine, GLEntry.Amount > 0, false);
             end;
         end;
     end;
 
-    local procedure UpdateSourceCurrencyAmounts(var TempGLEntry: Record "G/L Entry" temporary; var LastSourceCurrencyTaxAmount: Decimal)
+    local procedure UpdateSourceCurrencyAmounts(var TempGLEntry: Record "G/L Entry" temporary; var LastSourceCurrencyTaxAmount: Decimal; var LastSourceCurrencyTaxAmountCredit: Decimal; var LastSourceCurrencyNonDedTaxAmount: Decimal; var LastSourceCurrencyNonDedTaxAmountCredit: Decimal; ReverseCharge: Boolean)
+    var
+        SourceCurrency: Record Currency;
     begin
-        if LastSourceCurrencyTaxAmount <> 0 then begin // VAT case
-            TempGLEntry."Source Currency Amount" := LastSourceCurrencyTaxAmount;
+        if (LastSourceCurrencyNonDedTaxAmount <> 0) and (TempGLEntry."Debit Amount" <> 0) then begin // Non Deductible VAT case
+            TempGLEntry."Source Currency Amount" := UpdateAmountSign(LastSourceCurrencyTaxAmount - LastSourceCurrencyNonDedTaxAmount, TempGLEntry.Amount > 0);
             TempGLEntry."Source Currency VAT Amount" := 0;
-            LastSourceCurrencyTaxAmount := 0;
-        end else begin
-            LastSourceCurrencyTaxAmount := TempGLEntry."Source Currency VAT Amount";
-            if TempGLEntry."Source Currency Amount" = 0 then begin // Sales Tax case
-                TempGLEntry."Source Currency Amount" := TempGLEntry."Source Currency VAT Amount";
+            LastSourceCurrencyNonDedTaxAmountCredit := -LastSourceCurrencyNonDedTaxAmount;
+            LastSourceCurrencyTaxAmount := LastSourceCurrencyNonDedTaxAmount;
+            LastSourceCurrencyNonDedTaxAmount := 0;
+        end else
+            if (LastSourceCurrencyNonDedTaxAmountCredit <> 0) and (TempGLEntry."Credit Amount" <> 0) then begin
+                TempGLEntry."Source Currency Amount" := UpdateAmountSign(LastSourceCurrencyTaxAmountCredit - LastSourceCurrencyNonDedTaxAmountCredit, TempGLEntry.Amount > 0);
                 TempGLEntry."Source Currency VAT Amount" := 0;
-            end;
-        end;
+                LastSourceCurrencyTaxAmountCredit := LastSourceCurrencyNonDedTaxAmountCredit;
+                LastSourceCurrencyNonDedTaxAmountCredit := 0;
+            end else
+                if (LastSourceCurrencyTaxAmount <> 0) and (TempGLEntry."Debit Amount" <> 0) then begin // VAT case
+                    TempGLEntry."Source Currency Amount" := UpdateAmountSign(LastSourceCurrencyTaxAmount, TempGLEntry.Amount > 0);
+                    TempGLEntry."Source Currency VAT Amount" := 0;
+                    if ReverseCharge then
+                        LastSourceCurrencyTaxAmountCredit := -LastSourceCurrencyTaxAmount;
+                    LastSourceCurrencyTaxAmount := 0;
+                end else
+                    if (LastSourceCurrencyTaxAmountCredit <> 0) and (TempGLEntry."Credit Amount" <> 0) then begin
+                        TempGLEntry."Source Currency Amount" := UpdateAmountSign(LastSourceCurrencyTaxAmountCredit, TempGLEntry.Amount > 0);
+                        TempGLEntry."Source Currency VAT Amount" := 0;
+                        LastSourceCurrencyTaxAmountCredit := 0;
+                    end else begin
+                        LastSourceCurrencyTaxAmount := TempGLEntry."Source Currency VAT Amount";
+                        LastSourceCurrencyTaxAmountCredit := -TempGLEntry."Source Currency VAT Amount";
+                        if TempGLEntry."VAT Amount" <> 0 then begin
+                            SourceCurrency.Get(TempGLEntry."Source Currency Code");
+                            SourceCurrency.TestField("Amount Rounding Precision");
+                            TempGLEntry."Src. Curr. Non-Ded. VAT Amount" :=
+                                Round(
+                                    TempGLEntry."Source Currency VAT Amount" * TempGLEntry."Non-Deductible VAT Amount" / TempGLEntry."VAT Amount",
+                                    SourceCurrency."Amount Rounding Precision", SourceCurrency.VATRoundingDirection());
+                            LastSourceCurrencyNonDedTaxAmount := TempGLEntry."Src. Curr. Non-Ded. VAT Amount";
+                            LastSourceCurrencyNonDedTaxAmountCredit := -TempGLEntry."Src. Curr. Non-Ded. VAT Amount";
+                        end;
+                        if TempGLEntry."Source Currency Amount" = 0 then begin // Sales Tax case
+                            TempGLEntry."Source Currency Amount" := TempGLEntry."Source Currency VAT Amount";
+                            TempGLEntry."Source Currency VAT Amount" := 0;
+                        end;
+                    end;
     end;
 
     local procedure InsertGLAccountSourceCurrency(var GLEntry: Record "G/L Entry")
@@ -2142,6 +2210,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
             GLEntry."Additional-Currency Amount" :=
                 GLCalcAddCurrency(Amount, AmountAddCurr, GLEntry."Additional-Currency Amount", UseAmountAddCurr, GenJnlLine);
             UpdateGLEntrySourceCurrencyFields(GLEntry, GenJnlLine);
+            if (GLEntry."Source Currency Code" <> '') and (GenJnlLine."Deferral Code" <> '') then
+                GLEntry."Source Currency Amount" := AmountAddCurr;
         end;
 
         OnAfterInitGLEntry(GLEntry, GenJnlLine, Amount, AmountAddCurr, UseAmountAddCurr, CurrencyFactor, GLReg);
@@ -2311,6 +2381,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         InitGLEntry(GenJnlLine, GLEntry, AccNo, Amount, 0, UseAmountAddCurr, true);
         OnBeforeCreateGLEntryGainLossInsertGLEntry(GenJnlLine, GLEntry);
         InsertGLEntry(GenJnlLine, GLEntry, true);
+        ClearGLEntrySourceCurrencyFields(TempGLEntryBuf);
     end;
 
     /// <summary>
@@ -4864,7 +4935,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         OnPostDtldVendLedgEntriesOnBeforeCreateGLEntriesForTotalAmounts(VendPostingGr, DetailedCVLedgEntryBuffer, GenJournalLine, TempDimensionPostingBuffer, AdjAmount, SaveEntryNo, LedgEntryInserted, IsHandled);
         if not IsHandled then
             CreateGLEntriesForTotalAmounts(
-                GenJournalLine, TempDimensionPostingBuffer, AdjAmount, SaveEntryNo, GetVendorPayablesAccount(GenJournalLine, VendPostingGr), LedgEntryInserted);
+                GenJournalLine, TempDimensionPostingBuffer, AdjAmount, SaveEntryNo, GetVendorPayablesAccount2(DetailedCVLedgEntryBuffer, GenJournalLine, VendPostingGr), LedgEntryInserted);
 
         OnPostDtldVendLedgEntriesOnAfterCreateGLEntriesForTotalAmounts(TempGLEntryBuf, GlobalGLEntry, NextTransactionNo);
 
@@ -7165,19 +7236,37 @@ codeunit 12 "Gen. Jnl.-Post Line"
         then begin
             IsHandled := false;
             OnPostDtldAdjustmentOnBeforeCreateGLEntryBalAcc(GenJnlLine, GLAcc, AdjAmount, ArrayIndex, IsHandled, NextEntryNo);
-            if not IsHandled then
+            if not IsHandled then begin
                 CreateGLEntryBalAcc(
-                  GenJnlLine, GLAcc, -AdjAmount[ArrayIndex], -AdjAmount[ArrayIndex + 1],
-                  GenJnlLine."Bal. Account Type", GenJnlLine."Bal. Account No.");
-            InitGLEntry(GenJnlLine, GLEntry,
-              GLAcc, TotalAmountLCY + AdjAmount[ArrayIndex],
-              TotalAmountAddCurr + AdjAmount[ArrayIndex + 1], true, true);
+                    GenJnlLine, GLAcc, -AdjAmount[ArrayIndex], -AdjAmount[ArrayIndex + 1],
+                    GenJnlLine."Bal. Account Type", GenJnlLine."Bal. Account No.");
+                ClearGLEntrySourceCurrencyFields(TempGLEntryBuf);
+            end;
+            InitGLEntry(
+                GenJnlLine, GLEntry, GLAcc, TotalAmountLCY + AdjAmount[ArrayIndex],
+                TotalAmountAddCurr + AdjAmount[ArrayIndex + 1], true, true);
             AdjAmount[ArrayIndex] := 0;
             AdjAmount[ArrayIndex + 1] := 0;
             exit(true);
         end;
 
         exit(false);
+    end;
+
+    local procedure GetSourceCurrencyAmount(GenJnlLine: Record "Gen. Journal Line"; IsPositive: Boolean; IsSourceCurrVATZero: Boolean): Decimal
+    begin
+        if IsSourceCurrVATZero then
+            exit(UpdateAmountSign(GenJnlLine."Source Currency Amount", IsPositive));
+
+        exit(UpdateAmountSign(GenJnlLine."Source Curr. VAT Base Amount", IsPositive));
+    end;
+
+    local procedure UpdateAmountSign(Amount: Decimal; IsPositive: Boolean): Decimal
+    begin
+        if IsPositive then
+            exit(Abs(Amount))
+        else
+            exit(-Abs(Amount));
     end;
 
     /// <summary>
@@ -8106,6 +8195,18 @@ codeunit 12 "Gen. Jnl.-Post Line"
     procedure SetTempGLEntryBufEntryNo(NewTempGLEntryBufEntryNo: Integer)
     begin
         TempGLEntryBuf."Entry No." := NewTempGLEntryBufEntryNo;
+    end;
+
+    local procedure GetVendorPayablesAccount2(var DetailedCVLedgEntryBuffer: Record "Detailed CV Ledg. Entry Buffer"; var GenJournalLine: Record "Gen. Journal Line"; VendPostingGr: Record "Vendor Posting Group"): Code[20]
+    begin
+        if MultiplePostingGroups then begin
+            DetailedCVLedgEntryBuffer.Reset();
+            DetailedCVLedgEntryBuffer.SetFilter("Entry Type", '%1|%2', DetailedCVLedgEntryBuffer."Entry Type"::"Realized Gain", DetailedCVLedgEntryBuffer."Entry Type"::"Realized Loss");
+            if DetailedCVLedgEntryBuffer.FindFirst() then
+                exit(GetVendDtldCVLedgEntryBufferAccNo(GenJournalLine, DetailedCVLedgEntryBuffer));
+        end;
+
+        exit(GetVendorPayablesAccount(GenJournalLine, VendPostingGr));
     end;
 
     [IntegrationEvent(true, false)]
