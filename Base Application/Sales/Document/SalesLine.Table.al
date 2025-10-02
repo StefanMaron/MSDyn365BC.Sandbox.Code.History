@@ -1572,14 +1572,15 @@ table 37 "Sales Line"
                                 TestField("No.", VATPostingSetup.GetSalesAccount(false));
                             end;
                     end;
+                GetSalesSetup();
+                if ("VAT Bus. Posting Group" = SalesSetup."Reverse Charge VAT Posting Gr.") and not "Reverse Charge Item" then
+                    FieldError("VAT Bus. Posting Group", StrSubstNo(Text1041001, "VAT Bus. Posting Group", Type, "No."));
+
                 if "Document Type" = "Document Type"::"Credit Memo" then begin
-                    GetSalesSetup();
                     "Reverse Charge" := 0;
-                    if ("VAT Bus. Posting Group" = SalesSetup."Reverse Charge VAT Posting Gr.") and not "Reverse Charge Item" then
-                        FieldError("VAT Bus. Posting Group", StrSubstNo(Text1041001, "VAT Bus. Posting Group", Type, "No."));
                     if ("VAT Bus. Posting Group" = SalesSetup."Reverse Charge VAT Posting Gr.") and
-                       (SalesHeader."VAT Bus. Posting Group" = SalesSetup."Domestic Customers")
-                    then
+                     (SalesHeader."VAT Bus. Posting Group" = SalesSetup."Domestic Customers")
+                  then
                         "Reverse Charge" :=
                           Round(Amount * (1 - SalesHeader."VAT Base Discount %" / 100) * xRec."VAT %" / 100,
                             Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
@@ -2407,6 +2408,8 @@ table 37 "Sales Line"
 
                 if Type = Type::Item then begin
                     GetUnitCost();
+                    if "Document Type" = "Document Type"::"Return Order" then
+                        ValidateReturnReasonCode(FieldNo("Variant Code"));
                     if "Variant Code" <> xRec."Variant Code" then
                         PlanPriceCalcByField(FieldNo("Variant Code"));
                 end;
@@ -3745,7 +3748,7 @@ table 37 "Sales Line"
         ReverseChargeApplies: Boolean;
         Text1041001: Label 'cannot be %1. %2 %3 is not subjected to Reverse Charge';
         CanNotAddItemWhsShipmentExistErr: Label 'You cannot add an item line because an open warehouse shipment exists for the sales header and Shipping Advice is %1.\\You must add items as new lines to the existing warehouse shipment or change Shipping Advice to Partial.', Comment = '%1- Shipping Advice';
-        CanNotAddItemPickExistErr: Label 'You cannot add an item line because an open inventory pick exists for the Sales Header and because Shipping Advice is %1.\\You must first post or delete the inventory pick or change Shipping Advice to Partial.', Comment = '%1- Shipping Advice';	
+        CanNotAddItemPickExistErr: Label 'You cannot add an item line because an open inventory pick exists for the Sales Header and because Shipping Advice is %1.\\You must first post or delete the inventory pick or change Shipping Advice to Partial.', Comment = '%1- Shipping Advice';
         ItemChargeAssignmentErr: Label 'You can only assign Item Charges for Line Types of Charge (Item).';
         SalesLineCompletelyShippedErr: Label 'You cannot change the purchasing code for a sales line that has been completely shipped.';
         SalesSetupRead: Boolean;
@@ -5312,14 +5315,17 @@ table 37 "Sales Line"
         if CurrFieldNo = FieldNo("Requested Delivery Date") then
             exit("Requested Delivery Date");
 
-        if "Shipment Date" = 0D then
+        if ("Shipment Date" = 0D) and (CurrFieldNo <> FieldNo("Planned Delivery Date")) then
             exit("Planned Delivery Date");
 
         CustomCalendarChange[1].SetSource(CalChange."Source Type"::"Shipping Agent", "Shipping Agent Code", "Shipping Agent Service Code", '');
         case CurrFieldNo of
             FieldNo("Shipment Date"):
                 begin
-                    CustomCalendarChange[2].SetSource(CalChange."Source Type"::Customer, "Sell-to Customer No.", '', '');
+                    if CheckCustomerBaseCalendarCodeExist() then
+                        CustomCalendarChange[2].SetSource(CalChange."Source Type"::Customer, "Sell-to Customer No.", '', '')
+                    else
+                        CustomCalendarChange[2].SetSource(CalChange."Source Type"::Location, "Location Code", '', '');
                     exit(CalendarMgmt.CalcDateBOC(Format("Shipping Time"), "Planned Shipment Date", CustomCalendarChange, true));
                 end;
             FieldNo("Planned Delivery Date"):
@@ -5328,6 +5334,18 @@ table 37 "Sales Line"
                     exit(CalendarMgmt.CalcDateBOC2(Format("Shipping Time"), "Planned Delivery Date", CustomCalendarChange, true));
                 end;
         end;
+    end;
+
+    local procedure CheckCustomerBaseCalendarCodeExist(): Boolean
+    var
+        Customer: Record customer;
+    begin
+        if "Sell-to Customer No." = '' then
+            exit(false);
+            
+        Customer.SetLoadFields("Base Calendar Code");
+        if Customer.Get("Sell-to Customer No.") then
+            exit(Customer."Base Calendar Code" <> '');
     end;
 
     procedure CalcPlannedShptDate(CurrFieldNo: Integer) PlannedShipmentDate: Date
@@ -5630,10 +5648,11 @@ table 37 "Sales Line"
 
         Clear(SalesHeader);
         TestStatusOpen();
-        if ItemSubstitutionMgt.ItemSubstGet(Rec) then
+        if ItemSubstitutionMgt.ItemSubstGet(Rec) then begin
+            Rec.Validate("Location Code");
             if TransferExtendedText.SalesCheckIfAnyExtText(Rec, false) then
                 TransferExtendedText.InsertSalesExtText(Rec);
-
+        end;
         OnAfterShowItemSub(Rec);
     end;
 
@@ -6260,7 +6279,7 @@ table 37 "Sales Line"
         if SalesLine.FindSet() then
             repeat
                 if not SalesLine.ZeroAmountLine(QtyType) then begin
-		            OnCalcVATAmountLinesOnBeforeProcessSalesLine(SalesLine);
+                    OnCalcVATAmountLinesOnBeforeProcessSalesLine(SalesLine);
                     if ReverseChargeApplies and SalesLine."Reverse Charge Item" then begin
                         SalesLine."Reverse Charge" := SalesLine."Amount Including VAT" - SalesLine.Amount;
                         SalesLine.SuspendStatusCheck(true);
@@ -6286,7 +6305,7 @@ table 37 "Sales Line"
                         VATAmountLine.Positive := SalesLine."Line Amount" >= 0;
                         VATAmountLine."Reverse Charge" := SalesLine."Reverse Charge";
                         VATAmountLine.Insert();
-			            OnCalcVATAmountLinesOnAfterInsertNewVATAmountLine(SalesLine, VATAmountLine);
+                        OnCalcVATAmountLinesOnAfterInsertNewVATAmountLine(SalesLine, VATAmountLine);
                     end;
                     OnCalcVATAmountLinesOnBeforeQtyTypeCase(VATAmountLine, SalesLine, SalesHeader);
                     case QtyType of
@@ -7808,7 +7827,7 @@ table 37 "Sales Line"
 
     local procedure CheckWMS()
     begin
-        if CurrFieldNo <> 0 then
+        if (CurrFieldNo <> 0) or (SalesHeader."VAT Bus. Posting Group" <> Rec."VAT Bus. Posting Group") then
             CheckLocationOnWMS();
     end;
 
