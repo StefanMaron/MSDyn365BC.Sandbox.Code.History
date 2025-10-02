@@ -16,17 +16,17 @@
       "id": "e4e86220-cac0-4ec3-b853-7c2fa610399d",
       "name": "PowerBI Reports",
       "publisher": "Microsoft",
-      "version": "25.4.0.0"
+      "version": "25.5.0.0"
     },
     {
       "id": "5d86850b-0d76-4eca-bd7b-951ad998e997",
       "publisher": "Microsoft",
       "name": "Tests-TestLibraries",
-      "version": "25.4.0.0"
+      "version": "25.5.0.0"
     }
   ],
   "screenshots": [],
-  "application": "25.4.0.0",
+  "application": "25.5.0.0",
   "platform": "25.2.0.0",
   "target": "OnPrem",
   "idRanges": [

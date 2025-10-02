@@ -12,7 +12,7 @@
   "contextSensitiveHelpUrl": "https://go.microsoft.com",
   "logo": "ExtensionLogo.png",
   "dependencies": [],
-  "application": "25.4.0.0",
+  "application": "25.5.0.0",
   "target": "OnPrem",
   "resourceExposurePolicy": {
     "allowDebugging": false,
