@@ -55,12 +55,8 @@ report 7000087 "Batch Settl. Posted POs"
 
                     TotalDocCount := TotalDocCount + 1;
                     DocCount := DocCount + 1;
-
-                    if not SupressWindows then begin
-                        Window.Update(3, Round(DocCount / TotalDoc * 10000, 1));
-                        Window.Update(4, StrSubstNo('%1 %2', "Document Type", "Document No."));
-                    end;
-
+                    Window.Update(3, Round(DocCount / TotalDoc * 10000, 1));
+                    Window.Update(4, StrSubstNo('%1 %2', "Document Type", "Document No."));
                     case "Document Type" of
                         "Document Type"::Invoice, "Document Type"::"Credit Memo":
                             begin
@@ -133,7 +129,6 @@ report 7000087 "Batch Settl. Posted POs"
                                 GenJnlLine."Shortcut Dimension 1 Code" := VendLedgEntry."Global Dimension 1 Code";
                                 GenJnlLine."Shortcut Dimension 2 Code" := VendLedgEntry."Global Dimension 2 Code";
                                 GenJnlLine."Dimension Set ID" := VendLedgEntry."Dimension Set ID";
-                                GenJnlLine."Posting Group" := VendLedgEntry."Vendor Posting Group";
                                 OnBeforeGenJournalLineInsert(PostedDoc, GenJnlLine, VATPostingSetup, VendLedgEntry, VendLedgEntry, PostedPmtOrd);
                                 GenJnlLine.Insert();
                                 SumLCYAmt := SumLCYAmt + GenJnlLine."Amount (LCY)";
@@ -299,13 +294,9 @@ report 7000087 "Batch Settl. Posted POs"
             trigger OnAfterGetRecord()
             begin
                 PmtOrdCount := PmtOrdCount + 1;
-
-                if not SupressWindows then begin
-                    Window.Update(1, Round(PmtOrdCount / TotalPmtOrd * 10000, 1));
-                    Window.Update(2, StrSubstNo('%1', "No."));
-                    Window.Update(3, 0);
-                end;
-
+                Window.Update(1, Round(PmtOrdCount / TotalPmtOrd * 10000, 1));
+                Window.Update(2, StrSubstNo('%1', "No."));
+                Window.Update(3, 0);
                 GroupAmount := 0;
             end;
 
@@ -315,10 +306,9 @@ report 7000087 "Batch Settl. Posted POs"
 
                 Commit();
 
-                if not SupressWindows then
-                    Message(
-                      Text1100003,
-                      TotalDocCount, PmtOrdCount, GroupAmountLCY);
+                Message(
+                  Text1100003,
+                  TotalDocCount, PmtOrdCount, GroupAmountLCY);
             end;
 
             trigger OnPreDataItem()
@@ -335,11 +325,10 @@ report 7000087 "Batch Settl. Posted POs"
                 TotalPmtOrd := Count;
                 ExistVATEntry := false;
 
-                if not SupressWindows then
-                    Window.Open(
-                      Text1100000 +
-                      Text1100001 +
-                      Text1100002);
+                Window.Open(
+                  Text1100000 +
+                  Text1100001 +
+                  Text1100002);
             end;
         }
     }
@@ -416,7 +405,6 @@ report 7000087 "Batch Settl. Posted POs"
         Window: Dialog;
         PostingDate: Date;
         DueOnly: Boolean;
-        SupressWindows: Boolean;
         Delay: Decimal;
         SourceCode: Code[10];
         Acct: Code[20];
@@ -473,16 +461,6 @@ report 7000087 "Batch Settl. Posted POs"
         GenJnlLine."Dimension Set ID" := VendLedgEntry."Dimension Set ID";
         OnBeforeGenJournalLineInsert(PostedDoc, GenJnlLine, VATPostingSetup, VendLedgEntry, VendLedgEntry, PostedPmtOrd);
         GenJnlLine.Insert();
-    end;
-
-    procedure SetPostingDate(NewPostingDate: Date)
-    begin
-        PostingDate := NewPostingDate;
-    end;
-
-    procedure SetSupressWindows(NewSupressWindows: Boolean)
-    begin
-        SupressWindows := NewSupressWindows;
     end;
 
     [IntegrationEvent(false, false)]

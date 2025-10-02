@@ -828,7 +828,9 @@ table 290 "VAT Amount Line"
                         "VAT Calculation Type"::"No taxable VAT":
                             begin
                                 "VAT Base" :=
-                                    (CalcLineAmount() - "Pmt. Discount Amount") / (1 + GetVATPct() / 100) - "VAT Difference";
+                                  Round(
+                                    (CalcLineAmount() - "Pmt. Discount Amount") / (1 + GetVATPct() / 100),
+                                    Currency."Amount Rounding Precision") - "VAT Difference";
                                 OnUpdateLinesOnAfterCalcVATBase(Rec, Currency, PricesIncludingVAT);
                                 if ("VAT %" <> 0) or ("EC %" <> 0) then begin
                                     "VAT Amount" :=
@@ -846,10 +848,6 @@ table 290 "VAT Amount Line"
                                         ("EC %" / GetVATPct()) * (1 - VATBaseDiscountPerc / 100),
                                         Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
                                 end;
-                                if (VATBaseDiscountPerc <> 0) or ("EC Amount" <> 0) then
-                                    "VAT Base" := Round("VAT Base", Currency."Amount Rounding Precision")
-                                else
-                                    "VAT Base" := CalcLineAmount() - "VAT Amount";
                                 OnUpdateLinesOnAfterCalcVATAmount(Rec, PrevVATAmountLine, Currency, VATBaseDiscountPerc, PricesIncludingVAT);
                                 "Amount Including VAT" := "VAT Base" + "VAT Amount" + "EC Amount";
                                 OnUpdateLinesOnAfterCalcAmountIncludingVATNormalVAT(Rec, PrevVATAmountLine, Currency, VATBaseDiscountPerc, PricesIncludingVAT);
