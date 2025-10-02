@@ -54,8 +54,8 @@ if ($LASTEXITCODE -ne 0) {
 if ($branches) {
     $branchesToUpdate = @()
     foreach ($pattern in $branches) {
-        # Expand wildcards
-        $matchedBranches = git branch -r | Where-Object { $_ -match "origin/$pattern" } | ForEach-Object { $_.Trim() -replace '^origin/', '' }
+        # Expand wildcards - use exact match with line boundaries
+        $matchedBranches = git branch -r | Where-Object { $_.Trim() -match "^origin/$pattern$" } | ForEach-Object { $_.Trim() -replace '^origin/', '' }
         if ($matchedBranches) {
             $branchesToUpdate += $matchedBranches
         }
