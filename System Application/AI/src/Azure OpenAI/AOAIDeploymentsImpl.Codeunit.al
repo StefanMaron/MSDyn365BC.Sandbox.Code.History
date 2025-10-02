@@ -92,7 +92,6 @@ codeunit 7769 "AOAI Deployments Impl"
         exit(GetDeploymentName(GPT4LatestLbl));
     end;
 #endif
-
 #if not CLEAN27
     procedure GetGPT4oPreview(CallerModuleInfo: ModuleInfo): Text
     begin
