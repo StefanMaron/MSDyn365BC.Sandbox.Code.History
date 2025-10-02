@@ -867,7 +867,6 @@ page 47 "Sales Invoice Subform"
                 {
                     Caption = 'F&unctions';
                     Image = "Action";
-#if not CLEAN25
                     action("Get &Price")
                     {
                         AccessByPermission = TableData "Sales Price" = R;
@@ -877,9 +876,6 @@ page 47 "Sales Invoice Subform"
                         Image = Price;
                         ToolTip = 'Insert the lowest possible price in the Unit Price field according to any special price that you have set up.';
                         Visible = not ExtendedPriceEnabled;
-                        ObsoleteState = Pending;
-                        ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                        ObsoleteTag = '17.0';
 
                         trigger OnAction()
                         begin
@@ -895,16 +891,12 @@ page 47 "Sales Invoice Subform"
                         Image = LineDiscount;
                         ToolTip = 'Insert the best possible discount in the Line Discount field according to any special discounts that you have set up.';
                         Visible = not ExtendedPriceEnabled;
-                        ObsoleteState = Pending;
-                        ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                        ObsoleteTag = '17.0';
 
                         trigger OnAction()
                         begin
                             ShowLineDisc()
                         end;
                     }
-#endif
                     action(GetPrice)
                     {
                         AccessByPermission = TableData "Sales Price Access" = R;

@@ -1177,7 +1177,7 @@
   </Item>
   <Item ItemId=";Codeunit 3313963396 - NamedType 1949805838" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Could not parse input dataset]]></Val>
+      <Val><![CDATA[Could not parse input dataset.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -1191,6 +1191,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[%1 = JSON Line Content]D;]A;(Namespace=System.TestTools.TestRunner)(LookupHint=Codeunit Test Inputs Management - NamedType CouldNotParseJsonlInputErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3313963396 - NamedType 504715629" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The data does not represent valid YAML.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Codeunit Test Inputs Management - NamedType CouldNotParseYamlInputErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3313963396 - NamedType 3755293884" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

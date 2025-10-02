@@ -33,7 +33,7 @@ table 6752 "Reminder Action Log"
             ObsoleteState = Pending;
             ObsoleteReason = 'This field is obsolete and should not be used.';
 #pragma warning disable AS0074
-                ObsoleteTag = '26.0';
+            ObsoleteTag = '26.0';
 #pragma warning restore AS0074
 #else
             ObsoleteState = Removed;

@@ -80,10 +80,8 @@ permissionset 2909 "D365 PURCH DOC, POST"
                   tabledata "Purch. Rcpt. Header" = imD,
                   tabledata "Purch. Rcpt. Line" = imd,
                   tabledata "Purchase Discount Access" = RIMD,
-#if not CLEAN25
                   tabledata "Purchase Line Discount" = RIMD,
                   tabledata "Purchase Price" = RIMD,
-#endif
                   tabledata "Purchase Price Access" = RIMD,
                   tabledata "Reservation Entry" = I,
                   tabledata "Return Shipment Header" = im,

@@ -51,6 +51,13 @@ page 5 Currencies
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the symbol for the currency, for example, $ for US dollars.';
                 }
+                field(CurrencySymbolPosition; Rec."Currency Symbol Position")
+                {
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies the position of the currency symbol in relation to the amount.';
+                    Caption = 'Currency Symbol Position';
+                    importance = Additional;
+                }
 
                 field(ExchangeRateDate; ExchangeRateDate)
                 {
