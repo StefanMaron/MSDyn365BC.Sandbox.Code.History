@@ -54,8 +54,8 @@ codeunit 8999 "Email Rate Limit Impl."
         EmailImpl: Codeunit "Email Impl";
         RateLimit: Integer;
     begin
-        EmailOutboxCurrent.ReadIsolation := IsolationLevel::ReadUncommitted;
         SentEmail.ReadIsolation := IsolationLevel::ReadUncommitted;
+        EmailOutboxCurrent.ReadIsolation := IsolationLevel::ReadUncommitted;
         RateLimit := GetRateLimit(AccountId, Connector, EmailAddress);
         if RateLimit = 0 then
             exit(false);
@@ -66,20 +66,24 @@ codeunit 8999 "Email Rate Limit Impl."
 
     procedure IsConcurrencyLimitExceeded(AccountId: Guid; Connector: Enum "Email Connector"; EmailAddress: Text[250]): Boolean
     begin
-        exit(GetEmailOutboxCurrentProcessingCount(AccountId) > GetConcurrencyLimit(AccountId, Connector, EmailAddress))
+        exit(GetEmailOutboxCurrentProcessingCountDuringPastOneHour(AccountId) > GetConcurrencyLimit(AccountId, Connector, EmailAddress))
     end;
 
     /// <summary>
-    /// Returns the current count of emails in the outbox that are being processed for current user.
+    /// Returns the current count of emails in the outbox that are being processed for current user within the past 1 hour.
     /// </summary>
-    /// <returns>The count of the email which is being sending for the account</returns>
-    internal procedure GetEmailOutboxCurrentProcessingCount(AccountId: Guid): Integer
+    /// <returns>The count of the email which is being sent for the account during past one hour</returns>
+    internal procedure GetEmailOutboxCurrentProcessingCountDuringPastOneHour(AccountId: Guid): Integer
     var
         EmailOutbox: Record "Email Outbox";
+        FromDateTime: DateTime;
     begin
         EmailOutbox.ReadIsolation := IsolationLevel::ReadUncommitted;
+        // Calculate the datetime 1 hour ago
+        FromDateTime := CurrentDateTime() - 3600000; // 1 hour = 3,600,000 ms
         EmailOutbox.SetRange(Status, EmailOutbox.Status::Processing);
         EmailOutbox.SetRange("Account Id", AccountId);
+        EmailOutbox.SetFilter("Date Sending", '>=%1', FromDateTime);
         if EmailOutbox.IsEmpty() then
             exit(0);
 
@@ -112,6 +116,19 @@ codeunit 8999 "Email Rate Limit Impl."
         exit(EmailRateLimit."Concurrency Limit");
     end;
 
+    [InherentPermissions(PermissionObjectType::TableData, Database::"Email Rate Limit", 'ri')]
+    procedure GetMaxRetryLimit(AccountId: Guid; Connector: Enum "Email Connector"; EmailAddress: Text[250]): Integer
+    var
+        EmailRateLimit: Record "Email Rate Limit";
+    begin
+        if EmailRateLimit.Get(AccountId, Connector) then
+            exit(EmailRateLimit."Max. Retry Limit");
+
+        InitEmailRateLimitRecord(EmailRateLimit, AccountId, Connector, EmailAddress);
+
+        exit(EmailRateLimit."Concurrency Limit");
+    end;
+
     local procedure GetDefaultRateLimit(): Integer
     begin
         exit(0); // Default rate limit is 0, meaning no limit.
@@ -122,6 +139,11 @@ codeunit 8999 "Email Rate Limit Impl."
         exit(3);
     end;
 
+    local procedure GetDefaultMaxRetryLimit(): Integer
+    begin
+        exit(10);
+    end;
+
     local procedure InitEmailRateLimitRecord(var EmailRateLimit: Record "Email Rate Limit"; AccountId: Guid; Connector: Enum "Email Connector"; EmailAddress: Text[250])
     begin
         EmailRateLimit.Validate("Account Id", AccountId);
@@ -129,6 +151,7 @@ codeunit 8999 "Email Rate Limit Impl."
         EmailRateLimit.Validate("Email Address", EmailAddress);
         EmailRateLimit.Validate("Rate Limit", GetDefaultRateLimit());
         EmailRateLimit.Validate("Concurrency Limit", GetDefaultConcurrencyLimit());
+        EmailRateLimit.Validate("Max. Retry Limit", GetDefaultMaxRetryLimit());
         EmailRateLimit.Insert();
     end;
 }
