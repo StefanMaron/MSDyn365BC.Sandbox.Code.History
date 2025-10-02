@@ -13,11 +13,11 @@
   "logo": "ExtensionLogo.png",
   "dependencies": [],
   "screenshots": [],
-  "platform": "25.0.0.0",
+  "platform": "25.2.0.0",
   "resourceExposurePolicy": {
     "allowDebugging": false,
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "25.1.0.0"
+  "application": "25.2.0.0"
 }
