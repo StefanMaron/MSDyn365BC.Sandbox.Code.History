@@ -987,8 +987,9 @@ codeunit 426 "Payment Tolerance Management"
                 TotalAmount := TotalAmount + AppliedCustLedgEntry.Amount;
             until AppliedCustLedgEntry.Next() = 0;
 
-        AppliedCustLedgEntry.LockTable();
+        AppliedCustLedgEntry.LockTable();        
         AppliedCustLedgEntry.SetLoadFields();
+        AppliedCustLedgEntry.SetCurrentKey("Max. Payment Tolerance");
 
         AcceptedTolAmount := Amount + AppliedAmount;
         Number := AppliedCustLedgEntry.Count();
