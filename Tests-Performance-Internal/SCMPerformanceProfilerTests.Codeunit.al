@@ -20,7 +20,6 @@ codeunit 139070 "SCM Performance Profiler Tests"
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryRandom: Codeunit "Library - Random";
-        LibraryDimension: Codeunit "Library - Dimension";
         LibraryPurchase: Codeunit "Library - Purchase";
         LibrarySales: Codeunit "Library - Sales";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
@@ -281,19 +280,6 @@ codeunit 139070 "SCM Performance Profiler Tests"
         //CreateDefaultDimensionForItem(Item."No.");
     end;
 
-    local procedure CreateDefaultDimensionForItem(ItemNo: Code[20])
-    var
-        DefaultDimension: Record "Default Dimension";
-        Dimension: Record Dimension;
-        DimensionValue: Record "Dimension Value";
-    begin
-        LibraryDimension.FindDimension(Dimension);
-        LibraryDimension.FindDimensionValue(DimensionValue, Dimension.Code);
-        LibraryDimension.CreateDefaultDimensionItem(DefaultDimension, ItemNo, Dimension.Code, DimensionValue.Code);
-        DefaultDimension.Validate("Value Posting", DefaultDimension."Value Posting"::"Code Mandatory");
-        DefaultDimension.Modify(true);
-    end;
-
     local procedure CreateLocationSetup(var Location: Record Location; UseAsInTransit: Boolean; RequireShipment: Boolean; RequireReceive: Boolean)
     var
         WarehouseEmployee: Record "Warehouse Employee";
@@ -352,29 +338,6 @@ codeunit 139070 "SCM Performance Profiler Tests"
         //CreateDefaultDimensionVendor(Vendor."No.");
         Vendor.Validate("Location Code", LocationCode);
         Vendor.Modify(true);
-    end;
-
-    local procedure CreateDefaultDimensionVendor(VendorNo: Code[20])
-    var
-        DefaultDimension: Record "Default Dimension";
-        Dimension: Record Dimension;
-        DimensionValue: Record "Dimension Value";
-    begin
-        SelectDimensionValue(Dimension, DimensionValue);
-        LibraryDimension.CreateDefaultDimensionVendor(DefaultDimension, VendorNo, Dimension.Code, DimensionValue.Code);
-        UpdateDefaultDimension(DefaultDimension);
-    end;
-
-    local procedure SelectDimensionValue(var Dimension: Record Dimension; var DimensionValue: Record "Dimension Value")
-    begin
-        LibraryDimension.FindDimension(Dimension);
-        LibraryDimension.FindDimensionValue(DimensionValue, Dimension.Code);
-    end;
-
-    local procedure UpdateDefaultDimension(DefaultDimension: Record "Default Dimension")
-    begin
-        DefaultDimension.Validate("Value Posting", DefaultDimension."Value Posting"::"Code Mandatory");
-        DefaultDimension.Modify(true);
     end;
 
     local procedure CreateSalesSetup(var SalesHeader: Record "Sales Header"; var SalesHeader2: Record "Sales Header"; DocumentType: Enum "Sales Document Type"; ItemNo: Code[20]; LocationCode: Code[10]; CustomerNo: Code[20])
