@@ -44,9 +44,9 @@ codeunit 117041 "Create Service Item"
         InsertData('19', 'HP739038762', XDESKTOP, XComputerIII866MHz, ServiceItem.Status::Installed, ServiceItem.Priority::Low, '50000', '', '80005', XPCS,
           19021126D, 16, 26.7, XSMdashITEM, '', '');
         InsertData('20', 'HP83738020', XDESKTOP, XComputerIII866MHz, ServiceItem.Status::Installed, ServiceItem.Priority::Low, '50000', '', '80005', XPCS, 19020802D
-      , 16, 26.7, XSMdashITEM, '', '');
+          , 16, 26.7, XSMdashITEM, '', '');
         InsertData('21', '1234567', XGRAPHICS, XGraphicProgram, ServiceItem.Status::Installed, ServiceItem.Priority::Low, '40000', '', '80201', XPCS, 0D, 24, 55.4,
-      XSMdashITEM, '', '');
+          XSMdashITEM, '', '');
         InsertData('22', '54321', XDESKTOP, XComputerIII866MHz, ServiceItem.Status::Installed, ServiceItem.Priority::Low, '40000', '', '80005', XPCS, 19020802D, 24,
           26.7, XSMdashITEM, '', '');
         InsertData('23', 'MCM-58746', XMONITOR, X17INCHM780Monitor, ServiceItem.Status::Installed, ServiceItem.Priority::Low, '10000', '', '80102', XPCS, 19020630D, 24,
@@ -93,7 +93,7 @@ codeunit 117041 "Create Service Item"
         XDUDLEY: Label 'DUDLEY';
         MakeAdjustments: Codeunit "Make Adjustments";
 
-    procedure InsertData("No.": Text[250]; "Serial No.": Text[250]; "Service Item Group Code": Text[250]; Description: Text[250]; Status: Enum "Service Item Status"; Priority: Option; "Customer No.": Text[250]; "Ship-to Code": Text[250]; "Item No.": Text[250]; "Unit of Measure Code": Text[250]; "Warranty Starting Date (Parts)": Date; "Response Time (Hours)": Decimal; "Default Contract Value": Decimal; "No. Series": Text[250]; "Preferred Resource": Text[250]; "Service Price Group Code": Text[250])
+    procedure InsertData("No.": Text[250]; "Serial No.": Text[250]; "Service Item Group Code": Text[250]; Description: Text[250]; Status: Enum "Service Item Status"; Priority: Enum "Service Priority"; "Customer No.": Text[250]; "Ship-to Code": Text[250]; "Item No.": Text[250]; "Unit of Measure Code": Text[250]; "Warranty Starting Date (Parts)": Date; "Response Time (Hours)": Decimal; "Default Contract Value": Decimal; "No. Series": Text[250]; "Preferred Resource": Text[250]; "Service Price Group Code": Text[250])
     var
         ServiceItem: Record "Service Item";
         ResSkillMgt: Codeunit "Resource Skill Mgt.";
