@@ -360,12 +360,14 @@ page 52 "Purchase Credit Memo"
                     BlankZero = true;
                     Enabled = DocAmountEnable;
                     Visible = DocAmountEnable;
+                    Editable = DocAmountsEditable;
                     ShowMandatory = true;
                 }
                 field(DocAmountVAT; Rec."Doc. Amount VAT")
                 {
                     ApplicationArea = Basic, Suite;
                     Enabled = DocAmountEnable;
+                    Editable = DocAmountsEditable;
                     Visible = DocAmountEnable;
                 }
             }
@@ -1796,7 +1798,6 @@ page 52 "Purchase Credit Memo"
         JobQueueUsed := PurchSetup.JobQueueActive();
         SetExtDocNoMandatoryCondition();
         IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
-        DocAmountEnable := PurchSetup."Check Doc. Total Amounts";
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1819,6 +1820,8 @@ page 52 "Purchase Credit Memo"
         SIIManagement: Codeunit "SII Management";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
+        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
+        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetDocNoVisible();
         IsOfficeAddin := OfficeMgt.IsAvailable();
         IsSaaS := EnvironmentInfo.IsSaaS();
@@ -1891,7 +1894,7 @@ page 52 "Purchase Credit Memo"
         DocHasMultipleRegimeCode: Boolean;
         MultipleSchemeCodesLbl: Label 'Multiple scheme codes';
         VATDateEnabled: Boolean;
-        DocAmountEnable: Boolean;
+        DocAmountEnable, DocAmountsEditable : Boolean;
 
     protected var
         ShipToOptions: Option "Default (Vendor Address)","Alternate Vendor Address","Custom Address";
@@ -2031,6 +2034,8 @@ page 52 "Purchase Credit Memo"
     begin
         JobQueueVisible := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
         HasIncomingDocument := Rec."Incoming Document Entry No." <> 0;
+        DocAmountEnable := PurchSetup.ShouldDocumentTotalAmountsBeChecked(Rec);
+        DocAmountsEditable := PurchSetup.CanDocumentTotalAmountsBeEdited(Rec);
         SetExtDocNoMandatoryCondition();
         SetPostingGroupEditable();
 
