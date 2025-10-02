@@ -12,6 +12,7 @@ page 526 "Posted Sales Invoice Lines"
     Caption = 'Posted Sales Invoice Lines';
     Editable = false;
     PageType = List;
+    AboutText = 'Review detailed line information from posted sales invoices, including customer, item, quantity, pricing, discounts, and related order data for financial analysis and reporting.';
     SourceTable = "Sales Invoice Line";
     UsageCategory = History;
 
