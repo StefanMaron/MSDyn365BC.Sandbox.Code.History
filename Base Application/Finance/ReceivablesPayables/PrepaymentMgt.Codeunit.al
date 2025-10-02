@@ -143,7 +143,8 @@ codeunit 441 "Prepayment Mgt."
             repeat
                 if SalesLine."Prepmt. Line Amount" <> 0 then
                     if SalesLine."Prepmt. Amt. Inv." <> SalesLine."Prepmt. Line Amount" then
-                        exit(true);
+                        if SalesLine."Line Amount" - SalesLine."Prepmt. VAT Base Amt." <> SalesLine."Inv. Discount Amount" then
+                            exit(true);
             until SalesLine.Next() = 0;
     end;
 
