@@ -4131,7 +4131,6 @@ codeunit 136101 "Service Orders"
             ServiceHeader."Document Type".AsInteger(), ServiceHeader."No.", 0);
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CorrectCalculationLineDiscountForServiceLineWithSalesPrice()
@@ -4184,7 +4183,7 @@ codeunit 136101 "Service Orders"
         ServiceLine.TestField("Line Discount %", 0);
         ServiceLine.TestField("Line Discount Amount", 0);
     end;
-#endif
+
     [Test]
     [Scope('OnPrem')]
     procedure ThereIsNoPaymentGLEntriesAfterPostingServiceOrderWithEmptyPaymentMethodCode()
@@ -8026,7 +8025,6 @@ codeunit 136101 "Service Orders"
         LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Item, Item."No.");
     end;
 
-#if not CLEAN25
     local procedure CreateSalesLineDiscount(var SalesLineDiscount: Record "Sales Line Discount"; CustomerNo: Code[20]; ItemNo: Code[20])
     begin
         SalesLineDiscount.Init();
@@ -8036,7 +8034,7 @@ codeunit 136101 "Service Orders"
         SalesLineDiscount.Validate("Sales Code", CustomerNo);
         SalesLineDiscount.Insert(true);
     end;
-#endif
+
     local procedure SetupForUoMTest(
         var Item: Record Item;
         var ServiceLine: Record "Service Line";

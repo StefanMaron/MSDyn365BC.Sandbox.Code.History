@@ -516,7 +516,6 @@ codeunit 134335 "ERM Purch. Doc. Reports"
         asserterror LibraryReportDataset.AssertElementWithValueExists('', DocumentNo);
     end;
 
-#if not CLEAN25
     [Test]
     [HandlerFunctions('ReportHandlerVendorItemCatalog')]
     [Scope('OnPrem')]
@@ -544,7 +543,6 @@ codeunit 134335 "ERM Purch. Doc. Reports"
         LibraryReportDataset.AssertElementWithValueExists('ItemVendLeadTimeCal', Format(ItemVendor."Lead Time Calculation"));
         LibraryReportDataset.AssertElementWithValueExists('ItemVendVendorItemNo', ItemVendor."Vendor Item No.");
     end;
-#endif
 
     [Test]
     [HandlerFunctions('ReportHandlerVendorPurchaseList')]
@@ -1887,7 +1885,7 @@ codeunit 134335 "ERM Purch. Doc. Reports"
         Item.Modify(true);
         exit(Item."No.");
     end;
-#if not CLEAN25
+
     local procedure CreateItemVendor(var ItemVendor: Record "Item Vendor"; ItemNo: Code[20]; VendorNo: Code[20])
     begin
         // Using Random value for Lead Time Calculation.
@@ -1897,7 +1895,7 @@ codeunit 134335 "ERM Purch. Doc. Reports"
         Evaluate(ItemVendor."Lead Time Calculation", '<' + Format(LibraryRandom.RandInt(5)) + 'D>');
         ItemVendor.Modify(true);
     end;
-#endif
+
     local procedure CreateItemWithDimension(var DefaultDimension: Record "Default Dimension")
     var
         Dimension: Record Dimension;
@@ -1988,7 +1986,6 @@ codeunit 134335 "ERM Purch. Doc. Reports"
         PurchaseLine.Modify(true);
     end;
 
-#if not CLEAN25
     local procedure CreatePurchasePrice(var PurchasePrice: Record "Purchase Price"; VendorNo: Code[20])
     var
         Item: Record Item;
@@ -1999,7 +1996,6 @@ codeunit 134335 "ERM Purch. Doc. Reports"
         PurchasePrice.Validate("Direct Unit Cost", Item."Last Direct Cost");
         PurchasePrice.Modify(true);
     end;
-#endif
 
     local procedure CreatePurchaseQuoteWithMultipleLine(var PurchaseHeader: Record "Purchase Header")
     var
@@ -2305,7 +2301,7 @@ codeunit 134335 "ERM Purch. Doc. Reports"
         VendorDetailTrialBalance.InitializeRequest(PrintAmountsInLCY, false, ExcludeBalanceOnly);  // Set FALSE for Print Only Per Page.
         VendorDetailTrialBalance.Run();
     end;
-#if not CLEAN25
+
     local procedure SaveVendorItemCatalog(VendorNo: Code[20])
     var
         Vendor: Record Vendor;
@@ -2317,7 +2313,7 @@ codeunit 134335 "ERM Purch. Doc. Reports"
         VendorItemCatalog.SetTableView(Vendor);
         VendorItemCatalog.Run();
     end;
-#endif
+
     local procedure SaveVendorOrderSummary(No: Code[20]; PostingDate: Date; AmountLCY: Boolean)
     var
         Vendor: Record Vendor;

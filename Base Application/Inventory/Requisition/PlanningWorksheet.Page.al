@@ -12,6 +12,7 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
 using Microsoft.Inventory.Transfer;
 using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
 using Microsoft.Warehouse.Setup;
 using System.Environment;
 using System.Environment.Configuration;
@@ -722,6 +723,49 @@ page 99000852 "Planning Worksheet"
                             Rec.SetUpNewLine(Rec);
                     end;
                 }
+                group("Drop Shipment")
+                {
+                    Caption = 'Drop Shipment';
+                    Image = Delivery;
+                    action("Get Sales Orders")
+                    {
+                        AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
+                        ApplicationArea = Planning;
+                        Caption = 'Get Sales Orders';
+                        Ellipsis = true;
+                        Image = "Order";
+                        ToolTip = 'Copy sales lines to the planning worksheet. You can use the batch job to create planning worksheet proposal lines from sales lines for drop shipments or special orders.';
+
+                        trigger OnAction()
+                        var
+                            GetSalesOrder: Report "Get Sales Orders";
+                        begin
+                            GetSalesOrder.SetReqWkshLine(Rec, 0);
+                            GetSalesOrder.RunModal();
+                            Clear(GetSalesOrder);
+                        end;
+                    }
+                    action("Sales Order")
+                    {
+                        AccessByPermission = TableData "Sales Header" = R;
+                        ApplicationArea = Planning;
+                        Caption = 'Sales Order';
+                        Image = Document;
+                        Enabled = Rec."Sales Order No." <> '';
+                        ToolTip = 'View the sales order that is the source of the line. This applies only to drop shipments and special orders.';
+
+                        trigger OnAction()
+                        var
+                            SalesHeader: Record "Sales Header";
+                            SalesOrder: Page "Sales Order";
+                        begin
+                            SalesHeader.SetRange("No.", Rec."Sales Order No.");
+                            SalesOrder.SetTableView(SalesHeader);
+                            SalesOrder.Editable := false;
+                            SalesOrder.Run();
+                        end;
+                    }
+                }
                 separator(Action32)
                 {
                 }
@@ -848,6 +892,17 @@ page 99000852 "Planning Worksheet"
                 {
                 }
                 actionref("&Reserve_Promoted"; "&Reserve")
+                {
+                }
+            }
+            group(Category_Category9)
+            {
+                Caption = 'Drop Shipment', Comment = 'Generated from the PromotedActionCategories property index 3.';
+
+                actionref("Get Sales Orders_Promoted"; "Get Sales Orders")
+                {
+                }
+                actionref("Sales Order_Promoted"; "Sales Order")
                 {
                 }
             }

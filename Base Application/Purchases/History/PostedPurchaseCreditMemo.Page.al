@@ -390,13 +390,13 @@ page 140 "Posted Purchase Credit Memo"
                     {
                         ApplicationArea = Basic, Suite;
                         Editable = false;
-                        ToolTip = 'Specifies the name of the company sucessor in connection with corporate restructuring.';
+                        ToolTip = 'Specifies the name of the company successor in connection with corporate restructuring.';
                     }
                     field("Succeeded VAT Registration No."; Rec."Succeeded VAT Registration No.")
                     {
                         ApplicationArea = Basic, Suite;
                         Editable = false;
-                        ToolTip = 'Specifies the VAT registration number of the company sucessor in connection with corporate restructuring.';
+                        ToolTip = 'Specifies the VAT registration number of the company successor in connection with corporate restructuring.';
                     }
                     field("Do Not Send To SII"; Rec."Do Not Send To SII")
                     {

@@ -311,17 +311,15 @@ codeunit 99000872 "Sales Availability Mgt."
     local procedure OnGetDemandEntries(var AvailabilityCalcOverview: Record "Availability Calc. Overview"; var Item: Record Item; var sender: Codeunit "Calc. Availability Overview")
     var
         SalesLine: Record "Sales Line";
-        SalesHeader: Record "Sales Header";
     begin
         if SalesLine.FindLinesWithItemToPlan(Item, SalesLine."Document Type"::Order) then
             repeat
-                SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
-                SalesLine.CalcFields("Reserved Qty. (Base)");
+                SalesLine.CalcFields("Reserved Qty. (Base)", "Sell-to Customer Name");
                 sender.InsertAvailabilityEntry(
                     AvailabilityCalcOverview,
                     AvailabilityCalcOverview.Type::Demand, SalesLine."Shipment Date", SalesLine."Location Code", SalesLine."Variant Code",
                     -SalesLine."Outstanding Qty. (Base)", -SalesLine."Reserved Qty. (Base)",
-                    Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesHeader."Sell-to Customer Name",
+                    Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Sell-to Customer Name",
                     "Demand Order Source Type"::"Sales Demand");
             until SalesLine.Next() = 0;
     end;
@@ -330,17 +328,15 @@ codeunit 99000872 "Sales Availability Mgt."
     local procedure OnGetSupplyEntries(var AvailabilityCalcOverview: Record "Availability Calc. Overview"; var Item: Record Item; var sender: Codeunit "Calc. Availability Overview")
     var
         SalesLine: Record "Sales Line";
-        SalesHeader: Record "Sales Header";
     begin
         if SalesLine.FindLinesWithItemToPlan(Item, SalesLine."Document Type"::"Return Order") then
             repeat
-                SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
-                SalesLine.CalcFields("Reserved Qty. (Base)");
+                SalesLine.CalcFields("Reserved Qty. (Base)", "Sell-to Customer Name");
                 sender.InsertAvailabilityEntry(
                   AvailabilityCalcOverview,
                   AvailabilityCalcOverview.Type::Supply, SalesLine."Shipment Date", SalesLine."Location Code", SalesLine."Variant Code",
                   SalesLine."Outstanding Qty. (Base)", SalesLine."Reserved Qty. (Base)",
-                  Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesHeader."Sell-to Customer Name",
+                  Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Sell-to Customer Name",
                   "Demand Order Source Type"::"All Demands");
             until SalesLine.Next() = 0;
     end;

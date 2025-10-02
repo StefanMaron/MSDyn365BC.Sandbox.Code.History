@@ -8,6 +8,7 @@ using Microsoft.CRM.Outlook;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Foundation.Attachment;
+using Microsoft.Utilities;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.EServices.EDocument;
@@ -346,8 +347,10 @@ page 144 "Posted Sales Credit Memos"
                     ToolTip = 'Open the posted sales credit memo.';
 
                     trigger OnAction()
+                    var
+                        PageManagement: Codeunit "Page Management";
                     begin
-                        PAGE.Run(PAGE::"Posted Sales Credit Memo", Rec)
+                        PageManagement.PageRun(Rec);
                     end;
                 }
                 action(Statistics)
@@ -677,10 +680,11 @@ page 144 "Posted Sales Credit Memos"
     local procedure DoDrillDown()
     var
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        PageManagement: Codeunit "Page Management";
     begin
         SalesCrMemoHeader.Copy(Rec);
         SalesCrMemoHeader.SetRange("No.");
-        PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
+        PageManagement.PageRun(SalesCrMemoHeader);
     end;
 
     var

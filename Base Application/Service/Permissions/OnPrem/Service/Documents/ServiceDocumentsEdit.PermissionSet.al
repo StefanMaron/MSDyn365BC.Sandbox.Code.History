@@ -52,9 +52,7 @@ using Microsoft.Pricing.Source;
 using Microsoft.Pricing.Worksheet;
 using Microsoft.Purchases.Document;
 using Microsoft.Projects.Resources.Resource;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Service.Resources;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Pricing;
@@ -157,20 +155,16 @@ permissionset 8611 "Service Documents - Edit"
                   tabledata "Reservation Entry" = Rimd,
                   tabledata "Resolution Code" = R,
                   tabledata Resource = R,
-#if not CLEAN25
                   tabledata "Resource Cost" = R,
                   tabledata "Resource Price" = R,
-#endif
                   tabledata "Resource Skill" = R,
                   tabledata "Resource Unit of Measure" = R,
                   tabledata "Responsibility Center" = R,
                   tabledata "Return Receipt Header" = R,
                   tabledata "Sales Discount Access" = R,
                   tabledata "Sales Line" = R,
-#if not CLEAN25
                   tabledata "Sales Line Discount" = R,
                   tabledata "Sales Price" = R,
-#endif
                   tabledata "Sales Price Access" = R,
                   tabledata "Salesperson/Purchaser" = R,
                   tabledata "Segment Header" = R,

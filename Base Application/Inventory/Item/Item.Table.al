@@ -95,6 +95,7 @@ table 27 Item
         field(2; "No. 2"; Code[20])
         {
             Caption = 'No. 2';
+            ToolTip = 'Specifies an alternative account number which can be used internally in the company.';
             OptimizeForTextSearch = true;
         }
         field(3; Description; Text[100])
@@ -458,6 +459,7 @@ table 27 Item
         field(32; "Vendor Item No."; Text[50])
         {
             Caption = 'Vendor Item No.';
+            ToolTip = 'Specifies the number that the vendor uses for this item.';
             OptimizeForTextSearch = true;
         }
         field(33; "Lead Time Calculation"; DateFormula)
@@ -494,6 +496,7 @@ table 27 Item
         field(37; "Alternative Item No."; Code[20])
         {
             Caption = 'Alternative Item No.';
+            ToolTip = 'Specifies another identifier for this item.';
             OptimizeForTextSearch = true;
             TableRelation = Item;
         }
@@ -2100,6 +2103,44 @@ table 27 Item
             Caption = 'Over-Receipt Code';
             TableRelation = "Over-Receipt Code";
         }
+        field(9110; "Qty. on Blanket Sales Order"; Decimal)
+        {
+            CalcFormula = sum("Sales Line"."Outstanding Qty. (Base)" where("Document Type" = const("Blanket Order"),
+                                                                            Type = const(Item),
+                                                                            "No." = field("No."),
+                                                                            "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                            "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Shipment Date" = field("Date Filter"),
+                                                                            "Unit of Measure Code" = field("Unit of Measure Filter")));
+            Caption = 'Qty. on Blanket Sales Order';
+            ToolTip = 'Specifies how many units of the item are allocated to blanket sales orders, meaning listed on outstanding blanket sales order lines.';
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+            FieldClass = FlowField;
+            AutoFormatType = 0;
+        }
+        field(9210; "Qty. on Blanket Purch. Order"; Decimal)
+        {
+            CalcFormula = sum("Purchase Line"."Outstanding Qty. (Base)" where("Document Type" = const("Blanket Order"),
+                                                                            Type = const(Item),
+                                                                            "No." = field("No."),
+                                                                            "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                            "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Expected Receipt Date" = field("Date Filter"),
+                                                                            "Unit of Measure Code" = field("Unit of Measure Filter")));
+            Caption = 'Qty. on Blanket Purch. Order';
+            ToolTip = 'Specifies how many units of the item are allocated to blanket purchase orders, meaning listed on outstanding blanket purchase order lines.';
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+            FieldClass = FlowField;
+            AutoFormatType = 0;
+        }
         field(10700; "Cost Regulation %"; Decimal)
         {
             Caption = 'Cost Regulation %';
@@ -2349,6 +2390,7 @@ table 27 Item
         field(99008500; "Common Item No."; Code[20])
         {
             Caption = 'Common Item No.';
+            ToolTip = 'Specifies the unique common item number that the intercompany partners agree upon.';
             OptimizeForTextSearch = true;
         }
     }

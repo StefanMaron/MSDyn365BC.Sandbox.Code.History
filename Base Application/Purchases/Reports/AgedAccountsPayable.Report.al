@@ -220,7 +220,6 @@ report 322 "Aged Accounts Payable"
                         SetRange("Posting Date", 0D, EndingDate);
                         SetRange("Date Filter", 0D, EndingDate);
                     end;
-
                     CopyDimFiltersFromVendor(OpenVendorLedgEntry);
                     Vendor.CopyFilter("Currency Filter", "Currency Code");
                 end;

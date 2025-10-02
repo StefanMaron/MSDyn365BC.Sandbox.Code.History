@@ -187,6 +187,7 @@ page 134 "Posted Sales Credit Memo"
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
+                    Editable = false;
                     ToolTip = 'Specifies the customer''s reference. The contents will be printed on sales documents.';
                 }
                 field("Document Date"; Rec."Document Date")
@@ -430,13 +431,13 @@ page 134 "Posted Sales Credit Memo"
                     {
                         ApplicationArea = Basic, Suite;
                         Editable = false;
-                        ToolTip = 'Specifies the name of the company sucessor in connection with corporate restructuring.';
+                        ToolTip = 'Specifies the name of the company successor in connection with corporate restructuring.';
                     }
                     field("Succeeded VAT Registration No."; Rec."Succeeded VAT Registration No.")
                     {
                         ApplicationArea = Basic, Suite;
                         Editable = false;
-                        ToolTip = 'Specifies the VAT registration number of the company sucessor in connection with corporate restructuring.';
+                        ToolTip = 'Specifies the VAT registration number of the company successor in connection with corporate restructuring.';
                     }
                     field("Issued By Third Party"; Rec."Issued By Third Party")
                     {

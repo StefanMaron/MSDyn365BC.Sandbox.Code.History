@@ -87,9 +87,7 @@ using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Projects.Resources.Journal;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.Resources.Setup;
 using Microsoft.Projects.TimeSheet;
@@ -168,6 +166,9 @@ permissionset 191 "D365 SETUP"
                   tabledata "Allocation Account" = RIMD,
                   tabledata "Allocation Line" = RIMD,
                   tabledata "Financial Report" = RIMD,
+                  tabledata "Financial Report Export Log" = RIMD,
+                  tabledata "Financial Report Recipient" = RIMD,
+                  tabledata "Financial Report Schedule" = RIMD,
                   tabledata "Financial Report User Filters" = RIMD,
                   tabledata "Fin. Report Excel Template" = RIMD,
                   tabledata "Accounting Period" = IMD,
@@ -495,10 +496,8 @@ permissionset 191 "D365 SETUP"
                   tabledata "Requisition Wksh. Name" = RIMD,
                   tabledata "Res. Journal Line" = D,
                   tabledata "Reservation Entry" = RimD,
-#if not CLEAN25
                   tabledata "Resource Cost" = D,
                   tabledata "Resource Price" = D,
-#endif
                   tabledata "Resource Unit of Measure" = D,
                   tabledata "Resources Setup" = RimD,
                   tabledata "Responsibility Center" = RIMD,
@@ -519,14 +518,10 @@ permissionset 191 "D365 SETUP"
                   tabledata "Sales Invoice Line" = Rd,
                   tabledata "Sales Line" = RmD,
                   tabledata "Sales Line Archive" = RmD,
-#if not CLEAN25
                   tabledata "Sales Line Discount" = IM,
-#endif
                   tabledata "Sales Planning Line" = d,
                   tabledata "Sales Prepayment %" = RIMD,
-#if not CLEAN25
                   tabledata "Sales Price Worksheet" = RIMD,
-#endif
                   tabledata "Sales Shipment Header" = RD,
                   tabledata "Sales Shipment Line" = d,
                   tabledata "Salesperson/Purchaser" = RIMD,

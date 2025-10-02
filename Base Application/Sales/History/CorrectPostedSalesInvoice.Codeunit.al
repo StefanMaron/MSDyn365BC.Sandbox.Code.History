@@ -135,6 +135,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
     var
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        PageManagement: Codeunit "Page Management";
         IsHandled: Boolean;
     begin
         TestCorrectInvoiceIsAllowed(SalesInvoiceHeader, CancellingOnly);
@@ -145,7 +146,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
                     IsHandled := false;
                     OnCreateCreditMemoOnBeforePostedPageRun(SalesCrMemoHeader, IsHandled);
                     if not IsHandled then
-                        PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
+                        PageManagement.PageRun(SalesCrMemoHeader);
                 end;
             end else begin
                 SalesHeader.SetRange("Applies-to Doc. No.", SalesInvoiceHeader."No.");

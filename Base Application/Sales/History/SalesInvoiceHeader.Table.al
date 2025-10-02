@@ -1418,6 +1418,7 @@ table 112 "Sales Invoice Header"
     var
         CancelledDocument: Record "Cancelled Document";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        PageManagement: Codeunit "Page Management";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1431,7 +1432,7 @@ table 112 "Sales Invoice Header"
 
         if CancelledDocument.FindSalesCancelledInvoice("No.") then begin
             SalesCrMemoHeader.Get(CancelledDocument."Cancelled By Doc. No.");
-            PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
+            PageManagement.PageRun(SalesCrMemoHeader);
         end;
     end;
 
@@ -1439,6 +1440,7 @@ table 112 "Sales Invoice Header"
     var
         CancelledDocument: Record "Cancelled Document";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        PageManagement: Codeunit "Page Management";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1452,7 +1454,7 @@ table 112 "Sales Invoice Header"
 
         if CancelledDocument.FindSalesCorrectiveInvoice("No.") then begin
             SalesCrMemoHeader.Get(CancelledDocument."Cancelled Doc. No.");
-            PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
+            PageManagement.PageRun(SalesCrMemoHeader);
         end;
     end;
 

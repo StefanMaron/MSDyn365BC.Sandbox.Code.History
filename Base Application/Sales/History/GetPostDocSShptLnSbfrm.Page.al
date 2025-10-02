@@ -6,6 +6,7 @@ namespace Microsoft.Sales.History;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Utilities;
 
 page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
 {
@@ -408,10 +409,11 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
     local procedure ShowPostedShipment()
     var
         SalesShptHeader: Record "Sales Shipment Header";
+        PageManagement: Codeunit "Page Management";
     begin
         if not SalesShptHeader.Get(Rec."Document No.") then
             exit;
-        PAGE.Run(PAGE::"Posted Sales Shipment", SalesShptHeader);
+        PageManagement.PageRun(SalesShptHeader);
     end;
 
     local procedure ShowShptItemTrackingLines()

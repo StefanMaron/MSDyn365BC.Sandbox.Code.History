@@ -106,13 +106,13 @@ page 1351 "Posted Purch. Invoice - Update"
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = true;
-                    ToolTip = 'Specifies the name of the company sucessor in connection with corporate restructuring.';
+                    ToolTip = 'Specifies the name of the company successor in connection with corporate restructuring.';
                 }
                 field("Succeeded VAT Registration No."; Rec."Succeeded VAT Registration No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = true;
-                    ToolTip = 'Specifies the VAT registration number of the company sucessor in connection with corporate restructuring.';
+                    ToolTip = 'Specifies the VAT registration number of the company successor in connection with corporate restructuring.';
                 }
                 field("Posting Description"; Rec."Posting Description")
                 {

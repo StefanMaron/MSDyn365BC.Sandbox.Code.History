@@ -28,9 +28,7 @@
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryJob: Codeunit "Library - Job";
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
-#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
-#endif
         LibraryTemplates: Codeunit "Library - Templates";
         LibraryFiscalYear: Codeunit "Library - Fiscal Year";
         isInitialized: Boolean;
@@ -316,7 +314,6 @@
         WarehouseEmployee.Delete();
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountOnPurchaseInvoice()
@@ -384,7 +381,7 @@
         LibraryLowerPermissions.SetPurchDocsPost();
         PostItemAndVerifyValueEntries(Item, PurchaseLineDiscount);
     end;
-#endif
+
     [Test]
     [Scope('OnPrem')]
     procedure InvDiscountOnPurchaseInvoice()
@@ -1270,7 +1267,6 @@
         VerifyGLEntry(DocumentNo, PurchInvHeader."Amount Including VAT");
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure PurchInvoiceWithoutPriceInclVAT()
@@ -1324,7 +1320,6 @@
         PurchInvHeader.CalcFields("Amount Including VAT");
         VerifyGLEntry(PostedDocumentNo, PurchInvHeader."Amount Including VAT" + PurchaseLine."Line Discount Amount");
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -1555,7 +1550,6 @@
         Assert.AreEqual(0, PurchaseLine."Outstanding Amt. Ex. VAT (LCY)", 'should be zero');
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure UpdateUnitCostWithPurchPriceWhenChangeVendorNo()
@@ -1592,7 +1586,7 @@
         PurchLine.Find();
         PurchLine.TestField("Direct Unit Cost", PurchPrice."Direct Unit Cost");
     end;
-#endif
+
     [Test]
     [Scope('OnPrem')]
     procedure UnitCostNotUpdatedWithoutPurchPriceWhenChangeVendorNo()
@@ -3278,7 +3272,7 @@
         Item.Validate("Last Direct Cost", LibraryRandom.RandDecInRange(1000, 2000, 2));
         Item.Modify(true);
     end;
-#if not CLEAN25
+
     local procedure CreateServiceItem(): Code[20]
     var
         Item: Record Item;
@@ -3300,7 +3294,7 @@
         Item.Modify(true);
         exit(Item."No.");
     end;
-#endif
+
     local procedure CreateItemAndExtendedText(var Item: Record Item): Text[100]
     var
         ExtendedTextHeader: Record "Extended Text Header";
@@ -3426,7 +3420,6 @@
               PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, CreateItem(), LibraryRandom.RandInt(10));
     end;
 
-#if not CLEAN25
     local procedure CreatePurchInvWithPricesIncludingVAT(var PurchaseHeader: Record "Purchase Header"; PurchaseLineDiscount: Record "Purchase Line Discount"; PricesIncludingVAT: Boolean)
     var
         PurchaseLine: Record "Purchase Line";
@@ -3438,7 +3431,7 @@
           PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, PurchaseLineDiscount."Item No.",
           PurchaseLineDiscount."Minimum Quantity" + LibraryRandom.RandInt(10));  // Take Quantity greater than Purchase Line Discount Minimum Quantity.
     end;
-#endif
+
     local procedure CreatePurchaseLine(var PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; InvDiscountAmount: Decimal)
     var
         QtyToReceive: Decimal;
@@ -3917,7 +3910,6 @@
         exit(VendorInvoiceDisc.Code);
     end;
 
-#if not CLEAN25
     local procedure SetupLineDiscount(var PurchaseLineDiscount: Record "Purchase Line Discount")
     var
         GeneralPostingSetup: Record "General Posting Setup";
@@ -3942,7 +3934,7 @@
           LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"));
         GeneralPostingSetup.Modify(true);
     end;
-#endif
+
     local procedure VerifyAdditionalAmtOnGLEntry(DocumentNo: Code[20]; GLAccountNo: Code[20]; AdditionalCurrencyAmount: Decimal)
     var
         GLEntry: Record "G/L Entry";
@@ -4087,7 +4079,7 @@
           Amount, PurchaseAmount, GeneralLedgerSetup."Amount Rounding Precision",
           StrSubstNo(AmountErr, ValueEntry.FieldCaption("Purchase Amount (Actual)"), ValueEntry.TableCaption()));
     end;
-#if not CLEAN25
+
     local procedure VerifyValueEntryAreNonInventoriable(DocumentNo: Code[20])
     var
         DummyValueEntry: Record "Value Entry";
@@ -4096,7 +4088,7 @@
         DummyValueEntry.SetRange(Inventoriable, true);
         Assert.RecordIsEmpty(DummyValueEntry);
     end;
-#endif
+
     local procedure VerifyVATEntry(DocumentNo: Code[20]; Amount: Decimal)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -4146,7 +4138,7 @@
           InvoiceDiscountAmount, PurchaseLine."Inv. Discount Amount", GeneralLedgerSetup."Amount Rounding Precision",
           StrSubstNo(AmountErr, PurchaseLine.FieldCaption("Inv. Discount Amount"), PurchaseLine.TableCaption()));
     end;
-#if not CLEAN25
+
     local procedure VerifyLineDiscountAmount(PurchaseLine: Record "Purchase Line"; DocumentNo: Code[20]; LineDiscountAmount: Decimal)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -4165,7 +4157,7 @@
           LineDiscountAmount, PurchaseLine."Line Discount Amount", GeneralLedgerSetup."Amount Rounding Precision",
           StrSubstNo(AmountErr, PurchaseLine.FieldCaption("Line Discount Amount"), PurchaseLine.TableCaption()));
     end;
-#endif
+
     local procedure VerifyPurchRcptLine(PurchaseLine: Record "Purchase Line"; DocumentNo: Code[20])
     var
         PurchRcptLine: Record "Purch. Rcpt. Line";
@@ -4570,7 +4562,6 @@
         Reply := false;
     end;
 
-#if not CLEAN25
     [Scope('OnPrem')]
     procedure PostItemAndVerifyValueEntries(Item: Record Item; PurchaseLineDiscount: Record "Purchase Line Discount")
     var
@@ -4585,7 +4576,7 @@
         // Verify: Verify Purchase Line and Posted G/L Entry have no cost for the service item.
         VerifyValueEntryAreNonInventoriable(PostedDocumentNo);
     end;
-#endif
+
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure VendorLookupHandler(var VendorLookup: TestPage "Vendor Lookup")

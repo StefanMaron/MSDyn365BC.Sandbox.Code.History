@@ -5751,7 +5751,7 @@ codeunit 134902 "ERM Account Schedule"
         FinancialReports.FILTER.SetFilter(Name, AccScheduleLine."Schedule Name");
         AccScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
-        AccScheduleOverview.NegativeAmountFormat.Value(Format(Enum::"Analysis Negative Format"::"Minus Sign"));
+        AccScheduleOverview.NegativeAmountFormatDefault.Value(Format(Enum::"Fin. Report Negative Format"::"Minus Sign"));
 
         // [THEN] Negative amount is displayed with a minus sign
         AccScheduleOverview.GoToRecord(AccScheduleLine);
@@ -5784,7 +5784,7 @@ codeunit 134902 "ERM Account Schedule"
         FinancialReports.FILTER.SetFilter(Name, AccScheduleLine."Schedule Name");
         AccScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
-        AccScheduleOverview.NegativeAmountFormat.Value(Format(Enum::"Analysis Negative Format"::Parentheses));
+        AccScheduleOverview.NegativeAmountFormatDefault.Value(Format(Enum::"Fin. Report Negative Format"::Parentheses));
 
         // [THEN] Negative amount is displayed with parentheses
         AccScheduleOverview.GoToRecord(AccScheduleLine);
@@ -5883,7 +5883,7 @@ codeunit 134902 "ERM Account Schedule"
         FinancialReports.Filter.SetFilter(Name, AccScheduleName.Name);
         AccountScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
-        AccountScheduleOverview.NegativeAmountFormat.SetValue(Enum::"Analysis Negative Format"::"Minus Sign");
+        AccountScheduleOverview.NegativeAmountFormatDefault.SetValue(Enum::"Fin. Report Negative Format"::"Minus Sign");
         Commit();
 
         // [WHEN] Running account schedule report from account schedule overview
@@ -5893,7 +5893,7 @@ codeunit 134902 "ERM Account Schedule"
         // [THEN] Account schedule report inherits negative amount format as minus sign
 
         // [WHEN] Negative amount format is changed to parentheses and account schedule report is ran again
-        AccountScheduleOverview.NegativeAmountFormat.SetValue(Enum::"Analysis Negative Format"::Parentheses);
+        AccountScheduleOverview.NegativeAmountFormatDefault.SetValue(Enum::"Fin. Report Negative Format"::Parentheses);
         Commit();
         LibraryVariableStorage.Enqueue(Enum::"Analysis Negative Format"::Parentheses);
         AccountScheduleOverview.Print.Invoke();
@@ -7397,9 +7397,9 @@ codeunit 134902 "ERM Account Schedule"
         AccScheduleOverview.UseAmtsInAddCurr.SetValue(false);
         LibraryVariableStorage.Dequeue(RowNo);
         AccScheduleOverview."Row No.".AssertEquals(RowNo);
-        AccScheduleOverview.PeriodType.SetValue(LibraryVariableStorage.DequeueInteger());
+        AccScheduleOverview.PeriodTypeDefault.SetValue(LibraryVariableStorage.DequeueInteger());
         AccScheduleOverview.ColumnValues1.AssertEquals(LibraryVariableStorage.DequeueDecimal());
-        AccScheduleOverview.PeriodType.SetValue(ViewByRef::Day);
+        AccScheduleOverview.PeriodTypeDefault.SetValue(ViewByRef::Day);
         AccScheduleOverview.OK().Invoke();
     end;
 

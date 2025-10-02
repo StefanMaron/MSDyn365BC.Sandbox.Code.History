@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -526,12 +526,12 @@ page 44 "Sales Credit Memo"
                     field("Succeeded Company Name"; Rec."Succeeded Company Name")
                     {
                         ApplicationArea = Basic, Suite;
-                        ToolTip = 'Specifies the name of the company sucessor in connection with corporate restructuring.';
+                        ToolTip = 'Specifies the name of the company successor in connection with corporate restructuring.';
                     }
                     field("Succeeded VAT Registration No."; Rec."Succeeded VAT Registration No.")
                     {
                         ApplicationArea = Basic, Suite;
-                        ToolTip = 'Specifies the VAT registration number of the company sucessor in connection with corporate restructuring.';
+                        ToolTip = 'Specifies the VAT registration number of the company successor in connection with corporate restructuring.';
                     }
                     field("SII First Summary Doc. No."; SIIFirstSummaryDocNo)
                     {
@@ -710,6 +710,7 @@ page 44 "Sales Credit Memo"
                         var
                             Customer: Record Customer;
                         begin
+                            OnBeforeLookupBillToName(Customer, Rec);
                             if Customer.SelectCustomer(Customer) then begin
                                 xRec := Rec;
                                 Rec."Bill-to Name" := Customer.Name;
@@ -1291,6 +1292,8 @@ page 44 "Sales Credit Memo"
                     trigger OnAction()
                     begin
                         Rec.GetPstdDocLinesToReverse();
+                        CurrPage.SalesLines.Page.ForceTotalsCalculation();
+                        CurrPage.Update();
                     end;
                 }
                 action(ApplyEntries)
@@ -1870,6 +1873,7 @@ page 44 "Sales Credit Memo"
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         OfficeMgt: Codeunit "Office Management";
         InstructionMgt: Codeunit "Instruction Mgt.";
+        PageManagement: Codeunit "Page Management";
         PreAssignedNo: Code[20];
         xLastPostingNo: Code[20];
         IsScheduledPosting: Boolean;
@@ -1908,7 +1912,7 @@ page 44 "Sales Credit Memo"
             OnPostDocumentOnBeforeOpenPage(SalesCrMemoHeader, IsHandled);
             if not IsHandled then
                 if SalesCrMemoHeader.FindFirst() then
-                    PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
+                    PageManagement.PageRun(SalesCrMemoHeader);
         end else
             if InstructionMgt.IsEnabled(InstructionMgt.ShowPostedConfirmationMessageCode()) then
                 ShowPostedConfirmationMessage(PreAssignedNo, xLastPostingNo);
@@ -2089,4 +2093,8 @@ page 44 "Sales Credit Memo"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLookupBillToName(var Customer: Record Customer; SalesHeader: Record "Sales Header")
+    begin
+    end;
 }

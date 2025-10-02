@@ -19,9 +19,7 @@ using Microsoft.Pricing.Source;
 using Microsoft.Projects.Project.Analysis;
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Planning;
-#if not CLEAN25
 using Microsoft.Projects.Project.Pricing;
-#endif
 using Microsoft.Projects.Project.Reports;
 using Microsoft.Projects.Project.Archive;
 using Microsoft.Projects.Project.WIP;
@@ -1228,15 +1226,11 @@ page 88 "Job Card"
                     ToolTip = 'View the project''s WIP G/L entries.';
                 }
             }
-#if not CLEAN25
             group("&Prices")
             {
                 Caption = '&Prices';
                 Image = Price;
                 Visible = not ExtendedPriceEnabled;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                ObsoleteTag = '17.0';
                 action("&Resource")
                 {
                     ApplicationArea = Suite;
@@ -1246,9 +1240,6 @@ page 88 "Job Card"
                     RunObject = Page "Job Resource Prices";
                     RunPageLink = "Job No." = field("No.");
                     ToolTip = 'View this project''s resource prices.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
                 action("&Item")
                 {
@@ -1259,9 +1250,6 @@ page 88 "Job Card"
                     RunObject = Page "Job Item Prices";
                     RunPageLink = "Job No." = field("No.");
                     ToolTip = 'View this project''s item prices.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
                 action("&G/L Account")
                 {
@@ -1272,12 +1260,8 @@ page 88 "Job Card"
                     RunObject = Page "Job G/L Account Prices";
                     RunPageLink = "Job No." = field("No.");
                     ToolTip = 'View this project''s G/L account prices.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
             }
-#endif
             group(Prices)
             {
                 Caption = 'Prices & Discounts';
@@ -1335,7 +1319,6 @@ page 88 "Job Card"
                         PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
-#if not CLEAN25
                 action(SalesPriceListsDiscounts)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1343,9 +1326,6 @@ page 88 "Job Card"
                     Image = LineDiscount;
                     Visible = false;
                     ToolTip = 'View or set up different discounts for products that you sell to the customer. A product line discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action SalesPriceLists shows all sales price lists with prices and discounts';
-                    ObsoleteTag = '18.0';
 
                     trigger OnAction()
                     var
@@ -1356,7 +1336,6 @@ page 88 "Job Card"
                         PriceUXManagement.ShowPriceLists(Rec, PriceType::Sale, AmountType::Discount);
                     end;
                 }
-#endif
                 action(PurchasePriceLists)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1410,7 +1389,6 @@ page 88 "Job Card"
                         PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
-#if not CLEAN25
                 action(PurchasePriceListsDiscounts)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1418,9 +1396,6 @@ page 88 "Job Card"
                     Image = LineDiscount;
                     Visible = false;
                     ToolTip = 'View or set up different discounts for products that you buy from the vendor. An product discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action PurchasePriceLists shows all purchase price lists with prices and discounts';
-                    ObsoleteTag = '18.0';
 
                     trigger OnAction()
                     var
@@ -1431,7 +1406,6 @@ page 88 "Job Card"
                         PriceUXManagement.ShowPriceLists(Rec, PriceType::Purchase, AmountType::Discount);
                     end;
                 }
-#endif
             }
             group("Plan&ning")
             {
@@ -1805,46 +1779,21 @@ page 88 "Job Card"
                 actionref(PurchDiscountLines_Promoted; PurchDiscountLines)
                 {
                 }
-#if not CLEAN25
                 actionref(SalesPriceListsDiscounts_Promoted; SalesPriceListsDiscounts)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action SalesPriceLists shows all sales price lists with prices and discounts';
-                    ObsoleteTag = '18.0';
                 }
-#endif
-#if not CLEAN25
                 actionref(PurchasePriceListsDiscounts_Promoted; PurchasePriceListsDiscounts)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action PurchasePriceLists shows all purchase price lists with prices and discounts';
-                    ObsoleteTag = '18.0';
                 }
-#endif
-#if not CLEAN25
                 actionref("&Resource_Promoted"; "&Resource")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
-#if not CLEAN25
                 actionref("&Item_Promoted"; "&Item")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
-#if not CLEAN25
                 actionref("&G/L Account_Promoted"; "&G/L Account")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
             }
             group(Category_Category5)
             {
