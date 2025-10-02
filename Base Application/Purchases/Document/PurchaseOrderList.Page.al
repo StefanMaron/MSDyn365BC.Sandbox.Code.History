@@ -6,6 +6,7 @@ using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Foundation.Reporting;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.GLAccount;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.History;
@@ -168,7 +169,7 @@ page 9307 "Purchase Order List"
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
-                    ToolTip = 'Specifies the location where the items are to be placed when they are received. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
+                    ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
                 }
                 field("Purchaser Code"; Rec."Purchaser Code")
                 {
@@ -603,10 +604,11 @@ page 9307 "Purchase Order List"
 
                     trigger OnAction()
                     var
-                        PurchaseHeader: Record "Purchase Header";
+                        ICInOutboxMgt: Codeunit ICInboxOutboxMgt;
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        CurrPage.SetSelectionFilter(PurchaseHeader);
-                        Rec.SendICPurchaseDoc(PurchaseHeader);
+                        if ApprovalsMgmt.PrePostApprovalCheckPurch(Rec) then
+                            ICInOutboxMgt.SendPurchDoc(Rec, false);
                     end;
                 }
                 action("Delete Invoiced")
