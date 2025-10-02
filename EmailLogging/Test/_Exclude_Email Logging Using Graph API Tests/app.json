@@ -16,13 +16,13 @@
       "id": "114e4e19-182b-42e2-b5a9-91d8b8ee8ce1",
       "name": "_Exclude_Email Logging using Graph API",
       "publisher": "Microsoft",
-      "version": "25.3.0.0"
+      "version": "25.4.0.0"
     },
     {
       "id": "5d86850b-0d76-4eca-bd7b-951ad998e997",
       "name": "Tests-TestLibraries",
       "publisher": "Microsoft",
-      "version": "25.3.0.0"
+      "version": "25.4.0.0"
     }
   ],
   "screenshots": [],
@@ -33,5 +33,5 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "25.3.0.0"
+  "application": "25.4.0.0"
 }

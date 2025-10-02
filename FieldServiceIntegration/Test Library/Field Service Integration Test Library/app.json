@@ -16,7 +16,7 @@
       "id": "1ba1031e-eae9-4f20-b9d2-d19b6d1e3f29",
       "name": "Field Service Integration",
       "publisher": "Microsoft",
-      "version": "25.3.0.0"
+      "version": "25.4.0.0"
     }
   ],
   "screenshots": [],
@@ -27,7 +27,7 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "25.3.0.0",
+  "application": "25.4.0.0",
   "idRanges": [
     {
       "from": 139205,
