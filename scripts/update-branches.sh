@@ -64,16 +64,15 @@ else
     for pattern in "${BRANCHES[@]}"; do
         found=false
         while IFS= read -r remote_branch; do
-            # Extract branch name (remove origin/ prefix)
-            branch="${remote_branch#origin/}"
-            branch="${branch#refs/heads/}"
+            # Extract branch name (remove origin/ prefix and trim spaces)
+            branch=$(echo "$remote_branch" | sed 's/^[[:space:]]*origin\///' | sed 's/^refs\/heads\///')
 
             # Check if matches pattern (simple wildcard support)
             if [[ "$branch" == $pattern ]]; then
                 BRANCHES_TO_UPDATE+=("$branch")
                 found=true
             fi
-        done < <(git branch -r | grep "origin/$pattern")
+        done < <(git branch -r | grep -E "^[[:space:]]*origin/$pattern\$" || true)
 
         if [ "$found" == false ]; then
             echo -e "${YELLOW}Warning: No branches found matching pattern: $pattern${NC}"
