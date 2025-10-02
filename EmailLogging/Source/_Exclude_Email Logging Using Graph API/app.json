@@ -33,5 +33,5 @@
     "includeSourceInSymbolFile": true
   },
   "target": "OnPrem",
-  "application": "25.2.0.0"
+  "application": "25.3.0.0"
 }
