@@ -32,10 +32,8 @@ using Microsoft.Assembly.Comment;
 using Microsoft.Inventory.Location;
 using Microsoft.Warehouse.Structure;
 using Microsoft.Manufacturing.ProductionBOM;
-#if not CLEAN25
 using Microsoft.Sales.Pricing;
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Sales.Setup;
 using Microsoft.Purchases.Setup;
@@ -138,7 +136,6 @@ codeunit 137101 "SCM Kitting"
         Assert.ExpectedTestFieldError(BOMComponent.FieldCaption(Type), Format(BOMComponent.Type::Resource));
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CalculateStandardCostAfterCopyAssemblyBOM()
@@ -192,7 +189,6 @@ codeunit 137101 "SCM Kitting"
               LibraryERM.GetAmountRoundingPrecision(), AmountMustBeSame);
         end;
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -268,7 +264,6 @@ codeunit 137101 "SCM Kitting"
         VerifyBOMComponentAfterExplodeBOM(Item."No.", Item2."No.", QuantityPer);
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CalculateStandardCostWithResourcePrice()
@@ -317,7 +312,6 @@ codeunit 137101 "SCM Kitting"
               LibraryERM.GetAmountRoundingPrecision(), AmountMustBeSame);
         end;
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -680,7 +674,6 @@ codeunit 137101 "SCM Kitting"
         LibraryAssembly.PostAssemblyHeader(AssemblyHeader, StrSubstNo(DocumentErrorsMgt.GetNothingToPostErrorMsg()));
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CalculateStandardCostWithSalesDiscount()
@@ -747,7 +740,6 @@ codeunit 137101 "SCM Kitting"
               LibraryERM.GetAmountRoundingPrecision(), AmountMustBeSame);
         end;
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -2775,7 +2767,6 @@ codeunit 137101 "SCM Kitting"
           BOMComponent.Type::Item, AssemblyComponentItem."No.", AssemblyItemNo, '', BOMComponent."Resource Usage Type", Quantity, true);  // Use Base Unit of Measure as True.
     end;
 
-#if not CLEAN25
     local procedure AddItemToAssemblyBOM(Item: Record Item; WithSalesPrice: Boolean)
     var
         BOMComponent: Record "BOM Component";
@@ -2805,7 +2796,6 @@ codeunit 137101 "SCM Kitting"
           BOMComponent.Type::Resource, Resource."No.", Item."No.", '', BOMComponent."Resource Usage Type"::Direct,
           LibraryRandom.RandInt(5), true);  // Use Base Unit of Measure as True and Variant as blank.
     end;
-#endif
 
     local procedure CalculateDateUsingDefaultSafetyLeadTime(): Date
     begin
@@ -2829,7 +2819,7 @@ codeunit 137101 "SCM Kitting"
         PostedAssemblyHeader.CalcActualCosts(ActualCosts);
         exit(ActualCosts[1] + ActualCosts[2] + ActualCosts[3] + ActualCosts[4] + ActualCosts[5]);
     end;
-#if not CLEAN25
+
     local procedure CopyAssemblyBOM(FromParentItemNo: Code[20]; ToParentItemNo: Code[20])
     var
         BOMComponent: Record "BOM Component";
@@ -2841,7 +2831,7 @@ codeunit 137101 "SCM Kitting"
               BOMComponent."Quantity per", true);  // Use Base Unit of Measure as True.
         until BOMComponent.Next() = 0;
     end;
-#endif
+
     local procedure CreateAndPostAssemblyOrder(var AssemblyHeader: Record "Assembly Header"; var AssemblyLine: Record "Assembly Line"; AssemblyItemNo: Code[20]; Quantity: Decimal; HeaderQtyFactor: Integer; CompQtyFactor: Integer; UpdateAllComps: Boolean)
     begin
         LibraryAssembly.CreateAssemblyHeader(AssemblyHeader, CalculateDateUsingDefaultSafetyLeadTime(), AssemblyItemNo, '', Quantity, '');
@@ -3090,7 +3080,6 @@ codeunit 137101 "SCM Kitting"
         LibraryAssembly.AddEntityDimensions(AssemblyLine.Type::Item, Item."No.");
     end;
 
-#if not CLEAN25
     local procedure CreateItemWithSalesLineDiscount(var Item2: Record Item; Item: Record Item)
     var
         SalesLineDiscount: Record "Sales Line Discount";
@@ -3115,7 +3104,6 @@ codeunit 137101 "SCM Kitting"
         SalesPrice.Validate("Unit Price", Item2."Unit Price" + LibraryRandom.RandDec(100, 2));  // Use Different Sales Price.
         SalesPrice.Modify(true);
     end;
-#endif
 
     local procedure CreateMultipleStockkeepingUnit(ItemNo: Code[20]; LocationCode: Code[10]; LocationCode2: Code[10])
     var

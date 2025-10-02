@@ -7392,6 +7392,38 @@ codeunit 137079 "SCM Production Order III"
     end;
 
     [Test]
+    [Scope('OnPrem')]
+    [HandlerFunctions('ConfirmHandler')]
+    procedure RegisterPartialPutAwayAfterSortingWhseActivityLine()
+    var
+        Item: Record Item;
+        PurchaseHeader: Record "Purchase Header";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        QtyToHandle: Decimal;
+        WareHouseActionType: Enum "Warehouse Action Type";
+    begin
+        // [SCENARIO 598381] Regiter partial Whse Put-away successfully when sorting set on Qty. to Handle
+        Initialize();
+
+        // [GIVEN] Create an Item
+        CreateItem(Item);
+
+        // [GIVEN] Create Whse. Receipt form Purchase Order
+        CreateWhseReceiptFromPurchaseOrder(PurchaseHeader, Item."No.", LocationWhite.Code, LibraryRandom.RandInt(20));
+
+        // [GIVEN] Post Warehouse Receipt
+        PostWarehouseReceipt(PurchaseHeader."No.");
+
+        // [WHEN] Update Qty. to Handle, sort the Wharehouse Activity Line on Qty. to Handle and register Warehouse Activity
+        QtyToHandle := LibraryRandom.RandInt(5);
+        UpdateQuantityToHandleAndRegisterWarehouseActivity(PurchaseHeader."No.", WarehouseActivityHeader.Type::"Put-away", QtyToHandle);
+
+        // [THEN] Verify registered Warehouse Activity Lines
+        VerifyRegisteredWhseActivityLine(PurchaseHeader."No.", WarehouseActivityHeader.Type::"Put-away", WareHouseActionType::Take, QtyToHandle);
+        VerifyRegisteredWhseActivityLine(PurchaseHeader."No.", WarehouseActivityHeader.Type::"Put-away", WareHouseActionType::Place, QtyToHandle);
+    end;
+
+    [Test]
     [HandlerFunctions('ConfirmHandler,MessageHandlerWithoutValidation')]
     procedure VerifyReverseItemLedgerEntryShouldBeCreatedForConsumptionWithSamePostedValue()
     var
@@ -7422,38 +7454,6 @@ codeunit 137079 "SCM Production Order III"
             -ItemLedgerEntries.Quantity.AsDecimal(),
             ItemLedgerEntry.Quantity,
             StrSubstNo(ValueMustBeEqualErr, ItemLedgerEntry.FieldCaption(Quantity), -ItemLedgerEntries.Quantity.AsInteger(), ItemLedgerEntry.TableCaption()));
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    [HandlerFunctions('ConfirmHandler')]
-    procedure RegisterPartialPutAwayAfterSortingWhseActivityLine()
-    var
-        Item: Record Item;
-        PurchaseHeader: Record "Purchase Header";
-        WarehouseActivityHeader: Record "Warehouse Activity Header";
-        QtyToHandle: Decimal;
-        WareHouseActionType: Enum "Warehouse Action Type";
-    begin
-        // [SCENARIO 598381] Regiter partial Whse Put-away successfully when sorting set on Qty. to Handle
-        Initialize();
-
-        // [GIVEN] Create an Item
-        CreateItem(Item);
-
-        // [GIVEN] Create Whse. Receipt form Purchase Order
-        CreateWhseReceiptFromPurchaseOrder(PurchaseHeader, Item."No.", LocationWhite.Code, LibraryRandom.RandInt(20));
-
-        // [GIVEN] Post Warehouse Receipt
-        PostWarehouseReceipt(PurchaseHeader."No.");
-
-        // [WHEN] Update Qty. to Handle, sort the Wharehouse Activity Line on Qty. to Handle and register Warehouse Activity
-        QtyToHandle := LibraryRandom.RandInt(5);
-        UpdateQuantityToHandleAndRegisterWarehouseActivity(PurchaseHeader."No.", WarehouseActivityHeader.Type::"Put-away", QtyToHandle);
-
-        // [THEN] Verify registered Warehouse Activity Lines
-        VerifyRegisteredWhseActivityLine(PurchaseHeader."No.", WarehouseActivityHeader.Type::"Put-away", WareHouseActionType::Take, QtyToHandle);
-        VerifyRegisteredWhseActivityLine(PurchaseHeader."No.", WarehouseActivityHeader.Type::"Put-away", WareHouseActionType::Place, QtyToHandle);
     end;
 
     local procedure Initialize()

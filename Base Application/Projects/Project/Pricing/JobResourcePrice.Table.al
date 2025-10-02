@@ -1,4 +1,3 @@
-#if not CLEANSCHEMA28 
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -13,16 +12,8 @@ using Microsoft.Utilities;
 table 1012 "Job Resource Price"
 {
     Caption = 'Project Resource Price';
-#if not CLEAN25
     DrillDownPageID = "Job Resource Prices";
     LookupPageID = "Job Resource Prices";
-    ObsoleteState = Pending;
-    ObsoleteTag = '16.0';
-#else
-    ObsoleteState = Removed;
-    ObsoleteTag = '28.0';
-#endif    
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
     DataClassification = CustomerContent;
 
     fields
@@ -206,6 +197,3 @@ table 1012 "Job Resource Price"
         Job.Get("Job No.");
     end;
 }
-
- 
-#endif

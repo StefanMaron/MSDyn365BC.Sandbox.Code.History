@@ -5,6 +5,7 @@
 namespace Microsoft.CRM.Interaction;
 
 using Microsoft.CRM.Campaign;
+using Microsoft.Utilities;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Segment;
@@ -624,6 +625,7 @@ table 5065 "Interaction Log Entry"
         IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
         ReturnShipmentHeader: Record "Return Shipment Header";
+        PageManagement: Codeunit "Page Management";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -643,7 +645,7 @@ table 5065 "Interaction Log Entry"
                     Page.Run(Page::"Sales Quote Archive", SalesHeaderArchive);
                 end else begin
                     SalesHeader.Get(SalesHeader."Document Type"::Quote, "Document No.");
-                    Page.Run(Page::"Sales Quote", SalesHeader);
+                    PageManagement.PageRun(SalesHeader);
                 end;
             "Document Type"::"Sales Blnkt. Ord":
                 if "Version No." <> 0 then begin
@@ -655,7 +657,7 @@ table 5065 "Interaction Log Entry"
                     Page.Run(Page::"Blanket Sales Order Archive", SalesHeaderArchive);
                 end else begin
                     SalesHeader.Get(SalesHeader."Document Type"::"Blanket Order", "Document No.");
-                    Page.Run(Page::"Blanket Sales Order", SalesHeader);
+                    PageManagement.PageRun(SalesHeader);
                 end;
             "Document Type"::"Sales Ord. Cnfrmn.":
                 if "Version No." <> 0 then begin
@@ -668,27 +670,27 @@ table 5065 "Interaction Log Entry"
                     Page.Run(Page::"Sales Order Archive", SalesHeaderArchive);
                 end else begin
                     SalesHeader.Get(SalesHeader."Document Type"::Order, "Document No.");
-                    Page.Run(Page::"Sales Order", SalesHeader);
+                    PageManagement.PageRun(SalesHeader);
                 end;
             "Document Type"::"Sales Draft Invoice":
                 begin
                     SalesHeader.Get(SalesHeader."Document Type"::Invoice, "Document No.");
-                    Page.Run(Page::"Sales Invoice", SalesHeader);
+                    PageManagement.PageRun(SalesHeader);
                 end;
             "Document Type"::"Sales Inv.":
                 begin
                     SalesInvHeader.Get("Document No.");
-                    Page.Run(Page::"Posted Sales Invoice", SalesInvHeader);
+                    PageManagement.PageRun(SalesInvHeader);
                 end;
             "Document Type"::"Sales Shpt. Note":
                 begin
                     SalesShptHeader.Get("Document No.");
-                    Page.Run(Page::"Posted Sales Shipment", SalesShptHeader);
+                    PageManagement.PageRun(SalesShptHeader);
                 end;
             "Document Type"::"Sales Cr. Memo":
                 begin
                     SalesCrMemoHeader.Get("Document No.");
-                    Page.Run(Page::"Posted Sales Credit Memo", SalesCrMemoHeader);
+                    PageManagement.PageRun(SalesCrMemoHeader);
                 end;
             "Document Type"::"Sales Stmnt.":
                 Error(CantViewStatementsErr);
@@ -708,7 +710,7 @@ table 5065 "Interaction Log Entry"
                     Page.Run(Page::"Purchase Quote Archive", PurchHeaderArchive);
                 end else begin
                     PurchHeader.Get(PurchHeader."Document Type"::Quote, "Document No.");
-                    Page.Run(Page::"Purchase Quote", PurchHeader);
+                    PageManagement.PageRun(PurchHeader);
                 end;
             "Document Type"::"Purch. Blnkt. Ord.":
                 if "Version No." <> 0 then begin
@@ -721,7 +723,7 @@ table 5065 "Interaction Log Entry"
                     Page.Run(Page::"Blanket Purchase Order Archive", PurchHeaderArchive);
                 end else begin
                     PurchHeader.Get(PurchHeader."Document Type"::"Blanket Order", "Document No.");
-                    Page.Run(Page::"Blanket Purchase Order", PurchHeader);
+                    PageManagement.PageRun(PurchHeader);
                 end;
             "Document Type"::"Purch. Ord.":
                 if "Version No." <> 0 then begin
@@ -734,31 +736,34 @@ table 5065 "Interaction Log Entry"
                     Page.Run(Page::"Purchase Order Archive", PurchHeaderArchive);
                 end else begin
                     PurchHeader.Get(PurchHeader."Document Type"::Order, "Document No.");
-                    Page.Run(Page::"Purchase Order", PurchHeader);
+                    PageManagement.PageRun(PurchHeader);
                 end;
             "Document Type"::"Purch. Inv.":
                 begin
                     PurchInvHeader.Get("Document No.");
-                    Page.Run(Page::"Posted Purchase Invoice", PurchInvHeader);
+                    PageManagement.PageRun(PurchInvHeader);
                 end;
             "Document Type"::"Purch. Rcpt.":
                 begin
                     PurchRcptHeader.Get("Document No.");
-                    Page.Run(Page::"Posted Purchase Receipt", PurchRcptHeader);
+                    PageManagement.PageRun(PurchRcptHeader);
                 end;
             "Document Type"::"Purch. Cr. Memo":
                 begin
                     PurchCrMemoHeader.Get("Document No.");
-                    Page.Run(Page::"Posted Purchase Credit Memo", PurchCrMemoHeader);
+                    PageManagement.PageRun(PurchCrMemoHeader);
                 end;
             "Document Type"::"Cover Sheet":
                 Error(CantShowCoverSheetsErr);
             "Document Type"::"Sales Return Order":
                 if SalesHeader.Get(SalesHeader."Document Type"::"Return Order", "Document No.") then
-                    Page.Run(Page::"Sales Return Order", SalesHeader)
+                    PageManagement.PageRun(SalesHeader)
                 else begin
                     ReturnRcptHeader.SetRange("Return Order No.", "Document No.");
-                    Page.Run(Page::"Posted Return Receipt", ReturnRcptHeader);
+                    if ReturnRcptHeader.Count() = 1 then
+                        PageManagement.PageRun(ReturnRcptHeader)
+                    else
+                        PageManagement.PageRunList(ReturnRcptHeader);
                 end;
             "Document Type"::"Sales Finance Charge Memo":
                 begin
@@ -768,19 +773,22 @@ table 5065 "Interaction Log Entry"
             "Document Type"::"Sales Return Receipt":
                 begin
                     ReturnReceiptHeader.Get("Document No.");
-                    Page.Run(Page::"Posted Return Receipt", ReturnReceiptHeader);
+                    PageManagement.PageRun(ReturnReceiptHeader);
                 end;
             "Document Type"::"Purch. Return Shipment":
                 begin
                     ReturnShipmentHeader.Get("Document No.");
-                    Page.Run(Page::"Posted Return Shipment", ReturnShipmentHeader);
+                    PageManagement.PageRun(ReturnShipmentHeader);
                 end;
             "Document Type"::"Purch. Return Ord. Cnfrmn.":
                 if PurchHeader.Get(PurchHeader."Document Type"::"Return Order", "Document No.") then
-                    Page.Run(Page::"Purchase Return Order", PurchHeader)
+                    PageManagement.PageRun(PurchHeader)
                 else begin
                     ReturnShipmentHeader.SetRange("Return Order No.", "Document No.");
-                    Page.Run(Page::"Posted Return Shipment", ReturnShipmentHeader);
+                    if ReturnShipmentHeader.Count() = 1 then
+                        PageManagement.PageRun(ReturnShipmentHeader)
+                    else
+                        PageManagement.PageRunList(ReturnShipmentHeader);
                 end;
         end;
 

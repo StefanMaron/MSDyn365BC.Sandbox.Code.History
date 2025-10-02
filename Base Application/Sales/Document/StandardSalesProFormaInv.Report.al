@@ -364,6 +364,7 @@ report 1302 "Standard Sales - Pro Forma Inv"
             }
             dataitem(Totals; "Integer")
             {
+                DataItemTableView = sorting(Number);
                 MaxIteration = 1;
                 column(TotalWeight; TotalWeight)
                 {

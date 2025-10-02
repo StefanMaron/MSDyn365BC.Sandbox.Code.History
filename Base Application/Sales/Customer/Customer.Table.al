@@ -74,10 +74,8 @@ table 18 Customer
                   tabledata "Payment Terms" = R,
                   TableData "Price List Header" = rd,
                   TableData "Price List Line" = rd,
-#if not CLEAN25
                   TableData "Sales Price" = rd,
                   TableData "Sales Line Discount" = rd,
-#endif
                   TableData "Sales Price Access" = rd,
                   TableData "Sales Discount Access" = rd,
                   tabledata "Customer Templ." = rm,
@@ -3700,6 +3698,8 @@ table 18 Customer
         OnAfterGetVATRegistrationNo(Rec, VATRegNo);
     end;
 
+#if not CLEAN28
+    [Obsolete('It is no longer used in GetTotalAmountLCYCommon procedure.', '28.0')]
     procedure GetShippedOutstandingInvoicesAmountLCY(): Decimal
     var
         SalesLine: Record "Sales Line";
@@ -3712,6 +3712,7 @@ table 18 Customer
         exit(SalesLine."Outstanding Amount (LCY)");
     end;
 
+    [Obsolete('It is no longer used in GetTotalAmountLCYCommon procedure.', '28.0')]
     procedure GetShippedFromOrderLCYAmountLCY(): Decimal
     var
         SalesShippedNotInvoicedLCY: Query "Sales Shipped Not Invoiced LCY";
@@ -3732,6 +3733,7 @@ table 18 Customer
             end;
         exit(ShippedFromOrderLCY);
     end;
+#endif
 
     procedure GetDefaultLocation() ReturnLocationCode: Code[10]
     var

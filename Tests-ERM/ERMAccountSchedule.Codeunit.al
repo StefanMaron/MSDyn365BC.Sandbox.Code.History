@@ -5751,7 +5751,7 @@ codeunit 134902 "ERM Account Schedule"
         FinancialReports.FILTER.SetFilter(Name, AccScheduleLine."Schedule Name");
         AccScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
-        AccScheduleOverview.NegativeAmountFormat.Value(Format(Enum::"Analysis Negative Format"::"Minus Sign"));
+        AccScheduleOverview.NegativeAmountFormatDefault.Value(Format(Enum::"Fin. Report Negative Format"::"Minus Sign"));
 
         // [THEN] Negative amount is displayed with a minus sign
         AccScheduleOverview.GoToRecord(AccScheduleLine);
@@ -5784,7 +5784,7 @@ codeunit 134902 "ERM Account Schedule"
         FinancialReports.FILTER.SetFilter(Name, AccScheduleLine."Schedule Name");
         AccScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
-        AccScheduleOverview.NegativeAmountFormat.Value(Format(Enum::"Analysis Negative Format"::Parentheses));
+        AccScheduleOverview.NegativeAmountFormatDefault.Value(Format(Enum::"Fin. Report Negative Format"::Parentheses));
 
         // [THEN] Negative amount is displayed with parentheses
         AccScheduleOverview.GoToRecord(AccScheduleLine);
@@ -5864,6 +5864,62 @@ codeunit 134902 "ERM Account Schedule"
     end;
 
     [Test]
+    [Scope('OnPrem')]
+    procedure AccountScheduleOverviewNegativeFormatDefault()
+    var
+        AccScheduleLine: Record "Acc. Schedule Line";
+        FinancialReport: Record "Financial Report";
+        GLSetup: Record "General Ledger Setup";
+        AccScheduleOverview: TestPage "Acc. Schedule Overview";
+        FinancialReports: TestPage "Financial Reports";
+        Amount: Decimal;
+    begin
+        // [SCENARIO] When using parentheses as negative format, a negative amount should be displayed with parentheses on the page
+        Initialize();
+#if not CLEAN27
+        EnabledFinancialReportDefaultsFeature();
+#endif
+        GLSetup.Get();
+
+        // [GIVEN] An account schedule line with negative value
+        Amount := -LibraryRandom.RandDec(100, 2);
+        SetupForAccountScheduleOverviewPage(
+          AccScheduleLine, Enum::"Column Layout Show"::Always, Amount, Enum::"Analysis Rounding Factor"::None, '');
+        FinancialReport.Get(AccScheduleLine."Schedule Name");
+        FinancialReport."Financial Report Column Group" := LibraryVariableStorage.DequeueText();
+        FinancialReport.Modify();
+
+        // [WHEN] Account schedule overview is opened with negative amount format as parentheses
+        FinancialReports.OpenView();
+        FinancialReports.FILTER.SetFilter(Name, AccScheduleLine."Schedule Name");
+        AccScheduleOverview.Trap();
+        FinancialReports.Overview.Invoke();
+        AccScheduleOverview.NegativeAmountFormatDefault.Value(Format(Enum::"Fin. Report Negative Format"::Default));
+
+        // [GIVEN] GL Setup negative amount format is set parentheses
+        GLSetup.Validate("Fin. Rep. Neg. Amount Format", GLSetup."Fin. Rep. Neg. Amount Format"::Parentheses);
+        GLSetup.Modify();
+
+        // [THEN] Negative amount is displayed with parentheses
+        Clear(AccScheduleOverview);
+        AccScheduleOverview.Trap();
+        FinancialReports.Overview.Invoke();
+        AccScheduleOverview.GoToRecord(AccScheduleLine);
+        AccScheduleOverview.ColumnValues1.AssertEquals('(' + Format(Abs(Amount), 0, RoundingFormatTxt) + ')');
+
+        // [GIVEN] GL Setup negative amount format is set minus sign
+        GLSetup.Validate("Fin. Rep. Neg. Amount Format", GLSetup."Fin. Rep. Neg. Amount Format"::"Minus Sign");
+        GLSetup.Modify();
+
+        // [THEN] Negative amount is displayed with minus sign
+        Clear(AccScheduleOverview);
+        AccScheduleOverview.Trap();
+        FinancialReports.Overview.Invoke();
+        AccScheduleOverview.GoToRecord(AccScheduleLine);
+        AccScheduleOverview.ColumnValues1.AssertEquals(Format(Amount, 0, RoundingFormatTxt));
+    end;
+
+    [Test]
     [HandlerFunctions('AccountScheduleRequestPageNegativeFormatHandler')]
     [Scope('OnPrem')]
     procedure AccountScheduleInheritNegativeFormat()
@@ -5883,7 +5939,7 @@ codeunit 134902 "ERM Account Schedule"
         FinancialReports.Filter.SetFilter(Name, AccScheduleName.Name);
         AccountScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
-        AccountScheduleOverview.NegativeAmountFormat.SetValue(Enum::"Analysis Negative Format"::"Minus Sign");
+        AccountScheduleOverview.NegativeAmountFormatDefault.SetValue(Enum::"Fin. Report Negative Format"::"Minus Sign");
         Commit();
 
         // [WHEN] Running account schedule report from account schedule overview
@@ -5893,13 +5949,204 @@ codeunit 134902 "ERM Account Schedule"
         // [THEN] Account schedule report inherits negative amount format as minus sign
 
         // [WHEN] Negative amount format is changed to parentheses and account schedule report is ran again
-        AccountScheduleOverview.NegativeAmountFormat.SetValue(Enum::"Analysis Negative Format"::Parentheses);
+        AccountScheduleOverview.NegativeAmountFormatDefault.SetValue(Enum::"Fin. Report Negative Format"::Parentheses);
         Commit();
         LibraryVariableStorage.Enqueue(Enum::"Analysis Negative Format"::Parentheses);
         AccountScheduleOverview.Print.Invoke();
         // Handled by AccountScheduleRequestPageNegativeFormatHandler
         // [THEN] Account schedule report inherits negative amount format as parentheses
     end;
+
+    [Test]
+    [HandlerFunctions('AccountScheduleRequestPageNegativeFormatHandler')]
+    [Scope('OnPrem')]
+    procedure AccountScheduleDefaultNegativeFormatMinusSign()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        ColumnLayoutName: Record "Column Layout Name";
+        GLSetup: Record "General Ledger Setup";
+        FinancialReports: TestPage "Financial Reports";
+        AccountScheduleOverview: TestPage "Acc. Schedule Overview";
+    begin
+        // [SCENARIO] Account Schedule defaults negative format option from GL Setup
+        Initialize();
+#if not CLEAN27
+        EnabledFinancialReportDefaultsFeature();
+#endif
+
+        // [GIVEN] GL Setup negative amount format is set minus sign
+        GLSetup.Get();
+        GLSetup.Validate("Fin. Rep. Neg. Amount Format", GLSetup."Fin. Rep. Neg. Amount Format"::"Minus Sign");
+        GLSetup.Modify();
+        Commit();
+
+        // [GIVEN] An financial report with negative amount format as default
+        CreateAccountScheduleNameAndColumn(AccScheduleName, ColumnLayoutName);
+        Commit();
+        FinancialReports.OpenEdit();
+        FinancialReports.Filter.SetFilter(Name, AccScheduleName.Name);
+        AccountScheduleOverview.Trap();
+        FinancialReports.Overview.Invoke();
+        AccountScheduleOverview.NegativeAmountFormatDefault.SetValue(Enum::"Fin. Report Negative Format"::Default);
+
+        // [WHEN] Running account schedule report from account schedule overview
+        LibraryVariableStorage.Enqueue(Enum::"Analysis Negative Format"::"Minus Sign");
+        AccountScheduleOverview.Print.Invoke();
+        // Handled by AccountScheduleRequestPageNegativeFormatHandler
+        // [THEN] Account schedule report defaults negative amount format as minus sign
+    end;
+
+
+    [Test]
+    [HandlerFunctions('AccountScheduleRequestPageNegativeFormatHandler')]
+    [Scope('OnPrem')]
+    procedure AccountScheduleDefaultNegativeFormatParenthesis()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        ColumnLayoutName: Record "Column Layout Name";
+        GLSetup: Record "General Ledger Setup";
+        FinancialReports: TestPage "Financial Reports";
+        AccountScheduleOverview: TestPage "Acc. Schedule Overview";
+    begin
+        // [SCENARIO] Account Schedule defaults negative format option from GL Setup
+        Initialize();
+#if not CLEAN27
+        EnabledFinancialReportDefaultsFeature();
+#endif
+
+        // [GIVEN] GL Setup negative amount format is set parentheses
+        GLSetup.Get();
+        GLSetup.Validate("Fin. Rep. Neg. Amount Format", GLSetup."Fin. Rep. Neg. Amount Format"::Parentheses);
+        GLSetup.Modify();
+        Commit();
+
+        // [GIVEN] An financial report with negative amount format as default
+        CreateAccountScheduleNameAndColumn(AccScheduleName, ColumnLayoutName);
+        Commit();
+        FinancialReports.OpenEdit();
+        FinancialReports.Filter.SetFilter(Name, AccScheduleName.Name);
+        AccountScheduleOverview.Trap();
+        FinancialReports.Overview.Invoke();
+        AccountScheduleOverview.NegativeAmountFormatDefault.SetValue(Enum::"Fin. Report Negative Format"::Default);
+
+        // [WHEN] Running account schedule report from account schedule overview again
+        LibraryVariableStorage.Enqueue(Enum::"Analysis Negative Format"::Parentheses);
+        AccountScheduleOverview.Print.Invoke();
+        // Handled by AccountScheduleRequestPageNegativeFormatHandler
+        // [THEN] Account schedule report defaults negative amount format as parentheses
+    end;
+
+    [Test]
+    [HandlerFunctions('ViewByDefaultValuesOnOverviewPageHandler')]
+    [Scope('OnPrem')]
+    procedure AccountScheduleViewByDayFromDefault()
+    begin
+        // Check that correct values updated in the newly created column on Account Schedule Overview Page when the default View by is set to Day.
+        Initialize();
+#if not CLEAN27
+        EnabledFinancialReportDefaultsFeature();
+#endif
+        LibraryLowerPermissions.SetFinancialReporting();
+        LibraryLowerPermissions.AddO365Setup();
+        AccountScheduleOverviewByPeriod(ViewByRef::Day);
+    end;
+
+    [Test]
+    [HandlerFunctions('ViewByDefaultValuesOnOverviewPageHandler')]
+    [Scope('OnPrem')]
+    procedure AccountScheduleViewByWeekFromDefault()
+    begin
+        // Check that correct values updated in the newly created column on Account Schedule Overview Page when the default View by is set to Week.
+        Initialize();
+#if not CLEAN27
+        EnabledFinancialReportDefaultsFeature();
+#endif
+        LibraryLowerPermissions.SetFinancialReporting();
+        LibraryLowerPermissions.AddO365Setup();
+        AccountScheduleOverviewByPeriod(ViewByRef::Week);
+    end;
+
+    [Test]
+    [HandlerFunctions('ViewByDefaultValuesOnOverviewPageHandler')]
+    [Scope('OnPrem')]
+    procedure AccountScheduleViewByMonthFromDefault()
+    begin
+        // Check that correct values updated in the newly created column on Account Schedule Overview Page when the default View by is set to Month.
+        Initialize();
+#if not CLEAN27
+        EnabledFinancialReportDefaultsFeature();
+#endif
+        LibraryLowerPermissions.SetFinancialReporting();
+        LibraryLowerPermissions.AddO365Setup();
+        AccountScheduleOverviewByPeriod(ViewByRef::Month);
+    end;
+
+    [Test]
+    [HandlerFunctions('ViewByDefaultValuesOnOverviewPageHandler')]
+    [Scope('OnPrem')]
+    procedure AccountScheduleViewByQuarterFromDefault()
+    begin
+        // Check that correct values updated in the newly created column on Account Schedule Overview Page when the default View by is set to Quarter.
+        Initialize();
+#if not CLEAN27
+        EnabledFinancialReportDefaultsFeature();
+#endif
+        LibraryLowerPermissions.SetFinancialReporting();
+        LibraryLowerPermissions.AddO365Setup();
+        AccountScheduleOverviewByPeriod(ViewByRef::Quarter);
+    end;
+
+    [Test]
+    [HandlerFunctions('ViewByDefaultValuesOnOverviewPageHandler')]
+    [Scope('OnPrem')]
+    procedure AccountScheduleViewByYearFromDefault()
+    begin
+        // Check that correct values updated in the newly created column on Account Schedule Overview Page when the default View by is set to Year.
+        Initialize();
+#if not CLEAN27
+        EnabledFinancialReportDefaultsFeature();
+#endif
+        LibraryLowerPermissions.SetFinancialReporting();
+        LibraryLowerPermissions.AddO365Setup();
+        AccountScheduleOverviewByPeriod(ViewByRef::Year);
+    end;
+
+    [PageHandler]
+    [Scope('OnPrem')]
+    procedure ViewByDefaultValuesOnOverviewPageHandler(var AccScheduleOverview: TestPage "Acc. Schedule Overview")
+    var
+        GLSetup: Record "General Ledger Setup";
+        RowNo: Variant;
+    begin
+        AccScheduleOverview.CurrentColumnName.SetValue(LibraryVariableStorage.DequeueText());
+        AccScheduleOverview.CurrentSchedName.SetValue(LibraryVariableStorage.DequeueText());
+        AccScheduleOverview.FinancialReportName.SetValue(AccScheduleOverview.CurrentSchedName);
+        AccScheduleOverview.UseAmtsInAddCurr.SetValue(false);
+        LibraryVariableStorage.Dequeue(RowNo);
+        AccScheduleOverview."Row No.".AssertEquals(RowNo);
+
+        GLSetup.Get();
+        GLSetup."Fin. Rep. Period Type" := Enum::"Analysis Period Type".FromInteger(LibraryVariableStorage.DequeueInteger());
+        GLSetup.Modify();
+
+        AccScheduleOverview.PeriodTypeDefault.SetValue(Enum::"Financial Report Period Type"::Default);
+        AccScheduleOverview.ColumnValues1.AssertEquals(LibraryVariableStorage.DequeueDecimal());
+        AccScheduleOverview.PeriodTypeDefault.SetValue(ViewByRef::Day);
+        AccScheduleOverview.OK().Invoke();
+    end;
+
+#if not CLEAN27
+    local procedure EnabledFinancialReportDefaultsFeature()
+    var
+        FeatureKey: Record "Feature Key";
+        FeatureFinancialReportDef: Codeunit "Feature - Fin. Report Default";
+    begin
+        if FeatureKey.Get(FeatureFinancialReportDef.GetFinancialReportDefaultsFeatureKey()) then begin
+            FeatureKey.Enabled := FeatureKey.Enabled::"All Users";
+            FeatureKey.Modify();
+        end;
+    end;
+#endif
 
     [Test]
     procedure ColumnLayoutGLAccountTotaling()
@@ -7397,9 +7644,9 @@ codeunit 134902 "ERM Account Schedule"
         AccScheduleOverview.UseAmtsInAddCurr.SetValue(false);
         LibraryVariableStorage.Dequeue(RowNo);
         AccScheduleOverview."Row No.".AssertEquals(RowNo);
-        AccScheduleOverview.PeriodType.SetValue(LibraryVariableStorage.DequeueInteger());
+        AccScheduleOverview.PeriodTypeDefault.SetValue(LibraryVariableStorage.DequeueInteger());
         AccScheduleOverview.ColumnValues1.AssertEquals(LibraryVariableStorage.DequeueDecimal());
-        AccScheduleOverview.PeriodType.SetValue(ViewByRef::Day);
+        AccScheduleOverview.PeriodTypeDefault.SetValue(ViewByRef::Day);
         AccScheduleOverview.OK().Invoke();
     end;
 

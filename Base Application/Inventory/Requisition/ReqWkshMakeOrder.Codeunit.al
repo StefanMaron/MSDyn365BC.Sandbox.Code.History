@@ -672,7 +672,12 @@ codeunit 333 "Req. Wksh.-Make Order"
         TransferFromReqLineToPurchLine(PurchOrderLine, ReqLine2);
         OnInsertPurchOrderLineOnAfterTransferFromReqLineToPurchLine(PurchOrderLine, ReqLine2);
 
-        PurchOrderLine."Drop Shipment" := ReqLine2."Sales Order Line No." <> 0;
+        PurchOrderLine."Drop Shipment" := (ReqLine2."Sales Order Line No." <> 0) or ((ReqLine2."Drop Shipment") and (ReqLine2."Demand Type" = Database::"Sales Line"));
+
+        if (ReqLine2."Drop Shipment") and (ReqLine2."Sales Order Line No." = 0) then begin
+            PurchOrderLine.Validate("Sales Order No.", ReqLine2."Demand Order No.");
+            PurchOrderLine.Validate("Sales Order Line No.", ReqLine2."Demand Line No.");
+        end;
 
         if PurchasingCode.Get(ReqLine2."Purchasing Code") then
             if PurchasingCode."Special Order" then begin

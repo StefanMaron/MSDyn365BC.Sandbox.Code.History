@@ -545,32 +545,26 @@ table 252 "General Posting Setup"
 
     internal procedure CheckPrepmtSalesLinesToDeduct(ErrorMsg: Text)
     var
-        SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
     begin
         SalesLine.SetLoadFields("Document No.");
         SalesLine.SetRange("Gen. Bus. Posting Group", "Gen. Bus. Posting Group");
         SalesLine.SetRange("Gen. Prod. Posting Group", "Gen. Prod. Posting Group");
         SalesLine.SetFilter("Prepmt Amt to Deduct", '>0');
-        if SalesLine.FindFirst() then begin
-            SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
-            Error(ErrorMsg, SalesHeader.RecordId);
-        end;
+        if SalesLine.FindFirst() then
+            Error(ErrorMsg, SalesLine.GetSalesHeader().RecordId);
     end;
 
     internal procedure CheckPrepmtPurchLinesToDeduct(ErrorMsg: Text)
     var
-        PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
     begin
         PurchaseLine.SetLoadFields("Document No.");
         PurchaseLine.SetRange("Gen. Bus. Posting Group", "Gen. Bus. Posting Group");
         PurchaseLine.SetRange("Gen. Prod. Posting Group", "Gen. Prod. Posting Group");
         PurchaseLine.SetFilter("Prepmt Amt to Deduct", '>0');
-        if PurchaseLine.FindFirst() then begin
-            PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
-            Error(ErrorMsg, PurchaseHeader.RecordId);
-        end;
+        if PurchaseLine.FindFirst() then
+            Error(ErrorMsg, PurchaseLine.GetPurchHeader().RecordId);
     end;
 
     local procedure FilterBlankSalesDiscountAccounts(DiscountPosting: Option; var FieldNumber: Integer) Found: Boolean
