@@ -34,6 +34,7 @@ table 132209 "Perf Profiler Events Test"
         }
         field(8; Duration; Decimal)
         {
+            AutoFormatType = 0;
         }
         field(9; HitCount; Integer)
         {
@@ -44,6 +45,7 @@ table 132209 "Perf Profiler Events Test"
                                                                           "Session ID" = field("Session ID"),
                                                                           Statement = filter(<> '*2000000207*User AL Code*' & <> '*2000000071*User AL Code*')));
             FieldClass = FlowField;
+            AutoFormatType = 0;
         }
         field(11; "Total SQL Queries"; Integer)
         {
@@ -60,6 +62,7 @@ table 132209 "Perf Profiler Events Test"
                                                                           "Session ID" = field("Session ID"),
                                                                           Statement = filter(<> '*2000000207*User AL Code*' & <> '*2000000071*User AL Code*')));
             FieldClass = FlowField;
+            AutoFormatType = 0;
         }
         field(13; "Total SQL Query Hit Count"; Integer)
         {
@@ -76,6 +79,7 @@ table 132209 "Perf Profiler Events Test"
                                                                           "Session ID" = field("Session ID"),
                                                                           Statement = filter(<> '*2000000207*User AL Code*' & <> '*2000000071*User AL Code*')));
             FieldClass = FlowField;
+            AutoFormatType = 0;
         }
         field(15; "Max SQL Query Hit Count"; Integer)
         {
@@ -136,4 +140,3 @@ table 132209 "Perf Profiler Events Test"
     {
     }
 }
-

@@ -7,9 +7,6 @@
       "path": "./Business Foundation Test Libraries"
     },
     {
-      "path": "./Performance Toolkit Tests"
-    },
-    {
       "path": "./System Application Test Library"
     },
     {
@@ -56,9 +53,6 @@
     },
     {
       "path": "./Tests-Integration-Internal"
-    },
-    {
-      "path": "./Tests-Invoicing"
     },
     {
       "path": "./Tests-Job"
@@ -148,9 +142,6 @@
       "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
       "path": "./Test Runner/src/DataDrivenTest"
     },
     {
@@ -159,10 +150,10 @@
   ],
   "settings": {
     "allint.enabled": false,
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false
+    }
   }
 }
