@@ -150,7 +150,7 @@ codeunit 7307 "Whse.-Activity-Register"
         RegisterWhseActivityLines(GlobalWhseActivLine, TempWhseActivLineToReserve, TempWhseActivityLineGrouped);
         GlobalWhseActivLine.SetRange("Breakbulk No.");
 
-        OnCodeOnBeforeTempWhseActivityLineGroupedLoop(GlobalWhseActivHeader, GlobalWhseActivLine, RegisteredWhseActivHeader, TempWhseActivityLineGrouped);
+        OnCodeOnBeforeTempWhseActivityLineGroupedLoop(GlobalWhseActivHeader, GlobalWhseActivLine, RegisteredWhseActivHeader);
         TempWhseActivityLineGrouped.Reset();
         if TempWhseActivityLineGrouped.FindSet() then
             repeat
@@ -947,12 +947,7 @@ codeunit 7307 "Whse.-Activity-Register"
         WhseItemTrackingSetup: Record "Item Tracking Setup";
         WhseLocation: Record Location;
         BreakBulkQtyBaseToPlace: Decimal;
-        IsHandled: Boolean;
     begin
-        OnBeforeCheckBinContent(TempBinContentBuffer, IsHandled);
-        if IsHandled then
-            exit;
-
         TempBinContentBuffer.SetFilter("Qty. to Handle (Base)", '<>0');
         if TempBinContentBuffer.Find('-') then
             repeat
@@ -1165,11 +1160,10 @@ codeunit 7307 "Whse.-Activity-Register"
                     if QtyToRegisterBase > QtyAvailToRegisterBase then
                         QtyAvailToInsertBase -= QtyToRegisterBase - QtyAvailToRegisterBase;
                     OnBeforeCheckQtyAvailToInsertBase(TempWhseActivLine, QtyAvailToInsertBase);
-                    if not CheckAllowWhseOverpick(TempWhseActivLine."Item No.") then
-                        if QtyAvailToInsertBase < 0 then
-                            Error(
-                              InsufficientQtyItemTrkgErr, TempWhseActivLine."Source Line No.", TempWhseActivLine."Source Document",
-                              TempWhseActivLine."Source No.");
+                    if QtyAvailToInsertBase < 0 then
+                        Error(
+                          InsufficientQtyItemTrkgErr, TempWhseActivLine."Source Line No.", TempWhseActivLine."Source Document",
+                          TempWhseActivLine."Source No.");
 
                     if TempWhseActivLine.TrackingExists() then begin
                         WhseItemTrackingSetup.CopyTrackingFromWhseActivityLine(TempWhseActivLine);
@@ -2242,7 +2236,6 @@ codeunit 7307 "Whse.-Activity-Register"
             if Item."Reserved Qty. on Inventory" > 0 then begin
                 xReservedQty := Item."Reserved Qty. on Inventory";
                 WhseActivityItemTrackingSetup.CopyTrackingFromWhseActivityLine(WhseActivLine);
-                RemoveNonSpecificReservations(WhseActivLine, WhseItemTrackingSetup, QtyToRelease);
                 LateBindingMgt.ReleaseForReservation(
                   WhseActivLine."Item No.", WhseActivLine."Variant Code", WhseActivLine."Location Code",
                   WhseActivityItemTrackingSetup, QtyToRelease);
@@ -2331,57 +2324,6 @@ codeunit 7307 "Whse.-Activity-Register"
                 WarehouseActivityLine.ResetQtyToHandleOnReservation();
             until WarehouseActivityLine.Next() = 0;
     end;
-
-    local procedure CheckAllowWhseOverpick(ItemNo: Code[20]): Boolean
-    var
-        WarehouseActivityLine: Record "Warehouse Activity Line";
-    begin
-        WarehouseActivityLine.SetLoadFields("Item No.");
-        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityLine."Activity Type"::Pick);
-        WarehouseActivityLine.SetRange("Source Document", WarehouseActivityLine."Source Document"::"Prod. Consumption");
-        WarehouseActivityLine.SetRange("Whse. Document Type", WarehouseActivityLine."Whse. Document Type"::Production);
-        WarehouseActivityLine.SetRange("Source Type", Database::"Prod. Order Component");
-        WarehouseActivityLine.SetRange("Source Subtype", WarehouseActivityLine."Source Subtype"::"3");
-        WarehouseActivityLine.SetRange("Item No.", ItemNo);
-        if WarehouseActivityLine.FindFirst() then
-            GetItem(WarehouseActivityLine."Item No.");
-
-        exit(Item."Allow Whse. Overpick");
-    end;
-
-    local procedure RemoveNonSpecificReservations(WhseActivLine: Record "Warehouse Activity Line"; WhseItemTrackingSetup: Record "Item Tracking Setup"; QtyToRelease: Decimal)
-    var
-        ReservationEntry: Record "Reservation Entry";
-        SalesLine: Record "Sales Line";
-        QtyToPick: Decimal;
-    begin
-        if not WhseItemTrackingSetup.TrackingRequired() then
-            exit;
-        if not (WhseActivLine."Source Type" = Database::"Sales Line") then
-            exit;
-
-        QtyToPick := QtyToRelease;
-        SalesLine.Get(WhseActivLine."Source Subtype", WhseActivLine."Source No.", WhseActivLine."Source Line No.");
-        ReservationEntry.SetSourceFilter(WhseActivLine."Source Type", WhseActivLine."Source Subtype", WhseActivLine."Source No.", WhseActivLine."Source Line No.", true);
-        ReservationEntry.SetRange(Positive, false);
-        if ReservationEntry.FindSet() then
-            repeat
-                DeleteNonSpecificReservationEntries(ReservationEntry, SalesLine, QtyToPick);
-            until (ReservationEntry.Next() = 0) or (QtyToPick >= 0);
-    end;
-
-    local procedure DeleteNonSpecificReservationEntries(ReservationEntry: Record "Reservation Entry"; SalesLine: Record "Sales Line"; var QtyToPick: Decimal)
-    var
-        ReservationManagement: Codeunit "Reservation Management";
-    begin
-        if ReservationEntry.TrackingExists() then
-            exit;
-
-        ReservationManagement.SetReservSource(SalesLine);
-        ReservationManagement.DeleteReservEntries(false, ReservationEntry."Quantity (Base)");
-        QtyToPick += ReservationEntry."Quantity (Base)"
-    end;
-
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCode(var WarehouseActivityLine: Record "Warehouse Activity Line")
@@ -2864,7 +2806,7 @@ codeunit 7307 "Whse.-Activity-Register"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforeTempWhseActivityLineGroupedLoop(var WhseActivHeader: Record "Warehouse Activity Header"; var WhseActivLine: Record "Warehouse Activity Line"; var RegisteredWhseActivHeader: Record "Registered Whse. Activity Hdr."; var TempWarehouseActivityLineGrouped: Record "Warehouse Activity Line" temporary)
+    local procedure OnCodeOnBeforeTempWhseActivityLineGroupedLoop(var WhseActivHeader: Record "Warehouse Activity Header"; var WhseActivLine: Record "Warehouse Activity Line"; var RegisteredWhseActivHeader: Record "Registered Whse. Activity Hdr.")
     begin
     end;
 
@@ -2885,11 +2827,6 @@ codeunit 7307 "Whse.-Activity-Register"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckSourceDocumentForAvailableQty(var WarehouseActivityLine: Record "Warehouse Activity Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckBinContent(var TempBinContentBuffer: Record "Bin Content Buffer" temporary; var IsHandled: Boolean)
     begin
     end;
 }
