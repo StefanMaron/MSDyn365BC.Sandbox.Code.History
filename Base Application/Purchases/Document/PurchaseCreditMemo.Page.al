@@ -453,8 +453,10 @@ page 52 "Purchase Credit Memo"
                     var
                         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
                     begin
-                        if ApplicationAreaMgmtFacade.IsFoundationEnabled() then
+                        if ApplicationAreaMgmtFacade.IsFoundationEnabled() then begin
                             PurchCalcDiscByType.ApplyDefaultInvoiceDiscount(0, Rec);
+                            Rec.SetOperationType();
+                        end;
                     end;
                 }
                 field("Vendor Posting Group"; Rec."Vendor Posting Group")
@@ -540,7 +542,7 @@ page 52 "Purchase Credit Memo"
                 {
                     ApplicationArea = Location;
                     Importance = Additional;
-                    ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
+                    ToolTip = 'Specifies the location where the items are to be shipped. This field acts as the default location for new lines. You can update the location code for individual lines as needed.';
                 }
                 field(Correction; Rec.Correction)
                 {

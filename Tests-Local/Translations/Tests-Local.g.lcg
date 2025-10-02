@@ -1229,6 +1229,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM IT Prepayment II - NamedType ConfirmSalesChangeVATBusPostingGroupTxt)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1880347326 - NamedType 2454288812" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Operation Type must be %1 in %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 =Operation Type Value, %2=Table Name.]D;]A;(LookupHint=Codeunit ERM IT Prepayment II - NamedType OperationTypeErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1880347326 - NamedType 3573412396" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Prepayment Due Date must have a value in %1: Document Type=Order, No.=%2. It cannot be zero or empty.]]></Val>
@@ -2811,6 +2820,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[%1 = Field Caption , %2 = Expected Value , %3 = Table Caption]D;]A;(LookupHint=Codeunit IT - Calc. And Post VAT Settl. - NamedType ValueMustBeEqualErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3213551793 - Method 4095615755 - NamedType 3651045205" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Before using Per Activity Code Settlement Entry, you must split the previous entries amounts per activity code manually using "Split Periodic Entry" action on Periodic VAT Settlemnt List page.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit IT - Calc. And Post VAT Settl. - Method MultipleActivityCodes_PreviousPeriodEntryExists_SplitError - NamedType ExpectedErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2709192724 - NamedType 2916310800" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

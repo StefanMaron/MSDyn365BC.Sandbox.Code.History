@@ -1484,6 +1484,99 @@ codeunit 134396 "ERM Sales Invoice Aggregate UT"
         Assert.AreEqual(ExpectedTaxAmount, ActualTaxAmount, StrSubstNo(TaxAmountErr, ExpectedTaxAmount));
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    procedure TotalVATAmtIsNotZeroInSalesInvoicePageWhenSalesLineHavingVATPercentIsCreated()
+    var
+        Item: Record Item;
+        Customer: Record Customer;
+        VATPostingSetup: Record "VAT Posting Setup";
+        SalesReceivablesSetup: Record "Sales & Receivables Setup";
+        SalesInvoice: TestPage "Sales Invoice";
+    begin
+        // [SCENARIO 545351] When a Sales Line having VAT % is created then Total VAT Amount is not 0 in 
+        // Sales Lines of Sales Invoice page if Default Item Quantity is set to true in Sales & Receivables page.
+        Initialize();
+
+        // [GIVEN] Set Default Item Quantity to true in Sales & Receivables Setup.
+        SalesReceivablesSetup.Get();
+        SalesReceivablesSetup."Default Item Quantity" := true;
+        SalesReceivablesSetup.Modify(true);
+
+        // [GIVEN] Create a VAT Posting Setup.
+        CreateVATPostingSetup(VATPostingSetup, LibraryRandom.RandIntInRange(10, 10));
+
+        // [GIVEN] Create a Customer with VAT Bus. Posting Group.
+        CreateCustomerWithVATBusPostingGroup(Customer, VATPostingSetup."VAT Bus. Posting Group");
+
+        // [GIVEN] Create an Item with VAT Posting Setup and Validate Unit Price.
+        CreateItemWithVATPostingSetup(Item, VATPostingSetup);
+        Item.Validate("Unit Price", LibraryRandom.RandIntInRange(100, 100));
+        Item.Modify(true);
+
+        // [GIVEN] Open and create a Sales Invoice.
+        SalesInvoice.OpenNew();
+        SalesInvoice."Sell-to Customer No.".SetValue(Customer."No.");
+
+        // [WHEN] Create a Sales Line.
+        SalesInvoice.SalesLines.Last();
+        SalesInvoice.SalesLines.Next();
+        SalesInvoice.SalesLines."No.".SetValue(Item."No.");
+
+        // [THEN] Total VAT Amount must not be 0 in Sales Line of Sales Invoice.
+        Assert.AreNotEqual(0, SalesInvoice.SalesLines."Total VAT Amount".AsDecimal(), StrSubstNo(TaxAmountErr, 0));
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure VerifyTotalTaxAmountSameOnGLEntries()
+    var
+        SalesHeader: Record "Sales Header";
+        GLEntry: Record "G/L Entry";
+        VATPostingSetup: Record "VAT Posting Setup";
+        SalesInvoice: TestPage "Sales Invoice";
+        ActualTaxAmount: Decimal;
+        DocumentNo: Text;
+        PostedDocumentNo: Code[20];
+        Quantity: array[4] of Integer;
+        UnitPrice: array[4] of Decimal;
+    begin
+        // [SCENARIO 538876] Correct VAT in Statistics FactBox when "Price Including VAT" is activated.
+        Initialize();
+
+        // [GIVEN] Create VAT Posting Setup with VAT Percentage 20
+        CreateVATPostingSetup(VATPostingSetup, 20);
+
+        // [GIVEN] Create Static Unit Price to get the 0.01 difference
+        AssignStaticValues524113(UnitPrice, Quantity);
+
+        // [GIVEN] Create Four Sales Invoice Lines
+        CreateInvoiceWithMultipleLineThroughTestPageNoDiscount(SalesInvoice, VATPostingSetup, UnitPrice, Quantity);
+
+        // [GIVEN] Save Total Tax Amount on Page as actual result
+        ActualTaxAmount := SalesInvoice.SalesLines."Total VAT Amount".AsDecimal();
+
+        // [GIVEN] Save the Sales Invoice Document No.
+        DocumentNo := SalesInvoice."No.".Value();
+
+        // [GIVEN] Close the Sales Invoice Page
+        SalesInvoice.Close();
+
+        // [GIVEN] Get the Sales Header
+        SalesHeader.Get(SalesHeader."Document Type"::Invoice, DocumentNo);
+
+        // [WHEN] Post the Sales Document 
+        PostedDocumentNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [GIVEN] Get the Sales VAT Account G/l Entries
+        GLEntry.SetRange("Document No.", PostedDocumentNo);
+        GLEntry.SetRange("G/L Account No.", VATPostingSetup."Sales VAT Account");
+        GLEntry.FindFirst();
+
+        // [THEN] Verify the Total tax amount should be same as on Sales Invoice Page
+        Assert.AreEqual(-ActualTaxAmount, GLEntry.Amount, '');
+    end;
+
     local procedure CreateCustomerWithDiscount(var Customer: Record Customer; DiscPct: Decimal; minAmount: Decimal)
     begin
         CreateCustomer(Customer);
@@ -2344,7 +2437,7 @@ codeunit 134396 "ERM Sales Invoice Aggregate UT"
             Field.FieldNo(SystemModifiedBy));
     end;
 
-    local procedure AssignStaticValues524113(var UnitPrice: array[4] of Decimal; Quantity: array[4] of Integer)
+    local procedure AssignStaticValues524113(var UnitPrice: array[4] of Decimal; var Quantity: array[4] of Integer)
     var
         i: Integer;
     begin
