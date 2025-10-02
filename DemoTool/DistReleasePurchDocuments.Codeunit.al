@@ -29,16 +29,4 @@ codeunit 118824 "Dist. Release Purch. Documents"
         PurchHeader.Get(DocumentType, DocumentNo);
         ReleasePurchaseDocument.Run(PurchHeader);
     end;
-
-    local procedure PostPurchaseDocument(PurchDocType: Enum "Purchase Document Type"; DocumentNo: Code[20])
-    var
-        PurchHeader: Record "Purchase Header";
-        PurcPost: Codeunit "Purch.-Post";
-    begin
-        PurchHeader.Get(PurchDocType, DocumentNo);
-        PurchHeader.Receive := true;
-        PurchHeader.Invoice := true;
-        PurcPost.Run(PurchHeader);
-    end;
 }
-
