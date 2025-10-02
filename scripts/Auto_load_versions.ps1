@@ -35,7 +35,7 @@ $Versions | Sort-Object -Property Country, Version | % {
         Write-Host "###############################################"
         Write-Host "Processing $($country) - $($Version.ToString())"
         Write-Host "###############################################"
-        
+
         $LatestCommitIDOfBranchEmpty = git log -n 1 --pretty=format:"%h" "main"
         if ($LatestCommitIDOfBranchEmpty -eq $null) {
             $LatestCommitIDOfBranchEmpty = git log -n 1 --pretty=format:"%h" "origin/main"
@@ -58,7 +58,45 @@ $Versions | Sort-Object -Property Country, Version | % {
                 git switch -c "$($country)-$($Version.Major)" $CommitIDLastCUFromPreviousMajor
             }
             else {
-                git switch -c "$($country)-$($Version.Major)" $LatestCommitIDOfBranchEmpty                
+                git switch -c "$($country)-$($Version.Major)" $LatestCommitIDOfBranchEmpty
+            }
+        }
+
+        # Check if this is a late hotfix (older than current HEAD)
+        $IsLateHotfix = $false
+        $InsertionPoint = $null
+
+        if ($BranchAlreadyExists) {
+            # Get the latest version on this branch
+            $LatestVersionCommit = git log -n 1 --pretty=format:"%s" "$($country)-$($Version.Major)"
+            if ($LatestVersionCommit -match "^$($country)-(.+)$") {
+                $LatestVersion = [version]::Parse($Matches[1])
+
+                if ($Version -lt $LatestVersion) {
+                    Write-Host "Detected late hotfix: $($Version) is older than current HEAD $($LatestVersion)"
+                    $IsLateHotfix = $true
+
+                    # Find all versions on this branch to determine insertion point
+                    $AllVersionsOnBranch = git log --pretty=format:"%s" "$($country)-$($Version.Major)" | Where-Object { $_ -match "^$($country)-(.+)$" } | ForEach-Object {
+                        [PSCustomObject]@{
+                            CommitMessage = $_
+                            Version = [version]::Parse($Matches[1])
+                        }
+                    }
+
+                    # Find the commit this should come after (highest version that's still lower than new version)
+                    $PreviousVersion = $AllVersionsOnBranch | Where-Object { $_.Version -lt $Version } | Sort-Object -Property Version -Descending | Select-Object -First 1
+
+                    if ($PreviousVersion) {
+                        $InsertionPoint = git log -n 1 --pretty=format:"%H" --grep="^$($PreviousVersion.CommitMessage)$" "$($country)-$($Version.Major)"
+                        Write-Host "Will insert after version $($PreviousVersion.Version) (commit: $InsertionPoint)"
+                    }
+                    else {
+                        # No previous version found, insert at branch start
+                        $InsertionPoint = git log --reverse --pretty=format:"%H" "$($country)-$($Version.Major)" | Select-Object -First 1
+                        Write-Host "Will insert at beginning of branch (commit: $InsertionPoint)"
+                    }
+                }
             }
         }
         
@@ -82,19 +120,61 @@ $Versions | Sort-Object -Property Country, Version | % {
             $TargetPathOfVersion = (Join-Path $PlatformPath (Get-ChildItem -Path $PlatformPath -filter "Applications")[0].Name)
         }
         
-        & "scripts/UpdateALRepo.ps1" -SourcePath $TargetPathOfVersion -RepoPath (Split-Path $PSScriptRoot -Parent) -Version $version -Localization $country
-        & "scripts/BuildTestsWorkSpace.ps1"
-        
-        Get-ChildItem -Recurse -Filter "*.xlf" | Remove-Item
+        if ($IsLateHotfix) {
+            # Checkout the insertion point
+            git checkout $InsertionPoint
 
-        "$($country)-$($version.ToString())" > version.txt
+            # Extract and commit the hotfix
+            & "scripts/UpdateALRepo.ps1" -SourcePath $TargetPathOfVersion -RepoPath (Split-Path $PSScriptRoot -Parent) -Version $version -Localization $country
+            & "scripts/BuildTestsWorkSpace.ps1"
 
-        git config user.email "stefanmaron@outlook.de"
-        git config user.name "Stefan Maron"
-        git add -A | out-null
-        git commit -a -m "$($country)-$($version.ToString())" | out-null
-        git gc | out-null
-        git push --set-upstream origin "$($country)-$($Version.Major)"
+            Get-ChildItem -Recurse -Filter "*.xlf" | Remove-Item
+
+            "$($country)-$($version.ToString())" > version.txt
+
+            git config user.email "stefanmaron@outlook.de"
+            git config user.name "Stefan Maron"
+            git add -A | out-null
+            git commit -a -m "$($country)-$($version.ToString())" | out-null
+
+            # Get the hash of the new commit
+            $NewCommitHash = git rev-parse HEAD
+
+            # Switch back to branch
+            git switch "$($country)-$($Version.Major)"
+
+            # Rebase all commits after insertion point onto the new commit
+            Write-Host "Rebasing commits after insertion point onto new commit..."
+            $RebaseResult = git rebase --onto $NewCommitHash $InsertionPoint "$($country)-$($Version.Major)" 2>&1
+
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "Rebase failed, aborting..."
+                git rebase --abort
+                throw "Rebase failed: $RebaseResult"
+            }
+
+            git gc | out-null
+
+            # Force push with lease to prevent overwriting concurrent changes
+            Write-Host "Force pushing rebased history..."
+            git push --force-with-lease origin "$($country)-$($Version.Major)"
+        }
+        else {
+            # Normal linear commit (not a late hotfix)
+            & "scripts/UpdateALRepo.ps1" -SourcePath $TargetPathOfVersion -RepoPath (Split-Path $PSScriptRoot -Parent) -Version $version -Localization $country
+            & "scripts/BuildTestsWorkSpace.ps1"
+
+            Get-ChildItem -Recurse -Filter "*.xlf" | Remove-Item
+
+            "$($country)-$($version.ToString())" > version.txt
+
+            git config user.email "stefanmaron@outlook.de"
+            git config user.name "Stefan Maron"
+            git add -A | out-null
+            git commit -a -m "$($country)-$($version.ToString())" | out-null
+            git gc | out-null
+            git push --set-upstream origin "$($country)-$($Version.Major)"
+        }
         
         Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
 
