@@ -61,8 +61,8 @@ codeunit 117041 "Create Service Item"
           44.25, XSMdashITEM, '', '');
         InsertData('28', 'SN 5TR78', XDESKTOP, XComputerIII866MHz, ServiceItem.Status::Installed, ServiceItem.Priority::Low, '10000', XLEWESROAD, '80005', XPCS,
           19030116D, 12, 26.7, XSMdashITEM, '', '');
-        InsertData('29', 'SNM2453', XMONITOR, X24INCHUltrascan, ServiceItem.Status::Installed, ServiceItem.Priority::Low, '10000', XLEWESROAD, '80105', XPCS,
-          19030116D, 24, 70.35, XSMdashITEM, '', '');
+        InsertData('29', 'SNM2453', XMONITOR, X24INCHUltrascan, ServiceItem.Status::Installed, ServiceItem.Priority::Low, '10000', XLEWESROAD, '80105', XPCS, 19030116D, 24,
+          70.35, XSMdashITEM, '', '');
         InsertData('2000-S-2', '', XDESKTOP, XComputerdashBasicPackage, ServiceItem.Status::Installed, ServiceItem.Priority::High, '30000', '', '8904-W', XPCS,
           19030102D, 16, 83.84, '', XKatherine, '');
     end;
@@ -93,7 +93,7 @@ codeunit 117041 "Create Service Item"
         XLEWESROAD: Label 'LEWES ROAD';
         MakeAdjustments: Codeunit "Make Adjustments";
 
-    procedure InsertData("No.": Text[250]; "Serial No.": Text[250]; "Service Item Group Code": Text[250]; Description: Text[250]; Status: Enum "Service Item Status"; Priority: Option; "Customer No.": Text[250]; "Ship-to Code": Text[250]; "Item No.": Text[250]; "Unit of Measure Code": Text[250]; "Warranty Starting Date (Parts)": Date; "Response Time (Hours)": Decimal; "Default Contract Value": Decimal; "No. Series": Text[250]; "Preferred Resource": Text[250]; "Service Price Group Code": Text[250])
+    procedure InsertData("No.": Text[250]; "Serial No.": Text[250]; "Service Item Group Code": Text[250]; Description: Text[250]; Status: Enum "Service Item Status"; Priority: Enum "Service Priority"; "Customer No.": Text[250]; "Ship-to Code": Text[250]; "Item No.": Text[250]; "Unit of Measure Code": Text[250]; "Warranty Starting Date (Parts)": Date; "Response Time (Hours)": Decimal; "Default Contract Value": Decimal; "No. Series": Text[250]; "Preferred Resource": Text[250]; "Service Price Group Code": Text[250])
     var
         ServiceItem: Record "Service Item";
         ResSkillMgt: Codeunit "Resource Skill Mgt.";

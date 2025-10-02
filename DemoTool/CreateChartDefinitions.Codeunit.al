@@ -342,9 +342,9 @@ codeunit 119100 "Create Chart Definitions"
 
     local procedure InsertPeriodFormula(Period: Integer): Text[10]
     var
-        ColumnLayout: Record "Column Layout";
+        PeriodFormulaParser: Codeunit "Period Formula Parser";
     begin
-        exit(StrSubstNo('%1%2', Period, ColumnLayout.GetPeriodName()));
+        exit(StrSubstNo('%1%2', Period, PeriodFormulaParser.GetPeriodName()));
     end;
 
     procedure GetCashCycleAccSchedName(): Code[10]
