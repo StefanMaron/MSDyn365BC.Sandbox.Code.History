@@ -45,6 +45,7 @@ codeunit 101995 "Create RapidStart Package"
         PaymentMethod: Record "Payment Method";
         Item: Record Item;
         Customer: Record Customer;
+        ColumnLayout: Record "Column Layout";
         Contact: Record Contact;
         DocumentSendingProfile: Record "Document Sending Profile";
         ItemAttribute: Record "Item Attribute";
@@ -224,6 +225,7 @@ codeunit 101995 "Create RapidStart Package"
         CreateTable(DATABASE::"Acc. Schedule Name");
         CreateTable(DATABASE::"Acc. Schedule Line");
         CreateTable(DATABASE::"Column Layout");
+        SkipValidateField(ColumnLayout.FieldNo("Comparison Period Formula"));
         CreateTable(DATABASE::"Column Layout Name");
         CreateTable(DATABASE::"Account Schedules Chart Setup");
         CreateTable(DATABASE::"Acc. Sched. Chart Setup Line");

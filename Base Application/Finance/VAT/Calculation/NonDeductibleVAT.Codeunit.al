@@ -11,9 +11,11 @@ using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.FixedAssets.Ledger;
 using Microsoft.Foundation.Enums;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
+using Microsoft.Projects.Project.Journal;
 
 /// <summary>
 /// Provides an interface of the Non-Deductible VAT functionality.
@@ -468,6 +470,21 @@ codeunit 6200 "Non-Deductible VAT"
     end;
 
     /// <summary>
+    /// Copy Non-Deductible VAT from general journal line to FA ledger Entry
+    /// </summary>
+    /// <param name="FALedgEntry">The current FA ledger entry</param>
+    /// <param name="GenJnlLine">The current general journal line</param>
+    procedure CopyNonDedVATFromGenJnlLineToFALedgEntry(var FALedgEntry: Record "FA Ledger Entry"; GenJnlLine: Record "Gen. Journal Line")
+    begin
+        NonDedVATImpl.CopyNonDedVATFromGenJnlLineToFALedgEntry(FALedgEntry, GenJnlLine);
+    end;
+
+    procedure CopyNonDedVATFromGenJnlLineToJobJnlLine(var JobJnlLine: Record "Job Journal Line"; GenJnlLine: Record "Gen. Journal Line")
+    begin
+        NonDedVATImpl.CopyNonDedVATFromGenJnlLineToJobJnlLine(JobJnlLine, GenJnlLine);
+    end;
+
+    /// <summary>
     /// Throws an error if purchase line contains prepayment and Non-Deductible VAT
     /// </summary>
     /// <param name="PurchaseLine">The current purchase line</param>
@@ -623,6 +640,16 @@ codeunit 6200 "Non-Deductible VAT"
         NonDedVATImpl.Increment(TotalInvoicePostBuffer, InvoicePostBuffer);
     end;
 #endif
+
+    /// <summary>
+    /// Identifies if the current FA ledger entry is a Non-Deductible VAT entry in the first acquisition
+    /// </summary>
+    /// <param name="FALedgEntry"></param>
+    /// <returns>Returns true if the current FA ledger entry is a Non-Deductible VAT entry in the first acquisition</returns>
+    procedure IsNonDedFALedgEntryInFirstAcquisition(FALedgEntry: Record "FA Ledger Entry"): Boolean
+    begin
+        exit(NonDedVATImpl.IsNonDedFALedgEntryInFirstAcquisition(FALedgEntry));
+    end;
 
     /// <summary>
     /// Round Non-Deductible VAT amounts after exchanging to the local currency
