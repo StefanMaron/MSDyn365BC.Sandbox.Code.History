@@ -4,9 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace System.Environment.Configuration;
 
-#if not CLEAN25
 using Microsoft.Pricing.Calculation;
-#endif
 
 codeunit 265 "Feature Key Management"
 {
@@ -161,7 +159,6 @@ codeunit 265 "Feature Key Management"
         end;
     end;
 
-#if not CLEAN25
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Feature Management Facade", 'OnAfterUpdateData', '', false, false)]
     local procedure HandleOnAfterUpdateData(var FeatureDataUpdateStatus: Record "Feature Data Update Status")
     var
@@ -176,7 +173,6 @@ codeunit 265 "Feature Key Management"
                 FeatureTelemetry.LogUptake('0000LLR', PriceCalculationMgt.GetFeatureTelemetryName(), Enum::System.Telemetry."Feature Uptake Status"::Discovered);
         end;
     end;
-#endif
 
     [InternalEvent(false)]
     local procedure OnAfterIsConcurrentInventoryPostingEnabled(var ConcurrentInventoryPosting: Boolean)

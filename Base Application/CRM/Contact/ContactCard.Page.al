@@ -896,7 +896,6 @@ page 5050 "Contact Card"
                         PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
-#if not CLEAN25
                 action(PriceListsDiscounts)
                 {
                     ApplicationArea = Basic, Suite;
@@ -904,9 +903,6 @@ page 5050 "Contact Card"
                     Image = LineDiscount;
                     Visible = false;
                     ToolTip = 'View or set up different discounts for products that you sell to the customer. A product line discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action PriceLists shows all sales price lists with prices and discounts';
-                    ObsoleteTag = '18.0';
 
                     trigger OnAction()
                     var
@@ -917,7 +913,6 @@ page 5050 "Contact Card"
                         PriceUXManagement.ShowPriceLists(Rec, PriceType::Sale, AmountType::Discount);
                     end;
                 }
-#endif
             }
             group(Tasks)
             {

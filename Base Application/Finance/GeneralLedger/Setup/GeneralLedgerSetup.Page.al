@@ -405,30 +405,6 @@ page 118 "General Ledger Setup"
             group(Reporting)
             {
                 Caption = 'Reporting';
-                field("Acc. Sched. for Balance Sheet"; Rec."Fin. Rep. for Balance Sheet")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Financial Report for Balance Sheet';
-                    ToolTip = 'Specifies which financial report is used to generate the Balance Sheet report.';
-                }
-                field("Acc. Sched. for Income Stmt."; Rec."Fin. Rep. for Income Stmt.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Financial Report for Income Stmt.';
-                    ToolTip = 'Specifies which financial report is used to generate the Income Statement report.';
-                }
-                field("Acc. Sched. for Cash Flow Stmt"; Rec."Fin. Rep. for Cash Flow Stmt")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Financial Report for Cash Flow Stmt.';
-                    ToolTip = 'Specifies which financial report is used to generate the Cash Flow Statement report.';
-                }
-                field("Acc. Sched. for Retained Earn."; Rec."Fin. Rep. for Retained Earn.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Financial Report for Retained Earn.';
-                    ToolTip = 'Specifies which financial report is used to generate the Retained Earnings report.';
-                }
                 field("Additional Reporting Currency"; Rec."Additional Reporting Currency")
                 {
                     ApplicationArea = Suite;
@@ -463,6 +439,48 @@ page 118 "General Ledger Setup"
                 {
                     ApplicationArea = Suite;
                     Tooltip = 'Specifies the G/L Account Category that will be used for the Account Payables accounts.';
+                }
+                group("Financial Reports")
+                {
+                    Caption = 'Financial Reports';
+                    field("Acc. Sched. for Balance Sheet"; Rec."Fin. Rep. for Balance Sheet")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Balance Sheet Report';
+                    }
+                    field("Acc. Sched. for Income Stmt."; Rec."Fin. Rep. for Income Stmt.")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Income Statement Report';
+                    }
+                    field("Acc. Sched. for Cash Flow Stmt"; Rec."Fin. Rep. for Cash Flow Stmt")
+                    {
+                        ApplicationArea = Suite;
+                        Caption = 'Cash Flow Statement Report';
+                    }
+                    field("Acc. Sched. for Retained Earn."; Rec."Fin. Rep. for Retained Earn.")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Retained Earnings Report';
+                    }
+                    field("Fin. Rep. Period Type"; Rec."Fin. Rep. Period Type")
+                    {
+                        Caption = 'Default View by';
+#if not CLEAN27
+                        Visible = FinancialReportDefaultsEnabled;
+#endif
+                    }
+                    field("Fin. Rep. Neg. Amount Format"; Rec."Fin. Rep. Neg. Amount Format")
+                    {
+                        Caption = 'Default Negative Amount Format';
+#if not CLEAN27
+                        Visible = FinancialReportDefaultsEnabled;
+#endif
+                    }
+                    field("Fin. Rep. Company Logo Pos."; Rec."Fin. Rep. Company Logo Pos.")
+                    {
+                        Caption = 'Default Company Logo Position';
+                    }
                 }
             }
             group(Application)
@@ -1031,6 +1049,12 @@ page 118 "General Ledger Setup"
     end;
 
     trigger OnOpenPage()
+    var
+#if not CLEAN27
+#pragma warning disable AL0432
+        FeatureFinancialReportDef: Codeunit "Feature - Fin. Report Default";
+#pragma warning restore AL0432
+#endif
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -1041,6 +1065,10 @@ page 118 "General Ledger Setup"
 
         IsJournalTemplatesVisible := Rec."Journal Templ. Name Mandatory";
         UpdateControls();
+
+#if not CLEAN27
+        FinancialReportDefaultsEnabled := FeatureFinancialReportDef.IsDefaultsFeatureEnabled();
+#endif
     end;
 
     var
@@ -1054,7 +1082,9 @@ page 118 "General Ledger Setup"
         BAStobeLodgedasaGroupEnable: Boolean;
         "BAS Group CompanyEnable": Boolean;
         "BAS GST Division FactorEnable": Boolean;
-
+#if not CLEAN27
+        FinancialReportDefaultsEnabled: Boolean;
+#endif
 #pragma warning disable AA0074
         Text001: Label 'Do you want to change all open entries for every customer and vendor that are not blocked?';
         Text002: Label 'If you delete the additional reporting currency, future general ledger entries are posted in LCY only. Deleting the additional reporting currency does not affect already posted general ledger entries.\\Are you sure that you want to delete the additional reporting currency?';

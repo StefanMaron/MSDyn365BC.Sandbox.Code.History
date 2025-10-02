@@ -15,9 +15,7 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Reports;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using System.Text;
 
 page 77 "Resource List"
@@ -569,7 +567,6 @@ page 77 "Resource List"
             {
                 Caption = '&Prices';
                 Image = Price;
-#if not CLEAN25
                 action(Costs)
                 {
                     ApplicationArea = Jobs;
@@ -580,9 +577,6 @@ page 77 "Resource List"
                                   Code = field("No.");
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View or change detailed information about costs for the resource.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
                 action(Prices)
                 {
@@ -594,11 +588,7 @@ page 77 "Resource List"
                                   Code = field("No.");
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View or edit prices for the resource.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
                 action(PurchPriceLists)
                 {
                     ApplicationArea = Jobs;
@@ -706,7 +696,6 @@ page 77 "Resource List"
                 RunObject = Report "Resource - Cost Breakdown";
                 ToolTip = 'View the direct unit costs and the total direct costs for each resource. Only usage postings are considered in this report. Resource usage can be posted in the resource journal or the project journal.';
             }
-#if not CLEAN25
             action("Resource - Price List")
             {
                 ApplicationArea = Jobs;
@@ -715,11 +704,7 @@ page 77 "Resource List"
                 Visible = not ExtendedPriceEnabled;
                 RunObject = Report "Resource - Price List";
                 ToolTip = 'Specifies a list of unit prices for the selected resources. By default, a unit price is based on the price in the Resource Prices window. If there is no valid alternative price, then the unit price from the resource card is used. The report can be used by the company''s salespeople or sent to customers.';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                ObsoleteTag = '17.0';
             }
-#endif
             action("Res. Price List")
             {
                 ApplicationArea = Jobs;
@@ -818,22 +803,12 @@ page 77 "Resource List"
                 actionref("Units of Measure_Promoted"; "Units of Measure")
                 {
                 }
-#if not CLEAN25
                 actionref(Costs_Promoted; Costs)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
-#if not CLEAN25
                 actionref(Prices_Promoted; Prices)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
             }
             group(Category_Category6)
             {
@@ -857,14 +832,9 @@ page 77 "Resource List"
                 actionref("Resource - Cost Breakdown_Promoted"; "Resource - Cost Breakdown")
                 {
                 }
-#if not CLEAN25
                 actionref("Resource - Price List_Promoted"; "Resource - Price List")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
                 actionref("Res. Price List_Promoted"; "Res. Price List")
                 {
                 }
