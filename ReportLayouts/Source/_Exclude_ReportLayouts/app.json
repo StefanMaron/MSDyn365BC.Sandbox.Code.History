@@ -12,14 +12,14 @@
   "contextSensitiveHelpUrl": "https://go.microsoft.com",
   "logo": "ExtensionLogo.png",
   "dependencies": [],
-  "application": "25.1.0.0",
+  "application": "25.2.0.0",
   "target": "OnPrem",
   "resourceExposurePolicy": {
     "allowDebugging": false,
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "platform": "25.0.0.0",
+  "platform": "25.2.0.0",
   "idRanges": [
     {
       "from": 1,
