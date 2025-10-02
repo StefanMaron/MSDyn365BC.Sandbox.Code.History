@@ -318,9 +318,6 @@ table 36 "Sales Header"
 
                 if xRec."Bill-to Customer No." <> "Bill-to Customer No." then
                     SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
-
-                if Rec."Sell-to Customer No." <> Rec."Bill-to Customer No." then
-                    UpdateShipToSalespersonCode();
             end;
         }
         field(5; "Bill-to Name"; Text[100])
@@ -480,7 +477,7 @@ table 36 "Sales Header"
                             CopyShipToCustomerAddressFieldsFromCust(Customer);
                         end;
 
-                UpdateShipToSalespersonCode();
+                UpdateShipToSalespersonCode(FieldNo("Ship-to Code"));
                 GetShipmentMethodCode();
                 GetShippingTime(FieldNo("Ship-to Code"));
 
@@ -2326,6 +2323,19 @@ table 36 "Sales Header"
             Caption = 'Received-from Country/Region Code';
             TableRelation = "Country/Region";
         }
+        field(185; "Last Email Sent Time"; DateTime)
+        {
+            Caption = 'Last Email Sent Time';
+            FieldClass = FlowField;
+            CalcFormula = max("Email Related Record".SystemCreatedAt where("Table Id" = const(Database::"Sales Header"),
+                                                                           "System Id" = field(SystemId)));
+        }
+        field(186; "Last Email Sent Message Id"; Guid)
+        {
+            Caption = 'Last Email Sent Message Id';
+            FieldClass = FlowField;
+            CalcFormula = lookup("Email Related Record"."Email Message Id" where(SystemCreatedAt = field("Last Email Sent Time")));
+        }
         field(200; "Work Description"; BLOB)
         {
             Caption = 'Work Description';
@@ -3150,9 +3160,6 @@ table 36 "Sales Header"
 
         if GetFilterContNo() <> '' then
             Validate("Sell-to Contact No.", GetFilterContNo());
-
-        if "Salesperson Code" = '' then
-            SetDefaultSalesperson();
 
         if "Sell-to Customer No." <> '' then
             StandardCodesMgtGlobal.CheckCreateSalesRecurringLines(Rec);
@@ -4267,7 +4274,7 @@ table 36 "Sales Header"
                         FieldNo("Shipping Agent Code"):
                             SalesLine.Validate("Shipping Agent Code", "Shipping Agent Code");
                         FieldNo("Shipping Agent Service Code"):
-                            if SalesLine."No." <> '' then
+                            if (SalesLine."No." <> '') and (SalesLine."Shipping Agent Code" <> '') then
                                 SalesLine.Validate("Shipping Agent Service Code", "Shipping Agent Service Code");
                         FieldNo("Shipping Time"):
                             if SalesLine."No." <> '' then
@@ -4889,6 +4896,7 @@ table 36 "Sales Header"
 
     local procedure CheckCustomerContactRelation(Cont: Record Contact; CustomerNo: Code[20]; ContBusinessRelationNo: Code[20])
     var
+        ContactBusinessRelationLinkType: Enum "Contact Business Relation Link To Table";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -4897,7 +4905,8 @@ table 36 "Sales Header"
             exit;
 
         if (CustomerNo <> '') and (CustomerNo <> ContBusinessRelationNo) then
-            Error(Text037, Cont."No.", Cont.Name, CustomerNo);
+            if FindContactBusinessRelation(CustomerNo, Cont."Company No.", ContactBusinessRelationLinkType::Customer) then
+                Error(Text037, Cont."No.", Cont.Name, CustomerNo);
     end;
 
     local procedure UpdateBillToCust(ContactNo: Code[20])
@@ -6578,6 +6587,28 @@ table 36 "Sales Header"
         Commit();
     end;
 
+    procedure BatchConfirmUpdatePostingDate(ReplacePostingDate: Boolean; PostingDateReq: Date; ReplaceVATDate: Boolean; VATDateReq: Date; ReplaceDocDate: Boolean)
+    begin
+        if not ReplacePostingDate then
+            exit;
+        if (PostingDateReq = "Posting Date") then
+            exit;
+        if DeferralHeadersExist() then
+            exit;
+
+        "Posting Date" := PostingDateReq;
+        Validate("Currency Code");
+
+        if ReplaceVATDate then
+            "VAT Reporting Date" := VATDateReq;
+
+        if ReplaceDocDate and ("Document Date" <> PostingDateReq) then begin
+            UpdateDocumentDate := true;
+            Validate("Document Date", PostingDateReq);
+        end;
+
+        Commit();
+    end;
     procedure GetSelectedPaymentServicesText(): Text
     var
         PaymentServiceSetup: Record "Payment Service Setup";
@@ -6756,6 +6787,7 @@ table 36 "Sales Header"
             "Registration Number" := SellToCustomer."Registration Number";
             "VAT Country/Region Code" := SellToCustomer."Country/Region Code";
             "Shipping Advice" := SellToCustomer."Shipping Advice";
+            "Salesperson Code" := SellToCustomer."Salesperson Code";
             IsHandled := false;
             OnCopySelltoCustomerAddressFieldsFromCustomerOnBeforeAssignRespCenter(Rec, SellToCustomer, IsHandled);
             if not IsHandled then begin
@@ -6841,6 +6873,7 @@ table 36 "Sales Header"
     var
         IsHandled: Boolean;
         ShouldCopyLocationCode: Boolean;
+        ShouldCopySalespersonCode: Boolean;
     begin
         IsHandled := false;
         OnBeforeCopyShipToCustomerAddressFieldsFromShipToAddr(Rec, ShipToAddr, IsHandled);
@@ -6857,9 +6890,12 @@ table 36 "Sales Header"
         Validate("Ship-to Country/Region Code", ShipToAddr."Country/Region Code");
         "Ship-to Contact" := ShipToAddr.Contact;
         ShouldCopyLocationCode := ShipToAddr."Location Code" <> '';
+        ShouldCopySalespersonCode := (ShipToAddr."Salesperson Code" <> '') and (ShipToAddr."Salesperson Code" <> "Salesperson Code");
         OnSetShipToCustomerAddressFieldsFromShipToAddrOnAfterCalcShouldCopyLocationCode(Rec, xRec, ShipToAddr, ShouldCopyLocationCode);
         if ShouldCopyLocationCode then
             Validate("Location Code", ShipToAddr."Location Code");
+        if ShouldCopySalespersonCode then
+            Validate("Salesperson Code", ShipToAddr."Salesperson Code");
         IsHandled := false;
         OnSetShipToCustomerAddressFieldsFromShipToAddrOnBeforeValidateShippingAgentFields(Rec, xRec, ShipToAddr, IsHandled);
         if not IsHandled then begin
@@ -6933,7 +6969,8 @@ table 36 "Sales Header"
         "Customer Disc. Group" := BillToCustomer."Customer Disc. Group";
         "Language Code" := BillToCustomer."Language Code";
         "Format Region" := BillToCustomer."Format Region";
-        SetSalespersonCode(BillToCustomer."Salesperson Code", "Salesperson Code");
+        if (BilltoCustomer."No." <> "Sell-to Customer No.") or BillToCustomerIsReplaced() then
+            UpdateShipToSalespersonCode(FieldNo("Bill-to Customer No."));
         "Combine Shipments" := BillToCustomer."Combine Shipments";
         Reserve := BillToCustomer.Reserve;
         if "Document Type" in ["Document Type"::Order, "Document Type"::Quote] then
@@ -7670,6 +7707,53 @@ table 36 "Sales Header"
         end;
     end;
 
+    /// <summary>
+    /// Updates the salesperson code from either the ship-to addresses or bill-to customer's salesperson.
+    /// </summary>
+    /// <remarks>
+    /// If neither are set, it uses the default salesperson from the user setup.
+    /// If salesperson is blocked, it doesn't get assigned.
+    /// </remarks>
+    procedure UpdateShipToSalespersonCode(FieldNo: Integer)
+    var
+        ShipToAddress: Record "Ship-to Address";
+        SalespersonCode: Code[20];
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeUpdateShipToSalespersonCode(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        SalespersonCode := "Salesperson Code";
+
+        // three-step logic - Bill-to, Ship-to, Default
+        if FieldNo = FieldNo("Bill-to Customer No.") then
+            if ("Bill-to Customer No." <> '') then begin
+                GetCust("Bill-to Customer No.");
+                if Customer."Salesperson Code" = '' then
+                    SalespersonCode := ''
+                else
+                    SetSalespersonCode(Customer."Salesperson Code", SalespersonCode);
+            end;
+
+        // two-step logic - Ship-to, Default
+        if FieldNo in [FieldNo("Bill-to Customer No."), FieldNo("Ship-to Code")] then
+            if "Ship-to Code" <> '' then begin
+                ShipToAddress.SetLoadFields("Salesperson Code");
+                ShipToAddress.Get("Sell-to Customer No.", "Ship-to Code");
+                if ShipToAddress."Salesperson Code" <> '' then
+                    SetSalespersonCode(ShipToAddress."Salesperson Code", SalespersonCode);
+            end;
+
+        // one-step logic - Default
+        if SalespersonCode = '' then
+            SetSalespersonCode('', SalespersonCode);
+
+        if SalespersonCode <> "Salesperson Code" then
+            Validate("Salesperson Code", SalespersonCode);
+    end;
+
     procedure SetSalespersonCode(SalesPersonCodeToCheck: Code[20]; var SalesPersonCodeToAssign: Code[20])
     var
         IsHandled: Boolean;
@@ -8341,6 +8425,16 @@ table 36 "Sales Header"
                 GLSetup.UpdateVATDate("Document Date", Enum::"VAT Reporting Date"::"Document Date", "VAT Reporting Date");
         end;
         Validate("VAT Reporting Date");
+    end;
+
+    local procedure FindContactBusinessRelation(CustomerNo: Code[20]; ContactNo: Code[20]; ContactBusinessRelationLinkType: Enum "Contact Business Relation Link To Table"): Boolean
+    var
+        ContactBusinessRelation: Record "Contact Business Relation";
+    begin
+        ContactBusinessRelation.SetRange("No.", CustomerNo);
+        ContactBusinessRelation.SetRange("Contact No.", ContactNo);
+        ContactBusinessRelation.SetRange(ContactBusinessRelation."Link to Table", ContactBusinessRelationLinkType);
+        exit(ContactBusinessRelation.IsEmpty());
     end;
 
     [IntegrationEvent(false, false)]
