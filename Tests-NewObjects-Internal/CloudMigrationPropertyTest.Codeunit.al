@@ -815,6 +815,10 @@
         ListOfTablesToMigrate.Add(9990); // Database::"Word Templates Related Table"
         ListOfTablesToMigrate.Add(9987); // Database::"Word Templates Table"
 
+        // E-Document
+        ListOfTablesToMigrate.Add(6121); // Database::"E-Document"
+        ListOfTablesToMigrate.Add(6103); // Database::"E-Document Service"
+
         // Other tables
         ListOfTablesToMigrate.Add(Database::"Acc. Sched. Cell Value");
         ListOfTablesToMigrate.Add(Database::"Acc. Sched. Chart Setup Line");
