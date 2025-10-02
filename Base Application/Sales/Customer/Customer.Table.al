@@ -3547,14 +3547,20 @@ table 18 Customer
     var
         SalesShippedNotInvoicedLCY: Query "Sales Shipped Not Invoiced LCY";
         ShippedFromOrderLCY: Decimal;
+        SalesOrderNo: Code[20];
     begin
+        SalesOrderNo := '';
         ShippedFromOrderLCY := 0;
         SalesShippedNotInvoicedLCY.SetRange(BillToCustomerNo, "No.");
         SalesShippedNotInvoicedLCY.SetFilter(OrderNo, '<>%1', '');
         SalesShippedNotInvoicedLCY.SetFilter(OrderLineNo, '<>%1', 0);
         if SalesShippedNotInvoicedLCY.Open() then
-            while SalesShippedNotInvoicedLCY.Read() do
-                ShippedFromOrderLCY += SalesShippedNotInvoicedLCY.ShippedNotInvoicedLCY;
+            while SalesShippedNotInvoicedLCY.Read() do begin
+                if SalesShippedNotInvoicedLCY.OrderNo <> SalesOrderNo then
+                    ShippedFromOrderLCY += SalesShippedNotInvoicedLCY.ShippedNotInvoicedLCY;
+
+                SalesOrderNo := SalesShippedNotInvoicedLCY.OrderNo;
+            end;
         exit(ShippedFromOrderLCY);
     end;
 

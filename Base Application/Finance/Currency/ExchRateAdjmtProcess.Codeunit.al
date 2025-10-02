@@ -308,6 +308,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         Window.Open(AdjustingVATEntriesTxt + VATEntryProgressBarTxt);
 
         VATEntryNoTotal := VATEntry.Count();
+        if VATEntryNoTotal = 0 then
+            exit;
         SetVATEntryFilters(VATEntry, ExchRateAdjmtParameters."Start Date", ExchRateAdjmtParameters."End Date");
         if VATPostingSetup.FindSet() then
             repeat
@@ -1742,6 +1744,7 @@ codeunit 699 "Exch. Rate Adjmt. Process"
     begin
         GenJournalLine."Journal Template Name" := ExchRateAdjmtParameters."Journal Template Name";
         GenJournalLine."Journal Batch Name" := ExchRateAdjmtParameters."Journal Batch Name";
+        GenJournalLine."Zero Src. Curr. Amount" := true;
         SetPostingDimensions(GenJournalLine, DimensionSetEntry);
         OnPostGenJnlLineOnBeforeGenJnlPostLineRun(GenJournalLine, ExchRateAdjmtParameters);
         GenJnlPostLine.Run(GenJournalLine);
