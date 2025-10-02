@@ -9,7 +9,7 @@
       "id": "5d86850b-0d76-4eca-bd7b-951ad998e997",
       "name": "Tests-TestLibraries",
       "publisher": "Microsoft",
-      "version": "26.2.0.0"
+      "version": "26.3.0.0"
     }
   ],
   "target": "OnPrem",
@@ -18,6 +18,6 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "26.2.0.0",
+  "application": "26.3.0.0",
   "brief": "Tests-SINGLESERVER-Internal (CA)"
 }
