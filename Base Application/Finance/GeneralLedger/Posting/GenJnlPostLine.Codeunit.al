@@ -42,6 +42,9 @@ using System.Telemetry;
 using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Finance.WithholdingTax;
 using Microsoft.Bank.Payment;
+#if not CLEAN27
+using System.Environment.Configuration;
+#endif
 
 codeunit 12 "Gen. Jnl.-Post Line"
 {
@@ -145,6 +148,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         MultiplePostingGroups: Boolean;
         SourceCodeSetupRead: Boolean;
         IsGLRegInserted: Boolean;
+        IgnoreJournalTemplNameMandatoryCheck: Boolean;
 
         EntryAmount: Decimal;
         EntryAmountLCY: Decimal;
@@ -367,6 +371,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
         if CheckLine then begin
             if OverrideDimErr then
                 GenJnlCheckLine.SetOverDimErr();
+            if IgnoreJournalTemplNameMandatoryCheck then
+                GenJnlCheckLine.SetIgnoreJournalTemplNameMandatoryCheck();
             OnCheckGenJnlLineOnBeforeRunCheck(GenJournalLine);
             GenJnlCheckLine.RunCheck(GenJournalLine);
         end else
@@ -1601,7 +1607,11 @@ codeunit 12 "Gen. Jnl.-Post Line"
             Iterations := Iterations + 1;
             OnPostVendOnBeforeInitVendLedgEntry(GenJournalLine, VendLedgEntry, CVLedgEntryBuf, TempDtldCVLedgEntryBuf, VendPostingGr);
             InitVendLedgEntry(GenJournalLine, VendLedgEntry);
-            VendLedgEntry."Document Occurrence" := Iterations;
+            if (GenJournalLine."Applies-to Occurrence No." <> 0) and (GenJournalLine."Applies-to Doc. No." = '') then begin
+                VendLedgEntry."Document Occurrence" := GenJournalLine."Applies-to Occurrence No.";
+                GenJournalLine."Applies-to Occurrence No." := 0;
+            end else
+                VendLedgEntry."Document Occurrence" := Iterations;
             VendLedgEntry."Applies-to Occurrence No." := GenJournalLine."Applies-to Occurrence No.";
             VendLedgEntry."Due Date" := PaymentTermsLine."Due Date";
             VendLedgEntry."Pmt. Discount Date" := PaymentTermsLine."Pmt. Discount Date";
@@ -1923,6 +1933,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         FAAutomaticEntry: Codeunit "FA Automatic Entry";
         ShortcutDim1Code: Code[20];
         ShortcutDim2Code: Code[20];
+        OriginalGLAccNo: Code[20];
         Correction2: Boolean;
         NetDisposalNo: Integer;
         DimensionSetID: Integer;
@@ -1959,9 +1970,10 @@ codeunit 12 "Gen. Jnl.-Post Line"
                     OnPostFixedAssetOnBeforeInitGLEntryFromTempFAGLPostBuf(GenJnlLine, TempFAGLPostBuf);
                     FADimAlreadyChecked := TempFAGLPostBuf."FA Posting Group" <> '';
                     CheckDimValueForDisposal(GenJnlLine, TempFAGLPostBuf."Account No.");
-                    if TempFAGLPostBuf."Original General Journal Line" then
-                        InitGLEntry(GenJnlLine, GLEntry, TempFAGLPostBuf."Account No.", TempFAGLPostBuf.Amount, GLEntry2."Additional-Currency Amount", true, true)
-                    else begin
+                    if TempFAGLPostBuf."Original General Journal Line" then begin
+                        InitGLEntry(GenJnlLine, GLEntry, TempFAGLPostBuf."Account No.", TempFAGLPostBuf.Amount, GLEntry2."Additional-Currency Amount", true, true);
+                        OriginalGLAccNo := TempFAGLPostBuf."Account No.";
+                    end else begin
                         CheckNonAddCurrCodeOccurred('');
                         InitGLEntry(GenJnlLine, GLEntry, TempFAGLPostBuf."Account No.", TempFAGLPostBuf.Amount, 0, false, true);
                     end;
@@ -1997,7 +2009,9 @@ codeunit 12 "Gen. Jnl.-Post Line"
             OnPostFixedAssetOnAfterSetGenJnlLineShortcutDimCodes(GenJnlLine);
             GenJnlLine."Dimension Set ID" := DimensionSetID;
             GenJnlLine.Correction := Correction2;
-            GenJnlLine."FA G/L Account No." := GLEntry."G/L Account No.";
+            GenJnlLine."FA G/L Account No." := OriginalGLAccNo;
+            if GenJnlLine."FA G/L Account No." = '' then
+                GenJnlLine."FA G/L Account No." := GLEntry."G/L Account No.";
             OnPostFixedAssetOnBeforeAssignGLEntry(GenJnlLine, GLEntry, GLEntry2);
             GLEntry := GLEntry2;
             if VATEntryGLEntryNo = 0 then
@@ -2383,6 +2397,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
                     GLEntry."Source Currency Amount" := GetSourceCurrencyAmount(GenJnlLine, GLEntry.Amount > 0, true)
                 else
                     GLEntry."Source Currency Amount" := GetSourceCurrencyAmount(GenJnlLine, GLEntry.Amount > 0, false);
+                if (GLEntry."Source Currency Code" = AddCurrencyCode) and (GLEntry."Additional-Currency Amount" = 0) and MultiplePostingGroups then
+                    GLEntry."Additional-Currency Amount" := GLEntry."Source Currency Amount";
             end;
         end;
     end;
@@ -2646,6 +2662,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
     var
         GLEntry: Record "G/L Entry";
     begin
+        if (AddCurrencyCode <> '') and MultiplePostingGroups then
+            UseAmountAddCurr := true;
         if UseAmountAddCurr then
             InitGLEntry(GenJnlLine, GLEntry, AccNo, Amount, AmountAddCurr, true, true)
         else begin
@@ -3738,6 +3756,9 @@ codeunit 12 "Gen. Jnl.-Post Line"
                 NewCVLedgEntryBuf."Document Occurrence to Close" := OldCVLedgEntryBuf."Document Occurrence to Close";
             end;
         end;
+
+        if not NewCVLedgEntryBuf.Open then
+            NewCVLedgEntryBuf."Closed at Date" := GenJnlLine."Posting Date";
 
         OnAfterCalcApplication(GenJnlLine, DtldCVLedgEntryBuf);
     end;
@@ -7065,6 +7086,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
             VendLedgEntry."Pmt. Tolerance (LCY)" := 0;
             VendLedgEntry."Vendor Bill No." := '';
             VendLedgEntry."Vendor Bill List" := '';
+            VendLedgEntry."Applies-to Ext. Doc. No." := '';
         end;
 
         OnBeforeVendLedgEntryModify(VendLedgEntry, DtldVendLedgEntry);
@@ -7555,6 +7577,15 @@ codeunit 12 "Gen. Jnl.-Post Line"
         Error(DimMgt.GetDimValuePostingErr());
     end;
 
+    /// <summary>
+    /// Sets the global variable IgnoreJournalTemplNameMandatoryCheck for the current instance of the codeunit.
+    /// If IgnoreJournalTemplNameMandatoryCheck is not set "Journal Templ. Name Mandatory" check is performed before gen. journal line 
+    /// </summary>
+    procedure SetIgnoreJournalTemplNameMandatoryCheck()
+    begin
+        IgnoreJournalTemplNameMandatoryCheck := true;
+    end;
+
     local procedure IsGainLossAccount(CurrencyCode: Code[10]; GLAccNo: Code[20]): Boolean
     var
         Currency: Record Currency;
@@ -8020,14 +8051,35 @@ codeunit 12 "Gen. Jnl.-Post Line"
     [Scope('OnPrem')]
     procedure CheckIfVATPeriodClosed(PostingDate: Date)
     var
+#if not CLEAN27
         SettlementVATEntry: Record "Periodic Settlement VAT Entry";
+        VATSettlementEntry: Record "Periodic VAT Settlement Entry";
+        FeatureManagementIT: Codeunit "Feature Management IT";
+#else
+        VATSettlementEntry: Record "Periodic VAT Settlement Entry";
+#endif
         VATPeriod: Code[10];
     begin
         VATPeriod :=
           Format(Date2DMY(PostingDate, 3)) + '/' +
           ConvertStr(Format(Date2DMY(PostingDate, 2), 2), ' ', '0');
-        if SettlementVATEntry.Get(VATPeriod) then
-            SettlementVATEntry.TestField("VAT Period Closed", false);
+#if not CLEAN27
+        if FeatureManagementIT.IsVATSettlementPerActivityCodeFeatureEnabled() then begin
+            VATSettlementEntry.SetRange("VAT Period", VATPeriod);
+            if VATSettlementEntry.FindSet() then
+                repeat
+                    VATSettlementEntry.TestField("VAT Period Closed", false);
+                until VATSettlementEntry.Next() = 0;
+        end else
+            if SettlementVATEntry.Get(VATPeriod) then
+                SettlementVATEntry.TestField("VAT Period Closed", false);
+#else
+        VATSettlementEntry.SetRange("VAT Period", VATPeriod);
+        if VATSettlementEntry.FindSet() then
+            repeat
+                VATSettlementEntry.TestField("VAT Period Closed", false);
+            until VATSettlementEntry.Next() = 0;
+#endif
     end;
 
     [Scope('OnPrem')]
