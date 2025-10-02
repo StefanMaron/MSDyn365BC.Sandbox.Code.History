@@ -12,6 +12,7 @@ page 525 "Posted Sales Shipment Lines"
     Caption = 'Posted Sales Shipment Lines';
     Editable = false;
     PageType = List;
+    AboutText = 'Review detailed records of items, quantities, and related information for each line in posted sales shipments, helping you track what has been shipped to customers and the status of invoicing for those shipments.';
     SourceTable = "Sales Shipment Line";
     UsageCategory = History;
 
