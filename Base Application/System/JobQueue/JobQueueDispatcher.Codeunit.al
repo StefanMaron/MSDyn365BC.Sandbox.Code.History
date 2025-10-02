@@ -13,6 +13,7 @@ codeunit 448 "Job Queue Dispatcher"
 
     trigger OnRun()
     var
+        TelemetrySubscribers: Codeunit "Telemetry Subscribers";
         Skip: Boolean;
     begin
         OnBeforeRun(Rec, Skip);
@@ -52,7 +53,6 @@ codeunit 448 "Job Queue Dispatcher"
     end;
 
     var
-        TelemetrySubscribers: Codeunit "Telemetry Subscribers";
         TestMode: Boolean;
         JobQueueEntryFailedtoGetBeforeFinalizingTxt: Label 'Failed to get Job Queue Entry before finalizing record.', Locked = true;
         JobQueueEntryFailedtoGetBeforeUpdatingStatusTxt: Label 'Failed to get Job Queue Entry before updating status.', Locked = true;
