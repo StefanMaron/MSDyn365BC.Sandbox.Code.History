@@ -6489,7 +6489,7 @@ codeunit 22 "Item Jnl.-Post Line"
         if (ItemLedgerEntry."Remaining Quantity" + OldItemLedgerEntry."Remaining Quantity") > 0 then
             exit(0);
 
-        exit(GetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry));
+        exit(GetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry, ItemLedgerEntry));
     end;
 
     procedure RunOnPublishPostingInventoryToGL()
@@ -6510,7 +6510,7 @@ codeunit 22 "Item Jnl.-Post Line"
         exit(JobPlanningLineReserve.FindReservEntry(JobPlanningLine, ReservationEntry));
     end;
 
-    local procedure GetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry: Record "Item Ledger Entry"): Decimal
+    local procedure GetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"): Decimal
     var
         ReservationEntry: Record "Reservation Entry";
         ReservationEntry2: Record "Reservation Entry";
@@ -6529,6 +6529,15 @@ codeunit 22 "Item Jnl.-Post Line"
         case SourceType of
             Database::"Sales Line":
                 exit(-Abs(OldItemLedgerEntry."Remaining Quantity" - OldItemLedgerEntry."Reserved Quantity"));
+            Database::"Prod. Order Component":
+                begin
+                    if (ReservationEntry2."Source ID" <> ItemLedgerEntry."Order No.") then
+                        exit(0);
+                    if ReservationEntry2."Source Ref. No." <> ItemLedgerEntry."Prod. Order Comp. Line No." then
+                        exit(0);
+
+                    exit(-Abs(OldItemLedgerEntry."Reserved Quantity"))
+                end;
             else
                 exit(-Abs(OldItemLedgerEntry."Reserved Quantity"));
         end;
