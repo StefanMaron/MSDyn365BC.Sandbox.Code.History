@@ -47,22 +47,11 @@ codeunit 101931 "Create Local RapidStart Pack"
 
     procedure SetFieldsAndFilters(TableID: Integer)
     var
-#if not CLEAN24    
-        NoSeriesLine: Record "No. Series Line";
-#endif
         TaxArea: Record "Tax Area";
     begin
         case TableID of
-#if not CLEAN24
-            DATABASE::"No. Series Line":
-                begin
-                    CreateConfigPackageHelper.ValidateField(NoSeriesLine.FieldNo("Authorization Code"), false);
-                    CreateConfigPackageHelper.ValidateField(NoSeriesLine.FieldNo("Authorization Year"), false);
-                end;
-#endif
             DATABASE::"Tax Area":
                 CreateConfigPackageHelper.ValidateField(TaxArea.FieldNo("Country/Region"), false);
         end;
     end;
 }
-
