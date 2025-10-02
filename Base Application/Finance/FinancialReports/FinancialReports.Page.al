@@ -24,7 +24,7 @@ page 108 "Financial Reports"
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = Basic, Suite;
-                    trigger OnAssistEdit()
+                    trigger OnDrillDown()
                     var
                         AccScheduleOverview: Page "Acc. Schedule Overview";
                     begin
