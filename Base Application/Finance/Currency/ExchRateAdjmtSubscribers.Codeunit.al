@@ -17,6 +17,9 @@ using Microsoft.Sales.Receivables;
 
 codeunit 597 "Exch. Rate Adjmt. Subscribers"
 {
+    Permissions = TableData "VAT Entry" = rim,
+                  TableData "G/L Register" = rim;
+
     var
         GLSetup: Record "General Ledger Setup";
         SourceCodeSetup: Record "Source Code Setup";
@@ -77,8 +80,8 @@ codeunit 597 "Exch. Rate Adjmt. Subscribers"
                 exit(false);
             if (AdjAmt2 + RemAmtLCY) > OrigRemAmtLCY then
                 AdjAmt2 := OrigRemAmtLCY - RemAmtLCY;
-            exit(true);
         end;
+        exit(true);
     end;
 
     local procedure CustCalcRemOrigAmtLCY(CustLedgEntry2: Record "Cust. Ledger Entry"; PostingDate: Date): Decimal
