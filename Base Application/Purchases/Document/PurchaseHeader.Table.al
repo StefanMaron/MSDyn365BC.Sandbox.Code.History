@@ -704,9 +704,9 @@ table 38 "Purchase Header"
                     exit;
 
                 TestStatusOpen();
-                ShipmentMethod.Get("Shipment Method Code");
-                if ShipmentMethod."Incoterm in Intrastat Decl." <> '' then
-                    Validate("Transaction Specification", ShipmentMethod."Incoterm in Intrastat Decl.");
+                if ShipmentMethod.Get("Shipment Method Code") then
+                    if ShipmentMethod."Incoterm in Intrastat Decl." <> '' then
+                        Validate("Transaction Specification", ShipmentMethod."Incoterm in Intrastat Decl.");
             end;
         }
         field(28; "Location Code"; Code[10])
@@ -4657,6 +4657,7 @@ table 38 "Purchase Header"
 
         PurchaseLine.SetRange("Document Type", "Document Type");
         PurchaseLine.SetRange("Document No.", "No.");
+        PurchaseLine.SetFilter(Type, '<>%1', PurchaseLine.Type::" ");
         if not PurchaseLine.FindFirst() then
             exit(true);
 

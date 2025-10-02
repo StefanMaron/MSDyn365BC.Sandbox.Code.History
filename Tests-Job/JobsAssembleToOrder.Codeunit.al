@@ -27,6 +27,8 @@ codeunit 136322 "Jobs - Assemble-to Order"
         AssembleOrderExistErr: Label 'One or more assembly orders exists for the project %1.\\You must delete the assembly order before you can change the job status.', Comment = 'Project No.';
         RemainingQtyGreaterThanErr: Label 'Remaining Quantity (Base) cannot be more than %1 in Assembly Header Document Type=''%2'',No.=''%3''', Comment = 'Remaining Quantity, Document Type, No.';
         BillableLineTypeErr: Label 'Line Type must not be Billable in Project Planning Line Project No.=''%1'',Project Task No.=''%2'',Line No.=''%3''.';
+        ZeroJobContractLineMsg: Label 'Job Contract Entry No. is empty.';
+        UsageLinkExpectedErr: Label 'Usage Link must not be No in Project Planning Line Project No.=''%1'',Project Task No.=''%2'',Line No.=''%3''.', Comment = '%1 = Project No., %2 = Project Task No., %3 = Line No.';
 
     [Test]
     procedure AssemblyOrderIsCreated()
@@ -59,6 +61,37 @@ codeunit 136322 "Jobs - Assemble-to Order"
 
         ATOLink.FindFirst();
         Assert.AreEqual(ATOLink."Document Type"::Order, ATOLink."Document Type", ATOLinkWrongTypeMsg);
+    end;
+
+    [Test]
+    procedure AssemblyOrderIsNotCreatedIfApplyUsageLinkIsNotChecked()
+    var
+        ParentItem, CompItem1, CompItem2 : Record Item;
+        Job: Record Job;
+        JobTask: Record "Job Task";
+        JobPlanningLine: Record "Job Planning Line";
+    begin
+        // [SCENARIO 539741] Verify assembly order is not created if Apply Usage Link is not checked
+        Initialize();
+
+        // [GIVEN] Create an assembly item with 2 components.
+        CreateAssemblyItemWithBOM(ParentItem, CompItem1, CompItem2);
+
+        // [GIVEN] Create Job and Job Task
+        CreateJobAndJobTask(Job, JobTask);
+
+        // [GIVEN] Set Apply Usage Link to false
+        Job.Validate("Apply Usage Link", false);
+        Job.Modify(true);
+
+        // [GIVEN] Create Job Planning Line
+        CreateSimpleJobPlanningLineWithAssemblyItem(JobPlanningLine, JobTask, ParentItem."No.");
+
+        // [WHEN] Validate Quantity on Job Planning Line
+        asserterror JobPlanningLine.Validate("Quantity", LibraryRandom.RandInt(10));
+
+        // [THEN] Verify results
+        Assert.ExpectedError(StrSubstNo(UsageLinkExpectedErr, JobPlanningLine."Job No.", JobPlanningLine."Job Task No.", JobPlanningLine."Line No."));
     end;
 
     [Test]
@@ -649,6 +682,7 @@ codeunit 136322 "Jobs - Assemble-to Order"
         JobPlanningLine.TestField("Planning Date", PlanningDate);
         JobPlanningLine.TestField("Planned Delivery Date", PlannedDeliveryDate);
         JobPlanningLine.TestField("Document No.", DocumentNo);
+        Assert.IsFalse(JobPlanningLine."Job Contract Entry No." = 0, ZeroJobContractLineMsg);
     end;
 
     [Test]
@@ -857,6 +891,50 @@ codeunit 136322 "Jobs - Assemble-to Order"
         // [THEN] Verify results
         SetFiltersToPostedATOLink(JobTask, JobPlanningLine, PostedATOLink);
         Assert.RecordIsNotEmpty(PostedATOLink);
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerTrue,MessageHandler')]
+    procedure PostJobJournalLinesForTwoPlanningLinesWithSameAssemblyItem()
+    var
+        ParentItem, CompItem1, CompItem2 : Record Item;
+        Job: Record Job;
+        JobTask: Record "Job Task";
+        JobPlanningLine: Record "Job Planning Line";
+        ItemJournalLine: Record "Item Journal Line";
+        JobJournalLine: Record "Job Journal Line";
+        i: Integer;
+    begin
+        // [SCENARIO 561041] Verify post job journal lines for two planning lines with same assembly item
+        Initialize();
+
+        // [GIVEN] Create an assembly item with 2 components.
+        CreateAssemblyItemWithBOM(ParentItem, CompItem1, CompItem2);
+
+        // [GIVEN] Add components to inventory
+        CreateAndPostItemJournalLine(ItemJournalLine, ItemJournalLine."Entry Type"::"Positive Adjmt.", CompItem1."No.");
+        CreateAndPostItemJournalLine(ItemJournalLine, ItemJournalLine."Entry Type"::"Positive Adjmt.", CompItem2."No.");
+
+        // [GIVEN] Create Job and Job Task
+        CreateJobAndJobTask(Job, JobTask);
+
+        // [WHEN] Create Job Planning Line and Job Journal Line 2 times
+        for i := 1 to 2 do begin
+            // Create Job Planning Line
+            CreateSimpleJobPlanningLineWithAssemblyItem(JobPlanningLine, JobTask, ParentItem."No.");
+
+            // Validate Quantity on Job Planning Line
+            JobPlanningLine.Validate("Quantity", 1);
+            JobPlanningLine.Modify(true);
+
+            // Create Job Journal Line
+            LibraryJob.CreateJobJournalLineForPlan(JobPlanningLine, "Job Line Type"::Budget, 1, JobJournalLine);
+            JobJournalLine.Validate("Job Planning Line No.", JobPlanningLine."Line No.");
+            JobJournalLine.Modify(true);
+        end;
+
+        // [THEN] Verify Post usage from Job Journal
+        LibraryJob.PostJobJournal(JobJournalLine);
     end;
 
     local procedure Initialize()

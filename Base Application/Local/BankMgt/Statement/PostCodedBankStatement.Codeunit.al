@@ -6,6 +6,7 @@ namespace Microsoft.Bank.CODA;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
+using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Purchases.Payables;
@@ -59,6 +60,7 @@ codeunit 2000042 "Post Coded Bank Statement"
         Vend: Record Vendor;
         VendLedgEntry: Record "Vendor Ledger Entry";
         GLAcc: Record "G/L Account";
+        CurrExchRate: Record "Currency Exchange Rate";
         PaymJnlManagement: Codeunit PmtJrnlManagement;
         GenJnlManagement: Codeunit GenJnlManagement;
         CodeFound: Boolean;
@@ -95,6 +97,7 @@ codeunit 2000042 "Post Coded Bank Statement"
         GenJnlLine.SetRange("Journal Template Name", GenJnlTemplate.Name);
         GenJnlManagement.OpenJnl(BatchName, GenJnlLine);
         OnCodeOnBeforeTransferCodBankStmtLines(CodedBankStmtLine, CodBankStmtLine);
+        CheckAccountType(CodBankStmtLine."Bank Account No.", CodBankStmtLine."Statement No.");
         TransferCodBankStmtLines();
     end;
 
@@ -151,7 +154,12 @@ codeunit 2000042 "Post Coded Bank Statement"
                 end;
                 GenJnlLine.Validate("Account No.", CodBankStmtLine."Account No.");
                 GenJnlLine."Applies-to ID" := CodBankStmtLine."Applies-to ID";
-                GenJnlLine.Validate(Amount, -CodBankStmtLine."Statement Amount");
+                if ((BankAcc."Currency Code" = '') and (GenJnlLine."Currency Code" <> '')) then begin
+                    GenJnlLine."Amount (LCY)" := -CodBankStmtLine."Statement Amount";
+                    GenJnlLine.Amount := Round(
+                        CurrExchRate.ExchangeAmtLCYToFCY(GenJnlLine."Posting Date", GenJnlLine."Currency Code", GenJnlLine."Amount (LCY)", GenJnlLine."Currency Factor"));
+                end else
+                    GenJnlLine.Validate(Amount, -CodBankStmtLine."Statement Amount");
                 GenJnlLine."System-Created Entry" := true;
                 OnTransferCodBankStmtLinesOnBeforeGenJnlLineInsert(GenJnlLine, CodBankStmtLine);
                 GenJnlLine.Insert();
@@ -766,6 +774,57 @@ codeunit 2000042 "Post Coded Bank Statement"
             CodBankStmtLine."Unapplied Amount" := CodBankStmtLine."Unapplied Amount" - CodBankStmtLine.Amount;
         end;
         OnAfterInitCodBankStmtLine(CodBankStmtLine, CodedTrans, AccountType, UpdateApplicationAmounts);
+    end;
+
+    local procedure CheckAccountType(BankAccountNo: Code[20]; StatementNo: Code[20])
+    var
+        CODAStatementLine: Record "CODA Statement Line";
+    begin
+        CODAStatementLine.SetRange("Bank Account No.", BankAccountNo);
+        CODAStatementLine.SetRange("Statement No.", StatementNo);
+        CODAStatementLine.SetFilter("Application Status", '%1|%2', CODAStatementLine."Application Status"::Applied, CODAStatementLine."Application Status"::"Partly applied");
+        CodBankStmtLine.SetFilter("Statement Amount", '<>%1', 0);
+        if CODAStatementLine.FindSet() then
+            repeat
+                case CODAStatementLine."Account Type" of
+                    CODAStatementLine."Account Type"::"G/L Account":
+                        GetGLAccount(CODAStatementLine."Account No.");
+                    CODAStatementLine."Account Type"::Customer:
+                        GetCustomerAccount(CODAStatementLine."Account No.");
+                    CODAStatementLine."Account Type"::Vendor:
+                        GetVendorAccount(CODAStatementLine."Account No.");
+                end;
+            until CODAStatementLine.Next() = 0;
+    end;
+
+    local procedure GetGLAccount(AccountNo: Code[20])
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        GLAccount.Get(AccountNo);
+        GLAccount.CheckGLAcc();
+    end;
+
+    local procedure GetCustomerAccount(AccountNo: Code[20])
+    var
+        Customer: Record Customer;
+    begin
+        Customer.Get(AccountNo);
+        if Customer.Blocked = Customer.Blocked::" " then
+            exit;
+
+        Customer.CustBlockedErrorMessage(Customer, true)
+    end;
+
+    local procedure GetVendorAccount(AccountNo: Code[20])
+    var
+        Vendor: Record Vendor;
+    begin
+        Vendor.Get(AccountNo);
+        if Vendor.Blocked = Vendor.Blocked::" " then
+            exit;
+
+        Vendor.VendBlockedErrorMessage(Vendor, true)
     end;
 
     [IntegrationEvent(false, false)]
