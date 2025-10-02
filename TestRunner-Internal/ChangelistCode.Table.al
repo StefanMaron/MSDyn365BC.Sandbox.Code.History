@@ -37,6 +37,7 @@ table 130026 "Changelist Code"
         }
         field(11; "Coverage %"; Decimal)
         {
+            AutoFormatType = 0;
         }
         field(12; "Is Modification"; Boolean)
         {
@@ -98,4 +99,3 @@ table 130026 "Changelist Code"
         end;
     end;
 }
-

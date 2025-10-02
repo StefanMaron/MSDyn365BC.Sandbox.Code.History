@@ -93,7 +93,7 @@ codeunit 117041 "Create Service Item"
         XDUDLEY: Label 'DUDLEY';
         MakeAdjustments: Codeunit "Make Adjustments";
 
-    procedure InsertData("No.": Text[250]; "Serial No.": Text[250]; "Service Item Group Code": Text[250]; Description: Text[250]; Status: Enum "Service Item Status"; Priority: Option; "Customer No.": Text[250]; "Ship-to Code": Text[250]; "Item No.": Text[250]; "Unit of Measure Code": Text[250]; "Warranty Starting Date (Parts)": Date; "Response Time (Hours)": Decimal; "Default Contract Value": Decimal; "No. Series": Text[250]; "Preferred Resource": Text[250]; "Service Price Group Code": Text[250])
+    procedure InsertData("No.": Text[250]; "Serial No.": Text[250]; "Service Item Group Code": Text[250]; Description: Text[250]; Status: Enum "Service Item Status"; Priority: Enum "Service Priority"; "Customer No.": Text[250]; "Ship-to Code": Text[250]; "Item No.": Text[250]; "Unit of Measure Code": Text[250]; "Warranty Starting Date (Parts)": Date; "Response Time (Hours)": Decimal; "Default Contract Value": Decimal; "No. Series": Text[250]; "Preferred Resource": Text[250]; "Service Price Group Code": Text[250])
     var
         ServiceItem: Record "Service Item";
         ResSkillMgt: Codeunit "Resource Skill Mgt.";
