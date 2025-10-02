@@ -35,13 +35,8 @@ using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
-#if not CLEAN25
 using Microsoft.RoleCenters;
-#endif
 using Microsoft.Sales.Document;
-#if CLEAN25
-using Microsoft.Sales.Pricing;
-#endif
 using Microsoft.Utilities;
 
 page 8905 "Purchasing Manager Role Center"
@@ -289,12 +284,8 @@ page 8905 "Purchasing Manager Role Center"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'List Price Sheet';
-#if not CLEAN25
                         RunPageView = where("Object Type" = const(Report), "Object ID" = const(10148)); // "List Price Sheet"
                         RunObject = Page "Role Center Page Dispatcher";
-#else
-                        RunObject = Report "List Price Sheet V16";
-#endif
                     }
                     action("Item Charges - Specification")
                     {

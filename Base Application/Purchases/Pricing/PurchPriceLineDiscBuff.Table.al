@@ -1,4 +1,3 @@
-#if not CLEANSCHEMA28 
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -11,14 +10,6 @@ using Microsoft.Inventory.Item;
 table 1315 "Purch. Price Line Disc. Buff."
 {
     Caption = 'Purch. Price Line Disc. Buff.';
-#if not CLEAN25
-    ObsoleteState = Pending;
-    ObsoleteTag = '16.0';
-#else
-    ObsoleteState = Removed;
-    ObsoleteTag = '28.0';
-#endif    
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price Worksheet Line';
     DataClassification = CustomerContent;
 
     fields
@@ -106,7 +97,6 @@ table 1315 "Purch. Price Line Disc. Buff."
     {
     }
 
-#if not CLEAN25
     procedure LoadDataForItem(Item: Record Item)
     var
         PurchasePrice: Record "Purchase Price";
@@ -185,8 +175,4 @@ table 1315 "Purch. Price Line Disc. Buff."
 
         exit(false);
     end;
-#endif
 }
-
- 
-#endif

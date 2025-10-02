@@ -34,11 +34,9 @@ using Microsoft.Sales.Posting;
 using Microsoft.Finance.GeneralLedger.Preview;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Warehouse.Activity;
-#if not CLEAN25
 using Microsoft.Pricing.PriceList;
 using Microsoft.Sales.Pricing;
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Warehouse.Ledger;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Sales.Archive;
@@ -73,15 +71,11 @@ codeunit 137096 "SCM Kitting - ATO"
         LibraryAssembly: Codeunit "Library - Assembly";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
-#if not CLEAN25
         LibraryResource: Codeunit "Library - Resource";
-#endif
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryRandom: Codeunit "Library - Random";
-#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
-#endif
         GenProdPostingGr: Code[20];
         AsmInvtPostingGr: Code[20];
         CompInvtPostingGr: Code[20];
@@ -543,7 +537,6 @@ codeunit 137096 "SCM Kitting - ATO"
         exit(UnitCost);
     end;
 
-#if not CLEAN25
     local procedure GetRollupPrice(AssemblyHeader: Record "Assembly Header") Price: Decimal
     var
         AssemblyLine: Record "Assembly Line";
@@ -563,7 +556,6 @@ codeunit 137096 "SCM Kitting - ATO"
             end;
         until AssemblyLine.Next() = 0;
     end;
-#endif
 
     local procedure FindSOL(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; SOLIndex: Integer)
     begin
@@ -3561,7 +3553,6 @@ codeunit 137096 "SCM Kitting - ATO"
           StrSubstNo(WrongUnitValueMsg, SalesLine.FieldCaption("Unit Cost")));
     end;
 
-#if not CLEAN25
     [Test]
     [HandlerFunctions('ConfirmHandler')]
     [Scope('OnPrem')]
@@ -3594,7 +3585,6 @@ codeunit 137096 "SCM Kitting - ATO"
           SalesLine."Unit Price", GetRollupPrice(AssemblyHeader) / AssemblyHeader.Quantity, GLSetup."Unit-Amount Rounding Precision",
           StrSubstNo(WrongUnitValueMsg, SalesLine.FieldCaption("Unit Price")));
     end;
-#endif
 
     local procedure TCRollupCost(var Item: Record Item; var SalesLine: Record "Sales Line"; var AssemblyHeader: Record "Assembly Header"; LocationCode: Code[10]; SalesDocumentType: Enum "Sales Document Type"; QtyToAssembleToOrder: Integer; OrderQty: Integer)
     var
@@ -4889,7 +4879,6 @@ codeunit 137096 "SCM Kitting - ATO"
         ChangeCostAndPriceOnCompList(Item."No.");
     end;
 
-#if not CLEAN25
     local procedure CreateSalesAndResourcePricesOnCompList(ItemNo: Code[20])
     var
         BOMComponent: Record "BOM Component";
@@ -4948,7 +4937,6 @@ codeunit 137096 "SCM Kitting - ATO"
         ResourcePrice.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
         ResourcePrice.Modify(true);
     end;
-#endif
 
     local procedure CheckGetAsmOrdersFromSalesHeader(SalesHeader: Record "Sales Header"; NoOfAsmOrders: Integer)
     var

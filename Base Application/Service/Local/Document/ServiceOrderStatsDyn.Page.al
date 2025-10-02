@@ -600,38 +600,38 @@ page 10452 "Service Order Stats. Dyn"
             TempServLine.DeleteAll();
             Clear(TempServLine);
             ServAmtsMgt.GetServiceLines(Rec, TempServLine, i - 1);
-            SalesTaxCalculate.StartSalesTaxCalculation();
+            ServSalesTaxCalculate.StartSalesTaxCalculation();
             TempServLine.SetFilter(Type, '>0');
             TempServLine.SetFilter(Quantity, '<>0');
             if TempServLine.Find('-') then
                 repeat
-                    SalesTaxCalculate.AddServiceLine(TempServLine);
+                    ServSalesTaxCalculate.AddServiceLine(TempServLine);
                 until TempServLine.Next() = 0;
             case i of
                 1:
                     begin
                         TempSalesTaxLine1.DeleteAll();
-                        SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
-                        SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine1);
+                        ServSalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
+                        ServSalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine1);
                     end;
                 2:
                     begin
                         TempSalesTaxLine2.DeleteAll();
-                        SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
-                        SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine2);
+                        ServSalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
+                        ServSalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine2);
                     end;
                 3:
                     begin
                         TempSalesTaxLine3.DeleteAll();
-                        SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
-                        SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine3);
+                        ServSalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
+                        ServSalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine3);
                     end;
             end;
 
             ServAmtsMgt.SumServiceLinesTemp(
               Rec, TempServLine, i - 1, TotalServLine[i], TotalServLineLCY[i],
               VATAmount[i], VATAmountText[i], ProfitLCY[i], ProfitPct[i], TotalAdjCostLCY[i]);
-            SalesTaxCalculate.DistTaxOverServLines(TempServLine);
+            ServSalesTaxCalculate.DistTaxOverServLines(TempServLine);
             if i = 3 then
                 TotalAdjCostLCY[i] := TotalServLineLCY[i]."Unit Cost (LCY)";
 
@@ -642,7 +642,7 @@ page 10452 "Service Order Stats. Dyn"
             TotalAmount2[i] := TotalAmount1[i];
             VATAmount[i] := 0;
 
-            SalesTaxCalculate.GetSummarizedSalesTaxTable(TempSalesTaxAmtLine);
+            ServSalesTaxCalculate.GetSummarizedSalesTaxTable(TempSalesTaxAmtLine);
             BrkIdx := 0;
             PrevPrintOrder := 0;
             PrevTaxPercent := 0;
@@ -733,7 +733,7 @@ page 10452 "Service Order Stats. Dyn"
         ServAmtsMgt: Codeunit "Serv-Amounts Mgt.";
         SalesTaxDifference: Record "Sales Tax Amount Difference";
         TaxArea: Record "Tax Area";
-        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
+        ServSalesTaxCalculate: Codeunit "Serv. Sales Tax Calculate";
         TotalAmount1: array[7] of Decimal;
         TotalAmount2: array[7] of Decimal;
         VATAmount: array[7] of Decimal;
@@ -943,22 +943,22 @@ page 10452 "Service Order Stats. Dyn"
         ServLine.FindFirst();
 
         if TempSalesTaxLine1.GetAnyLineModified() then begin
-            SalesTaxCalculate.StartSalesTaxCalculation();
-            SalesTaxCalculate.PutSalesTaxAmountLineTable(
+            ServSalesTaxCalculate.StartSalesTaxCalculation();
+            ServSalesTaxCalculate.PutSalesTaxAmountLineTable(
               TempSalesTaxLine1,
               SalesTaxDifference."Document Product Area"::Service.AsInteger(),
               Rec."Document Type".AsInteger(), Rec."No.");
-            SalesTaxCalculate.DistTaxOverServLines(ServLine);
-            SalesTaxCalculate.SaveTaxDifferences();
+            ServSalesTaxCalculate.DistTaxOverServLines(ServLine);
+            ServSalesTaxCalculate.SaveTaxDifferences();
         end;
         if TempSalesTaxLine2.GetAnyLineModified() then begin
-            SalesTaxCalculate.StartSalesTaxCalculation();
-            SalesTaxCalculate.PutSalesTaxAmountLineTable(
+            ServSalesTaxCalculate.StartSalesTaxCalculation();
+            ServSalesTaxCalculate.PutSalesTaxAmountLineTable(
               TempSalesTaxLine2,
               SalesTaxDifference."Document Product Area"::Service.AsInteger(),
               Rec."Document Type".AsInteger(), Rec."No.");
-            SalesTaxCalculate.DistTaxOverServLines(ServLine);
-            SalesTaxCalculate.SaveTaxDifferences();
+            ServSalesTaxCalculate.DistTaxOverServLines(ServLine);
+            ServSalesTaxCalculate.SaveTaxDifferences();
         end;
 
         PrevNo := '';

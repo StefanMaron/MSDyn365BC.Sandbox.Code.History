@@ -28,9 +28,9 @@ codeunit 141018 "UT PAG Sales Tax Statistics"
         TaxArea: Record "Tax Area";
         TaxJurisdiction: Record "Tax Jurisdiction";
         SalesInvoiceLine: Record "Sales Invoice Line";
-        SalesTaxAmountLineCalc: Codeunit "Sales Tax Amount Line Calc";
+        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
         SalesLineType: Enum "Sales Line Type";
-        TaxCountry: Option US,CA;
+        TaxCountry: Enum "Sales Tax Country";
         ExchangeFactor: Decimal;
     begin
         // [SCENARIO] The field Positive in the table "Sales Tax Amount Line" is correctly updated to true based on the value of the field LineAmount
@@ -76,9 +76,12 @@ codeunit 141018 "UT PAG Sales Tax Statistics"
         ExchangeFactor := 1;
 
         // [WHEN] The variable LineType in the codeunit SalesTaxAmountLineCalc is properly initialized
-        SalesTaxAmountLineCalc.InitFromSalesInvLine(SalesInvoiceLine);
-        // [WHEN] Running the method CalcSalesOrServLineSalesTaxAmountLine to properly update the field Positive in the SalesTaxAmountLine table
-        SalesTaxAmountLineCalc.CalcSalesOrServLineSalesTaxAmountLine(SalesTaxAmountLine, TaxAreaLine, TaxCountry::CA, TaxArea, TaxJurisdiction, ExchangeFactor);
+        // [WHEN] Running the method CalcSalesTaxAmountLine to properly update the field Positive in the SalesTaxAmountLine table
+        SalesTaxCalculate.CalcSalesTaxAmountLine(
+            SalesTaxAmountLine, TaxCountry, ExchangeFactor,
+            SalesInvoiceLine."Tax Area Code", SalesInvoiceLine."Tax Group Code", SalesInvoiceLine.Type.AsInteger(),
+            SalesInvoiceLine."Line Amount", SalesInvoiceLine."VAT Base Amount", SalesInvoiceLine."Quantity (Base)",
+            SalesInvoiceLine."Posting Date", SalesInvoiceLine."Tax Liable", false, "Sales Tax Document Area"::"Posted Sale");
 
         // [THEN] The field Positive in the SalesTaxAmountLine table is properly updated
         Assert.AreEqual(true, SalesTaxAmountLine.Positive, 'The field Positive in the table SalesTaxAmountLine should be true');

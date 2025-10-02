@@ -304,22 +304,22 @@ page 10056 "Service Invoice Stats."
                 else
                     CreditLimitLCYExpendedPct := Round(Cust."Balance (LCY)" / Cust."Credit Limit (LCY)" * 10000, 1);
 
-        SalesTaxCalculate.StartSalesTaxCalculation();
+        ServSalesTaxCalculate.StartSalesTaxCalculation();
         TempSalesTaxLine.DeleteAll();
 
         OnAfterCalculateSalesTax(ServInvLine, TempSalesTaxLine, TempSalesTaxAmtLine, SalesTaxCalculationOverridden);
         if not SalesTaxCalculationOverridden then
             if TaxArea."Use External Tax Engine" then
-                SalesTaxCalculate.CallExternalTaxEngineForDoc(DATABASE::"Service Invoice Header", 0, Rec."No.")
+                ServSalesTaxCalculate.CallExternalTaxEngineForDoc(DATABASE::"Service Invoice Header", 0, Rec."No.")
             else begin
-                SalesTaxCalculate.AddServInvoiceLines(Rec."No.");
-                SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
+                ServSalesTaxCalculate.AddServInvoiceLines(Rec."No.");
+                ServSalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
             end;
 
-        SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine);
+        ServSalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine);
 
         if not SalesTaxCalculationOverridden then
-            SalesTaxCalculate.GetSummarizedSalesTaxTable(TempSalesTaxAmtLine);
+            ServSalesTaxCalculate.GetSummarizedSalesTaxTable(TempSalesTaxAmtLine);
         if TaxArea."Country/Region" = TaxArea."Country/Region"::CA then
             BreakdownTitle := Text006
         else
@@ -352,7 +352,7 @@ page 10056 "Service Invoice Stats."
         TempSalesTaxLine: Record "Sales Tax Amount Line" temporary;
         Currency: Record Currency;
         TaxArea: Record "Tax Area";
-        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
+        ServSalesTaxCalculate: Codeunit "Serv. Sales Tax Calculate";
         CustAmount: Decimal;
         AmountInclTax: Decimal;
         InvDiscAmount: Decimal;

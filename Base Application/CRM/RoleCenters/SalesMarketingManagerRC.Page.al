@@ -35,12 +35,7 @@ using Microsoft.Inventory.Reports;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
-#if CLEAN25
-using Microsoft.Pricing.Worksheet;
-#endif
-#if not CLEAN25
 using Microsoft.RoleCenters;
-#endif
 using Microsoft.Sales.Analysis;
 using Microsoft.Sales.Archive;
 using Microsoft.Sales.Customer;
@@ -636,7 +631,6 @@ page 8907 "Sales & Marketing Manager RC"
                     Caption = 'Item Attributes';
                     RunObject = page "Item Attributes";
                 }
-#if not CLEAN25
                 action("Sales Price Worksheet")
                 {
                     ApplicationArea = Suite;
@@ -644,16 +638,6 @@ page 8907 "Sales & Marketing Manager RC"
                     RunPageView = where("Object Type" = const(Page), "Object ID" = const(7023)); // "Sales Price Worksheet";
                     RunObject = Page "Role Center Page Dispatcher";
                 }
-#else
-                action("Sales Price Worksheet")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Sales Price Worksheet';
-                    Image = PriceWorksheet;
-                    RunObject = Page "Price Worksheet";
-                    ToolTip = 'Manage sales prices for individual customers, for a group of customers, for all customers, or for a campaign.';
-                }
-#endif
                 action("Adjust Item Costs/Prices")
                 {
                     ApplicationArea = Basic, Suite;
@@ -743,12 +727,8 @@ page 8907 "Sales & Marketing Manager RC"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'List Price Sheet';
-#if not CLEAN25
                         RunPageView = where("Object Type" = const(Report), "Object ID" = const(10148)); // "List Price Sheet"
                         RunObject = Page "Role Center Page Dispatcher";
-#else
-                        RunObject = Report "List Price Sheet V16";
-#endif
                     }
                     action("Picking List by Item")
                     {

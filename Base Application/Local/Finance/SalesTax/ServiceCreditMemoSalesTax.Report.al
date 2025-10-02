@@ -464,14 +464,14 @@ report 10473 "Service Credit Memo-Sales Tax"
                                 TaxRegLabel := CompanyInformation.FieldCaption("VAT Registration No.");
                             end;
                     end;
-                    SalesTaxCalc.StartSalesTaxCalculation();
+                    ServSalesTaxCalc.StartSalesTaxCalculation();
                     if TaxArea."Use External Tax Engine" then
-                        SalesTaxCalc.CallExternalTaxEngineForDoc(DATABASE::"Service Cr.Memo Header", 0, "No.")
+                        ServSalesTaxCalc.CallExternalTaxEngineForDoc(DATABASE::"Service Cr.Memo Header", 0, "No.")
                     else begin
-                        SalesTaxCalc.AddServCrMemoLines("No.");
-                        SalesTaxCalc.EndSalesTaxCalculation("Posting Date");
+                        ServSalesTaxCalc.AddServCrMemoLines("No.");
+                        ServSalesTaxCalc.EndSalesTaxCalculation("Posting Date");
                     end;
-                    SalesTaxCalc.GetSummarizedSalesTaxTable(TempSalesTaxAmtLine);
+                    ServSalesTaxCalc.GetSummarizedSalesTaxTable(TempSalesTaxAmtLine);
                     BrkIdx := 0;
                     PrevPrintOrder := 0;
                     PrevTaxPercent := 0;
@@ -601,7 +601,7 @@ report 10473 "Service Credit Memo-Sales Tax"
         ServiceCrMemoPrinted: Codeunit "Service Cr. Memo-Printed";
         FormatAddress: Codeunit "Format Address";
         ServiceFormatAddress: Codeunit "Service Format Address";
-        SalesTaxCalc: Codeunit "Sales Tax Calculate";
+        ServSalesTaxCalc: Codeunit "Serv. Sales Tax Calculate";
         Text000: Label 'COPY';
         TaxRegNo: Text[30];
         TaxRegLabel: Text;

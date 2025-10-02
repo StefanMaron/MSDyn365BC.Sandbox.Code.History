@@ -25,9 +25,7 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
-#if not CLEAN25
 using Microsoft.Sales.Pricing;
-#endif
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using System.Environment.Configuration;
@@ -456,11 +454,9 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             'CRM Account-Customer':
                 if UpdateCustomerBlocked(SourceRecordRef, DestinationRecordRef) then
                     AdditionalFieldsWereModified := true;
-#if not CLEAN25
             'Sales Price-CRM Productpricelevel':
                 if UpdateCRMProductPricelevelAfterTransferRecordFields(SourceRecordRef, DestinationRecordRef) then
                     AdditionalFieldsWereModified := true;
-#endif
             'Price List Line-CRM Productpricelevel':
                 if UpdateCRMProductPricelevelAfterTransferRecordFieldsPriceListLine(SourceRecordRef, DestinationRecordRef) then
                     AdditionalFieldsWereModified := true;
@@ -512,10 +508,8 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 UpdateCRMContactParentCustomerId(SourceRecordRef, DestinationRecordRef);
             'Currency-CRM Transactioncurrency':
                 UpdateCRMTransactionCurrencyBeforeInsertRecord(DestinationRecordRef);
-#if not CLEAN25
             'Customer Price Group-CRM Pricelevel':
                 UpdateCRMPricelevelBeforeInsertRecord(SourceRecordRef, DestinationRecordRef);
-#endif
             'Price List Header-CRM Pricelevel':
                 UpdateCRMPricelevelBeforeInsertPriceListHeader(SourceRecordRef, DestinationRecordRef);
             'Item-CRM Product',
@@ -562,10 +556,8 @@ codeunit 5341 "CRM Int. Table. Subscriber"
     begin
         SourceDestCode := GetSourceDestCode(SourceRecordRef, DestinationRecordRef);
         case SourceDestCode of
-#if not CLEAN25
             'Customer Price Group-CRM Pricelevel':
                 ResetCRMProductpricelevelFromCustomerPriceGroup(SourceRecordRef);
-#endif
             'Price List Header-CRM Pricelevel':
                 ResetCRMProductpricelevelFromPriceListHeader(SourceRecordRef);
             'Item-CRM Product',
@@ -764,6 +756,19 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             ChangeSalesOrderStateCode(DestinationRecordRef, CRMSalesorder.StateCode::Submitted);
     end;
 
+    local procedure SubmitOrInvoiceSalesOrder(var SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
+    var
+        SalesHeader: Record "Sales Header";
+        CRMSalesorder: Record "CRM Salesorder";
+        CRMSalesDocumentPostingMgt: Codeunit "CRM Sales Document Posting Mgt";
+    begin
+        SourceRecordRef.SetTable(SalesHeader);
+        if CRMSalesDocumentPostingMgt.IsSalesOrderFullyInvoiced(SalesHeader) then
+            ChangeSalesOrderStateCode(DestinationRecordRef, CRMSalesorder.StateCode::Invoiced)
+        else
+            ChangeSalesOrderStateCode(DestinationRecordRef, CRMSalesorder.StateCode::Submitted);
+    end;
+
     local procedure ChangeValidateSalesOrderStatus(var SourceRecordRef: RecordRef; NewStatus: Enum "Sales Document Status")
     var
         SalesHeader: Record "Sales Header";
@@ -798,10 +803,8 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 UpdateContactParentCompany(SourceRecordRef, DestinationRecordRef);
             'Contact-CRM Contact':
                 UpdateCRMContactParentCustomerId(SourceRecordRef, DestinationRecordRef);
-#if not CLEAN25
             'Customer Price Group-CRM Pricelevel':
                 UpdateCRMPricelevelBeforeModifyRecord(SourceRecordRef, DestinationRecordRef);
-#endif
             'Price List Header-CRM Pricelevel':
                 UpdateCRMPricelevelBeforeModifyPriceListHeader(SourceRecordRef, DestinationRecordRef);
             'Item-CRM Product',
@@ -827,13 +830,10 @@ codeunit 5341 "CRM Int. Table. Subscriber"
     procedure OnAfterModifyRecord(IntegrationTableMapping: Record "Integration Table Mapping"; SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
     var
         CRMConnectionSetup: Record "CRM Connection Setup";
-        CRMSalesOrder: Record "CRM Salesorder";
     begin
         case GetSourceDestCode(SourceRecordRef, DestinationRecordRef) of
-#if not CLEAN25
             'Customer Price Group-CRM Pricelevel':
                 ResetCRMProductpricelevelFromCustomerPriceGroup(SourceRecordRef);
-#endif
             'Price List Header-CRM Pricelevel':
                 ResetCRMProductpricelevelFromPriceListHeader(SourceRecordRef);
             'Sales Header-CRM Salesorder':
@@ -841,7 +841,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                     ResetCRMSalesorderdetailFromSalesOrderLine(SourceRecordRef, DestinationRecordRef);
                     SetCRMSalesOrderStateCode(SourceRecordRef, DestinationRecordRef);
                 end else
-                    ChangeSalesOrderStateCode(DestinationRecordRef, CRMSalesOrder.StateCode::Submitted);
+                    SubmitOrInvoiceSalesOrder(SourceRecordRef, DestinationRecordRef);
             'CRM Salesorder-Sales Header':
                 if CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled() then begin
                     ResetSalesOrderLineFromCRMSalesorderdetail(SourceRecordRef, DestinationRecordRef);
@@ -863,10 +863,8 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         SalesHeader: Record "Sales Header";
     begin
         case GetSourceDestCode(SourceRecordRef, DestinationRecordRef) of
-#if not CLEAN25
             'Customer Price Group-CRM Pricelevel':
                 ResetCRMProductpricelevelFromCustomerPriceGroup(SourceRecordRef);
-#endif
             'Price List Header-CRM Pricelevel':
                 ResetCRMProductpricelevelFromPriceListHeader(SourceRecordRef);
             'Sales Header-CRM Salesorder':
@@ -1013,11 +1011,9 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         end;
 
         case SourceRecordRef.Number() of
-#if not CLEAN25
             DATABASE::"Sales Price":
                 if CRMPriceListLineFindUncoupledDestinationRecord(SourceRecordRef, DestinationRecordRef) then
                     DestinationFound := true;
-#endif
             DATABASE::"Price List Line":
                 if CRMExtPriceListLineFindUncoupledDestinationRecord(SourceRecordRef, DestinationRecordRef) then
                     DestinationFound := true;
@@ -1600,7 +1596,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         DestinationRecordRef.GetTable(CRMInvoicedetail);
     end;
 
-#if not CLEAN25
     local procedure UpdateCRMPricelevelBeforeInsertRecord(SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
     var
         CRMPricelevel: Record "CRM Pricelevel";
@@ -1622,7 +1617,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
 
         SetCompanyId(DestinationRecordRef);
     end;
-#endif
 
     local procedure UpdateCRMPricelevelBeforeInsertPriceListHeader(SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
     var
@@ -1656,7 +1650,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         UpdateOwnerIdAndCompanyId(DestinationRecordRef);
     end;
 
-#if not CLEAN25
     local procedure UpdateCRMPricelevelBeforeModifyRecord(SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
     var
         CRMPricelevel: Record "CRM Pricelevel";
@@ -1671,7 +1664,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
 
         SetCompanyId(DestinationRecordRef);
     end;
-#endif
+
     local procedure UpdateCRMPricelevelBeforeModifyPriceListHeader(SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
     var
         CRMPricelevel: Record "CRM Pricelevel";
@@ -1687,7 +1680,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         SetCompanyId(DestinationRecordRef);
     end;
 
-#if not CLEAN25
     local procedure ResetCRMProductpricelevelFromCustomerPriceGroup(SourceRecordRef: RecordRef)
     var
         CustomerPriceGroup: Record "Customer Price Group";
@@ -1704,7 +1696,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             CRMIntegrationTableSynch.SynchRecordsToIntegrationTable(SalesPriceRecordRef, false, false);
         end;
     end;
-#endif
+
     local procedure ResetCRMProductpricelevelFromPriceListHeader(SourceRecordRef: RecordRef)
     var
         PriceListHeader: Record "Price List Header";
@@ -1885,7 +1877,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             SalesLine.InsertFreightLine(CRMSalesorder.FreightAmount);
     end;
 
-#if not CLEAN25
     local procedure UpdateCRMProductPricelevelAfterTransferRecordFields(SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef) UoMHasBeenChanged: Boolean
     var
         CRMProductpricelevel: Record "CRM Productpricelevel";
@@ -1902,7 +1893,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         end;
         DestinationRecordRef.GetTable(CRMProductpricelevel);
     end;
-#endif
+
     local procedure UpdateCRMProductPricelevelAfterTransferRecordFieldsPriceListLine(SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef) UoMHasBeenChanged: Boolean
     var
         CRMProductpricelevel: Record "CRM Productpricelevel";
@@ -2142,7 +2133,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             DestinationFound := DestinationRecordRef.Get(CRMTransactioncurrency.RecordId());
     end;
 
-#if not CLEAN25
     local procedure CRMPriceListLineFindUncoupledDestinationRecord(SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef) DestinationFound: Boolean
     var
         CRMIntegrationRecord: Record "CRM Integration Record";
@@ -2166,7 +2156,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             DestinationRecordRef.GetTable(CRMProductpricelevel);
         end;
     end;
-#endif
+
     local procedure CRMExtPriceListLineFindUncoupledDestinationRecord(SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef) DestinationFound: Boolean
     var
         CRMIntegrationRecord: Record "CRM Integration Record";
@@ -2645,7 +2635,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         end;
     end;
 
-#if not CLEAN25
     local procedure CheckSalesPricesForSync(CustomerPriceGroupCode: Code[10]; ExpectedCurrencyCode: Code[10])
     var
         SalesPrice: Record "Sales Price";
@@ -2660,7 +2649,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
                 FindCRMUoMIdForSalesPrice(Enum::"Price Asset Type"::Item, SalesPrice."Item No.", SalesPrice."Unit of Measure Code", CRMUom);
             until SalesPrice.Next() = 0;
     end;
-#endif
+
     local procedure CheckPriceListLinesForSync(PriceListCode: Code[20]; ExpectedCurrencyCode: Code[10])
     var
         PriceListLine: Record "Price List Line";
@@ -2680,7 +2669,6 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             until PriceListLine.Next() = 0;
     end;
 
-#if not CLEAN25
     local procedure CheckCustPriceGroupForSync(var CRMTransactioncurrency: Record "CRM Transactioncurrency"; CustomerPriceGroup: Record "Customer Price Group")
     var
         SalesPrice: Record "Sales Price";
@@ -2693,7 +2681,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         end else
             CRMSynchHelper.FindNAVLocalCurrencyInCRM(CRMTransactioncurrency);
     end;
-#endif
+
     local procedure CheckPriceListHeaderForSync(var CRMTransactioncurrency: Record "CRM Transactioncurrency"; PriceListHeader: Record "Price List Header")
     var
         PriceListLine: Record "Price List Line";

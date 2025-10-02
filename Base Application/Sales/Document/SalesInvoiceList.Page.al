@@ -724,6 +724,24 @@ page 9301 "Sales Invoice List"
                         RunObject = Report "Customer - Detail Trial Bal.";
                         ToolTip = 'View the balance for customers with balances on a specified date. The report can be used at the close of an accounting period, for example, or for an audit.';
                     }
+                    action("Customer - Summary Aging")
+                    {
+                        ApplicationArea = Suite;
+                        Caption = 'Customer - Summary Aging';
+                        Image = "Report";
+                        RunObject = Report "Customer - Summary Aging";
+                        ToolTip = 'View, print, or save a summary of each customer''s total payments due, divided into three time periods. The report can be used to decide when to issue reminders, to evaluate a customer''s creditworthiness, or to prepare liquidity analyses.';
+                        Visible = false;
+                    }
+                    action("Customer - Detailed Aging")
+                    {
+                        ApplicationArea = Suite;
+                        Caption = 'Customer - Detailed Aging';
+                        Image = "Report";
+                        RunObject = Report "Customer Detailed Aging";
+                        ToolTip = 'View, print, or save a detailed list of each customer''s total payments due, divided into three time periods. The report can be used to decide when to issue reminders, to evaluate a customer''s creditworthiness, or to prepare liquidity analyses.';
+                        Visible = false;
+                    }
                     action("Aged Accounts Receivable")
                     {
                         ApplicationArea = Basic, Suite;

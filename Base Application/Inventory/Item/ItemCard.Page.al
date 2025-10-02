@@ -166,7 +166,6 @@ page 30 "Item Card"
                 {
                     ApplicationArea = Intercompany;
                     Importance = Additional;
-                    ToolTip = 'Specifies the unique common item number that the intercompany partners agree upon.';
                 }
                 field("Purchasing Code"; Rec."Purchasing Code")
                 {
@@ -192,6 +191,18 @@ page 30 "Item Card"
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
+                }
+                field("No. 2"; Rec."No. 2")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                    Importance = Additional;
+                }
+                field("Alternative Item No."; Rec."Alternative Item No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                    Importance = Additional;
                 }
             }
             group(InventoryGrp)
@@ -270,6 +281,16 @@ page 30 "Item Card"
                     ApplicationArea = Jobs;
                     Importance = Additional;
                     ToolTip = 'Specifies how many units of the item are allocated to projects, meaning listed on outstanding project planning lines.';
+                }
+                field("Qty. on Blanket Sales Order"; Rec."Qty. on Blanket Sales Order")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
+                field("Qty. on Blanket Purch. Order"; Rec."Qty. on Blanket Purch. Order")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
                 }
                 field(StockoutWarningDefaultYes; Rec."Stockout Warning")
                 {
@@ -484,7 +505,6 @@ page 30 "Item Card"
                             UpdateSpecialPriceListsTxt(PriceType::Purchase);
                         end;
                     }
-#if not CLEAN25
                     field(SpecialPurchPricesAndDiscountsTxt; SpecialPurchPricesAndDiscountsTxt)
                     {
                         ApplicationArea = Suite;
@@ -492,9 +512,6 @@ page 30 "Item Card"
                         Editable = false;
                         Visible = not ExtendedPriceEnabled;
                         ToolTip = 'Specifies purchase prices and line discounts for the item.';
-                        ObsoleteState = Pending;
-                        ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                        ObsoleteTag = '17.0';
 
                         trigger OnDrillDown()
                         var
@@ -524,7 +541,6 @@ page 30 "Item Card"
                             UpdateSpecialPricesAndDiscountsTxt();
                         end;
                     }
-#endif
                 }
                 group("Posting Details")
                 {
@@ -651,7 +667,6 @@ page 30 "Item Card"
                         UpdateSpecialPriceListsTxt(PriceType::Sale);
                     end;
                 }
-#if not CLEAN25
                 field(SpecialPricesAndDiscountsTxt; SpecialPricesAndDiscountsTxt)
                 {
                     ApplicationArea = Basic, Suite;
@@ -659,9 +674,6 @@ page 30 "Item Card"
                     Editable = false;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'Specifies sales prices and line discounts for the item.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '16.0';
 
                     trigger OnDrillDown()
                     var
@@ -693,7 +705,6 @@ page 30 "Item Card"
                         UpdateSpecialPricesAndDiscountsTxt();
                     end;
                 }
-#endif
                 field("Allow Invoice Disc."; Rec."Allow Invoice Disc.")
                 {
                     ApplicationArea = Basic, Suite;
@@ -1131,7 +1142,6 @@ page 30 "Item Card"
             group(PricesandDiscounts)
             {
                 Caption = 'Sales Prices & Discounts';
-#if not CLEAN25
                 action("Set Special Prices")
                 {
                     ApplicationArea = Basic, Suite;
@@ -1139,9 +1149,6 @@ page 30 "Item Card"
                     Image = Price;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'Set up sales prices for the item. An item price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
 
                     trigger OnAction()
                     var
@@ -1158,9 +1165,6 @@ page 30 "Item Card"
                     Image = LineDiscount;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'Set up sales discounts for the item. An item discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
 
                     trigger OnAction()
                     var
@@ -1179,9 +1183,6 @@ page 30 "Item Card"
                     Image = PriceWorksheet;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View the sales prices and line discounts that you grant for this item when certain criteria are met, such as vendor, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
 
                     trigger OnAction()
                     var
@@ -1192,7 +1193,6 @@ page 30 "Item Card"
                         SalesPriceAndLineDiscounts.RunModal();
                     end;
                 }
-#endif
                 action(SalesPriceLists)
                 {
                     AccessByPermission = TableData "Sales Price Access" = R;
@@ -1233,7 +1233,6 @@ page 30 "Item Card"
             group(PurchPricesandDiscounts)
             {
                 Caption = 'Purchase Prices & Discounts';
-#if not CLEAN25
                 action(Action86)
                 {
                     ApplicationArea = Suite;
@@ -1244,9 +1243,6 @@ page 30 "Item Card"
                     RunPageLink = "Item No." = field("No.");
                     RunPageView = sorting("Item No.");
                     ToolTip = 'Set up purchase prices for the item. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
                 action(Action85)
                 {
@@ -1257,9 +1253,6 @@ page 30 "Item Card"
                     RunObject = Page "Purchase Line Discounts";
                     RunPageLink = "Item No." = field("No.");
                     ToolTip = 'Set up purchase discounts for the item. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
                 action(PurchPricesDiscountsOverview)
                 {
@@ -1268,9 +1261,6 @@ page 30 "Item Card"
                     Image = PriceWorksheet;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View the purchase prices and line discounts that you grant for this item when certain criteria are met, such as vendor, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
 
                     trigger OnAction()
                     var
@@ -1280,7 +1270,6 @@ page 30 "Item Card"
                         PurchasesPriceAndLineDisc.RunModal();
                     end;
                 }
-#endif
                 action(PurchPriceLists)
                 {
                     AccessByPermission = TableData "Purchase Price Access" = R;
@@ -2566,66 +2555,36 @@ page 30 "Item Card"
             {
                 Caption = 'Prices & Discounts', Comment = 'Generated from the PromotedActionCategories property index 5.';
 
-#if not CLEAN25
                 actionref("Set Special Prices_Promoted"; "Set Special Prices")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
                 actionref(SalesPriceLists_Promoted; SalesPriceLists)
                 {
                 }
                 actionref(PurchPriceLists_Promoted; PurchPriceLists)
                 {
                 }
-#if not CLEAN25
                 actionref(PricesDiscountsOverview_Promoted; PricesDiscountsOverview)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
-#if not CLEAN25
                 actionref("Set Special Discounts_Promoted"; "Set Special Discounts")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
-#if not CLEAN25
                 actionref(PurchPricesDiscountsOverview_Promoted; PurchPricesDiscountsOverview)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
                 actionref(SalesPriceListsDiscounts_Promoted; SalesPriceListsDiscounts)
                 {
                 }
                 actionref(PurchPriceListsDiscounts_Promoted; PurchPriceListsDiscounts)
                 {
                 }
-#if not CLEAN25
                 actionref(Action86_Promoted; Action86)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
-#if not CLEAN25
                 actionref(Action85_Promoted; Action85)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
             }
             group(Category_Report)
             {
@@ -2798,12 +2757,10 @@ page 30 "Item Card"
         MarketingTextPlaceholderTxt: Label '[Create draft]() based on this item''s attributes.', Comment = 'Text contained in [here]() will be clickable to invoke the generate action';
         ViewExistingTxt: Label 'View Existing Prices and Discounts...';
         ShowVariantMandatoryDefaultYes: Boolean;
-#if not CLEAN25
         SpecialPricesAndDiscountsTxt: Text;
         CreateNewSpecialPriceTxt: Label 'Create New Special Price...';
         CreateNewSpecialDiscountTxt: Label 'Create New Special Discount...';
         SpecialPurchPricesAndDiscountsTxt: Text;
-#endif
 
     protected var
         ItemReplenishmentSystem: Enum "Item Replenishment System";
@@ -2863,10 +2820,8 @@ page 30 "Item Card"
         EnablePlanningControls();
         EnableCostingControls();
 
-#if not CLEAN25
         if not ExtendedPriceEnabled then
             UpdateSpecialPricesAndDiscountsTxt();
-#endif
         SetExpirationCalculationEditable();
     end;
 
@@ -2987,8 +2942,6 @@ page 30 "Item Card"
         OnAfterInitControls();
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     local procedure UpdateSpecialPricesAndDiscountsTxt()
     var
         TempSalesPriceAndLineDiscBuff: Record "Sales Price and Line Disc Buff" temporary;
@@ -3002,7 +2955,6 @@ page 30 "Item Card"
         if TempPurchPriceLineDiscBuff.ItemHasLines(Rec) then
             SpecialPurchPricesAndDiscountsTxt := ViewExistingTxt;
     end;
-#endif
 
     local procedure UpdateSpecialPriceListsTxt(PriceType: Enum "Price Type")
     begin

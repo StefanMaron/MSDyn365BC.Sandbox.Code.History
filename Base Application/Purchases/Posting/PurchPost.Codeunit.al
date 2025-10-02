@@ -117,6 +117,7 @@ codeunit 90 "Purch.-Post"
         InventorySetup: Record "Inventory Setup";
         ErrorContextElementProcessLines: Codeunit "Error Context Element";
         ErrorContextElementPostLine: Codeunit "Error Context Element";
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
         ZeroPurchLineRecID: RecordId;
         EverythingInvoiced: Boolean;
         SavedPreviewMode: Boolean;
@@ -128,6 +129,7 @@ codeunit 90 "Purch.-Post"
         SalesTaxCalculationOverridden: Boolean;
         IsHandled: Boolean;
     begin
+        SequenceNoMgt.SetPreviewMode(PreviewMode);
         IsHandled := false;
         OnBeforePostPurchaseDoc(PurchaseHeader2, PreviewMode, SuppressCommit, HideProgressWindow, ItemJnlPostLine, IsHandled);
         if IsHandled then
@@ -1028,6 +1030,7 @@ codeunit 90 "Purch.-Post"
         SearchPurchCrMemoLine: Record "Purch. Cr. Memo Line";
         CostBaseAmount: Decimal;
         IsHandled: Boolean;
+        AmountsOnly: Boolean;
     begin
         IsHandled := false;
         OnBeforePostPurchLine(PurchHeader, PurchLine, IsHandled);
@@ -1043,10 +1046,12 @@ codeunit 90 "Purch.-Post"
         if PurchLine."Qty. to Invoice" + PurchLine."Quantity Invoiced" <> PurchLine.Quantity then
             EverythingInvoiced := false;
 
-        OnPostPurchLineOnAfterSetEverythingInvoiced(PurchLine, EverythingInvoiced, PurchHeader);
+        AmountsOnly := false;
+        OnPostPurchLineOnAfterSetEverythingInvoiced(PurchLine, EverythingInvoiced, PurchHeader, TempVATAmountLine, TempVATAmountLineRemainder, AmountsOnly);
 
-        if PurchLine.Quantity <> 0 then begin
-            PurchLine.TestField("No.");
+        if (PurchLine.Quantity <> 0) or AmountsOnly then begin
+            if not AmountsOnly then
+                PurchLine.TestField("No.");
             PurchLine.TestField(Type);
             IsHandled := false;
             OnPostPurchLineOnBeforeTestGeneralPostingGroups(PurchLine, IsHandled);
@@ -1062,7 +1067,8 @@ codeunit 90 "Purch.-Post"
             if not IsHandled then
                 DivideAmount(PurchHeader, PurchLine, 1, PurchLine."Qty. to Invoice", TempVATAmountLine, TempVATAmountLineRemainder);
         end else
-            PurchLine.TestField(Amount, 0);
+            if not AmountsOnly then
+                PurchLine.TestField(Amount, 0);
 
         if PurchLine."Prepayment Line" and PurchHeader."Prepmt. Include Tax" then begin
             PurchLine.Amount := PurchLine.Amount + (PurchLine."VAT Base Amount" * PurchLine."VAT %" / 100);
@@ -8201,7 +8207,7 @@ codeunit 90 "Purch.-Post"
         IsHandled := false;
         OnBeforePostItemTracking(
             PurchHeader, PurchLine, TempTrackingSpecification, TrackingSpecificationExists,
-            PreciseTotalChargeAmt, PreciseTotalChargeAmtACY, RoundedPrevTotalChargeAmt, RoundedPrevTotalChargeAmtACY, IsHandled);
+            PreciseTotalChargeAmt, PreciseTotalChargeAmtACY, RoundedPrevTotalChargeAmt, RoundedPrevTotalChargeAmtACY, IsHandled, RemQtyToBeInvoiced);
         if IsHandled then
             exit;
 
@@ -8247,7 +8253,7 @@ codeunit 90 "Purch.-Post"
         end;
     end;
 
-    local procedure PostItemTrackingCheckReceipt(PurchaseLine: Record "Purchase Line"; RemQtyToBeInvoiced: Decimal)
+    procedure PostItemTrackingCheckReceipt(PurchaseLine: Record "Purchase Line"; RemQtyToBeInvoiced: Decimal)
     var
         IsHandled: Boolean;
     begin
@@ -8263,7 +8269,7 @@ codeunit 90 "Purch.-Post"
         end;
     end;
 
-    local procedure PostItemTrackingForReceipt(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; TrackingSpecificationExists: Boolean; var TempTrackingSpecification: Record "Tracking Specification" temporary)
+    procedure PostItemTrackingForReceipt(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; TrackingSpecificationExists: Boolean; var TempTrackingSpecification: Record "Tracking Specification" temporary)
     var
         PurchRcptLine: Record "Purch. Rcpt. Line";
         ItemEntryRelation: Record "Item Entry Relation";
@@ -8303,20 +8309,15 @@ codeunit 90 "Purch.-Post"
 
                 OnPostItemTrackingForReceiptOnAfterPurchRcptLineTestFields(PurchRcptLine, PurchLine);
 
-                UpdateQtyToBeInvoicedForReceipt(
-                  QtyToBeInvoiced, QtyToBeInvoicedBase,
-                  TrackingSpecificationExists, PurchLine, PurchRcptLine, TempTrackingSpecification);
-
-                if TrackingSpecificationExists then begin
-                    TempTrackingSpecification."Quantity actual Handled (Base)" := QtyToBeInvoicedBase;
-                    TempTrackingSpecification.Modify();
-                end;
-
-                if TrackingSpecificationExists then
-                    AdjustQuantityRoundingForReceipt(PurchRcptLine, RemQtyToInvoiceCurrLine, QtyToBeInvoiced, RemQtyToInvoiceCurrLineBase, QtyToBeInvoicedBase);
-
-                RemQtyToBeInvoiced := RemQtyToBeInvoiced - QtyToBeInvoiced;
-                RemQtyToBeInvoicedBase := RemQtyToBeInvoicedBase - QtyToBeInvoicedBase;
+                UpdateReceiptInvoicingQuantities(
+                    QtyToBeInvoiced,
+                    QtyToBeInvoicedBase,
+                    TrackingSpecificationExists,
+                    PurchLine,
+                    PurchRcptLine,
+                    TempTrackingSpecification,
+                    RemQtyToInvoiceCurrLine,
+                    RemQtyToInvoiceCurrLineBase);
 
                 UpdateInvoicedQtyOnPurchRcptLine(
                   PurchInvHeader, PurchRcptLine, PurchHeader, PurchLine, QtyToBeInvoiced, QtyToBeInvoicedBase, TrackingSpecificationExists, TempTrackingSpecification);
@@ -9388,6 +9389,48 @@ codeunit 90 "Purch.-Post"
         ItemChargeAssgntPurch.DeleteAll();
     end;
 
+    local procedure UpdateReceiptInvoicingQuantities(
+        var QtyToBeInvoiced: Decimal;
+        var QtyToBeInvoicedBase: Decimal;
+        TrackingSpecificationExists: Boolean;
+        PurchLine: Record "Purchase Line";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
+        var TempTrackingSpecification: Record "Tracking Specification" temporary;
+        RemQtyToInvoiceCurrLine: Decimal;
+        RemQtyToInvoiceCurrLineBase: Decimal)
+    var
+        SkipQuantityUpdate: Boolean;
+    begin
+        SkipQuantityUpdate := false;
+        OnBeforeUpdateReceiptInvoicingQuantities(PurchLine, SkipQuantityUpdate);
+        if SkipQuantityUpdate then
+            exit;
+
+        UpdateQtyToBeInvoicedForReceipt(
+            QtyToBeInvoiced,
+            QtyToBeInvoicedBase,
+            TrackingSpecificationExists,
+            PurchLine,
+            PurchRcptLine,
+            TempTrackingSpecification);
+
+        if TrackingSpecificationExists then begin
+            TempTrackingSpecification."Quantity actual Handled (Base)" := QtyToBeInvoicedBase;
+            TempTrackingSpecification.Modify(false);
+        end;
+
+        if TrackingSpecificationExists then
+            AdjustQuantityRoundingForReceipt(
+                PurchRcptLine,
+                RemQtyToInvoiceCurrLine,
+                QtyToBeInvoiced,
+                RemQtyToInvoiceCurrLineBase,
+                QtyToBeInvoicedBase);
+
+        RemQtyToBeInvoiced := RemQtyToBeInvoiced - QtyToBeInvoiced;
+        RemQtyToBeInvoicedBase := RemQtyToBeInvoicedBase - QtyToBeInvoicedBase;
+    end;
+
     local procedure SetExternalDocumentNo(): Code[35]
     begin
         if PurchRcptHeader."Vendor Shipment No." <> '' then
@@ -10279,7 +10322,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforePostItemTracking(PurchHeader: Record "Purchase Header"; var PurchLine: Record "Purchase Line"; var TempTrackingSpecification: Record "Tracking Specification" temporary; var TrackingSpecificationExists: Boolean; var PreciseTotalChargeAmt: Decimal; var PreciseTotalChargeAmtACY: Decimal; var RoundedPrevTotalChargeAmt: Decimal; var RoundedPrevTotalChargeAmtACY: Decimal; var IsHandled: Boolean)
+    local procedure OnBeforePostItemTracking(PurchHeader: Record "Purchase Header"; var PurchLine: Record "Purchase Line"; var TempTrackingSpecification: Record "Tracking Specification" temporary; var TrackingSpecificationExists: Boolean; var PreciseTotalChargeAmt: Decimal; var PreciseTotalChargeAmtACY: Decimal; var RoundedPrevTotalChargeAmt: Decimal; var RoundedPrevTotalChargeAmtACY: Decimal; var IsHandled: Boolean; RemQtyToBeInvoiced: Decimal)
     begin
     end;
 
@@ -10896,7 +10939,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostItemTrackingForReceiptOnAfterPurchRcptLineTestFields(PurchRcptLine: Record "Purch. Rcpt. Line"; PurchaseLine: Record "Purchase Line")
+    local procedure OnPostItemTrackingForReceiptOnAfterPurchRcptLineTestFields(var PurchRcptLine: Record "Purch. Rcpt. Line"; PurchaseLine: Record "Purchase Line")
     begin
     end;
 
@@ -10916,7 +10959,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostPurchLineOnAfterSetEverythingInvoiced(PurchaseLine: Record "Purchase Line"; var EverythingInvoiced: Boolean; PurchaseHeader: Record "Purchase Header")
+    local procedure OnPostPurchLineOnAfterSetEverythingInvoiced(var PurchaseLine: Record "Purchase Line"; var EverythingInvoiced: Boolean; PurchaseHeader: Record "Purchase Header"; var TempVATAmountLine: Record "VAT Amount Line" temporary; var TempVATAmountLineRemainder: Record "VAT Amount Line" temporary; var AmountsOnly: Boolean)
     begin
     end;
 
@@ -11996,6 +12039,11 @@ codeunit 90 "Purch.-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateItemChargeAssgntOnBeforeItemChargeAssignmentPurchModify(var ItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateReceiptInvoicingQuantities(PurchLine: Record "Purchase Line"; var SkipQuantityUpdate: Boolean)
     begin
     end;
 }

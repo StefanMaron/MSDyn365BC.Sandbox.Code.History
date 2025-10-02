@@ -98,11 +98,9 @@ codeunit 1762 "Sales-Data Classification"
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Line Fee Note on Report Hist.");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Sales Document Icon");
         DataClassificationMgt.SetTableFieldsToNormal(Database::"Customer Templ.");
-#if not CLEAN25
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Sales Price");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Sales Line Discount");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Sales Price Worksheet");
-#endif
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Sales Comment Line Archive");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Sales Cue");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Sales by Cust. Grp.Chart Setup");

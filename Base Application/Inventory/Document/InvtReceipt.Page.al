@@ -150,6 +150,7 @@ page 6561 "Invt. Receipt"
                 }
                 action("Co&mments")
                 {
+                    ApplicationArea = Comments;
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     ToolTip = 'View or edit comments.';
