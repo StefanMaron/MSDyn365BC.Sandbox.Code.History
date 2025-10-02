@@ -1,6 +1,10 @@
+#if not CLEAN27
 codeunit 144525 "Test Submit VAT Declare Rqst"
 {
     Subtype = Test;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Moved to GovTalk app';
+    ObsoleteTag = '27.0';
 
     trigger OnRun()
     begin
@@ -112,4 +116,5 @@ codeunit 144525 "Test Submit VAT Declare Rqst"
         VATStatementReportLine.Insert();
     end;
 }
+#endif
 

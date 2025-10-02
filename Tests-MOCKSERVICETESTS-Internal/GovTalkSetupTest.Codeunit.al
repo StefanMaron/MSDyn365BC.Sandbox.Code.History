@@ -1,6 +1,10 @@
+#if not CLEAN27
 codeunit 144523 "GovTalk Setup Test"
 {
     Subtype = Test;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Moved to GovTalk app';
+    ObsoleteTag = '27.0';
 
     trigger OnRun()
     begin
@@ -133,4 +137,5 @@ codeunit 144523 "GovTalk Setup Test"
         CompanyInformation.Insert();
     end;
 }
+#endif
 
