@@ -9,7 +9,7 @@
       "id": "dd0be2ea-f733-4d65-bb34-a28f4624fb14",
       "name": "Library Assert",
       "publisher": "Microsoft",
-      "version": "26.3.0.0"
+      "version": "26.4.0.0"
     }
   ],
   "target": "OnPrem",
@@ -28,6 +28,6 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "26.3.0.0",
+  "application": "26.4.0.0",
   "brief": "Tests-Upgrade (NZ)"
 }
