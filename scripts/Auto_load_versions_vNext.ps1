@@ -176,28 +176,74 @@ $Versions | Sort-Object -Property Country, Version | % {
             git switch "$($country)-$($Version.Major)-vNext"
 
             # Rebase all commits after insertion point onto the new commit
+            # Use -X ours strategy to auto-resolve conflicts by keeping the version being rebased
             Write-Host "Rebasing commits after insertion point onto new commit..."
-            $RebaseResult = git rebase --onto $NewCommitHash $InsertionPoint "$($country)-$($Version.Major)-vNext" 2>&1
+            $RebaseResult = git rebase -X ours --onto $NewCommitHash $InsertionPoint "$($country)-$($Version.Major)-vNext" 2>&1
 
             if ($LASTEXITCODE -ne 0) {
-                Write-Host "##[error]Rebase failed for late hotfix $($country)-$($Version.ToString())-vNext"
-                Write-Host "Rebase output: $RebaseResult"
+                Write-Host "##[warning]Rebase with auto-merge failed, attempting manual conflict resolution..."
 
-                # Clean up rebase state
-                git rebase --abort 2>&1 | Out-Null
-                git rebase --quit 2>&1 | Out-Null
+                # Get conflicted files
+                $ConflictedFiles = git diff --name-only --diff-filter=U 2>&1
 
-                # Force cleanup directories if commands failed
-                $RebaseMergeDir = Join-Path (Get-Location) ".git/rebase-merge"
-                $RebaseApplyDir = Join-Path (Get-Location) ".git/rebase-apply"
-                if (Test-Path $RebaseMergeDir) { Remove-Item -Recurse -Force $RebaseMergeDir }
-                if (Test-Path $RebaseApplyDir) { Remove-Item -Recurse -Force $RebaseApplyDir }
+                if ($ConflictedFiles) {
+                    Write-Host "Conflicted files: $($ConflictedFiles -join ', ')"
 
-                # Use exit instead of throw to bypass SilentlyContinue
-                Write-Host "##[error]Exiting due to rebase failure"
-                exit 1
+                    # For metadata files, use --ours (keep the commit being rebased)
+                    foreach ($file in $ConflictedFiles) {
+                        if ($file -match "app\.json$" -or $file -match "AppSourceCop\.json$" -or $file -eq "version.txt") {
+                            Write-Host "Auto-resolving $file (keeping rebased commit's version)"
+                            git checkout --ours $file 2>&1 | Out-Null
+                            git add $file 2>&1 | Out-Null
+                        }
+                        else {
+                            Write-Host "##[error]Unexpected conflict in non-metadata file: $file"
+                        }
+                    }
+
+                    # Try to continue rebase
+                    Write-Host "Continuing rebase after conflict resolution..."
+                    $ContinueResult = git -c core.editor=true rebase --continue 2>&1
+
+                    # Keep resolving conflicts until rebase completes
+                    while ($LASTEXITCODE -ne 0 -and $ContinueResult -match "git rebase --continue") {
+                        $ConflictedFiles = git diff --name-only --diff-filter=U 2>&1
+                        if ($ConflictedFiles) {
+                            foreach ($file in $ConflictedFiles) {
+                                if ($file -match "app\.json$" -or $file -match "AppSourceCop\.json$" -or $file -eq "version.txt") {
+                                    git checkout --ours $file 2>&1 | Out-Null
+                                    git add $file 2>&1 | Out-Null
+                                }
+                            }
+                            $ContinueResult = git -c core.editor=true rebase --continue 2>&1
+                        }
+                        else {
+                            break
+                        }
+                    }
+                }
+
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Host "##[error]Rebase failed for late hotfix $($country)-$($Version.ToString())-vNext"
+                    Write-Host "Rebase output: $RebaseResult"
+
+                    # Clean up rebase state
+                    git rebase --abort 2>&1 | Out-Null
+                    git rebase --quit 2>&1 | Out-Null
+
+                    # Force cleanup directories if commands failed
+                    $RebaseMergeDir = Join-Path (Get-Location) ".git/rebase-merge"
+                    $RebaseApplyDir = Join-Path (Get-Location) ".git/rebase-apply"
+                    if (Test-Path $RebaseMergeDir) { Remove-Item -Recurse -Force $RebaseMergeDir }
+                    if (Test-Path $RebaseApplyDir) { Remove-Item -Recurse -Force $RebaseApplyDir }
+
+                    # Use exit instead of throw to bypass SilentlyContinue
+                    Write-Host "##[error]Exiting due to rebase failure"
+                    exit 1
+                }
             }
 
+            Write-Host "Rebase completed successfully"
             git gc | out-null
 
             # Force push with lease to prevent overwriting concurrent changes
