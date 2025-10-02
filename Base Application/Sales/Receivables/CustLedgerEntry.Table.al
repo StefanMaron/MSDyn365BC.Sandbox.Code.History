@@ -526,6 +526,7 @@ table 21 "Cust. Ledger Entry"
             begin
                 TestField(Open, true);
                 CalcFields("Remaining Amount");
+                OnValidateAmounttoApplyBeforeFieldError(Rec);
 
                 CheckBillSituation();
 
@@ -1391,6 +1392,11 @@ table 21 "Cust. Ledger Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterRecalculateAmounts(var CustLedgerEntry: Record "Cust. Ledger Entry"; FromCurrencyCode: Code[10]; ToCurrencyCode: Code[10]; PostingDate: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateAmounttoApplyBeforeFieldError(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
 
