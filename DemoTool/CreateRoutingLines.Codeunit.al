@@ -70,6 +70,8 @@
         RtngLine.Validate("Routing Link Code", RtngLinkCode);
         RtngLine.Validate("Unit Cost per", UnitCostPer);
         RtngLine.Insert();
+#if not CLEAN27
+#pragma warning disable AL0801
         //BEGIN IT
         if RoutingNo = '2000' then begin
             case OperationNo of
@@ -89,6 +91,8 @@
             RtngLine.Modify();
         end;
         //END IT
+#pragma warning restore AL0801
+#endif
     end;
 }
 

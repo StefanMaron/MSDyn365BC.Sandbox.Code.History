@@ -1,3 +1,4 @@
+#pragma warning disable AA0247
 codeunit 104151 "UPG.IT Detailed Ledger Entries"
 {
     Subtype = Upgrade;
