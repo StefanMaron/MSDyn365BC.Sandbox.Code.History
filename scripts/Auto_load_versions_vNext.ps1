@@ -167,7 +167,7 @@ $Versions | Sort-Object -Property Country, Version | % {
             git config user.email "stefanmaron@outlook.de"
             git config user.name "Stefan Maron"
             git add -A | out-null
-            git commit -a -m "$($country)-$($version.ToString())-vNext" | out-null
+            git commit -a -m "$($country)-$($version.ToString())" | out-null
 
             # Get the hash of the new commit
             $NewCommitHash = git rev-parse HEAD
@@ -262,7 +262,7 @@ $Versions | Sort-Object -Property Country, Version | % {
             git config user.email "stefanmaron@outlook.de"
             git config user.name "Stefan Maron"
             git add -A | out-null
-            git commit -a -m "$($country)-$($version.ToString())-vNext" | out-null
+            git commit -a -m "$($country)-$($version.ToString())" | out-null
             git gc | out-null
 
             # Pull with rebase to handle concurrent updates (e.g., late hotfixes)
@@ -273,7 +273,7 @@ $Versions | Sort-Object -Property Country, Version | % {
         
         Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
 
-        Write-Host "$($country)-$($version.ToString())-vNext"
+        Write-Host "$($country)-$($version.ToString())"
     }
     else {
         Write-Host "###############################################"
