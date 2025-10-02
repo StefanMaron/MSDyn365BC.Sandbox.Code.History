@@ -33,7 +33,7 @@
     "includeSourceInSymbolFile": false
   },
   "target": "OnPrem",
-  "application": "25.4.0.0",
+  "application": "25.5.0.0",
   "features": [
     "TranslationFile",
     "GenerateCaptions"
