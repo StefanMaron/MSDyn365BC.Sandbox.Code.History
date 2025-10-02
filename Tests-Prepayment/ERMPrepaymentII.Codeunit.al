@@ -2025,6 +2025,7 @@ codeunit 134101 "ERM Prepayment II"
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"ERM Prepayment II");
         LibraryVariableStorage.Clear();
         LibrarySetupStorage.Restore();
+
         if isInitialized then
             exit;
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(CODEUNIT::"ERM Prepayment II");
