@@ -154,6 +154,9 @@
     },
     {
       "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
     }
   ]
 }

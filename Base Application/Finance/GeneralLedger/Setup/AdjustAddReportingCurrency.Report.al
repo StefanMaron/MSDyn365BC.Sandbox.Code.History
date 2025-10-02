@@ -250,6 +250,8 @@ report 86 "Adjust Add. Reporting Currency"
 
     requestpage
     {
+        AboutTitle = 'About Adjust Additional Reporting Currency (batch job)';
+        AboutText = 'The Adjust Additional Reporting Currency batch job converts LCY amounts on existing G/L entries to the ACY. The batch job uses a default exchange rate copied from the exchange rate that is valid on the work date on the Currency Exchange Rates page. Residual amounts that occur on conversion of LCY to ACY are posted to the residual gains and losses accounts specified on the Currencies page. Please see the documentation on how to set up an additional reporting currency for more information';
 
         layout
         {

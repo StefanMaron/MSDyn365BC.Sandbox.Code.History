@@ -861,6 +861,7 @@ page 42 "Sales Order"
                                 Customer: Record Customer;
                             begin
                                 Selected.SetTable(Customer);
+                                OnBeforeLookupBillToName(Customer, Rec);
                                 if Rec."Bill-to Customer No." <> Customer."No." then begin
                                     Rec.Validate("Bill-to Customer No.", Customer."No.");
                                     if Rec."Bill-to Customer No." <> Customer."No." then  // User responded 'no' to change
@@ -3134,4 +3135,10 @@ page 42 "Sales Order"
     local procedure OnQueryClosePageOnBeforeConfirmCloseUnposted(var DocumentIsPosted: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLookupBillToName(var Customer: Record Customer; SalesHeader: Record "Sales Header")
+    begin
+    end;
 }
+

@@ -28,9 +28,7 @@ using Microsoft.Projects.Project.Journal;
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Setup;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Customer;
@@ -2102,13 +2100,10 @@ table 1003 "Job Planning Line"
         OnAfterCalculateRetrievedCost(Rec, xRec, SKU, Item, RetrievedCost);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     procedure AfterResourceFindCost(var ResourceCost: Record "Resource Cost");
     begin
         OnAfterResourceFindCost(Rec, ResourceCost);
     end;
-#endif
 
     protected procedure RetrieveCostPrice(CalledByFieldNo: Integer): Boolean
     var
@@ -2165,18 +2160,12 @@ table 1003 "Job Planning Line"
     end;
 
     local procedure IsQuantityChangedForPrice(): Boolean;
-#if not CLEAN25
     var
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
-#endif
     begin
         if Quantity = xRec.Quantity then
             exit(false);
-#if not CLEAN25
         exit(PriceCalculationMgt.IsExtendedPriceCalculationEnabled());
-#else
-        exit(true);
-#endif
     end;
 
     local procedure UpdateTotalCost()
@@ -3498,13 +3487,10 @@ table 1003 "Job Planning Line"
     begin
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterResourceFindCost(var JobPlanningLine: Record "Job Planning Line"; var ResourceCost: Record "Resource Cost")
     begin
     end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetReservationFilters(var ReservEntry: Record "Reservation Entry"; JobPlanningLine: Record "Job Planning Line");

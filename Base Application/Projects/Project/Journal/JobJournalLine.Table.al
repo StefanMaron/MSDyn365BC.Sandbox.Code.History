@@ -29,9 +29,7 @@ using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Projects.Project.Setup;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.TimeSheet;
 using Microsoft.Sales.Customer;
@@ -1886,18 +1884,12 @@ table 210 "Job Journal Line"
     end;
 
     local procedure IsQuantityChangedForPrice(): Boolean;
-#if not CLEAN25
     var
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
-#endif
     begin
         if Quantity = xRec.Quantity then
             exit(false);
-#if not CLEAN25
         exit(PriceCalculationMgt.IsExtendedPriceCalculationEnabled());
-#else
-        exit(true);
-#endif
     end;
 
     procedure UpdateTotalCost()
@@ -1965,13 +1957,10 @@ table 210 "Job Journal Line"
         end;
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     procedure AfterResourceFindCost(var ResourceCost: Record "Resource Cost")
     begin
         OnAfterResourceFindCost(Rec, ResourceCost);
     end;
-#endif
 
     procedure ApplyPrice(PriceType: enum "Price Type"; CalledByFieldNo: Integer)
     var
@@ -2492,13 +2481,10 @@ table 210 "Job Journal Line"
     begin
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by the new implementation (V16) of price calculation.', '17.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterResourceFindCost(var JobJournalLine: Record "Job Journal Line"; var ResourceCost: Record "Resource Cost")
     begin
     end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetUpNewLine(var JobJournalLine: Record "Job Journal Line"; LastJobJournalLine: Record "Job Journal Line"; JobJournalTemplate: Record "Job Journal Template"; JobJournalBatch: Record "Job Journal Batch")

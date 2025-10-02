@@ -777,9 +777,9 @@ table 99000829 "Planning Component"
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
         GetReqLine();
-        DimensionSetIDArr[1] :=
+        DimensionSetIDArr[1] := ReqLine."Dimension Set ID";
+        DimensionSetIDArr[2] :=
           DimMgt.GetRecDefaultDimID(Rec, CurrFieldNo, DefaultDimSource, '', "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-        DimensionSetIDArr[2] := ReqLine."Dimension Set ID";
         "Dimension Set ID" :=
           DimMgt.GetCombinedDimensionSetID(DimensionSetIDArr, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 

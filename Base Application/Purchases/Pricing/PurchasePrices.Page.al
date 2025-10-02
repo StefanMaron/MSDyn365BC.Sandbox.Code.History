@@ -1,4 +1,3 @@
-#if not CLEAN25
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -17,9 +16,6 @@ page 7012 "Purchase Prices"
     DelayedInsert = true;
     PageType = Worksheet;
     SourceTable = "Purchase Price";
-    ObsoleteState = Pending;
-    ObsoleteTag = '19.0';
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
 
     layout
     {
@@ -321,4 +317,3 @@ page 7012 "Purchase Prices"
         CurrPage.SetSelectionFilter(PurchasePrice);
     end;
 }
-#endif

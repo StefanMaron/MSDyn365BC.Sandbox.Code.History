@@ -43,6 +43,19 @@ codeunit 134982 "ERM Financial Reports"
         JournalLineCreatedMsg: Label 'The journal lines have successfully been created.';
         SourceCurrencyCodeErr: Label 'Source Currency Amount should not be zero after reversing and closing income statement.';
         CurrentSaveValuesId: Integer;
+        G_L_Register_NoLbl: Label 'G_L_Register_No';
+        G_L_Entry_Document_NoLbl: Label 'G_L_Entry_Document_No';
+        G_L_Entry_G_L_Account_NoLbl: Label 'G_L_Entry_G_L_Account_No';
+        G_L_Register_From_Entry_NoLbl: Label 'G_L_Register_From_Entry_No';
+        G_L_Register_To_Entry_NoLbl: Label 'G_L_Register_To_Entry_No';
+        G_L_Entry_Document_TypeLbl: Label 'G_L_Entry_Document_Type';
+        G_L_Entry_AmountLbl: Label 'G_L_Entry_Amount';
+        G_L_Entry_Entry_NoLbl: Label 'G_L_Entry_Entry_No';
+        G_L_Entry_Source_CodeLbl: Label 'G_L_Entry_Source_Code';
+        G_L_Entry_Source_NoLbl: Label 'G_L_Entry_Source_No';
+        G_L_Entry_System_Created_EntryLbl: Label 'G_L_Entry_System_Created_Entry';
+        G_L_Entry_Posting_DateLbl: Label 'G_L_Entry_Posting_Date';
+        G_L_Entry_Document_DateLbl: Label 'G_L_Entry_Document_Date';
 
     [Test]
     [HandlerFunctions('RHDetailTrialBalance')]
@@ -1621,6 +1634,32 @@ codeunit 134982 "ERM Financial Reports"
         LibraryReportDataset.AssertElementWithValueExists('Amount', Amount2);
     end;
 
+    [Test]
+    [HandlerFunctions('AuditTrailReportRequestPageHandler')]
+    procedure VerifyAuditTrailReportShowsGLEntries()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        GLRegister: Record "G/L Register";
+    begin
+        // [SCENARIO 565665] Verify Audit Trail report dataset contains G/L Entries.
+        Initialize();
+
+        // [GIVEN] Create and Post General Journal Line.
+        CreateAndPostGenLine(GenJournalLine);
+
+        // [GIVEN] Find "G/L Register".
+        GLRegister.FindLast();
+
+        // [GIVEN] Save the transaction.
+        Commit();
+
+        // [WHEN] Run Audit Trail report.
+        RunAuditTrailReport(GLRegister."No.");
+
+        // [THEN] Verify Audit Trail report dataset contains  G/L Entry.
+        VerifyAuditTrailReport(GenJournalLine, GLRegister);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -2567,6 +2606,43 @@ codeunit 134982 "ERM Financial Reports"
         LibrarySales.PostSalesDocument(SalesHeader, true, true);
     end;
 
+    local procedure RunAuditTrailReport(RegisterNo: Integer)
+    var
+        GLRegister: Record "G/L Register";
+        AuditTrailReport: Report "Audit Trail";
+    begin
+        GLRegister.SetRange("No.", RegisterNo);
+        AuditTrailReport.SetTableView(GLRegister);
+        AuditTrailReport.Run();
+    end;
+
+    local procedure VerifyAuditTrailReport(GenJournalLine: Record "Gen. Journal Line"; GLRegister: Record "G/L Register")
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        LibraryReportDataset.LoadDataSetFile();
+        LibraryReportDataset.AssertElementWithValueExists(G_L_Register_NoLbl, GLRegister."No.");
+        LibraryReportDataset.SetRange(G_L_Entry_Document_NoLbl, GenJournalLine."Document No.");
+        if LibraryReportDataset.GetNextRow() then begin
+            GLEntry.Get(GLRegister."From Entry No.");
+
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_Document_NoLbl, GenJournalLine."Document No.");
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_G_L_Account_NoLbl, GenJournalLine."Account No.");
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Register_From_Entry_NoLbl, GLRegister."From Entry No.");
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Register_To_Entry_NoLbl, GLRegister."To Entry No.");
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_Document_TypeLbl, Format(GenJournalLine."Document Type"));
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_G_L_Account_NoLbl, Format(GLEntry."G/L Account No."));
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_AmountLbl, GLEntry.Amount);
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_Entry_NoLbl, GLEntry."Entry No.");
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_Source_CodeLbl, GLEntry."Source Code");
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_Source_NoLbl, GLEntry."Source No.");
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_System_Created_EntryLbl, GLEntry."System-Created Entry");
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_Posting_DateLbl, Format(GLEntry."Posting Date"));
+            LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_Document_DateLbl, Format(GLEntry."Document Date"));
+        end else
+            Error(ReportErr, GenJournalLine.FieldCaption("Document No."), GenJournalLine."Document No.");
+    end;
+
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure ConfirmHandler(Question: Text[1024]; var Reply: Boolean)
@@ -2828,5 +2904,11 @@ codeunit 134982 "ERM Financial Reports"
         CloseIncomeStatement.DocumentNo.SetValue(LibraryVariableStorage.DequeueText()); // Document No.
         CloseIncomeStatement.RetainedEarningsAcc.SetValue(''); // Retained Earnings Acc.
         CloseIncomeStatement.OK().Invoke();
+    end;
+
+    [RequestPageHandler]
+    procedure AuditTrailReportRequestPageHandler(var AuditTrail: TestRequestPage "Audit Trail")
+    begin
+        AuditTrail.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 }
