@@ -5,6 +5,7 @@
 namespace Microsoft.Sales.History;
 
 using Microsoft.Finance.Dimension;
+using Microsoft.Utilities;
 
 page 6663 "Posted Return Receipt Lines"
 {
@@ -144,9 +145,10 @@ page 6663 "Posted Return Receipt Lines"
                     trigger OnAction()
                     var
                         ReturnRcptHeader: Record "Return Receipt Header";
+                        PageManagement: Codeunit "Page Management";
                     begin
                         ReturnRcptHeader.Get(Rec."Document No.");
-                        PAGE.Run(PAGE::"Posted Return Receipt", ReturnRcptHeader);
+                        PageManagement.PageRun(ReturnRcptHeader);
                     end;
                 }
                 action(Dimensions)

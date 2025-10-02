@@ -136,7 +136,7 @@ codeunit 5988 "Serv-Documents Mgt."
         TrackingSpecificationExists: Boolean;
         ServLineInvoicedConsumedQty: Decimal;
         ServLedgEntryNo: Integer;
-        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
+        ServSalesTaxCalculate: Codeunit "Serv. Sales Tax Calculate";
         TaxArea: Record "Tax Area";
         TaxOption: Option ,VAT,SalesTax;
         SalesTaxCountry: Option US,CA,,,,,,,,,,,,NoTax;
@@ -317,14 +317,14 @@ codeunit 5988 "Serv-Documents Mgt."
                 if not SalesTaxCalculationOverridden then
                     if SalesTaxCountry <> SalesTaxCountry::NoTax then begin
                         if UseExternalTaxEngine then
-                            SalesTaxCalculate.CallExternalTaxEngineForServ(ServHeader, false)
+                            ServSalesTaxCalculate.CallExternalTaxEngineForServ(ServHeader, false)
                         else
-                            SalesTaxCalculate.EndSalesTaxCalculation(ServHeader."Posting Date");
-                        SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxAmtLine);
-                        SalesTaxCalculate.DistTaxOverServLines(TempServiceLineForSalesTax);
+                            ServSalesTaxCalculate.EndSalesTaxCalculation(ServHeader."Posting Date");
+                        ServSalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxAmtLine);
+                        ServSalesTaxCalculate.DistTaxOverServLines(TempServiceLineForSalesTax);
                     end;
-            end else
-                TempVATAmountLineRemainder.DeleteAll();
+        end else
+            TempVATAmountLineRemainder.DeleteAll();
 
         // init cu for posting SLE type Usage
         ServPostingJnlsMgt.InitServiceRegister(NextServLedgerEntryNo, NextWarrantyLedgerEntryNo);
@@ -2428,7 +2428,7 @@ codeunit 5988 "Serv-Documents Mgt."
         if FirstLine then begin
             TempServiceLineForSalesTax.DeleteAll();
             TempSalesTaxAmtLine.DeleteAll();
-            SalesTaxCalculate.StartSalesTaxCalculation();
+            ServSalesTaxCalculate.StartSalesTaxCalculation();
         end;
         GetCurrency(ServHeader."Currency Code", Currency);
         TempServiceLineForSalesTax := ServLine;
@@ -2474,7 +2474,7 @@ codeunit 5988 "Serv-Documents Mgt."
         TempServiceLineForSalesTax."VAT Base Amount" := TempServiceLineForSalesTax.Amount;
         TempServiceLineForSalesTax.Insert();
         if not UseExternalTaxEngine then
-            SalesTaxCalculate.AddServiceLine(TempServiceLineForSalesTax);
+            ServSalesTaxCalculate.AddServiceLine(TempServiceLineForSalesTax);
     end;
 
     local procedure GetCurrency(CurrencyCode: Code[10]; var Currency2: Record Currency)
@@ -3130,7 +3130,7 @@ codeunit 5988 "Serv-Documents Mgt."
     local procedure OnPostDocumentLinesOnBeforeSalesTaxLineToSalesTaxCalc(ServiceLine: Record "Service Line" temporary; ServiceHeader: Record "Service Header" temporary)
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnFinalizeShipmentDocumentOnBeforeCopyServiceShipmentItemLine(var ServiceShipmentItemLine: Record "Service Shipment Item Line")
     begin

@@ -533,7 +533,7 @@ report 5902 "Service Quote"
                         trigger OnAfterGetRecord()
                         var
                             ExchangeFactor: Decimal;
-                            SalesTaxCalculate: Codeunit "Sales Tax Calculate";
+                            ServSalesTaxCalculate: Codeunit "Serv. Sales Tax Calculate";
                             TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary;
                         begin
                             Amt := "Line Amount";
@@ -541,10 +541,10 @@ report 5902 "Service Quote"
                                 ExchangeFactor := 1
                             else
                                 ExchangeFactor := "Service Header"."Currency Factor";
-                            SalesTaxCalculate.StartSalesTaxCalculation();
-                            SalesTaxCalculate.AddServiceLine("Service Line");
-                            SalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
-                            SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxAmountLine);
+                            ServSalesTaxCalculate.StartSalesTaxCalculation();
+                            ServSalesTaxCalculate.AddServiceLine("Service Line");
+                            ServSalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
+                            ServSalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxAmountLine);
                             OnAfterCalculateSalesTax("Service Header", "Service Line", TempSalesTaxAmountLine);
                             GrossAmt := Amt + TempSalesTaxAmountLine.GetTotalTaxAmountFCY();
 

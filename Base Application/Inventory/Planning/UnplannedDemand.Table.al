@@ -134,6 +134,10 @@ table 5520 "Unplanned Demand"
         {
             Caption = 'Purchasing Code';
         }
+        field(25; "Drop Shipment"; Boolean)
+        {
+            Caption = 'Drop Shipment';
+        }
     }
 
     keys

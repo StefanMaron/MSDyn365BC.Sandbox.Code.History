@@ -1,4 +1,3 @@
-#if not CLEAN25
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -23,9 +22,6 @@ page 7004 "Sales Line Discounts"
     SaveValues = true;
     ShowFilter = false;
     SourceTable = "Sales Line Discount";
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-    ObsoleteTag = '16.0';
 
     layout
     {
@@ -212,30 +208,6 @@ page 7004 "Sales Line Discounts"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(SalesType; Rec."Sales Type")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the sales type of the sales line discount. The sales type defines whether the sales price is for an individual customer, customer discount group, all customers, or for a campaign.';
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Use now the Column Sales Type';
-                    ObsoleteTag = '25.0';
-
-                    trigger OnValidate()
-                    begin
-                        SetEditableFields();
-                    end;
-                }
-                field(SalesCode; Rec."Sales Code")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Editable = SalesCodeEditable;
-                    ToolTip = 'Specifies one of the following values, depending on the value in the Sales Type field.';
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Use now the Column Sales Code';
-                    ObsoleteTag = '25.0';
-                }
                 field("Sales Type"; Rec."Sales Type")
                 {
                     ApplicationArea = Basic, Suite;
@@ -661,4 +633,3 @@ page 7004 "Sales Line Discounts"
     begin
     end;
 }
-#endif

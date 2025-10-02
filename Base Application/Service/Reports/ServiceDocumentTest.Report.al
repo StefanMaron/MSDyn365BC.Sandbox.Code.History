@@ -679,7 +679,7 @@ report 5915 "Service Document - Test"
                             "Service Line" := TempServiceLine;
 
                             if SalesTax and not HeaderTaxArea."Use External Tax Engine" then
-                                SalesTaxCalculate.AddServiceLine("Service Line");
+                                ServSalesTaxCalculate.AddServiceLine("Service Line");
 
                             if not "Service Header"."Prices Including VAT" and
                                    ("Service Line"."VAT Calculation Type" = "Service Line"."VAT Calculation Type"::"Full VAT")
@@ -804,10 +804,10 @@ report 5915 "Service Document - Test"
                                 if SalesTax then begin
                                     if not SalesTaxCalculationOverridden then begin
                                         if HeaderTaxArea."Use External Tax Engine" then
-                                            SalesTaxCalculate.CallExternalTaxEngineForServ("Service Header", true)
+                                            ServSalesTaxCalculate.CallExternalTaxEngineForServ("Service Header", true)
                                         else
-                                            SalesTaxCalculate.EndSalesTaxCalculation("Service Header"."Posting Date");
-                                        SalesTaxCalculate.GetSalesTaxAmountLineTable(SalesTaxAmountLine);
+                                            ServSalesTaxCalculate.EndSalesTaxCalculation("Service Header"."Posting Date");
+                                        ServSalesTaxCalculate.GetSalesTaxAmountLineTable(SalesTaxAmountLine);
                                     end;
                                     VATAmount := SalesTaxAmountLine.GetTotalTaxAmountFCY();
                                     VATBaseAmount := SalesTaxAmountLine.GetTotalTaxBase();
@@ -1108,7 +1108,7 @@ report 5915 "Service Document - Test"
                         if SalesTax then begin
                             SalesTaxAmountLine.DeleteAll();
                             OnBeforeCalculateSalesTax("Service Header", SalesTaxAmountLine, SalesTaxCalculationOverridden);
-                            SalesTaxCalculate.StartSalesTaxCalculation();
+                            ServSalesTaxCalculate.StartSalesTaxCalculation();
                         end;
                     end;
                 }
@@ -1403,7 +1403,7 @@ report 5915 "Service Document - Test"
         SalesTax: Boolean;
         HeaderTaxArea: Record "Tax Area";
         SalesTaxAmountLine: Record "Sales Tax Amount Line";
-        SalesTaxCalculate: Codeunit "Sales Tax Calculate";
+        ServSalesTaxCalculate: Codeunit "Serv. Sales Tax Calculate";
         TaxText: Text[30];
         SumtotalVAT: Decimal;
         SumtotalExchFactor: Decimal;
