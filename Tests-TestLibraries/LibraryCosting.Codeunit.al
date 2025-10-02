@@ -309,7 +309,6 @@ codeunit 132200 "Library - Costing"
 #pragma warning restore AL0801
 #endif
 
-#if not CLEAN25
     procedure CreatePurchasePrice(var PurchasePrice: Record "Purchase Price"; VendorNo: Code[20]; ItemNo: Code[20]; StartingDate: Date; CurrencyCode: Code[10]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; MinimumQuantity: Decimal)
     begin
         PurchasePrice.Init();
@@ -322,7 +321,6 @@ codeunit 132200 "Library - Costing"
         PurchasePrice.Validate("Minimum Quantity", MinimumQuantity);
         PurchasePrice.Insert(true);
     end;
-#endif
 
     procedure CreateRevaluationJournal(var ItemJournalBatch: Record "Item Journal Batch"; var Item: Record Item; NewPostingDate: Date; NewDocNo: Code[20]; NewCalculatePer: Enum "Inventory Value Calc. Per"; NewByLocation: Boolean; NewByVariant: Boolean; NewUpdStdCost: Boolean; NewCalcBase: Enum "Inventory Value Calc. Base"; NewShowDialog: Boolean)
     var
@@ -354,7 +352,6 @@ codeunit 132200 "Library - Costing"
         CalcInvtValue.RunModal();
     end;
 
-#if not CLEAN25
     procedure CreateSalesPrice(var SalesPrice: Record "Sales Price"; SalesType: Enum "Sales Price Type"; SalesCode: Code[20]; ItemNo: Code[20]; StartingDate: Date; CurrencyCode: Code[10]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; MinimumQuantity: Decimal)
     begin
         SalesPrice.Init();
@@ -379,7 +376,6 @@ codeunit 132200 "Library - Costing"
         ImplementPriceChangeReport.SetTableView(SalesPriceWorksheet);
         ImplementPriceChangeReport.RunModal();
     end;
-#endif
 
     local procedure FindFirstValueEntry(ItemLedgerEntryNo: Integer; var FirstEntryNo: Integer; var FirstPostingDate: Date)
     var
@@ -483,10 +479,6 @@ codeunit 132200 "Library - Costing"
 #pragma warning restore AL0801
 #endif
 
-#if not CLEAN25
-#pragma warning disable AS0072
-    [Obsolete('Not used', '23.0')]
-#pragma warning restore AS0072
     procedure SuggestSalesPriceWorksheet(Item: Record Item; SalesCode: Code[20]; SalesType: Enum "Sales Price Type"; PriceLowerLimit: Decimal; UnitPriceFactor: Decimal)
     var
         SalesPrice: Record "Sales Price";
@@ -501,9 +493,6 @@ codeunit 132200 "Library - Costing"
         SuggestSalesPriceOnWksh.RunModal();
     end;
 
-#pragma warning disable AS0072
-    [Obsolete('Not used', '23.0')]
-#pragma warning restore AS0072
     procedure SuggestItemPriceWorksheet(Item: Record Item; SalesCode: Code[20]; SalesType: Enum "Sales Price Type"; PriceLowerLimit: Decimal; UnitPriceFactor: Decimal)
     var
         SuggestItemPriceOnWksh: Report "Suggest Item Price on Wksh.";
@@ -517,9 +506,6 @@ codeunit 132200 "Library - Costing"
         SuggestItemPriceOnWksh.RunModal();
     end;
 
-#pragma warning disable AS0072
-    [Obsolete('Not used', '23.0')]
-#pragma warning restore AS0072
     procedure SuggestItemPriceWorksheet2(Item: Record Item; SalesCode: Code[20]; SalesType: Enum "Sales Price Type"; PriceLowerLimit: Decimal; UnitPriceFactor: Decimal; CurrencyCode: Code[10])
     var
         TmpItem: Record Item;
@@ -538,7 +524,6 @@ codeunit 132200 "Library - Costing"
         SuggestItemPriceOnWksh.UseRequestPage(false);
         SuggestItemPriceOnWksh.RunModal();
     end;
-#endif
 
     procedure SuggestItemStandardCost(var Item: Record Item; StandardCostWorksheetName: Code[10]; StandardCostAdjustmentFactor: Integer; StandardCostRoundingMethod: Code[10])
     var

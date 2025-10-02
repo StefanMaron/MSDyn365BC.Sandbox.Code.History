@@ -33,7 +33,7 @@ codeunit 6400 "Flow Service Management"
         FlowLinkInvalidFlowIdErr: Label 'An invalid flow ID was provided.';
         NullGuidReceivedMsg: Label 'Encountered an null GUID value as Power Automate Environment ID.', Locked = true;
         EmptyAccessTokenTelemetryMsg: Label 'Encountered an empty access token for Power Automate services.', Locked = true;
-        EmptyMicrosoftEntraIDTelemetryMsg: Label 'Encountered an empty Microsoft Entra ID for Power Automate services.', Locked = true;
+        EmptyPowerPlatformTenantTelemetryMsg: Label 'Encountered an empty Power Platform Tenant URL for Power Automate services.', Locked = true;
         PowerAutomateURLTelemetryMsg: Label 'Power Automate Environment URL: %1', Locked = true, Comment = '%1: URL used to access Power Automate environments';
         PowerAutomatePickerTelemetryCategoryLbl: Label 'AL Power Automate Environment Picker', Locked = true;
         MicrosoftPowerAutomatePrivacyIdTxt: Label 'Power Automate', Locked = true;
@@ -315,15 +315,14 @@ codeunit 6400 "Flow Service Management"
     local procedure TryGetFlowEnvironmentsApi(var FlowEnvironmentsApi: Text)
     var
         AzureADTenant: Codeunit "Azure AD Tenant";
-        PowerPlatformApiWrapper: dotnet "PowerPlatformApiWrapper";
     begin
-        if AzureADTenant.GetAadTenantId() = '' then begin
-            Session.LogMessage('0000Q79', EmptyMicrosoftEntraIDTelemetryMsg, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerAutomatePickerTelemetryCategoryLbl);
+        if AzureADTenant.GetPowerPlatformTenantURL() = '' then begin
+            Session.LogMessage('0000Q79', EmptyPowerPlatformTenantTelemetryMsg, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerAutomatePickerTelemetryCategoryLbl);
             FlowEnvironmentsApi := '';
             exit;
         end;
 
-        FlowEnvironmentsApi := 'https://' + PowerPlatformApiWrapper.GetPowerPlatformTenantUrl(AzureADTenant.GetAadTenantId()) + '/powerautomate/environments?api-version=1';
+        FlowEnvironmentsApi := 'https://' + AzureADTenant.GetPowerPlatformTenantURL() + '/powerautomate/environments?api-version=1';
         Session.LogMessage('0000Q7A', StrSubstNo(PowerAutomateURLTelemetryMsg, FlowEnvironmentsApi), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerAutomatePickerTelemetryCategoryLbl);
     end;
 

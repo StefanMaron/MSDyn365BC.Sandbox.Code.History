@@ -13,6 +13,7 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Budget;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Period;
 using System.Telemetry;
 using System.Text;
@@ -122,6 +123,12 @@ report 25 "Account Schedule"
                 {
                 }
                 column(ClosingParagraph; ClosingParagraph)
+                {
+                }
+                column(CompanyPicture; DummyCompanyInfo.Picture)
+                {
+                }
+                column(CompanyLogoPosition; CompanyLogoPosition)
                 {
                 }
                 dataitem("Acc. Schedule Line"; "Acc. Schedule Line")
@@ -269,6 +276,12 @@ report 25 "Account Schedule"
 
                         if not ShowRowNo then
                             "Row No." := '';
+
+                        if RowsOutput <= 1 then begin
+                            if RowsOutput = 1 then
+                                Clear(DummyCompanyInfo.Picture);
+                            RowsOutput += 1;
+                        end;
                     end;
 
                     trigger OnPreDataItem()
@@ -294,6 +307,8 @@ report 25 "Account Schedule"
                         SetFilter("Cost Center Filter", CostCenterFilter);
                         SetFilter("Cost Object Filter", CostObjectFilter);
                         SetFilter("Cash Flow Forecast Filter", CashFlowFilter);
+
+                        DummyCompanyInfo.Picture := CompanyInfo.Picture;
                     end;
                 }
 
@@ -467,6 +482,7 @@ report 25 "Account Schedule"
                             Enabled = StartDateEnabled;
                             ShowMandatory = true;
                             ToolTip = 'Specifies the start date from which data in the report should be included.';
+                            Visible = not DateFilterDisabled;
 
                             trigger OnValidate()
                             begin
@@ -481,6 +497,7 @@ report 25 "Account Schedule"
                             ClosingDates = true;
                             ShowMandatory = true;
                             ToolTip = 'Specifies the end date for which data in the report should be included.';
+                            Visible = not DateFilterDisabled;
 
                             trigger OnValidate()
                             begin
@@ -760,6 +777,8 @@ report 25 "Account Schedule"
         var
             FinancialReportMgt: Codeunit "Financial Report Mgt.";
         begin
+            if RunForExport then
+                exit;
             FinancialReportMgt.Initialize();
             GLSetup.Get();
             AccSchedName := '';
@@ -810,6 +829,8 @@ report 25 "Account Schedule"
     var
         AnalysisView: Record "Analysis View";
         GLSetup: Record "General Ledger Setup";
+        CompanyInfo: Record "Company Information";
+        DummyCompanyInfo: Record "Company Information";
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
         AccSchedNameHidden: Code[10];
         FinancialReportDescription: Text;
@@ -879,6 +900,11 @@ report 25 "Account Schedule"
         NegativeAmountFormatHidden: Enum "Analysis Negative Format";
         PadChar: Char;
         PadString: Text;
+        RowsOutput: Integer;
+        CompanyLogoPosition: Integer;
+        DateFilterDisabled: Boolean;
+        UseHiddenDateFilter: Boolean;
+        RunForExport: Boolean;
 
 #pragma warning disable AA0074
         Text000: Label '(Thousands)';
@@ -1099,6 +1125,23 @@ report 25 "Account Schedule"
         ColumnLayoutNameHidden := ColLayoutName;
     end;
 
+    procedure SetDateFilterDisabled(Toggle: Boolean)
+    begin
+        DateFilterDisabled := Toggle;
+    end;
+
+    procedure SetDateFilterHidden(NewDateFilter: Text)
+    begin
+        DateFilterHidden := NewDateFilter;
+        UseHiddenDateFilter := true;
+    end;
+
+    procedure SetRunForExport()
+    begin
+        RunForExport := true;
+        StartDateEnabled := true;
+    end;
+
     procedure SetFilters(NewDateFilter: Text; NewBudgetFilter: Text; NewCostBudgetFilter: Text; NewBusUnitFilter: Text; NewDim1Filter: Text; NewDim2Filter: Text; NewDim3Filter: Text; NewDim4Filter: Text)
     begin
         DateFilterHidden := NewDateFilter;
@@ -1152,6 +1195,20 @@ report 25 "Account Schedule"
             exit(false);
 
         exit(true);
+    end;
+
+    procedure GetFilters(var AccScheduleLine: Record "Acc. Schedule Line")
+    begin
+        AccScheduleLine.SetRange("Schedule Name", AccSchedName);
+        AccScheduleLine.SetFilter("Date Filter", DateFilter);
+        AccScheduleLine.SetFilter("G/L Budget Filter", GLBudgetFilter);
+        AccScheduleLine.SetFilter("Cost Budget Filter", CostBudgetFilter);
+        AccScheduleLine.SetFilter("Business Unit Filter", BusinessUnitFilter);
+        AccScheduleLine.SetFilter("Dimension 1 Filter", Dim1Filter);
+        AccScheduleLine.SetFilter("Dimension 2 Filter", Dim2Filter);
+        AccScheduleLine.SetFilter("Dimension 3 Filter", Dim3Filter);
+        AccScheduleLine.SetFilter("Dimension 4 Filter", Dim4Filter);
+        AccScheduleLine.SetFilter("Cost Center Filter", CostCenterFilter);
     end;
 
     local procedure FormLookUpDimFilter(Dim: Code[20]; var Text: Text[1024]): Boolean
@@ -1278,6 +1335,10 @@ report 25 "Account Schedule"
             AnalysisView."Dimension 2 Code" := GLSetup."Global Dimension 2 Code";
         end;
 
+        CompanyInfo.SetAutoCalcFields(Picture);
+        CompanyInfo.Get();
+        CompanyLogoPosition := FinancialReportLocal.GetEffectiveLogoPosition().AsInteger();
+
         OnAfterTransferValues(StartDate, EndDate, DateFilterHidden);
     end;
 
@@ -1300,6 +1361,9 @@ report 25 "Account Schedule"
                 StartDate := CalcDate('<-CM>', EndDate);
             ValidateStartEndDate();
         end;
+
+        if UseHiddenDateFilter then
+            DateFilter := DateFilterHidden;
     end;
 
     local procedure SetBudgetFilterEnable()

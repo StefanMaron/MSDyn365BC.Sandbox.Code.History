@@ -19,9 +19,7 @@ codeunit 134329 "ERM Purchase Return Order"
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryRandom: Codeunit "Library - Random";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
-#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
-#endif
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryWarehouse: Codeunit "Library - Warehouse";
@@ -316,7 +314,6 @@ codeunit 134329 "ERM Purchase Return Order"
         LibraryPurchase.PostPurchaseDocument(PurchaseHeaderRet, true, true);
     end;
 
-#if not CLEAN25
     [Test]
     [HandlerFunctions('ConfirmHandler')]
     [Scope('OnPrem')]
@@ -351,7 +348,7 @@ codeunit 134329 "ERM Purchase Return Order"
         VerifyLineDiscountAmount(
           PurchaseHeader."No.", (PurchaseLine.Quantity * PurchaseLine."Direct Unit Cost") * PurchaseLineDiscount."Line Discount %" / 100);
     end;
-#endif
+
     [Test]
     [HandlerFunctions('ConfirmHandler')]
     [Scope('OnPrem')]
@@ -1834,7 +1831,6 @@ codeunit 134329 "ERM Purchase Return Order"
         ModifyPurchaseLine(PurchaseLine, PurchaseHeader);
     end;
 
-#if not CLEAN25
     local procedure SetupLineDiscount(var PurchaseLineDiscount: Record "Purchase Line Discount")
     var
         Item: Record Item;
@@ -1847,7 +1843,6 @@ codeunit 134329 "ERM Purchase Return Order"
         PurchaseLineDiscount.Validate("Line Discount %", LibraryRandom.RandInt(10));
         PurchaseLineDiscount.Modify(true);
     end;
-#endif
 
     local procedure UpdatePurchaseHeader(var PurchaseHeader: Record "Purchase Header"; VendorCrMemoNo: Code[35])
     begin
@@ -2026,7 +2021,7 @@ codeunit 134329 "ERM Purchase Return Order"
           -CostAmount, TotalCostAmount, GeneralLedgerSetup."Amount Rounding Precision",
           StrSubstNo(FieldError, ValueEntry.FieldCaption("Cost Amount (Actual)"), TotalCostAmount, ValueEntry.TableCaption()));
     end;
-#if not CLEAN25
+
     local procedure VerifyLineDiscountAmount(ReturnOrderNo: Code[20]; LineDiscountAmount: Decimal)
     var
         PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
@@ -2041,7 +2036,7 @@ codeunit 134329 "ERM Purchase Return Order"
         Assert.AreNearlyEqual(LineDiscountAmount, PurchCrMemoLine."Line Discount Amount", GeneralLedgerSetup."Amount Rounding Precision",
           StrSubstNo(FieldError, PurchCrMemoLine.FieldCaption("Line Discount Amount"), LineDiscountAmount, PurchCrMemoLine.TableCaption()));
     end;
-#endif
+
     local procedure VerifyInvoiceDiscountAmount(ReturnOrderNo: Code[20]; InvoiceDiscountAmount: Decimal)
     var
         VendorLedgerEntry: Record "Vendor Ledger Entry";

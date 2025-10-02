@@ -586,7 +586,6 @@ codeunit 139183 "CRM Integration Mapping"
         VerifyJobQueueEntry(IntegrationTableMapping, 1);
     end;
 
-#if not CLEAN25
     [Test]
     [TransactionModel(TransactionModel::AutoRollback)]
     [Scope('OnPrem')]
@@ -602,7 +601,6 @@ codeunit 139183 "CRM Integration Mapping"
           IntegrationTableMapping, DATABASE::"Customer Price Group", DATABASE::"CRM Pricelevel", CRMPricelevel.FieldNo(PriceLevelId), 1, 1, false);
         VerifyJobQueueEntry(IntegrationTableMapping, 1);
     end;
-#endif
 
     [Test]
     [TransactionModel(TransactionModel::AutoRollback)]
@@ -668,7 +666,6 @@ codeunit 139183 "CRM Integration Mapping"
         VerifyJobQueueEntry(IntegrationTableMapping, 1);
     end;
 
-#if not CLEAN25
     [Test]
     [TransactionModel(TransactionModel::AutoRollback)]
     [Scope('OnPrem')]
@@ -685,7 +682,6 @@ codeunit 139183 "CRM Integration Mapping"
           CRMProductpricelevel.FieldNo(ProductPriceLevelId), 6, 1, false);
         VerifyJobQueueEntry(IntegrationTableMapping, 1);
     end;
-#endif
 
     [Test]
     [TransactionModel(TransactionModel::AutoRollback)]
@@ -1747,10 +1743,8 @@ codeunit 139183 "CRM Integration Mapping"
         CRMInvoice: Record "CRM Invoice";
         CRMInvoiceDetail: Record "CRM Invoicedetail";
         CRMUomschedule: Record "CRM Uomschedule";
-#if not CLEAN25
         CRMPricelevel: Record "CRM Pricelevel";
         CRMProductPricelevel: Record "CRM Productpricelevel";
-#endif
         IntegrationTableMappingList: TestPage "Integration Table Mapping List";
         IntegrationTableMappingsNo: Integer;
     begin
@@ -1780,10 +1774,8 @@ codeunit 139183 "CRM Integration Mapping"
         ModifyIntegrationTableMappingDirection(DATABASE::"Sales Invoice Header", DATABASE::"CRM Invoice");
         ModifyIntegrationTableMappingDirection(DATABASE::"Sales Invoice Line", DATABASE::"CRM Invoicedetail");
         ModifyIntegrationTableMappingDirection(DATABASE::"Unit of Measure", DATABASE::"CRM Uomschedule");
-#if not CLEAN25
         ModifyIntegrationTableMappingDirection(DATABASE::"Customer Price Group", DATABASE::"CRM Pricelevel");
         ModifyIntegrationTableMappingDirection(DATABASE::"Sales Price", DATABASE::"CRM Productpricelevel");
-#endif
         ModifyIntegrationTableMappingDirection(DATABASE::"Shipping Agent", DATABASE::"CRM Account");
         ModifyIntegrationTableMappingDirection(DATABASE::"Shipment Method", DATABASE::"CRM Account");
         ModifyIntegrationTableMappingDirection(DATABASE::"Payment Terms", DATABASE::"CRM Account");
@@ -1841,7 +1833,6 @@ codeunit 139183 "CRM Integration Mapping"
           IntegrationTableMapping, DATABASE::"Unit of Measure", DATABASE::"CRM Uomschedule", CRMUomschedule.FieldNo(UoMScheduleId), 1, 1, false);
         VerifyJobQueueEntry(IntegrationTableMapping, 1);
 
-#if not CLEAN25
         VerifyMapping(
           IntegrationTableMapping, DATABASE::"Customer Price Group", DATABASE::"CRM Pricelevel", CRMPricelevel.FieldNo(PriceLevelId), 1, 1, false);
         VerifyJobQueueEntry(IntegrationTableMapping, 1);
@@ -1850,7 +1841,6 @@ codeunit 139183 "CRM Integration Mapping"
           IntegrationTableMapping, DATABASE::"Sales Price", DATABASE::"CRM Productpricelevel",
           CRMProductpricelevel.FieldNo(ProductPriceLevelId), 6, 1, false);
         VerifyJobQueueEntry(IntegrationTableMapping, 1);
-#endif
 
         VerifyMapping(
                   IntegrationTableMapping, DATABASE::"Shipping Agent", DATABASE::"CRM Account",
