@@ -851,7 +851,6 @@ table 254 "VAT Entry"
         }
         key(Key12100; Type, Closed, "Tax Liable", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Operation Occurred Date", "VAT Period")
         {
-            SumIndexFields = Base, Amount, "Additional-Currency Base", "Additional-Currency Amount";
         }
     }
 
@@ -889,7 +888,6 @@ table 254 "VAT Entry"
             "VAT Reporting Date" := GenJnlLine."VAT Reporting Date";
     end;
 
-    [InherentPermissions(PermissionObjectType::TableData, Database::"VAT Entry", 'r')]
     procedure GetLastEntryNo(): Integer;
     var
         FindRecordManagement: Codeunit "Find Record Management";
@@ -1192,20 +1190,11 @@ table 254 "VAT Entry"
     procedure CheckGLAccountNoFilled()
     var
         VATEntryLocal: Record "VAT Entry";
-        GLEntryVATLink: Record "G/L Entry - VAT Entry Link";
     begin
         VATEntryLocal.Copy(Rec);
         VATEntryLocal.SetRange("G/L Acc. No.", '');
-        if not VATEntryLocal.FindSet() then
-            exit;
-
-        repeat
-            GLEntryVATLink.Reset();
-            GLEntryVATLink.SetRange("VAT Entry No.", VATEntryLocal."Entry No.");
-            GLEntryVATLink.SetFilter("G/L Entry No.", '<>%1', 0);
-            if not GLEntryVATLink.IsEmpty() then
-                Error(NoGLAccNoOnVATEntriesErr, VATEntryLocal.GetFilters());
-        until VATEntryLocal.Next() = 0;
+        if not VATEntryLocal.IsEmpty() then
+            Error(NoGLAccNoOnVATEntriesErr, VATEntryLocal.GetFilters());
     end;
 
     local procedure AdjustGLAccountNoOnRec(var VATEntry: Record "VAT Entry")
