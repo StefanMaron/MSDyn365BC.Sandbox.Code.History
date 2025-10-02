@@ -237,6 +237,21 @@ page 108 "Financial Reports"
                     AccSchedOverview.Run();
                 end;
             }
+            action(Schedules)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Schedules';
+                ToolTip = 'View or edit when the financial report is scheduled to be exported or emailed.';
+                Image = CheckList;
+
+                trigger OnAction()
+                var
+                    FinancialReportSchedule: Record "Financial Report Schedule";
+                begin
+                    FinancialReportSchedule.SetRange("Financial Report Name", Rec.Name);
+                    Page.Run(0, FinancialReportSchedule);
+                end;
+            }
         }
         area(reporting)
         {
@@ -268,6 +283,7 @@ page 108 "Financial Reports"
                 actionref(Overview_Promoted; Overview) { }
                 actionref(EditRowGroup_Promoted; EditRowGroup) { }
                 actionref(EditColumnGroup_Promoted; EditColumnGroup) { }
+                actionref(Schedules_Promoted; Schedules) { }
             }
             group(CopyExportImport)
             {

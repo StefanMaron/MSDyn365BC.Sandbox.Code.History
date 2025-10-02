@@ -86,6 +86,33 @@ page 9002 "Acc. Payables Coordinator RC"
                 RunObject = Report "Vendor - List";
                 ToolTip = 'View the list of your vendors.';
             }
+            action("Vendor - &Balance to date")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Vendor - &Balance to date';
+                Image = "Report";
+                RunObject = Report "Vendor - Balance to Date";
+                ToolTip = 'View, print, or save a detail balance to date for selected vendors.';
+                Visible = false;
+            }
+            action("Vendor - &Summary Aging")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Vendor - &Summary Aging';
+                Image = "Report";
+                RunObject = Report "Vendor - Summary Aging";
+                ToolTip = 'View a summary of the payables owed to each vendor, divided into three time periods.';
+                Visible = false;
+            }
+            action("Aged &Accounts Payable")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Aged &Accounts Payable';
+                Image = "Report";
+                RunObject = Report "Aged Accounts Payable";
+                ToolTip = 'View an overview of when your payables to vendors are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
+                Visible = false;
+            }
             action("Vendor - &Purchase List")
             {
                 ApplicationArea = Basic, Suite;

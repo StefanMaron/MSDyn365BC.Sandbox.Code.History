@@ -17,9 +17,7 @@ using Microsoft.Purchases.Document;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Sales.History;
 using Microsoft.Sales.Document;
 using Microsoft.Finance.SalesTax;
@@ -68,13 +66,9 @@ permissionset 6427 "Resources - Edit"
                   tabledata "Res. Journal Line" = Rm,
                   tabledata "Res. Ledger Entry" = Rm,
                   tabledata Resource = RIMD,
-#if not CLEAN25
                   tabledata "Resource Cost" = RIMD,
-#endif
                   tabledata "Resource Group" = RIMD,
-#if not CLEAN25
                   tabledata "Resource Price" = RIMD,
-#endif
                   tabledata "Resource Unit of Measure" = RID,
                   tabledata "Return Receipt Line" = r,
                   tabledata "Sales Cr.Memo Line" = r,

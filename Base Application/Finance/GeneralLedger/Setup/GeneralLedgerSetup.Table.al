@@ -674,21 +674,25 @@ table 98 "General Ledger Setup"
         {
             Caption = 'Financial Report for Balance Sheet';
             TableRelation = "Financial Report";
+            ToolTip = 'Specifies which financial report is used to generate the Balance Sheet report.';
         }
         field(115; "Fin. Rep. for Income Stmt."; Code[10])
         {
             Caption = 'Financial Report for Income Stmt.';
             TableRelation = "Financial Report";
+            ToolTip = 'Specifies which financial report is used to generate the Income Statement report.';
         }
         field(116; "Fin. Rep. for Cash Flow Stmt"; Code[10])
         {
             Caption = 'Financial Report for Cash Flow Stmt';
             TableRelation = "Financial Report";
+            ToolTip = 'Specifies which financial report is used to generate the Cash Flow Statement report.';
         }
         field(117; "Fin. Rep. for Retained Earn."; Code[10])
         {
             Caption = 'Financial Report for Retained Earn.';
             TableRelation = "Financial Report";
+            ToolTip = 'Specifies which financial report is used to generate the Retained Earnings report.';
         }
         field(120; "Tax Invoice Renaming Threshold"; Decimal)
         {
@@ -884,6 +888,21 @@ table 98 "General Ledger Setup"
         {
             TableRelation = "G/L Account Category";
             Caption = 'Account Payables G/L Account Category';
+        }
+        field(195; "Fin. Rep. Period Type"; Enum "Analysis Period Type")
+        {
+            Caption = 'Financial Report Period Type';
+            ToolTip = 'Specifies by which period amounts are displayed on financial report by default.';
+        }
+        field(196; "Fin. Rep. Neg. Amount Format"; Enum "Analysis Negative Format")
+        {
+            Caption = 'Financial Report Default Negative Amt. Format';
+            ToolTip = 'Specifies how negative amounts are displayed on the financial report by default.';
+        }
+        field(197; "Fin. Rep. Company Logo Pos."; Enum "Fin. Report Logo Position")
+        {
+            Caption = 'Financial Report Company Logo Position';
+            ToolTip = 'Specifies how your company logo is displayed on the financial report by default.';
         }
         field(11600; "BAS to be Lodged as a Group"; Boolean)
         {

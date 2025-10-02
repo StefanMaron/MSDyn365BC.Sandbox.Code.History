@@ -176,10 +176,8 @@ permissionset 8322 "Service Documents - Post"
                   tabledata "Sales Discount Access" = R,
                   tabledata "Sales Header" = RIM,
                   tabledata "Sales Line" = RIM,
-#if not CLEAN25
                   tabledata "Sales Line Discount" = R,
                   tabledata "Sales Price" = R,
-#endif
                   tabledata "Sales Price Access" = R,
                   tabledata "Salesperson/Purchaser" = R,
                   tabledata "Segment Header" = R,

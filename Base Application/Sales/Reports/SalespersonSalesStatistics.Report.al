@@ -188,4 +188,3 @@ report 114 "Salesperson - Sales Statistics"
         Rounding: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
         RoundingNO: Integer;
 }
-

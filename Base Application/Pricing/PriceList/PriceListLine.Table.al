@@ -22,6 +22,7 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
+using System.Environment;
 
 table 7001 "Price List Line"
 {
@@ -338,7 +339,6 @@ table 7001 "Price List Line"
                 Verify();
                 if "Unit Price" <> 0 then
                     "Cost Factor" := 0;
-
                 "Cost-plus %" := 0;
                 "Discount Amount" := 0;
             end;
@@ -760,7 +760,12 @@ table 7001 "Price List Line"
     end;
 
     procedure IsAmountMandatory(AmountType: enum "Price Amount Type"): Boolean;
+    var
+        ClientTypeManagement: Codeunit "Client Type Management";
     begin
+        if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::OData, CLIENTTYPE::ODataV4] then
+            exit(true);
+
         case "Amount Type" of
             "Amount Type"::Any:
                 exit(true)
@@ -873,9 +878,6 @@ table 7001 "Price List Line"
 
         CopyFromAssetType();
 
-#if not CLEAN25
-        OnAfterCopyFromPriceAsset(PriceAsset, Rec);
-#endif
         OnAfterCopyFromForPriceAsset(PriceAsset, Rec);
     end;
 
@@ -1227,14 +1229,6 @@ table 7001 "Price List Line"
             end;
         end;
     end;
-
-#if not CLEAN25
-    [Obsolete('typo, use OnAfterCopyFromForPriceAsset instead', '23.0')]
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterCopyFromPriceAsset(PriceAsset: Record "Price Asset"; var riceListLine: Record "Price List Line")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterCopyFromForPriceAsset(PriceAsset: Record "Price Asset"; var PriceListLine: Record "Price List Line")

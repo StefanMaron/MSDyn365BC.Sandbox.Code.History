@@ -11,12 +11,8 @@ using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.WIP;
 using Microsoft.Purchases.Pricing;
 using Microsoft.Sales.Pricing;
-#if not CLEAN25
 using System.Telemetry;
-#endif
-#if not CLEAN25
 using Microsoft.Pricing.Calculation;
-#endif
 
 table 315 "Jobs Setup"
 {
@@ -116,7 +112,6 @@ table 315 "Jobs Setup"
                     Validate("Default Sales Price List Code", PriceListHeader.Code);
                 end;
             end;
-#if not CLEAN25
 
             trigger OnValidate()
             var
@@ -126,7 +121,6 @@ table 315 "Jobs Setup"
                 if ("Default Sales Price List Code" <> xRec."Default Sales Price List Code") or (CurrFieldNo = 0) then
                     FeatureTelemetry.LogUptake('0000LLR', PriceCalculationMgt.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::"Set up");
             end;
-#endif
         }
         field(7004; "Default Purch Price List Code"; Code[20])
         {
@@ -142,7 +136,6 @@ table 315 "Jobs Setup"
                     Validate("Default Purch Price List Code", PriceListHeader.Code);
                 end;
             end;
-#if not CLEAN25
 
             trigger OnValidate()
             var
@@ -152,7 +145,6 @@ table 315 "Jobs Setup"
                 if ("Default Purch Price List Code" <> xRec."Default Purch Price List Code") or (CurrFieldNo = 0) then
                     FeatureTelemetry.LogUptake('0000LLR', PriceCalculationMgt.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::"Set up");
             end;
-#endif
         }
     }
 
