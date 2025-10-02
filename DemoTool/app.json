@@ -11,6 +11,6 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "25.1.0.0",
+  "application": "25.2.0.0",
   "brief": "DemoTool (IT)"
 }
