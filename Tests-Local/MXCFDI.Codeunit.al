@@ -59,6 +59,7 @@
         NoElectronicDocumentSentErr: Label 'There is no electronic Document sent yet';
         NamespaceCFD4Txt: Label 'http://www.sat.gob.mx/cfd/4';
         SchemaLocationCFD4Txt: Label 'http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd';
+        CertificateNotExistErr: Label 'The Isolated Certificate does not exist. Identification fields and values: Code=''%1''', Comment = '%1 - Isolated Certificate code';
         CancelOption: Option ,CancelRequest,GetResponse,MarkAsCanceled,ResetCancelRequest;
 
     [Test]
@@ -3138,7 +3139,7 @@
         VerifyVATTotalLine(
           OriginalStr, 2448.71, 16, '002', 0, 4, 1);
         VerifyTotalImpuestos(
-          OriginalStr, 'TotalImpuestosTrasladados', 2448.71, 87);
+          OriginalStr, 'TotalImpuestosTrasladados', 2448.71, 88);
 
         LibraryVariableStorage.AssertEmpty();
     end;
@@ -3195,7 +3196,7 @@
         VerifyVATTotalLine(
           OriginalStr, 71.12, 16, '002', 0, 1, 1);
         VerifyTotalImpuestos(
-          OriginalStr, 'TotalImpuestosTrasladados', 71.12, 42);
+          OriginalStr, 'TotalImpuestosTrasladados', 71.12, 43);
 
         LibraryVariableStorage.AssertEmpty();
     end;
@@ -3399,7 +3400,7 @@
               StrSubstNo(IncorrectOriginalStrValueErr, CFDIRelationDocument[i]."Fiscal Invoice Number PAC", OriginalStr));
         // [THEN] String for digital stamp contains Descrition with encoded special characters (TFS327477)
         Assert.AreEqual(
-          EncodedDescr, SelectStr(31, OriginalStr),
+          EncodedDescr, SelectStr(32, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, SalesInvoiceLine.FieldCaption(Description), OriginalStr));
         // [THEN] "Date/Time First Req. Sent" is created in current time zone (TFS 323341) (TFS 522707)
         // VerifyIsNearlyEqualDateTime(
@@ -3844,16 +3845,16 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 323341] Request Stamp for Sales Invoice in 'Ship-to' Time Zone
+        // [SCENARIO 540218] Request Stamp for Sales Invoice in Location Time Zone
         Initialize();
         TableNo := DATABASE::"Sales Invoice Header";
 
-        // [GIVEN] Sales Invoice has 'Ship-To City' and 'Ship-to Post Code' with Time Zone offset = 2h
+        // [GIVEN] Sales Invoice has Location with City and Post Code with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
-          SalesInvoiceHeader.FieldNo("Ship-to City"), SalesInvoiceHeader.FieldNo("Ship-to Post Code"), TimeZoneID);
+          SalesInvoiceHeader.FieldNo("Location Code"), TimeZoneID);
 
         // [WHEN] Request stamp for the Sales Invoice
         RequestStamp(TableNo, DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -3877,16 +3878,16 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 323341] Request Stamp for Sales Credit Memo in 'Sell-to' Time Zone
+        // [SCENARIO 540218] Request Stamp for Sales Credit Memo in Location Time Zone
         Initialize();
         TableNo := DATABASE::"Sales Cr.Memo Header";
 
-        // [GIVEN] Sales Credit memo has 'Sell-To City' and 'Sell-to Post Code' with Time Zone offset = 2h
+        // [GIVEN] Sales Credit memo has Location with City and Post Code with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, SalesCrMemoHeader.FieldNo("No."), DocumentNo,
-          SalesCrMemoHeader.FieldNo("Ship-to City"), SalesCrMemoHeader.FieldNo("Ship-to Post Code"), TimeZoneID);
+          SalesCrMemoHeader.FieldNo("Location Code"), TimeZoneID);
 
         // [WHEN] Request stamp for the Sales Credit Memo
         RequestStamp(TableNo, DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -3910,16 +3911,16 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 323341] Request Stamp for Service Invoice in 'Bill-to' Time Zone
+        // [SCENARIO 540218] Request Stamp for Service Invoice in Location Time Zone
         Initialize();
         TableNo := DATABASE::"Service Invoice Header";
 
-        // [GIVEN] Service Invoice has 'Bill-To City' and 'Bill-to Post Code' with Time Zone offset = 2h
+        // [GIVEN] Service Invoice has Location with City and Post Code with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, ServiceInvoiceHeader.FieldNo("No."), DocumentNo,
-          ServiceInvoiceHeader.FieldNo("Ship-to City"), ServiceInvoiceHeader.FieldNo("Ship-to Post Code"), TimeZoneID);
+          ServiceInvoiceHeader.FieldNo("Location Code"), TimeZoneID);
 
         // [WHEN] Request stamp for the Service Invoice
         RequestStamp(TableNo, DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -3943,17 +3944,16 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 323341] Request Stamp for Service Credit Memo for customer with defined Time Zone
+        // [SCENARIO 540218] Request Stamp for Service Credit Memo for Location with defined Time Zone
         Initialize();
         TableNo := DATABASE::"Service Cr.Memo Header";
 
-        // [GIVEN] Service Credit Memo  has Customer with Post Code of Time Zone offset = 2h
+        // [GIVEN] Service Credit Memo  has Location with City and Post Code with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, ServiceCrMemoHeader.FieldNo("No."), DocumentNo,
-          ServiceCrMemoHeader.FieldNo("Ship-to City"), ServiceCrMemoHeader.FieldNo("Ship-to Post Code"),
-          TimeZoneID);
+          ServiceCrMemoHeader.FieldNo("Location Code"), TimeZoneID);
 
         // [WHEN] Request stamp for the Service Credit Memo
         RequestStamp(TableNo, DocumentNo, ResponseOption::Success, ActionOption::"Request Stamp");
@@ -4015,11 +4015,11 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 323341] Send document for Sales Invoice in 'Ship-to' Time Zone
+        // [SCENARIO 540218] Send document for Sales Invoice in Location Time Zone
         Initialize();
         TableNo := DATABASE::"Sales Invoice Header";
 
-        // [GIVEN] Stamped Sales Invoice has 'Ship-To City' and 'Ship-to Post Code' with Time Zone offset = 2h
+        // [GIVEN] Stamped Sales Invoice has Location with City and Post Code with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         UpdateDocumentFieldValue(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
@@ -4027,7 +4027,7 @@
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
-          SalesInvoiceHeader.FieldNo("Ship-to City"), SalesInvoiceHeader.FieldNo("Ship-to Post Code"), TimeZoneID);
+          SalesInvoiceHeader.FieldNo("Location Code"), TimeZoneID);
 
         // [WHEN] Send Electronic Document for the Sales Invoice
         RequestStamp(TableNo, DocumentNo, ResponseOption::Success, ActionOption::Send);
@@ -4091,11 +4091,11 @@
         TimeZoneOffset: Duration;
         UserOffset: Duration;
     begin
-        // [SCENARIO 323341] Cancel Sales Invoice in 'Ship-to' Time Zone
+        // [SCENARIO 540218] Cancel Sales Invoice in Location Time Zone
         Initialize();
         TableNo := DATABASE::"Sales Invoice Header";
 
-        // [GIVEN] Stamped Sales Invoice has 'Ship-To City' and 'Ship-to Post Code' with Time Zone offset = 2h
+        // [GIVEN] Stamped Sales Invoice has Location with City and Post Code with Time Zone offset = 2h
         DocumentNo := CreateAndPostDoc(TableNo, CreatePaymentMethodForSAT());
         UpdateDocumentFieldValue(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
@@ -4103,7 +4103,7 @@
         FindTimeZone(TimeZoneID, TimeZoneOffset, UserOffset);
         UpdateDocumentWithTimeZone(
           TableNo, SalesInvoiceHeader.FieldNo("No."), DocumentNo,
-          SalesInvoiceHeader.FieldNo("Ship-to City"), SalesInvoiceHeader.FieldNo("Ship-to Post Code"), TimeZoneID);
+          SalesInvoiceHeader.FieldNo("Location Code"), TimeZoneID);
 
         // [WHEN] Cancel Sales Invoice
         Cancel(TableNo, DocumentNo, ResponseOption::Success);
@@ -4631,9 +4631,9 @@
         // [GIVEN] Posted Sales Invoice with line1: Amount = 1000, VAT % = 16, line2: Amount = 800, VAT % = 8.
         Customer.Get(CreateCustomer());
         CreateSalesHeaderForCustomer(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.", CreatePaymentMethodForSAT());
-        // [GIVEN] Customer."Post Code" is filled in with 12345
-        Customer."Post Code" := Format(LibraryRandom.RandIntInRange(10000, 20000));
-        Customer.Modify();
+        // [GIVEN] "Bill-to Post Code" is filled in with 12345
+        SalesHeader."Bill-to Post Code" := Format(LibraryRandom.RandIntInRange(10000, 20000));
+        SalesHeader.Modify();
         VATProdPostingGroup := CreateVATPostingSetup(SalesHeader."VAT Bus. Posting Group", 16, false, false);
         CreateSalesLineItemWithVATSetup(SalesLine1, SalesHeader, CreateItem(), VATProdPostingGroup, 1, LibraryRandom.RandIntInRange(1000, 2000), 0);
         VATProdPostingGroup := CreateVATPostingSetup(SalesHeader."VAT Bus. Posting Group", 8, false, false);
@@ -4651,26 +4651,26 @@
         InStream.ReadText(OriginalStr);
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
 
-        // [THEN] 'DomicilioFiscalReceptor' is exported from Customer."Post Code" = 12345 (TFS 477864)
+        // [THEN] 'DomicilioFiscalReceptor' is exported from SalesInvoice."Post Code" = 12345 (TFS 547550)
         VerifyPartyInformation(
           OriginalStr, Customer."RFC No.", Customer."CFDI Customer Name",
-          Customer."Post Code", Customer."SAT Tax Regime Classification", 18, 21);
+          SalesInvoiceHeader."Bill-to Post Code", Customer."SAT Tax Regime Classification", 18, 21);
         // [THEN] XML Document has node 'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' with VAT data for lines
         // [THEN] Line1 has attributes 'Importe' = 160, 'TipoFactor' = 'Tasa', 'Impuesto' = '002', 'Base' = 1000.
         // [THEN] Line2 has attributes 'Importe' = 64, 'TipoFactor' = 'Tasa', 'Impuesto' = '002', 'Base' = 800.
         VerifyVATAmountLines(
-          OriginalStr, SalesLine1.Amount, SalesLine1."Amount Including VAT" - SalesLine1.Amount, SalesLine1."VAT %", '002', 1, 0);
+          OriginalStr, SalesLine1.Amount, SalesLine1."Amount Including VAT" - SalesLine1.Amount, SalesLine1."VAT %", '002', 0, 0);
         VerifyVATAmountLines(
-          OriginalStr, SalesLine2.Amount, SalesLine2."Amount Including VAT" - SalesLine2.Amount, SalesLine2."VAT %", '002', 1, 1);
+          OriginalStr, SalesLine2.Amount, SalesLine2."Amount Including VAT" - SalesLine2.Amount, SalesLine2."VAT %", '002', 0, 1);
         // [THEN] XML Document has node 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' with 2 total VAT lines
         // [THEN] Line1: attributes 'Importe' = 160, 'TipoFactor' = 'Tasa', 'Impuesto' = '002'.
         // [THEN] Line2: attributes 'Importe' = 64, 'TipoFactor' = 'Tasa', 'Impuesto' = '002'.
         VerifyVATTotalLine(
           OriginalStr,
-          SalesLine1."Amount Including VAT" - SalesLine1.Amount, SalesLine1."VAT %", '002', 0, 1, 16);
+          SalesLine1."Amount Including VAT" - SalesLine1.Amount, SalesLine1."VAT %", '002', 0, 1, 15);
         VerifyVATTotalLine(
           OriginalStr,
-          SalesLine2."Amount Including VAT" - SalesLine2.Amount, SalesLine2."VAT %", '002', 1, 1, 16);
+          SalesLine2."Amount Including VAT" - SalesLine2.Amount, SalesLine2."VAT %", '002', 1, 1, 15);
         VerifyTotalImpuestos(
           OriginalStr, 'TotalImpuestosTrasladados', SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount, 63);
     end;
@@ -4759,7 +4759,7 @@
           OriginalStr, SalesInvoiceHeader.Amount, '002');
 
         // [THEN] Total Impuestos:  'cfdi:Impuestos/TotalImpuestosTrasladados' = 0
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 38);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 39);
     end;
 
     [Test]
@@ -4860,7 +4860,7 @@
           SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine.Amount, SalesInvoiceLine."VAT %",
           GetTaxCodeTraslado(SalesInvoiceLine."VAT %"), 1, 2, 0);
         VerifyTotalImpuestos(
-          OriginalStr, 'TotalImpuestosTrasladados', SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount, 62);
+          OriginalStr, 'TotalImpuestosTrasladados', SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount, 63);
     end;
 
     [Test]
@@ -5013,7 +5013,7 @@
           ServiceLineDisc."Amount Including VAT" - ServiceLineDisc.Amount,
           ServiceLineDisc.Amount, 0);
         // [THEN] 'Concepto' node for normal line has 'Descuento' = 0, Importe = 3000, 'ValorUnitario' = 1000
-        // [THEN] 'Traslado' node for normal line has 'Importe' = 450 (3450 - 3000), 'Base' = 3000        VerifyLineAmountsByIndex(
+        // [THEN] 'Traslado' node for normal line has 'Importe' = 450 (3450 - 3000), 'Base' = 3000 
         VerifyLineAmountsByIndex(
           0, UnitPrice * ServiceLine.Quantity, UnitPrice,
           ServiceLine."Amount Including VAT" - ServiceLine.Amount,
@@ -5399,7 +5399,7 @@
         InStream.ReadText(OriginalStr);
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
         Assert.AreEqual(
-          NameValueBuffer.Name, SelectStr(37, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumeroPedimento', OriginalStr));
+          NameValueBuffer.Name, SelectStr(38, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumeroPedimento', OriginalStr));
 
         NameValueBuffer.Delete();
     end;
@@ -5449,7 +5449,7 @@
         InStream.ReadText(OriginalStr);
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
         Assert.AreEqual(
-          NumeroPedimentoStr, SelectStr(37, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumeroPedimento', OriginalStr));
+          NumeroPedimentoStr, SelectStr(38, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'NumeroPedimento', OriginalStr));
     end;
 
     [Test]
@@ -5603,17 +5603,17 @@
         VerifyRetentionAmountLine(
           OriginalStr,
           SalesLine."Amount Including VAT", SalesLineRetention."Amount Including VAT",
-          SalesLineRetention."Retention VAT %", GetTaxCodeRetention(SalesLineRetention."Retention VAT %"), 41, 0);
+          SalesLineRetention."Retention VAT %", GetTaxCodeRetention(SalesLineRetention."Retention VAT %"), 42, 0);
 
         // [THEN] 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' has attributes 'Importe' = 0, 'TipoFactor' = 'Tasa', 'Impuesto' = '002'.
         // [THEN] 'cfdi:Impuestos/cfdi:Retenciones/cfdi:Retencion' has attributes 'Importe' = 100, 'Impuesto' = '002'.
         VerifyVATTotalLine(OriginalStr, 0, 0, '002', 0, 1, 8);
         VerifyRetentionTotalLine(
-          OriginalStr, -SalesLineRetention."Amount Including VAT", GetTaxCodeRetention(SalesLineRetention."Retention VAT %"), 42, 0);
+          OriginalStr, -SalesLineRetention."Amount Including VAT", GetTaxCodeRetention(SalesLineRetention."Retention VAT %"), 43, 0);
 
         // [THEN] Total Impuestos:  'cfdi:Impuestos/TotalImpuestosTrasladados' = 0, 'cfdi:Impuestos/TotalImpuestosRetenidos' = 100
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 49);
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', -SalesLineRetention."Amount Including VAT", 44);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 50);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', -SalesLineRetention."Amount Including VAT", 45);
     end;
 
     [Test]
@@ -5668,17 +5668,17 @@
         VerifyRetentionAmountLine(
           OriginalStr,
           SalesLine."Amount Including VAT", SalesLineRetention."Amount Including VAT",
-          SalesLineRetention."Retention VAT %", GetTaxCodeRetention(SalesLineRetention."VAT %"), 41, 0);
+          SalesLineRetention."Retention VAT %", GetTaxCodeRetention(SalesLineRetention."VAT %"), 42, 0);
 
         // [THEN] 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' has attributes 'Importe' = 0, 'TipoFactor' = 'Tasa', 'Impuesto' = '002'.
         // [THEN] 'cfdi:Impuestos/cfdi:Retenciones/cfdi:Retencion' has attributes 'Importe' = 100, 'Impuesto' = '002'.
         VerifyVATTotalLine(OriginalStr, 0, 0, '002', 0, 1, 8);
         VerifyRetentionTotalLine(
-          OriginalStr, -SalesLineRetention."Amount Including VAT", GetTaxCodeRetention(SalesLineRetention."VAT %"), 42, 0);
+          OriginalStr, -SalesLineRetention."Amount Including VAT", GetTaxCodeRetention(SalesLineRetention."VAT %"), 43, 0);
 
         // [THEN] Total Impuestos:  'cfdi:Impuestos/TotalImpuestosTrasladados' = 0, 'cfdi:Impuestos/TotalImpuestosRetenidos' = 100
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 49);
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', -SalesLineRetention."Amount Including VAT", 44);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', 0, 50);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', -SalesLineRetention."Amount Including VAT", 45);
     end;
 
     [Test]
@@ -5741,12 +5741,12 @@
         VerifyRetentionAmountLine(
           OriginalStr,
           SalesLine.Amount, SalesLineRetention1.Amount, SalesLineRetention1."Retention VAT %",
-          GetTaxCodeRetention(SalesLineRetention1."Retention VAT %"), 41, 0);
+          GetTaxCodeRetention(SalesLineRetention1."Retention VAT %"), 42, 0);
         VerifyRetentionAmountLine(
           OriginalStr,
           SalesLine.Amount,
           SalesLineRetention2."Unit Price" * SalesLineRetention2.Quantity, SalesLineRetention2."Retention VAT %",
-          GetTaxCodeRetention(SalesLineRetention2."Retention VAT %"), 46, 1);
+          GetTaxCodeRetention(SalesLineRetention2."Retention VAT %"), 47, 1);
 
         // [THEN] 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' has attributes 'Importe' = 12480, 'TipoFactor' = 'Tasa', 'Impuesto' = '002'.
         // [THEN] Line 1 of 'cfdi:Impuestos/cfdi:Retenciones/cfdi:Retencion' has attributes 'Importe' = 7800, 'Impuesto' = '001'.
@@ -5755,13 +5755,13 @@
           OriginalStr, SalesLine."Amount Including VAT" - SalesLine.Amount, SalesLine."VAT %",
           GetTaxCodeTraslado(SalesLine."VAT %"), 0, 1, 15);
         VerifyRetentionTotalLine(OriginalStr, -SalesLineRetention1."Amount Including VAT",
-          GetTaxCodeRetention(SalesLineRetention1."Retention VAT %"), 47, 0);
+          GetTaxCodeRetention(SalesLineRetention1."Retention VAT %"), 48, 0);
         VerifyRetentionTotalLine(OriginalStr, -SalesLineRetention2."Amount Including VAT",
-          GetTaxCodeRetention(SalesLineRetention2."Retention VAT %"), 49, 1);
+          GetTaxCodeRetention(SalesLineRetention2."Retention VAT %"), 50, 1);
 
         // [THEN] Total Impuestos:  'cfdi:Impuestos/TotalImpuestosTrasladados' = 12480, 'cfdi:Impuestos/TotalImpuestosRetenidos' = 16119.95
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', SalesLine."Amount Including VAT" - SalesLine.Amount, 56);
-        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', SalesLineRetention1.Amount + SalesLineRetention2.Amount, 51);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosTrasladados', SalesLine."Amount Including VAT" - SalesLine.Amount, 57);
+        VerifyTotalImpuestos(OriginalStr, 'TotalImpuestosRetenidos', SalesLineRetention1.Amount + SalesLineRetention2.Amount, 52);
     end;
 
     [Test]
@@ -5923,9 +5923,9 @@
         InStream.ReadText(OriginalStr);
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
 
-        // [THEN] 'DomicilioFiscalReceptor' is exported from SAT Address Id (TFS 477864)
+        // [THEN] 'DomicilioFiscalReceptor' is exported from Bill-to Post Code (TFS 547550)
         VerifyPartyInformation(
-          OriginalStr, Customer."RFC No.", Customer."CFDI Customer Name", GetSATPostalCode(SalesInvoiceHeader."SAT Address ID"), Customer."SAT Tax Regime Classification", 18, 22);
+          OriginalStr, Customer."RFC No.", Customer."CFDI Customer Name", SalesInvoiceHeader."Bill-to Post Code", Customer."SAT Tax Regime Classification", 18, 22);
         // [THEN] Comercio Exterior node has TipoCambioUSD = 20, TotalUSD = 100 (2000 / 20)
         VerifyComercioExteriorHeader(
           OriginalStr, SalesInvoiceHeader."SAT International Trade Term",
@@ -6228,7 +6228,7 @@
         // [THEN] 'cfdi:Conceptos/cfdi:Concepto' has attributes ClaveProdServ="84111506" Cantidad="1" ClaveUnidad="ACT" ValorUnitario="2000" Importe="2000"
         BaseAmount := SalesLine.Amount * SalesHeader."Prepayment %" / 100;
         VerifyConceptoNode(
-          OriginalStr, '84111506', '1', 'ACT', 'Anticipo bien o servicio', FormatDecimal(BaseAmount, 2), FormatDecimal(BaseAmount, 2), 21);
+          OriginalStr, '84111506', '1', 'ACT', 'Anticipo bien o servicio', FormatDecimal(BaseAmount, 2), FormatDecimal(BaseAmount, 2), 22);
 
         // [THEN] Total VAT line in 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' has 'Base' = 2000, 'Importe' = 320  
         // [THEN] Total VAT Amount in 'cfdi:Impuestos/TotalImpuestosTrasladados' =  320
@@ -6289,7 +6289,7 @@
         // [THEN] 'cfdi:Conceptos/cfdi:Concepto' has attributes ClaveProdServ="84111506" Cantidad="1" ClaveUnidad="ACT" ValorUnitario="2000" Importe="2000"
         BaseAmount := SalesLine.Amount * SalesHeader."Prepayment %" / 100;
         VerifyConceptoNode(
-          OriginalStr, '84111506', '1', 'ACT', 'Anticipo bien o servicio', FormatDecimal(BaseAmount, 2), FormatDecimal(BaseAmount, 2), 22);
+          OriginalStr, '84111506', '1', 'ACT', 'Anticipo bien o servicio', FormatDecimal(BaseAmount, 2), FormatDecimal(BaseAmount, 2), 23);
 
         // [THEN] Total VAT line in 'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado' has 'Base' = 2000, 'Importe' = 320  
         // [THEN] Total VAT Amount in 'cfdi:Impuestos/TotalImpuestosTrasladados' =  320
@@ -6866,6 +6866,246 @@
         LibraryVariableStorage.AssertEmpty();
     end;
 
+    [Test]
+    procedure SATCertOnPostedSalesInvoiceWhenLocationCertNotSet()
+    var
+        DummyGLSetup: Record "General Ledger Setup";
+        Certificate: Record "Isolated Certificate";
+        Location: Record Location;
+        PostedSalesInvoiceCard: TestPage "Posted Sales Invoice";
+        PostedDocNo: Code[20];
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] "SAT Certificate Name" and "SAT Certificate Source" values on Posted Sales Invoice card when Multiple SAT Certificates are enabled and SAT Certificate is not set in Location.
+        Initialize();
+
+        // [GIVEN] Multiple SAT Certificates are enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [GIVEN] SAT Certificate with Name A is set in General Ledger Setup.
+        CreateIsolatedCertificate(Certificate);
+        UpdateSATCertificateOnGLSetup(Certificate.Code);
+
+        // [GIVEN] Location L1 that does not have linked SAT Certificate.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        UpdateSATCertificateOnLocation(Location, '');
+
+        // [GIVEN] Posted Sales Invoice with Location L1.
+        PostedDocNo := CreateAndPostSalesDoc(Enum::"Sales Document Type"::Invoice, CreatePaymentMethodForSAT());
+        UpdateLocationOnPostedSalesInvoice(PostedDocNo, Location.Code);
+
+        // [WHEN] Posted Sales Invoice card is opened.
+        PostedSalesInvoiceCard.OpenEdit();
+        PostedSalesInvoiceCard.Filter.SetFilter("No.", PostedDocNo);
+
+        // [THEN] "SAT Certificate Name" is A and "SAT Certificate Source" is 'General Ledger Setup'.
+        Assert.AreEqual(Certificate.Name, PostedSalesInvoiceCard."SAT Certificate Name".Value, 'Incorrect SAT Certificate Name');
+        Assert.AreEqual(DummyGLSetup.TableCaption, PostedSalesInvoiceCard."SAT Certificate Source".Value, 'Incorrect SAT Certificate Source');
+        PostedSalesInvoiceCard.Close();
+    end;
+
+    [Test]
+    procedure SATCertOnPostedTransferShipmentWhenLocationCertNotSet()
+    var
+        DummyGLSetup: Record "General Ledger Setup";
+        Certificate: Record "Isolated Certificate";
+        Location: Record Location;
+        PostedTransferShipmentCard: TestPage "Posted Transfer Shipment";
+        PostedDocNo: Code[20];
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] "SAT Certificate Name" and "SAT Certificate Source" values on Posted Transfer Shipment card when Multiple SAT Certificates are enabled and SAT Certificate is not set in Location.
+        Initialize();
+
+        // [GIVEN] Multiple SAT Certificates are enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [GIVEN] SAT Certificate with Name A is set in General Ledger Setup.
+        CreateIsolatedCertificate(Certificate);
+        UpdateSATCertificateOnGLSetup(Certificate.Code);
+
+        // [GIVEN] Location L1 that does not have linked SAT Certificate.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        UpdateSATCertificateOnLocation(Location, '');
+
+        // [GIVEN] Transfer Order posted as Shipment with Transfer-from Code location that does not have linked SAT Certificate.
+        PostedDocNo := CreateAndPostDoc(Database::"Transfer Shipment Header", CreatePaymentMethodForSAT());
+        UpdateLocationFromOnTransferShipment(PostedDocNo, Location.Code);
+
+        // [WHEN] Posted Transfer Shipment card is opened.
+        PostedTransferShipmentCard.OpenEdit();
+        PostedTransferShipmentCard.Filter.SetFilter("No.", PostedDocNo);
+
+        // [THEN] "SAT Certificate Name" is A and "SAT Certificate Source" is 'General Ledger Setup'.
+        Assert.AreEqual(Certificate.Name, PostedTransferShipmentCard."SAT Certificate Name".Value, 'Incorrect SAT Certificate Name');
+        Assert.AreEqual(DummyGLSetup.TableCaption, PostedTransferShipmentCard."SAT Certificate Source".Value, 'Incorrect SAT Certificate Source');
+        PostedTransferShipmentCard.Close();
+    end;
+
+    [Test]
+    procedure SATCertOnPostedSalesInvoiceWhenLocationCertSet()
+    var
+        CertificateA: Record "Isolated Certificate";
+        CertificateB: Record "Isolated Certificate";
+        Location: Record Location;
+        PostedSalesInvoiceCard: TestPage "Posted Sales Invoice";
+        PostedDocNo: Code[20];
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] "SAT Certificate Name" and "SAT Certificate Source" values on Posted Sales Invoice card when Multiple SAT Certificates are enabled and SAT Certificate is set in Location.
+        Initialize();
+
+        // [GIVEN] Multiple SAT Certificates are enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [GIVEN] SAT Certificate with Name A is set in General Ledger Setup.
+        CreateIsolatedCertificate(CertificateA);
+        UpdateSATCertificateOnGLSetup(CertificateA.Code);
+
+        // [GIVEN] Location L1 with SAT Certificate with Name B.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        CreateIsolatedCertificate(CertificateB);
+        UpdateSATCertificateOnLocation(Location, CertificateB.Code);
+
+        // [GIVEN] Posted Sales Invoice with Location L1.
+        PostedDocNo := CreateAndPostSalesDoc(Enum::"Sales Document Type"::Invoice, CreatePaymentMethodForSAT());
+        UpdateLocationOnPostedSalesInvoice(PostedDocNo, Location.Code);
+
+        // [WHEN] Posted Sales Invoice card is opened.
+        PostedSalesInvoiceCard.OpenEdit();
+        PostedSalesInvoiceCard.Filter.SetFilter("No.", PostedDocNo);
+
+        // [THEN] "SAT Certificate Name" is B and "SAT Certificate Source" is 'Location L1'.
+        Assert.AreEqual(CertificateB.Name, PostedSalesInvoiceCard."SAT Certificate Name".Value, 'Incorrect SAT Certificate Name');
+        Assert.AreEqual(StrSubstNo('%1 %2', Location.TableCaption, Location.Code), PostedSalesInvoiceCard."SAT Certificate Source".Value, 'Incorrect SAT Certificate Source');
+        PostedSalesInvoiceCard.Close();
+    end;
+
+    [Test]
+    procedure SATCertOnPostedTransferShipmentWhenLocationCertSet()
+    var
+        CertificateA: Record "Isolated Certificate";
+        CertificateB: Record "Isolated Certificate";
+        Location: Record Location;
+        PostedTransferShipmentCard: TestPage "Posted Transfer Shipment";
+        PostedDocNo: Code[20];
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] "SAT Certificate Name" and "SAT Certificate Source" values on Posted Transfer Shipment card when Multiple SAT Certificates are enabled and SAT Certificate is set in Location.
+        Initialize();
+
+        // [GIVEN] Multiple SAT Certificates are enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [GIVEN] SAT Certificate with Name A is set in General Ledger Setup.
+        CreateIsolatedCertificate(CertificateA);
+        UpdateSATCertificateOnGLSetup(CertificateA.Code);
+
+        // [GIVEN] Location L1 with SAT Certificate with Name B.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        CreateIsolatedCertificate(CertificateB);
+        UpdateSATCertificateOnLocation(Location, CertificateB.Code);
+
+        // [GIVEN] Transfer Order posted as Shipment with Transfer-from Code L1.
+        PostedDocNo := CreateAndPostDoc(Database::"Transfer Shipment Header", CreatePaymentMethodForSAT());
+        UpdateLocationFromOnTransferShipment(PostedDocNo, Location.Code);
+
+        // [WHEN] Posted Transfer Shipment card is opened.
+        PostedTransferShipmentCard.OpenEdit();
+        PostedTransferShipmentCard.Filter.SetFilter("No.", PostedDocNo);
+
+        // [THEN] "SAT Certificate Name" is A and "SAT Certificate Source" is 'General Ledger Setup'.
+        Assert.AreEqual(CertificateB.Name, PostedTransferShipmentCard."SAT Certificate Name".Value, 'Incorrect SAT Certificate Name');
+        Assert.AreEqual(StrSubstNo('%1 %2', Location.TableCaption, Location.Code), PostedTransferShipmentCard."SAT Certificate Source".Value, 'Incorrect SAT Certificate Source');
+        PostedTransferShipmentCard.Close();
+    end;
+
+    [Test]
+    [HandlerFunctions('StrMenuHandler')]
+    procedure RequestStampSalesInvoiceWhenLocationCertificateNotSet()
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        Location: Record Location;
+        EInvoiceMgt: Codeunit "E-Invoice Mgt.";
+        RecRef: RecordRef;
+        SATCertificateCode: Code[20];
+        PostedDocNo: Code[20];
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] Request Stamp on Posted Sales Invoice card when Multiple SAT Certificates are enabled and SAT Certificate is not set in Location.
+        Initialize();
+        UpdateSimulationModeOnGLSetup(false);
+
+        // [GIVEN] Multiple SAT Certificates are enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [GIVEN] General Ledger Setup with SAT Certificate A. Isolated Certificate A does not exist.
+        SATCertificateCode := LibraryUtility.GenerateGUID();
+        UpdateSATCertificateOnGLSetup(SATCertificateCode);
+
+        // [GIVEN] Location L1 that does not have linked SAT Certificate.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        UpdateSATCertificateOnLocation(Location, '');
+
+        // [GIVEN] Posted Sales Invoice with Location L1.
+        PostedDocNo := CreateAndPostSalesDoc(Enum::"Sales Document Type"::Invoice, CreatePaymentMethodForSAT());
+        UpdateLocationOnPostedSalesInvoice(PostedDocNo, Location.Code);
+
+        // [WHEN] Request Stamp for Posted Sales Invoice.
+        LibraryVariableStorage.Enqueue(ActionOption::"Request Stamp");
+        SalesInvoiceHeader.Get(PostedDocNo);
+        RecRef.GetTable(SalesInvoiceHeader);
+        asserterror EInvoiceMgt.RequestStampDocument(RecRef, false);
+
+        // [THEN] Error message "The certificate A does not exist" is shown.
+        Assert.ExpectedErrorCode('RecordNotFound');
+        Assert.ExpectedError(StrSubstNo(CertificateNotExistErr, SATCertificateCode));
+    end;
+
+    [Test]
+    [HandlerFunctions('StrMenuHandler')]
+    procedure RequestStampSalesInvoiceWhenLocationCertificateSet()
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        Location: Record Location;
+        EInvoiceMgt: Codeunit "E-Invoice Mgt.";
+        RecRef: RecordRef;
+        SATCertificateCodeA: Code[20];
+        SATCertificateCodeB: Code[20];
+        PostedDocNo: Code[20];
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] Request Stamp on Posted Sales Invoice card when Multiple SAT Certificates are enabled and SAT Certificate is set in Location.
+        Initialize();
+        UpdateSimulationModeOnGLSetup(false);
+
+        // [GIVEN] Multiple SAT Certificates are enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [GIVEN] General Ledger Setup with SAT Certificate A. Isolated Certificate A does not exist.
+        SATCertificateCodeA := LibraryUtility.GenerateGUID();
+        UpdateSATCertificateOnGLSetup(SATCertificateCodeA);
+
+        // [GIVEN] Location L1 with SAT Certificate B. Isolated Certificate B does not exist.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        SATCertificateCodeB := LibraryUtility.GenerateGUID();
+        UpdateSATCertificateOnLocation(Location, SATCertificateCodeB);
+
+        // [GIVEN] Posted Sales Invoice with Location L1.
+        PostedDocNo := CreateAndPostSalesDoc(Enum::"Sales Document Type"::Invoice, CreatePaymentMethodForSAT());
+        UpdateLocationOnPostedSalesInvoice(PostedDocNo, Location.Code);
+
+        // [WHEN] Request Stamp for Posted Sales Invoice.
+        LibraryVariableStorage.Enqueue(ActionOption::"Request Stamp");
+        SalesInvoiceHeader.Get(PostedDocNo);
+        RecRef.GetTable(SalesInvoiceHeader);
+        asserterror EInvoiceMgt.RequestStampDocument(RecRef, false);
+
+        // [THEN] Error message "The certificate B does not exist" is shown.
+        Assert.ExpectedErrorCode('RecordNotFound');
+        Assert.ExpectedError(StrSubstNo(CertificateNotExistErr, SATCertificateCodeB));
+    end;
+
     local procedure Initialize()
     var
         PostCode: Record "Post Code";
@@ -7101,16 +7341,16 @@
     local procedure CreateSalesDocWithPaymentMethodCode(DocumentType: Enum "Sales Document Type"; PaymentMethodCode: Code[10]): Code[20]
     var
         SalesHeader: Record "Sales Header";
+        DocumentNo: Code[20];
     begin
-        SalesHeader.Get(
-          DocumentType, CreateSalesDocForCustomer(DocumentType, CreateCustomer(), PaymentMethodCode));
+        DocumentNo := CreateSalesDocForCustomer(DocumentType, CreateCustomer(), PaymentMethodCode);
+        SalesHeader.Get(DocumentType, DocumentNo);
         exit(SalesHeader."No.");
     end;
 
     local procedure CreateSalesDocForCustomer(DocumentType: Enum "Sales Document Type"; CustomerNo: Code[20]; PaymentMethodCode: Code[10]): Code[20]
     begin
-        exit(
-          CreateSalesDocForCustomerWithVAT(DocumentType, CustomerNo, PaymentMethodCode, LibraryRandom.RandIntInRange(10, 20), false, false));
+        exit(CreateSalesDocForCustomerWithVAT(DocumentType, CustomerNo, PaymentMethodCode, LibraryRandom.RandIntInRange(10, 20), false, false));
     end;
 
     local procedure CreateSalesDocForCustomerWithVAT(DocumentType: Enum "Sales Document Type"; CustomerNo: Code[20]; PaymentMethodCode: Code[10]; VATPct: Decimal; IsVATExempt: Boolean; IsNoTaxable: Boolean): Code[20]
@@ -7119,8 +7359,7 @@
         SalesLine: Record "Sales Line";
     begin
         CreateSalesHeaderForCustomer(SalesHeader, DocumentType, CustomerNo, PaymentMethodCode);
-        CreateSalesLineItem(
-          SalesLine, SalesHeader, CreateItem(), LibraryRandom.RandInt(10), 0, VATPct, IsVATExempt, IsNoTaxable);
+        CreateSalesLineItem(SalesLine, SalesHeader, CreateItem(), LibraryRandom.RandInt(10), 0, VATPct, IsVATExempt, IsNoTaxable);
         exit(SalesHeader."No.");
     end;
 
@@ -7179,11 +7418,11 @@
     local procedure CreateAndPostSalesDoc(DocumentType: Enum "Sales Document Type"; PaymentMethodCode: Code[10]) PostedDocumentNo: Code[20]
     var
         SalesHeader: Record "Sales Header";
-        NoSeries: Codeunit "No. Series";
+        DocumentNo: Code[20];
     begin
-        SalesHeader.Get(DocumentType, CreateSalesDocWithPaymentMethodCode(DocumentType, PaymentMethodCode));
-        PostedDocumentNo := NoSeries.PeekNextNo(SalesHeader."Posting No. Series");
-        LibrarySales.PostSalesDocument(SalesHeader, true, true);
+        DocumentNo := CreateSalesDocWithPaymentMethodCode(DocumentType, PaymentMethodCode);
+        SalesHeader.Get(DocumentType, DocumentNo);
+        PostedDocumentNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
     end;
 
     local procedure CreateAndPostSalesInvoice(var CustLedgerEntry: Record "Cust. Ledger Entry"; CustomerNo: Code[20])
@@ -7523,10 +7762,16 @@
     var
         IsolatedCertificate: Record "Isolated Certificate";
     begin
+        CreateIsolatedCertificate(IsolatedCertificate);
+        exit(IsolatedCertificate.Code);
+    end;
+
+    local procedure CreateIsolatedCertificate(var IsolatedCertificate: Record "Isolated Certificate")
+    begin
         IsolatedCertificate.Code := LibraryUtility.GenerateGUID();
+        IsolatedCertificate.Name := LibraryUtility.GenerateGUID();
         IsolatedCertificate.ThumbPrint := IsolatedCertificate.Code;
         IsolatedCertificate.Insert();
-        exit(IsolatedCertificate.Code);
     end;
 
     local procedure CreatePostCode(var PostCode: Record "Post Code"; TimeZoneID: Text[180])
@@ -8848,16 +9093,14 @@
         PostedHeaderRecRef.Modify();
     end;
 
-    local procedure UpdateDocumentPostCode(TableNo: Integer; FieldNoDocumentNo: Integer; DocumentNo: Code[20]; FieldNoCity: Integer; FieldNoPostCode: Integer; City: Variant; PostCode: Variant)
+    local procedure UpdateDocumentLocation(TableNo: Integer; FieldNoDocumentNo: Integer; DocumentNo: Code[20]; FieldNoLocation: Integer; LocationCode: Variant)
     var
         PostedHeaderRecRef: RecordRef;
         ChangeFieldRef: FieldRef;
     begin
         FindPostedHeader(PostedHeaderRecRef, TableNo, FieldNoDocumentNo, DocumentNo);
-        ChangeFieldRef := PostedHeaderRecRef.Field(FieldNoCity);
-        ChangeFieldRef.Value := City;
-        ChangeFieldRef := PostedHeaderRecRef.Field(FieldNoPostCode);
-        ChangeFieldRef.Value := PostCode;
+        ChangeFieldRef := PostedHeaderRecRef.Field(FieldNoLocation);
+        ChangeFieldRef.Value := LocationCode;
         PostedHeaderRecRef.Modify();
     end;
 
@@ -8881,13 +9124,17 @@
         Customer.Modify();
     end;
 
-    local procedure UpdateDocumentWithTimeZone(TableID: Integer; FieldNoDocumentNo: Integer; DocumentNo: Code[20]; FieldNoCity: Integer; FieldNoPostCode: Integer; TimeZoneID: Text[180])
+    local procedure UpdateDocumentWithTimeZone(TableID: Integer; FieldNoDocumentNo: Integer; DocumentNo: Code[20]; FieldNoLocation: Integer; TimeZoneID: Text[180])
     var
         PostCode: Record "Post Code";
+        Location: Record Location;
     begin
         CreatePostCode(PostCode, TimeZoneID);
-        UpdateDocumentPostCode(
-          TableID, FieldNoDocumentNo, DocumentNo, FieldNoCity, FieldNoPostCode, PostCode.City, PostCode.Code);
+        LibraryWarehouse.CreateLocation(Location);
+        Location."Post Code" := PostCode.Code;
+        Location.City := PostCode.City;
+        Location.Modify();
+        UpdateDocumentLocation(TableID, FieldNoDocumentNo, DocumentNo, FieldNoLocation, Location.Code);
     end;
 
     local procedure UpdateSalesInvoiceCancellation(var SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -8999,6 +9246,59 @@
         Currency.Modify();
     end;
 
+    local procedure UpdateSimulationModeOnGLSetup(Enabled: Boolean)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup.Validate("Sim. Signature", Enabled);
+        GeneralLedgerSetup.Validate("Sim. Send", Enabled);
+        GeneralLedgerSetup.Validate("Sim. Request Stamp", Enabled);
+        GeneralLedgerSetup.Modify(true);
+    end;
+
+    local procedure UpdateMultipleSATCertOnGLSetup(Enabled: Boolean)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Multiple SAT Certificates" := Enabled;
+        GeneralLedgerSetup.Modify();
+    end;
+
+    local procedure UpdateSATCertificateOnGLSetup(SATCertificateCode: Code[20])
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."SAT Certificate" := SATCertificateCode;
+        GeneralLedgerSetup.Modify();
+    end;
+
+    local procedure UpdateSATCertificateOnLocation(var Location: Record Location; SATCertificateCode: Code[20])
+    begin
+        Location."SAT Certificate" := SATCertificateCode;
+        Location.Modify();
+    end;
+
+    local procedure UpdateLocationOnPostedSalesInvoice(PostedDocNo: Code[20]; LocationCode: Code[10])
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        SalesInvoiceHeader.Get(PostedDocNo);
+        SalesInvoiceHeader."Location Code" := LocationCode;
+        SalesInvoiceHeader.Modify();
+    end;
+
+    local procedure UpdateLocationFromOnTransferShipment(PostedDocNo: Code[20]; LocationCode: Code[10])
+    var
+        TransferShipmentHeader: Record "Transfer Shipment Header";
+    begin
+        TransferShipmentHeader.Get(PostedDocNo);
+        TransferShipmentHeader."Transfer-from Code" := LocationCode;
+        TransferShipmentHeader.Modify();
+    end;
+
     local procedure VerifyMandatoryFields(OriginalString: Text; RFCNo: Code[13]; CFDIPurpose: Code[10]; CFDIRelation: Code[10]; PaymentMethodCode: Code[10]; PaymentTermsCode: Code[10]; UnitOfMeasureCode: Text[10]; RelationIdx: Integer)
     var
         CompanyInformation: Record "Company Information";
@@ -9021,7 +9321,7 @@
           StrSubstNo(IncorrectOriginalStrValueErr, RFCNoFieldTxt, OriginalString));
         Assert.AreEqual(
           CFDIPurpose,
-          SelectStr(19 + RelationIdx, OriginalString),
+          SelectStr(20 + RelationIdx, OriginalString),
           StrSubstNo(IncorrectOriginalStrValueErr, CFDIPurposeFieldTxt, OriginalString));
         VerifyCFDIRelation(OriginalString, CFDIRelation, RelationIdx);
 
@@ -9035,7 +9335,7 @@
           StrSubstNo(IncorrectOriginalStrValueErr, MetodoDePagoFieldTxt, OriginalString));
         Assert.AreEqual(
           UpperCase(UnitOfMeasureCode),
-          SelectStr(23 + RelationIdx, OriginalString),
+          SelectStr(24 + RelationIdx, OriginalString),
           StrSubstNo(IncorrectOriginalStrValueErr, ConceptoUnidadFieldTxt, OriginalString));
     end;
 
@@ -9092,21 +9392,23 @@
     end;
 
     local procedure VerifyCFDIConceptoFields(OriginalStr: Text; NoIdentificacion: Code[20]; SATUnitOfMeasure: Code[10]; LineType: Enum "Sales Line Type")
+    var
+        StartPosition: Integer;
     begin
         OriginalStr := ConvertStr(OriginalStr, '|', ',');
-
+        StartPosition := 23;
         LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'ClaveProdServ', SATUtilities.GetSATClassification(LineType, NoIdentificacion));
         LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'NoIdentificacion', NoIdentificacion);
         LibraryXPathXMLReader.VerifyAttributeValue('cfdi:Conceptos/cfdi:Concepto', 'ClaveUnidad', SATUnitOfMeasure);
 
         Assert.AreEqual(
-          SATUtilities.GetSATClassification(LineType, NoIdentificacion), SelectStr(22, OriginalStr),
+          SATUtilities.GetSATClassification(LineType, NoIdentificacion), SelectStr(StartPosition, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'SAT Item Classification', OriginalStr));
         Assert.AreEqual(
-          NoIdentificacion, SelectStr(23, OriginalStr),
+          NoIdentificacion, SelectStr(StartPosition + 1, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'NoIdentificacion', OriginalStr));
         Assert.AreEqual(
-          SATUnitOfMeasure, SelectStr(25, OriginalStr),
+          SATUnitOfMeasure, SelectStr(StartPosition + 3, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'SAT Unit of Measure', OriginalStr));
     end;
 
@@ -9352,62 +9654,68 @@
     end;
 
     local procedure VerifyVATAmountLines(OriginalStr: Text; Amount: Decimal; VATAmount: Decimal; VATPct: Decimal; Impuesto: Text; Offset: Integer; index: Integer)
+    var
+        StartPosition: Integer;
     begin
+        StartPosition := 33;
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'Importe', FormatDecimal(VATAmount, 6), index);
         Assert.AreEqual(
-          FormatDecimal(VATAmount, 6), SelectStr(36 + index * 15 + Offset, OriginalStr),
+          FormatDecimal(VATAmount, 6), SelectStr(StartPosition + 4 + index * 15 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Importe', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'TasaOCuota', FormatDecimal(VATPct / 100, 6), index);
         Assert.AreEqual(
-          FormatDecimal(VATPct / 100, 6), SelectStr(35 + index * 15 + Offset, OriginalStr),
+          FormatDecimal(VATPct / 100, 6), SelectStr(StartPosition + 3 + index * 15 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'TasaOCuota', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'TipoFactor', 'Tasa', index);
         Assert.AreEqual(
-          'Tasa', SelectStr(34 + index * 15 + Offset, OriginalStr),
+          'Tasa', SelectStr(StartPosition + 2 + index * 15 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Tasa', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'Impuesto', Impuesto, index);
         Assert.AreEqual(
-          Impuesto, SelectStr(33 + index * 15 + Offset, OriginalStr),
+          Impuesto, SelectStr(StartPosition + 1 + index * 15 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Impuesto', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'Base', FormatDecimal(Amount, 6), index);
         Assert.AreEqual(
-          FormatDecimal(Amount, 6), SelectStr(32 + index * 15 + Offset, OriginalStr),
+          FormatDecimal(Amount, 6), SelectStr(StartPosition + index * 15 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Base', OriginalStr));
     end;
 
     local procedure VerifyVATAmountLinesExempt(OriginalStr: Text; Amount: Decimal; Impuesto: Text)
+    var
+        StartPosition: Integer;
     begin
+        StartPosition := 33;
         LibraryXPathXMLReader.VerifyAttributeValue(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'TipoFactor', 'Exento');
         Assert.AreEqual(
-          'Exento', SelectStr(34, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Exento', OriginalStr));
+          'Exento', SelectStr(StartPosition + 2, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Exento', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValue(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'Impuesto', Impuesto);
         Assert.AreEqual(
-          Impuesto, SelectStr(33, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Impuesto', OriginalStr));
+          Impuesto, SelectStr(StartPosition + 1, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Impuesto', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValue(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
           'Base', FormatDecimal(Amount, 6));
         Assert.AreEqual(
-          FormatDecimal(Amount, 6), SelectStr(32, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Base', OriginalStr));
+          FormatDecimal(Amount, 6), SelectStr(StartPosition, OriginalStr), StrSubstNo(IncorrectOriginalStrValueErr, 'Base', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeAbsence(
           'cfdi:Conceptos/cfdi:Concepto/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado',
@@ -9458,32 +9766,34 @@
 
     local procedure VerifyVATTotalLine(OriginalStr: Text; VATAmount: Decimal; VATPct: Decimal; Impuesto: Text; index: Integer; LineQty: Integer; Offset: Integer)
     var
+        StartPosition: Integer;
         TotalOffset: Integer;
     begin
+        StartPosition := 39;
         TotalOffset := (LineQty - 1) * 15;
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', 'Importe', FormatDecimal(VATAmount, 2), index);
         Assert.AreEqual(
-          FormatDecimal(VATAmount, 2), SelectStr(41 + TotalOffset + index * 5 + Offset, OriginalStr),
+          FormatDecimal(VATAmount, 2), SelectStr(StartPosition + 3 + TotalOffset + index * 5 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Importe', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', 'TasaOCuota', FormatDecimal(VATPct / 100, 6), index);
         Assert.AreEqual(
-          FormatDecimal(VATPct / 100, 6), SelectStr(40 + TotalOffset + index * 5 + Offset, OriginalStr),
+          FormatDecimal(VATPct / 100, 6), SelectStr(StartPosition + 2 + TotalOffset + index * 5 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'TasaOCuota', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', 'TipoFactor', 'Tasa', index);
         Assert.AreEqual(
-          'Tasa', SelectStr(39 + TotalOffset + index * 5 + Offset, OriginalStr),
+          'Tasa', SelectStr(StartPosition + 1 + TotalOffset + index * 5 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'TipoFactor', OriginalStr));
 
         LibraryXPathXMLReader.VerifyAttributeValueByNodeIndex(
           'cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado', 'Impuesto', Impuesto, index);
         Assert.AreEqual(
-          Impuesto, SelectStr(38 + TotalOffset + index * 5 + Offset, OriginalStr),
+          Impuesto, SelectStr(StartPosition + TotalOffset + index * 5 + Offset, OriginalStr),
           StrSubstNo(IncorrectOriginalStrValueErr, 'Impuesto', OriginalStr));
     end;
 

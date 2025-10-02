@@ -643,7 +643,7 @@
         SalesInvoiceHeader."No." := LibraryUtility.GenerateGUID();
         SalesInvoiceHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         SalesInvoiceHeader."Electronic Document Status" := SalesInvoiceHeader."Electronic Document Status"::"Stamp Received";
-        SalesInvoiceHeader."CFDI Cancellation Reason Code" := '01';
+        SalesInvoiceHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
         asserterror SalesInvoiceHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -661,7 +661,7 @@
         SalesCrMemoHeader."No." := LibraryUtility.GenerateGUID();
         SalesCrMemoHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         SalesCrMemoHeader."Electronic Document Status" := SalesCrMemoHeader."Electronic Document Status"::"Stamp Received";
-        SalesCrMemoHeader."CFDI Cancellation Reason Code" := '01';
+        SalesCrMemoHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
         asserterror SalesCrMemoHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -679,7 +679,7 @@
         ServiceInvoiceHeader."No." := LibraryUtility.GenerateGUID();
         ServiceInvoiceHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         ServiceInvoiceHeader."Electronic Document Status" := ServiceInvoiceHeader."Electronic Document Status"::"Stamp Received";
-        ServiceInvoiceHeader."CFDI Cancellation Reason Code" := '01';
+        ServiceInvoiceHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
         asserterror ServiceInvoiceHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -697,7 +697,7 @@
         ServiceCrMemoHeader."No." := LibraryUtility.GenerateGUID();
         ServiceCrMemoHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         ServiceCrMemoHeader."Electronic Document Status" := ServiceCrMemoHeader."Electronic Document Status"::"Stamp Received";
-        ServiceCrMemoHeader."CFDI Cancellation Reason Code" := '01';
+        ServiceCrMemoHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
         asserterror ServiceCrMemoHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -715,7 +715,7 @@
         SalesShipmentHeader."No." := LibraryUtility.GenerateGUID();
         SalesShipmentHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         SalesShipmentHeader."Electronic Document Status" := SalesShipmentHeader."Electronic Document Status"::"Stamp Received";
-        SalesShipmentHeader."CFDI Cancellation Reason Code" := '01';
+        SalesShipmentHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
         asserterror SalesShipmentHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -733,7 +733,7 @@
         TransferShipmentHeader."No." := LibraryUtility.GenerateGUID();
         TransferShipmentHeader."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         TransferShipmentHeader."Electronic Document Status" := TransferShipmentHeader."Electronic Document Status"::"Stamp Received";
-        TransferShipmentHeader."CFDI Cancellation Reason Code" := '01';
+        TransferShipmentHeader."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
         asserterror TransferShipmentHeader.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -751,7 +751,7 @@
         CustLedgerEntry."Entry No." := LibraryUtility.GetNewRecNo(CustLedgerEntry, CustLedgerEntry.FieldNo("Entry No."));
         CustLedgerEntry."Fiscal Invoice Number PAC" := LibraryUtility.GenerateGUID();
         CustLedgerEntry."Electronic Document Status" := CustLedgerEntry."Electronic Document Status"::"Stamp Received";
-        CustLedgerEntry."CFDI Cancellation Reason Code" := '01';
+        CustLedgerEntry."CFDI Cancellation Reason Code" := CreateCancellationReasonCode(true);
         asserterror CustLedgerEntry.CancelEDocument();
         Assert.ExpectedErrorCode('DB:RecordNotFound');
     end;
@@ -2547,6 +2547,228 @@
         Assert.RecordIsEmpty(PACWebServiceDetail);
     end;
 
+    [Test]
+    procedure SATCertificateFieldOnPostedSalesInvoiceCard()
+    var
+        PostedSalesInvoiceCard: TestPage "Posted Sales Invoice";
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] Fields "SAT Certificate Name" and "SAT Certificate Source" visibility and editability on Posted Sales Invoice card.
+        Initialize();
+
+        // [GIVEN] Enabled CFDI feature.
+        UpdateGLSetupPACEnvironment(true);
+
+        // [GIVEN] Multiple SAT Certificates is disabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(false);
+
+        // [WHEN] Posted Sales Invoice card is opened.
+        PostedSalesInvoiceCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are not visible.
+        Assert.IsFalse(PostedSalesInvoiceCard."SAT Certificate Name".Visible(), '');
+        Assert.IsFalse(PostedSalesInvoiceCard."SAT Certificate Source".Visible(), '');
+        PostedSalesInvoiceCard.Close();
+
+        // [GIVEN] Multiple SAT Certificates is enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [WHEN] Posted Sales Invoice card is opened.
+        PostedSalesInvoiceCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are visible and not editable.
+        Assert.IsTrue(PostedSalesInvoiceCard."SAT Certificate Name".Visible(), '');
+        Assert.IsTrue(PostedSalesInvoiceCard."SAT Certificate Source".Visible(), '');
+        Assert.IsFalse(PostedSalesInvoiceCard."SAT Certificate Name".Editable(), '');
+        Assert.IsFalse(PostedSalesInvoiceCard."SAT Certificate Source".Editable(), '');
+        PostedSalesInvoiceCard.Close();
+    end;
+
+    [Test]
+    procedure SATCertificateFieldOnPostedSalesCreditMemoCard()
+    var
+        PostedSalesCreditMemoCard: TestPage "Posted Sales Credit Memo";
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] Fields "SAT Certificate Name" and "SAT Certificate Source" visibility and editability on Posted Sales Credit Memo card.
+        Initialize();
+
+        // [GIVEN] Enabled CFDI feature.
+        UpdateGLSetupPACEnvironment(true);
+
+        // [GIVEN] Multiple SAT Certificates is disabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(false);
+
+        // [WHEN] Posted Sales Credit Memo card is opened.
+        PostedSalesCreditMemoCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are not visible.
+        Assert.IsFalse(PostedSalesCreditMemoCard."SAT Certificate Name".Visible(), '');
+        Assert.IsFalse(PostedSalesCreditMemoCard."SAT Certificate Source".Visible(), '');
+        PostedSalesCreditMemoCard.Close();
+
+        // [GIVEN] Multiple SAT Certificates is enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [WHEN] Posted Sales Credit Memo card is opened.
+        PostedSalesCreditMemoCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are visible and not editable.
+        Assert.IsTrue(PostedSalesCreditMemoCard."SAT Certificate Name".Visible(), '');
+        Assert.IsTrue(PostedSalesCreditMemoCard."SAT Certificate Source".Visible(), '');
+        Assert.IsFalse(PostedSalesCreditMemoCard."SAT Certificate Name".Editable(), '');
+        Assert.IsFalse(PostedSalesCreditMemoCard."SAT Certificate Source".Editable(), '');
+        PostedSalesCreditMemoCard.Close();
+    end;
+
+    [Test]
+    procedure SATCertificateFieldOnPostedServiceInvoiceCard()
+    var
+        PostedServiceInvoiceCard: TestPage "Posted Service Invoice";
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] Fields "SAT Certificate Name" and "SAT Certificate Source" visibility and editability on Posted Service Invoice card.
+        Initialize();
+
+        // [GIVEN] Enabled CFDI feature.
+        UpdateGLSetupPACEnvironment(true);
+
+        // [GIVEN] Multiple SAT Certificates is disabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(false);
+
+        // [WHEN] Posted Service Invoice card is opened.
+        PostedServiceInvoiceCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are not visible.
+        Assert.IsFalse(PostedServiceInvoiceCard."SAT Certificate Name".Visible(), '');
+        Assert.IsFalse(PostedServiceInvoiceCard."SAT Certificate Source".Visible(), '');
+        PostedServiceInvoiceCard.Close();
+
+        // [GIVEN] Multiple SAT Certificates is enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [WHEN] Posted Service Invoice card is opened.
+        PostedServiceInvoiceCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are visible and not editable.
+        Assert.IsTrue(PostedServiceInvoiceCard."SAT Certificate Name".Visible(), '');
+        Assert.IsTrue(PostedServiceInvoiceCard."SAT Certificate Source".Visible(), '');
+        Assert.IsFalse(PostedServiceInvoiceCard."SAT Certificate Name".Editable(), '');
+        Assert.IsFalse(PostedServiceInvoiceCard."SAT Certificate Source".Editable(), '');
+        PostedServiceInvoiceCard.Close();
+    end;
+
+    [Test]
+    procedure SATCertificateFieldOnPostedServiceCreditMemoCard()
+    var
+        PostedServiceCreditMemoCard: TestPage "Posted Service Credit Memo";
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] Fields "SAT Certificate Name" and "SAT Certificate Source" visibility and editability on Posted Service Credit Memo card.
+        Initialize();
+
+        // [GIVEN] Enabled CFDI feature.
+        UpdateGLSetupPACEnvironment(true);
+
+        // [GIVEN] Multiple SAT Certificates is disabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(false);
+
+        // [WHEN] Posted Service Credit Memo card is opened.
+        PostedServiceCreditMemoCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are not visible.
+        Assert.IsFalse(PostedServiceCreditMemoCard."SAT Certificate Name".Visible(), '');
+        Assert.IsFalse(PostedServiceCreditMemoCard."SAT Certificate Source".Visible(), '');
+        PostedServiceCreditMemoCard.Close();
+
+        // [GIVEN] Multiple SAT Certificates is enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [WHEN] Posted Service Credit Memo card is opened.
+        PostedServiceCreditMemoCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are visible and not editable.
+        Assert.IsTrue(PostedServiceCreditMemoCard."SAT Certificate Name".Visible(), '');
+        Assert.IsTrue(PostedServiceCreditMemoCard."SAT Certificate Source".Visible(), '');
+        Assert.IsFalse(PostedServiceCreditMemoCard."SAT Certificate Name".Editable(), '');
+        Assert.IsFalse(PostedServiceCreditMemoCard."SAT Certificate Source".Editable(), '');
+        PostedServiceCreditMemoCard.Close();
+    end;
+
+    [Test]
+    procedure SATCertificateFieldOnPostedSalesShipmentCard()
+    var
+        PostedSalesShipmentCard: TestPage "Posted Sales Shipment";
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] Fields "SAT Certificate Name" and "SAT Certificate Source" visibility and editability on Posted Sales Shipment card.
+        Initialize();
+
+        // [GIVEN] Enabled CFDI feature.
+        UpdateGLSetupPACEnvironment(true);
+
+        // [GIVEN] Multiple SAT Certificates is disabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(false);
+
+        // [WHEN] Posted Sales Shipment card is opened.
+        PostedSalesShipmentCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are not visible.
+        Assert.IsFalse(PostedSalesShipmentCard."SAT Certificate Name".Visible(), '');
+        Assert.IsFalse(PostedSalesShipmentCard."SAT Certificate Source".Visible(), '');
+        PostedSalesShipmentCard.Close();
+
+        // [GIVEN] Multiple SAT Certificates is enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [WHEN] Posted Sales Shipment card is opened.
+        PostedSalesShipmentCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are visible and not editable.
+        Assert.IsTrue(PostedSalesShipmentCard."SAT Certificate Name".Visible(), '');
+        Assert.IsTrue(PostedSalesShipmentCard."SAT Certificate Source".Visible(), '');
+        Assert.IsFalse(PostedSalesShipmentCard."SAT Certificate Name".Editable(), '');
+        Assert.IsFalse(PostedSalesShipmentCard."SAT Certificate Source".Editable(), '');
+        PostedSalesShipmentCard.Close();
+    end;
+
+    [Test]
+    procedure SATCertificateFieldOnPostedTransferShipmentCard()
+    var
+        PostedTransferShipmentCard: TestPage "Posted Transfer Shipment";
+    begin
+        // [FEATURE] [Multiple SAT Certificates]
+        // [SCENARIO 540218] Fields "SAT Certificate Name" and "SAT Certificate Source" visibility and editability on Posted Transfer Shipment card.
+        Initialize();
+
+        // [GIVEN] Enabled CFDI feature.
+        UpdateGLSetupPACEnvironment(true);
+
+        // [GIVEN] Multiple SAT Certificates is disabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(false);
+
+        // [WHEN] Posted Transfer Shipment card is opened.
+        PostedTransferShipmentCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are not visible.
+        Assert.IsFalse(PostedTransferShipmentCard."SAT Certificate Name".Visible(), '');
+        Assert.IsFalse(PostedTransferShipmentCard."SAT Certificate Source".Visible(), '');
+        PostedTransferShipmentCard.Close();
+
+        // [GIVEN] Multiple SAT Certificates is enabled in General Ledger Setup.
+        UpdateMultipleSATCertOnGLSetup(true);
+
+        // [WHEN] Posted Transfer Shipment card is opened.
+        PostedTransferShipmentCard.OpenEdit();
+
+        // [THEN] "SAT Certificate Name" and "SAT Certificate Source" fields are visible and not editable.
+        Assert.IsTrue(PostedTransferShipmentCard."SAT Certificate Name".Visible(), '');
+        Assert.IsTrue(PostedTransferShipmentCard."SAT Certificate Source".Visible(), '');
+        Assert.IsFalse(PostedTransferShipmentCard."SAT Certificate Name".Editable(), '');
+        Assert.IsFalse(PostedTransferShipmentCard."SAT Certificate Source".Editable(), '');
+        PostedTransferShipmentCard.Close();
+    end;
+
     local procedure Initialize()
     begin
         LibrarySetupStorage.Restore();
@@ -2685,6 +2907,16 @@
         DummyCFDIRelationDocument: Record "CFDI Relation Document";
     begin
         exit(DummyCFDIRelationDocument."Related Doc. Type"::"Credit Memo");
+    end;
+
+    local procedure CreateCancellationReasonCode(SubstitutionRequired: Boolean): Code[10]
+    var
+        CFDICancellationReason: Record "CFDI Cancellation Reason";
+    begin
+        CFDICancellationReason.Code := LibraryUtility.GenerateGUID();
+        CFDICancellationReason."Substitution Number Required" := SubstitutionRequired;
+        CFDICancellationReason.Insert();
+        exit(CFDICancellationReason.Code);
     end;
 
     local procedure FindCancellationReasonCode(): Code[10]
@@ -2897,6 +3129,15 @@
     begin
         GeneralLedgerSetup.Get();
         GeneralLedgerSetup."SAT Certificate" := LibraryUtility.GenerateGUID();
+        GeneralLedgerSetup.Modify();
+    end;
+
+    local procedure UpdateMultipleSATCertOnGLSetup(Enabled: Boolean)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Multiple SAT Certificates" := Enabled;
         GeneralLedgerSetup.Modify();
     end;
 
