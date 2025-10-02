@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.ReceivablesPayables;
 
 using Microsoft.Finance.Currency;
@@ -143,7 +147,8 @@ codeunit 441 "Prepayment Mgt."
             repeat
                 if SalesLine."Prepmt. Line Amount" <> 0 then
                     if SalesLine."Prepmt. Amt. Inv." <> SalesLine."Prepmt. Line Amount" then
-                        exit(true);
+                        if SalesLine."Line Amount" - SalesLine."Prepmt. VAT Base Amt." <> SalesLine."Inv. Discount Amount" then
+                            exit(true);
             until SalesLine.Next() = 0;
     end;
 
