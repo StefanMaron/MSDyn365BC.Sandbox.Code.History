@@ -13,7 +13,7 @@
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2179727",
   "dependencies": [],
   "screenshots": [],
-  "platform": "25.0.0.0",
+  "platform": "25.2.0.0",
   "idRanges": [
     {
       "from": 30100,
@@ -32,7 +32,7 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "25.1.0.0",
+  "application": "25.2.0.0",
   "target": "OnPrem",
   "features": [
     "NoImplicitWith"
