@@ -193,6 +193,10 @@ $Versions | Sort-Object -Property Country, Version | % {
             git add -A | out-null
             git commit -a -m "$($country)-$($version.ToString())-vNext" | out-null
             git gc | out-null
+
+            # Pull with rebase to handle concurrent updates (e.g., late hotfixes)
+            git pull --rebase origin "$($country)-$($Version.Major)-vNext" 2>&1 | Out-Null
+
             git push --set-upstream origin "$($country)-$($Version.Major)-vNext"
         }
         
