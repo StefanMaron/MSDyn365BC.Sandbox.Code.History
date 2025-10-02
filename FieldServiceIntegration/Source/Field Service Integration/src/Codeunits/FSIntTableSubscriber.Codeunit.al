@@ -7,6 +7,7 @@ namespace Microsoft.Integration.DynamicsFieldService;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.UOM;
 using Microsoft.Projects.Project.Setup;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Sales.Customer;
@@ -984,12 +985,14 @@ codeunit 6610 "FS Int. Table Subscriber"
         CRMProduct: Record "CRM Product";
         BudgetJobJournalLine: Record "Job Journal Line";
         CRMProductName: Codeunit "CRM Product Name";
+        UOMMgt: Codeunit "Unit of Measure Management";
         BookableResourceCoupled: Boolean;
         BookableResourceCoupledToDeleted: Boolean;
         FSQuantity: Decimal;
         FSQuantityToBill: Decimal;
         QuantityCurrentlyConsumed: Decimal;
         QuantityCurrentlyInvoiced: Decimal;
+        RoundedQtyToInvoice: Decimal;
     begin
         SetCurrentProjectPlanningQuantities(SourceRecordRef, QuantityCurrentlyConsumed, QuantityCurrentlyInvoiced);
         case SourceRecordRef.Number of
@@ -1093,7 +1096,8 @@ codeunit 6610 "FS Int. Table Subscriber"
                     JobJournalLine.Validate("Unit Cost", Item."Unit Cost");
                     JobJournalLine.Validate(Quantity, FSQuantity - QuantityCurrentlyConsumed);
                     JobJournalLine.Validate("Unit Price", Item."Unit Price");
-                    JobJournalLine.Validate("Qty. to Transfer to Invoice", FSQuantityToBill - QuantityCurrentlyInvoiced);
+                    RoundedQtyToInvoice := UOMMgt.RoundAndValidateQty(FSQuantityToBill - QuantityCurrentlyInvoiced, JobJournalLine."Qty. Rounding Precision", JobJournalLine.FieldCaption("Qty. to Transfer to Invoice"));
+                    JobJournalLine.Validate("Qty. to Transfer to Invoice", RoundedQtyToInvoice);
                 end;
         end;
     end;
