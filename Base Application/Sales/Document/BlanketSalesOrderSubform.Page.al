@@ -886,7 +886,6 @@ page 508 "Blanket Sales Order Subform"
             {
                 Caption = 'F&unctions';
                 Image = "Action";
-#if not CLEAN25
                 action("Get &Price")
                 {
                     AccessByPermission = TableData "Sales Price" = R;
@@ -896,9 +895,6 @@ page 508 "Blanket Sales Order Subform"
                     Image = Price;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'Insert the lowest possible price in the Unit Price field according to any special price that you have set up.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '19.0';
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
 
                     trigger OnAction()
                     begin
@@ -914,16 +910,12 @@ page 508 "Blanket Sales Order Subform"
                     Image = LineDiscount;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'Insert the best possible discount in the Line Discount field according to any special discounts that you have set up.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '19.0';
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
 
                     trigger OnAction()
                     begin
                         Rec.PickDiscount();
                     end;
                 }
-#endif
                 action(GetPrice)
                 {
                     AccessByPermission = TableData "Sales Price Access" = R;

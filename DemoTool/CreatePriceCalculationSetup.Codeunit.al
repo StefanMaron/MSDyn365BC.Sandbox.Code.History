@@ -6,11 +6,7 @@ codeunit 101703 "Create Price Calculation Setup"
         PriceCalculationMgt: codeunit "Price Calculation Mgt.";
     begin
         PriceCalculationMgt.Run();
-#if not CLEAN25
         SetCodeunitAsDefault(Codeunit::"Price Calculation - V15");
-#else
-        SetCodeunitAsDefault(Codeunit::"Price Calculation - V16");
-#endif
     end;
 
     local procedure SetCodeunitAsDefault(NewImplementation: Integer)

@@ -233,9 +233,7 @@ codeunit 5520 "Get Unplanned Demand"
         if IsHandled then
             exit(NeededQty);
 
-        if SalesLine.Planned or (SalesLine."No." = '') or (SalesLine.Type <> SalesLine.Type::Item) or
-            SalesLine."Drop Shipment" or SalesLine."Special Order"
-        then
+        if SalesLine.Planned or (SalesLine."No." = '') or (SalesLine.Type <> SalesLine.Type::Item) or SalesLine."Special Order" then
             exit(0);
 
         SalesLine.CalcFields("Reserved Qty. (Base)");
@@ -284,6 +282,7 @@ codeunit 5520 "Get Unplanned Demand"
         UnplannedDemand.Reserve := SalesLine.Reserve = SalesLine.Reserve::Always;
         UnplannedDemand."Special Order" := SalesLine."Special Order";
         UnplannedDemand."Purchasing Code" := SalesLine."Purchasing Code";
+        UnplannedDemand."Drop Shipment" := SalesLine."Drop Shipment";
         OnInsertSalesLineOnBeforeInsert(UnplannedDemand, SalesLine);
         UnplannedDemand.Insert();
         UnplannedDemand.Copy(UnplannedDemand2);
@@ -348,7 +347,7 @@ codeunit 5520 "Get Unplanned Demand"
                 IsHandled := false;
                 OnCalcNeededDemandsOnBeforeCalcNeededQtyBase(UnplannedDemand, IsHandled);
                 if not IsHandled then
-                    if UnplannedDemand."Special Order" then
+                    if UnplannedDemand."Special Order" or UnplannedDemand."Drop Shipment" then
                         UnplannedDemand."Needed Qty. (Base)" := TempUnplannedDemand."Quantity (Base)"
                     else
                         UnplannedDemand."Needed Qty. (Base)" :=

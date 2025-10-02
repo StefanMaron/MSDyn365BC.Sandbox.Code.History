@@ -25,9 +25,7 @@
         LibraryResource: Codeunit "Library - Resource";
         LibraryFixedAsset: Codeunit "Library - Fixed Asset";
         LibraryApplicationArea: Codeunit "Library - Application Area";
-#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
-#endif
         WorkflowSetup: Codeunit "Workflow Setup";
         LibraryWorkflow: Codeunit "Library - Workflow";
         LibraryDocumentApprovals: Codeunit "Library - Document Approvals";
@@ -268,7 +266,6 @@
         LibrarySales.SetStockoutWarning(true);
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountOnSalesOrder()
@@ -302,7 +299,6 @@
         // Tear Down: Cleanup of Setup Done.
         LibrarySales.SetStockoutWarning(true);
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -1250,7 +1246,6 @@
         VerifyValueEntry(SalesInvoiceHeader."No.", SalesHeader.Amount);
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountOnSalesInvoice()
@@ -1305,7 +1300,6 @@
           SumLineDiscountAmount(TempSalesLine, SalesHeader."No."), TotalLineDiscountInGLEntry(TempSalesLine, SalesInvoiceHeader."No."),
           StrSubstNo(ValueErr, TempSalesLine.FieldCaption("Line Discount Amount")));
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -6398,7 +6392,6 @@
         ReturnReceiptLine.FindFirst();
     end;
 
-#if not CLEAN25
     local procedure SalesLinesWithMinimumQuantity(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; SalesLineDiscount: Record "Sales Line Discount")
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -6412,7 +6405,6 @@
               SalesLineDiscount."Minimum Quantity" + LibraryRandom.RandDec(10, 2));
         end;
     end;
-#endif
 
     local procedure CreateSalesOrder(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
     var
@@ -6726,7 +6718,7 @@
             SalesLine.Insert();
         until SalesLine2.Next() = 0;
     end;
-#if not CLEAN25
+
     local procedure TotalLineDiscountInGLEntry(var SalesLine: Record "Sales Line"; DocumentNo: Code[20]): Decimal
     var
         GLEntry: Record "G/L Entry";
@@ -6738,7 +6730,7 @@
         GLEntry.SetRange("G/L Account No.", GeneralPostingSetup."Sales Line Disc. Account");
         exit(TotalAmountInGLEntry(GLEntry));
     end;
-#endif
+
     local procedure TotalInvoiceDiscountInGLEntry(var SalesLine: Record "Sales Line"; DocumentNo: Code[20]): Decimal
     var
         GLEntry: Record "G/L Entry";
@@ -6857,7 +6849,6 @@
         CustInvoiceDisc.Modify(true);
     end;
 
-#if not CLEAN25
     local procedure SetupLineDiscount(var SalesLineDiscount: Record "Sales Line Discount")
     var
         Item: Record Item;
@@ -6872,7 +6863,6 @@
         SalesLineDiscount.Validate("Line Discount %", LibraryRandom.RandDec(99, 2));
         SalesLineDiscount.Modify(true);
     end;
-#endif
 
     local procedure UpdateSalesReceivableSetup()
     var
@@ -6930,7 +6920,7 @@
         SalesLine.Validate("Qty. to Invoice", QtyToInvoice);
         SalesLine.Modify(true);
     end;
-#if not CLEAN25
+
     local procedure SumLineDiscountAmount(var SalesLine: Record "Sales Line"; DocumentNo: Code[20]) LineDiscountAmount: Decimal
     begin
         SalesLine.SetRange("Document No.", DocumentNo);
@@ -6939,7 +6929,7 @@
             LineDiscountAmount += SalesLine."Line Discount Amount";
         until SalesLine.Next() = 0;
     end;
-#endif
+
     local procedure SumInvoiceDiscountAmount(var SalesLine: Record "Sales Line"; DocumentNo: Code[20]) InvoiceDiscountAmount: Decimal
     begin
         SalesLine.SetRange("Document No.", DocumentNo);
@@ -7390,7 +7380,7 @@
           InvoiceDiscountAmount, SalesLine."Inv. Discount Amount", GeneralLedgerSetup."Amount Rounding Precision",
           StrSubstNo(AmountErr, SalesLine.FieldCaption("Inv. Discount Amount"), InvoiceDiscountAmount, SalesLine.TableCaption()));
     end;
-#if not CLEAN25
+
     local procedure VerifyLineDiscountAmount(SalesLine: Record "Sales Line"; DocumentNo: Code[20]; LineDiscountAmount: Decimal)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -7409,7 +7399,7 @@
           LineDiscountAmount, SalesLine."Line Discount Amount", GeneralLedgerSetup."Amount Rounding Precision",
           StrSubstNo(AmountErr, SalesLine.FieldCaption("Line Discount Amount"), LineDiscountAmount, SalesLine.TableCaption()));
     end;
-#endif
+
     local procedure VerifyPostedSalesInvoice(DocumentNo: Code[20]; LineDiscountAmount: Decimal)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -7551,7 +7541,7 @@
               StrSubstNo(VATAmountErr, VATAmountSalesLine, SalesLine.TableCaption()));
         until SalesLine.Next() = 0;
     end;
-#if not CLEAN25
+
     local procedure VerifyLineDiscountOnInvoice(SalesLine: Record "Sales Line")
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -7566,7 +7556,7 @@
               StrSubstNo(AmountErr, SalesLine.FieldCaption("Line Discount Amount"), LineDiscountAmount, SalesLine.TableCaption()));
         until SalesLine.Next() = 0;
     end;
-#endif
+
     local procedure VerifyInvoiceDiscountOnInvoice(SalesLine: Record "Sales Line"; CustInvoiceDisc: Record "Cust. Invoice Disc.")
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
