@@ -91,7 +91,6 @@ page 7 "Customer Price Groups"
             group("Cust. &Price Group")
             {
                 Caption = 'Cust. &Price Group';
-#if not CLEAN25
                 action(SalesPrices)
                 {
                     ApplicationArea = Basic, Suite;
@@ -99,9 +98,6 @@ page 7 "Customer Price Groups"
                     Image = SalesPrices;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'Define how to set up sales price agreements. These sales prices can be for individual customers, for a group of customers, for all customers, or for a campaign.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
 
                     trigger OnAction()
                     var
@@ -113,7 +109,6 @@ page 7 "Customer Price Groups"
                         Page.Run(Page::"Sales Prices", SalesPrice);
                     end;
                 }
-#endif
                 action(PriceLists)
                 {
                     AccessByPermission = TableData "Sales Price Access" = R;
@@ -245,14 +240,9 @@ page 7 "Customer Price Groups"
             {
                 Caption = 'Customer Price Group';
 
-#if not CLEAN25
                 actionref(SalesPrices_Promoted; SalesPrices)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
                 actionref(PriceLists_Promoted; PriceLists)
                 {
                 }

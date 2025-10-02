@@ -2039,6 +2039,7 @@ codeunit 5330 "CRM Integration Management"
         Resource: Record Resource;
         SalesInvoiceHeader: Record "Sales Invoice Header";
         CustomerPriceGroup: Record "Customer Price Group";
+        PageManagement: Codeunit "Page Management";
         RecordRef: RecordRef;
         IsHandled: Boolean;
     begin
@@ -2077,7 +2078,7 @@ codeunit 5330 "CRM Integration Management"
             DATABASE::"Sales Invoice Header":
                 begin
                     RecordRef.SetTable(SalesInvoiceHeader);
-                    PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
+                    PageManagement.PageRun(SalesInvoiceHeader);
                 end;
             DATABASE::Resource:
                 begin
@@ -2351,10 +2352,8 @@ codeunit 5330 "CRM Integration Management"
                     Database::Resource:
                         if IntegrationTableMapping."Integration Table ID" = Database::"CRM Product" then
                             CRMSetupDefaults.ResetResourceProductMapping(IntegrationTableMapping.Name, EnqueueJobQueEntries);
-#if not CLEAN25
                     Database::"Customer Price Group":
                         CRMSetupDefaults.ResetCustomerPriceGroupPricelevelMapping(IntegrationTableMapping.Name, EnqueueJobQueEntries);
-#endif
                     Database::"Sales Invoice Header":
                         CRMSetupDefaults.ResetSalesInvoiceHeaderInvoiceMapping(IntegrationTableMapping.Name, IsTeamOwnershipModel, EnqueueJobQueEntries);
                     Database::"Sales Invoice Line":

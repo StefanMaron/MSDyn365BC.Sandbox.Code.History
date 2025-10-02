@@ -179,6 +179,7 @@ page 132 "Posted Sales Invoice"
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
+                    Editable = false;
                     ToolTip = 'Specifies the customer''s reference. The contents will be printed on sales documents.';
                 }
                 field("Document Date"; Rec."Document Date")

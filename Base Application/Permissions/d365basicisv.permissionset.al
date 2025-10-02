@@ -19,9 +19,7 @@ using Microsoft.eServices.OnlineMap;
 using Microsoft.Finance.Payroll;
 using Microsoft.Inventory.Reconciliation;
 using Microsoft.Projects.Project.Journal;
-#if not CLEAN25
 using Microsoft.Projects.Project.Pricing;
-#endif
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Projects.Project.Posting;
@@ -126,9 +124,7 @@ using Microsoft.Inventory.Transfer;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.Resources.Setup;
 using Microsoft.Projects.RoleCenters;
@@ -219,6 +215,9 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Acc. Schedule Line Entity" = RIMD,
                   tabledata "Acc. Schedule Name" = RIMD,
                   tabledata "Financial Report" = RIMD,
+                  tabledata "Financial Report Export Log" = RIMD,
+                  tabledata "Financial Report Recipient" = RIMD,
+                  tabledata "Financial Report Schedule" = RIMD,
                   tabledata "Financial Report User Filters" = RIMD,
                   tabledata "Fin. Report Excel Template" = RIMD,
                   tabledata "Account Schedules Chart Setup" = RIMD,
@@ -661,10 +660,8 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata Job = RIMD,
                   tabledata "Job Cue" = RIMD,
                   tabledata "Job Entry No." = RIMD,
-#if not CLEAN25
                   tabledata "Job G/L Account Price" = RIMD,
                   tabledata "Job Item Price" = RIMD,
-#endif
                   tabledata "Job Journal Batch" = RIMD,
                   tabledata "Job Journal Line" = RIMD,
                   tabledata "Job Journal Quantity" = RIMD,
@@ -683,9 +680,7 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Job Queue Notification Setup" = RIMD,
                   tabledata "Job Queue Notified Admin" = RIMD,
                   tabledata "Job Register" = Rimd,
-#if not CLEAN25
                   tabledata "Job Resource Price" = RIMD,
-#endif
                   tabledata "Job Responsibility" = RIMD,
                   tabledata "Job Task" = RIMD,
                   tabledata "Job Task Dimension" = RIMD,
@@ -818,20 +813,14 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Purch. Inv. Header" = RimD,
                   tabledata "Purch. Inv. Line" = Rimd,
                   tabledata "Purch. Inv. Line Aggregate" = RIMD,
-#if not CLEAN25
                   tabledata "Purch. Price Line Disc. Buff." = RIMD,
-#endif
                   tabledata "Purchase Cue" = RIMD,
                   tabledata "Purchase Discount Access" = RIMD,
                   tabledata "Purchase Header" = RIMD,
                   tabledata "Purchase Line" = RIMD,
-#if not CLEAN25
                   tabledata "Purchase Line Discount" = RIMD,
-#endif
                   tabledata "Purchase Order Entity Buffer" = RIMD,
-#if not CLEAN25
                   tabledata "Purchase Price" = RIMD,
-#endif
                   tabledata "Purchase Price Access" = RIMD,
                   tabledata "Purchases & Payables Setup" = RIMD,
                   tabledata Purchasing = RIMD,
@@ -888,13 +877,9 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Reservation Entry" = RIMD,
                   tabledata "Reservation Entry Buffer" = RIMD,
                   tabledata Resource = RIMD,
-#if not CLEAN25
                   tabledata "Resource Cost" = RIMD,
-#endif
                   tabledata "Resource Group" = RIMD,
-#if not CLEAN25
                   tabledata "Resource Price" = RIMD,
-#endif
                   tabledata "Resource Register" = RIMD,
                   tabledata "Resource Unit of Measure" = RIMD,
                   tabledata "Resources Setup" = RIMD,
@@ -924,19 +909,13 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Sales Invoice Line Aggregate" = RIMD,
                   tabledata "Sales Line" = RIMD,
                   tabledata "Sales Line Archive" = RIMD,
-#if not CLEAN25
                   tabledata "Sales Line Discount" = RIMD,
-#endif
                   tabledata "Sales Order Entity Buffer" = RIMD,
                   tabledata "Sales Planning Line" = Rimd,
-#if not CLEAN25
                   tabledata "Sales Price" = RIMD,
-#endif
                   tabledata "Sales Price Access" = RIMD,
-#if not CLEAN25
                   tabledata "Sales Price and Line Disc Buff" = RIMD,
                   tabledata "Sales Price Worksheet" = RIMD,
-#endif
                   tabledata "Sales Quote Entity Buffer" = RIMD,
                   tabledata "Sales Shipment Buffer" = RIMD,
                   tabledata "Salesperson/Purchaser" = RIMD,

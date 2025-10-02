@@ -129,10 +129,8 @@ permissionset 8562 "Inventory - Edit"
                   tabledata "Purch. Rcpt. Line" = r,
                   tabledata "Purchase Discount Access" = RIMD,
                   tabledata "Purchase Line" = Rm,
-#if not CLEAN25
                   tabledata "Purchase Line Discount" = RIMD,
                   tabledata "Purchase Price" = RIMD,
-#endif
                   tabledata "Purchase Price Access" = RIMD,
                   tabledata "Put-away Template Header" = R,
                   tabledata "Registered Whse. Activity Line" = r,
@@ -145,10 +143,8 @@ permissionset 8562 "Inventory - Edit"
                   tabledata "Sales Discount Access" = RimD,
                   tabledata "Sales Invoice Line" = r,
                   tabledata "Sales Line" = Rm,
-#if not CLEAN25
                   tabledata "Sales Line Discount" = RimD,
                   tabledata "Sales Price" = RIMD,
-#endif
                   tabledata "Sales Price Access" = RIMD,
                   tabledata "Sales Shipment Line" = r,
                   tabledata "Serial No. Information" = RIMD,
