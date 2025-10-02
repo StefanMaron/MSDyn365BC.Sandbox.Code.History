@@ -16,10 +16,8 @@ codeunit 135200 "Time Series Tests"
         LibraryInventory: Codeunit "Library - Inventory";
         LibrarySales: Codeunit "Library - Sales";
         MockServiceURITxt: Label 'https://localhost:8080/services.azureml.net/workspaces/2eaccaaec84c47c7a1f8f01ec0a6eea7', Locked = true;
-        LibraryPurchase: Codeunit "Library - Purchase";
         LibraryERM: Codeunit "Library - ERM";
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
-        LibraryRandom: Codeunit "Library - Random";
         LibraryUtility: Codeunit "Library - Utility";
         HttpMessageHandler: DotNet MockHttpMessageHandler;
         DataSize: Option "No Data",Small,Big;
@@ -647,21 +645,6 @@ codeunit 135200 "Time Series Tests"
         exit('\App\Test\Files\AzureMLResponse\Time_Series_Forecast.txt');
     end;
 
-    local procedure MockVendorLedgerEntryData()
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-        GenJournalBatch: Record "Gen. Journal Batch";
-    begin
-        LibraryERM.SelectLastGenJnBatch(GenJournalBatch);
-        LibraryERM.ClearGenJournalLines(GenJournalBatch);
-        LibraryERM.CreateGeneralJnlLineWithBalAcc(
-          GenJournalLine, GenJournalBatch."Journal Template Name", GenJournalBatch.Name,
-          GenJournalLine."Document Type"::Invoice, GenJournalLine."Account Type"::Vendor, LibraryPurchase.CreateVendorNo(),
-          GenJournalLine."Bal. Account Type"::"G/L Account", LibraryERM.CreateGLAccountNo(),
-          -LibraryRandom.RandDecInRange(100, 200, 2));
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-    end;
-
     [Normal]
     local procedure GetForecast(var TimeSeriesManagement: Codeunit "Time Series Management"; var ItemLedgerEntry: Record "Item Ledger Entry"; var TempTimeSeriesForecast: Record "Time Series Forecast" temporary; PeriodType: Option; Periods: Integer)
     var
@@ -678,4 +661,3 @@ codeunit 135200 "Time Series Tests"
         TimeSeriesManagement.GetForecast(TempTimeSeriesForecast)
     end;
 }
-
