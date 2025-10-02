@@ -175,6 +175,7 @@ codeunit 139134 "Mail Management Test"
     procedure TestMailDialogClearBodyAfterTemplate()
     var
         TempEmailItem: Record "Email Item" temporary;
+        TempBlobMail: Codeunit "Temp Blob";
         MailManagement: Codeunit "Mail Management";
         TemplateBodyText: Text;
         DialogBodyText: array[2] of Text;
@@ -185,11 +186,12 @@ codeunit 139134 "Mail Management Test"
 
         // [GIVEN] Send first email using email template body
         TemplateBodyText := LibraryUtility.GenerateRandomXMLText(100);
-        InitTempEmailItem(TempEmailItem, false, GenerateTempBodyFile(TemplateBodyText));
+        GenerateTempBody(TemplateBodyText, TempBlobMail);
+        InitTempEmailItem(TempEmailItem, false, TempBlobMail);
         SendEmail(TempEmailItem, MailManagement);
 
         // [WHEN] Send second email using plain text body
-        InitTempEmailItem(TempEmailItem, true, '');
+        InitTempEmailItem(TempEmailItem, true);
         SendEmail(TempEmailItem, MailManagement);
 
         // [THEN] The first "Send Email" dialog is opened with filled message body text from template
@@ -223,12 +225,12 @@ codeunit 139134 "Mail Management Test"
 
         // [GIVEN] Send first email using non-empty plain text message body
         BodyText := LibraryUtility.GenerateRandomXMLText(100);
-        InitTempEmailItem(TempEmailItem, true, '');
+        InitTempEmailItem(TempEmailItem, true);
         TempEmailItem.SetBodyText(BodyText);
         SendEmail(TempEmailItem, MailManagement);
 
         // [WHEN] Send second email using plain text body
-        InitTempEmailItem(TempEmailItem, true, '');
+        InitTempEmailItem(TempEmailItem, true);
         SendEmail(TempEmailItem, MailManagement);
 
         // [THEN] The second "Send Email" dialog is opened with an empty body text
@@ -307,6 +309,7 @@ codeunit 139134 "Mail Management Test"
     procedure TestMailDialogOpenedTwiceCcTextAndBccTextBlank()
     var
         TempEmailItem: Record "Email Item" temporary;
+        TempBlobMail: Codeunit "Temp Blob";
         MailManagement: Codeunit "Mail Management";
         ActionType: Option Update,Validate;
     begin
@@ -315,7 +318,8 @@ codeunit 139134 "Mail Management Test"
         Initialize();
 
         // [GIVEN] Email Item where BCC and CC are not specified
-        InitTempEmailItem(TempEmailItem, false, GenerateTempBodyFile(LibraryUtility.GenerateRandomXMLText(100)));
+        GenerateTempBody(LibraryUtility.GenerateRandomXMLText(100), TempBlobMail);
+        InitTempEmailItem(TempEmailItem, false, TempBlobMail);
         Assert.IsTrue(MailManagement.IsEnabled(), 'Mail management is not configured');
 
         // [GIVEN] CC Text and BCC Text are updated on Send Email Dialog
@@ -337,6 +341,7 @@ codeunit 139134 "Mail Management Test"
     procedure TestMailDialogOpenedTwiceCcTextAndBccTextFromMailItem()
     var
         TempEmailItem: Record "Email Item" temporary;
+        TempBlobMail: Codeunit "Temp Blob";
         MailManagement: Codeunit "Mail Management";
         ActionType: Option Update,Validate;
     begin
@@ -345,7 +350,8 @@ codeunit 139134 "Mail Management Test"
         Initialize();
 
         // [GIVEN] Email Item where BCC = "toBCC" and CC = "toCC"
-        InitTempEmailItem(TempEmailItem, false, GenerateTempBodyFile(LibraryUtility.GenerateRandomXMLText(100)));
+        GenerateTempBody(LibraryUtility.GenerateRandomXMLText(100), TempBlobMail);
+        InitTempEmailItem(TempEmailItem, false, TempBlobMail);
         TempEmailItem."Send CC" := LibraryUtility.GenerateGUID();
         TempEmailItem."Send BCC" := LibraryUtility.GenerateGUID();
         Assert.IsTrue(MailManagement.IsEnabled(), 'Mail management is not configured');
@@ -388,14 +394,19 @@ codeunit 139134 "Mail Management Test"
         ServiceEmailQueue.Insert();
     end;
 
-    local procedure InitTempEmailItem(var EmailItem: Record "Email Item"; PlaintextFormatted: Boolean; BodyFilePath: Text)
+    local procedure InitTempEmailItem(var EmailItem: Record "Email Item"; PlaintextFormatted: Boolean)
     begin
         Clear(EmailItem);
         EmailItem."From Address" := 'no@where.com';
         EmailItem."Send to" := 'Some@where.com';
         EmailItem.Subject := 'Anywhere';
         EmailItem."Plaintext Formatted" := PlaintextFormatted;
-        EmailItem."Body File Path" := CopyStr(BodyFilePath, 1, MaxStrLen(EmailItem."Body File Path"));
+    end;
+
+    local procedure InitTempEmailItem(var EmailItem: Record "Email Item"; PlaintextFormatted: boolean; TempBlobBody: Codeunit "Temp Blob")
+    begin
+        InitTempEmailItem(EmailItem, PlaintextFormatted);
+        EmailItem.SetBody(TempBlobBody);
     end;
 
     local procedure EnqueueCCAndBCCValues(ActionType: Variant; CCText: Variant; BCCText: Variant)
@@ -462,18 +473,12 @@ codeunit 139134 "Mail Management Test"
         Reply := false;
     end;
 
-    local procedure GenerateTempBodyFile(BodyText: Text): Text[250]
+    local procedure GenerateTempBody(BodyText: Text; var TempBlob: Codeunit "Temp Blob")
     var
-        TempBlob: Codeunit "Temp Blob";
-        FileManagement: Codeunit "File Management";
         BlobStream: OutStream;
-        FileName: Text[250];
     begin
-        FileName := Format(FileManagement.ServerTempFileName('html'), 250);
         TempBlob.CreateOutStream(BlobStream);
         BlobStream.WriteText('<html><body><b>' + BodyText + '</b></body></html>');
-        FileManagement.BLOBExportToServerFile(TempBlob, FileName);
-        exit(FileName);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Email Item", 'OnAfterInsertEvent', '', false, false)]
