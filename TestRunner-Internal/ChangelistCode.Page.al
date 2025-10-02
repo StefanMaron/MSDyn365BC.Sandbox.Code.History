@@ -117,6 +117,7 @@ page 130026 "Changelist Code"
                 {
                     ApplicationArea = All;
                     Caption = 'Code Coverage %';
+                    AutoFormatType = 0;
                 }
             }
         }
@@ -243,4 +244,3 @@ page 130026 "Changelist Code"
         exit(Round(Numerator / Denominator * 100, 0.01));
     end;
 }
-
