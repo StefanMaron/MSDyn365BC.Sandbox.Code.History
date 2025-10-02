@@ -184,7 +184,7 @@ pageextension 6222 "Sust. Item Card" extends "Item Card"
     var
         SustainabilitySetup: Record "Sustainability Setup";
     begin
-        SustainabilitySetup.GetRecordOnce();
+        SustainabilitySetup.Get();
 
         SustainabilityVisible := SustainabilitySetup."Item Emissions";
         SustainabilityAllGasesAsCO2eVisible := SustainabilitySetup."Use All Gases As CO2e";

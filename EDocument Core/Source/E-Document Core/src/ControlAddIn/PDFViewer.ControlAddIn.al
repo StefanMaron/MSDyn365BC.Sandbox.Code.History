@@ -1,12 +1,14 @@
 #if not CLEAN27
+#pragma warning disable AA0247
 controladdin "PDF Viewer"
+#pragma warning restore AA0247
 {
     ObsoleteReason = 'Replaced by platform support';
     ObsoleteTag = '27.0';
     ObsoleteState = Pending;
 
     Scripts =
-        'https://cdn-bc.dynamics.com/common/js/pdfjs-4.10.38/pdf.min.mjs',
+        'https://bc-cdn.dynamics.com/common/js/pdfjs-4.10.38/pdf.min.mjs',
         'script.js';
 
     StartupScript = 'startup.js';

@@ -5,6 +5,7 @@
 namespace Microsoft.Sales.History;
 
 using Microsoft.Finance.Dimension;
+using Microsoft.Utilities;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 
@@ -161,9 +162,10 @@ page 5824 "Sales Shipment Lines"
                     trigger OnAction()
                     var
                         SalesShptHeader: Record "Sales Shipment Header";
+                        PageManagement: Codeunit "Page Management";
                     begin
                         SalesShptHeader.Get(Rec."Document No.");
-                        PAGE.Run(PAGE::"Posted Sales Shipment", SalesShptHeader);
+                        PageManagement.PageRun(SalesShptHeader);
                     end;
                 }
                 action(Dimensions)

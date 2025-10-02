@@ -80,27 +80,61 @@ table 6240 "Sust. Excise Jnl. Line"
             Caption = 'Document No.';
             NotBlank = true;
         }
+#if not CLEANSCHEMA29
         field(8; "Account No."; Code[20])
         {
             Caption = 'Account No.';
             TableRelation = "Sustainability Account" where("Account Type" = const(Posting), Blocked = const(false));
+            ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+#if not CLEAN28
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '29.0';
+#endif
         }
         field(9; "Account Name"; Text[100])
         {
             Caption = 'Account Name';
             DataClassification = CustomerContent;
+            ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+#if not CLEAN28
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '29.0';
+#endif
         }
         field(10; "Account Category"; Code[20])
         {
             Caption = 'Account Category';
             Editable = false;
             TableRelation = "Sustain. Account Category";
+            ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+#if not CLEAN28
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '29.0';
+#endif
         }
         field(11; "Account Subcategory"; Code[20])
         {
             Caption = 'Account Subcategory';
             TableRelation = "Sustain. Account Subcategory".Code where("Category Code" = field("Account Category"));
+            ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+#if not CLEAN28
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '29.0';
+#endif
         }
+#endif
         field(12; Description; Text[100])
         {
             Caption = 'Description';

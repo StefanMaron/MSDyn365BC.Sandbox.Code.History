@@ -390,6 +390,9 @@ codeunit 1751 "Data Classification Eval. Data"
         FinancialReportUserFilters: Record "Financial Report User Filters";
     begin
         SetTableFieldsToNormal(Database::"Financial Report");
+        SetTableFieldsToNormal(Database::"Financial Report Schedule");
+        SetTableFieldsToNormal(Database::"Financial Report Export Log");
+        SetTableFieldsToNormal(Database::"Financial Report Recipient");
         SetTableFieldsToNormal(Database::"Financial Report User Filters");
         SetTableFieldsToNormal(Database::"Fin. Report Excel Template");
         SetFieldToPersonal(Database::"Financial Report User Filters", FinancialReportUserFilters.FieldNo("User ID"));

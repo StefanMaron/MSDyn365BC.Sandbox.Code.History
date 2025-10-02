@@ -4,6 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Document;
 
+using Microsoft.Inventory.Comment;
+
+
 page 6563 "Invt. Receipts"
 {
     ApplicationArea = Basic, Suite;
@@ -84,6 +87,24 @@ page 6563 "Invt. Receipts"
 
     actions
     {
+        area(navigation)
+        {
+            group("Receipt")
+            {
+                Caption = 'Receipt';
+                Image = Receipt;
+                action("Comments")
+                {
+                    ApplicationArea = Comments;
+                    Caption = 'Comments';
+                    Image = ViewComments;
+                    ToolTip = 'View or edit comments.';
+                    RunObject = Page "Inventory Comment Sheet";
+                    RunPageLink = "Document Type" = const("Inventory Receipt"),
+                                  "No." = field("No.");
+                }
+            }
+        }
     }
 }
 

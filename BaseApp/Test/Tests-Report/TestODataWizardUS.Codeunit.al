@@ -802,7 +802,6 @@ codeunit 134767 "Test OData Wizard US"
         Assert.AreEqual(ODataExpectedName, ODataActualName, 'Object name conversion did not match the expected value.');
     end;
 
-#if not CLEAN25
     [Test]
     [HandlerFunctions('SalesPriceFilterPageHandler')]
     [Scope('OnPrem')]
@@ -843,7 +842,6 @@ codeunit 134767 "Test OData Wizard US"
 
         AssertODataUrls(ServiceRootUrl, ServiceName, SelectText, FilterText, FilterText, ObjectTypeVariable::Page);
     end;
-#endif
 
     [Scope('OnPrem')]
     procedure CreateCustomerListEndpoint(ServiceNameParam: Text[240]; FilterTextParam: Text; AddColumnsParam: Boolean; var TenantWebService: Record "Tenant Web Service")
@@ -1088,7 +1086,6 @@ codeunit 134767 "Test OData Wizard US"
         VerifyNavContact(NavContact, ExchangeContact);
     end;
 
-#if not CLEAN25
     [FilterPageHandler]
     [Scope('OnPrem')]
     procedure SalesPriceFilterPageHandler(var SalesLineRecordRef: RecordRef): Boolean
@@ -1100,6 +1097,5 @@ codeunit 134767 "Test OData Wizard US"
         SalesLineRecordRef.SetView(SalesPrice.GetView());
         exit(true);
     end;
-#endif
 }
 

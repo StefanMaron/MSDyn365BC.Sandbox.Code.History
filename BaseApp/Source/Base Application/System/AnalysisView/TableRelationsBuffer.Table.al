@@ -7,9 +7,10 @@ namespace System.Tooling;
 using System.Reflection;
 using System.Environment;
 
+#pragma warning disable AS0130
+#pragma warning disable PTE0025
 table 9640 "Table Relations Buffer"
 {
-    Scope = OnPrem;
     TableType = Temporary;
     Access = Internal;
     InherentPermissions = RIMDX;

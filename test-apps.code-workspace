@@ -105,7 +105,7 @@
       "path": "./System Application/Test/System Application Test/DisabledTests"
     },
     {
-      "path": "./System Application/Test/System Application Test/Extension Management/testArtifacts"
+      "path": "./System Application/Test/System Application Test Library/Extension Management/testArtifacts"
     },
     {
       "path": "./ServiceDeclaration/Test/Service Declaration Tests"
@@ -135,7 +135,7 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
-      "path": "./ErrorMessagesWithRecommendations/test/Error Messages with Recommendations Tests"
+      "path": "./ErrorMessagesWithRecommendations/Test/Error Messages with Recommendations Tests/DisabledTests"
     },
     {
       "path": "./SalesAndInventoryForecast/Test/Sales and Inventory Forecast Tests"
@@ -205,6 +205,9 @@
     },
     {
       "path": "./EDocumentConnectors/Continia/Test/E-Document Connector - Continia Tests"
+    },
+    {
+      "path": "./EDocumentConnectors/ForNAV/Test/E-Document Connector - ForNAV Tests"
     },
     {
       "path": "./APIV2/Test/_Exclude_APIV2_ Tests"
@@ -333,10 +336,10 @@
       "path": "./Email - Outlook REST API/Test"
     },
     {
-      "path": "./DataArchive/test/Data Archive Tests"
+      "path": "./DataArchive/Test/Data Archive Tests"
     },
     {
-      "path": "./DataSearch/test/Data Search Tests"
+      "path": "./DataSearch/Test/Data Search Tests"
     },
     {
       "path": "./ReviewGLEntries/Test/_Exclude_Review_General_Ledger_Entries_Tests"

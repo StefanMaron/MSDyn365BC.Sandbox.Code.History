@@ -1,3 +1,7 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
 namespace Microsoft.PowerBIReports;
 
 using System.Environment;
@@ -658,23 +662,36 @@ page 36950 "PowerBI Assisted Setup"
                         }
                     }
                 }
+#if not CLEAN28
                 group(SubscriptionBillingReportSetup)
                 {
                     Caption = 'Subscription Billing';
                     InstructionalText = 'Configure the Power BI Subscription Billing App.';
+                    ObsoleteReason = 'Moved to the Subscription Billing app, please add it to your dependencies and extend instead "SubBill PBI Assisted Setup"';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
+                    Visible = false;
+#pragma warning disable AL0801
                     field("Subscription Billing Report Name"; Rec."Subs. Billing Report Name")
                     {
                         Caption = 'Power BI Subscription Billing Report';
                         ToolTip = 'Specifies the Power BI Subscription Billing Report.';
                         ApplicationArea = All;
                         Editable = false;
+                        ObsoleteReason = 'Moved to the Subscription Billing app, please add it to your dependencies and extend instead "SubBill PBI Assisted Setup"';
+                        ObsoleteState = Pending;
+                        ObsoleteTag = '28.0';
+                        Visible = false;
+
                         trigger OnAssistEdit()
                         begin
                             SetupHelper.EnsureUserAcceptedPowerBITerms();
                             SetupHelper.LookupPowerBIReport(Rec."Subscription Billing Report ID", Rec."Subs. Billing Report Name");
                         end;
                     }
+#pragma warning restore AL0801
                 }
+#endif
             }
             group(Step6)
             {

@@ -675,6 +675,12 @@ table 4 Currency
         field(56; Symbol; Text[10])
         {
             Caption = 'Symbol';
+
+            trigger OnValidate()
+            begin
+                CheckDuplicateCurrencySymbol(Rec.Symbol);
+                CheckLCYSymbol(Rec.Symbol);
+            end;
         }
 
         /// <summary>
@@ -799,8 +805,10 @@ table 4 Currency
         GLSetup: Record "General Ledger Setup";
         TypeHelper: Codeunit "Type Helper";
         AccountSuggested: Boolean;
-        DuplicateSymbolNotificationIdLbl: Label '8fcf129e-4be3-43c1-991d-d2fb116623eb', Locked = true;
+        DuplicateSymbolNotificationId: Label '8fcf129e-4be3-43c1-991d-d2fb116623eb', Locked = true;
         DuplicateSymbolNoteLbl: Label 'The currency symbol "%1" is used by multiple currencies. If shown in the UI this can be confusing. Please choose a different symbol.', Comment = '%1 = currency symbol';
+        LCYSymbolNotificationId: Label '5d669b73-cfbc-4a8c-8c2e-cd9816a2591c', Locked = true;
+        LCYSymbolNoteLbl: Label 'The currency symbol "%1" is used as local currency symbol. If shown in the UI this can be confusing. Please choose a different symbol.', Comment = '%1 = local currency symbol';
 
 #pragma warning disable AA0074
 #pragma warning disable AA0470
@@ -1266,7 +1274,7 @@ table 4 Currency
         Currency: Record Currency;
         DuplicateeSymbolNotification: Notification;
     begin
-        DuplicateeSymbolNotification.Id := DuplicateSymbolNotificationIdLbl;
+        DuplicateeSymbolNotification.Id := DuplicateSymbolNotificationId;
         DuplicateeSymbolNotification.Recall();
 
         if CurrencySymbol = '' then
@@ -1276,6 +1284,24 @@ table 4 Currency
         if not Currency.IsEmpty() then begin
             DuplicateeSymbolNotification.Message(StrSubstNo(DuplicateSymbolNoteLbl, CurrencySymbol));
             DuplicateeSymbolNotification.Send();
+        end;
+    end;
+
+    local procedure CheckLCYSymbol(CurrencySymbol: Text[10])
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        LCYSymbolNotification: Notification;
+    begin
+        if CurrencySymbol = '' then
+            exit;
+
+        LCYSymbolNotification.Id := LCYSymbolNotificationId;
+        LCYSymbolNotification.Recall();
+
+        GeneralLedgerSetup.Get();
+        if CurrencySymbol = GeneralLedgerSetup."Local Currency Symbol" then begin
+            LCYSymbolNotification.Message(StrSubstNo(LCYSymbolNoteLbl, CurrencySymbol));
+            LCYSymbolNotification.Send();
         end;
     end;
 

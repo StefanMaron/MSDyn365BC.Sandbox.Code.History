@@ -81,5 +81,8 @@
     "includeSourceInSymbolFile": true
   },
   "application": "$(app_minimumVersion)",
-  "target": "OnPrem"
+  "target": "OnPrem",
+  "features": [
+    "TranslationFile"
+  ]
 }

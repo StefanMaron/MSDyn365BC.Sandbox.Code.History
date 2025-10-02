@@ -126,6 +126,9 @@ table 6217 "Sustainability Setup"
             begin
                 if Rec."Use Emissions In Purch. Doc." then
                     FeatureTelemetry.LogUptake('0000PGZ', SustainabilityLbl, Enum::"Feature Uptake Status"::"Set up");
+
+                if not Rec."Use Emissions In Purch. Doc." then
+                    Rec.TestField("Use Formulas In Purch. Docs", false);
             end;
         }
         field(17; "Waste Unit of Measure Code"; Code[10])
@@ -237,6 +240,16 @@ table 6217 "Sustainability Setup"
                     UpdateSustJobQueueEntriesStatus();
             end;
         }
+        field(41; "Use Formulas In Purch. Docs"; Boolean)
+        {
+            Caption = 'Use Formulas in Purchase Documents';
+
+            trigger OnValidate()
+            begin
+                if Rec."Use Formulas In Purch. Docs" then
+                    Rec.TestField("Use Emissions In Purch. Doc.", true);
+            end;
+        }
     }
 
     keys
@@ -261,8 +274,7 @@ table 6217 "Sustainability Setup"
     begin
         if RecordHasBeenRead then
             exit;
-        if not Get() then
-            exit;
+        Get();
         RecordHasBeenRead := true;
     end;
 
@@ -360,9 +372,7 @@ table 6217 "Sustainability Setup"
     local procedure GetSustainabilitySetup()
     begin
         if not SustainabilitySetupRetrieved then begin
-            if not SustainabilitySetup.Get() then
-                exit;
-
+            SustainabilitySetup.Get();
             SustainabilitySetupRetrieved := true;
         end;
     end;

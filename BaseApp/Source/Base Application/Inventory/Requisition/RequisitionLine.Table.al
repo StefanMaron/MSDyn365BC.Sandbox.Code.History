@@ -2743,6 +2743,9 @@ table 246 "Requisition Line"
         Level := 1;
         "Action Message" := ReqLine."Action Message"::New;
         "User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
+        "Drop Shipment" := UnplannedDemand."Drop Shipment";
+
+        UpdateSalesOrderDetailForDropShipment();
 
         UpdateDim();
 
@@ -3307,6 +3310,25 @@ table 246 "Requisition Line"
             ItemVariant.SetLoadFields("Blocked");
             ItemVariant.Get(Rec."No.", Rec."Variant Code");
         end;
+    end;
+
+    local procedure UpdateSalesOrderDetailForDropShipment()
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        if Rec."Demand Type" <> Database::"Sales Line" then
+            exit;
+
+        if not Rec."Drop Shipment" then
+            exit;
+
+        SalesLine.SetLoadFields("Sell-to Customer No.");
+        if not SalesLine.Get(Rec."Demand Subtype", Rec."Demand Order No.", Rec."Demand Line No.") then
+            exit;
+
+        Rec."Sales Order No." := SalesLine."Document No.";
+        Rec."Sales Order Line No." := SalesLine."Line No.";
+        Rec."Sell-to Customer No." := SalesLine."Sell-to Customer No.";
     end;
 
     procedure ReserveBindingOrder(TrackingSpecification: Record "Tracking Specification"; SourceDescription: Text[100]; ExpectedDate: Date; ReservQty: Decimal; ReservQtyBase: Decimal; UpdateReserve: Boolean)

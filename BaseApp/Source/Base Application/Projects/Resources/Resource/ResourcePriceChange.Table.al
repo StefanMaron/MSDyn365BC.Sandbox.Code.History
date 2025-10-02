@@ -1,4 +1,3 @@
-#if not CLEANSCHEMA28 
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -11,16 +10,8 @@ using Microsoft.Utilities;
 table 335 "Resource Price Change"
 {
     Caption = 'Resource Price Change';
-#if not CLEAN25
     DrillDownPageID = "Resource Price Changes";
     LookupPageID = "Resource Price Changes";
-    ObsoleteState = Pending;
-    ObsoleteTag = '16.0';
-#else
-    ObsoleteState = Removed;
-    ObsoleteTag = '28.0';
-#endif    
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price Worksheet Line';
     DataClassification = CustomerContent;
 
     fields
@@ -87,6 +78,3 @@ table 335 "Resource Price Change"
 #pragma warning restore AA0470
 #pragma warning restore AA0074
 }
-
- 
-#endif

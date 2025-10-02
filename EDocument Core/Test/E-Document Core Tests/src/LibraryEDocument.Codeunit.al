@@ -1,4 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+#pragma warning disable AA0247
 codeunit 139629 "Library - E-Document"
+#pragma warning restore AA0247
 {
     EventSubscriberInstance = Manual;
     Permissions = tabledata "E-Document Service" = rimd,
@@ -464,12 +471,12 @@ codeunit 139629 "Library - E-Document"
     begin
         LibraryERM.CreateReminderHeader(ReminderHeader);
         ReminderHeader.Validate("Customer No.", Customer."No.");
-        ReminderHeader."Your Reference" := LibraryRandom.RandText(35);
+        ReminderHeader."Your Reference" := CopyStr(LibraryRandom.RandText(35), 1, 35);
         ReminderHeader.Modify(false);
 
         LibraryERM.CreateReminderLine(ReminderLine, ReminderHeader."No.", Enum::"Reminder Source Type"::"G/L Account");
         ReminderLine.Validate("Remaining Amount", this.LibraryRandom.RandInt(100));
-        ReminderLine.Description := LibraryRandom.RandText(100);
+        ReminderLine.Description := CopyStr(LibraryRandom.RandText(100), 1, 100);
         ReminderLine.Modify(false);
     end;
 
@@ -481,12 +488,12 @@ codeunit 139629 "Library - E-Document"
         LibraryERM.CreateFinanceChargeMemoHeader(FinChargeMemoHeader, Customer."No.");
         LibraryFinChargeMemo.CreateFinanceChargeTermAndText(FinanceChargeTerms);
         FinChargeMemoHeader.Validate("Fin. Charge Terms Code", FinanceChargeTerms.Code);
-        FinChargeMemoHeader."Your Reference" := LibraryRandom.RandText(35);
+        FinChargeMemoHeader."Your Reference" := CopyStr(LibraryRandom.RandText(35), 1, 35);
         FinChargeMemoHeader.Modify(false);
 
         LibraryERM.CreateFinanceChargeMemoLine(FinChargeMemoLine, FinChargeMemoHeader."No.", FinChargeMemoLine.Type::"G/L Account");
         FinChargeMemoLine.Validate("Remaining Amount", this.LibraryRandom.RandInt(100));
-        FinChargeMemoLine.Description := LibraryRandom.RandText(100);
+        FinChargeMemoLine.Description := CopyStr(LibraryRandom.RandText(100), 1, 100);
         FinChargeMemoLine.Modify(false);
     end;
 

@@ -166,7 +166,7 @@ page 6105 "Inbound E-Documents"
                 end;
             }
 #if not CLEAN27
-#pragma warning disable AA0194
+#pragma warning disable AA0194, AL0432
             action(ViewMailMessage)
             {
                 ApplicationArea = Basic, Suite;
@@ -349,7 +349,9 @@ page 6105 "Inbound E-Documents"
         HasPdf := false;
         if EDocDataStorage.Get(Rec."Unstructured Data Entry No.") then
             HasPdf := EDocDataStorage."File Format" = Enum::"E-Doc. File Format"::PDF;
+#if not CLEAN27
         SetEmailActionsVisibility();
+#endif
     end;
 
     local procedure PopulateDocumentNameTxt()
@@ -482,15 +484,19 @@ page 6105 "Inbound E-Documents"
             DocumentTypeStyleTxt := 'Ambiguous';
     end;
 
+#if not CLEAN27
     local procedure SetEmailActionsVisibility()
     begin
         EmailVisibilityFlag := Rec.GetEDocumentService()."Service Integration V2".AsInteger() = 6383; // Outlook Integration
     end;
+#endif
 
     var
         EDocDataStorage: Record "E-Doc. Data Storage";
         EDocumentHelper: Codeunit "E-Document Helper";
         RecordLinkTxt, VendorNameTxt, DocumentNameTxt, DocumentTypeStyleTxt : Text;
         HasPdf: Boolean;
+#if not CLEAN27
         EmailVisibilityFlag: Boolean;
+#endif
 }

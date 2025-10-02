@@ -5360,15 +5360,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Library - Manufacturing - NamedType OutputVarianceMismatchTxt)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3581665342 - NamedType 2558506169" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[FOR. LABOR]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Library - Manufacturing - NamedType TemplateName)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3581665342 - NamedType 2720473193" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Inbound Whse. Requests are created.]]></Val>

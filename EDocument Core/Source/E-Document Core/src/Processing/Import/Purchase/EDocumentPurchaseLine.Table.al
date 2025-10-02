@@ -66,6 +66,7 @@ table 6101 "E-Document Purchase Line"
             Caption = 'Quantity';
             ToolTip = 'Specifies the quantity.';
             Editable = false;
+            AutoFormatType = 0;
         }
         field(7; "Unit of Measure"; Text[50])
         {
@@ -74,23 +75,31 @@ table 6101 "E-Document Purchase Line"
         }
         field(8; "Unit Price"; Decimal)
         {
+            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 2;
             Caption = 'Unit Price';
             ToolTip = 'Specifies the direct unit cost.';
             Editable = false;
         }
         field(9; "Sub Total"; Decimal)
         {
+            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 2;
             Caption = 'Sub Total';
+            ToolTip = 'Specifies the line subtotal.';
         }
         field(10; "Total Discount"; Decimal)
         {
             Caption = 'Total Discount';
             ToolTip = 'Specifies the line discount.';
+            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 2;
         }
         field(11; "VAT Rate"; Decimal)
         {
             Caption = 'VAT Rate';
             Editable = false;
+            AutoFormatType = 0;
         }
         field(12; "Currency Code"; Code[10])
         {
@@ -111,7 +120,7 @@ table 6101 "E-Document Purchase Line"
             ToolTip = 'Specifies what you''re selling. The options vary, depending on what you choose in the Type field.';
             TableRelation = if ("[BC] Purchase Line Type" = const(" ")) "Standard Text"
             else
-            if ("[BC] Purchase Line Type" = const("G/L Account")) "G/L Account"
+            if ("[BC] Purchase Line Type" = const("G/L Account")) "G/L Account" where("Direct Posting" = const(true))
             else
             if ("[BC] Purchase Line Type" = const("Fixed Asset")) "Fixed Asset"
             else

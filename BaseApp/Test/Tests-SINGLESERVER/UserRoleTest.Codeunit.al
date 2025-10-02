@@ -76,7 +76,8 @@
         UserCardPage.OpenNew();
         UserCardPage."User Name".SetValue('');
         Assert.AreEqual('', UserCardPage."User Name".Value, '');
-        UserCardPage.Close();
+        asserterror UserCardPage.Close();
+        Assert.ExpectedError('User Name must have a value in User');
     end;
 
     [Test]
@@ -394,7 +395,7 @@
     procedure CopyPermissionSetTest()
     var
         TenantPermissionSet: Record "Tenant Permission Set";
-        OrgPermission: Record "Permission";
+        OrgPermission: Record "Expanded Permission";
         NewTenantPermission: Record "Tenant Permission";
         ZeroGUID: Guid;
         RoleId: Code[20];
@@ -409,6 +410,7 @@
 
         PermissionSetsPage.OpenEdit();
         PermissionSetsPage.Filter.SetFilter(Type, 'System');
+        PermissionSetsPage.Filter.SetFilter("App ID", '63ca2fa4-4f03-4f2b-a480-172fef340d3f');
         // Copy first Permission Set to 'NEWROLE'
         PermissionSetsPage.First();
         RoleId := PermissionSetsPage.PermissionSet.Value();
