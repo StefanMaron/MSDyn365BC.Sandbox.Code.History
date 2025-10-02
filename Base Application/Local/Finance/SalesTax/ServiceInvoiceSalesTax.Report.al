@@ -542,14 +542,14 @@ report 10474 "Service Invoice-Sales Tax"
                                 TaxRegLabel := CompanyInformation.FieldCaption("VAT Registration No.");
                             end;
                     end;
-                    SalesTaxCalc.StartSalesTaxCalculation();
+                    ServSalesTaxCalc.StartSalesTaxCalculation();
                     if TaxArea."Use External Tax Engine" then
-                        SalesTaxCalc.CallExternalTaxEngineForDoc(DATABASE::"Service Invoice Header", 0, "No.")
+                        ServSalesTaxCalc.CallExternalTaxEngineForDoc(DATABASE::"Service Invoice Header", 0, "No.")
                     else begin
-                        SalesTaxCalc.AddServInvoiceLines("No.");
-                        SalesTaxCalc.EndSalesTaxCalculation("Posting Date");
+                        ServSalesTaxCalc.AddServInvoiceLines("No.");
+                        ServSalesTaxCalc.EndSalesTaxCalculation("Posting Date");
                     end;
-                    SalesTaxCalc.GetSummarizedSalesTaxTable(TempSalesTaxAmtLine);
+                    ServSalesTaxCalc.GetSummarizedSalesTaxTable(TempSalesTaxAmtLine);
                     BrkIdx := 0;
                     PrevPrintOrder := 0;
                     PrevTaxPercent := 0;
@@ -695,7 +695,7 @@ report 10474 "Service Invoice-Sales Tax"
         ServiceInvCountPrinted: Codeunit "Service Inv.-Printed";
         FormatAddress: Codeunit "Format Address";
         ServiceFormatAddress: Codeunit "Service Format Address";
-        SalesTaxCalc: Codeunit "Sales Tax Calculate";
+        ServSalesTaxCalc: Codeunit "Serv. Sales Tax Calculate";
         NextEntryNo: Integer;
         FirstValueEntryNo: Integer;
         Text000: Label 'COPY';

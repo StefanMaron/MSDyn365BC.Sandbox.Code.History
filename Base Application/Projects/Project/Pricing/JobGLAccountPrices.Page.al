@@ -1,4 +1,3 @@
-#if not CLEAN25
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -12,9 +11,6 @@ page 1013 "Job G/L Account Prices"
     Caption = 'Project G/L Account Prices';
     PageType = List;
     SourceTable = "Job G/L Account Price";
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-    ObsoleteTag = '16.0';
 
     layout
     {
@@ -96,4 +92,3 @@ page 1013 "Job G/L Account Prices"
         FeaturePriceCalculation.FailIfFeatureEnabled();
     end;
 }
-#endif

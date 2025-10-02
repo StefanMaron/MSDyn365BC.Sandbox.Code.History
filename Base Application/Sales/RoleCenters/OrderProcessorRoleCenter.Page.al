@@ -819,12 +819,8 @@ page 9006 "Order Processor Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'List Price Sheet';
                         Image = "Report";
-#if not CLEAN25
                         RunPageView = where("Object Type" = const(Report), "Object ID" = const(10148)); // "List Price Sheet"
                         RunObject = Page "Role Center Page Dispatcher";
-#else
-                        RunObject = Report "List Price Sheet V16";
-#endif
                         ToolTip = 'View a list of your items and their prices, for example, to send to customers. You can create the list for specific customers, campaigns, currencies, or other criteria.';
                     }
                     action("Inventory - Sales &Back Orders")

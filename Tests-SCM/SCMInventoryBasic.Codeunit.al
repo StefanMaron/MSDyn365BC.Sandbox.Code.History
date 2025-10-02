@@ -53,9 +53,7 @@ codeunit 137280 "SCM Inventory Basic"
         VatProdPostingGrMostNotMatchErr: Label '%1 must not be that same as in the %2';
         ItemUOMErr: Label 'The field %1';
         UOMErr: Label '%1 should be taken from appropriate table';
-#if not CLEAN25
         ControlVisibilityErr: Label 'Control visibility should be %1';
-#endif
         UnspecifiedLocationTxt: Label 'UNSPECIFIED';
         IsNotFoundOnThePageTxt: Label 'is not found on the page';
         UnexpectedValueErr: Label 'Unexpected value of field %1 in table %2', Comment = '%1: Field name, %2: Table name';
@@ -1842,7 +1840,6 @@ codeunit 137280 "SCM Inventory Basic"
             ItemSubstitution."Substitute Type"::Item, Item."No."), 'Item Substitution not found.');
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure SalesPriceWorksheetControlNotVisibleOnPhone()
@@ -1874,7 +1871,6 @@ codeunit 137280 "SCM Inventory Basic"
         Assert.IsFalse(
           ItemList."Sales Price Worksheet".Visible(), StrSubstNo(ControlVisibilityErr, false));
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
