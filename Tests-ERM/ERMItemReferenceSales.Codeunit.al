@@ -9,14 +9,16 @@ codeunit 134463 "ERM Item Reference Sales"
     end;
 
     var
-        LibrarySales: Codeunit "Library - Sales";
+        Assert: Codeunit Assert;
+        LibraryERM: Codeunit "Library - ERM";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryItemReference: Codeunit "Library - Item Reference";
         LibraryRandom: Codeunit "Library - Random";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
-        Assert: Codeunit Assert;
+        LibraryUtility: Codeunit "Library - Utility";
+        LibraryVariableStorage: Codeunit "Library - Variable Storage";
         ItemRefNotExistsErr: Label 'There are no items with reference %1.';
         DialogCodeErr: Label 'Dialog';
         ItemReferenceMgt: Codeunit "Item Reference Management";
