@@ -5,6 +5,7 @@
 namespace Microsoft.Finance.FinancialReports;
 
 using Microsoft.Foundation.Enums;
+using Microsoft.Finance.GeneralLedger.Setup;
 
 table 88 "Financial Report"
 {
@@ -27,11 +28,21 @@ table 88 "Financial Report"
             Caption = 'Use Amounts in Additional Currency';
             DataClassification = SystemMetadata;
         }
+#if not CLEANSCHEMA30
         field(4; PeriodType; Enum "Analysis Period Type")
         {
             Caption = 'Period Type';
             DataClassification = SystemMetadata;
+            ObsoleteReason = 'This field has been replaced by the PeriodTypeDefault field.';
+#if not CLEAN28
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '30.0';
+#endif
         }
+#endif
         field(5; ShowLinesWithShowNo; Boolean)
         {
             Caption = 'Show All Lines';
@@ -94,10 +105,32 @@ table 88 "Financial Report"
             TableRelation = "Fin. Report Excel Template"."Code" where("Financial Report Name" = field(Name));
             ToolTip = 'Specifies the Excel Layout that will be used when exporting to Excel.';
         }
+#if not CLEANSCHEMA30
         field(17; NegativeAmountFormat; Enum "Analysis Negative Format")
         {
             Caption = 'Negative Amount Format';
             DataClassification = SystemMetadata;
+            ObsoleteReason = 'This field has been replaced by the NegativeAmountFormatDefault field.';
+#if not CLEAN28
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '30.0';
+#endif
+        }
+#endif
+        field(18; PeriodTypeDefault; Enum "Financial Report Period Type")
+        {
+            Caption = 'Period Type';
+            DataClassification = SystemMetadata;
+            ToolTip = 'Specifies by which period amounts are displayed.';
+        }
+        field(19; NegativeAmountFormatDefault; Enum "Fin. Report Negative Format")
+        {
+            Caption = 'Negative Amount Format';
+            DataClassification = SystemMetadata;
+            ToolTip = 'Specifies the default negative amount format for this financial report.';
         }
         // Fields not in "FinancialReportUserFilters"
         field(50; Description; Text[80])
@@ -164,6 +197,11 @@ table 88 "Financial Report"
             Caption = 'Date Filter Period Formula Lang. ID';
             DataClassification = SystemMetadata;
         }
+        field(60; LogoPositionDefault; Enum "Fin. Report Logo Position Def.")
+        {
+            Caption = 'Logo Position';
+            ToolTip = 'Specifies how your company logo is displayed on the financial report.';
+        }
     }
     keys
     {
@@ -174,11 +212,26 @@ table 88 "Financial Report"
     }
 
     var
+        GLSetup: Record "General Ledger Setup";
         AccSchedManagement: Codeunit AccSchedManagement;
+#if not CLEAN28
+#pragma warning disable AL0432
+        FeatureFinancialReportDef: Codeunit "Feature - Fin. Report Default";
+#pragma warning restore AL0432
+#endif
+        GLSetupRead: Boolean;
 
     trigger OnInsert()
     begin
         AccSchedManagement.CheckAnalysisView(Rec."Financial Report Row Group", Rec."Financial Report Column Group", true);
+    end;
+
+    trigger OnDelete()
+    var
+        FinancialReportSchedule: Record "Financial Report Schedule";
+    begin
+        FinancialReportSchedule.SetRange("Financial Report Name", Name);
+        FinancialReportSchedule.DeleteAll(true);
     end;
 
     procedure GetIntroductoryParagraph(): Text
@@ -217,5 +270,45 @@ table 88 "Financial Report"
     begin
         Rec."Closing Paragraph".CreateOutStream(OutStream);
         OutStream.Write(TextValue);
+    end;
+
+    local procedure ReadGLSetup()
+    begin
+        if not GLSetupRead then begin
+            GLSetup.Get();
+            GLSetupRead := true;
+        end;
+    end;
+
+    procedure GetEffectivePeriodType(): Enum "Analysis Period Type"
+    begin
+#if not CLEAN28
+        if not FeatureFinancialReportDef.IsDefaultsFeatureEnabled() then
+            exit(PeriodType);
+#endif
+        if PeriodTypeDefault <> PeriodTypeDefault::Default then
+            exit(Enum::"Analysis Period Type".FromInteger(PeriodTypeDefault.AsInteger()));
+        ReadGLSetup();
+        exit(Enum::"Analysis Period Type".FromInteger(GLSetup."Fin. Rep. Period Type".AsInteger()));
+    end;
+
+    procedure GetEffectiveNegativeAmountFormat(): Enum "Analysis Negative Format"
+    begin
+#if not CLEAN28
+        if not FeatureFinancialReportDef.IsDefaultsFeatureEnabled() then
+            exit(NegativeAmountFormat);
+#endif
+        if NegativeAmountFormatDefault <> NegativeAmountFormatDefault::Default then
+            exit(Enum::"Analysis Negative Format".FromInteger(NegativeAmountFormatDefault.AsInteger()));
+        ReadGLSetup();
+        exit(Enum::"Analysis Negative Format".FromInteger(GLSetup."Fin. Rep. Neg. Amount Format".AsInteger()));
+    end;
+
+    procedure GetEffectiveLogoPosition(): Enum "Fin. Report Logo Position"
+    begin
+        if LogoPositionDefault <> LogoPositionDefault::Default then
+            exit(Enum::"Fin. Report Logo Position".FromInteger(LogoPositionDefault.AsInteger()));
+        ReadGLSetup();
+        exit(Enum::"Fin. Report Logo Position".FromInteger(GLSetup."Fin. Rep. Company Logo Pos.".AsInteger()));
     end;
 }

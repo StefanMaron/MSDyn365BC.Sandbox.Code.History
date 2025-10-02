@@ -86,6 +86,7 @@ page 6569 "Posted Invt. Receipts"
                 Image = Receipt;
                 action("Co&mments")
                 {
+                    ApplicationArea = Comments;
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inventory Comment Sheet";

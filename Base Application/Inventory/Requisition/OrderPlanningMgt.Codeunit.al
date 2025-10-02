@@ -267,7 +267,6 @@ codeunit 5522 "Order Planning Mgt."
         Item.SetRange("Variant Filter", VariantFilter);
         Item.SetRange("Location Filter", LocationFilter);
         Item.SetRange("Date Filter", 0D, DemandDate);
-        Item.SetRange("Drop Shipment Filter", false);
         if DemandDate = 0D then
             DemandDate := WorkDate();
         Evaluate(ODF, '<0D>');

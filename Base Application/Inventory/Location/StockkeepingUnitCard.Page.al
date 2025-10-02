@@ -101,6 +101,16 @@ page 5700 "Stockkeeping Unit Card"
                     HideValue = IsNonInventoriable;
                     ToolTip = 'Specifies for the SKU, the same as the field does on the item card.';
                 }
+                field("Qty. on Blanket Sales Order"; Rec."Qty. on Blanket Sales Order")
+                {
+                    ApplicationArea = Planning;
+                    Visible = false;
+                }
+                field("Qty. on Blanket Purch. Order"; Rec."Qty. on Blanket Purch. Order")
+                {
+                    ApplicationArea = Planning;
+                    Visible = false;
+                }
                 field("Qty. on Job Order"; Rec."Qty. on Job Order")
                 {
                     ApplicationArea = Planning;

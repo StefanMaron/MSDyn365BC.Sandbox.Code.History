@@ -1,4 +1,3 @@
-#if not CLEANSCHEMA28 
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -12,16 +11,8 @@ using Microsoft.Projects.Project.Job;
 table 1014 "Job G/L Account Price"
 {
     Caption = 'Project G/L Account Price';
-#if not CLEAN25
     DrillDownPageID = "Job G/L Account Prices";
     LookupPageID = "Job G/L Account Prices";
-    ObsoleteState = Pending;
-    ObsoleteTag = '16.0';
-#else
-    ObsoleteState = Removed;
-    ObsoleteTag = '28.0';
-#endif    
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
     DataClassification = CustomerContent;
 
     fields
@@ -32,20 +23,17 @@ table 1014 "Job G/L Account Price"
             NotBlank = true;
             TableRelation = Job;
 
-#if not CLEAN25
             trigger OnValidate()
             begin
                 GetJob();
                 "Currency Code" := Job."Currency Code";
             end;
-#endif
         }
         field(2; "Job Task No."; Code[20])
         {
             Caption = 'Project Task No.';
             TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
 
-#if not CLEAN25
             trigger OnValidate()
             begin
                 if "Job Task No." <> '' then begin
@@ -53,7 +41,6 @@ table 1014 "Job G/L Account Price"
                     JT.TestField("Job Task Type", JT."Job Task Type"::Posting);
                 end;
             end;
-#endif
         }
         field(3; "G/L Account No."; Code[20])
         {
@@ -126,7 +113,6 @@ table 1014 "Job G/L Account Price"
     {
     }
 
-#if not CLEAN25
     trigger OnInsert()
     begin
         LockTable();
@@ -160,8 +146,4 @@ table 1014 "Job G/L Account Price"
     local procedure OnBeforeCheckGLAccountNotEmpty(var JobGLAccountPrice: Record "Job G/L Account Price"; var IsHandled: Boolean)
     begin
     end;
-#endif
 }
-
- 
-#endif

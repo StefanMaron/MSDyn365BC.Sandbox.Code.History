@@ -22,9 +22,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryWarehouse: Codeunit "Library - Warehouse";
-#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
-#endif
         LibraryResource: Codeunit "Library - Resource";
         LibraryDocumentApprovals: Codeunit "Library - Document Approvals";
         LibraryWorkflow: Codeunit "Library - Workflow";
@@ -37,7 +35,6 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         ValueMustBeEqualErr: Label '%1 must be equal to %2 in the %3.', Comment = '%1 = Field Caption , %2 = Expected Value, %3 = Table Caption';
         GLEntryExistLbl: Label 'G/L Entry with zero amount is posted.';
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CopyPurchOrdCopyHeadRecalcLine()
@@ -191,7 +188,6 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
           ItemCost,
           PurchaseLineDiscount."Line Discount %");
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -353,7 +349,6 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         VerifyPurchaseLinesAreEqual(OriginalPurchHeader, DestinationPurchHeader);
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CopySalesOrdCopyHeadRecalcLine()
@@ -502,7 +497,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
 
         ValidateSalesLine(DestinationSalesLine, OriginalSalesLine.Quantity, ItemPrice, ExpectedDiscount);
     end;
-#endif
+
     [Test]
     [Scope('OnPrem')]
     procedure CopySalesOrdWithInvRoundingLine()
@@ -6841,7 +6836,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         Commit();
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"ERM Copy Purch/Sales Doc");
     end;
-#if not CLEAN25
+
     local procedure SetRandomSalesValues(var ItemCost: Integer; var ItemPrice: Integer; var DestinationDocType: Enum "Sales Document Type"; var OriginalDocType: Enum "Sales Document Type")
     var
         SalesHeader: Record "Sales Header";
@@ -6871,7 +6866,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         DestinationDocType := "Purchase Document Type".FromInteger(LibraryRandom.RandInt(NumOfDocTypes) - 1);
         OriginalDocType := "Purchase Document Type".FromInteger(LibraryRandom.RandInt(NumOfDocTypes) - 1);
     end;
-#endif
+
     local procedure CopyPurchDocFromArchive(ToPurchaseHeader: Record "Purchase Header"; FromDocType: Enum "Purchase Document Type From"; FromDocNo: Code[20]; IncludeHeader: Boolean; RecalculateLines: Boolean; ArchivedDocType: Enum "Purchase Document Type")
     var
         PurchaseHeaderArchive: Record "Purchase Header Archive";
@@ -7359,7 +7354,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         SalesHeader.Validate("Sell-to Customer No.", CustomerCode);
         SalesHeader.Modify(true);
     end;
-#if not CLEAN25
+
     local procedure CreateCopiableItem(var Item: Record Item; ItemCost: Integer; ItemPrice: Integer)
     begin
         // Create an item and set the last item cost, so when copying the lines we'll have a cost to retrieve (otherwise is 0).
@@ -7388,7 +7383,6 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         SalesLineDiscount.Validate("Line Discount %", LibraryRandom.RandInt(100));
         SalesLineDiscount.Modify(true);
     end;
-#endif
 
     local procedure CreateItemWithExtText(): Code[20]
     var
@@ -7776,7 +7770,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         PurchRcptLine.SetRange(Quantity, Quantity);
         PurchRcptLine.FindFirst();
     end;
-#if not CLEAN25
+
     local procedure GetNumberOfOptions(TableID: Integer; FieldNo: Integer): Integer
     var
         "Field": Record "Field";
@@ -7794,7 +7788,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
             exit(0);
         exit(StrLen(OptionStringCommas) + 1);
     end;
-#endif
+
     local procedure MapperPurchaseHeaders(PurchHeaderDocType: Enum "Purchase Document Type") ReportDocType: Enum "Purchase Document Type From"
     var
         PurchHeader: Record "Purchase Header";
@@ -7834,7 +7828,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
                 ReportDocType := "Sales Document Type From"::"Return Order";
         end;
     end;
-#if not CLEAN25
+
     local procedure PrepareSalesTest(var Item: Record Item; var OriginalDocType: Enum "Sales Document Type"; var DestinationDocType: Enum "Sales Document Type"; var ItemCost: Integer; var ItemPrice: Integer)
     begin
         SetRandomSalesValues(ItemCost, ItemPrice, DestinationDocType, OriginalDocType);
@@ -7846,7 +7840,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         SetRandomPurchaseValues(ItemCost, ItemPrice, DestinationDocType, OriginalDocType);
         CreateCopiableItem(Item, ItemCost, ItemPrice);
     end;
-#endif
+
     local procedure UpdateVATClauseVATIdentifierOnVATPostingSetup(VATBusPostingGroup: Code[20]; VATProdPostingGroup: Code[20]; VATClauseCode: Code[20]; VATIdentifier: Code[20])
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -7876,7 +7870,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         SalesLine.TestField("Drop Shipment", DropShipment);
         SalesLine.TestField("Special Order", SpecialOrder);
     end;
-#if not CLEAN25
+
     local procedure VerifyPurchaseHeadersAreEqual(OriginalPurchHeader: Record "Purchase Header"; CopiedPurchHeader: Record "Purchase Header")
     begin
         OriginalPurchHeader.TestField("Buy-from Vendor No.", CopiedPurchHeader."Buy-from Vendor No.");
@@ -7888,7 +7882,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         OriginalSalesHeader.TestField("Sell-to Customer No.", CopiedSalesHeader."Sell-to Customer No.");
         OriginalSalesHeader.TestField(Amount, CopiedSalesHeader.Amount);
     end;
-#endif
+
     local procedure VerifyPurchaseLinesAreEqual(PurchHeaderOriginal: Record "Purchase Header"; PurchHeaderCopied: Record "Purchase Header")
     var
         OriginalPurchLine: Record "Purchase Line";
