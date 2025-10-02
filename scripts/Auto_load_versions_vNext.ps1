@@ -109,7 +109,6 @@ $Versions | Sort-Object -Property Country, Version | % {
 
         "$($country)-$($version.ToString())" > version.txt
 
-        git pull --ff-only origin
         git config user.email "stefanmaron@outlook.de"
         git config user.name "Stefan Maron"
         git add -A | out-null
