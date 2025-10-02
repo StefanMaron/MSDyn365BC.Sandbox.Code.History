@@ -12,7 +12,7 @@
   "logo": "ExtensionLogo.png",
   "dependencies": [],
   "screenshots": [],
-  "platform": "25.0.0.0",
+  "platform": "25.2.0.0",
   "idRanges": [
     {
       "from": 1,
@@ -26,5 +26,5 @@
     "includeSourceInSymbolFile": true
   },
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=870429",
-  "application": "25.1.0.0"
+  "application": "25.2.0.0"
 }

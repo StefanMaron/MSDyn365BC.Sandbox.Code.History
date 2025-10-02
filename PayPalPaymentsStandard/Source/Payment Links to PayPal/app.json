@@ -13,7 +13,7 @@
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?LinkId=733363",
   "dependencies": [],
   "screenshots": [],
-  "platform": "25.0.0.0",
+  "platform": "25.2.0.0",
   "idRanges": [
     {
       "from": 1,
@@ -26,5 +26,5 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "25.1.0.0"
+  "application": "25.2.0.0"
 }
