@@ -187,11 +187,6 @@ codeunit 101931 "Create Local RapidStart Pack"
         IncludeField(SalesAdvLetterLineCZZ.FieldNo("Amount Including VAT"));
     end;
 
-    local procedure ExcludeField(FieldID: Integer)
-    begin
-        CreateConfigPackageHelper.IncludeField(FieldID, false);
-    end;
-
     local procedure IncludeField(FieldID: Integer)
     begin
         CreateConfigPackageHelper.IncludeField(FieldID, true);
@@ -202,4 +197,3 @@ codeunit 101931 "Create Local RapidStart Pack"
         CreateConfigPackageHelper.ValidateField(FieldID, false);
     end;
 }
-

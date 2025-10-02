@@ -105,14 +105,4 @@ codeunit 163533 "Create Stat. Report. Setup CZL"
           StatutoryReportingSetupCZL."VIES Declaration Nos.", XVIES, XVIESDeclaration, XVIES16001, '', '', '', 1);
         StatutoryReportingSetupCZL.Modify();
     end;
-
-    local procedure SetDefaultNos(SeriesCode: Code[20]; DefaultNos: Boolean)
-    var
-        NoSeries: Record "No. Series";
-    begin
-        NoSeries.Get(SeriesCode);
-        NoSeries."Default Nos." := DefaultNos;
-        NoSeries.Modify();
-    end;
 }
-

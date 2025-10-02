@@ -3,6 +3,7 @@
 
     trigger OnRun()
     begin
+        DemoDataSetup.Get();
         InventorySetup.Get();
         "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM1, XPartiallyManufactured, '70000', '70099', '70060', '70095', 1);
         "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM2, XPaint, '70100', '70199', '70104', '70195', 1, Enum::"No. Series Implementation"::Sequence);
@@ -49,16 +50,19 @@
         "Create No. Series".InitBaseSeries(
           InventorySetup."Posted Invt. Shipment Nos.", XIShipmentPLUS, XPostedInventoryShipment, XPIS000001, XPIS999999, '', '', 1, Enum::"No. Series Implementation"::Sequence);
 
+        InventorySetup."Combined MPS/MRP Calculation" := true;
+        Evaluate(InventorySetup."Default Safety Lead Time", '<1D>');
+        InventorySetup."Current Demand Forecast" := Format(DemoDataSetup."Starting Year" + 1);
         // NAVCZ
         InventorySetup."Post Neg.Transf. As Corr.CZL" := true;
         InventorySetup."Def.Tmpl. for Phys.Pos.Adj CZL" := CreateInvtMovementTemplate.GetSurplusCode();
         InventorySetup."Def.Tmpl. for Phys.Neg.Adj CZL" := CreateInvtMovementTemplate.GetDeficiencyCode();
         // NAVCZ
-
         InventorySetup.Modify();
     end;
 
     var
+        DemoDataSetup: Record "Demo Data Setup";
         InventorySetup: Record "Inventory Setup";
         "Create No. Series": Codeunit "Create No. Series";
         CreateInvtMovementTemplate: Codeunit "Create Invt. Mvmt. Templ. CZL";
@@ -144,6 +148,7 @@
 
     procedure InsertMiniAppData()
     begin
+        DemoDataSetup.Get();
         InventorySetup.Get();
         "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEMTxt, XItemNoSeriesTxt, '1000', '9999', '', '9995', 1, Enum::"No. Series Implementation"::Sequence);
         "Create No. Series".InitBaseSeries(InventorySetup."Nonstock Item Nos.", XNSITEM, XNonStockItems, XNS0001, XNS0100, '', XNS0095, 1, Enum::"No. Series Implementation"::Sequence);
@@ -168,12 +173,13 @@
         InventorySetup."Automatic Cost Adjustment" := InventorySetup."Automatic Cost Adjustment"::Always;
         InventorySetup."Average Cost Calc. Type" := InventorySetup."Average Cost Calc. Type"::"Item & Location & Variant";
         InventorySetup."Average Cost Period" := InventorySetup."Average Cost Period"::Day;
-
+        InventorySetup."Combined MPS/MRP Calculation" := true;
+        Evaluate(InventorySetup."Default Safety Lead Time", '<1D>');
+        InventorySetup."Current Demand Forecast" := Format(DemoDataSetup."Starting Year" + 1);
         // NAVCZ
         InventorySetup."Def.Tmpl. for Phys.Pos.Adj CZL" := CreateInvtMovementTemplate.GetSurplusCode();
         InventorySetup."Def.Tmpl. for Phys.Neg.Adj CZL" := CreateInvtMovementTemplate.GetDeficiencyCode();
         // NAVCZ
-
         InventorySetup.Modify();
     end;
 }
