@@ -356,6 +356,11 @@ page 44 "Sales Credit Memo"
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies a code to indicate if the document is used for exports to other countries.';
                 }
+                field("CFDI Certificate of Origin No."; Rec."CFDI Certificate of Origin No.")
+                {
+                    ApplicationArea = BasicMX;
+                    ToolTip = 'Specifies the identifier which was used to pay for the issuance of the certificate of origin.';
+                }
                 field(Control1310005; Rec."Foreign Trade")
                 {
                     ApplicationArea = BasicMX;
@@ -620,6 +625,23 @@ page 44 "Sales Credit Memo"
 
                         trigger OnValidate()
                         begin
+                            if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
+                                if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
+                                    Rec.SetRange("Bill-to Customer No.");
+
+                            CurrPage.Update();
+                        end;
+
+                        trigger OnLookup(var Text: Text): Boolean
+                        var
+                            Customer: Record Customer;
+                        begin
+                            if Customer.SelectCustomer(Customer) then begin
+                                xRec := Rec;
+                                Rec."Bill-to Name" := Customer.Name;
+                                Rec.Validate("Bill-to Customer No.", Customer."No.");
+                            end;
+
                             if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
                                 if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
                                     Rec.SetRange("Bill-to Customer No.");
