@@ -14,6 +14,7 @@ using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Segment;
 using Microsoft.Finance.Dimension;
+using Microsoft.Finance.FinancialReports;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Budget;
 using Microsoft.Finance.GeneralLedger.Ledger;
@@ -252,6 +253,7 @@ codeunit 418 "User Management"
         PrinterSelection: Record "Printer Selection";
         SelectedDimension: Record "Selected Dimension";
         FAJournalSetup: Record "FA Journal Setup";
+        FinancialReportRecipient: Record "Financial Report Recipient";
         AnalysisSelectedDimension: Record "Analysis Selected Dimension";
         WarehouseEmployee: Record "Warehouse Employee";
         MyCustomer: Record "My Customer";
@@ -351,6 +353,15 @@ codeunit 418 "User Management"
                 Checklist.UpdateUserName(RecRef, Company, UserName, 1993);
             1994: //User Checklist Status
                 Checklist.UpdateUserName(RecRef, Company, UserName, 1994);
+            Database::"Financial Report Recipient":
+                begin
+                    FinancialReportRecipient.ChangeCompany(Company);
+                    RecRef.SetTable(FinancialReportRecipient);
+                    FinancialReportRecipient.Rename(
+                        FinancialReportRecipient."Financial Report Name",
+                        FinancialReportRecipient."Financial Report Schedule Code",
+                        UserName);
+                end;
         end;
     end;
 

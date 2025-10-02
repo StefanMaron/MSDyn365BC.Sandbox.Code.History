@@ -27,10 +27,8 @@ codeunit 136306 "Job Invoicing"
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryUTUtility: Codeunit "Library UT Utility";
         LibraryUtility: Codeunit "Library - Utility";
-#if not CLEAN25
         LibraryWarehouse: Codeunit "Library - Warehouse";
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
-#endif
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryItemTracking: Codeunit "Library - Item Tracking";
         LibraryCosting: Codeunit "Library - Costing";
@@ -45,9 +43,7 @@ codeunit 136306 "Job Invoicing"
         WrongJobJnlDimensionsErr: Label 'Wrong %1 in General Journal Line.';
         WrongJobLedgerEntryQtyErr: Label 'Wrong Quantity in General Ledger Entry.';
         WrongSalesInvoiceDimensionsErr: Label 'Dimensions must be equal.';
-#if not CLEAN25
         UnitPriceMustNotBeZeroErr: Label 'Field Unit Price of Project Journal Line must not be zero.';
-#endif
         WrongDescriptionInPostedSalesInvoiceErr: Label 'Wrong Description in Sales Invoice Line.';
         TrackingOption: Option "Assign Lot No.","Assign Serial No.";
         CancelPostedInvoiceQst: Label 'This invoice was posted from a sales order. To cancel it, a sales credit memo will be created and posted. The quantities from the original sales order will be restored, provided the sales order still exists.\ \Do you want to continue?';
@@ -869,7 +865,6 @@ codeunit 136306 "Job Invoicing"
           DimensionSetEntrySalesLine."Dimension Value Code", WrongSalesInvoiceDimensionsErr);
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure ChangeQuantityInJobJournalLine()
@@ -906,7 +901,6 @@ codeunit 136306 "Job Invoicing"
         // [THEN] Line's "Unit Price" must be calculated using Item's Unit Cost and Job Item Price factor.
         Assert.AreEqual(Round(ExpectedUnitPrice, 2), Round(JobJournalLine."Unit Price", 2), UnitPriceMustNotBeZeroErr);
     end;
-#endif
 
     [Test]
     [HandlerFunctions('TransferToInvoiceHandler,MessageHandler')]
@@ -4940,7 +4934,6 @@ codeunit 136306 "Job Invoicing"
         SalesInvoiceLine.FindFirst();
     end;
 
-#if not CLEAN25
     local procedure CreateJobJnlLine(var JobJournalLine: Record "Job Journal Line"): Decimal
     var
         Item: Record Item;
@@ -4964,7 +4957,6 @@ codeunit 136306 "Job Invoicing"
         JobJournalLine.Modify(true);
         exit(JobItemPrice."Unit Cost Factor" * Item."Unit Cost");
     end;
-#endif
 
     local procedure UpdateDesriptionInSalesLine(DocumentNo: Code[20]; DocumentType: Enum "Sales Document Type"): Text[50]
     var

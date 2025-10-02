@@ -1,3 +1,4 @@
+#if not CLEAN28
 namespace Microsoft.Sales.Customer;
 
 using Microsoft.Sales.Document;
@@ -8,6 +9,9 @@ query 115 "Sales Shipped Not Invoiced LCY"
     Caption = 'Sales Shipped Not Invoiced (LCY)';
     QueryType = Normal;
     DataAccessIntent = ReadOnly;
+    ObsoleteReason = 'Not used, as Customer.GetShippedFromOrderLCYAmountLCY() procedure is no longer used in GetTotalAmountLCYCommon procedure.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '28.0';
 
     elements
     {
@@ -29,3 +33,4 @@ query 115 "Sales Shipped Not Invoiced LCY"
         }
     }
 }
+#endif

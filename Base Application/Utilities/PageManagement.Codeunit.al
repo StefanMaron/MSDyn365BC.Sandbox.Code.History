@@ -282,11 +282,16 @@ codeunit 700 "Page Management"
 #endif
     var
         SalesHeader: Record "Sales Header";
+        DocumentType: Enum "Sales Document Type";
     begin
         RecRef.SetTable(SalesHeader);
-        if IsNullGuid(SalesHeader.SystemId) then
-            exit(0);
-        case SalesHeader."Document Type" of
+        if IsNullGuid(SalesHeader.SystemId) then begin
+            if not Evaluate(DocumentType, SalesHeader.GetFilter("Document Type")) then
+                exit(0);
+        end else
+            DocumentType := SalesHeader."Document Type";
+
+        case DocumentType of
             SalesHeader."Document Type"::Quote:
                 exit(PAGE::"Sales Quote");
             SalesHeader."Document Type"::Order:
@@ -309,11 +314,16 @@ codeunit 700 "Page Management"
     local procedure GetPurchaseHeaderPageID(RecRef: RecordRef) Result: Integer
     var
         PurchaseHeader: Record "Purchase Header";
+        DocumentType: Enum "Purchase Document Type";
     begin
         RecRef.SetTable(PurchaseHeader);
-        if IsNullGuid(PurchaseHeader.SystemId) then
-            exit(0);
-        case PurchaseHeader."Document Type" of
+        if IsNullGuid(PurchaseHeader.SystemId) then begin
+            if not Evaluate(DocumentType, PurchaseHeader.GetFilter("Document Type")) then
+                exit(0);
+        end else
+            DocumentType := PurchaseHeader."Document Type";
+
+        case DocumentType of
             PurchaseHeader."Document Type"::Quote:
                 Result := PAGE::"Purchase Quote";
             PurchaseHeader."Document Type"::Order:
@@ -333,10 +343,17 @@ codeunit 700 "Page Management"
     local procedure GetPurchaseHeaderPageID(RecRef: RecordRef): Integer
     var
         PurchaseHeader: Record "Purchase Header";
+
+        DocumentType: Enum "Purchase Document Type";
     begin
         RecRef.SetTable(PurchaseHeader);
+        if IsNullGuid(PurchaseHeader.SystemId) then begin
+            if not Evaluate(DocumentType, PurchaseHeader.GetFilter("Document Type")) then
+                exit(0);
+        end else
+            DocumentType := PurchaseHeader."Document Type";
 
-        case PurchaseHeader."Document Type" of
+        case DocumentType of
             PurchaseHeader."Document Type"::Quote:
                 exit(PAGE::"Purchase Quote");
             PurchaseHeader."Document Type"::Order:

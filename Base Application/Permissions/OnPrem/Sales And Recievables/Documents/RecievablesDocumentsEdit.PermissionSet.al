@@ -48,9 +48,7 @@ using Microsoft.Pricing.Source;
 using Microsoft.Pricing.Worksheet;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Projects.Resources.Resource;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Sales.History;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Pricing;
@@ -140,10 +138,8 @@ permissionset 8651 "Recievables Documents - Edit"
                   tabledata "Requisition Line" = Rim,
                   tabledata "Reservation Entry" = Rimd,
                   tabledata Resource = R,
-#if not CLEAN25
                   tabledata "Resource Cost" = R,
                   tabledata "Resource Price" = R,
-#endif
                   tabledata "Resource Unit of Measure" = R,
                   tabledata "Responsibility Center" = R,
                   tabledata "Return Reason" = R,
@@ -156,13 +152,9 @@ permissionset 8651 "Recievables Documents - Edit"
                   tabledata "Sales Invoice Line" = R,
                   tabledata "Sales Line" = RIMD,
                   tabledata "Sales Line Archive" = RIMD,
-#if not CLEAN25
                   tabledata "Sales Line Discount" = R,
-#endif
                   tabledata "Sales Planning Line" = Rimd,
-#if not CLEAN25
                   tabledata "Sales Price" = R,
-#endif
                   tabledata "Sales Price Access" = R,
                   tabledata "Sales Shipment Header" = R,
                   tabledata "Sales Shipment Line" = R,

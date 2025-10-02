@@ -376,16 +376,13 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
     end;
 
     local procedure UpdateEntryDescriptionFromSalesLine(SalesLine: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    var
-        SalesHeader: Record "Sales Header";
     begin
         SalesSetup.Get();
-        SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
         InvoicePostingBuffer.UpdateEntryDescription(
             SalesSetup."Copy Line Descr. to G/L Entry",
             SalesLine."Line No.",
             SalesLine.Description,
-            SalesHeader."Posting Description");
+            SalesLine.GetSalesHeader()."Posting Description");
     end;
 
     local procedure UpdateInvoicePostingBuffer(InvoicePostingBuffer: Record "Invoice Posting Buffer"; ForceGLAccountType: Boolean)
