@@ -1,0 +1,40 @@
+name: Delete vNext Branches
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-vnext-branches:
+    name: Delete All vNext Branches
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4.1.2
+        with:
+          fetch-depth: 0
+
+      - name: Delete vNext Branches
+        shell: bash
+        run: |
+          # Fetch all remote branches
+          git fetch --all
+
+          # Get list of all remote vNext branches
+          vnext_branches=$(git branch -r | grep 'origin/.*-vNext$' | sed 's|origin/||')
+
+          if [ -z "$vnext_branches" ]; then
+            echo "No vNext branches found to delete"
+            exit 0
+          fi
+
+          echo "Found vNext branches to delete:"
+          echo "$vnext_branches"
+
+          # Delete each vNext branch
+          for branch in $vnext_branches; do
+            echo "Deleting branch: $branch"
+            git push origin --delete "$branch"
+          done
+
+          echo "All vNext branches deleted successfully"
