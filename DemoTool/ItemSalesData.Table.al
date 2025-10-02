@@ -17,6 +17,7 @@ table 122003 "Item Sales Data"
         field(3; Quantity; Decimal)
         {
             Caption = 'Quantity';
+            AutoFormatType = 0;
         }
         field(4; "Number of Invoices"; Integer)
         {
@@ -25,6 +26,7 @@ table 122003 "Item Sales Data"
         field(5; "Scale to Average Quantity"; Decimal)
         {
             Caption = 'Scale to Average Quantity';
+            AutoFormatType = 0;
         }
     }
 
@@ -39,4 +41,3 @@ table 122003 "Item Sales Data"
     {
     }
 }
-
