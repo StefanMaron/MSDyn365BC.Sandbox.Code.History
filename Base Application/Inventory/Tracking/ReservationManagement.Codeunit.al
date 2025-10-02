@@ -372,7 +372,7 @@ codeunit 99000845 "Reservation Management"
                     UpdateItemTrackingLineStats(CalcReservEntry, TempEntrySummary, AvailabilityDate);
             end;
 
-            OnUpdateStatistics(CalcReservEntry, TempEntrySummary, AvailabilityDate, Positive, TotalQuantity, HandleItemTracking2, QtyOnOutBound);
+            OnUpdateStatistics(CalcReservEntry, TempEntrySummary, AvailabilityDate, Positive, TotalQuantity, HandleItemTracking2, QtyOnOutBound, ValueArray[i]);
         end;
 
         OnAfterUpdateStatistics(TempEntrySummary, AvailabilityDate, TotalQuantity);
@@ -624,7 +624,7 @@ codeunit 99000845 "Reservation Management"
 
         case ReservSummaryType of
             Enum::"Reservation Summary Type"::"Item Ledger Entry":
-                AutoReserveItemLedgEntry(
+                AutoManageReservationItemLedgerEntry(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate);
             Enum::"Reservation Summary Type"::"Purchase Order",
             Enum::"Reservation Summary Type"::"Purchase Return Order":
@@ -1090,6 +1090,7 @@ codeunit 99000845 "Reservation Management"
                             end;
                             SetQtyToReserveDownToTrackedQuantity(
                                 CalcReservEntry, TransLine.RowID1(TransferDirection::Inbound), QtyThisLine, QtyThisLineBase);
+                            SetReservedQtyDownToTrackedQuantity(CalcReservEntry, TransLine.RowID1(TransferDirection::Inbound), ReservQty);
                         end;
                 end;
 
@@ -2802,6 +2803,27 @@ codeunit 99000845 "Reservation Management"
         QtyThisLineBase := GetMinAbs(QtyThisLineBase, MaxReservQtyBasePerLotOrSerial) * GetSign(QtyThisLineBase);
     end;
 
+    local procedure SetReservedQtyDownToTrackedQuantity(ReservEntry: Record "Reservation Entry"; RowID: Text[250]; var ReserveQty: Decimal)
+    var
+        FilterReservEntry: Record "Reservation Entry";
+        TempTrackingSpec: Record "Tracking Specification" temporary;
+        ItemTrackingMgt: Codeunit "Item Tracking Management";
+    begin
+        if not ReservEntry.TrackingExists() then
+            exit;
+
+        FilterReservEntry.SetPointer(RowID);
+        FilterReservEntry.SetPointerFilter();
+        FilterReservEntry.SetTrackingFilterFromReservEntry(ReservEntry);
+        FilterReservEntry.SetRange("Reservation Status", FilterReservEntry."Reservation Status"::Reservation);
+        ItemTrackingMgt.SumUpItemTracking(FilterReservEntry, TempTrackingSpec, true, true);
+
+        if TempTrackingSpec.IsEmpty then
+            ReserveQty := 0
+        else
+            ReserveQty := TempTrackingSpec."Quantity (Base)";
+    end;
+
     local procedure IsSpecialOrderOrDropShipment(ReservationEntry: Record "Reservation Entry"): Boolean
     var
         SalesLine: Record "Sales Line";
@@ -2891,6 +2913,49 @@ codeunit 99000845 "Reservation Management"
                     JobPlanningLine.TestField(Type, JobPlanningLine.Type::Item);
                 end;
         end;
+    end;
+
+    local procedure AutoManageReservationItemLedgerEntry(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date)
+    begin
+        if not HandleItemTracking then
+            AutoReserveItemLedgerEntryFromSurplus(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate);
+        if RemainingQtyToReserveBase <> 0 then
+            AutoReserveItemLedgEntry(ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate);
+    end;
+
+    local procedure AutoReserveItemLedgerEntryFromSurplus(ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date)
+    var
+        ReservationEntry: Record "Reservation Entry";
+    begin
+        if CalcReservEntry.TrackingExists() then
+            exit;
+
+        ReservationEntry.SetSourceFilterFromReservEntry(CalcReservEntry);
+        ReservationEntry.SetRange("Reservation Status", ReservationEntry."Reservation Status"::Surplus);
+        if ReservationEntry.FindSet() then
+            repeat
+                AutoReserveFromSpecificReservEntry(ReservationEntry, ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate)
+            until ReservationEntry.Next() = 0;
+    end;
+
+    local procedure AutoReserveFromSpecificReservEntry(ReservationEntry: Record "Reservation Entry"; ReservSummEntryNo: Integer; var RemainingQtyToReserve: Decimal; var RemainingQtyToReserveBase: Decimal; Description: Text[100]; AvailabilityDate: Date)
+    var
+        QtyToReserve: Decimal;
+        QtyToReserveBase: Decimal;
+    begin
+        if not ReservationEntry.TrackingExists() then
+            exit;
+
+        CalcReservEntry.CopyTrackingFromReservEntry(ReservationEntry);
+        QtyToReserve := Abs(ReservationEntry.Quantity);
+        QtyToReserveBase := Abs(ReservationEntry."Qty. to Handle (Base)");
+        AutoReserveItemLedgEntry(ReservSummEntryNo, QtyToReserve, QtyToReserveBase, Description, AvailabilityDate);
+        if Abs(ReservationEntry."Qty. to Handle (Base)") = QtyToReserveBase then begin
+            CalcReservEntry.ClearTracking();
+            exit;
+        end;
+        RemainingQtyToReserve -= Abs(ReservationEntry.Quantity);
+        RemainingQtyToReserveBase -= Abs(ReservationEntry."Qty. to Handle (Base)");
     end;
 
     [IntegrationEvent(false, false)]
@@ -3277,7 +3342,7 @@ codeunit 99000845 "Reservation Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateStatistics(CalcReservEntry: Record "Reservation Entry"; var ReservSummEntry: Record "Entry Summary"; AvailabilityDate: Date; Positive: Boolean; var TotalQuantity: Decimal; HandleItemTracking2: Boolean; var QtyOnOutBound: Decimal)
+    local procedure OnUpdateStatistics(CalcReservEntry: Record "Reservation Entry"; var ReservSummEntry: Record "Entry Summary"; AvailabilityDate: Date; Positive: Boolean; var TotalQuantity: Decimal; HandleItemTracking2: Boolean; var QtyOnOutBound: Decimal; ReservationSummaryType: Integer)
     begin
     end;
 
