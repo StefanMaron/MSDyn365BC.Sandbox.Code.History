@@ -742,12 +742,13 @@ codeunit 99000854 "Inventory Profile Offsetting"
         Item.CopyFilter("Location Filter", ForecastEntry2."Location Code");
 
         for ComponentForecast := ComponentForecastFrom to true do begin
-            if ComponentForecast then begin
-                if not FindReplishmentLocation(ReplenishmentLocation, Item) then
-                    ReplenishmentLocation := ManufacturingSetup."Components at Location";
-                if InvtSetup."Location Mandatory" and (ReplenishmentLocation = '') then
-                    exit;
-            end;
+            if not ManufacturingSetup."Use Forecast on Locations" then
+                if ComponentForecast then begin
+                    if not FindReplishmentLocation(ReplenishmentLocation, Item) then
+                        ReplenishmentLocation := ManufacturingSetup."Components at Location";
+                    if InvtSetup."Location Mandatory" and (ReplenishmentLocation = '') then
+                        exit;
+                end;
             ForecastEntry.SetRange("Component Forecast", ComponentForecast);
             ForecastEntry2.SetRange("Component Forecast", ComponentForecast);
             if ForecastEntry2.Find('-') then
@@ -1166,11 +1167,12 @@ codeunit 99000854 "Inventory Profile Offsetting"
         ReservEntry.SetFilter(ReservEntry."Reservation Status", '<>%1', ReservEntry."Reservation Status"::Prospect);
         if ReservEntry.Find('-') then
             repeat
+                Item.SetLoadFields("Manufacturing Policy", "Replenishment System", "Reordering Policy", "Order Tracking Policy");
                 Item.Get(ReservEntry."Item No.");
                 if not IsTrkgForSpecialOrderOrDropShpt(ReservEntry) then begin
                     if ShouldDeleteReservEntry(ReservEntry, ToDate) then begin
                         ResEntryWasDeleted := true;
-                        if (ReservEntry."Source Type" = Database::"Item Ledger Entry") and
+                        if ((ReservEntry."Source Type" = Database::"Item Ledger Entry") or CheckReorderingPolicyAndOrderTrackingPolicy(Item)) and
                            (ReservEntry."Reservation Status" = ReservEntry."Reservation Status"::Tracking)
                         then
                             if ReservEntry1.Get(ReservEntry."Entry No.", not ReservEntry.Positive) then
@@ -2337,8 +2339,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                               TempSKU."Reorder Quantity";
                 end;
 
-            if ((TempSKU."Replenishment System" = TempSKU."Replenishment System"::"Prod. Order") and (TempSKU."Manufacturing Policy" = TempSKU."Manufacturing Policy"::"Make-to-Stock"))
-                or (TempSKU."Replenishment System" = TempSKU."Replenishment System"::Purchase) then
+            if IsReorderQtyToAdjust(TempSKU) then
                 ReorderQty += AdjustReorderQty(ReorderQty, TempSKU, SupplyInvtProfile."Line No.", SupplyInvtProfile."Min. Quantity");
             SupplyInvtProfile."Max. Quantity" := TempSKU."Maximum Order Quantity";
         end;
@@ -5249,6 +5250,24 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 if CheckItemInventoryExists(SupplyInvtProfile) then
                     exit(true);
         end;
+    end;
+
+    local procedure IsReorderQtyToAdjust(StockkeepingUnit: Record "Stockkeeping Unit"): Boolean
+    begin
+        exit(not ((StockkeepingUnit."Reordering Policy" = StockkeepingUnit."Reordering Policy"::"Lot-for-Lot") and (StockkeepingUnit."Manufacturing Policy" = StockkeepingUnit."Manufacturing Policy"::"Make-to-Order")) or
+            ((StockkeepingUnit."Replenishment System" = StockkeepingUnit."Replenishment System"::"Prod. Order") and (StockkeepingUnit."Manufacturing Policy" = StockkeepingUnit."Manufacturing Policy"::"Make-to-Stock")) or
+            (StockkeepingUnit."Replenishment System" in [StockkeepingUnit."Replenishment System"::Purchase, StockkeepingUnit."Replenishment System"::Assembly]))
+    end;
+
+    local procedure CheckReorderingPolicyAndOrderTrackingPolicy(Item: Record Item): Boolean
+    begin
+        if not (Item."Reordering Policy" in ["Reordering Policy"::"Fixed Reorder Qty.", "Reordering Policy"::"Lot-for-Lot"]) then
+            exit(false);
+
+        if Item."Order Tracking Policy" <> Item."Order Tracking Policy"::"Tracking Only" then
+            exit(false);
+
+        exit(true);
     end;
 
     [IntegrationEvent(false, false)]
