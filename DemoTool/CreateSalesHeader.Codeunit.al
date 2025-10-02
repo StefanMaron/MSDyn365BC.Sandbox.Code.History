@@ -135,7 +135,7 @@ codeunit 101036 "Create Sales Header"
         "Sales Header".Modify();
     end;
 
-    procedure SetPackage("Shipping Agent Code": Code[10]; "Package Tracking No.": Text[30])
+    procedure SetPackage("Shipping Agent Code": Code[10]; "Package Tracking No.": Text[50])
     begin
         "Sales Header"."Shipping Agent Code" := "Shipping Agent Code";
         "Sales Header"."Package Tracking No." := "Package Tracking No.";
@@ -161,4 +161,3 @@ codeunit 101036 "Create Sales Header"
         InsertData(3, '10000', 19030127D, 'SCM-1002', false, '');
     end;
 }
-
