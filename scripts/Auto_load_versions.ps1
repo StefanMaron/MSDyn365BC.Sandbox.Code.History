@@ -26,7 +26,19 @@ $Versions | Sort-Object -Property Country, Version | % {
     [version]$Version = $_.Version
     $country = $_.Country.Trim()
     Write-Host ($($country)-$($version.ToString()))
-    
+
+    # Defensive check: clean up any stuck rebase state before processing
+    $RebaseMergeDir = Join-Path (Get-Location) ".git/rebase-merge"
+    $RebaseApplyDir = Join-Path (Get-Location) ".git/rebase-apply"
+    if ((Test-Path $RebaseMergeDir) -or (Test-Path $RebaseApplyDir)) {
+        Write-Host "WARNING: Detected stuck rebase state, cleaning up..."
+        git rebase --abort 2>&1 | Out-Null
+        git rebase --quit 2>&1 | Out-Null
+        # Force remove directories if git commands failed
+        if (Test-Path $RebaseMergeDir) { Remove-Item -Recurse -Force $RebaseMergeDir }
+        if (Test-Path $RebaseApplyDir) { Remove-Item -Recurse -Force $RebaseApplyDir }
+    }
+
     git fetch --all
 
     $LastCommit = git log --all --grep="^$($country)-$($version.ToString())$"
@@ -148,9 +160,22 @@ $Versions | Sort-Object -Property Country, Version | % {
             $RebaseResult = git rebase --onto $NewCommitHash $InsertionPoint "$($country)-$($Version.Major)" 2>&1
 
             if ($LASTEXITCODE -ne 0) {
-                Write-Host "Rebase failed, aborting..."
-                git rebase --abort
-                throw "Rebase failed: $RebaseResult"
+                Write-Host "##[error]Rebase failed for late hotfix $($country)-$($Version.ToString())"
+                Write-Host "Rebase output: $RebaseResult"
+
+                # Clean up rebase state
+                git rebase --abort 2>&1 | Out-Null
+                git rebase --quit 2>&1 | Out-Null
+
+                # Force cleanup directories if commands failed
+                $RebaseMergeDir = Join-Path (Get-Location) ".git/rebase-merge"
+                $RebaseApplyDir = Join-Path (Get-Location) ".git/rebase-apply"
+                if (Test-Path $RebaseMergeDir) { Remove-Item -Recurse -Force $RebaseMergeDir }
+                if (Test-Path $RebaseApplyDir) { Remove-Item -Recurse -Force $RebaseApplyDir }
+
+                # Use exit instead of throw to bypass SilentlyContinue
+                Write-Host "##[error]Exiting due to rebase failure"
+                exit 1
             }
 
             git gc | out-null
