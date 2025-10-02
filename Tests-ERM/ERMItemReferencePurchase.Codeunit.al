@@ -19,6 +19,15 @@ codeunit 134464 "ERM Item Reference Purchase"
         LibraryWarehouse: Codeunit "Library - Warehouse";
         Assert: Codeunit Assert;
         ItemReferenceMgt: Codeunit "Item Reference Management";
+        LibraryERM: Codeunit "Library - ERM";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryItemReference: Codeunit "Library - Item Reference";
+        LibraryPurchase: Codeunit "Library - Purchase";
+        LibraryRandom: Codeunit "Library - Random";
+        LibraryTestInitialize: Codeunit "Library - Test Initialize";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibraryVariableStorage: Codeunit "Library - Variable Storage";
+        LibraryWarehouse: Codeunit "Library - Warehouse";
         ItemRefNotExistsErr: Label 'There are no items with reference %1.';
         DialogCodeErr: Label 'Dialog';
         DescriptionMustBeSameErr: Label 'Description must be same.';
