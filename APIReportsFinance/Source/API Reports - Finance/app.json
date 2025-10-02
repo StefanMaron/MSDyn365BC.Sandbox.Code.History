@@ -13,7 +13,7 @@
   "screenshots": [],
   "platform": "25.0.0.0",
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2134520",
-  "application": "25.0.0.0",
+  "application": "25.1.0.0",
   "idRanges": [
     {
       "from": 30300,
