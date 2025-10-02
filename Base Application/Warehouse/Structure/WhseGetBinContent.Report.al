@@ -34,7 +34,7 @@ report 7391 "Whse. Get Bin Content"
 
                 QtyToEmptyBase := GetQtyToEmptyBase(DummyItemTrackingSetup);
                 ShouldSkipReportForQty := QtyToEmptyBase <= 0;
-                OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty("Bin Content", ShouldSkipReportForQty, DestinationType2, WhseWorksheetLine, WhseInternalPutawayLine, ItemJournalLine, TransferLine, InternalMovementLine);
+                OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty("Bin Content", ShouldSkipReportForQty, DestinationType2, WhseWorksheetLine, WhseInternalPutawayLine, ItemJournalLine, TransferLine, InternalMovementLine, PostingDate, DocNo);
                 if ShouldSkipReportForQty then
                     CurrReport.Skip();
 
@@ -360,6 +360,7 @@ report 7391 "Whse. Get Bin Content"
         ItemTrackingSetup: Record "Item Tracking Setup";
         WarehouseEntry: Record "Warehouse Entry";
         TempTrackingSpecification: Record "Tracking Specification" temporary;
+        WhseItemTrackingSetup: Record "Item Tracking Setup";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         ItemJnlLineReserve: Codeunit "Item Jnl. Line-Reserve";
         TransferLineReserve: Codeunit "Transfer Line-Reserve";
@@ -374,13 +375,18 @@ report 7391 "Whse. Get Bin Content"
             exit;
 
         Clear(ItemTrackingMgt);
-        if not ItemTrackingMgt.GetWhseItemTrkgSetup(BinContent."Item No.") then
+        if not ItemTrackingMgt.GetWhseItemTrkgSetup(BinContent."Item No.", WhseItemTrackingSetup) then
             exit;
 
         WarehouseEntry.Reset();
-        WarehouseEntry.SetCurrentKey(
-          "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
-          "Lot No.", "Package No.", "Serial No.", "Entry Type", Dedicated);
+        if WhseItemTrackingSetup."Serial No. Required" then
+            WarehouseEntry.SetCurrentKey(
+                "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
+                "Package No.", "Serial No.", "Entry Type", Dedicated)
+        else
+            WarehouseEntry.SetCurrentKey(
+              "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code",
+              "Lot No.", "Package No.", "Serial No.", "Entry Type", Dedicated);
         WarehouseEntry.SetRange("Item No.", BinContent."Item No.");
         WarehouseEntry.SetRange("Bin Code", BinContent."Bin Code");
         WarehouseEntry.SetRange("Location Code", BinContent."Location Code");
@@ -506,7 +512,7 @@ report 7391 "Whse. Get Bin Content"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty(var BinContent: Record "Bin Content"; var ShouldSkipReportForQty: Boolean; DestinationType2: Enum "Warehouse Destination Type 2"; WhseWorksheetLine: Record "Whse. Worksheet Line"; WhseInternalPutawayLine: Record "Whse. Internal Put-away Line"; ItemJournalLine: Record "Item Journal Line"; TransferLine: Record "Transfer Line"; InternalMovementLine: Record "Internal Movement Line")
+    local procedure OnBinContenOnAfterGetRecordOnAfterCalcShouldSkipReportForQty(var BinContent: Record "Bin Content"; var ShouldSkipReportForQty: Boolean; DestinationType2: Enum "Warehouse Destination Type 2"; WhseWorksheetLine: Record "Whse. Worksheet Line"; WhseInternalPutawayLine: Record "Whse. Internal Put-away Line"; ItemJournalLine: Record "Item Journal Line"; TransferLine: Record "Transfer Line"; InternalMovementLine: Record "Internal Movement Line"; PostingDate: Date; DocumentNo: Code[20])
     begin
     end;
 
