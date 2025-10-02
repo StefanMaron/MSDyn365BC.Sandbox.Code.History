@@ -1464,7 +1464,6 @@ page 21 "Customer Card"
                         PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
-#if not CLEAN25
                 action(PriceListsDiscounts)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1472,9 +1471,6 @@ page 21 "Customer Card"
                     Image = LineDiscount;
                     Visible = false;
                     ToolTip = 'View or set up different discounts for products that you sell to the customer. A product line discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action PriceLists shows all sales price lists with prices and discounts';
-                    ObsoleteTag = '18.0';
 
                     trigger OnAction()
                     var
@@ -1484,8 +1480,6 @@ page 21 "Customer Card"
                         PriceUXManagement.ShowPriceLists(Rec, AmountType::Discount);
                     end;
                 }
-#endif
-#if not CLEAN25
                 action(Prices)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1493,9 +1487,6 @@ page 21 "Customer Card"
                     Image = Price;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View or set up different prices for items that you sell to the customer. An item price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
 
                     trigger OnAction()
                     var
@@ -1514,9 +1505,6 @@ page 21 "Customer Card"
                     Image = LineDiscount;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View or set up different discounts for items that you sell to the customer. An item discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
 
                     trigger OnAction()
                     var
@@ -1535,9 +1523,6 @@ page 21 "Customer Card"
                     Image = PriceWorksheet;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View all the sales prices and line discounts that you grant for this customer when certain criteria are met, such as quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
 
                     trigger OnAction()
                     var
@@ -1548,7 +1533,6 @@ page 21 "Customer Card"
                         SalesPriceAndLineDiscounts.RunModal();
                     end;
                 }
-#endif
             }
             group(Action82)
             {
@@ -2289,33 +2273,18 @@ page 21 "Customer Card"
             group(Category_Category7)
             {
                 Caption = 'Prices & Discounts', Comment = 'Generated from the PromotedActionCategories property index 6.';
-#if not CLEAN25
                 actionref(Prices_Promoted; Prices)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
-#if not CLEAN25
                 actionref("Line Discounts_Promoted"; "Line Discounts")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
                 actionref(PriceLists_Promoted; PriceLists)
                 {
                 }
-#if not CLEAN25
                 actionref("Prices and Discounts Overview_Promoted"; "Prices and Discounts Overview")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
                 actionref(PriceLines_Promoted; PriceLines)
                 {
                 }

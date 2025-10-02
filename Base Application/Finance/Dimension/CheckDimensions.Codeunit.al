@@ -74,15 +74,20 @@ codeunit 481 "Check Dimensions"
     end;
 
     local procedure CheckPurchDimLines(PurchaseHeader: Record "Purchase Header"; var TempPurchaseLine: Record "Purchase Line" temporary)
+    var
+        CheckDimensions: Boolean;
     begin
         TempPurchaseLine.Reset();
         TempPurchaseLine.SetFilter(Type, '<>%1', TempPurchaseLine.Type::" ");
         if TempPurchaseLine.FindSet() then
             repeat
-                if (PurchaseHeader.Receive and (TempPurchaseLine."Qty. to Receive" <> 0)) or
-                    (PurchaseHeader.Invoice and (TempPurchaseLine."Qty. to Invoice" <> 0)) or
-                    (PurchaseHeader.Ship and (TempPurchaseLine."Return Qty. to Ship" <> 0))
-                then begin
+                CheckDimensions := (PurchaseHeader.Receive and (TempPurchaseLine."Qty. to Receive" <> 0)) or
+                (PurchaseHeader.Invoice and (TempPurchaseLine."Qty. to Invoice" <> 0)) or
+                    (PurchaseHeader.Ship and (TempPurchaseLine."Return Qty. to Ship" <> 0));
+                if not CheckDimensions then
+                    OnCheckPurchDimLinesOnBeforeCheckDim(PurchaseHeader, TempPurchaseLine, CheckDimensions);
+
+                if CheckDimensions then begin
                     CheckPurchDimCombLine(TempPurchaseLine);
                     CheckPurchDimValuePostingLine(TempPurchaseLine);
                     OnCheckPurchDimLinesOnAfterCheckPurchDimValuePostingLine(TempPurchaseLine);
@@ -464,6 +469,11 @@ codeunit 481 "Check Dimensions"
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckDimValuePostingOnAfterCreateDimTableIDs(RecordVariant: Variant; var TableIDArr: array[10] of Integer; var NumberArr: array[10] of Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckPurchDimLinesOnBeforeCheckDim(PurchaseHeader: Record "Purchase Header"; var TempPurchaseLine: Record "Purchase Line" temporary; var CheckDimensions: Boolean)
     begin
     end;
 }

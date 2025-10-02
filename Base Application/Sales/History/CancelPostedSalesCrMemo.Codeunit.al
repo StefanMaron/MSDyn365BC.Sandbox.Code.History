@@ -65,6 +65,7 @@ codeunit 1339 "Cancel Posted Sales Cr. Memo"
     var
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
+        PageManagement: Codeunit "Page Management";
         IsHandled: Boolean;
     begin
         TestCorrectCrMemoIsAllowed(SalesCrMemoHeader);
@@ -75,7 +76,7 @@ codeunit 1339 "Cancel Posted Sales Cr. Memo"
                     IsHandled := false;
                     OnBeforeShowPostedSalesInvoice(SalesInvHeader, IsHandled);
                     if not IsHandled then
-                        PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
+                        PageManagement.PageRun(SalesInvHeader);
                 end
             end else begin
                 SalesHeader.SetRange("Applies-to Doc. No.", SalesCrMemoHeader."No.");

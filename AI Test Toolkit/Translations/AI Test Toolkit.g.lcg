@@ -4820,15 +4820,6 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=XmlPort AIT Test Suite Import/Export - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";XmlPort 3065248582 - XmlPortNode 3004954119 - Method 3093245866 - NamedType 3193960831" ItemType=";XmlPort - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The test suite %1 is already imported with a different XML by the same app. Please delete the test suite and import again.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = Test Suite Code]D;]A;(Namespace=System.TestTools.AITestToolkit)(LookupHint=XmlPort AIT Test Suite Import/Export - XmlPortNode Code - Method OnAfterAssignField - NamedType SameSuiteDifferentXMLErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";XmlPort 3065248582 - XmlPortNode 3004954119 - Method 3093245866 - NamedType 1512260591" ItemType=";XmlPort - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The test suite %1 is already imported by a different app. Please rename the test suite and import again.]]></Val>

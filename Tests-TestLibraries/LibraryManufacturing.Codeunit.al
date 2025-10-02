@@ -19,7 +19,6 @@ codeunit 132202 "Library - Manufacturing"
         LibraryItemTracking: Codeunit "Library - Item Tracking";
         Assert: Codeunit Assert;
         BOMItemLineNo: Integer;
-        TemplateName: Label 'FOR. LABOR';
         BatchName: Label 'DEFAULT', Comment = 'Default Batch';
         OutputConsumpMismatchTxt: Label 'Output Cost in Prod. Order %1, line %2 does not match Consumption.';
         OutputVarianceMismatchTxt: Label 'Output Cost including Variance in Prod. Order %1, line %2 does not match total Standard Cost of Produced Item.';
@@ -1078,7 +1077,7 @@ codeunit 132202 "Library - Manufacturing"
         ReqJnlManagement.WkshTemplateSelection(PAGE::"Subcontracting Worksheet", false, "Req. Worksheet Template Type"::"For. Labor", RequisitionLine, JnlSelected);
         if not JnlSelected then
             Error('');
-        RequisitionLine."Worksheet Template Name" := TemplateName;
+        RequisitionLine."Worksheet Template Name" := CopyStr(Format("Req. Worksheet Template Type"::"For. Labor"), 1, MaxStrLen(RequisitionLine."Worksheet Template Name"));
         RequisitionLine."Journal Batch Name" := BatchName;
         OnBeforeOpenJournal(RequisitionLine, Handled);
         if Handled then

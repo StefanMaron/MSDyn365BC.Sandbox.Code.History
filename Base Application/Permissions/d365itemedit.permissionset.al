@@ -83,20 +83,16 @@ permissionset 5947 "D365 ITEM, EDIT"
                   tabledata "Purch. Inv. Line" = r,
                   tabledata "Purch. Rcpt. Line" = r,
                   tabledata "Purchase Discount Access" = RIMD,
-#if not CLEAN25
                   tabledata "Purchase Line Discount" = RIMD,
                   tabledata "Purchase Price" = RIMD,
-#endif
                   tabledata "Purchase Price Access" = RIMD,
                   tabledata "Return Receipt Line" = r,
                   tabledata "Return Shipment Line" = r,
                   tabledata "Sales Cr.Memo Line" = r,
                   tabledata "Sales Discount Access" = RimD,
                   tabledata "Sales Invoice Line" = r,
-#if not CLEAN25
                   tabledata "Sales Line Discount" = RimD,
                   tabledata "Sales Price" = RIMD,
-#endif
                   tabledata "Sales Price Access" = RIMD,
                   tabledata "Sales Shipment Line" = r,
                   tabledata "Special Equipment" = R,

@@ -6,9 +6,7 @@ namespace Microsoft.Sales.Pricing;
 
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
-#if not CLEAN25
 using Microsoft.Pricing.Calculation;
-#endif
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
 using Microsoft.Projects.Project.Pricing;
@@ -501,14 +499,12 @@ page 7016 "Sales Price List"
         }
     }
 
-#if not CLEAN25
     trigger OnInit()
     var
         FeaturePriceCalculation: Codeunit "Feature - Price Calculation";
     begin
         FeaturePriceCalculation.FailIfFeatureDisabled();
     end;
-#endif
 
     trigger OnOpenPage()
     var

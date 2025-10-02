@@ -26,9 +26,7 @@ codeunit 136309 "Job Posting"
         LibraryRandom: Codeunit "Library - Random";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
-#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
-#endif
         LibraryNoSeries: Codeunit "Library - No. Series";
         Any: Codeunit Any;
         TargetJobNo: Code[20];
@@ -909,7 +907,6 @@ codeunit 136309 "Job Posting"
             JobLedgerEntry.TableCaption()));
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure JobPlanningLineUnitPriceWithItemSalesPrice()
@@ -940,7 +937,6 @@ codeunit 136309 "Job Posting"
         // 3. Verify: Verify Unit Price on Job Planning Line.
         JobPlanningLine.TestField("Unit Price", SalesPrice."Unit Price");
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]

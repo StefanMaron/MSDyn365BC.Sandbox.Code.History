@@ -1,5 +1,4 @@
-#if not CLEAN25
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -24,9 +23,6 @@ using Microsoft.Sales.Document;
 
 codeunit 7010 "Purch. Price Calc. Mgt."
 {
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-    ObsoleteTag = '16.0';
 
     trigger OnRun()
     begin
@@ -70,7 +66,7 @@ codeunit 7010 "Purch. Price Calc. Mgt."
             exit;
 
         SetCurrency(PurchHeader."Currency Code", PurchHeader."Currency Factor", PurchHeaderExchDate(PurchHeader));
-        SetVAT(PurchHeader."Prices Including VAT", PurchLine."VAT %", PurchLine."VAT Bus. Posting Group");
+        SetVAT(PurchHeader."Prices Including VAT", PurchLine.GetVATPct(), PurchLine."VAT Bus. Posting Group");
         SetUoM(Abs(PurchLine.Quantity), PurchLine."Qty. per Unit of Measure");
         SetLineDisc(PurchLine."Line Discount %");
 
@@ -1167,4 +1163,3 @@ codeunit 7010 "Purch. Price Calc. Mgt."
     begin
     end;
 }
-#endif

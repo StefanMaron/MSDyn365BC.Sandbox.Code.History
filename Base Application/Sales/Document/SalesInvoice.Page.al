@@ -843,6 +843,7 @@ page 43 "Sales Invoice"
                             var
                                 Customer: Record Customer;
                             begin
+                                OnBeforeLookupBillToName(Customer, Rec);
                                 if Customer.SelectCustomer(Customer) then begin
                                     xRec := Rec;
                                     Rec."Bill-to Name" := Customer.Name;
@@ -2110,6 +2111,7 @@ page 43 "Sales Invoice"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         OfficeMgt: Codeunit "Office Management";
         InstructionMgt: Codeunit "Instruction Mgt.";
+        PageManagement: Codeunit "Page Management";
         PreAssignedNo: Code[20];
         xLastPostingNo: Code[20];
         IsScheduledPosting: Boolean;
@@ -2145,7 +2147,7 @@ page 43 "Sales Invoice"
                 SalesInvoiceHeader.SetRange("Pre-Assigned No.", PreAssignedNo);
             end;
             if SalesInvoiceHeader.FindFirst() then
-                PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
+                PageManagement.PageRun(SalesInvoiceHeader);
         end else
             case Navigate of
                 Enum::"Navigate After Posting"::"Posted Document":
@@ -2335,6 +2337,11 @@ page 43 "Sales Invoice"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnQueryClosePage(var SalesHeader: Record "Sales Header"; DocumentIsPosted: Boolean; CloseAction: Action; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLookupBillToName(var Customer: Record Customer; SalesHeader: Record "Sales Header")
     begin
     end;
 }

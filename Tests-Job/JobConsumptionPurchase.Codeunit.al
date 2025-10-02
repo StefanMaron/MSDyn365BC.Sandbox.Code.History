@@ -4409,10 +4409,8 @@ codeunit 136302 "Job Consumption Purchase"
     local procedure Initialize()
     var
         WarehouseEmployee: Record "Warehouse Employee";
-#if not CLEAN25
         PurchasePrice: Record "Purchase Price";
         SalesPrice: Record "Sales Price";
-#endif
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"Job Consumption Purchase");
@@ -4432,11 +4430,9 @@ codeunit 136302 "Job Consumption Purchase"
         LibraryERMCountryData.UpdateGeneralPostingSetup();
         LibraryERMCountryData.UpdatePurchasesPayablesSetup();
         LibraryInventory.UpdateGenProdPostingSetup();
-#if not CLEAN25
         // Removing special prices
         PurchasePrice.DeleteAll(true);
         SalesPrice.DeleteAll(true);
-#endif
         LibrarySetupStorage.Save(DATABASE::"Inventory Setup");
         LibrarySetupStorage.Save(DATABASE::"Purchases & Payables Setup");
 

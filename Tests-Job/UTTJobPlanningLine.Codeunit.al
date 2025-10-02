@@ -21,9 +21,7 @@ codeunit 136353 "UT T Job Planning Line"
         LibraryResource: Codeunit "Library - Resource";
         LibrarySales: Codeunit "Library - Sales";
         LibraryUtility: Codeunit "Library - Utility";
-#if not CLEAN25
         CopyFromToPriceListLine: Codeunit CopyFromToPriceListLine;
-#endif
         IsInitialized: Boolean;
         EmptyLocationCodeErr: Label 'Location Code must have a value in Order Promising Line';
         ActualTxt: Label 'Actual: ';
@@ -512,7 +510,6 @@ codeunit 136353 "UT T Job Planning Line"
         Assert.ExpectedError(CannotRemoveJobPlanningLineErr);
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure LineDiscountPctInJobPlanningLineWhenAllowLineDiscDefinedInCustPriceGroup()
@@ -582,7 +579,6 @@ codeunit 136353 "UT T Job Planning Line"
         // [THEN] "Line Discount %" in Job Planning Line is zero
         JobPlanningLine.TestField("Line Discount %", 0);
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -1045,7 +1041,6 @@ codeunit 136353 "UT T Job Planning Line"
         JobPlanningLine.TestField("Description 2", ItemVariant."Description 2");
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure NoLineDiscountInJobPlanningLineWhenNoAllowLineDiscInSalesPriceForAllCustomersAndVariant()
@@ -1108,7 +1103,6 @@ codeunit 136353 "UT T Job Planning Line"
         // [THEN] "Line Discount %" in Job Planning Line is 0%
         JobPlanningLine.TestField("Line Discount %", 0);
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -1548,15 +1542,8 @@ codeunit 136353 "UT T Job Planning Line"
         Item: Record Item;
         Job: Record Job;
         JobTask: Record "Job Task";
-#if not CLEAN25
         JobItemPrice: Record "Job Item Price";
-#else
-        PriceListLine: Record "Price List Line";
-#endif
         JobPlanningLine: Record "Job Planning Line";
-#if CLEAN25
-        LibraryPriceCalculation: Codeunit "Library - Price Calculation";
-#endif
         CostFactor: Decimal;
         UnitPrice: Decimal;
     begin
@@ -1571,18 +1558,10 @@ codeunit 136353 "UT T Job Planning Line"
         // [GIVEN] Price line for Job and Item, where "Cost Factor" is set
         CostFactor := LibraryRandom.RandDec(10, 1);
         Item.Get(JobPlanningLine."No.");
-#if not CLEAN25
         LibraryJob.CreateJobItemPrice(
             JobItemPrice, Job."No.", JobTask."Job Task No.", JobPlanningLine."No.", '', '', Item."Base Unit of Measure");
         JobItemPrice.Validate("Unit Cost Factor", CostFactor);
         JobItemPrice.Modify();
-#else
-        LibraryPriceCalculation.CreateSalesPriceLine(
-            PriceListLine, '', "Price Source Type"::Job, Job."No.", "Price Asset Type"::Item, JobPlanningLine."No.");
-        PriceListLine.Validate("Cost Factor", CostFactor);
-        PriceListLine.Status := "Price Status"::Active;
-        PriceListLine.Modify();
-#endif
 
         // [GIVEN] Job planning line, where "Unit Price" is 15, calculated by "Cost Factor"
         JobPlanningLine.Validate(Quantity, 1);
@@ -1758,10 +1737,7 @@ codeunit 136353 "UT T Job Planning Line"
         JobCard.Close();
     end;
 
-#if not CLEAN25
-#pragma warning disable AS0072
     [Test]
-    [Obsolete('Not used.', '23.0')]
     procedure JobPlanningLineFindJTPriceForGLAccountNotUpdateUnitPrice()
     var
         JobPlanningLine: Record "Job Planning Line";
@@ -1785,7 +1761,6 @@ codeunit 136353 "UT T Job Planning Line"
     end;
 
     [Test]
-    [Obsolete('Not used.', '23.0')]
     procedure JobPlanningLineFindJTPriceForGLAccountUpdateUnitPrice()
     var
         JobPlanningLine: Record "Job Planning Line";
@@ -1809,8 +1784,6 @@ codeunit 136353 "UT T Job Planning Line"
 
         JobPlanningLine.TestField("Unit Cost", UnitCost);
     end;
-#pragma warning restore AS0072
-#endif
 
     [Test]
     procedure PlanningDateOnInitJobPlanningLine()
@@ -2480,7 +2453,6 @@ codeunit 136353 "UT T Job Planning Line"
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"UT T Job Planning Line");
     end;
 
-#if not CLEAN25
     local procedure SetupLineDiscScenario(var JobPlanningLine: Record "Job Planning Line"; var SalesLineDiscount: Record "Sales Line Discount"; JobTask: Record "Job Task"; CustNo: Code[20]; CustomerPriceGroupCode: Code[10])
     var
         Item: Record Item;
@@ -2498,7 +2470,6 @@ codeunit 136353 "UT T Job Planning Line"
         CreateSimpleJobPlanningLine(JobPlanningLine, JobTask);
         JobPlanningLine.Validate(Type, JobPlanningLine.Type::Item);
     end;
-#endif
 
     local procedure CreateJobPlanningLine(var JobPlanningLine: Record "Job Planning Line"; ApplyUsageLink: Boolean)
     var
@@ -2652,7 +2623,6 @@ codeunit 136353 "UT T Job Planning Line"
         ArrAmount[9] := JobPlanningLine."Line Amount";
     end;
 
-#if not CLEAN25
     local procedure CreateJobGLAccPrice(var JobGLAccountPrice: Record "Job G/L Account Price"; JobNo: Code[20]; JobTaskNo: Code[20]; GLAccountNo: Code[20])
     begin
         LibraryJob.CreateJobGLAccountPrice(
@@ -2662,7 +2632,7 @@ codeunit 136353 "UT T Job Planning Line"
         JobGLAccountPrice."Unit Cost" := LibraryRandom.RandIntInRange(1, 10);
         JobGLAccountPrice.Modify();
     end;
-#endif
+
     local procedure CreateJobLedgerEntriesWithMultipleTypesAndLineTypes(var Job: Record Job; var ArrAmount: array[12] of Decimal)
     var
         JobTask: Record "Job Task";
@@ -2681,7 +2651,6 @@ codeunit 136353 "UT T Job Planning Line"
         MockJobLedgEntry(Job."No.", ArrAmount[11], -ArrAmount[12], JobLedgerEntry.Type::"G/L Account", JobLedgerEntry."Entry Type"::Sale);
     end;
 
-#if not CLEAN25
     local procedure CreateLineDiscForCustomer(var SalesLineDiscount: Record "Sales Line Discount"; Item: Record Item; CustNo: Code[20])
     begin
         LibraryERM.CreateLineDiscForCustomer(
@@ -2690,7 +2659,6 @@ codeunit 136353 "UT T Job Planning Line"
         SalesLineDiscount.Validate("Line Discount %", LibraryRandom.RandDec(10, 2));
         SalesLineDiscount.Modify(true);
     end;
-#endif
 
     local procedure CreateJobPlanningLineWithType(var JobPlanningLine: Record "Job Planning Line"; ConsumableType: Enum "Job Planning Line Type")
     var
@@ -2718,7 +2686,7 @@ codeunit 136353 "UT T Job Planning Line"
         JobLedgEntry."Entry Type" := JLEntryType;
         JobLedgEntry.Insert();
     end;
-#if not CLEAN25
+
     local procedure SetAllowLineDiscOfCustPostGroup(var Job: Record Job; AllowLineDisc: Boolean): Code[10]
     var
         CustomerPriceGroup: Record "Customer Price Group";
@@ -2730,7 +2698,7 @@ codeunit 136353 "UT T Job Planning Line"
         Job.Modify(true);
         exit(CustomerPriceGroup.Code);
     end;
-#endif
+
     local procedure OpenOrderPromissingPage(var JobPlanningLine: Record "Job Planning Line")
     var
         JobPlanningLines: TestPage "Job Planning Lines";

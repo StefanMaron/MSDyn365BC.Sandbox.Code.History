@@ -61,6 +61,7 @@ table 5050 Contact
                   TableData Opportunity = rm,
                   TableData "Opportunity Entry" = rm,
                   tabledata Contact = rm,
+                  tabledata Customer = im,
                   tabledata "Salesperson/Purchaser" = R,
                   tabledata "Marketing Setup" = r,
                   tabledata Salutation = r,
