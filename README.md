@@ -105,17 +105,19 @@ Occasionally, Microsoft releases hotfix versions with version numbers lower than
 - If you have an existing clone and a branch gets rebased, your local copy will become outdated
 - `git pull` will fail with "divergent branches" errors
 
-**Solution - Update your local branches:**
+**Solution - Update your local branches automatically:**
+
+Linux/macOS (one-liner):
+```bash
+curl -sSL https://raw.githubusercontent.com/StefanMaron/MSDyn365BC.Sandbox.Code.History/main/scripts/update-branches.sh | bash
+```
 
 Windows (PowerShell):
 ```powershell
-.\scripts\Update-Branches.ps1 -branches w1-24,w1-25,de-24
+iex (irm https://raw.githubusercontent.com/StefanMaron/MSDyn365BC.Sandbox.Code.History/main/scripts/Update-Branches.ps1)
 ```
 
-Linux/macOS (Bash):
-```bash
-./scripts/update-branches.sh w1-24 w1-25 de-24
-```
+The scripts automatically detect and update all your locally tracked branches. To update specific branches only, add branch names as arguments when running locally.
 
 Or manually for a single branch:
 ```bash
