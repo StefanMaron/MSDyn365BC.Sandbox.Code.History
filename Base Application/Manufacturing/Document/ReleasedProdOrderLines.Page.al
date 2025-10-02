@@ -339,12 +339,6 @@ page 99000832 "Released Prod. Order Lines"
                         Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
-                field("Standard Task Code"; Rec."Standard Task Code")
-                {
-                    ApplicationArea = Manufacturing;
-                    ToolTip = 'Specifies a standard task.';
-                    Visible = false;
-                }
             }
         }
     }
