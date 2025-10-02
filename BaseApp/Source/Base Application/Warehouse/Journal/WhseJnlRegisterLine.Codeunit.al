@@ -12,6 +12,7 @@ codeunit 7301 "Whse. Jnl.-Register Line"
 {
     Permissions = TableData "Warehouse Entry" = rimd,
                   TableData "Warehouse Register" = rimd,
+                  TableData Bin = m,
                   TableData "Bin Content" = rimd;
     TableNo = "Warehouse Journal Line";
 
@@ -738,12 +739,10 @@ codeunit 7301 "Whse. Jnl.-Register Line"
     begin
     end;
 
-#pragma warning disable AS0077    
     [IntegrationEvent(false, false)]
     local procedure OnRegisterRoundResidualOnBeforeWhseJnlRegLineSetWhseRegister(var WhseEntry: Record "Warehouse Entry"; var WhseEntry2: Record "Warehouse Entry"; var WhseJnlLine: Record "Warehouse Journal Line"; var WhseJnlLine2: Record "Warehouse Journal Line"; var Bin: Record Bin)
     begin
     end;
-#pragma warning restore AS0077    
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteFromBinContentOnAfterClearTrackingFilters(var WarehouseEntry2: Record "Warehouse Entry"; var FromBinContent: Record "Bin Content"; WarehouseEntry: Record "Warehouse Entry")
