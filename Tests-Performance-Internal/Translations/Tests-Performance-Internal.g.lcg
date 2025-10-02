@@ -437,13 +437,4 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Performance Profiler Tests - NamedType OpenBankStatementPageQst)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2756434632 - Method 1880868829 - NamedType 3908984908" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The shipments are now combined]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Performance Profiler Tests - Method RunCombineShipments - NamedType CombineShipmentMsg)]]></Cmt>
-    </Cmts>
-  </Item>
 </LCX>
