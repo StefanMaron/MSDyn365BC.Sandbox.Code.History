@@ -21,7 +21,6 @@ codeunit 139094 "Local Performance Tests"
         LibraryService: Codeunit "Library - Service";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
-        Assert: Codeunit Assert;
         TestsBuffer: Integer;
         TestsBufferPercentage: Integer;
         TraceDumpFilePath: Text;
@@ -334,15 +333,5 @@ codeunit 139094 "Local Performance Tests"
     procedure InvokePostInvoice(var ServiceInvoice: TestPage "Service Invoice")
     begin
         ServiceInvoice.Post.Invoke();
-    end;
-
-    local procedure VerifyExpectedResults(var PerfProfilerEventsTest: Record "Perf Profiler Events Test"; ExpectedSqlQueryCount: Integer; ExpectedMaxHitCount: Integer)
-    begin
-        Assert.IsTrue(PerfProfilerEventsTest."Total SQL Queries" <= ExpectedSqlQueryCount,
-          StrSubstNo('This operation executed %1 SQL Queries. Expected number was %2. Local path to trace dump: %3',
-            PerfProfilerEventsTest."Total SQL Queries", ExpectedSqlQueryCount, TraceDumpFilePath));
-        Assert.IsTrue(PerfProfilerEventsTest."Max SQL Query Hit Count" <= ExpectedMaxHitCount,
-          StrSubstNo('This operation executed a SQL Query with a hit count %1. Expected number was %2. Local path to trace dump: %3',
-            PerfProfilerEventsTest."Max SQL Query Hit Count", ExpectedMaxHitCount, TraceDumpFilePath));
     end;
 }
