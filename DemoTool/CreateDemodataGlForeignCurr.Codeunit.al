@@ -72,11 +72,7 @@ codeunit 161551 "Create Demodata GlForeign Curr"
         GLAccount."Account Type" := GLAccount."Account Type"::Posting;
         GLAccount."Income/Balance" := GLAccount."Income/Balance"::"Balance Sheet";
         GLAccount."Direct Posting" := true;
-#if not CLEAN24
-        GLAccount."Currency Code" := CurrencyCode;
-#else
         GLAccount."Source Currency Code" := CurrencyCode;
-#endif
 
         if GLAccountExist then
             GLAccount.Modify()
@@ -149,4 +145,3 @@ codeunit 161551 "Create Demodata GlForeign Curr"
         GenJnlLine.DeleteAll();
     end;
 }
-

@@ -4,9 +4,9 @@ codeunit 117001 "Create Service Header"
     trigger OnRun()
     begin
         InsertData(ServiceHeader."Document Type"::Order, XSO000001, ServiceHeader.Priority::High, '10000', '', '10000', '', '', 19030106D, 142150T, 0D, 19030106D,
-  143017T, 19030106D, 143031T);
+            143017T, 19030106D, 143031T);
         InsertData(ServiceHeader."Document Type"::Order, XSO000002, ServiceHeader.Priority::Low, '50000', '', '50000', '', '', 19030109D, 174712T, 0D, 19040521D,
-          174712T, 0D, 0T);
+            174712T, 0D, 0T);
     end;
 
     var
@@ -15,7 +15,7 @@ codeunit 117001 "Create Service Header"
         XSO000002: Label 'SO000002';
         MakeAdjustments: Codeunit "Make Adjustments";
 
-    procedure InsertData("Document Type": Enum "Service Document Type"; "No.": Text[20]; Priority: Option; "Customer No.": Text[250]; "Responsibility Center": Text[250]; "Bill-to Customer No.": Text[250]; "Job No.": Text[250]; "Ship-to Code": Text[250]; "Order Date": Date; "Order Time": Time; "Expected Finishing Date": Date; "Starting Date": Date; "Starting Time": Time; "Finishing Date": Date; "Finishing Time": Time)
+    procedure InsertData("Document Type": Enum "Service Document Type"; "No.": Text[20]; Priority: Enum "Service Priority"; "Customer No.": Text[250]; "Responsibility Center": Text[250]; "Bill-to Customer No.": Text[250]; "Job No.": Text[250]; "Ship-to Code": Text[250]; "Order Date": Date; "Order Time": Time; "Expected Finishing Date": Date; "Starting Date": Date; "Starting Time": Time; "Finishing Date": Date; "Finishing Time": Time)
     var
         ServiceHeader: Record "Service Header";
     begin

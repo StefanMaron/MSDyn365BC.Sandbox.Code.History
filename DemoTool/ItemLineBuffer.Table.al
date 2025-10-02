@@ -17,6 +17,7 @@ table 122001 "Item Line Buffer"
         field(3; Quantity; Decimal)
         {
             Caption = 'Quantity';
+            AutoFormatType = 0;
 
             trigger OnValidate()
             begin
@@ -66,4 +67,3 @@ table 122001 "Item Line Buffer"
         exit(Quantity / Abs(Quantity));
     end;
 }
-
