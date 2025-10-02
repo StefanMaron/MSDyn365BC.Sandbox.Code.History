@@ -2972,7 +2972,6 @@ codeunit 6620 "Copy Document Mgt."
                 OnCopySalesShptLinesToDocOnBeforeTestPricesInclVAT(ToSalesHeader, IncludeHeader, RecalculateLines, IsHandled);
                 if not IsHandled then
                     FromSalesShptHeader.TestField("Prices Including VAT", ToSalesHeader."Prices Including VAT");
-                FromSalesShptHeader.TestField("Prices Including VAT", ToSalesHeader."Prices Including VAT");
 
                 OnCopySalesShptLinesToDocOnBeforeFromSalesHeaderTransferFields(FromSalesShptHeader, FromSalesHeader, ToSalesHeader, FromSalesShptLine);
                 FromSalesHeader.TransferFields(FromSalesShptHeader);

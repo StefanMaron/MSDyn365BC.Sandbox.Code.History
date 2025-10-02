@@ -1,5 +1,4 @@
-﻿#if not CLEAN25
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -11,9 +10,6 @@ page 7007 "Get Sales Price"
     Editable = false;
     PageType = List;
     SourceTable = "Sales Price";
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-    ObsoleteTag = '16.0';
 
     layout
     {
@@ -119,4 +115,3 @@ page 7007 "Get Sales Price"
     {
     }
 }
-#endif

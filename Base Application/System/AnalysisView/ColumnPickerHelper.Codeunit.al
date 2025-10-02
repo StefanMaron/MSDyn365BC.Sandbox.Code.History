@@ -1,4 +1,3 @@
-#if not CLEAN28
 // // ------------------------------------------------------------------------------------------------
 // // Copyright (c) Microsoft Corporation. All rights reserved.
 // // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -7,12 +6,11 @@ namespace System.Tooling;
 
 using System.Reflection;
 
+#pragma warning disable AS0130
+#pragma warning disable PTE0025
 codeunit 9640 "Column Picker Helper"
 {
     Access = Internal;
-    ObsoleteState = Pending;
-    ObsoleteTag = '28.0';
-    ObsoleteReason = 'The Analysis View module is being moved to be part of the Business Central platform.';
 
     procedure Initialize(var PageTableField: Record "Page Table Field")
     begin
@@ -30,13 +28,6 @@ codeunit 9640 "Column Picker Helper"
         end;
     end;
 
-    procedure FilterRelatedFieldsForEmptyPage(var PageTableField: Record "Page Table Field")
-    begin
-        PageTableField.SetFilter(FieldKind, '%1', PageTableField.FieldKind::TableField);
-        PageTableField.SetFilter("Page ID", '%1', PageTableField."Page ID");
-    end;
-
-
     local procedure FilterRelatedPagesAndFields(var PageTableField: Record "Page Table Field")
     var
         PageMetadata: Record "Page Metadata";
@@ -46,8 +37,10 @@ codeunit 9640 "Column Picker Helper"
         PageMetadata.SetFilter(PageType, '%1|%2', PageMetadata.PageType::List, PageMetadata.PageType::Card);
 
         AreTherePagesAvailable := not PageMetadata.IsEmpty();
-        if AreTherePagesAvailable then
-            FilterRelatedFieldsForEmptyPage(PageTableField);
+        if AreTherePagesAvailable then begin
+            PageTableField.SetFilter(FieldKind, '%1', PageTableField.FieldKind::TableField);
+            PageTableField.SetFilter("Page ID", '%1', PageTableField."Page ID");
+        end;
 
         // Filter the fields in the repeater control to show only supported field types and skip system fields.
         PageTableField.SetFilter(Type, '<>%1 & <>%2 & <>%3 & <>%4 & <>%5', PageTableField.Type::BLOB, PageTableField.Type::Media, PageTableField.Type::MediaSet, PageTableField.Type::NotSupported_Binary, PageTableField.Type::TableFilter);
@@ -86,4 +79,3 @@ codeunit 9640 "Column Picker Helper"
         AreTherePagesAvailable: Boolean;
         IsRelatedTableIsNotEmpty: Boolean;
 }
-#endif

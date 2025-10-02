@@ -156,6 +156,7 @@ page 6564 "Invt. Shipment"
                 }
                 action("Co&mments")
                 {
+                    ApplicationArea = Comments;
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     ToolTip = 'View or edit comments.';
@@ -165,7 +166,7 @@ page 6564 "Invt. Shipment"
                 }
                 action(Dimensions)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = Dimensions;
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     ShortCutKey = 'Alt+D';

@@ -8,9 +8,7 @@ using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.Finance.Currency;
 using Microsoft.Pricing.Asset;
-#if not CLEAN25
 using Microsoft.Pricing.Calculation;
-#endif
 using Microsoft.Pricing.Source;
 using Microsoft.Pricing.Worksheet;
 using Microsoft.Sales.Customer;
@@ -562,14 +560,13 @@ page 7024 "Prices Overview"
         }
     }
 
-#if not CLEAN25
     trigger OnInit()
     var
         FeaturePriceCalculation: Codeunit "Feature - Price Calculation";
     begin
         FeaturePriceCalculation.FailIfFeatureDisabled();
     end;
-#endif
+
     trigger OnAfterGetCurrRecord()
     begin
         SetEditableFields();

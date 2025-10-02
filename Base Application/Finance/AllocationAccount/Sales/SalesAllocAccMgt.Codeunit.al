@@ -24,7 +24,6 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
 
     internal procedure GetOrGenerateAllocationLines(var AllocationLine: Record "Allocation Line"; var ParentSystemId: Guid; var AmountToAllocate: Decimal; var PostingDate: Date)
     var
-        SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         AllocationAccount: Record "Allocation Account";
         AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
@@ -34,9 +33,7 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
         SalesLine.GetBySystemId(ParentSystemId);
         AmountToAllocate := SalesLine.Amount;
 
-        SalesHeader.ReadIsolation := IsolationLevel::ReadUncommitted;
-        SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
-        PostingDate := SalesHeader."Posting Date";
+        PostingDate := SalesLine.GetSalesHeader()."Posting Date";
 
         if SalesLine."Alloc. Acc. Modified by User" then
             LoadManualAllocationLines(SalesLine, AllocationLine)
@@ -540,13 +537,10 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
 
     local procedure GetUnitPrice(var SalesLine: Record "Sales Line"; AllocationLineAmount: Decimal): Decimal
     var
-        SalesHeader: Record "Sales Header";
         AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
         AmountRoundingPrecision: Decimal;
     begin
-        SalesHeader.ReadIsolation := IsolationLevel::ReadUncommitted;
-        SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
-        if SalesHeader."Prices Including VAT" then
+        if SalesLine.GetSalesHeader()."Prices Including VAT" then
             AllocationLineAmount += AllocationLineAmount * SalesLine."VAT %" / 100;
 
         AmountRoundingPrecision := AllocationAccountMgt.GetCurrencyRoundingPrecision(SalesLine."Currency Code");
