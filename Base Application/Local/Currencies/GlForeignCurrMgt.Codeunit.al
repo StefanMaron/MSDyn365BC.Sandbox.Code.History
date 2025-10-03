@@ -14,11 +14,9 @@ using Microsoft.Sales.Customer;
 
 codeunit 3010536 GlForeignCurrMgt
 {
-#pragma warning disable AS0072
     ObsoleteReason = 'Procedure code merged to Gen. Journal Line table code.';
     ObsoleteState = Pending;
     ObsoleteTag = '24.0';
-#pragma warning restore AS0072
 
     trigger OnRun()
     begin

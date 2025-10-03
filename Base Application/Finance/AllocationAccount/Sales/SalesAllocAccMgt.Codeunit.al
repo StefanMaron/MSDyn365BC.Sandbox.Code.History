@@ -68,7 +68,6 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
             AllocationLine."Dimension Set ID" := AllocAccManualOverride."Dimension Set ID";
             AllocationLine.Amount := AllocAccManualOverride.Amount;
             AllocationLine.Quantity := AllocAccManualOverride.Quantity;
-            OnLoadManualAllocationLinesOnBeforeInsertAllocationLine(AllocAccManualOverride, AllocationLine);
             AllocationLine.Insert();
         until AllocAccManualOverride.Next() = 0;
     end;
@@ -730,11 +729,6 @@ codeunit 2678 "Sales Alloc. Acc. Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeVerifySalesLine(var SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnLoadManualAllocationLinesOnBeforeInsertAllocationLine(var AllocAccManualOverride: Record "Alloc. Acc. Manual Override"; var AllocationLine: Record "Allocation Line")
     begin
     end;
 

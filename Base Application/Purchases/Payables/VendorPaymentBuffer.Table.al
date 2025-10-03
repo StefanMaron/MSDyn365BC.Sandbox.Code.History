@@ -173,7 +173,7 @@ table 475 "Vendor Payment Buffer"
         GenJournalLine."Posting Group" := "Vendor Posting Group";
         GenJournalLine."Remit-to Code" := "Remit-to Code";
 
-        OnCopyFieldsToGenJournalLine(Rec, GenJournalLine, Rec);
+        OnCopyFieldsToGenJournalLine(Rec, GenJournalLine);
         OnAfterCopyFieldsToGenJournalLine(Rec, GenJournalLine);
     end;
 
@@ -183,7 +183,7 @@ table 475 "Vendor Payment Buffer"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyFieldsToGenJournalLine(VendorPaymentBufferSource: Record "Vendor Payment Buffer"; var GenJournalLineTarget: Record "Gen. Journal Line"; PaymentBufferSource: Record "Vendor Payment Buffer")
+    local procedure OnCopyFieldsToGenJournalLine(VendorPaymentBufferSource: Record "Vendor Payment Buffer"; var GenJournalLineTarget: Record "Gen. Journal Line")
     begin
     end;
 

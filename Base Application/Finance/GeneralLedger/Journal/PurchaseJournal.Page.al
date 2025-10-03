@@ -176,7 +176,7 @@ page 254 "Purchase Journal"
                         CurrPage.SaveRecord();
                     end;
                 }
-                field("<Vendor Name>"; GetVendorName())
+                field("<Vendor Name>"; AccName)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Vendor Name';
@@ -1688,14 +1688,6 @@ page 254 "Purchase Journal"
         TotalBalanceVisible := ShowTotalBalance;
         if ShowTotalBalance then
             NumberOfRecords := Rec.Count();
-    end;
-
-    local procedure GetVendorName(): Text[100]
-    begin
-        if (Rec."Account Type" = Rec."Account Type"::Vendor) and (AccName <> '') then
-            exit(AccName);
-
-        exit('');
     end;
 
     local procedure EnableApplyEntriesAction()
