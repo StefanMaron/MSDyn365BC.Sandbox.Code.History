@@ -17,7 +17,7 @@
       "id": "b3780cd9-f8f8-4a83-a4d5-0c2ad87b28af",
       "name": "Sustainability",
       "publisher": "Microsoft",
-      "version": "26.2.0.0"
+      "version": "26.3.0.0"
     }
   ],
   "internalsVisibleTo": [
@@ -28,7 +28,7 @@
     }
   ],
   "screenshots": [],
-  "application": "26.2.0.0",
+  "application": "26.3.0.0",
   "platform": "26.0.0.0",
   "idRanges": [
     {
