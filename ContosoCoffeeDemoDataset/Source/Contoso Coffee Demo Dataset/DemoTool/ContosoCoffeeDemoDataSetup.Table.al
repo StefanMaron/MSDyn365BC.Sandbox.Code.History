@@ -56,10 +56,6 @@ table 4768 "Contoso Coffee Demo Data Setup"
             InitValue = 0;
             TableRelation = "Windows Language";
         }
-        field(8; "Starting Date"; Date)
-        {
-            Caption = 'Starting Date';
-        }
     }
 
     keys
@@ -78,7 +74,6 @@ table 4768 "Contoso Coffee Demo Data Setup"
 
         Rec.Init();
         Rec.Validate("Starting Year", Date2DMY(Today(), 3) - 1);
-        Rec.Validate("Starting Date", Today());
         Rec.Insert();
     end;
 }

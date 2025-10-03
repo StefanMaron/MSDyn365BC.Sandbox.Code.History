@@ -20,7 +20,6 @@ using Microsoft.DemoData.Purchases;
 using Microsoft.DemoData.Sales;
 using Microsoft.DemoData.Service;
 using Microsoft.DemoData.Warehousing;
-using Microsoft.DemoData.Analytics;
 
 enum 5160 "Contoso Demo Data Module" implements "Contoso Demo Data Module"
 {
@@ -100,10 +99,5 @@ enum 5160 "Contoso Demo Data Module" implements "Contoso Demo Data Module"
     {
         Implementation = "Contoso Demo Data Module" = "EService Module";
         Caption = 'EService';
-    }
-    value(18; Analytics)
-    {
-        Implementation = "Contoso Demo Data Module" = "Analytics Module";
-        Caption = 'Analytics';
     }
 }

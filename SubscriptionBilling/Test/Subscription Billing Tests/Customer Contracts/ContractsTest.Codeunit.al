@@ -131,7 +131,6 @@ codeunit 148155 "Contracts Test"
         Initialize();
 
         ContractTestLibrary.CreateCustomerContractAndCreateContractLinesForItems(CustomerContract, ServiceObject, '', true);
-        ContractTestLibrary.DisableDeferralsForCustomerContract(CustomerContract, false);
         ContractTestLibrary.CreateBillingProposal(BillingTemplate, Enum::"Service Partner"::Customer, WorkDate());
         BillingLine.SetRange("Billing Template Code", BillingTemplate.Code);
         BillingLine.SetRange(Partner, BillingLine.Partner::Customer);
@@ -453,7 +452,7 @@ codeunit 148155 "Contracts Test"
     end;
 
     [Test]
-    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,ConfirmHandlerYes,MessageHandler')]
+    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,ConfirmHandler,MessageHandler')]
     procedure CheckValueChangesOnCustomerContractLines()
     var
         Currency: Record Currency;
@@ -469,6 +468,7 @@ codeunit 148155 "Contracts Test"
         ExpectedDecimalValue: Decimal;
         MaxServiceAmount: Decimal;
         SrvCommFieldNotTransferredErr: Label 'Subscription Line field "%1" not transferred from Customer Subscription Contract Line.', Locked = true;
+        NotTransferredMisspelledTok: Label 'Subscription Line field "%1" not transfered from Customer Subscription Contract Line.', Locked = true;
         CustomerContractPage: TestPage "Customer Contract";
         DescriptionText: Text;
         ServiceObjectQuantity: Decimal;
@@ -514,12 +514,12 @@ codeunit 148155 "Contracts Test"
         ExpectedDate := CalcDate('<1D>', WorkDate());
         CustomerContractPage.Lines."Cancellation Possible Until".SetValue(ExpectedDate);
         ServiceCommitment.Get(OldServiceCommitment."Entry No.");
-        Assert.AreEqual(ExpectedDate, ServiceCommitment."Cancellation Possible Until", StrSubstNo(SrvCommFieldNotTransferredErr, ServiceCommitment.FieldCaption("Cancellation Possible Until")));
+        Assert.AreEqual(ExpectedDate, ServiceCommitment."Cancellation Possible Until", StrSubstNo(NotTransferredMisspelledTok, ServiceCommitment.FieldCaption("Cancellation Possible Until")));
 
         ExpectedDate := CalcDate('<1D>', WorkDate());
         CustomerContractPage.Lines."Term Until".SetValue(ExpectedDate);
         ServiceCommitment.Get(OldServiceCommitment."Entry No.");
-        Assert.AreEqual(ExpectedDate, ServiceCommitment."Term Until", StrSubstNo(SrvCommFieldNotTransferredErr, ServiceCommitment.FieldCaption("Term Until")));
+        Assert.AreEqual(ExpectedDate, ServiceCommitment."Term Until", StrSubstNo(NotTransferredMisspelledTok, ServiceCommitment.FieldCaption("Term Until")));
 
         ExpectedDecimalValue := LibraryRandom.RandDecInDecimalRange(1, 100, 2);
         while ExpectedDecimalValue = OldServiceCommitment."Discount %" do
@@ -565,7 +565,7 @@ codeunit 148155 "Contracts Test"
         Evaluate(BillingBasePeriod, '<3M>');
         CustomerContractPage.Lines."Billing Base Period".SetValue(BillingBasePeriod);
         ServiceCommitment.Get(OldServiceCommitment."Entry No.");
-        Assert.AreEqual(BillingBasePeriod, ServiceCommitment."Billing Base Period", StrSubstNo(SrvCommFieldNotTransferredErr, ServiceCommitment.FieldCaption("Billing Base Period")));
+        Assert.AreEqual(BillingBasePeriod, ServiceCommitment."Billing Base Period", StrSubstNo(NotTransferredMisspelledTok, ServiceCommitment.FieldCaption("Billing Base Period")));
 
         Evaluate(BillingRhythmValue, '<3M>');
         CustomerContractPage.Lines."Billing Rhythm".SetValue(BillingRhythmValue);
@@ -633,7 +633,7 @@ codeunit 148155 "Contracts Test"
     end;
 
     [Test]
-    [HandlerFunctions('ConfirmHandlerYes')]
+    [HandlerFunctions('ConfirmHandler')]
     procedure CurrencyCodeRemainsSameWhenBillToCustomerChanges()
     var
         Customer: Record Customer;
@@ -1172,7 +1172,7 @@ codeunit 148155 "Contracts Test"
     end;
 
     [Test]
-    [HandlerFunctions('ConfirmHandlerYes,ExchangeRateSelectionModalPageHandler,MessageHandler')]
+    [HandlerFunctions('ConfirmHandler,ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure TestChangeOfHarmonizedBillingFieldInContractType()
     var
         ContractType: Record "Subscription Contract Type";
@@ -1404,7 +1404,7 @@ codeunit 148155 "Contracts Test"
     end;
 
     [Test]
-    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler,ConfirmHandlerYes')]
+    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure TestDeleteServiceCommitmentLinkedToContractLineIsClosed()
     var
         Customer: Record Customer;
@@ -1650,7 +1650,7 @@ codeunit 148155 "Contracts Test"
         CustomerContract.TestField("Create Contract Deferrals", false);
 
         // allow manually changing the value of the field
-        ContractTestLibrary.DisableDeferralsForCustomerContract(CustomerContract, true);
+        CustomerContract.Validate("Create Contract Deferrals", true);
         CustomerContract.Modify(false);
         CustomerContract.TestField("Contract Type", ContractType.Code);
     end;
@@ -2291,7 +2291,7 @@ codeunit 148155 "Contracts Test"
     #region Handlers
 
     [ConfirmHandler]
-    procedure ConfirmHandlerYes(Question: Text[1024]; var Reply: Boolean)
+    procedure ConfirmHandler(Question: Text[1024]; var Reply: Boolean)
     begin
         Reply := true;
     end;
