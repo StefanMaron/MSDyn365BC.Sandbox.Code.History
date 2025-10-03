@@ -47,6 +47,7 @@ codeunit 1351 "Telemetry Subscribers"
         JobQueueEntryEnqueuedAllTxt: Label 'Job queue entry enqueued: %1', Comment = '%1 = Job queue id', Locked = true;
         JobQueueEntryNotEnqueuedTxt: Label 'Job queue entry not enqueued: %1', Comment = '%1 = Job queue id', Locked = true;
         JobQueueEntryTaskCancelledTxt: Label 'Job queue entry task cancelled: %1', Comment = '%1 = Job queue id', Locked = true;
+        JobQueueEntrySkippedTxt: Label 'Job queue entry skipped: %1', Comment = '%1 = Job queue id', Locked = true;
         JobQueueEntryNotReadyToStartTxt: Label 'Job queue entry not ready to start: %1', Comment = '%1 = Job queue id', Locked = true;
         UndoSalesShipmentCategoryTxt: Label 'AL UndoSalesShipmentNoOfLines', Locked = true;
         UndoSalesShipmentNoOfLinesTxt: Label 'UndoNoOfLines = %1', Locked = true;
@@ -67,6 +68,38 @@ codeunit 1351 "Telemetry Subscribers"
         AuditNewTok: Label 'New', Locked = true;
         AuditEditTok: Label 'Edit', Locked = true;
         AuditDeleteTok: Label 'Delete', Locked = true;
+
+    procedure SendJobQueueSkippedTelemetry(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        TranslationHelper: Codeunit "Translation Helper";
+        Dimensions: Dictionary of [Text, Text];
+    begin
+        TranslationHelper.SetGlobalLanguageToDefault();
+        SetJobQueueTelemetryDimensions(JobQueueEntry, Dimensions);
+        Telemetry.LogMessage('0000P8K',
+                                StrSubstNo(JobQueueEntrySkippedTxt, Format(JobQueueEntry.ID, 0, 4)),
+                                Verbosity::Normal,
+                                DataClassification::OrganizationIdentifiableInformation,
+                                TelemetryScope::All,
+                                Dimensions);
+        TranslationHelper.RestoreGlobalLanguage();
+    end;
+
+    procedure SendJobQueueNotReadyToStartTelemetry(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        TranslationHelper: Codeunit "Translation Helper";
+        Dimensions: Dictionary of [Text, Text];
+    begin
+        TranslationHelper.SetGlobalLanguageToDefault();
+        SetJobQueueTelemetryDimensions(JobQueueEntry, Dimensions);
+        Telemetry.LogMessage('0000P8L',
+                                StrSubstNo(JobQueueEntryNotReadyToStartTxt, Format(JobQueueEntry.ID, 0, 4)),
+                                Verbosity::Normal,
+                                DataClassification::OrganizationIdentifiableInformation,
+                                TelemetryScope::All,
+                                Dimensions);
+        TranslationHelper.RestoreGlobalLanguage();
+    end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Conf./Personalization Mgt.", 'OnProfileChanged', '', true, true)]
     local procedure SendTraceOnProfileChanged(PrevAllProfile: Record "All Profile"; CurrentAllProfile: Record "All Profile")
@@ -435,24 +468,6 @@ codeunit 1351 "Telemetry Subscribers"
         Dimensions.Add('JobQueueCompanyName', JobQueueLogEntry.CurrentCompany());
         Dimensions.Add('JobQueueScheduledTaskId', Format(JobQueueLogEntry."System Task ID", 0, 4));
         Dimensions.Add('JobQueueCategory', Format(JobQueueLogEntry."Job Queue Category Code"));
-    end;
-
-    procedure SendJobQueueNotReadyToStartTelemetry(var JobQueueEntry: Record "Job Queue Entry")
-    var
-        TranslationHelper: Codeunit "Translation Helper";
-        Dimensions: Dictionary of [Text, Text];
-    begin
-        TranslationHelper.SetGlobalLanguageToDefault();
-
-        SetJobQueueTelemetryDimensions(JobQueueEntry, Dimensions);
-        Telemetry.LogMessage('0000P8L',
-                                StrSubstNo(JobQueueEntryNotReadyToStartTxt, Format(JobQueueEntry.ID, 0, 4)),
-                                Verbosity::Normal,
-                                DataClassification::OrganizationIdentifiableInformation,
-                                TelemetryScope::All,
-                                Dimensions);
-
-        TranslationHelper.RestoreGlobalLanguage();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Undo Sales Shipment Line", 'OnAfterCode', '', false, false)]
