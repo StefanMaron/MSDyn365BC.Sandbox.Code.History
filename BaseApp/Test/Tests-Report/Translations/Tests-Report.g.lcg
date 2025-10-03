@@ -1382,15 +1382,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test Custom Reports - NamedType TargetEmailErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 491879528 - NamedType 3771913144" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Set Up Reporting Data]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test OData Wizard US - NamedType ODataWizardTxt)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 570390768 - NamedType 159342192" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[End Date must have a value.]]></Val>
