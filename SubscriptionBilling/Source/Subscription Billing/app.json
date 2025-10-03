@@ -15,7 +15,7 @@
       "id": "e4e86220-cac0-4ec3-b853-7c2fa610399d",
       "name": "PowerBI Reports",
       "publisher": "Microsoft",
-      "version": "26.3.0.0"
+      "version": "26.4.0.0"
     }
   ],
   "screenshots": [],
@@ -33,7 +33,7 @@
     }
   ],
   "platform": "26.0.0.0",
-  "application": "26.3.0.0",
+  "application": "26.4.0.0",
   "idRanges": [
     {
       "from": 8000,
