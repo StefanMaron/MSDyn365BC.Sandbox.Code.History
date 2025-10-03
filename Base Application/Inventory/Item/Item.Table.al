@@ -3961,11 +3961,6 @@ table 27 Item
         OnCalcRelOrderReceiptQty(Rec, Result);
     end;
 
-    procedure CalcQtyOnServiceOrder() Result: Decimal
-    begin
-        OnCalcQtyOnServiceOrder(Rec, Result);
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckDocuments(var Item: Record Item; var xItem: Record Item; var CurrentFieldNo: Integer; CheckFieldNo: Integer; CheckFieldCaption: Text)
     begin
@@ -4518,11 +4513,6 @@ table 27 Item
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcRelOrderReceiptQty(var Item: Record Item; var Result: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCalcQtyOnServiceOrder(var Item: Record Item; var Result: Decimal)
     begin
     end;
 
