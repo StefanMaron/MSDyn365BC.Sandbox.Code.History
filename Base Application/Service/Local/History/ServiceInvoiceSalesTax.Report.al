@@ -23,7 +23,7 @@ using System.Utilities;
 report 10474 "Service Invoice-Sales Tax"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/Finance/SalesTax/ServiceInvoiceSalesTax.rdlc';
+    RDLCLayout = './Service/Local/History/ServiceInvoiceSalesTax.rdlc';
     Caption = 'Service - Invoice';
 
     dataset
