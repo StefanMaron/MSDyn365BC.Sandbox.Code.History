@@ -2,8 +2,8 @@
   "id": "cc2187fe-1b59-4f29-8a75-76d76c88c6dc",
   "name": "Tests-Invoicing",
   "publisher": "Microsoft",
-  "version": "25.1.25873.40347",
-  "platform": "25.0.0.0",
+  "version": "25.2.27733.40349",
+  "platform": "25.2.0.0",
   "dependencies": [
     {
       "id": "9856ae4f-d1a7-46ef-89bb-6ef056398228",
