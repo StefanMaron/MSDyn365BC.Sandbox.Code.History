@@ -13,22 +13,10 @@
       "path": "./ReportLayouts/Test/Report Layouts Tests"
     },
     {
-      "path": "./businessfoundation/Test/Business Foundation Test Libraries"
+      "path": "./BusinessFoundation/Test/Business Foundation Test Libraries"
     },
     {
-      "path": "./businessfoundation/Test/Business Foundation Tests/DisabledTests"
-    },
-    {
-      "path": "./system application/source/System Application/Email/src/Test Email"
-    },
-    {
-      "path": "./system application/Test/System Application Test Library"
-    },
-    {
-      "path": "./system application/Test/System Application Test/DisabledTests"
-    },
-    {
-      "path": "./system application/Test/System Application Test/Extension Management/testArtifacts"
+      "path": "./BusinessFoundation/Test/Business Foundation Tests/DisabledTests"
     },
     {
       "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
@@ -89,6 +77,18 @@
     },
     {
       "path": "./testframework/TestRunner/Test Runner/src/DataDrivenTest"
+    },
+    {
+      "path": "./System Application/Source/System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./System Application/Test/System Application Test Library"
+    },
+    {
+      "path": "./System Application/Test/System Application Test/DisabledTests"
+    },
+    {
+      "path": "./System Application/Test/System Application Test/Extension Management/testArtifacts"
     },
     {
       "path": "./ServiceDeclaration/Test/Service Declaration Tests"
