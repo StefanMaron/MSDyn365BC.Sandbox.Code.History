@@ -27,7 +27,6 @@ page 99000846 "Consumption Journal"
     DataCaptionFields = "Journal Batch Name";
     DelayedInsert = true;
     PageType = Worksheet;
-    AboutText = 'Record and post the consumption of components for released production orders, updating inventory based on actual or calculated production output.';
     SaveValues = true;
     SourceTable = "Item Journal Line";
     UsageCategory = Tasks;
@@ -745,9 +744,6 @@ page 99000846 "Consumption Journal"
             ItemTrackingEditable := not Rec.ReservEntryExist();
 
         ExpirationDateEditable := SetExpirationDateVisibility();
-
-        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
-            SetItemTrackingFieldsEditabilityForOData();
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -769,12 +765,11 @@ page 99000846 "Consumption Journal"
 
     trigger OnOpenPage()
     var
+        ClientTypeManagement: Codeunit "Client Type Management";
         ServerSetting: Codeunit "Server Setting";
         JnlSelected: Boolean;
     begin
         IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
-        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
-            exit;
 
         SetDimensionsVisibility();
         if Rec.IsOpenedFromBatch() then begin
@@ -788,13 +783,15 @@ page 99000846 "Consumption Journal"
             Error('');
         ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
         SetControlAppearanceFromBatch();
+
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            ItemTrackingEditable := CanSelectItemTrackingOnLines;
     end;
 
     var
         ItemJnlMgt: Codeunit ItemJnlManagement;
         MfgItemJournalMgt: Codeunit "Mfg. Item Journal Mgt.";
         ReportPrint: Codeunit "Test Report-Print";
-        ClientTypeManagement: Codeunit "Client Type Management";
         ItemJournalErrorsMgt: Codeunit "Item Journal Errors Mgt.";
         ProdOrderDescription: Text[100];
         BackgroundErrorCheck: Boolean;
@@ -892,17 +889,6 @@ page 99000846 "Consumption Journal"
     local procedure ShowPreview()
     begin
         Rec.PreviewPostItemJnlFromProduction();
-    end;
-
-    local procedure SetItemTrackingFieldsEditabilityForOData()
-    var
-        ItemJournalBatch: Record "Item Journal Batch";
-    begin
-        if ItemJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then begin
-            CanSelectItemTrackingOnLines := ItemJournalBatch."Item Tracking on Lines";
-            ItemTrackingEditable := CanSelectItemTrackingOnLines;
-            CurrPage.Update(false);
-        end;
     end;
 
     [IntegrationEvent(false, false)]
