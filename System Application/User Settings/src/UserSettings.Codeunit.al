@@ -111,7 +111,7 @@ codeunit 9176 "User Settings"
     var
         UserSettingsImpl: Codeunit "User Settings Impl.";
     begin
-        exit(UserSettingsImpl.GetProfileName(UserSettingsRec.Scope, UserSettingsRec."App ID", UserSettingsRec."Profile ID"));
+        UserSettingsImpl.GetProfileName(UserSettingsRec.Scope, UserSettingsRec."App ID", UserSettingsRec."Profile ID");
     end;
 
     /// <summary>

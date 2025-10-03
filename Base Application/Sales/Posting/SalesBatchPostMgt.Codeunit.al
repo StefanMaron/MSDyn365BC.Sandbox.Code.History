@@ -333,11 +333,10 @@ codeunit 1371 "Sales Batch Post Mgt."
 
         if ManualReopen then
             ReleaseSalesHeader(SalesHeader)
-        else
-            if SalesHeader.Status = SalesHeader.Status::Released then begin
-                ReleaseSalesDoc.PerformManualReopen(SalesHeader);
-                ManualReopen := true;
-            end;
+        else begin
+            ReleaseSalesDoc.PerformManualReopen(SalesHeader);
+            ManualReopen := true;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Batch Processing Mgt.", 'OnBeforeBatchProcessing', '', false, false)]
