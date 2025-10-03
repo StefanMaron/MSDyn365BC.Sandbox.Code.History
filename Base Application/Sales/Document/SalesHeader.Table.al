@@ -251,13 +251,14 @@ table 36 "Sales Header"
             trigger OnValidate()
             var
                 IsHandled: Boolean;
+                IsHandledDoExist: Boolean;
             begin
                 TestStatusOpen();
                 BilltoCustomerNoChanged := xRec."Bill-to Customer No." <> "Bill-to Customer No.";
 
                 IsHandled := false;
-                OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(Rec, xRec, CurrFieldNo, IsHandled);
-                if IsHandled then
+                OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(Rec, xRec, CurrFieldNo, IsHandled, IsHandledDoExist);
+                if IsHandledDoExist then
                     exit;
 
                 if BilltoCustomerNoChanged and not IsHandled then
@@ -2051,7 +2052,13 @@ table 36 "Sales Header"
             trigger OnLookup()
             var
                 NoSeries: Codeunit "No. Series";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeLookupPrepmtNoSeries(Rec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 SalesHeader := Rec;
                 GetSalesSetup();
                 SalesSetup.TestField("Posted Prepmt. Inv. Nos.");
@@ -2063,7 +2070,13 @@ table 36 "Sales Header"
             trigger OnValidate()
             var
                 NoSeries: Codeunit "No. Series";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidatePrepmtNoSeries(Rec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if "Prepayment No. Series" <> '' then begin
                     GetSalesSetup();
                     SalesSetup.TestField("Posted Prepmt. Inv. Nos.");
@@ -9229,7 +9242,6 @@ table 36 "Sales Header"
 
     procedure UpdateSalesOrderLineIfExist()
     var
-        SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCreditMemoHeader: Record "Sales Cr.Memo Header";
         CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
         IsHandled: Boolean;
@@ -11088,7 +11100,7 @@ table 36 "Sales Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; CurrFieldNo: Integer; var IsHandled: Boolean)
+    local procedure OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; CurrFieldNo: Integer; var IsHandled: Boolean; var IsHandledDoExist: Boolean)
     begin
     end;
 

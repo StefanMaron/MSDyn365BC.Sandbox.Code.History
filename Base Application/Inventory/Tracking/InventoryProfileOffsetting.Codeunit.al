@@ -2451,6 +2451,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 ReservEntry.UpdateItemTracking();
                 UpdateAppliedItemEntry(ReservEntry);
                 ReservEntry.Insert();
+                OnCommitTrackingOnAfterInsertReservationEntry(ReservEntry);
                 PrevTempEntryNo := TempTrkgReservEntry."Entry No.";
                 PrevInsertedEntryNo := ReservEntry."Entry No.";
                 TempTrkgReservEntry.Delete();
@@ -3652,6 +3653,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
             end;
 
         LeadTimeEndDate := AtDate;
+
+        OnCreateSupplyForwardOnBeforeLoopQtyToOrderMoreThanZero(TempSKU, QtyToOrder, SupplyWithinLeadtime, TempSupplyInvtProfile);
 
         while QtyToOrder > 0 do begin
             // In case of max order the new supply could be split in several new supplies:
