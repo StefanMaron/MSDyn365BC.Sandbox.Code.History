@@ -3209,33 +3209,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Excel Buffer Test - NamedType UnknownCellTypeError)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 476676487 - NamedType 1988248460" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 tables are processed.\%2 errors found.\%3 records inserted.\%4 records modified.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Excel Data Migration Test - NamedType ApplySummaryTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 476676487 - NamedType 1997645008" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Field %1 in table %2 has a different value than expected.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Excel Data Migration Test - NamedType FieldValueErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 476676487 - NamedType 778698418" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Some of the fields will not be applied because errors were found in the imported data.\\Do you want to continue?]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Excel Data Migration Test - NamedType ValidateErrorsBeforeApplyQst)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 1240596346 - NamedType 2620270689" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Test Extended Text]]></Val>
