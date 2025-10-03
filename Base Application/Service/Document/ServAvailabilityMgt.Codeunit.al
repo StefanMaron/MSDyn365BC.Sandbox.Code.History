@@ -662,4 +662,11 @@ codeunit 6452 "Serv. Availability Mgt."
     local procedure OnSetServiceHeaderOnAfterFilterServiceLine(var ServiceLine: Record "Service Line"; var ServiceHeader: Record "Service Header")
     begin
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnCalcQtyOnServiceOrder', '', false, false)]
+    local procedure OnCalcQtyOnServiceOrder(var Item: Record Item; var Result: Decimal)
+    begin
+        Item.CalcFields("Qty. on Service Order");
+        Result := Item."Qty. on Service Order";
+    end;
 }
