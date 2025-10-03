@@ -15,7 +15,7 @@
     {
       "id": "e1d97edc-c239-46b4-8d84-6368bdf67c8b",
       "name": "E-Document Core",
-      "version": "26.2.0.0",
+      "version": "26.3.0.0",
       "publisher": "Microsoft"
     }
   ],
@@ -28,7 +28,7 @@
   ],
   "screenshots": [],
   "platform": "26.0.0.0",
-  "application": "26.2.0.0",
+  "application": "26.3.0.0",
   "idRanges": [
     {
       "from": 6490,
