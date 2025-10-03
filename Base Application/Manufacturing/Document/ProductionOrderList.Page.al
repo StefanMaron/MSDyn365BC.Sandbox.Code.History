@@ -16,6 +16,7 @@ page 99000815 "Production Order List"
     DataCaptionFields = Status;
     Editable = false;
     PageType = List;
+    AboutText = 'Monitor and manage production orders, track progress and status, analyze manufacturing costs and variances, and review key details such as quantities, dates, routing, and responsible users to optimize production efficiency and address potential issues.';
     SourceTable = "Production Order";
     UsageCategory = Lists;
 
