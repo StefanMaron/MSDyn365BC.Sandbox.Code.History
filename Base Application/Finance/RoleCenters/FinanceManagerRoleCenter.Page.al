@@ -427,6 +427,14 @@ page 8901 "Finance Manager Role Center"
                     group("Group9")
                     {
                         Caption = 'Financial Statement';
+                        action("Account Schedule")
+                        {
+                            ApplicationArea = Basic, Suite;
+                            Caption = 'Financial Report';
+                            RunObject = report "Account Schedule";
+                            Tooltip = 'Run the Account Schedule report.';
+                            Visible = false;
+                        }
                         action("Trial Balance")
                         {
                             ApplicationArea = Basic, Suite;

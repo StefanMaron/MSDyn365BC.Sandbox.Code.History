@@ -5,6 +5,7 @@
 namespace Microsoft.CRM.Outlook;
 
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 using Microsoft.Sales.History;
 
 table 1606 "Office Invoice"
@@ -44,13 +45,14 @@ table 1606 "Office Invoice"
     var
         SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
+        PageManagement: Codeunit "Page Management";
     begin
         if Posted then begin
             SalesInvoiceHeader.Get("Document No.");
-            PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
+            PageManagement.PageRun(SalesInvoiceHeader);
         end else begin
             SalesHeader.Get(SalesHeader."Document Type"::Invoice, "Document No.");
-            PAGE.Run(PAGE::"Sales Invoice", SalesHeader);
+            PageManagement.PageRun(SalesHeader);
         end;
     end;
 

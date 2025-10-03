@@ -45,8 +45,8 @@ codeunit 137035 "SCM PS Bugs-I"
         QuantityErr: Label 'Quantity update should be possible in %1.', Comment = '%1= Table Name.';
         DueDateErr: Label 'Planned production order due date not match with planning worksheet due date';
         SKUInventoryErr: Label 'Expected inventory to be blank for non-inventory item';
-        MainItemErr: Label 'New planning worksheet line is not created for main item';
-        CompoItemErr: Label 'New planning worksheet line is not created for component item';
+        MainItemErr: Label 'New planning worksheet line not created for main item';
+        CompoItemErr: Label 'New planning worksheet line not created for component item';
 
     [Test]
     [Scope('OnPrem')]

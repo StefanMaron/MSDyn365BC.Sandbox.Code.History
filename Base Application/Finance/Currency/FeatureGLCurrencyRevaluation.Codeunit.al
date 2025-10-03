@@ -119,7 +119,7 @@ codeunit 5891 "Feature-GLCurrencyRevaluation" implements "Feature Data Update"
         if RecordCount = 0 then
             exit;
         TempDocumentEntry.Init();
-        TempDocumentEntry."Entry No." += 1;
+        TempDocumentEntry."Entry No." := TableID;
         TempDocumentEntry."Table ID" := TableID;
         TempDocumentEntry."Table Name" := CopyStr(TableName, 1, MaxStrLen(TempDocumentEntry."Table Name"));
         TempDocumentEntry."No. of Records" := RecordCount;

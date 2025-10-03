@@ -57,7 +57,7 @@ page 6757 "Reminder Act. History Log"
                     ObsoleteState = Pending;
                     ObsoleteReason = 'This field is obsolete and should not be used.';
 #pragma warning disable AS0074
-                ObsoleteTag = '26.0';
+                    ObsoleteTag = '26.0';
 #pragma warning restore AS0074
                 }
 #endif

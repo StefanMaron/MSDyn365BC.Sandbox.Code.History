@@ -242,7 +242,6 @@ codeunit 131920 "Library - Job"
     end;
 #endif
 
-#if not CLEAN25
     procedure CreateJobGLAccountPrice(var JobGLAccountPrice: Record "Job G/L Account Price"; JobNo: Code[20]; JobTaskNo: Code[20]; GLAccountNo: Code[20]; CurrencyCode: Code[10])
     begin
         JobGLAccountPrice.Init();
@@ -276,7 +275,6 @@ codeunit 131920 "Library - Job"
         JobResourcePrice.Validate("Currency Code", CurrencyCode);
         JobResourcePrice.Insert(true);
     end;
-#endif
 
     procedure CreateJobJournalBatch(JobJournalTemplateName: Code[10]; var JobJournalBatch: Record "Job Journal Batch") BatchName: Code[10]
     begin
@@ -412,6 +410,8 @@ codeunit 131920 "Library - Job"
     end;
 
     procedure GetGenJournalTemplate(var GenJournalTemplate: Record "Gen. Journal Template"): Code[10]
+    var
+        SourceCode: Record "Source Code";
     begin
         // In this test codeunit we always use the same gen. journal template
 
@@ -421,6 +421,8 @@ codeunit 131920 "Library - Job"
             GenJournalTemplate.Insert(true)
         end;
 
+        LibraryERM.CreateSourceCode(SourceCode);
+        GenJournalTemplate.Validate("Source Code", SourceCode.Code);
         GenJournalTemplate.Validate("No. Series", GetJobTestNoSeries());
         GenJournalTemplate.Modify(true);
 

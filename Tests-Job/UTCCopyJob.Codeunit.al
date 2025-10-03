@@ -425,7 +425,6 @@ codeunit 136361 "UT C Copy Job"
         VerifyJobPlanningLineLedgerEntryFields(Job[2]."No.", JobTask."Job Task No.");
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure CopyJobWithPriceDiffCurrency()
@@ -481,7 +480,6 @@ codeunit 136361 "UT C Copy Job"
         JobResourcePrice[2].SetRange("Currency Code", Currency.Code);
         Assert.RecordIsNotEmpty(JobResourcePrice[2]);
     end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -809,7 +807,6 @@ codeunit 136361 "UT C Copy Job"
         JobPlanningLine.Modify();
     end;
 
-#if not CLEAN25
     local procedure CreateJobGLAccPrice(var JobGLAccountPrice: Record "Job G/L Account Price"; JobNo: Code[20]; GLAccountNo: Code[20]; CurrencyCode: Code[20])
     begin
         LibraryJob.CreateJobGLAccountPrice(
@@ -833,7 +830,6 @@ codeunit 136361 "UT C Copy Job"
         JobResourcePrice."Unit Price" := LibraryRandom.RandIntInRange(1, 10);
         JobResourcePrice.Modify();
     end;
-#endif
 
     local procedure CompareJobFields(SourceJob: Record Job; TargetJob: Record Job)
     begin

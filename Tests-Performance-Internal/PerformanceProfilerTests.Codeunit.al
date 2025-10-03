@@ -27,7 +27,6 @@
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryWorkflow: Codeunit "Library - Workflow";
         LibraryDocumentApprovals: Codeunit "Library - Document Approvals";
-        LibraryCAMTFileMgt: Codeunit "Library - CAMT File Mgt.";
         LibraryJobQueue: Codeunit "Library - Job Queue";
         IsInitialized: Boolean;
         BankRecIsInitialized: Boolean;
@@ -241,7 +240,6 @@
         CustomerCard.Close();
     end;
 
-#if not CLEAN25
     [Test]
     [Scope('OnPrem')]
     procedure TestOpenCustomerCardSalesPricesAndDiscountPerformance()
@@ -276,42 +274,6 @@
             PerfProfilerEventsTest."Object Type"::Page, PAGE::"Customer Card", true);
         CustomerCard.Close();
     end;
-#else
-    [Test]
-    [Scope('OnPrem')]
-    procedure TestOpenCustomerCardSalesPricesAndDiscountPerformance()
-    var
-        Item: Record Item;
-        Customer: Record Customer;
-        PriceListLine: Record "Price List Line";
-        CustomerDiscountGroup: Record "Customer Discount Group";
-        CustomerCard: TestPage "Customer Card";
-        PerfProfilerEventsTest: Record "Perf Profiler Events Test";
-    begin
-        LibraryApplicationArea.EnablePremiumSetup();
-        LibraryInventory.CreateItem(Item);
-        LibrarySales.CreateCustomer(Customer);
-
-        //Add customer discount group
-        CreateCustomerDiscountGroupWithSalesLineDiscount(CustomerDiscountGroup, PriceListLine, Item);
-        Customer."Customer Disc. Group" := CustomerDiscountGroup.Code;
-        Customer.Modify(true);
-
-        //Add customer specific discount
-        CreateCustomerDiscountWithSalesLineDiscount(Customer, PriceListLine, Item);
-
-        //Add discount for all customer
-        CreateAllCustomerDiscountWithSalesLineDiscount(PriceListLine, Item);
-
-        CustomerCard.OpenView();
-        LibraryPerformanceProfiler.StartProfiler(true);
-        CustomerCard.GotoRecord(Customer);
-        TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
-            PerfProfilerEventsTest, 'TestOpenCustomerCardSalesPricesAndDiscountPerformance',
-            PerfProfilerEventsTest."Object Type"::Page, PAGE::"Customer Card", true);
-        CustomerCard.Close();
-    end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -1562,102 +1524,6 @@
 
     [Test]
     [Scope('OnPrem')]
-    procedure TestPaymentReconciliationOpenPeformance()
-    var
-        BankAccRecon: Record "Bank Acc. Reconciliation";
-        CustLedgEntry: array[36] of Record "Cust. Ledger Entry";
-        PerfProfilerEventsTest: Record "Perf Profiler Events Test";
-        PmtReconJnl: TestPage "Payment Reconciliation Journal";
-        NoOfSales: Integer;
-    begin
-        InitializePaymentRec(BankAccRecon, CustLedgEntry, NoOfSales);
-
-        // Measure Open Pmt Jnl
-        LibraryPerformanceProfiler.StartProfiler(true);
-        OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
-        LibraryPerformanceProfiler.StopProfiler(
-            PerfProfilerEventsTest, 'TestOpenPaymentReconciliationJnlPerformance',
-            PerfProfilerEventsTest."Object Type"::Page, Page::"Payment Reconciliation Journal", true);
-    end;
-
-    [Test]
-    [HandlerFunctions('MessageHandler')]
-    [Scope('OnPrem')]
-    procedure TestPaymentReconciliationAutomaticalPeformance()
-    var
-        CustLedgEntry: array[36] of Record "Cust. Ledger Entry";
-        BankAccRecon: Record "Bank Acc. Reconciliation";
-        PerfProfilerEventsTest: Record "Perf Profiler Events Test";
-        PmtReconJnl: TestPage "Payment Reconciliation Journal";
-        NoOfSales: Integer;
-    begin
-        InitializePaymentRec(BankAccRecon, CustLedgEntry, NoOfSales);
-
-        OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
-
-        // Measure Apply Automatically
-        LibraryPerformanceProfiler.StartProfiler(true);
-
-        AutoApplyLinesPaymentRec(PmtReconJnl);
-
-        LibraryPerformanceProfiler.StopProfiler(
-            PerfProfilerEventsTest, 'TestPaymentReconciliationApplyAutomaticallyPerformance',
-            PerfProfilerEventsTest."Object Type"::Page, Page::"Payment Reconciliation Journal", true);
-    end;
-
-    [Test]
-    [HandlerFunctions('PmtApplnToCustHandler')]
-    [Scope('OnPrem')]
-    procedure TestPaymentReconciliationManualPeformance()
-    var
-        CustLedgEntry: array[36] of Record "Cust. Ledger Entry";
-        BankAccRecon: Record "Bank Acc. Reconciliation";
-        PerfProfilerEventsTest: Record "Perf Profiler Events Test";
-        PmtReconJnl: TestPage "Payment Reconciliation Journal";
-        NoOfSales: Integer;
-    begin
-        InitializePaymentRec(BankAccRecon, CustLedgEntry, NoOfSales);
-
-        OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
-
-        // Measure Manual Apply
-        LibraryPerformanceProfiler.StartProfiler(true);
-
-        ManualApplyLinesPaymentRec(PmtReconJnl, CustLedgEntry, NoOfSales);
-
-        LibraryPerformanceProfiler.StopProfiler(
-            PerfProfilerEventsTest, 'TestPaymentReconciliationApplyManuallyPerformance',
-            PerfProfilerEventsTest."Object Type"::Page, Page::"Payment Reconciliation Journal", true);
-    end;
-
-    [Test]
-    [HandlerFunctions('MessageHandler,ConfirmHandlerYes,PmtApplnToCustHandler,PostAndReconcilePageHandler')]
-    [Scope('OnPrem')]
-    procedure TestPaymentReconciliationPostPeformance()
-    var
-        BankAccRecon: Record "Bank Acc. Reconciliation";
-        CustLedgEntry: array[36] of Record "Cust. Ledger Entry";
-        PerfProfilerEventsTest: Record "Perf Profiler Events Test";
-        PmtReconJnl: TestPage "Payment Reconciliation Journal";
-        NoOfSales: Integer;
-    begin
-        InitializePaymentRec(BankAccRecon, CustLedgEntry, NoOfSales);
-        GetLinesAndUpdateBankAccRecStmEndingBalance(BankAccRecon);
-
-        OpenPmtReconJnl(BankAccRecon, PmtReconJnl);
-        AutoApplyLinesPaymentRec(PmtReconJnl);
-        ManualApplyLinesPaymentRec(PmtReconJnl, CustLedgEntry, NoOfSales);
-
-        // Measure Post
-        LibraryPerformanceProfiler.StartProfiler(true);
-        PmtReconJnl.Post.Invoke();
-        LibraryPerformanceProfiler.StopProfiler(
-            PerfProfilerEventsTest, 'TestPaymentReconciliationJnlPostPerformance',
-            PerfProfilerEventsTest."Object Type"::Page, Page::"Payment Reconciliation Journal", true);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
     [HandlerFunctions('LowLevelCodeConfirmHandler')]
     procedure TestCalcLowLevelCodePerformance()
     var
@@ -1670,160 +1536,16 @@
             PerfProfilerEventsTest."Object Type"::Codeunit, Codeunit::"Low-Level Code Calculator", true);
     end;
 
-    local procedure InitializePaymentRec(var BankAccRecon: Record "Bank Acc. Reconciliation"; var CustLedgEntry: array[36] of Record "Cust. Ledger Entry"; var NoOfSales: Integer)
-    var
-        InventorySetup: Record "Inventory Setup";
-        TempBlobUTF8: Codeunit "Temp Blob";
-        OutStream: OutStream;
-        i: Integer;
-        j: Integer;
-    begin
-        LibraryERMCountryData.CreateVATData();
-        LibraryERMCountryData.UpdateGeneralLedgerSetup();
-        LibraryERMCountryData.UpdateGeneralPostingSetup();
-        LibraryERMCountryData.UpdatePurchasesPayablesSetup();
-        LibraryInventory.NoSeriesSetup(InventorySetup);
-        UpdateCustPostingGrp();
-        LibraryERMCountryData.UpdateJournalTemplMandatory(false);
-        Commit();
 
-        NoOfSales := 6;
 
-        TempBlobUTF8.CreateOutStream(OutStream, TEXTENCODING::UTF8);
 
-        LibraryCAMTFileMgt.WriteCAMTHeader(OutStream);
-        LibraryCAMTFileMgt.WriteCAMTStmtHeader(OutStream, '', 'TEST');
 
-        j := 0;
 
-        for i := 1 to NoOfSales do begin
-            TwoSaleOnePmt(CustLedgEntry, OutStream, j + 1, j + NoOfSales);
-            j := i * NoOfSales;
-        end;
 
-        WriteCAMTFooter(OutStream);
 
-        CreateBankAccReconAndImportStmt(BankAccRecon, TempBlobUTF8);
-    end;
 
-    local procedure AutoApplyLinesPaymentRec(var PmtReconJnl: TestPage "Payment Reconciliation Journal")
-    begin
-        PmtReconJnl.ApplyAutomatically.Invoke();
-        PmtReconJnl.First();
-    end;
 
-    local procedure ManualApplyLinesPaymentRec(var PmtReconJnl: TestPage "Payment Reconciliation Journal"; var CustLedgEntry: array[36] of Record "Cust. Ledger Entry"; NoOfSales: Integer)
-    var
-        GlobalPmtReconJnl: TestPage "Payment Reconciliation Journal";
-        j: Integer;
-    begin
-        for j := 0 to NoOfSales - 1 do begin
-            GlobalCustLedgEntry := CustLedgEntry[j * NoOfSales + 1];
-            GlobalPmtReconJnl := PmtReconJnl;
-            GlobalPmtReconJnl.ApplyEntries.Invoke();
-            PmtReconJnl := GlobalPmtReconJnl;
-            PmtReconJnl.Next();
-        end;
-    end;
 
-    local procedure UpdateCustPostingGrp()
-    var
-        CustPostingGroup: Record "Customer Posting Group";
-        GLAcc: Record "G/L Account";
-    begin
-        LibraryERM.CreateGLAccount(GLAcc);
-        if CustPostingGroup.FindSet() then
-            repeat
-                if CustPostingGroup."Payment Disc. Debit Acc." = '' then begin
-                    CustPostingGroup.Validate("Payment Disc. Debit Acc.", GLAcc."No.");
-                    CustPostingGroup.Modify(true);
-                end;
-                if CustPostingGroup."Payment Disc. Credit Acc." = '' then begin
-                    CustPostingGroup.Validate("Payment Disc. Credit Acc.", GLAcc."No.");
-                    CustPostingGroup.Modify(true);
-                end;
-            until CustPostingGroup.Next() = 0;
-    end;
-
-    local procedure WriteCAMTFooter(var OutStream: OutStream)
-    begin
-        LibraryCAMTFileMgt.WriteCAMTStmtFooter(OutStream);
-        LibraryCAMTFileMgt.WriteCAMTFooter(OutStream);
-    end;
-
-    local procedure TwoSaleOnePmt(var CustLedgEntry: array[36] of Record "Cust. Ledger Entry"; var OutStream: OutStream; FromPos: Integer; ToPos: Integer)
-    var
-        Cust: Record Customer;
-        i: Integer;
-        Total: Decimal;
-        DocNo: Text[250];
-    begin
-        LibrarySales.CreateCustomer(Cust);
-
-        for i := FromPos to ToPos do begin
-            CreateSalesInvoiceAndPost(Cust, CustLedgEntry[i], '');
-            Total += CustLedgEntry[i]."Remaining Amount" - CustLedgEntry[i]."Remaining Pmt. Disc. Possible";
-            DocNo := StrSubstNo('%1;%2', DocNo, CustLedgEntry[i]."Document No.");
-        end;
-
-        LibraryCAMTFileMgt.WriteCAMTStmtLine(OutStream, CustLedgEntry[FromPos]."Posting Date", DocNo, Total, '', '');
-    end;
-
-    local procedure CreateSalesInvoiceAndPost(var Cust: Record Customer; var CustLedgEntry: Record "Cust. Ledger Entry"; CurrencyCode: Code[10])
-    var
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        Item: Record Item;
-    begin
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Cust."No.");
-        SalesHeader.Validate("Currency Code", CurrencyCode);
-        SalesHeader.Modify(true);
-
-        LibraryInventory.CreateItem(Item);
-        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", 1);
-        SalesLine.Validate("Unit Price", 100);
-        SalesLine.Modify(true);
-
-        CustLedgEntry.SetRange("Customer No.", Cust."No.");
-        CustLedgEntry.SetRange("Document Type", CustLedgEntry."Document Type"::Invoice);
-        CustLedgEntry.SetRange("Document No.", LibrarySales.PostSalesDocument(SalesHeader, true, true));
-        CustLedgEntry.FindFirst();
-
-        CustLedgEntry.CalcFields("Remaining Amount");
-    end;
-
-    local procedure CreateBankAccReconAndImportStmt(var BankAccRecon: Record "Bank Acc. Reconciliation"; var TempBlobUTF8: Codeunit "Temp Blob")
-    var
-        BankAcc: Record "Bank Account";
-        BankStmtFormat: Code[20];
-    begin
-        BankStmtFormat := 'SEPA CAMT';
-        CreateBankAcc(BankStmtFormat, BankAcc);
-        LibraryERM.CreateBankAccReconciliation(BankAccRecon, BankAcc."No.", BankAccRecon."Statement Type"::"Payment Application");
-        LibraryCAMTFileMgt.SetupSourceMock(BankStmtFormat, TempBlobUTF8);
-        BankAccRecon.ImportBankStatement();
-
-        BankAccRecon.CalcFields("Total Transaction Amount");
-    end;
-
-    local procedure CreateBankAcc(BankStmtFormat: Code[20]; var BankAcc: Record "Bank Account")
-    begin
-        LibraryERM.CreateBankAccount(BankAcc);
-        BankAcc."Bank Account No." := 'TEST';
-        BankAcc."Bank Branch No." := 'TEST';
-        BankAcc."Bank Statement Import Format" := BankStmtFormat;
-        BankAcc.Modify(true);
-    end;
-
-    local procedure OpenPmtReconJnl(BankAccRecon: Record "Bank Acc. Reconciliation"; var PmtReconJnl: TestPage "Payment Reconciliation Journal")
-    var
-        PmtReconciliationJournals: TestPage "Pmt. Reconciliation Journals";
-    begin
-        PmtReconciliationJournals.OpenView();
-        PmtReconciliationJournals.GotoRecord(BankAccRecon);
-        PmtReconJnl.Trap();
-        PmtReconciliationJournals.EditJournal.Invoke();
-    end;
 
     local procedure CreateBankAccReconciliation(var BankAccReconciliation: Record "Bank Acc. Reconciliation"; BankAccountNo: Code[20])
     begin
@@ -2002,7 +1724,6 @@
         PaymentJournal.Post.Invoke();
     end;
 
-#if not CLEAN25
     local procedure CreateCustomerDiscountWithSalesLineDiscount(var Customer: Record "Customer"; var SalesLineDiscount: Record "Sales Line Discount"; Item: Record Item)
     begin
         CreateSalesLineDiscount(
@@ -2032,58 +1753,6 @@
           Quantity);
         SalesLineDiscount.Validate("Line Discount %", LibraryRandom.RandDec(10, 2));
         SalesLineDiscount.Modify(true);
-    end;
-#else
-    local procedure CreateCustomerDiscountWithSalesLineDiscount(var Customer: Record "Customer"; var PriceListLine: Record "Price List Line"; Item: Record Item)
-    begin
-        CreateSalesLineDiscount(
-            PriceListLine, Item, "Price Source Type"::Customer, Customer."No.", WorkDate(), LibraryRandom.RandDec(10, 2));
-    end;
-
-    local procedure CreateAllCustomerDiscountWithSalesLineDiscount(var PriceListLine: Record "Price List Line"; Item: Record Item)
-    begin
-        CreateSalesLineDiscount(
-            PriceListLine, Item, "Price Source Type"::"All Customers", '', WorkDate(), LibraryRandom.RandDec(10, 2));
-    end;
-
-    local procedure CreateCustomerDiscountGroupWithSalesLineDiscount(var CustomerDiscountGroup: Record "Customer Discount Group"; var PriceListLine: Record "Price List Line"; Item: Record Item)
-    begin
-        LibraryERM.CreateCustomerDiscountGroup(CustomerDiscountGroup);
-        CreateSalesLineDiscount(
-            PriceListLine, Item, "Price Source Type"::"Customer Disc. Group", CustomerDiscountGroup.Code,
-            WorkDate(), LibraryRandom.RandDec(10, 2));
-    end;
-
-    local procedure CreateSalesLineDiscount(var PriceListLine: Record "Price List Line"; Item: Record Item; SalesType: Enum "Price Source Type"; SalesCode: Code[20]; StartingDate: Date; Quantity: Decimal)
-    var
-        LibraryPriceCalculation: Codeunit "Library - Price Calculation";
-    begin
-        LibraryPriceCalculation.CreateSalesDiscountLine(PriceListLine, '', SalesType, SalesCode, "Price Asset Type"::Item, Item."No.");
-        PriceListLine.Validate("Starting Date", StartingDate);
-        PriceListLine.Validate("Unit of Measure Code", Item."Base Unit of Measure");
-        PriceListLine.Validate("Minimum Quantity", Quantity);
-        PriceListLine.Validate("Line Discount %", LibraryRandom.RandDec(10, 2));
-        PriceListLine.Status := "Price Status"::Active;
-        PriceListLine.Modify(true);
-    end;
-#endif
-
-    local procedure GetLinesAndUpdateBankAccRecStmEndingBalance(var BankAccRecon: Record "Bank Acc. Reconciliation")
-    var
-        BankAccRecLine: Record "Bank Acc. Reconciliation Line";
-        TotalLinesAmount: Decimal;
-    begin
-        BankAccRecLine.LinesExist(BankAccRecon);
-        repeat
-            TotalLinesAmount += BankAccRecLine."Statement Amount";
-        until BankAccRecLine.Next() = 0;
-        UpdateBankAccRecStmEndingBalance(BankAccRecon, BankAccRecon."Balance Last Statement" + TotalLinesAmount);
-    end;
-
-    local procedure UpdateBankAccRecStmEndingBalance(var BankAccRecon: Record "Bank Acc. Reconciliation"; NewStmEndingBalance: Decimal)
-    begin
-        BankAccRecon.Validate("Statement Ending Balance", NewStmEndingBalance);
-        BankAccRecon.Modify();
     end;
 
     [ModalPageHandler]

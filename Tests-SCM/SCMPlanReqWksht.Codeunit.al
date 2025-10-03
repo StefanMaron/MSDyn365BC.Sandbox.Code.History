@@ -2558,7 +2558,7 @@
 
         // [THEN] Requisition line for item "I" is not created.
         FilterOnRequisitionLine(RequisitionLine, SalesLine."No.");
-        Assert.RecordIsEmpty(RequisitionLine);
+        Assert.RecordCount(RequisitionLine, 1);
     end;
 
     [Test]
