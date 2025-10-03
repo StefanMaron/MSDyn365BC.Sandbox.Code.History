@@ -1201,9 +1201,6 @@ codeunit 1000 "Job Calculate WIP"
         if Rec.IsTemporary then
             exit;
 
-        if not RunTrigger then
-            exit;
-
         if JobTaskWIPRelatedFieldsAreModified(Rec) then
             VerifyJobWIPEntryIsEmpty(Rec."Job No.");
     end;
@@ -1212,9 +1209,6 @@ codeunit 1000 "Job Calculate WIP"
     procedure VerifyJobWIPEntryOnBeforeRename(var Rec: Record "Job Task"; var xRec: Record "Job Task"; RunTrigger: Boolean)
     begin
         if Rec.IsTemporary then
-            exit;
-
-        if not RunTrigger then
             exit;
 
         VerifyJobWIPEntryIsEmpty(Rec."Job No.");
