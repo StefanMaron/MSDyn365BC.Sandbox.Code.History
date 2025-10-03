@@ -2,8 +2,8 @@
   "id": "fdddc5f1-3294-485f-aed1-0b798b6edd69",
   "name": "Tests-Prepayment",
   "publisher": "Microsoft",
-  "version": "25.1.25873.40347",
-  "platform": "25.0.0.0",
+  "version": "25.2.27733.40349",
+  "platform": "25.2.0.0",
   "dependencies": [
     {
       "id": "5d86850b-0d76-4eca-bd7b-951ad998e997",
