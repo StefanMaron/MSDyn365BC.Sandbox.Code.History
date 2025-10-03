@@ -37,9 +37,9 @@ codeunit 9066 "Check Purchase Document Line"
     end;
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterCheckDocuments', '', false, false)]
-    local procedure ItemOnBeforeCheckDocuments(Item: Record Item; CurrentFieldNo: Integer; CheckFieldNo: Integer; CheckFieldCaption: Text);
+    local procedure ItemOnBeforeCheckDocuments(Item: Record Item; CurrentFieldNo: Integer);
     begin
-        CheckPurchaseLines(Item, CurrentFieldNo, CheckFieldNo, CheckFieldCaption);
+        CheckPurchaseLines(Item, CurrentFieldNo, Item.FieldNo(Type), Item.FieldCaption(Type));
     end;
 
     internal procedure CheckPurchaseLines(Item: Record Item; CurrentFieldNo: Integer; CheckFieldNo: Integer; CheckFieldCaption: Text)

@@ -12,9 +12,9 @@ codeunit 9134 "Check Transfer Document"
         CannotChangeItemWithOutstandingDocumentLinesErr: Label 'You cannot delete %1 %2 because there are one or more outstanding transfer orders that include this item.', Comment = '%1 - Item, %2 - Item No.';
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterCheckDocuments', '', false, false)]
-    local procedure ItemOnBeforeCheckDocuments(Item: Record Item; CurrentFieldNo: Integer; CheckFieldNo: Integer; CheckFieldCaption: Text);
+    local procedure ItemOnBeforeCheckDocuments(Item: Record Item; CurrentFieldNo: Integer);
     begin
-        CheckTransferLines(Item, CurrentFieldNo, CheckFieldNo, CheckFieldCaption);
+        CheckTransferLines(Item, CurrentFieldNo, Item.FieldNo(Type), Item.FieldCaption(Type));
     end;
 
     internal procedure CheckTransferLines(Item: Record Item; CurrentFieldNo: Integer; CheckFieldNo: Integer; CheckFieldCaption: Text)
