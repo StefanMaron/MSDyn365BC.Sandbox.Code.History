@@ -1409,42 +1409,6 @@
       <Cmt Name="Dev"><![CDATA[%1 = Project No.]D;]A;(LookupHint=Codeunit New Time Sheet Experience - Method UpdateJobStatusWhenExistOnTimeSheetLine - NamedType TimeSheetLineExistsForJobErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 1692564887 - NamedType 2922458564" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[OK]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Page Troubleshooting Test - NamedType PageSuccessfullyValidatedTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1692564887 - NamedType 3189525254" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 error(s)]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Page Troubleshooting Test - NamedType PageValidationFailedWithErrorsTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1692564887 - NamedType 4169431022" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Scanning complete, no problems were found.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Page Troubleshooting Test - NamedType ScanCompletedSuccessfullyMsg)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1692564887 - NamedType 2440360502" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Scanning complete, %1 error(s) were found.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Page Troubleshooting Test - NamedType ScanCompletedWithErrorsMsg)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 630621805 - NamedType 188336940" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You are logged in as a Team Member role, so you cannot complete this task.]]></Val>
@@ -1569,15 +1533,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test My Settings - NamedType MyNotificationFilterTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 4182462641 - NamedType 484497177" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[(View filter details)]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test My Settings - NamedType ViewFilterDetailsTxt)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1651143873 - NamedType 1255942961" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
