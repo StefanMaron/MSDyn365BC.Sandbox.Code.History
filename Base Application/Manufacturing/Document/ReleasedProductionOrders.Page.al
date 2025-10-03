@@ -21,6 +21,7 @@ page 9326 "Released Production Orders"
     CardPageID = "Released Production Order";
     Editable = false;
     PageType = List;
+    AboutText = 'Track and monitor released production orders, compare expected and finished quantities, and analyze variances to prioritize production, identify process issues, and improve manufacturing efficiency.';
     SourceTable = "Production Order";
     SourceTableView = where(Status = const(Released));
     UsageCategory = Lists;
