@@ -144,8 +144,6 @@ table 1252 "Bank Pmt. Appl. Rule"
           ParameterBankPmtApplRule."Direct Debit Collect. Matched",
           ParameterBankPmtApplRule."Direct Debit Collect. Matched"::"Not Considered");
 
-        OnGetBestMatchScoreOnAfterSetFilters(Rec, ParameterBankPmtApplRule);
-
         if FindFirst() then
             exit(Score);
 
@@ -276,7 +274,6 @@ table 1252 "Bank Pmt. Appl. Rule"
 
         // Insert High Confidence rules
         RulePriority := 1;
-        OnInsertDefaultMatchingRulesBeforeInsertHighConfidenceRules(Rec, RulePriority);
         InsertBankPaymentApplicationRule(
           BankPmtApplRule."Match Confidence"::High, RulePriority,
           BankPmtApplRule."Related Party Matched"::"Not Considered",
@@ -504,16 +501,6 @@ table 1252 "Bank Pmt. Appl. Rule"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidatePriority(var BankPmtApplRule: Record "Bank Pmt. Appl. Rule"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertDefaultMatchingRulesBeforeInsertHighConfidenceRules(var BankPmtApplRule: Record "Bank Pmt. Appl. Rule"; var RulePriority: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetBestMatchScoreOnAfterSetFilters(var BankPmtApplRule: Record "Bank Pmt. Appl. Rule"; ParameterBankPmtApplRule: Record "Bank Pmt. Appl. Rule")
     begin
     end;
 }

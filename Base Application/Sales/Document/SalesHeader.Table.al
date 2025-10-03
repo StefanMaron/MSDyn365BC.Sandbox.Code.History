@@ -648,7 +648,8 @@ table 36 "Sales Header"
                     if ("Document Date" < "Posting Date") and
                        ("Incoming Document Entry No." = 0) and
                        (Rec."Posting Date" <> xRec."Posting Date") and
-                       (SalesReceivablesSetup."Link Doc. Date To Posting Date")
+                       SalesReceivablesSetup."Link Doc. Date To Posting Date" and
+                       not GetCalledFromWhseDoc()
                     then
                         Validate("Document Date", "Posting Date");
 
@@ -717,7 +718,7 @@ table 36 "Sales Header"
                     exit;
 
                 PaymentLines.CreatePaymentLinesSales(Rec);
-                CalcFields("Payment %");
+                CalcFields("Payment %"); 
             end;
         }
         field(24; "Due Date"; Date)

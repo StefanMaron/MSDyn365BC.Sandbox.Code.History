@@ -165,7 +165,6 @@ using Microsoft.Projects.Resources.Pricing;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.Resources.Setup;
 using Microsoft.Projects.RoleCenters;
-using Microsoft.Purchases.Analysis;
 using Microsoft.Purchases.Archive;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Document;
@@ -334,7 +333,6 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Accounting Services Cue" = RIMD,
                   tabledata "Action Message Entry" = R,
                   tabledata "Activities Cue" = RIMD,
-                  tabledata "Account Payable Cue" = RIMD,
                   tabledata Activity = R,
                   tabledata "Activity Log" = RIMD,
                   tabledata "Activity Step" = R,
@@ -1100,7 +1098,6 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Overdue Approval Entry" = R,
                   tabledata "Package No. Information" = R,
                   tabledata "Payable Employee Ledger Entry" = R,
-                  tabledata "Acc. Payable Performance Chart" = R,
                   tabledata "Payable Vendor Ledger Entry" = R,
                   tabledata "Payment Application Proposal" = R,
                   tabledata "Vendor Payment Buffer" = R,
@@ -1194,7 +1191,6 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Pstd. Phys. Invt. Record Hdr" = R,
                   tabledata "Pstd. Phys. Invt. Record Line" = R,
                   tabledata "Pstd. Phys. Invt. Tracking" = R,
-                  tabledata "Purch. by Vend.Grp.Chart Setup" = R,
                   tabledata "Purch. Comment Line" = R,
                   tabledata "Purch. Comment Line Archive" = R,
                   tabledata "Purch. Cr. Memo Entity Buffer" = R,
@@ -1440,7 +1436,6 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "To-do" = R,
                   tabledata "To-do Interaction Language" = R,
                   tabledata "Top Customers By Sales Buffer" = R,
-                  tabledata "Top Vendors By Purchase" = R,
                   tabledata "Total Value Insured" = R,
                   tabledata "Tracking Specification" = R,
                   tabledata "Trailing Sales Orders Setup" = R,

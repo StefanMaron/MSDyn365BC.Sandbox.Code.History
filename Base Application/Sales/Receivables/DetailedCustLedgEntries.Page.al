@@ -17,7 +17,6 @@ page 573 "Detailed Cust. Ledg. Entries"
     Editable = false;
     InsertAllowed = false;
     PageType = List;
-    AboutText = 'Review and audit individual customer transactions, including payments, invoices, and adjustments, to ensure accurate accounts receivable records and identify discrepancies such as missing payments or billing errors.';
     SourceTable = "Detailed Cust. Ledg. Entry";
     UsageCategory = History;
 
