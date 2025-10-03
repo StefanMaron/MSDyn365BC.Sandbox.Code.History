@@ -5,6 +5,7 @@
 namespace Microsoft.Sales.History;
 
 using Microsoft.Finance.Dimension;
+using Microsoft.Utilities;
 using Microsoft.Sales.Document;
 
 page 6638 "Get Return Receipt Lines"
@@ -183,9 +184,11 @@ page 6638 "Get Return Receipt Lines"
                     ToolTip = 'Open the document that the selected line exists on.';
 
                     trigger OnAction()
+                    var
+                        PageManagement: Codeunit "Page Management";
                     begin
                         ReturnRcptHeader.Get(Rec."Document No.");
-                        PAGE.Run(PAGE::"Posted Return Receipt", ReturnRcptHeader);
+                        PageManagement.PageRun(ReturnRcptHeader);
                     end;
                 }
                 action(Dimensions)

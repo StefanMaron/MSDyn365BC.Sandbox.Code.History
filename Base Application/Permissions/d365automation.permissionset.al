@@ -19,9 +19,7 @@ using Microsoft.eServices.OnlineMap;
 using Microsoft.Finance.Payroll;
 using Microsoft.Inventory.Reconciliation;
 using Microsoft.Projects.Project.Journal;
-#if not CLEAN25
 using Microsoft.Projects.Project.Pricing;
-#endif
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Projects.Project.Posting;
@@ -164,9 +162,7 @@ using Microsoft.Pricing.Worksheet;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Ledger;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.Resources.Setup;
 using Microsoft.Projects.RoleCenters;
@@ -335,6 +331,9 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Acc. Schedule Line Entity" = RIMD,
                   tabledata "Acc. Schedule Name" = RIMD,
                   tabledata "Financial Report" = RIMD,
+                  tabledata "Financial Report Export Log" = RIMD,
+                  tabledata "Financial Report Recipient" = RIMD,
+                  tabledata "Financial Report Schedule" = RIMD,
                   tabledata "Financial Report User Filters" = RIMD,
                   tabledata "Account Schedules Chart Setup" = RIMD,
                   tabledata "Account Use Buffer" = RIMD,
@@ -1001,10 +1000,8 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Job Cue" = RIMD,
                   tabledata "Job Difference Buffer" = Rimd,
                   tabledata "Job Entry No." = RIMD,
-#if not CLEAN25
                   tabledata "Job G/L Account Price" = RIMD,
                   tabledata "Job Item Price" = RIMD,
-#endif
                   tabledata "Job Journal Batch" = RIMD,
                   tabledata "Job Journal Line" = RIMD,
                   tabledata "Job Journal Quantity" = RIMD,
@@ -1024,9 +1021,7 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Job Queue Notification Setup" = RIMD,
                   tabledata "Job Queue Notified Admin" = RIMD,
                   tabledata "Job Register" = Rimd,
-#if not CLEAN25
                   tabledata "Job Resource Price" = RIMD,
-#endif
                   tabledata "Job Responsibility" = RIMD,
                   tabledata "Job Task" = RIMD,
                   tabledata "Job Task Archive" = RIMD,
@@ -1230,9 +1225,7 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Purch. Inv. Header" = RimD,
                   tabledata "Purch. Inv. Line" = Rimd,
                   tabledata "Purch. Inv. Line Aggregate" = RIMD,
-#if not CLEAN25
                   tabledata "Purch. Price Line Disc. Buff." = RIMD,
-#endif
                   tabledata "Purch. Rcpt. Header" = RIMD,
                   tabledata "Purch. Rcpt. Line" = Rimd,
                   tabledata "Purchase Cue" = RIMD,
@@ -1241,14 +1234,10 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Purchase Header Archive" = RIMD,
                   tabledata "Purchase Line" = RIMD,
                   tabledata "Purchase Line Archive" = RIMD,
-#if not CLEAN25
                   tabledata "Purchase Line Discount" = RIMD,
-#endif
                   tabledata "Purchase Order Entity Buffer" = RIMD,
                   tabledata "Purchase Prepayment %" = RIMD,
-#if not CLEAN25
                   tabledata "Purchase Price" = RIMD,
-#endif
                   tabledata "Purchase Price Access" = RIMD,
                   tabledata "Purchases & Payables Setup" = RIMD,
                   tabledata Purchasing = RIMD,
@@ -1271,7 +1260,7 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Recorded Event Buffer" = RIMD,
                   tabledata "Referenced XML Schema" = RIMD,
                   tabledata "Registered Invt. Movement Hdr." = RimD,
-                  tabledata "Registered Invt. Movement Line" = Rimd,
+                  tabledata "Registered Invt. Movement Line" = RimD,
                   tabledata "Registered Whse. Activity Hdr." = Rimd,
                   tabledata "Registered Whse. Activity Line" = Rimd,
                   tabledata "Relationship Mgmt. Cue" = RIMD,
@@ -1316,14 +1305,10 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Reservation Entry" = RIMD,
                   tabledata "Reservation Entry Buffer" = RIMD,
                   tabledata Resource = RIMD,
-#if not CLEAN25
                   tabledata "Resource Cost" = RIMD,
-#endif
                   tabledata "Resource Group" = RIMD,
-#if not CLEAN25
                   tabledata "Resource Price" = RIMD,
                   tabledata "Resource Price Change" = RIMD,
-#endif
                   tabledata "Resource Register" = RIMD,
                   tabledata "Resource Unit of Measure" = RIMD,
                   tabledata "Resources Setup" = RIMD,
@@ -1361,20 +1346,14 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Sales Invoice Line Aggregate" = RIMD,
                   tabledata "Sales Line" = RIMD,
                   tabledata "Sales Line Archive" = RIMD,
-#if not CLEAN25
                   tabledata "Sales Line Discount" = RIMD,
-#endif
                   tabledata "Sales Order Entity Buffer" = RIMD,
                   tabledata "Sales Planning Line" = Rimd,
                   tabledata "Sales Prepayment %" = RIMD,
-#if not CLEAN25
                   tabledata "Sales Price" = RIMD,
-#endif
                   tabledata "Sales Price Access" = RIMD,
-#if not CLEAN25
                   tabledata "Sales Price and Line Disc Buff" = RIMD,
                   tabledata "Sales Price Worksheet" = RIMD,
-#endif
                   tabledata "Sales Quote Entity Buffer" = RIMD,
                   tabledata "Sales Shipment Buffer" = RIMD,
                   tabledata "Sales Shipment Header" = RimD,

@@ -5,6 +5,7 @@
 namespace Microsoft.Sales.History;
 
 using Microsoft.Finance.Dimension;
+using Microsoft.Utilities;
 using Microsoft.Sales.Document;
 
 page 5708 "Get Shipment Lines"
@@ -192,9 +193,11 @@ page 5708 "Get Shipment Lines"
                     ToolTip = 'Open the document that the selected line exists on.';
 
                     trigger OnAction()
+                    var
+                        PageManagement: Codeunit "Page Management";
                     begin
                         SalesShptHeader.Get(Rec."Document No.");
-                        PAGE.Run(PAGE::"Posted Sales Shipment", SalesShptHeader);
+                        PageManagement.PageRun(SalesShptHeader);
                     end;
                 }
                 action(Dimensions)

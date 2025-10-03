@@ -1,9 +1,5 @@
-#if not CLEAN25
 codeunit 101213 "Create Job Resource Prices"
 {
-    ObsoleteState = Pending;
-    ObsoleteTag = '19.0';
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
 
     trigger OnRun()
     begin
@@ -38,4 +34,3 @@ codeunit 101213 "Create Job Resource Prices"
         JobResourcePrice.Insert();
     end;
 }
-#endif

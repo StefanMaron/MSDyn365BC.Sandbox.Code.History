@@ -66,10 +66,8 @@ table 23 Vendor
     Permissions = TableData "Vendor Ledger Entry" = r,
                   TableData "Price List Header" = rd,
                   TableData "Price List Line" = rd,
-#if not CLEAN25
                   TableData "Purchase Price" = rd,
                   TableData "Purchase Line Discount" = rd,
-#endif
                   TableData "Purchase Price Access" = rd,
                   TableData "Purchase Discount Access" = rd,
                   tabledata Language = r,
@@ -2862,20 +2860,16 @@ table 23 Vendor
     begin
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by the new implementation (V16) of price calculation.', '16.0')]
     [Scope('OnPrem')]
     procedure ValidatePricesIncludingVATOnAfterGetVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup")
     begin
         OnValidatePricesIncludingVATOnAfterGetVATPostingSetup(VATPostingSetup);
     end;
 
-    [Obsolete('Replaced by the new implementation (V16) of price calculation.', '16.0')]
     [IntegrationEvent(false, false)]
     local procedure OnValidatePricesIncludingVATOnAfterGetVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup")
     begin
     end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateRegistrationNumber(var Vendor: Record Vendor; var IsHandled: Boolean)

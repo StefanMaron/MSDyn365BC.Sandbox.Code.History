@@ -10,9 +10,7 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Projects.Project.Analysis;
 using Microsoft.Projects.Resources.Analysis;
-#if not CLEAN25
 using Microsoft.Projects.Resources.Pricing;
-#endif
 
 page 72 "Resource Groups"
 {
@@ -126,7 +124,6 @@ page 72 "Resource Groups"
             {
                 Caption = '&Prices';
                 Image = Price;
-#if not CLEAN25
                 action(Costs)
                 {
                     ApplicationArea = Jobs;
@@ -137,9 +134,6 @@ page 72 "Resource Groups"
                                   Code = field("No.");
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View or change detailed information about costs for the resource.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
                 action(Prices)
                 {
@@ -151,11 +145,7 @@ page 72 "Resource Groups"
                                   Code = field("No.");
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View or edit prices for the resource.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
                 action(PurchPriceLists)
                 {
                     ApplicationArea = Jobs;
@@ -289,22 +279,12 @@ page 72 "Resource Groups"
                 actionref(SalesPriceLists_Promoted; SalesPriceLists)
                 {
                 }
-#if not CLEAN25
                 actionref(Costs_Promoted; Costs)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
-#if not CLEAN25
                 actionref(Prices_Promoted; Prices)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
             }
         }
     }
