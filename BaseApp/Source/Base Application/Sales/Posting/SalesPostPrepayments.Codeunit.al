@@ -297,7 +297,7 @@ codeunit 442 "Sales-Post Prepayments"
           SalesHeader, TotalPrepmtInvLineBuffer, TotalPrepmtInvLineBufferLCY, DocumentType, PostingDescription,
           GenJnlLineDocType, GenJnlLineDocNo, GenJnlLineExtDocNo, SrcCode, PostingNoSeriesCode, CalcPmtDiscOnCrMemos);
 
-        UpdatePostedSalesDocument(DocumentType, GenJnlLineDocNo, CustLedgEntry);
+        UpdatePostedSalesDocument(DocumentType, GenJnlLineDocNo);
 
         SalesAssertPrepmtAmountNotMoreThanDocAmount(CustLedgEntry, SalesHeader, SalesLine);
         // Balancing account
@@ -373,9 +373,7 @@ codeunit 442 "Sales-Post Prepayments"
         if IsHandled then
             exit;
 
-        if CustLedgEntry."Entry No." = 0 then // Fallback if the Customer Ledger Entry was not provided from UpdatePostedSalesDocument or the event
-            CustLedgEntry.FindLast();
-
+        CustLedgEntry.FindLast();
         CustLedgEntry.CalcFields(Amount);
         if SalesHeader."Document Type" = SalesHeader."Document Type"::Order then begin
             SalesLine.CalcSums("Amount Including VAT");
@@ -1559,8 +1557,9 @@ codeunit 442 "Sales-Post Prepayments"
         end;
     end;
 
-    local procedure UpdatePostedSalesDocument(DocumentType: Option Invoice,"Credit Memo"; DocumentNo: Code[20]; var CustLedgerEntry: Record "Cust. Ledger Entry")
+    local procedure UpdatePostedSalesDocument(DocumentType: Option Invoice,"Credit Memo"; DocumentNo: Code[20])
     var
+        CustLedgerEntry: Record "Cust. Ledger Entry";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         IsHandled: Boolean;
