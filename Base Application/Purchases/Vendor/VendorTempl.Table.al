@@ -413,7 +413,9 @@ table 1383 "Vendor Templ."
 #if CLEAN26
             ObsoleteReason = 'Not supported in the template.';
             ObsoleteState = Removed;
+#pragma warning disable AS0072
             ObsoleteTag = '27.0';
+#pragma warning restore AS0072
 #else
             ObsoleteReason = 'Not supported in the template.';
             ObsoleteState = Pending;

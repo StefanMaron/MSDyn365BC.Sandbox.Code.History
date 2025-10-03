@@ -188,7 +188,6 @@ page 5086 "Campaign Card"
                     RunPageView = sorting("Campaign No.");
                     ToolTip = 'View opportunities for the campaign.';
                 }
-#if not CLEAN25
                 action("Sales &Prices")
                 {
                     ApplicationArea = RelationshipMgmt;
@@ -196,9 +195,6 @@ page 5086 "Campaign Card"
                     Image = SalesPrices;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'Define how to set up sales price agreements. These sales prices can be for individual customers, for a group of customers, for all customers, or for a campaign.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
 
                     trigger OnAction()
                     var
@@ -217,9 +213,6 @@ page 5086 "Campaign Card"
                     Image = SalesLineDisc;
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View the sales line discounts that are available. These discount agreements can be for individual customers, for a group of customers, for all customers or for a campaign.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
 
                     trigger OnAction()
                     var
@@ -231,7 +224,6 @@ page 5086 "Campaign Card"
                         Page.Run(Page::"Sales Line Discounts", SalesLineDiscount);
                     end;
                 }
-#endif
                 action(PriceLists)
                 {
                     ApplicationArea = Basic, Suite;
@@ -283,7 +275,6 @@ page 5086 "Campaign Card"
                         PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
-#if not CLEAN25
                 action(PriceListsDiscounts)
                 {
                     ApplicationArea = Basic, Suite;
@@ -291,9 +282,6 @@ page 5086 "Campaign Card"
                     Image = LineDiscount;
                     Visible = false;
                     ToolTip = 'View or set up different discounts for products that you sell to the customer. A product line discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action PriceLists shows all sales price lists with prices and discounts';
-                    ObsoleteTag = '18.0';
 
                     trigger OnAction()
                     var
@@ -304,7 +292,6 @@ page 5086 "Campaign Card"
                         PriceUXManagement.ShowPriceLists(Rec, PriceType::Sale, AmountType::Discount);
                     end;
                 }
-#endif
             }
         }
         area(processing)
@@ -376,27 +363,17 @@ page 5086 "Campaign Card"
             {
                 Caption = 'Navigate', Comment = 'Generated from the PromotedActionCategories property index 4.';
 
-#if not CLEAN25
                 actionref(PriceListsDiscounts_Promoted; PriceListsDiscounts)
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Action PriceLists shows all sales price lists with prices and discounts';
-                    ObsoleteTag = '18.0';
                 }
-#endif
             }
             group(Category_Category6)
             {
                 Caption = 'Prices & Discounts', Comment = 'Generated from the PromotedActionCategories property index 5.';
 
-#if not CLEAN25
                 actionref("Sales &Prices_Promoted"; "Sales &Prices")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
                 actionref(ActivateSalesPricesLineDisc_Promoted; ActivateSalesPricesLineDisc)
                 {
                 }
@@ -406,14 +383,9 @@ page 5086 "Campaign Card"
                 actionref(PriceLists_Promoted; PriceLists)
                 {
                 }
-#if not CLEAN25
                 actionref("Sales &Line Discounts_Promoted"; "Sales &Line Discounts")
                 {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '17.0';
                 }
-#endif
                 actionref(DiscountLines_Promoted; DiscountLines)
                 {
                 }

@@ -836,10 +836,11 @@ page 143 "Posted Sales Invoices"
     local procedure DoDrillDown()
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
+        PageManagement: Codeunit "Page Management";
     begin
         SalesInvoiceHeader.Copy(Rec);
         SalesInvoiceHeader.SetRange("No.");
-        PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvoiceHeader);
+        PageManagement.PageRun(SalesInvoiceHeader);
     end;
 
     var

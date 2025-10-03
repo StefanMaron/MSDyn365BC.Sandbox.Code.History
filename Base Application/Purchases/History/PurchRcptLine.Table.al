@@ -852,7 +852,7 @@ table 121 "Purch. Rcpt. Line"
             CopyFromPurchRcptLine(PurchLine, PurchOrderLine, TempPurchLine, NextLineNo);
 
             ShouldProcessAsRegularLine := not ExtTextLine;
-            OnInsertInvLineFromRcptLineOnAfterCalcShouldProcessAsRegularLine(Rec, ShouldProcessAsRegularLine);
+            OnInsertInvLineFromRcptLineOnAfterCalcShouldProcessAsRegularLine(Rec, PurchLine, PurchOrderLine, TempPurchLine, ShouldProcessAsRegularLine);
             if ShouldProcessAsRegularLine then begin
                 IsHandled := false;
                 OnInsertInvLineFromRcptLineOnBeforeValidateQuantity(Rec, PurchLine, IsHandled, PurchInvHeader);
@@ -1297,7 +1297,7 @@ table 121 "Purch. Rcpt. Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromRcptLineOnAfterCalcShouldProcessAsRegularLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; var ShouldProcessAsRegularLine: Boolean)
+    local procedure OnInsertInvLineFromRcptLineOnAfterCalcShouldProcessAsRegularLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; var PurchaseLine: Record "Purchase Line"; var PurchaseOrderLine: Record "Purchase Line"; var TempPurchLine: Record "Purchase Line"; var ShouldProcessAsRegularLine: Boolean)
     begin
     end;
 

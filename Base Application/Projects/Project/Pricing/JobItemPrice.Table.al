@@ -1,4 +1,3 @@
-#if not CLEANSCHEMA28 
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -12,16 +11,8 @@ using Microsoft.Projects.Project.Job;
 table 1013 "Job Item Price"
 {
     Caption = 'Project Item Price';
-#if not CLEAN25
     DrillDownPageID = "Job Item Prices";
     LookupPageID = "Job Item Prices";
-    ObsoleteState = Pending;
-    ObsoleteTag = '16.0';
-#else
-    ObsoleteState = Removed;
-    ObsoleteTag = '28.0';
-#endif    
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
     DataClassification = CustomerContent;
 
     fields
@@ -32,20 +23,17 @@ table 1013 "Job Item Price"
             NotBlank = true;
             TableRelation = Job;
 
-#if not CLEAN25
             trigger OnValidate()
             begin
                 GetJob();
                 "Currency Code" := Job."Currency Code";
             end;
-#endif
         }
         field(2; "Job Task No."; Code[20])
         {
             Caption = 'Project Task No.';
             TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
 
-#if not CLEAN25
             trigger OnValidate()
             begin
                 if "Job Task No." <> '' then begin
@@ -53,20 +41,17 @@ table 1013 "Job Item Price"
                     JT.TestField("Job Task Type", JT."Job Task Type"::Posting);
                 end;
             end;
-#endif
         }
         field(3; "Item No."; Code[20])
         {
             Caption = 'Item No.';
             TableRelation = Item;
 
-#if not CLEAN25
             trigger OnValidate()
             begin
                 Item.Get("Item No.");
                 Validate("Unit of Measure Code", Item."Sales Unit of Measure");
             end;
-#endif
         }
         field(4; "Unit of Measure Code"; Code[10])
         {
@@ -150,7 +135,6 @@ table 1013 "Job Item Price"
     {
     }
 
-#if not CLEAN25
     trigger OnInsert()
     begin
         LockTable();
@@ -185,8 +169,4 @@ table 1013 "Job Item Price"
     local procedure OnBeforeCheckItemNoNotEmpty(var JobItemPrice: Record "Job Item Price"; var IsHandled: Boolean)
     begin
     end;
-#endif
 }
-
- 
-#endif

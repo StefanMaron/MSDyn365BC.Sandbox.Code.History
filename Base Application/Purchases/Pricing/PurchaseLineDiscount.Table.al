@@ -1,4 +1,3 @@
-#if not CLEANSCHEMA28 
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -12,15 +11,6 @@ using Microsoft.Purchases.Vendor;
 table 7014 "Purchase Line Discount"
 {
     Caption = 'Purchase Line Discount';
-#if not CLEAN25
-    LookupPageID = "Purchase Line Discounts";
-    ObsoleteState = Pending;
-    ObsoleteTag = '16.0';
-#else
-    ObsoleteState = Removed;
-    ObsoleteTag = '28.0';
-#endif    
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
     DataClassification = CustomerContent;
 
     fields
@@ -135,6 +125,3 @@ table 7014 "Purchase Line Discount"
 #pragma warning restore AA0470
 #pragma warning restore AA0074
 }
-
- 
-#endif

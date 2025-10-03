@@ -8,6 +8,7 @@ using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
 using Microsoft.Bank.Ledger;
 using Microsoft.CostAccounting.Ledger;
+using Microsoft.Utilities;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
@@ -1589,6 +1590,7 @@ page 344 Navigate
 
     procedure ShowRecords()
     var
+        PageManagement: Codeunit "Page Management";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1629,24 +1631,24 @@ page 344 Navigate
                     Page.Run(PAGE::"General Journal", GenJnlLine);
                 Database::"Sales Invoice Header":
                     if Rec."No. of Records" = 1 then
-                        PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader)
+                        PageManagement.PageRun(SalesInvHeader)
                     else
-                        PAGE.Run(PAGE::"Posted Sales Invoices", SalesInvHeader);
+                        PageManagement.PageRunList(SalesInvHeader);
                 Database::"Sales Cr.Memo Header":
                     if Rec."No. of Records" = 1 then
-                        PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader)
+                        PageManagement.PageRun(SalesCrMemoHeader)
                     else
-                        PAGE.Run(PAGE::"Posted Sales Credit Memos", SalesCrMemoHeader);
+                        PageManagement.PageRunList(SalesCrMemoHeader);
                 Database::"Return Receipt Header":
                     if Rec."No. of Records" = 1 then
-                        PAGE.Run(PAGE::"Posted Return Receipt", ReturnRcptHeader)
+                        PageManagement.PageRun(ReturnRcptHeader)
                     else
-                        PAGE.Run(0, ReturnRcptHeader);
+                        PageManagement.PageRunList(ReturnRcptHeader);
                 Database::"Sales Shipment Header":
                     if Rec."No. of Records" = 1 then
-                        PAGE.Run(PAGE::"Posted Sales Shipment", SalesShptHeader)
+                        PageManagement.PageRun(SalesShptHeader)
                     else
-                        PAGE.Run(0, SalesShptHeader);
+                        PageManagement.PageRunList(SalesShptHeader);
                 Database::"Issued Reminder Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Issued Reminder", IssuedReminderHeader)
@@ -1659,24 +1661,24 @@ page 344 Navigate
                         PAGE.Run(0, IssuedFinChrgMemoHeader);
                 Database::"Purch. Inv. Header":
                     if Rec."No. of Records" = 1 then
-                        PAGE.Run(PAGE::"Posted Purchase Invoice", PurchInvHeader)
+                        PageManagement.PageRun(PurchInvHeader)
                     else
-                        PAGE.Run(PAGE::"Posted Purchase Invoices", PurchInvHeader);
+                        PageManagement.PageRunList(PurchInvHeader);
                 Database::"Purch. Cr. Memo Hdr.":
                     if Rec."No. of Records" = 1 then
-                        PAGE.Run(PAGE::"Posted Purchase Credit Memo", PurchCrMemoHeader)
+                        PageManagement.PageRun(PurchCrMemoHeader)
                     else
-                        PAGE.Run(PAGE::"Posted Purchase Credit Memos", PurchCrMemoHeader);
+                        PageManagement.PageRunList(PurchCrMemoHeader);
                 Database::"Return Shipment Header":
                     if Rec."No. of Records" = 1 then
-                        PAGE.Run(PAGE::"Posted Return Shipment", ReturnShptHeader)
+                        PageManagement.PageRun(ReturnShptHeader)
                     else
-                        PAGE.Run(0, ReturnShptHeader);
+                        PageManagement.PageRunList(ReturnShptHeader);
                 Database::"Purch. Rcpt. Header":
                     if Rec."No. of Records" = 1 then
-                        PAGE.Run(PAGE::"Posted Purchase Receipt", PurchRcptHeader)
+                        PageManagement.PageRun(PurchRcptHeader)
                     else
-                        PAGE.Run(0, PurchRcptHeader);
+                        PageManagement.PageRunList(PurchRcptHeader);
                 Database::"Transfer Shipment Header":
                     if Rec."No. of Records" = 1 then
                         PAGE.Run(PAGE::"Posted Transfer Shipment", TransShptHeader)
@@ -1759,58 +1761,62 @@ page 344 Navigate
     end;
 
     local procedure ShowPurchaseHeaderRecords()
+    var
+        PageManagement: Codeunit "Page Management";
     begin
         Rec.TestField("Table ID", Database::"Purchase Header");
 
         case Rec."Document Type" of
             Rec."Document Type"::Quote:
                 if Rec."No. of Records" = 1 then
-                    PAGE.Run(PAGE::"Purchase Quote", PQPurchaseHeader)
+                    PageManagement.PageRun(PQPurchaseHeader)
                 else
-                    PAGE.Run(0, PQPurchaseHeader);
+                    PageManagement.PageRunList(PQPurchaseHeader);
             Rec."Document Type"::Order:
                 if Rec."No. of Records" = 1 then
-                    PAGE.Run(PAGE::"Purchase Order", POPurchaseHeader)
+                    PageManagement.PageRun(POPurchaseHeader)
                 else
-                    PAGE.Run(0, POPurchaseHeader);
+                    PageManagement.PageRunList(POPurchaseHeader);
             Rec."Document Type"::Invoice:
                 if Rec."No. of Records" = 1 then
-                    PAGE.Run(PAGE::"Purchase Invoice", PIPurchaseHeader)
+                    PageManagement.PageRun(PIPurchaseHeader)
                 else
-                    PAGE.Run(0, PIPurchaseHeader);
+                    PageManagement.PageRunList(PIPurchaseHeader);
         end;
     end;
 
     local procedure ShowSalesHeaderRecords()
+    var
+        PageManagement: Codeunit "Page Management";
     begin
         Rec.TestField("Table ID", Database::"Sales Header");
 
         case Rec."Document Type" of
             Rec."Document Type"::Quote:
                 if Rec."No. of Records" = 1 then
-                    PAGE.Run(PAGE::"Sales Quote", SQSalesHeader)
+                    PageManagement.PageRun(SQSalesHeader)
                 else
-                    PAGE.Run(0, SQSalesHeader);
+                    PageManagement.PageRunList(SQSalesHeader);
             Rec."Document Type"::Order:
                 if Rec."No. of Records" = 1 then
-                    PAGE.Run(PAGE::"Sales Order", SOSalesHeader)
+                    PageManagement.PageRun(SOSalesHeader)
                 else
-                    PAGE.Run(0, SOSalesHeader);
+                    PageManagement.PageRunList(SOSalesHeader);
             Rec."Document Type"::Invoice:
                 if Rec."No. of Records" = 1 then
-                    PAGE.Run(PAGE::"Sales Invoice", SISalesHeader)
+                    PageManagement.PageRun(SISalesHeader)
                 else
-                    PAGE.Run(0, SISalesHeader);
+                    PageManagement.PageRunList(SISalesHeader);
             Rec."Document Type"::"Return Order":
                 if Rec."No. of Records" = 1 then
-                    PAGE.Run(PAGE::"Sales Return Order", SROSalesHeader)
+                    PageManagement.PageRun(SROSalesHeader)
                 else
-                    PAGE.Run(0, SROSalesHeader);
+                    PageManagement.PageRunList(SROSalesHeader);
             Rec."Document Type"::"Credit Memo":
                 if Rec."No. of Records" = 1 then
-                    PAGE.Run(PAGE::"Sales Credit Memo", SCMSalesHeader)
+                    PageManagement.PageRun(SCMSalesHeader)
                 else
-                    PAGE.Run(0, SCMSalesHeader);
+                    PageManagement.PageRunList(SCMSalesHeader);
         end;
     end;
 

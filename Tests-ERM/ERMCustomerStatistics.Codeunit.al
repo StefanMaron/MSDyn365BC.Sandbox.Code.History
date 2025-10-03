@@ -113,6 +113,7 @@ codeunit 134389 "ERM Customer Statistics"
 
         // Setup: Update Sales and Receivables Setup.
         Initialize();
+        UpdateGenLedgerSetupForDataCheck(false);
         UpdateSalesReceivableSetup(OldCreditWarnings, SalesReceivablesSetup."Credit Warnings"::"Overdue Balance");
         CreateAndPostSalesInvoice(SalesHeader);  // Assign Overdue Amount in global variable.
 
@@ -125,6 +126,7 @@ codeunit 134389 "ERM Customer Statistics"
         // Tear Down: Delete the new Sales Invoice created and rollback Credit Warnings value in Sales & Receivables Setup.
         SalesHeader.Get(SalesHeader."Document Type"::Invoice, InvoiceNo);
         SalesHeader.Delete(true);
+        UpdateGenLedgerSetupForDataCheck(true);
         UpdateSalesReceivableSetup(OldCreditWarnings, OldCreditWarnings);
         NotificationLifecycleMgt.RecallAllNotifications();
     end;
@@ -146,6 +148,7 @@ codeunit 134389 "ERM Customer Statistics"
 
         // Setup: Update Sales and Receivables Setup.
         Initialize();
+        UpdateGenLedgerSetupForDataCheck(false);
         UpdateSalesReceivableSetup(OldCreditWarnings, SalesReceivablesSetup."Credit Warnings"::"Overdue Balance");
         OverdueAmount := CreateAndPostSalesInvoice(SalesHeader);
         CustomerNo := SalesHeader."Sell-to Customer No.";
@@ -164,6 +167,7 @@ codeunit 134389 "ERM Customer Statistics"
         VerifyOverdueBalanceForCustomer(SalesHeader."Sell-to Customer No.", OverdueAmount);
 
         // Tear Down: Rollback Credit Warnings value in Sales & Receivables Setup.
+        UpdateGenLedgerSetupForDataCheck(true);
         UpdateSalesReceivableSetup(OldCreditWarnings, OldCreditWarnings);
         NotificationLifecycleMgt.RecallAllNotifications();
     end;
@@ -1144,6 +1148,7 @@ codeunit 134389 "ERM Customer Statistics"
             exit;
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(CODEUNIT::"ERM Customer Statistics");
 
+        UpdateGenLedgerSetupForDataCheck(true);
         PurchasesPayablesSetup.Get();
         PurchasesPayablesSetup.Validate("Link Doc. Date To Posting Date", true);
         PurchasesPayablesSetup.Modify();
@@ -1472,6 +1477,15 @@ codeunit 134389 "ERM Customer Statistics"
         OldCreditWarnings := SalesReceivablesSetup."Credit Warnings";
         SalesReceivablesSetup.Validate("Credit Warnings", CreditWarnings);
         SalesReceivablesSetup.Modify(true);
+    end;
+
+    local procedure UpdateGenLedgerSetupForDataCheck(EnableDataCheck: Boolean)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup.Validate("Enable Data Check", EnableDataCheck);
+        GeneralLedgerSetup.Modify(true);
     end;
 
     local procedure UpdatePostedNoSeriesInSalesSetup()

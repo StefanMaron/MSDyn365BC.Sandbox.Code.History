@@ -673,6 +673,42 @@ table 5700 "Stockkeeping Unit"
         {
             Caption = 'Next Counting End Date';
         }
+        field(9110; "Qty. on Blanket Sales Order"; Decimal)
+        {
+            CalcFormula = sum("Sales Line"."Outstanding Qty. (Base)" where("Document Type" = const("Blanket Order"),
+                                                                            Type = const(Item),
+                                                                            "No." = field("Item No."),
+                                                                            "Location Code" = field("Location Code"),
+                                                                            "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                            "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                            "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                            "Variant Code" = field("Variant Code"),
+                                                                            "Shipment Date" = field("Date Filter")));
+            Caption = 'Qty. on Blanket Sales Order';
+            ToolTip = 'Specifies how many units of the item are allocated to blanket sales orders, meaning listed on outstanding blanket sales order lines.';
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+            FieldClass = FlowField;
+            AutoFormatType = 0;
+        }
+        field(9210; "Qty. on Blanket Purch. Order"; Decimal)
+        {
+            CalcFormula = sum("Purchase Line"."Outstanding Qty. (Base)" where("Document Type" = const("Blanket Order"),
+                                                                            Type = const(Item),
+                                                                            "No." = field("Item No."),
+                                                                            "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                            "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                            "Location Code" = field("Location Code"),
+                                                                            "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                            "Variant Code" = field("Variant Code"),
+                                                                            "Expected Receipt Date" = field("Date Filter")));
+            Caption = 'Qty. on Blanket Purch. Order';
+            ToolTip = 'Specifies how many units of the item are allocated to blanket purchase orders, meaning listed on outstanding blanket purchase order lines.';
+            DecimalPlaces = 0 : 5;
+            Editable = false;
+            FieldClass = FlowField;
+            AutoFormatType = 0;
+        }
         field(99000770; "Purch. Req. Receipt (Qty.)"; Decimal)
         {
             CalcFormula = sum("Requisition Line"."Quantity (Base)" where(Type = const(Item),

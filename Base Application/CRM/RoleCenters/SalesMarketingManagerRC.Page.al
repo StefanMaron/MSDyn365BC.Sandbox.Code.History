@@ -35,13 +35,7 @@ using Microsoft.Inventory.Reports;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
-#if CLEAN25
-using Microsoft.Pricing.Reports;
-using Microsoft.Pricing.Worksheet;
-#endif
-#if not CLEAN25
 using Microsoft.RoleCenters;
-#endif
 using Microsoft.Sales.Analysis;
 using Microsoft.Sales.Archive;
 using Microsoft.Sales.Customer;
@@ -606,7 +600,6 @@ page 8907 "Sales & Marketing Manager RC"
                     Caption = 'Item Attributes';
                     RunObject = page "Item Attributes";
                 }
-#if not CLEAN25
                 action("Sales Price Worksheet")
                 {
                     ApplicationArea = Suite;
@@ -614,16 +607,6 @@ page 8907 "Sales & Marketing Manager RC"
                     RunPageView = where("Object Type" = const(Page), "Object ID" = const(7023)); // "Sales Price Worksheet";
                     RunObject = Page "Role Center Page Dispatcher";
                 }
-#else
-                action("Sales Price Worksheet")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Sales Price Worksheet';
-                    Image = PriceWorksheet;
-                    RunObject = Page "Price Worksheet";
-                    ToolTip = 'Manage sales prices for individual customers, for a group of customers, for all customers, or for a campaign.';
-                }
-#endif
                 action("Adjust Item Costs/Prices")
                 {
                     ApplicationArea = Basic, Suite;
@@ -675,7 +658,6 @@ page 8907 "Sales & Marketing Manager RC"
                         Caption = 'Inventory Order Details';
                         RunObject = report "Inventory Order Details";
                     }
-#if not CLEAN25
                     action("Price List")
                     {
                         ApplicationArea = Basic, Suite;
@@ -683,14 +665,6 @@ page 8907 "Sales & Marketing Manager RC"
                         RunPageView = where("Object Type" = const(Report), "Object ID" = const(715)); // "Price List";
                         RunObject = Page "Role Center Page Dispatcher";
                     }
-#else
-                    action("Price List")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Price List';
-                        RunObject = Report "Item Price List";
-                    }
-#endif
                     action("Inventory - Sales Back Orders")
                     {
                         ApplicationArea = Basic, Suite;
