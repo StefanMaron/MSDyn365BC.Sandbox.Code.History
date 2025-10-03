@@ -385,7 +385,6 @@ codeunit 1890 "Reminder Communication"
     procedure PopulateEmailText(var IssuedReminderHeader: Record "Issued Reminder Header"; var CompanyInfo: Record "Company Information"; var GreetingTxt: Text; var AmtDueTxt: Text; var BodyTxt: Text; var ClosingTxt: Text; var DescriptionTxt: Text; NNC_TotalInclVAT: Decimal)
     var
         ReminderEmailText: Record "Reminder Email Text";
-        MailManagement: Codeunit "Mail Management";
     begin
         if NewReminderCommunicationEnabled() then begin
             AmtDueTxt := '';
@@ -399,12 +398,6 @@ codeunit 1890 "Reminder Communication"
             if GetReminderEmailText(IssuedReminderHeader, ReminderEmailText) then begin
                 GreetingTxt := ReminderEmailText.Greeting;
                 ClosingTxt := ReminderEmailText.Closing;
-                if Format(IssuedReminderHeader."Due Date") <> '' then
-                    if not MailManagement.IsHandlingGetEmailBody() then begin
-                        SelectEmailBodyText(ReminderEmailText, IssuedReminderHeader, AmtDueTxt);
-                        AmtDueTxt := StripHtmlTags(AmtDueTxt);
-                        SubstituteRelatedValues(AmtDueTxt, IssuedReminderHeader, IssuedReminderHeader.CalculateTotalIncludingVAT(), CopyStr(CompanyName, 1, 100));
-                    end;
             end else begin
                 GreetingTxt := ReminderEmailText.GetDefaultGreetingLbl();
                 if Format(IssuedReminderHeader."Due Date") <> '' then
@@ -473,8 +466,6 @@ codeunit 1890 "Reminder Communication"
             IssuedReminderHeader."Posting Date",
             CompanyName,
             IssuedReminderHeader."Add. Fee per Line");
-
-        OnAfterSubstituteRelatedValues(BodyTxt, IssuedReminderHeader);
     end;
 
 #if not CLEAN26
@@ -895,25 +886,6 @@ codeunit 1890 "Reminder Communication"
         exit(false);
     end;
 
-    local procedure StripHtmlTags(HtmlText: Text): Text
-    var
-        Regex: Codeunit Regex;
-        TypeHelper: Codeunit "Type Helper";
-    begin
-        // Remove HTML tags using regex (more accurate than string manipulation)
-        HtmlText := Regex.Replace(HtmlText, '<.*?>', '');
-
-        // Decode HTML entities using framework utility
-        HtmlText := TypeHelper.HtmlDecode(HtmlText);
-
-        // Clean up whitespace
-        HtmlText := HtmlText.Trim();
-        while HtmlText.Contains('  ') do
-            HtmlText := HtmlText.Replace('  ', ' ');
-
-        exit(HtmlText);
-    end;
-
     var
 #if not CLEAN26
         FeatureIdTok: Label 'ReminderTermsCommunicationTexts', Locked = true;
@@ -1028,11 +1000,6 @@ codeunit 1890 "Reminder Communication"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeExitReportIDOnReplaceHTMLText(ReportID: Integer; var RecordVariant: Variant; var ReportIDExit: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSubstituteRelatedValues(var BodyTxt: Text; var IssuedReminderHeader: Record "Issued Reminder Header")
     begin
     end;
 }

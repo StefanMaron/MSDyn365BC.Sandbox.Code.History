@@ -17,7 +17,6 @@ page 99000764 "Routing List"
     DataCaptionFields = "No.", Description;
     Editable = false;
     PageType = List;
-    AboutText = 'Create and manage routings that define the sequence and structure of manufacturing operations, assign resources and quality measures, and control production scheduling with support for multiple versions and statuses.';
     SourceTable = "Routing Header";
     UsageCategory = Lists;
 
