@@ -17,7 +17,6 @@ page 574 "Detailed Vendor Ledg. Entries"
     Editable = false;
     InsertAllowed = false;
     PageType = List;
-    AboutText = 'Review, analyze, and reconcile individual vendor transactions, including invoices, payments, credits, and adjustments, to ensure accurate accounts payable records and support audit and month-end closing activities.';
     SourceTable = "Detailed Vendor Ledg. Entry";
     UsageCategory = History;
 

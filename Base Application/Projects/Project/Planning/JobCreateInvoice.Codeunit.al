@@ -160,15 +160,10 @@ codeunit 1002 "Job Create-Invoice"
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
         LineCounter: Integer;
         LastError: Text;
-        SkipError: Boolean;
-        SkipClear: Boolean;
-        SkipCreateSalesLine: Boolean;
     begin
-        SkipClear := false;
-        OnBeforeCreateSalesInvoiceLines(JobPlanningLineSource, InvoiceNo, NewInvoice, PostingDate, CreditMemo, NoOfSalesLinesCreated, SkipClear);
+        OnBeforeCreateSalesInvoiceLines(JobPlanningLineSource, InvoiceNo, NewInvoice, PostingDate, CreditMemo, NoOfSalesLinesCreated);
 
-        if not SkipClear then
-            ClearAll();
+        ClearAll();
         Job.Get(JobNo);
         OnCreateSalesInvoiceLinesOnBeforeTestJob(Job);
         if Job.Blocked = Job.Blocked::All then
@@ -228,12 +223,10 @@ codeunit 1002 "Job Create-Invoice"
                     then
                         JobPlanningLine.TestField("No.");
 
-                    SkipCreateSalesLine := false;
                     OnCreateSalesInvoiceLinesOnBeforeCreateSalesLine(
-                      JobPlanningLine, SalesHeader, SalesHeader2, NewInvoice, NoOfSalesLinesCreated, SkipCreateSalesLine);
+                      JobPlanningLine, SalesHeader, SalesHeader2, NewInvoice, NoOfSalesLinesCreated);
 
-                    if not SkipCreateSalesLine then
-                        CreateSalesLine(JobPlanningLine);
+                    CreateSalesLine(JobPlanningLine);
 
                     JobPlanningLineInvoice.InitFromJobPlanningLine(JobPlanningLine);
                     if NewInvoice then
@@ -252,11 +245,8 @@ codeunit 1002 "Job Create-Invoice"
           JobPlanningLineSource."Job No.", JobPlanningLineSource."Job Task No.", JobPlanningLineSource."Line No.");
         JobPlanningLineSource.CalcFields("Qty. Transferred to Invoice");
 
-        SkipError := false;
-        OnCreateSalesInvoiceLinesOnBeforeNoSalesLineCreatedError(SkipError);
-        if not SkipError then
-            if NoOfSalesLinesCreated = 0 then
-                Error(Text002, JobPlanningLine.TableCaption(), JobPlanningLine.FieldCaption("Qty. to Transfer to Invoice"));
+        if NoOfSalesLinesCreated = 0 then
+            Error(Text002, JobPlanningLine.TableCaption(), JobPlanningLine.FieldCaption("Qty. to Transfer to Invoice"));
 
         OnAfterCreateSalesInvoiceLines(SalesHeader, NewInvoice);
     end;
@@ -1282,7 +1272,7 @@ codeunit 1002 "Job Create-Invoice"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateSalesInvoiceLines(var JobPlanningLine: Record "Job Planning Line"; InvoiceNo: Code[20]; NewInvoice: Boolean; PostingDate: Date; CreditMemo: Boolean; var NoOfSalesLinesCreated: Integer; var SkipClear: Boolean)
+    local procedure OnBeforeCreateSalesInvoiceLines(var JobPlanningLine: Record "Job Planning Line"; InvoiceNo: Code[20]; NewInvoice: Boolean; PostingDate: Date; CreditMemo: Boolean; var NoOfSalesLinesCreated: Integer)
     begin
     end;
 
@@ -1422,7 +1412,7 @@ codeunit 1002 "Job Create-Invoice"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateSalesInvoiceLinesOnBeforeCreateSalesLine(var JobPlanningLine: Record "Job Planning Line"; SalesHeader: Record "Sales Header"; SalesHeader2: Record "Sales Header"; NewInvoice: Boolean; var NoOfSalesLinesCreated: Integer; var SkipCreateSalesLine: Boolean)
+    local procedure OnCreateSalesInvoiceLinesOnBeforeCreateSalesLine(var JobPlanningLine: Record "Job Planning Line"; SalesHeader: Record "Sales Header"; SalesHeader2: Record "Sales Header"; NewInvoice: Boolean; var NoOfSalesLinesCreated: Integer)
     begin
     end;
 
@@ -1539,11 +1529,6 @@ codeunit 1002 "Job Create-Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnTestExchangeRateOnBeforeValidateCurrencyDate(var JobPlanningLine: Record "Job Planning Line"; PostingDate: Date; var CurrencyExchangeRate: Record "Currency Exchange Rate"; var ShouldValidateCurrencyCode: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateSalesInvoiceLinesOnBeforeNoSalesLineCreatedError(var SkipError: Boolean)
     begin
     end;
 }
