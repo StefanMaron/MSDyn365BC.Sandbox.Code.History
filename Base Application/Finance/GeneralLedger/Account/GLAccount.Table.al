@@ -27,7 +27,6 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.Service.Contract;
 using Microsoft.Utilities;
 using System.Utilities;
 
@@ -560,12 +559,6 @@ table 15 "G/L Account"
         {
             Caption = 'Tax Group Code';
             TableRelation = "Tax Group";
-
-            trigger OnValidate()
-            begin
-                if (xRec."Tax Group Code" <> '') and (Rec."Tax Group Code" = '') then
-                    CheckServiceContractAccGroup(Rec."No.");
-            end;
         }
         field(57; "VAT Bus. Posting Group"; Code[20])
         {
@@ -960,7 +953,6 @@ table 15 "G/L Account"
         CannotChangeSetupOnPrepmtAccErr: Label 'You cannot change %2 on account %3 while %1 is pending prepayment.', Comment = '%2 - field caption, %3 - account number, %1 - recordId - "Sales Header: Order, 1001".';
         CurrencyCodeErr: Label 'Currency codes are only allowed for assets and liabilities and posting account.';
         BalanceMustBeZeroErr: Label 'In order to change the currency code, the balance of the account must be zero.';
-        CannotRemoveTaxGroupErr: Label 'You cannot remove Tax Group Code from G/L Account :%1 because it is attached to Service Contract Group : %2.', Comment = '%1 - G/L Account No., %2 - Service Contract Group Code';
 
     local procedure AsPriceAsset(var PriceAsset: Record "Price Asset"; PriceType: Enum "Price Type")
     begin
@@ -1184,21 +1176,6 @@ table 15 "G/L Account"
                 GeneralPostingSetup.CheckPrepmtPurchLinesToDeduct(
                     StrSubstNo(CannotChangeSetupOnPrepmtAccErr, '%1', FldCaption, "No."));
             until GeneralPostingSetup.Next() = 0;
-    end;
-
-    local procedure CheckServiceContractAccGroup(GLAccNo: Code[20])
-    var
-        ServiceContractAccGroup: Record "Service Contract Account Group";
-    begin
-        ServiceContractAccGroup.SetRange("Non-Prepaid Contract Acc.", GLAccNo);
-        if ServiceContractAccGroup.FindFirst() then
-            Error(CannotRemoveTaxGroupErr, GLAccNo, ServiceContractAccGroup.Code);
-
-        ServiceContractAccGroup.SetRange("Non-Prepaid Contract Acc.");
-
-        ServiceContractAccGroup.SetRange("Prepaid Contract Acc.", GLAccNo);
-        if ServiceContractAccGroup.FindFirst() then
-            Error(CannotRemoveTaxGroupErr, GLAccNo, ServiceContractAccGroup.Code);
     end;
 
     procedure IsTotaling(): Boolean

@@ -19,7 +19,7 @@ using System.Utilities;
 report 10473 "Service Credit Memo-Sales Tax"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/Finance/SalesTax/ServiceCreditMemoSalesTax.rdlc';
+    RDLCLayout = './Service/Local/History/ServiceCreditMemoSalesTax.rdlc';
     Caption = 'Service Credit Memo';
     Permissions = TableData "Sales Shipment Buffer" = rimd;
 

@@ -968,14 +968,14 @@ report 10130 "Availability Projection"
                         end;
                         Item.SetRange("Date Filter", PeriodStartingDate[i], PeriodStartingDate[i + 1] - 1);
                         Item.CalcFields(
-                          "Qty. on Sales Order", "Qty. on Purch. Order", "Qty. on Service Order",
+                          "Qty. on Sales Order", "Qty. on Purch. Order",
                           "Positive Adjmt. (Qty.)", "Negative Adjmt. (Qty.)",
                           "Transferred (Qty.)", "Consumptions (Qty.)", "Outputs (Qty.)",
                           "Rel. Scheduled Receipt (Qty.)", "Rel. Scheduled Need (Qty.)",
                           "Scheduled Receipt (Qty.)", "Qty. on Component Lines");
                         TQtyOnSalesOrders[i] := Item."Qty. on Sales Order";
                         TQtyOnPurchOrders[i] := Item."Qty. on Purch. Order";
-                        TQtyOnServiceOrders[i] := Item."Qty. on Service Order";
+                        TQtyOnServiceOrders[i] := Item.CalcQtyOnServiceOrder();
                         case IncludeMfg of
                             IncludeMfg::"Do not include":
                                 begin
@@ -1094,14 +1094,14 @@ report 10130 "Availability Projection"
                     end;
                     SetRange("Date Filter", PeriodStartingDate[i], PeriodStartingDate[i + 1] - 1);
                     CalcFields(
-                      "Qty. on Sales Order", "Qty. on Purch. Order", "Qty. on Service Order",
+                      "Qty. on Sales Order", "Qty. on Purch. Order",
                       "Positive Adjmt. (Qty.)", "Negative Adjmt. (Qty.)",
                       "Transferred (Qty.)", "Consumptions (Qty.)", "Outputs (Qty.)",
                       "Rel. Scheduled Receipt (Qty.)", "Rel. Scheduled Need (Qty.)",
                       "Scheduled Receipt (Qty.)", "Qty. on Component Lines");
                     QtyOnSalesOrders[i] := "Qty. on Sales Order";
                     QtyOnPurchOrders[i] := "Qty. on Purch. Order";
-                    QtyOnServiceOrders[i] := "Qty. on Service Order";
+                    QtyOnServiceOrders[i] := CalcQtyOnServiceOrder();
                     case IncludeMfg of
                         IncludeMfg::"Do not include":
                             begin
