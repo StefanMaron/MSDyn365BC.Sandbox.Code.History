@@ -16,7 +16,6 @@ codeunit 133527 EDocCopilotPOUPIAHarms
     Subtype = Test;
     TestPermissions = Disabled;
     SingleInstance = true;
-    TestType = AITest;
 
     var
         //AdversarialSimulation: Codeunit "Adversarial Simulation";

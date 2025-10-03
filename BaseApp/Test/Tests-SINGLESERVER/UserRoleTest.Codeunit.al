@@ -62,6 +62,28 @@
     [HandlerFunctions('ConfirmHandlerNo')]
     [TransactionModel(TransactionModel::AutoRollback)]
     [Scope('OnPrem')]
+    procedure AddUserWithBlankNameTest()
+    var
+        UserCardPage: TestPage "User Card";
+        RandomUserName: Code[50];
+    begin
+        // Test function property TransactionModel = AutoRollback
+        // Bug Sicily 6812
+        Initialize();
+        RandomUserName := SelectRandomADUser();
+        AddUserHelper(RandomUserName);
+        TestValidateUserHelper(RandomUserName);
+        UserCardPage.OpenNew();
+        UserCardPage."User Name".SetValue('');
+        Assert.AreEqual('', UserCardPage."User Name".Value, '');
+        asserterror UserCardPage.Close();
+        Assert.ExpectedError('User Name must have a value in User');
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerNo')]
+    [TransactionModel(TransactionModel::AutoRollback)]
+    [Scope('OnPrem')]
     procedure AddUserWithLicenseTypeTest()
     begin
         // Test function property TransactionModel = AutoRollback

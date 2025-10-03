@@ -17,8 +17,7 @@ codeunit 133501 EDocCopilotPORedTeaming
     Subtype = Test;
     TestPermissions = Disabled;
     SingleInstance = true;
-    TestType = AITest;
-    
+
     var
         //AdversarialSimulation: Codeunit "Adversarial Simulation";
         Initialized: Boolean;

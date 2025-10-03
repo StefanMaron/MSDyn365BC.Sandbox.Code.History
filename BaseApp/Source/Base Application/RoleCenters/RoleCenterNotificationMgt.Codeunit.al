@@ -399,7 +399,6 @@ codeunit 1430 "Role Center Notification Mgt."
 
     procedure ShowNotifications(): Boolean
     var
-        EnvironmentInformation: Codeunit "Environment Information";
         DataMigrationMgt: Codeunit "Data Migration Mgt.";
         DataClassNotificationMgt: Codeunit "Data Class. Notification Mgt.";
         DataGeoNotification: Codeunit "Data Geo. Notification";
@@ -425,7 +424,6 @@ codeunit 1430 "Role Center Notification Mgt."
         ResultPaidSuspended := ShowPaidSuspendedNotification();
         ResultSandbox := ShowSandboxNotification();
 
-        EnvironmentInformation.ShowEarlyPreviewNotification();
         DataMigrationMgt.ShowDataMigrationRelatedGlobalNotifications();
         DataClassNotificationMgt.ShowNotifications();
         DataGeoNotification.ShowExistingAppsNotification();
