@@ -25,7 +25,6 @@ page 7345 "Pick Worksheet"
     DataCaptionFields = Name;
     InsertAllowed = false;
     PageType = Worksheet;
-    AboutText = 'Create and manage pick worksheets to efficiently prepare, sort, and generate pick documents in bulk for released warehouse shipments, optimizing item handling and warehouse operations.';
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "Whse. Worksheet Line";
