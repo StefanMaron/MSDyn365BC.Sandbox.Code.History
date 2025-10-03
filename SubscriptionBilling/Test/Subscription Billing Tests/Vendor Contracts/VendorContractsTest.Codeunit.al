@@ -203,7 +203,7 @@ codeunit 148154 "Vendor Contracts Test"
     end;
 
     [Test]
-    [HandlerFunctions('ConfirmHandlerYes')]
+    [HandlerFunctions('ConfirmHandler')]
     procedure CheckTransferDefaultsFromVendorToVendorContract()
     begin
         Initialize();
@@ -223,13 +223,14 @@ codeunit 148154 "Vendor Contracts Test"
     end;
 
     [Test]
-    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,ConfirmHandlerYes,MessageHandler')]
+    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,ConfirmHandler,MessageHandler')]
     procedure CheckValueChangesOnVendorContractLines()
     var
         OldServiceCommitment: Record "Subscription Line";
         BillingBasePeriod: DateFormula;
         ServCommFieldFromVendContrLineErr: Label 'Subscription Line field "%1" not transferred from Vendor Subscription Contract Line.', Locked = true;
         ServCommFieldFromCustContrLineErr: Label 'Subscription Line field "%1" not transferred from Customer Subscription Contract Line.', Locked = true;
+        NotTransferredMisspelledTok: Label 'Subscription Line field "%1" not transfered from Customer Subscription Contract Line.', Locked = true;
         MaxServiceAmount: Decimal;
         ServiceObjectQuantity: Decimal;
     begin
@@ -273,12 +274,12 @@ codeunit 148154 "Vendor Contracts Test"
         ExpectedDate := CalcDate('<1D>', WorkDate());
         VendorContractPage.Lines."Cancellation Possible Until".SetValue(ExpectedDate);
         ServiceCommitment.Get(OldServiceCommitment."Entry No.");
-        AssertThat.AreEqual(ExpectedDate, ServiceCommitment."Cancellation Possible Until", StrSubstNo(ServCommFieldFromCustContrLineErr, ServiceCommitment.FieldCaption("Cancellation Possible Until")));
+        AssertThat.AreEqual(ExpectedDate, ServiceCommitment."Cancellation Possible Until", StrSubstNo(NotTransferredMisspelledTok, ServiceCommitment.FieldCaption("Cancellation Possible Until")));
 
         ExpectedDate := CalcDate('<1D>', WorkDate());
         VendorContractPage.Lines."Term Until".SetValue(ExpectedDate);
         ServiceCommitment.Get(OldServiceCommitment."Entry No.");
-        AssertThat.AreEqual(ExpectedDate, ServiceCommitment."Term Until", StrSubstNo(ServCommFieldFromCustContrLineErr, ServiceCommitment.FieldCaption("Term Until")));
+        AssertThat.AreEqual(ExpectedDate, ServiceCommitment."Term Until", StrSubstNo(NotTransferredMisspelledTok, ServiceCommitment.FieldCaption("Term Until")));
 
         ExpectedDecimalValue := LibraryRandom.RandDecInDecimalRange(1, 100, 2);
         while ExpectedDecimalValue = OldServiceCommitment."Discount %" do
@@ -324,7 +325,7 @@ codeunit 148154 "Vendor Contracts Test"
         Evaluate(BillingBasePeriod, '<3M>');
         VendorContractPage.Lines."Billing Base Period".SetValue(BillingBasePeriod);
         ServiceCommitment.Get(OldServiceCommitment."Entry No.");
-        AssertThat.AreEqual(BillingBasePeriod, ServiceCommitment."Billing Base Period", StrSubstNo(ServCommFieldFromCustContrLineErr, ServiceCommitment.FieldCaption("Billing Base Period")));
+        AssertThat.AreEqual(BillingBasePeriod, ServiceCommitment."Billing Base Period", StrSubstNo(NotTransferredMisspelledTok, ServiceCommitment.FieldCaption("Billing Base Period")));
 
         Evaluate(BillingRhythmValue, '<3M>');
         VendorContractPage.Lines."Billing Rhythm".SetValue(BillingRhythmValue);
@@ -355,7 +356,7 @@ codeunit 148154 "Vendor Contracts Test"
     end;
 
     [Test]
-    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler,ConfirmHandlerYes')]
+    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler,ConfirmHandler')]
     procedure CurrencyCodeRemainsSameWhenPayToVendorChanges()
     var
         CurrencyCode: Code[10];
@@ -485,8 +486,8 @@ codeunit 148154 "Vendor Contracts Test"
         ServiceCommitment.SetRange("Subscription Contract No.", VendorContract."No.");
         if ServiceCommitment.FindSet() then
             repeat
-                ServiceCommitment."Subscription Line Start Date" := CalcDate('<1D>', Today());
-                ServiceCommitment."Subscription Line End Date" := CalcDate('<2D>', Today());
+                ServiceCommitment."Subscription Line Start Date" := CalcDate('<1D>', Today);
+                ServiceCommitment."Subscription Line End Date" := CalcDate('<2D>', Today);
                 ServiceCommitment.Modify(false);
             until ServiceCommitment.Next() = 0;
         VendorContract.UpdateServicesDates();
@@ -566,7 +567,7 @@ codeunit 148154 "Vendor Contracts Test"
     end;
 
     [Test]
-    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler,ConfirmHandlerYes')]
+    [HandlerFunctions('ExchangeRateSelectionModalPageHandler,MessageHandler')]
     procedure TestDeleteServiceCommitmentLinkedToContractLineIsClosed()
     begin
         // Test: A closed Contract Line is deleted when deleting the Subscription Line
@@ -717,7 +718,7 @@ codeunit 148154 "Vendor Contracts Test"
         VendorContract.TestField("Create Contract Deferrals", false);
 
         // allow manually changing the value of the field
-        ContractTestLibrary.DisableDeferralsForVendorContract(VendorContract, true);
+        VendorContract.Validate("Create Contract Deferrals", true);
         VendorContract.Modify(false);
         VendorContract.TestField("Contract Type", ContractType.Code);
     end;
@@ -931,7 +932,7 @@ codeunit 148154 "Vendor Contracts Test"
     #region Handlers
 
     [ConfirmHandler]
-    procedure ConfirmHandlerYes(Question: Text[1024]; var Reply: Boolean)
+    procedure ConfirmHandler(Question: Text[1024]; var Reply: Boolean)
     begin
         Reply := true;
     end;

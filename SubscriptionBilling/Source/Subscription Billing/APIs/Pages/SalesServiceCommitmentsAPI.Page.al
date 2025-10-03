@@ -126,12 +126,6 @@ page 8019 "Sales Service Commitments API"
                 field(process; Rec.Process)
                 {
                 }
-                field(systemCreatedAt; Rec.SystemCreatedAt)
-                {
-                }
-                field(lastModifiedDateTime; Rec.SystemModifiedAt)
-                {
-                }
             }
         }
     }

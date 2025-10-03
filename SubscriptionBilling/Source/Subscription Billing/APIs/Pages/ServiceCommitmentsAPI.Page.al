@@ -178,12 +178,6 @@ page 8018 "Service Commitments API"
                 {
                 }
             }
-            field(systemCreatedAt; Rec.SystemCreatedAt)
-            {
-            }
-            field(lastModifiedDateTime; Rec.SystemModifiedAt)
-            {
-            }
         }
     }
 }

@@ -125,6 +125,7 @@ codeunit 5691 "Create Contoso Tenant Data"
     begin
         if FeatureKey.ID in ['PowerAutomateCopilot',
                              'FullTextSearch',
+                             'SemanticMetadataSearch',
                              'AdvancedTellMe']
         then
             exit(true);
