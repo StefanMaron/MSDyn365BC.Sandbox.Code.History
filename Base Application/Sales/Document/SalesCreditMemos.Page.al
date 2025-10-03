@@ -29,7 +29,6 @@ page 9302 "Sales Credit Memos"
     DataCaptionFields = "Sell-to Customer No.";
     Editable = false;
     PageType = List;
-    AboutText = 'Create, manage, and post sales credit memos to process customer refunds, returns, cancellations, and allowances, and apply credits to specific customer ledger entries to update account balances.';
     QueryCategory = 'Sales Credit Memos';
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
