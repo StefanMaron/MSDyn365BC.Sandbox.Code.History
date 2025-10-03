@@ -59,11 +59,36 @@ page 6183 "E-Doc. Purchase Draft Subform"
                 {
                     ApplicationArea = All;
                     Editable = true;
+                    trigger OnValidate()
+                    begin
+                        CalcLineAmount();
+                    end;
                 }
                 field("Direct Unit Cost"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     Editable = true;
+                    trigger OnValidate()
+                    begin
+                        CalcLineAmount();
+                    end;
+                }
+                field("Total Discount"; Rec."Total Discount")
+                {
+                    Caption = 'Line Discount';
+                    ApplicationArea = All;
+                    Editable = true;
+                    trigger OnValidate()
+                    begin
+                        CalcLineAmount();
+                    end;
+                }
+                field("Line Amount"; LineAmount)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Line Amount';
+                    ToolTip = 'Specifies the line amount.';
+                    Editable = false;
                 }
                 field("Deferral Code"; Rec."[BC] Deferral Code")
                 {
@@ -88,7 +113,7 @@ page 6183 "E-Doc. Purchase Draft Subform"
                     Visible = HasAdditionalColumns;
                     trigger OnDrillDown()
                     begin
-                        Page.Run(Page::"E-Doc Line Values.", Rec);
+                        Page.RunModal(Page::"E-Doc Line Values.", Rec);
                     end;
                 }
             }
@@ -142,21 +167,22 @@ page 6183 "E-Doc. Purchase Draft Subform"
         EDocumentPurchaseLine: Record "E-Document Purchase Line";
         EDocPurchaseHistMapping: Codeunit "E-Doc. Purchase Hist. Mapping";
         AdditionalColumns: Text;
+        LineAmount: Decimal;
         DimVisible1, DimVisible2, HasAdditionalColumns : Boolean;
         HistoryCantBeRetrievedErr: Label 'The purchase invoice that matched historically with this line can''t be opened.';
 
     trigger OnOpenPage()
-    var
-        EDocPurchLineFieldSetup: Record "EDoc. Purch. Line Field Setup";
     begin
         SetDimensionsVisibility();
-        HasAdditionalColumns := not EDocPurchLineFieldSetup.IsEmpty();
     end;
 
     trigger OnAfterGetRecord()
     begin
         if EDocumentPurchaseLine.Get(Rec."E-Document Entry No.", Rec."Line No.") then;
         AdditionalColumns := Rec.AdditionalColumnsDisplayText();
+
+        SetHasAdditionalColumns();
+        CalcLineAmount();
     end;
 
     local procedure SetDimensionsVisibility()
@@ -169,6 +195,35 @@ page 6183 "E-Doc. Purchase Draft Subform"
 
         DimMgt.UseShortcutDims(
           DimVisible1, DimVisible2, DimOther, DimOther, DimOther, DimOther, DimOther, DimOther);
+    end;
+
+    local procedure CalcLineAmount()
+    begin
+        LineAmount := (Rec.Quantity * Rec."Unit Price") - Rec."Total Discount";
+    end;
+
+    local procedure SetHasAdditionalColumns()
+    var
+        EDocPurchLineFieldSetup: Record "ED Purchase Line Field Setup";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+    begin
+        if EDocPurchLineFieldSetup.IsEmpty() then begin
+            HasAdditionalColumns := false;
+            exit;
+        end;
+
+        EDocumentPurchaseHeader.Get(Rec."E-Document Entry No.");
+        if EDocumentPurchaseHeader."[BC] Vendor No." = '' then begin
+            HasAdditionalColumns := false;
+            exit;
+        end;
+
+        if Rec."E-Doc. Purch. Line History Id" = 0 then begin
+            HasAdditionalColumns := false;
+            exit;
+        end;
+
+        HasAdditionalColumns := true;
     end;
 
 }

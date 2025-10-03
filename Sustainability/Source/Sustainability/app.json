@@ -16,7 +16,7 @@
       "id": "ea130081-c669-460f-a5f4-5dde14f03131",
       "name": "Statistical Accounts",
       "publisher": "Microsoft",
-      "version": "26.2.0.0"
+      "version": "26.3.0.0"
     }
   ],
   "internalsVisibleTo": [
@@ -28,7 +28,7 @@
   ],
   "screenshots": [],
   "platform": "26.0.0.0",
-  "application": "26.2.0.0",
+  "application": "26.3.0.0",
   "idRanges": [
     {
       "from": 6210,
