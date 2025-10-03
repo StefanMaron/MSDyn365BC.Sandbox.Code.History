@@ -25,7 +25,6 @@ page 7324 "Whse. Item Journal"
     DataCaptionFields = "Journal Batch Name";
     DelayedInsert = true;
     PageType = Worksheet;
-    AboutText = 'Adjust warehouse bin inventory by entering item details, quantities, and bins to record increases or decreases, ensuring accurate warehouse records.';
     SaveValues = true;
     SourceTable = "Warehouse Journal Line";
     UsageCategory = Tasks;
