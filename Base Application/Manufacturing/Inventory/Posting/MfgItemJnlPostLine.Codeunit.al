@@ -1501,4 +1501,22 @@ codeunit 99000822 "Mfg. Item Jnl.-Post Line"
         if ItemJournalLine.Subcontracting then
             CapLedgEntry."Completely Invoiced" := CapLedgEntry."Invoiced Quantity" = CapLedgEntry."Output Quantity"
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnAfterGetUpdatedAppliedQtyForConsumption', '', true, true)]
+    local procedure OnAfterGetUpdatedAppliedQtyForConsumption(OldItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; ReservationEntry2: Record "Reservation Entry"; SourceType: Integer; var AppliedQty: Decimal)
+    begin
+        if SourceType = Database::"Prod. Order Component" then begin
+            if (ReservationEntry2."Source ID" <> ItemLedgerEntry."Order No.") then begin
+                AppliedQty := 0;
+                exit;
+            end;
+
+            if ReservationEntry2."Source Ref. No." <> ItemLedgerEntry."Prod. Order Comp. Line No." then begin
+                AppliedQty := 0;
+                exit;
+            end;
+
+            AppliedQty := -Abs(OldItemLedgerEntry."Reserved Quantity")
+        end;
+    end;
 }
