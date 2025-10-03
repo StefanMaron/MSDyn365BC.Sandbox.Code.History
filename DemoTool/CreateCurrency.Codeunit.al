@@ -346,7 +346,6 @@ codeunit 101004 "Create Currency"
     begin
         Currency.Get(LCYCurrencyCode);
         GLSetup.Get();
-        GLSetup."LCY Code" := '';   // to avoid error on updating LCY Code
         GLSetup.Validate("LCY Code", Currency.Code);
         GLSetup.Validate("Local Currency Description", GetCurrencyDescription(LCYCurrencyCode));
         GLSetup."Inv. Rounding Precision (LCY)" := Currency."Invoice Rounding Precision";

@@ -10,9 +10,9 @@ codeunit 9133 "Check Planning Component"
 {
 
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterCheckDocuments', '', false, false)]
-    local procedure ItemOnBeforeCheckDocuments(Item: Record Item; CurrentFieldNo: Integer; CheckFieldNo: Integer; CheckFieldCaption: Text);
+    local procedure ItemOnBeforeCheckDocuments(Item: Record Item; CurrentFieldNo: Integer);
     begin
-        CheckPlanningComponents(Item, CurrentFieldNo, CheckFieldNo, CheckFieldCaption);
+        CheckPlanningComponents(Item, CurrentFieldNo, Item.FieldNo(Type), Item.FieldCaption(Type));
     end;
 
     procedure CheckPlanningComponents(Item: Record Item; CurrentFieldNo: Integer; CheckFieldNo: Integer; CheckFieldCaption: Text)
