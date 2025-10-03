@@ -102,8 +102,6 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
 using Microsoft.Pricing.Worksheet;
-using Microsoft.Purchases.Vendor;
-using Microsoft.Purchases.Analysis;
 using Microsoft.RoleCenters;
 using System.Agents;
 using System.AI;
@@ -272,7 +270,6 @@ codeunit 1751 "Data Classification Eval. Data"
         ClassifyInsCoverageLedgerEntry();
         ClassifyTermsAndConditionsState();
         ClassifyDetailedCVLedgEntryBuffer();
-        ClassifyAccPayablesRoleCenter();
         ClassifyPostedPaymentReconLine();
         ClassifyAppliedPaymentEntry();
         ClassifySelectedDimension();
@@ -2510,20 +2507,6 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToCompanyConfidential(TableNo, DummyDetailedCVLedgEntryBuffer.FieldNo("Non-Deductible VAT Amount ACY"));
     end;
 
-    local procedure ClassifyAccPayablesRoleCenter()
-    var
-        PurchByVendGrpChartSetup: Record "Purch. by Vend.Grp.Chart Setup";
-        TopVendorsByPurch: Record "Top Vendors By Purchase";
-    begin
-        SetTableFieldsToNormal(Database::"Acc. Payable Performance Chart");
-        SetTableFieldsToNormal(Database::"Account Payable Cue");
-        SetTableFieldsToNormal(Database::"Purch. by Vend.Grp.Chart Setup");
-        SetFieldToPersonal(Database::"Acc. Payable Performance Chart", PurchByVendGrpChartSetup.FieldNo("User ID"));
-        SetTableFieldsToNormal(Database::"Top Vendors By Purchase");
-        SetFieldToPersonal(Database::"Top Vendors By Purchase", TopVendorsByPurch.FieldNo(VendorNo));
-        SetFieldToPersonal(Database::"Top Vendors By Purchase", TopVendorsByPurch.FieldNo(VendorName));
-    end;
-
     local procedure ClassifyPostedPaymentReconLine()
     var
         DummyPostedPaymentReconLine: Record "Posted Payment Recon. Line";
@@ -3856,7 +3839,7 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(4302); // "Agent Message Template"
         SetTableFieldsToNormal(4315); // "Developer Agent"
         SetFieldToCompanyConfidential(4315, 2); // Instructions
-
+        
         // No-code agent 
         SetTableFieldsToNormal(4387); // No-Code Agent Setup
         SetFieldToPersonal(4387, 1); // Agent User Security Id
