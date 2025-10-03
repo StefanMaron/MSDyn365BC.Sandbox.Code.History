@@ -51,7 +51,6 @@ Codeunit 163502 "Interface CZ Data"
         if not DemoDataSetup."Skip sequence of actions" then
             RunCodeunit(Codeunit::"Create S. AdvLetter Appl. CZZ");
         RunCodeunit(Codeunit::"Create Compensations Setup CZC");
-        RunCodeunit(Codeunit::"Create VAT Period CZL");
         RunCodeunit(Codeunit::"Create Reason Code");
         RunCodeunit(Codeunit::"Create Tax Depr. Group CZF");
         RunCodeunit(Codeunit::"Create FA Ext. Posting Gr. CZF");

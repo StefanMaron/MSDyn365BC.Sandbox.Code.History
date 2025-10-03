@@ -1,5 +1,9 @@
+#if not CLEAN28
 codeunit 163529 "Create VAT Period CZL"
 {
+    ObsoleteState = Pending;
+    ObsoleteTag = '28.0';
+    ObsoleteReason = 'Replaced by Create VAT Return Period codeunit.';
 
     trigger OnRun()
     begin
@@ -22,4 +26,4 @@ codeunit 163529 "Create VAT Period CZL"
         end;
     end;
 }
-
+#endif

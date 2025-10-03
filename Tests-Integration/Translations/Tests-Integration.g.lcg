@@ -284,33 +284,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Office OCR Test - NamedType PurchaseInvoiceCreateFromFileVisibleMsg)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 799481124 - NamedType 397931369" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Create Incoming Document from Email Attachments action is disabled when email attachments exit]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Office OCR Test - NamedType PurchaseInvoiceIncomingEmailAttachEnabledMsg)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 799481124 - NamedType 1546069148" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[View Incoming Document action is enabled when there are no incoming documents linked to purchase invoice]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Office OCR Test - NamedType PurchaseInvoiceViewIncomingDocDisabledMsg)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 799481124 - NamedType 3754035103" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[View Incoming Document action is disabled when there is an incoming document linked to purchase invoice]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Office OCR Test - NamedType PurchaseInvoiceViewIncomingDocEnabledMsg)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 799481124 - NamedType 3003188426" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The attachment was not successfully sent to Incoming Documents]]></Val>
