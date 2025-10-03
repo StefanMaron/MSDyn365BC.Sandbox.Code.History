@@ -122,21 +122,7 @@ codeunit 4321 Agent
     end;
 
     /// <summary>
-    /// Populates the temporary profile record with the specified information.
-    /// </summary>
-    /// <param name="ProfileID">The profile ID.</param>
-    /// <param name="ProfileAppID">The profile App ID.</param>
-    /// <param name="TempAllProfile">The profile record.</param>
-    [Scope('OnPrem')]
-    procedure PopulateDefaultProfile(ProfileID: Text[30]; ProfileAppID: Guid; var TempAllProfile: Record "All Profile" temporary)
-    var
-        AgentImpl: Codeunit "Agent Impl.";
-    begin
-        AgentImpl.PopulateProfileTempRecord(ProfileID, ProfileAppID, TempAllProfile);
-    end;
-
-    /// <summary>
-    /// Assigns the profile to the agent.
+    /// Assigns the permission set to the agent.
     /// </summary>
     /// <param name="AgentUserSecurityID">The user security ID of the agent.</param>
     /// <param name="AllProfile">Profile to set to the agent.</param>
@@ -149,44 +135,17 @@ codeunit 4321 Agent
     end;
 
     /// <summary>
-    /// Assigns the profile to the agent.
-    /// </summary>
-    /// <param name="AgentUserSecurityID">The user security ID of the agent.</param>
-    /// <param name="ProfileID">The profile ID.</param>
-    /// <param name="ProfileAppID">The profile App ID.</param>
-    [Scope('OnPrem')]
-    procedure SetProfile(AgentUserSecurityID: Guid; ProfileID: Text[30]; ProfileAppID: Guid)
-    var
-        TempAllProfile: Record "All Profile" temporary;
-        AgentImpl: Codeunit "Agent Impl.";
-    begin
-        AgentImpl.PopulateProfileTempRecord(ProfileID, ProfileAppID, TempAllProfile);
-        AgentImpl.SetProfile(AgentUserSecurityID, TempAllProfile);
-    end;
-
-    /// <summary>
-    /// Allows the user to select the new profile for given User Settings for an agent.
-    /// </summary>
-    /// <param name="UserSettingsRec">User settings to update with the new profile</param>
-    [Scope('OnPrem')]
-    procedure ProfileLookup(var UserSettingsRec: Record "User Settings"): Boolean
-    var
-        AgentImpl: Codeunit "Agent Impl.";
-    begin
-        exit(AgentImpl.ProfileLookup(UserSettingsRec));
-    end;
-
-    /// <summary>
-    /// Updates the Language, Regional Settings and Time Zone for the agent.
+    /// Updates the region and language settings for the agent. Few properties are updated, like: Language, Regional Settings and Time Zone.
+    /// <remarks>Profile is not updated, use SetProfile function instead</remarks>
     /// </summary>
     /// <param name="AgentUserSecurityID">The user security ID of the agent.</param>
     /// <param name="NewUserSettings">The new user settings for the agent.</param>
     [Scope('OnPrem')]
-    procedure UpdateLocalizationSettings(AgentUserSecurityID: Guid; var NewUserSettings: Record "User Settings")
+    procedure UpdateUserSettings(AgentUserSecurityID: Guid; var NewUserSettings: Record "User Settings")
     var
         AgentImpl: Codeunit "Agent Impl.";
     begin
-        AgentImpl.UpdateLocalizationSettings(AgentUserSecurityID, NewUserSettings);
+        AgentImpl.UpdateUserSettings(AgentUserSecurityID, NewUserSettings);
     end;
 
     /// <summary>

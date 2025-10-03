@@ -25,7 +25,6 @@ page 5701 "Stockkeeping Unit List"
     CardPageID = "Stockkeeping Unit Card";
     Editable = false;
     PageType = List;
-    AboutText = 'Manage item details and planning parameters for specific locations or variants, including inventory levels, replenishment methods, and warehouse information, to optimize stock control and supply processes.';
     SourceTable = "Stockkeeping Unit";
     UsageCategory = Lists;
 
