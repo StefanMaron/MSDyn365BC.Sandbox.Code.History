@@ -43,12 +43,8 @@ codeunit 99000836 "Transfer Line-Reserve"
     var
         ShipmentDate: Date;
         IsHandled: Boolean;
-        SkipCheck: Boolean;
     begin
-        SkipCheck := false;
-        OnCreateReservationOnBeforeCheckSourceType(TransferLine, FromTrackingSpecification, SkipCheck);
-        
-        if (FromTrackingSpecification."Source Type" = 0) and (not SkipCheck) then
+        if FromTrackingSpecification."Source Type" = 0 then
             Error(Text000Err);
 
         TransferLine.TestField("Item No.");
@@ -1184,11 +1180,6 @@ codeunit 99000836 "Transfer Line-Reserve"
             TransferLine.Get(TrackingSpecification."Source ID", TrackingSpecification."Source Ref. No.");
             ShipmentDate := TransferLine."Shipment Date";
         end;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateReservationOnBeforeCheckSourceType(var TransferLine: Record "Transfer Line"; FromTrackingSpecification: Record "Tracking Specification"; var SkipCheck: Boolean)
-    begin
     end;
 }
 

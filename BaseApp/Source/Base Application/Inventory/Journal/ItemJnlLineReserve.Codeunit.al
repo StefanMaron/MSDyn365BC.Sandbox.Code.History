@@ -79,8 +79,6 @@ codeunit 99000835 "Item Jnl. Line-Reserve"
             Description, ExpectedReceiptDate, ShipmentDate, 0);
 
         FromTrackingSpecification."Source Type" := 0;
-
-        OnAfterCreateReservation(ItemJournalLine, Description, ExpectedReceiptDate, Quantity, QuantityBase, ForReservationEntry);
     end;
 
     procedure CreateReservationSetFrom(TrackingSpecification: Record "Tracking Specification")
@@ -803,11 +801,6 @@ codeunit 99000835 "Item Jnl. Line-Reserve"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetSourceValue(var ReservationEntry: Record "Reservation Entry"; var SourceRecRef: RecordRef; ReturnOption: Option "Net Qty. (Base)","Gross Qty. (Base)")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateReservation(var ItemJournalLine: Record "Item Journal Line"; Description: Text[100]; ExpectedReceiptDate: Date; Quantity: Decimal; QuantityBase: Decimal; ReservationEntry: Record "Reservation Entry")
     begin
     end;
 
