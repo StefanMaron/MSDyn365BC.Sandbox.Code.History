@@ -429,15 +429,6 @@ codeunit 130026 "Get Changelist Code"
         end;
     end;
 
-    local procedure FormatTriggerName(FieldName: Text; TriggerName: Text): Text
-    begin
-        if TriggerName = '' then
-            exit;
-        if FieldName <> '' then
-            TriggerName := FieldName + ' - ' + TriggerName;
-        exit(DelChr(TriggerName, '>', ';'));
-    end;
-
     local procedure IsEmptyLine(LowerCaseTrimmedToken: Text): Boolean
     begin
         LowerCaseTrimmedToken := TrimCodeLine(LowerCaseTrimmedToken);

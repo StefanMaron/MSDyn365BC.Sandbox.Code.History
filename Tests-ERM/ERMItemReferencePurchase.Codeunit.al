@@ -9,17 +9,20 @@ codeunit 134464 "ERM Item Reference Purchase"
     end;
 
     var
-        LibraryPurchase: Codeunit "Library - Purchase";
-        LibraryInventory: Codeunit "Library - Inventory";
-        LibraryItemReference: Codeunit "Library - Item Reference";
-        LibraryVariableStorage: Codeunit "Library - Variable Storage";
-        LibraryUtility: Codeunit "Library - Utility";
-        LibraryTestInitialize: Codeunit "Library - Test Initialize";
-        LibraryWarehouse: Codeunit "Library - Warehouse";
         Assert: Codeunit Assert;
         ItemReferenceMgt: Codeunit "Item Reference Management";
+        LibraryERM: Codeunit "Library - ERM";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryItemReference: Codeunit "Library - Item Reference";
+        LibraryPurchase: Codeunit "Library - Purchase";
+        LibraryRandom: Codeunit "Library - Random";
+        LibraryTestInitialize: Codeunit "Library - Test Initialize";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibraryVariableStorage: Codeunit "Library - Variable Storage";
+        LibraryWarehouse: Codeunit "Library - Warehouse";
         ItemRefNotExistsErr: Label 'There are no items with reference %1.';
         DialogCodeErr: Label 'Dialog';
+        DescriptionMustBeSameErr: Label 'Description must be same.';
         isInitialized: Boolean;
 
     [Test]
@@ -1641,6 +1644,149 @@ codeunit 134464 "ERM Item Reference Purchase"
         Assert.ExpectedError(StrSubstNo(ItemRefNotExistsErr, ItemReferenceNo));
     end;
 
+    [Test]
+    procedure VerifyDescriptionInPurchaseLineWhenBothItemReferenceAndItemVariantAreUsed()
+    var
+        Item: array[2] of Record Item;
+        ItemReference: array[2] of Record "Item Reference";
+        ItemVariant: array[2] of Record "Item Variant";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: array[2] of Record "Purchase Line";
+        VendorNo: Code[20];
+    begin
+        // [SCENARIO 574832] Verify that the item description in the purchase line is prioritized correctly when both Item Reference and Item Variant are used. 
+        Initialize();
+
+        // [GIVEN] Create a new Vendor.
+        VendorNo := LibraryPurchase.CreateVendorNo();
+
+        // [GIVEN] Create first Item with Item Variant and Item Reference.
+        CreateItemWithItemVariantAndItemReference(Item[1], ItemVariant[1], ItemReference[1], VendorNo);
+
+        // [GIVEN] Set description value in first Item Reference.
+        if ItemReference[1].Description = '' then begin
+            ItemReference[1].Validate(Description, ItemReference[1]."Reference No.");
+            ItemReference[1].Modify(true);
+        end;
+
+        // [GIVEN] Create second Item with Item Variant and Item Reference.
+        CreateItemWithItemVariantAndItemReference(Item[2], ItemVariant[2], ItemReference[2], VendorNo);
+
+        // [GIVEN] Create Purchase Header with document type Invoice.
+        LibraryPurchase.CreatePurchHeader(
+          PurchaseHeader, PurchaseHeader."Document Type"::Invoice, VendorNo);
+
+        // [GIVEN] Create Two Purchase Lines.
+        CreatePurchaseLine(PurchaseLine[1], PurchaseHeader, Item[1]."No.");
+        CreatePurchaseLine(PurchaseLine[2], PurchaseHeader, Item[2]."No.");
+
+        // [WHEN] Both Item Variant and Item Reference have description values and their values are set in the Purchase line.
+        ModifyPurchaseLine(PurchaseLine[1], ItemVariant[1].Code, ItemReference[1]."Reference No.");
+
+        // [THEN] Ensure that the Purchase Line description is the same as the Item Reference description.
+        Assert.AreEqual(PurchaseLine[1].Description, ItemReference[1].Description, DescriptionMustBeSameErr);
+
+        // [WHEN] Both Item Variant and Item Reference have description values, but only the Item Variant value is set in the Purchase line.
+        ModifyPurchaseLine(PurchaseLine[1], ItemVariant[1].Code, '');
+
+        // [THEN] Ensure that the Purchase Line description is the same as the Item Variant description.
+        Assert.AreEqual(PurchaseLine[1].Description, ItemVariant[1].Description, DescriptionMustBeSameErr);
+
+        // [WHEN] Both Item Variant and Item Reference have description values, but both values are set blank in the Purchase line.
+        ModifyPurchaseLine(PurchaseLine[1], '', '');
+
+        // [THEN] Ensure that the Purchase Line description is the same as the Item description.
+        Assert.AreEqual(PurchaseLine[1].Description, Item[1].Description, DescriptionMustBeSameErr);
+
+        // [WHEN] Item Variant has a description value, but Item Reference has a blank description. However, both values are set in the Purchase line.
+        ModifyPurchaseLine(PurchaseLine[2], ItemVariant[2].Code, ItemReference[2]."Reference No.");
+
+        // [THEN] Ensure that the Purchase Line description is the same as the Item Variant description.
+        Assert.AreEqual(PurchaseLine[2].Description, ItemVariant[2].Description, DescriptionMustBeSameErr);
+
+        // [WHEN] Item Variant and Item Reference values are set blank in the Purchase line.
+        ModifyPurchaseLine(PurchaseLine[2], '', '');
+
+        // [THEN] Ensure that the Purchase Line description is the same as the Item description.
+        Assert.AreEqual(PurchaseLine[2].Description, Item[2].Description, DescriptionMustBeSameErr);
+    end;
+
+    [Test]
+    procedure VerifyDescriptionInPurchaseLineWhenItemReferenceAndItemVariantAndItemTranslationUsed()
+    var
+        Item: array[2] of Record Item;
+        ItemReference: array[2] of Record "Item Reference";
+        ItemTranslation: array[2] of Record "Item Translation";
+        ItemVariant: array[2] of Record "Item Variant";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: array[2] of Record "Purchase Line";
+        Vendor: Record Vendor;
+        LanguageCode: Code[10];
+    begin
+        // [SCENARIO 574832] Verify that the Item description in the purchase line is prioritized correctly when Item Reference,Item Variant and Item Translation are used. 
+        Initialize();
+
+        // [GIVEN] Create a new Vendor ansd set Languague code.
+        LanguageCode := LibraryERM.GetAnyLanguageDifferentFromCurrent();
+        LibraryPurchase.CreateVendor(Vendor);
+        Vendor.Validate("Language Code", LanguageCode);
+        Vendor.Modify(true);
+
+        // [GIVEN] Create first Item with Item Variant and Item Reference.
+        CreateItemWithItemVariantAndItemReference(Item[1], ItemVariant[1], ItemReference[1], Vendor."No.");
+
+        // [GIVEN] Set description value in first Item Reference.
+        if ItemReference[1].Description = '' then begin
+            ItemReference[1].Validate(Description, ItemReference[1]."Reference No.");
+            ItemReference[1].Modify(true);
+        end;
+
+        // [GIVEN] Create second Item with Item Variant and Item Reference.
+        CreateItemWithItemVariantAndItemReference(Item[2], ItemVariant[2], ItemReference[2], Vendor."No.");
+
+        // [GIVEN] Create Multiple Item Translation.
+        CreateItemTranslation(ItemTranslation[1], Item[1]."No.", LanguageCode, ItemVariant[1].Code);
+        CreateItemTranslation(ItemTranslation[2], Item[2]."No.", LanguageCode, ItemVariant[2].Code);
+
+        // [GIVEN] Create Purchase Header with document type Invoice.
+        LibraryPurchase.CreatePurchHeader(
+          PurchaseHeader, PurchaseHeader."Document Type"::Invoice, Vendor."No.");
+
+        // [GIVEN] Create Two Purchase Lines.
+        CreatePurchaseLine(PurchaseLine[1], PurchaseHeader, Item[1]."No.");
+        CreatePurchaseLine(PurchaseLine[2], PurchaseHeader, Item[2]."No.");
+
+        // [WHEN] Both Item Variant and Item Reference have description values and their values are set in the Purchase line.
+        ModifyPurchaseLine(PurchaseLine[1], ItemVariant[1].Code, ItemReference[1]."Reference No.");
+
+        // [THEN] Ensure that the Purchase Line description is the same as the Item Reference description.
+        Assert.AreEqual(PurchaseLine[1].Description, ItemReference[1].Description, DescriptionMustBeSameErr);
+
+        // [WHEN] Both Item Variant and Item Reference have description values, but only the Item Variant value is set in the Purchase line.
+        ModifyPurchaseLine(PurchaseLine[1], ItemVariant[1].Code, '');
+
+        // [THEN] Ensure that the Purchase Line description is the same as the Item Translation description.
+        Assert.AreEqual(PurchaseLine[1].Description, ItemTranslation[1].Description, DescriptionMustBeSameErr);
+
+        // [WHEN] Both Item Variant and Item Reference have description values, but both values are set blank in the Purchase line.
+        ModifyPurchaseLine(PurchaseLine[1], '', '');
+
+        // [THEN] Ensure that the Purchase Line description is the same as the Item description.
+        Assert.AreEqual(PurchaseLine[1].Description, Item[1].Description, DescriptionMustBeSameErr);
+
+        // [WHEN] Item Variant has a description value, but Item Reference has a blank description. However, both values are set in the Purchase line.
+        ModifyPurchaseLine(PurchaseLine[2], ItemVariant[2].Code, ItemReference[2]."Reference No.");
+
+        // [THEN] Ensure that the Purchase Line description is the same as the Item Translation description.
+        Assert.AreEqual(PurchaseLine[2].Description, ItemTranslation[2].Description, DescriptionMustBeSameErr);
+
+        // [WHEN] Item Variant and Item Reference values are set blank in the Purchase line.
+        ModifyPurchaseLine(PurchaseLine[2], '', '');
+
+        // [THEN] Ensure that the Purchase Line description is the same as the Item description.
+        Assert.AreEqual(PurchaseLine[2].Description, Item[2].Description, DescriptionMustBeSameErr);
+    end;
+
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(Codeunit::"ERM Item Reference Purchase");
@@ -1693,6 +1839,40 @@ codeunit 134464 "ERM Item Reference Purchase"
         LibraryVariableStorage.Enqueue(ItemReference."Reference Type");
         LibraryVariableStorage.Enqueue(ItemReference."Reference Type No.");
         LibraryVariableStorage.Enqueue(ItemReference."Item No.");
+    end;
+
+    local procedure CreateItemWithItemVariantAndItemReference(var Item: Record Item; var ItemVariant: Record "Item Variant"; var ItemReference: Record "Item Reference"; VendorNo: Code[20])
+    begin
+        LibraryInventory.CreateItem(Item);
+        Item.Validate(Description, Item."No.");
+        Item.Modify(true);
+
+        LibraryInventory.CreateItemVariant(ItemVariant, Item."No.");
+        LibraryItemReference.CreateItemReference(ItemReference, Item."No.", ItemVariant.Code, '', "Item Reference Type"::Vendor, VendorNo, LibraryUtility.GenerateRandomCode(ItemReference.FieldNo("Reference No."), Database::"Item Reference"));
+    end;
+
+    local procedure CreatePurchaseLine(var PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; ItemNo: Code[20])
+    begin
+        LibraryPurchase.CreatePurchaseLine(
+            PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, ItemNo, LibraryRandom.RandIntInRange(1, 10));
+    end;
+
+    local procedure ModifyPurchaseLine(var PurchaseLine: Record "Purchase Line"; VariantCode: Code[20]; ItemReferenceNo: Code[50])
+    begin
+        PurchaseLine.Validate("Variant Code", VariantCode);
+        PurchaseLine.Validate("Item Reference No.", ItemReferenceNo);
+        PurchaseLine.Modify(true);
+    end;
+
+    local procedure CreateItemTranslation(var ItemTranslation: Record "Item Translation"; ItemNo: Code[20]; LanguageCode: Code[10]; VariantCode: Code[10])
+    begin
+        ItemTranslation.Init();
+        ItemTranslation.Validate("Item No.", ItemNo);
+        ItemTranslation.Validate("Language Code", LanguageCode);
+        ItemTranslation.Validate("Variant Code", VariantCode);
+        ItemTranslation.Validate(Description, LibraryUtility.GenerateGUID());
+        ItemTranslation.Validate("Description 2", LibraryUtility.GenerateGUID());
+        ItemTranslation.Insert(true);
     end;
 
     [ModalPageHandler]
