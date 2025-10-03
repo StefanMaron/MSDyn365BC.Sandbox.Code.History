@@ -117,7 +117,6 @@ using Microsoft.Pricing.Source;
 using Microsoft.Foundation;
 using Microsoft.Pricing.Worksheet;
 using System.Device;
-using Microsoft.Purchases.Analysis;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Archive;
 using Microsoft.Purchases.Pricing;
@@ -872,9 +871,5 @@ permissionset 209 "D365 Basic - Read"
                   tabledata "XML Buffer" = R,
                   tabledata "XML Schema" = R,
                   tabledata "XML Schema Element" = R,
-                  tabledata "XML Schema Restriction" = R,
-                  tabledata "Acc. Payable Performance Chart" = R,
-                  tabledata "Account Payable Cue" = R,
-                  tabledata "Top Vendors By Purchase" = R,
-                  tabledata "Purch. by Vend.Grp.Chart Setup" = R;
+                  tabledata "XML Schema Restriction" = R;
 }

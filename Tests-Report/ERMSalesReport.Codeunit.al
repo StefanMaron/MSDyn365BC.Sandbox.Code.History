@@ -2981,7 +2981,6 @@
 
         // [GIVEN] General Ledger Setup "LCY Code" = "Curr", "Local Currency Symbol" = "$"
         GeneralLedgerSetup.Get();
-        GeneralLedgerSetup."LCY Code" := '';        // to avoid error on updating LCY Code
         GeneralLedgerSetup.Validate("LCY Code", 'Curr');
         GeneralLedgerSetup.Validate("Local Currency Symbol", '$');
         GeneralLedgerSetup.Modify();
