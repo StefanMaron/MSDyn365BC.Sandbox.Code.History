@@ -22,6 +22,7 @@ page 9306 "Purchase Quotes"
     DataCaptionFields = "Buy-from Vendor No.";
     Editable = false;
     PageType = List;
+    AboutText = 'Create, manage, and track vendor purchase quotes as preliminary drafts before converting accepted quotes into purchase orders for processing purchases.';
     QueryCategory = 'Purchase Quotes';
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";
