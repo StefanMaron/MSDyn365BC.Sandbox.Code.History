@@ -29,6 +29,7 @@ page 393 "Item Reclass. Journal"
     DataCaptionFields = "Journal Batch Name";
     DelayedInsert = true;
     PageType = Worksheet;
+    AboutText = 'Reclassify inventory items by transferring them between locations or bins, updating lot or serial numbers, changing expiration dates, and adjusting item dimensions to maintain accurate stock records and traceability.';
     SaveValues = true;
     SourceTable = "Item Journal Line";
     UsageCategory = Tasks;
