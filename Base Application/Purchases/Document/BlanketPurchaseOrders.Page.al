@@ -19,7 +19,6 @@ page 9310 "Blanket Purchase Orders"
     DataCaptionFields = "Buy-from Vendor No.";
     Editable = false;
     PageType = List;
-    AboutText = 'Manage long-term purchase agreements with vendors by tracking blanket orders, scheduling multiple deliveries, and converting planned shipments into purchase orders as needed for ongoing procurement and forecasting.';
     QueryCategory = 'Blanket Purchase Orders';
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";

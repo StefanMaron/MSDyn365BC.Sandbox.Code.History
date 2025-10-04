@@ -406,6 +406,9 @@ codeunit 393 "Reminder-Issue"
         if IsHandled then
             exit;
 
+        if NewDueDate < ReminderEntry2."Due Date" then
+            exit;
+
         ReminderEntry2.Validate("Due Date", NewDueDate);
         ReminderEntry2.Modify();
     end;

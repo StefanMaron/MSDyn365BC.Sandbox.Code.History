@@ -15,7 +15,6 @@ page 7340 "Posted Whse. Shipment List"
     DataCaptionFields = "No.";
     Editable = false;
     PageType = List;
-    AboutText = 'Review and track completed warehouse shipments, including shipment details, quantities shipped, locations, and related sales shipments for audit and operational purposes.';
     SourceTable = "Posted Whse. Shipment Header";
     SourceTableView = sorting("Posting Date")
                       order(descending);

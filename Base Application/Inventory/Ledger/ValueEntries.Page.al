@@ -22,7 +22,6 @@ page 5802 "Value Entries"
     DataCaptionExpression = GetCaption();
     Editable = false;
     PageType = List;
-    AboutText = 'Track and analyze the detailed cost and value changes for inventory items, including actual and expected costs, sales and purchase amounts, adjustments, and links to related documents for comprehensive inventory valuation and costing.';
     SourceTable = "Value Entry";
     SourceTableView = sorting("Entry No.")
                       order(descending);
