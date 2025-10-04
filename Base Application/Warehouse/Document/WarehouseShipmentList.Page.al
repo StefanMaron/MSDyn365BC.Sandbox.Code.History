@@ -18,6 +18,7 @@ page 7339 "Warehouse Shipment List"
     DataCaptionFields = "No.";
     Editable = false;
     PageType = List;
+    AboutText = 'Create, organize, and post outbound warehouse shipments by selecting source documents, assigning locations and users, managing picking activities, and tracking shipment status and delivery details.';
     SourceTable = "Warehouse Shipment Header";
     UsageCategory = Lists;
 
