@@ -857,7 +857,7 @@ codeunit 23 "Item Jnl.-Post Batch"
                     AvailableQty := Item."Net Change" - Item."Reserved Qty. on Inventory";
                     OnCheckItemAvailabilityOnAfterSetAvailableQty(TempSKU, ItemJnlLine2, AvailableQty);
 
-                    if (Item."Reserved Qty. on Inventory" > 0) and (AvailableQty < Abs(QtyinItemJnlLine)) and not InvtSetup."Prevent Negative Inventory" then
+                    if (Item."Reserved Qty. on Inventory" > 0) and (AvailableQty < Abs(QtyinItemJnlLine)) then
                         if not ConfirmManagement.GetResponseOrDefault(
                             StrSubstNo(
                                 Text010, TempSKU.FieldCaption("Item No."), TempSKU."Item No.", TempSKU.FieldCaption("Location Code"),

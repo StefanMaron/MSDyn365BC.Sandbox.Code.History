@@ -11,10 +11,7 @@ codeunit 4308 "Agent Message Impl."
     InherentEntitlements = X;
     InherentPermissions = X;
 
-    var
-        GlobalIgnoreAttachment: Boolean;
-
-    procedure GetText(var AgentTaskMessage: Record "Agent Task Message"): Text
+    procedure GetMessageText(var AgentTaskMessage: Record "Agent Task Message"): Text
     var
         AgentTaskImpl: Codeunit "Agent Task Impl.";
         ContentInStream: InStream;
@@ -37,7 +34,7 @@ codeunit 4308 "Agent Message Impl."
         AgentTaskMessage.Modify(true);
     end;
 
-    procedure IsEditable(var AgentTaskMessage: Record "Agent Task Message"): Boolean
+    procedure IsMessageEditable(var AgentTaskMessage: Record "Agent Task Message"): Boolean
     begin
         if AgentTaskMessage.Type <> AgentTaskMessage.Type::Output then
             exit(false);
@@ -47,12 +44,7 @@ codeunit 4308 "Agent Message Impl."
 
     procedure SetStatusToSent(var AgentTaskMessage: Record "Agent Task Message")
     begin
-        UpdateStatus(AgentTaskMessage, AgentTaskMessage.Status::Sent);
-    end;
-
-    procedure SetIgnoreAttachment(IgnoreAttachment: Boolean)
-    begin
-        GlobalIgnoreAttachment := IgnoreAttachment;
+        UpdateAgentTaskMessageStatus(AgentTaskMessage, AgentTaskMessage.Status::Sent);
     end;
 
     procedure AddAttachment(var AgentTaskMessage: Record "Agent Task Message"; var TempAgentTaskFile: Record "Agent Task File" temporary)
@@ -87,7 +79,6 @@ codeunit 4308 "Agent Message Impl."
         AgentTaskMessageAttachment."Task ID" := AgentTaskMessage."Task ID";
         AgentTaskMessageAttachment."Message ID" := AgentTaskMessage.ID;
         AgentTaskMessageAttachment."File ID" := AgentTaskFile.ID;
-        AgentTaskMessageAttachment.Ignored := GlobalIgnoreAttachment;
         AgentTaskMessageAttachment.Insert();
     end;
 
@@ -170,7 +161,7 @@ codeunit 4308 "Agent Message Impl."
         until AgentTaskMessageAttachment.Next() = 0;
     end;
 
-    procedure UpdateStatus(var AgentTaskMessage: Record "Agent Task Message"; Status: Option)
+    procedure UpdateAgentTaskMessageStatus(var AgentTaskMessage: Record "Agent Task Message"; Status: Option)
     begin
         AgentTaskMessage.Status := Status;
         AgentTaskMessage.Modify(true);

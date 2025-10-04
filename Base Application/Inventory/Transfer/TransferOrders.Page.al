@@ -21,7 +21,6 @@ page 5742 "Transfer Orders"
     CardPageID = "Transfer Order";
     Editable = false;
     PageType = List;
-    AboutText = 'Manage and track the movement of inventory items between locations by creating, posting, and monitoring transfer orders, including handling shipment, receipt, and serial or lot number assignments.';
     SourceTable = "Transfer Header";
     UsageCategory = Lists;
 
