@@ -2096,6 +2096,7 @@ codeunit 134263 "Test Bank Payment Application"
         GLSetup: Record "General Ledger Setup";
     begin
         GLSetup.Get();
+        GLSetup."LCY Code" := '';       // to avoid error on updating LCY Code
         GLSetup.Validate("LCY Code", CurrencyCode);
         GLSetup.Modify(true);
     end;
