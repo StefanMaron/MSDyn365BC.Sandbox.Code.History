@@ -23,9 +23,7 @@ codeunit 30123 "Shpfy Sync Customers"
         SetShop(Rec);
         SyncStartTime := CurrentDateTime;
         if Shop."Customer Import From Shopify" = Shop."Customer Import From Shopify"::AllCustomers then
-            ImportCustomersFromShopify(true);
-        if (Shop."Customer Import From Shopify" = Shop."Customer Import From Shopify"::WithOrderImport) and Shop."Shopify Can Update Customer" then
-            ImportCustomersFromShopify(false);
+            ImportCustomersFromShopify();
         if Shop."Can Update Shopify Customer" then
             SyncCustomersToShopify();
 
@@ -56,7 +54,7 @@ codeunit 30123 "Shpfy Sync Customers"
     /// <summary> 
     /// Import Customers From Shopify.
     /// </summary>
-    local procedure ImportCustomersFromShopify(CreateCustomers: Boolean)
+    local procedure ImportCustomersFromShopify()
     var
         Customer: Record "Shpfy Customer";
         TempCustomer: Record "Shpfy Customer" temporary;
@@ -74,8 +72,6 @@ codeunit 30123 "Shpfy Sync Customers"
                     TempCustomer.Insert(false);
                 end;
             end else begin
-                if not CreateCustomers then
-                    continue;
                 Clear(TempCustomer);
                 TempCustomer.Id := Id;
                 TempCustomer."Shop Id" := Shop."Shop Id";

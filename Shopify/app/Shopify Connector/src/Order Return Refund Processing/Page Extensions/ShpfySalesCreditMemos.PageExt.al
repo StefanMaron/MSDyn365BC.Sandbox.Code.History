@@ -31,16 +31,4 @@ pageextension 30121 "Shpfy Sales Credit Memos" extends "Sales Credit Memos"
             }
         }
     }
-
-    views
-    {
-        addlast
-        {
-            view(FromShopify)
-            {
-                Caption = 'From Shopify';
-                Filters = where("Shpfy Refund Id" = filter(<> 0));
-            }
-        }
-    }
 }

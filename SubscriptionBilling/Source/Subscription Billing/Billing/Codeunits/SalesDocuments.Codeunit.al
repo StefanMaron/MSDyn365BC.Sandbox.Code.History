@@ -547,14 +547,8 @@ codeunit 8063 "Sales Documents"
                 SubscriptionLine.CalculateInitialCancellationPossibleUntilDate();
                 SubscriptionLine.SetCurrencyData(SalesHeader."Currency Factor", SalesHeader."Posting Date", SalesHeader."Currency Code");
                 SubscriptionLine.SetLCYFields(true);
-                if SalesLine."No." = SubscriptionLine."Invoicing Item No." then begin
-                    SubscriptionLine."Shortcut Dimension 1 Code" := SalesLine."Shortcut Dimension 1 Code";
-                    SubscriptionLine."Shortcut Dimension 2 Code" := SalesLine."Shortcut Dimension 2 Code";
-                    SubscriptionLine."Dimension Set ID" := SalesLine."Dimension Set ID"
-                end else begin
-                    SubscriptionLine.SetDefaultDimensions(false);
-                    SubscriptionLine.GetCombinedDimensionSetID(SalesLine."Dimension Set ID", SubscriptionLine."Dimension Set ID");
-                end;
+                SubscriptionLine.SetDefaultDimensions(false);
+                SubscriptionLine.GetCombinedDimensionSetID(SalesLine."Dimension Set ID", SubscriptionLine."Dimension Set ID");
                 SubscriptionLine."Renewal Term" := SubscriptionLine."Initial Term";
                 OnCreateSubscriptionHeaderFromSalesLineBeforeInsertSubscriptionLine(SubscriptionLine, SalesSubscriptionLine, SalesLine);
                 SubscriptionLine.CalculateServiceAmount(SubscriptionLine.FieldNo("Discount %"));

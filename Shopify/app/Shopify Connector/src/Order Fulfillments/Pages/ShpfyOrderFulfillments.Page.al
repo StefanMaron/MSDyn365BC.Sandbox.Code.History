@@ -12,7 +12,7 @@ using Microsoft.Sales.History;
 /// </summary>
 page 30112 "Shpfy Order Fulfillments"
 {
-    Caption = 'Shopify Completed Fulfillments';
+    Caption = 'Shopify Fulfillments';
     CardPageID = "Shpfy Order Fulfillment";
     DeleteAllowed = false;
     Editable = false;
