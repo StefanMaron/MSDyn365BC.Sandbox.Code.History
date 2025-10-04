@@ -17,6 +17,7 @@ page 99000787 "Production BOM List"
     DataCaptionFields = "No.";
     Editable = false;
     PageType = List;
+    AboutText = 'Manage and track production Bills of Materials, including creating, editing, and versioning BOMs with multiple components to support manufacturing processes and product changes.';
     SourceTable = "Production BOM Header";
     UsageCategory = Lists;
 
