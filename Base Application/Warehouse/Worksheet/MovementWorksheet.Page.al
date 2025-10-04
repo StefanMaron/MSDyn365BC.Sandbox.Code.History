@@ -24,6 +24,7 @@ page 7351 "Movement Worksheet"
     DataCaptionFields = Name;
     DelayedInsert = true;
     PageType = Worksheet;
+    AboutText = 'Plan and execute internal warehouse item movements between bins and zones for purposes such as reorganization or inspection, using worksheet lines that can be filled manually or with automated suggestions, and register the movements for advanced warehouse management.';
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "Whse. Worksheet Line";
