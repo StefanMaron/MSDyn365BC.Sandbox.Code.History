@@ -48,7 +48,7 @@
       "path": "./Manufacturing/Test/Manufacturing Tests"
     },
     {
-      "path": "./EDocument Core/Test/E-Document Core Tests"
+      "path": "./EDocument Core/Test/E-Document Core Tests/DisabledTests"
     },
     {
       "path": "./VATGroupManagement/Test/VAT Group Management Tests"
@@ -132,7 +132,7 @@
       "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
     },
     {
-      "path": "./PowerBIReports/Test/PowerBI Reports Tests"
+      "path": "./PowerBIReports/Test/PowerBI Reports Tests/DisabledTests"
     },
     {
       "path": "./ErrorMessagesWithRecommendations/Test/Error Messages with Recommendations Tests/DisabledTests"

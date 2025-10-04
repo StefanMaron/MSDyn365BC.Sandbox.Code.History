@@ -37,7 +37,7 @@ function renderPDF(base64String, pageid) {
     var { pdfjsLib } = globalThis;
 
     // The workerSrc property shall be specified.
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://bc-cdn.dynamics.com/common/js/pdfjs-4.10.38/pdf.worker.min.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn-bc.dynamics.com/common/js/pdfjs-4.10.38/pdf.worker.min.mjs';
     pageNum = pageid;
 
     var binaryString = atob(base64String);
