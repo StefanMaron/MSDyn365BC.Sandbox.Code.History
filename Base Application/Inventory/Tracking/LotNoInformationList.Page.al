@@ -14,7 +14,6 @@ page 6508 "Lot No. Information List"
     ApplicationArea = ItemTracking;
     Editable = false;
     PageType = List;
-    AboutText = 'View and update details for tracked item lot numbers, including descriptions, quality status, certificate numbers, comments, and blocking specific lots from transactions.';
     SourceTable = "Lot No. Information";
     UsageCategory = Lists;
 
