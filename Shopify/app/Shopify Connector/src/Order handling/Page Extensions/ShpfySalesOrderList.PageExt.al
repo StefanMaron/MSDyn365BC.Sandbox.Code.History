@@ -45,16 +45,4 @@ pageextension 30116 "Shpfy Sales Order List" extends "Sales Order List"
 #endif
         }
     }
-
-    views
-    {
-        addlast
-        {
-            view(FromShopify)
-            {
-                Caption = 'From Shopify';
-                Filters = where("Shpfy Order Id" = filter(<> 0));
-            }
-        }
-    }
 }

@@ -89,6 +89,7 @@ table 8009 "Imported Subscription Line"
         {
             Caption = 'Calculation Base %';
             MinValue = 0;
+            MaxValue = 100;
             BlankZero = true;
             DecimalPlaces = 0 : 5;
             AutoFormatType = 0;

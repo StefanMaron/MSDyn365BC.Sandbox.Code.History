@@ -12,9 +12,6 @@ codeunit 139649 "Shpfy Orders API Subscriber"
     SingleInstance = true;
     EventSubscriberInstance = Manual;
 
-    var
-        CompanyLocationId: BigInteger;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Shpfy Communication Events", 'OnClientSend', '', true, false)]
     local procedure OnClientSend(HttpRequestMessage: HttpRequestMessage; var HttpResponseMessage: HttpResponseMessage)
     begin
@@ -31,8 +28,7 @@ codeunit 139649 "Shpfy Orders API Subscriber"
     var
         Uri: Text;
         GraphQlQuery: Text;
-        TransactionsGraphQLMsg: Label '{ transactions { authorizationCode createdAt errorCode formattedGateway gateway', Locked = true;
-        CompanyLocationGraphQLMsg: Label '{"query": "{ companyLocation(id:', Locked = true;
+        GraphQLCmdMsg: Label '{ transactions { authorizationCode createdAt errorCode formattedGateway gateway', Locked = true;
         GraphQLCmdTxt: Label '/graphql.json', Locked = true;
     begin
         case HttpRequestMessage.Method of
@@ -40,12 +36,9 @@ codeunit 139649 "Shpfy Orders API Subscriber"
                 begin
                     Uri := HttpRequestMessage.GetRequestUri();
                     if Uri.EndsWith(GraphQLCmdTxt) then
-                        if HttpRequestMessage.Content.ReadAs(GraphQlQuery) then begin
-                            if GraphQlQuery.Contains(TransactionsGraphQLMsg) then
+                        if HttpRequestMessage.Content.ReadAs(GraphQlQuery) then
+                            if GraphQlQuery.Contains(GraphQLCmdMsg) then
                                 HttpResponseMessage := GetOrderTransactionResult();
-                            if GraphQlQuery.Contains(CompanyLocationGraphQLMsg) then
-                                HttpResponseMessage := GetCompanyLocationResult();
-                        end;
                 end;
         end;
     end;
@@ -60,22 +53,5 @@ codeunit 139649 "Shpfy Orders API Subscriber"
         ResInStream.ReadText(Body);
         HttpResponseMessage.Content.WriteFrom(Body);
         exit(HttpResponseMessage);
-    end;
-
-    local procedure GetCompanyLocationResult(): HttpResponseMessage;
-    var
-        HttpResponseMessage: HttpResponseMessage;
-        Body: Text;
-        ResInStream: InStream;
-    begin
-        NavApp.GetResource('Order Handling/CompanyLocationResult.txt', ResInStream, TextEncoding::UTF8);
-        ResInStream.ReadText(Body);
-        HttpResponseMessage.Content.WriteFrom(Body.Replace('{{LocationId}}', Format(CompanyLocationId)));
-        exit(HttpResponseMessage);
-    end;
-
-    internal procedure SetLocationId(LocationId: BigInteger)
-    begin
-        CompanyLocationId := LocationId;
     end;
 }

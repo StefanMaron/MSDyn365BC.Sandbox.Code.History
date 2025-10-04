@@ -848,7 +848,7 @@ table 99000829 "Planning Component"
             exit;
 
         "Bin Code" := '';
-        if ("Location Code" <> '') and ("Item No." <> '') and Item.IsInventoriableType() then
+        if ("Location Code" <> '') and ("Item No." <> '') then
             Validate("Bin Code", GetToBin());
     end;
 

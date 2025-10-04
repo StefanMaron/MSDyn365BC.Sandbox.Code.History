@@ -34,16 +34,4 @@ pageextension 30107 "Shpfy Posted Sales Invoices" extends "Posted Sales Invoices
             }
         }
     }
-
-    views
-    {
-        addlast
-        {
-            view(FromShopify)
-            {
-                Caption = 'From Shopify';
-                Filters = where("Shpfy Order Id" = filter(<> 0));
-            }
-        }
-    }
 }

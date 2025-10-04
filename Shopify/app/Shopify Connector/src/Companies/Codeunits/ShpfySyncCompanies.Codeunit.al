@@ -23,9 +23,7 @@ codeunit 30285 "Shpfy Sync Companies"
         SetShop(Rec);
         SyncStartTime := CurrentDateTime;
         if Shop."Company Import From Shopify" = Shop."Company Import From Shopify"::AllCompanies then
-            ImportCompaniesFromShopify(true);
-        if (Shop."Company Import From Shopify" = Shop."Company Import From Shopify"::WithOrderImport) and Shop."Shopify Can Update Companies" then
-            ImportCompaniesFromShopify(false);
+            ImportCompaniesFromShopify();
         if Shop."Can Update Shopify Companies" then
             ExportCompaniesToShopify();
 
@@ -41,7 +39,7 @@ codeunit 30285 "Shpfy Sync Companies"
         CompanyImport: Codeunit "Shpfy Company Import";
         CompanyApi: Codeunit "Shpfy Company API";
 
-    local procedure ImportCompaniesFromShopify(CreateCompanies: Boolean)
+    local procedure ImportCompaniesFromShopify()
     var
         Company: Record "Shpfy Company";
         TempCompany: Record "Shpfy Company" temporary;
@@ -59,8 +57,6 @@ codeunit 30285 "Shpfy Sync Companies"
                     TempCompany.Insert(false);
                 end;
             end else begin
-                if not CreateCompanies then
-                    continue;
                 Clear(TempCompany);
                 TempCompany.Id := Id;
                 TempCompany.Insert(false);

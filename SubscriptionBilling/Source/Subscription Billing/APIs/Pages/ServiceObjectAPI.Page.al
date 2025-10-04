@@ -187,12 +187,6 @@ page 8020 "Service Object API"
                 {
                 }
             }
-            field(systemCreatedAt; Rec.SystemCreatedAt)
-            {
-            }
-            field(lastModifiedDateTime; Rec.SystemModifiedAt)
-            {
-            }
         }
     }
 }
