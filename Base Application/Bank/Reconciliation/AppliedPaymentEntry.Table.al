@@ -99,13 +99,7 @@ table 1294 "Applied Payment Entry"
                 VendLedgEntry: Record "Vendor Ledger Entry";
                 BankAccLedgEntry: Record "Bank Account Ledger Entry";
                 GLEntry: Record "G/L Entry";
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeAppliesToEntryNoLookup(Rec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 case "Account Type" of
                     "Account Type"::"G/L Account":
                         begin
@@ -1198,11 +1192,6 @@ table 1294 "Applied Payment Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSuggestAmtToApply(var AppliedPaymentEntry: Record "Applied Payment Entry"; var IsHandled: Boolean; var Result: Decimal)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeAppliesToEntryNoLookup(var AppliedPaymentEntry: Record "Applied Payment Entry"; var IsHandled: boolean)
     begin
     end;
 }

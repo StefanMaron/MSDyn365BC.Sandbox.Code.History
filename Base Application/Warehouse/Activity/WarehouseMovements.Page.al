@@ -15,7 +15,6 @@ page 9314 "Warehouse Movements"
     CardPageID = "Warehouse Movement";
     Editable = false;
     PageType = List;
-    AboutText = 'Register and manage warehouse movements by specifying source and destination details, quantities, and locations, ensuring accurate tracking and completion of inventory transfers within the warehouse.';
     SourceTable = "Warehouse Activity Header";
     SourceTableView = where(Type = const(Movement));
     UsageCategory = Lists;
