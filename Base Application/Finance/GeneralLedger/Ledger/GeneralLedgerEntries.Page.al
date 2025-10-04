@@ -192,11 +192,9 @@ page 20 "General Ledger Entries"
                     Editable = false;
                     ToolTip = 'Specifies the foreign currency amount for G/L entries.';
                     Visible = not SourceCurrencyVisible;
-#pragma warning disable AS0072
                     ObsoleteReason = 'Replaced by W1 field Source Currency Amount';
                     ObsoleteState = Pending;
                     ObsoleteTag = '24.0';
-#pragma warning restore AS0072
                 }
 #endif
                 field("Debit Amount"; Rec."Debit Amount")

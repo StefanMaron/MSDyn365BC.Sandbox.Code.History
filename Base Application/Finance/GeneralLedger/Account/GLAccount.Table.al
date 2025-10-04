@@ -793,15 +793,11 @@ table 15 "G/L Account"
             TableRelation = Currency;
             ObsoleteReason = 'Replaced by W1 field Source Currency Code';
 #if CLEAN25
-#pragma warning disable AS0072
             ObsoleteState = Removed;
             ObsoleteTag = '27.0';
-#pragma warning restore AS0072
 #else
-#pragma warning disable AS0072
             ObsoleteState = Pending;
             ObsoleteTag = '24.0';
-#pragma warning restore AS0072
 
             trigger OnValidate()
             var
@@ -824,15 +820,11 @@ table 15 "G/L Account"
             FieldClass = FlowField;
             ObsoleteReason = 'Replaced by W1 field Source Currency Balance';
 #if not CLEAN25
-#pragma warning disable AS0072
             ObsoleteState = Pending;
             ObsoleteTag = '24.0';
-#pragma warning restore AS0072
 #else
-#pragma warning disable AS0072
-            ObsoleteState = Removed;
+            ObsoleteState = removed;
             ObsoleteTag = '27.0';
-#pragma warning restore AS0072
 #endif
         }
         field(3010538; "Balance at Date (FCY)"; Decimal)
@@ -849,15 +841,11 @@ table 15 "G/L Account"
             FieldClass = FlowField;
             ObsoleteReason = 'Replaced by W1 field Source Curr. Balance at Date';
 #if not CLEAN25
-#pragma warning disable AS0072
             ObsoleteState = Pending;
             ObsoleteTag = '24.0';
-#pragma warning restore AS0072
 #else
-#pragma warning disable AS0072
-            ObsoleteState = Removed;
+            ObsoleteState = removed;
             ObsoleteTag = '27.0';
-#pragma warning restore AS0072
 #endif
         }
         field(3010539; "Movement (FCY)"; Decimal)
@@ -874,15 +862,11 @@ table 15 "G/L Account"
             FieldClass = FlowField;
             ObsoleteReason = 'Replaced by W1 field Source Currency Net Change';
 #if not CLEAN25
-#pragma warning disable AS0072
             ObsoleteState = Pending;
             ObsoleteTag = '24.0';
-#pragma warning restore AS0072
 #else
-#pragma warning disable AS0072
-            ObsoleteState = Removed;
+            ObsoleteState = removed;
             ObsoleteTag = '27.0';
-#pragma warning restore AS0072
 #endif
         }
 #endif
