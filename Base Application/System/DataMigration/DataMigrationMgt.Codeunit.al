@@ -61,7 +61,6 @@ codeunit 1798 "Data Migration Mgt."
         // migrate any other tables if any
         CheckAbortAndMigrateRemainingEntities(DataMigrationStatus, Retry);
         OnCreatePostMigrationData(DataMigrationStatus, DataCreationFailed);
-        OnValidateMigration(DataMigrationStatus, DataCreationFailed);
         if DataCreationFailed then
             exit;
 
@@ -302,12 +301,6 @@ codeunit 1798 "Data Migration Mgt."
 
     [IntegrationEvent(false, false)]
     procedure OnCreatePostMigrationData(var DataMigrationStatus: Record "Data Migration Status"; var DataCreationFailed: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Scope('OnPrem')]
-    procedure OnValidateMigration(var DataMigrationStatus: Record "Data Migration Status"; var DataCreationFailed: Boolean)
     begin
     end;
 
