@@ -1,18 +1,15 @@
 [
   {
-    "bug": "584006",
     "codeunitId": 135135,
     "codeunitName": "Image Tests",
     "method": "ClearTest"
   },
-  {
-    "bug": "584006",
+  { 
     "codeunitId": 135135,
     "codeunitName": "Image Tests",
     "method": "RotateFlip360Test"
   },
   {
-    "bug": "584006",
     "codeunitId": 135135,
     "codeunitName": "Image Tests",
     "method": "RotateFlipTest"

@@ -7,7 +7,7 @@
       "path": "./BankDeposits/Test/_Exclude_Bank Deposits Tests"
     },
     {
-      "path": "./Shopify/test/Shopify Connector Test"
+      "path": "./Shopify/test/Shopify Connector Test/DisabledTests"
     },
     {
       "path": "./ReportLayouts/Test/Report Layouts Tests"
@@ -37,6 +37,9 @@
       "path": "./Onprem Permissions/Test/OnPrem Permissions Tests"
     },
     {
+      "path": "./Manufacturing/Test/Manufacturing Tests"
+    },
+    {
       "path": "./EDocument Core/Test/E-Document Core Tests"
     },
     {
@@ -50,6 +53,9 @@
     },
     {
       "path": "./SAF-T/Test/SAF-T Tests"
+    },
+    {
+      "path": "./SustainabilityCopilotSuggestion/Test/Sustainability Copilot Tests"
     },
     {
       "path": "./RecommendedApps/Test/Recommended Apps Tests"
@@ -80,6 +86,9 @@
     },
     {
       "path": "./System Application/Source/System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./System Application/Test/System Application Partner Test"
     },
     {
       "path": "./System Application/Test/System Application Test Library"
@@ -124,10 +133,13 @@
       "path": "./SalesAndInventoryForecast/Test/Sales and Inventory Forecast Tests"
     },
     {
+      "path": "./ServiceManagement/Test/Service Management Tests"
+    },
+    {
       "path": "./EssentialBusinessHeadlines/Test/Essential Business Headlines Test"
     },
     {
-      "path": "./SubscriptionBilling/Test/Subscription Billing Tests"
+      "path": "./SubscriptionBilling/Test/Subscription Billing Tests/DisabledTests"
     },
     {
       "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AI Tests"
@@ -239,9 +251,6 @@
     },
     {
       "path": "./BaseApp/Test/Tests-Integration"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Invoicing"
     },
     {
       "path": "./BaseApp/Test/Tests-Job"
