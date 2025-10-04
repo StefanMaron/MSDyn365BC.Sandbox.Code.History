@@ -19,7 +19,6 @@ page 147 "Posted Purchase Credit Memos"
     CardPageID = "Posted Purchase Credit Memo";
     Editable = false;
     PageType = List;
-    AboutText = 'Review and track posted purchase credit memos, including vendor details, amounts, payment status, and related documents, to manage supplier returns and corrections in your purchasing process.';
     QueryCategory = 'Posted Purchase Credit Memos';
     SourceTable = "Purch. Cr. Memo Hdr.";
     SourceTableView = sorting("Posting Date")
