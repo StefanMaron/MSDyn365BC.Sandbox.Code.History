@@ -17,7 +17,6 @@ page 99000755 "Work Center List"
     CardPageID = "Work Center Card";
     Editable = false;
     PageType = List;
-    AboutText = 'Manage and analyze work centers for production by tracking capacity, efficiency, and shop floor load, enabling effective scheduling and resource planning based on available capacity and production order status.';
     SourceTable = "Work Center";
     UsageCategory = Lists;
 

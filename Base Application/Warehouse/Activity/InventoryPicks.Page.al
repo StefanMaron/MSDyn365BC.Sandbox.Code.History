@@ -15,7 +15,6 @@ page 9316 "Inventory Picks"
     CardPageID = "Inventory Pick";
     Editable = false;
     PageType = List;
-    AboutText = 'Record, manage, and post inventory picking activities for outbound orders, including selecting bins, handling quantities, splitting lines for multiple bins, and updating warehouse records.';
     RefreshOnActivate = true;
     SourceTable = "Warehouse Activity Header";
     SourceTableView = where(Type = const("Invt. Pick"));
