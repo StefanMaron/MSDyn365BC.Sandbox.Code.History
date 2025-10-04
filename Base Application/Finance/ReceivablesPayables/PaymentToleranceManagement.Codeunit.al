@@ -2132,6 +2132,8 @@ codeunit 426 "Payment Tolerance Management"
                             NewCustLedgEntry.Amount += AppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
                             UpdateGenJournalLineAmount(NewCustLedgEntry.Amount);
                             AdjustRemainingAmount(NewCustLedgEntry, AppliedCustLedgEntry."Remaining Amount");
+                            if not SuppressCommit then
+                                Commit();
                         end;
                 end else begin
                     DelCustPmtTolAcc(NewCustLedgEntry, GenJnlLineApplID);
