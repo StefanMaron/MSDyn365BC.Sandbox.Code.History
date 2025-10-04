@@ -8,7 +8,7 @@ controladdin "PDF Viewer"
     ObsoleteState = Pending;
 
     Scripts =
-        'https://bc-cdn.dynamics.com/common/js/pdfjs-4.10.38/pdf.min.mjs',
+        'https://cdn-bc.dynamics.com/common/js/pdfjs-4.10.38/pdf.min.mjs',
         'script.js';
 
     StartupScript = 'startup.js';
