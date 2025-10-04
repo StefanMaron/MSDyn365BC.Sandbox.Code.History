@@ -174,7 +174,6 @@ using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.Resources.Setup;
 using Microsoft.Projects.RoleCenters;
 using Microsoft.Projects.TimeSheet;
-using Microsoft.Purchases.Analysis;
 using Microsoft.Purchases.Archive;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Document;
@@ -344,7 +343,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Accounting Services Cue" = RM,
                   tabledata "Action Message Entry" = RM,
                   tabledata "Activities Cue" = RIMD,
-                  tabledata "Account Payable Cue" = RIMD,
                   tabledata Activity = RM,
                   tabledata "Activity Log" = RIMD,
                   tabledata "Activity Step" = RM,
@@ -1106,7 +1104,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Overdue Approval Entry" = Rm,
                   tabledata "Package No. Information" = RIMD,
                   tabledata "Payable Employee Ledger Entry" = RM,
-                  tabledata "Acc. Payable Performance Chart" = RIMD,
                   tabledata "Payable Vendor Ledger Entry" = RM,
                   tabledata "Payment Application Proposal" = RM,
                   tabledata "Vendor Payment Buffer" = RM,
@@ -1200,7 +1197,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Pstd. Phys. Invt. Record Hdr" = RM,
                   tabledata "Pstd. Phys. Invt. Record Line" = RM,
                   tabledata "Pstd. Phys. Invt. Tracking" = RM,
-                  tabledata "Purch. by Vend.Grp.Chart Setup" = RM,
                   tabledata "Purch. Comment Line" = RM,
                   tabledata "Purch. Comment Line Archive" = RM,
                   tabledata "Purch. Cr. Memo Entity Buffer" = RIMD,
@@ -1449,7 +1445,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "To-do" = RM,
                   tabledata "To-do Interaction Language" = RM,
                   tabledata "Top Customers By Sales Buffer" = RIMD,
-                  tabledata "Top Vendors By Purchase" = RIMD,
                   tabledata "Total Value Insured" = RM,
                   tabledata "Tracking Specification" = Rimd,
                   tabledata "Trailing Sales Orders Setup" = RM,
