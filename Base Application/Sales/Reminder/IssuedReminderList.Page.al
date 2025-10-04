@@ -17,6 +17,7 @@ page 440 "Issued Reminder List"
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
+    AboutText = 'View and manage reminders issued to customers for overdue payments, including the ability to review details and cancel reminders individually or in batches before they are sent.';
     SourceTable = "Issued Reminder Header";
     UsageCategory = Lists;
 
