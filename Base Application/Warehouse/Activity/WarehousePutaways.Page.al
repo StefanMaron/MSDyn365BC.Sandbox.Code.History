@@ -15,6 +15,7 @@ page 9312 "Warehouse Put-aways"
     CardPageID = "Warehouse Put-away";
     Editable = false;
     PageType = List;
+    AboutText = 'Organize and record the physical placement of received items in the warehouse by managing put-away activities for specific source documents and locations, to update inventory availability in the destination bins.';
     SourceTable = "Warehouse Activity Header";
     SourceTableView = where(Type = const("Put-away"));
     UsageCategory = Lists;
