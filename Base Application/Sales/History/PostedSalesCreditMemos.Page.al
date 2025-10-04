@@ -21,7 +21,6 @@ page 144 "Posted Sales Credit Memos"
     CardPageID = "Posted Sales Credit Memo";
     Editable = false;
     PageType = List;
-    AboutText = 'Review posted sales credit memos, including details of amounts, customer information, payment status, and related documents, to track reversals of sales invoices, returns, and cancellations. Filter and analyze credit memos by contract or other criteria to support financial reconciliation and customer account management.';
     QueryCategory = 'Posted Sales Credit Memos';
     SourceTable = "Sales Cr.Memo Header";
     SourceTableView = sorting("Posting Date")
