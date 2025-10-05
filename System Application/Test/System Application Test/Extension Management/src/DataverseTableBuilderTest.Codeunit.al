@@ -97,7 +97,6 @@ codeunit 133103 "Dataverse Table Builder Test"
 
         // Cleanup
         UninstallExtension();
-        UnpublishExtension();
     end;
 
     local procedure Initialize()
@@ -115,17 +114,5 @@ codeunit 133103 "Dataverse Table Builder Test"
         NavAppInstalledApp.SetRange(Publisher, 'Designer');
         if NavAppInstalledApp.FindFirst() then
             ExtensionManagement.UninstallExtension(NavAppInstalledApp."Package ID", false);
-    end;
-
-    local procedure UnpublishExtension()
-    var
-        NavAppInstalledApp: Record "NAV App Installed App";
-        ExtensionManagement: Codeunit "Extension Management";
-    begin
-        NavAppInstalledApp.SetRange(Name, 'CRM Sync Designer');
-        NavAppInstalledApp.SetRange(Publisher, 'Designer');
-        if NavAppInstalledApp.FindFirst() then
-            ExtensionManagement.UnpublishExtension(NavAppInstalledApp."Package ID");
-        Commit();
     end;
 }
