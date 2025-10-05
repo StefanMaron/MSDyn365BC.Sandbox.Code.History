@@ -225,6 +225,7 @@ report 11564 "SR G/L Acc Sheet Foreign Curr"
                     FcyAcyBalance := FcyAcyBalance + "Source Currency Amount";
                     Exrate := CalcExrate("Source Currency Amount", Amount, "G/L Account"."Source Currency Code");
 #endif
+                    OnAfterOnAfterGetRecord("G/L Account", "G/L Entry", FcyAcyAmt, FcyAcyBalance, Exrate);
                 end;
 
                 trigger OnPreDataItem()
@@ -673,6 +674,11 @@ report 11564 "SR G/L Acc Sheet Foreign Curr"
 
         GenJourLine2.SetRange("Bal. Account No.");
         GenJourLine2.SetRange("Bal. Account Type");
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnAfterOnAfterGetRecord(var GLAccount: Record "G/L Account"; var GLEntry: Record "G/L Entry"; var FcyAcyAmt: Decimal; var FcyAcyBalance: Decimal; var Exrate: Decimal)
+    begin
     end;
 }
 
