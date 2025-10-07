@@ -38,7 +38,10 @@ codeunit 5760 "Whse.-Post Receipt"
     TableNo = "Warehouse Receipt Line";
 
     trigger OnRun()
+    var
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
     begin
+        SequenceNoMgt.SetPreviewMode(PreviewMode);
         OnBeforeRun(Rec, SuppressCommit, PreviewMode);
 
         WhseRcptLine.Copy(Rec);
