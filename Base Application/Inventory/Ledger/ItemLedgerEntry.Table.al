@@ -886,6 +886,9 @@ table 32 "Item Ledger Entry"
     var
         ValueEntry: Record "Value Entry";
     begin
+        if RemQty = 0 then
+            exit(0);
+
         ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgEntryNo);
         if ValuationDate <> 0D then
             ValueEntry.SetRange("Valuation Date", 0D, ValuationDate);
