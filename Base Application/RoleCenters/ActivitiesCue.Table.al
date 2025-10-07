@@ -149,7 +149,7 @@ table 1313 "Activities Cue"
         field(25; "Inc. Doc. Awaiting Verfication"; Integer)
         {
             CalcFormula = count("Incoming Document" where("OCR Status" = const("Awaiting Verification")));
-            Caption = 'Inc. Doc. Awaiting Verfication';
+            Caption = 'Inc. Doc. Awaiting Verification';
             FieldClass = FlowField;
         }
         field(26; "Purchase Orders"; Integer)
