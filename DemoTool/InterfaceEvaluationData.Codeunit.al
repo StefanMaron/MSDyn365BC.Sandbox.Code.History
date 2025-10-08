@@ -265,16 +265,6 @@ codeunit 122001 "Interface Evaluation Data"
             until SalesHeader.Next() = 0;
     end;
 
-    local procedure CalcBankAmountToBePosted(BankAccountNo: Code[20]): Decimal
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-    begin
-        GenJournalLine.SetRange("Account Type", GenJournalLine."Account Type"::"Bank Account");
-        GenJournalLine.SetRange("Account No.", BankAccountNo);
-        GenJournalLine.CalcSums(Amount);
-        exit(GenJournalLine.Amount);
-    end;
-
     local procedure CreateBankAccountReconciliation()
     var
         BankAccReconciliation: Record "Bank Acc. Reconciliation";
@@ -855,4 +845,3 @@ codeunit 122001 "Interface Evaluation Data"
             until PurchaseHeader.Next() = 0;
     end;
 }
-

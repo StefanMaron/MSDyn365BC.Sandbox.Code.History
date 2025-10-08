@@ -57,7 +57,9 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"Service Tariff Number");
         ListOfTablesToMigrate.Add(Database::"Spesometro Appointment");
         ListOfTablesToMigrate.Add(Database::"Split VAT Test");
+#if not CLEAN27
         ListOfTablesToMigrate.Add(Database::"Subcontractor Prices");
+#endif
         ListOfTablesToMigrate.Add(Database::"Tmp Withholding Contribution");
         ListOfTablesToMigrate.Add(Database::"Transport Reason Code");
         ListOfTablesToMigrate.Add(Database::"VAT Book Entry");

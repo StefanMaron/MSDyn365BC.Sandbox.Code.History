@@ -22,10 +22,6 @@ codeunit 101931 "Create Local RapidStart Pack"
         CreateTable(DATABASE::"Contribution Bracket");
         CreateTable(DATABASE::"Contribution Bracket Line");
         CreateTable(DATABASE::"VAT Identifier");
-#if not CLEAN24
-        CreateTable(DATABASE::"No. Series Line Sales");
-        CreateTable(DATABASE::"No. Series Line Purchase");
-#endif
         CreateTable(DATABASE::"VAT Register");
         CreateTable(DATABASE::"Payment Lines");
         CreateTable(DATABASE::"ABI/CAB Codes");
@@ -53,10 +49,6 @@ codeunit 101931 "Create Local RapidStart Pack"
         CreateConfigWorksheet.CreateConfigLine(DATABASE::"Contribution Bracket");
         CreateConfigWorksheet.CreateConfigLine(DATABASE::"Contribution Bracket Line");
         CreateConfigWorksheet.CreateConfigLine(DATABASE::"VAT Identifier");
-#if not CLEAN24
-        CreateConfigWorksheet.CreateConfigLine(DATABASE::"No. Series Line Sales");
-        CreateConfigWorksheet.CreateConfigLine(DATABASE::"No. Series Line Purchase");
-#endif
         CreateConfigWorksheet.CreateConfigLine(DATABASE::"VAT Register");
         CreateConfigWorksheet.CreateConfigLine(DATABASE::"Payment Lines");
         CreateConfigWorksheet.CreateConfigLine(DATABASE::"ABI/CAB Codes");
@@ -100,4 +92,3 @@ codeunit 101931 "Create Local RapidStart Pack"
         end;
     end;
 }
-

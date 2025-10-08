@@ -14,7 +14,9 @@ using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Manufacturing.Capacity;
+#if not CLEAN27
 using Microsoft.Manufacturing.Document;
+#endif
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
@@ -259,13 +261,17 @@ codeunit 5812 "Calculate Standard Cost"
             until TempItem.Next() = 0;
     end;
 
+#if not CLEAN27
+    [Obsolete('procedure that was implemented to throw the error has now been identified as unnecessary', '27.0')]
     procedure CalcItemForNonInventoryValue(var Item: Record Item)
     begin
     end;
 
+    [Obsolete('procedure that was implemented to throw the error has now been identified as unnecessary', '27.0')]
     procedure CalcSKUForNonInventoryValue(var SKU: Record "Stockkeeping Unit")
     begin
     end;
+#endif
 
     procedure CalcItemSKU(ItemNo: Code[20]; LocationCode: Code[20]; VariantCode: Code[20])
     var
@@ -940,12 +946,18 @@ codeunit 5812 "Calculate Standard Cost"
         end;
     end;
 
+#if not CLEAN27
     local procedure CalcRoutingCostPerUnit(Type: Enum "Capacity Type Routing"; No: Code[20]; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type"; Item: Record Item; StandardTaskCode: Code[10])
+#else
+    local procedure CalcRoutingCostPerUnit(Type: Enum "Capacity Type Routing"; No: Code[20]; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type")
+#endif
     var
         WorkCenter: Record "Work Center";
         MachineCenter: Record "Machine Center";
+#if not CLEAN27
         SubContPrices: Record "Subcontractor Prices";
         SubContPriceMgt: Codeunit SubcontractingPricesMgt;
+#endif
         IsHandled: Boolean;
     begin
         case Type of
@@ -960,6 +972,7 @@ codeunit 5812 "Calculate Standard Cost"
         if IsHandled then
             exit;
 
+#if not CLEAN27
         if (Type = Type::"Work Center") and
            (WorkCenter."Subcontractor No." <> '')
         then begin
@@ -974,6 +987,7 @@ codeunit 5812 "Calculate Standard Cost"
             SubContPriceMgt.GetRoutingPricelistCost(
                 SubContPrices, WorkCenter, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, 1, 1, 1);
         end else
+#endif
             MfgCostCalcMgt.CalcRoutingCostPerUnit(
                 Type, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter);
     end;
@@ -1287,9 +1301,14 @@ codeunit 5812 "Calculate Standard Cost"
             WorkCenter.Get(RoutingLine."No.");
 
         UnitCost := RoutingLine."Unit Cost per";
+#if not CLEAN27
         CalcRoutingCostPerUnit(
             RoutingLine.Type, RoutingLine."No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation,
             ParentItem, RoutingLine."Standard Task Code");
+#else
+        CalcRoutingCostPerUnit(
+            RoutingLine.Type, RoutingLine."No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation);
+#endif
         OnCalcRtngLineCostOnAfterCalcRoutingCostPerUnit(RoutingLine, WorkCenter, MfgItemQtyBase, UnitCostCalculation);
         CostTime :=
           MfgCostCalcMgt.CalculateCostTime(
@@ -1324,7 +1343,11 @@ codeunit 5812 "Calculate Standard Cost"
             WorkCenter.Get(RoutingLine."No.");
 
         UnitCost := RoutingLine."Unit Cost per";
+#if not CLEAN27
         CalcRoutingCostPerUnit(RoutingLine.Type, RoutingLine."No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, MainItem, RoutingLine."Standard Task Code");
+#else
+        CalcRoutingCostPerUnit(RoutingLine.Type, RoutingLine."No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation);
+#endif
         OnCalcRtngLineCostOnAfterCalcRoutingCostPerUnit(RoutingLine, WorkCenter, MfgItemQtyBase, UnitCostCalculation);
         CostTime :=
           MfgCostCalcMgt.CalculateCostTime(
@@ -1565,7 +1588,7 @@ codeunit 5812 "Calculate Standard Cost"
     begin
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Standard Cost Worksheet", 'OnAfterValidateEvent', 'No.', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Standard Cost Worksheet", 'OnAfterValidateEvent', 'No.', false, false)]
     local procedure OnValidateNoByType(var Rec: Record "Standard Cost Worksheet")
     var
         MachineCenter: Record "Machine Center";

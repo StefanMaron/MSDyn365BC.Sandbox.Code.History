@@ -1,5 +1,9 @@
+#if not CLEAN27
 codeunit 161352 "Create Subcontracting Prices"
 {
+    ObsoleteReason = 'Preparation for replacement by Subcontracting app.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '27.0';
 
     trigger OnRun()
     begin
@@ -27,4 +31,4 @@ codeunit 161352 "Create Subcontracting Prices"
         SubcontractorPrices.Insert();
     end;
 }
-
+#endif

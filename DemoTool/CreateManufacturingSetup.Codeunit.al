@@ -35,8 +35,7 @@ codeunit 119020 "Create Manufacturing Setup"
         MfgSetup."Planned Order Nos." := XMPLAN;
         MfgSetup."Firm Planned Order Nos." := XMFIRMP;
         MfgSetup."Released Order Nos." := XMREL;
-        MfgSetup."Combined MPS/MRP Calculation" := true;
-        Evaluate(MfgSetup."Default Safety Lead Time", '<1D>');
+
         MfgSetup.Modify();
     end;
 

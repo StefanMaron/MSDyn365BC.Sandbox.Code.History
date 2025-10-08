@@ -5,6 +5,7 @@
     var
         "No. Series": Record "No. Series";
     begin
+        DemoDataSetup.Get();
         InventorySetup.Get();
         "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEM1, XPartiallyManufactured, '70000', '70099', '70060', '70095', 1,
           "No. Series"."No. Series Type"::Normal, '', 0, '', false);
@@ -75,10 +76,14 @@
           InventorySetup."Posted Invt. Shipment Nos.", XIShipmentPLUS, XPostedInventoryShipment, XPIS000001, XPIS999999, '', '', 1,
           "No. Series"."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
 
+        InventorySetup."Combined MPS/MRP Calculation" := true;
+        Evaluate(InventorySetup."Default Safety Lead Time", '<1D>');
+        InventorySetup."Current Demand Forecast" := Format(DemoDataSetup."Starting Year" + 1);
         InventorySetup.Modify();
     end;
 
     var
+        DemoDataSetup: Record "Demo Data Setup";
         InventorySetup: Record "Inventory Setup";
         "Create No. Series": Codeunit "Create No. Series";
         XITEMTxt: Label 'ITEM', Comment = 'Can be translated.';
@@ -165,6 +170,7 @@
     var
         "No. Series": Record "No. Series";
     begin
+        DemoDataSetup.Get();
         InventorySetup.Get();
         "Create No. Series".InitBaseSeries(InventorySetup."Item Nos.", XITEMTxt, XItemNoSeriesTxt, '1000', '9999', '', '9995', 1,
           "No. Series"."No. Series Type"::Normal, '', 0, '', false, Enum::"No. Series Implementation"::Sequence);
@@ -201,6 +207,9 @@
         InventorySetup."Automatic Cost Adjustment" := InventorySetup."Automatic Cost Adjustment"::Always;
         InventorySetup."Average Cost Calc. Type" := InventorySetup."Average Cost Calc. Type"::"Item & Location & Variant";
         InventorySetup."Average Cost Period" := InventorySetup."Average Cost Period"::Day;
+        InventorySetup."Combined MPS/MRP Calculation" := true;
+        Evaluate(InventorySetup."Default Safety Lead Time", '<1D>');
+        InventorySetup."Current Demand Forecast" := Format(DemoDataSetup."Starting Year" + 1);
         InventorySetup.Modify();
     end;
 }
