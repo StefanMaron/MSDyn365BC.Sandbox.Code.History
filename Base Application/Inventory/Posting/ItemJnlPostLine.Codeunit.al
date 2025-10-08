@@ -1270,6 +1270,7 @@ codeunit 22 "Item Jnl.-Post Line"
         ReservEntry: Record "Reservation Entry";
         ReservEntry2: Record "Reservation Entry";
         AppliesFromItemLedgEntry: Record "Item Ledger Entry";
+        EntryFindMethod: Text[1];
         AppliedQty: Decimal;
         FirstReservation: Boolean;
         FirstApplication: Boolean;
@@ -1384,7 +1385,7 @@ codeunit 22 "Item Jnl.-Post Line"
                     end else
                         exit;
                 end else
-                    if FindOpenItemLedgEntryToApply(ItemLedgEntry2, ItemLedgEntry, FirstApplication) then
+                    if FindOpenItemLedgEntryToApply(ItemLedgEntry2, ItemLedgEntry, FirstApplication, EntryFindMethod) then
                         OldItemLedgEntry.Copy(ItemLedgEntry2)
                     else
                         exit;
@@ -1672,15 +1673,25 @@ codeunit 22 "Item Jnl.-Post Line"
                   ItemLedgEntry."Entry Type", OldItemLedgEntry."Entry Type", OldItemLedgEntry."Item No.", OldItemLedgEntry."Order No.");
     end;
 
-    local procedure FindOpenItemLedgEntryToApply(var OpenItemLedgEntry: Record "Item Ledger Entry"; ItemLedgEntry: Record "Item Ledger Entry"; var FirstApplication: Boolean): Boolean
+    local procedure FindOpenItemLedgEntryToApply(var OpenItemLedgEntry: Record "Item Ledger Entry"; ItemLedgEntry: Record "Item Ledger Entry"; var FirstApplication: Boolean; var EntryFindMethod: Text[1]): Boolean
     begin
         if FirstApplication then begin
             FirstApplication := false;
             ApplyItemLedgEntrySetFilters(OpenItemLedgEntry, ItemLedgEntry, GlobalItemTrackingCode);
-            OpenItemLedgEntry.Ascending(Item."Costing Method" <> Item."Costing Method"::LIFO);
-            exit(OpenItemLedgEntry.FindSet());
+
+            if Item."Costing Method" = Item."Costing Method"::LIFO then
+                EntryFindMethod := '+'
+            else
+                EntryFindMethod := '-';
+
+            exit(OpenItemLedgEntry.Find(EntryFindMethod));
         end else
-            exit(OpenItemLedgEntry.Next() <> 0);
+            case EntryFindMethod of
+                '-':
+                    exit(OpenItemLedgEntry.Next() <> 0);
+                '+':
+                    exit(OpenItemLedgEntry.Next(-1) <> 0);
+            end;
     end;
 
     local procedure TestFirstApplyItemLedgerEntryTracking(ItemLedgEntry: Record "Item Ledger Entry"; OldItemLedgEntry: Record "Item Ledger Entry"; ItemTrackingCode: Record "Item Tracking Code");
@@ -4252,6 +4263,7 @@ codeunit 22 "Item Jnl.-Post Line"
         OnUndoQuantityPostingOnBeforeInsertApplEntry(NewItemLedgEntry, OldItemLedgEntry, GlobalItemLedgEntry);
         if NewItemLedgEntry.Positive then begin
             UpdateOrigAppliedFromEntry(OldItemLedgEntry."Entry No.");
+            OldItemLedgEntry.SetAppliedEntryToAdjust(true);
             InsertApplEntry(
               NewItemLedgEntry."Entry No.", NewItemLedgEntry."Entry No.",
               OldItemLedgEntry."Entry No.", 0, NewItemLedgEntry."Posting Date",
