@@ -7750,6 +7750,9 @@ table 37 "Sales Line"
         if "Job Contract Entry No." = 0 then
             exit;
 
+        if CurrFieldNo = 0 then
+            exit;
+
         JobPostLine.TestSalesLine(Rec);
     end;
 
