@@ -7,7 +7,6 @@ codeunit 122001 "Interface Evaluation Data"
 
     var
         XEvalDataMsg: Label 'Create evaluation demo data';
-        DemoDataSetup: Record "Demo Data Setup";
         CreatePaymentTerms: Codeunit "Create Payment Terms";
         CreatePaymentMethod: Codeunit "Create Payment Method";
         MakeAdjustments: Codeunit "Make Adjustments";
@@ -262,16 +261,6 @@ codeunit 122001 "Interface Evaluation Data"
                 ReleaseSalesDocument.Reopen(SalesHeader);
                 Clear(ReleaseSalesDocument);
             until SalesHeader.Next() = 0;
-    end;
-
-    local procedure CalcBankAmountToBePosted(BankAccountNo: Code[20]): Decimal
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-    begin
-        GenJournalLine.SetRange("Account Type", GenJournalLine."Account Type"::"Bank Account");
-        GenJournalLine.SetRange("Account No.", BankAccountNo);
-        GenJournalLine.CalcSums(Amount);
-        exit(GenJournalLine.Amount);
     end;
 
     local procedure CreateBankAccountReconciliation()
@@ -721,14 +710,6 @@ codeunit 122001 "Interface Evaluation Data"
         CreatePurchDocument(CalcDate('<+11M>', PostingDate), '1996-S', 5);
     end;
 
-    local procedure AdjustAmount(Amount: Decimal): Decimal
-    begin
-        DemoDataSetup.Get();
-        if DemoDataSetup."Local Currency Factor" = 0 then
-            exit(Amount);
-        exit(Amount / DemoDataSetup."Local Currency Factor");
-    end;
-
     local procedure RandRate("Count": Integer): Decimal
     var
         Delta: Decimal;
@@ -850,4 +831,3 @@ codeunit 122001 "Interface Evaluation Data"
         RunCodeunit(Codeunit::"Create New Employee Template");
     end;
 }
-
