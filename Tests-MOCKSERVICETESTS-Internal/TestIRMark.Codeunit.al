@@ -1,6 +1,10 @@
+#if not CLEAN27
 codeunit 144526 TestIRMark
 {
     Subtype = Test;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Moved to GovTalk app';
+    ObsoleteTag = '27.0';
 
     trigger OnRun()
     begin
@@ -56,4 +60,5 @@ codeunit 144526 TestIRMark
         Assert.AreEqual('1B2M2Y8AsgTpgAmY7PhCfg==', HMRCSubmissionHelpers.HashPassword(''), '');
     end;
 }
+#endif
 

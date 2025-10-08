@@ -1,8 +1,12 @@
+#if not CLEAN27
 codeunit 144521 "GovTalkMessage Management Test"
 {
     Permissions = TableData "VAT Report Archive" = rimd,
                   TableData GovTalkMessage = rim;
     Subtype = Test;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Moved to GovTalk app';
+    ObsoleteTag = '27.0';
 
     trigger OnRun()
     begin
@@ -506,4 +510,5 @@ codeunit 144521 "GovTalkMessage Management Test"
         exit(Format(PeriodEnd, 0, '<Year4>-<Month,2>'));
     end;
 }
+#endif
 

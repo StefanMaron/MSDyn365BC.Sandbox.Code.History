@@ -1,9 +1,13 @@
+#if not CLEAN27
 codeunit 144527 "ECSL XML Gen. Test"
 {
     // // [FEATURE] [Record Link]
 
     Subtype = Test;
     TestPermissions = Disabled;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Moved to GovTalk app';
+    ObsoleteTag = '27.0';
 
     trigger OnRun()
     begin
@@ -245,4 +249,5 @@ codeunit 144527 "ECSL XML Gen. Test"
         GovTalkSetup.Modify();
     end;
 }
+#endif
 
