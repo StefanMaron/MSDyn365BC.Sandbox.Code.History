@@ -41,10 +41,12 @@ table 101900 "Demo Data Setup"
         {
             Caption = 'Local Currency Factor';
             DecimalPlaces = 4 : 4;
+            AutoFormatType = 0;
         }
         field(16; "Local Precision Factor"; Decimal)
         {
             Caption = 'Local Precision Factor';
+            AutoFormatType = 0;
         }
         field(17; "Company Type"; Option)
         {
@@ -261,14 +263,17 @@ table 101900 "Demo Data Setup"
         field(130; "Goods VAT Rate"; Decimal)
         {
             Caption = 'Goods VAT Rate';
+            AutoFormatType = 0;
         }
         field(131; "Services VAT Rate"; Decimal)
         {
             Caption = 'Services VAT Rate';
+            AutoFormatType = 0;
         }
         field(132; "Reduced VAT Rate"; Decimal)
         {
             Caption = 'Reduced VAT Rate';
+            AutoFormatType = 0;
         }
         field(133; "Rapid Start Country"; Code[10])
         {
@@ -507,4 +512,3 @@ table 101900 "Demo Data Setup"
         exit(XFINISHED);
     end;
 }
-
