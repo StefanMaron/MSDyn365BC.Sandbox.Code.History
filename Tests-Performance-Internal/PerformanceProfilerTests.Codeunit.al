@@ -24,7 +24,6 @@
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryReportDataset: Codeunit "Library - Report Dataset";
-        Assert: Codeunit Assert;
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryWorkflow: Codeunit "Library - Workflow";
         LibraryDocumentApprovals: Codeunit "Library - Document Approvals";
@@ -36,7 +35,6 @@
         TestsBufferPercentage: Integer;
         TraceDumpFilePath: Text;
         DateFormulaTxt: Label '<2D>', Locked = true;
-        NordeaCorporateTxt: Label '"NDEADKKKXXX","1888","9999940560","DKK","Encoding","","20030221","20030221","15757.25","+","15757.25","","68","","Order 12345","4","500","MEDDELNR 2001´Š¢´Š¢´Š¢","0","99999999999903","501","","502","KON konto 0979999035","0","","0","","0","","","","","","","266787.12","+","266787.12","","","Driftskonto","DK3420009999940560","N","Test Testsen","Testvej 10","9999 Testrup","","","","Ordrenr. 65656","99999999999903","1170200109040120000018","7","Betaling af f´Š¢lgende fakturaer:","Fakturanr. Bel´Š¢b:","12345 2500,35","22345 1265,66","32345 5825,00","42345 3635,88","52345 2530,36","","","","","","","","","","","","","","","","","","","","","","","",""', Locked = true;
         OpenBankStatementPageQst: Label 'Do you want to open the bank account statement?';
 
     [Test]
@@ -264,7 +262,7 @@
         Customer."Customer Disc. Group" := CustomerDiscountGroup.Code;
         Customer.Modify(true);
 
-        //Add customer specific discount 
+        //Add customer specific discount
         CreateCustomerDiscountWithSalesLineDiscount(Customer, SalesLineDiscount, Item);
 
         //Add discount for all customer
@@ -299,7 +297,7 @@
         Customer."Customer Disc. Group" := CustomerDiscountGroup.Code;
         Customer.Modify(true);
 
-        //Add customer specific discount 
+        //Add customer specific discount
         CreateCustomerDiscountWithSalesLineDiscount(Customer, PriceListLine, Item);
 
         //Add discount for all customer
@@ -1953,16 +1951,6 @@
         BindSubscription(LibraryJobQueue);
     end;
 
-    local procedure VerifyExpectedResults(var PerfProfilerEventsTest: Record "Perf Profiler Events Test"; ExpectedUniqueQuery: Integer; ExpectedTotalQuery: Integer)
-    begin
-        Assert.IsTrue(PerfProfilerEventsTest."Total SQL Queries" <= ExpectedUniqueQuery,
-          StrSubstNo('This operation executed %1 SQL Queries. Expected number was %2. Local path to trace dump: %3',
-            PerfProfilerEventsTest."Total SQL Queries", ExpectedUniqueQuery, TraceDumpFilePath));
-        Assert.IsTrue(PerfProfilerEventsTest."Total SQL Query Hit Count" <= ExpectedTotalQuery,
-          StrSubstNo('This operation executed a SQL Query with a hit count %1. Expected number was %2. Local path to trace dump: %3',
-            PerfProfilerEventsTest."Total SQL Query Hit Count", ExpectedTotalQuery, TraceDumpFilePath));
-    end;
-
     local procedure PostPayments(var TempPaymentRegistrationBuffer: Record "Payment Registration Buffer" temporary)
     var
         PaymentRegistrationMgt: Codeunit "Payment Registration Mgt.";
@@ -2001,19 +1989,6 @@
         exit(CustLedgerEntry."Entry No.")
     end;
 
-    local procedure ReadNordeaCorpBankStatmentFile(var TempBlob: Codeunit "Temp Blob")
-    var
-        ErmPeSourceTestMock: Codeunit "ERM PE Source Test Mock";
-        TempBlobList: Codeunit "Temp Blob List";
-        OutputStream: OutStream;
-    begin
-        TempBlob.CreateOutStream(OutputStream, TEXTENCODING::Windows);
-        OutputStream.WriteText(NordeaCorporateTxt);
-
-        TempBlobList.Add(TempBlob);
-        ErmPeSourceTestMock.SetTempBlobList(TempBlobList);
-    end;
-
     local procedure PostPaymentToPurchaseInvoice(Vendor: Record Vendor)
     var
         GenJournalLine: Record "Gen. Journal Line";
@@ -2025,21 +2000,6 @@
         PaymentJournal."Account No.".SetValue(Vendor."No.");
         PaymentJournal.Amount.SetValue(123);
         PaymentJournal.Post.Invoke();
-    end;
-
-    local procedure CreateBankAccountReconciliation(var BankAccReconciliation: Record "Bank Acc. Reconciliation"; BankStatementImportFormat: Code[20])
-    var
-        BankAccount: Record "Bank Account";
-    begin
-        LibraryERM.CreateBankAccount(BankAccount);
-        BankAccount.Validate("Bank Branch No.", '1888');
-        BankAccount.Validate("Bank Account No.", '9999940560');
-        BankAccount.Validate("Currency Code", 'DKK');
-        BankAccount.Validate("Bank Statement Import Format", BankStatementImportFormat);
-        BankAccount.Modify(true);
-
-        LibraryERM.CreateBankAccReconciliation(BankAccReconciliation,
-          BankAccount."No.", BankAccReconciliation."Statement Type"::"Bank Reconciliation");
     end;
 
 #if not CLEAN25
