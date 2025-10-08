@@ -553,27 +553,6 @@ codeunit 139093 "Financials Perf Tests"
         Employee.Modify(true);
     end;
 
-    local procedure CreateAndPostGenLine(var GenJournalLine: Record "Gen. Journal Line")
-    var
-        GlAccount: Record "G/L Account";
-    begin
-        LibraryERM.CreateGLAccount(GLAccount);
-        CreateGeneralJournalLine(GenJournalLine, GenJournalLine."Account Type"::"G/L Account", GLAccount."No.", 5);
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-    end;
-
-    local procedure CreateGeneralJournalLine(var GenJournalLine: Record "Gen. Journal Line"; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20]; Amount: Decimal)
-    var
-        GenJournalBatch: Record "Gen. Journal Batch";
-    begin
-        LibraryERM.SelectGenJnlBatch(GenJournalBatch);
-        LibraryERM.ClearGenJournalLines(GenJournalBatch);
-        LibraryERM.CreateGeneralJnlLine(
-            GenJournalLine, GenJournalBatch."Journal Template Name", GenJournalBatch.Name,
-            GenJournalLine."Document Type"::" ", AccountType, AccountNo, Amount);
-
-    end;
-
     [RequestPageHandler]
     PROCEDURE BalanceSheetRequestPageHandler(var AccountSchedule: TestRequestPage "Account Schedule");
     BEGIN
