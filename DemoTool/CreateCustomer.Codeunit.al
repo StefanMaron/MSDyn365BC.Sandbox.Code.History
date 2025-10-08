@@ -235,9 +235,9 @@ codeunit 101018 "Create Customer"
             "Currency Code":
                 Counter := Counter + 1;
             else begin
-                    PreviousCurrencyCode := "Currency Code";
-                    Counter := 1;
-                end;
+                PreviousCurrencyCode := "Currency Code";
+                Counter := 1;
+            end;
         end;
 
         case (Counter - 1) mod 3 of
@@ -420,46 +420,6 @@ codeunit 101018 "Create Customer"
         Customer.Modify(true);
     end;
 
-    local procedure ModifyData(
-      CustomerCode: Code[20];
-      StateCode: Code[20];
-      AssesseeCode: Code[20];
-      PANNO: Code[20];
-      PanStatus: Enum "P.A.N.Status";
-      PanRefNo: Text[80];
-      GenBusPostingGroup: Code[20];
-      CustomerPostingGroup: Code[20])
-    var
-        Customer: Record Customer;
-    begin
-        Customer.Get(CustomerCode);
-        Customer."State Code" := StateCode;
-        Customer."Assessee Code" := AssesseeCode;
-        Customer."P.A.N. No." := PANNO;
-        Customer."P.A.N. Status" := PanStatus;
-        Customer."P.A.N. Reference No." := PanRefNo;
-        Customer.Validate("Gen. Bus. Posting Group", GenBusPostingGroup);
-        Customer.Validate("Customer Posting Group", CustomerPostingGroup);
-        Customer.Validate("VAT Bus. Posting Group", '');
-        Customer.Modify(true);
-    end;
-
-    local procedure CreateAllowedTDSSection(
-      CustomerCode: Code[20];
-      SectionCode: Code[20];
-      ThresholdOverlook: Boolean;
-      SurchargeOverlook: Boolean)
-    var
-        CustomerAllowedSection: Record "Customer Allowed Sections";
-    begin
-        CustomerAllowedSection.Init();
-        CustomerAllowedSection."Customer No" := CustomerCode;
-        CustomerAllowedSection."TDS Section" := SectionCode;
-        CustomerAllowedSection."Threshold Overlook" := ThresholdOverlook;
-        CustomerAllowedSection."Surcharge Overlook" := SurchargeOverlook;
-        CustomerAllowedSection.Insert();
-    end;
-
     local procedure CreateAllowedTCSNOC(
       CustomerCode: Code[20];
       NOC: Code[20];
@@ -476,38 +436,6 @@ codeunit 101018 "Create Customer"
         AllowedNOC."Threshold Overlook" := ThresholdOverlook;
         AllowedNOC."Surcharge Overlook" := SurchargeOverlook;
         AllowedNOC.Insert();
-    end;
-
-    local procedure CreateTDSCustomerConcessionalCode(
-      CustomerCode: Code[20];
-      SectionCode: Code[20];
-      ConcessionalCode: Code[20];
-      CertificateNo: Code[20])
-    var
-        TDSCustomerConcenssionalCode: Record "TDS Customer Concessional Code";
-    begin
-        TDSCustomerConcenssionalCode.Init();
-        TDSCustomerConcenssionalCode."Customer No." := CustomerCode;
-        TDSCustomerConcenssionalCode."TDS Section Code" := SectionCode;
-        TDSCustomerConcenssionalCode."Concessional Code" := ConcessionalCode;
-        TDSCustomerConcenssionalCode."Certificate No." := CertificateNo;
-        TDSCustomerConcenssionalCode.Insert();
-    end;
-
-    local procedure CreateTCSCustomerConcessionalCode(
-      CustomerCode: Code[20];
-      NOC: Code[20];
-      ConcessionalCode: Code[20];
-      CertificateNo: Code[20])
-    var
-        CustomerConcenssionalCode: Record "Customer Concessional Code";
-    begin
-        CustomerConcenssionalCode.Init();
-        CustomerConcenssionalCode."Customer No." := CustomerCode;
-        CustomerConcenssionalCode."TCS Nature of Collection" := NOC;
-        CustomerConcenssionalCode."Concessional Code" := ConcessionalCode;
-        CustomerConcenssionalCode."Concessional Form No." := CertificateNo;
-        CustomerConcenssionalCode.Insert();
     end;
 
     procedure UpdateCustomerData(

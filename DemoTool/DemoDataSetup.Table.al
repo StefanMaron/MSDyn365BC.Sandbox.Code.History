@@ -33,9 +33,11 @@ table 101900 "Demo Data Setup"
         field(15; "Local Currency Factor"; Decimal)
         {
             DecimalPlaces = 4 : 4;
+            AutoFormatType = 0;
         }
         field(16; "Local Precision Factor"; Decimal)
         {
+            AutoFormatType = 0;
         }
         field(17; "Company Type"; Option)
         {
@@ -227,12 +229,15 @@ table 101900 "Demo Data Setup"
         }
         field(130; "Goods VAT Rate"; Decimal)
         {
+            AutoFormatType = 0;
         }
         field(131; "Services VAT Rate"; Decimal)
         {
+            AutoFormatType = 0;
         }
         field(132; "Reduced VAT Rate"; Decimal)
         {
+            AutoFormatType = 0;
         }
         field(133; "Rapid Start Country"; Code[10])
         {
@@ -494,4 +499,3 @@ table 101900 "Demo Data Setup"
         exit(XSRV + ' ' + XRED);
     end;
 }
-

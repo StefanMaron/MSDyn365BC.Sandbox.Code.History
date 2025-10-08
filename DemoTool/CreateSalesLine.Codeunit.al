@@ -243,15 +243,6 @@ codeunit 101037 "Create Sales Line"
         exit(SalesHeader."No.");
     end;
 
-    local procedure EnableOrDisableGST(Enable: Boolean)
-    var
-        TaxType: Record "Tax Type";
-    begin
-        TaxType.Get('GST');
-        TaxType.Enabled := Enable;
-        TaxType.Modify();
-    end;
-
     local procedure InsertRefInvNo(DocType: Integer; DocNo: Code[20]; SourceNo: Code[20])
     var
         RefInvNo: Record "Reference Invoice No.";
@@ -296,4 +287,3 @@ codeunit 101037 "Create Sales Line"
         InsertRefInvNo(3, 'SCM-1002', '10000');
     end;
 }
-

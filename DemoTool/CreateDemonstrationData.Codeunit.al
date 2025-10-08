@@ -226,11 +226,9 @@ codeunit 101900 "Create Demonstration Data"
     local procedure ExcludeNewFeature(FeatureKey: Record "Feature Key"): Boolean
     begin
         if FeatureKey.ID in ['PowerAutomateCopilot',
-                             'CalcOnlyVisibleFlowFields',
-                             'ConcurrentInventoryPosting',
-                             'ConcurrentJobPosting',
-                             'ConcurrentResourcePosting',
-                             'SemanticMetadataSearch']
+                             'FullTextSearch',
+                             'SemanticMetadataSearch',
+                             'AdvancedTellMe']
         then
             exit(true);
 
