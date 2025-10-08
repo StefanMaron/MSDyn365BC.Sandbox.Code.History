@@ -24,9 +24,6 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"Delivery Reminder Text");
         ListOfTablesToMigrate.Add(Database::"DTA Setup");
         ListOfTablesToMigrate.Add(Database::"ESR Setup");
-#if not CLEAN24
-        ListOfTablesToMigrate.Add(Database::"Expect. Phys. Inv. Track. Line");
-#endif
         ListOfTablesToMigrate.Add(Database::"Issued Deliv. Reminder Header");
         ListOfTablesToMigrate.Add(Database::"Issued Deliv. Reminder Line");
         ListOfTablesToMigrate.Add(Database::"Key Buffer");
@@ -34,27 +31,30 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"LSV Journal");
         ListOfTablesToMigrate.Add(Database::"LSV Setup");
         ListOfTablesToMigrate.Add(Database::"Number Series Buffer");
-#if not CLEAN24
-        ListOfTablesToMigrate.Add(Database::"Phys. Inventory Comment Line");
-        ListOfTablesToMigrate.Add(Database::"Phys. Inventory Order Header");
-        ListOfTablesToMigrate.Add(Database::"Phys. Inventory Order Line");
-        ListOfTablesToMigrate.Add(Database::"Phys. Invt. Diff. List Buffer");
-        ListOfTablesToMigrate.Add(Database::"Phys. Invt. Recording Header");
-        ListOfTablesToMigrate.Add(Database::"Phys. Invt. Recording Line");
-        ListOfTablesToMigrate.Add(Database::"Phys. Invt. Tracking Buffer");
-#endif
         ListOfTablesToMigrate.Add(Database::"Place of Dispatcher");
         ListOfTablesToMigrate.Add(Database::"Place of Receiver");
-#if not CLEAN24
-        ListOfTablesToMigrate.Add(Database::"Post. Exp. Ph. In. Track. Line");
-        ListOfTablesToMigrate.Add(Database::"Post. Phys. Invt. Order Header");
-        ListOfTablesToMigrate.Add(Database::"Posted Phys. Invt. Order Line");
-        ListOfTablesToMigrate.Add(Database::"Posted Phys. Invt. Rec. Header");
-        ListOfTablesToMigrate.Add(Database::"Posted Phys. Invt. Rec. Line");
-        ListOfTablesToMigrate.Add(Database::"Posted Phys. Invt. Track. Line");
-#endif
         ListOfTablesToMigrate.Add(Database::"VAT Cipher Code");
         ListOfTablesToMigrate.Add(Database::"VAT Cipher Setup");
         ListOfTablesToMigrate.Add(Database::"VAT Currency Adjustment Buffer");
+        // obsoleted tables
+#if not CLEANSCHEMA27
+        ListOfTablesToMigrate.Add(5005361); // Database::"Expect. Phys. Inv. Track. Line"
+        ListOfTablesToMigrate.Add(5005358); // Database::"Phys. Inventory Comment Line"
+        ListOfTablesToMigrate.Add(5005350); // Database::"Phys. Inventory Order Header"
+        ListOfTablesToMigrate.Add(5005351); // Database::"Phys. Inventory Order Line"
+        ListOfTablesToMigrate.Add(5005363); // Database::"Phys. Invt. Diff. List Buffer"
+        ListOfTablesToMigrate.Add(5005352); // Database::"Phys. Invt. Recording Header"
+        ListOfTablesToMigrate.Add(5005353); // Database::"Phys. Invt. Recording Line"
+        ListOfTablesToMigrate.Add(5005360); // Database::"Phys. Invt. Tracking Buffer"
+        ListOfTablesToMigrate.Add(5005362); // Database::"Post. Exp. Ph. In. Track. Line"
+        ListOfTablesToMigrate.Add(5005354); // Database::"Post. Phys. Invt. Order Header"
+        ListOfTablesToMigrate.Add(5005355); // Database::"Posted Phys. Invt. Order Line"
+        ListOfTablesToMigrate.Add(5005356); // Database::"Posted Phys. Invt. Rec. Header"
+        ListOfTablesToMigrate.Add(5005357); // Database::"Posted Phys. Invt. Rec. Line"
+        ListOfTablesToMigrate.Add(5005359); // Database::"Posted Phys. Invt. Track. Line"
+#endif
+#if not CLEANSCHEMA28
+        ListOfTablesToMigrate.Add(26100); // Database::"DACH Report Selections"
+#endif
     end;
 }

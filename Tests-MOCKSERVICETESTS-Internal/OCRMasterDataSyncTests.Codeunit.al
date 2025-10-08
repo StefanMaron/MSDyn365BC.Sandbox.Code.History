@@ -646,15 +646,6 @@ codeunit 135098 "OCR Master Data Sync Tests"
         if JobQueueEntry.FindFirst() then;
     end;
 
-    local procedure RunJobQueueEntry()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-    begin
-        GetJobQueueEntry(JobQueueEntry);
-        JobQueueEntry.Status := JobQueueEntry.Status::"In Process";
-        JobQueueEntry.Modify();
-    end;
-
     local procedure CheckJobQueueEntry(Exists: Boolean)
     var
         JobQueueEntry: Record "Job Queue Entry";
@@ -696,4 +687,3 @@ codeunit 135098 "OCR Master Data Sync Tests"
         CustConsentConfirmation.Accept.Invoke();
     end;
 }
-
