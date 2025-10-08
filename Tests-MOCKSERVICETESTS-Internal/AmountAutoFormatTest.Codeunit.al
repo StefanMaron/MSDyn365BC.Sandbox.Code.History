@@ -11,8 +11,8 @@ codeunit 132583 "Amount Auto Format Test"
     [TransactionModel(TransactionModel::AutoRollback)]
     procedure TestAutoFormatCase1()
     var
-        AmountAutoFormatTestPage: TestPage "Amount Auto Format Test Page";
         AmountAutoFormatPage: Page "Amount Auto Format Test Page";
+        AmountAutoFormatTestPage: TestPage "Amount Auto Format Test Page";
     begin
         // [GIVEN] A page with fields with AutoFormatType=1
         // [GIVEN] The Amount Decimal Places from the table "General Ledger Setup"
@@ -51,8 +51,8 @@ codeunit 132583 "Amount Auto Format Test"
     [TransactionModel(TransactionModel::AutoRollback)]
     procedure TestAutoFormatCase2()
     var
-        AmountAutoFormatTestPage: TestPage "Amount Auto Format Test Page";
         AmountAutoFormatPage: Page "Amount Auto Format Test Page";
+        AmountAutoFormatTestPage: TestPage "Amount Auto Format Test Page";
     begin
         // [GIVEN] A page with fields with AutoFormatType=2
         // [GIVEN] The Unit-Amount Decimal Places from the table "General Ledger Setup"
@@ -98,7 +98,7 @@ codeunit 132583 "Amount Auto Format Test"
         InitializeCurrency('3:3', '0:1', '$', 'USD');
 
         // [GIVEN] A test table with the values to format
-        // In this case the values need to be in a table because they are declared as Decimal but they will be converted in text if 
+        // In this case the values need to be in a table because they are declared as Decimal but they will be converted in text if
         // there are symbols (e.g: $) in the final formatted result
         InitializeTestTable();
 
@@ -123,8 +123,8 @@ codeunit 132583 "Amount Auto Format Test"
 
     local procedure TestCaseNoSubtype()
     var
-        AmountAutoFormatTestPage: TestPage "Amount Auto Format Test Page";
         AmountAutoFormatPage: Page "Amount Auto Format Test Page";
+        AmountAutoFormatTestPage: TestPage "Amount Auto Format Test Page";
     begin
         AmountAutoFormatPage.InitializeExpression('case_10_NoSubtype');
         AmountAutoFormatPage.setAutoFormatExpressionCase10('<Precision,0:0><Standard Format,0>', '', '', '', '');
@@ -143,9 +143,8 @@ codeunit 132583 "Amount Auto Format Test"
 
     local procedure TestCaseSubtype1()
     var
-        AmountAutoFormatTestPage: TestPage "Amount Auto Format Test Page";
         AmountAutoFormatPage: Page "Amount Auto Format Test Page";
-
+        AmountAutoFormatTestPage: TestPage "Amount Auto Format Test Page";
     begin
         AmountAutoFormatPage.InitializeExpression('case_10_1');
         AmountAutoFormatPage.setAutoFormatExpressionCase10('', '1', '1,InvalidCurrency,Prefix', '1,USD', '1,USD,Prefix');
@@ -155,22 +154,22 @@ codeunit 132583 "Amount Auto Format Test"
         // [WHEN] AutoFormatExpression = '1'
         // [WHEN] A value is inserted in the field from the table when the page loads
         // [THEN] The inserted value is formatted using the Amount Decimal Places from the table "General Ledger Setup"
-        LibraryAssert.AreEqual('€34.6', AmountAutoFormatTestPage.Case10GLSetup1.Value, 'The return value should be "€34.6"');
+        LibraryAssert.AreEqual('€ 34.6', AmountAutoFormatTestPage.Case10GLSetup1.Value, 'The return value should be "€ 34.6"');
 
         // [WHEN] AutoFormatExpression = '1,InvalidCurrency,Prefix';
         // [WHEN] A value is inserted in the field from the table when the page loads
         // [THEN] The inserted value is formatted using Amount Decimal Places from the table "General Ledger Setup", the given Prefix and the default currency symbol
-        LibraryAssert.AreEqual('Prefix €37.0', AmountAutoFormatTestPage.Case10GLSetup2.Value, 'The return value should be "Prefix €37.0"');
+        LibraryAssert.AreEqual('Prefix € 37.0', AmountAutoFormatTestPage.Case10GLSetup2.Value, 'The return value should be "Prefix € 37.0"');
 
         // [WHEN] AutoFormatExpression = '1,USD';
         // [WHEN] A value is inserted in the field from the table when the page loads
         // [THEN] The inserted value is formatted using Amount Decimal Places from the table "Currency" and the currency associated to the 3 letter code
-        LibraryAssert.AreEqual('$144.490', AmountAutoFormatTestPage.Case10Currency1.Value, 'The return value should be "$144.490"');
+        LibraryAssert.AreEqual('$ 144.490', AmountAutoFormatTestPage.Case10Currency1.Value, 'The return value should be "$ 144.490"');
 
         // [WHEN] AutoFormatExpression = '1,USD,Prefix';
         // [WHEN] A value is inserted in the field from the table when the page loads
         // [THEN] The inserted value is formatted using Amount Decimal Places from the table "Currency", the given Prefix and the currency associated to the 3 letter code
-        LibraryAssert.AreEqual('Prefix $320.400', AmountAutoFormatTestPage.Case10Currency2.Value, 'The return value should be "Prefix $320.400"');
+        LibraryAssert.AreEqual('Prefix $ 320.400', AmountAutoFormatTestPage.Case10Currency2.Value, 'The return value should be "Prefix $ 320.400"');
 
         AmountAutoFormatTestPage.Close();
         AmountAutoFormatPage.Close();
@@ -178,8 +177,8 @@ codeunit 132583 "Amount Auto Format Test"
 
     local procedure TestCaseSubtype2()
     var
-        AmountAutoFormatTestPage: TestPage "Amount Auto Format Test Page";
         AmountAutoFormatPage: Page "Amount Auto Format Test Page";
+        AmountAutoFormatTestPage: TestPage "Amount Auto Format Test Page";
     begin
         AmountAutoFormatPage.InitializeExpression('case_10_2');
         AmountAutoFormatPage.setAutoFormatExpressionCase10('', '2', '2,InvalidCurrency,Prefix', '2,USD', '2,USD,Prefix');
@@ -189,22 +188,22 @@ codeunit 132583 "Amount Auto Format Test"
         // [WHEN] AutoFormatExpression = '2'
         // [WHEN] A value is inserted in the field from the table when the page loads
         // [THEN] The inserted value is formatted using the Unit-Amount Decimal Places from the table "General Ledger Setup"
-        LibraryAssert.AreEqual('€34.56', AmountAutoFormatTestPage.Case10GLSetup1.Value, 'The return value should be "€34.56"');
+        LibraryAssert.AreEqual('€ 34.56', AmountAutoFormatTestPage.Case10GLSetup1.Value, 'The return value should be "€ 34.56"');
 
         // [WHEN] AutoFormatExpression = '2,InvalidCurrency,Prefix';
         // [WHEN] A value is inserted in the field from the table when the page loads
         // [THEN] The inserted value is formatted using Unit-Amount Decimal Places from the table "General Ledger Setup", the given Prefix and the default currency symbol
-        LibraryAssert.AreEqual('Prefix €37.00', AmountAutoFormatTestPage.Case10GLSetup2.Value, 'The return value should be "Prefix €37.00"');
+        LibraryAssert.AreEqual('Prefix € 37.00', AmountAutoFormatTestPage.Case10GLSetup2.Value, 'The return value should be "Prefix € 37.00"');
 
         // [WHEN] AutoFormatExpression = '2,USD';
         // [WHEN] A value is inserted in the field from the table when the page loads
         // [THEN] The inserted value is formatted using Unit-Amount Decimal Places from the table "Currency" and the currency associated to the 3 letter code
-        LibraryAssert.AreEqual('$144.5', AmountAutoFormatTestPage.Case10Currency1.Value, 'The return value should be "$144.5"');
+        LibraryAssert.AreEqual('$ 144.5', AmountAutoFormatTestPage.Case10Currency1.Value, 'The return value should be "$ 144.5"');
 
         // [WHEN] AutoFormatExpression = '2,USD,Prefix';
         // [WHEN] A value is inserted in the field from the table when the page loads
         // [THEN] The inserted value is formatted using Unit-Amount Decimal Places from the table "Currency", the given Prefix and the currency associated to the 3 letter code
-        LibraryAssert.AreEqual('Prefix $320.4', AmountAutoFormatTestPage.Case10Currency2.Value, 'The return value should be "Prefix $320.4"');
+        LibraryAssert.AreEqual('Prefix $ 320.4', AmountAutoFormatTestPage.Case10Currency2.Value, 'The return value should be "Prefix $ 320.4"');
 
         AmountAutoFormatTestPage.Close();
         AmountAutoFormatPage.Close();
@@ -220,14 +219,9 @@ codeunit 132583 "Amount Auto Format Test"
         GLSetup."Local Currency Symbol" := CurrencySymbol;
         GLSetup."LCY Code" := LCYCode;
         GLSetup."Amount Rounding Precision" := 0.00001;
+        GLSetup."Show Currency" := enum::"Show Currency"::Never;
+        GLSetup."Currency Symbol Position" := enum::"Currency Symbol Position"::"Before Amount";
         GLSetup.Insert(true);
-    end;
-
-    local procedure DeleteGLSetupTable()
-    var
-        GLSetup: Record "General Ledger Setup";
-    begin
-        GLSetup.DeleteAll(true);
     end;
 
     local procedure InitializeCurrency(DecimalPlaces: Text[5]; UnitDecimalPlaces: Text[5]; CurrencySymbol: Text[1]; CurrencyCode: Text[3])
@@ -239,6 +233,7 @@ codeunit 132583 "Amount Auto Format Test"
         Currency."Amount Decimal Places" := DecimalPlaces;
         Currency."Unit-Amount Decimal Places" := UnitDecimalPlaces;
         Currency."Symbol" := CurrencySymbol;
+        Currency."Currency Symbol Position" := enum::"Currency Symbol Position"::"Before Amount";
         Currency.Insert(true);
     end;
 
