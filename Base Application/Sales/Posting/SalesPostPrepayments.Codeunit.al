@@ -37,7 +37,10 @@ codeunit 442 "Sales-Post Prepayments"
     TableNo = "Sales Header";
 
     trigger OnRun()
+    var
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
     begin
+        SequenceNoMgt.SetPreviewMode(PreviewMode);
         Execute(Rec);
     end;
 
