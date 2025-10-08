@@ -14,21 +14,25 @@ table 101904 "Temporary Currency Data"
         {
             Caption = 'Local Precision Factor';
             DecimalPlaces = 2 : 5;
+            AutoFormatType = 0;
         }
         field(3; "Amount Rounding Precision"; Decimal)
         {
             Caption = 'Amount Rounding Precision';
             DecimalPlaces = 2 : 5;
+            AutoFormatType = 0;
         }
         field(4; "Unit-Amount Rounding Precision"; Decimal)
         {
             Caption = 'Unit-Amount Rounding Precision';
             DecimalPlaces = 0 : 9;
+            AutoFormatType = 0;
         }
         field(5; "Invoice Rounding Precision"; Decimal)
         {
             Caption = 'Invoice Rounding Precision';
             DecimalPlaces = 0 : 5;
+            AutoFormatType = 0;
         }
         field(6; "Invoice Rounding Type"; Option)
         {
@@ -44,6 +48,7 @@ table 101904 "Temporary Currency Data"
         {
             Caption = 'Relational Exch. Rate Amount';
             DecimalPlaces = 1 : 6;
+            AutoFormatType = 0;
         }
         field(9; "EMU Currency"; Boolean)
         {
@@ -76,4 +81,3 @@ table 101904 "Temporary Currency Data"
     {
     }
 }
-
