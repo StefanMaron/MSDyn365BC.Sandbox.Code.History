@@ -278,13 +278,6 @@ codeunit 119100 "Create Chart Definitions"
         CreateAccScheduleLine.InsertMiniAppDataFormula(ScheduleName, RowNo, Description, Totaling, TotalingType, RowType, false, true);
     end;
 
-    local procedure CreateAccScheduleLineExtended(ScheduleName: Code[10]; RowNo: Code[10]; Description: Text[80]; Totaling: Text[250]; TotalingType: Enum "Acc. Schedule Line Totaling Type"; RowType: Option; ShowOppositeSign: Boolean)
-    var
-        CreateAccScheduleLine: Codeunit "Create Acc. Schedule Line";
-    begin
-        CreateAccScheduleLine.InsertMiniAppData(ScheduleName, RowNo, Description, Totaling, TotalingType, RowType, ShowOppositeSign);
-    end;
-
     local procedure CreateTotalAccountLine_TotalLiquidFunds(): Text
     begin
         exit(StrSubstNo('%1|%2|%3|%4|%5|%6',
@@ -396,9 +389,9 @@ codeunit 119100 "Create Chart Definitions"
 
     local procedure InsertPeriodFormula(Period: Integer): Text[10]
     var
-        ColumnLayout: Record "Column Layout";
+        PeriodFormulaParser: Codeunit "Period Formula Parser";
     begin
-        exit(StrSubstNo('%1%2', Period, ColumnLayout.GetPeriodName()));
+        exit(StrSubstNo('%1%2', Period, PeriodFormulaParser.GetPeriodName()));
     end;
 
     procedure GetCashCycleAccSchedName(): Code[10]
@@ -423,4 +416,3 @@ codeunit 119100 "Create Chart Definitions"
         exit(MakeAdjustments.AdjustDate(19030401D));
     end;
 }
-
