@@ -320,6 +320,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestLibraries.Email)(LookupHint=Table Test Email Connector Setup - Field Email Message ID - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Table 883688266 - Field 4088645632 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Fail On Get Email Folders]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestLibraries.Email)(LookupHint=Table Test Email Connector Setup - Field Fail On Get Email Folders - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Table 883688266 - Field 2603469650 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Fail On Retrieve Emails]]></Val>
