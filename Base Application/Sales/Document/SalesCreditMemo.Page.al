@@ -585,6 +585,7 @@ page 44 "Sales Credit Memo"
                         var
                             Customer: Record Customer;
                         begin
+                            OnBeforeLookupBillToName(Customer, Rec);
                             if Customer.SelectCustomer(Customer) then begin
                                 xRec := Rec;
                                 Rec."Bill-to Name" := Customer.Name;
@@ -1928,4 +1929,9 @@ page 44 "Sales Credit Memo"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLookupBillToName(var Customer: Record Customer; SalesHeader: Record "Sales Header")
+    begin
+    end;
 }
+
