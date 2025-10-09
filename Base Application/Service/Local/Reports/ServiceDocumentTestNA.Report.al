@@ -8,9 +8,7 @@ using Microsoft.CRM.Team;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Setup;
-#if not CLEAN28
 using Microsoft.Finance.SalesTax;
-#endif
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
@@ -29,10 +27,10 @@ using Microsoft.Utilities;
 using System.Security.User;
 using System.Utilities;
 
-report 5915 "Service Document - Test"
+report 10485 "Service Document - Test NA"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Service/Reports/ServiceDocumentTest.rdlc';
+    RDLCLayout = './Service/Local/Reports/ServiceDocumentTestNA.rdlc';
     Caption = 'Service Document - Test';
     WordMergeDataItem = "Service Header";
 
@@ -680,10 +678,9 @@ report 5915 "Service Document - Test"
                                 TempServiceLine.Next();
                             "Service Line" := TempServiceLine;
 
-#if not CLEAN28
                             if SalesTax and not HeaderTaxArea."Use External Tax Engine" then
                                 ServSalesTaxCalculate.AddServiceLine("Service Line");
-#endif
+
                             if not "Service Header"."Prices Including VAT" and
                                    ("Service Line"."VAT Calculation Type" = "Service Line"."VAT Calculation Type"::"Full VAT")
                             then
@@ -803,7 +800,6 @@ report 5915 "Service Document - Test"
                                 "Service Line"."No." := '';
                                 "Service Line".Type := "Service Line".Type::" ";
                             end;
-#if not CLEAN28
                             if "Service Line"."Line No." = OrigMaxLineNo then
                                 if SalesTax then begin
                                     if not SalesTaxCalculationOverridden then begin
@@ -818,7 +814,6 @@ report 5915 "Service Document - Test"
                                     TaxText := SalesTaxAmountLine.TaxAmountText();
                                 end else
                                     TaxText := TempVATAmountLine.VATAmountText();
-#endif
                         end;
 
                         trigger OnPreDataItem()
@@ -956,16 +951,13 @@ report 5915 "Service Document - Test"
 
                         trigger OnPreDataItem()
                         begin
-#if not CLEAN28
                             if SalesTax then
                                 CurrReport.Break();
-#endif
                             if VATAmount = 0 then
                                 CurrReport.Break();
                             SetRange(Number, 1, TempVATAmountLine.Count);
                         end;
                     }
-#if not CLEAN28
                     dataitem(SalesTaxCounter; "Integer")
                     {
                         column(SalesTaxAmountLine__Tax_Amount_; SalesTaxAmountLine."Tax Amount")
@@ -1096,7 +1088,6 @@ report 5915 "Service Document - Test"
                             SumtotalVAT := 0;
                         end;
                     }
-#endif
 
                     trigger OnAfterGetRecord()
                     begin
@@ -1114,13 +1105,14 @@ report 5915 "Service Document - Test"
                         VATBaseAmount := TempVATAmountLine.GetTotalVATBase();
                         VATDiscountAmount :=
                           TempVATAmountLine.GetTotalVATDiscount("Service Header"."Currency Code", "Service Header"."Prices Including VAT");
-#if not CLEAN28
                         if SalesTax then begin
                             SalesTaxAmountLine.DeleteAll();
                             OnBeforeCalculateSalesTax("Service Header", SalesTaxAmountLine, SalesTaxCalculationOverridden);
+#if not CLEAN28
+                            ServiceDocumentTest.RunOnBeforeCalculateSalesTax("Service Header", SalesTaxAmountLine, SalesTaxCalculationOverridden);
+#endif
                             ServSalesTaxCalculate.StartSalesTaxCalculation();
                         end;
-#endif
                     end;
                 }
             }
@@ -1139,26 +1131,21 @@ report 5915 "Service Document - Test"
                     TotalText := StrSubstNo(Text004, GLSetup."LCY Code");
                     TotalExclVATText := StrSubstNo(Text033, GLSetup."LCY Code");
                     TotalInclVATText := StrSubstNo(Text005, GLSetup."LCY Code");
-#if not CLEAN28
                     ExchangeFactor := 1;
-#endif
                 end else begin
                     TotalText := StrSubstNo(Text004, "Currency Code");
                     TotalExclVATText := StrSubstNo(Text033, "Currency Code");
                     TotalInclVATText := StrSubstNo(Text005, "Currency Code");
-#if not CLEAN28
                     ExchangeFactor := "Currency Factor";
-#endif
                 end;
 
                 Invoice := InvOnNextPostReq;
                 Ship := ShipReceiveOnNextPostReq;
 
-#if not CLEAN28
                 SalesTax := "Tax Area Code" <> '';
                 if SalesTax then
                     HeaderTaxArea.Get("Tax Area Code");
-#endif
+
                 VerifyCustomerNo("Service Header");
                 VerifyBilltoCustomerNo("Service Header");
 
@@ -1261,6 +1248,9 @@ report 5915 "Service Document - Test"
                     AddError(DimMgt.GetDimValuePostingErr());
 
                 OnAfterCheckServiceDoc("Service Header", ErrorText, ErrorCounter);
+#if not CLEAN28
+                ServiceDocumentTest.RunOnAfterCheckServiceDoc("Service Header", ErrorText, ErrorCounter);
+#endif
             end;
 
             trigger OnPreDataItem()
@@ -1379,6 +1369,9 @@ report 5915 "Service Document - Test"
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         DimSetEntry: Record "Dimension Set Entry";
         TempDimSetEntry: Record "Dimension Set Entry" temporary;
+#if not CLEAN28
+        ServiceDocumentTest: Report "Service Document - Test";
+#endif
         DimMgt: Codeunit DimensionManagement;
         ServDimMgt: Codeunit "Serv. Dimension Management";
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
@@ -1415,7 +1408,6 @@ report 5915 "Service Document - Test"
         Invoice: Boolean;
         DimTxtArrLength: Integer;
         DimTxtArr: array[500] of Text;
-#if not CLEAN28
         ExchangeFactor: Decimal;
         SalesTax: Boolean;
         HeaderTaxArea: Record "Tax Area";
@@ -1424,7 +1416,6 @@ report 5915 "Service Document - Test"
         TaxText: Text[30];
         SumtotalVAT: Decimal;
         SumtotalExchFactor: Decimal;
-#endif
 
 #pragma warning disable AA0074
         Text000: Label 'Ship and Invoice';
@@ -1500,7 +1491,6 @@ report 5915 "Service Document - Test"
         VATAmountLine__Inv__Disc__Base_Amount__Control171CaptionLbl: Label 'Inv. Disc. Base Amount';
         VATAmountLine__Line_Amount__Control169CaptionLbl: Label 'Line Amount';
         TotalCaptionLbl: Label 'Total';
-#if not CLEAN28
         Sales_Tax_AmountsCaptionLbl: Label 'Sales Tax Amounts';
         Tax_Area_CodeCaptionLbl: Label 'Tax Area Code';
         Tax__CaptionLbl: Label 'Tax %';
@@ -1513,7 +1503,6 @@ report 5915 "Service Document - Test"
         TotalCaption_Control1020017Lbl: Label 'Total';
         TotalCaption_Control1020019Lbl: Label 'Total';
         SalesTaxCalculationOverridden: Boolean;
-#endif
 
     local procedure AddError(Text: Text)
     begin
@@ -1663,18 +1652,10 @@ report 5915 "Service Document - Test"
         ShowDim := ShowDimFrom;
     end;
 
-#if not CLEAN28
-    internal procedure RunOnBeforeCalculateSalesTax(var ServiceHeader: Record "Service Header"; var SalesTaxAmountLine: Record "Sales Tax Amount Line"; var SalesTaxCalculationOverridden: Boolean)
-    begin
-        OnBeforeCalculateSalesTax(ServiceHeader, SalesTaxAmountLine, SalesTaxCalculationOverridden);
-    end;
-
-    [Obsolete('Replaced by report Service Document Test NA', '28.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateSalesTax(var ServiceHeader: Record "Service Header"; var SalesTaxAmountLine: Record "Sales Tax Amount Line"; var SalesTaxCalculationOverridden: Boolean)
     begin
     end;
-#endif
 
     local procedure CheckType(ServiceLine2: Record "Service Line")
     var
@@ -1682,6 +1663,9 @@ report 5915 "Service Document - Test"
         ItemItemVariantLbl: Label '%1 %2', Comment = '%1 - Item No., %2 - Variant Code';
     begin
         OnBeforeCheckType(ServiceLine2, ErrorCounter, ErrorText);
+#if not CLEAN28
+        ServiceDocumentTest.RunOnBeforeCheckType(ServiceLine2, ErrorCounter, ErrorText);
+#endif
         case ServiceLine2.Type of
             ServiceLine2.Type::"G/L Account":
                 begin
@@ -1824,23 +1808,11 @@ report 5915 "Service Document - Test"
                     AddError(TempErrorText);
     end;
 
-#if not CLEAN28
-    internal procedure RunOnAfterCheckServiceDoc(ServiceHeader: Record "Service Header"; var ErrorText: array[99] of Text[250]; var ErrorCounter: Integer)
-    begin
-        OnAfterCheckServiceDoc(ServiceHeader, ErrorText, ErrorCounter);
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckServiceDoc(ServiceHeader: Record "Service Header"; var ErrorText: array[99] of Text[250]; var ErrorCounter: Integer)
     begin
     end;
 
-#if not CLEAN28
-    internal procedure RunOnBeforeCheckType(ServiceLine: Record "Service Line"; var ErrorCounter: Integer; var ErrorText: array[99] of Text[250])
-    begin
-        OnBeforeCheckType(ServiceLine, ErrorCounter, ErrorText);
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckType(ServiceLine: Record "Service Line"; var ErrorCounter: Integer; var ErrorText: array[99] of Text[250])
     begin

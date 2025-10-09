@@ -1589,6 +1589,15 @@
       <Cmt Name="Dev"><![CDATA[%3, %5-%9 - numbers, %1,%4 - text value, %2 - date]D;]A;(LookupHint=Codeunit ERM Consolidation - NamedType TransactionLineTok)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 937765622 - NamedType 1473101328" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Cost is Adjusted should be TRUE for new copied item]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Copy Item - NamedType CostAdjustedTrueErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 937765622 - NamedType 3305540346" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Invalid Customer Name]]></Val>
