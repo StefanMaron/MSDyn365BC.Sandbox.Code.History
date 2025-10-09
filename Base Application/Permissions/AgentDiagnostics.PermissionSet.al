@@ -5,12 +5,10 @@
 
 namespace System.Security.AccessControl;
 
-permissionset 4305 "Agent - Admin"
+permissionset 4306 "Agent - Diagnostics"
 {
     Assignable = true;
-    Caption = 'Agent administrator';
+    Caption = 'Agent Diagnostics';
     IncludedPermissionSets = "D365 Agent";
-    Permissions =
-        system "Configure All Agents" = X,
-        system "Create Custom Agent" = X;
+    Permissions = system "Troubleshoot All Agents" = X;
 }
