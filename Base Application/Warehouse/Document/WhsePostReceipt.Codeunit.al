@@ -792,7 +792,7 @@ codeunit 5760 "Whse.-Post Receipt"
                     Clear(TransferPostReceipt);
                 end;
             else
-                OnPostSourceDocument(WarehouseReceiptHeader, WarehouseReceiptLine);
+                OnPostSourceDocument(WarehouseReceiptHeader, WarehouseReceiptLine, CounterSourceDocOK);
         end;
 
         OnAfterPostSourceDocument(WarehouseReceiptLine);
@@ -1957,7 +1957,7 @@ codeunit 5760 "Whse.-Post Receipt"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostSourceDocument(var WhseReceiptHeader: Record "Warehouse Receipt Header"; var WhseReceiptLine: Record "Warehouse Receipt Line")
+    local procedure OnPostSourceDocument(var WhseReceiptHeader: Record "Warehouse Receipt Header"; var WhseReceiptLine: Record "Warehouse Receipt Line"; var CounterSourceDocOK: Integer)
     begin
     end;
 
