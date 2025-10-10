@@ -587,7 +587,7 @@ table 18 Customer
             Caption = 'Balance (LCY)';
             Editable = false;
             FieldClass = FlowField;
-            ToolTip = 'Specifies the payment amount that the customer owes for completed sales. This value is also known as the customer''s balance.';
+            ToolTip = 'Specifies the total amount the customer owes you, or you owe them, based on all sales and credits for the customer. A positive amount means they owe you, and a negative amount means you owe them. The amount isn''t necessarily due today though. The customer''s payment terms determine due dates. Select the amount to explore the ledger entries behind it.';
         }
         field(60; "Net Change"; Decimal)
         {
@@ -685,10 +685,10 @@ table 18 Customer
                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                  "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
                                                                                  "Currency Code" = field("Currency Filter")));
-            Caption = 'Balance Due (LCY)';
+            Caption = 'Overdue Balance (LCY)';
             Editable = false;
             FieldClass = FlowField;
-            ToolTip = 'Specifies payments from the customer that are overdue per today''s date.';
+            ToolTip = 'Specifies the total amount that''s due from the customer as of today. Consider using reminders to minimize late payments and optimize cashflow.';
         }
         field(69; Payments; Decimal)
         {
