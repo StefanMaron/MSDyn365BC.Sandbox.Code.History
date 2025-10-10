@@ -112,6 +112,7 @@ codeunit 730 "Copy Item"
 
         TargetItem."Last Date Modified" := Today;
         TargetItem."Created From Nonstock Item" := false;
+        TargetItem."Cost is Adjusted" := true;
     end;
 
     procedure CopyItem(CopyCounter: Integer)

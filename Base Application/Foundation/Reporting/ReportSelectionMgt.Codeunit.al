@@ -328,6 +328,16 @@ codeunit 1901 "Report Selection Mgt."
         end;
     end;
 
+    procedure UpdateReportSelection(ReportUsage: Enum "Report Selection Usage"; Sequence: Code[10]; ReportID: Integer)
+    var
+        ReportSelections: Record "Report Selections";
+    begin
+        if ReportSelections.Get(ReportUsage, Sequence) then begin
+            ReportSelections.Validate("Report ID", ReportID);
+            ReportSelections.Modify();
+        end;
+    end;
+
     procedure InsertReportSelectionWhse(ReportUsage: Enum "Report Selection Warehouse Usage"; Sequence: Code[10]; ReportID: Integer)
     var
         ReportSelectionWhse: Record "Report Selection Warehouse";
