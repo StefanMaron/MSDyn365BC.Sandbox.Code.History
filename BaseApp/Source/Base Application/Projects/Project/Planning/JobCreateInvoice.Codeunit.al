@@ -240,6 +240,8 @@ codeunit 1002 "Job Create-Invoice"
                         JobPlanningLineInvoice.InitFromSales(SalesHeader, PostingDate, SalesLine."Line No.")
                     else
                         JobPlanningLineInvoice.InitFromSales(SalesHeader, SalesHeader."Posting Date", SalesLine."Line No.");
+
+                    OnCreateSalesInvoiceLinesOnBeforeJobPlanningLineInvoiceInsert(JobPlanningLineInvoice);
                     JobPlanningLineInvoice.Insert();
 
                     JobPlanningLine.UpdateQtyToTransfer();
@@ -1544,6 +1546,11 @@ codeunit 1002 "Job Create-Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateSalesInvoiceLinesOnBeforeNoSalesLineCreatedError(var SkipError: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateSalesInvoiceLinesOnBeforeJobPlanningLineInvoiceInsert(var JobPlanningLineInvoice: Record "Job Planning Line Invoice")
     begin
     end;
 }
