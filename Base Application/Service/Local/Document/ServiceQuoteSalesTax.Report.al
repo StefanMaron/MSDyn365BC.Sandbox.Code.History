@@ -4,13 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Service.Document;
 
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
 using Microsoft.Finance.Dimension;
-#if not CLEAN28
 using Microsoft.Finance.SalesTax;
-#endif
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Inventory.Location;
+using Microsoft.Sales.Customer;
 using Microsoft.Service.Archive;
 using Microsoft.Service.Comment;
 using Microsoft.Service.Setup;
@@ -19,23 +21,23 @@ using System.Email;
 using System.Globalization;
 using System.Utilities;
 
-report 5900 "Service Order"
+report 10471 "Service Quote-Sales Tax"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Service/Document/ServiceOrder.rdlc';
-    Caption = 'Service Order';
+    RDLCLayout = './Service/Local/Document/ServiceQuoteSalesTax.rdlc';
+    Caption = 'Service Quote';
     WordMergeDataItem = "Service Header";
 
     dataset
     {
         dataitem("Service Header"; "Service Header")
         {
-            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Quote));
             RequestFilterFields = "No.", "Customer No.";
             column(Service_Header_Document_Type; "Document Type")
             {
             }
-            column(No_ServHeader; "No.")
+            column(Service_Header_No_; "No.")
             {
             }
             dataitem(CopyLoop; "Integer")
@@ -53,10 +55,16 @@ report 5900 "Service Order"
                     column(CompanyInfo2_Picture; CompanyInfo2.Picture)
                     {
                     }
-                    column(Service_Header___Contract_No__; "Service Header"."Contract No.")
+                    column(Service_Header___Order_Time_; "Service Header"."Order Time")
                     {
                     }
-                    column(Service_Header___Order_Time_; "Service Header"."Order Time")
+                    column(Service_Header___Order_Date_; Format("Service Header"."Order Date"))
+                    {
+                    }
+                    column(Service_Header__Status; "Service Header".Status)
+                    {
+                    }
+                    column(Service_Header___No__; "Service Header"."No.")
                     {
                     }
                     column(CustAddr_6_; CustAddr[6])
@@ -68,19 +76,10 @@ report 5900 "Service Order"
                     column(CustAddr_4_; CustAddr[4])
                     {
                     }
-                    column(Service_Header___Order_Date_; Format("Service Header"."Order Date"))
-                    {
-                    }
                     column(CustAddr_3_; CustAddr[3])
                     {
                     }
-                    column(Service_Header__Status; "Service Header".Status)
-                    {
-                    }
                     column(CustAddr_2_; CustAddr[2])
-                    {
-                    }
-                    column(Service_Header___No__; "Service Header"."No.")
                     {
                     }
                     column(CustAddr_1_; CustAddr[1])
@@ -122,31 +121,25 @@ report 5900 "Service Order"
                     column(CompanyInfo__Fax_No__; CompanyInfo."Fax No.")
                     {
                     }
-                    column(Service_Header___Phone_No__; "Service Header"."Phone No.")
-                    {
-                    }
                     column(Service_Header___E_Mail_; "Service Header"."E-Mail")
                     {
                     }
-                    column(Service_Header__Description; "Service Header".Description)
-                    {
-                    }
-                    column(PageCaption; StrSubstNo(Text002, ' '))
+                    column(Service_Header___Phone_No__; "Service Header"."Phone No.")
                     {
                     }
                     column(OutputNo; OutputNo)
                     {
                     }
+                    column(PageCaption; StrSubstNo(Text002, ''))
+                    {
+                    }
                     column(PageLoop_Number; Number)
                     {
                     }
-                    column(Contract_No_Caption; Contract_No_CaptionLbl)
+                    column(Service_Header___Order_Date_Caption; Service_Header___Order_Date_CaptionLbl)
                     {
                     }
                     column(Service_Header___Order_Time_Caption; "Service Header".FieldCaption("Order Time"))
-                    {
-                    }
-                    column(Service_Header___Order_Date_Caption; Service_Header___Order_Date_CaptionLbl)
                     {
                     }
                     column(Service_Header__StatusCaption; "Service Header".FieldCaption(Status))
@@ -170,19 +163,16 @@ report 5900 "Service Order"
                     column(Service_Header___E_Mail_Caption; Service_Header___E_Mail_CaptionLbl)
                     {
                     }
-                    column(Service_Header__DescriptionCaption; "Service Header".FieldCaption(Description))
-                    {
-                    }
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
-                        column(DimText_Control11; DimText)
+                        column(DimensionLoopNumber; Number)
                         {
                         }
-                        column(DimensionLoop1_Number; Number)
+                        column(DimText_Control9; DimText)
                         {
                         }
                         column(Header_DimensionsCaption; Header_DimensionsCaptionLbl)
@@ -228,10 +218,10 @@ report 5900 "Service Order"
                         DataItemLink = "Table Subtype" = field("Document Type"), "No." = field("No.");
                         DataItemLinkReference = "Service Header";
                         DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") where("Table Name" = const("Service Header"), Type = const(General));
-                        column(Service_Order_Comment_Comment; Comment)
+                        column(Service_Order_Comment__Line_No__; "Line No.")
                         {
                         }
-                        column(ServiceOrderComment_TabName; "Table Name")
+                        column(Service_Order_Comment_Table_Name; "Table Name")
                         {
                         }
                         column(Service_Order_Comment_Table_Subtype; "Table Subtype")
@@ -246,52 +236,52 @@ report 5900 "Service Order"
                         column(Service_Order_Comment_Table_Line_No_; "Table Line No.")
                         {
                         }
-                        column(Service_Order_Comment_Line_No_; "Line No.")
-                        {
-                        }
                     }
                     dataitem("Service Item Line"; "Service Item Line")
                     {
                         DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Service Header";
                         DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
-                        column(Service_Item_Line___Line_No__; "Service Item Line"."Line No.")
+                        column(NoOfCopies; NoOfCopies)
                         {
                         }
-                        column(SerialNo_ServItemLine; "Serial No.")
+                        column(ShowInternalInfo; ShowInternalInfo)
                         {
                         }
-                        column(Service_Item_Line_Description; Description)
+                        column(Service_Item_Line__Serial_No__; "Serial No.")
                         {
                         }
-                        column(Service_Item_Line__Service_Item_No__; "Service Item No.")
+                        column(Description_ServLineType; Description)
                         {
                         }
-                        column(ServItemGroupCode_ServItemLine; "Service Item Group Code")
+                        column(ServItemNo_ServLineType; "Service Item No.")
                         {
                         }
-                        column(Service_Item_Line_Warranty; Format(Warranty))
+                        column(Service_Item_Line__Service_Item_Group_Code_; "Service Item Group Code")
+                        {
+                        }
+                        column(Service_Item_Line_Warranty; Warranty)
+                        {
+                        }
+                        column(ItemNo_ServLineType; "Item No.")
                         {
                         }
                         column(Service_Item_Line__Loaner_No__; "Loaner No.")
                         {
                         }
-                        column(Service_Item_Line__Repair_Status_Code_; "Repair Status Code")
-                        {
-                        }
                         column(Service_Item_Line__Service_Shelf_No__; "Service Shelf No.")
                         {
                         }
-                        column(Service_Item_Line__Response_Time_; Format("Response Time"))
-                        {
-                        }
-                        column(Service_Item_Line__Response_Date_; Format("Response Date"))
+                        column(Warranty; Format(Warranty))
                         {
                         }
                         column(Service_Item_Line_Document_Type; "Document Type")
                         {
                         }
                         column(Service_Item_Line_Document_No_; "Document No.")
+                        {
+                        }
+                        column(Service_Item_Line_Line_No_; "Line No.")
                         {
                         }
                         column(Service_Item_Line__Serial_No__Caption; FieldCaption("Serial No."))
@@ -306,7 +296,10 @@ report 5900 "Service Order"
                         column(Service_Item_Line__Service_Item_Group_Code_Caption; FieldCaption("Service Item Group Code"))
                         {
                         }
-                        column(Service_Item_Line_WarrantyCaption; CaptionClassTranslate(FieldCaption(Warranty)))
+                        column(Service_Item_Line__Item_No__Caption; FieldCaption("Item No."))
+                        {
+                        }
+                        column(Service_Item_Line_WarrantyCaption; FieldCaption(Warranty))
                         {
                         }
                         column(Service_Item_LinesCaption; Service_Item_LinesCaptionLbl)
@@ -315,23 +308,17 @@ report 5900 "Service Order"
                         column(Service_Item_Line__Loaner_No__Caption; FieldCaption("Loaner No."))
                         {
                         }
-                        column(Service_Item_Line__Repair_Status_Code_Caption; FieldCaption("Repair Status Code"))
-                        {
-                        }
                         column(Service_Item_Line__Service_Shelf_No__Caption; FieldCaption("Service Shelf No."))
-                        {
-                        }
-                        column(Service_Item_Line__Response_Date_Caption; Service_Item_Line__Response_Date_CaptionLbl)
-                        {
-                        }
-                        column(Service_Item_Line__Response_Time_Caption; Service_Item_Line__Response_Time_CaptionLbl)
                         {
                         }
                         dataitem("Fault Comment"; "Service Comment Line")
                         {
                             DataItemLink = "Table Subtype" = field("Document Type"), "No." = field("Document No."), "Table Line No." = field("Line No.");
                             DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") where("Table Name" = const("Service Header"), Type = const(Fault));
-                            column(Comment_FaultComment; Comment)
+                            column(Fault_Comment_Comment; Comment)
+                            {
+                            }
+                            column(FaultCommentNumber; Number1)
                             {
                             }
                             column(Fault_Comment_Table_Name; "Table Name")
@@ -355,12 +342,21 @@ report 5900 "Service Order"
                             column(Fault_CommentsCaption; Fault_CommentsCaptionLbl)
                             {
                             }
+
+                            trigger OnAfterGetRecord()
+                            begin
+                                Number2 := 0;
+                                Number1 := Number1 + 1;
+                            end;
                         }
                         dataitem("Resolution Comment"; "Service Comment Line")
                         {
                             DataItemLink = "Table Subtype" = field("Document Type"), "No." = field("Document No."), "Table Line No." = field("Line No.");
                             DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") where("Table Name" = const("Service Header"), Type = const(Resolution));
-                            column(Comment_ResolutionComment; Comment)
+                            column(Resolution_Comment_Comment; Comment)
+                            {
+                            }
+                            column(ResolutionCommentNumber; Number2)
                             {
                             }
                             column(Resolution_Comment_Table_Name; "Table Name")
@@ -384,22 +380,25 @@ report 5900 "Service Order"
                             column(Resolution_CommentsCaption; Resolution_CommentsCaptionLbl)
                             {
                             }
+
+                            trigger OnAfterGetRecord()
+                            begin
+                                Number1 := 0;
+                                Number2 := Number2 + 1;
+                            end;
                         }
+
+                        trigger OnAfterGetRecord()
+                        begin
+                            Number1 := 0;
+                            Number2 := 0;
+                        end;
                     }
                     dataitem("Service Line"; "Service Line")
                     {
                         DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Service Header";
                         DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
-                        column(Service_Line___Line_No__; "Service Line"."Line No.")
-                        {
-                        }
-                        column(TotalAmt; TotalAmt)
-                        {
-                        }
-                        column(TotalGrossAmt; TotalGrossAmt)
-                        {
-                        }
                         column(Service_Line__Service_Item_Serial_No__; "Service Item Serial No.")
                         {
                         }
@@ -409,43 +408,40 @@ report 5900 "Service Order"
                         column(Service_Line__No__; "No.")
                         {
                         }
-                        column(Service_Line__Variant_Code_; "Variant Code")
-                        {
-                        }
                         column(Service_Line_Description; Description)
                         {
                         }
-                        column(Qty; Qty)
+                        column(Service_Line__Unit_Price_; "Unit Price")
                         {
                         }
-                        column(UnitPrice_ServLine; "Unit Price")
-                        {
-                        }
-                        column(Service_Line__Line_Discount___; "Line Discount %")
+                        column(LineDiscount_ServLine; "Line Discount %")
                         {
                         }
                         column(Amt; Amt)
                         {
                         }
+                        column(Service_Line__Variant_Code_; "Variant Code")
+                        {
+                        }
                         column(GrossAmt; GrossAmt)
                         {
                         }
-                        column(Service_Line__Quantity_Consumed_; "Quantity Consumed")
+                        column(Quantity_ServLine; Quantity)
                         {
                         }
-                        column(Service_Line__Qty__to_Consume_; "Qty. to Consume")
+                        column(TotAmt; TotAmt)
                         {
                         }
-                        column(Amt_Control63; Amt)
-                        {
-                        }
-                        column(GrossAmt_Control65; GrossAmt)
+                        column(TotGrossAmt; TotGrossAmt)
                         {
                         }
                         column(Service_Line_Document_Type; "Document Type")
                         {
                         }
-                        column(DocumentNo_ServLine; "Document No.")
+                        column(Service_Line_Document_No_; "Document No.")
+                        {
+                        }
+                        column(Service_Line_Line_No_; "Line No.")
                         {
                         }
                         column(Service_Line__Service_Item_Serial_No__Caption; FieldCaption("Service Item Serial No."))
@@ -463,10 +459,7 @@ report 5900 "Service Order"
                         column(Service_Line_DescriptionCaption; FieldCaption(Description))
                         {
                         }
-                        column(QtyCaption; QtyCaptionLbl)
-                        {
-                        }
-                        column(Service_LinesCaption; Service_LinesCaptionLbl)
+                        column(Service_LineCaption; Service_LineCaptionLbl)
                         {
                         }
                         column(Service_Line__Unit_Price_Caption; FieldCaption("Unit Price"))
@@ -475,28 +468,25 @@ report 5900 "Service Order"
                         column(Service_Line__Line_Discount___Caption; FieldCaption("Line Discount %"))
                         {
                         }
-                        column(AmountCaption; AmountCaptionLbl)
+                        column(AmtCaption; AmtCaptionLbl)
                         {
                         }
                         column(Gross_AmountCaption; Gross_AmountCaptionLbl)
                         {
                         }
-                        column(Service_Line__Quantity_Consumed_Caption; FieldCaption("Quantity Consumed"))
-                        {
-                        }
-                        column(Service_Line__Qty__to_Consume_Caption; FieldCaption("Qty. to Consume"))
+                        column(Service_Line_QuantityCaption; FieldCaption(Quantity))
                         {
                         }
                         column(TotalCaption; TotalCaptionLbl)
                         {
                         }
-                        dataitem(DimensionLoop2; "Integer")
+                        dataitem(DimesionLoop2; "Integer")
                         {
                             DataItemTableView = sorting(Number) where(Number = filter(1 ..));
-                            column(DimText_Control13; DimText)
+                            column(DimText_Control12; DimText)
                             {
                             }
-                            column(DimensionLoop2_Number; Number)
+                            column(DimesionLoop2_Number; Number)
                             {
                             }
                             column(Line_DimensionsCaption; Line_DimensionsCaptionLbl)
@@ -541,50 +531,28 @@ report 5900 "Service Order"
                         }
 
                         trigger OnAfterGetRecord()
-#if not CLEAN28
                         var
                             ExchangeFactor: Decimal;
                             ServSalesTaxCalculate: Codeunit "Serv. Sales Tax Calculate";
                             TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary;
-#endif
                         begin
-                            if ShowQty = ShowQty::Quantity then begin
-                                Qty := Quantity;
-                                Amt := "Line Amount";
+                            Amt := "Line Amount";
+                            if "Service Header"."Currency Factor" = 0 then
+                                ExchangeFactor := 1
+                            else
+                                ExchangeFactor := "Service Header"."Currency Factor";
+                            ServSalesTaxCalculate.StartSalesTaxCalculation();
+                            ServSalesTaxCalculate.AddServiceLine("Service Line");
+                            ServSalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
+                            ServSalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxAmountLine);
+                            OnAfterCalculateSalesTax("Service Header", "Service Line", TempSalesTaxAmountLine);
 #if not CLEAN28
-                                if "Service Header"."Currency Factor" = 0 then
-                                    ExchangeFactor := 1
-                                else
-                                    ExchangeFactor := "Service Header"."Currency Factor";
-                                ServSalesTaxCalculate.StartSalesTaxCalculation();
-                                ServSalesTaxCalculate.AddServiceLine("Service Line");
-                                ServSalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
-                                ServSalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxAmountLine);
-                                OnAfterCalculateSalesTax("Service Header", "Service Line", TempSalesTaxAmountLine);
-                                GrossAmt := Amt + TempSalesTaxAmountLine.GetTotalTaxAmountFCY();
-#else
-                                GrossAmt := "Amount Including VAT";
+                            ServiceQuote.RunOnAfterCalculateSalesTax("Service Header", "Service Line", TempSalesTaxAmountLine);
 #endif
-                            end else begin
-                                if "Quantity Invoiced" = 0 then
-                                    CurrReport.Skip();
-                                Qty := "Quantity Invoiced";
+                            GrossAmt := Amt + TempSalesTaxAmountLine.GetTotalTaxAmountFCY();
 
-                                Amt := Round((Qty * "Unit Price") * (1 - "Line Discount %" / 100));
-                                GrossAmt := (1 + "VAT %" / 100) * Amt;
-                            end;
-
-                            TotalAmt += Amt;
-                            TotalGrossAmt += GrossAmt;
-                        end;
-
-                        trigger OnPreDataItem()
-                        begin
-                            Clear(Amt);
-                            Clear(GrossAmt);
-
-                            TotalAmt := 0;
-                            TotalGrossAmt := 0;
+                            TotAmt := TotAmt + Amt;
+                            TotGrossAmt := TotGrossAmt + GrossAmt;
                         end;
                     }
                     dataitem(Shipto; "Integer")
@@ -628,10 +596,18 @@ report 5900 "Service Order"
 
                 trigger OnAfterGetRecord()
                 begin
-                    if Number > 1 then begin
+                    TotAmt := 0;
+                    TotGrossAmt := 0;
+
+                    if Number > 1 then
                         CopyText := FormatDocument.GetCOPYText();
-                        OutputNo += 1;
-                    end;
+                    OutputNo += 1;
+                end;
+
+                trigger OnPostDataItem()
+                begin
+                    if not IsReportInPreviewMode() then
+                        CODEUNIT.Run(CODEUNIT::"Service-Printed", "Service Header");
                 end;
 
                 trigger OnPreDataItem()
@@ -641,7 +617,6 @@ report 5900 "Service Order"
                         NoOfLoops := 1;
                     CopyText := '';
                     SetRange(Number, 1, NoOfLoops);
-
                     OutputNo := 1;
                 end;
             }
@@ -650,7 +625,7 @@ report 5900 "Service Order"
             var
                 ServiceDocumentArchiveMgmt: Codeunit "Service Document Archive Mgmt.";
             begin
-                CurrReport.Language := LanguageMgt.GetLanguageIdOrDefault("Language Code");
+                CurrReport.Language(LanguageMgt.GetLanguageIdOrDefault("Language Code"));
                 CurrReport.FormatRegion := LanguageMgt.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
@@ -660,21 +635,26 @@ report 5900 "Service Order"
 
                 if not IsReportInPreviewMode() and
                    ((CurrReport.UseRequestPage()) and ArchiveDocument or
-                   not (CurrReport.UseRequestPage()) and (ServiceSetup."Archive Orders"))
-                then begin
-                    CurrReport.Language(LanguageMgt.GetLanguageIdOrDefault(LanguageMgt.GetUserLanguageCode()));
-                    ServiceDocumentArchiveMgmt.ArchServiceDocumentNoConfirm("Service Header");
-                    CurrReport.Language(LanguageMgt.GetLanguageIdOrDefault("Language Code"));
-                end;
+                   not (CurrReport.UseRequestPage()) and (ServiceSetup."Archive Quotes" <> ServiceSetup."Archive Quotes"::Never))
+                then
+                    case ServiceSetup."Archive Quotes" of
+                        ServiceSetup."Archive Quotes"::Always:
+                            ServiceDocumentArchiveMgmt.ArchServiceDocumentNoConfirm("Service Header");
+                        ServiceSetup."Archive Quotes"::Question:
+                            begin
+                                CurrReport.Language(LanguageMgt.GetLanguageIdOrDefault(LanguageMgt.GetUserLanguageCode()));
+                                ServiceDocumentArchiveMgmt.ArchiveServiceDocument("Service Header");
+                                CurrReport.Language(LanguageMgt.GetLanguageIdOrDefault("Language Code"));
+                            end;
+                    end;
             end;
         }
     }
 
     requestpage
     {
-        AboutTitle = 'About Service Order';
-        AboutText = 'Generate a service order document that you can send to your customer.';
-
+        AboutTitle = 'About Service Quote';
+        AboutText = 'Generate a service quote that you can send to your customer.';
         SaveValues = true;
 
         layout
@@ -696,18 +676,24 @@ report 5900 "Service Order"
                         Caption = 'Show Internal Information';
                         ToolTip = 'Specifies if you want the printed report to show information that is only for internal use.';
                     }
+                    field(LogInteraction; LogInteraction)
+                    {
+                        ApplicationArea = Service;
+                        Caption = 'Log Interaction';
+                        Enabled = LogInteractionEnable;
+                        ToolTip = 'Specifies if you want to record the service quotes that you want to print as interactions and add them to the Interaction Log Entry table.';
+                    }
                     field(ArchiveDocument; ArchiveDocument)
                     {
                         ApplicationArea = Service;
                         Caption = 'Archive Document';
                         ToolTip = 'Specifies if the document is archived after you preview or print it.';
-                    }
-                    field(ShowQty; ShowQty)
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Amounts Based on';
-                        OptionCaption = 'Quantity,Quantity Invoiced';
-                        ToolTip = 'Specifies the amounts that the service order is based on.';
+
+                        trigger OnValidate()
+                        begin
+                            if not ArchiveDocument then
+                                LogInteraction := false;
+                        end;
                     }
                 }
             }
@@ -719,7 +705,9 @@ report 5900 "Service Order"
 
         trigger OnInit()
         begin
-            ArchiveDocument := ServiceSetup."Archive Orders";
+            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Service Quote") <> '';
+            LogInteractionEnable := LogInteraction;
+            ArchiveDocument := ServiceSetup."Archive Quotes" <> ServiceSetup."Archive Quotes"::Never;
         end;
     }
 
@@ -732,7 +720,6 @@ report 5900 "Service Order"
         CompanyInfo.Get();
         ServiceSetup.Get();
 
-#if not CLEAN28
         case ServiceSetup."Logo Position on Documents" of
             ServiceSetup."Logo Position on Documents"::"No Logo":
                 ;
@@ -749,15 +736,26 @@ report 5900 "Service Order"
                     CompanyInfo2.CalcFields(Picture);
                 end;
         end;
-#else
-        FormatDocument.SetLogoPosition(ServiceSetup."Logo Position on Documents", CompanyInfo1, CompanyInfo2, CompanyInfo3);
-#endif
+    end;
+
+    trigger OnPostReport()
+    begin
+        if LogInteraction and not IsReportInPreviewMode() then
+            if "Service Header".FindSet() then
+                repeat
+                    "Service Header".CalcFields("No. of Archived Versions");
+                    if "Service Header"."Contact No." <> '' then
+                        SegManagement.LogDocument(25, "Service Header"."No.", "Service Header"."Doc. No. Occurrence",
+                         "Service Header"."No. of Archived Versions", Database::Contact, "Service Header"."Contact No.",
+                          "Service Header"."Salesperson Code", '', '', '')
+                    else
+                        SegManagement.LogDocument(25, "Service Header"."No.", "Service Header"."Doc. No. Occurrence",
+                        "Service Header"."No. of Archived Versions", Database::Customer, "Service Header"."Customer No.",
+                          "Service Header"."Salesperson Code", '', '', '');
+                until "Service Header".Next() = 0;
     end;
 
     var
-#if CLEAN28
-        CompanyInfo3: Record "Company Information";
-#endif
         ServiceSetup: Record "Service Mgt. Setup";
         RespCenter: Record "Responsibility Center";
         DimSetEntry1: Record "Dimension Set Entry";
@@ -765,33 +763,37 @@ report 5900 "Service Order"
         LanguageMgt: Codeunit Language;
         FormatAddr: Codeunit "Format Address";
         FormatDocument: Codeunit "Format Document";
+        SegManagement: Codeunit SegManagement;
+#if not CLEAN28
+        ServiceQuote: Report "Service Quote";
+#endif
         NoOfCopies: Integer;
         NoOfLoops: Integer;
-        OutputNo: Integer;
-        ShowInternalInfo: Boolean;
-        Continue: Boolean;
-        ShowShippingAddr: Boolean;
+        Number1: Integer;
+        Number2: Integer;
         ArchiveDocument: Boolean;
+        ShowInternalInfo: Boolean;
+        ShowShippingAddr: Boolean;
+        Continue: Boolean;
+        CopyText: Text[30];
+        CompanyAddr: array[8] of Text[100];
         CustAddr: array[8] of Text[100];
         ShipToAddr: array[8] of Text[100];
-        CompanyAddr: array[8] of Text[100];
-        CopyText: Text[30];
         DimText: Text[120];
         OldDimText: Text[120];
-        Qty: Decimal;
         Amt: Decimal;
-        ShowQty: Option Quantity,"Quantity Invoiced";
+        TotAmt: Decimal;
+        LogInteraction: Boolean;
         GrossAmt: Decimal;
-        TotalAmt: Decimal;
-        TotalGrossAmt: Decimal;
-
+        TotGrossAmt: Decimal;
+        OutputNo: Integer;
+        LogInteractionEnable: Boolean;
 #pragma warning disable AA0074
 #pragma warning disable AA0470
-        Text001: Label 'Service Order %1';
+        Text001: Label 'Service Quote %1';
         Text002: Label 'Page %1';
 #pragma warning restore AA0470
 #pragma warning restore AA0074
-        Contract_No_CaptionLbl: Label 'Contract No.';
         Service_Header___Order_Date_CaptionLbl: Label 'Order Date';
         Invoice_toCaptionLbl: Label 'Invoice to';
         CompanyInfo__Phone_No__CaptionLbl: Label 'Phone No.';
@@ -800,13 +802,10 @@ report 5900 "Service Order"
         Service_Header___E_Mail_CaptionLbl: Label 'Email';
         Header_DimensionsCaptionLbl: Label 'Header Dimensions';
         Service_Item_LinesCaptionLbl: Label 'Service Item Lines';
-        Service_Item_Line__Response_Date_CaptionLbl: Label 'Response Date';
-        Service_Item_Line__Response_Time_CaptionLbl: Label 'Response Time';
         Fault_CommentsCaptionLbl: Label 'Fault Comments';
         Resolution_CommentsCaptionLbl: Label 'Resolution Comments';
-        QtyCaptionLbl: Label 'Quantity';
-        Service_LinesCaptionLbl: Label 'Service Lines';
-        AmountCaptionLbl: Label 'Amount';
+        Service_LineCaptionLbl: Label 'Service Line';
+        AmtCaptionLbl: Label 'Amount';
         Gross_AmountCaptionLbl: Label 'Gross Amount';
         TotalCaptionLbl: Label 'Total';
         Line_DimensionsCaptionLbl: Label 'Line Dimensions';
@@ -821,13 +820,7 @@ report 5900 "Service Order"
     var
         MailManagement: Codeunit "Mail Management";
     begin
-        exit(CurrReport.Preview() or MailManagement.IsHandlingGetEmailBody());
-    end;
-
-    procedure InitializeRequest(ShowInternalInfoFrom: Boolean; ShowQtyFrom: Option)
-    begin
-        ShowInternalInfo := ShowInternalInfoFrom;
-        ShowQty := ShowQtyFrom;
+        exit(CurrReport.Preview or MailManagement.IsHandlingGetEmailBody());
     end;
 
     local procedure FormatAddressFields(var ServiceHeader: Record "Service Header")
@@ -841,12 +834,9 @@ report 5900 "Service Order"
             ServiceFormatAddress.ServiceOrderShipto(ShipToAddr, ServiceHeader);
     end;
 
-#if not CLEAN28
-    [Obsolete('Replaced by report Service Order NA', '28.0')]
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCalculateSalesTax(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var SalesTaxAmountLine: Record "Sales Tax Amount Line")
+    local procedure OnAfterCalculateSalesTax(var ServiceHeaderParm: Record "Service Header"; var ServiceLine: Record "Service Line"; var SalesTaxAmountLineParm: Record "Sales Tax Amount Line")
     begin
     end;
-#endif
 }
 
