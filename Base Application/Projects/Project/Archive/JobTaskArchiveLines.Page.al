@@ -8,7 +8,7 @@ using Microsoft.Projects.Project.Job;
 
 page 5178 "Job Task Archive Lines"
 {
-    Caption = 'Project Task Lines';
+    Caption = 'Project Task Archive Lines';
     DataCaptionFields = "Job No.";
     PageType = List;
     Editable = false;
