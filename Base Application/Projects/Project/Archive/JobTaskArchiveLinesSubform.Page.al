@@ -8,7 +8,7 @@ using Microsoft.Projects.Project.Job;
 
 page 5181 "Job Task Archive Lines Subform"
 {
-    Caption = 'Project Task Lines Subform';
+    Caption = 'Project Task Archive Lines Subform';
     DataCaptionFields = "Job No.";
     PageType = ListPart;
     Editable = false;
