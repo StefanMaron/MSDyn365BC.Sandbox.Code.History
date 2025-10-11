@@ -330,7 +330,7 @@ codeunit 137296 "SCM Inventory Misc. IV"
 
     [Test]
     [Scope('OnPrem')]
-    procedure DoNotUpdatePhysInvCountingPeriodOnPhysInventoryOutsideThePeriodMonthlyCounting()
+    procedure DoNotUpdatePhysInvCountingPeriodOnPhysInventoryOutsideThePeriod()
     var
         Item: Record Item;
         PhysInvtCountManagement: Codeunit "Phys. Invt. Count.-Management";
@@ -339,47 +339,18 @@ codeunit 137296 "SCM Inventory Misc. IV"
         CountFrequency: Integer;
     begin
         // [FEATURE] [Physical Inventory] [UT]
-        // [SCENARIO 379410] Next Counting Start and End Dates are not updated when Phys. Inventory is posted one day before the starting date of the Counting Period with monthly counting.
+        // [SCENARIO 379410] Next Counting Start and End Dates are not updated when Phys. Inventory is posted one day before the starting date of the Counting Period.
         Initialize();
 
-        // [GIVEN] Item with a Phys. Inventory Counting Period, monthly counting frequency.
-        CountFrequency := 12;
+        // [GIVEN] Item with a Phys. Inventory Counting Period.
+        CountFrequency := LibraryRandom.RandInt(100);
         UpdatePhysInvCountingPeriodOnItem(Item, CountFrequency);
         NextCountingStartDate := Item."Next Counting Start Date";
         NextCountingEndDate := Item."Next Counting End Date";
 
         // [WHEN] Call "Phys. Invt. Count Management".CalcPeriod function with a Phys. Inventory posting date parameter a day before the period start.
         PhysInvtCountManagement.CalcPeriod(
-            NextCountingStartDate - 1, Item."Next Counting Start Date", Item."Next Counting End Date", CountFrequency);
-
-        // [THEN] Next Counting Start and End Dates are not updated.
-        Item.TestField("Next Counting Start Date", NextCountingStartDate);
-        Item.TestField("Next Counting End Date", NextCountingEndDate);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure DoNotUpdatePhysInvCountingPeriodOnPhysInventoryOutsideThePeriodBiweeklyCounting()
-    var
-        Item: Record Item;
-        PhysInvtCountManagement: Codeunit "Phys. Invt. Count.-Management";
-        NextCountingStartDate: Date;
-        NextCountingEndDate: Date;
-        CountFrequency: Integer;
-    begin
-        // [FEATURE] [Physical Inventory] [UT]
-        // [SCENARIO 379410] Next Counting Start and End Dates are not updated when Phys. Inventory is posted one day before the starting date of the Counting Period with biweekly counting.
-        Initialize();
-
-        // [GIVEN] Item with a Phys. Inventory Counting Period, biweekly counting frequency.
-        CountFrequency := 24;
-        UpdatePhysInvCountingPeriodOnItem(Item, CountFrequency);
-        NextCountingStartDate := Item."Next Counting Start Date";
-        NextCountingEndDate := Item."Next Counting End Date";
-
-        // [WHEN] Call "Phys. Invt. Count Management".CalcPeriod function with a Phys. Inventory posting date parameter a day before the period start.
-        PhysInvtCountManagement.CalcPeriod(
-            NextCountingStartDate - 1, Item."Next Counting Start Date", Item."Next Counting End Date", CountFrequency);
+          NextCountingStartDate - 1, Item."Next Counting Start Date", Item."Next Counting End Date", CountFrequency);
 
         // [THEN] Next Counting Start and End Dates are not updated.
         Item.TestField("Next Counting Start Date", NextCountingStartDate);
