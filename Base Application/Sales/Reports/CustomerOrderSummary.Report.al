@@ -569,13 +569,12 @@ report 107 "Customer - Order Summary"
         TotalCaptionLbl: Label 'Total';
         TotalLCYCaptionLbl: Label 'Total (LCY)';
 
-        protected var
+    protected var
         SalesAmtOnOrderLCY: array[5] of Decimal;
         SalesAmtOnOrderLCY1: array[5] of Decimal;
         PeriodNo: Integer;
         SalesAmtOnOrder: array[5] of Decimal;
         SalesAmtOnOrder1: array[5] of Decimal;
-
 
 #if not CLEAN27    
         [Obsolete('RDLC Only layout field caption. To be removed along with the RDLC layout', '27.0')]
