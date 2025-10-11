@@ -10,14 +10,8 @@ table 10524 "GovTalk Message Parts"
     Caption = 'GovTalk Message Parts';
     DataClassification = CustomerContent;
     ObsoleteReason = 'Moved to GovTalk app';
-#if CLEAN27
-    ObsoleteState = Moved;
-    ObsoleteTag = '30.0';
-    MovedTo = '80672d74-d90a-4eb0-8f90-5b9bcea58dca';
-#else
     ObsoleteState = Pending;
     ObsoleteTag = '27.0';
-#endif
 
     fields
     {

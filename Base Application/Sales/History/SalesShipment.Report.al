@@ -41,18 +41,22 @@ report 208 "Sales - Shipment"
             column(No_SalesShptHeader; "No.")
             {
             }
+#if not CLEAN28
             column(DocumentDateCaption; DocumentDateCaptionLbl)
             {
             }
+#endif
             column(PageCaption; PageCaptionCap)
             {
             }
+#if not CLEAN28
             column(HomePageCaption; HomePageCaptionLbl)
             {
             }
             column(EmailCaption; EmailCaptionLbl)
             {
             }
+#endif
             dataitem(CopyLoop; "Integer")
             {
                 DataItemTableView = sorting(Number);
@@ -104,15 +108,28 @@ report 208 "Sales - Shipment"
                     column(ShipToAddr6; ShipToAddr[6])
                     {
                     }
+#if not CLEAN28
                     column(CompanyInfoVATRegistrationNo; CompanyInfo."VAT Registration No.")
                     {
                     }
+#endif
                     column(CompanyInfoHomePage; CompanyInfo."Home Page")
                     {
                     }
                     column(CompanyInfoEmail; CompanyInfo."E-Mail")
                     {
                     }
+#if CLEAN28
+                    column(CompanyInfoFaxNo; CompanyInfo."Fax No.")
+                    {
+                    }
+                    column(CompanyInfoVATRegtnNo; CompanyInfo."VAT Registration No.")
+                    {
+                    }
+                    column(CompanyInfoGiroNo; CompanyInfo."Giro No.")
+                    {
+                    }
+#endif
                     column(CompanyInfoBankName; CompanyBankAccount.Name)
                     {
                     }
@@ -122,9 +139,15 @@ report 208 "Sales - Shipment"
                     column(SelltoCustNo_SalesShptHeader; "Sales Shipment Header"."Sell-to Customer No.")
                     {
                     }
+#if not CLEAN28
                     column(ShptHeaderDocDate; Format("Sales Shipment Header"."Document Date"))
                     {
                     }
+#else
+                    column(DocDate_SalesShptHeader; Format("Sales Shipment Header"."Document Date"))
+                    {
+                    }
+#endif
                     column(SalesPersonText; SalesPersonText)
                     {
                     }
@@ -134,9 +157,15 @@ report 208 "Sales - Shipment"
                     column(ReferenceText; ReferenceText)
                     {
                     }
+#if not CLEAN28
                     column(YourReference_SalesShptHeader; "Sales Shipment Header"."Your Reference")
                     {
                     }
+#else
+                    column(YourRef_SalesShptHeader; "Sales Shipment Header"."Your Reference")
+                    {
+                    }
+#endif
                     column(ShipToAddr7; ShipToAddr[7])
                     {
                     }
@@ -146,9 +175,11 @@ report 208 "Sales - Shipment"
                     column(CompanyAddr5; CompanyAddr[5])
                     {
                     }
+#if not CLEAN28
                     column(CompanyInfoBankBranchNo; CompanyInfo."Bank Branch No.")
                     {
                     }
+#endif
                     column(CompanyAddr6; CompanyAddr[6])
                     {
                     }
@@ -158,15 +189,22 @@ report 208 "Sales - Shipment"
                     column(CompanyAddr8; CompanyAddr[8])
                     {
                     }
+#if not CLEAN28
                     column(ShipmentDate_SalesShptHeader; Format("Sales Shipment Header"."Shipment Date"))
                     {
                     }
+#else
+                    column(ShptDate_SalesShptHeader; Format("Sales Shipment Header"."Shipment Date"))
+                    {
+                    }
+#endif
                     column(OutputNo; OutputNo)
                     {
                     }
                     column(ItemTrackingAppendixCaption; ItemTrackingAppendixCaptionLbl)
                     {
                     }
+#if not CLEAN28
                     column(CompanyInfoPhoneNoCaption; CompanyInfoPhoneNoCaptionLbl)
                     {
                     }
@@ -188,6 +226,38 @@ report 208 "Sales - Shipment"
                     column(SalesShipmentHeaderShipmentDateCaption; SalesShipmentHeaderShipmentDateCaptionLbl)
                     {
                     }
+#else
+                    column(PhoneNoCaption; PhoneNoCaptionLbl)
+                    {
+                    }
+                    column(VATRegNoCaption; VATRegNoCaptionLbl)
+                    {
+                    }
+                    column(GiroNoCaption; GiroNoCaptionLbl)
+                    {
+                    }
+                    column(BankNameCaption; BankNameCaptionLbl)
+                    {
+                    }
+                    column(BankAccNoCaption; BankAccNoCaptionLbl)
+                    {
+                    }
+                    column(ShipmentNoCaption; ShipmentNoCaptionLbl)
+                    {
+                    }
+                    column(ShipmentDateCaption; ShipmentDateCaptionLbl)
+                    {
+                    }
+                    column(HomePageCaption; HomePageCaptionLbl)
+                    {
+                    }
+                    column(EmailCaption; EmailCaptionLbl)
+                    {
+                    }
+                    column(DocumentDateCaption; DocumentDateCaptionLbl)
+                    {
+                    }
+#endif
                     column(SelltoCustNo_SalesShptHeaderCaption; "Sales Shipment Header".FieldCaption("Sell-to Customer No."))
                     {
                     }
@@ -265,15 +335,27 @@ report 208 "Sales - Shipment"
                         column(Type_SalesShptLine; Format(Type, 0, 2))
                         {
                         }
+#if not CLEAN28
                         column(LinNo; LinNo)
                         {
                         }
-                        column(DocumentNo_SalesShptLine; "Document No.")
-                        {
-                        }
+#else
                         column(AsmHeaderExists; AsmHeaderExists)
                         {
                         }
+#endif
+                        column(DocumentNo_SalesShptLine; "Document No.")
+                        {
+                        }
+#if not CLEAN28
+                        column(AsmHeaderExists; AsmHeaderExists)
+                        {
+                        }
+#else
+                        column(LinNo; LinNo)
+                        {
+                        }
+#endif
                         column(ItemReferenceNo_Line; "Item Reference No.")
                         {
                         }
@@ -283,9 +365,15 @@ report 208 "Sales - Shipment"
                         column(Qty_SalesShptLine; Quantity)
                         {
                         }
+#if not CLEAN28
                         column(UnitofMeasure_SalesShptLine; "Unit of Measure")
                         {
                         }
+#else
+                        column(UOM_SalesShptLine; "Unit of Measure")
+                        {
+                        }
+#endif
                         column(No_SalesShptLine; "No.")
                         {
                         }
@@ -295,12 +383,21 @@ report 208 "Sales - Shipment"
                         column(Description_SalesShptLineCaption; FieldCaption(Description))
                         {
                         }
+#if not CLEAN28
                         column(Quantity_SalesShptLineCaption; FieldCaption(Quantity))
                         {
                         }
                         column(UnitofMeasure_SalesShptLineCaption; FieldCaption("Unit of Measure"))
                         {
                         }
+#else
+                        column(Qty_SalesShptLineCaption; FieldCaption(Quantity))
+                        {
+                        }
+                        column(UOM_SalesShptLineCaption; FieldCaption("Unit of Measure"))
+                        {
+                        }
+#endif
                         column(No_SalesShptLineCaption; FieldCaption("No."))
                         {
                         }
@@ -348,7 +445,11 @@ report 208 "Sales - Shipment"
                                     CurrReport.Break();
                             end;
                         }
+#if not CLEAN28
                         dataitem(AsmLoop; "Integer")
+#else
+                        dataitem(DisplayAsmInfo; "Integer")
+#endif
                         {
                             DataItemTableView = sorting(Number);
                             column(PostedAsmLineItemNo; BlanksForIndent() + PostedAsmLine."No.")
@@ -429,15 +530,23 @@ report 208 "Sales - Shipment"
                     {
                         DataItemTableView = sorting(Number) where(Number = const(1));
                     }
+#if not CLEAN28
                     dataitem("Integer"; "Integer")
                     {
                         DataItemTableView = sorting(Number) where(Number = const(1));
+#endif
                         dataitem(Total2; "Integer")
                         {
                             DataItemTableView = sorting(Number) where(Number = const(1));
+#if not CLEAN28
                             column(BilltoCustNo_SalesShipmentHdr; "Sales Shipment Header"."Bill-to Customer No.")
                             {
                             }
+#else
+                            column(BilltoCustNo_SalesShptHeader; "Sales Shipment Header"."Bill-to Customer No.")
+                            {
+                            }
+#endif
                             column(CustAddr1; CustAddr[1])
                             {
                             }
@@ -465,11 +574,16 @@ report 208 "Sales - Shipment"
                             column(BilltoAddressCaption; BilltoAddressCaptionLbl)
                             {
                             }
+#if not CLEAN28
                             column(BilltoCustNo_SalesShipmentHdrCaption; "Sales Shipment Header".FieldCaption("Bill-to Customer No."))
                             {
                             }
                         }
-
+#else
+                            column(BilltoCustNo_SalesShptHeaderCaption; "Sales Shipment Header".FieldCaption("Bill-to Customer No."))
+                            {
+                            }
+#endif
                         trigger OnPreDataItem()
                         begin
                             if not ShowCustAddr then
@@ -479,18 +593,33 @@ report 208 "Sales - Shipment"
                     dataitem(ItemTrackingLine; "Integer")
                     {
                         DataItemTableView = sorting(Number);
+#if not CLEAN28
                         column(TrackingSpecBufferItemNo; TempTrackingSpecBuffer."Item No.")
                         {
                         }
                         column(TrackingSpecBufferDescription; TempTrackingSpecBuffer.Description)
                         {
                         }
+#else
+                        column(TrackingSpecBufferNo; TempTrackingSpecBuffer."Item No.")
+                        {
+                        }
+                        column(TrackingSpecBufferDesc; TempTrackingSpecBuffer.Description)
+                        {
+                        }
+#endif
                         column(TrackingSpecBufferLotNo; TempTrackingSpecBuffer."Lot No.")
                         {
                         }
+#if not CLEAN28
                         column(TrackingSpecBufferSerialNo; TempTrackingSpecBuffer."Serial No.")
                         {
                         }
+#else
+                        column(TrackingSpecBufferSerNo; TempTrackingSpecBuffer."Serial No.")
+                        {
+                        }
+#endif
                         column(TrackingSpecBufferQty; TempTrackingSpecBuffer."Quantity (Base)")
                         {
                         }
@@ -518,9 +647,15 @@ report 208 "Sales - Shipment"
                         dataitem(TotalItemTracking; "Integer")
                         {
                             DataItemTableView = sorting(Number) where(Number = const(1));
+#if not CLEAN28
                             column(TotalQuantity; TotalQty)
                             {
                             }
+#else
+                            column(Quantity1; TotalQty)
+                            {
+                            }
+#endif
                         }
 
                         trigger OnAfterGetRecord()
@@ -646,7 +781,11 @@ report 208 "Sales - Shipment"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
+#if not CLEAN28
                         ToolTip = 'Specifies if you want the program to log this interaction.';
+#else
+                        ToolTip = 'Specifies if you want to record the reports that you print as interactions.';
+#endif
                     }
                     field("Show Correction Lines"; ShowCorrectionLines)
                     {
@@ -772,6 +911,7 @@ report 208 "Sales - Shipment"
         Text002: Label 'Sales - Shipment %1', Comment = '%1 = Document No.';
 #pragma warning restore AA0074
         ItemTrackingAppendixCaptionLbl: Label 'Item Tracking - Appendix';
+#if not CLEAN28
         CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
         CompanyInfoVATRegistrationNoCaptionLbl: Label 'VAT Registration No.';
         CompanyInfoBankNameCaptionLbl: Label 'Bank';
@@ -779,6 +919,18 @@ report 208 "Sales - Shipment"
         SalesShipmentHeaderNoCaptionLbl: Label 'Shipment No.';
         CompanyInfoBankBranchNoCaptionLbl: Label 'Bank Branch No.';
         SalesShipmentHeaderShipmentDateCaptionLbl: Label 'Shipment Date';
+#else
+        PhoneNoCaptionLbl: Label 'Phone No.';
+        VATRegNoCaptionLbl: Label 'VAT Reg. No.';
+        GiroNoCaptionLbl: Label 'Giro No.';
+        BankNameCaptionLbl: Label 'Bank';
+        BankAccNoCaptionLbl: Label 'Account No.';
+        ShipmentNoCaptionLbl: Label 'Shipment No.';
+        ShipmentDateCaptionLbl: Label 'Shipment Date';
+        HomePageCaptionLbl: Label 'Home Page';
+        EmailCaptionLbl: Label 'Email';
+        DocumentDateCaptionLbl: Label 'Document Date';
+#endif
         HeaderDimensionsCaptionLbl: Label 'Header Dimensions';
         LineDimensionsCaptionLbl: Label 'Line Dimensions';
         BilltoAddressCaptionLbl: Label 'Bill-to Address';
@@ -790,9 +942,11 @@ report 208 "Sales - Shipment"
 #pragma warning disable AA0074
 #pragma warning disable AA0470
         PageCaptionCap: Label 'Page %1 of %2';
+#if not CLEAN28
         DocumentDateCaptionLbl: Label 'Document Date';
         HomePageCaptionLbl: Label 'Home Page';
         EmailCaptionLbl: Label 'Email';
+#endif
 #pragma warning restore AA0470
 #pragma warning restore AA0074
         OurDocumentNoLbl: Label 'Our Document No.';

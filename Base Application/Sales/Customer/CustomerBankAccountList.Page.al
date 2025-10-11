@@ -58,11 +58,16 @@ page 424 "Customer Bank Account List"
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
+#if not CLEAN28
                 field("Bank Branch No."; Rec."Bank Branch No.")
                 {
                     ToolTip = 'Specifies the number for the customer''s bank branch. You can enter a maximum of 20 characters, both numbers and letters.';
                     Visible = false;
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 field("SWIFT Code"; Rec."SWIFT Code")
                 {
                     ApplicationArea = Basic, Suite;

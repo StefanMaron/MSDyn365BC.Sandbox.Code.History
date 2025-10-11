@@ -366,10 +366,21 @@ table 79 "Company Information"
         {
             Caption = 'EORI Number';
         }
+#if not CLEANSCHEMA31
         field(93; "Suppl. VAT Registration No."; Text[40])
         {
             Caption = 'Supplementary VAT Registration No.';
+#if not CLEAN28
+            ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+            ObsoleteState = removed;
+            ObsoleteTag = '31.0';
+#endif
         }
+#endif
         field(95; "Use GLN in Electronic Document"; Boolean)
         {
             Caption = 'Use GLN in Electronic Documents';

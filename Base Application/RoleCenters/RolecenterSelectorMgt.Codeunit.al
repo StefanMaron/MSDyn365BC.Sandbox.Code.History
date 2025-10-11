@@ -11,8 +11,10 @@ using System.Reflection;
 using System.Security.User;
 using System.Text;
 using System.Xml;
+#if not CLEAN28
 using System.Environment.Configuration;
 using System.Security.AccessControl;
+#endif
 
 codeunit 1485 "Rolecenter Selector Mgt."
 {
@@ -315,6 +317,7 @@ codeunit 1485 "Rolecenter Selector Mgt."
         exit(UpperCase('RoleCenterOverviewShowState'));
     end;
 
+#if not CLEAN28
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"System Initialization", 'OnAfterLogin', '', true, true)]
     local procedure AddRoleCenterOverviewSetupOnAfterLogin()
     var
@@ -325,5 +328,6 @@ codeunit 1485 "Rolecenter Selector Mgt."
                 if User."User Name" <> '' then
                     SetShowStateFromUserPreference(User."User Name", true);
     end;
+#endif
 }
 

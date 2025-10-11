@@ -1,7 +1,9 @@
 namespace System.Security.AccessControl;
 
 using Microsoft.Finance.GeneralLedger.Setup;
+#if not CLEAN28
 using Microsoft.Bank.Ledger;
+#endif
 using Microsoft.Sales.FinanceCharge;
 #if not CLEAN27
 using Microsoft.Finance.VAT.Reporting;
@@ -15,8 +17,10 @@ permissionset 1002 "LOCAL READ"
     Caption = 'Country/region-specific read only access.';
 
     Permissions = tabledata "Accounting Period GB" = R,
+#if not CLEAN28
                   tabledata "BACS Ledger Entry" = R,
                   tabledata "BACS Register" = R,
+#endif
                   tabledata "Fin. Charge Interest Rate" = R,
 #if not CLEAN27
                   tabledata "GovTalk Message Parts" = R,

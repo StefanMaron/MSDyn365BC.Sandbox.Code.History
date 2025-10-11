@@ -39,11 +39,30 @@ page 425 "Vendor Bank Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies additional address information.';
                 }
+#if CLEAN28
+                field("Post Code"; Rec."Post Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the postal code.';
+                }
+#endif
                 field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the bank where the vendor has the bank account.';
                 }
+#if CLEAN28
+                field("Country/Region Code"; Rec."Country/Region Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the country/region of the address.';
+
+                    trigger OnValidate()
+                    begin
+                        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
+                    end;
+                }
+#endif
                 group(CountyGroup)
                 {
                     ShowCaption = false;
@@ -54,7 +73,7 @@ page 425 "Vendor Bank Account Card"
                         ToolTip = 'Specifies the state, province or county as a part of the address.';
                     }
                 }
-
+#if not CLEAN28
                 field("Post Code"; Rec."Post Code")
                 {
                     ApplicationArea = Basic, Suite;
@@ -70,6 +89,7 @@ page 425 "Vendor Bank Account Card"
                         IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                     end;
                 }
+#endif
                 field("Phone No."; Rec."Phone No.")
                 {
                     ApplicationArea = Basic, Suite;
@@ -103,11 +123,16 @@ page 425 "Vendor Bank Account Card"
                     ToolTip = 'Specifies a bank identification number of your own choice.';
                     MaskType = Concealed;
                 }
+#if not CLEAN28
                 field("Reference No."; Rec."Reference No.")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the reference number that is used for BACS files for this account.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
             }
             group(Communication)
             {

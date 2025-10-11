@@ -66,11 +66,16 @@ page 426 "Vendor Bank Account List"
                     ToolTip = 'Specifies the number used by the bank for the bank account.';
                     Visible = false;
                 }
+#if not CLEAN28
                 field("Bank Branch No."; Rec."Bank Branch No.")
                 {
                     ToolTip = 'Specifies the number for the vendor''s bank branch. You can enter a maximum of 20 characters, both numbers and letters.';
                     Visible = false;
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 field("SWIFT Code"; Rec."SWIFT Code")
                 {
                     ApplicationArea = Basic, Suite;

@@ -41,6 +41,7 @@ page 5054 "Company Details"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies additional address information.';
                 }
+#if not CLEAN28
                 field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
@@ -50,12 +51,23 @@ page 5054 "Company Details"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the county of the company''s address.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 field("Post Code"; Rec."Post Code")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the postal code.';
                 }
+#if CLEAN28
+                field(City; Rec.City)
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the city where the contact is located.';
+                }
+#endif
                 field("Country/Region Code"; Rec."Country/Region Code")
                 {
                     ApplicationArea = Basic, Suite;

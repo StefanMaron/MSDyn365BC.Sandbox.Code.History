@@ -1321,6 +1321,7 @@ page 21 "Customer Card"
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
+#if not CLEAN28
                 action(SalesPerPeriod)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1329,7 +1330,11 @@ page 21 "Customer Card"
                     RunObject = Page "Sales Stats. Per Period";
                     RunPageLink = "Customer No. Filter" = field("No.");
                     ToolTip = 'View sales information for the customer by period.';
+                    ObsoleteReason = 'This action is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action("S&ales")
                 {
                     ApplicationArea = Basic, Suite;

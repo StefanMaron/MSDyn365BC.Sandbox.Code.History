@@ -10,7 +10,9 @@ using Microsoft.HumanResources.Employee;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Sales.Archive;
 using System.Privacy;
+#if not CLEAN28
 using Microsoft.Bank.Ledger;
+#endif
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Finance.GeneralLedger.Setup;
 
@@ -37,8 +39,10 @@ codeunit 1752 "Data Class. Eval. Data Country"
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"GovTalk Setup");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"GovTalk Message Parts");
 #endif
+#if not CLEAN28
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"BACS Ledger Entry");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"BACS Register");
+#endif
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Fin. Charge Interest Rate");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Accounting Period GB");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Alt. Employee Posting Group");

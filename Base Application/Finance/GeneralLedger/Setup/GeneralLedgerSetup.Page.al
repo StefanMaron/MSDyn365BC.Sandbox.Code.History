@@ -198,11 +198,16 @@ page 118 "General Ledger Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies how the program will round VAT when calculated for the local currency. When you enter an Amount Including VAT in a document, the system first calculates and rounds the Amount Excluding VAT, and then calculates by subtraction the VAT Amount because the total amount has to match the Amount Including VAT entered manually. In that case, the VAT Rounding Type does not apply as the Amount Excluding VAT is already rounded using the Amount Rounding Precision.';
                 }
+#if not CLEAN28
                 field("VAT Tolerance %"; Rec."VAT Tolerance %")
                 {
                     ApplicationArea = VAT;
                     ToolTip = 'Specifies the maximum allowed VAT percentage to be used for discounting the VAT element in sales and purchase order processing. If you do not specify any value, the program will not discount the VAT element when calculating VAT.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 field("Control VAT Period"; Rec."Control VAT Period")
                 {
                     ApplicationArea = VAT;

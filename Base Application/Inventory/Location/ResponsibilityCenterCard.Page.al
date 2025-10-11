@@ -39,6 +39,7 @@ page 5714 "Responsibility Center Card"
                     ApplicationArea = Location;
                     ToolTip = 'Specifies additional address information.';
                 }
+#if not CLEAN28
                 field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
@@ -48,16 +49,36 @@ page 5714 "Responsibility Center Card"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the county of the responsibility center.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 field("Post Code"; Rec."Post Code")
                 {
+#if not CLEAN28
                     ApplicationArea = Basic, Suite;
+#else
+                    ApplicationArea = Location;
+#endif
                     ToolTip = 'Specifies the postal code.';
                 }
+#if CLEAN28
+                field(City; Rec.City)
+                {
+                    ApplicationArea = Location;
+                    ToolTip = 'Specifies the city where the responsibility center is located.';
+                }
+#endif
                 field("Country/Region Code"; Rec."Country/Region Code")
                 {
+#if not CLEAN28
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the country/region code for the responsibility''s center. To see the country/region codes in the Country/Region table, click the field.';
+#else
+                    ApplicationArea = Location;
+                    ToolTip = 'Specifies the country/region of the address.';
+#endif
                 }
                 field(Contact; Rec.Contact)
                 {

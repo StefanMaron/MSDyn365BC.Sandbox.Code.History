@@ -3,8 +3,10 @@ codeunit 135161 "Cloud Mig Country Tables"
     procedure GetTablesThatShouldBeCloudMigrated(var ListOfTablesToMigrate: List of [Integer])
     begin
         ListOfTablesToMigrate.Add(Database::"Accounting Period GB");
+#if not CLEAN28
         ListOfTablesToMigrate.Add(Database::"BACS Ledger Entry");
         ListOfTablesToMigrate.Add(Database::"BACS Register");
+#endif
         ListOfTablesToMigrate.Add(Database::"Fin. Charge Interest Rate");
 #if not CLEAN27
         ListOfTablesToMigrate.Add(Database::"GovTalk Message Parts");

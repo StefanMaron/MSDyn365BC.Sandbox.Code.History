@@ -59,11 +59,16 @@ page 369 "Order Address List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the order address.';
                 }
+#if not CLEAN28
                 field(County; Rec.County)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the county of the order address.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 field("Country/Region Code"; Rec."Country/Region Code")
                 {
                     ApplicationArea = Basic, Suite;

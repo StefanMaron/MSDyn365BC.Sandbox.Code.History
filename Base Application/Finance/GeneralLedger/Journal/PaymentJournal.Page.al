@@ -857,12 +857,16 @@ page 256 "Payment Journal"
                         SuggestVendorPayments.RunModal();
                     end;
                 }
+#if not CLEAN28
                 action("Print Remi&ttance Advice")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Print Remi&ttance Advice';
                     Image = PrintAttachment;
                     ToolTip = 'Print the remittance advice before posting a payment journal and after posting a payment. This advice displays vendor invoice numbers, which helps vendors to perform reconciliations.';
+                    ObsoleteReason = 'Moved to Send remittance advice by email app';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
 
                     trigger OnAction()
                     var
@@ -878,7 +882,11 @@ page 256 "Payment Journal"
                 }
                 separator(Action1040007)
                 {
+                    ObsoleteReason = 'No longer required';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action(SuggestEmployeePayments)
                 {
                     ApplicationArea = BasicHR;
