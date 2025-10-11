@@ -553,17 +553,12 @@ report 107 "Customer - Order Summary"
         TotalSalesOrderAmount: Decimal;
         TotalSalesAmtOnOrder: array[5] of Decimal;
         PeriodStartDate: array[5] of Date;
-        SalesAmtOnOrderLCY: array[5] of Decimal;
-        SalesAmtOnOrderLCY1: array[5] of Decimal;
         PrintAmountsInLCY: Boolean;
         AllAmountsAreInLCYTxt: Text;
         Period1Text: Text;
         Period2Text: Text;
         Period3Text: Text;
         TotalText: Text;
-        PeriodNo: Integer;
-        SalesAmtOnOrder: array[5] of Decimal;
-        SalesAmtOnOrder1: array[5] of Decimal;
         i: Integer;
         GroupNumber: Integer;
         LineNo: Integer;
@@ -573,6 +568,14 @@ report 107 "Customer - Order Summary"
         AllAmountsAreInLCYCaptionLbl: Label 'All amounts are in LCY';
         TotalCaptionLbl: Label 'Total';
         TotalLCYCaptionLbl: Label 'Total (LCY)';
+
+        protected var
+        SalesAmtOnOrderLCY: array[5] of Decimal;
+        SalesAmtOnOrderLCY1: array[5] of Decimal;
+        PeriodNo: Integer;
+        SalesAmtOnOrder: array[5] of Decimal;
+        SalesAmtOnOrder1: array[5] of Decimal;
+
 
 #if not CLEAN27    
         [Obsolete('RDLC Only layout field caption. To be removed along with the RDLC layout', '27.0')]
