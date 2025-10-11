@@ -1955,6 +1955,71 @@ page 30 "Item Card"
                     end;
                 }
             }
+            group(StatisticsGroup)
+            {
+                Caption = 'Statistics';
+                Image = Statistics;
+                action(ItemStatistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Item Statistics';
+                    Image = Statistics;
+                    RunObject = Page "Item Statistics 2";
+                    RunPageLink = "No." = field("No."),
+                                      "Date Filter" = field("Date Filter"),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
+                    ToolTip = 'View item statistics. Summarised sales, inventory value, turnover and aging based on the selected filters, with drill-down to related ledger and value entries.';
+                }
+                action(Statistics)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Advanced Statistics';
+                    Image = Statistics;
+                    ShortCutKey = 'F7';
+                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
+
+                    trigger OnAction()
+                    var
+                        ItemStatistics: Page "Item Statistics";
+                    begin
+                        ItemStatistics.SetItem(Rec);
+                        ItemStatistics.RunModal();
+                    end;
+                }
+                action("Entry Statistics")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Entry Statistics';
+                    Image = EntryStatistics;
+                    RunObject = Page "Item Entry Statistics";
+                    RunPageLink = "No." = field("No."),
+                                      "Date Filter" = field("Date Filter"),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
+                    ToolTip = 'View statistics for item ledger entries.';
+                }
+                action("T&urnover")
+                {
+                    ApplicationArea = Suite;
+                    Caption = 'T&urnover';
+                    Image = Turnover;
+                    RunObject = Page "Item Turnover";
+                    RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
+                    ToolTip = 'View a detailed account of item turnover by periods after you have set the relevant filters for location and variant.';
+                }
+            }
             group(Availability)
             {
                 Caption = 'Availability';
@@ -2069,56 +2134,6 @@ page 30 "Item Card"
                                       "Drop Shipment Filter" = field("Drop Shipment Filter"),
                                       "Variant Filter" = field("Variant Filter");
                         ToolTip = 'View the item''s availability by a unit of measure.';
-                    }
-                }
-                group(StatisticsGroup)
-                {
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    action(Statistics)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Statistics';
-                        Image = Statistics;
-                        ShortCutKey = 'F7';
-                        ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-
-                        trigger OnAction()
-                        var
-                            ItemStatistics: Page "Item Statistics";
-                        begin
-                            ItemStatistics.SetItem(Rec);
-                            ItemStatistics.RunModal();
-                        end;
-                    }
-                    action("Entry Statistics")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Entry Statistics';
-                        Image = EntryStatistics;
-                        RunObject = Page "Item Entry Statistics";
-                        RunPageLink = "No." = field("No."),
-                                      "Date Filter" = field("Date Filter"),
-                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
-                                      "Location Filter" = field("Location Filter"),
-                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
-                                      "Variant Filter" = field("Variant Filter");
-                        ToolTip = 'View statistics for item ledger entries.';
-                    }
-                    action("T&urnover")
-                    {
-                        ApplicationArea = Suite;
-                        Caption = 'T&urnover';
-                        Image = Turnover;
-                        RunObject = Page "Item Turnover";
-                        RunPageLink = "No." = field("No."),
-                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
-                                      "Location Filter" = field("Location Filter"),
-                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
-                                      "Variant Filter" = field("Variant Filter");
-                        ToolTip = 'View a detailed account of item turnover by periods after you have set the relevant filters for location and variant.';
                     }
                 }
             }
