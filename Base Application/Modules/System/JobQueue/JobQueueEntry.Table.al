@@ -876,7 +876,7 @@ table 472 "Job Queue Entry"
                 SetStatus(Status::Ready);
             end;
 
-            OnReuseExisingJobFromId(Rec);
+            OnReuseExisingJobFromId(Rec, ExecutionDateTime);
 
             exit(true);
         end;
@@ -1647,7 +1647,7 @@ table 472 "Job Queue Entry"
     end;
 
     [InternalEvent(false)]
-    local procedure OnReuseExisingJobFromId(var JobQueueEntry: Record "Job Queue Entry")
+    local procedure OnReuseExisingJobFromId(var JobQueueEntry: Record "Job Queue Entry"; ExecutionDateTime: DateTime)
     begin
     end;
 
