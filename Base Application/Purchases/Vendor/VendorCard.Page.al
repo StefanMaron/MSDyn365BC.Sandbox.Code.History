@@ -359,6 +359,10 @@ page 26 "Vendor Card"
                     Importance = Additional;
                     ToolTip = 'Specifies the vendor in connection with electronic document receiving.';
                 }
+                field("Copy Buy-from Add. to Qte From"; Rec."Copy Buy-from Add. to Qte From")
+                {
+                    ApplicationArea = Basic, Suite;
+                }
                 field("Tax Liable"; Rec."Tax Liable")
                 {
                     ApplicationArea = SalesTax;
