@@ -68,6 +68,18 @@ page 27 "Vendor List"
                     ToolTip = 'Specifies an additional part of the name.';
                     Visible = false;
                 }
+                field(Address; Rec.Address)
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the vendor street address.';
+                    Visible = false;
+                }
+                field(City; Rec.City)
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the vendor''s city.';
+                    Visible = false;
+                }
                 field("Responsibility Center"; Rec."Responsibility Center")
                 {
                     ApplicationArea = Suite;
