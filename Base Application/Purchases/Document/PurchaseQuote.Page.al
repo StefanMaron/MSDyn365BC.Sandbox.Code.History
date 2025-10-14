@@ -226,6 +226,20 @@ page 49 "Purchase Quote"
                         CurrPage.Update();
                     end;
                 }
+                field("Buy-from Vendor Templ. Code"; Rec."Buy-from Vendor Templ. Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Vendor Template Code';
+                    Enabled = EnableNewBuyFromVendorTemplateCode;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the code for the template to create a new vendors';
+
+                    trigger OnValidate()
+                    begin
+                        ActivateFields();
+                        CurrPage.Update();
+                    end;
+                }
                 field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = Suite;
@@ -608,6 +622,7 @@ page 49 "Purchase Quote"
                 }
                 group(Control51)
                 {
+                    Enabled = not EnableBuyFromVendorTemplateCode;
                     ShowCaption = false;
                     field(PayToOptions; PayToOptions)
                     {
@@ -631,7 +646,7 @@ page 49 "Purchase Quote"
                             ApplicationArea = Basic, Suite;
                             Caption = 'Name';
                             Editable = PayToOptions = PayToOptions::"Another Vendor";
-                            Enabled = PayToOptions = PayToOptions::"Another Vendor";
+                            Enabled = EnablePayToVendorNo;
                             Importance = Promoted;
                             ToolTip = 'Specifies the name of the vendor that you received the invoice from.';
 
@@ -1591,6 +1606,8 @@ page 49 "Purchase Quote"
     var
         EnvironmentInformation: Codeunit "Environment Information";
     begin
+        EnablePayToVendorNo := true;
+        EnableBuyFromVendorTemplateCode := true;
         ShowShippingOptionsWithLocation := ApplicationAreaMgmtFacade.IsLocationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled();
         IsSaaS := EnvironmentInformation.IsSaaS();
         IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(FlowServiceManagement.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
@@ -1627,6 +1644,8 @@ page 49 "Purchase Quote"
         ActivateFields();
 
         SetDocNoVisible();
+
+        SetEnableBuyFromVendorTemplateCode();
     end;
 
     var
@@ -1659,20 +1678,26 @@ page 49 "Purchase Quote"
         IsPurchaseLinesEditable: Boolean;
         IsJournalTemplateNameVisible: Boolean;
         IsPaymentMethodCodeVisible: Boolean;
+        EnableBuyFromVendorTemplateCode: Boolean;
+        EnableNewBuyFromVendorTemplateCode: Boolean;
 
     protected var
         ShipToOptions: Option "Default (Company Address)",Location,"Custom Address";
         PayToOptions: Option "Default (Vendor)","Another Vendor","Custom Address";
         DocNoVisible: Boolean;
+        EnablePayToVendorNo: Boolean;
 
     protected procedure ActivateFields()
     begin
+        EnablePayToVendorNo := Rec."Pay-to Vendor Templ. Code" = '';
+        EnableBuyFromVendorTemplateCode := Rec."Buy-from Vendor No." = '';
         IsBuyFromCountyVisible := FormatAddress.UseCounty(Rec."Buy-from Country/Region Code");
         IsPayToCountyVisible := FormatAddress.UseCounty(Rec."Pay-to Country/Region Code");
         IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
         GLSetup.Get();
         IsJournalTemplateNameVisible := GLSetup."Journal Templ. Name Mandatory";
         IsPaymentMethodCodeVisible := not GLSetup."Hide Payment Method Code";
+        SetEnableBuyFromVendorTemplateCode();
 
         OnAfterActivateFields();
     end;
@@ -1769,6 +1794,11 @@ page 49 "Purchase Quote"
         end;
 
         OnAfterCalculateCurrentShippingAndPayToOption(ShipToOptions, PayToOptions, Rec);
+    end;
+
+    local procedure SetEnableBuyFromVendorTemplateCode()
+    begin
+        EnableNewBuyFromVendorTemplateCode := Rec."Buy-from Vendor No." = '';
     end;
 
     [IntegrationEvent(true, false)]

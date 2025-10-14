@@ -2300,6 +2300,8 @@ table 38 "Purchase Header"
 
                 if ("Buy-from Contact No." <> xRec."Buy-from Contact No.") then
                     UpdateBuyFromVend("Buy-from Contact No.");
+
+                UpdateBuyFromVendorTemplateCode();
             end;
         }
         field(5053; "Pay-to Contact No."; Code[20])
@@ -2362,6 +2364,88 @@ table 38 "Purchase Header"
                 CheckContactRelatedToVendorCompany("Pay-to Contact No.", "Pay-to Vendor No.", FieldNo("Pay-to Contact No."));
 
                 UpdatePayToVend("Pay-to Contact No.");
+            end;
+        }
+        field(5056; "Buy-from Vendor Templ. Code"; Code[20])
+        {
+            Caption = 'Buy-from Vendor Template Code';
+            TableRelation = "Vendor Templ.";
+
+            trigger OnValidate()
+            var
+                BuyFromVendorTemplate: Record "Vendor Templ.";
+            begin
+                EnsureDocumentTypeIsQuote();
+                TestStatusOpen();
+
+                if not InsertMode and
+                   ("Buy-from Vendor Templ. Code" <> xRec."Buy-from Vendor Templ. Code") and
+                   (xRec."Buy-from Vendor Templ. Code" <> '')
+                then begin
+                    if GetHideValidationDialog() or not GuiAllowed() then
+                        Confirmed := true
+                    else
+                        Confirmed := Confirm(ConfirmChangeQst, false, FieldCaption("Buy-from Vendor Templ. Code"));
+
+                    if Confirmed then begin
+                        if InitFromTemplate("Buy-from Vendor Templ. Code", FieldCaption("Buy-from Vendor Templ. Code")) then
+                            exit
+                    end else begin
+                        "Buy-from Vendor Templ. Code" := xRec."Buy-from Vendor Templ. Code";
+                        exit;
+                    end;
+                end;
+
+                if BuyFromVendorTemplate.Get("Buy-from Vendor Templ. Code") then
+                    CopyFromNewBuyFromVendorTemplate(BuyFromVendorTemplate);
+
+                if not InsertMode and
+                   ((xRec."Buy-from Vendor Templ. Code" <> "Buy-from Vendor Templ. Code") or
+                    (xRec."Currency Code" <> "Currency Code"))
+                then
+                    RecreatePurchLines(CopyStr(FieldCaption("Buy-from Vendor Templ. Code"), 1, 100));
+            end;
+        }
+        field(5057; "Pay-to Vendor Templ. Code"; Code[20])
+        {
+            Caption = 'Pay-to Vendor Template Code';
+            TableRelation = "Vendor Templ.";
+
+            trigger OnValidate()
+            var
+                PayToVendorTemplate: Record "Vendor Templ.";
+            begin
+                TestField("Document Type", "Document Type"::Quote);
+                TestStatusOpen();
+
+                if not InsertMode and
+                   ("Pay-to Vendor Templ. Code" <> xRec."Pay-to Vendor Templ. Code") and
+                   (xRec."Pay-to Vendor Templ. Code" <> '')
+                then begin
+                    if GetHideValidationDialog() or not GuiAllowed then
+                        Confirmed := true
+                    else
+                        Confirmed := Confirm(ConfirmChangeQst, false, FieldCaption("Pay-to Vendor Templ. Code"));
+
+                    if Confirmed then begin
+                        if InitFromTemplate("Pay-to Vendor Templ. Code", FieldCaption("Pay-to Vendor Templ. Code")) then
+                            exit;
+                    end else begin
+                        "Pay-to Vendor Templ. Code" := xRec."Pay-to Vendor Templ. Code";
+                        exit;
+                    end;
+                end;
+
+                if PayToVendorTemplate.Get("Pay-to Vendor Templ. Code") then
+                    InitFromPayToVendorTemplate(PayToVendorTemplate);
+
+                CreateDimFromDefaultDim(Rec.FieldNo("Pay-to Vendor Templ. Code"));
+
+                if not InsertMode and
+                   (xRec."Buy-from Vendor Templ. Code" = "Buy-from Vendor Templ. Code") and
+                   (xRec."Pay-to Vendor Templ. Code" <> "Pay-to Vendor Templ. Code")
+                then
+                    RecreatePurchLines(CopyStr(FieldCaption("Pay-to Vendor Templ. Code"), 1, 100));
             end;
         }
         field(5700; "Responsibility Center"; Code[10])
@@ -2747,6 +2831,9 @@ table 38 "Purchase Header"
         key(Key9; "Assigned User ID")
         {
         }
+        key(Key10; "Document Type", "Buy-from Contact No.")
+        {
+        }
     }
 
     fieldgroups
@@ -2817,6 +2904,9 @@ table 38 "Purchase Header"
         Insertmode := true;
 
         SetBuyFromVendorFromFilter();
+
+        if GetFilterContNo() <> '' then
+            Validate("Buy-from Contact No.", GetFilterContNo());
 
         if "Purchaser Code" = '' then
             SetDefaultPurchaser();
@@ -2986,6 +3076,8 @@ table 38 "Purchase Header"
         WarnZeroQuantityPostingTxt: Label 'Warn before posting Purchase lines with 0 quantity';
         WarnZeroQuantityPostingDescriptionTxt: Label 'Warn before posting lines on Purchase documents where quantity is 0.';
         WarnDocAmountVatTxt: Label '%1 must not be more than %2.', comment = '%1 - Doc. Amount VAT; %2 - DocAmountVAT';
+        CreateVendorQst: Label 'You cannot Release Quote or Make Order unless you specify a vendor on the quote.\\Do you want to create vendor(s) now?';
+        SelectVendorTemplateQst: Label 'Do you want to select the vendor template?';
         CalledFromWhseDoc: Boolean;
 #if not CLEAN26
         SkipStatsPrep: Boolean;
@@ -4602,7 +4694,10 @@ table 38 "Purchase Header"
         ContBusinessRelation: Record "Contact Business Relation";
         Vend: Record Vendor;
         Cont: Record Contact;
+        SearchContact: Record Contact;
+        VendorTempl: Record "Vendor Templ.";
         ShouldUpdateFromContact: Boolean;
+        ContactBusinessRelationFound: Boolean;
     begin
         ShouldUpdateFromContact := Cont.Get(ContactNo);
         OnUpdateBuyFromVendOnAfterGetContact(Rec, Cont, ShouldUpdateFromContact);
@@ -4620,7 +4715,13 @@ table 38 "Purchase Header"
             exit;
         end;
 
-        if ContBusinessRelation.FindByContact(ContBusinessRelation."Link to Table"::Vendor, Cont."Company No.") then begin
+        if Cont.Type = Cont.Type::Person then
+            ContactBusinessRelationFound := ContBusinessRelation.FindByContact(ContBusinessRelation."Link to Table"::Vendor, Cont."No.");
+
+        if not ContactBusinessRelationFound then
+            ContactBusinessRelationFound := ContBusinessRelation.FindByContact(ContBusinessRelation."Link to Table"::Vendor, Cont."Company No.");
+
+        if ContactBusinessRelationFound then begin
             if ("Buy-from Vendor No." <> '') and
                ("Buy-from Vendor No." <> ContBusinessRelation."No.")
             then
@@ -4630,10 +4731,42 @@ table 38 "Purchase Header"
                 Validate("Buy-from Vendor No.", ContBusinessRelation."No.");
                 SkipBuyFromContact := false;
             end;
-        end else
-            ContactIsNotRelatedToVendorError(Cont, ContactNo);
+        end else begin
+            if "Document Type" = "Document Type"::Quote then begin
+                if not GetContactAsCompany(Cont, SearchContact) then
+                    SearchContact := Cont;
 
+                "Buy-from Vendor Name" := SearchContact."Company Name";
+                "Buy-from Vendor Name 2" := SearchContact."Name 2";
+                SetShipToAddress(
+                  SearchContact."Company Name", SearchContact."Name 2", SearchContact.Address, SearchContact."Address 2",
+                  SearchContact.City, SearchContact."Post Code", SearchContact.County, SearchContact."Country/Region Code");
+                "Ship-to Phone No." := SearchContact."Phone No.";
+                if ("Buy-from Vendor Templ. Code" = '') and (not VendorTempl.IsEmpty) then
+                    Validate("Buy-from Vendor Templ. Code", Cont.FindNewVendorTemplate());
+            end else
+                ContactIsNotRelatedToVendorError(Cont, ContactNo);
+
+            "Buy-from Contact" := Cont.Name;
+        end;
         OnCheckBuyFromContactOnAfterFindByContact(Rec, ContBusinessRelation, Cont);
+
+        UpdateBuyFromVendContact(Vend, Cont);
+
+        if "Document Type" = "Document Type"::Quote then begin
+            if Vend.Get("Buy-from Vendor No.") or Vend.Get(ContBusinessRelation."No.") then begin
+                if Vend."Copy Buy-from Add. to Qte From" = Vend."Copy Buy-from Add. to Qte From"::Company then
+                    GetContactAsCompany(Cont, Cont);
+            end else
+                GetContactAsCompany(Cont, Cont);
+
+            "Buy-from Address" := Cont.Address;
+            "Buy-from Address 2" := Cont."Address 2";
+            "Buy-from City" := Cont.City;
+            "Buy-from Post Code" := Cont."Post Code";
+            "Buy-from County" := Cont.County;
+            "Buy-from Country/Region Code" := Cont."Country/Region Code";
+        end;
 
         if ("Buy-from Vendor No." = "Pay-to Vendor No.") or
            ("Pay-to Vendor No." = '')
@@ -4648,7 +4781,10 @@ table 38 "Purchase Header"
         ContBusinessRelation: Record "Contact Business Relation";
         Vend: Record Vendor;
         Cont: Record Contact;
+        SearchContact: Record Contact;
+        VendorTempl: Record "Vendor Templ.";
         ShouldUpdateFromContact: Boolean;
+        ContactBusinessRelationFound: Boolean;
     begin
         ShouldUpdateFromContact := Cont.Get(ContactNo);
         OnUpdatePayToVendOnAfterGetContact(Rec, Cont, ShouldUpdateFromContact);
@@ -4667,7 +4803,13 @@ table 38 "Purchase Header"
         end;
 
         OnUpdatePayToVendOnBeforeFindByContact(Rec, Vend, Cont);
-        if ContBusinessRelation.FindByContact(ContBusinessRelation."Link to Table"::Vendor, Cont."Company No.") then begin
+        if Cont.Type = Cont.Type::Person then
+            ContactBusinessRelationFound := ContBusinessRelation.FindByContact(ContBusinessRelation."Link to Table"::Vendor, Cont."No.");
+
+        if not ContactBusinessRelationFound then
+            ContactBusinessRelationFound := ContBusinessRelation.FindByContact(ContBusinessRelation."Link to Table"::Vendor, Cont."Company No.");
+
+        if ContactBusinessRelationFound then begin
             if "Pay-to Vendor No." = '' then begin
                 SkipPayToContact := true;
                 Validate("Pay-to Vendor No.", ContBusinessRelation."No.");
@@ -4676,7 +4818,28 @@ table 38 "Purchase Header"
                 if "Pay-to Vendor No." <> ContBusinessRelation."No." then
                     Error(Text037, Cont."No.", Cont.Name, "Pay-to Vendor No.");
         end else
-            ContactIsNotRelatedToVendorError(Cont, ContactNo);
+            if "Document Type" = "Document Type"::Quote then begin
+                if not GetContactAsCompany(Cont, SearchContact) then
+                    SearchContact := Cont;
+
+                "Pay-to Name" := SearchContact."Company Name";
+                "Pay-to Name 2" := SearchContact."Name 2";
+                "Pay-to Address" := SearchContact.Address;
+                "Pay-to Address 2" := SearchContact."Address 2";
+                "Pay-to City" := SearchContact.City;
+                "Pay-to Post Code" := SearchContact."Post Code";
+                "Pay-to County" := SearchContact.County;
+                "Pay-to Country/Region Code" := SearchContact."Country/Region Code";
+                "VAT Registration No." := SearchContact."VAT Registration No.";
+                Validate("Currency Code", SearchContact."Currency Code");
+                "Language Code" := SearchContact."Language Code";
+                "Format Region" := SearchContact."Format Region";
+
+                if ("Pay-to Vendor Templ. Code" = '') and (not VendorTempl.IsEmpty) then
+                    Validate("Pay-to Vendor Templ. Code", Cont.FindNewVendorTemplate());
+            end else
+                ContactIsNotRelatedToVendorError(Cont, ContactNo);
+
         OnAfterUpdatePayToVend(Rec, Cont);
     end;
 
@@ -5866,6 +6029,7 @@ table 38 "Purchase Header"
     local procedure CopyBuyFromVendorAddressFieldsFromVendor(var BuyFromVendor: Record Vendor; ForceCopy: Boolean)
     begin
         if BuyFromVendorIsReplaced() or ShouldCopyAddressFromBuyFromVendor(BuyFromVendor) or ForceCopy then begin
+            "Buy-from Vendor Templ. Code" := '';
             "Buy-from Address" := BuyFromVendor.Address;
             "Buy-from Address 2" := BuyFromVendor."Address 2";
             "Buy-from City" := BuyFromVendor.City;
@@ -5893,6 +6057,7 @@ table 38 "Purchase Header"
     local procedure CopyPayToVendorAddressFieldsFromVendor(var PayToVendor: Record Vendor; ForceCopy: Boolean)
     begin
         if PayToVendorIsReplaced() or ShouldCopyAddressFromPayToVendor(PayToVendor) or ForceCopy then begin
+            "Pay-to Vendor Templ. Code" := '';
             "Pay-to Address" := PayToVendor.Address;
             "Pay-to Address 2" := PayToVendor."Address 2";
             "Pay-to City" := PayToVendor.City;
@@ -7530,6 +7695,7 @@ table 38 "Purchase Header"
         DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Purchaser Code", FieldNo = Rec.FieldNo("Purchaser Code"));
         DimMgt.AddDimSource(DefaultDimSource, Database::Campaign, Rec."Campaign No.", FieldNo = Rec.FieldNo("Campaign No."));
         DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
+        DimMgt.AddDimSource(DefaultDimSource, Database::"Vendor Templ.", Rec."Pay-to Vendor Templ. Code", FieldNo = Rec.FieldNo("Pay-to Vendor Templ. Code"));
         DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
@@ -7551,7 +7717,10 @@ table 38 "Purchase Header"
     /// <returns>True if purchase lines are editable, otherwise false.</returns>
     procedure PurchaseLinesEditable() IsEditable: Boolean;
     begin
-        IsEditable := Rec."Buy-from Vendor No." <> '';
+        if "Document Type" = "Document Type"::Quote then
+            IsEditable := (Rec."Buy-from Vendor No." <> '') or (Rec."Buy-from Vendor Templ. Code" <> '') or (Rec."Buy-from Contact No." <> '') or (Rec.GetFilter("Buy-from Contact No.") <> '')
+        else
+            IsEditable := Rec."Buy-from Vendor No." <> '';
 
         OnAfterPurchaseLinesEditable(Rec, IsEditable);
     end;
@@ -7671,6 +7840,178 @@ table 38 "Purchase Header"
             exit;
 
         CorrectPostedPurchInvoice.UpdatePurchaseOrderLineIfExist(PurchaseCrMemoHeader."No.");
+    end;
+
+    /// <summary>
+    /// Retrieves the company contact associated with the provided contact.
+    /// </summary>
+    /// <param name="Contact">The contact record to get the associated company contact for.</param>
+    /// <param name="SearchContact">Return value: associated company contact.</param>
+    /// <returns>True if company contact was found, otherwise false.</returns>
+    protected procedure GetContactAsCompany(Contact: Record Contact; var SearchContact: Record Contact): Boolean;
+    begin
+        if Contact."Company No." <> '' then
+            exit(SearchContact.Get(Contact."Company No."));
+    end;
+
+    /// <summary>
+    /// Checks if buy-from and pay-to vendor numbers are filled. If not, it creates vendors based on the associated
+    /// contact and vendor template, and assigns the new vendor number to the document.
+    /// </summary>
+    /// <remarks>
+    /// The transaction is committed after each vendor record is created.
+    /// Procedure are used in release purchase quote or make order from quote processes.
+    /// </remarks>
+    /// <param name="Prompt">If set to true, a confirmation dialog to create a vendor will be shown, otherwise not.</param>
+    /// <returns>True if buy-from and pay-to vendor numbers are filled, otherwise false.</returns>
+    internal procedure CheckVendorCreated(Prompt: Boolean): Boolean
+    var
+        Cont: Record Contact;
+        ConfirmManagement: Codeunit "Confirm Management";
+    begin
+        if ("Pay-to Vendor No." <> '') and ("Buy-from Vendor No." <> '') then
+            exit(true);
+
+        if Prompt then
+            if not ConfirmManagement.GetResponseOrDefault(CreateVendorQst, true) then
+                exit(false);
+
+        if "Buy-from Vendor No." = '' then begin
+            TestField("Buy-from Contact No.");
+            TestField("Buy-from Vendor Templ. Code");
+            GetContact(Cont, "Buy-from Contact No.");
+
+            CreateVendorFromBuyFromVendorTemplate(Cont);
+            Commit();
+            Get("Document Type"::Quote, "No.");
+        end;
+
+        if "Pay-to Vendor No." = '' then begin
+            TestField("Pay-to Contact No.");
+            TestField("Pay-to Vendor Templ. Code");
+            GetContact(Cont, "Pay-to Contact No.");
+
+            CreateVendorFromPayToVendorTemplate(Cont);
+            Commit();
+            Get("Document Type"::Quote, "No.");
+        end;
+
+        exit(("Pay-to Vendor No." <> '') and ("Buy-from Vendor No." <> ''));
+    end;
+
+    /// <summary>
+    /// Opens a page for selecting a vendor template to use for creating a new vendor.
+    /// </summary>
+    /// <remarks>
+    /// If Buy-from contact has no business relations a confirmation for template selection is raised.
+    /// If the user confirms, it commits any changes
+    /// and returns the code of the new vendor template selected by the user.
+    /// </remarks>
+    /// <returns>Vendor template code.</returns>
+    internal procedure SelectPurchaseHeaderNewVendorTemplate(): Code[20]
+    var
+        Contact: Record Contact;
+        ConfirmManagement: Codeunit "Confirm Management";
+    begin
+        Contact.Get("Buy-from Contact No.");
+        if (Contact.Type = Contact.Type::Person) and (Contact."Company No." <> '') then
+            Contact.Get(Contact."Company No.");
+
+        if not Contact.ContactToCustBusinessRelationExist() then
+            if ConfirmManagement.GetResponse(SelectVendorTemplateQst, false) then begin
+                Commit();
+                
+                exit(Contact.LookupNewVendorTemplate());
+            end;
+    end;
+
+    local procedure CreateVendorFromBuyFromVendorTemplate(Contact: Record Contact)
+    begin
+        Contact.CreateVendorFromTemplate("Buy-from Vendor Templ. Code");
+    end;
+
+    local procedure CreateVendorFromPayToVendorTemplate(Contact: Record Contact)
+    begin
+        Contact.CreateVendorFromTemplate("Pay-to Vendor Templ. Code");
+    end;
+
+    local procedure UpdateBuyFromVendContact(Vendor: Record Vendor; Contact: Record Contact)
+    begin
+        if (Contact.Type = Contact.Type::Company) and Vendor.Get("Buy-from Vendor No.") then
+            "Buy-from Contact" := Vendor.Contact
+        else
+            if Contact.Type = Contact.Type::Company then
+                "Buy-from Contact" := ''
+            else
+                "Buy-from Contact" := Contact.Name;
+    end;
+
+    local procedure InitFromTemplate(TemplateCode: Code[20]; TemplateCaption: Text): Boolean
+    var
+        PurchaseLine: Record "Purchase Line";
+    begin
+        PurchaseLine.Reset();
+        PurchaseLine.SetRange("Document Type", "Document Type");
+        PurchaseLine.SetRange("Document No.", "No.");
+        if TemplateCode = '' then begin
+            if not PurchaseLine.IsEmpty() then
+                Error(Text005, TemplateCaption);
+
+            Init();
+            GetPurchSetup();
+            "No. Series" := xRec."No. Series";
+            InitRecord();
+            InitNoSeries();
+
+            exit(true);
+        end;
+    end;
+
+    local procedure CopyFromNewBuyFromVendorTemplate(BuyFromVendorTemplate: Record "Vendor Templ.")
+    begin
+        if not ApplicationAreaMgmt.IsSalesTaxEnabled() then
+            BuyFromVendorTemplate.TestField("Gen. Bus. Posting Group");
+
+        "Gen. Bus. Posting Group" := BuyFromVendorTemplate."Gen. Bus. Posting Group";
+        "VAT Bus. Posting Group" := BuyFromVendorTemplate."VAT Bus. Posting Group";
+        if "Pay-to Vendor No." = '' then
+            Validate("Pay-to Vendor Templ. Code", "Buy-from Vendor Templ. Code");
+    end;
+
+    local procedure InitFromPayToVendorTemplate(PayToVendorTemplate: Record "Vendor Templ.")
+    begin
+        PayToVendorTemplate.TestField("Vendor Posting Group");
+        "Vendor Posting Group" := PayToVendorTemplate."Vendor Posting Group";
+        "Invoice Disc. Code" := PayToVendorTemplate."Invoice Disc. Code";
+        Validate("Payment Terms Code", PayToVendorTemplate."Payment Terms Code");
+        Validate("Payment Method Code", PayToVendorTemplate."Payment Method Code");
+        "Prices Including VAT" := PayToVendorTemplate."Prices Including VAT";
+        "Shipment Method Code" := PayToVendorTemplate."Shipment Method Code";
+    end;
+
+    local procedure GetContact(var Contact: Record Contact; ContactNo: Code[20])
+    begin
+        Contact.Get(ContactNo);
+        if (Contact.Type = Contact.Type::Person) and (Contact."Company No." <> '') then
+            Contact.Get(Contact."Company No.");
+    end;
+
+    local procedure EnsureDocumentTypeIsQuote()
+    begin
+        Rec.TestField("Document Type", "Document Type"::Quote);
+    end;
+
+    local procedure UpdateBuyFromVendorTemplateCode()
+    begin
+        if ("Document Type" = "Document Type"::Quote) and ("Buy-from Vendor No." = '') and ("Buy-from Vendor Templ. Code" = '') and (GetFilterContNo() = '') then
+            Validate("Buy-from Vendor Templ. Code", SelectPurchaseHeaderNewVendorTemplate());
+    end;
+
+    local procedure GetFilterContNo(): Code[20]
+    begin
+        if GetFilter("Buy-from Contact No.") <> '' then
+            if GetRangeMin("Buy-from Contact No.") = GetRangeMax("Buy-from Contact No.") then
+                exit(GetRangeMax("Buy-from Contact No."));
     end;
 
     [IntegrationEvent(false, false)]
