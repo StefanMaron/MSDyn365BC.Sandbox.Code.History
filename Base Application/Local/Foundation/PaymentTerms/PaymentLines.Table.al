@@ -376,7 +376,9 @@ table 12170 "Payment Lines"
             ;
             PaymentCounter := 0;
             FixedDueDates.Reset();
-            Vendor.Get(PurchaseHeader."Pay-to Vendor No.");
+            if (PurchaseHeader."Pay-to Vendor No." <> '') or (PurchaseHeader."Document Type" <> PurchaseHeader."Document Type"::Quote) then
+                Vendor.Get(PurchaseHeader."Pay-to Vendor No.");
+
             if Vendor."Apply Company Payment days" then begin
                 FixedDueDates.SetRange(Type, FixedDueDates.Type::Company);
                 FixedDueDates.SetRange(Code, '');
