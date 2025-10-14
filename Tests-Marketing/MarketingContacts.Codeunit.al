@@ -54,6 +54,7 @@ codeunit 136201 "Marketing Contacts"
         DuplicateContactsMsg: Label 'There are duplicate contacts.';
         ItemDimensionAllowedFilter: Label 'Allowed Dimension filter must match in both Item template and Item.';
         ValueMustMatch: Label 'Value must match.';
+        SelectVendorTemplateQst: Label 'Do you want to select the vendor template?';
 
     [Test]
     procedure ContactBusinessRelationCompatibility()
@@ -6015,6 +6016,170 @@ codeunit 136201 "Marketing Contacts"
             TaskList.Filter.GetFilter("System To-do Type"), 'Wrong filter was set');
     end;
 
+    [Test]
+    [HandlerFunctions('ConfirmHandlerTrue,VendorTempModalFormHandler')]
+    procedure TestContactListNewPurchaseQuoteForContactCompanyVendorTemplate()
+    var
+        Contact: Record Contact;
+        PurchaseHeader: Record "Purchase Header";
+        ContactList: TestPage "Contact List";
+        PurchaseQuote: TestPage "Purchase Quote";
+        VendorTemplateCode: Code[20];
+    begin
+        // [SCENARIO 391449] Verify that the Purchase Quote is created from Contact List page for Contact with Vendor Template selection.
+        Initialize();
+
+        // [GIVEN] Create Vendor Template "CT", Contact "C" with type Company.
+        LibraryMarketing.CreateCompanyContact(Contact);
+        VendorTemplateCode := CreateVendorTemplateForContact('');
+
+        // [GIVEN] Create another Vendor Template.
+        CreateVendorTemplateForContact('');
+
+        // [GIVEN] Contact List page is opened and focus is set on Contact "C".
+        ContactList.OpenView();
+        ContactList.GotoRecord(Contact);
+
+        // [WHEN] Invoke "New Purchase Quote" action.
+        PurchaseQuote.Trap();
+        ContactList.NewPurchaseQuote.Invoke();
+
+        // [THEN] Verify that the Purchase Quote is created from Contact List page.
+        PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Quote);
+        PurchaseHeader.SetRange("Buy-from Contact No.", Contact."No.");
+        PurchaseHeader.SetRange("Buy-from Vendor Templ. Code", VendorTemplateCode);
+        Assert.RecordIsNotEmpty(PurchaseHeader);
+        PurchaseQuote.Close();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerFalseWithTextVerification')]
+    procedure TestContactListPurchaseQuoteForContactPerson()
+    var
+        Contact: Record Contact;
+        ContactList: TestPage "Contact List";
+        PurchaseQuote: TestPage "Purchase Quote";
+    begin
+        // [SCENARIO 391449] Verify that the Purchase Quote is created from Contact List for Vendor with Type Person.
+        Initialize();
+
+        // [GIVEN] Create Contact with Type = Person.
+        LibraryMarketing.CreatePersonContact(Contact);
+
+        // [GIVEN] Contact List page is opened and focus is set on Contact "C".
+        ContactList.OpenView();
+        ContactList.GotoRecord(Contact);
+
+        // [WHEN] Invoke "New Purchase Quote" action.
+        LibraryVariableStorage.Enqueue(SelectVendorTemplateQst);
+        PurchaseQuote.Trap();
+        ContactList.NewPurchaseQuote.Invoke();
+
+        // [THEN] PurchaseQuote Page opens (handled in ModalPageHandler)
+        PurchaseQuote.Close();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerTrue,VendorTempModalPageHandlerWithEnqueue')]
+    procedure TestCreatePurchaseQuoteFromContactListAndVendorTemplateConfirmation()
+    var
+        Contact: Record Contact;
+        VendorTempl: Record "Vendor Templ.";
+        ContactList: TestPage "Contact List";
+        PurchaseQuote: TestPage "Purchase Quote";
+    begin
+        // [SCENARIO 391449] Verify that the Stan can create purchase quote from "Contact List" when "New Purchase Quote" action is invoked.
+        Initialize();
+
+        // [GIVEN] Create Company Contact.
+        LibraryMarketing.CreateCompanyContact(Contact);
+
+        // [GIVEN] Create a Vendor Template.
+        LibraryTemplates.CreateVendorTemplate(VendorTempl);
+
+        // [GIVEN] Create another Vendor Template.
+        LibraryTemplates.CreateVendorTemplate(VendorTempl);
+
+        // [GIVEN] "Contact list" page is opened.
+        ContactList.OpenView();
+        ContactList.GotoRecord(Contact);
+
+        // [WHEN] Create New Purchase Quote.
+        PurchaseQuote.Trap();
+        ContactList.NewPurchaseQuote.Invoke();
+
+        // [THEN] Verify that the Purchase Quote is populated with "Buy-from Vendor Template Code" = "X".
+        PurchaseQuote."Buy-from Address".SetValue('');
+        PurchaseQuote."Buy-from Vendor Templ. Code".AssertEquals(LibraryVariableStorage.DequeueText());
+        PurchaseQuote.Close();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerTrue,VendorTemplateHandler,MessageHandler')]
+    procedure TestPurchaseOrderIsCreatedFromPurchaseQuoteCreateFromContactRelatedForVendorTemplate()
+    var
+        Item: Record Item;
+        Contact: Record Contact;
+        CompanyContact: Record Contact;
+        VendorTempl: Record "Vendor Templ.";
+        VendorTempl1: Record "Vendor Templ.";
+        ContactCard: TestPage "Contact Card";
+        PurchaseQuote: TestPage "Purchase Quote";
+        PurchaseOrder: TestPage "Purchase Order";
+        QuoteNo: Code[20];
+    begin
+        // [SCENARIO 391449] Verify that the Purchase Order is created from Purchase Quote for Vendor Template.
+        Initialize();
+
+        // [GIVEN] Create Company Contact.
+        LibraryMarketing.CreateCompanyContact(CompanyContact);
+
+        // [GIVEN] Create and update Vendor Template.
+        LibraryTemplates.CreateVendorTemplateWithData(VendorTempl);
+        VendorTempl."Contact Type" := VendorTempl."Contact Type"::Person;
+        VendorTempl.Modify(true);
+
+        // [GIVEN] Enqueue Vendor Template.
+        LibraryVariableStorage.Enqueue(VendorTempl.Code);
+
+        // [GIVEN] Create and another update Vendor Template.
+        LibraryTemplates.CreateVendorTemplateWithData(VendorTempl1);
+        VendorTempl1."Contact Type" := VendorTempl."Contact Type"::Person;
+        VendorTempl1.Modify(true);
+
+        // [GIVEN] Create an Item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create and Post Item Journal.
+        CreateAndPostItemJournal(Item."No.");
+
+        // [GIVEN] Create Person Contact.
+        LibraryMarketing.CreatePersonContact(Contact);
+        Contact.Validate("Company No.", CompanyContact."No.");
+        Contact.Modify();
+
+        // [GIVEN] Open "Contact Card" page.
+        ContactCard.OpenView();
+        ContactCard.GotoRecord(Contact);
+        PurchaseQuote.Trap();
+
+        // [GIVEN] NewPurchaseQuote action is invoked.
+        ContactCard.NewPurchaseQuote.Invoke();
+
+        // [GIVEN] Create Purchase Quote Line with Item.
+        QuoteNo := CopyStr(PurchaseQuote."No.".Value(), 1, 20);
+        PurchaseQuote.PurchLines."No.".SetValue(Item."No.");
+        PurchaseQuote.PurchLines.Quantity.SetValue(LibraryRandom.RandInt(10));
+        PurchaseQuote.PurchLines."Direct Unit Cost".SetValue(LibraryRandom.RandInt(10));
+
+        // [WHEN] Make Order from Quote.
+        PurchaseOrder.Trap();
+        PurchaseQuote.MakeOrder.Invoke();
+
+        // [THEN] Verify Purchae Order is created from purchase quote.     
+        PurchaseOrder."Quote No.".AssertEquals(QuoteNo);
+    end;
+
     local procedure Initialize()
     var
         MarketingSetup: Record "Marketing Setup";
@@ -6837,6 +7002,26 @@ codeunit 136201 "Marketing Contacts"
         ItemJournalLine.DeleteAll();
     end;
 
+    local procedure CreateVendorTemplateForContact(VATBusPostingGroupCode: Code[20]): Code[20]
+    var
+        VendorTemplate: Record "Vendor Templ.";
+        GenBusPostingGroup: Record "Gen. Business Posting Group";
+        VendorPostingGroup: Record "Vendor Posting Group";
+    begin
+        LibraryTemplates.CreateVendorTemplate(VendorTemplate);
+        LibraryVariableStorage.Enqueue(VendorTemplate.Code);
+
+        LibraryERM.CreateGenBusPostingGroup(GenBusPostingGroup);
+        LibraryPurchase.CreateVendorPostingGroup(VendorPostingGroup);
+
+        VendorTemplate.Validate("Gen. Bus. Posting Group", GenBusPostingGroup.Code);
+        VendorTemplate.Validate("Vendor Posting Group", VendorPostingGroup.Code);
+        VendorTemplate.Validate("VAT Bus. Posting Group", VATBusPostingGroupCode);
+        VendorTemplate.Modify();
+
+        exit(VendorTemplate.Code);
+    end;
+
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure NameDetailsModalFormHandler(var NameDetails: Page "Name Details"; var Reply: Action)
@@ -7236,6 +7421,42 @@ codeunit 136201 "Marketing Contacts"
     procedure ModalSelectCustomerTemplListHandler(var SelectCustomerTemplList: TestPage "Select Customer Templ. List")
     begin
         SelectCustomerTemplList.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure VendorTempModalFormHandler(var VendorTemplateList: Page "Select Vendor Templ. List"; var Reply: Action)
+    var
+        VendorTemplate: Record "Vendor Templ.";
+    begin
+        VendorTemplate.Init();  // Required to initialize the variable.
+        VendorTemplate.Get(LibraryVariableStorage.DequeueText());
+        VendorTemplateList.SetRecord(VendorTemplate);
+        Reply := Action::LookupOK;
+    end;
+
+    [ModalPageHandler]
+    procedure VendorTempModalPageHandlerWithEnqueue(var VendorTemplateList: Page "Select Vendor Templ. List"; var Reply: Action)
+    var
+        VATPostingSetup: Record "VAT Posting Setup";
+        VendorTemplate: Record "Vendor Templ.";
+    begin
+        LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+
+        VendorTemplate.Get(CreateVendorTemplateForContact(VATPostingSetup."VAT Bus. Posting Group"));
+        VendorTemplateList.SetRecord(VendorTemplate);
+        LibraryVariableStorage.Enqueue(VendorTemplate.Code);
+
+        Reply := Action::LookupOK;
+    end;
+
+    [ModalPageHandler]
+    procedure VendorTemplateHandler(var VendorTemplateList: Page "Select Vendor Templ. List"; var Reply: Action)
+    var
+        VendorTemplate: Record "Vendor Templ.";
+    begin
+        VendorTemplate.Get(LibraryVariableStorage.DequeueText());
+        VendorTemplateList.SetRecord(VendorTemplate);
+        Reply := Action::LookupOK;
     end;
 
     [SendNotificationHandler]
