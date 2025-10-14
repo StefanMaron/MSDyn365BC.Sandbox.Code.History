@@ -27,6 +27,7 @@ using Microsoft.Integration.Dataverse;
 using Microsoft.Inventory.Intrastat;
 using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Source;
+using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
@@ -1227,6 +1228,9 @@ table 5050 Contact
         PhoneNoCannotContainLettersErr: Label 'must not contain letters';
         FieldLengthErr: Label 'must not have the length more than 20 symbols';
         VendorTemplNotFoundMsg: Label 'You cannot create vendor because there is no vendor template with contact type: %1.', Comment = '%1=Contact Type';
+        MultipleVendorTemplatesConfirmQst: Label 'Quotes with vendor templates different from %1 were assigned to vendor %2. Do you want to review the quotes now?', Comment = '%1 = Vendor Template Code, %2 = Vendor No.';
+        DifferentVendorTemplateMsg: Label 'Purchase quote %1 with original vendor template %2 was assigned to the vendor created from template %3.', Comment = '%1 = Document No., %2 = Original Vendor Template Code, %3 = Vendor Template Code';
+        NoOriginalVendorTemplateMsg: Label 'Purchase quote %1 without an original vendor template was assigned to the vendor created from template %2.', Comment = '%1 = Document No., %2 = Vendor Template Code';
 
     protected var
         HideValidationDialog: Boolean;
@@ -1719,6 +1723,8 @@ table 5050 Contact
 
         OnCreateVendorOnAfterUpdateVendor(Vend, Rec, ContBusRel);
 
+        UpdateQuotesFromTemplate(Vend, VendorTemplateCode);
+
         ShowResultForVendor(Vend);
 
         OnAfterCreateVendor(Rec, Vend);
@@ -1843,6 +1849,7 @@ table 5050 Contact
 
     procedure CreateVendorLink()
     var
+        Vendor: Record Vendor;
         ContBusRel: Record "Contact Business Relation";
         IsHandled: Boolean;
     begin
@@ -1858,6 +1865,13 @@ table 5050 Contact
               PAGE::"Vendor Link",
               RMSetup."Bus. Rel. Code for Vendors",
               ContBusRel."Link to Table"::Vendor);
+
+            ContBusRel.SetCurrentKey("Link to Table", "Contact No.");
+            ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Vendor);
+            ContBusRel.SetRange("Contact No.", "Company No.");
+            if ContBusRel.FindFirst() then
+                if Vendor.Get(ContBusRel."No.") then
+                    UpdateQuotesFromTemplate(Vendor, '');
         end;
         OnAfterCreateVendorLink(Rec, xRec);
     end;
@@ -2263,6 +2277,24 @@ table 5050 Contact
         if CustTemplate.Count = 1 then begin
             CustTemplate.FindFirst();
             exit(CustTemplate.Code);
+        end;
+    end;
+
+    procedure FindNewVendorTemplate(): Code[20]
+    var
+        VendorTemplate: Record "Vendor Templ.";
+        ContCompany: Record Contact;
+    begin
+        VendorTemplate.SetRange("Territory Code", "Territory Code");
+        VendorTemplate.SetRange("Country/Region Code", "Country/Region Code");
+        VendorTemplate.SetRange("Contact Type", Type);
+        if ContCompany.Get("Company No.") then
+            VendorTemplate.SetRange("Currency Code", ContCompany."Currency Code");
+
+        if VendorTemplate.Count = 1 then begin
+            VendorTemplate.FindFirst();
+
+            exit(VendorTemplate.Code);
         end;
     end;
 
@@ -3046,6 +3078,22 @@ table 5050 Contact
         OnCreateSalesQuoteFromContactOnAfterRunPage(Rec, SalesHeader);
     end;
 
+    procedure CreatePurchaseQuoteFromContact()
+    var
+        PurchaseHeader: Record "Purchase Header";
+    begin
+        CheckIfPrivacyBlockedGeneric();
+
+        PurchaseHeader.Init();
+        PurchaseHeader.Validate("Document Type", PurchaseHeader."Document Type"::Quote);
+        PurchaseHeader.Insert(true);
+        PurchaseHeader.Validate("Document Date", WorkDate());
+        PurchaseHeader.Validate("Buy-from Contact No.", "No.");
+        PurchaseHeader.Modify();
+
+        Page.Run(Page::"Purchase Quote", PurchaseHeader);
+    end;
+
     procedure ContactToCustBusinessRelationExist(): Boolean
     var
         ContBusRel: Record "Contact Business Relation";
@@ -3370,6 +3418,136 @@ table 5050 Contact
         LanguageSelection.SetRange("Language ID", Language."Windows Language ID");
         if LanguageSelection.FindFirst() then
             Rec.Validate("Format Region", LanguageSelection."Language Tag");
+    end;
+
+    local procedure UpdateQuotesFromTemplate(Vendor: Record Vendor; VendorTemplateCode: Code[20])
+    var
+        Contact: Record Contact;
+        TempErrorMessage: Record "Error Message" temporary;
+        ConfirmManagement: Codeunit "Confirm Management";
+    begin
+        if "Company No." <> '' then
+            Contact.SetRange("Company No.", "Company No.")
+        else
+            Contact.SetRange("No.", "No.");
+
+        if Contact.FindSet() then
+            repeat
+                AssignVendorToQuotesByBuyFromContact(Contact, Vendor, TempErrorMessage, VendorTemplateCode);
+                AssignVendorToQuotesByPayToContact(Contact, Vendor);
+            until Contact.Next() = 0;
+
+        if not TempErrorMessage.IsEmpty() then
+            if ConfirmManagement.GetResponse(StrSubstNo(MultipleVendorTemplatesConfirmQst, VendorTemplateCode, Vendor."No."), true) then
+                TempErrorMessage.ShowErrorMessages(false);
+    end;
+
+    local procedure AssignVendorToQuotesByBuyFromContact(Contact: Record Contact; Vendor: Record Vendor; var TempErrorMessage: Record "Error Message" temporary; VendorTemplateCode: Code[20])
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseHeader2: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+    begin
+        PurchaseHeader.SetRange("Buy-from Vendor No.", '');
+        PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Quote);
+        PurchaseHeader.SetRange("Buy-from Contact No.", Contact."No.");
+        if PurchaseHeader.FindSet() then
+            repeat
+                PurchaseHeader2.LockTable();
+                PurchaseHeader2.Get(PurchaseHeader."Document Type", PurchaseHeader."No.");
+                PurchaseHeader2."Buy-from Vendor No." := Vendor."No.";
+                PurchaseHeader2."Buy-from Vendor Name" := Vendor.Name;
+                CheckNewVendorTemplate(PurchaseHeader2, TempErrorMessage, VendorTemplateCode);
+
+                PurchaseHeader2."Buy-from Vendor Templ. Code" := '';
+                if PurchaseHeader2."Buy-from Contact No." = PurchaseHeader2."Pay-to Contact No." then begin
+                    PurchaseHeader2."Pay-to Vendor No." := Vendor."No.";
+                    PurchaseHeader2."Pay-to Name" := Vendor.Name;
+                    PurchaseHeader2."Pay-to Vendor Templ. Code" := '';
+                    PurchaseHeader2."Purchaser Code" := Vendor."Purchaser Code";
+                end;
+                PurchaseHeader2.Modify();
+
+                PurchaseLine.LockTable();
+                PurchaseLine.SetRange("Document Type", PurchaseHeader2."Document Type");
+                PurchaseLine.SetRange("Document No.", PurchaseHeader2."No.");
+                PurchaseLine.ModifyAll("Buy-from Vendor No.", PurchaseHeader2."Buy-from Vendor No.");
+
+                if PurchaseHeader2."Buy-from Contact No." = PurchaseHeader2."Pay-to Contact No." then
+                    PurchaseLine.ModifyAll("Pay-to Vendor No.", PurchaseHeader2."Pay-to Vendor No.");
+            until PurchaseHeader.Next() = 0;
+    end;
+
+    local procedure AssignVendorToQuotesByPayToContact(Contact: Record Contact; Vendor: Record Vendor)
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseHeader2: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+    begin
+        PurchaseHeader.SetRange("Pay-to Vendor No.", '');
+        PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Quote);
+        PurchaseHeader.SetRange("Pay-to Contact No.", Contact."No.");
+        if PurchaseHeader.FindSet() then
+            repeat
+                PurchaseHeader2.LockTable();
+                PurchaseHeader2.Get(PurchaseHeader."Document Type", PurchaseHeader."No.");
+                PurchaseHeader2."Pay-to Vendor No." := Vendor."No.";
+                PurchaseHeader2."Pay-to Vendor Templ. Code" := '';
+                PurchaseHeader2."Purchaser Code" := Vendor."Purchaser Code";
+                PurchaseHeader2.Modify();
+
+                PurchaseLine.LockTable();
+                PurchaseLine.SetRange("Document Type", PurchaseHeader2."Document Type");
+                PurchaseLine.SetRange("Document No.", PurchaseHeader2."No.");
+                PurchaseLine.ModifyAll("Pay-to Vendor No.", PurchaseHeader2."Pay-to Vendor No.");
+            until PurchaseHeader.Next() = 0;
+    end;
+
+    local procedure CheckNewVendorTemplate(PurchaseHeader: Record "Purchase Header"; var TempErrorMessage: Record "Error Message" temporary; VendorTemplateCode: Code[20])
+    var
+        WarningMessage: Text;
+    begin
+        if VendorTemplateCode = '' then
+            exit;
+
+        if PurchaseHeader."Buy-from Vendor Templ. Code" = VendorTemplateCode then
+            exit;
+
+        if PurchaseHeader."Buy-from Vendor Templ. Code" <> '' then
+            WarningMessage := StrSubstNo(
+                DifferentVendorTemplateMsg,
+                PurchaseHeader."No.",
+                PurchaseHeader."Buy-from Vendor Templ. Code",
+                VendorTemplateCode)
+        else
+            WarningMessage := StrSubstNo(
+                NoOriginalVendorTemplateMsg,
+                PurchaseHeader."No.",
+                VendorTemplateCode);
+
+        TempErrorMessage.LogMessage(
+          PurchaseHeader,
+          PurchaseHeader.FieldNo("Buy-from Vendor Templ. Code"),
+          TempErrorMessage."Message Type"::Warning,
+          WarningMessage);
+    end;
+
+    internal procedure LookupNewVendorTemplate(): Code[20]
+    var
+        VendorTemplate: Record "Vendor Templ.";
+        SelectVendorTemplList: Page "Select Vendor Templ. List";
+    begin
+        VendorTemplate.FilterGroup(2);
+        VendorTemplate.SetRange("Contact Type", Type);
+        VendorTemplate.FilterGroup(0);
+        SelectVendorTemplList.LookupMode := true;
+
+        SelectVendorTemplList.SetTableView(VendorTemplate);
+        if SelectVendorTemplList.RunModal() = Action::LookupOK then begin
+            SelectVendorTemplList.GetRecord(VendorTemplate);
+
+            exit(VendorTemplate.Code);
+        end;
     end;
 
     [IntegrationEvent(false, false)]

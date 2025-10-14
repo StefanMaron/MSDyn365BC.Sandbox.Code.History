@@ -374,6 +374,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Marketing Contacts - NamedType SelectCustomerTemplateQst)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 688363657 - NamedType 656251454" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Do you want to select the vendor template?]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Marketing Contacts - NamedType SelectVendorTemplateQst)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 688363657 - NamedType 4174999501" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[%1: %2 must exist.]]></Val>
