@@ -112,7 +112,7 @@ codeunit 418 "User Management"
                   TableData "Ins. Coverage Ledger Entry" = rm,
                   TableData "Insurance Register" = rm,
                   TableData "Value Entry" = rm,
-#if not CLEAN25
+#if not CLEAN28
                   TableData Microsoft.Service.Ledger."Service Ledger Entry" = rm,
                   TableData Microsoft.Service.Ledger."Service Register" = rm,
                   TableData Microsoft.Service.Contract."Contract Gain/Loss Entry" = rm,
