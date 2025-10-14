@@ -1508,6 +1508,12 @@ table 23 Vendor
         {
             Caption = 'Validate EU VAT Reg. No.';
         }
+        field(7603; "Copy Buy-from Add. to Qte From"; Enum "Contact Type")
+        {
+            AccessByPermission = TableData Contact = R;
+            Caption = 'Copy Buy-from Addr. to Qte From';
+            ToolTip = 'Specifies which vendor address is inserted on purchase quotes that you create for the vendor.';
+        }
         field(8001; "Currency Id"; Guid)
         {
             Caption = 'Currency Id';
