@@ -69,7 +69,7 @@ codeunit 483 "Change Global Dimensions"
                   TableData "Job WIP G/L Entry" = rm,
                   TableData "Employee Ledger Entry" = rm,
                   TableData "Detailed Employee Ledger Entry" = rm,
-#if not CLEAN26
+#if not CLEAN28
                   TableData Microsoft.Manufacturing.Document."Production Order" = rm,
                   TableData Microsoft.Manufacturing.Document."Prod. Order Line" = rm,
                   TableData Microsoft.Manufacturing.Document."Prod. Order Component" = rm,
@@ -91,7 +91,7 @@ codeunit 483 "Change Global Dimensions"
                   TableData "Ins. Coverage Ledger Entry" = rm,
                   TableData "Value Entry" = rm,
                   TableData Microsoft.Manufacturing.Capacity."Capacity Ledger Entry" = rm,
-#if not CLEAN25
+#if not CLEAN28
                   TableData Microsoft.Service.Document."Service Header" = rm,
                   TableData Microsoft.Service.Document."Service Item Line" = rm,
                   TableData Microsoft.Service.Document."Service Line" = rm,
