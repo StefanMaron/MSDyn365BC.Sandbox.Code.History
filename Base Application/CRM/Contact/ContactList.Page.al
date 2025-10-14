@@ -997,6 +997,18 @@ page 5052 "Contact List"
                     Rec.CreateSalesQuoteFromContact();
                 end;
             }
+            action(NewPurchaseQuote)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Create Purchase Quote';
+                Image = Quote;
+                ToolTip = 'Create a new purchase quote for the vendor.';
+
+                trigger OnAction()
+                begin
+                    Rec.CreatePurchaseQuoteFromContact();
+                end;
+            }
         }
         area(reporting)
         {
@@ -1038,6 +1050,9 @@ page 5052 "Contact List"
                 {
                 }
                 actionref(NewSalesQuote_Promoted; NewSalesQuote)
+                {
+                }
+                actionref(NewPurchaseQuote_Promoted; NewPurchaseQuote)
                 {
                 }
                 actionref(MakePhoneCall_Promoted; MakePhoneCall)

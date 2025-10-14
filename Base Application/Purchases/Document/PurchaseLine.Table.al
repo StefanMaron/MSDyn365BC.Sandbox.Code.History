@@ -4013,6 +4013,7 @@ table 39 "Purchase Line"
         ChangeExtendedTextErr: Label 'You cannot change %1 for Extended Text Line.', Comment = '%1= Field Caption';
         InvoiceOrOrderDocTypeErr: Label '%1 must be either %2 or %3.', Comment = '%1 - Document Type; %2, %3 - Purchase Document Type, Invoice or Order';
         CannotInsertPurchLineWithoutHeaderErr: Label 'You cannot insert a purchase line without a purchase header.';
+        MustSpecifyErr: Label 'You must either specify %1 or %2.', Comment = '%1 = Field Caption; %2 = Field Caption';
 
     protected var
         Currency: Record Currency;
@@ -9245,7 +9246,10 @@ table 39 "Purchase Line"
         if IsHandled then
             exit;
 
-        PurchaseHeader.TestField("Buy-from Vendor No.");
+        if PurchaseHeader."Document Type" = PurchaseHeader."Document Type"::Quote then
+            CheckQuoteVendorTemplateCode(PurchaseHeader)
+        else
+            PurchaseHeader.TestField("Buy-from Vendor No.");
     end;
 
     local procedure UpdateLineAmount(var LineAmountChanged: Boolean)
@@ -9724,6 +9728,25 @@ table 39 "Purchase Line"
             Codeunit::"Purchase Line - Price",
             'SetPurchaseReceiveQty',
             StrSubstNo(QtyReceiveActionDescriptionLbl, Rec.FieldCaption("Qty. to Receive"), Rec.Quantity)));
+    end;
+
+    local procedure CheckQuoteVendorTemplateCode(PurchaseHeader: Record "Purchase Header")
+    begin
+        if (PurchaseHeader."Buy-from Vendor No." = '') and
+           (PurchaseHeader."Buy-from Vendor Templ. Code" = '')
+        then
+            Error(
+              MustSpecifyErr,
+              PurchaseHeader.FieldCaption("Buy-from Vendor No."),
+              PurchaseHeader.FieldCaption("Buy-from Vendor Templ. Code"));
+
+        if (PurchaseHeader."Pay-to Vendor No." = '') and
+           (PurchaseHeader."Pay-to Vendor Templ. Code" = '')
+        then
+            Error(
+              MustSpecifyErr,
+              PurchaseHeader.FieldCaption("Pay-to Vendor No."),
+              PurchaseHeader.FieldCaption("Pay-to Vendor Templ. Code"));
     end;
 
     procedure IsProdOrder() Result: Boolean
