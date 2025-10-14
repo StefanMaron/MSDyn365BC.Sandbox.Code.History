@@ -78,8 +78,9 @@ codeunit 7010 "Purch. Price Calc. Mgt."
             PurchLine.Type::Item:
                 begin
                     Item.Get(PurchLine."No.");
-                    if not Vend.Get(PurchHeader."Pay-to Vendor No.") then
-                        Vend.Get(PurchLine."Pay-to Vendor No.");
+                    if (PurchHeader."Pay-to Vendor No." <> '') or (PurchHeader."Document Type" <> PurchHeader."Document Type"::Quote) then
+                        if not Vend.Get(PurchHeader."Pay-to Vendor No.") then
+                            Vend.Get(PurchLine."Pay-to Vendor No.");
                     PriceInSKU := SKU.Get(PurchLine."Location Code", PurchLine."No.", PurchLine."Variant Code");
                     PurchLinePriceExists(PurchHeader, PurchLine, false);
                     CalcBestDirectUnitCost(TempPurchPrice);
