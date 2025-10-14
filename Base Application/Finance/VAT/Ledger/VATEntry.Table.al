@@ -33,7 +33,7 @@ table 254 "VAT Entry"
     LookupPageID = "VAT Entries";
     Permissions = TableData "Sales Invoice Header" = rm,
                     TableData "Sales Cr.Memo Header" = rm,
-#if not CLEAN25
+#if not CLEAN28
                     TableData Microsoft.Service.History."Service Invoice Header" = rm,
                     TableData Microsoft.Service.History."Service Cr.Memo Header" = rm,
 #endif
@@ -486,18 +486,26 @@ table 254 "VAT Entry"
         }
         field(81; "Realized Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            Caption = 'Realized Amount';
             Editable = false;
         }
         field(82; "Realized Base"; Decimal)
         {
+            AutoFormatType = 1;
+            Caption = 'Realized Base';
             Editable = false;
         }
         field(83; "Add.-Curr. Realized Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            Caption = 'Add.-Curr. Realized Amount';
             Editable = false;
         }
         field(84; "Add.-Curr. Realized Base"; Decimal)
         {
+            AutoFormatType = 1;
+            Caption = 'Add.-Curr. Realized Base';
             Editable = false;
         }
         field(85; "G/L Acc. No."; Code[20])
