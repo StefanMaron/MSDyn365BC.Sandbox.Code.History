@@ -32,7 +32,7 @@ codeunit 22 "Item Jnl.-Post Line"
                   TableData "Item Register" = rimd,
                   TableData "Phys. Inventory Ledger Entry" = rimd,
                   TableData "Item Application Entry" = rimd,
-#if not CLEAN27
+#if not CLEAN28
                   TableData Microsoft.Manufacturing.Document."Prod. Order Capacity Need" = rimd,
 #endif
                   TableData "Stockkeeping Unit" = rimd,

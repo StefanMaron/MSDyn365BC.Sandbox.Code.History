@@ -35,7 +35,7 @@ table 254 "VAT Entry"
     LookupPageID = "VAT Entries";
     Permissions = TableData "Sales Invoice Header" = rm,
                     TableData "Sales Cr.Memo Header" = rm,
-#if not CLEAN25
+#if not CLEAN28
                     TableData Microsoft.Service.History."Service Invoice Header" = rm,
                     TableData Microsoft.Service.History."Service Cr.Memo Header" = rm,
 #endif

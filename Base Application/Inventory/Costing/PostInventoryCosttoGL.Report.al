@@ -24,7 +24,7 @@ report 1002 "Post Inventory Cost to G/L"
     Caption = 'Post Inventory Cost to G/L';
     Permissions = TableData "Item Ledger Entry" = r,
                   TableData "Invt. Posting Buffer" = r,
-#if not CLEAN26
+#if not CLEAN28
                   TableData Microsoft.Manufacturing.Document."Prod. Order Line" = r,
 #endif
                   TableData "Value Entry" = rm,
