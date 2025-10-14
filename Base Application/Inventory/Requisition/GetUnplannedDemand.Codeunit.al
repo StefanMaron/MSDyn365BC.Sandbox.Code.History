@@ -15,7 +15,7 @@ using System.Text;
 
 codeunit 5520 "Get Unplanned Demand"
 {
-#if not CLEAN27
+#if not CLEAN28
     Permissions = TableData Microsoft.Manufacturing.Document."Production Order" = r,
                   TableData Microsoft.Manufacturing.Document."Prod. Order Component" = r,
                   TableData Microsoft.Manufacturing.Document."Prod. Order Capacity Need" = r;
