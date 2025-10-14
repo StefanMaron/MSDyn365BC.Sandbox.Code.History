@@ -212,6 +212,11 @@ page 1386 "Vendor Templ. Card"
                     ToolTip = 'Specifies the vendor in connection with electronic document receiving.';
                     Visible = false;
                 }
+                field("Copy Buy-from Add. to Qte From"; Rec."Copy Buy-from Add. to Qte From")
+                {
+                    Visible = false;
+                    ApplicationArea = Basic, Suite;
+                }
                 field("Tax Liable"; Rec."Tax Liable")
                 {
                     ApplicationArea = SalesTax;
