@@ -404,6 +404,12 @@ table 1383 "Vendor Templ."
         {
             Caption = 'Validate EU VAT Reg. No.';
         }
+        field(7603; "Copy Buy-from Add. to Qte From"; Enum "Contact Type")
+        {
+            AccessByPermission = TableData Contact = R;
+            Caption = 'Copy Buy-from Addr. to Qte From';
+            ToolTip = 'Specifies which vendor address is inserted on purchase quotes that you create for the vendor.';
+        }
         field(8510; "Over-Receipt Code"; Code[20])
         {
             Caption = 'Over-Receipt Code';
