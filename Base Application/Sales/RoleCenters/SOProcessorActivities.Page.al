@@ -11,7 +11,9 @@ using Microsoft.Sales.Document;
 using System;
 using System.Environment;
 using System.Environment.Configuration;
+#if not CLEAN28
 using System.Feedback;
+#endif
 using System.Visualization;
 
 page 9060 "SO Processor Activities"
@@ -184,22 +186,16 @@ page 9060 "SO Processor Activities"
                     Visible = ShowDocumentsPendingDodExchService;
                 }
             }
+#if not CLEAN28
             usercontrol(SATAsyncLoader; SatisfactionSurveyAsync)
             {
                 ApplicationArea = Basic, Suite;
-                trigger ResponseReceived(Status: Integer; Response: Text)
-                var
-                    SatisfactionSurveyMgt: Codeunit "Satisfaction Survey Mgt.";
-                begin
-                    SatisfactionSurveyMgt.TryShowSurvey(Status, Response);
-                end;
-
-                trigger ControlAddInReady();
-                begin
-                    IsAddInReady := true;
-                    CheckIfSurveyEnabled();
-                end;
+                Visible = false;
+                ObsoleteReason = 'The Satisfaction Survey feature will be removed in a future release.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '28.0';
             }
+#endif
         }
     }
 
@@ -325,34 +321,10 @@ page 9060 "SO Processor Activities"
         CalcTaskId: Integer;
         SalesOrdersReservedFromStock: Integer;
         ShowDocumentsPendingDodExchService: Boolean;
-        IsAddInReady: Boolean;
-        IsPageReady: Boolean;
         AverageDaysDelayedStyle: Text;
         ReadyToShipStyle: Text;
         PartiallyShippedStyle: Text;
         DelayedOrdersStyle: Text;
-
-    trigger PageNotifier::PageReady()
-    begin
-        IsPageReady := true;
-        CheckIfSurveyEnabled();
-    end;
-
-    local procedure CheckIfSurveyEnabled()
-    var
-        SatisfactionSurveyMgt: Codeunit "Satisfaction Survey Mgt.";
-        CheckUrl: Text;
-    begin
-        if not IsAddInReady then
-            exit;
-        if not IsPageReady then
-            exit;
-        if not SatisfactionSurveyMgt.DeactivateSurvey() then
-            exit;
-        if not SatisfactionSurveyMgt.TryGetCheckUrl(CheckUrl) then
-            exit;
-        CurrPage.SATAsyncLoader.SendRequest(CheckUrl, SatisfactionSurveyMgt.GetRequestTimeoutAsync());
-    end;
 
     [IntegrationEvent(true, false)]
     procedure OnBeforeOnPageBackgroundTaskCompleted(TaskId: Integer; CalcTaskId: Integer; var Results: Dictionary of [Text, Text]; var IsHandled: Boolean)
