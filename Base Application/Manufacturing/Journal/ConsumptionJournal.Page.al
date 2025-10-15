@@ -27,6 +27,7 @@ page 99000846 "Consumption Journal"
     DataCaptionFields = "Journal Batch Name";
     DelayedInsert = true;
     PageType = Worksheet;
+    AboutTitle = 'About Consumption Journals';
     AboutText = 'Record and post the consumption of components for released production orders, updating inventory based on actual or calculated production output.';
     SaveValues = true;
     SourceTable = "Item Journal Line";
