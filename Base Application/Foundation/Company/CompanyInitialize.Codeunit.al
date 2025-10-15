@@ -62,7 +62,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
 using System.Globalization;
-using System.Feedback;
 using System.IO;
 using System.Upgrade;
 
@@ -99,7 +98,6 @@ codeunit 2 "Company-Initialize"
         TransformationRule: Record "Transformation Rule";
         WorkflowSetup: Codeunit "Workflow Setup";
         VATRegistrationLogMgt: Codeunit "VAT Registration Log Mgt.";
-        SatisfactionSurveyMgt: Codeunit "Satisfaction Survey Mgt.";
         UpgradeTag: Codeunit "Upgrade Tag";
         Window: Dialog;
     begin
@@ -120,7 +118,6 @@ codeunit 2 "Company-Initialize"
         TransformationRule.CreateDefaultTransformations();
         InitElectronicFormats();
         InitApplicationAreasForSaaS();
-        SatisfactionSurveyMgt.ResetCache();
         UpgradeTag.SetAllUpgradeTags();
 
         OnCompanyInitialize();
@@ -822,7 +819,7 @@ codeunit 2 "Company-Initialize"
     local procedure OnAfterInitBankExportImportSetup()
     begin
     end;
-    
+
     [IntegrationEvent(true, false)]
     local procedure OnBeforeSourceCodeSetupInsert(var SourceCodeSetup: Record "Source Code Setup")
     begin
