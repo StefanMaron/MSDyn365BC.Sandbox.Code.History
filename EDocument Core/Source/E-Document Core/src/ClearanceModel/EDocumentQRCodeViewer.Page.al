@@ -79,12 +79,11 @@ page 6169 "E-Document QR Code Viewer"
     begin
         Clear(QRCodePreviewTxt);
         Rec.CalcFields("QR Code Base64");
-        if Rec."QR Code Base64".HasValue then begin
-            Rec."QR Code Base64".CreateInStream(InStr, TextEncoding::UTF8);
-            InStr.ReadText(QRCodePreviewTxt);
-            if StrLen(QRCodePreviewTxt) > MaxStrLen(QRCodePreviewTxt) then
-                QRCodePreviewTxt := CopyStr(QRCodePreviewTxt, 1, MaxStrLen(QRCodePreviewTxt) - StrLen('...')) + '...';
-        end;
+        if not Rec."QR Code Base64".HasValue then
+            exit;
+
+        Rec."QR Code Base64".CreateInStream(InStr, TextEncoding::UTF8);
+        InStr.ReadText(QRCodePreviewTxt);
 
         SetQRCodeImageFromBase64();
     end;
