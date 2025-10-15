@@ -27,6 +27,7 @@ page 99000823 "Output Journal"
     DataCaptionFields = "Journal Batch Name";
     DelayedInsert = true;
     PageType = Worksheet;
+    AboutTitle = 'About Output Journals';
     AboutText = 'Record and post output quantities, run times, and completion status for production order operations, updating inventory and capacity ledgers as manufacturing progresses. Use functions to generate journal lines from production orders, mark operations as finished, and preview entries before posting.';
     SaveValues = true;
     SourceTable = "Item Journal Line";
