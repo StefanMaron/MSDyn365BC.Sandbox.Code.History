@@ -17,9 +17,6 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Reports;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Transfer;
-#if CLEAN25
-using Microsoft.Pricing.Worksheet;
-#endif
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
@@ -30,9 +27,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
-#if CLEAN25
-using Microsoft.Sales.Pricing;
-#endif
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Reports;
 using System.Automation;
@@ -683,7 +677,6 @@ page 9006 "Order Processor Role Center"
                     RunObject = Page "Sales Journal";
                     ToolTip = 'Open a sales journal where you can batch post sales transactions to G/L, bank, customer, vendor and fixed assets accounts.';
                 }
-#if not CLEAN25
                 action("Sales Price &Worksheet")
                 {
                     ApplicationArea = Basic, Suite;
@@ -692,25 +685,11 @@ page 9006 "Order Processor Role Center"
                     RunPageView = where("Object Type" = const(Page), "Object ID" = const(7023)); // "Sales Price Worksheet";
                     RunObject = Page "Role Center Page Dispatcher";
                     ToolTip = 'Manage sales prices for individual customers, for a group of customers, for all customers, or for a campaign.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                    ObsoleteTag = '19.0';
                 }
-#else
-                action("Price &Worksheet")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Price &Worksheet';
-                    Image = PriceWorksheet;
-                    RunObject = Page "Price Worksheet";
-                    ToolTip = 'Opens the page where you can add new price lines manually or copy them from the existing price lists or suggest new lines based on data in the product cards.';
-                }
-#endif
             }
             group(Action42)
             {
                 Caption = 'Sales';
-#if not CLEAN25
                 action("&Prices")
                 {
                     ApplicationArea = Basic, Suite;
@@ -719,9 +698,6 @@ page 9006 "Order Processor Role Center"
                     RunPageView = where("Object Type" = const(Page), "Object ID" = const(7002)); // "Sales Prices";
                     RunObject = Page "Role Center Page Dispatcher";
                     ToolTip = 'Set up different prices for items that you sell to the customer. An item price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the Sales Price Lists action.';
-                    ObsoleteTag = '19.0';
                 }
                 action("&Line Discounts")
                 {
@@ -731,20 +707,7 @@ page 9006 "Order Processor Role Center"
                     RunPageView = where("Object Type" = const(Page), "Object ID" = const(7004)); // "Sales Line Discounts";
                     RunObject = Page "Role Center Page Dispatcher";
                     ToolTip = 'Set up different discounts for items that you sell to the customer. An item discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced by the Sales Price Lists action.';
-                    ObsoleteTag = '19.0';
                 }
-#else
-                action("Price Lists")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = '&Prices';
-                    Image = SalesPrices;
-                    RunObject = Page "Sales Price Lists";
-                    ToolTip = 'View or set up sales price lists for products that you sell to the customer. A product price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
-                }
-#endif
                 action("Credit Management")
                 {
                     ApplicationArea = Basic, Suite;
