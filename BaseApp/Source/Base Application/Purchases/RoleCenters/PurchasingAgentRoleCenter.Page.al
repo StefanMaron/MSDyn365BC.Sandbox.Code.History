@@ -20,14 +20,9 @@ using Microsoft.Purchases.Analysis;
 using Microsoft.Purchases.Document;
 using Microsoft.Foundation.Task;
 using Microsoft.Purchases.History;
-#if CLEAN25
-using Microsoft.Purchases.Pricing;
-#endif
 using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Vendor;
-#if not CLEAN25
 using Microsoft.RoleCenters;
-#endif
 using Microsoft.Sales.Document;
 using System.Threading;
 
@@ -453,7 +448,6 @@ page 9007 "Purchasing Agent Role Center"
                                     Recurring = const(false));
                 ToolTip = 'Calculate a supply plan to fulfill item demand with purchases or transfers.';
             }
-#if not CLEAN25
             action("Pur&chase Prices")
             {
                 ApplicationArea = Basic, Suite;
@@ -462,9 +456,6 @@ page 9007 "Purchasing Agent Role Center"
                 RunPageView = where("Object Type" = const(Page), "Object ID" = const(7012)); // "Purchase Prices";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'View or set up different prices for items that you buy from the vendor. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                ObsoleteTag = '19.0';
             }
             action("Purchase &Line Discounts")
             {
@@ -474,20 +465,7 @@ page 9007 "Purchasing Agent Role Center"
                 RunPageView = where("Object Type" = const(Page), "Object ID" = const(7014)); // "Purchase Line Discounts";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'View or set up different discounts for items that you buy from the vendor. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
-                ObsoleteTag = '19.0';
             }
-#else
-            action("Purchase Price Lists")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = '&Prices';
-                Image = Price;
-                RunObject = Page "Purchase Price Lists";
-                ToolTip = 'View or set up price lists for products that you buy from the vendor. A product price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
-            }
-#endif
             separator(History)
             {
                 Caption = 'History';
