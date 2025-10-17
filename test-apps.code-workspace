@@ -140,8 +140,8 @@
     }
   ],
   "settings": {
-    "al.enableCodeAnalysis": false,
     "allint.enabled": false,
+    "al.enableCodeAnalysis": false,
     "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
