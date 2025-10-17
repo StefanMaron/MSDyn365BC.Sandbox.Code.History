@@ -9293,6 +9293,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Reservations Data Driven - NamedType ErrNothingToHandle)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1953108099 - NamedType 1612705530" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Dimension value should be match]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Revaluation - NamedType DimensionValueErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1953108099 - NamedType 1633568329" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Cost must be Equal]]></Val>

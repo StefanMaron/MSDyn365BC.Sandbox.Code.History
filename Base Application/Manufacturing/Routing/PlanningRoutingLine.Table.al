@@ -342,7 +342,7 @@ table 99000830 "Planning Routing Line"
         field(53; "Scrap Factor % (Accumulated)"; Decimal)
         {
             Caption = 'Scrap Factor % (Accumulated)';
-            DecimalPlaces = 1 : 1;
+            DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(55; "Sequence No. (Actual)"; Integer)
