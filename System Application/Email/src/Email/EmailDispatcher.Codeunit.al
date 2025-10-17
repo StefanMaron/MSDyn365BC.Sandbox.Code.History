@@ -171,7 +171,7 @@ codeunit 8888 "Email Dispatcher"
         TaskId := TaskScheduler.CreateTask(Codeunit::"Email Dispatcher", Codeunit::"Email Error Handler", true, CompanyName(), RescheduleTime, EmailOutbox.RecordId());
 
         EmailOutbox."Task Scheduler Id" := TaskId;
-        EmailOutbox."Date Sending" := CurrentDateTime() + Delay;
+        EmailOutbox."Date Sending" := RescheduleTime;
         EmailOutbox.Status := EmailOutbox.Status::Queued;
         EmailOutbox.Modify();
 
