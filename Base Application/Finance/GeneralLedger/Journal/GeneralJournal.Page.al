@@ -49,6 +49,8 @@ page 39 "General Journal"
     DataCaptionExpression = Rec.DataCaption();
     DelayedInsert = true;
     PageType = Worksheet;
+    AboutTitle = 'About General Journals';
+    AboutText = 'Post and manage financial transactions such as purchases, payments, accruals, and expense reimbursements across general ledger, bank, customer, vendor, and employee accounts, with flexible editing and document numbering until entries are finalized.';
     SaveValues = true;
     SourceTable = "Gen. Journal Line";
     UsageCategory = Tasks;
