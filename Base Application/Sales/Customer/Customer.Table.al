@@ -1061,7 +1061,7 @@ table 18 Customer
             trigger OnLookup()
             var
                 ReminderTermsRecord: Record "Reminder Terms";
-                ReminderTerms: Page "Reminder Terms";
+                ReminderTerms: Page "Reminder Terms List";
             begin
                 ReminderTerms.LookupMode(true);
                 if ReminderTerms.RunModal() <> ACTION::LookupOK then
