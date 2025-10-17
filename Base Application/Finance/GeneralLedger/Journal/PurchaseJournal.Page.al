@@ -37,6 +37,8 @@ page 254 "Purchase Journal"
     DataCaptionExpression = Rec.DataCaption();
     DelayedInsert = true;
     PageType = Worksheet;
+    AboutTitle = 'About Purchase Journals';
+    AboutText = 'Record and post purchase-related transactions such as invoices, payments, and credit memos, including amounts, accounts, VAT, and dimensions, to update vendor balances and the general ledger.';
     SaveValues = true;
     SourceTable = "Gen. Journal Line";
     UsageCategory = Tasks;
