@@ -1252,7 +1252,7 @@ codeunit 5407 "Prod. Order Status Management"
         OnAfterInitItemJnlLineFromProdOrderComp(ItemJnlLine, ProdOrder, ProdOrderLine, ProdOrderComp);
     end;
 
-    local procedure CheckBeforeFinishProdOrder(ProdOrder: Record "Production Order")
+    procedure CheckBeforeFinishProdOrder(ProdOrder: Record "Production Order")
     var
         ProdOrderLine: Record "Prod. Order Line";
         ProdOrderComp: Record "Prod. Order Component";
