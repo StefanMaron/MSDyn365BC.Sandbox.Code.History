@@ -479,10 +479,7 @@ page 5871 "Item Availability by BOM Level"
     end;
 
     var
-        SourceRecordVar: Variant;
         IsParentExpr: Boolean;
-        DemandDate: Date;
-        ShowTotalAvailability: Boolean;
         HasWarning: Boolean;
 #pragma warning disable AA0074
         Text000: Label 'Could not find items with BOM levels.';
@@ -491,9 +488,12 @@ page 5871 "Item Availability by BOM Level"
 
     protected var
         Item: Record Item;
+        SourceRecordVar: Variant;
         ItemFilter: Code[250];
         LocationFilter: Code[250];
         VariantFilter: Code[250];
+        DemandDate: Date;
+        ShowTotalAvailability: Boolean;
         IsCalculated: Boolean;
         ShowBy: Enum "BOM Structure Show By";
 

@@ -74,7 +74,7 @@ codeunit 1381 "Customer Templ. Mgt."
         OnAfterApplyCustomerTemplate(Customer, CustomerTempl);
     end;
 
-    local procedure ApplyTemplate(var Customer: Record Customer; CustomerTempl: Record "Customer Templ."; UpdateExistingValues: Boolean)
+    procedure ApplyTemplate(var Customer: Record Customer; CustomerTempl: Record "Customer Templ."; UpdateExistingValues: Boolean)
     var
         CustomerRecRef: RecordRef;
         EmptyCustomerRecRef: RecordRef;
