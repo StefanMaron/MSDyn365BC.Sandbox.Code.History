@@ -1025,6 +1025,14 @@ codeunit 131902 "Library - Service"
         SignServContractDoc.SignContract(ServiceContractHeader);
     end;
 
+    procedure SignContract(ServiceContractHeader: Record "Service Contract Header"; HideDialog: Boolean)
+    var
+        SignServContractDoc: Codeunit SignServContractDoc;
+    begin
+        SignServContractDoc.SetHideDialog(HideDialog);
+        SignServContractDoc.SignContract(ServiceContractHeader);
+    end;
+
     local procedure UpdatePaymentChannelContract(var ServiceContractHeader: Record "Service Contract Header")
     var
         RecRef: RecordRef;

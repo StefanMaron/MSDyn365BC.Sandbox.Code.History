@@ -154,6 +154,24 @@ codeunit 130509 "Library - Sales"
         OnAfterCreateCustomer(Customer);
     end;
 
+    procedure CreateCustomer(var Customer: Record Customer; ContactType: Enum "Contact Type")
+    var
+        PaymentMethod: Record "Payment Method";
+        GeneralPostingSetup: Record "General Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+    begin
+        LibraryERM.FindPaymentMethod(PaymentMethod);
+        LibraryERM.SetSearchGenPostingTypeSales();
+        LibraryERM.FindGeneralPostingSetupInvtFull(GeneralPostingSetup);
+        LibraryERM.FindVATPostingSetupInvt(VATPostingSetup);
+        LibraryUtility.UpdateSetupNoSeriesCode(
+          DATABASE::"Sales & Receivables Setup", SalesReceivablesSetup.FieldNo("Customer Nos."));
+
+        Clear(Customer);
+        Customer.Validate("Contact Type", ContactType);
+        Customer.Insert(true);
+    end;
+
     procedure CreateCustomerWithCountryCodeAndVATRegNo(var Customer: Record Customer)
     begin
         CreateCustomer(Customer);
