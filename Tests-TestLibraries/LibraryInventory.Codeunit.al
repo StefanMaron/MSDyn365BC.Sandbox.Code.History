@@ -732,7 +732,8 @@ codeunit 132201 "Library - Inventory"
         // The IF condition is important because it grants flexibility to the function.
         if UnitOfMeasureCode = '' then begin
             UnitOfMeasure.SetFilter(Code, '<>%1', UnitOfMeasureCode);
-            UnitOfMeasure.FindFirst();
+            if not UnitOfMeasure.FindFirst() then
+                CreateUnitOfMeasureCode(UnitOfMeasure);
             ItemUnitOfMeasure.Validate(Code, UnitOfMeasure.Code);
         end else
             ItemUnitOfMeasure.Validate(Code, UnitOfMeasureCode);
