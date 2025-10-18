@@ -3361,7 +3361,6 @@ table 5050 Contact
             "Search E-Mail" := "E-Mail";
     end;
 
-    [Scope('OnPrem')]
     procedure CreateEmployee() EmployeeNo: Code[20];
     var
         Employee: Record Employee;
@@ -3403,7 +3402,6 @@ table 5050 Contact
         OnAfterCreateEmployee(Employee, ContBusRel);
     end;
 
-    [Scope('OnPrem')]
     procedure CreateEmployeeLink()
     var
         ContBusRel: Record "Contact Business Relation";
