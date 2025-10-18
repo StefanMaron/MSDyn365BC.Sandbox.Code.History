@@ -5773,7 +5773,7 @@ table 37 "Sales Line"
         end;
     end;
 
-    local procedure CheckCustomerBaseCalendarCodeExist(): Boolean
+    procedure CheckCustomerBaseCalendarCodeExist(): Boolean
     var
         Customer: Record customer;
     begin
@@ -10998,7 +10998,7 @@ table 37 "Sales Line"
         OnAfterClearVATDifference(Rec);
     end;
 
-    internal procedure GetVATPct() VATPct: Decimal
+    procedure GetVATPct() VATPct: Decimal
     begin
         VATPct := "VAT %";
         OnAfterGetVATPct(Rec, VATPct);
