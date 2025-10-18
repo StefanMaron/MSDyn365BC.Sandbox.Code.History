@@ -155,6 +155,16 @@ codeunit 130509 "Library - Sales"
         OnAfterCreateCustomer(Customer);
     end;
 
+    procedure CreateCustomer(var Customer: Record Customer; ContactType: Enum "Contact Type")
+    begin
+        LibraryUtility.UpdateSetupNoSeriesCode(
+          DATABASE::"Sales & Receivables Setup", SalesReceivablesSetup.FieldNo("Customer Nos."));
+
+        Clear(Customer);
+        Customer.Validate("Contact Type", ContactType);
+        Customer.Insert(true);
+    end;
+
     procedure CreateCustomerWithCountryCodeAndVATRegNo(var Customer: Record Customer)
     begin
         CreateCustomer(Customer);
