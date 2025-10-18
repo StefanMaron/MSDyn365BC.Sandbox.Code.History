@@ -166,5 +166,16 @@ table 315 "Jobs Setup"
     begin
         exit(not FeatureKeyManagement.IsConcurrentJobPostingEnabled());
     end;
+
+    procedure GetRecordOnce()
+    begin
+        if RecordHasBeenRead then
+            exit;
+        Get();
+        RecordHasBeenRead := true;
+    end;
+
+    var
+        RecordHasBeenRead: Boolean;
 }
 
