@@ -34,25 +34,25 @@ codeunit 131009 "Library - Setup Storage"
     [Scope('OnPrem')]
     procedure SaveSalesSetup()
     begin
-        Save(DATABASE::"Sales & Receivables Setup");
+        Save(Database::"Sales & Receivables Setup");
     end;
 
     [Scope('OnPrem')]
     procedure SavePurchasesSetup()
     begin
-        Save(DATABASE::"Purchases & Payables Setup");
+        Save(Database::"Purchases & Payables Setup");
     end;
 
     [Scope('OnPrem')]
     procedure SaveGeneralLedgerSetup()
     begin
-        Save(DATABASE::"General Ledger Setup");
+        Save(Database::"General Ledger Setup");
     end;
 
     [Scope('OnPrem')]
     procedure SaveCompanyInformation()
     begin
-        Save(DATABASE::"Company Information");
+        Save(Database::"Company Information");
     end;
 
     [Scope('OnPrem')]
@@ -64,7 +64,13 @@ codeunit 131009 "Library - Setup Storage"
     [Scope('OnPrem')]
     procedure SaveInventorySetup()
     begin
-        Save(DATABASE::"Inventory Setup");
+        Save(Database::"Inventory Setup");
+    end;
+
+    [Scope('OnPrem')]
+    procedure SaveServiceMgtSetup()
+    begin
+        Save(Database::"Service Mgt. Setup");
     end;
 
     [Scope('OnPrem')]
