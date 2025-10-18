@@ -1343,6 +1343,8 @@
         WarehouseSetup.Validate("Whse. Put-away Nos.", LibraryUtility.GetGlobalNoSeriesCode());
         WarehouseSetup.Validate("Whse. Receipt Nos.", LibraryUtility.GetGlobalNoSeriesCode());
         WarehouseSetup.Validate("Whse. Ship Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+        WarehouseSetup.Validate("Whse. Internal Pick Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+        WarehouseSetup.Validate("Whse. Internal Put-away Nos.", LibraryUtility.GetGlobalNoSeriesCode());
         WarehouseSetup.Modify(true);
     end;
 
