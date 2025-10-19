@@ -35,6 +35,8 @@ page 89 "Job List"
     CardPageID = "Job Card";
     Editable = false;
     PageType = List;
+    AboutTitle = 'About Projects';
+    AboutText = 'Manage and track projects by organizing tasks, assigning responsibilities, setting billing methods for one or multiple customers, and monitoring project status and invoicing details.';
     QueryCategory = 'Job List';
     SourceTable = Job;
     UsageCategory = Lists;
