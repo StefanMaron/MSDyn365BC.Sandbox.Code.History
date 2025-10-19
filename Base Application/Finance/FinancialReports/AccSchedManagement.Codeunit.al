@@ -2523,7 +2523,7 @@ codeunit 8 AccSchedManagement
             ColumnLayout."Include Date In Header"::Weekday:
                 DateText := Format(ToDate, 0, '<Weekday Text>');
             ColumnLayout."Include Date In Header"::Week:
-                DateText := StrSubstNo(WeekTxt, Format(ToDate, 0, '<Week Year>'));
+                DateText := StrSubstNo(WeekTxt, Format(ToDate, 0, '<Week>'));
             ColumnLayout."Include Date In Header"::Month:
                 DateText := Format(ToDate, 0, '<Month Text>');
             ColumnLayout."Include Date In Header"::MonthAndYear:
