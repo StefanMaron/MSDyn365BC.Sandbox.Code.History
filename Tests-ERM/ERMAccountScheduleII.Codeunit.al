@@ -2365,6 +2365,71 @@
         LibraryReportValidation.VerifyCellValue(11, 1, '');
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    procedure ChangeDateFilterWithDynamicColumnHeading()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        FinancialReport: Record "Financial Report";
+        ColumnLayoutName: Record "Column Layout Name";
+        ColumnLayout: array[3] of Record "Column Layout";
+        FilterDateFormula: array[2] of DateFormula;
+        AccScheduleOverview: TestPage "Acc. Schedule Overview";
+        FinancialReports: TestPage "Financial Reports";
+        FilterDate: array[4] of Date;
+    begin
+        // [SCENARIO] Changing the period on financial report should update the dynamic column headings
+        Initialize();
+
+        FilterDate[1] := 20251101D;
+        FilterDate[2] := 20251130D;
+        FilterDate[3] := 20251201D;
+        FilterDate[4] := 20251231D;
+        Evaluate(FilterDateFormula[1], '<1M>');
+        Evaluate(FilterDateFormula[2], '<2M>');
+
+        // [GIVEN] Financial report with 3 columns, current, next month, and month after next
+        LibraryERM.CreateColumnLayoutName(ColumnLayoutName);
+        LibraryERM.CreateColumnLayout(ColumnLayout[1], ColumnLayoutName.Name);
+        ColumnLayout[1]."Include Date In Header" := ColumnLayout[1]."Include Date In Header"::Month;
+        ColumnLayout[1].Modify();
+        LibraryERM.CreateColumnLayout(ColumnLayout[2], ColumnLayoutName.Name);
+        ColumnLayout[2]."Include Date In Header" := ColumnLayout[2]."Include Date In Header"::Month;
+        ColumnLayout[2]."Comparison Date Formula" := FilterDateFormula[1];
+        ColumnLayout[2].Modify();
+        LibraryERM.CreateColumnLayout(ColumnLayout[3], ColumnLayoutName.Name);
+        ColumnLayout[3]."Include Date In Header" := ColumnLayout[3]."Include Date In Header"::Month;
+        ColumnLayout[3]."Comparison Date Formula" := FilterDateFormula[2];
+        ColumnLayout[3].Modify();
+
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        FinancialReport.Get(AccScheduleName.Name);
+        FinancialReport.Validate("Financial Report Column Group", ColumnLayoutName.Name);
+        FinancialReport.Modify();
+
+        FinancialReports.OpenEdit();
+        FinancialReports.Filter.SetFilter(Name, AccScheduleName.Name);
+        AccScheduleOverview.Trap();
+        FinancialReports.Overview.Invoke();
+
+        // [WHEN] Period type is set to month and filtered to the first period
+        AccScheduleOverview.PeriodTypeDefault.SetValue(Enum::"Financial Report Period Type"::Month);
+        AccScheduleOverview.DateFilter.SetValue(StrSubstNo('%1..%2', Format(FilterDate[1], 0, 9), Format(FilterDate[2], 0, 9)));
+
+        // [THEN] Column headings should show current month, +1 month, and +2 month
+        Assert.AreEqual(Format(FilterDate[2], 0, '<Month Text>'), AccScheduleOverview.ColumnValues1.Caption, 'Heading for current period is incorrect.');
+        Assert.AreEqual(Format(CalcDate(FilterDateFormula[1], FilterDate[2]), 0, '<Month Text>'), AccScheduleOverview.ColumnValues2.Caption, 'Heading for 1M comparison period is incorrect.');
+        Assert.AreEqual(Format(CalcDate(FilterDateFormula[2], FilterDate[2]), 0, '<Month Text>'), AccScheduleOverview.ColumnValues3.Caption, 'Heading for 2M comparison period is incorrect.');
+
+        // [WHEN] Next Period is selected
+        AccScheduleOverview.NextPeriod.Invoke();
+
+        // [THEN] Column headings should update to show the +1 month, +2 month, and +3 month
+        Assert.AreEqual(Format(FilterDate[4], 0, '<Month Text>'), AccScheduleOverview.ColumnValues1.Caption, 'Heading for current period is incorrect after Next Period.');
+        Assert.AreEqual(Format(CalcDate(FilterDateFormula[1], FilterDate[4]), 0, '<Month Text>'), AccScheduleOverview.ColumnValues2.Caption, 'Heading for 1M comparison period is incorrect after Next Period.');
+        Assert.AreEqual(Format(CalcDate(FilterDateFormula[2], FilterDate[4]), 0, '<Month Text>'), AccScheduleOverview.ColumnValues3.Caption, 'Heading for 2M comparison period is incorrect after Next Period.');
+    end;
+
     local procedure Initialize()
     var
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
