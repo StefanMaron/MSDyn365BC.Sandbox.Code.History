@@ -147,6 +147,9 @@
       "path": "./System Application/Email/src/Test Email"
     },
     {
+      "path": "./Base Application/System/DevTools/CALTest"
+    },
+    {
       "path": "./Test Runner/src/DataDrivenTest"
     },
     {
