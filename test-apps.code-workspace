@@ -142,6 +142,9 @@
       "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
+      "path": "./Base Application/System/DevTools/CALTest"
+    },
+    {
       "path": "./Test Runner/src/DataDrivenTest"
     },
     {
