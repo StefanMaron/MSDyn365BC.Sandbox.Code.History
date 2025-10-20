@@ -235,7 +235,7 @@
       "path": "./Onprem Permissions/Test/OnPrem Permissions Tests"
     },
     {
-      "path": "./DataSearch/test/Data Search Tests"
+      "path": "./Email - SMTP API/Test Library/Email - SMTP API Test Library"
     },
     {
       "path": "./Email - Current User Connector/Test/Email - Current User Connector Tests"
