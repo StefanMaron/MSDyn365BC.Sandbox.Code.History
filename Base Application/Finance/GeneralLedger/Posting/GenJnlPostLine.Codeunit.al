@@ -4660,7 +4660,10 @@ codeunit 12 "Gen. Jnl.-Post Line"
             GenJnlLine."Posting Group" := Empl."Employee Posting Group";
         end;
         EmplPostingGr.Get(GenJnlLine."Posting Group");
-        EmplPostingGr.GetPayablesAccount();
+        IsHandled := false;
+        OnBeforeGetEmployeePayablesAccount(GenJnlLine, EmplPostingGr, EmplPostingGr."Payables Account", IsHandled);
+        if not IsHandled then
+            EmplPostingGr.GetPayablesAccount();
 
         DtldEmplLedgEntry.LockTable();
         EmplLedgEntry.LockTable();
@@ -5054,7 +5057,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         AccNo: Code[20];
     begin
         if MultiplePostingGroups and (DetailedCVLedgEntryBuffer."Entry Type" = DetailedCVLedgEntryBuffer."Entry Type"::Application) then
-            AccNo := GetEmplDtldCVLedgEntryBufferAccNo(DetailedCVLedgEntryBuffer)
+            AccNo := GetEmplDtldCVLedgEntryBufferAccNo(GenJournalLine, DetailedCVLedgEntryBuffer)
         else
             AccNo := GetDtldEmplLedgEntryAccNo(GenJournalLine, DetailedCVLedgEntryBuffer, EmplPostingGr, 0, false);
         PostDtldCVLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, AccNo, AdjAmount, false);
@@ -5071,7 +5074,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
             exit;
 
         if MultiplePostingGroups and (DetailedCVLedgEntryBuffer."Entry Type" = DetailedCVLedgEntryBuffer."Entry Type"::Application) then
-            AccNo := GetEmplDtldCVLedgEntryBufferAccNo(DetailedCVLedgEntryBuffer)
+            AccNo := GetEmplDtldCVLedgEntryBufferAccNo(GenJournalLine, DetailedCVLedgEntryBuffer)
         else
             AccNo := GetDtldEmplLedgEntryAccNo(GenJournalLine, DetailedCVLedgEntryBuffer, EmplPostingGr, OriginalTransactionNo, true);
         DetailedCVLedgEntryBuffer."Gen. Posting Type" := DetailedCVLedgEntryBuffer."Gen. Posting Type"::Purchase;
@@ -5133,14 +5136,14 @@ codeunit 12 "Gen. Jnl.-Post Line"
         exit(GetVendorPayablesAccount(GenJournalLine, VendorPostingGroup));
     end;
 
-    local procedure GetEmplDtldCVLedgEntryBufferAccNo(var DetailedCVLedgEntryBuffer: Record "Detailed CV Ledg. Entry Buffer"): Code[20]
+    local procedure GetEmplDtldCVLedgEntryBufferAccNo(var GenJournalLine: Record "Gen. Journal Line"; var DetailedCVLedgEntryBuffer: Record "Detailed CV Ledg. Entry Buffer"): Code[20]
     var
         EmployeeLedgerEntry: Record "Employee Ledger Entry";
         EmployeePostingGroup: Record "Employee Posting Group";
     begin
         EmployeeLedgerEntry.Get(DetailedCVLedgEntryBuffer."CV Ledger Entry No.");
         EmployeePostingGroup.Get(EmployeeLedgerEntry."Employee Posting Group");
-        exit(EmployeePostingGroup.GetPayablesAccount());
+        exit(GetEmployeePayablesAccount(GenJournalLine, EmployeePostingGroup));
     end;
 
     /// <summary>
@@ -5200,7 +5203,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         OnPostDtldEmplLedgEntriesOnBeforeCreateGLEntriesForTotalAmounts(EmplPostingGr, DtldCVLedgEntryBuf, GenJnlLine, TempDimPostingBuffer, AdjAmount, SaveEntryNo, LedgEntryInserted, IsHandled);
         if not IsHandled then
             CreateGLEntriesForTotalAmounts(
-              GenJnlLine, TempDimPostingBuffer, AdjAmount, SaveEntryNo, EmplPostingGr.GetPayablesAccount(), LedgEntryInserted);
+              GenJnlLine, TempDimPostingBuffer, AdjAmount, SaveEntryNo, GetEmployeePayablesAccount(GenJnlLine, EmplPostingGr), LedgEntryInserted);
 
         OnPostDtldEmplLedgEntriesOnAfterCreateGLEntriesForTotalAmounts(TempGLEntryBuf, GlobalGLEntry, NextTransactionNo);
 
@@ -5266,8 +5269,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
                             GenJournalLine."Account Type"::Employee:
                                 begin
                                     EmployeePostingGroup.Get(GenJournalLine."Posting Group");
-                                    AccNo2 := GetEmplDtldCVLedgEntryBufferAccNo(DetailedCVLedgEntryBuffer);
-                                    AccNo3 := EmployeePostingGroup.GetPayablesAccount();
+                                    AccNo2 := GetEmplDtldCVLedgEntryBufferAccNo(GenJournalLine, DetailedCVLedgEntryBuffer);
+                                    AccNo3 := GetEmployeePayablesAccount(GenJournalLine, EmployeePostingGroup);
                                 end;
                         end;
                         CreateGLEntryGainLoss(GenJournalLine, AccNo2, DetailedCVLedgEntryBuffer."Amount (LCY)", DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode);
@@ -6229,7 +6232,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         IsHandled := false;
         OnBeforeCreateGLEntriesForTotalAmountsUnapplyEmployee(DetailedEmployeeLedgerEntry, EmployeePostingGroup, GenJournalLineToPost, TempDimensionPostingBuffer, IsHandled);
         if not IsHandled then
-            CreateGLEntriesForTotalAmountsUnapply(GenJournalLineToPost, TempDimensionPostingBuffer, EmployeePostingGroup.GetPayablesAccount());
+            CreateGLEntriesForTotalAmountsUnapply(GenJournalLineToPost, TempDimensionPostingBuffer, GetEmployeePayablesAccount(GenJournalLineToPost, EmployeePostingGroup));
 
         if IsTempGLEntryBufEmpty() then
             DetailedEmployeeLedgerEntry.SetZeroTransNo(NextTransactionNo);
@@ -8340,6 +8343,12 @@ codeunit 12 "Gen. Jnl.-Post Line"
         OnAfterGetVendorPayablesAccount(GenJournalLine, VendorPostingGroup, PayablesAccount);
     end;
 
+    local procedure GetEmployeePayablesAccount(GenJournalLine: Record "Gen. Journal Line"; EmployeePostingGroup: Record "Employee Posting Group") PayablesAccount: Code[20]
+    begin
+        PayablesAccount := EmployeePostingGroup.GetPayablesAccount();
+        OnAfterGetEmployeePayablesAccount(GenJournalLine, EmployeePostingGroup, PayablesAccount);
+    end;
+
     /// <summary>
     /// Sets the new value for global variable FADimAlreadyChecked.
     /// </summary>
@@ -9995,6 +10004,11 @@ codeunit 12 "Gen. Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetEmployeePayablesAccount(GenJournalLine: Record "Gen. Journal Line"; EmployeePostingGroup: Record "Employee Posting Group"; var PayablesAccount: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnVendPostApplyVendLedgEntryOnBeforeFinishPosting(var GenJournalLine: Record "Gen. Journal Line"; VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
@@ -10096,6 +10110,11 @@ codeunit 12 "Gen. Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetVendorPayablesAccount(GenJournalLine: Record "Gen. Journal Line"; VendorPostingGroup: Record "Vendor Posting Group"; var PayablesAccount: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetEmployeePayablesAccount(GenJournalLine: Record "Gen. Journal Line"; EmployeePostingGroup: Record "Employee Posting Group"; var PayablesAccount: Code[20])
     begin
     end;
 
