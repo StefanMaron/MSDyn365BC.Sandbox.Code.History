@@ -161,7 +161,7 @@ codeunit 1751 "Data Classification Eval. Data"
 
         if Field.FindSet() then
             repeat
-                DataSensitivity."Company Name" := CompanyName;
+                DataSensitivity."Company Name" := CopyStr(CompanyName, 1, MaxStrLen(DataSensitivity."Company Name"));
                 DataSensitivity."Table No" := Field.TableNo;
                 DataSensitivity."Field No" := Field."No.";
                 DataSensitivity."Data Sensitivity" := DataSensitivity."Data Sensitivity"::Unclassified;
@@ -382,6 +382,7 @@ codeunit 1751 "Data Classification Eval. Data"
         ClassifyAllocationAccounts();
         ClassifyAgents();
         ClassifyOrderTakerAgent();
+        ClassifyExpenseAgent();
         ClasifyScheduledPerformanceProfiling();
     end;
 
@@ -3784,6 +3785,38 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToPersonal(4592, 10); // Sender Name
     end;
 
+    local procedure ClassifyExpenseAgent()
+    begin
+        SetTableFieldsToNormal(6900); // Expense
+        SetTableFieldsToNormal(6901); // ExpenseCommentLine
+        SetTableFieldsToNormal(6902); // ExpenseItemization
+        SetTableFieldsToNormal(6903); // ExpenseItemizationLine
+        SetTableFieldsToNormal(6904); // ExpenseParticipant
+        SetTableFieldsToNormal(6905); // ExpensePerDiem
+        SetTableFieldsToNormal(6906); // ExpenseReportHeader
+        SetTableFieldsToNormal(6907); // ExpenseReportLine
+        SetTableFieldsToNormal(6908); // ExpenseReportLineParticip
+        SetTableFieldsToNormal(6909); // ExpenseReportLinePerDiem
+        SetTableFieldsToNormal(6910); // ExpReportItemizationLine
+        SetTableFieldsToNormal(6911); // ExpReportLineItemization
+        SetTableFieldsToNormal(6915); // PostedExpenseReportHeader
+        SetTableFieldsToNormal(6916); // PostedExpenseReportLine
+        SetTableFieldsToNormal(6917); // PostedExpReportLinePcpt
+        SetTableFieldsToNormal(6918); // PstdExpRepItemLine
+        SetTableFieldsToNormal(6919); // PstdExpRepLineItem
+        SetTableFieldsToNormal(6920); // PstdExpRepLinePerDiem
+        SetTableFieldsToNormal(6921); // ExpenseCategory
+        SetTableFieldsToNormal(6922); // ExpenseCreditCardFeed
+        SetTableFieldsToNormal(6923); // ExpenseEmployee
+        SetTableFieldsToNormal(6924); // ExpenseGroup
+        SetTableFieldsToNormal(6925); // ExpenseLocation
+        SetTableFieldsToNormal(6926); // ExpensePolicyCondition
+        SetTableFieldsToNormal(6927); // ExpensePolicyHeader
+        SetTableFieldsToNormal(6928); // ExpensePostingGroup
+        SetTableFieldsToNormal(6929); // ExpenseSubcategory
+        SetTableFieldsToNormal(6930); // ExpenseAgentSetup
+    end;
+
     local procedure ClassifyAgents()
     var
         DummyAgent: Record "Agent";
@@ -3909,9 +3942,9 @@ codeunit 1751 "Data Classification Eval. Data"
 
     local procedure ClasifyScheduledPerformanceProfiling()
     var
-        TableNo: Integer;
         PerformanceProfileScheduler: Record "Performance Profile Scheduler";
         PerformanceProfiles: Record "Performance Profiles";
+        TableNo: Integer;
     begin
         TableNo := DATABASE::"Performance Profile Scheduler";
         SetTableFieldsToNormal(TableNo);
