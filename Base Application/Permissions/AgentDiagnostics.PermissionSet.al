@@ -10,5 +10,4 @@ permissionset 4306 "Agent - Diagnostics"
     Assignable = true;
     Caption = 'Agent Diagnostics';
     IncludedPermissionSets = "D365 Agent";
-    Permissions = system "Troubleshoot All Agents" = X;
 }
