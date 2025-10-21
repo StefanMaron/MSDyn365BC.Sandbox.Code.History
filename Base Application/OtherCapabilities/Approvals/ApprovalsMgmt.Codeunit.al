@@ -1356,6 +1356,8 @@ codeunit 1535 "Approvals Mgmt."
                 IsSufficient := IsSufficientSalesApprover(UserSetup, ApprovalEntryArgument."Document Type", ApprovalEntryArgument."Amount (LCY)");
             DATABASE::"Gen. Journal Line":
                 IsSufficient := IsSufficientGenJournalLineApprover(UserSetup, ApprovalEntryArgument);
+            else
+                OnSufficientApproverElseCase(UserSetup, ApprovalEntryArgument, IsSufficient);
         end;
 
         IsHandled := false;
@@ -3190,6 +3192,11 @@ codeunit 1535 "Approvals Mgmt."
 
     [IntegrationEvent(false, false)]
     local procedure OnFindOpenApprovalEntriesForWorkflowStepInstanceOnAfterSetApprovalEntry2Filters(var ApprovalEntry2: Record "Approval Entry"; ApprovalEntry: Record "Approval Entry"; WorkflowStepInstanceRecID: RecordId)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSufficientApproverElseCase(UserSetup: Record "User Setup"; ApprovalEntryArgument: Record "Approval Entry"; var IsSufficient: Boolean)
     begin
     end;
 }
