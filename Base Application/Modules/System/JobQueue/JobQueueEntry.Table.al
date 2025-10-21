@@ -527,33 +527,26 @@ table 472 "Job Queue Entry"
     procedure RefreshLocked()
     begin
         SetLoadFields();
-        if not Rec.GetRecLockedExtendedTimeout() then begin
-            Rec.ReadIsolation(IsolationLevel::UpdLock);
-            Rec.Get(ID);  // one last try, and then throw the lock timeout error
-        end;
+        Rec.GetRecLockedExtendedTimeout();
     end;
 
     /// <summary>
-    /// Allow up to three lock time-outs = 90 seconds, in order to reduce lock timeouts
+    /// Allow up to 10 minutes of lock, in order to reduce lock timeouts
     ///</summary>    
     procedure GetRecLockedExtendedTimeout(): Boolean
     var
-        i: Integer;
+        Found: Boolean;
+        PrevLockTimeout: Integer;
     begin
         Rec.ReadIsolation(IsolationLevel::ReadUncommitted);
         if not Rec.Find() then
             exit(false);
         Rec.ReadIsolation(IsolationLevel::UpdLock);
-        for i := 1 to 3 do
-            if TryGetRecordLocked(Rec) then
-                exit(true);
-        exit(false);
-    end;
-
-    [TryFunction]
-    local procedure TryGetRecordLocked(var JobQueueEntry: Record "Job Queue Entry")
-    begin
-        JobQueueEntry.Find();
+        PrevLockTimeout := LockTimeoutDuration();
+        LockTimeoutDuration(600); // 10min.
+        Found := Rec.Find();
+        LockTimeoutDuration(PrevLockTimeout);
+        exit(Found);
     end;
 
     procedure IsExpired(AtDateTime: DateTime): Boolean
