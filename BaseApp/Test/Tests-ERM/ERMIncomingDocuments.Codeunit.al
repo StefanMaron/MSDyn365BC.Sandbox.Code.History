@@ -19,8 +19,9 @@ codeunit 134400 "ERM Incoming Documents"
         LibraryRandom: Codeunit "Library - Random";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryInventory: Codeunit "Library - Inventory";
-        OnlyOneDefaultAttachmentErr: Label 'There can only be one default attachment.';
-        MainAttachErr: Label 'There can only be one main attachment.';
+        CannotDeleteDefaultAttachmentErr: Label 'You cannot delete the default attachment.';
+        DeleteOtherAttachmentsFirstErr: Label 'You must delete all other attachments before you can delete attachment marked as Default.';
+        MainAttachErr: Label 'You must delete all other attachments before you can delete attachment marked as Main Attachment.';
         ReplaceMainAttachmentQst: Label 'Are you sure you want to replace the attached file?';
         DoYouWantToRemoveReferenceQst: Label 'Do you want to remove the reference?';
         DetachQst: Label 'Do you want to remove the reference from this incoming document to posted document %1, posting date %2?', Comment = '%1 Posted Document No. %2 Posting Date';
@@ -1482,11 +1483,11 @@ codeunit 134400 "ERM Incoming Documents"
 
         // Verify
         asserterror IncomingDocumentAttachment.Delete(true);
-        Assert.ExpectedError(OnlyOneDefaultAttachmentErr);
+        Assert.ExpectedError(DeleteOtherAttachmentsFirstErr);
 
         // Verify - 2
         asserterror IncomingDocumentAttachment.DeleteAttachment();
-        Assert.ExpectedError(OnlyOneDefaultAttachmentErr);
+        Assert.ExpectedError(CannotDeleteDefaultAttachmentErr);
     end;
 
     [Test]

@@ -3758,6 +3758,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM G/L Currency Revaluation - NamedType PostingDateErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3882817668 - NamedType 4078016097" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You cannot delete the default attachment.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Incoming Documents - NamedType CannotDeleteDefaultAttachmentErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3882817668 - NamedType 884905726" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Cannot replace the main attachment because the document has already been sent to OCR.]]></Val>
@@ -3765,6 +3774,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Incoming Documents - NamedType CannotReplaceMainAttachmentErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3882817668 - NamedType 3287428116" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You must delete all other attachments before you can delete attachment marked as Default.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Incoming Documents - NamedType DeleteOtherAttachmentsFirstErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3882817668 - NamedType 969114126" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -3823,20 +3841,11 @@
   </Item>
   <Item ItemId=";Codeunit 3882817668 - NamedType 1541803775" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[There can only be one main attachment.]]></Val>
+      <Val><![CDATA[You must delete all other attachments before you can delete attachment marked as Main Attachment.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Incoming Documents - NamedType MainAttachErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3882817668 - NamedType 2167377889" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[There can only be one default attachment.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Incoming Documents - NamedType OnlyOneDefaultAttachmentErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3882817668 - NamedType 538095048" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
