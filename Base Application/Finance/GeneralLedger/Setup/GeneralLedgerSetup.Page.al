@@ -449,6 +449,7 @@ page 118 "General Ledger Setup"
                 group("Financial Reports")
                 {
                     Caption = 'Financial Reports';
+
                     field("Acc. Sched. for Balance Sheet"; Rec."Fin. Rep. for Balance Sheet")
                     {
                         ApplicationArea = Basic, Suite;
@@ -468,6 +469,36 @@ page 118 "General Ledger Setup"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Retained Earnings Report';
+                    }
+                    field("Fin. Rep. Bal. Sheet Row"; Rec."Fin. Rep. Bal. Sheet Row")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Row Definition for Balance Sheet';
+                    }
+                    field("Fin. Rep. Income Stmt. Row"; Rec."Fin. Rep. Income Stmt. Row")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Row Definition for Income Statement';
+                    }
+                    field("Fin. Rep. Cash Flow Stmt. Row"; Rec."Fin. Rep. Cash Flow Stmt. Row")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Row Definition for Cash Flow Statement';
+                    }
+                    field("Fin. Rep. Retained Earn. Row"; Rec."Fin. Rep. Retained Earn. Row")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Row Definition for Retained Earnings';
+                    }
+                    field("Fin. Rep. Bal. Sheet Column"; Rec."Fin. Rep. Bal. Sheet Column")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Column Definition for Balance Sheet';
+                    }
+                    field("Fin. Rep. Net Change Column"; Rec."Fin. Rep. Net Change Column")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Column Definition for Net Change';
                     }
                     field("Fin. Rep. Period Type"; Rec."Fin. Rep. Period Type")
                     {
