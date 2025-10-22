@@ -360,7 +360,7 @@ page 9022 "Business Manager Role Center"
 #if not CLEAN26
                 group(Legacy)
                 {
-                    Caption = 'Legacy reports (will be removed)';
+                    Caption = 'Legacy';
                     Image = Excel;
                     ObsoleteReason = 'These reports have been deprecated and will be removed in a future release.';
                     ObsoleteState = Pending;
@@ -372,7 +372,7 @@ page 9022 "Business Manager Role Center"
                         Caption = 'Balance Sheet';
                         Image = "Report";
                         RunObject = Codeunit "Run Template Balance Sheet";
-                        ToolTip = 'Open a spreadsheet that shows your company''s assets, liabilities, and equity. This report is deprecated and will be removed in a future release.';
+                        ToolTip = 'Open a spreadsheet that shows your company''s assets, liabilities, and equity.';
                         ObsoleteReason = 'This report is deprecated and will be removed in a future release.';
                         ObsoleteState = Pending;
                         ObsoleteTag = '26.0';
@@ -383,7 +383,7 @@ page 9022 "Business Manager Role Center"
                         Caption = 'Income Statement';
                         Image = "Report";
                         RunObject = Codeunit "Run Template Income Stmt.";
-                        ToolTip = 'Open a spreadsheet that shows your company''s income and expenses. This report is deprecated and will be removed in a future release.';
+                        ToolTip = 'Open a spreadsheet that shows your company''s income and expenses.';
                         ObsoleteReason = 'This report is deprecated and will be removed in a future release.';
                         ObsoleteState = Pending;
                         ObsoleteTag = '26.0';
@@ -394,7 +394,7 @@ page 9022 "Business Manager Role Center"
                         Caption = 'Cash Flow Statement';
                         Image = "Report";
                         RunObject = Codeunit "Run Template CashFlow Stmt.";
-                        ToolTip = 'Open a spreadsheet that shows how changes in balance sheet accounts and income affect the company''s cash holdings. This report is deprecated and will be removed in a future release.';
+                        ToolTip = 'Open a spreadsheet that shows how changes in balance sheet accounts and income affect the company''s cash holdings.';
                         ObsoleteReason = 'This report is deprecated and will be removed in a future release.';
                         ObsoleteState = Pending;
                         ObsoleteTag = '26.0';
@@ -405,7 +405,7 @@ page 9022 "Business Manager Role Center"
                         Caption = 'Retained Earnings Statement';
                         Image = "Report";
                         RunObject = Codeunit "Run Template Retained Earn.";
-                        ToolTip = 'Open a spreadsheet that shows your company''s changes in retained earnings based on net income from the other financial statements. This report is deprecated and will be removed in a future release.';
+                        ToolTip = 'Open a spreadsheet that shows your company''s changes in retained earnings based on net income from the other financial statements.';
                         ObsoleteReason = 'This report is deprecated and will be removed in a future release.';
                         ObsoleteState = Pending;
                         ObsoleteTag = '26.0';
@@ -417,7 +417,7 @@ page 9022 "Business Manager Role Center"
                         Caption = 'Trial Balance';
                         Image = "Report";
                         RunObject = Codeunit "Run Template Trial Balance";
-                        ToolTip = 'Open a spreadsheet that shows a summary trial balance by account. This report is deprecated and will be removed in a future release.';
+                        ToolTip = 'Open a spreadsheet that shows a summary trial balance by account.';
 #pragma warning disable AS0072
                         ObsoleteReason = 'Functionality replaced by "EXR Trial Balance Excel". Extend this report object with Excel layout instead.';
                         ObsoleteState = Pending;
@@ -430,7 +430,7 @@ page 9022 "Business Manager Role Center"
                         Caption = 'Aged Accounts Payable';
                         Image = "Report";
                         RunObject = Codeunit "Run Template Aged Acc. Pay.";
-                        ToolTip = 'Open a spreadsheet that shows a list of aged remaining balances for each vendor by period. This report is deprecated and will be removed in a future release.';
+                        ToolTip = 'Open a spreadsheet that shows a list of aged remaining balances for each vendor by period.';
 #pragma warning disable AS0072
                         ObsoleteReason = 'Functionality replaced by "EXR Aged Acc Payable Excel". Extend this report object with Excel layout instead.';
                         ObsoleteState = Pending;
@@ -443,7 +443,7 @@ page 9022 "Business Manager Role Center"
                         Caption = 'Aged Accounts Receivable';
                         Image = "Report";
                         RunObject = Codeunit "Run Template Aged Acc. Rec.";
-                        ToolTip = 'Open a spreadsheet that shows when customer payments are due or overdue by period. This report is deprecated and will be removed in a future release.';
+                        ToolTip = 'Open a spreadsheet that shows when customer payments are due or overdue by period.';
 #pragma warning disable AS0072
                         ObsoleteReason = 'Functionality replaced by "EXR Aged Accounts Rec Excel". Extend this report object with Excel layout instead.';
                         ObsoleteState = Pending;
