@@ -423,7 +423,8 @@ report 90 "Import Consolidation from DB"
         SkipDateConfirm := true;
         SkipRunningTrialBalanceAfter := true;
         OnlyImportData := true;
-        ColumnDim := DimSelectionBuf.GetDimSelectionText(3, REPORT::"Import Consolidation from DB", '');
+        if ColumnDim = '' then
+            ColumnDim := DimSelectionBuf.GetDimSelectionText(3, REPORT::"Import Consolidation from DB", '');
     end;
 
     internal procedure GetConsolidate(var ConsolidateToGet: Codeunit Consolidate)
