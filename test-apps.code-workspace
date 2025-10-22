@@ -48,10 +48,22 @@
       "path": "./EssentialBusinessHeadlines/Test/Essential Business Headlines Test"
     },
     {
-      "path": "./BusinessFoundation/Test/Business Foundation Test Libraries"
+      "path": "./businessfoundation/Test/Business Foundation Test Libraries"
     },
     {
-      "path": "./BusinessFoundation/Test/Business Foundation Tests/DisabledTests"
+      "path": "./businessfoundation/Test/Business Foundation Tests/DisabledTests"
+    },
+    {
+      "path": "./system application/source/System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./system application/Test/System Application Test Library"
+    },
+    {
+      "path": "./system application/Test/System Application Test/DisabledTests"
+    },
+    {
+      "path": "./system application/Test/System Application Test/Extension Management/testArtifacts"
     },
     {
       "path": "./APIV1/Test/_Exclude_APIV1_ Tests"
