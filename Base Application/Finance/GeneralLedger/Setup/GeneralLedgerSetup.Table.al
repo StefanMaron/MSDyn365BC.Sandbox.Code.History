@@ -678,24 +678,28 @@ table 98 "General Ledger Setup"
             Caption = 'Financial Report for Balance Sheet';
             TableRelation = "Financial Report";
             ToolTip = 'Specifies which financial report is used to generate the Balance Sheet report.';
+            ValidateTableRelation = false;
         }
         field(115; "Fin. Rep. for Income Stmt."; Code[10])
         {
             Caption = 'Financial Report for Income Stmt.';
             TableRelation = "Financial Report";
             ToolTip = 'Specifies which financial report is used to generate the Income Statement report.';
+            ValidateTableRelation = false;
         }
         field(116; "Fin. Rep. for Cash Flow Stmt"; Code[10])
         {
-            Caption = 'Financial Report for Cash Flow Stmt';
+            Caption = 'Financial Report for Cash Flow Stmt.';
             TableRelation = "Financial Report";
             ToolTip = 'Specifies which financial report is used to generate the Cash Flow Statement report.';
+            ValidateTableRelation = false;
         }
         field(117; "Fin. Rep. for Retained Earn."; Code[10])
         {
             Caption = 'Financial Report for Retained Earn.';
             TableRelation = "Financial Report";
             ToolTip = 'Specifies which financial report is used to generate the Retained Earnings report.';
+            ValidateTableRelation = false;
         }
         field(120; "Tax Invoice Renaming Threshold"; Decimal)
         {
@@ -907,6 +911,48 @@ table 98 "General Ledger Setup"
         {
             Caption = 'Financial Report Company Logo Position';
             ToolTip = 'Specifies how your company logo is displayed on the financial report by default.';
+        }
+        field(198; "Fin. Rep. Bal. Sheet Row"; Code[10])
+        {
+            Caption = 'Financial Report Row Definition for Balance Sheet';
+            TableRelation = "Acc. Schedule Name";
+            ToolTip = 'Specifies the name of the Balance Sheet row on Financial Reports.';
+            ValidateTableRelation = false;
+        }
+        field(199; "Fin. Rep. Income Stmt. Row"; Code[10])
+        {
+            Caption = 'Financial Report Row Definition for Income Stmt.';
+            TableRelation = "Acc. Schedule Name";
+            ToolTip = 'Specifies the name of the Income Statement row on Financial Reports.';
+            ValidateTableRelation = false;
+        }
+        field(200; "Fin. Rep. Cash Flow Stmt. Row"; Code[10])
+        {
+            Caption = 'Financial Report Row Definition for Cash Flow Stmt.';
+            TableRelation = "Acc. Schedule Name";
+            ToolTip = 'Specifies the name of the Cash Flow Statement row on Financial Reports.';
+            ValidateTableRelation = false;
+        }
+        field(201; "Fin. Rep. Retained Earn. Row"; Code[10])
+        {
+            Caption = 'Financial Report Row Definition for Retained Earn.';
+            TableRelation = "Acc. Schedule Name";
+            ToolTip = 'Specifies the name of the Retained Earnings row on Financial Reports.';
+            ValidateTableRelation = false;
+        }
+        field(202; "Fin. Rep. Bal. Sheet Column"; Code[10])
+        {
+            Caption = 'Financial Report Column Definition for Balance Sheet';
+            TableRelation = "Column Layout Name";
+            ToolTip = 'Specifies the name of the Balance Sheet column on Financial Reports.';
+            ValidateTableRelation = false;
+        }
+        field(203; "Fin. Rep. Net Change Column"; Code[10])
+        {
+            Caption = 'Financial Report Column Definition for Net Change';
+            TableRelation = "Column Layout Name";
+            ToolTip = 'Specifies the name of the Net Change column on Financial Reports.';
+            ValidateTableRelation = false;
         }
         field(11003; "Currency Code For EURO"; Code[10])
         {
