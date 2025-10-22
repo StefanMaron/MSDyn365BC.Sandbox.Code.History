@@ -10,14 +10,14 @@ using System.Text;
 
 page 790 "G/L Account Categories"
 {
+    AboutTitle = 'About G/L Account Categories';
+    AboutText = 'The G/L Account Categories page lets you create simple financial reports based on your chart of accounts. By providing categories, subcategories, and account mapping to your chart of accounts, you can generate basic financial reporting out of the box. If you''re just getting started with financial reporting, the standard reports are excellent options until you become more experienced.';
     AccessByPermission = TableData "G/L Account Category" = R;
     AdditionalSearchTerms = 'general ledger account categories';
     ApplicationArea = Basic, Suite;
     Caption = 'G/L Account Categories';
     InsertAllowed = false;
     PageType = List;
-    AboutTitle = 'About G/L Account Categories';
-    AboutText = 'Organize general ledger accounts into customizable categories and subcategories to structure financial statements, assign accounts for reporting, and generate up-to-date financial reports such as the Balance Sheet and Income Statement.';
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "G/L Account Category";
@@ -177,7 +177,7 @@ page 790 "G/L Account Categories"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Generate Financial Reports';
                 Image = CreateLinesFromJob;
-                ToolTip = 'Generate financial reports.';
+                ToolTip = 'Generate new or replace standard financial reports, such as Balance Sheet, Cash Flow Statement, Income Statement, and Retained Earnings.';
 
                 trigger OnAction()
                 var
@@ -185,6 +185,14 @@ page 790 "G/L Account Categories"
                 begin
                     GLAccountCategoryMgt.ConfirmAndRunGenerateAccountSchedules();
                 end;
+            }
+            action(ViewUncategorizedAccounts)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'View Uncategorized Accounts';
+                Image = ViewCheck;
+                RunObject = page "Uncategorized G/L Accounts";
+                ToolTip = 'View a list of Uncategorized G/L Accounts.';
             }
         }
         area(navigation)
@@ -233,6 +241,9 @@ page 790 "G/L Account Categories"
                 {
                 }
                 actionref(GenerateAccSched_Promoted; GenerateAccSched)
+                {
+                }
+                actionref(ViewUncategorizedAccounts_Promoted; ViewUncategorizedAccounts)
                 {
                 }
                 actionref(GLSetup_Promoted; GLSetup)
