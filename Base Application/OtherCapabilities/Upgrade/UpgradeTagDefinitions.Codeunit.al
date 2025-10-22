@@ -122,7 +122,9 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetUseCustomLookupUpgradeTag());
         PerCompanyUpgradeTags.Add(SanitizeCloudMigratedDataUpgradeTag());
 
+#if not CLEAN28
         PerCompanyUpgradeTags.Add(GetGLEntryJournalTemplateNameUpgradeTag());
+#endif
         PerCompanyUpgradeTags.Add(GetGLRegisterJournalTemplateNameUpgradeTag());
         PerCompanyUpgradeTags.Add(GetGenJournalTemplateDatesUpgradeTag());
         PerCompanyUpgradeTags.Add(GetGenJournalTemplateNamesSetupUpgradeTag());
@@ -891,11 +893,13 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-290460-IntercompanySetup-20211110');
     end;
 
+#if not CLEAN28
+    [Obsolete('Upgrade code has been deleted.', '28.0')]
     procedure GetGLEntryJournalTemplateNameUpgradeTag(): Code[250]
     begin
         exit('MS-415286-GLEntryJournalTemplateName-20211026');
     end;
-
+#endif
     procedure GetGLRegisterJournalTemplateNameUpgradeTag(): Code[250]
     begin
         exit('MS-415286-GLRegisterJournalTemplateName-20211026');

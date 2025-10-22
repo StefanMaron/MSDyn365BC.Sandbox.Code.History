@@ -79,7 +79,6 @@ using System.Telemetry;
 using System.Threading;
 using System.Upgrade;
 using System.Utilities;
-using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.HumanResources.Payables;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Setup;
@@ -203,7 +202,6 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeJobReportSelection();
         UpgradeJobTaskReportSelection();
         UpgradeJournalTemplateNamesInSetupTables();
-        UpgradeGLEntryJournalTemplateName();
         UpgradeGenJournalTemplates();
         UpgradeAccountSchedulesToFinancialReports();
         UpgradeCRMUnitGroupMapping();
@@ -2963,27 +2961,6 @@ codeunit 104000 "Upgrade - BaseApp"
         if AnythingModified then
             GeneralLedgerSetup.Modify();
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetAccountSchedulesToFinancialReportsUpgradeTag());
-    end;
-
-    local procedure UpgradeGLEntryJournalTemplateName()
-    var
-        GLEntry: Record "G/L Entry";
-        UpgradeTag: Codeunit "Upgrade Tag";
-        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
-        GLEntryDataTransfer: DataTransfer;
-    begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetGLEntryJournalTemplateNameUpgradeTag()) then
-            exit;
-
-        GLEntry.SetFilter("Journal Templ. Name", '<>%1', '');
-        if not GLEntry.IsEmpty() then
-            exit;
-
-        GLEntryDataTransfer.SetTables(Database::"G/L Entry", Database::"G/L Entry");
-        GLEntryDataTransfer.UpdateAuditFields := false;
-        GLEntryDataTransfer.CopyFields();
-
-        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetGLEntryJournalTemplateNameUpgradeTag());
     end;
 
     local procedure UpgradeGenJournalTemplates()
