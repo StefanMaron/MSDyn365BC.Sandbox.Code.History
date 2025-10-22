@@ -45,11 +45,13 @@ table 15 "G/L Account"
             Caption = 'No.';
             OptimizeForTextSearch = true;
             NotBlank = true;
+            ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
         }
         field(2; Name; Text[100])
         {
             Caption = 'Name';
             OptimizeForTextSearch = true;
+            ToolTip = 'Specifies the name of the general ledger account.';
 
             trigger OnValidate()
             begin
@@ -67,6 +69,7 @@ table 15 "G/L Account"
         field(4; "Account Type"; Enum "G/L Account Type")
         {
             Caption = 'Account Type';
+            ToolTip = 'Specifies the purpose of the account. Total: Used to total a series of balances on accounts from many different account groupings. To use Total, leave this field blank. Begin-Total: A marker for the beginning of a series of accounts to be totaled that ends with an End-Total account. End-Total: A total of a series of accounts that starts with the preceding Begin-Total account. The total is defined in the Totaling field.';
 
             trigger OnValidate()
             var
@@ -137,6 +140,7 @@ table 15 "G/L Account"
         {
             BlankZero = true;
             Caption = 'Account Category';
+            ToolTip = 'Specifies the category of the G/L account.';
 
             trigger OnValidate()
             begin
@@ -156,6 +160,7 @@ table 15 "G/L Account"
         field(9; "Income/Balance"; Enum "G/L Account Report Type")
         {
             Caption = 'Income/Balance';
+            ToolTip = 'Specifies whether a general ledger account is an income statement account or a balance sheet account.';
 
             trigger OnValidate()
             var
@@ -195,12 +200,14 @@ table 15 "G/L Account"
         field(14; "Direct Posting"; Boolean)
         {
             Caption = 'Direct Posting';
+            ToolTip = 'Specifies whether you will be able to post directly or only indirectly to this general ledger account. To allow Direct Posting to the G/L account, place a check mark in the check box.';
             InitValue = true;
         }
         field(16; "Reconciliation Account"; Boolean)
         {
             AccessByPermission = TableData "Bank Account" = R;
             Caption = 'Reconciliation Account';
+            ToolTip = 'Specifies whether this general ledger account will be included in the Reconciliation window in the general journal. To have the G/L account included in the window, place a check mark in the check box. You can find the Reconciliation window by clicking Actions, Posting in the General Journal window.';
         }
         field(17; "New Page"; Boolean)
         {
@@ -445,11 +452,13 @@ table 15 "G/L Account"
         field(43; "Gen. Posting Type"; Enum "General Posting Type")
         {
             Caption = 'Gen. Posting Type';
+            ToolTip = 'Specifies the general posting type to use when posting to this account.';
         }
         field(44; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             TableRelation = "Gen. Business Posting Group";
+            ToolTip = 'Specifies the vendor''s or customer''s trade type to link transactions made for this business partner with the appropriate general ledger account according to the general posting setup.';
 
             trigger OnValidate()
             var
@@ -464,6 +473,7 @@ table 15 "G/L Account"
         {
             Caption = 'Gen. Prod. Posting Group';
             TableRelation = "Gen. Product Posting Group";
+            ToolTip = 'Specifies the item''s product type to link transactions made for this item with the appropriate general ledger account according to the general posting setup.';
 
             trigger OnValidate()
             var
@@ -564,11 +574,13 @@ table 15 "G/L Account"
         {
             Caption = 'VAT Bus. Posting Group';
             TableRelation = "VAT Business Posting Group";
+            ToolTip = 'Specifies the VAT specification of the involved customer or vendor to link transactions made for this record with the appropriate general ledger account according to the VAT posting setup.';
         }
         field(58; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             TableRelation = "VAT Product Posting Group";
+            ToolTip = 'Specifies the VAT specification of the involved item or resource to link transactions made for this record with the appropriate general ledger account according to the VAT posting setup.';
 
             trigger OnValidate()
             begin
@@ -767,6 +779,7 @@ table 15 "G/L Account"
         field(1700; "Default Deferral Template Code"; Code[10])
         {
             Caption = 'Default Deferral Template Code';
+            ToolTip = 'Specifies the default deferral template that governs how to defer revenues and expenses to the periods when they occurred.';
             TableRelation = "Deferral Template"."Deferral Code";
         }
         field(9000; "API Account Type"; Enum "G/L Account Type")
