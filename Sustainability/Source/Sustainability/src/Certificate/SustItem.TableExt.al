@@ -246,26 +246,21 @@ tableextension 6220 "Sust. Item" extends Item
             ToolTip = 'Specifies the classification system, such as HS, CPV, or UNSPSC.';
             DataClassification = SystemMetadata;
         }
-        field(6236; "Product Classification Name"; Text[250])
-        {
-            Caption = 'Product Classification Name';
-            ToolTip = 'Specifies the descriptive name of the classification code.';
-            DataClassification = CustomerContent;
-        }
-        field(6237; "Product Classification Code"; Code[50])
+        field(6236; "Product Classification Code"; Code[50])
         {
             Caption = 'Product Classification Code';
             ToolTip = 'Specifies the external classification code for this item.';
             DataClassification = CustomerContent;
             TableRelation = "Product Classification Code".Code where(Type = field("Product Classification Type"));
-
-            trigger OnValidate()
-            var
-                ProductClassificationCode: Record "Product Classification Code";
-            begin
-                ProductClassificationCode.Get("Product Classification Code", "Product Classification Type");
-                Rec.Validate("Product Classification Name", ProductClassificationCode.Name);
-            end;
+        }
+        field(6237; "Product Classification Name"; Text[250])
+        {
+            Caption = 'Product Classification Name';
+            ToolTip = 'Specifies the descriptive name of the classification code.';
+            FieldClass = FlowField;
+            Editable = false;
+            CalcFormula = lookup("Product Classification Code".Name where("Code" = field("Product Classification Code"),
+                                                                          "Type" = field("Product Classification Type")));
         }
 #pragma warning restore PTE0002
     }
