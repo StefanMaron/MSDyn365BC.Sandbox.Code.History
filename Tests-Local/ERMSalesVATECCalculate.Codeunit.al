@@ -559,7 +559,8 @@ codeunit 144123 "ERM Sales VAT EC Calculate"
 
         // [THEN] "EC Amount" = "A" * (100 - "P") * "E"
         FindSalesLine(SalesLine, SalesHeader."Document Type", SalesHeader."No.");
-        ExpectedECAmount := Round(SalesLine."VAT Base Amount" * (100 - FirstPrepmtPct) * SalesLine."EC %" / 10000);
+        ExpectedECAmount := Round(SalesLine."VAT Base Amount" * SalesLine."EC %" / 100);
+        ExpectedECAmount := Round(ExpectedECAmount * (100 - FirstPrepmtPct) / 100);
         VerifySalesPrepmtDocTestReportECAmount(ExpectedECAmount);
     end;
 
