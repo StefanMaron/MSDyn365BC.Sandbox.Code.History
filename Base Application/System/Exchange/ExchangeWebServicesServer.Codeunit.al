@@ -1,6 +1,8 @@
 namespace System.Integration;
 
+#if not CLEAN28
 using Microsoft.CRM.Outlook;
+#endif
 using System;
 using System.Azure.Identity;
 
@@ -14,9 +16,11 @@ codeunit 5321 "Exchange Web Services Server"
     var
         Service: DotNet ExchangeServiceWrapper;
         ProdEndpointTxt: Label 'https://outlook.office365.com/EWS/Exchange.asmx', Locked = true;
-        ExpiredTokenErr: Label 'Trying to reconnect. Please close and reopen the add-in. Error from the service: %1', Comment = '%1 = the error message from the service.';
         CategoryTxt: Label 'AL EWS Server', Locked = true;
+#if not CLEAN28
+        ExpiredTokenErr: Label 'Trying to reconnect. Please close and reopen the add-in. Error from the service: %1', Comment = '%1 = the error message from the service.';
         ExpiredTokenTxt: Label 'Expired token.', Locked = true;
+#endif
         InvalidCredentialsTxt: Label 'Invalid credentials.', Locked = true;
         InitializedTxt: Label 'Service has been initialized.', Locked = true;
         NotInitializedTxt: Label 'Service has not been initialized.', Locked = true;
@@ -249,12 +253,15 @@ codeunit 5321 "Exchange Web Services Server"
         exit(LeftFlag = RightFlag);
     end;
 
+#if not CLEAN28
+    [Obsolete('Please use Microsoft Graph API instead e.g `Email - Outlook REST API`', '28.0')]
     [TryFunction]
     local procedure TryGetEmailWithAttachments(var EmailMessage: DotNet IEmailMessage; ItemID: Text[250])
     begin
         EmailMessage := Service.GetEmailWithAttachments(ItemID);
     end;
 
+    [Obsolete('Please use Microsoft Graph API instead e.g `Email - Outlook REST API`', '28.0')]
     [Scope('OnPrem')]
     procedure GetEmailAndAttachments(ItemID: Text[250]; var TempExchangeObject: Record "Exchange Object" temporary; "Action": Option InitiateSendToOCR,InitiateSendToIncomingDocuments,InitiateSendToWorkFlow,IntiateSendToAttachments; RecRef: RecordRef)
     var
@@ -300,6 +307,7 @@ codeunit 5321 "Exchange Web Services Server"
         end;
     end;
 
+    [Obsolete('Please use Microsoft Graph API instead e.g `Email - Outlook REST API`', '28.0')]
     [Scope('OnPrem')]
     procedure GetEmailBody(ItemID: Text[250]) EmailBody: Text
     var
@@ -313,12 +321,14 @@ codeunit 5321 "Exchange Web Services Server"
         end;
     end;
 
+    [Obsolete('Please use Microsoft Graph API instead e.g `Email - Outlook REST API`', '28.0')]
     [TryFunction]
     local procedure TryEmailHasAttachments(var HasAttachments: Boolean; ItemID: Text[250])
     begin
         HasAttachments := Service.AttachmentsExists(ItemID);
     end;
 
+    [Obsolete('Please use Microsoft Graph API instead e.g `Email - Outlook REST API`', '28.0')]
     [Scope('OnPrem')]
     procedure EmailHasAttachments(ItemID: Text[250]): Boolean
     var
@@ -328,6 +338,7 @@ codeunit 5321 "Exchange Web Services Server"
             exit(false);
         exit(HasAttachments)
     end;
+#endif
 
     procedure GetEndpoint() Endpoint: Text
     begin
