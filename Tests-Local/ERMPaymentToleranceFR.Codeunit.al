@@ -105,7 +105,7 @@ codeunit 144012 "ERM Payment Tolerance FR"
     end;
 
     [Test]
-    [HandlerFunctions('PaymentClassListPageHandler,ApplyCustomerEntriesPageHandler,PaymentToleranceWarningPageHandler,ConfirmHandler')]
+    [HandlerFunctions('PaymentClassListPageHandler,ApplyCustomerEntriesPageHandler,ConfirmHandler')]
     [Scope('OnPrem')]
     procedure PmtTolWarningOnPmntLineAfterAppliesToIdCustomer()
     var
@@ -144,7 +144,7 @@ codeunit 144012 "ERM Payment Tolerance FR"
     end;
 
     [Test]
-    [HandlerFunctions('PaymentClassListPageHandler,ApplyVendorEntriesPageHandler,PaymentToleranceWarningPageHandler,ConfirmHandler')]
+    [HandlerFunctions('PaymentClassListPageHandler,ApplyVendorEntriesPageHandler,ConfirmHandler')]
     [Scope('OnPrem')]
     procedure PmtTolWarningOnPmntLineAfterAppliesToIdVendor()
     var
