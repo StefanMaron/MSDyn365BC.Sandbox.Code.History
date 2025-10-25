@@ -1149,6 +1149,38 @@
     end;
 
     [Test]
+    [Scope('OnPrem')]
+    procedure AccScheduleCaptionIncludesNameAndDescription()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        AccScheduleMgt: Codeunit AccSchedManagement;
+    begin
+        // [SCENARIO] Account Schedule caption will include name and description if possible
+        Initialize();
+
+        // [GIVEN] Account schedule with only name
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        AccScheduleName.Description := '';
+        AccScheduleName.Modify();
+
+        // [THEN] Caption includes name only
+        Assert.AreEqual(
+            AccScheduleName.Name,
+            AccScheduleMgt.GetAccountScheduleCaption(AccScheduleName.Name),
+            'Caption should include name only when description is empty.');
+
+        // [GIVEN] Account schedule with name and description
+        AccScheduleName.Description := CopyStr(LibraryRandom.RandText(MaxStrLen(AccScheduleName.Description)), 1, MaxStrLen(AccScheduleName.Description));
+        AccScheduleName.Modify();
+
+        // [THEN] Caption includes name and description
+        Assert.AreEqual(
+            StrSubstNo('%1 (%2)', AccScheduleName.Description, AccScheduleName.Name),
+            AccScheduleMgt.GetAccountScheduleCaption(AccScheduleName.Name),
+            'Caption should include name and description when description has a value.');
+    end;
+
+    [Test]
     [HandlerFunctions('RHAccountSchedule')]
     [Scope('OnPrem')]
     procedure TotalingDimensionValuesCanBeUsedAsFiltersInAccountScheduleWithAnalysisViewReport()
@@ -1904,6 +1936,38 @@
 
     [Test]
     [Scope('OnPrem')]
+    procedure ColumnLayoutCaptionIncludesNameAndDescription()
+    var
+        ColumnLayoutName: Record "Column Layout Name";
+        AccScheduleMgt: Codeunit AccSchedManagement;
+    begin
+        // [SCENARIO] Column Layout caption will include name and description if possible
+        Initialize();
+
+        // [GIVEN] Column layout with only name
+        LibraryERM.CreateColumnLayoutName(ColumnLayoutName);
+        ColumnLayoutName.Description := '';
+        ColumnLayoutName.Modify();
+
+        // [THEN] Caption includes name only
+        Assert.AreEqual(
+            ColumnLayoutName.Name,
+            AccScheduleMgt.GetColumnLayoutCaption(ColumnLayoutName.Name),
+            'Caption should include name only when description is empty.');
+
+        // [GIVEN] Column layout with name and description
+        ColumnLayoutName.Description := CopyStr(LibraryRandom.RandText(MaxStrLen(ColumnLayoutName.Description)), 1, MaxStrLen(ColumnLayoutName.Description));
+        ColumnLayoutName.Modify();
+
+        // [THEN] Caption includes name and description
+        Assert.AreEqual(
+            StrSubstNo('%1 (%2)', ColumnLayoutName.Description, ColumnLayoutName.Name),
+            AccScheduleMgt.GetColumnLayoutCaption(ColumnLayoutName.Name),
+            'Caption should include name and description when description has a value.');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
     procedure AccountScheduleResetColumnLayoutOnAccountScheduleChangeAccScheduleOverviewPage()
     var
         AccScheduleName: array[2] of Record "Acc. Schedule Name";
@@ -2305,6 +2369,7 @@
     end;
 
     [Test]
+    [Scope('OnPrem')]
     procedure VerifyFinancialReportEmptyCellForNoEntry()
     var
         AccScheduleLine: Record "Acc. Schedule Line";
@@ -2363,6 +2428,33 @@
         // [THEN] Verify exported Excel file GL Account That Has No Entry shows empty cell.
         LibraryReportValidation.OpenExcelFile();
         LibraryReportValidation.VerifyCellValue(11, 1, '');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure OpenGLAccountWhereUsedInAccScheduleLine()
+    var
+        GLAccount: Record "G/L Account";
+        AccScheduleName: Record "Acc. Schedule Name";
+        AccScheduleLine: Record "Acc. Schedule Line";
+        TempGLAccWhereUsed: Record "G/L Account Where-Used" temporary;
+        FinReportMgt: Codeunit "Financial Report Mgt.";
+    begin
+        // [SCENARIO] Where-used for G/L Account will correctly find usage in Acc. Schedule Line
+        Initialize();
+
+        // [GIVEN] G/L Account that's used in an Acc. Schedule Line
+        LibraryERM.CreateGLAccount(GLAccount);
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        CreateAccScheduleLineWithGLAcc(
+            AccScheduleLine, AccScheduleName.Name, GLAccount."No.", AccScheduleLine.Show::Yes);
+
+        // [WHEN] Finding where-used for the G/L Account
+        // [THEN] The usage in the Acc. Schedule Line is found and points to the correct record
+        Assert.IsTrue(FinReportMgt.FindGLAccountWhereUsedInAccScheduleLine(GLAccount."No.", TempGLAccWhereUsed), 'Where-used should be found in Acc. Schedule Line');
+        Assert.AreEqual(1, TempGLAccWhereUsed.Count(), 'There should be one where-used entry.');
+        Assert.AreEqual(AccScheduleLine."Schedule Name", TempGLAccWhereUsed."Key 1", 'Where-used entry should contain the schedule name as key 1.');
+        Assert.AreEqual(Format(AccScheduleLine."Line No."), TempGLAccWhereUsed."Key 2", 'Where-used entry should contain the line no. as key 2.');
     end;
 
     [Test]
@@ -2591,14 +2683,11 @@
     local procedure CopyColumnLayoutFromColumnLayoutPage(SourceColumnLayoutName: Code[10])
     var
         ColumnLayoutNames: TestPage "Column Layout Names";
-        ColumnLayout: TestPage "Column Layout";
     begin
         Commit();
         ColumnLayoutNames.OpenView();
         ColumnLayoutNames.GoToKey(SourceColumnLayoutName);
-        ColumnLayout.Trap();
-        ColumnLayoutNames.EditColumnLayoutSetup.Invoke();
-        ColumnLayout.CopyColumnLayout.Invoke();
+        ColumnLayoutNames.CopyColumnLayout.Invoke();
     end;
 
     local procedure RunAccountScheduleReport(ScheduleName: Code[10]; ColumnLayoutName: Code[10])

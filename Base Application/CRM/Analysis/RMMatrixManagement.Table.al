@@ -170,12 +170,10 @@ table 5102 "RM Matrix Management"
             Caption = 'Date Filter';
             FieldClass = FlowFilter;
         }
-        field(14; "Action Taken Filter"; Option)
+        field(14; "Action Taken Filter"; Enum "Opportunity Action Taken")
         {
             Caption = 'Action Taken Filter';
             FieldClass = FlowFilter;
-            OptionCaption = ' ,Next,Previous,Updated,Jumped,Won,Lost';
-            OptionMembers = " ",Next,Previous,Updated,Jumped,Won,Lost;
         }
         field(15; "Sales Cycle Filter"; Code[10])
         {
