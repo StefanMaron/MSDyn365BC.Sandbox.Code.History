@@ -270,6 +270,7 @@ page 489 "Column Layout"
     {
         area(processing)
         {
+#if not CLEAN28
             action(CopyColumnLayout)
             {
                 ApplicationArea = Basic, Suite;
@@ -277,6 +278,10 @@ page 489 "Column Layout"
                 Image = Copy;
                 Scope = Repeater;
                 ToolTip = 'Create a copy of the current column layout.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This action will be removed in a future release, use the same action on the Column Layout Names page instead.';
+                ObsoleteTag = '28.0';
+                Visible = false;
 
                 trigger OnAction()
                 var
@@ -287,6 +292,7 @@ page 489 "Column Layout"
                     Report.RunModal(Report::"Copy Column Layout", true, true, ColLayoutName);
                 end;
             }
+#endif
             action(WhereUsed)
             {
                 ApplicationArea = Basic, Suite;
@@ -309,9 +315,14 @@ page 489 "Column Layout"
             {
                 Caption = 'Process';
 
+#if not CLEAN28
                 actionref(CopyColumnLayout_Promoted; CopyColumnLayout)
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This action will be removed in a future release, use the same action on the Column Layout Names page instead.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 actionref(WhereUsed_Promoted; WhereUsed)
                 {
                 }
@@ -328,11 +339,14 @@ page 489 "Column Layout"
     trigger OnOpenPage()
     var
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
+        CurrentPageCaption: Text;
     begin
         FinancialReportMgt.LaunchEditColumnsWarningNotification();
         AccSchedManagement.OpenColumns(CurrentColumnName, Rec);
-        if CurrentColumnName <> '' then
-            CurrPage.Caption(CurrentColumnName);
+        CurrentPageCaption := AccSchedManagement.GetColumnLayoutCaption(CurrentColumnName);
+        if CurrentPageCaption <> '' then
+            CurrPage.Caption(CurrentPageCaption);
+
         GetDescriptions();
     end;
 
