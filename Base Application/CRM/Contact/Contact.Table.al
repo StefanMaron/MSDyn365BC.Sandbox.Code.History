@@ -758,12 +758,10 @@ table 5050 Contact
             Caption = 'Contact Business Relation';
             Editable = false;
         }
-        field(5087; "Action Taken Filter"; Option)
+        field(5087; "Action Taken Filter"; Enum "Opportunity Action Taken")
         {
             Caption = 'Action Taken Filter';
             FieldClass = FlowFilter;
-            OptionCaption = ' ,Next,Previous,Updated,Jumped,Won,Lost';
-            OptionMembers = " ",Next,Previous,Updated,Jumped,Won,Lost;
         }
         field(5088; "Sales Cycle Filter"; Code[10])
         {
