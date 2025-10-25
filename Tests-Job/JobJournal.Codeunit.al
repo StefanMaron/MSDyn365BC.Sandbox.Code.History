@@ -2759,7 +2759,7 @@ codeunit 136305 "Job Journal"
         // [THEN] Validate the posting date for changing the Exch. rate on Job Journal line.
         JobJournalLine.Validate("Posting Date", WorkDate() + 1);
         JobJournalLine.Modify();
-        JobJournalLine."Unit Cost (LCY)" := Round(JobJournalLine."Unit Cost (LCY)", 0.001);
+        JobJournalLine."Unit Cost (LCY)" := Round(JobJournalLine."Unit Cost (LCY)", 0.01);
 
         // [VERIFY] Verify Unit Cost (LCY) after changing the posting date. Unit Cost will update Correctly.
         JobJournalLine.TestField("Unit Cost (LCY)", Resource."Unit Cost");

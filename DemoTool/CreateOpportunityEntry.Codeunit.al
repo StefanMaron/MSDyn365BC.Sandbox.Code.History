@@ -149,7 +149,7 @@ codeunit 101593 "Create Opportunity Entry"
         "Opportunity Entry".Validate("Date of Change", MakeAdjustments.AdjustDate("Date of Change"));
         "Opportunity Entry".Validate(Active, Active);
         "Opportunity Entry".Validate("Date Closed", MakeAdjustments.AdjustDate("Date Closed"));
-        "Opportunity Entry".Validate("Action Taken", "Action Taken");
+        "Opportunity Entry".Validate("Action Taken", "Opportunity Action Taken".FromInteger("Action Taken"));
         "Opportunity Entry".Validate("Estimated Value (LCY)", "Estimated Value (LCY)");
         "Opportunity Entry".Validate("Completed %", "Completed %");
         "Opportunity Entry".Validate("Chances of Success %", "Chances of Success %");
