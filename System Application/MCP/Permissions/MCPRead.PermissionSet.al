@@ -3,12 +3,16 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-namespace System.TestLibraries.Feedback;
+namespace System.MCP;
 
-using System.Feedback;
-
-permissionset 138074 "Satisfaction View"
+permissionset 8351 "MCP - Read"
 {
-    Assignable = true;
-    IncludedPermissionSets = "Satisfaction Survey - View";
+    Access = Internal;
+    Assignable = false;
+    Caption = 'MCP - Read';
+
+    IncludedPermissionSets = "MCP - Objects";
+
+    Permissions = tabledata "MCP Configuration" = R,
+                  tabledata "MCP Configuration Tool" = R;
 }

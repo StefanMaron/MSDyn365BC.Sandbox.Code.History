@@ -114,6 +114,16 @@ codeunit 8 AccSchedManagement
             end;
     end;
 
+    procedure GetAccountScheduleCaption(CurrentSchedName: Code[10]): Text
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+    begin
+        if CurrentSchedName <> '' then
+            if AccScheduleName.Get(CurrentSchedName) and (AccScheduleName.Description <> '') then
+                exit(StrSubstNo('%1 (%2)', AccScheduleName.Description, AccScheduleName.Name));
+        exit(CurrentSchedName);
+    end;
+
     local procedure CurrentScheduleAlreadyDefinedInGLSetup(ScheduleName: Code[10]): Boolean
     var
         FinancialReport: Record "Financial Report";
@@ -202,6 +212,16 @@ codeunit 8 AccSchedManagement
         ColumnLayout.SetRange("Column Layout Name", CurrentColumnName);
         ColumnLayout.FilterGroup(0);
         OnAfterOpenColumns(CurrentColumnName, ColumnLayout);
+    end;
+
+    procedure GetColumnLayoutCaption(CurrentColumnName: Code[10]): Text;
+    var
+        ColLayoutName: Record "Column Layout Name";
+    begin
+        if CurrentColumnName <> '' then
+            if ColLayoutName.Get(CurrentColumnName) and (ColLayoutName.Description <> '') then
+                exit(StrSubstNo('%1 (%2)', ColLayoutName.Description, ColLayoutName.Name));
+        exit(CurrentColumnName);
     end;
 
     local procedure CheckColumnTemplateName(var CurrentColumnName: Code[10])
@@ -421,7 +441,7 @@ codeunit 8 AccSchedManagement
         if not IsHandled then begin
             if ColumnLayout."Show in ACY" then
                 CalcAddCurr := true;
-            
+
             AccountScheduleLine."Dimension 1 Totaling" := AccSchedLine."Dimension 1 Totaling";
             AccountScheduleLine."Dimension 2 Totaling" := AccSchedLine."Dimension 2 Totaling";
             AccountScheduleLine.CopyFilters(AccSchedLine);
