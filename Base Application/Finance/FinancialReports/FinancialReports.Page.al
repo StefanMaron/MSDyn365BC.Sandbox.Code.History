@@ -170,6 +170,22 @@ page 108 "Financial Reports"
                     ColumnLayout.Run();
                 end;
             }
+            action(ShowAllRowDefinitions)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Show All Row Definitions';
+                Image = List;
+                ToolTip = 'Open the Row Definitions list page.';
+                RunObject = page "Account Schedule Names";
+            }
+            action(ShowAllColumnDefinitions)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Show All Column Definitions';
+                Image = List;
+                ToolTip = 'Open the Column Definitions list page.';
+                RunObject = page "Column Layout Names";
+            }
             action(CopyFinancialReport)
             {
                 ApplicationArea = Basic, Suite;
@@ -283,6 +299,8 @@ page 108 "Financial Reports"
                 actionref(Overview_Promoted; Overview) { }
                 actionref(EditRowGroup_Promoted; EditRowGroup) { }
                 actionref(EditColumnGroup_Promoted; EditColumnGroup) { }
+                actionref(ShowAllRowDefinitions_Promoted; ShowAllRowDefinitions) { }
+                actionref(ShowAllColumnDefinitions_Promoted; ShowAllColumnDefinitions) { }
                 actionref(Schedules_Promoted; Schedules) { }
             }
             group(CopyExportImport)
