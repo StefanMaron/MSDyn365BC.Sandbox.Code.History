@@ -211,12 +211,10 @@ table 13 "Salesperson/Purchaser"
         {
             Caption = 'Job Title';
         }
-        field(5063; "Action Taken Filter"; Option)
+        field(5063; "Action Taken Filter"; Enum "Opportunity Action Taken")
         {
             Caption = 'Action Taken Filter';
             FieldClass = FlowFilter;
-            OptionCaption = ' ,Next,Previous,Updated,Jumped,Won,Lost';
-            OptionMembers = " ",Next,Previous,Updated,Jumped,Won,Lost;
         }
         field(5064; "Sales Cycle Filter"; Code[10])
         {
