@@ -499,6 +499,7 @@ page 104 "Account Schedule"
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
         ServerSetting: Codeunit "Server Setting";
         OriginalSchedName: Code[10];
+        CurrentPageCaption: Text;
     begin
         IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
 
@@ -507,8 +508,11 @@ page 104 "Account Schedule"
         AccSchedManagement.OpenAndCheckSchedule(CurrentSchedName, Rec);
         if CurrentSchedName <> OriginalSchedName then
             CurrentSchedNameOnAfterValidate();
-        if CurrentSchedName <> '' then
-            CurrPage.Caption(CurrentSchedName);
+
+        CurrentPageCaption := AccSchedManagement.GetAccountScheduleCaption(CurrentSchedName);
+        if CurrentPageCaption <> '' then
+            CurrPage.Caption(CurrentPageCaption);
+
         GetDescriptions();
     end;
 

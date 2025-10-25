@@ -289,7 +289,9 @@ codeunit 144076 "ERM Payment Discount"
         PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
         OpenPurchaseOrderToCalculatePaymentDiscount(PurchaseHeader."No.");
         PurchaseAmountActual :=
-          Round(PurchaseLine."Line Amount" - (PurchaseLine."Line Amount" * (PaymentDiscountPct + InvoiceDiscountPct) / 100));
+          Round(PurchaseLine."Line Amount" - (PurchaseLine."Line Amount" * (PaymentDiscountPct) / 100));
+        if InvoiceDiscountPct <> 0 then
+            PurchaseAmountActual := PurchaseAmountActual - (PurchaseAmountActual * (InvoiceDiscountPct) / 100);
         DocumentNo := GetPostedDocumentNo(PurchaseHeader."Receiving No. Series");
 
         // Exercise.
