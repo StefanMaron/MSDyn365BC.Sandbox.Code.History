@@ -105,7 +105,7 @@
     begin
         // Check that Purchase Line not lead to Service charge Line after Create Purchase Order and Change Direct Unit Cost.
         Initialize();
-        CreatePurchCreditMemoInvDisc(PurchaseHeader, -1);
+        CreatePurchCreditMemoInvDisc(PurchaseHeader, -2);
 
         // Verify: Verify Purchase Line.
         Assert.IsFalse(FindPurchaseLine(PurchaseLine, PurchaseHeader."No."), 'Purchase Line must not exist');
