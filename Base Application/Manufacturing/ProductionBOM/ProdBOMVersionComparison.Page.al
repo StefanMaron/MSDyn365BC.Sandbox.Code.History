@@ -402,7 +402,7 @@ page 9288 "Prod. BOM Version Comparison"
                 action("Matrix per Version")
                 {
                     ApplicationArea = Manufacturing;
-                    Caption = 'Matrix per Version';
+                    Caption = 'Production BOM Version Comparison';
                     Image = ProdBOMMatrixPerVersion;
                     ToolTip = 'For a production BOM set for the item, view a list of all versions and items and the used quantity per item. You can use the matrix to compare different production BOM versions concerning the used items per version.';
 
