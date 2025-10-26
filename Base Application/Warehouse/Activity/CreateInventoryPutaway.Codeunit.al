@@ -392,6 +392,8 @@ codeunit 7321 "Create Inventory Put-away"
                     else
                         RemQtyToPutAway := SalesLine."Return Qty. to Receive";
 
+                    OnCreatePutAwayLinesFromSalesOnAfterSetRemQtyToPutAway(SalesHeader, SalesLine, CurrWarehouseActivityHeader, RemQtyToPutAway);
+
                     FindReservationFromSalesLine(SalesLine);
 
                     if CurrLocation."Bin Mandatory" then
@@ -1530,6 +1532,11 @@ codeunit 7321 "Create Inventory Put-away"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreatePutawayForTransferLine(var TransferLine: Record "Transfer Line"; var RemQtyToPutAway: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreatePutAwayLinesFromSalesOnAfterSetRemQtyToPutAway(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var WarehouseActivityHeader: Record "Warehouse Activity Header"; var RemQtyToPutAway: Decimal)
     begin
     end;
 
