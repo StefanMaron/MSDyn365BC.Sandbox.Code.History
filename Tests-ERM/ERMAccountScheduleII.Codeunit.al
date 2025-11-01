@@ -36,6 +36,7 @@
         InvalidRowErr: Label 'Row %1 with is visible with the value %2.';
         RowNotFoundErr: Label 'Row %1 is not visible.';
         WrongValueErr: Label 'Wrong value of the field %1 in table %2.', Comment = '%1 = Field name, %2 = Table name';
+        MissingSheetDataErr: Label 'Sheet %1 is either missing or does not contain the correct data.', Comment = '%1 = Sheet number';
         IsInitialized: Boolean;
 
     [Test]
@@ -915,6 +916,82 @@
         LibraryReportValidation.OpenExcelFile();
         LibraryReportValidation.VerifyCellValue(3, 1, IntroductoryParagraph);
         LibraryReportValidation.VerifyCellValue(9, 1, ClosingParagraph);
+    end;
+
+    [Test]
+    procedure ExportAccScheduleToExcelWithSheetDefinition()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        AccScheduleLine: Record "Acc. Schedule Line";
+        ColumnLayoutName: Record "Column Layout Name";
+        ColumnLayout: Record "Column Layout";
+        FinancialReport: Record "Financial Report";
+        GenJournalLine: Record "Gen. Journal Line";
+        GLAccount: Record "G/L Account";
+        SheetDefName: Record "Sheet Definition Name";
+        SheetDefLine: Record "Sheet Definition Line";
+        DimensionValue: array[2] of Record "Dimension Value";
+        i: Integer;
+    begin
+        // [FEATURE] [Excel]
+        // [SCENARIO] Financial Report export to excel must create and filter by the Sheet Definition
+        Initialize();
+
+        // [GIVEN] Sheet Definition for two global dimension 1 values
+        SheetDefName.Init();
+        SheetDefName.Name := LibraryUtility.GenerateRandomCode(SheetDefName.FieldNo(Name), Database::"Sheet Definition Name");
+        SheetDefName."Sheet Type" := SheetDefName."Sheet Type"::Custom;
+        SheetDefName.Insert();
+
+        // [GIVEN] A G/L Account with transactions under each dimension value
+        LibraryERM.CreateGLAccount(GLAccount);
+        for i := 1 to 2 do begin
+            LibraryDimension.CreateDimensionValue(DimensionValue[i], LibraryERM.GetGlobalDimensionCode(1));
+            LibraryJournals.CreateGenJournalLineWithBatch(
+                GenJournalLine, GenJournalLine."Document Type"::" ", GenJournalLine."Account Type"::"G/L Account",
+                GLAccount."No.", LibraryRandom.RandDec(10, 2));
+            GenJournalLine.Validate("Shortcut Dimension 1 Code", DimensionValue[i].Code);
+            GenJournalLine.Modify(true);
+            LibraryERM.PostGeneralJnlLine(GenJournalLine);
+
+            SheetDefLine.Init();
+            SheetDefLine.Name := SheetDefName.Name;
+            SheetDefLine."Line No." := i * 10000;
+            SheetDefLine."Sheet Header" := DimensionValue[i].Code;
+            SheetDefLine."Dimension 1 Totaling" := DimensionValue[i].Code;
+            SheetDefLine.Insert();
+        end;
+
+        // [GIVEN] Financial Report using said Sheet Definition 
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        CreateAccScheduleLineWithGLAcc(AccScheduleLine, AccScheduleName.Name, GenJournalLine."Account No.", AccScheduleLine.Show::Yes);
+        LibraryERM.CreateColumnLayoutName(ColumnLayoutName);
+        CreateColumnLayoutLine(ColumnLayout, ColumnLayoutName.Name, ColumnLayout."Column Type"::"Net Change", '');
+        FinancialReport.Get(AccScheduleLine."Schedule Name");
+        FinancialReport."Financial Report Column Group" := ColumnLayout."Column Layout Name";
+        FinancialReport.SheetDefinition := SheetDefName.Name;
+        FinancialReport.Modify();
+
+        // [WHEN] The report is exported to Excel
+        AccScheduleLine.SetRange("Schedule Name", AccScheduleName.Name);
+        AccScheduleLine.SetRange("Date Filter", CalcDate('<-CY>', WorkDate()), CalcDate('<CY>', WorkDate()));
+        LibraryReportValidation.SetFileName(AccScheduleName.Name);
+        RunExportAccSchedule(AccScheduleLine, AccScheduleName);
+
+        // [THEN] The Excel contains 3 worksheets, one for unfiltered data and one for each dimension value filter
+        LibraryReportValidation.OpenExcelFile();
+        Assert.AreEqual(3, LibraryReportValidation.CountWorksheets(), 'There should be 3 worksheets, 1 for unfiltered data, 1 for each dimension value filter.');
+
+        // [THEN] The first worksheet contains the unfiltered data
+        GLAccount.CalcFields("Net Change");
+        LibraryReportValidation.VerifyCellValue(7, 3, Format(GLAccount."Net Change"));
+
+        // [THEN] The following worksheets contain the filtered data for each dimension value
+        for i := 1 to 2 do begin
+            GLAccount.SetRange("Global Dimension 1 Filter", DimensionValue[i].Code);
+            GLAccount.CalcFields("Net Change");
+            Assert.IsTrue(LibraryReportValidation.CheckIfValueExistsOnSpecifiedWorksheet(i + 1, Format(GLAccount."Net Change")), StrSubstNo(MissingSheetDataErr, i + 1));
+        end;
     end;
 
     [Test]
@@ -2746,7 +2823,7 @@
     begin
         FinancialReport.Get(AccScheduleName.Name);
         ExportAccSchedToExcel.SetFileNameSilent(LibraryReportValidation.GetFileName());
-        ExportAccSchedToExcel.SetOptions(AccScheduleLine, FinancialReport."Financial Report Column Group", false, AccScheduleName.Name);
+        ExportAccSchedToExcel.SetOptions(AccScheduleLine, FinancialReport."Financial Report Column Group", false, FinancialReport.Name, FinancialReport.SheetDefinition);
         ExportAccSchedToExcel.SetTestMode(true);
         ExportAccSchedToExcel.UseRequestPage(false);
         ExportAccSchedToExcel.Run();
