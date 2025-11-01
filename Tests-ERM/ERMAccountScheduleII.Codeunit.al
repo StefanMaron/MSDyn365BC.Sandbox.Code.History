@@ -963,6 +963,7 @@
         SheetDefName: Record "Sheet Definition Name";
         SheetDefLine: Record "Sheet Definition Line";
         DimensionValue: array[2] of Record "Dimension Value";
+        ExpectedCellValue: Decimal;
         i: Integer;
     begin
         // [FEATURE] [Excel]
@@ -994,7 +995,7 @@
             SheetDefLine.Insert();
         end;
 
-        // [GIVEN] Financial Report using said Sheet Definition 
+        // [GIVEN] Financial Report using said Sheet Definition
         LibraryERM.CreateAccScheduleName(AccScheduleName);
         CreateAccScheduleLineWithGLAcc(AccScheduleLine, AccScheduleName.Name, GenJournalLine."Account No.", AccScheduleLine.Show::Yes);
         LibraryERM.CreateColumnLayoutName(ColumnLayoutName);
@@ -1016,7 +1017,8 @@
 
         // [THEN] The first worksheet contains the unfiltered data
         GLAccount.CalcFields("Net Change");
-        LibraryReportValidation.VerifyCellValue(7, 3, Format(GLAccount."Net Change"));
+        ExpectedCellValue := GLAccount."Net Change";
+        LibraryReportValidation.VerifyCellValue(7, 3, Format(ExpectedCellValue, 0, 9));
 
         // [THEN] The following worksheets contain the filtered data for each dimension value
         for i := 1 to 2 do begin
@@ -1494,7 +1496,7 @@
         // [SCENARIO 316070] Account Schedule report prints lines with empty Totaling and Show=Yes when SkipEmptyLines = true
         Initialize();
 
-        // [GIVEN] Account Schedule Name 
+        // [GIVEN] Account Schedule Name
         CreateColumnLayout(ColumnLayout);
         LibraryERM.CreateAccScheduleName(AccScheduleName);
         // [GIVEN] Line 10000 with empty Totaling and Show=Yes
@@ -1962,7 +1964,7 @@
         AccScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
 
-        // [GIVEN] As "AS1" has empty "Default Column Layout", Current Column Name = "Default" (w1) 
+        // [GIVEN] As "AS1" has empty "Default Column Layout", Current Column Name = "Default" (w1)
         AccountSchedule1CurrentColumnName := AccScheduleOverview.CurrentColumnName.Value();
         AccScheduleOverview.Close();
 
@@ -1971,7 +1973,7 @@
         AccScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
 
-        // [THEN] As "AS2" has empty "Default Column Layout", Current Column Name = "CL" (w1) 
+        // [THEN] As "AS2" has empty "Default Column Layout", Current Column Name = "CL" (w1)
         AccScheduleOverview.CurrentColumnName.AssertEquals(ColumnLayoutName.Name);
         AccScheduleOverview.Close();
 
@@ -1980,7 +1982,7 @@
         AccScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
 
-        // [GIVEN] Current Column Name has not changed and is equal to previous value = "Default" (w1) 
+        // [GIVEN] Current Column Name has not changed and is equal to previous value = "Default" (w1)
         AccScheduleOverview.CurrentColumnName.AssertEquals(AccountSchedule1CurrentColumnName);
         AccScheduleOverview.Close();
     end;
@@ -2141,7 +2143,7 @@
         Amount: Decimal;
     begin
         // [FEATURE] [Report]
-        // [SCENARIO 365423] Account Schedule report shows Currency Symbol for column formula 
+        // [SCENARIO 365423] Account Schedule report shows Currency Symbol for column formula
         // Clear
         Initialize();
         // [GIVEN] GLSetup with local currency symbol '$' specified
@@ -2150,7 +2152,7 @@
         Amount := LibraryRandom.RandDec(100, 2);
         AccountNo := CreateGLAccountWithNetChange(Amount);
         // [GIVEN] Create financial report for account "A"
-        // Note that the CreateAccScheduleName procedure creates a Financial Report 
+        // Note that the CreateAccScheduleName procedure creates a Financial Report
         // with the same name as sets the Account Schedule Name as a Row Group
         LibraryERM.CreateAccScheduleName(AccScheduleName);
         LibraryERM.CreateAccScheduleLine(AccScheduleLine, AccScheduleName.Name);
@@ -2206,7 +2208,7 @@
         // [GIVEN] Create G/L Account account "A" and post entry with amount 100
         Amount := LibraryRandom.RandDec(100, 2);
         AccountNo := CreateGLAccountWithNetChange(Amount);
-        // [GIVEN] Create account schedule line for account "A" 
+        // [GIVEN] Create account schedule line for account "A"
         LibraryERM.CreateAccScheduleName(AccScheduleName);
         LibraryERM.CreateAccScheduleLine(AccScheduleLine, AccScheduleName.Name);
         FinancialReport.Get(AccScheduleName.Name);
@@ -2269,7 +2271,7 @@
         // [GIVEN] Open "Financial Reports" page
         FinancialReports.OpenView();
 
-        // [GIVEN] Position to created "Financial Report"        
+        // [GIVEN] Position to created "Financial Report"
         FinancialReports.GoToKey(AccScheduleName.Name);
 
         // [WHEN] Run "Edit Row Definition" action
