@@ -60,6 +60,7 @@ table 741 "VAT Report Line"
         field(8; Base; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Base';
 
             trigger OnValidate()
@@ -73,6 +74,7 @@ table 741 "VAT Report Line"
         field(9; Amount; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Amount';
 
             trigger OnValidate()
@@ -132,12 +134,14 @@ table 741 "VAT Report Line"
         field(22; "Unrealized Amount"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Unrealized Amount';
             Editable = false;
         }
         field(23; "Unrealized Base"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Unrealized Base';
             Editable = false;
         }
@@ -460,4 +464,3 @@ table 741 "VAT Report Line"
             Error(CorrectionEntryExistsErr, VATReportHeader."No.");
     end;
 }
-

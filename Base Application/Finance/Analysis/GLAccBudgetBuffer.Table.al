@@ -91,6 +91,7 @@ table 374 "G/L Acc. Budget Buffer"
         }
         field(13; "Budgeted Amount"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             CalcFormula = sum("G/L Budget Entry".Amount where("Budget Name" = field("Budget Filter"),
                                                                "G/L Account No." = field("G/L Account Filter"),
@@ -175,4 +176,3 @@ table 374 "G/L Acc. Budget Buffer"
         end;
     end;
 }
-
