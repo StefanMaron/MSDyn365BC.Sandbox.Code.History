@@ -202,6 +202,17 @@ table 88 "Financial Report"
             Caption = 'Logo Position';
             ToolTip = 'Specifies how your company logo is displayed on the financial report.';
         }
+        field(61; SheetDefinition; Code[10])
+        {
+            Caption = 'Sheet Definition';
+            TableRelation = "Sheet Definition Name";
+
+            trigger OnValidate()
+            begin
+                if SheetDefinition <> '' then
+                    AccSchedManagement.CheckSheetAnalysisView(Rec."Financial Report Row Group", Rec.SheetDefinition);
+            end;
+        }
     }
     keys
     {
