@@ -29,7 +29,7 @@ codeunit 134099 "Purchase Documents"
         WrongReportInvokedErr: Label 'Wrong report invoked.';
         ZeroQuantityInLineErr: Label 'One or more document lines with a value in the No. field do not have a quantity specified.';
         PurchLinesNotUpdatedMsg: Label 'You have changed %1 on the purchase header, but it has not been changed on the existing purchase lines.', Comment = 'You have changed Posting Date on the purchase header, but it has not been changed on the existing purchase lines.';
-        PurchLinesNotUpdatedDateMsg: Label 'You have changed the %1 on the purchase order, which might affect the prices and discounts on the purchase order lines.';
+        PurchLinesNotUpdatedDateMsg: Label 'You have changed the %1 on the purchase header, which might affect the prices and discounts on the purchase lines.';
         ReviewLinesManuallyMsg: Label 'You should review the lines and manually update prices and discounts if needed.';
         AffectExchangeRateMsg: Label 'The change may affect the exchange rate that is used for price calculation on the purchase lines.';
         SplitMessageTxt: Label '%1\%2', Comment = 'Some message text 1.\Some message text 2.', Locked = true;

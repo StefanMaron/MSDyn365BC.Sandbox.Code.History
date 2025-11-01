@@ -408,7 +408,6 @@ codeunit 130512 "Library - Purchase"
         PurchaseLine.Modify(true);
     end;
 
-    [Scope('OnPrem')]
     procedure MakeVendor(var Vendor: Record Vendor)
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -457,7 +456,6 @@ codeunit 130512 "Library - Purchase"
         exit(GeneralPostingSetup."Gen. Bus. Posting Group");
     end;
 
-    [Scope('OnPrem')]
     procedure MakePurchaseHeader(var PurchaseHeader: Record "Purchase Header"; DocType: Enum "Purchase Document Type"; PostingDate: Date; Vendor: Record Vendor)
     var
         ReasonCode: Record "Reason Code";

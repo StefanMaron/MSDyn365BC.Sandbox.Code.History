@@ -15,6 +15,7 @@ using Microsoft.Finance.GeneralLedger.Budget;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Period;
+using System.IO;
 using System.Telemetry;
 using System.Text;
 using System.Utilities;
@@ -470,6 +471,30 @@ report 25 "Account Schedule"
                                 RequestOptionsPage.Update();
                             end;
                         }
+                        field(SheetDefNameField; SheetDefNameText)
+                        {
+                            ApplicationArea = Basic, Suite;
+                            Caption = 'Sheet Definition';
+                            Editable = AccSchedNameEditable;
+                            Importance = Additional;
+                            ShowMandatory = true;
+                            TableRelation = "Sheet Definition Name";
+                            ToolTip = 'Specifies the name (code) of the sheet definition to be used for the report (default is the one used in the report definition, but you can override this here).';
+
+                            trigger OnAfterLookup(Selected: RecordRef)
+                            var
+                                SheetDefName: Record "Sheet Definition Name";
+                            begin
+                                SheetDefName := Selected;
+                                SheetDefNameText := SheetDefName.Name;
+                            end;
+
+                            trigger OnValidate()
+                            begin
+                                SheetDefNameTextHidden := '';
+                                RequestOptionsPage.Update();
+                            end;
+                        }
                     }
                     group(Filters)
                     {
@@ -783,6 +808,7 @@ report 25 "Account Schedule"
             GLSetup.Get();
             AccSchedName := '';
             ColumnLayoutName := '';
+            SheetDefNameText := '';
             TransferValues();
             ContextInitialized := true;
             if AccSchedName <> '' then
@@ -826,6 +852,67 @@ report 25 "Account Schedule"
         LogUsageTelemetry();
     end;
 
+    trigger OnPreRendering(var RenderingPayload: JsonObject)
+    var
+        SheetDefName: Record "Sheet Definition Name";
+        TempSheetDefLine: Record "Sheet Definition Line" temporary;
+        AccountSchedule: Report "Account Schedule";
+        PDFDocument: Codeunit "PDF Document";
+        SheetDefAccSchMgtHandler: Codeunit SheetDefAccSchMgtHandler;
+        TempBlob: Codeunit "Temp Blob";
+        ISheetDefinition: Interface ISheetDefinition;
+        OutStream: OutStream;
+        Instream: InStream;
+        IsHandled: Boolean;
+    begin
+        if SheetDefNameText = '' then
+            exit;
+        if FilteredBySheetDef then
+            exit;
+
+        SheetDefName.Get(SheetDefNameText);
+
+        AccSchedManagement.CheckSheetAnalysisView(AccSchedName, SheetDefName.Name);
+
+        PDFDocument.Initialize();
+
+        ISheetDefinition := SheetDefName."Sheet Type";
+        ISheetDefinition.PopulateLineBufferForReporting(SheetDefName, TempSheetDefLine);
+        if TempSheetDefLine.FindSet() then begin
+            BindSubscription(SheetDefAccSchMgtHandler);
+            SheetDefAccSchMgtHandler.SetSheetDefName(SheetDefName);
+            repeat
+                SheetDefAccSchMgtHandler.SetSheetDefLine(TempSheetDefLine);
+
+                Clear(AccountSchedule);
+                if FinancialReportName <> '' then
+                    AccountSchedule.SetFinancialReportName(FinancialReportName);
+                if AccSchedName <> '' then
+                    AccountSchedule.SetAccSchedName(AccSchedName);
+                if ColumnLayoutName <> '' then
+                    AccountSchedule.SetColumnLayoutName(ColumnLayoutName);
+                AccountSchedule.SetFilters(
+                    DateFilter, GLBudgetFilter, CostBudgetFilter, BusinessUnitFilter,
+                    Dim1Filter, Dim2Filter, Dim3Filter, Dim4Filter, CashFlowFilter, NegativeAmountFormat);
+                AccountSchedule.SetFilteredBySheetDef(true);
+                AccountSchedule.SetBudgetFilterEnable();
+
+                TempBlob.CreateOutStream(OutStream);
+                AccountSchedule.SetFinancialReportDescription(TempSheetDefLine."Sheet Header");
+                IsHandled := false;
+                OnBeforeSaveSheetDefinitionReport(AccountSchedule, TempSheetDefLine, OutStream, IsHandled);
+                if not IsHandled then
+                    AccountSchedule.SaveAs('', ReportFormat::Pdf, OutStream);
+                TempBlob.CreateInStream(Instream);
+                PDFDocument.AddStreamToAppend(Instream);
+
+            until TempSheetDefLine.Next() = 0;
+            UnbindSubscription(SheetDefAccSchMgtHandler);
+        end;
+
+        PDFDocument.ToJson(RenderingPayload);
+    end;
+
     var
         AnalysisView: Record "Analysis View";
         GLSetup: Record "General Ledger Setup";
@@ -834,7 +921,9 @@ report 25 "Account Schedule"
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
         AccSchedNameHidden: Code[10];
         FinancialReportDescription: Text;
+        FinancialReportDescHidden: Text;
         ColumnLayoutNameHidden: Code[10];
+        SheetDefNameTextHidden: Code[10];
         GLBudgetName: Code[10];
         StartDateEnabled: Boolean;
         StartDate: Date;
@@ -905,6 +994,7 @@ report 25 "Account Schedule"
         DateFilterDisabled: Boolean;
         UseHiddenDateFilter: Boolean;
         RunForExport: Boolean;
+        FilteredBySheetDef: Boolean;
 
 #pragma warning disable AA0074
         Text000: Label '(Thousands)';
@@ -939,6 +1029,7 @@ report 25 "Account Schedule"
         LineSkipped: Boolean;
         UseAmtsInAddCurr: Boolean;
         NegativeAmountFormat: Enum "Analysis Negative Format";
+        SheetDefNameText: Code[10];
 
     local procedure CalcColumnValueAsText(var AccScheduleLine: Record "Acc. Schedule Line"; var ColumnLayout: Record "Column Layout"; var ColumnHeader: Text; var ValueIsEmpty: Boolean): Text[30]
     var
@@ -1142,6 +1233,21 @@ report 25 "Account Schedule"
         StartDateEnabled := true;
     end;
 
+    procedure SetSheetDefName(SheetDefName: Code[10])
+    begin
+        SheetDefNameTextHidden := SheetDefName;
+    end;
+
+    procedure SetFilteredBySheetDef(IsFiltered: Boolean)
+    begin
+        FilteredBySheetDef := IsFiltered;
+    end;
+
+    procedure SetFinancialReportDescription(NewDescription: Text)
+    begin
+        FinancialReportDescHidden := NewDescription;
+    end;
+
     procedure SetFilters(NewDateFilter: Text; NewBudgetFilter: Text; NewCostBudgetFilter: Text; NewBusUnitFilter: Text; NewDim1Filter: Text; NewDim2Filter: Text; NewDim3Filter: Text; NewDim4Filter: Text)
     begin
         DateFilterHidden := NewDateFilter;
@@ -1278,6 +1384,9 @@ report 25 "Account Schedule"
                 AccSchedName := AccSchedNameHidden;
             if ColumnLayoutNameHidden <> '' then
                 ColumnLayoutName := ColumnLayoutNameHidden;
+            SheetDefNameText := '';
+            if SheetDefNameTextHidden <> '' then
+                SheetDefNameText := SheetDefNameTextHidden;
             if DateFilterHidden <> '' then
                 DateFilter := DateFilterHidden;
             if GLBudgetFilterHidden <> '' then
@@ -1311,6 +1420,8 @@ report 25 "Account Schedule"
             AccSchedName := FinancialReportLocal."Financial Report Row Group";
         if ColumnLayoutName = '' then
             ColumnLayoutName := FinancialReportLocal."Financial Report Column Group";
+        if SheetDefNameText = '' then
+            SheetDefNameText := FinancialReportLocal.SheetDefinition;
 
         if AccSchedName <> '' then
             if not AccScheduleName.Get(AccSchedName) then
@@ -1319,10 +1430,13 @@ report 25 "Account Schedule"
             if AccScheduleName.FindFirst() then
                 AccSchedName := AccScheduleName.Name;
 
-        if FinancialReportLocal.Name <> '' then
-            FinancialReportDescription := FinancialReportLocal.Description
+        if FinancialReportDescHidden <> '' then
+            FinancialReportDescription := FinancialReportDescHidden
         else
-            FinancialReportDescription := AccScheduleName.Description;
+            if FinancialReportLocal.Name <> '' then
+                FinancialReportDescription := FinancialReportLocal.Description
+            else
+                FinancialReportDescription := AccScheduleName.Description;
 
         if not ColumnLayoutName2.Get(ColumnLayoutName) then
             if ColumnLayoutName2.FindFirst() then
@@ -1366,7 +1480,7 @@ report 25 "Account Schedule"
             DateFilter := DateFilterHidden;
     end;
 
-    local procedure SetBudgetFilterEnable()
+    procedure SetBudgetFilterEnable()
     var
         ColumnLayout: Record "Column Layout";
     begin
@@ -1479,6 +1593,11 @@ report 25 "Account Schedule"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetColumnLayoutOnAfteCheckIsLineSkipped(var AccScheduleLine: Record "Acc. Schedule Line"; var ValueIsEmpty: Boolean; var IsLineSkipped: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSaveSheetDefinitionReport(var AccountSchedule: Report "Account Schedule"; SheetDefLine: Record "Sheet Definition Line"; var OutStr: OutStream; var IsHandled: Boolean)
     begin
     end;
 }

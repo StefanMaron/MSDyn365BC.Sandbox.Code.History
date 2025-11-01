@@ -674,7 +674,6 @@ codeunit 131332 "Library - Cash Flow Helper"
         PaymentTerms.Get(Customer."Payment Terms Code");
     end;
 
-    [Scope('OnPrem')]
     procedure FindFirstCustLEFromSO(var CustLedgerEntry: Record "Cust. Ledger Entry"; SalesOrderNo: Code[20])
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
@@ -1013,7 +1012,6 @@ codeunit 131332 "Library - Cash Flow Helper"
         exit(PaymentTermsCode);
     end;
 
-    [Scope('OnPrem')]
     procedure GetPmtTermsDiscountPercentage(PaymentTerms: Record "Payment Terms"): Decimal
     var
         PaymentLines: Record "Payment Lines";
@@ -1026,7 +1024,6 @@ codeunit 131332 "Library - Cash Flow Helper"
         exit(PaymentLines."Discount %");
     end;
 
-    [Scope('OnPrem')]
     procedure GetPmtTermsDueDateCalculation(var Result: DateFormula; PaymentTerms: Record "Payment Terms")
     var
         PaymentLines: Record "Payment Lines";
@@ -1038,7 +1035,6 @@ codeunit 131332 "Library - Cash Flow Helper"
         Result := PaymentLines."Due Date Calculation";
     end;
 
-    [Scope('OnPrem')]
     procedure GetPmtTermsDiscountDateCalculation(var Result: DateFormula; PaymentTerms: Record "Payment Terms")
     var
         PaymentLines: Record "Payment Lines";
