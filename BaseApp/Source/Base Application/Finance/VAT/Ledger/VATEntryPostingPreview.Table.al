@@ -70,6 +70,7 @@ table 1571 "VAT Entry Posting Preview"
         field(8; Base; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Base';
             Editable = false;
             ToolTip = 'Specifies the amount that the VAT amount (the amount shown in the Amount field) is calculated from.';
@@ -77,6 +78,7 @@ table 1571 "VAT Entry Posting Preview"
         field(9; Amount; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Amount';
             Editable = false;
             ToolTip = 'Specifies the amount of the VAT entry in LCY.';
@@ -150,24 +152,28 @@ table 1571 "VAT Entry Posting Preview"
         field(22; "Unrealized Amount"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Unrealized Amount';
             Editable = false;
         }
         field(23; "Unrealized Base"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Unrealized Base';
             Editable = false;
         }
         field(24; "Remaining Unrealized Amount"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Remaining Unrealized Amount';
             Editable = false;
         }
         field(25; "Remaining Unrealized Base"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Remaining Unrealized Base';
             Editable = false;
         }
@@ -287,6 +293,7 @@ table 1571 "VAT Entry Posting Preview"
         }
         field(48; "VAT Base Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT Base Discount %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -310,6 +317,7 @@ table 1571 "VAT Entry Posting Preview"
         field(51; "VAT Difference"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'VAT Difference';
             Editable = false;
             ToolTip = 'Specifies the difference between the calculated VAT amount and a VAT amount that you have entered manually.';
@@ -370,29 +378,34 @@ table 1571 "VAT Entry Posting Preview"
         field(60; "Base Before Pmt. Disc."; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Base Before Pmt. Disc.';
             Editable = false;
         }
         field(81; "Realized Amount"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Realized Amount';
             Editable = false;
         }
         field(82; "Realized Base"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Realized Base';
             Editable = false;
         }
         field(83; "Add.-Curr. Realized Amount"; Decimal)
         {
+            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Add.-Curr. Realized Amount';
             Editable = false;
         }
         field(84; "Add.-Curr. Realized Base"; Decimal)
         {
+            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Add.-Curr. Realized Base';
             Editable = false;
@@ -437,4 +450,3 @@ table 1571 "VAT Entry Posting Preview"
         exit(GLSetup."Additional Reporting Currency");
     end;
 }
-

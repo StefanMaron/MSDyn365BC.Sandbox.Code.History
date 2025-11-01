@@ -72,6 +72,7 @@ table 430 "Handled IC Outbox Sales Header"
         }
         field(25; "Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             Editable = false;
         }
@@ -179,4 +180,3 @@ table 430 "Handled IC Outbox Sales Header"
           DATABASE::"Handled IC Outbox Sales Header", "IC Transaction No.", "IC Partner Code", "Transaction Source", 0);
     end;
 }
-
