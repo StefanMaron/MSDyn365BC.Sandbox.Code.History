@@ -24,6 +24,7 @@
         LibrarySales: Codeunit "Library - Sales";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryCosting: Codeunit "Library - Costing";
+        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibraryERM: Codeunit "Library - ERM";
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
         LibraryRandom: Codeunit "Library - Random";
@@ -944,7 +945,7 @@
 
         // Exercise
         LibraryCosting.AdjustCostItemEntries('', '');
-        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify: Starting Date and Ending Date is work correctly in Inventory Valuation WIP report.
         Commit();
