@@ -39,6 +39,8 @@ table 2673 "Alloc. Acc. Manual Override"
         }
         field(8; Amount; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             DataClassification = CustomerContent;
             Caption = 'Amount';
         }
@@ -49,11 +51,13 @@ table 2673 "Alloc. Acc. Manual Override"
         }
         field(15; Percentage; Decimal)
         {
+            AutoFormatType = 0;
             DataClassification = CustomerContent;
             Caption = 'Percentage';
         }
         field(20; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             DataClassification = SystemMetadata;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;

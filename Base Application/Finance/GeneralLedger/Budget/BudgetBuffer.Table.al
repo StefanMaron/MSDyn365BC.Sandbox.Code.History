@@ -67,6 +67,7 @@ table 371 "Budget Buffer"
         }
         field(11; Amount; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount';
             DataClassification = SystemMetadata;
@@ -85,4 +86,3 @@ table 371 "Budget Buffer"
     {
     }
 }
-
