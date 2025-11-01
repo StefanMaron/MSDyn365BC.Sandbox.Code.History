@@ -451,6 +451,8 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Service Shipment Line");
         ListOfTablesToMigrate.Add(Database::"Service Status Priority Setup");
         ListOfTablesToMigrate.Add(Database::"Service Zone");
+        ListOfTablesToMigrate.Add(Database::"Sheet Definition Line");
+        ListOfTablesToMigrate.Add(Database::"Sheet Definition Name");
         ListOfTablesToMigrate.Add(Database::"Shipment Method Translation");
         ListOfTablesToMigrate.Add(Database::"Shipment Method");
         ListOfTablesToMigrate.Add(Database::"Shipping Agent Services");

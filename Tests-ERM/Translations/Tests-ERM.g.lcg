@@ -914,6 +914,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Account Schedule II - NamedType InvalidRowErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 583230938 - NamedType 939244098" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Sheet %1 is either missing or does not contain the correct data.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Sheet number]D;]A;(LookupHint=Codeunit ERM Account Schedule II - NamedType MissingSheetDataErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 583230938 - NamedType 3453919253" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You can only copy one rows definition at a time.]]></Val>
@@ -5911,7 +5920,7 @@
   </Item>
   <Item ItemId=";Codeunit 1951354433 - NamedType 2347725511" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[You have changed the Order Date on the purchase order, which might affect the prices and discounts on the purchase order lines.\Do you want to update the order date for existing lines?]]></Val>
+      <Val><![CDATA[You have changed the Order Date on the purchase header, which might affect the prices and discounts on the purchase lines.\Do you want to update the order date for existing lines?]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -11491,7 +11500,7 @@
   </Item>
   <Item ItemId=";Codeunit 1217376489 - NamedType 454677184" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[You have changed the %1 on the purchase order, which might affect the prices and discounts on the purchase order lines.]]></Val>
+      <Val><![CDATA[You have changed the %1 on the purchase header, which might affect the prices and discounts on the purchase lines.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
