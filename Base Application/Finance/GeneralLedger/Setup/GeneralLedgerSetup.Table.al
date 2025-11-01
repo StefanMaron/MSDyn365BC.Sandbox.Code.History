@@ -132,6 +132,7 @@ table 98 "General Ledger Setup"
         }
         field(44; "Cust. Balances Due"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                  "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
@@ -143,6 +144,7 @@ table 98 "General Ledger Setup"
         }
         field(45; "Vendor Balances Due"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             CalcFormula = - sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" where("Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                    "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
@@ -272,6 +274,7 @@ table 98 "General Ledger Setup"
         }
         field(58; "Inv. Rounding Precision (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Inv. Rounding Precision (LCY)';
 
@@ -365,6 +368,7 @@ table 98 "General Ledger Setup"
         }
         field(69; "VAT Tolerance %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT Tolerance %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -407,6 +411,7 @@ table 98 "General Ledger Setup"
         }
         field(73; "Amount Rounding Precision"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Amount Rounding Precision';
             DecimalPlaces = 0 : 5;
             InitValue = 0.01;
@@ -424,6 +429,7 @@ table 98 "General Ledger Setup"
         }
         field(74; "Unit-Amount Rounding Precision"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Unit-Amount Rounding Precision';
             DecimalPlaces = 0 : 9;
             InitValue = 0.00001;
@@ -436,7 +442,8 @@ table 98 "General Ledger Setup"
         }
         field(75; "Appln. Rounding Precision"; Decimal)
         {
-            AutoFormatType = 1;
+            AutoFormatExpression = '';
+            AutoFormatType = 0;
             Caption = 'Appln. Rounding Precision';
             MinValue = 0;
         }
@@ -542,6 +549,7 @@ table 98 "General Ledger Setup"
         }
         field(89; "Max. VAT Difference Allowed"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Max. VAT Difference Allowed';
 
@@ -573,6 +581,7 @@ table 98 "General Ledger Setup"
         }
         field(94; "Payment Tolerance %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Tolerance %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -581,6 +590,8 @@ table 98 "General Ledger Setup"
         }
         field(95; "Max. Payment Tolerance Amount"; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             Caption = 'Max. Payment Tolerance Amount';
             Editable = false;
             MinValue = 0;
@@ -703,6 +714,8 @@ table 98 "General Ledger Setup"
         }
         field(120; "Tax Invoice Renaming Threshold"; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             Caption = 'Tax Invoice Renaming Threshold';
             DataClassification = SystemMetadata;
         }

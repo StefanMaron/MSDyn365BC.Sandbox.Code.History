@@ -85,6 +85,7 @@ table 96 "G/L Budget Entry"
         }
         field(7; Amount; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount';
 
@@ -563,4 +564,3 @@ table 96 "G/L Budget Entry"
     begin
     end;
 }
-
