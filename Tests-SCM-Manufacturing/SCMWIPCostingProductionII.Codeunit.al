@@ -43,6 +43,7 @@ codeunit 137004 "SCM WIP Costing Production-II"
     var
         LibraryUtility: Codeunit "Library - Utility";
         LibraryCosting: Codeunit "Library - Costing";
+        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryPlanning: Codeunit "Library - Planning";
         LibraryInventory: Codeunit "Library - Inventory";
@@ -1455,7 +1456,7 @@ codeunit 137004 "SCM WIP Costing Production-II"
     local procedure AdjustCostPostInventoryCostGL(ItemNoFilter: Text[250])
     begin
         LibraryCosting.AdjustCostItemEntries(ItemNoFilter, '');
-        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
     end;
 
     local procedure CreateSubcontractorWithCurrency(CurrencyCode: Code[10]): Code[20]
