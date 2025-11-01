@@ -61,6 +61,7 @@ codeunit 137101 "SCM Kitting"
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryAssembly: Codeunit "Library - Assembly";
         LibraryCosting: Codeunit "Library - Costing";
+        LibraryPostInventoryCostToGL: Codeunit "Library - Post Inventory To GL";
         LibraryERM: Codeunit "Library - ERM";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryResource: Codeunit "Library - Resource";
@@ -1337,7 +1338,7 @@ codeunit 137101 "SCM Kitting"
         PrepareAndPostAssemblyOrder(AssemblyHeader, TempAssemblyLine, 100, 70, false);  // Use 100 for full Quantity to Assemble and 70 for Quantity to Consume.
 
         // Exercise.
-        LibraryAssembly.PostInvtCostToGL(false, AssemblyItem."No.", '', StrSubstNo(FileName, TemporaryPath + AssemblyItem."No."));
+        LibraryPostInventoryCostToGL.PostInvtCostToGL(false, AssemblyItem."No.", '', StrSubstNo(FileName, TemporaryPath + AssemblyItem."No."));
 
         // Verify.
         VerifyGLEntry(AssemblyItem, AssemblyHeader."No.");
@@ -1365,7 +1366,7 @@ codeunit 137101 "SCM Kitting"
 
         // Exercise.
         LibraryVariableStorage.Enqueue(ValueEntriesWerePostedTxt);
-        LibraryAssembly.PostInvtCostToGL(false, AssemblyItem."No.", '', StrSubstNo(FileName, TemporaryPath + AssemblyItem."No."));
+        LibraryPostInventoryCostToGL.PostInvtCostToGL(false, AssemblyItem."No.", '', StrSubstNo(FileName, TemporaryPath + AssemblyItem."No."));
 
         // Verify.
         VerifyGLEntry(AssemblyItem, AssemblyHeader."No.");
@@ -1393,7 +1394,7 @@ codeunit 137101 "SCM Kitting"
 
         // Exercise.
         LibraryVariableStorage.Enqueue(ValueEntriesWerePostedTxt);
-        LibraryAssembly.PostInvtCostToGL(false, AssemblyItem."No.", '', StrSubstNo(FileName, TemporaryPath + AssemblyItem."No."));
+        LibraryPostInventoryCostToGL.PostInvtCostToGL(false, AssemblyItem."No.", '', StrSubstNo(FileName, TemporaryPath + AssemblyItem."No."));
 
         // Verify.
         VerifyGLEntry(AssemblyItem, AssemblyHeader."No.");

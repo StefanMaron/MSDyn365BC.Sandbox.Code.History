@@ -5,7 +5,6 @@ codeunit 132222 "Library - Notification Mgt."
     begin
     end;
 
-    [Scope('OnPrem')]
     procedure RecallNotificationsForRecord(RecVarToRecall: Variant)
     var
         RecRef: RecordRef;
@@ -14,7 +13,6 @@ codeunit 132222 "Library - Notification Mgt."
         RecallNotificationsForRecordID(RecRef.RecordId);
     end;
 
-    [Scope('OnPrem')]
     procedure RecallNotificationsForRecordID(RecordIDToRecall: RecordID)
     var
         NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
@@ -61,7 +59,6 @@ codeunit 132222 "Library - Notification Mgt."
               false);
     end;
 
-    [Scope('OnPrem')]
     procedure DisableMyNotification(NotificationID: Guid)
     var
         MyNotifications: Record "My Notifications";
@@ -70,7 +67,6 @@ codeunit 132222 "Library - Notification Mgt."
         MyNotifications.Disable(NotificationID);
     end;
 
-    [Scope('OnPrem')]
     procedure ClearTemporaryNotificationContext()
     var
         TempNotificationContext: Record "Notification Context" temporary;
