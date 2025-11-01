@@ -76,6 +76,9 @@ codeunit 101903 "Localized Create Demo Data"
             CreateCashDeskEventCZP.CreateEvaluationData();
             CreateCashDocumentHdrCZP.CreateEvaluationData();
             CreateCashDocumentLineCZP.CreateEvaluationData();
+#if not CLEAN28
+            Codeunit.Run(Codeunit::"Create VAT Period CZL");
+#endif            
             Codeunit.Run(Codeunit::"Create VAT Return Period CZL");
             Codeunit.Run(Codeunit::"Create Company Official CZL");
             Codeunit.Run(Codeunit::"Create P. AdvLetter Header CZZ");

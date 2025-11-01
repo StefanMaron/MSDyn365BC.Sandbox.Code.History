@@ -19,6 +19,7 @@
         LibrarySales: Codeunit "Library - Sales";
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryUtility: Codeunit "Library - Utility";
+        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryDimension: Codeunit "Library - Dimension";
@@ -81,7 +82,7 @@
         RoundingTo0Err: Label 'Rounding of the field';
         RemitToCodeShouldNotBeEditableErr: Label 'Remit-to code should not be editable when vendor is not selected.';
         RemitToCodeShouldBeEditableErr: Label 'Remit-to code should be editable when vendor is selected.';
-        UpdateLinesOrderDateAutomaticallyQst: Label 'You have changed the Order Date on the purchase order, which might affect the prices and discounts on the purchase order lines.\Do you want to update the order date for existing lines?';
+        UpdateLinesOrderDateAutomaticallyQst: Label 'You have changed the Order Date on the purchase header, which might affect the prices and discounts on the purchase lines.\Do you want to update the order date for existing lines?';
         OrderDateErr: Label 'The purchase line order date is (%1), but it should be (%2).', Comment = '%1 - Actual Purchase Line Order Date; %2 - Expected Purchase Line Order Date';
         DescriptionErr: Label 'The purchase line description (%1) should be the same as the random generated description (%2).', Comment = '%1 - Purchase Line Description; %2 - Random Generated Description';
         QtyReceivedBaseErr: Label 'Qty. Received (Base) is not as expected.';
@@ -272,7 +273,7 @@
         Order.SaveAsExcel(FilePath);
 
         // Verify: Verify that Saved files have some data.
-        LibraryUtility.CheckFileNotEmpty(FilePath);
+        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
@@ -356,7 +357,7 @@
         PurchaseInvoice.SaveAsExcel(FilePath);
 
         // Verify: Verify that Saved files have some data.
-        LibraryUtility.CheckFileNotEmpty(FilePath);
+        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]

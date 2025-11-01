@@ -18,7 +18,7 @@ codeunit 135200 "Time Series Tests"
         MockServiceURITxt: Label 'https://localhost:8080/services.azureml.net/workspaces/2eaccaaec84c47c7a1f8f01ec0a6eea7', Locked = true;
         LibraryERM: Codeunit "Library - ERM";
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
-        LibraryUtility: Codeunit "Library - Utility";
+        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         HttpMessageHandler: DotNet MockHttpMessageHandler;
         DataSize: Option "No Data",Small,Big;
         TimeSeriesCalculationState: Option Uninitialized,Initialized,"Data Prepared",Done;
@@ -180,7 +180,7 @@ codeunit 135200 "Time Series Tests"
 
         // [GIVEN] An initialized Time Series Management
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtilityOnPrem.GetInetRoot() + GetResponseFileName()));
         ApiUrl := MockServiceURITxt;
         ApiKey := '';
         TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
@@ -239,7 +239,7 @@ codeunit 135200 "Time Series Tests"
         // [GIVEN] An initialized Time Series Management
         LibraryLowerPermissions.SetO365Basic();
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtilityOnPrem.GetInetRoot() + GetResponseFileName()));
         ApiUrl := MockServiceURITxt;
         ApiKey := '';
         TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
@@ -285,7 +285,7 @@ codeunit 135200 "Time Series Tests"
 
         // [GIVEN] An initialized Time Series Management
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtilityOnPrem.GetInetRoot() + GetResponseFileName()));
         ApiUrl := MockServiceURITxt;
         ApiKey := '';
         TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
@@ -324,7 +324,7 @@ codeunit 135200 "Time Series Tests"
         LibraryLowerPermissions.SetSalesDocsCreate();
 
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtilityOnPrem.GetInetRoot() + GetResponseFileName()));
         ApiUrl := MockServiceURITxt;
         ApiKey := '';
         TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
@@ -362,7 +362,7 @@ codeunit 135200 "Time Series Tests"
         LibraryLowerPermissions.SetO365Basic();
 
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtilityOnPrem.GetInetRoot() + GetResponseFileName()));
         ApiUrl := MockServiceURITxt;
         ApiKey := '';
         TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
@@ -403,7 +403,7 @@ codeunit 135200 "Time Series Tests"
         CreateTestData(ItemLedgerEntry, DataSize::Small);
         LibraryLowerPermissions.SetO365Basic();
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtilityOnPrem.GetInetRoot() + GetResponseFileName()));
 
         // [WHEN] The results are requested
         GetForecast(TimeSeriesManagement, ItemLedgerEntry, TempTimeSeriesForecast, Date."Period Type"::Month, 3);
@@ -434,7 +434,7 @@ codeunit 135200 "Time Series Tests"
         CreateTestData(ItemLedgerEntry, DataSize::Big);
         LibraryLowerPermissions.SetO365Basic();
         TimeSeriesManagement.SetMessageHandler(
-          HttpMessageHandler.MockHttpMessageHandler(LibraryUtility.GetInetRoot() + GetResponseFileName()));
+          HttpMessageHandler.MockHttpMessageHandler(LibraryUtilityOnPrem.GetInetRoot() + GetResponseFileName()));
         ApiUrl := MockServiceURITxt;
         ApiKey := '';
         TimeSeriesManagement.Initialize(ApiUrl, ApiKey, 0, false);
