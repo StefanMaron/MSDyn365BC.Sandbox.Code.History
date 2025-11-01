@@ -139,17 +139,20 @@ codeunit 5995 "Service Warehouse Mgt."
     begin
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"WMS Management", 'OnBeforeShowPostedSourceDocument', '', false, false)]
-    local procedure OnBeforeShowPostedSourceDocument(PostedSourceDoc: Enum "Warehouse Shipment Posted Source Document"; PostedSourceNo: Code[20]; var IsHandled: Boolean)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"WMS Management", 'OnShowPostedSourceDoc', '', false, false)]
+    local procedure OnShowPostedSourceDoc(PostedSourceDoc: Option; PostedSourceNo: Code[20]; WarehouseActivitySourceDocument: Enum "Warehouse Activity Source Document")
     var
         ServiceShipmentHeader: Record "Service Shipment Header";
+        WarehouseShipmentPostedSourceDocument: Enum "Warehouse Shipment Posted Source Document";
     begin
-        case PostedSourceDoc of
-            PostedSourceDoc::"Posted Shipment":
-                if ServiceShipmentHeader.Get(PostedSourceNo) then begin
-                    IsHandled := true;
+        if WarehouseActivitySourceDocument <> WarehouseActivitySourceDocument::"Service Order" then
+            exit;
+
+        WarehouseShipmentPostedSourceDocument := Enum::"Warehouse Shipment Posted Source Document".FromInteger(PostedSourceDoc);
+        case WarehouseShipmentPostedSourceDocument of
+            WarehouseShipmentPostedSourceDocument::"Posted Shipment":
+                if ServiceShipmentHeader.Get(PostedSourceNo) then
                     Page.RunModal(Page::"Posted Service Shipment", ServiceShipmentHeader);
-                end;
         end;
     end;
 
