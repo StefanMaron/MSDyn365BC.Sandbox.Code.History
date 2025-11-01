@@ -63,7 +63,7 @@ codeunit 5991 "Sales Warehouse Mgt."
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"WMS Management", 'OnShowPostedSourceDoc', '', false, false)]
-    local procedure OnShowPostedSourceDoc(PostedSourceDoc: Option; PostedSourceNo: Code[20])
+    local procedure OnShowPostedSourceDoc(PostedSourceDoc: Option; PostedSourceNo: Code[20]; WarehouseActivitySourceDocument: Enum "Warehouse Activity Source Document")
     var
         SalesShipmentHeader: Record "Sales Shipment Header";
         ReturnReceiptHeader: Record "Return Receipt Header";
@@ -72,7 +72,7 @@ codeunit 5991 "Sales Warehouse Mgt."
         PostedSourceDocEnum := Enum::"Warehouse Shipment Posted Source Document".FromInteger(PostedSourceDoc);
         case PostedSourceDocEnum of
             PostedSourceDocEnum::"Posted Shipment":
-                begin
+                if WarehouseActivitySourceDocument = WarehouseActivitySourceDocument::"Sales Order" then begin
                     SalesShipmentHeader.Reset();
                     SalesShipmentHeader.SetRange("No.", PostedSourceNo);
                     PAGE.RunModal(PAGE::"Posted Sales Shipment", SalesShipmentHeader);
