@@ -215,6 +215,12 @@ table 298 "Issued Reminder Line"
         {
             SumIndexFields = Amount, "VAT Amount", "Remaining Amount";
         }
+#if CLEAN28
+        key(Key4; "Reminder No.", Type)
+        {
+            SumIndexFields = "VAT Amount";
+        }
+#endif
     }
 
     fieldgroups

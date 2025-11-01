@@ -3,12 +3,14 @@ namespace System.Security.AccessControl;
 using Microsoft.Finance.GeneralLedger.Setup;
 #if not CLEAN28
 using Microsoft.Bank.Ledger;
-#endif
 using Microsoft.Sales.FinanceCharge;
+#endif
 #if not CLEAN27
 using Microsoft.Finance.VAT.Reporting;
 #endif
+#if not CLEAN28
 using Microsoft.Foundation.Address;
+#endif
 
 permissionset 1001 "LOCAL"
 {
@@ -16,12 +18,13 @@ permissionset 1001 "LOCAL"
     Assignable = true;
     Caption = 'Country/region-specific func.';
 
-    Permissions = tabledata "Accounting Period GB" = RIMD,
+    Permissions = tabledata "Accounting Period GB" = RIMD
 #if not CLEAN28
+                  ,
                   tabledata "BACS Ledger Entry" = RIMD,
                   tabledata "BACS Register" = RIMD,
-#endif
                   tabledata "Fin. Charge Interest Rate" = RIMD,
+#endif
 #if not CLEAN27
                   tabledata "GovTalk Message Parts" = RIMD,
                   tabledata "GovTalk Setup" = r,
@@ -35,5 +38,8 @@ permissionset 1001 "LOCAL"
                   tabledata "MTD-Session Fraud Prev. Hdr" = RIMD,
                   tabledata "MTD-Default Fraud Prev. Hdr" = RIMD,
 #endif
-                  tabledata "Postcode Notification Memory" = RIMD;
+#if not CLEAN28
+                  tabledata "Postcode Notification Memory" = RIMD
+#endif
+;
 }
