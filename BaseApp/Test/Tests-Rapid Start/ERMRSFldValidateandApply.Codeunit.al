@@ -18,6 +18,7 @@ codeunit 136609 "ERM RS Fld. Validate and Apply"
         LibraryRandom: Codeunit "Library - Random";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryWarehouse: Codeunit "Library - Warehouse";
+        APIMockEvents: Codeunit "API Mock Events";
         isInitialized: Boolean;
         SingleEntryRecNo: Integer;
         MigrationError: Label 'There are errors in Migration Data Error.';
@@ -41,7 +42,7 @@ codeunit 136609 "ERM RS Fld. Validate and Apply"
 
         SingleEntryRecNo := 1;
 
-        LibraryRapidStart.SetAPIServicesEnabled(false);
+        APIMockEvents.SetAPIServicesEnabled(false);
         isInitialized := true;
         Commit();
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"ERM RS Fld. Validate and Apply");

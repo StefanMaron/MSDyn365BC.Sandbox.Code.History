@@ -109,6 +109,12 @@ page 7339 "Warehouse Shipment List"
                     ToolTip = 'Specifies the delivery conditions of the related shipment, such as free on board (FOB).';
                     Visible = false;
                 }
+                field("Completely Picked"; Rec."Completely Picked")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies whether all items on the warehouse shipment have been completely picked.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)

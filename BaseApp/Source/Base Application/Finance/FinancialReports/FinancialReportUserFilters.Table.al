@@ -142,6 +142,12 @@ table 89 "Financial Report User Filters"
             Caption = 'Column Definition';
             DataClassification = SystemMetadata;
         }
+        field(60; FinReportSheetDefName; Code[10])
+        {
+            Caption = 'Sheet Definition';
+            DataClassification = SystemMetadata;
+            TableRelation = "Sheet Definition Name";
+        }
     }
 
     keys
