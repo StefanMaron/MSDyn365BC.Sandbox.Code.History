@@ -26,30 +26,35 @@ table 331 "Adjust Exchange Rate Buffer"
         }
         field(3; AdjBase; Decimal)
         {
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'AdjBase';
             DataClassification = SystemMetadata;
         }
         field(4; AdjBaseLCY; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'AdjBaseLCY';
             DataClassification = SystemMetadata;
         }
         field(5; AdjAmount; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'AdjAmount';
             DataClassification = SystemMetadata;
         }
         field(6; TotalGainsAmount; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'TotalGainsAmount';
             DataClassification = SystemMetadata;
         }
         field(7; TotalLossesAmount; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'TotalLossesAmount';
             DataClassification = SystemMetadata;
@@ -88,4 +93,3 @@ table 331 "Adjust Exchange Rate Buffer"
     {
     }
 }
-
