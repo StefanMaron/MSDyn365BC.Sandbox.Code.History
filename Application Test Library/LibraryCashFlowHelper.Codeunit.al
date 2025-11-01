@@ -992,7 +992,6 @@ codeunit 131332 "Library - Cash Flow Helper"
         exit(TotalAmount);
     end;
 
-    [Scope('OnPrem')]
     procedure GetSalesVATBaseAmtFromVATEntry(PostingDate: Date; DocNo: Code[20]): Decimal
     var
         VATEntry: Record "VAT Entry";
@@ -1000,7 +999,6 @@ codeunit 131332 "Library - Cash Flow Helper"
         exit(GetVATBaseAmtFromVATEntry(PostingDate, DocNo, VATEntry.Type::Sale));
     end;
 
-    [Scope('OnPrem')]
     procedure GetPurchVATBaseAmtFromVATEntry(PostingDate: Date; DocNo: Code[20]): Decimal
     var
         VATEntry: Record "VAT Entry";
@@ -1046,7 +1044,6 @@ codeunit 131332 "Library - Cash Flow Helper"
         exit(GetAmountLCY(ServHeader."Currency Code", ServHeader."Posting Date", ServLine."VAT Base Amount"));
     end;
 
-    [Scope('OnPrem')]
     procedure GetAmountLCY(CurrencyCode: Code[10]; PostingDate: Date; Amount: Decimal): Decimal
     begin
         if CurrencyCode = '' then

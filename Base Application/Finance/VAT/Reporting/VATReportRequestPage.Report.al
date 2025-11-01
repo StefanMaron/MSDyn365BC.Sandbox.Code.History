@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -230,7 +230,7 @@ report 742 "VAT Report Request Page"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeVATStatementLineFindSet(VATStatementLine: Record "VAT Statement Line"; VATReportHeader: Record "VAT Report Header")
+    local procedure OnBeforeVATStatementLineFindSet(var VATStatementLine: Record "VAT Statement Line"; VATReportHeader: Record "VAT Report Header")
     begin
     end;
 

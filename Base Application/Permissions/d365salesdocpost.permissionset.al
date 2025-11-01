@@ -36,6 +36,7 @@ using Microsoft.Sales.Document;
 using Microsoft.Finance.VAT.Registration;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.HumanResources.Employee;
+using Microsoft.Finance.VAT.Reporting;
 
 permissionset 9977 "D365 SALES DOC, POST"
 {
@@ -100,6 +101,7 @@ permissionset 9977 "D365 SALES DOC, POST"
                   tabledata "VAT Entry" = Rimd,
                   tabledata "VAT Business Posting Group" = RM,
                   tabledata "VAT Registration No. Format" = R,
+                  tabledata "VAT Return Period" = R,
                   tabledata "VAT Setup" = R,
                   tabledata "Alt. Cust. VAT Reg." = R,
                   tabledata "VAT Posting Parameters" = R,

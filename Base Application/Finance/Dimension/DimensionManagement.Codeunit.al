@@ -2308,7 +2308,7 @@ codeunit 408 DimensionManagement
             until TempDimSetEntry.Next() = 0;
     end;
 
-    internal procedure ChunkDimSetFilters(var TempDimensionSetEntry: Record "Dimension Set Entry" temporary): List of [Text]
+    procedure ChunkDimSetFilters(var TempDimensionSetEntry: Record "Dimension Set Entry" temporary): List of [Text]
     var
         DimSetFilters: List of [Text];
         CurrentDimSetFilter: Text;
