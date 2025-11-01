@@ -271,6 +271,26 @@ table 85 "Acc. Schedule Line"
                     TestField("Totaling Type", "Acc. Schedule Line Totaling Type"::Formula);
             end;
         }
+        field(41; "Dimension 5 Filter"; Text[250])
+        {
+            Caption = 'Dimension 5 Filter';
+            FieldClass = FlowFilter;
+        }
+        field(42; "Dimension 6 Filter"; Text[250])
+        {
+            Caption = 'Dimension 6 Filter';
+            FieldClass = FlowFilter;
+        }
+        field(43; "Dimension 7 Filter"; Text[250])
+        {
+            Caption = 'Dimension 7 Filter';
+            FieldClass = FlowFilter;
+        }
+        field(45; "Dimension 8 Filter"; Text[250])
+        {
+            Caption = 'Dimension 8 Filter';
+            FieldClass = FlowFilter;
+        }
         field(840; "Cash Flow Forecast Filter"; Code[20])
         {
             Caption = 'Cash Flow Forecast Filter';

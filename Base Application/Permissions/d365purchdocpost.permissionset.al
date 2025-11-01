@@ -9,6 +9,7 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.FixedAssets.Setup;
 using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.CRM.Interaction;
 using Microsoft.Inventory.Item;
@@ -91,6 +92,7 @@ permissionset 2909 "D365 PURCH DOC, POST"
                   tabledata "Sent Notification Entry" = RIMD,
                   tabledata "VAT Entry" = Rimd,
                   tabledata "VAT Registration No. Format" = R,
+                  tabledata "VAT Return Period" = R,
                   tabledata "VAT Setup" = R,
                   tabledata "VAT Posting Parameters" = R,
                   tabledata "Vendor Ledger Entry" = iMd,
