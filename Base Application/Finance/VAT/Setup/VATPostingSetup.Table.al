@@ -48,6 +48,7 @@ table 325 "VAT Posting Setup"
         }
         field(4; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -218,6 +219,7 @@ table 325 "VAT Posting Setup"
         }
         field(6200; "Non-Deductible VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Non-Deductible VAT %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -656,4 +658,3 @@ table 325 "VAT Posting Setup"
     begin
     end;
 }
-

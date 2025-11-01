@@ -130,21 +130,25 @@ table 179 "Reversal Entry"
         }
         field(15; "Amount (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount (LCY)';
         }
         field(16; "Debit Amount (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Debit Amount (LCY)';
         }
         field(17; "Credit Amount (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Credit Amount (LCY)';
         }
         field(18; "VAT Amount"; Decimal)
         {
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'VAT Amount';
         }
@@ -203,14 +207,14 @@ table 179 "Reversal Entry"
         }
         field(31; "Source Currency Amount"; Decimal)
         {
-            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatExpression = Rec."Source Currency Code";
             AutoFormatType = 1;
             Caption = 'Source Currency Amount';
             DataClassification = CustomerContent;
         }
         field(32; "Source Currency VAT Amount"; Decimal)
         {
-            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatExpression = Rec."Source Currency Code";
             AutoFormatType = 1;
             Caption = 'Source Currency VAT Amount';
             DataClassification = CustomerContent;
