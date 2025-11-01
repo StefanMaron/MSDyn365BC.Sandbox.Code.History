@@ -48,6 +48,7 @@ table 429 "IC Outbox Purchase Line"
         }
         field(15; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -61,6 +62,7 @@ table 429 "IC Outbox Purchase Line"
         }
         field(27; "Line Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Line Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -94,6 +96,7 @@ table 429 "IC Outbox Purchase Line"
         }
         field(54; "Indirect Cost %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Indirect Cost %';
             Editable = false;
         }
@@ -231,4 +234,3 @@ table 429 "IC Outbox Purchase Line"
           DATABASE::"IC Outbox Purchase Line", "IC Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
     end;
 }
-

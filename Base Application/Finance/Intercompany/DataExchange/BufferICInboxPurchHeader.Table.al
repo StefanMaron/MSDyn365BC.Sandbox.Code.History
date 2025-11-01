@@ -72,6 +72,7 @@ table 607 "Buffer IC Inbox Purch Header"
         }
         field(25; "Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             Editable = false;
         }
