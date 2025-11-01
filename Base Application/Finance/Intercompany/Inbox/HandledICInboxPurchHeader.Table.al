@@ -81,6 +81,7 @@ table 440 "Handled IC Inbox Purch. Header"
         }
         field(25; "Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             Editable = false;
         }
@@ -199,4 +200,3 @@ table 440 "Handled IC Inbox Purch. Header"
           DATABASE::"Handled IC Inbox Purch. Header", "IC Transaction No.", "IC Partner Code", "Transaction Source", 0);
     end;
 }
-
