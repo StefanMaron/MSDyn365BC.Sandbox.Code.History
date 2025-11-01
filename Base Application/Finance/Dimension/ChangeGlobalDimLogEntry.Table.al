@@ -127,6 +127,7 @@ table 483 "Change Global Dim. Log Entry"
         }
         field(5; Progress; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Progress';
             ExtendedDatatype = Ratio;
         }
@@ -563,4 +564,3 @@ table 483 "Change Global Dim. Log Entry"
     begin
     end;
 }
-
