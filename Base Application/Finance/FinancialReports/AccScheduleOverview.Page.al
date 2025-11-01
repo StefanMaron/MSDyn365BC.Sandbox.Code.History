@@ -139,6 +139,31 @@ page 490 "Acc. Schedule Overview"
                         CurrentColumnNameOnAfterValidate();
                     end;
                 }
+                field(SheetDefinitionName; TempFinancialReport.SheetDefinition)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Sheet Definition';
+                    Editable = (not ViewOnlyMode or (ViewLayout = "Financial Report View Layout"::"Show All"));
+                    Importance = Additional;
+                    TableRelation = "Sheet Definition Name";
+                    ToolTip = 'Specifies the name (code) of the sheet definition to be used for the report.';
+
+                    trigger OnAfterLookup(Selected: RecordRef)
+                    var
+                        SheetDefName: Record "Sheet Definition Name";
+                    begin
+                        SheetDefName := Selected;
+                        TempFinancialReport.SheetDefinition := SheetDefName.Name;
+                        if not ViewOnlyMode then
+                            SaveStateToFinancialReport();
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        if not ViewOnlyMode then
+                            SaveStateToFinancialReport();
+                    end;
+                }
                 field(UseAmtsInAddCurr; TempFinancialReport.UseAmountsInAddCurrency)
                 {
                     ApplicationArea = Suite;
@@ -881,6 +906,8 @@ page 490 "Acc. Schedule Overview"
                         AccSched.SetAccSchedName(TempFinancialReport."Financial Report Row Group");
                     if TempFinancialReport."Financial Report Column Group" <> '' then
                         AccSched.SetColumnLayoutName(TempFinancialReport."Financial Report Column Group");
+                    if TempFinancialReport.SheetDefinition <> '' then
+                        AccSched.SetSheetDefName(TempFinancialReport.SheetDefinition);
                     DateFilter2 := Rec.GetFilter("Date Filter");
                     GLBudgetFilter2 := Rec.GetFilter("G/L Budget Filter");
                     CostBudgetFilter2 := Rec.GetFilter("Cost Budget Filter");
@@ -1017,6 +1044,22 @@ page 490 "Acc. Schedule Overview"
                     ColumnLayout.Run();
                 end;
             }
+            action(EditSheetDefinition)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Edit sheet definition';
+                Image = Edit;
+                ToolTip = 'Edit the sheet definition of this financial report.';
+
+                trigger OnAction()
+                var
+                    SheetDefLine: Record "Sheet Definition Line";
+                begin
+                    TempFinancialReport.TestField(SheetDefinition);
+                    SheetDefLine.SetRange(Name, TempFinancialReport.SheetDefinition);
+                    Page.Run(0, SheetDefLine);
+                end;
+            }
             action(EditIntroductoryClosingParagraph)
             {
                 ApplicationArea = Basic, Suite;
@@ -1118,7 +1161,9 @@ page 490 "Acc. Schedule Overview"
                             FinReportExcelTemplate: Record "Fin. Report Excel Template";
                             ExportAccSchedToExcel: Report "Export Acc. Sched. to Excel";
                         begin
-                            ExportAccSchedToExcel.SetOptions(Rec, TempFinancialReport."Financial Report Column Group", TempFinancialReport.UseAmountsInAddCurrency, TempFinancialReport.Name);
+                            ExportAccSchedToExcel.SetOptions(
+                                Rec, TempFinancialReport."Financial Report Column Group", TempFinancialReport.UseAmountsInAddCurrency,
+                                TempFinancialReport.Name, TempFinancialReport.SheetDefinition);
                             if TempFinancialReport."Excel Template Code" <> '' then begin
                                 FinReportExcelTemplate.Get(TempFinancialReport.Name, TempFinancialReport."Excel Template Code");
                                 ExportAccSchedToExcel.SetUseExistingTemplate(FinReportExcelTemplate);
@@ -1156,7 +1201,9 @@ page 490 "Acc. Schedule Overview"
                         var
                             ExportAccSchedToExcel: Report "Export Acc. Sched. to Excel";
                         begin
-                            ExportAccSchedToExcel.SetOptions(Rec, TempFinancialReport."Financial Report Column Group", TempFinancialReport.UseAmountsInAddCurrency, TempFinancialReport.Name);
+                            ExportAccSchedToExcel.SetOptions(
+                                Rec, TempFinancialReport."Financial Report Column Group", TempFinancialReport.UseAmountsInAddCurrency,
+                                TempFinancialReport.Name, TempFinancialReport.SheetDefinition);
                             ExportAccSchedToExcel.Run();
                         end;
                     }
@@ -1174,7 +1221,9 @@ page 490 "Acc. Schedule Overview"
                         var
                             ExportAccSchedToExcel: Report "Export Acc. Sched. to Excel";
                         begin
-                            ExportAccSchedToExcel.SetOptions(Rec, TempFinancialReport."Financial Report Column Group", TempFinancialReport.UseAmountsInAddCurrency, TempFinancialReport.Name);
+                            ExportAccSchedToExcel.SetOptions(
+                                Rec, TempFinancialReport."Financial Report Column Group", TempFinancialReport.UseAmountsInAddCurrency,
+                                TempFinancialReport.Name, TempFinancialReport.SheetDefinition);
                             ExportAccSchedToExcel.SetUpdateExistingWorksheet(true);
                             ExportAccSchedToExcel.Run();
                         end;
@@ -1270,6 +1319,9 @@ page 490 "Acc. Schedule Overview"
                 {
                 }
                 actionref(EditColumnDefinition_Promoted; EditColumnDefinition)
+                {
+                }
+                actionref(EditSheetDefinition_Promoted; EditSheetDefinition)
                 {
                 }
                 actionref(EditIntroductoryClosingParagraph_Promoted; EditIntroductoryClosingParagraph)

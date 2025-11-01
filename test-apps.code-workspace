@@ -4,6 +4,9 @@
       "path": "./AI Test Toolkit"
     },
     {
+      "path": "./Application Test Library"
+    },
+    {
       "path": "./Business Foundation Test Libraries"
     },
     {
@@ -152,11 +155,11 @@
     }
   ],
   "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
-    }
+    },
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false,
+    "al.enableCodeActions": false
   }
 }
