@@ -741,6 +741,8 @@ permissionset 209 "D365 Basic - Read"
                   tabledata "Sent Notification Entry" = R,
                   tabledata "SEPA Direct Debit Mandate" = R,
                   tabledata "Service Connection" = R,
+                  tabledata "Sheet Definition Name" = R,
+                  tabledata "Sheet Definition Line" = R,
                   tabledata "Ship-to Address" = R,
                   tabledata "Shipment Method" = R,
                   tabledata "Shipment Method Translation" = R,

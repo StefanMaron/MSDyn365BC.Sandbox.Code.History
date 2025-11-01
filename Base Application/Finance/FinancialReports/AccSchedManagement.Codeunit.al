@@ -52,6 +52,7 @@ codeunit 8 AccSchedManagement
         MatrixMgt: Codeunit "Matrix Management";
         AccountingPeriodMgt: Codeunit "Accounting Period Mgt.";
         AnalysisViewRead: Boolean;
+        SheetDefinitionRead: Boolean;
         StartDate: Date;
         EndDate: Date;
         FiscalStartDate: Date;
@@ -75,7 +76,7 @@ codeunit 8 AccSchedManagement
 #pragma warning disable AA0470
         Text022: Label 'You cannot have more than %1 lines with %2 of %3.';
         Text023: Label 'Formulas ending with a percent sign require %2 %1 on a line before it.';
-        Text024: Label 'The %1 %3 on the %2 must equal the %4 %6 on the %5 when any Dimension Totaling is used in any Column.';
+        Text024: Label 'The %1 %3 on the %2 must equal the %4 %6 on the %5 when any Dimension Totaling is used in any %7.';
 #pragma warning restore AA0470
 #pragma warning restore AA0074
 #pragma warning disable AA0470
@@ -88,6 +89,7 @@ codeunit 8 AccSchedManagement
         WeekTxt: Label 'W%1', Comment = '%1 = Week number';
         Recalculate: Boolean;
         SystemGeneratedAccSchedQst: Label 'This account schedule may be automatically updated by the system, so any changes you make may be lost. Do you want to make a copy?';
+        SheetDimensionMismatchErr: Label 'The %1 on %2 must be one of the dimension codes specified on the %3 %4.', Comment = '%1 = Sheet Type, %2 = Sheet Definition Name, %3 = Analysis View, %4 = Analysis View Name';
 
     procedure OpenSchedule(var CurrentSchedName: Code[10]; var AccSchedLine: Record "Acc. Schedule Line")
     begin
@@ -344,11 +346,74 @@ codeunit 8 AccSchedManagement
                       AccSchedName."Analysis View Name",
                       ColumnLayoutName.FieldCaption("Analysis View Name"),
                       ColumnLayoutName.TableCaption(),
-                      ColumnLayoutName."Analysis View Name");
+                      ColumnLayoutName."Analysis View Name",
+                      ColumnLayout2.TableCaption());
             end;
         end;
 
         OnAfterCheckAnalysisView(AccSchedName, ColumnLayoutName, AnalysisView);
+    end;
+
+    procedure CheckSheetAnalysisView(CurrentSchedName: Code[10]; CurrentSheetName: Code[10])
+    var
+        SheetDefName: Record "Sheet Definition Name";
+        SheetDefLine: Record "Sheet Definition Line";
+        AnySheetDimensions: Boolean;
+    begin
+        if not SheetDefinitionRead then begin
+            SheetDefinitionRead := true;
+            if CurrentSchedName <> AccSchedName.Name then begin
+                CheckTemplateName(CurrentSchedName);
+                AccSchedName.Get(CurrentSchedName);
+            end;
+            SheetDefName.Get(CurrentSheetName);
+            if AccSchedName."Analysis View Name" = '' then begin
+                GetGLSetup();
+                AnalysisView.Init();
+                AnalysisView."Dimension 1 Code" := GLSetup."Global Dimension 1 Code";
+                AnalysisView."Dimension 2 Code" := GLSetup."Global Dimension 2 Code";
+            end else
+                AnalysisView.Get(AccSchedName."Analysis View Name");
+
+            if AccSchedName."Analysis View Name" <> SheetDefName."Analysis View Name" then begin
+                SheetDefLine.SetRange(Name, CurrentSheetName);
+                if SheetDefLine.FindSet() then
+                    repeat
+                        AnySheetDimensions :=
+                          (SheetDefLine."Dimension 1 Totaling" <> '') or
+                          (SheetDefLine."Dimension 2 Totaling" <> '') or
+                          (SheetDefLine."Dimension 3 Totaling" <> '') or
+                          (SheetDefLine."Dimension 4 Totaling" <> '');
+                    until AnySheetDimensions or (SheetDefLine.Next() = 0);
+                if AnySheetDimensions then
+                    Error(
+                      Text024,
+                      AccSchedName.FieldCaption("Analysis View Name"),
+                      AccSchedName.TableCaption(),
+                      AccSchedName."Analysis View Name",
+                      SheetDefName.FieldCaption("Analysis View Name"),
+                      SheetDefName.TableCaption(),
+                      SheetDefName."Analysis View Name",
+                      SheetDefLine.TableCaption());
+            end;
+
+            if (SheetDefName."Sheet Type" <> SheetDefName."Sheet Type"::Custom) and
+                (SheetDefName."Analysis View Name" <> '')
+            then
+                case SheetDefName."Sheet Type" of
+                    "Sheet Type"::Dimension5,
+                    "Sheet Type"::Dimension6,
+                    "Sheet Type"::Dimension7,
+                    "Sheet Type"::Dimension8,
+                    "Sheet Type"::BusinessUnit:
+                        Error(
+                            SheetDimensionMismatchErr,
+                            SheetDefName.FieldCaption("Sheet Type"),
+                            SheetDefName.TableCaption(),
+                            SheetDefName.FieldCaption("Analysis View Name"),
+                            SheetDefName."Analysis View Name");
+                end;
+        end;
     end;
 
     procedure AccPeriodStartEnd(ColumnLayout: Record "Column Layout"; Date: Date; var StartDate: Date; var EndDate: Date)

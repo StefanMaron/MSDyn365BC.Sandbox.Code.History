@@ -9115,7 +9115,7 @@
   </Item>
   <Item ItemId=";Codeunit 1217376489 - NamedType 454677184" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[You have changed the %1 on the purchase order, which might affect the prices and discounts on the purchase order lines.]]></Val>
+      <Val><![CDATA[You have changed the %1 on the purchase header, which might affect the prices and discounts on the purchase lines.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
