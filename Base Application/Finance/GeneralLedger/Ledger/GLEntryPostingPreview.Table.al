@@ -78,6 +78,7 @@ table 1570 "G/L Entry Posting Preview"
         }
         field(17; Amount; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount';
         }
@@ -118,11 +119,13 @@ table 1570 "G/L Entry Posting Preview"
         }
         field(42; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
         }
         field(43; "VAT Amount"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'VAT Amount';
         }
@@ -164,12 +167,14 @@ table 1570 "G/L Entry Posting Preview"
         }
         field(53; "Debit Amount"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Debit Amount';
         }
         field(54; "Credit Amount"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Credit Amount';
@@ -445,4 +450,3 @@ table 1570 "G/L Entry Posting Preview"
         exit(GLSetup."Additional Reporting Currency");
     end;
 }
-
