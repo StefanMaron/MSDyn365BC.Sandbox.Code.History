@@ -34,18 +34,22 @@ table 322 "Tax Detail"
             Caption = 'Maximum Amount/Qty.';
             DecimalPlaces = 2 : 2;
             MinValue = 0;
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
         }
         field(5; "Tax Below Maximum"; Decimal)
         {
             Caption = 'Tax Below Maximum';
             DecimalPlaces = 1 : 4;
             MinValue = 0;
+            AutoFormatType = 0;
         }
         field(6; "Tax Above Maximum"; Decimal)
         {
             Caption = 'Tax Above Maximum';
             DecimalPlaces = 1 : 4;
             MinValue = 0;
+            AutoFormatType = 0;
         }
         field(7; "Effective Date"; Date)
         {
@@ -301,4 +305,3 @@ table 322 "Tax Detail"
         Modify();
     end;
 }
-
