@@ -9,7 +9,6 @@ codeunit 131903 "Library - Rapid Start"
 
     var
         LibraryUtility: Codeunit "Library - Utility";
-        APIMockEvents: Codeunit "API Mock Events";
         TemplateSelectionRuleTxt: Label '<?xml version="1.0" encoding="utf-8" standalone="yes"?><ReportParameters><DataItems><DataItem name="%1">SORTING(Field1) WHERE(Field%2=1(%3))</DataItem></DataItems></ReportParameters>', Locked = true;
 
     procedure CleanUp(PackageCode: Code[20])
@@ -298,13 +297,6 @@ codeunit 131903 "Library - Rapid Start"
         ConfigPackageMgt.SetHideDialog(true);
         ConfigPackageTable.SetRange("Package Code", ConfigPackage.Code);
         ConfigPackageMgt.ApplyPackage(ConfigPackage, ConfigPackageTable, SetupProcessingOrderForTables);
-    end;
-
-    procedure SetAPIServicesEnabled(Value: Boolean)
-    begin
-        UnbindSubscription(APIMockEvents);
-        APIMockEvents.SetIsAPIEnabled(Value);
-        BindSubscription(APIMockEvents);
     end;
 
     procedure ValidatePackage(ConfigPackage: Record "Config. Package"; SetupProcessingOrderForTables: Boolean)
