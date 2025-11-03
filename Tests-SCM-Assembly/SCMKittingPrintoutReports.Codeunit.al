@@ -42,7 +42,6 @@ codeunit 137311 "SCM Kitting - Printout Reports"
         LibraryUtility: Codeunit "Library - Utility";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory to GL";
         LibraryAssembly: Codeunit "Library - Assembly";
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryDimension: Codeunit "Library - Dimension";
@@ -80,7 +79,7 @@ codeunit 137311 "SCM Kitting - Printout Reports"
 
         WorkDate2 := LibraryPlanning.SetSafetyWorkDate(); // to avoid Due Date Before Work Date message.
         LibraryCosting.AdjustCostItemEntries('', '');
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate2, '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate2, '');
 
         LibraryAssembly.UpdateAssemblySetup(AssemblySetup, '', AssemblySetup."Copy Component Dimensions from"::"Item/Resource Card",
           LibraryUtility.GetGlobalNoSeriesCode());

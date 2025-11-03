@@ -54,7 +54,6 @@ table 1700 "Deferral Template"
         /// </summary>
         field(4; "Deferral %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Deferral %';
             DecimalPlaces = 0 : 5;
             InitValue = 100;
@@ -155,3 +154,4 @@ table 1700 "Deferral Template"
         DeferralPercentageErr: Label 'The deferral percentage must be greater than 0 and less than 100.';
         NumberofPeriodsErr: Label 'You must specify one or more periods.';
 }
+

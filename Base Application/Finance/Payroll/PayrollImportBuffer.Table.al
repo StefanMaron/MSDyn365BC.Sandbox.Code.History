@@ -50,8 +50,6 @@ table 1662 "Payroll Import Buffer"
         /// </summary>
         field(12; Amount; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Amount';
             DataClassification = SystemMetadata;
         }
@@ -77,3 +75,4 @@ table 1662 "Payroll Import Buffer"
     {
     }
 }
+

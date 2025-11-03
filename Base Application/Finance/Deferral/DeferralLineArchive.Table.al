@@ -79,7 +79,6 @@ table 5128 "Deferral Line Archive"
         /// </summary>
         field(10; "Amount (LCY)"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount (LCY)';
         }
@@ -118,3 +117,4 @@ table 5128 "Deferral Line Archive"
     {
     }
 }
+

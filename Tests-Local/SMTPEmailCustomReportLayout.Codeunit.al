@@ -946,10 +946,10 @@ codeunit 144055 "SMTPEMail Custom Report Layout"
 
     local procedure Initialize();
     var
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
     begin
         LibrarySetupStorage.Restore();
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
 
         if IsInitialized then
             exit;

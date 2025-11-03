@@ -14,7 +14,7 @@ codeunit 144083 "EMail Custom Report Layout"
         LibraryPurchase: Codeunit "Library - Purchase";
         LibrarySales: Codeunit "Library - Sales";
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibraryvariableStorage: Codeunit "Library - Variable Storage";
         LibraryRandom: Codeunit "Library - Random";
@@ -948,7 +948,7 @@ codeunit 144083 "EMail Custom Report Layout"
     local procedure Initialize();
     begin
         LibrarySetupStorage.Restore();
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
 
         if IsInitialized then
             exit;

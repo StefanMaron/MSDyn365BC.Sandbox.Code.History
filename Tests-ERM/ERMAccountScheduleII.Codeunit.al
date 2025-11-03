@@ -931,7 +931,6 @@
         SheetDefName: Record "Sheet Definition Name";
         SheetDefLine: Record "Sheet Definition Line";
         DimensionValue: array[2] of Record "Dimension Value";
-        ExpectedCellValue: Decimal;
         i: Integer;
     begin
         // [FEATURE] [Excel]
@@ -963,7 +962,7 @@
             SheetDefLine.Insert();
         end;
 
-        // [GIVEN] Financial Report using said Sheet Definition
+        // [GIVEN] Financial Report using said Sheet Definition 
         LibraryERM.CreateAccScheduleName(AccScheduleName);
         CreateAccScheduleLineWithGLAcc(AccScheduleLine, AccScheduleName.Name, GenJournalLine."Account No.", AccScheduleLine.Show::Yes);
         LibraryERM.CreateColumnLayoutName(ColumnLayoutName);
@@ -985,8 +984,7 @@
 
         // [THEN] The first worksheet contains the unfiltered data
         GLAccount.CalcFields("Net Change");
-        ExpectedCellValue := GLAccount."Net Change";
-        LibraryReportValidation.VerifyCellValue(7, 3, Format(ExpectedCellValue, 0, 9));
+        LibraryReportValidation.VerifyCellValue(7, 3, Format(GLAccount."Net Change"));
 
         // [THEN] The following worksheets contain the filtered data for each dimension value
         for i := 1 to 2 do begin

@@ -60,35 +60,30 @@ table 595 "Exch. Rate Adjmt. Buffer"
         }
         field(10; "Adjmt. Base"; Decimal)
         {
-            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'AdjBase';
             DataClassification = SystemMetadata;
         }
         field(11; "Adjmt. Base (LCY)"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Adjmt. Base (LCY)';
             DataClassification = SystemMetadata;
         }
         field(12; "Adjmt. Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Adjmt. Amount';
             DataClassification = SystemMetadata;
         }
         field(13; "Gains Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Gains Amount';
             DataClassification = SystemMetadata;
         }
         field(14; "Losses Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Losses Amount';
             DataClassification = SystemMetadata;
@@ -122,3 +117,4 @@ table 595 "Exch. Rate Adjmt. Buffer"
     begin
     end;
 }
+
