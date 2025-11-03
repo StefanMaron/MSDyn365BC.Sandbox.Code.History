@@ -11,6 +11,7 @@ codeunit 137035 "SCM PS Bugs-I"
     var
         LibraryRandom: Codeunit "Library - Random";
         LibraryCosting: Codeunit "Library - Costing";
+        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryPlanning: Codeunit "Library - Planning";
         LibrarySales: Codeunit "Library - Sales";
@@ -210,7 +211,7 @@ codeunit 137035 "SCM PS Bugs-I"
 
         // Exercise : Run Adjust cost batch Job.
         LibraryCosting.AdjustCostItemEntries(Item."No.", '');
-        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify : WIP Account.
         VerifyTotalWIPAccountAmount(Item."No.", ProdOrderNo);

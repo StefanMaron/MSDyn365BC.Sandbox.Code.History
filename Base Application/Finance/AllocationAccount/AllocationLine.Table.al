@@ -52,6 +52,8 @@ table 2672 "Allocation Line"
         }
         field(6; Amount; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             DataClassification = SystemMetadata;
             Caption = 'Amount';
         }
@@ -62,6 +64,8 @@ table 2672 "Allocation Line"
         }
         field(11; "Breakdown Account Balance"; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             DataClassification = SystemMetadata;
             Caption = 'Breakdown Account Balance';
         }
@@ -72,11 +76,13 @@ table 2672 "Allocation Line"
         }
         field(13; Percentage; Decimal)
         {
+            AutoFormatType = 0;
             DataClassification = SystemMetadata;
             Caption = 'Percentage';
         }
         field(20; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             DataClassification = SystemMetadata;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
