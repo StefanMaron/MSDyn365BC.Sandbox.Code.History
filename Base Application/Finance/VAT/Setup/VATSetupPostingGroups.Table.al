@@ -21,6 +21,7 @@ table 1877 "VAT Setup Posting Groups"
         }
         field(4; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -259,4 +260,3 @@ table 1877 "VAT Setup Posting Groups"
     begin
     end;
 }
-
