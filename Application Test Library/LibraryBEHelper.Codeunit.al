@@ -15,7 +15,6 @@ codeunit 143000 "Library - BE Helper"
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryUtility: Codeunit "Library - Utility";
 
-    [Scope('OnPrem')]
     procedure InitializeCompanyInformation()
     var
         CompanyInformation: Record "Company Information";
@@ -36,7 +35,6 @@ codeunit 143000 "Library - BE Helper"
         end;
     end;
 
-    [Scope('OnPrem')]
     procedure CreateVATRegNoFormat(CountryCode: Code[10]; FormatText: Text[20])
     var
         VATRegistrationNoFormat: Record "VAT Registration No. Format";
@@ -49,13 +47,11 @@ codeunit 143000 "Library - BE Helper"
         VATRegistrationNoFormat.Insert();
     end;
 
-    [Scope('OnPrem')]
     procedure GetVATRegNoFormatText(): Text[20]
     begin
         exit('#########');
     end;
 
-    [Scope('OnPrem')]
     procedure GetUniqueVATRegNo(CountryCode: Code[10]): Text[20]
     var
         TempVATEntry: Record "VAT Entry" temporary;
@@ -91,13 +87,11 @@ codeunit 143000 "Library - BE Helper"
             until Vendor.Next() = 0;
     end;
 
-    [Scope('OnPrem')]
     procedure CalcPercentage(Source: Decimal; Percentage: Integer; Precision: Decimal) Result: Decimal
     begin
         Result := Round(Source * (Percentage / 100), Precision);
     end;
 
-    [Scope('OnPrem')]
     procedure CalcPercentageChange(Source: Decimal; Percentage: Integer; Precision: Decimal; Increase: Boolean) Result: Decimal
     begin
         if Increase then
@@ -114,13 +108,11 @@ codeunit 143000 "Library - BE Helper"
         VATEntry.DeleteAll();
     end;
 
-    [Scope('OnPrem')]
     procedure CreateEnterpriseNo(): Code[20]
     begin
         exit('TVA' + CreateMOD97CompliantCode());
     end;
 
-    [Scope('OnPrem')]
     procedure CreateMOD97CompliantCode() CodeMod97Compliant: Code[10]
     var
         CompliantCodeBody: Integer;
@@ -130,7 +122,6 @@ codeunit 143000 "Library - BE Helper"
         CodeMod97Compliant += ConvertStr(Format(97 - CompliantCodeBody mod 97, 2, '<Integer>'), ' ', '0');
     end;
 
-    [Scope('OnPrem')]
     procedure CreateVatRegNo(CountryCode: Code[10]) Result: Text[20]
     var
         VATRegistrationNoFormat: Record "VAT Registration No. Format";
@@ -143,8 +134,6 @@ codeunit 143000 "Library - BE Helper"
         Result := Format(LibraryRandom.RandIntInRange(100000000, 999999999));
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateCustomerItemSalesInvoiceAndPost(var Customer: Record Customer)
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -154,8 +143,6 @@ codeunit 143000 "Library - BE Helper"
         CreateCustomerItemSalesInvoiceAndPostHelper(Customer, VATPostingSetup);
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateVATPostingSetupCustomerItemSalesInvoiceAndPost(var Customer: Record Customer)
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -165,7 +152,6 @@ codeunit 143000 "Library - BE Helper"
         CreateCustomerItemSalesInvoiceAndPostHelper(Customer, VATPostingSetup);
     end;
 
-    [Scope('OnPrem')]
     procedure CreateAndPostInvoiceInPeriod(CustomerNo: Code[20]; ItemNo: Code[20]; StartDate: Date; EndDate: Date)
     var
         SalesHeader: Record "Sales Header";
@@ -184,7 +170,6 @@ codeunit 143000 "Library - BE Helper"
         LibrarySales.PostSalesDocument(SalesHeader, true, true);
     end;
 
-    [Scope('OnPrem')]
     procedure CreateCustomer(var Customer: Record Customer; CountryCode: Code[10])
     begin
         LibrarySales.CreateCustomer(Customer);
@@ -196,7 +181,6 @@ codeunit 143000 "Library - BE Helper"
         Customer.Modify();
     end;
 
-    [Scope('OnPrem')]
     procedure CreateDomesticCustomer(var Customer: Record Customer)
     var
         CompanyInformation: Record "Company Information";
@@ -209,7 +193,6 @@ codeunit 143000 "Library - BE Helper"
         ClearVATEntriesByEnterpriseNo(Customer."Enterprise No.");
     end;
 
-    [Scope('OnPrem')]
     procedure CreateDomesticCustomerWithVATSetup(var Customer: Record Customer; VATPostingSetup: Record "VAT Posting Setup")
     begin
         CreateDomesticCustomer(Customer);
@@ -217,7 +200,6 @@ codeunit 143000 "Library - BE Helper"
         Customer.Modify();
     end;
 
-    [Scope('OnPrem')]
     procedure CreateForeignCustomerWithVATSetup(var Customer: Record Customer; VATPostingSetup: Record "VAT Posting Setup")
     begin
         CreateCustomer(Customer, 'GB');
@@ -225,8 +207,6 @@ codeunit 143000 "Library - BE Helper"
         Customer.Modify();
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateItem(var Item: Record Item; VATPostingSetup: Record "VAT Posting Setup")
     begin
         LibraryInventory.CreateItem(Item);
@@ -235,8 +215,6 @@ codeunit 143000 "Library - BE Helper"
         Item.Modify(true);
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateResource(var Resource: Record Resource; VATPostingSetup: Record "VAT Posting Setup")
     var
         ResourceNo: Code[20];
@@ -250,8 +228,6 @@ codeunit 143000 "Library - BE Helper"
         Resource.Modify();
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateRepresentative(var Representative: Record Representative)
     var
         CountryRegion: Record "Country/Region";
@@ -280,8 +256,6 @@ codeunit 143000 "Library - BE Helper"
         Representative.Insert();
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateCountryRegion(var CountryRegion: Record "Country/Region")
     begin
         LibraryERM.CreateCountryRegion(CountryRegion);
@@ -289,8 +263,6 @@ codeunit 143000 "Library - BE Helper"
         CountryRegion.Modify();
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateDomesticCustomerResourceServiceDocumentAndPost(var Customer: Record Customer; DocumentType: Enum "Service Document Type")
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -315,8 +287,6 @@ codeunit 143000 "Library - BE Helper"
         CreateAndPostServiceDocumentInPeriod(Customer."No.", DocumentType, Resource."No.", StartDate, EndDate);
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateForeignCustomerResourceServiceDocumentAndPost(var Customer: Record Customer; DocumentType: Enum "Service Document Type")
     var
         VATPostingSetup: Record "VAT Posting Setup";
@@ -341,7 +311,6 @@ codeunit 143000 "Library - BE Helper"
         CreateAndPostServiceDocumentInPeriod(Customer."No.", DocumentType, Resource."No.", StartDate, EndDate);
     end;
 
-    [Scope('OnPrem')]
     procedure CreateAndPostServiceDocumentInPeriod(CustomerNo: Code[20]; DocumentType: Enum "Service Document Type"; ResourceNo: Code[20]; StartDate: Date; EndDate: Date)
     var
         ServiceHeader: Record "Service Header";
@@ -362,8 +331,6 @@ codeunit 143000 "Library - BE Helper"
         LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup"; VATCalculationType: Enum "Tax Calculation Type")
     var
         GLAccount1: Record "G/L Account";
@@ -387,8 +354,6 @@ codeunit 143000 "Library - BE Helper"
         VATPostingSetup.Modify();
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateGLAccount(var GLAccount: Record "G/L Account"; VATPostingSetup: Record "VAT Posting Setup"; GenPostingType: Enum "General Posting Type"; NonDeductibleVAT: Integer)
     var
         GLAccountNo: Code[20];
@@ -402,8 +367,6 @@ codeunit 143000 "Library - BE Helper"
         GLAccount.Modify();
     end;
 
-    [Normal]
-    [Scope('OnPrem')]
     procedure CreateCustomerItemSalesInvoiceAndPostHelper(var Customer: Record Customer; VATPostingSetup: Record "VAT Posting Setup")
     var
         Item: Record Item;
@@ -424,7 +387,6 @@ codeunit 143000 "Library - BE Helper"
         CreateAndPostInvoiceInPeriod(Customer."No.", Item."No.", StartDate, EndDate);
     end;
 
-    [Scope('OnPrem')]
     procedure CreatePaymentJournalTemplate(var PaymentJournalTemplate: Record "Payment Journal Template")
     begin
         PaymentJournalTemplate.Init();
@@ -432,7 +394,6 @@ codeunit 143000 "Library - BE Helper"
         PaymentJournalTemplate.Insert();
     end;
 
-    [Scope('OnPrem')]
     procedure CreatePaymentJournalBatch(var PaymJournalBatch: Record "Paym. Journal Batch"; PaymentJournalTemplateName: Code[10])
     begin
         PaymJournalBatch.Init();

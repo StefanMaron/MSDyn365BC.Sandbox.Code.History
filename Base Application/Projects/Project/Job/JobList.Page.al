@@ -133,6 +133,12 @@ page 89 "Job List"
                     ToolTip = 'Specifies the customer''s reference. The content will be printed on sales documents.';
                     Visible = false;
                 }
+                field("Completely Picked"; Rec."Completely Picked")
+                {
+                    ApplicationArea = Jobs;
+                    ToolTip = 'Specifies whether all items on the project planning lines have been completely picked.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)

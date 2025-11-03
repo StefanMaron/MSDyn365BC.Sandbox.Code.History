@@ -22,6 +22,7 @@ codeunit 134008 "ERM VAT Settlement with Apply"
         LibraryReportDataset: Codeunit "Library - Report Dataset";
         Assert: Codeunit Assert;
         LibraryUtility: Codeunit "Library - Utility";
+        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         isInitialized: Boolean;
         AdditionalCurrencyError: Label 'Additional Currency Amount must be %1.';
@@ -61,7 +62,7 @@ codeunit 134008 "ERM VAT Settlement with Apply"
         CalcandPostVATSettlement.SaveAsExcel(FilePath);
 
         // Verify: Verify that Saved files have some data.
-        LibraryUtility.CheckFileNotEmpty(FilePath);
+        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
 
         // Cleanup: Delete Additional Currency and Unrealized VAT set to False from General Ledger Setup and Unrealized VAT type from
         // VAT Posting Setup.
