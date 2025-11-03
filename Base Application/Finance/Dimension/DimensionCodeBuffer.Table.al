@@ -58,7 +58,6 @@ table 367 "Dimension Code Buffer"
         field(9; Amount; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             CalcFormula = sum("Analysis View Entry".Amount where("Analysis View Code" = const(''),
                                                                   "Dimension 1 Value Code" = field("Dimension 1 Value Filter"),
                                                                   "Dimension 2 Value Code" = field("Dimension 2 Value Filter"),
@@ -89,7 +88,6 @@ table 367 "Dimension Code Buffer"
         }
         field(7101; Quantity; Decimal)
         {
-            AutoFormatType = 0;
             CalcFormula = sum("Analysis View Entry".Amount where("Analysis View Code" = const(''),
                                                                   "Dimension 1 Value Code" = field("Dimension 1 Value Filter"),
                                                                   "Dimension 2 Value Code" = field("Dimension 2 Value Filter"),
@@ -116,3 +114,4 @@ table 367 "Dimension Code Buffer"
     {
     }
 }
+

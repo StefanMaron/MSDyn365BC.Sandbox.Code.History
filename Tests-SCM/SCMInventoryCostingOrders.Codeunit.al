@@ -13,7 +13,6 @@ codeunit 137292 "SCM Inventory Costing Orders"
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibraryERM: Codeunit "Library - ERM";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryManufacturing: Codeunit "Library - Manufacturing";
@@ -819,7 +818,7 @@ codeunit 137292 "SCM Inventory Costing Orders"
 
         // Exercise: Run Post Inventory Cost to G/L Report.
         LibraryVariableStorage.Enqueue(ValueEntriesWerePostedTxt);
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify: Verify Post Value Entry To G/L should not exist any entry for given Item.
         PostValueEntryToGL.SetRange("Item No.", ItemJournalLine."Item No.");

@@ -361,8 +361,7 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
 
         BindSubscription(AllocAccHandleDocPost);
         PurchaseLine.Validate("No.", AllocationLine."Destination Account Number");
-        if AllocationPurchaseLine."Tax Group Code" <> '' then
-            PurchaseLine.Validate("Tax Group Code", AllocationPurchaseLine."Tax Group Code");
+        PurchaseLine.Validate("Tax Group Code", AllocationPurchaseLine."Tax Group Code");
         UnbindSubscription(AllocAccHandleDocPost);
 
         if DescriptionChanged then begin

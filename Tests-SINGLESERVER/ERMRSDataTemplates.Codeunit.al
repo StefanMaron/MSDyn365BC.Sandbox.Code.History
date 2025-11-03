@@ -28,7 +28,6 @@ codeunit 136601 "ERM RS Data Templates"
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         ConfigTemplateManagement: Codeunit "Config. Template Management";
-        APIMockEvents: Codeunit "API Mock Events";
         TemplateRelateToItselfError: Label 'A template cannot relate to itself. Specify a different template.';
         UnknownError: Label 'Unknown error.';
         TemplateInHierarchyErr: Label 'The template %1 is in this hierarchy and contains the same field.';
@@ -1794,7 +1793,7 @@ codeunit 136601 "ERM RS Data Templates"
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(CODEUNIT::"ERM RS Data Templates");
         LibraryERMCountryData.CreateVATData();
         LibraryERMCountryData.UpdateGeneralPostingSetup();
-        APIMockEvents.SetAPIServicesEnabled(false);
+        LibraryRapidStart.SetAPIServicesEnabled(false);
         IsInitialized := true;
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"ERM RS Data Templates");
     end;

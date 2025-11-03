@@ -67,7 +67,6 @@ table 186 "Exch. Rate Adjmt. Ledg. Entry"
         }
         field(12; "Currency Factor"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Currency Factor';
             Editable = false;
         }
@@ -80,14 +79,12 @@ table 186 "Exch. Rate Adjmt. Ledg. Entry"
         }
         field(16; "Base Amount (LCY)"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Base Amount (LCY)';
             Editable = false;
         }
         field(17; "Adjustment Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Adjustment Amount';
             Editable = false;
@@ -98,7 +95,6 @@ table 186 "Exch. Rate Adjmt. Ledg. Entry"
         }
         field(20; "Detailed Ledger Entry No."; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Detailed Ledger Entry No.';
             Editable = false;
         }

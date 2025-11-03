@@ -23,7 +23,6 @@ table 342 "Acc. Sched. Cell Value"
         field(3; Value; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Value';
         }
         field(4; "Has Error"; Boolean)
@@ -48,3 +47,4 @@ table 342 "Acc. Sched. Cell Value"
     {
     }
 }
+
