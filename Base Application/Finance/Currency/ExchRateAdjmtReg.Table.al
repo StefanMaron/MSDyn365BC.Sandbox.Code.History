@@ -53,6 +53,7 @@ table 86 "Exch. Rate Adjmt. Reg."
         }
         field(6; "Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 15;
             MinValue = 0;
@@ -65,11 +66,13 @@ table 86 "Exch. Rate Adjmt. Reg."
         }
         field(8; "Adjusted Base (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Adjusted Base (LCY)';
         }
         field(9; "Adjusted Amt. (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Adjusted Amt. (LCY)';
         }
@@ -153,4 +156,3 @@ table 86 "Exch. Rate Adjmt. Reg."
         exit(GLSetup."Additional Reporting Currency");
     end;
 }
-
