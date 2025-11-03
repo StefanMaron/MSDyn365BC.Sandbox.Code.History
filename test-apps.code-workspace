@@ -1,6 +1,9 @@
 {
   "folders": [
     {
+      "path": "./Application Test Library"
+    },
+    {
       "path": "./AuditFileExport/Test/Audit File Export Tests"
     },
     {
@@ -137,6 +140,9 @@
     },
     {
       "path": "./EssentialBusinessHeadlines/Test/Essential Business Headlines Test"
+    },
+    {
+      "path": "./Application Test Library/Source/Application Test Library"
     },
     {
       "path": "./SubscriptionBilling/Test/Subscription Billing Tests/DisabledTests"

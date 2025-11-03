@@ -34,16 +34,22 @@ table 927 "Receivables-Payables Buffer"
         field(10; "Cust. Balances Due"; Decimal)
         {
             Caption = 'Cust. Balances Due';
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             DataClassification = SystemMetadata;
         }
         field(11; "Vendor Balances Due"; Decimal)
         {
             Caption = 'Vendor Balances Due';
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             DataClassification = SystemMetadata;
         }
         field(12; "Receivables-Payables"; Decimal)
         {
             Caption = 'Receivables-Payables';
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             DataClassification = SystemMetadata;
         }
     }
