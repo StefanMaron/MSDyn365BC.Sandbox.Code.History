@@ -1848,50 +1848,6 @@ codeunit 141012 "ERM WHT"
         VerifyWHTAmountOnGlEntry(GenJournalLine, WHTAmount, WHTPostingSetup."Payable WHT Account Code");
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    procedure WHTEntryOnPostedPurchaseInvoiceJournalWithWHT()
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-        VATPostingSetup: Record "VAT Posting Setup";
-        VATEntry: Record "VAT Entry";
-        WHTPostingSetup: Record "WHT Posting Setup";
-        WHTEntry: Record "WHT Entry";
-        VendorNo: Code[20];
-    begin
-        // [SCENARIO] 599209 -Test to verify after Posting Purchase Invoice Journal with WHT, WHT Entry - Unrealized Base Amount is correctly calculated.
-        Initialize();
-
-        // [GIVEN] WHT Posting Setup has been created
-        LibraryAPACLocalization.CreateWHTPostingSetupWithPayableGLAccounts(WHTPostingSetup);
-
-        // [GIVEN] Create Purchase Invoice Journal with WHT .
-        UpdateGeneralLedgerSetup(false, true, false);  // False - Enable GST, Round Amount for WHT Calc and True as Enable WHT.
-        LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
-        FindWHTPostingSetup(WHTPostingSetup);
-        VendorNo := LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group");
-        CreateGeneralJournalLineWithCurrency(
-         GenJournalLine, WHTPostingSetup, GenJournalLine."Account Type"::Vendor, GenJournalLine."Document Type"::Invoice,
-         VendorNo, '', '', -1000);
-        GenJournalLine.Validate("Bal. Account Type", GenJournalLine."Bal. Account Type"::"G/L Account");
-        GenJournalLine.validate("Bal. Account No.", CreateGLAccount(VATPostingSetup."VAT Prod. Posting Group"));
-        GenJournalLine.validate("Bal. VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
-        GenJournalLine.validate("Bal. VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
-        GenJournalLine.validate("Bal. Gen. Posting Type", GenJournalLine."Bal. Gen. Posting Type"::Purchase);
-        GenJournalLine.Modify();
-
-        // [WHEN] Post Purchase Invoice Journal with WHT.
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-
-        // [THEN] Verify WHT Entry - Unrealized Base, VAT Entry - Base.
-        VATEntry.SetRange("Document Type", VATEntry."Document Type"::Invoice);
-        VATEntry.SetRange("Document No.", GenJournalLine."Document No.");
-        VATEntry.Findlast();
-        WHTEntry.SetRange("Document No.", GenJournalLine."Document No.");
-        WHTEntry.Findlast();
-        Assert.AreEqual(VATEntry.Base, WHTEntry."Unrealized Base", 'Not equal');
-    end;
-
     local procedure Initialize()
     begin
         LibrarySetupStorage.Restore();

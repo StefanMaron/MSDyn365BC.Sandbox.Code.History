@@ -44,71 +44,51 @@ table 197 "Acc. Sched. KPI Buffer"
         }
         field(7; "Net Change Actual"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Net Change Actual';
             DataClassification = SystemMetadata;
         }
         field(8; "Balance at Date Actual"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Balance at Date Actual';
             DataClassification = SystemMetadata;
         }
         field(9; "Net Change Budget"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Net Change Budget';
             DataClassification = SystemMetadata;
         }
         field(10; "Balance at Date Budget"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Balance at Date Budget';
             DataClassification = SystemMetadata;
         }
         field(11; "Net Change Actual Last Year"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Net Change Actual Last Year';
             DataClassification = SystemMetadata;
         }
         field(12; "Balance at Date Act. Last Year"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Balance at Date Act. Last Year';
             DataClassification = SystemMetadata;
         }
         field(13; "Net Change Budget Last Year"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Net Change Budget Last Year';
             DataClassification = SystemMetadata;
         }
         field(14; "Balance at Date Bud. Last Year"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Balance at Date Bud. Last Year';
             DataClassification = SystemMetadata;
         }
         field(15; "Net Change Forecast"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Net Change Forecast';
             DataClassification = SystemMetadata;
         }
         field(16; "Balance at Date Forecast"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Balance at Date Forecast';
             DataClassification = SystemMetadata;
         }
@@ -193,3 +173,4 @@ table 197 "Acc. Sched. KPI Buffer"
         exit(Result)
     end;
 }
+

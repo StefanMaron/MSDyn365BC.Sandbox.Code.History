@@ -266,12 +266,12 @@ codeunit 134911 "ERM Create Finance Charge Memo"
     var
         IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
         Customer: Record Customer;
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
     begin
         // [FEATURE] [EMail]
         // [SCENARIO 376445] Issue Finance Charge Memo with Print = E-Mail and Hide Email-Dialog = No should show 'E-Mail Dialog' page
         Initialize();
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
 
         // [GIVEN] Customer "A" with Finance Charge Memo
         Customer.Get(CreateCustomerWithFinanceChargeTerms(CreateFinanceChargeTerms(1)));

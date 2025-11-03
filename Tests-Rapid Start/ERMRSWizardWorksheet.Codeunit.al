@@ -16,7 +16,6 @@ codeunit 136606 "ERM RS Wizard & Worksheet"
         LibraryRapidStart: Codeunit "Library - Rapid Start";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         ConfigPackageMgt: Codeunit "Config. Package Management";
-        APIMockEvents: Codeunit "API Mock Events";
         IncorrectNumOfTablesWithDataErr: Label 'Incorrect number of tables for Get Config. Tables report with IncludeWithDataOnly option.';
         IncorrectNumOfRelatedTablesErr: Label 'Incorrect number of tables for Get Config. Tables report with IncludeRelatedTables option.';
         ConfigPackageTblNotFoundErr: Label 'Config Package Table is not found.';
@@ -2486,7 +2485,7 @@ codeunit 136606 "ERM RS Wizard & Worksheet"
     begin
         LibraryVariableStorage.Clear();
         LibraryRapidStart.CleanUp('');
-        APIMockEvents.SetAPIServicesEnabled(false);
+        LibraryRapidStart.SetAPIServicesEnabled(false);
     end;
 
     local procedure CleanupData(PackageCode: Code[20]; DeleteConfigLines: Boolean)
