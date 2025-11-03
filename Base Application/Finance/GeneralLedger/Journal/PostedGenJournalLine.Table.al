@@ -106,6 +106,7 @@ table 181 "Posted Gen. Journal Line"
         }
         field(10; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -168,6 +169,7 @@ table 181 "Posted Gen. Journal Line"
         }
         field(18; "Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 15;
             Editable = false;
@@ -175,16 +177,19 @@ table 181 "Posted Gen. Journal Line"
         }
         field(19; "Sales/Purch. (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Sales/Purch. (LCY)';
         }
         field(20; "Profit (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Profit (LCY)';
         }
         field(21; "Inv. Discount (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Inv. Discount (LCY)';
         }
@@ -262,6 +267,7 @@ table 181 "Posted Gen. Journal Line"
         }
         field(40; "Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -274,6 +280,7 @@ table 181 "Posted Gen. Journal Line"
         }
         field(43; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
         }
@@ -381,6 +388,7 @@ table 181 "Posted Gen. Journal Line"
         }
         field(68; "Bal. VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Bal. VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -520,6 +528,7 @@ table 181 "Posted Gen. Journal Line"
         }
         field(98; "FA Add.-Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'FA Add.-Currency Factor';
             DecimalPlaces = 0 : 15;
             MinValue = 0;
@@ -553,6 +562,7 @@ table 181 "Posted Gen. Journal Line"
         }
         field(103; "VAT Base Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT Base Discount %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -808,6 +818,7 @@ table 181 "Posted Gen. Journal Line"
         field(1004; "Job Quantity"; Decimal)
         {
             AccessByPermission = TableData Job = R;
+            AutoFormatType = 0;
             Caption = 'Project Quantity';
             DecimalPlaces = 0 : 5;
         }
@@ -821,7 +832,7 @@ table 181 "Posted Gen. Journal Line"
         field(1006; "Job Line Discount %"; Decimal)
         {
             AccessByPermission = TableData Job = R;
-            AutoFormatType = 1;
+            AutoFormatType = 0;
             Caption = 'Project Line Discount %';
         }
         field(1007; "Job Line Disc. Amount (LCY)"; Decimal)
@@ -901,6 +912,7 @@ table 181 "Posted Gen. Journal Line"
         }
         field(1018; "Job Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Project Currency Factor';
         }
         field(1019; "Job Currency Code"; Code[10])
@@ -916,6 +928,7 @@ table 181 "Posted Gen. Journal Line"
         field(1030; "Job Remaining Qty."; Decimal)
         {
             AccessByPermission = TableData Job = R;
+            AutoFormatType = 0;
             Caption = 'Project Remaining Qty.';
             DecimalPlaces = 0 : 5;
         }
@@ -1061,17 +1074,20 @@ table 181 "Posted Gen. Journal Line"
         }
         field(6200; "Non-Deductible VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Non-Deductible VAT %';
             DecimalPlaces = 0 : 5;
         }
         field(6201; "Non-Deductible VAT Base"; Decimal)
         {
             AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Base';
         }
         field(6202; "Non-Deductible VAT Amount"; Decimal)
         {
             AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Amount';
         }
         field(6203; "Non-Deductible VAT Base LCY"; Decimal)

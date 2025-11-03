@@ -74,6 +74,7 @@ table 366 "Analysis View Budget Entry"
         }
         field(11; Amount; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount';
         }
@@ -120,4 +121,3 @@ table 366 "Analysis View Budget Entry"
         SetFilter("Dimension 4 Value Code", DimFilter4);
     end;
 }
-

@@ -75,6 +75,7 @@ codeunit 136101 "Service Orders"
         LibraryService: Codeunit "Library - Service";
         LibraryResource: Codeunit "Library - Resource";
         LibraryUtility: Codeunit "Library - Utility";
+        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibrarySmallBusiness: Codeunit "Library - Small Business";
@@ -740,7 +741,7 @@ codeunit 136101 "Service Orders"
         ServiceOrderResponseTime.SaveAsExcel(FilePath);
 
         // [THEN] Verify that Saved file has some data.
-        LibraryUtility.CheckFileNotEmpty(FilePath);
+        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
@@ -765,7 +766,7 @@ codeunit 136101 "Service Orders"
         ServiceItemLineLabels.SaveAsExcel(FilePath);
 
         // [THEN] Verify that Saved file has some data.
-        LibraryUtility.CheckFileNotEmpty(FilePath);
+        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
@@ -794,7 +795,7 @@ codeunit 136101 "Service Orders"
         ServiceProfitRespCenters.SaveAsExcel(FilePath);
 
         // [THEN] Verify that Saved file has some data.
-        LibraryUtility.CheckFileNotEmpty(FilePath);
+        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
@@ -823,7 +824,7 @@ codeunit 136101 "Service Orders"
         ServiceProfitServOrders.SaveAsExcel(FilePath);
 
         // [THEN] Verify that Saved file has some data.
-        LibraryUtility.CheckFileNotEmpty(FilePath);
+        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
@@ -856,7 +857,7 @@ codeunit 136101 "Service Orders"
         ServiceTasks.SaveAsExcel(FilePath);
 
         // [THEN] Verify that Saved file has some data.
-        LibraryUtility.CheckFileNotEmpty(FilePath);
+        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
