@@ -12,7 +12,6 @@ codeunit 136603 "ERM RS Package Operations"
     var
         LibraryRapidStart: Codeunit "Library - Rapid Start";
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryERM: Codeunit "Library - ERM";
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibrarySales: Codeunit "Library - Sales";
@@ -29,7 +28,6 @@ codeunit 136603 "ERM RS Package Operations"
         FileMgt: Codeunit "File Management";
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
-        APIMockEvents: Codeunit "API Mock Events";
         isInitialized: Boolean;
         PackageDataErr: Label 'There are errors in Package Data Error.';
         ApplyErr: Label 'There are errors in Apply Migration Data.';
@@ -389,7 +387,7 @@ codeunit 136603 "ERM RS Package Operations"
         CreatePackageWithTable(ConfigPackage, ConfigPackageTable, DATABASE::Customer);
         ExportToXML(ConfigPackage.Code, ConfigPackageTable, FilePath);
 
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
 
         Erase(FilePath);
     end;
@@ -1060,7 +1058,7 @@ codeunit 136603 "ERM RS Package Operations"
 
         CreatePackageWithTable(ConfigPackage, ConfigPackageTable, DATABASE::"Payment Method");
         ExportToXML(ConfigPackage.Code, ConfigPackageTable, FilePath);
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
 
         CompressedServerFileName := FileMgt.ServerTempFileName('');
         ConfigPckgCompressionMgt.ServersideCompress(FilePath, CompressedServerFileName);
@@ -2992,7 +2990,7 @@ codeunit 136603 "ERM RS Package Operations"
 
         HideDialog();
         LibraryERMCountryData.UpdateGeneralPostingSetup();
-        APIMockEvents.SetAPIServicesEnabled(false);
+        LibraryRapidStart.SetAPIServicesEnabled(false);
         RemoveSalesData();
 
         isInitialized := true;

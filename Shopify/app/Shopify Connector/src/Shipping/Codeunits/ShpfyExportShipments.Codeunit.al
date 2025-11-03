@@ -29,8 +29,7 @@ codeunit 30190 "Shpfy Export Shipments"
     /// Create Shopify Fulfillment.
     /// </summary>
     /// <param name="SalesShipmentHeader">Parameter of type Record "Sales Shipment Header".</param>
-    /// <param name="AssignedFulfillmentOrderIds">Parameter of type Dictionary of [BigInteger, Code[20]].</param>
-    internal procedure CreateShopifyFulfillment(var SalesShipmentHeader: Record "Sales Shipment Header"; var AssignedFulfillmentOrderIds: Dictionary of [BigInteger, Code[20]]);
+    internal procedure CreateShopifyFulfillment(var SalesShipmentHeader: Record "Sales Shipment Header");
     var
         ShipmentLocation: Query "Shpfy Shipment Location";
     begin
@@ -38,11 +37,11 @@ codeunit 30190 "Shpfy Export Shipments"
             ShipmentLocation.SetRange(No, SalesShipmentHeader."No.");
             if ShipmentLocation.Open() then
                 while ShipmentLocation.Read() do
-                    CreateShopifyFulfillment(SalesShipmentHeader, ShipmentLocation.LocationId, ShipmentLocation.DeliveryMethodType, AssignedFulfillmentOrderIds);
+                    CreateShopifyFulfillment(SalesShipmentHeader, ShipmentLocation.LocationId, ShipmentLocation.DeliveryMethodType);
         end;
     end;
 
-    local procedure CreateShopifyFulfillment(var SalesShipmentHeader: Record "Sales Shipment Header"; LocationId: BigInteger; DeliveryMethodType: Enum "Shpfy Delivery Method Type"; var AssignedFulfillmentOrderIds: Dictionary of [BigInteger, Code[20]]);
+    local procedure CreateShopifyFulfillment(var SalesShipmentHeader: Record "Sales Shipment Header"; LocationId: BigInteger; DeliveryMethodType: Enum "Shpfy Delivery Method Type");
     var
         Shop: Record "Shpfy Shop";
         ShopifyOrderHeader: Record "Shpfy Order Header";
@@ -58,7 +57,7 @@ codeunit 30190 "Shpfy Export Shipments"
         if ShopifyOrderHeader.Get(SalesShipmentHeader."Shpfy Order Id") then begin
             ShopifyCommunicationMgt.SetShop(ShopifyOrderHeader."Shop Code");
             Shop.Get(ShopifyOrderHeader."Shop Code");
-            FulfillmentOrderRequests := CreateFulfillmentOrderRequest(SalesShipmentHeader, Shop, LocationId, DeliveryMethodType, AssignedFulfillmentOrderIds);
+            FulfillmentOrderRequests := CreateFulfillmentOrderRequest(SalesShipmentHeader, Shop, LocationId, DeliveryMethodType);
             if FulfillmentOrderRequests.Count <> 0 then
                 foreach FulfillmentOrderRequest in FulfillmentOrderRequests do begin
                     JResponse := ShopifyCommunicationMgt.ExecuteGraphQL(FulfillmentOrderRequest);
@@ -80,7 +79,7 @@ codeunit 30190 "Shpfy Export Shipments"
         end;
     end;
 
-    internal procedure CreateFulfillmentOrderRequest(SalesShipmentHeader: Record "Sales Shipment Header"; Shop: Record "Shpfy Shop"; LocationId: BigInteger; DeliveryMethodType: Enum "Shpfy Delivery Method Type"; var AssignedFulfillmentOrderIds: Dictionary of [BigInteger, Code[20]]) Requests: List of [Text];
+    internal procedure CreateFulfillmentOrderRequest(SalesShipmentHeader: Record "Sales Shipment Header"; Shop: Record "Shpfy Shop"; LocationId: BigInteger; DeliveryMethodType: Enum "Shpfy Delivery Method Type") Requests: List of [Text];
     var
         SalesShipmentLine: Record "Sales Shipment Line";
         ShippingAgent: Record "Shipping Agent";
@@ -120,8 +119,6 @@ codeunit 30190 "Shpfy Export Shipments"
                                 TempFulfillmentOrderLine."Quantity to Fulfill" := Round(SalesShipmentLine.Quantity, 1, '=');
                                 TempFulfillmentOrderLine.Insert();
                             end;
-                            // Accept pending fulfillment request before creating fulfillment
-                            AcceptPendingFulfillmentRequests(Shop, FulfillmentOrderLine."Shopify Fulfillment Order Id", AssignedFulfillmentOrderIds);
                         end;
             until SalesShipmentLine.Next() = 0;
 
@@ -166,10 +163,6 @@ codeunit 30190 "Shpfy Export Shipments"
                 GraphQuery.Append('lineItemsByFulfillmentOrder: [');
                 GraphQueryStart := GraphQuery.ToText();
                 repeat
-                    // Skip fulfillment orders that are assigned and not accepted
-                    if AssignedFulfillmentOrderIds.ContainsKey(TempFulfillmentOrderLine."Shopify Fulfillment Order Id") then
-                        continue;
-
                     if PrevFulfillmentOrderId <> TempFulfillmentOrderLine."Shopify Fulfillment Order Id" then begin
                         if PrevFulfillmentOrderId <> 0 then
                             GraphQuery.Append(']},');
@@ -235,18 +228,5 @@ codeunit 30190 "Shpfy Export Shipments"
             exit(NotifyCustomer)
         else
             exit(Shop."Send Shipping Confirmation");
-    end;
-
-    local procedure AcceptPendingFulfillmentRequests(Shop: Record "Shpfy Shop"; FulfillmentOrderId: BigInteger; var AssignedFulfillmentOrderIds: Dictionary of [BigInteger, Code[20]])
-    var
-        FulfillmentOrderHeader: Record "Shpfy FulFillment Order Header";
-        FulfillmentOrdersAPI: Codeunit "Shpfy Fulfillment Orders API";
-    begin
-        // Check if this fulfillment order needs to be accepted and remove from dictionary
-        if AssignedFulfillmentOrderIds.ContainsKey(FulfillmentOrderId) then
-            if FulfillmentOrderHeader.Get(FulfillmentOrderId) then
-                if (FulfillmentOrderHeader.Status = 'OPEN') and (FulfillmentOrderHeader."Request Status" = FulfillmentOrderHeader."Request Status"::SUBMITTED) then
-                    if FulfillmentOrdersAPI.AcceptFulfillmentRequest(Shop, FulfillmentOrderHeader) then
-                        AssignedFulfillmentOrderIds.Remove(FulfillmentOrderId);
     end;
 }

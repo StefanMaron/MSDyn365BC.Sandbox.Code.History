@@ -23,7 +23,6 @@ codeunit 137011 "SCM Revaluation-II"
         LibrarySales: Codeunit "Library - Sales";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibraryManufacturing: Codeunit "Library - Manufacturing";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryWarehouse: Codeunit "Library - Warehouse";
@@ -583,7 +582,7 @@ codeunit 137011 "SCM Revaluation-II"
         // Exercise: Finish Production Order and Run Adjust Cost Item Entries.
         LibraryManufacturing.ChangeStatusReleasedToFinished(ProductionOrderNo);
         LibraryCosting.AdjustCostItemEntries('', '');
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify: Verify Value Entries.
         VerifyValueEntryComponentItem(Qty, ItemNo, OldUnitCost, NewUnitCost, OldUnitCost - NewUnitCost);
@@ -702,7 +701,7 @@ codeunit 137011 "SCM Revaluation-II"
         // Exercise: Finish Production Order and Run Adjust Cost Item Entries.
         LibraryManufacturing.ChangeStatusReleasedToFinished(ProductionOrderNo);
         LibraryCosting.AdjustCostItemEntries('', '');
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify: Verify Value Entries.
         VerifyValueEntryComponentItem(Qty, ItemNo, OldUnitCost, NewUnitCost, OldUnitCost - NewUnitCost);
@@ -940,7 +939,7 @@ codeunit 137011 "SCM Revaluation-II"
         LibraryCosting.AdjustCostItemEntries(ParentItem."No.", '');
 
         // [WHEN] Post inventory cost to G/L
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // [THEN] All actual cost amounts are posted to G/L
         VerifyActualCostPostedToGL(ProductionOrder."No.");

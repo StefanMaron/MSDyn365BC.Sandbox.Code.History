@@ -353,11 +353,11 @@ codeunit 134605 "Test Report Layout Selection"
         JobQueueEntry: Record "Job Queue Entry";
         DocumentSendingProfile: Record "Document Sending Profile";
         LibraryJobQueue: Codeunit "Library - Job Queue";
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
     begin
         // [FEATURE] [Email] [Document Sending Profile] [Sales]
         // [SCENARIO 334364] Stan can "Send" to email posted sales invoice and "print" them via job queue.
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
         LibrarySmtpMailHandler.SetDisableSending(true);
         FilterJobQueueEntryDocumentMailing(JobQueueEntry);
         JobQueueEntry.DeleteAll();
@@ -400,11 +400,11 @@ codeunit 134605 "Test Report Layout Selection"
         JobQueueEntry: Record "Job Queue Entry";
         DocumentSendingProfile: Record "Document Sending Profile";
         LibraryJobQueue: Codeunit "Library - Job Queue";
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
     begin
         // [FEATURE] [Email] [Document Sending Profile] [Sales]
         // [SCENARIO 334364] Stan can "Send" to email posted sales invoice and "print" them via job queue.
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
         LibrarySmtpMailHandler.SetDisableSending(true);
         FilterJobQueueEntryDocumentMailing(JobQueueEntry);
         JobQueueEntry.DeleteAll();

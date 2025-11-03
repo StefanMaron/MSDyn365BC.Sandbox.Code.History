@@ -20,7 +20,6 @@ codeunit 136612 "ERM RS Process Data"
         LibrarySales: Codeunit "Library - Sales";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryUtility: Codeunit "Library - Utility";
-        APIMockEvents: Codeunit "API Mock Events";
         FilterInfoOneFieldMsg: Label '%1=%2', Locked = true;
         FilterInfoTwoFieldsMsg: Label '%1=%2, %3=%4';
         ActionMustBeCustomErr: Label 'Action must be equal to ''Custom''';
@@ -1579,7 +1578,7 @@ codeunit 136612 "ERM RS Process Data"
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"ERM RS Process Data");
         LibraryRapidStart.CleanUp('');
-        APIMockEvents.SetAPIServicesEnabled(false);
+        LibraryRapidStart.SetAPIServicesEnabled(false);
         ConfigPackageTable.DeleteAll(true);
         ConfigPackageFilter.DeleteAll(true);
         ConfigTableProcessingRule.DeleteAll(true);

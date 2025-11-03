@@ -1,9 +1,6 @@
 {
   "folders": [
     {
-      "path": "./Application Test Library"
-    },
-    {
       "path": "./AuditFileExport/Test/Audit File Export Tests"
     },
     {
@@ -140,9 +137,6 @@
     },
     {
       "path": "./EssentialBusinessHeadlines/Test/Essential Business Headlines Test"
-    },
-    {
-      "path": "./Application Test Library/Source/Application Test Library"
     },
     {
       "path": "./SubscriptionBilling/Test/Subscription Billing Tests/DisabledTests"
@@ -344,11 +338,11 @@
     }
   ],
   "settings": {
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
-    }
+    },
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
   }
 }

@@ -60,12 +60,6 @@ table 30143 "Shpfy FulFillment Order Header"
             DataClassification = SystemMetadata;
             Editable = false;
         }
-        field(10; "Request Status"; Enum "Shpfy FF Request Status")
-        {
-            Caption = 'Request Status';
-            DataClassification = SystemMetadata;
-            Editable = false;
-        }
     }
     keys
     {

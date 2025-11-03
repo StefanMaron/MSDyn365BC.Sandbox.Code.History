@@ -44,7 +44,7 @@ pageextension 8051 "Customer Card" extends "Customer Card"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Subscriptions';
                 Image = ServiceItem;
-                RunObject = page "Service Objects";
+                RunObject = page "Service Object";
                 RunPageLink = "End-User Customer No." = field("No.");
                 ToolTip = 'View a list of Subscriptions for the customer.';
             }

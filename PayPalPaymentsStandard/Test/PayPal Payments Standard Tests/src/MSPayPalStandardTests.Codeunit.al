@@ -614,7 +614,7 @@ codeunit 139500 "MS - PayPal Standard Tests"
         DummyPaymentMethod: Record "Payment Method";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         TempPaymentReportingArgument: Record "Payment Reporting Argument" temporary;
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
         PostedSalesInvoice: TestPage "Posted Sales Invoice";
     begin
         Initialize();
@@ -627,7 +627,7 @@ codeunit 139500 "MS - PayPal Standard Tests"
         TempPaymentServiceSetup.CreateReportingArgs(TempPaymentReportingArgument, SalesInvoiceHeader);
         PostedSalesInvoice.OPENEDIT();
         PostedSalesInvoice.GOTORECORD(SalesInvoiceHeader);
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
 
         // Exercise
         PostedSalesInvoice.Email.INVOKE();

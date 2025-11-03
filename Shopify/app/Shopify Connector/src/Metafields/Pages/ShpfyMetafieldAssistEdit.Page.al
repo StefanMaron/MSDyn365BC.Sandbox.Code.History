@@ -12,6 +12,7 @@ page 30164 "Shpfy Metafield Assist Edit"
     Caption = 'Metafield Assist Edit';
     PageType = StandardDialog;
     ApplicationArea = All;
+    UsageCategory = Administration;
 
     layout
     {
