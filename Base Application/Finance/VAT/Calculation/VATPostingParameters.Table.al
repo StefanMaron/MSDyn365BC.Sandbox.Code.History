@@ -6,6 +6,7 @@ namespace Microsoft.Finance.VAT.Calculation;
 
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Finance.GeneralLedger.Setup;
 
 table 187 "VAT Posting Parameters"
 {
@@ -20,10 +21,14 @@ table 187 "VAT Posting Parameters"
         }
         field(2; "Full VAT Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             DataClassification = SystemMetadata;
         }
         field(3; "Full VAT Amount ACY"; Decimal)
         {
+            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
+            AutoFormatType = 1;
             DataClassification = SystemMetadata;
         }
         field(4; "Source Currency Code"; Code[10])
@@ -36,22 +41,31 @@ table 187 "VAT Posting Parameters"
         }
         field(6; "Deductible VAT Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             DataClassification = SystemMetadata;
         }
         field(7; "Deductible VAT Amount ACY"; Decimal)
         {
+            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
+            AutoFormatType = 1;
             DataClassification = SystemMetadata;
         }
         field(8; "Non-Deductible VAT Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             DataClassification = SystemMetadata;
         }
         field(9; "Non-Deductible VAT Amount ACY"; Decimal)
         {
+            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
+            AutoFormatType = 1;
             DataClassification = SystemMetadata;
         }
         field(10; "Non-Deductible VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             DataClassification = SystemMetadata;
         }
         field(11; "Non-Ded. Purchase VAT Account"; Code[20])
@@ -96,5 +110,13 @@ table 187 "VAT Posting Parameters"
     [IntegrationEvent(false, false)]
     procedure OnBeforeInsertVATPostingBuffer(var VATPostingParameters: Record "VAT Posting Parameters"; GenJournalLine: Record "Gen. Journal Line"; VATPostingSetup: Record "VAT Posting Setup"; FullVATAmount: Decimal; FullVATAmountACY: Decimal; SrcCurrCode: Code[10]; UnrealizedVAT: Boolean; DeductibleVATAmount: Decimal; DeductibleVATAmountACY: Decimal; NonDeductibleVATAmount: Decimal; NonDeductibleVATAmountACY: Decimal; var IsHandled: Boolean)
     begin
+    end;
+
+    local procedure GetAdditionalReportingCurrencyCode(): Code[10]
+    var
+        GLSetup: Record "General Ledger Setup";
+    begin
+        GLSetup.GetRecordOnce();
+        exit(GLSetup."Additional Reporting Currency");
     end;
 }

@@ -84,6 +84,8 @@ table 419 "IC Inbox Jnl. Line"
         }
         field(6; Amount; Decimal)
         {
+            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 1;
             Caption = 'Amount';
             Editable = false;
         }
@@ -93,6 +95,8 @@ table 419 "IC Inbox Jnl. Line"
         }
         field(8; "VAT Amount"; Decimal)
         {
+            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 1;
             Caption = 'VAT Amount';
             Editable = false;
         }
@@ -108,6 +112,7 @@ table 419 "IC Inbox Jnl. Line"
         }
         field(12; "Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -119,6 +124,7 @@ table 419 "IC Inbox Jnl. Line"
         }
         field(14; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             Editable = false;
         }
@@ -156,4 +162,3 @@ table 419 "IC Inbox Jnl. Line"
           DATABASE::"IC Inbox Jnl. Line", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
     end;
 }
-
