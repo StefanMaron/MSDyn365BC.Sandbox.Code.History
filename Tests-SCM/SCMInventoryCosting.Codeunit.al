@@ -10,7 +10,6 @@ codeunit 137007 "SCM Inventory Costing"
 
     var
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibraryERM: Codeunit "Library - ERM";
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryPlanning: Codeunit "Library - Planning";
@@ -387,7 +386,7 @@ codeunit 137007 "SCM Inventory Costing"
 
         // Exercise: run report Post Inventory Cost to G/L
         LibraryVariableStorage.Enqueue(ValueEntriesWerePostedTxt);
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify:
         VerifyValueEntryCostPostedToGL(Item."No.", UnitCostRevalued * Quantity);
@@ -1581,7 +1580,7 @@ codeunit 137007 "SCM Inventory Costing"
             PurchaseHeader, PurchaseLine, ItemNos[1], ItemNos[2], ItemNos[3], LibraryRandom.RandInt(100) + 50, PartialRecvInv);
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
         if not AutomaticCostPosting then
-            LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+            LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // 3.1 Verify: Verify General Ledger Entries that WIP Account does not exist and Total Inventory amount equals calculated amount.
         PurchInvHeader.SetRange("Order No.", PurchaseHeader."No.");
@@ -1594,7 +1593,7 @@ codeunit 137007 "SCM Inventory Costing"
         if MultiplePartialRecvInv then begin
             UpdatePurchaseHeader(PurchaseHeader."No.", ItemNos[1], ItemNos[2], ItemNos[3]);
             if not AutomaticCostPosting then
-                LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+                LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
             PurchInvHeader.SetRange("Order No.", PurchaseHeader."No.");
             PurchInvHeader.FindLast();
             VerifyInvtAmountGLEntry(PurchInvHeader."No.", ItemNos[1]);

@@ -343,9 +343,7 @@ codeunit 130502 "Library - Item Tracking"
     begin
         ItemTrackingSetup."Serial No." := SerialNo;
         ItemTrackingSetup."Lot No." := LotNo;
-#pragma warning disable AL0432
         CreateProdOrderItemTracking(ReservEntry, ProdOrderLine, ItemTrackingSetup, QtyBase);
-#pragma warning restore AL0432
     end;
 #pragma warning restore AL0801
 #endif
@@ -372,9 +370,7 @@ codeunit 130502 "Library - Item Tracking"
     begin
         ItemTrackingSetup."Serial No." := SerialNo;
         ItemTrackingSetup."Lot No." := LotNo;
-#pragma warning disable AL0432
         CreateProdOrderCompItemTracking(ReservEntry, ProdOrderComp, ITemTrackingSetup, QtyBase);
-#pragma warning restore AL0432
     end;
 #pragma warning restore AL0801
 #endif
