@@ -33,36 +33,49 @@ table 922 "G/L Acc. Balance/Budget Buffer"
         }
         field(10; "Debit Amount"; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             Caption = 'Debit Amount';
             DataClassification = SystemMetadata;
         }
         field(11; "Credit Amount"; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             Caption = 'Credit Amount';
             DataClassification = SystemMetadata;
         }
         field(12; "Net Change"; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             Caption = 'Net Change';
             DataClassification = SystemMetadata;
         }
         field(13; "Budgeted Debit Amount"; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             Caption = 'Budgeted Debit Amount';
             DataClassification = SystemMetadata;
         }
         field(14; "Budgeted Credit Amount"; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             Caption = 'Budgeted Credit Amount';
             DataClassification = SystemMetadata;
         }
         field(15; "Budgeted Amount"; Decimal)
         {
+            AutoFormatExpression = '';
+            AutoFormatType = 1;
             Caption = 'Budgeted Amount';
             DataClassification = SystemMetadata;
         }
         field(16; "Balance/Budget Pct."; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Balance/Budget (%)';
             DataClassification = SystemMetadata;
         }
