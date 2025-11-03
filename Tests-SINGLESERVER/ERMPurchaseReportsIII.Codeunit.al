@@ -15,6 +15,7 @@ codeunit 134988 "ERM Purchase Reports III"
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryReportDataset: Codeunit "Library - Report Dataset";
         LibraryUtility: Codeunit "Library - Utility";
+        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryDimension: Codeunit "Library - Dimension";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryWarehouse: Codeunit "Library - Warehouse";
@@ -435,7 +436,7 @@ codeunit 134988 "ERM Purchase Reports III"
 
         // Verify: Verify that Saved files have some data.
         LibraryReportDataset.LoadDataSetFile();
-        LibraryUtility.CheckFileNotEmpty(LibraryReportDataset.GetFileName());
+        LibraryUtilityOnPrem.CheckFileNotEmpty(LibraryReportDataset.GetFileName());
     end;
 
     [Test]

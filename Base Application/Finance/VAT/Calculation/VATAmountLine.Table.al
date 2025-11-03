@@ -29,19 +29,18 @@ table 290 "VAT Amount Line"
     {
         field(1; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(2; "VAT Base"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'VAT Base';
             Editable = false;
         }
         field(3; "VAT Amount"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'VAT Amount';
 
             trigger OnValidate()
@@ -56,7 +55,6 @@ table 290 "VAT Amount Line"
         }
         field(4; "Amount Including VAT"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Amount Including VAT';
             Editable = false;
         }
@@ -67,19 +65,16 @@ table 290 "VAT Amount Line"
         }
         field(6; "Line Amount"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Line Amount';
             Editable = false;
         }
         field(7; "Inv. Disc. Base Amount"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Inv. Disc. Base Amount';
             Editable = false;
         }
         field(8; "Invoice Discount Amount"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Invoice Discount Amount';
 
             trigger OnValidate()
@@ -105,6 +100,7 @@ table 290 "VAT Amount Line"
         }
         field(11; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -119,13 +115,11 @@ table 290 "VAT Amount Line"
         }
         field(14; "Calculated VAT Amount"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Calculated VAT Amount';
             Editable = false;
         }
         field(15; "VAT Difference"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'VAT Difference';
             Editable = false;
         }
@@ -148,25 +142,23 @@ table 290 "VAT Amount Line"
         }
         field(20; "Pmt. Discount Amount"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Pmt. Discount Amount';
             Editable = false;
         }
         field(6200; "Non-Deductible VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Non-Deductible VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(6201; "Non-Deductible VAT Base"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Base';
             Editable = false;
         }
         field(6202; "Non-Deductible VAT Amount"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Amount';
 
             trigger OnValidate()
@@ -176,25 +168,22 @@ table 290 "VAT Amount Line"
         }
         field(6203; "Calc. Non-Ded. VAT Amount"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Calculated Non-Deductible VAT Amount';
             Editable = false;
         }
         field(6204; "Deductible VAT Base"; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Deductible VAT Base';
             Editable = false;
         }
         field(6205; "Deductible VAT Amount"; Decimal)
         {
-            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Deductible VAT Amount';
             Editable = false;
         }
         field(6206; "Non-Deductible VAT Diff."; Decimal)
         {
-            AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Difference';
             Editable = false;
         }
@@ -213,12 +202,14 @@ table 290 "VAT Amount Line"
         field(28081; "VAT Base (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             Caption = 'VAT Base (ACY)';
             Editable = false;
         }
         field(28082; "VAT Amount (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             Caption = 'VAT Amount (ACY)';
 
             trigger OnValidate()
@@ -233,24 +224,28 @@ table 290 "VAT Amount Line"
         field(28083; "Amount Including VAT (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             Caption = 'Amount Including VAT (ACY)';
             Editable = false;
         }
         field(28084; "Amount (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             Caption = 'Amount (ACY)';
             Editable = false;
         }
         field(28085; "VAT Difference (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             Caption = 'VAT Difference (ACY)';
             Editable = false;
         }
         field(28086; "Calculated VAT Amount (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             Caption = 'Calculated VAT Amount (ACY)';
             Editable = false;
         }
@@ -270,10 +265,11 @@ table 290 "VAT Amount Line"
 
     var
         Currency: Record Currency;
+        GeneralLedgerSetup: Record "General Ledger Setup";
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
         AllowVATDifference: Boolean;
         GlobalsInitialized: Boolean;
-
+        GeneralLedgerSetupRead: Boolean;
 #pragma warning disable AA0074
 #pragma warning disable AA0470
         Text000: Label '%1% VAT';
@@ -1103,6 +1099,15 @@ table 290 "VAT Amount Line"
             NewVATBaseDiscountPerc := VATBaseDiscountPerc;
     end;
 
+    local procedure GetAdditionalReportingCurrencyCode(): Code[10]
+    begin
+        if not GeneralLedgerSetupRead then begin
+            GeneralLedgerSetup.Get();
+            GeneralLedgerSetupRead := true;
+        end;
+        exit(GeneralLedgerSetup."Additional Reporting Currency")
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalcLineAmount(var VATAmountLine: Record "VAT Amount Line"; var LineAmount: Decimal)
     begin
@@ -1274,4 +1279,3 @@ table 290 "VAT Amount Line"
     begin
     end;
 }
-
