@@ -303,7 +303,6 @@ table 15 "G/L Account"
         field(31; "Balance at Date"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             CalcFormula = sum("G/L Entry".Amount where("G/L Account No." = field("No."),
                                                         "G/L Account No." = field(filter(Totaling)),
                                                         "Business Unit Code" = field("Business Unit Filter"),
@@ -319,7 +318,6 @@ table 15 "G/L Account"
         field(32; "Net Change"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             CalcFormula = sum("G/L Entry".Amount where("G/L Account No." = field("No."),
                                                         "G/L Account No." = field(filter(Totaling)),
                                                         "Business Unit Code" = field("Business Unit Filter"),
@@ -335,7 +333,6 @@ table 15 "G/L Account"
         field(33; "Budgeted Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             CalcFormula = sum("G/L Budget Entry".Amount where("G/L Account No." = field("No."),
                                                                "G/L Account No." = field(filter(Totaling)),
                                                                "Business Unit Code" = field("Business Unit Filter"),
@@ -369,7 +366,6 @@ table 15 "G/L Account"
         field(36; Balance; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             CalcFormula = sum("G/L Entry".Amount where("G/L Account No." = field("No."),
                                                         "G/L Account No." = field(filter(Totaling)),
                                                         "Business Unit Code" = field("Business Unit Filter"),
@@ -383,7 +379,6 @@ table 15 "G/L Account"
         field(37; "Budget at Date"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             CalcFormula = sum("G/L Budget Entry".Amount where("G/L Account No." = field("No."),
                                                                "G/L Account No." = field(filter(Totaling)),
                                                                "Business Unit Code" = field("Business Unit Filter"),
@@ -498,7 +493,6 @@ table 15 "G/L Account"
         field(47; "Debit Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             BlankZero = true;
             CalcFormula = sum("G/L Entry"."Debit Amount" where("G/L Account No." = field("No."),
                                                                 "G/L Account No." = field(filter(Totaling)),
@@ -515,7 +509,6 @@ table 15 "G/L Account"
         field(48; "Credit Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             BlankZero = true;
             CalcFormula = sum("G/L Entry"."Credit Amount" where("G/L Account No." = field("No."),
                                                                  "G/L Account No." = field(filter(Totaling)),
@@ -536,7 +529,6 @@ table 15 "G/L Account"
         field(52; "Budgeted Debit Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             BlankNumbers = BlankNegAndZero;
             CalcFormula = sum("G/L Budget Entry".Amount where("G/L Account No." = field("No."),
                                                                "G/L Account No." = field(filter(Totaling)),
@@ -552,7 +544,6 @@ table 15 "G/L Account"
         field(53; "Budgeted Credit Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             BlankNumbers = BlankNegAndZero;
             CalcFormula = - sum("G/L Budget Entry".Amount where("G/L Account No." = field("No."),
                                                                 "G/L Account No." = field(filter(Totaling)),
@@ -599,7 +590,6 @@ table 15 "G/L Account"
         field(59; "VAT Amt."; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             CalcFormula = sum("G/L Entry"."VAT Amount" where("G/L Account No." = field("No."),
                                                               "G/L Account No." = field(filter(Totaling)),
                                                               "Business Unit Code" = field("Business Unit Filter"),
@@ -700,7 +690,7 @@ table 15 "G/L Account"
         }
         field(75; "Source Currency Net Change"; Decimal)
         {
-            AutoFormatExpression = Rec."Source Currency Code";
+            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             CalcFormula = sum("G/L Entry"."Source Currency Amount" where("G/L Account No." = field("No."),
                                                                           "G/L Account No." = field(filter(Totaling)),
@@ -715,7 +705,7 @@ table 15 "G/L Account"
         }
         field(76; "Source Curr. Balance at Date"; Decimal)
         {
-            AutoFormatExpression = Rec."Source Currency Code";
+            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             CalcFormula = sum("G/L Entry"."Source Currency Amount" where("G/L Account No." = field("No."),
                                                                           "G/L Account No." = field(filter(Totaling)),
@@ -730,7 +720,7 @@ table 15 "G/L Account"
         }
         field(77; "Source Currency Balance"; Decimal)
         {
-            AutoFormatExpression = Rec."Source Currency Code";
+            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             CalcFormula = sum("G/L Entry"."Source Currency Amount" where("G/L Account No." = field("No."),
                                                                           "G/L Account No." = field(filter(Totaling)),

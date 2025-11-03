@@ -69,7 +69,6 @@ table 5127 "Deferral Header Archive"
         /// </summary>
         field(9; "Amount to Defer (LCY)"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount to Defer (LCY)';
         }
@@ -108,8 +107,6 @@ table 5127 "Deferral Header Archive"
         /// </summary>
         field(14; "Initial Amount to Defer"; Decimal)
         {
-            AutoFormatType = 1;
-            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Initial Amount to Defer';
         }
         /// <summary>
@@ -185,3 +182,4 @@ table 5127 "Deferral Header Archive"
             DeferralLineArchive.DeleteAll();
     end;
 }
+

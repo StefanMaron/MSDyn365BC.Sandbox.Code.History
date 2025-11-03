@@ -2091,7 +2091,7 @@ codeunit 134421 "Report Selections Tests"
         InventorySetup: Record "Inventory Setup";
         CompanyInformation: Record "Company Information";
         ReportLayoutSelection: Record "Report Layout Selection";
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
     begin
         LibraryTestInitialize.OnTestInitialize(Codeunit::"Report Selections Tests");
 
@@ -2102,7 +2102,7 @@ codeunit 134421 "Report Selections Tests"
         ReportLayoutSelection.DeleteAll();
         CreateDefaultReportSelection();
         LibrarySetupStorage.Restore();
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
 
         if Initialized then
             exit;

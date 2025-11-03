@@ -38,17 +38,14 @@ table 1831 "Bus. Unit In Cons. Process"
         }
         field(5; "Average Exchange Rate"; Decimal)
         {
-            AutoFormatType = 0;
             DataClassification = CustomerContent;
         }
         field(6; "Closing Exchange Rate"; Decimal)
         {
-            AutoFormatType = 0;
             DataClassification = CustomerContent;
         }
         field(7; "Last Closing Exchange Rate"; Decimal)
         {
-            AutoFormatType = 0;
             DataClassification = CustomerContent;
         }
         field(8; "Currency Exchange Rate Table"; Option)
