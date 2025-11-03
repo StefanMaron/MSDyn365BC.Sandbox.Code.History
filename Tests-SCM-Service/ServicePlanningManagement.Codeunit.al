@@ -41,6 +41,7 @@ codeunit 136111 "Service Planning Management"
         LibraryResource: Codeunit "Library - Resource";
         LibraryService: Codeunit "Library - Service";
         LibraryUtility: Codeunit "Library - Utility";
+        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         isInitialized: Boolean;
         ResourceSkillDeletionError: Label '%1 must not be deleted.';
@@ -889,7 +890,7 @@ codeunit 136111 "Service Planning Management"
         DispatchBoard.SaveAsExcel(FilePath);
 
         // 3. Verify: Verify that Saved file has some data.
-        LibraryUtility.CheckFileNotEmpty(FilePath);
+        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
     end;
 
     local procedure ChangeAndVerifyRepairStatus(Status: Option Finished,"Partly Serviced",Referred)
@@ -1233,7 +1234,7 @@ codeunit 136111 "Service Planning Management"
         ServiceLoadLevel.InitializeRequest(Selection);
         FilePath := TemporaryPath + Format(Resource.Type) + ResourceNo + '.xlsx';
         ServiceLoadLevel.SaveAsExcel(FilePath);
-        LibraryUtility.CheckFileNotEmpty(FilePath)
+        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath)
     end;
 
     local procedure VerifyStatusServiceAllocation(DocumentNo: Code[20]; Status: Option)
