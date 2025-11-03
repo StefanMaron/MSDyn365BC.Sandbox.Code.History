@@ -79,7 +79,6 @@ table 436 "IC Inbox Purchase Header"
         }
         field(25; "Payment Discount %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             Editable = false;
         }
@@ -197,3 +196,4 @@ table 436 "IC Inbox Purchase Header"
           DATABASE::"IC Inbox Purchase Header", "IC Transaction No.", "IC Partner Code", "Transaction Source", 0);
     end;
 }
+

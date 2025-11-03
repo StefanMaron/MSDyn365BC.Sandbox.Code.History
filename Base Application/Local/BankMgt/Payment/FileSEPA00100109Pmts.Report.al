@@ -76,8 +76,6 @@ report 2000007 "File SEPA 001.001.09 Pmts"
                 if CheckNewGroup(SeparatePmtJnlLine) then
                     ExportPaymentInformation(CstmrCdtTrfInitnNode, SeparatePmtJnlLine);
                 ExportTransactionInformation(PmtInfNode, SeparatePmtJnlLine, "Payment Message");
-                if EmptyConsolidatedPayment() then
-                    InitConsolidatedPayment(SeparatePmtJnlLine);
             end;
 
             trigger OnPostDataItem()

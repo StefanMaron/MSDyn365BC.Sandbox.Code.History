@@ -200,9 +200,7 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
         FeatureTelemetry.LogUsage('0000NHM', FeatureNameTxt, 'Confirm changes');
         if not BuildFieldChangeBuffer(TempChangeLogEntry, SalesHeader) then
             exit(true);
-        if not GuiAllowed() then
-            exit(true);
-        if SalesHeader.GetHideValidationDialog() then
+        if (not GuiAllowed()) or SalesHeader.GetHideValidationDialog() then
             exit(true);
         if not ShowConfirmation() then
             exit(true);
@@ -218,8 +216,6 @@ codeunit 205 "Alt. Cust. VAT Reg. Doc. Impl." implements "Alt. Cust. VAT Reg. Do
     var
         MyNotifications: Record "My Notifications";
     begin
-        if Database.IsInWriteTransaction() then
-            exit(false);
         exit(MyNotifications.IsEnabled(GetConfirmChangesNotificationId()));
     end;
 

@@ -21,7 +21,6 @@
         LibraryReportDataset: Codeunit "Library - Report Dataset";
         LibrarySales: Codeunit "Library - Sales";
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryCosting: Codeunit "Library - Costing";
         LibraryRandom: Codeunit "Library - Random";
@@ -137,7 +136,7 @@
         PurchaseDocumentTest.SaveAsExcel(FilePath);
 
         // Verify: Verify that saved files have some data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
@@ -273,7 +272,7 @@
         PurchaseInvoice.SaveAsExcel(FilePath);
 
         // Verify: Verify that Saved files have some data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]

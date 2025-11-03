@@ -80,7 +80,6 @@ table 428 "IC Outbox Purchase Header"
         }
         field(25; "Payment Discount %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             Editable = false;
         }
@@ -196,3 +195,4 @@ table 428 "IC Outbox Purchase Header"
           DATABASE::"IC Outbox Purchase Header", "IC Transaction No.", "IC Partner Code", "Transaction Source", 0);
     end;
 }
+

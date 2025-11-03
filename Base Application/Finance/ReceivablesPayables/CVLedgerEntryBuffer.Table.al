@@ -87,42 +87,36 @@ table 382 "CV Ledger Entry Buffer"
         field(15; "Original Amt. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Original Amt. (LCY)';
             DataClassification = SystemMetadata;
         }
         field(16; "Remaining Amt. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Remaining Amt. (LCY)';
             DataClassification = SystemMetadata;
         }
         field(17; "Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Amount (LCY)';
             DataClassification = SystemMetadata;
         }
         field(18; "Sales/Purchase (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Sales/Purchase (LCY)';
             DataClassification = SystemMetadata;
         }
         field(19; "Profit (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Profit (LCY)';
             DataClassification = SystemMetadata;
         }
         field(20; "Inv. Discount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Inv. Discount (LCY)';
             DataClassification = SystemMetadata;
         }
@@ -210,14 +204,12 @@ table 382 "CV Ledger Entry Buffer"
         field(40; "Pmt. Disc. Given (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Pmt. Disc. Given (LCY)';
             DataClassification = SystemMetadata;
         }
         field(42; "Orig. Pmt. Disc. Possible(LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Orig. Pmt. Disc. Possible (LCY)';
             DataClassification = SystemMetadata;
         }
@@ -292,7 +284,6 @@ table 382 "CV Ledger Entry Buffer"
         field(54; "Closed by Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Closed by Amount (LCY)';
             DataClassification = SystemMetadata;
         }
@@ -315,7 +306,6 @@ table 382 "CV Ledger Entry Buffer"
         field(60; "Debit Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             BlankZero = true;
             Caption = 'Debit Amount (LCY)';
             DataClassification = SystemMetadata;
@@ -323,7 +313,6 @@ table 382 "CV Ledger Entry Buffer"
         field(61; "Credit Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             BlankZero = true;
             Caption = 'Credit Amount (LCY)';
             DataClassification = SystemMetadata;
@@ -375,33 +364,30 @@ table 382 "CV Ledger Entry Buffer"
         field(71; "Rounding Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Rounding Amount';
             DataClassification = SystemMetadata;
         }
         field(72; "Rounding Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Rounding Amount (LCY)';
             DataClassification = SystemMetadata;
         }
         field(73; "Adjusted Currency Factor"; Decimal)
         {
-            AutoFormatType = 0;
+            AutoFormatType = 1;
             Caption = 'Adjusted Currency Factor';
             DataClassification = SystemMetadata;
         }
         field(74; "Original Currency Factor"; Decimal)
         {
-            AutoFormatType = 0;
+            AutoFormatType = 1;
             Caption = 'Original Currency Factor';
             DataClassification = SystemMetadata;
         }
         field(75; "Original Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Original Amount';
             DataClassification = SystemMetadata;
         }
@@ -419,15 +405,11 @@ table 382 "CV Ledger Entry Buffer"
         }
         field(79; "Max. Payment Tolerance"; Decimal)
         {
-            AutoFormatExpression = Rec."Currency Code";
-            AutoFormatType = 1;
             Caption = 'Max. Payment Tolerance';
             DataClassification = SystemMetadata;
         }
         field(81; "Accepted Payment Tolerance"; Decimal)
         {
-            AutoFormatExpression = Rec."Currency Code";
-            AutoFormatType = 1;
             Caption = 'Accepted Payment Tolerance';
             DataClassification = SystemMetadata;
         }
@@ -440,7 +422,6 @@ table 382 "CV Ledger Entry Buffer"
         {
             Caption = 'Pmt. Tolerance (LCY)';
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             DataClassification = SystemMetadata;
         }
         field(84; "Amount to Apply"; Decimal)
