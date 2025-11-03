@@ -11,7 +11,7 @@ codeunit 139320 "Import Item Pictures Test"
     var
         Assert: Codeunit Assert;
         LibraryInventory: Codeunit "Library - Inventory";
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
+        LibraryUtility: Codeunit "Library - Utility";
         ArchiveFileName: Text;
         IsInitialized: Boolean;
         CannotCreateZIPErr: Label 'ZIP archive file cannot be created.';
@@ -192,7 +192,7 @@ codeunit 139320 "Import Item Pictures Test"
         if ArchiveFileName = '' then
             Error(CannotCreateZIPErr);
 
-        FilePath := LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\';
+        FilePath := LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\';
         FileName[1] := 'AllowedImage.jpg';
         FileName[2] := 'Debra Core.jpg';
 

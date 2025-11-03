@@ -7475,15 +7475,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Plan-Req. Wksht - NamedType DateConflictWithExistingReservationsErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 901776604 - NamedType 1912214012" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Comment should match expected value]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Plan-Req. Wksht - NamedType ExpectedCommentErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 901776604 - NamedType 918030026" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Firm Planned Prod. Order line with Due Date %1 is not correct.]]></Val>
@@ -7563,15 +7554,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Plan-Req. Wksht - NamedType PostingProductionJournalTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 901776604 - NamedType 3705653498" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Production Order Component comment should exist]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Plan-Req. Wksht - NamedType ProdOrderComponentCommentErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 901776604 - NamedType 3471433997" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

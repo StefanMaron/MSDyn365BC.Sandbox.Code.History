@@ -86,7 +86,6 @@ table 1704 "Posted Deferral Header"
         /// </summary>
         field(9; "Amount to Defer (LCY)"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount to Defer (LCY)';
         }
@@ -313,3 +312,4 @@ table 1704 "Posted Deferral Header"
     begin
     end;
 }
+

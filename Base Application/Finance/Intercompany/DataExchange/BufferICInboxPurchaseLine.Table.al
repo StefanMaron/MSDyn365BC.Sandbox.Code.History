@@ -40,7 +40,6 @@ table 606 "Buffer IC Inbox Purchase Line"
         }
         field(15; Quantity; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -54,7 +53,6 @@ table 606 "Buffer IC Inbox Purchase Line"
         }
         field(27; "Line Discount %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Line Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -87,7 +85,6 @@ table 606 "Buffer IC Inbox Purchase Line"
         }
         field(54; "Indirect Cost %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Indirect Cost %';
             Editable = false;
         }
