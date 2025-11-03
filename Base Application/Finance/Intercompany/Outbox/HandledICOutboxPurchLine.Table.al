@@ -49,6 +49,7 @@ table 433 "Handled IC Outbox Purch. Line"
         }
         field(15; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -62,6 +63,7 @@ table 433 "Handled IC Outbox Purch. Line"
         }
         field(27; "Line Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Line Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -96,6 +98,7 @@ table 433 "Handled IC Outbox Purch. Line"
         }
         field(54; "Indirect Cost %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Indirect Cost %';
             Editable = false;
         }
@@ -233,4 +236,3 @@ table 433 "Handled IC Outbox Purch. Line"
           DATABASE::"Handled IC Outbox Purch. Line", "IC Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
     end;
 }
-
