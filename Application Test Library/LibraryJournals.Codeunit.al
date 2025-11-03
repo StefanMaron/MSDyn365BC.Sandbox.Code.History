@@ -43,6 +43,7 @@ codeunit 131306 "Library - Journals"
         GenJournalLine.Validate("Source Code", LibraryERM.FindGeneralJournalSourceCode());  // Unused but required for AU, NZ builds
         GenJournalLine.Validate("Bal. Account Type", BalAccountType);
         GenJournalLine.Validate("Bal. Account No.", BalAccountNo);
+        OnBeforeModifyGenJnlLineWhenCreate(GenJournalLine);
         GenJournalLine.Modify(true);
     end;
 
@@ -84,6 +85,7 @@ codeunit 131306 "Library - Journals"
         GenJournalLine.Validate("Source Code", LibraryERM.FindGeneralJournalSourceCode());  // Unused but required for AU, NZ builds
         GenJournalLine.Validate("Bal. Account Type", BalAccountType);
         GenJournalLine.Validate("Bal. Account No.", BalAccountNo);
+        OnBeforeModifyGenJnlLineWhenCreate(GenJournalLine);
         GenJournalLine.Modify(true);
     end;
 
@@ -228,5 +230,9 @@ codeunit 131306 "Library - Journals"
             JournalUserPreferences.Insert();
         end;
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeModifyGenJnlLineWhenCreate(var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+}

@@ -1533,25 +1533,6 @@ codeunit 132207 "Library - Assembly"
         Commit();
     end;
 
-    procedure PostInvtCostToGL(PerPostingGroup: Boolean; ItemNo: Code[20]; DocNo: Code[20]; PreviewDumpFilePath: Text[1024])
-    var
-        PostValueEntryToGL: Record "Post Value Entry to G/L";
-        PostInventoryCostToGL: Report "Post Inventory Cost to G/L";
-        PostMethod: Option "per Posting Group","per Entry";
-    begin
-        Commit();
-        PostValueEntryToGL.SetFilter("Item No.", '>=%1', ItemNo);
-
-        if PerPostingGroup then
-            PostMethod := PostMethod::"per Posting Group"
-        else
-            PostMethod := PostMethod::"per Entry";
-        PostInventoryCostToGL.InitializeRequest(PostMethod, DocNo, true);
-        PostInventoryCostToGL.SetTableView(PostValueEntryToGL);
-        PostInventoryCostToGL.UseRequestPage(false);
-        PostInventoryCostToGL.SaveAsPdf(PreviewDumpFilePath);
-    end;
-
     procedure PrepareOrderPosting(var AssemblyHeader: Record "Assembly Header"; var TempAssemblyLine: Record "Assembly Line" temporary; HeaderQtyFactor: Integer; CompQtyFactor: Integer; UpdateAllComps: Boolean; PostingDate: Date)
     var
         AssemblyLine: Record "Assembly Line";

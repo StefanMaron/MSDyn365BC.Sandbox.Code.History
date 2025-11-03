@@ -33,6 +33,7 @@ codeunit 137094 "SCM Kitting - D3 - Part 2"
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryCosting: Codeunit "Library - Costing";
+        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory to GL";
         LibraryAssembly: Codeunit "Library - Assembly";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryPlanning: Codeunit "Library - Planning";
@@ -262,7 +263,7 @@ codeunit 137094 "SCM Kitting - D3 - Part 2"
             DocNo := PostedAssemblyHeader."No."
         else
             DocNo := '';
-        LibraryAssembly.PostInvtCostToGL(PerPostingGroup, PostedAssemblyHeader."Item No.", DocNo,
+        LibraryPostInventoryToGL.PostInvtCostToGL(PerPostingGroup, PostedAssemblyHeader."Item No.", DocNo,
           TemporaryPath + PostedAssemblyHeader."No." + '.pdf');
 
         // Verify.
@@ -428,7 +429,7 @@ codeunit 137094 "SCM Kitting - D3 - Part 2"
         PostedAssemblyHeader.Reset();
         PostedAssemblyHeader.SetRange("Order No.", AssemblyHeaderNo1, AssemblyHeaderNo2);
         PostedAssemblyHeader.FindSet();
-        LibraryAssembly.PostInvtCostToGL(false, PostedAssemblyHeader."Item No.", '',
+        LibraryPostInventoryToGL.PostInvtCostToGL(false, PostedAssemblyHeader."Item No.", '',
           TemporaryPath + AssemblyHeaderNo1 + AssemblyHeaderNo2 + '.pdf');
 
         // Verify.
