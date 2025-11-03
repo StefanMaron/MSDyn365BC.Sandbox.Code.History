@@ -45,7 +45,7 @@ codeunit 136104 "Service Posting - Credit Memo"
         LibraryService: Codeunit "Library - Service";
         UseContractTemplateConfirm: Label 'Do you want to create the contract using a contract template?';
         UnknownError: Label 'Unknown error.';
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
+        LibraryUtility: Codeunit "Library - Utility";
         LibraryERM: Codeunit "Library - ERM";
         LibraryInventory: Codeunit "Library - Inventory";
         LibrarySales: Codeunit "Library - Sales";
@@ -977,7 +977,7 @@ codeunit 136104 "Service Posting - Credit Memo"
         CreateServiceInvoiceFromReport(ServiceContractHeader."Contract No.", CreateInvoices::"Print Only");
 
         // [THEN] Verify that Saved Report have some data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]

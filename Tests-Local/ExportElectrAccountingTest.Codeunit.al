@@ -1178,15 +1178,13 @@
     end;
 
     local procedure ExportXSDShemas()
-    var
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
     begin
         XSDSchemaFile_CatalogosParaEsqContE :=
-          LibraryUtilityOnPrem.GetInetRoot() + '..\' + '\GDL\NA\App\Test\XMLSchemas\CatalogosParaEsqContE.xsd';
-        XSDSchemaFile_ChartOfAccount := LibraryUtilityOnPrem.GetInetRoot() + '..\' + '\GDL\NA\App\Test\XMLSchemas\CatalogoCuentas_1_3.xsd';
-        XSDSchemaFile_Balance := LibraryUtilityOnPrem.GetInetRoot() + '..\' + '\GDL\NA\App\Test\XMLSchemas\BalanzaComprobacion_1_3.xsd';
-        XSDSchemaFile_Transactions := LibraryUtilityOnPrem.GetInetRoot() + '..\' + '\GDL\NA\App\Test\XMLSchemas\PolizasPeriodo_1_3.xsd';
-        XSDSchemaFile_AuxAccount := LibraryUtilityOnPrem.GetInetRoot() + '..\' + '\GDL\NA\App\Test\XMLSchemas\AuxiliarCtas_1_3.xsd';
+          LibraryUtility.GetInetRoot() + '..\' + '\GDL\NA\App\Test\XMLSchemas\CatalogosParaEsqContE.xsd';
+        XSDSchemaFile_ChartOfAccount := LibraryUtility.GetInetRoot() + '..\' + '\GDL\NA\App\Test\XMLSchemas\CatalogoCuentas_1_3.xsd';
+        XSDSchemaFile_Balance := LibraryUtility.GetInetRoot() + '..\' + '\GDL\NA\App\Test\XMLSchemas\BalanzaComprobacion_1_3.xsd';
+        XSDSchemaFile_Transactions := LibraryUtility.GetInetRoot() + '..\' + '\GDL\NA\App\Test\XMLSchemas\PolizasPeriodo_1_3.xsd';
+        XSDSchemaFile_AuxAccount := LibraryUtility.GetInetRoot() + '..\' + '\GDL\NA\App\Test\XMLSchemas\AuxiliarCtas_1_3.xsd';
     end;
 }
 

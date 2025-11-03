@@ -22,7 +22,7 @@ codeunit 135208 "ML Prediction Management Test"
         LabelCannotBeFeatureErr: Label 'You have used the same field as the feature and as the label. A field can be either the label or feature, but not both.';
         FeatureRepeatedErr: Label 'You can add a field as a feature only one time.';
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
+        LibraryUtility: Codeunit "Library - Utility";
         AzureMLTask: Option Training,Prediction,Evaluation,Error,Plot;
         TrainingPercentageErr: Label 'The training percentage must be a decimal number between 0 and 1.';
         SomethingWentWrongErr: Label 'Oops, something went wrong when connecting to the Azure Machine Learning endpoint. Please contact your system administrator. %1.';
@@ -711,15 +711,15 @@ codeunit 135208 "ML Prediction Management Test"
     begin
         case Task of
             AzureMLTask::Prediction:
-                exit(LibraryUtilityOnPrem.GetInetRoot() + GetPredictionFileName());
+                exit(LibraryUtility.GetInetRoot() + GetPredictionFileName());
             AzureMLTask::Training:
-                exit(LibraryUtilityOnPrem.GetInetRoot() + GetTrainingFileName());
+                exit(LibraryUtility.GetInetRoot() + GetTrainingFileName());
             AzureMLTask::Evaluation:
-                exit(LibraryUtilityOnPrem.GetInetRoot() + GetEvaluationFileName());
+                exit(LibraryUtility.GetInetRoot() + GetEvaluationFileName());
             AzureMLTask::Error:
-                exit(LibraryUtilityOnPrem.GetInetRoot() + GetErrorFileName());
+                exit(LibraryUtility.GetInetRoot() + GetErrorFileName());
             AzureMLTask::Plot:
-                exit(LibraryUtilityOnPrem.GetInetRoot() + GetPlotFileName());
+                exit(LibraryUtility.GetInetRoot() + GetPlotFileName());
         end;
     end;
 
@@ -759,7 +759,7 @@ codeunit 135208 "ML Prediction Management Test"
         ModelFile: File;
         ModelStream: InStream;
     begin
-        ModelFile.Open(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\Prediction\model.txt');
+        ModelFile.Open(LibraryUtility.GetInetRoot() + '\App\Test\Files\Prediction\model.txt');
         ModelFile.CreateInStream(ModelStream);
         ModelStream.ReadText(Model);
     end;
