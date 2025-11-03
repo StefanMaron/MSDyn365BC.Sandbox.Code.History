@@ -58,8 +58,6 @@ table 417 "Handled IC Outbox Jnl. Line"
         }
         field(6; Amount; Decimal)
         {
-            AutoFormatExpression = Rec."Currency Code";
-            AutoFormatType = 1;
             Caption = 'Amount';
             Editable = false;
         }
@@ -70,8 +68,6 @@ table 417 "Handled IC Outbox Jnl. Line"
         }
         field(8; "VAT Amount"; Decimal)
         {
-            AutoFormatExpression = Rec."Currency Code";
-            AutoFormatType = 1;
             Caption = 'VAT Amount';
             Editable = false;
         }
@@ -88,7 +84,6 @@ table 417 "Handled IC Outbox Jnl. Line"
         }
         field(12; "Payment Discount %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             Editable = false;
         }
@@ -99,7 +94,6 @@ table 417 "Handled IC Outbox Jnl. Line"
         }
         field(14; Quantity; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Quantity';
             Editable = false;
         }
@@ -136,3 +130,4 @@ table 417 "Handled IC Outbox Jnl. Line"
           DATABASE::"Handled IC Outbox Jnl. Line", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
     end;
 }
+

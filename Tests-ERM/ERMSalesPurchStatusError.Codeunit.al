@@ -16,7 +16,6 @@ codeunit 134383 "ERM Sales/Purch Status Error"
         LibraryPurchase: Codeunit "Library - Purchase";
         LibrarySales: Codeunit "Library - Sales";
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryReportDataset: Codeunit "Library - Report Dataset";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryDimension: Codeunit "Library - Dimension";
@@ -833,7 +832,7 @@ codeunit 134383 "ERM Sales/Purch Status Error"
         SalesDocumentTest.SaveAsExcel(FilePath);
 
         // Verify: Verify that saved files have some data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
 
         // Tear Down: Cleanup of Setup Done.
         UpdateSalesReceivableSetup(DefaultPostingDate, DefaultPostingDate);
@@ -861,7 +860,7 @@ codeunit 134383 "ERM Sales/Purch Status Error"
         ReturnOrderConfirmation.SaveAsExcel(FilePath);
 
         // Verify: Verify that saved files have some data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
 
         // Tear Down: Cleanup of Setup Done.
         UpdateSalesReceivableSetup(DefaultPostingDate, DefaultPostingDate);
@@ -889,7 +888,7 @@ codeunit 134383 "ERM Sales/Purch Status Error"
         PurchaseDocumentTest.SaveAsExcel(FilePath);
 
         // Verify: Verify that saved files have some data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
 
         // Tear Down: Cleanup of Setup Done.
         UpdatePurchasePayableSetup(DefaultPostingDate, DefaultPostingDate);
@@ -917,7 +916,7 @@ codeunit 134383 "ERM Sales/Purch Status Error"
         Order.SaveAsExcel(FilePath);
 
         // Verify: Verify that saved files have some data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
 
         // Tear Down: Cleanup of Setup Done.
         UpdatePurchasePayableSetup(DefaultPostingDate, DefaultPostingDate);
@@ -945,7 +944,7 @@ codeunit 134383 "ERM Sales/Purch Status Error"
         ReturnOrder.SaveAsExcel(FilePath);
 
         // Verify: Verify that saved files have some data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
 
         // Tear Down: Cleanup of Setup Done.
         UpdatePurchasePayableSetup(DefaultPostingDate, DefaultPostingDate);

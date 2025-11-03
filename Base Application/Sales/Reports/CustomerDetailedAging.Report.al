@@ -195,8 +195,6 @@ report 106 "Customer Detailed Aging"
                     if OnlyOpen then
                         NumCustLedgEntriesperCust.SetFilter(OpenValue, 'TRUE');
 
-                    OnCustomerPreDataItemOnBeforeFillCustomersWithLedgerEntriesList(NumCustLedgEntriesperCust, Customer);
-
                     if NumCustLedgEntriesperCust.Open() then
                         while NumCustLedgEntriesperCust.Read() do
                             if not CustomersWithLedgerEntriesList.Contains(NumCustLedgEntriesperCust.Customer_No) then
@@ -339,11 +337,6 @@ report 106 "Customer Detailed Aging"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetCustLedgerEntryOnBeforeUpdateTotal(var CustLedgerEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCustomerPreDataItemOnBeforeFillCustomersWithLedgerEntriesList(var NumCustLedgEntriesperCust: Query "Num CustLedgEntries per Cust"; Customer: Record Customer)
     begin
     end;
 }

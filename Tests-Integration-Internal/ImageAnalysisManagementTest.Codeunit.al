@@ -13,7 +13,7 @@ codeunit 135206 "Image Analysis Management Test"
         Assert: Codeunit Assert;
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
+        LibraryUtility: Codeunit "Library - Utility";
         EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
         HttpMessageHandler: DotNet MockHttpMessageHandler;
         SetMediaErr: Label 'There was a problem uploading the image file. Please try again.';
@@ -748,65 +748,65 @@ codeunit 135206 "Image Analysis Management Test"
     [Normal]
     local procedure GetImagePath(): Text
     begin
-        exit(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\AllowedImage.jpg');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\AllowedImage.jpg');
     end;
 #if not CLEAN25
     [Normal]
     [Obsolete('Image analysis for face is being removed. There is no replacement.', '25.0')]
     local procedure GetFaceImagePath(): Text
     begin
-        exit(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\Debra Core.jpg');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\Debra Core.jpg');
     end;
 #endif
 
     [Normal]
     local procedure GetImageAnalysisColorResponsePath(): Text
     begin
-        exit(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\ImageAnalysisColorResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\ImageAnalysisColorResponse.txt');
     end;
 
     [Normal]
     local procedure GetImageAnalysisTagsResponsePath(): Text
     begin
-        exit(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\ImageAnalysisTagsResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\ImageAnalysisTagsResponse.txt');
     end;
 
     [Normal]
     local procedure GetCustomImageAnalysisTagsResponsePath(): Text
     begin
-        exit(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisTagsResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisTagsResponse.txt');
     end;
 
     [Normal]
     local procedure GetCustomImageAnalysisTagsResponsePathV2(): Text
     begin
-        exit(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisTagsResponseV2.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisTagsResponseV2.txt');
     end;
 
     [Normal]
     local procedure GetCustomImageAnalysisErrorResponsePath(): Text
     begin
-        exit(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisErrorResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\CustomImageAnalysisErrorResponse.txt');
     end;
 
     [Normal]
     local procedure GetImageAnalysisErrorResponsePath(): Text
     begin
-        exit(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\ImageAnalysisErrorResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\ImageAnalysisErrorResponse.txt');
     end;
 #if not CLEAN25
     [Normal]
     [Obsolete('Image analysis for face is being removed. There is no replacement.', '25.0')]
     local procedure GetFaceAnalysisResponsePath(): Text
     begin
-        exit(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\FaceImageAnalysisResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\FaceImageAnalysisResponse.txt');
     end;
 
     [Normal]
     [Obsolete('Image analysis for face is being removed. There is no replacement.', '25.0')]
     local procedure GetFaceMinorAnalysisResponsePath(): Text
     begin
-        exit(LibraryUtilityOnPrem.GetInetRoot() + '\App\Test\Files\ImageAnalysis\FaceMinorImageAnalysisResponse.txt');
+        exit(LibraryUtility.GetInetRoot() + '\App\Test\Files\ImageAnalysis\FaceMinorImageAnalysisResponse.txt');
     end;
 #endif
 

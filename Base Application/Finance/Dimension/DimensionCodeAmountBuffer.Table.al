@@ -25,7 +25,6 @@ table 375 "Dimension Code Amount Buffer"
         field(3; Amount; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Amount';
             DataClassification = SystemMetadata;
         }
@@ -43,3 +42,4 @@ table 375 "Dimension Code Amount Buffer"
     {
     }
 }
+

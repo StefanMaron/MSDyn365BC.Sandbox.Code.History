@@ -32,7 +32,7 @@ codeunit 136314 "Job Quote Report Tests"
     Procedure SendProjectTaskQuoteFromProjectTaskCardDoesNotProvideWithTheSsameFileNameAsSendProjectQuotefromProjectCard()
     var
         JobTaskLine: Record "Job Task";
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
         LibraryJob: Codeunit "Library - Job";
         LibraryERM: Codeunit "Library - ERM";
         LibraryRandom: Codeunit "Library - Random";
@@ -42,7 +42,7 @@ codeunit 136314 "Job Quote Report Tests"
         Initialize();
 
         //[GIVEN] Setup Email
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
 
         // [GIVEN] Create Job
         LibraryJob.CreateJob(Job);
@@ -249,13 +249,13 @@ codeunit 136314 "Job Quote Report Tests"
     var
         JobPlanningLine: Record "Job Planning Line";
         JobCard: TestPage "Job Card";
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
     begin
         // [GIVEN] A newly setup company, with a new job created
         Initialize();
         SetReportLayoutForRDLC();
         SetupForJobQuote(JobPlanningLine);
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
 
         // [THEN] Verify contents on Job Quote report
         VerifyJobQuoteReport(JobPlanningLine, QuantityTxt, UnitCostTxt, TotalCostTxt, JobTaskNoTxt);
