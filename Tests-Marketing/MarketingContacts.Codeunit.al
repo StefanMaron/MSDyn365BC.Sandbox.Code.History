@@ -14,6 +14,7 @@ codeunit 136201 "Marketing Contacts"
         LibrarySales: Codeunit "Library - Sales";
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryUtility: Codeunit "Library - Utility";
+        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryMarketing: Codeunit "Library - Marketing";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
@@ -1340,7 +1341,7 @@ codeunit 136201 "Marketing Contacts"
         // 3. Verify: Check that location has been changed for attachments.
         Attachment.FindSet();
         repeat
-            LibraryUtility.CheckFileNotEmpty(TemporaryPath + Format(Attachment."No."))
+            LibraryUtilityOnPrem.CheckFileNotEmpty(TemporaryPath + Format(Attachment."No."))
         until Attachment.Next() = 0;
     end;
 
@@ -2769,12 +2770,12 @@ codeunit 136201 "Marketing Contacts"
         SalesLine: Record "Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
         GenProductPostingGroup: Record "Gen. Product Posting Group";
-        LibraryWorkflow: Codeunit "Library - Workflow";
+        LibraryEmail: Codeunit "Library - Email";
         SalesQuote: TestPage "Sales Quote";
     begin
         // [SCENARIO 199641] Email Dialog shows Contact Email when Sales Quote created for Contact
         Initialize();
-        LibraryWorkflow.SetUpEmailAccount();
+        LibraryEmail.SetUpEmailAccount();
         UpdateCompanyInformationPaymentInfo(true);
 
         // [GIVEN] Customer Template "CT", Contact "C" with type Company and Email "Email"
