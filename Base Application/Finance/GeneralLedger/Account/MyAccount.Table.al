@@ -60,6 +60,7 @@ table 9153 "My Account"
         }
         field(10; "Acc. Balance"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             CalcFormula = sum("G/L Entry".Amount where("G/L Account No." = field("Account No."),
                                                        "G/L Account No." = field(filter(Totaling))));
