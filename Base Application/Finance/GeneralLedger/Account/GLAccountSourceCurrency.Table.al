@@ -48,7 +48,6 @@ table 589 "G/L Account Source Currency"
         }
         field(31; "Balance at Date"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             CalcFormula = sum("G/L Entry".Amount where("G/L Account No." = field("G/L Account No."),
                                                         "Source Currency Code" = field("Currency Code"),
@@ -161,3 +160,4 @@ table 589 "G/L Account Source Currency"
         GLAccountSourceCurrency.Insert();
     end;
 }
+

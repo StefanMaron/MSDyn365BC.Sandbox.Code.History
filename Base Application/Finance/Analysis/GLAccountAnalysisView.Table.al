@@ -141,7 +141,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(31; "Balance at Date"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
@@ -161,7 +160,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(32; "Net Change"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
@@ -181,7 +179,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(33; "Budgeted Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Budget Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
@@ -213,7 +210,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(36; Balance; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
@@ -233,7 +229,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(37; "Budgeted at Date"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Budget Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
@@ -283,7 +278,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(47; "Debit Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Entry"."Debit Amount" where("Analysis View Code" = field("Analysis View Filter"),
@@ -303,7 +297,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(48; "Credit Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Entry"."Credit Amount" where("Analysis View Code" = field("Analysis View Filter"),
@@ -327,7 +320,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(52; "Budgeted Debit Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankNumbers = BlankNegAndZero;
             BlankZero = true;
@@ -347,7 +339,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(53; "Budgeted Credit Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             BlankNumbers = BlankZeroAndPos;
             BlankZero = true;
@@ -391,7 +382,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(60; "Additional-Currency Net Change"; Decimal)
         {
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Entry"."Add.-Curr. Amount" where("Analysis View Code" = field("Analysis View Filter"),
@@ -411,7 +401,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(61; "Add.-Currency Balance at Date"; Decimal)
         {
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Entry"."Add.-Curr. Amount" where("Analysis View Code" = field("Analysis View Filter"),
@@ -431,7 +420,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(62; "Additional-Currency Balance"; Decimal)
         {
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Entry"."Add.-Curr. Amount" where("Analysis View Code" = field("Analysis View Filter"),
@@ -457,7 +445,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(64; "Add.-Currency Debit Amount"; Decimal)
         {
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Entry"."Add.-Curr. Debit Amount" where("Analysis View Code" = field("Analysis View Filter"),
@@ -477,7 +464,6 @@ table 376 "G/L Account (Analysis View)"
         }
         field(65; "Add.-Currency Credit Amount"; Decimal)
         {
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             AutoFormatType = 1;
             BlankZero = true;
             CalcFormula = sum("Analysis View Entry"."Add.-Curr. Credit Amount" where("Analysis View Code" = field("Analysis View Filter"),
@@ -624,12 +610,5 @@ table 376 "G/L Account (Analysis View)"
     local procedure OnBeforeGetCaptionClass(var GLAccountAnalysisView: Record "G/L Account (Analysis View)"; AnalysisViewDimType: Integer; var Result: Text[250]; var IsHandled: Boolean)
     begin
     end;
-
-    local procedure GetAdditionalReportingCurrencyCode(): Code[10]
-    var
-        GLSetup: Record "General Ledger Setup";
-    begin
-        GLSetup.Get();
-        exit(GLSetup."Additional Reporting Currency");
-    end;
 }
+

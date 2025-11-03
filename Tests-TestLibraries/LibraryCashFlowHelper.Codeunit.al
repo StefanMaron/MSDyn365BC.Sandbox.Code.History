@@ -516,9 +516,7 @@ codeunit 131332 "Library - Cash Flow Helper"
     [Obsolete('Moved to codeunit Library Service', '27.0')]
     procedure CreateDefaultServiceOrder(var ServiceHeader: Record "Service Header")
     begin
-#pragma warning disable AL0432
         CreateSpecificServiceOrder(ServiceHeader, '', '');
-#pragma warning restore AL0432
     end;
 #endif
 

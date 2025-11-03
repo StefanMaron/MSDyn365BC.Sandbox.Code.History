@@ -66,14 +66,12 @@ table 49 "Invoice Post. Buffer"
         }
         field(7; Amount; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount';
             DataClassification = SystemMetadata;
         }
         field(8; "VAT Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'VAT Amount';
             DataClassification = SystemMetadata;
@@ -97,7 +95,6 @@ table 49 "Invoice Post. Buffer"
         }
         field(14; "VAT Base Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'VAT Base Amount';
             DataClassification = SystemMetadata;
@@ -126,7 +123,6 @@ table 49 "Invoice Post. Buffer"
         }
         field(21; Quantity; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Quantity';
             DataClassification = SystemMetadata;
             DecimalPlaces = 1 : 5;
@@ -171,21 +167,18 @@ table 49 "Invoice Post. Buffer"
         }
         field(31; "VAT Difference"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'VAT Difference';
             DataClassification = SystemMetadata;
         }
         field(32; "VAT %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'VAT %';
             DataClassification = SystemMetadata;
             DecimalPlaces = 1 : 1;
         }
         field(35; "VAT Base Before Pmt. Disc."; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'VAT Base Before Pmt. Disc.';
             DataClassification = SystemMetadata;
@@ -236,7 +229,6 @@ table 49 "Invoice Post. Buffer"
         }
         field(5603; "Salvage Value"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Salvage Value';
             DataClassification = SystemMetadata;
@@ -287,21 +279,18 @@ table 49 "Invoice Post. Buffer"
         }
         field(6200; "Non-Deductible VAT %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Non-Deductible VAT %';
             DecimalPlaces = 0 : 5;
             DataClassification = SystemMetadata;
         }
         field(6201; "Non-Deductible VAT Base"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Base';
             DataClassification = SystemMetadata;
         }
         field(6202; "Non-Deductible VAT Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Amount';
             DataClassification = SystemMetadata;
@@ -322,8 +311,6 @@ table 49 "Invoice Post. Buffer"
         }
         field(6205; "Non-Deductible VAT Diff."; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Difference';
             Editable = false;
         }

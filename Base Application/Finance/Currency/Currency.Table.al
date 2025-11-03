@@ -177,7 +177,6 @@ table 4 Currency
         field(10; "Invoice Rounding Precision"; Decimal)
         {
             AutoFormatExpression = Code;
-            AutoFormatType = 1;
             DecimalPlaces = 2 : 5;
             Caption = 'Invoice Rounding Precision';
             InitValue = 0.01;
@@ -211,8 +210,6 @@ table 4 Currency
             DecimalPlaces = 2 : 5;
             InitValue = 0.01;
             MinValue = 0;
-            AutoFormatType = 1;
-            AutoFormatExpression = Code;
 
             trigger OnValidate()
             begin
@@ -233,8 +230,6 @@ table 4 Currency
             DecimalPlaces = 0 : 9;
             InitValue = 0.00001;
             MinValue = 0;
-            AutoFormatType = 2;
-            AutoFormatExpression = Code;
         }
         /// <summary>
         /// Descriptive name for the currency (e.g., "US Dollar", "Euro", "British Pound").
@@ -581,7 +576,6 @@ table 4 Currency
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 5;
             Editable = false;
-            AutoFormatType = 0;
         }
         /// <summary>
         /// General Ledger account for posting residual currency gains.
@@ -661,7 +655,6 @@ table 4 Currency
             Editable = false;
             MaxValue = 100;
             MinValue = 0;
-            AutoFormatType = 0;
         }
         /// <summary>
         /// Maximum payment tolerance amount allowed for this currency.
