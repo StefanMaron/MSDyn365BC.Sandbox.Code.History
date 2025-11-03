@@ -1451,7 +1451,6 @@
         exit(VATIdentifier.Code);
     end;
 
-    [Scope('OnPrem')]
     procedure CreateVATIdentifier(var VATIdentifier: Record "VAT Identifier")
     begin
         VATIdentifier.Init();
@@ -2128,7 +2127,6 @@
               VATPostingSetup."VAT Calculation Type"::"Normal VAT", LibraryRandom.RandDecInDecimalRange(10, 25, 0));
     end;
 
-    [Scope('OnPrem')]
     procedure FindVATPostingSetupSales(var VATPostingSetup: Record "VAT Posting Setup")
     var
         VATBusPostingGroup: Record "VAT Business Posting Group";
@@ -2906,7 +2904,6 @@
         VATPostingSetup.Modify();
     end;
 
-    [Scope('OnPrem')]
     procedure SetDefaultSalesOperationType(VATBusPostingGroupCode: Code[20])
     var
         VATBusPostingGroup: Record "VAT Business Posting Group";

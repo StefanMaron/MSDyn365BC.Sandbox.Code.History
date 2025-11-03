@@ -89,6 +89,7 @@ codeunit 137079 "SCM Production Order III"
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
         LibraryERM: Codeunit "Library - ERM";
         LibraryCosting: Codeunit "Library - Costing";
+        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         ShopCalendarMgt: Codeunit "Shop Calendar Management";
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
@@ -6196,7 +6197,7 @@ codeunit 137079 "SCM Production Order III"
             StrSubstNo(EntryMustBeEqualErr, ValueEntry.FieldCaption("Cost Posted to G/L"), 0, ValueEntry."Entry No.", ValueEntry.TableCaption()));
 
         // [WHEN] Run "Post Inventory Cost to G/L".
-        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
 
         // [THEN] Verify "Direct Cost Non-Inv. App. Acc." must be updated for "Direct Cost - Non Inventory" and "Cost Posted to G/L" must be updated in Value Entry.
         VerifyGLEntriesForNonInventoryAppliedAccount(ProductionOrder, "Item Ledger Entry Type"::Output, "Cost Entry Type"::"Direct Cost - Non Inventory", OutputItem, NonInvUnitCost * Quantity);
@@ -6773,7 +6774,7 @@ codeunit 137079 "SCM Production Order III"
             StrSubstNo(EntryMustBeEqualErr, ValueEntry.FieldCaption("Cost Posted to G/L"), 0, ValueEntry."Entry No.", ValueEntry.TableCaption()));
 
         // [WHEN] Run "Post Inventory Cost to G/L".
-        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
 
         // [THEN] Verify "Mat. Non-Inv. Variance Acc." must be updated for "Variance Type"-"Material - Non Inventory" and "Cost Posted to G/L" must be updated in Value Entry.
         VerifyGLEntriesForNonInventoryVarianceAccount(ProductionOrder, "Item Ledger Entry Type"::Output, "Cost Entry Type"::Variance, OutputItem, NonInvUnitCost * ConsumptionQuantity);
