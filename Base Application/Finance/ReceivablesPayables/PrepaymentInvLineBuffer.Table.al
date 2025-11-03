@@ -36,7 +36,8 @@ table 461 "Prepayment Inv. Line Buffer"
         }
         field(3; Amount; Decimal)
         {
-            AutoFormatType = 2;
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Amount';
             DataClassification = SystemMetadata;
         }
@@ -72,6 +73,7 @@ table 461 "Prepayment Inv. Line Buffer"
         field(9; "VAT Amount"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'VAT Amount';
             DataClassification = SystemMetadata;
         }
@@ -83,6 +85,7 @@ table 461 "Prepayment Inv. Line Buffer"
         field(11; "VAT Base Amount"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'VAT Base Amount';
             DataClassification = SystemMetadata;
         }
@@ -110,11 +113,13 @@ table 461 "Prepayment Inv. Line Buffer"
         field(15; "VAT Difference"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'VAT Difference';
             DataClassification = SystemMetadata;
         }
         field(16; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DataClassification = SystemMetadata;
             DecimalPlaces = 1 : 1;
@@ -148,6 +153,7 @@ table 461 "Prepayment Inv. Line Buffer"
         field(22; "Amount Incl. VAT"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Amount Incl. VAT';
             DataClassification = SystemMetadata;
         }
@@ -181,11 +187,14 @@ table 461 "Prepayment Inv. Line Buffer"
         field(29; "VAT Base Before Pmt. Disc."; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'VAT Base Before Pmt. Disc.';
             DataClassification = SystemMetadata;
         }
         field(30; "Orig. Pmt. Disc. Possible"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Original Pmt. Disc. Possible';
             DataClassification = SystemMetadata;
         }

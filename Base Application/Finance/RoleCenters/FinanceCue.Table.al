@@ -201,6 +201,7 @@ table 9054 "Finance Cue"
         }
         field(34; "Total Overdue (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Total Overdue (LCY)';
             FieldClass = FlowField;
@@ -210,6 +211,7 @@ table 9054 "Finance Cue"
         }
         field(35; "Total Outstanding (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Total Outstanding (LCY)';
             FieldClass = FlowField;
@@ -228,6 +230,7 @@ table 9054 "Finance Cue"
         }
         field(38; "AR Accounts Balance"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'A/R Accounts Balance';
             FieldClass = Normal;
@@ -311,4 +314,3 @@ table 9054 "Finance Cue"
         exit(ActivitiesCue.GetAmountFormat());
     end;
 }
-
