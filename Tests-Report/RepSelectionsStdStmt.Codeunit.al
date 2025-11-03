@@ -2508,10 +2508,10 @@ codeunit 134422 "Rep. Selections - Std. Stmt."
         JobQueueEntry: Record "Job Queue Entry";
         ActivityLog: Record "Activity Log";
         ReportInbox: Record "Report Inbox";
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
         CustomerCard: TestPage "Customer Card";
     begin
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
         LibraryTestInitialize.OnTestInitialize(Codeunit::"Rep. Selections - Std. Stmt.");
 
         LibraryVariableStorage.Clear();

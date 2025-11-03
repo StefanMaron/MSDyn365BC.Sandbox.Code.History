@@ -1,5 +1,4 @@
-﻿#if not CLEAN28
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -15,9 +14,6 @@ page 10501 "Postcode Configuration Page"
     PageType = StandardDialog;
     SourceTable = "Postcode Service Config";
     UsageCategory = Administration;
-    ObsoleteReason = 'Page has been moved to the GetAddress.io UK Postcodes.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '28.0';
 
     layout
     {
@@ -110,5 +106,4 @@ page 10501 "Postcode Configuration Page"
         DisabledTok: Label 'Disabled';
         ServiceKeyText: Text;
 }
-#endif
 

@@ -6,8 +6,8 @@ codeunit 135161 "Cloud Mig Country Tables"
 #if not CLEAN28
         ListOfTablesToMigrate.Add(Database::"BACS Ledger Entry");
         ListOfTablesToMigrate.Add(Database::"BACS Register");
-        ListOfTablesToMigrate.Add(Database::"Fin. Charge Interest Rate");
 #endif
+        ListOfTablesToMigrate.Add(Database::"Fin. Charge Interest Rate");
 #if not CLEAN27
         ListOfTablesToMigrate.Add(Database::"GovTalk Message Parts");
         ListOfTablesToMigrate.Add(Database::"GovTalk Setup");
@@ -21,8 +21,6 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"MTD-Return Details");
         ListOfTablesToMigrate.Add(Database::"MTD-Session Fraud Prev. Hdr");
 #endif
-#if not CLEAN28
         ListOfTablesToMigrate.Add(Database::"Postcode Notification Memory");
-#endif
     end;
 }

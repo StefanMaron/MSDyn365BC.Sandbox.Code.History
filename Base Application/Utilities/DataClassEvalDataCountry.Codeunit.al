@@ -12,8 +12,8 @@ using Microsoft.Sales.Archive;
 using System.Privacy;
 #if not CLEAN28
 using Microsoft.Bank.Ledger;
-using Microsoft.Sales.FinanceCharge;
 #endif
+using Microsoft.Sales.FinanceCharge;
 using Microsoft.Finance.GeneralLedger.Setup;
 
 codeunit 1752 "Data Class. Eval. Data Country"
@@ -42,8 +42,8 @@ codeunit 1752 "Data Class. Eval. Data Country"
 #if not CLEAN28
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"BACS Ledger Entry");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"BACS Register");
-        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Fin. Charge Interest Rate");
 #endif
+        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Fin. Charge Interest Rate");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Accounting Period GB");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Alt. Employee Posting Group");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Employee Posting Group");

@@ -35,7 +35,7 @@ codeunit 144011 "UT COMPANY"
 
     var
         Assert: Codeunit Assert;
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
+        LibraryUtility: Codeunit "Library - Utility";
 #if not CLEAN27
         LibraryRandom: Codeunit "Library - Random";
 
@@ -159,7 +159,7 @@ codeunit 144011 "UT COMPANY"
         ControlExist: Boolean;
     begin
         // Setup and Exercise: Find Control on Company Information Page with Field No.
-        ControlExist := LibraryUtilityOnPrem.FindControl(1, FieldNo);  // 1 used for Company Information Page Id.
+        ControlExist := LibraryUtility.FindControl(1, FieldNo);  // 1 used for Company Information Page Id.
 
         // Verify: Verify that control exist on Company Information page.
         Assert.AreEqual(true, ControlExist, 'Control must exist');

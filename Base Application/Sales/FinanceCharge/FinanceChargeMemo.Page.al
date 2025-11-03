@@ -70,7 +70,6 @@ page 446 "Finance Charge Memo"
                     QuickEntry = false;
                     ToolTip = 'Specifies additional address information.';
                 }
-#if not CLEAN28
                 field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
@@ -80,24 +79,13 @@ page 446 "Finance Charge Memo"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the county name of the customer the finance charge memo is for.';
-                    ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '28.0';
                 }
-#endif
                 field("Post Code"; Rec."Post Code")
                 {
                     ApplicationArea = Basic, Suite;
                     QuickEntry = false;
                     ToolTip = 'Specifies the postal code.';
                 }
-#if CLEAN28
-                field(City; Rec.City)
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the city name of the customer the finance charge memo is for.';
-                }
-#endif
                 field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;

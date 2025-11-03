@@ -33,8 +33,6 @@ table 362 "ECSL VAT Report Line"
         field(5; "Total Value Of Supplies"; Decimal)
         {
             Caption = 'Total Value Of Supplies';
-            AutoFormatType = 1;
-            AutoFormatExpression = '';
         }
         field(6; "Transaction Indicator"; Option)
         {
@@ -103,3 +101,4 @@ table 362 "ECSL VAT Report Line"
         ECSLVATReportLine.DeleteAll();
     end;
 }
+

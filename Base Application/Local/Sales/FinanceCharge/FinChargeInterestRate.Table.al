@@ -1,5 +1,4 @@
-﻿#if not CLEANSCHEMA31
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -10,9 +9,6 @@ table 10555 "Fin. Charge Interest Rate"
     Caption = 'Fin. Charge Interest Rate';
     DataCaptionFields = "Fin. Charge Terms Code", "Start Date";
     DataClassification = CustomerContent;
-    ObsoleteReason = 'This table is deprecated and will be removed in future release';
-    ObsoleteState = Pending;
-    ObsoleteTag = '28.0';
 
     fields
     {
@@ -51,5 +47,4 @@ table 10555 "Fin. Charge Interest Rate"
     {
     }
 }
-#endif
 
