@@ -108,6 +108,7 @@ table 221 "Gen. Jnl. Allocation"
         {
             Caption = 'Allocation Quantity';
             DecimalPlaces = 0 : 5;
+            AutoFormatType = 0;
 
             trigger OnValidate()
             begin
@@ -123,6 +124,7 @@ table 221 "Gen. Jnl. Allocation"
         {
             Caption = 'Allocation %';
             DecimalPlaces = 2 : 2;
+            AutoFormatType = 0;
 
             trigger OnValidate()
             begin
@@ -205,6 +207,7 @@ table 221 "Gen. Jnl. Allocation"
             Editable = false;
             MaxValue = 100;
             MinValue = 0;
+            AutoFormatType = 0;
         }
         field(17; "Account Name"; Text[100])
         {
@@ -278,6 +281,7 @@ table 221 "Gen. Jnl. Allocation"
             AutoFormatType = 1;
             Caption = 'Additional-Currency Amount';
             Editable = false;
+            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -546,6 +550,15 @@ table 221 "Gen. Jnl. Allocation"
         exit('');
     end;
 
+    local procedure GetAdditionalReportingCurrencyCode(): Code[10]
+    var
+        GLSetup: Record "General Ledger Setup";
+    begin
+        if GLSetup.Get() then
+            exit(GLSetup."Additional Reporting Currency");
+        exit('');
+    end;
+
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         IsHandled: Boolean;
@@ -759,4 +772,3 @@ table 221 "Gen. Jnl. Allocation"
     begin
     end;
 }
-
