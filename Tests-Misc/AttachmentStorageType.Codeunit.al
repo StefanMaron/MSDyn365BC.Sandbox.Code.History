@@ -15,7 +15,6 @@ codeunit 136450 "Attachment Storage Type"
         MarketingSetup: Record "Marketing Setup";
         Assert: Codeunit Assert;
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryMarketing: Codeunit "Library - Marketing";
         LibraryRandom: Codeunit "Library - Random";
@@ -284,7 +283,7 @@ codeunit 136450 "Attachment Storage Type"
         Attachment.ExportAttachmentToServerFile(ExportToFile);
 
         // Verify attachment
-        LibraryUtilityOnPrem.CheckFileNotEmpty(ExportToFile);
+        LibraryUtility.CheckFileNotEmpty(ExportToFile);
 
         // Rollback
         Rollback(NewDirName);
@@ -307,7 +306,7 @@ codeunit 136450 "Attachment Storage Type"
         Attachment.ExportAttachmentToServerFile(ExportToFile);
 
         // Verify attachment
-        LibraryUtilityOnPrem.CheckFileNotEmpty(ExportToFile);
+        LibraryUtility.CheckFileNotEmpty(ExportToFile);
     end;
 
     [Test]
@@ -859,12 +858,12 @@ codeunit 136450 "Attachment Storage Type"
         InteractionLogEntry: Record "Interaction Log Entry";
         Attachment: Record Attachment;
         TempDeliverySorter: Record "Delivery Sorter" temporary;
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
     begin
         // [FEATURE] [Send]
         // [SCENARIO] AttachmentManagement.Send() with "html" attachment: InteractLogEntry."Delivery Status" = Error in case of canceling "Email Dialog"
         Initialize();
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
 
         LibraryVariableStorage.Enqueue(CreateHTMLReadyAttachment(Attachment));
         MockInterLogEntry(InteractionLogEntry, InteractionLogEntry."Correspondence Type"::Email, Attachment."No.");
@@ -1197,7 +1196,7 @@ codeunit 136450 "Attachment Storage Type"
               StrSubstNo('Attachment %1 not relocated to disk', Attachment."No."));
             Assert.IsTrue(Attachment."Storage Pointer" = Path,
               StrSubstNo('Attachment %1 not relocated to disk', Attachment."No."));
-            LibraryUtilityOnPrem.CheckFileNotEmpty(Attachment.ConstDiskFileName());
+            LibraryUtility.CheckFileNotEmpty(Attachment.ConstDiskFileName());
         until Attachment.Next() = 0;
     end;
 
