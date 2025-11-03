@@ -521,9 +521,9 @@ codeunit 134314 "WF Notification Schedule Tests"
         NotificationSchedule: Record "Notification Schedule";
         NotificationEntry: Record "Notification Entry";
         JobQueueEntry: Record "Job Queue Entry";
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
     begin
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
         JobQueueEntry.DeleteAll();
         NotificationSchedule.DeleteAll();
         NotificationEntry.DeleteAll();

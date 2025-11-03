@@ -39,7 +39,6 @@ codeunit 137092 "SCM Kitting - D3 - Part 1"
         LibraryUtility: Codeunit "Library - Utility";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory to GL";
         LibraryAssembly: Codeunit "Library - Assembly";
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryDimension: Codeunit "Library - Dimension";
@@ -97,7 +96,7 @@ codeunit 137092 "SCM Kitting - D3 - Part 1"
 
         WorkDate2 := LibraryPlanning.SetSafetyWorkDate(); // to avoid Due Date Before Work Date message.
         LibraryCosting.AdjustCostItemEntries('', '');
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate2, '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate2, '');
         Commit();
         LibrarySetupStorage.Save(DATABASE::"General Ledger Setup");
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"SCM Kitting - D3 - Part 1");
@@ -1099,7 +1098,7 @@ codeunit 137092 "SCM Kitting - D3 - Part 1"
             DocNo := PostedAssemblyHeader."No."
         else
             DocNo := '';
-        LibraryPostInventoryToGL.PostInvtCostToGL(PerPostingGroup, PostedAssemblyHeader."Item No.", DocNo,
+        LibraryAssembly.PostInvtCostToGL(PerPostingGroup, PostedAssemblyHeader."Item No.", DocNo,
           TemporaryPath + PostedAssemblyHeader."No." + '.pdf');
         if PostWithoutAdj then
             LibraryCosting.AdjustCostItemEntries(PostedAssemblyHeader."Item No.", '');

@@ -20,14 +20,12 @@ table 332 "Currency Total Buffer"
         }
         field(2; "Total Amount"; Decimal)
         {
-            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Amount';
             DataClassification = SystemMetadata;
         }
         field(3; "Total Amount (LCY)"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Total Amount (LCY)';
             DataClassification = SystemMetadata;
@@ -66,3 +64,4 @@ table 332 "Currency Total Buffer"
         end;
     end;
 }
+

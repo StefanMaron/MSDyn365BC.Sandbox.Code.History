@@ -22,15 +22,11 @@ table 1318 "Trial Balance Cache"
         }
         field(3; "Period 1 Amount"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Period 1 Amount';
             DataClassification = AccountData;
         }
         field(4; "Period 2 Amount"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Period 2 Amount';
             DataClassification = AccountData;
         }
@@ -56,3 +52,4 @@ table 1318 "Trial Balance Cache"
     {
     }
 }
+
