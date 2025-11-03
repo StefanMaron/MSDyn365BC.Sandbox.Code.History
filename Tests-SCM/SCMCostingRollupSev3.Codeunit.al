@@ -12,7 +12,6 @@ codeunit 137614 "SCM Costing Rollup Sev 3"
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryManufacturing: Codeunit "Library - Manufacturing";
         LibraryPurchase: Codeunit "Library - Purchase";
@@ -451,7 +450,7 @@ codeunit 137614 "SCM Costing Rollup Sev 3"
         LibraryCosting.AdjustCostItemEntries(JobJournalLine."No.", '');
 
         // Exercise: Post Inventory to G/L batch job.
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify: Verify Amount on G/L Entries.
         GLEntry.SetRange("Job No.", JobJournalLine."Job No.");
@@ -492,7 +491,7 @@ codeunit 137614 "SCM Costing Rollup Sev 3"
         LibraryCosting.AdjustCostItemEntries(JobJournalLine."No.", '');
 
         // Exercise: Post Inventory to G/L batch job.
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify: Verify Value Entry after running Post Inventory Cost To G/L batch job.
         ValueEntry.SetRange("Job No.", JobJournalLine."Job No.");

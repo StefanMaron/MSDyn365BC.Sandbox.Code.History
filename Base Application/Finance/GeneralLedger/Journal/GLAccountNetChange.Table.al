@@ -23,13 +23,11 @@ table 269 "G/L Account Net Change"
         }
         field(3; "Net Change in Jnl."; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Net Change in Jnl.';
         }
         field(4; "Balance after Posting"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Balance after Posting';
         }
@@ -47,3 +45,4 @@ table 269 "G/L Account Net Change"
     {
     }
 }
+

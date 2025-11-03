@@ -167,7 +167,6 @@ table 751 "Standard General Journal Line"
         }
         field(10; "VAT %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -379,7 +378,6 @@ table 751 "Standard General Journal Line"
         }
         field(18; "Currency Factor"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 15;
             Editable = false;
@@ -484,7 +482,6 @@ table 751 "Standard General Journal Line"
         }
         field(40; "Payment Discount %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -503,7 +500,6 @@ table 751 "Standard General Journal Line"
         }
         field(43; Quantity; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
 
@@ -742,7 +738,6 @@ table 751 "Standard General Journal Line"
         }
         field(68; "Bal. VAT %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Bal. VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1952,3 +1947,4 @@ table 751 "Standard General Journal Line"
     begin
     end;
 }
+

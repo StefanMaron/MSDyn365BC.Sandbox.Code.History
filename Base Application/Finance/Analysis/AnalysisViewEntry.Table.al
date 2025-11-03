@@ -12,7 +12,6 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.FinancialReports;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Ledger;
-using Microsoft.Finance.GeneralLedger.Setup;
 
 table 365 "Analysis View Entry"
 {
@@ -108,7 +107,6 @@ table 365 "Analysis View Entry"
         }
         field(10; Amount; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount';
 
@@ -119,34 +117,29 @@ table 365 "Analysis View Entry"
         }
         field(11; "Debit Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Debit Amount';
         }
         field(12; "Credit Amount"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Credit Amount';
         }
         field(13; "Add.-Curr. Amount"; Decimal)
         {
             AccessByPermission = TableData Currency = R;
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Add.-Curr. Amount';
         }
         field(14; "Add.-Curr. Debit Amount"; Decimal)
         {
             AccessByPermission = TableData Currency = R;
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Add.-Curr. Debit Amount';
         }
         field(15; "Add.-Curr. Credit Amount"; Decimal)
         {
             AccessByPermission = TableData Currency = R;
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Add.-Curr. Credit Amount';
         }
@@ -308,12 +301,5 @@ table 365 "Analysis View Entry"
     local procedure OnLookupAccountNo(var AnalysisViewEntry: Record "Analysis View Entry"; var IsHandled: Boolean)
     begin
     end;
-
-    local procedure GetAdditionalReportingCurrencyCode(): Code[10]
-    var
-        GLSetup: Record "General Ledger Setup";
-    begin
-        GLSetup.Get();
-        exit(GLSetup."Additional Reporting Currency");
-    end;
 }
+

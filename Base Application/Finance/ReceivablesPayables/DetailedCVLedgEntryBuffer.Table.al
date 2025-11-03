@@ -66,7 +66,6 @@ table 383 "Detailed CV Ledg. Entry Buffer"
         field(8; "Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Amount (LCY)';
             DataClassification = SystemMetadata;
         }
@@ -128,7 +127,6 @@ table 383 "Detailed CV Ledg. Entry Buffer"
         field(18; "Debit Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             BlankZero = true;
             Caption = 'Debit Amount (LCY)';
             DataClassification = SystemMetadata;
@@ -136,7 +134,6 @@ table 383 "Detailed CV Ledg. Entry Buffer"
         field(19; "Credit Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             BlankZero = true;
             Caption = 'Credit Amount (LCY)';
             DataClassification = SystemMetadata;
@@ -217,7 +214,6 @@ table 383 "Detailed CV Ledg. Entry Buffer"
         field(33; "VAT Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'VAT Amount (LCY)';
             DataClassification = SystemMetadata;
         }
@@ -275,12 +271,10 @@ table 383 "Detailed CV Ledg. Entry Buffer"
             Caption = 'Non-Deductible VAT Amount LCY';
             Editable = false;
             AutoFormatType = 1;
-            AutoFormatExpression = '';
         }
         field(6202; "Non-Deductible VAT Amount ACY"; Decimal)
         {
             AutoFormatExpression = GetAdditionalReportingCurrencyCode();
-            AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Amount ACY';
             Editable = false;
         }

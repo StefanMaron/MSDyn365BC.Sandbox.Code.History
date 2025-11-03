@@ -29,7 +29,6 @@ table 220 "Business Unit"
         }
         field(3; "Consolidation %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Consolidation %';
             DecimalPlaces = 0 : 5;
             InitValue = 100;
@@ -46,7 +45,6 @@ table 220 "Business Unit"
         }
         field(6; "Income Currency Factor"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Income Currency Factor';
             DecimalPlaces = 0 : 15;
             Editable = false;
@@ -55,7 +53,6 @@ table 220 "Business Unit"
         }
         field(7; "Balance Currency Factor"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Balance Currency Factor';
             DecimalPlaces = 0 : 15;
             Editable = false;
@@ -94,7 +91,6 @@ table 220 "Business Unit"
         }
         field(11; "Last Balance Currency Factor"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Last Balance Currency Factor';
             DecimalPlaces = 0 : 15;
             Editable = false;
@@ -349,3 +345,4 @@ table 220 "Business Unit"
     end;
 
 }
+

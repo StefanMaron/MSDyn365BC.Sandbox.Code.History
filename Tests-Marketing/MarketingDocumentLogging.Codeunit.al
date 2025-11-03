@@ -10,7 +10,6 @@ codeunit 136202 "Marketing Document Logging"
 
     var
         LibraryUtility: Codeunit "Library - Utility";
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibrarySales: Codeunit "Library - Sales";
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
         LibraryInventory: Codeunit "Library - Inventory";
@@ -188,7 +187,7 @@ codeunit 136202 "Marketing Document Logging"
         REPORT.Run(REPORT::"Standard Sales - Quote", true, false, SalesHeader);
 
         // 3. Verify: Verify Saved Report have some data and Interaction Log Entry.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(LibraryReportDataset.GetFileName());
+        LibraryUtility.CheckFileNotEmpty(LibraryReportDataset.GetFileName());
         InteractionLogEntry.SetRange("Contact No.", SalesHeader."Bill-to Contact No.");
         InteractionLogEntry.SetRange("Document No.", SalesHeader."No.");
         InteractionLogEntry.FindFirst();
@@ -560,7 +559,7 @@ codeunit 136202 "Marketing Document Logging"
         ArchivedSalesQuote.SaveAsExcel(FilePath);
 
         // 3. Verify: Verify Saved report have some Data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
@@ -592,7 +591,7 @@ codeunit 136202 "Marketing Document Logging"
         ArchivedSalesOrder.SaveAsExcel(FilePath);
 
         // 3. Verify: Verify Saved report have some Data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
@@ -624,7 +623,7 @@ codeunit 136202 "Marketing Document Logging"
         ArchSalesReturnOrder.SaveAsExcel(FilePath);
 
         // 3. Verify: Verify Saved report have some Data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
@@ -904,7 +903,7 @@ codeunit 136202 "Marketing Document Logging"
 
         // [VERIFY] Verify: Test Archived Sales Order Report successfully created and Saved report have some Data
         ArchivedSalesOrder.SaveAsExcel(FilePath);
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
     end;
 
     local procedure Initialize()

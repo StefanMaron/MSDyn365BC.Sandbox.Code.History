@@ -1,18 +1,7 @@
 {
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false
-  },
   "folders": [
     {
       "path": "./AI Test Toolkit"
-    },
-    {
-      "path": "./Application Test Library"
     },
     {
       "path": "./Business Foundation Test Libraries"
@@ -161,5 +150,13 @@
     {
       "path": "./System Application Test Library/Extension Management/testArtifacts"
     }
-  ]
+  ],
+  "settings": {
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false
+  }
 }

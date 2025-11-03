@@ -15,6 +15,7 @@ codeunit 132200 "Library - Costing"
         IncorrectCostTxt: Label 'Incorrect Cost Amount in Entry No. %1.';
         IncorrectRoundingTxt: Label 'Rounding mismatch of %1 for Inbound Entry No. %2.';
         ShouldBeOfRecordTypeErr: Label 'Applies-To should be of type Record.';
+        TempPathTxt: Label '%1%2.html', Comment = '%1 = Temporary Path, %2 = Document No.';
         WrongRecordTypeErr: Label 'Wrong Record Type.';
 
     procedure AdjustCostItemEntries(ItemNoFilter: Text[250]; ItemCategoryFilter: Text[250])
@@ -405,6 +406,27 @@ codeunit 132200 "Library - Costing"
                 LastValuationDate := ValueEntry."Valuation Date";
         until (ValueEntry.Next() = 0);
         exit(LastValuationDate);
+    end;
+
+    procedure PostInvtCostToGL(PerPostingGroup: Boolean; PostingDate: Date; DocNo: Code[20])
+    var
+        PostValueEntryToGL: Record "Post Value Entry to G/L";
+        PostInventoryCosttoGL: Report "Post Inventory Cost to G/L";
+        PostMethod: Option "per Posting Group","per Entry";
+    begin
+        Commit();
+
+        PostValueEntryToGL.SetFilter("Posting Date", '=%1', PostingDate);
+        if PerPostingGroup then begin
+            PostMethod := PostMethod::"per Posting Group";
+            PostInventoryCosttoGL.InitializeRequest(PostMethod, DocNo, true);
+        end else begin
+            PostMethod := PostMethod::"per Entry";
+            PostInventoryCosttoGL.InitializeRequest(PostMethod, '', true);
+        end;
+        PostInventoryCosttoGL.SetTableView(PostValueEntryToGL);
+        PostInventoryCosttoGL.UseRequestPage(false);
+        PostInventoryCosttoGL.SaveAsPdf(StrSubstNo(TempPathTxt, TemporaryPath, DocNo));
     end;
 
     procedure PostInvtCostToGLTest(PostMethod: Option; ItemNo: Code[20]; DocumentNo: Code[20]; ShowDim: Boolean; ShowOnlyWarnings: Boolean)
