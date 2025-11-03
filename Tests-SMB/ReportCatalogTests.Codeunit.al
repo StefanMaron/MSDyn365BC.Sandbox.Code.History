@@ -15,7 +15,7 @@ codeunit 139125 ReportCatalogTests
     var
         SmallBusinessReportCatalogCU: Codeunit "Small Business Report Catalog";
         FileManagement: Codeunit "File Management";
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
+        LibraryUtility: Codeunit "Library - Utility";
         SavedPDFFile: Text;
 
     [Test]
@@ -87,7 +87,7 @@ codeunit 139125 ReportCatalogTests
 
         SavedPDFFile := FileManagement.ServerTempFileName('.pdf');
         AgedAccountsReceivable.SaveAsPdf(SavedPDFFile);
-        LibraryUtilityOnPrem.CheckFileNotEmpty(SavedPDFFile);
+        LibraryUtility.CheckFileNotEmpty(SavedPDFFile);
     end;
 
     [RequestPageHandler]
@@ -104,7 +104,7 @@ codeunit 139125 ReportCatalogTests
 
         SavedPDFFile := FileManagement.ServerTempFileName('.pdf');
         AgedAccountsPayable.SaveAsPdf(SavedPDFFile);
-        LibraryUtilityOnPrem.CheckFileNotEmpty(SavedPDFFile);
+        LibraryUtility.CheckFileNotEmpty(SavedPDFFile);
     end;
 
     [RequestPageHandler]
@@ -118,7 +118,7 @@ codeunit 139125 ReportCatalogTests
 
         SavedPDFFile := FileManagement.ServerTempFileName('.pdf');
         CustomerTop10List.SaveAsPdf(SavedPDFFile);
-        LibraryUtilityOnPrem.CheckFileNotEmpty(SavedPDFFile);
+        LibraryUtility.CheckFileNotEmpty(SavedPDFFile);
     end;
 
     [RequestPageHandler]
@@ -132,7 +132,7 @@ codeunit 139125 ReportCatalogTests
 
         SavedPDFFile := FileManagement.ServerTempFileName('.pdf');
         VendorTop10List.SaveAsPdf(SavedPDFFile);
-        LibraryUtilityOnPrem.CheckFileNotEmpty(SavedPDFFile);
+        LibraryUtility.CheckFileNotEmpty(SavedPDFFile);
     end;
 
     [RequestPageHandler]
@@ -157,7 +157,7 @@ codeunit 139125 ReportCatalogTests
 
         SavedPDFFile := FileManagement.ServerTempFileName('.pdf');
         CustomerStatement.SaveAsPdf(SavedPDFFile);
-        LibraryUtilityOnPrem.CheckFileNotEmpty(SavedPDFFile);
+        LibraryUtility.CheckFileNotEmpty(SavedPDFFile);
     end;
 
     [RequestPageHandler]
@@ -166,7 +166,7 @@ codeunit 139125 ReportCatalogTests
     begin
         SavedPDFFile := FileManagement.ServerTempFileName('.pdf');
         TrialBalance.SaveAsPdf(SavedPDFFile);
-        LibraryUtilityOnPrem.CheckFileNotEmpty(SavedPDFFile);
+        LibraryUtility.CheckFileNotEmpty(SavedPDFFile);
     end;
 }
 #endif

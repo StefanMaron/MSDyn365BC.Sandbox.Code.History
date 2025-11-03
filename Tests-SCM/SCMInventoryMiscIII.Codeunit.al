@@ -12,7 +12,6 @@ codeunit 137295 "SCM Inventory Misc. III"
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibraryDimension: Codeunit "Library - Dimension";
         LibraryERM: Codeunit "Library - ERM";
         LibraryFiscalYear: Codeunit "Library - Fiscal Year";
@@ -296,7 +295,7 @@ codeunit 137295 "SCM Inventory Misc. III"
 
         // Exercise: Post Inventory to G/L batch job.
         LibraryVariableStorage.Enqueue(ValueEntriesWerePostedTxt);
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify: Verify Amount on G/L Entries.
         GLEntry.SetRange("Job No.", JobJournalLine."Job No.");
@@ -327,7 +326,7 @@ codeunit 137295 "SCM Inventory Misc. III"
 
         // Exercise: Post Inventory to G/L batch job.
         LibraryVariableStorage.Enqueue(ValueEntriesWerePostedTxt);
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify: Verify Value Entry after running Post Inventory Cost To G/L batch job.
         CostAmount := Round((JobJournalLine."Unit Cost" - ItemJournalLine."Unit Cost") * JobJournalLine.Quantity);
@@ -1617,7 +1616,7 @@ codeunit 137295 "SCM Inventory Misc. III"
 
         // [WHEN] Post Inventory to G/L.
         LibraryVariableStorage.Enqueue(ValueEntriesWerePostedTxt);
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // [THEN] General Ledger contains entries with Reason Code "R".
         GLEntry.Init();

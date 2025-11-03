@@ -4,8 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.Analysis;
 
-using Microsoft.Finance.GeneralLedger.Setup;
-
 table 2151 "Upd Analysis View Entry Buffer"
 {
     TableType = Temporary;
@@ -53,38 +51,26 @@ table 2151 "Upd Analysis View Entry Buffer"
         }
         field(10; Amount; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             DataClassification = CustomerContent;
         }
         field(11; DebitAmount; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             DataClassification = CustomerContent;
         }
         field(12; CreditAmount; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             DataClassification = CustomerContent;
         }
         field(13; AmountACY; Decimal)
         {
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
-            AutoFormatType = 1;
             DataClassification = CustomerContent;
         }
         field(14; DebitAmountACY; Decimal)
         {
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
-            AutoFormatType = 1;
             DataClassification = CustomerContent;
         }
         field(15; CreditAmountACY; Decimal)
         {
-            AutoFormatExpression = GetAdditionalReportingCurrencyCode();
-            AutoFormatType = 1;
             DataClassification = CustomerContent;
         }
         field(16; EntryNo; Integer)
@@ -103,12 +89,4 @@ table 2151 "Upd Analysis View Entry Buffer"
             Clustered = true;
         }
     }
-
-    local procedure GetAdditionalReportingCurrencyCode(): Code[10]
-    var
-        GLSetup: Record "General Ledger Setup";
-    begin
-        if GLSetup.Get() then
-            exit(GLSetup."Additional Reporting Currency");
-    end;
 }
