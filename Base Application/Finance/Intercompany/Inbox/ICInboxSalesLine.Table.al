@@ -48,7 +48,6 @@ table 435 "IC Inbox Sales Line"
         }
         field(15; Quantity; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -62,7 +61,6 @@ table 435 "IC Inbox Sales Line"
         }
         field(27; "Line Discount %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Line Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -227,3 +225,4 @@ table 435 "IC Inbox Sales Line"
           DATABASE::"IC Inbox Sales Line", "IC Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
     end;
 }
+

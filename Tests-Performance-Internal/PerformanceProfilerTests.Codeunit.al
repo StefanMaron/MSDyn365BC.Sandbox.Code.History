@@ -26,7 +26,6 @@
         LibraryReportDataset: Codeunit "Library - Report Dataset";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryWorkflow: Codeunit "Library - Workflow";
-        LibraryEmail: Codeunit "Library - Email";
         LibraryDocumentApprovals: Codeunit "Library - Document Approvals";
         LibraryJobQueue: Codeunit "Library - Job Queue";
         IsInitialized: Boolean;
@@ -770,7 +769,7 @@
         SalesInvoice.OpenEdit();
         SalesInvoice.GotoRecord(SalesHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
         SalesInvoice.PostAndSend.Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestPrintSalesInvoicePerformance',
@@ -802,7 +801,7 @@
         PostedSalesCreditMemo.OpenEdit();
         PostedSalesCreditMemo.GotoRecord(SalesCrMemoHeader);
         LibraryPerformanceProfiler.StartProfiler(true);
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
         PostedSalesCreditMemo."Send by &Email".Invoke();
         TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
             PerfProfilerEventsTest, 'TestEmailPostedSalesCreditMemoPerformance',
