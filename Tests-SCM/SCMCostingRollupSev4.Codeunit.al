@@ -10,7 +10,6 @@
 
     var
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibrarySales: Codeunit "Library - Sales";
         LibraryERM: Codeunit "Library - ERM";
         LibraryDimension: Codeunit "Library - Dimension";
@@ -72,7 +71,7 @@
         Initialize();
 
         LibraryCosting.AdjustCostItemEntries('', '');
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         LibraryInventory.UpdateAverageCostSettings(
           InventorySetup."Average Cost Calc. Type"::Item, InventorySetup."Average Cost Period"::Day);
@@ -100,7 +99,7 @@
         InventorySetup.Modify(true);
 
         // Exercise. Post to G/L.
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify. Interim accounts have 0 balance.
         InventoryPostingSetup.Get('', Item."Inventory Posting Group");
@@ -149,7 +148,7 @@
         // Execute: Adjust and post to G/L.
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
         LibraryCosting.AdjustCostItemEntries(Item."No.", '');
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify: Value Entry Cost Amount (Non-Invtbl.).
         ValueEntry.SetRange("Item No.", Item."No.");

@@ -3798,9 +3798,9 @@ codeunit 139197 DocumentSendingPostTests
     var
         CompanyInfo: Record "Company Information";
         SalesHeader: Record "Sales Header";
-        LibraryEmail: Codeunit "Library - Email";
+        LibraryWorkflow: Codeunit "Library - Workflow";
     begin
-        LibraryEmail.SetUpEmailAccount();
+        LibraryWorkflow.SetUpEmailAccount();
         LibraryTestInitialize.OnTestInitialize(Codeunit::DocumentSendingPostTests);
 
         BindActiveDirectoryMockEvents();

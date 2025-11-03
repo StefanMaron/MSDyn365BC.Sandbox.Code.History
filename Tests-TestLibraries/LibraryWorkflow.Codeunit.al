@@ -15,7 +15,13 @@ codeunit 131101 "Library - Workflow"
     end;
 
     var
+        Assert: Codeunit Assert;
         LibraryUtility: Codeunit "Library - Utility";
+        LibraryTextFileValidation: Codeunit "Library - Text File Validation";
+        FileManagement: Codeunit "File Management";
+        NotificationBodyDoesNotMatchErr: Label 'The body of the notification does not match the one that was sent to the server.';
+        EmailShouldNotExistErr: Label 'There should not be an email sent to this user.';
+        TimeoutErr: Label 'The Notification Entry was not completed during the 2 minutes period.';
         InvalidEventCondErr: Label 'No event conditions are specified.';
 
     procedure CreateWorkflow(var Workflow: Record Workflow)
@@ -84,6 +90,107 @@ codeunit 131101 "Library - Workflow"
         WorkflowStepArgument.Get(WorkflowStep.Argument);
         WorkflowStepArgument.Validate("Notify Sender", true);
         WorkflowStepArgument.Modify();
+    end;
+
+    procedure SetUpEmailAccount()
+    var
+        TempAccount: Record "Email Account" temporary;
+        ConnectorMock: Codeunit "Connector Mock";
+        EmailScenarioMock: Codeunit "Email Scenario Mock";
+    begin
+        ConnectorMock.Initialize();
+        ConnectorMock.AddAccount(TempAccount);
+        EmailScenarioMock.DeleteAllMappings();
+        EmailScenarioMock.AddMapping(Enum::"Email Scenario"::Default, TempAccount."Account Id", TempAccount.Connector);
+    end;
+
+    procedure VerifyEmailWithMockService(UserId: Code[50]; NotificationBodyText: Text)
+    var
+        SentNotificationEntry: Record "Sent Notification Entry";
+        UserSetup: Record "User Setup";
+        Retries: Integer;
+    begin
+        SentNotificationEntry.SetRange("Recipient User ID", UserId);
+
+        Retries := 0;
+        while SentNotificationEntry.IsEmpty() and (Retries < 120) do begin
+            Sleep(1000);
+            Retries += 1;
+        end;
+
+        if Retries = 120 then
+            Error(TimeoutErr);
+
+        UserSetup.Get(UserId);
+
+        VerifyEmailFile(NotificationBodyText, UserSetup."E-Mail");
+    end;
+
+    local procedure VerifyEmailFile(NotificationBodyText: Text; UserEmailAddress: Text)
+    var
+        FilePath: Text;
+        Line: Text;
+    begin
+        FilePath := GetEmailFilePath(UserEmailAddress);
+        if FileManagement.ServerFileExists(FilePath) then begin
+            Line := LibraryTextFileValidation.NewFindLineWithValue(FilePath, 1, 1024, NotificationBodyText);
+            FileManagement.DeleteServerFile(FilePath);
+        end;
+        Assert.AreEqual(NotificationBodyText, Line, NotificationBodyDoesNotMatchErr);
+    end;
+
+    procedure VerifyEmailContainsValues(ExpectedValues: array[5] of Text; UserCode: Code[50])
+    var
+        SentNotificationEntry: Record "Sent Notification Entry";
+        UserSetup: Record "User Setup";
+        FilePath: Text;
+        Retries: Integer;
+        index: Integer;
+    begin
+        SentNotificationEntry.SetRange("Recipient User ID", UserCode);
+
+        Retries := 0;
+        while SentNotificationEntry.IsEmpty() and (Retries < 120) do begin
+            Sleep(1000);
+            Retries += 1;
+        end;
+
+        if Retries = 120 then
+            Error(TimeoutErr);
+
+        UserSetup.Get(UserCode);
+
+        FilePath := GetEmailFilePath(UserSetup."E-Mail");
+        if FileManagement.ServerFileExists(FilePath) then begin
+            for index := 1 to ArrayLen(ExpectedValues) do
+                if ExpectedValues[index] <> '' then
+                    Assert.IsTrue(LibraryTextFileValidation.DoesFileContainValue(FilePath, ExpectedValues[index]),
+                      'The value was not found in the file');
+            FileManagement.DeleteServerFile(FilePath);
+        end else
+            Assert.Fail('File not found at:' + FilePath);
+    end;
+
+    local procedure GetEmailFilePath(UserEmail: Text): Text
+    var
+        TempFile: File;
+        PathHelper: DotNet Path;
+        FilePath: Text;
+    begin
+        TempFile.CreateTempFile();
+        FilePath := PathHelper.GetDirectoryName(TempFile.Name) + '\' + UserEmail + '.txt';
+        TempFile.Close();
+        exit(FilePath);
+    end;
+
+    procedure CheckEmailWasNotSent(UserId: Code[50])
+    var
+        UserSetup: Record "User Setup";
+        FilePath: Text;
+    begin
+        UserSetup.Get(UserId);
+        FilePath := GetEmailFilePath(UserSetup."E-Mail");
+        Assert.IsFalse(FileManagement.ServerFileExists(FilePath), EmailShouldNotExistErr);
     end;
 
     procedure DeleteAllExistingWorkflows()
