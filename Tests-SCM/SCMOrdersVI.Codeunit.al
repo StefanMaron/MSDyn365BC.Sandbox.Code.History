@@ -33,7 +33,7 @@
         LibraryWarehouse: Codeunit "Library - Warehouse";
         LibraryRandom: Codeunit "Library - Random";
         LibraryERM: Codeunit "Library - ERM";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
+        LibraryCosting: Codeunit "Library - Costing";
         LibraryPlanning: Codeunit "Library - Planning";
         LibraryResource: Codeunit "Library - Resource";
         isInitialized: Boolean;
@@ -925,7 +925,7 @@
 
         // Exercise.
         LibraryVariableStorage.Enqueue(ValueEntriesWerePostedTxt);
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // Verify: Item Ledger entries and Value entries.
         VerifyQuantityOnItemLedgerEntry(PostedDocumentNo, LineNo, Item."No.", Quantity);

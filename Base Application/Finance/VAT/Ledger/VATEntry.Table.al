@@ -99,7 +99,6 @@ table 254 "VAT Entry"
         field(8; Base; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Base';
             Editable = false;
             ToolTip = 'Specifies the amount that the VAT amount (the amount shown in the Amount field) is calculated from.';
@@ -107,7 +106,6 @@ table 254 "VAT Entry"
         field(9; Amount; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Amount';
             Editable = false;
             ToolTip = 'Specifies the amount of the VAT entry in LCY.';
@@ -217,7 +215,6 @@ table 254 "VAT Entry"
         field(22; "Unrealized Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Unrealized Amount';
             Editable = false;
             ToolTip = 'Specifies the unrealized VAT amount for this line if you use unrealized VAT.';
@@ -225,7 +222,6 @@ table 254 "VAT Entry"
         field(23; "Unrealized Base"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Unrealized Base';
             Editable = false;
             ToolTip = 'Specifies the unrealized base amount if you use unrealized VAT.';
@@ -233,7 +229,6 @@ table 254 "VAT Entry"
         field(24; "Remaining Unrealized Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Remaining Unrealized Amount';
             Editable = false;
             ToolTip = 'Specifies the amount that remains unrealized in the VAT entry.';
@@ -241,7 +236,6 @@ table 254 "VAT Entry"
         field(25; "Remaining Unrealized Base"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Remaining Unrealized Base';
             Editable = false;
             ToolTip = 'Specifies the amount of base that remains unrealized in the VAT entry.';
@@ -362,7 +356,6 @@ table 254 "VAT Entry"
         }
         field(48; "VAT Base Discount %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'VAT Base Discount %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -386,7 +379,6 @@ table 254 "VAT Entry"
         field(51; "VAT Difference"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'VAT Difference';
             Editable = false;
             ToolTip = 'Specifies the difference between the calculated VAT amount and a VAT amount that you have entered manually.';
@@ -454,7 +446,6 @@ table 254 "VAT Entry"
         field(60; "Base Before Pmt. Disc."; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Base Before Pmt. Disc.';
             Editable = false;
         }
@@ -482,7 +473,6 @@ table 254 "VAT Entry"
         }
         field(75; "Source Currency Factor"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Source Currency Factor';
             DataClassification = SystemMetadata;
         }
@@ -497,27 +487,23 @@ table 254 "VAT Entry"
         field(81; "Realized Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Realized Amount';
             Editable = false;
         }
         field(82; "Realized Base"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Realized Base';
             Editable = false;
         }
         field(83; "Add.-Curr. Realized Amount"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Add.-Curr. Realized Amount';
             Editable = false;
         }
         field(84; "Add.-Curr. Realized Base"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Add.-Curr. Realized Base';
             Editable = false;
@@ -553,7 +539,6 @@ table 254 "VAT Entry"
         }
         field(6200; "Non-Deductible VAT %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Non-Deductible VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -561,7 +546,6 @@ table 254 "VAT Entry"
         field(6201; "Non-Deductible VAT Base"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Non-Deductible VAT Base';
             Editable = false;
             ToolTip = 'Specifies the amount of VAT that is not deducted due to the type of goods or services purchased.';
@@ -569,14 +553,12 @@ table 254 "VAT Entry"
         field(6202; "Non-Deductible VAT Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Non-Deductible VAT Amount';
             Editable = false;
             ToolTip = 'Specifies the amount of the transaction for which VAT is not applied, due to the type of goods or services purchased.';
         }
         field(6203; "Non-Deductible VAT Base ACY"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Base ACY';
             Editable = false;
@@ -584,7 +566,6 @@ table 254 "VAT Entry"
         }
         field(6204; "Non-Deductible VAT Amount ACY"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Amount ACY';
             Editable = false;
@@ -592,16 +573,12 @@ table 254 "VAT Entry"
         }
         field(6205; "Non-Deductible VAT Diff."; Decimal)
         {
-            AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Non-Deductible VAT Difference';
             Editable = false;
             ToolTip = 'Specifies the difference between the calculated Non-Deductible VAT amount and a Non-Deductible VAT amount that you have entered manually.';
         }
         field(6206; "Non-Deductible VAT Diff. ACY"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
-            AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Difference ACY';
             Editable = false;
         }

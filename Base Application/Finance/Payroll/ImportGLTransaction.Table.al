@@ -90,8 +90,6 @@ table 1661 "Import G/L Transaction"
         /// </summary>
         field(12; Amount; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Amount';
         }
         /// <summary>
@@ -118,3 +116,4 @@ table 1661 "Import G/L Transaction"
     {
     }
 }
+

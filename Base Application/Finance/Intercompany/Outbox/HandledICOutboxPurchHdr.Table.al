@@ -81,7 +81,6 @@ table 432 "Handled IC Outbox Purch. Hdr"
         }
         field(25; "Payment Discount %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             Editable = false;
         }
@@ -196,3 +195,4 @@ table 432 "Handled IC Outbox Purch. Hdr"
           DATABASE::"Handled IC Outbox Purch. Hdr", "IC Transaction No.", "IC Partner Code", "Transaction Source", 0);
     end;
 }
+

@@ -44,14 +44,12 @@ table 742 "VAT Statement Report Line"
         field(7; Base; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Base';
             Editable = false;
         }
         field(8; Amount; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Amount';
             Editable = false;
         }
@@ -90,3 +88,4 @@ table 742 "VAT Statement Report Line"
         VATReportHeader: Record "VAT Report Header";
         MissingSetupErr: Label 'This is not allowed because of the setup in the %1 window.', Comment = '%1 = Setup table';
 }
+
