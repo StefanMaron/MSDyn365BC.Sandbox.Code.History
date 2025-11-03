@@ -35,22 +35,16 @@ table 926 "G/L Acc. Balance Buffer"
         {
             Caption = 'Debit Amount';
             DataClassification = SystemMetadata;
-            AutoFormatType = 1;
-            AutoFormatExpression = '';
         }
         field(11; "Credit Amount"; Decimal)
         {
             Caption = 'Credit Amount';
             DataClassification = SystemMetadata;
-            AutoFormatType = 1;
-            AutoFormatExpression = '';
         }
         field(12; "Net Change"; Decimal)
         {
             Caption = 'Net Change';
             DataClassification = SystemMetadata;
-            AutoFormatType = 1;
-            AutoFormatExpression = '';
         }
     }
 

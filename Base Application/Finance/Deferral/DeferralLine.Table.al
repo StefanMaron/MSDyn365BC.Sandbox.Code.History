@@ -146,7 +146,6 @@ table 1702 "Deferral Line"
         /// </summary>
         field(10; "Amount (LCY)"; Decimal)
         {
-            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Amount (LCY)';
             ToolTip = 'Specifies the net amount in your local currency.';
@@ -166,10 +165,6 @@ table 1702 "Deferral Line"
         key(Key1; "Deferral Doc. Type", "Gen. Jnl. Template Name", "Gen. Jnl. Batch Name", "Document Type", "Document No.", "Line No.", "Posting Date")
         {
             Clustered = true;
-        }
-        key(Key2; "Deferral Doc. Type", "Gen. Jnl. Template Name", "Gen. Jnl. Batch Name", "Document Type", "Document No.", "Line No.")
-        {
-            SumIndexFields = Amount;
         }
     }
 
@@ -209,3 +204,4 @@ table 1702 "Deferral Line"
     begin
     end;
 }
+

@@ -12,7 +12,7 @@ codeunit 134329 "ERM Purchase Return Order"
     var
         LibraryERM: Codeunit "Library - ERM";
         LibraryNotificationMgt: Codeunit "Library - Notification Mgt.";
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
+        LibraryUtility: Codeunit "Library - Utility";
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryItemTracking: Codeunit "Library - Item Tracking";
@@ -23,7 +23,6 @@ codeunit 134329 "ERM Purchase Return Order"
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryWarehouse: Codeunit "Library - Warehouse";
-        LibraryUtility: Codeunit "Library - Utility";
         VATAmountError: Label 'VAT %1 must be %2 in %3.';
         LineAmountError: Label 'Total Amount must be equal to %1 in %2.';
         AmountError: Label '%1 must be equal to %2 in %3.';
@@ -131,7 +130,7 @@ codeunit 134329 "ERM Purchase Return Order"
         PurchaseDocumentTest.SaveAsExcel(FilePath);
 
         // Verify: Verify that saved files have some data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]
@@ -184,7 +183,7 @@ codeunit 134329 "ERM Purchase Return Order"
         PurchaseCreditMemo.SaveAsExcel(FilePath);
 
         // Verify: Verify that saved files have some data.
-        LibraryUtilityOnPrem.CheckFileNotEmpty(FilePath);
+        LibraryUtility.CheckFileNotEmpty(FilePath);
     end;
 
     [Test]

@@ -1139,6 +1139,7 @@
         exit('');
     end;
 
+    [Scope('OnPrem')]
     procedure FindWhseActivityBySourceDoc(var WarehouseActivityHeader: Record "Warehouse Activity Header"; SourceType: Option; SourceSubtype: Option; SourceNo: Code[20]; SourceLineNo: Integer): Boolean
     var
         WarehouseActivityLine: Record "Warehouse Activity Line";
@@ -1150,6 +1151,7 @@
         exit(true);
     end;
 
+    [Scope('OnPrem')]
     procedure FindWhseActivityLineBySourceDoc(var WarehouseActivityLine: Record "Warehouse Activity Line"; SourceType: Option; SourceSubtype: Option; SourceNo: Code[20]; SourceLineNo: Integer): Boolean
     begin
         WarehouseActivityLine.SetRange("Source Type", SourceType);
