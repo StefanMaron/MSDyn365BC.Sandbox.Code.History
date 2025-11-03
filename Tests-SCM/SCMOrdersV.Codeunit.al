@@ -30,7 +30,6 @@ codeunit 137158 "SCM Orders V"
         LibraryMarketing: Codeunit "Library - Marketing";
         LibraryAssembly: Codeunit "Library - Assembly";
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
@@ -926,7 +925,7 @@ codeunit 137158 "SCM Orders V"
             // Exercise.
             LibraryCosting.AdjustCostItemEntries(PurchaseLine."No.", '');
             LibraryVariableStorage.Enqueue(ValueEntriesWerePostedTxt);
-            LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+            LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
             // Verify.
             VerifyGLEntry(DocumentNo, GeneralPostingSetup."Direct Cost Applied Account", -PurchaseLine."Line Amount");

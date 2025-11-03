@@ -12,7 +12,6 @@ codeunit 137352 "SCM Inventory Reports - V"
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryItemTracking: Codeunit "Library - Item Tracking";
@@ -709,7 +708,7 @@ codeunit 137352 "SCM Inventory Reports - V"
         LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomer());
         ModifySalesLineAndPostSalesOrder(SalesLine, SalesHeader, ItemNo);
         LibraryCosting.AdjustCostItemEntries(ItemNo, '');
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // [WHEN] Run Inventory Valuation Sales Report.
         Commit();
