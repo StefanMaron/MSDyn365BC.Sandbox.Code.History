@@ -99,7 +99,6 @@ table 17 "G/L Entry"
         field(17; Amount; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'Amount (LCY)';
             DataClassification = CustomerContent;
         }
@@ -162,14 +161,12 @@ table 17 "G/L Entry"
         }
         field(42; Quantity; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
         }
         field(43; "VAT Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             Caption = 'VAT Amount';
         }
         field(45; "Business Unit Code"; Code[20])
@@ -211,14 +208,12 @@ table 17 "G/L Entry"
         field(53; "Debit Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             BlankZero = true;
             Caption = 'Debit Amount (LCY)';
         }
         field(54; "Credit Amount"; Decimal)
         {
             AutoFormatType = 1;
-            AutoFormatExpression = '';
             BlankZero = true;
             Caption = 'Credit Amount (LCY)';
         }
@@ -462,9 +457,8 @@ table 17 "G/L Entry"
         }
         field(6200; "Non-Deductible VAT Amount"; Decimal)
         {
-            AutoFormatExpression = '';
-            AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Amount';
+            AutoFormatType = 1;
         }
         field(6201; "Non-Deductible VAT Amount ACY"; Decimal)
         {

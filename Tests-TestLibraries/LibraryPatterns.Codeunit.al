@@ -1367,6 +1367,7 @@
 
 #if not CLEAN26
     [Obsolete('Move to codeunit Library Purchase', '26.0')]
+    [Scope('OnPrem')]
     procedure MakePurchaseHeader(var PurchaseHeader: Record "Purchase Header"; DocType: Enum "Purchase Document Type"; PostingDate: Date; Vendor: Record Vendor)
     begin
         LibraryPurchase.MakePurchaseHeader(PurchaseHeader, DocType, PostingDate, Vendor);
@@ -1375,6 +1376,7 @@
 
 #if not CLEAN26
     [Obsolete('Move to codeunit Library Purchase', '26.0')]
+    [Scope('OnPrem')]
     procedure MakeVendor(var Vendor: Record Vendor)
     begin
         LibraryPurchase.MakeVendor(Vendor);

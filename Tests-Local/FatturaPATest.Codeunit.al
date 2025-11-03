@@ -2893,14 +2893,13 @@ codeunit 144200 "FatturaPA Test"
 
     local procedure VerifyXSDSchemaForStream(XmlInStream: InStream)
     VAR
-        LibraryUtilityOnPrem: Codeunit "Library - Utility OnPrem";
         LibraryVerifyXMLSchema: Codeunit "Library - Verify XML Schema";
         Message: Text;
         SignatureXsdPath: Text;
         XsdPath: Text;
         InetRoot: Text;
     BEGIN
-        InetRoot := LibraryUtilityOnPrem.GetInetRoot() + InetRootRelativePathTxt;
+        InetRoot := LibraryUtility.GetInetRoot() + InetRootRelativePathTxt;
         SignatureXsdPath := InetRoot + SignatureXSDRelativePathTxt;
         XsdPath := InetRoot + XSDRelativePathTxt;
         LibraryVerifyXMLSchema.SetAdditionalSchemaPath(SignatureXsdPath);

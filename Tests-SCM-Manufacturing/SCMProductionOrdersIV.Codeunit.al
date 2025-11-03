@@ -45,7 +45,6 @@ codeunit 137083 "SCM Production Orders IV"
         LibraryRandom: Codeunit "Library - Random";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryCosting: Codeunit "Library - Costing";
-        LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibraryPlanning: Codeunit "Library - Planning";
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryInventory: Codeunit "Library - Inventory";
@@ -166,7 +165,7 @@ codeunit 137083 "SCM Production Orders IV"
             StrSubstNo(EntryMustBeEqualErr, ValueEntry.FieldCaption("Cost Posted to G/L"), 0, ValueEntry."Entry No.", ValueEntry.TableCaption()));
 
         // [WHEN] Run "Post Inventory Cost to G/L".
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // [THEN] Verify "Cost Posted to G/L" must be updated in Value Entry for Capacity and Consumption.
         FilterValueEntryWithItemLedgerEntryType(ValueEntry, ProductionOrder."No.", "Item Ledger Entry Type"::Consumption, CompItem."No.");
@@ -364,7 +363,7 @@ codeunit 137083 "SCM Production Orders IV"
             StrSubstNo(EntryMustBeEqualErr, ValueEntry.FieldCaption("Cost Posted to G/L"), 0, ValueEntry."Entry No.", ValueEntry.TableCaption()));
 
         // [WHEN] Run "Post Inventory Cost to G/L".
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // [THEN] Verify "Cost Posted to G/L" must be updated in Value Entry for Capacity and Consumption. "G/L Entries" for both value entries and cost impact should also be posted to the inventory adjustment account.
         FilterValueEntryWithItemLedgerEntryType(ValueEntry, ProductionOrder."No.", "Item Ledger Entry Type"::Consumption, CompItem."No.");
@@ -571,7 +570,7 @@ codeunit 137083 "SCM Production Orders IV"
         LibraryCosting.AdjustCostItemEntries(CompItem."No.", '');
 
         // [WHEN] Run "Post Inventory Cost to G/L".
-        LibraryPostInventoryToGL.PostInvtCostToGL(false, WorkDate(), '');
+        LibraryCosting.PostInvtCostToGL(false, WorkDate(), '');
 
         // [THEN] Verify cost impact should also be posted to the inventory adjustment account for Item Charge.
         VerifyGLEntriesForAdjustmentConsumptionEntry(ProductionOrder, ProdItem, CompItem, Quantity * ItemChargeUnitCost);

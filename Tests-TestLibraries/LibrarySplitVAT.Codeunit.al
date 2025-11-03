@@ -13,6 +13,7 @@ codeunit 143003 "Library - Split VAT"
         LibrarySales: Codeunit "Library - Sales";
         LibraryService: Codeunit "Library - Service";
 
+    [Scope('OnPrem')]
     procedure AddSalesLine(SalesHeader: Record "Sales Header"; VATProdPostingGroup: Code[20]; LineAmountExcludingVAT: Decimal)
     var
         SalesLine: Record "Sales Line";
@@ -35,12 +36,14 @@ codeunit 143003 "Library - Split VAT"
         exit(Item."No.");
     end;
 
+    [Scope('OnPrem')]
     procedure CreateSalesHeader(var SalesHeader: Record "Sales Header"; DocumentType: Enum "Service Document Type"; VATBusPostingGroupCode: Code[20])
     begin
         LibrarySales.CreateSalesHeader(
           SalesHeader, DocumentType, LibrarySales.CreateCustomerWithVATBusPostingGroup(VATBusPostingGroupCode));
     end;
 
+    [Scope('OnPrem')]
     procedure CreateSalesLine(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; VATProdPostingGroupCode: Code[20])
     begin
         LibrarySales.CreateSalesLine(
@@ -50,6 +53,7 @@ codeunit 143003 "Library - Split VAT"
         SalesLine.Modify(true);
     end;
 
+    [Scope('OnPrem')]
     procedure CreateSalesDoc(var SalesHeader: Record "Sales Header"; VATPostingSetup: Record "VAT Posting Setup"; DocumentType: Enum "Sales Document Type")
     var
         SalesLine: Record "Sales Line";
@@ -64,6 +68,7 @@ codeunit 143003 "Library - Split VAT"
           ServiceHeader, DocumentType, LibrarySales.CreateCustomerWithVATBusPostingGroup(VATBusPostingGroupCode));
     end;
 
+    [Scope('OnPrem')]
     procedure CreateServiceLine(var ServiceLine: Record "Service Line"; ServiceHeader: Record "Service Header"; VATProdPostingGroupCode: Code[20])
     begin
         LibraryService.CreateServiceLine(
@@ -74,6 +79,7 @@ codeunit 143003 "Library - Split VAT"
         ServiceLine.Modify(true);
     end;
 
+    [Scope('OnPrem')]
     procedure CreateServiceDoc(var ServiceHeader: Record "Service Header"; VATPostingSetup: Record "VAT Posting Setup"; DocumentType: Enum "Service Document Type")
     var
         ServiceLine: Record "Service Line";
@@ -82,6 +88,7 @@ codeunit 143003 "Library - Split VAT"
         CreateServiceLine(ServiceLine, ServiceHeader, VATPostingSetup."VAT Prod. Posting Group");
     end;
 
+    [Scope('OnPrem')]
     procedure CreateVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup"; VATBusinessPostingGroupCode: Code[20])
     var
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
@@ -98,6 +105,7 @@ codeunit 143003 "Library - Split VAT"
         VATPostingSetup.Modify(true);
     end;
 
+    [Scope('OnPrem')]
     procedure CreateVATPostingSetupForSplitVAT(var VATPostingSetup: Record "VAT Posting Setup"; var SplitVATPostingSetup: Record "VAT Posting Setup"; VATPercentage: Decimal)
     begin
         CreateVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Bus. Posting Group");
@@ -110,6 +118,7 @@ codeunit 143003 "Library - Split VAT"
         SplitVATPostingSetup.Modify(true);
     end;
 
+    [Scope('OnPrem')]
     procedure CreateVATTransactionNatureCode(): Code[4]
     var
         VATTransactionNature: Record "VAT Transaction Nature";
@@ -122,12 +131,14 @@ codeunit 143003 "Library - Split VAT"
         exit(VATTransactionNature.Code);
     end;
 
+    [Scope('OnPrem')]
     procedure UpdateVATPostingSetupFullVAT(var VATPostingSetup: Record "VAT Posting Setup")
     begin
         VATPostingSetup.Validate("VAT Calculation Type", VATPostingSetup."VAT Calculation Type"::"Full VAT");
         VATPostingSetup.Modify(true);
     end;
 
+    [Scope('OnPrem')]
     procedure FindSalesLine(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; AutomaticallyGenerated: Boolean)
     begin
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -136,6 +147,7 @@ codeunit 143003 "Library - Split VAT"
         SalesLine.FindFirst();
     end;
 
+    [Scope('OnPrem')]
     procedure FindServiceLine(var ServiceLine: Record "Service Line"; ServiceHeader: Record "Service Header"; AutomaticallyGenerated: Boolean)
     begin
         ServiceLine.SetRange("Document Type", ServiceHeader."Document Type");
