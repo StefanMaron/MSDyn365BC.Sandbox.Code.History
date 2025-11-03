@@ -132,6 +132,12 @@ page 9326 "Released Production Orders"
                     ToolTip = 'Specifies a bin to which you want to post the finished items.';
                     Visible = false;
                 }
+                field("Completely Picked"; Rec."Completely Picked")
+                {
+                    ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies whether all production components have been completely picked.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)

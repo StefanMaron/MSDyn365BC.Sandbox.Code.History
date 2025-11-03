@@ -873,12 +873,17 @@ page 8900 "Administrator Main Role Center"
                     Caption = 'Account Schedule KPI Web Service';
                     RunObject = page "Acc. Sched. KPI Web Service";
                 }
+#if not CLEAN28
                 action("UK Postcode Address Autocomplete")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'UK Postcode Address Autocomplete';
                     RunObject = page "Postcode Configuration Page";
+                    ObsoleteReason = 'Action has been moved to the GetAddress.io UK Postcodes.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
             }
             group("Group27A")
             {

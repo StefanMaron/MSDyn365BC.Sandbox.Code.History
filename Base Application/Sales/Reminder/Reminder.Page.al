@@ -71,17 +71,29 @@ page 434 Reminder
                     QuickEntry = false;
                     ToolTip = 'Specifies additional address information.';
                 }
+#if CLEAN28
+                field("Post Code"; Rec."Post Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    QuickEntry = false;
+                    ToolTip = 'Specifies the postal code.';
+                }
+#endif
                 field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     QuickEntry = false;
                     ToolTip = 'Specifies the city name of the customer the reminder is for.';
                 }
+#if not CLEAN28
                 field(County; Rec.County)
                 {
                     ApplicationArea = Basic, Suite;
                     QuickEntry = false;
                     ToolTip = 'Specifies the county name of the customer the reminder is for.';
+                    ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
                 field("Post Code"; Rec."Post Code")
                 {
@@ -89,6 +101,7 @@ page 434 Reminder
                     QuickEntry = false;
                     ToolTip = 'Specifies the postal code of the customer the reminder is for.';
                 }
+#endif
                 field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;

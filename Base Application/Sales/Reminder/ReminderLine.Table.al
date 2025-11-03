@@ -515,6 +515,12 @@ table 296 "Reminder Line"
         {
             SumIndexFields = Amount, "VAT Amount", "Remaining Amount";
         }
+#if CLEAN28
+        key(Key4; "Reminder No.", Type)
+        {
+            SumIndexFields = "VAT Amount";
+        }
+#endif
     }
 
     fieldgroups
@@ -1108,5 +1114,5 @@ table 296 "Reminder Line"
     [IntegrationEvent(false, false)]
     local procedure OnValidateAppliesToDocumentNoOnAfterCalcRemainingAmount(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
-    end;    
+    end;
 }

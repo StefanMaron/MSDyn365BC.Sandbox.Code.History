@@ -3,12 +3,14 @@ namespace System.Security.AccessControl;
 using Microsoft.Finance.GeneralLedger.Setup;
 #if not CLEAN28
 using Microsoft.Bank.Ledger;
-#endif
 using Microsoft.Sales.FinanceCharge;
+#endif
 #if not CLEAN27
 using Microsoft.Finance.VAT.Reporting;
 #endif
+#if not CLEAN28
 using Microsoft.Foundation.Address;
+#endif
 
 permissionset 1002 "LOCAL READ"
 {
@@ -16,12 +18,13 @@ permissionset 1002 "LOCAL READ"
     Assignable = true;
     Caption = 'Country/region-specific read only access.';
 
-    Permissions = tabledata "Accounting Period GB" = R,
+    Permissions = tabledata "Accounting Period GB" = R
 #if not CLEAN28
+                  ,
                   tabledata "BACS Ledger Entry" = R,
                   tabledata "BACS Register" = R,
-#endif
                   tabledata "Fin. Charge Interest Rate" = R,
+#endif
 #if not CLEAN27
                   tabledata "GovTalk Message Parts" = R,
                   tabledata "GovTalk Setup" = r,
@@ -35,5 +38,8 @@ permissionset 1002 "LOCAL READ"
                   tabledata "MTD-Session Fraud Prev. Hdr" = R,
                   tabledata "MTD-Default Fraud Prev. Hdr" = R,
 #endif
-                  tabledata "Postcode Notification Memory" = R;
+#if not CLEAN28
+                  tabledata "Postcode Notification Memory" = R
+#endif
+;
 }
