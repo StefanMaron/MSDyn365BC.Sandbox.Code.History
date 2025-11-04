@@ -274,7 +274,7 @@ codeunit 7201 "CDS Integration Impl."
         CDSConnectionFirstPartyAppIdAKVSecretNameLbl: Label 'bctocdsappid', Locked = true;
         CDSConnectionClientSecretAKVSecretNameLbl: Label 'globaldisco-clientsecret', Locked = true;
         CDSConnectionFirstPartyAppCertificateNameAKVSecretNameLbl: Label 'bctocdsappcertificatename', Locked = true;
-        MissingClientIdOrSecretTelemetryTxt: Label 'The client id or client secret have not been initialized.', Locked = true;
+        MissingClientIdOrSecretTelemetryTxt: Label 'The client id or client secret have not been initialized. This indicates that the tenant is not embed ISV. Other tenants will use cert auth instead.', Locked = true;
         MissingFirstPartyappIdOrCertificateTelemetryTxt: Label 'The first-party app id or certificate have not been initialized.', Locked = true;
         MissingClientIdOrSecretErr: Label 'The client id or client secret have not been initialized.';
         MissingClientIdOrSecretOnPremErr: Label 'You must register an Microsoft Entra application that will be used to connect to the Dataverse environment and specify the application id, secret and redirect URL in the Dataverse Connection Setup page.', Comment = 'Dataverse and Microsoft Entra are names of a Microsoft service and a Microsoft Azure resource and should not be translated.';
@@ -3585,7 +3585,7 @@ codeunit 7201 "CDS Integration Impl."
     begin
         if EnvironmentInfo.IsSaaSInfrastructure() then
             if not AzureKeyVault.GetAzureKeyVaultSecret(CDSConnectionClientIdAKVSecretNameLbl, ClientId) then
-                Session.LogMessage('0000C0Y', MissingClientIdOrSecretTelemetryTxt, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok)
+                Session.LogMessage('0000C0Y', MissingClientIdOrSecretTelemetryTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok)
             else
                 exit(ClientId);
 
