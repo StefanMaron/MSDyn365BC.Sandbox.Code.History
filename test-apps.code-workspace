@@ -9,6 +9,8 @@
     },
     "al.enableCodeAnalysis": false,
     "al.enableCodeActions": false,
-    "allint.enabled": false
+    "search.exclude": {
+      "**.xlf": true
+    }
   }
 }
