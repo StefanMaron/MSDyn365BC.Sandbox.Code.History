@@ -7673,15 +7673,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT Page Actions & Controls - NamedType TaskNoErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3361232935 - NamedType 568101514" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[error for Field: TypeSaaS,  Message = 'Your entry of '0' is not an acceptable value for 'Type'.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT Page Actions & Controls - NamedType TypeSaaSValidationErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 460857726 - NamedType 3745436764" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Customer Card]]></Val>

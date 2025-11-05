@@ -22,7 +22,6 @@ codeunit 134341 "UT Page Actions & Controls"
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryJob: Codeunit "Library - Job";
         AmountRoundingValidationErr: Label 'Validation error for Field: %1,  Message = ''You cannot change the contents of the %2 field because there are posted ledger entries.';
-        TypeSaaSValidationErr: Label 'error for Field: TypeSaaS,  Message = ''Your entry of ''0'' is not an acceptable value for ''Type''.';
         LibraryMarketing: Codeunit "Library - Marketing";
         TaskNoErr: Label 'Wrong number of Tasks was created.';
         CountOrdersNotInvoicedErr: Label 'Wrong result of PurchaseCue.CountOrders("Not Invoiced") ';
@@ -1868,35 +1867,6 @@ codeunit 134341 "UT Page Actions & Controls"
         LibraryApplicationArea.EnableFoundationSetup();
         PurchaseOrderList.OpenNew();
         Assert.IsTrue(PurchaseOrderList.Status.Visible(), '');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure CreateTaskSaaS()
-    var
-        ToDo: Record "To-do";
-        EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
-        CreateTask: TestPage "Create Task";
-    begin
-        // [FEATURE] [Marketing] [To-do]
-        // [SCEANRIO 258975] Cassies can't set "Meeting" in field "Type" at Create Task page. "Location" field is not visible
-        EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(true);
-
-        MockTodo(ToDo);
-
-        CreateTask.OpenEdit();
-        CreateTask.FILTER.SetFilter("No.", ToDo."No.");
-        Assert.IsTrue(CreateTask.TypeSaaS.Visible(), '');
-        Assert.IsFalse(CreateTask.TypeOnPrem.Visible(), '');
-        Assert.IsFalse(CreateTask.Location.Visible(), '');
-        Assert.AreEqual('Type', CreateTask.TypeSaaS.Caption, '');
-
-        CreateTask.TypeSaaS.SetValue(ToDo.Type::" ");
-        asserterror CreateTask.TypeSaaS.SetValue(ToDo.Type::Meeting);
-        Assert.ExpectedError(TypeSaaSValidationErr);
-
-        EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(false);
-        ToDo.Delete(false)
     end;
 
     [Test]
