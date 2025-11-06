@@ -2129,6 +2129,15 @@
       <Cmt Name="Dev"><![CDATA[%1: Purchase Order No., %2: Sales Order No.]D;]A;(LookupHint=Codeunit ERM Copy Purch/Sales Doc - NamedType AddrChangedErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 556740976 - NamedType 2954007190" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 must be %2 in %3.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1= Field Name, %2= Field Value, %3= Table name.]D;]A;(LookupHint=Codeunit ERM Copy Purch/Sales Doc - NamedType CostAmountErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 556740976 - NamedType 3116341442" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[G/L Entry with zero amount is posted.]]></Val>
