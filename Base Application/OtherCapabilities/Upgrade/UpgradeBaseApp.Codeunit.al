@@ -238,6 +238,7 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeGLAmountFCYAndCurrencyCode();
 #endif
         UpgradeICTransactionSourceType();
+        UpgradeNewSalesPricingFeatureKeyState();
     end;
 
     local procedure ClearTemporaryTables()
@@ -3854,4 +3855,26 @@ codeunit 104000 "Upgrade - BaseApp"
         exit('SEPA CAMT 053-08-CH');
     end;
 
+    local procedure UpgradeNewSalesPricingFeatureKeyState()
+    var
+        CompanyInformation: Record "Company Information";
+        FeatureDataUpdateStatus: Record "Feature Data Update Status";
+        FeaturePriceCalculation: Codeunit "Feature - Price Calculation";
+        PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesPricingFeatureKeyStateTag()) then
+            exit;
+
+        if FeatureDataUpdateStatus.Get(PriceCalculationMgt.GetFeatureKey(), CompanyName()) then
+            if FeatureDataUpdateStatus."Feature Status" = FeatureDataUpdateStatus."Feature Status"::Enabled then begin
+                CompanyInformation.Get();
+                CompanyInformation."Pricing Implementation" := CompanyInformation."Pricing Implementation"::"Extended Pricing";
+                FeaturePriceCalculation.CopyBasicPricingData(CompanyInformation."Pricing Implementation", false);
+                CompanyInformation.Modify();
+            end;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetNewSalesPricingFeatureKeyStateTag());
+    end;
 }
