@@ -5,6 +5,7 @@ using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Posting;
 using Microsoft.Finance.GeneralLedger.Preview;
 using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Posting;
@@ -71,6 +72,8 @@ codeunit 1520 "Workflow Event Handling"
         CreateGenJnlLineFromIncDocFailsEventDescTxt: Label 'The creation of a general journal line from the incoming document failed.';
         JobQueueEntryApprovalEventDescTxt: Label 'Approval of a job queue entry is requested.';
         JobQueueEntryApprReqCancelledEventDescTxt: Label 'Approval of a job queue entry is cancelled.';
+        RequisitionWkshBatchSendForApprovalEventDescTxt: Label 'An Approval request of a requisition worksheet batch is created.';
+        RequisitionWkshBatchApprovalRequestCancelEventDescTxt: Label 'An approval request for a requisition worksheet batch is canceled.';
 
     procedure CreateEventsLibrary()
     begin
@@ -160,6 +163,11 @@ codeunit 1520 "Workflow Event Handling"
         AddEventToLibrary(RunWorkflowOnGeneralJournalBatchNotBalancedCode(), DATABASE::"Gen. Journal Batch",
           GeneralJournalBatchNotBalancedEventDescTxt, 0, false);
 
+        AddEventToLibrary(RunWorkflowOnSendRequisitionWkshBatchForApprovalCode(), Database::"Requisition Wksh. Name",
+          RequisitionWkshBatchSendForApprovalEventDescTxt, 0, false);
+        AddEventToLibrary(RunWorkflowOnCancelRequisitionWkshBatchApprovalRequestCode(), Database::"Requisition Wksh. Name",
+          RequisitionWkshBatchApprovalRequestCancelEventDescTxt, 0, false);
+
         AddEventToLibrary(
           RunWorkflowOnBinaryFileAttachedCode(),
           DATABASE::"Incoming Document Attachment", ImageOrPDFIsAttachedToAnIncomingDocEventDescTxt, 0, false);
@@ -205,6 +213,9 @@ codeunit 1520 "Workflow Event Handling"
             RunWorkflowOnCancelGeneralJournalLineApprovalRequestCode():
                 AddEventPredecessor(RunWorkflowOnCancelGeneralJournalLineApprovalRequestCode(),
                   RunWorkflowOnSendGeneralJournalLineForApprovalCode());
+            RunWorkflowOnCancelRequisitionWkshBatchApprovalRequestCode():
+                AddEventPredecessor(RunWorkflowOnCancelRequisitionWkshBatchApprovalRequestCode(),
+                  RunWorkflowOnSendRequisitionWkshBatchForApprovalCode());
             RunWorkflowOnCustomerCreditLimitExceededCode():
                 AddEventPredecessor(RunWorkflowOnCustomerCreditLimitExceededCode(), RunWorkflowOnSendSalesDocForApprovalCode());
             RunWorkflowOnCustomerCreditLimitNotExceededCode():
@@ -220,6 +231,7 @@ codeunit 1520 "Workflow Event Handling"
                     AddEventPredecessor(RunWorkflowOnApproveApprovalRequestCode(), RunWorkflowOnSendGeneralJournalBatchForApprovalCode());
                     AddEventPredecessor(RunWorkflowOnApproveApprovalRequestCode(), RunWorkflowOnGeneralJournalBatchBalancedCode());
                     AddEventPredecessor(RunWorkflowOnApproveApprovalRequestCode(), RunWorkflowOnSendGeneralJournalLineForApprovalCode());
+                    AddEventPredecessor(RunWorkflowOnApproveApprovalRequestCode(), RunWorkflowOnSendRequisitionWkshBatchForApprovalCode());
                     AddEventPredecessor(RunWorkflowOnApproveApprovalRequestCode(), RunWorkflowOnCustomerChangedCode());
                     AddEventPredecessor(RunWorkflowOnApproveApprovalRequestCode(), RunWorkflowOnVendorChangedCode());
                     AddEventPredecessor(RunWorkflowOnApproveApprovalRequestCode(), RunWorkflowOnItemChangedCode());
@@ -236,6 +248,7 @@ codeunit 1520 "Workflow Event Handling"
                     AddEventPredecessor(RunWorkflowOnRejectApprovalRequestCode(), RunWorkflowOnSendGeneralJournalBatchForApprovalCode());
                     AddEventPredecessor(RunWorkflowOnRejectApprovalRequestCode(), RunWorkflowOnGeneralJournalBatchBalancedCode());
                     AddEventPredecessor(RunWorkflowOnRejectApprovalRequestCode(), RunWorkflowOnSendGeneralJournalLineForApprovalCode());
+                    AddEventPredecessor(RunWorkflowOnRejectApprovalRequestCode(), RunWorkflowOnSendRequisitionWkshBatchForApprovalCode());
                     AddEventPredecessor(RunWorkflowOnRejectApprovalRequestCode(), RunWorkflowOnCustomerChangedCode());
                     AddEventPredecessor(RunWorkflowOnRejectApprovalRequestCode(), RunWorkflowOnVendorChangedCode());
                     AddEventPredecessor(RunWorkflowOnRejectApprovalRequestCode(), RunWorkflowOnItemChangedCode());
@@ -252,6 +265,7 @@ codeunit 1520 "Workflow Event Handling"
                     AddEventPredecessor(RunWorkflowOnDelegateApprovalRequestCode(), RunWorkflowOnSendGeneralJournalBatchForApprovalCode());
                     AddEventPredecessor(RunWorkflowOnDelegateApprovalRequestCode(), RunWorkflowOnGeneralJournalBatchBalancedCode());
                     AddEventPredecessor(RunWorkflowOnDelegateApprovalRequestCode(), RunWorkflowOnSendGeneralJournalLineForApprovalCode());
+                    AddEventPredecessor(RunWorkflowOnDelegateApprovalRequestCode(), RunWorkflowOnSendRequisitionWkshBatchForApprovalCode());
                     AddEventPredecessor(RunWorkflowOnDelegateApprovalRequestCode(), RunWorkflowOnCustomerChangedCode());
                     AddEventPredecessor(RunWorkflowOnDelegateApprovalRequestCode(), RunWorkflowOnVendorChangedCode());
                     AddEventPredecessor(RunWorkflowOnDelegateApprovalRequestCode(), RunWorkflowOnItemChangedCode());
@@ -501,6 +515,16 @@ codeunit 1520 "Workflow Event Handling"
     procedure RunWorkflowOnGeneralJournalBatchNotBalancedCode(): Code[128]
     begin
         exit('RUNWORKFLOWONGENERALJOURNALBATCHNOTBALANCED');
+    end;
+
+    procedure RunWorkflowOnSendRequisitionWkshBatchForApprovalCode(): Code[128]
+    begin
+        exit('RUNWORKFLOWONSENDREQUISITIONWORKSHEETBATCHFORAPPROVAL');
+    end;
+
+    procedure RunWorkflowOnCancelRequisitionWkshBatchApprovalRequestCode(): Code[128]
+    begin
+        exit('RUNWORKFLOWONCANCELAREQUISITIONWORKSHEETBATCHAPPROVALREQUEST');
     end;
 
     procedure RunWorkflowOnBinaryFileAttachedCode(): Code[128]
@@ -785,6 +809,18 @@ codeunit 1520 "Workflow Event Handling"
     procedure RunWorkflowOnGeneralJournalBatchNotBalanced(var Sender: Record "Gen. Journal Batch")
     begin
         WorkflowManagement.HandleEvent(RunWorkflowOnGeneralJournalBatchNotBalancedCode(), Sender);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Approvals Mgmt.", 'OnSendRequisitionWkshBatchForApproval', '', false, false)]
+    procedure RunWorkflowOnSendRequisitionWkshBatchForApproval(var RequisitionWkshName: Record "Requisition Wksh. Name")
+    begin
+        WorkflowManagement.HandleEvent(RunWorkflowOnSendRequisitionWkshBatchForApprovalCode(), RequisitionWkshName);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Approvals Mgmt.", 'OnCancelRequisitionWkshBatchApprovalRequest', '', false, false)]
+    procedure RunWorkflowOnCancelRequisitionWkshBatchApprovalRequest(var RequisitionWkshName: Record "Requisition Wksh. Name")
+    begin
+        WorkflowManagement.HandleEvent(RunWorkflowOnCancelRequisitionWkshBatchApprovalRequestCode(), RequisitionWkshName);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Incoming Document Attachment", 'OnAttachBinaryFile', '', false, false)]
