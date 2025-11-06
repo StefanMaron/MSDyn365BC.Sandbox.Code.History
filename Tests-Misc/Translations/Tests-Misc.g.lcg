@@ -5153,6 +5153,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Report Selections Tests - NamedType DocumentNoTok)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 4238987348 - NamedType 1842497574" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[docx]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Report Selections Tests - NamedType DocxLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 4238987348 - NamedType 2049079553" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Destination email address does not match expected address.]]></Val>
@@ -5169,6 +5178,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Report Selections Tests - NamedType LayoutCodeShouldNotChangedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4238987348 - NamedType 1921119112" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[MS-X%1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Random Value]D;]A;(LookupHint=Codeunit Report Selections Tests - NamedType MSXLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4238987348 - NamedType 3984601750" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You must select an email body or attachment in report selection for %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Usage, for example Sales Invoice]D;]A;(LookupHint=Codeunit Report Selections Tests - NamedType MustSelectAndEmailBodyOrAttahmentErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 4238987348 - NamedType 2968334780" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
