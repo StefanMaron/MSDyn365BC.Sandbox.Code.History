@@ -10217,6 +10217,7 @@ codeunit 80 "Sales-Post"
 
     local procedure SyncSurPlusItemTracking(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line")
     var
+        Location2: Record Location;
         ReservEntry: Record "Reservation Entry";
         TempTrackingSpecification2: Record "Tracking Specification" temporary;
         TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary;
@@ -10229,9 +10230,12 @@ codeunit 80 "Sales-Post"
         if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::Order]) then
             exit;
 
-        GetLocation(SalesLine."Location Code");
-        if Location.IsEmpty() or not Location."Require Shipment" then
+        if (SalesLine."Location Code" = '') or
+           not Location2.Get(SalesLine."Location Code") or
+           not Location2."Require Shipment"
+        then
             exit;
+
         TempTrackingSpecification2.SetSourceFromSalesLine(SalesLine);
         QtyReservedForCurrLine := Abs(WarehouseAvailabilityMgt.CalcLineReservedQtyOnInvt(
             TempTrackingSpecification2."Source Type", TempTrackingSpecification2."Source Subtype", TempTrackingSpecification2."Source ID", TempTrackingSpecification2."Source Ref. No.",
@@ -10245,11 +10249,11 @@ codeunit 80 "Sales-Post"
                                  TempTrackingSpecification2."Source ID", TempTrackingSpecification2."Source Ref. No.", true);
         ReservEntry.SetSourceFilter('', TempTrackingSpecification2."Source Prod. Order Line");
         ReservEntry.SetRange("Reservation Status", ReservEntry."Reservation Status"::Surplus);
-        ReservEntry.CalcSums("Qty. to Handle (Base)");
-        SurplusQtyToHandle := Abs(ReservEntry."Qty. to Handle (Base)");
         if not ReservEntry.FindSet() then
             exit;
 
+        ReservEntry.CalcSums("Qty. to Handle (Base)");
+        SurplusQtyToHandle := Abs(ReservEntry."Qty. to Handle (Base)");
         if (QtyReservedForCurrLine + SurplusQtyToHandle) < SalesLine."Qty. to Ship (Base)" then
             exit;
 
