@@ -7954,16 +7954,26 @@ codeunit 80 "Sales-Post"
     /// <param name="PostedSalesDocumentVariant">Return Variable: The posted document that was created from the specified sales header.</param>
     procedure GetPostedDocumentRecord(SalesHeader: Record "Sales Header"; var PostedSalesDocumentVariant: Variant)
     var
+        SalesShipmentHeader: Record "Sales Shipment Header";
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        ReturnReceiptHeader: Record "Return Receipt Header";
         IsHandled: Boolean;
     begin
         case SalesHeader."Document Type" of
             SalesHeader."Document Type"::Order:
-                if SalesHeader.Invoice then begin
-                    SalesInvHeader.Get(SalesHeader."Last Posting No.");
-                    SalesInvHeader.SetRecFilter();
-                    PostedSalesDocumentVariant := SalesInvHeader;
+                begin
+                    if (not SalesHeader.Invoice) and (SalesHeader.Ship) then begin
+                        SalesShipmentHeader.Get(SalesHeader."Last Shipping No.");
+                        SalesShipmentHeader.SetRecFilter();
+                        PostedSalesDocumentVariant := SalesShipmentHeader;
+                    end;
+
+                    if SalesHeader.Invoice then begin
+                        SalesInvHeader.Get(SalesHeader."Last Posting No.");
+                        SalesInvHeader.SetRecFilter();
+                        PostedSalesDocumentVariant := SalesInvHeader;
+                    end;
                 end;
             SalesHeader."Document Type"::Invoice:
                 begin
@@ -7985,13 +7995,21 @@ codeunit 80 "Sales-Post"
                     PostedSalesDocumentVariant := SalesCrMemoHeader;
                 end;
             SalesHeader."Document Type"::"Return Order":
-                if SalesHeader.Invoice then begin
-                    if SalesHeader."Last Posting No." = '' then
-                        SalesCrMemoHeader.Get(SalesHeader."No.")
-                    else
-                        SalesCrMemoHeader.Get(SalesHeader."Last Posting No.");
-                    SalesCrMemoHeader.SetRecFilter();
-                    PostedSalesDocumentVariant := SalesCrMemoHeader;
+                begin
+                    if (not SalesHeader.Invoice) and (SalesHeader.Receive) then begin
+                        ReturnReceiptHeader.Get(SalesHeader."Last Return Receipt No.");
+                        ReturnReceiptHeader.SetRecFilter();
+                        PostedSalesDocumentVariant := ReturnReceiptHeader;
+                    end;
+
+                    if SalesHeader.Invoice then begin
+                        if SalesHeader."Last Posting No." = '' then
+                            SalesCrMemoHeader.Get(SalesHeader."No.")
+                        else
+                            SalesCrMemoHeader.Get(SalesHeader."Last Posting No.");
+                        SalesCrMemoHeader.SetRecFilter();
+                        PostedSalesDocumentVariant := SalesCrMemoHeader;
+                    end;
                 end;
             else begin
                 IsHandled := false;
