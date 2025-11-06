@@ -1222,46 +1222,6 @@ codeunit 137400 "SCM Inventory - Orders"
     end;
 
     [Test]
-    [HandlerFunctions('GetPriceLineHandler,MessageHandler')]
-    [Scope('OnPrem')]
-    procedure SalesUnitPriceFromCustomerPriceLineGroup()
-    var
-        CustomerPriceGroup: Record "Customer Price Group";
-        Item: Record Item;
-        Customer: Record Customer;
-        SalesPrice: Record "Sales Price";
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        PriceListLine: Record "Price List Line";
-    begin
-        // Test and verify Sales Unit Price update from Customer Price Group.
-        Initialize();
-        LibraryPriceCalculation.EnableExtendedPriceCalculation();
-        LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 16.0)");
-
-        // Setup: Create Item and Customer with Customer Price Group. Create and release Sales Order. Reopen Sales Order and update Order Date.
-        PriceListLine.DeleteAll();
-        CreateItem(Item);
-        LibrarySales.CreateCustomerPriceGroup(CustomerPriceGroup);
-        CreateCustomer(Customer, false, CustomerPriceGroup.Code);
-        CreateSalesPrice(
-          SalesPrice, Item, "Sales Price Type"::"Customer Price Group", Customer."Customer Price Group", Item."Base Unit of Measure",
-          0, CalcDate('<' + Format(LibraryRandom.RandInt(5)) + 'D>', WorkDate()));
-        CopyFromToPriceListLine.CopyFrom(SalesPrice, PriceListLine);
-
-        // Use random Starting Date.
-        CreateAndReleaseSalesOrder(SalesHeader, SalesLine, Customer."No.", Item."No.", LibraryRandom.RandDec(100, 2));  // Use random Quantity.
-        LibrarySales.ReopenSalesDocument(SalesHeader);
-        UpdateOrderDateOnSalesOrder(SalesHeader, SalesPrice."Starting Date");
-
-        // Exercise: Get Sales Price.
-        GetSalesPrice(SalesHeader."No.");
-
-        // Verify: Verify Unit Price on Sales Line.
-        VerifyUnitPriceOnSalesLine(SalesLine, SalesPrice."Unit Price");
-    end;
-
-    [Test]
     [Scope('OnPrem')]
     procedure SalesUnitPriceWithDifferentUnitOfMeasureCode()
     var
@@ -2963,6 +2923,46 @@ codeunit 137400 "SCM Inventory - Orders"
         // [THEN] Create correct Credit Memo
         asserterror CorrectPstdSalesInvYesNo.CorrectInvoice(SalesInvoiceHeader);
         Assert.ExpectedError(StrSubstNo(DropShipmentDocumentExistsErr, PurchaseHeader."No."));
+    end;
+
+    [Test]
+    [HandlerFunctions('GetPriceLineHandler,MessageHandler')]
+    [Scope('OnPrem')]
+    procedure SalesUnitPriceFromCustomerPriceLineGroup()
+    var
+        CustomerPriceGroup: Record "Customer Price Group";
+        Item: Record Item;
+        Customer: Record Customer;
+        SalesPrice: Record "Sales Price";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        PriceListLine: Record "Price List Line";
+    begin
+        // Test and verify Sales Unit Price update from Customer Price Group.
+        Initialize();
+        LibraryPriceCalculation.EnableExtendedPriceCalculation();
+        LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 16.0)");
+
+        // Setup: Create Item and Customer with Customer Price Group. Create and release Sales Order. Reopen Sales Order and update Order Date.
+        PriceListLine.DeleteAll();
+        CreateItem(Item);
+        LibrarySales.CreateCustomerPriceGroup(CustomerPriceGroup);
+        CreateCustomer(Customer, false, CustomerPriceGroup.Code);
+        CreateSalesPrice(
+          SalesPrice, Item, "Sales Price Type"::"Customer Price Group", Customer."Customer Price Group", Item."Base Unit of Measure",
+          0, CalcDate('<' + Format(LibraryRandom.RandInt(5)) + 'D>', WorkDate()));
+        CopyFromToPriceListLine.CopyFrom(SalesPrice, PriceListLine);
+
+        // Use random Starting Date.
+        CreateAndReleaseSalesOrder(SalesHeader, SalesLine, Customer."No.", Item."No.", LibraryRandom.RandDec(100, 2));  // Use random Quantity.
+        LibrarySales.ReopenSalesDocument(SalesHeader);
+        UpdateOrderDateOnSalesOrder(SalesHeader, SalesPrice."Starting Date");
+
+        // Exercise: Get Sales Price.
+        GetSalesPrice(SalesHeader."No.");
+
+        // Verify: Verify Unit Price on Sales Line.
+        VerifyUnitPriceOnSalesLine(SalesLine, SalesPrice."Unit Price");
     end;
 
     local procedure Initialize()
