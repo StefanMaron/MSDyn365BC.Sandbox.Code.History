@@ -393,6 +393,8 @@ codeunit 333 "Req. Wksh.-Make Order"
                         SalesLine."Line No."));
             end;
 
+        ReqLine2.CheckRequisitionWkshLineRestriction();
+
         OnAfterCheckReqWkshLine(ReqLine2, SuppressCommit);
     end;
 

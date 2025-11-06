@@ -29,6 +29,7 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Structure;
+using System.Automation;
 using System.Security.AccessControl;
 
 table 246 "Requisition Line"
@@ -1398,12 +1399,22 @@ table 246 "Requisition Line"
 
     trigger OnDelete()
     var
+        RequisitionWkshName: Record "Requisition Wksh. Name";
+        RequisitionLine: Record "Requisition Line";
         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeOnDelete(Rec, IsHandled);
         if IsHandled then
             exit;
+
+        // Lines are deleted 1 by 1, this actually check if this is the last line in the Requisition Worksheet Name.
+        RequisitionLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
+        RequisitionLine.SetRange("Journal Batch Name", "Journal Batch Name");
+        RequisitionLine.SetFilter("Line No.", '<>%1', "Line No.");
+        if RequisitionLine.IsEmpty() then
+            if RequisitionWkshName.Get(Rec."Worksheet Template Name", Rec."Journal Batch Name") then
+                ApprovalsMgmt.PreventDeletingRecordWithOpenApprovalEntry(RequisitionWkshName);
 
         ReqLine.Reset();
         ReqLine.Get("Worksheet Template Name", "Journal Batch Name", "Line No.");
@@ -1435,6 +1446,8 @@ table 246 "Requisition Line"
         ReqWkshTemplate.Get("Worksheet Template Name");
         ReqWkshName.Get("Worksheet Template Name", "Journal Batch Name");
 
+        ApprovalsMgmt.PreventInsertRecIfOpenApprovalEntryExist(ReqWkshName);
+
         Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
         Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
 
@@ -1443,11 +1456,13 @@ table 246 "Requisition Line"
 
     trigger OnModify()
     begin
+        CheckOpenApprovalEntryExistForCurrentUser();
         ReqLineReserve.VerifyChange(Rec, xRec);
     end;
 
     trigger OnRename()
     begin
+        ApprovalsMgmt.OnRenameRecordInApprovalRequest(xRec.RecordId(), RecordId());
         Error(Text004, TableCaption);
     end;
 
@@ -1464,6 +1479,7 @@ table 246 "Requisition Line"
         GetPlanningParameters: Codeunit "Planning-Get Parameters";
         WMSManagement: Codeunit "WMS Management";
         ConfirmManagement: Codeunit System.Utilities."Confirm Management";
+        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         BlockReservation: Boolean;
         DoNotUpdateOrderReceiptDate: Boolean;
 
@@ -3387,6 +3403,19 @@ table 246 "Requisition Line"
         DoNotUpdateOrderReceiptDate := NewUpdateOrderReceiptDate;
     end;
 
+    local procedure CheckOpenApprovalEntryExistForCurrentUser()
+    var
+        RequisitionWkshName: Record "Requisition Wksh. Name";
+    begin
+        if RequisitionWkshName.Get("Worksheet Template Name", "Journal Batch Name") then
+            ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(RequisitionWkshName);
+    end;
+
+    procedure CheckRequisitionWkshLineRestriction()
+    begin
+        OnCheckRequisitionWkshLinePostRestrictions();
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var RequisitionLine: Record "Requisition Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CurrFieldNo: Integer)
     begin
@@ -4024,6 +4053,11 @@ table 246 "Requisition Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateItemReferenceDescription(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnCheckRequisitionWkshLinePostRestrictions()
     begin
     end;
 }
