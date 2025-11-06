@@ -3730,6 +3730,7 @@ table 38 "Purchase Header"
         ExtendedTextAdded: Boolean;
         ConfirmText: Text;
         IsHandled: Boolean;
+        ShouldCreatePurchLines: Boolean;
     begin
         IsHandled := false;
         OnRecreatePurchLinesOnBeforePurchLinesExists(Rec, xRec, ChangedFieldName, IsHandled);
@@ -3782,7 +3783,9 @@ table 38 "Purchase Header"
                 TempPurchLine.FindSet();
                 ExtendedTextAdded := false;
                 repeat
-                    if not TempPurchLine.IsExtendedText() then begin
+                    ShouldCreatePurchLines := not TempPurchLine.IsExtendedText();
+                    OnRecreatePurchLinesOnAfterCalcShouldCreatePurchLines(TempPurchLine, ShouldCreatePurchLines, PurchLine);
+                    if ShouldCreatePurchLines then begin
                         PurchLine.Init();
                         PurchLine."Line No." := PurchLine."Line No." + 10000;
                         PurchLine."Price Calculation Method" := "Price Calculation Method";
@@ -8844,6 +8847,11 @@ table 38 "Purchase Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnRecreatePurchLinesOnAfterProcessTempPurchLines(var TempPurchaseLine: Record "Purchase Line" temporary; var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; ChangedFieldName: Text[100])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRecreatePurchLinesOnAfterCalcShouldCreatePurchLines(var TempPurchaseLine: Record "Purchase Line" temporary; var ShouldCreatePurchLines: Boolean; var PurchaseLine: Record "Purchase Line")
     begin
     end;
 
