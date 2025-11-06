@@ -169,6 +169,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetInventoryPlanningSetupUpgradeTag());
         PerCompanyUpgradeTags.Add(GetICTransactionSourceTypeUpgradeTag());
         PerCompanyUpgradeTags.Add(GetFinancialReportDefaultsUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetNewSalesPricingFeatureKeyStateTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerDatabaseUpgradeTags', '', false, false)]
@@ -1203,5 +1204,10 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetFinancialReportDefaultsUpgradeTag(): Code[250]
     begin
         exit('GIT-1494-FinancialReportDefaultsUpgradeTag-20250801');
+    end;
+
+    internal procedure GetNewSalesPricingFeatureKeyStateTag(): Code[250]
+    begin
+        exit('MS-600753-NewSalesPricingFeatureKeyStateUpgradeTag-20251015');
     end;
 }
