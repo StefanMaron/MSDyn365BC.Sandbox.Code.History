@@ -87,16 +87,6 @@ codeunit 137059 "SCM RTAM Item Tracking-II"
         PurchaseOrderWithDropShipmentSerialNo(false);  // Post Sales Order -False.
     end;
 
-    [Test]
-    [HandlerFunctions('ItemTrackingDropShipmentPageHandler,QuantityToCreatePageHandler,SalesListPageHandler,AvailabilityConfirmHandler')]
-    [Scope('OnPrem')]
-    procedure PurchaseOrderWithDropShipmentSerialNoWithoutPostSalesOrderError()
-    begin
-        // Setup.
-        Initialize();
-        PurchaseOrderWithDropShipmentSerialNo(true);  // Post Sales Order -True.
-    end;
-
     local procedure PurchaseOrderWithDropShipmentSerialNo(PostSalesOrder: Boolean)
     var
         SalesHeader: Record "Sales Header";
@@ -3403,6 +3393,104 @@ codeunit 137059 "SCM RTAM Item Tracking-II"
         );
     end;
 
+    [Test]
+    [HandlerFunctions('ItemTrackingDropShipmentPageHandler,QuantityToCreatePageHandler,SalesListPageHandler,AvailabilityConfirmHandler')]
+    procedure PurchaseOrderMustBePostedWithDropShipmentSerialNoWithoutPostingOfSalesInvoice()
+    var
+        Item: Record Item;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseInvoiceHeader: Record "Purch. Inv. Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        // [SCENARIO 295310] Verify that system must allow to post a Purchase Invoice against a drop shipment Purchase Order prior to posting a Sales Invoice against the related Sales Order.
+        Initialize();
+
+        // [GIVEN] Create an item with Serial No. tracking.
+        CreateItem(Item, ItemTrackingCodeSerialSpecific.Code);
+
+        // [GIVEN] Create a sales order with drop shipment.
+        CreateSalesOrderWithPurchasingCode(SalesHeader, SalesLine, Item."No.", '', LibraryRandom.RandIntInRange(50, 100), false);
+
+        // [GIVEN] Assign Global variable for Page Handler. Assign Tracking as SerialNo.
+        SetGlobalValue(Item."No.", false, false, false, AssignTracking::SerialNo, 0);
+
+        // [GIVEN] Open Item Tracking Lines for Sales Line.
+        SalesLine.OpenItemTrackingLines();
+
+        // [GIVEN] Create a purchase order for drop shipment.
+        CreatePurchaseHeaderAndGetDropShipment(PurchaseHeader, SalesHeader."Sell-to Customer No.");
+
+        // [GIVEN] Assign Global variable for Page Handler. PartialTracking as True.
+        SetGlobalValue(Item."No.", false, false, true, AssignTracking::None, 0);
+
+        // [GIVEN] Assign Tracking on Purchase Line.
+        AssignTrackingOnPurchaseLine(PurchaseHeader."No.");
+
+        // [GIVEN] Post Sales Document with shipment only.
+        PostSalesDocument(SalesHeader."Document Type", SalesHeader."No.", true, false);
+
+        // [WHEN] Post Purchase Document with invoice.
+        PostPurchaseDocument(PurchaseHeader."Document Type", PurchaseHeader."No.", false, true);
+
+        // [THEN] Verify that the Posted Purchase Invoice has been created and that the Posted Sales Invoice has not been created yet.
+        PurchaseInvoiceHeader.SetRange("Order No.", PurchaseHeader."No.");
+        Assert.RecordIsNotEmpty(PurchaseInvoiceHeader);
+
+        SalesInvoiceHeader.SetRange("Order No.", SalesHeader."No.");
+        Assert.RecordIsEmpty(SalesInvoiceHeader);
+    end;
+
+    [Test]
+    [HandlerFunctions('ItemTrackingDropShipmentPageHandler,QuantityToCreatePageHandler,SalesListPageHandler,AvailabilityConfirmHandler')]
+    procedure PurchaseInvoiceMustBePostedWithDropShipmentSerialNoWithoutPostingOfSalesInvoice()
+    var
+        Item: Record Item;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseInvoiceHeader: Record "Purch. Inv. Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        // [SCENARIO 295310] Verify that system must allow to post a Purchase Invoice via "Get Receipt Lines" from against a drop shipment Purchase Order prior to posting a Sales Invoice against the related Sales Order.
+        Initialize();
+
+        // [GIVEN] Create an item with Serial No. tracking.
+        CreateItem(Item, ItemTrackingCodeSerialSpecific.Code);
+
+        // [GIVEN] Create a sales order with drop shipment.
+        CreateSalesOrderWithPurchasingCode(SalesHeader, SalesLine, Item."No.", '', LibraryRandom.RandIntInRange(50, 100), false);
+
+        // [GIVEN] Assign Global variable for Page Handler. Assign Tracking as SerialNo.
+        SetGlobalValue(Item."No.", false, false, false, AssignTracking::SerialNo, 0);
+
+        // [GIVEN] Open Item Tracking Lines for Sales Line.
+        SalesLine.OpenItemTrackingLines();
+
+        // [GIVEN] Create a purchase order for drop shipment.
+        CreatePurchaseHeaderAndGetDropShipment(PurchaseHeader, SalesHeader."Sell-to Customer No.");
+
+        // [GIVEN] Assign Global variable for Page Handler. PartialTracking as True.
+        SetGlobalValue(Item."No.", false, false, true, AssignTracking::None, 0);
+
+        // [GIVEN] Assign Tracking on Purchase Line.
+        AssignTrackingOnPurchaseLine(PurchaseHeader."No.");
+
+        // [GIVEN] Post Sales Document with shipment only.
+        PostSalesDocument(SalesHeader."Document Type", SalesHeader."No.", true, false);
+
+        // [WHEN] Create Purchase Invoice for previous receipt and post it.
+        CreateAndPostPurchInvoice(PurchaseHeader);
+
+        // [THEN] Verify that the Posted Purchase Invoice has been created and that the Posted Sales Invoice has not been created yet.
+        PurchaseInvoiceHeader.SetRange("Order No.", PurchaseHeader."No.");
+        Assert.RecordIsNotEmpty(PurchaseInvoiceHeader);
+
+        SalesInvoiceHeader.SetRange("Order No.", SalesHeader."No.");
+        Assert.RecordIsEmpty(SalesInvoiceHeader);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -5031,6 +5119,23 @@ codeunit 137059 "SCM RTAM Item Tracking-II"
           ItemJournalLine."Entry Type"::"Positive Adjmt.", Quantity, UnitAmount);
 
         LibraryInventory.PostItemJournalBatch(ItemJournalBatch);
+    end;
+
+    local procedure CreateAndPostPurchInvoice(var PurchHeader: Record "Purchase Header")
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
+        PurchGetReceipt: Codeunit "Purch.-Get Receipt";
+    begin
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, PurchHeader."Buy-from Vendor No.");
+
+        PurchRcptLine.SetCurrentKey("Buy-from Vendor No.");
+        PurchRcptLine.SetRange("Buy-from Vendor No.", PurchHeader."Buy-from Vendor No.");
+
+        PurchGetReceipt.SetPurchHeader(PurchaseHeader);
+        PurchGetReceipt.CreateInvLines(PurchRcptLine);
+
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true);
     end;
 
     [ModalPageHandler]
