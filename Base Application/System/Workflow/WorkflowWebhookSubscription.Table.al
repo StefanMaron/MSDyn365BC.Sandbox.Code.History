@@ -244,6 +244,8 @@ table 469 "Workflow Webhook Subscription"
         EventConditions: FilterPageBuilder;
         ConditionsObject: DotNet JObject;
         ConditionsCount: Integer;
+        Result: Text;
+        IsHandled: Boolean;
     begin
         if not TryDecodeConditions(ConditionsTxt) then
             SendAndLogError(GetLastErrorText, UnableToParseEncodingErr);
@@ -313,14 +315,20 @@ table 469 "Workflow Webhook Subscription"
                       RequestPageParametersHelper.GetViewFromDynamicRequestPage(
                         EventConditions, WorkflowWebhookSetup.GetPurchPayCategoryTxt(), DATABASE::Vendor));
                 end
-            else
+            else begin
+                OnCreateWorkflowEventConditions(ConditionsTxt, EventCode, ConditionsObject, EventConditions, ConditionsCount, Result, IsHandled);
+                if IsHandled then
+                    exit(Result);
+
                 SendAndLogError(
                   StrSubstNo(WorkflowWebhookSetup.GetUnsupportedWorkflowEventCodeErr(), EventCode),
                   StrSubstNo(WorkflowWebhookSetup.GetUnsupportedWorkflowEventCodeErr(), EventCode));
+            end;
         end;
     end;
 
-    local procedure AddEventConditionsWrapper(ConditionsPropertyName: Text; ConditionsObject: DotNet JObject; SourcePageNo: Integer; var EventConditions: FilterPageBuilder; var ConditionsCount: Integer)
+    [Scope('OnPrem')]
+    procedure AddEventConditionsWrapper(ConditionsPropertyName: Text; ConditionsObject: DotNet JObject; SourcePageNo: Integer; var EventConditions: FilterPageBuilder; var ConditionsCount: Integer)
     var
         ConditionsCollection: DotNet JToken;
     begin
@@ -444,6 +452,11 @@ table 469 "Workflow Webhook Subscription"
 
     [IntegrationEvent(false, false)]
     local procedure OnFindTaskSchedulerAllowed(var IsTaskSchedulingAllowed: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnCreateWorkflowEventConditions(ConditionsTxt: Text; EventCode: Code[128]; ConditionsObject: DotNet JObject; var EventConditions: FilterPageBuilder; var ConditionsCount: Integer; var Result: Text; var IsHandled: Boolean)
     begin
     end;
 }
