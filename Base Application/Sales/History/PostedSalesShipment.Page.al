@@ -8,6 +8,7 @@ using Microsoft.CRM.Contact;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Sales.Comment;
 using Microsoft.Utilities;
 using System.Automation;
@@ -714,6 +715,14 @@ page 130 "Posted Sales Shipment"
             {
                 ApplicationArea = Notes;
             }
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = All;
+                Caption = 'Documents';
+                UpdatePropagation = Both;
+                SubPageLink = "Table ID" = const(Database::"Sales Shipment Header"),
+                              "No." = field("No.");
+            }
         }
     }
 
@@ -878,6 +887,23 @@ page 130 "Posted Sales Shipment"
                     end;
                 }
             }
+            action(SendCustom)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Send';
+                Ellipsis = true;
+                Image = SendToMultiple;
+                ToolTip = 'Prepare to send the document according to the customer''s sending profile, such as attached to an email. The Send document to window opens first so you can confirm or select a sending profile.';
+
+                trigger OnAction()
+                var
+                    SalesShipmentHeader: Record "Sales Shipment Header";
+                begin
+                    SalesShipmentHeader := Rec;
+                    CurrPage.SetSelectionFilter(SalesShipmentHeader);
+                    SalesShipmentHeader.SendRecords();
+                end;
+            }
             action("&Print")
             {
                 ApplicationArea = Basic, Suite;
@@ -892,6 +918,36 @@ page 130 "Posted Sales Shipment"
                     OnBeforePrintRecords(Rec, SalesShptHeader);
                     CurrPage.SetSelectionFilter(SalesShptHeader);
                     SalesShptHeader.PrintRecords(true);
+                end;
+            }
+            action(Email)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = '&Email';
+                Image = Email;
+                ToolTip = 'Prepare to email the document. The Send Email window opens prefilled with the customer''s email address so you can add or edit information.';
+
+                trigger OnAction()
+                begin
+                    SalesShptHeader := Rec;
+                    CurrPage.SetSelectionFilter(SalesShptHeader);
+                    SalesShptHeader.EmailRecords(true);
+                end;
+            }
+            action(AttachAsPDF)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Attach as PDF';
+                Image = PrintAttachment;
+                ToolTip = 'Create a PDF file and attach it to the document.';
+
+                trigger OnAction()
+                var
+                    SalesShipmentHeader: Record "Sales Shipment Header";
+                begin
+                    SalesShipmentHeader := Rec;
+                    SalesShipmentHeader.SetRecFilter();
+                    Rec.PrintToDocumentAttachment(SalesShipmentHeader);
                 end;
             }
             action("&Navigate")
@@ -950,6 +1006,23 @@ page 130 "Posted Sales Shipment"
                 group(Category_Category4)
                 {
                     Caption = 'Print/Send', Comment = 'Generated from the PromotedActionCategories property index 3.';
+                }
+            }
+            group(Category_Category6)
+            {
+                Caption = 'Print/Send', Comment = 'Generated from the PromotedActionCategories property index 5.';
+
+                actionref(Print_Promoted; "&Print")
+                {
+                }
+                actionref(Email_Promoted; Email)
+                {
+                }
+                actionref(AttachAsPDF_Promoted; AttachAsPDF)
+                {
+                }
+                actionref(SendCustom_Promoted; SendCustom)
+                {
                 }
             }
             group(Category_Category5)

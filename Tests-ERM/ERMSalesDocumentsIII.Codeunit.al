@@ -2813,7 +2813,7 @@ codeunit 134387 "ERM Sales Documents III"
         SalesPost: Codeunit "Sales-Post";
         RecVar: Variant;
     begin
-        // [SCENARIO 260584] COD80.GetPostedDocumentRecords returns nothing for shipped only "Sales Header" with "Document Type" = "Return Order"
+        // [SCENARIO 260584] COD80.GetPostedDocumentRecords returns single filtered "Return Receipt Header" record for shipped only "Sales Header" with "Document Type" = "Return Order"
         Initialize();
 
         CreateSalesDocumentWithItem(SalesHeader, SalesHeader."Document Type"::"Return Order");
@@ -2822,7 +2822,7 @@ codeunit 134387 "ERM Sales Documents III"
         RecVar := 0D;
         SalesPost.GetPostedDocumentRecord(SalesHeader, RecVar);
 
-        Assert.IsTrue(RecVar.IsDate, '');
+        VerifyRecRefSingleRecord(RecVar, Database::"Return Receipt Header");
     end;
 
     [Test]
