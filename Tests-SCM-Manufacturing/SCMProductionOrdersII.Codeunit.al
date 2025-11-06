@@ -7231,6 +7231,87 @@ codeunit 137072 "SCM Production Orders II"
                         StrSubstNo(LotNoMustBeEqualErr, WarehouseActivityLine.FieldCaption("Lot No."), LotNo, WarehouseActivityLine.TableCaption));
     end;
 
+    [Test]
+    [HandlerFunctions('ProductionJnlPageHandler2,ChangeStatusOnProdOrderPageHandler,ConfirmHandler,MessageHandlerNoText')]
+    procedure FinishProdOrderNoOutputUseNewPostingDateForWIPAdjustments()
+    var
+        Item: array[2] of Record Item;
+        Location: Record Location;
+        ManufacturingSetup: Record "Manufacturing Setup";
+        ProdOrderLine: Record "Prod. Order Line";
+        ProductionBOMHeader: Record "Production BOM Header";
+        ProductionBOMLine: Record "Production BOM Line";
+        ProductionOrder: Record "Production Order";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        ReleasedProductionOrder: TestPage "Released Production Order";
+        FinishPostingDate: Date;
+    begin
+        // [SCENARIO 606044] When using 'Finish Order Without Output' posted on different Posting Date in period is using current Posting Date on Finish status change.
+        Initialize();
+
+        // [GIVEN] Set Finish Posting Date to Work Date.
+        FinishPostingDate := WorkDate();
+
+        // [GIVEN] Create a Location with Inventory Posting Setup.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+
+        // [GIVEN] Update Allow Posting From/To in General Ledger Setup.
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Allow Posting From" := CalcDate('<-1M>', WorkDate() - 1);
+        GeneralLedgerSetup."Allow Posting To" := CalcDate('<+3M>', WorkDate());
+        GeneralLedgerSetup.Modify();
+
+        // [GIVEN] Create Item [1] and Validate Costing Method.
+        LibraryInventory.CreateItem(Item[1]);
+        Item[1].Validate("Costing Method", Item[1]."Costing Method"::FIFO);
+        Item[1].Modify(true);
+
+        // [GIVEN] Create and Post Item Journal Line.
+        CreateAndPostItemJournalLine(Item[1]."No.", LibraryRandom.RandIntInRange(10, 10), '', Location.Code, false);
+
+        // [GIVEN] Create a Production BOM Header.
+        LibraryManufacturing.CreateProductionBOMHeader(ProductionBOMHeader, Item[1]."Base Unit of Measure");
+
+        // [GIVEN] Create a Production BOM Line.
+        LibraryManufacturing.CreateProductionBOMLine(ProductionBOMHeader, ProductionBOMLine, '', ProductionBOMLine.Type::Item, Item[1]."No.", LibraryRandom.RandIntInRange(2, 2));
+        ProductionBOMHeader.Validate(Status, ProductionBOMHeader.Status::Certified);
+        ProductionBOMHeader.Modify(true);
+
+        // [GIVEN] Create Item [2] and Validate Costing Method and Production BOM No.
+        LibraryInventory.CreateItem(Item[2]);
+        Item[2].Validate("Costing Method", Item[2]."Costing Method"::FIFO);
+        Item[2].Validate("Production BOM No.", ProductionBOMHeader."No.");
+        Item[2].Modify(true);
+
+        // [GIVEN] Validate Finish Order without Output in Manufacturing Setup.
+        ManufacturingSetup.Get();
+        ManufacturingSetup."Finish Order without Output" := true;
+        ManufacturingSetup.Modify(true);
+
+        // [GIVEN] Create and Refresh Production Order.
+        CreateAndRefreshProductionOrder(ProductionOrder, ProductionOrder.Status::Released, Item[2]."No.", LibraryRandom.RandInt(0), Location.Code, '');
+
+        // [GIVEN] Find Prod. Order Line.
+        ProdOrderLine.SetRange(Status, ProductionOrder.Status::Released);
+        ProdOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+        ProdOrderLine.FindFirst();
+
+        // [GIVEN] Create and Post Production Journal.
+        CreateAndPostProductionJournal(ProductionOrder, ProdOrderLine."Line No.");
+
+        // [GIVEN] Open Released Production Order page and run Change Status action.
+        WorkDate(FinishPostingDate);
+
+        // [WHEN] Open Released Production Order page and run Change Status action.
+        ReleasedProductionOrder.OpenEdit();
+        ReleasedProductionOrder.GoToRecord(ProductionOrder);
+        ReleasedProductionOrder."Change &Status".Invoke();
+
+        // [THEN] Finished Production Order status is found.
+        ProductionOrder.Get(ProductionOrder.Status::Finished, ProductionOrder."No.");
+        Assert.RecordIsNotEmpty(ProductionOrder);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
