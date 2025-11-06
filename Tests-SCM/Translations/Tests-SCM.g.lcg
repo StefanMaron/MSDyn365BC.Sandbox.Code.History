@@ -8294,15 +8294,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Purchase Correct Invoice - NamedType TransportMethodErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2922115478 - NamedType 2929215701" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[You cannot invoice this purchase order before the associated sales orders have been invoiced.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Purchases & Payables - NamedType AssociatedSalesOrderErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 2922115478 - NamedType 2755009930" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Calculation of the remaining inventory value must include only one value entry]]></Val>
