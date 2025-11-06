@@ -461,6 +461,8 @@ codeunit 5407 "Prod. Order Status Management"
         if GeneralLedgerSetup."Journal Templ. Name Mandatory" then
             InventoryPostingToGL.SetGenJnlBatch(InventorySetup."Invt. Cost Jnl. Template Name", InventorySetup."Invt. Cost Jnl. Batch Name");
 
+        if NewPostingDate <> 0D then
+            ValueEntry."Posting Date" := NewPostingDate;
         InventoryPostingToGL.PostInvtPostBufPerEntry(ValueEntry);
     end;
 
