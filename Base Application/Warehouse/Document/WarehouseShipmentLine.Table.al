@@ -1042,7 +1042,14 @@ table 7321 "Warehouse Shipment Line"
     end;
 
     local procedure InitQtyToShip()
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeInitQtyToShip(Rec, CurrFieldNo, IsHandled);
+        if IsHandled then
+            exit;
+
         if Location."Require Pick" then begin
             if "Assemble to Order" then
                 Validate("Qty. to Ship", 0)
@@ -1397,6 +1404,11 @@ table 7321 "Warehouse Shipment Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnInitNewLineOnAfterInit(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInitQtyToShip(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
