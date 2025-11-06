@@ -4366,6 +4366,80 @@ codeunit 134776 "Document Attachment Tests"
             StrSubstNo(ValueMustBeEqualErr, DocumentAttachment.FieldCaption("File Name"), ExpectedRoutingFileName, DocumentAttachment.TableCaption()));
     end;
 
+    [Test]
+    procedure PostedSalesShipmentPrintWithAttachment()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesShipmentHeader: Record "Sales Shipment Header";
+        DocumentAttachment: Record "Document Attachment";
+        PostedSalesShipment: TestPage "Posted Sales Shipment";
+    begin
+        // [SCENARIO 425426] Verify "Attach As PDF" action on posted sales shipment page makes new "Document Attachment" record.
+        Initialize();
+
+        // [GIVEN] Select "Sales - Shipment" report in report selections for Sales Shipment.
+        LibraryERM.SetupReportSelection("Report Selection Usage"::"S.Shipment", Report::"Sales - Shipment");
+
+        // [GIVEN] Create Sales Order.
+        LibrarySales.CreateSalesOrder(SalesHeader);
+
+        // [GIVEN] Post Sales Document.
+        SalesShipmentHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, false));
+
+        // [GIVEN] Open Posted Sales Shipment.
+        PostedSalesShipment.OpenEdit();
+        PostedSalesShipment.Filter.SetFilter("No.", SalesShipmentHeader."No.");
+
+        // [WHEN] Invoke "Print to attachment" action on Posted Sales Shipment page.
+        PostedSalesShipment.AttachAsPDF.Invoke();
+
+        // [THEN] Verify new document attachment is created.
+        FindDocumentAttachment(DocumentAttachment, Database::"Sales Shipment Header", SalesShipmentHeader."No.", 0);
+        Assert.AreEqual(
+            GetExpectedAttachmentFileName(Report::"Sales - Shipment", SalesShipmentHeader."No."),
+            DocumentAttachment."File Name",
+            StrSubstNo(ValueMustBeEqualErr, DocumentAttachment.FieldCaption("File Name"), GetExpectedAttachmentFileName(Report::"Sales - Shipment", SalesShipmentHeader."No."), DocumentAttachment.TableCaption()));
+
+        LibraryNotificationMgt.RecallNotificationsForRecord(SalesShipmentHeader);
+    end;
+
+    [Test]
+    procedure PostedReturnReceiptPrintWithAttachment()
+    var
+        SalesHeader: Record "Sales Header";
+        ReturnReceiptHeader: Record "Return Receipt Header";
+        DocumentAttachment: Record "Document Attachment";
+        PostedReturnReceipt: TestPage "Posted Return Receipt";
+    begin
+        // [SCENARIO 425426] Verify "Attach As PDF" action on posted return receipt page makes new "Document Attachment" record.
+        Initialize();
+
+        // [GIVEN] Select "Sales - Return Receipt" report in report selections for Sales Return Receipt.
+        LibraryERM.SetupReportSelection("Report Selection Usage"::"S.Ret.Rcpt.", Report::"Sales - Return Receipt");
+
+        // [GIVEN] Create Sales Return Order.
+        LibrarySales.CreateSalesReturnOrder(SalesHeader);
+
+        // [GIVEN] Post Sales Document.
+        ReturnReceiptHeader.Get(LibrarySales.PostSalesDocument(SalesHeader, true, false));
+
+        // [GIVEN] Open Posted Return Receipt.
+        PostedReturnReceipt.OpenEdit();
+        PostedReturnReceipt.Filter.SetFilter("No.", ReturnReceiptHeader."No.");
+
+        // [WHEN] Invoke "Print to attachment" action on Posted Return Receipt page.
+        PostedReturnReceipt.AttachAsPDF.Invoke();
+
+        // [THEN] Verify new document attachment is created.
+        FindDocumentAttachment(DocumentAttachment, Database::"Return Receipt Header", ReturnReceiptHeader."No.", 0);
+        Assert.AreEqual(
+            GetExpectedAttachmentFileName(Report::"Sales - Return Receipt", ReturnReceiptHeader."No."),
+            DocumentAttachment."File Name",
+            StrSubstNo(ValueMustBeEqualErr, DocumentAttachment.FieldCaption("File Name"), GetExpectedAttachmentFileName(Report::"Sales - Return Receipt", ReturnReceiptHeader."No."), DocumentAttachment.TableCaption()));
+
+        LibraryNotificationMgt.RecallNotificationsForRecord(ReturnReceiptHeader);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
