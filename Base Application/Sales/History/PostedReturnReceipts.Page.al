@@ -5,6 +5,7 @@
 namespace Microsoft.Sales.History;
 
 using Microsoft.Finance.Dimension;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Sales.Comment;
 
 page 6662 "Posted Return Receipts"
@@ -201,6 +202,14 @@ page 6662 "Posted Return Receipts"
             {
                 ApplicationArea = Notes;
             }
+            part("Attached Documents List"; "Doc. Attachment List Factbox")
+            {
+                ApplicationArea = All;
+                Caption = 'Documents';
+                UpdatePropagation = Both;
+                SubPageLink = "Table ID" = const(Database::"Return Receipt Header"),
+                              "No." = field("No.");
+            }
         }
     }
 
@@ -266,6 +275,55 @@ page 6662 "Posted Return Receipts"
                     ReturnRcptHeader.PrintRecords(true);
                 end;
             }
+            action(SendCustom)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Send';
+                Ellipsis = true;
+                Image = SendToMultiple;
+                ToolTip = 'Prepare to send the document according to the customer''s sending profile, such as attached to an email. The Send document to window opens where you can confirm or select a sending profile.';
+
+                trigger OnAction()
+                var
+                    ReturnRcptHeader: Record "Return Receipt Header";
+                begin
+                    ReturnRcptHeader := Rec;
+                    CurrPage.SetSelectionFilter(ReturnRcptHeader);
+                    ReturnRcptHeader.SendRecords();
+                end;
+            }
+            action(Email)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Send by &Email';
+                Image = Email;
+                ToolTip = 'Prepare to send the document by email. The Send Email window opens prefilled for the customer where you can add or change information before you send the email.';
+
+                trigger OnAction()
+                var
+                    ReturnRcptHeader: Record "Return Receipt Header";
+                begin
+                    ReturnRcptHeader := Rec;
+                    CurrPage.SetSelectionFilter(ReturnRcptHeader);
+                    ReturnRcptHeader.EmailRecords(true);
+                end;
+            }
+            action(AttachAsPDF)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Attach as PDF';
+                Image = PrintAttachment;
+                ToolTip = 'Create a PDF file and attach it to the document.';
+
+                trigger OnAction()
+                var
+                    ReturnRcptHeader: Record "Return Receipt Header";
+                begin
+                    ReturnRcptHeader := Rec;
+                    CurrPage.SetSelectionFilter(ReturnRcptHeader);
+                    Rec.PrintToDocumentAttachment(ReturnRcptHeader);
+                end;
+            }
             action("&Navigate")
             {
                 ApplicationArea = SalesReturnOrder;
@@ -312,6 +370,23 @@ page 6662 "Posted Return Receipts"
                 {
                 }
                 actionref(Statistics_Promoted; Statistics)
+                {
+                }
+            }
+            group(Category_Category7)
+            {
+                Caption = 'Print/Send', Comment = 'Generated from the PromotedActionCategories property index 6.';
+
+                actionref(Print_Promoted; "&Print")
+                {
+                }
+                actionref(Email_Promoted; Email)
+                {
+                }
+                actionref(SendCustom_Promoted; SendCustom)
+                {
+                }
+                actionref(AttachAsPDF_Promoted; AttachAsPDF)
                 {
                 }
             }
