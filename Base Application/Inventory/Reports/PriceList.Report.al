@@ -548,6 +548,7 @@ report 715 "Price List"
         PriceListCaptionLbl: Label 'Price List';
         CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
         CompanyInfoFaxNoCaptionLbl: Label 'Fax No.';
+        CompanyInfoEnterpriseNoCaptionLbl: Label 'Enterprise No.';
         CompanyInfoGiroNoCaptionLbl: Label 'Giro No.';
         CompanyInfoBankNameCaptionLbl: Label 'Bank';
         CompanyInfoBankAccNoCaptionLbl: Label 'Account No.';
@@ -556,7 +557,6 @@ report 715 "Price List"
         UnitOfMeasureCaptionLbl: Label 'Unit of Measure';
         MinimumQuantityCaptionLbl: Label 'Minimum Quantity';
         VATTextCaptionLbl: Label 'VAT';
-        CompanyInfoEnterpriseNoCaptionLbl: Label 'Enterprise No.';
         NativeCalculationErr: Label 'The Business Central (Version 15.0) must be selected on the Price Calculation Method page.';
 
     local procedure VerifyPriceSetup()
