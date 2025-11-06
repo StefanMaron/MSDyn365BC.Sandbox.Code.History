@@ -1520,16 +1520,19 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     local procedure AssemblyReservationEntryMismatchWithItemJnlLine(var ReservEntry: Record "Reservation Entry"): Boolean
-    var
+   var
         ReservEntry2: Record "Reservation Entry";
+        ItemRec: Record Item;
     begin
         ReservEntry2.SetLoadFields("Source Type", "Source Subtype");
         ReservEntry2.Get(ReservEntry."Entry No.", not ReservEntry.Positive);
-        if (ReservEntry2."Source Type" = Database::"Assembly Header") and (ReservEntry2."Source Subtype" = 1)
-             and (not ItemJnlLine."Assemble to Order") then
-            exit(true);
+        if ItemRec.Get(ReservEntry2."Item No.") then
+            if not (ItemRec."Assembly Policy" = ItemRec."Assembly Policy"::"Assemble-to-Stock") then
+                if (ReservEntry2."Source Type" = Database::"Assembly Header") and (ReservEntry2."Source Subtype" = 1)
+                      and (not ItemJnlLine."Assemble to Order") then
+                    exit(true);
     end;
-
+    
     local procedure UpdateReservationEntryForNonInventoriableItem()
     var
         ReservationEntry: Record "Reservation Entry";
