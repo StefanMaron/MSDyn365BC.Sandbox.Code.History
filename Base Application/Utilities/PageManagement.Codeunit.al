@@ -13,6 +13,7 @@ using Microsoft.Foundation.Company;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Projects.Project.Journal;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Purchases.Archive;
@@ -211,6 +212,10 @@ codeunit 700 "Page Management"
                 exit(GetGenJournalBatchPageID(RecRef));
             Database::"Gen. Journal Line":
                 exit(GetGenJournalLinePageID(RecRef));
+            Database::"Requisition Wksh. Name":
+                exit(GetRequisitionWkshBatchPageID(RecRef));
+            Database::"Requisition Line":
+                exit(GetRequisitionWkshLinePageID(RecRef));
             Database::"User Setup":
                 exit(PAGE::"User Setup");
             Database::"General Ledger Setup":
@@ -583,6 +588,55 @@ codeunit 700 "Page Management"
         exit(PageMetadata.Caption);
     end;
 
+    local procedure GetRequisitionWkshBatchPageID(RecRef: RecordRef): Integer
+    var
+        RequisitionWkshName: Record "Requisition Wksh. Name";
+        RequisitionLine: Record "Requisition Line";
+    begin
+        RecRef.SetTable(RequisitionWkshName);
+
+        RequisitionLine.SetRange(RequisitionLine."Worksheet Template Name", RequisitionWkshName."Worksheet Template Name");
+        RequisitionLine.SetRange(RequisitionLine."Journal Batch Name", RequisitionWkshName.Name);
+        if not RequisitionLine.FindFirst() then begin
+            RequisitionLine."Worksheet Template Name" := RequisitionWkshName."Worksheet Template Name";
+            RequisitionLine."Journal Batch Name" := RequisitionWkshName.Name;
+            RecRef.GetTable(RequisitionLine);
+
+            exit(Page::"Req. Worksheet");
+        end;
+
+        RecRef.GetTable(RequisitionLine);
+        exit(GetRequisitionWkshLinePageID(RecRef));
+    end;
+
+    local procedure GetRequisitionWkshLinePageID(RecRef: RecordRef): Integer
+    var
+        RequisitionLine: Record "Requisition Line";
+        ReqWkshTemplate: Record "Req. Wksh. Template";
+        CardPageID: Integer;
+    begin
+        RecRef.SetTable(RequisitionLine);
+        ReqWkshTemplate.Get(RequisitionLine."Worksheet Template Name");
+
+        if ReqWkshTemplate."Page ID" <> 0 then
+            exit(ReqWkshTemplate."Page ID");
+
+        if ReqWkshTemplate.Recurring then
+            exit(Page::"Recurring Req. Worksheet");
+
+        case ReqWkshTemplate.Type of
+            ReqWkshTemplate.Type::Planning:
+                exit(Page::"Planning Worksheet");
+            ReqWkshTemplate.Type::"Req.":
+                exit(Page::"Req. Worksheet");
+            else begin
+                OnGetReqWkshTemplatePageID(ReqWkshTemplate, RecRef, CardPageID);
+
+                exit(CardPageID);
+            end;
+        end;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetConditionalListPageID(RecRef: RecordRef; var PageID: Integer; var IsHandled: Boolean; CheckDocumentTypeFilter: Boolean);
     begin
@@ -647,6 +701,11 @@ codeunit 700 "Page Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeVerifyPageID(TableID: Integer; PageID: Integer; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetReqWkshTemplatePageID(ReqWkshTemplate: Record "Req. Wksh. Template"; RecordRef: RecordRef; var CardPageID: Integer)
     begin
     end;
 }
