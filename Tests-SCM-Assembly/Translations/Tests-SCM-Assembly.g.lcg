@@ -473,6 +473,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Assembly Reservation I - NamedType WrongReservedQtyErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 237793734 - Method 4091925825 - NamedType 2026071488" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reserved item %1 is not on inventory.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Assembly Reservation I - Method TestAssemblyToStockWithSalesOrder - NamedType ReservedItemErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 4215128246 - NamedType 3919762249" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Due Date %1 is before Ending Date %2.]]></Val>
