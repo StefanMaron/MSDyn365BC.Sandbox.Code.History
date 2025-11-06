@@ -1855,6 +1855,11 @@ codeunit 5988 "Serv-Documents Mgt."
     end;
 
     procedure SetNoSeries(var PServHeader: Record "Service Header") Result: Boolean
+    begin
+        exit(SetNoSeries(PServHeader, false));
+    end;
+
+    procedure SetNoSeries(var PServHeader: Record "Service Header"; PreviewMode: Boolean) Result: Boolean
     var
         NoSeries: Codeunit "No. Series";
         ModifyHeader: Boolean;
@@ -1871,7 +1876,10 @@ codeunit 5988 "Serv-Documents Mgt."
                ((ServHeader."Document Type" = ServHeader."Document Type"::Invoice) and ServMgtSetup."Shipment on Invoice")
             then begin
                 ServHeader.TestField(ServHeader."Shipping No. Series");
-                ServHeader."Shipping No." := NoSeries.GetNextNo(ServHeader."Shipping No. Series", ServHeader."Posting Date");
+                if PreviewMode then
+                    ServHeader."Shipping No." := '***'
+                else
+                    ServHeader."Shipping No." := NoSeries.GetNextNo(ServHeader."Shipping No. Series", ServHeader."Posting Date");
                 ModifyHeader := true;
             end;
 
@@ -1883,7 +1891,10 @@ codeunit 5988 "Serv-Documents Mgt."
                 ServHeader.TestField(ServHeader."Posting No. Series");
             if (ServHeader."No. Series" <> ServHeader."Posting No. Series") or (ServHeader."Document Type" = ServHeader."Document Type"::Order)
             then begin
-                ServHeader."Posting No." := NoSeries.GetNextNo(ServHeader."Posting No. Series", ServHeader."Posting Date");
+                if PreviewMode then
+                    ServHeader."Posting No." := '***'
+                else
+                    ServHeader."Posting No." := NoSeries.GetNextNo(ServHeader."Posting No. Series", ServHeader."Posting Date");
                 ModifyHeader := true;
             end;
         end;

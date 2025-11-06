@@ -927,6 +927,20 @@ table 110 "Sales Shipment Header"
           ReportDistributionMgt.GetFullDocumentTypeText(Rec), FieldNo("Sell-to Customer No."), FieldNo("No."));
     end;
 
+    procedure SendRecords()
+    var
+        DocumentSendingProfile: Record "Document Sending Profile";
+        DummyReportSelections: Record "Report Selections";
+        ReportDistributionMgt: Codeunit "Report Distribution Management";
+        DocumentTypeTxt: Text[50];
+    begin
+        DocumentTypeTxt := ReportDistributionMgt.GetFullDocumentTypeText(Rec);
+
+        DocumentSendingProfile.SendCustomerRecords(
+          DummyReportSelections.Usage::"S.Shipment".AsInteger(), Rec, DocumentTypeTxt, "Bill-to Customer No.", "No.",
+          FieldNo("Bill-to Customer No."), FieldNo("No."));
+    end;
+
     procedure PrintRecords(ShowRequestForm: Boolean)
     var
         ReportSelection: Record "Report Selections";
@@ -1107,6 +1121,26 @@ table 110 "Sales Shipment Header"
     begin
         LoCRecRef.GetTable(Rec);
         EInvoiceMgt.CancelDocument(LoCRecRef);
+    end;
+
+    procedure PrintToDocumentAttachment(var SalesShipmentHeader: Record "Sales Shipment Header")
+    var
+        ShowNotificationAction: Boolean;
+    begin
+        ShowNotificationAction := SalesShipmentHeader.Count() = 1;
+        if SalesShipmentHeader.FindSet() then
+            repeat
+                DoPrintToDocumentAttachment(SalesShipmentHeader, ShowNotificationAction);
+            until SalesShipmentHeader.Next() = 0;
+    end;
+
+    local procedure DoPrintToDocumentAttachment(SalesShipmentHeader: Record "Sales Shipment Header"; ShowNotificationAction: Boolean)
+    var
+        ReportSelections: Record "Report Selections";
+    begin
+        SalesShipmentHeader.SetRecFilter();
+        ReportSelections.SaveAsDocumentAttachment(
+            ReportSelections.Usage::"S.Shipment".AsInteger(), SalesShipmentHeader, SalesShipmentHeader."No.", SalesShipmentHeader."Bill-to Customer No.", ShowNotificationAction);
     end;
 
     local procedure UpdateSellToCustomerId()
