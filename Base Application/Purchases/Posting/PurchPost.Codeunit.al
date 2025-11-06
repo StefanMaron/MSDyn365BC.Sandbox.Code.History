@@ -283,12 +283,13 @@ codeunit 90 "Purch.-Post"
 #pragma warning restore AA0470
         InvoiceNoMsg: Label '%1 %2 -> Invoice %3', Comment = '%1 = Document Type, %2 = Document No, %3 = Invoice No.';
         CreditMemoNoMsg: Label '%1 %2 -> Credit Memo %3', Comment = '%1 = Document Type, %2 = Document No, %3 = Credit Memo No.';
-        CannotInvoiceBeforeAssocSalesOrderErr: Label 'You cannot invoice this purchase order before the associated sales orders have been invoiced. Please invoice sales order %1 before invoicing this purchase order.', Comment = '%1 = Document No.';
         ReceiptSameSignErr: Label 'must have the same sign as the receipt';
         ReceiptLinesDeletedErr: Label 'Receipt lines have been deleted.';
         PurchaseAlreadyExistsErr: Label 'Purchase %1 %2 already exists for this vendor.', Comment = '%1 = Document Type, %2 = Document No.';
         InvoiceMoreThanReceivedErr: Label 'You cannot invoice order %1 for more than you have received.', Comment = '%1 = Order No.';
+#if not CLEAN28
         CannotPostBeforeAssosSalesOrderErr: Label 'You cannot post this purchase order before the associated sales orders have been invoiced. Post sales order %1 before posting this purchase order.', Comment = '%1 = Sales Order No.';
+#endif
         ExtDocNoNeededErr: Label 'You need to enter the document number of the document from the vendor in the %1 field, so that this document stays linked to the original.', Comment = '%1 = Field caption of e.g. Vendor Invoice No.';
         VATAmountTxt: Label 'VAT Amount';
         VATRateTxt: Label '%1% VAT', Comment = '%1 = VAT Rate';
@@ -7606,17 +7607,6 @@ codeunit 90 "Purch.-Post"
                         PurchLine."Qty. to Invoice" := PurchLine."Quantity Received" - PurchLine."Quantity Invoiced";
                         PurchLine."Qty. to Invoice (Base)" := PurchLine."Qty. Received (Base)" - PurchLine."Qty. Invoiced (Base)";
                     end;
-                    IsHandled := false;
-                    OnCheckAssocOrderLinesOnBeforeCheckOrderLine(PurchHeader, PurchLine, IsHandled, SalesOrderLine, TempSalesLine);
-                    if not IsHandled then
-                        if Abs(PurchLine.Quantity - (PurchLine."Qty. to Invoice" + PurchLine."Quantity Invoiced")) <
-                           Abs(SalesOrderLine.Quantity - SalesOrderLine."Quantity Invoiced")
-                        then
-                            Error(
-                                ErrorInfo.Create(
-                                    StrSubstNo(CannotInvoiceBeforeAssocSalesOrderErr, PurchLine."Sales Order No."),
-                                    true,
-                                    PurchHeader));
                 end;
 
                 TempSalesHeader."Document Type" := TempSalesHeader."Document Type"::Order;
@@ -8355,8 +8345,6 @@ codeunit 90 "Purch.-Post"
                     if Abs(PurchOrderLine."Quantity Invoiced") > Abs(PurchOrderLine."Quantity Received") then
                         Error(InvoiceMoreThanReceivedErr, PurchOrderLine."Document No.");
                 end;
-                if PurchOrderLine."Sales Order Line No." <> 0 then
-                    CheckAssociatedSalesOrderLine(PurchOrderLine);
                 OnPostUpdateInvoiceLineOnBeforeInitQtyToInvoice(PurchOrderLine, TempPurchLine);
                 PurchOrderLine.InitQtyToInvoice();
                 if PurchOrderLine."Prepayment %" <> 0 then begin
@@ -8711,6 +8699,7 @@ codeunit 90 "Purch.-Post"
         CopyAndCheckItemCharge(PurchaseHeader);
     end;
 
+#if not CLEAN28
     /// <summary>
     /// Checks if Sales Order line associated with the purchase line does not exeed quantity on the purhcase line. Error is raised if the quantity is exeeded
     /// </summary>
@@ -8718,6 +8707,7 @@ codeunit 90 "Purch.-Post"
     /// Sales Order line must exist otherwise an error is raised
     /// </remarks>
     /// <param name="PurchaseLine">The purchase line of the document that is being posted.</param>
+    [Obsolete('This procedure is no longer used.', '28.0')]
     procedure CheckAssociatedSalesOrderLine(PurchaseLine: Record "Purchase Line")
     var
         SalesLine: Record "Sales Line";
@@ -8732,6 +8722,7 @@ codeunit 90 "Purch.-Post"
         if Abs(PurchaseLine.Quantity - PurchaseLine."Quantity Invoiced") < Abs(SalesLine.Quantity - SalesLine."Quantity Invoiced") then
             Error(CannotPostBeforeAssosSalesOrderErr, PurchaseLine."Sales Order No.");
     end;
+#endif
 
     local procedure PurchRcptLineInsert(var PurchRcptLine: Record "Purch. Rcpt. Line"; PurchRcptHeader: Record "Purch. Rcpt. Header"; PurchLine: Record "Purchase Line")
     var
@@ -10228,10 +10219,13 @@ codeunit 90 "Purch.-Post"
     begin
     end;
 
+#if not CLEAN28
+    [Obsolete('This event is no longer used.', '28.0')]
     [IntegrationEvent(false, false)]
     local procedure OnCheckAssocOrderLinesOnBeforeCheckOrderLine(PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; SalesOrderLine: Record "Sales Line"; var TempSalesLine: Record "Sales Line" temporary)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckExternalDocumentNumberOnAfterSetFilters(var VendLedgEntry: Record "Vendor Ledger Entry"; PurchaseHeader: Record "Purchase Header")
@@ -10885,10 +10879,13 @@ codeunit 90 "Purch.-Post"
     begin
     end;
 
+#if not CLEAN28
+    [Obsolete('This event is no longer used.', '28.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckAssociatedSalesOrderLine(PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckAssociatedOrderLines(var PurchHeader: Record "Purchase Header")
