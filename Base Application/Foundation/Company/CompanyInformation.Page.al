@@ -541,6 +541,16 @@ page 1 "Company Information"
                         ApplicationAreaMgmtFacade.LookupExperienceTier(Experience);
                     end;
                 }
+                field("Pricing Implementation"; Rec."Pricing Implementation")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Pricing Implementation';
+                    ToolTip = 'Specifies which pricing implementation to use for price calculations, Basic or Extended. The setting applies to all users.';
+
+                    trigger OnValidate()
+                    begin
+                    end;
+                }
             }
         }
         area(factboxes)

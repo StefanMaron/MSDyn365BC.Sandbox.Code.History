@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -12,6 +12,7 @@ using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Enums;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
+using Microsoft.Pricing.Calculation;
 using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
@@ -357,6 +358,21 @@ table 79 "Company Information"
         {
             Caption = 'Ship-to Phone No.';
             ExtendedDatatype = PhoneNo;
+        }
+        field(60; "Pricing Implementation"; Enum "Pricing Implementation")
+        {
+            Caption = 'Pricing Implementation';
+
+            trigger OnValidate()
+            var
+                FeaturePriceCalculation: Codeunit "Feature - Price Calculation";
+            begin
+                if "Pricing Implementation" = xRec."Pricing Implementation" then
+                    exit;
+
+                if "Pricing Implementation" = "Pricing Implementation"::"Extended Pricing" then
+                    FeaturePriceCalculation.CopyBasicPricingData("Pricing Implementation", true);
+            end;
         }
         field(90; GLN; Code[13])
         {
