@@ -132,8 +132,14 @@ codeunit 5980 "Service-Post"
                 Window.Update(1, StrSubstNo('%1 %2', ServiceHeader."Document Type", ServiceHeader."No."));
             end;
 
-            if ServDocumentsMgt.SetNoSeries(ServiceHeader) then
+            if ServDocumentsMgt.SetNoSeries(ServiceHeader, PreviewMode) then begin
                 ServiceHeader.Modify();
+                if not SuppressCommit and not PreviewMode then
+                    Commit();
+            end;
+
+            if PreviewMode then
+                ServiceHeader.Consistent(false); // Safety net to prevent commits
 
             ServDocumentsMgt.CalcInvDiscount();
             ServiceHeader.Find();

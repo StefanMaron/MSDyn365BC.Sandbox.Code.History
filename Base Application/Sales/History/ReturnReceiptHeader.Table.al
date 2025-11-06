@@ -758,6 +758,40 @@ table 6660 "Return Receipt Header"
         HyperLink(ShippingAgent.GetTrackingInternetAddr("Package Tracking No."));
     end;
 
+    procedure SendRecords()
+    var
+        DocumentSendingProfile: Record "Document Sending Profile";
+        DummyReportSelections: Record "Report Selections";
+        ReportDistributionMgt: Codeunit "Report Distribution Management";
+        DocumentTypeTxt: Text[50];
+    begin
+        DocumentTypeTxt := ReportDistributionMgt.GetFullDocumentTypeText(Rec);
+
+        DocumentSendingProfile.SendCustomerRecords(
+          DummyReportSelections.Usage::"S.Ret.Rcpt.".AsInteger(), Rec, DocumentTypeTxt, "Bill-to Customer No.", "No.",
+          FieldNo("Bill-to Customer No."), FieldNo("No."));
+    end;
+
+    procedure PrintToDocumentAttachment(var ReturnReceiptHeader: Record "Return Receipt Header")
+    var
+        ShowNotificationAction: Boolean;
+    begin
+        ShowNotificationAction := ReturnReceiptHeader.Count() = 1;
+        if ReturnReceiptHeader.FindSet() then
+            repeat
+                DoPrintToDocumentAttachment(ReturnReceiptHeader, ShowNotificationAction);
+            until ReturnReceiptHeader.Next() = 0;
+    end;
+
+    local procedure DoPrintToDocumentAttachment(ReturnReceiptHeader: Record "Return Receipt Header"; ShowNotificationAction: Boolean)
+    var
+        ReportSelections: Record "Report Selections";
+    begin
+        ReturnReceiptHeader.SetRecFilter();
+        ReportSelections.SaveAsDocumentAttachment(
+            ReportSelections.Usage::"S.Ret.Rcpt.".AsInteger(), ReturnReceiptHeader, ReturnReceiptHeader."No.", ReturnReceiptHeader."Bill-to Customer No.", ShowNotificationAction);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforePrintRecords(var ReturnRcptHeader: Record "Return Receipt Header"; ShowDialog: Boolean; var IsHandled: Boolean)
     begin
