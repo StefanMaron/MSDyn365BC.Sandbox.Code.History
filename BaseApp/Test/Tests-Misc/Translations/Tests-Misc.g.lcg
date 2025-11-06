@@ -4289,6 +4289,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit DocumentSendingPostTests - NamedType IT_ReportNoServiceCrMemoHdrTxt)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3063528946 - NamedType 2720269126" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[No_SalesShipHdr]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit DocumentSendingPostTests - NamedType IT_ReportNo_SalesShptHeaderTxt)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3063528946 - NamedType 949379401" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[No_ServCrMemoHdr]]></Val>
@@ -4377,6 +4386,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit DocumentSendingPostTests - NamedType ReportNoServiceInvHdrTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3063528946 - NamedType 882291396" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[No_ReturnRcptHeader]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit DocumentSendingPostTests - NamedType ReportNo_ReturnRcptHeaderTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3063528946 - NamedType 2705699996" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[No_SalesShptHeader]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit DocumentSendingPostTests - NamedType ReportNo_SalesShptHeaderTxt)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3063528946 - NamedType 840094085" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -5522,6 +5549,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Report Selections Tests - NamedType DocumentNoTok)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 4238987348 - NamedType 1842497574" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[docx]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Report Selections Tests - NamedType DocxLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 4238987348 - NamedType 2049079553" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Destination email address does not match expected address.]]></Val>
@@ -5538,6 +5574,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Report Selections Tests - NamedType LayoutCodeShouldNotChangedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4238987348 - NamedType 1921119112" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[MS-X%1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Random Value]D;]A;(LookupHint=Codeunit Report Selections Tests - NamedType MSXLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4238987348 - NamedType 3984601750" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You must select an email body or attachment in report selection for %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Usage, for example Sales Invoice]D;]A;(LookupHint=Codeunit Report Selections Tests - NamedType MustSelectAndEmailBodyOrAttahmentErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 4238987348 - NamedType 2968334780" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
