@@ -3848,6 +3848,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Incoming Documents - NamedType DoYouWantToRemoveReferenceQst)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3882817668 - NamedType 1461464388" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[ The email was not sent to the customer.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Incoming Documents - NamedType EmailNotSentErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3882817668 - NamedType 2256087571" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Link to related record is empty.]]></Val>
@@ -3864,6 +3873,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Incoming Documents - NamedType MainAttachErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3882817668 - NamedType 4278166234" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The email has no attachments.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Incoming Documents - NamedType NoAttachmentsErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3882817668 - NamedType 3550125399" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The number of attachments must be the same.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Incoming Documents - NamedType NoOfAttachmentsSameErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3882817668 - NamedType 538095048" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
