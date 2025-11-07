@@ -621,11 +621,15 @@ table 7321 "Warehouse Shipment Line"
 
     local procedure GetLocation(LocationCode: Code[10])
     begin
+        OnBeforeGetLocation(Location, LocationCode);
+
         if LocationCode = '' then
             Location.GetLocationSetup(LocationCode, Location)
         else
             if Location.Code <> LocationCode then
                 Location.Get(LocationCode);
+
+        OnAfterGetLocation(Location, LocationCode);
     end;
 
     local procedure TestReleased()
@@ -1409,6 +1413,16 @@ table 7321 "Warehouse Shipment Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInitQtyToShip(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; CurrentFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetLocation(var Location: Record Location; var LocationCode: Code[10])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetLocation(var Location: Record Location; var LocationCode: Code[10])
     begin
     end;
 }
