@@ -3007,11 +3007,14 @@ codeunit 134984 "ERM Sales Report III"
         DocumentNo: Code[20];
         PeriodLength: DateFormula;
     begin
+
         //[SCENARIO 599304] Aged Accounts Receivable/Payable reports do not show credit memo when using option Aging By = Posting Date
         Initialize();
+
         // [GIVEN] Create Customer
         LibrarySales.CreateCustomer(Customer);
         LibraryInventory.CreateItem(Item);
+
         // [GIVEN] Create and Post Sales Invoice
         LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.");
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", 1);
@@ -3020,6 +3023,7 @@ codeunit 134984 "ERM Sales Report III"
         SalesLine.Validate("Unit Price", 1000); //Use a value that is easy to verify in the report
         SalesLine.Modify(true);
         LibrarySales.PostSalesDocument(SalesHeader, true, false);
+
         // [GIVEN] Create and Post Sales Credit Memo
         LibrarySales.CreateSalesHeader(SalesCrMemo, SalesCrMemo."Document Type"::"Credit Memo", Customer."No.");
         LibrarySales.CreateSalesLine(SalesLine, SalesCrMemo, SalesLine.Type::Item, Item."No.", 1);
@@ -3028,15 +3032,18 @@ codeunit 134984 "ERM Sales Report III"
         SalesLine.Validate("Unit Price", 1000); //Use a value that is easy to verify in the report
         SalesLine.Modify(true);
         DocumentNo := LibrarySales.PostSalesDocument(SalesCrMemo, true, false);
+
         // [WHEN] Apply Entries from Credit Memo to Invoice
         LibraryERM.FindCustomerLedgerEntry(CustledEntry, CustledEntry."Document Type"::"Credit Memo", DocumentNo);
         ApplyCustLedgerEntry(CustledEntry."Document Type"::"Credit Memo", Customer."No.");
+
         // [WHEN] Run Aged Accounts Receivable Report
         Evaluate(PeriodLength, '<1M>');
         Customer.SetRecFilter();
         Commit();
         SaveAgedAccountsReceivable(
             Customer, AgingBy::"Posting Date", HeadingType::"Date Interval", PeriodLength, true, true);
+
         //[THEN] Check These  Entries should be there.
         LibraryReportDataset.AssertElementWithValueNotExist('CLEPostingDate', WorkDate());
     end;
@@ -3978,6 +3985,7 @@ codeunit 134984 "ERM Sales Report III"
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
         GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."LCY Code" := '';        // to avoid error on updating LCY Code
         GeneralLedgerSetup.Validate("LCY Code", CurrencyCode);
         GeneralLedgerSetup.Modify(true);
     end;
