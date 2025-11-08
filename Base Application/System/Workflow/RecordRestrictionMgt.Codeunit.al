@@ -192,6 +192,12 @@ codeunit 1550 "Record Restriction Mgt."
             until GenJournalLine.Next() = 0;
     end;
 
+    local procedure CheckGenJournalLineHasUsageRestrictions(GenJournalLine: Record "Gen. Journal Line"; GenJournalBatch: Record "Gen. Journal Batch")
+    begin
+        CheckRecordHasUsageRestrictions(GenJournalBatch);
+        CheckRecordHasUsageRestrictions(GenJournalLine);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Requisition Line", 'OnAfterInsertEvent', '', false, false)]
     procedure RestrictRequisitionLineAfterInsert(var Rec: Record "Requisition Line"; RunTrigger: Boolean)
     begin
@@ -468,6 +474,25 @@ codeunit 1550 "Record Restriction Mgt."
         CheckGenJournalBatchHasUsageRestrictions(Sender);
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Gen. Journal Line", 'OnCheckGenJournalLineExportRestrictions', '', false, false)]
+    local procedure GenJournalLineCheckLineExportRestrictions(var Sender: Record "Gen. Journal Line")
+    var
+        GenJournalBatch: Record "Gen. Journal Batch";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeGenJournalLineCheckLineExportRestrictions(Sender, IsHandled);
+        if IsHandled then
+            exit;
+
+        GenJournalBatch.SetLoadFields("Allow Payment Export");
+        if GenJournalBatch.Get(Sender."Journal Template Name", Sender."Journal Batch Name") then
+            if not GenJournalBatch."Allow Payment Export" then
+                exit;
+
+        CheckGenJournalLineHasUsageRestrictions(Sender, GenJournalBatch);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnCheckSalesPostRestrictions', '', false, false)]
     procedure SalesHeaderCheckSalesPostRestrictions(var Sender: Record "Sales Header")
     var
@@ -708,6 +733,11 @@ codeunit 1550 "Record Restriction Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGenJournalBatchCheckGenJournalLineExportRestrictions(var GenJournalBatch: Record "Gen. Journal Batch"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGenJournalLineCheckLineExportRestrictions(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
 
