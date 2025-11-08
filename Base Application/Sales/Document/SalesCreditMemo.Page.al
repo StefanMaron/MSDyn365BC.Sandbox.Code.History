@@ -1137,6 +1137,8 @@ page 44 "Sales Credit Memo"
                     trigger OnAction()
                     begin
                         Rec.GetPstdDocLinesToReverse();
+                        CurrPage.SalesLines.Page.ForceTotalsCalculation();
+                        CurrPage.Update();
                     end;
                 }
                 action(CalculateInvoiceDiscount)
