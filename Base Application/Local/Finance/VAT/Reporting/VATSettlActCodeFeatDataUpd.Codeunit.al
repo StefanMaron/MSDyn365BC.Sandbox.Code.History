@@ -131,7 +131,7 @@ codeunit 12136 "VATSettl ActCode FeatDataUpd" implements "Feature Data Update"
                         PeriodicSettlVATEntry."Omit VAT Payable Interest" := PeriodicSettlementVATEntry."Omit VAT Payable Interest";
                         PeriodicSettlVATEntry."Credit VAT Compensation" := PeriodicSettlementVATEntry."Credit VAT Compensation";
                         PeriodicSettlVATEntry."Special Credit" := PeriodicSettlementVATEntry."Special Credit";
-                        OnAfterTransferfieldsToPeriodicSettlVATEntry(PeriodicSettlementVATEntry, PeriodicSettlVATEntry);
+                        OnAfterTransferfieldsToPeriodicSettlVATEntry(Company.Name, PeriodicSettlementVATEntry, PeriodicSettlVATEntry);
                         PeriodicSettlVATEntry.Insert(true);
                     until PeriodicSettlementVATEntry.Next() = 0;
             until Company.Next() = 0;
@@ -153,7 +153,7 @@ codeunit 12136 "VATSettl ActCode FeatDataUpd" implements "Feature Data Update"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterTransferfieldsToPeriodicSettlVATEntry(PeriodicSettlementVATEntry: Record "Periodic Settlement VAT Entry"; var PeriodicSettlVATEntry: Record "Periodic VAT Settlement Entry")
+    local procedure OnAfterTransferfieldsToPeriodicSettlVATEntry(CalledFromCompanyName: Text[30]; PeriodicSettlementVATEntry: Record "Periodic Settlement VAT Entry"; var PeriodicSettlVATEntry: Record "Periodic VAT Settlement Entry")
     begin
     end;
 }
