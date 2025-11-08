@@ -6833,6 +6833,10 @@ table 81 "Gen. Journal Line"
     begin
     end;
 
+    [IntegrationEvent(true, false)]
+    procedure OnCheckGenJournalLineExportRestrictions()
+    begin
+    end;
 
     procedure NeedCheckZeroAmount(): Boolean
     begin
