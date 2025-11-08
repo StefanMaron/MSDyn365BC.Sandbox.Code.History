@@ -887,6 +887,15 @@
       <Cmt Name="Dev"><![CDATA[%1 - Validating Field Caption, %2 - Validating Table Caption, %3 - Validating Value, %4 - Related Table Caption]D;]A;(Namespace=Microsoft.Service.Test)(LookupHint=Codeunit Service Item Blocked - NamedType InvalidTableRelationErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2796130277 - NamedType 2969328907" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Description must be same.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Service.Test)(LookupHint=Codeunit Service Item Reference - NamedType DescriptionMustBeSameErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2796130277 - NamedType 1976599132" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Dialog]]></Val>
