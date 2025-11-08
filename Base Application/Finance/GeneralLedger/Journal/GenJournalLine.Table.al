@@ -5699,7 +5699,13 @@ table 81 "Gen. Journal Line"
         Currency: Record Currency;
         CurrExchRate: Record "Currency Exchange Rate";
         CurrencyFactor: Decimal;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeConvertAmtFCYToLCYForSourceCurrency(Rec, Amount, IsHandled);
+        if IsHandled then
+            exit(Amount);
+
         if (Amount = 0) or ("Source Currency Code" = '') then
             exit(Amount);
 
@@ -8119,7 +8125,13 @@ table 81 "Gen. Journal Line"
         Employee: Record Employee;
         BankAccount: Record "Bank Account";
         ICPartner: Record "IC Partner";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetAccCurrencyCode(Rec, CurrencyCode, IsHandled);
+        if IsHandled then
+            exit(CurrencyCode);
+
         if ("Account No." = '') or ("Currency Code" = '') then
             exit;
 
@@ -12413,6 +12425,16 @@ table 81 "Gen. Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateLineBalanceOnBeforeUpdateAmounts(var GenJnlLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeConvertAmtFCYToLCYForSourceCurrency(var Rec: Record "Gen. Journal Line"; var Amount: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetAccCurrencyCode(var GenJnlLine: Record "Gen. Journal Line"; var CurrencyCode: Code[10]; var IsHandled: Boolean)
     begin
     end;
 }
