@@ -69,9 +69,15 @@ codeunit 104153 "UPG Per. VAT Settl. Entry IT"
         DataTransfer.AddFieldValue(PeriodicSettlementVATEntry.FieldNo("Credit VAT Compensation"), PeriodicSettlVATEntry.FieldNo("Credit VAT Compensation"));
         DataTransfer.AddFieldValue(PeriodicSettlementVATEntry.FieldNo("Special Credit"), PeriodicSettlVATEntry.FieldNo("Special Credit"));
 
+        OnUpgradePeriodicVATSettlementEntryOnBeforeCopyRows(PeriodicSettlementVATEntry, PeriodicSettlVATEntry, DataTransfer);
         DataTransfer.CopyRows();
 
         UpgradeTag.SetUpgradeTag(UpgradeTags.GetPeriodicVATSettlementEntryUpgradeTag());
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpgradePeriodicVATSettlementEntryOnBeforeCopyRows(var PeriodicSettlementVATEntry: Record "Periodic Settlement VAT Entry"; var PeriodicSettlVATEntry: Record "Periodic VAT Settlement Entry"; var DataTransfer: DataTransfer)
+    begin
     end;
 }
 #endif
