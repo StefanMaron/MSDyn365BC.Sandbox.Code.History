@@ -313,6 +313,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         Window.Open(AdjustingVATEntriesTxt + VATEntryProgressBarTxt);
 
         VATEntryNoTotal := VATEntry.Count();
+        if VATEntryNoTotal = 0 then
+            exit;
         SetVATEntryFilters(VATEntry, ExchRateAdjmtParameters."Start Date", ExchRateAdjmtParameters."End Date");
         if VATPostingSetup.FindSet() then
             repeat
