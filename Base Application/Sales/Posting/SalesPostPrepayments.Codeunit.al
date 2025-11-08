@@ -1336,6 +1336,7 @@ codeunit 442 "Sales-Post Prepayments"
                 SalesHeader."Posting Date", SalesHeader."Document Date", SalesHeader."VAT Reporting Date", PostingDescription,
                 SalesHeader."Shortcut Dimension 1 Code", SalesHeader."Shortcut Dimension 2 Code",
                 SalesHeader."Dimension Set ID", SalesHeader."Reason Code");
+            GenJnlLine.Validate("Your Reference", SalesHeader."Your Reference");
 
             GenJnlLine.CopyDocumentFields(DocType, DocNo, ExtDocNo, SrcCode, PostingNoSeriesCode);
 
