@@ -30,12 +30,12 @@ using Microsoft.Finance.Dimension;
 codeunit 7233 "Master Data Management"
 {
     SingleInstance = true;
-    Permissions = tabledata "Master Data Mgt. Coupling" = rimd,
+    Permissions = tabledata "Master Data Mgt. Coupling" = rmd,
                   tabledata "Integration Field Mapping" = ri,
-                  tabledata "Integration Table Mapping" = rimd,
+                  tabledata "Integration Table Mapping" = rim,
                   tabledata "Integration Synch. Job" = r,
-                  tabledata "Job Queue Entry" = rimd,
-                  tabledata "Master Data Management Setup" = rimd;
+                  tabledata "Job Queue Entry" = rm,
+                  tabledata "Master Data Management Setup" = r;
 
     var
         CachedDoesJobActOnTable: Dictionary of [Text, Boolean];
