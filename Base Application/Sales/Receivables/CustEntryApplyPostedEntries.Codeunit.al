@@ -416,6 +416,8 @@ codeunit 226 "CustEntry-Apply Posted Entries"
         if PreviewMode then
             GenJnlPostPreview.ThrowError();
 
+        OnPostUnApplyCustomerCommitOnAfterPreviewMode(CustLedgEntry);
+
         if CommitChanges then
             Commit();
         if not HideProgressWindow then
@@ -843,6 +845,11 @@ codeunit 226 "CustEntry-Apply Posted Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostUnApplyCustomerCommitOnBeforeFilterDtldCustLedgEntry(DetailedCustLedgEntry2: Record "Detailed Cust. Ledg. Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostUnApplyCustomerCommitOnAfterPreviewMode(CustLedgerEntry: Record "Cust. Ledger Entry");
     begin
     end;
 }
