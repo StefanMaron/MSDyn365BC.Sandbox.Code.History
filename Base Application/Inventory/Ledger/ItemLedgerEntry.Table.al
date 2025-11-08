@@ -642,11 +642,9 @@ table 32 "Item Ledger Entry"
         }
         key(Key22; "Order Type", "Order No.", "Order Line No.", "Prod. Order Comp. Line No.", "Entry Type", "Subcontr. Purch. Order No.", "Location Code", Positive)
         {
-            SumIndexFields = Quantity;
         }
         key(Key23; "Entry Type", "Order Type", "Order No.", "Posting Date", "Source No.")
         {
-            SumIndexFields = Quantity;
         }
         key(Key24; SystemModifiedAt)
 #else
@@ -657,13 +655,6 @@ table 32 "Item Ledger Entry"
         key(Key25; "Entry Type", "Item No.")
         {
         }
-#if not CLEAN27
-        key(Key12183; "Entry Type", "Location Code", "Prod. Order No.", "Prod. Order Line No.", "Prod. Order Comp. Line No.", "Subcontr. Purch. Order No.")
-        {
-            MaintainSQLIndex = false;
-            SumIndexFields = Quantity;
-        }
-#endif
     }
 
     fieldgroups
@@ -952,6 +943,9 @@ table 32 "Item Ledger Entry"
     var
         ValueEntry: Record "Value Entry";
     begin
+        if RemQty = 0 then
+            exit(0);
+
         ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgEntryNo);
         if ValuationDate <> 0D then
             ValueEntry.SetRange("Valuation Date", 0D, ValuationDate);
