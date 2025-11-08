@@ -221,7 +221,6 @@ codeunit 101900 "Create Demonstration Data"
     begin
         if FeatureKey.ID in ['PowerAutomateCopilot',
                              'FullTextSearch',
-                             'SemanticMetadataSearch',
                              'AdvancedTellMe']
         then
             exit(true);
