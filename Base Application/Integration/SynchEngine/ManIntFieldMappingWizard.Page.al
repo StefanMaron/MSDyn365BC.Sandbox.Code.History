@@ -13,6 +13,7 @@ page 5383 "Man. Int. Field Mapping Wizard"
     PageType = ListPart;
     SourceTable = "Man. Int. Field Mapping";
     SourceTableTemporary = true;
+
     layout
     {
         area(Content)
@@ -34,7 +35,6 @@ page 5383 "Man. Int. Field Mapping Wizard"
                         Field.SetRange(TableNo, IntegrationMappingTableId);
                         Rec.GetAllValidFields(Field, false, IntegrationMappingName, IntegrationMappingTableId);
                         if FieldSelection.Open(Field) then begin
-                            Rec.CheckTableRelationForSync(Field);
                             Rec."Table Field No." := Field."No.";
                             Rec."Table Field Caption" := Field."Field Caption";
                         end;
@@ -49,18 +49,23 @@ page 5383 "Man. Int. Field Mapping Wizard"
 
                     trigger OnAssistEdit()
                     var
+                        IntegrationField: Record "Integration Field";
                         Field: Record "Field";
                         LocalField: Record Field;
-                        FieldSelection: Codeunit "Field Selection";
                     begin
-                        Field.SetRange(TableNo, IntegrationMappingIntTableId);
-                        Rec.GetAllValidFields(Field, true, IntegrationMappingName, IntegrationMappingIntTableId);
-                        if FieldSelection.Open(Field) then begin
-                            Rec.CheckTableRelationForSync(Field);
-                            LocalField.Get(IntegrationMappingTableId, Rec."Table Field No.");
-                            Rec.CompareFieldType(LocalField, Field);
-                            Rec."Integration Table Field No." := Field."No.";
-                            Rec."Int. Table Field Caption" := Field."Field Caption";
+                        Rec.GetAllValidIntegrationFields(IntegrationField, IntegrationMappingName, IntegrationMappingIntTableId);
+                        if LookupIntegrationField(IntegrationField) then begin
+                            if not IntegrationField.IsRuntime then begin
+                                Field.Get(IntegrationField."Table No.", IntegrationField."Field No.");
+                                LocalField.Get(IntegrationMappingTableId, Rec."Table Field No.");
+                                Rec.CompareFieldType(LocalField, Field);
+                                Rec."Integration Table Field No." := Field."No.";
+                            end else
+                                // Potential improvement: Handle runtime fields type comparison
+                                // expose altpgen's casting logic to AL
+                                // and use it here to compare types
+                                Rec."Integration Table Field Name" := IntegrationField."Field Name";
+                            Rec."Int. Table Field Caption" := IntegrationField."Field Caption";
                         end;
                     end;
                 }
@@ -107,5 +112,16 @@ page 5383 "Man. Int. Field Mapping Wizard"
                 ManIntFieldMapping.Copy(Rec);
                 ManIntFieldMapping.Insert();
             until Rec.Next() = 0;
+    end;
+
+    procedure LookupIntegrationField(var IntegrationField: Record "Integration Field"): Boolean
+    var
+        IntegrationFieldsLookup: Page "Integration Fields Lookup";
+    begin
+        if Page.RunModal(Page::"Integration Fields Lookup", IntegrationField) = Action::LookupOK then begin
+            IntegrationFieldsLookup.GetSelectedFields(IntegrationField);
+            exit(true);
+        end;
+        exit(false);
     end;
 }

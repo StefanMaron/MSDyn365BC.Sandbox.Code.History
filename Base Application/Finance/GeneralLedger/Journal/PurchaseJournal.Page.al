@@ -307,6 +307,7 @@ page 254 "Purchase Journal"
                             Rec.Validate(Amount, DocumentAmount)
                         else
                             Rec.Validate(Amount, DocumentAmount * -1);
+                        CurrPage.SaveRecord();
                     end;
                 }
                 field(Amount; Rec.Amount)

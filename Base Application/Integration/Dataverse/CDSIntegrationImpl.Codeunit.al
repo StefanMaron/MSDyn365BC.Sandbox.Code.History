@@ -334,6 +334,8 @@ codeunit 7201 "CDS Integration Impl."
         VirtualTableAppNameTxt: Label 'dyn365bc_BusinessCentralConfiguration', Locked = true;
         SyntheticRelationEntityNameTxt: Label 'dyn365bc_syntheticrelation', Locked = true;
         InstallVirtualTablesAppLbl: Label 'Install Virtual Tables App';
+        RetrievingEntityMetadataTxt: Label 'Retrieving entity metadata for table %1.', Locked = true, Comment = '%1 - table external name';
+        RetrievingEntityFieldsTxt: Label 'Retrieving entity fields for table %1.', Locked = true, Comment = '%1 - table external name';
 
     [Scope('OnPrem')]
     procedure GetBaseSolutionUniqueName(): Text
@@ -5286,6 +5288,64 @@ codeunit 7201 "CDS Integration Impl."
             // Deleting all couplings can timeout so disable the keys before deleting
             TableKey.DisableAll(Database::"CRM Integration Record");
             CRMIntegrationRecord.DeleteAll();
+        end;
+    end;
+
+    internal procedure GetEntityMetadata(TableNo: Integer): Text
+    var
+        TableMetadata: Record "Table Metadata";
+        CrmHelper: DotNet CrmHelper;
+    begin
+        if TableNo = 0 then
+            exit('');
+
+        if not TableMetadata.Get(TableNo) then
+            exit('');
+
+        if TableMetadata.ExternalName = '' then
+            exit('');
+
+        if not InitializeConnection(CrmHelper) then
+            exit('');
+
+        Session.LogMessage('0000QL8', StrSubstNo(RetrievingEntityMetadataTxt, TableMetadata.ExternalName), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
+
+        exit(CrmHelper.GetEntityMetadata(TableMetadata.ExternalName));
+    end;
+
+    internal procedure GetEntityFields(TableNo: Integer; var IntegrationField: Record "Integration Field")
+    var
+        Field: Record Field;
+        TableMatadata: Record "Table Metadata";
+        CrmHelper: DotNet CrmHelper;
+        FieldsDictionary: Dotnet GenericDictionary2;
+        Fields: DotNet GenericKeyValuePair2;
+    begin
+        if TableNo = 0 then
+            exit;
+
+        if not TableMatadata.Get(TableNo) then
+            exit;
+
+        if TableMatadata.ExternalName = '' then
+            exit;
+
+        if not InitializeConnection(CrmHelper) then
+            exit;
+
+        Session.LogMessage('0000QL9', StrSubstNo(RetrievingEntityFieldsTxt, TableMatadata.ExternalName), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
+
+        FieldsDictionary := CrmHelper.GetEntityFields(TableMatadata.ExternalName);
+        foreach Fields in FieldsDictionary do begin
+            Field.SetRange(TableNo, TableNo);
+            Field.SetRange(ExternalName, Fields.Key);
+            if not Field.IsEmpty() then
+                continue;
+            IntegrationField."Table No." := TableNo;
+            IntegrationField."Field Name" := Fields.Key;
+            IntegrationField."Field Caption" := Fields.Value;
+            IntegrationField.IsRuntime := true;
+            IntegrationField.Insert();
         end;
     end;
 
