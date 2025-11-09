@@ -6,6 +6,8 @@ namespace Microsoft.Integration.SyncEngine;
 
 using System.Reflection;
 using System.IO;
+using Microsoft.Integration.Dataverse;
+
 table 5384 "Man. Int. Field Mapping"
 {
     DataClassification = SystemMetadata;
@@ -35,6 +37,11 @@ table 5384 "Man. Int. Field Mapping"
         field(40; "Int. Table Field Caption"; Text[80])
         {
             Caption = 'Integration Table Field Caption';
+            DataClassification = SystemMetadata;
+        }
+        field(41; "Integration Table Field Name"; Text[80])
+        {
+            Caption = 'Integration Field Name';
             DataClassification = SystemMetadata;
         }
         field(50; "Direction"; Option)
@@ -77,12 +84,10 @@ table 5384 "Man. Int. Field Mapping"
 
     var
         FieldTypeNotTheSameErr: Label 'The field %1 with type %2 must have the same type as field %3 (%4).', Comment = '%1 - field name, %2 - field type, %3 - field name, %4 - field type';
-        FieldRelationExistsErr: Label 'The field %1 must not have a relationship with another table.', Comment = '%1 = field name';
 
     internal procedure GetAllValidFields(var Field: Record "Field"; IntegrationTable: Boolean; IntegrationMappingName: Code[20]; TableNo: Integer)
     var
         IntegrationFieldMapping: Record "Integration Field Mapping";
-        TableRelationsMetadata: Record "Table Relations Metadata";
         TextBuilder: TextBuilder;
     begin
         Field.SetRange(ObsoleteState, Field.ObsoleteState::No);
@@ -100,16 +105,6 @@ table 5384 "Man. Int. Field Mapping"
                             Field.Type::Integer,
                             Field.Type::Option,
                             Field.Type::Text);
-
-        //Filter out fields that have a relationship        
-        TableRelationsMetadata.SetRange("Table ID", TableNo);
-        if TableRelationsMetadata.FindSet() then
-            repeat
-                if TextBuilder.Length = 0 then
-                    TextBuilder.Append('<>' + Format(TableRelationsMetadata."Field No."))
-                else
-                    TextBuilder.Append('&<>' + Format(TableRelationsMetadata."Field No."));
-            until TableRelationsMetadata.Next() = 0;
 
         //Filder fields that are in field mapping table
         IntegrationFieldMapping.SetRange("Integration Table Mapping Name", IntegrationMappingName);
@@ -147,14 +142,23 @@ table 5384 "Man. Int. Field Mapping"
             Field.SetFilter("No.", TextBuilder.ToText() + '&..1999999999');
     end;
 
-    internal procedure CheckTableRelationForSync(Field: Record Field)
+    internal procedure GetAllValidIntegrationFields(var IntegrationField: Record "Integration Field"; IntegrationMappingName: Code[20]; TableNo: Integer)
     var
-        TableRelationsMetadata: Record "Table Relations Metadata";
+        Field: Record "Field";
+        CDSIntegrationMgt: Codeunit "CDS Integration Mgt.";
     begin
-        TableRelationsMetadata.SetRange("Table ID", Field.TableNo);
-        TableRelationsMetadata.SetRange("Field No.", Field."No.");
-        if not TableRelationsMetadata.IsEmpty() then
-            Error(FieldRelationExistsErr, Field."Field Caption");
+        Field.SetRange(TableNo, TableNo);
+        GetAllValidFields(Field, true, IntegrationMappingName, TableNo);
+        if Field.FindSet() then
+            repeat
+                IntegrationField."Table No." := Field.TableNo;
+                IntegrationField."Field Name" := Field.FieldName;
+                IntegrationField."Field Caption" := Field."Field Caption";
+                IntegrationField."Field No." := Field."No.";
+                IntegrationField.IsRuntime := false;
+                IntegrationField.Insert();
+            until Field.Next() = 0;
+        CDSIntegrationMgt.GetEntityFields(TableNo, IntegrationField);
     end;
 
     internal procedure CompareFieldType(LocalField: Record Field; IntegrationField: Record Field)
