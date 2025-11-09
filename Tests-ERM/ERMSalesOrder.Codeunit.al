@@ -5468,6 +5468,7 @@
         LibrarySales.ReopenSalesDocument(SalesHeader);
 
         // [WHEN] Delete the Sales Line with Type as Charge Item
+        SalesLine1.Find();
         SalesLine1.Delete(true);
 
         // [THEN] No error is thrown
