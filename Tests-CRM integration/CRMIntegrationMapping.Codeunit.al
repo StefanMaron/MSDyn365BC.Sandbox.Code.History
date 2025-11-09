@@ -16,6 +16,7 @@ codeunit 139183 "CRM Integration Mapping"
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryTemplates: Codeunit "Library - Templates";
+        LibraryRandom: Codeunit "Library - Random";
         SyncStartedMsg: Label 'The synchronization has been scheduled.';
         ExpectedRecordNotFoundErr: Label 'Expected record not found.';
         UnexpectedRecordFoundErr: Label 'Unexpected record found.';
@@ -2077,9 +2078,6 @@ codeunit 139183 "CRM Integration Mapping"
         Assert.AreEqual(1, ManIntegrationTableMapping.Count, 'the record set should include 1 record');
     end;
 
-
-
-
     [Test]
     procedure IntegrationTableMappingTestIsEnabledForBidirectionalTableAndField()
     var
@@ -2213,6 +2211,132 @@ codeunit 139183 "CRM Integration Mapping"
         Assert.IsFalse(IntegrationTableMapping.IsFieldMappingEnabled(Customer.FieldNo("No."), CRMAccount.FieldNo(AccountNumber), IntegrationTableMapping.Direction::Bidirectional), 'The mapping should not be enabled');
         Assert.IsFalse(IntegrationTableMapping.IsFieldMappingEnabled(Customer.FieldNo("No."), CRMAccount.FieldNo(AccountNumber), IntegrationTableMapping.Direction::ToIntegrationTable), 'The mapping should not be enabled');
         Assert.IsFalse(IntegrationTableMapping.IsFieldMappingEnabled(Customer.FieldNo("No."), CRMAccount.FieldNo(AccountNumber), IntegrationTableMapping.Direction::FromIntegrationTable), 'The mapping should not be enabled');
+    end;
+
+    [Test]
+    procedure TestGetRuntimeFieldsToCreate()
+    var
+        TempManIntFieldMapping: Record "Man. Int. Field Mapping" temporary;
+        ManIntFieldMapping: Codeunit "Man. Int. Field Mapping";
+        RuntimeFields: List of [Text];
+    begin
+        // [FEATURE] [Manual Integration Field Mapping]
+        // [SCENARIO] Get runtime fields to create
+        Initialize();
+
+        // [GIVEN] Temporary Manual Integration Field Mapping table with both runtime and non-runtime fields
+        CreateManIntFieldMapping(TempManIntFieldMapping, true, 'mockfield1');
+        CreateManIntFieldMapping(TempManIntFieldMapping, false, '');
+
+        // [WHEN] Getting runtime fields
+        ManIntFieldMapping.GetRuntimeFieldsToCreate(TempManIntFieldMapping, RuntimeFields);
+
+        // [THEN] Only runtime fields are returned
+        Assert.AreEqual(1, RuntimeFields.Count(), 'The number of runtime fields is incorrect');
+    end;
+
+    [Test]
+    procedure TestGetRuntimeFieldsToCreateDuplicates()
+    var
+        TempManIntFieldMapping: Record "Man. Int. Field Mapping" temporary;
+        ManIntFieldMapping: Codeunit "Man. Int. Field Mapping";
+        RuntimeFields: List of [Text];
+    begin
+        // [FEATURE] [Manual Integration Field Mapping]
+        // [SCENARIO] Get duplicate runtime fields to create
+        Initialize();
+
+        // [GIVEN] Temporary Manual Integration Field Mapping table with duplicate runtime fields
+        CreateManIntFieldMapping(TempManIntFieldMapping, true, 'mockfield1');
+        CreateManIntFieldMapping(TempManIntFieldMapping, true, 'mockfield1');
+
+        // [WHEN] Getting runtime fields
+        ManIntFieldMapping.GetRuntimeFieldsToCreate(TempManIntFieldMapping, RuntimeFields);
+
+        // [THEN] Only runtime fields are returned
+        Assert.AreEqual(1, RuntimeFields.Count(), 'The number of runtime fields is incorrect');
+    end;
+
+    [Test]
+    procedure TestCreateFieldMappingsForRuntimeFields()
+    var
+        TempManIntFieldMapping: Record "Man. Int. Field Mapping" temporary;
+        IntegrationFieldMapping: Record "Integration Field Mapping";
+        CRMAccount: Record "CRM Account";
+        ManIntFieldMapping: Codeunit "Man. Int. Field Mapping";
+        FailedFields: Boolean;
+        TableFieldNo1: Integer;
+        TableFieldNo2: Integer;
+    begin
+        // [FEATURE] [Manual Integration Field Mapping]
+        // [SCENARIO] Create field mappings for runtime fields
+        Initialize();
+
+        // [GIVEN] Temporary Manual Integration Field Mapping table with runtime fields built
+        TableFieldNo1 := CreateManIntFieldMapping(TempManIntFieldMapping, true, 'address1_city');
+        TableFieldNo2 := CreateManIntFieldMapping(TempManIntFieldMapping, true, 'address1_county');
+
+        // [WHEN] Creating field mappings for runtime fields
+        ManIntFieldMapping.CreateFieldMappingsForRuntimeFields(TempManIntFieldMapping, 'tablemapping1', Database::"CRM Account", true, FailedFields);
+
+        // [THEN] No failed fields
+        Assert.IsFalse(FailedFields, 'There should be no failed fields');
+        // [THEN] Integration field mappings are created
+        IntegrationFieldMapping.SetRange("Integration Table Mapping Name", 'tablemapping1');
+        IntegrationFieldMapping.SetRange("Field No.", TableFieldNo1);
+        Assert.IsTrue(IntegrationFieldMapping.FindFirst(), 'Field mapping for address1_city not found');
+        Assert.AreEqual(IntegrationFieldMapping."Integration Table Field No.", CRMAccount.FieldNo(Address1_City), 'Field mapping for address1_city has incorrect field no.');
+        Assert.AreEqual(IntegrationFieldMapping.Status, IntegrationFieldMapping.Status::Disabled, 'Field mapping for address1_city should be disabled.');
+        IntegrationFieldMapping.SetRange("Field No.", TableFieldNo2);
+        Assert.IsTrue(IntegrationFieldMapping.FindFirst(), 'Field mapping for address1_county not found');
+        Assert.AreEqual(IntegrationFieldMapping."Integration Table Field No.", CRMAccount.FieldNo(Address1_County), 'Field mapping for address1_county has incorrect field no.');
+        Assert.AreEqual(IntegrationFieldMapping.Status, IntegrationFieldMapping.Status::Disabled, 'Field mapping for address1_county should be disabled.');
+    end;
+
+    [Test]
+    procedure TestCreateFieldMappingsForRuntimeFieldsFailed()
+    var
+        TempManIntFieldMapping: Record "Man. Int. Field Mapping" temporary;
+        IntegrationFieldMapping: Record "Integration Field Mapping";
+        CRMAccount: Record "CRM Account";
+        ManIntFieldMapping: Codeunit "Man. Int. Field Mapping";
+        FailedFields: Boolean;
+        TableFieldNo1: Integer;
+        TableFieldNo2: Integer;
+    begin
+        // [FEATURE] [Manual Integration Field Mapping]
+        // [SCENARIO] Create field mappings for runtime fields with failures
+        Initialize();
+
+        // [GIVEN] Temporary Manual Integration Field Mapping table with runtime fields built
+        TableFieldNo1 := CreateManIntFieldMapping(TempManIntFieldMapping, true, 'address1_city');
+        TableFieldNo2 := CreateManIntFieldMapping(TempManIntFieldMapping, true, 'nonexistingfield');
+
+        // [WHEN] Creating field mappings for runtime fields
+        ManIntFieldMapping.CreateFieldMappingsForRuntimeFields(TempManIntFieldMapping, 'tablemapping2', Database::"CRM Account", true, FailedFields);
+
+        // [THEN] Failed fields
+        Assert.IsTrue(FailedFields, 'There should be failed fields');
+        // [THEN] Integration field mapping is not created for non-existing field
+        IntegrationFieldMapping.SetRange("Integration Table Mapping Name", 'tablemapping2');
+        IntegrationFieldMapping.SetRange("Field No.", TableFieldNo2);
+        Assert.RecordIsEmpty(IntegrationFieldMapping);
+        // [THEN] Integration field mapping is created for existing field
+        IntegrationFieldMapping.SetRange("Field No.", TableFieldNo1);
+        Assert.IsTrue(IntegrationFieldMapping.FindFirst(), 'Field mapping for address1_city not found');
+        Assert.AreEqual(IntegrationFieldMapping."Integration Table Field No.", CRMAccount.FieldNo(Address1_City), 'Field mapping for address1_city has incorrect field no.');
+    end;
+
+    local procedure CreateManIntFieldMapping(var TempManIntFieldMapping: Record "Man. Int. Field Mapping" temporary; IsRuntimeField: Boolean; IntegrationTableFieldName: Text[50]): Integer
+    begin
+        TempManIntFieldMapping.Name := '';
+        TempManIntFieldMapping."Table Field No." := LibraryRandom.RandIntInRange(1000000, 2000000);
+        if not IsRuntimeField then
+            TempManIntFieldMapping."Integration Table Field No." := LibraryRandom.RandIntInRange(1000000, 2000000)
+        else
+            TempManIntFieldMapping."Integration Table Field Name" := IntegrationTableFieldName;
+        TempManIntFieldMapping.Insert();
+        exit(TempManIntFieldMapping."Table Field No.");
     end;
 
     local procedure InsertIntegrationTableMapping(TableId: Integer; IntegrationTableId: Integer)
