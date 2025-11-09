@@ -2680,6 +2680,7 @@ codeunit 137400 "SCM Inventory - Orders"
         LibrarySales.ReopenSalesDocument(SalesHeader);
 
         // [WHEN] Delete the first sales line.
+        SalesLine[1].Find();
         SalesLine[1].Delete(true);
 
         // [VERIFY] Verify that it is possible to delete the first sales line.
@@ -2743,6 +2744,7 @@ codeunit 137400 "SCM Inventory - Orders"
         LibraryPurchase.ReopenPurchaseDocument(PurchaseHeader);
 
         // [WHEN] Delete the first Purchase line.
+        PurchaseLine[1].Find();
         PurchaseLine[1].Delete(true);
 
         // [VERIFY] Verify that it is possible to delete the first purchase line.
