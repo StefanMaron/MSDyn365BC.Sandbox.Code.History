@@ -202,8 +202,7 @@ table 1853 "MS - Sales Forecast Setup"
         exit('');
     end;
 #endif
-#pragma warning disable AS0022
-    internal procedure GetAPIKeyAsSecret(): SecretText
+    procedure GetAPIKeyAsSecret(): SecretText
     var
         UserDefinedAPIKey: SecretText;
     begin
@@ -213,7 +212,6 @@ table 1853 "MS - Sales Forecast Setup"
             exit(UserDefinedAPIKey);
         exit(UserDefinedAPIKey);
     end;
-#pragma warning restore AS0022
 
     procedure GetAPIUri(): Text[250]
     begin
