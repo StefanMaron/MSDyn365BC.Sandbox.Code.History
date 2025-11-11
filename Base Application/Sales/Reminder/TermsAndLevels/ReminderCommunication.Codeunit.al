@@ -607,7 +607,7 @@ codeunit 1890 "Reminder Communication"
     begin
         if ReminderText.IsEmpty() then
             exit;
-        DefaultLanguageCode := Language.GetLanguageCode(Language.GetDefaultApplicationLanguageId());
+        DefaultLanguageCode := Language.GetUserLanguageCode();
         ReminderText.FindSet();
         repeat
             Clear(ReminderAttachmentText);
