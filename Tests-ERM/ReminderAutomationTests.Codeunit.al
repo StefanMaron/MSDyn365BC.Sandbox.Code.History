@@ -891,6 +891,85 @@ codeunit 134979 "Reminder Automation Tests"
         LibraryVariableStorage.Clear();
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    [HandlerFunctions('ConfirmHandler,MessageHandler')]
+    procedure ReminderTermTransferTextNewLanguage()
+    var
+        Language: Record Language;
+        ReminderTerms: Record "Reminder Terms";
+        ReminderAttachText: Record "Reminder Attachment Text Line";
+        ReminderLevel: Record "Reminder Level";
+        ReminderTermList: TestPage "Reminder Terms List";
+        LanguageCode: Code[10];
+    begin
+        // [SCENARIO 609485] When using Transfer Texts from the old reminder term text to the new customer communications the used language is not considered
+        Initialize();
+
+        // [GIVEN] Create reminder term with levels
+        CreateReminderTerm(ReminderTerms);
+
+        // [GIVEN] Set Global Language
+        SetLanguageInUserPersonalization(1031);
+        GlobalLanguage(1031);
+        Language.SetRange("Windows Language ID", 1031);
+        if Language.FindFirst() then
+            LanguageCode := Language.Code;
+
+        // [GIVEN] Page Reminder Term Invoke Action Transfer Texts 
+        ReminderTermList.OpenEdit();
+        ReminderTermList.TransferOldTexts.Invoke();
+
+        // [VERIFY] Language on the new Reminder Text is same as Global Language
+        ReminderLevel.SetRange("Reminder Terms Code", ReminderTerms.Code);
+        if ReminderLevel.FindFirst() then begin
+            ReminderAttachText.SetRange(id, ReminderLevel."Reminder Attachment Text");
+            if ReminderAttachText.FindFirst() then
+                assert.AreEqual(ReminderAttachText."Language Code", LanguageCode, 'Not Match');
+        end;
+
+        // Tear Down
+        SetLanguageInUserPersonalization(1033);
+        GlobalLanguage(1033);
+    end;
+
+    local procedure CreateReminderTerm(var ReminderTerms: Record "Reminder Terms")
+    var
+        ReminderLevel: Record "Reminder Level";
+        ReminderText: Record "Reminder Text";
+    begin
+        LibraryERM.CreateReminderTerms(ReminderTerms);
+        LibraryERM.CreateReminderLevel(ReminderLevel, ReminderTerms.Code);
+        ReminderLevel.Validate("Calculate Interest", true);
+        ReminderLevel.Modify(true);
+
+        LibraryERM.CreateReminderText(
+          ReminderText, ReminderTerms.Code, ReminderLevel."No.",
+          ReminderText.Position::Beginning, LibraryUtility.GenerateGUID());
+    end;
+
+    local procedure SetLanguageInUserPersonalization(ID: Integer)
+    var
+        UserPersonalization: Record "User Personalization";
+    begin
+        UserPersonalization.Get(UserSecurityId());
+        UserPersonalization."Language ID" := ID;
+        UserPersonalization.Modify();
+    end;
+
+    [ConfirmHandler]
+    [Scope('OnPrem')]
+    procedure ConfirmHandler(Question: Text[1024]; var Reply: Boolean)
+    begin
+        Reply := true;
+    end;
+
+    [MessageHandler]
+    [Scope('OnPrem')]
+    procedure MessageHandler(Message: Text[1024])
+    begin
+    end;
+
     local procedure CreateReminderAttachmentText(ReminderTerms: Record "Reminder Terms"; LanguageCode: Code[10])
     var
         ReminderLevel: Record "Reminder Level";
@@ -898,7 +977,7 @@ codeunit 134979 "Reminder Automation Tests"
     begin
         ReminderAttachmentText.Id := CreateGuid();
         ReminderAttachmentText."Language Code" := LanguageCode;
-        ReminderAttachmentText."File Name" := CopyStr(LibraryRandom.RandText(20),1,MaxStrLen(ReminderAttachmentText."File Name"));
+        ReminderAttachmentText."File Name" := CopyStr(LibraryRandom.RandText(20), 1, MaxStrLen(ReminderAttachmentText."File Name"));
         ReminderAttachmentText.Insert();
 
         ReminderLevel.SetRange("Reminder Terms Code", ReminderTerms.Code);
