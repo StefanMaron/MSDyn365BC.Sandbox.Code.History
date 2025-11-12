@@ -49,7 +49,7 @@ codeunit 5407 "Prod. Order Status Management"
 
         ChangeStatusForm.Set(Rec);
         if ChangeStatusForm.RunModal() = ACTION::Yes then begin
-            OnRunOnAfterChangeStatusFormRun(Rec);
+            OnRunOnAfterChangeStatusFormRun(Rec, ChangeStatusForm);
             ChangeStatusForm.ReturnPostingInfo(NewStatus, NewPostingDate, NewUpdateUnitCost, FinishOrderWithoutOutput);
             ChangeProdOrderStatus(Rec, NewStatus, NewPostingDate, NewUpdateUnitCost);
             Commit();
@@ -1894,7 +1894,7 @@ codeunit 5407 "Prod. Order Status Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnAfterChangeStatusFormRun(var ProductionOrder: Record "Production Order")
+    local procedure OnRunOnAfterChangeStatusFormRun(var ProductionOrder: Record "Production Order"; var ChangeStatusOnProdOrder: Page "Change Status on Prod. Order")
     begin
     end;
 
