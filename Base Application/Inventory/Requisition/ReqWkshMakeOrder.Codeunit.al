@@ -697,7 +697,7 @@ codeunit 333 "Req. Wksh.-Make Order"
 
         UpdateJobLink(PurchOrderLine, ReqLine2);
 
-        OnInsertPurchOrderLineOnBeforeTransferReqLine(PurchOrderHeader, PurchOrderLine);
+        OnInsertPurchOrderLineOnBeforeTransferReqLine(PurchOrderHeader, PurchOrderLine, ReqLine2);
         ReqLineReserve.TransferReqLineToPurchLine(ReqLine2, PurchOrderLine, ReqLine2."Quantity (Base)", false);
 
         DimensionSetIDArr[1] := PurchOrderLine."Dimension Set ID";
@@ -1775,7 +1775,7 @@ codeunit 333 "Req. Wksh.-Make Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertPurchOrderLineOnBeforeTransferReqLine(var PurchOrderHeader: Record "Purchase Header"; PurchOrderLine: Record "Purchase Line")
+    local procedure OnInsertPurchOrderLineOnBeforeTransferReqLine(var PurchOrderHeader: Record "Purchase Header"; PurchOrderLine: Record "Purchase Line"; var RequisitionLine: Record "Requisition Line")
     begin
     end;
 

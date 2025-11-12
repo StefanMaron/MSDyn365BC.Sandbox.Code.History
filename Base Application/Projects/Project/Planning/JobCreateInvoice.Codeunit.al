@@ -113,6 +113,7 @@ codeunit 1002 "Job Create-Invoice"
                 TempJobTask.DeleteAll();
                 JobPlanningLine2.Copy(JobPlanningLine);
                 JobPlanningLine2.SetCurrentKey("Job No.", "Job Task No.");
+                OnCreateSalesInvoiceOnBeforeFindJobPlanningLines(JobPlanningLine2);
                 if JobPlanningLine2.FindSet() then
                     repeat
                         if not TempJobTask.Get(JobPlanningLine2."Job No.", JobPlanningLine2."Job Task No.") then begin
@@ -1551,6 +1552,11 @@ codeunit 1002 "Job Create-Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateSalesInvoiceLinesOnBeforeJobPlanningLineInvoiceInsert(var JobPlanningLineInvoice: Record "Job Planning Line Invoice")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateSalesInvoiceOnBeforeFindJobPlanningLines(var JobPlanningLine: Record "Job Planning Line")
     begin
     end;
 }
