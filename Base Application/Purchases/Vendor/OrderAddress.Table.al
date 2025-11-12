@@ -235,17 +235,17 @@ table 224 "Order Address"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeLookupCity(var OrderAddress: Record "Order Address"; var PostCodeRec: Record "Post Code");
+    local procedure OnBeforeLookupCity(var OrderAddress: Record "Order Address"; var PostCode: Record "Post Code");
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterValidateCity(var OrderAddress: Record "Order Address"; var PostCodeRec: Record "Post Code");
+    local procedure OnAfterValidateCity(var OrderAddress: Record "Order Address"; var PostCode: Record "Post Code");
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeLookupPostCode(var OrderAddress: Record "Order Address"; var PostCodeRec: Record "Post Code");
+    local procedure OnBeforeLookupPostCode(var OrderAddress: Record "Order Address"; var PostCode: Record "Post Code");
     begin
     end;
 
