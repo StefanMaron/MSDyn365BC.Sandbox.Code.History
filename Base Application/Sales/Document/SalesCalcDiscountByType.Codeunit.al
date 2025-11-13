@@ -205,7 +205,6 @@ codeunit 56 "Sales - Calc Discount By Type"
     var
         SalesLine: Record "Sales Line";
     begin
-        SalesLine.LockTable(); // ModifyAll would previously trigger LockTable if there are subscribers
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.SetRange("Recalculate Invoice Disc.", true);
