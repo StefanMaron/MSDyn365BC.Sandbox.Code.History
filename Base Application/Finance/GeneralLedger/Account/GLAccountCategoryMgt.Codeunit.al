@@ -19,8 +19,10 @@ codeunit 570 "G/L Account Category Mgt."
     var
         BalanceColumnNameTxt: Label 'M-BALANCE', Comment = 'Max 10 char';
         BalanceColumnDescTxt: Label 'Balance', Comment = 'Max 10 char';
+        BalanceColumnInternalDescTxt: Label 'Single-column layout showing balance-at-date using ledger net amounts. Useful for point-in-time balances, financial position, reconciliations, and snapshot reporting of assets, liabilities, or equity.', MaxLength = 250;
         NetChangeColumnNameTxt: Label 'M-NETCHANG', Comment = 'Max 10 char';
         NetChangeColumnDescTxt: Label 'Net Change', Comment = 'Max 10 char';
+        NetChangeColumnInternalDescTxt: Label 'Single-column layout showing period net change from ledger entries (Net Amount). Useful for reporting activity, income statement movements, variance analysis, and tracking transaction-driven account changes.', MaxLength = 250;
         BalanceSheetCodeTxt: Label 'M-BALANCE', Comment = 'Max 10 char';
         BalanceSheetDescTxt: Label 'Balance Sheet', Comment = 'Max 80 chars';
         IncomeStmdCodeTxt: Label 'M-INCOME', Comment = 'Max 10 chars';
@@ -72,7 +74,7 @@ codeunit 570 "G/L Account Category Mgt."
         JobSalesContraTxt: Label 'Job Sales Contra';
         OverwriteConfirmationQst: Label 'How do you want to generate standard financial reports?';
         GenerateAccountSchedulesOptionsTxt: Label 'Keep existing financial reports with their row definitions and create new ones.,Overwrite existing financial reports and row defintions.';
-        GeneratedFromGLAccountCategoriesPageTxt: Label 'Generated from the G/L Account Categories page.';
+        GeneratedFromGLAccountCategoriesPageTxt: Label 'Generated from G/L Account Categories.';
         CreateAccountScheduleForBalanceSheet: Boolean;
         CreateAccountScheduleForIncomeStatement: Boolean;
         CreateAccountScheduleForCashFlowStatement: Boolean;
@@ -281,9 +283,8 @@ codeunit 570 "G/L Account Category Mgt."
         end;
 
         GeneralLedgerSetup.Modify();
-
-        AddColumnLayout(GeneralLedgerSetup."Fin. Rep. Bal. Sheet Column", BalanceColumnDescTxt, true);
-        AddColumnLayout(GeneralLedgerSetup."Fin. Rep. Net Change Column", NetChangeColumnDescTxt, false);
+        AddColumnLayout(GeneralLedgerSetup."Fin. Rep. Bal. Sheet Column", BalanceColumnDescTxt, true, StrSubstNo('%1 %2', GeneratedFromGLAccountCategoriesPageTxt, BalanceColumnInternalDescTxt));
+        AddColumnLayout(GeneralLedgerSetup."Fin. Rep. Net Change Column", NetChangeColumnDescTxt, false, StrSubstNo('%1 %2', GeneratedFromGLAccountCategoriesPageTxt, NetChangeColumnInternalDescTxt));
 
         AddAccountSchedule(GeneralLedgerSetup."Fin. Rep. Bal. Sheet Row", BalanceSheetDescTxt);
         AddAccountSchedule(GeneralLedgerSetup."Fin. Rep. Income Stmt. Row", IncomeStmdDescTxt);
@@ -327,18 +328,17 @@ codeunit 570 "G/L Account Category Mgt."
     local procedure AddAccountSchedule(NewName: Code[10]; NewDescription: Text[80])
     var
         AccScheduleName: Record "Acc. Schedule Name";
-        InternalDescriptionLbl: Label 'Generated from the G/L Account Categories page.', MaxLength = 250;
     begin
         if AccScheduleName.Get(NewName) then
             exit;
         AccScheduleName.Init();
         AccScheduleName.Name := NewName;
         AccScheduleName.Description := NewDescription;
-        AccScheduleName."Internal Description" := InternalDescriptionLbl;
+        AccScheduleName."Internal Description" := GeneratedFromGLAccountCategoriesPageTxt;
         AccScheduleName.Insert();
     end;
 
-    local procedure AddColumnLayout(NewName: Code[10]; NewDescription: Text[80]; IsBalance: Boolean)
+    local procedure AddColumnLayout(NewName: Code[10]; NewDescription: Text[80]; IsBalance: Boolean; NewInternalDescription: Text[250])
     var
         ColumnLayoutName: Record "Column Layout Name";
         ColumnLayout: Record "Column Layout";
@@ -348,7 +348,7 @@ codeunit 570 "G/L Account Category Mgt."
         ColumnLayoutName.Init();
         ColumnLayoutName.Name := NewName;
         ColumnLayoutName.Description := NewDescription;
-        ColumnLayoutName."Internal Description" := GeneratedFromGLAccountCategoriesPageTxt;
+        ColumnLayoutName."Internal Description" := NewInternalDescription;
         ColumnLayoutName.Insert();
 
         ColumnLayout.Init();
