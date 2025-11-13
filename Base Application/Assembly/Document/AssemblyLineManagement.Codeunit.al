@@ -120,7 +120,10 @@ codeunit 905 "Assembly Line Management"
         AssemblyLine.Validate("Unit of Measure Code", BOMComponent."Unit of Measure Code");
         OnAddBOMLineOnAfterValidateUOMCode(AssemblyLine, BOMComponent, AssemblyHeader);
         if AssemblyLine.Type <> AssemblyLine.Type::" " then
-            AssemblyLine."Quantity per" := BOMComponent."Quantity per" * QtyPerUoM;
+            AssemblyLine.Validate(
+                "Quantity per",
+                AssemblyLine.CalcBOMQuantity(
+                BOMComponent.Type, BOMComponent."Quantity per", 1, QtyPerUoM, AssemblyLine."Resource Usage Type"));
         IsHandled := false;
         OnAddBOMLineOnBeforeValidateQuantity(AssemblyHeader, AssemblyLine, BOMComponent, IsHandled, QtyPerUoM);
         if not IsHandled then begin
