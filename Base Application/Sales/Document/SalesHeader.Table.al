@@ -5127,29 +5127,6 @@ table 36 "Sales Header"
             end;
     end;
 
-#if not CLEAN25
-    /// <summary>
-    /// Recreates requisition lines linked to a sales line, either shifting them to a temporary table or
-    /// back based on the provided ToTemp flag, updating the order promising line ID in the process.
-    /// </summary>
-    /// <remarks>
-    /// Temporary requisition line table is defined as a local variable and the caller has no way to pass in / retrieve lines.
-    /// Old requisition lines after recreation are deleted.
-    /// </remarks>
-    /// <param name="OldSalesLine">Sales line that is associated with the requisition lines that need to be recreated.</param>
-    /// <param name="NewSourceRefNo">New order promising line ID that should be assigned to the requisition lines when they are moved back from the temporary table to the main table.</param>
-    /// <param name="ToTemp">
-    /// If true, the procedure moves the requisition lines to a temporary table,
-    /// otherwise it moves the requisition lines back from the temporary table to the main table.
-    /// </param>
-    [Obsolete('Use RecreateReqLine with TempReqLine parameter instead.', '25.0')]
-    procedure RecreateReqLine(OldSalesLine: Record "Sales Line"; NewSourceRefNo: Integer; ToTemp: Boolean)
-    var
-        TempReqLine: Record "Requisition Line" temporary;
-    begin
-        RecreateReqLine(TempReqLine, OldSalesLine, NewSourceRefNo, ToTemp);
-    end;
-#endif
 
     procedure TestPostingDate(BatchPost: Boolean)
     begin
@@ -5932,23 +5909,6 @@ table 36 "Sales Header"
     /// Returns customer global location number. Currently defined to return an empty value.
     /// </summary>
     /// <returns>Empty text.</returns>
-#if not CLEAN25
-    [Obsolete('The procedure is not used and will be obsoleted.', '25.0')]
-    procedure GetCustomerGlobalLocationNumber(): Text
-    begin
-        exit('');
-    end;
-
-    /// <summary>
-    /// Returns customer global location number caption. Currently defined to return an empty value.
-    /// </summary>
-    /// <returns>Empty text.</returns>
-    [Obsolete('The procedure is not used and will be obsoleted.', '25.0')]
-    procedure GetCustomerGlobalLocationNumberLbl(): Text
-    begin
-        exit('');
-    end;
-#endif
 
     /// <summary>
     /// Returns document status field style expression based on the status of the sales header.

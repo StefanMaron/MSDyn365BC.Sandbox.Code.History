@@ -24,9 +24,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Utilities;
-#if not CLEAN25
-using Microsoft.Finance.VAT.Reporting;
-#endif
 
 table 25 "Vendor Ledger Entry"
 {
@@ -649,14 +646,8 @@ table 25 "Vendor Ledger Entry"
         {
             Caption = 'IRS 1099 Code';
             ObsoleteReason = 'Moved to IRS Forms App.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            TableRelation = "IRS 1099 Form-Box";
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
         }
 #endif
 #if not CLEANSCHEMA28
@@ -664,13 +655,8 @@ table 25 "Vendor Ledger Entry"
         {
             Caption = 'IRS 1099 Amount';
             ObsoleteReason = 'Moved to IRS Forms App.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
         }
 #endif
     }
@@ -971,10 +957,6 @@ table 25 "Vendor Ledger Entry"
         "Payment Reference" := GenJnlLine."Payment Reference";
         "Payment Method Code" := GenJnlLine."Payment Method Code";
         "Exported to Payment File" := GenJnlLine."Exported to Payment File";
-#if not CLEAN25
-        "IRS 1099 Code" := GenJnlLine."IRS 1099 Code";
-        "IRS 1099 Amount" := GenJnlLine."IRS 1099 Amount";
-#endif
         if (GenJnlLine."Remit-to Code" <> '') then
             "Remit-to Code" := GenJnlLine."Remit-to Code";
 
@@ -1213,4 +1195,3 @@ table 25 "Vendor Ledger Entry"
     begin
     end;
 }
-

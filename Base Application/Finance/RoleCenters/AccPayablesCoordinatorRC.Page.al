@@ -18,9 +18,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.Task;
 using System.Threading;
-#if not CLEAN25
-using Microsoft.Finance.VAT.Reporting;
-#endif
 using Microsoft.Sales.Customer;
 
 page 9002 "Acc. Payables Coordinator RC"
@@ -159,89 +156,9 @@ page 9002 "Acc. Payables Coordinator RC"
             separator(Action63)
             {
             }
-#if not CLEAN25
-            action("Vendor &Document Nos.")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report "Vendor - Balance to Date";
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The Report Vendor Document Nos. doesn''t exist anymore.';
-                ObsoleteTag = '25.0';
-            }
-            action("Purchase &Invoice Nos.")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report "Purchase - Invoice";
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The related report doesn''t exist anymore';
-                ObsoleteTag = '25.0';
-            }
-            action("Purchase &Credit Memo Nos.")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report "Purchase Credit Memo NA";
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The related report doesn''t exist anymore';
-                ObsoleteTag = '25.0';
-            }
-#endif
             separator(Action29)
             {
             }
-#if not CLEAN25
-            action("Vendor 1099 Div")
-            {
-                Caption = 'Vendor 1099 Div';
-                Image = "Report";
-                RunObject = Report "Vendor 1099 Div";
-                ToolTip = 'View the federal form 1099-DIV for dividends and distribution.';
-                ObsoleteReason = 'Moved to IRS Forms App.';
-                ObsoleteState = Pending;
-                ObsoleteTag = '25.0';
-            }
-            action("Vendor 1099 Information")
-            {
-                Caption = 'Vendor 1099 Information';
-                Image = "Report";
-                RunObject = Report "Vendor 1099 Information";
-                ToolTip = 'View the vendors'' 1099 information. The report includes all 1099 information for the vendors that have been set up using the IRS 1099 Form-Box table. This includes only amounts that have been paid. It does not include amounts billed but not yet paid. You must enter a date filter before you can print this report.';
-                ObsoleteReason = 'Moved to IRS Forms App.';
-                ObsoleteState = Pending;
-                ObsoleteTag = '25.0';
-            }
-            action("Vendor 1099 Int")
-            {
-                Caption = 'Vendor 1099 Int';
-                Image = "Report";
-                RunObject = Report "Vendor 1099 Int";
-                ToolTip = 'View the federal form 1099-INT for interest income.';
-                ObsoleteReason = 'Moved to IRS Forms App.';
-                ObsoleteState = Pending;
-                ObsoleteTag = '25.0';
-            }
-            action("Vendor 1099 Misc")
-            {
-                Caption = 'Vendor 1099 Misc';
-                Image = "Report";
-                RunObject = Report "Vendor 1099 Misc";
-                ToolTip = 'View the federal form 1099-MISC for miscellaneous income.';
-                ObsoleteReason = 'Moved to IRS Forms App.';
-                ObsoleteState = Pending;
-                ObsoleteTag = '25.0';
-            }
-#endif
         }
         area(embedding)
         {
@@ -513,4 +430,3 @@ page 9002 "Acc. Payables Coordinator RC"
         }
     }
 }
-

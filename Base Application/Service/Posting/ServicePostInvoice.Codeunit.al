@@ -294,9 +294,6 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
 
         UpdateEntryDescriptionFromServiceLine(ServiceLine, InvoicePostingBuffer);
 
-#if not CLEAN25
-        InvoicePostingBuffer.RunOnAfterPrepareService(ServiceLine, InvoicePostingBuffer);
-#endif
         ServicePostInvoiceEvents.RunOnAfterPrepareInvoicePostingBuffer(ServiceLine, InvoicePostingBuffer);
     end;
 

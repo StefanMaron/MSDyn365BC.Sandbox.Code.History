@@ -17,9 +17,6 @@ using Microsoft.Foundation.Reporting;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Projects.Resources.Resource;
-#if not CLEAN25
-using Microsoft.RoleCenters;
-#endif
 using Microsoft.Sales.Archive;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
@@ -1008,19 +1005,6 @@ page 41 "Sales Quote"
         }
         area(factboxes)
         {
-#if not CLEAN25
-            part("Attached Documents"; "Document Attachment Factbox")
-            {
-                ObsoleteTag = '25.0';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
-                ApplicationArea = All;
-                Visible = false;
-                SubPageLink = "Table ID" = const(Database::"Sales Header"),
-                              "No." = field("No."),
-                              "Document Type" = field("Document Type");
-            }
-#endif
             part("Attached Documents List"; "Doc. Attachment List Factbox")
             {
                 ApplicationArea = All;
@@ -1733,12 +1717,7 @@ page 41 "Sales Quote"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales Promotion';
                 Image = "Report";
-#if not CLEAN25
-                RunPageView = where("Object Type" = const(Report), "Object ID" = const(10159)); // "Sales Promotion"
-                RunObject = Page "Role Center Page Dispatcher";
-#else
                 RunObject = Report "Sales Promotion V16";
-#endif
                 ToolTip = 'View the sales promotions that you have set up using the prices option on the sales pull-down menu on the item card. This report can show future sales promotions that have been set up but have not yet occurred, as well as sales promotions that have occurred but have not been deleted.';
             }
             action("Customer/Item Statistics")

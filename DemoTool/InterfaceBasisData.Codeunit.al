@@ -292,9 +292,6 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Incoming Document");
         RunCodeunit(CODEUNIT::"Create Text To Account Mapping");
         RunCodeunit(CODEUNIT::"Create MX SAT");
-#if not CLEAN25
-        RunCodeunit(CODEUNIT::"Create IRS 1099 Form Boxes");
-#endif
         RunCodeunit(CODEUNIT::"Create Late Payment Model");
         RunCodeunit(Codeunit::"Create Over-Receipt Code");
         CreateNewTemplates();
@@ -930,4 +927,3 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(Codeunit::"Create New Employee Template");
     end;
 }
-

@@ -3756,13 +3756,8 @@ table 39 "Purchase Line"
         {
             Caption = 'IRS 1099 Liable';
             ObsoleteReason = 'Moved to IRS Forms App.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
         }
 #endif
         field(10025; "GST/HST"; Enum "GST HST Tax Type")
@@ -4024,9 +4019,6 @@ table 39 "Purchase Line"
         if ("Deferral Code" <> '') and (GetDeferralAmount() <> 0) then
             UpdateDeferralAmounts();
         PurchHeader."No." := '';
-#if not CLEAN25
-        "IRS 1099 Liable" := (PurchHeader."IRS 1099 Code" <> '');
-#endif
     end;
 
     trigger OnModify()
@@ -4418,9 +4410,6 @@ table 39 "Purchase Line"
         "Prepayment Tax Area Code" := PurchHeader."Tax Area Code";
         "Prepayment Tax Liable" := PurchHeader."Tax Liable";
         "Responsibility Center" := PurchHeader."Responsibility Center";
-#if not CLEAN25
-        "IRS 1099 Liable" := (PurchHeader."IRS 1099 Code" <> '');
-#endif
         "Requested Receipt Date" := PurchHeader."Requested Receipt Date";
         "Promised Receipt Date" := PurchHeader."Promised Receipt Date";
         "Inbound Whse. Handling Time" := PurchHeader."Inbound Whse. Handling Time";

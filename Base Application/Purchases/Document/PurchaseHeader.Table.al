@@ -63,9 +63,6 @@ using System.Security.User;
 using System.Threading;
 using System.Utilities;
 using Microsoft.Projects.Project.Job;
-#if not CLEAN25
-using Microsoft.Finance.VAT.Reporting;
-#endif
 
 table 38 "Purchase Header"
 {
@@ -287,9 +284,6 @@ table 38 "Purchase Header"
                 "Language Code" := Vend."Language Code";
                 "Format Region" := Vend."Format Region";
                 SetPurchaserCode(Vend."Purchaser Code", "Purchaser Code");
-#if not CLEAN25
-                "IRS 1099 Code" := Vend."IRS 1099 Code";
-#endif
                 Validate("Payment Terms Code");
                 Validate("Prepmt. Payment Terms Code");
                 Validate("Payment Method Code");
@@ -2847,14 +2841,8 @@ table 38 "Purchase Header"
         {
             Caption = 'IRS 1099 Code';
             ObsoleteReason = 'Moved to IRS Forms App.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            TableRelation = "IRS 1099 Form-Box";
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
         }
 #endif
 #if not CLEANSCHEMA28
@@ -2862,13 +2850,8 @@ table 38 "Purchase Header"
         {
             Caption = 'IRS 1099 Amount';
             ObsoleteReason = 'Moved to IRS Forms App.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
             Editable = false;
         }
 #endif

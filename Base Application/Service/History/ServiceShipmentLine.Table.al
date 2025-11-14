@@ -915,9 +915,6 @@ table 5991 "Service Shipment Line"
         ItemJournalLine."Return Reason Code" := Rec."Return Reason Code";
 
         OnAfterCopyToItemJnlLine(ItemJournalLine, Rec);
-#if not CLEAN25
-        ItemJournalLine.RunOnAfterCopyItemJnlLineFromServShptLine(ItemJournalLine, Rec);
-#endif
     end;
 
     procedure CopyToItemJnlLineUndo(var ItemJournalLine: Record "Item Journal Line")
@@ -952,9 +949,6 @@ table 5991 "Service Shipment Line"
         ItemJournalLine."Return Reason Code" := Rec."Return Reason Code";
 
         OnAfterCopyToItemJnlLineUndo(ItemJournalLine, Rec);
-#if not CLEAN25
-        ItemJournalLine.RunOnAfterCopyItemJnlLineFromServShptLineUndo(ItemJournalLine, Rec);
-#endif
     end;
 
     procedure CopyToResJournalLine(var ResJournalLine: Record "Res. Journal Line")
