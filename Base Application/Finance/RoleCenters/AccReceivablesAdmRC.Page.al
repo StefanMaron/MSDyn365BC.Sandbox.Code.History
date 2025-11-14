@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -125,68 +125,6 @@ page 9003 "Acc. Receivables Adm. RC"
             separator(Action20)
             {
             }
-#if not CLEAN25
-            action("Customer &Document Nos.")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report "Customer Register";
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The related report doesn''t exist anymore.';
-                ObsoleteTag = '25.0';
-            }
-            action("Sales &Invoice Nos.")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report "Sales - Shipment";
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The related report doesn''t exist anymore.';
-                ObsoleteTag = '25.0';
-            }
-            action("Sa&les Credit Memo Nos.")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report "Standard Sales - Credit Memo";
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The related report doesn''t exist anymore.';
-                ObsoleteTag = '25.0';
-            }
-            action("Re&minder Nos.")
-            {
-                ApplicationArea = Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report Reminder;
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The related report doesn''t exist anymore.';
-                ObsoleteTag = '25.0';
-            }
-            action("Finance Cha&rge Memo Nos.")
-            {
-                ApplicationArea = Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report "Finance Charge Memo";
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The related report doesn''t exist anymore.';
-                ObsoleteTag = '25.0';
-            }
-#endif
         }
         area(embedding)
         {

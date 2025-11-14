@@ -47,9 +47,6 @@ codeunit 927 "Assembly Header Invt. Profile"
         InventoryProfile."Due Date" := AssemblyHeader."Due Date";
 
         OnAfterTransferInventoryProfileFromAssemblyHeader(InventoryProfile, AssemblyHeader);
-#if not CLEAN25
-        InventoryProfile.RunOnAfterTransferFromAsmHeader(InventoryProfile, AssemblyHeader);
-#endif
     end;
 
     [IntegrationEvent(false, false)]

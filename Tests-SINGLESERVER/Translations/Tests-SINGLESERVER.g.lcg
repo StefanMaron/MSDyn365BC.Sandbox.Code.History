@@ -23,15 +23,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Assembly Mgmt. Plan-based E2E - NamedType MissingPermissionsErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 330807007 - NamedType 4085301460" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[You must choose a company.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Company Consol. Wizard Tests - NamedType EmptyCompanyNameErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 330807007 - NamedType 2330524054" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[G/L Entry %1: The %2 must be %3 for %4 %5 for %6 %7. Currently it's %8.]]></Val>
@@ -48,24 +39,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Company Consol. Wizard Tests - NamedType GLEntryErrTagTok)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 330807007 - NamedType 1665222178" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Enter a Business Unit Code.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Company Consol. Wizard Tests - NamedType SpecifyBusinessUnitCodeTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 330807007 - NamedType 3911743218" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[To continue, you must specify a name for the company.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Company Consol. Wizard Tests - NamedType SpecifyCompanyNameErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 330807007 - NamedType 956639880" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

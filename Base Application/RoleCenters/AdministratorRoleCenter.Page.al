@@ -686,18 +686,6 @@ page 9018 "Administrator Role Center"
                     RunObject = Page "Report Selection - Warehouse";
                     ToolTip = 'View or edit the list of reports that can be printed when you work with warehouse.';
                 }
-#if not CLEAN25
-                action("Report Selection - Intrastat")
-                {
-                    ApplicationArea = BasicEU;
-                    Caption = 'Report Selection - Intrastat';
-                    RunObject = Page "Report Selection - Intrastat";
-                    ToolTip = 'View the list of reports that are used to print Intrastat documents.';
-                    ObsoleteReason = 'Replaced by Intrastat extension';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                }
-#endif
                 action("Report Selection - VAT")
                 {
                     ApplicationArea = VAT;
@@ -846,20 +834,6 @@ page 9018 "Administrator Role Center"
                     RunObject = Page Activity;
                 }
             }
-#if not CLEAN25
-            separator(Action47)
-            {
-                ObsoleteReason = 'Not used';
-                ObsoleteState = Pending;
-                ObsoleteTag = '25.0';
-            }
-            separator(Action263)
-            {
-                ObsoleteReason = 'Not used';
-                ObsoleteState = Pending;
-                ObsoleteTag = '25.0';
-            }
-#endif
             group("&Sales Analysis")
             {
                 Caption = '&Sales Analysis';

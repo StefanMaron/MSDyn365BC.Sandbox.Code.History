@@ -1,8 +1,5 @@
 namespace System.Security.AccessControl;
 
-#if not CLEAN25
-using Microsoft.Foundation.Reporting;
-#endif
 using Microsoft.Finance.AuditFileExport;
 using Microsoft.Purchases.Document;
 using Microsoft.Finance.GeneralLedger.Reports;
@@ -23,9 +20,6 @@ permissionset 1002 "LOCAL READ"
                   tabledata "Data Export Record Type" = R,
                   tabledata "Data Export Setup" = R,
                   tabledata "Data Export Table Relation" = R,
-#if not CLEAN25
-                  tabledata "DACH Report Selections" = R,
-#endif
                   tabledata "Delivery Reminder Comment Line" = R,
                   tabledata "Delivery Reminder Header" = R,
                   tabledata "Delivery Reminder Ledger Entry" = R,

@@ -401,24 +401,6 @@ page 1290 "Payment Reconciliation Journal"
                         {
                             ShowCaption = false;
 
-#if not CLEAN25
-                            group("Number of Lines")
-                            {
-                                Visible = false;
-                                ShowCaption = false;
-                                ObsoleteState = Pending;
-                                ObsoleteReason = 'Rearranging the footer fields.';
-                                ObsoleteTag = '25.0';
-                            }
-                            group(LinesWithDifferenceGroup)
-                            {
-                                Visible = false;
-                                ShowCaption = false;
-                                ObsoleteState = Pending;
-                                ObsoleteReason = 'Rearranging the footer fields.';
-                                ObsoleteTag = '25.0';
-                            }
-#endif
                             field(TotalLines; TotalLinesCount)
                             {
                                 Caption = 'Number of Lines';
@@ -469,24 +451,6 @@ page 1290 "Payment Reconciliation Journal"
                             ShowCaption = false;
                             Editable = false;
 
-#if not CLEAN25
-                            group("Transaction Total")
-                            {
-                                Visible = false;
-                                ShowCaption = false;
-                                ObsoleteState = Pending;
-                                ObsoleteReason = 'Rearranging the footer fields.';
-                                ObsoleteTag = '25.0';
-                            }
-                            group(CreditDebit)
-                            {
-                                Visible = false;
-                                ShowCaption = false;
-                                ObsoleteState = Pending;
-                                ObsoleteReason = 'Rearranging the footer fields.';
-                                ObsoleteTag = '25.0';
-                            }
-#endif
                             field(TotalTransactionAmountFixedLayout; BankAccReconciliation."Total Transaction Amount")
                             {
                                 ApplicationArea = Basic, Suite;
@@ -519,32 +483,6 @@ page 1290 "Payment Reconciliation Journal"
                         group(Balances1)
                         {
                             ShowCaption = false;
-#if not CLEAN25
-                            group(BalanceOnBankAccountGroup)
-                            {
-                                Visible = false;
-                                ShowCaption = false;
-                                ObsoleteState = Pending;
-                                ObsoleteReason = 'Rearranging the footer fields.';
-                                ObsoleteTag = '25.0';
-                            }
-                            group(BalanceOnBankAccountAfterPostingGroup)
-                            {
-                                Visible = false;
-                                ShowCaption = false;
-                                ObsoleteState = Pending;
-                                ObsoleteReason = 'Rearranging the footer fields.';
-                                ObsoleteTag = '25.0';
-                            }
-                            group(StatementEndingBalanceGroup)
-                            {
-                                Visible = false;
-                                ShowCaption = false;
-                                ObsoleteState = Pending;
-                                ObsoleteReason = 'Rearranging the footer fields.';
-                                ObsoleteTag = '25.0';
-                            }
-#endif
                             field(BalanceOnBankAccountFixedLayout; BankAccReconciliation."Total Balance on Bank Account")
                             {
                                 ApplicationArea = Basic, Suite;
@@ -1489,4 +1427,3 @@ page 1290 "Payment Reconciliation Journal"
     begin
     end;
 }
-
