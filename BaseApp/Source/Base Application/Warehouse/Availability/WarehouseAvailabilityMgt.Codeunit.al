@@ -994,9 +994,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         ItemAvailabilityFormsMgt.FilterItem(Item, WhseRcptLine."Location Code", WhseRcptLine."Variant Code", WhseRcptLine."Due Date");
 
         OnBeforeShowItemAvailFromWhseRcptLine(Item, WhseRcptLine, AvailabilityType);
-#if not CLEAN25
-        ItemAvailabilityFormsMgt.RunOnBeforeShowItemAvailFromWhseRcptLine(Item, WhseRcptLine, AvailabilityType);
-#endif
         case AvailabilityType of
             AvailabilityType::Period:
                 ItemAvailabilityFormsMgt.ShowItemAvailabilityByPeriod(Item, WhseRcptLine.FieldCaption(WhseRcptLine."Due Date"), WhseRcptLine."Due Date", NewDate);
@@ -1033,9 +1030,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         ItemAvailabilityFormsMgt.FilterItem(Item, WhseActivLine."Location Code", WhseActivLine."Variant Code", WhseActivLine."Due Date");
 
         OnBeforeShowItemAvailabilityFromWhseActivLine(Item, WhseActivLine, AvailabilityType);
-#if not CLEAN25
-        ItemAvailabilityFormsMgt.RunOnBeforeShowItemAvailFromWhseActivLine(Item, WhseActivLine, AvailabilityType);
-#endif
         case AvailabilityType of
             AvailabilityType::Period:
                 ItemAvailabilityFormsMgt.ShowItemAvailabilityByPeriod(Item, WhseActivLine.FieldCaption(WhseActivLine."Due Date"), WhseActivLine."Due Date", NewDate);
@@ -1105,4 +1099,3 @@ codeunit 7314 "Warehouse Availability Mgt."
     begin
     end;
 }
-

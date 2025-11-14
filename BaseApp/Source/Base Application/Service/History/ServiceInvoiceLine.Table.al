@@ -713,9 +713,6 @@ table 5993 "Service Invoice Line"
         VATAmountLine."VAT Difference" := Rec."VAT Difference";
 
         OnAfterCopyToVATAmountLine(Rec, VATAmountLine);
-#if not CLEAN25
-        VATAmountLine.RunOnAfterCopyFromServInvLine(VATAmountLine, Rec);
-#endif
     end;
 
     procedure RowID1(): Text[250]

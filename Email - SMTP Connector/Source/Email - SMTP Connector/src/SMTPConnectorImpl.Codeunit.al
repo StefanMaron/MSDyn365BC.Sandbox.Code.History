@@ -45,6 +45,9 @@ codeunit 4513 "SMTP Connector Impl." implements "Email Connector"
         CouldNotConnectErr: Label 'Could not connect to the SMTP server.\\%1', Comment = '%1 = the error message returned by the SMTP server.';
         CouldNotAuthenticateErr: Label 'Could not authenticate on the SMTP server.\\%1', Comment = '%1 = the error message returned by the SMTP server.';
         CouldNotSendErr: Label 'Could not send the email.\\%1', Comment = '%1 = the error message returned by the SMTP server.';
+        UrlTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2340938', Locked = true;
+        LearnMoreAboutSMTPBasicAuthObsoletionTxt: Label 'Learn more about Exchange SMTP Basic Authentication obsoletion';
+        SMTPBasicOAuthObsoletionNotificationTxt: Label 'One or more email accounts are still using Exchange SMTP Basic authentication. Please update them to use OAuth 2.0 because Exchange SMTP Basic auth is being deprecated.';
 
     /// <summary>
     /// Gets the registered accounts for the SMTP connector.
@@ -346,6 +349,30 @@ codeunit 4513 "SMTP Connector Impl." implements "Email Connector"
         end;
 
         Error(ErrorWithStatusCodeErr, StrSubstNo(CouldNotSendErr, GetErrorContent(ErrorResponse)), NewLine, ErrorCode);
+    end;
+
+    internal procedure SMTPBasicOAuthIsUsed(): Boolean
+    var
+        SMTPEmailAccount: Record "SMTP Account";
+    begin
+        SMTPEmailAccount.SetRange("Authentication Type", SMTPEmailAccount."Authentication Type"::Basic);
+        SMTPEmailAccount.SetRange(Server, GetO365SmtpServer());
+        exit(not SMTPEmailAccount.IsEmpty());
+    end;
+
+    internal procedure SendSMTPBasicOAuthObsoletionNotification()
+    var
+        Notif: Notification;
+    begin
+        Notif.AddAction(LearnMoreAboutSMTPBasicAuthObsoletionTxt, Codeunit::"SMTP Connector Impl.", 'LearnMoreAboutSMTPBasicAuthObsoletion');
+        Notif.Message(SMTPBasicOAuthObsoletionNotificationTxt);
+        Notif.Scope := NotificationScope::LocalScope;
+        Notif.Send();
+    end;
+
+    internal procedure LearnMoreAboutSMTPBasicAuthObsoletion(Notification: Notification)
+    begin
+        Hyperlink(UrlTxt);
     end;
 
     procedure GetSmtpErrorCodeFromResponse(ErrorResponse: Text): Text

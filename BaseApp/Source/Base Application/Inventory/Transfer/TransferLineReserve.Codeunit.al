@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -927,13 +927,6 @@ codeunit 99000836 "Transfer Line-Reserve"
         EntryDate: Date;
         IsReserved: Boolean;
     begin
-#if not CLEAN25
-        IsReserved := false;
-        sender.RunOnBeforeAutoReserveTransLine(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserve, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-#endif
         IsReserved := false;
         OnBeforeAutoReserveTransLine(
           ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserve, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
@@ -1164,9 +1157,6 @@ codeunit 99000836 "Transfer Line-Reserve"
         end;
 
         OnAfterInitFromTransLine(TrackingSpecification, TransLine, Direction);
-#if not CLEAN25
-        TrackingSpecification.RunOnAfterInitFromTransLine(TrackingSpecification, TransLine, Direction);
-#endif
     end;
 
     [IntegrationEvent(false, false)]
