@@ -676,9 +676,6 @@ table 5995 "Service Cr.Memo Line"
         VATAmountLine."VAT Difference" := Rec."VAT Difference";
 
         OnAfterCopyToVATAmountLine(Rec, VATAmountLine);
-#if not CLEAN25
-        VATAmountLine.RunOnAfterCopyFromServCrMemoLine(VATAmountLine, Rec);
-#endif
     end;
 
     procedure GetCaptionClass(FieldNumber: Integer): Text[80]

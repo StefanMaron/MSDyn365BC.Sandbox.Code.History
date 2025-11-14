@@ -271,18 +271,6 @@ page 27 "Vendor List"
                 ApplicationArea = Basic, Suite;
                 Visible = false;
             }
-#if not CLEAN25
-            part("Attached Documents"; "Document Attachment Factbox")
-            {
-                ObsoleteTag = '25.0';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
-                ApplicationArea = All;
-                Visible = false;
-                Caption = 'Attachments';
-                SubPageLink = "Table ID" = const(Database::Vendor), "No." = field("No.");
-            }
-#endif
             part("Attached Documents List"; "Doc. Attachment List Factbox")
             {
                 ApplicationArea = All;
@@ -1476,4 +1464,3 @@ page 27 "Vendor List"
         CurrPage.SetSelectionFilter(Vendor);
     end;
 }
-

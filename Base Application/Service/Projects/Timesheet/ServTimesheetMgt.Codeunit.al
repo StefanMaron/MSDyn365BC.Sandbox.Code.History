@@ -126,9 +126,6 @@ codeunit 6451 "Serv. Time Sheet Mgt."
     begin
         IsHandled := false;
         OnBeforeCreateTSLineFromServiceLine(ServiceLine, IsHandled);
-#if not CLEAN25
-        TimesheetManagement.RunOnBeforeCreateTSLineFromServiceLine(ServiceLine, IsHandled);
-#endif
         if IsHandled then
             exit;
 
@@ -144,9 +141,6 @@ codeunit 6451 "Serv. Time Sheet Mgt."
     begin
         IsHandled := false;
         OnBeforeCreateTSLineFromServiceShptLine(ServiceShipmentLine, IsHandled);
-#if not CLEAN25
-        TimesheetManagement.RunOnBeforeCreateTSLineFromServiceShptLine(ServiceShipmentLine, IsHandled);
-#endif
         if IsHandled then
             exit;
 
@@ -258,9 +252,6 @@ codeunit 6451 "Serv. Time Sheet Mgt."
     begin
         IsHandled := false;
         OnBeforeAddServLinesFromTSDetail(ServiceHeader, TimeSheetDetail, LineNo, IsHandled);
-#if not CLEAN25
-        TimesheetManagement.RunOnBeforeAddServLinesFromTSDetail(ServiceHeader, TimeSheetDetail, LineNo, IsHandled);
-#endif
         if IsHandled then
             exit;
 
@@ -284,9 +275,6 @@ codeunit 6451 "Serv. Time Sheet Mgt."
             ServiceLine."Planned Delivery Date" := TimeSheetDetail.Date;
             ServiceLine.Validate("Work Type Code", TimeSheetLine."Work Type Code");
             OnAddServLinesFromTSDetailOnBeforeInsertServiceLine(ServiceLine, LineNo, ServiceHeader, TimeSheetDetail);
-#if not CLEAN25
-            TimesheetManagement.RunOnAddServLinesFromTSDetailOnBeforeInsertServiceLine(ServiceLine, LineNo, ServiceHeader, TimeSheetDetail);
-#endif
             ServiceLine.Insert();
         end;
     end;

@@ -896,19 +896,6 @@ codeunit 9510 "Document Service Management"
         end else
             TrySaveStreamFromRec(InStream, TargetName, ConflictBehavior, DocumentServiceRec, DocumentUri, UploadedFileName);
     end;
-#if not CLEAN25
-
-    [NonDebuggable]
-    [Obsolete('Replaced by GetAccessToken(Location: Text; var AccessToken: SecretText; GetTokenFromCache: Boolean)', '25.0')]
-    local procedure GetAccessToken(Location: Text; var AccessToken: Text; GetTokenFromCache: Boolean)
-    var
-        AccessTokenAsSecretText: SecretText;
-    begin
-        AccessTokenAsSecretText := AccessToken;
-        GetAccessToken(Location, AccessTokenAsSecretText, GetTokenFromCache);
-        AccessToken := AccessTokenAsSecretText.Unwrap();
-    end;
-#endif
 
     local procedure GetAccessToken(Location: Text; var AccessToken: SecretText; GetTokenFromCache: Boolean)
     var
@@ -1252,19 +1239,6 @@ codeunit 9510 "Document Service Management"
             exit(true);
         end;
     end;
-#if not CLEAN25
-
-    [Scope('OnPrem')]
-    [NonDebuggable]
-    [Obsolete('Replaced by TestLocationResolves(Location: Text[250]; AccessToken: SecretText)', '25.0')]
-    procedure TestLocationResolves(Location: Text[250]; AccessToken: Text): Boolean
-    var
-        AccessTokenAsSecretText: SecretText;
-    begin
-        AccessTokenAsSecretText := AccessToken;
-        exit(TestLocationResolves(Location, AccessTokenAsSecretText))
-    end;
-#endif
 
     [NonDebuggable]
     [Scope('OnPrem')]
@@ -1479,4 +1453,3 @@ codeunit 9510 "Document Service Management"
     begin
     end;
 }
-
