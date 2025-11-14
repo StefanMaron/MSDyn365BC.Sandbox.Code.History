@@ -265,8 +265,7 @@ codeunit 134984 "ERM Sales Report III"
 
         // Verify.
         LibraryReportDataset.LoadDataSetFile();
-        VerifyVATEntries('VATAmountLine__VAT_Identifier_', 'VATAmountLine__VAT___', 'VATAmountLine__VAT_Base_',
-          'VATAmountLine__Line_Amount_', 'VATAmountLine__Inv__Disc__Base_Amount_');
+        VerifyVATEntries('VATAmountLine__VAT_Identifier_', 'VATAmountLine__VAT___', 'VATAmountLine__VAT_Base_', 'VATAmountLine__Line_Amount_', 'VATAmountLine__Inv__Disc__Base_Amount_', VATAmountLine);
     end;
 
     [Test]
@@ -760,8 +759,7 @@ codeunit 134984 "ERM Sales Report III"
 
         // Verify: Verify Report Data for VAT.
         LibraryReportDataset.LoadDataSetFile();
-        VerifyVATEntries('VATAmtLineVATIdentifier', 'VATAmtLineVATPercentage',
-          'VATAmtLineVATBase', 'VATAmtLineLineAmt', 'VATAmtLineInvDiscBaseAmt');
+        VerifyVATEntries('VATAmtLineVATIdentifier', 'VATAmtLineVATPercentage', 'VATAmtLineVATBase', 'VATAmtLineLineAmt', 'VATAmtLineInvDiscBaseAmt', VATAmountLine);
     end;
 
     [Test]
@@ -4340,9 +4338,7 @@ codeunit 134984 "ERM Sales Report III"
         LibraryReportDataset.AssertCurrentRowValueEquals('TtlAmtCurrencyTtlBuff2', Round(InvoiceAmount + GenJournalLine.Amount));
     end;
 
-    local procedure VerifyVATEntries(VATIdentifierLabel: Text[50]; VATPercLabel: Text[50]; VATBaseLabel: Text[50]; LineAmountLabel: Text[50]; InvDiscBaseAmountLabel: Text[50])
-    var
-        VATAmountLine: Record "VAT Amount Line";
+    local procedure VerifyVATEntries(VATIdentifierLabel: Text[50]; VATPercLabel: Text[50]; VATBaseLabel: Text[50]; LineAmountLabel: Text[50]; InvDiscBaseAmountLabel: Text[50]; var VATAmountLine: Record "VAT Amount Line")
     begin
         VATAmountLine.SetFilter("VAT %", '>0');
         VATAmountLine.FindFirst();
