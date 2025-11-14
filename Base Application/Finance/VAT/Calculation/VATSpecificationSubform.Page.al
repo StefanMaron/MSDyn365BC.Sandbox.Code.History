@@ -103,8 +103,6 @@ page 576 "VAT Specification Subform"
                 field("EC Amount"; Rec."EC Amount")
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = CurrencyCode;
-                    AutoFormatType = 1;
                     Editable = ECAmountEditable;
                     ToolTip = 'Specifies the Equivalence Charge (EC) amount used in the purchase or sales lines with the same VAT code.';
 
@@ -230,7 +228,6 @@ page 576 "VAT Specification Subform"
         VATAmountEditable: Boolean;
         NonDeductibleVATVisible: Boolean;
         ECAmountEditable: Boolean;
-
 #pragma warning disable AA0074
 #pragma warning disable AA0470
         Text000: Label '%1 can only be modified on the %2 tab.';
@@ -342,13 +339,6 @@ page 576 "VAT Specification Subform"
         OnAfterSetParentControl(ParentControl);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure SetSourceHeader', '25.0')]
-    procedure SetServHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    begin
-        SourceHeader := ServiceHeader;
-    end;
-#endif
 
     procedure SetSourceHeader(NewSourceHeader: Variant)
     begin
@@ -385,4 +375,3 @@ page 576 "VAT Specification Subform"
     begin
     end;
 }
-

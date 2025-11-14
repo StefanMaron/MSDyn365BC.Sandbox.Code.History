@@ -66,9 +66,7 @@ codeunit 144076 "ERM Payment Discount"
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         LibraryRandom: Codeunit "Library - Random";
-#if CLEAN25
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
-#endif
         AmountMustMatchMsg: Label 'Amount must match.';
         SalesLinePmtDiscGivenAmountCap: Label 'SalesLine__Pmt__Disc__Given_Amount_';
         SumPmtDiscRcdAmountCap: Label 'SumPmtDiscRcdAmount';
@@ -946,17 +944,6 @@ codeunit 144076 "ERM Payment Discount"
         PurchaseLine.Modify(true);
     end;
 
-#if not CLEAN25
-    local procedure CreatePurchaseLineDiscount(Item: Record Item; VendorNo: Code[20]; LineDiscountPct: Decimal)
-    var
-        PurchaseLineDiscount: Record "Purchase Line Discount";
-    begin
-        LibraryERM.CreateLineDiscForVendor(
-          PurchaseLineDiscount, Item."No.", VendorNo, WorkDate(), '', '', Item."Base Unit of Measure", 0);  // Blank for Currency and Variant, 0 for Minimum Quantity.
-        PurchaseLineDiscount.Validate("Line Discount %", LineDiscountPct);
-        PurchaseLineDiscount.Modify(true);
-    end;
-#else
     local procedure CreatePurchaseLineDiscount(Item: Record Item; VendorNo: Code[20]; LineDiscountPct: Decimal)
     var
         PriceListLine: Record "Price List Line";
@@ -969,7 +956,6 @@ codeunit 144076 "ERM Payment Discount"
         PriceListLine.Status := "Price Status"::Active;
         PriceListLine.Modify(true);
     end;
-#endif
 
     local procedure CreatePurchaseOrderWithItemCharge(var PurchaseLine: Record "Purchase Line"; VendorNo: Code[20]; PaymentDiscountPct: Decimal; DiscountPct: Decimal; LineDiscountPct: Decimal)
     var

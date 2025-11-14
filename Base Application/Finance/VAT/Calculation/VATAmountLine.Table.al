@@ -17,13 +17,7 @@ table 290 "VAT Amount Line"
 {
     Caption = 'VAT Amount Line';
     DataClassification = CustomerContent;
-#if not CLEAN25
-    ObsoleteReason = 'Table will be made Temporary.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '25.0';
-#else
     TableType = Temporary;
-#endif
 
     fields
     {
@@ -189,11 +183,12 @@ table 290 "VAT Amount Line"
         }
         field(10700; "EC %"; Decimal)
         {
-            Caption = 'EC %';
             AutoFormatType = 0;
+            Caption = 'EC %';
         }
         field(10701; "EC Amount"; Decimal)
         {
+            AutoFormatExpression = CurrencyCode;
             AutoFormatType = 1;
             Caption = 'EC Amount';
 
@@ -208,14 +203,20 @@ table 290 "VAT Amount Line"
         }
         field(10703; "Line Discount Amount"; Decimal)
         {
+            AutoFormatExpression = CurrencyCode;
+            AutoFormatType = 1;
             Caption = 'Line Discount Amount';
         }
         field(10704; "Calculated EC Amount"; Decimal)
         {
+            AutoFormatExpression = CurrencyCode;
+            AutoFormatType = 1;
             Caption = 'Calculated EC Amount';
         }
         field(10705; "EC Difference"; Decimal)
         {
+            AutoFormatExpression = CurrencyCode;
+            AutoFormatType = 1;
             Caption = 'EC Difference';
             Editable = false;
         }
@@ -763,33 +764,7 @@ table 290 "VAT Amount Line"
         Modify();
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedures using Source Record.', '25.0')]
-    procedure SumLine(LineAmount: Decimal; InvDiscAmount: Decimal; VATDifference: Decimal; AllowInvDisc: Boolean; Prepayment: Boolean)
-    var
-        PmtDiscAmount: Decimal;
-        ECDifference: Decimal;
-    begin
-        SumLine(LineAmount, InvDiscAmount, PmtDiscAmount, VATDifference, ECDifference, AllowInvDisc, Prepayment);
-    end;
-#endif
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedures using Source Record.', '25.0')]
-    procedure SumLine(LineAmount: Decimal; InvDiscAmount: Decimal; PmtDiscAmount: Decimal; VATDifference: Decimal; ECDifference: Decimal; AllowInvDisc: Boolean; Prepayment: Boolean)
-    begin
-        "Line Amount" += LineAmount;
-        if AllowInvDisc then
-            "Inv. Disc. Base Amount" += LineAmount;
-        "Invoice Discount Amount" += InvDiscAmount;
-        "Pmt. Discount Amount" += PmtDiscAmount;
-        "VAT Difference" += VATDifference;
-        "EC Difference" += ECDifference;
-        if Prepayment then
-            "Includes Prepayment" := true;
-        Modify();
-    end;
-#endif
 
     procedure UpdateLines(var TotalVATAmount: Decimal; Currency: Record Currency; CurrencyFactor: Decimal; PricesIncludingVAT: Boolean; VATBaseDiscountPercHeader: Decimal; TaxAreaCode: Code[20]; TaxLiable: Boolean; PostingDate: Date)
     var
@@ -1080,57 +1055,7 @@ table 290 "VAT Amount Line"
         OnAfterCopyFromSalesCrMemoLine(Rec, SalesCrMemoLine);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToVATAmountLine in table Service Invoice Line', '25.0')]
-    procedure CopyFromServInvLine(ServiceInvoiceLine: Record Microsoft.Service.History."Service Invoice Line")
-    begin
-        "VAT Identifier" := ServiceInvoiceLine."VAT Identifier";
-        "VAT Calculation Type" := ServiceInvoiceLine."VAT Calculation Type";
-        "Tax Group Code" := ServiceInvoiceLine."Tax Group Code";
-        "VAT %" := ServiceInvoiceLine."VAT %";
-        "VAT Base" := ServiceInvoiceLine.Amount;
-        "VAT Amount" := ServiceInvoiceLine."Amount Including VAT" - ServiceInvoiceLine.Amount;
-        "Amount Including VAT" := ServiceInvoiceLine."Amount Including VAT";
-        "Line Amount" := ServiceInvoiceLine."Line Amount";
-        if ServiceInvoiceLine."Allow Invoice Disc." then
-            "Inv. Disc. Base Amount" := ServiceInvoiceLine."Line Amount";
-        "Invoice Discount Amount" := ServiceInvoiceLine."Inv. Discount Amount";
-        Quantity := ServiceInvoiceLine."Quantity (Base)";
-        "Calculated VAT Amount" :=
-          ServiceInvoiceLine."Amount Including VAT" - ServiceInvoiceLine.Amount - ServiceInvoiceLine."VAT Difference";
-        "VAT Difference" := ServiceInvoiceLine."VAT Difference";
-        "EC %" := ServiceInvoiceLine."EC %";
-        "EC Difference" := ServiceInvoiceLine."EC Difference";
 
-        OnAfterCopyFromServInvLine(Rec, ServiceInvoiceLine);
-    end;
-#endif
-
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToVATAmountLine in table Service Cr.Memo Line', '25.0')]
-    procedure CopyFromServCrMemoLine(ServiceCrMemoLine: Record Microsoft.Service.History."Service Cr.Memo Line")
-    begin
-        "VAT Identifier" := ServiceCrMemoLine."VAT Identifier";
-        "VAT Calculation Type" := ServiceCrMemoLine."VAT Calculation Type";
-        "Tax Group Code" := ServiceCrMemoLine."Tax Group Code";
-        "VAT %" := ServiceCrMemoLine."VAT %";
-        "VAT Base" := ServiceCrMemoLine.Amount;
-        "VAT Amount" := ServiceCrMemoLine."Amount Including VAT" - ServiceCrMemoLine.Amount;
-        "Amount Including VAT" := ServiceCrMemoLine."Amount Including VAT";
-        "Line Amount" := ServiceCrMemoLine."Line Amount";
-        if ServiceCrMemoLine."Allow Invoice Disc." then
-            "Inv. Disc. Base Amount" := ServiceCrMemoLine."Line Amount";
-        "Invoice Discount Amount" := ServiceCrMemoLine."Inv. Discount Amount";
-        Quantity := ServiceCrMemoLine."Quantity (Base)";
-        "Calculated VAT Amount" :=
-          ServiceCrMemoLine."Amount Including VAT" - ServiceCrMemoLine.Amount - ServiceCrMemoLine."VAT Difference";
-        "VAT Difference" := ServiceCrMemoLine."VAT Difference";
-        "EC %" := ServiceCrMemoLine."EC %";
-        "EC Difference" := ServiceCrMemoLine."EC Difference";
-
-        OnAfterCopyFromServCrMemoLine(Rec, ServiceCrMemoLine);
-    end;
-#endif
 
     local procedure GetVATBaseDiscountPerc(VATBaseDiscountPerc: Decimal) NewVATBaseDiscountPerc: Decimal
     var
@@ -1185,31 +1110,7 @@ table 290 "VAT Amount Line"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnAfterCopyFromServInvLine(var VATAmountLine: Record "VAT Amount Line"; ServiceInvoiceLine: Record Microsoft.Service.History."Service Invoice Line")
-    begin
-        OnAfterCopyFromServInvLine(VATAmountLine, ServiceInvoiceLine);
-    end;
 
-    [Obsolete('Replaced by event OnAfterCopyToVATAmountLine in table Service Invoice Line', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyFromServInvLine(var VATAmountLine: Record "VAT Amount Line"; ServiceInvoiceLine: Record Microsoft.Service.History."Service Invoice Line")
-    begin
-    end;
-#endif
-
-#if not CLEAN25
-    internal procedure RunOnAfterCopyFromServCrMemoLine(var VATAmountLine: Record "VAT Amount Line"; ServiceCrMemoLine: Record Microsoft.Service.History."Service Cr.Memo Line")
-    begin
-        OnAfterCopyFromServCrMemoLine(VATAmountLine, ServiceCrMemoLine);
-    end;
-
-    [Obsolete('Replaced by event OnAfterCopyToVATAmountLine in table Service Cr.Memo Line', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyFromServCrMemoLine(var VATAmountLine: Record "VAT Amount Line"; ServiceCrMemoLine: Record Microsoft.Service.History."Service Cr.Memo Line")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSalesTaxCalculateCalculateTax(var VATAmountLine: Record "VAT Amount Line"; Currency: Record Currency; TaxAreaCode: Code[20]; TaxLiable: Boolean; PostingDate: Date; CurrencyFactor: Decimal)

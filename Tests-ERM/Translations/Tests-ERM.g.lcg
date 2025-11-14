@@ -3764,7 +3764,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[.]D;]A;(LookupHint=Codeunit ERM Prices Incl VAT Doc - NamedType AmountErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 = Field Caption, %2 = Expected Value, %3 = Table Caption]D;]A;(LookupHint=Codeunit ERM Prices Incl VAT Doc - NamedType AmountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1396839232 - NamedType 1063273132" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

@@ -18,9 +18,6 @@ using Microsoft.Purchases.Payables;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Purchases.History;
 using Microsoft.Finance.VAT.Ledger;
-#if not CLEAN25
-using Microsoft;
-#endif
 
 codeunit 1752 "Data Class. Eval. Data Country"
 {
@@ -48,14 +45,6 @@ codeunit 1752 "Data Class. Eval. Data Country"
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"AEAT Transference Format");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Statistical Code");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"AEAT Transference Format XML");
-#if not CLEAN25
-        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"G/L Accounts Equivalence Tool");
-        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Historic G/L Account");
-        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"New G/L Account");
-        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"G/L Acc. Equiv. Tool Setup");
-        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"History of Equivalences COA");
-        DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Hist. G/L Account (An. View)");
-#endif
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Selected G/L Accounts");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Selected Gen. Prod. Post. Gr.");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Customer/Vendor Warning 349");

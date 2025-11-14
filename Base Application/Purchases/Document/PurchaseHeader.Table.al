@@ -683,7 +683,8 @@ table 38 "Purchase Header"
             begin
                 if PaymentTerms.Get("Payment Terms Code") then
                     PaymentTerms.VerifyMaxNoDaysTillDueDate("Due Date", "Document Date", FieldCaption("Due Date"));
-                "Due Date Modified" := true;
+
+                CompareDueDateToUpdateDueDateModified();
             end;
         }
         field(25; "Payment Discount %"; Decimal)
@@ -8135,6 +8136,28 @@ table 38 "Purchase Header"
         if GetFilter("Buy-from Contact No.") <> '' then
             if GetRangeMin("Buy-from Contact No.") = GetRangeMax("Buy-from Contact No.") then
                 exit(GetRangeMax("Buy-from Contact No."));
+    end;
+
+    local procedure CompareDueDateToUpdateDueDateModified()
+    var
+        PaymentTerm: Record "Payment Terms";
+        DueDateCalc: Date;
+    begin
+        "Due Date Modified" := true;
+
+        if ("Payment Terms Code" = '') or ("Document Date" = 0D) then
+            exit;
+
+        if IsCreditDocType() then
+            exit;
+
+        if not PaymentTerm.Get("Payment Terms Code") then
+            exit;
+
+        DueDateCalc := CalcDate(PaymentTerms."Due Date Calculation", "Document Date");
+        AdjustDueDate.PurchAdjustDueDate(DueDateCalc, "Document Date", PaymentTerms.CalculateMaxDueDate("Document Date"), "Pay-to Vendor No.");
+        if DueDateCalc = "Due Date" then
+            "Due Date Modified" := false;
     end;
 
     [IntegrationEvent(false, false)]

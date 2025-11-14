@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -258,9 +258,6 @@ codeunit 817 "Service Post Invoice" implements "Invoice Posting"
 
         UpdateEntryDescriptionFromServiceLine(ServiceLine, InvoicePostingBuffer);
 
-#if not CLEAN25
-        InvoicePostingBuffer.RunOnAfterPrepareService(ServiceLine, InvoicePostingBuffer);
-#endif
         ServicePostInvoiceEvents.RunOnAfterPrepareInvoicePostingBuffer(ServiceLine, InvoicePostingBuffer);
     end;
 

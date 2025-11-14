@@ -870,4 +870,3 @@ codeunit 483 "Change Global Dimensions"
     begin
     end;
 }
-

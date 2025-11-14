@@ -6383,9 +6383,6 @@ table 5902 "Service Line"
     begin
         IsHandled := false;
         OnBeforeCopyToItemJnlLine(ItemJournalLine, Rec, IsHandled);
-#if not CLEAN25
-        ItemJournalLine.RunOnBeforeCopyItemJnlLineFromServLine(ItemJournalLine, Rec, IsHandled);
-#endif
         if not IsHandled then begin
             ItemJournalLine."Item No." := Rec."No.";
             ItemJournalLine."Posting Date" := Rec."Posting Date";
@@ -6424,9 +6421,6 @@ table 5902 "Service Line"
         end;
 
         OnAfterCopyToItemJnlLine(ItemJournalLine, Rec);
-#if not CLEAN25
-        ItemJournalLine.RunOnAfterCopyItemJnlLineFromServLine(ItemJournalLine, Rec);
-#endif
     end;
 
     procedure CopyToResJournalLine(var ResJournalLine: Record "Res. Journal Line")

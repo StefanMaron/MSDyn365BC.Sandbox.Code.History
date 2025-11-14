@@ -36,14 +36,6 @@ permissionset 1002 "LOCAL READ"
                   tabledata "Customer/Vendor Warning 349" = R,
                   tabledata "Doc. Post. Buffer" = R,
                   tabledata "Fee Range" = R,
-#if not CLEAN25
-                  tabledata "G/L Acc. Equiv. Tool Setup" = R,
-                  tabledata "G/L Accounts Equivalence Tool" = R,
-                  tabledata "Hist. G/L Account (An. View)" = R,
-                  tabledata "Historic G/L Account" = R,
-                  tabledata "History of Equivalences COA" = R,
-                  tabledata "New G/L Account" = R,
-#endif
                   tabledata "G/L Account Buffer" = R,
                   tabledata "Gen. Prod. Post. Group Buffer" = R,
                   tabledata "Inc. Stmt. Clos. Buffer" = R,

@@ -50,12 +50,6 @@ using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
-#if not CLEAN25
-using Microsoft.Service.Contract;
-using Microsoft.Service.Document;
-using Microsoft.Service.Item;
-using Microsoft.Service.Ledger;
-#endif
 using Microsoft.Utilities;
 using System;
 using System.Automation;
@@ -77,12 +71,6 @@ table 18 Customer
                   tabledata "VAT Business Posting Group" = R,
                   TableData "VAT Registration Log" = rd,
                   tabledata "Payment Terms" = R,
-#if not CLEAN25
-                  TableData "Service Header" = r,
-                  TableData "Service Ledger Entry" = r,
-                  TableData "Service Item" = rm,
-                  TableData "Service Contract Header" = rm,
-#endif
                   TableData "Price List Header" = rd,
                   TableData "Price List Line" = rd,
                   TableData "Sales Price" = rd,
@@ -1074,21 +1062,6 @@ table 18 Customer
             TableRelation = "Reminder Terms";
             ToolTip = 'Specifies how reminders about late payments are handled for this customer.';
 
-#if not CLEAN25
-            trigger OnLookup()
-            var
-                ReminderTermsRecord: Record "Reminder Terms";
-                ReminderTerms: Page "Reminder Terms List";
-            begin
-                ReminderTerms.LookupMode(true);
-                if ReminderTerms.RunModal() <> ACTION::LookupOK then
-                    exit;
-
-                ReminderTerms.SetSelectionFilter(ReminderTermsRecord);
-                ReminderTermsRecord.FindFirst();
-                Rec."Reminder Terms Code" := ReminderTermsRecord.Code;
-            end;
-#endif
         }
         field(105; "Reminder Amounts"; Decimal)
         {

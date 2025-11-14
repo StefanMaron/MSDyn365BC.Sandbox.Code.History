@@ -1,4 +1,4 @@
-﻿#if not CLEANSCHEMA28 
+#if not CLEANSCHEMA28 
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -18,13 +18,8 @@ table 10722 "New G/L Account"
     Caption = 'New G/L Account';
     DataCaptionFields = "No.", Name;
     ObsoleteReason = 'Obsolete feature';
-#if CLEAN25
     ObsoleteState = Removed;
     ObsoleteTag = '28.0';
-#else
-    ObsoleteState = Pending;
-    ObsoleteTag = '15.0';
-#endif
     DataClassification = CustomerContent;
 
     fields
@@ -147,10 +142,6 @@ table 10722 "New G/L Account"
         field(34; Totaling; Text[250])
         {
             Caption = 'Totaling';
-#if not CLEAN25
-            TableRelation = "New G/L Account";
-            ValidateTableRelation = false;
-#endif
         }
         field(35; "Budget Filter"; Code[10])
         {
@@ -309,9 +300,6 @@ table 10722 "New G/L Account"
         field(10700; "Income Stmt. Bal. Acc."; Code[20])
         {
             Caption = 'Income Stmt. Bal. Acc.';
-#if not CLEAN25
-            TableRelation = "New G/L Account";
-#endif
         }
         field(10701; "Ignore in 347 Report"; Boolean)
         {
