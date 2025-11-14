@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -474,13 +474,8 @@ table 28076 "Purch. Tax Inv. Line"
         {
             Caption = 'Product Group Code';
             ObsoleteReason = 'Product Groups became first level children of Item Categories.';
-#if CLEAN25
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '17.0';
-#endif
         }
 #endif
         field(6608; "Return Reason Code"; Code[10])
@@ -680,4 +675,3 @@ table 28076 "Purch. Tax Inv. Line"
         TransferFields(PurchCrMemoLine);
     end;
 }
-

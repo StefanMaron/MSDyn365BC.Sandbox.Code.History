@@ -185,44 +185,6 @@ page 9002 "Acc. Payables Coordinator RC"
             separator(Action63)
             {
             }
-#if not CLEAN25
-            action("Vendor &Document Nos.")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report "Vendor - Balance to Date";
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The Report Vendor Document Nos. doesn''t exist anymore.';
-                ObsoleteTag = '25.0';
-            }
-            action("Purchase &Invoice Nos.")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report "Purchase - Invoice";
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The related report doesn''t exist anymore';
-                ObsoleteTag = '25.0';
-            }
-            action("Purchase &Credit Memo Nos.")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'The action will be deleted.';
-                Image = "Report";
-                RunObject = Report "Purchase - Credit Memo";
-                ToolTip = 'The action will be deleted.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The related report doesn''t exist anymore.';
-                ObsoleteTag = '25.0';
-            }
-#endif
             action("Purchase Receipts")
             {
                 ApplicationArea = Basic, Suite;
@@ -582,4 +544,3 @@ page 9002 "Acc. Payables Coordinator RC"
         }
     }
 }
-

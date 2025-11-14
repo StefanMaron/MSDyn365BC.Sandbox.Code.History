@@ -2492,9 +2492,6 @@ codeunit 134776 "Document Attachment Tests"
         // [THEN] "SI1" has one attachment in factbox
         SalesHeader.Get(SalesHeader."Document Type"::Invoice, SalesHeaders[1]);
         SalesInvoiceList.Filter.SetFilter("No.", SalesHeader."No.");
-#if not CLEAN25
-        SalesInvoiceList.AttachedDocuments.Documents.AssertEquals(1);
-#endif
         Assert.IsTrue(SalesInvoiceList."Attached Documents List".First(), 'No attachments found');
         Assert.AreEqual('1', SalesInvoiceList."Attached Documents List".Name.Value(), 'Incorrect Name of attachments');
         Assert.AreEqual('txt', SalesInvoiceList."Attached Documents List"."File Extension".Value, 'Incorrect file extension of attachments');
@@ -2503,9 +2500,6 @@ codeunit 134776 "Document Attachment Tests"
         // [THEN] "SI2" has two attachments in factbox
         SalesHeader.Get(SalesHeader."Document Type"::Invoice, SalesHeaders[2]);
         SalesInvoiceList.Filter.SetFilter("No.", SalesHeader."No.");
-#if not CLEAN25
-        SalesInvoiceList.AttachedDocuments.Documents.AssertEquals(2);
-#endif
         Assert.IsTrue(SalesInvoiceList."Attached Documents List".First(), 'No attachments found');
         Assert.AreEqual('1', SalesInvoiceList."Attached Documents List".Name.Value(), 'Incorrect Name of attachments');
         Assert.AreEqual('txt', SalesInvoiceList."Attached Documents List"."File Extension".Value, 'Incorrect file extension of attachments');
@@ -2545,9 +2539,6 @@ codeunit 134776 "Document Attachment Tests"
         // [THEN] "SCM1" has one attachment in factbox
         SalesHeader.Get(SalesHeader."Document Type"::"Credit Memo", SalesHeaders[1]);
         SalesCreditMemos.Filter.SetFilter("No.", SalesHeader."No.");
-#if not CLEAN25
-        SalesCreditMemos.AttachedDocuments.Documents.AssertEquals(1);
-#endif
         Assert.IsTrue(SalesCreditMemos."Attached Documents List".First(), 'No attachments found');
         Assert.AreEqual('1', SalesCreditMemos."Attached Documents List".Name.Value(), 'Incorrect Name of attachments');
         Assert.AreEqual('txt', SalesCreditMemos."Attached Documents List"."File Extension".Value, 'Incorrect file extension of attachments');
@@ -2556,9 +2547,6 @@ codeunit 134776 "Document Attachment Tests"
         // [THEN] "SCM2" has two attachments in factbox
         SalesHeader.Get(SalesHeader."Document Type"::"Credit Memo", SalesHeaders[2]);
         SalesCreditMemos.Filter.SetFilter("No.", SalesHeader."No.");
-#if not CLEAN25
-        SalesCreditMemos.AttachedDocuments.Documents.AssertEquals(2);
-#endif
         Assert.IsTrue(SalesCreditMemos."Attached Documents List".First(), 'No attachments found');
         Assert.AreEqual('1', SalesCreditMemos."Attached Documents List".Name.Value(), 'Incorrect Name of attachments');
         Assert.AreEqual('txt', SalesCreditMemos."Attached Documents List"."File Extension".Value, 'Incorrect file extension of attachments');
@@ -2598,9 +2586,6 @@ codeunit 134776 "Document Attachment Tests"
         // [THEN] "PI1" has one attachment in factbox
         PurchaseHeader.Get(PurchaseHeader."Document Type"::Invoice, PurchaseHeaders[1]);
         PurchaseInvoices.Filter.SetFilter("No.", PurchaseHeader."No.");
-#if not CLEAN25
-        PurchaseInvoices.AttachedDocuments.Documents.AssertEquals(1);
-#endif
         Assert.IsTrue(PurchaseInvoices."Attached Documents List".First(), 'No attachments found');
         Assert.AreEqual('1', PurchaseInvoices."Attached Documents List".Name.Value(), 'Incorrect Name of attachments');
         Assert.AreEqual('txt', PurchaseInvoices."Attached Documents List"."File Extension".Value, 'Incorrect file extension of attachments');
@@ -2609,9 +2594,6 @@ codeunit 134776 "Document Attachment Tests"
         // [THEN] "PI2" has two attachments in factbox
         PurchaseHeader.Get(PurchaseHeader."Document Type"::Invoice, PurchaseHeaders[2]);
         PurchaseInvoices.Filter.SetFilter("No.", PurchaseHeader."No.");
-#if not CLEAN25
-        PurchaseInvoices.AttachedDocuments.Documents.AssertEquals(2);
-#endif
         Assert.IsTrue(PurchaseInvoices."Attached Documents List".First(), 'No attachments found');
         Assert.AreEqual('1', PurchaseInvoices."Attached Documents List".Name.Value(), 'Incorrect Name of attachments');
         Assert.AreEqual('txt', PurchaseInvoices."Attached Documents List"."File Extension".Value, 'Incorrect file extension of attachments');
@@ -2651,9 +2633,6 @@ codeunit 134776 "Document Attachment Tests"
         // [THEN] "PCM1" has one attachment in factbox
         PurchaseHeader.Get(PurchaseHeader."Document Type"::"Credit Memo", PurchaseHeaders[1]);
         PurchaseCreditMemos.Filter.SetFilter("No.", PurchaseHeader."No.");
-#if not CLEAN25
-        PurchaseCreditMemos.AttachedDocuments.Documents.AssertEquals(1);
-#endif
         Assert.IsTrue(PurchaseCreditMemos."Attached Documents List".First(), 'No attachments found');
         Assert.AreEqual('1', PurchaseCreditMemos."Attached Documents List".Name.Value(), 'Incorrect Name of attachments');
         Assert.AreEqual('txt', PurchaseCreditMemos."Attached Documents List"."File Extension".Value, 'Incorrect file extension of attachments');
@@ -2662,9 +2641,6 @@ codeunit 134776 "Document Attachment Tests"
         // [THEN] "PCM2" has two attachments in factbox
         PurchaseHeader.Get(PurchaseHeader."Document Type"::"Credit Memo", PurchaseHeaders[2]);
         PurchaseCreditMemos.Filter.SetFilter("No.", PurchaseHeader."No.");
-#if not CLEAN25
-        PurchaseCreditMemos.AttachedDocuments.Documents.AssertEquals(2);
-#endif
         Assert.IsTrue(PurchaseCreditMemos."Attached Documents List".First(), 'No attachments found');
         Assert.AreEqual('1', PurchaseCreditMemos."Attached Documents List".Name.Value(), 'Incorrect Name of attachments');
         Assert.AreEqual('txt', PurchaseCreditMemos."Attached Documents List"."File Extension".Value, 'Incorrect file extension of attachments');
