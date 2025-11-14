@@ -504,18 +504,6 @@ table 5404 "Item Unit of Measure"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnBeforeCheckNoOutstandingQtyServiceLine(ItemUnitOfMeasure: Record "Item Unit of Measure"; xItemUnitOfMeasure: Record "Item Unit of Measure"; var ServiceLine: Record Microsoft.Service.Document."Service Line"; var IsHandled: Boolean)
-    begin
-        OnBeforeCheckNoOutstandingQtyServiceLine(ItemUnitOfMeasure, xItemUnitOfMeasure, ServiceLine, IsHandled);
-    end;
-
-    [Obsolete('Moved to codeunit Serv. Item Unit of Measure', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckNoOutstandingQtyServiceLine(ItemUnitOfMeasure: Record "Item Unit of Measure"; xItemUnitOfMeasure: Record "Item Unit of Measure"; var ServiceLine: Record Microsoft.Service.Document."Service Line"; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckNoOutstandingQtyTransferLine(ItemUnitOfMeasure: Record "Item Unit of Measure"; xItemUnitOfMeasure: Record "Item Unit of Measure"; var TransferLine: Record "Transfer Line"; var IsHandled: Boolean)
@@ -537,4 +525,3 @@ table 5404 "Item Unit of Measure"
     begin
     end;
 }
-
