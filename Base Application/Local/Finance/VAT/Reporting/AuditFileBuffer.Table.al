@@ -64,13 +64,8 @@ table 11404 "Audit File Buffer"
             Caption = 'AccountID';
             DataClassification = SystemMetadata;
             ObsoleteReason = 'Replaced with Account ID';
-#if CLEAN25
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '17.0';
-#endif
         }
 #endif
 #if not CLEANSCHEMA28
@@ -79,13 +74,8 @@ table 11404 "Audit File Buffer"
             Caption = 'CustSupID';
             DataClassification = SystemMetadata;
             ObsoleteReason = 'Replaced with Source ID';
-#if CLEAN25
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '17.0';
-#endif
         }
 #endif
 #if not CLEANSCHEMA28
@@ -94,13 +84,8 @@ table 11404 "Audit File Buffer"
             Caption = 'DocumentID';
             DataClassification = SystemMetadata;
             ObsoleteReason = 'Replaced with Document ID';
-#if CLEAN25
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '17.0';
-#endif
         }
 #endif
         field(60; EffectiveDate; Date)
@@ -178,4 +163,3 @@ table 11404 "Audit File Buffer"
     {
     }
 }
-

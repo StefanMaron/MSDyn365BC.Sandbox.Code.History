@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -640,24 +640,6 @@ codeunit 1605 "PEPPOL Management"
         OnAfterGetPaymentMeansPayeeFinancialAccBIS(SalesHeader, PayeeFinancialAccountID, FinancialInstitutionBranchID);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by GetPaymentMeansPayeeFinancialAccBIS with SalesHeader parameter.', '25.0')]
-    procedure GetPaymentMeansPayeeFinancialAccBIS(var PayeeFinancialAccountID: Text; var FinancialInstitutionBranchID: Text)
-    var
-        CompanyInfo: Record "Company Information";
-        SalesHeader: Record "Sales Header";
-    begin
-        CompanyInfo.Get();
-        if CompanyInfo.IBAN <> '' then
-            PayeeFinancialAccountID := DelChr(CompanyInfo.IBAN, '=', ' ')
-        else
-            if CompanyInfo."Bank Account No." <> '' then
-                PayeeFinancialAccountID := CompanyInfo."Bank Account No.";
-        FinancialInstitutionBranchID := CompanyInfo."Bank Branch No.";
-
-        OnAfterGetPaymentMeansPayeeFinancialAccBIS(SalesHeader, PayeeFinancialAccountID, FinancialInstitutionBranchID);
-    end;
-#endif
 
     procedure GetPaymentMeansFinancialInstitutionAddr(var FinancialInstitutionStreetName: Text; var AdditionalStreetName: Text; var FinancialInstitutionCityName: Text; var FinancialInstitutionPostalZone: Text; var FinancialInstCountrySubentity: Text; var FinancialInstCountryIdCode: Text; var FinancialInstCountryListID: Text)
     begin
@@ -1383,25 +1365,7 @@ codeunit 1605 "PEPPOL Management"
         exit(false);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by same procedure in codeunit ServPEPPOLManagement', '25.0')]
-    procedure MapServiceLineTypeToSalesLineType(ServiceLineType: Enum Microsoft.Service.Document."Service Line Type"): Integer
-    var
-        ServPEPPOLManagement: Codeunit "Serv. PEPPOL Management";
-    begin
-        exit(ServPEPPOLManagement.MapServiceLineTypeToSalesLineType(ServiceLineType).AsInteger());
-    end;
-#endif
 
-#if not CLEAN25
-    [Obsolete('Replaced by same procedure in codeunit ServPEPPOLManagement', '25.0')]
-    procedure MapServiceLineTypeToSalesLineTypeEnum(ServiceLineType: Enum Microsoft.Service.Document."Service Line Type"): Enum "Sales Line Type"
-    var
-        ServPEPPOLManagement: Codeunit "Serv. PEPPOL Management";
-    begin
-        exit(ServPEPPOLManagement.MapServiceLineTypeToSalesLineType(ServiceLineType));
-    end;
-#endif
 
     procedure TransferHeaderToSalesHeader(FromRecord: Variant; var ToSalesHeader: Record "Sales Header")
     var
@@ -1461,23 +1425,6 @@ codeunit 1605 "PEPPOL Management"
         ToFieldRef.Value := FromFieldRef.Value();
     end;
 
-#if not CLEAN25
-    [Obsolete('Service documents separated to codeunit ServPEPPOLManagement', '25.0')]
-    procedure FindNextInvoiceRec(var SalesInvoiceHeader: Record "Sales Invoice Header"; var ServiceInvoiceHeader: Record Microsoft.Service.History."Service Invoice Header"; var SalesHeader: Record "Sales Header"; ProcessedDocType: Option Sale,Service; Position: Integer) Found: Boolean
-    var
-        ServPEPPOLManagement: Codeunit "Serv. PEPPOL Management";
-    begin
-        case ProcessedDocType of
-            ProcessedDocType::Sale:
-                Found := FindNextSalesInvoiceRec(SalesInvoiceHeader, SalesHeader, Position);
-            ProcessedDocType::Service:
-                Found := ServPEPPOLManagement.FindNextServiceInvoiceRec(ServiceInvoiceHeader, SalesHeader, Position);
-        end;
-        SalesHeader."Document Type" := SalesHeader."Document Type"::Invoice;
-
-        OnAfterFindNextInvoiceRec(SalesInvoiceHeader, ServiceInvoiceHeader, SalesHeader, ProcessedDocType, Position, Found);
-    end;
-#endif
 
     procedure FindNextSalesInvoiceRec(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"; Position: Integer) Found: Boolean
     begin
@@ -1492,22 +1439,6 @@ codeunit 1605 "PEPPOL Management"
         OnAfterFindNextSalesInvoiceRec(SalesInvoiceHeader, SalesHeader, Position, Found);
     end;
 
-#if not CLEAN25
-    [Obsolete('Service documents separated to codeunit ServPEPPOLManagement', '25.0')]
-    procedure FindNextInvoiceLineRec(var SalesInvoiceLine: Record "Sales Invoice Line"; var ServiceInvoiceLine: Record Microsoft.Service.History."Service Invoice Line"; var SalesLine: Record "Sales Line"; ProcessedDocType: Option Sale,Service; Position: Integer) Found: Boolean
-    var
-        ServPEPPOLManagement: Codeunit "Serv. PEPPOL Management";
-    begin
-        case ProcessedDocType of
-            ProcessedDocType::Sale:
-                exit(FindNextSalesInvoiceLineRec(SalesInvoiceLine, SalesLine, Position));
-            ProcessedDocType::Service:
-                exit(ServPEPPOLManagement.FindNextServiceInvoiceLineRec(ServiceInvoiceLine, SalesLine, Position));
-        end;
-
-        OnAfterFindNextInvoiceLineRec(SalesInvoiceLine, ServiceInvoiceLine, SalesLine, ProcessedDocType, Found);
-    end;
-#endif
 
     procedure FindNextSalesInvoiceLineRec(var SalesInvoiceLine: Record "Sales Invoice Line"; var SalesLine: Record "Sales Line"; Position: Integer): Boolean
     var
@@ -1524,23 +1455,6 @@ codeunit 1605 "PEPPOL Management"
         exit(Found);
     end;
 
-#if not CLEAN25
-    [Obsolete('Service documents separated to codeunit ServPEPPOLManagement', '25.0')]
-    procedure FindNextCreditMemoRec(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var ServiceCrMemoHeader: Record Microsoft.Service.History."Service Cr.Memo Header"; var SalesHeader: Record "Sales Header"; ProcessedDocType: Option Sale,Service; Position: Integer) Found: Boolean
-    var
-        ServPEPPOLManagement: Codeunit "Serv. PEPPOL Management";
-    begin
-        case ProcessedDocType of
-            ProcessedDocType::Sale:
-                exit(FindNextSalesCreditMemoRec(SalesCrMemoHeader, SalesHeader, Position));
-            ProcessedDocType::Service:
-                exit(ServPEPPOLManagement.FindNextServiceCreditMemoRec(ServiceCrMemoHeader, SalesHeader, Position));
-        end;
-        SalesHeader."Document Type" := SalesHeader."Document Type"::"Credit Memo";
-
-        OnAfterFindNextCreditMemoRec(SalesCrMemoHeader, ServiceCrMemoHeader, SalesHeader, ProcessedDocType, Position, Found);
-    end;
-#endif
 
     procedure FindNextSalesCreditMemoRec(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var SalesHeader: Record "Sales Header"; Position: Integer) Found: Boolean
     begin
@@ -1556,36 +1470,6 @@ codeunit 1605 "PEPPOL Management"
         OnAfterFindNextSalesCreditMemoRec(SalesCrMemoHeader, SalesHeader, Position, Found);
     end;
 
-#if not CLEAN25
-    [Obsolete('Service documents separated to codeunit ServPEPPOLManagement', '25.0')]
-    procedure FindNextCreditMemoLineRec(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var ServiceCrMemoLine: Record Microsoft.Service.History."Service Cr.Memo Line"; var SalesLine: Record "Sales Line"; ProcessedDocType: Option Sale,Service; Position: Integer) Found: Boolean
-    begin
-        case ProcessedDocType of
-            ProcessedDocType::Sale:
-                begin
-                    if Position = 1 then
-                        Found := SalesCrMemoLine.Find('-')
-                    else
-                        Found := SalesCrMemoLine.Next() <> 0;
-                    if Found then
-                        SalesLine.TransferFields(SalesCrMemoLine);
-                end;
-            ProcessedDocType::Service:
-                begin
-                    if Position = 1 then
-                        Found := ServiceCrMemoLine.Find('-')
-                    else
-                        Found := ServiceCrMemoLine.Next() <> 0;
-                    if Found then begin
-                        TransferLineToSalesLine(ServiceCrMemoLine, SalesLine);
-                        SalesLine.Type := MapServiceLineTypeToSalesLineTypeEnum(ServiceCrMemoLine.Type);
-                    end;
-                end;
-        end;
-
-        OnAfterFindNextCreditMemoLineRec(SalesCrMemoLine, ServiceCrMemoLine, SalesLine, ProcessedDocType, Position, Found);
-    end;
-#endif
 
     procedure FindNextSalesCreditMemoLineRec(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var SalesLine: Record "Sales Line"; Position: Integer) Found: Boolean
     begin
@@ -1599,52 +1483,24 @@ codeunit 1605 "PEPPOL Management"
         OnAfterFindNextSalesCrMemoLineRec(SalesCrMemoLine, SalesLine, Position, Found);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by event OnAfterFindNextSalesInvoiceLineRec', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFindNextInvoiceLineRec(var SalesInvoiceLine: Record "Sales Invoice Line"; var ServiceInvoiceLine: Record Microsoft.Service.History."Service Invoice Line"; var SalesLine: Record "Sales Line"; ProcessedDocType: Option Sale,Service; var Found: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFindNextSalesInvoiceLineRec(var SalesInvoiceLine: Record "Sales Invoice Line"; var SalesLine: Record "Sales Line"; var Found: Boolean)
     begin
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by event OnAfterFindNextSalesInvoiceRec', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFindNextInvoiceRec(var SalesInvoiceHeader: Record "Sales Invoice Header"; var ServiceInvoiceHeader: Record Microsoft.Service.History."Service Invoice Header"; var SalesHeader: Record "Sales Header"; ProcessedDocType: Option Sale,Service; Position: Integer; var Found: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFindNextSalesInvoiceRec(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"; Position: Integer; var Found: Boolean)
     begin
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by event OnAfterFindNextSalesCreditMemoRec', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFindNextCreditMemoRec(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var ServiceCrMemoHeader: Record Microsoft.Service.History."Service Cr.Memo Header"; var SalesHeader: Record "Sales Header"; ProcessedDocType: Option Sale,Service; Position: Integer; var Found: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFindNextSalesCreditMemoRec(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var SalesHeader: Record "Sales Header"; Position: Integer; var Found: Boolean)
     begin
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by event OnAfterFindNextSalesCreditMemoLineRec', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFindNextCreditMemoLineRec(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var ServiceCrMemoLine: Record Microsoft.Service.History."Service Cr.Memo Line"; var SalesLine: Record "Sales Line"; ProcessedDocType: Option Sale,Service; Position: Integer; var Found: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFindNextSalesCrMemoLineRec(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var SalesLine: Record "Sales Line"; Position: Integer; var Found: Boolean)
@@ -1796,4 +1652,3 @@ codeunit 1605 "PEPPOL Management"
     begin
     end;
 }
-

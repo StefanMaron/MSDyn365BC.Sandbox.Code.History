@@ -969,6 +969,7 @@ table 98 "General Ledger Setup"
             Caption = 'Local SEPA Instr. Priority';
             InitValue = true;
         }
+#if not CLEANSCHEMA28
         field(11401; "Use New Apply G/L Entries Page"; Boolean)
         {
             Caption = 'Use New Apply G/L Entries Page';
@@ -976,6 +977,7 @@ table 98 "General Ledger Setup"
             ObsoleteTag = '22.0';
             ObsoleteState = Removed;
         }
+#endif
         field(11000000; "Local Currency"; Option)
         {
             Caption = 'Local Currency';
