@@ -665,19 +665,6 @@ codeunit 700 "Page Management"
     begin
     end;
 #endif
-#if not CLEAN25
-
-    internal procedure RunOnAfterGetServiceHeaderPageID(RecRef: RecordRef; ServiceHeader: Record Microsoft.Service.Document."Service Header"; var Result: Integer)
-    begin
-        OnAfterGetServiceHeaderPageID(RecRef, ServiceHeader, Result);
-    end;
-
-    [Obsolete('Replaced by same procedure in codeunit Serv. Page Management', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetServiceHeaderPageID(RecRef: RecordRef; ServiceHeader: Record Microsoft.Service.Document."Service Header"; var Result: Integer)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetDefaultLookupPageID(TableID: Integer; var PageID: Integer)
@@ -709,4 +696,3 @@ codeunit 700 "Page Management"
     begin
     end;
 }
-

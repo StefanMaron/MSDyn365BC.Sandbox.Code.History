@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -157,36 +157,24 @@ page 20 "General Ledger Entries"
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies the source currency code for general ledger entries.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Source Currency Amount"; Rec."Source Currency Amount")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies the source currency amount for general ledger entries.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Source Currency VAT Amount"; Rec."Source Currency VAT Amount")
                 {
                     ApplicationArea = VAT;
                     Editable = false;
                     ToolTip = 'Specifies the source currency VAT amount for general ledger entries.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Src. Curr. Non-Ded. VAT Amount"; Rec."Src. Curr. Non-Ded. VAT Amount")
                 {
                     ApplicationArea = VAT;
                     Editable = false;
                     ToolTip = 'Specifies the amount in source currency of the transaction for which VAT is not applied, due to the type of goods or services purchased.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Debit Amount"; Rec."Debit Amount")
                 {
@@ -811,9 +799,6 @@ page 20 "General Ledger Entries"
         AmountVisible: Boolean;
         DebitCreditVisible: Boolean;
         IsVATDateEnabled: Boolean;
-#if not CLEAN25
-        SourceCurrencyVisible: Boolean;
-#endif
 
     protected var
         Dim1Visible: Boolean;
@@ -854,21 +839,10 @@ page 20 "General Ledger Entries"
     local procedure SetControlVisibility()
     var
         GLSetup: Record "General Ledger Setup";
-#if not CLEAN25
-        ClientTypeManagement: Codeunit System.Environment."Client Type Management";
-        FeatureKeyManagement: Codeunit System.Environment.Configuration."Feature Key Management";
-#endif
     begin
         GLSetup.Get();
         AmountVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Debit/Credit Only");
         DebitCreditVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Amount Only");
-#if not CLEAN25
-        if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::SOAP, CLIENTTYPE::OData, CLIENTTYPE::ODataV4, ClientType::Api]
-        then
-            SourceCurrencyVisible := false
-        else
-            SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
-#endif
     end;
 
     local procedure CheckEntryPostedFromJournal()
@@ -913,4 +887,3 @@ page 20 "General Ledger Entries"
     begin
     end;
 }
-

@@ -5478,9 +5478,6 @@ table 5900 "Service Header"
             GenJournalLine."Journal Template Name" := "Journal Templ. Name";
 
         OnAfterCopyToGenJnlLine(GenJournalLine, Rec);
-#if not CLEAN25
-        GenJournalLine.RunOnAfterCopyGenJnlLineFromServHeader(Rec, GenJournalLine);
-#endif
     end;
 
     /// <summary>
@@ -5495,9 +5492,6 @@ table 5900 "Service Header"
         GenJournalLine."Allow Application" := "Bal. Account No." = '';
 
         OnAfterCopyToGenJnlLineApplyTo(GenJournalLine, Rec);
-#if not CLEAN25
-        GenJournalLine.RunOnAfterCopyGenJnlLineFromServHeaderApplyTo(Rec, GenJournalLine);
-#endif
     end;
 
     /// <summary>
@@ -5514,9 +5508,6 @@ table 5900 "Service Header"
         GenJournalLine."Direct Debit Mandate ID" := "Direct Debit Mandate ID";
 
         OnAfterCopyToGenJnlLinePayment(GenJournalLine, Rec);
-#if not CLEAN25
-        GenJournalLine.RunOnAfterCopyGenJnlLineFromServHeaderPayment(Rec, GenJournalLine);
-#endif
     end;
 
     /// <summary>
@@ -5544,9 +5535,6 @@ table 5900 "Service Header"
                 ItemJournalLine."Country/Region Code" := Rec."Country/Region Code";
 
         OnAfterCopyToItemJnlLine(ItemJournalLine, Rec);
-#if not CLEAN25
-        ItemJournalLine.RunOnAfterCopyItemJnlLineFromServHeader(ItemJournalLine, Rec);
-#endif
     end;
 
     procedure CopyToResJournalLine(var ResJournalLine: Record "Res. Journal Line")
@@ -5556,9 +5544,6 @@ table 5900 "Service Header"
         ResJournalLine."Order No." := Rec."No.";
 
         OnAfterCopyToResJournalLine(ResJournalLine, Rec);
-#if not CLEAN25
-        ResJournalLine.RunOnAfterCopyResJnlLineFromServHeader(Rec, ResJournalLine);
-#endif
     end;
 
     procedure SetWorkDescription(NewWorkDescription: Text)

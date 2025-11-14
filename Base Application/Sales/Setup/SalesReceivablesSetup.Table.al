@@ -730,13 +730,8 @@ table 311 "Sales & Receivables Setup"
         {
             Caption = 'Orders';
             ObsoleteReason = 'Merged to W1';
-#if CLEAN25
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-#endif
         }
 #endif
     }

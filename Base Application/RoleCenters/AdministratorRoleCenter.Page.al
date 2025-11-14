@@ -827,20 +827,6 @@ page 9018 "Administrator Role Center"
                     RunObject = Page Activity;
                 }
             }
-#if not CLEAN25
-            separator(Action47)
-            {
-                ObsoleteReason = 'Not used';
-                ObsoleteState = Pending;
-                ObsoleteTag = '25.0';
-            }
-            separator(Action263)
-            {
-                ObsoleteReason = 'Not used';
-                ObsoleteState = Pending;
-                ObsoleteTag = '25.0';
-            }
-#endif
             group("&Sales Analysis")
             {
                 Caption = '&Sales Analysis';
