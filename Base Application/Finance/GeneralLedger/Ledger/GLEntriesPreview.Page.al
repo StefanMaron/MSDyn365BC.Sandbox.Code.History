@@ -126,18 +126,12 @@ page 122 "G/L Entries Preview"
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies the source currency code for G/L entries.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Source Currency Amount"; Rec."Source Currency Amount")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies the source currency amount for G/L entries.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Additional-Currency Amount"; Rec."Additional-Currency Amount")
                 {
@@ -156,9 +150,6 @@ page 122 "G/L Entries Preview"
                     ApplicationArea = VAT;
                     Editable = false;
                     ToolTip = 'Specifies the source currency VAT amount for G/L entries.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field(NonDeductibleVATAmount; Rec."Non-Deductible VAT Amount")
                 {
@@ -351,14 +342,8 @@ page 122 "G/L Entries Preview"
     trigger OnOpenPage()
     var
         GLSetup: Record "General Ledger Setup";
-#if not CLEAN25
-        FeatureKeyManagement: Codeunit System.Environment.Configuration."Feature Key Management";
-#endif
     begin
         SetDimVisibility();
-#if not CLEAN25
-        SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
-#endif
         GLSetup.Get();
         AmountVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Debit/Credit Only");
         DebitCreditVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Amount Only");
@@ -368,9 +353,6 @@ page 122 "G/L Entries Preview"
         GLAcc: Record "G/L Account";
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         DimensionSetIDFilter: Page "Dimension Set ID Filter";
-#if not CLEAN25
-        SourceCurrencyVisible: Boolean;
-#endif
 
     protected var
         Dim1Visible: Boolean;
@@ -399,4 +381,3 @@ page 122 "G/L Entries Preview"
         exit(StrSubstNo('%1 %2', GLAcc."No.", GLAcc.Name))
     end;
 }
-

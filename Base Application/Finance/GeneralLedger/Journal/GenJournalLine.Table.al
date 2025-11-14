@@ -6555,29 +6555,8 @@ table 81 "Gen. Journal Line"
         OnAfterCopyGenJnlLineFromSalesHeaderPayment(SalesHeader, Rec);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToGenJournalLine() in table Service Header', '25.0')]
-    procedure CopyFromServiceHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    begin
-        ServiceHeader.CopyToGenJournalLine(Rec);
-    end;
-#endif
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToGenJournalLineApplyTo() in table Service Header', '25.0')]
-    procedure CopyFromServiceHeaderApplyTo(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    begin
-        ServiceHeader.CopyToGenJournalLineApplyTo(Rec);
-    end;
-#endif
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToGenJournalLinePayment() in table Service Header', '25.0')]
-    procedure CopyFromServiceHeaderPayment(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    begin
-        ServiceHeader.CopyToGenJournalLinePayment(Rec);
-    end;
-#endif
 
     procedure CopyFromPaymentCustLedgEntry(CustLedgEntry: Record "Cust. Ledger Entry")
     begin
@@ -8024,44 +8003,8 @@ table 81 "Gen. Journal Line"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnAfterCopyGenJnlLineFromServHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-        OnAfterCopyGenJnlLineFromServHeader(ServiceHeader, GenJournalLine);
-    end;
 
-    [Obsolete('Replaced by event OnAfterCopyToGenJnlLine in table Service Header', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyGenJnlLineFromServHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-#endif
 
-#if not CLEAN25
-    internal procedure RunOnAfterCopyGenJnlLineFromServHeaderApplyTo(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-        OnAfterCopyGenJnlLineFromServHeaderApplyTo(ServiceHeader, GenJournalLine);
-    end;
-
-    [Obsolete('Replaced by event OnAfterCopyToGenJnlLineApplyTo in table Service Header', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyGenJnlLineFromServHeaderApplyTo(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-#endif
-
-#if not CLEAN25
-    internal procedure RunOnAfterCopyGenJnlLineFromServHeaderPayment(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-        OnAfterCopyGenJnlLineFromServHeaderPayment(ServiceHeader, GenJournalLine);
-    end;
-
-    [Obsolete('Replaced by event OnAfterCopyToGenJnlLinePayment in table Service Header', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyGenJnlLineFromServHeaderPayment(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-#endif
 
     /// <summary>
     /// Event triggered after copying data from a prepayment invoice line buffer to the general journal line.
