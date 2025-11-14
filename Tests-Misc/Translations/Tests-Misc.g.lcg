@@ -5270,15 +5270,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test Partner Integration Event - NamedType OnAfterNavigateFindRecordsTxt)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2821958246 - NamedType 3745245681" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[OnAfterNavigateShowRecords]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test Partner Integration Event - NamedType OnAfterNavigateShowRecordsTxt)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 2821958246 - NamedType 2815758778" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[OnAfterPostItemJnlLine]]></Val>

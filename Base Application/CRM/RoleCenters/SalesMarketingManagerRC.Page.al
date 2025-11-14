@@ -754,12 +754,7 @@ page 8907 "Sales & Marketing Manager RC"
                     action("Sales Promotion")
                     {
                         Caption = 'Sales Promotion';
-#if not CLEAN25
-                        RunPageView = where("Object Type" = const(Report), "Object ID" = const(10159)); // "Sales Promotion"
-                        RunObject = Page "Role Center Page Dispatcher";
-#else
                         RunObject = report "Sales Promotion V16";
-#endif
                     }
                     action("Serial Number Sold History")
                     {

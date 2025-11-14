@@ -65,9 +65,6 @@ codeunit 444 "Purchase-Post Prepayments"
         SuppressCommit: Boolean;
         PrepmtDocumentType: Option ,,Invoice,"Credit Memo";
         PreviewMode: Boolean;
-#if not CLEAN25
-        TotalAmount1099: Decimal;
-#endif
 
 #pragma warning disable AA0074
 #pragma warning disable AA0470
@@ -1098,15 +1095,6 @@ codeunit 444 "Purchase-Post Prepayments"
         PrepmtInvLineBuf."VAT Base Before Pmt. Disc." := PurchLine."Prepayment Amount";
         PrepmtInvLineBuf."Orig. Pmt. Disc. Possible" := PurchLine."Prepmt. Pmt. Discount Amount";
 
-#if not CLEAN25
-        if PurchLine."IRS 1099 Liable" then
-            if PurchHeader."Document Type" in [PurchHeader."Document Type"::"Return Order",
-                                               PurchHeader."Document Type"::"Credit Memo"]
-            then
-                TotalAmount1099 := TotalAmount1099 - PurchLine."Prepmt. Amt. Incl. VAT"
-            else
-                TotalAmount1099 := TotalAmount1099 + PurchLine."Prepmt. Amt. Incl. VAT";
-#endif
         PrepmtInvLineBuf."Location Code" := PurchLine."Location Code";
 
         OnAfterFillInvLineBuffer(PrepmtInvLineBuf, PurchLine, SuppressCommit, PurchHeader);
@@ -1370,12 +1358,6 @@ codeunit 444 "Purchase-Post Prepayments"
         if GLSetup."Journal Templ. Name Mandatory" then
             GenJnlLine."Journal Template Name" := GenJournalTemplate.Name;
 
-#if not CLEAN25
-        if GenJnlLine."IRS 1099 Code" <> '' then begin
-            GenJnlLine."IRS 1099 Code" := GenJnlLine."IRS 1099 Code";
-            GenJnlLine."IRS 1099 Amount" := -Round(TotalAmount1099);
-        end;
-#endif
         OnBeforePostVendorEntry(GenJnlLine, TotalPrepmtInvLineBuffer, TotalPrepmtInvLineBufferLCY, SuppressCommit, PurchHeader, DocumentType);
         GenJnlPostLine.RunWithCheck(GenJnlLine);
         OnAfterPostVendorEntry(GenJnlLine, TotalPrepmtInvLineBuffer, TotalPrepmtInvLineBufferLCY, SuppressCommit);

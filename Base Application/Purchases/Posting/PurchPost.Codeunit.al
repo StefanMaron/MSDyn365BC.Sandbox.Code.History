@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -209,9 +209,6 @@ codeunit 90 "Purch.-Post"
         BindSubscription(this); // Start collect value entries for GLPosting
 
         PurchaseLinesProcessed := false;
-#if not CLEAN25
-        PurchHeader."IRS 1099 Amount" := 0;
-#endif
         if not InventorySetup.UseLegacyPosting() then
             TempPurchLineGlobal.SetCurrentKey(Type, "Line No.");
         if TempPurchLineGlobal.FindSet() then
@@ -1090,13 +1087,6 @@ codeunit 90 "Purch.-Post"
                 end;
         end;
 
-#if not CLEAN25
-        if PurchLine."IRS 1099 Liable" then
-            if PurchLine."Document Type" in [PurchLine."Document Type"::"Return Order", PurchLine."Document Type"::"Credit Memo"] then
-                PurchHeader."IRS 1099 Amount" -= xPurchLine."Amount Including VAT"
-            else
-                PurchHeader."IRS 1099 Amount" += xPurchLine."Amount Including VAT";
-#endif
 
         RemQtyToBeInvoiced := PurchLine."Qty. to Invoice";
         RemQtyToBeInvoicedBase := PurchLine."Qty. to Invoice (Base)";

@@ -27,9 +27,6 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.FinanceCharge;
 using System.Globalization;
-#if not CLEAN25
-using Microsoft.Finance.VAT.Reporting;
-#endif
 
 table 1383 "Vendor Templ."
 {
@@ -446,14 +443,8 @@ table 1383 "Vendor Templ."
         {
             Caption = 'IRS 1099 Code';
             ObsoleteReason = 'Moved to IRS Forms App.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            TableRelation = "IRS 1099 Form-Box";
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
         }
 #endif
         field(10023; "RFC No."; Code[13])

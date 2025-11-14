@@ -43,9 +43,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using System.IO;
-#if not CLEAN25
-using Microsoft.Finance.VAT.Reporting;
-#endif
 
 table 181 "Posted Gen. Journal Line"
 {
@@ -1189,14 +1186,8 @@ table 181 "Posted Gen. Journal Line"
         {
             Caption = 'IRS 1099 Code';
             ObsoleteReason = 'Moved to IRS Forms App.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            TableRelation = "IRS 1099 Form-Box";
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
         }
 #endif
 #if not CLEANSCHEMA28
@@ -1204,13 +1195,8 @@ table 181 "Posted Gen. Journal Line"
         {
             Caption = 'IRS 1099 Amount';
             ObsoleteReason = 'Moved to IRS Forms App.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
         }
 #endif
         field(10030; "Foreign Exchange Indicator"; Option)

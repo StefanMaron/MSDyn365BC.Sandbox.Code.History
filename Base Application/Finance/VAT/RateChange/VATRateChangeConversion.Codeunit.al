@@ -1283,15 +1283,6 @@ codeunit 550 "VAT Rate Change Conversion"
         exit(Currency."Unit-Amount Rounding Precision");
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by same procedure in codeunit "Serv. VAT Rate Change Conv."', '25.0')]
-    procedure GetNextServiceLineNo(ServiceLine: Record Microsoft.Service.Document."Service Line"; var NextLineNo: Integer): Boolean
-    var
-        ServVATRateChangeConv: Codeunit "Serv. VAT Rate Change Conv.";
-    begin
-        exit(ServVATRateChangeConv.GetNextServiceLineNo(ServiceLine, NextLineNo));
-    end;
-#endif
 
     local procedure GetNextItemChrgAssSaleLineNo(ItemChargeAssignmentSales: Record "Item Charge Assignment (Sales)"): Integer
     var
@@ -1492,18 +1483,6 @@ codeunit 550 "VAT Rate Change Conversion"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnAddNewServiceLineOnBeforeOldServiceLineModify(var OldServiceLine: Record Microsoft.Service.Document."Service Line"; var NewServiceLine: Record Microsoft.Service.Document."Service Line"; VATProdPostingGroup: Code[20]; GenProdPostingGroup: Code[20])
-    begin
-        OnAddNewServiceLineOnBeforeOldServiceLineModify(OldServiceLine, NewServiceLine, VATProdPostingGroup, GenProdPostingGroup);
-    end;
-
-    [Obsolete('Replaced by same event in codeunit Serv. VAT Rate Change Conv.', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAddNewServiceLineOnBeforeOldServiceLineModify(var OldServiceLine: Record Microsoft.Service.Document."Service Line"; var NewServiceLine: Record Microsoft.Service.Document."Service Line"; VATProdPostingGroup: Code[20]; GenProdPostingGroup: Code[20])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitNewSalesLineFromSalesLine(var NewSalesLine: Record "Sales Line"; SalesLine: Record "Sales Line")
@@ -1585,31 +1564,7 @@ codeunit 550 "VAT Rate Change Conversion"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnBeforeUpdateServPriceAdjDetail(var VATRateChangeSetup: Record "VAT Rate Change Setup"; var IsHandled: Boolean)
-    begin
-        OnBeforeUpdateServPriceAdjDetail(VATRateChangeSetup, IsHandled);
-    end;
 
-    [Obsolete('Replaced by same event in codeunit Serv. VAT Rate Change Conv.', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateServPriceAdjDetail(var VATRateChangeSetup: Record "VAT Rate Change Setup"; var IsHandled: Boolean)
-    begin
-    end;
-#endif
-
-#if not CLEAN25
-    internal procedure RunOnBeforeUpdateService(var VATRateChangeSetup: Record "VAT Rate Change Setup"; var IsHandled: Boolean)
-    begin
-        OnBeforeUpdateService(VATRateChangeSetup, IsHandled);
-    end;
-
-    [Obsolete('Replaced by same event in codeunit Serv. VAT Rate Change Conv.', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateService(var VATRateChangeSetup: Record "VAT Rate Change Setup"; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateRec(var RecRef: RecordRef; ConvertVATProdPostingGroup: Boolean; ConvertGenProdPostingGroup: Boolean; var IsHandled: Boolean)

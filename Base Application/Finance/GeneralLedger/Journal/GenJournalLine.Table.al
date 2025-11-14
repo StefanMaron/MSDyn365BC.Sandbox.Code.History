@@ -70,9 +70,6 @@ using System.Automation;
 using System.IO;
 using System.DateTime;
 using System.Environment.Configuration;
-#if not CLEAN25
-using Microsoft.Finance.VAT.Reporting;
-#endif
 using System.Utilities;
 
 table 81 "Gen. Journal Line"
@@ -285,15 +282,6 @@ table 81 "Gen. Journal Line"
                 Vend: Record Vendor;
             begin
                 Validate("Payment Terms Code");
-#if not CLEAN25
-                if ("Document Type" = "Document Type"::" ") or
-                   ("Document Type" = "Document Type"::Invoice) or
-                   ("Document Type" = "Document Type"::"Credit Memo")
-                then
-                    Validate("IRS 1099 Code")
-                else
-                    "IRS 1099 Amount" := 0;
-#endif
                 if "Account No." <> '' then
                     case "Account Type" of
                         "Account Type"::Customer:
@@ -3145,27 +3133,9 @@ table 81 "Gen. Journal Line"
         {
             Caption = 'IRS 1099 Code';
             ObsoleteReason = 'Moved to IRS Forms App.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            TableRelation = "IRS 1099 Form-Box";
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
 
-#if not CLEAN25
-            trigger OnValidate()
-            begin
-                if "IRS 1099 Code" <> '' then begin
-                    if "Account Type" = "Account Type"::Vendor then
-                        "IRS 1099 Amount" := Amount
-                    else
-                        "IRS 1099 Amount" := -Amount;
-                end else
-                    "IRS 1099 Amount" := 0;
-            end;
-#endif
         }
 #endif
 #if not CLEANSCHEMA28
@@ -3173,13 +3143,8 @@ table 81 "Gen. Journal Line"
         {
             Caption = 'IRS 1099 Amount';
             ObsoleteReason = 'Moved to IRS Forms App.';
-#if not CLEAN25
-            ObsoleteState = Pending;
-            ObsoleteTag = '25.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
-#endif
         }
 #endif
         field(10030; "Foreign Exchange Indicator"; Option)
@@ -4483,15 +4448,6 @@ table 81 "Gen. Journal Line"
 
         Validate("VAT %");
         Validate("Bal. VAT %");
-#if not CLEAN25
-        if ("Document Type" = "Document Type"::" ") or
-           ("Document Type" = "Document Type"::Invoice) or
-           ("Document Type" = "Document Type"::"Credit Memo")
-        then
-            Validate("IRS 1099 Code")
-        else
-            "IRS 1099 Amount" := 0;
-#endif
         UpdateLineBalance();
         if "Deferral Code" <> '' then
             Validate("Deferral Code");
@@ -6746,29 +6702,8 @@ table 81 "Gen. Journal Line"
         OnAfterCopyGenJnlLineFromSalesHeaderPayment(SalesHeader, Rec);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToGenJournalLine() in table Service Header', '25.0')]
-    procedure CopyFromServiceHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    begin
-        ServiceHeader.CopyToGenJournalLine(Rec);
-    end;
-#endif
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToGenJournalLineApplyTo() in table Service Header', '25.0')]
-    procedure CopyFromServiceHeaderApplyTo(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    begin
-        ServiceHeader.CopyToGenJournalLineApplyTo(Rec);
-    end;
-#endif
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToGenJournalLinePayment() in table Service Header', '25.0')]
-    procedure CopyFromServiceHeaderPayment(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    begin
-        ServiceHeader.CopyToGenJournalLinePayment(Rec);
-    end;
-#endif
 
     procedure CopyFromPaymentCustLedgEntry(CustLedgEntry: Record "Cust. Ledger Entry")
     begin
@@ -7276,9 +7211,6 @@ table 81 "Gen. Journal Line"
         if not SetCurrencyCode("Bal. Account Type", "Bal. Account No.") then
             "Currency Code" := Vend."Currency Code";
         ClearPostingGroups();
-#if not CLEAN25
-        "IRS 1099 Code" := Vend."IRS 1099 Code";
-#endif
         "Tax Area Code" := Vend."Tax Area Code";
         CheckConfirmDifferentVendorAndPayToVendor(Vend, "Account No.");
         Validate("Payment Terms Code");
@@ -7351,9 +7283,6 @@ table 81 "Gen. Journal Line"
             "Currency Code" := Vend."Currency Code";
         CheckSetCurrencyCodeForBankVendLine(Vend);
         ClearBalancePostingGroups();
-#if not CLEAN25
-        "IRS 1099 Code" := Vend."IRS 1099 Code";
-#endif
         CheckConfirmDifferentVendorAndPayToVendor(Vend, "Bal. Account No.");
         Validate("Payment Terms Code");
         CheckPaymentTolerance();
@@ -7406,9 +7335,6 @@ table 81 "Gen. Journal Line"
             "Posting Group" := '';
             "Salespers./Purch. Code" := '';
             "Payment Terms Code" := '';
-#if not CLEAN25
-            "IRS 1099 Code" := '';
-#endif
         end;
         if BankAcc."Currency Code" = '' then begin
             if "Bal. Account No." = '' then
@@ -8225,44 +8151,8 @@ table 81 "Gen. Journal Line"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnAfterCopyGenJnlLineFromServHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-        OnAfterCopyGenJnlLineFromServHeader(ServiceHeader, GenJournalLine);
-    end;
 
-    [Obsolete('Replaced by event OnAfterCopyToGenJnlLine in table Service Header', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyGenJnlLineFromServHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-#endif
 
-#if not CLEAN25
-    internal procedure RunOnAfterCopyGenJnlLineFromServHeaderApplyTo(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-        OnAfterCopyGenJnlLineFromServHeaderApplyTo(ServiceHeader, GenJournalLine);
-    end;
-
-    [Obsolete('Replaced by event OnAfterCopyToGenJnlLineApplyTo in table Service Header', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyGenJnlLineFromServHeaderApplyTo(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-#endif
-
-#if not CLEAN25
-    internal procedure RunOnAfterCopyGenJnlLineFromServHeaderPayment(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-        OnAfterCopyGenJnlLineFromServHeaderPayment(ServiceHeader, GenJournalLine);
-    end;
-
-    [Obsolete('Replaced by event OnAfterCopyToGenJnlLinePayment in table Service Header', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyGenJnlLineFromServHeaderPayment(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-#endif
 
     /// <summary>
     /// Event triggered after copying data from a prepayment invoice line buffer to the general journal line.

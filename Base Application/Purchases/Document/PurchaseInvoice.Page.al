@@ -898,18 +898,6 @@ page 51 "Purchase Invoice"
                             ToolTip = 'Specifies the name of the person to contact about an invoice from this vendor.';
                         }
                     }
-#if not CLEAN25
-                    field("IRS 1099 Code"; Rec."IRS 1099 Code")
-                    {
-                        ApplicationArea = BasicUS;
-                        Importance = Additional;
-                        ToolTip = 'Specifies the 1099 code of the vendor if one was entered on the vendor card.';
-                        ObsoleteReason = 'Moved to IRS Forms App.';
-                        ObsoleteState = Pending;
-                        ObsoleteTag = '25.0';
-                        Visible = false;
-                    }
-#endif
                 }
                 group("Remit-to")
                 {
@@ -1051,20 +1039,6 @@ page 51 "Purchase Invoice"
                               "Document Type" = field("Document Type");
             }
 
-#if not CLEAN25
-            part("Attached Documents"; "Document Attachment Factbox")
-            {
-                ObsoleteTag = '25.0';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
-                ApplicationArea = All;
-                Visible = false;
-                Caption = 'Attachments';
-                SubPageLink = "Table ID" = const(Database::"Purchase Header"),
-                              "Document Type" = field("Document Type"),
-                              "No." = field("No.");
-            }
-#endif
             part("Attached Documents List"; "Doc. Attachment List Factbox")
             {
                 ApplicationArea = All;

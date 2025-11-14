@@ -382,9 +382,6 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
 
         InvoicePostingBuffer."Journal Templ. Name" := PurchLine.GetJnlTemplateName();
 
-#if not CLEAN25
-        InvoicePostingBuffer.RunOnAfterPreparePurchase(PurchLine, InvoicePostingBuffer);
-#endif
         PurchPostInvoiceEvents.RunOnAfterPrepareInvoicePostingBuffer(PurchLine, InvoicePostingBuffer);
     end;
 
@@ -745,12 +742,6 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         GenJnlLine."Orig. Pmt. Disc. Possible(LCY)" :=
             CurrExchRate.ExchangeAmtFCYToLCY(
                 PurchHeader.GetUseDate(), PurchHeader."Currency Code", -TotalPurchLine."Pmt. Discount Amount", PurchHeader."Currency Factor");
-#if not CLEAN25
-        if PurchHeader."IRS 1099 Code" <> '' then begin
-            GenJnlLine."IRS 1099 Code" := PurchHeader."IRS 1099 Code";
-            GenJnlLine."IRS 1099 Amount" := -Round(PurchHeader."IRS 1099 Amount");
-        end;
-#endif
     end;
 
     procedure PostBalancingEntry(PurchHeaderVar: Variant; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")

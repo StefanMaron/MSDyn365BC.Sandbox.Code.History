@@ -621,19 +621,6 @@ page 138 "Posted Purchase Invoice"
                         Editable = false;
                         ToolTip = 'Specifies the name of the person you should contact at the vendor who you received the invoice from.';
                     }
-#if not CLEAN25
-                    field("IRS 1099 Code"; Rec."IRS 1099 Code")
-                    {
-                        ApplicationArea = BasicUS;
-                        Editable = false;
-                        Importance = Additional;
-                        ToolTip = 'Specifies the Internal Revenue Service (IRS) 1099 code for the purchase invoice header.';
-                        ObsoleteReason = 'Moved to IRS Forms App.';
-                        ObsoleteState = Pending;
-                        ObsoleteTag = '25.0';
-                        Visible = false;
-                    }
-#endif
                 }
                 group("Remit-to")
                 {
@@ -732,19 +719,6 @@ page 138 "Posted Purchase Invoice"
         }
         area(factboxes)
         {
-#if not CLEAN25
-            part("Attached Documents"; "Document Attachment Factbox")
-            {
-                ObsoleteTag = '25.0';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
-                ApplicationArea = All;
-                Visible = false;
-                Caption = 'Attachments';
-                SubPageLink = "Table ID" = const(Database::"Purch. Inv. Header"),
-                              "No." = field("No.");
-            }
-#endif
             part("Attached Documents List"; "Doc. Attachment List Factbox")
             {
                 ApplicationArea = All;
