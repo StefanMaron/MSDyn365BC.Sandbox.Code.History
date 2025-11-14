@@ -1,4 +1,4 @@
-﻿codeunit 134299 "Test Partner Integration Event"
+codeunit 134299 "Test Partner Integration Event"
 {
     EventSubscriberInstance = Manual;
     Subtype = Test;
@@ -72,9 +72,6 @@
         OnBeforePostItemJnlLineTxt: Label 'OnBeforePostItemJnlLine';
         OnAfterPostItemJnlLineTxt: Label 'OnAfterPostItemJnlLine';
         OnAfterNavigateFindRecordsTxt: Label 'OnAfterNavigateFindRecords';
-#if not CLEAN25
-        OnAfterNavigateShowRecordsTxt: Label 'OnAfterNavigateShowRecords';
-#endif
         OnAfterCheckMandatoryFieldsTxt: Label 'OnAfterCheckMandatoryFields';
         OnAfterUpdatePostingNosTxt: Label 'OnAfterUpdatePostingNos';
         OnAfterSalesInvLineInsertTxt: Label 'OnAfterSalesInvLineInsert';
@@ -1758,38 +1755,6 @@
         VerifyDataTypeBuffer(OnAfterNavigateFindRecordsTxt);
     end;
 
-#if not CLEAN25
-    [Test]
-    [Scope('OnPrem')]
-    procedure TestOnAfterNavigateShowRecords()
-    var
-        GLEntry: Record "G/L Entry";
-        TestPartnerIntegrationEvent: Codeunit "Test Partner Integration Event";
-        Navigate: TestPage Navigate;
-        GeneralLedgerEntries: TestPage "General Ledger Entries";
-    begin
-        // [SCENARIO] When using the Navigate page for show records, events are raised to include Custom records.
-        if not GLEntry.FindFirst() then
-            exit; // Nothing to find
-
-        // Setup
-        Initialize();
-        BindSubscription(TestPartnerIntegrationEvent);
-
-        // Exercise
-        Navigate.OpenEdit();
-        Navigate.DocNoFilter.SetValue(GLEntry."Document No.");
-        Navigate.PostingDateFilter.SetValue(Format(GLEntry."Posting Date"));
-        Navigate.Find.Invoke();
-        Navigate.First();
-        GeneralLedgerEntries.Trap();
-        Navigate.Show.Invoke();
-        GeneralLedgerEntries.Close();
-
-        // Verify
-        VerifyDataTypeBuffer(OnAfterNavigateShowRecordsTxt);
-    end;
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -2521,13 +2486,6 @@
         InsertDataTypeBuffer(OnAfterNavigateFindRecordsTxt);
     end;
 
-#if not CLEAN25
-    [EventSubscriber(ObjectType::Page, Page::"Navigate", 'OnAfterNavigateShowRecords', '', false, false)]
-    local procedure OnAfterNavigateShowRecords(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text; ItemTrackingSearch: Boolean)
-    begin
-        InsertDataTypeBuffer(OnAfterNavigateShowRecordsTxt);
-    end;
-#endif
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterInitRecord', '', false, false)]
     local procedure OnAfterSalesHeaderInitRecord(var SalesHeader: Record "Sales Header")
@@ -2970,4 +2928,3 @@
         UndoPurchaseReceiptLine.Run(PurchRcptLine);
     end;
 }
-

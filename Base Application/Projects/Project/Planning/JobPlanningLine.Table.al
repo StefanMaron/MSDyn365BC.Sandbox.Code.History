@@ -3570,13 +3570,6 @@ table 1003 "Job Planning Line"
     begin
     end;
 
-#if not CLEAN25
-    [Obsolete('Event no longer used as procedure EnsureDirectedPutawayandPickFalse is deleted.', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeEnsureDirectedPutawayandPickFalse(var JobPlanningLine: Record "Job Planning Line"; Location: Record Location; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeFindPriceAndDiscount(CalledByFieldNo: Integer; var IsHandled: Boolean; var JobPlanningLine: Record "Job Planning Line"; xJobPlanningLine: Record "Job Planning Line")

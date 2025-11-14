@@ -484,9 +484,6 @@ codeunit 6452 "Serv. Availability Mgt."
         ItemAvailabilityFormsMgt.FilterItem(Item, ServLine."Location Code", ServLine."Variant Code", ServHeader."Response Date");
 
         OnBeforeShowItemAvailFromServLine(Item, ServLine);
-#if not CLEAN25
-        ItemAvailabilityFormsMgt.RunOnBeforeShowItemAvailFromServLine(Item, ServLine);
-#endif
         case AvailabilityType of
             AvailabilityType::Period:
                 ItemAvailabilityFormsMgt.ShowItemAvailabilityByPeriod(Item, GetFieldCaption(ServHeader.FieldCaption("Response Date")), ServHeader."Response Date", NewDate);
@@ -614,9 +611,6 @@ codeunit 6452 "Serv. Availability Mgt."
         InventoryEventBuffer.Positive := not (InventoryEventBuffer."Remaining Quantity (Base)" < 0);
 
         OnAfterTransferFromServiceNeed(InventoryEventBuffer, ServiceLine);
-#if not CLEAN25
-        InventoryEventBuffer.RunOnAfterTransferFromServiceNeed(InventoryEventBuffer, ServiceLine);
-#endif
     end;
 
     [IntegrationEvent(false, false)]
@@ -639,9 +633,6 @@ codeunit 6452 "Serv. Availability Mgt."
     begin
         IsHandled := false;
         OnBeforeUpdateServOrderAvail(AvailabilityAtDate, Item, IsHandled);
-#if not CLEAN25
-        AvailableToPromise.RunOnBeforeUpdateServOrderAvail(AvailabilityAtDate, Item, IsHandled);
-#endif
         if IsHandled then
             exit;
 
