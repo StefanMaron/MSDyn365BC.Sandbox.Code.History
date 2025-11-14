@@ -338,9 +338,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         SalesHeader: Record "Sales Header";
     begin
         SalesPostInvoiceEvents.RunOnBeforePrepareInvoicePostingBuffer(SalesLine, InvoicePostingBuffer);
-#if not CLEAN25
-        InvoicePostingBuffer.RunOnBeforePrepareSales(InvoicePostingBuffer, SalesLine);
-#endif
 
         Clear(InvoicePostingBuffer);
         InvoicePostingBuffer.Type := SalesLine.Type;
@@ -390,9 +387,6 @@ codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
         end;
 
         InvoicePostingBuffer."Journal Templ. Name" := SalesLine.GetJnlTemplateName();
-#if not CLEAN25
-        InvoicePostingBuffer.RunOnAfterPrepareSales(SalesLine, InvoicePostingBuffer);
-#endif
         SalesPostInvoiceEvents.RunOnAfterPrepareInvoicePostingBuffer(SalesLine, InvoicePostingBuffer);
     end;
 

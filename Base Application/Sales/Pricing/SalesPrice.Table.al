@@ -243,9 +243,6 @@ table 7002 "Sales Price"
 
             trigger OnValidate()
             begin
-#if not CLEAN25
-                UpdateUnitPrice();
-#endif
             end;
         }
     }

@@ -88,10 +88,6 @@ permissionset 9921 "D365 VENDOR, EDIT"
                   tabledata "Purch. Rcpt. Line" = rm,
                   tabledata "Purchase Discount Access" = RIMD,
                   tabledata "Purchase Header Archive" = r,
-#if not CLEAN25
-                  tabledata "Purchase Line Discount" = RIMD,
-                  tabledata "Purchase Price" = RIMD,
-#endif
                   tabledata "Purchase Price Access" = RIMD,
                   tabledata "Purchases & Payables Setup" = M,
                   tabledata "Registered Whse. Activity Line" = rm,

@@ -42,9 +42,6 @@ codeunit 6484 "Serv. Undo Posting Mgt."
     begin
         IsHandled := false;
         OnBeforeUpdateServLine(ServLine, UndoQty, UndoQtyBase, TempUndoneItemLedgEntry, IsHandled);
-#if not CLEAN25
-        UndoPostingManagement.RunOnBeforeUpdateServLine(ServLine, UndoQty, UndoQtyBase, TempUndoneItemLedgEntry, IsHandled);
-#endif
         if IsHandled then
             exit;
 
@@ -71,9 +68,6 @@ codeunit 6484 "Serv. Undo Posting Mgt."
             DATABASE::"Service Line", ServLine."Document Type".AsInteger(), ServLine."Document No.", ServLine."Location Code");
 
         OnAfterUpdateServLine(ServLine);
-#if not CLEAN25
-        UndoPostingManagement.RunOnAfterUpdateServLine(ServLine);
-#endif
     end;
 
     local procedure RevertPostedItemTrackingFromServiceLine(ServiceLine: Record "Service Line"; var TempUndoneItemLedgEntry: Record "Item Ledger Entry" temporary)
@@ -82,9 +76,6 @@ codeunit 6484 "Serv. Undo Posting Mgt."
     begin
         IsHandled := false;
         OnBeforeRevertPostedItemTrackingFromServiceLine(ServiceLine, TempUndoneItemLedgEntry, IsHandled);
-#if not CLEAN25
-        UndoPostingManagement.RunOnBeforeRevertPostedItemTrackingFromServiceLine(ServiceLine, TempUndoneItemLedgEntry, IsHandled);
-#endif
         if IsHandled then
             exit;
 
@@ -98,9 +89,6 @@ codeunit 6484 "Serv. Undo Posting Mgt."
     begin
         IsHandled := false;
         OnBeforeServiceLineReserveVerifyQuantity(ServiceLine, xServiceLine, IsHandled);
-#if not CLEAN25
-        UndoPostingManagement.RunOnBeforeServiceLineReserveVerifyQuantity(ServiceLine, xServiceLine, IsHandled);
-#endif
         if IsHandled then
             exit;
 
@@ -152,9 +140,6 @@ codeunit 6484 "Serv. Undo Posting Mgt."
     begin
         IsHandled := false;
         OnBeforeServiceLineCnsmReserveVerifyQuantity(ServiceLine, xServiceLine, IsHandled);
-#if not CLEAN25
-        UndoPostingManagement.RunOnBeforeServiceLineCnsmReserveVerifyQuantity(ServiceLine, xServiceLine, IsHandled);
-#endif
         if IsHandled then
             exit;
 

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -374,13 +374,6 @@ page 189 "Incoming Document"
 
     actions
     {
-#if not CLEAN25
-#pragma warning disable AL0545
-        area(creation)
-        {
-        }
-#pragma warning restore AL0545
-#endif
         area(navigation)
         {
             group(Action57)
@@ -1224,4 +1217,3 @@ page 189 "Incoming Document"
         ShowOCRSetup := not OCRServiceIsEnabled;
     end;
 }
-

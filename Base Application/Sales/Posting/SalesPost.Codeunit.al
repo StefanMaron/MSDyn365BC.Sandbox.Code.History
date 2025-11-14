@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -9572,18 +9572,6 @@ codeunit 80 "Sales-Post"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnBeforeCreateServItemOnSalesInvoice(SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-        OnBeforeCreateServItemOnSalesInvoice(SalesHeader, IsHandled);
-    end;
-
-    [Obsolete('Moved to codeunit Serv. Sales Post', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateServItemOnSalesInvoice(SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateWhseJnlLine(ItemJnlLine: Record "Item Journal Line"; var IsHandled: Boolean)
