@@ -752,18 +752,6 @@ page 8905 "Purchasing Manager Role Center"
                     Caption = 'Report Selections Purchase';
                     RunObject = page "Report Selection - Purchase";
                 }
-#if not CLEAN25
-                action("Report Selection - Comf. Purch")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Report Selection - Comf. Purch';
-                    RunObject = page "Report Selection - Comf. Purch";
-                    Visible = false;
-                    ObsoleteReason = 'Replaced by action Report Selection Purchase';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                }
-#endif
                 action("Req. Worksheet")
                 {
                     ApplicationArea = Planning;

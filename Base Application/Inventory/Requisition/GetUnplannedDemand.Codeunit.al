@@ -574,18 +574,6 @@ codeunit 5520 "Get Unplanned Demand"
     end;
 #endif
 
-#if not CLEAN25
-    internal procedure RunOnBeforeGetUnplannedServLine(var UnplannedDemand: Record "Unplanned Demand"; var ServiceLine: Record Microsoft.Service.Document."Service Line");
-    begin
-        OnBeforeGetUnplannedServLine(UnplannedDemand, ServiceLine);
-    end;
-
-    [Obsolete('Moved to codeunit ServiceLinePlanning', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetUnplannedServLine(var UnplannedDemand: Record "Unplanned Demand"; var ServiceLine: Record Microsoft.Service.Document."Service Line");
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetUnplannedJobPlanningLine(var UnplannedDemand: Record "Unplanned Demand"; var JobPlanningLine: Record "Job Planning Line");
@@ -638,18 +626,6 @@ codeunit 5520 "Get Unplanned Demand"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnGetUnplannedServLineOnAfterInsertUnplannedDemand(var UnplannedDemand: Record "Unplanned Demand")
-    begin
-        OnGetUnplannedServLineOnAfterInsertUnplannedDemand(UnplannedDemand);
-    end;
-
-    [Obsolete('Moved to codeunit ServiceLinePlanning', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnGetUnplannedServLineOnAfterInsertUnplannedDemand(var UnplannedDemand: Record "Unplanned Demand")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnGetUnplannedSalesLineOnAfterInsertUnplannedDemand(var SalesLine: Record "Sales Line"; var UnplannedDemand: Record "Unplanned Demand")
@@ -731,18 +707,6 @@ codeunit 5520 "Get Unplanned Demand"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnInsertServLineOnBeforeInsert(var UnplannedDemand: Record "Unplanned Demand"; ServiceLine: Record Microsoft.Service.Document."Service Line")
-    begin
-        OnInsertServLineOnBeforeInsert(UnplannedDemand, ServiceLine);
-    end;
-
-    [Obsolete('Moved to codeunit ServiceLinePlanning', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertServLineOnBeforeInsert(var UnplannedDemand: Record "Unplanned Demand"; ServiceLine: Record Microsoft.Service.Document."Service Line")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertJobPlanningLineOnBeforeInsert(var UnplannedDemand: Record "Unplanned Demand"; JobPlanningLine: Record "Job Planning Line")
@@ -774,4 +738,3 @@ codeunit 5520 "Get Unplanned Demand"
     begin
     end;
 }
-

@@ -463,6 +463,7 @@ table 23 Vendor
         field(59; "Balance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = - sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" where("Vendor No." = field("No."),
                                                                                    "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                    "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
@@ -1549,6 +1550,7 @@ table 23 Vendor
             Caption = 'Over-Receipt Code';
             TableRelation = "Over-Receipt Code";
         }
+#if not CLEANSCHEMA25
         field(11000; "Registration No."; Text[20])
         {
             Caption = 'Registration No.';
@@ -1557,6 +1559,7 @@ table 23 Vendor
             ObsoleteTag = '25.0';
             ObsoleteState = Removed;
         }
+#endif
         field(5005270; "Delivery Reminder Terms"; Code[10])
         {
             Caption = 'Delivery Reminder Terms';

@@ -609,9 +609,6 @@ codeunit 99000871 "Job Planning Availability Mgt."
         InventoryEventBuffer.Positive := not (InventoryEventBuffer."Remaining Quantity (Base)" < 0);
 
         OnAfterTransferFromJobNeed(InventoryEventBuffer, JobPlanningLine);
-#if not CLEAN25
-        InventoryEventBuffer.RunOnAfterTransferFromJobNeed(InventoryEventBuffer, JobPlanningLine);
-#endif
     end;
 
     [IntegrationEvent(false, false)]

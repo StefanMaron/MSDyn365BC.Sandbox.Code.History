@@ -1152,15 +1152,6 @@ table 130 "Incoming Document"
             SalesHeader.AddLink(GetURL(), Description);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by same procedure in codeunit ServDocExchangeMgt', '25.0')]
-    procedure SetServiceDoc(var ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    var
-        ServDocExchangeMgt: Codeunit "Serv. Doc. Exchange Mgt.";
-    begin
-        ServDocExchangeMgt.SetServiceDoc(ServiceHeader, Rec);
-    end;
-#endif
 
     procedure SetPurchDoc(var PurchaseHeader: Record "Purchase Header")
     begin
