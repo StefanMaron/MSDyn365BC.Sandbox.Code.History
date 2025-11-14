@@ -174,13 +174,16 @@ table 1853 "MS - Sales Forecast Setup"
         "API Key ID" := InsertAPICredential(UserDefinedAPIKey);
     end;
 
-#pragma warning disable AS0022
-    internal procedure GetAPIKeyAsSecret(): SecretText
+    procedure GetAPIKeyAsSecret(): SecretText
+    var
+        UserDefinedAPIKey: SecretText;
     begin
         // The API Key and URI entered by the user take precedence
-        exit(GetUserDefinedAPIKeyAsSecret());
+        UserDefinedAPIKey := GetUserDefinedAPIKeyAsSecret();
+        if not UserDefinedAPIKey.IsEmpty() then
+            exit(UserDefinedAPIKey);
+        exit(UserDefinedAPIKey);
     end;
-#pragma warning restore AS0022
 
     procedure GetAPIUri(): Text[250]
     begin
