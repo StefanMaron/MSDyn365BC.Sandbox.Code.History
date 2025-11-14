@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -242,44 +242,29 @@ page 17 "G/L Account Card"
             group(Revaluation)
             {
                 Caption = 'Revaluation';
-#if not CLEAN25
-                Visible = SourceCurrencyVisible;
-#endif
                 field("Source Currency Posting"; Rec."Source Currency Posting")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Source Currency Posting';
                     ToolTip = 'Specifies how the system will validate posting of entries containing currencies. Blank will allow all currencies to be posted to the account. Same Code will only allow the currency specified in Source Currency Code. Multiple currencies will allow only posting of currencies selected in Source currency code. Local currency only allow posting without a Currency code.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Source Currency Code"; Rec."Source Currency Code")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Source Currency Code';
                     ToolTip = 'Specifies the source currency code which can be posted to this account, if Source Currency Posting is set as Same Code.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Source Currency Revaluation"; Rec."Source Currency Revaluation")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Source Currency Revaluation';
                     ToolTip = 'Specifies if source currency revaluation should be done for this account.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Unrealized Revaluation"; Rec."Unrealized Revaluation")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Unrealized Revaluation';
                     ToolTip = 'Specifies if revaluation should be posted to currency realized or unrealized gains and losses accounts.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
             }
             group(Consolidation)
@@ -347,9 +332,6 @@ page 17 "G/L Account Card"
                               "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
                               "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
                               "Date Filter" = field("Date Filter");
-#if not CLEAN25
-                Visible = SourceCurrencyVisible;
-#endif
             }
             systempart(Control1900383207; Links)
             {
@@ -729,9 +711,6 @@ page 17 "G/L Account Card"
 
     var
         ExtendedPriceEnabled: Boolean;
-#if not CLEAN25
-        SourceCurrencyVisible: Boolean;
-#endif
         SubCategoryDescription: Text[80];
 
     local procedure UpdateAccountSubcategoryDescription()
@@ -743,19 +722,7 @@ page 17 "G/L Account Card"
     local procedure SetControlVisibility()
     var
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
-#if not CLEAN25
-        FeatureKeyManagement: Codeunit System.Environment.Configuration."Feature Key Management";
-        ClientTypeManagement: Codeunit System.Environment."Client Type Management";
-#endif
     begin
         ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
-#if not CLEAN25
-        if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::SOAP, CLIENTTYPE::OData, CLIENTTYPE::ODataV4, ClientType::Api]
-then
-            SourceCurrencyVisible := false
-        else
-            SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
-#endif
     end;
 }
-

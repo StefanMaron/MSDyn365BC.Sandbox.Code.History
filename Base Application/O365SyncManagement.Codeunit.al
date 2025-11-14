@@ -169,15 +169,6 @@ codeunit 6700 "O365 Sync. Management"
           ActivityDescription, ActivityMessage, UserID);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by BuildBookingsConnectionStringAsSecretText', '25.0')]
-    [NonDebuggable]
-    [Scope('OnPrem')]
-    procedure BuildBookingsConnectionString(var BookingSync: Record "Booking Sync") ConnectionString: Text
-    begin
-        exit(BuildBookingsConnectionStringAsSecretText(BookingSync).Unwrap());
-    end;
-#endif
 
     [Scope('OnPrem')]
     procedure BuildBookingsConnectionStringAsSecretText(var BookingSync: Record "Booking Sync") ConnectionString: SecretText
@@ -208,15 +199,6 @@ codeunit 6700 "O365 Sync. Management"
             ConnectionString := SecretStrSubstNo('%1;{Uri}=%2', ConnectionString, ExchangeSync.GetExchangeEndpoint());
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by BuildExchangeConnectionStringAsSecretText', '25.0')]
-    [NonDebuggable]
-    [Scope('OnPrem')]
-    procedure BuildExchangeConnectionString(var ExchangeSync: Record "Exchange Sync") ConnectionString: Text
-    begin
-        exit(BuildExchangeConnectionStringAsSecretText(ExchangeSync).Unwrap());
-    end;
-#endif
 
     [Scope('OnPrem')]
     procedure BuildExchangeConnectionStringAsSecretText(var ExchangeSync: Record "Exchange Sync") ConnectionString: SecretText
