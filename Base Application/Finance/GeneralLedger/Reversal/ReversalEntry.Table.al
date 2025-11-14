@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -224,17 +224,10 @@ table 179 "Reversal Entry"
         {
             Caption = 'Amount (FCY)';
             ObsoleteReason = 'Replaced by W1 field Source Currency Amount';
-#if CLEAN25
 #pragma warning disable AS0072
             ObsoleteState = Removed;
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
-#else
-#pragma warning disable AS0072
-            ObsoleteState = Pending;
-            ObsoleteTag = '24.0';
-#pragma warning restore AS0072
-#endif
         }
 #endif
         field(33; "Source Currency Code"; Code[10])
@@ -1405,9 +1398,6 @@ table 179 "Reversal Entry"
         Description := GLEntry.Description;
         "Amount (LCY)" := GLEntry.Amount;
         "Source Currency Amount" := GLEntry."Source Currency Amount";
-#if not CLEAN25
-        "Amount (FCY)" := GLEntry."Amount (FCY)";
-#endif
         "Debit Amount (LCY)" := GLEntry."Debit Amount";
         "Credit Amount (LCY)" := GLEntry."Credit Amount";
         "VAT Amount" := GLEntry."VAT Amount";
@@ -1450,9 +1440,6 @@ table 179 "Reversal Entry"
         Amount := VATEntry.Amount;
         "Amount (LCY)" := VATEntry.Amount;
         "Source Currency Amount" := VATEntry."Source Currency VAT Amount";
-#if not CLEAN25
-        "Amount (FCY)" := VATEntry."Amount (FCY)";
-#endif
         "Document Type" := VATEntry."Document Type";
         "Document No." := VATEntry."Document No.";
 

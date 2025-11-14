@@ -104,9 +104,6 @@ using Microsoft.HumanResources.Payables;
 using Microsoft.HumanResources.Setup;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
-#if not CLEAN25
-using Microsoft.Integration.FieldService;
-#endif
 using Microsoft.Integration.Entity;
 using Microsoft.Integration.Graph;
 using Microsoft.Integration.SyncEngine;
@@ -612,22 +609,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "CRM Transactioncurrency" = RM,
                   tabledata "CRM Uom" = RM,
                   tabledata "CRM Uomschedule" = RM,
-#if not CLEAN25
-                  tabledata "FS Connection Setup" = RM,
-                  tabledata "FS Bookable Resource" = RM,
-                  tabledata "FS Bookable Resource Booking" = RM,
-                  tabledata "FS BookableResourceBookingHdr" = RM,
-                  tabledata "FS Customer Asset" = RM,
-                  tabledata "FS Customer Asset Category" = RM,
-                  tabledata "FS Project Task" = RM,
-                  tabledata "FS Resource Pay Type" = RM,
-                  tabledata "FS Work Order" = RM,
-                  tabledata "FS Work Order Incident" = RM,
-                  tabledata "FS Work Order Product" = RM,
-                  tabledata "FS Work Order Service" = RM,
-                  tabledata "FS Work Order Substatus" = RM,
-                  tabledata "FS Work Order Type" = RM,
-#endif
                   tabledata "CSV Buffer" = RM,
                   tabledata "Curr. Exch. Rate Update Setup" = RM,
                   tabledata Currency = RM,

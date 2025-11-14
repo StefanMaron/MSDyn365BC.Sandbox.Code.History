@@ -70,9 +70,6 @@ using System.Automation;
 using System.IO;
 using System.DateTime;
 using System.Environment.Configuration;
-#if not CLEAN25
-using System.Security.AccessControl;
-#endif
 using System.Utilities;
 
 table 81 "Gen. Journal Line"
@@ -3374,10 +3371,6 @@ table 81 "Gen. Journal Line"
         DimMgt: Codeunit DimensionManagement;
         PaymentToleranceMgt: Codeunit "Payment Tolerance Management";
         LSVMgt: Codeunit LSVMgt;
-#if not CLEAN25
-        GLForeignCurrMgt: Codeunit GlForeignCurrMgt;
-        FeatureKeyManagement: Codeunit "Feature Key Management";
-#endif
         DTAMgt: Codeunit DtaMgt;
         DeferralUtilities: Codeunit "Deferral Utilities";
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
@@ -6002,16 +5995,6 @@ table 81 "Gen. Journal Line"
         OnAfterClearBalPostingGroups(Rec);
     end;
 
-#if not CLEAN25
-    local procedure CheckGLForeignCurrMgtPermission(): Boolean
-    var
-        LicensePermission: Record "License Permission";
-    begin
-        exit(
-          (LicensePermission.Get(LicensePermission."Object Type"::Codeunit, CODEUNIT::GlForeignCurrMgt) and
-          (LicensePermission."Read Permission" = LicensePermission."Read Permission"::Yes)));
-    end;
-#endif
 
     procedure CancelBackgroundPosting()
     var
@@ -6704,29 +6687,8 @@ table 81 "Gen. Journal Line"
         OnAfterCopyGenJnlLineFromSalesHeaderPayment(SalesHeader, Rec);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToGenJournalLine() in table Service Header', '25.0')]
-    procedure CopyFromServiceHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    begin
-        ServiceHeader.CopyToGenJournalLine(Rec);
-    end;
-#endif
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToGenJournalLineApplyTo() in table Service Header', '25.0')]
-    procedure CopyFromServiceHeaderApplyTo(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    begin
-        ServiceHeader.CopyToGenJournalLineApplyTo(Rec);
-    end;
-#endif
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure CopyToGenJournalLinePayment() in table Service Header', '25.0')]
-    procedure CopyFromServiceHeaderPayment(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    begin
-        ServiceHeader.CopyToGenJournalLinePayment(Rec);
-    end;
-#endif
 
     procedure CopyFromPaymentCustLedgEntry(CustLedgEntry: Record "Cust. Ledger Entry")
     begin
@@ -7068,19 +7030,9 @@ table 81 "Gen. Journal Line"
                 ClearPostingGroups();
         Validate("Deferral Code", GLAcc."Default Deferral Template Code");
 
-#if not CLEAN25
-        if FeatureKeyManagement.IsGLCurrencyRevaluationEnabled() then begin
-            GLSetup.Get();
-            if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
-                "Currency Code" := GLAcc."Source Currency Code";
-        end else
-            if CheckGLForeignCurrMgtPermission() or (CopyStr(SerialNumber, 7, 3) = '000') then
-                GLForeignCurrMgt.GetCurrCode("Account No.", Rec);
-#else
         GLSetup.Get();
         if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
             "Currency Code" := GLAcc."Source Currency Code";
-#endif
 
         OnAfterAccountNoOnValidateGetGLAccount(Rec, GLAcc, CurrFieldNo);
     end;
@@ -7129,19 +7081,9 @@ table 81 "Gen. Journal Line"
             if "Posting Date" = ClosingDate("Posting Date") then
                 ClearBalancePostingGroups();
 
-#if not CLEAN25
-        if FeatureKeyManagement.IsGLCurrencyRevaluationEnabled() then begin
-            GLSetup.Get();
-            if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
-                "Currency Code" := GLAcc."Source Currency Code";
-        end else
-            if CheckGLForeignCurrMgtPermission() then
-                GLForeignCurrMgt.GetCurrCode("Bal. Account No.", Rec);
-#else
         GLSetup.Get();
         if ("Currency Code" = '') or (("Currency Code" = GLSetup."LCY Code") and (GLAcc."Source Currency Code" <> '')) then
             "Currency Code" := GLAcc."Source Currency Code";
-#endif
 
         OnAfterAccountNoOnValidateGetGLBalAccount(Rec, GLAcc, CurrFieldNo);
     end;
@@ -8197,44 +8139,8 @@ table 81 "Gen. Journal Line"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnAfterCopyGenJnlLineFromServHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-        OnAfterCopyGenJnlLineFromServHeader(ServiceHeader, GenJournalLine);
-    end;
 
-    [Obsolete('Replaced by event OnAfterCopyToGenJnlLine in table Service Header', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyGenJnlLineFromServHeader(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-#endif
 
-#if not CLEAN25
-    internal procedure RunOnAfterCopyGenJnlLineFromServHeaderApplyTo(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-        OnAfterCopyGenJnlLineFromServHeaderApplyTo(ServiceHeader, GenJournalLine);
-    end;
-
-    [Obsolete('Replaced by event OnAfterCopyToGenJnlLineApplyTo in table Service Header', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyGenJnlLineFromServHeaderApplyTo(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-#endif
-
-#if not CLEAN25
-    internal procedure RunOnAfterCopyGenJnlLineFromServHeaderPayment(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-        OnAfterCopyGenJnlLineFromServHeaderPayment(ServiceHeader, GenJournalLine);
-    end;
-
-    [Obsolete('Replaced by event OnAfterCopyToGenJnlLinePayment in table Service Header', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyGenJnlLineFromServHeaderPayment(ServiceHeader: Record Microsoft.Service.Document."Service Header"; var GenJournalLine: Record "Gen. Journal Line")
-    begin
-    end;
-#endif
 
     /// <summary>
     /// Event triggered after copying data from a prepayment invoice line buffer to the general journal line.

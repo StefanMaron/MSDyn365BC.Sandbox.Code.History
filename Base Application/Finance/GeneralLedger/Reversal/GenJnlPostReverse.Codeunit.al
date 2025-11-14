@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -207,9 +207,6 @@ codeunit 17 "Gen. Jnl.-Post Reverse"
                 NonDeductibleVAT.Reverse(GLEntry, GLEntry2);
                 GLEntry."Debit Amount" := -GLEntry2."Debit Amount";
                 GLEntry."Credit Amount" := -GLEntry2."Credit Amount";
-#if not CLEAN25
-                GLEntry."Amount (FCY)" := -GLEntry2."Amount (FCY)";
-#endif
                 GLEntry."Additional-Currency Amount" := -GLEntry2."Additional-Currency Amount";
                 GLEntry."Add.-Currency Debit Amount" := -GLEntry2."Add.-Currency Debit Amount";
                 GLEntry."Add.-Currency Credit Amount" := -GLEntry2."Add.-Currency Credit Amount";
@@ -574,10 +571,6 @@ codeunit 17 "Gen. Jnl.-Post Reverse"
                 NewVATEntry.Amount := -NewVATEntry.Amount;
                 NewVATEntry."Source Currency VAT Base" := -NewVATEntry."Source Currency VAT Base";
                 NewVATEntry."Source Currency VAT Amount" := -NewVATEntry."Source Currency VAT Amount";
-#if not CLEAN25
-                NewVATEntry."Amount (FCY)" := -NewVATEntry."Amount (FCY)";
-                NewVATEntry."Base (FCY)" := -NewVATEntry."Base (FCY)";
-#endif
                 NewVATEntry."Unrealized Amount" := -NewVATEntry."Unrealized Amount";
                 NewVATEntry."Unrealized Base" := -NewVATEntry."Unrealized Base";
                 NewVATEntry."Remaining Unrealized Amount" := -NewVATEntry."Remaining Unrealized Amount";

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -2426,17 +2426,6 @@ page 8901 "Finance Manager Role Center"
                 group("Group57")
                 {
                     Caption = 'Intrastat';
-#if not CLEAN25
-                    action("Report Selection - Intrastat")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Report Selection';
-                        RunObject = page "Report Selection - Intrastat";
-                        ObsoleteReason = 'Replaced by Intrastat extension';
-                        ObsoleteState = Pending;
-                        ObsoleteTag = '25.0';
-                    }
-#endif
                     action("Tariff Numbers")
                     {
                         ApplicationArea = Basic, Suite;
@@ -2697,19 +2686,6 @@ page 8901 "Finance Manager Role Center"
                         Caption = 'Swiss VAT Statement';
                         RunObject = report "Swiss VAT Statement";
                     }
-#if not CLEAN25
-#pragma warning disable AA0194
-                    action("Adjust Exchange Rates G/L")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Adjust Exchange Rates G/L';
-                        ObsoleteReason = 'Replaced by new report G/L Currency Revaluation in Chart of Accounts page.';
-                        ObsoleteState = Pending;
-                        ObsoleteTag = '25.0';
-                        Visible = false;
-                    }
-#pragma warning restore AA0194
-#endif
                     action("Account Interest")
                     {
                         ApplicationArea = Basic, Suite;

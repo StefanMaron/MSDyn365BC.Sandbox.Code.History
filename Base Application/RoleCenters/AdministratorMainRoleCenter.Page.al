@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -302,17 +302,6 @@ page 8900 "Administrator Main Role Center"
                         Caption = 'Report Selections Inventory';
                         RunObject = page "Report Selection - Inventory";
                     }
-#if not CLEAN25
-                    action("Report Selection - Comf. Purch")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Report Selection - Comf. Purch';
-                        RunObject = page "Report Selection - Comf. Purch";
-                        ObsoleteReason = 'Replaced by action Report Selection - Purchase';
-                        ObsoleteState = Pending;
-                        ObsoleteTag = '25.0';
-                    }
-#endif
                 }
                 group("Group7")
                 {
