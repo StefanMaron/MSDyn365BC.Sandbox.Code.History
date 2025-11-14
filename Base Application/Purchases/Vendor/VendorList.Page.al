@@ -31,9 +31,6 @@ using System.Integration.PowerBI;
 using System.Integration.Word;
 using System.Text;
 using Microsoft.Inventory.Location;
-#if not CLEAN25
-using Microsoft.Finance.VAT.Reporting;
-#endif
 using Microsoft.Finance.SalesTax;
 
 page 27 "Vendor List"
@@ -277,18 +274,6 @@ page 27 "Vendor List"
                 ApplicationArea = Basic, Suite;
                 Visible = false;
             }
-#if not CLEAN25
-            part("Attached Documents"; "Document Attachment Factbox")
-            {
-                ObsoleteTag = '25.0';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
-                ApplicationArea = All;
-                Visible = false;
-                Caption = 'Attachments';
-                SubPageLink = "Table ID" = const(Database::Vendor), "No." = field("No.");
-            }
-#endif
             part("Attached Documents List"; "Doc. Attachment List Factbox")
             {
                 ApplicationArea = All;
@@ -714,22 +699,6 @@ page 27 "Vendor List"
                                   "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'View entry statistics for the record.';
                 }
-#if not CLEAN25
-                action("1099 Statistics")
-                {
-                    ApplicationArea = BasicUS;
-                    Caption = '1099 Statistics';
-                    Image = Statistics1099;
-                    RunObject = Page "Vendor 1099 Statistics";
-                    RunPageLink = "No." = field("No.");
-                    ShortCutKey = 'Shift+F11';
-                    ToolTip = 'View the vendor 1099 statistics that you can use to create 1099 reports and generate the files necessary to submit 1099 information to the Internal Revenue Service (IRS). This information is required to report paid vendor income.';
-                    ObsoleteReason = 'Moved to IRS Forms App.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                    Visible = false;
-                }
-#endif
                 action("Statistics by C&urrencies")
                 {
                     ApplicationArea = Suite;
@@ -1217,110 +1186,6 @@ page 27 "Vendor List"
                     RunObject = Report "Item/Vendor Catalog";
                     ToolTip = 'View a list of the items that your vendors supply.';
                 }
-#if not CLEAN25
-                action("Vendor 1099 Div")
-                {
-                    ApplicationArea = BasicUS;
-                    Caption = 'Vendor 1099 Div';
-                    Image = "Report";
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = "Report";
-                    ToolTip = 'View the federal form 1099-DIV for dividends and distribution.';
-                    ObsoleteReason = 'Moved to IRS Forms App.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-
-                    trigger OnAction()
-                    var
-                        IRS1099Management: Codeunit "IRS 1099 Management";
-                    begin
-                        IRS1099Management.Run1099DivReport();
-                    end;
-                }
-                action("Vendor 1099 Information")
-                {
-                    ApplicationArea = BasicUS;
-                    Caption = 'Vendor 1099 Information';
-                    Image = "Report";
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = "Report";
-                    RunObject = Report "Vendor 1099 Information";
-                    ToolTip = 'View the vendors'' 1099 information. The report includes all 1099 information for the vendors that have been set up using the IRS 1099 Form-Box table. This includes only amounts that have been paid. It does not include amounts billed but not yet paid. You must enter a date filter before you can print this report.';
-                    ObsoleteReason = 'Moved to IRS Forms App.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                }
-                action("Vendor 1099 Int")
-                {
-                    ApplicationArea = BasicUS;
-                    Caption = 'Vendor 1099 Int';
-                    Image = "Report";
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = "Report";
-                    ToolTip = 'View the federal form 1099-INT for interest income.';
-                    ObsoleteReason = 'Moved to IRS Forms App.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-
-                    trigger OnAction()
-                    var
-                        IRS1099Management: Codeunit "IRS 1099 Management";
-                    begin
-                        IRS1099Management.Run1099IntReport();
-                    end;
-                }
-                action("Vendor 1099 Misc")
-                {
-                    ApplicationArea = BasicUS;
-                    Caption = 'Vendor 1099 Misc';
-                    Image = "Report";
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = "Report";
-                    ToolTip = 'View the federal form 1099-MISC for miscellaneous income.';
-                    ObsoleteReason = 'Moved to IRS Forms App.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-
-                    trigger OnAction()
-                    var
-                        IRS1099Management: Codeunit "IRS 1099 Management";
-                    begin
-                        IRS1099Management.Run1099MiscReport();
-                    end;
-                }
-                action(RunVendor1099NecReport)
-                {
-                    ApplicationArea = BasicUS;
-                    Caption = 'Vendor 1099 Nec';
-                    Image = "Report";
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = "Report";
-                    ToolTip = 'View the federal form 1099-NEC for nonemployee compensation.';
-                    ObsoleteReason = 'Moved to IRS Forms App.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-
-                    trigger OnAction()
-                    var
-                        IRS1099Management: Codeunit "IRS 1099 Management";
-                    begin
-                        IRS1099Management.Run1099NecReport();
-                    end;
-                }
-#endif
-#if not CLEAN25
-                action("Vendor - Top 10 List")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Vendor - Top 10 List';
-                    Image = "Report";
-                    RunObject = Report "Top __ Vendor List";
-                    ToolTip = 'View a list of the vendors from whom you purchase the most or to whom you owe the most.';
-                    ObsoleteReason = 'Moved to IRS Forms App.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                }
-#endif
             }
             group(Action5)
             {
@@ -1450,14 +1315,6 @@ page 27 "Vendor List"
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
-#if not CLEAN25
-                actionref("1099 Statistics_Promoted"; "1099 Statistics")
-                {
-                    ObsoleteReason = 'Moved to IRS Forms App.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                }
-#endif
                 separator(Navigate_Separator)
                 {
                 }
@@ -1622,4 +1479,3 @@ page 27 "Vendor List"
         CurrPage.SetSelectionFilter(Vendor);
     end;
 }
-

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -710,13 +710,6 @@ codeunit 99000837 "Prod. Order Line-Reserve"
         ReservQty: Decimal;
         IsReserved: Boolean;
     begin
-#if not CLEAN25
-        IsReserved := false;
-        sender.RunOnBeforeAutoReserveProdOrderLine(
-          ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserve, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
-        if IsReserved then
-            exit;
-#endif
         IsReserved := false;
         OnBeforeAutoReserveProdOrderLine(
           ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, IsReserved, Search, NextStep, CalcReservEntry);
@@ -910,9 +903,6 @@ codeunit 99000837 "Prod. Order Line-Reserve"
             ProdOrderLine."Finished Qty. (Base)");
 
         OnAfterInitFromProdOrderLine(TrackingSpecification, ProdOrderLine);
-#if not CLEAN25
-        TrackingSpecification.RunOnAfterInitFromProdOrderLine(TrackingSpecification, ProdOrderLine);
-#endif
     end;
 
     [IntegrationEvent(false, false)]
@@ -1076,9 +1066,6 @@ codeunit 99000837 "Prod. Order Line-Reserve"
         InventoryProfile.IsSupply := InventoryProfile."Untracked Quantity" >= 0;
 
         OnAfterTransferInventoryProfileFromProdOrderLine(InventoryProfile, ProdOrderLine);
-#if not CLEAN25
-        InventoryProfile.RunOnAfterTransferFromProdOrderLine(InventoryProfile, ProdOrderLine);
-#endif
     end;
 
     [IntegrationEvent(false, false)]

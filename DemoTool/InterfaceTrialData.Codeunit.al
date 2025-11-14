@@ -147,9 +147,6 @@ codeunit 122000 "Interface Trial Data"
         CreateItemJournalTemplate.InsertMiniAppData();
         RunCodeunit(CODEUNIT::"Create Excel Templates");
         RunCodeunit(CODEUNIT::"Create MX SAT");
-#if not CLEAN25
-        RunCodeunit(CODEUNIT::"Create IRS 1099 Form Boxes");
-#endif
         RunCodeunit(Codeunit::"Create Word Templates");
         RunCodeunit(CODEUNIT::"Create Miniform Header");
         RunCodeunit(CODEUNIT::"Create Miniform Line");
@@ -186,4 +183,3 @@ codeunit 122000 "Interface Trial Data"
         OnlineMapMgt.SetupDefault();
     end;
 }
-

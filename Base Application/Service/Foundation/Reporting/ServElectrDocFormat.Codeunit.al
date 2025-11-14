@@ -46,22 +46,12 @@ codeunit 6464 "Serv. Electr. Doc. Format"
     local procedure GetDocumentUsageForServiceHeader(DocumentRecordRef: RecordRef; var DocumentFormatUsage: Enum "Electronic Document Format Usage")
     var
         ServiceHeader: Record "Service Header";
-#if not CLEAN25
-        ElectronitDocumentFormat: Record "Electronic Document Format";
-        DocumentUsage: Option;
-#endif
         IsHandled: Boolean;
     begin
         DocumentRecordRef.SetTable(ServiceHeader);
 
         IsHandled := false;
         OnBeforeGetDocumentFormatUsageForServiceHeader(ServiceHeader, DocumentFormatUsage, IsHandled);
-#if not CLEAN25
-        DocumentUsage := DocumentFormatUsage.AsInteger();
-        ElectronitDocumentFormat.RunOnBeforeGetDocumentUsageForServiceHeader(ElectronitDocumentFormat, ServiceHeader, DocumentUsage, IsHandled);
-        if DocumentFormatUsage.AsInteger() <> DocumentUsage then
-            DocumentFormatUsage := "Electronic Document Format Usage".FromInteger(DocumentUsage);
-#endif
         if IsHandled then
             exit;
 

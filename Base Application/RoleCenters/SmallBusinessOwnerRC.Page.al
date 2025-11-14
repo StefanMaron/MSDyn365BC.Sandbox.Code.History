@@ -913,19 +913,6 @@ page 9020 "Small Business Owner RC"
                     RunObject = Page "Reason Codes";
                     ToolTip = 'View or set up codes that specify reasons why entries were created, such as Return, to specify why a purchase credit memo was posted.';
                 }
-#if not CLEAN25
-                action("IRS 1099 Form-Box")
-                {
-                    Caption = 'IRS 1099 Form-Box';
-                    Image = "1099Form";
-                    RunObject = Page "IRS 1099 Form-Box";
-                    ToolTip = 'Set up 1099 tax forms to use on vendor cards, track posted amounts, and print or export 1099 information. After you have set up a 1099 code, you can enter it as a default 1099 form for a vendor.';
-                    ObsoleteReason = 'Moved to IRS Forms App.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                    Visible = false;
-                }
-#endif
                 action("GIFI Codes")
                 {
                     Caption = 'GIFI Codes';

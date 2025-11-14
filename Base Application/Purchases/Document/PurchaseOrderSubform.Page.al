@@ -898,17 +898,6 @@ page 54 "Purchase Order Subform"
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
                 }
-#if not CLEAN25
-                field("IRS 1099 Liable"; Rec."IRS 1099 Liable")
-                {
-                    ApplicationArea = BasicUS;
-                    ToolTip = 'Specifies if the amount is to be a 1099 amount.';
-                    Visible = false;
-                    ObsoleteReason = 'Moved to IRS Forms App.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '25.0';
-                }
-#endif
                 field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = Suite;
@@ -2048,4 +2037,3 @@ page 54 "Purchase Order Subform"
     begin
     end;
 }
-

@@ -172,19 +172,6 @@ page 89 "Job List"
                 Caption = 'Project Details';
                 SubPageLink = "No." = field("No.");
             }
-#if not CLEAN25
-            part("Attached Documents"; "Document Attachment Factbox")
-            {
-                ObsoleteTag = '25.0';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The "Document Attachment FactBox" has been replaced by "Doc. Attachment List Factbox", which supports multiple files upload.';
-                ApplicationArea = All;
-                Visible = false;
-                Caption = 'Attachments';
-                SubPageLink = "Table ID" = const(Database::Job),
-                              "No." = field("No.");
-            }
-#endif
             part("Attached Documents List"; "Doc. Attachment List Factbox")
             {
                 ApplicationArea = All;
@@ -1107,4 +1094,3 @@ page 89 "Job List"
         Page.Run(Page::"Warehouse Activity Lines", TempWarehouseActivityLine);
     end;
 }
-

@@ -82,35 +82,6 @@ page 565 "CrossIntercompany Modify Setup"
         }
     }
 
-#if not CLEAN25
-    actions
-    {
-        area(Processing)
-        {
-            action(TestConnection)
-            {
-                ApplicationArea = Intercompany;
-                Caption = 'Test Connection';
-                ToolTip = 'Test the connection to the partner''s company to check whether authentication is correctly set up.';
-                Image = InteractionTemplateSetup;
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'Moved logic to OnClosePage.';
-                ObsoleteTag = '25.0';
-
-                trigger OnAction()
-                var
-                    CrossIntercompanyConnector: Codeunit "CrossIntercompany Connector";
-                begin
-                    if CrossIntercompanyConnector.TestICPartnerSetup(Rec) then
-                        Message(SuccesfullConnectionMsg)
-                    else
-                        Message(FailedConnectionErr);
-                end;
-            }
-        }
-    }
-#endif
 
     trigger OnOpenPage()
     begin
@@ -156,10 +127,6 @@ page 565 "CrossIntercompany Modify Setup"
         ClientSecretModified: Boolean;
         ConnectionUrl, TokenEndpoint, RedirectUrl : Text;
         CompanyId, ClientId : Guid;
-#if not CLEAN25
-        SuccesfullConnectionMsg: Label 'Connection to the partner''s company was successful.';
-        FailedConnectionErr: Label 'Connection to the partner''s company failed.';
-#endif
         ClientSecretTok: Label '*********', Locked = true;
 
     [NonDebuggable]
