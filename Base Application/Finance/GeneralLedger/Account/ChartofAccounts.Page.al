@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -208,17 +208,11 @@ page 16 "Chart of Accounts"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies how amounts in foreign currencies should be posted to this account.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Source Currency Code"; Rec."Source Currency Code")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the allowed source currency code if Source Currency Posting value is Same Currency.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 field("Source Currency Balance"; Rec."Source Currency Balance")
                 {
@@ -281,9 +275,6 @@ page 16 "Chart of Accounts"
                               "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
                               "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
                               "Date Filter" = field("Date Filter");
-#if not CLEAN25
-                Visible = SourceCurrencyVisible;
-#endif
             }
             systempart(Control1900383207; Links)
             {
@@ -521,9 +512,6 @@ page 16 "Chart of Accounts"
                     Image = CurrencyExchangeRates;
                     RunObject = Report "G/L Currency Revaluation";
                     ToolTip = 'Create general journal lines with currency revaluation for G/L accounts with posting in source currency.';
-#if not CLEAN25
-                    Visible = SourceCurrencyVisible;
-#endif
                 }
                 action("Close Income Statement")
                 {
@@ -756,28 +744,13 @@ page 16 "Chart of Accounts"
         NameIndent: Integer;
         AmountVisible: Boolean;
         DebitCreditVisible: Boolean;
-#if not CLEAN25
-        SourceCurrencyVisible: Boolean;
-#endif
 
     local procedure SetControlVisibility()
     var
         GLSetup: Record "General Ledger Setup";
-#if not CLEAN25
-        FeatureKeyManagement: Codeunit System.Environment.Configuration."Feature Key Management";
-        ClientTypeManagement: Codeunit System.Environment."Client Type Management";
-#endif
     begin
         GLSetup.Get();
         AmountVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Debit/Credit Only");
         DebitCreditVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Amount Only");
-#if not CLEAN25
-        if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::SOAP, CLIENTTYPE::OData, CLIENTTYPE::ODataV4, ClientType::Api]
-        then
-            SourceCurrencyVisible := false
-        else
-            SourceCurrencyVisible := FeatureKeyManagement.IsGLCurrencyRevaluationEnabled();
-#endif
     end;
 }
-

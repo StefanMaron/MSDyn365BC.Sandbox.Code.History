@@ -1004,15 +1004,6 @@ codeunit 408 DimensionManagement
         OnAfterTypeToTableID4(Type, TableId);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure ServiceLineTypeToTableID() in codeunit Serv. Dimension Management', '25.0')]
-    procedure TypeToTableID5(Type: Option " ",Item,Resource,Cost,"G/L Account") TableId: Integer
-    var
-        ServDimensionManagement: Codeunit Microsoft.Service.Document."Serv. Dimension Management";
-    begin
-        exit(ServDimensionManagement.ServiceLineTypeTotableId(Microsoft.Service.Document."Service Line Type".FromInteger(Type)));
-    end;
-#endif
 
     procedure DeleteDefaultDim(TableID: Integer; No: Code[20])
     var

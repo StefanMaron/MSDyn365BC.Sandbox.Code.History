@@ -382,15 +382,6 @@ table 55 "Invoice Posting Buffer"
         exit(GeneralLedgerSetup."Additional Reporting Currency")
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure PrepareInvoicePostingBuffer in codeunit Sales Post Invoice', '25.0')]
-    procedure PrepareSales(var SalesLine: Record Microsoft.Sales.Document."Sales Line")
-    var
-        SalesPostInvoice: Codeunit Microsoft.Sales.Posting."Sales Post Invoice";
-    begin
-        SalesPostInvoice.PrepareInvoicePostingBuffer(SalesLine, Rec);
-    end;
-#endif
 
     procedure CalcDiscount(PricesInclVAT: Boolean; DiscountAmount: Decimal; DiscountAmountACY: Decimal)
     var
@@ -466,15 +457,6 @@ table 55 "Invoice Posting Buffer"
         "VAT Base Before Pmt. Disc." := TotalAmount;
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure PrepareInvoicePostingBuffer in codeunit Purch. Post Invoice', '25.0')]
-    procedure PreparePurchase(var PurchLine: Record Microsoft.Purchases.Document."Purchase Line")
-    var
-        PurchPostInvoice: Codeunit Microsoft.Purchases.Posting."Purch. Post Invoice";
-    begin
-        PurchPostInvoice.PrepareInvoicePostingBuffer(PurchLine, Rec);
-    end;
-#endif
 
     procedure CalcDiscountNoVAT(DiscountAmount: Decimal; DiscountAmountACY: Decimal)
     var
@@ -492,25 +474,7 @@ table 55 "Invoice Posting Buffer"
         "VAT Base Before Pmt. Disc." := "VAT Base Amount";
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure SetSalesTax in codeunit Purch. Post Invoice', '25.0')]
-    procedure SetSalesTaxForPurchLine(PurchaseLine: Record Microsoft.Purchases.Document."Purchase Line")
-    var
-        PurchPostInvoice: Codeunit Microsoft.Purchases.Posting."Purch. Post Invoice";
-    begin
-        PurchPostInvoice.SetSalesTax(PurchaseLine, Rec);
-    end;
-#endif
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure SetSalesTax in codeunit Sales Post Invoice', '25.0')]
-    procedure SetSalesTaxForSalesLine(SalesLine: Record Microsoft.Sales.Document."Sales Line")
-    var
-        SalesPostInvoice: Codeunit Microsoft.Sales.Posting."Sales Post Invoice";
-    begin
-        SalesPostInvoice.SetSalesTax(SalesLine, Rec);
-    end;
-#endif
 
     procedure ReverseAmounts()
     begin
@@ -535,15 +499,6 @@ table 55 "Invoice Posting Buffer"
         "VAT Difference" := VATDifference;
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by procedure PrepareInvoicePostingBuffer in codeunit Service Post Invoice', '25.0')]
-    procedure PrepareService(var ServiceLine: Record Microsoft.Service.Document."Service Line")
-    var
-        ServicePostInvoice: Codeunit Microsoft.Service.Posting."Service Post Invoice";
-    begin
-        ServicePostInvoice.PrepareInvoicePostingBuffer(ServiceLine, Rec);
-    end;
-#endif
 
     procedure PreparePrepmtAdjBuffer(InvoicePostingBuffer: Record "Invoice Posting Buffer"; GLAccountNo: Code[20]; AdjAmount: Decimal; RoundingEntry: Boolean)
     var
@@ -795,44 +750,8 @@ table 55 "Invoice Posting Buffer"
         OnAfterCopyToGenJnlLineFA(GenJnlLine, Rec);
     end;
 
-#if not CLEAN25
-    internal procedure RunOnAfterPrepareSales(var SalesLine: Record Microsoft.Sales.Document."Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-        OnAfterPrepareSales(SalesLine, InvoicePostingBuffer);
-    end;
 
-    [Obsolete('Replaced by event OnAfterPrepareInvoicePostingBuffer in codeunit Sales Post Invoice Events', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPrepareSales(var SalesLine: Record Microsoft.Sales.Document."Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-#endif
 
-#if not CLEAN25
-    internal procedure RunOnAfterPreparePurchase(var PurchaseLine: Record Microsoft.Purchases.Document."Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-        OnAfterPreparePurchase(PurchaseLine, InvoicePostingBuffer);
-    end;
-
-    [Obsolete('Replaced by event OnAfterPrepareInvoicePostingBuffer in Purch. Post Invoice Events', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPreparePurchase(var PurchaseLine: Record Microsoft.Purchases.Document."Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-#endif
-
-#if not CLEAN25
-    internal procedure RunOnAfterPrepareService(var ServiceLine: Record Microsoft.Service.Document."Service Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-        OnAfterPrepareService(ServiceLine, InvoicePostingBuffer);
-    end;
-
-    [Obsolete('Replaced by event OnAfterPrepareInvoicePostingBuffer in codeunit Service Post Invoice', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPrepareService(var ServiceLine: Record Microsoft.Service.Document."Service Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterBuildPrimaryKey(var InvoicePostingBuffer: Record "Invoice Posting Buffer")
@@ -869,18 +788,6 @@ table 55 "Invoice Posting Buffer"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnBeforePrepareSales(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var SalesLine: Record Microsoft.Sales.Document."Sales Line")
-    begin
-        OnBeforePrepareSales(InvoicePostingBuffer, SalesLine);
-    end;
-
-    [Obsolete('Moved to codeunit Sales Post Invoice Events', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePrepareSales(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var SalesLine: Record Microsoft.Sales.Document."Sales Line")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnFillPrepmtAdjBufferOnBeforeAssignInvoicePostingBuffer(var PrepmtAdjInvoicePostingBuffer: Record "Invoice Posting Buffer"; InvoicePostingBuffer: Record "Invoice Posting Buffer")
