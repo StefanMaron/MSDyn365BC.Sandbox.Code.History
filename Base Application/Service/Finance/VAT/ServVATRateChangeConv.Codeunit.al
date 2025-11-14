@@ -323,9 +323,6 @@ codeunit 6471 "Serv. VAT Rate Change Conv."
             OldServiceLine.Validate("Qty. to Invoice", OldServiceLine."Qty. to Invoice");
 
         OnAddNewServiceLineOnBeforeOldServiceLineModify(OldServiceLine, NewServiceLine, VATProdPostingGroup, GenProdPostingGroup);
-#if not CLEAN25
-        VATRateChangeConversionMgt.RunOnAddNewServiceLineOnBeforeOldServiceLineModify(OldServiceLine, NewServiceLine, VATProdPostingGroup, GenProdPostingGroup);
-#endif
         OldServiceLine.Modify();
     end;
 
