@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -1556,9 +1556,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
                 // Post Reminder Terms - Note About Line Fee on Report
                 LineFeeNoteOnReportHist.Save(CustLedgEntry);
                 OnAfterCustLedgEntryInsert(CustLedgEntry, GenJournalLine, DtldLedgEntryInserted, PreviewMode);
-#if not CLEAN25
-                OnAfterCustLedgEntryInsertInclPreviewMode(CustLedgEntry, GenJournalLine, DtldLedgEntryInserted, PreviewMode);
-#endif
                 if DtldLedgEntryInserted then
                     if IsTempGLEntryBufEmpty() then
                         DtldCustLedgEntry.SetZeroTransNo(NextTransactionNo);
@@ -1734,9 +1731,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
             DtldLedgEntryInserted := PostDtldVendLedgEntries(GenJournalLine, TempDtldCVLedgEntryBuf, VendPostingGr, true);
 
             OnAfterVendLedgEntryInsert(VendLedgEntry, GenJournalLine, DtldLedgEntryInserted, PreviewMode);
-#if not CLEAN25
-            OnAfterVendLedgEntryInsertInclPreviewMode(VendLedgEntry, GenJournalLine, DtldLedgEntryInserted, PreviewMode);
-#endif
             if DtldLedgEntryInserted then
                 if IsTempGLEntryBufEmpty() then
                     DtldVendLedgEntry.SetZeroTransNo(NextTransactionNo);
@@ -9507,13 +9501,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
     begin
     end;
 
-#if not CLEAN25
-    [Obsolete('This event is obsolete. Use OnAfterCustLedgEntryInsert instead.', '25.0')]
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterCustLedgEntryInsertInclPreviewMode(var CustLedgerEntry: Record "Cust. Ledger Entry"; GenJournalLine: Record "Gen. Journal Line"; DtldLedgEntryInserted: Boolean; PreviewMode: Boolean)
-    begin
-    end;
-#endif
 
 
     [IntegrationEvent(false, false)]
@@ -9531,13 +9518,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
     begin
     end;
 
-#if not CLEAN25
-    [Obsolete('This event is obsolete. Use OnAfterVendLedgEntryInsert instead.', '25.0')]
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterVendLedgEntryInsertInclPreviewMode(var VendorLedgerEntry: Record "Vendor Ledger Entry"; GenJournalLine: Record "Gen. Journal Line"; var DtldLedgEntryInserted: Boolean; PreviewMode: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFindAmtForAppln(var NewCVLedgEntryBuf: Record "CV Ledger Entry Buffer"; var OldCVLedgEntryBuf: Record "CV Ledger Entry Buffer"; var OldCVLedgEntryBuf2: Record "CV Ledger Entry Buffer"; var AppliedAmount: Decimal; var AppliedAmountLCY: Decimal; var OldAppliedAmount: Decimal; var ApplnRoundingPrecision: Decimal; var VATEntry: Record "VAT Entry")

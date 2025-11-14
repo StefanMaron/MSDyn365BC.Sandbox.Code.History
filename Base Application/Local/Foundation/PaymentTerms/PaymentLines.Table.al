@@ -444,16 +444,6 @@ table 12170 "Payment Lines"
         end;
     end;
 
-#if not CLEAN25
-    [Obsolete('Moved to codeunit ServPaymentLinesMgt', '25.0')]
-    [Scope('OnPrem')]
-    procedure CreatePaymentLinesServices(ServiceHeader: Record Microsoft.Service.Document."Service Header")
-    var
-        ServPaymentLinesMgt: Codeunit "Serv. Payment Lines Mgt.";
-    begin
-        ServPaymentLinesMgt.CreatePaymentLinesServices(ServiceHeader);
-    end;
-#endif
 
     [Scope('OnPrem')]
     procedure DeletePaymentLines(RecVar: Variant)
@@ -529,31 +519,7 @@ table 12170 "Payment Lines"
     begin
     end;
 
-#if not CLEAN25
-    internal procedure RunOnCreatePaymentLinesServicesOnAfterSetDueDate(var PaymentLines: Record "Payment Lines"; var ServiceHeader: Record Microsoft.Service.Document."Service Header"; DeferringDueDates: Record "Deferring Due Dates")
-    begin
-        OnCreatePaymentLinesServicesOnAfterSetDueDate(PaymentLines, ServiceHeader, DeferringDueDates);
-    end;
 
-    [Obsolete('Moved to codeunit ServPaymentLinesMgt', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnCreatePaymentLinesServicesOnAfterSetDueDate(var PaymentLines: Record "Payment Lines"; var ServiceHeader: Record Microsoft.Service.Document."Service Header"; DeferringDueDates: Record "Deferring Due Dates")
-    begin
-    end;
-#endif
-
-#if not CLEAN25
-    internal procedure RunOnCreatePaymentLinesServicesOnBeforePaymentLinesInsert(var PaymentLines: Record "Payment Lines"; ServiceHeader: Record Microsoft.Service.Document."Service Header"; PaymentLinesTerms: Record "Payment Lines")
-    begin
-        OnCreatePaymentLinesServicesOnBeforePaymentLinesInsert(PaymentLines, ServiceHeader, PaymentLinesTerms);
-    end;
-
-    [Obsolete('Moved to codeunit ServPaymentLinesMgt', '25.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnCreatePaymentLinesServicesOnBeforePaymentLinesInsert(var PaymentLines: Record "Payment Lines"; ServiceHeader: Record Microsoft.Service.Document."Service Header"; PaymentLinesTerms: Record "Payment Lines")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnCreatePaymentLiensPurchasesOnAfterPopulatePaymentLines(var PaymentLines: Record "Payment Lines"; PaymentLinesTerms: Record "Payment Lines"; PurchaseHeader: Record "Purchase Header")
@@ -575,4 +541,3 @@ table 12170 "Payment Lines"
     begin
     end;
 }
-

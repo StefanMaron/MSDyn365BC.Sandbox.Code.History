@@ -467,6 +467,7 @@ table 23 Vendor
         field(59; "Balance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = - sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" where("Vendor No." = field("No."),
                                                                                    "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                    "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),

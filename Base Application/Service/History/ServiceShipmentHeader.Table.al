@@ -917,9 +917,6 @@ table 5990 "Service Shipment Header"
         ItemJournalLine."Reason Code" := Rec."Reason Code";
 
         OnAfterCopyToItemJnlLine(ItemJournalLine, Rec);
-#if not CLEAN25
-        ItemJournalLine.RunOnAfterCopyItemJnlLineFromServShptHeader(ItemJournalLine, Rec);
-#endif
     end;
 
     procedure CopyToResJournalLine(var ResJournalLine: Record "Res. Journal Line")
@@ -944,9 +941,6 @@ table 5990 "Service Shipment Header"
             CertificateOfSupply."Ship-to Country/Region Code" := Rec."Ship-to Country/Region Code";
             CertificateOfSupply."Customer/Vendor No." := Rec."Bill-to Customer No.";
             OnAfterInitCertificateOfSupply(CertificateOfSupply, Rec);
-#if not CLEAN25
-            CertificateOfSupply.RunOnAfterInitFromService(CertificateOfSupply, Rec);
-#endif
             CertificateOfSupply.Insert(true);
         end
     end;
