@@ -201,15 +201,6 @@ codeunit 99 "Posting Selection Management"
         exit(true);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by same procedure in codeunit Serv. Posting Selection Mgt.', '25.0')]
-    procedure ConfirmPostServiceDocument(var ServiceHeaderToPost: Record Microsoft.Service.Document."Service Header"; var Ship: Boolean; var Consume: Boolean; var Invoice: Boolean; DefaultOption: Integer; WithPrint: Boolean; WithEmail: Boolean; PreviewMode: Boolean) Result: Boolean
-    var
-        ServPostingSelectionMgt: Codeunit Microsoft.Service.Document."Serv. Posting Selection Mgt.";
-    begin
-        exit(ServPostingSelectionMgt.ConfirmPostServiceDocument(ServiceHeaderToPost, Ship, Consume, Invoice, DefaultOption, WithPrint, WithEmail, PreviewMode));
-    end;
-#endif
 
     procedure ConfirmPostWarehouseActivity(var WarehouseActivityLine: Record "Warehouse Activity Line"; var Selection: Integer; DefaultOption: Integer; WithPrint: Boolean) Result: Boolean
     var
@@ -298,15 +289,6 @@ codeunit 99 "Posting Selection Management"
         exit(Receive and Invoice);
     end;
 
-#if not CLEAN25
-    [Obsolete('Replaced by same procedure in codeunit Serv. Posting Selection Mgt.', '25.0')]
-    procedure CheckUserCanInvoiceService()
-    var
-        ServPostingSelectionMgt: Codeunit Microsoft.Service.Document."Serv. Posting Selection Mgt.";
-    begin
-        ServPostingSelectionMgt.CheckUserCanInvoiceService();
-    end;
-#endif
 
     local procedure GetShipInvoiceSelectionForWhseActivity(SourceDocument: Enum "Warehouse Activity Source Document"; DefaultOption: Integer; var Selection: Integer): Boolean
     var
