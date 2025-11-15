@@ -30,10 +30,6 @@ codeunit 104062 "Mfg. Upgrade BaseApp"
         if not HybridDeployment.VerifyCanStartUpgrade(CompanyName()) then
             exit;
 
-#if not CLEAN27
-        UpgradeInventoryPlanningFields();
-#endif
-
         // Upgrade starting from version 29
         NavApp.GetCurrentModuleInfo(CurrentModuleInfo);
         if CurrentModuleInfo.AppVersion().Major() < 29 then
@@ -43,6 +39,7 @@ codeunit 104062 "Mfg. Upgrade BaseApp"
         UpgradeFlushingMethod();
 #endif
 #if not CLEAN27
+        UpgradeInventoryPlanningFields();
         UpgradeGranularWarehouseHandlingSetup();
 #endif
     end;
@@ -242,7 +239,7 @@ codeunit 104062 "Mfg. Upgrade BaseApp"
             InventorySetup.Modify();
         end;
 
-        SetUpgradeTag(true, UpgradeTagDefinitions.GetInventoryPlanningSetupUpgradeTag());
+        SetUpgradeTag(true, UpgradeTagDefinitions.GetItemVariantItemIdUpgradeTag());
     end;
 #endif
 
