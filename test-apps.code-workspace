@@ -133,6 +133,12 @@
       "path": "./ErrorMessagesWithRecommendations/Test/Error Messages with Recommendations Tests/DisabledTests"
     },
     {
+      "path": "./Quality Management/Test/Quality Management-Tests"
+    },
+    {
+      "path": "./Quality Management/Test/Quality Management-Tests/src/TestLibraries"
+    },
+    {
       "path": "./SalesAndInventoryForecast/Test/Sales and Inventory Forecast Tests"
     },
     {
