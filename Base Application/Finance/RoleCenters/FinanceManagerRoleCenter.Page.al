@@ -1687,101 +1687,6 @@ page 8901 "Finance Manager Role Center"
                 }
                 group("Group40")
                 {
-                    Caption = 'Posted Documents';
-                    action("Posted Credit Memos1")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Posted Purchase Credit Memos';
-                        RunObject = page "Posted Purchase Credit Memos";
-                        Tooltip = 'Open the Posted Purchase Credit Memos page.';
-                    }
-                    action("Posted Purchase Invoices")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Posted Purchase Invoices';
-                        RunObject = page "Posted Purchase Invoices";
-                        Tooltip = 'Open the Posted Purchase Invoices page.';
-                    }
-                    action("Posted Purchase Receipts")
-                    {
-                        ApplicationArea = Suite;
-                        Caption = 'Posted Purchase Receipts';
-                        RunObject = page "Posted Purchase Receipts";
-                        Tooltip = 'Open the Posted Purchase Receipts page.';
-                    }
-                    action("Posted Return Shipments")
-                    {
-                        ApplicationArea = PurchReturnOrder;
-                        Caption = 'Posted Purchase Return Shipments';
-                        RunObject = page "Posted Return Shipments";
-                        Tooltip = 'Open the Posted Purchase Return Shipments page.';
-                    }
-                    action("Posted Purchase Tax Invoice")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Posted Purchase Tax Invoice';
-                        RunObject = page "Posted Purchase Tax Invoice";
-                    }
-                    action("Posted Purch. Tax  Credit Memo")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Posted Purch. Tax  Credit Memo';
-                        RunObject = page "Posted Purch. Tax  Credit Memo";
-                    }
-                }
-                group("Group41")
-                {
-                    Caption = 'Registers/Entries';
-                    action("G/L Registers2")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'G/L Registers';
-                        RunObject = page "G/L Registers";
-                        Tooltip = 'Open the G/L Registers page.';
-                    }
-                    action("Vendor Ledger Entries")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Vendor Ledger Entries';
-                        RunObject = page "Vendor Ledger Entries";
-                        Tooltip = 'Open the Vendor Ledger Entries page.';
-                    }
-                    action("Detailed Cust. Ledg. Entries1")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Detailed Vendor Ledger Entries';
-                        RunObject = page "Detailed Vendor Ledg. Entries";
-                        Tooltip = 'Open the Detailed Vendor Ledger Entries page.';
-                    }
-                    action("Credit Transfer Registers")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Credit Transfer Registers';
-                        RunObject = page "Credit Transfer Registers";
-                        Tooltip = 'Open the Credit Transfer Registers page.';
-                    }
-                    action("Employee Ledger Entries")
-                    {
-                        Caption = 'Employee Ledger Entries';
-                        RunObject = page "Employee Ledger Entries";
-                        Tooltip = 'Open the Employee Ledger Entries page.';
-                    }
-                    action("Detailed Employee Ledger Entries")
-                    {
-                        ApplicationArea = BasicHR;
-                        Caption = 'Detailed Employee Ledger Entries';
-                        RunObject = page "Detailed Empl. Ledger Entries";
-                        Tooltip = 'Open the Detailed Employee Ledger Entries page.';
-                    }
-                    action("EFT Registers")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'EFT Registers';
-                        RunObject = page "EFT Register";
-                    }
-                }
-                group("Group42")
-                {
                     Caption = 'Reports';
                     action("Aged Accounts Payable")
                     {
@@ -1911,6 +1816,101 @@ page 8901 "Finance Manager Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'WHT Certificate - Other Copy';
                         RunObject = Report "WHT Certificate - Other Copy";
+                    }
+                }
+                group("Group41")
+                {
+                    Caption = 'Registers/Entries';
+                    action("G/L Registers2")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'G/L Registers';
+                        RunObject = page "G/L Registers";
+                        Tooltip = 'Open the G/L Registers page.';
+                    }
+                    action("Vendor Ledger Entries")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Vendor Ledger Entries';
+                        RunObject = page "Vendor Ledger Entries";
+                        Tooltip = 'Open the Vendor Ledger Entries page.';
+                    }
+                    action("Detailed Cust. Ledg. Entries1")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Detailed Vendor Ledger Entries';
+                        RunObject = page "Detailed Vendor Ledg. Entries";
+                        Tooltip = 'Open the Detailed Vendor Ledger Entries page.';
+                    }
+                    action("Credit Transfer Registers")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Credit Transfer Registers';
+                        RunObject = page "Credit Transfer Registers";
+                        Tooltip = 'Open the Credit Transfer Registers page.';
+                    }
+                    action("Employee Ledger Entries")
+                    {
+                        Caption = 'Employee Ledger Entries';
+                        RunObject = page "Employee Ledger Entries";
+                        Tooltip = 'Open the Employee Ledger Entries page.';
+                    }
+                    action("Detailed Employee Ledger Entries")
+                    {
+                        ApplicationArea = BasicHR;
+                        Caption = 'Detailed Employee Ledger Entries';
+                        RunObject = page "Detailed Empl. Ledger Entries";
+                        Tooltip = 'Open the Detailed Employee Ledger Entries page.';
+                    }
+                    action("EFT Registers")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'EFT Registers';
+                        RunObject = page "EFT Register";
+                    }
+                }
+                group("Group42")
+                {
+                    Caption = 'Posted Documents';
+                    action("Posted Credit Memos1")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Posted Purchase Credit Memos';
+                        RunObject = page "Posted Purchase Credit Memos";
+                        Tooltip = 'Open the Posted Purchase Credit Memos page.';
+                    }
+                    action("Posted Purchase Invoices")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Posted Purchase Invoices';
+                        RunObject = page "Posted Purchase Invoices";
+                        Tooltip = 'Open the Posted Purchase Invoices page.';
+                    }
+                    action("Posted Purchase Receipts")
+                    {
+                        ApplicationArea = Suite;
+                        Caption = 'Posted Purchase Receipts';
+                        RunObject = page "Posted Purchase Receipts";
+                        Tooltip = 'Open the Posted Purchase Receipts page.';
+                    }
+                    action("Posted Return Shipments")
+                    {
+                        ApplicationArea = PurchReturnOrder;
+                        Caption = 'Posted Purchase Return Shipments';
+                        RunObject = page "Posted Return Shipments";
+                        Tooltip = 'Open the Posted Purchase Return Shipments page.';
+                    }
+                    action("Posted Purchase Tax Invoice")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Posted Purchase Tax Invoice';
+                        RunObject = page "Posted Purchase Tax Invoice";
+                    }
+                    action("Posted Purch. Tax  Credit Memo")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Posted Purch. Tax  Credit Memo';
+                        RunObject = page "Posted Purch. Tax  Credit Memo";
                     }
                 }
                 group("Group43")
