@@ -1008,13 +1008,12 @@ codeunit 99000822 "Mfg. Item Jnl.-Post Line"
         if ProdOrderComp."Flushing Method" in
            [ProdOrderComp."Flushing Method"::Backward, ProdOrderComp."Flushing Method"::"Pick + Backward"]
         then begin
-            QtyToPost :=
-              MfgCostCalcMgt.CalcActNeededQtyBase(ProdOrderLine, ProdOrderComp, OutputQtyBase) / ProdOrderComp."Qty. per Unit of Measure";
+            QtyToPost := ProdOrderRoutingLine."Fixed Scrap Qty. (Accum.)" + MfgCostCalcMgt.CalcActNeededQtyBase(ProdOrderLine, ProdOrderComp,
+              OutputQtyBase - ProdOrderRoutingLine."Fixed Scrap Qty. (Accum.)") / ProdOrderComp."Qty. per Unit of Measure";
             if (ProdOrderLine."Remaining Qty. (Base)" = OutputQtyBase) and
                (ProdOrderComp."Remaining Quantity" <> 0) and
                (Abs(Round(QtyToPost, CompItem."Rounding Precision") - ProdOrderComp."Remaining Quantity") <= CompItem."Rounding Precision") and
-               (Abs(Round(QtyToPost, CompItem."Rounding Precision") - ProdOrderComp."Remaining Quantity") < 1) or
-               (OutputQtyBase = Round(ProdOrderComp."Remaining Qty. (Base)", 1))
+               (Abs(Round(QtyToPost, CompItem."Rounding Precision") - ProdOrderComp."Remaining Quantity") < 1)
             then
                 QtyToPost := ProdOrderComp."Remaining Quantity";
         end else
