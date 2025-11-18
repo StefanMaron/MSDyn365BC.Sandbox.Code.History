@@ -32,9 +32,6 @@ table 253 "G/L Entry - VAT Entry Link"
         {
             Clustered = true;
         }
-        key(Key2; "VAT Entry No.")
-        {
-        }
     }
 
     fieldgroups
