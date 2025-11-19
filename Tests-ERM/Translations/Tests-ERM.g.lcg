@@ -3371,6 +3371,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM G/L Currency Revaluation - NamedType CurrUpdateBalAccErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 306780767 - NamedType 714223528" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 does not set correctly.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM G/L Currency Revaluation - NamedType JournalErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 306780767 - NamedType 2236746637" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[There are already entries in the G/L journal %1. Please post or delete them before you proceed.]]></Val>
