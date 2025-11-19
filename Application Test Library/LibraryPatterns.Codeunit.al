@@ -1,4 +1,7 @@
-﻿codeunit 132212 "Library - Patterns"
+﻿/// <summary>
+/// Provides utility functions implementing common test patterns for inventory, purchase, and sales scenarios.
+/// </summary>
+codeunit 132212 "Library - Patterns"
 {
 
     trigger OnRun()

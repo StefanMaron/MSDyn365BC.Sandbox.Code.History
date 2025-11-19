@@ -1,8 +1,8 @@
+/// <summary>
+/// Provides helper functions for filling and managing cash flow journal entries in test scenarios.
+/// </summary>
 codeunit 131332 "Library - Cash Flow Helper"
 {
-    // Feature:  Cash Flow
-    // Area:     Filling Cash Flow Journal
-    //           Provides helper functions for codeunits in this area.
 
     Subtype = Normal;
 
@@ -324,7 +324,6 @@ codeunit 131332 "Library - Cash Flow Helper"
         LibraryCashFlowForecast.CreateCashFlowAccount(CashFlowAccount, CashFlowAccount."Account Type"::Entry);
         LibraryCashFlowForecast.CreateManualLinePayment(CFManualExpense, CashFlowAccount."No.");
 
-        // HACK - as long as test is running on current NAV6 Liquidity feature, recurring frequency is required
         Evaluate(CFManualExpense."Recurring Frequency", '<1D>');
 
         CFManualExpense.Validate(Amount, LibraryRandom.RandInt(500));
@@ -338,7 +337,6 @@ codeunit 131332 "Library - Cash Flow Helper"
         LibraryCashFlowForecast.CreateCashFlowAccount(CashFlowAccount, CashFlowAccount."Account Type"::Entry);
         LibraryCashFlowForecast.CreateManualLineRevenue(CFManualRevenue, CashFlowAccount."No.");
 
-        // HACK - as long as test is running on current NAV6 Liquidity feature, recurring frequency is required
         Evaluate(CFManualRevenue."Recurring Frequency", '<1D>');
 
         CFManualRevenue.Validate(Amount, LibraryRandom.RandInt(500));

@@ -25,10 +25,11 @@ using Microsoft.Inventory.Item;
 using Microsoft.Projects.TimeSheet;
 using Microsoft.Projects.Resources.Resource;
 
+/// <summary>
+/// Provides utility functions for creating and managing service-related entities in test scenarios, including service orders, contracts, and items.
+/// </summary>
 codeunit 131902 "Library - Service"
 {
-    // Contains all utility functions related to Service.
-
 
     trigger OnRun()
     begin
