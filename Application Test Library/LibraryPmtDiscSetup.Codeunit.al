@@ -1,7 +1,8 @@
+/// <summary>
+/// Provides utility functions for setting up and managing payment discount scenarios in test cases.
+/// </summary>
 codeunit 131303 "Library - Pmt Disc Setup"
 {
-    // Library to fix Payment Discount releated issues in ES Country Build.
-
 
     trigger OnRun()
     begin
