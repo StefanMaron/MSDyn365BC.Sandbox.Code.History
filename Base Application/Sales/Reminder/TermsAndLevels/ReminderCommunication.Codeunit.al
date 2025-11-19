@@ -708,7 +708,7 @@ codeunit 1890 "Reminder Communication"
     begin
         if ReminderTerms.IsEmpty() then
             exit;
-        DefaultLanguageCode := Language.GetLanguageCode(Language.GetDefaultApplicationLanguageId());
+        DefaultLanguageCode := Language.GetUserLanguageCode();
         ReminderTerms.FindSet();
         repeat
             Clear(ReminderAttachmentText);
@@ -742,7 +742,7 @@ codeunit 1890 "Reminder Communication"
     begin
         if ReminderLevel.IsEmpty() then
             exit;
-        DefaultLanguageCode := Language.GetLanguageCode(Language.GetDefaultApplicationLanguageId());
+        DefaultLanguageCode := Language.GetUserLanguageCode();
         ReminderLevel.FindSet();
         repeat
             Clear(ReminderAttachmentText);
