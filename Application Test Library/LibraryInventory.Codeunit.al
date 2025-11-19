@@ -1,9 +1,8 @@
-﻿codeunit 132201 "Library - Inventory"
+﻿/// <summary>
+/// Provides utility functions for creating and managing inventory-related entities in test scenarios, including items, item journals, locations, and inventory postings.
+/// </summary>
+codeunit 132201 "Library - Inventory"
 {
-    // Unsupported version tags:
-    // 
-    // Contains all utility functions related to Inventory Management.
-
 
     trigger OnRun()
     begin
