@@ -933,6 +933,62 @@ codeunit 134979 "Reminder Automation Tests"
         GlobalLanguage(1033);
     end;
 
+    [Test]
+    [HandlerFunctions('ConfirmHandler,MessageHandler')]
+    procedure ReminderTermTransferTextBeginningandEndingNewLanguage()
+    var
+        CompanyInfo: Record "Company Information";
+        Language: Record Language;
+        ReminderAttachText: Record "Reminder Attachment Text Line";
+        ReminderLevel: Record "Reminder Level";
+        ReminderTerms: Record "Reminder Terms";
+        ReminderTermList: TestPage "Reminder Terms List";
+        LanguageCode: Code[10];
+    begin
+        // [SCENARIO 609485] When using Transfer Texts from the old reminder term text to the new customer communications the used language is not considered
+        Initialize();
+
+        // [GIVEN] Disable Feature Reminder Terms Communication Texts
+        this.CheckFeatureReminderTermsCommunicationTexts('ReminderTermsCommunicationTexts', false);
+
+        // [GIVEN] Set Region and Global Language to Dutch (Netherlands)
+        // Save old company region so we can restore it in tear down
+        CompanyInfo.Get();
+        CompanyInfo.Validate("Country/Region Code", 'NL');
+        CompanyInfo.Modify(true);
+
+        // [GIVEN] Set Global Language
+        SetLanguageInUserPersonalization(1043);
+        GlobalLanguage(1043);
+        Language.SetRange("Windows Language ID", 1043);
+        if Language.FindFirst() then
+            LanguageCode := Language.Code;
+
+        // [GIVEN] Create reminder term with levels
+        CreateReminderTerm(ReminderTerms);
+
+        // [GIVEN] Enable Feature Reminder Terms Communication Texts
+        this.CheckFeatureReminderTermsCommunicationTexts('ReminderTermsCommunicationTexts', true);
+
+        // [WHEN] Page Reminder Term Invoke Action Transfer Texts 
+        ReminderTermList.OpenEdit();
+        ReminderTermList.TransferOldTexts.Invoke();
+
+        // [VERIFY] Create Reminder Attachment Text with Language Code Dutch (Netherlands)
+        ReminderLevel.SetRange("Reminder Terms Code", ReminderTerms.Code);
+        ReminderLevel.FindFirst();
+        Assert.IsTrue(ReminderLevel.FindFirst(), ReminderLevelNotFoundErr);
+
+        // [VERIFY] Language on the new Reminder Text is same as Global Language
+        ReminderAttachText.SetRange(Id, ReminderLevel."Reminder Attachment Text");
+        ReminderAttachText.FindFirst();
+        Assert.AreEqual(ReminderAttachText."Language Code", LanguageCode, LanguageDoesNotMatchErr);
+
+        // Restore old company region
+        SetLanguageInUserPersonalization(1033);
+        GlobalLanguage(1033);
+    end;
+
     local procedure CreateReminderTerm(var ReminderTerms: Record "Reminder Terms")
     var
         ReminderLevel: Record "Reminder Level";
@@ -1337,6 +1393,19 @@ codeunit 134979 "Reminder Automation Tests"
         ReportSelections.SendEmailToCust(ReportUsage.AsInteger(), Document, '', '', true, CustomerNo);
     end;
 
+    local procedure CheckFeatureReminderTermsCommunicationTexts(FeatureKeyCode: Code[100]; Enable: Boolean)
+    var
+        FeatureKey: Record "Feature Key";
+    begin
+        FeatureKey.Get(FeatureKeyCode);
+        if Enable then
+            FeatureKey.Validate(Enabled, FeatureKey.Enabled::"All Users")
+        else
+            FeatureKey.Validate(Enabled, FeatureKey.Enabled::None);
+
+        FeatureKey.Modify(true);
+    end;
+
     [StrMenuHandler]
     [Scope('OnPrem')]
     procedure CancelMailSendingStrMenuHandler(Options: Text; var Choice: Integer; Instruction: Text)
@@ -1450,4 +1519,6 @@ codeunit 134979 "Reminder Automation Tests"
         IsInitialized: Boolean;
         FiltersAreNotSavedErr: Label 'Filters are not saved';
         EmailRelatedRecordNotFoundErr: Label 'Email related record not found';
+        ReminderLevelNotFoundErr: Label 'No Reminder Level found for the created Reminder Terms';
+        LanguageDoesNotMatchErr: Label 'Attachment language does not match global language';
 }
