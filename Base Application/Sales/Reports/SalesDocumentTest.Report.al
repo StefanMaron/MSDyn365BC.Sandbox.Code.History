@@ -1582,8 +1582,7 @@ report 202 "Sales Document - Test"
                 if SalesTax then begin
                     HeaderTaxArea.Get("Tax Area Code");
                     SalesTaxCountry := HeaderTaxArea."Country/Region";
-                end else
-                    SalesTaxCountry := SalesTaxCountry::NoTax;
+                end;
 
                 OnSalesHeaderOnAfterGetRecordOnBeforeVerifySellToCust("Sales Header", ErrorText, ErrorCounter);
 
@@ -2013,13 +2012,13 @@ report 202 "Sales Document - Test"
         SumLineAmount: Decimal;
         SumInvDiscountAmount: Decimal;
         DifferentPostingDateToWorkDateTxt: Label '%1 %2 is different to Work Date %3.', Comment = '%1 = Posting Date Field Caption %2=Posting Date Field Value %3=WorkDate value';
-	TaxText: Text[30];
+        TaxText: Text[30];
         totAmount: Decimal;
         Summarize: Boolean;
         Salesperson: Record "Salesperson/Purchaser";
         InvoiceAmount: Decimal;
         TempVATAmount: Decimal;
-        SalesTaxCountry: Option US,CA,,,,,,,,,,,,NoTax;
+        SalesTaxCountry: Option US,CA;
         RemSalesTaxAmt: Decimal;
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         Sales_Document___TestCaptionLbl: Label 'Sales Document - Test';

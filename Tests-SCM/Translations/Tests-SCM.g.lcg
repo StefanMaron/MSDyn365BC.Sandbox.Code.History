@@ -11993,6 +11993,15 @@
       <Cmt Name="Dev"><![CDATA[%1: USERID]D;]A;(LookupHint=Codeunit SCM Warehouse Documents UI - NamedType UserIsNotWhseEmployeeAtWMSLocationErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2751631348 - NamedType 1157951090" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[To open warehouse document for location %1, You must first set up user %2 as a warehouse employee.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Location Code, %2: User Id]D;]A;(LookupHint=Codeunit SCM Warehouse Documents UI - NamedType UserIsNotWhseEmployeeForLocationErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2700410155 - NamedType 2490664914" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You cannot reclassify location %1 because it is set up with Directed Put-away and Pick]]></Val>

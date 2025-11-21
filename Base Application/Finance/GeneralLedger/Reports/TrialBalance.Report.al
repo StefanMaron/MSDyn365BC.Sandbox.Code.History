@@ -12,6 +12,15 @@ using System.IO;
 using System.Utilities;
 using Microsoft.Utilities;
 
+/// <summary>
+/// Generates standard trial balance report displaying account balances and period movements.
+/// Shows opening balances, period debits/credits, and closing balances for comprehensive G/L account analysis.
+/// </summary>
+/// <remarks>
+/// Data source: G/L Account table with balance calculations and period filtering capabilities.
+/// Used for financial statement preparation, account reconciliation, and period-end procedures.
+/// Supports filtering by account types, date ranges, and global dimensions for customized trial balance reporting.
+/// </remarks>
 report 10022 "Trial Balance"
 {
     // This report is copied from 10011 GL - Fin Stm. Even though it does not and
