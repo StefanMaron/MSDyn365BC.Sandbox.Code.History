@@ -182,31 +182,142 @@ page 9401 "VAT Amount Lines"
                 ApplicationArea = RecordLinks;
                 Visible = false;
             }
-            systempart(Control1905767507; 0   nt mmpart(Control1905767507; 0   nt mmpart(Control19057   '7; 0   nt mmpart(Control(Co57   '7; 0   nt mmpart(Control(Co(Co5; 0; 0   nt mmpart(Control(Co(
-  ; 0; 0   nt mmpart(Control(eo(
-  ; 0; 0   nt mmpart(Contro905o(
-  ; 0; 0   nt mmpart(Controt(Co(
-  ; 0; 0   nt mmpart(Contrt((Co(
-  ; 0; 0   nt mmpart(Contrt((Co(
-  ; 0; 0   nt mmpart(Contrt((Co(
-  ; 0; 0   nt mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont mmpart(Contrt((Co(
-  ;   ;,(Cont m  ;,
+            systempart(Control1905767507; Notes)
+            {
+                ApplicationArea = Notes;
+                Visible = false;
+            }
+        }
+    }
+
+    actions
+    {
+    }
+
+    trigger OnAfterGetRecord()
+    begin
+        VATAmountEditable := AllowVATDifference and not Rec."Includes Prepayment";
+        InvoiceDiscountAmountEditable := AllowInvDisc and not Rec."Includes Prepayment";
+    end;
+
+    trigger OnFindRecord(Which: Text): Boolean
+    begin
+        TempVATAmountLine.Copy(Rec);
+        if TempVATAmountLine.Find(Which) then begin
+            Rec := TempVATAmountLine;
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    trigger OnInit()
+    begin
+        InvoiceDiscountAmountEditable := true;
+        VATAmountEditable := true;
+        NonDeductibleVATVisible := NonDeductibleVAT.IsNonDeductibleVATEnabled();
+    end;
+
+
+    trigger OnNextRecord(Steps: Integer): Integer
+    var
+        ResultSteps: Integer;
+    begin
+        TempVATAmountLine.Copy(Rec);
+        ResultSteps := TempVATAmountLine.Next(Steps);
+        if ResultSteps <> 0 then
+            Rec := TempVATAmountLine;
+        exit(ResultSteps);
+    end;
+
+    var
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
+        NonDeductibleVAT: Codeunit "Non-Deductible VAT";
+        Currency: Record Currency;
+        CurrencyCode: Code[10];
+        PricesIncludingVAT: Boolean;
+        VATBaseDiscPct: Decimal;
+        VATAmountEditable: Boolean;
+        InvoiceDiscountAmountEditable: Boolean;
+        NonDeductibleVATVisible: Boolean;
+
+    protected var
+        AllowVATDifference: Boolean;
+        AllowVATDifferenceOnThisTab: Boolean;
+        AllowInvDisc: Boolean;
+
+#pragma warning disable AA0074
+#pragma warning disable AA0470
+        Text000: Label '%1 can only be modified on the Invoicing tab.';
+        Text001: Label 'The total %1 for a document must not exceed the value %2 in the %3 field.';
+#pragma warning restore AA0470
+#pragma warning restore AA0074
+
+    procedure SetTempVATAmountLine(var NewVATAmountLine: Record "VAT Amount Line")
+    begin
+        TempVATAmountLine.DeleteAll();
+        if NewVATAmountLine.Find('-') then
+            repeat
+                TempVATAmountLine.Copy(NewVATAmountLine);
+                TempVATAmountLine.Insert();
+            until NewVATAmountLine.Next() = 0;
+    end;
+
+    procedure GetTempVATAmountLine(var NewVATAmountLine: Record "VAT Amount Line")
+    begin
+        NewVATAmountLine.DeleteAll();
+        if TempVATAmountLine.Find('-') then
+            repeat
+                NewVATAmountLine.Copy(TempVATAmountLine);
+                NewVATAmountLine.Insert();
+            until TempVATAmountLine.Next() = 0;
+    end;
+
+    procedure InitGlobals(NewCurrencyCode: Code[10]; NewAllowVATDifference: Boolean; NewAllowVATDifferenceOnThisTab: Boolean; NewPricesIncludingVAT: Boolean; NewAllowInvDisc: Boolean; NewVATBaseDiscPct: Decimal)
+    begin
+        CurrencyCode := NewCurrencyCode;
+        AllowVATDifference := NewAllowVATDifference;
+        AllowVATDifferenceOnThisTab := NewAllowVATDifferenceOnThisTab;
+        PricesIncludingVAT := NewPricesIncludingVAT;
+        AllowInvDisc := NewAllowInvDisc;
+        VATBaseDiscPct := NewVATBaseDiscPct;
+        VATAmountEditable := AllowVATDifference;
+        InvoiceDiscountAmountEditable := AllowInvDisc;
+        if CurrencyCode = '' then
+            Currency.InitRoundingPrecision()
+        else
+            Currency.Get(CurrencyCode);
+    end;
+
+    local procedure FormCheckVATDifference()
+    var
+        VATAmountLine2: Record "VAT Amount Line";
+        TotalVATDifference: Decimal;
+    begin
+        Rec.CheckVATDifference(CurrencyCode, AllowVATDifference);
+        VATAmountLine2 := TempVATAmountLine;
+        TotalVATDifference := Abs(Rec."VAT Difference") - Abs(xRec."VAT Difference");
+        if TempVATAmountLine.Find('-') then
+            repeat
+                TotalVATDifference := TotalVATDifference + Abs(TempVATAmountLine."VAT Difference");
+            until TempVATAmountLine.Next() = 0;
+        TempVATAmountLine := VATAmountLine2;
+        if TotalVATDifference > Currency."Max. VAT Difference Allowed" then
+            Error(
+              Text001, Rec.FieldCaption("VAT Difference"),
+              Currency."Max. VAT Difference Allowed", Currency.FieldCaption("Max. VAT Difference Allowed"));
+    end;
+
+    local procedure ModifyRec()
+    begin
+        TempVATAmountLine := Rec;
+        TempVATAmountLine.Modified := true;
+        TempVATAmountLine.Modify();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFormCheckVATDifference(VATAmountLine: Record "VAT Amount Line"; var IsHandled: Boolean)
+    begin
+    end;
+}
+
+
