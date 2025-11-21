@@ -676,6 +676,7 @@ table 38 "Purchase Header"
         }
         field(25; "Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             ToolTip = 'Specifies the payment discount percent granted if payment is made on or before the date in the Pmt. Discount Date field.';
             DecimalPlaces = 0 : 5;
@@ -827,6 +828,7 @@ table 38 "Purchase Header"
         }
         field(33; "Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 15;
             Editable = false;
@@ -1816,6 +1818,7 @@ table 38 "Purchase Header"
         }
         field(119; "VAT Base Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT Base Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -1870,6 +1873,7 @@ table 38 "Purchase Header"
         }
         field(122; "Invoice Discount Value"; Decimal)
         {
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Invoice Discount Value';
             Editable = false;
@@ -1944,6 +1948,7 @@ table 38 "Purchase Header"
         }
         field(134; "Prepayment %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepayment %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -2097,6 +2102,7 @@ table 38 "Purchase Header"
         }
         field(144; "Prepmt. Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepmt. Payment Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -2205,6 +2211,7 @@ table 38 "Purchase Header"
         }
         field(300; "A. Rcd. Not Inv. Ex. VAT (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             CalcFormula = sum("Purchase Line"."A. Rcd. Not Inv. Ex. VAT (LCY)" where("Document Type" = field("Document Type"),
                                                                                       "Document No." = field("No.")));
             Caption = 'Amount Received Not Invoiced (LCY)';
@@ -2214,6 +2221,7 @@ table 38 "Purchase Header"
         }
         field(301; "Amt. Rcd. Not Invoiced (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             CalcFormula = sum("Purchase Line"."Amt. Rcd. Not Invoiced (LCY)" where("Document Type" = field("Document Type"),
                                                                                     "Document No." = field("No.")));
             Caption = 'Amount Received Not Invoiced (LCY) Incl. VAT';
@@ -2244,6 +2252,7 @@ table 38 "Purchase Header"
         }
         field(1305; "Invoice Discount Amount"; Decimal)
         {
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CalcFormula = sum("Purchase Line"."Inv. Discount Amount" where("Document No." = field("No."),
                                                                             "Document Type" = field("Document Type")));
