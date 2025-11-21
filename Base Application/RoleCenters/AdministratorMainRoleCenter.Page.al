@@ -564,12 +564,6 @@ page 8900 "Administrator Main Role Center"
                     Caption = 'User Setup';
                     RunObject = page "User Setup";
                 }
-                // action("Change Password")
-                // {
-                //     ApplicationArea =;
-                //     Caption = 'Change Password';
-                //     RunObject = page 9809;
-                // }
                 action("User Security Status")
                 {
                     ApplicationArea = Basic, Suite;

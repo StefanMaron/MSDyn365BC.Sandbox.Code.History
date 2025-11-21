@@ -2820,13 +2820,13 @@ page 8901 "Finance Manager Role Center"
                     }
                     action("Service - Invoice ESR")
                     {
-                        ApplicationArea =;
+                        ApplicationArea = Service;
                         Caption = 'Service - Invoice ESR';
                         RunObject = report "Service - Invoice ESR";
                     }
                     action("Service - ESR Coupon")
                     {
-                        ApplicationArea =;
+                        ApplicationArea = Service;
                         Caption = 'Service - ESR Coupon';
                         RunObject = report "Service - ESR Coupon";
                     }
