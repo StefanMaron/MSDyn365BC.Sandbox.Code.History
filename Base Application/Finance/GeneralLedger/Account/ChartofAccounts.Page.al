@@ -16,6 +16,16 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
 
+/// <summary>
+/// Primary interface for managing the complete chart of accounts structure with hierarchical display and account operations.
+/// Provides comprehensive account management including creation, modification, analysis, and reporting functionality.
+/// </summary>
+/// <remarks>
+/// Key functionality: Account overview, balance inquiries, account setup, dimensional analysis, reporting navigation.
+/// User workflow: Central hub for all general ledger account operations and financial structure management.
+/// Extensible via page extensions for additional columns, actions, and account-specific functionality.
+/// Supports indented display for account hierarchies and integrated financial reporting access.
+/// </remarks>
 page 16 "Chart of Accounts"
 {
     ApplicationArea = Basic, Suite;
