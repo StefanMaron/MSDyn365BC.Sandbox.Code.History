@@ -848,7 +848,7 @@ page 8901 "Finance Manager Role Center"
                     }
                     action("Bank Reference Payments")
                     {
-                        ApplicationArea =;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'Bank Payments to Send';
                         RunObject = page "Bank Payments to send";
                     }
@@ -895,7 +895,7 @@ page 8901 "Finance Manager Role Center"
                     }
                     action("Payment Method Codes")
                     {
-                        ApplicationArea =;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'Payment Method Codes';
                         RunObject = page "Payment Method Codes";
                     }
