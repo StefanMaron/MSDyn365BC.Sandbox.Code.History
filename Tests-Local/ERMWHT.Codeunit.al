@@ -1892,6 +1892,79 @@ codeunit 141012 "ERM WHT"
         Assert.AreEqual(VATEntry.Base, WHTEntry."Unrealized Base", 'Not equal');
     end;
 
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    procedure WHTRemainingAmountAfterCreditMemoUnapplication()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        WHTPostingSetup: Record "WHT Posting Setup";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        WHTEntry: Record "WHT Entry";
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        CustomerNo: Code[20];
+        ExpectedRemainingAmount: Decimal;
+        ExpectedRemainingBase: Decimal;
+    begin
+        // [SCENARIO 608687] Unapplying Customer Ledger Entry restores WHT entry remaining amounts after credit memo application.
+        Initialize();
+
+        // [GIVEN] WHT is enabled and setup configured
+        UpdateGeneralLedgerSetup(false, true, false);
+
+        // [GIVEN] Find WHT Posting Setup and VAT Posting Setup.
+        LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+        FindWHTPostingSetup(WHTPostingSetup);
+
+        // [GIVEN] Create Customer with VAT Business Posting Group.
+        CustomerNo := CreateCustomer(VATPostingSetup."VAT Bus. Posting Group");
+
+        // [GIVEN] Posted Sales Invoice with WHT Posting Group.
+        SalesInvoiceHeader.Get(
+          CreateAndPostSalesDocumentWithWHT(
+            SalesLine,
+            WHTPostingSetup,
+            SalesHeader."Document Type"::Invoice,
+            CustomerNo,
+            CreateGLAccount(
+              VATPostingSetup."VAT Prod. Posting Group")));
+
+        // [GIVEN] Store original WHT remaining amounts for later verification.
+        WHTEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
+        WHTEntry.FindFirst();
+        ExpectedRemainingAmount := WHTEntry."Remaining Unrealized Amount";
+        ExpectedRemainingBase := WHTEntry."Remaining Unrealized Base";
+
+        // [GIVEN] Create and Post Corrective Credit Memo.
+        CreateCorrectiveCreditMemoAndOpenSalesCreditMemoPageAndPost(SalesInvoiceHeader);
+
+        // [WHEN] Unapply Credit memo from Invoice.
+        CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::"Credit Memo");
+        CustLedgerEntry.SetRange("Customer No.", CustomerNo);
+        CustLedgerEntry.findFirst();
+        LibraryERM.UnapplyCustomerLedgerEntry(CustLedgerEntry);
+
+        // [THEN] Verify WHT remaining amounts are restored to original values.
+        WHTEntry.SetRange("Document No.", SalesInvoiceHeader."No.");
+        WHTEntry.FindFirst();
+        Assert.AreEqual(
+          ExpectedRemainingAmount,
+          WHTEntry."Remaining Unrealized Amount",
+          StrSubstNo(
+            AmountErr,
+            WHTEntry.FieldCaption("Remaining Unrealized Amount"),
+            ExpectedRemainingAmount));
+
+        Assert.AreEqual(
+          ExpectedRemainingBase,
+          WHTEntry."Remaining Unrealized Base",
+          StrSubstNo(
+            AmountErr,
+            WHTEntry.FieldCaption("Remaining Unrealized Base"),
+            ExpectedRemainingBase));
+    end;
+
     local procedure Initialize()
     begin
         LibrarySetupStorage.Restore();
@@ -2924,6 +2997,18 @@ codeunit 141012 "ERM WHT"
         WHTEntry.SetRange("Document No.", DocumentNo);
         WHTEntry.FindFirst();
         exit(WHTEntry."Unrealized Amount");
+    end;
+
+    local procedure CreateCorrectiveCreditMemoAndOpenSalesCreditMemoPageAndPost(SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        SalesHeader: Record "Sales Header";
+        CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
+        SalesCreditMemo: TestPage "Sales Credit Memo";
+    begin
+        CorrectPostedSalesInvoice.CreateCreditMemoCopyDocument(SalesInvoiceHeader, SalesHeader);
+        SalesCreditMemo.OpenEdit();
+        SalesCreditMemo.GoToRecord(SalesHeader);
+        SalesCreditMemo.Post.Invoke();
     end;
 
     [ModalPageHandler]
