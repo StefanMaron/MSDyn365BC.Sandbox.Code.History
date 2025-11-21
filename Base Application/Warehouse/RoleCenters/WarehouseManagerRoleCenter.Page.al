@@ -648,7 +648,7 @@ page 8909 "Warehouse Manager Role Center"
                     }
                     action("CMR - Transfer Shipment")
                     {
-                        ApplicationArea =;
+                        ApplicationArea = Warehouse;
                         Caption = 'CMR - Transfer Shipment';
                         RunObject = report "CMR - Transfer Shipment";
                     }

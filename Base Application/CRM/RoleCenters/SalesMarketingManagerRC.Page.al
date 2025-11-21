@@ -365,7 +365,7 @@ page 8907 "Sales & Marketing Manager RC"
                 }
                 action("CMR - Sales Shipment")
                 {
-                    ApplicationArea =;
+                    ApplicationArea = Warehouse;
                     Caption = 'CMR - Sales Shipment';
                     RunObject = report "CMR - Sales Shipment";
                 }
