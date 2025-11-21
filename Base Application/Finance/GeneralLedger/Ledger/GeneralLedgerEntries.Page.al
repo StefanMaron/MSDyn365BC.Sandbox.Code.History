@@ -16,6 +16,15 @@ using Microsoft.Inventory.Item;
 using System.Diagnostics;
 using System.Security.User;
 
+/// <summary>
+/// Displays general ledger entries with filtering, navigation, and analysis capabilities.
+/// Provides read-only access to G/L entries with dimension details and related document navigation.
+/// </summary>
+/// <remarks>
+/// Primary data source: G/L Entry table. Supports filtering by G/L account, document type, and posting dates.
+/// Navigation: Related documents, dimensions, reversals, and source journal entries.
+/// Extensibility: OnBeforeCheckEntryPostedFromJournal, OnBeforeGetCaption, OnBeforeOnModifyRecord events available.
+/// </remarks>
 page 20 "General Ledger Entries"
 {
     AdditionalSearchTerms = 'G/L Transactions, Accounting Entries, Financial Entries, Bookkeeping Records, Account Records, G/L Entries, Account Lines, GL Entries';
@@ -822,6 +831,11 @@ page 20 "General Ledger Entries"
         ChangeLogEntry.SetRange("Primary Key Field 1 Value", Format(Rec."Entry No.", 0, 9));
     end;
 
+    /// <summary>
+    /// Integration event raised before checking if G/L entry was posted from a journal.
+    /// </summary>
+    /// <param name="GLEntry">G/L Entry record being checked.</param>
+    /// <param name="IsHandled">Boolean indicating if the check has been handled by the subscriber.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckEntryPostedFromJournal(var GLEntry: Record "G/L Entry"; var IsHandled: Boolean)
     begin
@@ -830,11 +844,24 @@ page 20 "General Ledger Entries"
     var
         TooManyGLEntriesSelectedErr: Label 'You have selected too many G/L entries. Split the change to select fewer entries, or go to the Dimension Correction page and use filters to select the entries.';
 
+    /// <summary>
+    /// Integration event raised before getting the page caption.
+    /// </summary>
+    /// <param name="GLEntry">G/L Entry record for caption context.</param>
+    /// <param name="GLAccount">G/L Account record for caption context.</param>
+    /// <param name="RetCaption">Text variable for the resulting caption.</param>
+    /// <param name="IsHandled">Boolean indicating if caption generation has been handled by the subscriber.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetCaption(GLEntry: Record "G/L Entry"; GLAccount: Record "G/L Account"; var RetCaption: Text; var IsHandled: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised before modifying a G/L entry record.
+    /// </summary>
+    /// <param name="GLEntry">G/L Entry record being modified.</param>
+    /// <param name="Result">Boolean indicating the result of the modification.</param>
+    /// <param name="IsHandled">Boolean indicating if the modification has been handled by the subscriber.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOnModifyRecord(GLEntry: Record "G/L Entry"; var Result: Boolean; var IsHandled: Boolean)
     begin
