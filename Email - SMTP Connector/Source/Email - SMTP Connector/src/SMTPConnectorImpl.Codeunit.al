@@ -46,8 +46,8 @@ codeunit 4513 "SMTP Connector Impl." implements "Email Connector"
         CouldNotAuthenticateErr: Label 'Could not authenticate on the SMTP server.\\%1', Comment = '%1 = the error message returned by the SMTP server.';
         CouldNotSendErr: Label 'Could not send the email.\\%1', Comment = '%1 = the error message returned by the SMTP server.';
         UrlTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2340938', Locked = true;
-        LearnMoreAboutSMTPBasicAuthObsoletionTxt: Label 'Learn more about Exchange SMTP Basic Authentication obsoletion';
-        SMTPBasicOAuthObsoletionNotificationTxt: Label 'One or more email accounts are still using Exchange SMTP Basic authentication. Please update them to use OAuth 2.0 because Exchange SMTP Basic auth is being deprecated.';
+        LearnMoreAboutSMTPBasicAuthObsoletionTxt: Label 'Learn more';
+        SMTPBasicOAuthObsoletionNotificationTxt: Label 'Update email accounts to OAuth 2.0 as Exchange SMTP Basic authentication is being deprecated.';
 
     /// <summary>
     /// Gets the registered accounts for the SMTP connector.
@@ -489,7 +489,6 @@ codeunit 4513 "SMTP Connector Impl." implements "Email Connector"
         SMTPAccounts.SetRange("Authentication Type", Enum::"SMTP Authentication Types"::"OAuth 2.0");
         SMTPAccounts.SetFilter("Client Id Storage Id", '<>%1', EmptyGuid);
         SMTPAccounts.SetFilter("Client Secret Storage Id", '<>%1', EmptyGuid);
-        SMTPAccounts.SetFilter("Authority URL", '<>%1', EmptyGuid);
         exit(SMTPAccounts.FindFirst());
     end;
 
