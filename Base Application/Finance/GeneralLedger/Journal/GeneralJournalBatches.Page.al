@@ -10,6 +10,16 @@ using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Foundation.Reporting;
 using System.Environment;
 
+/// <summary>
+/// List page for managing general journal batches within journal templates providing batch configuration and navigation.
+/// Displays journal batches with their settings including balancing account configuration, number series, and posting parameters.
+/// </summary>
+/// <remarks>
+/// Journal batch management interface for configuring and navigating journal batches within templates.
+/// Key features: Batch configuration display, balancing account setup, number series assignment, posting parameter management.
+/// Integration: Direct navigation to journal lines, batch-level posting operations, template context filtering.
+/// Actions: Open journal lines, post batches, test reports, navigate to ledger entries and registers.
+/// </remarks>
 page 251 "General Journal Batches"
 {
     Caption = 'General Journal Batches';
