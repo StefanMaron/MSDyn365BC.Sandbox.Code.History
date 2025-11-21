@@ -22,6 +22,7 @@ using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
@@ -959,7 +960,7 @@ table 5900 "Service Header"
                     CopyAppliestoFieldsFromCustLedgerEntry(CustLedgEntry);
                 end;
                 Clear(ServApplyCustEntries);
-                
+
                 OnAfterLookupAppliesToDocNo(Rec, CustLedgEntry);
             end;
 
@@ -1717,6 +1718,11 @@ table 5900 "Service Header"
                 else
                     ServDocExchangeMgt.SetServiceDoc(Rec, IncomingDocument);
             end;
+        }
+        field(176; "Tax System Type"; Enum "Tax System Type")
+        {
+            Caption = 'Tax System Type';
+            Editable = false;
         }
         field(178; "Journal Templ. Name"; Code[10])
         {

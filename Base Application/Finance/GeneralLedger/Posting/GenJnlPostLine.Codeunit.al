@@ -44,6 +44,35 @@ using Microsoft.Sales.Setup;
 using System.Telemetry;
 using Microsoft;
 
+/// <summary>
+/// Core posting engine for individual general journal lines with comprehensive validation and ledger entry creation.
+/// Handles posting transactions to general ledger, customer/vendor ledgers, VAT entries, and auxiliary registers.
+/// Provides advanced features including currency handling, dimension processing, and deferral management.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>Architecture:</b>
+/// This codeunit serves as the fundamental posting engine for Business Central's general journal system.
+/// It orchestrates the creation of multiple ledger entries from a single journal line, handling complex
+/// business rules, currency conversions, and cross-module integrations.
+/// </para>
+/// <para>
+/// <b>Core Responsibilities:</b>
+/// </para>
+/// <list type="bullet">
+/// <item><description>General ledger entry posting with dimension and currency support</description></item>
+/// <item><description>Customer and vendor ledger entry creation and application processing</description></item>
+/// <item><description>VAT calculation and posting including unrealized VAT handling</description></item>
+/// <item><description>Fixed asset journal integration and depreciation posting</description></item>
+/// <item><description>Bank account and payment processing</description></item>
+/// <item><description>Intercompany transaction handling and G/L register maintenance</description></item>
+/// </list>
+/// <para>
+/// <b>Extension Points:</b>
+/// Supports extensive customization through integration events at key posting stages, enabling
+/// custom validation, field modifications, and auxiliary posting operations.
+/// </para>
+/// </remarks>
 codeunit 12 "Gen. Jnl.-Post Line"
 {
     Permissions = TableData "G/L Account" = r,
@@ -2334,6 +2363,17 @@ codeunit 12 "Gen. Jnl.-Post Line"
         SummarizeVAT(GLSetup."Summarize G/L Entries", GLEntry);
     end;
 
+    /// <summary>
+    /// Initializes a general ledger entry for VAT posting with data copied from an existing VAT entry.
+    /// Creates G/L entry with dimension and posting details derived from the source VAT entry.
+    /// </summary>
+    /// <param name="GenJnlLine">General journal line that is being posted</param>
+    /// <param name="AccNo">G/L account number for the new entry</param>
+    /// <param name="BalAccNo">Balancing account number for the new entry</param>
+    /// <param name="Amount">Amount for the G/L entry in local currency</param>
+    /// <param name="AmountAddCurr">Amount for the G/L entry in additional currency</param>
+    /// <param name="VATEntry">Source VAT entry to copy posting details from</param>
+    /// <returns>Entry number of the created G/L entry</returns>
     procedure InitGLEntryVATCopy(GenJnlLine: Record "Gen. Journal Line"; AccNo: Code[20]; BalAccNo: Code[20]; Amount: Decimal; AmountAddCurr: Decimal; VATEntry: Record "VAT Entry"): Integer
     var
         GLEntry: Record "G/L Entry";
@@ -6227,6 +6267,17 @@ codeunit 12 "Gen. Jnl.-Post Line"
         OnAfterGetVendUnrealizedVATAccounts(VATEntry2, VATPostingSetup, PurchVATAccount, PurchVATUnrealAccount, PurchReverseAccount, PurchReverseUnrealAccount);
     end;
 
+    /// <summary>
+    /// Posts an unrealized VAT entry for general journal line processing.
+    /// Handles unrealized VAT scenarios where VAT is posted upon payment rather than invoice.
+    /// </summary>
+    /// <param name="GenJnlLine">General journal line being processed</param>
+    /// <param name="VATEntry2">Source VAT entry to base the unrealized entry on</param>
+    /// <param name="VATAmount">VAT amount in local currency</param>
+    /// <param name="VATBase">VAT base amount in local currency</param>
+    /// <param name="VATAmountAddCurr">VAT amount in additional currency</param>
+    /// <param name="VATBaseAddCurr">VAT base amount in additional currency</param>
+    /// <param name="GLEntryNo">Associated G/L entry number for cross-reference</param>
     procedure PostUnrealVATEntry(GenJnlLine: Record "Gen. Journal Line"; var VATEntry2: Record "VAT Entry"; VATAmount: Decimal; VATBase: Decimal; VATAmountAddCurr: Decimal; VATBaseAddCurr: Decimal; GLEntryNo: Integer)
     begin
         OnBeforePostUnrealVATEntry(GenJnlLine, VATEntry);
@@ -7467,6 +7518,16 @@ codeunit 12 "Gen. Jnl.-Post Line"
             CVLedgEntryBuf."Calculate Interest" := true;
     end;
 
+    /// <summary>
+    /// Calculates additional currency amount for G/L posting based on various posting scenarios.
+    /// Handles currency conversion, rounding, and posting rules for additional currency setup.
+    /// </summary>
+    /// <param name="Amount">Base amount in local currency</param>
+    /// <param name="AddCurrAmount">Amount in additional currency</param>
+    /// <param name="OldAddCurrAmount">Previous additional currency amount for comparison</param>
+    /// <param name="UseAddCurrAmount">Indicates whether to use the provided additional currency amount</param>
+    /// <param name="GenJnlLine">General journal line containing currency posting rules</param>
+    /// <returns>Calculated additional currency amount for posting</returns>
     procedure GLCalcAddCurrency(Amount: Decimal; AddCurrAmount: Decimal; OldAddCurrAmount: Decimal; UseAddCurrAmount: Boolean; GenJnlLine: Record "Gen. Journal Line") Result: Decimal
     var
         IsHandled: Boolean;
@@ -7738,6 +7799,10 @@ codeunit 12 "Gen. Jnl.-Post Line"
         NewGLSetup := GLSetup;
     end;
 
+    /// <summary>
+    /// Retrieves and caches the source code setup for posting operations.
+    /// Optimizes performance by reading the setup once and reusing it across posting operations.
+    /// </summary>
     procedure GetSourceCodeSetup()
     begin
         if SourceCodeSetupRead then
@@ -7994,6 +8059,16 @@ codeunit 12 "Gen. Jnl.-Post Line"
         AdjAmount[Offset + 1] += AmountAddCurr;
     end;
 
+    /// <summary>
+    /// Handles detailed adjustment entries for currency and rounding differences in posting.
+    /// Creates additional G/L entries to balance out adjustment amounts from currency conversions and rounding.
+    /// </summary>
+    /// <param name="GenJnlLine">General journal line being processed</param>
+    /// <param name="GLEntry">G/L entry being adjusted</param>
+    /// <param name="AdjAmount">Array of adjustment amounts for different currencies and scenarios</param>
+    /// <param name="TotalAmountLCY">Total amount in local currency for validation</param>
+    /// <param name="TotalAmountAddCurr">Total amount in additional currency for validation</param>
+    /// <param name="GLAccNo">G/L account number for adjustment entries</param>
     procedure HandleDtldAdjustment(GenJnlLine: Record "Gen. Journal Line"; var GLEntry: Record "G/L Entry"; AdjAmount: array[4] of Decimal; TotalAmountLCY: Decimal; TotalAmountAddCurr: Decimal; GLAccNo: Code[20])
     var
         IsHandled: Boolean;

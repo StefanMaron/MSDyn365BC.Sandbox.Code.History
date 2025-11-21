@@ -18,6 +18,16 @@ using System.Environment.Configuration;
 using System.Integration;
 using System.Threading;
 
+/// <summary>
+/// Recurring general journal page for entering automated recurring transactions with various recurring methods.
+/// Provides specialized interface for setting up recurring entries including fixed, variable, and balance-based methods.
+/// </summary>
+/// <remarks>
+/// Specialized recurring journal interface for automated periodic transaction generation.
+/// Supports all recurring methods: Fixed, Variable, Balance, Reversing variants, and dimension-based balancing.
+/// Key capabilities: Recurring frequency setup, allocation support, automated reversal entries, balance calculations.
+/// Integration: Automated posting via job queue, recurring method processing, dimension allocation support.
+/// </remarks>
 page 283 "Recurring General Journal"
 {
     AdditionalSearchTerms = 'accruals';
@@ -1049,26 +1059,60 @@ page 283 "Recurring General Journal"
         DimensionBalanceLine := Rec."Recurring Method" in [Rec."Recurring Method"::"BD Balance by Dimension", Rec."Recurring Method"::"RBD Reversing Balance by Dimension"];
     end;
 
+    /// <summary>
+    /// Integration event that occurs after validating shortcut dimension codes in the recurring journal.
+    /// Allows custom processing of dimension validation for recurring journal entries.
+    /// </summary>
+    /// <param name="GenJournalLine">The journal line being validated for dimension codes.</param>
+    /// <param name="ShortcutDimCode">Array of shortcut dimension codes being validated.</param>
+    /// <param name="DimIndex">Index of the dimension code being validated (1-8).</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateShortcutDimCode(var GenJournalLine: Record "Gen. Journal Line"; var ShortcutDimCode: array[8] of Code[20]; DimIndex: Integer)
     begin
     end;
 
+    /// <summary>
+    /// Integration event that occurs before selecting a journal batch when an error occurs.
+    /// Allows custom handling of journal batch selection errors during recurring journal operations.
+    /// </summary>
+    /// <param name="CurrentJnlBatchName">The current journal batch name being processed.</param>
+    /// <param name="GenJnlManagement">General journal management codeunit for batch operations.</param>
+    /// <param name="IsHandled">Set to true to skip standard error handling for journal selection.</param>
     [IntegrationEvent(true, false)]
     local procedure OnBeforeSelectJournalWithError(var CurrentJnlBatchName: Code[10]; GenJnlManagement: Codeunit GenJnlManagement; var IsHandled: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Integration event that occurs after opening the recurring general journal page.
+    /// Allows custom initialization and setup after the page is loaded and batches are selected.
+    /// </summary>
+    /// <param name="CurrentJnlBatchName">The current journal batch name after page opening.</param>
     [IntegrationEvent(true, false)]
     local procedure OnAfterOnOpenPage(var CurrentJnlBatchName: Code[10])
     begin
     end;
 
+    /// <summary>
+    /// Integration event that occurs before opening the recurring general journal page initialization.
+    /// Allows custom processing before standard page opening procedures for recurring journals.
+    /// </summary>
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnOpenPage()
     begin
     end;
 
+    /// <summary>
+    /// Integration event that occurs before updating balance display for recurring journal lines.
+    /// Allows customization of balance calculation and display behavior in recurring journals.
+    /// </summary>
+    /// <param name="GenJournalLine">The journal line being processed for balance update.</param>
+    /// <param name="xGenJournalLine">The previous version of the journal line for comparison.</param>
+    /// <param name="Balance">Current balance amount to be displayed.</param>
+    /// <param name="TotalBalance">Total balance amount across all lines.</param>
+    /// <param name="ShowBalance">Boolean indicating whether to show balance information.</param>
+    /// <param name="ShowTotalBalance">Boolean indicating whether to show total balance information.</param>
+    /// <param name="IsHandled">Set to true to skip standard balance update processing.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateBalance(var GenJournalLine: Record "Gen. Journal Line"; xGenJournalLine: Record "Gen. Journal Line"; var Balance: Decimal; var TotalBalance: Decimal; var ShowBalance: Boolean; var ShowTotalBalance: Boolean; var IsHandled: Boolean)
     begin

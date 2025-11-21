@@ -18,6 +18,15 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using System.IO;
 
+/// <summary>
+/// Primary interface for creating, viewing, and editing general ledger account master data.
+/// Provides comprehensive account setup including posting groups, dimensions, and financial reporting classifications.
+/// </summary>
+/// <remarks>
+/// Key functionality: Account configuration, posting setup validation, dimension assignment, balance inquiry.
+/// User workflow: Chart of Accounts → Account Card → Account configuration and analysis.
+/// Extensible via page extensions for additional fields, actions, and validation logic.
+/// </remarks>
 page 17 "G/L Account Card"
 {
     Caption = 'G/L Account Card';
