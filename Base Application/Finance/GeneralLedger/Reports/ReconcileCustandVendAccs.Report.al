@@ -14,6 +14,15 @@ using Microsoft.Sales.Receivables;
 using System.Utilities;
 using System.Globalization;
 
+/// <summary>
+/// Reconciles customer and vendor account balances with corresponding G/L account balances for audit and validation purposes.
+/// Provides detailed analysis of posting group account mappings and identifies balance discrepancies between subsidiary and general ledgers.
+/// </summary>
+/// <remarks>
+/// Data sources: G/L Account, Customer/Vendor Posting Groups, Currency, and CV Ledger Entry tables.
+/// Analyzes receivables accounts, payables accounts, payment discount accounts, tolerance accounts, and rounding accounts.
+/// Critical for month-end reconciliation procedures, audit preparation, and maintaining subsidiary ledger integrity.
+/// </remarks>
 report 33 "Reconcile Cust. and Vend. Accs"
 {
     DefaultLayout = RDLC;

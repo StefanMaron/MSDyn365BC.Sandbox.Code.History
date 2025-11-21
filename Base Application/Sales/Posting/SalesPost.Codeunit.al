@@ -258,8 +258,9 @@ codeunit 80 "Sales-Post"
         TempSalesTaxAmtLine: Record "Sales Tax Amount Line" temporary;
         TempSalesLineForSalesTax: Record "Sales Line" temporary;
         TempSalesLineForSpread: Record "Sales Line" temporary;
-        SalesTaxCountry: Option US,CA,,,,,,,,,,,,NoTax;
+        SalesTaxCountry: Enum "Sales Tax Country";
         TaxOption: Option ,VAT,SalesTax;
+        UseSalesTax: Boolean;
         UseExternalTaxEngine: Boolean;
         EveryLineMustHaveSameErr: Label 'Every sales line must have same %1 = %2.';
         TaxAreaSetupShouldBeSameErr: Label 'If sales document has Tax Area Code whose %1 is %2, then any line with a Tax Area Code must have one whose %1 is %2. ';
@@ -481,7 +482,7 @@ codeunit 80 "Sales-Post"
             OnBeforeCalculateSalesTax(
               SalesHeader, TempSalesLineForSalesTax, TempSalesTaxAmtLine, SalesTaxCalculationOverridden, SuppressCommit);
             if not SalesTaxCalculationOverridden then
-                if SalesTaxCountry <> SalesTaxCountry::NoTax then begin
+                if UseSalesTax then begin
                     if UseExternalTaxEngine then
                         SalesTaxCalculate.CallExternalTaxEngineForSales(SalesHeader, false)
                     else
@@ -885,11 +886,13 @@ codeunit 80 "Sales-Post"
             SalesHeader.TestField("Payment Method Code", ErrorInfo.Create());
             SalesSetup.TestField("Shipment on Invoice", ErrorInfo.Create());
         end;
+
         if SalesHeader."Tax Area Code" = '' then
-            SalesTaxCountry := SalesTaxCountry::NoTax
+            UseSalesTax := false
         else begin
             TaxArea.Get(SalesHeader."Tax Area Code");
-            SalesTaxCountry := TaxArea."Country/Region";
+            SalesTaxCountry := "Sales Tax Country".FromInteger(TaxArea."Country/Region");
+            UseSalesTax := true;
             UseExternalTaxEngine := TaxArea."Use External Tax Engine";
         end;
 
@@ -6949,10 +6952,13 @@ codeunit 80 "Sales-Post"
         TotalTaxAmount: Decimal;
         NewAmountIncludingVAT: Decimal;
         IsHandled: Boolean;
+        SalesTaxCountryOption: Option;
     begin
         IsHandled := false;
-        OnBeforePostSalesTaxToGeneralLedger(SalesHeader, LineCount, TempSalesTaxAmtLine, Window, SalesTaxCountry, GenJnlLineDocNo,
+        SalesTaxCountryOption := SalesTaxCountry.AsInteger();
+        OnBeforePostSalesTaxToGeneralLedger(SalesHeader, LineCount, TempSalesTaxAmtLine, Window, SalesTaxCountryOption, GenJnlLineDocNo,
             GenJnlLineExtDocNo, GenJnlLineDocType, SrcCode, Currency, GenJnlPostLine, TotalSalesLineLCY, TotalSalesLine, TempSalesLineGlobal, IsHandled);
+        SalesTaxCountry := "Sales Tax Country".FromInteger(SalesTaxCountryOption);
         if IsHandled = true then
             exit;
 
@@ -7436,7 +7442,7 @@ codeunit 80 "Sales-Post"
                 OnInsertPostedHeadersOnAfterCalcShouldInsertInvoiceHeader(SalesHeader, ShouldInsertInvoiceHeader);
                 if ShouldInsertInvoiceHeader then begin
                     InsertInvoiceHeader(SalesHeader, SalesInvHeader);
-                    if SalesTaxCountry <> SalesTaxCountry::NoTax then
+                    if UseSalesTax then
                         TaxAmountDifference.CopyTaxDifferenceRecords(
                           TaxAmountDifference."Document Product Area"::Sales, SalesHeader."Document Type".AsInteger(), SalesHeader."No.",
                           TaxAmountDifference."Document Product Area"::"Posted Sale",
@@ -7447,7 +7453,7 @@ codeunit 80 "Sales-Post"
                     OnInsertPostedHeadersOnAfterInsertInvoiceHeader(SalesHeader, SalesInvHeader);
                 end else begin // Credit Memo
                     InsertCrMemoHeader(SalesHeader, SalesCrMemoHeader);
-                    if SalesTaxCountry <> SalesTaxCountry::NoTax then
+                    if UseSalesTax then
                         TaxAmountDifference.CopyTaxDifferenceRecords(
                           TaxAmountDifference."Document Product Area"::Sales, SalesHeader."Document Type".AsInteger(), SalesHeader."No.",
                           TaxAmountDifference."Document Product Area"::"Posted Sale",
@@ -9097,10 +9103,10 @@ codeunit 80 "Sales-Post"
                 repeat
                     if SalesLine."VAT Calculation Type" = SalesLine."VAT Calculation Type"::"Sales Tax" then begin
                         if SalesLine."Tax Area Code" <> '' then begin
-                            if SalesTaxCountry = SalesTaxCountry::NoTax then
+                            if not UseSalesTax then
                                 Error(EveryLineMustHaveSameErr, SalesLine.FieldCaption("Tax Area Code"), SalesLine."Tax Area Code");
                             TaxArea.Get(SalesLine."Tax Area Code");
-                            if TaxArea."Country/Region" <> SalesTaxCountry then
+                            if TaxArea."Country/Region" <> SalesTaxCountry.AsInteger() then
                                 Error(TaxAreaSetupShouldBeSameErr, TaxArea.FieldCaption("Country/Region"), SalesTaxCountry);
                             if TaxArea."Use External Tax Engine" <> UseExternalTaxEngine then
                                 Error(TaxAreaSetupShouldBeSameErr, TaxArea.FieldCaption("Use External Tax Engine"), UseExternalTaxEngine);

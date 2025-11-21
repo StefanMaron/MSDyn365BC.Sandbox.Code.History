@@ -6,6 +6,7 @@ namespace Microsoft.Finance.SalesTax;
 
 enum 398 "Sales Tax Country"
 {
+    AssignmentCompatibility = true;
     Extensible = true;
 
     value(0; "US") { Caption = 'US'; }

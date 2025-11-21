@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ page 10150 "O365 Tax Settings Card"
                     ShowCaption = false;
                     field(City; TempSalesTaxSetupWizard.City)
                     {
-                        ApplicationArea = Invoicing, Basic, Suite;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'City';
                         Enabled = CityNameEditable;
                         ShowCaption = false;
@@ -40,7 +40,7 @@ page 10150 "O365 Tax Settings Card"
                     }
                     field(CityRate; TempSalesTaxSetupWizard."City Rate")
                     {
-                        ApplicationArea = Invoicing, Basic, Suite;
+                        ApplicationArea = Basic, Suite;
                         BlankZero = true;
                         Caption = 'City Rate';
                         MinValue = 0;
@@ -61,7 +61,7 @@ page 10150 "O365 Tax Settings Card"
                     ShowCaption = false;
                     field(State; TempSalesTaxSetupWizard.State)
                     {
-                        ApplicationArea = Invoicing, Basic, Suite;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'State';
                         Enabled = StateNameEditable;
                         ShowCaption = false;
@@ -73,7 +73,7 @@ page 10150 "O365 Tax Settings Card"
                     }
                     field(StateRate; TempSalesTaxSetupWizard."State Rate")
                     {
-                        ApplicationArea = Invoicing, Basic, Suite;
+                        ApplicationArea = Basic, Suite;
                         BlankZero = true;
                         Caption = 'State Rate';
                         MinValue = 0;
@@ -99,7 +99,7 @@ page 10150 "O365 Tax Settings Card"
                     Visible = GSTorHSTVisible;
                     field(GSTorHST; GSTorHST)
                     {
-                        ApplicationArea = Invoicing, Basic, Suite;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'GST/HST';
                         Editable = false;
                         TableRelation = "Tax Jurisdiction" where("Country/Region" = const(CA),
@@ -114,7 +114,7 @@ page 10150 "O365 Tax Settings Card"
                     }
                     field(GSTorHSTrate; GSTorHSTrate)
                     {
-                        ApplicationArea = Invoicing, Basic, Suite;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'GST/HST Rate';
                         DecimalPlaces = 1 : 3;
                         Editable = (GSTorHST <> '');
@@ -126,7 +126,7 @@ page 10150 "O365 Tax Settings Card"
                     Visible = PSTVisible;
                     field(PST; PST)
                     {
-                        ApplicationArea = Invoicing, Basic, Suite;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'PST';
                         Editable = false;
                         TableRelation = "Tax Jurisdiction" where("Country/Region" = const(CA),
@@ -141,7 +141,7 @@ page 10150 "O365 Tax Settings Card"
                     }
                     field(PSTrate; PSTrate)
                     {
-                        ApplicationArea = Invoicing, Basic, Suite;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'PST Rate';
                         DecimalPlaces = 1 : 3;
                         Editable = (PST <> '');
@@ -153,7 +153,7 @@ page 10150 "O365 Tax Settings Card"
                 ShowCaption = false;
                 field(Total; TotalRate)
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     Caption = 'Total rate';
                     DecimalPlaces = 1 : 3;
                     Editable = false;
@@ -165,7 +165,7 @@ page 10150 "O365 Tax Settings Card"
                 ShowCaption = false;
                 field(Default; DefaultTxt)
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     Editable = false;
                     Enabled = not IsDefaultArea;
                     ShowCaption = false;

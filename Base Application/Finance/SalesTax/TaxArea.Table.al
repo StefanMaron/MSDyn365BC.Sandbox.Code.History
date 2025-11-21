@@ -37,7 +37,7 @@ table 318 "Tax Area"
             BlankZero = false;
             Caption = 'Country/Region';
             OptionCaption = 'US,CA';
-            OptionMembers = US,CA;
+            OptionMembers = "US","CA";
 
             trigger OnValidate()
             begin
