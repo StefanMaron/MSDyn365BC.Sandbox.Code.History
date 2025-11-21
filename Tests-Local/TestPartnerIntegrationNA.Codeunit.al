@@ -1641,8 +1641,17 @@
         InsertDataTypeBuffer(OnFillInvPostingBufferServAmtsMgtTxt);
     end;
 
+#if not CLEAN28
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Documents Mgt.", 'OnBeforeCalculateSalesTax', '', false, false)]
     local procedure OnBeforeCalculateSalesTaxServDocumentsMgt(var SalesTaxCalculationOverridden: Boolean; var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary)
+    begin
+        InsertDataTypeBuffer(OnBeforeCalculateSalesTaxStatisticsTxt);
+        SalesTaxCalculationOverridden := true;
+    end;
+#endif
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Documents Mgt. NA", 'OnBeforeCalculateSalesTax', '', false, false)]
+    local procedure OnBeforeCalculateSalesTaxServDocumentsMgtNA(var SalesTaxCalculationOverridden: Boolean; var ServiceHeader: Record "Service Header"; var TempServiceLine: Record "Service Line" temporary; var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary)
     begin
         InsertDataTypeBuffer(OnBeforeCalculateSalesTaxStatisticsTxt);
         SalesTaxCalculationOverridden := true;

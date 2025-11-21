@@ -8,6 +8,15 @@ using Microsoft.Finance.FinancialReports;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
 
+/// <summary>
+/// Manages general ledger account categorization system and automatic financial statement generation.
+/// Provides functionality for account category initialization, financial report structure creation, and category-based reporting.
+/// </summary>
+/// <remarks>
+/// Key functions: Account category setup, financial report generation, balance sheet and income statement structure creation.
+/// Used during company initialization and when setting up financial reporting requirements.
+/// Integrates with Financial Reports framework for automated statement generation based on account categories.
+/// </remarks>
 codeunit 570 "G/L Account Category Mgt."
 {
 
@@ -81,6 +90,15 @@ codeunit 570 "G/L Account Category Mgt."
         CreateAccountScheduleForRetainedEarnings: Boolean;
         ForceCreateAccountSchedule: Boolean;
 
+    /// <summary>
+    /// Creates the complete hierarchy of standard G/L account categories and subcategories for financial reporting.
+    /// Initializes categories for Assets, Liabilities, Equity, Income, and Cost of Goods Sold with detailed subcategories.
+    /// </summary>
+    /// <remarks>
+    /// Called during company setup or when account categories need to be reset.
+    /// Creates both high-level categories and detailed subcategories for comprehensive financial reporting.
+    /// Assigns cash flow activity classifications to categories for cash flow statement generation.
+    /// </remarks>
     procedure InitializeAccountCategories()
     var
         GLAccountCategory: Record "G/L Account Category";
@@ -181,6 +199,17 @@ codeunit 570 "G/L Account Category Mgt."
         OnAfterInitializeAccountCategories();
     end;
 
+    /// <summary>
+    /// Creates a new general ledger account category with specified hierarchical position and properties.
+    /// Inserts the category at the specified position in the category tree and updates presentation order.
+    /// </summary>
+    /// <param name="InsertAfterEntryNo">Entry number of the category to insert after, or 0 for end of list</param>
+    /// <param name="ParentEntryNo">Entry number of the parent category for hierarchical structure</param>
+    /// <param name="AccountCategory">Primary account category classification (Assets, Liabilities, etc.)</param>
+    /// <param name="NewDescription">Descriptive text for the new category</param>
+    /// <param name="SystemGenerated">Indicates if this is a system-generated category that cannot be modified by users</param>
+    /// <param name="CashFlowActivity">Cash flow statement activity classification for the category</param>
+    /// <returns>Entry number of the newly created account category</returns>
     procedure AddCategory(InsertAfterEntryNo: Integer; ParentEntryNo: Integer; AccountCategory: Option; NewDescription: Text[80]; SystemGenerated: Boolean; CashFlowActivity: Option): Integer
     var
         GLAccountCategory: Record "G/L Account Category";
@@ -213,12 +242,25 @@ codeunit 570 "G/L Account Category Mgt."
         exit(GLAccountCategory."Entry No.");
     end;
 
+    /// <summary>
+    /// Forces recreation of standard account schedules even if they already exist.
+    /// Used when account schedules need to be reset or updated with new standard definitions.
+    /// </summary>
     procedure ForceInitializeStandardAccountSchedules()
     begin
         ForceCreateAccountSchedule := true;
         InitializeStandardAccountSchedules();
     end;
 
+    /// <summary>
+    /// Creates standard financial report structures including Balance Sheet, Income Statement, Cash Flow, and Retained Earnings.
+    /// Generates account schedules and column layouts based on account categories for automated financial reporting.
+    /// </summary>
+    /// <remarks>
+    /// Creates Financial Reports with associated row and column definitions.
+    /// Updates General Ledger Setup with references to the created financial reports.
+    /// Only creates reports that don't already exist unless forced recreation is specified.
+    /// </remarks>
     procedure InitializeStandardAccountSchedules()
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -362,6 +404,16 @@ codeunit 570 "G/L Account Category Mgt."
         ColumnLayout.Insert();
     end;
 
+    /// <summary>
+    /// Retrieves General Ledger Setup with validation that required financial reports are configured.
+    /// Automatically initializes missing financial reports and triggers account schedule generation if needed.
+    /// </summary>
+    /// <param name="GeneralLedgerSetup">Returns the General Ledger Setup record with verified financial report configuration</param>
+    /// <remarks>
+    /// Ensures all standard financial reports are available before returning setup.
+    /// Creates missing financial reports automatically and runs category-based account schedule generation.
+    /// Throws error if financial reports cannot be created or configured properly.
+    /// </remarks>
     procedure GetGLSetup(var GeneralLedgerSetup: Record "General Ledger Setup")
     var
         CategGenerateAccSchedules: Codeunit "Categ. Generate Acc. Schedules";
@@ -439,6 +491,11 @@ codeunit 570 "G/L Account Category Mgt."
         exit(CopyStr(SuggestedName, 1, MaxStrLen(SuggestedName) - StrLen(NumPart)) + NumPart);
     end;
 
+    /// <summary>
+    /// Executes the account schedule report for the specified financial report configuration.
+    /// Opens the Account Schedule report with predefined filters and formatting based on the financial report setup.
+    /// </summary>
+    /// <param name="FinancialReportName">Code identifying the financial report configuration to run</param>
     procedure RunAccountScheduleReport(FinancialReportName: Code[10])
     var
         AccountSchedule: Report "Account Schedule";
@@ -454,6 +511,10 @@ codeunit 570 "G/L Account Category Mgt."
         AccountSchedule.Run();
     end;
 
+    /// <summary>
+    /// Prompts user confirmation and generates missing account schedules for financial reporting.
+    /// Initializes financial report management and creates required account schedules if not already defined in setup.
+    /// </summary>
     procedure ConfirmAndRunGenerateAccountSchedules()
     var
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
@@ -500,6 +561,11 @@ codeunit 570 "G/L Account Category Mgt."
         exit(false);
     end;
 
+    /// <summary>
+    /// Checks if all required account schedule names are properly defined in General Ledger Setup.
+    /// Returns true if any standard financial report configurations are missing from setup.
+    /// </summary>
+    /// <returns>True if account schedule names are not fully defined, false if all are configured</returns>
     procedure GLSetupAllAccScheduleNamesNotDefined(): Boolean
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -528,206 +594,413 @@ codeunit 570 "G/L Account Category Mgt."
         OnAfterInitializeCompany();
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Current Assets account subcategory.
+    /// Used for identifying and filtering current asset accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Current Assets subcategory</returns>
     procedure GetCurrentAssets(): Text
     begin
         exit(CurrentAssetsTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Accounts Receivable account subcategory.
+    /// Used for identifying and filtering accounts receivable accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Accounts Receivable subcategory</returns>
     procedure GetAR(): Text
     begin
         exit(ARTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Cash account subcategory.
+    /// Used for identifying and filtering cash and cash equivalent accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Cash subcategory</returns>
     procedure GetCash(): Text
     begin
         exit(CashTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Prepaid Expenses account subcategory.
+    /// Used for identifying and filtering prepaid expense accounts in financial reports.
+    /// </summary>    
+    /// <returns>Localized description text for Prepaid Expenses subcategory</returns>
     procedure GetPrepaidExpenses(): Text
     begin
         exit(PrepaidExpensesTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Inventory account subcategory.
+    /// Used for identifying and filtering inventory-related accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Inventory subcategory</returns>  
     procedure GetInventory(): Text
     begin
         exit(InventoryTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Fixed Assets account subcategory.
+    /// Used for identifying and filtering fixed asset accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Fixed Assets subcategory</returns>
     procedure GetFixedAssets(): Text
     begin
         exit(FixedAssetsTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Equipment account subcategory.
+    /// Used for identifying and filtering equipment-related accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Equipment subcategory</returns>
     procedure GetEquipment(): Text
     begin
         exit(EquipementTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Accumulated Depreciation account subcategory.
+    /// Used for identifying and filtering accumulated depreciation accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Accumulated Depreciation subcategory</returns>
     procedure GetAccumDeprec(): Text
     begin
         exit(AccumDeprecTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Current Liabilities account subcategory.
+    /// Used for identifying and filtering current liability accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Current Liabilities subcategory</returns>
     procedure GetCurrentLiabilities(): Text
     begin
         exit(CurrentLiabilitiesTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Payroll Liabilities account subcategory.
+    /// Used for identifying and filtering payroll-related liability accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Payroll Liabilities subcategory</returns>
     procedure GetPayrollLiabilities(): Text
     begin
         exit(PayrollLiabilitiesTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Long Term Liabilities account subcategory.
+    /// Used for identifying and filtering long-term liability accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Long Term Liabilities subcategory</returns>
     procedure GetLongTermLiabilities(): Text
     begin
         exit(LongTermLiabilitiesTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Common Stock account subcategory.
+    /// Used for identifying and filtering common stock equity accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Common Stock subcategory</returns>
     procedure GetCommonStock(): Text
     begin
         exit(CommonStockTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Retained Earnings account subcategory.
+    /// Used for identifying and filtering retained earnings accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Retained Earnings subcategory</returns>
     procedure GetRetEarnings(): Text
     begin
         exit(RetEarningsTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Distribution to Shareholders account subcategory.
+    /// Used for identifying and filtering shareholder distribution accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Distribution to Shareholders subcategory</returns>
     procedure GetDistrToShareholders(): Text
     begin
         exit(DistrToShareholdersTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Service Income account subcategory.
+    /// Used for identifying and filtering service revenue accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Service Income subcategory</returns>
     procedure GetIncomeService(): Text
     begin
         exit(IncomeServiceTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Product Sales Income account subcategory.
+    /// Used for identifying and filtering product sales revenue accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Product Sales Income subcategory</returns>
     procedure GetIncomeProdSales(): Text
     begin
         exit(IncomeProdSalesTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Sales Discounts Income account subcategory.
+    /// Used for identifying and filtering sales discount accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Sales Discounts Income subcategory</returns>
     procedure GetIncomeSalesDiscounts(): Text
     begin
         exit(IncomeSalesDiscountsTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Sales Returns Income account subcategory.
+    /// Used for identifying and filtering sales return accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Sales Returns Income subcategory</returns>
     procedure GetIncomeSalesReturns(): Text
     begin
         exit(IncomeSalesReturnsTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Interest Income account subcategory.
+    /// Used for identifying and filtering interest income accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Interest Income subcategory</returns>
     procedure GetIncomeInterest(): Text
     begin
         exit(IncomeInterestTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Cost of Goods Sold - Labor account subcategory.
+    /// Used for identifying and filtering labor-related cost of goods sold accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for COGS Labor subcategory</returns>
     procedure GetCOGSLabor(): Text
     begin
         exit(COGSLaborTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Cost of Goods Sold - Materials account subcategory.
+    /// Used for identifying and filtering material-related cost of goods sold accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for COGS Materials subcategory</returns>
     procedure GetCOGSMaterials(): Text
     begin
         exit(COGSMaterialsTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Cost of Goods Sold - Discounts Granted account subcategory.
+    /// Used for identifying and filtering discount-related cost of goods sold accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for COGS Discounts Granted subcategory</returns>
     procedure GetCOGSDiscountsGranted(): Text
     begin
         exit(COGSDiscountsGrantedTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Rent Expense account subcategory.
+    /// Used for identifying and filtering rent expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Rent Expense subcategory</returns>
     procedure GetRentExpense(): Text
     begin
         exit(RentExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Advertising Expense account subcategory.
+    /// Used for identifying and filtering advertising expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Advertising Expense subcategory</returns>
     procedure GetAdvertisingExpense(): Text
     begin
         exit(AdvertisingExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Interest Expense account subcategory.
+    /// Used for identifying and filtering interest expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Interest Expense subcategory</returns>
     procedure GetInterestExpense(): Text
     begin
         exit(InterestExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Fees Expense account subcategory.
+    /// Used for identifying and filtering fees expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Fees Expense subcategory</returns>
     procedure GetFeesExpense(): Text
     begin
         exit(FeesExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Insurance Expense account subcategory.
+    /// Used for identifying and filtering insurance expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Insurance Expense subcategory</returns>
     procedure GetInsuranceExpense(): Text
     begin
         exit(InsuranceExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Payroll Expense account subcategory.
+    /// Used for identifying and filtering payroll expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Payroll Expense subcategory</returns>
     procedure GetPayrollExpense(): Text
     begin
         exit(PayrollExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Benefits Expense account subcategory.
+    /// Used for identifying and filtering employee benefits expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Benefits Expense subcategory</returns>
     procedure GetBenefitsExpense(): Text
     begin
         exit(BenefitsExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Repairs Expense account subcategory.
+    /// Used for identifying and filtering repairs and maintenance expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Repairs Expense subcategory</returns>
     procedure GetRepairsExpense(): Text
     begin
         exit(RepairsTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Utilities Expense account subcategory.
+    /// Used for identifying and filtering utilities expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Utilities Expense subcategory</returns>
     procedure GetUtilitiesExpense(): Text
     begin
         exit(UtilitiesExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Other Income/Expense account subcategory.
+    /// Used for identifying and filtering miscellaneous income and expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Other Income/Expense subcategory</returns>
     procedure GetOtherIncomeExpense(): Text
     begin
         exit(OtherIncomeExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Tax Expense account subcategory.
+    /// Used for identifying and filtering tax expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Tax Expense subcategory</returns>
     procedure GetTaxExpense(): Text
     begin
         exit(TaxExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Travel Expense account subcategory.
+    /// Used for identifying and filtering travel expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Travel Expense subcategory</returns>
     procedure GetTravelExpense(): Text
     begin
         exit(TravelExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Vehicle Expenses account subcategory.
+    /// Used for identifying and filtering vehicle-related expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Vehicle Expenses subcategory</returns>
     procedure GetVehicleExpenses(): Text
     begin
         exit(VehicleExpensesTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Bad Debt Expense account subcategory.
+    /// Used for identifying and filtering bad debt expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Bad Debt Expense subcategory</returns>
     procedure GetBadDebtExpense(): Text
     begin
         exit(BadDebtExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Salaries Expense account subcategory.
+    /// Used for identifying and filtering salaries expense accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Salaries Expense subcategory</returns>
     procedure GetSalariesExpense(): Text
     begin
         exit(SalariesExpenseTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Jobs Cost account subcategory.
+    /// Used for identifying and filtering job cost accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Jobs Cost subcategory</returns>
     procedure GetJobsCost(): Text
     begin
         exit(JobsCostTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Jobs Income account subcategory.
+    /// Used for identifying and filtering job income accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Jobs Income subcategory</returns>
     procedure GetIncomeJobs(): Text
     begin
         exit(IncomeJobsTxt);
     end;
 
+    /// <summary>
+    /// Returns the localized text description for the Job Sales Contra account subcategory.
+    /// Used for identifying and filtering job sales contra accounts in financial reports.
+    /// </summary>
+    /// <returns>Localized description text for Job Sales Contra subcategory</returns>
     procedure GetJobSalesContra(): Text
     begin
         exit(JobSalesContraTxt);
     end;
 
+    /// <summary>
+    /// Retrieves the G/L Account Category record for the specified primary account category.
+    /// Filters for top-level categories with no parent entry and returns the first match.
+    /// </summary>
+    /// <param name="GLAccountCategory">Returns the found G/L Account Category record</param>
+    /// <param name="Category">Account category option value to search for</param>
+    /// <returns>True if category is found, false otherwise</returns>
     procedure GetAccountCategory(var GLAccountCategory: Record "G/L Account Category"; Category: Option): Boolean
     begin
         GLAccountCategory.SetRange("Account Category", Category);
@@ -735,6 +1008,14 @@ codeunit 570 "G/L Account Category Mgt."
         exit(GLAccountCategory.FindFirst());
     end;
 
+    /// <summary>
+    /// Retrieves the G/L Account Category record for a specific subcategory under a primary account category.
+    /// Filters for child categories with a parent entry and matches the description text.
+    /// </summary>
+    /// <param name="GLAccountCategory">Returns the found G/L Account Category record</param>
+    /// <param name="Category">Primary account category option value</param>
+    /// <param name="Description">Subcategory description text to match</param>
+    /// <returns>True if subcategory is found, false otherwise</returns>
     procedure GetAccountSubcategory(var GLAccountCategory: Record "G/L Account Category"; Category: Option; Description: Text): Boolean
     begin
         GLAccountCategory.SetRange("Account Category", Category);
@@ -743,6 +1024,13 @@ codeunit 570 "G/L Account Category Mgt."
         exit(GLAccountCategory.FindFirst());
     end;
 
+    /// <summary>
+    /// Returns the entry number for a subcategory under the specified primary account category.
+    /// Searches for matching category and description, returning the entry number for category assignment.
+    /// </summary>
+    /// <param name="Category">Primary account category option value</param>
+    /// <param name="SubcategoryDescription">Subcategory description text to locate</param>
+    /// <returns>Entry number of the matching subcategory, or 0 if not found</returns>
     procedure GetSubcategoryEntryNo(Category: Option; SubcategoryDescription: Text): Integer
     var
         GLAccountCategory: Record "G/L Account Category";
@@ -753,11 +1041,31 @@ codeunit 570 "G/L Account Category Mgt."
             exit(GLAccountCategory."Entry No.");
     end;
 
+    /// <summary>
+    /// Validates G/L Account setup and assigns account category and subcategory if not already set.
+    /// Simplified version that delegates to the full CheckGLAccount procedure with default table and field parameters.
+    /// </summary>
+    /// <param name="AccNo">G/L Account number to validate and categorize</param>
+    /// <param name="CheckProdPostingGroup">Whether to validate General Product Posting Group is assigned</param>
+    /// <param name="CheckDirectPosting">Whether to validate Direct Posting is enabled</param>
+    /// <param name="AccountCategory">Account category to assign if account has no category</param>
+    /// <param name="AccountSubcategory">Subcategory description to assign if account has no category</param>
     procedure CheckGLAccount(AccNo: Code[20]; CheckProdPostingGroup: Boolean; CheckDirectPosting: Boolean; AccountCategory: Option; AccountSubcategory: Text)
     begin
         CheckGLAccount(0, 0, AccNo, CheckProdPostingGroup, CheckDirectPosting, AccountCategory, AccountSubcategory);
     end;
 
+    /// <summary>
+    /// Validates G/L Account setup and assigns account category and subcategory if not already set.
+    /// Performs comprehensive validation including posting group checks and automatic category assignment.
+    /// </summary>
+    /// <param name="TableNo">Source table number for extensibility events</param>
+    /// <param name="FieldNo">Source field number for extensibility events</param>
+    /// <param name="AccNo">G/L Account number to validate and categorize</param>
+    /// <param name="CheckProdPostingGroup">Whether to validate General Product Posting Group is assigned</param>
+    /// <param name="CheckDirectPosting">Whether to validate Direct Posting is enabled</param>
+    /// <param name="AccountCategory">Account category to assign if account has no category</param>
+    /// <param name="AccountSubcategory">Subcategory description to assign if account has no category</param>
     procedure CheckGLAccount(TableNo: Integer; FieldNo: Integer; AccNo: Code[20]; CheckProdPostingGroup: Boolean; CheckDirectPosting: Boolean; AccountCategory: Option; AccountSubcategory: Text)
     var
         GLAcc: Record "G/L Account";
@@ -785,6 +1093,13 @@ codeunit 570 "G/L Account Category Mgt."
         end;
     end;
 
+    /// <summary>
+    /// Validates G/L Account setup without requiring or assigning account categories.
+    /// Performs basic validation for posting groups and direct posting without category enforcement.
+    /// </summary>
+    /// <param name="AccNo">G/L Account number to validate</param>
+    /// <param name="CheckProdPostingGroup">Whether to validate General Product Posting Group is assigned</param>
+    /// <param name="CheckDirectPosting">Whether to validate Direct Posting is enabled</param>
     procedure CheckGLAccountWithoutCategory(AccNo: Code[20]; CheckProdPostingGroup: Boolean; CheckDirectPosting: Boolean)
     var
         OptionValueOutOfRange: Integer;
@@ -793,11 +1108,27 @@ codeunit 570 "G/L Account Category Mgt."
         CheckGLAccount(AccNo, CheckProdPostingGroup, CheckDirectPosting, OptionValueOutOfRange, '');
     end;
 
+    /// <summary>
+    /// Opens G/L Account lookup filtered by account category and subcategory for user selection.
+    /// Simplified version that delegates to the full LookupGLAccount procedure with default table and field parameters.
+    /// </summary>
+    /// <param name="AccountNo">Current account number, updated with user selection</param>
+    /// <param name="AccountCategory">Account category to filter the lookup</param>
+    /// <param name="AccountSubcategoryFilter">Subcategory filter text for refined lookup results</param>
     procedure LookupGLAccount(var AccountNo: Code[20]; AccountCategory: Option; AccountSubcategoryFilter: Text)
     begin
         LookupGLAccount(0, 0, AccountNo, AccountCategory, AccountSubcategoryFilter);
     end;
 
+    /// <summary>
+    /// Opens G/L Account lookup filtered by account category and subcategory for user selection.
+    /// Provides filtered lookup based on category and subcategory criteria with extensibility support.
+    /// </summary>
+    /// <param name="TableNo">Source table number for extensibility events</param>
+    /// <param name="FieldNo">Source field number for extensibility events</param>
+    /// <param name="AccountNo">Current account number, updated with user selection</param>
+    /// <param name="AccountCategory">Account category to filter the lookup</param>
+    /// <param name="AccountSubcategoryFilter">Subcategory filter text for refined lookup results</param>
     procedure LookupGLAccount(TableNo: Integer; FieldNo: Integer; var AccountNo: Code[20]; AccountCategory: Option; AccountSubcategoryFilter: Text)
     var
         GLAccount: Record "G/L Account";
@@ -840,6 +1171,11 @@ codeunit 570 "G/L Account Category Mgt."
         end;
     end;
 
+    /// <summary>
+    /// Opens G/L Account lookup without category filtering for unrestricted user selection.
+    /// Provides access to all posting-type G/L accounts without category or subcategory restrictions.
+    /// </summary>
+    /// <param name="AccountNo">Current account number, updated with user selection</param>
     procedure LookupGLAccountWithoutCategory(var AccountNo: Code[20])
     var
         GLAccount: Record "G/L Account";
@@ -858,36 +1194,81 @@ codeunit 570 "G/L Account Category Mgt."
         end;
     end;
 
+    /// <summary>
+    /// Integration event raised after company initialization is complete.
+    /// Allows subscribers to perform custom setup or validation after standard account categories are created.
+    /// </summary>
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitializeCompany()
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised before company initialization begins.
+    /// Allows subscribers to perform custom setup or preparation before standard account categories are created.
+    /// </summary>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInitializeCompany()
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised before running an account schedule report.
+    /// Allows subscribers to customize or override the standard account schedule execution.
+    /// </summary>
+    /// <param name="AccSchedName">Account schedule name to be executed</param>
+    /// <param name="IsHandled">Set to true to skip standard report execution</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOnRunAccountScheduleReport(AccSchedName: Code[10]; var IsHandled: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised before initializing standard account categories.
+    /// Allows subscribers to customize or override the standard account category initialization process.
+    /// </summary>
+    /// <param name="IsHandled">Set to true to skip standard account category initialization</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInitializeAccountCategories(var IsHandled: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised before validating and categorizing a G/L account.
+    /// Allows subscribers to customize account validation logic or override category assignment.
+    /// </summary>
+    /// <param name="TableNo">Source table number for context</param>
+    /// <param name="FieldNo">Source field number for context</param>
+    /// <param name="AccNo">G/L Account number being validated</param>
+    /// <param name="CheckProdPostingGroup">Whether to validate General Product Posting Group</param>
+    /// <param name="CheckDirectPosting">Whether to validate Direct Posting is enabled</param>
+    /// <param name="AccountCategory">Account category to assign if account has no category</param>
+    /// <param name="AccountSubcategory">Subcategory description to assign if account has no category</param>
+    /// <param name="IsHandled">Set to true to skip standard account validation</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckGLAccount(TableNo: Integer; FieldNo: Integer; AccNo: Code[20]; CheckProdPostingGroup: Boolean; CheckDirectPosting: Boolean; var AccountCategory: Option; var AccountSubcategory: Text; var IsHandled: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised before opening G/L account lookup with category filtering.
+    /// Allows subscribers to customize lookup behavior or override filtering criteria.
+    /// </summary>
+    /// <param name="TableNo">Source table number for context</param>
+    /// <param name="FieldNo">Source field number for context</param>
+    /// <param name="AccountNo">Current account number being looked up</param>
+    /// <param name="AccountCategory">Account category filter for lookup</param>
+    /// <param name="AccountSubcategoryFilter">Subcategory filter text for lookup</param>
+    /// <param name="IsHandled">Set to true to skip standard lookup process</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeLookupGLAccount(TableNo: Integer; FieldNo: Integer; var AccountNo: Code[20]; var AccountCategory: Option; var AccountSubcategoryFilter: Text; var IsHandled: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised after account categories have been initialized.
+    /// Allows subscribers to perform additional setup or customization after standard categories are created.
+    /// </summary>
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitializeAccountCategories()
     begin

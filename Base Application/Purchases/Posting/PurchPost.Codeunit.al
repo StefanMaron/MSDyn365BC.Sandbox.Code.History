@@ -429,7 +429,8 @@ codeunit 90 "Purch.-Post"
         CannotBeGreaterThanErr: Label 'cannot be more than %1.', Comment = '%1 = Amount';
         CannotBeSmallerThanErr: Label 'must be at least %1.', Comment = '%1 = Amount';
         ItemJnlRollRndg: Boolean;
-        SalesTaxCountry: Option US,CA,,,,,,,,,,,,NoTax;
+        SalesTaxCountry: Enum "Sales Tax Country";
+        UseSalesTaxCountry: Boolean;
         TaxOption: Option ,VAT,SalesTax;
         RemSalesTaxAmt: Decimal;
         RemSalesTaxAmtACY: Decimal;
@@ -827,10 +828,11 @@ codeunit 90 "Purch.-Post"
         CheckVATDate(PurchHeader);
 
         if PurchHeader."Tax Area Code" = '' then
-            SalesTaxCountry := SalesTaxCountry::NoTax
+            UseSalesTaxCountry := false
         else begin
             TaxArea.Get(PurchHeader."Tax Area Code");
-            SalesTaxCountry := TaxArea."Country/Region";
+            SalesTaxCountry := "Sales Tax Country".FromInteger(TaxArea."Country/Region");
+            UseSalesTaxCountry := true;
             UseExternalTaxEngine := TaxArea."Use External Tax Engine";
         end;
 
@@ -6404,11 +6406,14 @@ codeunit 90 "Purch.-Post"
         RemSalesTaxSrcAmt: Decimal;
         UseTaxRemSalesTaxAmt: Decimal;
         IsHandled: Boolean;
+        SalesTaxCountryOption: Option;
     begin
+        SalesTaxCountryOption := SalesTaxCountry.AsInteger();
         OnBeforePostSalesTaxToGL(
             PurchHeader, DummyPurchLine, DummyLineCount, TotalUseTaxAmount, TotalNotUseTaxAmount, TempSalesTaxAmtLine, Window,
-            SalesTaxCountry, GenJnlLineDocNo, GenJnlLineExtDocNo, GenJnlLineDocType, SrcCode, Currency, GenJnlPostLine,
+            SalesTaxCountryOption, GenJnlLineDocNo, GenJnlLineExtDocNo, GenJnlLineDocType, SrcCode, Currency, GenJnlPostLine,
             TotalPurchLineLCY, TotalPurchLine, IsHandled);
+        SalesTaxCountry := "Sales Tax Country".FromInteger(SalesTaxCountryOption);
         if IsHandled = true then
             exit;
 
@@ -6641,10 +6646,13 @@ codeunit 90 "Purch.-Post"
         RemSalesTaxAmt: Decimal;
         RemSalesTaxSrcAmt: Decimal;
         IsHandled: Boolean;
+        SalesTaxCountryOption: Option;
     begin
         IsHandled := false;
-        OnBeforePostProvincialSalesTaxToGL(PurchHeader, TotalUseTaxAmount, TempSalesTaxAmtLine, SalesTaxCountry,
+        SalesTaxCountryOption := SalesTaxCountry.AsInteger();
+        OnBeforePostProvincialSalesTaxToGL(PurchHeader, TotalUseTaxAmount, TempSalesTaxAmtLine, SalesTaxCountryOption,
             TaxOption, GenJnlLineDocNo, GenJnlLineExtDocNo, GenJnlLineDocType, SrcCode, Currency, GenJnlPostLine, IsHandled);
+        SalesTaxCountry := "Sales Tax Country".FromInteger(SalesTaxCountryOption);
         if IsHandled then
             exit;
 
@@ -7156,7 +7164,7 @@ codeunit 90 "Purch.-Post"
                 if not IsHandled then
                     if PurchHeader."Document Type" in [PurchHeader."Document Type"::Order, PurchHeader."Document Type"::Invoice] then begin
                         InsertInvoiceHeader(PurchHeader, PurchInvHeader);
-                        if SalesTaxCountry <> SalesTaxCountry::NoTax then
+                        if UseSalesTaxCountry then
                             TaxAmountDifference.CopyTaxDifferenceRecords(
                               TaxAmountDifference."Document Product Area"::Purchase, PurchHeader."Document Type".AsInteger(), PurchHeader."No.",
                               TaxAmountDifference."Document Product Area"::"Posted Purchase",
@@ -7166,7 +7174,7 @@ codeunit 90 "Purch.-Post"
                         GenJnlLineExtDocNo := PurchHeader."Vendor Invoice No.";
                     end else begin // Credit Memo
                         InsertCrMemoHeader(PurchHeader, PurchCrMemoHeader);
-                        if SalesTaxCountry <> SalesTaxCountry::NoTax then
+                        if UseSalesTaxCountry then
                             TaxAmountDifference.CopyTaxDifferenceRecords(
                               TaxAmountDifference."Document Product Area"::Purchase, PurchHeader."Document Type".AsInteger(), PurchHeader."No.",
                               TaxAmountDifference."Document Product Area"::"Posted Purchase",
@@ -8882,10 +8890,10 @@ codeunit 90 "Purch.-Post"
                 repeat
                     if PurchLine."VAT Calculation Type" = PurchLine."VAT Calculation Type"::"Sales Tax" then begin
                         if PurchLine."Tax Area Code" <> '' then begin
-                            if SalesTaxCountry = SalesTaxCountry::NoTax then
+                            if not UseSalesTaxCountry then
                                 Error(EveryLineMustHaveSameErr, PurchLine.FieldCaption("Tax Area Code"), PurchLine."Tax Area Code");
                             TaxArea.Get(PurchLine."Tax Area Code");
-                            if TaxArea."Country/Region" <> SalesTaxCountry then
+                            if TaxArea."Country/Region" <> SalesTaxCountry.AsInteger() then
                                 Error(TaxAreaSetupShouldBeSameErr, TaxArea.FieldCaption("Country/Region"), SalesTaxCountry);
                             if TaxArea."Use External Tax Engine" <> UseExternalTaxEngine then
                                 Error(TaxAreaSetupShouldBeSameErr, TaxArea.FieldCaption("Use External Tax Engine"), UseExternalTaxEngine);

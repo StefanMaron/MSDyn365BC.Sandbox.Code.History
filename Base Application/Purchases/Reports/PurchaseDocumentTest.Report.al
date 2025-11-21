@@ -1705,8 +1705,7 @@ report 402 "Purchase Document - Test"
                 if SalesTax then begin
                     HeaderTaxArea.Get("Tax Area Code");
                     SalesTaxCountry := HeaderTaxArea."Country/Region";
-                end else
-                    SalesTaxCountry := SalesTaxCountry::NoTax;
+                end;
 
                 VerifyBuyFromVend("Purchase Header");
                 VerifyPayToVend("Purchase Header");
@@ -2183,7 +2182,7 @@ report 402 "Purchase Document - Test"
         Summarize: Boolean;
         InvoiceAmount: Decimal;
         PurchHeaderDocTypeNo: Integer;
-        SalesTaxCountry: Option US,CA,,,,,,,,,,,,NoTax;
+        SalesTaxCountry: Option US,CA;
         RemSalesTaxAmt: Decimal;
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         Purchase_Document___TestCaptionLbl: Label 'Purchase Document - Test';
