@@ -9,6 +9,15 @@ using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Finance.GeneralLedger.Setup;
 using System.Text;
 
+/// <summary>
+/// List page for managing G/L Budget Names with dimension configuration and budget administration capabilities.
+/// Primary interface for creating, configuring, and managing budget templates with multi-dimensional support.
+/// </summary>
+/// <remarks>
+/// Key features: Budget name management, dimension configuration, budget copying, and Excel integration access.
+/// Navigation: Links to budget entries, Excel import/export, and budget analysis workflows.
+/// Extensibility: Support for custom budget actions through page extensions and event subscribers.
+/// </remarks>
 page 121 "G/L Budget Names"
 {
     AdditionalSearchTerms = 'general ledger budgets,general ledger forecast';
@@ -158,6 +167,11 @@ page 121 "G/L Budget Names"
     var
         GLSetup: Record "General Ledger Setup";
 
+    /// <summary>
+    /// Returns a selection filter string based on the currently selected budget names in the page.
+    /// Used for filtering operations on selected budget records.
+    /// </summary>
+    /// <returns>Filter string containing selected budget names.</returns>
     procedure GetSelectionFilter(): Text
     var
         GLBudgetName: Record "G/L Budget Name";

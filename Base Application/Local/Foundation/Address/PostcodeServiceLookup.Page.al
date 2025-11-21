@@ -1,4 +1,4 @@
-﻿#if not CLEAN28
+#if not CLEAN28
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -30,7 +30,7 @@ page 10502 "Postcode Service Lookup"
             {
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = Invoicing, Basic, Suite;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the service to automatically insert post codes, such as GetAdress.io.';
                 }
             }
@@ -75,4 +75,3 @@ page 10502 "Postcode Service Lookup"
         PostcodeServiceManager: Codeunit "Postcode Service Manager";
 }
 #endif
-
