@@ -797,7 +797,7 @@ page 8901 "Finance Manager Role Center"
                 }
                 action("Payment Registration")
                 {
-                    ApplicationArea =;
+                    ApplicationArea = Basic, Suite;
                     Caption = 'Payment Registration';
                     RunObject = page "Payment Registration";
                 }
@@ -1257,7 +1257,7 @@ page 8901 "Finance Manager Role Center"
                 }
                 action("Direct Debit Collections")
                 {
-                    ApplicationArea =;
+                    ApplicationArea = Suite;
                     Caption = 'Direct Debit Collections';
                     RunObject = page "Direct Debit Collections";
                     Tooltip = 'Open the Direct Debit Collections page.';

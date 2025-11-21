@@ -10,6 +10,15 @@ using Microsoft.Finance.GeneralLedger.Preview;
 using Microsoft.Finance.GeneralLedger.Setup;
 using System.Security.User;
 
+/// <summary>
+/// Preview page displaying G/L entries before posting for verification and validation.
+/// Shows expected G/L entries from posting preview functionality using temporary table.
+/// </summary>
+/// <remarks>
+/// PageType = List with SourceTableTemporary = true. Data source: G/L Entry (temporary).
+/// Used in posting preview processes to display expected G/L entries before commitment.
+/// Read-only interface for reviewing posting results with dimension and account details.
+/// </remarks>
 page 122 "G/L Entries Preview"
 {
     Caption = 'G/L Entries Preview';
