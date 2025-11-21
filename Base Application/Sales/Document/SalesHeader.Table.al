@@ -727,6 +727,7 @@ table 36 "Sales Header"
         }
         field(25; "Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             ToolTip = 'Specifies the payment discount percentage that is granted if the customer pays on or before the date entered in the Pmt. Discount Date field. The discount percentage is specified in the Payment Terms Code field.';
             DecimalPlaces = 0 : 5;
@@ -891,6 +892,7 @@ table 36 "Sales Header"
         }
         field(33; "Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 15;
             Editable = false;
@@ -1998,6 +2000,7 @@ table 36 "Sales Header"
         }
         field(119; "VAT Base Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT Base Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -2043,6 +2046,7 @@ table 36 "Sales Header"
         }
         field(122; "Invoice Discount Value"; Decimal)
         {
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Invoice Discount Value';
             Editable = false;
@@ -2098,6 +2102,7 @@ table 36 "Sales Header"
         }
         field(130; "Prepayment %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepayment %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -2267,6 +2272,7 @@ table 36 "Sales Header"
         }
         field(140; "Prepmt. Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepmt. Payment Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -2474,16 +2480,19 @@ table 36 "Sales Header"
         }
         field(300; "Amt. Ship. Not Inv. (LCY)"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Sales Line"."Shipped Not Invoiced (LCY)" where("Document Type" = field("Document Type"),
                                                                                "Document No." = field("No.")));
             Caption = 'Amount Shipped Not Invoiced (LCY) Incl. VAT';
             ToolTip = 'Specifies the sum, in LCY, for items that have been shipped but not yet been invoiced. The amount is calculated as Amount Including VAT x Qty. Shipped Not Invoiced / Quantity.';
             Editable = false;
             FieldClass = FlowField;
-            AutoFormatType = 1;
         }
         field(301; "Amt. Ship. Not Inv. (LCY) Base"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Sales Line"."Shipped Not Inv. (LCY) No VAT" where("Document Type" = field("Document Type"),
                                                                                   "Document No." = field("No.")));
             Caption = 'Amount Shipped Not Invoiced (LCY)';
@@ -2538,6 +2547,7 @@ table 36 "Sales Header"
         }
         field(1305; "Invoice Discount Amount"; Decimal)
         {
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CalcFormula = sum("Sales Line"."Inv. Discount Amount" where("Document No." = field("No."),
                                                                          "Document Type" = field("Document Type")));
@@ -5540,7 +5550,7 @@ table 36 "Sales Header"
     local procedure CheckCustomerContactRelation(Cont: Record Contact; CustomerNo: Code[20]; ContBusinessRelationNo: Code[20])
     var
         ContactBusinessRelationLinkType: Enum "Contact Business Relation Link To Table";
-        IsHandled: Boolean;
+                                             IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeCheckCustomerContactRelation(Rec, Cont, IsHandled, CustomerNo, ContBusinessRelationNo);
@@ -6151,7 +6161,7 @@ table 36 "Sales Header"
     procedure GetPstdDocLinesToReverse()
     var
         SalesPostedDocLines: Page "Posted Sales Document Lines";
-        IsHandled: Boolean;
+                                 IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeGetPstdDocLinesToReverse(Rec, IsHandled);
@@ -6727,9 +6737,9 @@ table 36 "Sales Header"
     local procedure UpdateOpportunityLink(Opportunity: Record Opportunity; SalesDocumentType: Enum "Opportunity Document Type"; SalesHeaderNo: Code[20])
     begin
         Opportunity."Sales Document Type" := SalesDocumentType;
-        Opportunity."Sales Document No." := SalesHeaderNo;
-        OnUpdateOpportunityLinkOnBeforeModify(Opportunity, Rec, SalesDocumentType.AsInteger(), SalesHeaderNo);
-        Opportunity.Modify();
+                                                                                                  Opportunity."Sales Document No." := SalesHeaderNo;
+                                                                                                  OnUpdateOpportunityLinkOnBeforeModify(Opportunity, Rec, SalesDocumentType.AsInteger(), SalesHeaderNo);
+                                                                                                  Opportunity.Modify();
     end;
 
     /// <summary>
@@ -8808,8 +8818,8 @@ table 36 "Sales Header"
         MyNotifications: Record "My Notifications";
         NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
         PageMyNotifications: Page "My Notifications";
-        ModifyCustomerAddressNotification: Notification;
-        IsHandled: Boolean;
+                                 ModifyCustomerAddressNotification: Notification;
+                                 IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeShowModifyAddressNotification(IsHandled, Rec, CustomerNumber);
@@ -9429,7 +9439,7 @@ table 36 "Sales Header"
     procedure CopyDocument()
     var
         CopySalesDocument: Report "Copy Sales Document";
-        IsHandled: Boolean;
+                               IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeCopyDocument(Rec, IsHandled);
@@ -9889,7 +9899,7 @@ table 36 "Sales Header"
     internal procedure CalculateReservableOutstandingQuantityBase() OutstandingQtyBase: Decimal
     var
         RemQtyBaseInvtItemSalesLine: Query RemQtyBaseInvtItemSalesLine;
-        IsHandled: Boolean;
+                                         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeCalculateReservableOutstandingQuantityBase(Rec, IsHandled, OutstandingQtyBase);
