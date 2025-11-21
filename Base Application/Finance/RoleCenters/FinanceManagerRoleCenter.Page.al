@@ -192,12 +192,6 @@ page 8901 "Finance Manager Role Center"
                         Caption = 'Periodic VAT Payment Communication';
                         RunObject = report "VAT Payment Communication";
                     }
-                    // action("ECSL Report")
-                    // {
-                    // 	ApplicationArea = ;
-                    // 	Caption = 'EC Sales List Reports';
-                    // 	RunObject = page "EC Sales List Reports";
-                    // }
                     group("Group2")
                     {
                         Caption = 'Reports';
@@ -2592,7 +2586,7 @@ page 8901 "Finance Manager Role Center"
                     }
                     action("Service Tariff Numbers")
                     {
-                        ApplicationArea =;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'Service Tariff Numbers';
                         RunObject = page "Service Tariff Numbers";
                     }

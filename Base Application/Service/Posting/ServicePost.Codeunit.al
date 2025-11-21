@@ -209,7 +209,7 @@ codeunit 5980 "Service-Post"
             Finalize(ServiceHeader);
 
             OnAfterFinalizePostingOnBeforeCommit(
-              PassedServHeader, PassedServLine, ServDocumentsMgt, PassedShip, PassedConsume, PassedInvoice);
+              PassedServHeader, PassedServLine, ServDocumentsMgt, PassedShip, PassedConsume, PassedInvoice, ServInvoiceNo, ServCrMemoNo);
 
             if WhseShip then
                 WhseServiceRelease.Release(ServiceHeader);
@@ -217,10 +217,11 @@ codeunit 5980 "Service-Post"
             if not SuppressCommit then
                 Commit();
 
-            OnAfterPostServiceDoc(ServiceHeader, ServShipmentNo, ServInvoiceNo, ServCrMemoNo, ServDocumentsMgt, SuppressCommit, PassedShip, PassedConsume, PassedInvoice, WhseShip);
+            OnAfterPostServiceDoc(ServiceHeader, ServShipmentNo, ServInvoiceNo, ServCrMemoNo, ServDocumentsMgt, SuppressCommit, PassedShip, PassedConsume, PassedInvoice, WhseShip, Invoice);
 
             if GuiAllowed() then
                 Window.Close();
+
             UpdateAnalysisView.UpdateAll(0, true);
             UpdateItemAnalysisView.UpdateAll(0, true);
 
@@ -697,7 +698,7 @@ codeunit 5980 "Service-Post"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterFinalizePostingOnBeforeCommit(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var ServDocumentsMgt: Codeunit "Serv-Documents Mgt."; var PassedShip: Boolean; var PassedConsume: Boolean; var PassedInvoice: Boolean)
+    local procedure OnAfterFinalizePostingOnBeforeCommit(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var ServDocumentsMgt: Codeunit "Serv-Documents Mgt."; var PassedShip: Boolean; var PassedConsume: Boolean; var PassedInvoice: Boolean; ServInvoiceNo: Code[20]; ServCrMemoNo: Code[20])
     begin
     end;
 
@@ -707,7 +708,7 @@ codeunit 5980 "Service-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterPostServiceDoc(var ServiceHeader: Record "Service Header"; ServShipmentNo: Code[20]; ServInvoiceNo: Code[20]; ServCrMemoNo: Code[20]; var ServDocumentsMgt: Codeunit "Serv-Documents Mgt."; CommitIsSuppressed: Boolean; PassedShip: Boolean; PassedConsume: Boolean; PassedInvoice: Boolean; WhseShip: Boolean)
+    local procedure OnAfterPostServiceDoc(var ServiceHeader: Record "Service Header"; ServShipmentNo: Code[20]; ServInvoiceNo: Code[20]; ServCrMemoNo: Code[20]; var ServDocumentsMgt: Codeunit "Serv-Documents Mgt."; CommitIsSuppressed: Boolean; PassedShip: Boolean; PassedConsume: Boolean; PassedInvoice: Boolean; WhseShip: Boolean; Invoice: Boolean)
     begin
     end;
 
