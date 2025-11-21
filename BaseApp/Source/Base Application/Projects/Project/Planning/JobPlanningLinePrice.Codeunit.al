@@ -104,12 +104,7 @@ codeunit 7024 "Job Planning Line - Price" implements "Line With Price"
     begin
         DtldPriceCalculationSetup.Init();
         DtldPriceCalculationSetup.Type := CurrPriceType;
-        case CurrPriceType of
-            CurrPriceType::Sale:
-                DtldPriceCalculationSetup.Method := JobPlanningLine."Price Calculation Method";
-            CurrPriceType::Purchase:
-                DtldPriceCalculationSetup.Method := JobPlanningLine."Cost Calculation Method";
-        end;
+        DtldPriceCalculationSetup.Method := JobPlanningLine."Price Calculation Method";
         DtldPriceCalculationSetup."Asset Type" := GetAssetType();
         DtldPriceCalculationSetup."Asset No." := JobPlanningLine."No.";
         exit(PriceSourceList.GetSourceGroup(DtldPriceCalculationSetup));

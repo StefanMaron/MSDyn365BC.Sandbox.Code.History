@@ -36,7 +36,6 @@ table 8510 "Over-Receipt Code"
         }
         field(4; "Over-Receipt Tolerance %"; Decimal)
         {
-            AutoFormatType = 0;
             Caption = 'Over-Receipt Tolerance %';
             DecimalPlaces = 0 : 2;
 
