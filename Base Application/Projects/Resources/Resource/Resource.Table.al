@@ -264,6 +264,7 @@ table 156 Resource
         }
         field(22; "Profit %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Profit %';
             DecimalPlaces = 0 : 5;
 
