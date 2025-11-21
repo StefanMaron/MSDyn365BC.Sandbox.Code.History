@@ -133,6 +133,7 @@ table 171 "Standard Sales Line"
         }
         field(6; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             BlankZero = true;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
@@ -359,4 +360,3 @@ table 171 "Standard Sales Line"
     begin
     end;
 }
-
