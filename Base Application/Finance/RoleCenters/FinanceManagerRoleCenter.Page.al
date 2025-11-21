@@ -142,7 +142,7 @@ page 8901 "Finance Manager Role Center"
                 }
                 action("Fiscal Year Closing Steps")
                 {
-                    ApplicationArea =;
+                    ApplicationArea = Basic, Suite;
                     Caption = 'Fiscal Year Closing Steps';
                     RunObject = page "Fiscal Year Closing Steps";
                 }
@@ -847,13 +847,13 @@ page 8901 "Finance Manager Role Center"
                     Caption = 'Payment Slip';
                     action("View/Edit Payment Lines")
                     {
-                        ApplicationArea =;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'View/Edit Payment Lines';
                         RunObject = page "View/Edit Payment Line";
                     }
                     action("Payment Report")
                     {
-                        ApplicationArea =;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'Payment Report';
                         RunObject = page "Payment Report";
                     }

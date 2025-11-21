@@ -499,7 +499,7 @@ page 8907 "Sales & Marketing Manager RC"
                     }
                     action("EC Sales List - Services")
                     {
-                        ApplicationArea =;
+                        ApplicationArea = Basic, Suite;
                         Caption = 'EC Sales List - Services';
                         RunObject = report "EC Sales List - Services";
                     }
