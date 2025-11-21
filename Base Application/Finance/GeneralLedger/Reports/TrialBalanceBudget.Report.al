@@ -9,6 +9,15 @@ using Microsoft.Foundation.Period;
 using Microsoft.Foundation.Reporting;
 using System.Utilities;
 
+/// <summary>
+/// Generates trial balance with budget comparison analysis showing actual vs. budgeted amounts and variances.
+/// Displays actual balances alongside budget figures with variance calculations for performance analysis.
+/// </summary>
+/// <remarks>
+/// Data source: G/L Account table with budget filter integration for actual vs. budget comparison.
+/// Shows period movements, budget amounts, and variance analysis for comprehensive budget monitoring.
+/// Used for budget performance evaluation, variance analysis, and management reporting requirements.
+/// </remarks>
 report 9 "Trial Balance/Budget"
 {
     DefaultLayout = RDLC;
