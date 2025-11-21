@@ -16,37 +16,24 @@ codeunit 5461 "Json Impl."
     InherentPermissions = X;
 
     var
-        SourceWarningLength: Integer;
         JsonArrayDotNet: DotNet JArray;
         JsonObjectDotNet: DotNet JObject;
-        LogLimitWarningTxt: Label 'The JSON input length (%1) exceeds the maximum suggested length (%2) for JSON processing.', Locked = true;
-
-    internal procedure EmitLengthWarning(SourceLength: Integer; tag: Text; FormatString: Text)
-    begin
-        if SourceWarningLength <= 0 then
-            SourceWarningLength := 10485760; // 10 * 1024 * 1024 = 10 MB
-
-        if SourceLength > SourceWarningLength then
-            Session.LogMessage(tag, StrSubstNo(FormatString, SourceLength, SourceWarningLength), Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, 'resources', 'memory');
-    end;
 
     procedure InitializeCollectionFromString(JSONString: Text)
     begin
         Clear(JsonArrayDotNet);
-        if JSONString <> '' then begin
-            EmitLengthWarning(StrLen(JSONString), '0000QNC', LogLimitWarningTxt);
+        if JSONString <> '' then
             JsonArrayDotNet := JsonArrayDotNet.Parse(JSONString)
-        end else
+        else
             InitializeEmptyCollection();
     end;
 
     procedure InitializeObjectFromString(JSONString: Text)
     begin
         Clear(JsonObjectDotNet);
-        if JSONString <> '' then begin
-            EmitLengthWarning(StrLen(JSONString), '0000QND', LogLimitWarningTxt);
+        if JSONString <> '' then
             JsonObjectDotNet := JsonObjectDotNet.Parse(JSONString)
-        end else
+        else
             InitializeEmptyObject();
     end;
 
