@@ -27,6 +27,16 @@ using Microsoft.Sales.Receivables;
 using Microsoft.HumanResources.Payables;
 using Microsoft.HumanResources.Employee;
 
+/// <summary>
+/// Manages exchange rate adjustment processing for foreign currency transactions.
+/// Provides functionality to revalue customer, vendor, bank account, and G/L account balances
+/// when exchange rates change, ensuring accurate financial reporting in the local currency.
+/// </summary>
+/// <remarks>
+/// Integrates with Customer Ledger Entries, Vendor Ledger Entries, Bank Account Ledger Entries,
+/// and G/L Entries for comprehensive currency revaluation. Supports dimension handling and
+/// generates adjustment entries through General Journal posting.
+/// </remarks>
 codeunit 699 "Exch. Rate Adjmt. Process"
 {
     EventSubscriberInstance = Manual;
