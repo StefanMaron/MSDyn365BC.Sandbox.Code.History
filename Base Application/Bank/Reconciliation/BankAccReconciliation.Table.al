@@ -13,6 +13,18 @@ using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using System.IO;
 
+/// <summary>
+/// Central table for managing bank account reconciliation and payment application processes.
+/// This table serves as the header for bank reconciliation workflows, containing statement information,
+/// balances, and processing settings. It supports both traditional bank reconciliation and automated
+/// payment application scenarios with comprehensive tracking of applied amounts and differences.
+/// </summary>
+/// <remarks>
+/// Supports two main workflows via Statement Type: Bank Reconciliation for matching bank statements
+/// with ledger entries, and Payment Application for processing payment files and applying them to invoices.
+/// Integrates with bank statement import, automated matching, manual application, and posting processes.
+/// Key extension points include dimension handling, statement import customization, and posting validation.
+/// </remarks>
 table 273 "Bank Acc. Reconciliation"
 {
     Caption = 'Bank Acc. Reconciliation';
@@ -26,6 +38,10 @@ table 273 "Bank Acc. Reconciliation"
 
     fields
     {
+        /// <summary>
+        /// Bank account number that this reconciliation statement relates to.
+        /// Links the reconciliation to a specific bank account and drives currency and setup inheritance.
+        /// </summary>
         field(1; "Bank Account No."; Code[20])
         {
             Caption = 'Bank Account No.';
@@ -59,6 +75,10 @@ table 273 "Bank Acc. Reconciliation"
                 CreateDimFromDefaultDim();
             end;
         }
+        /// <summary>
+        /// Unique statement number for this reconciliation document.
+        /// Automatically generated based on bank account number series configuration.
+        /// </summary>
         field(2; "Statement No."; Code[20])
         {
             Caption = 'Statement No.';
@@ -70,16 +90,28 @@ table 273 "Bank Acc. Reconciliation"
                 TestField("Bank Account No.");
             end;
         }
+        /// <summary>
+        /// Ending balance as reported on the bank statement.
+        /// Used as the target balance for reconciliation and difference calculation.
+        /// </summary>
         field(3; "Statement Ending Balance"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 2;
             Caption = 'Statement Ending Balance';
         }
+        /// <summary>
+        /// Date of the bank statement being reconciled.
+        /// Determines the cutoff date for transaction matching and validation.
+        /// </summary>
         field(4; "Statement Date"; Date)
         {
             Caption = 'Statement Date';
         }
+        /// <summary>
+        /// Beginning balance from the previous statement or last reconciliation.
+        /// Used as the starting point for calculating current period reconciliation differences.
+        /// </summary>
         field(5; "Balance Last Statement"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -99,10 +131,18 @@ table 273 "Bank Acc. Reconciliation"
                         "Balance Last Statement" := xRec."Balance Last Statement";
             end;
         }
+        /// <summary>
+        /// Binary storage for the imported bank statement file.
+        /// Contains the original electronic statement data for reference and audit purposes.
+        /// </summary>
         field(6; "Bank Statement"; BLOB)
         {
             Caption = 'Bank Statement';
         }
+        /// <summary>
+        /// Calculated total of all bank account ledger entries for this bank account.
+        /// Represents the current book balance in the general ledger system.
+        /// </summary>
         field(7; "Total Balance on Bank Account"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -112,6 +152,10 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Sum of all applied amounts on reconciliation lines for this statement.
+        /// Tracks how much of the statement transactions have been matched and applied.
+        /// </summary>
         field(8; "Total Applied Amount"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -122,6 +166,10 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Sum of all statement amounts on reconciliation lines for this statement.
+        /// Represents the total value of transactions imported from the bank statement.
+        /// </summary>
         field(9; "Total Transaction Amount"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -132,6 +180,10 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Sum of applied amounts excluding bank account entries (manual adjustments).
+        /// Tracks amounts that will create new ledger entries when posted rather than matching existing ones.
+        /// </summary>
         field(10; "Total Unposted Applied Amount"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -143,6 +195,10 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Sum of all differences between statement amounts and applied amounts.
+        /// Indicates the total amount of unreconciled differences requiring resolution.
+        /// </summary>
         field(11; "Total Difference"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -153,6 +209,10 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Sum of negative statement amounts representing payments made from the account.
+        /// Shows total outgoing transactions on the bank statement.
+        /// </summary>
         field(12; "Total Paid Amount"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -164,6 +224,10 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Sum of positive statement amounts representing deposits received in the account.
+        /// Shows total incoming transactions on the bank statement.
+        /// </summary>
         field(13; "Total Received Amount"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -175,10 +239,18 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Type of reconciliation statement being processed.
+        /// Determines workflow behavior and available features (Bank Reconciliation vs Payment Application).
+        /// </summary>
         field(20; "Statement Type"; Enum "Bank Acc. Rec. Stmt. Type")
         {
             Caption = 'Statement Type';
         }
+        /// <summary>
+        /// First global dimension code for this reconciliation.
+        /// Inherited from bank account setup and applied to generated journal entries.
+        /// </summary>
         field(21; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
@@ -191,6 +263,10 @@ table 273 "Bank Acc. Reconciliation"
                 Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
+        /// <summary>
+        /// Second global dimension code for this reconciliation.
+        /// Inherited from bank account setup and applied to generated journal entries.
+        /// </summary>
         field(22; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
@@ -203,16 +279,28 @@ table 273 "Bank Acc. Reconciliation"
                 Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
+        /// <summary>
+        /// Flag indicating whether to post only payment applications without bank account entries.
+        /// Used in payment application scenarios to create customer/vendor entries without bank entries.
+        /// </summary>
         field(23; "Post Payments Only"; Boolean)
         {
             Caption = 'Post Payments Only';
         }
+        /// <summary>
+        /// Option controlling whether already posted transactions should be imported from the bank account.
+        /// Helps prevent duplicate transaction import and processing.
+        /// </summary>
         field(24; "Import Posted Transactions"; Option)
         {
             Caption = 'Import Posted Transactions';
             OptionCaption = ' ,Yes,No';
             OptionMembers = " ",Yes,No;
         }
+        /// <summary>
+        /// Sum of open bank account ledger entries excluding check entries.
+        /// Represents outstanding bank transactions that have not been reconciled.
+        /// </summary>
         field(25; "Total Outstd Bank Transactions"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -223,6 +311,10 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Sum of open bank account ledger entries with associated check entries.
+        /// Represents outstanding check payments that have not been reconciled.
+        /// </summary>
         field(26; "Total Outstd Payments"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -233,6 +325,10 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Total bank account balance in local currency.
+        /// Provides balance information in the company's reporting currency regardless of bank account currency.
+        /// </summary>
         field(28; "Bank Account Balance (LCY)"; Decimal)
         {
             CalcFormula = sum("Bank Account Ledger Entry"."Amount (LCY)" where("Bank Account No." = field("Bank Account No.")));
@@ -241,6 +337,10 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Sum of positive adjustment amounts for non-bank account applications.
+        /// Tracks positive differences that will increase the bank balance when posted.
+        /// </summary>
         field(29; "Total Positive Adjustments"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -253,6 +353,10 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Sum of negative adjustment amounts for non-bank account applications.
+        /// Tracks negative differences that will decrease the bank balance when posted.
+        /// </summary>
         field(30; "Total Negative Adjustments"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
@@ -265,20 +369,36 @@ table 273 "Bank Acc. Reconciliation"
             Editable = false;
             FieldClass = FlowField;
         }
+        /// <summary>
+        /// Flag controlling whether VAT setup should be copied to generated journal lines.
+        /// Ensures proper VAT handling when posting reconciliation adjustments.
+        /// </summary>
         field(33; "Copy VAT Setup to Jnl. Line"; Boolean)
         {
             Caption = 'Copy VAT Setup to Jnl. Line';
             InitValue = true;
         }
+        /// <summary>
+        /// Name of the bank account for display purposes.
+        /// Automatically retrieved from the bank account master record.
+        /// </summary>
         field(50; "Bank Account Name"; Text[100])
         {
             FieldClass = FlowField;
             CalcFormula = lookup("Bank Account".Name where("No." = field("Bank Account No.")));
         }
+        /// <summary>
+        /// Flag allowing the import of duplicate transactions from bank statements.
+        /// When enabled, prevents blocking of statement import due to duplicate detection.
+        /// </summary>
         field(51; "Allow Duplicated Transactions"; Boolean)
         {
             Caption = 'Allow Duplicated Transactions';
         }
+        /// <summary>
+        /// Dimension set identifier linking this reconciliation to its dimension values.
+        /// Used for tracking and reporting on reconciliation activities by dimension.
+        /// </summary>
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -396,6 +516,12 @@ table 273 "Bank Acc. Reconciliation"
         exit(BankReconciliationFeatureNameTelemetryTxt);
     end;
 
+    /// <summary>
+    /// Creates dimension set ID from default dimension sources for this bank reconciliation.
+    /// Builds dimension combinations from bank account defaults and custom dimension sources.
+    /// Updates all related reconciliation lines when dimensions change.
+    /// </summary>
+    /// <param name="DefaultDimSource">Dictionary list containing dimension source types and values to apply</param>
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
@@ -432,6 +558,11 @@ table 273 "Bank Acc. Reconciliation"
         exit('');
     end;
 
+    /// <summary>
+    /// Runs automatic matching process for bank reconciliation lines against bank ledger entries.
+    /// Uses configurable date range and matching rules to find and apply probable matches.
+    /// </summary>
+    /// <param name="DateRange">Number of days to extend the matching date range beyond statement dates</param>
     procedure MatchSingle(DateRange: Integer)
     var
         MatchBankRecLines: Codeunit "Match Bank Rec. Lines";
@@ -445,6 +576,10 @@ table 273 "Bank Acc. Reconciliation"
         MatchBankRecLines.BankAccReconciliationAutoMatch(Rec, DateRange);
     end;
 
+    /// <summary>
+    /// Initiates bank statement import process for this reconciliation.
+    /// Creates reconciliation record and imports statement data using configured import format.
+    /// </summary>
     procedure ImportBankStatement()
     var
         DataExch: Record "Data Exch.";
@@ -460,6 +595,12 @@ table 273 "Bank Acc. Reconciliation"
         end;
     end;
 
+    /// <summary>
+    /// Validates and updates dimension shortcut codes for this reconciliation.
+    /// Propagates dimension changes to all related reconciliation lines automatically.
+    /// </summary>
+    /// <param name="FieldNumber">Field number of the shortcut dimension being validated (1 or 2)</param>
+    /// <param name="ShortcutDimCode">Dimension value code to validate and assign</param>
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         OldDimSetID: Integer;
@@ -477,6 +618,10 @@ table 273 "Bank Acc. Reconciliation"
         OnAfterValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode);
     end;
 
+    /// <summary>
+    /// Opens dimension maintenance dialog for this reconciliation header.
+    /// Allows interactive editing of all dimension values and propagates changes to lines.
+    /// </summary>
     procedure ShowDocDim()
     var
         OldDimSetID: Integer;
@@ -523,6 +668,10 @@ table 273 "Bank Acc. Reconciliation"
         end;
     end;
 
+    /// <summary>
+    /// Creates new payment application batch and opens payment reconciliation worksheet.
+    /// Prompts user to select bank account and initializes new payment application session.
+    /// </summary>
     procedure OpenNewWorksheet()
     var
         BankAccount: Record "Bank Account";
@@ -535,6 +684,10 @@ table 273 "Bank Acc. Reconciliation"
         OpenWorksheet(BankAccReconciliation);
     end;
 
+    /// <summary>
+    /// Imports bank statement file and processes it into new reconciliation with automatic matching.
+    /// Handles complete workflow from bank account selection through statement import and processing.
+    /// </summary>
     procedure ImportAndProcessToNewStatement()
     var
         BankAccount: Record "Bank Account";
@@ -599,6 +752,13 @@ table 273 "Bank Acc. Reconciliation"
         Commit();
     end;
 
+    /// <summary>
+    /// Imports statement data from data exchange record into bank reconciliation lines.
+    /// Processes electronic bank statement data and creates reconciliation line entries.
+    /// </summary>
+    /// <param name="BankAccReconciliation">Bank reconciliation record to populate with imported lines</param>
+    /// <param name="DataExch">Data exchange record containing bank statement data to import</param>
+    /// <returns>True if import was successful, false if no transactions were imported</returns>
     procedure ImportStatement(var BankAccReconciliation: Record "Bank Acc. Reconciliation"; DataExch: Record "Data Exch."): Boolean
     var
         ProcessBankAccRecLines: Codeunit "Process Bank Acc. Rec Lines";
@@ -638,6 +798,14 @@ table 273 "Bank Acc. Reconciliation"
         BankAccReconciliation.Insert(true);
     end;
 
+    /// <summary>
+    /// Prompts user to select a bank account for payment reconciliation operations.
+    /// Provides filtered selection based on import format configuration and displays appropriate bank account lists.
+    /// Handles scenarios with single bank accounts, multiple options, and import format requirements.
+    /// </summary>
+    /// <param name="BankAccount">Bank account record to populate with the selected account details.</param>
+    /// <param name="OnlyWithImportFormatSet">If true, only shows bank accounts with configured import formats; otherwise shows all accounts.</param>
+    /// <returns>True if a bank account was successfully selected; false if user cancelled or no accounts available.</returns>
     procedure SelectBankAccountToUse(var BankAccount: Record "Bank Account"; OnlyWithImportFormatSet: Boolean): Boolean
     var
         TempBankAccount: Record "Bank Account" temporary;
@@ -821,6 +989,11 @@ table 273 "Bank Acc. Reconciliation"
         Insert(true);
     end;
 
+    /// <summary>
+    /// Opens bank account ledger entries page filtered to show open entries for this reconciliation's bank account.
+    /// Provides drill-down functionality to view detailed ledger entries that contribute to the bank account balance.
+    /// Used for balance verification and investigation of unreconciled transactions.
+    /// </summary>
     procedure DrillDownOnBalanceOnBankAccount()
     var
         BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
@@ -830,6 +1003,12 @@ table 273 "Bank Acc. Reconciliation"
         PAGE.Run(PAGE::"Bank Account Ledger Entries", BankAccountLedgerEntry);
     end;
 
+    /// <summary>
+    /// Calculates the optimal filter date for finding matching candidates during bank reconciliation.
+    /// Determines the earliest transaction date from reconciliation lines to establish the date range
+    /// for searching potential matches in ledger entries and improving matching performance.
+    /// </summary>
+    /// <returns>Date representing the earliest transaction date for candidate filtering; WorkDate if no lines exist.</returns>
     procedure MatchCandidateFilterDate(): Date
     var
         BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
