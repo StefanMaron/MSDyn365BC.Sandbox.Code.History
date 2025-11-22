@@ -247,7 +247,6 @@ page 12111 "Show Computed Withh. Contrib."
     local procedure OKOnPush()
     var
         IsHandled: Boolean;
-        LineExists: Boolean;
     begin
         IsHandled := false;
         OnBeforeOKOnPush(Rec, IsHandled);
@@ -276,9 +275,6 @@ page 12111 "Show Computed Withh. Contrib."
                 if Rec."Payment Line-Withholding" = 0 then begin
                     GenJnlLine.Init();
                     GenJnlLine.Copy(GenJnlLine2);
-                    GenJnlLine2.Reset();
-                    GenJnlLine2.SetRange("Journal Template Name", Rec."Journal Template Name");
-                    GenJnlLine2.SetRange("Journal Batch Name", Rec."Journal Batch Name");
                     if GenJnlLine2.FindLast() then
                         PurchSetup := GenJnlLine2."Line No.";
                     GenJnlLine."Line No." := PurchSetup + 10000;
@@ -288,11 +284,10 @@ page 12111 "Show Computed Withh. Contrib."
                     GenJnlLine.SetRange("Journal Template Name", TmpGenJnlLine."Journal Template Name");
                     GenJnlLine.SetRange("Journal Batch Name", TmpGenJnlLine."Journal Batch Name");
                     GenJnlLine.SetRange("Line No.", Rec."Payment Line-Withholding");
-                    LineExists := GenJnlLine.FindFirst();
+                    GenJnlLine.FindFirst();
                     ClearFilters();
                 end;
                 GenJnlLine.Validate("Account No.");
-                if Rec.Get(Rec."Journal Template Name", Rec."Journal Batch Name", Rec."Line No.") then;
                 if GenJnlLine."Document Type" = GenJnlLine."Document Type"::Payment then
                     GenJnlLine.Validate(Amount, Rec."Withholding Tax Amount")
                 else
@@ -302,11 +297,7 @@ page 12111 "Show Computed Withh. Contrib."
                 GenJnlLine.Validate("Bal. Account No.", Rec."Withholding Account");
 
                 if Rec."Payment Line-Withholding" = 0 then begin
-                    if not LineExists then
-                        GenJnlLine.Insert()
-                    else
-                        GenJnlLine.Modify();
-
+                    GenJnlLine.Insert();
                     Rec."Payment Line-Withholding" := GenJnlLine."Line No.";
                     Rec.Modify();
                 end else
