@@ -295,6 +295,9 @@ table 270 "Bank Account"
         {
             Caption = 'Statistics Group';
         }
+        /// <summary>
+        /// Internal contact person responsible for managing this bank account relationship.
+        /// </summary>
         field(29; "Our Contact Code"; Code[20])
         {
             Caption = 'Our Contact Code';
@@ -1177,6 +1180,10 @@ table 270 "Bank Account"
         OnAfterValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode);
     end;
 
+    /// <summary>
+    /// Displays or creates contact information linked to this bank account.
+    /// Creates new contact if none exists and user confirms creation.
+    /// </summary>
     procedure ShowContact()
     var
         ContBusRel: Record "Contact Business Relation";
@@ -1250,6 +1257,10 @@ table 270 "Bank Account"
         exit(BankExportImportSetup."Processing XMLport ID");
     end;
 
+    /// <summary>
+    /// Retrieves the codeunit ID for direct debit export processing.
+    /// </summary>
+    /// <returns>Codeunit ID for direct debit export</returns>
     procedure GetDDExportCodeunitID(): Integer
     var
         BankExportImportSetup: Record "Bank Export/Import Setup";
@@ -1259,6 +1270,10 @@ table 270 "Bank Account"
         exit(BankExportImportSetup."Processing Codeunit ID");
     end;
 
+    /// <summary>
+    /// Retrieves the XMLPort ID for direct debit export file generation.
+    /// </summary>
+    /// <returns>XMLPort ID for direct debit export</returns>
     procedure GetDDExportXMLPortID(): Integer
     var
         BankExportImportSetup: Record "Bank Export/Import Setup";
@@ -1268,6 +1283,10 @@ table 270 "Bank Account"
         exit(BankExportImportSetup."Processing XMLport ID");
     end;
 
+    /// <summary>
+    /// Retrieves bank export/import setup configuration for payment processing.
+    /// </summary>
+    /// <param name="BankExportImportSetup">Returns the setup record for the payment export format</param>
     procedure GetBankExportImportSetup(var BankExportImportSetup: Record "Bank Export/Import Setup")
     var
         IsHandled: Boolean;
@@ -1280,12 +1299,24 @@ table 270 "Bank Account"
         BankExportImportSetup.Get("Payment Export Format");
     end;
 
+    /// <summary>
+    /// Retrieves bank export/import setup configuration for direct debit processing.
+    /// </summary>
+    /// <param name="BankExportImportSetup">Returns the setup record for the direct debit export format</param>
     procedure GetDDExportImportSetup(var BankExportImportSetup: Record "Bank Export/Import Setup")
     begin
         TestField("SEPA Direct Debit Exp. Format");
         BankExportImportSetup.Get("SEPA Direct Debit Exp. Format");
     end;
 
+    /// <summary>
+    /// Generates and returns the next credit transfer message number from the number series.
+    /// </summary>
+    /// <returns>Next credit transfer message number</returns>
+    /// <summary>
+    /// Generates and returns the next credit transfer message number from the number series.
+    /// </summary>
+    /// <returns>Next credit transfer message number</returns>
     procedure GetCreditTransferMessageNo(): Code[20]
     var
         CreditTransferMsgNo: Code[20];
@@ -1330,6 +1361,9 @@ table 270 "Bank Account"
         exit("No.");
     end;
 
+    /// <summary>
+    /// Opens external map service to display bank account location.
+    /// </summary>
     procedure DisplayMap()
     var
         OnlineMapManagement: Codeunit "Online Map Management";
@@ -1337,6 +1371,10 @@ table 270 "Bank Account"
         OnlineMapManagement.MakeSelectionIfMapEnabled(Database::"Bank Account", GetPosition());
     end;
 
+    /// <summary>
+    /// Retrieves data exchange definition for bank statement import processing.
+    /// </summary>
+    /// <param name="DataExchDef">Returns the data exchange definition record</param>
     procedure GetDataExchDef(var DataExchDef: Record "Data Exch. Def")
     var
         BankExportImportSetup: Record "Bank Export/Import Setup";
@@ -1359,6 +1397,10 @@ table 270 "Bank Account"
         DataExchDef.TestField(Type, DataExchDef.Type::"Bank Statement Import");
     end;
 
+    /// <summary>
+    /// Retrieves data exchange definition for payment export processing.
+    /// </summary>
+    /// <param name="DataExchDef">Returns the data exchange definition record for payment export</param>
     procedure GetDataExchDefPaymentExport(var DataExchDef: Record "Data Exch. Def")
     var
         BankExportImportSetup: Record "Bank Export/Import Setup";
@@ -1370,6 +1412,10 @@ table 270 "Bank Account"
         DataExchDef.TestField(Type, DataExchDef.Type::"Payment Export");
     end;
 
+    /// <summary>
+    /// Retrieves bank account number with validation, raising error if empty.
+    /// </summary>
+    /// <returns>Bank account number or IBAN</returns>
     procedure GetBankAccountNoWithCheck() AccountNo: Text
     begin
         AccountNo := GetBankAccountNo();
@@ -1377,6 +1423,10 @@ table 270 "Bank Account"
             Error(BankAccIdentifierIsEmptyErr, FieldCaption("Bank Account No."), FieldCaption(IBAN));
     end;
 
+    /// <summary>
+    /// Retrieves the primary bank account identifier (IBAN if available, otherwise bank account number).
+    /// </summary>
+    /// <returns>Bank account number or IBAN</returns>
     procedure GetBankAccountNo(): Text
     var
         Handled: Boolean;
@@ -1393,6 +1443,10 @@ table 270 "Bank Account"
             exit("Bank Account No.");
     end;
 
+    /// <summary>
+    /// Determines if the bank account uses the local currency.
+    /// </summary>
+    /// <returns>True if bank account currency matches local currency or is empty</returns>
     procedure IsInLocalCurrency(): Boolean
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -1411,6 +1465,10 @@ table 270 "Bank Account"
         exit("Currency Code" = GeneralLedgerSetup.GetCurrencyCode(''));
     end;
 
+    /// <summary>
+    /// Retrieves the codeunit ID for positive pay export processing.
+    /// </summary>
+    /// <returns>Codeunit ID for positive pay export</returns>
     procedure GetPosPayExportCodeunitID(): Integer
     var
         BankExportImportSetup: Record "Bank Export/Import Setup";
@@ -1420,6 +1478,10 @@ table 270 "Bank Account"
         exit(BankExportImportSetup."Processing Codeunit ID");
     end;
 
+    /// <summary>
+    /// Checks if bank account is linked to an external bank statement service provider.
+    /// </summary>
+    /// <returns>True if linked to statement provider</returns>
     procedure IsLinkedToBankStatementServiceProvider(): Boolean
     var
         IsBankAccountLinked: Boolean;
@@ -1428,6 +1490,10 @@ table 270 "Bank Account"
         exit(IsBankAccountLinked);
     end;
 
+    /// <summary>
+    /// Checks if any bank statement service providers are available in the system.
+    /// </summary>
+    /// <returns>True if statement providers exist</returns>
     procedure StatementProvidersExist(): Boolean
     var
         TempNameValueBuffer: Record "Name/Value Buffer" temporary;
@@ -1436,6 +1502,10 @@ table 270 "Bank Account"
         exit(not TempNameValueBuffer.IsEmpty);
     end;
 
+    /// <summary>
+    /// Links bank account to an external bank statement service provider.
+    /// </summary>
+    /// <param name="BankAccount">Bank account to link to service provider</param>
     procedure LinkStatementProvider(var BankAccount: Record "Bank Account")
     var
         StatementProvider: Text;
@@ -1446,6 +1516,10 @@ table 270 "Bank Account"
             OnLinkStatementProviderEvent(BankAccount, StatementProvider);
     end;
 
+    /// <summary>
+    /// Links online bank account to statement service provider with minimal setup.
+    /// </summary>
+    /// <param name="OnlineBankAccLink">Online bank account link record to configure</param>
     procedure SimpleLinkStatementProvider(var OnlineBankAccLink: Record "Online Bank Acc. Link")
     var
         StatementProvider: Text;
@@ -1456,6 +1530,9 @@ table 270 "Bank Account"
             OnSimpleLinkStatementProviderEvent(OnlineBankAccLink, StatementProvider);
     end;
 
+    /// <summary>
+    /// Removes the link between bank account and external statement service provider.
+    /// </summary>
     procedure UnlinkStatementProvider()
     var
         Handled: Boolean;
@@ -1463,6 +1540,10 @@ table 270 "Bank Account"
         OnUnlinkStatementProviderEvent(Rec, Handled);
     end;
 
+    /// <summary>
+    /// Refreshes the connection to external bank statement service provider.
+    /// </summary>
+    /// <param name="BankAccount">Bank account to refresh connection for</param>
     procedure RefreshStatementProvider(var BankAccount: Record "Bank Account")
     var
         StatementProvider: Text;
@@ -1473,6 +1554,10 @@ table 270 "Bank Account"
             OnRefreshStatementProviderEvent(BankAccount, StatementProvider);
     end;
 
+    /// <summary>
+    /// Renews access consent for external bank statement service provider.
+    /// </summary>
+    /// <param name="BankAccount">Bank account to renew consent for</param>
     procedure RenewAccessConsentStatementProvider(var BankAccount: Record "Bank Account")
     var
         StatementProvider: Text;
@@ -1483,6 +1568,10 @@ table 270 "Bank Account"
             OnRenewAccessConsentStatementProviderEvent(BankAccount, StatementProvider);
     end;
 
+    /// <summary>
+    /// Opens edit interface for external bank statement service provider account settings.
+    /// </summary>
+    /// <param name="BankAccount">Bank account to edit provider settings for</param>
     procedure EditAccountStatementProvider(var BankAccount: Record "Bank Account")
     var
         StatementProvider: Text;
@@ -1493,6 +1582,9 @@ table 270 "Bank Account"
             OnEditAccountStatementProviderEvent(BankAccount, StatementProvider);
     end;
 
+    /// <summary>
+    /// Updates bank account linking configuration with statement service provider.
+    /// </summary>
     procedure UpdateBankAccountLinking()
     var
         StatementProvider: Text;
@@ -1503,6 +1595,10 @@ table 270 "Bank Account"
             OnUpdateBankAccountLinkingEvent(Rec, StatementProvider);
     end;
 
+    /// <summary>
+    /// Retrieves all bank accounts that are not linked to external statement service providers.
+    /// </summary>
+    /// <param name="TempUnlinkedBankAccount">Temporary record to populate with unlinked bank accounts</param>
     procedure GetUnlinkedBankAccounts(var TempUnlinkedBankAccount: Record "Bank Account" temporary)
     var
         BankAccount: Record "Bank Account";
@@ -1516,6 +1612,10 @@ table 270 "Bank Account"
             until BankAccount.Next() = 0;
     end;
 
+    /// <summary>
+    /// Retrieves all bank accounts that are linked to external statement service providers.
+    /// </summary>
+    /// <param name="TempUnlinkedBankAccount">Temporary record to populate with linked bank accounts</param>
     procedure GetLinkedBankAccounts(var TempUnlinkedBankAccount: Record "Bank Account" temporary)
     var
         BankAccount: Record "Bank Account";
@@ -1571,6 +1671,10 @@ table 270 "Bank Account"
         exit(TempNameValueBuffer.Name);
     end;
 
+    /// <summary>
+    /// Checks if automatic logon is possible for external bank statement service provider.
+    /// </summary>
+    /// <returns>True if automatic logon is supported and configured</returns>
     procedure IsAutoLogonPossible(): Boolean
     var
         AutoLogonPossible: Boolean;
@@ -1611,6 +1715,10 @@ table 270 "Bank Account"
             JobQueueEntry.DeleteAll();
     end;
 
+    /// <summary>
+    /// Creates new bank account from online bank account link information.
+    /// </summary>
+    /// <param name="OnlineBankAccLink">Online bank account link containing account details</param>
     procedure CreateNewAccount(OnlineBankAccLink: Record "Online Bank Acc. Link")
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -1658,6 +1766,11 @@ table 270 "Bank Account"
             Error('');
     end;
 
+    /// <summary>
+    /// Retrieves online feed statement status and linking information for bank account.
+    /// </summary>
+    /// <param name="OnlineFeedStatus">Returns the current online feed status</param>
+    /// <param name="Linked">Returns true if bank account is linked to statement provider</param>
     procedure GetOnlineFeedStatementStatus(var OnlineFeedStatus: Option; var Linked: Boolean)
     begin
         Linked := false;
@@ -1678,6 +1791,9 @@ table 270 "Bank Account"
         exit(JobQueueEntry.FindFirst());
     end;
 
+    /// <summary>
+    /// Disables all available bank statement service providers.
+    /// </summary>
     procedure DisableStatementProviders()
     var
         TempNameValueBuffer: Record "Name/Value Buffer" temporary;
@@ -2121,6 +2237,15 @@ table 270 "Bank Account"
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised before retrieving bank export/import setup configuration.
+    /// Enables custom logic to override or supplement standard setup retrieval.
+    /// </summary>
+    /// <param name="BankExportImportSetup">Returns the bank export/import setup record</param>
+    /// <param name="IsHandled">Set to true to bypass standard setup retrieval logic</param>
+    /// <remarks>
+    /// Raised from GetBankExportImportSetup procedure before standard configuration lookup.
+    /// </remarks>
     [IntegrationEvent(false, false)]
     procedure OnBeforeGetBankExportImportSetup(var BankExportImportSetup: Record "Bank Export/Import Setup"; var IsHandled: Boolean)
     begin
