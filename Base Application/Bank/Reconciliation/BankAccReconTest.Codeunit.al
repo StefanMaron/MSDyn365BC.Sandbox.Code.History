@@ -11,6 +11,10 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Ledger;
 
+/// <summary>
+/// Provides validation and testing functions for bank account reconciliation procedures.
+/// Validates reconciliation balance calculations and data integrity before posting.
+/// </summary>
 codeunit 380 "Bank Acc. Recon. Test"
 {
 
