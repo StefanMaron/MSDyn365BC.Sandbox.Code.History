@@ -12,6 +12,16 @@ using System.Integration;
 using System.Utilities;
 using System.Xml;
 
+/// <summary>
+/// Manages automatic updates of currency exchange rates from external services.
+/// Provides functionality to synchronize exchange rates, handle data transformations,
+/// and maintain currency rate accuracy through automated scheduled updates.
+/// </summary>
+/// <remarks>
+/// Integrates with Data Exchange Framework for rate import processing.
+/// Supports multiple currency exchange rate services and includes error handling
+/// and telemetry logging for monitoring service reliability.
+/// </remarks>
 codeunit 1281 "Update Currency Exchange Rates"
 {
     Permissions = TableData "Data Exch." = rimd;
