@@ -1,12 +1,12 @@
 namespace Microsoft.Inventory.Ledger;
 
-query 302 "Item Application Entries"
+query 303 "Item Application Entries Inb."
 {
     QueryType = Normal;
     DataAccessIntent = ReadOnly;
     Caption = 'Item Application Entries';
-    Description = 'Item application entries retrieved for inbound transfer entries check.';
-    OrderBy = ascending(Transferred_from_Entry_No, Cost_Application);
+    Description = 'Item application entries retrieved for inbound entries check.';
+    OrderBy = ascending(Outbound_Item_Entry_No, Item_Ledger_Entry_No, Cost_Application, Transferred_from_Entry_No);
 
     elements
     {
@@ -17,11 +17,8 @@ query 302 "Item Application Entries"
             column(Inbound_Item_Entry_No; "Inbound Item Entry No.") { }
             column(Outbound_Item_Entry_No; "Outbound Item Entry No.") { }
             column(Quantity; Quantity) { }
-            column(Posting_Date; "Posting Date") { }
             column(Transferred_from_Entry_No; "Transferred-from Entry No.") { }
             column(Cost_Application; "Cost Application") { }
-            column(Output_Completely_Invd__Date; "Output Completely Invd. Date") { }
-            column(Outbound_Entry_is_Updated; "Outbound Entry is Updated") { }
         }
     }
 }
