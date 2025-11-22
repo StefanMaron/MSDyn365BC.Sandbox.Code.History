@@ -10,6 +10,14 @@ using Microsoft.Integration.Dataverse;
 using Microsoft.Purchases.Reports;
 using Microsoft.Sales.Reports;
 
+/// <summary>
+/// Provides a detailed card interface for managing currency configuration and settings.
+/// Supports currency setup, exchange rate management, rounding configurations, and G/L account mappings.
+/// </summary>
+/// <remarks>
+/// Source Table: Currency (4). Key features include currency definition, rounding precision settings,
+/// exchange rate access, and G/L account configuration for currency gains/losses posting.
+/// </remarks>
 page 495 "Currency Card"
 {
     Caption = 'Currency Card';
