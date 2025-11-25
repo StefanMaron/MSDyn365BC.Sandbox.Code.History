@@ -66,13 +66,12 @@ codeunit 139085 "Exchange Sync Credentials Test"
         ExchangeSyncSetup.Trap();
         PAGE.Run(PAGE::"Exchange Sync. Setup");
 
-        // [THEN] User receives an error message when they try to open the contact sync or Bookings sync page.
+        // [THEN] User receives an error message when they try to open the contact sync 
         asserterror ExchangeSyncSetup.SetupContactSync.Invoke();
-        asserterror ExchangeSyncSetup.SetupBookingSync.Invoke();
     end;
 
     [Test]
-    [HandlerFunctions('ContactSyncSetupHandler,BookingSyncSetupHandler')]
+    [HandlerFunctions('ContactSyncSetupHandler')]
     [Scope('OnPrem')]
     procedure UserCanProceedWithNoPasswordWhenTokenAvailable()
     var
@@ -90,9 +89,6 @@ codeunit 139085 "Exchange Sync Credentials Test"
         // [WHEN] The user clicks the "Contact Sync Setup" button
         ExchangeSyncSetup.SetupContactSync.Invoke();
 
-        // [WHEN] The user clicks the "Bookings sync setup" button
-        ExchangeSyncSetup.SetupBookingSync.Invoke();
-
         // [THEN] User gets in without issue.
         // Verified through handlers.
     end;
@@ -103,15 +99,9 @@ codeunit 139085 "Exchange Sync Credentials Test"
     begin
     end;
 
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure BookingSyncSetupHandler(var BookingSyncSetup: TestPage "Booking Sync. Setup")
-    begin
-    end;
 
     local procedure Initialize(FreshTokenAvailable: Boolean; CachedTokenAvailable: Boolean)
     var
-        BookingSync: Record "Booking Sync";
         LibraryO365Sync: Codeunit "Library - O365 Sync";
         EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
     begin
@@ -126,8 +116,6 @@ codeunit 139085 "Exchange Sync Credentials Test"
             exit;
 
         LibraryO365Sync.SetupNavUser();
-        LibraryO365Sync.SetupBookingsSync(BookingSync);
-
         Initialized := true;
     end;
 
