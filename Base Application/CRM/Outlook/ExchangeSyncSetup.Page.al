@@ -3,8 +3,9 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.CRM.Outlook;
-
+#if not CLEAN28
 using Microsoft.Booking;
+#endif
 using System.Azure.Identity;
 using System.Security.AccessControl;
 
@@ -92,13 +93,16 @@ page 6700 "Exchange Sync. Setup"
             group(Navigate)
             {
                 Caption = 'Navigate';
+#if not CLEAN28
                 action(SetupBookingSync)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Bookings Sync. Setup';
                     Image = BookingsLogo;
                     ToolTip = 'Open the Bookings Sync. Setup page.';
-
+                    ObsoleteReason = 'Bookings is no longer part of Business Central 365.';
+                    ObsoleteState = pending;
+                    ObsoleteTag = '28.0';
                     trigger OnAction()
                     begin
                         if PasswordRequired and IsNullGuid(Rec."Exchange Account Password Key") then
@@ -107,6 +111,7 @@ page 6700 "Exchange Sync. Setup"
                         PAGE.RunModal(PAGE::"Booking Sync. Setup");
                     end;
                 }
+#endif
                 action(SetupContactSync)
                 {
                     ApplicationArea = Basic, Suite;
@@ -141,10 +146,14 @@ page 6700 "Exchange Sync. Setup"
             group(Category_Category4)
             {
                 Caption = 'Navigate', Comment = 'Generated from the PromotedActionCategories property index 3.';
-
+#if not CLEAN28
                 actionref(SetupBookingSync_Promoted; SetupBookingSync)
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Bookings is no longer part of Business Central 365.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 actionref(SetupContactSync_Promoted; SetupContactSync)
                 {
                 }
