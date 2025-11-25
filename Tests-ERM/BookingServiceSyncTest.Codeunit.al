@@ -1,5 +1,9 @@
+#if not CLEAN28
 codeunit 133782 "Booking Service Sync Test"
 {
+    ObsoleteReason = 'Bookings is no longer part of Business Central 365.';
+    ObsoleteState = pending;
+    ObsoleteTag = '28.0';
     Subtype = Test;
     TestPermissions = Disabled;
 
@@ -270,3 +274,4 @@ codeunit 133782 "Booking Service Sync Test"
     end;
 }
 
+#endif
