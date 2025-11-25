@@ -1865,64 +1865,6 @@ codeunit 134299 "Test Partner Integration Event"
 
     [Test]
     [Scope('OnPrem')]
-    procedure BookingHandleSalesHeader()
-    var
-        SalesHeader: Record "Sales Header";
-        TestPartnerIntegrationEvent: Codeunit "Test Partner Integration Event";
-    begin
-        // [FEATURE] [Booking] [Sales] [Invoice]
-        // [SCENARIO 298582] Integration event OnSetBookingItemInvoiced in codeunit "Booking Manager" is executed in case of non-temporary Sales Invoice
-
-        Initialize();
-        SetBookingMgrSetup();
-        BindSubscription(TestPartnerIntegrationEvent);
-
-        // [GIVEN] Sales Invoice "SI01"
-        MockSalesInvoice(SalesHeader);
-
-        // [GIVEN] Invoiced Booking Item for Sales Invoice "SI01"
-        MockInvoicedBookingItem(SalesHeader."No.");
-
-        // [WHEN] Modify Sales Invoice
-        SalesHeader.Modify(true);
-
-        // [THEN] OnSetBookingItemInvoiced event is executed
-        VerifyDataTypeBuffer(OnSetBookingItemInvoicedTxt);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure BookingHandleSalesLine()
-    var
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        TestPartnerIntegrationEvent: Codeunit "Test Partner Integration Event";
-    begin
-        // [FEATURE] [Booking] [Sales] [Invoice]
-        // [SCENARIO 298582] Integration event OnSetBookingItemInvoiced in codeunit "Booking Manager" is executed in case of non-temporary Sales Invoice Line
-
-        Initialize();
-        SetBookingMgrSetup();
-        BindSubscription(TestPartnerIntegrationEvent);
-
-        // [GIVEN] Sales Invoice "SI01"
-        MockSalesInvoice(SalesHeader);
-
-        // [GIVEN] Sales Line 10000 for "SI01"
-        MockSalesLine(SalesLine, SalesHeader);
-
-        // [GIVEN] Invoiced Booking Item for Sales Invoice "SI01"
-        MockInvoicedBookingItem(SalesHeader."No.");
-
-        // [WHEN] Modify Sales Line
-        SalesLine.Modify(true);
-
-        // [THEN] OnSetBookingItemInvoiced event is executed
-        VerifyDataTypeBuffer(OnSetBookingItemInvoicedTxt);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
     procedure TestOnBeforeGetAttachmentFileNameEventRaised()
     var
         DocumentMailing: Codeunit "Document-Mailing";
@@ -2701,12 +2643,6 @@ codeunit 134299 "Test Partner Integration Event"
     local procedure OnCheckPostingCostToGL(var PostCostToGL: Boolean)
     begin
         PostCostToGL := false;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Booking Manager", 'OnSetBookingItemInvoiced', '', false, false)]
-    local procedure OnSetBookingItemInvoiced(var InvoicedBookingItem: Record "Invoiced Booking Item")
-    begin
-        InsertDataTypeBuffer(OnSetBookingItemInvoicedTxt);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Document-Mailing", 'OnBeforeGetAttachmentFileName', '', false, false)]
