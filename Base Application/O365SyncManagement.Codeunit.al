@@ -15,8 +15,10 @@ codeunit 6700 "O365 Sync. Management"
             exit;
 
         CODEUNIT.Run(CODEUNIT::"Exchange Contact Sync.");
+#if not CLEAN28
         CODEUNIT.Run(CODEUNIT::"Booking Customer Sync.");
         CODEUNIT.Run(CODEUNIT::"Booking Service Sync.");
+#endif
     end;
 
     var
@@ -32,9 +34,11 @@ codeunit 6700 "O365 Sync. Management"
         BookingsConnectionString: SecretText;
         ExchangeConnectionString: SecretText;
         GettingContactsTxt: Label 'Getting Exchange contacts.';
+#if not CLEAN28
         GettingBookingCustomersTxt: Label 'Getting Booking customers.';
         GettingBookingServicesTxt: Label 'Getting Booking services.';
         NoUserAccessErr: Label 'Could not connect to %1. Verify that %2 is an administrator in the Bookings mailbox.', Comment = '%1 = The Bookings company; %2 = The user';
+#endif
         JobQueueEntryDescTxt: Label 'Auto-created for retrieval of new data from Outlook and Bookings. Can be deleted if not used. Will be recreated when the feature is activated.';
 
     [TryFunction]
@@ -120,7 +124,9 @@ codeunit 6700 "O365 Sync. Management"
         end;
     end;
 
+#if not CLEAN28
     [Scope('OnPrem')]
+    [obsolete('Deprecated not in use -Booking sync setup', '28.0')]
     procedure SyncBookingCustomers(var BookingSync: Record "Booking Sync")
     var
         BookingCustomerSync: Codeunit "Booking Customer Sync.";
@@ -145,6 +151,7 @@ codeunit 6700 "O365 Sync. Management"
         CloseProgress();
         BookingServiceSync.SyncRecords(BookingSync);
     end;
+#endif
 
     [Scope('OnPrem')]
     procedure SyncExchangeContacts(ExchangeSync: Record "Exchange Sync"; FullSync: Boolean)
@@ -419,6 +426,8 @@ codeunit 6700 "O365 Sync. Management"
         exit((not Token.IsEmpty()) or (not Password.IsEmpty()));
     end;
 
+#if not CLEAN28
+[obsolete('Booking sync is no longer part of Business Central 365.', '28.0')]
     local procedure CheckUserAccess(BookingSync: Record "Booking Sync")
     var
         ExchangeSync: Record "Exchange Sync";
@@ -435,6 +444,7 @@ codeunit 6700 "O365 Sync. Management"
         if not ExchangeService.CanAccessBookingMailbox(BookingSync."Booking Mailbox Address") then
             Error(NoUserAccessErr, BookingSync."Booking Mailbox Name", BookingSync."User ID");
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOnRun(var IsHandled: Boolean)
