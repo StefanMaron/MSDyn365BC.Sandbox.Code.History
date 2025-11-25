@@ -1,3 +1,4 @@
+#if not CLEAN28
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -18,6 +19,9 @@ page 1638 "Booking Items"
     PageType = List;
     SourceTable = "Booking Item";
     SourceTableTemporary = true;
+    ObsoleteReason = 'Booking sync is no longer part of Business Central 365.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '28.0';
 
     layout
     {
@@ -276,3 +280,4 @@ page 1638 "Booking Items"
     end;
 }
 
+#endif
