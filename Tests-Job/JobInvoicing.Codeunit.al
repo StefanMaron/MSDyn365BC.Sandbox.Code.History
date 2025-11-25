@@ -55,6 +55,7 @@ codeunit 136306 "Job Invoicing"
         LineDiscountPctErr: Label '%1 should be %2', Comment = '%1 = Field Caption, %2 = Field Value';
         WrongNoOfLinesLbl: Label 'Wrong number of lines created.';
         ValueFalseErr: Label 'Value must be equal to false';
+        ExpectedValueErr: Label '%1 should be equal to %2', Comment = '%1 = Field Caption, %2 = Expected Value';
 
     [Test]
     [HandlerFunctions('TransferToInvoiceHandler,MessageHandler')]
@@ -4117,6 +4118,74 @@ codeunit 136306 "Job Invoicing"
         // [THEN] No error should come, as posting for Non-Inventory Item.
     end;
 
+    [Test]
+    [HandlerFunctions('JobTransferToSalesInvoiceHandlers,MessageHandler,ConfirmHandler')]
+    procedure PostingWhenExchangeRatesChangeInSalesFromProjectPlanningLine()
+    var
+        Currency: Record Currency;
+        Customer: Record Customer;
+        Job: Record Job;
+        JobTask: Record "Job Task";
+        JobPlanningLine: Record "Job Planning Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        JobCreateInvoices: Codeunit "Job Create-Invoice";
+        PostingDate: Date;
+    begin
+        // [SCENARIO 610032] Unit Price in Project Planning Line updated correctly after changing posting date in Sales Invoice with different exchange rate
+        Initialize();
+
+        // [GIVEN] Create a currency.
+        LibraryERM.CreateCurrency(Currency);
+
+        // [GIVEN] Create exchange rates for the currency for today and one month from today.
+        CreateCurrencyExchangeRate(Currency.Code, WorkDate());
+        CreateCurrencyExchangeRate(Currency.Code, CalcDate('<+1M>', WorkDate()));
+
+        // [GIVEN] Create a Customer.
+        LibrarySales.CreateCustomer(Customer);
+
+        // [GIVEN] Create Job with Currency.
+        LibraryJob.CreateJob(Job, Customer."No.");
+        Job.Validate("Currency Code", Currency.Code);
+        Job.Modify(true);
+
+        // [GIVEN] Create a Job task.
+        LibraryJob.CreateJobTask(Job, JobTask);
+
+        // [GIVEN] Create a Job Planning Line with Quantity, Unit Price and Currency Factor.
+        LibraryJob.CreateJobPlanningLine(LibraryJob.PlanningLineTypeContract(), LibraryJob.ItemType(), JobTask, JobPlanningLine);
+        JobPlanningLine.Validate(Quantity, LibraryRandom.RandInt(10));
+        JobPlanningLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
+        JobPlanningLine.Modify(true);
+
+        // [GIVEN] Commit the transaction to persist the Job Planning Line data.
+        Commit();
+
+        // [GIVEN] Create Sales Invoice from Job Planning Line.
+        JobCreateInvoices.CreateSalesInvoice(JobPlanningLine, false);
+
+        // [GIVEN] Find the created Sales Header.
+        FindSalesHeaderFromJobPlanningLine(JobPlanningLine, SalesHeader);
+
+        // [WHEN] Change Posting Date on Sales Header to one month from today.
+        PostingDate := CalcDate('<+1M>', SalesHeader."Posting Date");
+        SalesHeader.Validate("Posting Date", PostingDate);
+        SalesHeader.Modify(true);
+
+        // [WHEN] Find Sales Line created from Job Planning Line.
+        FindSalesLine(SalesLine, SalesHeader."Document Type", SalesHeader."No.");
+        FindJobPlanningLine(JobPlanningLine, Job."No.", JobTask."Job Task No.", LibraryJob.ItemType());
+
+        // [THEN] Verify the Job Planning Line Currency Date, Currency Factor and Unit Price (LCY) are updated correctly.
+        Assert.AreEqual(JobPlanningLine."Currency Date", SalesHeader."Posting Date",
+                    StrSubstNo(ExpectedValueErr, SalesHeader.FieldCaption("Posting Date"), Format(SalesHeader."Posting Date")));
+        Assert.AreEqual(JobPlanningLine."Currency Factor", SalesHeader."Currency Factor",
+                    StrSubstNo(ExpectedValueErr, SalesHeader.FieldCaption("Currency Factor"), Format(SalesHeader."Currency Factor")));
+        Assert.AreEqual(JobPlanningLine."Unit Price (LCY)", SalesLine."Unit Price" / SalesHeader."Currency Factor",
+                    StrSubstNo(ExpectedValueErr, JobPlanningLine.FieldCaption("Unit Price (LCY)"), Format(SalesLine."Unit Price" / SalesHeader."Currency Factor")));
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -5762,6 +5831,26 @@ codeunit 136306 "Job Invoicing"
         LibraryJob.PostJobJournal(JobJournalLine);
     end;
 
+    local procedure FindSalesHeaderFromJobPlanningLine(JobPlanningLine: Record "Job Planning Line"; var SalesHeader: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Invoice);
+        SalesLine.SetRange("Job No.", JobPlanningLine."Job No.");
+        SalesLine.SetRange("Job Task No.", JobPlanningLine."Job Task No.");
+        SalesLine.FindFirst();
+        SalesHeader.Get(SalesHeader."Document Type"::Invoice, SalesLine."Document No.");
+    end;
+
+    local procedure FindJobPlanningLine(var JobPlanningLine: Record "Job Planning Line"; JobNo: Code[20]; JobTaskNo: Code[20]; LineType: Enum "Job Planning Line Type")
+    begin
+        JobPlanningLine.SetRange("Job No.", JobNo);
+        JobPlanningLine.SetRange("Job Task No.", JobTaskNo);
+        JobPlanningLine.SetRange(Type, LineType);
+        JobPlanningLine.SetRange("Line Type", LibraryJob.PlanningLineTypeContract());
+        JobPlanningLine.FindLast();
+    end;
+
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure TransferSalesCreditMemoReportWithDatesHandler(var JobTransferToCreditMemo: TestRequestPage "Job Transfer to Credit Memo")
@@ -5861,6 +5950,14 @@ codeunit 136306 "Job Invoicing"
         CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
     begin
         CorrectPostedSalesInvoice.CreateCorrectiveCreditMemo(Notification); // simulate 'Create credit memo anyway' action
+    end;
+
+    [RequestPageHandler]
+    procedure JobTransferToSalesInvoiceHandlers(var JobTransferToSalesInvoice: TestRequestPage "Job Transfer to Sales Invoice")
+    begin
+        JobTransferToSalesInvoice.CreateNewInvoice.SetValue(true);
+        JobTransferToSalesInvoice.PostingDate.SetValue(WorkDate());
+        JobTransferToSalesInvoice.OK().Invoke();
     end;
 }
 
