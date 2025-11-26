@@ -380,6 +380,7 @@ page 22207 "Review G/L Entries"
         GLEntry: Record "G/L Entry";
     begin
         SelectedGLEntries(GLEntry);
+        GLEntry.SetLoadFields("Debit Amount", "Credit Amount");
         GLEntry.CalcSums("Debit Amount", "Credit Amount");
         Debit := GLEntry."Debit Amount";
         Credit := GLEntry."Credit Amount";
@@ -396,6 +397,7 @@ page 22207 "Review G/L Entries"
     var
         GLAccount: record "G/L Account";
     begin
+        GLAccount.SetLoadFields("No.", Name, "Review Policy");
         if not GLAccount.Get(Rec."G/L Account No.") then
             if Rec.GetFilter(Rec."G/L Account No.") <> '' then
                 GLAccount.Get(Rec.GetRangeMin(Rec."G/L Account No."));
@@ -406,6 +408,7 @@ page 22207 "Review G/L Entries"
     local procedure CalcBalance(var GLEntryRec: Record "G/L Entry")
     var
         GLEntry: Record "G/L Entry";
+        FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
         Balance := 0;
         GLEntry.Copy(GLEntryRec);
