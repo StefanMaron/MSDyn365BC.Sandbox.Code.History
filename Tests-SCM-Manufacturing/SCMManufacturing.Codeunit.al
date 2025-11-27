@@ -5940,6 +5940,8 @@ codeunit 137404 "SCM Manufacturing"
         Evaluate(OperationNo, RoutingLine."Operation No.");
         AddRoutingLine(
           RoutingLine2, RoutingLine."Routing No.", WorkCenter."No.", OperationNo + LibraryRandom.RandInt(20)); // Add the second routing line
+        RoutingLine.GetBySystemId(RoutingLine.SystemId);
+        RoutingLine2.GetBySystemId(RoutingLine2.SystemId);
     end;
 
     local procedure CreateAndRefreshProdOrderWithSpecificItem(var ProductionOrder: Record "Production Order"; ItemNo: Code[20]; Forward: Boolean)
@@ -6260,16 +6262,15 @@ codeunit 137404 "SCM Manufacturing"
         RoutingHeader: Record "Routing Header";
     begin
         RoutingHeader.Get(RoutingLine."Routing No.");
-        RoutingHeader.Validate(Status, RoutingHeader.Status::"Under Development");
-        RoutingHeader.Modify(true);
+        ModifyRoutingStatus(RoutingHeader, Enum::"Routing Status"::"Under Development");
 
         RoutingLine.Validate("No.", WorkCenterNo);
         RoutingLine.Validate("Wait Time", WaitTime);
         RoutingLine.Validate("Wait Time Unit of Meas. Code", CapacityUomCode);
         RoutingLine.Modify(true);
 
-        RoutingHeader.Validate(Status, RoutingHeader.Status::Certified);
-        RoutingHeader.Modify(true);
+        ModifyRoutingStatus(RoutingHeader, Enum::"Routing Status"::Certified);
+        RoutingLine.GetBySystemId(RoutingLine.SystemId);
     end;
 
     local procedure ModifyWorkCenterAndRunTimeOnRoutingLine(var RoutingLine: Record "Routing Line"; WorkCenterNo: Code[20]; CapacityUomCode: Code[10]; RunTime: Integer)
@@ -6285,6 +6286,7 @@ codeunit 137404 "SCM Manufacturing"
         RoutingLine.Modify(true);
 
         ModifyRoutingStatus(RoutingHeader, RoutingHeader.Status::Certified);
+        RoutingLine.GetBySystemId(RoutingLine.SystemId);
     end;
 
     local procedure ModifySetupTimeOnRoutingLine(var RoutingLine: Record "Routing Line"; SetupTime: Decimal)
@@ -6296,6 +6298,7 @@ codeunit 137404 "SCM Manufacturing"
         RoutingLine.Validate("Setup Time", SetupTime);
         RoutingLine.Modify(true);
         ModifyRoutingStatus(RoutingHeader, RoutingHeader.Status::Certified);
+        RoutingLine.GetBySystemId(RoutingLine.SystemId);
     end;
 
     local procedure ModifyWaitTimeOnRoutingLine(var RoutingLine: Record "Routing Line"; WaitTime: Decimal)
@@ -6307,6 +6310,7 @@ codeunit 137404 "SCM Manufacturing"
         RoutingLine.Validate("Wait Time", WaitTime);
         RoutingLine.Modify(true);
         ModifyRoutingStatus(RoutingHeader, RoutingHeader.Status::Certified);
+        RoutingLine.GetBySystemId(RoutingLine.SystemId);
     end;
 
     local procedure ModifyRunTimeOnRoutingLine(var RoutingLine: Record "Routing Line"; RunTime: Decimal)
@@ -6318,6 +6322,7 @@ codeunit 137404 "SCM Manufacturing"
         RoutingLine.Validate("Run Time", RunTime);
         RoutingLine.Modify(true);
         ModifyRoutingStatus(RoutingHeader, RoutingHeader.Status::Certified);
+        RoutingLine.GetBySystemId(RoutingLine.SystemId);
     end;
 
     local procedure ModifyStartingDateOnProdOrderRtngLn(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; Date: Date)
