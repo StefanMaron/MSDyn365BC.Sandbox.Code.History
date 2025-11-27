@@ -343,6 +343,7 @@ codeunit 99000845 "Reservation Management"
         GetItemSetup(CalcReservEntry);
         Positive := EntryIsPositive;
         CalcReservEntry2.SetPointerFilter();
+        OnUpdateReservationOnAfterSetPointerFilter(CalcReservEntry2);
         CallCalcReservedQtyOnPick();
     end;
 
@@ -2869,6 +2870,11 @@ codeunit 99000845 "Reservation Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnAutoReserveItemLedgEntryOnAfterCalcReservQty(CalcItemLedgerEntry: Record "Item Ledger Entry"; QtyThisLine: Decimal; QtyThisLineBase: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateReservationOnAfterSetPointerFilter(var CalcReservationEntry: Record "Reservation Entry")
     begin
     end;
 }
