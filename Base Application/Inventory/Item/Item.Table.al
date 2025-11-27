@@ -2772,6 +2772,8 @@ table 27 Item
         ItemAttributeValueMapping.SetRange("No.", "No.");
         ItemAttributeValueMapping.DeleteAll();
 
+        DeleteItemVariantAttributes();
+
         EntityText.SetRange(Company, CompanyName());
         EntityText.SetRange("Source Table Id", Database::Item);
         EntityText.SetRange("Source System Id", Rec.SystemId);
@@ -3856,6 +3858,14 @@ table 27 Item
     begin
         if UnitGroup.Get(UnitGroup."Source Type"::Item, Rec.SystemId) then
             UnitGroup.Delete();
+    end;
+
+    local procedure DeleteItemVariantAttributes()
+    var
+        ItemVariantAttributeValueMapping: Record "Item Var. Attr. Value Mapping";
+    begin
+        ItemVariantAttributeValueMapping.SetRange("Item No.", "No.");
+        ItemVariantAttributeValueMapping.DeleteAll();
     end;
 
     procedure CalcScheduledReceiptQty() Result: Decimal
