@@ -1559,6 +1559,20 @@ page 30 "Item Card"
                         AdjustInventory.RunModal();
                     end;
                 }
+                action("Update Variant Attributes")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Update Variant Attributes';
+                    Image = Refresh;
+                    ToolTip = 'Keep your item variants up to date with the item. It adds any missing details, updates changes, and removes info that''s no longer needed. Variant-specific details stay as they are';
+
+                    trigger OnAction()
+                    var
+                        ItemAttributeManagement: Codeunit "Item Attribute Management";
+                    begin
+                        ItemAttributeManagement.UpdateItemVariantAttributeFromItem(Rec."No.");
+                    end;
+                }
             }
             action("Requisition Worksheet")
             {
@@ -2449,6 +2463,9 @@ page 30 "Item Card"
                 {
                 }
                 actionref(ApplyTemplate_Promoted; ApplyTemplate)
+                {
+                }
+                actionref("Update Variant Attributes_Promoted"; "Update Variant Attributes")
                 {
                 }
             }

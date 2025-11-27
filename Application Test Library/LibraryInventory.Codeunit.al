@@ -370,6 +370,19 @@ codeunit 132201 "Library - Inventory"
         ItemAttributeValueMapping.Insert(true);
     end;
 
+    procedure CreateItemVariantAttributeValueMapping(ItemCode: Code[20]; VariantCode: Code[10]; AttributeID: Integer; AttributeValueID: Integer; TableID: Integer; KeyValue: Code[20])
+    var
+        ItemVariantAttributeValueMapping: Record "Item Var. Attr. Value Mapping";
+    begin
+        ItemVariantAttributeValueMapping.Validate("Item No.", ItemCode);
+        ItemVariantAttributeValueMapping.Validate("Variant Code", VariantCode);
+        ItemVariantAttributeValueMapping.Validate("Item Attribute ID", AttributeID);
+        ItemVariantAttributeValueMapping.Validate("Item Attribute Value ID", AttributeValueID);
+        ItemVariantAttributeValueMapping.Validate("Inherited-From Table ID", TableID);
+        ItemVariantAttributeValueMapping.Validate("Inherited-From Key Value", KeyValue);
+        ItemVariantAttributeValueMapping.Insert(true);
+    end;
+
     procedure CreateUpdateItemTranslation(ItemNo: Code[20]; VariantCode: Code[10]; LanguageCode: Code[10]; Description: Text[100]; Description2: Text[50])
     var
         ItemTranslation: Record "Item Translation";

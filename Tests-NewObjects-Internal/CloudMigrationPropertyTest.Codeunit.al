@@ -1269,6 +1269,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Item Attr. Value Translation");
         ListOfTablesToMigrate.Add(Database::"Item Attribute Translation");
         ListOfTablesToMigrate.Add(Database::"Item Attribute Value Mapping");
+        ListOfTablesToMigrate.Add(Database::"Item Var. Attr. Value Mapping");
         ListOfTablesToMigrate.Add(Database::"Item Attribute Value Selection");
         ListOfTablesToMigrate.Add(Database::"Item Attribute Value");
         ListOfTablesToMigrate.Add(Database::"Item Attribute");
