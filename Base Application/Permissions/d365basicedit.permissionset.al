@@ -399,6 +399,7 @@ permissionset 208 "D365 Basic - Edit"
                   tabledata "Item Attribute Translation" = IMD,
                   tabledata "Item Attribute Value" = IMD,
                   tabledata "Item Attribute Value Mapping" = IMD,
+                  tabledata "Item Var. Attr. Value Mapping" = IMD,
                   tabledata "Item Attribute Value Selection" = IMD,
                   tabledata "Item Availability Buffer" = IMD,
                   tabledata "Item Budget Buffer" = IMD,
