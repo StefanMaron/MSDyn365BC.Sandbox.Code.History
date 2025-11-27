@@ -24,6 +24,9 @@ codeunit 4516 "OAuth2 SMTP Authentication"
         NoTokenInReposonseErr: Label 'The response does not contain an access token.';
         FailedToParseResponseErr: Label 'Failed to parse the response as JSON.';
         AdminConsentErrLbl: Label 'Consent authorization failed. Please try again or contact your administrator.';
+        TelemetryCategoryLbl: Label 'SMTP OAuth2 Authentication', Locked = true;
+        UsingCustomizedOAuth2TelemetryLbl: Label 'Using customized OAuth2 for SMTP authentication.', Locked = true;
+        UsingDefaultOAuth2TelemetryLbl: Label 'Using default OAuth2 for SMTP authentication.', Locked = true;
 
     /// <summary>
     /// Provide the credentials to authenticate using OAuth 2.0 for Exchange Online mailboxes.
@@ -148,12 +151,17 @@ codeunit 4516 "OAuth2 SMTP Authentication"
         if Handled then
             exit;
         if SMTPServer = SMTPConnectorImpl.GetO365SmtpServer() then begin
-            if SMTPConnectorImpl.CheckIfCustomizedSMTPOAuth(SMTPAuthentication.GetAccountId(), SMTPAccount) then
+            if SMTPConnectorImpl.CheckIfCustomizedSMTPOAuth(SMTPAuthentication.GetAccountId(), SMTPAccount) then begin
                 // if it is customized, use the token stored.
-                GetCustomTenantOAuthToken(UserName, AccessToken, SMTPAccount)
-            else
+                GetCustomTenantOAuthToken(UserName, AccessToken, SMTPAccount);
+                Session.LogMessage('0000QPH', UsingCustomizedOAuth2TelemetryLbl, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryLbl);
+            end
+            else begin
                 // if it is not customized - use the normal way to fetch token
                 GetOAuth2Credentials(UserName, AccessToken);
+                Session.LogMessage('0000QPI', UsingDefaultOAuth2TelemetryLbl, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryLbl);
+            end;
+
             SMTPAuthentication.SetOAuth2AuthInfo(CopyStr(UserName, 1, 250), AccessToken);
             Handled := true;
         end;

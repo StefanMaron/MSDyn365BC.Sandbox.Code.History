@@ -27,7 +27,6 @@ page 4512 "SMTP Account"
         {
             group(General)
             {
-                ShowCaption = false;
                 field(NameField; Rec.Name)
                 {
                     ApplicationArea = All;
@@ -76,7 +75,9 @@ page 4512 "SMTP Account"
                             Rec."User Name" := Rec."Email Address";
                     end;
                 }
-
+            }
+            group("Server settings")
+            {
                 field(ServerUrl; Rec.Server)
                 {
                     ApplicationArea = All;
@@ -107,10 +108,17 @@ page 4512 "SMTP Account"
                     ToolTip = 'Specifies the type of authentication that the SMTP mail server uses.';
 
                     trigger OnValidate()
+                    var
+                        EmptyGuid: Guid;
                     begin
                         SetProperties();
                         if AuthActionsVisible then
                             Message(EveryUserShouldPressAuthenticateMsg);
+                        if Rec."Authentication Type" = Rec."Authentication Type"::"OAuth 2.0" then begin
+                            Rec."Password Key" := EmptyGuid;
+                            Password := '';
+                            Rec.Modify();
+                        end;
                     end;
                 }
 
@@ -163,6 +171,9 @@ page 4512 "SMTP Account"
                                 TenantId := '';
                                 ClientId := '';
                                 ClientSecret := '';
+                            end else begin
+                                Rec."Password Key" := EmptyGuid;
+                                Password := '';
                             end;
                         end;
                     }
@@ -171,7 +182,7 @@ page 4512 "SMTP Account"
             group(OAuth2Group)
             {
                 Visible = (Rec."Authentication Type" = Rec."Authentication Type"::"OAuth 2.0") and CustomOAuth2Settings;
-                caption = 'OAuth 2.0 settings';
+                caption = 'Customized OAuth 2.0 settings';
                 field(ClientId; ClientId)
                 {
                     ApplicationArea = All;
@@ -179,7 +190,10 @@ page 4512 "SMTP Account"
                     ToolTip = 'Specifies the client ID of the third-party application registered in Microsoft Entra (Azure AD).';
                     trigger OnValidate()
                     begin
-                        Rec.SetClientId(ClientId);
+                        if (ClientId <> SecrectContentLbl) and (ClientId <> '') then begin
+                            Rec.SetClientId(ClientId);
+                            ClientId := SecrectContentLbl;
+                        end;
                     end;
                 }
 
@@ -190,7 +204,10 @@ page 4512 "SMTP Account"
                     ToolTip = 'Specifies the client secret associated with the client ID for authenticating the SMTP connection.';
                     trigger OnValidate()
                     begin
-                        Rec.SetClientSecret(ClientSecret);
+                        if (ClientSecret <> SecrectContentLbl) and (ClientSecret <> '') then begin
+                            Rec.SetClientSecret(ClientSecret);
+                            ClientSecret := SecrectContentLbl;
+                        end;
                     end;
                 }
                 field("Tenant Id"; TenantId)
@@ -202,7 +219,10 @@ page 4512 "SMTP Account"
 
                     trigger OnValidate()
                     begin
-                        Rec.Validate("Tenant Id", TenantId);
+                        if (TenantId <> SecrectContentLbl) and (TenantId <> '') then begin
+                            Rec.Validate("Tenant Id", TenantId);
+                            TenantId := SecrectContentLbl;
+                        end;
                     end;
                 }
                 field("Redirect Uri"; Rec."Redirect Uri")
@@ -317,6 +337,7 @@ page 4512 "SMTP Account"
         SenderFieldsEditable: Boolean;
         IsOnPrem: Boolean;
         CustomOAuth2Settings: Boolean;
+        SecrectContentLbl: Label '***', Locked = true;
         ConfirmApplyO365Qst: Label 'Do you want to override the current data?';
         EveryUserShouldPressAuthenticateMsg: Label 'Before people can send email they must authenticate their email account. They can do that by choosing the Authenticate action on the SMTP Account page.';
         ClientIdAndSecretRequiredErr: Label 'To use customized OAuth 2.0 settings, the Client ID, Client Secret and Tenant ID must be provided.';
@@ -327,13 +348,13 @@ page 4512 "SMTP Account"
         Rec.SetCurrentKey(Name);
 
         if not IsNullGuid(Rec."Password Key") then
-            Password := '***';
+            Password := SecrectContentLbl;
         if not IsNullGuid(Rec."Client Id Storage Id") then
-            ClientId := '***';
+            ClientId := SecrectContentLbl;
         if not IsNullGuid(Rec."Client Secret Storage Id") then
-            ClientSecret := '***';
+            ClientSecret := SecrectContentLbl;
         if not IsNullGuid(Rec."Tenant Id") then
-            TenantId := '***';
+            TenantId := SecrectContentLbl;
 
         SetProperties();
     end;

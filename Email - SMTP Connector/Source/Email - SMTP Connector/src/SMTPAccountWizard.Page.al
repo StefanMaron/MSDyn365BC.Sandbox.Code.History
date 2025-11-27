@@ -149,25 +149,18 @@ page 4511 "SMTP Account Wizard"
             {
                 Visible = Step2Visible and CustomOAuthVisible;
                 ShowCaption = false;
-                InstructionalText = 'Do you want to use a custom SMTP server with OAuth 2.0 authentication? (This requires you have an app registration in Microsoft Entra).';
-
+                InstructionalText = 'Do you want to use your own app registration with OAuth 2.0 authentication? (This requires an app registration in Microsoft Entra ID.)';
                 field(Custom; CustomOAuth)
                 {
                     ApplicationArea = All;
-                    Caption = 'Use custom SMTP server';
-                    ToolTip = 'Specifies if you want to set up a custom SMTP server.';
+                    Caption = 'Use custom app registration';
+                    ToolTip = 'Specifies if you want to set up a custom app registration for OAuth 2.0 authentication.';
                 }
             }
 
             // -------------------------
             // STEP 3 : Standard Credentials + Optional Custom OAuth Fields
             // -------------------------
-            group(OAuthInfo)
-            {
-                Visible = Step3Visible and CustomOAuth;
-                ShowCaption = false;
-                InstructionalText = 'Use client ID and secret from your Microsoft Entra application registration.';
-            }
             group(Step3Basic)
             {
                 Visible = Step3Visible;
@@ -185,91 +178,96 @@ page 4511 "SMTP Account Wizard"
                     end;
                 }
 
-                field(Password; Password)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Password';
-                    Editable = PasswordEditable;
-                    ExtendedDatatype = Masked;
-                    ToolTip = 'Specifies the password of the SMTP server.';
-                }
-
                 field(SecureConnection; Rec."Secure Connection")
                 {
                     ApplicationArea = All;
                     Caption = 'Secure Connection';
                     ToolTip = 'Specifies if your SMTP mail server setup requires a secure connection that uses a cryptography or security protocol, such as secure socket layers (SSL). Clear the check box if you do not want to enable this security setting.';
                 }
-            }
-
-            // OAuth fields only shown when: Step3Visible + OAuth2 + CustomOAuth = TRUE
-            group(OAuth)
-            {
-                Visible = Step3Visible and CustomOAuth;
-                ShowCaption = false;
-                group(Secrets)
+                group(PasswordGroup)
                 {
-                    Caption = 'Azure Application registration';
                     ShowCaption = false;
-                    field(ClientId; ClienStorageIdText)
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the Client Id.';
-                        Caption = 'Client Id';
-                        NotBlank = true;
-                        ShowMandatory = true;
-                        trigger OnValidate()
-                        begin
-                            SetClientIdInStorage(Rec);
-                            UpdateVisibility();
-                            if AllOAuthFieldsValid() then
-                                IsNextEnabled := true;
-                        end;
-                    }
+                    Visible = PasswordEditable;
 
-                    field(ClientSecret; ClientSecretStorageIdText)
+                    field(Password; Password)
                     {
                         ApplicationArea = All;
-                        ToolTip = 'Specifies the Client Secret.';
-                        Caption = 'Client Secret';
-                        NotBlank = true;
-                        ShowMandatory = true;
-                        trigger OnValidate()
-                        begin
-                            SetClientSecretInStorage(Rec);
-                            if AllOAuthFieldsValid() then
-                                IsNextEnabled := true;
-                        end;
-                    }
-                    field("Tenant Id"; TenantId)
-                    {
-                        ApplicationArea = All;
-                        ToolTip = 'Specifies the Tenant ID.';
-                        Caption = 'Tenant ID';
-                        NotBlank = true;
-                        ShowMandatory = true;
-                        trigger OnValidate()
-                        begin
-                            Rec.Validate("Tenant Id", TenantId);
-                            TenantId := HiddenValueTxt;
-                            if AllOAuthFieldsValid() then
-                                IsNextEnabled := true;
-                        end;
+                        Caption = 'Password';
+                        Editable = PasswordEditable;
+                        ExtendedDatatype = Masked;
+                        ToolTip = 'Specifies the password of the SMTP server.';
                     }
                 }
-            }
-            group(RedirectUriGroup)
-            {
-                Visible = Step3Visible and CustomOAuth and IsOnPrem;
-                ShowCaption = false;
-                field("Redirect Uri"; Rec."Redirect Uri")
+
+                // OAuth fields only shown when: Step3Visible + OAuth2 + CustomOAuth = TRUE
+                group(OAuth)
                 {
-                    ApplicationArea = All;
-                    Caption = 'Redirect URI';
-                    ToolTip = 'Specifies the redirect URI configured in the app registration in Microsoft Entra (Azure AD). This is required for OnPrem deployments.';
+                    Visible = Step3Visible and CustomOAuth;
+                    ShowCaption = false;
+                    group(Secrets)
+                    {
+                        Caption = 'Azure Application registration';
+                        ShowCaption = false;
+                        InstructionalText = 'Enter client ID and secret from your Microsoft Entra application registration.';
+                        field(ClientId; ClienStorageIdText)
+                        {
+                            ApplicationArea = All;
+                            ToolTip = 'Specifies the Client Id.';
+                            Caption = 'Client Id';
+                            NotBlank = true;
+                            ShowMandatory = true;
+                            trigger OnValidate()
+                            begin
+                                SetClientIdInStorage(Rec);
+                                UpdateVisibility();
+                                if AllOAuthFieldsValid() then
+                                    IsNextEnabled := true;
+                            end;
+                        }
+
+                        field(ClientSecret; ClientSecretStorageIdText)
+                        {
+                            ApplicationArea = All;
+                            ToolTip = 'Specifies the Client Secret.';
+                            Caption = 'Client Secret';
+                            NotBlank = true;
+                            ShowMandatory = true;
+                            trigger OnValidate()
+                            begin
+                                SetClientSecretInStorage(Rec);
+                                if AllOAuthFieldsValid() then
+                                    IsNextEnabled := true;
+                            end;
+                        }
+                        field("Tenant Id"; TenantId)
+                        {
+                            ApplicationArea = All;
+                            ToolTip = 'Specifies the Tenant ID.';
+                            Caption = 'Tenant ID';
+                            NotBlank = true;
+                            ShowMandatory = true;
+                            trigger OnValidate()
+                            begin
+                                Rec.Validate("Tenant Id", TenantId);
+                                TenantId := HiddenValueTxt;
+                                if AllOAuthFieldsValid() then
+                                    IsNextEnabled := true;
+                            end;
+                        }
+                    }
+                }
+                group(RedirectUriGroup)
+                {
+                    Visible = Step3Visible and CustomOAuth and IsOnPrem;
+                    ShowCaption = false;
+                    field("Redirect Uri"; Rec."Redirect Uri")
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Redirect URI';
+                        ToolTip = 'Specifies the redirect URI configured in the app registration in Microsoft Entra (Azure AD). This is required for OnPrem deployments.';
+                    }
                 }
             }
-
             group(HyperLinks)
             {
                 ShowCaption = false;
@@ -368,13 +366,20 @@ page 4511 "SMTP Account Wizard"
 
                 trigger OnAction()
                 begin
-                    if Step3Visible then begin
-                        Step3Visible := false;
-                        Step2Visible := true;
-                        IsNextEnabled := true;
-                        CurrPage.Update();
-                        exit;
-                    end;
+                    if Step3Visible then
+                        if IsOAuthAuth() then begin
+                            Step3Visible := false;
+                            Step2Visible := true;
+                            IsNextEnabled := true;
+                            CurrPage.Update();
+                            exit;
+                        end else begin
+                            Step3Visible := false;
+                            Step1Visible := true;
+                            IsNextEnabled := true;
+                            CurrPage.Update();
+                            exit;
+                        end;
 
                     if Step2Visible then begin
                         Step2Visible := false;

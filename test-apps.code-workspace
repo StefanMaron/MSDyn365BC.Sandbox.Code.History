@@ -10,7 +10,7 @@
       "path": "./BankDeposits/Test/_Exclude_Bank Deposits Tests"
     },
     {
-      "path": "./Shopify/test/Shopify Connector Test/DisabledTests"
+      "path": "./Shopify/test/Shopify Connector Test"
     },
     {
       "path": "./ReportLayouts/Test/Report Layouts Tests"
