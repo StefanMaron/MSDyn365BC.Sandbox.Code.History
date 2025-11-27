@@ -927,6 +927,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Item Attribute Translation" = RM,
                   tabledata "Item Attribute Value" = RIMD,
                   tabledata "Item Attribute Value Mapping" = RM,
+                  tabledata "Item Var. Attr. Value Mapping" = RM,
                   tabledata "Item Attribute Value Selection" = RM,
                   tabledata "Item Availability Buffer" = RIMD,
                   tabledata "Item Availability by Date" = RM,

@@ -517,6 +517,7 @@ permissionset 209 "D365 Basic - Read"
                   tabledata "Item Attribute Translation" = R,
                   tabledata "Item Attribute Value" = R,
                   tabledata "Item Attribute Value Mapping" = R,
+                  tabledata "Item Var. Attr. Value Mapping" = R,
                   tabledata "Item Attribute Value Selection" = R,
                   tabledata "Item Availability Buffer" = R,
                   tabledata "Item Availability by Date" = R,
