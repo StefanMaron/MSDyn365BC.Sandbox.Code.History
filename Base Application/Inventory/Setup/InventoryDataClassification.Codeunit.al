@@ -179,6 +179,7 @@ codeunit 1764 "Inventory-Data Classification"
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Item Attr. Value Translation");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Item Attribute Value Selection");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Item Attribute Value Mapping");
+        DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Item Var. Attr. Value Mapping");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Planning Component");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Item Availability Line");
         DataClassificationMgt.SetTableFieldsToNormal(DATABASE::"Planning Assignment");

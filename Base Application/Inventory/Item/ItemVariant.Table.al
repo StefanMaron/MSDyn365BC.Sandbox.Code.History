@@ -6,6 +6,7 @@ namespace Microsoft.Inventory.Item;
 
 using Microsoft.Assembly.Document;
 using Microsoft.Inventory.BOM;
+using Microsoft.Inventory.Item.Attribute;
 using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Inventory.Item.Substitution;
 using Microsoft.Inventory.Journal;
@@ -123,10 +124,19 @@ table 5401 "Item Variant"
         }
     }
 
+    trigger OnInsert()
+    var
+        ItemAttributeManagement: Codeunit "Item Attribute Management";
+    begin
+        if not IsTemporary then
+            ItemAttributeManagement.InheritAttributesFromItem(Rec, Rec."Item No.");
+    end;
+
     trigger OnRename()
     var
         SalesLine: Record "Sales Line";
         PurchaseLine: Record "Purchase Line";
+        ItemVariantAttributeValueMapping: Record "Item Var. Attr. Value Mapping";
     begin
         if xRec."Item No." <> "Item No." then begin
             SalesLine.SetRange(Type, SalesLine.Type::Item);
@@ -141,6 +151,8 @@ table 5401 "Item Variant"
             if not PurchaseLine.IsEmpty() then
                 Error(CannotRenameItemUsedInPurchaseLinesErr, FieldCaption("Item No."), TableCaption());
         end;
+
+        ItemVariantAttributeValueMapping.RenameItemVariantAttributeMapping(xRec."Item No.", xRec.Code, "Item No.", Code);
     end;
 
     trigger OnDelete()
@@ -268,6 +280,8 @@ table 5401 "Item Variant"
         PlanningAssignment.SetRange("Variant Code", Code);
         PlanningAssignment.DeleteAll();
 
+        DeleteItemVariantAttributes();
+
         OnAfterOnDelete(Rec);
     end;
 
@@ -294,6 +308,15 @@ table 5401 "Item Variant"
             exit;
 
         "Item Id" := Item.SystemId;
+    end;
+
+    local procedure DeleteItemVariantAttributes()
+    var
+        ItemVariantAttributeValueMapping: Record "Item Var. Attr. Value Mapping";
+    begin
+        ItemVariantAttributeValueMapping.SetRange("Item No.", "Item No.");
+        ItemVariantAttributeValueMapping.SetRange("Variant Code", Code);
+        ItemVariantAttributeValueMapping.DeleteAll();
     end;
 
     [IntegrationEvent(false, false)]
