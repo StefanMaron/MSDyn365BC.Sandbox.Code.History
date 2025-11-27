@@ -940,6 +940,7 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Item Attribute Translation" = RIMD,
                   tabledata "Item Attribute Value" = RIMD,
                   tabledata "Item Attribute Value Mapping" = RIMD,
+                  tabledata "Item Var. Attr. Value Mapping" = RIMD,
                   tabledata "Item Attribute Value Selection" = RIMD,
                   tabledata "Item Availability Buffer" = RIMD,
                   tabledata "Item Availability by Date" = RIMD,
