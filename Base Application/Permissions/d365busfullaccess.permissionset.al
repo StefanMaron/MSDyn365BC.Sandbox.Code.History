@@ -506,6 +506,7 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Item Attribute" = RIMD,
                   tabledata "Item Attribute Translation" = RIMD,
                   tabledata "Item Attribute Value" = RIMD,
+                  tabledata "Item Var. Attr. Value Mapping" = RIMD,
                   tabledata "Item Attribute Value Selection" = RIMD,
                   tabledata "Item Availability Buffer" = RIMD,
                   tabledata "Item Availability by Date" = RIM,
