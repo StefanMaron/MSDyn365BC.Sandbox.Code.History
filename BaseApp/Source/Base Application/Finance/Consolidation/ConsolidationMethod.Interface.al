@@ -4,10 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.Consolidation;
 
-/// <summary>
-/// Defines the consolidation processing interface for different consolidation methods.
-/// Enables custom consolidation algorithms and data processing strategies.
-/// </summary>
 interface "Consolidation Method"
 {
     Access = Public;

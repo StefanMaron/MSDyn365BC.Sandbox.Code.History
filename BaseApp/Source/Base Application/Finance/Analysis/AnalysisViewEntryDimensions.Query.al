@@ -4,10 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.Analysis;
 
-/// <summary>
-/// Query for aggregating analysis view entry amounts by dimension combinations.
-/// Provides dimension-based grouping and amount summation for analysis reporting and matrix displays.
-/// </summary>
 query 252 "Analysis View Entry Dimensions"
 {
     Caption = 'Analysis View Entry Dimensions';
