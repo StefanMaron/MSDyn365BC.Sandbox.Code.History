@@ -28,10 +28,10 @@ codeunit 570 "G/L Account Category Mgt."
     var
         BalanceColumnNameTxt: Label 'M-BALANCE', Comment = 'Max 10 char';
         BalanceColumnDescTxt: Label 'Balance', Comment = 'Max 10 char';
-        BalanceColumnInternalDescTxt: Label 'Single-column layout showing balance-at-date using ledger net amounts. Useful for point-in-time balances, financial position, reconciliations, and snapshot reporting of assets, liabilities, or equity.', MaxLength = 250;
+        BalanceColumnInternalDescTxt: Label 'Single-column layout showing balance-at-date using ledger net amounts. Useful for point-in-time balances, financial position, reconciliations, and snapshot reporting of assets, liabilities, or equity.', MaxLength = 210;
         NetChangeColumnNameTxt: Label 'M-NETCHANG', Comment = 'Max 10 char';
         NetChangeColumnDescTxt: Label 'Net Change', Comment = 'Max 10 char';
-        NetChangeColumnInternalDescTxt: Label 'Single-column layout showing period net change from ledger entries (Net Amount). Useful for reporting activity, income statement movements, variance analysis, and tracking transaction-driven account changes.', MaxLength = 250;
+        NetChangeColumnInternalDescTxt: Label 'Single-column layout showing period net change from ledger entries (Net Amount). Useful for reporting activity, income statement movements, variance analysis, and tracking transaction-driven account changes.', MaxLength = 210;
         BalanceSheetCodeTxt: Label 'M-BALANCE', Comment = 'Max 10 char';
         BalanceSheetDescTxt: Label 'Balance Sheet', Comment = 'Max 80 chars';
         IncomeStmdCodeTxt: Label 'M-INCOME', Comment = 'Max 10 chars';
@@ -83,7 +83,7 @@ codeunit 570 "G/L Account Category Mgt."
         JobSalesContraTxt: Label 'Job Sales Contra';
         OverwriteConfirmationQst: Label 'How do you want to generate standard financial reports?';
         GenerateAccountSchedulesOptionsTxt: Label 'Keep existing financial reports with their row definitions and create new ones.,Overwrite existing financial reports and row defintions.';
-        GeneratedFromGLAccountCategoriesPageTxt: Label 'Generated from G/L Account Categories.';
+        GeneratedFromGLAccountCategoriesPageTxt: Label 'Generated from G/L Account Categories.', MaxLength = 40;
         CreateAccountScheduleForBalanceSheet: Boolean;
         CreateAccountScheduleForIncomeStatement: Boolean;
         CreateAccountScheduleForCashFlowStatement: Boolean;
