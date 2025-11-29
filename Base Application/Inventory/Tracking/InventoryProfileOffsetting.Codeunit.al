@@ -1381,6 +1381,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
             IncrementLastProjectedInventory := true;
             OnStartOfPrePlanDateApplicationLoop(SupplyInvtProfile, DemandInvtProfile, SupplyExists, DemandExists, IncrementLastProjectedInventory);
             if DemandInvtProfile."Untracked Quantity" > SupplyInvtProfile."Untracked Quantity" then begin
+                OnPlanItemCalcInitialInventoryOnBeforeChechkIncrementLastProjectedInventory(SupplyInvtProfile, DemandInvtProfile, SupplyExists, DemandExists, IncrementLastProjectedInventory, LastProjectedInventory);
                 if IncrementLastProjectedInventory then
                     LastProjectedInventory += SupplyInvtProfile."Remaining Quantity (Base)";
                 DemandInvtProfile."Untracked Quantity" -= SupplyInvtProfile."Untracked Quantity";
@@ -5947,6 +5948,11 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSumUpAvailableSupply(var SupplyInventoryProfile: Record "Inventory Profile"; var FromDate: Date; var ToDate: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPlanItemCalcInitialInventoryOnBeforeChechkIncrementLastProjectedInventory(var SupplyInventoryProfile: Record "Inventory Profile"; var DemandInventoryProfile: Record "Inventory Profile"; var SupplyExists: Boolean; var DemandExists: Boolean; var IncrementLastProjectedInventory: Boolean; var LastProjectedInventory: Decimal)
     begin
     end;
 }
