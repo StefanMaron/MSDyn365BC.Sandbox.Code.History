@@ -2041,35 +2041,42 @@ codeunit 99000845 "Reservation Management"
         RemainingQtyToReserve: Decimal;
         RemainingQtyToReserveBase: Decimal;
         StopReservation: Boolean;
+        IsHandled: Boolean;
     begin
-        CalcReservEntry.TestField("Source Type");
+        IsHandled := false;
+        OnBeforeAutoReserveToShip(IsHandled, FullAutoReservation, Description, AvailabilityDate, QuantityToShip, QuantityToShipBase);
+        if not IsHandled then begin            
+            CalcReservEntry.TestField("Source Type");
 
-        if CalcReservEntry."Source Type" in [1 /*Sales*/, 3 /* Purchase*/]
-        then
-            StopReservation := not (CalcReservEntry."Source Subtype" in [1, 2, 5]); // Only invoice, order and return order
+            if CalcReservEntry."Source Type" in [1 /*Sales*/, 3 /* Purchase*/]
+            then
+                StopReservation := not (CalcReservEntry."Source Subtype" in [1, 2, 5]); // Only invoice, order and return order
 
-        if CalcReservEntry."Source Type" in [7 /*Prod. Order Line"*/, 8 /* Prod. Order Component */]
-        then
-            StopReservation := CalcReservEntry."Source Subtype" < 2; // Not simulated or planned
+            if CalcReservEntry."Source Type" in [7 /*Prod. Order Line"*/, 8 /* Prod. Order Component */]
+            then
+                StopReservation := CalcReservEntry."Source Subtype" < 2; // Not simulated or planned
 
-        if StopReservation then begin
-            FullAutoReservation := true;
-            exit;
-        end;
+            if StopReservation then begin
+                FullAutoReservation := true;
+                exit;
+            end;
 
-        RemainingQtyToReserve := QuantityToShip;
-        RemainingQtyToReserveBase := QuantityToShipBase;
-        FullAutoReservation := false;
+            RemainingQtyToReserve := QuantityToShip;
+            RemainingQtyToReserveBase := QuantityToShipBase;
+            FullAutoReservation := false;
 
-        if RemainingQtyToReserve = 0 then begin
-            FullAutoReservation := true;
-            exit;
-        end;
+            if RemainingQtyToReserve = 0 then begin
+                FullAutoReservation := true;
+                exit;
+            end;
 
-        SetValueArray(0);
-        AutoReserveOneLine(ValueArray[1], RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate);
+            SetValueArray(0);
+            AutoReserveOneLine(ValueArray[1], RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate);
 
-        FullAutoReservation := (RemainingQtyToReserve = 0);
+            FullAutoReservation := (RemainingQtyToReserve = 0);
+        end; 
+
+        OnAfterAutoReserveToShip(FullAutoReservation, Description, AvailabilityDate, QuantityToShip, QuantityToShipBase);
     end;
 
     local procedure CalcCurrLineReservQtyOnPicksShips(ReservationEntry: Record "Reservation Entry"): Decimal
@@ -2877,4 +2884,14 @@ codeunit 99000845 "Reservation Management"
     local procedure OnUpdateReservationOnAfterSetPointerFilter(var CalcReservationEntry: Record "Reservation Entry")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeAutoReserveToShip(var IsHandled: Boolean; var FullAutoReservation: Boolean; Description: Text[100]; AvailabilityDate: Date; QuantityToShip: Decimal; QuantityToShipBase: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterAutoReserveToShip(var FullAutoReservation: Boolean; Description: Text[100]; AvailabilityDate: Date; QuantityToShip: Decimal; QuantityToShipBase: Decimal)
+    begin
+    end;    
 }
