@@ -1757,7 +1757,7 @@ table 167 Job
         JobPlanningLine.LockTable();
         if JobPlanningLine.Find('-') then
             repeat
-                OnCurrencyUpdatePlanningLinesOnBeforeUpdateJobPlanningLine(Job, JobPlanningLine);
+                OnCurrencyUpdatePlanningLinesOnBeforeUpdateJobPlanningLine(Rec, JobPlanningLine);
                 if JobPlanningLine."Qty. Transferred to Invoice" <> 0 then
                     Error(AssociatedEntriesExistErr, FieldCaption("Currency Code"), TableCaption);
                 JobPlanningLine.Validate("Currency Code", "Currency Code");
