@@ -2868,7 +2868,7 @@ table 83 "Item Journal Line"
         ValueEntry.Reset();
         ValueEntry.SetCurrentKey("Item Ledger Entry No.");
         ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgEntry."Entry No.");
-        if CostCalcMgt.CanIncNonInvCostIntoProductionItem() then begin
+        if CostCalcMgt.CanIncNonInvCostIntoProductionItem() or Item.IsNonInventoriableType() then begin
             ValueEntry.CalcSums("Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)");
             UnitCost2 := (ValueEntry."Cost Amount (Expected)" + ValueEntry."Cost Amount (Actual)" + ValueEntry."Cost Amount (Non-Invtbl.)") / ItemLedgEntry.Quantity
         end else begin
