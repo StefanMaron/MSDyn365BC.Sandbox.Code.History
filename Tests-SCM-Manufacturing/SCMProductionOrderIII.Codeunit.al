@@ -7695,6 +7695,41 @@ codeunit 137079 "SCM Production Order III"
             StrSubstNo(ValueMustBeEqualErr, CapacityLedgerEntry[1].FieldCaption(Reversed), true, CapacityLedgerEntry[1].TableCaption()));
     end;
 
+    [Test]
+    [HandlerFunctions('ConfirmHandler,MessageHandlerWithoutValidation,ProductionJournalPageHandler3')]
+    procedure ReversalProductionConsumptionForNonInventoryItemWithCost()
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        ProdOrderComponent: Record "Prod. Order Component";
+        ItemLedgerEntries: TestPage "Item Ledger Entries";
+    begin
+        // [SCENARIO 608995] Reversal of production consumption of non-inv item reverses the Non-Inv Cost.
+        Initialize();
+
+        // [GIVEN] Create Production Order With Component.
+        CreateProdOrderAddNewComponentAndCreateConsumption(ProdOrderComponent);
+
+        // [GIVEN] Post Consumption Journal Line for this Component.
+        LibraryInventory.PostItemJournalLine(ConsumptionItemJournalTemplate.Name, ConsumptionItemJournalBatch.Name);
+
+        // [GIVEN] OpenEdit Item Ledger Entries.
+        ItemLedgerEntries.OpenEdit();
+        ItemLedgerEntries.Filter.SetFilter("Document No.", ProdOrderComponent."Prod. Order No.");
+        ItemLedgerEntries.Filter.SetFilter("Entry Type", Format(ItemLedgerEntry."Entry Type"::Consumption));
+
+        // [WHEN] Invoke "Reverse" action.
+        ItemLedgerEntries.Reverse.Invoke();
+
+        // [THEN] Verify Reverse Entry is reversed of Item Ledger Entry with Non-Inventory Cost.
+        ItemLedgerEntry.SetRange("Order Type", "Inventory Order Type"::Production);
+        ItemLedgerEntry.SetRange("Order No.", ProdOrderComponent."Prod. Order No.");
+        ItemLedgerEntry.SetRange("Order Line No.", ProdOrderComponent."Prod. Order Line No.");
+        ItemLedgerEntry.SetRange("Entry Type", "Item Ledger Entry Type"::Consumption);
+        ItemLedgerEntry.SetFilter("Cost Amount (Non-Invtbl.)", '<>0');
+        ItemLedgerEntry.FindLast();
+        Assert.RecordIsNotEmpty(ItemLedgerEntry);
+    end;
+
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"SCM Production Order III");
@@ -10630,6 +10665,73 @@ codeunit 137079 "SCM Production Order III"
         ReservationEntry.SetRange("Source Type", SourceType);
         ReservationEntry.SetRange("Reservation Status", ReservationStatus);
         Assert.IsFalse(ReservationEntry.IsEmpty(), StrSubstNo(ReservationEntryMustExistErr, ReservationEntry.TableCaption));
+    end;
+
+    local procedure CreateProdOrderAddNewComponentAndCreateConsumption(var ProdOrderComponent: Record "Prod. Order Component")
+    var
+        Location: Record Location;
+        ProductionOrder: Record "Production Order";
+        Item: Record Item;
+        ChildItem: Record Item;
+        ProdOrderLine: Record "Prod. Order Line";
+        InventoryPostingSetup: Record "Inventory Posting Setup";
+    begin
+        LibraryWarehouse.CreateLocation(Location);
+        CreateNonInventoryItemSetup(Item, ChildItem, LibraryRandom.RandInt(10));
+
+        CreateAndRefreshReleasedProductionOrder(ProductionOrder, Item."No.", LibraryRandom.RandInt(10), Location.Code, '');
+
+        ProdOrderLine.SetRange(Status, ProductionOrder.Status);
+        ProdOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+        ProdOrderLine.SetRange("Item No.", Item."No.");
+        ProdOrderLine.FindFirst();
+
+        CreateInventoryPostingSetup(InventoryPostingSetup, ProdOrderLine."Location Code", ProdOrderLine."Inventory Posting Group");
+
+        LibraryManufacturing.CreateProductionOrderComponent(
+            ProdOrderComponent,
+            ProdOrderLine.Status,
+            ProdOrderLine."Prod. Order No.",
+            ProdOrderLine."Line No.");
+        ProdOrderComponent.Validate("Item No.", ChildItem."No.");
+        ProdOrderComponent.Validate("Quantity per", LibraryRandom.RandInt(1));
+        ProdOrderComponent.Modify(true);
+
+        LibraryManufacturing.OpenProductionJournal(ProductionOrder, ProdOrderLine."Line No.");
+    end;
+
+    local procedure CreateNonInventoryItemSetup(var Item: Record Item; var Item2: Record Item; QuantityPer: Decimal)
+    var
+        ProductionBOMHeader: Record "Production BOM Header";
+    begin
+        // Create Child Item.
+        CreateItem(Item2);
+        Item2.Validate(Type, Item2.Type::"Non-Inventory");
+        Item2.Modify(true);
+
+        // Create Production BOM, Parent Item and attach Production BOM.
+        CreateCertifiedProductionBOM(ProductionBOMHeader, Item2, QuantityPer);
+        CreateProductionItem(Item, ProductionBOMHeader."No.");
+    end;
+
+    local procedure CreateInventoryPostingSetup(var InventoryPostingSetup: Record "Inventory Posting Setup"; LocationCode: Code[10]; InventoryPostingGroupCode: Code[20])
+    var
+        Location: Record Location;
+    begin
+        LibraryInventory.CreateInventoryPostingSetup(InventoryPostingSetup, LocationCode, InventoryPostingGroupCode);
+
+        InventoryPostingSetup."Inventory Account" := LibraryERM.CreateGLAccountNo();
+        InventoryPostingSetup."Inventory Account (Interim)" := LibraryERM.CreateGLAccountNo();
+        InventoryPostingSetup."WIP Account" := LibraryERM.CreateGLAccountNo();
+        InventoryPostingSetup."Material Variance Account" := LibraryERM.CreateGLAccountNo();
+        InventoryPostingSetup."Capacity Variance Account" := LibraryERM.CreateGLAccountNo();
+        InventoryPostingSetup."Mfg. Overhead Variance Account" := LibraryERM.CreateGLAccountNo();
+        InventoryPostingSetup."Cap. Overhead Variance Account" := LibraryERM.CreateGLAccountNo();
+        InventoryPostingSetup."Subcontracted Variance Account" := LibraryERM.CreateGLAccountNo();
+        InventoryPostingSetup."View All Accounts on Lookup" := true;
+        InventoryPostingSetup.Modify();
+        Location.Get(InventoryPostingSetup."Location Code");
+        LibraryInventory.UpdateInventoryPostingSetup(Location);
     end;
 
     [PageHandler]
