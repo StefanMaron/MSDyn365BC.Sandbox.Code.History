@@ -2469,7 +2469,7 @@ table 83 "Item Journal Line"
     procedure LookupShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
-        DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, "Dimension Set ID");
+        ValidateShortcutDimCode(FieldNumber, ShortcutDimCode);
     end;
 
     /// <summary>
@@ -2504,7 +2504,7 @@ table 83 "Item Journal Line"
     procedure LookupNewShortcutDimCode(FieldNumber: Integer; var NewShortcutDimCode: Code[20])
     begin
         DimMgt.LookupDimValueCode(FieldNumber, NewShortcutDimCode);
-        DimMgt.ValidateShortcutDimValues(FieldNumber, NewShortcutDimCode, "New Dimension Set ID");
+        ValidateNewShortcutDimCode(FieldNumber, NewShortcutDimCode);
     end;
 
     /// <summary>
