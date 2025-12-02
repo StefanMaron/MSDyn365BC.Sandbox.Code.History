@@ -3940,8 +3940,6 @@ table 39 "Purchase Line"
         if not HasPurchHeader then
             Error(CannotInsertPurchLineWithoutHeaderErr);
 
-        EnsurePositiveLineNo();
-
         if Quantity <> 0 then begin
             OnBeforeVerifyReservedQty(Rec, xRec, 0);
             PurchLineReserve.VerifyQuantity(Rec, xRec);
@@ -3978,20 +3976,6 @@ table 39 "Purchase Line"
     trigger OnRename()
     begin
         Error(Text000, TableCaption);
-    end;
-
-    local procedure EnsurePositiveLineNo()
-    var
-        PurchaseLine: Record "Purchase Line";
-        MaxLineNo: Integer;
-    begin
-        if "Line No." < 0 then begin
-            PurchaseLine.SetRange("Document Type", "Document Type");
-            PurchaseLine.SetRange("Document No.", "Document No.");
-            if PurchaseLine.FindLast() then
-                MaxLineNo := PurchaseLine."Line No.";
-            "Line No." := MaxLineNo + 10000;
-        end;
     end;
 
     var
