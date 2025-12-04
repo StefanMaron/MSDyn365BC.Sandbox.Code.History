@@ -1,3 +1,4 @@
+#if not CLEAN28
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -23,9 +24,12 @@ report 9 "Trial Balance/Budget"
     DefaultLayout = RDLC;
     RDLCLayout = './Finance/GeneralLedger/Reports/TrialBalanceBudget.rdlc';
     ApplicationArea = Basic, Suite;
-    Caption = 'Trial Balance/Budget';
+    Caption = 'Trial Balance/Budget (Obsolete)';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This report has been replaced by the report Trial Balance/Budget (Excel). This report will be removed in a future release.';
+    ObsoleteTag = '28.0';
 
     dataset
     {
@@ -245,8 +249,8 @@ report 9 "Trial Balance/Budget"
 
     requestpage
     {
-        AboutTitle = 'About Trial Balance/Budget';
-        AboutText = 'View a snapshot of your chart of accounts to check the debit and credit net change and closing balance compared to the budget. Shows the percentage of actual vs. budget.';
+        AboutTitle = 'About Trial Balance/Budget (Obsolete)';
+        AboutText = 'View a snapshot of your chart of accounts to check the debit and credit net change and closing balance compared to the budget. Shows the percentage of actual vs. budget.** This report is obsolete and will be removed in a future release.** Please refer to the report documentation for alternative ways to retrieve this information.';
 
         layout
         {
@@ -321,3 +325,4 @@ report 9 "Trial Balance/Budget"
         GLFilter: Text;
 }
 
+#endif
