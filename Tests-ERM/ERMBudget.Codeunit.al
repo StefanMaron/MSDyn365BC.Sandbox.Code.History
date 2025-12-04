@@ -903,34 +903,6 @@ codeunit 134922 "ERM Budget"
     end;
 
     [Test]
-    [HandlerFunctions('TrialBalanceBudgetCancelRequestPageHandler')]
-    [Scope('OnPrem')]
-    procedure CallTrialBalanceReportFromBudgetPage()
-    var
-        Budget: TestPage Budget;
-    begin
-        // [FEATURE] [UI]
-        Budget.OpenView();
-        Assert.IsTrue(Budget.ReportTrialBalance.Enabled(), Budget.Caption);
-        Assert.IsTrue(Budget.ReportTrialBalance.Visible(), Budget.Caption);
-        Budget.ReportTrialBalance.Invoke();
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceBudgetCancelRequestPageHandler')]
-    [Scope('OnPrem')]
-    procedure CallTrialBalanceReportFromGLBudgetNamesPage()
-    var
-        GLBudgetNames: TestPage "G/L Budget Names";
-    begin
-        // [FEATURE] [UI]
-        GLBudgetNames.OpenView();
-        Assert.IsTrue(GLBudgetNames.ReportTrialBalance.Visible(), GLBudgetNames.Caption);
-        Assert.IsTrue(GLBudgetNames.ReportTrialBalance.Enabled(), GLBudgetNames.Caption);
-        GLBudgetNames.ReportTrialBalance.Invoke();
-    end;
-
-    [Test]
     [HandlerFunctions('ExportBudgettoExcelRequestPageHandler')]
     [Scope('OnPrem')]
     procedure CheckPeriodLengthExportBudgettoExcelReqPage()
@@ -3626,13 +3598,6 @@ codeunit 134922 "ERM Budget"
         LibraryVariableStorage.Enqueue(PurchaseBudgetOverview.MATRIX.Field1.AsDecimal());
         PurchaseBudgetOverview.CurrentBudgetName.SetValue(FindAnotherItemBudgetName(PurchaseBudgetOverview.CurrentBudgetName.Value));
         LibraryVariableStorage.Enqueue(PurchaseBudgetOverview.MATRIX.Field1.AsDecimal());
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure TrialBalanceBudgetCancelRequestPageHandler(var TrialBalanceBudget: TestRequestPage "Trial Balance/Budget")
-    begin
-        TrialBalanceBudget.Cancel().Invoke();
     end;
 
     local procedure FindAnotherItemBudgetName(CurrentBudgetName: Code[10]): Code[10]
