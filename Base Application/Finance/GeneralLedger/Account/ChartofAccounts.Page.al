@@ -585,16 +585,21 @@ page 16 "Chart of Accounts"
                 RunObject = Report "Detail Trial Balance";
                 ToolTip = 'View a detail trial balance for the general ledger accounts that you specify.';
             }
+#if not CLEAN28
             action("Trial Balance")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Trial Balance';
+                Caption = 'Trial Balance (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Trial Balance";
                 ToolTip = 'View the chart of accounts that have balances and net changes.';
                 AboutTitle = 'Get the financial overview';
                 AboutText = 'With the **Trial Balance** reports you get the balance sheet, income statement, or the full trial balance.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Trial Balance (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Trial Balance by Period")
             {
                 ApplicationArea = Basic, Suite;
@@ -716,9 +721,14 @@ page 16 "Chart of Accounts"
                 actionref("Detail Trial Balance_Promoted"; "Detail Trial Balance")
                 {
                 }
+#if not CLEAN28
                 actionref("Trial Balance_Promoted"; "Trial Balance")
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report has been replaced by the report Trial Balance (Excel). This report will be removed in a future release.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 actionref(Action1900210206_Promoted; Action1900210206)
                 {
                 }
