@@ -93,14 +93,19 @@ page 9003 "Acc. Receivables Adm. RC"
                 RunObject = Report "Customer - Balance to Date";
                 ToolTip = 'View a list with customers'' payment history up until a certain date. You can use the report to extract your total sales income at the close of an accounting period or fiscal year.';
             }
+#if not CLEAN28
             action("Aged Accounts Receivable")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Aged Accounts Receivable';
+                Caption = 'Aged Accounts Receivable (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Aged Accounts Receivable NA";
                 ToolTip = 'View an overview of when your receivables from customers are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Aged Accounts Receivable (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Customer - &Summary Aging Simp.")
             {
                 ApplicationArea = Suite;

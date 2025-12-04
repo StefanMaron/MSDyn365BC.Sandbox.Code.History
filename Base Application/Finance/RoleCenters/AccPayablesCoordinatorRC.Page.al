@@ -77,14 +77,19 @@ page 9002 "Acc. Payables Coordinator RC"
     {
         area(reporting)
         {
+#if not CLEAN28
             action("&Vendor - List")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = '&Vendor - List';
+                Caption = '&Vendor - List (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Vendor - List";
                 ToolTip = 'View the list of your vendors.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Vendor - Listing")
             {
                 Caption = 'Vendor - Listing';
@@ -130,14 +135,19 @@ page 9002 "Acc. Payables Coordinator RC"
                 RunObject = Report "Vendor - Purchase List";
                 ToolTip = 'View a list of your purchases in a period, for example, to report purchase activity to customs and tax authorities.';
             }
+#if not CLEAN28
             action("Pa&yments on Hold")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Pa&yments on Hold';
+                Caption = 'Pa&yments on Hold (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Payments on Hold";
                 ToolTip = 'View a list of all vendor ledger entries on which the On Hold field is marked.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Vendor Purchase Statistics")
             {
                 ApplicationArea = Suite;
