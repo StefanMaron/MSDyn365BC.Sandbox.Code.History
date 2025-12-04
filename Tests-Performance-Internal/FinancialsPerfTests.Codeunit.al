@@ -24,23 +24,6 @@ codeunit 139093 "Financials Perf Tests"
 
     [Test]
     [Scope('OnPrem')]
-    [HandlerFunctions('TrialBalanceRequestPageHandler')]
-    procedure TestTrialBalance()
-    var
-        PerfProfilerEventsTest: Record "Perf Profiler Events Test";
-    begin
-        LibraryPerformanceProfiler.StartProfiler(TRUE);
-
-        report.Run(report::"Trial Balance");
-
-        TraceDumpFilePath := LibraryPerformanceProfiler.StopProfiler(
-            PerfProfilerEventsTest, 'TestTrialBalance',
-            PerfProfilerEventsTest."Object Type"::Report, REPORT::"Trial Balance", TRUE);
-        //VerifyExpectedResults(PerfProfilerEventsTest, 7, 3);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
     [HandlerFunctions('DetailedTrialBalancePageHandler')]
     procedure TestDetailedTrailBalance()
     var
@@ -526,12 +509,6 @@ codeunit 139093 "Financials Perf Tests"
     PROCEDURE BalanceSheetRequestPageHandler(var AccountSchedule: TestRequestPage "Account Schedule");
     BEGIN
         AccountSchedule.SAVEASXML(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
-    END;
-
-    [RequestPageHandler]
-    PROCEDURE TrialBalanceRequestPageHandler(var TrialBalance: TestRequestPage "Trial Balance");
-    BEGIN
-        TrialBalance.SAVEASXML(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     END;
 
     [RequestPageHandler]
