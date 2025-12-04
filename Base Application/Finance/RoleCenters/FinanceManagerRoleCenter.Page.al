@@ -509,20 +509,28 @@ page 8901 "Finance Manager Role Center"
                             RunObject = report "Account Schedule";
                             Tooltip = 'Run the Account Schedule report.';
                         }
+#if not CLEAN28
                         action("Trial Balance")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'Trial Balance';
+                            Caption = 'Trial Balance (Obsolete)';
                             RunObject = report "Trial Balance";
                             Tooltip = 'Run the Trial Balance report.';
+                            ObsoleteState = Pending;
+                            ObsoleteReason = 'This report has been replaced by the report Trial Balance (Excel). This report will be removed in a future release.';
+                            ObsoleteTag = '28.0';
                         }
                         action("Trial Balance/Budget")
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'Trial Balance/Budget';
+                            Caption = 'Trial Balance/Budget (Obsolete)';
                             RunObject = report "Trial Balance/Budget";
                             Tooltip = 'Run the Trial Balance/Budget report.';
+                            ObsoleteState = Pending;
+                            ObsoleteReason = 'This report has been replaced by the report Trial Balance/Budget (Excel). This report will be removed in a future release.';
+                            ObsoleteTag = '28.0';
                         }
+#endif
                         action("Trial Balance/Previous Year")
                         {
                             ApplicationArea = Basic, Suite;
@@ -1416,13 +1424,18 @@ page 8901 "Finance Manager Role Center"
                         RunObject = report "Customer - Labels";
                         Tooltip = 'Run the Customer Labels report.';
                     }
+#if not CLEAN28
                     action("Customer - Top 10 List")
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Customer Top 10 List';
+                        Caption = 'Customer Top 10 List (Obsolete)';
                         RunObject = report "Customer - Top 10 List";
                         Tooltip = 'Run the Customer Top 10 List report.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report has been replaced by the report Customer - Top List (Excel). This report will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     action("Sales Statistics")
                     {
                         ApplicationArea = Basic, Suite;
@@ -1458,13 +1471,18 @@ page 8901 "Finance Manager Role Center"
                         RunObject = report "Customer - Sales List";
                         Tooltip = 'Run the Customer - Sales List report.';
                     }
+#if not CLEAN28
                     action("Aged Accounts Receivable")
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Aged Accounts Receivable';
+                        Caption = 'Aged Accounts Receivable (Obsolete)';
                         RunObject = report "Aged Accounts Receivable";
                         Tooltip = 'Run the Aged Accounts Receivable report.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report has been replaced by the report Aged Accounts Receivable (Excel). This report will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     action("Customer - Trial Balance")
                     {
                         ApplicationArea = Basic, Suite;
@@ -1650,20 +1668,28 @@ page 8901 "Finance Manager Role Center"
                 group("Group40")
                 {
                     Caption = 'Reports';
+#if not CLEAN28
                     action("Aged Accounts Payable")
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Aged Accounts Payable';
+                        Caption = 'Aged Accounts Payable (Obsolete)';
                         RunObject = report "Aged Accounts Payable";
                         Tooltip = 'Run the Aged Accounts Payable report.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report has been replaced by the report Aged Accounts Payable (Excel). This report will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
                     action("Payments on Hold")
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Payments on Hold';
+                        Caption = 'Payments on Hold (Obsolete)';
                         RunObject = report "Payments on Hold";
                         Tooltip = 'Run the Payments on Hold report.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     action("Purchase Statistics")
                     {
                         ApplicationArea = Basic, Suite;
@@ -1706,13 +1732,18 @@ page 8901 "Finance Manager Role Center"
                         RunObject = report "Vendor - Labels";
                         Tooltip = 'Run the Vendor - Labels report.';
                     }
+#if not CLEAN28
                     action("Vendor - List")
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Vendor - List';
+                        Caption = 'Vendor - List (Obsolete)';
                         RunObject = report "Vendor - List";
                         Tooltip = 'Run the Vendor - List report.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     action("Vendor - Order Detail")
                     {
                         ApplicationArea = Basic, Suite;
@@ -1734,20 +1765,28 @@ page 8901 "Finance Manager Role Center"
                         RunObject = report "Vendor - Purchase List";
                         Tooltip = 'Run the Vendor - Purchase List report.';
                     }
+#if not CLEAN28
                     action("Vendor - Summary Aging")
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Vendor - Summary Aging';
+                        Caption = 'Vendor - Summary Aging (Obsolete)';
                         RunObject = report "Vendor - Summary Aging";
                         Tooltip = 'Run the Vendor - Summary Aging report.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
                     action("Vendor - Top 10 List")
                     {
                         ApplicationArea = Suite;
-                        Caption = 'Vendor - Top 10 List';
+                        Caption = 'Vendor - Top 10 List (Obsolete)';
                         RunObject = report "Vendor - Top 10 List";
                         Tooltip = 'Run the Vendor - Top 10 List report.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report has been replaced by the report Vendor - Top List (Excel). This report will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     action("Vendor - Trial Balance")
                     {
                         ApplicationArea = Basic, Suite;
@@ -1894,13 +1933,18 @@ page 8901 "Finance Manager Role Center"
                             RunObject = report "Fixed Asset - Acquisition List";
                             Tooltip = 'Run the FA Acquisition List report.';
                         }
+#if not CLEAN28
                         action("Analysis1")
                         {
                             ApplicationArea = FixedAssets;
-                            Caption = 'FA Analysis';
+                            Caption = 'FA Analysis (Obsolete)';
                             RunObject = report "Fixed Asset - Analysis";
                             Tooltip = 'Run the FA Analysis report.';
+                            ObsoleteState = Pending;
+                            ObsoleteReason = 'This report has been replaced by the report Fixed Asset Analysis (Excel). This report will be removed in a future release.';
+                            ObsoleteTag = '28.0';
                         }
+#endif
                         action("Book Value 01")
                         {
                             ApplicationArea = FixedAssets;
@@ -1915,13 +1959,18 @@ page 8901 "Finance Manager Role Center"
                             RunObject = report "Fixed Asset - Book Value 02";
                             Tooltip = 'Run the FA Book Value 02 report.';
                         }
+#if not CLEAN28
                         action("Details")
                         {
                             ApplicationArea = FixedAssets;
-                            Caption = 'FA Details';
+                            Caption = 'FA Details (Obsolete)';
                             RunObject = report "Fixed Asset - Details";
                             Tooltip = 'Run the FA Details report.';
+                            ObsoleteState = Pending;
+                            ObsoleteReason = 'This report has been replaced by the report Fixed Asset Details (Excel). This report will be removed in a future release.';
+                            ObsoleteTag = '28.0';
                         }
+#endif
                         action("G/L Analysis")
                         {
                             ApplicationArea = FixedAssets;
@@ -1936,13 +1985,18 @@ page 8901 "Finance Manager Role Center"
                             RunObject = report "Fixed Asset - List";
                             Tooltip = 'Run the FA List report.';
                         }
+#if not CLEAN28
                         action("Projected Value")
                         {
                             ApplicationArea = FixedAssets;
-                            Caption = 'FA Projected Value';
+                            Caption = 'FA Projected Value (Obsolete)';
                             RunObject = report "Fixed Asset - Projected Value";
                             Tooltip = 'Run the FA Projected Value report.';
+                            ObsoleteState = Pending;
+                            ObsoleteReason = 'This report has been replaced by the report Fixed Asset Projected Value (Excel). This report will be removed in a future release.';
+                            ObsoleteTag = '28.0';
                         }
+#endif
                     }
                     group("Group46")
                     {
