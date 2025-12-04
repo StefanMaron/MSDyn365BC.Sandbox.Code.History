@@ -534,18 +534,23 @@ page 113 Budget
             {
                 Caption = 'Report';
                 Image = "Report";
+#if not CLEAN28
                 action(ReportTrialBalance)
                 {
                     ApplicationArea = Suite;
-                    Caption = 'Trial Balance/Budget';
+                    Caption = 'Trial Balance/Budget (Obsolete)';
                     Image = "Report";
                     ToolTip = 'View budget details for the specified period.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report has been replaced by the report Trial Balance/Budget (Excel). This report will be removed in a future release.';
+                    ObsoleteTag = '28.0';
 
                     trigger OnAction()
                     begin
                         REPORT.Run(REPORT::"Trial Balance/Budget");
                     end;
                 }
+#endif
                 action(ReportBudget)
                 {
                     ApplicationArea = Suite;
@@ -712,9 +717,14 @@ page 113 Budget
                 actionref(ReportBudget_Promoted; ReportBudget)
                 {
                 }
+#if not CLEAN28
                 actionref(ReportTrialBalance_Promoted; ReportTrialBalance)
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report has been replaced by the report Trial Balance/Budget (Excel). This report will be removed in a future release.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 actionref(GLBalanceBudget_Promoted; GLBalanceBudget)
                 {
                 }

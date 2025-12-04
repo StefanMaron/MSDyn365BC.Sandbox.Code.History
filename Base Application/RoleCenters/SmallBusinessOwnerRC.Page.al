@@ -154,14 +154,19 @@ page 9020 "Small Business Owner RC"
                 RunObject = Report "Customer - Order Summary";
                 ToolTip = 'View the order detail (the quantity not yet shipped) for each customer in three periods of 30 days each, starting from a selected date. There are also columns with orders to be shipped before and after the three periods and a column with the total order detail for each customer. The report can be used to analyze a company''s expected sales volume.';
             }
+#if not CLEAN28
             action("Customer - T&op 10 List")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Customer - T&op 10 List';
+                Caption = 'Customer - T&op 10 List (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Customer - Top 10 List";
                 ToolTip = 'View which customers purchase the most or owe the most in a selected period. Only customers that have either purchases during the period or a balance at the end of the period will be included.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Customer - Top List (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Customer/&Item Sales")
             {
                 ApplicationArea = Basic, Suite;
@@ -239,22 +244,30 @@ page 9020 "Small Business Owner RC"
             separator(Action49)
             {
             }
+#if not CLEAN28
             action("Aged Ac&counts Receivable")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Aged Ac&counts Receivable';
+                Caption = 'Aged Ac&counts Receivable (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Aged Accounts Receivable";
                 ToolTip = 'View an overview of when your receivables from customers are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Aged Accounts Receivable (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
             action("Aged Accounts Pa&yable")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Aged Accounts Pa&yable';
+                Caption = 'Aged Accounts Pa&yable (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Aged Accounts Payable";
                 ToolTip = 'View an overview of when your payables to vendors are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Aged Accounts Payable (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Reconcile Cust. and &Vend. Accs")
             {
                 ApplicationArea = Basic, Suite;

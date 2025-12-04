@@ -419,4 +419,3 @@ page 18 "G/L Account List"
         Emphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
     end;
 }
-

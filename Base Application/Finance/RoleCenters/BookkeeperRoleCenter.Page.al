@@ -178,22 +178,30 @@ page 9004 "Bookkeeper Role Center"
                 RunObject = Report "SR Vendor - Balance to Date";
                 ToolTip = 'View a detail balance for selected vendors. The report can, for example, be used at the close of an accounting period or fiscal year.';
             }
+#if not CLEAN28
             action("&Aged Accounts Receivable")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = '&Aged Accounts Receivable';
+                Caption = '&Aged Accounts Receivable (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Aged Accounts Receivable";
                 ToolTip = 'View overdue customer payments.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Aged Accounts Receivable (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
             action("Aged Accou&nts Payable")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Aged Accou&nts Payable';
+                Caption = 'Aged Accou&nts Payable (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Aged Accounts Payable";
                 ToolTip = 'View an overview of when your payables to vendors are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Aged Accounts Payable (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Reconcile Customer and &Vendor Accounts")
             {
                 ApplicationArea = Basic, Suite;
