@@ -648,14 +648,19 @@ page 9309 "Purchase Credit Memos"
                     RunObject = Report "Vendor - Detail Trial Balance";
                     ToolTip = 'View the balance for vendors with balances on a specified date, for example, at the close of an accounting period or for an audit.';
                 }
+#if not CLEAN28
                 action("<Report Aged Accounts Payables")
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Aged Accounts Payables';
+                    Caption = 'Aged Accounts Payable (Obsolete)';
                     Image = "Report";
                     RunObject = Report "Aged Accounts Payable NA";
                     ToolTip = 'View an overview of when your payables to vendors are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report has been replaced by the report Aged Accounts Payable (Excel). This report will be removed in a future release.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action("<Report Vendor - Payment Recei")
                 {
                     ApplicationArea = Suite;

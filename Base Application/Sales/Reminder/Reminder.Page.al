@@ -564,4 +564,3 @@ page 434 Reminder
         DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::Reminder, Rec."No.");
     end;
 }
-
