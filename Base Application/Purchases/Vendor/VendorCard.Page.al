@@ -1552,18 +1552,23 @@ page 26 "Vendor Card"
         }
         area(reporting)
         {
+#if not CLEAN28
             action("Vendor - Summary Aging")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Vendor - Summary Aging';
+                Caption = 'Vendor - Summary Aging (Obsolete)';
                 Image = "Report";
                 ToolTip = 'View a summary of the payables owed to each vendor, divided into three time periods.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                ObsoleteTag = '28.0';
 
                 trigger OnAction()
                 begin
                     RunReport(REPORT::"Vendor - Summary Aging");
                 end;
             }
+#endif
             action("Vendor - Labels")
             {
                 ApplicationArea = Basic, Suite;
@@ -1746,9 +1751,14 @@ page 26 "Vendor Card"
                 actionref("Vendor - Balance to Date_Promoted"; "Vendor - Balance to Date")
                 {
                 }
+#if not CLEAN28
                 actionref("Vendor - Summary Aging_Promoted"; "Vendor - Summary Aging")
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 actionref(Purchases_Promoted; Purchases)
                 {
                 }
