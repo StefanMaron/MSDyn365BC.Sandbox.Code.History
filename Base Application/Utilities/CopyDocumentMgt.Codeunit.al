@@ -1174,16 +1174,17 @@ codeunit 6620 "Copy Document Mgt."
 
     local procedure CopyPurchDocUpdateHeader(FromDocType: Enum "Purchase Document Type From"; FromDocNo: Code[20]; var ToPurchHeader: Record "Purchase Header"; FromPurchHeader: Record "Purchase Header"; FromPurchRcptHeader: Record "Purch. Rcpt. Header"; FromPurchInvHeader: Record "Purch. Inv. Header"; FromReturnShptHeader: Record "Return Shipment Header"; FromPurchCrMemoHeader: Record "Purch. Cr. Memo Hdr."; FromPurchHeaderArchive: Record "Purchase Header Archive"; var ReleaseDocument: Boolean; ClearOriginalDocNosOnTarget: Boolean)
     var
-        Vend: Record Vendor;
+        BuyFromVendor: Record Vendor;
+        PayToVendor: Record Vendor;
         OldPurchHeader: Record "Purchase Header";
         SavedDimSetId: Integer;
     begin
-        if Vend.Get(FromPurchHeader."Buy-from Vendor No.") then
-            Vend.CheckBlockedVendOnDocs(Vend, false);
-        if Vend.Get(FromPurchHeader."Pay-to Vendor No.") then
-            Vend.CheckBlockedVendOnDocs(Vend, false);
+        if BuyFromVendor.Get(FromPurchHeader."Buy-from Vendor No.") then
+            BuyFromVendor.CheckBlockedVendOnDocs(BuyFromVendor, false);
+        if PayToVendor.Get(FromPurchHeader."Pay-to Vendor No.") then
+            PayToVendor.CheckBlockedVendOnDocs(PayToVendor, false);
         OldPurchHeader := ToPurchHeader;
-        OnBeforeCopyPurchHeaderDone(ToPurchHeader, FromPurchHeader, FromDocType, OldPurchHeader, FromPurchRcptHeader, FromPurchInvHeader, FromReturnShptHeader, FromPurchCrMemoHeader, FromPurchHeaderArchive);
+        OnBeforeCopyPurchHeaderDone(ToPurchHeader, FromPurchHeader, FromDocType, OldPurchHeader, FromPurchRcptHeader, FromPurchInvHeader, FromReturnShptHeader, FromPurchCrMemoHeader, FromPurchHeaderArchive, BuyFromVendor, PayToVendor);
         case FromDocType of
             "Purchase Document Type From"::Quote,
             "Purchase Document Type From"::"Blanket Order",
@@ -9551,7 +9552,9 @@ codeunit 6620 "Copy Document Mgt."
                                                                                                                                                                FromPurchInvHeader: Record "Purch. Inv. Header";
                                                                                                                                                                FromReturnShipmentHeader: Record "Return Shipment Header";
                                                                                                                                                                FromPurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
-                                                                                                                                                               FromPurchaseHeaderArchive: Record "Purchase Header Archive")
+                                                                                                                                                               FromPurchaseHeaderArchive: Record "Purchase Header Archive";
+                                                                                                                                                               BuyFromVendor: Record Vendor;
+                                                                                                                                                               PayToVendor: Record Vendor)
     begin
     end;
 
