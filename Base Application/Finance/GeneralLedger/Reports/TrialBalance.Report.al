@@ -1,3 +1,4 @@
+#if not CLEAN28
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -22,10 +23,13 @@ report 6 "Trial Balance"
     RDLCLayout = './Finance/GeneralLedger/Reports/TrialBalance.rdlc';
     AdditionalSearchTerms = 'year closing,close accounting period,close fiscal year';
     ApplicationArea = Basic, Suite;
-    Caption = 'Trial Balance';
+    Caption = 'Trial Balance (Obsolete)';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     DataAccessIntent = ReadOnly;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This report has been replaced by the report Trial Balance (Excel). This report will be removed in a future release.';
+    ObsoleteTag = '28.0';
 
     dataset
     {
@@ -158,8 +162,8 @@ report 6 "Trial Balance"
     requestpage
     {
         SaveValues = true;
-        AboutTitle = 'About Trial Balance';
-        AboutText = 'View a snapshot of your chart of accounts with a balance at date and net change in the specified period.';
+        AboutTitle = 'About Trial Balance (Obsolete)';
+        AboutText = 'View a snapshot of your chart of accounts with a balance at date and net change in the specified period.** This report is obsolete and will be removed in a future release.** Please refer to the report documentation for alternative ways to retrieve this information.';
 
         layout
         {
@@ -205,3 +209,4 @@ report 6 "Trial Balance"
         BlankLineNo: Integer;
 }
 
+#endif
