@@ -531,16 +531,21 @@ page 17 "G/L Account Card"
                 RunObject = Report "Detail Trial Balance";
                 ToolTip = 'View detail general ledger account balances and activities for all the selected accounts, one transaction per line.';
             }
+#if not CLEAN28
             action("Trial Balance")
             {
                 ApplicationArea = Suite;
-                Caption = 'Trial Balance';
+                Caption = 'Trial Balance (Obsolete)';
                 Image = "Report";
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Trial Balance";
                 ToolTip = 'View general ledger account balances and activities for all the selected accounts, one transaction per line.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Trial Balance (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Trial Balance by Period")
             {
                 ApplicationArea = Basic, Suite;

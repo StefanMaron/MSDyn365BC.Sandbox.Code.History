@@ -78,14 +78,19 @@ page 9002 "Acc. Payables Coordinator RC"
     {
         area(reporting)
         {
+#if not CLEAN28
             action("&Vendor - List")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = '&Vendor - List';
+                Caption = '&Vendor - List (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Vendor - List";
                 ToolTip = 'View the list of your vendors.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Vendor - &Balance to date")
             {
                 ApplicationArea = Basic, Suite;
@@ -110,22 +115,30 @@ page 9002 "Acc. Payables Coordinator RC"
                 RunObject = Report "Vendor Detail Trial Balance FR";
                 ToolTip = 'View transactions for all vendor accounts with subtotals per account. Each account shows the opening balance on the first line, and the list of transactions for the account and a closing balance on the last line.';
             }
+#if not CLEAN28
             action("Vendor - &Summary Aging")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Vendor - &Summary Aging';
+                Caption = 'Vendor - &Summary Aging (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Vendor - Summary Aging";
                 ToolTip = 'View a summary of the payables owed to each vendor, divided into three time periods.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
             action("Aged &Accounts Payable")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Aged &Accounts Payable';
+                Caption = 'Aged &Accounts Payable (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Aged Accounts Payable";
                 ToolTip = 'View an overview of when your payables to vendors are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Aged Accounts Payable (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Vendor - &Purchase List")
             {
                 ApplicationArea = Basic, Suite;
@@ -134,14 +147,19 @@ page 9002 "Acc. Payables Coordinator RC"
                 RunObject = Report "Vendor - Purchase List";
                 ToolTip = 'View a list of your purchases in a period, for example, to report purchase activity to customs and tax authorities.';
             }
+#if not CLEAN28
             action("Pa&yments on Hold")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Pa&yments on Hold';
+                Caption = 'Pa&yments on Hold (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Payments on Hold";
                 ToolTip = 'View a list of all vendor ledger entries on which the On Hold field is marked.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("P&urchase Statistics")
             {
                 ApplicationArea = Suite;
