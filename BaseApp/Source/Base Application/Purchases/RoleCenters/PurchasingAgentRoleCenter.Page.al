@@ -101,14 +101,19 @@ page 9007 "Purchasing Agent Role Center"
     {
         area(reporting)
         {
+#if not CLEAN28
             action("Vendor - T&op 10 List")
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Vendor - T&op 10 List';
+                Caption = 'Vendor - T&op 10 List (Obsolete)';
                 Image = "Report";
                 RunObject = Report "Vendor - Top 10 List";
                 ToolTip = 'View a list of the vendors from whom you purchase the most or to whom you owe the most.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Vendor - Top List (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Vendor/&Item Purchases")
             {
                 ApplicationArea = Basic, Suite;
