@@ -21,7 +21,6 @@ codeunit 141046 "UT REP Currency Rounding"
         CustSalesLCYCap: Label 'CustSalesLCY2';
         DateFilterTxt: Label '%1..%2';
         FiscalYearBalanceCap: Label 'FiscalYearBalance';
-        GLAccBalanceAtDateCap: Label 'G_L_Account___Balance_at_Date_';
         GLAccNoCap: Label 'No_GLAcc';
         GLAccountNoCap: Label 'No_GLAccount';
         PrecisionTxt: Label '<Precision,%1:><Standard Format,0>', Locked = true;
@@ -550,78 +549,6 @@ codeunit 141046 "UT REP Currency Rounding"
     end;
 
     [Test]
-    [HandlerFunctions('TrialBalanceBudgetRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeBlankTrialBalanceBudget()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 9 Trial Balance/Budget for blank.
-        AmountsInWholeForGLEntry(RoundingCap, GLAccBalanceAtDateCap, AmountsInWhole::" ", REPORT::"Trial Balance/Budget");
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceBudgetRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeTensTrialBalanceBudget()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 9 Trial Balance/Budget for Tens.
-        AmountsInWholeForGLEntry(RoundingCap, GLAccBalanceAtDateCap, AmountsInWhole::Tens, REPORT::"Trial Balance/Budget");
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceBudgetRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeHundredsTrialBalanceBudget()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 9 Trial Balance/Budget for Hundreds.
-        AmountsInWholeForGLEntry(RoundingCap, GLAccBalanceAtDateCap, AmountsInWhole::Hundreds, REPORT::"Trial Balance/Budget");
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceBudgetRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeThousandsTrialBalanceBudget()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 9 Trial Balance/Budget for Thousands.
-        AmountsInWholeForGLEntry(RoundingCap, GLAccBalanceAtDateCap, AmountsInWhole::Thousands, REPORT::"Trial Balance/Budget");
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceBudgetRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeHundredThousandsTrialBalBudg()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 9 Trial Balance/Budget for Hundred Thousands.
-        AmountsInWholeForGLEntry(RoundingCap, GLAccBalanceAtDateCap, AmountsInWhole::"Hundred Thousands", REPORT::"Trial Balance/Budget");
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceBudgetRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeMillionsTrialBalBudget()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 9 Trial Balance/Budget for Millions.
-        AmountsInWholeForGLEntry(RoundingCap, GLAccBalanceAtDateCap, AmountsInWhole::Millions, REPORT::"Trial Balance/Budget");
-    end;
-
-    [Test]
     [HandlerFunctions('TrialBalancePreviousYearRequestPageHandler')]
     [TransactionModel(TransactionModel::AutoRollback)]
     [Scope('OnPrem')]
@@ -711,107 +638,6 @@ codeunit 141046 "UT REP Currency Rounding"
         // Verify.
         VerifyXMLValuesOnReport(
           RoundCap, BalanceCap, AmountsInWhole, ReportManagement.RoundAmount(GLEntry.Amount, AmountsInWhole));
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeWithBlankTrialBalance()
-    var
-        GLEntry: Record "G/L Entry";
-        AmountsInWhole: Option " ",Tens;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 6 Trial Balance with blank Amount In Whole.
-
-        // Setup.
-        Initialize();
-        CreateGLEntry(GLEntry);
-        EnqueueValuesInRequestPageHandler(GLEntry."G/L Account No.", AmountsInWhole::" ");  // Enqueue values for TrialBalanceRequestPageHandler.
-
-        // Exercise.
-        REPORT.Run(REPORT::"Trial Balance");
-
-        // Verify.
-        LibraryReportDataset.LoadDataSetFile();
-        LibraryReportDataset.AssertElementWithValueExists(GLAccBalanceAtDateCap, GLEntry.Amount);
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeTensTrialBalance()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 6 Trial Balance for Tens.
-        AmountsInWholeTrialBalance(AmountsInWhole::Tens);
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeHundredsTrialBalance()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 6 Trial Balance for Hundreds.
-        AmountsInWholeTrialBalance(AmountsInWhole::Hundreds);
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeThousandsTrialBalance()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 6 Trial Balance for Thousands.
-        AmountsInWholeTrialBalance(AmountsInWhole::Thousands);
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeHundredThousandsTrialBal()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 6 Trial Balance for Hundred Thousands.
-        AmountsInWholeTrialBalance(AmountsInWhole::"Hundred Thousands");
-    end;
-
-    [Test]
-    [HandlerFunctions('TrialBalanceRequestPageHandler')]
-    [TransactionModel(TransactionModel::AutoRollback)]
-    [Scope('OnPrem')]
-    procedure OnPreReptAmtsInWholeMillionsTrialBalance()
-    var
-        AmountsInWhole: Option " ",Tens,Hundreds,Thousands,"Hundred Thousands",Millions;
-    begin
-        // [SCENARIO] validate Amounts In Whole - OnPreReport Trigger of Report - 6 Trial Balance for Millions.
-        AmountsInWholeTrialBalance(AmountsInWhole::Millions);
-    end;
-
-    local procedure AmountsInWholeTrialBalance(AmountsInWhole: Option)
-    var
-        GLEntry: Record "G/L Entry";
-    begin
-        // Setup.
-        Initialize();
-        CreateGLEntry(GLEntry);
-        EnqueueValuesInRequestPageHandler(GLEntry."G/L Account No.", AmountsInWhole);  // Enqueue values for TrialBalanceRequestPageHandler.
-
-        // Exercise.
-        REPORT.Run(REPORT::"Trial Balance");
-
-        // Verify.
-        VerifyXMLValuesOnReport(
-          RoundingCap, GLAccBalanceAtDateCap, AmountsInWhole, ReportManagement.RoundAmount(GLEntry.Amount, AmountsInWhole));
     end;
 
     [Test]
@@ -1204,21 +1030,6 @@ codeunit 141046 "UT REP Currency Rounding"
 
     [RequestPageHandler]
     [Scope('OnPrem')]
-    procedure TrialBalanceBudgetRequestPageHandler(var TrialBalanceBudget: TestRequestPage "Trial Balance/Budget")
-    var
-        AmountsInWhole: Variant;
-        No: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(No);
-        LibraryVariableStorage.Dequeue(AmountsInWhole);
-        TrialBalanceBudget."G/L Account".SetFilter("No.", No);
-        TrialBalanceBudget."G/L Account".SetFilter("Date Filter", StrSubstNo(DateFilterTxt, WorkDate(), CalcDate('<CY>', WorkDate())));
-        TrialBalanceBudget.AmountsInWhole.SetValue(AmountsInWhole);
-        TrialBalanceBudget.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
     procedure TrialBalancePreviousYearRequestPageHandler(var TrialBalancePreviousYear: TestRequestPage "Trial Balance/Previous Year")
     var
         AmountsInWhole: Variant;
@@ -1230,21 +1041,6 @@ codeunit 141046 "UT REP Currency Rounding"
         TrialBalancePreviousYear."G/L Account".SetFilter("Date Filter", StrSubstNo(DateFilterTxt, WorkDate(), CalcDate('<CY>', WorkDate())));
         TrialBalancePreviousYear.AmountsInWhole.SetValue(AmountsInWhole);
         TrialBalancePreviousYear.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
-    end;
-
-    [RequestPageHandler]
-    [Scope('OnPrem')]
-    procedure TrialBalanceRequestPageHandler(var TrialBalance: TestRequestPage "Trial Balance")
-    var
-        AmountsInWhole: Variant;
-        No: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(No);
-        LibraryVariableStorage.Dequeue(AmountsInWhole);
-        TrialBalance."G/L Account".SetFilter("No.", No);
-        TrialBalance."G/L Account".SetFilter("Date Filter", StrSubstNo(DateFilterTxt, WorkDate(), CalcDate('<CY>', WorkDate())));
-        TrialBalance.AmountsInWhole.SetValue(AmountsInWhole);
-        TrialBalance.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
     [RequestPageHandler]

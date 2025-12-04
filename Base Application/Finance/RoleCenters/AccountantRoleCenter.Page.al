@@ -52,7 +52,9 @@ using Microsoft.Intercompany.Partner;
 using Microsoft.Inventory.Costing;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
+#if not CLEAN28
 using Microsoft.Purchases.Reports;
+#endif
 using Microsoft.Purchases.Vendor;
 using Microsoft.RoleCenters;
 using Microsoft.Sales.Analysis;
@@ -61,7 +63,9 @@ using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
+#if not CLEAN28
 using Microsoft.Sales.Reports;
+#endif
 using Microsoft.Foundation.Navigate;
 using System.Automation;
 using System.Email;
@@ -161,14 +165,19 @@ page 9027 "Accountant Role Center"
             group("G/L Reports")
             {
                 Caption = 'G/L Reports';
+#if not CLEAN28
                 action("&G/L Trial Balance")
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = '&G/L Trial Balance';
+                    Caption = '&G/L Trial Balance (Obsolete)';
                     Image = "Report";
                     RunObject = Report "Trial Balance";
                     ToolTip = 'View, print, or send a report that shows the balances for the general ledger accounts, including the debits and credits. You can use this report to ensure accurate accounting practices.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report has been replaced by the report Trial Balance (Excel). This report will be removed in a future release.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action("&Bank Detail Trial Balance")
                 {
                     ApplicationArea = Basic, Suite;
@@ -193,14 +202,19 @@ page 9027 "Accountant Role Center"
                     RunObject = Report Budget;
                     ToolTip = 'View or edit estimated amounts for a range of accounting periods.';
                 }
+#if not CLEAN28
                 action("Trial Bala&nce/Budget")
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Trial Bala&nce/Budget';
+                    Caption = 'Trial Bala&nce/Budget (Obsolete)';
                     Image = "Report";
                     RunObject = Report "Trial Balance/Budget";
                     ToolTip = 'View a trial balance in comparison to a budget. You can choose to see a trial balance for selected dimensions. You can use the report at the close of an accounting period or fiscal year.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report has been replaced by the report Trial Balance/Budget (Excel). This report will be removed in a future release.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action("Trial Balance by &Period")
                 {
                     ApplicationArea = Basic, Suite;
@@ -257,22 +271,30 @@ page 9027 "Accountant Role Center"
             group("Customers and Vendors")
             {
                 Caption = 'Customers and Vendors';
+#if not CLEAN28
                 action("Aged Accounts &Receivable")
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Aged Accounts &Receivable';
+                    Caption = 'Aged Accounts &Receivable (Obsolete)';
                     Image = "Report";
                     RunObject = Report "Aged Accounts Receivable";
                     ToolTip = 'View an overview of when your receivables from customers are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report has been replaced by the report Aged Accounts Receivable (Excel). This report will be removed in a future release.';
+                    ObsoleteTag = '28.0';
                 }
                 action("Aged Accounts Pa&yable")
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Aged Accounts Pa&yable';
+                    Caption = 'Aged Accounts Pa&yable (Obsolete)';
                     Image = "Report";
                     RunObject = Report "Aged Accounts Payable";
                     ToolTip = 'View an overview of when your payables to vendors are due or overdue (divided into four periods). You must specify the date you want aging calculated from and the length of the period that each column will contain data for.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report has been replaced by the report Aged Accounts Payable (Excel). This report will be removed in a future release.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action("Reconcile Cus&t. and Vend. Accs")
                 {
                     ApplicationArea = Basic, Suite;
