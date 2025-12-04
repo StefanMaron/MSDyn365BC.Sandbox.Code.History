@@ -1,3 +1,4 @@
+#if not CLEAN28
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -15,9 +16,12 @@ report 120 "Aged Accounts Receivable"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/Reports/AgedAccountsReceivable.rdlc';
-    Caption = 'Aged Accounts Receivable';
+    Caption = 'Aged Accounts Receivable (Obsolete)';
     PreviewMode = PrintLayout;
     DataAccessIntent = ReadOnly;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This report has been replaced by the report Aged Accounts Receivable (Excel). This report will be removed in a future release.';
+    ObsoleteTag = '28.0';
 
     dataset
     {
@@ -651,8 +655,8 @@ report 120 "Aged Accounts Receivable"
     requestpage
     {
         SaveValues = true;
-        AboutTitle = 'About Aged Accounts Receivables';
-        AboutText = 'Analyze customer balances at the end of each period by calculating outstanding invoice, credit memo, and payment totals in three periods of equal length. Measure the reliability of collectable debts for your customers.';
+        AboutTitle = 'About Aged Accounts Receivable (Obsolete)';
+        AboutText = 'Analyze customer balances at the end of each period by calculating outstanding invoice, credit memo, and payment totals in three periods of equal length. Measure the reliability of collectable debts for your customers.** This report is obsolete and will be removed in a future release.** Please refer to the report documentation for alternative ways to retrieve this information.';
 
         layout
         {
@@ -993,3 +997,4 @@ report 120 "Aged Accounts Receivable"
     end;
 }
 
+#endif

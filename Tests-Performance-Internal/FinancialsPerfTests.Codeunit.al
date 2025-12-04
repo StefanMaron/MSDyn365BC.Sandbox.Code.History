@@ -543,12 +543,6 @@ codeunit 139093 "Financials Perf Tests"
     END;
 
     [RequestPageHandler]
-    PROCEDURE TrialBalanceRequestPageHandler(var TrialBalance: TestRequestPage "Trial Balance");
-    BEGIN
-        TrialBalance.SAVEASXML(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
-    END;
-
-    [RequestPageHandler]
     PROCEDURE DetailedTrialBalancePageHandler(var DetailTrialBalance: TestRequestPage "Detail Trial Balance");
     BEGIN
         DetailTrialBalance.SAVEASXML(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
