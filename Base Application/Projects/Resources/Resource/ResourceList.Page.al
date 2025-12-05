@@ -56,6 +56,18 @@ page 77 "Resource List"
                     ToolTip = 'Specifies information in addition to the description.';
                     Visible = false;
                 }
+                field(Address; Rec.Address)
+                {
+                    ApplicationArea = Jobs;
+                    ToolTip = 'Specifies the address of the resouce.';
+                    Visible = false;
+                }
+                field(City; Rec.City)
+                {
+                    ApplicationArea = Jobs;
+                    ToolTip = 'Specifies the city of the resouce.';
+                    Visible = false;
+                }
                 field(Type; Rec.Type)
                 {
                     ApplicationArea = Jobs;
