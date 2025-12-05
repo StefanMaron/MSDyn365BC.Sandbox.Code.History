@@ -1020,8 +1020,6 @@ page 201 "Job Journal"
         ClientTypeManagement: Codeunit "Client Type Management";
         JobJournalErrorsMgt: Codeunit "Job Journal Errors Mgt.";
         JobJnlReconcile: Page "Job Journal Reconcile";
-        JobDescription: Text[100];
-        AccName: Text[100];
         NumberOfRecords: Integer;
         ExtendedPriceEnabled: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
@@ -1031,6 +1029,8 @@ page 201 "Job Journal"
     protected var
         CurrentJnlBatchName: Code[10];
         ShortcutDimCode: array[8] of Code[20];
+        JobDescription: Text[100];
+        AccName: Text[100];
         DimVisible1: Boolean;
         DimVisible2: Boolean;
         DimVisible3: Boolean;
