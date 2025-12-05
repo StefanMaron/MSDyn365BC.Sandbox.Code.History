@@ -8,6 +8,10 @@ using Microsoft.Foundation.Attachment;
 using System.DateTime;
 using System.Utilities;
 
+/// <summary>
+/// Primary interface for creating, managing, and submitting VAT returns to tax authorities.
+/// Provides comprehensive workflow management from line suggestion through submission and response handling.
+/// </summary>
 page 740 "VAT Report"
 {
     Caption = 'VAT Return';
@@ -530,6 +534,14 @@ page 740 "VAT Report"
         exit(ErrorsExist);
     end;
 
+    /// <summary>
+    /// Integration event raised after initializing page controllers to allow customization of controller status.
+    /// Enables extension of page behavior based on VAT report header status and custom business rules.
+    /// </summary>
+    /// <param name="VATReportHeader">VAT report header record being processed</param>
+    /// <param name="SubmitControllerStatus">Submit action availability status</param>
+    /// <param name="MarkAsSubmitControllerStatus">Mark as submitted action availability status</param>
+    /// <param name="CalcAndPostVATStatus">Calculate and post VAT settlement action availability status</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitPageControllers(VATReportHeader: Record "VAT Report Header"; var SubmitControllerStatus: Boolean; var MarkAsSubmitControllerStatus: Boolean; var CalcAndPostVATStatus: Boolean)
     begin
