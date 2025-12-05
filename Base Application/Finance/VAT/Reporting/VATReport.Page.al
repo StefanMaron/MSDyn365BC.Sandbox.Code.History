@@ -7,6 +7,10 @@ namespace Microsoft.Finance.VAT.Reporting;
 using Microsoft.Foundation.Attachment;
 using System.Telemetry;
 
+/// <summary>
+/// Primary interface for creating, managing, and submitting VAT returns to tax authorities.
+/// Provides comprehensive workflow management from line suggestion through submission and response handling.
+/// </summary>
 page 740 "VAT Report"
 {
     Caption = 'VAT Report';
