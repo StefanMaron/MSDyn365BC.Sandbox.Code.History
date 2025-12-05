@@ -21,6 +21,15 @@ using System.Text;
 using System.Utilities;
 using Microsoft.Foundation.Enums;
 
+/// <summary>
+/// Generates financial reports based on account schedules and column layouts with flexible filtering and formatting options.
+/// Primary reporting engine for balance sheets, income statements, and custom financial analysis reports.
+/// </summary>
+/// <remarks>
+/// Integrates with G/L entries, budgets, cost accounting, and cash flow forecasts for comprehensive financial reporting.
+/// Supports multiple output formats, custom column layouts, and dimension-based filtering for detailed financial analysis.
+/// Extensibility: OnAfterSetFilters, OnAfterTransferValues, OnAfterFormatZeroAmount events for custom formatting and processing.
+/// </remarks>
 report 25 "Account Schedule"
 {
     AdditionalSearchTerms = 'financial reporting,income statement,balance sheet';
@@ -1142,6 +1151,14 @@ report 25 "Account Schedule"
                 MaxStrLen(ColumnValuesAsText));
     end;
 
+    /// <summary>
+    /// Initializes account schedule report with filters and date calculations for financial report generation.
+    /// Sets up G/L budget, cost budget, business unit, and dimension filters based on current report configuration.
+    /// </summary>
+    /// <remarks>
+    /// Calculates fiscal start date, period text, and column layout rounding settings.
+    /// Applies all hidden filters and prepares data for report processing.
+    /// </remarks>
     procedure InitAccSched()
     var
         ColumnLayout: Record "Column Layout";
@@ -1182,24 +1199,44 @@ report 25 "Account Schedule"
         ShowRoundingHeader := not ColumnLayout.IsEmpty();
     end;
 
+    /// <summary>
+    /// Sets the account schedule name for report processing and enables editing mode.
+    /// Configures the report to use the specified account schedule with editable name field.
+    /// </summary>
+    /// <param name="NewAccSchedName">Account schedule name to use for report generation</param>
     procedure SetAccSchedName(NewAccSchedName: Code[10])
     begin
         AccSchedNameHidden := NewAccSchedName;
         AccSchedNameEditable := true;
     end;
 
+    /// <summary>
+    /// Sets the account schedule name for report processing and disables editing mode.
+    /// Configures the report to use the specified account schedule with non-editable name field.
+    /// </summary>
+    /// <param name="NewAccSchedName">Account schedule name to use for report generation</param>
     procedure SetAccSchedNameNonEditable(NewAccSchedName: Code[10])
     begin
         SetAccSchedName(NewAccSchedName);
         AccSchedNameEditable := false;
     end;
 
+    /// <summary>
+    /// Sets the financial report name for report processing and disables editing mode.
+    /// Links the report to a specific financial report configuration with non-editable settings.
+    /// </summary>
+    /// <param name="NewAccSchedName">Financial report name to use for report generation</param>
     procedure SetFinancialReportNameNonEditable(NewAccSchedName: Code[10])
     begin
         SetFinancialReportName(NewAccSchedName);
         AccSchedNameEditable := false;
     end;
 
+    /// <summary>
+    /// Sets the financial report name and retrieves associated account schedule configuration.
+    /// Links to financial report master data and configures account schedule row group automatically.
+    /// </summary>
+    /// <param name="NewFinancialReportName">Financial report name to configure for report processing</param>
     procedure SetFinancialReportName(NewFinancialReportName: Code[10])
     var
         FinancialReportLocal: Record "Financial Report";
@@ -1211,6 +1248,11 @@ report 25 "Account Schedule"
         end;
     end;
 
+    /// <summary>
+    /// Sets the column layout name for report formatting and column structure configuration.
+    /// Defines how financial data will be presented in columns across the report output.
+    /// </summary>
+    /// <param name="ColLayoutName">Column layout name to use for report column formatting</param>
     procedure SetColumnLayoutName(ColLayoutName: Code[10])
     begin
         ColumnLayoutNameHidden := ColLayoutName;
@@ -1248,6 +1290,18 @@ report 25 "Account Schedule"
         FinancialReportDescHidden := NewDescription;
     end;
 
+    /// <summary>
+    /// Sets comprehensive filters for financial report data including date, budget, business unit, and dimension filters.
+    /// Configures hidden filter values and triggers extensibility events for custom filter processing.
+    /// </summary>
+    /// <param name="NewDateFilter">Date range filter for G/L entries and budget data</param>
+    /// <param name="NewBudgetFilter">G/L budget name filter for budget comparison</param>
+    /// <param name="NewCostBudgetFilter">Cost accounting budget filter for cost analysis</param>
+    /// <param name="NewBusUnitFilter">Business unit filter for consolidated reporting</param>
+    /// <param name="NewDim1Filter">Dimension 1 filter for detailed analysis</param>
+    /// <param name="NewDim2Filter">Dimension 2 filter for detailed analysis</param>
+    /// <param name="NewDim3Filter">Dimension 3 filter for detailed analysis</param>
+    /// <param name="NewDim4Filter">Dimension 4 filter for detailed analysis</param>
     procedure SetFilters(NewDateFilter: Text; NewBudgetFilter: Text; NewCostBudgetFilter: Text; NewBusUnitFilter: Text; NewDim1Filter: Text; NewDim2Filter: Text; NewDim3Filter: Text; NewDim4Filter: Text)
     begin
         DateFilterHidden := NewDateFilter;
@@ -1263,11 +1317,38 @@ report 25 "Account Schedule"
         OnAfterSetFilters(AccScheduleName, CostCenterFilter, CostObjectFilter, CashFlowFilter, CurrReport.UseRequestPage());
     end;
 
+    /// <summary>
+    /// Sets comprehensive filters including cash flow filter for financial report data processing.
+    /// Extends basic filter configuration with cash flow forecasting capabilities.
+    /// </summary>
+    /// <param name="NewDateFilter">Date range filter for G/L entries and budget data</param>
+    /// <param name="NewBudgetFilter">G/L budget name filter for budget comparison</param>
+    /// <param name="NewCostBudgetFilter">Cost accounting budget filter for cost analysis</param>
+    /// <param name="NewBusUnitFilter">Business unit filter for consolidated reporting</param>
+    /// <param name="NewDim1Filter">Dimension 1 filter for detailed analysis</param>
+    /// <param name="NewDim2Filter">Dimension 2 filter for detailed analysis</param>
+    /// <param name="NewDim3Filter">Dimension 3 filter for detailed analysis</param>
+    /// <param name="NewDim4Filter">Dimension 4 filter for detailed analysis</param>
+    /// <param name="CashFlowFilter">Cash flow forecast filter for liquidity analysis</param>
     procedure SetFilters(NewDateFilter: Text; NewBudgetFilter: Text; NewCostBudgetFilter: Text; NewBusUnitFilter: Text; NewDim1Filter: Text; NewDim2Filter: Text; NewDim3Filter: Text; NewDim4Filter: Text; CashFlowFilter: Text)
     begin
         SetFilters(NewDateFilter, NewBudgetFilter, NewCostBudgetFilter, NewBusUnitFilter, NewDim1Filter, NewDim2Filter, NewDim3Filter, NewDim4Filter, CashFlowFilter, NegativeAmountFormat);
     end;
 
+    /// <summary>
+    /// Sets comprehensive filters with cash flow and negative amount formatting for advanced financial report configuration.
+    /// Calculates date ranges automatically and configures negative amount display preferences.
+    /// </summary>
+    /// <param name="NewDateFilter">Date range filter for G/L entries and budget data</param>
+    /// <param name="NewBudgetFilter">G/L budget name filter for budget comparison</param>
+    /// <param name="NewCostBudgetFilter">Cost accounting budget filter for cost analysis</param>
+    /// <param name="NewBusUnitFilter">Business unit filter for consolidated reporting</param>
+    /// <param name="NewDim1Filter">Dimension 1 filter for detailed analysis</param>
+    /// <param name="NewDim2Filter">Dimension 2 filter for detailed analysis</param>
+    /// <param name="NewDim3Filter">Dimension 3 filter for detailed analysis</param>
+    /// <param name="NewDim4Filter">Dimension 4 filter for detailed analysis</param>
+    /// <param name="CashFlowFilter">Cash flow forecast filter for liquidity analysis</param>
+    /// <param name="NewNegativeAmountFormat">Format preference for displaying negative amounts (parentheses, minus sign, etc.)</param>
     procedure SetFilters(NewDateFilter: Text; NewBudgetFilter: Text; NewCostBudgetFilter: Text; NewBusUnitFilter: Text; NewDim1Filter: Text; NewDim2Filter: Text; NewDim3Filter: Text; NewDim4Filter: Text; CashFlowFilter: Text; NewNegativeAmountFormat: Enum "Analysis Negative Format")
     begin
         DateFilterHidden := NewDateFilter;
@@ -1289,6 +1370,13 @@ report 25 "Account Schedule"
         OnAfterSetFilters(AccScheduleName, CostCenterFilter, CostObjectFilter, CashFlowFilter, CurrReport.UseRequestPage());
     end;
 
+    /// <summary>
+    /// Determines whether an account schedule line should be displayed based on formatting and totaling type criteria.
+    /// Evaluates line visibility rules including bold/italic formatting and totaling type restrictions.
+    /// </summary>
+    /// <param name="Bold">Whether to show lines marked as bold formatting</param>
+    /// <param name="Italic">Whether to show lines marked as italic formatting</param>
+    /// <returns>True if the line should be displayed according to the formatting criteria, false otherwise</returns>
     procedure ShowLine(Bold: Boolean; Italic: Boolean): Boolean
     begin
         if "Acc. Schedule Line"."Totaling Type" = "Acc. Schedule Line"."Totaling Type"::"Set Base For Percent" then
@@ -1576,21 +1664,51 @@ report 25 "Account Schedule"
         FeatureTelemetry.LogUsage('0000O76', 'Financial Report', StrSubstNo(ReportRunEventTxt, FinancialReportName), TelemetryDimensions);
     end;
 
+    /// <summary>
+    /// Integration event raised after transferring date filter values to allow custom date range processing.
+    /// Enables modification of start date, end date, and date filter text for custom reporting scenarios.
+    /// </summary>
+    /// <param name="StartDate">Report start date for the current period</param>
+    /// <param name="EndDate">Report end date for the current period</param>
+    /// <param name="DateFilterHidden">Hidden date filter text used for internal processing</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterTransferValues(var StartDate: Date; var EndDate: Date; var DateFilterHidden: Text);
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised after formatting zero amounts to allow custom zero value display logic.
+    /// Enables modification of how zero amounts are presented in financial reports based on account schedule and column layout context.
+    /// </summary>
+    /// <param name="AccScheduleLine">Account schedule line being processed for zero amount formatting</param>
+    /// <param name="ColumnLayout">Column layout configuration affecting the zero amount display</param>
+    /// <param name="Result">Formatted text result for the zero amount display</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterFormatZeroAmount(var AccScheduleLine: Record "Acc. Schedule Line"; var ColumnLayout: Record "Column Layout"; var Result: Text[30])
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised after setting report filters to allow custom filter validation and processing.
+    /// Enables extension of filter logic with cost center, cost object, and cash flow filter processing.
+    /// </summary>
+    /// <param name="AccScheduleName">Account schedule name record with applied filters</param>
+    /// <param name="CostCenterFilter">Cost center filter applied to the report</param>
+    /// <param name="CostObjectFilter">Cost object filter applied to the report</param>
+    /// <param name="CashFlowFilter">Cash flow forecast filter applied to the report</param>
+    /// <param name="UseReqPage">Whether the report request page is being used for filter input</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetFilters(var AccScheduleName: Record "Acc. Schedule Name"; CostCenterFilter: Text; CostObjectFilter: Text; CashFlowFilter: Text; UseReqPage: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised after checking if a column layout line should be skipped during report processing.
+    /// Enables custom logic for determining when account schedule lines should be excluded from report output.
+    /// </summary>
+    /// <param name="AccScheduleLine">Account schedule line being evaluated for inclusion</param>
+    /// <param name="ValueIsEmpty">Whether the calculated value for this line is empty</param>
+    /// <param name="IsLineSkipped">Whether this line should be skipped in the report output</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetColumnLayoutOnAfteCheckIsLineSkipped(var AccScheduleLine: Record "Acc. Schedule Line"; var ValueIsEmpty: Boolean; var IsLineSkipped: Boolean)
     begin

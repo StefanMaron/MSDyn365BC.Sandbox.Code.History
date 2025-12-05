@@ -6,6 +6,14 @@ namespace Microsoft.Finance.FinancialReports;
 
 using Microsoft.Finance.Analysis;
 
+/// <summary>
+/// Financial reports list page providing management interface for configuring and running financial reports.
+/// Combines account schedule row definitions with column layouts to create comprehensive financial statements.
+/// </summary>
+/// <remarks>
+/// Supports drill-down to account schedule overview, analysis view integration for enhanced reporting,
+/// and template-based financial statement generation including balance sheets and income statements.
+/// </remarks>
 page 108 "Financial Reports"
 {
     AboutText = 'With the Financial Reports feature, you can get insights into the financial data shown on your chart of accounts (COA). Using row and column definitions, you can set up financial reports to analyse figures in general ledger (G/L) accounts, and compare general ledger entries with budget entries.';
@@ -383,6 +391,10 @@ page 108 "Financial Reports"
         UpdateCalculatedFields();
     end;
 
+    /// <summary>
+    /// Updates calculated fields for analysis view names from row and column definitions.
+    /// Retrieves analysis view assignments from account schedule and column layout records.
+    /// </summary>
     local procedure UpdateCalculatedFields()
     var
         AccScheduleName: Record "Acc. Schedule Name";
