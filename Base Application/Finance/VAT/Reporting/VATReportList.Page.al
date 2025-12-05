@@ -6,6 +6,10 @@ namespace Microsoft.Finance.VAT.Reporting;
 
 using Microsoft.Foundation.Attachment;
 
+/// <summary>
+/// Displays a list view of all VAT returns with filtering and navigation capabilities.
+/// Provides read-only access to VAT report headers with status tracking and card navigation.
+/// </summary>
 page 744 "VAT Report List"
 {
     ApplicationArea = VAT;
