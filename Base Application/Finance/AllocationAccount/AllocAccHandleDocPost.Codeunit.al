@@ -8,6 +8,10 @@ using Microsoft.Sales.Document;
 using Microsoft.Purchases.Document;
 using Microsoft.Finance.Deferral;
 
+/// <summary>
+/// Manages VAT posting group handling during document posting operations for allocation accounts.
+/// Provides event-driven VAT posting group assignment and deferral schedule redistribution control.
+/// </summary>
 codeunit 2674 "Alloc. Acc. Handle Doc. Post"
 {
     EventSubscriberInstance = Manual;
@@ -46,11 +50,19 @@ codeunit 2674 "Alloc. Acc. Handle Doc. Post"
         RedistributeDeferralSchedule := true;
     end;
 
+    /// <summary>
+    /// Sets the VAT business posting group code for document line processing.
+    /// </summary>
+    /// <param name="NewVATBusPostingGroupCode">VAT business posting group code to apply</param>
     procedure SetVATBusPostingGroupCode(NewVATBusPostingGroupCode: Code[20])
     begin
         VATBusPostingGroupCode := NewVATBusPostingGroupCode;
     end;
 
+    /// <summary>
+    /// Sets the VAT product posting group code for document line processing.
+    /// </summary>
+    /// <param name="NewVATProdPostingGroupCode">VAT product posting group code to apply</param>
     procedure SetVATProdPostingGroupCode(NewVATProdPostingGroupCode: Code[20])
     begin
         VATProdPostingGroupCode := NewVATProdPostingGroupCode;
