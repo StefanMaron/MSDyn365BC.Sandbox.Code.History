@@ -15,6 +15,10 @@ using Microsoft.Foundation.Address;
 using System.Environment.Configuration;
 #endif
 
+/// <summary>
+/// Generates formatted VAT statements with calculated totals and detailed breakdowns.
+/// Processes VAT statement templates and lines to produce regulatory compliance reports for tax authorities.
+/// </summary>
 report 12 "VAT Statement"
 {
     DefaultLayout = RDLC;
@@ -371,6 +375,14 @@ report 12 "VAT Statement"
         ActivityCode: Code[6];
         CountryRegionFilter: Text;
 
+    /// <summary>
+    /// Calculates the total amount for a VAT statement line based on configured calculation rules.
+    /// Processes VAT entries and G/L accounts according to line type and formula settings.
+    /// </summary>
+    /// <param name="VATStmtLine2">VAT statement line to calculate total for</param>
+    /// <param name="TotalAmount">Returns calculated total amount</param>
+    /// <param name="Level">Current calculation level for nested formulas</param>
+    /// <returns>True if calculation completed successfully, false if errors occurred</returns>
     procedure CalcLineTotal(VATStmtLine2: Record "VAT Statement Line"; var TotalAmount: Decimal; Level: Integer): Boolean
     var
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
@@ -916,11 +928,32 @@ report 12 "VAT Statement"
         TotalAmount := TotalAmount + Amount;
     end;
 
+    /// <summary>
+    /// Initializes VAT statement report parameters with standard configuration options.
+    /// Sets up report context including VAT statement template, selection criteria, and formatting preferences.
+    /// </summary>
+    /// <param name="NewVATStmtName">VAT statement name configuration</param>
+    /// <param name="NewVATStatementLine">VAT statement line filters</param>
+    /// <param name="NewSelection">Period or closing date selection type</param>
+    /// <param name="NewPeriodSelection">Period range selection criteria</param>
+    /// <param name="NewPrintInIntegers">Whether to print amounts as integers</param>
+    /// <param name="NewUseAmtsInAddCurr">Whether to use additional reporting currency amounts</param>
     procedure InitializeRequest(var NewVATStmtName: Record "VAT Statement Name"; var NewVATStatementLine: Record "VAT Statement Line"; NewSelection: Enum "VAT Statement Report Selection"; NewPeriodSelection: Enum "VAT Statement Report Period Selection"; NewPrintInIntegers: Boolean; NewUseAmtsInAddCurr: Boolean; NewVATPeriod: Code[10])
     begin
         InitializeRequest(NewVATStmtName, NewVATStatementLine, NewSelection, NewPeriodSelection, NewPrintInIntegers, NewUseAmtsInAddCurr, NewVATPeriod, '');
     end;
 
+    /// <summary>
+    /// Initializes VAT statement report parameters with country/region filtering capability.
+    /// Extended version including geographic filtering for multi-country VAT reporting scenarios.
+    /// </summary>
+    /// <param name="NewVATStmtName">VAT statement name configuration</param>
+    /// <param name="NewVATStatementLine">VAT statement line filters</param>
+    /// <param name="NewSelection">Period or closing date selection type</param>
+    /// <param name="NewPeriodSelection">Period range selection criteria</param>
+    /// <param name="NewPrintInIntegers">Whether to print amounts as integers</param>
+    /// <param name="NewUseAmtsInAddCurr">Whether to use additional reporting currency amounts</param>
+    /// <param name="NewCountryRegionFilter">Country/region filter for geographic reporting</param>
     procedure InitializeRequest(var NewVATStmtName: Record "VAT Statement Name"; var NewVATStatementLine: Record "VAT Statement Line"; NewSelection: Enum "VAT Statement Report Selection"; NewPeriodSelection: Enum "VAT Statement Report Period Selection"; NewPrintInIntegers: Boolean; NewUseAmtsInAddCurr: Boolean; NewVATPeriod: Code[10]; NewCountryRegionFilter: Text[250])
     begin
         "VAT Statement Name".Copy(NewVATStmtName);
@@ -958,31 +991,87 @@ report 12 "VAT Statement"
         exit('');
     end;
 
+    /// <summary>
+    /// Integration event raised before calculating total amounts for VAT entry totaling lines.
+    /// Enables custom calculation logic and amount modifications before standard VAT entry processing.
+    /// </summary>
+    /// <param name="VATStmtLine">VAT statement line being calculated</param>
+    /// <param name="VATEntry">VAT entry record used for totaling</param>
+    /// <param name="Amount">Current calculated amount, can be modified</param>
+    /// <param name="UseAmtsInAddCurr">Whether additional reporting currency amounts are used</param>
     [IntegrationEvent(false, false)]
     local procedure OnCalcLineTotalOnBeforeCalcTotalAmountVATEntryTotaling(VATStmtLine: Record "VAT Statement Line"; var VATEntry: Record "VAT Entry"; var Amount: Decimal; UseAmtsInAddCurr: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised before calculating total amounts for G/L account totaling lines.
+    /// Enables custom calculation logic and amount modifications before standard G/L account processing.
+    /// </summary>
+    /// <param name="VATStmtLine">VAT statement line being calculated</param>
+    /// <param name="VATEntry">VAT entry record used for account totaling</param>
+    /// <param name="Amount">Current calculated amount, can be modified</param>
+    /// <param name="UseAmtsInAddCurr">Whether additional reporting currency amounts are used</param>
     [IntegrationEvent(false, false)]
     local procedure OnCalcLineTotalOnBeforeCalcTotalAmountAccountTotaling(VATStmtLine: Record "VAT Statement Line"; var VATEntry: Record "VAT Entry"; var Amount: Decimal; UseAmtsInAddCurr: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised after setting filters on VAT entries for VAT entry totaling calculations.
+    /// Enables additional filter modifications or custom VAT entry selection logic.
+    /// </summary>
+    /// <param name="VATStmtLine">VAT statement line being processed</param>
+    /// <param name="VATEntry">VAT entry record with applied filters</param>
+    /// <param name="Selection">Selection type determining filter criteria</param>
     [IntegrationEvent(false, false)]
     local procedure OnCalcLineTotalOnVATEntryTotalingOnAfterVATEntrySetFilters(VATStmtLine: Record "VAT Statement Line"; var VATEntry: Record "VAT Entry"; Selection: Enum "VAT Statement Report Selection")
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised for custom VAT statement line types not handled by standard calculation logic.
+    /// Enables implementation of custom totaling and calculation methods for extended line types.
+    /// </summary>
+    /// <param name="VATStmtLine2">VAT statement line being calculated</param>
+    /// <param name="Amount">Current amount calculation, can be modified</param>
+    /// <param name="TotalAmount">Running total amount accumulator</param>
+    /// <param name="Level">Current calculation nesting level</param>
+    /// <param name="PeriodSelection">Period selection criteria</param>
+    /// <param name="StartDate">Period start date</param>
+    /// <param name="EndDate">Period end date</param>
+    /// <param name="EndDateReq">Requested end date</param>
+    /// <param name="PrintInIntegers">Whether amounts are printed as integers</param>
+    /// <param name="UseAmtsInAddCurr">Whether additional currency amounts are used</param>
+    /// <param name="TotalBase">Running total base amount accumulator</param>
     [IntegrationEvent(false, false)]
     local procedure OnCalcLineTotalWithBaseOnCaseElse(var VATStmtLine2: Record "VAT Statement Line"; var Amount: Decimal; var TotalAmount: Decimal; Level: Integer; PeriodSelection: Enum "VAT Statement Report Period Selection"; StartDate: Date; EndDate: Date; EndDateReq: Date; PrintInIntegers: Boolean; UseAmtsInAddCurr: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised after setting filters on G/L accounts for account totaling calculations.
+    /// Enables additional filter modifications or custom G/L account selection logic.
+    /// </summary>
+    /// <param name="GLAccount">G/L account record with applied filters</param>
+    /// <param name="VATStatementLine2">VAT statement line being processed</param>
     [IntegrationEvent(false, false)]
     local procedure OnCalcLineTotalWithBaseOnAfterGLAccSetFilters(var GLAccount: Record "G/L Account"; VATStatementLine2: Record "VAT Statement Line")
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised before calculating VAT statement line totals with base amounts.
+    /// Enables complete override of line total calculation logic with custom implementations.
+    /// </summary>
+    /// <param name="VATStmtLine2">VAT statement line being calculated</param>
+    /// <param name="TotalAmount">Total VAT amount result</param>
+    /// <param name="TotalBase">Total base amount result</param>
+    /// <param name="Level">Current calculation nesting level</param>
+    /// <param name="RowNo">Row number array for error tracking</param>
+    /// <param name="ErrorText">Error message text for validation failures</param>
+    /// <param name="Result">Calculation success result</param>
+    /// <param name="IsHandled">Set to true to skip standard calculation logic</param>
     [IntegrationEvent(true, false)]
     local procedure OnBeforeCalcLineTotalWithBase(VATStmtLine2: Record "VAT Statement Line"; var TotalAmount: Decimal; var TotalBase: Decimal; Level: Integer; var RowNo: array[6] of Code[10]; var ErrorText: Text[80]; var Result: Boolean; var IsHandled: Boolean)
     begin

@@ -13,6 +13,15 @@ using Microsoft.Foundation.Enums;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.History;
 
+/// <summary>
+/// Stores VAT calculation data for document lines grouped by VAT identifier and calculation parameters.
+/// Supports VAT amount calculations, invoice discounts, and non-deductible VAT processing for sales and purchase transactions.
+/// </summary>
+/// <remarks>
+/// Primary temporary table used during VAT calculations and document posting.
+/// Key integrations: VAT posting, invoice posting, sales/purchase document processing.
+/// Extensibility: Multiple integration events for VAT calculation customization.
+/// </remarks>
 #pragma warning disable AS0109
 table 290 "VAT Amount Line"
 {
@@ -22,6 +31,9 @@ table 290 "VAT Amount Line"
 
     fields
     {
+        /// <summary>
+        /// VAT percentage used for VAT calculations on document lines with this VAT identifier.
+        /// </summary>
         field(1; "VAT %"; Decimal)
         {
             AutoFormatType = 0;
@@ -29,11 +41,17 @@ table 290 "VAT Amount Line"
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
+        /// <summary>
+        /// Total net amount excluding VAT for document lines with this VAT identifier.
+        /// </summary>
         field(2; "VAT Base"; Decimal)
         {
             Caption = 'VAT Base';
             Editable = false;
         }
+        /// <summary>
+        /// Total VAT amount calculated for document lines with this VAT identifier.
+        /// </summary>
         field(3; "VAT Amount"; Decimal)
         {
             Caption = 'VAT Amount';
@@ -48,26 +66,41 @@ table 290 "VAT Amount Line"
                 NonDeductibleVAT.ValidateVATAmountInVATAmountLine(Rec);
             end;
         }
+        /// <summary>
+        /// Total amount including VAT for document lines with this VAT identifier.
+        /// </summary>
         field(4; "Amount Including VAT"; Decimal)
         {
             Caption = 'Amount Including VAT';
             Editable = false;
         }
+        /// <summary>
+        /// VAT identifier that groups VAT posting setup combinations for VAT calculations.
+        /// </summary>
         field(5; "VAT Identifier"; Code[20])
         {
             Caption = 'VAT Identifier';
             Editable = false;
         }
+        /// <summary>
+        /// Total line amount before invoice discount for document lines with this VAT identifier.
+        /// </summary>
         field(6; "Line Amount"; Decimal)
         {
             Caption = 'Line Amount';
             Editable = false;
         }
+        /// <summary>
+        /// Base amount eligible for invoice discount calculation.
+        /// </summary>
         field(7; "Inv. Disc. Base Amount"; Decimal)
         {
             Caption = 'Inv. Disc. Base Amount';
             Editable = false;
         }
+        /// <summary>
+        /// Invoice discount amount applied to document lines with this VAT identifier.
+        /// </summary>
         field(8; "Invoice Discount Amount"; Decimal)
         {
             Caption = 'Invoice Discount Amount';
@@ -82,17 +115,26 @@ table 290 "VAT Amount Line"
                 "VAT Base" := CalcLineAmount();
             end;
         }
+        /// <summary>
+        /// VAT calculation method determining how VAT is calculated for this VAT identifier.
+        /// </summary>
         field(9; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
             Caption = 'VAT Calculation Type';
             Editable = false;
         }
+        /// <summary>
+        /// Tax group code used for sales tax calculations in US localization.
+        /// </summary>
         field(10; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             Editable = false;
             TableRelation = "Tax Group";
         }
+        /// <summary>
+        /// Quantity sum for document lines with this VAT identifier.
+        /// </summary>
         field(11; Quantity; Decimal)
         {
             AutoFormatType = 0;
@@ -100,46 +142,76 @@ table 290 "VAT Amount Line"
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
+        /// <summary>
+        /// Indicates whether VAT amounts have been manually modified from calculated values.
+        /// </summary>
         field(12; Modified; Boolean)
         {
             Caption = 'Modified';
         }
+        /// <summary>
+        /// Indicates use tax calculation for reverse charge VAT scenarios.
+        /// </summary>
         field(13; "Use Tax"; Boolean)
         {
             Caption = 'Use Tax';
         }
+        /// <summary>
+        /// System-calculated VAT amount before manual adjustments or VAT differences.
+        /// </summary>
         field(14; "Calculated VAT Amount"; Decimal)
         {
             Caption = 'Calculated VAT Amount';
             Editable = false;
         }
+        /// <summary>
+        /// Difference between calculated VAT amount and manually entered VAT amount.
+        /// </summary>
         field(15; "VAT Difference"; Decimal)
         {
             Caption = 'VAT Difference';
             Editable = false;
         }
+        /// <summary>
+        /// Indicates whether line amounts are positive values for proper VAT calculation grouping.
+        /// </summary>
         field(16; Positive; Boolean)
         {
             Caption = 'Positive';
         }
+        /// <summary>
+        /// Indicates whether this VAT amount line includes prepayment amounts.
+        /// </summary>
         field(17; "Includes Prepayment"; Boolean)
         {
             Caption = 'Includes Prepayment';
         }
+        /// <summary>
+        /// VAT clause code providing additional VAT reporting information and text.
+        /// </summary>
         field(18; "VAT Clause Code"; Code[20])
         {
             Caption = 'VAT Clause Code';
             TableRelation = "VAT Clause";
         }
+        /// <summary>
+        /// Tax category code used for electronic VAT reporting and compliance.
+        /// </summary>
         field(19; "Tax Category"; Code[10])
         {
             Caption = 'Tax Category';
         }
+        /// <summary>
+        /// Payment discount amount applied to document lines with this VAT identifier.
+        /// </summary>
         field(20; "Pmt. Discount Amount"; Decimal)
         {
             Caption = 'Pmt. Discount Amount';
             Editable = false;
         }
+        /// <summary>
+        /// Non-deductible VAT percentage for partial VAT deduction scenarios.
+        /// </summary>
         field(6200; "Non-Deductible VAT %"; Decimal)
         {
             AutoFormatType = 0;
@@ -147,11 +219,17 @@ table 290 "VAT Amount Line"
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
+        /// <summary>
+        /// VAT base amount that is non-deductible according to non-deductible VAT percentage.
+        /// </summary>
         field(6201; "Non-Deductible VAT Base"; Decimal)
         {
             Caption = 'Non-Deductible VAT Base';
             Editable = false;
         }
+        /// <summary>
+        /// VAT amount that is non-deductible and will be added to the expense or asset cost.
+        /// </summary>
         field(6202; "Non-Deductible VAT Amount"; Decimal)
         {
             Caption = 'Non-Deductible VAT Amount';
@@ -161,21 +239,33 @@ table 290 "VAT Amount Line"
                 NonDeductibleVAT.ValidateNonDeductibleVATInVATAmountLine(Rec);
             end;
         }
+        /// <summary>
+        /// System-calculated non-deductible VAT amount before manual adjustments.
+        /// </summary>
         field(6203; "Calc. Non-Ded. VAT Amount"; Decimal)
         {
             Caption = 'Calculated Non-Deductible VAT Amount';
             Editable = false;
         }
+        /// <summary>
+        /// VAT base amount that is deductible and can be claimed back from tax authorities.
+        /// </summary>
         field(6204; "Deductible VAT Base"; Decimal)
         {
             Caption = 'Deductible VAT Base';
             Editable = false;
         }
+        /// <summary>
+        /// VAT amount that is deductible and can be claimed back from tax authorities.
+        /// </summary>
         field(6205; "Deductible VAT Amount"; Decimal)
         {
             Caption = 'Deductible VAT Amount';
             Editable = false;
         }
+        /// <summary>
+        /// Difference between calculated and manually entered non-deductible VAT amounts.
+        /// </summary>
         field(6206; "Non-Deductible VAT Diff."; Decimal)
         {
             Caption = 'Non-Deductible VAT Difference';
@@ -254,6 +344,11 @@ table 290 "VAT Amount Line"
         InvoiceDiscAmtIsGreaterThanBaseAmtErr: Label 'The maximum %1 that you can apply is %2.', Comment = '1 Invoice Discount Amount that should be set 2 Maximum Amount that you can assign';
 #pragma warning restore AA0470
 
+    /// <summary>
+    /// Validates VAT difference against maximum allowed VAT difference limits.
+    /// </summary>
+    /// <param name="NewCurrencyCode">Currency code for VAT difference validation</param>
+    /// <param name="NewAllowVATDifference">Whether VAT differences are allowed on this document</param>
     procedure CheckVATDifference(NewCurrencyCode: Code[10]; NewAllowVATDifference: Boolean)
     var
         GLSetup: Record "General Ledger Setup";
@@ -287,6 +382,10 @@ table 290 "VAT Amount Line"
         GlobalsInitialized := true;
     end;
 
+    /// <summary>
+    /// Inserts or updates VAT amount line with calculated amounts, combining with existing line if found.
+    /// </summary>
+    /// <returns>True if line was successfully inserted or updated, false if amounts are zero</returns>
     procedure InsertLine() Result: Boolean
     var
         VATAmountLine: Record "VAT Amount Line";
@@ -330,6 +429,17 @@ table 290 "VAT Amount Line"
     end;
 
 #if not CLEAN26
+    /// <summary>
+    /// Creates new VAT amount line with specified parameters. Obsolete - replaced by procedures using Source Record.
+    /// </summary>
+    /// <param name="VATIdentifier">VAT identifier for grouping</param>
+    /// <param name="VATCalcType">VAT calculation type</param>
+    /// <param name="TaxGroupCode">Tax group code for sales tax</param>
+    /// <param name="UseTax">Whether to use tax calculation</param>
+    /// <param name="TaxRate">VAT percentage rate</param>
+    /// <param name="IsPositive">Whether amounts are positive</param>
+    /// <param name="IsPrepayment">Whether line includes prepayment</param>
+    /// <param name="NonDeductibleVATPct">Non-deductible VAT percentage</param>
     [Obsolete('Replaced by procedures using Source Record.', '26.0')]
     procedure InsertNewLine(VATIdentifier: Code[20]; VATCalcType: Enum "Tax Calculation Type"; TaxGroupCode: Code[20]; UseTax: Boolean; TaxRate: Decimal; IsPositive: Boolean; IsPrepayment: Boolean; DeductiblePercent: Decimal)
     begin
@@ -350,6 +460,10 @@ table 290 "VAT Amount Line"
     end;
 #endif
 
+    /// <summary>
+    /// Retrieves VAT amount line by sequential number from the recordset.
+    /// </summary>
+    /// <param name="Number">Sequential number (1 for first line, otherwise next line)</param>
     procedure GetLine(Number: Integer)
     begin
         if Number = 1 then
@@ -358,6 +472,10 @@ table 290 "VAT Amount Line"
             Next();
     end;
 
+    /// <summary>
+    /// Generates descriptive text for VAT amount display based on VAT percentage.
+    /// </summary>
+    /// <returns>Formatted text showing VAT percentage or generic "VAT Amount" text</returns>
     procedure VATAmountText() Result: Text[30]
     var
         TempVATAmountLine: Record "VAT Amount Line" temporary;
@@ -387,6 +505,12 @@ table 290 "VAT Amount Line"
         OnAfterVATAmountText(VATPercentage, FullCount, Result);
     end;
 
+    /// <summary>
+    /// Calculates total line amount across all VAT amount lines with optional VAT subtraction.
+    /// </summary>
+    /// <param name="SubtractVAT">Whether to subtract VAT from line amounts</param>
+    /// <param name="CurrencyCode">Currency code for rounding precision</param>
+    /// <returns>Total line amount</returns>
     procedure GetTotalLineAmount(SubtractVAT: Boolean; CurrencyCode: Code[10]): Decimal
     var
         LineAmount: Decimal;
@@ -408,6 +532,10 @@ table 290 "VAT Amount Line"
         exit(LineAmount);
     end;
 
+    /// <summary>
+    /// Calculates total VAT amount across all VAT amount lines in the recordset.
+    /// </summary>
+    /// <returns>Total VAT amount</returns>
     procedure GetTotalVATAmount() VATAmount: Decimal
     var
         IsHandled: Boolean;
@@ -421,12 +549,22 @@ table 290 "VAT Amount Line"
         exit("VAT Amount");
     end;
 
+    /// <summary>
+    /// Calculates total invoice discount amount across all VAT amount lines.
+    /// </summary>
+    /// <returns>Total invoice discount amount</returns>
     procedure GetTotalInvDiscAmount(): Decimal
     begin
         CalcSums("Invoice Discount Amount");
         exit("Invoice Discount Amount");
     end;
 
+    /// <summary>
+    /// Calculates total invoice discount base amount with optional VAT subtraction.
+    /// </summary>
+    /// <param name="SubtractVAT">Whether to subtract VAT from base amounts</param>
+    /// <param name="CurrencyCode">Currency code for rounding precision</param>
+    /// <returns>Total invoice discount base amount</returns>
     procedure GetTotalInvDiscBaseAmount(SubtractVAT: Boolean; CurrencyCode: Code[10]): Decimal
     var
         InvDiscBaseAmount: Decimal;
@@ -448,18 +586,32 @@ table 290 "VAT Amount Line"
         exit(InvDiscBaseAmount);
     end;
 
+    /// <summary>
+    /// Calculates total VAT base amount across all VAT amount lines.
+    /// </summary>
+    /// <returns>Total VAT base amount</returns>
     procedure GetTotalVATBase(): Decimal
     begin
         CalcSums("VAT Base");
         exit("VAT Base");
     end;
 
+    /// <summary>
+    /// Calculates total amount including VAT across all VAT amount lines.
+    /// </summary>
+    /// <returns>Total amount including VAT</returns>
     procedure GetTotalAmountInclVAT(): Decimal
     begin
         CalcSums("Amount Including VAT");
         exit("Amount Including VAT");
     end;
 
+    /// <summary>
+    /// Calculates total VAT discount amount based on rounding differences.
+    /// </summary>
+    /// <param name="CurrencyCode">Currency code for rounding precision</param>
+    /// <param name="NewPricesIncludingVAT">Whether prices include VAT</param>
+    /// <returns>Total VAT discount amount</returns>
     procedure GetTotalVATDiscount(CurrencyCode: Code[10]; NewPricesIncludingVAT: Boolean): Decimal
     var
         VATDiscount: Decimal;
@@ -486,6 +638,10 @@ table 290 "VAT Amount Line"
         exit(VATDiscount);
     end;
 
+    /// <summary>
+    /// Checks whether any VAT amount line has been manually modified.
+    /// </summary>
+    /// <returns>True if any line has Modified flag set</returns>
     procedure GetAnyLineModified(): Boolean
     begin
         if Find('-') then
@@ -496,6 +652,13 @@ table 290 "VAT Amount Line"
         exit(false);
     end;
 
+    /// <summary>
+    /// Distributes invoice discount amount proportionally across VAT amount lines.
+    /// </summary>
+    /// <param name="NewInvoiceDiscount">Total invoice discount to distribute</param>
+    /// <param name="NewCurrencyCode">Currency code for calculations</param>
+    /// <param name="NewPricesIncludingVAT">Whether prices include VAT</param>
+    /// <param name="NewVATBaseDiscPct">VAT base discount percentage</param>
     procedure SetInvoiceDiscountAmount(NewInvoiceDiscount: Decimal; NewCurrencyCode: Code[10]; NewPricesIncludingVAT: Boolean; NewVATBaseDiscPct: Decimal)
     var
         TotalInvDiscBaseAmount: Decimal;
@@ -525,6 +688,14 @@ table 290 "VAT Amount Line"
         until Next() = 0;
     end;
 
+    /// <summary>
+    /// Applies invoice discount percentage to VAT amount lines with proportional distribution.
+    /// </summary>
+    /// <param name="NewInvoiceDiscountPct">Invoice discount percentage to apply</param>
+    /// <param name="NewCurrencyCode">Currency code for calculations</param>
+    /// <param name="NewPricesIncludingVAT">Whether prices include VAT</param>
+    /// <param name="CalcInvDiscPerVATID">Whether to calculate discount per VAT identifier</param>
+    /// <param name="NewVATBaseDiscPct">VAT base discount percentage</param>
     procedure SetInvoiceDiscountPercent(NewInvoiceDiscountPct: Decimal; NewCurrencyCode: Code[10]; NewPricesIncludingVAT: Boolean; CalcInvDiscPerVATID: Boolean; NewVATBaseDiscPct: Decimal)
     var
         NewRemainder: Decimal;
@@ -567,6 +738,10 @@ table 290 "VAT Amount Line"
             Currency."Amount Rounding Precision", Currency.VATRoundingDirection()));
     end;
 
+    /// <summary>
+    /// Calculates line amount after subtracting invoice discount from original line amount.
+    /// </summary>
+    /// <returns>Net line amount used for VAT calculations</returns>
     procedure CalcLineAmount() LineAmount: Decimal
     begin
         LineAmount := "Line Amount" - "Invoice Discount Amount";
@@ -574,6 +749,12 @@ table 290 "VAT Amount Line"
         OnAfterCalcLineAmount(Rec, LineAmount);
     end;
 
+    /// <summary>
+    /// Recalculates VAT amounts and VAT base based on current line amount and VAT parameters.
+    /// </summary>
+    /// <param name="NewCurrencyCode">Currency code for rounding precision</param>
+    /// <param name="NewPricesIncludingVAT">Whether prices include VAT</param>
+    /// <param name="NewVATBaseDiscPct">VAT base discount percentage</param>
     procedure CalcVATFields(NewCurrencyCode: Code[10]; NewPricesIncludingVAT: Boolean; NewVATBaseDiscPct: Decimal)
     begin
         OnBeforeCalcVATFields(Rec, NewVATBaseDiscPct);
@@ -619,11 +800,25 @@ table 290 "VAT Amount Line"
         exit(CurrencyExchangeRate.ExchangeAmtFCYToLCY(PostingDate, CurrencyCode, Value, CurrencyFactor));
     end;
 
+    /// <summary>
+    /// Converts VAT base amount from foreign currency to local currency using exchange rate.
+    /// </summary>
+    /// <param name="PostingDate">Date for exchange rate lookup</param>
+    /// <param name="CurrencyCode">Foreign currency code</param>
+    /// <param name="CurrencyFactor">Currency exchange factor</param>
+    /// <returns>VAT base amount in local currency</returns>
     procedure GetBaseLCY(PostingDate: Date; CurrencyCode: Code[10]; CurrencyFactor: Decimal): Decimal
     begin
         exit(Round(CalcValueLCY("VAT Base", PostingDate, CurrencyCode, CurrencyFactor)));
     end;
 
+    /// <summary>
+    /// Calculates VAT amount in local currency by converting from foreign currency.
+    /// </summary>
+    /// <param name="PostingDate">Date for exchange rate lookup</param>
+    /// <param name="CurrencyCode">Foreign currency code</param>
+    /// <param name="CurrencyFactor">Currency exchange factor</param>
+    /// <returns>VAT amount in local currency</returns>
     procedure GetAmountLCY(PostingDate: Date; CurrencyCode: Code[10]; CurrencyFactor: Decimal): Decimal
     begin
         exit(
@@ -631,6 +826,10 @@ table 290 "VAT Amount Line"
           Round(CalcValueLCY("VAT Base", PostingDate, CurrencyCode, CurrencyFactor)));
     end;
 
+    /// <summary>
+    /// Deducts amounts from current VAT amount lines using corresponding lines from another recordset.
+    /// </summary>
+    /// <param name="VATAmountLineDeduct">VAT amount line recordset containing amounts to deduct</param>
     procedure DeductVATAmountLine(var VATAmountLineDeduct: Record "VAT Amount Line")
     begin
         if FindSet() then
@@ -661,7 +860,18 @@ table 290 "VAT Amount Line"
         Modify();
     end;
 
-
+    /// <summary>
+    /// Updates VAT amount lines with calculated VAT amounts and totals based on currency, pricing settings, and tax configuration.
+    /// Performs comprehensive VAT calculations including sales tax processing and currency conversions.
+    /// </summary>
+    /// <param name="TotalVATAmount">Total VAT amount calculated across all lines</param>
+    /// <param name="Currency">Currency record for rounding and conversion</param>
+    /// <param name="CurrencyFactor">Currency exchange factor for conversion calculations</param>
+    /// <param name="PricesIncludingVAT">Whether prices include VAT or VAT is calculated on top</param>
+    /// <param name="VATBaseDiscountPercHeader">VAT base discount percentage from document header</param>
+    /// <param name="TaxAreaCode">Tax area code for sales tax calculations</param>
+    /// <param name="TaxLiable">Whether the transaction is liable for sales tax</param>
+    /// <param name="PostingDate">Posting date for tax rate determination</param>
     procedure UpdateLines(var TotalVATAmount: Decimal; Currency: Record Currency; CurrencyFactor: Decimal; PricesIncludingVAT: Boolean; VATBaseDiscountPercHeader: Decimal; TaxAreaCode: Code[20]; TaxLiable: Boolean; PostingDate: Date)
     var
         PrevVATAmountLine: Record "VAT Amount Line";
@@ -826,6 +1036,10 @@ table 290 "VAT Amount Line"
             TempVATAmountLine.Copy(Rec, true);
     end;
 
+    /// <summary>
+    /// Copies VAT-related fields from posted purchase invoice line to create VAT amount line for analysis or reporting.
+    /// </summary>
+    /// <param name="PurchInvLine">Posted purchase invoice line containing VAT information to copy</param>
     procedure CopyFromPurchInvLine(PurchInvLine: Record "Purch. Inv. Line")
     begin
         "VAT Identifier" := PurchInvLine."VAT Identifier";
@@ -851,6 +1065,10 @@ table 290 "VAT Amount Line"
         OnAfterCopyFromPurchInvLine(Rec, PurchInvLine);
     end;
 
+    /// <summary>
+    /// Copies VAT-related fields from posted purchase credit memo line to create VAT amount line for analysis or reporting.
+    /// </summary>
+    /// <param name="PurchCrMemoLine">Posted purchase credit memo line containing VAT information to copy</param>
     procedure CopyFromPurchCrMemoLine(PurchCrMemoLine: Record "Purch. Cr. Memo Line")
     begin
         "VAT Identifier" := PurchCrMemoLine."VAT Identifier";
@@ -876,6 +1094,10 @@ table 290 "VAT Amount Line"
         OnAfterCopyFromPurchCrMemoLine(Rec, PurchCrMemoLine);
     end;
 
+    /// <summary>
+    /// Copies VAT-related fields from posted sales invoice line to create VAT amount line for analysis or reporting.
+    /// </summary>
+    /// <param name="SalesInvoiceLine">Posted sales invoice line containing VAT information to copy</param>
     procedure CopyFromSalesInvLine(SalesInvoiceLine: Record "Sales Invoice Line")
     begin
         "VAT Identifier" := SalesInvoiceLine."VAT Identifier";
@@ -898,6 +1120,10 @@ table 290 "VAT Amount Line"
         OnAfterCopyFromSalesInvLine(Rec, SalesInvoiceLine);
     end;
 
+    /// <summary>
+    /// Copies VAT-related fields from posted sales credit memo line to create VAT amount line for analysis or reporting.
+    /// </summary>
+    /// <param name="SalesCrMemoLine">Posted sales credit memo line containing VAT information to copy</param>
     procedure CopyFromSalesCrMemoLine(SalesCrMemoLine: Record "Sales Cr.Memo Line")
     begin
         "VAT Identifier" := SalesCrMemoLine."VAT Identifier";
@@ -917,8 +1143,6 @@ table 290 "VAT Amount Line"
 
         OnAfterCopyFromSalesCrMemoLine(Rec, SalesCrMemoLine);
     end;
-
-
 
     local procedure GetVATBaseDiscountPerc(VATBaseDiscountPerc: Decimal) NewVATBaseDiscountPerc: Decimal
     var
