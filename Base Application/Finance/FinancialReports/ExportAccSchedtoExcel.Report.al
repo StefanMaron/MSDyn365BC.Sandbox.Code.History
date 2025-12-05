@@ -13,6 +13,15 @@ using System.Environment;
 using System.IO;
 using System.Utilities;
 
+/// <summary>
+/// Exports account schedule data and column layouts to Excel format with comprehensive formatting and template support.
+/// Provides flexible Excel export functionality including existing template updates, custom formatting, and filter information.
+/// </summary>
+/// <remarks>
+/// Supports both new Excel file creation and existing template updates. Includes advanced Excel formatting,
+/// formula preservation, and integration with financial report Excel templates for standardized output formatting.
+/// Extensible through multiple integration events for custom column calculations and filter processing.
+/// </remarks>
 report 29 "Export Acc. Sched. to Excel"
 {
     Caption = 'Export Acc. Sched. to Excel';
@@ -139,11 +148,26 @@ report 29 "Export Acc. Sched. to Excel"
         ExcelFileExtensionTok: Label '.xlsx', Locked = true;
         GenericSheetNameLbl: Label 'Sheet %1', Comment = '%1 = Sheet number';
 
+    /// <summary>
+    /// Sets account schedule export options including account schedule lines, column layout, and currency settings.
+    /// Configures the basic export parameters for Excel generation without financial report context.
+    /// </summary>
+    /// <param name="AccSchedLine2">Account schedule line record to export</param>
+    /// <param name="ColumnLayoutName2">Column layout name for formatting</param>
+    /// <param name="UseAmtsInAddCurr2">Whether to use amounts in additional currency</param>
     procedure SetOptions(var AccSchedLine2: Record "Acc. Schedule Line"; ColumnLayoutName2: Code[10]; UseAmtsInAddCurr2: Boolean)
     begin
         SetOptions(AccSchedLine2, ColumnLayoutName2, UseAmtsInAddCurr2, '');
     end;
 
+    /// <summary>
+    /// Sets comprehensive account schedule export options including financial report context.
+    /// Configures all export parameters for Excel generation with financial report integration.
+    /// </summary>
+    /// <param name="AccSchedLine2">Account schedule line record to export</param>
+    /// <param name="ColumnLayoutName2">Column layout name for formatting</param>
+    /// <param name="UseAmtsInAddCurr2">Whether to use amounts in additional currency</param>
+    /// <param name="FinancialReportName">Financial report name for context and template selection</param>
     procedure SetOptions(var AccSchedLine2: Record "Acc. Schedule Line"; ColumnLayoutName2: Code[10]; UseAmtsInAddCurr2: Boolean; FinancialReportName: Code[10])
     begin
         SetOptions(AccSchedLine2, ColumnLayoutName2, UseAmtsInAddCurr2, FinancialReportName, '');
@@ -381,21 +405,45 @@ report 29 "Export Acc. Sched. to Excel"
         exit(CopyStr(Dimension.GetMLFilterCaption(GlobalLanguage), 1, 80));
     end;
 
+    /// <summary>
+    /// Controls whether to update an existing Excel worksheet or create a new one.
+    /// Enables modification of existing workbooks while preserving non-data content.
+    /// </summary>
+    /// <param name="UpdateExistingWorksheet">True to update existing worksheet, false to create new</param>
     procedure SetUpdateExistingWorksheet(UpdateExistingWorksheet: Boolean)
     begin
         DoUpdateExistingWorksheet := UpdateExistingWorksheet;
     end;
 
+    /// <summary>
+    /// Sets the output file path for silent Excel export without user interaction.
+    /// Enables automated export scenarios where file path is predetermined.
+    /// </summary>
+    /// <param name="NewFileName">Full file path for Excel output file</param>
     procedure SetFileNameSilent(NewFileName: Text)
     begin
         ServerFileName := NewFileName;
     end;
 
+    /// <summary>
+    /// Enables or disables test mode for Excel export operations.
+    /// Test mode allows validation and debugging without full file generation.
+    /// </summary>
+    /// <param name="NewTestMode">True to enable test mode, false for normal operation</param>
     procedure SetTestMode(NewTestMode: Boolean)
     begin
         TestMode := NewTestMode;
     end;
 
+    /// <summary>
+    /// Configures the export to use an existing Excel template for formatting and layout.
+    /// Enables template-based Excel generation with predefined formatting and structure.
+    /// </summary>
+    /// <param name="FinReportExcelTemplate">Financial report Excel template record containing template data</param>
+    /// <remarks>
+    /// Extracts template from BLOB field, creates server file, and configures export parameters
+    /// for template-based Excel generation with preserved formatting and structure.
+    /// </remarks>
     procedure SetUseExistingTemplate(var FinReportExcelTemplate: Record "Fin. Report Excel Template")
     var
         InStream: InStream;
@@ -414,11 +462,21 @@ report 29 "Export Acc. Sched. to Excel"
         ExistingTemplateName := FileMgt.CreateFileNameWithExtension(ExistingTemplateName, ExcelFileExtensionTok);
     end;
 
+    /// <summary>
+    /// Configures the export to save Excel data to a stream instead of a file.
+    /// Enables in-memory Excel processing and custom output handling.
+    /// </summary>
+    /// <param name="NewSaveToStream">True to save to stream, false to save to file</param>
     procedure SetSaveToStream(NewSaveToStream: Boolean)
     begin
         SaveToStream := NewSaveToStream;
     end;
 
+    /// <summary>
+    /// Retrieves the saved Excel data as an output stream for custom processing.
+    /// Provides access to generated Excel content for further manipulation or transmission.
+    /// </summary>
+    /// <param name="OutStream">Output stream containing the Excel data</param>
     procedure GetSavedStream(var OutStream: OutStream)
     begin
         TempExcelBuffer.SaveToStream(OutStream, true);
@@ -477,16 +535,33 @@ report 29 "Export Acc. Sched. to Excel"
         exit(true);
     end;
 
+    /// <summary>
+    /// Integration event raised before calculating column values during Excel export.
+    /// Enables custom modification of currency settings and column layout parameters.
+    /// </summary>
+    /// <param name="UseAmtsInAddCurr">Whether to use amounts in additional currency</param>
+    /// <param name="ColumnLayout">Column layout record being processed</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcColumnValue(var UseAmtsInAddCurr: Boolean; var ColumnLayout: Record "Column Layout")
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised after calculating column values during Excel export.
+    /// Enables custom post-processing of currency settings and calculated column data.
+    /// </summary>
+    /// <param name="UseAmtsInAddCurr">Whether amounts in additional currency were used</param>
+    /// <param name="ColumnLayout">Column layout record that was processed</param>
     [IntegrationEvent(false, false)]
     local procedure OnAferCalcColumnValue(var UseAmtsInAddCurr: Boolean; var ColumnLayout: Record "Column Layout")
     begin
     end;
 
+    /// <summary>
+    /// Integration event raised after applying filters to account schedule lines during data processing.
+    /// Enables custom filter modification and additional filter criteria application.
+    /// </summary>
+    /// <param name="AccScheduleLine">Account schedule line record with applied filters</param>
     [IntegrationEvent(false, false)]
     local procedure OnIntegerOnAfterGetRecordOnAfterAccSchedLineSetFilter(var AccScheduleLine: Record "Acc. Schedule Line")
     begin
