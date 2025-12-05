@@ -22,6 +22,7 @@ table 2670 "Allocation Account"
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
+            OptimizeForTextSearch = true;
             NotBlank = true;
         }
         /// <summary>
@@ -30,6 +31,7 @@ table 2670 "Allocation Account"
         field(2; Name; Text[100])
         {
             Caption = 'Name';
+            OptimizeForTextSearch = true;
         }
         /// <summary>
         /// Type of allocation method: Fixed for predefined percentages, Variable for dynamic calculations.
