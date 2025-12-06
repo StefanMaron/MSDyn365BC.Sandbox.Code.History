@@ -436,6 +436,12 @@ page 26 "Vendor Card"
                     ApplicationArea = VAT;
                     ToolTip = 'Specifies if the Unit Price and Line Amount fields on document lines should be shown with or without VAT.';
                 }
+                field("Self-Billing Agreement"; Rec."Self-Billing Agreement")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the value of the Self-Billing Agreement field.';
+                }
                 field("Price Calculation Method"; Rec."Price Calculation Method")
                 {
                     Visible = ExtendedPriceEnabled;

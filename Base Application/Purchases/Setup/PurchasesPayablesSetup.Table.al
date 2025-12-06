@@ -108,6 +108,11 @@ table 312 "Purchases & Payables Setup"
             Caption = 'Posted Receipt Nos.';
             TableRelation = "No. Series";
         }
+        field(17; "Posted Self-Billing Inv. Nos."; Code[20])
+        {
+            Caption = 'Posted Self-Billing Invoice Nos.';
+            TableRelation = "No. Series";
+        }
         field(19; "Blanket Order Nos."; Code[20])
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
