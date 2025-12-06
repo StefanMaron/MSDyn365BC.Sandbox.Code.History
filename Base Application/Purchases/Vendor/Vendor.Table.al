@@ -1191,6 +1191,10 @@ table 23 Vendor
             Caption = 'Allow Multiple Posting Groups';
             DataClassification = SystemMetadata;
         }
+        field(180; "Self-Billing Agreement"; Boolean)
+        {
+            Caption = 'Self-Billing Agreement';
+        }
         field(288; "Preferred Bank Account Code"; Code[20])
         {
             Caption = 'Preferred Bank Account Code';
