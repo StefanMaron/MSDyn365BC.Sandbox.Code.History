@@ -3038,7 +3038,10 @@ codeunit 90 "Purch.-Post"
                         ResetPostingNoSeriesFromSetup(PurchHeader."Posting No. Series", PurchSetup."Posted Credit Memo Nos.")
                     else
                         if (PurchHeader."Document Type" <> PurchHeader."Document Type"::"Credit Memo") then
-                            ResetPostingNoSeriesFromSetup(PurchHeader."Posting No. Series", PurchSetup."Posted Invoice Nos.");
+                            if PurchHeader."Self-Billing Invoice" then
+                                ResetPostingNoSeriesFromSetup(PurchHeader."Posting No. Series", PurchSetup."Posted Self-Billing Inv. Nos.")
+                            else
+                                ResetPostingNoSeriesFromSetup(PurchHeader."Posting No. Series", PurchSetup."Posted Invoice Nos.");
                     if PurchHeader."Document Type" = PurchHeader."Document Type"::"Credit Memo" then
                         if (PurchSetup."Posted Credit Memo Nos." <> '') and (PurchHeader."Posting No. Series" = '') then
                             CheckDefaultNoSeries(PurchSetup."Posted Credit Memo Nos.");
