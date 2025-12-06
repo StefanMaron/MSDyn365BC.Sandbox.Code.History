@@ -1456,6 +1456,9 @@ codeunit 99000822 "Mfg. Item Jnl.-Post Line"
         CapLedgEntry."Concurrent Capacity" := ItemJournalLine."Concurrent Capacity";
         CapLedgEntry."Work Shift Code" := ItemJournalLine."Work Shift Code";
         CapLedgEntry."Last Output Line" := LastOperation;
+
+        if ItemJournalLine."Rev. Capacity Ledger Entry No." <> 0 then
+            UpdateReversedCapacityLedgerEntry(ItemJournalLine, CapLedgEntry);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnSetupTempSplitItemJnlLineOnAfterDeductNonDistr', '', true, true)]
@@ -1540,5 +1543,19 @@ codeunit 99000822 "Mfg. Item Jnl.-Post Line"
 
             AppliedQty := -Abs(OldItemLedgerEntry."Reserved Quantity")
         end;
+    end;
+
+    local procedure UpdateReversedCapacityLedgerEntry(var ItemJnlLine: Record "Item Journal Line"; var CapLedgEntry: Record Microsoft.Manufacturing.Capacity."Capacity Ledger Entry")
+    var
+        ReversedCapacityLedgerEntry: Record Microsoft.Manufacturing.Capacity."Capacity Ledger Entry";
+    begin
+        ReversedCapacityLedgerEntry.Get(ItemJnlLine."Rev. Capacity Ledger Entry No.");
+        CapLedgEntry.Reversed := true;
+        CapLedgEntry."Reversed Entry No." := ReversedCapacityLedgerEntry."Entry No.";
+        CapLedgEntry.Description := ReversedCapacityLedgerEntry.Description;
+
+        ReversedCapacityLedgerEntry.Reversed := true;
+        ReversedCapacityLedgerEntry."Reversed by Entry No." := CapLedgEntry."Entry No.";
+        ReversedCapacityLedgerEntry.Modify();
     end;
 }
