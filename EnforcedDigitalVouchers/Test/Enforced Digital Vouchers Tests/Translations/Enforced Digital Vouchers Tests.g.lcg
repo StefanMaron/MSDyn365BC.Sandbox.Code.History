@@ -32,6 +32,24 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.EServices.EDocument)(LookupHint=Codeunit Digital Vouchers Tests - NamedType DetachQst)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 4070772112 - NamedType 6559368" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Digital voucher has been generated.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.EServices.EDocument)(LookupHint=Codeunit Digital Vouchers Tests - NamedType DigitalVoucherGenerateErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4070772112 - NamedType 4151900491" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Digital voucher has not been generated]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.EServices.EDocument)(LookupHint=Codeunit Digital Vouchers Tests - NamedType DigitalVoucherNotGenerateErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 4070772112 - NamedType 777386507" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Do you want to post the journal lines?]]></Val>
@@ -66,6 +84,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.EServices.EDocument)(LookupHint=Codeunit Digital Vouchers Tests - NamedType NotPossibleToPostWithoutVoucherErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4070772112 - NamedType 180528833" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Not possible to post without attaching the digital voucher or adding the note.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.EServices.EDocument)(LookupHint=Codeunit Digital Vouchers Tests - NamedType NotPossibleToPostWithoutVoucherOrNoteErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 4070772112 - NamedType 2859880924" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
