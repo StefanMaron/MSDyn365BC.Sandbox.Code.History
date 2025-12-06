@@ -1,13 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:am="http://schemas.microsoft.com/sqlserver/reporting/authoringmetadata">
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>e455f827-1467-4562-8d6d-d3fc4bba34fe</rd:ReportID>
+  <am:AuthoringMetadata>
+    <am:CreatedBy>
+      <am:Name>MSRB</am:Name>
+      <am:Version>15.1.30001.02</am:Version>
+    </am:CreatedBy>
+    <am:UpdatedBy>
+      <am:Name>MSRB</am:Name>
+      <am:Version>15.1.30001.02</am:Version>
+    </am:UpdatedBy>
+    <am:LastModifiedTimestamp>2025-12-02T06:52:06.4830802Z</am:LastModifiedTimestamp>
+  </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="DataSource">
+      <rd:SecurityType>None</rd:SecurityType>
       <ConnectionProperties>
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>50f56e78-9c08-4ee4-b766-ce9bd3bd3615</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -115,11 +128,13 @@ Cstr(Fields!PaymentTermsCaption.Value) + Chr(177) +
 Cstr(Fields!ShipmentMethodCaption.Value) + Chr(177) + 
 Cstr(Fields!EMailCaption.Value) + Chr(177) + 
 Cstr(Fields!BuyFromVendNo_PurchInvHeaderCaption.Value) + Chr(177) + 
-Cstr(Fields!PayToVendNo_PurchInvHeaderCaption.Value)+ Chr(177) + 
-Cstr(Fields!CompanyInfoBusinessIdentityCodeCaption.Value)+ Chr(177) + 
-Cstr(Fields!CompanyInfoBusinessIdCode.Value)+ Chr(177) + 
-Cstr(Fields!CompanyInfoRegisteredHomeCityCaption.Value)+ Chr(177) + 
-Cstr(Fields!CompanyInfoRegHomeCity.Value)
+Cstr(Fields!PayToVendNo_PurchInvHeaderCaption.Value) + Chr(177) + 
+Cstr(Fields!SelfBillingCaption.Value) + Chr(177) + 
+Cstr(Fields!CompanyInfoBankBranchNo.Value) + Chr(177) + 
+Cstr(Fields!CompanyIBAN_Lbl.Value) + Chr(177) + 
+Cstr(Fields!CompanyInfoIBAN.Value) + Chr(177) + 
+Cstr(Fields!SwiftCodeCaption.Value) + Chr(177) + 
+Cstr(Fields!CompanyInfoSwiftCode.Value)
 , 1)</Hidden>
                                             </Visibility>
                                             <Style />
@@ -212,12 +227,12 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                               <PaddingRight>5pt</PaddingRight>
                                             </Style>
                                           </Textbox>
-                                          <rd:Selected>true</rd:Selected>
                                         </CellContents>
                                       </TablixCell>
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox469">
+                                            <rd:DefaultName>textbox469</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -236,7 +251,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox469</rd:DefaultName>
                                             <ZIndex>139</ZIndex>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
@@ -473,6 +487,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox197">
+                                            <rd:DefaultName>Textbox197</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -491,7 +506,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox197</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -523,6 +537,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox186">
+                                            <rd:DefaultName>Textbox186</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -541,7 +556,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox186</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -567,6 +581,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="PurchInvLineNo">
+                                            <rd:DefaultName>PurchInvLineNo</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -583,7 +598,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>PurchInvLineNo</rd:DefaultName>
                                             <ZIndex>130</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -595,6 +609,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox470">
+                                            <rd:DefaultName>textbox470</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -612,7 +627,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox470</rd:DefaultName>
                                             <ZIndex>129</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -687,6 +701,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="PurchInvLineDirectUnitCost">
+                                            <rd:DefaultName>PurchInvLineDirectUnitCost</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -707,7 +722,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>PurchInvLineDirectUnitCost</rd:DefaultName>
                                             <ZIndex>126</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -780,6 +794,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="PurchInvLineVATIdentifier">
+                                            <rd:DefaultName>PurchInvLineVATIdentifier</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -796,7 +811,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>PurchInvLineVATIdentifier</rd:DefaultName>
                                             <ZIndex>123</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -845,6 +859,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox43">
+                                            <rd:DefaultName>textbox43</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -861,7 +876,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox43</rd:DefaultName>
                                             <ZIndex>120</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -873,6 +887,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox63">
+                                            <rd:DefaultName>textbox63</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -890,7 +905,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox63</rd:DefaultName>
                                             <ZIndex>119</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -909,6 +923,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox71">
+                                            <rd:DefaultName>textbox71</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -925,7 +940,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox71</rd:DefaultName>
                                             <ZIndex>118</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -938,6 +952,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox72">
+                                            <rd:DefaultName>textbox72</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -954,7 +969,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox72</rd:DefaultName>
                                             <ZIndex>117</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -967,6 +981,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox164">
+                                            <rd:DefaultName>textbox164</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -987,7 +1002,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox164</rd:DefaultName>
                                             <ZIndex>116</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -1004,6 +1018,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox176">
+                                            <rd:DefaultName>textbox176</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1021,7 +1036,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox176</rd:DefaultName>
                                             <ZIndex>2</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -1035,6 +1049,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox484">
+                                            <rd:DefaultName>textbox484</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -1051,7 +1066,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox484</rd:DefaultName>
                                             <ZIndex>1</ZIndex>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
@@ -1077,6 +1091,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox436">
+                                            <rd:DefaultName>textbox436</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -1094,7 +1109,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox436</rd:DefaultName>
                                             <ZIndex>13</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -1121,6 +1135,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox81">
+                                            <rd:DefaultName>textbox81</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -1138,7 +1153,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox81</rd:DefaultName>
                                             <ZIndex>22</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -1156,6 +1170,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox86">
+                                            <rd:DefaultName>textbox86</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1176,7 +1191,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox86</rd:DefaultName>
                                             <ZIndex>16</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -1229,6 +1243,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox59">
+                                            <rd:DefaultName>textbox59</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -1245,7 +1260,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox59</rd:DefaultName>
                                             <ZIndex>31</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -1263,6 +1277,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox68">
+                                            <rd:DefaultName>textbox68</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1282,7 +1297,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox68</rd:DefaultName>
                                             <ZIndex>25</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -1298,6 +1312,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox75">
+                                            <rd:DefaultName>textbox75</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1318,7 +1333,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox75</rd:DefaultName>
                                             <ZIndex>24</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -1335,6 +1349,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox207">
+                                            <rd:DefaultName>Textbox207</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1353,7 +1368,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox207</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1376,6 +1390,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox220">
+                                            <rd:DefaultName>Textbox220</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1394,7 +1409,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox220</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1416,6 +1430,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox221">
+                                            <rd:DefaultName>Textbox221</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1434,7 +1449,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox221</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -1454,6 +1468,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox233">
+                                            <rd:DefaultName>Textbox233</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1472,7 +1487,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox233</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
                                               <PaddingLeft>5pt</PaddingLeft>
@@ -1488,6 +1502,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox74">
+                                            <rd:DefaultName>textbox74</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -1505,7 +1520,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox74</rd:DefaultName>
                                             <ZIndex>40</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -1523,6 +1537,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox96">
+                                            <rd:DefaultName>textbox96</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -1542,7 +1557,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox96</rd:DefaultName>
                                             <ZIndex>34</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -1558,6 +1572,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox133">
+                                            <rd:DefaultName>textbox133</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1579,7 +1594,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox133</rd:DefaultName>
                                             <ZIndex>33</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -1803,6 +1817,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox240">
+                                            <rd:DefaultName>Textbox240</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1821,7 +1836,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox240</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1844,6 +1858,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox250">
+                                            <rd:DefaultName>Textbox250</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1862,7 +1877,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox250</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -1884,6 +1898,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox251">
+                                            <rd:DefaultName>Textbox251</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1902,7 +1917,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox251</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -1922,6 +1936,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox261">
+                                            <rd:DefaultName>Textbox261</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -1940,7 +1955,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox261</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
                                               <PaddingLeft>5pt</PaddingLeft>
@@ -2061,6 +2075,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox60">
+                                            <rd:DefaultName>Textbox60</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2079,7 +2094,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox60</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -2099,6 +2113,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox78">
+                                            <rd:DefaultName>Textbox78</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2117,7 +2132,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox78</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
                                               <PaddingLeft>5pt</PaddingLeft>
@@ -2133,6 +2147,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox79">
+                                            <rd:DefaultName>Textbox79</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2151,7 +2166,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox79</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -2171,6 +2185,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox90">
+                                            <rd:DefaultName>Textbox90</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2189,7 +2204,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox90</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -2245,6 +2259,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox145">
+                                            <rd:DefaultName>textbox145</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2265,7 +2280,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox145</rd:DefaultName>
                                             <ZIndex>70</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -2281,6 +2295,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox148">
+                                            <rd:DefaultName>textbox148</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2302,7 +2317,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox148</rd:DefaultName>
                                             <ZIndex>69</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -2319,6 +2333,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox262">
+                                            <rd:DefaultName>Textbox262</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2337,7 +2352,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox262</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -2360,6 +2374,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox272">
+                                            <rd:DefaultName>Textbox272</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2378,7 +2393,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox272</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -2400,6 +2414,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox273">
+                                            <rd:DefaultName>Textbox273</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2418,7 +2433,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox273</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -2438,6 +2452,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox283">
+                                            <rd:DefaultName>Textbox283</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -2456,7 +2471,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox283</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
                                               <PaddingLeft>5pt</PaddingLeft>
@@ -2472,6 +2486,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox117">
+                                            <rd:DefaultName>textbox117</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -2489,7 +2504,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox117</rd:DefaultName>
                                             <ZIndex>85</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -2578,6 +2592,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox209">
+                                            <rd:DefaultName>textbox209</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -2595,7 +2610,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox209</rd:DefaultName>
                                             <ZIndex>96</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -3358,6 +3372,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox291">
+                                            <rd:DefaultName>Textbox291</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -3376,7 +3391,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox291</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -3405,6 +3419,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox284">
+                                            <rd:DefaultName>Textbox284</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -3423,7 +3438,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox284</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -3670,6 +3684,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox298">
+                                            <rd:DefaultName>Textbox298</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -3688,7 +3703,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox298</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -3704,6 +3718,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox300">
+                                            <rd:DefaultName>Textbox300</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -3724,7 +3739,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox300</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -3752,6 +3766,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox305">
+                                            <rd:DefaultName>Textbox305</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -3770,7 +3785,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox305</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -3783,6 +3797,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox307">
+                                            <rd:DefaultName>Textbox307</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -3803,7 +3818,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox307</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
                                               <PaddingLeft>5pt</PaddingLeft>
@@ -3825,6 +3839,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox32">
+                                            <rd:DefaultName>textbox32</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -3845,7 +3860,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox32</rd:DefaultName>
                                             <ZIndex>13</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -3857,6 +3871,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox33">
+                                            <rd:DefaultName>textbox33</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -3874,7 +3889,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox33</rd:DefaultName>
                                             <ZIndex>12</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -4148,6 +4162,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox12">
+                                            <rd:DefaultName>Textbox12</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -4166,7 +4181,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox12</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -4186,6 +4200,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="VALSpecLCYHeader">
+                                            <rd:DefaultName>VALSpecLCYHeader</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -4205,7 +4220,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>VALSpecLCYHeader</rd:DefaultName>
                                             <ZIndex>13</ZIndex>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
@@ -4226,6 +4240,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="VALExchRate">
+                                            <rd:DefaultName>VALExchRate</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -4245,7 +4260,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>VALExchRate</rd:DefaultName>
                                             <ZIndex>12</ZIndex>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
@@ -4397,6 +4411,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox317">
+                                            <rd:DefaultName>Textbox317</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -4415,7 +4430,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox317</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -4441,6 +4455,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox312">
+                                            <rd:DefaultName>Textbox312</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -4459,7 +4474,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox312</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -4538,6 +4552,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="VALVATBaseLCY">
+                                            <rd:DefaultName>VALVATBaseLCY</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -4558,7 +4573,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>VALVATBaseLCY</rd:DefaultName>
                                             <ZIndex>1</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -4606,6 +4620,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox321">
+                                            <rd:DefaultName>Textbox321</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -4624,7 +4639,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox321</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -4640,6 +4654,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox323">
+                                            <rd:DefaultName>Textbox323</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -4660,7 +4675,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox323</rd:DefaultName>
                                             <Style>
                                               <Border>
                                                 <Style>None</Style>
@@ -4685,6 +4699,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox325">
+                                            <rd:DefaultName>Textbox325</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -4703,7 +4718,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox325</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -4716,6 +4730,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox327">
+                                            <rd:DefaultName>Textbox327</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -4736,7 +4751,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox327</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Bottom</VerticalAlign>
                                               <PaddingLeft>5pt</PaddingLeft>
@@ -5356,8 +5370,8 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                 </Filter>
                               </Filters>
                               <Top>13.23214cm</Top>
-                              <Height>3.88059cm</Height>
-                              <Width>7cm</Width>
+                              <Height>3.88058cm</Height>
+                              <Width>6cm</Width>
                               <ZIndex>4</ZIndex>
                               <Visibility>
                                 <Hidden>=IIF(Fields!ShipToAddr1.Value="",TRUE,FALSE)</Hidden>
@@ -5790,9 +5804,9 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                               </Filters>
                               <Top>13.23214cm</Top>
                               <Left>7cm</Left>
-                              <Height>3.88059cm</Height>
-                              <Width>7cm</Width>
-                              <ZIndex>4</ZIndex>
+                              <Height>3.88058cm</Height>
+                              <Width>6cm</Width>
+                              <ZIndex>5</ZIndex>
                               <Visibility>
                                 <Hidden>=IIF(Fields!RemitToAddress_Name.Value="",TRUE,FALSE)</Hidden>
                               </Visibility>
@@ -5819,6 +5833,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="Textbox103">
+                                            <rd:DefaultName>Textbox103</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -5836,7 +5851,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 <Style />
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>Textbox103</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Middle</VerticalAlign>
                                               <PaddingRight>5pt</PaddingRight>
@@ -5855,6 +5869,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox257">
+                                            <rd:DefaultName>textbox257</rd:DefaultName>
                                             <CanGrow>true</CanGrow>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
@@ -5874,7 +5889,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox257</rd:DefaultName>
                                             <ZIndex>1</ZIndex>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
@@ -5886,6 +5900,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                       <TablixCell>
                                         <CellContents>
                                           <Textbox Name="textbox2216">
+                                            <rd:DefaultName>textbox221</rd:DefaultName>
                                             <KeepTogether>true</KeepTogether>
                                             <Paragraphs>
                                               <Paragraph>
@@ -5904,7 +5919,6 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                                                 </Style>
                                               </Paragraph>
                                             </Paragraphs>
-                                            <rd:DefaultName>textbox221</rd:DefaultName>
                                             <Style>
                                               <VerticalAlign>Top</VerticalAlign>
                                               <PaddingLeft>5pt</PaddingLeft>
@@ -5957,7 +5971,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                               <Top>17.17551cm</Top>
                               <Height>0.41667in</Height>
                               <Width>7.15857in</Width>
-                              <ZIndex>5</ZIndex>
+                              <ZIndex>6</ZIndex>
                               <Visibility>
                                 <Hidden>=IIF(Fields!ShowInternalInfo.Value=TRUE AND Fields!DimText_DimensionLoop1.Value&lt;&gt;"",FALSE,TRUE)</Hidden>
                               </Visibility>
@@ -5980,7 +5994,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                               <Left>0.24509in</Left>
                               <Height>0.03125in</Height>
                               <Width>0.10653in</Width>
-                              <ZIndex>6</ZIndex>
+                              <ZIndex>7</ZIndex>
                               <Visibility>
                                 <Hidden>true</Hidden>
                               </Visibility>
@@ -6027,6 +6041,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
             <PageBreak>
               <BreakLocation>End</BreakLocation>
             </PageBreak>
+            <Left>0.00694in</Left>
             <Height>18.23385cm</Height>
             <Width>18.18279cm</Width>
             <Style />
@@ -6035,39 +6050,13 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
         <Height>18.23385cm</Height>
         <Style />
       </Body>
-      <Width>18.1828cm</Width>
+      <Width>18.21803cm</Width>
       <Page>
         <PageHeader>
-          <Height>9.97692cm</Height>
+          <Height>8.97699cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
-            <Textbox Name="PurchInvHdrPricesIncVATCptn1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(40,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>8.86075cm</Top>
-              <Height>11pt</Height>
-              <Width>3.29826cm</Width>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
             <Textbox Name="PurchInvHdrPostingDateCptn1">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
@@ -6079,6 +6068,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -6087,121 +6077,10 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>6.05275cm</Top>
-              <Height>11pt</Height>
-              <Width>3.29826cm</Width>
-              <ZIndex>1</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="InvoiceNoCaption1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(42,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>4.8535cm</Top>
-              <Height>11pt</Height>
-              <Width>3.29826cm</Width>
-              <ZIndex>2</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="PurchInvHdrDueDateCptn1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(43,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>6.443cm</Top>
-              <Height>11pt</Height>
-              <Width>3.29826cm</Width>
-              <ZIndex>3</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="PurchInvHdrPricesIncVAT1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(26,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                        <Format>d</Format>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>8.86075cm</Top>
-              <Left>3.36cm</Left>
-              <Height>11pt</Height>
-              <Width>7.25347cm</Width>
-              <ZIndex>4</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="PurchInvHdrPostingDate1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(24,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>6.05275cm</Top>
-              <Left>3.36cm</Left>
-              <Height>11pt</Height>
-              <Width>7.2799cm</Width>
-              <ZIndex>5</ZIndex>
+              <Top>6.40039cm</Top>
+              <Left>1.78964in</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -6225,11 +6104,11 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>5.24675cm</Top>
-              <Left>3.36cm</Left>
-              <Height>11pt</Height>
-              <Width>7.23979cm</Width>
-              <ZIndex>6</ZIndex>
+              <Top>6.82405cm</Top>
+              <Left>0cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>1</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -6245,6 +6124,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -6253,21 +6133,178 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>5.24675cm</Top>
+              <Top>6.40039cm</Top>
+              <Left>0in</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>2</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="SalesPurchPersonName1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(33,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>5.77297cm</Top>
+              <Left>4.56776cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>3</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="DocCptnCopyText">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(57,1)</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>14pt</FontSize>
+                        <FontWeight>Normal</FontWeight>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value xml:space="preserve"> </Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>14pt</FontSize>
+                        <FontWeight>Normal</FontWeight>
+                      </Style>
+                    </TextRun>
+                    <TextRun>
+                      <Value>=Code.GetData(22,1)</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>14pt</FontSize>
+                        <FontWeight>Normal</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>0.04071in</Top>
+              <Left>0.04309cm</Left>
+              <Height>20pt</Height>
+              <Width>7.17248cm</Width>
+              <ZIndex>4</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="VendAddr81">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(8,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>4.64289cm</Top>
+              <Left>0.00694in</Left>
               <Height>11pt</Height>
-              <Width>3.29826cm</Width>
+              <Width>10.59979cm</Width>
+              <ZIndex>5</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="VendAddr71">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(7,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>4.21989cm</Top>
+              <Left>0.00694in</Left>
+              <Height>11pt</Height>
+              <Width>10.59979cm</Width>
+              <ZIndex>6</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="VendAddr61">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(6,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>3.79689cm</Top>
+              <Left>0.00694in</Left>
+              <Height>11pt</Height>
+              <Width>10.59979cm</Width>
               <ZIndex>7</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="PurchInvHdrYourRef">
+            <Textbox Name="VendAddr51">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(34,1)</Value>
+                      <Value>=Code.GetData(5,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -6280,22 +6317,22 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>7.6475cm</Top>
-              <Left>3.36001cm</Left>
+              <Top>3.37289cm</Top>
+              <Left>0.00694in</Left>
               <Height>11pt</Height>
-              <Width>7.25347cm</Width>
+              <Width>10.59979cm</Width>
               <ZIndex>8</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="PurchInvHdrNo1">
+            <Textbox Name="VendAddr41">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(22,1)</Value>
+                      <Value>=Code.GetData(4,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -6308,22 +6345,106 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>4.8535cm</Top>
-              <Left>3.36cm</Left>
+              <Top>2.94889cm</Top>
+              <Left>0.00694in</Left>
               <Height>11pt</Height>
-              <Width>7.23979cm</Width>
+              <Width>10.59979cm</Width>
               <ZIndex>9</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="CompanyInfoBusinessIdentityCode">
+            <Textbox Name="VendAddr31">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(58,1)</Value>
+                      <Value>=Code.GetData(3,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>2.52689cm</Top>
+              <Left>0.00694in</Left>
+              <Height>11pt</Height>
+              <Width>10.59979cm</Width>
+              <ZIndex>10</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="VendAddr21">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(2,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>2.13364cm</Top>
+              <Left>0.00694in</Left>
+              <Height>11pt</Height>
+              <Width>10.59979cm</Width>
+              <ZIndex>11</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="VendAddr11">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(1,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>1.73919cm</Top>
+              <Left>0.00694in</Left>
+              <Height>11pt</Height>
+              <Width>10.59979cm</Width>
+              <ZIndex>12</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyAddr61">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(14,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -6336,11 +6457,382 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>7.0125cm</Top>
-              <Left>14.43986cm</Left>
-              <Height>11pt</Height>
-              <Width>3.74293cm</Width>
-              <ZIndex>10</ZIndex>
+              <Top>3.8315cm</Top>
+              <Left>10.61741cm</Left>
+              <Height>11.1pt</Height>
+              <Width>7.583cm</Width>
+              <ZIndex>13</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyAddr51">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(13,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>3.37708cm</Top>
+              <Left>10.61741cm</Left>
+              <Height>11.9pt</Height>
+              <Width>7.583cm</Width>
+              <ZIndex>14</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyAddr41">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(12,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>2.95022cm</Top>
+              <Left>10.61741cm</Left>
+              <Height>11.9811pt</Height>
+              <Width>7.583cm</Width>
+              <ZIndex>15</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyAddr31">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(11,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>2.56503cm</Top>
+              <Left>10.61741cm</Left>
+              <Height>10.8811pt</Height>
+              <Width>7.583cm</Width>
+              <ZIndex>16</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyAddr21">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(10,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>2.12725cm</Top>
+              <Left>10.61741cm</Left>
+              <Height>11.39071pt</Height>
+              <Width>7.583cm</Width>
+              <ZIndex>17</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyAddr11">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(9,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>1.77724cm</Top>
+              <Left>10.61741cm</Left>
+              <Height>10.10271pt</Height>
+              <Width>7.583cm</Width>
+              <ZIndex>18</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox187">
+              <rd:DefaultName>textbox187</rd:DefaultName>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(50,1) &amp;" "&amp; code.GetGroupPageNumber(ReportItems!NewPage.Value,Globals!PageNumber).ToString</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>0.84424cm</Top>
+              <Left>0.01764cm</Left>
+              <Height>10.06875pt</Height>
+              <Width>7.19793cm</Width>
+              <ZIndex>19</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="PurchaserText1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(29,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>5.34931cm</Top>
+              <Left>4.56776cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>20</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox222">
+              <rd:DefaultName>Textbox222</rd:DefaultName>
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value />
+                      <Style />
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>1.38399cm</Top>
+              <Left>10.61741cm</Left>
+              <Height>10pt</Height>
+              <Width>7.583cm</Width>
+              <ZIndex>21</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="PurchInvHdrPaytoVendNoCptn1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(56,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>5.34931cm</Top>
+              <Left>0.00694in</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>22</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="PurchInvHdrPaytoVendNo1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(31,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>5.77297cm</Top>
+              <Left>0.01762cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>23</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox14">
+              <rd:DefaultName>Textbox14</rd:DefaultName>
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value />
+                      <Style />
+                    </TextRun>
+                  </TextRuns>
+                  <Style />
+                </Paragraph>
+              </Paragraphs>
+              <Top>8.27144cm</Top>
+              <Left>0.00691in</Left>
+              <Height>20pt</Height>
+              <Width>18.18279cm</Width>
+              <ZIndex>24</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+                <PaddingTop>2pt</PaddingTop>
+                <PaddingBottom>2pt</PaddingBottom>
+              </Style>
+            </Textbox>
+            <Textbox Name="PurchInvHdrPostingDate1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(24,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>6.82405cm</Top>
+              <Left>4.54569cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>25</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="PurchInvHdrDueDateCptn1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(43,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>6.40072cm</Top>
+              <Left>3.57928in</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>26</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -6365,11 +6857,108 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>6.443cm</Top>
-              <Left>3.36cm</Left>
-              <Height>11pt</Height>
-              <Width>7.25347cm</Width>
-              <ZIndex>11</ZIndex>
+              <Top>6.82405cm</Top>
+              <Left>9.09137cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>27</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox76">
+              <rd:DefaultName>textbox69</rd:DefaultName>
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(55,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>5.34931cm</Top>
+              <Left>3.57928in</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>28</ZIndex>
+              <Visibility>
+                <Hidden>=iif(Code.GetData(39,1)=Code.GetData(31,1),true,false)</Hidden>
+              </Visibility>
+              <Style>
+                <Border />
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="textbox77">
+              <rd:DefaultName>textbox70</rd:DefaultName>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(39,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>5.77297cm</Top>
+              <Left>9.0958cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>29</ZIndex>
+              <Visibility>
+                <Hidden>=iif(Code.GetData(39,1)=Code.GetData(31,1),true,false)</Hidden>
+              </Visibility>
+              <Style>
+                <Border />
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="VATNoText1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(28,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>5.34931cm</Top>
+              <Left>5.36389in</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>30</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -6393,815 +6982,11 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>7.25925cm</Top>
-              <Left>3.36cm</Left>
-              <Height>11pt</Height>
-              <Width>7.23979cm</Width>
-              <ZIndex>12</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="DocCptnCopyText">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(21,1)</Value>
-                      <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>14pt</FontSize>
-                        <FontWeight>Bold</FontWeight>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Left>0.23707cm</Left>
-              <Height>20pt</Height>
-              <Width>17.94573cm</Width>
-              <ZIndex>13</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="ExecutionTimeTextBox">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(35,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>5.64725cm</Top>
-              <Left>3.36cm</Left>
-              <Height>11pt</Height>
-              <Width>7.25347cm</Width>
-              <ZIndex>14</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="VendAddr81">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(8,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>3.66025cm</Top>
-              <Height>11pt</Height>
-              <Width>10.59979cm</Width>
-              <ZIndex>15</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="VendAddr71">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(7,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>3.23725cm</Top>
-              <Height>11pt</Height>
-              <Width>10.59979cm</Width>
-              <ZIndex>16</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="VendAddr61">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(6,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.81425cm</Top>
-              <Height>11pt</Height>
-              <Width>10.59979cm</Width>
-              <ZIndex>17</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="VendAddr51">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(5,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.39025cm</Top>
-              <Height>11pt</Height>
-              <Width>10.59979cm</Width>
-              <ZIndex>18</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="VendAddr41">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(4,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>1.96625cm</Top>
-              <Height>11pt</Height>
-              <Width>10.59979cm</Width>
-              <ZIndex>19</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="VendAddr31">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(3,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>1.54425cm</Top>
-              <Height>11pt</Height>
-              <Width>10.59979cm</Width>
-              <ZIndex>20</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="VendAddr21">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(2,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>1.151cm</Top>
-              <Height>11pt</Height>
-              <Width>10.59979cm</Width>
-              <ZIndex>21</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="VendAddr11">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(1,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>0.75655cm</Top>
-              <Height>11pt</Height>
-              <Width>10.59979cm</Width>
-              <ZIndex>22</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyAddr61">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(14,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>3.6285cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>7.583cm</Width>
-              <ZIndex>23</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyAddr51">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(13,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>3.2055cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>7.583cm</Width>
-              <ZIndex>24</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyAddr41">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(12,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.7825cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>7.583cm</Width>
-              <ZIndex>25</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyAddr31">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(11,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>2.3585cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>7.583cm</Width>
-              <ZIndex>26</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyAddr21">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(10,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>1.9345cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>7.583cm</Width>
-              <ZIndex>27</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyAddr11">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(9,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>1.57071cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>7.583cm</Width>
-              <ZIndex>28</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoBankAccNoCptn1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(44,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>6.5925cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>3.77294cm</Width>
-              <ZIndex>29</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoBankNameCptn1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(45,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>6.1625cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>3.77294cm</Width>
-              <ZIndex>30</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoGiroNoCptn1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(46,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>5.7445cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>3.77294cm</Width>
+              <Top>5.77297cm</Top>
+              <Left>13.62427cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
               <ZIndex>31</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoVATRegNoCptn1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(47,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>5.3225cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>3.77294cm</Width>
-              <ZIndex>32</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoHomePageCptn1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(48,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>4.4725cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>3.77294cm</Width>
-              <ZIndex>33</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoPhoneNoCptn1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(49,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>4.0525cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>3.77294cm</Width>
-              <ZIndex>34</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoBankAccNo1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(20,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>6.5925cm</Top>
-              <Left>14.43986cm</Left>
-              <Height>11pt</Height>
-              <Width>3.74293cm</Width>
-              <ZIndex>35</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoBankName1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(19,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>6.1625cm</Top>
-              <Left>14.43986cm</Left>
-              <Height>11pt</Height>
-              <Width>3.74293cm</Width>
-              <ZIndex>36</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoGiroNo1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(18,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>5.7445cm</Top>
-              <Left>14.43986cm</Left>
-              <Height>11pt</Height>
-              <Width>3.74293cm</Width>
-              <ZIndex>37</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoVATRegNo1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(17,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>5.3225cm</Top>
-              <Left>14.43986cm</Left>
-              <Height>11pt</Height>
-              <Width>3.74293cm</Width>
-              <ZIndex>38</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoHomePage">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(16,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>4.4725cm</Top>
-              <Left>14.43986cm</Left>
-              <Height>11pt</Height>
-              <Width>3.74293cm</Width>
-              <ZIndex>39</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="CompanyInfoPhoneNo1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(15,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>4.0525cm</Top>
-              <Left>14.43986cm</Left>
-              <Height>11pt</Height>
-              <Width>3.74293cm</Width>
-              <ZIndex>40</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="textbox187">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(50,1) &amp;" "&amp; code.GetGroupPageNumber(ReportItems!NewPage.Value,Globals!PageNumber).ToString</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>textbox187</rd:DefaultName>
-              <Top>0.78301cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>7.583cm</Width>
-              <ZIndex>41</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -7217,6 +7002,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -7225,22 +7011,22 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>7.6475cm</Top>
-              <Left>0.00001cm</Left>
-              <Height>11pt</Height>
-              <Width>3.29825cm</Width>
-              <ZIndex>42</ZIndex>
+              <Top>6.40072cm</Top>
+              <Left>13.67234cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>32</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="CompanyInfoBusinessIdentityCodeCaption">
+            <Textbox Name="PurchInvHdrYourRef">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(57,1)</Value>
+                      <Value>=Code.GetData(34,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -7253,98 +7039,12 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>7.0125cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>3.77294cm</Width>
-              <ZIndex>43</ZIndex>
+              <Top>6.82405cm</Top>
+              <Left>13.63706cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>33</ZIndex>
               <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="VATNoText1">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(28,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>7.25925cm</Top>
-              <Height>11pt</Height>
-              <Width>3.29826cm</Width>
-              <ZIndex>44</ZIndex>
-              <Style>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="Textbox222">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value />
-                      <Style />
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Right</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox222</rd:DefaultName>
-              <Top>1.17746cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>10pt</Height>
-              <Width>7.583cm</Width>
-              <ZIndex>45</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="DocumentDateCaption">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(51,1)</Value>
-                      <Style>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <Top>5.64725cm</Top>
-              <Height>11pt</Height>
-              <Width>3.29826cm</Width>
-              <ZIndex>46</ZIndex>
-              <Style>
-                <Border>
-                  <Style>None</Style>
-                </Border>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
@@ -7360,6 +7060,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -7368,10 +7069,11 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>3.175in</Top>
-              <Height>11pt</Height>
-              <Width>3.29826cm</Width>
-              <ZIndex>47</ZIndex>
+              <Top>2.92288in</Top>
+              <Left>0in</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>34</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -7395,11 +7097,10 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>3.175in</Top>
-              <Left>1.32284in</Left>
-              <Height>11pt</Height>
-              <Width>7.25347cm</Width>
-              <ZIndex>48</ZIndex>
+              <Top>3.08967in</Top>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>35</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -7416,6 +7117,7 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
                         <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
                       </Style>
                     </TextRun>
                   </TextRuns>
@@ -7424,10 +7126,11 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>3.335in</Top>
-              <Height>11pt</Height>
-              <Width>3.29826cm</Width>
-              <ZIndex>49</ZIndex>
+              <Top>2.92288in</Top>
+              <Left>1.78964in</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>36</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -7451,11 +7154,244 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>3.335in</Top>
-              <Left>1.32284in</Left>
+              <Top>3.08967in</Top>
+              <Left>1.78964in</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>37</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="PurchInvHdrPricesIncVATCptn1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(40,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>7.42411cm</Top>
+              <Left>3.58797in</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>38</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="PurchInvHdrPricesIncVAT1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(26,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                        <Format>d</Format>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>7.84777cm</Top>
+              <Left>9.09137cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>39</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+          </ReportItems>
+          <Style />
+        </PageHeader>
+        <PageFooter>
+          <Height>2.18775cm</Height>
+          <PrintOnFirstPage>true</PrintOnFirstPage>
+          <PrintOnLastPage>true</PrintOnLastPage>
+          <ReportItems>
+            <Textbox Name="CompanyInfoVATRegNoCptn1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(47,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>0cm</Top>
+              <Left>0.01764cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyInfoVATRegNo1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(17,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>0.42366cm</Top>
+              <Left>0cm</Left>
               <Height>11pt</Height>
-              <Width>7.25347cm</Width>
-              <ZIndex>50</ZIndex>
+              <Width>4.54569cm</Width>
+              <ZIndex>1</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyInfoHomePageCptn1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(48,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>0cm</Top>
+              <Left>4.56333cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>2</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyInfoHomePage">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(16,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>0.42366cm</Top>
+              <Left>4.54569cm</Left>
+              <Height>11pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>3</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyInfoPhoneNoCptn1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(49,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>0cm</Top>
+              <Left>9.10901cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>4</ZIndex>
+              <Style>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyInfoPhoneNo1">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(15,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>0.42366cm</Top>
+              <Left>9.09137cm</Left>
+              <Height>11pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>5</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -7479,11 +7415,11 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>4.8975cm</Top>
-              <Left>10.59979cm</Left>
-              <Height>11pt</Height>
-              <Width>3.77294cm</Width>
-              <ZIndex>51</ZIndex>
+              <Top>0cm</Top>
+              <Left>13.6547cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.55455cm</Width>
+              <ZIndex>6</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
@@ -7503,27 +7439,26 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Right</TextAlign>
+                    <TextAlign>Left</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>4.8975cm</Top>
-              <Left>14.43986cm</Left>
+              <Top>0.42366cm</Top>
+              <Left>13.63706cm</Left>
               <Height>11pt</Height>
-              <Width>3.74293cm</Width>
-              <ZIndex>52</ZIndex>
+              <Width>4.5329cm</Width>
+              <ZIndex>7</ZIndex>
               <Style>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="textbox76">
-              <CanGrow>true</CanGrow>
+            <Textbox Name="CompanyInfoBankAccNo">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(55,1)</Value>
+                      <Value>=Code.GetData(20,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -7536,117 +7471,56 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <rd:DefaultName>textbox69</rd:DefaultName>
-              <Top>6.85253cm</Top>
+              <Top>1.79969cm</Top>
+              <Left>0cm</Left>
               <Height>11pt</Height>
-              <Width>3.29826cm</Width>
-              <ZIndex>53</ZIndex>
-              <Visibility>
-                <Hidden>=iif(Code.GetData(39,1)=Code.GetData(31,1),true,false)</Hidden>
-              </Visibility>
-              <Style>
-                <Border />
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="textbox77">
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value>=Code.GetData(39,1)</Value>
-                      <Style>
-                        <FontStyle>Normal</FontStyle>
-                        <FontFamily>Segoe UI</FontFamily>
-                        <FontSize>8pt</FontSize>
-                      </Style>
-                    </TextRun>
-                  </TextRuns>
-                  <Style>
-                    <TextAlign>Left</TextAlign>
-                  </Style>
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>textbox70</rd:DefaultName>
-              <Top>6.85253cm</Top>
-              <Left>3.36354cm</Left>
-              <Height>11pt</Height>
-              <Width>7.24993cm</Width>
-              <ZIndex>54</ZIndex>
-              <Visibility>
-                <Hidden>=iif(Code.GetData(39,1)=Code.GetData(31,1),true,false)</Hidden>
-              </Visibility>
-              <Style>
-                <Border />
-                <VerticalAlign>Top</VerticalAlign>
-              </Style>
-            </Textbox>
-            <Textbox Name="Textbox14">
-              <CanGrow>true</CanGrow>
-              <KeepTogether>true</KeepTogether>
-              <Paragraphs>
-                <Paragraph>
-                  <TextRuns>
-                    <TextRun>
-                      <Value />
-                      <Style />
-                    </TextRun>
-                  </TextRuns>
-                  <Style />
-                </Paragraph>
-              </Paragraphs>
-              <rd:DefaultName>Textbox14</rd:DefaultName>
-              <Top>9.27136cm</Top>
-              <Height>20pt</Height>
-              <Width>18.18279cm</Width>
-              <ZIndex>55</ZIndex>
+              <Width>4.56333cm</Width>
+              <ZIndex>8</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
                 </Border>
-                <PaddingLeft>2pt</PaddingLeft>
-                <PaddingRight>2pt</PaddingRight>
-                <PaddingTop>2pt</PaddingTop>
-                <PaddingBottom>2pt</PaddingBottom>
+                <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="Textbox91">
-              <CanGrow>true</CanGrow>
+            <Textbox Name="CompanyInfoGiroNoCptn">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value />
-                      <Style />
+                      <Value>=Code.GetData(46,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
                     </TextRun>
                   </TextRuns>
-                  <Style />
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
                 </Paragraph>
               </Paragraphs>
-              <rd:DefaultName>Textbox91</rd:DefaultName>
-              <Top>4.0525cm</Top>
-              <Height>10pt</Height>
-              <Width>10.59979cm</Width>
-              <ZIndex>56</ZIndex>
+              <Top>0.98811cm</Top>
+              <Left>13.6547cm</Left>
+              <Height>12.00551pt</Height>
+              <Width>4.51526cm</Width>
+              <ZIndex>9</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
                 </Border>
-                <PaddingLeft>2pt</PaddingLeft>
-                <PaddingRight>2pt</PaddingRight>
-                <PaddingTop>2pt</PaddingTop>
-                <PaddingBottom>2pt</PaddingBottom>
+                <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="PurchInvHdrPaytoVendNoCptn1">
+            <Textbox Name="CompanyInfoGiroNo">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(56,1)</Value>
+                      <Value>=Code.GetData(18,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -7659,21 +7533,25 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>4.46282cm</Top>
-              <Height>11pt</Height>
-              <Width>3.32472cm</Width>
-              <ZIndex>57</ZIndex>
+              <Top>1.41163cm</Top>
+              <Left>13.6547cm</Left>
+              <Height>11.00014pt</Height>
+              <Width>4.51526cm</Width>
+              <ZIndex>10</ZIndex>
               <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="PurchInvHdrPaytoVendNo1">
+            <Textbox Name="CompanyInfoBankName">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(31,1)</Value>
+                      <Value>=Code.GetData(19,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -7686,16 +7564,50 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>4.46282cm</Top>
-              <Left>3.33357cm</Left>
-              <Height>11pt</Height>
-              <Width>7.2799cm</Width>
-              <ZIndex>58</ZIndex>
+              <Top>0.98811cm</Top>
+              <Left>0cm</Left>
+              <Height>11.60872pt</Height>
+              <Width>4.56333cm</Width>
+              <ZIndex>11</ZIndex>
               <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="CompanyInfoRegisteredHomeCityCaption">
+            <Textbox Name="CompanyInfoBankBranchNo">
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Code.GetData(58,1)</Value>
+                      <Style>
+                        <FontStyle>Normal</FontStyle>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>8pt</FontSize>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Left</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <Top>1.41164cm</Top>
+              <Left>0.01763cm</Left>
+              <Height>11pt</Height>
+              <Width>4.56333cm</Width>
+              <ZIndex>12</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <VerticalAlign>Top</VerticalAlign>
+              </Style>
+            </Textbox>
+            <Textbox Name="CompanyInfoIBANCptn">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -7714,16 +7626,19 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>7.3817cm</Top>
-              <Left>10.59972cm</Left>
-              <Height>11pt</Height>
-              <Width>3.77294cm</Width>
-              <ZIndex>59</ZIndex>
+              <Top>0.98797cm</Top>
+              <Left>4.56776cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>13</ZIndex>
               <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="CompanyInfoRegisteredHomeCity">
+            <Textbox Name="CompanyInfoIBAN">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -7738,26 +7653,29 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Right</TextAlign>
+                    <TextAlign>Left</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>7.3817cm</Top>
-              <Left>14.43979cm</Left>
+              <Top>1.41163cm</Top>
+              <Left>4.55012cm</Left>
               <Height>11pt</Height>
-              <Width>3.74293cm</Width>
-              <ZIndex>60</ZIndex>
+              <Width>4.54569cm</Width>
+              <ZIndex>14</ZIndex>
               <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="PurchaserText">
+            <Textbox Name="CompanyInfoSwiftCodeCptn">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(29,1)</Value>
+                      <Value>=Code.GetData(61,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -7770,22 +7688,25 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>7.80503cm</Top>
-              <Left>10.59972cm</Left>
-              <Height>11pt</Height>
-              <Width>3.77294cm</Width>
-              <ZIndex>61</ZIndex>
+              <Top>0.98797cm</Top>
+              <Left>9.11344cm</Left>
+              <Height>12.0094pt</Height>
+              <Width>4.54569cm</Width>
+              <ZIndex>15</ZIndex>
               <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
-            <Textbox Name="SalesPurchPersonName">
+            <Textbox Name="CompanyInfoSWIFTCode">
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>=Code.GetData(33,1)</Value>
+                      <Value>=Code.GetData(62,1)</Value>
                       <Style>
                         <FontStyle>Normal</FontStyle>
                         <FontFamily>Segoe UI</FontFamily>
@@ -7794,22 +7715,29 @@ Cstr(Fields!CompanyInfoRegHomeCity.Value)
                     </TextRun>
                   </TextRuns>
                   <Style>
-                    <TextAlign>Right</TextAlign>
+                    <TextAlign>Left</TextAlign>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <Top>7.80503cm</Top>
-              <Left>14.43979cm</Left>
+              <Top>1.41163cm</Top>
+              <Left>9.0958cm</Left>
               <Height>11pt</Height>
-              <Width>3.74293cm</Width>
-              <ZIndex>62</ZIndex>
+              <Width>4.54569cm</Width>
+              <ZIndex>16</ZIndex>
               <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
                 <VerticalAlign>Top</VerticalAlign>
               </Style>
             </Textbox>
           </ReportItems>
-          <Style />
-        </PageHeader>
+          <Style>
+            <Border>
+              <Style>None</Style>
+            </Border>
+          </Style>
+        </PageFooter>
         <PageHeight>29.7cm</PageHeight>
         <PageWidth>21cm</PageWidth>
         <InteractiveHeight>11in</InteractiveHeight>
@@ -7876,7 +7804,7 @@ If Not (group1 = currentgroup1)
    NewPage = TRUE
    currentgroup2 = group2
    currentgroup1 = group1
-else
+ELSE
    If Not (group2 = currentgroup2)
       NewPage = TRUE
       currentgroup2 = group2
@@ -7902,8 +7830,6 @@ End Function
 </Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
-  <rd:ReportUnitType>Cm</rd:ReportUnitType>
-  <rd:ReportID>e455f827-1467-4562-8d6d-d3fc4bba34fe</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
@@ -7915,6 +7841,15 @@ End Function
         </Field>
         <Field Name="AllowInvDiscCaption">
           <DataField>AllowInvDiscCaption</DataField>
+        </Field>
+        <Field Name="PayToVendNo_PurchInvHeaderCaption">
+          <DataField>PayToVendNo_PurchInvHeaderCaption</DataField>
+        </Field>
+        <Field Name="PricesIncVAT_PurchInvHeaderCaption">
+          <DataField>PricesIncVAT_PurchInvHeaderCaption</DataField>
+        </Field>
+        <Field Name="BuyFromVendNo_PurchInvHeaderCaption">
+          <DataField>BuyFromVendNo_PurchInvHeaderCaption</DataField>
         </Field>
         <Field Name="BuyFromContactPhoneNoLbl">
           <DataField>BuyFromContactPhoneNoLbl</DataField>
@@ -8144,15 +8079,6 @@ End Function
         <Field Name="DocDateCaption">
           <DataField>DocDateCaption</DataField>
         </Field>
-        <Field Name="PayToVendNo_PurchInvHeaderCaption">
-          <DataField>PayToVendNo_PurchInvHeaderCaption</DataField>
-        </Field>
-        <Field Name="PricesIncVAT_PurchInvHeaderCaption">
-          <DataField>PricesIncVAT_PurchInvHeaderCaption</DataField>
-        </Field>
-        <Field Name="BuyFromVendNo_PurchInvHeaderCaption">
-          <DataField>BuyFromVendNo_PurchInvHeaderCaption</DataField>
-        </Field>
         <Field Name="VATPercentageCaption">
           <DataField>VATPercentageCaption</DataField>
         </Field>
@@ -8176,18 +8102,6 @@ End Function
         </Field>
         <Field Name="TotalCaption">
           <DataField>TotalCaption</DataField>
-        </Field>
-        <Field Name="CompanyInfoBusinessIdCode">
-          <DataField>CompanyInfoBusinessIdCode</DataField>
-        </Field>
-        <Field Name="CompanyInfoRegHomeCity">
-          <DataField>CompanyInfoRegHomeCity</DataField>
-        </Field>
-        <Field Name="CompanyInfoBusinessIdentityCodeCaption">
-          <DataField>CompanyInfoBusinessIdentityCodeCaption</DataField>
-        </Field>
-        <Field Name="CompanyInfoRegisteredHomeCityCaption">
-          <DataField>CompanyInfoRegisteredHomeCityCaption</DataField>
         </Field>
         <Field Name="SwiftCodeCaption">
           <DataField>SwiftCodeCaption</DataField>
