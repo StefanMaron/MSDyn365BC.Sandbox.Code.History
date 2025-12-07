@@ -116,6 +116,7 @@ codeunit 6484 "Serv. Undo Posting Mgt."
                     ServLine.InitQtyToShip();
                     ServLine.Validate(ServLine."Line Discount %");
                     ServLine.ConfirmAdjPriceLineChange();
+                    OnUpdateServLineCnsmOnBeforeServLineModify(ServLine, UndoQty, UndoQtyBase);
                     ServLine.Modify();
 
                     SalesSetup.Get();
@@ -168,6 +169,11 @@ codeunit 6484 "Serv. Undo Posting Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRevertPostedItemTrackingFromServiceLine(ServiceLine: Record Microsoft.Service.Document."Service Line"; var TempUndoneItemLedgEntry: Record "Item Ledger Entry" temporary; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateServLineCnsmOnBeforeServLineModify(var ServiceLine: Record Microsoft.Service.Document."Service Line"; UndoQty: Decimal; UndoQtyBase: Decimal)
     begin
     end;
 }
