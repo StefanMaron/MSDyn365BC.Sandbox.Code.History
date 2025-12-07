@@ -423,7 +423,7 @@ codeunit 5988 "Serv-Documents Mgt."
                 if (ServLine.Type <> ServLine.Type::" ") and (ServLine."Qty. to Invoice" <> 0) then
                     InvoicePostingInterface.PrepareLine(ServHeader, ServLine, ServiceLineACY);
 
-                OnPostDocumentLinesOnAfterFillInvPostingBuffer(ServHeader, ServLine, ServiceLineACY, ServInvHeader, ServCrMemoHeader, ServShptHeader);
+                OnPostDocumentLinesOnAfterFillInvPostingBuffer(ServHeader, ServLine, TempServiceLine, ServiceLineACY, ServInvHeader, ServCrMemoHeader, ServShptHeader);
                 // prepare posted document lines
                 if Ship then
                     PrepareShipmentLine(TempServiceLine, WarrantyNo);
@@ -2026,7 +2026,7 @@ codeunit 5988 "Serv-Documents Mgt."
         if ServLine.Find('-') then
             repeat
                 IsHandled := false;
-                OnUpdateServLinesOnPostOrderOnBeforeServLineLoop(ServLine, Invoice, IsHandled);
+                OnUpdateServLinesOnPostOrderOnBeforeServLineLoop(ServLine, Invoice, Consume, IsHandled);
                 if not IsHandled then
                     if ServLine.Quantity <> 0 then begin
                         OldInvDiscountAmount := ServLine."Inv. Discount Amount";
@@ -2684,7 +2684,7 @@ codeunit 5988 "Serv-Documents Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostDocumentLinesOnAfterFillInvPostingBuffer(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var ServiceLineACY: Record "Service Line"; var ServiceInvoiceHeader: Record "Service Invoice Header"; var ServiceCrMemoHeader: Record "Service Cr.Memo Header"; var ServiceShipmentHeader: Record "Service Shipment Header")
+    local procedure OnPostDocumentLinesOnAfterFillInvPostingBuffer(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var TempServiceLine: Record "Service Line" temporary; var ServiceLineACY: Record "Service Line"; var ServiceInvoiceHeader: Record "Service Invoice Header"; var ServiceCrMemoHeader: Record "Service Cr.Memo Header"; var ServiceShipmentHeader: Record "Service Shipment Header")
     begin
     end;
 
@@ -2835,7 +2835,7 @@ codeunit 5988 "Serv-Documents Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateServLinesOnPostOrderOnBeforeServLineLoop(var ServiceLine: Record "Service Line"; Invoice: Boolean; var IsHandled: Boolean)
+    local procedure OnUpdateServLinesOnPostOrderOnBeforeServLineLoop(var ServiceLine: Record "Service Line"; Invoice: Boolean; Consume: Boolean; var IsHandled: Boolean)
     begin
     end;
 
