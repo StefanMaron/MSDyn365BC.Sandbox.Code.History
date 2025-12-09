@@ -849,6 +849,162 @@ codeunit 134979 "Reminder Automation Tests"
         GlobalLanguage(1033);
     end;
 
+    [Test]
+    [HandlerFunctions('NewReminderActionModalPageHandler,IssueRemindersSetupModalPageHandlerWithFilterSaveCheck,IssueReminderSetupPageReminderFilterHandler')]
+    procedure ReminderFilterAppliedInTheIssueRemindersSetupPageShouldBeSaved()
+    var
+        ReminderTerms: Record "Reminder Terms";
+        ReminderAutomationCard: TestPage "Reminder Automation Card";
+    begin
+        // [SCENARIO 613705] Filters should be saved and updated correctly in the Issue Reminders Setup page in Reminder Automation.
+        Initialize();
+
+        // [WHEN] Create a Reminder Automation with an Issue action.
+        CreateReminderAutomationGroupViaUI(ReminderAutomationCard, ReminderTerms);
+        CreateReminderAction(ReminderAutomationCard, Enum::"Reminder Action"::"Issue Reminder");
+
+        // [THEN] Verify through the "IssueRemindersSetupModalPageHandlerWithFilterSaveCheck" that all filters applied in the "Reminder Filter" of the Issue Reminders Setup page are saved and can be updated.
+        ReminderAutomationCard.Close();
+    end;
+
+    [Test]
+    [HandlerFunctions('NewReminderActionModalPageHandler,SendRemindersSetupModalPageHandlerWithFilterSaveCheck,SendReminderSetupPageReminderFilterHandler')]
+    procedure ReminderFilterAppliedInTheSendRemindersSetupPageShouldBeSaved()
+    var
+        ReminderTerms: Record "Reminder Terms";
+        ReminderAutomationCard: TestPage "Reminder Automation Card";
+    begin
+        // [SCENARIO 613705] Filters should be saved and updated correctly in the Send Reminders Setup page in Reminder Automation.
+        Initialize();
+
+        // [WHEN] Create a Reminder Automation with a Send action.
+        CreateReminderAutomationGroupViaUI(ReminderAutomationCard, ReminderTerms);
+        CreateReminderAction(ReminderAutomationCard, Enum::"Reminder Action"::"Send Reminder");
+
+        // [THEN] Verify through the "SendRemindersSetupModalPageHandlerWithFilterSaveCheck" that all filters applied in the "Reminder Filter" of the Send Reminders Setup page are saved and can be updated.
+        ReminderAutomationCard.Close();
+    end;
+
+    [ModalPageHandler()]
+    procedure IssueRemindersSetupModalPageHandlerWithFilterSaveCheck(var IssueRemindersSetupPage: TestPage "Issue Reminders Setup")
+    var
+        IssueRemindersSetup: Record "Issue Reminders Setup";
+        ReminderHeader: Record "Reminder Header";
+        Customer: Record Customer;
+    begin
+        IssueRemindersSetup.SetRange(Code, IssueRemindersSetupPage.Code.Value);
+        IssueRemindersSetup.FindFirst();
+
+        // Create a customer and reminder header for testing
+        LibrarySales.CreateCustomer(Customer);
+        ReminderHeader."No." := LibraryUtility.GenerateGUID();
+        ReminderHeader."Customer No." := Customer."No.";
+        ReminderHeader."Currency Code" := 'USD';
+        ReminderHeader.City := 'Seattle';
+        ReminderHeader.Insert();
+
+        // Set initial filters on City and Currency Code
+        LibraryVariableStorage.Enqueue('');
+        LibraryVariableStorage.Enqueue(ReminderHeader.City);
+        LibraryVariableStorage.Enqueue(ReminderHeader."Currency Code");
+        IssueRemindersSetupPage.ReminderFilter.AssistEdit();
+        Assert.IsTrue(IssueRemindersSetup.GetReminderSelectionDisplayText() <> '', FiltersAreNotSavedErr);
+
+        // Now change the filter by removing City and Currency Code filters and adding a No. filter
+        LibraryVariableStorage.Enqueue(ReminderHeader."No.");
+        LibraryVariableStorage.Enqueue('');
+        LibraryVariableStorage.Enqueue('');
+        IssueRemindersSetupPage.ReminderFilter.AssistEdit();
+        Assert.IsTrue(IssueRemindersSetup.GetReminderSelectionDisplayText() <> '', FiltersAreNotSavedErr);
+    end;
+
+    [ModalPageHandler()]
+    procedure SendRemindersSetupModalPageHandlerWithFilterSaveCheck(var SendRemindersSetupPage: TestPage "Send Reminders Setup")
+    var
+        SendRemindersSetup: Record "Send Reminders Setup";
+        IssuedReminderHeader: Record "Issued Reminder Header";
+        Customer: Record Customer;
+    begin
+        SendRemindersSetup.SetRange(Code, SendRemindersSetupPage.Code.Value);
+        SendRemindersSetup.FindFirst();
+
+        // Create a customer and issued reminder header for testing
+        LibrarySales.CreateCustomer(Customer);
+        IssuedReminderHeader."No." := LibraryUtility.GenerateGUID();
+        IssuedReminderHeader."Customer No." := Customer."No.";
+        IssuedReminderHeader."Currency Code" := 'USD';
+        IssuedReminderHeader.City := 'Seattle';
+        IssuedReminderHeader.Insert();
+
+        // Set initial filters on City and Currency Code
+        LibraryVariableStorage.Enqueue('');
+        LibraryVariableStorage.Enqueue(IssuedReminderHeader.City);
+        LibraryVariableStorage.Enqueue(IssuedReminderHeader."Currency Code");
+        SendRemindersSetupPage.ReminderFilter.AssistEdit();
+        Assert.IsTrue(SendRemindersSetup.GetReminderSelectionDisplayText() <> '', FiltersAreNotSavedErr);
+
+        // Now change the filter by removing City and Currency Code filters and adding a No. filter
+        LibraryVariableStorage.Enqueue(IssuedReminderHeader."No.");
+        LibraryVariableStorage.Enqueue('');
+        LibraryVariableStorage.Enqueue('');
+        SendRemindersSetupPage.ReminderFilter.AssistEdit();
+        Assert.IsTrue(SendRemindersSetup.GetReminderSelectionDisplayText() <> '', FiltersAreNotSavedErr);
+    end;
+
+    [FilterPageHandler]
+    procedure IssueReminderSetupPageReminderFilterHandler(var ReminderHeaderRecordRef: RecordRef): Boolean
+    var
+        ReminderHeader: Record "Reminder Header";
+        NoFilter: Text;
+        CityFilter: Text;
+        CurrencyCodeFilter: Text;
+    begin
+        ReminderHeaderRecordRef.GetTable(ReminderHeader);
+
+        // Get filters from variable storage
+        NoFilter := LibraryVariableStorage.DequeueText();
+        CityFilter := LibraryVariableStorage.DequeueText();
+        CurrencyCodeFilter := LibraryVariableStorage.DequeueText();
+
+        // Apply filters
+        if NoFilter <> '' then
+            ReminderHeader.SetFilter("No.", NoFilter);
+        if CityFilter <> '' then
+            ReminderHeader.SetFilter(City, CityFilter);
+        if CurrencyCodeFilter <> '' then
+            ReminderHeader.SetFilter("Currency Code", CurrencyCodeFilter);
+
+        ReminderHeaderRecordRef.SetView(ReminderHeader.GetView());
+        exit(true);
+    end;
+
+    [FilterPageHandler]
+    procedure SendReminderSetupPageReminderFilterHandler(var IssuedReminderHeaderRecordRef: RecordRef): Boolean
+    var
+        IssuedReminderHeader: Record "Issued Reminder Header";
+        NoFilter: Text;
+        CityFilter: Text;
+        CurrencyCodeFilter: Text;
+    begin
+        IssuedReminderHeaderRecordRef.GetTable(IssuedReminderHeader);
+
+        // Get filters from variable storage
+        NoFilter := LibraryVariableStorage.DequeueText();
+        CityFilter := LibraryVariableStorage.DequeueText();
+        CurrencyCodeFilter := LibraryVariableStorage.DequeueText();
+
+        // Apply filters
+        if NoFilter <> '' then
+            IssuedReminderHeader.SetFilter("No.", NoFilter);
+        if CityFilter <> '' then
+            IssuedReminderHeader.SetFilter(City, CityFilter);
+        if CurrencyCodeFilter <> '' then
+            IssuedReminderHeader.SetFilter("Currency Code", CurrencyCodeFilter);
+
+        IssuedReminderHeaderRecordRef.SetView(IssuedReminderHeader.GetView());
+        exit(true);
+    end;
+
     local procedure CreateReminderTerm(var ReminderTerms: Record "Reminder Terms")
     var
         ReminderLevel: Record "Reminder Level";
