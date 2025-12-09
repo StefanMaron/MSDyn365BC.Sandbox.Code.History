@@ -1769,6 +1769,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Dedicated Bins - NamedType ErrLocationOnResourceCard)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 967609788 - NamedType 2111776054" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Location code should have been set already]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Dedicated Bins - NamedType LocationSetErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 967609788 - NamedType 487574238" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Number of Invt. Pick activities created: 1 out of a total of 1.]]></Val>
