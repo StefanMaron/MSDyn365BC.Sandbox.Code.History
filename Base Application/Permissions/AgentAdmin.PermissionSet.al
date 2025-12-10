@@ -5,12 +5,15 @@
 
 namespace System.Security.AccessControl;
 
+using System.Agents;
+
 permissionset 4305 "Agent - Admin"
 {
     Assignable = true;
     Caption = 'Agent administrator';
     IncludedPermissionSets = "D365 Agent";
     Permissions =
+        tabledata Agent = RIMD,
         system "Configure All Agents" = X,
         system "Create Custom Agent" = X;
 }
