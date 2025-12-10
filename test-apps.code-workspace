@@ -1,6 +1,5 @@
 {
   "settings": {
-    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
     },
