@@ -14,6 +14,15 @@
       <Cmt Name="Dev"><![CDATA[%1 - Batch Name , %2 - Field Name]D;]A;(LookupHint=Codeunit Bank Deposit Posting Tests - NamedType BatchNameErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2437925581 - NamedType 964003467" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Cust. Ledger Entry must be close.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Bank Deposit Posting Tests - NamedType CustLedgerEntryOpenErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2437925581 - NamedType 2230233351" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[A dimension used in Gen. Journal Line]]></Val>
@@ -30,6 +39,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Bank Deposit Posting Tests - NamedType GLEntryErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2437925581 - NamedType 3288670887" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Remaining amount must be 0.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Bank Deposit Posting Tests - NamedType RemainingAmountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2437925581 - Method 2261378691 - NamedType 403291627" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
