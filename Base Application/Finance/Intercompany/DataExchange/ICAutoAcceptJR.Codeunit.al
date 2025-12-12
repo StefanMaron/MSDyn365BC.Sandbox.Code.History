@@ -11,6 +11,10 @@ using Microsoft.Intercompany.GLAccount;
 using System.Threading;
 using System.Telemetry;
 
+/// <summary>
+/// Job queue handler for automatically accepting intercompany transactions based on partner configuration.
+/// Processes queued inbox transactions and applies auto-acceptance rules for configured partners.
+/// </summary>
 codeunit 536 "IC Auto Accept JR"
 {
     Permissions = tabledata "IC Inbox Transaction" = m;
