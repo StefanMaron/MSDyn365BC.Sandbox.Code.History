@@ -8,6 +8,10 @@ using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
 using System.Environment;
 
+/// <summary>
+/// Wizard page for setting up cross-environment intercompany partner connections.
+/// Guides users through API configuration, authentication setup, and partner validation for multi-environment scenarios.
+/// </summary>
 page 561 "CrossIntercomp. Partner Setup"
 {
     Caption = 'IC Partner Cross-Environment Setup';
@@ -462,6 +466,11 @@ page 561 "CrossIntercomp. Partner Setup"
         FinishEnabled := true;
     end;
 
+    /// <summary>
+    /// Validates whether all required SaaS connection details are properly configured for API connectivity.
+    /// Checks partner connection URL, company ID, OAuth credentials, and token endpoint configuration.
+    /// </summary>
+    /// <returns>True if all SaaS connection details are filled and valid, false otherwise</returns>
     procedure CheckIfSaaSConnectionDetailsAreFilled(): Boolean
     var
         PartnerConnectionDetailsAreFilled: Boolean;
