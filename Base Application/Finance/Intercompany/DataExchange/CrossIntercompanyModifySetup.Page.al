@@ -6,6 +6,10 @@ namespace Microsoft.Intercompany.DataExchange;
 
 using Microsoft.Intercompany.Partner;
 
+/// <summary>
+/// Dialog page for modifying intercompany partner external connection settings and API configuration.
+/// Allows users to update connection details, authentication settings, and data exchange parameters for cross-company transactions.
+/// </summary>
 page 565 "CrossIntercompany Modify Setup"
 {
     ApplicationArea = Intercompany;
