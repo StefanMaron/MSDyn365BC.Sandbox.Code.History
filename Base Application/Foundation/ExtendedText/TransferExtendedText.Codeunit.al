@@ -586,6 +586,7 @@ codeunit 378 "Transfer Extended Text"
     var
         ExtTextHeader: Record "Extended Text Header";
         IsHandled: Boolean;
+        DocumentDate: Date;
     begin
         IsHandled := false;
         OnBeforeJobCheckIfAnyExtText(JobPlanningLine, Unconditionally, MakeUpdateRequired, AutoText, Result, IsHandled);
@@ -636,8 +637,9 @@ codeunit 378 "Transfer Extended Text"
         end;
         ExtTextHeader.SetRange("No.", JobPlanningLine."No.");
         ExtTextHeader.SetRange(Job, true);
-        OnJobCheckIfAnyExtTextOnBeforeReadExtTextLines(ExtTextHeader, Job, JobPlanningLine, Unconditionally, MakeUpdateRequired);
-        exit(ReadExtTextLines(ExtTextHeader, JobPlanningLine."Document Date", Job."Language Code"));
+        DocumentDate := JobPlanningLine."Document Date";
+        OnJobCheckIfAnyExtTextOnBeforeReadExtTextLines(ExtTextHeader, Job, JobPlanningLine, Unconditionally, MakeUpdateRequired, DocumentDate);
+        exit(ReadExtTextLines(ExtTextHeader, DocumentDate, Job."Language Code"));
     end;
 
     local procedure DeleteJobPlanningLines(var JobPlanningLine: Record "Job Planning Line"): Boolean
@@ -888,7 +890,7 @@ codeunit 378 "Transfer Extended Text"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnJobCheckIfAnyExtTextOnBeforeReadExtTextLines(var ExtendedTextHeader: Record "Extended Text Header"; var Job: Record Job; var JobPlanningLine: Record "Job Planning Line"; Unconditionally: Boolean; var MakeUpdateRequired: Boolean)
+    local procedure OnJobCheckIfAnyExtTextOnBeforeReadExtTextLines(var ExtendedTextHeader: Record "Extended Text Header"; var Job: Record Job; var JobPlanningLine: Record "Job Planning Line"; Unconditionally: Boolean; var MakeUpdateRequired: Boolean; var DocumentDate: Date)
     begin
     end;
 
