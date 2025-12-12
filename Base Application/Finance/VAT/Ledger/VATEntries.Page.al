@@ -218,12 +218,21 @@ page 315 "VAT Entries"
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
+                field("EU Service"; Rec."EU Service")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
                 field("External Document No."; Rec."External Document No.")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the external document number for this VAT entry.';
                 }
-                field("EU Service"; Rec."EU Service")
+                field("Reason Code"; Rec."Reason Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
+                field("Source Code"; Rec."Source Code")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
