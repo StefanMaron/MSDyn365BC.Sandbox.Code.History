@@ -12,6 +12,10 @@ using Microsoft.Utilities;
 using System.Telemetry;
 using System.Environment;
 
+/// <summary>
+/// Monitors changes to intercompany partner configuration and validates setup consistency.
+/// Tracks modifications to partner settings and logs activities for audit and troubleshooting purposes.
+/// </summary>
 codeunit 489 "IC Partner Change Monitor"
 {
 
