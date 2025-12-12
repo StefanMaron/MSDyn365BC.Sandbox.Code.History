@@ -1169,6 +1169,8 @@ codeunit 99000845 "Reservation Management"
             exit;
 
         GetItemSetup(CalcReservEntry);
+        OnAutoTrackOnAfterGetItemSetup(CalcReservEntry, Item);
+        
         if Item."Order Tracking Policy" = Item."Order Tracking Policy"::None then
             exit;
 
@@ -2812,6 +2814,11 @@ codeunit 99000845 "Reservation Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnAutoTrackOnCheckSourceType(var ReservationEntry: Record "Reservation Entry"; var ShouldExit: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAutoTrackOnAfterGetItemSetup(var ReservationEntry: Record "Reservation Entry"; var Item: Record Item)
     begin
     end;
 
