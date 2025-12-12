@@ -42,6 +42,7 @@ codeunit 1223 "SEPA CT-Check Line"
     var
         GLSetup: Record "General Ledger Setup";
         BankAccount: Record "Bank Account";
+        GenJournalBatch: Record "Gen. Journal Batch";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -50,8 +51,8 @@ codeunit 1223 "SEPA CT-Check Line"
             exit;
 
         GLSetup.Get();
-
-        GenJnlLine.OnCheckGenJournalLineExportRestrictions();
+        if GenJournalBatch.Get(GenJnlLine."Journal Template Name", GenJnlLine."Journal Batch Name") then
+            GenJournalBatch.OnCheckGenJournalLineExportRestrictions();
 
         if GenJnlLine."Bal. Account Type" <> GenJnlLine."Bal. Account Type"::"Bank Account" then
             GenJnlLine.InsertPaymentFileError(MustBeBankAccErr);
