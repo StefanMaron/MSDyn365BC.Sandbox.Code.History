@@ -2472,176 +2472,176 @@
     </ReportSection>
   </ReportSections>
   <ReportParameters>
-    <ReportParameter Name="DataRetrieved">
+    <ReportParameter Name="DataRetrievedLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>DataRetrieved</Value>
+          <Value>DataRetrievedLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>DataRetrieved</Prompt>
+      <Prompt>DataRetrievedLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="InventoryCustomerSales">
+    <ReportParameter Name="InventoryCustomerSalesLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>InventoryCustomerSales</Value>
+          <Value>InventoryCustomerSalesLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>InventoryCustomerSales</Prompt>
+      <Prompt>InventoryCustomerSalesLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="InventoryCustomerSalesPrint">
+    <ReportParameter Name="InvCustomerSalesPrintLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>InventoryCustomerSalesPrint</Value>
+          <Value>InvCustomerSalesPrintLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>InventoryCustomerSalesPrint</Prompt>
+      <Prompt>InvCustomerSalesPrintLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="InvCustomerSalesAnalysis">
+    <ReportParameter Name="InvCustomerSalesAnalysisLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>InvCustomerSalesAnalysis</Value>
+          <Value>InvCustomerSalesAnalysisLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>InvCustomerSalesAnalysis</Prompt>
+      <Prompt>InvCustomerSalesAnalysisLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="PostingDateFilterLabel">
+    <ReportParameter Name="CustomerNoLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>PostingDateFilterLabel</Value>
+          <Value>CustomerNoLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>PostingDateFilterLabel</Prompt>
+      <Prompt>CustomerNoLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="AboutTheReportLabel">
+    <ReportParameter Name="CustNameLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>AboutTheReportLabel</Value>
+          <Value>CustNameLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>AboutTheReportLabel</Prompt>
+      <Prompt>CustNameLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="EnvironmentLabel">
+    <ReportParameter Name="InvQtyLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>EnvironmentLabel</Value>
+          <Value>InvQtyLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>EnvironmentLabel</Prompt>
+      <Prompt>InvQtyLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="CompanyLabel">
+    <ReportParameter Name="AmountLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>CompanyLabel</Value>
+          <Value>AmountLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>CompanyLabel</Prompt>
+      <Prompt>AmountLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="UserLabel">
+    <ReportParameter Name="DiscountAmtLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>UserLabel</Value>
+          <Value>DiscountAmtLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>UserLabel</Prompt>
+      <Prompt>DiscountAmtLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="RunOnLabel">
+    <ReportParameter Name="ProfitLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>RunOnLabel</Value>
+          <Value>ProfitLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>RunOnLabel</Prompt>
+      <Prompt>ProfitLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ReportNameLabel">
+    <ReportParameter Name="ProfitPctLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ReportNameLabel</Value>
+          <Value>ProfitPctLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ReportNameLabel</Prompt>
+      <Prompt>ProfitPctLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="DocumentationLabel">
+    <ReportParameter Name="PeriodLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>DocumentationLabel</Value>
+          <Value>PeriodLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>DocumentationLabel</Prompt>
+      <Prompt>PeriodLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="CustomerNoLabel">
+    <ReportParameter Name="AboutTheReportLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>CustomerNoLabel</Value>
+          <Value>AboutTheReportLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>CustomerNoLabel</Prompt>
+      <Prompt>AboutTheReportLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="CustNameLabel">
+    <ReportParameter Name="EnvironmentLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>CustNameLabel</Value>
+          <Value>EnvironmentLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>CustNameLabel</Prompt>
+      <Prompt>EnvironmentLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="InvQtyLabel">
+    <ReportParameter Name="CompanyLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>InvQtyLabel</Value>
+          <Value>CompanyLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>InvQtyLabel</Prompt>
+      <Prompt>CompanyLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="AmountLabel">
+    <ReportParameter Name="UserLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>AmountLabel</Value>
+          <Value>UserLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>AmountLabel</Prompt>
+      <Prompt>UserLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="DiscountAmtLabel">
+    <ReportParameter Name="RunOnLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>DiscountAmtLabel</Value>
+          <Value>RunOnLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>DiscountAmtLabel</Prompt>
+      <Prompt>RunOnLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ProfitLabel">
+    <ReportParameter Name="ReportNameLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ProfitLabel</Value>
+          <Value>ReportNameLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ProfitLabel</Prompt>
+      <Prompt>ReportNameLbl</Prompt>
     </ReportParameter>
-    <ReportParameter Name="ProfitPctLabel">
+    <ReportParameter Name="DocumentationLbl">
       <DataType>String</DataType>
       <DefaultValue>
         <Values>
-          <Value>ProfitPctLabel</Value>
+          <Value>DocumentationLbl</Value>
         </Values>
       </DefaultValue>
-      <Prompt>ProfitPctLabel</Prompt>
+      <Prompt>DocumentationLbl</Prompt>
     </ReportParameter>
     <ReportParameter Name="ReportTitle">
       <DataType>String</DataType>
@@ -2796,97 +2796,97 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>0</RowIndex>
-          <ParameterName>DataRetrieved</ParameterName>
+          <ParameterName>DataRetrievedLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>1</RowIndex>
-          <ParameterName>InventoryCustomerSales</ParameterName>
+          <ParameterName>InventoryCustomerSalesLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>2</RowIndex>
-          <ParameterName>InventoryCustomerSalesPrint</ParameterName>
+          <ParameterName>InvCustomerSalesPrintLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>3</RowIndex>
-          <ParameterName>InvCustomerSalesAnalysis</ParameterName>
+          <ParameterName>InvCustomerSalesAnalysisLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>4</RowIndex>
-          <ParameterName>PostingDateFilterLabel</ParameterName>
+          <ParameterName>CustomerNoLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>5</RowIndex>
-          <ParameterName>AboutTheReportLabel</ParameterName>
+          <ParameterName>CustNameLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>6</RowIndex>
-          <ParameterName>EnvironmentLabel</ParameterName>
+          <ParameterName>InvQtyLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>7</RowIndex>
-          <ParameterName>CompanyLabel</ParameterName>
+          <ParameterName>AmountLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>8</RowIndex>
-          <ParameterName>UserLabel</ParameterName>
+          <ParameterName>DiscountAmtLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>9</RowIndex>
-          <ParameterName>RunOnLabel</ParameterName>
+          <ParameterName>ProfitLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>10</RowIndex>
-          <ParameterName>ReportNameLabel</ParameterName>
+          <ParameterName>ProfitPctLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>11</RowIndex>
-          <ParameterName>DocumentationLabel</ParameterName>
+          <ParameterName>PeriodLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>12</RowIndex>
-          <ParameterName>CustomerNoLabel</ParameterName>
+          <ParameterName>AboutTheReportLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>13</RowIndex>
-          <ParameterName>CustNameLabel</ParameterName>
+          <ParameterName>EnvironmentLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>14</RowIndex>
-          <ParameterName>InvQtyLabel</ParameterName>
+          <ParameterName>CompanyLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>15</RowIndex>
-          <ParameterName>AmountLabel</ParameterName>
+          <ParameterName>UserLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>16</RowIndex>
-          <ParameterName>DiscountAmtLabel</ParameterName>
+          <ParameterName>RunOnLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>17</RowIndex>
-          <ParameterName>ProfitLabel</ParameterName>
+          <ParameterName>ReportNameLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>18</RowIndex>
-          <ParameterName>ProfitPctLabel</ParameterName>
+          <ParameterName>DocumentationLbl</ParameterName>
         </CellDefinition>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
