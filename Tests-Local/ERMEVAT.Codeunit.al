@@ -841,6 +841,7 @@ codeunit 144051 "ERM EVAT"
 
     local procedure VerifyICPVATEntry(var VATEntry: Record "VAT Entry")
     var
+        CountryRegion: Record "Country/Region";
         TagName: Text;
         ElementName: Text;
     begin
@@ -857,7 +858,8 @@ codeunit 144051 "ERM EVAT"
             ElementName := 'bd-i:SuppliesAmount';
         end;
 
-        LibraryXMLRead.VerifyNodeValueInSubtree(TagName, 'bd-i:CountryCodeISO-EC', VATEntry."Country/Region Code");
+        if CountryRegion.Get(VATEntry."Country/Region Code") then;
+        LibraryXMLRead.VerifyNodeValueInSubtree(TagName, 'bd-i:CountryCodeISO-EC', CountryRegion."ISO Code");
         LibraryXMLRead.VerifyAttributeValueInSubtree(TagName, 'bd-i:CountryCodeISO-EC', 'contextRef', 'Msg');
 
         LibraryXMLRead.VerifyNodeValueInSubtree(TagName, ElementName, Format(-VATEntry.Base, 0, '<Sign><Integer>'));
