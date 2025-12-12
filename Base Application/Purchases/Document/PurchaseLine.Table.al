@@ -8965,9 +8965,10 @@ table 39 "Purchase Line"
     /// Determines if the document type of the line is order or invoice.
     /// </summary>
     /// <returns>True if the document type is order or invoice, otherwise false.</returns>
-    procedure IsInvoiceDocType(): Boolean
+    procedure IsInvoiceDocType() Result: Boolean
     begin
-        exit("Document Type" in ["Document Type"::Order, "Document Type"::Invoice]);
+        Result := "Document Type" in ["Document Type"::Order, "Document Type"::Invoice];
+        OnAfterIsInvoiceDocType(Rec, Result);
     end;
 
     /// <summary>
@@ -11295,6 +11296,11 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterIsCreditDocType(PurchaseLine: Record "Purchase Line"; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterIsInvoiceDocType(var PurchaseLine: Record "Purchase Line"; var Result: Boolean)
     begin
     end;
 
