@@ -3553,6 +3553,7 @@ table 37 "Sales Line"
         CapableToPromise: Codeunit "Capable to Promise";
         JobCreateInvoice: Codeunit "Job Create-Invoice";
         IsHandled: Boolean;
+        RequiresVATRoundingAdjustment: Boolean;
     begin
         IsHandled := false;
         OnDeleteOnBeforeTestStatusOpen(Rec, IsHandled);
@@ -3605,9 +3606,10 @@ table 37 "Sales Line"
             SalesCommentLine.DeleteAll();
 
         // In case we have roundings on VAT or Sales Tax, we should update some other line
-        if (Type <> Type::" ") and ("Line No." <> 0) and not IsExtendedText() and ("Job Contract Entry No." = 0) and
-           (Quantity <> 0) and (Amount <> 0) and (Amount <> "Amount Including VAT") and not StatusCheckSuspended
-        then begin
+        RequiresVATRoundingAdjustment := (Type <> Type::" ") and ("Line No." <> 0) and not IsExtendedText() and ("Job Contract Entry No." = 0) and
+           (Quantity <> 0) and (Amount <> 0) and (Amount <> "Amount Including VAT") and not StatusCheckSuspended;
+        OnBeforeVATRoundingAdjustment(Rec, StatusCheckSuspended, RequiresVATRoundingAdjustment);
+        if RequiresVATRoundingAdjustment then begin
             Quantity := 0;
             "Quantity (Base)" := 0;
             "Qty. to Invoice" := 0;
@@ -12464,6 +12466,11 @@ table 37 "Sales Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcVATAmountLinesOnBeforeGetDeferralAmount(var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeVATRoundingAdjustment(var SalesLine: Record "Sales Line"; StatusCheckSuspended: Boolean; var RequiresVATRoundingAdjustment: Boolean)
     begin
     end;
 }
