@@ -233,6 +233,21 @@ page 315 "VAT Entries"
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
+                field("External Document No."; Rec."External Document No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
+                field("Reason Code"; Rec."Reason Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
+                field("Source Code"; Rec."Source Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
                 field("Delivery Operation Code"; Rec."Delivery Operation Code")
                 {
                     ApplicationArea = VAT;
