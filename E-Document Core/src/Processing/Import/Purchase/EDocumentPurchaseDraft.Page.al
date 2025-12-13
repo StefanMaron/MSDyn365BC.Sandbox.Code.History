@@ -513,9 +513,6 @@ page 6181 "E-Document Purchase Draft"
         ErrorMessage: Record "Error Message";
         EDocImportParameters: Record "E-Doc. Import Parameters";
         EDocImport: Codeunit "E-Doc. Import";
-        EDocImpSessionTelemetry: Codeunit "E-Doc. Imp. Session Telemetry";
-        Telemetry: Codeunit Telemetry;
-        CustomDimensions: Dictionary of [Text, Text];
     begin
         Session.LogMessage('0000PCO', FinalizeDraftInvokedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', EDocumentPurchaseHeader.FeatureName());
 
@@ -536,9 +533,7 @@ page 6181 "E-Document Purchase Draft"
         PageEditable := IsEditable();
         CurrPage.Lines.Page.Update();
         CurrPage.Update();
-        CustomDimensions.Set('Category', EDocumentPurchaseHeader.FeatureName());
-        CustomDimensions.Set('SystemId', EDocImpSessionTelemetry.CreateSystemIdText(Rec.SystemId));
-        Telemetry.LogMessage('0000PCP', FinalizeDraftPerformedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+        Session.LogMessage('0000PCP', FinalizeDraftPerformedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', EDocumentPurchaseHeader.FeatureName());
         FeatureTelemetry.LogUsage('0000PCU', EDocumentPurchaseHeader.FeatureName(), 'Finalize draft');
         Rec.ShowRecord();
     end;
