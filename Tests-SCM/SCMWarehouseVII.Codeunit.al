@@ -2707,6 +2707,119 @@ codeunit 137159 "SCM Warehouse VII"
     end;
 
     [Test]
+    [Scope('OnPrem')]
+    [HandlerFunctions('ItemTrkingLinesPageHandler,CreateInvtPutAwayPickMvmtPageHandler,DummyMessageHandler')]
+    procedure InvtMvmtIsRegisteredEvenIfQtyInAOIsMoreThanInBinContent()
+    var
+        AssemblyHeader: Record "Assembly Header";
+        AssemblyLine: Record "Assembly Line";
+        Bin: array[3] of Record Bin;
+        Item: array[3] of Record Item;
+        ItemTrackingCode: Record "Item Tracking Code";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        Location: Record Location;
+        RegisteredInvtMovementHdr: Record "Registered Invt. Movement Hdr.";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        UnitOfMeasure: Record "Unit of Measure";
+        AssemblyOrder: TestPage "Assembly Order";
+        LotNo: array[2] of Code[50];
+    begin
+        // [SCENARIO 574710] Registered Invt. Movement is created even if Quanity in Item Tracking of Assembly Line 
+        // is more than that in the Bin Content of a particular Lot No.
+        Initialize();
+
+        // [GIVEN] Create a Location.
+        CreateLocation(Location);
+
+        // [GIVEN] Create three Bins.
+        LibraryWarehouse.CreateBin(Bin[1], Location.Code, Bin[1].Code, '', '');
+        LibraryWarehouse.CreateBin(Bin[2], Location.Code, Bin[2].Code, '', '');
+        LibraryWarehouse.CreateBin(Bin[3], Location.Code, Bin[3].Code, '', '');
+
+        // [GIVEN] Validate "To-Assembly Bin Code", "From-Assembly Bin Code" and 
+        // "Asm.-to-Order Shpt. Bin Code" in Location. 
+        Location.Validate("To-Assembly Bin Code", Bin[1].Code);
+        Location.Validate("From-Assembly Bin Code", Bin[2].Code);
+        Location.Validate("Asm.-to-Order Shpt. Bin Code", Bin[2].Code);
+        Location.Modify(true);
+
+        // [GIVEN] Create Item [1] and Validate "Replenishment System".
+        LibraryInventory.CreateItem(Item[1]);
+        Item[1].Validate("Replenishment System", Item[1]."Replenishment System"::Assembly);
+        Item[1].Modify(true);
+
+        // [GIVEN] Create Item Tracking Code and Validate "Use Expiration Dates".
+        LibraryItemTracking.CreateItemTrackingCode(ItemTrackingCode, false, true);
+        ItemTrackingCode.Validate("Use Expiration Dates", true);
+        ItemTrackingCode.Modify(true);
+
+        // [GIVEN] Create Item [2] and Validate "Item Tracking Code".
+        LibraryInventory.CreateItem(Item[2]);
+        Item[2].Validate("Item Tracking Code", ItemTrackingCode.Code);
+        Item[2].Modify(true);
+
+        // [GIVEN] Create Item [3] and Validate "Item Tracking Code".
+        LibraryInventory.CreateItem(Item[3]);
+        Item[3].Validate("Item Tracking Code", ItemTrackingCode.Code);
+        Item[3].Modify(true);
+
+        // [GIVEN] Create Unit of Measure.
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+
+        // [GIVEN] Create Item Unit of Measure.
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item[3]."No.", UnitOfMeasure.Code, LibraryRandom.RandIntInRange(2, 2));
+
+        // [GIVEN] Create two Assembly BOM Components.
+        CreateAssemblyBomComponent(Item[2], Item[1]."No.");
+        CreateAssemblyBomComponent(Item[3], Item[1]."No.");
+
+        // [GIVEN] Create and Post Item Journal Lines.
+        CreateAndPostItemJournalLines(Item[2], Item[3], Location, Bin[3], Bin[1], LotNo[1], LotNo[2]);
+
+        // [GIVEN] Create an Assembly Header.
+        LibraryAssembly.CreateAssemblyHeader(AssemblyHeader, WorkDate(), Item[1]."No.", Location.Code, LibraryRandom.RandIntInRange(1, 1), '');
+
+        // [GIVEN] Find Assembly Line.
+        AssemblyLine.SetRange("No.", Item[2]."No.");
+        AssemblyLine.FindFirst();
+
+        // [GIVEN] Open Item Tracking Lines.
+        LibraryVariableStorage.Enqueue(LotNo[1]);
+        LibraryVariableStorage.Enqueue(AssemblyLine.Quantity);
+        AssemblyLine.OpenItemTrackingLines();
+
+        // [GIVEN] Find Assembly Line.
+        AssemblyLine.SetRange("No.", Item[3]."No.");
+        AssemblyLine.FindFirst();
+
+        // [GIVEN] Open Item Tracking Lines.
+        LibraryVariableStorage.Enqueue(LotNo[2]);
+        LibraryVariableStorage.Enqueue(AssemblyLine.Quantity);
+        AssemblyLine.OpenItemTrackingLines();
+
+        // [GIVEN] Run Create Inventory Movement action from Assembly Order page.
+        AssemblyOrder.OpenEdit();
+        AssemblyOrder.GoToRecord(AssemblyHeader);
+        AssemblyOrder."Create Inventor&y Movement".Invoke();
+
+        // [GIVEN] Find Warehouse Activity Header.
+        WarehouseActivityHeader.SetRange("Location Code", Location.Code);
+        WarehouseActivityHeader.FindFirst();
+
+        // [GIVEN] Auto Fill Qty in Inventory Activity.
+        LibraryWarehouse.AutoFillQtyInventoryActivity(WarehouseActivityHeader);
+
+        // [GIVEN] Register Warehouse Activity.
+        LibraryWarehouse.RegisterWhseActivity(WarehouseActivityHeader);
+
+        // [WHEN] Find Registered Whse. Activity Hdr.
+        RegisteredInvtMovementHdr.SetRange("Location Code", Location.Code);
+
+        // [THEN] Registered Invt. Movement Hdr. is found.
+        Assert.IsFalse(RegisteredInvtMovementHdr.IsEmpty(), RegInvtMovementHdrDoesNotExistErr);
+    end;
+
+    [Test]
     [HandlerFunctions('ProductionJournalModalPage,DummyMessageHandler,ConfirmHandlerTrue')]
     procedure ConsumptionIsProportionalForHighPrecisionQtyPer()
     var
@@ -4791,8 +4904,8 @@ codeunit 137159 "SCM Warehouse VII"
     local procedure RegisterWarehouseActivity(
         var WarehouseActivityLine: Record "Warehouse Activity Line";
         SourceDocument: Enum "Warehouse Activity Source Document";
-        SourceNo: Code[20];
-        ActivityType: Enum "Warehouse Activity Type")
+                            SourceNo: Code[20];
+                            ActivityType: Enum "Warehouse Activity Type")
     var
         WarehouseActivityHeader: Record "Warehouse Activity Header";
     begin
@@ -4804,7 +4917,7 @@ codeunit 137159 "SCM Warehouse VII"
     local procedure FindWarehouseShipmentLine(
         var WarehouseShipmentLine: Record "Warehouse Shipment Line";
         SourceDocument: Enum "Warehouse Activity Source Document";
-        SourceNo: Code[20])
+                            SourceNo: Code[20])
     begin
         WarehouseShipmentLine.SetRange("Source Document", SourceDocument);
         WarehouseShipmentLine.SetRange("Source No.", SourceNo);
@@ -5038,48 +5151,6 @@ codeunit 137159 "SCM Warehouse VII"
         end;
         ItemTrackingLines.OK().Invoke();
     end;
-    local procedure CreateRoutingWithWorkCenterAndRoutingLink(var RoutingHeader: Record "Routing Header"; WorkCenterNo: Code[20]; RoutingLinkCode: Code[10]; WaitTime: Decimal; FixedScrapQuantity: Decimal): Code[20]
-    var
-        RoutingLine: Record "Routing Line";
-    begin
-        LibraryManufacturing.CreateRoutingHeader(RoutingHeader, RoutingHeader.Type::Serial);
-
-        LibraryManufacturing.CreateRoutingLine(
-            RoutingHeader, RoutingLine, '', Format(LibraryRandom.RandInt(100)), RoutingLine.Type::"Work Center", WorkCenterNo);
-        RoutingLine.Validate("Wait Time", WaitTime);
-        RoutingLine.Validate("Fixed Scrap Quantity", FixedScrapQuantity);
-        RoutingLine.Validate("Routing Link Code", RoutingLinkCode);
-        RoutingLine.Modify(true);
-
-        RoutingHeader.Validate(Status, RoutingHeader.Status::Certified);
-        RoutingHeader.Modify(true);
-        exit(RoutingHeader."No.");
-    end;
-
-    local procedure CreateProductionBOM(var ProductionBOMHeader: Record "Production BOM Header"; Item: Record Item; RoutinglinkCode: Code[10]; QtyPer: Decimal; ScrapPercent: Decimal)
-    var
-        ProductionBOMLine: Record "Production BOM Line";
-    begin
-        LibraryManufacturing.CreateProductionBOMHeader(ProductionBOMHeader, Item."Base Unit of Measure");
-        LibraryManufacturing.CreateProductionBOMLine(
-            ProductionBOMHeader, ProductionBOMLine, '', ProductionBOMLine.Type::Item, Item."No.", QtyPer);
-        if ScrapPercent <> 0 then
-            ProductionBOMLine.Validate("Scrap %", ScrapPercent);
-        ProductionBOMLine.Validate("Routing Link Code", RoutinglinkCode);
-        ProductionBOMLine.Modify(true);
-
-        LibraryManufacturing.UpdateProductionBOMStatus(ProductionBOMHeader, ProductionBOMHeader.Status::Certified);
-    end;
-
-    local procedure GetQuantityFromILE(ItemNo: Code[20]; EntryType: Enum "Item Ledger Entry Type"): Decimal
-    var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-    begin
-        ItemLedgerEntry.SetRange("Item No.", ItemNo);
-        ItemLedgerEntry.SetRange("Entry Type", EntryType);
-        ItemLedgerEntry.CalcSums("Quantity");
-        exit(Abs(ItemLedgerEntry."Quantity"));
-    end;
 
     local procedure CreateLocation(var Location: Record Location)
     begin
@@ -5174,6 +5245,48 @@ codeunit 137159 "SCM Warehouse VII"
         BomComponent.Insert(true);
     end;
 
+    local procedure CreateRoutingWithWorkCenterAndRoutingLink(var RoutingHeader: Record "Routing Header"; WorkCenterNo: Code[20]; RoutingLinkCode: Code[10]; WaitTime: Decimal; FixedScrapQuantity: Decimal): Code[20]
+    var
+        RoutingLine: Record "Routing Line";
+    begin
+        LibraryManufacturing.CreateRoutingHeader(RoutingHeader, RoutingHeader.Type::Serial);
+
+        LibraryManufacturing.CreateRoutingLine(
+            RoutingHeader, RoutingLine, '', Format(LibraryRandom.RandInt(100)), RoutingLine.Type::"Work Center", WorkCenterNo);
+        RoutingLine.Validate("Wait Time", WaitTime);
+        RoutingLine.Validate("Fixed Scrap Quantity", FixedScrapQuantity);
+        RoutingLine.Validate("Routing Link Code", RoutingLinkCode);
+        RoutingLine.Modify(true);
+
+        RoutingHeader.Validate(Status, RoutingHeader.Status::Certified);
+        RoutingHeader.Modify(true);
+        exit(RoutingHeader."No.");
+    end;
+
+    local procedure CreateProductionBOM(var ProductionBOMHeader: Record "Production BOM Header"; Item: Record Item; RoutinglinkCode: Code[10]; QtyPer: Decimal; ScrapPercent: Decimal)
+    var
+        ProductionBOMLine: Record "Production BOM Line";
+    begin
+        LibraryManufacturing.CreateProductionBOMHeader(ProductionBOMHeader, Item."Base Unit of Measure");
+        LibraryManufacturing.CreateProductionBOMLine(
+            ProductionBOMHeader, ProductionBOMLine, '', ProductionBOMLine.Type::Item, Item."No.", QtyPer);
+        if ScrapPercent <> 0 then
+            ProductionBOMLine.Validate("Scrap %", ScrapPercent);
+        ProductionBOMLine.Validate("Routing Link Code", RoutinglinkCode);
+        ProductionBOMLine.Modify(true);
+
+        LibraryManufacturing.UpdateProductionBOMStatus(ProductionBOMHeader, ProductionBOMHeader.Status::Certified);
+    end;
+
+    local procedure GetQuantityFromILE(ItemNo: Code[20]; EntryType: Enum "Item Ledger Entry Type"): Decimal
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.SetRange("Item No.", ItemNo);
+        ItemLedgerEntry.SetRange("Entry Type", EntryType);
+        ItemLedgerEntry.CalcSums("Quantity");
+        exit(Abs(ItemLedgerEntry."Quantity"));
+    end;
 
     [ModalPageHandler]
     [Scope('OnPrem')]
