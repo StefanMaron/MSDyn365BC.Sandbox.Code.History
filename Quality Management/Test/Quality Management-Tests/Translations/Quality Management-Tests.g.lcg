@@ -689,6 +689,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - More Tests - NamedType OnlyFieldExpressionErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2929021570 - NamedType 246594464" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The %1 and %2 cannot exceed the %3. The %3 is currently exceeded by %4.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1=the passed quantity caption, %2=the failed quantity caption, %3=the source quantity caption, %4=the quantity exceeded]D;]A;(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - More Tests - NamedType PassFailQuantityInvalidErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2929021570 - NamedType 3583428667" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Advanced configuration required. Please review the grade configurations for field "%1", for grade "%2".]]></Val>

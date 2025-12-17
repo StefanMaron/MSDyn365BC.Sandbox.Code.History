@@ -32,6 +32,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Item Service Comm. Type Test - NamedType ServiceCommitmentItemErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 837722888 - Method 3277720177 - NamedType 759636845" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The number of filtered billing lines for Subscription Line %1 %2 (%3) does not match the total number of billing lines for this Subscription Line (%4). Adjust the page filters so that there are no gaps in the billing period.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Subscription Header No., %2 = Subscription Line Entry No., %3 = Filtered Count, %4 = Total Count]D;]A;(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Recurring Billing Test - Method CheckServiceCommitmentConsistencyWhenCreatingDocuments - NamedType ConsistencyErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 540279428 - Method 4244044965 - NamedType 2283387991" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The Subscription Line cannot be deleted because it is linked to a contract line which is not yet marked as "Closed".]]></Val>
