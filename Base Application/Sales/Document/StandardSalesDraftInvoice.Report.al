@@ -27,6 +27,7 @@ using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
+using System.Reflection;
 using System.Utilities;
 
 report 1303 "Standard Sales - Draft Invoice"
@@ -614,10 +615,14 @@ report 1303 "Standard Sales - Draft Invoice"
                 }
 
                 trigger OnAfterGetRecord()
+                var
+                    TypeHelper: Codeunit "Type Helper";
                 begin
                     if WorkDescriptionInstream.EOS then
                         CurrReport.Break();
-                    WorkDescriptionInstream.ReadText(WorkDescriptionLine);
+                    WorkDescriptionLine := TypeHelper.ReadAsTextWithSeparator(WorkDescriptionInstream, TypeHelper.LFSeparator());
+                    if WorkDescriptionLine = '' then
+                        CurrReport.Break();
                 end;
 
                 trigger OnPostDataItem()
@@ -629,7 +634,6 @@ report 1303 "Standard Sales - Draft Invoice"
                 begin
                     if not ShowWorkDescription then
                         CurrReport.Break();
-
                     Header."Work Description".CreateInStream(WorkDescriptionInstream, TEXTENCODING::UTF8);
                 end;
             }
