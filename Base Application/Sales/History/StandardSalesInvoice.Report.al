@@ -777,6 +777,8 @@ report 1306 "Standard Sales - Invoice"
                     if WorkDescriptionInstream.EOS then
                         CurrReport.Break();
                     WorkDescriptionLine := TypeHelper.ReadAsTextWithSeparator(WorkDescriptionInstream, TypeHelper.LFSeparator());
+                    if WorkDescriptionLine = '' then
+                        CurrReport.Break();
                 end;
 
                 trigger OnPostDataItem()
