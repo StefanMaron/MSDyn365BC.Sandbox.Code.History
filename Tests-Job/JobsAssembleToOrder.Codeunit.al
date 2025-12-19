@@ -1104,7 +1104,7 @@ codeunit 136322 "Jobs - Assemble-to Order"
 
         // [GIVEN] Create Job Planning Line with Quantity = 400.
         CreateSimpleJobPlanningLineBillableWithAssemblyItem(JobPlanningLine, JobTask, ParentItem."No.");
-        JobPlanningLine.Validate(Quantity, 400);
+        JobPlanningLine.Validate(Quantity, LibraryRandom.RandIntInRange(300, 500));
         JobPlanningLine.Modify(true);
 
         // [WHEN] Explode BOM.
