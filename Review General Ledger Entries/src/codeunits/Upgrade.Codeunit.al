@@ -6,6 +6,7 @@ codeunit 22201 "Upgrade"
 {
     Access = Internal;
     Subtype = Upgrade;
+    Permissions = TableData "G/L Entry" = rimd;
 
     trigger OnUpgradePerCompany()
     begin
@@ -45,15 +46,20 @@ codeunit 22201 "Upgrade"
         UpgradeTag.SetUpgradeTag(UpgradeReviewGLEntryTag());
     end;
 
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerCompanyUpgradeTags', '', false, false)]
     local procedure RegisterPerCompanyTags(var PerCompanyUpgradeTags: List of [Code[250]])
     begin
         PerCompanyUpgradeTags.Add(UpgradeReviewGLEntryTag());
+        PerCompanyUpgradeTags.Add(UpgradeFixGLEntryReviewLogWithReviewedAmountZeroTag());
     end;
 
     local procedure UpgradeReviewGLEntryTag(): Code[250]
     begin
         exit('MS-547765-UpdateReviewGLEntry-20250704');
+    end;
+
+    local procedure UpgradeFixGLEntryReviewLogWithReviewedAmountZeroTag(): Code[250]
+    begin
+        exit('MS-616473-UpgradeFixGLEntryReviewLogWithReviewedAmountZeroTag-20251216');
     end;
 }
