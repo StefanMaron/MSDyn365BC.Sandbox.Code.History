@@ -1102,7 +1102,7 @@ page 27 "Vendor List"
                     RunObject = Report "Vendor - List";
                     ToolTip = 'View various kinds of basic information for vendors, such as vendor posting group, discount and payment information, priority level and the vendor''s default currency, and the vendor''s current balance (in LCY). The report can be used, for example, to maintain the information in the Vendor table.';
                     ObsoleteState = Pending;
-                    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                    ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                     ObsoleteTag = '28.0';
                 }
 #endif
@@ -1207,7 +1207,7 @@ page 27 "Vendor List"
                     RunObject = Report "Payments on Hold";
                     ToolTip = 'View a list of all vendor ledger entries on which the On Hold field is marked.';
                     ObsoleteState = Pending;
-                    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                    ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                     ObsoleteTag = '28.0';
                 }
                 action("Vendor - Summary Aging")
@@ -1218,7 +1218,7 @@ page 27 "Vendor List"
                     RunObject = Report "Vendor - Summary Aging";
                     ToolTip = 'View, print, or save a summary of the payables owed to each vendor, divided into three time periods.';
                     ObsoleteState = Pending;
-                    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                    ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                     ObsoleteTag = '28.0';
                 }
                 action("Aged Accounts Payable")
