@@ -4416,6 +4416,116 @@ codeunit 134776 "Document Attachment Tests"
         LibraryNotificationMgt.RecallNotificationsForRecord(ReturnReceiptHeader);
     end;
 
+    [Test]
+    [HandlerFunctions('GetReturnShipmentLinesPageHandler')]
+    procedure EnsureDocAttachFlowFromPurchaseReturnShipmentToPurchaseCreditMemo()
+    var
+        Item: Record Item;
+        PurchaseHeaderReturnOrder: Record "Purchase Header";
+        PurchaseLineReturnOrder: Record "Purchase Line";
+        Vendor: Record Vendor;
+        RecordRef: RecordRef;
+        PurchaseCreditMemoPage: TestPage "Purchase Credit Memo";
+        CreditMemoNo: Code[20];
+    begin
+        // [SCENARIO 614313] Ensuring attached docs on Posted Purchase Return Shipment flow to Purchase Credit Memo when using 'Get Return Shipment Lines'.
+        Initialize();
+
+        // [GIVEN] Create Vendor.
+        LibraryPurchase.CreateVendor(Vendor);
+        RecordRef.GetTable(Vendor);
+
+        // [GIVEN] Create Purchase Return Order with Item line.
+        LibraryInventory.CreateItem(Item);
+        CreatePurchDoc(PurchaseHeaderReturnOrder, PurchaseLineReturnOrder, Vendor, Item, PurchaseHeaderReturnOrder."Document Type"::"Return Order");
+
+        // [GIVEN] Attach document to Purchase Return Order header.
+        Clear(RecordRef);
+        RecordRef.GetTable(PurchaseHeaderReturnOrder);
+        CreateDocAttach(RecordRef, 'PurchaseReturnOrder.jpeg', false, false);
+
+        // [GIVEN] Attach document to 1st Purchase Return Order line .
+        Clear(RecordRef);
+        RecordRef.GetTable(PurchaseLineReturnOrder);
+        CreateDocAttach(RecordRef, 'PurchaseReturnLine.jpeg', false, false);
+
+        // [GIVEN] Post Purchase Return Shipment from Purchase Return Order
+        PurchaseHeaderReturnOrder.Ship := true;
+        Codeunit.Run(Codeunit::"Purch.-Post", PurchaseHeaderReturnOrder);
+
+        // [GIVEN] Create Purchase Credit Memo.
+        PurchaseCreditMemoPage.OpenNew();
+        PurchaseCreditMemoPage."Buy-from Vendor Name".SetValue(Vendor."No.");
+        Evaluate(CreditMemoNo, PurchaseCreditMemoPage."No.".Value);
+
+        // [WHEN] Use 'Get Return Shipment Lines' to insert lines.
+        PurchaseCreditMemoPage.PurchLines.GetReturnShipmentLines.Invoke(); // opens modal page "Get Return Shipment Lines", and handler clicks OK.
+
+        // [WHEN] Repeat use 'Get Return Shipment Lines' to check it will run multiple times - inserts new line with attachment
+        PurchaseCreditMemoPage.PurchLines.GetReturnShipmentLines.Invoke(); // opens modal page "Get Return Shipment Lines", and handler clicks OK
+
+        // [THEN] Verify attached documents are flown to Purchase Credit Memo.
+        CheckDocAttachments(Database::"Purchase Header", 1, CreditMemoNo, PurchaseHeaderReturnOrder."Document Type"::"Credit Memo".AsInteger(), 'PurchaseReturnOrder');
+
+        // [THEN] Verify Purchase Credit Memo lines have two document attachments (one per each line inserted from Purchase Return Order).
+        CheckDocAttachments(Database::"Purchase Line", 2, CreditMemoNo, PurchaseHeaderReturnOrder."Document Type"::"Credit Memo".AsInteger(), 'PurchaseReturnLine');
+    end;
+
+    [Test]
+    [HandlerFunctions('GetReturnReceiptLinesPageHandler')]
+    procedure EnsureDocAttachFlowFromSalesReturnReceiptToSalesCreditMemo()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        SalesHeaderReturnOrder: Record "Sales Header";
+        SalesLineReturnOrder: Record "Sales Line";
+        RecordRef: RecordRef;
+        SalesCreditMemoPage: TestPage "Sales Credit Memo";
+        CreditMemoNo: Code[20];
+    begin
+        // [SCENARIO 614313] Ensuring attached docs on Posted Purchase Return Shipment flow to Purchase Credit Memo when using 'Get Return Shipment Lines'.
+        Initialize();
+
+        // [GIVEN] Create Customer.
+        LibrarySales.CreateCustomer(Customer);
+        RecordRef.GetTable(Customer);
+
+        // [GIVEN] Create Sales Return Order with Item line.
+        LibraryInventory.CreateItem(Item);
+        CreateSalesDoc(SalesHeaderReturnOrder, SalesLineReturnOrder, Customer, Item, SalesHeaderReturnOrder."Document Type"::"Return Order");
+
+        // [GIVEN] Attach document to Sales Return Order header.
+        Clear(RecordRef);
+        RecordRef.GetTable(SalesHeaderReturnOrder);
+        CreateDocAttach(RecordRef, 'SalesReturnOrder.jpeg', false, false);
+
+        // [GIVEN] Attach document to 1st Sales Return Order line .
+        Clear(RecordRef);
+        RecordRef.GetTable(SalesLineReturnOrder);
+        CreateDocAttach(RecordRef, 'SalesReturnLine.jpeg', false, false);
+
+        // [GIVEN] Post Sales Return Receipt from Sales Return Order.
+        SalesHeaderReturnOrder.Receive := true;
+        Codeunit.Run(Codeunit::"Sales-Post", SalesHeaderReturnOrder);
+
+        // [GIVEN] Create Sales Credit Memo.
+        SalesCreditMemoPage.OpenNew();
+        SalesCreditMemoPage."Sell-to Customer Name".SetValue(Customer."No.");
+        Evaluate(CreditMemoNo, SalesCreditMemoPage."No.".Value);
+
+        // [WHEN] Use 'Get Return Receipt Lines' to insert lines.
+        SalesCreditMemoPage.SalesLines."Get Return &Receipt Lines".Invoke(); // opens modal page "Get Return Receipt Lines", and handler clicks OK
+
+        // [WHEN] Repeat use 'Get Return Receipt Lines' to check it will run multiple times - inserts new line with attachment
+        SalesCreditMemoPage.SalesLines."Get Return &Receipt Lines".Invoke(); // opens modal page "Get Return Receipt Lines", and handler clicks OK
+
+        // [THEN] Verify attached documents are flown to Sales Credit Memo.
+        CheckDocAttachments(Database::"Sales Header", 1, CreditMemoNo, SalesHeaderReturnOrder."Document Type"::"Credit Memo".AsInteger(), 'SalesReturnOrder');
+
+        // [THEN] Verify Sales Credit Memo lines have two document attachments (one per each line inserted from Sales Return Order).
+        CheckDocAttachments(Database::"Sales Line", 2, CreditMemoNo, SalesHeaderReturnOrder."Document Type"::"Credit Memo".AsInteger(), 'SalesReturnLine');
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -5312,5 +5422,17 @@ codeunit 134776 "Document Attachment Tests"
         Assert.IsFalse(DocumentAttachmentDetails."Document Flow Sales".Visible(), StrSubstNo(UnexpectedFieldVisibleErr, DocumentAttachmentDetails."Document Flow Sales".Caption));
         Assert.IsFalse(DocumentAttachmentDetails."Document Flow Purchase".Visible(), StrSubstNo(UnexpectedFieldVisibleErr, DocumentAttachmentDetails."Document Flow Purchase".Caption));
         Assert.IsFalse(DocumentAttachmentDetails."Document Flow Service".Visible(), StrSubstNo(UnexpectedFieldVisibleErr, DocumentAttachmentDetails."Document Flow Service".Caption));
+    end;
+
+    [ModalPageHandler]
+    procedure GetReturnShipmentLinesPageHandler(var GetReturnShipmentLines: TestPage "Get Return Shipment Lines")
+    begin
+        GetReturnShipmentLines.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure GetReturnReceiptLinesPageHandler(var GetReturnReceiptLines: TestPage "Get Return Receipt Lines")
+    begin
+        GetReturnReceiptLines.OK().Invoke();
     end;
 }
