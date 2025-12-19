@@ -1402,7 +1402,7 @@ codeunit 427 ICInboxOutboxMgt
                 PurchLine.Description := ICInboxPurchLine.Description;
                 PurchLine."Description 2" := ICInboxPurchLine."Description 2";
                 IsHandled := false;
-                OnCreatePurchLinesOnBeforeCalcPriceAndAmounts(PurchHeader, PurchLine, IsHandled);
+                OnCreatePurchLinesOnBeforeCalcPriceAndAmounts(PurchHeader, PurchLine, IsHandled, ICInboxPurchLine);
                 if not IsHandled then begin
                     PurchLine.Validate("Direct Unit Cost", ICInboxPurchLine."Direct Unit Cost");
                     PurchLine."Amount Including VAT" := ICInboxPurchLine."Amount Including VAT";
@@ -4718,7 +4718,7 @@ codeunit 427 ICInboxOutboxMgt
     /// <param name="PurchaseLine">Purchase line for price and amount calculation</param>
     /// <param name="IsHandled">Set to true to skip standard price calculation</param>
     [IntegrationEvent(false, false)]
-    local procedure OnCreatePurchLinesOnBeforeCalcPriceAndAmounts(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    local procedure OnCreatePurchLinesOnBeforeCalcPriceAndAmounts(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; var ICInboxPurchLine: Record "IC Inbox Purchase Line")
     begin
     end;
 
