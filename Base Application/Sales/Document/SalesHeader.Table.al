@@ -38,6 +38,7 @@ using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Shipping;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.Graph;
 using Microsoft.Intercompany;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
@@ -3143,6 +3144,7 @@ table 36 "Sales Header"
         ArchiveManagement: Codeunit ArchiveManagement;
         CRMIntTableSubscriber: Codeunit "CRM Int. Table. Subscriber";
         ShowPostedDocsToPrint: Boolean;
+        DisableAggregateTableUpdate: Codeunit "Disable Aggregate Table Update";
     begin
         if not UserSetupMgt.CheckRespCenter(0, "Responsibility Center") then
             Error(
@@ -3166,7 +3168,9 @@ table 36 "Sales Header"
 
         DeleteWarehouseRequest();
 
+        SetupDisableAggregateTableUpdate(DisableAggregateTableUpdate);
         DeleteAllSalesLines();
+        EnableAggregateTableUpdate(DisableAggregateTableUpdate);
 
         ShowPostedDocsToPrint := (SalesShptHeader."No." <> '') or
            (SalesInvHeader."No." <> '') or
@@ -9285,6 +9289,24 @@ table 36 "Sales Header"
                 if ApprovalsMgmt.PrePostApprovalCheckSales(SalesHeader) then
                     ICInOutboxMgt.SendSalesDoc(SalesHeader, false);
             until SalesHeader.Next() = 0;
+    end;
+
+    local procedure SetupDisableAggregateTableUpdate(var DisableAggregateTableUpdate: Codeunit "Disable Aggregate Table Update")
+    var
+        AggregateTableID: Integer;
+    begin
+        AggregateTableID := DisableAggregateTableUpdate.GetAggregateTableIDFromSalesHeader(Rec);
+        if not (AggregateTableID > 0) then
+            exit;
+
+        DisableAggregateTableUpdate.SetAggregateTableIDDisabled(AggregateTableID);
+        DisableAggregateTableUpdate.SetTableSystemIDDisabled(SystemId);
+        BindSubscription(DisableAggregateTableUpdate);
+    end;
+
+    local procedure EnableAggregateTableUpdate(var DisableAggregateTableUpdate: Codeunit "Disable Aggregate Table Update")
+    begin
+        if UnbindSubscription(DisableAggregateTableUpdate) then;
     end;
 
     [IntegrationEvent(false, false)]
