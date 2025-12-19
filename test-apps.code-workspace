@@ -133,6 +133,9 @@
       "path": "./ErrorMessagesWithRecommendations/Test/Error Messages with Recommendations Tests/DisabledTests"
     },
     {
+      "path": "./Quality Management/Source/Quality Management/src/Configuration/Template/Test"
+    },
+    {
       "path": "./Quality Management/Test/Quality Management-Tests"
     },
     {
