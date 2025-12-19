@@ -1822,7 +1822,7 @@ page 26 "Vendor Card"
                 Image = "Report";
                 ToolTip = 'View a summary of the payables owed to each vendor, divided into three time periods.';
                 ObsoleteState = Pending;
-                ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                 ObsoleteTag = '28.0';
 
                 trigger OnAction()
@@ -2017,7 +2017,7 @@ page 26 "Vendor Card"
                 actionref("Vendor - Summary Aging_Promoted"; "Vendor - Summary Aging")
                 {
                     ObsoleteState = Pending;
-                    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                    ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                     ObsoleteTag = '28.0';
                 }
 #endif
