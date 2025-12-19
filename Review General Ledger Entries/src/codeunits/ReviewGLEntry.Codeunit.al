@@ -39,10 +39,7 @@ codeunit 22200 "Review G/L Entry" implements "G/L Entry Reviewer"
             GLEntryReviewLog."G/L Entry No." := GLEntry."Entry No.";
             GLEntryReviewLog."Reviewed Identifier" := Identifier;
             GLEntryReviewLog."Reviewed By" := UserName;
-            if GLEntry."Amount to Review" = 0 then
-                GLEntryReviewLog."Reviewed Amount" := GLEntry.Amount
-            else
-                GLEntryReviewLog."Reviewed Amount" := GLEntry."Amount to Review";
+            GLEntryReviewLog."Reviewed Amount" := GLEntry."Amount to Review";
             GLEntryReviewLog."G/L Account No." := GLEntry."G/L Account No.";
             GLEntryReviewLog.Insert(true);
 
@@ -94,17 +91,14 @@ codeunit 22200 "Review G/L Entry" implements "G/L Entry Reviewer"
     var
         Balance: Decimal;
     begin
-        GLEntry.SetLoadFields("Amount to Review", "Debit Amount", "Credit Amount");
-        if GLEntry.IsEmpty() then
-            exit(true);
+        if not GLEntry.IsEmpty() and (GLEntry."Amount to Review" = 0) then begin
+            GLEntry.CalcSums("Debit Amount", "Credit Amount");
+            Balance := GLEntry."Credit Amount" - GLEntry."Debit Amount";
+        end else
+            repeat
+                Balance := Balance + GLEntry."Amount to Review";
+            until GLEntry.Next() = 0;
 
-        GLEntry.SetRange("Amount to Review", 0);
-        GLEntry.CalcSums("Debit Amount", "Credit Amount");
-        Balance := GLEntry."Credit Amount" - GLEntry."Debit Amount";
-        GLEntry.SetFilter("Amount to Review", '<>0');
-        GLEntry.CalcSums("Amount to Review");
-        Balance += GLEntry."Amount to Review";
-        GLEntry.SetRange("Amount to Review");
         exit(Balance = 0);
     end;
 
