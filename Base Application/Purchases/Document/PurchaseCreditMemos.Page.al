@@ -654,7 +654,7 @@ page 9309 "Purchase Credit Memos"
                     RunObject = Report "Vendor - Summary Aging";
                     ToolTip = 'View, print, or save a summary of the payables owed to each vendor, divided into three time periods. The report can be used to prepare liquidity analyses.';
                     ObsoleteState = Pending;
-                    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                    ObsoleteReason = 'This report will be removed in a future release. Check the documentation for alternative options such as the report Aged Accounts Payable (Excel).';
                     ObsoleteTag = '28.0';
                 }
                 action("<Report Aged Accounts Payables")
