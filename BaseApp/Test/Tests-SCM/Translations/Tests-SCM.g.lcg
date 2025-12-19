@@ -367,11 +367,11 @@
   </Item>
   <Item ItemId=";Codeunit 1068311504 - NamedType 319115757" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Item %1 in Location %2 should have Replenishment System %3.Current Value is %4.]]></Val>
+      <Val><![CDATA[Item %1 in Location %2 should have %3 set to %4. Current %3 is %5.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1= Item No., %2= Location Code, %3= Replenishment System::Purchase, %4= Field Value.]D;]A;(LookupHint=Codeunit SCM - Planning UT - NamedType ReplenishmentSystemPurchaseErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1= Item No., %2= Location Code, %3= Replenishment System Caption, %4= Replenishment System::Purchase, %5= Field Value.]D;]A;(LookupHint=Codeunit SCM - Planning UT - NamedType ReplenishmentSystemPurchaseErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1068311504 - NamedType 52278390" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
