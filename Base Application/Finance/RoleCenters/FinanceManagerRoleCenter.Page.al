@@ -1780,7 +1780,7 @@ page 8901 "Finance Manager Role Center"
                         RunObject = report "Vendor - List";
                         Tooltip = 'Run the Vendor - List report.';
                         ObsoleteState = Pending;
-                        ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                        ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                         ObsoleteTag = '28.0';
                     }
 #endif

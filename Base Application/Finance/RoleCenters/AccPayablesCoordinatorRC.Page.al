@@ -86,7 +86,7 @@ page 9002 "Acc. Payables Coordinator RC"
                 RunObject = Report "Vendor - List";
                 ToolTip = 'View the list of your vendors.';
                 ObsoleteState = Pending;
-                ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                 ObsoleteTag = '28.0';
             }
 #endif
@@ -144,7 +144,7 @@ page 9002 "Acc. Payables Coordinator RC"
                 RunObject = Report "Payments on Hold";
                 ToolTip = 'View a list of all vendor ledger entries on which the On Hold field is marked.';
                 ObsoleteState = Pending;
-                ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                 ObsoleteTag = '28.0';
             }
 #endif
