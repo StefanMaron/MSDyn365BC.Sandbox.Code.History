@@ -1817,10 +1817,7 @@ codeunit 137055 "SCM Warehouse Pick"
         SetupItemTrackingWithExpirationDates(Item);
 
         // [GIVEN] Add secondary UOM with problematic conversion factor and very small rounding precision
-        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
-        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, QtyPerUOM);
-        ItemUnitOfMeasure.Validate("Qty. Rounding Precision", QtyRoundingPrecision);
-        ItemUnitOfMeasure.Modify(true);
+        CreateItemUnitOfMeasure(ItemUnitOfMeasure, UnitOfMeasure, Item, QtyPerUOM, QtyRoundingPrecision);
 
         // [GIVEN] Set Sales Unit of Measure to the secondary UOM
         Item.Validate("Sales Unit of Measure", UnitOfMeasure.Code);
@@ -2822,6 +2819,24 @@ codeunit 137055 "SCM Warehouse Pick"
         ItemJournalLine."Expiration Date" := ExpiryDate;
         ItemJournalLine.Modify(true);
         LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
+    end;
+
+    local procedure CreateItemUnitOfMeasure(
+        var ItemUnitOfMeasure: Record "Item Unit of Measure";
+        var UnitOfMeasure: Record "Unit of Measure";
+        Item: Record Item;
+        QtyPerUOM: Decimal;
+        QtyRoundingPrecision: Decimal)
+    begin
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        ItemUnitOfMeasure.SetRange("Item No.", Item."No.");
+        ItemUnitOfMeasure.SetRange(Code, Item."Base Unit of Measure");
+        ItemUnitOfMeasure.FindFirst();
+        ItemUnitOfMeasure.Validate("Qty. Rounding Precision", QtyRoundingPrecision);
+        ItemUnitOfMeasure.Modify(true);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, QtyPerUOM);
+        ItemUnitOfMeasure.Validate("Qty. Rounding Precision", QtyRoundingPrecision);
+        ItemUnitOfMeasure.Modify(true);
     end;
 
     [ModalPageHandler]
