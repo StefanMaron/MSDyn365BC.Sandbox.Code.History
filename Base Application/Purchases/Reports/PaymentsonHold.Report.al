@@ -16,7 +16,7 @@ report 319 "Payments on Hold"
     Caption = 'Payments on Hold (Obsolete)';
     UsageCategory = ReportsAndAnalysis;
     ObsoleteState = Pending;
-    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+    ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
     ObsoleteTag = '28.0';
 
     dataset

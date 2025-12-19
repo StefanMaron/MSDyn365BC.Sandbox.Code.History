@@ -25,7 +25,11 @@ using System.Utilities;
 report 118 "Finance Charge Memo"
 {
     DefaultLayout = RDLC;
+#if not CLEAN28
+    RDLCLayout = './Sales/FinanceCharge/FinanceChargeMemoFR.rdlc';
+#else
     RDLCLayout = './Sales/FinanceCharge/FinanceChargeMemo.rdlc';
+#endif
     Caption = 'Finance Charge Memo';
     WordMergeDataItem = "Issued Fin. Charge Memo Header";
 
@@ -310,9 +314,14 @@ report 118 "Finance Charge Memo"
                     column(DcType_IssuFinChrgMemoLine; "Document Type")
                     {
                     }
+#if not CLEAN28
                     column(InterestRate_IssuFinChrgMemoLine; "Interest Rate")
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     column(DocNo_IssuFinChrgMemoLineCaption; FieldCaption("Document No."))
                     {
                     }
@@ -325,9 +334,14 @@ report 118 "Finance Charge Memo"
                     column(DcType_IssuFinChrgMemoLineCaption; FieldCaption("Document Type"))
                     {
                     }
+#if not CLEAN28
                     column(InterestRate_IssuFinChrgMemoLineCaption; FieldCaption("Interest Rate"))
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     column(No_IssuedFinChgMemoLine; "No.")
                     {
                     }

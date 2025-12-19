@@ -29,7 +29,11 @@ using Microsoft.Sales.FinanceCharge;
 report 117 Reminder
 {
     Caption = 'Reminder';
+#if not CLEAN28
+    DefaultRenderingLayout = "ReminderFR.rdlc";
+#else
     DefaultRenderingLayout = "Reminder.rdlc";
+#endif
     WordMergeDataItem = "Issued Reminder Header";
 
     dataset
@@ -316,12 +320,20 @@ report 117 Reminder
                     column(DueDate_IssuedReminderLine; Format("Due Date"))
                     {
                     }
+#if not CLEAN28
                     column(InterestRate_IssuedReminderLine; "Interest Rate")
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
                     column(InterestRateCaption_IssuedReminderLine; FieldCaption("Interest Rate"))
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     column(OriginalAmt_IssuedReminderLine; "Original Amount")
                     {
                         AutoFormatExpression = GetCurrencyCodeFromHeader();
@@ -870,6 +882,15 @@ report 117 Reminder
 
     rendering
     {
+#if not CLEAN28
+        layout("ReminderFR.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/Reminder/ReminderFR.rdlc';
+            Caption = 'Reminder (RDLC)';
+            Summary = 'The Reminder (RDLC) provides a detailed layout.';
+        }
+#else
         layout("Reminder.rdlc")
         {
             Type = RDLC;
@@ -877,6 +898,7 @@ report 117 Reminder
             Caption = 'Reminder (RDLC)';
             Summary = 'The Reminder (RDLC) provides a detailed layout.';
         }
+#endif
         layout("DefaultReminderEmail.docx")
         {
             Type = Word;

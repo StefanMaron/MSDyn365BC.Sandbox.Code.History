@@ -20,7 +20,11 @@ using System.Utilities;
 report 122 "Reminder - Test"
 {
     DefaultLayout = RDLC;
+#if not CLEAN28
+    RDLCLayout = './Sales/Reminder/ReminderTestFR.rdlc';
+#else
     RDLCLayout = './Sales/Reminder/ReminderTest.rdlc';
+#endif
     Caption = 'Reminder - Test';
     WordMergeDataItem = "Reminder Header";
 
@@ -262,9 +266,14 @@ report 122 "Reminder - Test"
                     column(Reminder_Line__Due_Date_; Format("Due Date"))
                     {
                     }
+#if not CLEAN28
                     column(Reminder_Line__Interest_Rate_; "Interest Rate")
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     column(Reminder_Line__Document_Type_; "Document Type")
                     {
                     }
@@ -324,9 +333,14 @@ report 122 "Reminder - Test"
                     column(Reminder_Line__Due_Date_Caption; Reminder_Line__Due_Date_CaptionLbl)
                     {
                     }
+#if not CLEAN28
                     column(Reminder_Line__Interest_Rate_Caption; FieldCaption("Interest Rate"))
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     column(Reminder_Line__Document_No__Caption; FieldCaption("Document No."))
                     {
                     }
@@ -448,9 +462,14 @@ report 122 "Reminder - Test"
                     column(Not_Due__Due_Date_; Format("Due Date"))
                     {
                     }
+#if not CLEAN28
                     column(Not_Due__Interest_Rate_; "Interest Rate")
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     column(Not_Due__Original_Amount_; "Original Amount")
                     {
                     }
@@ -471,9 +490,14 @@ report 122 "Reminder - Test"
                     column(Not_Due__Due_Date_Caption; Not_Due__Due_Date_CaptionLbl)
                     {
                     }
+#if not CLEAN28
                     column(Not_Due__Interest_Rate_Caption; FieldCaption("Interest Rate"))
                     {
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     column(Not_Due__Original_Amount_Caption; FieldCaption("Original Amount"))
                     {
                     }
