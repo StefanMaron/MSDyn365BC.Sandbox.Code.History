@@ -3818,6 +3818,8 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(6928); // ExpensePostingGroup
         SetTableFieldsToNormal(6929); // ExpenseSubcategory
         SetTableFieldsToNormal(6930); // ExpenseAgentSetup
+        SetTableFieldsToNormal(6931); // ExpenseTeam
+        SetTableFieldsToNormal(6932); // ExpenseApprovalSetup
     end;
 
     local procedure ClassifyAgents()
