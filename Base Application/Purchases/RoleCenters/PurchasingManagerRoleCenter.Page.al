@@ -500,7 +500,7 @@ page 8905 "Purchasing Manager Role Center"
                             Caption = 'Vendor - List (Obsolete)';
                             RunObject = report "Vendor - List";
                             ObsoleteState = Pending;
-                            ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                            ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                             ObsoleteTag = '28.0';
                         }
                         action("Vendor - Summary Aging")
@@ -509,7 +509,7 @@ page 8905 "Purchasing Manager Role Center"
                             Caption = 'Vendor - Summary Aging (Obsolete)';
                             RunObject = report "Vendor - Summary Aging";
                             ObsoleteState = Pending;
-                            ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                            ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                             ObsoleteTag = '28.0';
                         }
 #endif
