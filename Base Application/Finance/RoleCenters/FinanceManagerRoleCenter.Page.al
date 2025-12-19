@@ -1732,7 +1732,7 @@ page 8901 "Finance Manager Role Center"
                         RunObject = report "Payments on Hold";
                         Tooltip = 'Run the Payments on Hold report.';
                         ObsoleteState = Pending;
-                        ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                        ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                         ObsoleteTag = '28.0';
                     }
 #endif
@@ -1786,7 +1786,7 @@ page 8901 "Finance Manager Role Center"
                         RunObject = report "Vendor - List";
                         Tooltip = 'Run the Vendor - List report.';
                         ObsoleteState = Pending;
-                        ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                        ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                         ObsoleteTag = '28.0';
                     }
 #endif
@@ -1819,7 +1819,7 @@ page 8901 "Finance Manager Role Center"
                         RunObject = report "Vendor - Summary Aging";
                         Tooltip = 'Run the Vendor - Summary Aging report.';
                         ObsoleteState = Pending;
-                        ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                        ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                         ObsoleteTag = '28.0';
                     }
                     action("Vendor - Top 10 List")
