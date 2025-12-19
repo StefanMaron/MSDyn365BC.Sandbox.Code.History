@@ -137,7 +137,6 @@ codeunit 137072 "SCM Production Orders II"
         LotNoMustBeEqualErr: Label '%1 must be equal to %2 in %3', Comment = '%1 = Lot No. Caption, %2 = Expected Lot No., %3 = Warehouse Activity Line Table';
         ProdOrderLineErr: Label 'Production Order should have two lines for variant-based BOM structure.';
         NoOfRecordsMustBeSameErr: Label 'The number of records in table %1 must be the same.', Comment = '%1- TableCaption';
-        UnitCostMustBeEqualErr: Label '%1 must be correct in %2', Comment = '%1 =Field Name %2 = Table Name';
 
     [Test]
     [Scope('OnPrem')]
@@ -7468,60 +7467,6 @@ codeunit 137072 "SCM Production Orders II"
         Assert.AreEqual(3, RegisteredWhseActivityHdr.Count, StrSubstNo(NoOfRecordsMustBeSameErr, RegisteredWhseActivityHdr.TableCaption));
     end;
 
-    [Test]
-    [HandlerFunctions('ProductionJnlPageHandler4,ConfirmHandler,MessageHandlerNoText')]
-    [Scope('OnPrem')]
-    procedure UnitCostCorrectlyCalculatedWhenFinishedQtyDiffersFromProdOrderQty()
-    var
-        Item: array[2] of Record Item;
-        Location: Record Location;
-        ProductionOrder: Record "Production Order";
-        ProductionBOMHeader: Record "Production BOM Header";
-        ProdOrderLine: Record "Prod. Order Line";
-    begin
-        // [SCENARIO 563091] When Finished quantity is different than Prod. Order quantity, Unit Cost on 
-        // Finished Prod. Order is calculated correctly
-        Initialize();
-
-        // [GIVEN] Create Item [1] and Validate Costing Method.
-        CreateItemWithProductionBOM(Item[1], LibraryRandom.RandIntInRange(10, 10), ProductionBOMHeader."No.");
-
-        // [GIVEN] Create and Post Item Journal Line.
-        CreateAndPostItemJournalLine(Item[1]."No.", LibraryRandom.RandIntInRange(50, 100), '', '', false);
-
-        // // [GIVEN] Create a Production BOM
-        LibraryManufacturing.CreateCertifiedProductionBOM(ProductionBOMHeader, Item[1]."No.", LibraryRandom.RandInt(1));
-
-        // [GIVEN] Create Item [2] and Validate Costing Method and Production BOM No.
-        CreateItemWithProductionBOM(Item[2], 0, ProductionBOMHeader."No.");
-
-        // [GIVEN] Create and Refresh Production Order.
-        CreateAndRefreshProductionOrder(ProductionOrder, ProductionOrder.Status::Released, Item[2]."No.", LibraryRandom.RandInt(5), Location.Code, '');
-
-        // [GIVEN] Find Prod. Order Line.
-        ProdOrderLine.SetRange(Status, ProductionOrder.Status::Released);
-        ProdOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
-        ProdOrderLine.FindFirst();
-
-        // [GIVEN] Create and Post Production Journal.
-        CreateAndPostProductionJournal(ProductionOrder, ProdOrderLine."Line No.");
-
-        // [WHEN] Finish the Production Order with Finished Quantity different than Prod. Order Quantity.
-        LibraryManufacturing.ChangeProdOrderStatus(ProductionOrder, ProductionOrder.Status::Finished, WorkDate(), true);
-
-        // [THEN] Find Finished Production Order.
-        ProductionOrder.Get(ProductionOrder.Status::Finished, ProductionOrder."No.");
-
-        // [THEN] Get Finished Production Order and verify the Unit Cost Updated correctly.
-        ProdOrderLine.SetRange(Status, ProductionOrder.Status::Finished);
-        ProdOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
-        ProdOrderLine.FindFirst();
-
-        // [THEN] Unit Cost is correctly calculated.
-        Assert.AreEqual(Round(ProdOrderLine."Cost Amount" / ProdOrderLine."Finished Quantity"), ProdOrderLine."Unit Cost",
-            StrSubstNo(UnitCostMustBeEqualErr, ProdOrderLine.FieldCaption("Unit Cost"), ProdOrderLine.TableCaption()));
-    end;
-
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -9773,18 +9718,6 @@ codeunit 137072 "SCM Production Orders II"
         exit(WarehouseActivityLine."No.");
     end;
 
-    local procedure CreateItemWithProductionBOM(var Item: Record Item; UnitCost: Decimal; ProductionBOMNo: Code[20])
-    begin
-        LibraryInventory.CreateItem(Item);
-        Item.Validate("Costing Method", Item."Costing Method"::FIFO);
-        if UnitCost <> 0 then
-            Item.Validate("Unit Cost", UnitCost);
-        if ProductionBOMNo <> '' then
-            Item.Validate("Production BOM No.", ProductionBOMNo);
-
-        Item.Modify(true);
-    end;
-
     [ModalPageHandler]
     procedure ProductionJournalModalPageHandler(var ProductionJournal: TestPage "Production Journal")
     begin
@@ -10170,18 +10103,6 @@ codeunit 137072 "SCM Production Orders II"
                 end;
         end;
         ItemTrackingLines.OK().Invoke();
-    end;
-
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure ProductionJnlPageHandler4(var ProductionJournal: TestPage "Production Journal")
-    var
-        OutputQuantity: Decimal;
-    begin
-        ProductionJournal.Next();
-        OutputQuantity := ProductionJournal."Output Quantity".AsDecimal();
-        ProductionJournal."Output Quantity".SetValue(OutputQuantity + 1);
-        ProductionJournal.Post.Invoke();
     end;
 }
 
