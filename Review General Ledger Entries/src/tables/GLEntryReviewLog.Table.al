@@ -50,9 +50,6 @@ table 22218 "G/L Entry Review Log"
         {
             IncludedFields = "Reviewed Amount";
         }
-        key(ReviewedAmount; "Reviewed Amount")
-        {
-        }
     }
     trigger OnInsert()
     begin
