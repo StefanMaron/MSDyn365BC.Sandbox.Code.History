@@ -85,6 +85,7 @@ report 81 "Import Budget from Excel"
                 GLBudgetEntry."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
                 OnBudgetBufOnAfterGetRecordOnBeforeGLBudgetEntryInsert(GLBudgetEntry);
                 GLBudgetEntry.Insert(true);
+                OnBudgetBufOnAfterGetRecordOnAfterGLBudgetEntryInsert(GLBudgetEntry, EntryNo);
                 EntryNo := EntryNo + 1;
             end;
 
@@ -532,7 +533,7 @@ report 81 "Import Budget from Excel"
                                                 ApplyFilteredDimensionsToBudgetBuf(BudgetBuf, CountDim);
                                                 Evaluate(BudgetBuf.Date, TempExcelBuf."Cell Value as Text");
                                                 Evaluate(BudgetBuf.Amount, TempGlobalExcelBuf."Cell Value as Text");
-                                                
+
                                                 IsHandled := false;
                                                 OnAnalyzeDataOnBeforeInsertBudgetBuf(BudgetBuf, IsHandled);
                                                 if not IsHandled then
@@ -541,9 +542,9 @@ report 81 "Import Budget from Excel"
                                                     else begin
                                                         IsHandled := false;
                                                         OnAnalyzeDataOnBeforeCombinationMustBeUniqueError(BudgetBuf, IsHandled);
-                                                    if not IsHandled then
-                                                        Error(Text023 + Text024 + Format(BudgetBuf.RecordId()));
-                                                end;
+                                                        if not IsHandled then
+                                                            Error(Text023 + Text024 + Format(BudgetBuf.RecordId()));
+                                                    end;
                                             end;
                                             OnAnalyzeDataOnAfterCaseText014(BudgetBuf);
                                         end;
@@ -708,7 +709,7 @@ report 81 "Import Budget from Excel"
         ServerFileName := NewFileName;
     end;
 
-local procedure ApplyFilteredDimensionsToBudgetBuf(var BudgetBuffer: Record "Budget Buffer"; var CurrentDimCount: Integer)
+    local procedure ApplyFilteredDimensionsToBudgetBuf(var BudgetBuffer: Record "Budget Buffer"; var CurrentDimCount: Integer)
     var
     begin
         // Process each possible filtered dimension
@@ -800,7 +801,7 @@ local procedure ApplyFilteredDimensionsToBudgetBuf(var BudgetBuffer: Record "Bud
                 Evaluate(BudgetBuffer."Dimension Value Code 8", FilterValue);
         end;
     end;
-    
+
     /// <summary>
     /// Integration event raised before setting G/L Budget Entry filters during Excel data analysis.
     /// Enables custom filter logic during the budget import analysis phase.
@@ -1030,6 +1031,17 @@ local procedure ApplyFilteredDimensionsToBudgetBuf(var BudgetBuffer: Record "Bud
 
     [IntegrationEvent(false, false)]
     local procedure OnAnalyzeDataOnAfterCaseText014(var BudgetBuf: Record "Budget Buffer")
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised after inserting G/L Budget Entry records during import processing.
+    /// Enables custom budget entry modification after insertion and allows modification of the EntryNo for creating additional entries.
+    /// </summary>
+    /// <param name="GLBudgetEntry">G/L Budget Entry record that was inserted</param>
+    /// <param name="EntryNo">Current entry number counter that will be incremented for the next entry</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnBudgetBufOnAfterGetRecordOnAfterGLBudgetEntryInsert(var GLBudgetEntry: Record "G/L Budget Entry"; var EntryNo: Integer)
     begin
     end;
 }
