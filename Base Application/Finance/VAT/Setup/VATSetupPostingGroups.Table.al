@@ -126,12 +126,21 @@ table 1877 "VAT Setup Posting Groups"
         SERVREDTok: Label 'SERV RED', Comment = 'the same as values in Product posting group';
         STANDARDTok: Label 'STANDARD', Comment = 'the same as values in Product posting group';
         ZEROTok: Label 'ZERO', Comment = 'the same as values in Product posting group';
+#if not CLEAN28
         FULLNORMTxt: Label 'VAT Only Invoices 20%';
         FULLREDTxt: Label 'VAT Only Invoices 5%';
         REDUCEDTxt: Label 'Reduced VAT (5%)';
         SERVNORMTxt: Label 'Miscellaneous 20 VAT';
         SERVREDTxt: Label 'Miscellaneous 5 VAT';
         STANDARDTxt: Label 'Standard VAT (20%)';
+#else
+        FULLNORMTxt: Label 'VAT Only Invoices 25%';
+        FULLREDTxt: Label 'VAT Only Invoices 10%';
+        REDUCEDTxt: Label 'Reduced VAT (10%)';
+        SERVNORMTxt: Label 'Miscellaneous 25 VAT';
+        SERVREDTxt: Label 'Miscellaneous 10 VAT';
+        STANDARDTxt: Label 'Standard VAT (25%)';
+#endif
         ZEROTxt: Label 'No VAT';
         InvalidGLAccountsTxt: Label '%1 is not valid G/L Account.', Comment = '%1 is placeholder for the invalid gl account code';
         VATAssistedAccountsMsg: Label 'You have not assigned general ledger accounts for sales and purchases for all VAT amounts. You won''t be able to calculate and post VAT for the missing accounts. If you''re skipping this step on purpose, you can manually assign accounts later in the VAT Posting Setup page.';
@@ -326,6 +335,7 @@ table 1877 "VAT Setup Posting Groups"
 
     local procedure InitWithStandardValues()
     begin
+#if not CLEAN28
         AddOrUpdateProdPostingGrp(FULLNORMTok, FULLNORMTxt, 100, '56130', '46330', false, true);
         AddOrUpdateProdPostingGrp(FULLREDTok, FULLREDTxt, 100, '56120', '46320', false, true);
         AddOrUpdateProdPostingGrp(REDUCEDTok, REDUCEDTxt, 5, '56110', '46310', false, true);
@@ -333,6 +343,15 @@ table 1877 "VAT Setup Posting Groups"
         AddOrUpdateProdPostingGrp(SERVREDTok, SERVREDTxt, 5, '56110', '46310', true, true);
         AddOrUpdateProdPostingGrp(STANDARDTok, STANDARDTxt, 20, '56100', '46300', false, true);
         AddOrUpdateProdPostingGrp(ZEROTok, ZEROTxt, 0, '56100', '46300', false, true);
+#else
+        AddOrUpdateProdPostingGrp(FULLNORMTok, FULLNORMTxt, 100, '', '', false, true);
+        AddOrUpdateProdPostingGrp(FULLREDTok, FULLREDTxt, 100, '', '', false, true);
+        AddOrUpdateProdPostingGrp(REDUCEDTok, REDUCEDTxt, 10, '5611', '5631', false, true);
+        AddOrUpdateProdPostingGrp(SERVNORMTok, SERVNORMTxt, 25, '5611', '5631', true, true);
+        AddOrUpdateProdPostingGrp(SERVREDTok, SERVREDTxt, 10, '5611', '5631', true, true);
+        AddOrUpdateProdPostingGrp(STANDARDTok, STANDARDTxt, 25, '5610', '5630', false, true);
+        AddOrUpdateProdPostingGrp(ZEROTok, ZEROTxt, 0, '5610', '5630', false, true);
+#endif
     end;
 
     /// <summary>

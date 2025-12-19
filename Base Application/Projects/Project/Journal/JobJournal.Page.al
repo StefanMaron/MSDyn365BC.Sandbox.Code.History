@@ -345,12 +345,17 @@ page 201 "Job Journal"
                     ToolTip = 'Specifies the date that a time sheet is created.';
                     Visible = false;
                 }
+#if not CLEAN28
                 field("Shpt. Method Code"; Rec."Shpt. Method Code")
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies a Shipment Method Code that you want to post with this entry.';
                     Visible = false;
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = Dimensions;

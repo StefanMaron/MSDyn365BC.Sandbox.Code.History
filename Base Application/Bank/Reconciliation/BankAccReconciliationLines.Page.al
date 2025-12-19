@@ -43,11 +43,17 @@ page 380 "Bank Acc. Reconciliation Lines"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a number of your choice that will appear on the reconciliation line.';
+#if CLEAN28
+                    Visible = false;
+#endif
                 }
                 field("Check No."; Rec."Check No.")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the check number for the transaction on the reconciliation line.';
+#if CLEAN28
+                    Visible = false;
+#endif
                 }
                 field(Description; Rec.Description)
                 {
@@ -75,16 +81,21 @@ page 380 "Bank Acc. Reconciliation Lines"
                         Rec.DisplayApplication();
                     end;
                 }
+#if not CLEAN28
                 field(Reconciled; Rec.Reconciled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the amount of the transaction on the reconciliation line has been reconciled.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
 
                     trigger OnValidate()
                     begin
                         CurrPage.Update(true)
                     end;
                 }
+#endif
                 field(Difference; Rec.Difference)
                 {
                     ApplicationArea = Basic, Suite;
@@ -94,6 +105,9 @@ page 380 "Bank Acc. Reconciliation Lines"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the transaction on the bank''s statement has been applied to one or more bank account or check ledger entries.';
+#if CLEAN28
+                    Visible = false;
+#endif
                 }
                 field("Related-Party Name"; Rec."Related-Party Name")
                 {
@@ -111,6 +125,7 @@ page 380 "Bank Acc. Reconciliation Lines"
             group(Control16)
             {
                 ShowCaption = false;
+#if not CLEAN28
                 field(TotalDiff; TotalDiff + Rec.Difference)
                 {
                     ApplicationArea = Basic, Suite;
@@ -121,6 +136,7 @@ page 380 "Bank Acc. Reconciliation Lines"
                     Enabled = TotalDiffEnable;
                     ToolTip = 'Specifies the total amount of the Difference field for all the lines on the bank reconciliation.';
                 }
+#endif
                 label(Control13)
                 {
                     ApplicationArea = Basic, Suite;
@@ -147,6 +163,7 @@ page 380 "Bank Acc. Reconciliation Lines"
                     Enabled = TotalBalanceEnable;
                     ToolTip = 'Specifies the accumulated balance of the bank reconciliation, which consists of the Balance Last Statement field, plus the balance in the Statement Amount field.';
                 }
+#if not CLEAN28
                 field(ReconciledAmount; ReconciledAmount)
                 {
                     ApplicationArea = Basic, Suite;
@@ -154,6 +171,9 @@ page 380 "Bank Acc. Reconciliation Lines"
                     Editable = false;
                     Enabled = ReconciledAmountEnable;
                     ToolTip = 'Specifies if the transaction has been reconciled.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
                 field(TotalReconciledAmount; TotalReconciledAmount)
                 {
@@ -162,7 +182,22 @@ page 380 "Bank Acc. Reconciliation Lines"
                     Editable = false;
                     Enabled = TotalReconciledAmountEnable;
                     ToolTip = 'Specifies how many total lines are reconciled.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#else
+                field(TotalDiff; TotalDiff + Rec.Difference)
+                {
+                    ApplicationArea = Basic, Suite;
+                    AutoFormatExpression = Rec.GetCurrencyCode();
+                    AutoFormatType = 1;
+                    Caption = 'Total Difference';
+                    Editable = false;
+                    Enabled = TotalDiffEnable;
+                    ToolTip = 'Specifies the total amount of the Difference field for all the lines on the bank reconciliation.';
+                }
+#endif
             }
         }
     }
@@ -202,8 +237,10 @@ page 380 "Bank Acc. Reconciliation Lines"
 
     trigger OnInit()
     begin
+#if not CLEAN28
         TotalReconciledAmountEnable := true;
         ReconciledAmountEnable := true;
+#endif
         BalanceEnable := true;
         TotalBalanceEnable := true;
         TotalDiffEnable := true;
@@ -220,13 +257,17 @@ page 380 "Bank Acc. Reconciliation Lines"
     var
         BankAccReconciliation: Record "Bank Acc. Reconciliation";
         StyleTxt: Text;
+#if not CLEAN28
         ReconciledAmount: Decimal;
         TotalReconciledAmount: Decimal;
+#endif
         TotalDiffEnable: Boolean;
         TotalBalanceEnable: Boolean;
         BalanceEnable: Boolean;
+#if not CLEAN28
         ReconciledAmountEnable: Boolean;
         TotalReconciledAmountEnable: Boolean;
+#endif
 
     protected var
         TotalDiff: Decimal;
@@ -260,6 +301,7 @@ page 380 "Bank Acc. Reconciliation Lines"
             BalanceEnable := true;
         end;
 
+#if not CLEAN28
         CopyBankAccReconciliationLine.SetCurrentKey(Reconciled);
         CopyBankAccReconciliationLine.SetRange(Reconciled, true);
         if CopyBankAccReconciliationLine.CalcSums("Statement Amount") then begin
@@ -272,6 +314,7 @@ page 380 "Bank Acc. Reconciliation Lines"
             TotalReconciledAmount := CopyBankAccReconciliationLine."Statement Amount";
             TotalReconciledAmountEnable := true;
         end;
+#endif
     end;
 
     procedure GetSelectedRecords(var TempBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line" temporary)

@@ -223,10 +223,20 @@ table 288 "Vendor Bank Account"
             Caption = 'Bank Clearing Standard';
             TableRelation = "Bank Clearing Standard";
         }
+#if not CLEANSCHEMA31
         field(10550; "Reference No."; Text[30])
         {
             Caption = 'Reference No.';
+            ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+#if CLEAN28
+            ObsoleteState = Removed;
+            ObsoleteTag = '31.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#endif
         }
+#endif
     }
 
     keys
@@ -264,11 +274,13 @@ table 288 "Vendor Bank Account"
         end;
     end;
 
+#if not CLEAN28
     trigger OnInsert()
     begin
         if (GetFilter("Vendor No.") <> '') and ("Vendor No." = '') then
             "Vendor No." := GetFilter("Vendor No.");
     end;
+#endif
 
     trigger OnRename()
     begin

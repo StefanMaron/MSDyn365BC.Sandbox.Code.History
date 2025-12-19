@@ -8,6 +8,9 @@ using Microsoft.CRM.Contact;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
+#if CLEAN28
+using Microsoft.Foundation.Address;
+#endif
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Comment;
@@ -121,12 +124,28 @@ page 509 "Blanket Purchase Order"
                         QuickEntry = false;
                         ToolTip = 'Specifies the city of the vendor who ships the items.';
                     }
+#if CLEAN28
+                    group(Control122)
+                    {
+                        ShowCaption = false;
+                        Visible = IsBuyFromCountyVisible;
+                        field("Buy-from County"; Rec."Buy-from County")
+                        {
+                            ApplicationArea = Suite;
+                            CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
+                            Importance = Additional;
+                            QuickEntry = false;
+                            ToolTip = 'Specifies the state, province or county of the address.';
+                        }
+                    }
+#else
                     field("Buy-from County"; Rec."Buy-from County")
                     {
                         ApplicationArea = Basic, Suite;
                         CaptionClass = '5,1,' + Rec."Buy-from Country/Region Code";
                         ToolTip = 'Specifies the county of the vendor related to the blanket purchase order.';
                     }
+#endif
                     field("Buy-from Post Code"; Rec."Buy-from Post Code")
                     {
                         ApplicationArea = Suite;
@@ -142,6 +161,13 @@ page 509 "Blanket Purchase Order"
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the country or region of the address.';
+
+#if CLEAN28
+                        trigger OnValidate()
+                        begin
+                            IsBuyFromCountyVisible := FormatAddress.UseCounty(Rec."Buy-from Country/Region Code");
+                        end;
+#endif
                     }
                     field("Buy-from Contact No."; Rec."Buy-from Contact No.")
                     {
@@ -401,11 +427,16 @@ page 509 "Blanket Purchase Order"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the date on which the amount in the entry must be paid for a payment discount to be granted.';
                 }
+#if not CLEAN28
                 field("VAT Base Discount %"; Rec."VAT Base Discount %")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the percentage to use to discount the VAT element if a payment discount is to be posted. The value is validated against the maximum possible VAT Tolerance % field value in the General Ledger Setup. ';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 field("Journal Templ. Name"; Rec."Journal Templ. Name")
                 {
                     ApplicationArea = BasicBE;
@@ -473,12 +504,28 @@ page 509 "Blanket Purchase Order"
                         QuickEntry = false;
                         ToolTip = 'Specifies the city the items in the purchase order will be shipped to.';
                     }
+#if CLEAN28
+                    group(Control124)
+                    {
+                        ShowCaption = false;
+                        Visible = IsShipToCountyVisible;
+                        field("Ship-to County"; Rec."Ship-to County")
+                        {
+                            ApplicationArea = Basic, Suite;
+                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                            Importance = Additional;
+                            QuickEntry = false;
+                            ToolTip = 'Specifies the state, province or county of the address.';
+                        }
+                    }
+#else
                     field("Ship-to County"; Rec."Ship-to County")
                     {
                         ApplicationArea = Basic, Suite;
                         CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
                         ToolTip = 'Specifies the county of the vendor related to the blanket purchase order.';
                     }
+#endif
                     field("Ship-to Post Code"; Rec."Ship-to Post Code")
                     {
                         ApplicationArea = Suite;
@@ -494,6 +541,13 @@ page 509 "Blanket Purchase Order"
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the country/region code of the address that you want the items on the purchase document to be shipped to.';
+
+#if CLEAN28
+                        trigger OnValidate()
+                        begin
+                            IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
+                        end;
+#endif
                     }
                     field("Ship-to Phone No."; Rec."Ship-to Phone No.")
                     {
@@ -568,12 +622,30 @@ page 509 "Blanket Purchase Order"
                         QuickEntry = false;
                         ToolTip = 'Specifies the city of the vendor sending the invoice.';
                     }
+#if CLEAN28
+                    group(Control123)
+                    {
+                        ShowCaption = false;
+                        Visible = IsPayToCountyVisible;
+                        field("Pay-to County"; Rec."Pay-to County")
+                        {
+                            ApplicationArea = Basic, Suite;
+                            CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
+                            Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
+                            Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
+                            Importance = Additional;
+                            QuickEntry = false;
+                            ToolTip = 'Specifies the state, province or county of the address.';
+                        }
+                    }
+#else
                     field("Pay-to County"; Rec."Pay-to County")
                     {
                         ApplicationArea = Basic, Suite;
                         CaptionClass = '5,1,' + Rec."Pay-to Country/Region Code";
                         ToolTip = 'Specifies the county of the vendor related to the blanket purchase order.';
                     }
+#endif
                     field("Pay-to Post Code"; Rec."Pay-to Post Code")
                     {
                         ApplicationArea = Suite;
@@ -593,6 +665,13 @@ page 509 "Blanket Purchase Order"
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the country/region code of the vendor on the purchase document.';
+
+#if CLEAN28
+                        trigger OnValidate()
+                        begin
+                            IsPayToCountyVisible := FormatAddress.UseCounty(Rec."Pay-to Country/Region Code");
+                        end;
+#endif
                     }
                     field("Pay-to Contact No."; Rec."Pay-to Contact No.")
                     {
@@ -1278,6 +1357,9 @@ page 509 "Blanket Purchase Order"
         UserMgt: Codeunit "User Setup Management";
         ArchiveManagement: Codeunit ArchiveManagement;
         PurchCalcDiscByType: Codeunit "Purch - Calc Disc. By Type";
+#if CLEAN28
+        FormatAddress: Codeunit "Format Address";
+#endif
         ChangeExchangeRate: Page "Change Exchange Rate";
         DocNoVisible: Boolean;
         OpenApprovalEntriesExist: Boolean;
@@ -1288,9 +1370,19 @@ page 509 "Blanket Purchase Order"
         IsJournalTemplNameVisible: Boolean;
         IsPaymentMethodCodeVisible: Boolean;
         IsPurchaseLinesEditable: Boolean;
+#if CLEAN28
+        IsBuyFromCountyVisible: Boolean;
+        IsPayToCountyVisible: Boolean;
+        IsShipToCountyVisible: Boolean;
+#endif
 
     local procedure ActivateFields()
     begin
+#if CLEAN28
+        IsBuyFromCountyVisible := FormatAddress.UseCounty(Rec."Buy-from Country/Region Code");
+        IsPayToCountyVisible := FormatAddress.UseCounty(Rec."Pay-to Country/Region Code");
+        IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
+#endif
         GLSetup.Get();
         IsJournalTemplNameVisible := GLSetup."Journal Templ. Name Mandatory";
         IsPaymentMethodCodeVisible := not GLSetup."Hide Payment Method Code";

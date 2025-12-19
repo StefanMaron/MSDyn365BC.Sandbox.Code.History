@@ -2,7 +2,6 @@ codeunit 135161 "Cloud Mig Country Tables"
 {
     procedure GetTablesThatShouldBeCloudMigrated(var ListOfTablesToMigrate: List of [Integer])
     begin
-        ListOfTablesToMigrate.Add(Database::"Accounting Period GB");
 #if not CLEANSCHEMA28
         ListOfTablesToMigrate.Add(10533); // Database::"MTD-Liability"
         ListOfTablesToMigrate.Add(10534); // Database::"MTD-Payment"
@@ -21,6 +20,7 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(10551); // Database::"BACS Register"
         ListOfTablesToMigrate.Add(10555); // Database::"Fin. Charge Interest Rate"
         ListOfTablesToMigrate.Add(10501); // Database::"Postcode Notification Memory"
+        ListOfTablesToMigrate.Add(10560); // Database::"Accounting Period GB"
 #endif
     end;
 }

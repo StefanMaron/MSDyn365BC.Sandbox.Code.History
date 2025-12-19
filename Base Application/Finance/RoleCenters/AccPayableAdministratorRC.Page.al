@@ -296,7 +296,7 @@ page 9045 "Acc. Payable Administrator RC"
                     RunObject = Report "Aged Accounts Payable";
                     ToolTip = 'View the aged accounts payable report.';
                     ObsoleteState = Pending;
-                    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                    ObsoleteReason = 'This report has been replaced by the report Aged Accounts Payable (Excel). This report will be removed in a future release.';
                     ObsoleteTag = '28.0';
                 }
                 action(PaymentsOnHold)
@@ -352,7 +352,7 @@ page 9045 "Acc. Payable Administrator RC"
                     RunObject = Report "Vendor - List";
                     ToolTip = 'View the vendor list report.';
                     ObsoleteState = Pending;
-                    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                    ObsoleteReason = 'This report is obsolete and will be removed in a future release. Please see the documentation for alternative options.';
                     ObsoleteTag = '28.0';
                 }
 #endif
@@ -381,7 +381,7 @@ page 9045 "Acc. Payable Administrator RC"
                     RunObject = Report "Vendor - Summary Aging";
                     ToolTip = 'View the vendor summary aging report.';
                     ObsoleteState = Pending;
-                    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                    ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
                     ObsoleteTag = '28.0';
                 }
                 action(VendorTop10List)
@@ -390,7 +390,7 @@ page 9045 "Acc. Payable Administrator RC"
                     RunObject = Report "Vendor - Top 10 List";
                     ToolTip = 'View the vendor top 10 list report.';
                     ObsoleteState = Pending;
-                    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+                    ObsoleteReason = 'This report has been replaced by the report Vendor - Top List (Excel). This report will be removed in a future release.';
                     ObsoleteTag = '28.0';
                 }
 #endif

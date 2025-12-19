@@ -410,10 +410,20 @@ table 274 "Bank Acc. Reconciliation Line"
                 DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
             end;
         }
+#if not CLEANSCHEMA31
         field(10500; Reconciled; Boolean)
         {
             Caption = 'Reconciled';
+            ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+#if CLEAN28
+            ObsoleteState = Removed;
+            ObsoleteTag = '31.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#endif
         }
+#endif
     }
 
     keys

@@ -13,8 +13,8 @@ using System.Privacy;
 #if not CLEAN28
 using Microsoft.Bank.Ledger;
 using Microsoft.Sales.FinanceCharge;
-#endif
 using Microsoft.Finance.GeneralLedger.Setup;
+#endif
 
 codeunit 1752 "Data Class. Eval. Data Country"
 {
@@ -43,8 +43,8 @@ codeunit 1752 "Data Class. Eval. Data Country"
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"BACS Ledger Entry");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"BACS Register");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Fin. Charge Interest Rate");
-#endif
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Accounting Period GB");
+#endif
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Alt. Employee Posting Group");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Employee Posting Group");
         DataClassificationEvalData.SetTableFieldsToNormal(DATABASE::"Cause of Absence");

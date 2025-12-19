@@ -73,6 +73,7 @@ table 1829 "Consolidation Account"
     {
     }
 
+#if not CLEAN28
     var
         XPurchaseVATPERCENTEUTok: Label 'Purchase VAT %1 EU', Comment = '%1=Goods or Services text.';
         XPurchaseVATPERCENTTok: Label 'Purchase VAT %1', Comment = '%1=Goods or Services text.';
@@ -150,6 +151,7 @@ table 1829 "Consolidation Account"
         InsertData('60200', 'Retained Earnings', 1, true);
         InsertData('60300', 'Dividends', 1, true);
     end;
+#endif
 
     /// <summary>
     /// Creates sample consolidation accounts with default configuration for initial setup.

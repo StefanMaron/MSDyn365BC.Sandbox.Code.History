@@ -1,7 +1,7 @@
 namespace System.Security.AccessControl;
 
-using Microsoft.Finance.GeneralLedger.Setup;
 #if not CLEAN28
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Bank.Ledger;
 using Microsoft.Sales.FinanceCharge;
 #endif
@@ -15,12 +15,15 @@ using Microsoft.Foundation.Address;
 permissionset 1002 "LOCAL READ"
 {
     Access = Public;
+#if CLEAN28
+    Assignable = false;
+#else
     Assignable = true;
     Caption = 'Country/region-specific read only access.';
 
 #if CLEAN28
     Permissions = tabledata "Accounting Period GB" = R;
-#else
+#endif
     Permissions = tabledata "Accounting Period GB" = R,
                   tabledata "BACS Ledger Entry" = R,
                   tabledata "BACS Register" = R,
