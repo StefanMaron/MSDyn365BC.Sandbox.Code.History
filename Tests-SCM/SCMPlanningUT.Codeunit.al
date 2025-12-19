@@ -26,7 +26,7 @@ codeunit 137801 "SCM - Planning UT"
         UnexpectedRequisitionLineErr: Label 'Requisition line is unexpected.';
         LeadTimeCalcNegativeErr: Label 'The amount of time to replenish the item must not be negative.';
         WrongQuantityInReqLine: Label 'The quantity %1 is wrong. It must be either %2 or %3.', Comment = 'Example: The quantity 11 is wrong. It must be either 12 or 8.';
-        ReplenishmentSystemPurchaseErr: Label 'Item %1 in Location %2 should have Replenishment System %3.Current Value is %4.', Comment = '%1= Item No., %2= Location Code, %3= Replenishment System::Purchase, %4= Field Value.';
+        ReplenishmentSystemPurchaseErr: Label 'Item %1 in Location %2 should have %3 set to %4. Current %3 is %5.', Comment = '%1= Item No., %2= Location Code, %3= Replenishment System Caption, %4= Replenishment System::Purchase, %5= Field Value.';
 
     [Test]
     [Scope('OnPrem')]
@@ -633,6 +633,7 @@ codeunit 137801 "SCM - Planning UT"
                 ReplenishmentSystemPurchaseErr,
                 Item."No.",
                 Location.Code,
+                RequisitionLine.FieldCaption("Replenishment System"),
                 RequisitionLine."Replenishment System"::Purchase,
                 RequisitionLine."Replenishment System"));
     end;
