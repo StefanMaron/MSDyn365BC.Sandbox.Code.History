@@ -534,8 +534,10 @@ table 5406 "Prod. Order Line"
                     else
                         "Unit Cost" := Item."Unit Cost" * "Qty. per Unit of Measure";
                 end;
-
-                "Cost Amount" := Round(Quantity * "Unit Cost");
+                if "Finished Quantity" <> 0 then
+                    "Cost Amount" := Round("Finished Quantity" * "Unit Cost")
+                else
+                    "Cost Amount" := Round(Quantity * "Unit Cost");
             end;
         }
         field(67; "Cost Amount"; Decimal)
