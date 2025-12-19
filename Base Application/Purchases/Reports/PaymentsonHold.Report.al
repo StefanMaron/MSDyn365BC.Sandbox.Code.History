@@ -14,7 +14,7 @@ report 319 "Payments on Hold"
     RDLCLayout = './Purchases/Reports/PaymentsonHold.rdlc';
     Caption = 'Payments on Hold (Obsolete)';
     ObsoleteState = Pending;
-    ObsoleteReason = 'This report is obsolete and will be removed in a future release.';
+    ObsoleteReason = 'This report is obsolete and will be removed in a future release. See the documentation for alternative options.';
     ObsoleteTag = '28.0';
 
     dataset

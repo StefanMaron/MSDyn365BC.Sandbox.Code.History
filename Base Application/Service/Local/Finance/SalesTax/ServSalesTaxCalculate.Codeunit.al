@@ -66,6 +66,7 @@ codeunit 5968 "Serv. Sales Tax Calculate"
         TaxAreaLine: Record "Tax Area Line";
         TaxJurisdiction: Record "Tax Jurisdiction";
     begin
+        OnBeforeAddServiceLine(ServiceLine);
         if not ServHeaderRead then begin
             ServiceHeader.Get(ServiceLine."Document Type", ServiceLine."Document No.");
             ServHeaderRead := true;
@@ -106,10 +107,12 @@ codeunit 5968 "Serv. Sales Tax Calculate"
         TempSalesTaxAmountLine.SetRange("Tax Group Code", ServiceLine."Tax Group Code");
         TaxAreaLine.SetCurrentKey("Tax Area", "Calculation Order");
         TaxAreaLine.SetRange("Tax Area", ServiceLine."Tax Area Code");
+        OnAddServiceLineOnAfterTempSalesTaxAmountLineSetFilters(TempSalesTaxAmountLine);
         if TaxAreaLine.FindSet() then
             repeat
                 TempSalesTaxAmountLine.SetRange("Tax Jurisdiction Code", TaxAreaLine."Tax Jurisdiction Code");
                 TempSalesTaxAmountLine."Tax Jurisdiction Code" := TaxAreaLine."Tax Jurisdiction Code";
+                OnAddServiceLineOnAfterSetSalesTaxAmountLineFilter(TempSalesTaxAmountLine, ServiceLine, TaxAreaLine);
                 if not TempSalesTaxAmountLine.FindFirst() then begin
                     TempSalesTaxAmountLine.Init();
                     TempSalesTaxAmountLine."Tax Group Code" := ServiceLine."Tax Group Code";
@@ -142,6 +145,7 @@ codeunit 5968 "Serv. Sales Tax Calculate"
             until TaxAreaLine.Next() = 0;
 
         SalesTaxCalculate.SetSalesTaxAmountLineTable(TempSalesTaxAmountLine);
+        OnAfterAddServiceLine(TempSalesTaxAmountLine, ServiceLine)
     end;
 
     procedure AddServInvoiceLines(DocNo: Code[20])
@@ -359,6 +363,26 @@ codeunit 5968 "Serv. Sales Tax Calculate"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDistTaxOverServLines(var ServiceLine: Record "Service Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeAddServiceLine(var ServiceLine: Record "Service Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAddServiceLineOnAfterTempSalesTaxAmountLineSetFilters(var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAddServiceLineOnAfterSetSalesTaxAmountLineFilter(var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary; ServiceLine: Record "Service Line"; TaxAreaLine: Record "Tax Area Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterAddServiceLine(var TempSalesTaxAmountLine: Record "Sales Tax Amount Line" temporary; ServiceLine: Record "Service Line")
     begin
     end;
 }
