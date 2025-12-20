@@ -9,99 +9,99 @@ using Microsoft.Finance.Analysis;
 using Microsoft.Finance.GeneralLedger.Budget;
 using Microsoft.Finance.GeneralLedger.Ledger;
 
-codeunit 8363 SheetDefAccSchMgtHandler
+codeunit 8363 DimPerspectiveAccSchMgtHandler
 {
     EventSubscriberInstance = Manual;
 
     var
-        SheetDefName: Record "Sheet Definition Name";
-        SheetDefLine: Record "Sheet Definition Line";
+        DimPerspectiveName: Record "Dimension Perspective Name";
+        DimPerspectiveLine: Record "Dimension Perspective Line";
 
-    procedure SetSheetDefName(SheetDefName: Record "Sheet Definition Name")
+    procedure SetDimPerspectiveName(DimPerspectiveName: Record "Dimension Perspective Name")
     begin
-        this.SheetDefName := SheetDefName;
+        this.DimPerspectiveName := DimPerspectiveName;
     end;
 
-    procedure SetSheetDefLine(SheetDefLine: Record "Sheet Definition Line")
+    procedure SetDimPerspectiveLine(DimPerspectiveLine: Record "Dimension Perspective Line")
     begin
-        this.SheetDefLine := SheetDefLine;
+        this.DimPerspectiveLine := DimPerspectiveLine;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::AccSchedManagement, OnAfterSetGLAccGLEntryFilters, '', false, false)]
     local procedure OnAfterSetGLAccGLEntryFilters(var GLEntry: Record "G/L Entry")
     var
-        ISheetDefinition: Interface ISheetDefinition;
+        IDimPerspective: Interface IDimensionPerspective;
         LastFilterGroup: Integer;
     begin
-        ISheetDefinition := SheetDefName."Sheet Type";
+        IDimPerspective := DimPerspectiveName."Perspective Type";
         LastFilterGroup := GLEntry.FilterGroup();
         GLEntry.FilterGroup(9);
-        ISheetDefinition.FilterGLEntryBySheetTotaling(SheetDefLine, GLEntry);
+        IDimPerspective.FilterGLEntryByPerspectiveTotaling(DimPerspectiveLine, GLEntry);
         GLEntry.FilterGroup(LastFilterGroup);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::AccSchedManagement, OnAfterSetGLAccGLBudgetEntryFilters, '', false, false)]
     local procedure OnAfterSetGLAccGLBudgetEntryFilters(var GLBudgetEntry: Record "G/L Budget Entry")
     var
-        ISheetDefinition: Interface ISheetDefinition;
+        IDimPerspective: Interface IDimensionPerspective;
         LastFilterGroup: Integer;
     begin
-        ISheetDefinition := SheetDefName."Sheet Type";
+        IDimPerspective := DimPerspectiveName."Perspective Type";
         LastFilterGroup := GLBudgetEntry.FilterGroup();
         GLBudgetEntry.FilterGroup(9);
-        ISheetDefinition.FilterGLBudgetEntryBySheetTotaling(SheetDefLine, GLBudgetEntry);
+        IDimPerspective.FilterGLBudgetEntryByPerspectiveTotaling(DimPerspectiveLine, GLBudgetEntry);
         GLBudgetEntry.FilterGroup(LastFilterGroup);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::AccSchedManagement, OnSetCFEntryFiltersOnAfterAccShedLineCopyFilter, '', false, false)]
     local procedure OnSetCFEntryFiltersOnAfterAccShedLineCopyFilter(var CFForecastEntry: Record "Cash Flow Forecast Entry")
     var
-        ISheetDefinition: Interface ISheetDefinition;
+        IDimPerspective: Interface IDimensionPerspective;
         LastFilterGroup: Integer;
     begin
-        ISheetDefinition := SheetDefName."Sheet Type";
+        IDimPerspective := DimPerspectiveName."Perspective Type";
         LastFilterGroup := CFForecastEntry.FilterGroup();
         CFForecastEntry.FilterGroup(9);
-        ISheetDefinition.FilterCFEntryBySheetTotaling(SheetDefLine, CFForecastEntry);
+        IDimPerspective.FilterCFEntryByPerspectiveTotaling(DimPerspectiveLine, CFForecastEntry);
         CFForecastEntry.FilterGroup(LastFilterGroup);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::AccSchedManagement, OnAfterSetGLAccAnalysisViewEntryFilters, '', false, false)]
     local procedure OnAfterSetGLAccAnalysisViewEntryFilters(var AnalysisViewEntry: Record "Analysis View Entry")
     var
-        ISheetDefinition: Interface ISheetDefinition;
+        IDimPerspective: Interface IDimensionPerspective;
         LastFilterGroup: Integer;
     begin
-        ISheetDefinition := SheetDefName."Sheet Type";
+        IDimPerspective := DimPerspectiveName."Perspective Type";
         LastFilterGroup := AnalysisViewEntry.FilterGroup();
         AnalysisViewEntry.FilterGroup(9);
-        ISheetDefinition.FilterAnalysisViewEntryBySheetTotaling(SheetDefLine, AnalysisViewEntry);
+        IDimPerspective.FilterAnalysisViewEntryByPerspectiveTotaling(DimPerspectiveLine, AnalysisViewEntry);
         AnalysisViewEntry.FilterGroup(LastFilterGroup);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::AccSchedManagement, OnAfterSetCFAnalysisViewEntryFilters, '', false, false)]
     local procedure OnAfterSetCFAnalysisViewEntryFilters(var AnalysisViewEntry: Record "Analysis View Entry")
     var
-        ISheetDefinition: Interface ISheetDefinition;
+        IDimPerspective: Interface IDimensionPerspective;
         LastFilterGroup: Integer;
     begin
-        ISheetDefinition := SheetDefName."Sheet Type";
+        IDimPerspective := DimPerspectiveName."Perspective Type";
         LastFilterGroup := AnalysisViewEntry.FilterGroup();
         AnalysisViewEntry.FilterGroup(9);
-        ISheetDefinition.FilterAnalysisViewEntryBySheetTotaling(SheetDefLine, AnalysisViewEntry);
+        IDimPerspective.FilterAnalysisViewEntryByPerspectiveTotaling(DimPerspectiveLine, AnalysisViewEntry);
         AnalysisViewEntry.FilterGroup(LastFilterGroup);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::AccSchedManagement, OnAfterSetGLAccAnalysisViewBudgetEntries, '', false, false)]
     local procedure OnAfterSetGLAccAnalysisViewBudgetEntries(var AnalysisViewBudgetEntry: Record "Analysis View Budget Entry")
     var
-        ISheetDefinition: Interface ISheetDefinition;
+        IDimPerspective: Interface IDimensionPerspective;
         LastFilterGroup: Integer;
     begin
-        ISheetDefinition := SheetDefName."Sheet Type";
+        IDimPerspective := DimPerspectiveName."Perspective Type";
         LastFilterGroup := AnalysisViewBudgetEntry.FilterGroup();
         AnalysisViewBudgetEntry.FilterGroup(9);
-        ISheetDefinition.FilterAnalysisViewBudgetEntryBySheetTotaling(SheetDefLine, AnalysisViewBudgetEntry);
+        IDimPerspective.FilterAnalysisViewBudgetEntryByPerspectiveTotaling(DimPerspectiveLine, AnalysisViewBudgetEntry);
         AnalysisViewBudgetEntry.FilterGroup(LastFilterGroup);
     end;
 
