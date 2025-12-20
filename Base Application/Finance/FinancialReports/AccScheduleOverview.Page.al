@@ -148,21 +148,21 @@ page 490 "Acc. Schedule Overview"
                         CurrentColumnNameOnAfterValidate();
                     end;
                 }
-                field(SheetDefinitionName; TempFinancialReport.SheetDefinition)
+                field(DimPerspectiveName; TempFinancialReport.DimPerspective)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Sheet Definition';
+                    Caption = 'Dimension Perspective';
                     Editable = (not ViewOnlyMode or (ViewLayout = "Financial Report View Layout"::"Show All"));
                     Importance = Additional;
-                    TableRelation = "Sheet Definition Name";
-                    ToolTip = 'Specifies the name (code) of the sheet definition to be used for the report.';
+                    TableRelation = "Dimension Perspective Name";
+                    ToolTip = 'Specifies the name (code) of the dimension perspective to be used for the report.';
 
                     trigger OnAfterLookup(Selected: RecordRef)
                     var
-                        SheetDefName: Record "Sheet Definition Name";
+                        DimPerspectiveName: Record "Dimension Perspective Name";
                     begin
-                        SheetDefName := Selected;
-                        TempFinancialReport.SheetDefinition := SheetDefName.Name;
+                        DimPerspectiveName := Selected;
+                        TempFinancialReport.DimPerspective := DimPerspectiveName.Name;
                         if not ViewOnlyMode then
                             SaveStateToFinancialReport();
                     end;
@@ -915,8 +915,8 @@ page 490 "Acc. Schedule Overview"
                         AccSched.SetAccSchedName(TempFinancialReport."Financial Report Row Group");
                     if TempFinancialReport."Financial Report Column Group" <> '' then
                         AccSched.SetColumnLayoutName(TempFinancialReport."Financial Report Column Group");
-                    if TempFinancialReport.SheetDefinition <> '' then
-                        AccSched.SetSheetDefName(TempFinancialReport.SheetDefinition);
+                    if TempFinancialReport.DimPerspective <> '' then
+                        AccSched.SetDimPerspectiveName(TempFinancialReport.DimPerspective);
                     DateFilter2 := Rec.GetFilter("Date Filter");
                     GLBudgetFilter2 := Rec.GetFilter("G/L Budget Filter");
                     CostBudgetFilter2 := Rec.GetFilter("Cost Budget Filter");
@@ -1053,20 +1053,20 @@ page 490 "Acc. Schedule Overview"
                     ColumnLayout.Run();
                 end;
             }
-            action(EditSheetDefinition)
+            action(EditDimPerspective)
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Edit sheet definition';
+                Caption = 'Edit dimension perspective';
                 Image = Edit;
-                ToolTip = 'Edit the sheet definition of this financial report.';
+                ToolTip = 'Edit the dimension perspective of this financial report.';
 
                 trigger OnAction()
                 var
-                    SheetDefLine: Record "Sheet Definition Line";
+                    DimPerspectiveLine: Record "Dimension Perspective Line";
                 begin
-                    TempFinancialReport.TestField(SheetDefinition);
-                    SheetDefLine.SetRange(Name, TempFinancialReport.SheetDefinition);
-                    Page.Run(0, SheetDefLine);
+                    TempFinancialReport.TestField(DimPerspective);
+                    DimPerspectiveLine.SetRange(Name, TempFinancialReport.DimPerspective);
+                    Page.Run(0, DimPerspectiveLine);
                 end;
             }
             action(EditIntroductoryClosingParagraph)
@@ -1172,7 +1172,7 @@ page 490 "Acc. Schedule Overview"
                         begin
                             ExportAccSchedToExcel.SetOptions(
                                 Rec, TempFinancialReport."Financial Report Column Group", TempFinancialReport.UseAmountsInAddCurrency,
-                                TempFinancialReport.Name, TempFinancialReport.SheetDefinition);
+                                TempFinancialReport.Name, TempFinancialReport.DimPerspective);
                             if TempFinancialReport."Excel Template Code" <> '' then begin
                                 FinReportExcelTemplate.Get(TempFinancialReport.Name, TempFinancialReport."Excel Template Code");
                                 ExportAccSchedToExcel.SetUseExistingTemplate(FinReportExcelTemplate);
@@ -1212,7 +1212,7 @@ page 490 "Acc. Schedule Overview"
                         begin
                             ExportAccSchedToExcel.SetOptions(
                                 Rec, TempFinancialReport."Financial Report Column Group", TempFinancialReport.UseAmountsInAddCurrency,
-                                TempFinancialReport.Name, TempFinancialReport.SheetDefinition);
+                                TempFinancialReport.Name, TempFinancialReport.DimPerspective);
                             ExportAccSchedToExcel.Run();
                         end;
                     }
@@ -1232,7 +1232,7 @@ page 490 "Acc. Schedule Overview"
                         begin
                             ExportAccSchedToExcel.SetOptions(
                                 Rec, TempFinancialReport."Financial Report Column Group", TempFinancialReport.UseAmountsInAddCurrency,
-                                TempFinancialReport.Name, TempFinancialReport.SheetDefinition);
+                                TempFinancialReport.Name, TempFinancialReport.DimPerspective);
                             ExportAccSchedToExcel.SetUpdateExistingWorksheet(true);
                             ExportAccSchedToExcel.Run();
                         end;
@@ -1330,7 +1330,7 @@ page 490 "Acc. Schedule Overview"
                 actionref(EditColumnDefinition_Promoted; EditColumnDefinition)
                 {
                 }
-                actionref(EditSheetDefinition_Promoted; EditSheetDefinition)
+                actionref(EditDimPerspective_Promoted; EditDimPerspective)
                 {
                 }
                 actionref(EditIntroductoryClosingParagraph_Promoted; EditIntroductoryClosingParagraph)
