@@ -1027,6 +1027,7 @@ table 290 "VAT Amount Line"
         if PurchInvLine."Allow Invoice Disc." then
             "Inv. Disc. Base Amount" := PurchInvLine."Line Amount";
         "Invoice Discount Amount" := PurchInvLine."Inv. Discount Amount";
+        "Pmt. Discount Amount" := PurchInvLine."Pmt. Discount Amount";
         Quantity := PurchInvLine."Quantity (Base)";
         "Calculated VAT Amount" :=
           PurchInvLine."Amount Including VAT" - PurchInvLine.Amount - PurchInvLine."VAT Difference";
@@ -1055,6 +1056,7 @@ table 290 "VAT Amount Line"
         if PurchCrMemoLine."Allow Invoice Disc." then
             "Inv. Disc. Base Amount" := PurchCrMemoLine."Line Amount";
         "Invoice Discount Amount" := PurchCrMemoLine."Inv. Discount Amount";
+        "Pmt. Discount Amount" := PurchCrMemoLine."Pmt. Discount Amount";
         Quantity := PurchCrMemoLine."Quantity (Base)";
         "Calculated VAT Amount" :=
           PurchCrMemoLine."Amount Including VAT" - PurchCrMemoLine.Amount - PurchCrMemoLine."VAT Difference";
@@ -1081,6 +1083,7 @@ table 290 "VAT Amount Line"
         if SalesInvoiceLine."Allow Invoice Disc." then
             "Inv. Disc. Base Amount" := SalesInvoiceLine."Line Amount";
         "Invoice Discount Amount" := SalesInvoiceLine."Inv. Discount Amount";
+        "Pmt. Discount Amount" := SalesInvoiceLine."Pmt. Discount Amount";
         Quantity := SalesInvoiceLine."Quantity (Base)";
         "Calculated VAT Amount" :=
           SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine.Amount - SalesInvoiceLine."VAT Difference";
@@ -1106,6 +1109,7 @@ table 290 "VAT Amount Line"
         if SalesCrMemoLine."Allow Invoice Disc." then
             "Inv. Disc. Base Amount" := SalesCrMemoLine."Line Amount";
         "Invoice Discount Amount" := SalesCrMemoLine."Inv. Discount Amount";
+        "Pmt. Discount Amount" := SalesCrMemoLine."Pmt. Discount Amount";
         Quantity := SalesCrMemoLine."Quantity (Base)";
         "Calculated VAT Amount" := SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine.Amount - SalesCrMemoLine."VAT Difference";
         "VAT Difference" := SalesCrMemoLine."VAT Difference";

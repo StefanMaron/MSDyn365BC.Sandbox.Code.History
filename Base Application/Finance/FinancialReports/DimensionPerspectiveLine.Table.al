@@ -9,11 +9,11 @@ using Microsoft.Finance.Consolidation;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 
-table 8364 "Sheet Definition Line"
+table 8364 "Dimension Perspective Line"
 {
-    Caption = 'Sheet Definition Line';
+    Caption = 'Dimension Perspective Line';
     DataClassification = CustomerContent;
-    LookupPageId = "Sheet Definition";
+    LookupPageId = "Dimension Perspective";
 
     fields
     {
@@ -21,21 +21,21 @@ table 8364 "Sheet Definition Line"
         {
             Caption = 'Name';
             DataClassification = CustomerContent;
-            TableRelation = "Sheet Definition Name";
-            ToolTip = 'Specifies the name of the financial report sheet definition.';
+            TableRelation = "Dimension Perspective Name";
+            ToolTip = 'Specifies the name of the financial report dimension perspective.';
             NotBlank = true;
         }
         field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
             DataClassification = SystemMetadata;
-            ToolTip = 'Specifies the line number for the financial report sheet.';
+            ToolTip = 'Specifies the line number for the financial report perspective.';
         }
-        field(4; "Sheet Header"; Text[30])
+        field(4; "Perspective Header"; Text[30])
         {
-            Caption = 'Sheet Header';
+            Caption = 'Perspective Header';
             DataClassification = CustomerContent;
-            ToolTip = 'Specifies a header for the sheet.';
+            ToolTip = 'Specifies a header for the perspective.';
             NotBlank = true;
         }
         field(7; "Business Unit Totaling"; Text[80])
@@ -43,7 +43,7 @@ table 8364 "Sheet Definition Line"
             Caption = 'Business Unit Totaling';
             DataClassification = CustomerContent;
             TableRelation = "Business Unit";
-            ToolTip = 'Specifies which business unit amounts will be totaled on this sheet.';
+            ToolTip = 'Specifies which business unit amounts will be totaled on this perspective.';
             ValidateTableRelation = false;
         }
         field(8; "Dimension 1 Totaling"; Text[80])
@@ -52,7 +52,7 @@ table 8364 "Sheet Definition Line"
             Caption = 'Dimension 1 Totaling';
             DataClassification = CustomerContent;
             CaptionClass = GetCaptionClass(1);
-            ToolTip = 'Specifies which dimension value amounts will be totaled on this sheet.';
+            ToolTip = 'Specifies which dimension value amounts will be totaled on this perspective.';
 
             trigger OnLookup()
             begin
@@ -65,7 +65,7 @@ table 8364 "Sheet Definition Line"
             DataClassification = CustomerContent;
             Caption = 'Dimension 2 Totaling';
             CaptionClass = GetCaptionClass(2);
-            ToolTip = 'Specifies which dimension value amounts will be totaled on this sheet.';
+            ToolTip = 'Specifies which dimension value amounts will be totaled on this perspective.';
 
             trigger OnLookup()
             begin
@@ -78,7 +78,7 @@ table 8364 "Sheet Definition Line"
             DataClassification = CustomerContent;
             Caption = 'Dimension 3 Totaling';
             CaptionClass = GetCaptionClass(3);
-            ToolTip = 'Specifies which dimension value amounts will be totaled on this sheet.';
+            ToolTip = 'Specifies which dimension value amounts will be totaled on this perspective.';
 
             trigger OnLookup()
             begin
@@ -90,7 +90,7 @@ table 8364 "Sheet Definition Line"
             AccessByPermission = TableData Dimension = R;
             Caption = 'Dimension 4 Totaling';
             CaptionClass = GetCaptionClass(4);
-            ToolTip = 'Specifies which dimension value amounts will be totaled on this sheet.';
+            ToolTip = 'Specifies which dimension value amounts will be totaled on this perspective.';
 
             trigger OnLookup()
             begin
@@ -103,7 +103,7 @@ table 8364 "Sheet Definition Line"
             DataClassification = CustomerContent;
             Caption = 'Dimension 5 Totaling';
             CaptionClass = GetCaptionClass(5);
-            ToolTip = 'Specifies which dimension value amounts will be totaled on this sheet.';
+            ToolTip = 'Specifies which dimension value amounts will be totaled on this perspective.';
 
             trigger OnLookup()
             begin
@@ -116,7 +116,7 @@ table 8364 "Sheet Definition Line"
             DataClassification = CustomerContent;
             Caption = 'Dimension 6 Totaling';
             CaptionClass = GetCaptionClass(6);
-            ToolTip = 'Specifies which dimension value amounts will be totaled on this sheet.';
+            ToolTip = 'Specifies which dimension value amounts will be totaled on this perspective.';
 
             trigger OnLookup()
             begin
@@ -129,7 +129,7 @@ table 8364 "Sheet Definition Line"
             DataClassification = CustomerContent;
             Caption = 'Dimension 7 Totaling';
             CaptionClass = GetCaptionClass(7);
-            ToolTip = 'Specifies which dimension value amounts will be totaled on this sheet.';
+            ToolTip = 'Specifies which dimension value amounts will be totaled on this perspective.';
 
             trigger OnLookup()
             begin
@@ -142,7 +142,7 @@ table 8364 "Sheet Definition Line"
             DataClassification = CustomerContent;
             Caption = 'Dimension 8 Totaling';
             CaptionClass = GetCaptionClass(8);
-            ToolTip = 'Specifies which dimension value amounts will be totaled on this sheet.';
+            ToolTip = 'Specifies which dimension value amounts will be totaled on this perspective.';
 
             trigger OnLookup()
             begin
@@ -161,18 +161,18 @@ table 8364 "Sheet Definition Line"
 
     trigger OnInsert()
     begin
-        TestField("Sheet Header");
+        TestField("Perspective Header");
     end;
 
     var
         AnalysisView: Record "Analysis View";
         GLSetup: Record "General Ledger Setup";
-        SheetDefName: Record "Sheet Definition Name";
+        DimPerspectiveName: Record "Dimension Perspective Name";
         DimensionCodes: array[8] of Text[20];
         HasGLSetup: Boolean;
         DimensionTxt: Label '1,5,%1,, Totaling', Comment = '%1 = Dimension Code';
         DimensionGenericTxt: Label '1,5,,Dimension %1 Totaling', Comment = '%1 = Dimension No.';
-        MissingAnalysisViewMsg: Label 'The %1 refers to %2 %3, which does not exist. The field %4 on table %1 has now been deleted.', Comment = '%1 = Sheet Def Name, %2 = Analysis View, %3 = Analysis View Name, %4 = Analysis View Field';
+        MissingAnalysisViewMsg: Label 'The %1 refers to %2 %3, which does not exist. The field %4 on table %1 has now been deleted.', Comment = '%1 = Dimension Perspective Name, %2 = Analysis View, %3 = Analysis View Name, %4 = Analysis View Field';
 
     local procedure LookUpDimFilter(DimNo: Integer; var Result: Text[80])
     var
@@ -202,16 +202,16 @@ table 8364 "Sheet Definition Line"
     local procedure GetDimensionCodes()
     begin
         GetDefinitionName();
-        if SheetDefName."Analysis View Name" <> '' then
-            if SheetDefName."Analysis View Name" <> AnalysisView.Code then
-                if not AnalysisView.Get(SheetDefName."Analysis View Name") then begin
-                    Message(MissingAnalysisViewMsg, SheetDefName.TableCaption(),
-                        AnalysisView.TableCaption(), SheetDefName."Analysis View Name",
-                        SheetDefName.FieldCaption("Analysis View Name"));
-                    SheetDefName."Analysis View Name" := '';
-                    SheetDefName.Modify();
+        if DimPerspectiveName."Analysis View Name" <> '' then
+            if DimPerspectiveName."Analysis View Name" <> AnalysisView.Code then
+                if not AnalysisView.Get(DimPerspectiveName."Analysis View Name") then begin
+                    Message(MissingAnalysisViewMsg, DimPerspectiveName.TableCaption(),
+                        AnalysisView.TableCaption(), DimPerspectiveName."Analysis View Name",
+                        DimPerspectiveName.FieldCaption("Analysis View Name"));
+                    DimPerspectiveName."Analysis View Name" := '';
+                    DimPerspectiveName.Modify();
                 end;
-        if SheetDefName."Analysis View Name" = '' then begin
+        if DimPerspectiveName."Analysis View Name" = '' then begin
             if not HasGLSetup then begin
                 GLSetup.Get();
                 HasGLSetup := true;
@@ -235,7 +235,7 @@ table 8364 "Sheet Definition Line"
 
     local procedure GetDefinitionName()
     begin
-        if Name <> SheetDefName.Name then
-            SheetDefName.Get(Name);
+        if Name <> DimPerspectiveName.Name then
+            DimPerspectiveName.Get(Name);
     end;
 }
