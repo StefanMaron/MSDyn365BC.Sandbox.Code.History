@@ -1085,7 +1085,6 @@ report 20 "Calc. and Post VAT Settlement"
         PrintVATEntries: Boolean;
         NextVATEntryNo: Integer;
         LastVATEntryNo: Integer;
-        PostingDate: Date;
         DocNo: Code[20];
         VATType: Enum "General Posting Type";
         VATAmount: Decimal;
@@ -1185,6 +1184,7 @@ report 20 "Calc. and Post VAT Settlement"
         PostSettlement: Boolean;
         EntrdStartDate: Date;
         EndDateReq: Date;
+        PostingDate: Date;
 
     procedure InitializeRequest(NewStartDate: Date; NewEndDate: Date; NewPostingDate: Date; NewDocNo: Code[20]; NewSettlementAcc: Code[20]; NewPosRoundAcc: Code[20]; NewNegRoundAcc: Code[20]; ShowVATEntries: Boolean; Post: Boolean)
     begin
