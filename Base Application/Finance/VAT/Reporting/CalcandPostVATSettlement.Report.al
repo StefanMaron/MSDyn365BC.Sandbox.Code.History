@@ -774,7 +774,6 @@ report 20 "Calc. and Post VAT Settlement"
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         PrintVATEntries: Boolean;
         NextVATEntryNo: Integer;
-        PostingDate: Date;
         VATDate: Date;
         DocNo: Code[20];
         VATType: Enum "General Posting Type";
@@ -828,6 +827,7 @@ report 20 "Calc. and Post VAT Settlement"
         PostSettlement: Boolean;
         EntrdStartDate: Date;
         EnteredEndDate: Date;
+        PostingDate: Date;
 
     /// <summary>
     /// InitializeRequest with "VAT Date" default to "Posting Date"
