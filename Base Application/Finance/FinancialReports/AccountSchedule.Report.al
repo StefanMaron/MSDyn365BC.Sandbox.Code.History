@@ -369,7 +369,7 @@ report 25 "Account Schedule"
     requestpage
     {
         AboutTitle = 'About Run Financial Report';
-        AboutText = 'Specify the Financial Report you want to run (to get a pdf or to print) and the date range for the data to be included. You can also Specifies additional display options and filters for dimensions and budgets (choose "Show more" in the Options pane to see all options).';
+        AboutText = 'Specify the Financial Report you want to run (to get a pdf or to print) and the date range for the data to be included. You can also specify additional display options and filters for dimensions and budgets (choose "Show more" in the Options pane to see all options).';
         SaveValues = true;
 
         layout
@@ -480,27 +480,26 @@ report 25 "Account Schedule"
                                 RequestOptionsPage.Update();
                             end;
                         }
-                        field(SheetDefNameField; SheetDefNameText)
+                        field(DimPerspectiveNameField; DimPerspectiveNameText)
                         {
                             ApplicationArea = Basic, Suite;
-                            Caption = 'Sheet Definition';
+                            Caption = 'Dimension Perspective';
                             Editable = AccSchedNameEditable;
                             Importance = Additional;
-                            ShowMandatory = true;
-                            TableRelation = "Sheet Definition Name";
-                            ToolTip = 'Specifies the name (code) of the sheet definition to be used for the report (default is the one used in the report definition, but you can override this here).';
+                            TableRelation = "Dimension Perspective Name";
+                            ToolTip = 'Specifies the name (code) of the dimension perspective to be used for the report (default is the one used in the report definition, but you can override this here).';
 
                             trigger OnAfterLookup(Selected: RecordRef)
                             var
-                                SheetDefName: Record "Sheet Definition Name";
+                                DimPerspectiveName: Record "Dimension Perspective Name";
                             begin
-                                SheetDefName := Selected;
-                                SheetDefNameText := SheetDefName.Name;
+                                DimPerspectiveName := Selected;
+                                DimPerspectiveNameText := DimPerspectiveName.Name;
                             end;
 
                             trigger OnValidate()
                             begin
-                                SheetDefNameTextHidden := '';
+                                DimPerspectiveNameTextHidden := '';
                                 RequestOptionsPage.Update();
                             end;
                         }
@@ -817,7 +816,7 @@ report 25 "Account Schedule"
             GLSetup.Get();
             AccSchedName := '';
             ColumnLayoutName := '';
-            SheetDefNameText := '';
+            DimPerspectiveNameText := '';
             TransferValues();
             ContextInitialized := true;
             if AccSchedName <> '' then
@@ -863,35 +862,35 @@ report 25 "Account Schedule"
 
     trigger OnPreRendering(var RenderingPayload: JsonObject)
     var
-        SheetDefName: Record "Sheet Definition Name";
-        TempSheetDefLine: Record "Sheet Definition Line" temporary;
+        DimPerspectiveName: Record "Dimension Perspective Name";
+        TempDimPerspectiveLine: Record "Dimension Perspective Line" temporary;
         AccountSchedule: Report "Account Schedule";
         PDFDocument: Codeunit "PDF Document";
-        SheetDefAccSchMgtHandler: Codeunit SheetDefAccSchMgtHandler;
+        DimPerspectiveAccSchMgtHandler: Codeunit DimPerspectiveAccSchMgtHandler;
         TempBlob: Codeunit "Temp Blob";
-        ISheetDefinition: Interface ISheetDefinition;
+        IDimPerspective: Interface IDimensionPerspective;
         OutStream: OutStream;
         Instream: InStream;
         IsHandled: Boolean;
     begin
-        if SheetDefNameText = '' then
+        if DimPerspectiveNameText = '' then
             exit;
-        if FilteredBySheetDef then
+        if FilteredByDimPerspective then
             exit;
 
-        SheetDefName.Get(SheetDefNameText);
+        DimPerspectiveName.Get(DimPerspectiveNameText);
 
-        AccSchedManagement.CheckSheetAnalysisView(AccSchedName, SheetDefName.Name);
+        AccSchedManagement.CheckPerspectiveAnalysisView(AccSchedName, DimPerspectiveName.Name);
 
         PDFDocument.Initialize();
 
-        ISheetDefinition := SheetDefName."Sheet Type";
-        ISheetDefinition.PopulateLineBufferForReporting(SheetDefName, TempSheetDefLine);
-        if TempSheetDefLine.FindSet() then begin
-            BindSubscription(SheetDefAccSchMgtHandler);
-            SheetDefAccSchMgtHandler.SetSheetDefName(SheetDefName);
+        IDimPerspective := DimPerspectiveName."Perspective Type";
+        IDimPerspective.PopulateLineBufferForReporting(DimPerspectiveName, TempDimPerspectiveLine);
+        if TempDimPerspectiveLine.FindSet() then begin
+            BindSubscription(DimPerspectiveAccSchMgtHandler);
+            DimPerspectiveAccSchMgtHandler.SetDimPerspectiveName(DimPerspectiveName);
             repeat
-                SheetDefAccSchMgtHandler.SetSheetDefLine(TempSheetDefLine);
+                DimPerspectiveAccSchMgtHandler.SetDimPerspectiveLine(TempDimPerspectiveLine);
 
                 Clear(AccountSchedule);
                 if FinancialReportName <> '' then
@@ -903,20 +902,20 @@ report 25 "Account Schedule"
                 AccountSchedule.SetFilters(
                     DateFilter, GLBudgetFilter, CostBudgetFilter, BusinessUnitFilter,
                     Dim1Filter, Dim2Filter, Dim3Filter, Dim4Filter, CashFlowFilter, NegativeAmountFormat);
-                AccountSchedule.SetFilteredBySheetDef(true);
+                AccountSchedule.SetFilteredByDimPerspective(true);
                 AccountSchedule.SetBudgetFilterEnable();
 
                 TempBlob.CreateOutStream(OutStream);
-                AccountSchedule.SetFinancialReportDescription(TempSheetDefLine."Sheet Header");
+                AccountSchedule.SetFinancialReportDescription(TempDimPerspectiveLine."Perspective Header");
                 IsHandled := false;
-                OnBeforeSaveSheetDefinitionReport(AccountSchedule, TempSheetDefLine, OutStream, IsHandled);
+                OnBeforeSaveDimPerspectiveReport(AccountSchedule, TempDimPerspectiveLine, OutStream, IsHandled);
                 if not IsHandled then
                     AccountSchedule.SaveAs('', ReportFormat::Pdf, OutStream);
                 TempBlob.CreateInStream(Instream);
                 PDFDocument.AddStreamToAppend(Instream);
 
-            until TempSheetDefLine.Next() = 0;
-            UnbindSubscription(SheetDefAccSchMgtHandler);
+            until TempDimPerspectiveLine.Next() = 0;
+            UnbindSubscription(DimPerspectiveAccSchMgtHandler);
         end;
 
         PDFDocument.ToJson(RenderingPayload);
@@ -932,7 +931,7 @@ report 25 "Account Schedule"
         FinancialReportDescription: Text;
         FinancialReportDescHidden: Text;
         ColumnLayoutNameHidden: Code[10];
-        SheetDefNameTextHidden: Code[10];
+        DimPerspectiveNameTextHidden: Code[10];
         GLBudgetName: Code[10];
         StartDateEnabled: Boolean;
         StartDate: Date;
@@ -999,7 +998,7 @@ report 25 "Account Schedule"
         DateFilterDisabled: Boolean;
         UseHiddenDateFilter: Boolean;
         RunForExport: Boolean;
-        FilteredBySheetDef: Boolean;
+        FilteredByDimPerspective: Boolean;
 
 #pragma warning disable AA0074
         Text000: Label '(Thousands)';
@@ -1034,7 +1033,7 @@ report 25 "Account Schedule"
         LineSkipped: Boolean;
         UseAmtsInAddCurr: Boolean;
         NegativeAmountFormat: Enum "Analysis Negative Format";
-        SheetDefNameText: Code[10];
+        DimPerspectiveNameText: Code[10];
         Dim1Filter: Text;
         Dim2Filter: Text;
         Dim3Filter: Text;
@@ -1275,14 +1274,14 @@ report 25 "Account Schedule"
         StartDateEnabled := true;
     end;
 
-    procedure SetSheetDefName(SheetDefName: Code[10])
+    procedure SetDimPerspectiveName(DimPerspectiveName: Code[10])
     begin
-        SheetDefNameTextHidden := SheetDefName;
+        DimPerspectiveNameTextHidden := DimPerspectiveName;
     end;
 
-    procedure SetFilteredBySheetDef(IsFiltered: Boolean)
+    procedure SetFilteredByDimPerspective(IsFiltered: Boolean)
     begin
-        FilteredBySheetDef := IsFiltered;
+        FilteredByDimPerspective := IsFiltered;
     end;
 
     procedure SetFinancialReportDescription(NewDescription: Text)
@@ -1472,9 +1471,9 @@ report 25 "Account Schedule"
                 AccSchedName := AccSchedNameHidden;
             if ColumnLayoutNameHidden <> '' then
                 ColumnLayoutName := ColumnLayoutNameHidden;
-            SheetDefNameText := '';
-            if SheetDefNameTextHidden <> '' then
-                SheetDefNameText := SheetDefNameTextHidden;
+            DimPerspectiveNameText := '';
+            if DimPerspectiveNameTextHidden <> '' then
+                DimPerspectiveNameText := DimPerspectiveNameTextHidden;
             if DateFilterHidden <> '' then
                 DateFilter := DateFilterHidden;
             if GLBudgetFilterHidden <> '' then
@@ -1508,8 +1507,8 @@ report 25 "Account Schedule"
             AccSchedName := FinancialReportLocal."Financial Report Row Group";
         if ColumnLayoutName = '' then
             ColumnLayoutName := FinancialReportLocal."Financial Report Column Group";
-        if SheetDefNameText = '' then
-            SheetDefNameText := FinancialReportLocal.SheetDefinition;
+        if DimPerspectiveNameText = '' then
+            DimPerspectiveNameText := FinancialReportLocal.DimPerspective;
 
         if AccSchedName <> '' then
             if not AccScheduleName.Get(AccSchedName) then
@@ -1715,8 +1714,7 @@ report 25 "Account Schedule"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSaveSheetDefinitionReport(var AccountSchedule: Report "Account Schedule"; SheetDefLine: Record "Sheet Definition Line"; var OutStr: OutStream; var IsHandled: Boolean)
+    local procedure OnBeforeSaveDimPerspectiveReport(var AccountSchedule: Report "Account Schedule"; DimPerspectiveLine: Record "Dimension Perspective Line"; var OutStr: OutStream; var IsHandled: Boolean)
     begin
     end;
 }
-

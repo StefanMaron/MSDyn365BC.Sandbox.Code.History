@@ -203,11 +203,11 @@ table 89 "Financial Report User Filters"
             Caption = 'Column Definition';
             DataClassification = SystemMetadata;
         }
-        field(60; FinReportSheetDefName; Code[10])
+        field(60; FinReportDimPerspectiveName; Code[10])
         {
-            Caption = 'Sheet Definition';
+            Caption = 'Dimension Perspective';
             DataClassification = SystemMetadata;
-            TableRelation = "Sheet Definition Name";
+            TableRelation = "Dimension Perspective Name";
         }
     }
 

@@ -37,9 +37,9 @@ report 29 "Export Acc. Sched. to Excel"
             trigger OnAfterGetRecord()
             var
                 AccSchedLine: Record "Acc. Schedule Line";
-                TempSheetDefLine: Record "Sheet Definition Line" temporary;
-                SheetDefAccSchMgtHandler: Codeunit SheetDefAccSchMgtHandler;
-                ISheetDefinition: Interface ISheetDefinition;
+                TempDimPerspectiveLine: Record "Dimension Perspective Line" temporary;
+                DimPerspectiveAccSchMgtHandler: Codeunit DimPerspectiveAccSchMgtHandler;
+                IDimPerspective: Interface IDimensionPerspective;
                 ClientFileName: Text;
             begin
                 if DoUseExistingTemplate then
@@ -71,21 +71,21 @@ report 29 "Export Acc. Sched. to Excel"
                     TempExcelBuffer.WriteSheet(AccSchedName.Description, CompanyDisplayName, UserId);
                 end;
 
-                if SheetDefName.Name <> '' then begin
-                    AccSchedManagement.CheckSheetAnalysisView(AccSchedName.Name, SheetDefName.Name);
+                if DimPerspectiveName.Name <> '' then begin
+                    AccSchedManagement.CheckPerspectiveAnalysisView(AccSchedName.Name, DimPerspectiveName.Name);
                     AccSchedLine.Copy(AccSchedLineSource);
 
-                    ISheetDefinition := SheetDefName."Sheet Type";
-                    ISheetDefinition.PopulateLineBufferForReporting(SheetDefName, TempSheetDefLine);
-                    if TempSheetDefLine.FindSet() then begin
-                        BindSubscription(SheetDefAccSchMgtHandler);
-                        SheetDefAccSchMgtHandler.SetSheetDefName(SheetDefName);
+                    IDimPerspective := DimPerspectiveName."Perspective Type";
+                    IDimPerspective.PopulateLineBufferForReporting(DimPerspectiveName, TempDimPerspectiveLine);
+                    if TempDimPerspectiveLine.FindSet() then begin
+                        BindSubscription(DimPerspectiveAccSchMgtHandler);
+                        DimPerspectiveAccSchMgtHandler.SetDimPerspectiveName(DimPerspectiveName);
                         repeat
-                            SheetDefAccSchMgtHandler.SetSheetDefLine(TempSheetDefLine);
+                            DimPerspectiveAccSchMgtHandler.SetDimPerspectiveLine(TempDimPerspectiveLine);
                             AccSchedManagement.ForceRecalculate(true);
-                            WriteSheetPerDefinition(AccSchedLine, TempSheetDefLine."Sheet Header");
-                        until TempSheetDefLine.Next() = 0;
-                        UnbindSubscription(SheetDefAccSchMgtHandler);
+                            WriteSheetPerDefinition(AccSchedLine, TempDimPerspectiveLine."Perspective Header");
+                        until TempDimPerspectiveLine.Next() = 0;
+                        UnbindSubscription(DimPerspectiveAccSchMgtHandler);
                     end;
                 end;
 
@@ -123,7 +123,7 @@ report 29 "Export Acc. Sched. to Excel"
         AnalysisView: Record "Analysis View";
         Currency: Record Currency;
         FinancialReport: Record "Financial Report";
-        SheetDefName: Record "Sheet Definition Name";
+        DimPerspectiveName: Record "Dimension Perspective Name";
         AccSchedManagement: Codeunit AccSchedManagement;
         MatrixMgt: Codeunit "Matrix Management";
         FileMgt: Codeunit "File Management";
@@ -173,15 +173,15 @@ report 29 "Export Acc. Sched. to Excel"
         SetOptions(AccSchedLine2, ColumnLayoutName2, UseAmtsInAddCurr2, FinancialReportName, '');
     end;
 
-    procedure SetOptions(var AccSchedLine2: Record "Acc. Schedule Line"; ColumnLayoutName2: Code[10]; UseAmtsInAddCurr2: Boolean; FinancialReportName: Code[10]; SheetDefNameText: Code[10])
+    procedure SetOptions(var AccSchedLine2: Record "Acc. Schedule Line"; ColumnLayoutName2: Code[10]; UseAmtsInAddCurr2: Boolean; FinancialReportName: Code[10]; DimPerspectiveNameText: Code[10])
     begin
         AccSchedLineSource.CopyFilters(AccSchedLine2);
         ColumnLayout.SetRange("Column Layout Name", ColumnLayoutName2);
         UseAmtsInAddCurr := UseAmtsInAddCurr2;
         if FinancialReportName <> '' then
             FinancialReport.Get(FinancialReportName);
-        if SheetDefNameText <> '' then
-            SheetDefName.Get(SheetDefNameText);
+        if DimPerspectiveNameText <> '' then
+            DimPerspectiveName.Get(DimPerspectiveNameText);
     end;
 
     local procedure WriteSheetPerDefinition(var AccSchedLine: Record "Acc. Schedule Line"; PerDefSheetName: Text)

@@ -9,12 +9,12 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 using System.Utilities;
 
-table 8363 "Sheet Definition Name"
+table 8363 "Dimension Perspective Name"
 {
-    Caption = 'Sheet Definition Name';
+    Caption = 'Dimension Perspective Name';
     DataCaptionFields = Name;
     DataClassification = CustomerContent;
-    LookupPageId = "Sheet Definitions";
+    LookupPageId = "Dimension Perspectives";
 
     fields
     {
@@ -28,26 +28,26 @@ table 8363 "Sheet Definition Name"
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
-            ToolTip = 'Specifies the description of the sheet definition. The description is not shown on the final report but is used to provide more context when using the definition.';
+            ToolTip = 'Specifies the description of the dimension perspective. The description is not shown on the final report but is used to provide more context when using the definition.';
         }
         field(3; "Internal Description"; Text[250])
         {
             Caption = 'Internal Description';
             DataClassification = CustomerContent;
-            ToolTip = 'Specifies the internal description of the sheet definition. The internal description is not shown on the final report but is used to provide more context when using the definition.';
+            ToolTip = 'Specifies the internal description of the dimension perspective. The internal description is not shown on the final report but is used to provide more context when using the definition.';
         }
-        field(4; "Sheet Type"; Enum "Sheet Type")
+        field(4; "Perspective Type"; Enum "Dimension Perspective Type")
         {
-            Caption = 'Sheet Type';
+            Caption = 'Perspective Type';
             DataClassification = CustomerContent;
-            ToolTip = 'Specifies how the financial report sheets will be totaled by. If you select Custom, then you can set up a combination of fields to total by on a sheet-by-sheet basis. Otherwise, sheets are automatically created and totaled by each dimension value or business unit.';
+            ToolTip = 'Specifies how the financial report dimension perspectives will be totaled by. If you select Custom, then you can set up a combination of fields to total by on a dimension-by-dimension basis. Otherwise, perspectives are automatically created and totaled by each dimension value or business unit.';
         }
         field(5; "Analysis View Name"; Code[10])
         {
             Caption = 'Analysis View';
             DataClassification = CustomerContent;
             TableRelation = "Analysis View";
-            ToolTip = 'Specifies the name of the analysis view you want the sheet definition to use. This field is optional.';
+            ToolTip = 'Specifies the name of the analysis view you want the dimension perspective to use. This field is optional.';
 
             trigger OnValidate()
             begin
@@ -66,58 +66,58 @@ table 8363 "Sheet Definition Name"
 
     trigger OnDelete()
     var
-        SheetDefLine: Record "Sheet Definition Line";
+        DimPerspectiveLine: Record "Dimension Perspective Line";
     begin
-        SheetDefLine.SetRange(Name, Name);
-        SheetDefLine.DeleteAll(true);
+        DimPerspectiveLine.SetRange(Name, Name);
+        DimPerspectiveLine.DeleteAll(true);
     end;
 
     var
-        ClearDimensionTotalingConfirmTxt: Label 'Changing Analysis View will clear differing dimension totaling columns of Sheet Definition Lines. \Do you want to continue?';
+        ClearDimensionTotalingConfirmTxt: Label 'Changing Analysis View will clear differing dimension totaling columns of Dimension Perspective Lines. \Do you want to continue?';
 
-    procedure LookupSheetSheetType(var SheetTypeText: Text): Boolean
+    procedure LookupPerspectiveType(var PerspectiveTypeText: Text): Boolean
     var
         DimSelection: Page "Dimension Selection";
-        ISheetDefinition: Interface ISheetDefinition;
+        IDimPerspective: Interface IDimensionPerspective;
         Ordinal: Integer;
-        NewSheetType: Text;
+        NewPerspectiveType: Text;
     begin
-        foreach Ordinal in Enum::"Sheet Type".Ordinals() do begin
-            ISheetDefinition := Enum::"Sheet Type".FromInteger(Ordinal);
-            ISheetDefinition.InsertBufferForSheetTotalingLookup(this, Enum::"Sheet Type".FromInteger(Ordinal), DimSelection);
+        foreach Ordinal in Enum::"Dimension Perspective Type".Ordinals() do begin
+            IDimPerspective := Enum::"Dimension Perspective Type".FromInteger(Ordinal);
+            IDimPerspective.InsertBufferForPerspectiveTotalingLookup(this, Enum::"Dimension Perspective Type".FromInteger(Ordinal), DimSelection);
         end;
 
         DimSelection.LookupMode := true;
         if DimSelection.RunModal() = Action::LookupOK then begin
-            NewSheetType := DimSelection.GetDimSelCode();
-            if UpperCase(NewSheetType) <> UpperCase(SheetTypeText) then begin
-                SheetTypeText := NewSheetType;
+            NewPerspectiveType := DimSelection.GetDimSelCode();
+            if UpperCase(NewPerspectiveType) <> UpperCase(PerspectiveTypeText) then begin
+                PerspectiveTypeText := NewPerspectiveType;
                 exit(true);
             end;
         end;
     end;
 
-    procedure SheetTypeToText(SheetType: Enum "Sheet Type") Result: Text
+    procedure PerspectiveTypeToText(PerspectiveType: Enum "Dimension Perspective Type") Result: Text
     var
-        ISheetDefinition: Interface ISheetDefinition;
+        IDimPerspective: Interface IDimensionPerspective;
         Ordinal: Integer;
     begin
-        foreach Ordinal in Enum::"Sheet Type".Ordinals() do begin
-            ISheetDefinition := Enum::"Sheet Type".FromInteger(Ordinal);
-            if ISheetDefinition.SheetTypeToText(this, SheetType, Result) then
+        foreach Ordinal in Enum::"Dimension Perspective Type".Ordinals() do begin
+            IDimPerspective := Enum::"Dimension Perspective Type".FromInteger(Ordinal);
+            if IDimPerspective.PerspectiveTypeToText(this, PerspectiveType, Result) then
                 exit(Result);
         end;
     end;
 
-    procedure TextToSheetType(Text: Text) Type: Enum "Sheet Type"
+    procedure TextToPerspectiveType(Text: Text) Type: Enum "Dimension Perspective Type"
     var
-        ISheetDefinition: Interface ISheetDefinition;
+        IDimPerspective: Interface IDimensionPerspective;
         Ordinal: Integer;
     begin
         Text := UpperCase(Text);
-        foreach Ordinal in Enum::"Sheet Type".Ordinals() do begin
-            ISheetDefinition := Enum::"Sheet Type".FromInteger(Ordinal);
-            if ISheetDefinition.TextToSheetType(this, Text, Type) then
+        foreach Ordinal in Enum::"Dimension Perspective Type".Ordinals() do begin
+            IDimPerspective := Enum::"Dimension Perspective Type".FromInteger(Ordinal);
+            if IDimPerspective.TextToPerspectiveType(this, Text, Type) then
                 exit(Type);
         end;
     end;
@@ -125,7 +125,7 @@ table 8363 "Sheet Definition Name"
     local procedure ValidateAnalysisViewName()
     var
         AnalysisView: Record "Analysis View";
-        SheetDefLine: Record "Sheet Definition Line";
+        DimPerspectiveLine: Record "Dimension Perspective Line";
         xAnalysisView: Record "Analysis View";
         ConfirmManagement: Codeunit "Confirm Management";
         ClearConfirmed: Boolean;
@@ -138,21 +138,21 @@ table 8363 "Sheet Definition Name"
         AnalysisViewGet(AnalysisView, "Analysis View Name");
         AnalysisViewGet(xAnalysisView, xRec."Analysis View Name");
 
-        SheetDefLine.SetRange(Name, Name);
+        DimPerspectiveLine.SetRange(Name, Name);
         for i := 1 to 4 do begin
             if GetDimCodeByNum(AnalysisView, i) = GetDimCodeByNum(xAnalysisView, i) then
                 continue;
             case i of
                 1:
-                    SheetDefLine.SetFilter("Dimension 1 Totaling", '<>%1', '');
+                    DimPerspectiveLine.SetFilter("Dimension 1 Totaling", '<>%1', '');
                 2:
-                    SheetDefLine.SetFilter("Dimension 2 Totaling", '<>%1', '');
+                    DimPerspectiveLine.SetFilter("Dimension 2 Totaling", '<>%1', '');
                 3:
-                    SheetDefLine.SetFilter("Dimension 3 Totaling", '<>%1', '');
+                    DimPerspectiveLine.SetFilter("Dimension 3 Totaling", '<>%1', '');
                 4:
-                    SheetDefLine.SetFilter("Dimension 4 Totaling", '<>%1', '');
+                    DimPerspectiveLine.SetFilter("Dimension 4 Totaling", '<>%1', '');
             end;
-            if not SheetDefLine.IsEmpty() then begin
+            if not DimPerspectiveLine.IsEmpty() then begin
                 if not ClearConfirmed then
                     if ConfirmManagement.GetResponseOrDefault(ClearDimensionTotalingConfirmTxt, true) then
                         ClearConfirmed := true
@@ -165,20 +165,20 @@ table 8363 "Sheet Definition Name"
         if not ClearConfirmed then
             exit;
 
-        SheetDefLine.Reset();
-        SheetDefLine.SetRange(Name, Name);
-        if SheetDefLine.FindSet() then
+        DimPerspectiveLine.Reset();
+        DimPerspectiveLine.SetRange(Name, Name);
+        if DimPerspectiveLine.FindSet() then
             repeat
                 if DimsToClear[1] then
-                    SheetDefLine."Dimension 1 Totaling" := '';
+                    DimPerspectiveLine."Dimension 1 Totaling" := '';
                 if DimsToClear[2] then
-                    SheetDefLine."Dimension 2 Totaling" := '';
+                    DimPerspectiveLine."Dimension 2 Totaling" := '';
                 if DimsToClear[3] then
-                    SheetDefLine."Dimension 3 Totaling" := '';
+                    DimPerspectiveLine."Dimension 3 Totaling" := '';
                 if DimsToClear[4] then
-                    SheetDefLine."Dimension 4 Totaling" := '';
-                SheetDefLine.Modify(true);
-            until SheetDefLine.Next() = 0;
+                    DimPerspectiveLine."Dimension 4 Totaling" := '';
+                DimPerspectiveLine.Modify(true);
+            until DimPerspectiveLine.Next() = 0;
     end;
 
     local procedure AnalysisViewGet(var AnalysisView: Record "Analysis View"; AnalysisViewName: Code[10])
