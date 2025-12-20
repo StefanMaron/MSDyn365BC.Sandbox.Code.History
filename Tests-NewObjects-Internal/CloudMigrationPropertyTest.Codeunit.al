@@ -72,6 +72,8 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Allocation Account");
         ListOfTablesToMigrate.Add(Database::"Allocation Line");
         ListOfTablesToMigrate.Add(Database::"Allowed Language");
+        ListOfTablesToMigrate.Add(Database::"Dimension Perspective Line");
+        ListOfTablesToMigrate.Add(Database::"Dimension Perspective Name");
         ListOfTablesToMigrate.Add(Database::"Dispute Status");
         ListOfTablesToMigrate.Add(Database::"Job Journal Template");
         ListOfTablesToMigrate.Add(Database::"Job Ledger Entry");
@@ -451,8 +453,6 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Service Shipment Line");
         ListOfTablesToMigrate.Add(Database::"Service Status Priority Setup");
         ListOfTablesToMigrate.Add(Database::"Service Zone");
-        ListOfTablesToMigrate.Add(Database::"Sheet Definition Line");
-        ListOfTablesToMigrate.Add(Database::"Sheet Definition Name");
         ListOfTablesToMigrate.Add(Database::"Shipment Method Translation");
         ListOfTablesToMigrate.Add(Database::"Shipment Method");
         ListOfTablesToMigrate.Add(Database::"Shipping Agent Services");

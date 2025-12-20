@@ -61,7 +61,7 @@ codeunit 8 AccSchedManagement
         MatrixMgt: Codeunit "Matrix Management";
         AccountingPeriodMgt: Codeunit "Accounting Period Mgt.";
         AnalysisViewRead: Boolean;
-        SheetDefinitionRead: Boolean;
+        DimPerspectiveRead: Boolean;
         StartDate: Date;
         EndDate: Date;
         FiscalStartDate: Date;
@@ -98,7 +98,7 @@ codeunit 8 AccSchedManagement
         WeekTxt: Label 'W%1', Comment = '%1 = Week number';
         Recalculate: Boolean;
         SystemGeneratedAccSchedQst: Label 'This account schedule may be automatically updated by the system, so any changes you make may be lost. Do you want to make a copy?';
-        SheetDimensionMismatchErr: Label 'The %1 on %2 must be one of the dimension codes specified on the %3 %4.', Comment = '%1 = Sheet Type, %2 = Sheet Definition Name, %3 = Analysis View, %4 = Analysis View Name';
+        PerspectiveDimensionMismatchErr: Label 'The %1 on %2 must be one of the dimension codes specified on the %3 %4.', Comment = '%1 = Perspective Type, %2 = Dimension Perspective Name, %3 = Analysis View, %4 = Analysis View Name';
 
     /// <summary>
     /// Opens and initializes account schedule lines for the specified schedule name with proper template validation.
@@ -447,19 +447,19 @@ codeunit 8 AccSchedManagement
         OnAfterCheckAnalysisView(AccSchedName, ColumnLayoutName, AnalysisView);
     end;
 
-    procedure CheckSheetAnalysisView(CurrentSchedName: Code[10]; CurrentSheetName: Code[10])
+    procedure CheckPerspectiveAnalysisView(CurrentSchedName: Code[10]; CurrentPerspectiveName: Code[10])
     var
-        SheetDefName: Record "Sheet Definition Name";
-        SheetDefLine: Record "Sheet Definition Line";
-        AnySheetDimensions: Boolean;
+        DimPerspectiveName: Record "Dimension Perspective Name";
+        DimPerspectiveLine: Record "Dimension Perspective Line";
+        AnyPerspectiveDimensions: Boolean;
     begin
-        if not SheetDefinitionRead then begin
-            SheetDefinitionRead := true;
+        if not DimPerspectiveRead then begin
+            DimPerspectiveRead := true;
             if CurrentSchedName <> AccSchedName.Name then begin
                 CheckTemplateName(CurrentSchedName);
                 AccSchedName.Get(CurrentSchedName);
             end;
-            SheetDefName.Get(CurrentSheetName);
+            DimPerspectiveName.Get(CurrentPerspectiveName);
             if AccSchedName."Analysis View Name" = '' then begin
                 GetGLSetup();
                 AnalysisView.Init();
@@ -468,43 +468,43 @@ codeunit 8 AccSchedManagement
             end else
                 AnalysisView.Get(AccSchedName."Analysis View Name");
 
-            if AccSchedName."Analysis View Name" <> SheetDefName."Analysis View Name" then begin
-                SheetDefLine.SetRange(Name, CurrentSheetName);
-                if SheetDefLine.FindSet() then
+            if AccSchedName."Analysis View Name" <> DimPerspectiveName."Analysis View Name" then begin
+                DimPerspectiveLine.SetRange(Name, CurrentPerspectiveName);
+                if DimPerspectiveLine.FindSet() then
                     repeat
-                        AnySheetDimensions :=
-                          (SheetDefLine."Dimension 1 Totaling" <> '') or
-                          (SheetDefLine."Dimension 2 Totaling" <> '') or
-                          (SheetDefLine."Dimension 3 Totaling" <> '') or
-                          (SheetDefLine."Dimension 4 Totaling" <> '');
-                    until AnySheetDimensions or (SheetDefLine.Next() = 0);
-                if AnySheetDimensions then
+                        AnyPerspectiveDimensions :=
+                          (DimPerspectiveLine."Dimension 1 Totaling" <> '') or
+                          (DimPerspectiveLine."Dimension 2 Totaling" <> '') or
+                          (DimPerspectiveLine."Dimension 3 Totaling" <> '') or
+                          (DimPerspectiveLine."Dimension 4 Totaling" <> '');
+                    until AnyPerspectiveDimensions or (DimPerspectiveLine.Next() = 0);
+                if AnyPerspectiveDimensions then
                     Error(
                       Text024,
                       AccSchedName.FieldCaption("Analysis View Name"),
                       AccSchedName.TableCaption(),
                       AccSchedName."Analysis View Name",
-                      SheetDefName.FieldCaption("Analysis View Name"),
-                      SheetDefName.TableCaption(),
-                      SheetDefName."Analysis View Name",
-                      SheetDefLine.TableCaption());
+                      DimPerspectiveName.FieldCaption("Analysis View Name"),
+                      DimPerspectiveName.TableCaption(),
+                      DimPerspectiveName."Analysis View Name",
+                      DimPerspectiveLine.TableCaption());
             end;
 
-            if (SheetDefName."Sheet Type" <> SheetDefName."Sheet Type"::Custom) and
-                (SheetDefName."Analysis View Name" <> '')
+            if (DimPerspectiveName."Perspective Type" <> DimPerspectiveName."Perspective Type"::Custom) and
+                (DimPerspectiveName."Analysis View Name" <> '')
             then
-                case SheetDefName."Sheet Type" of
-                    "Sheet Type"::Dimension5,
-                    "Sheet Type"::Dimension6,
-                    "Sheet Type"::Dimension7,
-                    "Sheet Type"::Dimension8,
-                    "Sheet Type"::BusinessUnit:
+                case DimPerspectiveName."Perspective Type" of
+                    "Dimension Perspective Type"::Dimension5,
+                    "Dimension Perspective Type"::Dimension6,
+                    "Dimension Perspective Type"::Dimension7,
+                    "Dimension Perspective Type"::Dimension8,
+                    "Dimension Perspective Type"::BusinessUnit:
                         Error(
-                            SheetDimensionMismatchErr,
-                            SheetDefName.FieldCaption("Sheet Type"),
-                            SheetDefName.TableCaption(),
-                            SheetDefName.FieldCaption("Analysis View Name"),
-                            SheetDefName."Analysis View Name");
+                            PerspectiveDimensionMismatchErr,
+                            DimPerspectiveName.FieldCaption("Perspective Type"),
+                            DimPerspectiveName.TableCaption(),
+                            DimPerspectiveName.FieldCaption("Analysis View Name"),
+                            DimPerspectiveName."Analysis View Name");
                 end;
         end;
     end;
