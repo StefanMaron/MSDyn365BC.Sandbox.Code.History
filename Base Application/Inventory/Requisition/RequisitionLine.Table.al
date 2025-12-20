@@ -2001,6 +2001,8 @@ table 246 "Requisition Line"
         until RequisitionLine.Next() = 0;
 
         DeleteRelations(true);
+
+        OnAfterClearPlanningWorksheet(Rec);
     end;
 
     internal procedure ClearOrderPlanningWorksheet()
@@ -3438,6 +3440,11 @@ table 246 "Requisition Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyFromItem(var RequisitionLine: Record "Requisition Line"; Item: Record Item; CurrentFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterClearPlanningWorksheet(var RequisitionLine: Record "Requisition Line")
     begin
     end;
 
