@@ -4,14 +4,14 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.FinancialReports;
 
-page 8364 "Sheet Definitions"
+page 8364 "Dimension Perspectives"
 {
     ApplicationArea = Basic, Suite;
     AnalysisModeEnabled = false;
     DataCaptionFields = Name;
-    Caption = 'Financial Report Sheet Definitions';
+    Caption = 'Financial Report Dimension Perspectives';
     PageType = List;
-    SourceTable = "Sheet Definition Name";
+    SourceTable = "Dimension Perspective Name";
     UsageCategory = Lists;
 
     layout
@@ -51,14 +51,14 @@ page 8364 "Sheet Definitions"
                 Enabled = Rec.Name <> '';
                 Image = EditList;
                 Scope = Repeater;
-                ToolTip = 'View or edit the financial report sheet definition.';
+                ToolTip = 'View or edit the financial report dimension perspective.';
 
                 trigger OnAction()
                 var
-                    SheetDefLine: Record "Sheet Definition Line";
+                    DimPerspectiveLine: Record "Dimension Perspective Line";
                 begin
-                    SheetDefLine.SetRange(Name, Rec.Name);
-                    Page.Run(0, SheetDefLine);
+                    DimPerspectiveLine.SetRange(Name, Rec.Name);
+                    Page.Run(0, DimPerspectiveLine);
                 end;
             }
             action(WhereUsed)
@@ -68,13 +68,13 @@ page 8364 "Sheet Definitions"
                 Enabled = Rec.Name <> '';
                 Image = Track;
                 Scope = Repeater;
-                ToolTip = 'View or edit financial reports in which the sheet definition is used.';
+                ToolTip = 'View or edit financial reports in which the dimension perspective is used.';
 
                 trigger OnAction()
                 var
                     FinancialReport: Record "Financial Report";
                 begin
-                    FinancialReport.SetRange(SheetDefinition, Rec.Name);
+                    FinancialReport.SetRange(DimPerspective, Rec.Name);
                     Page.Run(0, FinancialReport);
                 end;
             }
