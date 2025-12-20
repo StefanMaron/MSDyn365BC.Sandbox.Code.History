@@ -11,53 +11,53 @@ using Microsoft.Finance.GeneralLedger.Budget;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
 
-codeunit 8367 SheetDefDimension implements ISheetDefinition
+codeunit 8367 DimPerspectiveDimension implements IDimensionPerspective
 {
     var
-        SheetDefMgt: Codeunit SheetDefMgt;
+        DimPerspectiveMgt: Codeunit DimensionPerspectiveMgt;
 
-    procedure PopulateLineBufferForReporting(SheetDefName: Record "Sheet Definition Name"; var TempSheetDefLine: Record "Sheet Definition Line")
+    procedure PopulateLineBufferForReporting(DimPerspectiveName: Record "Dimension Perspective Name"; var TempDimPerspectiveLine: Record "Dimension Perspective Line")
     var
         AnalysisView: Record "Analysis View";
         DimValue: Record "Dimension Value";
         TempDimValue: Record "Dimension Value" temporary;
         GLSetup: Record "General Ledger Setup";
     begin
-        if not TempSheetDefLine.IsTemporary() then
+        if not TempDimPerspectiveLine.IsTemporary() then
             exit;
 
-        if SheetDefName."Analysis View Name" <> '' then begin
-            AnalysisView.Get(SheetDefName."Analysis View Name");
-            case SheetDefName."Sheet Type" of
-                "Sheet Type"::Dimension1:
+        if DimPerspectiveName."Analysis View Name" <> '' then begin
+            AnalysisView.Get(DimPerspectiveName."Analysis View Name");
+            case DimPerspectiveName."Perspective Type" of
+                "Dimension Perspective Type"::Dimension1:
                     DimValue.SetRange("Dimension Code", AnalysisView."Dimension 1 Code");
-                "Sheet Type"::Dimension2:
+                "Dimension Perspective Type"::Dimension2:
                     DimValue.SetRange("Dimension Code", AnalysisView."Dimension 2 Code");
-                "Sheet Type"::Dimension3:
+                "Dimension Perspective Type"::Dimension3:
                     DimValue.SetRange("Dimension Code", AnalysisView."Dimension 3 Code");
-                "Sheet Type"::Dimension4:
+                "Dimension Perspective Type"::Dimension4:
                     DimValue.SetRange("Dimension Code", AnalysisView."Dimension 4 Code");
                 else
                     exit;
             end;
         end else begin
             GLSetup.Get();
-            case SheetDefName."Sheet Type" of
-                "Sheet Type"::Dimension1:
+            case DimPerspectiveName."Perspective Type" of
+                "Dimension Perspective Type"::Dimension1:
                     DimValue.SetRange("Dimension Code", GLSetup."Global Dimension 1 Code");
-                "Sheet Type"::Dimension2:
+                "Dimension Perspective Type"::Dimension2:
                     DimValue.SetRange("Dimension Code", GLSetup."Global Dimension 2 Code");
-                "Sheet Type"::Dimension3:
+                "Dimension Perspective Type"::Dimension3:
                     DimValue.SetRange("Dimension Code", GLSetup."Shortcut Dimension 3 Code");
-                "Sheet Type"::Dimension4:
+                "Dimension Perspective Type"::Dimension4:
                     DimValue.SetRange("Dimension Code", GLSetup."Shortcut Dimension 4 Code");
-                "Sheet Type"::Dimension5:
+                "Dimension Perspective Type"::Dimension5:
                     DimValue.SetRange("Dimension Code", GLSetup."Shortcut Dimension 5 Code");
-                "Sheet Type"::Dimension6:
+                "Dimension Perspective Type"::Dimension6:
                     DimValue.SetRange("Dimension Code", GLSetup."Shortcut Dimension 6 Code");
-                "Sheet Type"::Dimension7:
+                "Dimension Perspective Type"::Dimension7:
                     DimValue.SetRange("Dimension Code", GLSetup."Shortcut Dimension 7 Code");
-                "Sheet Type"::Dimension8:
+                "Dimension Perspective Type"::Dimension8:
                     DimValue.SetRange("Dimension Code", GLSetup."Shortcut Dimension 8 Code");
                 else
                     exit;
@@ -66,31 +66,31 @@ codeunit 8367 SheetDefDimension implements ISheetDefinition
 
         if DimValue.FindSet() then
             repeat
-                TempSheetDefLine.Init();
-                TempSheetDefLine.Name := SheetDefName.Name;
-                TempSheetDefLine."Line No." += 10000;
-                TempSheetDefLine."Sheet Header" := CopyStr(DimValue.Name, 1, MaxStrLen(TempSheetDefLine."Sheet Header"));
+                TempDimPerspectiveLine.Init();
+                TempDimPerspectiveLine.Name := DimPerspectiveName.Name;
+                TempDimPerspectiveLine."Line No." += 10000;
+                TempDimPerspectiveLine."Perspective Header" := CopyStr(DimValue.Name, 1, MaxStrLen(TempDimPerspectiveLine."Perspective Header"));
                 TempDimValue := DimValue;
                 TempDimValue.SetRecFilter();
-                case SheetDefName."Sheet Type" of
-                    "Sheet Type"::Dimension1:
-                        SetDimTotalingFilter(TempSheetDefLine."Dimension 1 Totaling", TempDimValue.GetFilter(Code));
-                    "Sheet Type"::Dimension2:
-                        SetDimTotalingFilter(TempSheetDefLine."Dimension 2 Totaling", TempDimValue.GetFilter(Code));
-                    "Sheet Type"::Dimension3:
-                        SetDimTotalingFilter(TempSheetDefLine."Dimension 3 Totaling", TempDimValue.GetFilter(Code));
-                    "Sheet Type"::Dimension4:
-                        SetDimTotalingFilter(TempSheetDefLine."Dimension 4 Totaling", TempDimValue.GetFilter(Code));
-                    "Sheet Type"::Dimension5:
-                        SetDimTotalingFilter(TempSheetDefLine."Dimension 5 Totaling", TempDimValue.GetFilter(Code));
-                    "Sheet Type"::Dimension6:
-                        SetDimTotalingFilter(TempSheetDefLine."Dimension 6 Totaling", TempDimValue.GetFilter(Code));
-                    "Sheet Type"::Dimension7:
-                        SetDimTotalingFilter(TempSheetDefLine."Dimension 7 Totaling", TempDimValue.GetFilter(Code));
-                    "Sheet Type"::Dimension8:
-                        SetDimTotalingFilter(TempSheetDefLine."Dimension 8 Totaling", TempDimValue.GetFilter(Code));
+                case DimPerspectiveName."Perspective Type" of
+                    "Dimension Perspective Type"::Dimension1:
+                        SetDimTotalingFilter(TempDimPerspectiveLine."Dimension 1 Totaling", TempDimValue.GetFilter(Code));
+                    "Dimension Perspective Type"::Dimension2:
+                        SetDimTotalingFilter(TempDimPerspectiveLine."Dimension 2 Totaling", TempDimValue.GetFilter(Code));
+                    "Dimension Perspective Type"::Dimension3:
+                        SetDimTotalingFilter(TempDimPerspectiveLine."Dimension 3 Totaling", TempDimValue.GetFilter(Code));
+                    "Dimension Perspective Type"::Dimension4:
+                        SetDimTotalingFilter(TempDimPerspectiveLine."Dimension 4 Totaling", TempDimValue.GetFilter(Code));
+                    "Dimension Perspective Type"::Dimension5:
+                        SetDimTotalingFilter(TempDimPerspectiveLine."Dimension 5 Totaling", TempDimValue.GetFilter(Code));
+                    "Dimension Perspective Type"::Dimension6:
+                        SetDimTotalingFilter(TempDimPerspectiveLine."Dimension 6 Totaling", TempDimValue.GetFilter(Code));
+                    "Dimension Perspective Type"::Dimension7:
+                        SetDimTotalingFilter(TempDimPerspectiveLine."Dimension 7 Totaling", TempDimValue.GetFilter(Code));
+                    "Dimension Perspective Type"::Dimension8:
+                        SetDimTotalingFilter(TempDimPerspectiveLine."Dimension 8 Totaling", TempDimValue.GetFilter(Code));
                 end;
-                TempSheetDefLine.Insert();
+                TempDimPerspectiveLine.Insert();
             until DimValue.Next() = 0;
     end;
 
@@ -99,37 +99,37 @@ codeunit 8367 SheetDefDimension implements ISheetDefinition
         DimTotaling := CopyStr(FilterText, 1, MaxStrLen(DimTotaling));
     end;
 
-    procedure FilterGLEntryBySheetTotaling(SheetDefLine: Record "Sheet Definition Line"; var GLEntry: Record "G/L Entry")
+    procedure FilterGLEntryByPerspectiveTotaling(DimPerspectiveLine: Record "Dimension Perspective Line"; var GLEntry: Record "G/L Entry")
     begin
-        SheetDefMgt.FilterGLEntryByDimension(SheetDefLine, GLEntry);
+        DimPerspectiveMgt.FilterGLEntryByDimension(DimPerspectiveLine, GLEntry);
     end;
 
-    procedure FilterGLBudgetEntryBySheetTotaling(SheetDefLine: Record "Sheet Definition Line"; var GLBudgetEntry: Record "G/L Budget Entry")
+    procedure FilterGLBudgetEntryByPerspectiveTotaling(DimPerspectiveLine: Record "Dimension Perspective Line"; var GLBudgetEntry: Record "G/L Budget Entry")
     begin
-        SheetDefMgt.FilterGLBudgetEntryByDimension(SheetDefLine, GLBudgetEntry);
+        DimPerspectiveMgt.FilterGLBudgetEntryByDimension(DimPerspectiveLine, GLBudgetEntry);
     end;
 
-    procedure FilterCFEntryBySheetTotaling(SheetDefLine: Record "Sheet Definition Line"; var CFForecastEntry: Record "Cash Flow Forecast Entry")
+    procedure FilterCFEntryByPerspectiveTotaling(DimPerspectiveLine: Record "Dimension Perspective Line"; var CFForecastEntry: Record "Cash Flow Forecast Entry")
     begin
-        SheetDefMgt.FilterCFEntryByDimension(SheetDefLine, CFForecastEntry);
+        DimPerspectiveMgt.FilterCFEntryByDimension(DimPerspectiveLine, CFForecastEntry);
     end;
 
-    procedure FilterAnalysisViewEntryBySheetTotaling(SheetDefLine: Record "Sheet Definition Line"; var AnalysisViewEntry: Record "Analysis View Entry")
+    procedure FilterAnalysisViewEntryByPerspectiveTotaling(DimPerspectiveLine: Record "Dimension Perspective Line"; var AnalysisViewEntry: Record "Analysis View Entry")
     begin
-        SheetDefMgt.FilterAnalysisViewEntryByDimension(SheetDefLine, AnalysisViewEntry);
+        DimPerspectiveMgt.FilterAnalysisViewEntryByDimension(DimPerspectiveLine, AnalysisViewEntry);
     end;
 
-    procedure FilterAnalysisViewBudgetEntryBySheetTotaling(SheetDefLine: Record "Sheet Definition Line"; var AnalysisViewBudgetEntry: Record "Analysis View Budget Entry")
+    procedure FilterAnalysisViewBudgetEntryByPerspectiveTotaling(DimPerspectiveLine: Record "Dimension Perspective Line"; var AnalysisViewBudgetEntry: Record "Analysis View Budget Entry")
     begin
-        SheetDefMgt.FilterAnalysisViewBudgetEntryByDimension(SheetDefLine, AnalysisViewBudgetEntry);
+        DimPerspectiveMgt.FilterAnalysisViewBudgetEntryByDimension(DimPerspectiveLine, AnalysisViewBudgetEntry);
     end;
 
-    procedure SheetTypeToText(SheetDefName: Record "Sheet Definition Name"; Type: Enum "Sheet Type"; var Text: Text): Boolean
+    procedure PerspectiveTypeToText(DimPerspectiveName: Record "Dimension Perspective Name"; Type: Enum "Dimension Perspective Type"; var Text: Text): Boolean
     var
         AnalysisView: Record "Analysis View";
         GLSetup: Record "General Ledger Setup";
     begin
-        if SheetDefName."Analysis View Name" = '' then begin
+        if DimPerspectiveName."Analysis View Name" = '' then begin
             GLSetup.Get();
             case Type of
                 Type::Dimension1:
@@ -152,7 +152,7 @@ codeunit 8367 SheetDefDimension implements ISheetDefinition
                     exit(false);
             end;
         end else begin
-            AnalysisView.Get(SheetDefName."Analysis View Name");
+            AnalysisView.Get(DimPerspectiveName."Analysis View Name");
             case Type of
                 Type::Dimension1:
                     Text := AnalysisView."Dimension 1 Code";
@@ -170,12 +170,12 @@ codeunit 8367 SheetDefDimension implements ISheetDefinition
         exit(true);
     end;
 
-    procedure TextToSheetType(SheetDefName: Record "Sheet Definition Name"; Text: Text; var Type: Enum "Sheet Type"): Boolean
+    procedure TextToPerspectiveType(DimPerspectiveName: Record "Dimension Perspective Name"; Text: Text; var Type: Enum "Dimension Perspective Type"): Boolean
     var
         AnalysisView: Record "Analysis View";
         GLSetup: Record "General Ledger Setup";
     begin
-        if SheetDefName."Analysis View Name" = '' then begin
+        if DimPerspectiveName."Analysis View Name" = '' then begin
             GLSetup.Get();
             case Text of
                 GLSetup."Global Dimension 1 Code":
@@ -198,7 +198,7 @@ codeunit 8367 SheetDefDimension implements ISheetDefinition
                     exit(false);
             end;
         end else begin
-            AnalysisView.Get(SheetDefName."Analysis View Name");
+            AnalysisView.Get(DimPerspectiveName."Analysis View Name");
             case Text of
                 AnalysisView."Dimension 1 Code":
                     Type := Type::Dimension1;
@@ -216,52 +216,52 @@ codeunit 8367 SheetDefDimension implements ISheetDefinition
         exit(true);
     end;
 
-    procedure InsertBufferForSheetTotalingLookup(SheetDefName: Record "Sheet Definition Name"; Type: Enum "Sheet Type"; var DimSelection: Page "Dimension Selection")
+    procedure InsertBufferForPerspectiveTotalingLookup(DimPerspectiveName: Record "Dimension Perspective Name"; Type: Enum "Dimension Perspective Type"; var DimSelection: Page "Dimension Selection")
     var
         AnalysisView: Record "Analysis View";
         GLSetup: Record "General Ledger Setup";
     begin
-        if SheetDefName."Analysis View Name" = '' then begin
+        if DimPerspectiveName."Analysis View Name" = '' then begin
             GLSetup.Get();
             case Type of
-                "Sheet Type"::Dimension1:
+                "Dimension Perspective Type"::Dimension1:
                     if GLSetup."Global Dimension 1 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, GLSetup."Global Dimension 1 Code", '');
-                "Sheet Type"::Dimension2:
+                "Dimension Perspective Type"::Dimension2:
                     if GLSetup."Global Dimension 2 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, GLSetup."Global Dimension 2 Code", '');
-                "Sheet Type"::Dimension3:
+                "Dimension Perspective Type"::Dimension3:
                     if GLSetup."Shortcut Dimension 3 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, GLSetup."Shortcut Dimension 3 Code", '');
-                "Sheet Type"::Dimension4:
+                "Dimension Perspective Type"::Dimension4:
                     if GLSetup."Shortcut Dimension 4 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, GLSetup."Shortcut Dimension 4 Code", '');
-                "Sheet Type"::Dimension5:
+                "Dimension Perspective Type"::Dimension5:
                     if GLSetup."Shortcut Dimension 5 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, GLSetup."Shortcut Dimension 5 Code", '');
-                "Sheet Type"::Dimension6:
+                "Dimension Perspective Type"::Dimension6:
                     if GLSetup."Shortcut Dimension 6 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, GLSetup."Shortcut Dimension 6 Code", '');
-                "Sheet Type"::Dimension7:
+                "Dimension Perspective Type"::Dimension7:
                     if GLSetup."Shortcut Dimension 7 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, GLSetup."Shortcut Dimension 7 Code", '');
-                "Sheet Type"::Dimension8:
+                "Dimension Perspective Type"::Dimension8:
                     if GLSetup."Shortcut Dimension 8 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, GLSetup."Shortcut Dimension 8 Code", '');
             end;
         end else begin
-            AnalysisView.Get(SheetDefName."Analysis View Name");
+            AnalysisView.Get(DimPerspectiveName."Analysis View Name");
             case Type of
-                "Sheet Type"::Dimension1:
+                "Dimension Perspective Type"::Dimension1:
                     if AnalysisView."Dimension 1 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, AnalysisView."Dimension 1 Code", '');
-                "Sheet Type"::Dimension2:
+                "Dimension Perspective Type"::Dimension2:
                     if AnalysisView."Dimension 2 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, AnalysisView."Dimension 2 Code", '');
-                "Sheet Type"::Dimension3:
+                "Dimension Perspective Type"::Dimension3:
                     if AnalysisView."Dimension 3 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, AnalysisView."Dimension 3 Code", '');
-                "Sheet Type"::Dimension4:
+                "Dimension Perspective Type"::Dimension4:
                     if AnalysisView."Dimension 4 Code" <> '' then
                         DimSelection.InsertDimSelBuf(false, AnalysisView."Dimension 4 Code", '');
             end;

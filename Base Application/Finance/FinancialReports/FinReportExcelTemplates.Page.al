@@ -103,7 +103,7 @@ page 773 "Fin. Report Excel Templates"
                 begin
                     ExportAccSchedToExcel.SetOptions(
                         this.AccScheduleLine, this.TempFinancialReport."Financial Report Column Group", this.TempFinancialReport.UseAmountsInAddCurrency,
-                        this.TempFinancialReport.Name, this.TempFinancialReport.SheetDefinition);
+                        this.TempFinancialReport.Name, this.TempFinancialReport.DimPerspective);
                     ExportAccSchedToExcel.SetUseExistingTemplate(Rec);
                     ExportAccSchedToExcel.Run();
                 end;
@@ -154,7 +154,7 @@ page 773 "Fin. Report Excel Templates"
     begin
         ExportAccSchedToExcel.SetOptions(
             this.AccScheduleLine, this.TempFinancialReport."Financial Report Column Group", this.TempFinancialReport.UseAmountsInAddCurrency,
-            this.TempFinancialReport.Name, this.TempFinancialReport.SheetDefinition);
+            this.TempFinancialReport.Name, this.TempFinancialReport.DimPerspective);
         ExportAccSchedToExcel.SetSaveToStream(true);
         ExportAccSchedToExcel.RunModal();
         Rec.Template.CreateOutStream(OutStream);
